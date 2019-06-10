@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace Oxide.Plugins
 {
     [Info("Weapon Changer", "Orange", "1.1.2")]
-    [Description("https://rustworkshop.space/resources/weapon-changer.12/")]
+    [Description("")]
     public class WeaponChanger : RustPlugin
     {
         #region Oxide Hooks
