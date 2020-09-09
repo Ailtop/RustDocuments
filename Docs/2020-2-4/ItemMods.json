@@ -1,0 +1,1652 @@
+{
+  "hat.wolf": [
+    "ItemModWearable"
+  ],
+  "fogmachine": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "strobelight": [
+    "ItemModEntity"
+  ],
+  "minihelicopter.repair": [],
+  "scraptransportheli.repair": [],
+  "ammo.grenadelauncher.buckshot": [],
+  "ammo.grenadelauncher.he": [],
+  "ammo.grenadelauncher.smoke": [],
+  "arrow.hv": [],
+  "arrow.wooden": [],
+  "arrow.bone": [],
+  "arrow.fire": [],
+  "ammo.handmade.shell": [],
+  "ammo.nailgun.nails": [],
+  "ammo.pistol": [],
+  "ammo.pistol.fire": [],
+  "ammo.pistol.hv": [],
+  "ammo.rifle": [],
+  "ammo.rifle.explosive": [],
+  "ammo.rifle.incendiary": [],
+  "ammo.rifle.hv": [],
+  "ammo.rocket.basic": [],
+  "ammo.rocket.fire": [],
+  "ammo.rocket.hv": [],
+  "ammo.rocket.smoke": [],
+  "ammo.shotgun": [],
+  "ammo.shotgun.fire": [],
+  "ammo.shotgun.slug": [],
+  "door.double.hinged.metal": [
+    "ItemModEntity"
+  ],
+  "door.double.hinged.toptier": [
+    "ItemModEntity"
+  ],
+  "door.double.hinged.wood": [
+    "ItemModEntity"
+  ],
+  "door.hinged.metal": [
+    "ItemModEntity"
+  ],
+  "door.hinged.toptier": [
+    "ItemModEntity"
+  ],
+  "door.hinged.wood": [
+    "ItemModEntity"
+  ],
+  "floor.grill": [
+    "ItemModEntity"
+  ],
+  "floor.ladder.hatch": [
+    "ItemModEntity"
+  ],
+  "gates.external.high.stone": [
+    "ItemModEntity"
+  ],
+  "gates.external.high.wood": [
+    "ItemModEntity"
+  ],
+  "ladder.wooden.wall": [
+    "ItemModEntity"
+  ],
+  "wall.external.high.stone": [
+    "ItemModEntity"
+  ],
+  "wall.external.high": [
+    "ItemModEntity"
+  ],
+  "wall.frame.cell.gate": [
+    "ItemModEntity"
+  ],
+  "wall.frame.cell": [
+    "ItemModEntity"
+  ],
+  "wall.frame.fence.gate": [
+    "ItemModEntity"
+  ],
+  "wall.frame.fence": [
+    "ItemModEntity"
+  ],
+  "wall.frame.garagedoor": [
+    "ItemModEntity"
+  ],
+  "wall.frame.netting": [
+    "ItemModEntity"
+  ],
+  "wall.frame.shopfront": [
+    "ItemModEntity"
+  ],
+  "wall.frame.shopfront.metal": [
+    "ItemModEntity"
+  ],
+  "wall.window.bars.metal": [
+    "ItemModEntity"
+  ],
+  "wall.window.bars.toptier": [
+    "ItemModEntity"
+  ],
+  "wall.window.bars.wood": [
+    "ItemModEntity"
+  ],
+  "shutter.metal.embrasure.a": [
+    "ItemModEntity"
+  ],
+  "shutter.metal.embrasure.b": [
+    "ItemModEntity"
+  ],
+  "wall.window.glass.reinforced": [
+    "ItemModEntity"
+  ],
+  "shutter.wood.a": [
+    "ItemModEntity"
+  ],
+  "watchtower.wood": [
+    "ItemModEntity"
+  ],
+  "diving.fins": [
+    "ItemModWearable"
+  ],
+  "diving.mask": [
+    "ItemModWearable"
+  ],
+  "diving.tank": [
+    "ItemModWearable",
+    "ItemModRepair",
+    "ItemModCycle",
+    "ItemModGiveOxygen"
+  ],
+  "diving.wetsuit": [
+    "ItemModWearable"
+  ],
+  "boots.frog": [
+    "ItemModWearable"
+  ],
+  "barrelcostume": [
+    "ItemModWearable"
+  ],
+  "cratecostume": [
+    "ItemModWearable"
+  ],
+  "burlap.gloves.new": [
+    "ItemModWearable"
+  ],
+  "burlap.gloves": [
+    "ItemModWearable"
+  ],
+  "roadsign.gloves": [
+    "ItemModWearable"
+  ],
+  "tactical.gloves": [
+    "ItemModWearable"
+  ],
+  "femalearmpithair.style01": [
+    "ItemModWearable"
+  ],
+  "malearmpithair.style01": [
+    "ItemModWearable"
+  ],
+  "femaleeyebrow.style01": [
+    "ItemModWearable"
+  ],
+  "maleeyebrow.style01": [
+    "ItemModWearable"
+  ],
+  "facialhair.style01": [
+    "ItemModWearable"
+  ],
+  "male.facialhair.style02": [
+    "ItemModWearable"
+  ],
+  "male.facialhair.style03": [
+    "ItemModWearable"
+  ],
+  "male.facialhair.style04": [
+    "ItemModWearable"
+  ],
+  "female_hairstyle_01": [
+    "ItemModWearable"
+  ],
+  "male_hairstyle_01": [
+    "ItemModWearable"
+  ],
+  "female_hairstyle_02": [
+    "ItemModWearable"
+  ],
+  "male_hairstyle_02": [
+    "ItemModWearable"
+  ],
+  "female_hairstyle_03": [
+    "ItemModWearable"
+  ],
+  "male_hairstyle_03": [
+    "ItemModWearable"
+  ],
+  "male_hairstyle_04": [
+    "ItemModWearable"
+  ],
+  "female_hairstyle_05": [
+    "ItemModWearable"
+  ],
+  "male_hairstyle_05": [
+    "ItemModWearable"
+  ],
+  "femalepubichair.style01": [
+    "ItemModWearable"
+  ],
+  "malepubichair.style01": [
+    "ItemModWearable"
+  ],
+  "halloween.mummysuit": [
+    "ItemModWearable"
+  ],
+  "scarecrow.suit": [
+    "ItemModWearable"
+  ],
+  "scarecrowhead": [
+    "ItemModWearable"
+  ],
+  "attire.hide.helterneck": [
+    "ItemModWearable"
+  ],
+  "hat.beenie": [
+    "ItemModWearable"
+  ],
+  "hat.boonie": [
+    "ItemModWearable"
+  ],
+  "bucket.helmet": [
+    "ItemModWearable"
+  ],
+  "burlap.headwrap": [
+    "ItemModWearable"
+  ],
+  "hat.candle": [
+    "ItemModWearable",
+    "ItemModContainer",
+    "ItemModMenuOption",
+    "ItemModSwitchFlag",
+    "ItemModConditionHasFlag",
+    "ItemModConditionContainerFlag",
+    "ItemModConditionHasContents",
+    "ItemModConditionInWater",
+    "ItemModActionContainerChange",
+    "ItemModActionChange",
+    "ItemModCycle",
+    "ItemModUseContent"
+  ],
+  "hat.cap": [
+    "ItemModWearable"
+  ],
+  "clatter.helmet": [
+    "ItemModWearable"
+  ],
+  "coffeecan.helmet": [
+    "ItemModWearable"
+  ],
+  "deer.skull.mask": [
+    "ItemModWearable"
+  ],
+  "heavy.plate.helmet": [
+    "ItemModWearable"
+  ],
+  "hat.miner": [
+    "ItemModWearable",
+    "ItemModContainer",
+    "ItemModMenuOption",
+    "ItemModSwitchFlag",
+    "ItemModConditionHasFlag",
+    "ItemModConditionContainerFlag",
+    "ItemModConditionHasContents",
+    "ItemModActionContainerChange",
+    "ItemModActionChange",
+    "ItemModCycle",
+    "ItemModUseContent"
+  ],
+  "partyhat": [
+    "ItemModWearable"
+  ],
+  "riot.helmet": [
+    "ItemModWearable"
+  ],
+  "wood.armor.helmet": [
+    "ItemModWearable"
+  ],
+  "hoodie": [
+    "ItemModWearable"
+  ],
+  "bone.armor.suit": [
+    "ItemModWearable"
+  ],
+  "heavy.plate.jacket": [
+    "ItemModWearable"
+  ],
+  "jacket.snow": [
+    "ItemModWearable"
+  ],
+  "jacket": [
+    "ItemModWearable"
+  ],
+  "wood.armor.jacket": [
+    "ItemModWearable"
+  ],
+  "mask.balaclava": [
+    "ItemModWearable"
+  ],
+  "mask.bandana": [
+    "ItemModWearable"
+  ],
+  "metal.facemask": [
+    "ItemModWearable"
+  ],
+  "burlap.trousers": [
+    "ItemModWearable"
+  ],
+  "heavy.plate.pants": [
+    "ItemModWearable"
+  ],
+  "attire.hide.pants": [
+    "ItemModWearable"
+  ],
+  "roadsign.kilt": [
+    "ItemModWearable"
+  ],
+  "pants.shorts": [
+    "ItemModWearable"
+  ],
+  "wood.armor.pants": [
+    "ItemModWearable"
+  ],
+  "pants": [
+    "ItemModWearable"
+  ],
+  "attire.hide.poncho": [
+    "ItemModWearable"
+  ],
+  "burlap.shirt": [
+    "ItemModWearable"
+  ],
+  "shirt.collared": [
+    "ItemModWearable"
+  ],
+  "attire.hide.vest": [
+    "ItemModWearable"
+  ],
+  "shirt.tanktop": [
+    "ItemModWearable"
+  ],
+  "shoes.boots": [
+    "ItemModWearable"
+  ],
+  "burlap.shoes": [
+    "ItemModWearable"
+  ],
+  "attire.hide.boots": [
+    "ItemModWearable"
+  ],
+  "attire.hide.skirt": [
+    "ItemModWearable"
+  ],
+  "hazmatsuit": [
+    "ItemModWearable"
+  ],
+  "hazmatsuit_scientist": [
+    "ItemModWearable"
+  ],
+  "hazmatsuit_scientist_peacekeeper": [
+    "ItemModWearable"
+  ],
+  "scientistsuit_heavy": [
+    "ItemModWearable"
+  ],
+  "tshirt.long": [
+    "ItemModWearable"
+  ],
+  "tshirt": [
+    "ItemModWearable"
+  ],
+  "metal.plate.torso": [
+    "ItemModWearable"
+  ],
+  "roadsign.jacket": [
+    "ItemModWearable"
+  ],
+  "bleach": [],
+  "ducttape": [],
+  "fuse": [],
+  "gears": [],
+  "glue": [],
+  "metalblade": [],
+  "metalpipe": [],
+  "propanetank": [],
+  "roadsigns": [],
+  "rope": [],
+  "sewingkit": [],
+  "sheetmetal": [],
+  "metalspring": [],
+  "sticks": [],
+  "tarp": [],
+  "techparts": [],
+  "riflebody": [],
+  "semibody": [],
+  "smgbody": [],
+  "barricade.concrete": [
+    "ItemModEntity"
+  ],
+  "barricade.metal": [
+    "ItemModEntity"
+  ],
+  "barricade.sandbags": [
+    "ItemModEntity"
+  ],
+  "barricade.stone": [
+    "ItemModEntity"
+  ],
+  "barricade.wood": [
+    "ItemModEntity"
+  ],
+  "barricade.woodwire": [
+    "ItemModEntity"
+  ],
+  "bbq": [
+    "ItemModEntity"
+  ],
+  "trap.bear": [
+    "ItemModEntity"
+  ],
+  "bed": [
+    "ItemModEntity"
+  ],
+  "campfire": [
+    "ItemModEntity"
+  ],
+  "ceilinglight": [
+    "ItemModEntity"
+  ],
+  "chair": [
+    "ItemModEntity"
+  ],
+  "dropbox": [
+    "ItemModEntity"
+  ],
+  "fireplace.stone": [
+    "ItemModEntity"
+  ],
+  "firework.boomer.blue": [
+    "ItemModEntity"
+  ],
+  "firework.boomer.champagne": [
+    "ItemModEntity"
+  ],
+  "firework.boomer.green": [
+    "ItemModEntity"
+  ],
+  "firework.boomer.orange": [
+    "ItemModEntity"
+  ],
+  "firework.boomer.red": [
+    "ItemModEntity"
+  ],
+  "firework.boomer.violet": [
+    "ItemModEntity"
+  ],
+  "firework.romancandle.blue": [
+    "ItemModEntity"
+  ],
+  "firework.romancandle.green": [
+    "ItemModEntity"
+  ],
+  "firework.romancandle.red": [
+    "ItemModEntity"
+  ],
+  "firework.romancandle.violet": [
+    "ItemModEntity"
+  ],
+  "firework.volcano": [
+    "ItemModEntity"
+  ],
+  "firework.volcano.red": [
+    "ItemModEntity"
+  ],
+  "firework.volcano.violet": [
+    "ItemModEntity"
+  ],
+  "spikes.floor": [
+    "ItemModEntity"
+  ],
+  "fridge": [
+    "ItemModEntity"
+  ],
+  "furnace.large": [
+    "ItemModEntity"
+  ],
+  "furnace": [
+    "ItemModEntity"
+  ],
+  "hitchtroughcombo": [
+    "ItemModEntity"
+  ],
+  "habrepair": [],
+  "jackolantern.angry": [
+    "ItemModEntity"
+  ],
+  "jackolantern.happy": [
+    "ItemModEntity"
+  ],
+  "trap.landmine": [
+    "ItemModEntity"
+  ],
+  "lantern": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "box.wooden.large": [
+    "ItemModEntity"
+  ],
+  "water.barrel": [
+    "ItemModEntity"
+  ],
+  "locker": [
+    "ItemModEntity"
+  ],
+  "mailbox": [
+    "ItemModEntity"
+  ],
+  "mining.pumpjack": [
+    "ItemModEntity"
+  ],
+  "small.oil.refinery": [
+    "ItemModEntity"
+  ],
+  "planter.large": [
+    "ItemModEntity"
+  ],
+  "planter.small": [
+    "ItemModEntity"
+  ],
+  "electric.audioalarm": [
+    "ItemModEntity"
+  ],
+  "electric.battery.rechargable.large": [
+    "ItemModEntity"
+  ],
+  "electric.battery.rechargable.medium": [
+    "ItemModEntity"
+  ],
+  "electric.battery.rechargable.small": [
+    "ItemModEntity"
+  ],
+  "electric.counter": [
+    "ItemModEntity"
+  ],
+  "electric.hbhfsensor": [
+    "ItemModEntity"
+  ],
+  "electric.laserdetector": [
+    "ItemModEntity"
+  ],
+  "electric.pressurepad": [
+    "ItemModEntity"
+  ],
+  "electric.doorcontroller": [
+    "ItemModEntity"
+  ],
+  "electric.andswitch": [
+    "ItemModEntity"
+  ],
+  "electric.blocker": [
+    "ItemModEntity"
+  ],
+  "electrical.branch": [
+    "ItemModEntity"
+  ],
+  "electrical.combiner": [
+    "ItemModEntity"
+  ],
+  "electrical.memorycell": [
+    "ItemModEntity"
+  ],
+  "electric.orswitch": [
+    "ItemModEntity"
+  ],
+  "electric.random.switch": [
+    "ItemModEntity"
+  ],
+  "electric.rf.broadcaster": [
+    "ItemModEntity"
+  ],
+  "electric.rf.receiver": [
+    "ItemModEntity"
+  ],
+  "electric.xorswitch": [
+    "ItemModEntity"
+  ],
+  "electric.fuelgenerator.small": [
+    "ItemModEntity"
+  ],
+  "electric.generator.small": [
+    "ItemModEntity"
+  ],
+  "electric.solarpanel.large": [
+    "ItemModEntity"
+  ],
+  "electric.igniter": [
+    "ItemModEntity"
+  ],
+  "electric.flasherlight": [
+    "ItemModEntity"
+  ],
+  "electric.simplelight": [
+    "ItemModEntity"
+  ],
+  "electric.sirenlight": [
+    "ItemModEntity"
+  ],
+  "electric.switch": [
+    "ItemModEntity"
+  ],
+  "electric.splitter": [
+    "ItemModEntity"
+  ],
+  "electric.teslacoil": [
+    "ItemModEntity"
+  ],
+  "electric.timer": [
+    "ItemModEntity"
+  ],
+  "electric.cabletunnel": [
+    "ItemModEntity"
+  ],
+  "mining.quarry": [
+    "ItemModEntity"
+  ],
+  "target.reactive": [
+    "ItemModEntity"
+  ],
+  "box.repair.bench": [
+    "ItemModEntity"
+  ],
+  "research.table": [
+    "ItemModEntity"
+  ],
+  "rug.bear": [
+    "ItemModEntity"
+  ],
+  "rug": [
+    "ItemModEntity"
+  ],
+  "searchlight": [
+    "ItemModEntity"
+  ],
+  "shelves": [
+    "ItemModEntity"
+  ],
+  "sign.hanging.banner.large": [
+    "ItemModEntity"
+  ],
+  "sign.hanging": [
+    "ItemModEntity"
+  ],
+  "sign.hanging.ornate": [
+    "ItemModEntity"
+  ],
+  "sign.pictureframe.landscape": [
+    "ItemModEntity"
+  ],
+  "sign.pictureframe.portrait": [
+    "ItemModEntity"
+  ],
+  "sign.pictureframe.tall": [
+    "ItemModEntity"
+  ],
+  "sign.pictureframe.xl": [
+    "ItemModEntity"
+  ],
+  "sign.pictureframe.xxl": [
+    "ItemModEntity"
+  ],
+  "sign.pole.banner.large": [
+    "ItemModEntity"
+  ],
+  "sign.post.double": [
+    "ItemModEntity"
+  ],
+  "sign.post.single": [
+    "ItemModEntity"
+  ],
+  "sign.post.town": [
+    "ItemModEntity"
+  ],
+  "sign.post.town.roof": [
+    "ItemModEntity"
+  ],
+  "sign.wooden.huge": [
+    "ItemModEntity"
+  ],
+  "sign.wooden.large": [
+    "ItemModEntity"
+  ],
+  "sign.wooden.medium": [
+    "ItemModEntity"
+  ],
+  "sign.wooden.small": [
+    "ItemModEntity"
+  ],
+  "guntrap": [
+    "ItemModEntity"
+  ],
+  "sleepingbag": [
+    "ItemModEntity"
+  ],
+  "stash.small": [
+    "ItemModEntity"
+  ],
+  "spinner.wheel": [
+    "ItemModEntity"
+  ],
+  "fishtrap.small": [
+    "ItemModEntity"
+  ],
+  "table": [
+    "ItemModEntity"
+  ],
+  "workbench1": [
+    "ItemModEntity"
+  ],
+  "workbench2": [
+    "ItemModEntity"
+  ],
+  "workbench3": [
+    "ItemModEntity"
+  ],
+  "cupboard.tool": [
+    "ItemModEntity"
+  ],
+  "tunalight": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "vending.machine": [
+    "ItemModEntity"
+  ],
+  "water.catcher.large": [
+    "ItemModEntity"
+  ],
+  "water.catcher.small": [
+    "ItemModEntity"
+  ],
+  "water.purifier": [
+    "ItemModEntity"
+  ],
+  "generator.wind.scrap": [
+    "ItemModEntity"
+  ],
+  "box.wooden": [
+    "ItemModEntity"
+  ],
+  "apple": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "apple.spoiled": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "black.raspberries": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "blueberries": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "botabag": [
+    "ItemModContainer",
+    "ItemModEntity"
+  ],
+  "cactusflesh": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "can.beans": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "can.tuna": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "chocholate": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "fish.cooked": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "fish.raw": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "fish.minnows": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "fish.troutsmall": [
+    "ItemModSwap",
+    "ItemModMenuOption"
+  ],
+  "granolabar": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "chicken.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "chicken.cooked": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "chicken.raw": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "chicken.spoiled": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "deermeat.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "deermeat.cooked": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "deermeat.raw": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "horsemeat.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "horsemeat.cooked": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "horsemeat.raw": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "humanmeat.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "humanmeat.cooked": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "humanmeat.raw": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "humanmeat.spoiled": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "bearmeat.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "bearmeat.cooked": [
+    "ItemModConsume",
+    "ItemModMenuOption",
+    "ItemModCookable"
+  ],
+  "bearmeat": [
+    "ItemModConsume",
+    "ItemModMenuOption",
+    "ItemModCookable"
+  ],
+  "wolfmeat.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "wolfmeat.cooked": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "wolfmeat.raw": [
+    "ItemModConsume",
+    "ItemModCookable",
+    "ItemModMenuOption"
+  ],
+  "wolfmeat.spoiled": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "meat.pork.burned": [
+    "ItemModConsume",
+    "ItemModMenuOption",
+    "ItemModCookable"
+  ],
+  "meat.pork.cooked": [
+    "ItemModConsume",
+    "ItemModMenuOption",
+    "ItemModCookable"
+  ],
+  "meat.boar": [
+    "ItemModConsume",
+    "ItemModMenuOption",
+    "ItemModCookable"
+  ],
+  "mushroom": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "jar.pickle": [
+    "ItemModConsumeChance",
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "smallwaterbottle": [
+    "ItemModContainer",
+    "ItemModEntity"
+  ],
+  "waterjug": [
+    "ItemModContainer",
+    "ItemModConsumeContents",
+    "ItemModMenuOption",
+    "ItemModEntity"
+  ],
+  "fun.bass": [
+    "ItemModEntity"
+  ],
+  "fun.cowbell": [
+    "ItemModEntity"
+  ],
+  "drumkit": [
+    "ItemModEntity"
+  ],
+  "fun.flute": [
+    "ItemModEntity"
+  ],
+  "fun.guitar": [
+    "ItemModEntity"
+  ],
+  "fun.jerrycanguitar": [
+    "ItemModEntity"
+  ],
+  "piano": [
+    "ItemModEntity"
+  ],
+  "fun.tambourine": [
+    "ItemModEntity"
+  ],
+  "fun.trumpet": [
+    "ItemModEntity"
+  ],
+  "fun.tuba": [
+    "ItemModEntity"
+  ],
+  "xylophone": [
+    "ItemModEntity"
+  ],
+  "door.key": [
+    "ItemModBurnable"
+  ],
+  "lock.key": [
+    "ItemModEntity"
+  ],
+  "lock.code": [
+    "ItemModEntity"
+  ],
+  "blueprintbase": [
+    "ItemModMenuOption",
+    "ItemModStudyBlueprint"
+  ],
+  "chineselantern": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "dragondoorknocker": [
+    "ItemModEntity"
+  ],
+  "hat.dragonmask": [
+    "ItemModWearable"
+  ],
+  "newyeargong": [
+    "ItemModEntity"
+  ],
+  "hat.ratmask": [
+    "ItemModWearable"
+  ],
+  "lunar.firecrackers": [
+    "ItemModEntity"
+  ],
+  "arcade.machine.chippy": [
+    "ItemModEntity"
+  ],
+  "door.closer": [
+    "ItemModEntity"
+  ],
+  "attire.bunnyears": [
+    "ItemModWearable"
+  ],
+  "attire.bunny.onesie": [
+    "ItemModWearable"
+  ],
+  "easterdoorwreath": [
+    "ItemModEntity"
+  ],
+  "easterbasket": [
+    "ItemModEntity"
+  ],
+  "rustige_egg_a": [
+    "ItemModEntity"
+  ],
+  "rustige_egg_b": [
+    "ItemModEntity"
+  ],
+  "easter.bronzeegg": [
+    "ItemModUpgrade",
+    "ItemModCrackOpen",
+    "ItemModUnwrap"
+  ],
+  "easter.goldegg": [
+    "ItemModCrackOpen",
+    "ItemModUnwrap"
+  ],
+  "easter.paintedeggs": [
+    "ItemModUpgrade"
+  ],
+  "easter.silveregg": [
+    "ItemModUpgrade",
+    "ItemModCrackOpen",
+    "ItemModUnwrap"
+  ],
+  "halloween.candy": [
+    "ItemModUpgrade",
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "largecandles": [
+    "ItemModEntity"
+  ],
+  "smallcandles": [
+    "ItemModEntity"
+  ],
+  "coffin.storage": [
+    "ItemModEntity"
+  ],
+  "cursedcauldron": [
+    "ItemModEntity"
+  ],
+  "gravestone": [
+    "ItemModEntity"
+  ],
+  "woodcross": [
+    "ItemModEntity"
+  ],
+  "wall.graveyard.fence": [
+    "ItemModEntity"
+  ],
+  "halloween.lootbag.large": [
+    "ItemModOpenLootBag",
+    "ItemModUnwrap"
+  ],
+  "halloween.lootbag.medium": [
+    "ItemModUpgrade",
+    "ItemModOpenLootBag",
+    "ItemModUnwrap"
+  ],
+  "halloween.lootbag.small": [
+    "ItemModUpgrade",
+    "ItemModOpenLootBag",
+    "ItemModUnwrap"
+  ],
+  "pumpkinbasket": [
+    "ItemModEntity"
+  ],
+  "scarecrow": [
+    "ItemModEntity"
+  ],
+  "skulldoorknocker": [
+    "ItemModEntity"
+  ],
+  "skull_fire_pit": [
+    "ItemModEntity"
+  ],
+  "spiderweb": [
+    "ItemModEntity"
+  ],
+  "spookyspeaker": [
+    "ItemModEntity"
+  ],
+  "halloween.surgeonsuit": [
+    "ItemModWearable"
+  ],
+  "note": [],
+  "skull.human": [
+    "ItemModSwap",
+    "ItemModMenuOption"
+  ],
+  "candycaneclub": [
+    "ItemModEntity",
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "xmas.lightstring": [
+    "ItemModEntity"
+  ],
+  "xmas.door.garland": [
+    "ItemModEntity"
+  ],
+  "candycane": [],
+  "giantcandycanedecor": [
+    "ItemModEntity"
+  ],
+  "giantlollipops": [
+    "ItemModEntity"
+  ],
+  "pookie.bear": [
+    "ItemModEntity"
+  ],
+  "xmas.lightstring.advanced": [
+    "ItemModEntity"
+  ],
+  "coal": [],
+  "xmas.present.large": [
+    "ItemModUnwrap"
+  ],
+  "xmas.present.medium": [
+    "ItemModUpgrade",
+    "ItemModUnwrap"
+  ],
+  "xmas.present.small": [
+    "ItemModUpgrade",
+    "ItemModUnwrap"
+  ],
+  "snowmachine": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "snowball": [
+    "ItemModEntity"
+  ],
+  "snowman": [
+    "ItemModEntity"
+  ],
+  "stocking.large": [
+    "ItemModEntity"
+  ],
+  "stocking.small": [
+    "ItemModEntity",
+    "ItemModUpgrade"
+  ],
+  "attire.reindeer.headband": [
+    "ItemModWearable"
+  ],
+  "santabeard": [
+    "ItemModWearable"
+  ],
+  "santahat": [
+    "ItemModWearable"
+  ],
+  "xmas.window.garland": [
+    "ItemModEntity"
+  ],
+  "wrappedgift": [
+    "ItemModContainer",
+    "ItemModOpenWrapped"
+  ],
+  "wrappingpaper": [
+    "ItemModContainer",
+    "ItemModWrap"
+  ],
+  "xmasdoorwreath": [
+    "ItemModEntity"
+  ],
+  "xmas.decoration.baubels": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.decoration.candycanes": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.decoration.gingerbreadmen": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.decoration.lights": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.decoration.pinecone": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.decoration.star": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.decoration.tinsel": [
+    "ItemModXMasTreeDecoration"
+  ],
+  "xmas.tree": [
+    "ItemModEntity"
+  ],
+  "autoturret": [
+    "ItemModEntity"
+  ],
+  "flameturret": [
+    "ItemModEntity"
+  ],
+  "gloweyes": [
+    "ItemModWearable"
+  ],
+  "ammo.rocket.sam": [],
+  "samsite": [
+    "ItemModEntity"
+  ],
+  "corn": [
+    "ItemModMenuOption",
+    "ItemModConsume"
+  ],
+  "clone.corn": [
+    "ItemModEntity"
+  ],
+  "seed.corn": [
+    "ItemModEntity"
+  ],
+  "clone.hemp": [
+    "ItemModEntity"
+  ],
+  "seed.hemp": [
+    "ItemModEntity"
+  ],
+  "pumpkin": [
+    "ItemModWearable",
+    "ItemModMenuOption",
+    "ItemModConsume"
+  ],
+  "clone.pumpkin": [
+    "ItemModEntity"
+  ],
+  "seed.pumpkin": [
+    "ItemModEntity"
+  ],
+  "fat.animal": [],
+  "battery.small": [],
+  "blood": [],
+  "bone.fragments": [],
+  "cctv.camera": [],
+  "charcoal": [],
+  "cloth": [
+    "ItemModXPWhenUsed"
+  ],
+  "crude.oil": [
+    "ItemModCookable"
+  ],
+  "diesel_barrel": [],
+  "can.beans.empty": [
+    "ItemModCookable"
+  ],
+  "can.tuna.empty": [
+    "ItemModCookable"
+  ],
+  "explosives": [],
+  "gunpowder": [],
+  "hq.metal.ore": [
+    "ItemModCookable"
+  ],
+  "metal.refined": [
+    "ItemModXPWhenUsed"
+  ],
+  "leather": [
+    "ItemModXPWhenUsed"
+  ],
+  "lowgradefuel": [
+    "ItemModBurnable"
+  ],
+  "metal.fragments": [
+    "ItemModXPWhenUsed"
+  ],
+  "metal.ore": [
+    "ItemModCookable"
+  ],
+  "paper": [],
+  "researchpaper": [],
+  "water.salt": [
+    "ItemModConsume"
+  ],
+  "scrap": [],
+  "stones": [
+    "ItemModXPWhenUsed"
+  ],
+  "sulfur.ore": [
+    "ItemModCookable"
+  ],
+  "sulfur": [
+    "ItemModXPWhenUsed"
+  ],
+  "targeting.computer": [],
+  "water": [
+    "ItemModConsume"
+  ],
+  "skull.wolf": [
+    "ItemModSwap",
+    "ItemModMenuOption"
+  ],
+  "wood": [
+    "ItemModBurnable",
+    "ItemModXPWhenUsed"
+  ],
+  "antiradpills": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "tool.binoculars": [
+    "ItemModEntity"
+  ],
+  "explosive.timed": [
+    "ItemModEntity"
+  ],
+  "tool.camera": [
+    "ItemModEntity"
+  ],
+  "rf.detonator": [
+    "ItemModEntity"
+  ],
+  "fishingrod.handmade": [
+    "ItemModEntity"
+  ],
+  "flare": [
+    "ItemModEntity"
+  ],
+  "flashlight.held": [
+    "ItemModEntity"
+  ],
+  "geiger.counter": [
+    "ItemModEntity"
+  ],
+  "jackhammer": [
+    "ItemModEntity",
+    "ItemModRepair"
+  ],
+  "keycard_blue": [
+    "ItemModEntity",
+    "ItemModKeycard"
+  ],
+  "keycard_green": [
+    "ItemModEntity",
+    "ItemModKeycard"
+  ],
+  "keycard_red": [
+    "ItemModEntity",
+    "ItemModKeycard"
+  ],
+  "largemedkit": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "map": [
+    "ItemModEntity",
+    "ItemModContainerRestriction"
+  ],
+  "syringe.medical": [
+    "ItemModEntity"
+  ],
+  "rf_pager": [
+    "ItemModRFListener"
+  ],
+  "building.planner": [
+    "ItemModEntity"
+  ],
+  "grenade.smoke": [
+    "ItemModEntity"
+  ],
+  "supply.signal": [
+    "ItemModEntity"
+  ],
+  "surveycharge": [
+    "ItemModEntity"
+  ],
+  "wiretool": [
+    "ItemModEntity"
+  ],
+  "weapon.mod.8x.scope": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.flashlight": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.holosight": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.lasersight": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.muzzleboost": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.muzzlebrake": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.simplesight": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.silencer": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "weapon.mod.small.scope": [
+    "ItemModEntity",
+    "ItemModSound"
+  ],
+  "rifle.ak": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "bandage": [
+    "ItemModEntity"
+  ],
+  "grenade.beancan": [
+    "ItemModEntity"
+  ],
+  "rifle.bolt": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "bone.club": [
+    "ItemModEntity"
+  ],
+  "knife.bone": [
+    "ItemModEntity"
+  ],
+  "bow.hunting": [
+    "ItemModEntity"
+  ],
+  "cakefiveyear": [
+    "ItemModEntity",
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
+  "chainsaw": [
+    "ItemModEntity"
+  ],
+  "salvaged.cleaver": [
+    "ItemModEntity"
+  ],
+  "bow.compound": [
+    "ItemModEntity"
+  ],
+  "crossbow": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "shotgun.double": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pistol.eoka": [
+    "ItemModEntity"
+  ],
+  "grenade.f1": [
+    "ItemModEntity"
+  ],
+  "flamethrower": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "multiplegrenadelauncher": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "knife.butcher": [
+    "ItemModEntity"
+  ],
+  "pitchfork": [
+    "ItemModEntity"
+  ],
+  "sickle": [
+    "ItemModEntity"
+  ],
+  "hammer": [
+    "ItemModEntity"
+  ],
+  "hatchet": [
+    "ItemModEntity"
+  ],
+  "knife.combat": [
+    "ItemModEntity"
+  ],
+  "rifle.l96": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "rifle.lr300": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "lmg.m249": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "rifle.m39": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pistol.m92": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "mace": [
+    "ItemModEntity"
+  ],
+  "machete": [
+    "ItemModEntity"
+  ],
+  "smg.mp5": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pistol.nailgun": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pickaxe": [
+    "ItemModEntity"
+  ],
+  "shotgun.waterpipe": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pistol.python": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pistol.revolver": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "rock": [
+    "ItemModEntity"
+  ],
+  "rocket.launcher": [
+    "ItemModEntity"
+  ],
+  "axe.salvaged": [
+    "ItemModEntity"
+  ],
+  "hammer.salvaged": [
+    "ItemModEntity"
+  ],
+  "icepick.salvaged": [
+    "ItemModEntity"
+  ],
+  "explosive.satchel": [
+    "ItemModEntity"
+  ],
+  "shotgun.pump": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "pistol.semiauto": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "rifle.semiauto": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "smg.2": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "shotgun.spas12": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "stonehatchet": [
+    "ItemModEntity"
+  ],
+  "stone.pickaxe": [
+    "ItemModEntity"
+  ],
+  "spear.stone": [
+    "ItemModEntity"
+  ],
+  "longsword": [
+    "ItemModEntity"
+  ],
+  "salvaged.sword": [
+    "ItemModEntity"
+  ],
+  "smg.thompson": [
+    "ItemModEntity",
+    "ItemModContainer"
+  ],
+  "toolgun": [
+    "ItemModEntity"
+  ],
+  "torch": [
+    "ItemModEntity"
+  ],
+  "bucket.water": [
+    "ItemModEntity",
+    "ItemModContainer",
+    "ItemModMenuOption",
+    "ItemModConsumeContents"
+  ],
+  "spear.wooden": [
+    "ItemModEntity"
+  ],
+  "horse.armor.roadsign": [
+    "ItemModAnimalEquipment"
+  ],
+  "horse.armor.wood": [
+    "ItemModAnimalEquipment"
+  ],
+  "horse.saddlebag": [
+    "ItemModAnimalEquipment"
+  ],
+  "horse.shoes.advanced": [
+    "ItemModAnimalEquipment"
+  ],
+  "horse.shoes.basic": [
+    "ItemModAnimalEquipment"
+  ]
+}
