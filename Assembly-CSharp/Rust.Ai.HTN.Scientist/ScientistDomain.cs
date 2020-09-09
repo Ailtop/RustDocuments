@@ -2130,8 +2130,8 @@ namespace Rust.Ai.HTN.Scientist
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[SerializeField]
 		[Header("Context")]
+		[SerializeField]
 		private ScientistContext _context;
 
 		[ReadOnly]
@@ -2191,8 +2191,8 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[SerializeField]
 		[Header("Reasoners")]
+		[SerializeField]
 		[ReadOnly]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
@@ -2282,8 +2282,8 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 

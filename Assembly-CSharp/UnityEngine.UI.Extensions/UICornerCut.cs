@@ -5,8 +5,8 @@ namespace UnityEngine.UI.Extensions
 	{
 		public Vector2 cornerSize = new Vector2(16f, 16f);
 
-		[Header("Corners to cut")]
 		[SerializeField]
+		[Header("Corners to cut")]
 		private bool m_cutUL = true;
 
 		[SerializeField]
@@ -22,8 +22,8 @@ namespace UnityEngine.UI.Extensions
 		[SerializeField]
 		private bool m_makeColumns;
 
-		[Header("Color the cut bars differently")]
 		[SerializeField]
+		[Header("Color the cut bars differently")]
 		private bool m_useColorUp;
 
 		[SerializeField]

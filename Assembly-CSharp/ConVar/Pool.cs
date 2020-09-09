@@ -25,8 +25,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool enabled = true;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool debug = false;
 
 		[ServerVar]
@@ -54,8 +54,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void print_prefabs(Arg arg)
 		{
 			PrefabPoolCollection pool = GameManager.server.pool;

@@ -1,8 +1,8 @@
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
-[ExecuteInEditMode]
 [RequireComponent(typeof(MeshRenderer))]
+[ExecuteInEditMode]
 public class Impostor : MonoBehaviour, IClientComponent
 {
 	public ImpostorAsset asset;

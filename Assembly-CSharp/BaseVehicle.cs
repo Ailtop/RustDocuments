@@ -748,8 +748,8 @@ public class BaseVehicle : BaseMountable
 		return baseMountable;
 	}
 
-	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(5f)]
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

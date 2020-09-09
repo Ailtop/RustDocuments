@@ -167,19 +167,19 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public ProtectionProperties mortalProtection;
 
-	[SerializeField]
 	[Header("Spawn")]
+	[SerializeField]
 	public SpawnSettings spawnSettings;
 
-	[Header("Fuel")]
 	[SerializeField]
+	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[Header("Audio/FX")]
 	[SerializeField]
+	[Header("Audio/FX")]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]

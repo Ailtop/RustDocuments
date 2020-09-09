@@ -63,12 +63,12 @@ public class VehicleModuleSeating : BaseVehicleModule
 	[SerializeField]
 	private Seating seating;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 steerAngle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 accelAngle;
 
 	[HideInInspector]
@@ -83,8 +83,8 @@ public class VehicleModuleSeating : BaseVehicleModule
 	[HideInInspector]
 	private Vector3 fuelAngle;
 
-	[Header("Horn")]
 	[SerializeField]
+	[Header("Horn")]
 	private SoundDefinition hornLoop;
 
 	[SerializeField]

@@ -51,8 +51,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[ReadOnly]
 		public JunkPile Junkpile;
 
-		[ReadOnly]
 		[Header("Cover")]
+		[ReadOnly]
 		public CoverPointVolume CoverVolume;
 
 		[ReadOnly]

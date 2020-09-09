@@ -21,11 +21,11 @@ public class DamageRenderer : MonoBehaviour, IClientComponent
 	[SerializeField]
 	private List<Material> damageShowingMats;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<DamageShowingRenderer> damageShowingRenderers;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<GlassPane> damageShowingGlassRenderers;
 }

@@ -570,8 +570,8 @@ namespace Rust.Ai.HTN.NPCTurret
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private NPCTurretContext _context;
 
 		[ReadOnly]
@@ -580,8 +580,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -678,8 +678,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		public bool ReducedLongRangeAccuracy;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public bool BurstAtLongRange;
 
 		private HTNUtilityAiClient _aiClient;

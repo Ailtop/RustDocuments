@@ -15,8 +15,8 @@ namespace VLB
 
 		public bool forceSinglePass;
 
-		[HighlightNull]
 		[SerializeField]
+		[HighlightNull]
 		private Shader beamShader1Pass;
 
 		[HighlightNull]

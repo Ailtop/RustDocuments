@@ -257,8 +257,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		return base.HasSlot(slot);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (isLootable)

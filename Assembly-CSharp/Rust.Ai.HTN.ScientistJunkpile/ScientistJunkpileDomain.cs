@@ -2124,8 +2124,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[SerializeField]
 		private bool _isRegisteredWithAgency;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private static List<ScientistJunkpileDomain> _allJunkpileNPCs;
 
 		private Vector3 missOffset;
@@ -2160,8 +2160,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		private Vector3 _spawnPosition;
 
 		[SerializeField]
-		[ReadOnly]
 		[Header("Sensors")]
+		[ReadOnly]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2305,9 +2305,9 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
-		[ReadOnly]
-		[Header("Firearm Utility")]
 		[SerializeField]
+		[Header("Firearm Utility")]
+		[ReadOnly]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]

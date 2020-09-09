@@ -269,7 +269,7 @@ namespace ConVar
 		public static int maxpacketspersecond_command = 100;
 
 		[ServerVar]
-		public static int maxpacketsize_command = 1000000;
+		public static int maxpacketsize_command = 100000;
 
 		[ServerVar]
 		public static int maxpacketspersecond_tick = 300;
@@ -301,11 +301,11 @@ namespace ConVar
 		{
 			get
 			{
-				return (int)Facepunch.Network.Raknet.Server.MaxPacketsPerSecond;
+				return (int)Network.Server.MaxPacketsPerSecond;
 			}
 			set
 			{
-				Facepunch.Network.Raknet.Server.MaxPacketsPerSecond = (ulong)Mathf.Clamp(value, 1, 1000000);
+				Network.Server.MaxPacketsPerSecond = (ulong)Mathf.Clamp(value, 1, 1000000);
 			}
 		}
 
@@ -314,11 +314,11 @@ namespace ConVar
 		{
 			get
 			{
-				return Facepunch.Network.Raknet.Server.MaxPacketSize;
+				return Network.Server.MaxPacketSize;
 			}
 			set
 			{
-				Facepunch.Network.Raknet.Server.MaxPacketSize = Mathf.Clamp(value, 1, 1000000000);
+				Network.Server.MaxPacketSize = Mathf.Clamp(value, 1, 1000000000);
 			}
 		}
 

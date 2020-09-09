@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[640]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[643]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2066,6 +2066,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "projectile_anglechange",
+			Parent = "antihack",
+			FullName = "antihack.projectile_anglechange",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.projectile_anglechange.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_anglechange = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "projectile_clientframes",
 			Parent = "antihack",
 			FullName = "antihack.projectile_clientframes",
@@ -2153,6 +2166,32 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.projectile_trajectory = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "projectile_velocitychange",
+			Parent = "antihack",
+			FullName = "antihack.projectile_velocitychange",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.projectile_velocitychange.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_velocitychange = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "projectile_waterhits",
+			Parent = "antihack",
+			FullName = "antihack.projectile_waterhits",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.projectile_waterhits.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_waterhits = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

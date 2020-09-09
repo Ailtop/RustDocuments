@@ -1120,8 +1120,8 @@ namespace Rust.Ai.HTN.Bear
 			}
 		}
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isRegisteredWithAgency;
 
 		private static Vector3[] pathCornerCache = new Vector3[128];
@@ -1132,17 +1132,17 @@ namespace Rust.Ai.HTN.Bear
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private BearContext _context;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]

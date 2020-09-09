@@ -378,8 +378,8 @@ public class WireTool : HeldEntity
 	{
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -437,8 +437,8 @@ public class WireTool : HeldEntity
 		iOEntity2.SendNetworkUpdate();
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void AddLine(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

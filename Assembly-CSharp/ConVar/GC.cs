@@ -77,15 +77,15 @@ namespace ConVar
 			Rust.GC.Collect();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void unload()
 		{
 			Resources.UnloadUnusedAssets();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void alloc(Arg args)
 		{
 			byte[] array = new byte[args.GetInt(0, 1048576)];

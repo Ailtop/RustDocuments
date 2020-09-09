@@ -239,8 +239,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Use(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

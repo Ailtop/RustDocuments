@@ -151,8 +151,8 @@ public class SearchLight : IOEntity
 		return Mathf.Clamp(currentEnergy - base.ConsumptionAmount(), 0, currentEnergy);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_UseLight(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

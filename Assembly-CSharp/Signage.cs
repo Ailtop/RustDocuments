@@ -134,8 +134,8 @@ public class Signage : BaseCombatEntity, ILOD
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || UnityEngine.Time.realtimeSinceStartup - msg.player.lastSignUpdate < ConVar.AntiHack.signpause)
