@@ -1,0 +1,117 @@
+using ProtoBuf;
+using UnityEngine;
+
+public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
+{
+	public GameObjectRef entityPrefab;
+
+	protected virtual bool AllowNullParenting => false;
+
+	public override void OnItemCreated(Item item)
+	{
+		base.OnItemCreated(item);
+		if (item.instanceData == null)
+		{
+			BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, Vector3.zero);
+			baseEntity.Spawn();
+			item.instanceData = new ProtoBuf.Item.InstanceData();
+			item.instanceData.ShouldPool = false;
+			item.instanceData.subEntity = baseEntity.net.ID;
+			item.MarkDirty();
+		}
+	}
+
+	public override void OnRemove(Item item)
+	{
+		base.OnRemove(item);
+		T associatedEntity = GetAssociatedEntity(item);
+		if ((bool)(Object)associatedEntity)
+		{
+			associatedEntity.Kill();
+		}
+	}
+
+	public override void OnMovedToWorld(Item item)
+	{
+		UpdateParent(item);
+		base.OnMovedToWorld(item);
+	}
+
+	public override void OnRemovedFromWorld(Item item)
+	{
+		UpdateParent(item);
+		base.OnRemovedFromWorld(item);
+	}
+
+	public void UpdateParent(Item item)
+	{
+		BaseEntity entityForParenting = GetEntityForParenting(item);
+		if (entityForParenting == null)
+		{
+			if (AllowNullParenting)
+			{
+				T associatedEntity = GetAssociatedEntity(item);
+				if ((Object)associatedEntity != (Object)null)
+				{
+					associatedEntity.SetParent(null, false, true);
+				}
+			}
+		}
+		else if (entityForParenting.isServer && entityForParenting.IsFullySpawned())
+		{
+			T associatedEntity2 = GetAssociatedEntity(item);
+			if ((bool)(Object)associatedEntity2)
+			{
+				associatedEntity2.SetParent(entityForParenting, false, true);
+			}
+		}
+	}
+
+	public override void OnParentChanged(Item item)
+	{
+		base.OnParentChanged(item);
+		UpdateParent(item);
+	}
+
+	public BaseEntity GetEntityForParenting(Item item = null)
+	{
+		if (item != null)
+		{
+			BasePlayer ownerPlayer = item.GetOwnerPlayer();
+			if ((bool)ownerPlayer)
+			{
+				return ownerPlayer;
+			}
+			BaseEntity baseEntity = (item.parent == null) ? null : item.parent.entityOwner;
+			if (baseEntity != null)
+			{
+				return baseEntity;
+			}
+			BaseEntity worldEntity = item.GetWorldEntity();
+			if ((bool)worldEntity)
+			{
+				return worldEntity;
+			}
+			return null;
+		}
+		return null;
+	}
+
+	public T GetAssociatedEntity(Item item, bool isServer = true)
+	{
+		BaseNetworkable baseNetworkable = null;
+		if (item.instanceData == null)
+		{
+			return null;
+		}
+		if (isServer)
+		{
+			baseNetworkable = BaseNetworkable.serverEntities.Find(item.instanceData.subEntity);
+		}
+		if ((bool)baseNetworkable)
+		{
+			return baseNetworkable.GetComponent<T>();
+		}
+		return null;
+	}
+}

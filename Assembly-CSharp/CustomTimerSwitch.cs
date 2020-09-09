@@ -1,0 +1,85 @@
+#define UNITY_ASSERTIONS
+using ConVar;
+using Network;
+using System;
+using UnityEngine;
+using UnityEngine.Assertions;
+
+public class CustomTimerSwitch : TimerSwitch
+{
+	public GameObjectRef timerPanelPrefab;
+
+	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
+	{
+		using (TimeWarning.New("CustomTimerSwitch.OnRpcMessage"))
+		{
+			if (rpc == 1019813162 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player + " - SERVER_SetTime ");
+				}
+				using (TimeWarning.New("SERVER_SetTime"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(1019813162u, "SERVER_SetTime", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							SERVER_SetTime(msg2);
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in SERVER_SetTime");
+					}
+				}
+				return true;
+			}
+		}
+		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void UpdateFromInput(int inputAmount, int inputSlot)
+	{
+		base.UpdateFromInput(inputAmount, inputSlot);
+		if (inputAmount > 0 && inputSlot == 1)
+		{
+			SwitchPressed();
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	public void SERVER_SetTime(RPCMessage msg)
+	{
+		if (CanPlayerAdmin(msg.player))
+		{
+			int num = msg.read.Int32();
+			timerLength = num;
+			SendNetworkUpdate();
+		}
+	}
+
+	public bool CanPlayerAdmin(BasePlayer player)
+	{
+		if (player != null && player.CanBuild())
+		{
+			return !IsOn();
+		}
+		return false;
+	}
+}
