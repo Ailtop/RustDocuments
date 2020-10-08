@@ -236,8 +236,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public class JunkpileTimeBlockNavigationEffect : EffectBase<ScientistJunkpileContext>
 		{
-			[ApexSerialization]
 			[FriendlyName("Time (Seconds)")]
+			[ApexSerialization]
 			public float Time;
 
 			public override void Apply(ScientistJunkpileContext context, bool fromPlanner, bool temporary)
@@ -2124,8 +2124,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[SerializeField]
 		private bool _isRegisteredWithAgency;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private static List<ScientistJunkpileDomain> _allJunkpileNPCs;
 
 		private Vector3 missOffset;
@@ -2151,17 +2151,17 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		private ScientistJunkpileContext _context;
 
 		[Header("Navigation")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
 		[SerializeField]
-		[Header("Sensors")]
 		[ReadOnly]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2306,16 +2306,16 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		};
 
 		[SerializeField]
-		[Header("Firearm Utility")]
 		[ReadOnly]
+		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isFiring;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;

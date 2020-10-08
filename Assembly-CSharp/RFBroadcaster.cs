@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using ConVar;
 using Network;
+using Oxide.Core;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -87,23 +88,26 @@ public class RFBroadcaster : IOEntity, IRFObject
 	{
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerSetFrequency(RPCMessage msg)
 	{
 		if (!(msg.player == null) && msg.player.CanBuild() && playerUsable && !(UnityEngine.Time.time < nextChangeTime))
 		{
 			nextChangeTime = UnityEngine.Time.time + 2f;
-			int newFrequency = msg.read.Int32();
-			if (RFManager.IsReserved(newFrequency))
+			int num = msg.read.Int32();
+			if (RFManager.IsReserved(num))
 			{
 				RFManager.ReserveErrorPrint(msg.player);
-				return;
 			}
-			RFManager.ChangeFrequency(frequency, newFrequency, this, false, IsPowered());
-			frequency = newFrequency;
-			MarkDirty();
-			SendNetworkUpdate();
+			else if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) == null)
+			{
+				RFManager.ChangeFrequency(frequency, num, this, false, IsPowered());
+				frequency = num;
+				MarkDirty();
+				SendNetworkUpdate();
+				Interface.CallHook("OnRfFrequencyChanged", this, num, msg.player);
+			}
 		}
 	}
 

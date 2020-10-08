@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GenerateRoadTopology : ProceduralComponent
@@ -25,9 +26,12 @@ public class GenerateRoadTopology : ProceduralComponent
 			item.ResetTrims();
 			heightMap.Push();
 			item.AdjustTerrainHeight();
-			item.AdjustTerrainTexture();
-			item.AdjustTerrainTopology();
 			heightMap.Pop();
+		}
+		foreach (PathList item2 in roads.AsEnumerable().Reverse())
+		{
+			item2.AdjustTerrainTexture();
+			item2.AdjustTerrainTopology();
 		}
 		MarkRoadside();
 		TerrainMeta.PlacementMap.Reset();

@@ -1,5 +1,6 @@
 using ConVar;
 using Oxide.Core;
+using Rust;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -119,6 +120,26 @@ public class BaseBoat : BaseVehicle
 		}
 	}
 
+	public void BaseBoatDecay(float decayTickRate, float timeSinceLastUsed, float outsideDecayMinutes, float deepWaterDecayMinutes)
+	{
+		if (!(timeSinceLastUsed < 2700f))
+		{
+			float overallWaterDepth = WaterLevel.GetOverallWaterDepth(base.transform.position);
+			float num = IsOutside() ? outsideDecayMinutes : float.PositiveInfinity;
+			if (overallWaterDepth > 4f)
+			{
+				float t = Mathf.InverseLerp(4f, 12f, overallWaterDepth);
+				float num2 = Mathf.Lerp(0.1f, 1f, t);
+				num = Mathf.Min(num, deepWaterDecayMinutes / num2);
+			}
+			if (!float.IsPositiveInfinity(num))
+			{
+				float num3 = decayTickRate / 60f / num;
+				Hurt(MaxHealth() * num3, DamageType.Decay, this, false);
+			}
+		}
+	}
+
 	public virtual bool EngineInWater()
 	{
 		return TerrainMeta.WaterMap.GetHeight(thrustPoint.position) > thrustPoint.position.y;
@@ -135,7 +156,7 @@ public class BaseBoat : BaseVehicle
 
 	public static float GetWaterDepth(Vector3 pos)
 	{
-		if (!Application.isPlaying || TerrainMeta.WaterMap == null)
+		if (!UnityEngine.Application.isPlaying || TerrainMeta.WaterMap == null)
 		{
 			RaycastHit hitInfo;
 			if (!UnityEngine.Physics.Raycast(pos, Vector3.down, out hitInfo, 100f, 8388608))

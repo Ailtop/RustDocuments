@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 public class GenerateRiverTopology : ProceduralComponent
 {
@@ -10,10 +11,13 @@ public class GenerateRiverTopology : ProceduralComponent
 		foreach (PathList item in rivers)
 		{
 			item.AdjustTerrainHeight();
-			item.AdjustTerrainTexture();
-			item.AdjustTerrainTopology();
 		}
 		heightMap.Pop();
+		foreach (PathList item2 in rivers.AsEnumerable().Reverse())
+		{
+			item2.AdjustTerrainTexture();
+			item2.AdjustTerrainTopology();
+		}
 		MarkRiverside();
 	}
 

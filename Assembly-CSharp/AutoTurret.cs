@@ -386,6 +386,11 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public virtual bool CanControl()
 	{
+		object obj = Interface.CallHook("OnEntityControl", this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		return false;
 	}
 
@@ -614,8 +619,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void FlipAim(RPCMessage rpc)
 	{
 		if (!IsOnline() && IsAuthed(rpc.player) && !booting)
@@ -625,8 +630,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
 		if (!IsOnline() && rpc.player.CanBuild() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
@@ -1287,7 +1292,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	public override void OnAttacked(HitInfo info)
 	{
 		base.OnAttacked(info);
-		if (((IsOnline() && !HasTarget()) || !targetVisible) && !(info.Initiator as AutoTurret != null) && !(info.Initiator as SamSite != null))
+		if (((IsOnline() && !HasTarget()) || !targetVisible) && !(info.Initiator as AutoTurret != null) && !(info.Initiator as SamSite != null) && !(info.Initiator as GunTrap != null))
 		{
 			BasePlayer basePlayer = info.Initiator as BasePlayer;
 			if (!basePlayer || !IsAuthed(basePlayer))

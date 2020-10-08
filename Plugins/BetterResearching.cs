@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Better Researching", "Arainrr", "1.1.1")]
+    [Info("Better Researching", "Arainrr", "1.1.2")]
     [Description("Modify research time, cost, chance")]
     public class BetterResearching : RustPlugin
     {
@@ -175,10 +175,10 @@ namespace Oxide.Plugins
                             return;
                         }
 
-                        HashSet<BasePlayer> players;
-                        if (lootingPlayers.TryGetValue(researchTable, out players))
+                        HashSet<BasePlayer> looters;
+                        if (lootingPlayers.TryGetValue(researchTable, out looters))
                         {
-                            foreach (var p in players)
+                            foreach (var p in looters)
                             {
                                 CreateResearchUI(p, timeLeft.ToString("0.00"), configData.uiS.researchTimeleftTextSize);
                             }
@@ -237,15 +237,15 @@ namespace Oxide.Plugins
         private void OnLootEntity(BasePlayer player, ResearchTable researchTable)
         {
             if (player == null || researchTable == null) return;
-            HashSet<BasePlayer> players;
-            if (!lootingPlayers.TryGetValue(researchTable, out players))
+            HashSet<BasePlayer> looters;
+            if (!lootingPlayers.TryGetValue(researchTable, out looters))
             {
-                players = new HashSet<BasePlayer> { player };
-                lootingPlayers.Add(researchTable, players);
+                looters = new HashSet<BasePlayer> { player };
+                lootingPlayers.Add(researchTable, looters);
             }
             else
             {
-                players.Add(player);
+                looters.Add(player);
             }
             UpdateUI(researchTable.inventory, null);
         }
@@ -284,10 +284,10 @@ namespace Oxide.Plugins
             if (researchTable == null) return;
             int scrapAmount = 0;
             bool flag = CanResearch(researchTable, ref scrapAmount);
-            HashSet<BasePlayer> players;
-            if (lootingPlayers.TryGetValue(researchTable, out players))
+            HashSet<BasePlayer> looters;
+            if (lootingPlayers.TryGetValue(researchTable, out looters))
             {
-                foreach (var player in players)
+                foreach (var player in looters)
                 {
                     CreateCostUI(player, scrapAmount);
                     if (!researchTable.IsResearching())
@@ -428,7 +428,7 @@ namespace Oxide.Plugins
 
         public class UI
         {
-            public static CuiElementContainer CreateElementContainer(string parent, string panelName, string backgroundColor, string anchorMin, string anchorMax, bool cursor = false)
+            public static CuiElementContainer CreateElementContainer(string parent, string panelName, string backgroundColor, string anchorMin, string anchorMax, string offsetMin, string offsetMax, bool cursor = false)
             {
                 return new CuiElementContainer()
                 {
@@ -436,11 +436,9 @@ namespace Oxide.Plugins
                         new CuiPanel
                         {
                             Image = { Color = backgroundColor },
-                            RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
+                            RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax ,OffsetMin = offsetMin,OffsetMax = offsetMax},
                             CursorEnabled = cursor
-                        },
-                        new CuiElement().Parent = parent,
-                        panelName
+                        },  parent,  panelName
                     }
                 };
             }
@@ -468,20 +466,20 @@ namespace Oxide.Plugins
         private static void CreateResearchUI(BasePlayer player, string message = "", int fontSize = 0)
         {
             if (player == null) return;
-            CuiHelper.DestroyUi(player, UINAME_RESEARCH);
-            var container = UI.CreateElementContainer("Overlay", UINAME_RESEARCH, instance.configData.uiS.researchBackgroundColor, instance.configData.uiS.researchAnchorMin, instance.configData.uiS.researchAnchorMax);
+            var container = UI.CreateElementContainer("Overlay", UINAME_RESEARCH, instance.configData.uiS.researchBackgroundColor, "0.5 0", "0.5 0", "436 116", "565 148");
             if (string.IsNullOrEmpty(message)) UI.CreateButton(ref container, UINAME_RESEARCH, "0 0 0 0", "ResearchUI_DoResearch", instance.configData.uiS.researchTextColor, instance.Lang("CanResearch", player.UserIDString), instance.configData.uiS.researchTextSize, "0 0", "1 1");
             else UI.CreateLabel(ref container, UINAME_RESEARCH, instance.configData.uiS.researchTextColor, message, fontSize == 0 ? instance.configData.uiS.researchTextSize : fontSize, "0 0", "1 1");
+            CuiHelper.DestroyUi(player, UINAME_RESEARCH);
             CuiHelper.AddUi(player, container);
         }
 
         private static void CreateCostUI(BasePlayer player, int scrapAmount)
         {
             if (player == null) return;
-            CuiHelper.DestroyUi(player, UINAME_COST);
             string message = scrapAmount > 0 ? scrapAmount.ToString() : "N/A";
-            var container = UI.CreateElementContainer("Overlay", UINAME_COST, instance.configData.uiS.researchCostBackgroundColor, instance.configData.uiS.researchCostAnchorMin, instance.configData.uiS.researchCostAnchorMax);
+            var container = UI.CreateElementContainer("Overlay", UINAME_COST, instance.configData.uiS.researchCostBackgroundColor, "0.5 0", "0.5 0", "445 292", "572 372");
             UI.CreateLabel(ref container, UINAME_COST, instance.configData.uiS.researchCostTextColor, message, instance.configData.uiS.researchCostTextSize, "0 0", "1 1");
+            CuiHelper.DestroyUi(player, UINAME_COST);
             CuiHelper.AddUi(player, container);
         }
 
@@ -691,16 +689,16 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Research Settings")]
             public Dictionary<string, ResearchSettings> researchS = new Dictionary<string, ResearchSettings>();
 
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version = new VersionNumber(1, 1, 1);
+
             public class ChatSettings
             {
                 [JsonProperty(PropertyName = "Use PopupNotifications")]
                 public bool usePop;
 
                 [JsonProperty(PropertyName = "Chat Prefix")]
-                public string prefix = "[BetterResearching]: ";
-
-                [JsonProperty(PropertyName = "Chat Prefix Color")]
-                public string prefixColor = "#00FFFF";
+                public string prefix = "<color=#00FFFF>[BetterResearching]</color>: ";
 
                 [JsonProperty(PropertyName = "Chat SteamID Icon")]
                 public ulong steamIDIcon;
@@ -708,12 +706,6 @@ namespace Oxide.Plugins
 
             public class UISettings
             {
-                [JsonProperty(PropertyName = "Research - Box - Min Anchor (in Rust Window)")]
-                public string researchAnchorMin = "0.84 0.161";
-
-                [JsonProperty(PropertyName = "Research - Box - Max Anchor (in Rust Window)")]
-                public string researchAnchorMax = "0.94 0.204";
-
                 [JsonProperty(PropertyName = "Research - Box - Background Color")]
                 public string researchBackgroundColor = "0.42 0.52 0.25 0.98";
 
@@ -725,12 +717,6 @@ namespace Oxide.Plugins
 
                 [JsonProperty(PropertyName = "Research - Text - Timeleft Text Size")]
                 public int researchTimeleftTextSize = 26;
-
-                [JsonProperty(PropertyName = "ResearchCost - Box - Min Anchor (in Rust Window)")]
-                public string researchCostAnchorMin = "0.847 0.4055";
-
-                [JsonProperty(PropertyName = "ResearchCost - Box - Max Anchor (in Rust Window)")]
-                public string researchCostAnchorMax = "0.947 0.515";
 
                 [JsonProperty(PropertyName = "ResearchCost - Box - Background Color")]
                 public string researchCostBackgroundColor = "0 0 0 0.98";
@@ -783,7 +769,13 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
             catch
             {
@@ -800,6 +792,21 @@ namespace Oxide.Plugins
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= new VersionNumber(1, 1, 1))
+                {
+                    if (configData.chatS.prefix == "[BetterResearching]: ")
+                    {
+                        configData.chatS.prefix = "<color=#00FFFF>[BetterResearching]</color>: ";
+                    }
+                }
+                configData.version = Version;
+            }
+        }
 
         #endregion ConfigurationFile
 
@@ -838,7 +845,7 @@ namespace Oxide.Plugins
 
         #region LanguageFile
 
-        private void Print(BasePlayer player, string message) => Player.Message(player, message, $"<color={configData.chatS.prefixColor}>{configData.chatS.prefix}</color>", configData.chatS.steamIDIcon);
+        private void Print(BasePlayer player, string message) => Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
 
         private void Print(ConsoleSystem.Arg arg, string message)
         {

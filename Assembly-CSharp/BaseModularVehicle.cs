@@ -184,7 +184,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public override Quaternion GetAngularVelocityServer()
 	{
-		if (rigidBody.angularVelocity.magnitude < 0.1f)
+		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
 		{
 			return Quaternion.identity;
 		}

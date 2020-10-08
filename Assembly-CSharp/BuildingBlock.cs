@@ -666,8 +666,8 @@ public class BuildingBlock : StabilityEntity
 		return !player.IsBuildingBlocked(base.transform.position, base.transform.rotation, bounds);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void DoRotation(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanRotate(msg.player) && blockDefinition.canRotateAfterPlacement && Interface.CallHook("OnStructureRotate", this, msg.player) == null)

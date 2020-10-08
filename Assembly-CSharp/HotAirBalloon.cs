@@ -269,8 +269,8 @@ public class HotAirBalloon : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void EngineSwitch(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();
@@ -397,6 +397,10 @@ public class HotAirBalloon : BaseCombatEntity
 
 	public override Quaternion GetAngularVelocityServer()
 	{
+		if (myRigidbody.angularVelocity.sqrMagnitude < 0.1f)
+		{
+			return Quaternion.identity;
+		}
 		return Quaternion.LookRotation(myRigidbody.angularVelocity, base.transform.up);
 	}
 

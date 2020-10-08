@@ -20,9 +20,9 @@ namespace VLB
 		private Shader beamShader1Pass;
 
 		[HighlightNull]
-		[SerializeField]
-		[FormerlySerializedAs("beamShader")]
 		[FormerlySerializedAs("BeamShader")]
+		[FormerlySerializedAs("beamShader")]
+		[SerializeField]
 		private Shader beamShader2Pass;
 
 		public int sharedMeshSides = 24;

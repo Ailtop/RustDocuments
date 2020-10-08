@@ -1,4 +1,5 @@
 //Requires: ZoneManager
+
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -9,13 +10,15 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Zone PVx Info", "BuzZ[PHOQUE]/Arainrr", "1.0.1")]
+    [Info("Zone PVx Info", "BuzZ[PHOQUE]/Arainrr", "1.0.2")]
     [Description("HUD on PVx name defined Zones")]
     public class ZonePVxInfo : RustPlugin
     {
         [PluginReference] private readonly Plugin ZoneManager;
         private const string UINAME_MAIN = "ZonePVxInfoUI";
         private bool pvpAll;
+        private string pvpUIJson;
+        private string pveUIJson;
 
         private enum PVxType
         {
@@ -28,22 +31,18 @@ namespace Oxide.Plugins
         private void Init()
         {
             AddCovalenceCommand("pvpall", nameof(CmdServerPVx));
+            pvpUIJson = GetUIJson(PVxType.PVP);
+            pveUIJson = GetUIJson(PVxType.PVE);
         }
 
         private void OnServerInitialized()
         {
-            foreach (var player in BasePlayer.activePlayerList)
-            {
-                OnPlayerConnected(player);
-            }
+            foreach (var player in BasePlayer.activePlayerList) OnPlayerConnected(player);
         }
 
         private void Unload()
         {
-            foreach (var player in BasePlayer.activePlayerList)
-            {
-                DestroyUI(player);
-            }
+            foreach (var player in BasePlayer.activePlayerList) DestroyUI(player);
         }
 
         private void OnPlayerConnected(BasePlayer player)
@@ -56,26 +55,34 @@ namespace Oxide.Plugins
             }
 
             if (pvpAll)
-            {
                 CratePVxUI(player, PVxType.PVP);
-            }
             else
-            {
                 CheckPlayerZone(player);
-            }
         }
 
         #endregion Oxide Hooks
 
         #region ZoneManager
 
-        private string GetZoneName(string zoneID) => (string)ZoneManager.Call("GetZoneName", zoneID);
+        private string GetZoneName(string zoneID)
+        {
+            return (string)ZoneManager.Call("GetZoneName", zoneID);
+        }
 
-        private string[] GetPlayerZoneIDs(BasePlayer player) => (string[])ZoneManager.Call("GetPlayerZoneIDs", player);
+        private string[] GetPlayerZoneIDs(BasePlayer player)
+        {
+            return (string[])ZoneManager.Call("GetPlayerZoneIDs", player);
+        }
 
-        private void OnEnterZone(string zoneID, BasePlayer player) => CheckPlayerZone(player);
+        private void OnEnterZone(string zoneID, BasePlayer player)
+        {
+            CheckPlayerZone(player);
+        }
 
-        private void OnExitZone(string zoneID, BasePlayer player) => CheckPlayerZone(player);
+        private void OnExitZone(string zoneID, BasePlayer player)
+        {
+            CheckPlayerZone(player);
+        }
 
         private void CheckPlayerZone(BasePlayer player)
         {
@@ -83,7 +90,7 @@ namespace Oxide.Plugins
             var zoneIDs = GetPlayerZoneIDs(player);
             foreach (var zoneID in zoneIDs)
             {
-                string zoneName = GetZoneName(zoneID);
+                var zoneName = GetZoneName(zoneID);
                 if (string.IsNullOrEmpty(zoneName)) continue;
                 switch (configData.defaultType)
                 {
@@ -93,6 +100,7 @@ namespace Oxide.Plugins
                             CratePVxUI(player, PVxType.PVP);
                             return;
                         }
+
                         continue;
                     case PVxType.PVP:
                         if (zoneName.Contains("pve", CompareOptions.IgnoreCase))
@@ -100,10 +108,12 @@ namespace Oxide.Plugins
                             CratePVxUI(player, PVxType.PVE);
                             return;
                         }
+
                         continue;
                     default: continue;
                 }
             }
+
             CratePVxUI(player, configData.defaultType);
         }
 
@@ -136,20 +146,14 @@ namespace Oxide.Plugins
                 case "off":
                 case "false":
                     pvpAll = false;
-                    foreach (var player in BasePlayer.activePlayerList)
-                    {
-                        CheckPlayerZone(player);
-                    }
+                    foreach (var player in BasePlayer.activePlayerList) CheckPlayerZone(player);
                     return;
 
                 case "1":
                 case "on":
                 case "true":
                     pvpAll = true;
-                    foreach (var player in BasePlayer.activePlayerList)
-                    {
-                        CratePVxUI(player, PVxType.PVP);
-                    }
+                    foreach (var player in BasePlayer.activePlayerList) CratePVxUI(player, PVxType.PVP);
                     return;
             }
         }
@@ -158,7 +162,7 @@ namespace Oxide.Plugins
 
         #region UI
 
-        private void CratePVxUI(BasePlayer player, PVxType type)
+        private string GetUIJson(PVxType type)
         {
             string zoneType, zoneColor, textColor;
             switch (type)
@@ -175,23 +179,24 @@ namespace Oxide.Plugins
                     textColor = configData.pvpTextColor;
                     break;
 
-                default: return;
+                default: return null;
             }
-            DestroyUI(player);
-            var container = new CuiElementContainer
+
+            return new CuiElementContainer
             {
                 {
                     new CuiPanel
                     {
-                        Image = { Color = zoneColor },
+                        Image = {Color = zoneColor},
                         RectTransform =
                         {
                             AnchorMin = configData.minAnchor,
-                            AnchorMax = configData.maxAnchor
+                            AnchorMax = configData.maxAnchor,
+                            OffsetMin = configData.minOffset,
+                            OffsetMax = configData.maxOffset
                         }
                     },
-                    new CuiElement().Parent = "Overlay",
-                    UINAME_MAIN
+                    "Overlay", UINAME_MAIN
                 },
                 {
                     new CuiLabel
@@ -201,16 +206,36 @@ namespace Oxide.Plugins
                             Text = zoneType, FontSize = configData.textSize, Align = TextAnchor.MiddleCenter,
                             Color = textColor
                         },
-                        RectTransform = { AnchorMin = "0.10 0.10", AnchorMax = "0.90 0.90" }
+                        RectTransform = {AnchorMin = "0.05 0.05", AnchorMax = "0.95 0.95"}
                     },
-                    UINAME_MAIN,
-                    CuiHelper.GetGuid()
+                    UINAME_MAIN, CuiHelper.GetGuid()
                 }
-            };
-            CuiHelper.AddUi(player, container);
+            }.ToJson();
         }
 
-        private static void DestroyUI(BasePlayer player) => CuiHelper.DestroyUi(player, UINAME_MAIN);
+        private void CratePVxUI(BasePlayer player, PVxType type)
+        {
+            string uiJson;
+            switch (type)
+            {
+                case PVxType.PVE:
+                    uiJson = pveUIJson;
+                    break;
+
+                case PVxType.PVP:
+                    uiJson = pvpUIJson;
+                    break;
+
+                default: return;
+            }
+            CuiHelper.DestroyUi(player, UINAME_MAIN);
+            CuiHelper.AddUi(player, uiJson);
+        }
+
+        private static void DestroyUI(BasePlayer player)
+        {
+            CuiHelper.DestroyUi(player, UINAME_MAIN);
+        }
 
         #endregion UI
 
@@ -224,26 +249,32 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Server Default PVx (pvp or pve)")]
             public PVxType defaultType = PVxType.PVE;
 
-            [JsonProperty(PropertyName = "UI Color - For PVP")]
+            [JsonProperty(PropertyName = "UI - PVP Background Color")]
             public string pvpColor = "0.6 0.2 0.2 0.5";
 
-            [JsonProperty(PropertyName = "UI Color - For PVE")]
+            [JsonProperty(PropertyName = "UI - PVE Background Color")]
             public string pveColor = "0.5 1.0 0.0 0.4";
 
-            [JsonProperty(PropertyName = "UI Text - Size")]
-            public int textSize = 14;
-
-            [JsonProperty(PropertyName = "UI Text - Color For PVP")]
+            [JsonProperty(PropertyName = "UI - PVP Text Color")]
             public string pvpTextColor = "1 1 1 1";
 
-            [JsonProperty(PropertyName = "UI Text - Color For PVE")]
+            [JsonProperty(PropertyName = "UI - PVE Text Color")]
             public string pveTextColor = "1 1 1 1";
 
-            [JsonProperty(PropertyName = "UI Anchor - Min")]
-            public string minAnchor = "0.65 0.04";
+            [JsonProperty(PropertyName = "UI - Text Size")]
+            public int textSize = 14;
 
-            [JsonProperty(PropertyName = "UI Anchor - Max")]
-            public string maxAnchor = "0.69 0.08";
+            [JsonProperty(PropertyName = "UI - Min Anchor")]
+            public string minAnchor = "0.5 0";
+
+            [JsonProperty(PropertyName = "UI - Max Anchor")]
+            public string maxAnchor = "0.5 0";
+
+            [JsonProperty(PropertyName = "UI - Min Offset")]
+            public string minOffset = "190 30";
+
+            [JsonProperty(PropertyName = "UI - Max Offset")]
+            public string maxOffset = "250 60";
         }
 
         protected override void LoadConfig()
@@ -270,7 +301,10 @@ namespace Oxide.Plugins
             configData = new ConfigData();
         }
 
-        protected override void SaveConfig() => Config.WriteObject(configData);
+        protected override void SaveConfig()
+        {
+            Config.WriteObject(configData);
+        }
 
         #endregion ConfigurationFile
     }

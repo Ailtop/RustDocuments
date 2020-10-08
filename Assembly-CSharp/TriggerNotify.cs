@@ -10,10 +10,22 @@ public class TriggerNotify : TriggerBase, IPrefabPreProcess
 
 	public bool runServerside = true;
 
+	public bool HasContents
+	{
+		get
+		{
+			if (contents != null)
+			{
+				return contents.Count > 0;
+			}
+			return false;
+		}
+	}
+
 	internal override void OnObjects()
 	{
 		base.OnObjects();
-		if (toNotify != null || notifyTarget.TryGetComponent(out toNotify))
+		if (toNotify != null || (notifyTarget != null && notifyTarget.TryGetComponent(out toNotify)))
 		{
 			toNotify.OnObjects(this);
 		}
@@ -22,7 +34,7 @@ public class TriggerNotify : TriggerBase, IPrefabPreProcess
 	internal override void OnEmpty()
 	{
 		base.OnEmpty();
-		if (toNotify != null || notifyTarget.TryGetComponent(out toNotify))
+		if (toNotify != null || (notifyTarget != null && notifyTarget.TryGetComponent(out toNotify)))
 		{
 			toNotify.OnEmpty();
 		}

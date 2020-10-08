@@ -13,8 +13,8 @@ namespace Rust.Modular
 		[Range(0f, 1f)]
 		public float rollingResistance = 0.05f;
 
-		[Header("Wheels")]
 		[Range(0f, 50f)]
+		[Header("Wheels")]
 		public float maxSteerAngle = 35f;
 
 		public bool steeringAssist = true;
@@ -42,8 +42,8 @@ namespace Rust.Modular
 		[Header("Brakes")]
 		public float brakeForceMultiplier = 1000f;
 
-		[Range(0f, 1f)]
 		[Header("Front/Rear Vehicle Balance")]
+		[Range(0f, 1f)]
 		public float handlingBias = 0.5f;
 	}
 }

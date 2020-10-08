@@ -20,7 +20,8 @@ public class ConstructionSocket : Socket_Base
 		WallFrame,
 		FloorFrame,
 		WindowDressing,
-		DoorDressing
+		DoorDressing,
+		Elevator
 	}
 
 	public Type socketType;
@@ -148,6 +149,10 @@ public class ConstructionSocket : Socket_Base
 		{
 			return null;
 		}
+		if (!CanConnectToEntity(target))
+		{
+			return null;
+		}
 		ConstructionSocket constructionSocket = target.socket as ConstructionSocket;
 		Vector3 worldPosition = target.GetWorldPosition();
 		Quaternion worldRotation = target.GetWorldRotation(true);
@@ -197,5 +202,10 @@ public class ConstructionSocket : Socket_Base
 			return null;
 		}
 		return placement2;
+	}
+
+	protected virtual bool CanConnectToEntity(Construction.Target target)
+	{
+		return true;
 	}
 }

@@ -1132,8 +1132,8 @@ namespace Rust.Ai.HTN.Bear
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[SerializeField]
 		[Header("Context")]
+		[SerializeField]
 		private BearContext _context;
 
 		[SerializeField]

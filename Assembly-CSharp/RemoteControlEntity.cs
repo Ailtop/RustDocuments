@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
@@ -142,6 +143,11 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 
 	public virtual bool CanControl()
 	{
+		object obj = Interface.CallHook("OnEntityControl", this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		return true;
 	}
 

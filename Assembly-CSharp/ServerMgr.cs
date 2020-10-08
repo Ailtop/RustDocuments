@@ -99,7 +99,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		switch (packet.type)
 		{
 		case Message.Type.GiveUserInformation:
-			if (packet.connection.GetPacketsPerSecond(packet.type) > 1)
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
 			{
 				Network.Net.sv.Kick(packet.connection, "Packet Flooding: User Information", packet.connection.connected);
 				break;
@@ -119,9 +119,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.Ready:
-			if (packet.connection.isAuthenticated)
+			if (packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > 1)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
 				{
 					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Client Ready", packet.connection.connected);
 					break;
@@ -142,9 +142,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.RPCMessage:
-			if (packet.connection.isAuthenticated)
+			if (packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > (ulong)ConVar.Server.maxpacketspersecond_rpc)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_rpc)
 				{
 					Network.Net.sv.Kick(packet.connection, "Paket Flooding: RPC Message");
 					break;
@@ -165,9 +165,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.ConsoleCommand:
-			if (packet.connection.isAuthenticated)
+			if (packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > (ulong)ConVar.Server.maxpacketspersecond_command)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_command)
 				{
 					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Client Command", packet.connection.connected);
 					break;
@@ -188,9 +188,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.DisconnectReason:
-			if (packet.connection.isAuthenticated)
+			if (packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > 1)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
 				{
 					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Disconnect Reason", packet.connection.connected);
 					break;
@@ -212,9 +212,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.Tick:
-			if (packet.connection.isAuthenticated)
+			if (packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > (ulong)ConVar.Server.maxpacketspersecond_tick)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_tick)
 				{
 					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Player Tick", packet.connection.connected);
 					break;
@@ -249,9 +249,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.World:
-			if (World.Transfer && packet.connection.isAuthenticated)
+			if (World.Transfer && packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > (ulong)ConVar.Server.maxpacketspersecond_world)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_world)
 				{
 					Network.Net.sv.Kick(packet.connection, "Packet Flooding: World", packet.connection.connected);
 				}
@@ -273,9 +273,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.VoiceData:
-			if (packet.connection.isAuthenticated)
+			if (packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) > (ulong)ConVar.Server.maxpacketspersecond_voice)
+				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_voice)
 				{
 					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Disconnect Reason", packet.connection.connected);
 					break;
@@ -343,7 +343,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 	{
 		BasePlayer.SpawnPoint spawnPoint = FindSpawnPoint();
 		BasePlayer basePlayer = GameManager.server.CreateEntity("assets/prefabs/player/player.prefab", spawnPoint.pos, spawnPoint.rot).ToPlayer();
-		if (Interface.CallHook("OnPlayerSpawn", basePlayer, this) != null)
+		if (Interface.CallHook("OnPlayerSpawn", basePlayer, connection) != null)
 		{
 			return null;
 		}
@@ -488,15 +488,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 			return;
 		}
-		if (packet.connection.protocol > 2256)
+		if (packet.connection.protocol > 2260)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2256);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2260);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 			return;
 		}
-		if (packet.connection.protocol < 2256)
+		if (packet.connection.protocol < 2260)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2256);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2260);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 			return;
 		}
@@ -635,6 +635,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		InvokeRepeating("DoHeartbeat", 1f, 1f);
 		runFrameUpdate = true;
 		ConsoleSystem.OnReplicatedVarChanged += OnReplicatedVarChanged;
+		Interface.CallHook("IOnServerInitialized");
 	}
 
 	private void CloseConnection()
@@ -738,6 +739,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		case AuthResponse.PublisherBanned:
 			if (!bannedPlayerNotices.Contains(SteamId))
 			{
+				Interface.CallHook("IOnPlayerBanned", connection, Status);
 				ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Kicking " + connection.username.EscapeRichText() + " (banned by anticheat)");
 				bannedPlayerNotices.Add(SteamId);
 			}
@@ -991,7 +993,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
 				string text3 = $"gm{GamemodeName()}";
 				string text4 = ConVar.Server.pve ? ",pve" : string.Empty;
-				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2256}{text4},h{AssemblyHash},{text},{text2},{text3}";
+				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2260}{text4},h{AssemblyHash},{text},{text2},{text3}";
 				Interface.CallHook("IOnUpdateServerInformation");
 				if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 				{

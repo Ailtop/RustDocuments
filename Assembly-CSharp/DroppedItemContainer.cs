@@ -193,6 +193,7 @@ public class DroppedItemContainer : BaseCombatEntity
 
 	public void PlayerStoppedLooting(BasePlayer player)
 	{
+		Interface.CallHook("OnLootEntityEnd", player, this);
 		if (inventory == null || inventory.itemList == null || inventory.itemList.Count == 0)
 		{
 			Kill();

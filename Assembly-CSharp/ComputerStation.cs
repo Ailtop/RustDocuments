@@ -266,7 +266,7 @@ public class ComputerStation : BaseMountable
 			return;
 		}
 		IRemoteControllable component = baseNetworkable.GetComponent<IRemoteControllable>();
-		if (component.CanControl() && !(component.GetIdentifier() != text) && Interface.CallHook("OnBookmarkControl", this, player, text) == null)
+		if (component.CanControl() && !(component.GetIdentifier() != text) && Interface.CallHook("OnBookmarkControl", this, player, text, component) == null)
 		{
 			BaseEntity baseEntity = currentlyControllingEnt.Get(true);
 			if ((bool)baseEntity)
@@ -430,7 +430,7 @@ public class ComputerStation : BaseMountable
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
 		base.PlayerServerInput(inputState, player);
-		if (currentlyControllingEnt.IsValid(true))
+		if (currentlyControllingEnt.IsValid(true) && Interface.CallHook("OnBookmarkInput", this, player, inputState) == null)
 		{
 			currentlyControllingEnt.Get(true).GetComponent<IRemoteControllable>().UserInput(inputState, player);
 		}

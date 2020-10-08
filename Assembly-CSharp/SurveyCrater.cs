@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using ConVar;
 using Network;
+using Oxide.Core;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -66,6 +67,7 @@ public class SurveyCrater : BaseCombatEntity
 	[RPC_Server]
 	public void AnalysisComplete(RPCMessage msg)
 	{
+		Interface.CallHook("OnAnalysisComplete", this, msg.player);
 	}
 
 	public override float BoundsPadding()

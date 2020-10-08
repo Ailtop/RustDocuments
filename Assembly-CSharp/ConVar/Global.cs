@@ -17,12 +17,12 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int maxthreads = 8;
 
-		[ServerVar(Saved = true)]
 		[ClientVar(Saved = true)]
+		[ServerVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -31,8 +31,8 @@ namespace ConVar
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int developer
 		{
 			get
@@ -431,8 +431,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -442,22 +442,22 @@ namespace ConVar
 			GC.unload();
 		}
 
-		[ServerVar(ServerUser = true)]
 		[ClientVar]
+		[ServerVar(ServerUser = true)]
 		public static void version(Arg arg)
 		{
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);
@@ -474,8 +474,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();

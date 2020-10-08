@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[643]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[650]
 	{
 		new ConsoleSystem.Command
 		{
@@ -388,8 +388,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				ServerUsers.User[] rval20 = Admin.Bans();
-				arg.ReplyWithObject(rval20);
+				ServerUsers.User[] rval22 = Admin.Bans();
+				arg.ReplyWithObject(rval22);
 			}
 		},
 		new ConsoleSystem.Command
@@ -402,8 +402,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				BuildInfo rval19 = Admin.BuildInfo();
-				arg.ReplyWithObject(rval19);
+				BuildInfo rval21 = Admin.BuildInfo();
+				arg.ReplyWithObject(rval21);
 			}
 		},
 		new ConsoleSystem.Command
@@ -551,8 +551,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Admin.PlayerInfo[] rval18 = Admin.playerlist();
-				arg.ReplyWithObject(rval18);
+				Admin.PlayerInfo[] rval20 = Admin.playerlist();
+				arg.ReplyWithObject(rval20);
 			}
 		},
 		new ConsoleSystem.Command
@@ -692,8 +692,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval17 = Admin.teaminfo(arg);
-				arg.ReplyWithObject(rval17);
+				string rval19 = Admin.teaminfo(arg);
+				arg.ReplyWithObject(rval19);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2183,19 +2183,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "projectile_waterhits",
-			Parent = "antihack",
-			FullName = "antihack.projectile_waterhits",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = (() => ConVar.AntiHack.projectile_waterhits.ToString()),
-			SetOveride = delegate(string str)
-			{
-				ConVar.AntiHack.projectile_waterhits = str.ToInt();
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "relaxationpause",
 			Parent = "antihack",
 			FullName = "antihack.relaxationpause",
@@ -2686,8 +2673,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval16 = Chat.search(arg);
-				arg.ReplyWithObject(rval16);
+				IEnumerable<Chat.ChatEntry> rval18 = Chat.search(arg);
+				arg.ReplyWithObject(rval18);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2712,8 +2699,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval15 = Chat.tail(arg);
-				arg.ReplyWithObject(rval15);
+				IEnumerable<Chat.ChatEntry> rval17 = Chat.tail(arg);
+				arg.ReplyWithObject(rval17);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2737,8 +2724,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval14 = Console.search(arg);
-				arg.ReplyWithObject(rval14);
+				IEnumerable<Output.Entry> rval16 = Console.search(arg);
+				arg.ReplyWithObject(rval16);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2750,8 +2737,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval13 = Console.tail(arg);
-				arg.ReplyWithObject(rval13);
+				IEnumerable<Output.Entry> rval15 = Console.tail(arg);
+				arg.ReplyWithObject(rval15);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3442,6 +3429,72 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Decay.upkeep_period_minutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "record",
+			Parent = "demo",
+			FullName = "demo.record",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval14 = Demo.record(arg);
+				arg.ReplyWithObject(rval14);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "recordlist",
+			Parent = "demo",
+			FullName = "demo.recordlist",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = (() => Demo.recordlist.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Demo.recordlist = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "splitmegabytes",
+			Parent = "demo",
+			FullName = "demo.splitmegabytes",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Demo.splitmegabytes.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Demo.splitmegabytes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "splitseconds",
+			Parent = "demo",
+			FullName = "demo.splitseconds",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Demo.splitseconds.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Demo.splitseconds = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "stop",
+			Parent = "demo",
+			FullName = "demo.stop",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval13 = Demo.stop(arg);
+				arg.ReplyWithObject(rval13);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5468,6 +5521,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "censorplayerlist",
+			Parent = "server",
+			FullName = "server.censorplayerlist",
+			ServerAdmin = true,
+			Description = "Censors the Steam player list to make player tracking more difficult",
+			Variable = true,
+			GetOveride = (() => Server.censorplayerlist.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.censorplayerlist = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "cheatreport",
 			Parent = "server",
 			FullName = "server.cheatreport",
@@ -7423,6 +7490,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "rendermap",
+			Parent = "world",
+			FullName = "world.rendermap",
+			ServerAdmin = true,
+			Client = true,
+			Description = "Renders a high resolution PNG of the current map",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.World.rendermap(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "enabled",
 			Parent = "xmas",
 			FullName = "xmas.enabled",
@@ -7875,11 +7956,25 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "deepwaterdecayminutes",
+			Parent = "motorrowboat",
+			FullName = "motorrowboat.deepwaterdecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a boat is killed while in deep water. If it's outside as well, the minimum of the two is used",
+			Variable = true,
+			GetOveride = (() => MotorRowboat.deepwaterdecayminutes.ToString()),
+			SetOveride = delegate(string str)
+			{
+				MotorRowboat.deepwaterdecayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "outsidedecayminutes",
 			Parent = "motorrowboat",
 			FullName = "motorrowboat.outsidedecayminutes",
 			ServerAdmin = true,
-			Description = "How long before a boat is killed while outside",
+			Description = "How long before a boat is killed while outside.  If it's in deep water as well, the minimum of the two is used",
 			Variable = true,
 			GetOveride = (() => MotorRowboat.outsidedecayminutes.ToString()),
 			SetOveride = delegate(string str)

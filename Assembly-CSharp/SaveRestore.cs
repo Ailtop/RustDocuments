@@ -86,7 +86,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						binaryReader.ReadChar();
 						SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 					}
-					if (binaryReader.ReadUInt32() != 198)
+					if (binaryReader.ReadUInt32() != 199)
 					{
 						if (allowOutOfDateSaves)
 						{
@@ -359,7 +359,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				writer.Write((sbyte)82);
 				writer.Write((sbyte)68);
 				writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-				writer.Write(198u);
+				writer.Write(199u);
 				BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 				saveInfo.forDisk = true;
 				if (!AndWait)

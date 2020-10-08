@@ -197,19 +197,15 @@ public class BaseCombatEntity : BaseEntity
 		}
 		if (pickup.enabled)
 		{
-			if (pickup.requireBuildingPrivilege)
+			if (!pickup.requireBuildingPrivilege || player.CanBuild())
 			{
-				if (player.CanBuild())
+				if (pickup.requireHammer)
 				{
-					if (pickup.requireHammer)
-					{
-						return player.IsHoldingEntity<Hammer>();
-					}
-					return true;
+					return player.IsHoldingEntity<Hammer>();
 				}
-				return false;
+				return true;
 			}
-			return true;
+			return false;
 		}
 		return false;
 	}
@@ -218,8 +214,8 @@ public class BaseCombatEntity : BaseEntity
 	{
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_PickupStart(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanPickup(rpc.player))

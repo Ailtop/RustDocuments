@@ -6,6 +6,7 @@ using Rust;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 public class BaseMountable : BaseCombatEntity
 {
@@ -41,11 +42,14 @@ public class BaseMountable : BaseCombatEntity
 
 	public Transform[] dismountPositions;
 
-	public Transform dismountCheckEyes;
-
 	public bool checkPlayerLosOnMount;
 
 	public bool disableMeshCullingForPlayers;
+
+	[FormerlySerializedAs("modifyPlayerCollider")]
+	public bool modifiesPlayerCollider;
+
+	public BasePlayer.CapsuleColliderInfo customPlayerCollider;
 
 	public SoundDefinition mountSoundDef;
 
@@ -263,8 +267,8 @@ public class BaseMountable : BaseCombatEntity
 		base.OnKilled(info);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -413,25 +417,15 @@ public class BaseMountable : BaseCombatEntity
 		OnPlayerDismounted(player);
 	}
 
-	public Vector3 DismountVisCheckOrigin()
-	{
-		if (dismountCheckEyes == null)
-		{
-			return base.transform.position + new Vector3(0f, 0.3f, 0f);
-		}
-		return dismountCheckEyes.position;
-	}
-
-	public virtual bool ValidDismountPosition(Vector3 disPos)
+	public bool ValidDismountPosition(Vector3 disPos, Vector3 visualCheckOrigin)
 	{
 		if (!UnityEngine.Physics.CheckCapsule(disPos + new Vector3(0f, 0.5f, 0f), disPos + new Vector3(0f, 1.3f, 0f), 0.5f, 1537286401))
 		{
-			Vector3 vector = DismountVisCheckOrigin();
-			Vector3 vector2 = disPos + base.transform.up * 0.5f;
-			if (IsVisible(vector2) && !UnityEngine.Physics.Linecast(vector, vector2, 1486946561))
+			Vector3 vector = disPos + base.transform.up * 0.5f;
+			if (IsVisible(vector) && !UnityEngine.Physics.Linecast(visualCheckOrigin, vector, 1486946561))
 			{
-				Ray ray = new Ray(vector, Vector3Ex.Direction(vector2, vector));
-				float maxDistance = Vector3.Distance(vector, vector2);
+				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
+				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
 				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, maxDistance, 1486946561))
 				{
 					return true;
@@ -448,10 +442,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			return baseVehicle.HasValidDismountPosition(player);
 		}
+		Vector3 visualCheckOrigin = player.TriggerPoint();
 		Transform[] array = dismountPositions;
 		foreach (Transform transform in array)
 		{
-			if (ValidDismountPosition(transform.transform.position))
+			if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
 			{
 				return true;
 			}
@@ -467,10 +462,11 @@ public class BaseMountable : BaseCombatEntity
 			return baseVehicle.GetDismountPosition(player, out res);
 		}
 		int num = 0;
+		Vector3 visualCheckOrigin = player.TriggerPoint();
 		Transform[] array = dismountPositions;
 		foreach (Transform transform in array)
 		{
-			if (ValidDismountPosition(transform.transform.position))
+			if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
 			{
 				res = transform.transform.position;
 				return true;

@@ -20,6 +20,15 @@ namespace CompanionServer
 			}
 		}
 
+		public bool IsNaughty
+		{
+			get
+			{
+				Update();
+				return _tokens <= -10.0;
+			}
+		}
+
 		public void Reset()
 		{
 			_lastUpdate = TimeEx.realtimeSinceStartup;
@@ -31,6 +40,7 @@ namespace CompanionServer
 			Update();
 			if (requestedTokens > _tokens)
 			{
+				_tokens -= 1.0;
 				return false;
 			}
 			_tokens -= requestedTokens;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define DEBUG
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Vehicle Licence", "Sorrow/TheDoc/Arainrr", "1.7.1")]
+    [Info("Vehicle Licence", "Sorrow/TheDoc/Arainrr", "1.7.4")]
     [Description("Allows players to buy vehicles and then spawn or store it")]
     public class VehicleLicence : RustPlugin
     {
@@ -121,6 +122,7 @@ namespace Oxide.Plugins
             Unsubscribe(nameof(CanMountEntity));
             Unsubscribe(nameof(OnEntityTakeDamage));
             Unsubscribe(nameof(OnEntityDismounted));
+            Unsubscribe(nameof(OnEntityEnter));
         }
 
         private void OnServerInitialized()
@@ -158,6 +160,10 @@ namespace Oxide.Plugins
             if (configData.globalS.noDecay)
             {
                 Subscribe(nameof(OnEntityTakeDamage));
+            }
+            if (configData.globalS.preventDamagePlayer)
+            {
+                Subscribe(nameof(OnEntityEnter));
             }
             if (configData.globalS.checkVehiclesInterval > 0 && allBaseVehicleSettings.Any(x => x.Value.wipeTime > 0))
             {
@@ -217,7 +223,7 @@ namespace Oxide.Plugins
             Vehicle vehicle;
             if (!vehiclesCache.TryGetValue(vehicleParent, out vehicle)) return null;
             if (AreFriends(vehicle.playerID, friend.userID)) return null;
-            if (configData.globalS.blockDriverSeat && vehicleParent.HasMountPoints() && entity != vehicleParent.mountPoints[0].mountable) return null;
+            if (configData.globalS.preventDriverSeat && vehicleParent.HasMountPoints() && entity != vehicleParent.mountPoints[0].mountable) return null;
             return false;
         }
 
@@ -242,6 +248,45 @@ namespace Oxide.Plugins
         private void OnEntityDeath(BaseCombatEntity entity, HitInfo info) => CheckEntity(entity, true);
 
         private void OnEntityKill(BaseCombatEntity entity) => CheckEntity(entity);
+
+        //ScrapTransportHelicopter And ModularCar
+        private object OnEntityEnter(TriggerHurtNotChild triggerHurtNotChild, BasePlayer player)
+        {
+            if (triggerHurtNotChild?.SourceEntity == null || player == null || !player.userID.IsSteamId()) return null;
+            var sourceEntity = triggerHurtNotChild.SourceEntity;
+            if (vehiclesCache.ContainsKey(sourceEntity))
+            {
+                var baseVehicle = sourceEntity as BaseVehicle;
+                if (baseVehicle != null)
+                {
+                    /*
+                    var dismountPositions = baseVehicle.dismountPositions;
+                    var position = dismountPositions.Select(x => x.position)
+                        .OrderBy(x => Vector3.Distance(x, player.transform.position)).FirstOrDefault();
+                    MoveToPosition(player, position);
+                    */
+                    MoveToPosition(player, triggerHurtNotChild.transform.position + triggerHurtNotChild.transform.right * 3f);
+                }
+                //triggerHurtNotChild.enabled = false;
+                return false;
+            }
+            return null;
+        }
+
+        //HotAirBalloon
+        private object OnEntityEnter(TriggerHurt triggerHurt, BasePlayer player)
+        {
+            if (triggerHurt == null || player == null || !player.userID.IsSteamId()) return null;
+            var sourceEntity = triggerHurt.gameObject?.ToBaseEntity();
+            if (sourceEntity == null) return null;
+            if (vehiclesCache.ContainsKey(sourceEntity))
+            {
+                MoveToPosition(player, triggerHurt.transform.position + triggerHurt.transform.forward * 2f);
+                //triggerHurt.enabled = false;
+                return false;
+            }
+            return null;
+        }
 
         #endregion Oxide Hooks
 
@@ -377,7 +422,7 @@ namespace Oxide.Plugins
                         {
                             if (CanRefundFuel(baseVehicleS, isCrash, isUnload))
                             {
-                                var fuelContainer = (entity as MotorRowboat)?.fuelSystem?.GetFuelContainer()?.inventory;
+                                var fuelContainer = (entity as MotorRowboat)?.GetFuelSystem()?.GetFuelContainer()?.inventory;
                                 if (fuelContainer != null) collect.AddRange(fuelContainer.itemList);
                             }
 
@@ -881,6 +926,7 @@ namespace Oxide.Plugins
             {
                 return true;
             }
+
             return entity.GetComponentsInChildren<BasePlayer>()?.Length > 0;
         }
 
@@ -919,10 +965,14 @@ namespace Oxide.Plugins
             return position;
         }
 
-        private static bool IsLookingAtWater(BasePlayer player, float distance)
+        private static bool PositionIsInWater(Vector3 position)
         {
-            var lookingAt = GetLookingAtGroundPos(player, distance);
-            return WaterLevel.Test(lookingAt);
+            var colliders = Facepunch.Pool.GetList<Collider>();
+            Vis.Colliders(position, 0.5f, colliders);
+            var flag = colliders.Any(x => x.gameObject?.layer == (int)Rust.Layer.Water);
+            Facepunch.Pool.FreeList(ref colliders);
+            return flag;
+            //return WaterLevel.Test(lookingAt);
         }
 
         private static Vector3 GetGroundPosition(Vector3 position)
@@ -932,6 +982,15 @@ namespace Oxide.Plugins
                 ? hitInfo.point.y
                 : TerrainMeta.HeightMap.GetHeight(position);
             return position;
+        }
+
+        private static void MoveToPosition(BasePlayer player, Vector3 position)
+        {
+            player.MovePosition(position);
+            player.SendNetworkUpdateImmediate();
+            player.ForceUpdateTriggers();
+            if (player.HasParent()) player.SetParent(null, true, true);
+            player.ClientRPCPlayer(null, player, "ForcePositionTo", position);
         }
 
         #endregion Helpers
@@ -1377,11 +1436,17 @@ namespace Oxide.Plugins
                 reason = Lang("AlreadyVehicleOut", player.UserIDString, baseVehicleS.displayName, configData.chatS.recallCommand);
                 return false;
             }
-            if (checkWater && !IsLookingAtWater(player, baseVehicleS.distance))
+            if (!CheckPosition(player, baseVehicleS, checkWater, out reason))
             {
-                reason = Lang("NotLookingAtWater", player.UserIDString, baseVehicleS.displayName);
                 return false;
             }
+#if DEBUG
+            if (player.IsAdmin)
+            {
+                reason = null;
+                return true;
+            }
+#endif
             var spawnCooldown = GetSpawnCooldown(player, baseVehicleS);
             if (spawnCooldown > 0)
             {
@@ -1408,7 +1473,7 @@ namespace Oxide.Plugins
             var prefab = GetVehiclePrefab(vehicleType, baseVehicleS);
             if (string.IsNullOrEmpty(prefab)) return;
             Vector3 position; Quaternion rotation;
-            GetVehicleSpawnPos(player, baseVehicleS.distance, checkWater, vehicleType, out position, out rotation);
+            GetVehicleSpawnPos(player, baseVehicleS, checkWater, vehicleType, out position, out rotation);
             var entity = GameManager.server.CreateEntity(prefab, position, rotation);
             if (entity == null) return;
             entity.enableSaving = configData.globalS.storeVehicle;
@@ -1425,15 +1490,14 @@ namespace Oxide.Plugins
                 var modularVehicleS = baseVehicleS as ModularVehicleS;
                 if (modularVehicleS != null)
                 {
-                    foreach (var moduleItem in modularVehicleS.CreateModuleItems())
+                    if (modularVehicleS.ModuleItems.Any())
                     {
-                        if (!modularCar.TryAddModule(moduleItem))
-                        {
-                            PrintError($"Module item '{moduleItem.info.shortname}' in '{vehicleType}' cannot be attached to the vehicle");
-                            moduleItem.Remove();
-                        }
+                        AttacheVehicleModules(modularCar, modularVehicleS, vehicleType);
                     }
-                    NextTick(() => AddItemsToVehicleEngine(modularCar, modularVehicleS, vehicleType));
+                    if (modularVehicleS.EngineItems.Any())
+                    {
+                        NextTick(() => AddItemsToVehicleEngine(modularCar, modularVehicleS, vehicleType));
+                    }
                 }
             }
             else
@@ -1461,6 +1525,18 @@ namespace Oxide.Plugins
             storedData.playerData[player.userID][vehicleType] = vehicle;
             Print(player, Lang("VehicleSpawned", player.UserIDString, baseVehicleS.displayName));
             Interface.CallHook("OnLicensedVehicleSpawned", entity, player, vehicleType);
+        }
+
+        private void AttacheVehicleModules(ModularCar modularCar, ModularVehicleS modularVehicleS, string vehicleType)
+        {
+            foreach (var moduleItem in modularVehicleS.CreateModuleItems())
+            {
+                if (!modularCar.TryAddModule(moduleItem))
+                {
+                    PrintError($"Module item '{moduleItem.info.shortname}' in '{vehicleType}' cannot be attached to the vehicle");
+                    moduleItem.Remove();
+                }
+            }
         }
 
         private void AddItemsToVehicleEngine(ModularCar modularCar, ModularVehicleS modularVehicleS, string vehicleType)
@@ -1604,11 +1680,17 @@ namespace Oxide.Plugins
                 reason = Lang("RecallTooFar", player.UserIDString, baseVehicleS.recallMaxDistance, baseVehicleS.displayName);
                 return false;
             }
-            if (checkWater && !IsLookingAtWater(player, baseVehicleS.distance))
+            if (!CheckPosition(player, baseVehicleS, checkWater, out reason))
             {
-                reason = Lang("NotLookingAtWater", player.UserIDString, baseVehicleS.displayName);
                 return false;
             }
+#if DEBUG
+            if (player.IsAdmin)
+            {
+                reason = null;
+                return true;
+            }
+#endif
             var recallCooldown = GetRecallCooldown(player, baseVehicleS);
             if (recallCooldown > 0)
             {
@@ -1645,7 +1727,7 @@ namespace Oxide.Plugins
 
             vehicle.OnRecall();
             Vector3 position; Quaternion rotation;
-            GetVehicleSpawnPos(player, baseVehicleS.distance, checkWater, vehicleType, out position, out rotation);
+            GetVehicleSpawnPos(player, baseVehicleS, checkWater, vehicleType, out position, out rotation);
             entity.transform.position = position;
             entity.transform.rotation = rotation;
             entity.transform.hasChanged = true;
@@ -1715,6 +1797,11 @@ namespace Oxide.Plugins
                     Print(player, Lang("PlayerMountedOnVehicle", player.UserIDString, baseVehicleS.displayName));
                     return false;
                 }
+                if (baseVehicleS.killMaxDistance > 0 && Vector3.Distance(player.transform.position, vehicle.entity.transform.position) > baseVehicleS.killMaxDistance)
+                {
+                    Print(player, Lang("KillTooFar", player.UserIDString, baseVehicleS.killMaxDistance, baseVehicleS.displayName));
+                    return false;
+                }
                 vehicle.entity.Kill(BaseNetworkable.DestroyMode.Gib);
                 Print(player, Lang("VehicleKilled", player.UserIDString, baseVehicleS.displayName));
                 return true;
@@ -1726,6 +1813,34 @@ namespace Oxide.Plugins
         #endregion Kill Command
 
         #region Command Helper
+
+        private bool CheckPosition(BasePlayer player, BaseVehicleS baseVehicleS, bool checkWater, out string reason)
+        {
+            if (checkWater || configData.globalS.spawnLookingAt)
+            {
+                var lookingAt = GetLookingAtGroundPos(player, baseVehicleS.distance);
+                if (checkWater && !PositionIsInWater(lookingAt))
+                {
+                    reason = Lang("NotLookingAtWater", player.UserIDString, baseVehicleS.displayName);
+                    return false;
+                }
+                if (configData.globalS.spawnLookingAt && baseVehicleS.minDistanceForPlayers > 0)
+                {
+                    var nearbyPlayers = Facepunch.Pool.GetList<BasePlayer>();
+                    Vis.Entities(lookingAt, baseVehicleS.minDistanceForPlayers, nearbyPlayers, Rust.Layers.Mask.Player_Server);
+                    bool flag = nearbyPlayers.Any(x => x.userID.IsSteamId() && x != player);
+                    Facepunch.Pool.FreeList(ref nearbyPlayers);
+                    if (flag)
+                    {
+                        reason = Lang("PlayersOnNearby", player.UserIDString, baseVehicleS.displayName);
+                        return false;
+                    }
+                }
+            }
+
+            reason = null;
+            return true;
+        }
 
         private bool IsValidVehicleType(string option, out string vehicleType)
         {
@@ -1763,12 +1878,12 @@ namespace Oxide.Plugins
             return false;
         }
 
-        private void GetVehicleSpawnPos(BasePlayer player, float distance, bool checkWater, string vehicleType, out Vector3 spawnPos, out Quaternion spawnRot)
+        private void GetVehicleSpawnPos(BasePlayer player, BaseVehicleS baseVehicleS, bool checkWater, string vehicleType, out Vector3 spawnPos, out Quaternion spawnRot)
         {
             if (configData.globalS.spawnLookingAt)
             {
                 bool needGetGround = true;
-                spawnPos = GetLookingAtGroundPos(player, distance);
+                spawnPos = GetLookingAtGroundPos(player, baseVehicleS.distance);
                 if (checkWater)
                 {
                     RaycastHit hit;
@@ -1786,7 +1901,7 @@ namespace Oxide.Plugins
                     {
                         var pos = spawnPos;
                         var closestBuildingBlock = buildingBlocks
-                            .Where(x => x.ShortPrefabName.Contains("foundation") || x.ShortPrefabName.Contains("floor"))
+                            .Where(x => !x.ShortPrefabName.Contains("wall"))
                             .OrderBy(x => Vector3.Distance(x.transform.position, pos)).FirstOrDefault();
                         if (closestBuildingBlock != null)
                         {
@@ -1804,30 +1919,30 @@ namespace Oxide.Plugins
             }
             else
             {
-                if (checkWater)
+                var minDistanceForPlayers = baseVehicleS.minDistanceForPlayers > 2 ? baseVehicleS.minDistanceForPlayers : 3;
+                var distance = Mathf.Max(baseVehicleS.distance, minDistanceForPlayers);
+                spawnPos = player.transform.position;
+                var nearbyPlayers = Facepunch.Pool.GetList<BasePlayer>();
+                var originPos = checkWater ? GetLookingAtGroundPos(player, distance) : player.transform.position;
+                for (int i = 0; i < 100; i++)
                 {
-                    spawnPos = player.transform.position;
-                    for (int i = 0; i < 10; i++)
+                    spawnPos.x = originPos.x + UnityEngine.Random.Range(minDistanceForPlayers, distance) * (UnityEngine.Random.Range(0, 2) > 0 ? 1 : -1);
+                    spawnPos.z = originPos.z + UnityEngine.Random.Range(minDistanceForPlayers, distance) * (UnityEngine.Random.Range(0, 2) > 0 ? 1 : -1);
+                    spawnPos = GetGroundPosition(spawnPos);
+                    nearbyPlayers.Clear();
+                    Vis.Entities(spawnPos, minDistanceForPlayers, nearbyPlayers, Rust.Layers.Mask.Player_Server);
+                    if (!nearbyPlayers.Any(x => x.userID.IsSteamId()))
                     {
-                        var originPos = GetLookingAtGroundPos(player, distance);
-                        var unitSphere = UnityEngine.Random.insideUnitSphere * distance;
-                        unitSphere.y = 0;
-                        spawnPos = originPos + unitSphere;
-                        if (Vector3Ex.Distance2D(spawnPos, player.transform.position) > 2f) break;
+                        break;
                     }
                 }
-                else
-                {
-                    var unitSphere = UnityEngine.Random.insideUnitSphere * distance;
-                    unitSphere.y = 0;
-                    spawnPos = player.transform.position + unitSphere;
-                }
-                spawnPos = GetGroundPosition(spawnPos);
+                Facepunch.Pool.FreeList(ref nearbyPlayers);
             }
+
             var normalized = (spawnPos - player.transform.position).normalized;
             var angle = normalized != Vector3.zero ? Quaternion.LookRotation(normalized).eulerAngles.y : UnityEngine.Random.Range(0f, 360f);
-            spawnRot = Quaternion.Euler(new Vector3(0f, angle + 90f, 0f));
-            if (vehicleType != nameof(NormalVehicleType.RidableHorse)) spawnPos += Vector3.up * 0.5f;
+            spawnRot = Quaternion.Euler(Vector3.up * (angle + 90f));
+            if (vehicleType != nameof(NormalVehicleType.RidableHorse)) spawnPos += Vector3.up * 0.3f;
         }
 
         #endregion Command Helper
@@ -1857,6 +1972,7 @@ namespace Oxide.Plugins
                     purchasable = true,
                     displayName = "Small Modular Car",
                     distance = 5,
+                    minDistanceForPlayers = 3,
                     usePermission = true,
                     permission = "vehiclelicence.smallmodularcar",
                     commands = new List<string> { "small", "smallcar" },
@@ -1923,6 +2039,7 @@ namespace Oxide.Plugins
                     purchasable = true,
                     displayName = "Large Modular Car",
                     distance = 6,
+                    minDistanceForPlayers = 3,
                     usePermission = true,
                     permission = "vehiclelicence.largemodularcar",
                     commands = new List<string> { "large", "largecar" },
@@ -2005,6 +2122,9 @@ namespace Oxide.Plugins
                     }
                 },
             };
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version = new VersionNumber(1, 7, 0);
         }
 
         public class ChatSettings
@@ -2015,7 +2135,7 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Spawn Chat Command")] public string spawnCommand = "spawn";
             [JsonProperty(PropertyName = "Recall Chat Command")] public string recallCommand = "recall";
             [JsonProperty(PropertyName = "Kill Chat Command")] public string killCommand = "kill";
-            [JsonProperty(PropertyName = "Chat Prefix")] public string prefix = "<color=#B366FF>[VehicleLicense]</color>: ";
+            [JsonProperty(PropertyName = "Chat Prefix")] public string prefix = "<color=#00FFFF>[VehicleLicense]</color>: ";
             [JsonProperty(PropertyName = "Chat SteamID Icon")] public ulong steamIDIcon = 76561198924840872;
         }
 
@@ -2033,7 +2153,8 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Prevent vehicles from spawning or recalling in safe zone")] public bool preventSafeZone = true;
 
             [JsonProperty(PropertyName = "Prevent other players from mounting vehicle")] public bool preventMounting = true;
-            [JsonProperty(PropertyName = "Prevent mounting on driver's seat only")] public bool blockDriverSeat = true;
+            [JsonProperty(PropertyName = "Prevent mounting on driver's seat only")] public bool preventDriverSeat = true;
+            [JsonProperty(PropertyName = "Prevent vehicles from damaging players")] public bool preventDamagePlayer = true;
             [JsonProperty(PropertyName = "Use Teams")] public bool useTeams;
             [JsonProperty(PropertyName = "Use Clans")] public bool useClans = true;
             [JsonProperty(PropertyName = "Use Friends")] public bool useFriends = true;
@@ -2055,6 +2176,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Sedan",
                 distance = 5,
+                minDistanceForPlayers = 3,
                 usePermission = true,
                 permission = "vehiclelicence.sedan",
                 commands = new List<string> { "car", "sedan" },
@@ -2082,6 +2204,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Chinook",
                 distance = 15,
+                minDistanceForPlayers = 6,
                 usePermission = true,
                 permission = "vehiclelicence.chinook",
                 commands = new List<string> { "ch47", "chinook" },
@@ -2109,6 +2232,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Row Boat",
                 distance = 5,
+                minDistanceForPlayers = 2,
                 usePermission = true,
                 permission = "vehiclelicence.rowboat",
                 commands = new List<string> { "row", "rowboat" },
@@ -2136,6 +2260,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Rigid Hulled Inflatable Boat",
                 distance = 10,
+                minDistanceForPlayers = 3,
                 usePermission = true,
                 permission = "vehiclelicence.rhib",
                 commands = new List<string> { "rhib" },
@@ -2163,6 +2288,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Hot Air Balloon",
                 distance = 20,
+                minDistanceForPlayers = 5,
                 usePermission = true,
                 permission = "vehiclelicence.hotairballoon",
                 commands = new List<string> { "hab", "hotairballoon" },
@@ -2190,6 +2316,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Ridable Horse",
                 distance = 6,
+                minDistanceForPlayers = 1,
                 usePermission = true,
                 permission = "vehiclelicence.ridablehorse",
                 commands = new List<string> { "horse", "ridablehorse" },
@@ -2217,6 +2344,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Mini Copter",
                 distance = 8,
+                minDistanceForPlayers = 2,
                 usePermission = true,
                 permission = "vehiclelicence.minicopter",
                 commands = new List<string> { "mini", "minicopter" },
@@ -2244,6 +2372,7 @@ namespace Oxide.Plugins
                 purchasable = true,
                 displayName = "Transport Copter",
                 distance = 10,
+                minDistanceForPlayers = 4,
                 usePermission = true,
                 permission = "vehiclelicence.transportcopter",
                 commands = new List<string>
@@ -2280,6 +2409,9 @@ namespace Oxide.Plugins
 
             [JsonProperty(PropertyName = "Maximum Health")] public float maxHealth { get; set; }
             [JsonProperty(PropertyName = "Can Recall Maximum Distance")] public float recallMaxDistance { get; set; }
+            [JsonProperty(PropertyName = "Can Kill Maximum Distance")] public float killMaxDistance { get; set; }
+            [JsonProperty(PropertyName = "Minimum distance from player to recall or spawn")] public float minDistanceForPlayers { get; set; }
+
             [JsonProperty(PropertyName = "Remove License Once Crashed")] public bool removeLicenseOnceCrash { get; set; }
 
             [JsonProperty(PropertyName = "Purchase Prices")] public Dictionary<string, PriceInfo> purchasePrices { get; set; }
@@ -2353,7 +2485,7 @@ namespace Oxide.Plugins
             [JsonIgnore] private List<ModuleItem> _validModuleItems;
 
             [JsonIgnore]
-            private IEnumerable<ModuleItem> ModuleItems
+            public IEnumerable<ModuleItem> ModuleItems
             {
                 get
                 {
@@ -2400,7 +2532,7 @@ namespace Oxide.Plugins
             [JsonIgnore] private List<EngineItem> _validEngineItems;
 
             [JsonIgnore]
-            private IEnumerable<EngineItem> EngineItems
+            public IEnumerable<EngineItem> EngineItems
             {
                 get
                 {
@@ -2474,7 +2606,13 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
             catch
             {
@@ -2490,7 +2628,52 @@ namespace Oxide.Plugins
             configData = new ConfigData();
         }
 
-        protected override void SaveConfig() => Config.WriteObject(configData);
+        protected override void SaveConfig() => Config.WriteObject(configData, true);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= new VersionNumber(1, 7, 0))
+                {
+                    if (configData.chatS.prefix == "[VehicleLicense]: ")
+                    {
+                        configData.chatS.prefix = "<color=#00FFFF>[VehicleLicense]</color>: ";
+                    }
+                }
+                if (configData.version <= new VersionNumber(1, 7, 3))
+                {
+                    configData.normalVehicleS.sedanS.minDistanceForPlayers = 3f;
+                    configData.normalVehicleS.chinookS.minDistanceForPlayers = 5f;
+                    configData.normalVehicleS.rowboatS.minDistanceForPlayers = 2f;
+                    configData.normalVehicleS.rhibS.minDistanceForPlayers = 3f;
+                    configData.normalVehicleS.hotAirBalloonS.minDistanceForPlayers = 4f;
+                    configData.normalVehicleS.ridableHorseS.minDistanceForPlayers = 1f;
+                    configData.normalVehicleS.miniCopterS.minDistanceForPlayers = 2f;
+                    configData.normalVehicleS.transportHelicopterS.minDistanceForPlayers = 4f;
+                    foreach (var entry in configData.modularCarS)
+                    {
+                        switch (entry.Value.chassisType)
+                        {
+                            case ChassisType.Small:
+                                entry.Value.minDistanceForPlayers = 2f;
+                                break;
+
+                            case ChassisType.Medium:
+                                entry.Value.minDistanceForPlayers = 2.5f;
+                                break;
+
+                            case ChassisType.Large:
+                                entry.Value.minDistanceForPlayers = 3f;
+                                break;
+
+                            default: continue;
+                        }
+                    }
+                }
+                configData.version = Version;
+            }
+        }
 
         #endregion ConfigurationFile
 
@@ -2635,6 +2818,8 @@ namespace Oxide.Plugins
                 ["NoResourcesToRecallVehicle"] = "You don't have enough resources to recall a <color=#009EFF>{0}</color>. You are missing: {1}",
                 ["MountedOrParented"] = "You cannot spawn or recall a <color=#009EFF>{0}</color> when mounted or parented.",
                 ["RecallTooFar"] = "You must be within <color=#FF1919>{0}</color> meters of <color=#009EFF>{1}</color> to recall.",
+                ["KillTooFar"] = "You must be within <color=#FF1919>{0}</color> meters of <color=#009EFF>{1}</color> to kill.",
+                ["PlayersOnNearby"] = "You cannot spawn or recall a <color=#009EFF>{0}</color> when there are players near the position you are looking at.",
             }, this);
             lang.RegisterMessages(new Dictionary<string, string>
             {
@@ -2642,7 +2827,7 @@ namespace Oxide.Plugins
                 ["HelpLicence1"] = "<color=#4DFF4D>/{0}</color> -- 购买一辆载具",
                 ["HelpLicence2"] = "<color=#4DFF4D>/{0}</color> -- 生成一辆载具",
                 ["HelpLicence3"] = "<color=#4DFF4D>/{0}</color> -- 召回一辆载具",
-                ["HelpLicence4"] = "<color=#4DFF4D>/{0}</color> -- 删除一辆载具",
+                ["HelpLicence4"] = "<color=#4DFF4D>/{0}</color> -- 摧毁一辆载具",
                 ["HelpLicence5"] = "<color=#4DFF4D>/{0}</color> -- 购买，生成，召回一辆 <color=#009EFF>{1}</color>",
 
                 ["HelpBuy"] = "<color=#4DFF4D>/{0} {1}</color> -- 购买一辆 <color=#009EFF>{2}</color>",
@@ -2651,7 +2836,7 @@ namespace Oxide.Plugins
                 ["HelpSpawnPrice"] = "<color=#4DFF4D>/{0} {1}</color> -- 生成一辆 <color=#009EFF>{2}</color>，价格: {3}",
                 ["HelpRecall"] = "<color=#4DFF4D>/{0} {1}</color> -- 召回一辆 <color=#009EFF>{2}</color>",
                 ["HelpRecallPrice"] = "<color=#4DFF4D>/{0} {1}</color> -- 召回一辆 <color=#009EFF>{2}</color>，价格: {3}",
-                ["HelpKill"] = "<color=#4DFF4D>/{0} {1}</color> -- 删除一辆 <color=#009EFF>{2}</color>",
+                ["HelpKill"] = "<color=#4DFF4D>/{0} {1}</color> -- 摧毁一辆 <color=#009EFF>{2}</color>",
 
                 ["NotAllowed"] = "您没有权限使用该命令",
                 ["RaidBlocked"] = "<color=#FF1919>您被突袭阻止了，不能使用该命令</color>",
@@ -2665,7 +2850,7 @@ namespace Oxide.Plugins
                 ["VehicleNotYetPurchased"] = "您还没有购买 <color=#009EFF>{0}</color>, 输入 <color=#4DFF4D>/{1}</color> 了解更多信息",
                 ["VehicleSpawned"] = "您生成了您的 <color=#009EFF>{0}</color>",
                 ["VehicleRecalled"] = "您召回了您的 <color=#009EFF>{0}</color>",
-                ["VehicleKilled"] = "您删除了您的 <color=#009EFF>{0}</color>",
+                ["VehicleKilled"] = "您摧毁了您的 <color=#009EFF>{0}</color>",
                 ["VehicleOnSpawnCooldown"] = "您必须等待 <color=#FF1919>{0}</color> 秒，才能生成您的 <color=#009EFF>{1}</color>",
                 ["VehicleOnRecallCooldown"] = "您必须等待 <color=#FF1919>{0}</color> 秒，才能召回您的 <color=#009EFF>{1}</color>",
                 ["NotLookingAtWater"] = "您必须看着水面才能生成您的 <color=#009EFF>{0}</color>",
@@ -2679,6 +2864,8 @@ namespace Oxide.Plugins
                 ["NoResourcesToRecallVehicle"] = "您没有足够的资源召回 <color=#009EFF>{0}</color>，还需要: {1}",
                 ["MountedOrParented"] = "当您坐着或者在附着在实体上时无法生成或召回 <color=#009EFF>{0}</color>",
                 ["RecallTooFar"] = "您必须在 <color=#FF1919>{0}</color> 米内才能召回您的 <color=#009EFF>{1}</color>",
+                ["KillTooFar"] = "您必须在 <color=#FF1919>{0}</color> 米内才能摧毁您的 <color=#009EFF>{1}</color>",
+                ["PlayersOnNearby"] = "您正在看着的位置附近有玩家时无法生成或召回 <color=#009EFF>{0}</color>",
             }, this, "zh-CN");
             lang.RegisterMessages(new Dictionary<string, string>
             {
@@ -2723,6 +2910,8 @@ namespace Oxide.Plugins
                 ["NoResourcesToRecallVehicle"] = "У вас недостаточно ресурсов для покупки <color=#009EFF>{0}</color>. Вам не хватает: {1}",
                 ["MountedOrParented"] = "Вы не можете создать <color=#009EFF>{0}</color> когда сидите или привязаны к объекту.",
                 ["RecallTooFar"] = "Вы должны быть в пределах <color=#FF1919>{0}</color> метров от <color=#009EFF>{1}</color>, чтобы вызывать.",
+                ["KillTooFar"] = "Вы должны быть в пределах <color=#FF1919>{0}</color> метров от <color=#009EFF>{1}</color>, уничтожить.",
+                ["PlayersOnNearby"] = "Вы не можете создать <color=#009EFF>{0}</color> когда рядом с той позицией, на которую вы смотрите, есть игроки.",
             }, this, "ru");
         }
 

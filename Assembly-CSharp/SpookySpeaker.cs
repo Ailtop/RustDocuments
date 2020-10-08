@@ -63,8 +63,8 @@ public class SpookySpeaker : BaseCombatEntity
 		UpdateInvokes();
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetWantsOn(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();

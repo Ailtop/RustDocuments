@@ -107,6 +107,14 @@ public class PathFinder
 
 	private Point[] neighbors;
 
+	public Point PushPoint;
+
+	public int PushRadius;
+
+	public int PushDistance;
+
+	public int PushMultiplier;
+
 	private static Point[] mooreNeighbors = new Point[8]
 	{
 		new Point(0, 1),
@@ -153,7 +161,7 @@ public class PathFinder
 		int num3 = 0;
 		int num4 = costmap.GetLength(1) - 1;
 		IntrusiveMinHeap<Node> intrusiveMinHeap = default(IntrusiveMinHeap<Node>);
-		int cost = costmap[start.y, start.x];
+		int cost = Cost(start);
 		int heuristic = Heuristic(start, end);
 		intrusiveMinHeap.Add(new Node(start, cost, heuristic));
 		visited[start.y, start.x] = true;
@@ -170,7 +178,7 @@ public class PathFinder
 				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.y, point.x])
 				{
 					visited[point.y, point.x] = true;
-					int num5 = costmap[point.y, point.x];
+					int num5 = Cost(point);
 					if (num5 != int.MaxValue)
 					{
 						int cost2 = node.cost + num5;
@@ -185,11 +193,19 @@ public class PathFinder
 
 	public Node FindPathDirected(List<Point> startList, List<Point> endList, int depth = int.MaxValue)
 	{
+		if (startList.Count == 0 || endList.Count == 0)
+		{
+			return null;
+		}
 		return FindPathReversed(endList, startList, depth);
 	}
 
 	public Node FindPathUndirected(List<Point> startList, List<Point> endList, int depth = int.MaxValue)
 	{
+		if (startList.Count == 0 || endList.Count == 0)
+		{
+			return null;
+		}
 		if (startList.Count > endList.Count)
 		{
 			return FindPathReversed(endList, startList, depth);
@@ -214,7 +230,7 @@ public class PathFinder
 		IntrusiveMinHeap<Node> intrusiveMinHeap = default(IntrusiveMinHeap<Node>);
 		foreach (Point start in startList)
 		{
-			int cost = costmap[start.y, start.x];
+			int cost = Cost(start);
 			int heuristic = Heuristic(start, endList);
 			intrusiveMinHeap.Add(new Node(start, cost, heuristic));
 			visited[start.y, start.x] = true;
@@ -232,7 +248,7 @@ public class PathFinder
 				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.y, point.x])
 				{
 					visited[point.y, point.x] = true;
-					int num5 = costmap[point.y, point.x];
+					int num5 = Cost(point);
 					if (num5 != int.MaxValue)
 					{
 						int cost2 = node.cost + num5;
@@ -321,6 +337,19 @@ public class PathFinder
 			}
 		}
 		return start;
+	}
+
+	public int Cost(Point a)
+	{
+		int num = costmap[a.y, a.x];
+		int num2 = 0;
+		if (num != int.MaxValue && PushMultiplier > 0)
+		{
+			int num3 = Mathf.Max(0, Heuristic(a, PushPoint) - PushRadius * PushRadius);
+			int num4 = Mathf.Max(0, PushDistance * PushDistance - num3);
+			num2 = PushMultiplier * num4;
+		}
+		return num + num2;
 	}
 
 	public int Heuristic(Point a)

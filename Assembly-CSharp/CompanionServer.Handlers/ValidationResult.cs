@@ -5,6 +5,7 @@ namespace CompanionServer.Handlers
 		Success,
 		NotFound,
 		RateLimit,
-		Banned
+		Banned,
+		Rejected
 	}
 }

@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using System;
 using UnityEngine;
@@ -133,10 +134,14 @@ public class PagerEntity : BaseEntity, IRFObject
 		if (!(msg.player == null) && msg.player.CanBuild() && !(UnityEngine.Time.time < nextChangeTime))
 		{
 			nextChangeTime = UnityEngine.Time.time + 2f;
-			int newFrequency = msg.read.Int32();
-			RFManager.ChangeFrequency(frequency, newFrequency, this, true);
-			frequency = newFrequency;
-			SendNetworkUpdateImmediate();
+			int num = msg.read.Int32();
+			if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) == null)
+			{
+				RFManager.ChangeFrequency(frequency, num, this, true);
+				frequency = num;
+				SendNetworkUpdateImmediate();
+				Interface.CallHook("OnRfFrequencyChanged", this, num, msg.player);
+			}
 		}
 	}
 

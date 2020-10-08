@@ -24,11 +24,6 @@ public class StorageMonitor : AppIOEntity
 		}
 	}
 
-	public override bool WantsPower()
-	{
-		return IsOn();
-	}
-
 	public StorageMonitor()
 	{
 		_onContainerChangedHandler = OnContainerChanged;

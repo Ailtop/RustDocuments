@@ -99,7 +99,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 
 	public void GenerateTextures()
 	{
-		SplatTexture0 = new Texture2D(res, res, TextureFormat.RGBA32, true, true);
+		SplatTexture0 = new Texture2D(res, res, TextureFormat.RGBA32, false, true);
 		SplatTexture0.name = "SplatTexture0";
 		SplatTexture0.wrapMode = TextureWrapMode.Clamp;
 		Color32[] cols = new Color32[res * res];
@@ -126,7 +126,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 			}
 		});
 		SplatTexture0.SetPixels32(cols);
-		SplatTexture1 = new Texture2D(res, res, TextureFormat.RGBA32, true, true);
+		SplatTexture1 = new Texture2D(res, res, TextureFormat.RGBA32, false, true);
 		SplatTexture1.name = "SplatTexture1";
 		SplatTexture1.wrapMode = TextureWrapMode.Clamp;
 		Color32[] cols2 = new Color32[res * res];

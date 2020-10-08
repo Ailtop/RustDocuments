@@ -79,7 +79,11 @@ namespace CompanionServer.Handlers
 			TokenBucket tokenBucket = _playerBuckets?.Get(Request.playerId);
 			if (tokenBucket == null || !tokenBucket.TryTake(TokenCost))
 			{
-				return ValidationResult.RateLimit;
+				if (tokenBucket == null || !tokenBucket.IsNaughty)
+				{
+					return ValidationResult.RateLimit;
+				}
+				return ValidationResult.Rejected;
 			}
 			UserId = Request.playerId;
 			Player = (BasePlayer.FindByID(UserId) ?? BasePlayer.FindSleeping(UserId));

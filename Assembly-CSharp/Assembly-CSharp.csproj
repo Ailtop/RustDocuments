@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{3A4547AA-86C2-4A57-918C-3DCE41E0D0DA}</ProjectGuid>
+    <ProjectGuid>{00C8C4BB-D297-41FF-A500-4BD0385947F9}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
@@ -487,7 +487,6 @@
     <Compile Include="CompanionServer\IConnection.cs" />
     <Compile Include="CompanionServer\ITokenBucketSettings.cs" />
     <Compile Include="CompanionServer\Listener.cs" />
-    <Compile Include="CompanionServer\MapImageRenderer.cs" />
     <Compile Include="CompanionServer\NotificationChannel.cs" />
     <Compile Include="CompanionServer\NotificationList.cs" />
     <Compile Include="CompanionServer\NotificationSendResult.cs" />
@@ -517,6 +516,7 @@
     <Compile Include="ConstructionPlaceholder.cs" />
     <Compile Include="ConstructionSkin.cs" />
     <Compile Include="ConstructionSocket.cs" />
+    <Compile Include="ConstructionSocket_Elevator.cs" />
     <Compile Include="ConsumableInformationPanel.cs" />
     <Compile Include="ContainerIOEntity.cs" />
     <Compile Include="ContainerSourceLocalPlayer.cs" />
@@ -545,6 +545,7 @@
     <Compile Include="ConVar\Debugging.cs" />
     <Compile Include="ConVar\Decay.cs" />
     <Compile Include="ConVar\Decor.cs" />
+    <Compile Include="ConVar\Demo.cs" />
     <Compile Include="ConVar\Editor.cs" />
     <Compile Include="ConVar\Effects.cs" />
     <Compile Include="ConVar\Entity.cs" />
@@ -742,6 +743,9 @@
     <Compile Include="ElectricGenerator.cs" />
     <Compile Include="ElectricSwitch.cs" />
     <Compile Include="ElectricWindmill.cs" />
+    <Compile Include="Elevator.cs" />
+    <Compile Include="ElevatorIOEntity.cs" />
+    <Compile Include="ElevatorLift.cs" />
     <Compile Include="EmissionScaledByLight.cs" />
     <Compile Include="EmissionToggle.cs" />
     <Compile Include="EngineAudioClip.cs" />
@@ -754,6 +758,7 @@
     <Compile Include="EntityDebug.cs" />
     <Compile Include="EntityFlag_Animator.cs" />
     <Compile Include="EntityFlag_Toggle.cs" />
+    <Compile Include="EntityFlag_ToggleNotify.cs" />
     <Compile Include="EntityFuelSystem.cs" />
     <Compile Include="EntityHUDRender.cs" />
     <Compile Include="EntityItem_RotateWhenOn.cs" />
@@ -979,6 +984,7 @@
     <Compile Include="IDraggable.cs" />
     <Compile Include="IEffect.cs" />
     <Compile Include="IEffectRecycle.cs" />
+    <Compile Include="IFlagNotify.cs" />
     <Compile Include="Igniter.cs" />
     <Compile Include="IgnoreCollision.cs" />
     <Compile Include="IIgniteable.cs" />
@@ -1233,6 +1239,7 @@
     <Compile Include="MainMenuSystem.cs" />
     <Compile Include="ManagedNoise.cs" />
     <Compile Include="MapEntity.cs" />
+    <Compile Include="MapImageRenderer.cs" />
     <Compile Include="MapInterface.cs" />
     <Compile Include="MapMarker.cs" />
     <Compile Include="MapMarkerCH47.cs" />
@@ -1326,7 +1333,6 @@
     <Compile Include="MonumentType.cs" />
     <Compile Include="MorphCache.cs" />
     <Compile Include="MortarFirework.cs" />
-    <Compile Include="MotorBoat.cs" />
     <Compile Include="MotorRowboat.cs" />
     <Compile Include="Mountain.cs" />
     <Compile Include="MoveForward.cs" />
@@ -2376,6 +2382,7 @@
     <Compile Include="TriggerPlayerForce.cs" />
     <Compile Include="TriggerPlayerTimer.cs" />
     <Compile Include="TriggerRadiation.cs" />
+    <Compile Include="TriggerRagdollRelocate.cs" />
     <Compile Include="TriggerSafeZone.cs" />
     <Compile Include="TriggerTemperature.cs" />
     <Compile Include="TriggerVehicleDrag.cs" />

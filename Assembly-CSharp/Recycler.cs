@@ -67,8 +67,8 @@ public class Recycler : StorageContainer
 		base.ResetState();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void SVSwitch(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();
@@ -225,7 +225,7 @@ public class Recycler : StorageContainer
 					}
 					else
 					{
-						num5 = Mathf.CeilToInt(Mathf.Clamp(num4 * num * UnityEngine.Random.Range(1f, 1f), 0f, ingredient.amount) * (float)num2);
+						num5 = Mathf.CeilToInt(Mathf.Clamp(num4 * num * UnityEngine.Random.Range(1f, 1f), 0f, ingredient.amount)) * num2;
 					}
 					if (num5 > 0)
 					{

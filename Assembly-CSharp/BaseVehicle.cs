@@ -671,10 +671,11 @@ public class BaseVehicle : BaseMountable
 			return baseVehicle.GetDismountPosition(player, out res);
 		}
 		List<Vector3> obj = Facepunch.Pool.GetList<Vector3>();
+		Vector3 visualCheckOrigin = player.TriggerPoint();
 		Transform[] dismountPositions = base.dismountPositions;
 		foreach (Transform transform in dismountPositions)
 		{
-			if (ValidDismountPosition(transform.transform.position))
+			if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
 			{
 				obj.Add(transform.transform.position);
 			}
@@ -748,8 +749,8 @@ public class BaseVehicle : BaseMountable
 		return baseMountable;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server]
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

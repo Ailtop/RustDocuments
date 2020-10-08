@@ -147,8 +147,8 @@ public class RepairBench : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ChangeSkin(RPCMessage msg)
 	{
 		if (UnityEngine.Time.realtimeSinceStartup < nextSkinChangeTime)
@@ -206,7 +206,7 @@ public class RepairBench : StorageContainer
 			ItemDefinition isRedirectOf = slot.info.isRedirectOf;
 			slot.Remove();
 			ItemManager.DoRemoves();
-			ItemManager.Create(isRedirectOf, 1, 0uL).MoveToContainer(base.inventory, 0, false);
+			ItemManager.Create(isRedirectOf, 1, Skin).MoveToContainer(base.inventory, 0, false);
 		}
 		else
 		{
@@ -230,8 +230,8 @@ public class RepairBench : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RepairItem(RPCMessage msg)
 	{
 		Item slot = base.inventory.GetSlot(0);

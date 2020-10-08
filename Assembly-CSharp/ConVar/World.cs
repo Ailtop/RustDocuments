@@ -1,10 +1,14 @@
+using System;
+using System.IO;
+using UnityEngine;
+
 namespace ConVar
 {
 	[Factory("world")]
 	public class World : ConsoleSystem
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool cache = true;
 
 		[ClientVar]
@@ -25,6 +29,24 @@ namespace ConVar
 				}
 				arg.ReplyWith(textTable.ToString());
 			}
+		}
+
+		[ServerVar(Clientside = true, Help = "Renders a high resolution PNG of the current map")]
+		public static void rendermap(Arg arg)
+		{
+			float @float = arg.GetFloat(0, 1f);
+			int imageWidth;
+			int imageHeight;
+			Color background;
+			byte[] array = MapImageRenderer.Render(out imageWidth, out imageHeight, out background, @float, false);
+			if (array == null)
+			{
+				arg.ReplyWith("Failed to render the map (is a map loaded now?)");
+				return;
+			}
+			string fullPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, $"map_{global::World.Size}_{global::World.Seed}.png"));
+			File.WriteAllBytes(fullPath, array);
+			arg.ReplyWith("Saved map render to: " + fullPath);
 		}
 	}
 }

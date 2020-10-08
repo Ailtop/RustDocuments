@@ -256,6 +256,9 @@ namespace ConVar
 		[ServerVar]
 		public static int idlekickadmins = 0;
 
+		[ServerVar(Help = "Censors the Steam player list to make player tracking more difficult")]
+		public static bool censorplayerlist = false;
+
 		[ServerVar(Saved = true)]
 		public static bool showHolsteredItems = true;
 

@@ -167,8 +167,8 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public ProtectionProperties mortalProtection;
 
-	[Header("Spawn")]
 	[SerializeField]
+	[Header("Spawn")]
 	public SpawnSettings spawnSettings;
 
 	[SerializeField]
@@ -178,15 +178,15 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[SerializeField]
 	[Header("Audio/FX")]
+	[SerializeField]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]
 	public GameObjectRef collisionEffect;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	public MeshRenderer[] damageShowingRenderers;
 
 	[ServerVar(Help = "Population active on the server")]

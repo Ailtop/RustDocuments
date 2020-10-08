@@ -64,11 +64,11 @@ namespace ConVar
 
 		private const float textVolumeBoost = 0.2f;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool enabled = true;
 
-		private static List<ChatEntry> History = new List<ChatEntry>();
+		public static List<ChatEntry> History = new List<ChatEntry>();
 
 		[ServerVar]
 		public static bool serverlog = true;
@@ -256,8 +256,8 @@ namespace ConVar
 			return false;
 		}
 
-		[ServerVar]
 		[Help("Return the last x lines of the console. Default is 200")]
+		[ServerVar]
 		public static IEnumerable<ChatEntry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);

@@ -269,6 +269,12 @@ namespace CompanionServer
 				Stream.SetData(_003C_003Ec__DisplayClass19_.message.Buffer.Data, 0, _003C_003Ec__DisplayClass19_.message.Buffer.Length);
 				_003C_003Ec__DisplayClass19_.request = AppRequest.Deserialize(Stream);
 			}
+			catch
+			{
+				DebugEx.LogWarning($"Malformed companion packet from {_003C_003Ec__DisplayClass19_.message.Connection.Address}");
+				_003C_003Ec__DisplayClass19_.message.Connection.Close();
+				throw;
+			}
 			finally
 			{
 				buffer.Dispose();
@@ -279,13 +285,17 @@ namespace CompanionServer
 				try
 				{
 					ValidationResult validationResult = requestHandler.Validate();
-					if (validationResult != 0)
+					switch (validationResult)
 					{
+					case ValidationResult.Rejected:
+						_003C_003Ec__DisplayClass19_.message.Connection.Close();
+						break;
+					default:
 						requestHandler.SendError(Util.ToErrorCode(validationResult));
-					}
-					else
-					{
+						break;
+					case ValidationResult.Success:
 						requestHandler.Execute();
+						break;
 					}
 				}
 				catch (Exception arg)

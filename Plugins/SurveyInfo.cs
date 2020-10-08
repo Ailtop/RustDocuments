@@ -6,15 +6,14 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Survey Info", "Diesel_42o/Arainrr", "1.0.1", ResourceId = 2463)]
+    [Info("Survey Info", "Diesel_42o/Arainrr", "1.0.2", ResourceId = 2463)]
     [Description("Displays loot from survey charges")]
     internal class SurveyInfo : RustPlugin
     {
         private static SurveyInfo instance;
         private const string PERMISSION_USE = "surveyinfo.use";
         private const string PERMISSION_CHECK = "surveyinfo.check";
-        private readonly HashSet<SurveyCrater> checkedCraters = new HashSet<SurveyCrater>();
-        private readonly Dictionary<uint, List<SurveyItem>> activeSurveyCharges = new Dictionary<uint, List<SurveyItem>>();
+        private readonly HashSet<uint> checkedCraters = new HashSet<uint>();
 
         #region Oxide Hooks
 
@@ -29,58 +28,59 @@ namespace Oxide.Plugins
         private void Unload()
         {
             foreach (var player in BasePlayer.activePlayerList)
+            {
                 UnityEngine.Object.Destroy(player.GetComponent<SurveyerComponent>());
+            }
             instance = null;
         }
 
-        private void OnExplosiveThrown(BasePlayer player, SurveyCharge surveyCharge)
+        private void OnAnalysisComplete(SurveyCrater crater, BasePlayer player)
         {
-            if (surveyCharge == null || surveyCharge.net == null || player == null) return;
-            if (!permission.UserHasPermission(player.UserIDString, PERMISSION_USE)) return;
-            var entityID = surveyCharge.net.ID;
-            activeSurveyCharges.Add(entityID, new List<SurveyItem>());
-            timer.Once(5.5f, () =>
+            if (player == null || crater == null) return;
+            var deposit = ResourceDepositManager.GetOrCreate(crater.transform.position);
+            if (deposit?._resources == null) return;
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(Lang("MineralAnalysis", player.UserIDString));
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine();
+            foreach (var resource in deposit._resources)
             {
-                List<SurveyItem> surveyItems;
-                if (activeSurveyCharges.TryGetValue(entityID, out surveyItems))
-                {
-                    activeSurveyCharges.Remove(entityID);
-                    if (surveyItems.Count > 0) SendMineralAnalysis(player, surveyItems);
-                }
-            });
+                var pM = 45f / resource.workNeeded;
+                var displayName = GetResourceDisplayName(resource.type.displayName.english);
+                stringBuilder.AppendLine($"{displayName} : {pM:0.00} pM");
+            }
+            var noteItem = ItemManager.CreateByName("note");
+            noteItem.text = stringBuilder.ToString();
+            player.GiveItem(noteItem, BaseEntity.GiveItemReason.PickedUp);
         }
 
         private void OnEntityKill(SurveyCharge surveyCharge)
         {
-            if (surveyCharge == null || surveyCharge.net == null) return;
-            var entityID = surveyCharge.net.ID;
-            if (!activeSurveyCharges.ContainsKey(entityID)) return;
-            Vector3 checkPosition = surveyCharge.transform.position;
-            timer.Once(0.3f, () =>
+            if (surveyCharge == null) return;
+            var player = surveyCharge.creatorEntity as BasePlayer;
+            if (player == null) return;
+            if (!permission.UserHasPermission(player.UserIDString, PERMISSION_USE)) return;
+            var checkPosition = surveyCharge.transform.position;
+            timer.Once(0.5f, () =>
             {
-                List<SurveyCrater> surveyCraterList = Pool.GetList<SurveyCrater>();
-                Vis.Entities(checkPosition, 1f, surveyCraterList, Rust.Layers.Mask.Default);
-                List<SurveyItem> surveyItems = new List<SurveyItem>();
-                foreach (var surveyCrater in surveyCraterList)
+                var list = Pool.GetList<SurveyCrater>();
+                Vis.Entities(checkPosition, 1f, list, Rust.Layers.Mask.Default);
+                var surveyItems = new List<SurveyItem>();
+                foreach (var surveyCrater in list)
                 {
-                    if (checkedCraters.Contains(surveyCrater)) continue;
+                    if (surveyCrater == null || surveyCrater.net == null) return;
+                    if (checkedCraters.Contains(surveyCrater.net.ID)) continue;
                     var deposit = ResourceDepositManager.GetOrCreate(surveyCrater.transform.position);
                     if (deposit == null) continue;
                     foreach (var resource in deposit._resources)
                     {
-                        string displayName;
-                        if (!configData.displayNames.TryGetValue(resource.type.displayName.english, out displayName))
-                        {
-                            displayName = resource.type.displayName.english;
-                            configData.displayNames.Add(displayName, displayName);
-                            SaveConfig();
-                        }
+                        var displayName = GetResourceDisplayName(resource.type.displayName.english);
                         surveyItems.Add(new SurveyItem { displayName = displayName, amount = resource.amount, workNeeded = resource.workNeeded });
                     }
-                    checkedCraters.Add(surveyCrater);
+                    checkedCraters.Add(surveyCrater.net.ID);
                 }
-                activeSurveyCharges[entityID] = surveyItems;
-                Pool.FreeList(ref surveyCraterList);
+                Pool.FreeList(ref list);
+                if (surveyItems.Count > 0) SendMineralAnalysis(player, surveyItems);
             });
         }
 
@@ -96,6 +96,8 @@ namespace Oxide.Plugins
         }
 
         #endregion Oxide Hooks
+
+        #region Component
 
         private class SurveyerComponent : MonoBehaviour
         {
@@ -131,7 +133,7 @@ namespace Oxide.Plugins
                 if (Time.realtimeSinceStartup - lastCheck >= 0.5f)
                 {
                     if (!player.serverInput.IsDown(BUTTON.FIRE_SECONDARY)) return;
-                    Vector3 surveyPosition = GetSurveyPosition();
+                    var surveyPosition = GetSurveyPosition();
                     instance.Print(player, CanSpawnCrater(surveyPosition) ? instance.Lang("CanSpawnCrater", player.UserIDString) : instance.Lang("CantSpawnCrater", player.UserIDString));
                     lastCheck = Time.realtimeSinceStartup;
                 }
@@ -140,31 +142,36 @@ namespace Oxide.Plugins
             private Vector3 GetSurveyPosition()
             {
                 RaycastHit hitInfo;
-                if (Physics.Raycast(player.eyes.HeadRay(), out hitInfo, 100f, Rust.Layers.Solid))
-                    return hitInfo.point;
-                return player.transform.position;
+                return Physics.Raycast(player.eyes.HeadRay(), out hitInfo, 100f, Rust.Layers.Solid) ? hitInfo.point : player.transform.position;
             }
 
-            private bool CanSpawnCrater(Vector3 position)
+            private static bool CanSpawnCrater(Vector3 position)
             {
                 if (WaterLevel.Test(position)) return false;
                 var deposit = ResourceDepositManager.GetOrCreate(position);
-                if (deposit == null || Time.realtimeSinceStartup - deposit.lastSurveyTime < 10f) return false;
-                RaycastHit raycastHit;
-                if (!TransformUtil.GetGroundInfo(position, out raycastHit, 0.3f, 8388608)) return false;
-                List<SurveyCrater> list = Pool.GetList<SurveyCrater>();
+                if (deposit?._resources == null || Time.realtimeSinceStartup - deposit.lastSurveyTime < 10f) return false;
+                RaycastHit hitOut;
+                if (!TransformUtil.GetGroundInfo(position, out hitOut, 0.3f, 8388608)) return false;
+                var list = Pool.GetList<SurveyCrater>();
                 Vis.Entities(position, 10f, list, 1);
-                bool flag = list.Count > 0;
+                var flag = list.Count > 0;
                 Pool.FreeList(ref list);
                 if (flag) return false;
-                foreach (ResourceDepositManager.ResourceDeposit.ResourceDepositEntry resource in deposit._resources)
+                foreach (var resource in deposit._resources)
                 {
-                    if (resource.spawnType == ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM && !resource.isLiquid && resource.amount >= 1000)
+                    if (resource.spawnType == ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM &&
+                        !resource.isLiquid && resource.amount >= 1000)
+                    {
                         return true;
+                    }
                 }
                 return false;
             }
         }
+
+        #endregion Component
+
+        #region Chat Command
 
         private void CmdCraterInfo(BasePlayer player, string command, string[] args)
         {
@@ -180,7 +187,7 @@ namespace Oxide.Plugins
                 return;
             }
             var surveyCrater = hitInfo.GetEntity() as SurveyCrater;
-            List<SurveyItem> surveyItems = new List<SurveyItem>();
+            var surveyItems = new List<SurveyItem>();
             var deposit = ResourceDepositManager.GetOrCreate(surveyCrater.transform.position);
             if (deposit != null)
             {
@@ -204,16 +211,31 @@ namespace Oxide.Plugins
             SendMineralAnalysis(player, surveyItems);
         }
 
+        #endregion Chat Command
+
         #region Methods
+
+        private string GetResourceDisplayName(string englishName)
+        {
+            string displayName;
+            if (!configData.displayNames.TryGetValue(englishName, out displayName))
+            {
+                displayName = englishName;
+                configData.displayNames.Add(displayName, displayName);
+                SaveConfig();
+            }
+
+            return displayName;
+        }
 
         private void SendMineralAnalysis(BasePlayer player, List<SurveyItem> surveyItems)
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(Lang("MineralAnalysis", player.UserIDString));
             foreach (var surveyItem in surveyItems)
             {
                 float pM = 45f / surveyItem.workNeeded;
-                stringBuilder.AppendLine(Lang("MineralInfo", player.UserIDString, surveyItem.displayName, surveyItem.amount, pM.ToString("0.0")));
+                stringBuilder.AppendLine(Lang("MineralInfo", player.UserIDString, surveyItem.displayName, surveyItem.amount, pM.ToString("0.00")));
             }
             Print(player, stringBuilder.ToString());
         }
@@ -237,10 +259,7 @@ namespace Oxide.Plugins
             public string command = "craterinfo";
 
             [JsonProperty(PropertyName = "Chat Prefix")]
-            public string prefix = "[SurveyInfo]: ";
-
-            [JsonProperty(PropertyName = "Chat Prefix Color")]
-            public string prefixColor = "#00FFFF";
+            public string prefix = "<color=#00FFFF>[SurveyInfo]</color>: ";
 
             [JsonProperty(PropertyName = "Chat SteamID Icon")]
             public ulong steamIDIcon = 0;
@@ -278,7 +297,7 @@ namespace Oxide.Plugins
 
         #region LanguageFile
 
-        private void Print(BasePlayer player, string message) => Player.Message(player, message, $"<color={configData.prefixColor}>{configData.prefix}</color>", configData.steamIDIcon);
+        private void Print(BasePlayer player, string message) => Player.Message(player, message, configData.prefix, configData.steamIDIcon);
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);
 

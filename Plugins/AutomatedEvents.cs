@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Automated Events", "k1lly0u/mspeedie/Arainrr", "1.0.5")]
+    [Info("Automated Events", "k1lly0u/mspeedie/Arainrr", "1.0.6")]
     internal class AutomatedEvents : RustPlugin
     {
         #region Fields
@@ -72,7 +72,13 @@ namespace Oxide.Plugins
             AddCovalenceCommand(configData.chatS.runEventCommand, nameof(CmdRunEvent));
             AddCovalenceCommand(configData.chatS.killEventCommand, nameof(CmdKillEvent));
 
-            if (!eventSchedulePrefabs.Values.Any(x =>
+            var eventTypes = new List<EventType>();
+            foreach (EventType value in Enum.GetValues(typeof(EventType)))
+            {
+                if (value == EventType.None) continue;
+                eventTypes.Add(value);
+            }
+            if (!eventTypes.Any(x =>
             {
                 var baseEventS = GetBaseEventS(x);
                 return baseEventS.enabled && baseEventS.restartTimerOnKill;
@@ -84,7 +90,7 @@ namespace Oxide.Plugins
             {
                 eventEntities = new Dictionary<EventType, BaseEntity>();
             }
-            if (!eventSchedulePrefabs.Values.Any(x => GetBaseEventS(x).disableVanillaEvent))
+            if (!eventTypes.Any(x => GetBaseEventS(x).disableVanillaEvent))
             {
                 Unsubscribe(nameof(OnEventTrigger));
             }
@@ -302,7 +308,7 @@ namespace Oxide.Plugins
                         else
                         {
                             var bradleySpawner = BradleySpawner.singleton;
-                            if (bradleySpawner == null)
+                            if (bradleySpawner == null || bradleySpawner.path?.interestZones == null)
                             {
                                 PrintError("There is no Bradley Spawner on your server, so you cannot spawn a Bradley");
                                 return;
@@ -674,7 +680,6 @@ namespace Oxide.Plugins
             {
                 eventEntities[eventType] = eventEntity;
             }
-
             if (!string.IsNullOrEmpty(eventTypeStr))
             {
                 Interface.CallHook("OnAutoEventTriggered", eventTypeStr, eventEntity, runOnce);

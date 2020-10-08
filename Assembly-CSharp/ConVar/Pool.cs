@@ -21,8 +21,8 @@ namespace ConVar
 		[ServerVar]
 		public static bool prewarm = true;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled = true;
 
 		[ClientVar]
@@ -116,8 +116,8 @@ namespace ConVar
 			Facepunch.Pool.Clear();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void clear_prefabs(Arg arg)
 		{
 			GameManager.server.pool.Clear();

@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using ConVar;
 using Network;
+using Oxide.Core;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -111,17 +112,21 @@ public class RFReceiver : IOEntity, IRFObject
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerSetFrequency(RPCMessage msg)
 	{
 		if (!(msg.player == null) && msg.player.CanBuild())
 		{
-			int newFrequency = msg.read.Int32();
-			RFManager.ChangeFrequency(frequency, newFrequency, this, true);
-			frequency = newFrequency;
-			MarkDirty();
-			SendNetworkUpdate();
+			int num = msg.read.Int32();
+			if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) == null)
+			{
+				RFManager.ChangeFrequency(frequency, num, this, true);
+				frequency = num;
+				MarkDirty();
+				SendNetworkUpdate();
+				Interface.CallHook("OnRfFrequencyChanged", this, num, msg.player);
+			}
 		}
 	}
 

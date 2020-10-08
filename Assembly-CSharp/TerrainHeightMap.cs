@@ -95,7 +95,7 @@ public class TerrainHeightMap : TerrainMap<short>
 					normals[z * normalres + i] = BitUtility.EncodeNormal(normal);
 				}
 			});
-			NormalTexture = new Texture2D(normalres, normalres, TextureFormat.RGBA32, true, true);
+			NormalTexture = new Texture2D(normalres, normalres, TextureFormat.RGBA32, false, true);
 			NormalTexture.name = "NormalTexture";
 			NormalTexture.wrapMode = TextureWrapMode.Clamp;
 			NormalTexture.SetPixels32(normals);

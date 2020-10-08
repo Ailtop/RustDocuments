@@ -46,12 +46,12 @@ public static class ServerUsers
 		}
 	}
 
-	private static Dictionary<ulong, User> users = new Dictionary<ulong, User>();
+	public static Dictionary<ulong, User> users = new Dictionary<ulong, User>();
 
 	public static void Remove(ulong uid)
 	{
-		users.Remove(uid);
 		Interface.CallHook("IOnServerUsersRemove", uid);
+		users.Remove(uid);
 	}
 
 	public static void Set(ulong uid, UserGroup group, string username, string notes, long expiry = -1L)

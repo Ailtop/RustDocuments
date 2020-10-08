@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Remover Tool", "Reneb/Fuji/Arainrr", "4.3.17", ResourceId = 651)]
+    [Info("Remover Tool", "Reneb/Fuji/Arainrr", "4.3.19", ResourceId = 651)]
     [Description("Building and entity removal tool")]
     public class RemoverTool : RustPlugin
     {
@@ -29,7 +29,8 @@ namespace Oxide.Plugins
         private const string PERMISSION_STRUCTURE = "removertool.structure";
         private const string PREFAB_ITEM_DROP = "assets/prefabs/misc/item drop/item_drop.prefab";
 
-        private static readonly int LAYER_ALL = LayerMask.GetMask("Construction", "Deployed", "Default");
+        private const int LAYER_TARGET = ~(1 << 2 | 1 << 3 | 1 << 10 | 1 << 18 | 1 << 28 | 1 << 29);
+        private const int LAYER_ALL = 1 << 8 | 1 << 21;
 
         private static RemoverTool rt;
         private static BUTTON removeButton;
@@ -39,7 +40,7 @@ namespace Oxide.Plugins
         private Coroutine removeStructureCoroutine;
         private Coroutine removeExternalCoroutine;
 
-        private readonly Hash<uint, float> entitySpawnedTimes = new Hash<uint, float>();
+        private Hash<uint, float> entitySpawnedTimes;
         private readonly Hash<ulong, float> cooldownTimes = new Hash<ulong, float>();
 
         private enum RemoveMode
@@ -97,6 +98,7 @@ namespace Oxide.Plugins
             if (configData.raidS.enabled) Subscribe(nameof(OnEntityDeath));
             if (configData.globalS.entityTimeLimit)
             {
+                entitySpawnedTimes = new Hash<uint, float>();
                 Subscribe(nameof(OnEntitySpawned));
                 Subscribe(nameof(OnEntityKill));
             }
@@ -128,7 +130,7 @@ namespace Oxide.Plugins
             foreach (var player in BasePlayer.activePlayerList)
             {
                 var toolRemover = player.GetComponent<ToolRemover>();
-                if (toolRemover != null) UnityEngine.Object.Destroy(toolRemover);
+                if (toolRemover != null) toolRemover.DisableTool();
                 DestroyAllUI(player);
             }
             rt = null;
@@ -152,7 +154,7 @@ namespace Oxide.Plugins
 
         private void OnEntityKill(BaseEntity entity)
         {
-            if (entity == null || entity.net == null) return; 
+            if (entity == null || entity.net == null) return;
             entitySpawnedTimes.Remove(entity.net.ID);
         }
 
@@ -291,7 +293,7 @@ namespace Oxide.Plugins
 
         private class UI
         {
-            public static CuiElementContainer CreateElementContainer(string parent, string panelName, string backgroundColor, string anchorMin, string anchorMax, bool cursor = false)
+            public static CuiElementContainer CreateElementContainer(string parent, string panelName, string backgroundColor, string anchorMin, string anchorMax, string offsetMin = "", string offsetMax = "", bool cursor = false)
             {
                 return new CuiElementContainer()
                 {
@@ -299,11 +301,9 @@ namespace Oxide.Plugins
                         new CuiPanel
                         {
                             Image = { Color = backgroundColor },
-                            RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
+                            RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax ,OffsetMin = offsetMin,OffsetMax = offsetMax},
                             CursorEnabled = cursor
-                        },
-                        new CuiElement().Parent = parent,
-                        panelName
+                        }, parent, panelName
                     }
                 };
             }
@@ -353,28 +353,28 @@ namespace Oxide.Plugins
         private static void CreateCrosshairUI(BasePlayer player)
         {
             if (rt.ImageLibrary == null) return;
-            CuiHelper.DestroyUi(player, UINAME_CROSSHAIR);
             var image = GetImageFromLibrary(UINAME_CROSSHAIR);
             if (string.IsNullOrEmpty(image)) return;
-            var container = UI.CreateElementContainer("Hud", UINAME_CROSSHAIR, "0 0 0 0", configData.removerModeS.crosshairAnchorMin, configData.removerModeS.crosshairAnchorMax);
+            var container = UI.CreateElementContainer("Hud", UINAME_CROSSHAIR, "0 0 0 0", configData.removerModeS.crosshairAnchorMin, configData.removerModeS.crosshairAnchorMax, configData.removerModeS.crosshairOffsetMin, configData.removerModeS.crosshairOffsetMax);
             UI.CreateImage(ref container, UINAME_CROSSHAIR, image, "0 0", "1 1", configData.removerModeS.crosshairColor);
+            CuiHelper.DestroyUi(player, UINAME_CROSSHAIR);
             CuiHelper.AddUi(player, container);
         }
 
         private static void CreateToolUI(BasePlayer player, RemoveType removeType)
         {
-            CuiHelper.DestroyUi(player, UINAME_MAIN);
-            var container = UI.CreateElementContainer("Hud", UINAME_MAIN, configData.uiS.removerToolBackgroundColor, configData.uiS.removerToolAnchorMin, configData.uiS.removerToolAnchorMax);
+            var container = UI.CreateElementContainer("Hud", UINAME_MAIN, configData.uiS.removerToolBackgroundColor, configData.uiS.removerToolAnchorMin, configData.uiS.removerToolAnchorMax, configData.uiS.removerToolOffsetMin, configData.uiS.removerToolOffsetMax);
             UI.CreatePanel(ref container, UINAME_MAIN, configData.uiS.removeBackgroundColor, configData.uiS.removeAnchorMin, configData.uiS.removeAnchorMax);
             UI.CreateLabel(ref container, UINAME_MAIN, configData.uiS.removeTextColor, rt.Lang("RemoverToolType", player.UserIDString, GetRemoveTypeName(removeType)), configData.uiS.removeTextSize, configData.uiS.removeTextAnchorMin, configData.uiS.removeTextAnchorMax, TextAnchor.MiddleLeft);
+            CuiHelper.DestroyUi(player, UINAME_MAIN);
             CuiHelper.AddUi(player, container);
         }
 
         private static void UpdateTimeLeftUI(BasePlayer player, RemoveType removeType, int timeLeft, int currentRemoved, int maxRemovable)
         {
-            CuiHelper.DestroyUi(player, UINAME_TIMELEFT);
             var container = UI.CreateElementContainer(UINAME_MAIN, UINAME_TIMELEFT, configData.uiS.timeLeftBackgroundColor, configData.uiS.timeLeftAnchorMin, configData.uiS.timeLeftAnchorMax);
             UI.CreateLabel(ref container, UINAME_TIMELEFT, configData.uiS.timeLeftTextColor, rt.Lang("TimeLeft", player.UserIDString, timeLeft, removeType == RemoveType.Normal || removeType == RemoveType.Admin ? maxRemovable == 0 ? $"{currentRemoved} / {rt.Lang("Unlimit", player.UserIDString)}" : $"{currentRemoved} / {maxRemovable}" : currentRemoved.ToString()), configData.uiS.timeLeftTextSize, configData.uiS.timeLeftTextAnchorMin, configData.uiS.timeLeftTextAnchorMax, TextAnchor.MiddleLeft);
+            CuiHelper.DestroyUi(player, UINAME_TIMELEFT);
             CuiHelper.AddUi(player, container);
         }
 
@@ -564,13 +564,16 @@ namespace Oxide.Plugins
                         if (configData.uiS.refundEnabled) UpdateRefundUI(player, refund, targetEntity);
                     }
                 }
+
                 if (timeLeft-- <= 0)
-                    Destroy(this);
+                {
+                    DisableTool();
+                }
             }
 
             private void GetTargetEntity()
             {
-                bool flag = Physics.Raycast(player.eyes.HeadRay(), out raycastHit, distance, Rust.Layers.Solid);
+                bool flag = Physics.Raycast(player.eyes.HeadRay(), out raycastHit, distance, LAYER_TARGET);
                 targetEntity = flag ? raycastHit.GetEntity() : null;
             }
 
@@ -589,7 +592,7 @@ namespace Oxide.Plugins
             {
                 if (player == null || !player.IsConnected || !player.CanInteract())
                 {
-                    Destroy(this);
+                    DisableTool();
                     return;
                 }
                 if (removeMode == RemoveMode.NoHeld && player.svActiveItemID != currentItemID)
@@ -599,7 +602,7 @@ namespace Oxide.Plugins
                     {
                         if (configData.removerModeS.disableInHand)
                         {
-                            Destroy(this);
+                            DisableTool();
                             return;
                         }
                         UnEquip();
@@ -630,7 +633,7 @@ namespace Oxide.Plugins
                 if (removeType == RemoveType.Normal && maxRemovable > 0 && currentRemoved >= maxRemovable)
                 {
                     rt.Print(player, rt.Lang("EntityLimit", player.UserIDString, maxRemovable));
-                    Destroy(this);
+                    DisableTool(false);
                 };
             }
 
@@ -645,7 +648,7 @@ namespace Oxide.Plugins
                 activeItem.SetParent(null);
                 player.Invoke(() =>
                 {
-                    if (activeItem == null) return;
+                    if (activeItem == null || !activeItem.IsValid()) return;
                     if (player.inventory.containerBelt.GetSlot(slot) == null)
                     {
                         activeItem.position = slot;
@@ -655,11 +658,23 @@ namespace Oxide.Plugins
                 }, 0.2f);
             }
 
+            public void DisableTool(bool showMessage = true)
+            {
+                if (showMessage)
+                {
+                    if (rt != null && player != null && player.IsConnected)
+                    {
+                        rt.Print(player, rt.Lang("ToolDisabled", player.UserIDString));
+                    }
+                }
+                DestroyImmediate(this);
+            }
+
             private void OnDestroy()
             {
-                CancelInvoke(RemoveUpdate);
                 DestroyAllUI(player);
-                if (removeType == RemoveType.Normal && rt != null)
+                CancelInvoke(RemoveUpdate);
+                if (rt != null && removeType == RemoveType.Normal)
                 {
                     rt.cooldownTimes[player.userID] = Time.realtimeSinceStartup;
                 }
@@ -1088,7 +1103,7 @@ namespace Oxide.Plugins
                 }
             }
             if (shouldRefund) GiveRefund(player, targetEntity);
-            DoNormalRemove(player,targetEntity, configData.removeTypeS[RemoveType.Normal].gibs);
+            DoNormalRemove(player, targetEntity, configData.removeTypeS[RemoveType.Normal].gibs);
             return true;
         }
 
@@ -1473,7 +1488,7 @@ namespace Oxide.Plugins
             int current = 0;
             foreach (var entity in entities)
             {
-                if (DoRemove(entity, gibs) && current++ % configData.globalS.removePerFrame == 0)
+                if (DoRemove(entity, gibs) && ++current % configData.globalS.removePerFrame == 0)
                     yield return CoroutineEx.waitForEndOfFrame;
             }
 
@@ -1510,11 +1525,12 @@ namespace Oxide.Plugins
             return false;
         }
 
-        private static void DoNormalRemove(BasePlayer player,BaseEntity entity, bool gibs = true)
+        private static void DoNormalRemove(BasePlayer player, BaseEntity entity, bool gibs = true)
         {
-            if (DoRemove(entity, gibs))
+            if (entity != null && !entity.IsDestroyed)
             {
                 Interface.CallHook("OnNormalRemovedEntity", player, entity);
+                entity.Kill(gibs ? BaseNetworkable.DestroyMode.Gib : BaseNetworkable.DestroyMode.None);
             }
         }
 
@@ -1525,7 +1541,7 @@ namespace Oxide.Plugins
         private bool IsToolRemover(BasePlayer player) => player?.GetComponent<ToolRemover>() != null;
 
         private string GetPlayerRemoveType(BasePlayer player) => player?.GetComponent<ToolRemover>()?.removeType.ToString();
- 
+
         #endregion API
 
         #region Commands
@@ -1537,8 +1553,7 @@ namespace Oxide.Plugins
                 var sourceRemover = player.GetComponent<ToolRemover>();
                 if (sourceRemover != null)
                 {
-                    UnityEngine.Object.Destroy(sourceRemover);
-                    Print(player, Lang("ToolDisabled", player.UserIDString));
+                    sourceRemover.DisableTool();
                     return;
                 }
             }
@@ -1766,7 +1781,7 @@ namespace Oxide.Plugins
                     var toolRemover = target.GetComponent<ToolRemover>();
                     if (toolRemover != null)
                     {
-                        UnityEngine.Object.Destroy(toolRemover);
+                        toolRemover.DisableTool();
                         Print(arg, $"{target}'s remover tool is disabled");
                     }
                     else Print(arg, $"{target} did not enable the remover tool");
@@ -1899,7 +1914,7 @@ namespace Oxide.Plugins
                         if (toolRemover.removeType == RemoveType.Normal && toolRemover.canOverride)
                         {
                             Print(toolRemover.player, "The remover tool has been disabled by the admin");
-                            UnityEngine.Object.Destroy(toolRemover);
+                            toolRemover.DisableTool(false);
                         }
                     }
                     return;
@@ -2063,10 +2078,7 @@ namespace Oxide.Plugins
                 public string command = "remove";
 
                 [JsonProperty(PropertyName = "Chat Prefix")]
-                public string prefix = "[RemoverTool]: ";
-
-                [JsonProperty(PropertyName = "Chat Prefix Color")]
-                public string prefixColor = "#00FFFF";
+                public string prefix = "<color=#00FFFF>[RemoverTool]</color>: ";
 
                 [JsonProperty(PropertyName = "Chat SteamID Icon")]
                 public ulong steamIDIcon = 0;
@@ -2157,10 +2169,16 @@ namespace Oxide.Plugins
                 public string crosshairImageUrl = "https://i.imgur.com/SqLCJaQ.png";
 
                 [JsonProperty(PropertyName = "No Held Item Mode - Crosshair Box - Min Anchor (in Rust Window)")]
-                public string crosshairAnchorMin = "0.49 0.48";
+                public string crosshairAnchorMin = "0.5 0.5";
 
                 [JsonProperty(PropertyName = "No Held Item Mode - Crosshair Box - Max Anchor (in Rust Window)")]
-                public string crosshairAnchorMax = "0.51 0.52";
+                public string crosshairAnchorMax = "0.5 0.5";
+
+                [JsonProperty(PropertyName = "No Held Item Mode - Crosshair Box - Min Offset (in Rust Window)")]
+                public string crosshairOffsetMin = "-15 -15";
+
+                [JsonProperty(PropertyName = "No Held Item Mode - Crosshair Box - Max Offset (in Rust Window)")]
+                public string crosshairOffsetMax = "15 15";
 
                 [JsonProperty(PropertyName = "No Held Item Mode - Crosshair Box - Image Color")]
                 public string crosshairColor = "1 0 0 1";
@@ -2218,37 +2236,43 @@ namespace Oxide.Plugins
                 public bool enabled = true;
 
                 [JsonProperty(PropertyName = "Main Box - Min Anchor (in Rust Window)")]
-                public string removerToolAnchorMin = "0.1 0.55";
+                public string removerToolAnchorMin = "0 1";
 
                 [JsonProperty(PropertyName = "Main Box - Max Anchor (in Rust Window)")]
-                public string removerToolAnchorMax = "0.4 0.95";
+                public string removerToolAnchorMax = "0 1";
+
+                [JsonProperty(PropertyName = "Main Box - Min Offset (in Rust Window)")]
+                public string removerToolOffsetMin = "30 -330";
+
+                [JsonProperty(PropertyName = "Main Box - Max Offset (in Rust Window)")]
+                public string removerToolOffsetMax = "470 -40";
 
                 [JsonProperty(PropertyName = "Main Box - Background Color")]
                 public string removerToolBackgroundColor = "0 0 0 0";
 
                 [JsonProperty(PropertyName = "Remove Title - Box - Min Anchor (in Main Box)")]
-                public string removeAnchorMin = "0 0.85";
+                public string removeAnchorMin = "0 0.84";
 
                 [JsonProperty(PropertyName = "Remove Title - Box - Max Anchor (in Main Box)")]
-                public string removeAnchorMax = "1 1";
+                public string removeAnchorMax = "0.996 1";
 
                 [JsonProperty(PropertyName = "Remove Title - Box - Background Color")]
-                public string removeBackgroundColor = "0 1 1 0.9";
+                public string removeBackgroundColor = "0.42 0.88 0.88 1";
 
                 [JsonProperty(PropertyName = "Remove Title - Text - Min Anchor (in Main Box)")]
-                public string removeTextAnchorMin = "0.05 0.85";
+                public string removeTextAnchorMin = "0.05 0.84";
 
                 [JsonProperty(PropertyName = "Remove Title - Text - Max Anchor (in Main Box)")]
                 public string removeTextAnchorMax = "0.6 1";
 
                 [JsonProperty(PropertyName = "Remove Title - Text - Text Color")]
-                public string removeTextColor = "1 0 0 0.9";
+                public string removeTextColor = "1 0.1 0.1 1";
 
                 [JsonProperty(PropertyName = "Remove Title - Text - Text Size")]
                 public int removeTextSize = 18;
 
                 [JsonProperty(PropertyName = "Timeleft - Box - Min Anchor (in Main Box)")]
-                public string timeLeftAnchorMin = "0.6 0.85";
+                public string timeLeftAnchorMin = "0.6 0.84";
 
                 [JsonProperty(PropertyName = "Timeleft - Box - Max Anchor (in Main Box)")]
                 public string timeLeftAnchorMax = "1 1";
@@ -2269,13 +2293,13 @@ namespace Oxide.Plugins
                 public int timeLeftTextSize = 15;
 
                 [JsonProperty(PropertyName = "Entity - Box - Min Anchor (in Main Box)")]
-                public string entityAnchorMin = "0 0.71";
+                public string entityAnchorMin = "0 0.68";
 
                 [JsonProperty(PropertyName = "Entity - Box - Max Anchor (in Main Box)")]
-                public string entityAnchorMax = "1 0.85";
+                public string entityAnchorMax = "1 0.84";
 
                 [JsonProperty(PropertyName = "Entity - Box - Background Color")]
-                public string entityBackgroundColor = "0 0 0 0.9";
+                public string entityBackgroundColor = "0 0 0 0.8";
 
                 [JsonProperty(PropertyName = "Entity - Text - Min Anchor (in Entity Box)")]
                 public string entityTextAnchorMin = "0.05 0";
@@ -2293,19 +2317,19 @@ namespace Oxide.Plugins
                 public bool entityImageEnabled = true;
 
                 [JsonProperty(PropertyName = "Entity - Image - Min Anchor (in Entity Box)")]
-                public string entityImageAnchorMin = "0.74 0";
+                public string entityImageAnchorMin = "0.795 0.01";
 
                 [JsonProperty(PropertyName = "Entity - Image - Max Anchor (in Entity Box)")]
-                public string entityImageAnchorMax = "0.86 1";
+                public string entityImageAnchorMax = "0.9 0.99";
 
                 [JsonProperty(PropertyName = "Authorization Check Enabled")]
                 public bool authorizationEnabled = true;
 
                 [JsonProperty(PropertyName = "Authorization Check - Box - Min Anchor (in Main Box)")]
-                public string authorizationsAnchorMin = "0 0.65";
+                public string authorizationsAnchorMin = "0 0.6";
 
                 [JsonProperty(PropertyName = "Authorization Check - Box - Max Anchor (in Main Box)")]
-                public string authorizationsAnchorMax = "1 0.71";
+                public string authorizationsAnchorMax = "1 0.68";
 
                 [JsonProperty(PropertyName = "Authorization Check - Box - Allowed Background")]
                 public string allowedBackgroundColor = "0 1 0 0.8";
@@ -2332,19 +2356,19 @@ namespace Oxide.Plugins
                 public float imageScale = 0.18f;
 
                 [JsonProperty(PropertyName = "Price & Refund - Distance of image from right border")]
-                public float rightDistance = 0.1f;
+                public float rightDistance = 0.05f;
 
                 [JsonProperty(PropertyName = "Price Enabled")]
                 public bool priceEnabled = true;
 
                 [JsonProperty(PropertyName = "Price - Box - Min Anchor (in Main Box)")]
-                public string priceAnchorMin = "0 0.4";
+                public string priceAnchorMin = "0 0.3";
 
                 [JsonProperty(PropertyName = "Price - Box - Max Anchor (in Main Box)")]
-                public string priceAnchorMax = "1 0.65";
+                public string priceAnchorMax = "1 0.6";
 
                 [JsonProperty(PropertyName = "Price - Box - Background Color")]
-                public string priceBackgroundColor = "0 0 0 0.9";
+                public string priceBackgroundColor = "0 0 0 0.8";
 
                 [JsonProperty(PropertyName = "Price - Text - Min Anchor (in Price Box)")]
                 public string priceTextAnchorMin = "0.05 0";
@@ -2374,13 +2398,13 @@ namespace Oxide.Plugins
                 public bool refundEnabled = true;
 
                 [JsonProperty(PropertyName = "Refund - Box - Min Anchor (in Main Box)")]
-                public string refundAnchorMin = "0 0.15";
+                public string refundAnchorMin = "0 0";
 
                 [JsonProperty(PropertyName = "Refund - Box - Max Anchor (in Main Box)")]
-                public string refundAnchorMax = "1 0.4";
+                public string refundAnchorMax = "1 0.3";
 
                 [JsonProperty(PropertyName = "Refund - Box - Background Color")]
-                public string refundBackgroundColor = "0 0 0 0.9";
+                public string refundBackgroundColor = "0 0 0 0.8";
 
                 [JsonProperty(PropertyName = "Refund - Text - Min Anchor (in Refund Box)")]
                 public string refundTextAnchorMin = "0.05 0";
@@ -2463,6 +2487,9 @@ namespace Oxide.Plugins
                     public Dictionary<string, int> refund = new Dictionary<string, int>();
                 }
             }
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version = new VersionNumber(4, 3, 17);
         }
 
         protected override void LoadConfig()
@@ -2472,7 +2499,13 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
             catch
             {
@@ -2488,7 +2521,41 @@ namespace Oxide.Plugins
             configData = new ConfigData();
         }
 
-        protected override void SaveConfig() => Config.WriteObject(configData);
+        protected override void SaveConfig() => Config.WriteObject(configData, true);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= new VersionNumber(4, 3, 17))
+                {
+                    if (configData.chatS.prefix == "[RemoverTool]: ")
+                    {
+                        configData.chatS.prefix = "<color=#00FFFF>[RemoverTool]</color>: ";
+                    }
+
+                    if (configData.uiS.removerToolAnchorMin == "0.1 0.55")
+                    {
+                        configData.uiS.removerToolAnchorMin = "0.04 0.55";
+                    }
+
+                    if (configData.uiS.removerToolAnchorMax == "0.4 0.95")
+                    {
+                        configData.uiS.removerToolAnchorMax = "0.37 0.95";
+                    }
+                }
+
+                if (configData.version <= new VersionNumber(4, 3, 18))
+                {
+                    configData.removerModeS.crosshairAnchorMin = "0.5 0";
+                    configData.removerModeS.crosshairAnchorMax = "0.5 0";
+                    configData.uiS.removerToolAnchorMin = "0 1";
+                    configData.uiS.removerToolAnchorMax = "0 1";
+                }
+
+                configData.version = Version;
+            }
+        }
 
         #endregion ConfigurationFile
 
@@ -2496,7 +2563,7 @@ namespace Oxide.Plugins
 
         private void Print(BasePlayer player, string message)
         {
-            Player.Message(player, message, string.IsNullOrEmpty(configData.chatS.prefix) ? string.Empty : $"<color={configData.chatS.prefixColor}>{configData.chatS.prefix}</color>", configData.chatS.steamIDIcon);
+            Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
         }
 
         private void Print(ConsoleSystem.Arg arg, string message)

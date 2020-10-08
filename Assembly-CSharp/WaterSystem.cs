@@ -432,6 +432,10 @@ public class WaterSystem : MonoBehaviour
 		{
 			UpdateOceanLevel_Native(OceanLevel);
 		}
+		foreach (WaterBody waterBody in WaterBodies)
+		{
+			waterBody.OnOceanLevelChanged(OceanLevel);
+		}
 	}
 
 	public void UpdateWaveData()

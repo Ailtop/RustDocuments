@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using System;
 using UnityEngine;
@@ -147,25 +148,32 @@ public class Detonator : HeldEntity, IRFObject
 			return;
 		}
 		nextChangeTime = UnityEngine.Time.time + 2f;
-		int newFrequency = msg.read.Int32();
-		if (RFManager.IsReserved(newFrequency))
+		int num = msg.read.Int32();
+		if (RFManager.IsReserved(num))
 		{
 			RFManager.ReserveErrorPrint(msg.player);
-			return;
 		}
-		RFManager.ChangeFrequency(frequency, newFrequency, this, false, IsOn());
-		frequency = newFrequency;
-		SendNetworkUpdate();
-		Item item = GetItem();
-		if (item != null)
+		else
 		{
-			if (item.instanceData == null)
+			if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) != null)
 			{
-				item.instanceData = new ProtoBuf.Item.InstanceData();
-				item.instanceData.ShouldPool = false;
+				return;
 			}
-			item.instanceData.dataInt = frequency;
-			item.MarkDirty();
+			RFManager.ChangeFrequency(frequency, num, this, false, IsOn());
+			frequency = num;
+			SendNetworkUpdate();
+			Item item = GetItem();
+			if (item != null)
+			{
+				if (item.instanceData == null)
+				{
+					item.instanceData = new ProtoBuf.Item.InstanceData();
+					item.instanceData.ShouldPool = false;
+				}
+				item.instanceData.dataInt = frequency;
+				item.MarkDirty();
+			}
+			Interface.CallHook("OnRfFrequencyChanged", this, num, msg.player);
 		}
 	}
 

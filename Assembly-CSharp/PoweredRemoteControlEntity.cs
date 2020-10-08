@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using System;
@@ -92,6 +93,11 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 
 	public virtual bool CanControl()
 	{
+		object obj = Interface.CallHook("OnEntityControl", this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (!IsPowered())
 		{
 			return IsStatic();
@@ -133,8 +139,8 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_SetID(RPCMessage msg)
 	{
 		if (IsStatic())

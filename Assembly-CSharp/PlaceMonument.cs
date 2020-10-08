@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlaceMonument : ProceduralComponent
 {
-	private struct SpawnInfo
+	public struct SpawnInfo
 	{
 		public Prefab prefab;
 

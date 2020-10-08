@@ -1038,6 +1038,43 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
+	public void EntityLinkBroadcast<T, S>(Action<T> action, Func<S, bool> canTraverseSocket) where T : BaseEntity where S : Socket_Base
+	{
+		globalBroadcastProtocol++;
+		globalBroadcastQueue.Clear();
+		broadcastProtocol = globalBroadcastProtocol;
+		globalBroadcastQueue.Enqueue(this);
+		if (this is T)
+		{
+			action(this as T);
+		}
+		while (globalBroadcastQueue.Count > 0)
+		{
+			List<EntityLink> entityLinks = globalBroadcastQueue.Dequeue().GetEntityLinks();
+			for (int i = 0; i < entityLinks.Count; i++)
+			{
+				EntityLink entityLink = entityLinks[i];
+				if (!(entityLink.socket is S) || !canTraverseSocket(entityLink.socket as S))
+				{
+					continue;
+				}
+				for (int j = 0; j < entityLink.connections.Count; j++)
+				{
+					BaseEntity owner = entityLink.connections[j].owner;
+					if (owner.broadcastProtocol != globalBroadcastProtocol)
+					{
+						owner.broadcastProtocol = globalBroadcastProtocol;
+						globalBroadcastQueue.Enqueue(owner);
+						if (owner is T)
+						{
+							action(owner as T);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public void EntityLinkBroadcast<T>(Action<T> action) where T : BaseEntity
 	{
 		globalBroadcastProtocol++;

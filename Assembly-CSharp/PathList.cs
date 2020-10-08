@@ -155,6 +155,8 @@ public class PathList
 
 	public bool IsExtraWide => Width > 10f;
 
+	public bool IsExtraNarrow => Width < 5f;
+
 	public PathList(string name, Vector3[] points)
 	{
 		Name = name;

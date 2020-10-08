@@ -134,8 +134,8 @@ public class Signage : BaseCombatEntity, ILOD
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || UnityEngine.Time.realtimeSinceStartup - msg.player.lastSignUpdate < ConVar.AntiHack.signpause)
@@ -216,8 +216,8 @@ public class Signage : BaseCombatEntity, ILOD
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -229,8 +229,8 @@ public class Signage : BaseCombatEntity, ILOD
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))

@@ -61,7 +61,7 @@ public class SleepingBag : DecayEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(3057055788u, "AssignToFriend", this, player, 3f))
+						if (!RPC_Server.IsVisible.Test(3057055788u, "AssignToFriend", this, player, 3f))
 						{
 							return true;
 						}
@@ -97,7 +97,7 @@ public class SleepingBag : DecayEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(1335950295u, "Rename", this, player, 3f))
+						if (!RPC_Server.IsVisible.Test(1335950295u, "Rename", this, player, 3f))
 						{
 							return true;
 						}
@@ -133,7 +133,7 @@ public class SleepingBag : DecayEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(42669546u, "RPC_MakeBed", this, player, 3f))
+						if (!RPC_Server.IsVisible.Test(42669546u, "RPC_MakeBed", this, player, 3f))
 						{
 							return true;
 						}
@@ -169,7 +169,7 @@ public class SleepingBag : DecayEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(393812086u, "RPC_MakePublic", this, player, 3f))
+						if (!RPC_Server.IsVisible.Test(393812086u, "RPC_MakePublic", this, player, 3f))
 						{
 							return true;
 						}
@@ -314,7 +314,7 @@ public class SleepingBag : DecayEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void Rename(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -339,7 +339,7 @@ public class SleepingBag : DecayEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void AssignToFriend(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && deployerUserID == msg.player.userID)
@@ -353,7 +353,7 @@ public class SleepingBag : DecayEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	public void RPC_MakePublic(RPCMessage msg)
 	{
@@ -373,8 +373,8 @@ public class SleepingBag : DecayEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_MakeBed(RPCMessage msg)
 	{
 		if (canBePublic && IsPublic() && msg.player.CanInteract())

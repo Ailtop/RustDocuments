@@ -24,6 +24,7 @@ public class PlayerModel : ListComponent<PlayerModel>
 		SitCarPassenger = 17,
 		SitSummer_Chair = 18,
 		SitRaft_NoPaddle = 19,
+		Sit_SecretLab = 20,
 		Standing = 0x80
 	}
 

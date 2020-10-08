@@ -136,8 +136,8 @@ public class PowerCounter : IOEntity
 		base.ResetState();
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SERVER_SetTarget(RPCMessage msg)
 	{
 		if (CanPlayerAdmin(msg.player))
@@ -147,8 +147,8 @@ public class PowerCounter : IOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ToggleDisplayMode(RPCMessage msg)
 	{
 		if (msg.player.CanBuild())

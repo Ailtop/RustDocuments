@@ -41,23 +41,29 @@ public class MonumentInfo : MonoBehaviour, IPrefabPreProcess
 		int topology3 = TerrainMeta.TopologyMap.GetTopology(point3);
 		int topology4 = TerrainMeta.TopologyMap.GetTopology(point4);
 		int num = TierToMask(Tier);
-		if ((num & topology) == 0)
+		int num2 = 0;
+		if ((num & topology) != 0)
 		{
-			return false;
+			num2++;
 		}
-		if ((num & topology2) == 0)
+		if ((num & topology2) != 0)
 		{
-			return false;
+			num2++;
 		}
-		if ((num & topology3) == 0)
+		if ((num & topology3) != 0)
 		{
-			return false;
+			num2++;
 		}
-		if ((num & topology4) == 0)
+		if ((num & topology4) != 0)
 		{
-			return false;
+			num2++;
 		}
-		return true;
+		return num2 >= 3;
+	}
+
+	public float Distance(Vector3 position)
+	{
+		return new OBB(base.transform.position, base.transform.rotation, Bounds).Distance(position);
 	}
 
 	public bool IsInBounds(Vector3 position)
@@ -68,6 +74,24 @@ public class MonumentInfo : MonoBehaviour, IPrefabPreProcess
 	public Vector3 ClosestPointOnBounds(Vector3 position)
 	{
 		return new OBB(base.transform.position, base.transform.rotation, Bounds).ClosestPoint(position);
+	}
+
+	public PathFinder.Point GetPathFinderPoint(int res)
+	{
+		Vector3 position = base.transform.position;
+		float num = TerrainMeta.NormalizeX(position.x);
+		float num2 = TerrainMeta.NormalizeZ(position.z);
+		PathFinder.Point result = default(PathFinder.Point);
+		result.x = Mathf.Clamp((int)(num * (float)res), 0, res - 1);
+		result.y = Mathf.Clamp((int)(num2 * (float)res), 0, res - 1);
+		return result;
+	}
+
+	public int GetPathFinderRadius(int res)
+	{
+		float a = Bounds.extents.x * TerrainMeta.OneOverSize.x;
+		float b = Bounds.extents.z * TerrainMeta.OneOverSize.z;
+		return Mathf.CeilToInt(Mathf.Max(a, b) * (float)res);
 	}
 
 	protected void OnDrawGizmosSelected()

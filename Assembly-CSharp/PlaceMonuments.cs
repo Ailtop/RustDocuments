@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 public class PlaceMonuments : ProceduralComponent
 {
-	private struct SpawnInfo
+	public struct SpawnInfo
 	{
 		public Prefab prefab;
 
@@ -125,7 +125,7 @@ public class PlaceMonuments : ProceduralComponent
 		}
 	}
 
-	private bool CheckRadius(List<SpawnInfo> spawns, Vector3 pos, float radius)
+	public bool CheckRadius(List<SpawnInfo> spawns, Vector3 pos, float radius)
 	{
 		float num = radius * radius;
 		foreach (SpawnInfo spawn in spawns)

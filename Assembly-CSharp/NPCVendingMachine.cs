@@ -5,6 +5,8 @@ public class NPCVendingMachine : VendingMachine
 {
 	public NPCVendingOrder vendingOrders;
 
+	private float[] refillTimes;
+
 	public byte GetBPState(bool sellItemAsBP, bool currencyItemAsBP)
 	{
 		byte result = 0;
@@ -37,19 +39,7 @@ public class NPCVendingMachine : VendingMachine
 	{
 		if (Interface.CallHook("OnNpcGiveSoldItem", this, soldItem, buyer) == null)
 		{
-			Item item = ItemManager.Create(soldItem.info, soldItem.amount, 0uL);
-			if (soldItem.blueprintTarget != 0)
-			{
-				item.blueprintTarget = soldItem.blueprintTarget;
-			}
 			base.GiveSoldItem(soldItem, buyer);
-			transactionActive = true;
-			if (!item.MoveToContainer(base.inventory))
-			{
-				Debug.LogWarning("NPCVending machine unable to refill item :" + soldItem.info.shortname + " buyer :" + buyer.displayName + " - Contact Developers");
-				item.Remove();
-			}
-			transactionActive = false;
 		}
 	}
 
@@ -65,6 +55,7 @@ public class NPCVendingMachine : VendingMachine
 		skinID = 861142659uL;
 		SendNetworkUpdate();
 		Invoke(InstallFromVendingOrders, 1f);
+		InvokeRandomized(Refill, 1f, 1f, 0.1f);
 	}
 
 	public virtual void InstallFromVendingOrders()
@@ -78,9 +69,8 @@ public class NPCVendingMachine : VendingMachine
 		base.inventory.Clear();
 		ItemManager.DoRemoves();
 		NPCVendingOrder.Entry[] orders = vendingOrders.orders;
-		for (int i = 0; i < orders.Length; i++)
+		foreach (NPCVendingOrder.Entry entry in orders)
 		{
-			NPCVendingOrder.Entry entry = orders[i];
 			AddItemForSale(entry.sellItem.itemid, entry.sellItemAmount, entry.currencyItem.itemid, entry.currencyAmount, GetBPState(entry.sellItemAsBP, entry.currencyAsBP));
 		}
 	}
@@ -88,6 +78,45 @@ public class NPCVendingMachine : VendingMachine
 	public override void InstallDefaultSellOrders()
 	{
 		base.InstallDefaultSellOrders();
+	}
+
+	public void Refill()
+	{
+		if (vendingOrders == null || vendingOrders.orders == null || base.inventory == null)
+		{
+			return;
+		}
+		if (refillTimes == null)
+		{
+			refillTimes = new float[vendingOrders.orders.Length];
+		}
+		for (int i = 0; i < vendingOrders.orders.Length; i++)
+		{
+			NPCVendingOrder.Entry entry = vendingOrders.orders[i];
+			if (!(Time.realtimeSinceStartup > refillTimes[i]))
+			{
+				continue;
+			}
+			int num = Mathf.FloorToInt(base.inventory.GetAmount(entry.sellItem.itemid, false) / entry.sellItemAmount);
+			int num2 = Mathf.Min(10 - num, entry.refillAmount) * entry.sellItemAmount;
+			if (num2 > 0)
+			{
+				transactionActive = true;
+				Item item = null;
+				if (entry.sellItemAsBP)
+				{
+					item = ItemManager.Create(blueprintBaseDef, num2, 0uL);
+					item.blueprintTarget = entry.sellItem.itemid;
+				}
+				else
+				{
+					item = ItemManager.Create(entry.sellItem, num2, 0uL);
+				}
+				item.MoveToContainer(base.inventory);
+				transactionActive = false;
+			}
+			refillTimes[i] = Time.realtimeSinceStartup + entry.refillDelay;
+		}
 	}
 
 	public void ClearSellOrders()

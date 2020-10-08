@@ -30,7 +30,7 @@ public class FileStorage : IDisposable
 
 	private Dictionary<uint, CacheData> _cache = new Dictionary<uint, CacheData>();
 
-	public static FileStorage server = new FileStorage("sv.files." + 198, true);
+	public static FileStorage server = new FileStorage("sv.files." + 199, true);
 
 	protected FileStorage(string name, bool server)
 	{

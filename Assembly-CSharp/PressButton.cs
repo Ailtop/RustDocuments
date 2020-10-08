@@ -10,6 +10,12 @@ public class PressButton : IOEntity
 {
 	public float pressDuration = 5f;
 
+	public float pressPowerTime = 0.5f;
+
+	public int pressPowerAmount = 2;
+
+	public const Flags Flag_EmittingPower = Flags.Reserved3;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("PressButton.OnRpcMessage"))
@@ -63,11 +69,21 @@ public class PressButton : IOEntity
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
 	{
-		if (!IsOn())
+		if (IsOn())
 		{
-			return 0;
+			if (HasFlag(Flags.Reserved3))
+			{
+				return pressPowerAmount;
+			}
+			return base.GetPassthroughAmount();
 		}
-		return base.GetPassthroughAmount(outputSlot);
+		return 0;
+	}
+
+	public void UnpowerTime()
+	{
+		SetFlag(Flags.Reserved3, false);
+		MarkDirty();
 	}
 
 	public override void PostServerLoad()
@@ -76,13 +92,15 @@ public class PressButton : IOEntity
 		SetFlag(Flags.On, false);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void Press(RPCMessage msg)
 	{
 		if (!IsOn() && Interface.CallHook("OnButtonPress", this, msg.player) == null)
 		{
 			SetFlag(Flags.On, true);
+			Invoke(UnpowerTime, pressPowerTime);
+			SetFlag(Flags.Reserved3, true);
 			SendNetworkUpdateImmediate();
 			MarkDirty();
 			Invoke(Unpress, pressDuration);

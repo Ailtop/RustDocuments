@@ -138,7 +138,7 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 		}
 	}
 
-	private bool CheckRadius(List<SpawnInfo> spawns, Vector3 pos, float radius)
+	public bool CheckRadius(List<SpawnInfo> spawns, Vector3 pos, float radius)
 	{
 		float num = radius * radius;
 		foreach (SpawnInfo spawn in spawns)

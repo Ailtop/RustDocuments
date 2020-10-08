@@ -1,5 +1,4 @@
 using Network;
-using Rust;
 using UnityEngine;
 
 public class Kayak : BaseBoat, PoolVehicle
@@ -17,6 +16,8 @@ public class Kayak : BaseBoat, PoolVehicle
 	public float maxPaddleFrequency = 0.5f;
 
 	public float forwardPaddleForce = 5f;
+
+	public float multiDriverPaddleForceMultiplier = 0.75f;
 
 	public float rotatePaddleForce = 3f;
 
@@ -43,7 +44,9 @@ public class Kayak : BaseBoat, PoolVehicle
 
 	public TimeCachedValue<float> fixedDragUpdate;
 
-	public TimeSince lastUsedTime;
+	private TimeSince timeSinceLastUsed;
+
+	private const float DECAY_TICK_TIME = 60f;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -56,12 +59,13 @@ public class Kayak : BaseBoat, PoolVehicle
 	public override void ServerInit()
 	{
 		base.ServerInit();
+		timeSinceLastUsed = 0f;
 		InvokeRandomized(BoatDecay, Random.Range(30f, 60f), 60f, 6f);
 	}
 
 	public override void DriverInput(InputState inputState, BasePlayer player)
 	{
-		lastUsedTime = 0f;
+		timeSinceLastUsed = 0f;
 		if (!IsPlayerHoldingPaddle(player))
 		{
 			return;
@@ -78,17 +82,22 @@ public class Kayak : BaseBoat, PoolVehicle
 		{
 			a = -a;
 		}
+		float num = forwardPaddleForce;
+		if (NumMounted() >= 2)
+		{
+			num *= multiDriverPaddleForceMultiplier;
+		}
 		if (inputState.IsDown(BUTTON.LEFT) || inputState.IsDown(BUTTON.FIRE_PRIMARY))
 		{
 			flag2 = true;
-			rigidBody.AddForceAtPosition(a * forwardPaddleForce, GetPaddlePoint(playerSeat, PaddleDirection.Left), ForceMode.Impulse);
+			rigidBody.AddForceAtPosition(a * num, GetPaddlePoint(playerSeat, PaddleDirection.Left), ForceMode.Impulse);
 			rigidBody.angularVelocity += -base.transform.up * rotatePaddleForce;
 			ClientRPC(null, "OnPaddled", flag ? 2 : 0, playerSeat);
 		}
 		else if (inputState.IsDown(BUTTON.RIGHT) || inputState.IsDown(BUTTON.FIRE_SECONDARY))
 		{
 			flag2 = true;
-			rigidBody.AddForceAtPosition(a * forwardPaddleForce, GetPaddlePoint(playerSeat, PaddleDirection.Right), ForceMode.Impulse);
+			rigidBody.AddForceAtPosition(a * num, GetPaddlePoint(playerSeat, PaddleDirection.Right), ForceMode.Impulse);
 			rigidBody.angularVelocity += base.transform.up * rotatePaddleForce;
 			ClientRPC(null, "OnPaddled", (!flag) ? 1 : 3, playerSeat);
 		}
@@ -162,22 +171,23 @@ public class Kayak : BaseBoat, PoolVehicle
 
 	public float CalculateDesiredDrag()
 	{
-		if (NumMounted() != 0)
+		int num = NumMounted();
+		if (num == 0)
+		{
+			return 0.5f;
+		}
+		if (num < 2)
 		{
 			return 0.05f;
 		}
-		return 0.5f;
+		return 0.1f;
 	}
 
 	public void BoatDecay()
 	{
-		if (base.healthFraction != 0f && !((float)lastUsedTime > 600f))
+		if (base.healthFraction != 0f)
 		{
-			float num = 1f / MotorRowboat.outsidedecayminutes;
-			if (IsOutside())
-			{
-				Hurt(MaxHealth() * num, DamageType.Decay, this, false);
-			}
+			BaseBoatDecay(60f, timeSinceLastUsed, MotorRowboat.outsidedecayminutes, MotorRowboat.deepwaterdecayminutes);
 		}
 	}
 

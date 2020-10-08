@@ -19,12 +19,12 @@ namespace ConVar
 		[ServerVar(Help = "Do not damage any items")]
 		public static bool disablecondition;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool callbacks;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool log
 		{
 			get
@@ -37,15 +37,15 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void renderinfo(Arg arg)
 		{
 			RenderInfo.GenerateReport();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void stall(Arg arg)
 		{
 			float num = Mathf.Clamp(arg.GetFloat(0), 0f, 1f);

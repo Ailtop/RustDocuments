@@ -76,7 +76,22 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		{
 			if (SingletonComponent<SpawnHandler>.Instance.CharDistribution.Sample(out spawnPoint.pos, out spawnPoint.rot))
 			{
-				return true;
+				bool flag = true;
+				if (TerrainMeta.Path != null)
+				{
+					foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+					{
+						if (monument.Distance(spawnPoint.pos) < 50f)
+						{
+							flag = false;
+							break;
+						}
+					}
+				}
+				if (flag)
+				{
+					return true;
+				}
 			}
 		}
 		return false;

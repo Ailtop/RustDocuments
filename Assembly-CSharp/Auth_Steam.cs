@@ -1,3 +1,5 @@
+using ConVar;
+using Facepunch;
 using Network;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,7 +53,8 @@ public static class Auth_Steam
 			}
 			else
 			{
-				PlatformService.Instance.UpdatePlayerSession(connection.userid, connection.username);
+				string userName = ConVar.Server.censorplayerlist ? RandomUsernames.Get(connection.userid) : connection.username;
+				PlatformService.Instance.UpdatePlayerSession(connection.userid, userName);
 			}
 		}
 	}

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class MotorRowboat : MotorBoat
+public class MotorRowboat : BaseBoat
 {
 	[Header("Audio")]
 	public BlendedSoundLoops engineLoops;
@@ -90,12 +90,15 @@ public class MotorRowboat : MotorBoat
 	[ServerVar(Help = "Population active on the server")]
 	public static float population = 0f;
 
-	[ServerVar(Help = "How long before a boat is killed while outside")]
+	[ServerVar(Help = "How long before a boat is killed while outside.  If it's in deep water as well, the minimum of the two is used")]
 	public static float outsidedecayminutes = 180f;
+
+	[ServerVar(Help = "How long before a boat is killed while in deep water. If it's outside as well, the minimum of the two is used")]
+	public static float deepwaterdecayminutes = 120f;
 
 	public EntityFuelSystem fuelSystem;
 
-	public float lastUsedFuelTime;
+	private TimeSince timeSinceLastUsedFuel;
 
 	public Transform[] stationaryDismounts;
 
@@ -112,6 +115,8 @@ public class MotorRowboat : MotorBoat
 	public float offAxisDrag = 1f;
 
 	public float offAxisDot = 0.25f;
+
+	private const float DECAY_TICK_TIME = 60f;
 
 	public float lastHadDriverTime;
 
@@ -194,6 +199,7 @@ public class MotorRowboat : MotorBoat
 	public override void ServerInit()
 	{
 		base.ServerInit();
+		timeSinceLastUsedFuel = 0f;
 		InvokeRandomized(BoatDecay, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
 	}
 
@@ -223,13 +229,9 @@ public class MotorRowboat : MotorBoat
 
 	public void BoatDecay()
 	{
-		if (!dying && base.healthFraction != 0f && !(UnityEngine.Time.time < lastUsedFuelTime + 600f))
+		if (!dying && base.healthFraction != 0f)
 		{
-			float num = 1f / outsidedecayminutes;
-			if (IsOutside())
-			{
-				Hurt(MaxHealth() * num, DamageType.Decay, this, false);
-			}
+			BaseBoatDecay(60f, timeSinceLastUsedFuel, outsidedecayminutes, deepwaterdecayminutes);
 		}
 	}
 
@@ -400,7 +402,7 @@ public class MotorRowboat : MotorBoat
 		{
 			float num5 = HasFlag(Flags.Reserved2) ? 1f : 0.0333f;
 			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime * num5, fuelPerSec);
-			lastUsedFuelTime = UnityEngine.Time.time;
+			timeSinceLastUsedFuel = 0f;
 		}
 	}
 
@@ -473,10 +475,11 @@ public class MotorRowboat : MotorBoat
 	{
 		if (rigidBody.velocity.magnitude <= 4f)
 		{
+			Vector3 visualCheckOrigin = player.TriggerPoint();
 			Transform[] array = stationaryDismounts;
 			foreach (Transform transform in array)
 			{
-				if (ValidDismountPosition(transform.transform.position))
+				if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
 				{
 					return true;
 				}
@@ -490,10 +493,11 @@ public class MotorRowboat : MotorBoat
 		if (rigidBody.velocity.magnitude <= 4f)
 		{
 			List<Vector3> obj = Facepunch.Pool.GetList<Vector3>();
+			Vector3 visualCheckOrigin = player.TriggerPoint();
 			Transform[] array = stationaryDismounts;
 			foreach (Transform transform in array)
 			{
-				if (ValidDismountPosition(transform.transform.position))
+				if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
 				{
 					obj.Add(transform.transform.position);
 				}

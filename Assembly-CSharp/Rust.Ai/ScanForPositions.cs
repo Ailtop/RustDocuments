@@ -17,8 +17,8 @@ namespace Rust.Ai
 		[ApexSerialization(defaultValue = 1.5f)]
 		public int SampleRings = 3;
 
-		[ApexSerialization(defaultValue = false)]
 		[FriendlyName("Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Should be used for fallbacks/stuck-detection only?")]
+		[ApexSerialization(defaultValue = false)]
 		public bool CalculatePath;
 
 		[FriendlyName("Percentage of Inner Circle for Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Here we can define what percentage of the sampling range (it's inner circle) we want to calculate paths for.")]

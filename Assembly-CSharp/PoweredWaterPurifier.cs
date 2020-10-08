@@ -17,6 +17,23 @@ public class PoweredWaterPurifier : WaterPurifier
 		base.ResetState();
 	}
 
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (base.isClient)
+		{
+			return base.CanPickup(player);
+		}
+		if (base.CanPickup(player) && !HasDirtyWater() && waterStorage != null)
+		{
+			if (waterStorage.inventory != null)
+			{
+				return waterStorage.inventory.itemList.Count == 0;
+			}
+			return true;
+		}
+		return false;
+	}
+
 	protected override void SpawnStorageEnt(bool load)
 	{
 		if (load)

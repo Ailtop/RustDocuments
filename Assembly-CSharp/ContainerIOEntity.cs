@@ -172,8 +172,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -219,6 +219,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 
 	public virtual void PlayerStoppedLooting(BasePlayer player)
 	{
+		Interface.CallHook("OnLootEntityEnd", player, this);
 		SetFlag(Flags.Open, false);
 		SendNetworkUpdate();
 	}

@@ -39,42 +39,49 @@ public class GeneratePowerlineLayout : ProceduralComponent
 		List<PathFinder.Point> list5 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list6 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list7 = new List<PathFinder.Point>();
+		foreach (PathList road in TerrainMeta.Path.Roads)
+		{
+			if (road.ProcgenStartNode != null && road.ProcgenEndNode != null && road.IsExtraWide)
+			{
+				int num = 1;
+				for (PathFinder.Node node = road.ProcgenStartNode; node != null; node = node.next)
+				{
+					if (num % 8 == 0)
+					{
+						list5.Add(node.point);
+					}
+					num++;
+				}
+			}
+		}
 		foreach (MonumentInfo item in monuments)
 		{
-			bool flag = list3.Count == 0;
 			TerrainPathConnect[] componentsInChildren = item.GetComponentsInChildren<TerrainPathConnect>(true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
 				if (terrainPathConnect.Type == InfrastructureType.Power)
 				{
-					PathFinder.Point point = terrainPathConnect.GetPoint(length);
-					PathFinder.Node node = pathFinder.FindClosestWalkable(point, 100000);
-					if (node != null)
+					PathFinder.Point pathFinderPoint = terrainPathConnect.GetPathFinderPoint(length);
+					PathFinder.Node node2 = pathFinder.FindClosestWalkable(pathFinderPoint, 100000);
+					if (node2 != null)
 					{
 						PathNode pathNode = new PathNode();
 						pathNode.monument = item;
-						pathNode.node = node;
-						if (flag)
-						{
-							list3.Add(pathNode);
-						}
-						else
-						{
-							list4.Add(pathNode);
-						}
+						pathNode.node = node2;
+						list4.Add(pathNode);
 					}
 				}
 			}
 		}
 		while (list4.Count != 0)
 		{
-			list6.Clear();
 			list7.Clear();
+			list7.AddRange(list4.Select((PathNode x) => x.node.point));
+			list6.Clear();
 			list6.AddRange(list3.Select((PathNode x) => x.node.point));
 			list6.AddRange(list5);
-			list7.AddRange(list4.Select((PathNode x) => x.node.point));
-			PathFinder.Node node2 = pathFinder.FindPathUndirected(list6, list7, 100000);
-			if (node2 == null)
+			PathFinder.Node node3 = pathFinder.FindPathUndirected(list6, list7, 100000);
+			if (node3 == null)
 			{
 				PathNode copy2 = list4[0];
 				list3.AddRange(list4.Where((PathNode x) => x.monument == copy2.monument));
@@ -82,47 +89,47 @@ public class GeneratePowerlineLayout : ProceduralComponent
 				continue;
 			}
 			PathSegment segment = new PathSegment();
-			for (PathFinder.Node node3 = node2; node3 != null; node3 = node3.next)
+			for (PathFinder.Node node4 = node3; node4 != null; node4 = node4.next)
 			{
-				if (node3 == node2)
+				if (node4 == node3)
 				{
-					segment.start = node3;
+					segment.start = node4;
 				}
-				if (node3.next == null)
+				if (node4.next == null)
 				{
-					segment.end = node3;
+					segment.end = node4;
 				}
 			}
 			list2.Add(segment);
 			PathNode copy = list4.Find((PathNode x) => x.node.point == segment.start.point || x.node.point == segment.end.point);
 			list3.AddRange(list4.Where((PathNode x) => x.monument == copy.monument));
 			list4.RemoveAll((PathNode x) => x.monument == copy.monument);
-			int num = 1;
-			for (PathFinder.Node node4 = node2; node4 != null; node4 = node4.next)
+			int num2 = 1;
+			for (PathFinder.Node node5 = node3; node5 != null; node5 = node5.next)
 			{
-				if (num % 8 == 0)
+				if (num2 % 8 == 0)
 				{
-					list5.Add(node4.point);
+					list5.Add(node5.point);
 				}
-				num++;
+				num2++;
 			}
 		}
 		List<Vector3> list8 = new List<Vector3>();
 		foreach (PathSegment item2 in list2)
 		{
-			for (PathFinder.Node node5 = item2.start; node5 != null; node5 = node5.next)
+			for (PathFinder.Node node6 = item2.start; node6 != null; node6 = node6.next)
 			{
-				float num2 = ((float)node5.point.x + 0.5f) / (float)length;
-				float num3 = ((float)node5.point.y + 0.5f) / (float)length;
-				float height = TerrainMeta.HeightMap.GetHeight01(num2, num3);
-				list8.Add(TerrainMeta.Denormalize(new Vector3(num2, height, num3)));
+				float num3 = ((float)node6.point.x + 0.5f) / (float)length;
+				float num4 = ((float)node6.point.y + 0.5f) / (float)length;
+				float height = TerrainMeta.HeightMap.GetHeight01(num3, num4);
+				list8.Add(TerrainMeta.Denormalize(new Vector3(num3, height, num4)));
 			}
 			if (list8.Count != 0)
 			{
 				if (list8.Count >= 8)
 				{
-					int num4 = TerrainMeta.Path.Powerlines.Count + list.Count;
-					PathList pathList = new PathList("Powerline " + num4, list8.ToArray());
+					int num5 = TerrainMeta.Path.Powerlines.Count + list.Count;
+					PathList pathList = new PathList("Powerline " + num5, list8.ToArray());
 					pathList.Start = true;
 					pathList.End = true;
 					pathList.ProcgenStartNode = item2.start;

@@ -148,8 +148,8 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		info.msg.simpleUID.uid = storageUnitInstance.uid;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

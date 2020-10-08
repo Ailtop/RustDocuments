@@ -244,21 +244,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		}
 	}
 
-	public override bool HasSlot(Slot slot)
-	{
-		if (isLockable && slot == Slot.Lock)
-		{
-			return true;
-		}
-		if (isMonitorable && slot == Slot.StorageMonitor)
-		{
-			return true;
-		}
-		return base.HasSlot(slot);
-	}
-
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (isLootable)
@@ -418,6 +405,19 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 				Debug.LogWarning("Storage container without inventory: " + ToString());
 			}
 		}
+	}
+
+	public override bool HasSlot(Slot slot)
+	{
+		if (isLockable && slot == Slot.Lock)
+		{
+			return true;
+		}
+		if (isMonitorable && slot == Slot.StorageMonitor)
+		{
+			return true;
+		}
+		return base.HasSlot(slot);
 	}
 
 	public bool OccupiedCheck(BasePlayer player = null)

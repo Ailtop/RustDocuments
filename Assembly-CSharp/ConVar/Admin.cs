@@ -81,7 +81,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				str = str + "hostname: " + Server.hostname + "\n";
-				str = str + "version : " + 2256.ToString() + " secure (secure mode enabled, connected to Steam3)\n";
+				str = str + "version : " + 2260.ToString() + " secure (secure mode enabled, connected to Steam3)\n";
 				str = str + "map     : " + Server.level + "\n";
 				str += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}

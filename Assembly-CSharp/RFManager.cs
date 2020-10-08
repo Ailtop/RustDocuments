@@ -126,17 +126,12 @@ public class RFManager
 	public static void ChangeFrequency(int oldFrequency, int newFrequency, IRFObject obj, bool isListener, bool isOn = true)
 	{
 		newFrequency = ClampFrequency(newFrequency);
-		if (Interface.CallHook("OnRfFrequencyChange", obj, oldFrequency, newFrequency) != null)
-		{
-			return;
-		}
 		if (isListener)
 		{
 			RemoveListener(oldFrequency, obj);
 			if (isOn)
 			{
 				AddListener(newFrequency, obj);
-				return;
 			}
 		}
 		else
@@ -147,7 +142,6 @@ public class RFManager
 				AddBroadcaster(newFrequency, obj);
 			}
 		}
-		Interface.CallHook("OnRfFrequencyChanged", obj, oldFrequency, newFrequency);
 	}
 
 	public static void MarkFrequencyDirty(int frequency)

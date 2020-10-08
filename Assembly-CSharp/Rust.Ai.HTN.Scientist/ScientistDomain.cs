@@ -2130,21 +2130,21 @@ namespace Rust.Ai.HTN.Scientist
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private ScientistContext _context;
 
+		[Header("Navigation")]
 		[ReadOnly]
 		[SerializeField]
-		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
 		[ReadOnly]
 		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
+		[Header("Sensors")]
 		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
@@ -2191,8 +2191,8 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[Header("Reasoners")]
 		[SerializeField]
+		[Header("Reasoners")]
 		[ReadOnly]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
@@ -2282,13 +2282,13 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[ReadOnly]
 		[SerializeField]
 		[Header("Firearm Utility")]
+		[ReadOnly]
 		private float _lastFirearmUsageTime;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isFiring;
 
 		[ReadOnly]

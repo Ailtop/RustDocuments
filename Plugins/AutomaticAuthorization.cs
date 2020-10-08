@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Automatic Authorization", "k1lly0u/Arainrr", "1.2.0", ResourceId = 2063)]
+    [Info("Automatic Authorization", "k1lly0u/Arainrr", "1.2.2", ResourceId = 2063)]
     public class AutomaticAuthorization : RustPlugin
     {
         #region Fields
@@ -21,7 +22,15 @@ namespace Oxide.Plugins
         private const string PERMISSION_USE = "automaticauthorization.use";
         private readonly Dictionary<ulong, EntityCache> playerEntities = new Dictionary<ulong, EntityCache>();
 
-        public class EntityCache
+        private enum ShareType
+        {
+            None,
+            Teams,
+            Friends,
+            Clans,
+        }
+
+        private class EntityCache
         {
             public HashSet<AutoTurret> autoTurrets = new HashSet<AutoTurret>();
             public HashSet<BuildingPrivlidge> buildingPrivlidges = new HashSet<BuildingPrivlidge>();
@@ -60,9 +69,9 @@ namespace Oxide.Plugins
                 Unsubscribe(nameof(OnClanDestroy));
             }
             Subscribe(nameof(OnEntitySpawned));
-            foreach (var entity in BaseNetworkable.serverEntities)
+            foreach (var entity in BaseNetworkable.serverEntities.OfType<BaseEntity>())
             {
-                CheckEntity(entity as BaseEntity);
+                CheckEntity(entity);
             }
         }
 
@@ -80,33 +89,34 @@ namespace Oxide.Plugins
         private void CheckEntity(BaseEntity entity, bool justCreated = false)
         {
             if (entity == null || !entity.OwnerID.IsSteamId()) return;
-            if (entity is BuildingPrivlidge)
+            var buildingPrivlidge = entity as BuildingPrivlidge;
+            if (buildingPrivlidge != null)
             {
-                var buildingPrivlidge = entity as BuildingPrivlidge;
                 EntityCache entityCache;
-                if (playerEntities.TryGetValue(entity.OwnerID, out entityCache)) entityCache.buildingPrivlidges.Add(buildingPrivlidge);
-                else playerEntities.Add(entity.OwnerID, new EntityCache { buildingPrivlidges = new HashSet<BuildingPrivlidge> { buildingPrivlidge } });
-                if (justCreated && permission.UserHasPermission(entity.OwnerID.ToString(), PERMISSION_USE))
-                    AuthToCupboard(new HashSet<BuildingPrivlidge> { buildingPrivlidge }, entity.OwnerID, true);
+                if (playerEntities.TryGetValue(buildingPrivlidge.OwnerID, out entityCache)) entityCache.buildingPrivlidges.Add(buildingPrivlidge);
+                else playerEntities.Add(buildingPrivlidge.OwnerID, new EntityCache { buildingPrivlidges = new HashSet<BuildingPrivlidge> { buildingPrivlidge } });
+                if (justCreated && permission.UserHasPermission(buildingPrivlidge.OwnerID.ToString(), PERMISSION_USE))
+                    AuthToCupboard(new HashSet<BuildingPrivlidge> { buildingPrivlidge }, buildingPrivlidge.OwnerID, true);
                 return;
             }
-            if (entity is AutoTurret)
+
+            var autoTurret = entity as AutoTurret;
+            if (autoTurret != null)
             {
-                var autoTurret = entity as AutoTurret;
                 EntityCache entityCache;
-                if (playerEntities.TryGetValue(entity.OwnerID, out entityCache)) entityCache.autoTurrets.Add(autoTurret);
-                else playerEntities.Add(entity.OwnerID, new EntityCache { autoTurrets = new HashSet<AutoTurret> { autoTurret } });
-                if (justCreated && permission.UserHasPermission(entity.OwnerID.ToString(), PERMISSION_USE))
-                    AuthToTurret(new HashSet<AutoTurret> { autoTurret }, entity.OwnerID, true);
+                if (playerEntities.TryGetValue(autoTurret.OwnerID, out entityCache)) entityCache.autoTurrets.Add(autoTurret);
+                else playerEntities.Add(autoTurret.OwnerID, new EntityCache { autoTurrets = new HashSet<AutoTurret> { autoTurret } });
+                if (justCreated && permission.UserHasPermission(autoTurret.OwnerID.ToString(), PERMISSION_USE))
+                    AuthToTurret(new HashSet<AutoTurret> { autoTurret }, autoTurret.OwnerID, true);
             }
         }
 
         private void OnEntityKill(BaseCombatEntity entity)
         {
             if (entity == null || !entity.OwnerID.IsSteamId()) return;
-            if (entity is BuildingPrivlidge)
+            var buildingPrivlidge = entity as BuildingPrivlidge;
+            if (buildingPrivlidge != null)
             {
-                var buildingPrivlidge = entity as BuildingPrivlidge;
                 foreach (var entry in playerEntities)
                 {
                     if (entry.Value.buildingPrivlidges.Remove(buildingPrivlidge))
@@ -116,9 +126,10 @@ namespace Oxide.Plugins
                 }
                 return;
             }
-            if (entity is AutoTurret)
+
+            var autoTurret = entity as AutoTurret;
+            if (autoTurret != null)
             {
-                var autoTurret = entity as AutoTurret;
                 foreach (var entry in playerEntities)
                 {
                     if (entry.Value.autoTurrets.Remove(autoTurret))
@@ -134,7 +145,7 @@ namespace Oxide.Plugins
             var parentEntity = baseLock?.GetParentEntity();
             if (player == null || parentEntity == null || !parentEntity.OwnerID.IsSteamId() || !baseLock.IsLocked()) return null;
             if (!permission.UserHasPermission(parentEntity.OwnerID.ToString(), PERMISSION_USE)) return null;
-            var shareData = GetShareData(parentEntity.OwnerID);
+            var shareData = GetShareData(parentEntity.OwnerID, true);
             if (shareData.friendsShare.enabled && HasFriend(parentEntity.OwnerID, player.userID))
             {
                 if (baseLock is KeyLock && shareData.friendsShare.keyLock && CanUnlockEntity(parentEntity, configData.friendsShareS.keyLockS))
@@ -269,7 +280,7 @@ namespace Oxide.Plugins
 
         private IEnumerable<ulong> GetAuthList(ulong playerID, AutoAuthType autoAuthType)
         {
-            var shareData = GetShareData(playerID);
+            var shareData = GetShareData(playerID, true);
             var sharePlayers = new HashSet<ulong> { playerID };
             if (shareData.friendsShare.enabled && (autoAuthType == AutoAuthType.Turret ? shareData.friendsShare.turret : shareData.friendsShare.cupboard))
             {
@@ -292,7 +303,7 @@ namespace Oxide.Plugins
             return sharePlayers;
         }
 
-        private StoredData.ShareData GetShareData(ulong playerID)
+        private StoredData.ShareData GetShareData(ulong playerID, bool readOnly = false)
         {
             StoredData.ShareData shareData;
             if (!storedData.playerShareData.TryGetValue(playerID, out shareData))
@@ -324,6 +335,10 @@ namespace Oxide.Plugins
                         codeLock = configData.teamShareS.codeLockS.enabled,
                     }
                 };
+                if (readOnly)
+                {
+                    return shareData;
+                }
                 storedData.playerShareData.Add(playerID, shareData);
             }
             return shareData;
@@ -352,6 +367,13 @@ namespace Oxide.Plugins
                 if (!configData.teamShareS.codeLockS.enabled) entry.Value.teamShare.codeLock = false;
             }
             SaveData();
+        }
+
+        private IEnumerable<ShareType> GetAvailableTypes()
+        {
+            if (configData.teamShareS.enabled && RelationshipManager.TeamsEnabled()) yield return ShareType.Teams;
+            if (configData.friendsShareS.enabled && Friends != null) yield return ShareType.Friends;
+            if (configData.clanShareS.enabled && Clans != null) yield return ShareType.Clans;
         }
 
         #endregion Methods
@@ -397,7 +419,7 @@ namespace Oxide.Plugins
                 UpdateAuthList(member, AutoAuthType.All);
         }
 
-        private List<ulong> GetTeamMembers(ulong playerID)
+        private static List<ulong> GetTeamMembers(ulong playerID)
         {
             if (!RelationshipManager.TeamsEnabled()) return new List<ulong>();
             var playerTeam = RelationshipManager.Instance.FindPlayersTeam(playerID);
@@ -405,7 +427,7 @@ namespace Oxide.Plugins
             return new List<ulong>();
         }
 
-        private bool SameTeam(ulong playerID, ulong friendID)
+        private static bool SameTeam(ulong playerID, ulong friendID)
         {
             if (!RelationshipManager.TeamsEnabled()) return false;
             var playerTeam = RelationshipManager.Instance.FindPlayersTeam(playerID);
@@ -498,137 +520,102 @@ namespace Oxide.Plugins
 
         #region UI
 
-        private class UI
+        private const string UINAME_MAIN = "AutoAuthUI_Main";
+        private const string UINAME_MENU = "AutoAuthUI_Menu";
+
+        private void CreateMainUI(BasePlayer player)
         {
-            public static CuiElementContainer CreateElementContainer(string parentName, string panelName, string backgroundColor, string anchorMin, string anchorMax, bool cursor = false)
+            var container = new CuiElementContainer();
+            container.Add(new CuiPanel
             {
-                return new CuiElementContainer()
-                {
-                    {
-                        new CuiPanel
-                        {
-                            Image = { Color = backgroundColor },
-                            RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
-                            CursorEnabled = cursor
-                        },
-                        new CuiElement().Parent = parentName,
-                        panelName
-                    }
-                };
-            }
-
-            public static string CreatePanel(ref CuiElementContainer container, string parentName, string backgroundColor, string anchorMin, string anchorMax, bool cursor = false)
+                Image = { Color = "0 0 0 0.6" },
+                RectTransform = { AnchorMin = "0.5 0.5", AnchorMax = "0.5 0.5", OffsetMin = "-380 -200", OffsetMax = "380 260" },
+                CursorEnabled = true
+            }, "Hud", UINAME_MAIN);
+            var titlePanel = container.Add(new CuiPanel
             {
-                return container.Add(new CuiPanel
-                {
-                    Image = { Color = backgroundColor },
-                    RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
-                    CursorEnabled = cursor
-                }, parentName);
-            }
-
-            public static string CreateLabel(ref CuiElementContainer container, string parentName, string textColor, string text, int fontSize, string anchorMin, string anchorMax, TextAnchor align = TextAnchor.MiddleCenter, float fadeIn = 0f)
+                Image = { Color = "0.42 0.88 0.88 1" },
+                RectTransform = { AnchorMin = "0 0.902", AnchorMax = "1 1" },
+            }, UINAME_MAIN);
+            container.Add(new CuiElement
             {
-                return container.Add(new CuiLabel
+                Parent = titlePanel,
+                Components =
                 {
-                    Text = { Color = textColor, FontSize = fontSize, Align = align, Text = text, FadeIn = fadeIn },
-                    RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax }
-                }, parentName);
-            }
-
-            public static string CreateButton(ref CuiElementContainer container, string parentName, string buttonColor, string command, string textColor, string text, int fontSize, string anchorMin, string anchorMax, string close = "", TextAnchor align = TextAnchor.MiddleCenter, float fadeIn = 0f)
+                    new CuiTextComponent { Text = Lang("UI_Title", player.UserIDString), FontSize = 20, Align = TextAnchor.MiddleCenter, Color ="1 0 0 1" },
+                    new CuiOutlineComponent { Distance = "0.5 0.5", Color = "1 1 1 1" },
+                    new CuiRectTransformComponent { AnchorMin = "0.2 0",  AnchorMax = "0.8 1" }
+                }
+            });
+            container.Add(new CuiButton
             {
-                return container.Add(new CuiButton
-                {
-                    Button = { Color = buttonColor, Command = command, Close = close },
-                    RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
-                    Text = { Color = textColor, Text = text, FontSize = fontSize, Align = align, FadeIn = fadeIn }
-                }, parentName);
-            }
+                Button = { Color = "0.95 0.1 0.1 0.95", Close = UINAME_MAIN },
+                Text = { Text = "X", Align = TextAnchor.MiddleCenter, Color = "0 0 0 1", FontSize = 22 },
+                RectTransform = { AnchorMin = "0.885 0.05", AnchorMax = "0.995 0.95" }
+            }, titlePanel);
+            container.Add(new CuiPanel
+            {
+                Image = { Color = "0.1 0.1 0.1 0.4" },
+                RectTransform = { AnchorMin = "0 0", AnchorMax = "1 0.898" },
+            }, UINAME_MAIN, UINAME_MENU);
+            CuiHelper.DestroyUi(player, UINAME_MAIN);
+            CuiHelper.AddUi(player, container);
+            var shareData = GetShareData(player.userID, true);
+            UpdateMenuUI(player, shareData);
         }
 
-        private const string UINAME_AUTO_AUTH = "AutoAuthUI";
-
-        private void CreateUI(BasePlayer player)
+        private void UpdateMenuUI(BasePlayer player, StoredData.ShareData shareData, ShareType type = ShareType.None)
         {
             if (player == null) return;
-            var shareData = GetShareData(player.userID);
-            CuiHelper.DestroyUi(player, UINAME_AUTO_AUTH);
-            var container = UI.CreateElementContainer("Hud", UINAME_AUTO_AUTH, "0 0 0 0.5", "0.15 0.15", "0.85 0.85", true);
-            UI.CreateLabel(ref container, UINAME_AUTO_AUTH, "1 1 1 1", Lang("UI_Title", player.UserIDString), 20, "0.2 0.9", "0.8 1");
-            UI.CreateButton(ref container, UINAME_AUTO_AUTH, "1 0 0 0.9", "AutoAuthUI Close", "0 0 0 1", "X", 18, "0.93 0.93", "1 1");
+            var container = new CuiElementContainer();
+            var availableTypes = GetAvailableTypes();
+            var total = availableTypes.Count();
+            if (total <= 0) return;
+            int i = 0;
 
             #region Teams UI
 
-            if (configData.teamShareS.enabled)
+            if (availableTypes.Contains(ShareType.Teams))
             {
-                var teamsPanel = UI.CreatePanel(ref container, UINAME_AUTO_AUTH, "0 0 0 0.6", "0.025 0.05", "0.325 0.85");
-                UI.CreateLabel(ref container, teamsPanel, "1 0 0 1", Lang("UI_TeamsTitle", player.UserIDString), 18, "0 0.85", "1 1");
-
-                UI.CreateLabel(ref container, teamsPanel, "0 1 1 1", Lang("UI_TeamsShare", player.UserIDString), 14, "0.05 0.69", "0.65 0.8", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, teamsPanel, "0 0 0 0.7", "AutoAuthUI Teams", "0 0 0 0.5", shareData.teamShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.69", "0.95 0.8");
-
-                UI.CreateLabel(ref container, teamsPanel, "0 1 1 1", Lang("UI_TeamsCupboard", player.UserIDString), 14, "0.05 0.53", "0.65 0.64", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, teamsPanel, "0 0 0 0.7", "AutoAuthUI Teams Cupboard", "0 0 0 0.5", shareData.teamShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.53", "0.95 0.64");
-
-                UI.CreateLabel(ref container, teamsPanel, "0 1 1 1", Lang("UI_TeamsTurret", player.UserIDString), 14, "0.05 0.37", "0.65 0.48", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, teamsPanel, "0 0 0 0.7", "AutoAuthUI Teams Turret", "0 0 0 0.5", shareData.teamShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.37", "0.95 0.48");
-
-                UI.CreateLabel(ref container, teamsPanel, "0 1 1 1", Lang("UI_TeamsKeyLock", player.UserIDString), 14, "0.05 0.21", "0.65 0.32", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, teamsPanel, "0 0 0 0.7", "AutoAuthUI Teams KeyLock", "0 0 0 0.5", shareData.teamShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.21", "0.95 0.32");
-
-                UI.CreateLabel(ref container, teamsPanel, "0 1 1 1", Lang("UI_TeamsCodeLock", player.UserIDString), 14, "0.05 0.05", "0.65 0.16", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, teamsPanel, "0 0 0 0.7", "AutoAuthUI Teams CodeLock", "0 0 0 0.5", shareData.teamShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.05", "0.95 0.16");
+                if ((type == ShareType.None || type == ShareType.Teams))
+                {
+                    var anchors = GetMenuSubAnchors(i, total);
+                    CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Teams);
+                    CreateMenuSubUI(ref container, shareData.teamShare, player.UserIDString, ShareType.Teams,
+                        $"{anchors[0]} 0.05", $"{anchors[1]} 0.95");
+                }
+                i++;
             }
 
             #endregion Teams UI
 
             #region Friends UI
 
-            if (configData.friendsShareS.enabled)
+            if (availableTypes.Contains(ShareType.Friends))
             {
-                var friendsPanel = UI.CreatePanel(ref container, UINAME_AUTO_AUTH, "0 0 0 0.6", "0.35 0.05", "0.65 0.85");
-                UI.CreateLabel(ref container, friendsPanel, "1 0 0 1", Lang("UI_FriendsTitle", player.UserIDString), 18, "0 0.85", "1 1");
-
-                UI.CreateLabel(ref container, friendsPanel, "0 1 1 1", Lang("UI_FriendsShare", player.UserIDString), 14, "0.05 0.69", "0.65 0.8", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, friendsPanel, "0 0 0 0.7", "AutoAuthUI Friends", "0 0 0 0.5", shareData.friendsShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.69", "0.95 0.8");
-
-                UI.CreateLabel(ref container, friendsPanel, "0 1 1 1", Lang("UI_FriendsCupboard", player.UserIDString), 14, "0.05 0.53", "0.65 0.64", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, friendsPanel, "0 0 0 0.7", "AutoAuthUI Friends Cupboard", "0 0 0 0.5", shareData.friendsShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.53", "0.95 0.64");
-
-                UI.CreateLabel(ref container, friendsPanel, "0 1 1 1", Lang("UI_FriendsTurret", player.UserIDString), 14, "0.05 0.37", "0.65 0.48", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, friendsPanel, "0 0 0 0.7", "AutoAuthUI Friends Turret", "0 0 0 0.5", shareData.friendsShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.37", "0.95 0.48");
-
-                UI.CreateLabel(ref container, friendsPanel, "0 1 1 1", Lang("UI_FriendsKeyLock", player.UserIDString), 14, "0.05 0.21", "0.65 0.32", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, friendsPanel, "0 0 0 0.7", "AutoAuthUI Friends KeyLock", "0 0 0 0.5", shareData.friendsShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.21", "0.95 0.32");
-
-                UI.CreateLabel(ref container, friendsPanel, "0 1 1 1", Lang("UI_FriendsCodeLock", player.UserIDString), 14, "0.05 0.05", "0.65 0.16", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, friendsPanel, "0 0 0 0.7", "AutoAuthUI Friends CodeLock", "0 0 0 0.5", shareData.friendsShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.05", "0.95 0.16");
+                if ((type == ShareType.None || type == ShareType.Friends))
+                {
+                    var anchors = GetMenuSubAnchors(i, total);
+                    CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Friends);
+                    CreateMenuSubUI(ref container, shareData.friendsShare, player.UserIDString, ShareType.Friends,
+                        $"{anchors[0]} 0.05", $"{anchors[1]} 0.95");
+                }
+                i++;
             }
 
             #endregion Friends UI
 
             #region Clans UI
 
-            if (configData.clanShareS.enabled)
+            if (availableTypes.Contains(ShareType.Clans))
             {
-                var clansPanel = UI.CreatePanel(ref container, UINAME_AUTO_AUTH, "0 0 0 0.6", "0.675 0.05", "0.975 0.85");
-                UI.CreateLabel(ref container, clansPanel, "1 0 0 1", Lang("UI_ClansTitle", player.UserIDString), 18, "0 0.85", "1 1");
-
-                UI.CreateLabel(ref container, clansPanel, "0 1 1 1", Lang("UI_ClansShare", player.UserIDString), 14, "0.05 0.69", "0.65 0.8", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, clansPanel, "0 0 0 0.7", "AutoAuthUI Clans", "0 0 0 0.5", shareData.clanShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.69", "0.95 0.8");
-
-                UI.CreateLabel(ref container, clansPanel, "0 1 1 1", Lang("UI_ClansCupboard", player.UserIDString), 14, "0.05 0.53", "0.65 0.64", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, clansPanel, "0 0 0 0.7", "AutoAuthUI Clans Cupboard", "0 0 0 0.5", shareData.clanShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.53", "0.95 0.64");
-
-                UI.CreateLabel(ref container, clansPanel, "0 1 1 1", Lang("UI_ClansTurret", player.UserIDString), 14, "0.05 0.37", "0.65 0.48", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, clansPanel, "0 0 0 0.7", "AutoAuthUI Clans Turret", "0 0 0 0.5", shareData.clanShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.37", "0.95 0.48");
-
-                UI.CreateLabel(ref container, clansPanel, "0 1 1 1", Lang("UI_ClansKeyLock", player.UserIDString), 14, "0.05 0.21", "0.65 0.32", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, clansPanel, "0 0 0 0.7", "AutoAuthUI Clans KeyLock", "0 0 0 0.5", shareData.clanShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.21", "0.95 0.32");
-
-                UI.CreateLabel(ref container, clansPanel, "0 1 1 1", Lang("UI_ClansCodeLock", player.UserIDString), 14, "0.05 0.05", "0.65 0.16", TextAnchor.MiddleLeft);
-                UI.CreateButton(ref container, clansPanel, "0 0 0 0.7", "AutoAuthUI Clans CodeLock", "0 0 0 0.5", shareData.clanShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString), 14, "0.65 0.05", "0.95 0.16");
+                if ((type == ShareType.None || type == ShareType.Clans))
+                {
+                    var anchors = GetMenuSubAnchors(i, total);
+                    CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Clans);
+                    CreateMenuSubUI(ref container, shareData.clanShare, player.UserIDString, ShareType.Clans,
+                        $"{anchors[0]} 0.05", $"{anchors[1]} 0.95");
+                }
             }
 
             #endregion Clans UI
@@ -636,7 +623,106 @@ namespace Oxide.Plugins
             CuiHelper.AddUi(player, container);
         }
 
-        private static void DestroyUI(BasePlayer player) => CuiHelper.DestroyUi(player, UINAME_AUTO_AUTH);
+        private void CreateMenuSubUI(ref CuiElementContainer container, StoredData.ShareEntry shareEntry, string playerID, ShareType type, string anchorMin, string anchorMax)
+        {
+            var panelName = container.Add(new CuiPanel
+            {
+                Image = { Color = "0.1 0.1 0.1 0.6" },
+                RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
+            }, UINAME_MENU, UINAME_MENU + type);
+            var titlePanel = container.Add(new CuiPanel
+            {
+                Image = { Color = "0.1 0.1 0.1 0.6" },
+                RectTransform = { AnchorMin = "0 0.85", AnchorMax = "1 1" },
+            }, panelName);
+            container.Add(new CuiLabel
+            {
+                Text = { Color = "0 1 1 1", FontSize = 18, Align = TextAnchor.MiddleCenter, Text = Lang($"UI_{type}Title", playerID) },
+                RectTransform = { AnchorMin = "0.1 0", AnchorMax = "0.795 1" }
+            }, titlePanel);
+            var contentPanel = container.Add(new CuiPanel
+            {
+                Image = { Color = "0.1 0.1 0.1 0.6" },
+                RectTransform = { AnchorMin = "0 0", AnchorMax = "0.995 0.845" },
+            }, panelName);
+            int i = 0;
+            var spacing = 1f / 5;
+            var anchors = GetEntryAnchors(i++, spacing);
+            CreateEntry(ref container, contentPanel, $"AutoAuthUI {type}", Lang($"UI_{type}Share", playerID),
+                shareEntry.enabled ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
+                $"0.995 {anchors[1]}");
+            anchors = GetEntryAnchors(i++, spacing);
+            CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} Cupboard", Lang($"UI_{type}Cupboard", playerID),
+                shareEntry.cupboard ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
+                $"0.995 {anchors[1]}");
+            anchors = GetEntryAnchors(i++, spacing);
+            CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} Turret", Lang($"UI_{type}Turret", playerID),
+                shareEntry.turret ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
+                $"0.995 {anchors[1]}");
+            anchors = GetEntryAnchors(i++, spacing);
+            CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} KeyLock", Lang($"UI_{type}KeyLock", playerID),
+                shareEntry.keyLock ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
+                $"0.995 {anchors[1]}");
+            anchors = GetEntryAnchors(i++, spacing);
+            CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} CodeLock", Lang($"UI_{type}CodeLock", playerID),
+                shareEntry.codeLock ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
+                $"0.995 {anchors[1]}");
+        }
+
+        private static void CreateEntry(ref CuiElementContainer container, string parentName, string command, string leftText, string rightText, string anchorMin, string anchorMax)
+        {
+            var panelName = container.Add(new CuiPanel
+            {
+                Image = { Color = "0.1 0.1 0.1 0.6" },
+                RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
+            }, parentName);
+            container.Add(new CuiLabel
+            {
+                Text = { Color = "0 1 1 1", FontSize = 14, Align = TextAnchor.MiddleLeft, Text = leftText },
+                RectTransform = { AnchorMin = "0.1 0", AnchorMax = "0.695 1" }
+            }, panelName);
+            container.Add(new CuiButton
+            {
+                Button = { Color = "0 0 0 0.7", Command = command },
+                Text = { Text = rightText, Align = TextAnchor.MiddleCenter, Color = "1 1 1 1", FontSize = 14 },
+                RectTransform = { AnchorMin = "0.7 0.01", AnchorMax = "0.995 0.99" },
+            }, panelName);
+        }
+
+        private static float[] GetEntryAnchors(int i, float spacing)
+        {
+            return new[] { 1f - (i + 1) * spacing, 1f - i * spacing };
+        }
+
+        private static float[] GetMenuSubAnchors(int i, int total)
+        {
+            switch (total)
+            {
+                case 1:
+                    return new[] { 0.3f, 0.7f };
+
+                case 2:
+                    return i == 0 ? new[] { 0.15f, 0.48f } : new[] { 0.52f, 0.85f };
+
+                case 3:
+                    switch (i)
+                    {
+                        case 0:
+                            return new[] { 0.02f, 0.32f };
+
+                        case 1:
+                            return new[] { 0.335f, 0.665f };
+
+                        default:
+                            return new[] { 0.68f, 0.98f };
+                    }
+
+                default:
+                    return null;
+            }
+        }
+
+        private static void DestroyUI(BasePlayer player) => CuiHelper.DestroyUi(player, UINAME_MAIN);
 
         #endregion UI
 
@@ -650,34 +736,18 @@ namespace Oxide.Plugins
                 return;
             }
             var shareData = GetShareData(player.userID);
+            var availableTypes = GetAvailableTypes();
             if (args == null || args.Length == 0)
             {
-                bool flag = false;
+                if (!availableTypes.Any())
+                {
+                    Print(player, Lang("UnableAutoAuth", player.UserIDString));
+                    return;
+                }
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine();
-                if (Friends != null && configData.friendsShareS.enabled)
+                if (availableTypes.Contains(ShareType.Teams))
                 {
-                    flag = true;
-                    stringBuilder.AppendLine(Lang("AutoShareFriendsStatus", player.UserIDString));
-                    stringBuilder.AppendLine(Lang("AutoShareFriends", player.UserIDString, shareData.friendsShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareFriendsCupboard", player.UserIDString, shareData.friendsShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareFriendsTurret", player.UserIDString, shareData.friendsShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareFriendsKeyLock", player.UserIDString, shareData.friendsShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareFriendsCodeLock", player.UserIDString, shareData.friendsShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                }
-                if (Clans != null && configData.clanShareS.enabled)
-                {
-                    flag = true;
-                    stringBuilder.AppendLine(Lang("AutoShareClansStatus", player.UserIDString));
-                    stringBuilder.AppendLine(Lang("AutoShareClans", player.UserIDString, shareData.clanShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareClansCupboard", player.UserIDString, shareData.clanShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareClansTurret", player.UserIDString, shareData.clanShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareClansKeyLock", player.UserIDString, shareData.clanShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                    stringBuilder.AppendLine(Lang("AutoShareClansCodeLock", player.UserIDString, shareData.clanShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                }
-                if (RelationshipManager.TeamsEnabled() && configData.teamShareS.enabled)
-                {
-                    flag = true;
                     stringBuilder.AppendLine(Lang("AutoShareTeamsStatus", player.UserIDString));
                     stringBuilder.AppendLine(Lang("AutoShareTeams", player.UserIDString, shareData.teamShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
                     stringBuilder.AppendLine(Lang("AutoShareTeamsCupboard", player.UserIDString, shareData.teamShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
@@ -685,19 +755,110 @@ namespace Oxide.Plugins
                     stringBuilder.AppendLine(Lang("AutoShareTeamsKeyLock", player.UserIDString, shareData.teamShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
                     stringBuilder.AppendLine(Lang("AutoShareTeamsCodeLock", player.UserIDString, shareData.teamShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
                 }
-                if (!flag)
+                if (availableTypes.Contains(ShareType.Friends))
                 {
-                    Print(player, Lang("UnableAutoAuth", player.UserIDString));
-                    return;
+                    stringBuilder.AppendLine(Lang("AutoShareFriendsStatus", player.UserIDString));
+                    stringBuilder.AppendLine(Lang("AutoShareFriends", player.UserIDString, shareData.friendsShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareFriendsCupboard", player.UserIDString, shareData.friendsShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareFriendsTurret", player.UserIDString, shareData.friendsShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareFriendsKeyLock", player.UserIDString, shareData.friendsShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareFriendsCodeLock", player.UserIDString, shareData.friendsShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                }
+                if (availableTypes.Contains(ShareType.Clans))
+                {
+                    stringBuilder.AppendLine(Lang("AutoShareClansStatus", player.UserIDString));
+                    stringBuilder.AppendLine(Lang("AutoShareClans", player.UserIDString, shareData.clanShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareClansCupboard", player.UserIDString, shareData.clanShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareClansTurret", player.UserIDString, shareData.clanShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareClansKeyLock", player.UserIDString, shareData.clanShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                    stringBuilder.AppendLine(Lang("AutoShareClansCodeLock", player.UserIDString, shareData.clanShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
                 }
                 Print(player, stringBuilder.ToString());
                 return;
             }
             switch (args[0].ToLower())
             {
+                case "at":
+                case "autoteam":
+                    if (!availableTypes.Contains(ShareType.Teams))
+                    {
+                        Print(player, Lang("TeamsDisabled", player.UserIDString));
+                        return;
+                    }
+                    if (args.Length <= 1)
+                    {
+                        shareData.teamShare.enabled = !shareData.teamShare.enabled;
+                        Print(player, Lang("Teams", player.UserIDString, shareData.teamShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                        UpdateAuthList(player.userID, AutoAuthType.All);
+                        return;
+                    }
+                    switch (args[1].ToLower())
+                    {
+                        case "c":
+                        case "cupboard":
+                            if (!configData.clanShareS.shareCupboard)
+                            {
+                                Print(player, Lang("TeamsCupboardDisable", player.UserIDString));
+                                return;
+                            }
+                            shareData.teamShare.cupboard = !shareData.teamShare.cupboard;
+                            Print(player, Lang("TeamsCupboard", player.UserIDString, shareData.teamShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                            UpdateAuthList(player.userID, AutoAuthType.Cupboard);
+                            return;
+
+                        case "t":
+                        case "turret":
+                            if (!configData.clanShareS.shareTurret)
+                            {
+                                Print(player, Lang("TeamsTurretDisable", player.UserIDString));
+                                return;
+                            }
+                            shareData.teamShare.turret = !shareData.teamShare.turret;
+                            Print(player, Lang("TeamsTurret", player.UserIDString, shareData.teamShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                            UpdateAuthList(player.userID, AutoAuthType.Turret);
+                            return;
+
+                        case "kl":
+                        case "keylock":
+                            if (!configData.clanShareS.keyLockS.enabled)
+                            {
+                                Print(player, Lang("TeamsKeyLockDisable", player.UserIDString));
+                                return;
+                            }
+                            shareData.teamShare.keyLock = !shareData.teamShare.keyLock;
+                            Print(player, Lang("TeamsKeyLock", player.UserIDString, shareData.teamShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                            return;
+
+                        case "cl":
+                        case "codelock":
+                            if (!configData.clanShareS.codeLockS.enabled)
+                            {
+                                Print(player, Lang("TeamsCodeLockDisable", player.UserIDString));
+                                return;
+                            }
+                            shareData.teamShare.codeLock = !shareData.teamShare.codeLock;
+                            Print(player, Lang("TeamsCodeLock", player.UserIDString, shareData.teamShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+
+                            return;
+
+                        case "h":
+                        case "help":
+                            StringBuilder stringBuilder1 = new StringBuilder();
+                            stringBuilder1.AppendLine();
+                            stringBuilder1.AppendLine(Lang("TeamsSyntax", player.UserIDString, configData.chatS.chatCommand));
+                            stringBuilder1.AppendLine(Lang("TeamsSyntax1", player.UserIDString, configData.chatS.chatCommand));
+                            stringBuilder1.AppendLine(Lang("TeamsSyntax2", player.UserIDString, configData.chatS.chatCommand));
+                            stringBuilder1.AppendLine(Lang("TeamsSyntax3", player.UserIDString, configData.chatS.chatCommand));
+                            stringBuilder1.AppendLine(Lang("TeamsSyntax4", player.UserIDString, configData.chatS.chatCommand));
+                            Print(player, stringBuilder1.ToString());
+                            return;
+                    }
+                    Print(player, Lang("SyntaxError", player.UserIDString, configData.chatS.chatCommand));
+                    return;
+
                 case "af":
                 case "autofriends":
-                    if (!configData.friendsShareS.enabled)
+                    if (!availableTypes.Contains(ShareType.Friends))
                     {
                         Print(player, Lang("FriendsDisabled", player.UserIDString));
                         return;
@@ -774,7 +935,7 @@ namespace Oxide.Plugins
 
                 case "ac":
                 case "autoclan":
-                    if (!configData.clanShareS.enabled)
+                    if (!availableTypes.Contains(ShareType.Clans))
                     {
                         Print(player, Lang("ClansDisabled", player.UserIDString));
                         return;
@@ -849,125 +1010,40 @@ namespace Oxide.Plugins
                     Print(player, Lang("SyntaxError", player.UserIDString, configData.chatS.chatCommand));
                     return;
 
-                case "at":
-                case "autoteam":
-                    if (!configData.teamShareS.enabled)
-                    {
-                        Print(player, Lang("TeamsDisabled", player.UserIDString));
-                        return;
-                    }
-                    if (args.Length <= 1)
-                    {
-                        shareData.teamShare.enabled = !shareData.teamShare.enabled;
-                        Print(player, Lang("Teams", player.UserIDString, shareData.teamShare.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                        UpdateAuthList(player.userID, AutoAuthType.All);
-                        return;
-                    }
-                    switch (args[1].ToLower())
-                    {
-                        case "c":
-                        case "cupboard":
-                            if (!configData.clanShareS.shareCupboard)
-                            {
-                                Print(player, Lang("TeamsCupboardDisable", player.UserIDString));
-                                return;
-                            }
-                            shareData.teamShare.cupboard = !shareData.teamShare.cupboard;
-                            Print(player, Lang("TeamsCupboard", player.UserIDString, shareData.teamShare.cupboard ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                            UpdateAuthList(player.userID, AutoAuthType.Cupboard);
-                            return;
-
-                        case "t":
-                        case "turret":
-                            if (!configData.clanShareS.shareTurret)
-                            {
-                                Print(player, Lang("TeamsTurretDisable", player.UserIDString));
-                                return;
-                            }
-                            shareData.teamShare.turret = !shareData.teamShare.turret;
-                            Print(player, Lang("TeamsTurret", player.UserIDString, shareData.teamShare.turret ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                            UpdateAuthList(player.userID, AutoAuthType.Turret);
-                            return;
-
-                        case "kl":
-                        case "keylock":
-                            if (!configData.clanShareS.keyLockS.enabled)
-                            {
-                                Print(player, Lang("TeamsKeyLockDisable", player.UserIDString));
-                                return;
-                            }
-                            shareData.teamShare.keyLock = !shareData.teamShare.keyLock;
-                            Print(player, Lang("TeamsKeyLock", player.UserIDString, shareData.teamShare.keyLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-                            return;
-
-                        case "cl":
-                        case "codelock":
-                            if (!configData.clanShareS.codeLockS.enabled)
-                            {
-                                Print(player, Lang("TeamsCodeLockDisable", player.UserIDString));
-                                return;
-                            }
-                            shareData.teamShare.codeLock = !shareData.teamShare.codeLock;
-                            Print(player, Lang("TeamsCodeLock", player.UserIDString, shareData.teamShare.codeLock ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
-
-                            return;
-
-                        case "h":
-                        case "help":
-                            StringBuilder stringBuilder1 = new StringBuilder();
-                            stringBuilder1.AppendLine();
-                            stringBuilder1.AppendLine(Lang("TeamsSyntax", player.UserIDString, configData.chatS.chatCommand));
-                            stringBuilder1.AppendLine(Lang("TeamsSyntax1", player.UserIDString, configData.chatS.chatCommand));
-                            stringBuilder1.AppendLine(Lang("TeamsSyntax2", player.UserIDString, configData.chatS.chatCommand));
-                            stringBuilder1.AppendLine(Lang("TeamsSyntax3", player.UserIDString, configData.chatS.chatCommand));
-                            stringBuilder1.AppendLine(Lang("TeamsSyntax4", player.UserIDString, configData.chatS.chatCommand));
-                            Print(player, stringBuilder1.ToString());
-                            return;
-                    }
-                    Print(player, Lang("SyntaxError", player.UserIDString, configData.chatS.chatCommand));
-                    return;
-
                 case "h":
                 case "help":
-                    bool flag = false;
+                    if (!availableTypes.Any())
+                    {
+                        Print(player, Lang("UnableAutoAuth", player.UserIDString));
+                        return;
+                    }
                     StringBuilder stringBuilder = new StringBuilder();
                     stringBuilder.AppendLine();
-                    if (Friends != null && configData.friendsShareS.enabled)
+                    if (availableTypes.Contains(ShareType.Teams))
                     {
-                        flag = true;
-                        stringBuilder.AppendLine(Lang("FriendsSyntax", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("FriendsSyntax1", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("FriendsSyntax2", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("FriendsSyntax3", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("FriendsSyntax4", player.UserIDString, configData.chatS.chatCommand));
-                    }
-                    if (Clans != null && configData.clanShareS.enabled)
-                    {
-                        flag = true;
-                        stringBuilder.AppendLine(Lang("ClansSyntax", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("ClansSyntax1", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("ClansSyntax2", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("ClansSyntax3", player.UserIDString, configData.chatS.chatCommand));
-                        stringBuilder.AppendLine(Lang("ClansSyntax4", player.UserIDString, configData.chatS.chatCommand));
-                    }
-                    if (RelationshipManager.TeamsEnabled() && configData.teamShareS.enabled)
-                    {
-                        flag = true;
                         stringBuilder.AppendLine(Lang("TeamsSyntax", player.UserIDString, configData.chatS.chatCommand));
                         stringBuilder.AppendLine(Lang("TeamsSyntax1", player.UserIDString, configData.chatS.chatCommand));
                         stringBuilder.AppendLine(Lang("TeamsSyntax2", player.UserIDString, configData.chatS.chatCommand));
                         stringBuilder.AppendLine(Lang("TeamsSyntax3", player.UserIDString, configData.chatS.chatCommand));
                         stringBuilder.AppendLine(Lang("TeamsSyntax4", player.UserIDString, configData.chatS.chatCommand));
                     }
-                    if (!flag)
+                    if (availableTypes.Contains(ShareType.Friends))
                     {
-                        Print(player, Lang("UnableAutoAuth", player.UserIDString));
-                        return;
+                        stringBuilder.AppendLine(Lang("FriendsSyntax", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("FriendsSyntax1", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("FriendsSyntax2", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("FriendsSyntax3", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("FriendsSyntax4", player.UserIDString, configData.chatS.chatCommand));
                     }
-                    else
+                    if (availableTypes.Contains(ShareType.Clans))
                     {
-                        stringBuilder.AppendLine(Lang("UISyntax", player.UserIDString, configData.chatS.uiCommand));
+                        stringBuilder.AppendLine(Lang("ClansSyntax", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("ClansSyntax1", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("ClansSyntax2", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("ClansSyntax3", player.UserIDString, configData.chatS.chatCommand));
+                        stringBuilder.AppendLine(Lang("ClansSyntax4", player.UserIDString, configData.chatS.chatCommand));
                     }
+                    stringBuilder.AppendLine(Lang("UISyntax", player.UserIDString, configData.chatS.uiCommand));
                     Print(player, stringBuilder.ToString());
                     return;
 
@@ -984,7 +1060,7 @@ namespace Oxide.Plugins
                 Print(player, Lang("NotAllowed", player.UserIDString));
                 return;
             }
-            CreateUI(player);
+            CreateMainUI(player);
         }
 
         [ConsoleCommand("AutoAuthUI")]
@@ -996,17 +1072,13 @@ namespace Oxide.Plugins
             var shareData = GetShareData(player.userID);
             switch (arg.Args[0].ToLower())
             {
-                case "close":
-                    DestroyUI(player);
-                    return;
-
                 case "teams":
                     if (!configData.teamShareS.enabled) return;
                     if (arg.Args.Length <= 1)
                     {
                         shareData.teamShare.enabled = !shareData.teamShare.enabled;
                         UpdateAuthList(player.userID, AutoAuthType.All);
-                        CreateUI(player);
+                        UpdateMenuUI(player, shareData, ShareType.Teams);
                         return;
                     }
                     switch (arg.Args[1].ToLower())
@@ -1031,7 +1103,7 @@ namespace Oxide.Plugins
 
                         default: return;
                     }
-                    CreateUI(player);
+                    UpdateMenuUI(player, shareData, ShareType.Teams);
                     return;
 
                 case "friends":
@@ -1040,7 +1112,7 @@ namespace Oxide.Plugins
                     {
                         shareData.friendsShare.enabled = !shareData.friendsShare.enabled;
                         UpdateAuthList(player.userID, AutoAuthType.All);
-                        CreateUI(player);
+                        UpdateMenuUI(player, shareData, ShareType.Friends);
                         return;
                     }
                     switch (arg.Args[1].ToLower())
@@ -1065,7 +1137,7 @@ namespace Oxide.Plugins
 
                         default: return;
                     }
-                    CreateUI(player);
+                    UpdateMenuUI(player, shareData, ShareType.Friends);
                     return;
 
                 case "clans":
@@ -1074,7 +1146,7 @@ namespace Oxide.Plugins
                     {
                         shareData.clanShare.enabled = !shareData.clanShare.enabled;
                         UpdateAuthList(player.userID, AutoAuthType.All);
-                        CreateUI(player);
+                        UpdateMenuUI(player, shareData, ShareType.Clans);
                         return;
                     }
                     switch (arg.Args[1].ToLower())
@@ -1099,7 +1171,7 @@ namespace Oxide.Plugins
 
                         default: return;
                     }
-                    CreateUI(player);
+                    UpdateMenuUI(player, shareData, ShareType.Clans);
                     return;
             }
         }
@@ -1115,17 +1187,20 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Clear Share Data On Map Wipe")]
             public bool clearDataOnWipe = false;
 
+            [JsonProperty(PropertyName = "Team Share Settings")]
+            public ShareSettings teamShareS = new ShareSettings();
+
             [JsonProperty(PropertyName = "Friends Share Settings")]
             public ShareSettings friendsShareS = new ShareSettings();
 
             [JsonProperty(PropertyName = "Clan Share Settings")]
             public ShareSettings clanShareS = new ShareSettings();
 
-            [JsonProperty(PropertyName = "Team Share Settings")]
-            public ShareSettings teamShareS = new ShareSettings();
-
             [JsonProperty(PropertyName = "Chat Settings")]
             public ChatSettings chatS = new ChatSettings();
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version = new VersionNumber(1, 2, 0);
 
             public class ChatSettings
             {
@@ -1139,10 +1214,7 @@ namespace Oxide.Plugins
                 public string uiCommand = "autoauthui";
 
                 [JsonProperty(PropertyName = "Chat Prefix")]
-                public string prefix = "[AutoAuth]: ";
-
-                [JsonProperty(PropertyName = "Chat Prefix Color")]
-                public string prefixColor = "#00FFFF";
+                public string prefix = "<color=#00FFFF>[AutoAuth]</color>: ";
 
                 [JsonProperty(PropertyName = "Chat SteamID Icon")]
                 public ulong steamIDIcon = 0;
@@ -1189,7 +1261,13 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
             catch
             {
@@ -1205,7 +1283,22 @@ namespace Oxide.Plugins
             configData = new ConfigData();
         }
 
-        protected override void SaveConfig() => Config.WriteObject(configData);
+        protected override void SaveConfig() => Config.WriteObject(configData, true);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= new VersionNumber(1, 2, 0))
+                {
+                    if (configData.chatS.prefix == "[AutoAuth]: ")
+                    {
+                        configData.chatS.prefix = "<color=#00FFFF>[AutoAuth]</color>: ";
+                    }
+                }
+                configData.version = Version;
+            }
+        }
 
         #endregion ConfigurationFile
 
@@ -1275,7 +1368,7 @@ namespace Oxide.Plugins
 
         private void Print(BasePlayer player, string message)
         {
-            Player.Message(player, message, string.IsNullOrEmpty(configData.chatS.prefix) ? string.Empty : $"<color={configData.chatS.prefixColor}>{configData.chatS.prefix}</color>", configData.chatS.steamIDIcon);
+            Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
         }
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);

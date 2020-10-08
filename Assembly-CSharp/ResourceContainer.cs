@@ -62,8 +62,8 @@ public class ResourceContainer : EntityComponent<BaseEntity>
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[BaseEntity.RPC_Server]
 	[BaseEntity.RPC_Server.IsVisible(3f)]
+	[BaseEntity.RPC_Server]
 	private void StartLootingContainer(BaseEntity.RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
