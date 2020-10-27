@@ -84,6 +84,8 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 
 	public string followBone;
 
+	public bool disableRigStripping;
+
 	[HideInInspector]
 	public PlayerModelHair playerModelHair;
 
@@ -115,8 +117,8 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[Header("First Person Legs")]
 	public bool HideInFirstPerson;
 
-	[Range(0f, 5f)]
 	[Tooltip("Use this if the clothing item clips into the player view. It'll push the chest legs model backwards.")]
+	[Range(0f, 5f)]
 	public float ExtraLeanBack;
 
 	public Renderer[] RenderersLod0;
@@ -167,6 +169,10 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 
 	public void StripRig(IPrefabProcessor preProcess, SkinnedMeshRenderer skinnedMeshRenderer)
 	{
+		if (disableRigStripping)
+		{
+			return;
+		}
 		Transform transform = SkinnedMeshRendererEx.FindRig(skinnedMeshRenderer);
 		if (!(transform != null))
 		{

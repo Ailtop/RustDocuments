@@ -2035,8 +2035,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		Signal signal = (Signal)msg.read.Int32();
@@ -2509,7 +2509,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			flag = false;
 			RaycastHit hitInfo;
-			if (!UnityEngine.Physics.Raycast(position, Vector3.up, out hitInfo, 100f, 1101070337))
+			if (!UnityEngine.Physics.Raycast(position, Vector3.up, out hitInfo, 100f, 161546513))
 			{
 				continue;
 			}

@@ -1667,8 +1667,8 @@ public class BasePlayer : BaseCombatEntity
 		return true;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_LootPlayer(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1683,8 +1683,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Assist(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerAssist", this, msg.player) == null)
@@ -1695,8 +1695,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_KeepAlive(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerKeepAlive", this, msg.player) == null)
@@ -2159,8 +2159,8 @@ public class BasePlayer : BaseCombatEntity
 		SendMarkersToClient();
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void Server_ClearMapMarkers(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMapMarkersClear", this, ServerCurrentMapNote) == null)
@@ -2456,8 +2456,8 @@ public class BasePlayer : BaseCombatEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void OnProjectileAttack(RPCMessage msg)
 	{
 		PlayerProjectileAttack playerProjectileAttack = PlayerProjectileAttack.Deserialize(msg.read);
@@ -2521,7 +2521,8 @@ public class BasePlayer : BaseCombatEntity
 		UnityEngine.Vector3 position = value.position;
 		UnityEngine.Vector3 velocity = value.velocity;
 		float partialTime = value.partialTime;
-		float travelTime = Mathf.Clamp(playerProjectileAttack.travelTime - value.travelTime, 0f, 8f);
+		float travelTime = value.travelTime;
+		float num = Mathf.Clamp(playerProjectileAttack.travelTime, 0f, 8f);
 		UnityEngine.Vector3 gravity = UnityEngine.Physics.gravity * value.projectilePrefab.gravityModifier;
 		float drag = value.projectilePrefab.drag;
 		int layerMask = ConVar.AntiHack.projectile_terraincheck ? 10551296 : 2162688;
@@ -2535,14 +2536,17 @@ public class BasePlayer : BaseCombatEntity
 		if (value.protection > 0)
 		{
 			bool flag6 = true;
-			float num = 1f + ConVar.AntiHack.projectile_forgiveness;
+			float num2 = 1f + ConVar.AntiHack.projectile_forgiveness;
 			float projectile_clientframes = ConVar.AntiHack.projectile_clientframes;
 			float projectile_serverframes = ConVar.AntiHack.projectile_serverframes;
-			float num2 = Mathx.Decrement(value.firedTime);
-			float num3 = Mathx.Increment(UnityEngine.Time.realtimeSinceStartup) - num2;
-			float num4 = projectile_clientframes / 60f;
-			float num5 = projectile_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
-			float num6 = (desyncTime + num3 + num4 + num5) * num;
+			float num3 = Mathx.Decrement(value.firedTime);
+			float num4 = Mathf.Clamp(Mathx.Increment(UnityEngine.Time.realtimeSinceStartup) - num3, 0f, 8f);
+			float num5 = num;
+			float num6 = Mathf.Abs(num4 - num5);
+			float num7 = Mathf.Min(num4, num5);
+			float num8 = projectile_clientframes / 60f;
+			float num9 = projectile_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
+			float num10 = (desyncTime + num7 + num8 + num9) * num2;
 			if (flag && hitInfo.boneArea == (HitArea)(-1))
 			{
 				string name = hitInfo.ProjectilePrefab.name;
@@ -2572,14 +2576,14 @@ public class BasePlayer : BaseCombatEntity
 			}
 			if (value.protection >= 2 && flag3)
 			{
-				float num7 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
-				float num8 = hitEntity.BoundsPadding() + num6 * num7;
-				float num9 = hitEntity.Distance(hitInfo.HitPositionWorld);
-				if (num9 > num8)
+				float num11 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
+				float num12 = hitEntity.BoundsPadding() + num10 * num11;
+				float num13 = hitEntity.Distance(hitInfo.HitPositionWorld);
+				if (num13 > num12)
 				{
 					string name4 = hitInfo.ProjectilePrefab.name;
 					string text4 = flag3 ? hitEntity.ShortPrefabName : "world";
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Entity too far away (" + name4 + " on " + text4 + " with " + num9 + "m > " + num8 + "m in " + num6 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Entity too far away (" + name4 + " on " + text4 + " with " + num13 + "m > " + num12 + "m in " + num10 + "s)");
 					stats.combat.Log(hitInfo, "projectile_target");
 					flag6 = false;
 				}
@@ -2587,23 +2591,31 @@ public class BasePlayer : BaseCombatEntity
 			if (value.protection >= 1)
 			{
 				float magnitude = value.initialVelocity.magnitude;
-				float num10 = hitInfo.ProjectilePrefab.initialDistance + num6 * magnitude;
-				float num11 = hitInfo.ProjectileDistance + 1f;
-				float num12 = UnityEngine.Vector3.Distance(value.initialPosition, hitInfo.HitPositionWorld);
-				if (num12 > num10)
+				float num14 = hitInfo.ProjectilePrefab.initialDistance + num10 * magnitude;
+				float num15 = hitInfo.ProjectileDistance + 1f;
+				float num16 = UnityEngine.Vector3.Distance(value.initialPosition, hitInfo.HitPositionWorld);
+				if (num16 > num14)
 				{
 					string name5 = hitInfo.ProjectilePrefab.name;
 					string text5 = flag3 ? hitEntity.ShortPrefabName : "world";
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Traveled too fast (" + name5 + " on " + text5 + " with " + num12 + "m > " + num10 + "m in " + num6 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too fast (" + name5 + " on " + text5 + " with " + num16 + "m > " + num14 + "m in " + num10 + "s)");
 					stats.combat.Log(hitInfo, "projectile_speed");
 					flag6 = false;
 				}
-				if (num12 > num11)
+				if (num16 > num15)
 				{
 					string name6 = hitInfo.ProjectilePrefab.name;
 					string text6 = flag3 ? hitEntity.ShortPrefabName : "world";
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too far away (" + name6 + " on " + text6 + " with " + num12 + "m > " + num11 + "m in " + num6 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too far away (" + name6 + " on " + text6 + " with " + num16 + "m > " + num15 + "m in " + num10 + "s)");
 					stats.combat.Log(hitInfo, "projectile_distance");
+					flag6 = false;
+				}
+				if (num6 > ConVar.AntiHack.projectile_desync)
+				{
+					string name7 = hitInfo.ProjectilePrefab.name;
+					string text7 = flag3 ? hitEntity.ShortPrefabName : "world";
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile desync (" + name7 + " on " + text7 + " with " + num6 + "s > " + ConVar.AntiHack.projectile_desync + "s)");
+					stats.combat.Log(hitInfo, "projectile_desync");
 					flag6 = false;
 				}
 			}
@@ -2617,8 +2629,8 @@ public class BasePlayer : BaseCombatEntity
 				{
 					hitPositionWorld += hitInfo.HitNormalWorld.normalized * 0.001f;
 				}
-				bool num13 = GamePhysics.LineOfSight(position2, pointStart, vector, hitPositionWorld, layerMask);
-				if (!num13)
+				bool num17 = GamePhysics.LineOfSight(position2, pointStart, vector, hitPositionWorld, layerMask);
+				if (!num17)
 				{
 					stats.Add("hit_" + (flag3 ? hitEntity.Categorize() : "world") + "_indirect_los", 1, Stats.Server);
 				}
@@ -2626,11 +2638,11 @@ public class BasePlayer : BaseCombatEntity
 				{
 					stats.Add("hit_" + (flag3 ? hitEntity.Categorize() : "world") + "_direct_los", 1, Stats.Server);
 				}
-				if (!num13)
+				if (!num17)
 				{
-					string name7 = hitInfo.ProjectilePrefab.name;
-					string text7 = flag3 ? hitEntity.ShortPrefabName : "world";
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Line of sight (" + name7 + " on " + text7 + ") " + position2 + " " + pointStart + " " + vector + " " + hitPositionWorld);
+					string name8 = hitInfo.ProjectilePrefab.name;
+					string text8 = flag3 ? hitEntity.ShortPrefabName : "world";
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Line of sight (" + name8 + " on " + text8 + ") " + position2 + " " + pointStart + " " + vector + " " + hitPositionWorld);
 					stats.combat.Log(hitInfo, "projectile_los");
 					flag6 = false;
 				}
@@ -2645,9 +2657,9 @@ public class BasePlayer : BaseCombatEntity
 					}
 					if (!GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask) && !GamePhysics.LineOfSight(hitPositionWorld2, vector2, layerMask))
 					{
-						string name8 = hitInfo.ProjectilePrefab.name;
-						string text8 = flag3 ? hitEntity.ShortPrefabName : "world";
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Line of sight (" + name8 + " on " + text8 + ") " + hitPositionWorld2 + " " + position3 + " or " + hitPositionWorld2 + " " + vector2);
+						string name9 = hitInfo.ProjectilePrefab.name;
+						string text9 = flag3 ? hitEntity.ShortPrefabName : "world";
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Line of sight (" + name9 + " on " + text9 + ") " + hitPositionWorld2 + " " + position3 + " or " + hitPositionWorld2 + " " + vector2);
 						stats.combat.Log(hitInfo, "projectile_los");
 						flag6 = false;
 					}
@@ -2657,45 +2669,45 @@ public class BasePlayer : BaseCombatEntity
 			{
 				UnityEngine.Vector3 prevPosition;
 				UnityEngine.Vector3 prevVelocity;
-				SimulateProjectile(ref position, ref velocity, ref partialTime, travelTime, gravity, drag, out prevPosition, out prevVelocity);
+				SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out prevPosition, out prevVelocity);
 				UnityEngine.Vector3 b = prevVelocity * 0.03125f;
 				Line line = new Line(prevPosition - b, position + b);
-				float num14 = line.Distance(hitInfo.PointStart);
-				float num15 = line.Distance(hitInfo.HitPositionWorld);
-				if (num14 > ConVar.AntiHack.projectile_trajectory)
-				{
-					string name9 = value.projectilePrefab.name;
-					string text9 = flag3 ? hitEntity.ShortPrefabName : "world";
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + name9 + " on " + text9 + " with " + num14 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
-					stats.combat.Log(hitInfo, "trajectory_start");
-					flag6 = false;
-				}
-				if (num15 > ConVar.AntiHack.projectile_trajectory)
+				float num18 = line.Distance(hitInfo.PointStart);
+				float num19 = line.Distance(hitInfo.HitPositionWorld);
+				if (num18 > ConVar.AntiHack.projectile_trajectory)
 				{
 					string name10 = value.projectilePrefab.name;
 					string text10 = flag3 ? hitEntity.ShortPrefabName : "world";
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + name10 + " on " + text10 + " with " + num15 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + name10 + " on " + text10 + " with " + num18 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					stats.combat.Log(hitInfo, "trajectory_start");
+					flag6 = false;
+				}
+				if (num19 > ConVar.AntiHack.projectile_trajectory)
+				{
+					string name11 = value.projectilePrefab.name;
+					string text11 = flag3 ? hitEntity.ShortPrefabName : "world";
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + name11 + " on " + text11 + " with " + num19 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
 					stats.combat.Log(hitInfo, "trajectory_end");
 					flag6 = false;
 				}
 				hitInfo.ProjectileVelocity = velocity;
 				if (playerProjectileAttack.hitVelocity != UnityEngine.Vector3.zero && velocity != UnityEngine.Vector3.zero)
 				{
-					float num16 = UnityEngine.Vector3.Angle(playerProjectileAttack.hitVelocity, velocity);
-					float num17 = playerProjectileAttack.hitVelocity.magnitude / velocity.magnitude;
-					if (num16 > ConVar.AntiHack.projectile_anglechange)
-					{
-						string name11 = value.projectilePrefab.name;
-						string text11 = flag3 ? hitEntity.ShortPrefabName : "world";
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + name11 + " on " + text11 + " with " + num16 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
-						stats.combat.Log(hitInfo, "angle_change");
-						flag6 = false;
-					}
-					if (num17 > ConVar.AntiHack.projectile_velocitychange)
+					float num20 = UnityEngine.Vector3.Angle(playerProjectileAttack.hitVelocity, velocity);
+					float num21 = playerProjectileAttack.hitVelocity.magnitude / velocity.magnitude;
+					if (num20 > ConVar.AntiHack.projectile_anglechange)
 					{
 						string name12 = value.projectilePrefab.name;
 						string text12 = flag3 ? hitEntity.ShortPrefabName : "world";
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + name12 + " on " + text12 + " with " + num17 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + name12 + " on " + text12 + " with " + num20 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
+						stats.combat.Log(hitInfo, "angle_change");
+						flag6 = false;
+					}
+					if (num21 > ConVar.AntiHack.projectile_velocitychange)
+					{
+						string name13 = value.projectilePrefab.name;
+						string text13 = flag3 ? hitEntity.ShortPrefabName : "world";
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + name13 + " on " + text13 + " with " + num21 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
 						stats.combat.Log(hitInfo, "velocity_change");
 						flag6 = false;
 					}
@@ -2711,7 +2723,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		value.position = hitInfo.HitPositionWorld;
 		value.velocity = playerProjectileAttack.hitVelocity;
-		value.travelTime = playerProjectileAttack.travelTime;
+		value.travelTime = num;
 		value.partialTime = partialTime;
 		value.hits++;
 		hitInfo.ProjectilePrefab.CalculateDamage(hitInfo, value.projectileModifier, value.integrity);
@@ -2729,8 +2741,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 		else
 		{
-			float num18 = hitEntity.PenetrationResistance(hitInfo) / hitInfo.ProjectilePrefab.penetrationPower;
-			value.integrity = Mathf.Clamp01(value.integrity - num18);
+			float num22 = hitEntity.PenetrationResistance(hitInfo) / hitInfo.ProjectilePrefab.penetrationPower;
+			value.integrity = Mathf.Clamp01(value.integrity - num22);
 			value.position += playerProjectileAttack.hitVelocity.normalized * 0.001f;
 		}
 		if (flag3)
@@ -2769,8 +2781,8 @@ public class BasePlayer : BaseCombatEntity
 		playerProjectileAttack = null;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -2805,8 +2817,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void OnProjectileUpdate(RPCMessage msg)
 	{
 		PlayerProjectileUpdate playerProjectileUpdate = PlayerProjectileUpdate.Deserialize(msg.read);
@@ -3773,8 +3785,8 @@ public class BasePlayer : BaseCombatEntity
 		lastTickTime = UnityEngine.Time.time;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void ClientLoadingComplete(RPCMessage msg)
 	{
 	}
@@ -3880,9 +3892,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -4187,7 +4199,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public virtual BaseCorpse CreateCorpse()
 	{
-		if (Interface.CallHook("OnPlayerCorpseCreate", this) != null)
+		if (Interface.CallHook("OnPlayerCorpseSpawn", this) != null)
 		{
 			return null;
 		}
@@ -4823,8 +4835,8 @@ public class BasePlayer : BaseCombatEntity
 		return net.connection.info.GetInt(key, defaultVal);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -4863,8 +4875,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void OnPlayerReported(RPCMessage msg)
 	{
 		string text = msg.read.String();
@@ -4908,6 +4920,7 @@ public class BasePlayer : BaseCombatEntity
 			SendNetworkUpdateImmediate();
 			SendGlobalSnapshot();
 			SendFullSnapshot();
+			ServerMgr.SendReplicatedVars(net.connection);
 			InvokeRepeating(MonitorDemoRecording, 10f, 10f);
 		}
 	}
@@ -5409,22 +5422,19 @@ public class BasePlayer : BaseCombatEntity
 			{
 				if (modelStateTick != null)
 				{
+					if (modelStateTick.flying && !IsAdmin && !IsDeveloper)
+					{
+						AntiHack.NoteAdminHack(this);
+					}
+					if (modelStateTick.inheritedVelocity != UnityEngine.Vector3.zero && FindTrigger<TriggerForce>() == null)
+					{
+						modelStateTick.inheritedVelocity = UnityEngine.Vector3.zero;
+					}
 					if (modelState != null)
 					{
-						if (modelStateTick.flying && !IsAdmin && !IsDeveloper)
+						if (ConVar.AntiHack.modelstate && TriggeredAntiHack())
 						{
-							AntiHack.NoteAdminHack(this);
-						}
-						if (ConVar.AntiHack.modelstate)
-						{
-							if (TriggeredAntiHack())
-							{
-								modelStateTick.ducked = modelState.ducked;
-							}
-							if (FindTrigger<TriggerForce>() == null)
-							{
-								modelStateTick.inheritedVelocity = UnityEngine.Vector3.zero;
-							}
+							modelStateTick.ducked = modelState.ducked;
 						}
 						modelState.ResetToPool();
 						modelState = null;
@@ -5466,6 +5476,13 @@ public class BasePlayer : BaseCombatEntity
 				{
 					eyes.NetworkUpdate(UnityEngine.Quaternion.Euler(viewAngles));
 					NetworkPositionTick();
+				}
+			}
+			using (TimeWarning.New("ModelState"))
+			{
+				if (modelState != null)
+				{
+					modelState.waterLevel = WaterFactor();
 				}
 			}
 			using (TimeWarning.New("EACStateUpdate"))
@@ -6110,7 +6127,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	private void AddPlayerRigidbody()
+	public void AddPlayerRigidbody()
 	{
 		if (playerRigidbody == null)
 		{
@@ -6127,7 +6144,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	private void RemovePlayerRigidbody()
+	public void RemovePlayerRigidbody()
 	{
 		if (playerRigidbody == null)
 		{

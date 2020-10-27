@@ -67,8 +67,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("The highest possible exposure value; adjust this value to modify the darkest areas of your level.")]
 			public float max;
 
-			[Min(0f)]
 			[Tooltip("Speed of linear adaptation. Higher is faster.")]
+			[Min(0f)]
 			public float speed;
 
 			[Tooltip("Displays a luminosity helper in the GameView.")]
@@ -162,8 +162,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Custom lookup texture (strip format, e.g. 256x16).")]
 			public Texture texture;
 
-			[Range(0f, 1f)]
 			[Tooltip("Blending factor.")]
+			[Range(0f, 1f)]
 			public float contribution;
 
 			public static LUTSettings defaultSettings
@@ -207,8 +207,8 @@ namespace UnityStandardAssets.CinematicEffects
 		[Serializable]
 		public struct BasicsSettings
 		{
-			[Range(-2f, 2f)]
 			[Tooltip("Sets the white balance to a custom color temperature.")]
+			[Range(-2f, 2f)]
 			public float temperatureShift;
 
 			[Range(-2f, 2f)]
@@ -224,25 +224,25 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Pushes the intensity of all colors.")]
 			public float saturation;
 
-			[Range(-1f, 1f)]
 			[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
+			[Range(-1f, 1f)]
 			public float vibrance;
 
-			[Range(0f, 10f)]
 			[Tooltip("Brightens or darkens all colors.")]
+			[Range(0f, 10f)]
 			public float value;
 
-			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			[Range(0f, 2f)]
+			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			[Space]
 			public float contrast;
 
-			[Range(0.01f, 5f)]
 			[Tooltip("Contrast gain curve. Controls the steepness of the curve.")]
+			[Range(0.01f, 5f)]
 			public float gain;
 
-			[Range(0.01f, 5f)]
 			[Tooltip("Applies a pow function to the source.")]
+			[Range(0.01f, 5f)]
 			public float gamma;
 
 			public static BasicsSettings defaultSettings
@@ -333,16 +333,16 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Internal LUT precision. \"Normal\" is 256x16, \"High\" is 1024x32. Prefer \"Normal\" on mobile devices.")]
 			public ColorGradingPrecision precision;
 
-			[Space]
 			[ColorWheelGroup]
+			[Space]
 			public ColorWheelsSettings colorWheels;
 
-			[Space]
 			[IndentedGroup]
+			[Space]
 			public BasicsSettings basics;
 
-			[ChannelMixer]
 			[Space]
+			[ChannelMixer]
 			public ChannelMixerSettings channelMixer;
 
 			[IndentedGroup]
@@ -387,12 +387,12 @@ namespace UnityStandardAssets.CinematicEffects
 		[SettingsGroup]
 		private TonemappingSettings m_Tonemapping = TonemappingSettings.defaultSettings;
 
-		[SettingsGroup]
 		[SerializeField]
+		[SettingsGroup]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SettingsGroup]
 		[SerializeField]
+		[SettingsGroup]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

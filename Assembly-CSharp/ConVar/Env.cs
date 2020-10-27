@@ -123,7 +123,7 @@ namespace ConVar
 		{
 			if (!(TOD_Sky.Instance == null))
 			{
-				DateTime dateTime = TOD_Sky.Instance.Cycle.DateTime.Add(arg.GetTimeSpan(0));
+				DateTime dateTime = TOD_Sky.Instance.Cycle.DateTime.AddTicks(arg.GetTicks(0, 0L));
 				TOD_Sky.Instance.Cycle.DateTime = dateTime;
 			}
 		}

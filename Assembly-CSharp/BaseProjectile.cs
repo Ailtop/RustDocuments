@@ -26,8 +26,8 @@ public class BaseProjectile : AttackEntity
 			[Tooltip("Set to 0 to not use inbuilt mag")]
 			public int builtInSize;
 
-			[InspectorFlags]
 			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
+			[InspectorFlags]
 			public AmmoTypes ammoTypes;
 		}
 
@@ -935,8 +935,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void ServerFractionalReloadInsert(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1044,8 +1044,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{

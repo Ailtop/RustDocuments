@@ -6,15 +6,15 @@ namespace Rust.Modular
 	[Serializable]
 	public class ModularCarSettings
 	{
-		[Range(0f, 3f)]
 		[Header("Vehicle Setup")]
+		[Range(0f, 3f)]
 		public float tireFriction = 1f;
 
 		[Range(0f, 1f)]
 		public float rollingResistance = 0.05f;
 
-		[Range(0f, 50f)]
 		[Header("Wheels")]
+		[Range(0f, 50f)]
 		public float maxSteerAngle = 35f;
 
 		public bool steeringAssist = true;

@@ -236,8 +236,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public class JunkpileTimeBlockNavigationEffect : EffectBase<ScientistJunkpileContext>
 		{
-			[FriendlyName("Time (Seconds)")]
 			[ApexSerialization]
+			[FriendlyName("Time (Seconds)")]
 			public float Time;
 
 			public override void Apply(ScientistJunkpileContext context, bool fromPlanner, bool temporary)
@@ -2120,8 +2120,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		[SerializeField]
@@ -2151,16 +2151,16 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		private ScientistJunkpileContext _context;
 
 		[Header("Navigation")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
@@ -2206,8 +2206,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
@@ -2314,8 +2314,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[ReadOnly]
 		private bool _isFiring;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;

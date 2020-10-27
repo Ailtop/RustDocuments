@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using System;
 using UnityEngine;
@@ -10,9 +11,9 @@ using UnityEngine.UI;
 
 public class PowerCounter : IOEntity
 {
-	private int counterNumber;
+	public int counterNumber;
 
-	private int targetCounterNumber = 10;
+	public int targetCounterNumber = 10;
 
 	public CanvasGroup screenAlpha;
 
@@ -136,13 +137,14 @@ public class PowerCounter : IOEntity
 		base.ResetState();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SERVER_SetTarget(RPCMessage msg)
 	{
-		if (CanPlayerAdmin(msg.player))
+		int num = msg.read.Int32();
+		if (Interface.CallHook("OnCounterTargetChange", this, msg.player, num) == null && CanPlayerAdmin(msg.player))
 		{
-			targetCounterNumber = msg.read.Int32();
+			targetCounterNumber = num;
 			SendNetworkUpdate();
 		}
 	}
@@ -151,9 +153,10 @@ public class PowerCounter : IOEntity
 	[RPC_Server]
 	public void ToggleDisplayMode(RPCMessage msg)
 	{
-		if (msg.player.CanBuild())
+		bool flag = msg.read.Bit();
+		if (Interface.CallHook("OnCounterModeToggle", this, msg.player, flag) == null && msg.player.CanBuild())
 		{
-			SetFlag(Flags.Reserved2, msg.read.Bit(), false, false);
+			SetFlag(Flags.Reserved2, flag, false, false);
 			MarkDirty();
 			SendNetworkUpdate();
 		}

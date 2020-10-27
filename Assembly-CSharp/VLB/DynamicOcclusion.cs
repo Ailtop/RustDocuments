@@ -6,8 +6,8 @@ namespace VLB
 {
 	[RequireComponent(typeof(VolumetricLightBeam))]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-dynocclusion/")]
-	[ExecuteInEditMode]
 	[DisallowMultipleComponent]
+	[ExecuteInEditMode]
 	public class DynamicOcclusion : MonoBehaviour
 	{
 		private enum Direction

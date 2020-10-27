@@ -27,8 +27,8 @@ namespace Rust.Modular
 		[SerializeField]
 		public VehicleModuleEngineItems allEngineItems;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private int accelerationBoostSlots;
 
 		[SerializeField]
@@ -42,25 +42,25 @@ namespace Rust.Modular
 		public bool isUsable
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public float accelerationBoostPercent
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public float topSpeedBoostPercent
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public float fuelEconomyBoostPercent
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public VehicleModuleEngine GetEngineModule()

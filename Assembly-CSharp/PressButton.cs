@@ -64,14 +64,16 @@ public class PressButton : IOEntity
 	{
 		base.ResetIOState();
 		SetFlag(Flags.On, false);
+		SetFlag(Flags.Reserved3, false);
 		CancelInvoke(Unpress);
+		CancelInvoke(UnpowerTime);
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
 	{
 		if (IsOn())
 		{
-			if (HasFlag(Flags.Reserved3))
+			if (HasFlag(Flags.Reserved3) && sourceItem != null)
 			{
 				return pressPowerAmount;
 			}
@@ -92,8 +94,8 @@ public class PressButton : IOEntity
 		SetFlag(Flags.On, false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Press(RPCMessage msg)
 	{
 		if (!IsOn() && Interface.CallHook("OnButtonPress", this, msg.player) == null)

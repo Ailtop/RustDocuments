@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{00C8C4BB-D297-41FF-A500-4BD0385947F9}</ProjectGuid>
+    <ProjectGuid>{0D3E971A-C840-49B1-933E-318F5ED7C160}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
@@ -111,17 +111,23 @@
     <Reference Include="UnityEngine.UIModule">
       <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="EZhex1991.EZSoftBone">
+      <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\EZhex1991.EZSoftBone.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Rust.UI">
+      <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\Rust.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="CurvedTextMeshPro">
+      <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\CurvedTextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Skeleton">
       <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\Facepunch.Skeleton.dll</HintPath>
     </Reference>
     <Reference Include="com.unity.postprocessing.Runtime">
       <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\com.unity.postprocessing.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Rust.UI">
-      <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\Rust.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>C:\Users\ljm\Desktop\Oxide.Rust\VS  DLL\Managed\UnityEngine.IMGUIModule.dll</HintPath>
@@ -278,6 +284,7 @@
     <Compile Include="AttractionPoint.cs" />
     <Compile Include="AudioAlarm.cs" />
     <Compile Include="AudioSettings.cs" />
+    <Compile Include="AuroraEffect.cs" />
     <Compile Include="Auth_EAC.cs" />
     <Compile Include="Auth_Steam.cs" />
     <Compile Include="AutoTurret.cs" />
@@ -757,6 +764,7 @@
     <Compile Include="EntityComponentBase.cs" />
     <Compile Include="EntityDebug.cs" />
     <Compile Include="EntityFlag_Animator.cs" />
+    <Compile Include="EntityFlag_TOD.cs" />
     <Compile Include="EntityFlag_Toggle.cs" />
     <Compile Include="EntityFlag_ToggleNotify.cs" />
     <Compile Include="EntityFuelSystem.cs" />
@@ -802,6 +810,7 @@
     <Compile Include="ExtendGBufferParams.cs" />
     <Compile Include="EyeBlink.cs" />
     <Compile Include="EyeController.cs" />
+    <Compile Include="EZSoftBoneHitboxSystemCollider.cs" />
     <Compile Include="Facepunch.GUI\Controls.cs" />
     <Compile Include="Facepunch.GUI\TabbedPanel.cs" />
     <Compile Include="Facepunch.Rust\Analytics.cs" />
@@ -869,6 +878,7 @@
     <Compile Include="GameContentList.cs" />
     <Compile Include="GameManager.cs" />
     <Compile Include="GameManifest.cs" />
+    <Compile Include="GameObjectLOD.cs" />
     <Compile Include="GameObjectRef.cs" />
     <Compile Include="GameObjectUtil.cs" />
     <Compile Include="GamePhysics.cs" />
@@ -900,6 +910,7 @@
     <Compile Include="GenerateWireMeshes.cs" />
     <Compile Include="GenericSpawnPoint.cs" />
     <Compile Include="GenericsUtil.cs" />
+    <Compile Include="GhostSheetSystemSpaceUpdater.cs" />
     <Compile Include="Gib.cs" />
     <Compile Include="Gibbable.cs" />
     <Compile Include="GizmosUtil.cs" />
@@ -975,7 +986,6 @@
     <Compile Include="IAIAgent.cs" />
     <Compile Include="IBatchingHandler.cs" />
     <Compile Include="IBlueprintsChanged.cs" />
-    <Compile Include="IClientComponentEx.cs" />
     <Compile Include="IClothingChanged.cs" />
     <Compile Include="IconSkin.cs" />
     <Compile Include="IconSkinPicker.cs" />
@@ -1033,16 +1043,12 @@
     <Compile Include="IOnPostNetworkUpdate.cs" />
     <Compile Include="IOnSendNetworkUpdate.cs" />
     <Compile Include="IPhotoReceiver.cs" />
-    <Compile Include="IPrefabPostProcess.cs" />
-    <Compile Include="IPrefabPreProcess.cs" />
-    <Compile Include="IPrefabProcessor.cs" />
     <Compile Include="IRagdollInhert.cs" />
     <Compile Include="IRemoteControllable.cs" />
     <Compile Include="IRFObject.cs" />
     <Compile Include="IronsightAimPoint.cs" />
     <Compile Include="IronSightOverride.cs" />
     <Compile Include="IronSights.cs" />
-    <Compile Include="IServerComponentEx.cs" />
     <Compile Include="ISoundBudgetedUpdate.cs" />
     <Compile Include="ISpawnGroup.cs" />
     <Compile Include="ISplashable.cs" />
@@ -1172,6 +1178,7 @@
     <Compile Include="LayerSelect.cs" />
     <Compile Include="LazyAimProperties.cs" />
     <Compile Include="LeavesBlowing.cs" />
+    <Compile Include="LegacyWeatherState.cs" />
     <Compile Include="LerpBetweenPointsBool.cs" />
     <Compile Include="LevelInfo.cs" />
     <Compile Include="LevelManager.cs" />
@@ -1431,7 +1438,9 @@
     <Compile Include="ParticleDisableOnParentDestroy.cs" />
     <Compile Include="ParticleEmitFromParentObject.cs" />
     <Compile Include="ParticleIKFix.cs" />
+    <Compile Include="ParticlePatch.cs" />
     <Compile Include="ParticleRandomLifetime.cs" />
+    <Compile Include="ParticleSpawn.cs" />
     <Compile Include="ParticleSystemContainer.cs" />
     <Compile Include="ParticleSystemCull.cs" />
     <Compile Include="ParticleSystemIK.cs" />
@@ -1554,7 +1563,9 @@
     <Compile Include="RadixSorter.cs" />
     <Compile Include="Ragdoll.cs" />
     <Compile Include="RagdollEditor.cs" />
+    <Compile Include="RainbowEffect.cs" />
     <Compile Include="RainEffect.cs" />
+    <Compile Include="RainEffectSting.cs" />
     <Compile Include="RainSurfaceAmbience.cs" />
     <Compile Include="RandomDestroy.cs" />
     <Compile Include="RandomDynamicObject.cs" />
@@ -2140,6 +2151,7 @@
     <Compile Include="SkinReplacement.cs" />
     <Compile Include="SkinSet.cs" />
     <Compile Include="SkinSetCollection.cs" />
+    <Compile Include="SkullTrophy.cs" />
     <Compile Include="SleepingBag.cs" />
     <Compile Include="SleepingBagButton.cs" />
     <Compile Include="SleepingBagClusterMapMarker.cs" />
@@ -2586,6 +2598,9 @@
     <Compile Include="WearableHolsterOffset.cs" />
     <Compile Include="WearableReplacementByRace.cs" />
     <Compile Include="WeatherEffect.cs" />
+    <Compile Include="WeatherEffectSting.cs" />
+    <Compile Include="WeatherPreset.cs" />
+    <Compile Include="WeatherPresetType.cs" />
     <Compile Include="WeightedAudioClip.cs" />
     <Compile Include="WheelSwitch.cs" />
     <Compile Include="WildlifeTrap.cs" />

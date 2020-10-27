@@ -114,9 +114,9 @@ public class HitboxSystem : MonoBehaviour, IPrefabPreProcess
 		{
 			foreach (HitboxDefinition item2 in obj)
 			{
-				preProcess.RemoveComponent(item2);
+				preProcess?.RemoveComponent(item2);
 			}
-			preProcess.RemoveComponent(this);
+			preProcess?.RemoveComponent(this);
 		}
 		if (clientside)
 		{
@@ -131,7 +131,7 @@ public class HitboxSystem : MonoBehaviour, IPrefabPreProcess
 					type = item3.type
 				};
 				hitboxes.Add(item);
-				preProcess.RemoveComponent(item3);
+				preProcess?.RemoveComponent(item3);
 			}
 		}
 		Pool.FreeList(ref obj);

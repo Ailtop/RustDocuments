@@ -570,18 +570,18 @@ namespace Rust.Ai.HTN.NPCTurret
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private NPCTurretContext _context;
 
 		[Header("Navigation")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -622,9 +622,9 @@ namespace Rust.Ai.HTN.NPCTurret
 			}
 		};
 
-		[Header("Reasoners")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
+		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -665,13 +665,13 @@ namespace Rust.Ai.HTN.NPCTurret
 			}
 		};
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isFiring;
 
 		[ReadOnly]

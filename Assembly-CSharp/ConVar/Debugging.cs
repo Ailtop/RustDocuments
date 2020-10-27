@@ -23,8 +23,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool callbacks;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool log
 		{
 			get
@@ -44,8 +44,8 @@ namespace ConVar
 			RenderInfo.GenerateReport();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void stall(Arg arg)
 		{
 			float num = Mathf.Clamp(arg.GetFloat(0), 0f, 1f);

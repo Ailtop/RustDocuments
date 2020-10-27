@@ -259,8 +259,25 @@ public static class GamePhysics
 		Vector3 vector = a / magnitude;
 		Ray ray = new Ray(p0 + vector * padding0, vector);
 		float maxDistance = magnitude - padding0 - padding1;
+		bool flag;
 		RaycastHit hitInfo;
-		if (!(((layerMask & 0x800000) == 0) ? UnityEngine.Physics.Raycast(ray, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore) : Trace(ray, 0f, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore)))
+		if ((layerMask & 0x800000) != 0)
+		{
+			flag = Trace(ray, 0f, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+			if (ConVar.AntiHack.losradius > 0f && !flag)
+			{
+				flag = Trace(ray, ConVar.AntiHack.losradius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+			}
+		}
+		else
+		{
+			flag = UnityEngine.Physics.Raycast(ray, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+			if (ConVar.AntiHack.losradius > 0f && !flag)
+			{
+				flag = UnityEngine.Physics.SphereCast(ray, ConVar.AntiHack.losradius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+			}
+		}
+		if (!flag)
 		{
 			if (ConVar.Vis.lineofsight)
 			{

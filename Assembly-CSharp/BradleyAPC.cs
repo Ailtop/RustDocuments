@@ -1241,7 +1241,7 @@ public class BradleyAPC : BaseCombatEntity
 
 	public override void OnKilled(HitInfo info)
 	{
-		if (base.isClient || Interface.CallHook("OnEntityKill", this) != null)
+		if (base.isClient || Interface.CallHook("OnEntityDestroy", this) != null)
 		{
 			return;
 		}

@@ -625,15 +625,17 @@ namespace ConVar
 			return "invalid player";
 		}
 
-		[ServerVar(ServerAdmin = false, Help = "This sends a snapshot of all the entities in the client's pvs. This is mostly redundant, but we request this when the client starts recording a demo.. so they get all the information.")]
+		[ServerVar(ServerAdmin = true, Help = "This sends a snapshot of all the entities in the client's pvs. This is mostly redundant, but we request this when the client starts recording a demo.. so they get all the information.")]
 		public static void snapshot(Arg arg)
 		{
-			if (!(ArgEx.Player(arg) == null))
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (!(basePlayer == null))
 			{
-				UnityEngine.Debug.Log("Sending full snapshot to " + ArgEx.Player(arg));
-				ArgEx.Player(arg).SendNetworkUpdateImmediate();
-				ArgEx.Player(arg).SendGlobalSnapshot();
-				ArgEx.Player(arg).SendFullSnapshot();
+				UnityEngine.Debug.Log("Sending full snapshot to " + basePlayer);
+				basePlayer.SendNetworkUpdateImmediate();
+				basePlayer.SendGlobalSnapshot();
+				basePlayer.SendFullSnapshot();
+				ServerMgr.SendReplicatedVars(basePlayer.net.connection);
 			}
 		}
 

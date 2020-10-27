@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using ConVar;
 using Network;
+using Oxide.Core;
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -105,12 +106,16 @@ public class ElevatorLift : BaseCombatEntity
 	[RPC_Server.IsVisible(3f)]
 	public void Server_RaiseLowerFloor(RPCMessage msg)
 	{
-		if (CanMove())
+		if (!CanMove())
 		{
-			Elevator.Direction direction = (Elevator.Direction)msg.read.Int32();
-			bool goTopBottom = msg.read.Bit();
+			return;
+		}
+		Elevator.Direction direction = (Elevator.Direction)msg.read.Int32();
+		bool flag = msg.read.Bit();
+		if (Interface.CallHook("OnElevatorButtonPress", this, msg.player, direction, flag) == null)
+		{
 			SetFlag((direction == Elevator.Direction.Up) ? Flags.Reserved1 : Flags.Reserved2, true);
-			owner.Server_RaiseLowerElevator(direction, goTopBottom);
+			owner.Server_RaiseLowerElevator(direction, flag);
 			Invoke(ClearDirection, 0.7f);
 			if (liftButtonPressedEffect.isValid)
 			{

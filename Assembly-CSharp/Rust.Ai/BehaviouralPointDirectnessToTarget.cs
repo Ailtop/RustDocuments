@@ -21,8 +21,8 @@ namespace Rust.Ai
 		[FriendlyName("Maximum Directness", "If Retreat guided, this value should be less than 0 to ensure we are retreating from our target, but if Flank guided, we rather want this to be a slight positive number, 0.1 for instance.")]
 		private float maxDirectness = 0.1f;
 
-		[ApexSerialization]
 		[FriendlyName("Behaviour Guide", "If Approach guided, min value over 0 should be used.\nIf Retreat guided, max value under 0 should be used.\nIf Flank guided, a min and max value around 0 (min: -0.1, max: 0.1) should be used.")]
+		[ApexSerialization]
 		private Guide guide = Guide.Flank;
 
 		public override float GetScore(BaseContext c, Vector3 point)

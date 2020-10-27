@@ -21,7 +21,7 @@ public class LootableCorpse : BaseCorpse
 	[NonSerialized]
 	public ItemContainer[] containers;
 
-	public string playerName
+	public virtual string playerName
 	{
 		get
 		{

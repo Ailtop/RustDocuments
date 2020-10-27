@@ -294,7 +294,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 
 	public override void OnKilled(HitInfo info)
 	{
-		if (Interface.CallHook("OnEntityKill", this) == null)
+		if (Interface.CallHook("OnEntityDestroy", this) == null)
 		{
 			if (!OutOfCrates())
 			{

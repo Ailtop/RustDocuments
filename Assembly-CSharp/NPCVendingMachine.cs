@@ -150,6 +150,11 @@ public class NPCVendingMachine : VendingMachine
 	{
 	}
 
+	protected override bool CanRotate()
+	{
+		return false;
+	}
+
 	public override bool CanPlayerAdmin(BasePlayer player)
 	{
 		object obj = Interface.CallHook("CanAdministerVending", player, this);

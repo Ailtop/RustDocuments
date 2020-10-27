@@ -21,8 +21,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("The Arc Rotation property permits adjusting the geometry orientation around the Z axis.")]
 		public int ArcRotation;
 
-		[Tooltip("The Progress property allows the primitive to be used as a progression indicator.")]
 		[Range(0f, 1f)]
+		[Tooltip("The Progress property allows the primitive to be used as a progression indicator.")]
 		public float Progress;
 
 		private float _progress;

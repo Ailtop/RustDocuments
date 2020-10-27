@@ -1,6 +1,7 @@
 using Rust.Workshop;
 using UnityEngine;
 
+[CreateAssetMenu(menuName = "Rust/ItemSkin")]
 public class ItemSkin : SteamInventoryItem
 {
 	public Skinnable Skinnable;
@@ -16,5 +17,18 @@ public class ItemSkin : SteamInventoryItem
 		{
 			Skin.Apply(obj, Skinnable, Materials);
 		}
+	}
+
+	public override bool HasUnlocked(ulong playerId)
+	{
+		if (Redirect != null && Redirect.isRedirectOf != null && Redirect.isRedirectOf.steamItem != null)
+		{
+			BasePlayer basePlayer = BasePlayer.FindByID(playerId);
+			if (basePlayer != null && basePlayer.blueprints.CheckSkinOwnership(Redirect.isRedirectOf.steamItem.id, basePlayer.userID))
+			{
+				return true;
+			}
+		}
+		return base.HasUnlocked(playerId);
 	}
 }

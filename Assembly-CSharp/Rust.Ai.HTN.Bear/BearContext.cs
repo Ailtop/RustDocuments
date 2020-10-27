@@ -24,8 +24,8 @@ namespace Rust.Ai.HTN.Bear
 		[SerializeField]
 		private int _decompositionScore;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;

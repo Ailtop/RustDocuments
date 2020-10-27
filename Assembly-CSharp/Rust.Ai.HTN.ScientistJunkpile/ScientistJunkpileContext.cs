@@ -17,8 +17,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[SerializeField]
 		private byte[] _worldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private byte[] _previousWorldState;
 
 		[ReadOnly]

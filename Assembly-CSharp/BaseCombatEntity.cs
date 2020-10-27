@@ -60,6 +60,16 @@ public class BaseCombatEntity : BaseEntity
 		Dead
 	}
 
+	[Serializable]
+	public enum Faction
+	{
+		Default,
+		Player,
+		Bandit,
+		Scientist,
+		Horror
+	}
+
 	private const float MAX_HEALTH_REPAIR = 50f;
 
 	[NonSerialized]
@@ -102,6 +112,8 @@ public class BaseCombatEntity : BaseEntity
 	public float _health;
 
 	public float _maxHealth = 100f;
+
+	public Faction faction;
 
 	[NonSerialized]
 	public float lastAttackedTime = float.NegativeInfinity;
@@ -214,8 +226,8 @@ public class BaseCombatEntity : BaseEntity
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_PickupStart(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanPickup(rpc.player))
@@ -595,6 +607,16 @@ public class BaseCombatEntity : BaseEntity
 	public virtual bool IsAlive()
 	{
 		return lifestate == LifeState.Alive;
+	}
+
+	public Faction GetFaction()
+	{
+		return faction;
+	}
+
+	public virtual bool IsFriendly(BaseCombatEntity other)
+	{
+		return false;
 	}
 
 	public override void ResetState()

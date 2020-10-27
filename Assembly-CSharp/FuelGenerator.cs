@@ -121,14 +121,15 @@ public class FuelGenerator : ContainerIOEntity
 		return currentEnergy;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_EngineSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnSwitchToggle", this, msg.player) == null)
 		{
 			bool generatorState = msg.read.Bit();
 			SetGeneratorState(generatorState);
+			Interface.CallHook("OnSwitchToggled", this, msg.player);
 		}
 	}
 

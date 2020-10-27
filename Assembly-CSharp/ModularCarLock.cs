@@ -1,4 +1,5 @@
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using System.Linq;
 using UnityEngine;
@@ -99,6 +100,15 @@ public class ModularCarLock
 
 	public bool CanHaveALock()
 	{
+		object obj = Interface.CallHook("OnVehicleLockableCheck", this);
+		if (obj != null)
+		{
+			if (!(obj is bool))
+			{
+				return false;
+			}
+			return (bool)obj;
+		}
 		if (!owner.IsDead())
 		{
 			return owner.HasDriverMountPoints();
@@ -110,7 +120,7 @@ public class ModularCarLock
 	{
 		if (isServer && !HasALock && !owner.IsDead())
 		{
-			LockID = Random.Range(1, 100000);
+			LockID = UnityEngine.Random.Range(1, 100000);
 			owner.SendNetworkUpdate();
 		}
 	}

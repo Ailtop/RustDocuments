@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[650]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[679]
 	{
 		new ConsoleSystem.Command
 		{
@@ -1689,6 +1689,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "eye_terraincheck",
+			Parent = "antihack",
+			FullName = "antihack.eye_terraincheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.eye_terraincheck.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_terraincheck = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "flyhack_extrusion",
 			Parent = "antihack",
 			FullName = "antihack.flyhack_extrusion",
@@ -1845,6 +1858,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "losradius",
+			Parent = "antihack",
+			FullName = "antihack.losradius",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.losradius.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.losradius = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxdeltatime",
 			Parent = "antihack",
 			FullName = "antihack.maxdeltatime",
@@ -1945,6 +1971,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.melee_serverframes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "melee_terraincheck",
+			Parent = "antihack",
+			FullName = "antihack.melee_terraincheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.melee_terraincheck.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.melee_terraincheck = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -2088,6 +2127,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.projectile_clientframes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "projectile_desync",
+			Parent = "antihack",
+			FullName = "antihack.projectile_desync",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.projectile_desync.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_desync = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -5009,6 +5061,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "createskull",
+			Parent = "player",
+			FullName = "player.createskull",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Player.createskull(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "dismount",
 			Parent = "player",
 			FullName = "player.dismount",
@@ -6671,7 +6735,7 @@ public class ConsoleGen
 			Name = "snapshot",
 			Parent = "server",
 			FullName = "server.snapshot",
-			ServerUser = true,
+			ServerAdmin = true,
 			Description = "This sends a snapshot of all the entities in the client's pvs. This is mostly redundant, but we request this when the client starts recording a demo.. so they get all the information.",
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
@@ -7417,15 +7481,275 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "clouds",
+			Name = "atmosphere_brightness",
 			Parent = "weather",
-			FullName = "weather.clouds",
+			FullName = "weather.atmosphere_brightness",
 			ServerAdmin = true,
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.atmosphere_brightness.ToString()),
+			SetOveride = delegate(string str)
 			{
-				Weather.clouds(arg);
-			}
+				Weather.atmosphere_brightness = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "atmosphere_contrast",
+			Parent = "weather",
+			FullName = "weather.atmosphere_contrast",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.atmosphere_contrast.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.atmosphere_contrast = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "atmosphere_directionality",
+			Parent = "weather",
+			FullName = "weather.atmosphere_directionality",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.atmosphere_directionality.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.atmosphere_directionality = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "atmosphere_mie",
+			Parent = "weather",
+			FullName = "weather.atmosphere_mie",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.atmosphere_mie.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.atmosphere_mie = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "atmosphere_rayleigh",
+			Parent = "weather",
+			FullName = "weather.atmosphere_rayleigh",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.atmosphere_rayleigh.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.atmosphere_rayleigh = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clear_chance",
+			Parent = "weather",
+			FullName = "weather.clear_chance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.clear_chance.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.clear_chance = str.ToFloat();
+			},
+			Default = "1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_attenuation",
+			Parent = "weather",
+			FullName = "weather.cloud_attenuation",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_attenuation.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_attenuation = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_brightness",
+			Parent = "weather",
+			FullName = "weather.cloud_brightness",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_brightness.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_brightness = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_coloring",
+			Parent = "weather",
+			FullName = "weather.cloud_coloring",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_coloring.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_coloring = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_coverage",
+			Parent = "weather",
+			FullName = "weather.cloud_coverage",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_coverage.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_coverage = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_opacity",
+			Parent = "weather",
+			FullName = "weather.cloud_opacity",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_opacity.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_opacity = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_saturation",
+			Parent = "weather",
+			FullName = "weather.cloud_saturation",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_saturation.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_saturation = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_scattering",
+			Parent = "weather",
+			FullName = "weather.cloud_scattering",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_scattering.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_scattering = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_sharpness",
+			Parent = "weather",
+			FullName = "weather.cloud_sharpness",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_sharpness.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_sharpness = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cloud_size",
+			Parent = "weather",
+			FullName = "weather.cloud_size",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.cloud_size.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.cloud_size = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "dust_chance",
+			Parent = "weather",
+			FullName = "weather.dust_chance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.dust_chance.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.dust_chance = str.ToFloat();
+			},
+			Default = "0"
 		},
 		new ConsoleSystem.Command
 		{
@@ -7433,11 +7757,62 @@ public class ConsoleGen
 			Parent = "weather",
 			FullName = "weather.fog",
 			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.fog.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.fog = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "fog_chance",
+			Parent = "weather",
+			FullName = "weather.fog_chance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.fog_chance.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.fog_chance = str.ToFloat();
+			},
+			Default = "0"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "load",
+			Parent = "weather",
+			FullName = "weather.load",
+			ServerAdmin = true,
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Weather.fog(arg);
+				Weather.load(arg);
 			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "overcast_chance",
+			Parent = "weather",
+			FullName = "weather.overcast_chance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.overcast_chance.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.overcast_chance = str.ToFloat();
+			},
+			Default = "0"
 		},
 		new ConsoleSystem.Command
 		{
@@ -7445,11 +7820,108 @@ public class ConsoleGen
 			Parent = "weather",
 			FullName = "weather.rain",
 			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.rain.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.rain = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "rain_chance",
+			Parent = "weather",
+			FullName = "weather.rain_chance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.rain_chance.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.rain_chance = str.ToFloat();
+			},
+			Default = "0"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "rainbow",
+			Parent = "weather",
+			FullName = "weather.rainbow",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.rainbow.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.rainbow = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "report",
+			Parent = "weather",
+			FullName = "weather.report",
+			ServerAdmin = true,
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Weather.rain(arg);
+				Weather.report(arg);
 			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "reset",
+			Parent = "weather",
+			FullName = "weather.reset",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Weather.reset(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "storm_chance",
+			Parent = "weather",
+			FullName = "weather.storm_chance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.storm_chance.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.storm_chance = str.ToFloat();
+			},
+			Default = "0"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "thunder",
+			Parent = "weather",
+			FullName = "weather.thunder",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.thunder.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.thunder = str.ToFloat();
+			},
+			Default = "-1"
 		},
 		new ConsoleSystem.Command
 		{
@@ -7457,11 +7929,16 @@ public class ConsoleGen
 			Parent = "weather",
 			FullName = "weather.wind",
 			ServerAdmin = true,
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = (() => Weather.wind.ToString()),
+			SetOveride = delegate(string str)
 			{
-				Weather.wind(arg);
-			}
+				Weather.wind = str.ToFloat();
+			},
+			Default = "-1"
 		},
 		new ConsoleSystem.Command
 		{

@@ -54,7 +54,7 @@ public class SteamInventoryItem : ScriptableObject
 
 	public ItemDefinition itemDefinition => ItemManager.FindItemDefinition(itemname);
 
-	public bool HasUnlocked(ulong playerId)
+	public virtual bool HasUnlocked(ulong playerId)
 	{
 		if (DlcItem != null && DlcItem.HasLicense(playerId))
 		{

@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using System;
@@ -268,7 +269,7 @@ public class MiniCopter : BaseHelicopterVehicle
 
 	public void EngineStartup()
 	{
-		if (!Waterlogged())
+		if (!Waterlogged() && Interface.CallHook("OnEngineStart", this, GetDriver()) == null)
 		{
 			Invoke(EngineOn, 5f);
 			SetFlag(Flags.Reserved4, true);
@@ -279,6 +280,7 @@ public class MiniCopter : BaseHelicopterVehicle
 	{
 		SetFlag(Flags.On, true);
 		SetFlag(Flags.Reserved4, false);
+		Interface.CallHook("OnEngineStarted", this, GetDriver());
 	}
 
 	public void EngineOff()

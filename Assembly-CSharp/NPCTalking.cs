@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using ConVar;
 using Network;
+using Oxide.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -238,9 +239,12 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 			{
 				OnConversationEnded(player);
 			}
-			conversingPlayers.Add(player);
-			UpdateFlags();
-			ClientRPCPlayer(null, player, "Client_StartConversation", GetConversationIndex(conversationFor.shortname), GetConversationStartSpeech());
+			if (Interface.CallHook("OnNpcConversationStart", this, player, conversationFor) == null)
+			{
+				conversingPlayers.Add(player);
+				UpdateFlags();
+				ClientRPCPlayer(null, player, "Client_StartConversation", GetConversationIndex(conversationFor.shortname), GetConversationStartSpeech());
+			}
 		}
 	}
 
@@ -287,7 +291,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 			return;
 		}
 		ConversationData.ResponseNode responseNode = conversationFor.speeches[num].responses[num2];
-		if (responseNode != null)
+		if (responseNode != null && Interface.CallHook("OnNpcConversationRespond", this, player, conversationFor, responseNode) == null)
 		{
 			if (responseNode.conditions.Length != 0)
 			{
@@ -302,11 +306,10 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 			if (speechNodeIndex == -1)
 			{
 				ForceEndConversation(player);
+				return;
 			}
-			else
-			{
-				ForceSpeechNode(player, speechNodeIndex);
-			}
+			ForceSpeechNode(player, speechNodeIndex);
+			Interface.CallHook("OnNpcConversationResponded", this, player, conversationFor, responseNode);
 		}
 	}
 

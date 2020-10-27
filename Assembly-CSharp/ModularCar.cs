@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.Modular;
@@ -171,8 +172,8 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[Header("Spawn")]
 	public SpawnSettings spawnSettings;
 
-	[SerializeField]
 	[Header("Fuel")]
+	[SerializeField]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
@@ -185,8 +186,8 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public GameObjectRef collisionEffect;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	public MeshRenderer[] damageShowingRenderers;
 
 	[ServerVar(Help = "Population active on the server")]
@@ -795,12 +796,14 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			{
 				bool arg = !HasAnyWorkingEngines() || waterlogged;
 				ClientRPC(null, "EngineStartFailed", arg);
-				return;
 			}
-			CancelEngineStart();
-			SetFlag(Flags.Reserved1, true);
-			SetFlag(Flags.On, false);
-			Invoke(FinishStartingEngine, carSettings.engineStartupTime);
+			else if (Interface.CallHook("OnEngineStart", this, player) == null)
+			{
+				CancelEngineStart();
+				SetFlag(Flags.Reserved1, true);
+				SetFlag(Flags.On, false);
+				Invoke(FinishStartingEngine, carSettings.engineStartupTime);
+			}
 		}
 	}
 
@@ -810,6 +813,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			SetFlag(Flags.On, true);
 			SetFlag(Flags.Reserved1, false);
+			Interface.CallHook("OnEngineStarted", this);
 		}
 	}
 
@@ -953,6 +957,10 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			return;
 		}
 		ModularCarPresetConfig modularCarPresetConfig = spawnSettings.configurationOptions[UnityEngine.Random.Range(0, spawnSettings.configurationOptions.Length)];
+		if (Interface.CallHook("OnVehicleModulesAssign", this, modularCarPresetConfig.socketItemDefs) != null)
+		{
+			return;
+		}
 		for (int i = 0; i < modularCarPresetConfig.socketItemDefs.Length; i++)
 		{
 			ItemModVehicleModule itemModVehicleModule = modularCarPresetConfig.socketItemDefs[i];
@@ -968,6 +976,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 				}
 			}
 		}
+		Interface.CallHook("OnVehicleModulesAssigned", this, modularCarPresetConfig.socketItemDefs);
 	}
 
 	[RPC_Server]

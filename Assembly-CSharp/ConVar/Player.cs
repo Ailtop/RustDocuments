@@ -15,8 +15,8 @@ namespace ConVar
 		[ServerVar]
 		public static int tickrate_sv = 16;
 
-		[ClientVar(AllowRunFromServer = true)]
 		[ServerUserVar]
+		[ClientVar(AllowRunFromServer = true)]
 		public static void cinematic_play(Arg arg)
 		{
 			if (!arg.HasArgs() || !arg.IsServerside)
@@ -340,6 +340,20 @@ namespace ConVar
 					baseLiquidVessel.AddLiquid(liquidType, amount);
 				}
 			}
+		}
+
+		[ServerVar]
+		public static void createskull(Arg arg)
+		{
+			string text = arg.GetString(0);
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (string.IsNullOrEmpty(text))
+			{
+				text = RandomUsernames.Get(Random.Range(0, 1000));
+			}
+			Item item = ItemManager.Create(ItemManager.FindItemDefinition("skull.human"), 1, 0uL);
+			item.name = HumanBodyResourceDispenser.CreateSkullName(text);
+			basePlayer.inventory.GiveItem(item);
 		}
 
 		[ServerVar]

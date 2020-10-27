@@ -53,8 +53,8 @@ public class BaseMelee : AttackEntity
 
 	public List<MaterialFX> materialStrikeFX = new List<MaterialFX>();
 
-	[Header("Other")]
 	[Range(0f, 1f)]
+	[Header("Other")]
 	public float heartStress = 0.5f;
 
 	public ResourceDispenser.GatherProperties gathering;
@@ -149,9 +149,9 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity();
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
 	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -352,8 +352,8 @@ public class BaseMelee : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void PlayerAttack(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -389,7 +389,7 @@ public class BaseMelee : AttackEntity
 							{
 								if (ConVar.AntiHack.melee_protection <= 0 || !hitInfo.HitEntity)
 								{
-									goto IL_067c;
+									goto IL_0688;
 								}
 								bool flag = true;
 								BasePlayer basePlayer = hitInfo.HitEntity as BasePlayer;
@@ -399,6 +399,7 @@ public class BaseMelee : AttackEntity
 								float num2 = melee_clientframes / 60f;
 								float num3 = melee_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
 								float num4 = (player.desyncTime + num2 + num3) * num;
+								int layerMask = ConVar.AntiHack.melee_terraincheck ? 10551296 : 2162688;
 								if ((bool)basePlayer && hitInfo.boneArea == (HitArea)(-1))
 								{
 									string shortPrefabName2 = base.ShortPrefabName;
@@ -444,7 +445,7 @@ public class BaseMelee : AttackEntity
 									Vector3 vector2 = pointStart;
 									Vector3 vector3 = hitInfo.PositionOnRay(vector);
 									Vector3 vector4 = vector;
-									bool num11 = GamePhysics.LineOfSight(center, position, vector2, vector3, vector4, 2162688);
+									bool num11 = GamePhysics.LineOfSight(center, position, vector2, vector3, vector4, layerMask);
 									if (!num11)
 									{
 										player.stats.Add("hit_" + hitInfo.HitEntity.Categorize() + "_indirect_los", 1, Stats.Server);
@@ -466,7 +467,7 @@ public class BaseMelee : AttackEntity
 										Vector3 vector5 = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
 										Vector3 position2 = basePlayer.eyes.position;
 										Vector3 vector6 = basePlayer.CenterPoint();
-										if (!GamePhysics.LineOfSight(vector5, position2, 2162688) && !GamePhysics.LineOfSight(vector5, vector6, 2162688))
+										if (!GamePhysics.LineOfSight(vector5, position2, layerMask) && !GamePhysics.LineOfSight(vector5, vector6, layerMask))
 										{
 											string shortPrefabName10 = base.ShortPrefabName;
 											string shortPrefabName11 = hitInfo.HitEntity.ShortPrefabName;
@@ -478,14 +479,14 @@ public class BaseMelee : AttackEntity
 								}
 								if (flag)
 								{
-									goto IL_067c;
+									goto IL_0688;
 								}
 								AntiHack.AddViolation(player, AntiHackType.MeleeHack, ConVar.AntiHack.melee_penalty);
 							}
 						}
 					}
 					goto end_IL_0031;
-					IL_067c:
+					IL_0688:
 					player.metabolism.UseHeart(heartStress * 0.2f);
 					using (TimeWarning.New("DoAttackShared", 50))
 					{

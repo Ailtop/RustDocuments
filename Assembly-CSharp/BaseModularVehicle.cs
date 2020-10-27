@@ -1,4 +1,5 @@
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using Rust.Modular;
 using System;
@@ -287,6 +288,10 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		BaseVehicleModule moduleForItem = GetModuleForItem(item);
 		if (moduleForItem != null)
 		{
+			if (Interface.CallHook("OnVehicleModuleMove", moduleForItem, this, player) != null)
+			{
+				return false;
+			}
 			return moduleForItem.CanBeMovedNow();
 		}
 		return true;

@@ -111,7 +111,7 @@ public class ReactiveTarget : IOEntity
 				Effect.server.Run(knockdownEffect.resourcePath, this, StringPool.Get("target_collider_bullseye"), Vector3.zero, Vector3.zero);
 				SetFlag(Flags.On, false);
 				QueueReset();
-				MarkDirtyForceUpdateOutputs();
+				SendPowerBurst();
 				SendNetworkUpdate();
 			}
 			else
@@ -144,7 +144,7 @@ public class ReactiveTarget : IOEntity
 
 	public bool CanToggle()
 	{
-		return UnityEngine.Time.realtimeSinceStartup > lastToggleTime + 1f;
+		return UnityEngine.Time.time > lastToggleTime + 1f;
 	}
 
 	public void QueueReset()
@@ -157,10 +157,9 @@ public class ReactiveTarget : IOEntity
 		if (IsKnockedDown() && CanToggle())
 		{
 			CancelInvoke(ResetTarget);
-			lastToggleTime = UnityEngine.Time.realtimeSinceStartup;
 			SetFlag(Flags.On, true);
 			knockdownHealth = 100f;
-			MarkDirtyForceUpdateOutputs();
+			SendPowerBurst();
 		}
 	}
 
@@ -168,10 +167,16 @@ public class ReactiveTarget : IOEntity
 	{
 		if (!IsKnockedDown() && CanToggle())
 		{
-			lastToggleTime = UnityEngine.Time.realtimeSinceStartup;
 			SetFlag(Flags.On, false);
-			MarkDirtyForceUpdateOutputs();
+			SendPowerBurst();
 		}
+	}
+
+	private void SendPowerBurst()
+	{
+		lastToggleTime = UnityEngine.Time.time;
+		MarkDirtyForceUpdateOutputs();
+		Invoke(base.MarkDirtyForceUpdateOutputs, activationPowerTime * 1.01f);
 	}
 
 	public override int ConsumptionAmount()
@@ -212,7 +217,7 @@ public class ReactiveTarget : IOEntity
 			{
 				return base.GetPassthroughAmount();
 			}
-			if (UnityEngine.Time.realtimeSinceStartup < lastToggleTime + activationPowerTime)
+			if (UnityEngine.Time.time < lastToggleTime + activationPowerTime)
 			{
 				return activationPowerAmount;
 			}

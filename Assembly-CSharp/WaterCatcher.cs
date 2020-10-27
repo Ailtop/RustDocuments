@@ -51,7 +51,7 @@ public class WaterCatcher : LiquidContainer
 
 	public bool TestIsOutside()
 	{
-		return !Physics.SphereCast(new Ray(base.transform.localToWorldMatrix.MultiplyPoint3x4(rainTestPosition), Vector3.up), rainTestSize, 256f, 1101070337);
+		return !Physics.SphereCast(new Ray(base.transform.localToWorldMatrix.MultiplyPoint3x4(rainTestPosition), Vector3.up), rainTestSize, 256f, 161546513);
 	}
 
 	public void AddResource(int iAmount)

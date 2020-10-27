@@ -44,7 +44,7 @@ public class Kayak : BaseBoat, PoolVehicle
 
 	public TimeCachedValue<float> fixedDragUpdate;
 
-	private TimeSince timeSinceLastUsed;
+	public TimeSince timeSinceLastUsed;
 
 	private const float DECAY_TICK_TIME = 60f;
 

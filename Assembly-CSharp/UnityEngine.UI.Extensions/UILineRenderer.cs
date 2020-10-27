@@ -4,8 +4,8 @@ using UnityEngine.Sprites;
 
 namespace UnityEngine.UI.Extensions
 {
-	[AddComponentMenu("UI/Extensions/Primitives/UILineRenderer")]
 	[RequireComponent(typeof(RectTransform))]
+	[AddComponentMenu("UI/Extensions/Primitives/UILineRenderer")]
 	public class UILineRenderer : UIPrimitiveBase
 	{
 		private enum SegmentType
@@ -71,8 +71,8 @@ namespace UnityEngine.UI.Extensions
 		[SerializeField]
 		internal float lineThickness = 2f;
 
-		[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
 		[SerializeField]
+		[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
 		internal bool relativeSize;
 
 		[SerializeField]

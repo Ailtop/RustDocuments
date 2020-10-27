@@ -135,8 +135,8 @@ public class Workbench : StorageContainer
 		return HasFlag(Flags.On);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Rotate(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -161,8 +161,8 @@ public class Workbench : StorageContainer
 		return blueprintBaseDef;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_BeginExperiment(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

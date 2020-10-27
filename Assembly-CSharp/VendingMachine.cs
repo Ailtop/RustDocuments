@@ -588,8 +588,8 @@ public class VendingMachine : StorageContainer
 		ClientRPC(null, "CLIENT_CancelVendingSounds");
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))
@@ -870,8 +870,8 @@ public class VendingMachine : StorageContainer
 		return false;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_DeleteSellOrder(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -889,11 +889,11 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_RotateVM(RPCMessage msg)
 	{
-		if (Interface.CallHook("OnRotateVendingMachine", this, msg.player) == null)
+		if (Interface.CallHook("OnRotateVendingMachine", this, msg.player) == null && CanRotate())
 		{
 			UpdateEmptyFlag();
 			if (msg.player.CanBuild() && IsInventoryEmpty())
@@ -904,8 +904,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_AddSellOrder(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -992,6 +992,11 @@ public class VendingMachine : StorageContainer
 			}
 			item.MarkDirty();
 		}
+	}
+
+	protected virtual bool CanRotate()
+	{
+		return true;
 	}
 
 	public bool IsBroadcasting()

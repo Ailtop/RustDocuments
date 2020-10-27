@@ -1,4 +1,5 @@
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
@@ -39,20 +40,20 @@ public class Elevator : IOEntity, IFlagNotify
 
 	public Transform CableRoot;
 
-	private const Flags TopFloorFlag = Flags.Reserved1;
+	public const Flags TopFloorFlag = Flags.Reserved1;
 
 	public const Flags ElevatorPowered = Flags.Reserved2;
 
-	private ElevatorLift liftEntity;
+	public ElevatorLift liftEntity;
 
-	private IOEntity ioEntity;
+	public IOEntity ioEntity;
 
-	private int[] previousPowerAmount = new int[2];
+	public int[] previousPowerAmount = new int[2];
 
 	public int Floor
 	{
 		get;
-		private set;
+		set;
 	}
 
 	private bool IsTop => HasFlag(Flags.Reserved1);
@@ -86,7 +87,7 @@ public class Elevator : IOEntity, IFlagNotify
 	{
 		EntityLinkBroadcast(delegate(Elevator elevatorEnt)
 		{
-			if (elevatorEnt.IsTop)
+			if (elevatorEnt.IsTop && Interface.CallHook("OnElevatorCall", this, elevatorEnt) == null)
 			{
 				float timeToTravel;
 				elevatorEnt.RequestMoveLiftTo(Floor, out timeToTravel);
@@ -122,9 +123,13 @@ public class Elevator : IOEntity, IFlagNotify
 		RequestMoveLiftTo(num, out timeToTravel);
 	}
 
-	private bool RequestMoveLiftTo(int targetFloor, out float timeToTravel)
+	public bool RequestMoveLiftTo(int targetFloor, out float timeToTravel)
 	{
 		timeToTravel = 0f;
+		if (Interface.CallHook("OnElevatorMove", this, targetFloor) != null)
+		{
+			return false;
+		}
 		if (IsBusy())
 		{
 			return false;
@@ -159,12 +164,12 @@ public class Elevator : IOEntity, IFlagNotify
 		return true;
 	}
 
-	private float TimeToTravelDistance(float distance)
+	public float TimeToTravelDistance(float distance)
 	{
 		return distance / LiftSpeedPerMetre;
 	}
 
-	private Vector3 GetWorldSpaceFloorPosition(int targetFloor)
+	public Vector3 GetWorldSpaceFloorPosition(int targetFloor)
 	{
 		int num = Floor - targetFloor;
 		Vector3 b = Vector3.up * ((float)num * 3f);
@@ -172,7 +177,7 @@ public class Elevator : IOEntity, IFlagNotify
 		return base.transform.position - b;
 	}
 
-	private void ClearBusy()
+	public void ClearBusy()
 	{
 		SetFlag(Flags.Busy, false);
 		if (liftEntity != null)
@@ -186,7 +191,7 @@ public class Elevator : IOEntity, IFlagNotify
 		}
 	}
 
-	private bool IsValidFloor(int targetFloor)
+	public bool IsValidFloor(int targetFloor)
 	{
 		if (targetFloor <= Floor)
 		{
@@ -195,7 +200,7 @@ public class Elevator : IOEntity, IFlagNotify
 		return false;
 	}
 
-	private Elevator GetElevatorInDirection(Direction dir)
+	public Elevator GetElevatorInDirection(Direction dir)
 	{
 		EntityLink entityLink = FindLink((dir == Direction.Down) ? "elevator/sockets/elevator-male" : "elevator/sockets/elevator-female");
 		if (entityLink != null && !entityLink.IsEmpty())
@@ -269,9 +274,10 @@ public class Elevator : IOEntity, IFlagNotify
 			info.msg.elevator = Pool.Get<ProtoBuf.Elevator>();
 		}
 		info.msg.elevator.floor = Floor;
+		Interface.CallHook("OnElevatorSaved", this, info);
 	}
 
-	private int LiftPositionToFloor()
+	public int LiftPositionToFloor()
 	{
 		Vector3 position = liftEntity.transform.position;
 		int result = -1;

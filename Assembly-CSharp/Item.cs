@@ -813,7 +813,7 @@ public class Item
 
 	public void LockUnlock(bool bNewState)
 	{
-		if (HasFlag(Flag.IsLocked) != bNewState)
+		if (HasFlag(Flag.IsLocked) != bNewState && (!bNewState || Interface.CallHook("OnItemLock", this) == null) && (bNewState || Interface.CallHook("OnItemUnlock", this) == null))
 		{
 			SetFlag(Flag.IsLocked, bNewState);
 			MarkDirty();

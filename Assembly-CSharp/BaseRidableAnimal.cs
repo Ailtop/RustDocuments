@@ -147,12 +147,12 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
-	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
 	[ServerVar]
+	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;

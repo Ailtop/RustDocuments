@@ -59,8 +59,8 @@ public class AmplifyOcclusionBase : MonoBehaviour
 	[Range(0f, 16f)]
 	public float PowerExponent = 1.8f;
 
-	[Tooltip("Controls the initial occlusion contribution offset.")]
 	[Range(0f, 0.99f)]
+	[Tooltip("Controls the initial occlusion contribution offset.")]
 	public float Bias = 0.05f;
 
 	[Range(0f, 1f)]
@@ -86,12 +86,12 @@ public class AmplifyOcclusionBase : MonoBehaviour
 
 	public Color FadeToTint = Color.black;
 
-	[Range(0f, 32f)]
 	[Tooltip("Final Radius parameter.")]
+	[Range(0f, 32f)]
 	public float FadeToRadius = 2f;
 
-	[Range(0f, 16f)]
 	[Tooltip("Final PowerExponent parameter.")]
+	[Range(0f, 16f)]
 	public float FadeToPowerExponent = 1.8f;
 
 	[Range(0f, 1f)]
@@ -105,8 +105,8 @@ public class AmplifyOcclusionBase : MonoBehaviour
 	[Tooltip("Radius in screen pixels.")]
 	public int BlurRadius = 3;
 
-	[Tooltip("Number of times that the Blur will repeat.")]
 	[Range(1f, 4f)]
+	[Tooltip("Number of times that the Blur will repeat.")]
 	public int BlurPasses = 1;
 
 	[Tooltip("0 - Blured, 1 - Sharpened.")]

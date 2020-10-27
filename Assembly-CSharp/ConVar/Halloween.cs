@@ -4,13 +4,13 @@ namespace ConVar
 	public class Halloween : ConsoleSystem
 	{
 		[ServerVar]
-		public static bool enabled = false;
+		public static bool enabled = true;
 
 		[ServerVar(Help = "Population active on the server, per square km")]
 		public static float murdererpopulation = 0f;
 
 		[ServerVar(Help = "Population active on the server, per square km")]
-		public static float scarecrowpopulation = 0f;
+		public static float scarecrowpopulation = 3f;
 
 		[ServerVar(Help = "Scarecrows can throw beancans (Default: true).")]
 		public static bool scarecrows_throw_beancans = true;

@@ -42,8 +42,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	private static Queue<GrowableEntity> queuedForUpdate = new Queue<GrowableEntity>();
 
-	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
 	public static float framebudgetms = 0.25f;
 
 	public bool underWater;
@@ -766,8 +766,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_TakeClone(RPCMessage msg)
 	{
 		TakeClones(msg.player);

@@ -483,8 +483,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_KnockDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)

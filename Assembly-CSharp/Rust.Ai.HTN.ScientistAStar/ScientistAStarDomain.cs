@@ -1968,8 +1968,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		private Vector3 _lastNavigationHeading = Vector3.zero;
 
-		[ReadOnly]
 		[Header("Pathfinding")]
+		[ReadOnly]
 		public BasePath Path;
 
 		[ReadOnly]
@@ -1995,14 +1995,14 @@ namespace Rust.Ai.HTN.ScientistAStar
 		[SerializeField]
 		private ScientistAStarContext _context;
 
-		[Header("Navigation")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
+		[Header("Navigation")]
 		private Vector3 _spawnPosition;
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Sensors")]
+		[ReadOnly]
+		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2047,9 +2047,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Reasoners")]
-		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2142,13 +2142,13 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
-		[ReadOnly]
-		[SerializeField]
 		[Header("Firearm Utility")]
+		[SerializeField]
+		[ReadOnly]
 		private float _lastFirearmUsageTime;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isFiring;
 
 		private HTNUtilityAiClient _aiClient;

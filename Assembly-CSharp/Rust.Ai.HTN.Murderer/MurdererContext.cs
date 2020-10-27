@@ -17,16 +17,16 @@ namespace Rust.Ai.HTN.Murderer
 		[SerializeField]
 		private byte[] _worldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private byte[] _previousWorldState;
 
 		[ReadOnly]
 		[SerializeField]
 		private int _decompositionScore;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;
@@ -48,8 +48,8 @@ namespace Rust.Ai.HTN.Murderer
 		[ReadOnly]
 		public AiLocationManager Location;
 
-		[ReadOnly]
 		[Header("Cover")]
+		[ReadOnly]
 		public CoverPointVolume CoverVolume;
 
 		[ReadOnly]

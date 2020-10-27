@@ -1,3 +1,4 @@
+using Oxide.Core;
 using Rust;
 using Rust.Modular;
 using System;
@@ -56,31 +57,31 @@ public class VehicleModuleEngine : VehicleModuleStorage
 	public bool IsUsable
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public float PerformanceFractionAcceleration
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public float PerformanceFractionTopSpeed
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public float PerformanceFractionFuelEconomy
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public float OverallPerformanceFraction
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public bool AtLowPerformance => OverallPerformanceFraction <= 0.5f;
@@ -124,21 +125,25 @@ public class VehicleModuleEngine : VehicleModuleStorage
 
 	public void RefreshPerformanceStats(EngineStorage engineStorage)
 	{
-		if (engineStorage == null)
+		if (Interface.CallHook("OnEngineStatsRefresh", this, engineStorage) == null)
 		{
-			IsUsable = false;
-			PerformanceFractionAcceleration = 0f;
-			PerformanceFractionTopSpeed = 0f;
-			PerformanceFractionFuelEconomy = 0f;
+			if (engineStorage == null)
+			{
+				IsUsable = false;
+				PerformanceFractionAcceleration = 0f;
+				PerformanceFractionTopSpeed = 0f;
+				PerformanceFractionFuelEconomy = 0f;
+			}
+			else
+			{
+				IsUsable = engineStorage.isUsable;
+				PerformanceFractionAcceleration = GetPerformanceFraction(engineStorage.accelerationBoostPercent);
+				PerformanceFractionTopSpeed = GetPerformanceFraction(engineStorage.topSpeedBoostPercent);
+				PerformanceFractionFuelEconomy = GetPerformanceFraction(engineStorage.fuelEconomyBoostPercent);
+			}
+			OverallPerformanceFraction = (PerformanceFractionAcceleration + PerformanceFractionTopSpeed + PerformanceFractionFuelEconomy) / 3f;
+			Interface.CallHook("OnEngineStatsRefreshed", this, engineStorage);
 		}
-		else
-		{
-			IsUsable = engineStorage.isUsable;
-			PerformanceFractionAcceleration = GetPerformanceFraction(engineStorage.accelerationBoostPercent);
-			PerformanceFractionTopSpeed = GetPerformanceFraction(engineStorage.topSpeedBoostPercent);
-			PerformanceFractionFuelEconomy = GetPerformanceFraction(engineStorage.fuelEconomyBoostPercent);
-		}
-		OverallPerformanceFraction = (PerformanceFractionAcceleration + PerformanceFractionTopSpeed + PerformanceFractionFuelEconomy) / 3f;
 	}
 
 	private float GetPerformanceFraction(float statBoostPercent)

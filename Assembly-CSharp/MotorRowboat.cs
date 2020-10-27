@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using System;
@@ -98,7 +99,7 @@ public class MotorRowboat : BaseBoat
 
 	public EntityFuelSystem fuelSystem;
 
-	private TimeSince timeSinceLastUsedFuel;
+	public TimeSince timeSinceLastUsedFuel;
 
 	public Transform[] stationaryDismounts;
 
@@ -301,9 +302,18 @@ public class MotorRowboat : BaseBoat
 
 	public void EngineToggle(bool wantsOn)
 	{
-		if (fuelSystem.HasFuel(true))
+		if (!fuelSystem.HasFuel(true))
+		{
+			return;
+		}
+		BasePlayer driver = GetDriver();
+		if (!wantsOn || Interface.CallHook("OnEngineStart", this, driver) == null)
 		{
 			SetFlag(Flags.Reserved1, wantsOn);
+			if (wantsOn)
+			{
+				Interface.CallHook("OnEngineStarted", this, driver);
+			}
 		}
 	}
 

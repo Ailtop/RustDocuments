@@ -41,8 +41,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 
 	public VisualGroup visualGroup;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private ModularVehicleLight[] lights;
 
 	public LODLevel[] lodRenderers;
@@ -239,8 +239,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Use(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

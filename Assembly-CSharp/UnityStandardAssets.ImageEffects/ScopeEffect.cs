@@ -2,8 +2,8 @@ using UnityEngine;
 
 namespace UnityStandardAssets.ImageEffects
 {
-	[AddComponentMenu("Image Effects/Other/Scope Overlay")]
 	[ExecuteInEditMode]
+	[AddComponentMenu("Image Effects/Other/Scope Overlay")]
 	public class ScopeEffect : PostEffectsBase, IImageEffect
 	{
 		public Material overlayMaterial;

@@ -31,8 +31,8 @@ namespace ConVar
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int developer
 		{
 			get
@@ -69,8 +69,8 @@ namespace ConVar
 			ServerPerformance.DoReport();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void objects(Arg args)
 		{
 			UnityEngine.Object[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Object>();
@@ -145,8 +145,8 @@ namespace ConVar
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void queue(Arg args)
 		{
 			string str = "";
@@ -431,8 +431,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -442,15 +442,15 @@ namespace ConVar
 			GC.unload();
 		}
 
-		[ClientVar]
 		[ServerVar(ServerUser = true)]
+		[ClientVar]
 		public static void version(Arg arg)
 		{
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
@@ -474,8 +474,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();

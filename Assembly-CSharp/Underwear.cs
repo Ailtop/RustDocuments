@@ -87,7 +87,7 @@ public class Underwear : ScriptableObject
 		}
 		bool num = underwear.steamItem == null || player.blueprints.steamInventory.HasItem(underwear.steamItem.id);
 		bool flag = false;
-		if (player.isServer && underwear.steamDLC != null && underwear.steamDLC.HasLicense(player.userID))
+		if (player.isServer && (underwear.steamDLC == null || underwear.steamDLC.HasLicense(player.userID)))
 		{
 			flag = true;
 		}

@@ -1,17 +1,17 @@
 using System;
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
 [AddComponentMenu("KriptoFX/Explosion_Bloom")]
-[RequireComponent(typeof(Camera))]
 [ImageEffectAllowedInSceneView]
 public class Explosion_Bloom : MonoBehaviour
 {
 	[Serializable]
 	public struct Settings
 	{
-		[Tooltip("Filters out pixels under this level of brightness.")]
 		[SerializeField]
+		[Tooltip("Filters out pixels under this level of brightness.")]
 		public float threshold;
 
 		[SerializeField]
@@ -19,9 +19,9 @@ public class Explosion_Bloom : MonoBehaviour
 		[Tooltip("Makes transition between under/over-threshold gradual.")]
 		public float softKnee;
 
-		[SerializeField]
 		[Tooltip("Changes extent of veiling effects in a screen resolution-independent fashion.")]
 		[Range(1f, 7f)]
+		[SerializeField]
 		public float radius;
 
 		[Tooltip("Blend factor of the result image.")]
@@ -79,8 +79,8 @@ public class Explosion_Bloom : MonoBehaviour
 	[SerializeField]
 	public Settings settings = Settings.defaultSettings;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Shader m_Shader;
 
 	private Material m_Material;

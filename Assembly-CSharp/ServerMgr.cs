@@ -488,15 +488,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 			return;
 		}
-		if (packet.connection.protocol > 2260)
+		if (packet.connection.protocol > 2261)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2260);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2261);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 			return;
 		}
-		if (packet.connection.protocol < 2260)
+		if (packet.connection.protocol < 2261)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2260);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2261);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 			return;
 		}
@@ -993,7 +993,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
 				string text3 = $"gm{GamemodeName()}";
 				string text4 = ConVar.Server.pve ? ",pve" : string.Empty;
-				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2260}{text4},h{AssemblyHash},{text},{text2},{text3}";
+				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2261}{text4},h{AssemblyHash},{text},{text2},{text3}";
 				Interface.CallHook("IOnUpdateServerInformation");
 				if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 				{
@@ -1237,7 +1237,40 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 	}
 
-	private static void SendReplicatedVars(Network.Connection connection)
+	public static void SendReplicatedVars(string filter)
+	{
+		if (Network.Net.sv.write.Start())
+		{
+			List<Network.Connection> obj = Facepunch.Pool.GetList<Network.Connection>();
+			foreach (Network.Connection connection in Network.Net.sv.connections)
+			{
+				if (connection.connected)
+				{
+					obj.Add(connection);
+				}
+			}
+			List<ConsoleSystem.Command> obj2 = Facepunch.Pool.GetList<ConsoleSystem.Command>();
+			foreach (ConsoleSystem.Command item in ConsoleSystem.Index.Server.Replicated)
+			{
+				if (item.FullName.StartsWith(filter))
+				{
+					obj2.Add(item);
+				}
+			}
+			Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
+			Network.Net.sv.write.Int32(obj2.Count);
+			foreach (ConsoleSystem.Command item2 in obj2)
+			{
+				Network.Net.sv.write.String(item2.FullName);
+				Network.Net.sv.write.String(item2.String);
+			}
+			Network.Net.sv.write.Send(new SendInfo(obj));
+			Facepunch.Pool.FreeList(ref obj2);
+			Facepunch.Pool.FreeList(ref obj);
+		}
+	}
+
+	public static void SendReplicatedVars(Network.Connection connection)
 	{
 		if (Network.Net.sv.write.Start())
 		{

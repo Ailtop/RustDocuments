@@ -2,6 +2,7 @@
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using System;
@@ -269,19 +270,24 @@ public class HotAirBalloon : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void EngineSwitch(RPCMessage msg)
 	{
-		bool b = msg.read.Bit();
-		SetFlag(Flags.On, b);
-		if (IsOn())
+		if (Interface.CallHook("OnHotAirBalloonToggle", this, msg.player) == null)
 		{
-			Invoke(ScheduleOff, 60f);
-		}
-		else
-		{
-			CancelInvoke(ScheduleOff);
+			bool b = msg.read.Bit();
+			SetFlag(Flags.On, b);
+			if (IsOn())
+			{
+				Invoke(ScheduleOff, 60f);
+				Interface.CallHook("OnHotAirBalloonToggled", this, msg.player);
+			}
+			else
+			{
+				CancelInvoke(ScheduleOff);
+				Interface.CallHook("OnHotAirBalloonToggled", this, msg.player);
+			}
 		}
 	}
 
