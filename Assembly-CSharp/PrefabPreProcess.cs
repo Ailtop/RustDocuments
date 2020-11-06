@@ -12,7 +12,7 @@ using VLB;
 
 public class PrefabPreProcess : IPrefabProcessor
 {
-	public static Type[] clientsideOnlyTypes = new Type[37]
+	public static Type[] clientsideOnlyTypes = new Type[38]
 	{
 		typeof(IClientComponent),
 		typeof(SkeletonSkinLod),
@@ -35,6 +35,7 @@ public class PrefabPreProcess : IPrefabProcessor
 		typeof(Animator),
 		typeof(AnimationEvents),
 		typeof(PlayerVoiceSpeaker),
+		typeof(VoiceProcessor),
 		typeof(PlayerVoiceRecorder),
 		typeof(ParticleScaler),
 		typeof(PostEffectsBase),

@@ -17,8 +17,8 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int maxthreads = 8;
 
 		[ClientVar(Saved = true)]
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -69,8 +69,8 @@ namespace ConVar
 			ServerPerformance.DoReport();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void objects(Arg args)
 		{
 			UnityEngine.Object[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Object>();
@@ -145,8 +145,8 @@ namespace ConVar
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void queue(Arg args)
 		{
 			string str = "";
@@ -442,8 +442,8 @@ namespace ConVar
 			GC.unload();
 		}
 
-		[ServerVar(ServerUser = true)]
 		[ClientVar]
+		[ServerVar(ServerUser = true)]
 		public static void version(Arg arg)
 		{
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
@@ -474,8 +474,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();

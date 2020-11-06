@@ -170,15 +170,17 @@ public class TerrainHeightMap : TerrainMap<short>
 		int num5 = Mathf.Clamp((int)num3, 0, num);
 		int x = Mathf.Min(num4 + 1, num);
 		int z = Mathf.Min(num5 + 1, num);
+		float num6 = num2 - (float)num4;
+		float num7 = num3 - (float)num5;
 		float height = GetHeight01(num4, num5);
-		float height2 = GetHeight01(x, num5);
-		float height3 = GetHeight01(num4, z);
-		float height4 = GetHeight01(x, z);
-		float t = num2 - (float)num4;
-		float t2 = num3 - (float)num5;
-		float a = Mathf.Lerp(height, height2, t);
-		float b = Mathf.Lerp(height3, height4, t);
-		return Mathf.Lerp(a, b, t2);
+		float height2 = GetHeight01(x, z);
+		if (num6 > num7)
+		{
+			float height3 = GetHeight01(x, num5);
+			return height + (height3 - height) * num6 + (height2 - height3) * num7;
+		}
+		float height4 = GetHeight01(num4, z);
+		return height + (height2 - height4) * num6 + (height4 - height) * num7;
 	}
 
 	public float GetHeight01(int x, int z)

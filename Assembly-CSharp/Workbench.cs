@@ -35,7 +35,6 @@ public class Workbench : StorageContainer
 	{
 		using (TimeWarning.New("Workbench.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 2308794761u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -56,7 +55,7 @@ public class Workbench : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -68,42 +67,6 @@ public class Workbench : StorageContainer
 					{
 						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_BeginExperiment");
-					}
-				}
-				return true;
-			}
-			if (rpc == 2051750736 && player != null)
-			{
-				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
-				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Rotate ");
-				}
-				using (TimeWarning.New("RPC_Rotate"))
-				{
-					using (TimeWarning.New("Conditions"))
-					{
-						if (!RPC_Server.IsVisible.Test(2051750736u, "RPC_Rotate", this, player, 3f))
-						{
-							return true;
-						}
-					}
-					try
-					{
-						using (TimeWarning.New("Call"))
-						{
-							rPCMessage = default(RPCMessage);
-							rPCMessage.connection = msg.connection;
-							rPCMessage.player = player;
-							rPCMessage.read = msg.read;
-							RPCMessage msg3 = rPCMessage;
-							RPC_Rotate(msg3);
-						}
-					}
-					catch (Exception exception2)
-					{
-						Debug.LogException(exception2);
-						player.Kick("RPC Error in RPC_Rotate");
 					}
 				}
 				return true;
@@ -135,23 +98,6 @@ public class Workbench : StorageContainer
 		return HasFlag(Flags.On);
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
-	public void RPC_Rotate(RPCMessage msg)
-	{
-		BasePlayer player = msg.player;
-		if (!Static && player.CanBuild() && (bool)player.GetHeldEntity() && player.GetHeldEntity().GetComponent<Hammer>() != null)
-		{
-			base.transform.rotation = Quaternion.LookRotation(-base.transform.forward, base.transform.up);
-			SendNetworkUpdate();
-			Deployable component = GetComponent<Deployable>();
-			if (component != null)
-			{
-				Effect.server.Run(component.placeEffect.resourcePath, base.transform.position, Vector3.up);
-			}
-		}
-	}
-
 	public static ItemDefinition GetBlueprintTemplate()
 	{
 		if (blueprintBaseDef == null)
@@ -161,8 +107,8 @@ public class Workbench : StorageContainer
 		return blueprintBaseDef;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_BeginExperiment(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -192,7 +138,7 @@ public class Workbench : StorageContainer
 		}
 		else
 		{
-			if (Interface.CallHook("CanExperiment", player, this) != null)
+			if (Interface.CallHook("OnExperimentStart", this, player) != null)
 			{
 				return;
 			}
@@ -214,6 +160,7 @@ public class Workbench : StorageContainer
 			CancelInvoke(ExperimentComplete);
 			Invoke(ExperimentComplete, 5f);
 			SendNetworkUpdate();
+			Interface.CallHook("OnExperimentStarted", this, player);
 		}
 	}
 
@@ -251,6 +198,10 @@ public class Workbench : StorageContainer
 		{
 			Debug.LogWarning("Pending blueprint was null!");
 		}
+		if (Interface.CallHook("OnExperimentEnd", this) != null)
+		{
+			return;
+		}
 		if (experimentResourceItem != null && experimentResourceItem.amount >= scrapForExperiment && pendingBlueprint != null)
 		{
 			experimentResourceItem.UseItem(scrapForExperiment);
@@ -271,6 +222,7 @@ public class Workbench : StorageContainer
 		pendingBlueprint = null;
 		base.inventory.SetLocked(false);
 		SendNetworkUpdate();
+		Interface.CallHook("OnExperimentEnded", this);
 	}
 
 	public override void PostServerLoad()

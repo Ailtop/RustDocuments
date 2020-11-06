@@ -5,7 +5,7 @@ using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
 {
-    [Info("Loot Bouncer", "Sorrow/Arainrr", "1.0.6")]
+    [Info("Loot Bouncer", "Sorrow/Arainrr", "1.0.7")]
     [Description("Empty the containers when players do not pick up all the items")]
     public class LootBouncer : RustPlugin
     {
@@ -190,7 +190,7 @@ namespace Oxide.Plugins
         private void EmptyJunkPile(LootContainer lootContainer)
         {
             if (!configData.emptyJunkpile) return;
-            var spawnGroup = lootContainer.GetComponent<SpawnPointInstance>()?.parentSpawnGroup;
+            var spawnGroup = lootContainer.GetComponent<SpawnPointInstance>()?.parentSpawnPointUser as SpawnGroup;
             if (spawnGroup == null) return;
 
             var junkPiles = Facepunch.Pool.GetList<JunkPile>();
@@ -211,7 +211,7 @@ namespace Oxide.Plugins
                         Vis.Entities(junkPile.transform.position, 10f, lootContainers, Rust.Layers.Mask.Default);
                         foreach (var loot in lootContainers)
                         {
-                            var lootSpawnGroup = loot.GetComponent<SpawnPointInstance>()?.parentSpawnGroup;
+                            var lootSpawnGroup = loot.GetComponent<SpawnPointInstance>()?.parentSpawnPointUser as SpawnGroup;
                             if (lootSpawnGroup != null && junkPile.spawngroups.Contains(lootSpawnGroup))
                             {
                                 DropItems(loot);

@@ -47,23 +47,23 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 
 	public LODLevel[] lodRenderers;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<ConditionalObject> conditionals;
 
-	[Header("Trigger Parent")]
 	[SerializeField]
+	[Header("Trigger Parent")]
 	private TriggerParent[] triggerParents;
 
-	[Header("Sliding Components")]
 	[SerializeField]
+	[Header("Sliding Components")]
 	private VehicleModuleSlidingComponent[] slidingComponents;
 
 	[SerializeField]
 	private VehicleModuleButtonComponent[] buttonComponents;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private DamageRenderer damageRenderer;
 
 	private TimeSince TimeSinceAddedToVehicle;
@@ -239,8 +239,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Use(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -457,11 +457,11 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 			BaseVehicleModule result;
 			if (TryGetAdjacentModuleInFront(out result))
 			{
-				flag2 = InSameVisualGroupAs(result);
+				flag2 = InSameVisualGroupAs(result, conditional.adjacentMatch);
 			}
 			if (TryGetAdjacentModuleBehind(out result))
 			{
-				flag3 = InSameVisualGroupAs(result);
+				flag3 = InSameVisualGroupAs(result, conditional.adjacentMatch);
 			}
 			switch (conditional.adjacentRestriction)
 			{
@@ -536,17 +536,39 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		return Vehicle.TryGetModuleAt(num + 1, out result);
 	}
 
-	private bool InSameVisualGroupAs(BaseVehicleModule moduleEntity)
+	private bool InSameVisualGroupAs(BaseVehicleModule moduleEntity, ConditionalObject.AdjacentMatchType matchType)
 	{
-		if (visualGroup == VisualGroup.None || moduleEntity == null)
+		if (moduleEntity == null)
 		{
 			return false;
 		}
-		if (moduleEntity.prefabID != prefabID)
+		if (visualGroup == VisualGroup.None)
 		{
-			return moduleEntity.visualGroup == visualGroup;
+			if (matchType == ConditionalObject.AdjacentMatchType.GroupNotExact)
+			{
+				return false;
+			}
+			return moduleEntity.prefabID == prefabID;
 		}
-		return true;
+		switch (matchType)
+		{
+		case ConditionalObject.AdjacentMatchType.GroupOrExact:
+			if (moduleEntity.prefabID != prefabID)
+			{
+				return moduleEntity.visualGroup == visualGroup;
+			}
+			return true;
+		case ConditionalObject.AdjacentMatchType.ExactOnly:
+			return moduleEntity.prefabID == prefabID;
+		case ConditionalObject.AdjacentMatchType.GroupNotExact:
+			if (moduleEntity.prefabID != prefabID)
+			{
+				return moduleEntity.visualGroup == visualGroup;
+			}
+			return false;
+		default:
+			return false;
+		}
 	}
 
 	private bool CanBeUsedNowBy(BasePlayer player)

@@ -141,7 +141,7 @@ public class ResearchTable : StorageContainer
 
 	public bool IsItemResearchable(Item item)
 	{
-		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint(item.info);
+		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint((item.info.isRedirectOf != null) ? item.info.isRedirectOf : item.info);
 		if (itemBlueprint == null || !itemBlueprint.isResearchable || itemBlueprint.defaultBlueprint)
 		{
 			return false;
@@ -265,7 +265,7 @@ public class ResearchTable : StorageContainer
 				base.inventory.Remove(targetItem);
 				targetItem.Remove();
 				Item item = ItemManager.Create(GetBlueprintTemplate(), 1, 0uL);
-				item.blueprintTarget = targetItem.info.itemid;
+				item.blueprintTarget = ((targetItem.info.isRedirectOf != null) ? targetItem.info.isRedirectOf.itemid : targetItem.info.itemid);
 				if (!item.MoveToContainer(base.inventory, 0))
 				{
 					item.Drop(GetDropPosition(), GetDropVelocity());

@@ -490,6 +490,8 @@ public class BasePlayer : BaseCombatEntity
 
 	public float eggVision;
 
+	private PhoneController activeTelephone;
+
 	[NonSerialized]
 	public IPlayer IPlayer;
 
@@ -859,6 +861,8 @@ public class BasePlayer : BaseCombatEntity
 	}
 
 	public override TraitFlag Traits => base.Traits | TraitFlag.Human | TraitFlag.Food | TraitFlag.Meat | TraitFlag.Alive;
+
+	public bool HasActiveTelephone => activeTelephone != null;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -1683,8 +1687,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Assist(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerAssist", this, msg.player) == null)
@@ -2139,8 +2143,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void Server_RemovePointOfInterest(RPCMessage msg)
 	{
 		if (ServerCurrentMapNote != null && Interface.CallHook("OnMapMarkerRemove", this, ServerCurrentMapNote) == null)
@@ -2152,8 +2156,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void Server_RequestMarkers(RPCMessage msg)
 	{
 		SendMarkersToClient();
@@ -2214,6 +2218,7 @@ public class BasePlayer : BaseCombatEntity
 			modelState.sleeping = IsSleeping();
 			modelState.mounted = isMounted;
 			modelState.relaxed = IsRelaxed();
+			modelState.onPhone = HasActiveTelephone;
 			if (!base.limitNetworking && Interface.CallHook("OnSendModelState", this) == null)
 			{
 				ClientRPC(null, "OnModelState", modelState);
@@ -2456,8 +2461,8 @@ public class BasePlayer : BaseCombatEntity
 		return false;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileAttack(RPCMessage msg)
 	{
 		PlayerProjectileAttack playerProjectileAttack = PlayerProjectileAttack.Deserialize(msg.read);
@@ -2817,8 +2822,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileUpdate(RPCMessage msg)
 	{
 		PlayerProjectileUpdate playerProjectileUpdate = PlayerProjectileUpdate.Deserialize(msg.read);
@@ -3778,8 +3783,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void ClientKeepConnectionAlive(RPCMessage msg)
 	{
 		lastTickTime = UnityEngine.Time.time;
@@ -4130,8 +4135,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void OnPlayerLanded(RPCMessage msg)
 	{
 		float num = msg.read.Float();
@@ -4835,8 +4840,8 @@ public class BasePlayer : BaseCombatEntity
 		return net.connection.info.GetInt(key, defaultVal);
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -4875,8 +4880,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void OnPlayerReported(RPCMessage msg)
 	{
 		string text = msg.read.String();
@@ -5170,15 +5175,22 @@ public class BasePlayer : BaseCombatEntity
 
 	public void OnReceivedVoice(byte[] data)
 	{
-		if (Interface.CallHook("OnPlayerVoice", this, data) == null && Network.Net.sv.write.Start())
+		if (Interface.CallHook("OnPlayerVoice", this, data) == null)
 		{
-			Network.Net.sv.write.PacketID(Message.Type.VoiceData);
-			Network.Net.sv.write.UInt32(net.ID);
-			Network.Net.sv.write.BytesWithSize(data);
-			Network.Net.sv.write.Send(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.transform.position, 100f))
+			if (Network.Net.sv.write.Start())
 			{
-				priority = Priority.Immediate
-			});
+				Network.Net.sv.write.PacketID(Message.Type.VoiceData);
+				Network.Net.sv.write.UInt32(net.ID);
+				Network.Net.sv.write.BytesWithSize(data);
+				Network.Net.sv.write.Send(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.transform.position, 100f))
+				{
+					priority = Priority.Immediate
+				});
+			}
+			if (activeTelephone != null)
+			{
+				activeTelephone.OnReceivedVoiceFromUser(data);
+			}
 		}
 	}
 
@@ -6505,5 +6517,10 @@ public class BasePlayer : BaseCombatEntity
 			}
 		}
 		return false;
+	}
+
+	public void SetActiveTelephone(PhoneController t)
+	{
+		activeTelephone = t;
 	}
 }

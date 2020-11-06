@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Automatic Authorization", "k1lly0u/Arainrr", "1.2.2", ResourceId = 2063)]
+    [Info("Automatic Authorization", "k1lly0u/Arainrr", "1.2.4", ResourceId = 2063)]
     public class AutomaticAuthorization : RustPlugin
     {
         #region Fields
@@ -30,10 +30,17 @@ namespace Oxide.Plugins
             Clans,
         }
 
+        private enum AutoAuthType
+        {
+            All,
+            Turret,
+            Cupboard,
+        }
+
         private class EntityCache
         {
-            public HashSet<AutoTurret> autoTurrets = new HashSet<AutoTurret>();
-            public HashSet<BuildingPrivlidge> buildingPrivlidges = new HashSet<BuildingPrivlidge>();
+            public readonly HashSet<AutoTurret> autoTurrets = new HashSet<AutoTurret>();
+            public readonly HashSet<BuildingPrivlidge> buildingPrivlidges = new HashSet<BuildingPrivlidge>();
         }
 
         #endregion Fields
@@ -48,14 +55,11 @@ namespace Oxide.Plugins
             permission.RegisterPermission(PERMISSION_USE, this);
             cmd.AddChatCommand(configData.chatS.chatCommand, this, nameof(CmdAutoAuth));
             cmd.AddChatCommand(configData.chatS.uiCommand, this, nameof(CmdAutoAuthUI));
-        }
-
-        private void OnServerInitialized()
-        {
             if (!configData.teamShareS.enabled)
             {
                 Unsubscribe(nameof(OnTeamLeave));
                 Unsubscribe(nameof(OnTeamKick));
+                Unsubscribe(nameof(OnTeamDisbanded));
                 Unsubscribe(nameof(OnTeamAcceptInvite));
             }
             if (!configData.friendsShareS.enabled)
@@ -67,11 +71,26 @@ namespace Oxide.Plugins
             {
                 Unsubscribe(nameof(OnClanUpdate));
                 Unsubscribe(nameof(OnClanDestroy));
+                Unsubscribe(nameof(OnClanMemberGone));
             }
+        }
+
+        private void OnServerInitialized()
+        {
             Subscribe(nameof(OnEntitySpawned));
-            foreach (var entity in BaseNetworkable.serverEntities.OfType<BaseEntity>())
+            foreach (var serverEntity in BaseNetworkable.serverEntities)
             {
-                CheckEntity(entity);
+                var autoTurret = serverEntity as AutoTurret;
+                if (autoTurret != null)
+                {
+                    CheckEntitySpawned(autoTurret);
+                    continue;
+                }
+                var buildingPrivlidge = serverEntity as BuildingPrivlidge;
+                if (buildingPrivlidge != null)
+                {
+                    CheckEntitySpawned(buildingPrivlidge);
+                }
             }
         }
 
@@ -84,85 +103,24 @@ namespace Oxide.Plugins
             SaveData();
         }
 
-        private void OnEntitySpawned(BaseEntity entity) => CheckEntity(entity, true);
+        private void OnEntitySpawned(AutoTurret autoTurret) => CheckEntitySpawned(autoTurret, true);
 
-        private void CheckEntity(BaseEntity entity, bool justCreated = false)
-        {
-            if (entity == null || !entity.OwnerID.IsSteamId()) return;
-            var buildingPrivlidge = entity as BuildingPrivlidge;
-            if (buildingPrivlidge != null)
-            {
-                EntityCache entityCache;
-                if (playerEntities.TryGetValue(buildingPrivlidge.OwnerID, out entityCache)) entityCache.buildingPrivlidges.Add(buildingPrivlidge);
-                else playerEntities.Add(buildingPrivlidge.OwnerID, new EntityCache { buildingPrivlidges = new HashSet<BuildingPrivlidge> { buildingPrivlidge } });
-                if (justCreated && permission.UserHasPermission(buildingPrivlidge.OwnerID.ToString(), PERMISSION_USE))
-                    AuthToCupboard(new HashSet<BuildingPrivlidge> { buildingPrivlidge }, buildingPrivlidge.OwnerID, true);
-                return;
-            }
+        private void OnEntitySpawned(BuildingPrivlidge buildingPrivlidge) => CheckEntitySpawned(buildingPrivlidge, true);
 
-            var autoTurret = entity as AutoTurret;
-            if (autoTurret != null)
-            {
-                EntityCache entityCache;
-                if (playerEntities.TryGetValue(autoTurret.OwnerID, out entityCache)) entityCache.autoTurrets.Add(autoTurret);
-                else playerEntities.Add(autoTurret.OwnerID, new EntityCache { autoTurrets = new HashSet<AutoTurret> { autoTurret } });
-                if (justCreated && permission.UserHasPermission(autoTurret.OwnerID.ToString(), PERMISSION_USE))
-                    AuthToTurret(new HashSet<AutoTurret> { autoTurret }, autoTurret.OwnerID, true);
-            }
-        }
+        private void OnEntityKill(AutoTurret autoTurret) => CheckEntityKill(autoTurret);
 
-        private void OnEntityKill(BaseCombatEntity entity)
-        {
-            if (entity == null || !entity.OwnerID.IsSteamId()) return;
-            var buildingPrivlidge = entity as BuildingPrivlidge;
-            if (buildingPrivlidge != null)
-            {
-                foreach (var entry in playerEntities)
-                {
-                    if (entry.Value.buildingPrivlidges.Remove(buildingPrivlidge))
-                    {
-                        return; ;
-                    }
-                }
-                return;
-            }
-
-            var autoTurret = entity as AutoTurret;
-            if (autoTurret != null)
-            {
-                foreach (var entry in playerEntities)
-                {
-                    if (entry.Value.autoTurrets.Remove(autoTurret))
-                    {
-                        return;
-                    }
-                }
-            }
-        }
+        private void OnEntityKill(BuildingPrivlidge buildingPrivlidge) => CheckEntityKill(buildingPrivlidge);
 
         private object CanUseLockedEntity(BasePlayer player, BaseLock baseLock)
         {
-            var parentEntity = baseLock?.GetParentEntity();
-            if (player == null || parentEntity == null || !parentEntity.OwnerID.IsSteamId() || !baseLock.IsLocked()) return null;
-            if (!permission.UserHasPermission(parentEntity.OwnerID.ToString(), PERMISSION_USE)) return null;
-            var shareData = GetShareData(parentEntity.OwnerID, true);
-            if (shareData.friendsShare.enabled && HasFriend(parentEntity.OwnerID, player.userID))
-            {
-                if (baseLock is KeyLock && shareData.friendsShare.keyLock && CanUnlockEntity(parentEntity, configData.friendsShareS.keyLockS))
-                    return true;
-                var codeLock = baseLock as CodeLock;
-                if (codeLock != null && shareData.friendsShare.codeLock && CanUnlockEntity(parentEntity, configData.friendsShareS.codeLockS))
-                    return SendUnlockedEffect(codeLock);
-            }
-            if (shareData.clanShare.enabled && SameClan(parentEntity.OwnerID, player.userID))
-            {
-                if (baseLock is KeyLock && shareData.clanShare.keyLock && CanUnlockEntity(parentEntity, configData.clanShareS.keyLockS))
-                    return true;
-                var codeLock = baseLock as CodeLock;
-                if (codeLock != null && shareData.clanShare.codeLock && CanUnlockEntity(parentEntity, configData.clanShareS.codeLockS))
-                    return SendUnlockedEffect(codeLock);
-            }
-            if (shareData.teamShare.enabled && SameTeam(parentEntity.OwnerID, player.userID))
+            if (player == null || baseLock == null || !baseLock.IsLocked()) return null;
+            var parentEntity = baseLock.GetParentEntity();
+            var ownerID = baseLock.OwnerID.IsSteamId() ? baseLock.OwnerID : parentEntity != null ? parentEntity.OwnerID : 0;
+            if (!ownerID.IsSteamId() || ownerID == player.userID) return null;
+            if (!permission.UserHasPermission(ownerID.ToString(), PERMISSION_USE)) return null;
+
+            var shareData = GetShareData(ownerID, true);
+            if (shareData.teamShare.enabled && SameTeam(ownerID, player.userID))
             {
                 if (baseLock is KeyLock && shareData.teamShare.keyLock && CanUnlockEntity(parentEntity, configData.teamShareS.keyLockS))
                     return true;
@@ -170,8 +128,29 @@ namespace Oxide.Plugins
                 if (codeLock != null && shareData.teamShare.codeLock && CanUnlockEntity(parentEntity, configData.teamShareS.codeLockS))
                     return SendUnlockedEffect(codeLock);
             }
+            if (shareData.friendsShare.enabled && HasFriend(ownerID, player.userID))
+            {
+                if (baseLock is KeyLock && shareData.friendsShare.keyLock && CanUnlockEntity(parentEntity, configData.friendsShareS.keyLockS))
+                    return true;
+                var codeLock = baseLock as CodeLock;
+                if (codeLock != null && shareData.friendsShare.codeLock && CanUnlockEntity(parentEntity, configData.friendsShareS.codeLockS))
+                    return SendUnlockedEffect(codeLock);
+            }
+
+            if (shareData.clanShare.enabled && SameClan(ownerID, player.userID))
+            {
+                if (baseLock is KeyLock && shareData.clanShare.keyLock && CanUnlockEntity(parentEntity, configData.clanShareS.keyLockS))
+                    return true;
+                var codeLock = baseLock as CodeLock;
+                if (codeLock != null && shareData.clanShare.codeLock && CanUnlockEntity(parentEntity, configData.clanShareS.codeLockS))
+                    return SendUnlockedEffect(codeLock);
+            }
             return null;
         }
+
+        #endregion Oxide Hooks
+
+        #region Helpers
 
         private static bool CanUnlockEntity(BaseEntity parentEntity, ConfigData.LockSettings lockSettings)
         {
@@ -188,20 +167,70 @@ namespace Oxide.Plugins
 
         private static bool SendUnlockedEffect(CodeLock codeLock)
         {
-            Effect.server.Run(codeLock.effectUnlocked.resourcePath, codeLock.transform.position);
+            if (codeLock.effectUnlocked.isValid)
+            {
+                Effect.server.Run(codeLock.effectUnlocked.resourcePath, codeLock.transform.position);
+            }
             return true;
         }
 
-        #endregion Oxide Hooks
+        #endregion Helpers
 
         #region Methods
 
-        private enum AutoAuthType
+        #region Entity Spawn / Kill
+
+        private void CheckEntitySpawned(AutoTurret autoTurret, bool justCreated = false)
         {
-            All,
-            Turret,
-            Cupboard,
+            if (autoTurret == null || !autoTurret.OwnerID.IsSteamId()) return;
+            EntityCache entityCache;
+            if (!playerEntities.TryGetValue(autoTurret.OwnerID, out entityCache))
+            {
+                entityCache = new EntityCache();
+                playerEntities.Add(autoTurret.OwnerID, entityCache);
+            }
+            entityCache.autoTurrets.Add(autoTurret);
+
+            if (justCreated && permission.UserHasPermission(autoTurret.OwnerID.ToString(), PERMISSION_USE))
+                AuthToTurret(new HashSet<AutoTurret> { autoTurret }, autoTurret.OwnerID, true);
         }
+
+        private void CheckEntitySpawned(BuildingPrivlidge buildingPrivlidge, bool justCreated = false)
+        {
+            if (buildingPrivlidge == null || !buildingPrivlidge.OwnerID.IsSteamId()) return;
+            EntityCache entityCache;
+            if (!playerEntities.TryGetValue(buildingPrivlidge.OwnerID, out entityCache))
+            {
+                entityCache = new EntityCache();
+                playerEntities.Add(buildingPrivlidge.OwnerID, entityCache);
+            }
+            entityCache.buildingPrivlidges.Add(buildingPrivlidge);
+
+            if (justCreated && permission.UserHasPermission(buildingPrivlidge.OwnerID.ToString(), PERMISSION_USE))
+                AuthToCupboard(new HashSet<BuildingPrivlidge> { buildingPrivlidge }, buildingPrivlidge.OwnerID, true);
+        }
+
+        private void CheckEntityKill(AutoTurret autoTurret)
+        {
+            if (autoTurret == null || !autoTurret.OwnerID.IsSteamId()) return;
+            EntityCache entityCache;
+            if (playerEntities.TryGetValue(autoTurret.OwnerID, out entityCache))
+            {
+                entityCache.autoTurrets.Remove(autoTurret);
+            }
+        }
+
+        private void CheckEntityKill(BuildingPrivlidge buildingPrivlidge)
+        {
+            if (buildingPrivlidge == null || !buildingPrivlidge.OwnerID.IsSteamId()) return;
+            EntityCache entityCache;
+            if (playerEntities.TryGetValue(buildingPrivlidge.OwnerID, out entityCache))
+            {
+                entityCache.buildingPrivlidges.Remove(buildingPrivlidge);
+            }
+        }
+
+        #endregion Entity Spawn / Kill
 
         private void UpdateAuthList(ulong playerID, AutoAuthType autoAuthType)
         {
@@ -211,8 +240,8 @@ namespace Oxide.Plugins
             switch (autoAuthType)
             {
                 case AutoAuthType.All:
-                    AuthToCupboard(entityCache.buildingPrivlidges, playerID);
                     AuthToTurret(entityCache.autoTurrets, playerID);
+                    AuthToCupboard(entityCache.buildingPrivlidges, playerID);
                     return;
 
                 case AutoAuthType.Turret:
@@ -223,6 +252,29 @@ namespace Oxide.Plugins
                     AuthToCupboard(entityCache.buildingPrivlidges, playerID);
                     return;
             }
+        }
+
+        private void AuthToTurret(HashSet<AutoTurret> autoTurrets, ulong playerID, bool justCreated = false)
+        {
+            if (autoTurrets.Count <= 0) return;
+            var authList = GetPlayerNameIDs(playerID, AutoAuthType.Turret);
+            foreach (var autoTurret in autoTurrets)
+            {
+                if (autoTurret == null || autoTurret.IsDestroyed) continue;
+                var isOnline = autoTurret.IsOnline();
+                if (isOnline) autoTurret.SetIsOnline(false);
+                autoTurret.authorizedPlayers.Clear();
+                foreach (var friend in authList)
+                {
+                    autoTurret.authorizedPlayers.Add(friend);
+                }
+                if (isOnline) autoTurret.SetIsOnline(true);
+                autoTurret.SendNetworkUpdate();
+            }
+            var player = BasePlayer.FindByID(playerID);
+            if (player == null) return;
+            if (justCreated && configData.chatS.sendMessage && authList.Count > 1)
+                Print(player, Lang("TurretSuccess", player.UserIDString, authList.Count - 1, autoTurrets.Count));
         }
 
         private void AuthToCupboard(HashSet<BuildingPrivlidge> buildingPrivlidges, ulong playerID, bool justCreated = false)
@@ -237,39 +289,12 @@ namespace Oxide.Plugins
                 {
                     buildingPrivlidge.authorizedPlayers.Add(friend);
                 }
-                buildingPrivlidge.SendNetworkUpdateImmediate();
+                buildingPrivlidge.SendNetworkUpdate();
             }
-            var player = RustCore.FindPlayerById(playerID);
+            var player = BasePlayer.FindByID(playerID);
             if (player == null) return;
             if (justCreated && configData.chatS.sendMessage && authList.Count > 1)
                 Print(player, Lang("CupboardSuccess", player.UserIDString, authList.Count - 1, buildingPrivlidges.Count));
-        }
-
-        private void AuthToTurret(HashSet<AutoTurret> autoTurrets, ulong playerID, bool justCreated = false)
-        {
-            if (autoTurrets.Count <= 0) return;
-            var authList = GetPlayerNameIDs(playerID, AutoAuthType.Turret);
-            foreach (var autoTurret in autoTurrets)
-            {
-                if (autoTurret == null || autoTurret.IsDestroyed) continue;
-                bool isOnline = false;
-                if (autoTurret.IsOnline())
-                {
-                    autoTurret.SetIsOnline(false);
-                    isOnline = true;
-                }
-                autoTurret.authorizedPlayers.Clear();
-                foreach (var friend in authList)
-                {
-                    autoTurret.authorizedPlayers.Add(friend);
-                }
-                if (isOnline) autoTurret.SetIsOnline(true);
-                autoTurret.SendNetworkUpdateImmediate();
-            }
-            var player = RustCore.FindPlayerById(playerID);
-            if (player == null) return;
-            if (justCreated && configData.chatS.sendMessage && authList.Count > 1)
-                Print(player, Lang("TurretSuccess", player.UserIDString, authList.Count - 1, autoTurrets.Count));
         }
 
         private List<PlayerNameID> GetPlayerNameIDs(ulong playerID, AutoAuthType autoAuthType)
@@ -282,23 +307,38 @@ namespace Oxide.Plugins
         {
             var shareData = GetShareData(playerID, true);
             var sharePlayers = new HashSet<ulong> { playerID };
+            if (shareData.teamShare.enabled && (autoAuthType == AutoAuthType.Turret ? shareData.teamShare.turret : shareData.teamShare.cupboard))
+            {
+                var teamMembers = GetTeamMembers(playerID);
+                if (teamMembers != null)
+                {
+                    foreach (var member in teamMembers)
+                    {
+                        sharePlayers.Add(member);
+                    }
+                }
+            }
             if (shareData.friendsShare.enabled && (autoAuthType == AutoAuthType.Turret ? shareData.friendsShare.turret : shareData.friendsShare.cupboard))
             {
                 var friends = GetFriends(playerID);
-                foreach (var friend in friends)
-                    sharePlayers.Add(friend);
+                if (friends != null)
+                {
+                    foreach (var friend in friends)
+                    {
+                        sharePlayers.Add(friend);
+                    }
+                }
             }
             if (shareData.clanShare.enabled && (autoAuthType == AutoAuthType.Turret ? shareData.clanShare.turret : shareData.clanShare.cupboard))
             {
                 var clanMembers = GetClanMembers(playerID);
-                foreach (var member in clanMembers)
-                    sharePlayers.Add(member);
-            }
-            if (shareData.teamShare.enabled && (autoAuthType == AutoAuthType.Turret ? shareData.teamShare.turret : shareData.teamShare.cupboard))
-            {
-                var teamMembers = GetTeamMembers(playerID);
-                foreach (var member in teamMembers)
-                    sharePlayers.Add(member);
+                if (clanMembers != null)
+                {
+                    foreach (var member in clanMembers)
+                    {
+                        sharePlayers.Add(member);
+                    }
+                }
             }
             return sharePlayers;
         }
@@ -382,15 +422,7 @@ namespace Oxide.Plugins
 
         #region Teams
 
-        private void OnTeamLeave(RelationshipManager.PlayerTeam playerTeam, BasePlayer player)
-        {
-            NextTick(() =>
-            {
-                if (playerTeam == null || player == null) return;
-                if (!playerTeam.members.Contains(player.userID))
-                    UpdateTeamAuthList(playerTeam.members);
-            });
-        }
+        #region Hooks
 
         private void OnTeamAcceptInvite(RelationshipManager.PlayerTeam playerTeam, BasePlayer player)
         {
@@ -398,33 +430,60 @@ namespace Oxide.Plugins
             {
                 if (playerTeam == null || player == null) return;
                 if (playerTeam.members.Contains(player.userID))
+                {
                     UpdateTeamAuthList(playerTeam.members);
+                }
             });
         }
 
-        private void OnTeamKick(RelationshipManager.PlayerTeam playerTeam, BasePlayer player, ulong target)
+        private void OnTeamLeave(RelationshipManager.PlayerTeam playerTeam, BasePlayer player)
+        {
+            NextTick(() =>
+            {
+                if (playerTeam == null || player == null) return;
+                if (!playerTeam.members.Contains(player.userID))
+                {
+                    var teamMembers = new List<ulong>(playerTeam.members) { player.userID };
+                    UpdateTeamAuthList(teamMembers);
+                }
+            });
+        }
+
+        private void OnTeamKick(RelationshipManager.PlayerTeam playerTeam, BasePlayer leader, ulong target)
         {
             NextTick(() =>
             {
                 if (playerTeam == null) return;
                 if (!playerTeam.members.Contains(target))
-                    UpdateTeamAuthList(playerTeam.members);
+                {
+                    var teamMembers = new List<ulong>(playerTeam.members) { target };
+                    UpdateTeamAuthList(teamMembers);
+                }
             });
         }
+
+        private void OnTeamDisbanded(RelationshipManager.PlayerTeam playerTeam)
+        {
+            if (playerTeam == null) return;
+            UpdateTeamAuthList(playerTeam.members);
+        }
+
+        #endregion Hooks
 
         private void UpdateTeamAuthList(List<ulong> teamMembers)
         {
             if (teamMembers.Count <= 0) return;
             foreach (var member in teamMembers)
+            {
                 UpdateAuthList(member, AutoAuthType.All);
+            }
         }
 
-        private static List<ulong> GetTeamMembers(ulong playerID)
+        private static IEnumerable<ulong> GetTeamMembers(ulong playerID)
         {
-            if (!RelationshipManager.TeamsEnabled()) return new List<ulong>();
+            if (!RelationshipManager.TeamsEnabled()) return null;
             var playerTeam = RelationshipManager.Instance.FindPlayersTeam(playerID);
-            if (playerTeam != null) return playerTeam.members;
-            return new List<ulong>();
+            return playerTeam?.members;
         }
 
         private static bool SameTeam(ulong playerID, ulong friendID)
@@ -441,69 +500,89 @@ namespace Oxide.Plugins
 
         #region Friends
 
-        private void OnFriendAdded(string playerID, string friendID) => UpdateFriendAuthList(playerID);
+        #region Hooks
 
-        private void OnFriendRemoved(string playerID, string friendID) => UpdateFriendAuthList(playerID);
+        private void OnFriendAdded(string playerID, string friendID) => UpdateFriendAuthList(playerID, friendID);
 
-        private void UpdateFriendAuthList(string playerID) => UpdateAuthList(ulong.Parse(playerID), AutoAuthType.All);
+        private void OnFriendRemoved(string playerID, string friendID) => UpdateFriendAuthList(playerID, friendID);
 
-        private List<ulong> GetFriends(ulong playerID)
+        #endregion Hooks
+
+        private void UpdateFriendAuthList(string playerID, string friendID)
         {
-            if (Friends == null) return new List<ulong>();
-            var friends = Friends.Call("GetFriends", playerID);
-            if (friends != null && friends is ulong[])
-                return (friends as ulong[]).ToList();
-            return new List<ulong>();
+            UpdateAuthList(ulong.Parse(playerID), AutoAuthType.All);
+            UpdateAuthList(ulong.Parse(friendID), AutoAuthType.All);
+        }
+
+        private IEnumerable<ulong> GetFriends(ulong playerID)
+        {
+            if (Friends == null) return null;
+            var friends = Friends.Call("GetFriends", playerID) as ulong[];
+            return friends;
         }
 
         private bool HasFriend(ulong playerID, ulong friendID)
         {
             if (Friends == null) return false;
             var hasFriend = Friends.Call("HasFriend", playerID, friendID);
-            if (hasFriend != null && (bool)hasFriend) return true;
-            return false;
+            return hasFriend is bool && (bool)hasFriend;
         }
 
         #endregion Friends
 
         #region Clans
 
+        #region Hooks
+
         private void OnClanDestroy(string clanName) => UpdateClanAuthList(clanName);
 
         private void OnClanUpdate(string clanName) => UpdateClanAuthList(clanName);
 
+        #region Clans Reborn Hooks
+
+        private void OnClanMemberGone(string playerID, List<string> memberUserIDs)
+        {
+            UpdateAuthList(ulong.Parse(playerID), AutoAuthType.All);
+        }
+
+        #endregion Clans Reborn Hooks
+
+        #endregion Hooks
+
         private void UpdateClanAuthList(string clanName)
         {
             var clanMembers = GetClanMembers(clanName);
-            foreach (var member in clanMembers)
-                UpdateAuthList(member, AutoAuthType.All);
-        }
-
-        private List<ulong> GetClanMembers(ulong playerID)
-        {
-            if (Clans == null) return new List<ulong>();
-            var clanName = Clans.Call("GetClanOf", playerID);
-            if (clanName != null && clanName is string)
-                return GetClanMembers((string)clanName);
-            return new List<ulong>();
-        }
-
-        private List<ulong> GetClanMembers(string clanName)
-        {
-            var clan = Clans.Call("GetClan", clanName);
-            if (clan != null && clan is JObject)
+            if (clanMembers != null)
             {
-                var members = (clan as JObject).GetValue("members");
-                if (members != null && members is JArray)
-                    return ((JArray)members).Select(x => ulong.Parse(x.ToString())).ToList();
+                foreach (var member in clanMembers)
+                {
+                    UpdateAuthList(member, AutoAuthType.All);
+                }
             }
-            return new List<ulong>();
+        }
+
+        private IEnumerable<ulong> GetClanMembers(ulong playerID)
+        {
+            if (Clans == null) return null;
+            //Clans Reborn
+            var members = Clans.Call("GetClanMembers", playerID);
+            if (members != null) return (members as List<string>)?.Select(ulong.Parse);
+            //Clans
+            var clanName = Clans.Call("GetClanOf", playerID) as string;
+            return clanName != null ? GetClanMembers(clanName) : null;
+        }
+
+        private IEnumerable<ulong> GetClanMembers(string clanName)
+        {
+            var clan = Clans.Call("GetClan", clanName) as JObject;
+            var members = clan?.GetValue("members") as JArray;
+            return members?.Select(x => ulong.Parse(x.ToString()));
         }
 
         private bool SameClan(ulong playerID, ulong friendID)
         {
             if (Clans == null) return false;
-            //Clans
+            //Clans and Clans Reborn
             var isMember = Clans.Call("IsClanMember", playerID.ToString(), friendID.ToString());
             if (isMember != null) return (bool)isMember;
             //Rust:IO Clans
@@ -542,7 +621,7 @@ namespace Oxide.Plugins
                 Parent = titlePanel,
                 Components =
                 {
-                    new CuiTextComponent { Text = Lang("UI_Title", player.UserIDString), FontSize = 20, Align = TextAnchor.MiddleCenter, Color ="1 0 0 1" },
+                    new CuiTextComponent { Text = Lang("UI_Title", player.UserIDString), FontSize = 24, Align = TextAnchor.MiddleCenter, Color ="1 0 0 1" },
                     new CuiOutlineComponent { Distance = "0.5 0.5", Color = "1 1 1 1" },
                     new CuiRectTransformComponent { AnchorMin = "0.2 0",  AnchorMax = "0.8 1" }
                 }
@@ -567,17 +646,18 @@ namespace Oxide.Plugins
         private void UpdateMenuUI(BasePlayer player, StoredData.ShareData shareData, ShareType type = ShareType.None)
         {
             if (player == null) return;
-            var container = new CuiElementContainer();
             var availableTypes = GetAvailableTypes();
             var total = availableTypes.Count();
             if (total <= 0) return;
+
             int i = 0;
+            var container = new CuiElementContainer();
 
             #region Teams UI
 
             if (availableTypes.Contains(ShareType.Teams))
             {
-                if ((type == ShareType.None || type == ShareType.Teams))
+                if (type == ShareType.None || type == ShareType.Teams)
                 {
                     var anchors = GetMenuSubAnchors(i, total);
                     CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Teams);
@@ -593,7 +673,7 @@ namespace Oxide.Plugins
 
             if (availableTypes.Contains(ShareType.Friends))
             {
-                if ((type == ShareType.None || type == ShareType.Friends))
+                if (type == ShareType.None || type == ShareType.Friends)
                 {
                     var anchors = GetMenuSubAnchors(i, total);
                     CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Friends);
@@ -609,7 +689,7 @@ namespace Oxide.Plugins
 
             if (availableTypes.Contains(ShareType.Clans))
             {
-                if ((type == ShareType.None || type == ShareType.Clans))
+                if (type == ShareType.None || type == ShareType.Clans)
                 {
                     var anchors = GetMenuSubAnchors(i, total);
                     CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Clans);
@@ -778,6 +858,10 @@ namespace Oxide.Plugins
             }
             switch (args[0].ToLower())
             {
+                case "ui":
+                    CreateMainUI(player);
+                    return;
+
                 case "at":
                 case "autoteam":
                     if (!availableTypes.Contains(ShareType.Teams))
@@ -1200,7 +1284,7 @@ namespace Oxide.Plugins
             public ChatSettings chatS = new ChatSettings();
 
             [JsonProperty(PropertyName = "Version")]
-            public VersionNumber version = new VersionNumber(1, 2, 0);
+            public VersionNumber version;
 
             public class ChatSettings
             {
@@ -1281,6 +1365,7 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData, true);
@@ -1312,9 +1397,9 @@ namespace Oxide.Plugins
 
             public class ShareData
             {
+                public ShareEntry teamShare = new ShareEntry();
                 public ShareEntry friendsShare = new ShareEntry();
                 public ShareEntry clanShare = new ShareEntry();
-                public ShareEntry teamShare = new ShareEntry();
             }
 
             public class ShareEntry

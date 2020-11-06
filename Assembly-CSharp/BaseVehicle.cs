@@ -462,7 +462,7 @@ public class BaseVehicle : BaseMountable
 					num = 0;
 				}
 				MountPointInfo mountPointInfo = mountPoints[num];
-				if (mountPointInfo.mountable != null && !mountPointInfo.mountable.IsMounted() && !IsSeatClipping(mountPointInfo.mountable) && IsSeatVisible(mountPointInfo.mountable, player.eyes.position))
+				if (mountPointInfo.mountable != null && !mountPointInfo.mountable.IsMounted() && mountPointInfo.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPointInfo.mountable) && IsSeatVisible(mountPointInfo.mountable, player.eyes.position))
 				{
 					baseMountable = mountPointInfo.mountable;
 					break;
@@ -510,11 +510,14 @@ public class BaseVehicle : BaseMountable
 
 	public void SetupOwner(BasePlayer owner, Vector3 newSafeAreaOrigin, float newSafeAreaRadius)
 	{
-		creatorEntity = owner;
-		SetFlag(Flags.Locked, true);
-		safeAreaRadius = newSafeAreaRadius;
-		safeAreaOrigin = newSafeAreaOrigin;
-		spawnTime = UnityEngine.Time.realtimeSinceStartup;
+		if (owner != null)
+		{
+			creatorEntity = owner;
+			SetFlag(Flags.Locked, true);
+			safeAreaRadius = newSafeAreaRadius;
+			safeAreaOrigin = newSafeAreaOrigin;
+			spawnTime = UnityEngine.Time.realtimeSinceStartup;
+		}
 	}
 
 	public void ClearOwnerEntry()
@@ -639,28 +642,33 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	public override void AttemptMount(BasePlayer player)
+	public override void AttemptMount(BasePlayer player, bool doMountChecks = true)
 	{
 		if (_mounted != null || !MountEligable(player))
 		{
 			return;
 		}
-		BaseMountable idealMountPoint = GetIdealMountPoint(player.eyes.position, player.eyes.position + player.eyes.HeadForward() * 1f);
-		if (!(idealMountPoint == null))
+		BaseMountable idealMountPointFor = GetIdealMountPointFor(player);
+		if (!(idealMountPointFor == null))
 		{
-			if (idealMountPoint == this)
+			if (idealMountPointFor == this)
 			{
-				base.AttemptMount(player);
+				base.AttemptMount(player, doMountChecks);
 			}
 			else
 			{
-				idealMountPoint.AttemptMount(player);
+				idealMountPointFor.AttemptMount(player, doMountChecks);
 			}
 			if (player.GetMountedVehicle() == this)
 			{
-				PlayerMounted(player, idealMountPoint);
+				PlayerMounted(player, idealMountPointFor);
 			}
 		}
+	}
+
+	protected BaseMountable GetIdealMountPointFor(BasePlayer player)
+	{
+		return GetIdealMountPoint(player.eyes.position, player.eyes.position + player.eyes.HeadForward() * 1f);
 	}
 
 	public override bool GetDismountPosition(BasePlayer player, out Vector3 res)

@@ -5,8 +5,8 @@ using UnityEngine.Rendering;
 
 namespace VLB
 {
-	[AddComponentMenu("")]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
+	[AddComponentMenu("")]
 	[ExecuteInEditMode]
 	public class BeamGeometry : MonoBehaviour
 	{

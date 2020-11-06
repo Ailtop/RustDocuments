@@ -122,8 +122,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool autosynctransforms
 		{
 			get

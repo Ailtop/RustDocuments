@@ -107,8 +107,8 @@ public class IOEntity : BaseCombatEntity
 	[NonSerialized]
 	public int lastResetIndex;
 
-	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]
@@ -364,8 +364,8 @@ public class IOEntity : BaseCombatEntity
 	}
 
 	[RPC_Server.CallsPerSecond(10uL)]
-	[RPC_Server.IsVisible(6f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(6f)]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

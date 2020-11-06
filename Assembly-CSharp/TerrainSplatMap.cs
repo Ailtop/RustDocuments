@@ -372,7 +372,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 		{
 			if (lerp > 0f)
 			{
-				float num = (int)dst[(idx * res + z) * res + x];
+				float num = BitUtility.Byte2Float(dst[(idx * res + z) * res + x]);
 				float new_val = Mathf.Lerp(num, 1f, lerp * opacity);
 				SetSplat(x, z, id, num, new_val);
 			}
@@ -394,7 +394,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 		{
 			if (lerp > 0f)
 			{
-				float num = (int)dst[(idx * res + z) * res + x];
+				float num = BitUtility.Byte2Float(dst[(idx * res + z) * res + x]);
 				float new_val = Mathf.Clamp01(num + lerp * delta);
 				SetSplat(x, z, id, num, new_val);
 			}

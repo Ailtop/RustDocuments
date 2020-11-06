@@ -12,6 +12,7 @@ namespace CompanionServer.Handlers
 			AppInfo appInfo = Facepunch.Pool.Get<AppInfo>();
 			appInfo.name = ConVar.Server.hostname;
 			appInfo.headerImage = ConVar.Server.headerimage;
+			appInfo.logoImage = ConVar.Server.logoimage;
 			appInfo.url = ConVar.Server.url;
 			appInfo.map = World.Name;
 			appInfo.mapSize = World.Size;
@@ -20,7 +21,7 @@ namespace CompanionServer.Handlers
 			appInfo.maxPlayers = (uint)ConVar.Server.maxplayers;
 			appInfo.queuedPlayers = (uint)SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued;
 			appInfo.seed = World.Seed;
-			appInfo.salt = World.Salt + 1;
+			appInfo.salt = World.Salt;
 			AppResponse appResponse = Facepunch.Pool.Get<AppResponse>();
 			appResponse.info = appInfo;
 			Send(appResponse);

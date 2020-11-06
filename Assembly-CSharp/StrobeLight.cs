@@ -49,8 +49,8 @@ public class StrobeLight : BaseCombatEntity
 		return speedSlow;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetStrobe(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

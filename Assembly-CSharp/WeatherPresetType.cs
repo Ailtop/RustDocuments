@@ -5,5 +5,6 @@ public enum WeatherPresetType
 	Storm,
 	Dust,
 	Fog,
-	Rain
+	Rain,
+	Cinematic
 }

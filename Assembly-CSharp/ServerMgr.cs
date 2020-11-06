@@ -407,6 +407,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				}
 			}
 		}
+		SendReplicatedVars(packet.connection);
 	}
 
 	private void OnRPCMessage(Message packet)
@@ -488,15 +489,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 			return;
 		}
-		if (packet.connection.protocol > 2261)
+		if (packet.connection.protocol > 2267)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2261);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2267);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 			return;
 		}
-		if (packet.connection.protocol < 2261)
+		if (packet.connection.protocol < 2267)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2261);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2267);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 			return;
 		}
@@ -993,7 +994,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
 				string text3 = $"gm{GamemodeName()}";
 				string text4 = ConVar.Server.pve ? ",pve" : string.Empty;
-				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2261}{text4},h{AssemblyHash},{text},{text2},{text3}";
+				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2267}{text4},h{AssemblyHash},{text},{text2},{text3}";
 				Interface.CallHook("IOnUpdateServerInformation");
 				if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 				{
@@ -1024,6 +1025,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				SteamServer.SetKey("world.size", World.Size.ToString());
 				SteamServer.SetKey("pve", ConVar.Server.pve.ToString());
 				SteamServer.SetKey("headerimage", ConVar.Server.headerimage);
+				SteamServer.SetKey("logoimage", ConVar.Server.logoimage);
 				SteamServer.SetKey("url", ConVar.Server.url);
 				SteamServer.SetKey("gmn", GamemodeName());
 				SteamServer.SetKey("gmt", GamemodeTitle());
@@ -1176,7 +1178,6 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			connection.encryptOutgoing = true;
 		}
 		connection.connected = true;
-		SendReplicatedVars(connection);
 	}
 
 	internal void Shutdown()

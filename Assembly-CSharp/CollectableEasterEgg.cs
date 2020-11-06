@@ -109,8 +109,8 @@ public class CollectableEasterEgg : BaseEntity
 		base.ServerInit();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_StartPickUp(RPCMessage msg)
 	{
 		if (!(msg.player == null))
@@ -119,8 +119,8 @@ public class CollectableEasterEgg : BaseEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_PickUp(RPCMessage msg)
 	{
 		if (msg.player == null)

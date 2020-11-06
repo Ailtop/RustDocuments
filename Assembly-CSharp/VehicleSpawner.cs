@@ -13,17 +13,28 @@ public class VehicleSpawner : BaseEntity
 		public GameObjectRef prefabToSpawn;
 	}
 
+	public float spawnNudgeRadius = 6f;
+
+	public float cleanupRadius = 10f;
+
+	public float occupyRadius = 5f;
+
 	public SpawnPair[] objectsToSpawn;
 
 	public Transform spawnOffset;
 
 	public float safeRadius = 10f;
 
+	public virtual int GetOccupyLayer()
+	{
+		return 32768;
+	}
+
 	public BaseVehicle GetVehicleOccupying()
 	{
 		BaseVehicle result = null;
 		List<BaseVehicle> obj = Pool.GetList<BaseVehicle>();
-		Vis.Entities(spawnOffset.transform.position, 5f, obj, 32768, QueryTriggerInteraction.Ignore);
+		Vis.Entities(spawnOffset.transform.position, occupyRadius, obj, GetOccupyLayer(), QueryTriggerInteraction.Ignore);
 		if (obj.Count > 0)
 		{
 			result = obj[0];
@@ -70,10 +81,10 @@ public class VehicleSpawner : BaseEntity
 		SpawnVehicle(spawnPair.prefabToSpawn.resourcePath, newOwner);
 	}
 
-	public void SpawnVehicle(string prefabToSpawn, BasePlayer newOwner)
+	public BaseVehicle SpawnVehicle(string prefabToSpawn, BasePlayer newOwner)
 	{
-		CleanupArea(10f);
-		NudgePlayersInRadius(6f);
+		CleanupArea(cleanupRadius);
+		NudgePlayersInRadius(spawnNudgeRadius);
 		BaseEntity baseEntity = GameManager.server.CreateEntity(prefabToSpawn, spawnOffset.transform.position, spawnOffset.transform.rotation);
 		baseEntity.Spawn();
 		BaseVehicle component = baseEntity.GetComponent<BaseVehicle>();
@@ -83,6 +94,7 @@ public class VehicleSpawner : BaseEntity
 			component.SetupOwner(newOwner, spawnOffset.transform.position, safeRadius);
 		}
 		fuelSystem?.AddStartingFuel(component.StartingFuelUnits());
+		return component;
 	}
 
 	public void CleanupArea(float radius)

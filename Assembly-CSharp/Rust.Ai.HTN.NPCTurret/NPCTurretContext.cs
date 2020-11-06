@@ -10,15 +10,15 @@ namespace Rust.Ai.HTN.NPCTurret
 	{
 		public delegate void WorldStateChangedEvent(NPCTurretContext context, Facts fact, byte oldValue, byte newValue);
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
 		private byte[] _worldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private byte[] _previousWorldState;
 
 		[SerializeField]

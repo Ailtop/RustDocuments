@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{0D3E971A-C840-49B1-933E-318F5ED7C160}</ProjectGuid>
+    <ProjectGuid>{ACB6E4AB-9B36-48E7-92D0-69490B9C37DC}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
@@ -283,6 +283,7 @@
     <Compile Include="AttackEntity.cs" />
     <Compile Include="AttractionPoint.cs" />
     <Compile Include="AudioAlarm.cs" />
+    <Compile Include="AudioInterceptComponent.cs" />
     <Compile Include="AudioSettings.cs" />
     <Compile Include="AuroraEffect.cs" />
     <Compile Include="Auth_EAC.cs" />
@@ -647,6 +648,8 @@
     <Compile Include="DecorPatch.cs" />
     <Compile Include="DecorRotate.cs" />
     <Compile Include="DecorScale.cs" />
+    <Compile Include="DecorSocketFemale.cs" />
+    <Compile Include="DecorSocketMale.cs" />
     <Compile Include="DecorSpawn.cs" />
     <Compile Include="DecorSwim.cs" />
     <Compile Include="DecorTransform.cs" />
@@ -970,6 +973,7 @@
     <Compile Include="HorseCorpse.cs" />
     <Compile Include="HorseEquipmentInformationPanel.cs" />
     <Compile Include="HorseRagdoll.cs" />
+    <Compile Include="HorseSpawner.cs" />
     <Compile Include="HostileNote.cs" />
     <Compile Include="HotAirBalloon.cs" />
     <Compile Include="HotOverlay.cs" />
@@ -1017,6 +1021,7 @@
     <Compile Include="ImpostorRenderer.cs" />
     <Compile Include="ImpostorShadows.cs" />
     <Compile Include="IndependentScale.cs" />
+    <Compile Include="IndividualSpawner.cs" />
     <Compile Include="InfoBar.cs" />
     <Compile Include="InfrastructureType.cs" />
     <Compile Include="IngameMenuBackground.cs" />
@@ -1051,6 +1056,7 @@
     <Compile Include="IronSights.cs" />
     <Compile Include="ISoundBudgetedUpdate.cs" />
     <Compile Include="ISpawnGroup.cs" />
+    <Compile Include="ISpawnPointUser.cs" />
     <Compile Include="ISplashable.cs" />
     <Compile Include="ISubscribable.cs" />
     <Compile Include="Item.cs" />
@@ -1331,11 +1337,14 @@
     <Compile Include="ModularCarGarage.cs" />
     <Compile Include="ModularCarLock.cs" />
     <Compile Include="ModularCarPresetConfig.cs" />
+    <Compile Include="ModularCarSeat.cs" />
+    <Compile Include="ModularVehicleShopFront.cs" />
     <Compile Include="Monument.cs" />
     <Compile Include="MonumentBenchmarkScene.cs" />
     <Compile Include="MonumentInfo.cs" />
     <Compile Include="MonumentMarker.cs" />
     <Compile Include="MonumentNavMesh.cs" />
+    <Compile Include="MonumentNode.cs" />
     <Compile Include="MonumentTier.cs" />
     <Compile Include="MonumentType.cs" />
     <Compile Include="MorphCache.cs" />
@@ -1455,6 +1464,9 @@
     <Compile Include="Performance.cs" />
     <Compile Include="PerformanceText.cs" />
     <Compile Include="PFXRepeatingFirework.cs" />
+    <Compile Include="PhoneController.cs" />
+    <Compile Include="PhoneDialler.cs" />
+    <Compile Include="PhoneDirectoryEntry.cs" />
     <Compile Include="PhotoEntity.cs" />
     <Compile Include="PhotoFrame.cs" />
     <Compile Include="PhotoPanel.cs" />
@@ -1464,6 +1476,7 @@
     <Compile Include="PieOption.cs" />
     <Compile Include="PieShape.cs" />
     <Compile Include="PingPongRotate.cs" />
+    <Compile Include="PlaceCliffs.cs" />
     <Compile Include="PlaceDecorUniform.cs" />
     <Compile Include="PlaceDecorValueNoise.cs" />
     <Compile Include="PlaceDecorWhiteNoise.cs" />
@@ -1542,6 +1555,7 @@
     <Compile Include="ProceduralLiftStop.cs" />
     <Compile Include="ProceduralObject.cs" />
     <Compile Include="ProcessedTexture.cs" />
+    <Compile Include="ProcessMonumentNodes.cs" />
     <Compile Include="ProcessProceduralObjects.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="ProgressBar.cs" />
@@ -1560,6 +1574,7 @@
     <Compile Include="QuickCraftButton.cs" />
     <Compile Include="RadialSpawnPoint.cs" />
     <Compile Include="RadiationOverlay.cs" />
+    <Compile Include="RadioDialog.cs" />
     <Compile Include="RadixSorter.cs" />
     <Compile Include="Ragdoll.cs" />
     <Compile Include="RagdollEditor.cs" />
@@ -2217,7 +2232,6 @@
     <Compile Include="SpawnIndividual.cs" />
     <Compile Include="SpawnPointInstance.cs" />
     <Compile Include="SpawnPopulation.cs" />
-    <Compile Include="SpawnRandomModularCar.cs" />
     <Compile Include="SphereEntity.cs" />
     <Compile Include="SpiderWeb.cs" />
     <Compile Include="SpinnerWheel.cs" />
@@ -2273,10 +2287,13 @@
     <Compile Include="SystemInfoEx.cs" />
     <Compile Include="SystemInfoGeneralText.cs" />
     <Compile Include="TabToggle.cs" />
+    <Compile Include="TakeCollisionDamage.cs" />
     <Compile Include="TargetTrigger.cs" />
     <Compile Include="TeamMemberElement.cs" />
     <Compile Include="TeamMemberMapMarker.cs" />
     <Compile Include="TeamUI.cs" />
+    <Compile Include="Telephone.cs" />
+    <Compile Include="TelephoneManager.cs" />
     <Compile Include="TennisArcadeGame.cs" />
     <Compile Include="TennisBall.cs" />
     <Compile Include="TerrainAlphaMap.cs" />
@@ -2444,6 +2461,7 @@
     <Compile Include="uiPlayerPreview.cs" />
     <Compile Include="UIPlayerPreviewControls.cs" />
     <Compile Include="UIPrefab.cs" />
+    <Compile Include="UIRecordingInfo.cs" />
     <Compile Include="UIRoot.cs" />
     <Compile Include="UIRootPixel.cs" />
     <Compile Include="UIRootScaled.cs" />
@@ -2513,6 +2531,7 @@
     <Compile Include="VehicleModuleInformationPanel.cs" />
     <Compile Include="VehicleModuleSeating.cs" />
     <Compile Include="VehicleModuleStorage.cs" />
+    <Compile Include="VehicleModuleTaxi.cs" />
     <Compile Include="VehicleSpawner.cs" />
     <Compile Include="VehicleTerrainHandler.cs" />
     <Compile Include="VehicleVendor.cs" />
@@ -2561,6 +2580,7 @@
     <Compile Include="VLB\Version.cs" />
     <Compile Include="VLB\VolumetricDustParticles.cs" />
     <Compile Include="VLB\VolumetricLightBeam.cs" />
+    <Compile Include="VoiceProcessor.cs" />
     <Compile Include="VTP.cs" />
     <Compile Include="v_chainsaw.cs" />
     <Compile Include="WaterBall.cs" />

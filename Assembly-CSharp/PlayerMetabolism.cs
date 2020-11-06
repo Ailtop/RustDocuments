@@ -207,8 +207,8 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		float f2 = 0f;
 		if (owner.IsOutside(owner.eyes.position))
 		{
-			f = Climate.GetRain(owner.eyes.position) * 0.6f;
-			f2 = Climate.GetSnow(owner.eyes.position) * 0.2f;
+			f = Climate.GetRain(owner.eyes.position) * Weather.wetness_rain;
+			f2 = Climate.GetSnow(owner.eyes.position) * Weather.wetness_snow;
 		}
 		bool flag = owner.baseProtection.amounts[4] > 0f;
 		float currentEnvironmentalWetness = owner.currentEnvironmentalWetness;

@@ -7,6 +7,12 @@ namespace ConVar
 	[Factory("weather")]
 	public class Weather : ConsoleSystem
 	{
+		[ServerVar]
+		public static float wetness_rain = 0.4f;
+
+		[ServerVar]
+		public static float wetness_snow = 0.2f;
+
 		[ReplicatedVar(Default = "1")]
 		public static float clear_chance
 		{
@@ -534,8 +540,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void reset(Arg args)
 		{
 			if ((bool)SingletonComponent<Climate>.Instance)
@@ -548,8 +554,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void report(Arg args)
 		{
 			if ((bool)SingletonComponent<Climate>.Instance)

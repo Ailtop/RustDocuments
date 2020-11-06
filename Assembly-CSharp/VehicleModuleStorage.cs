@@ -17,8 +17,6 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		public GameObjectRef storageUnitPrefab;
 
 		public Transform storageUnitPoint;
-
-		public EntityRef storageUnitInstance;
 	}
 
 	[SerializeField]

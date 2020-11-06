@@ -135,67 +135,67 @@ public class Climate : SingletonComponent<Climate>
 	public float WeatherStateBlend
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public uint WeatherSeedPrevious
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public uint WeatherSeedTarget
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public uint WeatherSeedNext
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public WeatherPreset WeatherStatePrevious
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public WeatherPreset WeatherStateTarget
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public WeatherPreset WeatherStateNext
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public WeatherPreset WeatherState
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public WeatherPreset WeatherClamps
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public WeatherPreset WeatherOverrides
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public LegacyWeatherState Overrides
 	{
 		get;
-		private set;
+		set;
 	}
 
 	protected override void Awake()
@@ -251,9 +251,42 @@ public class Climate : SingletonComponent<Climate>
 		}
 	}
 
-	public static float GetClouds(Vector3 position)
+	private static bool Initialized()
 	{
 		if (!SingletonComponent<Climate>.Instance)
+		{
+			return false;
+		}
+		if (!SingletonComponent<Climate>.Instance.WeatherStatePrevious)
+		{
+			return false;
+		}
+		if (!SingletonComponent<Climate>.Instance.WeatherStateTarget)
+		{
+			return false;
+		}
+		if (!SingletonComponent<Climate>.Instance.WeatherStateNext)
+		{
+			return false;
+		}
+		if (!SingletonComponent<Climate>.Instance.WeatherState)
+		{
+			return false;
+		}
+		if (!SingletonComponent<Climate>.Instance.WeatherClamps)
+		{
+			return false;
+		}
+		if (!SingletonComponent<Climate>.Instance.WeatherOverrides)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public static float GetClouds(Vector3 position)
+	{
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -262,7 +295,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetFog(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -271,7 +304,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetWind(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -280,11 +313,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetThunder(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
-		{
-			return 0f;
-		}
-		if (SingletonComponent<Climate>.Instance.WeatherOverrides == null)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -309,7 +338,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetRainbow(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -351,7 +380,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetAurora(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -377,7 +406,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetRain(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -388,7 +417,7 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetSnow(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 0f;
 		}
@@ -398,11 +427,12 @@ public class Climate : SingletonComponent<Climate>
 
 	public static float GetTemperature(Vector3 position)
 	{
-		if (!SingletonComponent<Climate>.Instance)
+		if (!Initialized())
 		{
 			return 15f;
 		}
-		if (!TOD_Sky.Instance)
+		TOD_Sky instance = TOD_Sky.Instance;
+		if (!instance)
 		{
 			return 15f;
 		}
@@ -413,7 +443,7 @@ public class Climate : SingletonComponent<Climate>
 		{
 			return 15f;
 		}
-		float hour = TOD_Sky.Instance.Cycle.Hour;
+		float hour = instance.Cycle.Hour;
 		float a = src.Temperature.Evaluate(hour);
 		float b = dst.Temperature.Evaluate(hour);
 		return Mathf.Lerp(a, b, t);

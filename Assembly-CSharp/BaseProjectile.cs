@@ -26,8 +26,8 @@ public class BaseProjectile : AttackEntity
 			[Tooltip("Set to 0 to not use inbuilt mag")]
 			public int builtInSize;
 
-			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
 			[InspectorFlags]
+			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
 			public AmmoTypes ammoTypes;
 		}
 
@@ -686,7 +686,7 @@ public class BaseProjectile : AttackEntity
 				if (entity != null && baseCombatEntity != null && (baseEntity == null || entity == baseEntity || entity.EqualNetID(baseEntity)))
 				{
 					HitInfo hitInfo = new HitInfo();
-					hitInfo.Initiator = GetOwnerPlayer();
+					AssignInitiator(hitInfo);
 					hitInfo.Weapon = this;
 					hitInfo.WeaponPrefab = base.gameManager.FindPrefab(base.PrefabName).GetComponent<AttackEntity>();
 					hitInfo.IsPredicting = false;
@@ -719,6 +719,15 @@ public class BaseProjectile : AttackEntity
 			Facepunch.Pool.FreeList(ref obj);
 			UnityEngine.Vector3 b = (flag && ownerPlayer.isMounted) ? (vector2 * 6f) : UnityEngine.Vector3.zero;
 			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + b, vector2 * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
+		}
+	}
+
+	private void AssignInitiator(HitInfo info)
+	{
+		info.Initiator = GetOwnerPlayer();
+		if (info.Initiator == null)
+		{
+			info.Initiator = GetParentEntity();
 		}
 	}
 
@@ -872,8 +881,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -914,8 +923,8 @@ public class BaseProjectile : AttackEntity
 		fractionalInsertCounter = 0;
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void StartReload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -993,8 +1002,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void Reload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1044,9 +1053,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

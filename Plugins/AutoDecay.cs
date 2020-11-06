@@ -1,20 +1,31 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using Oxide.Core;
 using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Auto Decay", "Hougan/Arainrr", "1.2.6")]
+    [Info("Auto Decay", "Hougan/Arainrr", "1.2.8")]
     [Description("Auto damage to objects, that are not in building zone")]
     public class AutoDecay : RustPlugin
     {
+        #region Fields
+
         private static AutoDecay instance;
         private const string PERMISSION_IGNORE = "autodecay.ignore";
         private readonly Hash<uint, DestroyControl> destroyControlEntities = new Hash<uint, DestroyControl>();
         private readonly Hash<ulong, float> notifyPlayer = new Hash<ulong, float>();
+
+        private readonly List<string> defaultDisabled = new List<string>
+        {
+            "small_stash_deployed",
+            "sleepingbag_leather_deployed",
+        };
+
+        #endregion Fields
+
+        #region Oxide Hooks
 
         private void Init()
         {
@@ -27,13 +38,13 @@ namespace Oxide.Plugins
         private void OnServerInitialized()
         {
             Subscribe(nameof(OnEntitySpawned));
-            if (configData.decayEntitySettings.Count <= 0) CreateConfig();
+            UpdateConfig(configData.decayEntitySettings.Count <= 0);
             foreach (var baseNetworkable in BaseNetworkable.serverEntities)
             {
-                var entity = baseNetworkable as BaseCombatEntity;
-                if (entity != null)
+                var baseCombatEntity = baseNetworkable as BaseCombatEntity;
+                if (baseCombatEntity != null)
                 {
-                    ApplyDestroyControl(entity);
+                    ApplyDestroyControl(baseCombatEntity);
                 }
             }
 
@@ -46,35 +57,83 @@ namespace Oxide.Plugins
             }
         }
 
-        private readonly List<string> defaultDisabled = new List<string>
-        {
-            "small_stash_deployed",
-            "sleepingbag_leather_deployed",
-        };
+        private void OnNewSave(string filename) => UpdateData();
 
-        private void CreateConfig()
+        private void Unload()
+        {
+            foreach (var destroyControl in destroyControlEntities.Values)
+                destroyControl?.Destroy();
+            instance = null;
+        }
+
+        private void OnEntitySpawned(BaseCombatEntity baseCombatEntity)
+        {
+            if (baseCombatEntity == null || baseCombatEntity.net == null) return;
+            var buildingPrivlidge = baseCombatEntity as BuildingPrivlidge;
+            if (buildingPrivlidge != null) HandleCupboard(buildingPrivlidge, true);
+            var player = baseCombatEntity.OwnerID.IsSteamId() ? BasePlayer.FindByID(baseCombatEntity.OwnerID) : null;
+            ApplyDestroyControl(baseCombatEntity, player, false);
+        }
+
+        private void OnEntityDeath(BaseCombatEntity baseCombatEntity, HitInfo info) => OnEntityKill(baseCombatEntity);
+
+        private void OnEntityKill(BaseCombatEntity baseCombatEntity)
+        {
+            if (baseCombatEntity == null || baseCombatEntity.net == null) return;
+            var buildingPrivlidge = baseCombatEntity as BuildingPrivlidge;
+            if (buildingPrivlidge != null) HandleCupboard(buildingPrivlidge, false);
+            DestroyControl destroyControl;
+            if (destroyControlEntities.TryGetValue(baseCombatEntity.net.ID, out destroyControl))
+            {
+                destroyControl?.Destroy();
+                destroyControlEntities.Remove(baseCombatEntity.net.ID);
+            }
+        }
+
+        #endregion Oxide Hooks
+
+        #region Methods
+
+        private void HandleCupboard(BuildingPrivlidge buildingPrivlidge, bool spawned)
+        {
+            var decayEntities = buildingPrivlidge?.GetBuilding()?.decayEntities;
+            if (decayEntities != null)
+            {
+                DestroyControl destroyControl;
+                foreach (var decayEntity in decayEntities)
+                {
+                    if (decayEntity == null || decayEntity.net == null) continue;
+                    if (destroyControlEntities.TryGetValue(decayEntity.net.ID, out destroyControl))
+                    {
+                        if (spawned) destroyControl?.OnCupboardPlaced();
+                        else destroyControl?.OnCupboardDestroyed();
+                    }
+                }
+            }
+        }
+
+        private void UpdateConfig(bool crate)
         {
             foreach (var itemDefinition in ItemManager.GetItemDefinitions())
             {
-                var itemModDeployable = itemDefinition.GetComponent<ItemModDeployable>();
-                if (itemModDeployable == null) continue;
-                var baseCombatEntity = GameManager.server.FindPrefab(itemModDeployable.entityPrefab.resourcePath)?.GetComponent<BaseCombatEntity>();
+                var prefabName = itemDefinition.GetComponent<ItemModDeployable>()?.entityPrefab?.resourcePath;
+                if (string.IsNullOrEmpty(prefabName)) continue;
+                var baseCombatEntity = GameManager.server.FindPrefab(prefabName)?.GetComponent<BaseCombatEntity>();
                 if (baseCombatEntity == null || string.IsNullOrEmpty(baseCombatEntity.ShortPrefabName)) continue;
                 if (configData.decayEntitySettings.ContainsKey(baseCombatEntity.ShortPrefabName)) continue;
 
                 configData.decayEntitySettings.Add(baseCombatEntity.ShortPrefabName, new DecayEntityS
                 {
-                    enabled = !(itemDefinition.category == ItemCategory.Food || defaultDisabled.Contains(baseCombatEntity.ShortPrefabName)),
+                    enabled = crate && !(itemDefinition.category == ItemCategory.Food || defaultDisabled.Contains(baseCombatEntity.ShortPrefabName)),
                     checkOwner = true,
                     delayTime = 600f,
                     destroyTime = 3600f,
                     tickRate = 10f,
                 });
             }
-            UpdateData(true);
+            if (crate) UpdateData(true);
+            else SaveConfig();
         }
-
-        private void OnNewSave(string filename) => UpdateData();
 
         private void UpdateData(bool saveConfig = false)
         {
@@ -100,53 +159,21 @@ namespace Oxide.Plugins
                     }
                 }
             }
-            if (saveConfig)
-            {
-                configData.decayEntitySettings = configData.decayEntitySettings.OrderBy(x => x.Key).ToDictionary(x => x.Key, y => y.Value);
-                SaveConfig();
-            }
+            if (saveConfig) SaveConfig();
             SaveData();
         }
 
-        private void Unload()
-        {
-            foreach (var destroyControl in destroyControlEntities.Values)
-                destroyControl?.Destroy();
-            instance = null;
-        }
-
-        private void OnEntitySpawned(BaseCombatEntity baseCombatEntity)
-        {
-            if (baseCombatEntity == null || baseCombatEntity.net == null) return;
-            var player = baseCombatEntity.OwnerID != 0 ? BasePlayer.FindByID(baseCombatEntity.OwnerID) : null;
-            ApplyDestroyControl(baseCombatEntity, player);
-        }
-
-        private void OnEntityDeath(BaseCombatEntity baseCombatEntity, HitInfo info) => OnEntityKill(baseCombatEntity);
-
-        private void OnEntityKill(BaseCombatEntity baseCombatEntity)
-        {
-            if (baseCombatEntity == null || baseCombatEntity.net == null) return;
-            DestroyControl destroyControl;
-            if (destroyControlEntities.TryGetValue(baseCombatEntity.net.ID, out destroyControl))
-            {
-                destroyControl.Destroy();
-                destroyControlEntities.Remove(baseCombatEntity.net.ID);
-            }
-        }
-
-        private void ApplyDestroyControl(BaseCombatEntity baseCombatEntity, BasePlayer player = null)
+        private void ApplyDestroyControl(BaseCombatEntity baseCombatEntity, BasePlayer player = null, bool init = true)
         {
             if (baseCombatEntity == null || baseCombatEntity.net == null) return;
             if (baseCombatEntity.OwnerID.IsSteamId() && permission.UserHasPermission(baseCombatEntity.OwnerID.ToString(), PERMISSION_IGNORE)) return;
             DecayEntityS decayEntityS;
-            if (configData.decayEntitySettings.TryGetValue(baseCombatEntity.ShortPrefabName, out decayEntityS))
+            if (configData.decayEntitySettings.TryGetValue(baseCombatEntity.ShortPrefabName, out decayEntityS) && decayEntityS.enabled)
             {
-                if (!decayEntityS.enabled) return;
                 if (decayEntityS.checkOwner && !baseCombatEntity.OwnerID.IsSteamId()) return;
                 if (!destroyControlEntities.ContainsKey(baseCombatEntity.net.ID))
                 {
-                    destroyControlEntities.Add(baseCombatEntity.net.ID, new DestroyControl(baseCombatEntity, decayEntityS.destroyTime, decayEntityS.delayTime, decayEntityS.tickRate));
+                    destroyControlEntities.Add(baseCombatEntity.net.ID, new DestroyControl(baseCombatEntity, decayEntityS.destroyTime, decayEntityS.delayTime, decayEntityS.tickRate, init));
                     if (configData.notifyPlayer && player != null && baseCombatEntity.GetBuildingPrivilege() == null)
                         SendMessage(player, decayEntityS.delayTime + decayEntityS.destroyTime);
                 }
@@ -161,6 +188,10 @@ namespace Oxide.Plugins
             Print(player, Lang("DESTROY", player.UserIDString, TimeSpan.FromSeconds(time).ToShortString()));
         }
 
+        #endregion Methods
+
+        #region DestroyControl
+
         private class DestroyControl
         {
             private readonly BaseCombatEntity baseCombatEntity;
@@ -173,14 +204,14 @@ namespace Oxide.Plugins
             private bool startedDamage;
             private bool delayDamage;
 
-            public DestroyControl(BaseCombatEntity baseCombatEntity, float destroyTime, float delayTime, float tickRate)
+            public DestroyControl(BaseCombatEntity baseCombatEntity, float destroyTime, float delayTime, float tickRate, bool init)
             {
                 this.baseCombatEntity = baseCombatEntity;
                 this.destroyTime = destroyTime;
                 this.delayTime = delayTime;
                 this.tickRate = tickRate;
-                if (baseCombatEntity is BuildingPrivlidge) isCupboard = true;
-                baseCombatEntity.InvokeRepeating(CheckBuildingPrivilege, UnityEngine.Random.Range(0f, 60f), instance.configData.checkTime);
+                isCupboard = baseCombatEntity is BuildingPrivlidge;
+                baseCombatEntity.InvokeRepeating(CheckBuildingPrivilege, init ? UnityEngine.Random.Range(0f, 60f) : 1f, instance.configData.checkTime);
             }
 
             private void CheckBuildingPrivilege()
@@ -192,20 +223,16 @@ namespace Oxide.Plugins
                 }
                 if (isCupboard ? OnFoundation() : baseCombatEntity.GetBuildingPrivilege() != null)
                 {
-                    if (startedDamage) StopDamage();
+                    OnCupboardPlaced();
                     return;
                 }
-                if (!startedDamage && !delayDamage)
-                {
-                    delayDamage = true;
-                    baseCombatEntity.Invoke(StartDamage, delayTime);
-                }
+                OnCupboardDestroyed();
             }
 
             private bool OnFoundation()
             {
                 RaycastHit raycastHit;
-                return Physics.Raycast(baseCombatEntity.transform.position + new Vector3(0f, 0.1f, 0f), Vector3.down, out raycastHit, 0.11f, Rust.Layers.Mask.Construction) && raycastHit.GetEntity() is BuildingBlock;
+                return Physics.Raycast(baseCombatEntity.transform.position + Vector3.up * 0.1f, Vector3.down, out raycastHit, 0.11f, Rust.Layers.Mask.Construction) && raycastHit.GetEntity() is BuildingBlock;
             }
 
             private void StartDamage()
@@ -217,13 +244,21 @@ namespace Oxide.Plugins
                 }
                 delayDamage = false;
                 startedDamage = true;
-                baseCombatEntity.InvokeRepeating(DoDamage, UnityEngine.Random.Range(0f, destroyTime / tickRate), destroyTime / tickRate);
+                baseCombatEntity.InvokeRepeating(DoDamage, 0f, destroyTime / tickRate);
             }
 
             private void StopDamage()
             {
-                startedDamage = false;
-                baseCombatEntity.CancelInvoke(DoDamage);
+                if (delayDamage)
+                {
+                    delayDamage = false;
+                    baseCombatEntity.CancelInvoke(StartDamage);
+                }
+                if (startedDamage)
+                {
+                    startedDamage = false;
+                    baseCombatEntity.CancelInvoke(DoDamage);
+                }
             }
 
             private void DoDamage()
@@ -238,13 +273,29 @@ namespace Oxide.Plugins
                 baseCombatEntity.Hurt(tickDamage, Rust.DamageType.Decay);
             }
 
+            public void OnCupboardPlaced()
+            {
+                StopDamage();
+            }
+
+            public void OnCupboardDestroyed()
+            {
+                if (!startedDamage && !delayDamage)
+                {
+                    delayDamage = true;
+                    baseCombatEntity.Invoke(StartDamage, delayTime);
+                }
+            }
+
             public void Destroy()
             {
                 baseCombatEntity?.CancelInvoke(DoDamage);
-                baseCombatEntity?.CancelInvoke(CheckBuildingPrivilege);
                 baseCombatEntity?.CancelInvoke(StartDamage);
+                baseCombatEntity?.CancelInvoke(CheckBuildingPrivilege);
             }
         }
+
+        #endregion DestroyControl
 
         #region ConfigurationFile
 
@@ -253,7 +304,7 @@ namespace Oxide.Plugins
         private class ConfigData
         {
             [JsonProperty(PropertyName = "Check cupboard time (seconds)")]
-            public float checkTime = 600f;
+            public float checkTime = 300f;
 
             [JsonProperty(PropertyName = "Notify player, that his object will be removed")]
             public bool notifyPlayer = true;
@@ -262,16 +313,16 @@ namespace Oxide.Plugins
             public float notifyInterval = 10f;
 
             [JsonProperty(PropertyName = "Chat prefix")]
-            public string prefix = "[AutoDecay]:";
-
-            [JsonProperty(PropertyName = "Chat prefix color")]
-            public string prefixColor = "#00FFFF";
+            public string prefix = "<color=#00FFFF>[AutoDecay]</color>: ";
 
             [JsonProperty(PropertyName = "Chat steamID icon")]
             public ulong steamIDIcon = 0;
 
             [JsonProperty(PropertyName = "Decay entity list")]
             public Dictionary<string, DecayEntityS> decayEntitySettings = new Dictionary<string, DecayEntityS>();
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version = new VersionNumber(1, 2, 6);
         }
 
         private class DecayEntityS
@@ -299,7 +350,13 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
             catch
             {
@@ -313,9 +370,25 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= new VersionNumber(1, 2, 7))
+                {
+                    if (configData.prefix == "[AutoDecay]:")
+                    {
+                        configData.prefix = "<color=#00FFFF>[AutoDecay]</color>: ";
+                    }
+                }
+                configData.version = Version;
+            }
+        }
 
         #endregion ConfigurationFile
 
@@ -357,7 +430,7 @@ namespace Oxide.Plugins
 
         private void Print(BasePlayer player, string message)
         {
-            Player.Message(player, message, string.IsNullOrEmpty(configData.prefix) ? string.Empty : $"<color={configData.prefixColor}>{configData.prefix}</color>", configData.steamIDIcon);
+            Player.Message(player, message, configData.prefix, configData.steamIDIcon);
         }
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);

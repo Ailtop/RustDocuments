@@ -16,6 +16,8 @@ public class MixerSnapshotManager : SingletonComponent<MixerSnapshotManager>, IC
 
 	public SoundDefinition underwaterOutSound;
 
+	public AudioMixerSnapshot recordingSnapshot;
+
 	public SoundDefinition woundedLoop;
 
 	private Sound woundedLoopSound;

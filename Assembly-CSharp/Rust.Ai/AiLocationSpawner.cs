@@ -140,7 +140,7 @@ namespace Rust.Ai
 				}
 				baseEntity.Spawn();
 				SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
-				spawnPointInstance.parentSpawnGroup = this;
+				spawnPointInstance.parentSpawnPointUser = this;
 				spawnPointInstance.parentSpawnPoint = spawnPoint;
 				spawnPointInstance.Notify();
 			}

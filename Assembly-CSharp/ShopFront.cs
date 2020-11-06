@@ -17,6 +17,8 @@ public class ShopFront : StorageContainer
 		public const Flags Exchanging = Flags.Reserved3;
 	}
 
+	public float maxUseAngle = 27f;
+
 	public BasePlayer vendorPlayer;
 
 	public BasePlayer customerPlayer;
@@ -24,6 +26,8 @@ public class ShopFront : StorageContainer
 	public GameObjectRef transactionCompleteEffect;
 
 	public ItemContainer customerInventory;
+
+	private float AngleDotProduct => 1f - maxUseAngle / 90f;
 
 	public ItemContainer vendorInventory => base.inventory;
 
@@ -138,12 +142,12 @@ public class ShopFront : StorageContainer
 
 	public bool PlayerInVendorPos(BasePlayer player)
 	{
-		return Vector3.Dot(base.transform.right, (player.transform.position - base.transform.position).normalized) <= -0.7f;
+		return Vector3.Dot(base.transform.right, (player.transform.position - base.transform.position).normalized) <= 0f - AngleDotProduct;
 	}
 
 	public bool PlayerInCustomerPos(BasePlayer player)
 	{
-		return Vector3.Dot(base.transform.right, (player.transform.position - base.transform.position).normalized) >= 0.7f;
+		return Vector3.Dot(base.transform.right, (player.transform.position - base.transform.position).normalized) >= AngleDotProduct;
 	}
 
 	public bool LootEligable(BasePlayer player)
@@ -200,8 +204,8 @@ public class ShopFront : StorageContainer
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void AcceptClicked(RPCMessage msg)
 	{
 		if (IsTradingPlayer(msg.player) && !(vendorPlayer == null) && !(customerPlayer == null) && Interface.CallHook("OnShopAcceptClick", this, msg.player) == null)
@@ -224,8 +228,8 @@ public class ShopFront : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void CancelClicked(RPCMessage msg)
 	{
 		if (IsTradingPlayer(msg.player) && Interface.CallHook("OnShopCancelClick", this, msg.player) == null)

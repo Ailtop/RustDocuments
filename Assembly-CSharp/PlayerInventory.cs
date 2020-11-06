@@ -279,8 +279,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return true;
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private void ItemCmd(BaseEntity.RPCMessage msg)
 	{
 		if (msg.player != null && msg.player.IsWounded())

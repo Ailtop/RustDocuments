@@ -17,8 +17,8 @@ namespace ConVar
 		[ClientVar]
 		public static int mode = 2;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool prewarm = true;
 
 		[ClientVar]
@@ -54,8 +54,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void print_prefabs(Arg arg)
 		{
 			PrefabPoolCollection pool = GameManager.server.pool;
@@ -116,22 +116,22 @@ namespace ConVar
 			Facepunch.Pool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void clear_prefabs(Arg arg)
 		{
 			GameManager.server.pool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void clear_assets(Arg arg)
 		{
 			AssetPool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void export_prefabs(Arg arg)
 		{
 			PrefabPoolCollection pool = GameManager.server.pool;

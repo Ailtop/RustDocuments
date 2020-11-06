@@ -1,4 +1,5 @@
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using System;
 using System.Linq;
@@ -29,15 +30,15 @@ namespace Rust.Modular
 
 		[SerializeField]
 		[ReadOnly]
-		private int accelerationBoostSlots;
+		public int accelerationBoostSlots;
 
 		[SerializeField]
 		[ReadOnly]
-		private int topSpeedBoostSlots;
+		public int topSpeedBoostSlots;
 
 		[SerializeField]
 		[ReadOnly]
-		private int fuelEconomyBoostSlots;
+		public int fuelEconomyBoostSlots;
 
 		public bool isUsable
 		{
@@ -154,12 +155,15 @@ namespace Rust.Modular
 
 		public void RefreshLoadoutData()
 		{
-			isUsable = (base.inventory.IsFull() && base.inventory.itemList.All((Item item) => !item.isBroken));
-			accelerationBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsAcceleration) / (float)accelerationBoostSlots;
-			topSpeedBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsTopSpeed) / (float)topSpeedBoostSlots;
-			fuelEconomyBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsFuelEconomy) / (float)fuelEconomyBoostSlots;
-			SendNetworkUpdate();
-			GetEngineModule()?.RefreshPerformanceStats(this);
+			if (Interface.CallHook("OnEngineLoadoutRefresh", this) == null)
+			{
+				isUsable = (base.inventory.IsFull() && base.inventory.itemList.All((Item item) => !item.isBroken));
+				accelerationBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsAcceleration) / (float)accelerationBoostSlots;
+				topSpeedBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsTopSpeed) / (float)topSpeedBoostSlots;
+				fuelEconomyBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsFuelEconomy) / (float)fuelEconomyBoostSlots;
+				SendNetworkUpdate();
+				GetEngineModule()?.RefreshPerformanceStats(this);
+			}
 		}
 
 		public override void Save(SaveInfo info)
@@ -234,7 +238,7 @@ namespace Rust.Modular
 			}
 		}
 
-		private float GetContainerItemsValueFor(Func<EngineItemTypes, bool> boostConditional)
+		public float GetContainerItemsValueFor(Func<EngineItemTypes, bool> boostConditional)
 		{
 			float num = 0f;
 			foreach (Item item in base.inventory.itemList)
@@ -248,7 +252,7 @@ namespace Rust.Modular
 			return num;
 		}
 
-		private float GetTierValue(int tier)
+		public float GetTierValue(int tier)
 		{
 			switch (tier)
 			{

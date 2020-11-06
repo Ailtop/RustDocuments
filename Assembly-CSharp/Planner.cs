@@ -59,8 +59,8 @@ public class Planner : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoPlace(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())
@@ -211,7 +211,9 @@ public class Planner : HeldEntity
 					p += target.normal.normalized * deployShell.LineOfSightPadding();
 				}
 			}
-			if (!GamePhysics.LineOfSight(padding: (target.socket != null) ? 0.5f : 0.01f, layerMask: (target.socket != null) ? 2097152 : 2162688, p0: center, p1: position, p2: origin, p3: p))
+			int num = 2097152;
+			int num2 = ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688;
+			if (!GamePhysics.LineOfSight(padding: (target.socket != null) ? 0.5f : 0.01f, layerMask: (target.socket != null) ? num : num2, p0: center, p1: position, p2: origin, p3: p))
 			{
 				ownerPlayer.ChatMessage("Line of sight blocked.");
 				return;

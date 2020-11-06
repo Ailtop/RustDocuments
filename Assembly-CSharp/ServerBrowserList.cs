@@ -32,7 +32,7 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 
 	public QueryType queryType;
 
-	public static string VersionTag = "v" + 2261;
+	public static string VersionTag = "v" + 2267;
 
 	public ServerKeyvalues[] keyValues = new ServerKeyvalues[0];
 

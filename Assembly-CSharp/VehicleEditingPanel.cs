@@ -21,8 +21,8 @@ public class VehicleEditingPanel : LootPanel
 		}
 	}
 
-	[SerializeField]
 	[Range(0f, 1f)]
+	[SerializeField]
 	private float disabledAlpha = 0.25f;
 
 	[SerializeField]

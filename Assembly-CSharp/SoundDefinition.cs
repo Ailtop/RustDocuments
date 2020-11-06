@@ -130,4 +130,9 @@ public class SoundDefinition : ScriptableObject
 	{
 		return null;
 	}
+
+	public Sound Play(GameObject forGameObject)
+	{
+		return null;
+	}
 }

@@ -32,7 +32,7 @@ public static class TerrainAnchorEx
 			float height;
 			float min;
 			float max;
-			terrainAnchor.Apply(out height, out min, out max, vector);
+			terrainAnchor.Apply(out height, out min, out max, vector, scale);
 			num += height - point.y;
 			num2 = Mathf.Max(num2, min - point.y);
 			num3 = Mathf.Min(num3, max - point.y);

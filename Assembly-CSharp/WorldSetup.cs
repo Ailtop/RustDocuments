@@ -30,6 +30,8 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 
 	public List<ProceduralObject> ProceduralObjects = new List<ProceduralObject>();
 
+	internal List<MonumentNode> MonumentNodes = new List<MonumentNode>();
+
 	public void OnValidate()
 	{
 		if (this.terrain == null)

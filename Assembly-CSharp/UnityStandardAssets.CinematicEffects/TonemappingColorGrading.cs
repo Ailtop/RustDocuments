@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects
 {
-	[ExecuteInEditMode]
 	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	[ImageEffectAllowedInSceneView]
+	[ExecuteInEditMode]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -57,8 +57,8 @@ namespace UnityStandardAssets.CinematicEffects
 		{
 			public bool enabled;
 
-			[Min(0f)]
 			[Tooltip("Midpoint Adjustment.")]
+			[Min(0f)]
 			public float middleGrey;
 
 			[Tooltip("The lowest possible exposure value; adjust this value to modify the brightest areas of your level.")]
@@ -207,42 +207,42 @@ namespace UnityStandardAssets.CinematicEffects
 		[Serializable]
 		public struct BasicsSettings
 		{
-			[Tooltip("Sets the white balance to a custom color temperature.")]
 			[Range(-2f, 2f)]
+			[Tooltip("Sets the white balance to a custom color temperature.")]
 			public float temperatureShift;
 
 			[Range(-2f, 2f)]
 			[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 			public float tint;
 
-			[Space]
-			[Range(-0.5f, 0.5f)]
 			[Tooltip("Shift the hue of all colors.")]
+			[Range(-0.5f, 0.5f)]
+			[Space]
 			public float hue;
 
-			[Range(0f, 2f)]
 			[Tooltip("Pushes the intensity of all colors.")]
+			[Range(0f, 2f)]
 			public float saturation;
 
 			[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
 			[Range(-1f, 1f)]
 			public float vibrance;
 
-			[Tooltip("Brightens or darkens all colors.")]
 			[Range(0f, 10f)]
+			[Tooltip("Brightens or darkens all colors.")]
 			public float value;
 
-			[Range(0f, 2f)]
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			[Space]
+			[Range(0f, 2f)]
 			public float contrast;
 
 			[Tooltip("Contrast gain curve. Controls the steepness of the curve.")]
 			[Range(0.01f, 5f)]
 			public float gain;
 
-			[Tooltip("Applies a pow function to the source.")]
 			[Range(0.01f, 5f)]
+			[Tooltip("Applies a pow function to the source.")]
 			public float gamma;
 
 			public static BasicsSettings defaultSettings
@@ -341,16 +341,16 @@ namespace UnityStandardAssets.CinematicEffects
 			[Space]
 			public BasicsSettings basics;
 
-			[Space]
 			[ChannelMixer]
+			[Space]
 			public ChannelMixerSettings channelMixer;
 
 			[IndentedGroup]
 			[Space]
 			public CurvesSettings curves;
 
-			[Tooltip("Use dithering to try and minimize color banding in dark areas.")]
 			[Space]
+			[Tooltip("Use dithering to try and minimize color banding in dark areas.")]
 			public bool useDithering;
 
 			[Tooltip("Displays the generated LUT in the top left corner of the GameView.")]
@@ -391,8 +391,8 @@ namespace UnityStandardAssets.CinematicEffects
 		[SettingsGroup]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

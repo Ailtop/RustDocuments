@@ -7,41 +7,39 @@ using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
 {
-    [Info("ItemCostCalculator", "Absolut/Arainrr", "2.0.8", ResourceId = 2109)]
+    [Info("Item Cost Calculator", "Absolut/Arainrr", "2.0.10", ResourceId = 2109)]
     internal class ItemCostCalculator : RustPlugin
     {
         [PluginReference] private Plugin ImageLibrary;
-        private readonly Dictionary<ItemDefinition, double> costs = new Dictionary<ItemDefinition, double>();
 
         private void OnServerInitialized()
         {
-            if (ImageLibrary == null)
-                PrintError("Unable to get image url of item without ImageLibrary loaded");
-            foreach (var item in ItemManager.GetItemDefinitions())
+            foreach (var itemDefinition in ItemManager.GetItemDefinitions())
             {
-                if (!configData.displayNames.ContainsKey(item.shortname))
-                    configData.displayNames.Add(item.shortname, item.displayName.english);
-                var itemBlueprint = ItemManager.FindBlueprint(item);
+                if (!configData.displayNames.ContainsKey(itemDefinition.shortname))
+                    configData.displayNames.Add(itemDefinition.shortname, itemDefinition.displayName.english);
+                var itemBlueprint = ItemManager.FindBlueprint(itemDefinition);
                 if (itemBlueprint != null)
                 {
                     foreach (var itemAmount in itemBlueprint.ingredients)
                         if (!configData.materials.ContainsKey(itemAmount.itemDef.shortname))
                             configData.materials.Add(itemAmount.itemDef.shortname, 1);
                 }
-                else if (!configData.noMaterials.ContainsKey(item.shortname))
-                    configData.noMaterials.Add(item.shortname, 1);
+                else if (!configData.noMaterials.ContainsKey(itemDefinition.shortname))
+                    configData.noMaterials.Add(itemDefinition.shortname, 1);
             }
             foreach (var material in configData.materials)
             {
                 if (configData.noMaterials.ContainsKey(material.Key))
                     configData.noMaterials.Remove(material.Key);
             }
+
             SaveConfig();
         }
 
         private string GetImageUrl(ItemDefinition itemDefinition, ulong skin = 0)
         {
-            if (ImageLibrary == null) return string.Empty;
+            if (ImageLibrary == null) return "https://rustlabs.com/img/items180/" + itemDefinition.shortname + ".png";
             return (string)ImageLibrary.Call("GetImageURL", itemDefinition.shortname, skin);
         }
 
@@ -68,7 +66,7 @@ namespace Oxide.Plugins
 
         private void GetItemCost(bool isGUIShop = true)
         {
-            costs.Clear();
+            var costs = new Dictionary<ItemDefinition, double>();
             double amount;
             foreach (var itemDefinition in ItemManager.GetItemDefinitions())
             {
@@ -99,43 +97,82 @@ namespace Oxide.Plugins
                 {
                     cost = cost / itemBlueprint.amountToCreate;
                     if (configData.gatherRateOffset > 0)
-                        cost = cost * configData.gatherRateOffset;
+                        cost *= configData.gatherRateOffset;
                     int rarity;
                     if (configData.rarityList.TryGetValue(itemDefinition.shortname, out rarity))
-                        cost = cost + cost * (rarity / 100);
+                        cost += cost * (rarity / 100d);
                     float level;
                     if (configData.workbenchMultiplier.TryGetValue(itemBlueprint.workbenchLevelRequired, out level))
-                        cost = cost + cost * (level / 100);
+                        cost += cost * (level / 100d);
                     costs.Add(itemDefinition, cost);
                 }
             }
-            CreatDataFile(isGUIShop);
+            CrateDataFile(costs, isGUIShop);
         }
 
-        private void CreatDataFile(bool isGUIShop = true)
+        private void CrateDataFile(Dictionary<ItemDefinition, double> costs, bool isGUIShop = true)
         {
             if (isGUIShop)
             {
-                Dictionary<string, ShopData> GUIShopData = new Dictionary<string, ShopData>();
+                ShopData GUIShopData = new ShopData();
+                var itemDisplayNames = new Dictionary<string, string>();
                 foreach (var entry in costs)
                 {
                     var imageUrl = GetImageUrl(entry.Key);
-                    string displayName = entry.Key.displayName.english;
-                    configData.displayNames.TryGetValue(entry.Key.shortname, out displayName);
-                    if (GUIShopData.ContainsKey(displayName)) displayName += $"_repeat{UnityEngine.Random.Range(0, 1000)}";
-                    if (!GUIShopData.ContainsKey(displayName))
+                    string displayName;
+                    if (!configData.displayNames.TryGetValue(entry.Key.shortname, out displayName))
                     {
-                        GUIShopData.Add(displayName, new ShopData
+                        displayName = entry.Key.displayName.english;
+                    }
+
+                    if (GUIShopData.items.ContainsKey(displayName))
+                    {
+                        displayName += $"_Repeat_{UnityEngine.Random.Range(0, 9999)}";
+                    }
+                    if (!GUIShopData.items.ContainsKey(displayName))
+                    {
+                        itemDisplayNames.Add(entry.Key.shortname, displayName);
+                        GUIShopData.items.Add(displayName, new ShopItem
                         {
                             item = entry.Key.shortname,
-                            buy = Math.Round(entry.Value, configData.keepdecimal).ToString(),
-                            sell = Math.Round(entry.Value * configData.recoveryRate, configData.keepdecimal).ToString(),
                             img = imageUrl,
-                            cooldown = "0",
+                            buyCooldown = 0,
+                            sellCooldown = 0,
+                            sell = Math.Round(entry.Value * configData.recoveryRate, configData.keepdecimal),
+                            buy = Math.Round(entry.Value, configData.keepdecimal),
+                            Fixed = false,
+                            cmd = null,
                         });
                     }
                 }
-                GUIShopData = GUIShopData.OrderBy(p => p.Key).ToDictionary(p => p.Key, o => o.Value);
+                GUIShopData.items = GUIShopData.items.OrderBy(p => p.Key).ToDictionary(p => p.Key, o => o.Value);
+
+                foreach (var itemDefinition in ItemManager.GetItemDefinitions())
+                {
+                    ShopCategory shopCategory;
+                    var categoryKey = itemDefinition.category.ToString().ToLower();
+                    if (!GUIShopData.shops.TryGetValue(categoryKey, out shopCategory))
+                    {
+                        shopCategory = new ShopCategory
+                        {
+                            name = itemDefinition.category.ToString(),
+                            description = "You currently have {0} coins to spend in the " + itemDefinition.category + " shop",
+                        };
+                        GUIShopData.shops.Add(categoryKey, shopCategory);
+                    }
+                    string displayName;
+                    if (!itemDisplayNames.TryGetValue(itemDefinition.shortname, out displayName))
+                        displayName = itemDefinition.displayName.english;
+                    shopCategory.buy.Add(displayName);
+                    shopCategory.sell.Add(displayName);
+                }
+
+                GUIShopData.shops.Add("commands", new ShopCategory
+                {
+                    name = "commands",
+                    description = "You currently have {0} coins to spend in the commands shop",
+                });
+
                 SaveData("GUIShop", GUIShopData);
                 PrintWarning("GUIShop successfully created, data file path: data/ItemCostCalculator/ItemCostCalculator_GUIShop.json");
             }
@@ -144,8 +181,9 @@ namespace Oxide.Plugins
                 Dictionary<string, RewardData> ServerRewardsData = new Dictionary<string, RewardData>();
                 foreach (var entry in costs)
                 {
-                    string displayName = entry.Key.displayName.english;
-                    configData.displayNames.TryGetValue(entry.Key.shortname, out displayName);
+                    string displayName;
+                    if (!configData.displayNames.TryGetValue(entry.Key.shortname, out displayName))
+                        displayName = entry.Key.displayName.english;
                     ulong skin = 0;
                     Category category;
                     Enum.TryParse(entry.Key.category.ToString(), true, out category);
@@ -252,24 +290,48 @@ namespace Oxide.Plugins
 
         private class RewardData
         {
-            public string displayName;
-            public int cost;
-            public int cooldown;
             public string shortname;
             public string customIcon;
             public int amount;
             public ulong skinId;
             public bool isBp;
             public Category category;
+            public string displayName;
+            public int cost;
+            public int cooldown;
         }
+
+        //From GUI Shop
 
         private class ShopData
         {
-            public string buy;
-            public string sell;
+            [JsonProperty("Shop - Shop List")]
+            public Dictionary<string, ShopCategory> shops = new Dictionary<string, ShopCategory>();
+
+            [JsonProperty("Shop - Shop Categories")]
+            public Dictionary<string, ShopItem> items = new Dictionary<string, ShopItem>();
+        }
+
+        private class ShopItem
+        {
             public string item;
-            public string cooldown;
             public string img;
+            public int buyCooldown;
+            public int sellCooldown;
+            public double sell;
+            public double buy;
+            public bool Fixed;
+            public List<string> cmd;
+        }
+
+        public class ShopCategory
+        {
+            public string description;
+            public string name;
+            public List<string> buy = new List<string>();
+            public List<string> sell = new List<string>();
+            public bool npc;
+            public string npcID;
         }
 
         private void SaveData<T>(string name, T data) => Interface.Oxide.DataFileSystem.WriteObject(Name + "/" + Name + "_" + name, data);

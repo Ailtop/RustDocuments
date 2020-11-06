@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class WaterInflatable : BaseMountable, PoolVehicle
+public class WaterInflatable : BaseMountable, PoolVehicle, INotifyTrigger
 {
 	private enum PaddleDirection
 	{
@@ -289,5 +289,25 @@ public class WaterInflatable : BaseMountable, PoolVehicle
 		{
 			buoyancy.Wake();
 		}
+	}
+
+	public void OnObjects(TriggerNotify trigger)
+	{
+		if (!base.isClient)
+		{
+			foreach (BaseEntity entityContent in trigger.entityContents)
+			{
+				BaseVehicle baseVehicle;
+				if ((object)(baseVehicle = (entityContent as BaseVehicle)) != null && baseVehicle.HasDriver() && (baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
+				{
+					Kill(DestroyMode.Gib);
+					break;
+				}
+			}
+		}
+	}
+
+	public void OnEmpty()
+	{
 	}
 }

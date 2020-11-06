@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnGroup
+public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, ISpawnGroup
 {
 	[Serializable]
 	public class SpawnEntry
@@ -165,7 +165,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnGroup
 					baseEntity.Spawn();
 					PostSpawnProcess(baseEntity, spawnPoint);
 					SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
-					spawnPointInstance.parentSpawnGroup = this;
+					spawnPointInstance.parentSpawnPointUser = this;
 					spawnPointInstance.parentSpawnPoint = spawnPoint;
 					spawnPointInstance.Notify();
 				}

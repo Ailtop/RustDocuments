@@ -29,6 +29,8 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 
 	public SpawnFilter CharacterSpawn;
 
+	public float CharacterSpawnCutoff;
+
 	public SpawnPopulation[] SpawnPopulations;
 
 	public SpawnDistribution[] SpawnDistributions;
@@ -118,13 +120,15 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 			}
 			byte[] map2 = new byte[pop_res * pop_res];
 			SpawnFilter filter2 = spawnPopulation.Filter;
+			float cutoff2 = spawnPopulation.FilterCutoff;
 			Parallel.For(0, pop_res, delegate(int z)
 			{
 				for (int k = 0; k < pop_res; k++)
 				{
 					float normX2 = ((float)k + 0.5f) / (float)pop_res;
 					float normZ2 = ((float)z + 0.5f) / (float)pop_res;
-					map2[z * pop_res + k] = (byte)(255f * filter2.GetFactor(normX2, normZ2));
+					float factor2 = filter2.GetFactor(normX2, normZ2);
+					map2[z * pop_res + k] = (byte)((factor2 >= cutoff2) ? (255f * factor2) : 0f);
 				}
 			});
 			SpawnDistribution value = SpawnDistributions[i] = new SpawnDistribution(this, map2, position, size);
@@ -133,13 +137,15 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		int char_res = Mathf.NextPowerOfTwo((int)((float)(double)World.Size * 0.5f));
 		byte[] map = new byte[char_res * char_res];
 		SpawnFilter filter = CharacterSpawn;
+		float cutoff = CharacterSpawnCutoff;
 		Parallel.For(0, char_res, delegate(int z)
 		{
 			for (int j = 0; j < char_res; j++)
 			{
 				float normX = ((float)j + 0.5f) / (float)char_res;
 				float normZ = ((float)z + 0.5f) / (float)char_res;
-				map[z * char_res + j] = (byte)(255f * filter.GetFactor(normX, normZ));
+				float factor = filter.GetFactor(normX, normZ);
+				map[z * char_res + j] = (byte)((factor >= cutoff) ? (255f * factor) : 0f);
 			}
 		});
 		CharDistribution = new SpawnDistribution(this, map, position, size);
@@ -378,7 +384,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		{
 			return null;
 		}
-		if (!CheckBounds(randomPrefab, pos, rot, scale))
+		if (!CheckBounds(randomPrefab.Object, pos, rot, scale))
 		{
 			return null;
 		}
@@ -402,7 +408,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 
 	private GameObject Spawn(Prefab<Spawnable> prefab, Vector3 pos, Quaternion rot)
 	{
-		if (!CheckBounds(prefab, pos, rot, Vector3.one))
+		if (!CheckBounds(prefab.Object, pos, rot, Vector3.one))
 		{
 			return null;
 		}
@@ -416,12 +422,21 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		return baseEntity.gameObject;
 	}
 
-	private bool CheckBounds(Prefab<Spawnable> prefab, Vector3 pos, Quaternion rot, Vector3 scale)
+	public bool CheckBounds(GameObject gameObject, Vector3 pos, Quaternion rot, Vector3 scale)
 	{
-		if ((int)BoundsCheckMask != 0)
+		return CheckBounds(gameObject, pos, rot, scale, BoundsCheckMask);
+	}
+
+	public static bool CheckBounds(GameObject gameObject, Vector3 pos, Quaternion rot, Vector3 scale, LayerMask mask)
+	{
+		if (gameObject == null)
 		{
-			BaseEntity component = prefab.Object.GetComponent<BaseEntity>();
-			if (component != null && UnityEngine.Physics.CheckBox(pos + rot * Vector3.Scale(component.bounds.center, scale), Vector3.Scale(component.bounds.extents, scale), rot, BoundsCheckMask))
+			return true;
+		}
+		if ((int)mask != 0)
+		{
+			BaseEntity component = gameObject.GetComponent<BaseEntity>();
+			if (component != null && UnityEngine.Physics.CheckBox(pos + rot * Vector3.Scale(component.bounds.center, scale), Vector3.Scale(component.bounds.extents, scale), rot, mask))
 			{
 				return false;
 			}

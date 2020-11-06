@@ -1,15 +1,5 @@
-using UnityEngine;
-
 public class BaseVehicleSeat : BaseVehicleMountPoint
 {
-	public bool supportsMouseSteer;
-
-	[SerializeField]
-	private Vector3 leftFootIKPos;
-
-	[SerializeField]
-	private Vector3 rightFootIKPos;
-
 	public float mountedAnimationSpeed;
 
 	public bool sendClientInputToVehicleParent;

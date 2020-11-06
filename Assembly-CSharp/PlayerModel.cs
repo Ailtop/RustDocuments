@@ -74,6 +74,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	protected static int vehicle_aim_speed = Animator.StringToHash("vehicleAimYawSpeed");
 
+	protected static int onPhone = Animator.StringToHash("onPhone");
+
 	protected static int leftFootIK = Animator.StringToHash("leftFootIK");
 
 	protected static int rightFootIK = Animator.StringToHash("rightFootIK");
@@ -142,8 +144,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public SubsurfaceProfile subsurfaceProfile;
 
-	[Range(0f, 1f)]
 	[Header("Parameters")]
+	[Range(0f, 1f)]
 	public float voiceVolume;
 
 	[Range(0f, 1f)]

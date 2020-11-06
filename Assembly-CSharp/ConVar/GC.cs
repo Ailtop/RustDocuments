@@ -28,8 +28,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool incremental_enabled
 		{
 			get
@@ -56,8 +56,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled
 		{
 			get
@@ -70,8 +70,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void collect()
 		{
 			Rust.GC.Collect();

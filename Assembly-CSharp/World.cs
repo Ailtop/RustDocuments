@@ -104,7 +104,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 199 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 200 + ".map";
 		}
 	}
 
@@ -116,9 +116,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 199 + ".sav";
+				return Name + "." + 200 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 199 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 200 + ".sav";
 		}
 	}
 
@@ -137,7 +137,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 199 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 200 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -174,7 +174,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 199 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 200 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)

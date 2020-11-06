@@ -3,8 +3,8 @@ using System.Runtime.CompilerServices;
 
 namespace Microsoft.CodeAnalysis
 {
-	[CompilerGenerated]
 	[Embedded]
+	[CompilerGenerated]
 	internal sealed class EmbeddedAttribute : Attribute
 	{
 	}

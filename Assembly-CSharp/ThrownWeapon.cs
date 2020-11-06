@@ -221,6 +221,7 @@ public class ThrownWeapon : AttackEntity
 			baseEntity.SetAngularVelocity(new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * tumbleVelocity);
 		}
 		baseEntity.Spawn();
+		SetUpThrownWeapon(baseEntity);
 		StartAttackCooldown(repeatDelay);
 		Interface.CallHook("OnExplosiveThrown", msg.player, baseEntity, this);
 		UseItemAmount(1);
@@ -309,8 +310,13 @@ public class ThrownWeapon : AttackEntity
 		baseEntity.creatorEntity = msg.player;
 		baseEntity.skinID = skinID;
 		baseEntity.Spawn();
+		SetUpThrownWeapon(baseEntity);
 		StartAttackCooldown(repeatDelay);
 		Interface.CallHook("OnExplosiveDropped", msg.player, baseEntity, this);
 		UseItemAmount(1);
+	}
+
+	protected virtual void SetUpThrownWeapon(BaseEntity ent)
+	{
 	}
 }

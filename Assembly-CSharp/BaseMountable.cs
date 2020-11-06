@@ -247,6 +247,11 @@ public class BaseMountable : BaseCombatEntity
 	{
 	}
 
+	public virtual bool CanSwapToThis(BasePlayer player)
+	{
+		return true;
+	}
+
 	public virtual bool IsMounted()
 	{
 		return _mounted != null;
@@ -278,23 +283,26 @@ public class BaseMountable : BaseCombatEntity
 		}
 	}
 
-	public virtual void AttemptMount(BasePlayer player)
+	public virtual void AttemptMount(BasePlayer player, bool doMountChecks = true)
 	{
-		if (!(_mounted != null) && !IsDead())
+		if (_mounted != null || IsDead())
+		{
+			return;
+		}
+		if (doMountChecks)
 		{
 			if (checkPlayerLosOnMount && UnityEngine.Physics.Linecast(player.eyes.position, mountAnchor.position + base.transform.up * 0.5f, 1218652417))
 			{
 				Debug.Log("No line of sight to mount pos");
+				return;
 			}
-			else if (!HasValidDismountPosition(player))
+			if (!HasValidDismountPosition(player))
 			{
 				Debug.Log("no valid dismount");
-			}
-			else
-			{
-				MountPlayer(player);
+				return;
 			}
 		}
+		MountPlayer(player);
 	}
 
 	public virtual bool AttemptDismount(BasePlayer player)

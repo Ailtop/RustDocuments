@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 public class TorchWeapon : BaseMelee
 {
 	[NonSerialized]
-	public float fuelTickAmount = 355f / (678f * (float)Math.PI);
+	public float fuelTickAmount = 0.0833333358f;
 
 	[Header("TorchWeapon")]
 	public AnimatorOverrideController LitHoldAnimationOverride;
@@ -123,8 +123,8 @@ public class TorchWeapon : BaseMelee
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Ignite(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())

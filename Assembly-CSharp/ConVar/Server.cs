@@ -107,6 +107,9 @@ namespace ConVar
 		public static string headerimage = "";
 
 		[ServerVar]
+		public static string logoimage = "";
+
+		[ServerVar]
 		public static string url = "";
 
 		[ServerVar]

@@ -125,11 +125,11 @@ public class CH47HelicopterAIController : CH47Helicopter
 		base.transform.position = position;
 	}
 
-	public override void AttemptMount(BasePlayer player)
+	public override void AttemptMount(BasePlayer player, bool doMountChecks = true)
 	{
 		if (Interface.CallHook("CanUseHelicopter", player, this) == null)
 		{
-			base.AttemptMount(player);
+			base.AttemptMount(player, doMountChecks);
 		}
 	}
 

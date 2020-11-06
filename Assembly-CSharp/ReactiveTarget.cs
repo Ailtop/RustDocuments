@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using ConVar;
 using Network;
+using Oxide.Core;
 using Rust;
 using System;
 using UnityEngine;
@@ -20,7 +21,7 @@ public class ReactiveTarget : IOEntity
 
 	private float lastToggleTime = float.NegativeInfinity;
 
-	private float knockdownHealth = 100f;
+	public float knockdownHealth = 100f;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -160,6 +161,7 @@ public class ReactiveTarget : IOEntity
 			SetFlag(Flags.On, true);
 			knockdownHealth = 100f;
 			SendPowerBurst();
+			Interface.CallHook("OnReactiveTargetReset", this);
 		}
 	}
 

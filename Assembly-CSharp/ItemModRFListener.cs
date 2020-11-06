@@ -5,7 +5,7 @@ public class ItemModRFListener : ItemModAssociatedEntity<PagerEntity>
 	public override void ServerCommand(Item item, string command, BasePlayer player)
 	{
 		base.ServerCommand(item, command, player);
-		PagerEntity associatedEntity = GetAssociatedEntity(item);
+		PagerEntity associatedEntity = ItemModAssociatedEntity<PagerEntity>.GetAssociatedEntity(item);
 		if (command == "stop")
 		{
 			associatedEntity.SetOff();

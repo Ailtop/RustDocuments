@@ -143,7 +143,7 @@ public class TimedExplosive : BaseEntity
 			}
 			else
 			{
-				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 1076005120, true);
+				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 1076005121, true);
 				if (creatorEntity != null && damageTypes != null)
 				{
 					float num2 = 0f;

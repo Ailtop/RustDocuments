@@ -12,8 +12,8 @@ namespace ConVar
 	[Factory("debug")]
 	public class Debugging : ConsoleSystem
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool checktriggers;
 
 		[ServerVar(Help = "Do not damage any items")]
@@ -23,8 +23,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool callbacks;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool log
 		{
 			get

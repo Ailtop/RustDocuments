@@ -7,7 +7,7 @@ using UnityEngine;
 public class RidableHorse : BaseRidableAnimal
 {
 	[ServerVar(Help = "Population active on the server, per square km")]
-	public static float Population = 4f;
+	public static float Population = 0f;
 
 	public string distanceStatName = "";
 
@@ -191,7 +191,7 @@ public class RidableHorse : BaseRidableAnimal
 
 	public override void EatNearbyFood()
 	{
-		if (Time.time < nextEatTime || StaminaCoreFraction() >= 1f)
+		if (Time.time < nextEatTime || (StaminaCoreFraction() >= 1f && base.healthFraction >= 1f))
 		{
 			return;
 		}
@@ -386,5 +386,22 @@ public class RidableHorse : BaseRidableAnimal
 	protected override bool CanPushNow(BasePlayer pusher)
 	{
 		return false;
+	}
+
+	[ServerVar]
+	public static void setHorseBreed(ConsoleSystem.Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (!(basePlayer == null) && basePlayer.IsDeveloper)
+		{
+			int @int = arg.GetInt(0);
+			List<RidableHorse> obj = Pool.GetList<RidableHorse>();
+			Vis.Entities(basePlayer.eyes.position, basePlayer.eyes.position + basePlayer.eyes.HeadForward() * 5f, 0f, obj);
+			foreach (RidableHorse item in obj)
+			{
+				item.SetBreed(@int);
+			}
+			Pool.FreeList(ref obj);
+		}
 	}
 }

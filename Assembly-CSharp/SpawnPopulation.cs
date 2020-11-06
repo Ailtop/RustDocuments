@@ -41,6 +41,8 @@ public class SpawnPopulation : BaseScriptableObject
 
 	public SpawnFilter Filter = new SpawnFilter();
 
+	public float FilterCutoff;
+
 	public Prefab<Spawnable>[] Prefabs;
 
 	public int[] numToSpawn;

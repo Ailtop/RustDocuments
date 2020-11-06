@@ -16,6 +16,13 @@ namespace Rust.Modular
 			BothSame
 		}
 
+		public enum AdjacentMatchType
+		{
+			GroupOrExact,
+			ExactOnly,
+			GroupNotExact
+		}
+
 		public GameObject gameObject;
 
 		public GameObject ownerGameObject;
@@ -31,6 +38,8 @@ namespace Rust.Modular
 		public bool restrictOnAdjacent;
 
 		public AdjacentCondition adjacentRestriction;
+
+		public AdjacentMatchType adjacentMatch;
 
 		public bool restrictOnLockable;
 

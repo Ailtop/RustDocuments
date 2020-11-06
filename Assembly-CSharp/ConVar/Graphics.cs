@@ -70,6 +70,9 @@ namespace ConVar
 		[ClientVar(Saved = true, Help = "Whether to scale vm models with fov")]
 		public static bool vm_fov_scale = true;
 
+		[ClientVar(Saved = true, Help = "FLips viewmodels horizontally (for left handed players)")]
+		public static bool vm_horizontal_flip = false;
+
 		private static float _uiscale = 1f;
 
 		private static int _anisotropic = 1;

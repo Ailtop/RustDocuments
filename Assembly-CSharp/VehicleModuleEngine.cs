@@ -36,7 +36,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 	[SerializeField]
 	public Engine engine;
 
-	private const float FORCE_MULTIPLIER = 13.25f;
+	private const float FORCE_MULTIPLIER = 12.75f;
 
 	private const float HEALTH_PERFORMANCE_FRACTION = 0.25f;
 
@@ -120,7 +120,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		{
 			return 0f;
 		}
-		return (float)engine.engineKW * 13.25f * PerformanceFractionTopSpeed;
+		return (float)engine.engineKW * 12.75f * PerformanceFractionTopSpeed;
 	}
 
 	public void RefreshPerformanceStats(EngineStorage engineStorage)
@@ -146,7 +146,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		}
 	}
 
-	private float GetPerformanceFraction(float statBoostPercent)
+	public float GetPerformanceFraction(float statBoostPercent)
 	{
 		if (!IsUsable)
 		{

@@ -59,16 +59,16 @@ namespace UnityEngine.UI.Extensions
 
 		private static Vector2[] fullUvs;
 
-		[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
 		[SerializeField]
+		[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
 		internal Vector2[] m_points;
 
-		[Tooltip("Segments to be drawn\n This is a list of arrays of points")]
 		[SerializeField]
+		[Tooltip("Segments to be drawn\n This is a list of arrays of points")]
 		internal List<Vector2[]> m_segments;
 
-		[Tooltip("Thickness of the line")]
 		[SerializeField]
+		[Tooltip("Thickness of the line")]
 		internal float lineThickness = 2f;
 
 		[SerializeField]
@@ -83,8 +83,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Add end caps to each line\nMultiple caps when used with Line List")]
 		internal bool lineCaps;
 
-		[SerializeField]
 		[Tooltip("Resolution of the Bezier curve, different to line Resolution")]
+		[SerializeField]
 		internal int bezierSegmentsPerCurve = 10;
 
 		[Tooltip("The type of Join used between lines, Square/Mitre or Curved/Bevel")]

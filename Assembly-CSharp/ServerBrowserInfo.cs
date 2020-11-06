@@ -18,4 +18,6 @@ public class ServerBrowserInfo : SingletonComponent<ServerBrowserInfo>
 	public ServerInfo? currentServer;
 
 	public HttpImage headerImage;
+
+	public HttpImage logoImage;
 }

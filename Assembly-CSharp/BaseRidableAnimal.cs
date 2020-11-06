@@ -37,6 +37,8 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public ItemContainer inventory;
 
+	public const Flags Flag_ForSale = Flags.Reserved2;
+
 	private Vector3 lastMoveDirection;
 
 	public GameObjectRef saddlePrefab;
@@ -52,6 +54,9 @@ public class BaseRidableAnimal : BaseVehicle
 	public const Flags Flag_Lead = Flags.Reserved7;
 
 	public const Flags Flag_HasRider = Flags.On;
+
+	[Header("Purchase")]
+	public ItemDefinition purchaseToken;
 
 	public GameObjectRef eatEffect;
 
@@ -151,8 +156,8 @@ public class BaseRidableAnimal : BaseVehicle
 	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
-	[ServerVar]
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
+	[ServerVar]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -216,6 +221,42 @@ public class BaseRidableAnimal : BaseVehicle
 		using (TimeWarning.New("BaseRidableAnimal.OnRpcMessage"))
 		{
 			RPCMessage rPCMessage;
+			if (rpc == 2333451803u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player + " - RPC_Claim ");
+				}
+				using (TimeWarning.New("RPC_Claim"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(2333451803u, "RPC_Claim", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							RPC_Claim(msg2);
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in RPC_Claim");
+					}
+				}
+				return true;
+			}
 			if (rpc == 3653170552u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -240,13 +281,13 @@ public class BaseRidableAnimal : BaseVehicle
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg2 = rPCMessage;
-							RPC_Lead(msg2);
+							RPCMessage msg3 = rPCMessage;
+							RPC_Lead(msg3);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception exception2)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in RPC_Lead");
 					}
 				}
@@ -280,9 +321,9 @@ public class BaseRidableAnimal : BaseVehicle
 							RPC_OpenLoot(rpc2);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception exception3)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in RPC_OpenLoot");
 					}
 				}
@@ -290,6 +331,11 @@ public class BaseRidableAnimal : BaseVehicle
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public bool IsForSale()
+	{
+		return HasFlag(Flags.Reserved2);
 	}
 
 	public void ContainerServerInit()
@@ -356,8 +402,8 @@ public class BaseRidableAnimal : BaseVehicle
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -480,8 +526,33 @@ public class BaseRidableAnimal : BaseVehicle
 		LoadContainer(info);
 	}
 
+	public override void AttemptMount(BasePlayer player, bool doMountChecks = true)
+	{
+		if (!IsForSale())
+		{
+			base.AttemptMount(player, doMountChecks);
+		}
+	}
+
 	public virtual void LeadingChanged()
 	{
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	public void RPC_Claim(RPCMessage msg)
+	{
+		BasePlayer player = msg.player;
+		if (!(player == null) && IsForSale())
+		{
+			Item item = GetPurchaseToken(player);
+			if (item != null)
+			{
+				item.UseItem();
+				SetFlag(Flags.Reserved2, false);
+				AttemptMount(player, false);
+			}
+		}
 	}
 
 	[RPC_Server]
@@ -489,7 +560,7 @@ public class BaseRidableAnimal : BaseVehicle
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && !HasDriver())
+		if (!(player == null) && !HasDriver() && !IsForSale())
 		{
 			bool num = IsLeading();
 			bool flag = msg.read.Bit();
@@ -538,9 +609,17 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
+	public override void Hurt(HitInfo info)
+	{
+		if (!IsForSale())
+		{
+			base.Hurt(info);
+		}
+	}
+
 	public void AnimalDecay()
 	{
-		if (base.healthFraction == 0f || base.IsDestroyed || UnityEngine.Time.time < lastInputTime + 600f || UnityEngine.Time.time < lastEatTime + 600f)
+		if (base.healthFraction == 0f || base.IsDestroyed || UnityEngine.Time.time < lastInputTime + 600f || UnityEngine.Time.time < lastEatTime + 600f || IsForSale())
 		{
 			return;
 		}
@@ -1258,7 +1337,7 @@ public class BaseRidableAnimal : BaseVehicle
 		bool flag3 = UnityEngine.Physics.SphereCast(base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up, obstacleDetectionRadius, normalized, out hitInfo, num12, 1503731969);
 		if (!Vis.AnyColliders(animalFront.transform.position + normalized * num12, obstacleDetectionRadius, 1503731969) && !flag2 && !flag3)
 		{
-			if (DropToGround(a2 + Vector3.up * 1.25f))
+			if (DropToGround(a2 + Vector3.up * maxStepHeight))
 			{
 				MarkDistanceTravelled(num12);
 			}
@@ -1275,11 +1354,15 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public bool DropToGround(Vector3 targetPos, bool force = false)
 	{
-		float range = force ? 10000f : 4f;
+		float range = force ? 10000f : (maxStepHeight + maxStepDownHeight);
 		Vector3 pos;
 		Vector3 normal;
 		if (TransformUtil.GetGroundInfo(targetPos, out pos, out normal, range, 278986753))
 		{
+			if (UnityEngine.Physics.CheckSphere(pos + Vector3.up * 1f, 0.2f, 278986753))
+			{
+				return false;
+			}
 			base.transform.position = pos;
 			Vector3 eulerAngles = QuaternionEx.LookRotationForcedUp(base.transform.forward, averagedUp).eulerAngles;
 			if (eulerAngles.z > 180f)
@@ -1352,6 +1435,17 @@ public class BaseRidableAnimal : BaseVehicle
 	public void UpdateDropToGroundForDuration(float duration)
 	{
 		dropUntilTime = duration;
+	}
+
+	public bool PlayerHasToken(BasePlayer player)
+	{
+		return GetPurchaseToken(player) != null;
+	}
+
+	public Item GetPurchaseToken(BasePlayer player)
+	{
+		int itemid = purchaseToken.itemid;
+		return player.inventory.FindItemID(itemid);
 	}
 
 	public virtual float GetWalkSpeed()

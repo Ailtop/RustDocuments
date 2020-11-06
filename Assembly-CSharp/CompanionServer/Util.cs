@@ -84,6 +84,7 @@ namespace CompanionServer
 			dictionary.Add("name", ConVar.Server.hostname.Truncate(128));
 			dictionary.Add("desc", ConVar.Server.description.Truncate(512));
 			dictionary.Add("img", ConVar.Server.headerimage.Truncate(128));
+			dictionary.Add("logo", ConVar.Server.logoimage.Truncate(128));
 			dictionary.Add("url", ConVar.Server.url.Truncate(128));
 			dictionary.Add("ip", App.GetPublicIP());
 			dictionary.Add("port", App.port.ToString("G", CultureInfo.InvariantCulture));

@@ -158,8 +158,8 @@ public class HBHFSensor : BaseDetector
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetIncludeAuth(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();

@@ -21,8 +21,8 @@ public class FoliagePlacement : ScriptableObject
 	[Header("Randomization")]
 	public float RandomScaling = 0.2f;
 
-	[MinMax(0f, 1f)]
 	[Header("Placement Range")]
+	[MinMax(0f, 1f)]
 	public MinMax Range = new MinMax(0f, 1f);
 
 	public float RangeFade = 0.1f;
@@ -37,7 +37,16 @@ public class FoliagePlacement : ScriptableObject
 	[Header("Visuals")]
 	public Material material;
 
-	public Mesh mesh;
+	[FormerlySerializedAs("mesh")]
+	public Mesh mesh0;
+
+	[FormerlySerializedAs("mesh")]
+	public Mesh mesh1;
+
+	[FormerlySerializedAs("mesh")]
+	public Mesh mesh2;
+
+	public const int lods = 5;
 
 	public const int octaves = 1;
 

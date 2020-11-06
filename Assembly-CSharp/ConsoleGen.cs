@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[679]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[688]
 	{
 		new ConsoleSystem.Command
 		{
@@ -1594,6 +1594,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.admincheat = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "build_terraincheck",
+			Parent = "antihack",
+			FullName = "antihack.build_terraincheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.build_terraincheck.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.build_terraincheck = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6051,6 +6064,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "logoimage",
+			Parent = "server",
+			FullName = "server.logoimage",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Server.logoimage.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.logoimage = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxpacketsize",
 			Parent = "server",
 			FullName = "server.maxpacketsize",
@@ -7925,6 +7951,32 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "wetness_rain",
+			Parent = "weather",
+			FullName = "weather.wetness_rain",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Weather.wetness_rain.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.wetness_rain = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wetness_snow",
+			Parent = "weather",
+			FullName = "weather.wetness_snow",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Weather.wetness_snow.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Weather.wetness_snow = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "wind",
 			Parent = "weather",
 			FullName = "weather.wind",
@@ -8118,6 +8170,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				SteamNetworking.steamsendbuffer = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamsendverify",
+			Parent = "global",
+			FullName = "global.steamsendverify",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => SteamNetworking.steamsendverify.ToString()),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamsendverify = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8675,6 +8740,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "sethorsebreed",
+			Parent = "ridablehorse",
+			FullName = "ridablehorse.sethorsebreed",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				RidableHorse.setHorseBreed(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "ai_dormant",
 			Parent = "aimanager",
 			FullName = "aimanager.ai_dormant",
@@ -8947,6 +9024,44 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Stag.Population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxcalllength",
+			Parent = "telephonemanager",
+			FullName = "telephonemanager.maxcalllength",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => TelephoneManager.MaxCallLength.ToString()),
+			SetOveride = delegate(string str)
+			{
+				TelephoneManager.MaxCallLength = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxconcurrentcalls",
+			Parent = "telephonemanager",
+			FullName = "telephonemanager.maxconcurrentcalls",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => TelephoneManager.MaxConcurrentCalls.ToString()),
+			SetOveride = delegate(string str)
+			{
+				TelephoneManager.MaxConcurrentCalls = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printallphones",
+			Parent = "telephonemanager",
+			FullName = "telephonemanager.printallphones",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				TelephoneManager.PrintAllPhones(arg);
 			}
 		},
 		new ConsoleSystem.Command

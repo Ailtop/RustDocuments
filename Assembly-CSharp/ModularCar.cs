@@ -12,7 +12,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUser, IVehicleLockUser
+public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUser, TakeCollisionDamage.ICanRestoreVelocity, IVehicleLockUser
 {
 	private class DriverSeatInputs
 	{
@@ -172,8 +172,8 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[Header("Spawn")]
 	public SpawnSettings spawnSettings;
 
-	[Header("Fuel")]
 	[SerializeField]
+	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
@@ -585,6 +585,11 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return false;
 		}
+		ModularCarSeat modularCarSeat = GetIdealMountPointFor(player) as ModularCarSeat;
+		if (modularCarSeat != null && !modularCarSeat.associatedSeatingModule.DoorsAreLockable)
+		{
+			return true;
+		}
 		return PlayerCanOpenThis(player, ModularCarLock.LockType.Door);
 	}
 
@@ -770,6 +775,15 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public void RemoveLock()
 	{
 		carLock.RemoveLock();
+	}
+
+	public void RestoreVelocity(Vector3 vel)
+	{
+		if (rigidBody.velocity.sqrMagnitude < vel.sqrMagnitude)
+		{
+			vel.y = rigidBody.velocity.y;
+			rigidBody.velocity = vel;
+		}
 	}
 
 	public override void DoPushAction(BasePlayer player)

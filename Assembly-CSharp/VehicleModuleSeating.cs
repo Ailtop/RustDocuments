@@ -19,6 +19,8 @@ public class VehicleModuleSeating : BaseVehicleModule
 	public class Seating
 	{
 		[Header("Seating & Controls")]
+		public bool doorsAreLockable = true;
+
 		public BaseVehicle.MountPointInfo[] mountPoints;
 
 		public Transform steeringWheel;
@@ -79,8 +81,8 @@ public class VehicleModuleSeating : BaseVehicleModule
 	[HideInInspector]
 	private Vector3 speedometerAngle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 fuelAngle;
 
 	[Header("Horn")]
@@ -123,6 +125,8 @@ public class VehicleModuleSeating : BaseVehicleModule
 	protected bool IsOnACar => Car != null;
 
 	protected bool IsOnAVehicleLockUser => VehicleLockUser != null;
+
+	public bool DoorsAreLockable => seating.doorsAreLockable;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -229,26 +233,31 @@ public class VehicleModuleSeating : BaseVehicleModule
 		base.ModuleAdded(vehicle, firstSocketIndex);
 		Car = (vehicle as ModularCar);
 		VehicleLockUser = (vehicle as IVehicleLockUser);
-		if (HasSeating && base.isServer)
+		if (!HasSeating || !base.isServer)
 		{
-			adjustedMountPoints = new BaseVehicle.MountPointInfo[seating.mountPoints.Length];
-			for (int i = 0; i < seating.mountPoints.Length; i++)
+			return;
+		}
+		adjustedMountPoints = new BaseVehicle.MountPointInfo[seating.mountPoints.Length];
+		for (int i = 0; i < seating.mountPoints.Length; i++)
+		{
+			BaseVehicle.MountPointInfo mountPointInfo = seating.mountPoints[i];
+			Vector3 pos = vehicle.transform.InverseTransformPoint(base.transform.position) + mountPointInfo.pos;
+			adjustedMountPoints[i] = new BaseVehicle.MountPointInfo
 			{
-				BaseVehicle.MountPointInfo mountPointInfo = seating.mountPoints[i];
-				Vector3 pos = vehicle.transform.InverseTransformPoint(base.transform.position) + mountPointInfo.pos;
-				adjustedMountPoints[i] = new BaseVehicle.MountPointInfo
-				{
-					isDriver = mountPointInfo.isDriver,
-					pos = pos,
-					rot = mountPointInfo.rot,
-					bone = mountPointInfo.bone,
-					prefab = mountPointInfo.prefab,
-					mountable = mountPointInfo.mountable
-				};
-			}
-			for (int j = 0; j < adjustedMountPoints.Length; j++)
+				isDriver = mountPointInfo.isDriver,
+				pos = pos,
+				rot = mountPointInfo.rot,
+				bone = mountPointInfo.bone,
+				prefab = mountPointInfo.prefab,
+				mountable = mountPointInfo.mountable
+			};
+		}
+		for (int j = 0; j < adjustedMountPoints.Length; j++)
+		{
+			ModularCarSeat modularCarSeat = vehicle.AddMountPoint(adjustedMountPoints[j]) as ModularCarSeat;
+			if (modularCarSeat != null)
 			{
-				vehicle.AddMountPoint(adjustedMountPoints[j]);
+				modularCarSeat.associatedSeatingModule = this;
 			}
 		}
 	}
@@ -327,8 +336,18 @@ public class VehicleModuleSeating : BaseVehicleModule
 		}
 	}
 
-	[RPC_Server]
+	protected bool ModuleHasMountPoint(BaseVehicle.MountPointInfo mountPointInfo)
+	{
+		ModularCarSeat modularCarSeat = mountPointInfo.mountable as ModularCarSeat;
+		if (modularCarSeat != null)
+		{
+			return modularCarSeat.associatedSeatingModule == this;
+		}
+		return false;
+	}
+
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_DestroyLock(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

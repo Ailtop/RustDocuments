@@ -7,6 +7,8 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 
 	protected virtual bool AllowNullParenting => false;
 
+	protected virtual bool AllowHeldEntityParenting => false;
+
 	public override void OnItemCreated(Item item)
 	{
 		base.OnItemCreated(item);
@@ -92,12 +94,16 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 			{
 				return worldEntity;
 			}
+			if (AllowHeldEntityParenting && item.parentItem != null && item.parentItem.GetHeldEntity() != null)
+			{
+				return item.parentItem.GetHeldEntity();
+			}
 			return null;
 		}
 		return null;
 	}
 
-	public T GetAssociatedEntity(Item item, bool isServer = true)
+	public static T GetAssociatedEntity(Item item, bool isServer = true)
 	{
 		BaseNetworkable baseNetworkable = null;
 		if (item.instanceData == null)

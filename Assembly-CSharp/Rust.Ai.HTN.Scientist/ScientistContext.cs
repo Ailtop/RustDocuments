@@ -10,8 +10,8 @@ namespace Rust.Ai.HTN.Scientist
 	{
 		public delegate void WorldStateChangedEvent(ScientistContext context, Facts fact, byte oldValue, byte newValue);
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
@@ -48,8 +48,8 @@ namespace Rust.Ai.HTN.Scientist
 		[ReadOnly]
 		public AiLocationManager Location;
 
-		[ReadOnly]
 		[Header("Cover")]
+		[ReadOnly]
 		public CoverPointVolume CoverVolume;
 
 		[ReadOnly]

@@ -1952,8 +1952,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		private Vector3 missOffset;
@@ -1968,8 +1968,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		private Vector3 _lastNavigationHeading = Vector3.zero;
 
-		[Header("Pathfinding")]
 		[ReadOnly]
+		[Header("Pathfinding")]
 		public BasePath Path;
 
 		[ReadOnly]
@@ -1991,13 +1991,13 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private ScientistAStarContext _context;
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Navigation")]
+		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
@@ -2048,8 +2048,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 		};
 
 		[SerializeField]
-		[ReadOnly]
 		[Header("Reasoners")]
+		[ReadOnly]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2142,9 +2142,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
-		[Header("Firearm Utility")]
 		[SerializeField]
 		[ReadOnly]
+		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]
