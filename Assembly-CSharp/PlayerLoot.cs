@@ -146,7 +146,7 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 	private void SendUpdate()
 	{
 		isInvokingSendUpdate = false;
-		if (BaseEntityEx.IsValid(base.baseEntity))
+		if (BaseEntityEx.IsValid(base.baseEntity) && Interface.CallHook("OnLootNetworkUpdate", this) == null)
 		{
 			using (PlayerUpdateLoot playerUpdateLoot = Pool.Get<PlayerUpdateLoot>())
 			{

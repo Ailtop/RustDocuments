@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class HotAirBalloon : BaseCombatEntity
+public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 {
 	protected const Flags Flag_HasFuel = Flags.Reserved6;
 
@@ -91,6 +91,8 @@ public class HotAirBalloon : BaseCombatEntity
 	public float avgTerrainHeight;
 
 	public bool grounded;
+
+	public bool IsFullyInflated => inflationLevel >= 1f;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -194,6 +196,11 @@ public class HotAirBalloon : BaseCombatEntity
 		return WaterLevel.Test(engineHeight.position, true, this);
 	}
 
+	public bool IsValidSAMTarget()
+	{
+		return IsFullyInflated;
+	}
+
 	public override float GetNetworkTime()
 	{
 		return UnityEngine.Time.fixedTime;
@@ -260,7 +267,7 @@ public class HotAirBalloon : BaseCombatEntity
 
 	public void DecayTick()
 	{
-		if (base.healthFraction != 0f && inflationLevel != 1f && !(UnityEngine.Time.time < lastBlastTime + 600f))
+		if (base.healthFraction != 0f && !IsFullyInflated && !(UnityEngine.Time.time < lastBlastTime + 600f))
 		{
 			float num = 1f / outsidedecayminutes;
 			if (IsOutside())
@@ -270,8 +277,8 @@ public class HotAirBalloon : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void EngineSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnHotAirBalloonToggle", this, msg.player) == null)
@@ -325,11 +332,11 @@ public class HotAirBalloon : BaseCombatEntity
 		GameObject[] array = killTriggers;
 		foreach (GameObject obj in array)
 		{
-			bool active = (inflationLevel == 1f && myRigidbody.velocity.y < 0f) || myRigidbody.velocity.y < 0.75f;
+			bool active = (IsFullyInflated && myRigidbody.velocity.y < 0f) || myRigidbody.velocity.y < 0.75f;
 			obj.SetActive(active);
 		}
 		float num = inflationLevel;
-		if (IsOn() && inflationLevel < 1f)
+		if (IsOn() && !IsFullyInflated)
 		{
 			inflationLevel = Mathf.Clamp01(inflationLevel + UnityEngine.Time.fixedDeltaTime / 10f);
 		}
@@ -339,7 +346,7 @@ public class HotAirBalloon : BaseCombatEntity
 		}
 		if (num != inflationLevel)
 		{
-			if (inflationLevel == 1f)
+			if (IsFullyInflated)
 			{
 				bounds = raisedBounds;
 			}
@@ -359,7 +366,7 @@ public class HotAirBalloon : BaseCombatEntity
 		}
 		if (IsOn())
 		{
-			if (inflationLevel >= 1f)
+			if (IsFullyInflated)
 			{
 				currentBuoyancy += UnityEngine.Time.fixedDeltaTime * 0.2f;
 				lastBlastTime = UnityEngine.Time.time;

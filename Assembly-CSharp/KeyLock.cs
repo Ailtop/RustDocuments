@@ -234,8 +234,8 @@ public class KeyLock : BaseLock
 		return !IsLocked();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Unlock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && HasLockPermission(rpc.player))
@@ -245,8 +245,8 @@ public class KeyLock : BaseLock
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Lock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && !IsLocked() && Interface.CallHook("CanLock", rpc.player, this) == null && HasLockPermission(rpc.player))
@@ -256,8 +256,8 @@ public class KeyLock : BaseLock
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_CreateKey(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || (IsLocked() && !HasLockPermission(rpc.player)))

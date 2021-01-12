@@ -1120,8 +1120,8 @@ namespace Rust.Ai.HTN.Bear
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		private static Vector3[] pathCornerCache = new Vector3[128];
@@ -1136,13 +1136,13 @@ namespace Rust.Ai.HTN.Bear
 		[SerializeField]
 		private BearContext _context;
 
-		[ReadOnly]
 		[Header("Navigation")]
 		[SerializeField]
+		[ReadOnly]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
@@ -1188,9 +1188,9 @@ namespace Rust.Ai.HTN.Bear
 			}
 		};
 
-		[SerializeField]
-		[Header("Reasoners")]
 		[ReadOnly]
+		[Header("Reasoners")]
+		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner

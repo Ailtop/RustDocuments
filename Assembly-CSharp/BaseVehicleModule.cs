@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
+public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPrefabPreProcess
 {
 	public enum VisualGroup
 	{
@@ -32,8 +32,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 
 	private const float TIME_BETWEEN_LOCK_REFRESH = 1f;
 
-	[SerializeField]
 	[Header("Vehicle Module")]
+	[SerializeField]
 	private Transform centreOfMassTransform;
 
 	[SerializeField]
@@ -55,8 +55,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 	[SerializeField]
 	private TriggerParent[] triggerParents;
 
-	[SerializeField]
 	[Header("Sliding Components")]
+	[SerializeField]
 	private VehicleModuleSlidingComponent[] slidingComponents;
 
 	[SerializeField]
@@ -152,6 +152,19 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	public virtual bool IsValidSAMTarget()
+	{
+		if (SamSite.alltarget)
+		{
+			if (IsOnAVehicle)
+			{
+				return Vehicle.AnyMounted();
+			}
+			return false;
+		}
+		return false;
+	}
+
 	public virtual void NonUserSpawn()
 	{
 	}
@@ -239,8 +252,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Use(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -577,11 +590,11 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		{
 			return false;
 		}
-		if (IsOnAVehicle && !Vehicle.IsEditableNow && !Vehicle.IsDead())
+		if (Vehicle.IsEditableNow || Vehicle.IsDead() || player.GetMountedVehicle() != Vehicle)
 		{
-			return player.GetMountedVehicle() == Vehicle;
+			return false;
 		}
-		return false;
+		return Vehicle.PlayerCanUseThis(player, ModularCarLock.LockType.General);
 	}
 
 	public bool PlayerIsLookingAtUsable(string lookingAtColldierName, string usableColliderName)

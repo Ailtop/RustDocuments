@@ -182,8 +182,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 	}
 
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(3uL)]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(3uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (!(msg.player == null) && CanUpdateSign(msg.player))
@@ -199,8 +199,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -212,8 +212,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))

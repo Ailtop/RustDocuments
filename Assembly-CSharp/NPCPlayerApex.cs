@@ -312,8 +312,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	private float accumPathPendingDelay;
 
-	[Header("Sensory")]
 	[Tooltip("Only care about sensations from our active enemy target, and nobody else.")]
+	[Header("Sensory")]
 	public bool OnlyTargetSensations;
 
 	private const int MaxPlayers = 128;

@@ -1,3 +1,4 @@
+using Oxide.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -88,6 +89,11 @@ public class TechTreeData : ScriptableObject
 
 	public bool PlayerHasPathForUnlock(BasePlayer player, NodeInstance node)
 	{
+		object obj = Interface.CallHook("CanUnlockTechTreeNodePath", player, node, this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		NodeInstance entryNode = GetEntryNode();
 		if (entryNode == null)
 		{
@@ -132,6 +138,11 @@ public class TechTreeData : ScriptableObject
 
 	public bool PlayerCanUnlock(BasePlayer player, NodeInstance node)
 	{
+		object obj = Interface.CallHook("CanUnlockTechTreeNode", player, node, this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (PlayerHasPathForUnlock(player, node))
 		{
 			return !HasPlayerUnlocked(player, node);

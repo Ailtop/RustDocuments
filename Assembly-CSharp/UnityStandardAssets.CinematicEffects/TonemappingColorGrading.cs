@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects
 {
-	[ExecuteInEditMode]
-	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	[ImageEffectAllowedInSceneView]
+	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
+	[ExecuteInEditMode]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -57,8 +57,8 @@ namespace UnityStandardAssets.CinematicEffects
 		{
 			public bool enabled;
 
-			[Min(0f)]
 			[Tooltip("Midpoint Adjustment.")]
+			[Min(0f)]
 			public float middleGrey;
 
 			[Tooltip("The lowest possible exposure value; adjust this value to modify the brightest areas of your level.")]
@@ -67,8 +67,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("The highest possible exposure value; adjust this value to modify the darkest areas of your level.")]
 			public float max;
 
-			[Min(0f)]
 			[Tooltip("Speed of linear adaptation. Higher is faster.")]
+			[Min(0f)]
 			public float speed;
 
 			[Tooltip("Displays a luminosity helper in the GameView.")]
@@ -207,29 +207,29 @@ namespace UnityStandardAssets.CinematicEffects
 		[Serializable]
 		public struct BasicsSettings
 		{
-			[Tooltip("Sets the white balance to a custom color temperature.")]
 			[Range(-2f, 2f)]
+			[Tooltip("Sets the white balance to a custom color temperature.")]
 			public float temperatureShift;
 
-			[Range(-2f, 2f)]
 			[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
+			[Range(-2f, 2f)]
 			public float tint;
 
-			[Space]
 			[Range(-0.5f, 0.5f)]
+			[Space]
 			[Tooltip("Shift the hue of all colors.")]
 			public float hue;
 
-			[Tooltip("Pushes the intensity of all colors.")]
 			[Range(0f, 2f)]
+			[Tooltip("Pushes the intensity of all colors.")]
 			public float saturation;
 
-			[Range(-1f, 1f)]
 			[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
+			[Range(-1f, 1f)]
 			public float vibrance;
 
-			[Range(0f, 10f)]
 			[Tooltip("Brightens or darkens all colors.")]
+			[Range(0f, 10f)]
 			public float value;
 
 			[Space]
@@ -237,8 +237,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			public float contrast;
 
-			[Tooltip("Contrast gain curve. Controls the steepness of the curve.")]
 			[Range(0.01f, 5f)]
+			[Tooltip("Contrast gain curve. Controls the steepness of the curve.")]
 			public float gain;
 
 			[Range(0.01f, 5f)]
@@ -333,8 +333,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Internal LUT precision. \"Normal\" is 256x16, \"High\" is 1024x32. Prefer \"Normal\" on mobile devices.")]
 			public ColorGradingPrecision precision;
 
-			[ColorWheelGroup]
 			[Space]
+			[ColorWheelGroup]
 			public ColorWheelsSettings colorWheels;
 
 			[Space]
@@ -391,8 +391,8 @@ namespace UnityStandardAssets.CinematicEffects
 		[SettingsGroup]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SettingsGroup]
 		[SerializeField]
+		[SettingsGroup]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

@@ -299,6 +299,11 @@ public class Construction : PrefabAttribute
 		return false;
 	}
 
+	public virtual bool ShowAsNeutral(Target target)
+	{
+		return target.inBuildingPrivilege;
+	}
+
 	public BaseEntity CreateConstruction(Target target, bool bNeedsValidPlacement = false)
 	{
 		GameObject gameObject = GameManager.server.CreatePrefab(fullName, Vector3.zero, Quaternion.identity, false);

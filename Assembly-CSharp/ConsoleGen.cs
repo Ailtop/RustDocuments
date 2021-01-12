@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[690]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[696]
 	{
 		new ConsoleSystem.Command
 		{
@@ -1867,6 +1867,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.forceposition = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "losforgiveness",
+			Parent = "antihack",
+			FullName = "antihack.losforgiveness",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.losforgiveness.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.losforgiveness = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -5501,6 +5514,48 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "bansserverendpoint",
+			Parent = "server",
+			FullName = "server.bansserverendpoint",
+			ServerAdmin = true,
+			Description = "HTTP API endpoint for centralized banning (see wiki)",
+			Variable = true,
+			GetOveride = (() => Server.bansServerEndpoint.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.bansServerEndpoint = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "bansserverfailuremode",
+			Parent = "server",
+			FullName = "server.bansserverfailuremode",
+			ServerAdmin = true,
+			Description = "Failure mode for centralized banning, set to 1 to reject players from joining if it's down (see wiki)",
+			Variable = true,
+			GetOveride = (() => Server.bansServerFailureMode.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.bansServerFailureMode = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "bansservertimeout",
+			Parent = "server",
+			FullName = "server.bansservertimeout",
+			ServerAdmin = true,
+			Description = "Timeout (in seconds) for centralized banning web server requests",
+			Variable = true,
+			GetOveride = (() => Server.bansServerTimeout.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.bansServerTimeout = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "bleedingarmor",
 			Parent = "server",
 			FullName = "server.bleedingarmor",
@@ -6467,6 +6522,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "playerlistpos",
+			Parent = "server",
+			FullName = "server.playerlistpos",
+			ServerAdmin = true,
+			Description = "Prints the position of all players on the server",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Server.playerlistpos(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "playerserverfall",
 			Parent = "server",
 			FullName = "server.playerserverfall",
@@ -6675,6 +6743,20 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Server.save(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "savebackupcount",
+			Parent = "server",
+			FullName = "server.savebackupcount",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = (() => Server.saveBackupCount.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.saveBackupCount = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8964,7 +9046,7 @@ public class ConsoleGen
 			Parent = "samsite",
 			FullName = "samsite.alltarget",
 			ServerAdmin = true,
-			Description = "targetmode, 1 = all air vehicles, 0 = only hot air ballons",
+			Description = "targetmode, 1 = all air vehicles, 0 = only hot air ballons and helicopters",
 			Variable = true,
 			GetOveride = (() => SamSite.alltarget.ToString()),
 			SetOveride = delegate(string str)

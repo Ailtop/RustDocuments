@@ -58,8 +58,10 @@ public class IOEntity : BaseCombatEntity
 
 		public void Clear()
 		{
+			IOEntity obj = ioEnt;
 			ioEnt = null;
 			entityRef.Set(null);
+			Interface.CallHook("OnIORefCleared", this, obj);
 		}
 
 		public void Set(IOEntity newIOEnt)
@@ -107,8 +109,8 @@ public class IOEntity : BaseCombatEntity
 	[NonSerialized]
 	public int lastResetIndex;
 
-	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]

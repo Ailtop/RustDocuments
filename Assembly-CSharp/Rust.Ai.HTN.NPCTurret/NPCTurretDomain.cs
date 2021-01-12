@@ -552,8 +552,8 @@ namespace Rust.Ai.HTN.NPCTurret
 			}
 		}
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isRegisteredWithAgency;
 
 		private Vector3 missOffset;
@@ -574,14 +574,14 @@ namespace Rust.Ai.HTN.NPCTurret
 		[Header("Context")]
 		private NPCTurretContext _context;
 
-		[SerializeField]
 		[ReadOnly]
 		[Header("Navigation")]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[ReadOnly]
 		[Header("Sensors")]
 		[SerializeField]
+		[ReadOnly]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -674,12 +674,12 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		private bool _isFiring;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool ReducedLongRangeAccuracy;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool BurstAtLongRange;
 
 		private HTNUtilityAiClient _aiClient;

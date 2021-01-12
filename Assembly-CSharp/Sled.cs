@@ -86,7 +86,10 @@ public class Sled : BaseVehicle, INotifyTrigger
 	protected override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		HasAnyPassengers();
+		if (!HasAnyPassengers())
+		{
+			return;
+		}
 		terrainHandler.FixedUpdate();
 		if (!terrainHandler.IsGrounded)
 		{

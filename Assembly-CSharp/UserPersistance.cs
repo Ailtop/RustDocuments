@@ -24,13 +24,13 @@ public class UserPersistance : IDisposable
 	public UserPersistance(string strFolder)
 	{
 		blueprints = new Database();
-		blueprints.Open(strFolder + "/player.blueprints." + 3 + ".db");
+		blueprints.Open(strFolder + "/player.blueprints." + 4 + ".db");
 		if (!blueprints.TableExists("data"))
 		{
 			blueprints.Execute("CREATE TABLE data ( userid TEXT PRIMARY KEY, info BLOB, updated INTEGER )");
 		}
 		deaths = new Database();
-		deaths.Open(strFolder + "/player.deaths." + 3 + ".db");
+		deaths.Open(strFolder + "/player.deaths." + 4 + ".db");
 		if (!deaths.TableExists("data"))
 		{
 			deaths.Execute("CREATE TABLE data ( userid TEXT, born INTEGER, died INTEGER, info BLOB )");
@@ -38,7 +38,7 @@ public class UserPersistance : IDisposable
 			deaths.Execute("CREATE INDEX IF NOT EXISTS diedindex ON data ( died )");
 		}
 		identities = new Database();
-		identities.Open(strFolder + "/player.identities." + 3 + ".db");
+		identities.Open(strFolder + "/player.identities." + 4 + ".db");
 		if (!identities.TableExists("data"))
 		{
 			identities.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, username TEXT )");
@@ -50,7 +50,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT )");
 		}
 		playerState = new Database();
-		playerState.Open(strFolder + "/player.states." + 201 + ".db");
+		playerState.Open(strFolder + "/player.states." + 202 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

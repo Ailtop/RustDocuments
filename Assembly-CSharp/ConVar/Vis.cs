@@ -7,13 +7,13 @@ namespace ConVar
 		[ClientVar]
 		public static bool lerp;
 
-		[ServerVar]
 		[Help("Turns on debug display of damages")]
+		[ServerVar]
 		public static bool damage;
 
-		[ServerVar]
-		[ClientVar]
 		[Help("Turns on debug display of attacks")]
+		[ClientVar]
+		[ServerVar]
 		public static bool attack;
 
 		[ServerVar]
@@ -29,8 +29,8 @@ namespace ConVar
 		[Help("Show trigger entries")]
 		public static bool triggers;
 
-		[Help("Turns on debug display of hitboxes")]
 		[ServerVar]
+		[Help("Turns on debug display of hitboxes")]
 		public static bool hitboxes;
 
 		[ServerVar]

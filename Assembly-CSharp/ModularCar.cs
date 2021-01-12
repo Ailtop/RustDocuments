@@ -172,15 +172,15 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[Header("Spawn")]
 	public SpawnSettings spawnSettings;
 
-	[SerializeField]
 	[Header("Fuel")]
+	[SerializeField]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[SerializeField]
 	[Header("Audio/FX")]
+	[SerializeField]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]
@@ -590,7 +590,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return true;
 		}
-		return PlayerCanOpenThis(player, ModularCarLock.LockType.Door);
+		return PlayerCanUseThis(player, ModularCarLock.LockType.Door);
 	}
 
 	public bool CanRunEngines()
@@ -1147,9 +1147,9 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		return carLock.PlayerHasUnlockPermission(player);
 	}
 
-	public bool PlayerCanOpenThis(BasePlayer player, ModularCarLock.LockType lockType)
+	public override bool PlayerCanUseThis(BasePlayer player, ModularCarLock.LockType lockType)
 	{
-		return carLock.PlayerCanOpenThis(player, lockType);
+		return carLock.PlayerCanUseThis(player, lockType);
 	}
 
 	public bool PlayerCanDestroyLock(BasePlayer player, BaseVehicleModule viaModule)
@@ -1163,7 +1163,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return false;
 		}
-		if (!PlayerCanOpenThis(player, ModularCarLock.LockType.Storage))
+		if (!PlayerCanUseThis(player, ModularCarLock.LockType.General))
 		{
 			return false;
 		}

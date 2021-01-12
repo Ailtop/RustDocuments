@@ -152,8 +152,8 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing ridable animals per frame")]
+	[ServerVar]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]
@@ -556,8 +556,8 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -17,8 +17,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		private byte[] _worldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private byte[] _previousWorldState;
 
 		[ReadOnly]

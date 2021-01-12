@@ -123,7 +123,7 @@ public class AttackEntity : HeldEntity
 			BasePlayer ownerPlayer = GetOwnerPlayer();
 			num += 0.1f;
 			num += cooldown * 0.1f;
-			num += (ownerPlayer ? ownerPlayer.desyncTime : 0.1f);
+			num += (ownerPlayer ? ownerPlayer.desyncTimeClamped : 0.1f);
 			num += Mathf.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime);
 		}
 		nextTime = ((nextTime < 0f) ? Mathf.Max(0f, time + cooldown - num) : ((!(time - nextTime <= num)) ? Mathf.Max(nextTime + cooldown, time + cooldown - num) : Mathf.Min(nextTime + cooldown, time + cooldown)));
@@ -168,9 +168,9 @@ public class AttackEntity : HeldEntity
 			player.stats.combat.Log(this, "player_sleeping");
 			return false;
 		}
-		if (player.desyncTime > ConVar.AntiHack.maxdesync)
+		if (player.desyncTimeRaw > ConVar.AntiHack.maxdesync)
 		{
-			AntiHack.Log(player, AntiHackType.AttackHack, "Player stalled (" + base.ShortPrefabName + " with " + player.desyncTime + "s)");
+			AntiHack.Log(player, AntiHackType.AttackHack, "Player stalled (" + base.ShortPrefabName + " with " + player.desyncTimeRaw + "s)");
 			player.stats.combat.Log(this, "player_stalled");
 			return false;
 		}
@@ -222,7 +222,7 @@ public class AttackEntity : HeldEntity
 			float eye_serverframes = ConVar.AntiHack.eye_serverframes;
 			float num2 = eye_clientframes / 60f;
 			float num3 = eye_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
-			float num4 = (player.desyncTime + num2 + num3) * num;
+			float num4 = (player.desyncTimeClamped + num2 + num3) * num;
 			int layerMask = ConVar.AntiHack.eye_terraincheck ? 10551296 : 2162688;
 			if (ConVar.AntiHack.eye_protection >= 1)
 			{

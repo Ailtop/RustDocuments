@@ -937,16 +937,19 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			using (TimeWarning.New("SendNetworkUpdate_Flags"))
 			{
 				LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Flags");
-				List<Connection> subscribers = GetSubscribers();
-				if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
+				if (Interface.CallHook("OnEntityFlagsNetworkUpdate", this) == null)
 				{
-					Network.Net.sv.write.PacketID(Message.Type.EntityFlags);
-					Network.Net.sv.write.EntityID(net.ID);
-					Network.Net.sv.write.Int32((int)flags);
-					SendInfo info = new SendInfo(subscribers);
-					Network.Net.sv.write.Send(info);
+					List<Connection> subscribers = GetSubscribers();
+					if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
+					{
+						Network.Net.sv.write.PacketID(Message.Type.EntityFlags);
+						Network.Net.sv.write.EntityID(net.ID);
+						Network.Net.sv.write.Int32((int)flags);
+						SendInfo info = new SendInfo(subscribers);
+						Network.Net.sv.write.Send(info);
+					}
+					OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this);
 				}
-				OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this);
 			}
 		}
 	}

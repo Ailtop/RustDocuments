@@ -7,8 +7,8 @@ namespace ConVar
 	[Factory("world")]
 	public class World : ConsoleSystem
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool cache = true;
 
 		[ClientVar]

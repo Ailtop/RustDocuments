@@ -114,8 +114,8 @@ public abstract class AppIOEntity : IOEntity
 		return new EntityTarget(net.ID);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
 	public async void PairWithApp(RPCMessage msg)
 	{

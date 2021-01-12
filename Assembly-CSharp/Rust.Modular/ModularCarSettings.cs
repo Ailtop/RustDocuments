@@ -6,8 +6,8 @@ namespace Rust.Modular
 	[Serializable]
 	public class ModularCarSettings
 	{
-		[Range(0f, 3f)]
 		[Header("Vehicle Setup")]
+		[Range(0f, 3f)]
 		public float tireFriction = 1f;
 
 		[Range(0f, 1f)]

@@ -7,8 +7,8 @@ namespace ConVar
 	{
 		private static int m_graph;
 
-		[ServerVar(Saved = true)]
 		[ClientVar(Saved = true)]
+		[ServerVar(Saved = true)]
 		public static int limit
 		{
 			get

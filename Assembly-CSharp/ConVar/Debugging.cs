@@ -23,8 +23,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool callbacks;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool log
 		{
 			get

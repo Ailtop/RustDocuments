@@ -25,8 +25,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool enabled = true;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool debug = false;
 
 		[ClientVar]
@@ -130,8 +130,8 @@ namespace ConVar
 			AssetPool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void export_prefabs(Arg arg)
 		{
 			PrefabPoolCollection pool = GameManager.server.pool;

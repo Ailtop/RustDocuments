@@ -88,8 +88,8 @@ public class RFBroadcaster : IOEntity, IRFObject
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ServerSetFrequency(RPCMessage msg)
 	{
 		if (!(msg.player == null) && msg.player.CanBuild() && playerUsable && !(UnityEngine.Time.time < nextChangeTime))

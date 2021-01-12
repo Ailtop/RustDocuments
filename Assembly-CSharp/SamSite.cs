@@ -6,6 +6,11 @@ using UnityEngine;
 
 public class SamSite : ContainerIOEntity
 {
+	public interface ISamSiteTarget
+	{
+		bool IsValidSAMTarget();
+	}
+
 	public Animator pitchAnimator;
 
 	public GameObject yaw;
@@ -40,7 +45,7 @@ public class SamSite : ContainerIOEntity
 
 	public Transform[] tubes;
 
-	[ServerVar(Help = "targetmode, 1 = all air vehicles, 0 = only hot air ballons")]
+	[ServerVar(Help = "targetmode, 1 = all air vehicles, 0 = only hot air ballons and helicopters")]
 	public static bool alltarget = false;
 
 	[ServerVar(Help = "how long until static sam sites auto repair")]
@@ -219,7 +224,7 @@ public class SamSite : ContainerIOEntity
 				if (!item.isClient && !(EntityCenterPoint(item).y < eyePoint.transform.position.y) && item.IsVisible(eyePoint.transform.position, scanRadius * 2f) && Interface.CallHook("OnSamSiteTarget", this, item) == null)
 				{
 					BaseVehicle component = item.GetComponent<BaseVehicle>();
-					if ((staticRespawn || !(component != null) || !component.InSafeZone()) && (alltarget || (bool)item.GetComponent<HotAirBalloon>() || (bool)item.GetComponent<MiniCopter>()))
+					if ((staticRespawn || !(component != null) || !component.InSafeZone()) && (item.GetComponent<ISamSiteTarget>()?.IsValidSAMTarget() ?? alltarget))
 					{
 						baseCombatEntity = item;
 					}

@@ -120,6 +120,9 @@ namespace ConVar
 		[ServerVar]
 		public static int ipQueriesPerMin = 30;
 
+		[ServerVar(Saved = true)]
+		public static int saveBackupCount = 2;
+
 		[ReplicatedVar(Saved = true)]
 		public static string motd = "";
 
@@ -260,6 +263,15 @@ namespace ConVar
 
 		[ServerVar(Help = "Censors the Steam player list to make player tracking more difficult")]
 		public static bool censorplayerlist = false;
+
+		[ServerVar(Help = "HTTP API endpoint for centralized banning (see wiki)")]
+		public static string bansServerEndpoint = "";
+
+		[ServerVar(Help = "Failure mode for centralized banning, set to 1 to reject players from joining if it's down (see wiki)")]
+		public static int bansServerFailureMode = 0;
+
+		[ServerVar(Help = "Timeout (in seconds) for centralized banning web server requests")]
+		public static int bansServerTimeout = 5;
 
 		[ServerVar(Saved = true)]
 		public static bool showHolsteredItems = true;
@@ -664,6 +676,18 @@ namespace ConVar
 			{
 				activePlayer.SendNetworkUpdate();
 			}
+		}
+
+		[ServerVar(Help = "Prints the position of all players on the server")]
+		public static void playerlistpos(Arg arg)
+		{
+			TextTable textTable = new TextTable();
+			textTable.AddColumns("SteamID", "DisplayName", "POS", "ROT");
+			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+			{
+				textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, activePlayer.transform.position.ToString(), activePlayer.transform.rotation.eulerAngles.ToString());
+			}
+			arg.ReplyWith(textTable.ToString());
 		}
 	}
 }

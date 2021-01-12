@@ -9,7 +9,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class MiniCopter : BaseHelicopterVehicle
+public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 {
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
@@ -135,6 +135,11 @@ public class MiniCopter : BaseHelicopterVehicle
 	public override void InitShared()
 	{
 		fuelSystem = new EntityFuelSystem(this, base.isServer);
+	}
+
+	public bool IsValidSAMTarget()
+	{
+		return true;
 	}
 
 	public override float GetServiceCeiling()

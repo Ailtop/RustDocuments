@@ -1,19 +1,20 @@
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
 public class EntityFuelSystem
 {
-	private readonly bool isServer;
+	public readonly bool isServer;
 
-	private readonly BaseEntity owner;
+	public readonly BaseEntity owner;
 
 	public EntityRef fuelStorageInstance;
 
-	private float nextFuelCheckTime;
+	public float nextFuelCheckTime;
 
-	private bool cachedHasFuel;
+	public bool cachedHasFuel;
 
-	private float pendingFuel;
+	public float pendingFuel;
 
 	public EntityFuelSystem(BaseEntity owner, bool isServer)
 	{
@@ -24,6 +25,11 @@ public class EntityFuelSystem
 	public bool IsInFuelInteractionRange(BasePlayer player)
 	{
 		StorageContainer fuelContainer = GetFuelContainer();
+		object obj = Interface.CallHook("CanCheckFuel", this, fuelContainer, player);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (fuelContainer != null)
 		{
 			float num = 0f;
@@ -67,6 +73,11 @@ public class EntityFuelSystem
 	public Item GetFuelItem()
 	{
 		StorageContainer fuelContainer = GetFuelContainer();
+		object obj = Interface.CallHook("OnFuelItemCheck", this, fuelContainer);
+		if (obj is Item)
+		{
+			return (Item)obj;
+		}
 		if (fuelContainer == null)
 		{
 			return null;
@@ -77,6 +88,11 @@ public class EntityFuelSystem
 	public int GetFuelAmount()
 	{
 		Item fuelItem = GetFuelItem();
+		object obj = Interface.CallHook("OnFuelAmountCheck", this, fuelItem);
+		if (obj is int)
+		{
+			return (int)obj;
+		}
 		if (fuelItem == null || fuelItem.amount < 1)
 		{
 			return 0;
@@ -88,8 +104,13 @@ public class EntityFuelSystem
 	{
 		if ((Time.time > nextFuelCheckTime) | forceCheck)
 		{
+			object obj = Interface.CallHook("OnFuelCheck", this);
+			if (obj is bool)
+			{
+				return (bool)obj;
+			}
 			cachedHasFuel = ((float)GetFuelAmount() > 0f);
-			nextFuelCheckTime = Time.time + Random.Range(1f, 2f);
+			nextFuelCheckTime = Time.time + UnityEngine.Random.Range(1f, 2f);
 		}
 		return cachedHasFuel;
 	}
@@ -97,6 +118,15 @@ public class EntityFuelSystem
 	public bool TryUseFuel(float seconds, float fuelUsedPerSecond)
 	{
 		StorageContainer fuelContainer = GetFuelContainer();
+		object obj = Interface.CallHook("CanUseFuel", this, fuelContainer, seconds, fuelUsedPerSecond);
+		if (obj != null)
+		{
+			if (!(obj is bool))
+			{
+				return false;
+			}
+			return (bool)obj;
+		}
 		if (fuelContainer == null)
 		{
 			return false;

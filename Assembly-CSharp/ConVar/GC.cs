@@ -70,8 +70,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void collect()
 		{
 			Rust.GC.Collect();

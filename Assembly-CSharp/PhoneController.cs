@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class PhoneController : EntityComponent<BaseEntity>
 {
-	private PhoneController activeCallTo;
+	public PhoneController activeCallTo;
 
 	public int PhoneNumber;
 
@@ -51,6 +51,10 @@ public class PhoneController : EntityComponent<BaseEntity>
 	public SoundDefinition FailedNetworkBusy;
 
 	public SoundDefinition FailedEngaged;
+
+	public SoundDefinition FailedRemoteHangUp;
+
+	public SoundDefinition FailedSelfHangUp;
 
 	public Light RingingLight;
 
@@ -192,17 +196,20 @@ public class PhoneController : EntityComponent<BaseEntity>
 		PhoneController telephone = TelephoneManager.GetTelephone(number);
 		if (telephone != null)
 		{
-			if (telephone.serverState == Telephone.CallState.Idle && telephone.CanReceiveCall())
+			if (Interface.CallHook("OnPhoneDial", this, telephone, currentPlayer) == null)
 			{
-				SetPhoneState(Telephone.CallState.Dialing);
-				lastDialedNumber = number;
-				activeCallTo = telephone;
-				activeCallTo.ReceiveCallFrom(this);
-			}
-			else
-			{
-				OnDialFailed(Telephone.DialFailReason.Engaged);
-				telephone.OnIncomingCallWhileBusy();
+				if (telephone.serverState == Telephone.CallState.Idle && telephone.CanReceiveCall())
+				{
+					SetPhoneState(Telephone.CallState.Dialing);
+					lastDialedNumber = number;
+					activeCallTo = telephone;
+					activeCallTo.ReceiveCallFrom(this);
+				}
+				else
+				{
+					OnDialFailed(Telephone.DialFailReason.Engaged);
+					telephone.OnIncomingCallWhileBusy();
+				}
 			}
 		}
 		else
@@ -213,6 +220,11 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	private bool CanReceiveCall()
 	{
+		object obj = Interface.CallHook("CanReceiveCall", this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (RequirePower && !IsPowered())
 		{
 			return false;
@@ -233,9 +245,13 @@ public class PhoneController : EntityComponent<BaseEntity>
 		if (!(activeCallTo == null))
 		{
 			BasePlayer player = msg.player;
-			UpdateServerPlayer(player);
-			BeginCall();
-			activeCallTo.BeginCall();
+			if (Interface.CallHook("OnPhoneAnswer", this, activeCallTo) == null)
+			{
+				UpdateServerPlayer(player);
+				BeginCall();
+				activeCallTo.BeginCall();
+				Interface.CallHook("OnPhoneAnswered", this, activeCallTo);
+			}
 		}
 	}
 
@@ -248,26 +264,34 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	private void TimeOutDialing()
 	{
-		activeCallTo.ServerPlayAnsweringMessage(this);
-		SetPhoneState(Telephone.CallState.Idle);
+		if (Interface.CallHook("OnPhoneDialTimeout", activeCallTo, this, activeCallTo.currentPlayer) == null)
+		{
+			activeCallTo.ServerPlayAnsweringMessage(this);
+			SetPhoneState(Telephone.CallState.Idle);
+			Interface.CallHook("OnPhoneDialTimedOut", activeCallTo, this, activeCallTo.currentPlayer);
+		}
 	}
 
 	public void OnDialFailed(Telephone.DialFailReason reason)
 	{
-		SetPhoneState(Telephone.CallState.Idle);
-		base.baseEntity.ClientRPC(null, "ClientOnDialFailed", (int)reason);
-		activeCallTo = null;
-		if (IsInvoking(TimeOutCall))
+		if (Interface.CallHook("OnPhoneDialFail", this, reason, currentPlayer) == null)
 		{
-			CancelInvoke(TimeOutCall);
-		}
-		if (IsInvoking(TriggerTimeOut))
-		{
-			CancelInvoke(TriggerTimeOut);
-		}
-		if (IsInvoking(TimeOutDialing))
-		{
-			CancelInvoke(TimeOutDialing);
+			SetPhoneState(Telephone.CallState.Idle);
+			base.baseEntity.ClientRPC(null, "ClientOnDialFailed", (int)reason);
+			activeCallTo = null;
+			if (IsInvoking(TimeOutCall))
+			{
+				CancelInvoke(TimeOutCall);
+			}
+			if (IsInvoking(TriggerTimeOut))
+			{
+				CancelInvoke(TriggerTimeOut);
+			}
+			if (IsInvoking(TimeOutDialing))
+			{
+				CancelInvoke(TimeOutDialing);
+			}
+			Interface.CallHook("OnPhoneDialFailed", this, reason, currentPlayer);
 		}
 	}
 
@@ -304,8 +328,12 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public void BeginCall()
 	{
-		SetPhoneStateWithPlayer(Telephone.CallState.InProcess);
-		Invoke(TimeOutCall, TelephoneManager.MaxCallLength);
+		if (Interface.CallHook("OnPhoneCallStart", this, activeCallTo, currentPlayer) == null)
+		{
+			SetPhoneStateWithPlayer(Telephone.CallState.InProcess);
+			Invoke(TimeOutCall, TelephoneManager.MaxCallLength);
+			Interface.CallHook("OnPhoneCallStarted", this, activeCallTo, currentPlayer);
+		}
 	}
 
 	public void ServerHangUp(BaseEntity.RPCMessage msg)
@@ -320,14 +348,19 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		if (activeCallTo != null)
 		{
-			activeCallTo.HangUp();
+			activeCallTo.RemoteHangUp();
 		}
-		HangUp();
+		SelfHangUp();
 	}
 
-	private void HangUp()
+	private void SelfHangUp()
 	{
-		OnDialFailed(Telephone.DialFailReason.HangUp);
+		OnDialFailed(Telephone.DialFailReason.SelfHangUp);
+	}
+
+	private void RemoteHangUp()
+	{
+		OnDialFailed(Telephone.DialFailReason.RemoteHangUp);
 	}
 
 	private void TimeOutCall()
@@ -360,7 +393,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		if (serverState != 0 && activeCallTo != null)
 		{
-			activeCallTo.HangUp();
+			activeCallTo.RemoteHangUp();
 		}
 	}
 

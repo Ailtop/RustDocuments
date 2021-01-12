@@ -6,8 +6,8 @@ namespace Rust.Ai
 {
 	public class PointDirectnessToTarget : WeightedScorerBase<Vector3>
 	{
-		[ApexSerialization]
 		[FriendlyName("Use Perfect Position Information", "Should we apply perfect knowledge about the attack target's whereabouts, or the last memorized position.")]
+		[ApexSerialization]
 		private bool UsePerfectInfo;
 
 		public override float GetScore(BaseContext c, Vector3 point)

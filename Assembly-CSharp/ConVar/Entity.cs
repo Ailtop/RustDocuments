@@ -102,8 +102,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_parent(Arg args)
 		{
 			uint filter = args.GetUInt(0);
@@ -111,8 +111,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void find_status(Arg args)
 		{
 			string filter = args.GetString(0);
@@ -120,8 +120,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void find_radius(Arg args)
 		{
 			BasePlayer player = ArgEx.Player(args);
@@ -133,8 +133,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_self(Arg args)
 		{
 			BasePlayer basePlayer = ArgEx.Player(args);

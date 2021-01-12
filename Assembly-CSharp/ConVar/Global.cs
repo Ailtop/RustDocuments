@@ -17,8 +17,8 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int maxthreads = 8;
 
 		[ClientVar(Saved = true)]
@@ -431,8 +431,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -449,8 +449,8 @@ namespace ConVar
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);

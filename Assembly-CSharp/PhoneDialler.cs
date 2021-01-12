@@ -1,5 +1,6 @@
 using Rust.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PhoneDialler : UIDialog
 {
@@ -22,6 +23,8 @@ public class PhoneDialler : UIDialog
 	public RustButton DefaultDialViewButton;
 
 	public RustText[] IncomingCallNumber;
+
+	public GameObject NumberDialRoot;
 
 	public RustButton ContactsButton;
 
@@ -54,4 +57,8 @@ public class PhoneDialler : UIDialog
 	public GameObject NoContactsRoot;
 
 	public RustButton AddContactButton;
+
+	public SoundDefinition DialToneSfx;
+
+	public Button[] NumberButtons;
 }

@@ -4,8 +4,8 @@ using UnityEngine.Sprites;
 
 namespace UnityEngine.UI.Extensions
 {
-	[AddComponentMenu("UI/Extensions/Primitives/UILineRenderer")]
 	[RequireComponent(typeof(RectTransform))]
+	[AddComponentMenu("UI/Extensions/Primitives/UILineRenderer")]
 	public class UILineRenderer : UIPrimitiveBase
 	{
 		private enum SegmentType
@@ -63,8 +63,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
 		internal Vector2[] m_points;
 
-		[Tooltip("Segments to be drawn\n This is a list of arrays of points")]
 		[SerializeField]
+		[Tooltip("Segments to be drawn\n This is a list of arrays of points")]
 		internal List<Vector2[]> m_segments;
 
 		[SerializeField]
@@ -79,8 +79,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Do the points identify a single line or split pairs of lines")]
 		internal bool lineList;
 
-		[Tooltip("Add end caps to each line\nMultiple caps when used with Line List")]
 		[SerializeField]
+		[Tooltip("Add end caps to each line\nMultiple caps when used with Line List")]
 		internal bool lineCaps;
 
 		[SerializeField]

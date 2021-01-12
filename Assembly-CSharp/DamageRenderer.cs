@@ -21,8 +21,8 @@ public class DamageRenderer : MonoBehaviour, IClientComponent
 	[SerializeField]
 	private List<Material> damageShowingMats;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<DamageShowingRenderer> damageShowingRenderers;
 
 	[SerializeField]

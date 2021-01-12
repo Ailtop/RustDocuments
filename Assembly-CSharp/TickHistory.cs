@@ -17,22 +17,22 @@ public class TickHistory
 		AddPoint(point);
 	}
 
-	public float Distance(Vector3 point, Bounds bounds)
+	public float Distance(BasePlayer player, Vector3 point)
 	{
 		if (points.Count == 0)
 		{
-			return 0f;
+			return player.Distance(point);
 		}
-		if (points.Count == 1)
-		{
-			Vector3 a = points[0];
-			return new Bounds(a + bounds.center, bounds.size).SqrDistance(point);
-		}
+		Vector3 position = player.transform.position;
+		Bounds bounds = player.bounds;
+		Matrix4x4 tickHistoryMatrix = player.tickHistoryMatrix;
 		float num = float.MaxValue;
-		for (int i = 1; i < points.Count; i++)
+		for (int i = 0; i < points.Count; i++)
 		{
-			Vector3 a2 = new Line(points[i - 1], points[i]).ClosestPoint(point);
-			num = Mathf.Min(num, new Bounds(a2 + bounds.center, bounds.size).SqrDistance(point));
+			Vector3 point2 = tickHistoryMatrix.MultiplyPoint3x4(points[i]);
+			Vector3 point3 = (i == points.Count - 1) ? position : tickHistoryMatrix.MultiplyPoint3x4(points[i + 1]);
+			Vector3 a = new Line(point2, point3).ClosestPoint(point);
+			num = Mathf.Min(num, new Bounds(a + bounds.center, bounds.size).SqrDistance(point));
 		}
 		return Mathf.Sqrt(num);
 	}

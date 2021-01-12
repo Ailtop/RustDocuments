@@ -166,7 +166,7 @@ public class Workbench : StorageContainer
 				}
 				Debug.Log("Player unlocked group :" + byID.groupName);
 			}
-			else if (byID.itemDef != null)
+			else if (byID.itemDef != null && Interface.CallHook("OnTechTreeNodeUnlock", this, byID, player) == null)
 			{
 				int num2 = ResearchTable.ScrapForResearch(byID.itemDef);
 				int itemid = ItemManager.FindItemDefinition("scrap").itemid;
@@ -174,6 +174,7 @@ public class Workbench : StorageContainer
 				{
 					player.inventory.Take(null, itemid, num2);
 					player.blueprints.Unlock(byID.itemDef);
+					Interface.CallHook("OnTechTreeNodeUnlocked", this, byID, player);
 				}
 			}
 		}
@@ -188,8 +189,8 @@ public class Workbench : StorageContainer
 		return blueprintBaseDef;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_BeginExperiment(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -22,8 +22,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool waterlogged;
 
-	[HideInInspector]
 	[Header("Modular Vehicle")]
+	[HideInInspector]
 	public float mass;
 
 	[SerializeField]
@@ -478,6 +478,11 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	}
 
 	public abstract float GetMaxForwardSpeed();
+
+	public virtual bool PlayerCanUseThis(BasePlayer player, ModularCarLock.LockType lockType)
+	{
+		return true;
+	}
 
 	public bool TryDeduceSocketIndex(BaseVehicleModule addedModule, out int index)
 	{

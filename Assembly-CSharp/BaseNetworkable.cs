@@ -421,7 +421,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		}
 	}
 
-	protected List<Connection> GetSubscribers()
+	public List<Connection> GetSubscribers()
 	{
 		if (net == null)
 		{
@@ -460,7 +460,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		}
 	}
 
-	private void TerminateOnClient(DestroyMode mode)
+	public void TerminateOnClient(DestroyMode mode)
 	{
 		if (net != null && net.group != null && Network.Net.sv.IsConnected())
 		{
@@ -524,7 +524,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		}
 	}
 
-	protected void SendAsSnapshot(Connection connection, bool justCreated = false)
+	public void SendAsSnapshot(Connection connection, bool justCreated = false)
 	{
 		if (Interface.CallHook("OnEntitySnapshot", this, connection) == null && Network.Net.sv.write.Start())
 		{

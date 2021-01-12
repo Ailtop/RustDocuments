@@ -888,8 +888,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -930,8 +930,8 @@ public class BaseProjectile : AttackEntity
 		fractionalInsertCounter = 0;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void StartReload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -954,8 +954,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void ServerFractionalReloadInsert(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1012,8 +1012,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Reload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1064,8 +1064,8 @@ public class BaseProjectile : AttackEntity
 	}
 
 	[RPC_Server.IsActiveItem]
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

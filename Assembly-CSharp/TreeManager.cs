@@ -98,8 +98,8 @@ public class TreeManager : BaseEntity
 		tree.scale = treeEntity.transform.lossyScale.y;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(0uL)]
+	[RPC_Server]
 	private void SERVER_RequestTrees(RPCMessage msg)
 	{
 		BufferList<TreeEntity> values = TreeEntity.activeTreeList.Values;

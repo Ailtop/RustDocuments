@@ -9,7 +9,7 @@ public class ModularCarLock
 	public enum LockType
 	{
 		Door,
-		Storage
+		General
 	}
 
 	private readonly bool isServer;
@@ -71,7 +71,7 @@ public class ModularCarLock
 		return player.inventory.FindItemIDs(owner.carKeyDefinition.itemid).Any((Item key) => KeyCanUnlockThis(key));
 	}
 
-	public bool PlayerCanOpenThis(BasePlayer player, LockType lockType)
+	public bool PlayerCanUseThis(BasePlayer player, LockType lockType)
 	{
 		if (lockType == LockType.Door && !CentralLockingIsOn)
 		{

@@ -533,13 +533,16 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				updateItemContainer.container = Facepunch.Pool.Get<List<ProtoBuf.ItemContainer>>();
 				updateItemContainer.container.Add(container.Save());
 			}
-			if (bSendInventoryToEveryone)
+			if (Interface.CallHook("OnInventoryNetworkUpdate", this, container, updateItemContainer, type, bSendInventoryToEveryone) == null)
 			{
-				base.baseEntity.ClientRPC(null, "UpdatedItemContainer", updateItemContainer);
-			}
-			else
-			{
-				base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdatedItemContainer", updateItemContainer);
+				if (bSendInventoryToEveryone)
+				{
+					base.baseEntity.ClientRPC(null, "UpdatedItemContainer", updateItemContainer);
+				}
+				else
+				{
+					base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdatedItemContainer", updateItemContainer);
+				}
 			}
 		}
 	}

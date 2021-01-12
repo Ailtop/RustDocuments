@@ -114,7 +114,7 @@ public class ResearchTable : StorageContainer
 
 	public int ScrapForResearch(Item item)
 	{
-		object obj = Interface.CallHook("OnItemScrap", this, item);
+		object obj = Interface.CallHook("OnResearchCostDetermine", item, this);
 		if (obj is int)
 		{
 			return (int)obj;
@@ -141,6 +141,11 @@ public class ResearchTable : StorageContainer
 
 	public static int ScrapForResearch(ItemDefinition info)
 	{
+		object obj = Interface.CallHook("OnResearchCostDetermine", info);
+		if (obj is int)
+		{
+			return (int)obj;
+		}
 		int result = 0;
 		if (info.rarity == Rarity.Common)
 		{

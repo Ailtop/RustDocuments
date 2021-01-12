@@ -86,8 +86,8 @@ namespace Rust.Modular
 		[Header("Brakes")]
 		private SoundDefinition brakeSoundDef;
 
-		[SerializeField]
 		[Header("Lights")]
+		[SerializeField]
 		private SoundDefinition lightsToggleSound;
 
 		[Header("Wheels")]

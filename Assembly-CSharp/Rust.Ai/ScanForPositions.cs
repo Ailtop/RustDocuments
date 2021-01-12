@@ -13,8 +13,8 @@ namespace Rust.Ai
 		[FriendlyName("Sampling Range", "How large a range points are sampled in, in a square with the entity in the center")]
 		public float SamplingRange = 12f;
 
-		[ApexSerialization(defaultValue = 1.5f)]
 		[FriendlyName("Sampling Density", "How much distance there is between individual samples")]
+		[ApexSerialization(defaultValue = 1.5f)]
 		public int SampleRings = 3;
 
 		[ApexSerialization(defaultValue = false)]

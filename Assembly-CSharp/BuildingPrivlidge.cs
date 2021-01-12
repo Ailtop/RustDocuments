@@ -587,8 +587,8 @@ public class BuildingPrivlidge : StorageContainer
 		authorizedPlayers.Add(playerNameID);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RemoveSelfAuthorize(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardDeauthorize", this, rpc.player) == null)
@@ -598,8 +598,8 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ClearList(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardClearList", this, rpc.player) == null)

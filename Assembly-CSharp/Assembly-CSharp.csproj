@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{343C2DA8-9815-4AFF-852B-B1936BD6C1DE}</ProjectGuid>
+    <ProjectGuid>{C5F22EDB-05A8-4E56-B1C0-E127D7F67724}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
@@ -198,6 +198,9 @@
     <Reference Include="Facepunch.Raknet">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Raknet.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
     <Reference Include="GA">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\GA.dll</HintPath>
     </Reference>
@@ -286,6 +289,7 @@
     <Compile Include="AudioInterceptComponent.cs" />
     <Compile Include="AudioSettings.cs" />
     <Compile Include="AuroraEffect.cs" />
+    <Compile Include="Auth_CentralizedBans.cs" />
     <Compile Include="Auth_EAC.cs" />
     <Compile Include="Auth_Steam.cs" />
     <Compile Include="AutoTurret.cs" />
@@ -526,6 +530,7 @@
     <Compile Include="ConstructionSkin.cs" />
     <Compile Include="ConstructionSocket.cs" />
     <Compile Include="ConstructionSocket_Elevator.cs" />
+    <Compile Include="Construction_SleepingBag.cs" />
     <Compile Include="ConsumableInformationPanel.cs" />
     <Compile Include="ContainerIOEntity.cs" />
     <Compile Include="ContainerSourceLocalPlayer.cs" />

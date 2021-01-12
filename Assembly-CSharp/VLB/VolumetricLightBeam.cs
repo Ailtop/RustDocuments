@@ -6,10 +6,10 @@ using UnityEngine.Serialization;
 
 namespace VLB
 {
-	[SelectionBase]
-	[DisallowMultipleComponent]
-	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	[ExecuteInEditMode]
+	[DisallowMultipleComponent]
+	[SelectionBase]
+	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	public class VolumetricLightBeam : MonoBehaviour
 	{
 		public bool colorFromLight = true;

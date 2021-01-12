@@ -630,8 +630,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
 		if (!IsOnline() && rpc.player.CanBuild() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
@@ -667,8 +667,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SERVER_Peacekeeper(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))

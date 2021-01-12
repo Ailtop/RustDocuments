@@ -256,8 +256,8 @@ namespace ConVar
 			return false;
 		}
 
-		[ServerVar]
 		[Help("Return the last x lines of the console. Default is 200")]
+		[ServerVar]
 		public static IEnumerable<ChatEntry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);

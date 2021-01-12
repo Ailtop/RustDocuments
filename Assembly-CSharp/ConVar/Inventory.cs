@@ -483,8 +483,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void defs(Arg arg)
 		{
 			if (Steamworks.SteamInventory.Definitions == null)

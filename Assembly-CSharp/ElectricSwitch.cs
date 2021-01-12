@@ -111,8 +111,8 @@ public class ElectricSwitch : IOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SVSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnSwitchToggle", this, msg.player) == null)

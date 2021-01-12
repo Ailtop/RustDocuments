@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 public class BaseVehicle : BaseMountable
 {
@@ -38,6 +39,8 @@ public class BaseVehicle : BaseMountable
 	[Header("Mount Points")]
 	public List<MountPointInfo> mountPoints;
 
+	public bool doClippingAndVisChecks = true;
+
 	[Header("Damage")]
 	public DamageRenderer damageRenderer;
 
@@ -51,7 +54,8 @@ public class BaseVehicle : BaseMountable
 
 	public TimeSince timeSinceLastPush;
 
-	public bool seatClipCheck;
+	[FormerlySerializedAs("seatClipCheck")]
+	public bool continuousClippingCheck;
 
 	private Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
 
@@ -161,7 +165,7 @@ public class BaseVehicle : BaseMountable
 	protected override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (seatClipCheck && HasAnyPassengers())
+		if (continuousClippingCheck && HasAnyPassengers())
 		{
 			Vector3 center = base.transform.TransformPoint(bounds.center);
 			int layerMask = 1210122497;
@@ -208,6 +212,10 @@ public class BaseVehicle : BaseMountable
 
 	public virtual bool IsSeatVisible(BaseMountable mountable, Vector3 eyePos, int mask = 1218511105)
 	{
+		if (!doClippingAndVisChecks)
+		{
+			return true;
+		}
 		if (mountable == null)
 		{
 			return false;
@@ -218,6 +226,10 @@ public class BaseVehicle : BaseMountable
 
 	public virtual bool IsSeatClipping(BaseMountable mountable, int mask = 1218511105)
 	{
+		if (!doClippingAndVisChecks)
+		{
+			return false;
+		}
 		if (mountable == null)
 		{
 			return false;

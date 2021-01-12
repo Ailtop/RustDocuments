@@ -95,7 +95,7 @@ namespace Rust.Modular
 
 		private TimeSince timeSinceDragModSet;
 
-		private TimeSince timeSinceWaterCheck;
+		public TimeSince timeSinceWaterCheck;
 
 		public float DriveWheelVelocity
 		{
@@ -316,7 +316,7 @@ namespace Rust.Modular
 			dragModDuration = duration;
 		}
 
-		private float GetModifiedDrag()
+		public float GetModifiedDrag()
 		{
 			return (1f - Mathf.InverseLerp(0f, dragModDuration, timeSinceDragModSet)) * dragMod;
 		}

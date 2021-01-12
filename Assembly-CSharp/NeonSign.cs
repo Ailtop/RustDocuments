@@ -38,15 +38,15 @@ public class NeonSign : Signage
 
 	public Material inactiveMaterial;
 
-	private float animationSpeed = 1f;
+	public float animationSpeed = 1f;
 
-	private int currentFrame;
+	public int currentFrame;
 
-	private List<ProtoBuf.NeonSign.Lights> frameLighting;
+	public List<ProtoBuf.NeonSign.Lights> frameLighting;
 
-	private bool isAnimating;
+	public bool isAnimating;
 
-	private Action animationLoopAction;
+	public Action animationLoopAction;
 
 	public AmbienceEmitter ambientSoundEmitter;
 
@@ -242,9 +242,9 @@ public class NeonSign : Signage
 		info.msg.neonSign.animationSpeed = animationSpeed;
 	}
 
+	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.MaxDistance(3f)]
 	public void SetAnimationSpeed(RPCMessage msg)
 	{
 		float num = animationSpeed = Mathf.Clamp(msg.read.Float(), 0.5f, 5f);
@@ -276,7 +276,7 @@ public class NeonSign : Signage
 		}
 	}
 
-	private void EnsureInitialized()
+	public new void EnsureInitialized()
 	{
 		if (frameLighting == null)
 		{

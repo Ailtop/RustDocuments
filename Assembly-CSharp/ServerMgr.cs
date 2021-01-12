@@ -489,15 +489,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 			return;
 		}
-		if (packet.connection.protocol > 2274)
+		if (packet.connection.protocol > 2275)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2274);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2275);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 			return;
 		}
-		if (packet.connection.protocol < 2274)
+		if (packet.connection.protocol < 2275)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2274);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2275);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 			return;
 		}
@@ -1006,7 +1006,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
 				string text3 = $"gm{GamemodeName()}";
 				string text4 = ConVar.Server.pve ? ",pve" : string.Empty;
-				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2274}{text4},h{AssemblyHash},{text},{text2},{text3}";
+				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2275}{text4},h{AssemblyHash},{text},{text2},{text3}";
 				Interface.CallHook("IOnUpdateServerInformation");
 				if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 				{
