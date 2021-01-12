@@ -1,0 +1,2500 @@
+[
+  {
+    "folder": "assets/bundled/prefabs/fx",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/bucket_drop_debris.prefab",
+      "assets/bundled/prefabs/fx/dig_effect.prefab",
+      "assets/bundled/prefabs/fx/elevator_arrive.prefab",
+      "assets/bundled/prefabs/fx/fire_explosion.prefab",
+      "assets/bundled/prefabs/fx/firebomb.prefab",
+      "assets/bundled/prefabs/fx/gas_explosion_small.prefab",
+      "assets/bundled/prefabs/fx/headshot.prefab",
+      "assets/bundled/prefabs/fx/headshot_2d.prefab",
+      "assets/bundled/prefabs/fx/hit_notify.prefab",
+      "assets/bundled/prefabs/fx/invite_notice.prefab",
+      "assets/bundled/prefabs/fx/item_break.prefab",
+      "assets/bundled/prefabs/fx/item_unlock.prefab",
+      "assets/bundled/prefabs/fx/missing.prefab",
+      "assets/bundled/prefabs/fx/oil_geyser.prefab",
+      "assets/bundled/prefabs/fx/ore_break.prefab",
+      "assets/bundled/prefabs/fx/screen_jump.prefab",
+      "assets/bundled/prefabs/fx/screen_land.prefab",
+      "assets/bundled/prefabs/fx/smoke_cover_full.prefab",
+      "assets/bundled/prefabs/fx/smoke_signal.prefab",
+      "assets/bundled/prefabs/fx/smoke_signal_full.prefab",
+      "assets/bundled/prefabs/fx/survey_explosion.prefab",
+      "assets/bundled/prefabs/fx/takedamage_generic.prefab",
+      "assets/bundled/prefabs/fx/takedamage_hit.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/animals/flies",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/animals/flies/flies_large.prefab",
+      "assets/bundled/prefabs/fx/animals/flies/flies_looping.prefab",
+      "assets/bundled/prefabs/fx/animals/flies/flies_medium.prefab",
+      "assets/bundled/prefabs/fx/animals/flies/flies_small.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/beartrap",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/beartrap/arm.prefab",
+      "assets/bundled/prefabs/fx/beartrap/fire.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/build",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/build/frame_place.prefab",
+      "assets/bundled/prefabs/fx/build/promote_metal.prefab",
+      "assets/bundled/prefabs/fx/build/promote_stone.prefab",
+      "assets/bundled/prefabs/fx/build/promote_toptier.prefab",
+      "assets/bundled/prefabs/fx/build/promote_wood.prefab",
+      "assets/bundled/prefabs/fx/build/repair.prefab",
+      "assets/bundled/prefabs/fx/build/repair_failed.prefab",
+      "assets/bundled/prefabs/fx/build/repair_full.prefab",
+      "assets/bundled/prefabs/fx/build/repair_full_metal.prefab",
+      "assets/bundled/prefabs/fx/build/repair_metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/building",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/building/fort_metal_gib.prefab",
+      "assets/bundled/prefabs/fx/building/metal_sheet_gib.prefab",
+      "assets/bundled/prefabs/fx/building/stone_gib.prefab",
+      "assets/bundled/prefabs/fx/building/thatch_gib.prefab",
+      "assets/bundled/prefabs/fx/building/wood_gib.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/collect",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/collect/collect fuel barrel.prefab",
+      "assets/bundled/prefabs/fx/collect/collect mushroom.prefab",
+      "assets/bundled/prefabs/fx/collect/collect plant.prefab",
+      "assets/bundled/prefabs/fx/collect/collect stone.prefab",
+      "assets/bundled/prefabs/fx/collect/collect stump.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blood/decal_blood_splatter_01.prefab",
+      "assets/bundled/prefabs/fx/decals/blood/decal_blood_splatter_02.prefab",
+      "assets/bundled/prefabs/fx/decals/blood/decal_blood_splatter_03.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/dirt/decal_blunt_dirt_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/forest/decal_blunt_forest_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/glass/decal_blunt_glass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/grass/decal_blunt_grass_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/metalore/decal_blunt_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/path",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/path/decal_blunt_path_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/rock/decal_blunt_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/sand/decal_blunt_sand_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/snow/decal_blunt_snow_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/tundra/decal_blunt_tundra_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/wood/wood 1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/concrete/decal_bullet_concrete_01.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/concrete/decal_bullet_concrete_02.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/concrete/decal_bullet_concrete_03.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/concrete/decal_bullet_concrete_04.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/dirt/decal_bullet_dirt_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/flesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/flesh/decal_bullet_flesh_entry_01.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/flesh/decal_bullet_flesh_exit_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/forest/decal_bullet_forest_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/glass/decal_bullet_glass.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/glass/decal_bullet_glass2.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/glass/decal_bullet_glass3.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/grass/decal_bullet_grass_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/metal/decal_bullet_metal_01.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/metal/decal_bullet_metal_02.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/metal/decal_bullet_metal_03.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/metalore/decal_bullet_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/path",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/path/decal_bullet_road_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/rock/decal_bullet_rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/sand/decal_bullet_sand_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/sandbag",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/sandbag/decal_bullet_sandbag_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/snow/decal_bullet_snow_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/tundra/decal_bullet_tundra.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/wood/decal_bullet_wood_01.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/wood/decal_bullet_wood_02.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/wood/decal_bullet_wood_03.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/wood/decal_bullet_wood_04.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/bare/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/bare/dirt/decal_footprint_human_bare_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/bare/dirt/decal_footprint_human_bare_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/bare/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/bare/forest/decal_footprint_human_bare_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/bare/forest/decal_footprint_human_bare_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/bare/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/bare/grass/decal_footprint_human_bare_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/bare/grass/decal_footprint_human_bare_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/bare/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/bare/sand/decal_footprint_human_sand_bare_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/bare/sand/decal_footprint_human_sand_bare_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/bare/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/bare/snow/decal_footprint_human_bare_snow_right.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/bare/snow/decal_footprint_human_snow_bare_left.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/bare/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/bare/tundra/decal_footprint_human_bare_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/bare/tundra/decal_footprint_human_bare_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/boot/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/boot/dirt/decal_footprint_human_boot_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/boot/dirt/decal_footprint_human_boot_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/boot/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/boot/forest/decal_footprint_human_boot_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/boot/forest/decal_footprint_human_boot_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/boot/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/boot/grass/decal_footprint_human_boot_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/boot/grass/decal_footprint_human_boot_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/boot/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/boot/sand/decal_footprint_human_sand_boot_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/boot/sand/decal_footprint_human_sand_boot_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/boot/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/boot/snow/decal_footprint_human_snow_boot_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/boot/snow/decal_footprint_human_snow_boot_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/footstep/boot/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/footstep/boot/tundra/decal_footprint_human_boot_left.prefab",
+      "assets/bundled/prefabs/fx/decals/footstep/boot/tundra/decal_footprint_human_boot_right.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/dirt/decal_slash_dirt_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/forest/decal_slash_forest_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/glass/decal_slash_glass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/grass/decal_slash_grass_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/metalore/decal_slash_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/path",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/path/decal_slash_path_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/rock/decal_slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/sand/decal_slash_sand_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/snow/decal_slash_snow_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/tundra/decal_slash_tundra_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/wood/wood 1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/concrete/decal_stab_concrete_01.prefab",
+      "assets/bundled/prefabs/fx/decals/stab/concrete/decal_stab_concrete_02.prefab",
+      "assets/bundled/prefabs/fx/decals/stab/concrete/decal_stab_concrete_03.prefab",
+      "assets/bundled/prefabs/fx/decals/stab/concrete/decal_stab_concrete_04.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/dirt/decal_stab_dirt_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/flesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/flesh/decal_stab_flesh_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/forest/decal_stab_forest_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/glass/decal_stab_glass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/grass/decal_stab_grass_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/metalore/decal_stab_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/path",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/path/decal_stab_path_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/rock/decal_stab_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/sand/decal_stab_sand_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/snow/decal_stab_snow_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/tundra/decal_stab_snow_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/displacement/player/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/displacement/player/grass/player_displacement.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/door",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/door/barricade_spawn.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/entities/loot_barrel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/entities/loot_barrel/gib.prefab",
+      "assets/bundled/prefabs/fx/entities/loot_barrel/impact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/entities/pumpkin",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/entities/pumpkin/gib.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/entities/tree",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/entities/tree/tree-impact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/explosions",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/explosions/explosion_01.prefab",
+      "assets/bundled/prefabs/fx/explosions/explosion_02.prefab",
+      "assets/bundled/prefabs/fx/explosions/explosion_03.prefab",
+      "assets/bundled/prefabs/fx/explosions/explosion_core.prefab",
+      "assets/bundled/prefabs/fx/explosions/explosion_core_flash.prefab",
+      "assets/bundled/prefabs/fx/explosions/water_bomb.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/fire",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/fire/fire_v2.prefab",
+      "assets/bundled/prefabs/fx/fire/fire_v3.prefab",
+      "assets/bundled/prefabs/fx/fire/oilbarrel-fire.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/gestures",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/gestures/cameratakescreenshot.prefab",
+      "assets/bundled/prefabs/fx/gestures/cut_meat.prefab",
+      "assets/bundled/prefabs/fx/gestures/drink_generic.prefab",
+      "assets/bundled/prefabs/fx/gestures/drink_tea.prefab",
+      "assets/bundled/prefabs/fx/gestures/drink_vomit.prefab",
+      "assets/bundled/prefabs/fx/gestures/eat_candybar.prefab",
+      "assets/bundled/prefabs/fx/gestures/eat_celery.prefab",
+      "assets/bundled/prefabs/fx/gestures/eat_chewy_meat.prefab",
+      "assets/bundled/prefabs/fx/gestures/eat_chips.prefab",
+      "assets/bundled/prefabs/fx/gestures/eat_generic.prefab",
+      "assets/bundled/prefabs/fx/gestures/eat_soft.prefab",
+      "assets/bundled/prefabs/fx/gestures/lick.prefab",
+      "assets/bundled/prefabs/fx/gestures/take_pills.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/additive",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/additive/explosion.prefab",
+      "assets/bundled/prefabs/fx/impacts/additive/fire.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/cloth/cloth1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/clothflesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/clothflesh/clothflesh1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/concrete/concrete1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/dirt/dirt1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/flesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/flesh/fleshbloodimpact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/generic/generic1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/glass/glass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/grass/grass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/gravel/slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/metal/metal1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/metalore/slash_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/rock/slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/sand/sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/snow/snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/stones/slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/water/water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/wood/wood1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/cloth/cloth1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/clothflesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/clothflesh/clothflesh1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/concrete/concrete1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/dirt/dirt1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/flesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/flesh/fleshbloodimpact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/forest/forest1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/generic/generic1.prefab",
+      "assets/bundled/prefabs/fx/impacts/bullet/generic/generic2.prefab",
+      "assets/bundled/prefabs/fx/impacts/bullet/generic/generic3.prefab",
+      "assets/bundled/prefabs/fx/impacts/bullet/generic/generic4.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/glass/glass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/grass/grass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/gravel/bullet_impact_rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/metal/metal1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/metalore/bullet_impact_metalore.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/path",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/path/path1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/rock/bullet_impact_rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/sand/sand1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/sandbag",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/sandbag/sand_bag_impact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/snow/snow1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/stones/bullet_impact_rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/tundra",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/tundra/bullet_impact_tundra.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/water/water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/wood/wood1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/cloth/footstep-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/concrete/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/dirt/footstep-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/forest/footstep-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/generic/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/grass/footstep-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/gravel/footstep-gravel.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/metal/footstep-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/metalore/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/rock/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/sand/footstep-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/snow/human_footstep_snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/stones/footstep-stones.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/water/boot_footstep_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/barefoot/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/barefoot/wood/footstep-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/cloth/footstep-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/concrete/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/dirt/footstep-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/forest/footstep-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/generic/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/grass/footstep-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/gravel/footstep-gravel.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/metal/footstep-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/metalore/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/rock/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/sand/footstep-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/snow/human_footstep_snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/stones/footstep-stones.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/water/boot_footstep_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/boots/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/boots/wood/footstep-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/cloth/footstep-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/concrete/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/dirt/footstep-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/forest/footstep-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/generic/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/grass/footstep-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/gravel/footstep-gravel.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/metal/footstep-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/metalore/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/rock/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/sand/footstep-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/snow/human_footstep_snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/stones/footstep-stones.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/water/boot_footstep_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/burlap/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/burlap/wood/footstep-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/crouch/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/crouch/water/boot_footstep_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/cloth/footstep-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/concrete/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/dirt/footstep-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/forest/footstep-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/generic/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/grass/footstep-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/gravel/footstep-gravel.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/metal/footstep-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/metalore/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/rock/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/sand/footstep-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/snow/human_footstep_snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/stones/footstep-stones.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/water/boot_footstep_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/hide/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/hide/wood/footstep-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/cloth/footstep-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/concrete/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/dirt/footstep-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/forest/footstep-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/generic/footstep-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/grass/footstep-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/gravel/footstep-gravel.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/metal/footstep-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/metalore/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/rock/footstep-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/sand/footstep-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/snow/human_footstep_snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/stones/footstep-stones.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/water/boot_footstep_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/rubberboots/wood/footstep-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/gravel/jump-land-gravel.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/stones/jump-land-stones.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/barefoot/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/boots/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/boots/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/burlap/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/burlap/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/hide/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/hide/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-land/rubberboots/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/barefoot/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/boots/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/boots/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/burlap/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/burlap/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/hide/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/hide/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/cloth/jump-land-cloth.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/concrete/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/dirt/jump-land-dirt.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/forest",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/forest/jump-land-forest.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/generic/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/grass/jump-land-grass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/gravel/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/metal/jump-land-metal.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/metalore/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/rock/jump-land-rock.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/sand/jump-land-sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/snow/jump-land-snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/stones/jump-land-concrete.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/water/jump_land_water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/jump-start/rubberboots/wood/jump-land-wood.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/physics",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-meat-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-meat-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-meat-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-can-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-can-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-can-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-hollow-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-hollow-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-hollow-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-medium-rattley-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-medium-rattley-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-medium-rattley-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-thin-hollow-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-thin-hollow-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-metal-thin-hollow-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-stone-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-stone-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-stone-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-tool-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-tool-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-tool-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-wood-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-wood-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-wood-small-hard.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-wood-small-med.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-wood-small-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/phys-impact-wood-soft.prefab",
+      "assets/bundled/prefabs/fx/impacts/physics/water-enter-exit.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/blood12slash_1.prefab",
+      "assets/bundled/prefabs/fx/impacts/slash/blood12slash_2.prefab",
+      "assets/bundled/prefabs/fx/impacts/slash/blood13slash.prefab",
+      "assets/bundled/prefabs/fx/impacts/slash/blood14slash.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/cloth/cloth1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/clothflesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/clothflesh/clothflesh1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/concrete/slash_concrete_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/dirt/dirt1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/flesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/flesh/fleshbloodimpact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/generic/generic1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/glass/glass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/grass/grass1.prefab",
+      "assets/bundled/prefabs/fx/impacts/slash/grass/grass2.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/gravel/slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/metal/metal1.prefab",
+      "assets/bundled/prefabs/fx/impacts/slash/metal/metal2.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/metalore/slash_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/rock/slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/sand/sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/snow/snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/stones/slash_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/water/water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/wood/wood1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/cloth",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/cloth/cloth1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/clothflesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/clothflesh/clothflesh1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/concrete",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/concrete/concrete1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/dirt",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/dirt/dirt1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/flesh",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/flesh/fleshbloodimpact.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/generic",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/generic/generic1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/glass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/glass/glass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/grass",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/grass/grass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/gravel",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/gravel/stab_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/metal",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/metal/metal1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/metalore",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/metalore/slash_metalore_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/rock",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/rock/stab_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/sand",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/sand/sand.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/snow",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/snow/snow.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/stones",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/stones/stab_rock_01.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/water/water.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/wood",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/wood/wood1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/notice",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/notice/item.select.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/loot.copy.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/loot.drag.dropsuccess.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/loot.drag.grab.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/loot.drag.itemdrop.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/loot.start.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/stack.ui.fx.prefab",
+      "assets/bundled/prefabs/fx/notice/stack.world.fx.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/oiljack",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/oiljack/pump_down.prefab",
+      "assets/bundled/prefabs/fx/oiljack/pump_up.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/player",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/player/beartrap_blood.prefab",
+      "assets/bundled/prefabs/fx/player/beartrap_clothing_rustle.prefab",
+      "assets/bundled/prefabs/fx/player/beartrap_scream.prefab",
+      "assets/bundled/prefabs/fx/player/bloodspurt_wounded_head.prefab",
+      "assets/bundled/prefabs/fx/player/bloodspurt_wounded_leftarm.prefab",
+      "assets/bundled/prefabs/fx/player/bloodspurt_wounded_pelvis.prefab",
+      "assets/bundled/prefabs/fx/player/bloodspurt_wounded_stomache.prefab",
+      "assets/bundled/prefabs/fx/player/debugeffect.prefab",
+      "assets/bundled/prefabs/fx/player/drown.prefab",
+      "assets/bundled/prefabs/fx/player/fall-damage.prefab",
+      "assets/bundled/prefabs/fx/player/flinch.prefab",
+      "assets/bundled/prefabs/fx/player/frosty_breath.prefab",
+      "assets/bundled/prefabs/fx/player/groundfall.prefab",
+      "assets/bundled/prefabs/fx/player/gutshot_scream.prefab",
+      "assets/bundled/prefabs/fx/player/howl.prefab",
+      "assets/bundled/prefabs/fx/player/onfire.prefab",
+      "assets/bundled/prefabs/fx/player/swing_weapon.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/repairbench",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/repairbench/itemrepair.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/ricochet",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/ricochet/ricochet1.prefab",
+      "assets/bundled/prefabs/fx/ricochet/ricochet2.prefab",
+      "assets/bundled/prefabs/fx/ricochet/ricochet3.prefab",
+      "assets/bundled/prefabs/fx/ricochet/ricochet4.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/smoke",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/smoke/generator_smoke.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/vehicle",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/vehicle/vehicle_glass_fx_1modarmored.prefab",
+      "assets/bundled/prefabs/fx/vehicle/vehicle_glass_fx_1modcockpit.prefab",
+      "assets/bundled/prefabs/fx/vehicle/vehicle_glass_fx_1modcockpitengine.prefab",
+      "assets/bundled/prefabs/fx/vehicle/vehicle_glass_fx_1modtaxi_back_rear.prefab",
+      "assets/bundled/prefabs/fx/vehicle/vehicle_glass_fx_1modtaxi_mid_rear.prefab",
+      "assets/bundled/prefabs/fx/vehicle/vehicle_glass_fx_1modtaxi_side.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/water",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/water/groundsplash.prefab",
+      "assets/bundled/prefabs/fx/water/midair_splash.prefab",
+      "assets/bundled/prefabs/fx/water/playerjumpinwater.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/weapons",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/weapons/rifle_jingle1.prefab",
+      "assets/bundled/prefabs/fx/weapons/rifle_jingle2.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/weapons/landmine",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/weapons/landmine/landmine_explosion.prefab",
+      "assets/bundled/prefabs/fx/weapons/landmine/landmine_trigger.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/weapons/survey_charge",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/weapons/survey_charge/survey_charge_stick.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/well",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/well/pump_down.prefab",
+      "assets/bundled/prefabs/fx/well/pump_up.prefab"
+    ]
+  }
+]
