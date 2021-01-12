@@ -6,8 +6,8 @@ namespace Rust.Ai
 {
 	public class HideoutScorer : OptionScorerBase<CoverPoint>
 	{
-		[Range(-1f, 1f)]
 		[ApexSerialization]
+		[Range(-1f, 1f)]
 		public float coverFromPointArcThreshold = -0.8f;
 
 		[ApexSerialization]

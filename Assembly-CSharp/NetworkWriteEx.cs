@@ -63,6 +63,10 @@ public static class NetworkWriteEx
 		{
 			write.Bool(GenericsUtil.Cast<T, bool>(obj));
 		}
+		else if (typeof(T) == typeof(Color))
+		{
+			write.Color(GenericsUtil.Cast<T, Color>(obj));
+		}
 		else if ((proto = (obj as IProto)) != null)
 		{
 			proto.WriteToStream(write);

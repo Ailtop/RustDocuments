@@ -39,7 +39,7 @@ namespace CompanionServer.Handlers
 					{
 						Vector2 vector = Util.WorldToMap(monument2.transform.position);
 						AppMap.Monument monument = Pool.Get<AppMap.Monument>();
-						monument.token = (monument2.displayPhrase.token ?? monument2.name);
+						monument.token = (monument2.displayPhrase.IsValid() ? monument2.displayPhrase.token : monument2.transform.root.name);
 						monument.x = vector.x;
 						monument.y = vector.y;
 						appMap.monuments.Add(monument);

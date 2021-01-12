@@ -7,7 +7,7 @@ using UnityEngine;
 public class RidableHorse : BaseRidableAnimal
 {
 	[ServerVar(Help = "Population active on the server, per square km")]
-	public static float Population = 0f;
+	public static float Population = 2f;
 
 	public string distanceStatName = "";
 

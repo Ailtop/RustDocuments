@@ -85,6 +85,8 @@ namespace CompanionServer
 
 			public static Func<AppRequest, AppCameraFrameRequest> _003C_003E9__19_11;
 
+			public static Func<AppRequest, AppPromoteToLeader> _003C_003E9__19_12;
+
 			internal AppEmpty _003CDispatch_003Eb__19_0(AppRequest r)
 			{
 				return r.getInfo;
@@ -143,6 +145,11 @@ namespace CompanionServer
 			internal AppCameraFrameRequest _003CDispatch_003Eb__19_11(AppRequest r)
 			{
 				return r.getCameraFrame;
+			}
+
+			internal AppPromoteToLeader _003CDispatch_003Eb__19_12(AppRequest r)
+			{
+				return r.promoteToLeader;
 			}
 		}
 
@@ -280,7 +287,7 @@ namespace CompanionServer
 				buffer.Dispose();
 			}
 			CompanionServer.Handlers.IHandler requestHandler;
-			if (_003CDispatch_003Eg__Handle_007C19_12<AppEmpty, Info>((AppRequest r) => r.getInfo, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, CompanionServer.Handlers.Time>((AppRequest r) => r.getTime, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, Map>((AppRequest r) => r.getMap, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, TeamInfo>((AppRequest r) => r.getTeamInfo, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, TeamChat>((AppRequest r) => r.getTeamChat, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppSendMessage, SendTeamChat>((AppRequest r) => r.sendTeamMessage, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, EntityInfo>((AppRequest r) => r.getEntityInfo, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppSetEntityValue, SetEntityValue>((AppRequest r) => r.setEntityValue, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, CheckSubscription>((AppRequest r) => r.checkSubscription, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppFlag, SetSubscription>((AppRequest r) => r.setSubscription, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppEmpty, MapMarkers>((AppRequest r) => r.getMapMarkers, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_12<AppCameraFrameRequest, CameraFrame>((AppRequest r) => r.getCameraFrame, out requestHandler, ref _003C_003Ec__DisplayClass19_))
+			if (_003CDispatch_003Eg__Handle_007C19_13<AppEmpty, Info>((AppRequest r) => r.getInfo, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, CompanionServer.Handlers.Time>((AppRequest r) => r.getTime, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, Map>((AppRequest r) => r.getMap, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, TeamInfo>((AppRequest r) => r.getTeamInfo, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, TeamChat>((AppRequest r) => r.getTeamChat, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppSendMessage, SendTeamChat>((AppRequest r) => r.sendTeamMessage, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, EntityInfo>((AppRequest r) => r.getEntityInfo, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppSetEntityValue, SetEntityValue>((AppRequest r) => r.setEntityValue, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, CheckSubscription>((AppRequest r) => r.checkSubscription, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppFlag, SetSubscription>((AppRequest r) => r.setSubscription, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppEmpty, MapMarkers>((AppRequest r) => r.getMapMarkers, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppCameraFrameRequest, CameraFrame>((AppRequest r) => r.getCameraFrame, out requestHandler, ref _003C_003Ec__DisplayClass19_) || _003CDispatch_003Eg__Handle_007C19_13<AppPromoteToLeader, PromoteToLeader>((AppRequest r) => r.promoteToLeader, out requestHandler, ref _003C_003Ec__DisplayClass19_))
 			{
 				try
 				{
@@ -344,7 +351,7 @@ namespace CompanionServer
 		}
 
 		[CompilerGenerated]
-		private bool _003CDispatch_003Eg__Handle_007C19_12<TProto, THandler>(Func<AppRequest, TProto> protoSelector, out CompanionServer.Handlers.IHandler requestHandler, ref _003C_003Ec__DisplayClass19_0 P_2) where TProto : class where THandler : BaseHandler<TProto>, new()
+		private bool _003CDispatch_003Eg__Handle_007C19_13<TProto, THandler>(Func<AppRequest, TProto> protoSelector, out CompanionServer.Handlers.IHandler requestHandler, ref _003C_003Ec__DisplayClass19_0 P_2) where TProto : class where THandler : BaseHandler<TProto>, new()
 		{
 			TProto val = protoSelector(P_2.request);
 			if (val == null)

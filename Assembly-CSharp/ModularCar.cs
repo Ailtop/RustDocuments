@@ -179,15 +179,15 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[Header("Audio/FX")]
 	[SerializeField]
+	[Header("Audio/FX")]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]
 	public GameObjectRef collisionEffect;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	public MeshRenderer[] damageShowingRenderers;
 
 	[ServerVar(Help = "Population active on the server")]
@@ -397,7 +397,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return false;
 		}
-		return serverTerrainHandler.CurrentGroundQuality == VehicleTerrainHandler.GroundQuality.Road;
+		return serverTerrainHandler.IsOnRoad;
 	}
 
 	public bool IsOnIce()

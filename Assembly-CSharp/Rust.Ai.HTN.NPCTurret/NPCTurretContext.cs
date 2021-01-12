@@ -21,8 +21,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		private byte[] _previousWorldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private int _decompositionScore;
 
 		[SerializeField]

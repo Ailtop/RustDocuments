@@ -1136,9 +1136,9 @@ namespace Rust.Ai.HTN.Bear
 		[SerializeField]
 		private BearContext _context;
 
-		[SerializeField]
-		[Header("Navigation")]
 		[ReadOnly]
+		[Header("Navigation")]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
 		[ReadOnly]
@@ -1189,8 +1189,8 @@ namespace Rust.Ai.HTN.Bear
 		};
 
 		[SerializeField]
-		[ReadOnly]
 		[Header("Reasoners")]
+		[ReadOnly]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner

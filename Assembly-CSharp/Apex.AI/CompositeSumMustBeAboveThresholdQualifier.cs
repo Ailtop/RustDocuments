@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace Apex.AI
 {
-	[AICategory("Composite Qualifiers")]
 	[FriendlyName("Sum must be above threshold", "Scores 0 if sum is below threshold.")]
+	[AICategory("Composite Qualifiers")]
 	public class CompositeSumMustBeAboveThresholdQualifier : CompositeQualifier
 	{
 		[ApexSerialization(defaultValue = 0f)]

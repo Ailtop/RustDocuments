@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CommandBufferManager))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(CommandBufferManager))]
 [RequireComponent(typeof(Camera))]
 public class DeferredExtension : MonoBehaviour
 {

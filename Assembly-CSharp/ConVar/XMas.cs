@@ -6,7 +6,7 @@ namespace ConVar
 		private const string path = "assets/prefabs/misc/xmas/xmasrefill.prefab";
 
 		[ServerVar]
-		public static bool enabled = false;
+		public static bool enabled = true;
 
 		[ServerVar]
 		public static float spawnRange = 40f;

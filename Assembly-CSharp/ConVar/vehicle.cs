@@ -5,8 +5,8 @@ namespace ConVar
 	[Factory("vehicle")]
 	public class vehicle : ConsoleSystem
 	{
-		[ServerVar]
 		[Help("how long until boat corpses despawn")]
+		[ServerVar]
 		public static float boat_corpse_seconds = 300f;
 
 		[ServerVar(Help = "Determines whether modular cars turn into wrecks when destroyed, or just immediately gib. Default: true")]

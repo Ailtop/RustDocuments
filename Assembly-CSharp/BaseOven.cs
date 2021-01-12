@@ -160,6 +160,10 @@ public class BaseOven : StorageContainer, ISplashable
 	public void Cook()
 	{
 		Item item = FindBurnable();
+		if (Interface.CallHook("OnOvenCook", this, item) != null)
+		{
+			return;
+		}
 		if (item == null)
 		{
 			StopCooking();
@@ -182,11 +186,15 @@ public class BaseOven : StorageContainer, ISplashable
 		{
 			ConsumeFuel(item, component);
 		}
+		Interface.CallHook("OnOvenCooked", this, item, slot);
 	}
 
 	public void ConsumeFuel(Item fuel, ItemModBurnable burnable)
 	{
-		Interface.CallHook("OnConsumeFuel", this, fuel, burnable);
+		if (Interface.CallHook("OnFuelConsume", this, fuel, burnable) != null)
+		{
+			return;
+		}
 		if (allowByproductCreation && burnable.byproductItem != null && UnityEngine.Random.Range(0f, 1f) > burnable.byproductChance)
 		{
 			Item item = ItemManager.Create(burnable.byproductItem, burnable.byproductAmount, 0uL);
@@ -204,6 +212,7 @@ public class BaseOven : StorageContainer, ISplashable
 		fuel.amount--;
 		fuel.fuel = burnable.fuelAmount;
 		fuel.MarkDirty();
+		Interface.CallHook("OnFuelConsumed", this, fuel, burnable);
 	}
 
 	[RPC_Server]

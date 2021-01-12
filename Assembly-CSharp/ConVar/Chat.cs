@@ -64,8 +64,8 @@ namespace ConVar
 
 		private const float textVolumeBoost = 0.2f;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled = true;
 
 		public static List<ChatEntry> History = new List<ChatEntry>();

@@ -526,7 +526,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	protected void SendAsSnapshot(Connection connection, bool justCreated = false)
 	{
-		if (Network.Net.sv.write.Start())
+		if (Interface.CallHook("OnEntitySnapshot", this, connection) == null && Network.Net.sv.write.Start())
 		{
 			connection.validate.entityUpdates++;
 			SaveInfo saveInfo = default(SaveInfo);
@@ -634,6 +634,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			{
 				Debug.LogError(this + ": ToStream - no baseNetworkable!?");
 			}
+			Interface.CallHook("IOnEntitySaved", this, saveInfo);
 			saveInfo.msg.ToProto(stream);
 			PostSave(saveInfo);
 		}
@@ -796,10 +797,12 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public virtual void OnNetworkGroupEnter(Group group)
 	{
+		Interface.CallHook("OnNetworkGroupEntered", this, group);
 	}
 
 	public virtual void OnNetworkGroupLeave(Group group)
 	{
+		Interface.CallHook("OnNetworkGroupLeft", this, group);
 	}
 
 	public void OnNetworkGroupChange()

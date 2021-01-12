@@ -62,8 +62,8 @@ public class ModularCarGarage : ContainerIOEntity
 	[SerializeField]
 	public Transform vehicleLiftPos;
 
-	[SerializeField]
 	[Range(0f, 1f)]
+	[SerializeField]
 	public float recycleEfficiency = 0.5f;
 
 	[SerializeField]
@@ -755,9 +755,9 @@ public class ModularCarGarage : ContainerIOEntity
 		SetFlag(Flags.Reserved6, false);
 	}
 
+	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
 	public void RPC_RepairItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -788,8 +788,8 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_SelectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -799,26 +799,31 @@ public class ModularCarGarage : ContainerIOEntity
 			return;
 		}
 		Item vehicleItem = carOccupant.GetVehicleItem(itemUID);
-		if (vehicleItem != null && Interface.CallHook("OnVehicleModuleSelect", vehicleItem, this, player) == null)
+		if (vehicleItem == null || Interface.CallHook("OnVehicleModuleSelect", vehicleItem, this, player) != null)
 		{
-			bool flag = player.inventory.loot.RemoveContainerAt(3);
-			BaseVehicleModule result;
-			VehicleModuleStorage vehicleModuleStorage;
-			if (TryGetModuleForItem(vehicleItem, out result) && (object)(vehicleModuleStorage = (result as VehicleModuleStorage)) != null)
+			return;
+		}
+		bool flag = player.inventory.loot.RemoveContainerAt(3);
+		BaseVehicleModule result;
+		VehicleModuleStorage vehicleModuleStorage;
+		if (TryGetModuleForItem(vehicleItem, out result) && (object)(vehicleModuleStorage = (result as VehicleModuleStorage)) != null)
+		{
+			IItemContainerEntity container = vehicleModuleStorage.GetContainer();
+			if (!ObjectEx.IsUnityNull(container))
 			{
-				player.inventory.loot.AddContainer(vehicleModuleStorage.GetContainer().inventory);
+				player.inventory.loot.AddContainer(container.inventory);
 				flag = true;
 			}
-			if (flag)
-			{
-				player.inventory.loot.SendImmediate();
-			}
-			Interface.CallHook("OnVehicleModuleSelected", vehicleItem, this, player);
 		}
+		if (flag)
+		{
+			player.inventory.loot.SendImmediate();
+		}
+		Interface.CallHook("OnVehicleModuleSelected", vehicleItem, this, player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_DeselectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -854,8 +859,8 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	public void RPC_RequestRemoveLock(RPCMessage msg)
 	{
@@ -866,8 +871,8 @@ public class ModularCarGarage : ContainerIOEntity
 	}
 
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_RequestCarKey(RPCMessage msg)
 	{
 		if (HasOccupant && carOccupant.carLock.HasALock)
@@ -893,10 +898,10 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_StopDestroyingChassis(RPCMessage msg)
 	{
 		StopChassisDestroy();

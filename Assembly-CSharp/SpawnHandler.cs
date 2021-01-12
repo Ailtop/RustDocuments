@@ -44,7 +44,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 	[ReadOnly]
 	public SpawnPopulation[] ConvarSpawnPopulations;
 
-	private Dictionary<SpawnPopulation, SpawnDistribution> population2distribution;
+	public Dictionary<SpawnPopulation, SpawnDistribution> population2distribution;
 
 	private bool spawnTick;
 
@@ -388,20 +388,22 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		{
 			return null;
 		}
-		if (randomPrefab.Component.Population != population)
-		{
-			randomPrefab.Component.Population = population;
-		}
 		if (Global.developer > 1)
 		{
 			Debug.Log("[Spawn] Spawning " + randomPrefab.Name);
 		}
-		BaseEntity baseEntity = randomPrefab.SpawnEntity(pos, rot);
+		BaseEntity baseEntity = randomPrefab.SpawnEntity(pos, rot, false);
 		if (baseEntity == null)
 		{
 			Debug.LogWarning("[Spawn] Couldn't create prefab as entity - " + randomPrefab.Name);
 			return null;
 		}
+		Spawnable component = baseEntity.GetComponent<Spawnable>();
+		if (component.Population != population)
+		{
+			component.Population = population;
+		}
+		PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
 		baseEntity.Spawn();
 		return baseEntity.gameObject;
 	}
@@ -464,7 +466,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		}
 	}
 
-	private void EnforceLimits(SpawnPopulation population, SpawnDistribution distribution)
+	public void EnforceLimits(SpawnPopulation population, SpawnDistribution distribution)
 	{
 		int targetCount = GetTargetCount(population, distribution);
 		Spawnable[] array = FindAll(population);

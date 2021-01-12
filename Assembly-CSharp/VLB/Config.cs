@@ -20,8 +20,8 @@ namespace VLB
 		private Shader beamShader1Pass;
 
 		[HighlightNull]
-		[SerializeField]
 		[FormerlySerializedAs("beamShader")]
+		[SerializeField]
 		[FormerlySerializedAs("BeamShader")]
 		private Shader beamShader2Pass;
 

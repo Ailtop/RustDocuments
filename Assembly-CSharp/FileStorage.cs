@@ -31,7 +31,7 @@ public class FileStorage : IDisposable
 
 	private Dictionary<uint, CacheData> _cache = new Dictionary<uint, CacheData>();
 
-	public static FileStorage server = new FileStorage("sv.files." + 200, true);
+	public static FileStorage server = new FileStorage("sv.files." + 201, true);
 
 	protected FileStorage(string name, bool server)
 	{
@@ -90,7 +90,7 @@ public class FileStorage : IDisposable
 		}
 	}
 
-	public byte[] Get(uint crc, Type type, uint entityID)
+	public byte[] Get(uint crc, Type type, uint entityID, uint numID = 0u)
 	{
 		using (TimeWarning.New("FileStorage.Get"))
 		{
@@ -104,7 +104,7 @@ public class FileStorage : IDisposable
 			{
 				return null;
 			}
-			byte[] array = db.QueryBlob("SELECT data FROM data WHERE crc = ? AND filetype = ? AND entid = ? LIMIT 1", (int)crc, (int)type, (int)entityID);
+			byte[] array = db.QueryBlob("SELECT data FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ? LIMIT 1", (int)crc, (int)type, (int)entityID, (int)numID);
 			if (array == null)
 			{
 				return null;
@@ -127,6 +127,21 @@ public class FileStorage : IDisposable
 			if (db != null)
 			{
 				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ?", (int)crc, (int)type, (int)entityID);
+			}
+			if (_cache.ContainsKey(crc))
+			{
+				_cache.Remove(crc);
+			}
+		}
+	}
+
+	public void RemoveExact(uint crc, Type type, uint entityID, uint numid)
+	{
+		using (TimeWarning.New("FileStorage.RemoveExact"))
+		{
+			if (db != null)
+			{
+				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ?", (int)crc, (int)type, (int)entityID, (int)numid);
 			}
 			if (_cache.ContainsKey(crc))
 			{

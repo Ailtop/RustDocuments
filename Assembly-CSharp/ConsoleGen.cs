@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[688]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[690]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2287,19 +2287,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "signpause",
-			Parent = "antihack",
-			FullName = "antihack.signpause",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = (() => ConVar.AntiHack.signpause.ToString()),
-			SetOveride = delegate(string str)
-			{
-				ConVar.AntiHack.signpause = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "speedhack_forgiveness",
 			Parent = "antihack",
 			FullName = "antihack.speedhack_forgiveness",
@@ -2439,6 +2426,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.terrain_timeslice = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tickhistorytime",
+			Parent = "antihack",
+			FullName = "antihack.tickhistorytime",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => ConVar.AntiHack.tickhistorytime.ToString()),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.tickhistorytime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6077,6 +6077,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "maxconnectionsperip",
+			Parent = "server",
+			FullName = "server.maxconnectionsperip",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Server.maxconnectionsperip.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.maxconnectionsperip = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxpacketsize",
 			Parent = "server",
 			FullName = "server.maxpacketsize",
@@ -6138,6 +6151,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.maxpacketspersecond_rpc = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxpacketspersecond_rpc_signal",
+			Parent = "server",
+			FullName = "server.maxpacketspersecond_rpc_signal",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = (() => Server.maxpacketspersecond_rpc_signal.ToString()),
+			SetOveride = delegate(string str)
+			{
+				Server.maxpacketspersecond_rpc_signal = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

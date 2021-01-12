@@ -28,8 +28,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool incremental_enabled
 		{
 			get
@@ -42,8 +42,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int incremental_milliseconds
 		{
 			get
@@ -56,8 +56,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool enabled
 		{
 			get

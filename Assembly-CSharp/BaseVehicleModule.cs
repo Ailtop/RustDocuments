@@ -32,8 +32,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 
 	private const float TIME_BETWEEN_LOCK_REFRESH = 1f;
 
-	[Header("Vehicle Module")]
 	[SerializeField]
+	[Header("Vehicle Module")]
 	private Transform centreOfMassTransform;
 
 	[SerializeField]
@@ -41,18 +41,18 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 
 	public VisualGroup visualGroup;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private ModularVehicleLight[] lights;
 
 	public LODLevel[] lodRenderers;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<ConditionalObject> conditionals;
 
-	[SerializeField]
 	[Header("Trigger Parent")]
+	[SerializeField]
 	private TriggerParent[] triggerParents;
 
 	[SerializeField]
@@ -62,8 +62,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 	[SerializeField]
 	private VehicleModuleButtonComponent[] buttonComponents;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private DamageRenderer damageRenderer;
 
 	private TimeSince TimeSinceAddedToVehicle;
@@ -239,8 +239,8 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Use(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

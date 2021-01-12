@@ -274,7 +274,6 @@ public class Elevator : IOEntity, IFlagNotify
 			info.msg.elevator = Pool.Get<ProtoBuf.Elevator>();
 		}
 		info.msg.elevator.floor = Floor;
-		Interface.CallHook("OnElevatorSaved", this, info);
 	}
 
 	public int LiftPositionToFloor()

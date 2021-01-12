@@ -1,3 +1,4 @@
+using Oxide.Core;
 using UnityEngine;
 
 public class ModularCarSeat : BaseVehicleSeat
@@ -15,6 +16,11 @@ public class ModularCarSeat : BaseVehicleSeat
 
 	public override bool CanSwapToThis(BasePlayer player)
 	{
+		object obj = Interface.CallHook("CanSwapToSeat", player, this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (associatedSeatingModule.DoorsAreLockable)
 		{
 			ModularCar modularCar = associatedSeatingModule.Vehicle as ModularCar;

@@ -51,6 +51,8 @@ public class Chainsaw : BaseMelee
 
 	public SoundPlayer offSound;
 
+	private int failedAttempts;
+
 	public float engineStartChance = 0.33f;
 
 	private float ammoRemainder;
@@ -279,7 +281,7 @@ public class Chainsaw : BaseMelee
 		{
 			return;
 		}
-		ammoRemainder += fuelPerSec * firingTime;
+		ammoRemainder += firingTime;
 		if (ammoRemainder >= 1f)
 		{
 			int num = Mathf.FloorToInt(ammoRemainder);
@@ -368,31 +370,37 @@ public class Chainsaw : BaseMelee
 		ReduceAmmo(fuelPerSec);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Server_StartEngine(RPCMessage msg)
 	{
 		if (ammo > 0 && !EngineOn())
 		{
 			ReduceAmmo(0.25f);
-			if (UnityEngine.Random.Range(0f, 1f) <= engineStartChance)
+			bool num = UnityEngine.Random.Range(0f, 1f) <= engineStartChance;
+			if (!num)
 			{
+				failedAttempts++;
+			}
+			if (num || failedAttempts >= 3)
+			{
+				failedAttempts = 0;
 				SetEngineStatus(true);
 				SendNetworkUpdateImmediate();
 			}
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Server_StopEngine(RPCMessage msg)
 	{
 		SetEngineStatus(false);
 		SendNetworkUpdateImmediate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Server_SetAttacking(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

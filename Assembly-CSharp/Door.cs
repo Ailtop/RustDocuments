@@ -401,8 +401,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_OpenDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
@@ -483,8 +483,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_KnockDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)
@@ -564,11 +564,30 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	{
 		if (base.isServer)
 		{
-			bool flag = HasFlag(Flags.Open);
-			SetOpen(!flag, true);
-			ReverseDoorAnimation(flag);
-			StopCheckingForBlockages();
-			ClientRPC(null, "OnDoorInterrupted", flag ? 1 : 0);
+			bool flag = false;
+			foreach (BaseEntity entityContent in trigger.entityContents)
+			{
+				BaseMountable baseMountable;
+				if ((object)(baseMountable = (entityContent as BaseMountable)) != null && baseMountable.BlocksDoors)
+				{
+					flag = true;
+					break;
+				}
+				BaseVehicleModule baseVehicleModule;
+				if ((object)(baseVehicleModule = (entityContent as BaseVehicleModule)) != null && baseVehicleModule.Vehicle != null && baseVehicleModule.Vehicle.BlocksDoors)
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (flag)
+			{
+				bool flag2 = HasFlag(Flags.Open);
+				SetOpen(!flag2, true);
+				ReverseDoorAnimation(flag2);
+				StopCheckingForBlockages();
+				ClientRPC(null, "OnDoorInterrupted", flag2 ? 1 : 0);
+			}
 		}
 	}
 

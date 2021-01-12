@@ -76,6 +76,8 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual bool CanDrinkWhileMounted => true;
 
+	public virtual bool BlocksDoors => true;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BaseMountable.OnRpcMessage"))
@@ -249,6 +251,11 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual bool CanSwapToThis(BasePlayer player)
 	{
+		object obj = Interface.CallHook("CanSwapToSeat", player, this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		return true;
 	}
 
@@ -272,8 +279,8 @@ public class BaseMountable : BaseCombatEntity
 		base.OnKilled(info);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

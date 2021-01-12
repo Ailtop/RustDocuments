@@ -26,6 +26,13 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 
 	public Vector3 localRotation;
 
+	public bool applyToAllRenderers = true;
+
+	public Renderer[] extraRenderers;
+
+	[NonSerialized]
+	public bool isSelected;
+
 	private static MaterialPropertyBlock block;
 
 	public void Init()
@@ -34,6 +41,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		{
 			texture = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, false);
 			texture.name = "MeshPaintableSource_" + base.gameObject.name;
+			texture.wrapMode = TextureWrapMode.Clamp;
 			texture.Clear(Color.clear);
 		}
 		if (block == null)
@@ -44,12 +52,23 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		{
 			block.Clear();
 		}
-		UpdateMaterials(block);
+		UpdateMaterials(block, null, false, isSelected);
 		List<Renderer> obj = Pool.GetList<Renderer>();
-		base.transform.root.GetComponentsInChildren(true, obj);
+		(applyToAllRenderers ? base.transform.root : base.transform).GetComponentsInChildren(true, obj);
 		foreach (Renderer item in obj)
 		{
 			item.SetPropertyBlock(block);
+		}
+		if (extraRenderers != null)
+		{
+			Renderer[] array = extraRenderers;
+			foreach (Renderer renderer in array)
+			{
+				if (renderer != null)
+				{
+					renderer.SetPropertyBlock(block);
+				}
+			}
 		}
 		Pool.FreeList(ref obj);
 	}
@@ -63,16 +82,18 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		}
 	}
 
-	public virtual void UpdateMaterials(MaterialPropertyBlock block, Texture2D textureOverride = null)
+	public virtual void UpdateMaterials(MaterialPropertyBlock block, Texture2D textureOverride = null, bool forEditing = false, bool isSelected = false)
 	{
 		block.SetTexture(replacementTextureName, textureOverride ?? texture);
 	}
 
-	public void UpdateFrom(Texture2D input)
+	public virtual Color32[] UpdateFrom(Texture2D input)
 	{
 		Init();
-		texture.SetPixels32(input.GetPixels32());
+		Color32[] pixels = input.GetPixels32();
+		texture.SetPixels32(pixels);
 		texture.Apply(true, false);
+		return pixels;
 	}
 
 	public void Load(byte[] data)
@@ -81,10 +102,6 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		if (data != null)
 		{
 			texture.LoadImage(data);
-			if (texture.width != texWidth || texture.height != texHeight)
-			{
-				texture.Resize(texWidth, texHeight);
-			}
 			texture.Apply(true, false);
 		}
 	}

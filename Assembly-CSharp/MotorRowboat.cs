@@ -89,7 +89,7 @@ public class MotorRowboat : BaseBoat
 	public Transform propellerRotate;
 
 	[ServerVar(Help = "Population active on the server")]
-	public static float population = 0f;
+	public static float population = 1f;
 
 	[ServerVar(Help = "How long before a boat is killed while outside.  If it's in deep water as well, the minimum of the two is used")]
 	public static float outsidedecayminutes = 180f;

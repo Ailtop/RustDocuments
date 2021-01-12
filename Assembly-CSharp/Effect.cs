@@ -49,6 +49,10 @@ public class Effect : EffectData
 
 		public static void ImpactEffect(HitInfo info)
 		{
+			if (!info.DoHitEffects)
+			{
+				return;
+			}
 			string materialName = StringPool.Get(info.HitMaterial);
 			string strName = EffectDictionary.GetParticle(info.damageTypes.GetMajorityDamageType(), materialName);
 			string decal = EffectDictionary.GetDecal(info.damageTypes.GetMajorityDamageType(), materialName);

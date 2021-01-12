@@ -105,7 +105,7 @@ public static class TelephoneManager
 				if (num2 >= num)
 				{
 					PhoneDirectory.DirectoryEntry directoryEntry = Pool.Get<PhoneDirectory.DirectoryEntry>();
-					directoryEntry.phoneName = allTelephone.Value.PhoneName;
+					directoryEntry.phoneName = allTelephone.Value.GetDirectoryName();
 					directoryEntry.phoneNumber = allTelephone.Value.PhoneNumber;
 					directory.entries.Add(directoryEntry);
 					if (directory.entries.Count >= perPage)
@@ -127,7 +127,7 @@ public static class TelephoneManager
 		foreach (KeyValuePair<int, PhoneController> allTelephone in allTelephones)
 		{
 			Vector3 position = allTelephone.Value.transform.position;
-			textTable.AddRow(allTelephone.Key.ToString(), allTelephone.Value.PhoneName, $"{position.x} {position.y} {position.z}");
+			textTable.AddRow(allTelephone.Key.ToString(), allTelephone.Value.GetDirectoryName(), $"{position.x} {position.y} {position.z}");
 		}
 		arg.ReplyWith(textTable.ToString());
 	}

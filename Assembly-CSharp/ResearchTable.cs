@@ -139,6 +139,28 @@ public class ResearchTable : StorageContainer
 		return result;
 	}
 
+	public static int ScrapForResearch(ItemDefinition info)
+	{
+		int result = 0;
+		if (info.rarity == Rarity.Common)
+		{
+			result = 20;
+		}
+		if (info.rarity == Rarity.Uncommon)
+		{
+			result = 75;
+		}
+		if (info.rarity == Rarity.Rare)
+		{
+			result = 125;
+		}
+		if (info.rarity == Rarity.VeryRare || info.rarity == Rarity.None)
+		{
+			result = 500;
+		}
+		return result;
+	}
+
 	public bool IsItemResearchable(Item item)
 	{
 		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint((item.info.isRedirectOf != null) ? item.info.isRedirectOf : item.info);
@@ -201,8 +223,8 @@ public class ResearchTable : StorageContainer
 		base.PlayerStoppedLooting(player);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void DoResearch(RPCMessage msg)
 	{
 		if (IsResearching())

@@ -489,15 +489,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 			return;
 		}
-		if (packet.connection.protocol > 2267)
+		if (packet.connection.protocol > 2274)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2267);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2274);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 			return;
 		}
-		if (packet.connection.protocol < 2267)
+		if (packet.connection.protocol < 2274)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2267);
+			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2274);
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 			return;
 		}
@@ -768,15 +768,27 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				}
 				try
 				{
+					using (TimeWarning.New("PlatformService.Update", 100))
+					{
+						PlatformService.Instance.Update();
+					}
+				}
+				catch (Exception exception)
+				{
+					UnityEngine.Debug.LogWarning("Server Exception: Platform Service Update");
+					UnityEngine.Debug.LogException(exception, this);
+				}
+				try
+				{
 					using (TimeWarning.New("Net.sv.Cycle", 100))
 					{
 						Network.Net.sv.Cycle();
 					}
 				}
-				catch (Exception exception)
+				catch (Exception exception2)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: Network Cycle");
-					UnityEngine.Debug.LogException(exception, this);
+					UnityEngine.Debug.LogException(exception2, this);
 				}
 				try
 				{
@@ -785,10 +797,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						BuildingManager.server.Cycle();
 					}
 				}
-				catch (Exception exception2)
+				catch (Exception exception3)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: Building Manager");
-					UnityEngine.Debug.LogException(exception2, this);
+					UnityEngine.Debug.LogException(exception3, this);
 				}
 				try
 				{
@@ -811,10 +823,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						}
 					}
 				}
-				catch (Exception exception3)
+				catch (Exception exception4)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: Player Update");
-					UnityEngine.Debug.LogException(exception3, this);
+					UnityEngine.Debug.LogException(exception4, this);
 				}
 				try
 				{
@@ -823,10 +835,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						SteamQueryResponse();
 					}
 				}
-				catch (Exception exception4)
+				catch (Exception exception5)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: Steam Query");
-					UnityEngine.Debug.LogException(exception4, this);
+					UnityEngine.Debug.LogException(exception5, this);
 				}
 				try
 				{
@@ -835,10 +847,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						connectionQueue.Cycle(AvailableSlots);
 					}
 				}
-				catch (Exception exception5)
+				catch (Exception exception6)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: Connection Queue");
-					UnityEngine.Debug.LogException(exception5, this);
+					UnityEngine.Debug.LogException(exception6, this);
 				}
 				try
 				{
@@ -847,10 +859,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						IOEntity.ProcessQueue();
 					}
 				}
-				catch (Exception exception6)
+				catch (Exception exception7)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: IOEntity.ProcessQueue");
-					UnityEngine.Debug.LogException(exception6, this);
+					UnityEngine.Debug.LogException(exception7, this);
 				}
 				try
 				{
@@ -859,10 +871,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						AIThinkManager.ProcessQueue();
 					}
 				}
-				catch (Exception exception7)
+				catch (Exception exception8)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: AIThinkManager.ProcessQueue");
-					UnityEngine.Debug.LogException(exception7, this);
+					UnityEngine.Debug.LogException(exception8, this);
 				}
 				try
 				{
@@ -871,10 +883,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						BaseRidableAnimal.ProcessQueue();
 					}
 				}
-				catch (Exception exception8)
+				catch (Exception exception9)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: BaseRidableAnimal.ProcessQueue");
-					UnityEngine.Debug.LogException(exception8, this);
+					UnityEngine.Debug.LogException(exception9, this);
 				}
 				try
 				{
@@ -883,10 +895,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						GrowableEntity.BudgetedUpdate();
 					}
 				}
-				catch (Exception exception9)
+				catch (Exception exception10)
 				{
 					UnityEngine.Debug.LogWarning("Server Exception: GrowableEntity.BudgetedUpdate");
-					UnityEngine.Debug.LogException(exception9, this);
+					UnityEngine.Debug.LogException(exception10, this);
 				}
 				if (EACServer.playerTracker != null)
 				{
@@ -994,7 +1006,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
 				string text3 = $"gm{GamemodeName()}";
 				string text4 = ConVar.Server.pve ? ",pve" : string.Empty;
-				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2267}{text4},h{AssemblyHash},{text},{text2},{text3}";
+				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2274}{text4},h{AssemblyHash},{text},{text2},{text3}";
 				Interface.CallHook("IOnUpdateServerInformation");
 				if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 				{

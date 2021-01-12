@@ -574,7 +574,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	[NonSerialized]
 	public string _name;
 
-	private Spawnable _spawnable;
+	public Spawnable _spawnable;
 
 	public static HashSet<BaseEntity> saveList = new HashSet<BaseEntity>();
 
@@ -1238,14 +1238,15 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		uint num = msg.read.UInt32();
 		FileStorage.Type type = (FileStorage.Type)msg.read.UInt8();
 		string funcName = StringPool.Get(msg.read.UInt32());
-		byte[] array = FileStorage.server.Get(num, type, net.ID);
+		uint num2 = (msg.read.Unread > 0) ? msg.read.UInt32() : 0u;
+		byte[] array = FileStorage.server.Get(num, type, net.ID, num2);
 		if (array != null)
 		{
 			ClientRPCEx(new SendInfo(msg.connection)
 			{
 				channel = 2,
 				method = SendMethod.Reliable
-			}, null, funcName, num, (uint)array.Length, array);
+			}, null, funcName, num, (uint)array.Length, array, num2);
 		}
 	}
 
@@ -2035,13 +2036,21 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
-		Signal signal = (Signal)msg.read.Int32();
-		string arg = msg.read.String();
-		SignalBroadcast(signal, arg, msg.connection);
+		uint num = StringPool.Get("BroadcastSignalFromClient");
+		if (num != 0)
+		{
+			BasePlayer player = msg.player;
+			if (!(player == null) && player.rpcHistory.TryIncrement(num, (ulong)ConVar.Server.maxpacketspersecond_rpc_signal))
+			{
+				Signal signal = (Signal)msg.read.Int32();
+				string arg = msg.read.String();
+				SignalBroadcast(signal, arg, msg.connection);
+			}
+		}
 	}
 
 	public void SignalBroadcast(Signal signal, string arg, Connection sourceConnection = null)

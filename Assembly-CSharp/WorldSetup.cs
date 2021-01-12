@@ -76,6 +76,8 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 				terrainMeta = terrain.GetComponent<TerrainMeta>();
 				terrainMeta.Init();
 				terrainMeta.SetupComponents();
+				terrainMeta.BindShaderProperties();
+				terrainMeta.PostSetupComponents();
 				World.InitSize(Mathf.RoundToInt(TerrainMeta.Size.x));
 				CreateObject(decorPrefab);
 				CreateObject(grassPrefab);

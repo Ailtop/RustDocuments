@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -124,8 +124,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void colliders(Arg args)
 		{
 			int num = (from x in UnityEngine.Object.FindObjectsOfType<Collider>()
@@ -431,8 +431,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -474,8 +474,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();

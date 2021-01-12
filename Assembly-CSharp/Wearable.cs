@@ -58,7 +58,9 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		LeftLeg = 0x8000,
 		RightLeg = 0x10000,
 		LeftFoot = 0x20000,
-		RightFoot = 0x40000
+		RightFoot = 0x40000,
+		Mouth = 0x80000,
+		Eyes = 0x100000
 	}
 
 	[InspectorFlags]
@@ -113,12 +115,12 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[HideInInspector]
 	public List<ComponentInfo> componentInfos = new List<ComponentInfo>();
 
-	[Tooltip("If this is true, we'll hide this item in the first person view. Usually done for items that you definitely won't see in first person view, like facemasks and hats.")]
 	[Header("First Person Legs")]
+	[Tooltip("If this is true, we'll hide this item in the first person view. Usually done for items that you definitely won't see in first person view, like facemasks and hats.")]
 	public bool HideInFirstPerson;
 
-	[Tooltip("Use this if the clothing item clips into the player view. It'll push the chest legs model backwards.")]
 	[Range(0f, 5f)]
+	[Tooltip("Use this if the clothing item clips into the player view. It'll push the chest legs model backwards.")]
 	public float ExtraLeanBack;
 
 	public Renderer[] RenderersLod0;

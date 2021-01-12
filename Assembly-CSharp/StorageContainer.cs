@@ -244,8 +244,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (isLootable)

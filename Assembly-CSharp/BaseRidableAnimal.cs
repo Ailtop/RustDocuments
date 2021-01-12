@@ -156,8 +156,8 @@ public class BaseRidableAnimal : BaseVehicle
 	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
-	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
 	[ServerVar]
+	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -543,7 +543,7 @@ public class BaseRidableAnimal : BaseVehicle
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && IsForSale())
+		if (!(player == null) && Interface.CallHook("OnRidableAnimalClaim", this, player) == null && IsForSale())
 		{
 			Item item = GetPurchaseToken(player);
 			if (item != null)
@@ -551,6 +551,7 @@ public class BaseRidableAnimal : BaseVehicle
 				item.UseItem();
 				SetFlag(Flags.Reserved2, false);
 				AttemptMount(player, false);
+				Interface.CallHook("OnRidableAnimalClaimed", this, player);
 			}
 		}
 	}

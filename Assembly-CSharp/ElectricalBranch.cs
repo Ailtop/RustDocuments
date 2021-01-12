@@ -57,8 +57,8 @@ public class ElectricalBranch : IOEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetBranchOffPower(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

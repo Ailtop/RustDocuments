@@ -113,24 +113,24 @@ public class Prefab : IComparable<Prefab>
 		return EnvironmentVolumeEx.CheckEnvironmentVolumes(Object.transform, pos, rot, scale, type);
 	}
 
-	public GameObject Spawn(Transform transform)
+	public GameObject Spawn(Transform transform, bool active = true)
 	{
-		return Manager.CreatePrefab(Name, transform);
+		return Manager.CreatePrefab(Name, transform, active);
 	}
 
-	public GameObject Spawn(Vector3 pos, Quaternion rot)
+	public GameObject Spawn(Vector3 pos, Quaternion rot, bool active = true)
 	{
-		return Manager.CreatePrefab(Name, pos, rot);
+		return Manager.CreatePrefab(Name, pos, rot, active);
 	}
 
-	public GameObject Spawn(Vector3 pos, Quaternion rot, Vector3 scale)
+	public GameObject Spawn(Vector3 pos, Quaternion rot, Vector3 scale, bool active = true)
 	{
-		return Manager.CreatePrefab(Name, pos, rot, scale);
+		return Manager.CreatePrefab(Name, pos, rot, scale, active);
 	}
 
-	public BaseEntity SpawnEntity(Vector3 pos, Quaternion rot)
+	public BaseEntity SpawnEntity(Vector3 pos, Quaternion rot, bool active = true)
 	{
-		return Manager.CreateEntity(Name, pos, rot);
+		return Manager.CreateEntity(Name, pos, rot, active);
 	}
 
 	public static Prefab<T> Load<T>(uint id, GameManager manager = null, PrefabAttribute.Library attribute = null) where T : Component

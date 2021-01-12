@@ -12,8 +12,8 @@ namespace ConVar
 	[Factory("debug")]
 	public class Debugging : ConsoleSystem
 	{
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool checktriggers;
 
 		[ServerVar(Help = "Do not damage any items")]
@@ -23,8 +23,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool callbacks;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool log
 		{
 			get
@@ -37,15 +37,15 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void renderinfo(Arg arg)
 		{
 			RenderInfo.GenerateReport();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void stall(Arg arg)
 		{
 			float num = Mathf.Clamp(arg.GetFloat(0), 0f, 1f);

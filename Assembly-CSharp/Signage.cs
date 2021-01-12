@@ -5,17 +5,21 @@ using Network;
 using Oxide.Core;
 using ProtoBuf;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class Signage : BaseCombatEntity, ILOD
+public class Signage : IOEntity, ILOD
 {
+	private const float TextureRequestTimeout = 15f;
+
 	public GameObjectRef changeTextDialog;
 
-	public MeshPaintableSource paintableSource;
+	public MeshPaintableSource[] paintableSources;
 
 	[NonSerialized]
-	public uint textureID;
+	public uint[] textureIDs;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -27,7 +31,7 @@ public class Signage : BaseCombatEntity, ILOD
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - LockSign ");
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player + " - LockSign ");
 				}
 				using (TimeWarning.New("LockSign"))
 				{
@@ -52,7 +56,7 @@ public class Signage : BaseCombatEntity, ILOD
 					}
 					catch (Exception exception)
 					{
-						Debug.LogException(exception);
+						UnityEngine.Debug.LogException(exception);
 						player.Kick("RPC Error in LockSign");
 					}
 				}
@@ -63,7 +67,7 @@ public class Signage : BaseCombatEntity, ILOD
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UnLockSign ");
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player + " - UnLockSign ");
 				}
 				using (TimeWarning.New("UnLockSign"))
 				{
@@ -88,7 +92,7 @@ public class Signage : BaseCombatEntity, ILOD
 					}
 					catch (Exception exception2)
 					{
-						Debug.LogException(exception2);
+						UnityEngine.Debug.LogException(exception2);
 						player.Kick("RPC Error in UnLockSign");
 					}
 				}
@@ -99,12 +103,16 @@ public class Signage : BaseCombatEntity, ILOD
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UpdateSign ");
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player + " - UpdateSign ");
 				}
 				using (TimeWarning.New("UpdateSign"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
+						if (!RPC_Server.CallsPerSecond.Test(1255380462u, "UpdateSign", this, player, 5uL))
+						{
+							return true;
+						}
 						if (!RPC_Server.MaxDistance.Test(1255380462u, "UpdateSign", this, player, 3f))
 						{
 							return true;
@@ -124,7 +132,7 @@ public class Signage : BaseCombatEntity, ILOD
 					}
 					catch (Exception exception3)
 					{
-						Debug.LogException(exception3);
+						UnityEngine.Debug.LogException(exception3);
 						player.Kick("RPC Error in UpdateSign");
 					}
 				}
@@ -134,26 +142,79 @@ public class Signage : BaseCombatEntity, ILOD
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
+	public override void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		base.PreProcess(preProcess, rootObj, name, serverside, clientside, bundling);
+		if (paintableSources != null && paintableSources.Length > 1)
+		{
+			MeshPaintableSource meshPaintableSource = paintableSources[0];
+			for (int i = 1; i < paintableSources.Length; i++)
+			{
+				MeshPaintableSource obj = paintableSources[i];
+				obj.texWidth = meshPaintableSource.texWidth;
+				obj.texHeight = meshPaintableSource.texHeight;
+			}
+		}
+	}
+
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
-		if (msg.player == null || UnityEngine.Time.realtimeSinceStartup - msg.player.lastSignUpdate < ConVar.AntiHack.signpause)
+		if (msg.player == null || !CanUpdateSign(msg.player))
 		{
 			return;
 		}
-		msg.player.lastSignUpdate = UnityEngine.Time.realtimeSinceStartup;
-		if (CanUpdateSign(msg.player))
+		int num = msg.read.Int32();
+		if (num < 0 || num >= paintableSources.Length)
 		{
-			byte[] array = msg.read.BytesWithSize();
-			if (array != null && ImageProcessing.IsValidPNG(array, 1024, 1024))
-			{
-				Interface.CallHook("OnSignUpdated", this, msg.player);
-				FileStorage.server.RemoveAllByEntity(net.ID);
-				textureID = FileStorage.server.Store(array, FileStorage.Type.png, net.ID);
-				SendNetworkUpdate();
-			}
+			return;
 		}
+		byte[] array = msg.read.BytesWithSize();
+		if (msg.read.Unread > 0 && msg.read.Bit() && !msg.player.IsAdmin)
+		{
+			UnityEngine.Debug.LogWarning($"{msg.player} tried to upload a sign from a file but they aren't admin, ignoring");
+			return;
+		}
+		EnsureInitialized();
+		if (array == null)
+		{
+			if (textureIDs[num] != 0)
+			{
+				FileStorage.server.RemoveExact(textureIDs[num], FileStorage.Type.png, net.ID, (uint)num);
+			}
+			textureIDs[num] = 0u;
+		}
+		else
+		{
+			if (!ImageProcessing.IsValidPNG(array, 1024, 1024))
+			{
+				return;
+			}
+			if (textureIDs[num] != 0)
+			{
+				FileStorage.server.RemoveExact(textureIDs[num], FileStorage.Type.png, net.ID, (uint)num);
+			}
+			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
+		}
+		SendNetworkUpdate();
+		Interface.CallHook("OnSignUpdated", this, msg.player);
+	}
+
+	private void EnsureInitialized()
+	{
+		int num = Mathf.Max(paintableSources.Length, 1);
+		if (textureIDs == null || textureIDs.Length != num)
+		{
+			Array.Resize(ref textureIDs, num);
+		}
+	}
+
+	[Conditional("SIGN_DEBUG")]
+	private static void SignDebugLog(string str)
+	{
+		UnityEngine.Debug.Log(str);
 	}
 
 	public virtual bool CanUpdateSign(BasePlayer player)
@@ -199,25 +260,55 @@ public class Signage : BaseCombatEntity, ILOD
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.sign != null && info.msg.sign.imageid != textureID)
+		EnsureInitialized();
+		bool flag = false;
+		if (info.msg.sign != null)
 		{
-			textureID = info.msg.sign.imageid;
+			uint num = textureIDs[0];
+			if (info.msg.sign.imageIds != null && info.msg.sign.imageIds.Count > 0)
+			{
+				int num2 = Mathf.Min(info.msg.sign.imageIds.Count, textureIDs.Length);
+				for (int i = 0; i < num2; i++)
+				{
+					uint num3 = info.msg.sign.imageIds[i];
+					bool flag2 = num3 != textureIDs[i];
+					flag |= flag2;
+					textureIDs[i] = num3;
+				}
+			}
+			else
+			{
+				flag = (num != info.msg.sign.imageid);
+				textureIDs[0] = info.msg.sign.imageid;
+			}
 		}
-		if (base.isServer)
+		if (!base.isServer)
 		{
-			if (textureID != 0 && FileStorage.server.Get(textureID, FileStorage.Type.png, net.ID) == null)
+			return;
+		}
+		bool flag3 = false;
+		for (int j = 0; j < paintableSources.Length; j++)
+		{
+			uint num4 = textureIDs[j];
+			if (num4 != 0)
 			{
-				textureID = 0u;
+				byte[] array = FileStorage.server.Get(num4, FileStorage.Type.png, net.ID, (uint)j);
+				if (array == null)
+				{
+					Log($"Frame {j} (id={num4}) doesn't exist, clearing");
+					textureIDs[j] = 0u;
+				}
+				flag3 = (flag3 || array != null);
 			}
-			if (textureID == 0)
-			{
-				SetFlag(Flags.Locked, false);
-			}
+		}
+		if (!flag3)
+		{
+			SetFlag(Flags.Locked, false);
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -243,8 +334,16 @@ public class Signage : BaseCombatEntity, ILOD
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
+		EnsureInitialized();
+		List<uint> list = Facepunch.Pool.GetList<uint>();
+		uint[] array = textureIDs;
+		foreach (uint item in array)
+		{
+			list.Add(item);
+		}
 		info.msg.sign = Facepunch.Pool.Get<Sign>();
-		info.msg.sign.imageid = textureID;
+		info.msg.sign.imageid = 0u;
+		info.msg.sign.imageIds = list;
 	}
 
 	public override void OnKilled(HitInfo info)
@@ -253,13 +352,21 @@ public class Signage : BaseCombatEntity, ILOD
 		{
 			FileStorage.server.RemoveAllByEntity(net.ID);
 		}
-		textureID = 0u;
+		if (textureIDs != null)
+		{
+			Array.Clear(textureIDs, 0, textureIDs.Length);
+		}
 		base.OnKilled(info);
 	}
 
 	public override bool ShouldNetworkOwnerInfo()
 	{
 		return true;
+	}
+
+	public override int ConsumptionAmount()
+	{
+		return 0;
 	}
 
 	public override string Categorize()

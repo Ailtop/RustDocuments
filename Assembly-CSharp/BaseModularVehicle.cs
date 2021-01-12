@@ -22,8 +22,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool waterlogged;
 
-	[Header("Modular Vehicle")]
 	[HideInInspector]
+	[Header("Modular Vehicle")]
 	public float mass;
 
 	[SerializeField]
@@ -288,9 +288,14 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		BaseVehicleModule moduleForItem = GetModuleForItem(item);
 		if (moduleForItem != null)
 		{
-			if (Interface.CallHook("OnVehicleModuleMove", moduleForItem, this, player) != null)
+			object obj = Interface.CallHook("OnVehicleModuleMove", moduleForItem, this, player);
+			if (obj != null)
 			{
-				return false;
+				if (!(obj is bool))
+				{
+					return false;
+				}
+				return (bool)obj;
 			}
 			return moduleForItem.CanBeMovedNow();
 		}

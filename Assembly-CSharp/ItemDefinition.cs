@@ -81,8 +81,8 @@ public class ItemDefinition : MonoBehaviour
 
 	public bool quickDespawn;
 
-	[Tooltip("How rare this item is and how much it costs to research")]
 	[Header("Spawn Tables")]
+	[Tooltip("How rare this item is and how much it costs to research")]
 	public Rarity rarity;
 
 	public bool spawnAsBlueprint;

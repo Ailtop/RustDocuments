@@ -24,7 +24,8 @@ public class SteamInventoryItem : ScriptableObject
 		Weapon,
 		Misc,
 		Crate,
-		Resource
+		Resource,
+		CrateUncraftable
 	}
 
 	public int id;

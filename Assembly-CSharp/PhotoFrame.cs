@@ -181,31 +181,26 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 		return CanUpdateSign(player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server.MaxDistance(3f)]
 	public void UpdateSign(RPCMessage msg)
 	{
-		if (msg.player == null)
-		{
-			return;
-		}
-		msg.player.lastSignUpdate = UnityEngine.Time.realtimeSinceStartup;
-		if (CanUpdateSign(msg.player))
+		if (!(msg.player == null) && CanUpdateSign(msg.player))
 		{
 			byte[] array = msg.read.BytesWithSize();
 			if (array != null && ImageProcessing.IsValidPNG(array, 1024, 1024))
 			{
-				Interface.CallHook("OnSignUpdated", this, msg.player);
 				FileStorage.server.RemoveAllByEntity(net.ID);
 				_overlayTextureCrc = FileStorage.server.Store(array, FileStorage.Type.png, net.ID);
 				SendNetworkUpdate();
+				Interface.CallHook("OnSignUpdated", this, msg.player);
 			}
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -217,8 +212,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))

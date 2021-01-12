@@ -12,8 +12,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private ModularCarChassisVisuals chassisVisuals;
 
-		[SerializeField]
 		[Header("Engine")]
+		[SerializeField]
 		private SoundDefinition engineStartSound;
 
 		[SerializeField]
@@ -86,8 +86,8 @@ namespace Rust.Modular
 		[Header("Brakes")]
 		private SoundDefinition brakeSoundDef;
 
-		[Header("Lights")]
 		[SerializeField]
+		[Header("Lights")]
 		private SoundDefinition lightsToggleSound;
 
 		[Header("Wheels")]

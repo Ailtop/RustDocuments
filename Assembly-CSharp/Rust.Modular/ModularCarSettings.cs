@@ -6,8 +6,8 @@ namespace Rust.Modular
 	[Serializable]
 	public class ModularCarSettings
 	{
-		[Header("Vehicle Setup")]
 		[Range(0f, 3f)]
+		[Header("Vehicle Setup")]
 		public float tireFriction = 1f;
 
 		[Range(0f, 1f)]
@@ -42,8 +42,8 @@ namespace Rust.Modular
 		[Header("Brakes")]
 		public float brakeForceMultiplier = 1000f;
 
-		[Range(0f, 1f)]
 		[Header("Front/Rear Vehicle Balance")]
+		[Range(0f, 1f)]
 		public float handlingBias = 0.5f;
 	}
 }

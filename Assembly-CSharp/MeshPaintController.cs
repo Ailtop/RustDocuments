@@ -15,5 +15,19 @@ public class MeshPaintController : MonoBehaviour, IClientComponent
 
 	public RawImage brushImage;
 
+	public float brushPreviewScaleMultiplier = 1f;
+
+	public bool applyDefaults;
+
+	public Texture2D defaltBrushTexture;
+
+	public float defaultBrushSize = 16f;
+
+	public Color defaultBrushColor = Color.black;
+
+	public float defaultBrushAlpha = 0.5f;
+
+	public Toggle lastBrush;
+
 	private Vector3 lastPosition;
 }

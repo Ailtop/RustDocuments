@@ -30,7 +30,7 @@ public class BigWheelBettingTerminal : StorageContainer
 
 	public bool IsPlayerValid(BasePlayer player)
 	{
-		if (!player.isMounted)
+		if (!player.isMounted || !(player.GetMounted() is BaseChair))
 		{
 			return false;
 		}

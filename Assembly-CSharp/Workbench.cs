@@ -25,6 +25,8 @@ public class Workbench : StorageContainer
 
 	public ItemDefinition experimentResource;
 
+	public TechTreeData techTree;
+
 	public static ItemDefinition blueprintBaseDef;
 
 	private ItemDefinition pendingBlueprint;
@@ -35,6 +37,7 @@ public class Workbench : StorageContainer
 	{
 		using (TimeWarning.New("Workbench.OnRpcMessage"))
 		{
+			RPCMessage rPCMessage;
 			if (rpc == 2308794761u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -55,7 +58,7 @@ public class Workbench : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -67,6 +70,42 @@ public class Workbench : StorageContainer
 					{
 						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_BeginExperiment");
+					}
+				}
+				return true;
+			}
+			if (rpc == 4127240744u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player + " - RPC_TechTreeUnlock ");
+				}
+				using (TimeWarning.New("RPC_TechTreeUnlock"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(4127240744u, "RPC_TechTreeUnlock", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg3 = rPCMessage;
+							RPC_TechTreeUnlock(msg3);
+						}
+					}
+					catch (Exception exception2)
+					{
+						Debug.LogException(exception2);
+						player.Kick("RPC Error in RPC_TechTreeUnlock");
 					}
 				}
 				return true;
@@ -96,6 +135,48 @@ public class Workbench : StorageContainer
 	public bool IsWorking()
 	{
 		return HasFlag(Flags.On);
+	}
+
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
+	public void RPC_TechTreeUnlock(RPCMessage msg)
+	{
+		BasePlayer player = msg.player;
+		int num = msg.read.Int32();
+		TechTreeData.NodeInstance byID = techTree.GetByID(num);
+		if (byID == null)
+		{
+			Debug.Log("Node for unlock not found :" + num);
+		}
+		else
+		{
+			if (!techTree.PlayerCanUnlock(player, byID))
+			{
+				return;
+			}
+			if (byID.IsGroup())
+			{
+				foreach (int output in byID.outputs)
+				{
+					TechTreeData.NodeInstance byID2 = techTree.GetByID(output);
+					if (byID2 != null && byID2.itemDef != null)
+					{
+						player.blueprints.Unlock(byID2.itemDef);
+					}
+				}
+				Debug.Log("Player unlocked group :" + byID.groupName);
+			}
+			else if (byID.itemDef != null)
+			{
+				int num2 = ResearchTable.ScrapForResearch(byID.itemDef);
+				int itemid = ItemManager.FindItemDefinition("scrap").itemid;
+				if (player.inventory.GetAmount(itemid) >= num2)
+				{
+					player.inventory.Take(null, itemid, num2);
+					player.blueprints.Unlock(byID.itemDef);
+				}
+			}
+		}
 	}
 
 	public static ItemDefinition GetBlueprintTemplate()

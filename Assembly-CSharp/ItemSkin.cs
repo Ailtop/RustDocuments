@@ -11,6 +11,8 @@ public class ItemSkin : SteamInventoryItem
 	[Tooltip("If set, whenever we make an item with this skin, we'll spawn this item without a skin instead")]
 	public ItemDefinition Redirect;
 
+	public SteamInventoryItem UnlockedViaSteamItem;
+
 	public void ApplySkin(GameObject obj)
 	{
 		if (!(Skinnable == null))
@@ -25,6 +27,14 @@ public class ItemSkin : SteamInventoryItem
 		{
 			BasePlayer basePlayer = BasePlayer.FindByID(playerId);
 			if (basePlayer != null && basePlayer.blueprints.CheckSkinOwnership(Redirect.isRedirectOf.steamItem.id, basePlayer.userID))
+			{
+				return true;
+			}
+		}
+		if (UnlockedViaSteamItem != null)
+		{
+			BasePlayer basePlayer2 = BasePlayer.FindByID(playerId);
+			if (basePlayer2 != null && basePlayer2.blueprints.CheckSkinOwnership(UnlockedViaSteamItem.id, basePlayer2.userID))
 			{
 				return true;
 			}

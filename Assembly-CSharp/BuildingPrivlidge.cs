@@ -28,11 +28,11 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
-	private float cachedProtectedMinutes;
+	public float cachedProtectedMinutes;
 
-	private float nextProtectedCalcTime;
+	public float nextProtectedCalcTime;
 
-	private static UpkeepBracket[] upkeepBrackets = new UpkeepBracket[4]
+	public static UpkeepBracket[] upkeepBrackets = new UpkeepBracket[4]
 	{
 		new UpkeepBracket(ConVar.Decay.bracket_0_blockcount, ConVar.Decay.bracket_0_costfraction),
 		new UpkeepBracket(ConVar.Decay.bracket_1_blockcount, ConVar.Decay.bracket_1_costfraction),
@@ -40,7 +40,7 @@ public class BuildingPrivlidge : StorageContainer
 		new UpkeepBracket(ConVar.Decay.bracket_3_blockcount, ConVar.Decay.bracket_3_costfraction)
 	};
 
-	private List<ItemAmount> upkeepBuffer = new List<ItemAmount>();
+	public List<ItemAmount> upkeepBuffer = new List<ItemAmount>();
 
 	public List<PlayerNameID> authorizedPlayers = new List<PlayerNameID>();
 
@@ -289,7 +289,7 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
-	private bool EnsurePrimary()
+	public bool EnsurePrimary()
 	{
 		BuildingManager.Building building = GetBuilding();
 		if (building != null)
@@ -347,7 +347,7 @@ public class BuildingPrivlidge : StorageContainer
 		return num3 / (float)count;
 	}
 
-	private void ApplyUpkeepPayment()
+	public void ApplyUpkeepPayment()
 	{
 		List<Item> obj = Facepunch.Pool.GetList<Item>();
 		for (int i = 0; i < upkeepBuffer.Count; i++)
@@ -373,7 +373,7 @@ public class BuildingPrivlidge : StorageContainer
 		Facepunch.Pool.FreeList(ref obj);
 	}
 
-	private void QueueUpkeepPayment(List<ItemAmount> itemAmounts)
+	public void QueueUpkeepPayment(List<ItemAmount> itemAmounts)
 	{
 		for (int i = 0; i < itemAmounts.Count; i++)
 		{
@@ -403,7 +403,7 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
-	private bool CanAffordUpkeepPayment(List<ItemAmount> itemAmounts)
+	public bool CanAffordUpkeepPayment(List<ItemAmount> itemAmounts)
 	{
 		for (int i = 0; i < itemAmounts.Count; i++)
 		{
@@ -609,8 +609,8 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Rotate(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

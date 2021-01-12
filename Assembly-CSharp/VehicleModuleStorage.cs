@@ -96,23 +96,21 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	public override void Spawn()
 	{
 		base.Spawn();
-		if (!Rust.Application.isLoadingSave)
+		if (!Rust.Application.isLoadingSave && storage.storageUnitPoint.gameObject.activeSelf)
 		{
-			BaseEntity baseEntity = GameManager.server.CreateEntity(storage.storageUnitPrefab.resourcePath, storage.storageUnitPoint.localPosition, storage.storageUnitPoint.localRotation);
-			baseEntity.SetParent(this);
-			baseEntity.Spawn();
-			storageUnitInstance.Set(baseEntity);
-			ItemContainer inventory = GetContainer().inventory;
-			inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
-			SendNetworkUpdate();
+			CreateStorageEntity();
 		}
 	}
 
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		ItemContainer inventory = GetContainer().inventory;
-		inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
+		IItemContainerEntity container = GetContainer();
+		if (!ObjectEx.IsUnityNull(container))
+		{
+			ItemContainer inventory = container.inventory;
+			inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
+		}
 	}
 
 	private void OnItemAddedRemoved(Item item, bool add)
@@ -132,7 +130,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	internal override void DoServerDestroy()
 	{
 		IItemContainerEntity container = GetContainer();
-		if (container != null && vehicle.carsdroploot)
+		if (!ObjectEx.IsUnityNull(container) && vehicle.carsdroploot)
 		{
 			container.DropItems();
 		}
@@ -146,6 +144,41 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		info.msg.simpleUID.uid = storageUnitInstance.uid;
 	}
 
+	public void CreateStorageEntity()
+	{
+		if (IsFullySpawned() && base.isServer && !storageUnitInstance.IsValid(base.isServer))
+		{
+			BaseEntity baseEntity = GameManager.server.CreateEntity(storage.storageUnitPrefab.resourcePath, storage.storageUnitPoint.localPosition, storage.storageUnitPoint.localRotation);
+			baseEntity.SetParent(this);
+			baseEntity.Spawn();
+			storageUnitInstance.Set(baseEntity);
+			ItemContainer inventory = GetContainer().inventory;
+			inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
+			SendNetworkUpdate();
+		}
+	}
+
+	public void DestroyStorageEntity()
+	{
+		if (!IsFullySpawned() || !base.isServer)
+		{
+			return;
+		}
+		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
+		if (BaseEntityEx.IsValid(baseEntity))
+		{
+			BaseCombatEntity baseCombatEntity;
+			if ((object)(baseCombatEntity = (baseEntity as BaseCombatEntity)) != null)
+			{
+				baseCombatEntity.Die();
+			}
+			else
+			{
+				baseEntity.Kill();
+			}
+		}
+	}
+
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open(RPCMessage msg)
@@ -154,7 +187,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		if (!(player == null) && CanBeLooted(player))
 		{
 			IItemContainerEntity container = GetContainer();
-			if (container != null)
+			if (!ObjectEx.IsUnityNull(container))
 			{
 				container.PlayerOpenLoot(player);
 			}
@@ -168,7 +201,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	protected override bool CanBeMovedNowOnVehicle()
 	{
 		IItemContainerEntity container = GetContainer();
-		if (container != null && !container.inventory.IsEmpty())
+		if (!ObjectEx.IsUnityNull(container) && !container.inventory.IsEmpty())
 		{
 			return false;
 		}

@@ -208,6 +208,11 @@ public static class GamePhysics
 		}
 	}
 
+	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding0, float padding1)
+	{
+		return LineOfSightInternal(p0, p1, layerMask, padding0, padding1);
+	}
+
 	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding = 0f)
 	{
 		return LineOfSightInternal(p0, p1, layerMask, padding, padding);

@@ -8,8 +8,8 @@ namespace VLB
 {
 	[SelectionBase]
 	[DisallowMultipleComponent]
-	[ExecuteInEditMode]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
+	[ExecuteInEditMode]
 	public class VolumetricLightBeam : MonoBehaviour
 	{
 		public bool colorFromLight = true;
@@ -98,8 +98,8 @@ namespace VLB
 		[SerializeField]
 		private int pluginVersion = -1;
 
-		[SerializeField]
 		[FormerlySerializedAs("trackChangesDuringPlaytime")]
+		[SerializeField]
 		private bool _TrackChangesDuringPlaytime;
 
 		[SerializeField]

@@ -1,5 +1,4 @@
 using EasyAntiCheat.Server.Scout;
-using Facepunch.Network.Raknet;
 using Network;
 using System;
 using System.Collections.Generic;
@@ -272,6 +271,9 @@ namespace ConVar
 		public static int maxpacketspersecond_rpc = 200;
 
 		[ServerVar]
+		public static int maxpacketspersecond_rpc_signal = 50;
+
+		[ServerVar]
 		public static int maxpacketspersecond_command = 100;
 
 		[ServerVar]
@@ -290,15 +292,28 @@ namespace ConVar
 		public static bool rpclog_enabled = false;
 
 		[ServerVar]
+		public static int maxconnectionsperip
+		{
+			get
+			{
+				return Network.Server.MaxConnectionsPerIP;
+			}
+			set
+			{
+				Network.Server.MaxConnectionsPerIP = Mathf.Clamp(value, 1, 1000);
+			}
+		}
+
+		[ServerVar]
 		public static float maxreceivetime
 		{
 			get
 			{
-				return Facepunch.Network.Raknet.Server.MaxReceiveTime;
+				return Network.Server.MaxReceiveTime;
 			}
 			set
 			{
-				Facepunch.Network.Raknet.Server.MaxReceiveTime = Mathf.Clamp(value, 1f, 1000f);
+				Network.Server.MaxReceiveTime = Mathf.Clamp(value, 1f, 1000f);
 			}
 		}
 

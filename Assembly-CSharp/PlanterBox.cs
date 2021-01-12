@@ -24,6 +24,8 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	private TimeCachedValue<float> plantArtificalTemperature;
 
+	private TimeSince lastRainCheck;
+
 	public float soilSaturationFraction => (float)soilSaturation / (float)soilSaturationMax;
 
 	public int availableIdealWaterCapacity => Mathf.Max(availableIdealWaterCapacity, Mathf.Max(idealSaturation - soilSaturation, 0));
@@ -67,6 +69,8 @@ public class PlanterBox : StorageContainer, ISplashable
 			refreshRandomRange = 5f,
 			updateValue = CalculateArtificialTemperature
 		};
+		lastRainCheck = 0f;
+		InvokeRandomized(CalculateRainFactor, 20f, 30f, 15f);
 	}
 
 	public override void OnItemAddedOrRemoved(Item item, bool added)
@@ -264,6 +268,21 @@ public class PlanterBox : StorageContainer, ISplashable
 	private float CalculatePlantTemperature()
 	{
 		return Mathf.Max(Climate.GetTemperature(base.transform.position), 15f);
+	}
+
+	private void CalculateRainFactor()
+	{
+		if (sunExposure.Get(false) > 0f)
+		{
+			float rain = Climate.GetRain(base.transform.position);
+			if (rain > 0f)
+			{
+				soilSaturation = Mathf.Clamp(soilSaturation + Mathf.RoundToInt(4f * rain * (float)lastRainCheck), 0, soilSaturationMax);
+				RefreshGrowables();
+				SendNetworkUpdate();
+			}
+		}
+		lastRainCheck = 0f;
 	}
 
 	private float CalculateArtificialTemperature()

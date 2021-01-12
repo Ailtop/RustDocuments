@@ -26,8 +26,8 @@ public class BaseProjectile : AttackEntity
 			[Tooltip("Set to 0 to not use inbuilt mag")]
 			public int builtInSize;
 
-			[InspectorFlags]
 			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
+			[InspectorFlags]
 			public AmmoTypes ammoTypes;
 		}
 
@@ -116,7 +116,7 @@ public class BaseProjectile : AttackEntity
 			}
 		}
 
-		public bool Reload(BasePlayer owner, int desiredAmount = -1)
+		public bool Reload(BasePlayer owner, int desiredAmount = -1, bool canRefundAmmo = true)
 		{
 			List<Item> list = owner.inventory.FindItemIDs(ammoType.itemid).ToList();
 			if (list.Count == 0)
@@ -134,7 +134,10 @@ public class BaseProjectile : AttackEntity
 				}
 				if (contents > 0)
 				{
-					owner.GiveItem(ItemManager.CreateByItemID(ammoType.itemid, contents, 0uL));
+					if (canRefundAmmo)
+					{
+						owner.GiveItem(ItemManager.CreateByItemID(ammoType.itemid, contents, 0uL));
+					}
 					contents = 0;
 				}
 				ammoType = list[0].info;
@@ -270,6 +273,10 @@ public class BaseProjectile : AttackEntity
 	public override bool IsUsableByTurret => usableByTurret;
 
 	public override Transform MuzzleTransform => MuzzlePoint;
+
+	protected virtual bool CanRefundAmmo => true;
+
+	protected virtual ItemDefinition PrimaryMagazineAmmo => primaryMagazine.ammoType;
 
 	private bool UsingInfiniteAmmoCheat => false;
 
@@ -690,7 +697,7 @@ public class BaseProjectile : AttackEntity
 					hitInfo.Weapon = this;
 					hitInfo.WeaponPrefab = base.gameManager.FindPrefab(base.PrefabName).GetComponent<AttackEntity>();
 					hitInfo.IsPredicting = false;
-					hitInfo.DoHitEffects = true;
+					hitInfo.DoHitEffects = component2.doDefaultHitEffects;
 					hitInfo.DidHit = true;
 					hitInfo.ProjectileVelocity = vector2 * 300f;
 					hitInfo.PointStart = MuzzlePoint.position;
@@ -869,7 +876,7 @@ public class BaseProjectile : AttackEntity
 		return num;
 	}
 
-	protected void ReloadMagazine(int desiredAmount = -1)
+	protected virtual void ReloadMagazine(int desiredAmount = -1)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
 		if ((bool)ownerPlayer && Interface.CallHook("OnReloadMagazine", ownerPlayer, this, desiredAmount) == null)
@@ -881,8 +888,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -939,7 +946,10 @@ public class BaseProjectile : AttackEntity
 			reloadFinished = false;
 			reloadStarted = true;
 			fractionalInsertCounter = 0;
-			primaryMagazine.SwitchAmmoTypesIfNeeded(player);
+			if (CanRefundAmmo)
+			{
+				primaryMagazine.SwitchAmmoTypesIfNeeded(player);
+			}
 			StartReloadCooldown(GetReloadDuration());
 		}
 	}
@@ -1078,9 +1088,9 @@ public class BaseProjectile : AttackEntity
 			player.stats.combat.Log(this, "ammo_missing");
 			return;
 		}
-		ItemDefinition ammoType = primaryMagazine.ammoType;
+		ItemDefinition primaryMagazineAmmo = PrimaryMagazineAmmo;
 		ProjectileShoot projectileShoot = ProjectileShoot.Deserialize(msg.read);
-		if (ammoType.itemid != projectileShoot.ammoType)
+		if (primaryMagazineAmmo.itemid != projectileShoot.ammoType)
 		{
 			AntiHack.Log(player, AntiHackType.ProjectileHack, "Ammo mismatch (" + base.ShortPrefabName + ")");
 			player.stats.combat.Log(this, "ammo_mismatch");
@@ -1090,7 +1100,7 @@ public class BaseProjectile : AttackEntity
 		{
 			primaryMagazine.contents--;
 		}
-		ItemModProjectile component = ammoType.GetComponent<ItemModProjectile>();
+		ItemModProjectile component = primaryMagazineAmmo.GetComponent<ItemModProjectile>();
 		if (component == null)
 		{
 			AntiHack.Log(player, AntiHackType.ProjectileHack, "Item mod not found (" + base.ShortPrefabName + ")");
@@ -1115,7 +1125,7 @@ public class BaseProjectile : AttackEntity
 			}
 			else if (ValidateEyePos(player, projectile.startPos))
 			{
-				player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, ammoType);
+				player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, primaryMagazineAmmo);
 				CreateProjectileEffectClientside(component.projectileObject.resourcePath, projectile.startPos, projectile.startVel, projectile.seed, msg.connection, IsSilenced());
 			}
 		}

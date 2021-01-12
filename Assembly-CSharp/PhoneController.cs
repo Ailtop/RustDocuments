@@ -1,7 +1,9 @@
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
+using System;
 using UnityEngine;
 
 public class PhoneController : EntityComponent<BaseEntity>
@@ -21,6 +23,8 @@ public class PhoneController : EntityComponent<BaseEntity>
 	public bool RequireParent;
 
 	public float CallWaitingTime = 12f;
+
+	public bool AppendGridToName;
 
 	public GameObjectRef PhoneDialog;
 
@@ -47,6 +51,10 @@ public class PhoneController : EntityComponent<BaseEntity>
 	public SoundDefinition FailedNetworkBusy;
 
 	public SoundDefinition FailedEngaged;
+
+	public Light RingingLight;
+
+	public float RingingLightFrequency = 0.4f;
 
 	public AudioSource answeringMachineSound;
 
@@ -95,6 +103,10 @@ public class PhoneController : EntityComponent<BaseEntity>
 		if (PhoneNumber == 0 && !Rust.Application.isLoadingSave)
 		{
 			PhoneNumber = TelephoneManager.GetUnusedTelephoneNumber();
+			if (AppendGridToName & !string.IsNullOrEmpty(PhoneName))
+			{
+				PhoneName = PhoneName + " " + PositionToGridCoord(base.transform.position);
+			}
 			TelephoneManager.RegisterTelephone(this);
 		}
 	}
@@ -361,8 +373,12 @@ public class PhoneController : EntityComponent<BaseEntity>
 			{
 				text = text.Substring(0, 20);
 			}
-			PhoneName = text;
-			base.baseEntity.SendNetworkUpdate();
+			if (Interface.CallHook("OnPhoneNameUpdate", this, text, msg.player) == null)
+			{
+				PhoneName = text;
+				base.baseEntity.SendNetworkUpdate();
+				Interface.CallHook("OnPhoneNameUpdated", this, PhoneName, msg.player);
+			}
 		}
 	}
 
@@ -416,6 +432,34 @@ public class PhoneController : EntityComponent<BaseEntity>
 				base.baseEntity.SendNetworkUpdate();
 			}
 		}
+	}
+
+	public string GetDirectoryName()
+	{
+		return PhoneName;
+	}
+
+	private static string PositionToGridCoord(Vector3 position)
+	{
+		Vector2 a = new Vector2(TerrainMeta.NormalizeX(position.x), TerrainMeta.NormalizeZ(position.z));
+		float num = TerrainMeta.Size.x / 1024f;
+		int num2 = 7;
+		Vector2 vector = a * num * num2;
+		float num3 = Mathf.Floor(vector.x) + 1f;
+		float num4 = Mathf.Floor(num * (float)num2 - vector.y);
+		string str = string.Empty;
+		float num5 = num3 / 26f;
+		float num6 = num3 % 26f;
+		if (num6 == 0f)
+		{
+			num6 = 26f;
+		}
+		if (num5 > 1f)
+		{
+			str += Convert.ToChar(64 + (int)num5).ToString();
+		}
+		str += Convert.ToChar(64 + (int)num6).ToString();
+		return $"{str}{num4}";
 	}
 
 	private bool IsPowered()

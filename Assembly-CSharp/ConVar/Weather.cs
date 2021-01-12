@@ -540,8 +540,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void reset(Arg args)
 		{
 			if ((bool)SingletonComponent<Climate>.Instance)

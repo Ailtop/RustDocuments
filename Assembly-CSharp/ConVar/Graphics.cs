@@ -55,7 +55,7 @@ namespace ConVar
 		[ClientVar(Saved = true)]
 		public static float dof_blur = 1f;
 
-		[ClientVar(Saved = true, Help = "0 = auto 1 = manual")]
+		[ClientVar(Saved = true, Help = "0 = auto 1 = manual 2 = dynamic based on target")]
 		public static int dof_mode = 0;
 
 		[ClientVar(Saved = true, Help = "distance from camera to focus on")]
@@ -66,6 +66,9 @@ namespace ConVar
 
 		[ClientVar(Saved = true, ClientAdmin = true)]
 		public static bool dof_debug = false;
+
+		[ClientVar(ClientAdmin = true)]
+		public static int dof_focus_target = 0;
 
 		[ClientVar(Saved = true, Help = "Whether to scale vm models with fov")]
 		public static bool vm_fov_scale = true;

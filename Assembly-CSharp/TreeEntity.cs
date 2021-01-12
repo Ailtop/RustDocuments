@@ -23,8 +23,7 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 
 	public bool impactSoundPlayed;
 
-	[NonSerialized]
-	public float treeDistanceUponFalling;
+	private float treeDistanceUponFalling;
 
 	public static ListHashSet<TreeEntity> activeTreeList = new ListHashSet<TreeEntity>();
 

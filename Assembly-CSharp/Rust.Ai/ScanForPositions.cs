@@ -21,8 +21,8 @@ namespace Rust.Ai
 		[FriendlyName("Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Should be used for fallbacks/stuck-detection only?")]
 		public bool CalculatePath;
 
-		[ApexSerialization(defaultValue = false)]
 		[FriendlyName("Percentage of Inner Circle for Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Here we can define what percentage of the sampling range (it's inner circle) we want to calculate paths for.")]
+		[ApexSerialization(defaultValue = false)]
 		public float CalculatePathInnerCirclePercentageThreshold = 0.1f;
 
 		[ApexSerialization]

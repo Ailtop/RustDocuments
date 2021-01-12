@@ -13,5 +13,13 @@ public class DemoText : SingletonComponent<DemoText>
 
 	public RustText DateTimeText;
 
+	public RustText ParentText;
+
+	public RustText DofText;
+
 	public GameObject InternalRoot;
+
+	public GameObject ParentRoot;
+
+	public GameObject DofRoot;
 }

@@ -209,6 +209,15 @@ public class Kayak : BaseBoat, PoolVehicle
 		}
 	}
 
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (!HasDriver())
+		{
+			return base.CanPickup(player);
+		}
+		return false;
+	}
+
 	public bool IsPlayerHoldingPaddle(BasePlayer player)
 	{
 		if (player.GetHeldEntity() != null)
