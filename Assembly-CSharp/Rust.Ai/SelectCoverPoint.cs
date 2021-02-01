@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.Serialization;
-using System.Collections.Generic;
 
 namespace Rust.Ai
 {

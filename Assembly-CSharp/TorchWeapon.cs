@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -24,7 +24,7 @@ public class TorchWeapon : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Extinguish ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Extinguish "));
 				}
 				using (TimeWarning.New("Extinguish"))
 				{
@@ -60,7 +60,7 @@ public class TorchWeapon : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Ignite ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Ignite "));
 				}
 				using (TimeWarning.New("Ignite"))
 				{

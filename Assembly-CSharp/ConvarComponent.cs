@@ -1,6 +1,6 @@
-using Rust;
 using System;
 using System.Collections.Generic;
+using Rust;
 using UnityEngine;
 
 public class ConvarComponent : MonoBehaviour
@@ -59,23 +59,25 @@ public class ConvarComponent : MonoBehaviour
 
 	protected void OnEnable()
 	{
-		if (ShouldRun())
+		if (!ShouldRun())
 		{
-			foreach (ConvarEvent item in List)
-			{
-				item.OnEnable();
-			}
+			return;
+		}
+		foreach (ConvarEvent item in List)
+		{
+			item.OnEnable();
 		}
 	}
 
 	protected void OnDisable()
 	{
-		if (!Rust.Application.isQuitting && ShouldRun())
+		if (Rust.Application.isQuitting || !ShouldRun())
 		{
-			foreach (ConvarEvent item in List)
-			{
-				item.OnDisable();
-			}
+			return;
+		}
+		foreach (ConvarEvent item in List)
+		{
+			item.OnDisable();
 		}
 	}
 

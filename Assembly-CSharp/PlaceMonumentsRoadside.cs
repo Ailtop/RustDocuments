@@ -86,66 +86,69 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			SpawnInfoGroup[] array3 = array2;
 			foreach (SpawnInfoGroup spawnInfoGroup3 in array3)
 			{
-				if (!spawnInfoGroup3.processed)
+				if (spawnInfoGroup3.processed)
 				{
-					Prefab<MonumentInfo> prefab3 = spawnInfoGroup3.prefab;
-					if (!prefab3.Component || World.Size >= prefab3.Component.MinWorldSize)
+					continue;
+				}
+				Prefab<MonumentInfo> prefab3 = spawnInfoGroup3.prefab;
+				if ((bool)prefab3.Component && World.Size < prefab3.Component.MinWorldSize)
+				{
+					continue;
+				}
+				foreach (PathList road in TerrainMeta.Path.Roads)
+				{
+					if (road.IsExtraNarrow)
 					{
-						foreach (PathList road in TerrainMeta.Path.Roads)
+						continue;
+					}
+					PathInterpolator path = road.Path;
+					float num = 20f;
+					float num2 = 10f;
+					float num3 = path.StartOffset + num2;
+					float num4 = path.Length - path.EndOffset - num2;
+					for (float num5 = num3; num5 <= num4; num5 += num)
+					{
+						Vector3 vector = (road.Spline ? path.GetPointCubicHermite(num5) : path.GetPoint(num5));
+						Vector3 tangent = path.GetTangent(num5);
+						int num6 = 0;
+						Vector3 zero = Vector3.zero;
+						TerrainPathConnect[] componentsInChildren = prefab3.Object.GetComponentsInChildren<TerrainPathConnect>(true);
+						foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 						{
-							if (!road.IsExtraNarrow)
+							if (terrainPathConnect.Type == InfrastructureType.Road)
 							{
-								PathInterpolator path = road.Path;
-								float num = 20f;
-								float num2 = 10f;
-								float num3 = path.StartOffset + num2;
-								float num4 = path.Length - path.EndOffset - num2;
-								for (float num5 = num3; num5 <= num4; num5 += num)
-								{
-									Vector3 vector = road.Spline ? path.GetPointCubicHermite(num5) : path.GetPoint(num5);
-									Vector3 tangent = path.GetTangent(num5);
-									int num6 = 0;
-									Vector3 zero = Vector3.zero;
-									TerrainPathConnect[] componentsInChildren = prefab3.Object.GetComponentsInChildren<TerrainPathConnect>(true);
-									foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
-									{
-										if (terrainPathConnect.Type == InfrastructureType.Road)
-										{
-											zero += terrainPathConnect.transform.position;
-											num6++;
-										}
-									}
-									if (num6 > 1)
-									{
-										zero /= (float)num6;
-									}
-									for (int m = -1; m <= 1; m += 2)
-									{
-										Quaternion quaternion = Quaternion.LookRotation(m * tangent.XZ3D());
-										Vector3 pos = vector;
-										Quaternion quaternion2 = quaternion;
-										Vector3 localScale = prefab3.Object.transform.localScale;
-										if (zero != Vector3.zero)
-										{
-											quaternion2 *= Quaternion.LookRotation(rot90 * -zero.XZ3D());
-											pos -= quaternion2 * zero;
-										}
-										if ((!prefab3.Component || prefab3.Component.CheckPlacement(pos, quaternion2, localScale)) && prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground))
-										{
-											SpawnInfo item = default(SpawnInfo);
-											item.prefab = prefab3;
-											item.position = pos;
-											item.rotation = quaternion2;
-											item.scale = localScale;
-											spawnInfoGroup3.candidates.Add(item);
-										}
-									}
-								}
+								zero += terrainPathConnect.transform.position;
+								num6++;
 							}
 						}
-						spawnInfoGroup3.processed = true;
+						if (num6 > 1)
+						{
+							zero /= (float)num6;
+						}
+						for (int m = -1; m <= 1; m += 2)
+						{
+							Quaternion quaternion = Quaternion.LookRotation(m * tangent.XZ3D());
+							Vector3 pos = vector;
+							Quaternion quaternion2 = quaternion;
+							Vector3 localScale = prefab3.Object.transform.localScale;
+							if (zero != Vector3.zero)
+							{
+								quaternion2 *= Quaternion.LookRotation(rot90 * -zero.XZ3D());
+								pos -= quaternion2 * zero;
+							}
+							if ((!prefab3.Component || prefab3.Component.CheckPlacement(pos, quaternion2, localScale)) && prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground))
+							{
+								SpawnInfo item = default(SpawnInfo);
+								item.prefab = prefab3;
+								item.position = pos;
+								item.rotation = quaternion2;
+								item.scale = localScale;
+								spawnInfoGroup3.candidates.Add(item);
+							}
+						}
 					}
 				}
+				spawnInfoGroup3.processed = true;
 			}
 			int num7 = 0;
 			List<SpawnInfo> a = new List<SpawnInfo>();

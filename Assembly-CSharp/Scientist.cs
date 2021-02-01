@@ -1,7 +1,7 @@
-using Oxide.Core;
-using Rust.Ai;
 using System;
 using System.Collections.Generic;
+using Oxide.Core;
+using Rust.Ai;
 using UnityEngine;
 
 public class Scientist : NPCPlayerApex

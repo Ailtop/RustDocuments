@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Facepunch;
 using Facepunch.Extend;
 using Network;
 using Network.Visibility;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -104,7 +104,7 @@ namespace ConVar
 				return keyValuePair.Value;
 			}))
 			{
-				text = text + dictionary[item.Key].ToString().PadLeft(10) + " " + item.Value.FormatBytes().PadLeft(15) + "\t" + item.Key + "\n";
+				text = string.Concat(text, dictionary[item.Key].ToString().PadLeft(10), " ", item.Value.FormatBytes().PadLeft(15), "\t", item.Key, "\n");
 			}
 			args.ReplyWith(text);
 		}
@@ -210,7 +210,7 @@ namespace ConVar
 			{
 				if (developer > 0)
 				{
-					UnityEngine.Debug.LogWarning(basePlayer + " wanted to respawn but isn't dead or spectating");
+					UnityEngine.Debug.LogWarning(string.Concat(basePlayer, " wanted to respawn but isn't dead or spectating"));
 				}
 				basePlayer.SendNetworkUpdate();
 			}

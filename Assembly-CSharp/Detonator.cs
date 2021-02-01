@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -32,7 +32,7 @@ public class Detonator : HeldEntity, IRFObject
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ServerSetFrequency ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerSetFrequency "));
 				}
 				using (TimeWarning.New("ServerSetFrequency"))
 				{
@@ -61,7 +61,7 @@ public class Detonator : HeldEntity, IRFObject
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetPressed ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetPressed "));
 				}
 				using (TimeWarning.New("SetPressed"))
 				{

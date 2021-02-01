@@ -1,5 +1,5 @@
-using Rust.UI;
 using System.Linq;
+using Rust.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -99,8 +99,8 @@ public class ItemListTools : MonoBehaviour
 		}
 		itemButton.SetActive(true);
 		bool flag = !string.IsNullOrEmpty(searchText);
-		string value = flag ? searchText.ToLower() : null;
-		IOrderedEnumerable<ItemDefinition> obj = flag ? allItems : currentItems;
+		string value = (flag ? searchText.ToLower() : null);
+		IOrderedEnumerable<ItemDefinition> obj = (flag ? allItems : currentItems);
 		int num = 0;
 		foreach (ItemDefinition item in obj)
 		{

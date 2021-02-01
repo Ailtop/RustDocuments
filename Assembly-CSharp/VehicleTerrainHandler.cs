@@ -52,9 +52,9 @@ public class VehicleTerrainHandler
 		if (Physics.Raycast(transform.position + transform.up * 0.5f, -transform.up, out hitInfo, RayLength, 27328512, QueryTriggerInteraction.Ignore))
 		{
 			CurGroundPhysicsMatName = AssetNameCache.GetNameLower(ColliderEx.GetMaterialAt(hitInfo.collider, hitInfo.point));
-			IsOnSnowOrIce = (CurGroundPhysicsMatName == "snow");
-			IsOnSand = (CurGroundPhysicsMatName == "sand");
-			IsOnIce = (IsOnSnowOrIce && hitInfo.collider.name.ToLower().Contains("ice"));
+			IsOnSnowOrIce = CurGroundPhysicsMatName == "snow";
+			IsOnSand = CurGroundPhysicsMatName == "sand";
+			IsOnIce = IsOnSnowOrIce && hitInfo.collider.name.ToLower().Contains("ice");
 			IsGrounded = true;
 		}
 		else

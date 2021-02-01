@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -50,7 +50,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AddLine ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddLine "));
 				}
 				using (TimeWarning.New("AddLine"))
 				{
@@ -86,7 +86,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - MakeConnection ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - MakeConnection "));
 				}
 				using (TimeWarning.New("MakeConnection"))
 				{
@@ -122,7 +122,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RequestClear ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestClear "));
 				}
 				using (TimeWarning.New("RequestClear"))
 				{
@@ -158,7 +158,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetPlugged ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetPlugged "));
 				}
 				using (TimeWarning.New("SetPlugged"))
 				{
@@ -187,7 +187,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - TryClear ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TryClear "));
 				}
 				using (TimeWarning.New("TryClear"))
 				{
@@ -324,7 +324,7 @@ public class WireTool : HeldEntity
 		BasePlayer player = msg.player;
 		uint uid = msg.read.UInt32();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
-		IOEntity iOEntity = (baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>();
+		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (!(iOEntity == null) && CanPlayerUseWires(player) && CanModifyEntity(player, iOEntity))
 		{
 			iOEntity.ClearConnections();
@@ -346,13 +346,13 @@ public class WireTool : HeldEntity
 		uint uid2 = msg.read.UInt32();
 		int num2 = msg.read.Int32();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
-		IOEntity iOEntity = (baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>();
+		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (iOEntity == null)
 		{
 			return;
 		}
 		BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
-		IOEntity iOEntity2 = (baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>();
+		IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
 		if (!(iOEntity2 == null) && !(Vector3.Distance(baseNetworkable2.transform.position, baseNetworkable.transform.position) > maxWireLength) && num < iOEntity.inputs.Length && num2 < iOEntity2.outputs.Length && !(iOEntity.inputs[num].connectedTo.Get() != null) && !(iOEntity2.outputs[num2].connectedTo.Get() != null) && (!iOEntity.inputs[num].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity) && CanModifyEntity(player, iOEntity2))
 		{
 			if (Interface.CallHook("OnWireConnect", msg.player, iOEntity, num, iOEntity2, num2) != null)
@@ -391,12 +391,12 @@ public class WireTool : HeldEntity
 		int num = msg.read.Int32();
 		bool flag = msg.read.Bit();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
-		IOEntity iOEntity = (baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>();
+		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (iOEntity == null || !CanModifyEntity(player, iOEntity) || num >= (flag ? iOEntity.inputs.Length : iOEntity.outputs.Length))
 		{
 			return;
 		}
-		IOEntity.IOSlot iOSlot = flag ? iOEntity.inputs[num] : iOEntity.outputs[num];
+		IOEntity.IOSlot iOSlot = (flag ? iOEntity.inputs[num] : iOEntity.outputs[num]);
 		if (iOSlot.connectedTo.Get() == null)
 		{
 			return;
@@ -406,7 +406,7 @@ public class WireTool : HeldEntity
 		{
 			return;
 		}
-		IOEntity.IOSlot obj = flag ? iOEntity2.outputs[iOSlot.connectedToSlot] : iOEntity2.inputs[iOSlot.connectedToSlot];
+		IOEntity.IOSlot obj = (flag ? iOEntity2.outputs[iOSlot.connectedToSlot] : iOEntity2.inputs[iOSlot.connectedToSlot]);
 		if (flag)
 		{
 			iOEntity.UpdateFromInput(0, num);
@@ -466,11 +466,11 @@ public class WireTool : HeldEntity
 		uint uid2 = msg.read.UInt32();
 		int num3 = msg.read.Int32();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
-		IOEntity iOEntity = (baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>();
+		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (!(iOEntity == null))
 		{
 			BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
-			IOEntity iOEntity2 = (baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>();
+			IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
 			if (!(iOEntity2 == null) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
 			{
 				iOEntity2.outputs[num3].linePoints = list.ToArray();

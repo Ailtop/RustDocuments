@@ -27,7 +27,7 @@ namespace Rust.Ai
 
 		public static byte Evaluate(NPCPlayerApex self, BasePlayer option)
 		{
-			return (byte)(self.IsVisibleMounted(option) ? 1 : 0);
+			return (byte)(self.IsVisibleMounted(option) ? 1u : 0u);
 		}
 	}
 }

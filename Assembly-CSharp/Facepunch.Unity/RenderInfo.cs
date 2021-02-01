@@ -1,8 +1,8 @@
-using Facepunch.Utility;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Facepunch.Utility;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -54,9 +54,9 @@ namespace Facepunch.Unity
 			{
 				RendererInstance result = default(RendererInstance);
 				result.IsVisible = renderer.isVisible;
-				result.CastShadows = (renderer.shadowCastingMode != ShadowCastingMode.Off);
+				result.CastShadows = renderer.shadowCastingMode != ShadowCastingMode.Off;
 				result.RecieveShadows = renderer.receiveShadows;
-				result.Enabled = (renderer.enabled && renderer.gameObject.activeInHierarchy);
+				result.Enabled = renderer.enabled && renderer.gameObject.activeInHierarchy;
 				result.Size = renderer.bounds.size.magnitude;
 				result.Distance = Vector3.Distance(renderer.bounds.center, Camera.main.transform.position);
 				result.MaterialCount = renderer.sharedMaterials.Length;

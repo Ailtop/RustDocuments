@@ -1,7 +1,7 @@
-using Facepunch;
-using Network;
 using System;
 using System.Collections.Generic;
+using Facepunch;
+using Network;
 
 namespace CompanionServer
 {

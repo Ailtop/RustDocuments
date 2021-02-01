@@ -12,7 +12,7 @@ namespace Rust.Ai
 
 		public override float GetScore(BaseContext c)
 		{
-			byte b = (byte)(value ? 1 : 0);
+			byte b = (byte)(value ? 1u : 0u);
 			if (c.GetFact(fact) != b)
 			{
 				return 0f;

@@ -228,11 +228,11 @@ public class MusicTheme : ScriptableObject
 		{
 			return false;
 		}
-		if (biomes != (TerrainBiome.Enum)(-1) && ((int)biomes & currentBiome) == 0)
+		if (biomes != (TerrainBiome.Enum)(-1) && ((uint)biomes & (uint)currentBiome) == 0)
 		{
 			return false;
 		}
-		if (topologies != (TerrainTopology.Enum)(-1) && ((int)topologies & currentTopology) != 0)
+		if (topologies != (TerrainTopology.Enum)(-1) && ((uint)topologies & (uint)currentTopology) != 0)
 		{
 			return false;
 		}

@@ -1,13 +1,13 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -144,7 +144,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AddSelfAuthorize ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddSelfAuthorize "));
 				}
 				using (TimeWarning.New("AddSelfAuthorize"))
 				{
@@ -180,7 +180,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ClearList ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClearList "));
 				}
 				using (TimeWarning.New("ClearList"))
 				{
@@ -216,7 +216,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - FlipAim ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - FlipAim "));
 				}
 				using (TimeWarning.New("FlipAim"))
 				{
@@ -252,7 +252,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RemoveSelfAuthorize ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RemoveSelfAuthorize "));
 				}
 				using (TimeWarning.New("RemoveSelfAuthorize"))
 				{
@@ -288,7 +288,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SERVER_AttackAll ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SERVER_AttackAll "));
 				}
 				using (TimeWarning.New("SERVER_AttackAll"))
 				{
@@ -324,7 +324,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SERVER_Peacekeeper ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SERVER_Peacekeeper "));
 				}
 				using (TimeWarning.New("SERVER_Peacekeeper"))
 				{
@@ -408,7 +408,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		bool flag = inputState.IsDown(BUTTON.FIRE_PRIMARY);
 		EnsureReloaded();
-		if (!(UnityEngine.Time.time >= nextShotTime) || !flag)
+		if (!(UnityEngine.Time.time >= nextShotTime && flag))
 		{
 			return;
 		}
@@ -418,7 +418,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			if (attachedWeapon.primaryMagazine.contents > 0)
 			{
 				FireAttachedGun(Vector3.zero, aimCone);
-				float delay = attachedWeapon.isSemiAuto ? (attachedWeapon.repeatDelay * 1.5f) : attachedWeapon.repeatDelay;
+				float delay = (attachedWeapon.isSemiAuto ? (attachedWeapon.repeatDelay * 1.5f) : attachedWeapon.repeatDelay);
 				delay = attachedWeapon.ScaleRepeatDelay(delay);
 				nextShotTime = UnityEngine.Time.time + delay;
 			}
@@ -634,12 +634,13 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	[RPC_Server.IsVisible(3f)]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
-		if (!IsOnline() && rpc.player.CanBuild() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
+		RPCMessage rpc2 = rpc;
+		if (!IsOnline() && rpc2.player.CanBuild() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
 		{
-			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc.player.userID);
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
 			PlayerNameID playerNameID = new PlayerNameID();
-			playerNameID.userid = rpc.player.userID;
-			playerNameID.username = rpc.player.displayName;
+			playerNameID.userid = rpc2.player.userID;
+			playerNameID.username = rpc2.player.displayName;
 			authorizedPlayers.Add(playerNameID);
 			SendNetworkUpdate();
 		}
@@ -649,9 +650,10 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	[RPC_Server.IsVisible(3f)]
 	private void RemoveSelfAuthorize(RPCMessage rpc)
 	{
-		if (!booting && !IsOnline() && IsAuthed(rpc.player) && Interface.CallHook("OnTurretDeauthorize", this, rpc.player) == null)
+		RPCMessage rpc2 = rpc;
+		if (!booting && !IsOnline() && IsAuthed(rpc2.player) && Interface.CallHook("OnTurretDeauthorize", this, rpc.player) == null)
 		{
-			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc.player.userID);
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
 			SendNetworkUpdate();
 		}
 	}
@@ -1123,7 +1125,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	public virtual float GetMaxAngleForEngagement()
 	{
 		BaseProjectile attachedWeapon = GetAttachedWeapon();
-		float result = (attachedWeapon == null) ? 1f : ((1f - Mathf.InverseLerp(0.2f, 1f, attachedWeapon.repeatDelay)) * 7f);
+		float result = ((attachedWeapon == null) ? 1f : ((1f - Mathf.InverseLerp(0.2f, 1f, attachedWeapon.repeatDelay)) * 7f));
 		if (UnityEngine.Time.time - lastShotTime > 1f)
 		{
 			result = 1f;
@@ -1151,7 +1153,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				if (attachedWeapon.primaryMagazine.contents > 0)
 				{
 					FireAttachedGun(AimOffset(target), aimCone, null, PeacekeeperMode() ? target : null);
-					float delay = attachedWeapon.isSemiAuto ? (attachedWeapon.repeatDelay * 1.5f) : attachedWeapon.repeatDelay;
+					float delay = (attachedWeapon.isSemiAuto ? (attachedWeapon.repeatDelay * 1.5f) : attachedWeapon.repeatDelay);
 					delay = attachedWeapon.ScaleRepeatDelay(delay);
 					nextShotTime = UnityEngine.Time.time + delay;
 				}
@@ -1215,42 +1217,46 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public void TargetScan()
 	{
-		if (!HasTarget() && !IsOffline() && !IsBeingRemoteControlled() && targetTrigger.entityContents != null)
+		if (HasTarget() || IsOffline() || IsBeingRemoteControlled() || targetTrigger.entityContents == null)
 		{
-			foreach (BaseEntity entityContent in targetTrigger.entityContents)
+			return;
+		}
+		foreach (BaseEntity entityContent in targetTrigger.entityContents)
+		{
+			if (entityContent == null)
 			{
-				if (!(entityContent == null))
+				continue;
+			}
+			BaseCombatEntity component = entityContent.GetComponent<BaseCombatEntity>();
+			if (component == null || !component.IsAlive() || !InFiringArc(component) || !ObjectVisible(component))
+			{
+				continue;
+			}
+			if (!Sentry.targetall)
+			{
+				BasePlayer basePlayer = component as BasePlayer;
+				if ((bool)basePlayer && (IsAuthed(basePlayer) || Ignore(basePlayer)))
 				{
-					BaseCombatEntity component = entityContent.GetComponent<BaseCombatEntity>();
-					if (!(component == null) && component.IsAlive() && InFiringArc(component) && ObjectVisible(component))
-					{
-						if (!Sentry.targetall)
-						{
-							BasePlayer basePlayer = component as BasePlayer;
-							if ((bool)basePlayer && (IsAuthed(basePlayer) || Ignore(basePlayer)))
-							{
-								continue;
-							}
-						}
-						if (ShouldTarget(component))
-						{
-							if (PeacekeeperMode())
-							{
-								if (!IsEntityHostile(component))
-								{
-									continue;
-								}
-								if (target == null)
-								{
-									nextShotTime = UnityEngine.Time.time + 1f;
-								}
-							}
-							SetTarget(component);
-							break;
-						}
-					}
+					continue;
 				}
 			}
+			if (!ShouldTarget(component))
+			{
+				continue;
+			}
+			if (PeacekeeperMode())
+			{
+				if (!IsEntityHostile(component))
+				{
+					continue;
+				}
+				if (target == null)
+				{
+					nextShotTime = UnityEngine.Time.time + 1f;
+				}
+			}
+			SetTarget(component);
+			break;
 		}
 	}
 

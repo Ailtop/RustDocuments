@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GrowableHeatSource : EntityComponent<BaseEntity>, IServerComponent
@@ -14,7 +14,7 @@ public class GrowableHeatSource : EntityComponent<BaseEntity>, IServerComponent
 			return 0f;
 		}
 		IOEntity iOEntity;
-		if (base.baseEntity.IsOn() || ((object)(iOEntity = (base.baseEntity as IOEntity)) != null && iOEntity.IsPowered()))
+		if (base.baseEntity.IsOn() || ((object)(iOEntity = base.baseEntity as IOEntity) != null && iOEntity.IsPowered()))
 		{
 			return Mathx.RemapValClamped(Vector3.Distance(forPosition, base.transform.position), 0f, Server.artificialTemperatureGrowableRange, 0f, heatAmount);
 		}

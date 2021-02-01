@@ -75,7 +75,7 @@ public class SystemInfoGeneralText : MonoBehaviour
 				stringBuilder.Append(World.Seed);
 				stringBuilder.AppendLine();
 				stringBuilder.Append("\tSize:        ");
-				stringBuilder.Append(KM2((float)(double)World.Size));
+				stringBuilder.Append(KM2(World.Size));
 				stringBuilder.Append(" km²");
 				stringBuilder.AppendLine();
 				stringBuilder.Append("\tHeightmap:   ");

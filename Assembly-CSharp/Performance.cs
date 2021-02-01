@@ -1,5 +1,5 @@
-using Rust.Workshop;
 using System;
+using Rust.Workshop;
 using UnityEngine;
 
 public class Performance : SingletonComponent<Performance>
@@ -75,7 +75,7 @@ public class Performance : SingletonComponent<Performance>
 			current.loadBalancerTasks = LoadBalancer.Count();
 			current.invokeHandlerTasks = InvokeHandler.Count();
 			current.workshopSkinsQueued = Rust.Workshop.WorkshopSkin.QueuedCount;
-			current.gcTriggered = (memoryCollections != current.memoryCollections);
+			current.gcTriggered = memoryCollections != current.memoryCollections;
 			frames = 0;
 			time = 0f;
 			cycles++;

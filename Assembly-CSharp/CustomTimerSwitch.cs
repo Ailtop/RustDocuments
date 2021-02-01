@@ -1,7 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -18,7 +18,7 @@ public class CustomTimerSwitch : TimerSwitch
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SERVER_SetTime ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SERVER_SetTime "));
 				}
 				using (TimeWarning.New("SERVER_SetTime"))
 				{
@@ -68,7 +68,7 @@ public class CustomTimerSwitch : TimerSwitch
 	{
 		if (CanPlayerAdmin(msg.player))
 		{
-			float num = timerLength = msg.read.Float();
+			float num = (timerLength = msg.read.Float());
 			SendNetworkUpdate();
 		}
 	}

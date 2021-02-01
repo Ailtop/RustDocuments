@@ -280,7 +280,7 @@ namespace VLB
 				Vector3 vector = m_Master.transform.InverseTransformPoint(cam.transform.position);
 				material.SetVector("_CameraPosObjectSpace", vector);
 				Vector3 normalized = base.transform.InverseTransformDirection(cam.transform.forward).normalized;
-				float w = cam.orthographic ? (-1f) : m_Master.GetInsideBeamFactorFromObjectSpacePos(vector);
+				float w = (cam.orthographic ? (-1f) : m_Master.GetInsideBeamFactorFromObjectSpacePos(vector));
 				material.SetVector("_CameraParams", new Vector4(normalized.x, normalized.y, normalized.z, w));
 				if (m_Master.colorMode == ColorMode.Gradient)
 				{

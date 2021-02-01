@@ -1,7 +1,7 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
 
 namespace UnityEngine
 {
@@ -233,7 +233,7 @@ namespace UnityEngine
 		{
 			List<T> obj = Pool.GetList<T>();
 			transform.GetComponentsInChildren(true, obj);
-			T result = (obj.Count > 0) ? obj[0] : null;
+			T result = ((obj.Count > 0) ? obj[0] : null);
 			Pool.FreeList(ref obj);
 			return result;
 		}

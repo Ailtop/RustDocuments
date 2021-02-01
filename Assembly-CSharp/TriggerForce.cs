@@ -44,15 +44,16 @@ public class TriggerForce : TriggerBase, IServerComponent
 
 	protected void FixedUpdate()
 	{
-		if (entityContents != null)
+		if (entityContents == null)
 		{
-			Vector3 vector = base.transform.TransformDirection(velocity);
-			foreach (BaseEntity entityContent in entityContents)
+			return;
+		}
+		Vector3 vector = base.transform.TransformDirection(velocity);
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if (entityContent != null)
 			{
-				if (entityContent != null)
-				{
-					entityContent.ApplyInheritedVelocity(vector);
-				}
+				entityContent.ApplyInheritedVelocity(vector);
 			}
 		}
 	}

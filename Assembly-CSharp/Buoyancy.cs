@@ -82,7 +82,7 @@ public class Buoyancy : ListComponent<Buoyancy>
 		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(position, true, forEntity);
 		bool num = waterInfo.surfaceLevel > (position - Vector3.up * 0.2f).y || waterInfo.currentDepth > 0.1f;
 		bool flag = !rigidBody.IsSleeping();
-		if (num & flag)
+		if (num && flag)
 		{
 			Wake();
 		}
@@ -232,7 +232,7 @@ public class Buoyancy : ListComponent<Buoyancy>
 			}
 			if (buoyancyPoint.doSplashEffects && ((!buoyancyPoint.wasSubmergedLastFrame && flag) || (!flag && buoyancyPoint.wasSubmergedLastFrame)) && doEffects && rigidBody.GetRelativePointVelocity(localPosition).magnitude > 1f)
 			{
-				string strName = (waterImpacts != null && waterImpacts.Length != 0 && waterImpacts[0].isValid) ? waterImpacts[0].resourcePath : DefaultWaterImpact();
+				string strName = ((waterImpacts != null && waterImpacts.Length != 0 && waterImpacts[0].isValid) ? waterImpacts[0].resourcePath : DefaultWaterImpact());
 				Vector3 b = new Vector3(UnityEngine.Random.Range(-0.25f, 0.25f), 0f, UnityEngine.Random.Range(-0.25f, 0.25f));
 				if (clientSide)
 				{

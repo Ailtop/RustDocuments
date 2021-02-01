@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FlameTurret : StorageContainer
@@ -172,36 +172,38 @@ public class FlameTurret : StorageContainer
 			foreach (BaseEntity item in entityContents)
 			{
 				BasePlayer component = item.GetComponent<BasePlayer>();
-				if (!component.IsSleeping() && component.IsAlive() && !component.IsBuildingAuthed())
+				if (component.IsSleeping() || !component.IsAlive() || component.IsBuildingAuthed())
 				{
-					object obj2 = Interface.CallHook("CanBeTargeted", component, this);
-					if (obj2 is bool)
+					continue;
+				}
+				object obj2 = Interface.CallHook("CanBeTargeted", component, this);
+				if (obj2 is bool)
+				{
+					Pool.FreeList(ref obj);
+					return (bool)obj2;
+				}
+				if (component.transform.position.y > GetEyePosition().y + 0.5f)
+				{
+					continue;
+				}
+				obj.Clear();
+				GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);
+				for (int i = 0; i < obj.Count; i++)
+				{
+					BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
+					if (entity != null && (entity == this || entity.EqualNetID(this)))
 					{
-						Pool.FreeList(ref obj);
-						return (bool)obj2;
+						flag = true;
+						break;
 					}
-					if (!(component.transform.position.y > GetEyePosition().y + 0.5f))
+					if (!(entity != null) || entity.ShouldBlockProjectiles())
 					{
-						obj.Clear();
-						GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);
-						for (int i = 0; i < obj.Count; i++)
-						{
-							BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
-							if (entity != null && (entity == this || entity.EqualNetID(this)))
-							{
-								flag = true;
-								break;
-							}
-							if (!(entity != null) || entity.ShouldBlockProjectiles())
-							{
-								break;
-							}
-						}
-						if (flag)
-						{
-							break;
-						}
+						break;
 					}
+				}
+				if (flag)
+				{
+					break;
 				}
 			}
 		}
@@ -283,7 +285,7 @@ public class FlameTurret : StorageContainer
 		if (Time.realtimeSinceStartup >= nextFireballTime)
 		{
 			nextFireballTime = Time.realtimeSinceStartup + UnityEngine.Random.Range(1f, 2f);
-			Vector3 a = (UnityEngine.Random.Range(0, 10) <= 7 && flag) ? hitInfo.point : (ray.origin + ray.direction * (flag ? hitInfo.distance : flameRange) * UnityEngine.Random.Range(0.4f, 1f));
+			Vector3 a = ((UnityEngine.Random.Range(0, 10) <= 7 && flag) ? hitInfo.point : (ray.origin + ray.direction * (flag ? hitInfo.distance : flameRange) * UnityEngine.Random.Range(0.4f, 1f)));
 			BaseEntity baseEntity = GameManager.server.CreateEntity(fireballPrefab.resourcePath, a - ray.direction * 0.25f);
 			if ((bool)baseEntity)
 			{

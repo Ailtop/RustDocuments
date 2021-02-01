@@ -44,37 +44,38 @@ public static class RecipeDictionary
 		}
 		foreach (Recipe item2 in recipesByFirstIngredient)
 		{
-			if (!(item2 == null) && item2.Ingredients.Length == orderedIngredients.Count)
+			if (item2 == null || item2.Ingredients.Length != orderedIngredients.Count)
 			{
-				bool flag = true;
-				int num = int.MaxValue;
-				int num2 = 0;
-				Recipe.RecipeIngredient[] ingredients = item2.Ingredients;
-				for (int i = 0; i < ingredients.Length; i++)
+				continue;
+			}
+			bool flag = true;
+			int num = int.MaxValue;
+			int num2 = 0;
+			Recipe.RecipeIngredient[] ingredients = item2.Ingredients;
+			for (int i = 0; i < ingredients.Length; i++)
+			{
+				Recipe.RecipeIngredient recipeIngredient = ingredients[i];
+				Item item = orderedIngredients[num2];
+				if (recipeIngredient.Ingredient != item.info || item.amount < recipeIngredient.Count)
 				{
-					Recipe.RecipeIngredient recipeIngredient = ingredients[i];
-					Item item = orderedIngredients[num2];
-					if (recipeIngredient.Ingredient != item.info || item.amount < recipeIngredient.Count)
-					{
-						flag = false;
-						break;
-					}
-					int num3 = item.amount / recipeIngredient.Count;
-					if (num2 == 0)
-					{
-						num = num3;
-					}
-					else if (num3 < num)
-					{
-						num = num3;
-					}
-					num2++;
+					flag = false;
+					break;
 				}
-				if (flag)
+				int num3 = item.amount / recipeIngredient.Count;
+				if (num2 == 0)
 				{
-					quantity = num;
-					return item2;
+					num = num3;
 				}
+				else if (num3 < num)
+				{
+					num = num3;
+				}
+				num2++;
+			}
+			if (flag)
+			{
+				quantity = num;
+				return item2;
 			}
 		}
 		return null;

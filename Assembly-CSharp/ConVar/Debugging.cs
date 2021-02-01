@@ -1,10 +1,10 @@
-using Facepunch;
-using Facepunch.Unity;
-using Rust;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Facepunch;
+using Facepunch.Unity;
+using Rust;
 using UnityEngine;
 
 namespace ConVar
@@ -98,69 +98,71 @@ namespace ConVar
 			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
 				GameObject gameObject = GameManager.server.FindPrefab(monument.gameObject.name);
-				if (!(gameObject == null))
+				if (gameObject == null)
 				{
-					Dictionary<IOEntity, IOEntity> dictionary = new Dictionary<IOEntity, IOEntity>();
-					IOEntity[] componentsInChildren = gameObject.GetComponentsInChildren<IOEntity>(true);
-					foreach (IOEntity iOEntity in componentsInChildren)
+					continue;
+				}
+				Dictionary<IOEntity, IOEntity> dictionary = new Dictionary<IOEntity, IOEntity>();
+				IOEntity[] componentsInChildren = gameObject.GetComponentsInChildren<IOEntity>(true);
+				foreach (IOEntity iOEntity in componentsInChildren)
+				{
+					Quaternion rot = monument.transform.rotation * iOEntity.transform.rotation;
+					Vector3 pos = monument.transform.TransformPoint(iOEntity.transform.position);
+					BaseEntity newEntity = GameManager.server.CreateEntity(iOEntity.PrefabName, pos, rot);
+					IOEntity iOEntity2 = newEntity as IOEntity;
+					if (!(iOEntity2 != null))
 					{
-						Quaternion rot = monument.transform.rotation * iOEntity.transform.rotation;
-						Vector3 pos = monument.transform.TransformPoint(iOEntity.transform.position);
-						BaseEntity newEntity = GameManager.server.CreateEntity(iOEntity.PrefabName, pos, rot);
-						IOEntity iOEntity2 = newEntity as IOEntity;
-						if (iOEntity2 != null)
+						continue;
+					}
+					dictionary.Add(iOEntity, iOEntity2);
+					DoorManipulator doorManipulator = newEntity as DoorManipulator;
+					if (doorManipulator != null)
+					{
+						List<Door> obj = Facepunch.Pool.GetList<Door>();
+						global::Vis.Entities(newEntity.transform.position, 10f, obj);
+						Door door = obj.OrderBy((Door x) => x.Distance(newEntity.transform.position)).FirstOrDefault();
+						if (door != null)
 						{
-							dictionary.Add(iOEntity, iOEntity2);
-							DoorManipulator doorManipulator = newEntity as DoorManipulator;
-							if (doorManipulator != null)
-							{
-								List<Door> obj = Facepunch.Pool.GetList<Door>();
-								global::Vis.Entities(newEntity.transform.position, 10f, obj);
-								Door door = obj.OrderBy((Door x) => x.Distance(newEntity.transform.position)).FirstOrDefault();
-								if (door != null)
-								{
-									doorManipulator.targetDoor = door;
-								}
-								Facepunch.Pool.FreeList(ref obj);
-							}
-							CardReader cardReader = newEntity as CardReader;
-							if (cardReader != null)
-							{
-								CardReader cardReader2 = iOEntity as CardReader;
-								if (cardReader2 != null)
-								{
-									cardReader.accessLevel = cardReader2.accessLevel;
-									cardReader.accessDuration = cardReader2.accessDuration;
-								}
-							}
-							TimerSwitch timerSwitch = newEntity as TimerSwitch;
-							if (timerSwitch != null)
-							{
-								TimerSwitch timerSwitch2 = iOEntity as TimerSwitch;
-								if (timerSwitch2 != null)
-								{
-									timerSwitch.timerLength = timerSwitch2.timerLength;
-								}
-							}
+							doorManipulator.targetDoor = door;
+						}
+						Facepunch.Pool.FreeList(ref obj);
+					}
+					CardReader cardReader = newEntity as CardReader;
+					if (cardReader != null)
+					{
+						CardReader cardReader2 = iOEntity as CardReader;
+						if (cardReader2 != null)
+						{
+							cardReader.accessLevel = cardReader2.accessLevel;
+							cardReader.accessDuration = cardReader2.accessDuration;
 						}
 					}
-					foreach (KeyValuePair<IOEntity, IOEntity> item2 in dictionary)
+					TimerSwitch timerSwitch = newEntity as TimerSwitch;
+					if (timerSwitch != null)
 					{
-						IOEntity key = item2.Key;
-						IOEntity value = item2.Value;
-						for (int j = 0; j < key.outputs.Length; j++)
+						TimerSwitch timerSwitch2 = iOEntity as TimerSwitch;
+						if (timerSwitch2 != null)
 						{
-							if (!(key.outputs[j].connectedTo.ioEnt == null))
-							{
-								value.outputs[j].connectedTo.ioEnt = dictionary[key.outputs[j].connectedTo.ioEnt];
-								value.outputs[j].connectedToSlot = key.outputs[j].connectedToSlot;
-							}
+							timerSwitch.timerLength = timerSwitch2.timerLength;
 						}
 					}
-					foreach (IOEntity value2 in dictionary.Values)
+				}
+				foreach (KeyValuePair<IOEntity, IOEntity> item2 in dictionary)
+				{
+					IOEntity key = item2.Key;
+					IOEntity value = item2.Value;
+					for (int j = 0; j < key.outputs.Length; j++)
 					{
-						value2.Spawn();
+						if (!(key.outputs[j].connectedTo.ioEnt == null))
+						{
+							value.outputs[j].connectedTo.ioEnt = dictionary[key.outputs[j].connectedTo.ioEnt];
+							value.outputs[j].connectedToSlot = key.outputs[j].connectedToSlot;
+						}
 					}
+				}
+				foreach (IOEntity value2 in dictionary.Values)
+				{
+					value2.Spawn();
 				}
 			}
 		}

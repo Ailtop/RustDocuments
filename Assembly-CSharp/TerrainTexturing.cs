@@ -112,7 +112,7 @@ public class TerrainTexturing : TerrainExtension
 			while (num4 < shoreMapSize)
 			{
 				bool flag = results[k * shoreMapSize + num4].collider.gameObject.layer == num2;
-				image[num3] = (byte)(flag ? 255 : 0);
+				image[num3] = (byte)(flag ? 255u : 0u);
 				distances[num3] = (flag ? 256 : 0);
 				num4++;
 				num3++;
@@ -149,8 +149,8 @@ public class TerrainTexturing : TerrainExtension
 		num6 = ((num6 >= 0) ? num6 : 0);
 		num5 = ((num5 <= num2) ? num5 : num2);
 		num6 = ((num6 <= num2) ? num6 : num2);
-		int num9 = (num3 < (float)num2) ? 1 : 0;
-		int num10 = (num4 < (float)num2) ? num : 0;
+		int num9 = ((num3 < (float)num2) ? 1 : 0);
+		int num10 = ((num4 < (float)num2) ? num : 0);
 		int num11 = num6 * num + num5;
 		int num12 = num11 + num9;
 		int num13 = num11 + num10;
@@ -185,8 +185,8 @@ public class TerrainTexturing : TerrainExtension
 		num6 = ((num6 >= 0) ? num6 : 0);
 		num5 = ((num5 <= num2) ? num5 : num2);
 		num6 = ((num6 <= num2) ? num6 : num2);
-		int num9 = (num3 < (float)num2) ? 1 : 0;
-		int num10 = (num4 < (float)num2) ? num : 0;
+		int num9 = ((num3 < (float)num2) ? 1 : 0);
+		int num10 = ((num4 < (float)num2) ? num : 0);
 		int num11 = num6 * num + num5;
 		int num12 = num11 + num9;
 		int num13 = num11 + num10;

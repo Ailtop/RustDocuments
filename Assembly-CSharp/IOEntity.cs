@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -164,7 +164,7 @@ public class IOEntity : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_RequestData ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestData "));
 				}
 				using (TimeWarning.New("Server_RequestData"))
 				{
@@ -434,11 +434,13 @@ public class IOEntity : BaseCombatEntity
 				if (connectedToSlot < 0 || connectedToSlot >= iOSlot.connectedTo.Get().inputs.Length)
 				{
 					Debug.LogError("Slot IOR Error: " + base.name + " setting up inputs for " + iOSlot.connectedTo.Get().name + " slot : " + iOSlot.connectedToSlot);
-					continue;
 				}
-				iOSlot.connectedTo.Get().inputs[iOSlot.connectedToSlot].connectedTo.Set(this);
-				iOSlot.connectedTo.Get().inputs[iOSlot.connectedToSlot].connectedToSlot = i;
-				iOSlot.connectedTo.Get().inputs[iOSlot.connectedToSlot].connectedTo.Init();
+				else
+				{
+					iOSlot.connectedTo.Get().inputs[iOSlot.connectedToSlot].connectedTo.Set(this);
+					iOSlot.connectedTo.Get().inputs[iOSlot.connectedToSlot].connectedToSlot = i;
+					iOSlot.connectedTo.Get().inputs[iOSlot.connectedToSlot].connectedTo.Init();
+				}
 			}
 		}
 		UpdateUsedOutputs();
@@ -577,7 +579,7 @@ public class IOEntity : BaseCombatEntity
 		{
 			return 0;
 		}
-		int num = (cachedOutputsUsed == 0) ? 1 : cachedOutputsUsed;
+		int num = ((cachedOutputsUsed == 0) ? 1 : cachedOutputsUsed);
 		return GetCurrentEnergy() / num;
 	}
 
@@ -616,7 +618,7 @@ public class IOEntity : BaseCombatEntity
 		int passthroughAmount = GetPassthroughAmount();
 		bool flag = lastPassthroughEnergy != passthroughAmount;
 		lastPassthroughEnergy = passthroughAmount;
-		if ((currentEnergy != lastEnergy) | flag)
+		if (currentEnergy != lastEnergy || flag)
 		{
 			IOStateChanged(inputAmount, inputSlot);
 			ensureOutputsUpdated = true;
@@ -685,7 +687,7 @@ public class IOEntity : BaseCombatEntity
 		}
 		if (flag)
 		{
-			forceUpdate = (forceUpdate && !flag2);
+			forceUpdate = forceUpdate && !flag2;
 			OnCircuitChanged(forceUpdate);
 		}
 	}
@@ -710,32 +712,34 @@ public class IOEntity : BaseCombatEntity
 
 	public virtual void UpdateOutputs()
 	{
-		if (Interface.CallHook("OnOutputUpdate", this) == null && ShouldUpdateOutputs() && ensureOutputsUpdated)
+		if (Interface.CallHook("OnOutputUpdate", this) != null || !ShouldUpdateOutputs() || !ensureOutputsUpdated)
 		{
-			ensureOutputsUpdated = false;
-			using (TimeWarning.New("ProcessIOOutputs"))
+			return;
+		}
+		ensureOutputsUpdated = false;
+		using (TimeWarning.New("ProcessIOOutputs"))
+		{
+			for (int i = 0; i < outputs.Length; i++)
 			{
-				for (int i = 0; i < outputs.Length; i++)
+				IOSlot iOSlot = outputs[i];
+				bool flag = true;
+				IOEntity iOEntity = iOSlot.connectedTo.Get();
+				if (!(iOEntity != null))
 				{
-					IOSlot iOSlot = outputs[i];
-					bool flag = true;
-					IOEntity iOEntity = iOSlot.connectedTo.Get();
-					if (iOEntity != null)
+					continue;
+				}
+				if (ioType == IOType.Fluidic && !DisregardGravityRestrictionsOnLiquid && !iOEntity.DisregardGravityRestrictionsOnLiquid)
+				{
+					using (TimeWarning.New("FluidOutputProcessing"))
 					{
-						if (ioType == IOType.Fluidic && !DisregardGravityRestrictionsOnLiquid && !iOEntity.DisregardGravityRestrictionsOnLiquid)
+						if (!iOEntity.AllowLiquidPassthrough(this, base.transform.TransformPoint(iOSlot.handlePosition)))
 						{
-							using (TimeWarning.New("FluidOutputProcessing"))
-							{
-								if (!iOEntity.AllowLiquidPassthrough(this, base.transform.TransformPoint(iOSlot.handlePosition)))
-								{
-									flag = false;
-								}
-							}
+							flag = false;
 						}
-						int passthroughAmount = GetPassthroughAmount(i);
-						iOEntity.UpdateFromInput(flag ? passthroughAmount : 0, iOSlot.connectedToSlot);
 					}
 				}
+				int passthroughAmount = GetPassthroughAmount(i);
+				iOEntity.UpdateFromInput(flag ? passthroughAmount : 0, iOSlot.connectedToSlot);
 			}
 		}
 	}
@@ -775,7 +779,7 @@ public class IOEntity : BaseCombatEntity
 			iOConnection.connectedToSlot = iOSlot.connectedToSlot;
 			iOConnection.niceName = iOSlot.niceName;
 			iOConnection.type = (int)iOSlot.type;
-			iOConnection.inUse = (iOConnection.connectedID != 0);
+			iOConnection.inUse = iOConnection.connectedID != 0;
 			info.msg.ioEntity.inputs.Add(iOConnection);
 		}
 		array = outputs;
@@ -786,7 +790,7 @@ public class IOEntity : BaseCombatEntity
 			iOConnection2.connectedToSlot = iOSlot2.connectedToSlot;
 			iOConnection2.niceName = iOSlot2.niceName;
 			iOConnection2.type = (int)iOSlot2.type;
-			iOConnection2.inUse = (iOConnection2.connectedID != 0);
+			iOConnection2.inUse = iOConnection2.connectedID != 0;
 			if (iOSlot2.linePoints != null)
 			{
 				iOConnection2.linePointList = Facepunch.Pool.GetList<ProtoBuf.IOEntity.IOConnection.LineVec>();

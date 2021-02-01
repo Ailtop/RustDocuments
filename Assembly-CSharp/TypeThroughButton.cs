@@ -1,5 +1,5 @@
-using Rust;
 using System.Collections;
+using Rust;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

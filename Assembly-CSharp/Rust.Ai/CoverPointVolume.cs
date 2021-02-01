@@ -1,5 +1,5 @@
-using Apex.LoadBalancing;
 using System.Collections.Generic;
+using Apex.LoadBalancing;
 using UnityEngine;
 using UnityEngine.AI;
 

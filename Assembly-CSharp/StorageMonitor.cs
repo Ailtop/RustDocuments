@@ -1,7 +1,7 @@
+using System;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 
 public class StorageMonitor : AppIOEntity
 {
@@ -49,7 +49,7 @@ public class StorageMonitor : AppIOEntity
 		}
 		payload.capacity = storageContainer.inventory.capacity;
 		BuildingPrivlidge buildingPrivlidge;
-		if ((object)(buildingPrivlidge = (storageContainer as BuildingPrivlidge)) != null)
+		if ((object)(buildingPrivlidge = storageContainer as BuildingPrivlidge) != null)
 		{
 			payload.hasProtection = true;
 			float protectedMinutes = buildingPrivlidge.GetProtectedMinutes();

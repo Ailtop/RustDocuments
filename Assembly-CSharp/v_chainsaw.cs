@@ -70,7 +70,7 @@ public class v_chainsaw : MonoBehaviour
 
 	private void ScrollChainTexture()
 	{
-		float z = chainAmount = (chainAmount + Time.deltaTime * chainSpeed) % 1f;
+		float z = (chainAmount = (chainAmount + Time.deltaTime * chainSpeed) % 1f);
 		block.Clear();
 		block.SetVector("_MainTex_ST", new Vector4(saveST.x, saveST.y, z, 0f));
 		chainRenderer.SetPropertyBlock(block);

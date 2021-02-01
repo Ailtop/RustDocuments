@@ -41,17 +41,18 @@ public class GeneratePowerlineLayout : ProceduralComponent
 		List<PathFinder.Point> list7 = new List<PathFinder.Point>();
 		foreach (PathList road in TerrainMeta.Path.Roads)
 		{
-			if (road.ProcgenStartNode != null && road.ProcgenEndNode != null && road.IsExtraWide)
+			if (road.ProcgenStartNode == null || road.ProcgenEndNode == null || !road.IsExtraWide)
 			{
-				int num = 1;
-				for (PathFinder.Node node = road.ProcgenStartNode; node != null; node = node.next)
+				continue;
+			}
+			int num = 1;
+			for (PathFinder.Node node = road.ProcgenStartNode; node != null; node = node.next)
+			{
+				if (num % 8 == 0)
 				{
-					if (num % 8 == 0)
-					{
-						list5.Add(node.point);
-					}
-					num++;
+					list5.Add(node.point);
 				}
+				num++;
 			}
 		}
 		foreach (MonumentInfo item in monuments)

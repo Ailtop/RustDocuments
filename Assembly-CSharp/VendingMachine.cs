@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -61,7 +61,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - BuyItem ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BuyItem "));
 				}
 				using (TimeWarning.New("BuyItem"))
 				{
@@ -97,7 +97,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_AddSellOrder ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_AddSellOrder "));
 				}
 				using (TimeWarning.New("RPC_AddSellOrder"))
 				{
@@ -133,7 +133,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Broadcast ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Broadcast "));
 				}
 				using (TimeWarning.New("RPC_Broadcast"))
 				{
@@ -169,7 +169,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_DeleteSellOrder ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DeleteSellOrder "));
 				}
 				using (TimeWarning.New("RPC_DeleteSellOrder"))
 				{
@@ -205,7 +205,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenAdmin ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenAdmin "));
 				}
 				using (TimeWarning.New("RPC_OpenAdmin"))
 				{
@@ -241,7 +241,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenShop ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenShop "));
 				}
 				using (TimeWarning.New("RPC_OpenShop"))
 				{
@@ -277,7 +277,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_RotateVM ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RotateVM "));
 				}
 				using (TimeWarning.New("RPC_RotateVM"))
 				{
@@ -313,7 +313,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_UpdateShopName ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_UpdateShopName "));
 				}
 				using (TimeWarning.New("RPC_UpdateShopName"))
 				{
@@ -349,7 +349,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - TransactionStart ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TransactionStart "));
 				}
 				using (TimeWarning.New("TransactionStart"))
 				{
@@ -408,20 +408,21 @@ public class VendingMachine : StorageContainer
 		info.msg.vendingMachine = new ProtoBuf.VendingMachine();
 		info.msg.vendingMachine.ShouldPool = false;
 		info.msg.vendingMachine.shopName = shopName;
-		if (sellOrders != null)
+		if (sellOrders == null)
 		{
-			info.msg.vendingMachine.sellOrderContainer = new ProtoBuf.VendingMachine.SellOrderContainer();
-			info.msg.vendingMachine.sellOrderContainer.ShouldPool = false;
-			info.msg.vendingMachine.sellOrderContainer.sellOrders = new List<ProtoBuf.VendingMachine.SellOrder>();
-			foreach (ProtoBuf.VendingMachine.SellOrder sellOrder2 in sellOrders.sellOrders)
+			return;
+		}
+		info.msg.vendingMachine.sellOrderContainer = new ProtoBuf.VendingMachine.SellOrderContainer();
+		info.msg.vendingMachine.sellOrderContainer.ShouldPool = false;
+		info.msg.vendingMachine.sellOrderContainer.sellOrders = new List<ProtoBuf.VendingMachine.SellOrder>();
+		foreach (ProtoBuf.VendingMachine.SellOrder sellOrder2 in sellOrders.sellOrders)
+		{
+			ProtoBuf.VendingMachine.SellOrder sellOrder = new ProtoBuf.VendingMachine.SellOrder
 			{
-				ProtoBuf.VendingMachine.SellOrder sellOrder = new ProtoBuf.VendingMachine.SellOrder
-				{
-					ShouldPool = false
-				};
-				sellOrder2.CopyTo(sellOrder);
-				info.msg.vendingMachine.sellOrderContainer.sellOrders.Add(sellOrder);
-			}
+				ShouldPool = false
+			};
+			sellOrder2.CopyTo(sellOrder);
+			info.msg.vendingMachine.sellOrderContainer.sellOrders.Add(sellOrder);
 		}
 	}
 
@@ -473,43 +474,42 @@ public class VendingMachine : StorageContainer
 	{
 		foreach (ProtoBuf.VendingMachine.SellOrder so in sellOrders.sellOrders)
 		{
-			if (itemDef == null || itemDef.itemid == so.itemToSellID)
+			if (!(itemDef == null) && itemDef.itemid != so.itemToSellID)
 			{
-				if (so.itemToSellIsBP)
+				continue;
+			}
+			if (so.itemToSellIsBP)
+			{
+				List<Item> list = (from x in base.inventory.FindItemsByItemID(blueprintBaseDef.itemid)
+					where x.blueprintTarget == so.itemToSellID
+					select x).ToList();
+				ProtoBuf.VendingMachine.SellOrder sellOrder = so;
+				int inStock;
+				if (list == null || list.Count() < 0)
 				{
-					List<Item> list = (from x in base.inventory.FindItemsByItemID(blueprintBaseDef.itemid)
-						where x.blueprintTarget == so.itemToSellID
-						select x).ToList();
-					ProtoBuf.VendingMachine.SellOrder sellOrder = so;
-					int inStock;
-					if (list == null || list.Count() < 0)
-					{
-						inStock = 0;
-					}
-					else
-					{
-						Interface.CallHook("OnRefreshVendingStock", this, itemDef);
-						inStock = list.Sum((Item x) => x.amount) / so.itemToSellAmount;
-					}
-					sellOrder.inStock = inStock;
+					inStock = 0;
 				}
 				else
 				{
-					List<Item> list2 = base.inventory.FindItemsByItemID(so.itemToSellID);
-					ProtoBuf.VendingMachine.SellOrder sellOrder2 = so;
-					int inStock2;
-					if (list2 == null || list2.Count < 0)
-					{
-						inStock2 = 0;
-					}
-					else
-					{
-						Interface.CallHook("OnRefreshVendingStock", this, itemDef);
-						inStock2 = list2.Sum((Item x) => x.amount) / so.itemToSellAmount;
-					}
-					sellOrder2.inStock = inStock2;
+					Interface.CallHook("OnRefreshVendingStock", this, itemDef);
+					inStock = list.Sum((Item x) => x.amount) / so.itemToSellAmount;
 				}
+				sellOrder.inStock = inStock;
+				continue;
 			}
+			List<Item> list2 = base.inventory.FindItemsByItemID(so.itemToSellID);
+			ProtoBuf.VendingMachine.SellOrder sellOrder2 = so;
+			int inStock2;
+			if (list2 == null || list2.Count < 0)
+			{
+				inStock2 = 0;
+			}
+			else
+			{
+				Interface.CallHook("OnRefreshVendingStock", this, itemDef);
+				inStock2 = list2.Sum((Item x) => x.amount) / so.itemToSellAmount;
+			}
+			sellOrder2.inStock = inStock2;
 		}
 	}
 
@@ -678,7 +678,7 @@ public class VendingMachine : StorageContainer
 		foreach (Item item2 in source)
 		{
 			int num6 = Mathf.Min(num4 - num5, item2.amount);
-			Item takenCurrencyItem = (item2.amount > num6) ? item2.SplitItem(num6) : item2;
+			Item takenCurrencyItem = ((item2.amount > num6) ? item2.SplitItem(num6) : item2);
 			TakeCurrencyItem(takenCurrencyItem);
 			num5 += num6;
 			if (num5 >= num4)
@@ -690,7 +690,7 @@ public class VendingMachine : StorageContainer
 		foreach (Item item3 in list)
 		{
 			int num8 = num - num7;
-			Item item = (item3.amount > num8) ? item3.SplitItem(num8) : item3;
+			Item item = ((item3.amount > num8) ? item3.SplitItem(num8) : item3);
 			if (item == null)
 			{
 				Debug.LogError("Vending machine error, contact developers!");
@@ -772,7 +772,7 @@ public class VendingMachine : StorageContainer
 			bool flag = false;
 			if (myMarker == null)
 			{
-				myMarker = (GameManager.server.CreateEntity(mapMarkerPrefab.resourcePath, base.transform.position, Quaternion.identity) as VendingMachineMapMarker);
+				myMarker = GameManager.server.CreateEntity(mapMarkerPrefab.resourcePath, base.transform.position, Quaternion.identity) as VendingMachineMapMarker;
 				flag = true;
 			}
 			myMarker.SetFlag(Flags.Busy, OutOfStock());
@@ -939,8 +939,8 @@ public class VendingMachine : StorageContainer
 			sellOrder.itemToSellAmount = itemToSellAmount;
 			sellOrder.currencyID = currencyToUseID;
 			sellOrder.currencyAmountPerItem = currencyAmount;
-			sellOrder.currencyIsBP = (bpState == 3 || bpState == 2);
-			sellOrder.itemToSellIsBP = (bpState == 3 || bpState == 1);
+			sellOrder.currencyIsBP = bpState == 3 || bpState == 2;
+			sellOrder.itemToSellIsBP = bpState == 3 || bpState == 1;
 			Interface.CallHook("OnAddVendingOffer", this, sellOrder);
 			sellOrders.sellOrders.Add(sellOrder);
 			RefreshSellOrderStockLevel(itemDefinition);
@@ -982,16 +982,17 @@ public class VendingMachine : StorageContainer
 				item2.UseItem();
 			}
 		}
-		if (item != null)
+		if (item == null)
 		{
-			foreach (ProtoBuf.VendingMachine.SellOrder sellOrder in sellOrders.sellOrders)
-			{
-				ItemDefinition itemDefinition3 = ItemManager.FindItemDefinition(sellOrder.itemToSellID);
-				Item item3 = item;
-				item3.text = item3.text + itemDefinition3.displayName.translated + "\n";
-			}
-			item.MarkDirty();
+			return;
 		}
+		foreach (ProtoBuf.VendingMachine.SellOrder sellOrder in sellOrders.sellOrders)
+		{
+			ItemDefinition itemDefinition3 = ItemManager.FindItemDefinition(sellOrder.itemToSellID);
+			Item item3 = item;
+			item3.text = item3.text + itemDefinition3.displayName.translated + "\n";
+		}
+		item.MarkDirty();
 	}
 
 	protected virtual bool CanRotate()

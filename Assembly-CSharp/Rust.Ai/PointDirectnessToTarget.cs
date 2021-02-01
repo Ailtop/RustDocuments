@@ -12,7 +12,7 @@ namespace Rust.Ai
 
 		public override float GetScore(BaseContext c, Vector3 point)
 		{
-			Vector3 b = (!UsePerfectInfo) ? c.AIAgent.AttackTargetMemory.Position : c.AIAgent.AttackTarget.ServerPosition;
+			Vector3 b = ((!UsePerfectInfo) ? c.AIAgent.AttackTargetMemory.Position : c.AIAgent.AttackTarget.ServerPosition);
 			float num = Vector3.Distance(c.Position, b);
 			float num2 = Vector3.Distance(point, b);
 			float num3 = Vector3.Distance(c.Position, point);

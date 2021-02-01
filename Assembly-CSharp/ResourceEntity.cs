@@ -1,7 +1,7 @@
+using System;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine.Serialization;
 
 public class ResourceEntity : BaseEntity

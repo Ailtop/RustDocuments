@@ -28,11 +28,11 @@ public class ConversationData : ScriptableObject
 			bool flag = false;
 			if (conditionType == ConditionType.HASSCRAP)
 			{
-				flag = (player.inventory.GetAmount(ItemManager.FindItemDefinition("scrap").itemid) >= conditionAmount);
+				flag = player.inventory.GetAmount(ItemManager.FindItemDefinition("scrap").itemid) >= conditionAmount;
 			}
 			else if (conditionType == ConditionType.HASHEALTH)
 			{
-				flag = (player.health >= (float)conditionAmount);
+				flag = player.health >= (float)conditionAmount;
 			}
 			else if (conditionType == ConditionType.PROVIDERBUSY)
 			{

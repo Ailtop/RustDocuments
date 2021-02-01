@@ -30,7 +30,7 @@ public class TickHistory
 		for (int i = 0; i < points.Count; i++)
 		{
 			Vector3 point2 = tickHistoryMatrix.MultiplyPoint3x4(points[i]);
-			Vector3 point3 = (i == points.Count - 1) ? position : tickHistoryMatrix.MultiplyPoint3x4(points[i + 1]);
+			Vector3 point3 = ((i == points.Count - 1) ? position : tickHistoryMatrix.MultiplyPoint3x4(points[i + 1]));
 			Vector3 a = new Line(point2, point3).ClosestPoint(point);
 			num = Mathf.Min(num, new Bounds(a + bounds.center, bounds.size).SqrDistance(point));
 		}

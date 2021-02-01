@@ -174,7 +174,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 	private void ApplyInitialForce()
 	{
 		Vector3 forward = base.transform.forward;
-		Vector3 a = (Vector3.Dot(forward, -Vector3.up) > Vector3.Dot(-forward, -Vector3.up)) ? forward : (-forward);
+		Vector3 a = ((Vector3.Dot(forward, -Vector3.up) > Vector3.Dot(-forward, -Vector3.up)) ? forward : (-forward));
 		rigidBody.AddForce(a * initialForceScale * (terrainHandler.IsOnSnowOrIce ? 1f : 0.25f), ForceMode.Acceleration);
 		initialForceScale += InitialForceIncreaseRate;
 		if (initialForceScale >= InitialForceCutoff && (rigidBody.velocity.magnitude > 1f || !terrainHandler.IsOnSnowOrIce))
@@ -191,7 +191,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 			DismountAllPlayers();
 			return;
 		}
-		float num = inputState.IsDown(BUTTON.LEFT) ? (-1f) : 0f;
+		float num = (inputState.IsDown(BUTTON.LEFT) ? (-1f) : 0f);
 		num += (inputState.IsDown(BUTTON.RIGHT) ? 1f : 0f);
 		if (inputState.IsDown(BUTTON.FORWARD) && (float)lastNudge > NudgeCooldown && rigidBody.velocity.magnitude < MaxNudgeVelocity)
 		{
@@ -236,13 +236,13 @@ public class Sled : BaseVehicle, INotifyTrigger
 			if (!(entityContent is Sled))
 			{
 				BaseVehicleModule baseVehicleModule;
-				if ((object)(baseVehicleModule = (entityContent as BaseVehicleModule)) != null && baseVehicleModule.Vehicle != null && (baseVehicleModule.Vehicle.IsOn() || !baseVehicleModule.Vehicle.IsStationary()))
+				if ((object)(baseVehicleModule = entityContent as BaseVehicleModule) != null && baseVehicleModule.Vehicle != null && (baseVehicleModule.Vehicle.IsOn() || !baseVehicleModule.Vehicle.IsStationary()))
 				{
 					Kill(DestroyMode.Gib);
 					break;
 				}
 				BaseVehicle baseVehicle;
-				if ((object)(baseVehicle = (entityContent as BaseVehicle)) != null && baseVehicle.HasDriver() && (baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
+				if ((object)(baseVehicle = entityContent as BaseVehicle) != null && baseVehicle.HasDriver() && (baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
 				{
 					Kill(DestroyMode.Gib);
 					break;

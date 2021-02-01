@@ -1,10 +1,10 @@
-using EasyAntiCheat.Server.Scout;
-using Network;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using EasyAntiCheat.Server.Scout;
+using Network;
 using UnityEngine;
 
 namespace ConVar
@@ -547,7 +547,7 @@ namespace ConVar
 		[ServerVar]
 		public static void fps(Arg arg)
 		{
-			arg.ReplyWith(Performance.report.frameRate.ToString() + " FPS");
+			arg.ReplyWith(Performance.report.frameRate + " FPS");
 		}
 
 		[ServerVar(Help = "Force save the current game")]
@@ -587,7 +587,7 @@ namespace ConVar
 			{
 				ulong uInt = arg.GetUInt64(0, 0uL);
 				string @string = arg.GetString(1);
-				UnityEngine.Debug.LogWarning(basePlayer + " reported " + uInt + ": " + @string.ToPrintable(140));
+				UnityEngine.Debug.LogWarning(string.Concat(basePlayer, " reported ", uInt, ": ", @string.ToPrintable(140)));
 				if (EACServer.eacScout != null)
 				{
 					EACServer.eacScout.SendPlayerReport(uInt.ToString(), basePlayer.net.connection.userid.ToString(), PlayerReportCategory.PlayerReportCheating, @string);

@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Rust/Hair Set")]

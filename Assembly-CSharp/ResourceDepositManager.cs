@@ -1,6 +1,6 @@
-using Oxide.Core;
 using System;
 using System.Collections.Generic;
+using Oxide.Core;
 using UnityEngine;
 
 public class ResourceDepositManager : BaseEntity

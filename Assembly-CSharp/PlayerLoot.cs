@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -34,25 +34,26 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 
 	public void Clear()
 	{
-		if (IsLooting())
+		if (!IsLooting())
 		{
-			Interface.CallHook("OnPlayerLootEnd", this);
-			MarkDirty();
-			if ((bool)entitySource)
-			{
-				entitySource.SendMessage("PlayerStoppedLooting", base.baseEntity, SendMessageOptions.DontRequireReceiver);
-			}
-			foreach (ItemContainer container in containers)
-			{
-				if (container != null)
-				{
-					container.onDirty -= MarkDirty;
-				}
-			}
-			containers.Clear();
-			entitySource = null;
-			itemSource = null;
+			return;
 		}
+		Interface.CallHook("OnPlayerLootEnd", this);
+		MarkDirty();
+		if ((bool)entitySource)
+		{
+			entitySource.SendMessage("PlayerStoppedLooting", base.baseEntity, SendMessageOptions.DontRequireReceiver);
+		}
+		foreach (ItemContainer container in containers)
+		{
+			if (container != null)
+			{
+				container.onDirty -= MarkDirty;
+			}
+		}
+		containers.Clear();
+		entitySource = null;
+		itemSource = null;
 	}
 
 	public ItemContainer FindContainer(uint id)
@@ -146,28 +147,29 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 	private void SendUpdate()
 	{
 		isInvokingSendUpdate = false;
-		if (BaseEntityEx.IsValid(base.baseEntity) && Interface.CallHook("OnLootNetworkUpdate", this) == null)
+		if (!BaseEntityEx.IsValid(base.baseEntity) || Interface.CallHook("OnLootNetworkUpdate", this) != null)
 		{
-			using (PlayerUpdateLoot playerUpdateLoot = Pool.Get<PlayerUpdateLoot>())
+			return;
+		}
+		using (PlayerUpdateLoot playerUpdateLoot = Pool.Get<PlayerUpdateLoot>())
+		{
+			if ((bool)entitySource && entitySource.net != null)
 			{
-				if ((bool)entitySource && entitySource.net != null)
-				{
-					playerUpdateLoot.entityID = entitySource.net.ID;
-				}
-				if (itemSource != null)
-				{
-					playerUpdateLoot.itemID = itemSource.uid;
-				}
-				if (containers.Count > 0)
-				{
-					playerUpdateLoot.containers = Pool.Get<List<ProtoBuf.ItemContainer>>();
-					foreach (ItemContainer container in containers)
-					{
-						playerUpdateLoot.containers.Add(container.Save());
-					}
-				}
-				base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateLoot", playerUpdateLoot);
+				playerUpdateLoot.entityID = entitySource.net.ID;
 			}
+			if (itemSource != null)
+			{
+				playerUpdateLoot.itemID = itemSource.uid;
+			}
+			if (containers.Count > 0)
+			{
+				playerUpdateLoot.containers = Pool.Get<List<ProtoBuf.ItemContainer>>();
+				foreach (ItemContainer container in containers)
+				{
+					playerUpdateLoot.containers.Add(container.Save());
+				}
+			}
+			base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateLoot", playerUpdateLoot);
 		}
 	}
 

@@ -1,7 +1,7 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
 using UnityEngine;
 
 public class HitboxSystem : MonoBehaviour, IPrefabPreProcess

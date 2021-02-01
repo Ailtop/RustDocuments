@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +28,7 @@ public class HBHFSensor : BaseDetector
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetIncludeAuth ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetIncludeAuth "));
 				}
 				using (TimeWarning.New("SetIncludeAuth"))
 				{
@@ -64,7 +64,7 @@ public class HBHFSensor : BaseDetector
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetIncludeOthers ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetIncludeOthers "));
 				}
 				using (TimeWarning.New("SetIncludeOthers"))
 				{
@@ -130,16 +130,17 @@ public class HBHFSensor : BaseDetector
 		{
 			foreach (BaseEntity entityContent in myTrigger.entityContents)
 			{
-				if (!(entityContent == null) && entityContent.IsVisible(base.transform.position + base.transform.forward * 0.1f, 10f))
+				if (entityContent == null || !entityContent.IsVisible(base.transform.position + base.transform.forward * 0.1f, 10f))
 				{
-					BasePlayer component = entityContent.GetComponent<BasePlayer>();
-					if (Interface.CallHook("OnSensorDetect", this, component) == null)
+					continue;
+				}
+				BasePlayer component = entityContent.GetComponent<BasePlayer>();
+				if (Interface.CallHook("OnSensorDetect", this, component) == null)
+				{
+					bool flag = component.CanBuild();
+					if ((!flag || ShouldIncludeAuthorized()) && (flag || ShouldIncludeOthers()) && component != null && component.IsAlive() && !component.IsSleeping() && component.isServer)
 					{
-						bool flag = component.CanBuild();
-						if ((!flag || ShouldIncludeAuthorized()) && (flag || ShouldIncludeOthers()) && component != null && component.IsAlive() && !component.IsSleeping() && component.isServer)
-						{
-							detectedPlayers++;
-						}
+						detectedPlayers++;
 					}
 				}
 			}

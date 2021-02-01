@@ -21,7 +21,7 @@ namespace CompanionServer.Handlers
 			}
 			IRemoteControllable remoteControllable = RemoteControlEntity.FindByID(base.Proto.identifier);
 			CCTV_RC camera;
-			if (remoteControllable == null || (object)(camera = (remoteControllable as CCTV_RC)) == null)
+			if (remoteControllable == null || (object)(camera = remoteControllable as CCTV_RC) == null)
 			{
 				SendError("not_found");
 			}

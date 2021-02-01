@@ -48,7 +48,7 @@ public class VTP : MonoBehaviour
 				num = num3;
 			}
 		}
-		Color color2 = colors[num2] = VertexColorLerp(colors[num2], color, strength);
+		Color color2 = (colors[num2] = VertexColorLerp(colors[num2], color, strength));
 		transform.GetComponent<MeshFilter>().sharedMesh.colors = colors;
 	}
 
@@ -61,7 +61,7 @@ public class VTP : MonoBehaviour
 		for (int i = 0; i < 3; i++)
 		{
 			num = triangles[triangleIndex * 3 + i];
-			Color color2 = colors[num] = VertexColorLerp(colors[num], color, strength);
+			Color color2 = (colors[num] = VertexColorLerp(colors[num], color, strength));
 		}
 		transform.GetComponent<MeshFilter>().sharedMesh.colors = colors;
 	}
@@ -146,8 +146,7 @@ public class VTP : MonoBehaviour
 		for (int i = 0; i < currentVertices.Length; i++)
 		{
 			Vector3 vector = transform.TransformDirection(Vector3.Cross(currentNormals[i], new Vector3(currentTangents[i].x, currentTangents[i].y, currentTangents[i].z)).normalized * currentTangents[i].w);
-			Vector3 vector2 = transform.TransformDirection(currentTangents[i].normalized);
-			float x = 0.5f + 0.5f * vector2.y;
+			float x = 0.5f + 0.5f * transform.TransformDirection(currentTangents[i].normalized).y;
 			float y = 0.5f + 0.5f * vector.y;
 			uv[i] = new Vector2(x, y);
 		}
@@ -183,7 +182,7 @@ public class VTP : MonoBehaviour
 			float num15 = vector5.y - vector4.y;
 			float num16 = vector6.y - vector4.y;
 			float num17 = num13 * num16 - num14 * num15;
-			float num18 = (num17 == 0f) ? 0f : (1f / num17);
+			float num18 = ((num17 == 0f) ? 0f : (1f / num17));
 			Vector3 vector7 = new Vector3((num16 * num7 - num15 * num8) * num18, (num16 * num9 - num15 * num10) * num18, (num16 * num11 - num15 * num12) * num18);
 			Vector3 vector8 = new Vector3((num13 * num8 - num14 * num7) * num18, (num13 * num10 - num14 * num9) * num18, (num13 * num12 - num14 * num11) * num18);
 			array[num4] += vector7;

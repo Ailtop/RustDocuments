@@ -192,7 +192,7 @@ public class HitInfo
 			DidHit = true;
 			if (serverSide)
 			{
-				HitEntity = (BaseNetworkable.serverEntities.Find(attack.hitID) as BaseEntity);
+				HitEntity = BaseNetworkable.serverEntities.Find(attack.hitID) as BaseEntity;
 			}
 			if ((bool)HitEntity)
 			{

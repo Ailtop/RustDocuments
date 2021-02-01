@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 using UnityEngine.AI;
 

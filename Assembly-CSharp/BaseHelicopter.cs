@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseHelicopter : BaseCombatEntity
@@ -298,19 +298,20 @@ public class BaseHelicopter : BaseCombatEntity
 		for (int i = 0; i < 12 - maxCratesToSpawn; i++)
 		{
 			BaseEntity baseEntity = GameManager.server.CreateEntity(this.fireBall.resourcePath, base.transform.position, base.transform.rotation);
-			if ((bool)baseEntity)
+			if (!baseEntity)
 			{
-				float min = 3f;
-				float max = 10f;
-				Vector3 onUnitSphere = UnityEngine.Random.onUnitSphere;
-				baseEntity.transform.position = base.transform.position + new Vector3(0f, 1.5f, 0f) + onUnitSphere * UnityEngine.Random.Range(-4f, 4f);
-				Collider component = baseEntity.GetComponent<Collider>();
-				baseEntity.Spawn();
-				baseEntity.SetVelocity(vector + onUnitSphere * UnityEngine.Random.Range(min, max));
-				foreach (ServerGib item in list)
-				{
-					Physics.IgnoreCollision(component, item.GetCollider(), true);
-				}
+				continue;
+			}
+			float min = 3f;
+			float max = 10f;
+			Vector3 onUnitSphere = UnityEngine.Random.onUnitSphere;
+			baseEntity.transform.position = base.transform.position + new Vector3(0f, 1.5f, 0f) + onUnitSphere * UnityEngine.Random.Range(-4f, 4f);
+			Collider component = baseEntity.GetComponent<Collider>();
+			baseEntity.Spawn();
+			baseEntity.SetVelocity(vector + onUnitSphere * UnityEngine.Random.Range(min, max));
+			foreach (ServerGib item in list)
+			{
+				Physics.IgnoreCollision(component, item.GetCollider(), true);
 			}
 		}
 		for (int j = 0; j < maxCratesToSpawn; j++)

@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -163,7 +163,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_PickFruit ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PickFruit "));
 				}
 				using (TimeWarning.New("RPC_PickFruit"))
 				{
@@ -203,7 +203,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_RemoveDying ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RemoveDying "));
 				}
 				using (TimeWarning.New("RPC_RemoveDying"))
 				{
@@ -239,7 +239,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_TakeClone ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TakeClone "));
 				}
 				using (TimeWarning.New("RPC_TakeClone"))
 				{
@@ -329,7 +329,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			{
 				artificialTemperatureExposure.ForceNextRun();
 			}
-			CalculateLightQuality(forceArtificialLightUpdates | firstTime);
+			CalculateLightQuality(forceArtificialLightUpdates || firstTime);
 			CalculateWaterQuality();
 			CalculateWaterConsumption();
 			CalculateGroundQuality(firstTime);
@@ -607,7 +607,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			BaseEntity parentEntity = GetParentEntity();
 			if (parentEntity != null)
 			{
-				planter = (parentEntity as PlanterBox);
+				planter = parentEntity as PlanterBox;
 			}
 		}
 		return planter;
@@ -616,7 +616,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	public override void OnParentChanging(BaseEntity oldParent, BaseEntity newParent)
 	{
 		base.OnParentChanging(oldParent, newParent);
-		planter = (newParent as PlanterBox);
+		planter = newParent as PlanterBox;
 		if (!Rust.Application.isLoadingSave && planter != null)
 		{
 			planter.FertilizeGrowables();
@@ -658,7 +658,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	public float UpdateAge(float overallQuality)
 	{
 		Age += growDeltaTime;
-		float num = currentStage.IgnoreConditions ? 1f : (Mathf.Max(overallQuality, 0f) * GetGrowthBonus(overallQuality));
+		float num = (currentStage.IgnoreConditions ? 1f : (Mathf.Max(overallQuality, 0f) * GetGrowthBonus(overallQuality)));
 		float num2 = growDeltaTime * num;
 		stageAge += num2;
 		return num2;
@@ -901,19 +901,20 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	public static void GrowAll(ConsoleSystem.Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		if (basePlayer.IsAdmin)
+		if (!basePlayer.IsAdmin)
 		{
-			List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
-			Vis.Entities(basePlayer.ServerPosition, 6f, obj);
-			foreach (GrowableEntity item in obj)
-			{
-				if (item.isServer)
-				{
-					item.ChangeState(item.currentStage.nextState, false);
-				}
-			}
-			Facepunch.Pool.FreeList(ref obj);
+			return;
 		}
+		List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
+		Vis.Entities(basePlayer.ServerPosition, 6f, obj);
+		foreach (GrowableEntity item in obj)
+		{
+			if (item.isServer)
+			{
+				item.ChangeState(item.currentStage.nextState, false);
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public void ReceiveInstanceData(ProtoBuf.Item.InstanceData data)

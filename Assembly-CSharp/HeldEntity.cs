@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 

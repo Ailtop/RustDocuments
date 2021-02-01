@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
 using Rust;
 using Rust.Modular;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -33,7 +33,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Open ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Open "));
 				}
 				using (TimeWarning.New("RPC_Open"))
 				{
@@ -168,7 +168,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		if (BaseEntityEx.IsValid(baseEntity))
 		{
 			BaseCombatEntity baseCombatEntity;
-			if ((object)(baseCombatEntity = (baseEntity as BaseCombatEntity)) != null)
+			if ((object)(baseCombatEntity = baseEntity as BaseCombatEntity) != null)
 			{
 				baseCombatEntity.Die();
 			}

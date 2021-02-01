@@ -97,7 +97,7 @@ public class PathList
 			for (int i = 0; i < Meshes.Length; i++)
 			{
 				MeshData obj = meshData[i];
-				Mesh mesh = Meshes[i] = new Mesh();
+				Mesh mesh = (Meshes[i] = new Mesh());
 				obj.Apply(mesh);
 				mesh.RecalculateTangents();
 			}
@@ -228,7 +228,7 @@ public class PathList
 			}
 			if (filter.Test(vector))
 			{
-				Quaternion rotation = (i == 2) ? Quaternion.LookRotation(rot180 * dir) : Quaternion.LookRotation(dir);
+				Quaternion rotation = ((i == 2) ? Quaternion.LookRotation(rot180 * dir) : Quaternion.LookRotation(dir));
 				if (SpawnObject(ref seed, prefabs, vector, rotation, filter))
 				{
 					break;
@@ -258,7 +258,7 @@ public class PathList
 			}
 			if (filter.Test(vector))
 			{
-				Quaternion rotation = (i == 2) ? Quaternion.LookRotation(rot180 * dir) : Quaternion.LookRotation(dir);
+				Quaternion rotation = ((i == 2) ? Quaternion.LookRotation(rot180 * dir) : Quaternion.LookRotation(dir));
 				if (CheckObjects(prefabs, vector, rotation, filter))
 				{
 					return true;
@@ -300,7 +300,7 @@ public class PathList
 		float num6 = Path.Length - Path.EndOffset - num4;
 		for (float num7 = num5; num7 <= num6; num7 += num3)
 		{
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(num7) : Path.GetPoint(num7);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num7) : Path.GetPoint(num7));
 			if ((vector - b).magnitude < distance)
 			{
 				continue;
@@ -392,7 +392,7 @@ public class PathList
 		float num4 = Path.Length - Path.EndOffset - num2;
 		for (float num5 = num3; num5 <= num4; num5 += num)
 		{
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(num5) : Path.GetPoint(num5);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num5) : Path.GetPoint(num5));
 			if ((vector - b).magnitude < distance)
 			{
 				continue;
@@ -527,23 +527,16 @@ public class PathList
 		Vector3[] points = Path.Points;
 		Vector3[] tangents = Path.Tangents;
 		int num = points.Length / 4;
-		int num2 = 0;
-		while (true)
+		for (int i = 0; i < num; i++)
 		{
-			if (num2 < num)
+			Vector3 pos = points[Path.MinIndex + i];
+			Vector3 dir = tangents[Path.MinIndex + i];
+			if (CheckObjects(array, pos, dir, obj))
 			{
-				Vector3 pos = points[Path.MinIndex + num2];
-				Vector3 dir = tangents[Path.MinIndex + num2];
-				if (CheckObjects(array, pos, dir, obj))
-				{
-					break;
-				}
-				num2++;
-				continue;
+				Path.MinIndex += i;
+				break;
 			}
-			return;
 		}
-		Path.MinIndex += num2;
 	}
 
 	public void TrimEnd(BasicObject obj)
@@ -561,23 +554,16 @@ public class PathList
 		Vector3[] points = Path.Points;
 		Vector3[] tangents = Path.Tangents;
 		int num = points.Length / 4;
-		int num2 = 0;
-		while (true)
+		for (int i = 0; i < num; i++)
 		{
-			if (num2 < num)
+			Vector3 pos = points[Path.MaxIndex - i];
+			Vector3 dir = -tangents[Path.MaxIndex - i];
+			if (CheckObjects(array, pos, dir, obj))
 			{
-				Vector3 pos = points[Path.MaxIndex - num2];
-				Vector3 dir = -tangents[Path.MaxIndex - num2];
-				if (CheckObjects(array, pos, dir, obj))
-				{
-					break;
-				}
-				num2++;
-				continue;
+				Path.MaxIndex -= i;
+				break;
 			}
-			return;
 		}
-		Path.MaxIndex -= num2;
 	}
 
 	public void TrimTopology(int topology)
@@ -593,22 +579,15 @@ public class PathList
 				break;
 			}
 		}
-		int num2 = 0;
-		while (true)
+		for (int j = 0; j < num; j++)
 		{
-			if (num2 < num)
+			Vector3 worldPos2 = points[Path.MaxIndex - j];
+			if (!TerrainMeta.TopologyMap.GetTopology(worldPos2, topology))
 			{
-				Vector3 worldPos2 = points[Path.MaxIndex - num2];
-				if (!TerrainMeta.TopologyMap.GetTopology(worldPos2, topology))
-				{
-					break;
-				}
-				num2++;
-				continue;
+				Path.MaxIndex -= j;
+				break;
 			}
-			return;
 		}
-		Path.MaxIndex -= num2;
 	}
 
 	public void ResetTrims()
@@ -639,7 +618,7 @@ public class PathList
 		float num3 = Path.Length + num;
 		for (float num4 = 0f; num4 < num3; num4 += num)
 		{
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4));
 			float opacity = 1f;
 			float radius = Mathf.Lerp(num2, num2 * randomScale, Noise.Billow(vector.x, vector.z, 2, 0.005f));
 			if (!Path.Circular)
@@ -699,7 +678,7 @@ public class PathList
 		float num3 = Path.Length + num;
 		for (float num4 = 0f; num4 < num3; num4 += num)
 		{
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4));
 			float opacity = 1f;
 			float radius = Mathf.Lerp(num2, num2 * randomScale, Noise.Billow(vector.x, vector.z, 2, 0.005f));
 			if (!Path.Circular)
@@ -750,7 +729,7 @@ public class PathList
 		float num3 = Path.Length + num;
 		for (float num4 = 0f; num4 < num3; num4 += num)
 		{
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4));
 			float opacity = 1f;
 			float radius = Mathf.Lerp(num2, num2 * randomScale, Noise.Billow(vector.x, vector.z, 2, 0.005f));
 			if (!Path.Circular)
@@ -796,7 +775,7 @@ public class PathList
 		float num2 = Path.Length + num;
 		for (float num3 = 0f; num3 < num2; num3 += num)
 		{
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(num3) : Path.GetPoint(num3);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num3) : Path.GetPoint(num3));
 			startTangent = Path.GetTangent(num3);
 			normalized = startTangent.XZ3D().normalized;
 			a = rot90 * normalized;
@@ -849,7 +828,7 @@ public class PathList
 		for (int k = 0; k < num2; k += num3)
 		{
 			float distance = (float)k * num4 + 0.5f * (float)num3 * num4;
-			Vector3 vector = Spline ? Path.GetPointCubicHermite(distance) : Path.GetPoint(distance);
+			Vector3 vector = (Spline ? Path.GetPointCubicHermite(distance) : Path.GetPoint(distance));
 			for (int l = 0; l < num3 && k + l < num2; l++)
 			{
 				float num6 = (float)(k + l) * num4;
@@ -867,7 +846,7 @@ public class PathList
 						float num7 = vector2.y - min.y;
 						float num8 = (vector2.z - min.z) / size.z;
 						float num9 = num6 + num8 * num4;
-						Vector3 a = Spline ? Path.GetPointCubicHermite(num9) : Path.GetPoint(num9);
+						Vector3 a = (Spline ? Path.GetPointCubicHermite(num9) : Path.GetPoint(num9));
 						Vector3 tangent = Path.GetTangent(num9);
 						Vector3 normalized = tangent.XZ3D().normalized;
 						Vector3 vector3 = rot90 * normalized;

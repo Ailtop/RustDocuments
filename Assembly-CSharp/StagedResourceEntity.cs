@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StagedResourceEntity : ResourceEntity

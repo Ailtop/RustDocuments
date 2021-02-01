@@ -1,5 +1,5 @@
-using Oxide.Core;
 using System.Collections.Generic;
+using Oxide.Core;
 using UnityEngine;
 
 public class BigWheelGame : SpinnerWheel
@@ -97,40 +97,41 @@ public class BigWheelGame : SpinnerWheel
 		HitNumber currentHitType = GetCurrentHitType();
 		foreach (BigWheelBettingTerminal terminal in terminals)
 		{
-			if (!terminal.isClient)
+			if (terminal.isClient)
 			{
-				bool flag = false;
-				bool flag2 = false;
-				Item slot = terminal.inventory.GetSlot((int)currentHitType.hitType);
-				if (slot != null)
+				continue;
+			}
+			bool flag = false;
+			bool flag2 = false;
+			Item slot = terminal.inventory.GetSlot((int)currentHitType.hitType);
+			if (slot != null)
+			{
+				int num = currentHitType.ColorToMultiplier(currentHitType.hitType);
+				if (Interface.CallHook("OnBigWheelWin", this, slot, terminal, num) != null)
 				{
-					int num = currentHitType.ColorToMultiplier(currentHitType.hitType);
-					if (Interface.CallHook("OnBigWheelWin", this, slot, terminal, num) != null)
-					{
-						return;
-					}
-					slot.amount += slot.amount * num;
-					slot.RemoveFromContainer();
-					slot.MoveToContainer(terminal.inventory, 5);
-					flag = true;
+					return;
 				}
-				for (int i = 0; i < 5; i++)
+				slot.amount += slot.amount * num;
+				slot.RemoveFromContainer();
+				slot.MoveToContainer(terminal.inventory, 5);
+				flag = true;
+			}
+			for (int i = 0; i < 5; i++)
+			{
+				Item slot2 = terminal.inventory.GetSlot(i);
+				if (Interface.CallHook("OnBigWheelLoss", this, slot2, terminal) != null)
 				{
-					Item slot2 = terminal.inventory.GetSlot(i);
-					if (Interface.CallHook("OnBigWheelLoss", this, slot2, terminal) != null)
-					{
-						return;
-					}
-					if (slot2 != null)
-					{
-						slot2.Remove();
-						flag2 = true;
-					}
+					return;
 				}
-				if (flag | flag2)
+				if (slot2 != null)
 				{
-					terminal.ClientRPC(null, "WinOrLoseSound", flag);
+					slot2.Remove();
+					flag2 = true;
 				}
+			}
+			if (flag || flag2)
+			{
+				terminal.ClientRPC(null, "WinOrLoseSound", flag);
 			}
 		}
 		ItemManager.DoRemoves();
@@ -157,6 +158,6 @@ public class BigWheelGame : SpinnerWheel
 	[ContextMenu("LoadHitNumbers")]
 	public void LoadHitNumbers()
 	{
-		HitNumber[] array = hitNumbers = GetComponentsInChildren<HitNumber>();
+		HitNumber[] array = (hitNumbers = GetComponentsInChildren<HitNumber>());
 	}
 }

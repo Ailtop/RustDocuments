@@ -7,7 +7,7 @@ namespace CompanionServer.Handlers
 		public override void Execute()
 		{
 			SmartSwitch smartSwitch;
-			if ((object)(smartSwitch = (base.Entity as SmartSwitch)) != null)
+			if ((object)(smartSwitch = base.Entity as SmartSwitch) != null)
 			{
 				smartSwitch.Value = base.Proto.value;
 				SendSuccess();

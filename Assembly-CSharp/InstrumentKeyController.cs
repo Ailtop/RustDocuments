@@ -1,6 +1,6 @@
-using Rust.Instruments;
 using System;
 using System.Runtime.InteropServices;
+using Rust.Instruments;
 using UnityEngine;
 
 public class InstrumentKeyController : MonoBehaviour

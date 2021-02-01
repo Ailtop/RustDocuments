@@ -77,7 +77,7 @@ public static class WaterLevel
 					return result;
 				}
 			}
-			int num = TerrainMeta.TopologyMap ? TerrainMeta.TopologyMap.GetTopologyFast(posUV) : 0;
+			int num = (TerrainMeta.TopologyMap ? TerrainMeta.TopologyMap.GetTopologyFast(posUV) : 0);
 			if ((flag || (num & 0x3C180) == 0) && (bool)WaterSystem.Collision && WaterSystem.Collision.GetIgnore(pos))
 			{
 				return result;
@@ -108,7 +108,7 @@ public static class WaterLevel
 			{
 				return GetWaterInfoFromVolumes(pos, forEntity);
 			}
-			float num2 = TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(pos) : 0f;
+			float num2 = (TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(pos) : 0f);
 			if (pos.y < num2 - 1f)
 			{
 				num = 0f;
@@ -147,7 +147,7 @@ public static class WaterLevel
 			{
 				return GetWaterInfoFromVolumes(bounds, forEntity);
 			}
-			float num2 = TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(bounds.center) : 0f;
+			float num2 = (TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(bounds.center) : 0f);
 			if (bounds.max.y < num2 - 1f)
 			{
 				num = 0f;

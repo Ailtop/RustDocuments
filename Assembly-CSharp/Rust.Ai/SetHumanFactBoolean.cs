@@ -12,7 +12,7 @@ namespace Rust.Ai
 
 		public override void DoExecute(BaseContext c)
 		{
-			c.SetFact(fact, (byte)(value ? 1 : 0));
+			c.SetFact(fact, (byte)(value ? 1u : 0u));
 		}
 	}
 }

@@ -223,7 +223,7 @@ public class AttackEntity : HeldEntity
 			float num2 = eye_clientframes / 60f;
 			float num3 = eye_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
 			float num4 = (player.desyncTimeClamped + num2 + num3) * num;
-			int layerMask = ConVar.AntiHack.eye_terraincheck ? 10551296 : 2162688;
+			int layerMask = (ConVar.AntiHack.eye_terraincheck ? 10551296 : 2162688);
 			if (ConVar.AntiHack.eye_protection >= 1)
 			{
 				float num5 = player.MaxVelocity() + player.GetParentVelocity().magnitude;
@@ -244,7 +244,7 @@ public class AttackEntity : HeldEntity
 				if (!GamePhysics.LineOfSight(center, position, eyePos, layerMask))
 				{
 					string shortPrefabName3 = base.ShortPrefabName;
-					AntiHack.Log(player, AntiHackType.EyeHack, "Line of sight (" + shortPrefabName3 + " on attack) " + center + " " + position + " " + eyePos);
+					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName3, " on attack) ", center, " ", position, " ", eyePos));
 					player.stats.combat.Log(this, "eye_los");
 					flag = false;
 				}

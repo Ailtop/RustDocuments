@@ -32,35 +32,37 @@ namespace Rust.Ai.HTN.Scientist.Reasoners
 				return;
 			}
 			HTNPlayer hTNPlayer = npc as HTNPlayer;
-			if (!(hTNPlayer == null))
+			if (hTNPlayer == null)
 			{
-				float bestScore = 0f;
-				float bestScore2 = 0f;
-				float bestScore3 = 0f;
-				foreach (CoverPoint coverPoint in scientistContext.CoverPoints)
+				return;
+			}
+			float bestScore = 0f;
+			float bestScore2 = 0f;
+			float bestScore3 = 0f;
+			foreach (CoverPoint coverPoint in scientistContext.CoverPoints)
+			{
+				if (coverPoint.IsCompromised || (coverPoint.IsReserved && !coverPoint.ReservedFor.EqualNetID(hTNPlayer)))
 				{
-					if (!coverPoint.IsCompromised && (!coverPoint.IsReserved || coverPoint.ReservedFor.EqualNetID(hTNPlayer)))
+					continue;
+				}
+				float arcThreshold = -0.8f;
+				BaseNpcMemory.EnemyPlayerInfo enemyInfo = scientistContext.Memory.PrimaryKnownEnemyPlayer;
+				if (coverPoint.ProvidesCoverFromPoint(enemyInfo.LastKnownPosition, arcThreshold))
+				{
+					Vector3 dirCover = coverPoint.Position - npc.transform.position;
+					Vector3 dirDanger = enemyInfo.LastKnownPosition - npc.transform.position;
+					float directness = Vector3.Dot(dirCover.normalized, dirDanger.normalized);
+					if (bestScore < 1f)
 					{
-						float arcThreshold = -0.8f;
-						BaseNpcMemory.EnemyPlayerInfo enemyInfo = scientistContext.Memory.PrimaryKnownEnemyPlayer;
-						if (coverPoint.ProvidesCoverFromPoint(enemyInfo.LastKnownPosition, arcThreshold))
-						{
-							Vector3 dirCover = coverPoint.Position - npc.transform.position;
-							Vector3 dirDanger = enemyInfo.LastKnownPosition - npc.transform.position;
-							float directness = Vector3.Dot(dirCover.normalized, dirDanger.normalized);
-							if (bestScore < 1f)
-							{
-								EvaluateAdvancement(npc, scientistContext, ref bestScore, ref enemyInfo, coverPoint, dirCover, dirDanger, directness);
-							}
-							if (bestScore3 < 1f)
-							{
-								EvaluateRetreat(npc, scientistContext, ref bestScore3, ref enemyInfo, coverPoint, dirCover, dirDanger, ref directness);
-							}
-							if (bestScore2 < 1f)
-							{
-								EvaluateFlanking(npc, scientistContext, ref bestScore2, ref enemyInfo, coverPoint, dirCover, dirDanger, directness);
-							}
-						}
+						EvaluateAdvancement(npc, scientistContext, ref bestScore, ref enemyInfo, coverPoint, dirCover, dirDanger, directness);
+					}
+					if (bestScore3 < 1f)
+					{
+						EvaluateRetreat(npc, scientistContext, ref bestScore3, ref enemyInfo, coverPoint, dirCover, dirDanger, ref directness);
+					}
+					if (bestScore2 < 1f)
+					{
+						EvaluateFlanking(npc, scientistContext, ref bestScore2, ref enemyInfo, coverPoint, dirCover, dirDanger, directness);
 					}
 				}
 			}

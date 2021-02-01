@@ -1,5 +1,5 @@
-using Network;
 using System.IO;
+using Network;
 
 public class NetworkCryptographyServer : NetworkCryptography
 {

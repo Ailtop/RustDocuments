@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GroundWatch : BaseMonoBehaviour, IServerComponent
@@ -23,20 +23,21 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 	public static void PhysicsChanged(GameObject obj)
 	{
 		Collider component = obj.GetComponent<Collider>();
-		if ((bool)component)
+		if (!component)
 		{
-			Bounds bounds = component.bounds;
-			List<BaseEntity> obj2 = Facepunch.Pool.GetList<BaseEntity>();
-			Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj2, 2263296);
-			foreach (BaseEntity item in obj2)
-			{
-				if (!item.IsDestroyed && !item.isClient && !(item is BuildingBlock))
-				{
-					item.BroadcastMessage("OnPhysicsNeighbourChanged", SendMessageOptions.DontRequireReceiver);
-				}
-			}
-			Facepunch.Pool.FreeList(ref obj2);
+			return;
 		}
+		Bounds bounds = component.bounds;
+		List<BaseEntity> obj2 = Facepunch.Pool.GetList<BaseEntity>();
+		Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj2, 2263296);
+		foreach (BaseEntity item in obj2)
+		{
+			if (!item.IsDestroyed && !item.isClient && !(item is BuildingBlock))
+			{
+				item.BroadcastMessage("OnPhysicsNeighbourChanged", SendMessageOptions.DontRequireReceiver);
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj2);
 	}
 
 	private void OnPhysicsNeighbourChanged()

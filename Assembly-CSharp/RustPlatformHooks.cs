@@ -1,9 +1,9 @@
+using System;
+using System.Net;
 using ConVar;
 using Network;
 using Rust;
 using Rust.Platform.Common;
-using System;
-using System.Net;
 
 public class RustPlatformHooks : IPlatformHooks
 {

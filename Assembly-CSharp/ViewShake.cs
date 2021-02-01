@@ -64,7 +64,7 @@ public class ViewShake
 				entry.angle = Random.Range((0f - entry.amplitude) * 0.25f, entry.amplitude * 0.25f);
 			}
 			float num = 0f;
-			float num2 = entry.infinite ? 1f : ((entry.endTime - Time.time) / entry.duration);
+			float num2 = (entry.infinite ? 1f : ((entry.endTime - Time.time) / entry.duration));
 			if (num2 != 0f)
 			{
 				num = entry.frequency / num2;

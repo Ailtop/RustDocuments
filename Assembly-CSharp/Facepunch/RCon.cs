@@ -1,8 +1,3 @@
-using ConVar;
-using Facepunch.Rcon;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Oxide.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +5,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using ConVar;
+using Facepunch.Rcon;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Oxide.Core;
 using UnityEngine;
 
 namespace Facepunch
@@ -95,37 +95,36 @@ namespace Facepunch
 					return;
 				}
 				int available = socket.Available;
-				if (available >= 14)
+				if (available < 14)
 				{
-					if (available > 4096)
+					return;
+				}
+				if (available > 4096)
+				{
+					Close("overflow");
+					return;
+				}
+				byte[] buffer = new byte[available];
+				socket.Receive(buffer);
+				using (BinaryReader binaryReader = new BinaryReader(new MemoryStream(buffer, false), utf8Mode ? Encoding.UTF8 : Encoding.ASCII))
+				{
+					int num = binaryReader.ReadInt32();
+					if (available < num)
 					{
-						Close("overflow");
+						Close("invalid packet");
 						return;
 					}
-					byte[] buffer = new byte[available];
-					socket.Receive(buffer);
-					using (BinaryReader binaryReader = new BinaryReader(new MemoryStream(buffer, false), utf8Mode ? Encoding.UTF8 : Encoding.ASCII))
+					lastMessageID = binaryReader.ReadInt32();
+					int type = binaryReader.ReadInt32();
+					string msg = ReadNullTerminatedString(binaryReader);
+					ReadNullTerminatedString(binaryReader);
+					if (!HandleMessage(type, msg))
 					{
-						int num = binaryReader.ReadInt32();
-						if (available < num)
-						{
-							Close("invalid packet");
-						}
-						else
-						{
-							lastMessageID = binaryReader.ReadInt32();
-							int type = binaryReader.ReadInt32();
-							string msg = ReadNullTerminatedString(binaryReader);
-							ReadNullTerminatedString(binaryReader);
-							if (!HandleMessage(type, msg))
-							{
-								Close("invalid packet");
-							}
-							else
-							{
-								lastMessageID = -1;
-							}
-						}
+						Close("invalid packet");
+					}
+					else
+					{
+						lastMessageID = -1;
 					}
 				}
 			}
@@ -168,7 +167,7 @@ namespace Facepunch
 					return false;
 				}
 				Reply(lastMessageID, SERVERDATA_RESPONSE_VALUE, "");
-				isAuthorised = (Password == msg);
+				isAuthorised = Password == msg;
 				if (!isAuthorised)
 				{
 					Reply(-1, SERVERDATA_AUTH_RESPONSE, "");
@@ -259,7 +258,7 @@ namespace Facepunch
 					{
 						return text;
 					}
-					text += c.ToString();
+					text += c;
 				}
 				while (text.Length <= 8192);
 				return string.Empty;
@@ -482,19 +481,20 @@ namespace Facepunch
 					OnCommand(Commands.Dequeue());
 				}
 			}
-			if (listener != null && !(lastRunTime + 0.02f >= UnityEngine.Time.realtimeSinceStartup))
+			if (listener == null || lastRunTime + 0.02f >= UnityEngine.Time.realtimeSinceStartup)
 			{
-				lastRunTime = UnityEngine.Time.realtimeSinceStartup;
-				try
-				{
-					bannedAddresses.RemoveAll((BannedAddresses x) => x.banTime < UnityEngine.Time.realtimeSinceStartup);
-					listener.Cycle();
-				}
-				catch (Exception exception)
-				{
-					Debug.LogWarning("Rcon Exception");
-					Debug.LogException(exception);
-				}
+				return;
+			}
+			lastRunTime = UnityEngine.Time.realtimeSinceStartup;
+			try
+			{
+				bannedAddresses.RemoveAll((BannedAddresses x) => x.banTime < UnityEngine.Time.realtimeSinceStartup);
+				listener.Cycle();
+			}
+			catch (Exception exception)
+			{
+				Debug.LogWarning("Rcon Exception");
+				Debug.LogException(exception);
 			}
 		}
 
@@ -520,7 +520,7 @@ namespace Facepunch
 				isInput = true;
 				if (Print)
 				{
-					Debug.Log("[rcon] " + cmd.Ip + ": " + cmd.Message);
+					Debug.Log(string.Concat("[rcon] ", cmd.Ip, ": ", cmd.Message));
 				}
 				isInput = false;
 				string text = ConsoleSystem.Run(ConsoleSystem.Option.Server.Quiet(), cmd.Message);

@@ -1,5 +1,5 @@
-using Oxide.Core;
 using System.Collections;
+using Oxide.Core;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.Murderer
@@ -56,17 +56,18 @@ namespace Rust.Ai.HTN.Murderer
 			if (loadouts != null && loadouts.Length != 0)
 			{
 				PlayerInventoryProperties playerInventoryProperties = loadouts[UnityEngine.Random.Range(0, loadouts.Length)];
-				if (playerInventoryProperties != null)
+				if (!(playerInventoryProperties != null))
 				{
-					foreach (PlayerInventoryProperties.ItemAmountSkinned item in playerInventoryProperties.belt)
-					{
-						if (item.itemDef.category == ItemCategory.Weapon)
-						{
-							target.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, 0uL), target.inventory.containerBelt);
-						}
-					}
-					target.StartCoroutine(EquipWeapon(target));
+					return;
 				}
+				foreach (PlayerInventoryProperties.ItemAmountSkinned item in playerInventoryProperties.belt)
+				{
+					if (item.itemDef.category == ItemCategory.Weapon)
+					{
+						target.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, 0uL), target.inventory.containerBelt);
+					}
+				}
+				target.StartCoroutine(EquipWeapon(target));
 			}
 			else
 			{

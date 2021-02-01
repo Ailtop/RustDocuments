@@ -1,5 +1,5 @@
-using Facepunch;
 using System;
+using Facepunch;
 
 [Serializable]
 public class TokenisedPhrase : Translate.Phrase
@@ -35,18 +35,16 @@ public class TokenisedPhrase : Translate.Phrase
 
 	public static string TranslateMouseButton(string mouseButton)
 	{
-		if (mouseButton == "mouse0")
+		switch (mouseButton)
 		{
+		case "mouse0":
 			return "Left Mouse";
-		}
-		if (mouseButton == "mouse1")
-		{
+		case "mouse1":
 			return "Right Mouse";
-		}
-		if (mouseButton == "mouse2")
-		{
+		case "mouse2":
 			return "Center Mouse";
+		default:
+			return mouseButton;
 		}
-		return mouseButton;
 	}
 }

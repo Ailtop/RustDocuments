@@ -23,21 +23,22 @@ public class PlayerInventoryProperties : ScriptableObject
 
 	public void GiveToPlayer(BasePlayer player)
 	{
-		if (!(player == null))
+		if (player == null)
 		{
-			player.inventory.Strip();
-			foreach (ItemAmountSkinned item in belt)
-			{
-				player.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, item.skinOverride), player.inventory.containerBelt);
-			}
-			foreach (ItemAmountSkinned item2 in main)
-			{
-				player.inventory.GiveItem(ItemManager.Create(item2.itemDef, (int)item2.amount, item2.skinOverride), player.inventory.containerMain);
-			}
-			foreach (ItemAmountSkinned item3 in wear)
-			{
-				player.inventory.GiveItem(ItemManager.Create(item3.itemDef, (int)item3.amount, item3.skinOverride), player.inventory.containerWear);
-			}
+			return;
+		}
+		player.inventory.Strip();
+		foreach (ItemAmountSkinned item in belt)
+		{
+			player.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, item.skinOverride), player.inventory.containerBelt);
+		}
+		foreach (ItemAmountSkinned item2 in main)
+		{
+			player.inventory.GiveItem(ItemManager.Create(item2.itemDef, (int)item2.amount, item2.skinOverride), player.inventory.containerMain);
+		}
+		foreach (ItemAmountSkinned item3 in wear)
+		{
+			player.inventory.GiveItem(ItemManager.Create(item3.itemDef, (int)item3.amount, item3.skinOverride), player.inventory.containerWear);
 		}
 	}
 }

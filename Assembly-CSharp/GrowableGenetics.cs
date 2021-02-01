@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 
 public static class GrowableGenetics
 {
@@ -65,19 +65,20 @@ public static class GrowableGenetics
 		dominant.Weighting = 0f;
 		foreach (GrowableEntity neighbour in neighbours)
 		{
-			if (neighbour.isServer)
+			if (!neighbour.isServer)
 			{
-				PlanterBox planter2 = neighbour.GetPlanter();
-				if (!(planter2 == null) && !(planter2 != planter) && !(neighbour == crossBreedingGrowable) && neighbour.prefabID == crossBreedingGrowable.prefabID && !neighbour.IsDead())
+				continue;
+			}
+			PlanterBox planter2 = neighbour.GetPlanter();
+			if (!(planter2 == null) && !(planter2 != planter) && !(neighbour == crossBreedingGrowable) && neighbour.prefabID == crossBreedingGrowable.prefabID && !neighbour.IsDead())
+			{
+				GeneType type = neighbour.Genes.Genes[slot].Type;
+				float crossBreedingWeight = neighbour.Properties.Genes.Weights[(int)type].CrossBreedingWeight;
+				float num = (neighbourWeights[(int)type].Weighting += crossBreedingWeight);
+				if (num > dominant.Weighting)
 				{
-					GeneType type = neighbour.Genes.Genes[slot].Type;
-					float crossBreedingWeight = neighbour.Properties.Genes.Weights[(int)type].CrossBreedingWeight;
-					float num = neighbourWeights[(int)type].Weighting += crossBreedingWeight;
-					if (num > dominant.Weighting)
-					{
-						dominant.Weighting = num;
-						dominant.GeneType = type;
-					}
+					dominant.Weighting = num;
+					dominant.GeneType = type;
 				}
 			}
 		}

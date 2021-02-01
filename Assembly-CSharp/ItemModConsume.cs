@@ -36,7 +36,7 @@ public class ItemModConsume : ItemMod
 		GameObjectRef gameObjectRef = GetConsumeEffect();
 		if (gameObjectRef.isValid)
 		{
-			Vector3 posLocal = player.IsDucked() ? new Vector3(0f, 1f, 0f) : new Vector3(0f, 2f, 0f);
+			Vector3 posLocal = (player.IsDucked() ? new Vector3(0f, 1f, 0f) : new Vector3(0f, 2f, 0f));
 			Effect.server.Run(gameObjectRef.resourcePath, player, 0u, posLocal, Vector3.zero);
 		}
 		player.metabolism.MarkConsumption();
@@ -55,23 +55,24 @@ public class ItemModConsume : ItemMod
 		}
 		foreach (ItemModConsumable.ConsumableEffect effect in consumable.effects)
 		{
-			if (!(Mathf.Clamp01(player.healthFraction + player.metabolism.pending_health.Fraction()) > effect.onlyIfHealthLessThan))
+			if (Mathf.Clamp01(player.healthFraction + player.metabolism.pending_health.Fraction()) > effect.onlyIfHealthLessThan)
 			{
-				if (effect.type == MetabolismAttribute.Type.Health)
+				continue;
+			}
+			if (effect.type == MetabolismAttribute.Type.Health)
+			{
+				if (effect.amount < 0f)
 				{
-					if (effect.amount < 0f)
-					{
-						player.OnAttacked(new HitInfo(player, player, DamageType.Generic, (0f - effect.amount) * num3 * num4, player.transform.position + player.transform.forward * 1f));
-					}
-					else
-					{
-						player.health += effect.amount * num3 * num4;
-					}
+					player.OnAttacked(new HitInfo(player, player, DamageType.Generic, (0f - effect.amount) * num3 * num4, player.transform.position + player.transform.forward * 1f));
 				}
 				else
 				{
-					player.metabolism.ApplyChange(effect.type, effect.amount * num3 * num4, effect.time * num3 * num4);
+					player.health += effect.amount * num3 * num4;
 				}
+			}
+			else
+			{
+				player.metabolism.ApplyChange(effect.type, effect.amount * num3 * num4, effect.time * num3 * num4);
 			}
 		}
 		if (player.modifiers != null)

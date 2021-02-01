@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -35,7 +35,7 @@ public class Landmine : BaseTrap
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Disarm ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Disarm "));
 				}
 				using (TimeWarning.New("RPC_Disarm"))
 				{

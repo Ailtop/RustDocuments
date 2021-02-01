@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -33,7 +33,7 @@ public class ReactiveTarget : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Lower ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Lower "));
 				}
 				using (TimeWarning.New("RPC_Lower"))
 				{
@@ -62,7 +62,7 @@ public class ReactiveTarget : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Reset ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Reset "));
 				}
 				using (TimeWarning.New("RPC_Reset"))
 				{

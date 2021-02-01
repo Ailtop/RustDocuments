@@ -1,6 +1,6 @@
+using System.IO;
 using Network;
 using ProtoBuf;
-using System.IO;
 using UnityEngine;
 
 namespace ConVar

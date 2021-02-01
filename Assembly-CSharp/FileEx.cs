@@ -42,7 +42,7 @@ public static class FileEx
 				if (fileInfo2.Exists)
 				{
 					double totalHours = (DateTime.Now - fileInfo2.LastWriteTime).TotalHours;
-					int num2 = (num != 0) ? (1 << num - 1) : 0;
+					int num2 = ((num != 0) ? (1 << num - 1) : 0);
 					if (totalHours >= (double)num2)
 					{
 						fileInfo2.Delete();

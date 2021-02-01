@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using CompanionServer;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MapMarker : BaseEntity

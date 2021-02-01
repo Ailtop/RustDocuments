@@ -92,7 +92,7 @@ public abstract class TerrainPlacement : PrefabAttribute
 	{
 		if (splatmap0.isValid && splatmap1.isValid)
 		{
-			return ((int)SplatMask & id) != 0;
+			return ((uint)SplatMask & (uint)id) != 0;
 		}
 		return false;
 	}
@@ -110,7 +110,7 @@ public abstract class TerrainPlacement : PrefabAttribute
 	{
 		if (biomemap.isValid)
 		{
-			return ((int)BiomeMask & id) != 0;
+			return ((uint)BiomeMask & (uint)id) != 0;
 		}
 		return false;
 	}
@@ -119,7 +119,7 @@ public abstract class TerrainPlacement : PrefabAttribute
 	{
 		if (topologymap.isValid)
 		{
-			return ((int)TopologyMask & id) != 0;
+			return ((uint)TopologyMask & (uint)id) != 0;
 		}
 		return false;
 	}

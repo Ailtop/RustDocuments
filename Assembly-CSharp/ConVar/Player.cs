@@ -1,7 +1,7 @@
-using Facepunch;
-using ProtoBuf;
 using System.Collections.Generic;
 using System.Text;
+using Facepunch;
+using ProtoBuf;
 using UnityEngine;
 
 namespace ConVar
@@ -129,7 +129,7 @@ namespace ConVar
 				{
 					if (!baseVehicle.isServer)
 					{
-						baseVehicle = (BaseNetworkable.serverEntities.Find(baseVehicle.net.ID) as BaseVehicle);
+						baseVehicle = BaseNetworkable.serverEntities.Find(baseVehicle.net.ID) as BaseVehicle;
 					}
 					baseVehicle.AttemptMount(basePlayer2);
 					return;
@@ -137,7 +137,7 @@ namespace ConVar
 			}
 			if ((bool)baseMountable && !baseMountable.isServer)
 			{
-				baseMountable = (BaseNetworkable.serverEntities.Find(baseMountable.net.ID) as BaseMountable);
+				baseMountable = BaseNetworkable.serverEntities.Find(baseMountable.net.ID) as BaseMountable;
 			}
 			if ((bool)baseMountable)
 			{
@@ -230,67 +230,69 @@ namespace ConVar
 		public static void wakeupall(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);
-			if (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic)
+			if (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic)
 			{
-				List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-				foreach (BasePlayer sleepingPlayer in BasePlayer.sleepingPlayerList)
-				{
-					obj.Add(sleepingPlayer);
-				}
-				foreach (BasePlayer item in obj)
-				{
-					item.EndSleeping();
-				}
-				Facepunch.Pool.FreeList(ref obj);
+				return;
 			}
+			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+			foreach (BasePlayer sleepingPlayer in BasePlayer.sleepingPlayerList)
+			{
+				obj.Add(sleepingPlayer);
+			}
+			foreach (BasePlayer item in obj)
+			{
+				item.EndSleeping();
+			}
+			Facepunch.Pool.FreeList(ref obj);
 		}
 
 		[ServerVar]
 		public static void printstats(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);
-			if ((bool)basePlayer)
+			if (!basePlayer)
 			{
-				StringBuilder stringBuilder = new StringBuilder();
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsAlive:F1}s alive");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsSleeping:F1}s sleeping");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsSwimming:F1}s swimming");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsInBase:F1}s in base");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsWilderness:F1}s in wilderness");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsInMonument:F1}s in monuments");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsFlying:F1}s flying");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsBoating:F1}s boating");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsDriving:F1}s driving");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.metersRun:F1}m run");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.metersWalked:F1}m walked");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.totalDamageTaken:F1} damage taken");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.totalHealing:F1} damage healed");
-				stringBuilder.AppendLine("===");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.killedPlayers} other players killed");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.killedScientists} scientists killed");
-				stringBuilder.AppendLine($"{basePlayer.lifeStory.killedAnimals} animals killed");
-				stringBuilder.AppendLine("===");
-				stringBuilder.AppendLine("Weapon stats:");
-				if (basePlayer.lifeStory.weaponStats != null)
-				{
-					foreach (PlayerLifeStory.WeaponStats weaponStat in basePlayer.lifeStory.weaponStats)
-					{
-						float num = (float)(double)weaponStat.shotsHit / (float)(double)weaponStat.shotsFired;
-						num *= 100f;
-						stringBuilder.AppendLine($"{weaponStat.weaponName} - shots fired: {weaponStat.shotsFired} shots hit: {weaponStat.shotsHit} accuracy: {num:F1}%");
-					}
-				}
-				stringBuilder.AppendLine("===");
-				stringBuilder.AppendLine("Misc stats:");
-				if (basePlayer.lifeStory.genericStats != null)
-				{
-					foreach (PlayerLifeStory.GenericStat genericStat in basePlayer.lifeStory.genericStats)
-					{
-						stringBuilder.AppendLine($"{genericStat.key} = {genericStat.value}");
-					}
-				}
-				arg.ReplyWith(stringBuilder.ToString());
+				return;
 			}
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsAlive:F1}s alive");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsSleeping:F1}s sleeping");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsSwimming:F1}s swimming");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsInBase:F1}s in base");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsWilderness:F1}s in wilderness");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsInMonument:F1}s in monuments");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsFlying:F1}s flying");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsBoating:F1}s boating");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.secondsDriving:F1}s driving");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.metersRun:F1}m run");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.metersWalked:F1}m walked");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.totalDamageTaken:F1} damage taken");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.totalHealing:F1} damage healed");
+			stringBuilder.AppendLine("===");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.killedPlayers} other players killed");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.killedScientists} scientists killed");
+			stringBuilder.AppendLine($"{basePlayer.lifeStory.killedAnimals} animals killed");
+			stringBuilder.AppendLine("===");
+			stringBuilder.AppendLine("Weapon stats:");
+			if (basePlayer.lifeStory.weaponStats != null)
+			{
+				foreach (PlayerLifeStory.WeaponStats weaponStat in basePlayer.lifeStory.weaponStats)
+				{
+					float num = (float)weaponStat.shotsHit / (float)weaponStat.shotsFired;
+					num *= 100f;
+					stringBuilder.AppendLine($"{weaponStat.weaponName} - shots fired: {weaponStat.shotsFired} shots hit: {weaponStat.shotsHit} accuracy: {num:F1}%");
+				}
+			}
+			stringBuilder.AppendLine("===");
+			stringBuilder.AppendLine("Misc stats:");
+			if (basePlayer.lifeStory.genericStats != null)
+			{
+				foreach (PlayerLifeStory.GenericStat genericStat in basePlayer.lifeStory.genericStats)
+				{
+					stringBuilder.AppendLine($"{genericStat.key} = {genericStat.value}");
+				}
+			}
+			arg.ReplyWith(stringBuilder.ToString());
 		}
 
 		[ServerVar]
@@ -329,11 +331,11 @@ namespace ConVar
 			{
 				Item itemInSlot = basePlayer.Belt.GetItemInSlot(i);
 				BaseLiquidVessel baseLiquidVessel;
-				if (itemInSlot != null && (object)(baseLiquidVessel = (itemInSlot.GetHeldEntity() as BaseLiquidVessel)) != null && baseLiquidVessel.hasLid)
+				if (itemInSlot != null && (object)(baseLiquidVessel = itemInSlot.GetHeldEntity() as BaseLiquidVessel) != null && baseLiquidVessel.hasLid)
 				{
 					int amount = 999;
 					ItemModContainer component;
-					if (baseLiquidVessel.GetItem().info.TryGetComponent(out component))
+					if (baseLiquidVessel.GetItem().info.TryGetComponent<ItemModContainer>(out component))
 					{
 						amount = component.maxStackSize;
 					}

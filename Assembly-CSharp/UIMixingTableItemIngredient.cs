@@ -15,7 +15,7 @@ public class UIMixingTableItemIngredient : MonoBehaviour
 		ItemCount.text = ingredient.Count.ToString();
 		ItemIcon.enabled = true;
 		ItemCount.enabled = true;
-		ToolTip.Text = ingredient.Count.ToString() + " x " + ingredient.Ingredient.displayName.translated;
+		ToolTip.Text = ingredient.Count + " x " + ingredient.Ingredient.displayName.translated;
 		ToolTip.enabled = true;
 	}
 

@@ -1,5 +1,5 @@
-using Rust.Ai.HTN;
 using System;
+using Rust.Ai.HTN;
 using UnityEngine;
 
 public abstract class BaseNpcDefinition : Definition<BaseNpcDefinition>

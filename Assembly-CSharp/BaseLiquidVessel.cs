@@ -1,7 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -54,7 +54,7 @@ public class BaseLiquidVessel : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoDrink ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoDrink "));
 				}
 				using (TimeWarning.New("DoDrink"))
 				{
@@ -90,7 +90,7 @@ public class BaseLiquidVessel : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SendFilling ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SendFilling "));
 				}
 				using (TimeWarning.New("SendFilling"))
 				{
@@ -119,7 +119,7 @@ public class BaseLiquidVessel : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ThrowContents ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ThrowContents "));
 				}
 				using (TimeWarning.New("ThrowContents"))
 				{
@@ -382,20 +382,22 @@ public class BaseLiquidVessel : AttackEntity
 	[RPC_Server.IsActiveItem]
 	private void DoDrink(RPCMessage msg)
 	{
-		if (msg.player.CanInteract())
+		if (!msg.player.CanInteract())
 		{
-			Item item = GetItem();
-			if (item != null && item.contents != null && msg.player.metabolism.CanConsume())
+			return;
+		}
+		Item item = GetItem();
+		if (item == null || item.contents == null || !msg.player.metabolism.CanConsume())
+		{
+			return;
+		}
+		foreach (Item item2 in item.contents.itemList)
+		{
+			ItemModConsume component = item2.info.GetComponent<ItemModConsume>();
+			if (!(component == null) && component.CanDoAction(item2, msg.player))
 			{
-				foreach (Item item2 in item.contents.itemList)
-				{
-					ItemModConsume component = item2.info.GetComponent<ItemModConsume>();
-					if (!(component == null) && component.CanDoAction(item2, msg.player))
-					{
-						component.DoAction(item2, msg.player);
-						break;
-					}
-				}
+				component.DoAction(item2, msg.player);
+				break;
 			}
 		}
 	}

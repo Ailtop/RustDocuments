@@ -207,7 +207,7 @@ public class Elevator : IOEntity, IFlagNotify
 		{
 			BaseEntity owner = entityLink.connections[0].owner;
 			Elevator elevator;
-			if (owner != null && owner.isServer && (object)(elevator = (owner as Elevator)) != null && elevator != this)
+			if (owner != null && owner.isServer && (object)(elevator = owner as Elevator) != null && elevator != this)
 			{
 				return elevator;
 			}
@@ -225,7 +225,7 @@ public class Elevator : IOEntity, IFlagNotify
 			}
 			if (liftEntity == null)
 			{
-				liftEntity = (GameManager.server.CreateEntity(LiftEntityPrefab.resourcePath, GetWorldSpaceFloorPosition(Floor), LiftRoot.rotation) as ElevatorLift);
+				liftEntity = GameManager.server.CreateEntity(LiftEntityPrefab.resourcePath, GetWorldSpaceFloorPosition(Floor), LiftRoot.rotation) as ElevatorLift;
 				liftEntity.SetParent(this, true);
 				liftEntity.Spawn();
 			}
@@ -235,7 +235,7 @@ public class Elevator : IOEntity, IFlagNotify
 			}
 			if (ioEntity == null)
 			{
-				ioEntity = (GameManager.server.CreateEntity(IoEntityPrefab.resourcePath, IoEntitySpawnPoint.position, IoEntitySpawnPoint.rotation) as IOEntity);
+				ioEntity = GameManager.server.CreateEntity(IoEntityPrefab.resourcePath, IoEntitySpawnPoint.position, IoEntitySpawnPoint.rotation) as IOEntity;
 				ioEntity.SetParent(this, true);
 				ioEntity.Spawn();
 			}
@@ -258,7 +258,7 @@ public class Elevator : IOEntity, IFlagNotify
 		foreach (BaseEntity child in children)
 		{
 			IOEntity iOEntity;
-			if ((object)(iOEntity = (child as IOEntity)) != null)
+			if ((object)(iOEntity = child as IOEntity) != null)
 			{
 				ioEntity = iOEntity;
 				break;
@@ -381,7 +381,7 @@ public class Elevator : IOEntity, IFlagNotify
 		foreach (BaseEntity child in children)
 		{
 			ElevatorLift elevatorLift;
-			if ((object)(elevatorLift = (child as ElevatorLift)) != null)
+			if ((object)(elevatorLift = child as ElevatorLift) != null)
 			{
 				liftEntity = elevatorLift;
 				break;

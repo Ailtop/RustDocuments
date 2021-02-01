@@ -1,4 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
@@ -6,9 +9,6 @@ using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.Modular;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -277,7 +277,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenFuel ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -440,15 +440,16 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 				prevCOMMultiplier = cOMMultiplier;
 			}
 		}
-		if (UnityEngine.Time.time >= nextCollisionDamageTime)
+		if (!(UnityEngine.Time.time >= nextCollisionDamageTime))
 		{
-			nextCollisionDamageTime = UnityEngine.Time.time + 0.33f;
-			foreach (KeyValuePair<BaseEntity, float> item in damageSinceLastTick)
-			{
-				DoCollisionDamage(item.Key, item.Value);
-			}
-			damageSinceLastTick.Clear();
+			return;
 		}
+		nextCollisionDamageTime = UnityEngine.Time.time + 0.33f;
+		foreach (KeyValuePair<BaseEntity, float> item in damageSinceLastTick)
+		{
+			DoCollisionDamage(item.Key, item.Value);
+		}
+		damageSinceLastTick.Clear();
 	}
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
@@ -509,7 +510,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			bool num2 = inputState.IsDown(BUTTON.FORWARD) && !inputState.WasDown(BUTTON.FORWARD);
 			bool flag = inputState.IsDown(BUTTON.BACKWARD) && !inputState.WasDown(BUTTON.BACKWARD) && !inputState.IsDown(BUTTON.FORWARD);
-			if (num2 | flag)
+			if (num2 || flag)
 			{
 				TryStartEngines(player);
 			}
@@ -700,24 +701,25 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	{
 		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
 		{
-			if (!(attachedModuleEntity == ignoreModule) && !(attachedModuleEntity.Health() <= 0f))
+			if (attachedModuleEntity == ignoreModule || attachedModuleEntity.Health() <= 0f)
 			{
+				continue;
+			}
+			if (IsDead())
+			{
+				break;
+			}
+			float num = UnityEngine.Random.Range(minPropagationPercent, maxPropagationPercent);
+			for (int i = 0; i < info.damageTypes.types.Length; i++)
+			{
+				float num2 = info.damageTypes.types[i];
+				if (num2 > 0f)
+				{
+					attachedModuleEntity.AcceptPropagatedDamage(num2 * num, (DamageType)i, info.Initiator, info.UseProtection);
+				}
 				if (IsDead())
 				{
 					break;
-				}
-				float num = UnityEngine.Random.Range(minPropagationPercent, maxPropagationPercent);
-				for (int i = 0; i < info.damageTypes.types.Length; i++)
-				{
-					float num2 = info.damageTypes.types[i];
-					if (num2 > 0f)
-					{
-						attachedModuleEntity.AcceptPropagatedDamage(num2 * num, (DamageType)i, info.Initiator, info.UseProtection);
-					}
-					if (IsDead())
-					{
-						break;
-					}
 				}
 			}
 		}
@@ -725,21 +727,22 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 
 	public override void ModuleReachedZeroHealth()
 	{
-		if (!IsDead())
+		if (IsDead())
 		{
-			bool flag = true;
-			foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
+			return;
+		}
+		bool flag = true;
+		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
+		{
+			if (attachedModuleEntity.health > 0f)
 			{
-				if (attachedModuleEntity.health > 0f)
-				{
-					flag = false;
-					break;
-				}
+				flag = false;
+				break;
 			}
-			if (flag)
-			{
-				Die();
-			}
+		}
+		if (flag)
+		{
+			Die();
 		}
 	}
 
@@ -876,7 +879,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			num *= 0.1f;
 		}
-		float num3 = base.HasAnyModules ? base.AttachedModuleEntities.Max((BaseVehicleModule module) => module.MaxHealth()) : MaxHealth();
+		float num3 = (base.HasAnyModules ? base.AttachedModuleEntities.Max((BaseVehicleModule module) => module.MaxHealth()) : MaxHealth());
 		DoDecayDamage(num3 * num);
 	}
 
@@ -931,12 +934,16 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public void DoCollisionDamage(BaseEntity hitEntity, float damage)
 	{
 		BaseVehicleModule baseVehicleModule;
-		if ((object)(baseVehicleModule = (hitEntity as BaseVehicleModule)) != null)
+		if ((object)(baseVehicleModule = hitEntity as BaseVehicleModule) != null)
 		{
 			baseVehicleModule.Hurt(damage, DamageType.Collision, this, false);
 		}
-		else if (hitEntity == this)
+		else
 		{
+			if (!(hitEntity == this))
+			{
+				return;
+			}
 			if (!base.HasAnyModules)
 			{
 				Hurt(damage, DamageType.Collision, this, false);
@@ -1009,7 +1016,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
 		{
 			VehicleModuleSeating vehicleModuleSeating;
-			if (attachedModuleEntity.HasSeating && (object)(vehicleModuleSeating = (attachedModuleEntity as VehicleModuleSeating)) != null && vehicleModuleSeating.IsOnThisModule(player))
+			if (attachedModuleEntity.HasSeating && (object)(vehicleModuleSeating = attachedModuleEntity as VehicleModuleSeating) != null && vehicleModuleSeating.IsOnThisModule(player))
 			{
 				attachedModuleEntity.ScaleDamageForPlayer(player, info);
 			}

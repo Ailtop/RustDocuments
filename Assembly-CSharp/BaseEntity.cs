@@ -1,4 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Facepunch.Extend;
@@ -9,10 +13,6 @@ using Rust;
 using Rust.Ai;
 using Rust.Workshop;
 using Spatial;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -493,7 +493,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			return (from x in BaseNetworkable.serverEntities.Where(delegate(BaseNetworkable x)
 				{
 					BaseEntity baseEntity;
-					if ((object)(baseEntity = (x as BaseEntity)) != null)
+					if ((object)(baseEntity = x as BaseEntity) != null)
 					{
 						if (baseEntity.OwnerID != ownedBy)
 						{
@@ -641,7 +641,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			foreach (TriggerBase trigger in triggers)
 			{
 				TriggerWetness triggerWetness;
-				if ((object)(triggerWetness = (trigger as TriggerWetness)) != null)
+				if ((object)(triggerWetness = trigger as TriggerWetness) != null)
 				{
 					num += triggerWetness.WorkoutWetness(networkPosition);
 				}
@@ -708,7 +708,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - BroadcastSignalFromClient ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BroadcastSignalFromClient "));
 				}
 				using (TimeWarning.New("BroadcastSignalFromClient"))
 				{
@@ -744,7 +744,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SV_RequestFile ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SV_RequestFile "));
 				}
 				using (TimeWarning.New("SV_RequestFile"))
 				{
@@ -932,24 +932,25 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	protected void SendNetworkUpdate_Flags()
 	{
-		if (!Rust.Application.isLoading && !Rust.Application.isLoadingSave && !base.IsDestroyed && net != null && isSpawned)
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || base.IsDestroyed || net == null || !isSpawned)
 		{
-			using (TimeWarning.New("SendNetworkUpdate_Flags"))
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdate_Flags"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Flags");
+			if (Interface.CallHook("OnEntityFlagsNetworkUpdate", this) == null)
 			{
-				LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Flags");
-				if (Interface.CallHook("OnEntityFlagsNetworkUpdate", this) == null)
+				List<Connection> subscribers = GetSubscribers();
+				if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
 				{
-					List<Connection> subscribers = GetSubscribers();
-					if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
-					{
-						Network.Net.sv.write.PacketID(Message.Type.EntityFlags);
-						Network.Net.sv.write.EntityID(net.ID);
-						Network.Net.sv.write.Int32((int)flags);
-						SendInfo info = new SendInfo(subscribers);
-						Network.Net.sv.write.Send(info);
-					}
-					OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this);
+					Network.Net.sv.write.PacketID(Message.Type.EntityFlags);
+					Network.Net.sv.write.EntityID(net.ID);
+					Network.Net.sv.write.Int32((int)flags);
+					SendInfo info = new SendInfo(subscribers);
+					Network.Net.sv.write.Send(info);
 				}
+				OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this);
 			}
 		}
 	}
@@ -1156,26 +1157,27 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private void LinkToEntity(BaseEntity other)
 	{
-		if (!(this == other) && links.Count != 0 && other.links.Count != 0)
+		if (this == other || links.Count == 0 || other.links.Count == 0)
 		{
-			using (TimeWarning.New("LinkToEntity"))
+			return;
+		}
+		using (TimeWarning.New("LinkToEntity"))
+		{
+			for (int i = 0; i < links.Count; i++)
 			{
-				for (int i = 0; i < links.Count; i++)
+				EntityLink entityLink = links[i];
+				for (int j = 0; j < other.links.Count; j++)
 				{
-					EntityLink entityLink = links[i];
-					for (int j = 0; j < other.links.Count; j++)
+					EntityLink entityLink2 = other.links[j];
+					if (entityLink.CanConnect(entityLink2))
 					{
-						EntityLink entityLink2 = other.links[j];
-						if (entityLink.CanConnect(entityLink2))
+						if (!entityLink.Contains(entityLink2))
 						{
-							if (!entityLink.Contains(entityLink2))
-							{
-								entityLink.Add(entityLink2);
-							}
-							if (!entityLink2.Contains(entityLink))
-							{
-								entityLink2.Add(entityLink);
-							}
+							entityLink.Add(entityLink2);
+						}
+						if (!entityLink2.Contains(entityLink))
+						{
+							entityLink2.Add(entityLink);
 						}
 					}
 				}
@@ -1185,24 +1187,25 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private void LinkToNeighbours()
 	{
-		if (links.Count != 0)
+		if (links.Count == 0)
 		{
-			linkedToNeighbours = true;
-			using (TimeWarning.New("LinkToNeighbours"))
+			return;
+		}
+		linkedToNeighbours = true;
+		using (TimeWarning.New("LinkToNeighbours"))
+		{
+			List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+			OBB oBB = WorldSpaceBounds();
+			Vis.Entities(oBB.position, oBB.extents.magnitude + 1f, obj);
+			for (int i = 0; i < obj.Count; i++)
 			{
-				List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-				OBB oBB = WorldSpaceBounds();
-				Vis.Entities(oBB.position, oBB.extents.magnitude + 1f, obj);
-				for (int i = 0; i < obj.Count; i++)
+				BaseEntity baseEntity = obj[i];
+				if (baseEntity.isServer == base.isServer)
 				{
-					BaseEntity baseEntity = obj[i];
-					if (baseEntity.isServer == base.isServer)
-					{
-						LinkToEntity(baseEntity);
-					}
+					LinkToEntity(baseEntity);
 				}
-				Facepunch.Pool.FreeList(ref obj);
 			}
+			Facepunch.Pool.FreeList(ref obj);
 		}
 	}
 
@@ -1241,7 +1244,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		uint num = msg.read.UInt32();
 		FileStorage.Type type = (FileStorage.Type)msg.read.UInt8();
 		string funcName = StringPool.Get(msg.read.UInt32());
-		uint num2 = (msg.read.Unread > 0) ? msg.read.UInt32() : 0u;
+		uint num2 = ((msg.read.Unread > 0) ? msg.read.UInt32() : 0u);
 		byte[] array = FileStorage.server.Get(num, type, net.ID, num2);
 		if (array != null)
 		{
@@ -1374,25 +1377,27 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private void SendChildrenNetworkUpdate()
 	{
-		if (children != null)
+		if (children == null)
 		{
-			foreach (BaseEntity child in children)
-			{
-				child.UpdateNetworkGroup();
-				child.SendNetworkUpdate();
-			}
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.UpdateNetworkGroup();
+			child.SendNetworkUpdate();
 		}
 	}
 
 	private void SendChildrenNetworkUpdateImmediate()
 	{
-		if (children != null)
+		if (children == null)
 		{
-			foreach (BaseEntity child in children)
-			{
-				child.UpdateNetworkGroup();
-				child.SendNetworkUpdateImmediate();
-			}
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.UpdateNetworkGroup();
+			child.SendNetworkUpdateImmediate();
 		}
 	}
 
@@ -1798,7 +1803,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			doneMovingWithoutARigidBodyCheck++;
 			if (doneMovingWithoutARigidBodyCheck >= 10 && !(GetComponent<Collider>() == null) && GetComponent<Rigidbody>() == null)
 			{
-				Debug.LogWarning("Entity moving without a rigid body! (" + base.gameObject + ")", this);
+				Debug.LogWarning(string.Concat("Entity moving without a rigid body! (", base.gameObject, ")"), this);
 			}
 		}
 	}
@@ -1820,7 +1825,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			UnityEngine.Object.Destroy(base.gameObject);
 			return;
 		}
-		BaseEntity baseEntity = (base.transform.parent != null) ? base.transform.parent.GetComponentInParent<BaseEntity>() : null;
+		BaseEntity baseEntity = ((base.transform.parent != null) ? base.transform.parent.GetComponentInParent<BaseEntity>() : null);
 		Spawn();
 		if (baseEntity != null)
 		{
@@ -1868,7 +1873,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual void OnInvalidPosition()
 	{
-		Debug.Log("Invalid Position: " + this + " " + base.transform.position + " (destroying)");
+		Debug.Log(string.Concat("Invalid Position: ", this, " ", base.transform.position, " (destroying)"));
 		Kill();
 	}
 
@@ -1886,7 +1891,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		BaseCorpse baseCorpse = GameManager.server.CreateEntity(strCorpsePrefab) as BaseCorpse;
 		if (baseCorpse == null)
 		{
-			Debug.LogWarning("Error creating corpse: " + base.gameObject + " - " + strCorpsePrefab);
+			Debug.LogWarning(string.Concat("Error creating corpse: ", base.gameObject, " - ", strCorpsePrefab));
 			return null;
 		}
 		baseCorpse.InitCorpse(this);
@@ -1897,49 +1902,50 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		Assert.IsTrue(base.isServer, "UpdateNetworkGroup called on clientside entity!");
 		isCallingUpdateNetworkGroup = false;
-		if (net != null && Network.Net.sv != null && Network.Net.sv.visibility != null)
+		if (net == null || Network.Net.sv == null || Network.Net.sv.visibility == null)
 		{
-			using (TimeWarning.New("UpdateNetworkGroup"))
+			return;
+		}
+		using (TimeWarning.New("UpdateNetworkGroup"))
+		{
+			if (globalBroadcast)
 			{
-				if (globalBroadcast)
+				if (net.SwitchGroup(BaseNetworkable.GlobalNetworkGroup))
 				{
-					if (net.SwitchGroup(BaseNetworkable.GlobalNetworkGroup))
-					{
-						SendNetworkGroupChange();
-					}
+					SendNetworkGroupChange();
 				}
-				else if (ShouldInheritNetworkGroup() && base.parentEntity.IsSet())
+			}
+			else if (ShouldInheritNetworkGroup() && base.parentEntity.IsSet())
+			{
+				BaseEntity parentEntity = GetParentEntity();
+				if (!BaseEntityEx.IsValid(parentEntity))
 				{
-					BaseEntity parentEntity = GetParentEntity();
-					if (!BaseEntityEx.IsValid(parentEntity))
-					{
-						Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + base.parentEntity.uid);
-						Invoke(UpdateNetworkGroup, 2f);
-						isCallingUpdateNetworkGroup = true;
-					}
-					else if (parentEntity != null)
-					{
-						if (net.SwitchGroup(parentEntity.net.group))
-						{
-							SendNetworkGroupChange();
-						}
-					}
-					else
-					{
-						Debug.LogWarning(base.gameObject + ": has parent id - but couldn't find parent! " + base.parentEntity);
-					}
+					Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + base.parentEntity.uid);
+					Invoke(UpdateNetworkGroup, 2f);
+					isCallingUpdateNetworkGroup = true;
 				}
-				else if (base.limitNetworking && !(this is BasePlayer))
+				else if (parentEntity != null)
 				{
-					if (net.SwitchGroup(BaseNetworkable.LimboNetworkGroup))
+					if (net.SwitchGroup(parentEntity.net.group))
 					{
 						SendNetworkGroupChange();
 					}
 				}
 				else
 				{
-					base.UpdateNetworkGroup();
+					Debug.LogWarning(string.Concat(base.gameObject, ": has parent id - but couldn't find parent! ", base.parentEntity));
 				}
+			}
+			else if (base.limitNetworking && !(this is BasePlayer))
+			{
+				if (net.SwitchGroup(BaseNetworkable.LimboNetworkGroup))
+				{
+					SendNetworkGroupChange();
+				}
+			}
+			else
+			{
+				base.UpdateNetworkGroup();
 			}
 		}
 	}
@@ -2164,22 +2170,23 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public void RemoveFromTriggers()
 	{
-		if (triggers != null)
+		if (triggers == null)
 		{
-			using (TimeWarning.New("RemoveFromTriggers"))
+			return;
+		}
+		using (TimeWarning.New("RemoveFromTriggers"))
+		{
+			TriggerBase[] array = triggers.ToArray();
+			foreach (TriggerBase triggerBase in array)
 			{
-				TriggerBase[] array = triggers.ToArray();
-				foreach (TriggerBase triggerBase in array)
+				if ((bool)triggerBase)
 				{
-					if ((bool)triggerBase)
-					{
-						triggerBase.RemoveEntity(this);
-					}
+					triggerBase.RemoveEntity(this);
 				}
-				if (triggers != null && triggers.Count == 0)
-				{
-					Facepunch.Pool.FreeList(ref triggers);
-				}
+			}
+			if (triggers != null && triggers.Count == 0)
+			{
+				Facepunch.Pool.FreeList(ref triggers);
 			}
 		}
 	}
@@ -2502,15 +2509,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			return true;
 		}
-		uint num = (net != null) ? net.ID : 0;
-		uint num2 = (other.net != null) ? other.net.ID : 0u;
+		uint num = ((net != null) ? net.ID : 0);
+		uint num2 = ((other.net != null) ? other.net.ID : 0u);
 		return num < num2;
 	}
 
 	public virtual bool IsOutside()
 	{
-		OBB oBB = WorldSpaceBounds();
-		return IsOutside(oBB.position);
+		return IsOutside(WorldSpaceBounds().position);
 	}
 
 	public bool IsOutside(Vector3 position)
@@ -2562,7 +2568,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		for (int i = 0; i < triggers.Count; i++)
 		{
 			WaterVolume waterVolume;
-			if ((object)(waterVolume = (triggers[i] as WaterVolume)) != null && waterVolume.Test(pos, out info))
+			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(pos, out info))
 			{
 				return true;
 			}
@@ -2581,7 +2587,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		for (int i = 0; i < triggers.Count; i++)
 		{
 			WaterVolume waterVolume;
-			if ((object)(waterVolume = (triggers[i] as WaterVolume)) != null && waterVolume.Test(pos, out info))
+			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(pos, out info))
 			{
 				return true;
 			}
@@ -2599,7 +2605,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		for (int i = 0; i < triggers.Count; i++)
 		{
 			WaterVolume waterVolume;
-			if ((object)(waterVolume = (triggers[i] as WaterVolume)) != null && waterVolume.Test(bounds, out info))
+			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(bounds, out info))
 			{
 				return true;
 			}
@@ -2762,19 +2768,20 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public void BroadcastEntityMessage(string msg, float radius = 20f, int layerMask = 1218652417)
 	{
-		if (!base.isClient)
+		if (base.isClient)
 		{
-			List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-			Vis.Entities(base.transform.position, radius, obj, layerMask);
-			foreach (BaseEntity item in obj)
-			{
-				if (item.isServer)
-				{
-					item.OnEntityMessage(this, msg);
-				}
-			}
-			Facepunch.Pool.FreeList(ref obj);
+			return;
 		}
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		Vis.Entities(base.transform.position, radius, obj, layerMask);
+		foreach (BaseEntity item in obj)
+		{
+			if (item.isServer)
+			{
+				item.OnEntityMessage(this, msg);
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public virtual void OnEntityMessage(BaseEntity from, string msg)

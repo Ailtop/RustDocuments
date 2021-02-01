@@ -1,6 +1,6 @@
+using System;
 using Oxide.Core;
 using Rust;
-using System;
 using UnityEngine;
 
 public class LootContainer : StorageContainer
@@ -194,7 +194,7 @@ public class LootContainer : StorageContainer
 		{
 			return;
 		}
-		float num = (basePlayer.modifiers != null) ? (1f + basePlayer.modifiers.GetValue(Modifier.ModifierType.Scrap_Yield)) : 0f;
+		float num = ((basePlayer.modifiers != null) ? (1f + basePlayer.modifiers.GetValue(Modifier.ModifierType.Scrap_Yield)) : 0f);
 		if (!(num > 1f))
 		{
 			return;

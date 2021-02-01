@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -50,7 +50,7 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_ChangeCode ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_ChangeCode "));
 				}
 				using (TimeWarning.New("RPC_ChangeCode"))
 				{
@@ -86,7 +86,7 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - TryLock ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TryLock "));
 				}
 				using (TimeWarning.New("TryLock"))
 				{
@@ -122,7 +122,7 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - TryUnlock ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TryUnlock "));
 				}
 				using (TimeWarning.New("TryUnlock"))
 				{
@@ -158,7 +158,7 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UnlockWithCode ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UnlockWithCode "));
 				}
 				using (TimeWarning.New("UnlockWithCode"))
 				{
@@ -266,8 +266,8 @@ public class CodeLock : BaseLock
 	{
 		base.Save(info);
 		info.msg.codeLock = Facepunch.Pool.Get<ProtoBuf.CodeLock>();
-		info.msg.codeLock.hasGuestCode = (guestCode.Length > 0);
-		info.msg.codeLock.hasCode = (code.Length > 0);
+		info.msg.codeLock.hasGuestCode = guestCode.Length > 0;
+		info.msg.codeLock.hasCode = code.Length > 0;
 		if (info.forDisk)
 		{
 			info.msg.codeLock.pv = Facepunch.Pool.Get<ProtoBuf.CodeLock.Private>();
@@ -303,14 +303,14 @@ public class CodeLock : BaseLock
 			if (!flag)
 			{
 				code = text;
-				hasCode = (code.Length > 0);
+				hasCode = code.Length > 0;
 				whitelistPlayers.Clear();
 				whitelistPlayers.Add(rpc.player.userID);
 			}
 			else
 			{
 				guestCode = text;
-				hasGuestCode = (guestCode.Length > 0);
+				hasGuestCode = guestCode.Length > 0;
 				guestPlayers.Clear();
 				guestPlayers.Add(rpc.player.userID);
 			}

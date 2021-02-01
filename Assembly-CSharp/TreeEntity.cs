@@ -1,6 +1,6 @@
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 
 public class TreeEntity : ResourceEntity, IPrefabPreProcess
@@ -159,7 +159,7 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 			currentBonusLevel++;
 			info.gatherScale = 1f + Mathf.Clamp((float)currentBonusLevel * 0.125f, 0f, 1f);
 		}
-		Vector3 vector = (xMarker != null) ? xMarker.transform.position : info.HitPositionWorld;
+		Vector3 vector = ((xMarker != null) ? xMarker.transform.position : info.HitPositionWorld);
 		CleanupMarker();
 		if (MarkerData != null)
 		{
@@ -178,16 +178,15 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 			Vector3 vector4 = base.transform.InverseTransformDirection(vector3.normalized) * 2.5f;
 			vector4 = base.transform.InverseTransformPoint(GetCollider().ClosestPoint(base.transform.TransformPoint(vector4)));
 			Vector3 aimFrom = base.transform.TransformPoint(vector4);
-			Vector3 vector5 = base.transform.InverseTransformPoint(info.HitPositionWorld);
-			vector4.y = vector5.y;
-			Vector3 vector6 = base.transform.InverseTransformPoint(info.Initiator.CenterPoint());
-			float min = Mathf.Max(0.75f, vector6.y);
-			float max = vector6.y + 0.5f;
+			vector4.y = base.transform.InverseTransformPoint(info.HitPositionWorld).y;
+			Vector3 vector5 = base.transform.InverseTransformPoint(info.Initiator.CenterPoint());
+			float min = Mathf.Max(0.75f, vector5.y);
+			float max = vector5.y + 0.5f;
 			vector4.y = Mathf.Clamp(vector4.y + UnityEngine.Random.Range(0.1f, 0.2f) * ((UnityEngine.Random.Range(0, 2) == 0) ? (-1f) : 1f), min, max);
-			Vector3 vector7 = Vector3Ex.Direction2D(base.transform.position, aimFrom);
-			Vector3 a2 = vector7;
-			vector7 = base.transform.InverseTransformDirection(vector7);
-			Quaternion quaternion = QuaternionEx.LookRotationNormal(-vector7, Vector3.zero);
+			Vector3 vector6 = Vector3Ex.Direction2D(base.transform.position, aimFrom);
+			Vector3 a2 = vector6;
+			vector6 = base.transform.InverseTransformDirection(vector6);
+			Quaternion quaternion = QuaternionEx.LookRotationNormal(-vector6, Vector3.zero);
 			vector4 = base.transform.TransformPoint(vector4);
 			quaternion = QuaternionEx.LookRotationNormal(-a2, Vector3.zero);
 			vector4 = GetCollider().ClosestPoint(vector4);

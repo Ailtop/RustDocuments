@@ -1,8 +1,8 @@
-using Facepunch;
-using Rust.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
+using Rust.UI;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
@@ -187,22 +187,23 @@ public class PrefabPreProcess : IPrefabProcessor
 		}
 		foreach (Transform item5 in list)
 		{
-			if ((bool)item5 && (bool)item5.gameObject)
+			if (!item5 || !item5.gameObject)
 			{
-				if (isServerside && item5.gameObject.CompareTag("Server Cull"))
+				continue;
+			}
+			if (isServerside && item5.gameObject.CompareTag("Server Cull"))
+			{
+				RemoveComponents(item5.gameObject);
+				NominateForDeletion(item5.gameObject);
+			}
+			if (isClientside)
+			{
+				bool num = item5.gameObject.CompareTag("Client Cull");
+				bool flag = item5 != go.transform && item5.gameObject.GetComponent<BaseEntity>() != null;
+				if (num || flag)
 				{
 					RemoveComponents(item5.gameObject);
 					NominateForDeletion(item5.gameObject);
-				}
-				if (isClientside)
-				{
-					bool num = item5.gameObject.CompareTag("Client Cull");
-					bool flag = item5 != go.transform && item5.gameObject.GetComponent<BaseEntity>() != null;
-					if (num | flag)
-					{
-						RemoveComponents(item5.gameObject);
-						NominateForDeletion(item5.gameObject);
-					}
 				}
 			}
 		}

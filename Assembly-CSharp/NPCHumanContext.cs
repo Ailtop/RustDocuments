@@ -1,5 +1,5 @@
-using Rust.Ai;
 using System.Collections.Generic;
+using Rust.Ai;
 using UnityEngine;
 
 public class NPCHumanContext : BaseNPCContext

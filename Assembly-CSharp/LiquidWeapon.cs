@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -92,7 +92,7 @@ public class LiquidWeapon : BaseLiquidVessel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - PumpWater ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - PumpWater "));
 				}
 				using (TimeWarning.New("PumpWater"))
 				{
@@ -128,7 +128,7 @@ public class LiquidWeapon : BaseLiquidVessel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - StartFiring ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartFiring "));
 				}
 				using (TimeWarning.New("StartFiring"))
 				{
@@ -164,7 +164,7 @@ public class LiquidWeapon : BaseLiquidVessel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - StopFiring ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StopFiring "));
 				}
 				using (TimeWarning.New("StopFiring"))
 				{

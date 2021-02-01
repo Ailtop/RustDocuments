@@ -1,7 +1,7 @@
+using System;
 using ConVar;
 using Facepunch;
 using ProtoBuf;
-using System;
 using UnityEngine;
 
 public class Composter : StorageContainer
@@ -77,7 +77,7 @@ public class Composter : StorageContainer
 			ItemModCompostable component = item.info.GetComponent<ItemModCompostable>();
 			if (!(component == null))
 			{
-				int num = (!CompostEntireStack) ? 1 : item.amount;
+				int num = ((!CompostEntireStack) ? 1 : item.amount);
 				item.UseItem(num);
 				fertilizerProductionProgress += (float)num * component.TotalFertilizerProduced;
 				ProduceFertilizer(Mathf.FloorToInt(fertilizerProductionProgress));

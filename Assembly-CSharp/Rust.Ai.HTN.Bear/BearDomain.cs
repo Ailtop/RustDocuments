@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.AI.Components;
 using Apex.Ai.HTN;
@@ -7,9 +10,6 @@ using Rust.Ai.HTN.Bear.Reasoners;
 using Rust.Ai.HTN.Bear.Sensors;
 using Rust.Ai.HTN.Reasoning;
 using Rust.Ai.HTN.Sensors;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -301,7 +301,7 @@ namespace Rust.Ai.HTN.Bear
 				{
 					float closeRange = context.Body.AiDefinition.Engagement.CloseRange;
 					float num = closeRange * closeRange;
-					Vector3 a = (!(primaryEnemyPlayerTarget.SqrDistance < num)) ? (primaryEnemyPlayerTarget.Player.transform.position - context.Body.transform.position).normalized : (context.Body.transform.position - primaryEnemyPlayerTarget.Player.transform.position).normalized;
+					Vector3 a = ((!(primaryEnemyPlayerTarget.SqrDistance < num)) ? (primaryEnemyPlayerTarget.Player.transform.position - context.Body.transform.position).normalized : (context.Body.transform.position - primaryEnemyPlayerTarget.Player.transform.position).normalized);
 					Vector3 vector = context.Body.transform.position + a * closeRange;
 					Vector3 vector2 = vector;
 					for (int i = 0; i < 10; i++)
@@ -928,7 +928,7 @@ namespace Rust.Ai.HTN.Bear
 
 			public override float Score(BearContext c)
 			{
-				byte b = (byte)(Value ? 1 : 0);
+				byte b = (byte)(Value ? 1u : 0u);
 				if (c.GetWorldState(Fact) != b)
 				{
 					return 0f;
@@ -1265,7 +1265,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				if (_bearDefinition == null)
 				{
-					_bearDefinition = (_context.Body.AiDefinition as BearDefinition);
+					_bearDefinition = _context.Body.AiDefinition as BearDefinition;
 				}
 				return _bearDefinition;
 			}
@@ -1633,33 +1633,34 @@ namespace Rust.Ai.HTN.Bear
 		private void OnGunshotSensation(ref Sensation info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberGunshot(ref info, item, initiatorPlayer))
 				{
-					if (RememberGunshot(ref info, item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null || _context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == initiatorPlayer)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null || _context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == initiatorPlayer)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
-				}
-				if (!flag)
-				{
-					_context.IncrementFact(Facts.Vulnerability, 1);
+					_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
 					_context.IncrementFact(Facts.Alertness, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 1);
+				_context.IncrementFact(Facts.Alertness, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
+				{
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 
@@ -1671,56 +1672,58 @@ namespace Rust.Ai.HTN.Bear
 				return;
 			}
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberThrownItem(ref info, item, initiatorPlayer))
 				{
-					if (RememberThrownItem(ref info, item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
+					_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
+					_context.IncrementFact(Facts.Alertness, 1);
+					flag = true;
+					break;
 				}
-				if (!flag)
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
 				{
-					_context.IncrementFact(Facts.Vulnerability, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
-				}
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 
 		private void OnExplosionSensation(ref Sensation info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberExplosion(ref info, item, initiatorPlayer))
 				{
-					if (RememberExplosion(ref info, item, initiatorPlayer))
-					{
-						_context.IncrementFact(Facts.Vulnerability, _context.IsFact(Facts.CanSeeEnemy) ? 1 : 2);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
-					}
-				}
-				if (!flag)
-				{
-					_context.IncrementFact(Facts.Vulnerability, 1);
+					_context.IncrementFact(Facts.Vulnerability, _context.IsFact(Facts.CanSeeEnemy) ? 1 : 2);
 					_context.IncrementFact(Facts.Alertness, 1);
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 1);
+				_context.IncrementFact(Facts.Alertness, 1);
 			}
 		}
 
@@ -1814,33 +1817,34 @@ namespace Rust.Ai.HTN.Bear
 		public override void OnHurt(HitInfo info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberPlayerThatHurtUs(item, initiatorPlayer))
 				{
-					if (RememberPlayerThatHurtUs(item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Vulnerability, _context.IsFact(Facts.CanSeeEnemy) ? 1 : 10);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
-				}
-				if (!flag)
-				{
-					_context.IncrementFact(Facts.Vulnerability, 10);
+					_context.IncrementFact(Facts.Vulnerability, _context.IsFact(Facts.CanSeeEnemy) ? 1 : 10);
 					_context.IncrementFact(Facts.Alertness, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 10);
+				_context.IncrementFact(Facts.Alertness, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
+				{
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 

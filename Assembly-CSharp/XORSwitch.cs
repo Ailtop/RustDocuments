@@ -45,7 +45,7 @@ public class XORSwitch : IOEntity
 			input2Amount = inputAmount;
 			break;
 		}
-		int num = (input1Amount <= 0 || input2Amount <= 0) ? Mathf.Max(input1Amount, input2Amount) : 0;
+		int num = ((input1Amount <= 0 || input2Amount <= 0) ? Mathf.Max(input1Amount, input2Amount) : 0);
 		bool b = num > 0;
 		SetFlag(Flags.Reserved1, input1Amount > 0, false, false);
 		SetFlag(Flags.Reserved2, input2Amount > 0, false, false);

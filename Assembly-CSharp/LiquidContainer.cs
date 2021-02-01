@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -66,7 +66,7 @@ public class LiquidContainer : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SVDrink ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVDrink "));
 				}
 				using (TimeWarning.New("SVDrink"))
 				{
@@ -336,16 +336,17 @@ public class LiquidContainer : ContainerIOEntity
 	[RPC_Server.MaxDistance(3f)]
 	public void SVDrink(RPCMessage rpc)
 	{
-		if (rpc.player.metabolism.CanConsume())
+		if (!rpc.player.metabolism.CanConsume())
 		{
-			foreach (Item item in base.inventory.itemList)
+			return;
+		}
+		foreach (Item item in base.inventory.itemList)
+		{
+			ItemModConsume component = item.info.GetComponent<ItemModConsume>();
+			if (!(component == null) && component.CanDoAction(item, rpc.player))
 			{
-				ItemModConsume component = item.info.GetComponent<ItemModConsume>();
-				if (!(component == null) && component.CanDoAction(item, rpc.player))
-				{
-					component.DoAction(item, rpc.player);
-					break;
-				}
+				component.DoAction(item, rpc.player);
+				break;
 			}
 		}
 	}
@@ -353,28 +354,29 @@ public class LiquidContainer : ContainerIOEntity
 	private void UpdatePushLiquidTargets()
 	{
 		pushTargets.Clear();
-		if (HasLiquidItem() && !IsConnectedTo(this, IOEntity.backtracking * 2))
+		if (!HasLiquidItem() || IsConnectedTo(this, IOEntity.backtracking * 2))
 		{
-			Item liquidItem = GetLiquidItem();
-			using (TimeWarning.New("UpdatePushTargets"))
+			return;
+		}
+		Item liquidItem = GetLiquidItem();
+		using (TimeWarning.New("UpdatePushTargets"))
+		{
+			IOSlot[] outputs = base.outputs;
+			foreach (IOSlot iOSlot in outputs)
 			{
-				IOSlot[] outputs = base.outputs;
-				foreach (IOSlot iOSlot in outputs)
+				if (iOSlot.type == IOType.Fluidic)
 				{
-					if (iOSlot.type == IOType.Fluidic)
+					IOEntity iOEntity = iOSlot.connectedTo.Get();
+					if (iOEntity != null)
 					{
-						IOEntity iOEntity = iOSlot.connectedTo.Get();
-						if (iOEntity != null)
-						{
-							CheckPushLiquid(iOEntity, liquidItem, this, IOEntity.backtracking * 4);
-						}
+						CheckPushLiquid(iOEntity, liquidItem, this, IOEntity.backtracking * 4);
 					}
 				}
 			}
-			if (pushTargets.Count > 0)
-			{
-				InvokeRandomized(pushLiquidAction, 0f, autofillTickRate, autofillTickRate * 0.2f);
-			}
+		}
+		if (pushTargets.Count > 0)
+		{
+			InvokeRandomized(pushLiquidAction, 0f, autofillTickRate, autofillTickRate * 0.2f);
 		}
 	}
 
@@ -431,7 +433,7 @@ public class LiquidContainer : ContainerIOEntity
 			return;
 		}
 		ContainerIOEntity containerIOEntity;
-		if ((object)(containerIOEntity = (connected as ContainerIOEntity)) != null && !pushTargets.Contains(containerIOEntity) && containerIOEntity.inventory.CanAcceptItem(ourFuel, 0) == ItemContainer.CanAcceptResult.CanAccept)
+		if ((object)(containerIOEntity = connected as ContainerIOEntity) != null && !pushTargets.Contains(containerIOEntity) && containerIOEntity.inventory.CanAcceptItem(ourFuel, 0) == ItemContainer.CanAcceptResult.CanAccept)
 		{
 			pushTargets.Add(containerIOEntity);
 			return;

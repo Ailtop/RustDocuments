@@ -1,13 +1,13 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -432,7 +432,7 @@ public class Item
 	public void Initialize(ItemDefinition template)
 	{
 		uid = Network.Net.sv.TakeUID();
-		float num2 = condition = (maxCondition = info.condition.max);
+		float num2 = (condition = (maxCondition = info.condition.max));
 		OnItemCreated();
 	}
 
@@ -916,8 +916,8 @@ public class Item
 		}
 		if (item.info.amountType == ItemDefinition.AmountType.Genetics || info.amountType == ItemDefinition.AmountType.Genetics)
 		{
-			int num = (item.instanceData != null) ? item.instanceData.dataInt : (-1);
-			int num2 = (instanceData != null) ? instanceData.dataInt : (-1);
+			int num = ((item.instanceData != null) ? item.instanceData.dataInt : (-1));
+			int num2 = ((instanceData != null) ? instanceData.dataInt : (-1));
 			if (num != num2)
 			{
 				return false;
@@ -1046,7 +1046,7 @@ public class Item
 	public bool HasAmmo(AmmoTypes ammoType)
 	{
 		ItemModProjectile component;
-		if (info.TryGetComponent(out component) && component.IsAmmo(ammoType))
+		if (info.TryGetComponent<ItemModProjectile>(out component) && component.IsAmmo(ammoType))
 		{
 			return true;
 		}
@@ -1060,7 +1060,7 @@ public class Item
 	public void FindAmmo(List<Item> list, AmmoTypes ammoType)
 	{
 		ItemModProjectile component;
-		if (info.TryGetComponent(out component) && component.IsAmmo(ammoType))
+		if (info.TryGetComponent<ItemModProjectile>(out component) && component.IsAmmo(ammoType))
 		{
 			list.Add(this);
 		}

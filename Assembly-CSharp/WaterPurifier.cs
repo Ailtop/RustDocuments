@@ -56,7 +56,7 @@ public class WaterPurifier : LiquidContainer
 				foreach (BaseEntity child in parentEntity.children)
 				{
 					LiquidContainer liquidContainer;
-					if (child != this && (object)(liquidContainer = (child as LiquidContainer)) != null)
+					if (child != this && (object)(liquidContainer = child as LiquidContainer) != null)
 					{
 						waterStorage = liquidContainer;
 						break;
@@ -69,7 +69,7 @@ public class WaterPurifier : LiquidContainer
 			waterStorage.SetConnectedTo(this);
 			return;
 		}
-		waterStorage = (GameManager.server.CreateEntity(storagePrefab.resourcePath, storagePrefabAnchor.localPosition, storagePrefabAnchor.localRotation) as LiquidContainer);
+		waterStorage = GameManager.server.CreateEntity(storagePrefab.resourcePath, storagePrefabAnchor.localPosition, storagePrefabAnchor.localRotation) as LiquidContainer;
 		waterStorage.SetParent(GetParentEntity());
 		waterStorage.Spawn();
 		waterStorage.SetConnectedTo(this);

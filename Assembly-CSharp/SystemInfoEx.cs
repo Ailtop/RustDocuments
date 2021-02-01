@@ -21,7 +21,7 @@ public static class SystemInfoEx
 			for (int i = 0; i <= num; i++)
 			{
 				bool flag = Enum.IsDefined(typeof(RenderTextureFormat), i);
-				supportedRenderTextureFormats[i] = (flag && SystemInfo.SupportsRenderTextureFormat((RenderTextureFormat)i));
+				supportedRenderTextureFormats[i] = flag && SystemInfo.SupportsRenderTextureFormat((RenderTextureFormat)i);
 			}
 		}
 		return supportedRenderTextureFormats[(int)format];

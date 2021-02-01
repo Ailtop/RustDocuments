@@ -25,7 +25,7 @@ public class TriggerNotify : TriggerBase, IPrefabPreProcess
 	internal override void OnObjects()
 	{
 		base.OnObjects();
-		if (toNotify != null || (notifyTarget != null && notifyTarget.TryGetComponent(out toNotify)))
+		if (toNotify != null || (notifyTarget != null && notifyTarget.TryGetComponent<INotifyTrigger>(out toNotify)))
 		{
 			toNotify.OnObjects(this);
 		}
@@ -34,7 +34,7 @@ public class TriggerNotify : TriggerBase, IPrefabPreProcess
 	internal override void OnEmpty()
 	{
 		base.OnEmpty();
-		if (toNotify != null || (notifyTarget != null && notifyTarget.TryGetComponent(out toNotify)))
+		if (toNotify != null || (notifyTarget != null && notifyTarget.TryGetComponent<INotifyTrigger>(out toNotify)))
 		{
 			toNotify.OnEmpty();
 		}

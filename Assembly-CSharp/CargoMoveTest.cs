@@ -38,7 +38,7 @@ public class CargoMoveTest : FacepunchBehaviour
 		float num3 = 5f;
 		float b = Mathf.InverseLerp(0.05f, 0.5f, Mathf.Abs(num2));
 		turnScale = Mathf.Lerp(turnScale, b, Time.deltaTime * 0.2f);
-		float num4 = (!(num2 < 0f)) ? 1 : (-1);
+		float num4 = ((!(num2 < 0f)) ? 1 : (-1));
 		base.transform.Rotate(Vector3.up, num3 * Time.deltaTime * turnScale * num4, Space.World);
 		currentThrottle = Mathf.Lerp(currentThrottle, num, Time.deltaTime * 0.2f);
 		base.transform.position += base.transform.forward * 5f * Time.deltaTime * currentThrottle;
@@ -80,7 +80,7 @@ public class CargoMoveTest : FacepunchBehaviour
 				Vector3 vector = TerrainMeta.Path.OceanPatrolFar[i];
 				Gizmos.color = Color.green;
 				Gizmos.DrawSphere(vector, 3f);
-				Vector3 to = (i + 1 == TerrainMeta.Path.OceanPatrolFar.Count) ? TerrainMeta.Path.OceanPatrolFar[0] : TerrainMeta.Path.OceanPatrolFar[i + 1];
+				Vector3 to = ((i + 1 == TerrainMeta.Path.OceanPatrolFar.Count) ? TerrainMeta.Path.OceanPatrolFar[0] : TerrainMeta.Path.OceanPatrolFar[i + 1]);
 				Gizmos.DrawLine(vector, to);
 			}
 		}

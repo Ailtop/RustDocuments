@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
@@ -80,7 +80,7 @@ public class BaseVehicle : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_WantsPush ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsPush "));
 				}
 				using (TimeWarning.New("RPC_WantsPush"))
 				{
@@ -573,31 +573,33 @@ public class BaseVehicle : BaseMountable
 		float num = float.PositiveInfinity;
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			if (!mountPoint.mountable.IsMounted())
+			if (mountPoint.mountable.IsMounted())
 			{
-				float num2 = Vector3.Distance(mountPoint.mountable.mountAnchor.position, pos);
-				if (!(num2 > num))
+				continue;
+			}
+			float num2 = Vector3.Distance(mountPoint.mountable.mountAnchor.position, pos);
+			if (num2 > num)
+			{
+				continue;
+			}
+			if (IsSeatClipping(mountPoint.mountable))
+			{
+				if (UnityEngine.Application.isEditor)
 				{
-					if (IsSeatClipping(mountPoint.mountable))
-					{
-						if (UnityEngine.Application.isEditor)
-						{
-							Debug.Log($"Skipping seat {mountPoint.mountable} - it's clipping");
-						}
-					}
-					else if (!IsSeatVisible(mountPoint.mountable, eyePos))
-					{
-						if (UnityEngine.Application.isEditor)
-						{
-							Debug.Log($"Skipping seat {mountPoint.mountable} - it's not visible");
-						}
-					}
-					else if (!OnlyOwnerAccessible() || mountPoint.isDriver)
-					{
-						result = mountPoint.mountable;
-						num = num2;
-					}
+					Debug.Log($"Skipping seat {mountPoint.mountable} - it's clipping");
 				}
+			}
+			else if (!IsSeatVisible(mountPoint.mountable, eyePos))
+			{
+				if (UnityEngine.Application.isEditor)
+				{
+					Debug.Log($"Skipping seat {mountPoint.mountable} - it's not visible");
+				}
+			}
+			else if (!OnlyOwnerAccessible() || mountPoint.isDriver)
+			{
+				result = mountPoint.mountable;
+				num = num2;
 			}
 		}
 		return result;

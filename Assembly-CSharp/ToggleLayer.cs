@@ -14,7 +14,7 @@ public class ToggleLayer : MonoBehaviour, IClientComponent
 	{
 		if ((bool)MainCamera.mainCamera)
 		{
-			toggleControl.isOn = ((MainCamera.mainCamera.cullingMask & layer.Mask) != 0);
+			toggleControl.isOn = (MainCamera.mainCamera.cullingMask & layer.Mask) != 0;
 		}
 	}
 

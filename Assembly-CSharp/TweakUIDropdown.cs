@@ -59,8 +59,8 @@ public class TweakUIDropdown : TweakUIBase
 		{
 			currentValue = nameValues.Length - 1;
 		}
-		Left.interactable = (currentValue > 0);
-		Right.interactable = (currentValue < nameValues.Length - 1);
+		Left.interactable = currentValue > 0;
+		Right.interactable = currentValue < nameValues.Length - 1;
 		if (ApplyImmediatelyOnChange)
 		{
 			SetConvarValue();

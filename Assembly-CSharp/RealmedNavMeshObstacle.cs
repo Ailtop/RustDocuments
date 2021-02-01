@@ -26,7 +26,7 @@ public class RealmedNavMeshObstacle : BasePrefab
 			}
 			else if (AiManager.nav_obstacles_carve_state == 1)
 			{
-				Obstacle.carving = (Obstacle.gameObject.layer == 21);
+				Obstacle.carving = Obstacle.gameObject.layer == 21;
 			}
 			else
 			{

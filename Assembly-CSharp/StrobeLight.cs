@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -65,7 +65,7 @@ public class StrobeLight : BaseCombatEntity
 	[RPC_Server]
 	public void SetStrobeSpeed(RPCMessage msg)
 	{
-		int num = currentSpeed = msg.read.Int32();
+		int num = (currentSpeed = msg.read.Int32());
 		UpdateSpeedFlags();
 	}
 
@@ -110,7 +110,7 @@ public class StrobeLight : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetStrobe ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetStrobe "));
 				}
 				using (TimeWarning.New("SetStrobe"))
 				{
@@ -146,7 +146,7 @@ public class StrobeLight : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetStrobeSpeed ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetStrobeSpeed "));
 				}
 				using (TimeWarning.New("SetStrobeSpeed"))
 				{

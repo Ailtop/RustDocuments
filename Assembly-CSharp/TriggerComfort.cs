@@ -1,5 +1,5 @@
-using Oxide.Core;
 using System.Collections.Generic;
+using Oxide.Core;
 using UnityEngine;
 
 public class TriggerComfort : TriggerBase

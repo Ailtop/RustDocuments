@@ -1,6 +1,6 @@
+using System;
 using Facepunch;
 using ProtoBuf;
-using System;
 using UnityEngine;
 
 namespace CompanionServer.Handlers

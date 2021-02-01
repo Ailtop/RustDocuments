@@ -14,7 +14,7 @@ public class ObjectSpam : MonoBehaviour
 		{
 			GameObject gameObject = Object.Instantiate(source);
 			gameObject.transform.position = base.transform.position + Vector3Ex.Range(0f - radius, radius);
-			gameObject.hideFlags = (HideFlags.HideInHierarchy | HideFlags.HideInInspector);
+			gameObject.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 		}
 	}
 }

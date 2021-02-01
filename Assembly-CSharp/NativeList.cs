@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Runtime.CompilerServices;
+using Facepunch;
 using Unity.Collections;
 
 public class NativeList<[System.Runtime.CompilerServices.IsUnmanaged] T> : Pool.IPooled where T : struct

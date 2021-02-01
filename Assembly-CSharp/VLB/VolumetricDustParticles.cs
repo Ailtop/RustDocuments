@@ -238,7 +238,7 @@ namespace VLB
 				if ((bool)mainCamera)
 				{
 					float num = cullingMaxDistance * cullingMaxDistance;
-					flag = (m_Master.bounds.SqrDistance(mainCamera.transform.position) <= num);
+					flag = m_Master.bounds.SqrDistance(mainCamera.transform.position) <= num;
 				}
 				else
 				{

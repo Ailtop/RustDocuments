@@ -102,38 +102,40 @@ public class GenerateRoadLayout : ProceduralComponent
 		List<PathFinder.Point> list8 = new List<PathFinder.Point>();
 		foreach (PathList road in TerrainMeta.Path.Roads)
 		{
-			if (road.ProcgenStartNode != null && road.ProcgenEndNode != null)
+			if (road.ProcgenStartNode == null || road.ProcgenEndNode == null)
 			{
-				int num = 1;
-				for (PathFinder.Node node4 = road.ProcgenStartNode; node4 != null; node4 = node4.next)
+				continue;
+			}
+			int num = 1;
+			for (PathFinder.Node node4 = road.ProcgenStartNode; node4 != null; node4 = node4.next)
+			{
+				if (num % 8 == 0)
 				{
-					if (num % 8 == 0)
-					{
-						list6.Add(node4.point);
-					}
-					num++;
+					list6.Add(node4.point);
 				}
+				num++;
 			}
 		}
 		foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 		{
-			if (monument.Type != MonumentType.Roadside)
+			if (monument.Type == MonumentType.Roadside)
 			{
-				TerrainPathConnect[] componentsInChildren = monument.GetComponentsInChildren<TerrainPathConnect>(true);
-				foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
+				continue;
+			}
+			TerrainPathConnect[] componentsInChildren = monument.GetComponentsInChildren<TerrainPathConnect>(true);
+			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
+			{
+				if (terrainPathConnect.Type == RoadType)
 				{
-					if (terrainPathConnect.Type == RoadType)
+					PathFinder.Point pathFinderPoint = terrainPathConnect.GetPathFinderPoint(length);
+					PathFinder.Node node5 = pathFinder.FindClosestWalkable(pathFinderPoint, 100000);
+					if (node5 != null)
 					{
-						PathFinder.Point pathFinderPoint = terrainPathConnect.GetPathFinderPoint(length);
-						PathFinder.Node node5 = pathFinder.FindClosestWalkable(pathFinderPoint, 100000);
-						if (node5 != null)
-						{
-							PathNode pathNode = new PathNode();
-							pathNode.monument = monument;
-							pathNode.target = terrainPathConnect;
-							pathNode.node = node5;
-							list4.Add(pathNode);
-						}
+						PathNode pathNode = new PathNode();
+						pathNode.monument = monument;
+						pathNode.target = terrainPathConnect;
+						pathNode.node = node5;
+						list4.Add(pathNode);
 					}
 				}
 			}

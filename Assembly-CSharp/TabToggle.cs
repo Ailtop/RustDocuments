@@ -41,7 +41,7 @@ public class TabToggle : MonoBehaviour
 				Button component = TabHolder.GetChild(i).GetComponent<Button>();
 				if ((bool)component)
 				{
-					component.interactable = (component.name != name);
+					component.interactable = component.name != name;
 				}
 			}
 		}
@@ -65,20 +65,21 @@ public class TabToggle : MonoBehaviour
 
 	private void Hide(GameObject go)
 	{
-		if (go.activeSelf)
+		if (!go.activeSelf)
 		{
-			CanvasGroup component = go.GetComponent<CanvasGroup>();
-			if (FadeOut && (bool)component)
-			{
-				LeanTween.alphaCanvas(component, 0f, 0.1f).setOnComplete((Action)delegate
-				{
-					go.SetActive(false);
-				});
-			}
-			else
+			return;
+		}
+		CanvasGroup component = go.GetComponent<CanvasGroup>();
+		if (FadeOut && (bool)component)
+		{
+			LeanTween.alphaCanvas(component, 0f, 0.1f).setOnComplete((Action)delegate
 			{
 				go.SetActive(false);
-			}
+			});
+		}
+		else
+		{
+			go.SetActive(false);
 		}
 	}
 

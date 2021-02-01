@@ -66,7 +66,7 @@ public class HairDye
 		}
 		for (int i = 0; i < 8; i++)
 		{
-			if (((int)copyProperties & (1 << i)) == 0)
+			if (((uint)copyProperties & (uint)(1 << i)) == 0)
 			{
 				continue;
 			}

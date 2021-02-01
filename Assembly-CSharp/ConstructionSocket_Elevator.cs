@@ -7,7 +7,7 @@ public class ConstructionSocket_Elevator : ConstructionSocket
 	protected override bool CanConnectToEntity(Construction.Target target)
 	{
 		Elevator elevator;
-		if ((object)(elevator = (target.entity as Elevator)) != null && elevator.Floor >= MaxFloor)
+		if ((object)(elevator = target.entity as Elevator) != null && elevator.Floor >= MaxFloor)
 		{
 			return false;
 		}

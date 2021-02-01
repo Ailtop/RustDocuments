@@ -30,7 +30,7 @@ public class MeshDataBatch : MeshBatch
 
 	public void Setup(Vector3 position, Material material, ShadowCastingMode shadows, int layer)
 	{
-		Vector3 vector2 = this.position = (base.transform.position = position);
+		Vector3 vector2 = (this.position = (base.transform.position = position));
 		base.gameObject.layer = layer;
 		meshRenderer.sharedMaterial = material;
 		meshRenderer.shadowCastingMode = shadows;

@@ -1,7 +1,7 @@
-using Rust;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rust;
 using UnityEngine;
 
 public class ItemDefinition : MonoBehaviour
@@ -252,7 +252,7 @@ public class ItemDefinition : MonoBehaviour
 		}
 		Children = itemList.Where((ItemDefinition x) => x.Parent == this).ToArray();
 		ItemModWearable = GetComponent<ItemModWearable>();
-		isHoldable = (GetComponent<ItemModEntity>() != null);
-		isUsable = (GetComponent<ItemModEntity>() != null || GetComponent<ItemModConsume>() != null);
+		isHoldable = GetComponent<ItemModEntity>() != null;
+		isUsable = GetComponent<ItemModEntity>() != null || GetComponent<ItemModConsume>() != null;
 	}
 }

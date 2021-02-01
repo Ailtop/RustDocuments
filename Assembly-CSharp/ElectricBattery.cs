@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ElectricBattery : IOEntity, IInstanceDataReceiver
@@ -164,7 +164,7 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 	public override void OnCircuitChanged(bool forceUpdate)
 	{
 		base.OnCircuitChanged(forceUpdate);
-		int num = activeDrain = GetDrain();
+		int num = (activeDrain = GetDrain());
 	}
 
 	public void CheckDischarge()
@@ -175,7 +175,7 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 			return;
 		}
 		IOEntity iOEntity = outputs[0].connectedTo.Get();
-		int num = activeDrain = GetDrain();
+		int num = (activeDrain = GetDrain());
 		if ((bool)iOEntity)
 		{
 			SetDischarging(iOEntity.WantsPower());

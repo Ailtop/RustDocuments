@@ -11,7 +11,7 @@ public class GhostSheetSystemSpaceUpdater : MonoBehaviour, IClientComponent
 	public void Awake()
 	{
 		ezSoftBones = GetComponents<EZSoftBone>();
-		player = (GameObjectEx.ToBaseEntity(base.gameObject) as BasePlayer);
+		player = GameObjectEx.ToBaseEntity(base.gameObject) as BasePlayer;
 	}
 
 	public void Update()

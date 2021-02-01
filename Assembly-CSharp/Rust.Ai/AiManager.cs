@@ -1,9 +1,9 @@
-using Apex.LoadBalancing;
-using Rust.Ai.HTN;
-using Rust.Ai.HTN.ScientistJunkpile;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Apex.LoadBalancing;
+using Rust.Ai.HTN;
+using Rust.Ai.HTN.ScientistJunkpile;
 using UnityEngine;
 
 namespace Rust.Ai
@@ -215,29 +215,28 @@ namespace Rust.Ai
 				}
 				foreach (IHTNAgent item2 in pendingRemoveFromActive)
 				{
-					if (item2 != null)
+					if (item2 == null)
 					{
-						activeAgents.Remove(item2);
-						HTNPlayer hTNPlayer = item2 as HTNPlayer;
-						if ((bool)hTNPlayer)
+						continue;
+					}
+					activeAgents.Remove(item2);
+					HTNPlayer hTNPlayer = item2 as HTNPlayer;
+					if ((bool)hTNPlayer)
+					{
+						if (hTNPlayer.AiDomain is ScientistJunkpileDomain)
 						{
-							if (hTNPlayer.AiDomain is ScientistJunkpileDomain)
-							{
-								tickingJunkpilePlayers.Remove(hTNPlayer);
-							}
-							else
-							{
-								tickingPlayers.Remove(hTNPlayer);
-							}
+							tickingJunkpilePlayers.Remove(hTNPlayer);
 						}
 						else
 						{
-							HTNAnimal hTNAnimal = item2 as HTNAnimal;
-							if ((bool)hTNAnimal)
-							{
-								tickingAnimals.Remove(hTNAnimal);
-							}
+							tickingPlayers.Remove(hTNPlayer);
 						}
+						continue;
+					}
+					HTNAnimal hTNAnimal = item2 as HTNAnimal;
+					if ((bool)hTNAnimal)
+					{
+						tickingAnimals.Remove(hTNAnimal);
 					}
 				}
 				pendingRemoveFromActive.Clear();
@@ -259,29 +258,28 @@ namespace Rust.Ai
 				}
 				foreach (IHTNAgent item2 in pendingAddToActive)
 				{
-					if (item2 != null && !item2.IsDestroyed && activeAgents.Add(item2))
+					if (item2 == null || item2.IsDestroyed || !activeAgents.Add(item2))
 					{
-						item2.IsDormant = false;
-						HTNPlayer hTNPlayer = item2 as HTNPlayer;
-						if ((bool)hTNPlayer)
+						continue;
+					}
+					item2.IsDormant = false;
+					HTNPlayer hTNPlayer = item2 as HTNPlayer;
+					if ((bool)hTNPlayer)
+					{
+						if (hTNPlayer.AiDomain is ScientistJunkpileDomain)
 						{
-							if (hTNPlayer.AiDomain is ScientistJunkpileDomain)
-							{
-								tickingJunkpilePlayers.Add(hTNPlayer);
-							}
-							else
-							{
-								tickingPlayers.Add(hTNPlayer);
-							}
+							tickingJunkpilePlayers.Add(hTNPlayer);
 						}
 						else
 						{
-							HTNAnimal hTNAnimal = item2 as HTNAnimal;
-							if ((bool)hTNAnimal)
-							{
-								tickingAnimals.Add(hTNAnimal);
-							}
+							tickingPlayers.Add(hTNPlayer);
 						}
+						continue;
+					}
+					HTNAnimal hTNAnimal = item2 as HTNAnimal;
+					if ((bool)hTNAnimal)
+					{
+						tickingAnimals.Add(hTNAnimal);
 					}
 				}
 				pendingAddToActive.Clear();
@@ -327,19 +325,20 @@ namespace Rust.Ai
 
 			private void TryMakeAgentsDormant()
 			{
-				if (ai_dormant)
+				if (!ai_dormant)
 				{
-					foreach (IHTNAgent activeAgent in activeAgents)
+					return;
+				}
+				foreach (IHTNAgent activeAgent in activeAgents)
+				{
+					if (activeAgent.IsDestroyed)
 					{
-						if (activeAgent.IsDestroyed)
-						{
-							RemoveActiveAgency(activeAgent);
-						}
-						else if (!IsAgentCloseToPlayers(activeAgent))
-						{
-							AddDormantAgency(activeAgent);
-							RemoveActiveAgency(activeAgent);
-						}
+						RemoveActiveAgency(activeAgent);
+					}
+					else if (!IsAgentCloseToPlayers(activeAgent))
+					{
+						AddDormantAgency(activeAgent);
+						RemoveActiveAgency(activeAgent);
 					}
 				}
 			}
@@ -592,19 +591,20 @@ namespace Rust.Ai
 
 		private void TryMakeAgentsDormant()
 		{
-			if (ai_dormant)
+			if (!ai_dormant)
 			{
-				foreach (IAIAgent activeAgent in activeAgents)
+				return;
+			}
+			foreach (IAIAgent activeAgent in activeAgents)
+			{
+				if (activeAgent.Entity.IsDestroyed)
 				{
-					if (activeAgent.Entity.IsDestroyed)
-					{
-						RemoveActiveAgency(activeAgent);
-					}
-					else if (!IsAgentCloseToPlayers(activeAgent))
-					{
-						AddDormantAgency(activeAgent);
-						RemoveActiveAgency(activeAgent);
-					}
+					RemoveActiveAgency(activeAgent);
+				}
+				else if (!IsAgentCloseToPlayers(activeAgent))
+				{
+					AddDormantAgency(activeAgent);
+					RemoveActiveAgency(activeAgent);
 				}
 			}
 		}
@@ -613,8 +613,7 @@ namespace Rust.Ai
 		{
 			if (coverPointVolumeGrid == null)
 			{
-				Vector3 size = TerrainMeta.Size;
-				coverPointVolumeGrid = new WorldSpaceGrid<CoverPointVolume>(size.x, CoverPointVolumeCellSize);
+				coverPointVolumeGrid = new WorldSpaceGrid<CoverPointVolume>(TerrainMeta.Size.x, CoverPointVolumeCellSize);
 			}
 		}
 

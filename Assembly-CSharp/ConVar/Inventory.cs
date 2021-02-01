@@ -1,10 +1,10 @@
-using Facepunch;
-using Newtonsoft.Json;
-using Steamworks;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Facepunch;
+using Newtonsoft.Json;
+using Steamworks;
 using UnityEngine;
 
 namespace ConVar
@@ -48,24 +48,25 @@ namespace ConVar
 				for (int i = 0; i < itemContainer.capacity; i++)
 				{
 					Item slot = itemContainer.GetSlot(i);
-					if (slot != null)
+					if (slot == null)
 					{
-						SavedItem savedItem = default(SavedItem);
-						savedItem.id = slot.info.itemid;
-						savedItem.amount = slot.amount;
-						savedItem.skin = slot.skin;
-						SavedItem item = savedItem;
-						if (slot.contents != null && slot.contents.itemList != null)
-						{
-							List<int> list2 = new List<int>();
-							foreach (Item item2 in slot.contents.itemList)
-							{
-								list2.Add(item2.info.itemid);
-							}
-							item.containedItems = list2.ToArray();
-						}
-						list.Add(item);
+						continue;
 					}
+					SavedItem savedItem = default(SavedItem);
+					savedItem.id = slot.info.itemid;
+					savedItem.amount = slot.amount;
+					savedItem.skin = slot.skin;
+					SavedItem item = savedItem;
+					if (slot.contents != null && slot.contents.itemList != null)
+					{
+						List<int> list2 = new List<int>();
+						foreach (Item item2 in slot.contents.itemList)
+						{
+							list2.Add(item2.info.itemid);
+						}
+						item.containedItems = list2.ToArray();
+					}
+					list.Add(item);
 				}
 				return list.ToArray();
 			}
@@ -138,8 +139,8 @@ namespace ConVar
 				arg.ReplyWith("Invalid Item!");
 				return;
 			}
-			int num = item.amount = arg.GetInt(1, 1);
-			float num2 = item.conditionNormalized = arg.GetFloat(2, 1f);
+			int num = (item.amount = arg.GetInt(1, 1));
+			float num2 = (item.conditionNormalized = arg.GetFloat(2, 1f));
 			item.OnVirginSpawn();
 			if (!basePlayer.inventory.GiveItem(item))
 			{
@@ -202,12 +203,10 @@ namespace ConVar
 				{
 					item.Remove();
 					arg.ReplyWith("Couldn't give item (inventory full?)");
+					continue;
 				}
-				else
-				{
-					activePlayer.Command("note.inv", item.info.itemid, item.amount);
-					Debug.Log(" [ServerVar] giving " + activePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
-				}
+				activePlayer.Command("note.inv", item.info.itemid, item.amount);
+				Debug.Log(" [ServerVar] giving " + activePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
 			}
 			if (item != null)
 			{
@@ -241,13 +240,11 @@ namespace ConVar
 			{
 				item.Remove();
 				arg.ReplyWith("Couldn't give item (inventory full?)");
+				return;
 			}
-			else
-			{
-				basePlayer.Command("note.inv", item.info.itemid, item.amount);
-				Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
-				Chat.Broadcast(text + " gave " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
-			}
+			basePlayer.Command("note.inv", item.info.itemid, item.amount);
+			Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
+			Chat.Broadcast(text + " gave " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
 		}
 
 		[ServerVar]
@@ -344,36 +341,37 @@ namespace ConVar
 			{
 				basePlayer2 = RelationshipManager.GetLookingAtPlayer(basePlayer);
 			}
-			if (!(basePlayer2 == null))
+			if (basePlayer2 == null)
 			{
-				basePlayer2.inventory.containerBelt.Clear();
-				basePlayer2.inventory.containerWear.Clear();
-				int num = 0;
-				foreach (Item item2 in basePlayer.inventory.containerBelt.itemList)
+				return;
+			}
+			basePlayer2.inventory.containerBelt.Clear();
+			basePlayer2.inventory.containerWear.Clear();
+			int num = 0;
+			foreach (Item item2 in basePlayer.inventory.containerBelt.itemList)
+			{
+				basePlayer2.inventory.containerBelt.AddItem(item2.info, item2.amount, item2.skin);
+				if (item2.contents != null)
 				{
-					basePlayer2.inventory.containerBelt.AddItem(item2.info, item2.amount, item2.skin);
-					if (item2.contents != null)
+					Item item = basePlayer2.inventory.containerBelt.itemList[num];
+					foreach (Item item3 in item2.contents.itemList)
 					{
-						Item item = basePlayer2.inventory.containerBelt.itemList[num];
-						foreach (Item item3 in item2.contents.itemList)
-						{
-							item.contents.AddItem(item3.info, item3.amount, item3.skin);
-						}
+						item.contents.AddItem(item3.info, item3.amount, item3.skin);
 					}
-					num++;
 				}
-				foreach (Item item4 in basePlayer.inventory.containerWear.itemList)
-				{
-					basePlayer2.inventory.containerWear.AddItem(item4.info, item4.amount, item4.skin);
-				}
-				if (basePlayer.IsDeveloper)
-				{
-					basePlayer.ChatMessage("you silently copied items to " + basePlayer2.displayName);
-				}
-				else
-				{
-					Chat.Broadcast(basePlayer.displayName + " copied their inventory to " + basePlayer2.displayName, "SERVER", "#eee", 0uL);
-				}
+				num++;
+			}
+			foreach (Item item4 in basePlayer.inventory.containerWear.itemList)
+			{
+				basePlayer2.inventory.containerWear.AddItem(item4.info, item4.amount, item4.skin);
+			}
+			if (basePlayer.IsDeveloper)
+			{
+				basePlayer.ChatMessage("you silently copied items to " + basePlayer2.displayName);
+			}
+			else
+			{
+				Chat.Broadcast(basePlayer.displayName + " copied their inventory to " + basePlayer2.displayName, "SERVER", "#eee", 0uL);
 			}
 		}
 
@@ -381,30 +379,31 @@ namespace ConVar
 		public static void deployLoadoutInRange(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);
-			if ((basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic) && !(basePlayer == null))
+			if ((!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic) || basePlayer == null)
 			{
-				string @string = arg.GetString(0);
-				SavedLoadout so;
-				if (!LoadLoadout(@string, out so))
-				{
-					arg.ReplyWith("Can't find loadout: " + @string);
-					return;
-				}
-				float @float = arg.GetFloat(1);
-				List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-				global::Vis.Entities(basePlayer.transform.position, @float, obj, 131072);
-				int num = 0;
-				foreach (BasePlayer item in obj)
-				{
-					if (!(item == basePlayer) && !item.isClient)
-					{
-						so.LoadItemsOnTo(item);
-						num++;
-					}
-				}
-				arg.ReplyWith($"Applied loadout {@string} to {num} players");
-				Facepunch.Pool.FreeList(ref obj);
+				return;
 			}
+			string @string = arg.GetString(0);
+			SavedLoadout so;
+			if (!LoadLoadout(@string, out so))
+			{
+				arg.ReplyWith("Can't find loadout: " + @string);
+				return;
+			}
+			float @float = arg.GetFloat(1);
+			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+			global::Vis.Entities(basePlayer.transform.position, @float, obj, 131072);
+			int num = 0;
+			foreach (BasePlayer item in obj)
+			{
+				if (!(item == basePlayer) && !item.isClient)
+				{
+					so.LoadItemsOnTo(item);
+					num++;
+				}
+			}
+			arg.ReplyWith($"Applied loadout {@string} to {num} players");
+			Facepunch.Pool.FreeList(ref obj);
 		}
 
 		[ServerVar(Help = "Deploys the given loadout to a target player. eg. inventory.deployLoadout testloadout jim")]
@@ -471,16 +470,17 @@ namespace ConVar
 		public static void listloadouts(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);
-			if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
+			if (basePlayer == null || (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic))
 			{
-				string serverFolder = Server.GetServerFolder("loadouts");
-				StringBuilder stringBuilder = new StringBuilder();
-				foreach (string item in Directory.EnumerateFiles(serverFolder))
-				{
-					stringBuilder.AppendLine(item);
-				}
-				arg.ReplyWith(stringBuilder.ToString());
+				return;
 			}
+			string serverFolder = Server.GetServerFolder("loadouts");
+			StringBuilder stringBuilder = new StringBuilder();
+			foreach (string item in Directory.EnumerateFiles(serverFolder))
+			{
+				stringBuilder.AppendLine(item);
+			}
+			arg.ReplyWith(stringBuilder.ToString());
 		}
 
 		[ServerVar]

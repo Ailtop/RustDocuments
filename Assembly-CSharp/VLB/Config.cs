@@ -83,9 +83,9 @@ namespace VLB
 			sharedMeshSegments = 5;
 			globalNoiseScale = 0.5f;
 			globalNoiseVelocity = Consts.NoiseVelocityDefault;
-			noise3DData = (Resources.Load("Noise3D_64x64x64") as TextAsset);
+			noise3DData = Resources.Load("Noise3D_64x64x64") as TextAsset;
 			noise3DSize = 64;
-			dustParticlesPrefab = (Resources.Load("DustParticles", typeof(ParticleSystem)) as ParticleSystem);
+			dustParticlesPrefab = Resources.Load("DustParticles", typeof(ParticleSystem)) as ParticleSystem;
 		}
 
 		public ParticleSystem NewVolumetricDustParticles()

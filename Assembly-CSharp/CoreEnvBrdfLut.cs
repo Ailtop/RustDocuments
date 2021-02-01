@@ -32,7 +32,7 @@ public class CoreEnvBrdfLut
 
 	public static Texture2D Generate(bool asset = false)
 	{
-		TextureFormat textureFormat = asset ? TextureFormat.RGBAHalf : TextureFormat.RGHalf;
+		TextureFormat textureFormat = (asset ? TextureFormat.RGBAHalf : TextureFormat.RGHalf);
 		textureFormat = (SystemInfo.SupportsTextureFormat(textureFormat) ? textureFormat : TextureFormat.ARGB32);
 		int num = 128;
 		int num2 = 32;
@@ -59,7 +59,7 @@ public class CoreEnvBrdfLut
 				float num12 = 0f;
 				for (uint num13 = 0u; num13 < 128; num13++)
 				{
-					float num14 = (float)(double)num13 * num5;
+					float num14 = (float)num13 * num5;
 					float num15 = (float)((double)ReverseBits(num13) / 4294967296.0);
 					float f = (float)Math.PI * 2f * num14;
 					float num16 = Mathf.Sqrt((1f - num15) / (1f + (num8 - 1f) * num15));
@@ -92,11 +92,11 @@ public class CoreEnvBrdfLut
 
 	private static uint ReverseBits(uint Bits)
 	{
-		Bits = ((Bits << 16) | (Bits >> 16));
-		Bits = (((Bits & 0xFF00FF) << 8) | ((uint)((int)Bits & -16711936) >> 8));
-		Bits = (((Bits & 0xF0F0F0F) << 4) | ((uint)((int)Bits & -252645136) >> 4));
-		Bits = (((Bits & 0x33333333) << 2) | ((uint)((int)Bits & -858993460) >> 2));
-		Bits = (((Bits & 0x55555555) << 1) | ((uint)((int)Bits & -1431655766) >> 1));
+		Bits = (Bits << 16) | (Bits >> 16);
+		Bits = ((Bits & 0xFF00FF) << 8) | ((Bits & 0xFF00FF00u) >> 8);
+		Bits = ((Bits & 0xF0F0F0F) << 4) | ((Bits & 0xF0F0F0F0u) >> 4);
+		Bits = ((Bits & 0x33333333) << 2) | ((Bits & 0xCCCCCCCCu) >> 2);
+		Bits = ((Bits & 0x55555555) << 1) | ((Bits & 0xAAAAAAAAu) >> 1);
 		return Bits;
 	}
 }

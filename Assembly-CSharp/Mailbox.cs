@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,7 +27,7 @@ public class Mailbox : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Submit ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Submit "));
 				}
 				using (TimeWarning.New("RPC_Submit"))
 				{
@@ -190,7 +190,7 @@ public class Mailbox : StorageContainer
 		bool flag = PlayerIsOwner(player);
 		if (!flag)
 		{
-			flag = (item == base.inventory.GetSlot(mailInputSlot));
+			flag = item == base.inventory.GetSlot(mailInputSlot);
 		}
 		if (flag)
 		{

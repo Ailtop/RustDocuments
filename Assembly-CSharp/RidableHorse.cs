@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RidableHorse : BaseRidableAnimal
@@ -71,10 +71,12 @@ public class RidableHorse : BaseRidableAnimal
 			if (index >= breeds.Length || index < 0)
 			{
 				Debug.LogError("ApplyBreed issue! index is " + index + " breed length is : " + breeds.Length);
-				return;
 			}
-			ApplyBreedInternal(breeds[index]);
-			currentBreed = index;
+			else
+			{
+				ApplyBreedInternal(breeds[index]);
+				currentBreed = index;
+			}
 		}
 	}
 
@@ -392,16 +394,17 @@ public class RidableHorse : BaseRidableAnimal
 	public static void setHorseBreed(ConsoleSystem.Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		if (!(basePlayer == null) && basePlayer.IsDeveloper)
+		if (basePlayer == null || !basePlayer.IsDeveloper)
 		{
-			int @int = arg.GetInt(0);
-			List<RidableHorse> obj = Pool.GetList<RidableHorse>();
-			Vis.Entities(basePlayer.eyes.position, basePlayer.eyes.position + basePlayer.eyes.HeadForward() * 5f, 0f, obj);
-			foreach (RidableHorse item in obj)
-			{
-				item.SetBreed(@int);
-			}
-			Pool.FreeList(ref obj);
+			return;
 		}
+		int @int = arg.GetInt(0);
+		List<RidableHorse> obj = Pool.GetList<RidableHorse>();
+		Vis.Entities(basePlayer.eyes.position, basePlayer.eyes.position + basePlayer.eyes.HeadForward() * 5f, 0f, obj);
+		foreach (RidableHorse item in obj)
+		{
+			item.SetBreed(@int);
+		}
+		Pool.FreeList(ref obj);
 	}
 }

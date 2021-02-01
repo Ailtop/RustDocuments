@@ -1,5 +1,5 @@
-using Rust;
 using System;
+using Rust;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
@@ -477,9 +477,9 @@ namespace UnityEngine.UI
 			bool num = viewRect.parent == transform;
 			bool flag = !m_HorizontalScrollbarRect || m_HorizontalScrollbarRect.parent == transform;
 			bool flag2 = !m_VerticalScrollbarRect || m_VerticalScrollbarRect.parent == transform;
-			bool flag3 = num & flag & flag2;
-			m_HSliderExpand = (flag3 && (bool)m_HorizontalScrollbarRect && horizontalScrollbarVisibility == ScrollbarVisibility.AutoHideAndExpandViewport);
-			m_VSliderExpand = (flag3 && (bool)m_VerticalScrollbarRect && verticalScrollbarVisibility == ScrollbarVisibility.AutoHideAndExpandViewport);
+			bool flag3 = num && flag && flag2;
+			m_HSliderExpand = flag3 && (bool)m_HorizontalScrollbarRect && horizontalScrollbarVisibility == ScrollbarVisibility.AutoHideAndExpandViewport;
+			m_VSliderExpand = flag3 && (bool)m_VerticalScrollbarRect && verticalScrollbarVisibility == ScrollbarVisibility.AutoHideAndExpandViewport;
 			m_HSliderHeight = ((m_HorizontalScrollbarRect == null) ? 0f : m_HorizontalScrollbarRect.rect.height);
 			m_VSliderWidth = ((m_VerticalScrollbarRect == null) ? 0f : m_VerticalScrollbarRect.rect.width);
 		}
@@ -790,7 +790,7 @@ namespace UnityEngine.UI
 			m_Tracker.Clear();
 			if (m_HSliderExpand || m_VSliderExpand)
 			{
-				m_Tracker.Add(this, viewRect, DrivenTransformProperties.AnchoredPositionX | DrivenTransformProperties.AnchoredPositionY | DrivenTransformProperties.AnchorMinX | DrivenTransformProperties.AnchorMinY | DrivenTransformProperties.AnchorMaxX | DrivenTransformProperties.AnchorMaxY | DrivenTransformProperties.SizeDeltaX | DrivenTransformProperties.SizeDeltaY);
+				m_Tracker.Add(this, viewRect, DrivenTransformProperties.Anchors | DrivenTransformProperties.AnchoredPosition | DrivenTransformProperties.SizeDelta);
 				viewRect.anchorMin = Vector2.zero;
 				viewRect.anchorMax = Vector2.one;
 				viewRect.sizeDelta = Vector2.zero;

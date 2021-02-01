@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CargoShip : BaseEntity
@@ -318,7 +318,7 @@ public class CargoShip : BaseEntity
 		float num3 = 2.5f;
 		float b = Mathf.InverseLerp(0.05f, 0.5f, Mathf.Abs(num2));
 		turnScale = Mathf.Lerp(turnScale, b, Time.deltaTime * 0.2f);
-		float num4 = (!(num2 < 0f)) ? 1 : (-1);
+		float num4 = ((!(num2 < 0f)) ? 1 : (-1));
 		currentTurnSpeed = num3 * turnScale * num4;
 		base.transform.Rotate(Vector3.up, Time.deltaTime * currentTurnSpeed, Space.World);
 		currentThrottle = Mathf.Lerp(currentThrottle, num, Time.deltaTime * 0.2f);

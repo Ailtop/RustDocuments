@@ -1,13 +1,13 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -52,7 +52,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ItemCmd ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ItemCmd "));
 				}
 				using (TimeWarning.New("ItemCmd"))
 				{
@@ -88,7 +88,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - MoveItem ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - MoveItem "));
 				}
 				using (TimeWarning.New("MoveItem"))
 				{
@@ -272,7 +272,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 	private bool CanMoveItemsFrom(BaseEntity entity, Item item)
 	{
 		ICanMoveFrom canMoveFrom;
-		if ((canMoveFrom = (entity as ICanMoveFrom)) != null && !canMoveFrom.CanMoveFrom(base.baseEntity, item))
+		if ((canMoveFrom = entity as ICanMoveFrom) != null && !canMoveFrom.CanMoveFrom(base.baseEntity, item))
 		{
 			return false;
 		}
@@ -741,7 +741,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 		nextCheckTime = UnityEngine.Time.time + 60f;
 		DateTime now = DateTime.Now;
-		wasBirthday = (now.Day == 11 && now.Month == 12);
+		wasBirthday = now.Day == 11 && now.Month == 12;
 		return wasBirthday;
 	}
 

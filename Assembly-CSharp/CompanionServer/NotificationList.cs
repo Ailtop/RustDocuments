@@ -1,14 +1,14 @@
-using ConVar;
-using Facepunch;
-using Network;
-using Newtonsoft.Json;
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using ConVar;
+using Facepunch;
+using Network;
+using Newtonsoft.Json;
+using ProtoBuf;
 using UnityEngine;
 
 namespace CompanionServer
@@ -59,12 +59,13 @@ namespace CompanionServer
 		public void LoadFrom(List<ulong> steamIds)
 		{
 			_subscriptions.Clear();
-			if (steamIds != null)
+			if (steamIds == null)
 			{
-				foreach (ulong steamId in steamIds)
-				{
-					_subscriptions.Add(steamId);
-				}
+				return;
+			}
+			foreach (ulong steamId in steamIds)
+			{
+				_subscriptions.Add(steamId);
 			}
 		}
 

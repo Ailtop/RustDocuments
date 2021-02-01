@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -44,7 +44,7 @@ public class InstantCameraTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - TakePhoto ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TakePhoto "));
 				}
 				using (TimeWarning.New("TakePhoto"))
 				{
@@ -119,7 +119,7 @@ public class InstantCameraTool : HeldEntity
 			return;
 		}
 		PhotoEntity photoEntity;
-		if ((object)(photoEntity = (baseNetworkable as PhotoEntity)) == null)
+		if ((object)(photoEntity = baseNetworkable as PhotoEntity) == null)
 		{
 			item2.Remove();
 			Debug.LogError("Sub-entity is not a photo");

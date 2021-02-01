@@ -1,9 +1,9 @@
-using CompanionServer;
-using Facepunch.Extend;
-using Steamworks;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using CompanionServer;
+using Facepunch.Extend;
+using Steamworks;
 using UnityEngine;
 
 namespace ConVar
@@ -60,11 +60,9 @@ namespace ConVar
 			if (listener == null)
 			{
 				arg.ReplyWith("Companion server is not enabled");
+				return;
 			}
-			else
-			{
-				arg.ReplyWith($"Listening on: {listener.Address}:{listener.Port}\nApp connects to: {GetPublicIP()}:{port}");
-			}
+			arg.ReplyWith($"Listening on: {listener.Address}:{listener.Port}\nApp connects to: {GetPublicIP()}:{port}");
 		}
 
 		[ServerVar]

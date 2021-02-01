@@ -1,6 +1,6 @@
+using System;
 using Apex.AI;
 using Apex.Serialization;
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -69,7 +69,7 @@ namespace Rust.Ai
 
 		private static void TryAddPoint(BaseContext c, Vector3 p, bool calculatePath, bool scanAllAreas, string areaName, bool sampleTerrainHeight)
 		{
-			int areaMask = (scanAllAreas || string.IsNullOrEmpty(areaName)) ? (-1) : (1 << NavMesh.GetAreaFromName(areaName));
+			int areaMask = ((scanAllAreas || string.IsNullOrEmpty(areaName)) ? (-1) : (1 << NavMesh.GetAreaFromName(areaName)));
 			if (sampleTerrainHeight)
 			{
 				p.y = TerrainMeta.HeightMap.GetHeight(p);

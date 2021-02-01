@@ -1,6 +1,6 @@
-using Oxide.Core;
 using System;
 using System.Collections.Generic;
+using Oxide.Core;
 using UnityEngine;
 
 namespace Rust.Ai.HTN
@@ -185,44 +185,28 @@ namespace Rust.Ai.HTN
 			{
 				return;
 			}
-			int num = 0;
-			AnimalInfo primaryKnownAnimal;
-			while (true)
+			for (int i = 0; i < NpcContext.AnimalsInRange.Count; i++)
 			{
-				if (num < NpcContext.AnimalsInRange.Count)
+				AnimalInfo primaryKnownAnimal = NpcContext.AnimalsInRange[i];
+				if (primaryKnownAnimal.Animal == animal)
 				{
-					primaryKnownAnimal = NpcContext.AnimalsInRange[num];
-					if (primaryKnownAnimal.Animal == animal)
-					{
-						break;
-					}
-					num++;
-					continue;
+					PrimaryKnownAnimal = primaryKnownAnimal;
+					break;
 				}
-				return;
 			}
-			PrimaryKnownAnimal = primaryKnownAnimal;
 		}
 
 		public void RememberPrimaryEnemyPlayer(BasePlayer primaryTarget)
 		{
-			int num = 0;
-			EnemyPlayerInfo info;
-			while (true)
+			for (int i = 0; i < KnownEnemyPlayers.Count; i++)
 			{
-				if (num < KnownEnemyPlayers.Count)
+				EnemyPlayerInfo info = KnownEnemyPlayers[i];
+				if (info.PlayerInfo.Player == primaryTarget)
 				{
-					info = KnownEnemyPlayers[num];
-					if (info.PlayerInfo.Player == primaryTarget)
-					{
-						break;
-					}
-					num++;
-					continue;
+					OnSetPrimaryKnownEnemyPlayer(ref info);
+					break;
 				}
-				return;
 			}
-			OnSetPrimaryKnownEnemyPlayer(ref info);
 		}
 
 		protected virtual void OnSetPrimaryKnownEnemyPlayer(ref EnemyPlayerInfo info)
@@ -351,8 +335,7 @@ namespace Rust.Ai.HTN
 			float time = Time.time;
 			for (int i = 0; i < _failedDestinationMemory.Count; i++)
 			{
-				FailedDestinationInfo failedDestinationInfo = _failedDestinationMemory[i];
-				if (time - failedDestinationInfo.Time > memoryTimeout)
+				if (time - _failedDestinationMemory[i].Time > memoryTimeout)
 				{
 					_failedDestinationMemory.RemoveAt(i);
 					i--;
@@ -383,8 +366,7 @@ namespace Rust.Ai.HTN
 			}
 			for (int k = 0; k < KnownEntitiesOfInterest.Count; k++)
 			{
-				EntityOfInterestInfo entityOfInterestInfo = KnownEntitiesOfInterest[k];
-				if (time - entityOfInterestInfo.Time > memoryTimeout)
+				if (time - KnownEntitiesOfInterest[k].Time > memoryTimeout)
 				{
 					KnownEntitiesOfInterest.RemoveAt(k);
 					k--;

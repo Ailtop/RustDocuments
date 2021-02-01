@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NPCShopKeeper : NPCPlayer

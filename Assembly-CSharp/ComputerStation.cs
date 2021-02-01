@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -42,7 +42,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AddBookmark ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddBookmark "));
 				}
 				using (TimeWarning.New("AddBookmark"))
 				{
@@ -71,7 +71,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - BeginControllingBookmark ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BeginControllingBookmark "));
 				}
 				using (TimeWarning.New("BeginControllingBookmark"))
 				{
@@ -100,7 +100,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DeleteBookmark ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DeleteBookmark "));
 				}
 				using (TimeWarning.New("DeleteBookmark"))
 				{
@@ -129,7 +129,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_DisconnectControl ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_DisconnectControl "));
 				}
 				using (TimeWarning.New("Server_DisconnectControl"))
 				{

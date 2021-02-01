@@ -500,11 +500,11 @@ public class ReflectionProbeEx : MonoBehaviour
 
 	private uint ReverseBits(uint bits)
 	{
-		bits = ((bits << 16) | (bits >> 16));
-		bits = (((bits & 0xFF00FF) << 8) | ((uint)((int)bits & -16711936) >> 8));
-		bits = (((bits & 0xF0F0F0F) << 4) | ((uint)((int)bits & -252645136) >> 4));
-		bits = (((bits & 0x33333333) << 2) | ((uint)((int)bits & -858993460) >> 2));
-		bits = (((bits & 0x55555555) << 1) | ((uint)((int)bits & -1431655766) >> 1));
+		bits = (bits << 16) | (bits >> 16);
+		bits = ((bits & 0xFF00FF) << 8) | ((bits & 0xFF00FF00u) >> 8);
+		bits = ((bits & 0xF0F0F0F) << 4) | ((bits & 0xF0F0F0F0u) >> 4);
+		bits = ((bits & 0x33333333) << 2) | ((bits & 0xCCCCCCCCu) >> 2);
+		bits = ((bits & 0x55555555) << 1) | ((bits & 0xAAAAAAAAu) >> 1);
 		return bits;
 	}
 

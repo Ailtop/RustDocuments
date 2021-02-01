@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace CompanionServer
@@ -16,18 +16,18 @@ namespace CompanionServer
 			{
 				Vector2 vector = Util.WorldToMap(player.transform.position);
 				member.steamId = player.userID;
-				member.name = (player.displayName ?? "");
+				member.name = player.displayName ?? "";
 				member.x = vector.x;
 				member.y = vector.y;
 				member.isOnline = player.IsConnected;
-				member.spawnTime = (player.lifeStory?.timeBorn ?? 0);
+				member.spawnTime = player.lifeStory?.timeBorn ?? 0;
 				member.isAlive = player.IsAlive();
-				member.deathTime = (player.previousLifeStory?.timeDied ?? 0);
+				member.deathTime = player.previousLifeStory?.timeDied ?? 0;
 			}
 			else
 			{
 				member.steamId = steamId;
-				member.name = (SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(steamId) ?? "");
+				member.name = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(steamId) ?? "";
 				member.x = 0f;
 				member.y = 0f;
 				member.isOnline = false;
@@ -67,13 +67,13 @@ namespace CompanionServer
 				Vector2 vector = Util.WorldToMap(basePlayer2?.transform.position ?? Vector3.zero);
 				AppTeamInfo.Member member = Pool.Get<AppTeamInfo.Member>();
 				member.steamId = num;
-				member.name = (basePlayer2?.displayName ?? SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(num) ?? "");
+				member.name = basePlayer2?.displayName ?? SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(num) ?? "";
 				member.x = vector.x;
 				member.y = vector.y;
-				member.isOnline = (basePlayer2?.IsConnected ?? false);
-				member.spawnTime = (basePlayer2?.lifeStory?.timeBorn ?? 0);
-				member.isAlive = (basePlayer2?.IsAlive() ?? false);
-				member.deathTime = (basePlayer2?.previousLifeStory?.timeDied ?? 0);
+				member.isOnline = basePlayer2?.IsConnected ?? false;
+				member.spawnTime = basePlayer2?.lifeStory?.timeBorn ?? 0;
+				member.isAlive = basePlayer2?.IsAlive() ?? false;
+				member.deathTime = basePlayer2?.previousLifeStory?.timeDied ?? 0;
 				appTeamInfo.members.Add(member);
 			}
 			appTeamInfo.leaderSteamId = team.teamLeader;

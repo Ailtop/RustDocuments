@@ -1,7 +1,7 @@
-using ConVar;
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using ConVar;
+using Facepunch;
 using UnityEngine;
 
 public static class GamePhysics
@@ -266,7 +266,7 @@ public static class GamePhysics
 		float maxDistance = magnitude - padding0 - padding1;
 		bool flag;
 		RaycastHit hitInfo;
-		if ((layerMask & 0x800000) != 0)
+		if (((uint)layerMask & 0x800000u) != 0)
 		{
 			flag = Trace(ray, 0f, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
 			if (ConVar.AntiHack.losradius > 0f && !flag)

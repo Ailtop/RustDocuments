@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using CompanionServer;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -47,7 +47,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetNotificationTextImpl ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetNotificationTextImpl "));
 				}
 				using (TimeWarning.New("SetNotificationTextImpl"))
 				{
@@ -87,7 +87,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - StartSetupNotification ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartSetupNotification "));
 				}
 				using (TimeWarning.New("StartSetupNotification"))
 				{
@@ -150,7 +150,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 
 	public override void IOStateChanged(int inputAmount, int inputSlot)
 	{
-		Value = (inputAmount > 0);
+		Value = inputAmount > 0;
 		if (Value == IsOn())
 		{
 			return;

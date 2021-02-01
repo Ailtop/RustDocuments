@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -48,7 +48,7 @@ public class PoweredLightsDeployer : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AddPoint ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddPoint "));
 				}
 				using (TimeWarning.New("AddPoint"))
 				{
@@ -84,7 +84,7 @@ public class PoweredLightsDeployer : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Finish ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Finish "));
 				}
 				using (TimeWarning.New("Finish"))
 				{

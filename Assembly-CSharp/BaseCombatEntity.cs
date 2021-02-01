@@ -1,13 +1,13 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -160,7 +160,7 @@ public class BaseCombatEntity : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_PickupStart ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PickupStart "));
 				}
 				using (TimeWarning.New("RPC_PickupStart"))
 				{
@@ -302,6 +302,7 @@ public class BaseCombatEntity : BaseEntity
 
 	public virtual void DoRepair(BasePlayer player)
 	{
+		BasePlayer player2 = player;
 		if (!repair.enabled || Interface.CallHook("OnStructureRepair", this, player) != null)
 		{
 			return;
@@ -309,14 +310,14 @@ public class BaseCombatEntity : BaseEntity
 		float num = 30f;
 		if (SecondsSinceAttacked <= num)
 		{
-			OnRepairFailed(player, $"Unable to repair: Recently damaged. Repairable in: {num - SecondsSinceAttacked:N0}s.");
+			OnRepairFailed(player2, $"Unable to repair: Recently damaged. Repairable in: {num - SecondsSinceAttacked:N0}s.");
 			return;
 		}
 		float num2 = MaxHealth() - Health();
 		float num3 = num2 / MaxHealth();
 		if (num2 <= 0f || num3 <= 0f)
 		{
-			OnRepairFailed(player, "Unable to repair: Not damaged.");
+			OnRepairFailed(player2, "Unable to repair: Not damaged.");
 			return;
 		}
 		List<ItemAmount> list = RepairCost(num3);
@@ -327,22 +328,22 @@ public class BaseCombatEntity : BaseEntity
 		float num4 = list.Sum((ItemAmount x) => x.amount);
 		if (num4 > 0f)
 		{
-			float a = list.Min((ItemAmount x) => Mathf.Clamp01((float)player.inventory.GetAmount(x.itemid) / x.amount));
+			float a = list.Min((ItemAmount x) => Mathf.Clamp01((float)player2.inventory.GetAmount(x.itemid) / x.amount));
 			a = Mathf.Min(a, 50f / num2);
 			if (a <= 0f)
 			{
-				OnRepairFailed(player, "Unable to repair: Insufficient resources.");
+				OnRepairFailed(player2, "Unable to repair: Insufficient resources.");
 				return;
 			}
 			int num5 = 0;
 			foreach (ItemAmount item in list)
 			{
 				int amount = Mathf.CeilToInt(a * item.amount);
-				int num6 = player.inventory.Take(null, item.itemid, amount);
+				int num6 = player2.inventory.Take(null, item.itemid, amount);
 				if (num6 > 0)
 				{
 					num5 += num6;
-					player.Command("note.inv", item.itemid, num6 * -1);
+					player2.Command("note.inv", item.itemid, num6 * -1);
 				}
 			}
 			float num7 = (float)num5 / num4;
@@ -404,80 +405,82 @@ public class BaseCombatEntity : BaseEntity
 	public virtual void Hurt(HitInfo info)
 	{
 		Assert.IsTrue(base.isServer, "This should be called serverside only");
-		if (!IsDead())
+		if (IsDead())
 		{
-			using (TimeWarning.New("Hurt( HitInfo )", 50))
+			return;
+		}
+		using (TimeWarning.New("Hurt( HitInfo )", 50))
+		{
+			float health = this.health;
+			ScaleDamage(info);
+			if (info.PointStart != Vector3.zero)
 			{
-				float health = this.health;
-				ScaleDamage(info);
-				if (info.PointStart != Vector3.zero)
+				for (int i = 0; i < propDirection.Length; i++)
 				{
-					for (int i = 0; i < propDirection.Length; i++)
+					if (!(propDirection[i].extraProtection == null) && !propDirection[i].IsWeakspot(base.transform, info))
 					{
-						if (!(propDirection[i].extraProtection == null) && !propDirection[i].IsWeakspot(base.transform, info))
-						{
-							propDirection[i].extraProtection.Scale(info.damageTypes);
-						}
+						propDirection[i].extraProtection.Scale(info.damageTypes);
 					}
 				}
-				info.damageTypes.Scale(DamageType.Arrow, ConVar.Server.arrowdamage);
-				info.damageTypes.Scale(DamageType.Bullet, ConVar.Server.bulletdamage);
-				info.damageTypes.Scale(DamageType.Slash, ConVar.Server.meleedamage);
-				info.damageTypes.Scale(DamageType.Blunt, ConVar.Server.meleedamage);
-				info.damageTypes.Scale(DamageType.Stab, ConVar.Server.meleedamage);
-				info.damageTypes.Scale(DamageType.Bleeding, ConVar.Server.bleedingdamage);
-				if (Interface.CallHook("IOnBaseCombatEntityHurt", this, info) == null)
+			}
+			info.damageTypes.Scale(DamageType.Arrow, ConVar.Server.arrowdamage);
+			info.damageTypes.Scale(DamageType.Bullet, ConVar.Server.bulletdamage);
+			info.damageTypes.Scale(DamageType.Slash, ConVar.Server.meleedamage);
+			info.damageTypes.Scale(DamageType.Blunt, ConVar.Server.meleedamage);
+			info.damageTypes.Scale(DamageType.Stab, ConVar.Server.meleedamage);
+			info.damageTypes.Scale(DamageType.Bleeding, ConVar.Server.bleedingdamage);
+			if (Interface.CallHook("IOnBaseCombatEntityHurt", this, info) != null)
+			{
+				return;
+			}
+			if (!(this is BasePlayer))
+			{
+				info.damageTypes.Scale(DamageType.Fun_Water, 0f);
+			}
+			DebugHurt(info);
+			this.health = health - info.damageTypes.Total();
+			SendNetworkUpdate();
+			if (ConVar.Global.developer > 1)
+			{
+				Debug.Log(string.Concat("[Combat]".PadRight(10), base.gameObject.name, " hurt ", info.damageTypes.GetMajorityDamageType(), "/", info.damageTypes.Total(), " - ", this.health.ToString("0"), " health left"));
+			}
+			lastDamage = info.damageTypes.GetMajorityDamageType();
+			lastAttacker = info.Initiator;
+			if (lastAttacker != null)
+			{
+				BaseCombatEntity baseCombatEntity = lastAttacker as BaseCombatEntity;
+				if (baseCombatEntity != null)
 				{
-					if (!(this is BasePlayer))
-					{
-						info.damageTypes.Scale(DamageType.Fun_Water, 0f);
-					}
-					DebugHurt(info);
-					this.health = health - info.damageTypes.Total();
-					SendNetworkUpdate();
-					if (ConVar.Global.developer > 1)
-					{
-						Debug.Log("[Combat]".PadRight(10) + base.gameObject.name + " hurt " + info.damageTypes.GetMajorityDamageType() + "/" + info.damageTypes.Total() + " - " + this.health.ToString("0") + " health left");
-					}
-					lastDamage = info.damageTypes.GetMajorityDamageType();
-					lastAttacker = info.Initiator;
-					if (lastAttacker != null)
-					{
-						BaseCombatEntity baseCombatEntity = lastAttacker as BaseCombatEntity;
-						if (baseCombatEntity != null)
-						{
-							baseCombatEntity.lastDealtDamageTime = UnityEngine.Time.time;
-						}
-					}
-					BaseCombatEntity baseCombatEntity2 = lastAttacker as BaseCombatEntity;
-					if (markAttackerHostile && baseCombatEntity2 != null && baseCombatEntity2 != this)
-					{
-						baseCombatEntity2.MarkHostileFor();
-					}
-					if (DamageTypeEx.IsConsideredAnAttack(lastDamage))
-					{
-						lastAttackedTime = UnityEngine.Time.time;
-						if (lastAttacker != null)
-						{
-							LastAttackedDir = (lastAttacker.transform.position - base.transform.position).normalized;
-						}
-					}
-					if (diesAtZeroHealth && Health() <= 0f)
-					{
-						Die(info);
-					}
-					BasePlayer initiatorPlayer = info.InitiatorPlayer;
-					if ((bool)initiatorPlayer)
-					{
-						if (IsDead())
-						{
-							initiatorPlayer.stats.combat.Log(info, health, this.health, "killed");
-						}
-						else
-						{
-							initiatorPlayer.stats.combat.Log(info, health, this.health);
-						}
-					}
+					baseCombatEntity.lastDealtDamageTime = UnityEngine.Time.time;
+				}
+			}
+			BaseCombatEntity baseCombatEntity2 = lastAttacker as BaseCombatEntity;
+			if (markAttackerHostile && baseCombatEntity2 != null && baseCombatEntity2 != this)
+			{
+				baseCombatEntity2.MarkHostileFor();
+			}
+			if (DamageTypeEx.IsConsideredAnAttack(lastDamage))
+			{
+				lastAttackedTime = UnityEngine.Time.time;
+				if (lastAttacker != null)
+				{
+					LastAttackedDir = (lastAttacker.transform.position - base.transform.position).normalized;
+				}
+			}
+			if (diesAtZeroHealth && Health() <= 0f)
+			{
+				Die(info);
+			}
+			BasePlayer initiatorPlayer = info.InitiatorPlayer;
+			if ((bool)initiatorPlayer)
+			{
+				if (IsDead())
+				{
+					initiatorPlayer.stats.combat.Log(info, health, this.health, "killed");
+				}
+				else
+				{
+					initiatorPlayer.stats.combat.Log(info, health, this.health);
 				}
 			}
 		}
@@ -534,7 +537,7 @@ public class BaseCombatEntity : BaseEntity
 				text = string.Concat(obj);
 			}
 		}
-		string text2 = "<color=lightblue>Damage:</color>".PadRight(10) + info.damageTypes.Total().ToString("0.00") + "\n<color=lightblue>Health:</color>".PadRight(10) + health.ToString("0.00") + " / " + ((health - info.damageTypes.Total() <= 0f) ? "<color=red>" : "<color=green>") + (health - info.damageTypes.Total()).ToString("0.00") + "</color>" + "\n<color=lightblue>HitEnt:</color>".PadRight(10) + this + "\n<color=lightblue>HitBone:</color>".PadRight(10) + info.boneName + "\n<color=lightblue>Attacker:</color>".PadRight(10) + info.Initiator + "\n<color=lightblue>WeaponPrefab:</color>".PadRight(10) + info.WeaponPrefab + "\n<color=lightblue>Damages:</color>\n" + text;
+		string text2 = string.Concat("<color=lightblue>Damage:</color>".PadRight(10), info.damageTypes.Total().ToString("0.00"), "\n<color=lightblue>Health:</color>".PadRight(10), health.ToString("0.00"), " / ", (health - info.damageTypes.Total() <= 0f) ? "<color=red>" : "<color=green>", (health - info.damageTypes.Total()).ToString("0.00"), "</color>", "\n<color=lightblue>HitEnt:</color>".PadRight(10), this, "\n<color=lightblue>HitBone:</color>".PadRight(10), info.boneName, "\n<color=lightblue>Attacker:</color>".PadRight(10), info.Initiator, "\n<color=lightblue>WeaponPrefab:</color>".PadRight(10), info.WeaponPrefab, "\n<color=lightblue>Damages:</color>\n", text);
 		ConsoleNetwork.BroadcastToAllClients("ddraw.text", 60, Color.white, info.HitPositionWorld, text2);
 	}
 

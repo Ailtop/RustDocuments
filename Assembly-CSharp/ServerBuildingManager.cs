@@ -82,25 +82,26 @@ public class ServerBuildingManager : BuildingManager
 			return;
 		}
 		Building building = ent.GetBuilding();
-		if (building != null)
+		if (building == null)
 		{
-			ent.EntityLinkMessage(delegate(BuildingBlock b)
+			return;
+		}
+		ent.EntityLinkMessage(delegate(BuildingBlock b)
+		{
+			if (b.buildingID != building.ID)
 			{
-				if (b.buildingID != building.ID)
+				Building building2 = b.GetBuilding();
+				if (building2 != null)
 				{
-					Building building2 = b.GetBuilding();
-					if (building2 != null)
-					{
-						Merge(building, building2);
-					}
+					Merge(building, building2);
 				}
-			});
-			if (AI.nav_carve_use_building_optimization)
-			{
-				building.isNavMeshCarvingDirty = true;
-				int ticks = 2;
-				UpdateNavMeshCarver(building, ref ticks, 0);
 			}
+		});
+		if (AI.nav_carve_use_building_optimization)
+		{
+			building.isNavMeshCarvingDirty = true;
+			int ticks = 2;
+			UpdateNavMeshCarver(building, ref ticks, 0);
 		}
 	}
 
@@ -191,25 +192,26 @@ public class ServerBuildingManager : BuildingManager
 				decayTickWorldIndex = 0;
 			}
 		}
-		if (AI.nav_carve_use_building_optimization)
+		if (!AI.nav_carve_use_building_optimization)
 		{
-			using (TimeWarning.New("NavMeshCarving"))
+			return;
+		}
+		using (TimeWarning.New("NavMeshCarving"))
+		{
+			int ticks = 5;
+			BufferList<Building> values4 = buildingDictionary.Values;
+			for (int l = navmeshCarveTickBuildingIndex; l < values4.Count; l++)
 			{
-				int ticks = 5;
-				BufferList<Building> values4 = buildingDictionary.Values;
-				for (int l = navmeshCarveTickBuildingIndex; l < values4.Count; l++)
+				if (ticks <= 0)
 				{
-					if (ticks <= 0)
-					{
-						break;
-					}
-					Building building = values4[l];
-					UpdateNavMeshCarver(building, ref ticks, l);
+					break;
 				}
-				if (ticks > 0)
-				{
-					navmeshCarveTickBuildingIndex = 0;
-				}
+				Building building = values4[l];
+				UpdateNavMeshCarver(building, ref ticks, l);
+			}
+			if (ticks > 0)
+			{
+				navmeshCarveTickBuildingIndex = 0;
 			}
 		}
 	}
@@ -231,8 +233,8 @@ public class ServerBuildingManager : BuildingManager
 			}
 			return;
 		}
-		Vector3 b = new Vector3((float)(double)World.Size, (float)(double)World.Size, (float)(double)World.Size);
-		Vector3 a = new Vector3(0L - World.Size, 0L - World.Size, 0L - World.Size);
+		Vector3 b = new Vector3(World.Size, World.Size, World.Size);
+		Vector3 a = new Vector3(0L - (long)World.Size, 0L - (long)World.Size, 0L - (long)World.Size);
 		int count = building.navmeshCarvers.Count;
 		if (count > 0)
 		{

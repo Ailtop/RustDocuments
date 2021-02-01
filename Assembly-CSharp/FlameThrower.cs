@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
@@ -69,7 +69,7 @@ public class FlameThrower : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoReload ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoReload "));
 				}
 				using (TimeWarning.New("DoReload"))
 				{
@@ -105,7 +105,7 @@ public class FlameThrower : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetFiring ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetFiring "));
 				}
 				using (TimeWarning.New("SetFiring"))
 				{
@@ -141,7 +141,7 @@ public class FlameThrower : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - TogglePilotLight ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TogglePilotLight "));
 				}
 				using (TimeWarning.New("TogglePilotLight"))
 				{
@@ -405,7 +405,7 @@ public class FlameThrower : AttackEntity
 		{
 			hitInfo.point = origin + ray.direction * flameRange;
 		}
-		float num3 = ownerPlayer.IsNpc ? npcDamageScale : 1f;
+		float num3 = (ownerPlayer.IsNpc ? npcDamageScale : 1f);
 		float amount = damagePerSec[0].amount;
 		damagePerSec[0].amount = amount * num * num3;
 		DamageUtil.RadiusDamage(ownerPlayer, LookupPrefab(), hitInfo.point - ray.direction * 0.1f, flameRadius * 0.5f, flameRadius, damagePerSec, 2279681, true);

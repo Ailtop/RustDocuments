@@ -140,8 +140,8 @@ public class OreResourceEntity : StagedResourceEntity
 		{
 			Vector3 a = Vector3.Cross(lastNodeDir, Vector3.up);
 			float d = Random.Range(0.25f, 0.5f);
-			float d2 = (Random.Range(0, 2) == 0) ? (-1f) : 1f;
-			Vector3 direction = lastNodeDir = (lastNodeDir + a * d * d2).normalized;
+			float d2 = ((Random.Range(0, 2) == 0) ? (-1f) : 1f);
+			Vector3 direction = (lastNodeDir = (lastNodeDir + a * d * d2).normalized);
 			zero = base.transform.position + base.transform.TransformDirection(direction) * 2f;
 			float num = Random.Range(1f, 1.5f);
 			zero += base.transform.up * (vector.y + num);
@@ -161,14 +161,14 @@ public class OreResourceEntity : StagedResourceEntity
 
 	public Vector3 RandomCircle(float distance = 1f, bool allowInside = false)
 	{
-		Vector2 vector = allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized;
+		Vector2 vector = (allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized);
 		return new Vector3(vector.x, 0f, vector.y);
 	}
 
 	public Vector3 RandomHemisphereDirection(Vector3 input, float degreesOffset, bool allowInside = true, bool changeHeight = true)
 	{
 		degreesOffset = Mathf.Clamp(degreesOffset / 180f, -180f, 180f);
-		Vector2 vector = allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized;
+		Vector2 vector = (allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized);
 		Vector3 b = new Vector3(vector.x * degreesOffset, changeHeight ? (Random.Range(-1f, 1f) * degreesOffset) : 0f, vector.y * degreesOffset);
 		return (input + b).normalized;
 	}
@@ -187,7 +187,7 @@ public class OreResourceEntity : StagedResourceEntity
 
 	public static Vector3 RandomCylinderPointAroundVector(Vector3 input, float distance, float minHeight = 0f, float maxHeight = 0f, bool allowInside = false)
 	{
-		Vector2 vector = allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized;
+		Vector2 vector = (allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized);
 		Vector3 result = new Vector3(vector.x, 0f, vector.y).normalized * distance;
 		result.y = Random.Range(minHeight, maxHeight);
 		return result;

@@ -1,5 +1,5 @@
-using ProtoBuf;
 using System;
+using ProtoBuf;
 using UnityEngine;
 
 public class VisualStorageContainer : LootContainer
@@ -113,31 +113,32 @@ public class VisualStorageContainer : LootContainer
 				displayModels[i] = null;
 			}
 		}
-		if (msg != null)
+		if (msg == null)
 		{
-			foreach (ProtoBuf.Item content in msg.contents)
-			{
-				ItemDefinition itemDefinition = ItemManager.FindItemDefinition(content.itemid);
-				GameObject gameObject = null;
-				gameObject = ((itemDefinition.worldModelPrefab == null || !itemDefinition.worldModelPrefab.isValid) ? UnityEngine.Object.Instantiate(defaultDisplayModel) : itemDefinition.worldModelPrefab.Instantiate());
-				if ((bool)gameObject)
-				{
-					gameObject.transform.SetPositionAndRotation(displayNodes[content.slot].transform.position + new Vector3(0f, 0.25f, 0f), displayNodes[content.slot].transform.rotation);
-					Rigidbody rigidbody = gameObject.AddComponent<Rigidbody>();
-					rigidbody.mass = 1f;
-					rigidbody.drag = 0.1f;
-					rigidbody.angularDrag = 0.1f;
-					rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-					rigidbody.constraints = (RigidbodyConstraints)10;
-					displayModels[content.slot].displayModel = gameObject;
-					displayModels[content.slot].slot = content.slot;
-					displayModels[content.slot].def = itemDefinition;
-					gameObject.SetActive(true);
-				}
-			}
-			SetItemsVisible(false);
-			CancelInvoke(ItemUpdateComplete);
-			Invoke(ItemUpdateComplete, 1f);
+			return;
 		}
+		foreach (ProtoBuf.Item content in msg.contents)
+		{
+			ItemDefinition itemDefinition = ItemManager.FindItemDefinition(content.itemid);
+			GameObject gameObject = null;
+			gameObject = ((itemDefinition.worldModelPrefab == null || !itemDefinition.worldModelPrefab.isValid) ? UnityEngine.Object.Instantiate(defaultDisplayModel) : itemDefinition.worldModelPrefab.Instantiate());
+			if ((bool)gameObject)
+			{
+				gameObject.transform.SetPositionAndRotation(displayNodes[content.slot].transform.position + new Vector3(0f, 0.25f, 0f), displayNodes[content.slot].transform.rotation);
+				Rigidbody rigidbody = gameObject.AddComponent<Rigidbody>();
+				rigidbody.mass = 1f;
+				rigidbody.drag = 0.1f;
+				rigidbody.angularDrag = 0.1f;
+				rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+				rigidbody.constraints = (RigidbodyConstraints)10;
+				displayModels[content.slot].displayModel = gameObject;
+				displayModels[content.slot].slot = content.slot;
+				displayModels[content.slot].def = itemDefinition;
+				gameObject.SetActive(true);
+			}
+		}
+		SetItemsVisible(false);
+		CancelInvoke(ItemUpdateComplete);
+		Invoke(ItemUpdateComplete, 1f);
 	}
 }

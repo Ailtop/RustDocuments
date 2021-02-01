@@ -7,7 +7,7 @@ namespace CompanionServer.Handlers
 		public override void Execute()
 		{
 			ISubscribable subscribable;
-			if ((subscribable = (base.Entity as ISubscribable)) != null)
+			if ((subscribable = base.Entity as ISubscribable) != null)
 			{
 				bool value = subscribable.HasSubscription(base.UserId);
 				SendFlag(value);

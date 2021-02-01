@@ -1,10 +1,10 @@
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Facepunch.Rust;
 using Oxide.Core;
 using ProtoBuf;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class ItemCrafter : EntityComponent<BasePlayer>
@@ -172,18 +172,19 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		foreach (ItemAmount ingredient in task.blueprint.ingredients)
 		{
 			int num = (int)ingredient.amount;
-			if (task.takenItems != null)
+			if (task.takenItems == null)
 			{
-				foreach (Item takenItem in task.takenItems)
+				continue;
+			}
+			foreach (Item takenItem in task.takenItems)
+			{
+				if (takenItem.info == ingredient.itemDef)
 				{
-					if (takenItem.info == ingredient.itemDef)
-					{
-						int num2 = Mathf.Min(takenItem.amount, num);
-						takenItem.UseItem(num);
-						num -= num2;
-					}
-					int num3 = 0;
+					int num2 = Mathf.Min(takenItem.amount, num);
+					takenItem.UseItem(num);
+					num -= num2;
 				}
+				int num3 = 0;
 			}
 		}
 		Facepunch.Rust.Analytics.Crafting(task.blueprint.targetItem.shortname, task.skinID);
@@ -226,7 +227,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 		Interface.CallHook("OnItemCraftCancelled", itemCraftTask);
 		itemCraftTask.owner.Command("note.craft_done", itemCraftTask.taskUID, 0);
-		if ((itemCraftTask.takenItems != null && itemCraftTask.takenItems.Count > 0) & ReturnItems)
+		if (itemCraftTask.takenItems != null && itemCraftTask.takenItems.Count > 0 && ReturnItems)
 		{
 			foreach (Item takenItem in itemCraftTask.takenItems)
 			{

@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class TelephoneManager
@@ -99,20 +99,21 @@ public static class TelephoneManager
 		int num2 = 0;
 		foreach (KeyValuePair<int, PhoneController> allTelephone in allTelephones)
 		{
-			if (allTelephone.Key != ignoreNumber && !string.IsNullOrEmpty(allTelephone.Value.PhoneName))
+			if (allTelephone.Key == ignoreNumber || string.IsNullOrEmpty(allTelephone.Value.PhoneName))
 			{
-				num2++;
-				if (num2 >= num)
+				continue;
+			}
+			num2++;
+			if (num2 >= num)
+			{
+				PhoneDirectory.DirectoryEntry directoryEntry = Pool.Get<PhoneDirectory.DirectoryEntry>();
+				directoryEntry.phoneName = allTelephone.Value.GetDirectoryName();
+				directoryEntry.phoneNumber = allTelephone.Value.PhoneNumber;
+				directory.entries.Add(directoryEntry);
+				if (directory.entries.Count >= perPage)
 				{
-					PhoneDirectory.DirectoryEntry directoryEntry = Pool.Get<PhoneDirectory.DirectoryEntry>();
-					directoryEntry.phoneName = allTelephone.Value.GetDirectoryName();
-					directoryEntry.phoneNumber = allTelephone.Value.PhoneNumber;
-					directory.entries.Add(directoryEntry);
-					if (directory.entries.Count >= perPage)
-					{
-						directory.atEnd = false;
-						return;
-					}
+					directory.atEnd = false;
+					return;
 				}
 			}
 		}

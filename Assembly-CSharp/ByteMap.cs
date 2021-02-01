@@ -28,14 +28,14 @@ public class ByteMap
 			{
 				byte num7 = values[num];
 				uint num3 = values[num + 1];
-				return (uint)((num7 << 8) | (int)num3);
+				return (uint)(num7 << 8) | num3;
 			}
 			case 3:
 			{
 				byte num6 = values[num];
 				uint num3 = values[num + 1];
 				uint num4 = values[num + 2];
-				return (uint)((num6 << 16) | (int)(num3 << 8) | (int)num4);
+				return (uint)(num6 << 16) | (num3 << 8) | num4;
 			}
 			default:
 			{
@@ -43,7 +43,7 @@ public class ByteMap
 				uint num3 = values[num + 1];
 				uint num4 = values[num + 2];
 				uint num5 = values[num + 3];
-				return (uint)((num2 << 24) | (int)(num3 << 16) | (int)(num4 << 8) | (int)num5);
+				return (uint)(num2 << 24) | (num3 << 16) | (num4 << 8) | num5;
 			}
 			}
 		}
@@ -53,22 +53,22 @@ public class ByteMap
 			switch (bytes)
 			{
 			case 1:
-				values[num] = (byte)(value & 0xFF);
+				values[num] = (byte)(value & 0xFFu);
 				break;
 			case 2:
-				values[num] = (byte)((value >> 8) & 0xFF);
-				values[num + 1] = (byte)(value & 0xFF);
+				values[num] = (byte)((value >> 8) & 0xFFu);
+				values[num + 1] = (byte)(value & 0xFFu);
 				break;
 			case 3:
-				values[num] = (byte)((value >> 16) & 0xFF);
-				values[num + 1] = (byte)((value >> 8) & 0xFF);
-				values[num + 2] = (byte)(value & 0xFF);
+				values[num] = (byte)((value >> 16) & 0xFFu);
+				values[num + 1] = (byte)((value >> 8) & 0xFFu);
+				values[num + 2] = (byte)(value & 0xFFu);
 				break;
 			default:
-				values[num] = (byte)((value >> 24) & 0xFF);
-				values[num + 1] = (byte)((value >> 16) & 0xFF);
-				values[num + 2] = (byte)((value >> 8) & 0xFF);
-				values[num + 3] = (byte)(value & 0xFF);
+				values[num] = (byte)((value >> 24) & 0xFFu);
+				values[num + 1] = (byte)((value >> 16) & 0xFFu);
+				values[num + 2] = (byte)((value >> 8) & 0xFFu);
+				values[num + 3] = (byte)(value & 0xFFu);
 				break;
 			}
 		}

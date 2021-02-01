@@ -81,25 +81,26 @@ public class TerrainHeightMap : TerrainMap<short>
 			HeightTexture.wrapMode = TextureWrapMode.Clamp;
 			HeightTexture.SetPixels32(heights);
 		}
-		if (normalTexture)
+		if (!normalTexture)
 		{
-			int normalres = res - 1;
-			Color32[] normals = new Color32[normalres * normalres];
-			Parallel.For(0, normalres, delegate(int z)
-			{
-				float normZ = ((float)z + 0.5f) / (float)normalres;
-				for (int i = 0; i < normalres; i++)
-				{
-					float normX = ((float)i + 0.5f) / (float)normalres;
-					Vector3 normal = GetNormal(normX, normZ);
-					normals[z * normalres + i] = BitUtility.EncodeNormal(normal);
-				}
-			});
-			NormalTexture = new Texture2D(normalres, normalres, TextureFormat.RGBA32, false, true);
-			NormalTexture.name = "NormalTexture";
-			NormalTexture.wrapMode = TextureWrapMode.Clamp;
-			NormalTexture.SetPixels32(normals);
+			return;
 		}
+		int normalres = res - 1;
+		Color32[] normals = new Color32[normalres * normalres];
+		Parallel.For(0, normalres, delegate(int z)
+		{
+			float normZ = ((float)z + 0.5f) / (float)normalres;
+			for (int i = 0; i < normalres; i++)
+			{
+				float normX = ((float)i + 0.5f) / (float)normalres;
+				Vector3 normal = GetNormal(normX, normZ);
+				normals[z * normalres + i] = BitUtility.EncodeNormal(normal);
+			}
+		});
+		NormalTexture = new Texture2D(normalres, normalres, TextureFormat.RGBA32, false, true);
+		NormalTexture.name = "NormalTexture";
+		NormalTexture.wrapMode = TextureWrapMode.Clamp;
+		NormalTexture.SetPixels32(normals);
 	}
 
 	public void ApplyTextures()
@@ -134,8 +135,8 @@ public class TerrainHeightMap : TerrainMap<short>
 		num5 = ((num5 >= 0) ? num5 : 0);
 		num4 = ((num4 <= num) ? num4 : num);
 		num5 = ((num5 <= num) ? num5 : num);
-		int num8 = (num2 < (float)num) ? 1 : 0;
-		int num9 = (num3 < (float)num) ? res : 0;
+		int num8 = ((num2 < (float)num) ? 1 : 0);
+		int num9 = ((num3 < (float)num) ? res : 0);
 		int num10 = num5 * res + num4;
 		int num11 = num10 + num8;
 		int num12 = num10 + num9;

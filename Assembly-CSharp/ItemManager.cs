@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -31,72 +31,74 @@ public class ItemManager
 
 	public static void InvalidateWorkshopSkinCache()
 	{
-		if (itemList != null)
+		if (itemList == null)
 		{
-			foreach (ItemDefinition item in itemList)
-			{
-				item.InvalidateWorkshopSkinCache();
-			}
+			return;
+		}
+		foreach (ItemDefinition item in itemList)
+		{
+			item.InvalidateWorkshopSkinCache();
 		}
 	}
 
 	public static void Initialize()
 	{
-		if (itemList == null)
+		if (itemList != null)
 		{
-			Stopwatch stopwatch = new Stopwatch();
-			stopwatch.Start();
-			GameObject[] array = FileSystem.LoadAllFromBundle<GameObject>("items.preload.bundle", "l:ItemDefinition");
-			if (array.Length == 0)
-			{
-				throw new Exception("items.preload.bundle has no items!");
-			}
-			if (stopwatch.Elapsed.TotalSeconds > 1.0)
-			{
-				UnityEngine.Debug.Log("Loading Items Took: " + (stopwatch.Elapsed.TotalMilliseconds / 1000.0).ToString() + " seconds");
-			}
-			List<ItemDefinition> list = (from x in array
-				select x.GetComponent<ItemDefinition>() into x
-				where x != null
-				select x).ToList();
-			List<ItemBlueprint> list2 = (from x in array
-				select x.GetComponent<ItemBlueprint>() into x
-				where x != null && x.userCraftable
-				select x).ToList();
-			Dictionary<int, ItemDefinition> dictionary = new Dictionary<int, ItemDefinition>();
-			Dictionary<string, ItemDefinition> dictionary2 = new Dictionary<string, ItemDefinition>(StringComparer.OrdinalIgnoreCase);
-			foreach (ItemDefinition item in list)
-			{
-				item.Initialize(list);
-				if (dictionary.ContainsKey(item.itemid))
-				{
-					ItemDefinition itemDefinition = dictionary[item.itemid];
-					UnityEngine.Debug.LogWarning("Item ID duplicate " + item.itemid + " (" + item.name + ") - have you given your items unique shortnames?", item.gameObject);
-					UnityEngine.Debug.LogWarning("Other item is " + itemDefinition.name, itemDefinition);
-				}
-				else
-				{
-					if (string.IsNullOrEmpty(item.shortname))
-					{
-						UnityEngine.Debug.LogWarning($"{item} has a null short name! id: {item.itemid} {item.displayName.english}");
-					}
-					dictionary.Add(item.itemid, item);
-					dictionary2.Add(item.shortname, item);
-				}
-			}
-			stopwatch.Stop();
-			if (stopwatch.Elapsed.TotalSeconds > 1.0)
-			{
-				UnityEngine.Debug.Log("Building Items Took: " + (stopwatch.Elapsed.TotalMilliseconds / 1000.0).ToString() + " seconds / Items: " + list.Count.ToString() + " / Blueprints: " + list2.Count.ToString());
-			}
-			defaultBlueprints = (from x in list2
-				where !x.NeedsSteamItem && !x.NeedsSteamDLC && x.defaultBlueprint
-				select x.targetItem.itemid).ToArray();
-			itemList = list;
-			bpList = list2;
-			itemDictionary = dictionary;
-			itemDictionaryByName = dictionary2;
+			return;
 		}
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.Start();
+		GameObject[] array = FileSystem.LoadAllFromBundle<GameObject>("items.preload.bundle", "l:ItemDefinition");
+		if (array.Length == 0)
+		{
+			throw new Exception("items.preload.bundle has no items!");
+		}
+		if (stopwatch.Elapsed.TotalSeconds > 1.0)
+		{
+			UnityEngine.Debug.Log("Loading Items Took: " + stopwatch.Elapsed.TotalMilliseconds / 1000.0 + " seconds");
+		}
+		List<ItemDefinition> list = (from x in array
+			select x.GetComponent<ItemDefinition>() into x
+			where x != null
+			select x).ToList();
+		List<ItemBlueprint> list2 = (from x in array
+			select x.GetComponent<ItemBlueprint>() into x
+			where x != null && x.userCraftable
+			select x).ToList();
+		Dictionary<int, ItemDefinition> dictionary = new Dictionary<int, ItemDefinition>();
+		Dictionary<string, ItemDefinition> dictionary2 = new Dictionary<string, ItemDefinition>(StringComparer.OrdinalIgnoreCase);
+		foreach (ItemDefinition item in list)
+		{
+			item.Initialize(list);
+			if (dictionary.ContainsKey(item.itemid))
+			{
+				ItemDefinition itemDefinition = dictionary[item.itemid];
+				UnityEngine.Debug.LogWarning("Item ID duplicate " + item.itemid + " (" + item.name + ") - have you given your items unique shortnames?", item.gameObject);
+				UnityEngine.Debug.LogWarning("Other item is " + itemDefinition.name, itemDefinition);
+			}
+			else
+			{
+				if (string.IsNullOrEmpty(item.shortname))
+				{
+					UnityEngine.Debug.LogWarning($"{item} has a null short name! id: {item.itemid} {item.displayName.english}");
+				}
+				dictionary.Add(item.itemid, item);
+				dictionary2.Add(item.shortname, item);
+			}
+		}
+		stopwatch.Stop();
+		if (stopwatch.Elapsed.TotalSeconds > 1.0)
+		{
+			UnityEngine.Debug.Log("Building Items Took: " + stopwatch.Elapsed.TotalMilliseconds / 1000.0 + " seconds / Items: " + list.Count + " / Blueprints: " + list2.Count);
+		}
+		defaultBlueprints = (from x in list2
+			where !x.NeedsSteamItem && !x.NeedsSteamDLC && x.defaultBlueprint
+			select x.targetItem.itemid).ToArray();
+		itemList = list;
+		bpList = list2;
+		itemDictionary = dictionary;
+		itemDictionaryByName = dictionary2;
 	}
 
 	public static Item CreateByName(string strName, int iAmount = 1, ulong skin = 0uL)

@@ -51,19 +51,21 @@ public class VehicleLiftOccupantTrigger : TriggerBase
 	internal override void OnEntityLeave(BaseEntity ent)
 	{
 		base.OnEntityLeave(ent);
-		if (carOccupant == ent)
+		if (!(carOccupant == ent))
 		{
-			carOccupant = null;
-			if (entityContents != null && entityContents.Count > 0)
+			return;
+		}
+		carOccupant = null;
+		if (entityContents == null || entityContents.Count <= 0)
+		{
+			return;
+		}
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if (entityContent != null)
 			{
-				foreach (BaseEntity entityContent in entityContents)
-				{
-					if (entityContent != null)
-					{
-						carOccupant = (ModularCar)entityContent;
-						break;
-					}
-				}
+				carOccupant = (ModularCar)entityContent;
+				break;
 			}
 		}
 	}

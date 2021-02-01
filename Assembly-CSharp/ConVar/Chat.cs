@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using CompanionServer;
 using Facepunch;
 using Facepunch.Math;
 using Network;
 using Oxide.Core;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using UnityEngine;
 
 namespace ConVar
@@ -182,7 +182,7 @@ namespace ConVar
 			}
 			if (serverlog)
 			{
-				ServerConsole.PrintColoured(ConsoleColor.DarkYellow, "[" + targetChannel + "] " + username + ": ", ConsoleColor.DarkGreen, text);
+				ServerConsole.PrintColoured(ConsoleColor.DarkYellow, string.Concat("[", targetChannel, "] ", username, ": "), ConsoleColor.DarkGreen, text);
 				string str = player?.ToString() ?? $"{username}[{userId}]";
 				if (targetChannel == ChatChannel.Team)
 				{
@@ -194,7 +194,7 @@ namespace ConVar
 				}
 			}
 			bool flag = userGroup == ServerUsers.UserGroup.Owner || userGroup == ServerUsers.UserGroup.Moderator;
-			bool num = (player != null) ? player.IsDeveloper : DeveloperList.Contains(userId);
+			bool num = ((player != null) ? player.IsDeveloper : DeveloperList.Contains(userId));
 			string text2 = "#5af";
 			if (flag)
 			{

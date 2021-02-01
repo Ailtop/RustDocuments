@@ -1,5 +1,5 @@
-using Rust.UI;
 using System;
+using Rust.UI;
 using UnityEngine;
 
 public class ItemStoreBuySuccessModal : MonoBehaviour

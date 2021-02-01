@@ -30,7 +30,7 @@ public class DroppedItem : WorldItem
 		{
 			return 30f;
 		}
-		int num = (item == null) ? 1 : item.despawnMultiplier;
+		int num = ((item == null) ? 1 : item.despawnMultiplier);
 		return Server.itemdespawn * (float)num;
 	}
 
@@ -60,8 +60,8 @@ public class DroppedItem : WorldItem
 		}
 		if (di.item.info != null && di.item.info.amountType == ItemDefinition.AmountType.Genetics)
 		{
-			int num = (di.item.instanceData != null) ? di.item.instanceData.dataInt : (-1);
-			int num2 = (item.instanceData != null) ? item.instanceData.dataInt : (-1);
+			int num = ((di.item.instanceData != null) ? di.item.instanceData.dataInt : (-1));
+			int num2 = ((item.instanceData != null) ? item.instanceData.dataInt : (-1));
 			if (num != num2)
 			{
 				return;
@@ -128,7 +128,7 @@ public class DroppedItem : WorldItem
 		if (base.isServer)
 		{
 			WorldModel component = gameObject.GetComponent<WorldModel>();
-			float mass = component ? component.mass : 1f;
+			float mass = (component ? component.mass : 1f);
 			float drag = 0.1f;
 			float angularDrag = 0.1f;
 			Rigidbody rigidbody = base.gameObject.AddComponent<Rigidbody>();

@@ -56,7 +56,7 @@ public struct EntityRef
 		{
 			if (serverside)
 			{
-				ent_cached = (BaseNetworkable.serverEntities.Find(id_cached) as BaseEntity);
+				ent_cached = BaseNetworkable.serverEntities.Find(id_cached) as BaseEntity;
 			}
 			else
 			{
@@ -114,7 +114,7 @@ public struct EntityRef<T> where T : BaseEntity
 			return null;
 		}
 		T result;
-		if ((result = (baseEntity as T)) == null)
+		if ((result = baseEntity as T) == null)
 		{
 			Set(null);
 			return null;

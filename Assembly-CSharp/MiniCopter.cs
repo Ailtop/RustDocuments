@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -355,7 +355,7 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 			int num;
 			if (!HasDriver())
 			{
-				flag = (currentInputState.throttle <= 0f);
+				flag = currentInputState.throttle <= 0f;
 			}
 			else
 				num = 0;
@@ -470,7 +470,7 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenFuel ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{

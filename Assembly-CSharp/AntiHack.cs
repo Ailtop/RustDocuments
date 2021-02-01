@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using ConVar;
 using EasyAntiCheat.Server.Scout;
 using Oxide.Core;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class AntiHack
@@ -166,9 +166,9 @@ public static class AntiHack
 				return false;
 			}
 			bool flag = ply.transform.parent == null;
-			Matrix4x4 matrix4x = flag ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix;
-			Vector3 oldPos = flag ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint);
-			Vector3 newPos = flag ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint);
+			Matrix4x4 matrix4x = (flag ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix);
+			Vector3 oldPos = (flag ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint));
+			Vector3 newPos = (flag ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
 			if (ConVar.AntiHack.noclip_protection >= 3)
 			{
 				float b = Mathf.Max(ConVar.AntiHack.noclip_stepsize, 0.1f);
@@ -238,9 +238,9 @@ public static class AntiHack
 				return false;
 			}
 			bool num = ply.transform.parent == null;
-			Matrix4x4 matrix4x = num ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix;
-			Vector3 vector = num ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint);
-			Vector3 a = num ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint);
+			Matrix4x4 matrix4x = (num ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix);
+			Vector3 vector = (num ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint));
+			Vector3 a = (num ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
 			float running = 1f;
 			float ducking = 0f;
 			if (ConVar.AntiHack.speedhack_protection >= 2)
@@ -249,7 +249,7 @@ public static class AntiHack
 				bool flag = ply.IsDucked();
 				bool flag2 = ply.IsSwimming();
 				running = (num2 ? 1f : 0f);
-				ducking = ((flag | flag2) ? 1f : 0f);
+				ducking = ((flag || flag2) ? 1f : 0f);
 			}
 			float speed = ply.GetSpeed(running, ducking);
 			Vector3 v = a - vector;
@@ -257,7 +257,7 @@ public static class AntiHack
 			float num4 = deltaTime * speed;
 			if (num3 > num4)
 			{
-				Vector3 v2 = TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetNormal(vector) : Vector3.up;
+				Vector3 v2 = (TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetNormal(vector) : Vector3.up);
 				float num5 = Mathf.Max(0f, Vector3.Dot(v2.XZ3D(), v.XZ3D())) * ConVar.AntiHack.speedhack_slopespeed * deltaTime;
 				num3 = Mathf.Max(0f, num3 - num5);
 			}
@@ -293,9 +293,9 @@ public static class AntiHack
 				return false;
 			}
 			bool flag = ply.transform.parent == null;
-			Matrix4x4 matrix4x = flag ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix;
-			Vector3 oldPos = flag ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint);
-			Vector3 newPos = flag ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint);
+			Matrix4x4 matrix4x = (flag ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix);
+			Vector3 oldPos = (flag ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint));
+			Vector3 newPos = (flag ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
 			if (ConVar.AntiHack.flyhack_protection >= 3)
 			{
 				float b = Mathf.Max(ConVar.AntiHack.flyhack_stepsize, 0.1f);
@@ -365,7 +365,7 @@ public static class AntiHack
 		}
 		else
 		{
-			ply.isInAir = (!ply.OnLadder() && !ply.IsSwimming() && !ply.IsOnGround());
+			ply.isInAir = !ply.OnLadder() && !ply.IsSwimming() && !ply.IsOnGround();
 		}
 		if (ply.isInAir)
 		{
@@ -428,7 +428,7 @@ public static class AntiHack
 			{
 				LogToConsole(ply, ply.lastViolationType, "Enforcing (violation of " + ply.violationLevel + ")");
 			}
-			string reason = ply.lastViolationType + " Violation Level " + ply.violationLevel;
+			string reason = string.Concat(ply.lastViolationType, " Violation Level ", ply.violationLevel);
 			if (ConVar.AntiHack.enforcementlevel > 1)
 			{
 				Kick(ply, reason);
@@ -451,32 +451,33 @@ public static class AntiHack
 
 	private static void LogToConsole(BasePlayer ply, AntiHackType type, string message)
 	{
-		Debug.LogWarning(ply + " " + type + ": " + message);
+		Debug.LogWarning(string.Concat(ply, " ", type, ": ", message));
 	}
 
 	private static void LogToEAC(BasePlayer ply, AntiHackType type, string message)
 	{
 		if (ConVar.AntiHack.reporting && EACServer.eacScout != null)
 		{
-			EACServer.eacScout.SendInvalidPlayerStateReport(ply.UserIDString, InvalidPlayerStateReportCategory.PlayerReportExploiting, type + ": " + message);
+			EACServer.eacScout.SendInvalidPlayerStateReport(ply.UserIDString, InvalidPlayerStateReportCategory.PlayerReportExploiting, string.Concat(type, ": ", message));
 		}
 	}
 
 	public static void AddViolation(BasePlayer ply, AntiHackType type, float amount)
 	{
-		if (Interface.CallHook("OnPlayerViolation", ply, type, amount) == null)
+		if (Interface.CallHook("OnPlayerViolation", ply, type, amount) != null)
 		{
-			using (TimeWarning.New("AntiHack.AddViolation"))
+			return;
+		}
+		using (TimeWarning.New("AntiHack.AddViolation"))
+		{
+			ply.lastViolationType = type;
+			ply.lastViolationTime = UnityEngine.Time.realtimeSinceStartup;
+			ply.violationLevel += amount;
+			if ((ConVar.AntiHack.debuglevel >= 2 && amount > 0f) || ConVar.AntiHack.debuglevel >= 3)
 			{
-				ply.lastViolationType = type;
-				ply.lastViolationTime = UnityEngine.Time.realtimeSinceStartup;
-				ply.violationLevel += amount;
-				if ((ConVar.AntiHack.debuglevel >= 2 && amount > 0f) || ConVar.AntiHack.debuglevel >= 3)
-				{
-					LogToConsole(ply, type, "Added violation of " + amount + " in frame " + UnityEngine.Time.frameCount + " (now has " + ply.violationLevel + ")");
-				}
-				EnforceViolations(ply);
+				LogToConsole(ply, type, "Added violation of " + amount + " in frame " + UnityEngine.Time.frameCount + " (now has " + ply.violationLevel + ")");
 			}
+			EnforceViolations(ply);
 		}
 	}
 

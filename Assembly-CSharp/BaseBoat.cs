@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Oxide.Core;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseBoat : BaseVehicle
@@ -125,7 +125,7 @@ public class BaseBoat : BaseVehicle
 		if (!(timeSinceLastUsed < 2700f))
 		{
 			float overallWaterDepth = WaterLevel.GetOverallWaterDepth(base.transform.position);
-			float num = IsOutside() ? outsideDecayMinutes : float.PositiveInfinity;
+			float num = (IsOutside() ? outsideDecayMinutes : float.PositiveInfinity);
 			if (overallWaterDepth > 4f)
 			{
 				float t = Mathf.InverseLerp(4f, 12f, overallWaterDepth);
@@ -190,18 +190,14 @@ public class BaseBoat : BaseVehicle
 		float d = 4f;
 		float num6 = 200f;
 		bool flag = true;
-		for (int j = 0; j < AI.ocean_patrol_path_iterations; j++)
+		for (int j = 0; j < AI.ocean_patrol_path_iterations && flag; j++)
 		{
-			if (!flag)
-			{
-				break;
-			}
 			flag = false;
 			for (int k = 0; k < num3; k++)
 			{
 				Vector3 vector = list[k];
-				int index = (k == 0) ? (num3 - 1) : (k - 1);
-				int index2 = (k != num3 - 1) ? (k + 1) : 0;
+				int index = ((k == 0) ? (num3 - 1) : (k - 1));
+				int index2 = ((k != num3 - 1) ? (k + 1) : 0);
 				Vector3 b = list[index2];
 				Vector3 b2 = list[index];
 				Vector3 origin = vector;

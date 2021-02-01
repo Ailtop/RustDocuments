@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -104,7 +104,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - EngineSwitch ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - EngineSwitch "));
 				}
 				using (TimeWarning.New("EngineSwitch"))
 				{
@@ -140,7 +140,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenFuel ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -309,7 +309,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		{
 			List<Collider> obj = Facepunch.Pool.GetList<Collider>();
 			GamePhysics.OverlapSphere(groundSample.transform.position, 1.25f, obj, 1218511105);
-			grounded = (obj.Count > 0);
+			grounded = obj.Count > 0;
 			Facepunch.Pool.FreeList(ref obj);
 		}
 	}

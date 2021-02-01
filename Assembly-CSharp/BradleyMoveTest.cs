@@ -109,7 +109,7 @@ public class BradleyMoveTest : MonoBehaviour
 	public float GetMotorTorque(bool rightSide)
 	{
 		float num = 0f;
-		WheelCollider[] array = rightSide ? rightWheels : leftWheels;
+		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		foreach (WheelCollider wheelCollider in array)
 		{
 			num += wheelCollider.motorTorque;
@@ -121,7 +121,7 @@ public class BradleyMoveTest : MonoBehaviour
 	{
 		newThrottle = Mathf.Clamp(newThrottle, -1f, 1f);
 		float motorTorque = torqueAmount * newThrottle;
-		WheelCollider[] array = rightSide ? rightWheels : leftWheels;
+		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].motorTorque = motorTorque;
@@ -130,7 +130,7 @@ public class BradleyMoveTest : MonoBehaviour
 
 	public void ApplyBrakeTorque(float amount, bool rightSide)
 	{
-		WheelCollider[] array = rightSide ? rightWheels : leftWheels;
+		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].brakeTorque = brakeForce * amount;

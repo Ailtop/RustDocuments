@@ -33,7 +33,7 @@ public class ItemTextValue : MonoBehaviour
 		{
 			text.text += suffix;
 		}
-		bool flag = (val > 0f) ? true : false;
+		bool flag = ((val > 0f) ? true : false);
 		if (negativestat)
 		{
 			flag = !flag;

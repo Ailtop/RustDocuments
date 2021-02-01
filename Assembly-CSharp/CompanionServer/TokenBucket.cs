@@ -1,5 +1,5 @@
-using Network;
 using System;
+using Network;
 
 namespace CompanionServer
 {
@@ -32,7 +32,7 @@ namespace CompanionServer
 		public void Reset()
 		{
 			_lastUpdate = TimeEx.realtimeSinceStartup;
-			_tokens = (Settings?.MaxTokens ?? 0.0);
+			_tokens = Settings?.MaxTokens ?? 0.0;
 		}
 
 		public bool TryTake(double requestedTokens)

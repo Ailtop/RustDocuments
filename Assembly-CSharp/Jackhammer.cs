@@ -1,7 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -16,7 +16,7 @@ public class Jackhammer : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_SetEngineStatus ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetEngineStatus "));
 				}
 				using (TimeWarning.New("Server_SetEngineStatus"))
 				{

@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Oxide.Core;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PatrolHelicopterAI : BaseMonoBehaviour
@@ -196,13 +196,13 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 						targetinfo.visibleFor = 0f;
 					}
 				}
-				bool flag2 = targetinfo.ply ? targetinfo.ply.IsDead() : (targetinfo.ent.Health() <= 0f);
-				if ((targetinfo.TimeSinceSeen() >= 6f) | flag2)
+				bool flag2 = (targetinfo.ply ? targetinfo.ply.IsDead() : (targetinfo.ent.Health() <= 0f));
+				if (targetinfo.TimeSinceSeen() >= 6f || flag2)
 				{
 					bool flag3 = UnityEngine.Random.Range(0f, 1f) >= 0f;
-					if (((CanStrafe() || CanUseNapalm()) && IsAlive() && !flag && !flag2 && (targetinfo.ply == leftGun._target || targetinfo.ply == rightGun._target)) & flag3)
+					if ((CanStrafe() || CanUseNapalm()) && IsAlive() && !flag && !flag2 && (targetinfo.ply == leftGun._target || targetinfo.ply == rightGun._target) && flag3)
 					{
-						shouldUseNapalm = (!ValidStrafeTarget(targetinfo.ply) || UnityEngine.Random.Range(0f, 1f) > 0.75f);
+						shouldUseNapalm = !ValidStrafeTarget(targetinfo.ply) || UnityEngine.Random.Range(0f, 1f) > 0.75f;
 						flag = true;
 						strafePos = targetinfo.ply.transform.position;
 					}
@@ -212,21 +212,22 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		}
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			if (!activePlayer.HasPlayerFlag(BasePlayer.PlayerFlags.SafeZone) && !(Vector3Ex.Distance2D(base.transform.position, activePlayer.transform.position) > 150f))
+			if (activePlayer.HasPlayerFlag(BasePlayer.PlayerFlags.SafeZone) || Vector3Ex.Distance2D(base.transform.position, activePlayer.transform.position) > 150f)
 			{
-				bool flag4 = false;
-				foreach (targetinfo target in _targetList)
+				continue;
+			}
+			bool flag4 = false;
+			foreach (targetinfo target in _targetList)
+			{
+				if (target.ply == activePlayer)
 				{
-					if (target.ply == activePlayer)
-					{
-						flag4 = true;
-						break;
-					}
+					flag4 = true;
+					break;
 				}
-				if (!flag4 && activePlayer.GetThreatLevel() > 0.5f && PlayerVisible(activePlayer))
-				{
-					_targetList.Add(new targetinfo(activePlayer, activePlayer));
-				}
+			}
+			if (!flag4 && activePlayer.GetThreatLevel() > 0.5f && PlayerVisible(activePlayer))
+			{
+				_targetList.Add(new targetinfo(activePlayer, activePlayer));
 			}
 		}
 		if (flag)
@@ -321,7 +322,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public void SetIdealRotation(Quaternion newTargetRot, float rotationSpeedOverride = -1f)
 	{
-		float num = (rotationSpeedOverride == -1f) ? Mathf.Clamp01(moveSpeed / (maxSpeed * 0.5f)) : rotationSpeedOverride;
+		float num = ((rotationSpeedOverride == -1f) ? Mathf.Clamp01(moveSpeed / (maxSpeed * 0.5f)) : rotationSpeedOverride);
 		rotationSpeed = num * maxRotationSpeed;
 		targetRotation = newTargetRot;
 	}
@@ -354,7 +355,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public void MoveToDestination()
 	{
-		Vector3 a = _lastMoveDir = Vector3.Lerp(_lastMoveDir, (destination - base.transform.position).normalized, UnityEngine.Time.deltaTime / courseAdjustLerpTime);
+		Vector3 a = (_lastMoveDir = Vector3.Lerp(_lastMoveDir, (destination - base.transform.position).normalized, UnityEngine.Time.deltaTime / courseAdjustLerpTime));
 		throttleSpeed = Mathf.Lerp(throttleSpeed, targetThrottleSpeed, UnityEngine.Time.deltaTime / 3f);
 		float d = throttleSpeed * maxSpeed;
 		TerrainPushback();
@@ -474,7 +475,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		bool num2 = ValidStrafeTarget(basePlayer);
 		bool flag = num2 && CanStrafe();
 		bool flag2 = !num2 && CanUseNapalm();
-		if (num < 5f && basePlayer != null && (flag | flag2))
+		if (num < 5f && basePlayer != null && (flag || flag2))
 		{
 			ExitCurrentState();
 			State_Strafe_Enter(info.Initiator.transform.position, flag2);
@@ -977,7 +978,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		float num = 4f;
 		bool flag = leftTubeFiredLast;
 		leftTubeFiredLast = !leftTubeFiredLast;
-		Transform transform = flag ? helicopterBase.rocket_tube_left.transform : helicopterBase.rocket_tube_right.transform;
+		Transform transform = (flag ? helicopterBase.rocket_tube_left.transform : helicopterBase.rocket_tube_right.transform);
 		Vector3 vector = transform.position + transform.forward * 1f;
 		Vector3 vector2 = (strafe_target_position - vector).normalized;
 		if (num > 0f)

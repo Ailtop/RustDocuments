@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class VehicleSpawner : BaseEntity
@@ -62,23 +62,14 @@ public class VehicleSpawner : BaseEntity
 			newOwner = component.GetActionPlayer();
 		}
 		SpawnPair[] array = objectsToSpawn;
-		int num = 0;
-		SpawnPair spawnPair;
-		while (true)
+		foreach (SpawnPair spawnPair in array)
 		{
-			if (num < array.Length)
+			if (msg == spawnPair.message)
 			{
-				spawnPair = array[num];
-				if (msg == spawnPair.message)
-				{
-					break;
-				}
-				num++;
-				continue;
+				SpawnVehicle(spawnPair.prefabToSpawn.resourcePath, newOwner);
+				break;
 			}
-			return;
 		}
-		SpawnVehicle(spawnPair.prefabToSpawn.resourcePath, newOwner);
 	}
 
 	public BaseVehicle SpawnVehicle(string prefabToSpawn, BasePlayer newOwner)

@@ -1,6 +1,6 @@
-using Rust.Ai.HTN.Sensors;
 using System;
 using System.Collections.Generic;
+using Rust.Ai.HTN.Sensors;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.Scientist.Sensors
@@ -80,8 +80,7 @@ namespace Rust.Ai.HTN.Scientist.Sensors
 			}
 			for (int k = 0; k < animalsInRange.Count; k++)
 			{
-				AnimalInfo animalInfo = animalsInRange[k];
-				if (time - animalInfo.Time > npc.AiDefinition.Memory.ForgetAnimalInRangeTime)
+				if (time - animalsInRange[k].Time > npc.AiDefinition.Memory.ForgetAnimalInRangeTime)
 				{
 					animalsInRange.RemoveAt(k);
 					k--;

@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -31,7 +31,7 @@ public class Signage : IOEntity, ILOD
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log("SV_RPCMessage: " + player + " - LockSign ");
+					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - LockSign "));
 				}
 				using (TimeWarning.New("LockSign"))
 				{
@@ -67,7 +67,7 @@ public class Signage : IOEntity, ILOD
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log("SV_RPCMessage: " + player + " - UnLockSign ");
+					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UnLockSign "));
 				}
 				using (TimeWarning.New("UnLockSign"))
 				{
@@ -103,7 +103,7 @@ public class Signage : IOEntity, ILOD
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log("SV_RPCMessage: " + player + " - UpdateSign ");
+					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateSign "));
 				}
 				using (TimeWarning.New("UpdateSign"))
 				{
@@ -272,13 +272,13 @@ public class Signage : IOEntity, ILOD
 				{
 					uint num3 = info.msg.sign.imageIds[i];
 					bool flag2 = num3 != textureIDs[i];
-					flag |= flag2;
+					flag = flag || flag2;
 					textureIDs[i] = num3;
 				}
 			}
 			else
 			{
-				flag = (num != info.msg.sign.imageid);
+				flag = num != info.msg.sign.imageid;
 				textureIDs[0] = info.msg.sign.imageid;
 			}
 		}
@@ -298,7 +298,7 @@ public class Signage : IOEntity, ILOD
 					Log($"Frame {j} (id={num4}) doesn't exist, clearing");
 					textureIDs[j] = 0u;
 				}
-				flag3 = (flag3 || array != null);
+				flag3 = flag3 || array != null;
 			}
 		}
 		if (!flag3)

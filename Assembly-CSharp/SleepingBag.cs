@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -55,7 +55,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AssignToFriend ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AssignToFriend "));
 				}
 				using (TimeWarning.New("AssignToFriend"))
 				{
@@ -91,7 +91,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Rename ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Rename "));
 				}
 				using (TimeWarning.New("Rename"))
 				{
@@ -127,7 +127,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_MakeBed ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_MakeBed "));
 				}
 				using (TimeWarning.New("RPC_MakeBed"))
 				{
@@ -163,7 +163,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_MakePublic ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_MakePublic "));
 				}
 				using (TimeWarning.New("RPC_MakePublic"))
 				{
@@ -215,8 +215,9 @@ public class SleepingBag : DecayEntity
 
 	public static bool SpawnPlayer(BasePlayer player, uint sleepingBag)
 	{
-		SleepingBag[] array = FindForPlayer(player.userID, true);
-		SleepingBag sleepingBag2 = array.FirstOrDefault((SleepingBag x) => x.deployerUserID == player.userID && x.net.ID == sleepingBag && x.unlockTime < UnityEngine.Time.realtimeSinceStartup);
+		BasePlayer player2 = player;
+		SleepingBag[] array = FindForPlayer(player2.userID, true);
+		SleepingBag sleepingBag2 = array.FirstOrDefault((SleepingBag x) => x.deployerUserID == player2.userID && x.net.ID == sleepingBag && x.unlockTime < UnityEngine.Time.realtimeSinceStartup);
 		if (sleepingBag2 == null)
 		{
 			return false;
@@ -228,7 +229,7 @@ public class SleepingBag : DecayEntity
 		}
 		Vector3 vector = sleepingBag2.transform.position + sleepingBag2.spawnOffset;
 		Quaternion rotation = Quaternion.Euler(0f, sleepingBag2.transform.rotation.eulerAngles.y, 0f);
-		player.RespawnAt(vector, rotation);
+		player2.RespawnAt(vector, rotation);
 		SleepingBag[] array2 = array;
 		foreach (SleepingBag sleepingBag3 in array2)
 		{

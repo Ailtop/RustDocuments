@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -50,7 +50,7 @@ public class MixingTable : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SVSwitch ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVSwitch "));
 				}
 				using (TimeWarning.New("SVSwitch"))
 				{
@@ -274,7 +274,7 @@ public class MixingTable : StorageContainer
 		currentProductionItem = recipe.ProducedItem;
 		for (int i = 0; i < num2; i++)
 		{
-			int num3 = (num > stackable) ? stackable : num;
+			int num3 = ((num > stackable) ? stackable : num);
 			Item item = ItemManager.Create(recipe.ProducedItem, num3, 0uL);
 			if (!item.MoveToContainer(base.inventory))
 			{

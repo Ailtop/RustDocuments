@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,7 +27,7 @@ public class Recycler : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SVSwitch ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVSwitch "));
 				}
 				using (TimeWarning.New("SVSwitch"))
 				{
@@ -72,20 +72,21 @@ public class Recycler : StorageContainer
 	private void SVSwitch(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();
-		if (flag != IsOn() && !(msg.player == null) && Interface.CallHook("OnRecyclerToggle", this, msg.player) == null && (!flag || HasRecyclable()))
+		if (flag == IsOn() || msg.player == null || Interface.CallHook("OnRecyclerToggle", this, msg.player) != null || (flag && !HasRecyclable()))
 		{
-			if (flag)
+			return;
+		}
+		if (flag)
+		{
+			foreach (Item item in base.inventory.itemList)
 			{
-				foreach (Item item in base.inventory.itemList)
-				{
-					item.CollectedForCrafting(msg.player);
-				}
-				StartRecycling();
+				item.CollectedForCrafting(msg.player);
 			}
-			else
-			{
-				StopRecycling();
-			}
+			StartRecycling();
+		}
+		else
+		{
+			StopRecycling();
 		}
 	}
 
@@ -151,107 +152,115 @@ public class Recycler : StorageContainer
 	{
 		bool flag = false;
 		float num = recycleEfficiency;
-		for (int i = 0; i < 6; i++)
+		int num2 = 0;
+		while (true)
 		{
-			Item slot = base.inventory.GetSlot(i);
-			if (slot == null)
+			if (num2 < 6)
 			{
-				continue;
-			}
-			if (Interface.CallHook("OnRecycleItem", this, slot) != null)
-			{
-				if (!HasRecyclable())
+				Item slot = base.inventory.GetSlot(num2);
+				if (slot == null)
 				{
-					StopRecycling();
+					goto IL_034f;
 				}
-				return;
-			}
-			if (!(slot.info.Blueprint != null))
-			{
-				continue;
-			}
-			if (slot.hasCondition)
-			{
-				num = Mathf.Clamp01(num * Mathf.Clamp(slot.conditionNormalized * slot.maxConditionNormalized, 0.1f, 1f));
-			}
-			int num2 = 1;
-			if (slot.amount > 1)
-			{
-				num2 = Mathf.CeilToInt(Mathf.Min(slot.amount, (float)slot.info.stackable * 0.1f));
-			}
-			if (slot.info.Blueprint.scrapFromRecycle > 0)
-			{
-				int num3 = slot.info.Blueprint.scrapFromRecycle * num2;
-				if (slot.info.stackable == 1 && slot.hasCondition)
+				if (Interface.CallHook("OnRecycleItem", this, slot) != null)
 				{
-					num3 = Mathf.CeilToInt((float)num3 * slot.conditionNormalized);
-				}
-				if (num3 >= 1)
-				{
-					Item newItem = ItemManager.CreateByName("scrap", num3, 0uL);
-					MoveItemToOutput(newItem);
-				}
-			}
-			if (!string.IsNullOrEmpty(slot.info.Blueprint.RecycleStat))
-			{
-				List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-				Vis.Entities(base.transform.position, 3f, obj, 131072);
-				foreach (BasePlayer item in obj)
-				{
-					if (item.IsAlive() && !item.IsSleeping() && item.inventory.loot.entitySource == this)
+					if (!HasRecyclable())
 					{
-						item.stats.Add(slot.info.Blueprint.RecycleStat, num2, (Stats)5);
-						item.stats.Save();
+						StopRecycling();
+					}
+					break;
+				}
+				if (!(slot.info.Blueprint != null))
+				{
+					goto IL_034f;
+				}
+				if (slot.hasCondition)
+				{
+					num = Mathf.Clamp01(num * Mathf.Clamp(slot.conditionNormalized * slot.maxConditionNormalized, 0.1f, 1f));
+				}
+				int num3 = 1;
+				if (slot.amount > 1)
+				{
+					num3 = Mathf.CeilToInt(Mathf.Min(slot.amount, (float)slot.info.stackable * 0.1f));
+				}
+				if (slot.info.Blueprint.scrapFromRecycle > 0)
+				{
+					int num4 = slot.info.Blueprint.scrapFromRecycle * num3;
+					if (slot.info.stackable == 1 && slot.hasCondition)
+					{
+						num4 = Mathf.CeilToInt((float)num4 * slot.conditionNormalized);
+					}
+					if (num4 >= 1)
+					{
+						Item newItem = ItemManager.CreateByName("scrap", num4, 0uL);
+						MoveItemToOutput(newItem);
 					}
 				}
-				Facepunch.Pool.FreeList(ref obj);
-			}
-			slot.UseItem(num2);
-			foreach (ItemAmount ingredient in slot.info.Blueprint.ingredients)
-			{
-				if (!(ingredient.itemDef.shortname == "scrap"))
+				if (!string.IsNullOrEmpty(slot.info.Blueprint.RecycleStat))
 				{
-					float num4 = ingredient.amount / (float)slot.info.Blueprint.amountToCreate;
-					int num5 = 0;
-					if (num4 <= 1f)
+					List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+					Vis.Entities(base.transform.position, 3f, obj, 131072);
+					foreach (BasePlayer item in obj)
 					{
-						for (int j = 0; j < num2; j++)
+						if (item.IsAlive() && !item.IsSleeping() && item.inventory.loot.entitySource == this)
 						{
-							if (UnityEngine.Random.Range(0f, 1f) <= num4 * num)
+							item.stats.Add(slot.info.Blueprint.RecycleStat, num3, (Stats)5);
+							item.stats.Save();
+						}
+					}
+					Facepunch.Pool.FreeList(ref obj);
+				}
+				slot.UseItem(num3);
+				foreach (ItemAmount ingredient in slot.info.Blueprint.ingredients)
+				{
+					if (ingredient.itemDef.shortname == "scrap")
+					{
+						continue;
+					}
+					float num5 = ingredient.amount / (float)slot.info.Blueprint.amountToCreate;
+					int num6 = 0;
+					if (num5 <= 1f)
+					{
+						for (int i = 0; i < num3; i++)
+						{
+							if (UnityEngine.Random.Range(0f, 1f) <= num5 * num)
 							{
-								num5++;
+								num6++;
 							}
 						}
 					}
 					else
 					{
-						num5 = Mathf.CeilToInt(Mathf.Clamp(num4 * num * UnityEngine.Random.Range(1f, 1f), 0f, ingredient.amount)) * num2;
+						num6 = Mathf.CeilToInt(Mathf.Clamp(num5 * num * UnityEngine.Random.Range(1f, 1f), 0f, ingredient.amount)) * num3;
 					}
-					if (num5 > 0)
+					if (num6 <= 0)
 					{
-						int num6 = Mathf.CeilToInt((float)num5 / (float)ingredient.itemDef.stackable);
-						for (int k = 0; k < num6; k++)
+						continue;
+					}
+					int num7 = Mathf.CeilToInt((float)num6 / (float)ingredient.itemDef.stackable);
+					for (int j = 0; j < num7; j++)
+					{
+						int num8 = ((num6 > ingredient.itemDef.stackable) ? ingredient.itemDef.stackable : num6);
+						Item newItem2 = ItemManager.Create(ingredient.itemDef, num8, 0uL);
+						if (!MoveItemToOutput(newItem2))
 						{
-							int num7 = (num5 > ingredient.itemDef.stackable) ? ingredient.itemDef.stackable : num5;
-							Item newItem2 = ItemManager.Create(ingredient.itemDef, num7, 0uL);
-							if (!MoveItemToOutput(newItem2))
-							{
-								flag = true;
-							}
-							num5 -= num7;
-							if (num5 <= 0)
-							{
-								break;
-							}
+							flag = true;
+						}
+						num6 -= num8;
+						if (num6 <= 0)
+						{
+							break;
 						}
 					}
 				}
 			}
+			if (flag || !HasRecyclable())
+			{
+				StopRecycling();
+			}
 			break;
-		}
-		if (flag || !HasRecyclable())
-		{
-			StopRecycling();
+			IL_034f:
+			num2++;
 		}
 	}
 

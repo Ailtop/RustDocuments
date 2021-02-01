@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Oxide.Core;
 using Rust;
 using Rust.Ai;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TimedExplosive : BaseEntity
@@ -114,7 +114,7 @@ public class TimedExplosive : BaseEntity
 				while (baseCombatEntity == null && parentEntity != null && parentEntity.HasParent())
 				{
 					parentEntity = parentEntity.GetParentEntity();
-					baseCombatEntity = (parentEntity as BaseCombatEntity);
+					baseCombatEntity = parentEntity as BaseCombatEntity;
 				}
 				if ((bool)baseCombatEntity)
 				{
@@ -136,7 +136,7 @@ public class TimedExplosive : BaseEntity
 					sensation.Position = creatorEntity.transform.position;
 					sensation.Radius = explosionRadius * 17f;
 					sensation.DamagePotential = num;
-					sensation.InitiatorPlayer = (creatorEntity as BasePlayer);
+					sensation.InitiatorPlayer = creatorEntity as BasePlayer;
 					sensation.Initiator = creatorEntity;
 					Sense.Stimulate(sensation);
 				}
@@ -156,7 +156,7 @@ public class TimedExplosive : BaseEntity
 					sensation.Position = creatorEntity.transform.position;
 					sensation.Radius = explosionRadius * 17f;
 					sensation.DamagePotential = num2;
-					sensation.InitiatorPlayer = (creatorEntity as BasePlayer);
+					sensation.InitiatorPlayer = creatorEntity as BasePlayer;
 					sensation.Initiator = creatorEntity;
 					Sense.Stimulate(sensation);
 				}

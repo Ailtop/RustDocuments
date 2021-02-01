@@ -102,14 +102,14 @@ public class EntityFuelSystem
 
 	public bool HasFuel(bool forceCheck = false)
 	{
-		if ((Time.time > nextFuelCheckTime) | forceCheck)
+		if (Time.time > nextFuelCheckTime || forceCheck)
 		{
 			object obj = Interface.CallHook("OnFuelCheck", this);
 			if (obj is bool)
 			{
 				return (bool)obj;
 			}
-			cachedHasFuel = ((float)GetFuelAmount() > 0f);
+			cachedHasFuel = (float)GetFuelAmount() > 0f;
 			nextFuelCheckTime = Time.time + UnityEngine.Random.Range(1f, 2f);
 		}
 		return cachedHasFuel;

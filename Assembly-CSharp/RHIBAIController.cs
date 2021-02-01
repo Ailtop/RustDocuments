@@ -44,8 +44,8 @@ public class RHIBAIController : FacepunchBehaviour
 			for (int j = 0; j < num3; j++)
 			{
 				Vector3 vector = nodes[j];
-				int index = (j == 0) ? (num3 - 1) : (j - 1);
-				int index2 = (j != num3 - 1) ? (j + 1) : 0;
+				int index = ((j == 0) ? (num3 - 1) : (j - 1));
+				int index2 = ((j != num3 - 1) ? (j + 1) : 0);
 				Vector3 b = nodes[index2];
 				Vector3 b2 = nodes[index];
 				Vector3 vector2 = vector;
@@ -110,7 +110,7 @@ public class RHIBAIController : FacepunchBehaviour
 				Vector3 vector = TerrainMeta.Path.OceanPatrolClose[i];
 				Gizmos.color = Color.green;
 				Gizmos.DrawSphere(vector, 3f);
-				Vector3 to = (i + 1 == TerrainMeta.Path.OceanPatrolClose.Count) ? TerrainMeta.Path.OceanPatrolClose[0] : TerrainMeta.Path.OceanPatrolClose[i + 1];
+				Vector3 to = ((i + 1 == TerrainMeta.Path.OceanPatrolClose.Count) ? TerrainMeta.Path.OceanPatrolClose[0] : TerrainMeta.Path.OceanPatrolClose[i + 1]);
 				Gizmos.DrawLine(vector, to);
 			}
 		}

@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Facepunch;
 using Oxide.Core;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FireBall : BaseEntity, ISplashable
@@ -139,21 +139,22 @@ public class FireBall : BaseEntity, ISplashable
 		hitInfo.PointStart = base.transform.position;
 		foreach (Collider item in obj)
 		{
-			if (!item.isTrigger || (item.gameObject.layer != 29 && item.gameObject.layer != 18))
+			if (item.isTrigger && (item.gameObject.layer == 29 || item.gameObject.layer == 18))
 			{
-				BaseCombatEntity baseCombatEntity = GameObjectEx.ToBaseEntity(item.gameObject) as BaseCombatEntity;
-				if (!(baseCombatEntity == null) && baseCombatEntity.isServer && baseCombatEntity.IsAlive() && (!ignoreNPC || !baseCombatEntity.IsNpc) && baseCombatEntity.IsVisible(position))
+				continue;
+			}
+			BaseCombatEntity baseCombatEntity = GameObjectEx.ToBaseEntity(item.gameObject) as BaseCombatEntity;
+			if (!(baseCombatEntity == null) && baseCombatEntity.isServer && baseCombatEntity.IsAlive() && (!ignoreNPC || !baseCombatEntity.IsNpc) && baseCombatEntity.IsVisible(position))
+			{
+				if (baseCombatEntity is BasePlayer)
 				{
-					if (baseCombatEntity is BasePlayer)
-					{
-						Effect.server.Run("assets/bundled/prefabs/fx/impacts/additive/fire.prefab", baseCombatEntity, 0u, new Vector3(0f, 1f, 0f), Vector3.up);
-					}
-					hitInfo.PointEnd = baseCombatEntity.transform.position;
-					hitInfo.HitPositionWorld = baseCombatEntity.transform.position;
-					hitInfo.damageTypes.Set(DamageType.Heat, damagePerSecond * tickRate);
-					Interface.CallHook("OnFireBallDamage", this, baseCombatEntity, hitInfo);
-					baseCombatEntity.OnAttacked(hitInfo);
+					Effect.server.Run("assets/bundled/prefabs/fx/impacts/additive/fire.prefab", baseCombatEntity, 0u, new Vector3(0f, 1f, 0f), Vector3.up);
 				}
+				hitInfo.PointEnd = baseCombatEntity.transform.position;
+				hitInfo.HitPositionWorld = baseCombatEntity.transform.position;
+				hitInfo.damageTypes.Set(DamageType.Heat, damagePerSecond * tickRate);
+				Interface.CallHook("OnFireBallDamage", this, baseCombatEntity, hitInfo);
+				baseCombatEntity.OnAttacked(hitInfo);
 			}
 		}
 		Pool.FreeList(ref obj);

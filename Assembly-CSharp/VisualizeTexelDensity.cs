@@ -63,7 +63,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 	{
 		if (texelDensityGradTex == null)
 		{
-			texelDensityGradTex = (Resources.Load("TexelDensityGrad") as Texture);
+			texelDensityGradTex = Resources.Load("TexelDensityGrad") as Texture;
 		}
 		if (texelDensityOverlayMat == null)
 		{
@@ -125,7 +125,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 			texelDensityCamera.SetReplacementShader(shader, shaderTag);
 			texelDensityCamera.enabled = false;
 		}
-		if (((texelDensityRT == null) | screenResized) || !texelDensityRT.IsCreated())
+		if (texelDensityRT == null || screenResized || !texelDensityRT.IsCreated())
 		{
 			texelDensityCamera.targetTexture = null;
 			SafeDestroyViewTexelDensityRT();
@@ -195,7 +195,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 			string text = "Texels Per Meter";
 			string text2 = "0";
 			string text3 = texelsPerMeter.ToString();
-			string text4 = (texelsPerMeter << 1).ToString() + "+";
+			string text4 = (texelsPerMeter << 1) + "+";
 			float num = texelDensityGradTex.width;
 			float num2 = texelDensityGradTex.height * 2;
 			float num3 = (Screen.width - texelDensityGradTex.width) / 2;

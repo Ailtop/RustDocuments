@@ -21,20 +21,20 @@ public class SeparableSSS
 	public static void CalculateKernel(Color[] target, int targetStart, int targetSize, Color subsurfaceColor, Color falloffColor)
 	{
 		int num = targetSize * 2 - 1;
-		float num2 = (num > 20) ? 3f : 2f;
+		float num2 = ((num > 20) ? 3f : 2f);
 		float p = 2f;
 		Color[] array = new Color[num];
 		float num3 = 2f * num2 / (float)(num - 1);
 		for (int i = 0; i < num; i++)
 		{
 			float num4 = 0f - num2 + (float)i * num3;
-			float num5 = (num4 < 0f) ? (-1f) : 1f;
+			float num5 = ((num4 < 0f) ? (-1f) : 1f);
 			array[i].a = num2 * num5 * Mathf.Abs(Mathf.Pow(num4, p)) / Mathf.Pow(num2, p);
 		}
 		for (int j = 0; j < num; j++)
 		{
-			float num6 = (j > 0) ? Mathf.Abs(array[j].a - array[j - 1].a) : 0f;
-			float num7 = (j < num - 1) ? Mathf.Abs(array[j].a - array[j + 1].a) : 0f;
+			float num6 = ((j > 0) ? Mathf.Abs(array[j].a - array[j - 1].a) : 0f);
+			float num7 = ((j < num - 1) ? Mathf.Abs(array[j].a - array[j + 1].a) : 0f);
 			Vector3 vector = (num6 + num7) / 2f * Profile(array[j].a, falloffColor);
 			array[j].r = vector.x;
 			array[j].g = vector.y;

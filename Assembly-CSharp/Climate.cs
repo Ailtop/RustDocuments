@@ -1,7 +1,7 @@
-using Rust;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rust;
 using UnityEngine;
 
 public class Climate : SingletonComponent<Climate>
@@ -201,9 +201,9 @@ public class Climate : SingletonComponent<Climate>
 	protected override void Awake()
 	{
 		base.Awake();
-		WeatherState = (ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset);
-		WeatherClamps = (ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset);
-		WeatherOverrides = (ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset);
+		WeatherState = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
+		WeatherClamps = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
+		WeatherOverrides = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
 		WeatherState.Reset();
 		WeatherClamps.Reset();
 		WeatherOverrides.Reset();
@@ -240,7 +240,7 @@ public class Climate : SingletonComponent<Climate>
 			long num3 = 216000000000L;
 			long num4 = num / num2;
 			WeatherStateBlend = Mathf.InverseLerp(0f, num3, num % num2);
-			uint seed = WeatherSeedPrevious = GetSeedFromLong(num4);
+			uint seed = (WeatherSeedPrevious = GetSeedFromLong(num4));
 			WeatherStatePrevious = GetWeatherPreset(seed);
 			seed = (WeatherSeedTarget = GetSeedFromLong(num4 + 1));
 			WeatherStateTarget = GetWeatherPreset(seed);
@@ -351,7 +351,7 @@ public class Climate : SingletonComponent<Climate>
 		{
 			return 0f;
 		}
-		float num = TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 3) : 0f;
+		float num = (TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 3) : 0f);
 		if (num <= 0f)
 		{
 			return 0f;
@@ -410,8 +410,8 @@ public class Climate : SingletonComponent<Climate>
 		{
 			return 0f;
 		}
-		float t = TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 1) : 0f;
-		float num = TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 8) : 0f;
+		float t = (TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 1) : 0f);
+		float num = (TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 8) : 0f);
 		return SingletonComponent<Climate>.Instance.WeatherState.Rain * Mathf.Lerp(1f, 0.5f, t) * (1f - num);
 	}
 
@@ -421,7 +421,7 @@ public class Climate : SingletonComponent<Climate>
 		{
 			return 0f;
 		}
-		float num = TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 8) : 0f;
+		float num = (TerrainMeta.BiomeMap ? TerrainMeta.BiomeMap.GetBiome(position, 8) : 0f);
 		return SingletonComponent<Climate>.Instance.WeatherState.Rain * num;
 	}
 

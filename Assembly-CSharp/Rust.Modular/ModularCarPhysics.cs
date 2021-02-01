@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Rust.Modular
@@ -221,8 +220,8 @@ namespace Rust.Modular
 					speedAngle = Vector3.Angle(rBody.velocity, transform.forward) * Mathf.Sign(Vector3.Dot(rBody.velocity, transform.right));
 					float maxDriveForce = modularCar.GetMaxDriveForce();
 					float maxForwardSpeed = modularCar.GetMaxForwardSpeed();
-					float num2 = modularCar.IsOn() ? modularCar.GetThrottleInput() : 0f;
-					float brakeInput = InSlowSpeedExitMode ? 1f : modularCar.GetBrakeInput();
+					float num2 = (modularCar.IsOn() ? modularCar.GetThrottleInput() : 0f);
+					float brakeInput = (InSlowSpeedExitMode ? 1f : modularCar.GetBrakeInput());
 					float num3 = 1f;
 					if (num < 3f)
 					{
@@ -243,11 +242,11 @@ namespace Rust.Modular
 						float a = modularCar.WaterFactor();
 						float b = 0f;
 						TriggerVehicleDrag result;
-						if (modularCar.FindTrigger(out result))
+						if (modularCar.FindTrigger<TriggerVehicleDrag>(out result))
 						{
 							b = result.vehicleDrag;
 						}
-						float a2 = (num2 != 0f) ? 0f : 0.25f;
+						float a2 = ((num2 != 0f) ? 0f : 0.25f);
 						float a3 = Mathf.Max(a, b);
 						a3 = Mathf.Max(a3, GetModifiedDrag());
 						rBody.drag = Mathf.Max(a2, a3);
@@ -473,8 +472,8 @@ namespace Rust.Modular
 		private void ComputeTireForces(ServerWheelData wd, float speed, float maxDriveForce, float maxSpeed, float throttleInput, float brakeInput, float driveForceMultiplier)
 		{
 			float absSpeed = Mathf.Abs(speed);
-			float num = wd.wheel.powerWheel ? throttleInput : 0f;
-			wd.hasThrottleInput = (num != 0f);
+			float num = (wd.wheel.powerWheel ? throttleInput : 0f);
+			wd.hasThrottleInput = num != 0f;
 			float num2 = vehicleSettings.maxDriveSlip;
 			if (Mathf.Sign(num) != Mathf.Sign(wd.localVelocity.y))
 			{
@@ -507,7 +506,7 @@ namespace Rust.Modular
 			{
 				wd.tireSlip.x = wd.localVelocity.x;
 				wd.tireSlip.y = wd.localVelocity.y - wd.angularVelocity * wd.wheelCollider.radius;
-				float num7 = modularCar.IsOnRoad() ? 1f : ((!modularCar.IsOnIce()) ? 0.75f : 0.25f);
+				float num7 = (modularCar.IsOnRoad() ? 1f : ((!modularCar.IsOnIce()) ? 0.75f : 0.25f));
 				float num8 = vehicleSettings.tireFriction * wd.downforce * num7;
 				float num9 = 0f;
 				if (!wd.isBraking)
@@ -572,7 +571,7 @@ namespace Rust.Modular
 
 		private float ComputeDriveForce(float speed, float absSpeed, float demandedForce, float maxForce, float maxForwardSpeed, float driveForceMultiplier)
 		{
-			float num = (speed >= 0f) ? maxForwardSpeed : (maxForwardSpeed * vehicleSettings.reversePercentSpeed);
+			float num = ((speed >= 0f) ? maxForwardSpeed : (maxForwardSpeed * vehicleSettings.reversePercentSpeed));
 			if (absSpeed < num)
 			{
 				if ((speed >= 0f || demandedForce <= 0f) && (speed <= 0f || demandedForce >= 0f))
@@ -642,25 +641,12 @@ namespace Rust.Modular
 		private Vector3 GetSidewaysForceAppPoint(ServerWheelData wd, Vector3 contactPoint)
 		{
 			Vector3 result = contactPoint + wd.wheelColliderTransform.up * wd.forceDistance;
-			float num = wd.wheel.steerWheel ? SteerAngle : 0f;
+			float num = (wd.wheel.steerWheel ? SteerAngle : 0f);
 			if (num != 0f && Mathf.Sign(num) != Mathf.Sign(wd.tireSlip.x))
 			{
 				result += wd.wheelColliderTransform.forward * midWheelPos * (vehicleSettings.handlingBias - 0.5f);
 			}
 			return result;
-		}
-
-		[CompilerGenerated]
-		private ServerWheelData _003C_002Ector_003Eg__AddWheel_007C42_0(ModularCar.Wheel wheel)
-		{
-			ServerWheelData serverWheelData = new ServerWheelData();
-			serverWheelData.wheelCollider = wheel.wheelCollider;
-			serverWheelData.wheelColliderTransform = wheel.wheelCollider.transform;
-			serverWheelData.forceDistance = GetWheelForceDistance(wheel.wheelCollider);
-			serverWheelData.wheel = wheel;
-			serverWheelData.wheelCollider.sidewaysFriction = zeroFriction;
-			serverWheelData.wheelCollider.forwardFriction = zeroFriction;
-			return serverWheelData;
 		}
 	}
 }

@@ -1,8 +1,8 @@
-using RustNative;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using RustNative;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -193,7 +193,7 @@ public class OcclusionCulling : MonoBehaviour
 			{
 				if (asyncRequests.Count < 10)
 				{
-					AsyncGPUReadbackRequest item = (!culling.usePixelShaderFallback) ? AsyncGPUReadback.Request(resultBuffer) : AsyncGPUReadback.Request(resultTexture);
+					AsyncGPUReadbackRequest item = ((!culling.usePixelShaderFallback) ? AsyncGPUReadback.Request(resultBuffer) : AsyncGPUReadback.Request(resultTexture));
 					asyncRequests.Enqueue(item);
 				}
 			}
@@ -493,7 +493,7 @@ public class OcclusionCulling : MonoBehaviour
 		{
 			if (array.Length < min)
 			{
-				int num = (array.Length == 0) ? 16 : (array.Length * 2);
+				int num = ((array.Length == 0) ? 16 : (array.Length * 2));
 				num = (Capacity = ((num < min) ? min : num));
 			}
 		}
@@ -626,7 +626,7 @@ public class OcclusionCulling : MonoBehaviour
 		{
 			if (list.Length < min)
 			{
-				int num = (list.Length == 0) ? 16 : (list.Length * 2);
+				int num = ((list.Length == 0) ? 16 : (list.Length * 2));
 				num = (Capacity = ((num < min) ? min : num));
 			}
 		}
@@ -1116,7 +1116,7 @@ public class OcclusionCulling : MonoBehaviour
 			{
 				RenderTexture renderTexture = hiZLevels[i - 1];
 				RenderTexture dest = hiZLevels[i];
-				int pass = ((renderTexture.width & 1) != 0 || (renderTexture.height & 1) != 0) ? 1 : 0;
+				int pass = ((((uint)renderTexture.width & (true ? 1u : 0u)) != 0 || ((uint)renderTexture.height & (true ? 1u : 0u)) != 0) ? 1 : 0);
 				downscaleMat.SetTexture("_MainTex", renderTexture);
 				UnityEngine.Graphics.Blit(renderTexture, dest, downscaleMat, pass);
 			}
@@ -1167,10 +1167,10 @@ public class OcclusionCulling : MonoBehaviour
 		int num4 = Mathf.Clamp(num, -1048575, 1048575);
 		int num5 = Mathf.Clamp(num2, -1048575, 1048575);
 		int num6 = Mathf.Clamp(num3, -1048575, 1048575);
-		long num7 = (num4 >= 0) ? num4 : (num4 + 1048575);
+		long num7 = ((num4 >= 0) ? num4 : (num4 + 1048575));
 		ulong num8 = (ulong)((num5 >= 0) ? num5 : (num5 + 1048575));
 		ulong num9 = (ulong)((num6 >= 0) ? num6 : (num6 + 1048575));
-		ulong key = (ulong)((num7 << 42) | (long)(num8 << 21) | (long)num9);
+		ulong key = (ulong)(num7 << 42) | (num8 << 21) | num9;
 		Cell value;
 		bool num10 = grid.TryGetValue(key, out value);
 		if (!num10)
@@ -1184,7 +1184,7 @@ public class OcclusionCulling : MonoBehaviour
 			Vector3 size = new Vector3(100f, 100f, 100f);
 			value = grid.Add(key).Initialize(num, num2, num3, new Bounds(center, size));
 		}
-		SmartList smartList = occludee.isStatic ? value.staticBucket : value.dynamicBucket;
+		SmartList smartList = (occludee.isStatic ? value.staticBucket : value.dynamicBucket);
 		if (!num10 || !smartList.Contains(occludee))
 		{
 			occludee.cell = value;
@@ -1209,7 +1209,7 @@ public class OcclusionCulling : MonoBehaviour
 	public static void UnregisterFromGrid(OccludeeState occludee)
 	{
 		Cell cell = occludee.cell;
-		SmartList obj = occludee.isStatic ? cell.staticBucket : cell.dynamicBucket;
+		SmartList obj = (occludee.isStatic ? cell.staticBucket : cell.dynamicBucket);
 		gridChanged.Enqueue(cell);
 		obj.Remove(occludee);
 		if (cell.staticBucket.Count == 0 && cell.dynamicBucket.Count == 0)
@@ -1289,13 +1289,13 @@ public class OcclusionCulling : MonoBehaviour
 		}
 		if (!Supported)
 		{
-			Debug.LogWarning("[OcclusionCulling] Disabled due to graphics device type " + SystemInfo.graphicsDeviceType + " not supported.");
+			Debug.LogWarning(string.Concat("[OcclusionCulling] Disabled due to graphics device type ", SystemInfo.graphicsDeviceType, " not supported."));
 			Enabled = false;
 			return;
 		}
-		usePixelShaderFallback = (usePixelShaderFallback || !SystemInfo.supportsComputeShaders || computeShader == null || !computeShader.HasKernel("compute_cull"));
-		useNativePath = (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11 && SupportsNativePath());
-		useAsyncReadAPI = (!useNativePath && SystemInfo.supportsAsyncGPUReadback);
+		usePixelShaderFallback = usePixelShaderFallback || !SystemInfo.supportsComputeShaders || computeShader == null || !computeShader.HasKernel("compute_cull");
+		useNativePath = SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11 && SupportsNativePath();
+		useAsyncReadAPI = !useNativePath && SystemInfo.supportsAsyncGPUReadback;
 		if (!useNativePath && !useAsyncReadAPI)
 		{
 			Debug.LogWarning("[OcclusionCulling] Disabled due to unsupported Async GPU Reads on device " + SystemInfo.graphicsDeviceType);
@@ -1453,7 +1453,7 @@ public class OcclusionCulling : MonoBehaviour
 		if (id >= 0 && id < 2097152)
 		{
 			bool num = id < 1048576;
-			int index = num ? id : (id - 1048576);
+			int index = (num ? id : (id - 1048576));
 			if (num)
 			{
 				return staticOccludees[index];
@@ -1467,7 +1467,7 @@ public class OcclusionCulling : MonoBehaviour
 	{
 		int num = -1;
 		num = ((!isStatic) ? RegisterOccludee(center, radius, isVisible, minTimeVisible, isStatic, layer, onVisibilityChanged, dynamicOccludees, dynamicStates, dynamicRecycled, dynamicChanged, dynamicSet, dynamicVisibilityChanged) : RegisterOccludee(center, radius, isVisible, minTimeVisible, isStatic, layer, onVisibilityChanged, staticOccludees, staticStates, staticRecycled, staticChanged, staticSet, staticVisibilityChanged));
-		if (!((num < 0) | isStatic))
+		if (!(num < 0 || isStatic))
 		{
 			return num + 1048576;
 		}
@@ -1497,7 +1497,7 @@ public class OcclusionCulling : MonoBehaviour
 		if (id >= 0 && id < 2097152)
 		{
 			bool num = id < 1048576;
-			int slot = num ? id : (id - 1048576);
+			int slot = (num ? id : (id - 1048576));
 			if (num)
 			{
 				UnregisterOccludee(slot, staticOccludees, staticRecycled, staticChanged);
@@ -1585,11 +1585,9 @@ public class OcclusionCulling : MonoBehaviour
 		if (grid.Size <= gridSet.resultData.Length)
 		{
 			RetrieveAndApplyVisibility();
+			return;
 		}
-		else
-		{
-			Debug.LogWarning("[OcclusionCulling] Grid size and result capacity are out of sync: " + grid.Size + ", " + gridSet.resultData.Length);
-		}
+		Debug.LogWarning("[OcclusionCulling] Grid size and result capacity are out of sync: " + grid.Size + ", " + gridSet.resultData.Length);
 	}
 
 	private void OnPostRender()
@@ -1739,7 +1737,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			if (!flag2)
 			{
-				flag2 = (time < value.waitTime);
+				flag2 = time < value.waitTime;
 			}
 			if (flag2 != (value.isVisible != 0))
 			{
@@ -1777,7 +1775,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			if (!flag2)
 			{
-				flag2 = (time < state.waitTime);
+				flag2 = time < state.waitTime;
 			}
 			if (flag2 != (state.isVisible != 0))
 			{
@@ -1812,7 +1810,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			bool flag = FrustumCull(frustumPlanes, cell.sphereBounds);
 			bool flag2 = gridSet.resultData[i].r > 0 && flag;
-			if (cell.isVisible | flag2)
+			if (cell.isVisible || flag2)
 			{
 				int num = 0;
 				int num2 = 0;
@@ -1824,7 +1822,7 @@ public class OcclusionCulling : MonoBehaviour
 				{
 					num2 = ProcessOccludees_Safe(dynamicStates, cell.dynamicBucket, dynamicSet.resultData, dynamicVisibilityChanged, frustumPlanes, time, frame);
 				}
-				cell.isVisible = (flag2 || num < cell.staticBucket.Count || num2 < cell.dynamicBucket.Count);
+				cell.isVisible = flag2 || num < cell.staticBucket.Count || num2 < cell.dynamicBucket.Count;
 			}
 		}
 	}
@@ -1842,7 +1840,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			bool flag = FrustumCull(frustumPlanes, cell.sphereBounds);
 			bool flag2 = gridSet.resultData[i].r > 0 && flag;
-			if (cell.isVisible | flag2)
+			if (cell.isVisible || flag2)
 			{
 				int num = 0;
 				int num2 = 0;
@@ -1854,7 +1852,7 @@ public class OcclusionCulling : MonoBehaviour
 				{
 					num2 = ProcessOccludees_Fast(dynamicStates.array, cell.dynamicBucket.Slots, cell.dynamicBucket.Size, dynamicSet.resultData, dynamicSet.resultData.Length, dynamicVisibilityChanged.array, ref dynamicVisibilityChanged.count, frustumPlanes, time, frame);
 				}
-				cell.isVisible = (flag2 || num < cell.staticBucket.Count || num2 < cell.dynamicBucket.Count);
+				cell.isVisible = flag2 || num < cell.staticBucket.Count || num2 < cell.dynamicBucket.Count;
 			}
 		}
 	}
@@ -1872,7 +1870,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			bool flag = FrustumCull(frustumPlanes, cell.sphereBounds);
 			bool flag2 = gridSet.resultData[i].r > 0 && flag;
-			if (cell.isVisible | flag2)
+			if (cell.isVisible || flag2)
 			{
 				int num = 0;
 				int num2 = 0;
@@ -1884,7 +1882,7 @@ public class OcclusionCulling : MonoBehaviour
 				{
 					num2 = ProcessOccludees_Native(ref dynamicStates.array[0], ref cell.dynamicBucket.Slots[0], cell.dynamicBucket.Size, ref dynamicSet.resultData[0], dynamicSet.resultData.Length, ref dynamicVisibilityChanged.array[0], ref dynamicVisibilityChanged.count, ref frustumPlanes[0], time, frame);
 				}
-				cell.isVisible = (flag2 || num < cell.staticBucket.Count || num2 < cell.dynamicBucket.Count);
+				cell.isVisible = flag2 || num < cell.staticBucket.Count || num2 < cell.dynamicBucket.Count;
 			}
 		}
 	}

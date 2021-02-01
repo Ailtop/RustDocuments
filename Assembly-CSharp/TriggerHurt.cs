@@ -1,5 +1,5 @@
-using Rust;
 using System.Linq;
+using Rust;
 using UnityEngine;
 
 public class TriggerHurt : TriggerBase

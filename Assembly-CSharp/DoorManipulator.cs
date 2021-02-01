@@ -1,5 +1,5 @@
-using Facepunch;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class DoorManipulator : IOEntity
@@ -66,22 +66,23 @@ public class DoorManipulator : IOEntity
 		float num = float.PositiveInfinity;
 		foreach (Door item in obj)
 		{
-			if (item.isServer)
+			if (!item.isServer)
 			{
-				if (!allowLocked)
+				continue;
+			}
+			if (!allowLocked)
+			{
+				BaseLock baseLock = item.GetSlot(Slot.Lock) as BaseLock;
+				if (baseLock != null && baseLock.IsLocked())
 				{
-					BaseLock baseLock = item.GetSlot(Slot.Lock) as BaseLock;
-					if (baseLock != null && baseLock.IsLocked())
-					{
-						continue;
-					}
+					continue;
 				}
-				float num2 = Vector3.Distance(item.transform.position, base.transform.position);
-				if (num2 < num)
-				{
-					result = item;
-					num = num2;
-				}
+			}
+			float num2 = Vector3.Distance(item.transform.position, base.transform.position);
+			if (num2 < num)
+			{
+				result = item;
+				num = num2;
 			}
 		}
 		Pool.FreeList(ref obj);

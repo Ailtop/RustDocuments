@@ -103,7 +103,7 @@ public class SimpleList<T>
 	{
 		if (array.Length < min)
 		{
-			int num = (array.Length == 0) ? 16 : (array.Length * 2);
+			int num = ((array.Length == 0) ? 16 : (array.Length * 2));
 			num = (Capacity = ((num < min) ? min : num));
 		}
 	}

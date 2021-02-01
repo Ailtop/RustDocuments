@@ -1,9 +1,9 @@
+using System.Collections.Generic;
 using CompanionServer;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RelationshipManager : BaseEntity
@@ -198,31 +198,33 @@ public class RelationshipManager : BaseEntity
 		base.Save(info);
 		info.msg.relationshipManager = Pool.Get<ProtoBuf.RelationshipManager>();
 		info.msg.relationshipManager.maxTeamSize = maxTeamSize;
-		if (info.forDisk)
+		if (!info.forDisk)
 		{
-			info.msg.relationshipManager.lastTeamIndex = lastTeamIndex;
-			info.msg.relationshipManager.teamList = Pool.GetList<ProtoBuf.PlayerTeam>();
-			foreach (KeyValuePair<ulong, PlayerTeam> team in teams)
+			return;
+		}
+		info.msg.relationshipManager.lastTeamIndex = lastTeamIndex;
+		info.msg.relationshipManager.teamList = Pool.GetList<ProtoBuf.PlayerTeam>();
+		foreach (KeyValuePair<ulong, PlayerTeam> team in teams)
+		{
+			PlayerTeam value = team.Value;
+			if (value == null)
 			{
-				PlayerTeam value = team.Value;
-				if (value != null)
-				{
-					ProtoBuf.PlayerTeam playerTeam = Pool.Get<ProtoBuf.PlayerTeam>();
-					playerTeam.teamLeader = value.teamLeader;
-					playerTeam.teamID = value.teamID;
-					playerTeam.teamName = value.teamName;
-					playerTeam.members = Pool.GetList<ProtoBuf.PlayerTeam.TeamMember>();
-					foreach (ulong member in value.members)
-					{
-						ProtoBuf.PlayerTeam.TeamMember teamMember = Pool.Get<ProtoBuf.PlayerTeam.TeamMember>();
-						BasePlayer basePlayer = FindByID(member);
-						teamMember.displayName = ((basePlayer != null) ? basePlayer.displayName : (SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(member) ?? "DEAD"));
-						teamMember.userID = member;
-						playerTeam.members.Add(teamMember);
-					}
-					info.msg.relationshipManager.teamList.Add(playerTeam);
-				}
+				continue;
 			}
+			ProtoBuf.PlayerTeam playerTeam = Pool.Get<ProtoBuf.PlayerTeam>();
+			playerTeam.teamLeader = value.teamLeader;
+			playerTeam.teamID = value.teamID;
+			playerTeam.teamName = value.teamName;
+			playerTeam.members = Pool.GetList<ProtoBuf.PlayerTeam.TeamMember>();
+			foreach (ulong member in value.members)
+			{
+				ProtoBuf.PlayerTeam.TeamMember teamMember = Pool.Get<ProtoBuf.PlayerTeam.TeamMember>();
+				BasePlayer basePlayer = FindByID(member);
+				teamMember.displayName = ((basePlayer != null) ? basePlayer.displayName : (SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(member) ?? "DEAD"));
+				teamMember.userID = member;
+				playerTeam.members.Add(teamMember);
+			}
+			info.msg.relationshipManager.teamList.Add(playerTeam);
 		}
 	}
 
@@ -506,33 +508,34 @@ public class RelationshipManager : BaseEntity
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.fromDisk && info.msg.relationshipManager != null)
+		if (!info.fromDisk || info.msg.relationshipManager == null)
 		{
-			lastTeamIndex = info.msg.relationshipManager.lastTeamIndex;
-			foreach (ProtoBuf.PlayerTeam team in info.msg.relationshipManager.teamList)
+			return;
+		}
+		lastTeamIndex = info.msg.relationshipManager.lastTeamIndex;
+		foreach (ProtoBuf.PlayerTeam team in info.msg.relationshipManager.teamList)
+		{
+			PlayerTeam playerTeam = Pool.Get<PlayerTeam>();
+			playerTeam.teamLeader = team.teamLeader;
+			playerTeam.teamID = team.teamID;
+			playerTeam.teamName = team.teamName;
+			playerTeam.members = new List<ulong>();
+			foreach (ProtoBuf.PlayerTeam.TeamMember member in team.members)
 			{
-				PlayerTeam playerTeam = Pool.Get<PlayerTeam>();
-				playerTeam.teamLeader = team.teamLeader;
-				playerTeam.teamID = team.teamID;
-				playerTeam.teamName = team.teamName;
-				playerTeam.members = new List<ulong>();
-				foreach (ProtoBuf.PlayerTeam.TeamMember member in team.members)
-				{
-					playerTeam.members.Add(member.userID);
-				}
-				teams[playerTeam.teamID] = playerTeam;
+				playerTeam.members.Add(member.userID);
 			}
-			foreach (PlayerTeam value in teams.Values)
+			teams[playerTeam.teamID] = playerTeam;
+		}
+		foreach (PlayerTeam value in teams.Values)
+		{
+			foreach (ulong member2 in value.members)
 			{
-				foreach (ulong member2 in value.members)
+				playerToTeam[member2] = value;
+				BasePlayer basePlayer = FindByID(member2);
+				if (basePlayer != null && basePlayer.currentTeam != value.teamID)
 				{
-					playerToTeam[member2] = value;
-					BasePlayer basePlayer = FindByID(member2);
-					if (basePlayer != null && basePlayer.currentTeam != value.teamID)
-					{
-						Debug.LogWarning($"Player {member2} has the wrong teamID: got {basePlayer.currentTeam}, expected {value.teamID}. Fixing automatically.");
-						basePlayer.currentTeam = value.teamID;
-					}
+					Debug.LogWarning($"Player {member2} has the wrong teamID: got {basePlayer.currentTeam}, expected {value.teamID}. Fixing automatically.");
+					basePlayer.currentTeam = value.teamID;
 				}
 			}
 		}

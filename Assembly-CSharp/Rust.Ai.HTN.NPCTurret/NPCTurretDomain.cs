@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.AI.Components;
 using Apex.Ai.HTN;
@@ -7,9 +10,6 @@ using Rust.Ai.HTN.NPCTurret.Reasoners;
 using Rust.Ai.HTN.NPCTurret.Sensors;
 using Rust.Ai.HTN.Reasoning;
 using Rust.Ai.HTN.Sensors;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -385,7 +385,7 @@ namespace Rust.Ai.HTN.NPCTurret
 
 			public override float Score(NPCTurretContext c)
 			{
-				byte b = (byte)(Value ? 1 : 0);
+				byte b = (byte)(Value ? 1u : 0u);
 				if (c.GetWorldState(Fact) != b)
 				{
 					return 0f;
@@ -807,7 +807,7 @@ namespace Rust.Ai.HTN.NPCTurret
 		{
 			_isFiring = true;
 			_lastFirearmUsageTime = startTime + triggerDownInterval + proj.attackSpacing;
-			float damageModifier = BurstAtLongRange ? 0.75f : 1f;
+			float damageModifier = (BurstAtLongRange ? 0.75f : 1f);
 			while (UnityEngine.Time.time - startTime < triggerDownInterval && _context.IsBodyAlive() && _context.IsFact(Facts.CanSeeEnemy))
 			{
 				proj.ServerUse(ConVar.AI.npc_htn_player_base_damage_modifier * damageModifier);
@@ -980,7 +980,7 @@ namespace Rust.Ai.HTN.NPCTurret
 			}
 			Vector3 vector = target + missOffset - origin;
 			float num = Mathf.Max(missToHeadingAlignmentTime - time, 0f);
-			float num2 = Mathf.Approximately(num, 0f) ? 1f : (1f - Mathf.Min(num / maxTime, 1f));
+			float num2 = (Mathf.Approximately(num, 0f) ? 1f : (1f - Mathf.Min(num / maxTime, 1f)));
 			if (Mathf.Approximately(num2, 1f))
 			{
 				recalculateMissOffset = true;
@@ -1055,31 +1055,32 @@ namespace Rust.Ai.HTN.NPCTurret
 		private void OnGunshotSensation(ref Sensation info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberGunshot(ref info, item, initiatorPlayer))
 				{
-					if (RememberGunshot(ref info, item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null || _context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == initiatorPlayer)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null || _context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == initiatorPlayer)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
-				}
-				if (!flag)
-				{
 					_context.IncrementFact(Facts.Alertness, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Alertness, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
+				{
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 
@@ -1091,52 +1092,54 @@ namespace Rust.Ai.HTN.NPCTurret
 				return;
 			}
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberThrownItem(ref info, item, initiatorPlayer))
 				{
-					if (RememberThrownItem(ref info, item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
+					_context.IncrementFact(Facts.Alertness, 1);
+					flag = true;
+					break;
 				}
-				if (!flag)
+			}
+			if (!flag)
+			{
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
 				{
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
-				}
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 
 		private void OnExplosionSensation(ref Sensation info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
-				{
-					if (RememberExplosion(ref info, item, initiatorPlayer))
-					{
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
-					}
-				}
-				if (!flag)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberExplosion(ref info, item, initiatorPlayer))
 				{
 					_context.IncrementFact(Facts.Alertness, 1);
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Alertness, 1);
 			}
 		}
 
@@ -1224,31 +1227,32 @@ namespace Rust.Ai.HTN.NPCTurret
 		public override void OnHurt(HitInfo info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberPlayerThatHurtUs(item, initiatorPlayer))
 				{
-					if (RememberPlayerThatHurtUs(item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
-				}
-				if (!flag)
-				{
 					_context.IncrementFact(Facts.Alertness, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Alertness, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
+				{
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 

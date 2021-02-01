@@ -1,4 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.AI.Components;
 using Apex.LoadBalancing;
@@ -9,9 +12,6 @@ using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.Ai;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Assertions;
@@ -732,32 +732,33 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public void TickAi()
 	{
-		if (AI.think)
+		if (!AI.think)
 		{
-			if (TerrainMeta.WaterMap != null)
+			return;
+		}
+		if (TerrainMeta.WaterMap != null)
+		{
+			waterDepth = TerrainMeta.WaterMap.GetDepth(ServerPosition);
+			wasSwimming = swimming;
+			swimming = waterDepth > Stats.WaterLevelNeck * 0.25f;
+		}
+		else
+		{
+			wasSwimming = false;
+			swimming = false;
+			waterDepth = 0f;
+		}
+		using (TimeWarning.New("TickNavigation"))
+		{
+			TickNavigation();
+		}
+		if (!AiManager.ai_dormant || GetNavAgent.enabled)
+		{
+			using (TimeWarning.New("TickMetabolism"))
 			{
-				waterDepth = TerrainMeta.WaterMap.GetDepth(ServerPosition);
-				wasSwimming = swimming;
-				swimming = (waterDepth > Stats.WaterLevelNeck * 0.25f);
-			}
-			else
-			{
-				wasSwimming = false;
-				swimming = false;
-				waterDepth = 0f;
-			}
-			using (TimeWarning.New("TickNavigation"))
-			{
-				TickNavigation();
-			}
-			if (!AiManager.ai_dormant || GetNavAgent.enabled)
-			{
-				using (TimeWarning.New("TickMetabolism"))
-				{
-					TickSleep();
-					TickMetabolism();
-					TickSpeed();
-				}
+				TickSleep();
+				TickMetabolism();
+				TickSpeed();
 			}
 		}
 	}
@@ -1079,7 +1080,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 	{
 		if (!ValidBounds.Test(moveToPosition) && base.transform != null && !base.IsDestroyed)
 		{
-			Debug.Log("Invalid NavAgent Position: " + this + " " + moveToPosition + " (destroying)");
+			Debug.Log(string.Concat("Invalid NavAgent Position: ", this, " ", moveToPosition, " (destroying)"));
 			Kill();
 			return false;
 		}
@@ -1143,7 +1144,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 		if (_traversingNavMeshLink)
 		{
-			Vector3 vector = (ChaseTransform != null) ? (ChaseTransform.localPosition - ServerPosition) : ((!(AttackTarget != null)) ? (NavAgent.destination - ServerPosition) : (AttackTarget.ServerPosition - ServerPosition));
+			Vector3 vector = ((ChaseTransform != null) ? (ChaseTransform.localPosition - ServerPosition) : ((!(AttackTarget != null)) ? (NavAgent.destination - ServerPosition) : (AttackTarget.ServerPosition - ServerPosition)));
 			if (vector.sqrMagnitude > 1f)
 			{
 				vector = _currentNavMeshLinkEndPos - ServerPosition;
@@ -1296,7 +1297,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			}
 		}
 		bool flag = UnityEngine.Random.value < Stats.HealthThresholdFleeChance;
-		SetFact(Facts.IsUnderHealthThreshold, (byte)(flag ? 1 : 0));
+		SetFact(Facts.IsUnderHealthThreshold, (byte)(flag ? 1u : 0u));
 		return flag;
 	}
 
@@ -1400,7 +1401,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 		if (GetFact(Facts.IsAggro) == 0 && (range == EnemyRangeEnum.AggroRange || range == EnemyRangeEnum.AttackRange))
 		{
-			float a = (range == EnemyRangeEnum.AttackRange) ? 1f : Stats.Defensiveness;
+			float a = ((range == EnemyRangeEnum.AttackRange) ? 1f : Stats.Defensiveness);
 			a = Mathf.Max(a, Stats.Hostility);
 			if (UnityEngine.Time.realtimeSinceStartup > lastAggroChanceCalcTime + 5f)
 			{
@@ -1432,7 +1433,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		bool triggerCallback = true;
 		if (float.IsInfinity(base.SecondsSinceDealtDamage))
 		{
-			flag = (UnityEngine.Time.realtimeSinceStartup > aggroTimeout);
+			flag = UnityEngine.Time.realtimeSinceStartup > aggroTimeout;
 		}
 		else
 		{
@@ -1883,21 +1884,22 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		float num3 = 0f;
 		foreach (BasePlayer player in AiContext.Players)
 		{
-			if (!player.IsDead() && !player.IsDestroyed && (!(blockTargetingThisEnemy != null) || player.net == null || blockTargetingThisEnemy.net == null || player.net.ID != blockTargetingThisEnemy.net.ID) && !(player.currentSafeLevel > 0f))
+			if (player.IsDead() || player.IsDestroyed || (blockTargetingThisEnemy != null && player.net != null && blockTargetingThisEnemy.net != null && player.net.ID == blockTargetingThisEnemy.net.ID) || player.currentSafeLevel > 0f)
 			{
-				Vector3 vector2 = player.ServerPosition - ServerPosition;
-				float sqrMagnitude = vector2.sqrMagnitude;
-				num2 += Mathf.Min(Mathf.Sqrt(sqrMagnitude), Stats.VisionRange) / Stats.VisionRange;
-				if (sqrMagnitude < num)
+				continue;
+			}
+			Vector3 vector2 = player.ServerPosition - ServerPosition;
+			float sqrMagnitude = vector2.sqrMagnitude;
+			num2 += Mathf.Min(Mathf.Sqrt(sqrMagnitude), Stats.VisionRange) / Stats.VisionRange;
+			if (sqrMagnitude < num)
+			{
+				num = sqrMagnitude;
+				basePlayer = player;
+				baseNpc = null;
+				vector = vector2;
+				if (num <= AttackRange)
 				{
-					num = sqrMagnitude;
-					basePlayer = player;
-					baseNpc = null;
-					vector = vector2;
-					if (num <= AttackRange)
-					{
-						break;
-					}
+					break;
 				}
 			}
 		}
@@ -1905,21 +1907,22 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		{
 			foreach (BaseNpc npc in AiContext.Npcs)
 			{
-				if (!npc.IsDead() && !npc.IsDestroyed && Stats.Family != npc.Stats.Family)
+				if (npc.IsDead() || npc.IsDestroyed || Stats.Family == npc.Stats.Family)
 				{
-					Vector3 vector3 = npc.ServerPosition - ServerPosition;
-					float sqrMagnitude2 = vector3.sqrMagnitude;
-					num3 += Mathf.Min(Mathf.Sqrt(sqrMagnitude2), Stats.VisionRange) / Stats.VisionRange;
-					if (sqrMagnitude2 < num)
+					continue;
+				}
+				Vector3 vector3 = npc.ServerPosition - ServerPosition;
+				float sqrMagnitude2 = vector3.sqrMagnitude;
+				num3 += Mathf.Min(Mathf.Sqrt(sqrMagnitude2), Stats.VisionRange) / Stats.VisionRange;
+				if (sqrMagnitude2 < num)
+				{
+					num = sqrMagnitude2;
+					baseNpc = npc;
+					basePlayer = null;
+					vector = vector3;
+					if (num < AttackRange)
 					{
-						num = sqrMagnitude2;
-						baseNpc = npc;
-						basePlayer = null;
-						vector = vector3;
-						if (num < AttackRange)
-						{
-							break;
-						}
+						break;
 					}
 				}
 			}
@@ -2043,20 +2046,21 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		bool flag = false;
 		foreach (BaseEntity item in AiContext.Memory.Visible)
 		{
-			if (!item.IsDestroyed && WantsToEat(item))
+			if (item.IsDestroyed || !WantsToEat(item))
 			{
-				Vector3 vector2 = item.ServerPosition - ServerPosition;
-				float sqrMagnitude = vector2.sqrMagnitude;
-				if (sqrMagnitude < num)
+				continue;
+			}
+			Vector3 vector2 = item.ServerPosition - ServerPosition;
+			float sqrMagnitude = vector2.sqrMagnitude;
+			if (sqrMagnitude < num)
+			{
+				num = sqrMagnitude;
+				FoodTarget = item;
+				vector = vector2;
+				flag = true;
+				if (num <= 0.1f)
 				{
-					num = sqrMagnitude;
-					FoodTarget = item;
-					vector = vector2;
-					flag = true;
-					if (num <= 0.1f)
-					{
-						break;
-					}
+					break;
 				}
 			}
 		}
@@ -2076,11 +2080,11 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 	{
 		SetFact(Facts.Health, (byte)ToHealthEnum(base.healthFraction));
 		SetFact(Facts.IsTired, ToIsTired(Sleep));
-		SetFact(Facts.IsAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= nextAttackTime) ? 1 : 0));
-		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1 : 0));
+		SetFact(Facts.IsAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= nextAttackTime) ? 1u : 0u));
+		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1u : 0u));
 		SetFact(Facts.Speed, (byte)ToSpeedEnum(TargetSpeed / Stats.Speed));
-		SetFact(Facts.IsHungry, (byte)((Energy.Level < 0.25f) ? 1 : 0));
-		SetFact(Facts.AttackedLately, (byte)((!float.IsNegativeInfinity(base.SecondsSinceAttacked) && base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1 : 0));
+		SetFact(Facts.IsHungry, (byte)((Energy.Level < 0.25f) ? 1u : 0u));
+		SetFact(Facts.AttackedLately, (byte)((!float.IsNegativeInfinity(base.SecondsSinceAttacked) && base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1u : 0u));
 		SetFact(Facts.IsMoving, IsMoving());
 		if (CheckHealthThresholdToFlee() || IsAfraid())
 		{
@@ -2090,7 +2094,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private byte IsMoving()
 	{
-		return (byte)((IsNavRunning() && NavAgent.hasPath && NavAgent.remainingDistance > NavAgent.stoppingDistance && !IsStuck && GetFact(Facts.Speed) != 0) ? 1 : 0);
+		return (byte)((IsNavRunning() && NavAgent.hasPath && NavAgent.remainingDistance > NavAgent.stoppingDistance && !IsStuck && GetFact(Facts.Speed) != 0) ? 1u : 0u);
 	}
 
 	private static bool AiCaresAbout(BaseEntity ent)

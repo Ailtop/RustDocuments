@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -37,7 +37,7 @@ public class PowerCounter : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SERVER_SetTarget ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SERVER_SetTarget "));
 				}
 				using (TimeWarning.New("SERVER_SetTarget"))
 				{
@@ -73,7 +73,7 @@ public class PowerCounter : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ToggleDisplayMode ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ToggleDisplayMode "));
 				}
 				using (TimeWarning.New("ToggleDisplayMode"))
 				{

@@ -42,7 +42,7 @@ public class GenerateCliffTopology : ProceduralComponent
 			{
 				topologyMap.AddTopology(x, z, 2);
 			}
-			else if (!keepExisting && slope < 20f && splat < 0.2f && (topology & 0xD800) != 0)
+			else if (!keepExisting && slope < 20f && splat < 0.2f && ((uint)topology & 0xD800u) != 0)
 			{
 				topologyMap.RemoveTopology(x, z, 2);
 			}

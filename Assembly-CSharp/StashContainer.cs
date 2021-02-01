@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -35,7 +35,7 @@ public class StashContainer : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_HideStash ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_HideStash "));
 				}
 				using (TimeWarning.New("RPC_HideStash"))
 				{
@@ -71,7 +71,7 @@ public class StashContainer : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_WantsUnhide ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsUnhide "));
 				}
 				using (TimeWarning.New("RPC_WantsUnhide"))
 				{

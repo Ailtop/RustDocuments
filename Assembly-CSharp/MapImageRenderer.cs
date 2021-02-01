@@ -5,7 +5,7 @@ using UnityEngine;
 public static class MapImageRenderer
 {
 	[IsReadOnly]
-	private readonly struct Array2D<T>
+	private struct Array2D<T>
 	{
 		private readonly T[] _items;
 
@@ -67,6 +67,7 @@ public static class MapImageRenderer
 
 	public static byte[] Render(out int imageWidth, out int imageHeight, out Color background, float scale = 0.5f, bool lossy = true)
 	{
+		_003C_003Ec__DisplayClass17_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass17_0();
 		imageWidth = 0;
 		imageHeight = 0;
 		background = OffShoreColor;
@@ -77,31 +78,30 @@ public static class MapImageRenderer
 		}
 		Terrain component = instance.GetComponent<Terrain>();
 		TerrainMeta component2 = instance.GetComponent<TerrainMeta>();
-		TerrainHeightMap terrainHeightMap = instance.GetComponent<TerrainHeightMap>();
-		TerrainSplatMap terrainSplatMap = instance.GetComponent<TerrainSplatMap>();
-		if (component == null || component2 == null || terrainHeightMap == null || terrainSplatMap == null)
+		CS_0024_003C_003E8__locals0.terrainHeightMap = instance.GetComponent<TerrainHeightMap>();
+		CS_0024_003C_003E8__locals0.terrainSplatMap = instance.GetComponent<TerrainSplatMap>();
+		if (component == null || component2 == null || CS_0024_003C_003E8__locals0.terrainHeightMap == null || CS_0024_003C_003E8__locals0.terrainSplatMap == null)
 		{
 			return null;
 		}
-		int mapRes = (int)((float)(double)World.Size * Mathf.Clamp(scale, 0.1f, 4f));
-		float invMapRes = 1f / (float)mapRes;
-		if (mapRes <= 0)
+		CS_0024_003C_003E8__locals0.mapRes = (int)((float)World.Size * Mathf.Clamp(scale, 0.1f, 4f));
+		CS_0024_003C_003E8__locals0.invMapRes = 1f / (float)CS_0024_003C_003E8__locals0.mapRes;
+		if (CS_0024_003C_003E8__locals0.mapRes <= 0)
 		{
 			return null;
 		}
-		imageWidth = mapRes + 1000;
-		imageHeight = mapRes + 1000;
+		imageWidth = CS_0024_003C_003E8__locals0.mapRes + 1000;
+		imageHeight = CS_0024_003C_003E8__locals0.mapRes + 1000;
 		Color[] array = new Color[imageWidth * imageHeight];
-		Array2D<Color> output = new Array2D<Color>(array, imageWidth, imageHeight);
-		_003C_003Ec__DisplayClass17_0 CS_0024_003C_003E8__locals0;
+		CS_0024_003C_003E8__locals0.output = new Array2D<Color>(array, imageWidth, imageHeight);
 		Parallel.For(0, imageHeight, delegate(int y)
 		{
 			y -= 500;
-			float y2 = (float)y * invMapRes;
-			int num = mapRes + 500;
+			float y2 = (float)y * CS_0024_003C_003E8__locals0.invMapRes;
+			int num = CS_0024_003C_003E8__locals0.mapRes + 500;
 			for (int i = -500; i < num; i++)
 			{
-				float x = (float)i * invMapRes;
+				float x = (float)i * CS_0024_003C_003E8__locals0.invMapRes;
 				Vector3 startColor = StartColor;
 				float num2 = CS_0024_003C_003E8__locals0._003CRender_003Eg__GetHeight_007C0(x, y2);
 				float num3 = Math.Max(Vector3.Dot(CS_0024_003C_003E8__locals0._003CRender_003Eg__GetNormal_007C1(x, y2), SunDirection), 0f);
@@ -123,10 +123,10 @@ public static class MapImageRenderer
 				startColor += (num3 - 0.5f) * 0.65f * startColor;
 				startColor = (startColor - Half) * 0.94f + Half;
 				startColor *= 1.05f;
-				output[i + 500, y + 500] = new Color(startColor.x, startColor.y, startColor.z);
+				CS_0024_003C_003E8__locals0.output[i + 500, y + 500] = new Color(startColor.x, startColor.y, startColor.z);
 			}
 		});
-		background = output[0, 0];
+		background = CS_0024_003C_003E8__locals0.output[0, 0];
 		return EncodeToFile(imageWidth, imageHeight, array, lossy);
 	}
 

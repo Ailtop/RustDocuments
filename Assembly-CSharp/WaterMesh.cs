@@ -168,11 +168,11 @@ public class WaterMesh
 			{
 				bool num21 = num20 % resolution == 0;
 				int num22 = num14;
-				int num23 = num21 ? (num15 - num4) : num15;
+				int num23 = (num21 ? (num15 - num4) : num15);
 				int num24 = num16;
 				int num25 = num17;
 				int num26 = num18;
-				int num27 = num21 ? (num19 + num4) : num19;
+				int num27 = (num21 ? (num19 + num4) : num19);
 				if (num23 >= num13)
 				{
 					num23 = num12;
@@ -346,7 +346,7 @@ public class WaterMesh
 						array4[num22++] = num29;
 						array4[num22++] = num28;
 					}
-					flag = ((num27 + 1) % (num13 - 1) == 0);
+					flag = (num27 + 1) % (num13 - 1) == 0;
 					if (flag)
 					{
 						num24++;

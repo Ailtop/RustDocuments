@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -71,7 +71,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AnswerPhone ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AnswerPhone "));
 				}
 				using (TimeWarning.New("AnswerPhone"))
 				{
@@ -107,7 +107,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ClearCurrentUser ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClearCurrentUser "));
 				}
 				using (TimeWarning.New("ClearCurrentUser"))
 				{
@@ -143,7 +143,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - InitiateCall ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - InitiateCall "));
 				}
 				using (TimeWarning.New("InitiateCall"))
 				{
@@ -179,7 +179,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_AddSavedNumber ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_AddSavedNumber "));
 				}
 				using (TimeWarning.New("Server_AddSavedNumber"))
 				{
@@ -219,7 +219,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_RemoveSavedNumber ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RemoveSavedNumber "));
 				}
 				using (TimeWarning.New("Server_RemoveSavedNumber"))
 				{
@@ -259,7 +259,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_RequestPhoneDirectory ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestPhoneDirectory "));
 				}
 				using (TimeWarning.New("Server_RequestPhoneDirectory"))
 				{
@@ -299,7 +299,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ServerHangUp ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerHangUp "));
 				}
 				using (TimeWarning.New("ServerHangUp"))
 				{
@@ -328,7 +328,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetCurrentUser ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetCurrentUser "));
 				}
 				using (TimeWarning.New("SetCurrentUser"))
 				{
@@ -364,7 +364,7 @@ public class Telephone : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UpdatePhoneName ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdatePhoneName "));
 				}
 				using (TimeWarning.New("UpdatePhoneName"))
 				{

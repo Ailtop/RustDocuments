@@ -1,5 +1,5 @@
-using Rust.Ai;
 using System.Collections.Generic;
+using Rust.Ai;
 using UnityEngine;
 
 public class SmokeGrenade : TimedExplosive
@@ -49,7 +49,7 @@ public class SmokeGrenade : TimedExplosive
 				sensation.Position = creatorEntity.transform.position;
 				sensation.Radius = explosionRadius * 17f;
 				sensation.DamagePotential = 0f;
-				sensation.InitiatorPlayer = (creatorEntity as BasePlayer);
+				sensation.InitiatorPlayer = creatorEntity as BasePlayer;
 				sensation.Initiator = creatorEntity;
 				Sense.Stimulate(sensation);
 			}

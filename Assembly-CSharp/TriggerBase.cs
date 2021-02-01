@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Oxide.Core;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class TriggerBase : BaseMonoBehaviour
@@ -83,26 +83,27 @@ public class TriggerBase : BaseMonoBehaviour
 			return;
 		}
 		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
-		if ((bool)baseEntity)
+		if (!baseEntity)
 		{
-			bool flag = false;
-			foreach (GameObject content in contents)
+			return;
+		}
+		bool flag = false;
+		foreach (GameObject content in contents)
+		{
+			if (content == null)
 			{
-				if (content == null)
-				{
-					Debug.LogWarning("Trigger " + ToString() + " contains null object.");
-				}
-				else if (GameObjectEx.ToBaseEntity(content) == baseEntity)
-				{
-					flag = true;
-					break;
-				}
+				Debug.LogWarning("Trigger " + ToString() + " contains null object.");
 			}
-			if (!flag)
+			else if (GameObjectEx.ToBaseEntity(content) == baseEntity)
 			{
-				baseEntity.LeaveTrigger(this);
-				OnEntityLeave(baseEntity);
+				flag = true;
+				break;
 			}
+		}
+		if (!flag)
+		{
+			baseEntity.LeaveTrigger(this);
+			OnEntityLeave(baseEntity);
 		}
 	}
 
@@ -113,47 +114,49 @@ public class TriggerBase : BaseMonoBehaviour
 			return;
 		}
 		Collider component = GetComponent<Collider>();
-		if (!(component == null))
+		if (component == null)
 		{
-			Bounds bounds = component.bounds;
-			bounds.Expand(1f);
-			List<BaseEntity> obj = null;
-			foreach (BaseEntity entityContent in entityContents)
+			return;
+		}
+		Bounds bounds = component.bounds;
+		bounds.Expand(1f);
+		List<BaseEntity> obj = null;
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if (entityContent == null)
 			{
-				if (entityContent == null)
+				if (Debugging.checktriggers)
 				{
-					if (Debugging.checktriggers)
-					{
-						Debug.LogWarning("Trigger " + ToString() + " contains destroyed entity.");
-					}
-					if (obj == null)
-					{
-						obj = Facepunch.Pool.GetList<BaseEntity>();
-					}
-					obj.Add(entityContent);
+					Debug.LogWarning("Trigger " + ToString() + " contains destroyed entity.");
 				}
-				else if (!bounds.Contains(entityContent.ClosestPoint(base.transform.position)))
+				if (obj == null)
 				{
-					if (Debugging.checktriggers)
-					{
-						Debug.LogWarning("Trigger " + ToString() + " contains entity that is too far away: " + entityContent.ToString());
-					}
-					if (obj == null)
-					{
-						obj = Facepunch.Pool.GetList<BaseEntity>();
-					}
-					obj.Add(entityContent);
+					obj = Facepunch.Pool.GetList<BaseEntity>();
 				}
+				obj.Add(entityContent);
 			}
-			if (obj != null)
+			else if (!bounds.Contains(entityContent.ClosestPoint(base.transform.position)))
 			{
-				foreach (BaseEntity item in obj)
+				if (Debugging.checktriggers)
 				{
-					RemoveEntity(item);
+					Debug.LogWarning("Trigger " + ToString() + " contains entity that is too far away: " + entityContent.ToString());
 				}
-				Facepunch.Pool.FreeList(ref obj);
+				if (obj == null)
+				{
+					obj = Facepunch.Pool.GetList<BaseEntity>();
+				}
+				obj.Add(entityContent);
 			}
 		}
+		if (obj == null)
+		{
+			return;
+		}
+		foreach (BaseEntity item in obj)
+		{
+			RemoveEntity(item);
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	internal bool CheckEntity(BaseEntity ent)
@@ -196,55 +199,57 @@ public class TriggerBase : BaseMonoBehaviour
 
 	public void RemoveEntity(BaseEntity ent)
 	{
-		if (!(this == null) && contents != null && !(ent == null))
+		if (this == null || contents == null || ent == null)
 		{
-			List<GameObject> obj = Facepunch.Pool.GetList<GameObject>();
-			foreach (GameObject content in contents)
-			{
-				if (content != null && content.GetComponentInParent<BaseEntity>() == ent)
-				{
-					obj.Add(content);
-				}
-			}
-			foreach (GameObject item in obj)
-			{
-				OnTriggerExit(item);
-			}
-			Facepunch.Pool.FreeList(ref obj);
+			return;
 		}
+		List<GameObject> obj = Facepunch.Pool.GetList<GameObject>();
+		foreach (GameObject content in contents)
+		{
+			if (content != null && content.GetComponentInParent<BaseEntity>() == ent)
+			{
+				obj.Add(content);
+			}
+		}
+		foreach (GameObject item in obj)
+		{
+			OnTriggerExit(item);
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public void OnTriggerEnter(Collider collider)
 	{
-		if (!(this == null))
+		if (this == null)
 		{
-			using (TimeWarning.New("TriggerBase.OnTriggerEnter"))
+			return;
+		}
+		using (TimeWarning.New("TriggerBase.OnTriggerEnter"))
+		{
+			GameObject gameObject = InterestedInObject(collider.gameObject);
+			if (gameObject == null)
 			{
-				GameObject gameObject = InterestedInObject(collider.gameObject);
-				if (gameObject == null)
-				{
-					return;
-				}
-				if (contents == null)
-				{
-					contents = new HashSet<GameObject>();
-				}
-				if (contents.Contains(gameObject))
-				{
-					return;
-				}
-				int count = contents.Count;
-				contents.Add(gameObject);
-				OnObjectAdded(gameObject);
-				if (count == 0 && contents.Count == 1)
-				{
-					OnObjects();
-				}
+				return;
 			}
-			if (Debugging.checktriggers)
+			if (contents == null)
 			{
-				RemoveInvalidEntities();
+				contents = new HashSet<GameObject>();
 			}
+			if (contents.Contains(gameObject))
+			{
+				return;
+			}
+			int count = contents.Count;
+			contents.Add(gameObject);
+			OnObjectAdded(gameObject);
+			if (count == 0 && contents.Count == 1)
+			{
+				OnObjects();
+			}
+		}
+		if (Debugging.checktriggers)
+		{
+			RemoveInvalidEntities();
 		}
 	}
 

@@ -12,8 +12,8 @@ public class TerrainGenerator : SingletonComponent<TerrainGenerator>
 
 	public GameObject CreateTerrain()
 	{
-		int heightmapResolution = Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)(double)World.Size * 0.5f))) + 1;
-		int alphamapResolution = Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)(double)World.Size * 0.5f)));
+		int heightmapResolution = Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)World.Size * 0.5f))) + 1;
+		int alphamapResolution = Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)World.Size * 0.5f)));
 		return CreateTerrain(heightmapResolution, alphamapResolution);
 	}
 
@@ -21,12 +21,12 @@ public class TerrainGenerator : SingletonComponent<TerrainGenerator>
 	{
 		Terrain component = Terrain.CreateTerrainGameObject(new TerrainData
 		{
-			baseMapResolution = Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)(double)World.Size * 0.01f))),
+			baseMapResolution = Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)World.Size * 0.01f))),
 			heightmapResolution = heightmapResolution,
 			alphamapResolution = alphamapResolution,
-			size = new Vector3((float)(double)World.Size, 1000f, (float)(double)World.Size)
+			size = new Vector3(World.Size, 1000f, World.Size)
 		}).GetComponent<Terrain>();
-		component.transform.position = base.transform.position + new Vector3((float)(0L - World.Size) * 0.5f, 0f, (float)(0L - World.Size) * 0.5f);
+		component.transform.position = base.transform.position + new Vector3((float)(0L - (long)World.Size) * 0.5f, 0f, (float)(0L - (long)World.Size) * 0.5f);
 		component.castShadows = config.CastShadows;
 		component.materialType = Terrain.MaterialType.Custom;
 		component.materialTemplate = config.Material;

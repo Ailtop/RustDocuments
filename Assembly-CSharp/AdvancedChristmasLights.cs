@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -60,7 +60,7 @@ public class AdvancedChristmasLights : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetAnimationStyle ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetAnimationStyle "));
 				}
 				using (TimeWarning.New("SetAnimationStyle"))
 				{
@@ -165,19 +165,20 @@ public class AdvancedChristmasLights : IOEntity
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.lightString != null)
+		if (info.msg.lightString == null)
 		{
-			ClearPoints();
-			foreach (LightString.StringPoint point in info.msg.lightString.points)
-			{
-				AddPoint(point.point, point.normal);
-			}
-			lengthUsed = info.msg.lightString.lengthUsed;
-			animationStyle = (AnimationType)info.msg.lightString.animationStyle;
-			if (info.fromDisk)
-			{
-				FinishEditing();
-			}
+			return;
+		}
+		ClearPoints();
+		foreach (LightString.StringPoint point in info.msg.lightString.points)
+		{
+			AddPoint(point.point, point.normal);
+		}
+		lengthUsed = info.msg.lightString.lengthUsed;
+		animationStyle = (AnimationType)info.msg.lightString.animationStyle;
+		if (info.fromDisk)
+		{
+			FinishEditing();
 		}
 	}
 

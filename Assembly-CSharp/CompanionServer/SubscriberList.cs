@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 
 namespace CompanionServer
 {
@@ -27,15 +27,13 @@ namespace CompanionServer
 				if (_subscriptions.TryGetValue(key, out value2))
 				{
 					value2.Add(value);
+					return;
 				}
-				else
+				value2 = new HashSet<TTarget>
 				{
-					value2 = new HashSet<TTarget>
-					{
-						value
-					};
-					_subscriptions.Add(key, value2);
-				}
+					value
+				};
+				_subscriptions.Add(key, value2);
 			}
 		}
 

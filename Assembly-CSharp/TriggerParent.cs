@@ -99,7 +99,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 			}
 			BasePlayer basePlayer2;
 			Vector3 res;
-			if (associatedMountable != null && doClippingCheck && IsClipping(ent) && (object)(basePlayer2 = (ent as BasePlayer)) != null && associatedMountable.GetDismountPosition(basePlayer2, out res))
+			if (associatedMountable != null && doClippingCheck && IsClipping(ent) && (object)(basePlayer2 = ent as BasePlayer) != null && associatedMountable.GetDismountPosition(basePlayer2, out res))
 			{
 				basePlayer2.MovePosition(res);
 				basePlayer2.SendNetworkUpdateImmediate();
@@ -110,24 +110,26 @@ public class TriggerParent : TriggerBase, IServerComponent
 
 	private void OnTick()
 	{
-		if (entityContents != null)
+		if (entityContents == null)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(base.gameObject);
-			if (BaseEntityEx.IsValid(baseEntity) && !baseEntity.IsDestroyed)
+			return;
+		}
+		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(base.gameObject);
+		if (!BaseEntityEx.IsValid(baseEntity) || baseEntity.IsDestroyed)
+		{
+			return;
+		}
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if (BaseEntityEx.IsValid(entityContent) && !entityContent.IsDestroyed)
 			{
-				foreach (BaseEntity entityContent in entityContents)
+				if (ShouldParent(entityContent))
 				{
-					if (BaseEntityEx.IsValid(entityContent) && !entityContent.IsDestroyed)
-					{
-						if (ShouldParent(entityContent))
-						{
-							Parent(entityContent);
-						}
-						else
-						{
-							Unparent(entityContent);
-						}
-					}
+					Parent(entityContent);
+				}
+				else
+				{
+					Unparent(entityContent);
 				}
 			}
 		}

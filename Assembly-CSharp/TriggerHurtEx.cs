@@ -1,6 +1,6 @@
-using Rust;
 using System.Collections.Generic;
 using System.Linq;
+using Rust;
 using UnityEngine;
 
 public class TriggerHurtEx : TriggerBase, IServerComponent
@@ -79,37 +79,38 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 
 	internal void DoDamage(BaseEntity ent, HurtType type, List<DamageTypeEntry> damage, GameObjectRef effect, float multiply = 1f)
 	{
-		if (damageEnabled)
+		if (!damageEnabled)
 		{
-			using (TimeWarning.New("TriggerHurtEx.DoDamage"))
+			return;
+		}
+		using (TimeWarning.New("TriggerHurtEx.DoDamage"))
+		{
+			if (damage != null && damage.Count > 0)
 			{
-				if (damage != null && damage.Count > 0)
+				BaseCombatEntity baseCombatEntity = ent as BaseCombatEntity;
+				if ((bool)baseCombatEntity)
 				{
-					BaseCombatEntity baseCombatEntity = ent as BaseCombatEntity;
-					if ((bool)baseCombatEntity)
+					HitInfo hitInfo = new HitInfo();
+					hitInfo.damageTypes.Add(damage);
+					hitInfo.damageTypes.ScaleAll(multiply);
+					hitInfo.DoHitEffects = true;
+					hitInfo.DidHit = true;
+					hitInfo.Initiator = GameObjectEx.ToBaseEntity(base.gameObject);
+					hitInfo.PointStart = base.transform.position;
+					hitInfo.PointEnd = baseCombatEntity.transform.position;
+					if (type == HurtType.Simple)
 					{
-						HitInfo hitInfo = new HitInfo();
-						hitInfo.damageTypes.Add(damage);
-						hitInfo.damageTypes.ScaleAll(multiply);
-						hitInfo.DoHitEffects = true;
-						hitInfo.DidHit = true;
-						hitInfo.Initiator = GameObjectEx.ToBaseEntity(base.gameObject);
-						hitInfo.PointStart = base.transform.position;
-						hitInfo.PointEnd = baseCombatEntity.transform.position;
-						if (type == HurtType.Simple)
-						{
-							baseCombatEntity.Hurt(hitInfo);
-						}
-						else
-						{
-							baseCombatEntity.OnAttacked(hitInfo);
-						}
+						baseCombatEntity.Hurt(hitInfo);
+					}
+					else
+					{
+						baseCombatEntity.OnAttacked(hitInfo);
 					}
 				}
-				if (effect.isValid)
-				{
-					Effect.server.Run(effect.resourcePath, ent, StringPool.closest, base.transform.position, Vector3.up);
-				}
+			}
+			if (effect.isValid)
+			{
+				Effect.server.Run(effect.resourcePath, ent, StringPool.closest, base.transform.position, Vector3.up);
 			}
 		}
 	}
@@ -201,24 +202,26 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 			}
 			entityAddList = null;
 		}
-		if (entityLeaveList != null)
+		if (entityLeaveList == null)
 		{
-			foreach (BaseEntity entityLeave in entityLeaveList)
+			return;
+		}
+		foreach (BaseEntity entityLeave in entityLeaveList)
+		{
+			if (!BaseEntityEx.IsValid(entityLeave))
 			{
-				if (BaseEntityEx.IsValid(entityLeave))
+				continue;
+			}
+			DoDamage(entityLeave, hurtTypeOnLeave, damageOnLeave, effectOnLeave);
+			if (entityInfo != null)
+			{
+				entityInfo.Remove(entityLeave);
+				if (entityInfo.Count == 0)
 				{
-					DoDamage(entityLeave, hurtTypeOnLeave, damageOnLeave, effectOnLeave);
-					if (entityInfo != null)
-					{
-						entityInfo.Remove(entityLeave);
-						if (entityInfo.Count == 0)
-						{
-							entityInfo = null;
-						}
-					}
+					entityInfo = null;
 				}
 			}
-			entityLeaveList.Clear();
 		}
+		entityLeaveList.Clear();
 	}
 }

@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +28,7 @@ public class MedicalTool : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UseOther ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UseOther "));
 				}
 				using (TimeWarning.New("UseOther"))
 				{
@@ -64,7 +64,7 @@ public class MedicalTool : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UseSelf ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UseSelf "));
 				}
 				using (TimeWarning.New("UseSelf"))
 				{

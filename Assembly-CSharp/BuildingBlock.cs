@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -98,7 +98,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoDemolish ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoDemolish "));
 				}
 				using (TimeWarning.New("DoDemolish"))
 				{
@@ -134,7 +134,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoImmediateDemolish ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoImmediateDemolish "));
 				}
 				using (TimeWarning.New("DoImmediateDemolish"))
 				{
@@ -170,7 +170,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoRotation ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoRotation "));
 				}
 				using (TimeWarning.New("DoRotation"))
 				{
@@ -206,7 +206,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoUpgradeToGrade ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoUpgradeToGrade "));
 				}
 				using (TimeWarning.New("DoUpgradeToGrade"))
 				{
@@ -315,7 +315,7 @@ public class BuildingBlock : StabilityEntity
 	{
 		if ((int)grade >= blockDefinition.grades.Length)
 		{
-			Debug.LogWarning("Grade out of range " + base.gameObject + " " + grade + " / " + blockDefinition.grades.Length);
+			Debug.LogWarning(string.Concat("Grade out of range ", base.gameObject, " ", grade, " / ", blockDefinition.grades.Length));
 			return blockDefinition.defaultGrade;
 		}
 		return blockDefinition.grades[(int)iGrade];
@@ -430,18 +430,19 @@ public class BuildingBlock : StabilityEntity
 
 	public void PayForUpgrade(ConstructionGrade g, BasePlayer player)
 	{
-		if (Interface.CallHook("OnPayForUpgrade", player, this, g) == null)
+		if (Interface.CallHook("OnPayForUpgrade", player, this, g) != null)
 		{
-			List<Item> list = new List<Item>();
-			foreach (ItemAmount item in g.costToBuild)
-			{
-				player.inventory.Take(list, item.itemid, (int)item.amount);
-				player.Command("note.inv " + item.itemid + " " + item.amount * -1f);
-			}
-			foreach (Item item2 in list)
-			{
-				item2.Remove();
-			}
+			return;
+		}
+		List<Item> list = new List<Item>();
+		foreach (ItemAmount item in g.costToBuild)
+		{
+			player.inventory.Take(list, item.itemid, (int)item.amount);
+			player.Command("note.inv " + item.itemid + " " + item.amount * -1f);
+		}
+		foreach (Item item2 in list)
+		{
+			item2.Remove();
 		}
 	}
 
@@ -574,7 +575,7 @@ public class BuildingBlock : StabilityEntity
 		}
 		bool flag2 = lastModelState != modelState;
 		lastModelState = modelState;
-		if ((flag | flag2) || forceSkinRefresh)
+		if (flag || flag2 || forceSkinRefresh)
 		{
 			currentSkin.Refresh(this);
 			forceSkinRefresh = false;

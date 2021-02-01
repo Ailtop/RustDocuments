@@ -1,7 +1,7 @@
-using ConVar;
-using Rust.Ai.HTN.Sensors;
 using System;
 using System.Collections.Generic;
+using ConVar;
+using Rust.Ai.HTN.Sensors;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.ScientistAStar.Sensors

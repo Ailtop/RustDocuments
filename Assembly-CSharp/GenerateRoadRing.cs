@@ -69,7 +69,7 @@ public class GenerateRoadRing : ProceduralComponent
 		int dir_x2 = num2;
 		int dir_y = -num2;
 		int dir_y2 = num2;
-		List<RingNode> list = (World.Size >= 5000) ? new List<RingNode>
+		List<RingNode> list = ((World.Size >= 5000) ? new List<RingNode>
 		{
 			new RingNode(num3, pos_y2, num4, dir_y, stepcount),
 			new RingNode(pos_x2, pos_y2, dir_x, dir_y, stepcount),
@@ -85,7 +85,7 @@ public class GenerateRoadRing : ProceduralComponent
 			new RingNode(pos_x2, pos_y, dir_x, dir_y2, stepcount),
 			new RingNode(pos_x, pos_y, dir_x2, dir_y2, stepcount),
 			new RingNode(pos_x, pos_y2, dir_x2, dir_y, stepcount)
-		};
+		});
 		for (int i = 0; i < list.Count; i++)
 		{
 			RingNode ringNode = list[i];

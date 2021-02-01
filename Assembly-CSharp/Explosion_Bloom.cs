@@ -213,7 +213,7 @@ public class Explosion_Bloom : MonoBehaviour
 			num /= 2;
 			num2 /= 2;
 		}
-		RenderTextureFormat format = isMobilePlatform ? RenderTextureFormat.Default : RenderTextureFormat.DefaultHDR;
+		RenderTextureFormat format = (isMobilePlatform ? RenderTextureFormat.Default : RenderTextureFormat.DefaultHDR);
 		float num3 = Mathf.Log(num2, 2f) + settings.radius - 8f;
 		int num4 = (int)num3;
 		int num5 = Mathf.Clamp(num4, 1, 16);

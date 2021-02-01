@@ -1,6 +1,6 @@
-using ConVar;
 using System;
 using System.Collections.Generic;
+using ConVar;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.ScientistJunkpile
@@ -67,21 +67,22 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public void Clear()
 		{
-			if (Spawned != null)
+			if (Spawned == null)
 			{
-				foreach (ScientistJunkpileDomain item in Spawned)
+				return;
+			}
+			foreach (ScientistJunkpileDomain item in Spawned)
+			{
+				if (!(item == null) && !(item.gameObject == null) && !(item.transform == null))
 				{
-					if (!(item == null) && !(item.gameObject == null) && !(item.transform == null))
+					BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
+					if ((bool)baseEntity)
 					{
-						BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-						if ((bool)baseEntity)
-						{
-							baseEntity.Kill();
-						}
+						baseEntity.Kill();
 					}
 				}
-				Spawned.Clear();
 			}
+			Spawned.Clear();
 		}
 
 		public void SpawnInitial()
@@ -177,22 +178,17 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 				return;
 			}
 			int num2 = MaxPopulation - Spawned.Count;
-			int num3 = 0;
-			BaseEntity baseEntity;
-			while (true)
+			for (int i = 0; i < num2; i++)
 			{
-				if (num3 >= num2)
-				{
-					return;
-				}
 				Vector3 pos;
 				Quaternion rot;
 				if (!(GetSpawnPoint(out pos, out rot) == null))
 				{
-					baseEntity = GameManager.server.CreateEntity(ScientistPrefab.resourcePath, pos, rot, false);
+					BaseEntity baseEntity = GameManager.server.CreateEntity(ScientistPrefab.resourcePath, pos, rot, false);
 					ScientistJunkpileDomain component = baseEntity.GetComponent<ScientistJunkpileDomain>();
 					if (!component)
 					{
+						baseEntity.Kill();
 						break;
 					}
 					baseEntity.enableSaving = false;
@@ -203,9 +199,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 					component.ReducedLongRangeAccuracy = ReducedLongRangeAccuracy;
 					Spawned.Add(component);
 				}
-				num3++;
 			}
-			baseEntity.Kill();
 		}
 
 		private BaseSpawnPoint GetSpawnPoint(out Vector3 pos, out Quaternion rot)

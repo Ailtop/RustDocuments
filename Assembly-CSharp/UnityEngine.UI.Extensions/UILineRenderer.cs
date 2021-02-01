@@ -223,8 +223,8 @@ namespace UnityEngine.UI.Extensions
 			{
 				pointsToDraw = IncreaseResolution(pointsToDraw);
 			}
-			float num = (!relativeSize) ? 1f : base.rectTransform.rect.width;
-			float num2 = (!relativeSize) ? 1f : base.rectTransform.rect.height;
+			float num = ((!relativeSize) ? 1f : base.rectTransform.rect.width);
+			float num2 = ((!relativeSize) ? 1f : base.rectTransform.rect.height);
 			float num3 = (0f - base.rectTransform.pivot.x) * num;
 			float num4 = (0f - base.rectTransform.pivot.y) * num2;
 			List<UIVertex[]> list2 = new List<UIVertex[]>();
@@ -514,12 +514,13 @@ namespace UnityEngine.UI.Extensions
 				int num2 = index;
 				foreach (Vector2[] segment in Segments)
 				{
-					if (num2 - segment.Length <= 0)
+					if (num2 - segment.Length > 0)
 					{
-						break;
+						num2 -= segment.Length;
+						num++;
+						continue;
 					}
-					num2 -= segment.Length;
-					num++;
+					break;
 				}
 				return Segments[num][num2 - 1];
 			}

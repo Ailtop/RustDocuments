@@ -25,7 +25,7 @@ namespace UnityEngine
 
 		public static Quaternion LookRotationGradient(Vector3 normal, Vector3 up)
 		{
-			Vector3 rhs = (normal == Vector3.up) ? Vector3.forward : Vector3.Cross(normal, Vector3.up);
+			Vector3 rhs = ((normal == Vector3.up) ? Vector3.forward : Vector3.Cross(normal, Vector3.up));
 			return LookRotationForcedUp(Vector3.Cross(normal, rhs), up);
 		}
 

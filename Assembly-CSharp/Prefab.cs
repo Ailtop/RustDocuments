@@ -56,7 +56,7 @@ public class Prefab : IComparable<Prefab>
 		{
 			return 1;
 		}
-		PrefabPriority prefabPriority = (Parameters != null) ? Parameters.Priority : PrefabPriority.Default;
+		PrefabPriority prefabPriority = ((Parameters != null) ? Parameters.Priority : PrefabPriority.Default);
 		return ((that.Parameters != null) ? that.Parameters.Priority : PrefabPriority.Default).CompareTo(prefabPriority);
 	}
 
@@ -283,7 +283,7 @@ public class Prefab : IComparable<Prefab>
 				continue;
 			}
 			PrefabParameters component = gameObject.GetComponent<PrefabParameters>();
-			int num = (!component) ? 1 : component.Count;
+			int num = ((!component) ? 1 : component.Count);
 			for (int j = 0; j < num; j++)
 			{
 				list.Add(item);

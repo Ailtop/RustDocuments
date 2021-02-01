@@ -91,6 +91,6 @@ public class Underwear : ScriptableObject
 		{
 			flag = true;
 		}
-		return num & flag;
+		return num && flag;
 	}
 }

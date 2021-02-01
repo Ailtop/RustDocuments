@@ -56,6 +56,7 @@ public static class ImageProcessing
 
 	public static void GaussianBlur2D(float[] data, int len1, int len2, int len3, int iterations = 1)
 	{
+		float[] src = data;
 		float[] dst = new float[len1 * len2 * len3];
 		for (int i = 0; i < iterations; i++)
 		{
@@ -69,21 +70,22 @@ public static class ImageProcessing
 					int num4 = Mathf.Min(len2 - 1, j + 1);
 					for (int k = 0; k < len3; k++)
 					{
-						float num5 = data[(x * len2 + j) * len3 + k] * 4f + data[(x * len2 + num3) * len3 + k] + data[(x * len2 + num4) * len3 + k] + data[(num * len2 + j) * len3 + k] + data[(num2 * len2 + j) * len3 + k];
+						float num5 = src[(x * len2 + j) * len3 + k] * 4f + src[(x * len2 + num3) * len3 + k] + src[(x * len2 + num4) * len3 + k] + src[(num * len2 + j) * len3 + k] + src[(num2 * len2 + j) * len3 + k];
 						dst[(x * len2 + j) * len3 + k] = num5 * 0.125f;
 					}
 				}
 			});
-			GenericsUtil.Swap(ref data, ref dst);
+			GenericsUtil.Swap(ref src, ref dst);
 		}
-		if (data != data)
+		if (src != data)
 		{
-			Buffer.BlockCopy(data, 0, data, 0, data.Length * 4);
+			Buffer.BlockCopy(src, 0, data, 0, data.Length * 4);
 		}
 	}
 
 	public static void Average2D(float[] data, int len1, int len2, int iterations = 1)
 	{
+		float[] src = data;
 		float[] dst = new float[len1 * len2];
 		for (int i = 0; i < iterations; i++)
 		{
@@ -95,20 +97,21 @@ public static class ImageProcessing
 				{
 					int num3 = Mathf.Max(0, j - 1);
 					int num4 = Mathf.Min(len2 - 1, j + 1);
-					float num5 = data[x * len2 + j] + data[x * len2 + num3] + data[x * len2 + num4] + data[num * len2 + j] + data[num2 * len2 + j];
+					float num5 = src[x * len2 + j] + src[x * len2 + num3] + src[x * len2 + num4] + src[num * len2 + j] + src[num2 * len2 + j];
 					dst[x * len2 + j] = num5 * 0.2f;
 				}
 			});
-			GenericsUtil.Swap(ref data, ref dst);
+			GenericsUtil.Swap(ref src, ref dst);
 		}
-		if (data != data)
+		if (src != data)
 		{
-			Buffer.BlockCopy(data, 0, data, 0, data.Length * 4);
+			Buffer.BlockCopy(src, 0, data, 0, data.Length * 4);
 		}
 	}
 
 	public static void Average2D(float[] data, int len1, int len2, int len3, int iterations = 1)
 	{
+		float[] src = data;
 		float[] dst = new float[len1 * len2 * len3];
 		for (int i = 0; i < iterations; i++)
 		{
@@ -122,72 +125,74 @@ public static class ImageProcessing
 					int num4 = Mathf.Min(len2 - 1, j + 1);
 					for (int k = 0; k < len3; k++)
 					{
-						float num5 = data[(x * len2 + j) * len3 + k] + data[(x * len2 + num3) * len3 + k] + data[(x * len2 + num4) * len3 + k] + data[(num * len2 + j) * len3 + k] + data[(num2 * len2 + j) * len3 + k];
+						float num5 = src[(x * len2 + j) * len3 + k] + src[(x * len2 + num3) * len3 + k] + src[(x * len2 + num4) * len3 + k] + src[(num * len2 + j) * len3 + k] + src[(num2 * len2 + j) * len3 + k];
 						dst[(x * len2 + j) * len3 + k] = num5 * 0.2f;
 					}
 				}
 			});
-			GenericsUtil.Swap(ref data, ref dst);
+			GenericsUtil.Swap(ref src, ref dst);
 		}
-		if (data != data)
+		if (src != data)
 		{
-			Buffer.BlockCopy(data, 0, data, 0, data.Length * 4);
+			Buffer.BlockCopy(src, 0, data, 0, data.Length * 4);
 		}
 	}
 
 	public static void Upsample2D(float[] src, int srclen1, int srclen2, float[] dst, int dstlen1, int dstlen2)
 	{
-		if (2 * srclen1 == dstlen1 && 2 * srclen2 == dstlen2)
+		if (2 * srclen1 != dstlen1 || 2 * srclen2 != dstlen2)
 		{
-			Parallel.For(0, srclen1, delegate(int x)
-			{
-				int num = Mathf.Max(0, x - 1);
-				int num2 = Mathf.Min(srclen1 - 1, x + 1);
-				for (int i = 0; i < srclen2; i++)
-				{
-					int num3 = Mathf.Max(0, i - 1);
-					int num4 = Mathf.Min(srclen2 - 1, i + 1);
-					float num5 = src[x * srclen2 + i] * 6f;
-					float num6 = num5 + src[num * srclen2 + i] + src[x * srclen2 + num3];
-					dst[2 * x * dstlen2 + 2 * i] = num6 * 0.125f;
-					float num7 = num5 + src[num2 * srclen2 + i] + src[x * srclen2 + num3];
-					dst[(2 * x + 1) * dstlen2 + 2 * i] = num7 * 0.125f;
-					float num8 = num5 + src[num * srclen2 + i] + src[x * srclen2 + num4];
-					dst[2 * x * dstlen2 + (2 * i + 1)] = num8 * 0.125f;
-					float num9 = num5 + src[num2 * srclen2 + i] + src[x * srclen2 + num4];
-					dst[(2 * x + 1) * dstlen2 + (2 * i + 1)] = num9 * 0.125f;
-				}
-			});
+			return;
 		}
+		Parallel.For(0, srclen1, delegate(int x)
+		{
+			int num = Mathf.Max(0, x - 1);
+			int num2 = Mathf.Min(srclen1 - 1, x + 1);
+			for (int i = 0; i < srclen2; i++)
+			{
+				int num3 = Mathf.Max(0, i - 1);
+				int num4 = Mathf.Min(srclen2 - 1, i + 1);
+				float num5 = src[x * srclen2 + i] * 6f;
+				float num6 = num5 + src[num * srclen2 + i] + src[x * srclen2 + num3];
+				dst[2 * x * dstlen2 + 2 * i] = num6 * 0.125f;
+				float num7 = num5 + src[num2 * srclen2 + i] + src[x * srclen2 + num3];
+				dst[(2 * x + 1) * dstlen2 + 2 * i] = num7 * 0.125f;
+				float num8 = num5 + src[num * srclen2 + i] + src[x * srclen2 + num4];
+				dst[2 * x * dstlen2 + (2 * i + 1)] = num8 * 0.125f;
+				float num9 = num5 + src[num2 * srclen2 + i] + src[x * srclen2 + num4];
+				dst[(2 * x + 1) * dstlen2 + (2 * i + 1)] = num9 * 0.125f;
+			}
+		});
 	}
 
 	public static void Upsample2D(float[] src, int srclen1, int srclen2, int srclen3, float[] dst, int dstlen1, int dstlen2, int dstlen3)
 	{
-		if (2 * srclen1 == dstlen1 && 2 * srclen2 == dstlen2 && srclen3 == dstlen3)
+		if (2 * srclen1 != dstlen1 || 2 * srclen2 != dstlen2 || srclen3 != dstlen3)
 		{
-			Parallel.For(0, srclen1, delegate(int x)
-			{
-				int num = Mathf.Max(0, x - 1);
-				int num2 = Mathf.Min(srclen1 - 1, x + 1);
-				for (int i = 0; i < srclen2; i++)
-				{
-					int num3 = Mathf.Max(0, i - 1);
-					int num4 = Mathf.Min(srclen2 - 1, i + 1);
-					for (int j = 0; j < srclen3; j++)
-					{
-						float num5 = src[(x * srclen2 + i) * srclen3 + j] * 6f;
-						float num6 = num5 + src[(num * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num3) * srclen3 + j];
-						dst[(2 * x * dstlen2 + 2 * i) * dstlen3 + j] = num6 * 0.125f;
-						float num7 = num5 + src[(num2 * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num3) * srclen3 + j];
-						dst[((2 * x + 1) * dstlen2 + 2 * i) * dstlen3 + j] = num7 * 0.125f;
-						float num8 = num5 + src[(num * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num4) * srclen3 + j];
-						dst[(2 * x * dstlen2 + (2 * i + 1)) * dstlen3 + j] = num8 * 0.125f;
-						float num9 = num5 + src[(num2 * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num4) * srclen3 + j];
-						dst[((2 * x + 1) * dstlen2 + (2 * i + 1)) * dstlen3 + j] = num9 * 0.125f;
-					}
-				}
-			});
+			return;
 		}
+		Parallel.For(0, srclen1, delegate(int x)
+		{
+			int num = Mathf.Max(0, x - 1);
+			int num2 = Mathf.Min(srclen1 - 1, x + 1);
+			for (int i = 0; i < srclen2; i++)
+			{
+				int num3 = Mathf.Max(0, i - 1);
+				int num4 = Mathf.Min(srclen2 - 1, i + 1);
+				for (int j = 0; j < srclen3; j++)
+				{
+					float num5 = src[(x * srclen2 + i) * srclen3 + j] * 6f;
+					float num6 = num5 + src[(num * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num3) * srclen3 + j];
+					dst[(2 * x * dstlen2 + 2 * i) * dstlen3 + j] = num6 * 0.125f;
+					float num7 = num5 + src[(num2 * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num3) * srclen3 + j];
+					dst[((2 * x + 1) * dstlen2 + 2 * i) * dstlen3 + j] = num7 * 0.125f;
+					float num8 = num5 + src[(num * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num4) * srclen3 + j];
+					dst[(2 * x * dstlen2 + (2 * i + 1)) * dstlen3 + j] = num8 * 0.125f;
+					float num9 = num5 + src[(num2 * srclen2 + i) * srclen3 + j] + src[(x * srclen2 + num4) * srclen3 + j];
+					dst[((2 * x + 1) * dstlen2 + (2 * i + 1)) * dstlen3 + j] = num9 * 0.125f;
+				}
+			}
+		});
 	}
 
 	public static void Dilate2D(int[] src, int len1, int len2, int srcmask, int radius, Action<int, int> action)
@@ -260,7 +265,7 @@ public static class ImageProcessing
 			}
 			num++;
 			bool flag;
-			bool flag2 = flag = false;
+			bool flag2 = (flag = false);
 			for (; num < len2; num++)
 			{
 				int num3 = data[x * len2 + num];
@@ -419,7 +424,7 @@ public static class ImageProcessing
 					return ((data[num + 7] << 8) | data[num + 8]) <= maxWidth && num3 <= maxHeight;
 				}
 				num += 2;
-				num2 = ((data[num] << 8) | data[num + 1]);
+				num2 = (data[num] << 8) | data[num + 1];
 			}
 			return false;
 		}

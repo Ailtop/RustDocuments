@@ -34,15 +34,16 @@ namespace Rust.Ai
 				}
 				c.AIAgent.AttackTarget = best;
 			}
-			if (c.AIAgent.AttackTarget != null)
+			if (!(c.AIAgent.AttackTarget != null))
 			{
-				foreach (Memory.SeenInfo item in c.Memory.All)
+				return;
+			}
+			foreach (Memory.SeenInfo item in c.Memory.All)
+			{
+				if (item.Entity == best)
 				{
-					if (item.Entity == best)
-					{
-						c.AIAgent.AttackTargetMemory = item;
-						break;
-					}
+					c.AIAgent.AttackTargetMemory = item;
+					break;
 				}
 			}
 		}

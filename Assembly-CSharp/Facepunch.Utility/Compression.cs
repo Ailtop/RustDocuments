@@ -1,5 +1,5 @@
-using Ionic.Zlib;
 using System;
+using Ionic.Zlib;
 
 namespace Facepunch.Utility
 {

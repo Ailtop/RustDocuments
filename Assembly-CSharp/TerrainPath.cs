@@ -50,7 +50,7 @@ public class TerrainPath : TerrainExtension
 	public static int[,] CreatePowerlineCostmap(ref uint seed)
 	{
 		float radius = 5f;
-		int num = (int)((float)(double)World.Size / 7.5f);
+		int num = (int)((float)World.Size / 7.5f);
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
 		int[,] array = new int[num, num];
@@ -89,7 +89,7 @@ public class TerrainPath : TerrainExtension
 	public static int[,] CreateRoadCostmap(ref uint seed)
 	{
 		float radius = 5f;
-		int num = (int)((float)(double)World.Size / 7.5f);
+		int num = (int)((float)World.Size / 7.5f);
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
 		int[,] array = new int[num, num];
@@ -141,24 +141,25 @@ public class TerrainPath : TerrainExtension
 			foreach (PowerlineNode item in wire.Value)
 			{
 				PowerLineWireConnectionHelper component = item.GetComponent<PowerLineWireConnectionHelper>();
-				if ((bool)component)
+				if (!component)
 				{
-					if (list.Count == 0)
-					{
-						gameObjectRef = item.WirePrefab;
-						num = component.connections.Count;
-					}
-					else
-					{
-						GameObject gameObject = list[list.Count - 1];
-						if (item.WirePrefab.guid != gameObjectRef?.guid || component.connections.Count != num || (gameObject.transform.position - item.transform.position).sqrMagnitude > item.MaxDistance * item.MaxDistance)
-						{
-							CreateWire(wire.Key, list, gameObjectRef);
-							list.Clear();
-						}
-					}
-					list.Add(item.gameObject);
+					continue;
 				}
+				if (list.Count == 0)
+				{
+					gameObjectRef = item.WirePrefab;
+					num = component.connections.Count;
+				}
+				else
+				{
+					GameObject gameObject = list[list.Count - 1];
+					if (item.WirePrefab.guid != gameObjectRef?.guid || component.connections.Count != num || (gameObject.transform.position - item.transform.position).sqrMagnitude > item.MaxDistance * item.MaxDistance)
+					{
+						CreateWire(wire.Key, list, gameObjectRef);
+						list.Clear();
+					}
+				}
+				list.Add(item.gameObject);
 			}
 			CreateWire(wire.Key, list, gameObjectRef);
 			list.Clear();

@@ -37,7 +37,7 @@ public abstract class TerrainMap : TerrainExtension
 		{
 			for (int l = num7; l <= num8; l++)
 			{
-				float arg2 = (new Vector2((float)l + 0.5f - num5, (float)k + 0.5f - num6).magnitude < num4) ? 1 : 0;
+				float arg2 = ((new Vector2((float)l + 0.5f - num5, (float)k + 0.5f - num6).magnitude < num4) ? 1 : 0);
 				action(l, k, arg2);
 			}
 		}

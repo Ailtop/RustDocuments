@@ -53,7 +53,7 @@ public class WaterRadialMesh
 	{
 		int num = Mathf.RoundToInt((float)Mathf.RoundToInt(Mathf.Sqrt(vertexCount)) * 0.4f);
 		int num2 = Mathf.RoundToInt((float)vertexCount / (float)num);
-		int num3 = volume ? (num2 / 2) : num2;
+		int num3 = (volume ? (num2 / 2) : num2);
 		List<Mesh> list = new List<Mesh>();
 		List<Vector3> list2 = new List<Vector3>();
 		List<int> list3 = new List<int>();

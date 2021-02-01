@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -69,7 +69,7 @@ public class ExcavatorArm : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_SetResourceTarget ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_SetResourceTarget "));
 				}
 				using (TimeWarning.New("RPC_SetResourceTarget"))
 				{
@@ -105,7 +105,7 @@ public class ExcavatorArm : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_StopMining ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_StopMining "));
 				}
 				using (TimeWarning.New("RPC_StopMining"))
 				{
@@ -160,7 +160,7 @@ public class ExcavatorArm : BaseEntity
 		if (!base.isClient)
 		{
 			bool flag = IsMining() && IsPowered();
-			float num = flag ? 1f : 0f;
+			float num = (flag ? 1f : 0f);
 			currentTurnThrottle = Mathf.Lerp(currentTurnThrottle, num, UnityEngine.Time.fixedDeltaTime * (flag ? 0.333f : 1f));
 			if (Mathf.Abs(num - currentTurnThrottle) < 0.025f)
 			{
@@ -211,21 +211,22 @@ public class ExcavatorArm : BaseEntity
 		ItemAmount[] array = pendingResources;
 		foreach (ItemAmount itemAmount in array)
 		{
-			if (itemAmount.amount >= (float)outputPiles.Count)
+			if (!(itemAmount.amount >= (float)outputPiles.Count))
 			{
-				int num3 = Mathf.FloorToInt(itemAmount.amount / (float)outputPiles.Count);
-				itemAmount.amount -= num3 * 2;
-				foreach (ExcavatorOutputPile outputPile in outputPiles)
+				continue;
+			}
+			int num3 = Mathf.FloorToInt(itemAmount.amount / (float)outputPiles.Count);
+			itemAmount.amount -= num3 * 2;
+			foreach (ExcavatorOutputPile outputPile in outputPiles)
+			{
+				Item item = ItemManager.Create(resourcesToMine[resourceMiningIndex].itemDef, num3, 0uL);
+				if (Interface.CallHook("OnExcavatorGather", this, item) != null)
 				{
-					Item item = ItemManager.Create(resourcesToMine[resourceMiningIndex].itemDef, num3, 0uL);
-					if (Interface.CallHook("OnExcavatorGather", this, item) != null)
-					{
-						return;
-					}
-					if (!item.MoveToContainer(outputPile.inventory))
-					{
-						item.Drop(outputPile.GetDropPosition(), outputPile.GetDropVelocity());
-					}
+					return;
+				}
+				if (!item.MoveToContainer(outputPile.inventory))
+				{
+					item.Drop(outputPile.GetDropPosition(), outputPile.GetDropVelocity());
 				}
 			}
 		}
@@ -252,21 +253,20 @@ public class ExcavatorArm : BaseEntity
 		string text = msg.read.String();
 		if (Interface.CallHook("OnExcavatorResourceSet", this, text, msg.player) == null)
 		{
-			if (text == "HQM")
+			switch (text)
 			{
+			case "HQM":
 				resourceMiningIndex = 0;
-			}
-			else if (text == "Sulfur")
-			{
+				break;
+			case "Sulfur":
 				resourceMiningIndex = 1;
-			}
-			else if (text == "Stone")
-			{
+				break;
+			case "Stone":
 				resourceMiningIndex = 2;
-			}
-			else if (text == "Metal")
-			{
+				break;
+			case "Metal":
 				resourceMiningIndex = 3;
+				break;
 			}
 			if (!IsOn())
 			{

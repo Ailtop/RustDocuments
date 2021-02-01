@@ -19,7 +19,7 @@ public class UIMixingTableItem : MonoBehaviour
 			return;
 		}
 		ItemIcon.sprite = recipe.ProducedItem.iconSprite;
-		TextItemNameAndQuantity.text = recipe.ProducedItemCount.ToString() + " x " + recipe.ProducedItem.displayName.translated;
+		TextItemNameAndQuantity.text = recipe.ProducedItemCount + " x " + recipe.ProducedItem.displayName.translated;
 		ItemTooltip.Text = recipe.ProducedItem.displayDescription.translated;
 		for (int i = 0; i < Ingredients.Length; i++)
 		{

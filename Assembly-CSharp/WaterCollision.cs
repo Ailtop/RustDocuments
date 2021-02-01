@@ -15,18 +15,19 @@ public class WaterCollision : MonoBehaviour
 
 	public void Clear()
 	{
-		if (waterColliders.Count != 0)
+		if (waterColliders.Count == 0)
 		{
-			HashSet<Collider>.Enumerator enumerator = waterColliders.GetEnumerator();
-			while (enumerator.MoveNext())
-			{
-				foreach (Collider key in ignoredColliders.Keys)
-				{
-					Physics.IgnoreCollision(key, enumerator.Current, false);
-				}
-			}
-			ignoredColliders.Clear();
+			return;
 		}
+		HashSet<Collider>.Enumerator enumerator = waterColliders.GetEnumerator();
+		while (enumerator.MoveNext())
+		{
+			foreach (Collider key in ignoredColliders.Keys)
+			{
+				Physics.IgnoreCollision(key, enumerator.Current, false);
+			}
+		}
+		ignoredColliders.Clear();
 	}
 
 	public void Reset(Collider collider)

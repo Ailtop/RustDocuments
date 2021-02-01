@@ -1,5 +1,5 @@
-using Oxide.Core;
 using System.Collections.Generic;
+using Oxide.Core;
 using UnityEngine;
 
 public class RFManager
@@ -157,27 +157,25 @@ public class RFManager
 			if (!BaseEntityEx.IsValidEntityReference(item))
 			{
 				flag2 = true;
+				continue;
 			}
-			else
+			if (flag)
 			{
-				if (flag)
+				flag = false;
+				foreach (IRFObject item2 in broadcasterList)
 				{
-					flag = false;
-					foreach (IRFObject item2 in broadcasterList)
+					if (!BaseEntityEx.IsValidEntityReference(item2))
 					{
-						if (!BaseEntityEx.IsValidEntityReference(item2))
-						{
-							flag3 = true;
-						}
-						else if (Vector3.Distance(item2.GetPosition(), item.GetPosition()) <= item2.GetMaxRange())
-						{
-							flag = true;
-							break;
-						}
+						flag3 = true;
+					}
+					else if (Vector3.Distance(item2.GetPosition(), item.GetPosition()) <= item2.GetMaxRange())
+					{
+						flag = true;
+						break;
 					}
 				}
-				item.RFSignalUpdate(flag);
 			}
+			item.RFSignalUpdate(flag);
 		}
 		if (flag2)
 		{

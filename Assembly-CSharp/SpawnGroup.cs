@@ -1,7 +1,7 @@
-using ConVar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConVar;
 using UnityEngine;
 
 public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, ISpawnGroup

@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EggHuntEvent : BaseHuntEvent
@@ -115,7 +115,7 @@ public class EggHuntEvent : BaseHuntEvent
 		}
 		eggHunter.numEggs++;
 		QueueUpdate();
-		int num = (!((float)Mathf.RoundToInt(player.eggVision) * 0.5f < 1f)) ? 1 : UnityEngine.Random.Range(0, 2);
+		int num = ((!((float)Mathf.RoundToInt(player.eggVision) * 0.5f < 1f)) ? 1 : UnityEngine.Random.Range(0, 2));
 		SpawnEggsAtPoint(UnityEngine.Random.Range(1 + num, 2 + num), player.transform.position, player.eyes.BodyForward(), 15f, 25f);
 	}
 

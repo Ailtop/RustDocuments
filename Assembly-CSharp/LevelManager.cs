@@ -1,5 +1,5 @@
-using Network;
 using System.Collections;
+using Network;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

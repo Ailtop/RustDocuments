@@ -1,9 +1,9 @@
-using Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Network;
 using UnityEngine;
 
 [Factory("global")]
@@ -109,25 +109,26 @@ public class DiagnosticsConSys : ConsoleSystem
 
 	private static void DumpNetwork(string targetFolder)
 	{
-		if (Net.sv.IsConnected())
+		if (!Net.sv.IsConnected())
 		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.AppendLine("Server Network Statistics");
-			stringBuilder.AppendLine();
-			stringBuilder.Append(Net.sv.GetDebug(null).Replace("\n", "\r\n"));
-			stringBuilder.AppendLine();
-			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
-			{
-				stringBuilder.AppendLine("Name: " + activePlayer.displayName);
-				stringBuilder.AppendLine("SteamID: " + activePlayer.userID);
-				stringBuilder.Append((activePlayer.net == null) ? "INVALID - NET IS NULL" : Net.sv.GetDebug(activePlayer.net.connection).Replace("\n", "\r\n"));
-				stringBuilder.AppendLine();
-				stringBuilder.AppendLine();
-				stringBuilder.AppendLine();
-				stringBuilder.AppendLine();
-			}
-			WriteTextToFile(targetFolder + "Network.Server.txt", stringBuilder.ToString());
+			return;
 		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendLine("Server Network Statistics");
+		stringBuilder.AppendLine();
+		stringBuilder.Append(Net.sv.GetDebug(null).Replace("\n", "\r\n"));
+		stringBuilder.AppendLine();
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			stringBuilder.AppendLine("Name: " + activePlayer.displayName);
+			stringBuilder.AppendLine("SteamID: " + activePlayer.userID);
+			stringBuilder.Append((activePlayer.net == null) ? "INVALID - NET IS NULL" : Net.sv.GetDebug(activePlayer.net.connection).Replace("\n", "\r\n"));
+			stringBuilder.AppendLine();
+			stringBuilder.AppendLine();
+			stringBuilder.AppendLine();
+			stringBuilder.AppendLine();
+		}
+		WriteTextToFile(targetFolder + "Network.Server.txt", stringBuilder.ToString());
 	}
 
 	private static void DumpObjects(string targetFolder)

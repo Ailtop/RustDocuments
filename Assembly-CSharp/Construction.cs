@@ -1,7 +1,7 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -32,7 +32,7 @@ public class Construction : PrefabAttribute
 		public Quaternion GetWorldRotation(bool female)
 		{
 			Quaternion rhs = socket.rotation;
-			if ((socket.male && socket.female) & female)
+			if (socket.male && socket.female && female)
 			{
 				rhs = socket.rotation * Quaternion.Euler(180f, 0f, 180f);
 			}
@@ -143,81 +143,86 @@ public class Construction : PrefabAttribute
 		foreach (Socket_Base item in obj)
 		{
 			Placement placement = null;
-			if (!(target.entity != null) || !(target.socket != null) || !target.entity.IsOccupied(target.socket))
+			if (target.entity != null && target.socket != null && target.entity.IsOccupied(target.socket))
 			{
-				if (placement == null)
-				{
-					placement = item.DoPlacement(target);
-				}
-				if (placement != null)
-				{
-					if (!item.CheckSocketMods(placement))
-					{
-						transform.position = placement.position;
-						transform.rotation = placement.rotation;
-					}
-					else if (!TestPlacingThroughRock(ref placement, target))
-					{
-						transform.position = placement.position;
-						transform.rotation = placement.rotation;
-						lastPlacementError = "Placing through rock";
-					}
-					else if (!TestPlacingThroughWall(ref placement, transform, common, target))
-					{
-						transform.position = placement.position;
-						transform.rotation = placement.rotation;
-						lastPlacementError = "Placing through wall";
-					}
-					else if (!TestPlacingCloseToRoad(ref placement, target))
-					{
-						transform.position = placement.position;
-						transform.rotation = placement.rotation;
-						lastPlacementError = "Placing too close to road";
-					}
-					else if (Vector3.Distance(placement.position, target.player.eyes.position) > common.maxplaceDistance + 1f)
-					{
-						transform.position = placement.position;
-						transform.rotation = placement.rotation;
-						lastPlacementError = "Too far away";
-					}
-					else
-					{
-						DeployVolume[] volumes = PrefabAttribute.server.FindAll<DeployVolume>(prefabID);
-						if (DeployVolume.Check(placement.position, placement.rotation, volumes))
-						{
-							transform.position = placement.position;
-							transform.rotation = placement.rotation;
-							lastPlacementError = "Not enough space";
-						}
-						else if (BuildingProximity.Check(target.player, this, placement.position, placement.rotation))
-						{
-							transform.position = placement.position;
-							transform.rotation = placement.rotation;
-							lastPlacementError = "Too close to another building";
-						}
-						else if (common.isBuildingPrivilege && !target.player.CanPlaceBuildingPrivilege(placement.position, placement.rotation, common.bounds))
-						{
-							transform.position = placement.position;
-							transform.rotation = placement.rotation;
-							lastPlacementError = "Cannot stack building privileges";
-						}
-						else
-						{
-							bool flag = target.player.IsBuildingBlocked(placement.position, placement.rotation, common.bounds);
-							if (common.canBypassBuildingPermission || !flag)
-							{
-								target.inBuildingPrivilege = flag;
-								transform.SetPositionAndRotation(placement.position, placement.rotation);
-								Pool.FreeList(ref obj);
-								return true;
-							}
-							transform.position = placement.position;
-							transform.rotation = placement.rotation;
-							lastPlacementError = "You don't have permission to build here";
-						}
-					}
-				}
+				continue;
 			}
+			if (placement == null)
+			{
+				placement = item.DoPlacement(target);
+			}
+			if (placement == null)
+			{
+				continue;
+			}
+			if (!item.CheckSocketMods(placement))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				continue;
+			}
+			if (!TestPlacingThroughRock(ref placement, target))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Placing through rock";
+				continue;
+			}
+			if (!TestPlacingThroughWall(ref placement, transform, common, target))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Placing through wall";
+				continue;
+			}
+			if (!TestPlacingCloseToRoad(ref placement, target))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Placing too close to road";
+				continue;
+			}
+			if (Vector3.Distance(placement.position, target.player.eyes.position) > common.maxplaceDistance + 1f)
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Too far away";
+				continue;
+			}
+			DeployVolume[] volumes = PrefabAttribute.server.FindAll<DeployVolume>(prefabID);
+			if (DeployVolume.Check(placement.position, placement.rotation, volumes))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Not enough space";
+				continue;
+			}
+			if (BuildingProximity.Check(target.player, this, placement.position, placement.rotation))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Too close to another building";
+				continue;
+			}
+			if (common.isBuildingPrivilege && !target.player.CanPlaceBuildingPrivilege(placement.position, placement.rotation, common.bounds))
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "Cannot stack building privileges";
+				continue;
+			}
+			bool flag = target.player.IsBuildingBlocked(placement.position, placement.rotation, common.bounds);
+			if (!common.canBypassBuildingPermission && flag)
+			{
+				transform.position = placement.position;
+				transform.rotation = placement.rotation;
+				lastPlacementError = "You don't have permission to build here";
+				continue;
+			}
+			target.inBuildingPrivilege = flag;
+			transform.SetPositionAndRotation(placement.position, placement.rotation);
+			Pool.FreeList(ref obj);
+			return true;
 		}
 		Pool.FreeList(ref obj);
 		return false;
@@ -233,7 +238,7 @@ public class Construction : PrefabAttribute
 			return false;
 		}
 		RaycastHit hit;
-		Vector3 end = oBB.Trace(target.ray, out hit) ? hit.point : oBB.ClosestPoint(origin);
+		Vector3 end = (oBB.Trace(target.ray, out hit) ? hit.point : oBB.ClosestPoint(origin));
 		if (Physics.Linecast(origin, end, 65536, QueryTriggerInteraction.Ignore))
 		{
 			return false;
@@ -372,21 +377,14 @@ public class Construction : PrefabAttribute
 			constructionGrade.construction = this;
 			grades[(int)constructionGrade.gradeBase.type] = constructionGrade;
 		}
-		int num = 0;
-		while (true)
+		for (int j = 0; j < grades.Length; j++)
 		{
-			if (num < grades.Length)
+			if (!(grades[j] == null))
 			{
-				if (!(grades[num] == null))
-				{
-					break;
-				}
-				num++;
-				continue;
+				defaultGrade = grades[j];
+				break;
 			}
-			return;
 		}
-		defaultGrade = grades[num];
 	}
 
 	protected override Type GetIndexedType()

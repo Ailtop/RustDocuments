@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CeilingLight : IOEntity

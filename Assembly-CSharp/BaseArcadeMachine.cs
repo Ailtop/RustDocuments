@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -58,7 +58,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - BroadcastEntityMessage ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BroadcastEntityMessage "));
 				}
 				using (TimeWarning.New("BroadcastEntityMessage"))
 				{
@@ -98,7 +98,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DestroyMessageFromHost ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DestroyMessageFromHost "));
 				}
 				using (TimeWarning.New("DestroyMessageFromHost"))
 				{
@@ -134,7 +134,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - GetSnapshotFromClient ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - GetSnapshotFromClient "));
 				}
 				using (TimeWarning.New("GetSnapshotFromClient"))
 				{
@@ -174,7 +174,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RequestAddScore ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestAddScore "));
 				}
 				using (TimeWarning.New("RequestAddScore"))
 				{
@@ -294,13 +294,14 @@ public class BaseArcadeMachine : BaseVehicle
 
 	public void NearbyClientMessage(string msg)
 	{
-		if (networkTrigger.entityContents != null)
+		if (networkTrigger.entityContents == null)
 		{
-			foreach (BaseEntity entityContent in networkTrigger.entityContents)
-			{
-				BasePlayer component = entityContent.GetComponent<BasePlayer>();
-				ClientRPCPlayer(null, component, msg);
-			}
+			return;
+		}
+		foreach (BaseEntity entityContent in networkTrigger.entityContents)
+		{
+			BasePlayer component = entityContent.GetComponent<BasePlayer>();
+			ClientRPCPlayer(null, component, msg);
 		}
 	}
 
@@ -309,14 +310,15 @@ public class BaseArcadeMachine : BaseVehicle
 	public void DestroyMessageFromHost(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && !(GetDriver() != player) && networkTrigger.entityContents != null)
+		if (player == null || GetDriver() != player || networkTrigger.entityContents == null)
 		{
-			uint arg = msg.read.UInt32();
-			foreach (BaseEntity entityContent in networkTrigger.entityContents)
-			{
-				BasePlayer component = entityContent.GetComponent<BasePlayer>();
-				ClientRPCPlayer(null, component, "DestroyEntity", arg);
-			}
+			return;
+		}
+		uint arg = msg.read.UInt32();
+		foreach (BaseEntity entityContent in networkTrigger.entityContents)
+		{
+			BasePlayer component = entityContent.GetComponent<BasePlayer>();
+			ClientRPCPlayer(null, component, "DestroyEntity", arg);
 		}
 	}
 
@@ -326,15 +328,16 @@ public class BaseArcadeMachine : BaseVehicle
 	public void BroadcastEntityMessage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && !(GetDriver() != player) && networkTrigger.entityContents != null)
+		if (player == null || GetDriver() != player || networkTrigger.entityContents == null)
 		{
-			uint arg = msg.read.UInt32();
-			string arg2 = msg.read.String();
-			foreach (BaseEntity entityContent in networkTrigger.entityContents)
-			{
-				BasePlayer component = entityContent.GetComponent<BasePlayer>();
-				ClientRPCPlayer(null, component, "GetEntityMessage", arg, arg2);
-			}
+			return;
+		}
+		uint arg = msg.read.UInt32();
+		string arg2 = msg.read.String();
+		foreach (BaseEntity entityContent in networkTrigger.entityContents)
+		{
+			BasePlayer component = entityContent.GetComponent<BasePlayer>();
+			ClientRPCPlayer(null, component, "GetEntityMessage", arg, arg2);
 		}
 	}
 
@@ -344,19 +347,21 @@ public class BaseArcadeMachine : BaseVehicle
 	public void GetSnapshotFromClient(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && !(player != GetDriver()))
+		if (player == null || player != GetDriver())
 		{
-			ArcadeGame arcadeGame = Facepunch.Pool.Get<ArcadeGame>();
-			arcadeGame = ArcadeGame.Deserialize(msg.read);
-			Connection sourceConnection = null;
-			if (networkTrigger.entityContents != null)
-			{
-				foreach (BaseEntity entityContent in networkTrigger.entityContents)
-				{
-					BasePlayer component = entityContent.GetComponent<BasePlayer>();
-					ClientRPCPlayer(sourceConnection, component, "GetSnapshotFromServer", arcadeGame);
-				}
-			}
+			return;
+		}
+		ArcadeGame arcadeGame = Facepunch.Pool.Get<ArcadeGame>();
+		arcadeGame = ArcadeGame.Deserialize(msg.read);
+		Connection sourceConnection = null;
+		if (networkTrigger.entityContents == null)
+		{
+			return;
+		}
+		foreach (BaseEntity entityContent in networkTrigger.entityContents)
+		{
+			BasePlayer component = entityContent.GetComponent<BasePlayer>();
+			ClientRPCPlayer(sourceConnection, component, "GetSnapshotFromServer", arcadeGame);
 		}
 	}
 }

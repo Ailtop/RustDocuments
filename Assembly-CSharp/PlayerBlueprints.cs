@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Oxide.Core;
 using ProtoBuf;
-using System.Collections.Generic;
 
 public class PlayerBlueprints : EntityComponent<BasePlayer>
 {

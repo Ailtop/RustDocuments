@@ -1,5 +1,5 @@
-using ProtoBuf;
 using System.Collections.Generic;
+using ProtoBuf;
 
 public class ItemCraftTask
 {

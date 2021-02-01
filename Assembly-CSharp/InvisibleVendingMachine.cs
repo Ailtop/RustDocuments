@@ -1,5 +1,5 @@
-using Facepunch;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class InvisibleVendingMachine : NPCVendingMachine
@@ -82,19 +82,20 @@ public class InvisibleVendingMachine : NPCVendingMachine
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.fromDisk && vmoManifest != null && info.msg.vendingMachine != null)
+		if (!info.fromDisk || !(vmoManifest != null) || info.msg.vendingMachine == null)
 		{
-			if (info.msg.vendingMachine.vmoIndex == -1 && TerrainMeta.Path.Monuments != null)
+			return;
+		}
+		if (info.msg.vendingMachine.vmoIndex == -1 && TerrainMeta.Path.Monuments != null)
+		{
+			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+				if (monument.displayPhrase.token.Contains("fish") && Vector3.Distance(monument.transform.position, base.transform.position) < 100f)
 				{
-					if (monument.displayPhrase.token.Contains("fish") && Vector3.Distance(monument.transform.position, base.transform.position) < 100f)
-					{
-						info.msg.vendingMachine.vmoIndex = 17;
-					}
+					info.msg.vendingMachine.vmoIndex = 17;
 				}
 			}
-			NPCVendingOrder nPCVendingOrder = vendingOrders = vmoManifest.GetFromIndex(info.msg.vendingMachine.vmoIndex);
 		}
+		NPCVendingOrder nPCVendingOrder = (vendingOrders = vmoManifest.GetFromIndex(info.msg.vendingMachine.vmoIndex));
 	}
 }

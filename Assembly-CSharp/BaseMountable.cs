@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
@@ -88,7 +88,7 @@ public class BaseMountable : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_WantsDismount ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsDismount "));
 				}
 				using (TimeWarning.New("RPC_WantsDismount"))
 				{
@@ -117,7 +117,7 @@ public class BaseMountable : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_WantsMount ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsMount "));
 				}
 				using (TimeWarning.New("RPC_WantsMount"))
 				{
@@ -379,6 +379,7 @@ public class BaseMountable : BaseCombatEntity
 			return;
 		}
 		BaseVehicle baseVehicle = VehicleParent();
+		Vector3 res;
 		if (lite)
 		{
 			_mounted.DismountObject();
@@ -388,10 +389,8 @@ public class BaseMountable : BaseCombatEntity
 			{
 				baseVehicle.PlayerDismounted(player, this);
 			}
-			return;
 		}
-		Vector3 res;
-		if (!GetDismountPosition(player, out res) || Distance(res) > 10f)
+		else if (!GetDismountPosition(player, out res) || Distance(res) > 10f)
 		{
 			res = player.transform.position;
 			_mounted.DismountObject();
@@ -406,30 +405,32 @@ public class BaseMountable : BaseCombatEntity
 			{
 				baseVehicle.PlayerDismounted(player, this);
 			}
-			return;
-		}
-		_mounted.DismountObject();
-		_mounted.transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
-		_mounted.MovePosition(res);
-		_mounted.SendNetworkUpdateImmediate();
-		_mounted = null;
-		SetFlag(Flags.Busy, false);
-		if (baseVehicle != null)
-		{
-			baseVehicle.PlayerDismounted(player, this);
-		}
-		player.ForceUpdateTriggers();
-		if ((bool)player.GetParentEntity())
-		{
-			BaseEntity parentEntity = player.GetParentEntity();
-			player.ClientRPCPlayer(null, player, "ForcePositionToParentOffset", parentEntity.transform.InverseTransformPoint(res), parentEntity.net.ID);
 		}
 		else
 		{
-			Interface.CallHook("OnEntityDismounted", this, player);
-			player.ClientRPCPlayer(null, player, "ForcePositionTo", res);
+			_mounted.DismountObject();
+			_mounted.transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
+			_mounted.MovePosition(res);
+			_mounted.SendNetworkUpdateImmediate();
+			_mounted = null;
+			SetFlag(Flags.Busy, false);
+			if (baseVehicle != null)
+			{
+				baseVehicle.PlayerDismounted(player, this);
+			}
+			player.ForceUpdateTriggers();
+			if ((bool)player.GetParentEntity())
+			{
+				BaseEntity parentEntity = player.GetParentEntity();
+				player.ClientRPCPlayer(null, player, "ForcePositionToParentOffset", parentEntity.transform.InverseTransformPoint(res), parentEntity.net.ID);
+			}
+			else
+			{
+				Interface.CallHook("OnEntityDismounted", this, player);
+				player.ClientRPCPlayer(null, player, "ForcePositionTo", res);
+			}
+			OnPlayerDismounted(player);
 		}
-		OnPlayerDismounted(player);
 	}
 
 	public bool ValidDismountPosition(Vector3 disPos, Vector3 visualCheckOrigin)

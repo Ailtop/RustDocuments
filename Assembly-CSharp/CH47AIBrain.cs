@@ -87,22 +87,23 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 						num2 -= count;
 					}
 					MonumentInfo monumentInfo2 = TerrainMeta.Path.Monuments[num2];
-					if (monumentInfo2.Type != 0 && monumentInfo2.Type != MonumentType.WaterWell && monumentInfo2.Tier != MonumentTier.Tier0 && (monumentInfo2.Tier & MonumentTier.Tier0) <= (MonumentTier)0)
+					if (monumentInfo2.Type == MonumentType.Cave || monumentInfo2.Type == MonumentType.WaterWell || monumentInfo2.Tier == MonumentTier.Tier0 || (monumentInfo2.Tier & MonumentTier.Tier0) > (MonumentTier)0)
 					{
-						bool flag = false;
-						foreach (Vector3 visitedPoint in visitedPoints)
+						continue;
+					}
+					bool flag = false;
+					foreach (Vector3 visitedPoint in visitedPoints)
+					{
+						if (Vector3Ex.Distance2D(monumentInfo2.transform.position, visitedPoint) < 100f)
 						{
-							if (Vector3Ex.Distance2D(monumentInfo2.transform.position, visitedPoint) < 100f)
-							{
-								flag = true;
-								break;
-							}
-						}
-						if (!flag)
-						{
-							monumentInfo = monumentInfo2;
+							flag = true;
 							break;
 						}
+					}
+					if (!flag)
+					{
+						monumentInfo = monumentInfo2;
+						break;
 					}
 				}
 				if (monumentInfo == null)
@@ -224,24 +225,25 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 				}
 			}
 			brain.GetEntity().SetMoveTarget(moveTarget);
-			if (num2)
+			if (!num2)
 			{
-				if (landedForSeconds > 1f && Time.time > nextDismountTime)
+				return;
+			}
+			if (landedForSeconds > 1f && Time.time > nextDismountTime)
+			{
+				foreach (BaseVehicle.MountPointInfo mountPoint in brain.GetEntity().mountPoints)
 				{
-					foreach (BaseVehicle.MountPointInfo mountPoint in brain.GetEntity().mountPoints)
+					if ((bool)mountPoint.mountable && mountPoint.mountable.IsMounted())
 					{
-						if ((bool)mountPoint.mountable && mountPoint.mountable.IsMounted())
-						{
-							nextDismountTime = Time.time + 0.5f;
-							mountPoint.mountable.DismountAllPlayers();
-							break;
-						}
+						nextDismountTime = Time.time + 0.5f;
+						mountPoint.mountable.DismountAllPlayers();
+						break;
 					}
 				}
-				if (landedForSeconds > 8f)
-				{
-					brain.GetComponent<CH47AIBrain>().age = float.PositiveInfinity;
-				}
+			}
+			if (landedForSeconds > 8f)
+			{
+				brain.GetComponent<CH47AIBrain>().age = float.PositiveInfinity;
 			}
 		}
 
@@ -307,7 +309,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 			Vector3 position = entity.GetPosition();
 			Vector3 vector = Vector3Ex.Direction2D(orbitCenter, position);
 			Vector3 vector2 = Vector3.Cross(Vector3.up, vector);
-			float d = (Vector3.Dot(Vector3.Cross(entity.transform.right, Vector3.up), vector2) < 0f) ? (-1f) : 1f;
+			float d = ((Vector3.Dot(Vector3.Cross(entity.transform.right, Vector3.up), vector2) < 0f) ? (-1f) : 1f);
 			float d2 = 75f;
 			Vector3 normalized = (-vector + vector2 * d * 0.6f).normalized;
 			Vector3 vector3 = orbitCenter + normalized * d2;
@@ -358,7 +360,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 			brain.GetEntity().EnableFacingOverride(false);
 			Transform transform = brain.GetEntity().transform;
 			Rigidbody rigidBody = brain.GetEntity().rigidBody;
-			Vector3 rhs = (rigidBody.velocity.magnitude < 0.1f) ? transform.forward : rigidBody.velocity.normalized;
+			Vector3 rhs = ((rigidBody.velocity.magnitude < 0.1f) ? transform.forward : rigidBody.velocity.normalized);
 			Vector3 a = Vector3.Cross(Vector3.Cross(transform.up, rhs), Vector3.up);
 			brain.mainInterestPoint = transform.position + a * 8000f;
 			brain.mainInterestPoint.y = 100f;

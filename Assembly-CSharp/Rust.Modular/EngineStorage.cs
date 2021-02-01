@@ -1,8 +1,8 @@
+using System;
+using System.Linq;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Linq;
 using UnityEngine;
 
 namespace Rust.Modular
@@ -157,7 +157,7 @@ namespace Rust.Modular
 		{
 			if (Interface.CallHook("OnEngineLoadoutRefresh", this) == null)
 			{
-				isUsable = (base.inventory.IsFull() && base.inventory.itemList.All((Item item) => !item.isBroken));
+				isUsable = base.inventory.IsFull() && base.inventory.itemList.All((Item item) => !item.isBroken);
 				accelerationBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsAcceleration) / (float)accelerationBoostSlots;
 				topSpeedBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsTopSpeed) / (float)topSpeedBoostSlots;
 				fuelEconomyBoostPercent = GetContainerItemsValueFor(EngineItemTypeEx.BoostsFuelEconomy) / (float)fuelEconomyBoostSlots;

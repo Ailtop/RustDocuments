@@ -1,11 +1,11 @@
-using Facepunch.Extend;
-using Facepunch.Math;
-using Network;
-using Oxide.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch.Extend;
+using Facepunch.Math;
+using Network;
+using Oxide.Core;
 using UnityEngine;
 
 public class ConnectionAuth : MonoBehaviour
@@ -66,7 +66,7 @@ public class ConnectionAuth : MonoBehaviour
 		{
 			ServerUsers.User user = ServerUsers.Get(connection.userid);
 			string text = user?.notes ?? "no reason given";
-			string text2 = (user != null && user.expiry > 0) ? (" for " + (user.expiry - Epoch.Current).FormatSecondsLong()) : "";
+			string text2 = ((user != null && user.expiry > 0) ? (" for " + (user.expiry - Epoch.Current).FormatSecondsLong()) : "");
 			Reject(connection, "You are banned from this server" + text2 + " (" + text + ")");
 			return;
 		}

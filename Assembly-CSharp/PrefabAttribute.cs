@@ -205,7 +205,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 	public override bool Equals(object o)
 	{
 		PrefabAttribute y;
-		if ((object)(y = (o as PrefabAttribute)) != null)
+		if ((object)(y = o as PrefabAttribute) != null)
 		{
 			return ComparePrefabAttribute(this, y);
 		}
@@ -234,7 +234,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 		{
 			return true;
 		}
-		if (flag | flag2)
+		if (flag || flag2)
 		{
 			return false;
 		}

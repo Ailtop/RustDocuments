@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
-using ConVar;
-using Facepunch.Sqlite;
-using Ionic.Crc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConVar;
+using Facepunch.Sqlite;
+using Ionic.Crc;
 using UnityEngine.Assertions;
 
 public class FileStorage : IDisposable

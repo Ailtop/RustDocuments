@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Sprinkler : IOEntity
@@ -67,7 +67,7 @@ public class Sprinkler : IOEntity
 					{
 						ISplashable splashable;
 						IOEntity entity;
-						if (!item.isClient && (splashable = (item as ISplashable)) != null && !cachedSplashables.Contains(splashable) && splashable.WantsSplash(currentFuelType, num) && item.IsVisible(position) && ((object)(entity = (item as IOEntity)) == null || !IsConnectedTo(entity, IOEntity.backtracking)))
+						if (!item.isClient && (splashable = item as ISplashable) != null && !cachedSplashables.Contains(splashable) && splashable.WantsSplash(currentFuelType, num) && item.IsVisible(position) && ((object)(entity = item as IOEntity) == null || !IsConnectedTo(entity, IOEntity.backtracking)))
 						{
 							cachedSplashables.Add(splashable);
 						}

@@ -1,9 +1,9 @@
+using System;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
 using UnityEngine;
 
 public class PhoneController : EntityComponent<BaseEntity>
@@ -320,7 +320,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 		serverState = state;
 		base.baseEntity.ClientRPC(null, "SetClientState", (int)serverState, (activeCallTo != null) ? activeCallTo.PhoneNumber : 0);
 		Telephone telephone;
-		if ((object)(telephone = (base.baseEntity as Telephone)) != null)
+		if ((object)(telephone = base.baseEntity as Telephone) != null)
 		{
 			telephone.MarkDirtyForceUpdateOutputs();
 		}
@@ -489,16 +489,16 @@ public class PhoneController : EntityComponent<BaseEntity>
 		}
 		if (num5 > 1f)
 		{
-			str += Convert.ToChar(64 + (int)num5).ToString();
+			str += Convert.ToChar(64 + (int)num5);
 		}
-		str += Convert.ToChar(64 + (int)num6).ToString();
+		str += Convert.ToChar(64 + (int)num6);
 		return $"{str}{num4}";
 	}
 
 	private bool IsPowered()
 	{
 		IOEntity iOEntity;
-		if (base.baseEntity != null && (object)(iOEntity = (base.baseEntity as IOEntity)) != null)
+		if (base.baseEntity != null && (object)(iOEntity = base.baseEntity as IOEntity) != null)
 		{
 			return iOEntity.IsPowered();
 		}

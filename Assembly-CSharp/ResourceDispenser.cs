@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
-using Oxide.Core;
-using Rust;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Oxide.Core;
+using Rust;
 using UnityEngine;
 
 public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
@@ -144,7 +144,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		}
 		float num = 0f;
 		float num2 = 0f;
-		BaseMelee baseMelee = (info.Weapon == null) ? null : info.Weapon.GetComponent<BaseMelee>();
+		BaseMelee baseMelee = ((info.Weapon == null) ? null : info.Weapon.GetComponent<BaseMelee>());
 		if (baseMelee != null)
 		{
 			GatherPropertyEntry gatherInfoFromIndex = baseMelee.GetGatherInfoFromIndex(gatherType);
@@ -193,22 +193,23 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 	public void AssignFinishBonus(BasePlayer player, float fraction)
 	{
 		SendMessage("FinishBonusAssigned", SendMessageOptions.DontRequireReceiver);
-		if (!(fraction <= 0f) && finishBonus != null)
+		if (fraction <= 0f || finishBonus == null)
 		{
-			foreach (ItemAmount finishBonu in finishBonus)
+			return;
+		}
+		foreach (ItemAmount finishBonu in finishBonus)
+		{
+			int num = Mathf.CeilToInt((float)(int)finishBonu.amount * Mathf.Clamp01(fraction));
+			int num2 = CalculateGatherBonus(player, finishBonu, num);
+			Item item = ItemManager.Create(finishBonu.itemDef, num + num2, 0uL);
+			if (item != null)
 			{
-				int num = Mathf.CeilToInt((float)(int)finishBonu.amount * Mathf.Clamp01(fraction));
-				int num2 = CalculateGatherBonus(player, finishBonu, num);
-				Item item = ItemManager.Create(finishBonu.itemDef, num + num2, 0uL);
-				if (item != null)
+				object obj = Interface.CallHook("OnDispenserBonus", this, player, item);
+				if (obj is Item)
 				{
-					object obj = Interface.CallHook("OnDispenserBonus", this, player, item);
-					if (obj is Item)
-					{
-						item = (Item)obj;
-					}
-					player.GiveItem(item, BaseEntity.GiveItemReason.ResourceHarvested);
+					item = (Item)obj;
 				}
+				player.GiveItem(item, BaseEntity.GiveItemReason.ResourceHarvested);
 			}
 		}
 	}
@@ -250,19 +251,19 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		BasePlayer basePlayer = entity.ToPlayer();
 		if ((bool)basePlayer)
 		{
-			Debug.Assert(attackWeapon.GetItem() != null, "Attack Weapon " + attackWeapon + " has no Item");
-			Debug.Assert(attackWeapon.ownerItemUID != 0, "Attack Weapon " + attackWeapon + " ownerItemUID is 0");
-			Debug.Assert(attackWeapon.GetParentEntity() != null, "Attack Weapon " + attackWeapon + " GetParentEntity is null");
-			Debug.Assert(BaseEntityEx.IsValid(attackWeapon.GetParentEntity()), "Attack Weapon " + attackWeapon + " GetParentEntity is not valid");
-			Debug.Assert(attackWeapon.GetParentEntity().ToPlayer() != null, "Attack Weapon " + attackWeapon + " GetParentEntity is not a player");
-			Debug.Assert(!attackWeapon.GetParentEntity().ToPlayer().IsDead(), "Attack Weapon " + attackWeapon + " GetParentEntity is not valid");
+			Debug.Assert(attackWeapon.GetItem() != null, string.Concat("Attack Weapon ", attackWeapon, " has no Item"));
+			Debug.Assert(attackWeapon.ownerItemUID != 0, string.Concat("Attack Weapon ", attackWeapon, " ownerItemUID is 0"));
+			Debug.Assert(attackWeapon.GetParentEntity() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is null"));
+			Debug.Assert(BaseEntityEx.IsValid(attackWeapon.GetParentEntity()), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
+			Debug.Assert(attackWeapon.GetParentEntity().ToPlayer() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not a player"));
+			Debug.Assert(!attackWeapon.GetParentEntity().ToPlayer().IsDead(), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
 			BasePlayer ownerPlayer = attackWeapon.GetOwnerPlayer();
-			Debug.Assert(ownerPlayer != null, "Attack Weapon " + attackWeapon + " ownerPlayer is null");
-			Debug.Assert(ownerPlayer == basePlayer, "Attack Weapon " + attackWeapon + " ownerPlayer is not player");
+			Debug.Assert(ownerPlayer != null, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is null"));
+			Debug.Assert(ownerPlayer == basePlayer, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is not player"));
 			if (ownerPlayer != null)
 			{
-				Debug.Assert(ownerPlayer.inventory != null, "Attack Weapon " + attackWeapon + " ownerPlayer inventory is null");
-				Debug.Assert(ownerPlayer.inventory.FindItemUID(attackWeapon.ownerItemUID) != null, "Attack Weapon " + attackWeapon + " FindItemUID is null");
+				Debug.Assert(ownerPlayer.inventory != null, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer inventory is null"));
+				Debug.Assert(ownerPlayer.inventory.FindItemUID(attackWeapon.ownerItemUID) != null, string.Concat("Attack Weapon ", attackWeapon, " FindItemUID is null"));
 			}
 		}
 	}
@@ -353,7 +354,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		}
 		num += basePlayer.modifiers.GetValue(type);
 		float variableValue = basePlayer.modifiers.GetVariableValue(type, 0f);
-		float num2 = (num > 1f) ? Mathf.Max(amountToGive * num - amountToGive, 0f) : 0f;
+		float num2 = ((num > 1f) ? Mathf.Max(amountToGive * num - amountToGive, 0f) : 0f);
 		variableValue += num2;
 		int num3 = 0;
 		if (variableValue >= 1f)

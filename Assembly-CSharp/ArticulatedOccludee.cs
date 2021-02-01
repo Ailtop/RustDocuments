@@ -1,6 +1,6 @@
-using Rust;
 using System;
 using System.Collections.Generic;
+using Rust;
 using UnityEngine;
 
 public class ArticulatedOccludee : BaseMonoBehaviour
@@ -103,8 +103,8 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 		Vector3 vector = Vector3.zero;
 		Vector3 a = Vector3.zero;
 		bool flag = false;
-		int num = (renderers != null) ? renderers.Count : 0;
-		int num2 = (colliders != null) ? colliders.Count : 0;
+		int num = ((renderers != null) ? renderers.Count : 0);
+		int num2 = ((colliders != null) ? colliders.Count : 0);
 		if (num > 0 && (num2 == 0 || num < num2))
 		{
 			for (int i = 0; i < renderers.Count; i++)
@@ -183,7 +183,7 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 	{
 		if (lodGroup != null)
 		{
-			float num = (!vis) ? 100000 : 0;
+			float num = ((!vis) ? 100000 : 0);
 			if (num != lodGroup.localReferencePoint.x)
 			{
 				lodGroup.localReferencePoint = new Vector3(num, num, num);

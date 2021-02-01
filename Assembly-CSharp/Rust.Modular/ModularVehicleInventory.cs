@@ -147,7 +147,7 @@ namespace Rust.Modular
 			int numSocketsTaken = moduleEntity.GetNumSocketsTaken();
 			if (SocketsAreFree(firstSocketIndex, numSocketsTaken))
 			{
-				Item item = moduleEntity.AssociatedItemInstance = ItemManager.Create(moduleEntity.AssociatedItemDef, 1, 0uL);
+				Item item = (moduleEntity.AssociatedItemInstance = ItemManager.Create(moduleEntity.AssociatedItemDef, 1, 0uL));
 				if (TryAddModuleItem(item, firstSocketIndex))
 				{
 					vehicle.SetUpModule(moduleEntity, item);

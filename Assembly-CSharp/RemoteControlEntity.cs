@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +28,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_SetID ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetID "));
 				}
 				using (TimeWarning.New("Server_SetID"))
 				{

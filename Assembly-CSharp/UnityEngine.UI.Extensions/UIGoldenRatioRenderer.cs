@@ -126,19 +126,20 @@ namespace UnityEngine.UI.Extensions
 
 		protected override void OnPopulateMesh(VertexHelper vh)
 		{
-			if (!(base.canvas == null))
+			if (base.canvas == null)
 			{
-				relativeSize = false;
-				DrawSpiral(vh);
-				m_points = _points.ToArray();
-				base.OnPopulateMesh(vh);
-				foreach (Rect rect in _rects)
-				{
-					DrawRect(vh, new Rect(rect.x, rect.y - lineThickness2 * 0.5f, rect.width, lineThickness2));
-					DrawRect(vh, new Rect(rect.x - lineThickness2 * 0.5f, rect.y, lineThickness2, rect.height));
-					DrawRect(vh, new Rect(rect.x, rect.y + rect.height - lineThickness2 * 0.5f, rect.width, lineThickness2));
-					DrawRect(vh, new Rect(rect.x + rect.width - lineThickness2 * 0.5f, rect.y, lineThickness2, rect.height));
-				}
+				return;
+			}
+			relativeSize = false;
+			DrawSpiral(vh);
+			m_points = _points.ToArray();
+			base.OnPopulateMesh(vh);
+			foreach (Rect rect in _rects)
+			{
+				DrawRect(vh, new Rect(rect.x, rect.y - lineThickness2 * 0.5f, rect.width, lineThickness2));
+				DrawRect(vh, new Rect(rect.x - lineThickness2 * 0.5f, rect.y, lineThickness2, rect.height));
+				DrawRect(vh, new Rect(rect.x, rect.y + rect.height - lineThickness2 * 0.5f, rect.width, lineThickness2));
+				DrawRect(vh, new Rect(rect.x + rect.width - lineThickness2 * 0.5f, rect.y, lineThickness2, rect.height));
 			}
 		}
 

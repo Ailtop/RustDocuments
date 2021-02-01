@@ -1,7 +1,7 @@
-using ConVar;
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using ConVar;
+using Facepunch;
 using UnityEngine;
 
 public abstract class Decay : PrefabAttribute, IServerComponent

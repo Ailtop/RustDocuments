@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System.Collections.Generic;
 using Network;
 using Network.Visibility;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -101,7 +101,7 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 
 	public Vector3 GetPosition(uint uid)
 	{
-		uid = (uint)((int)uid - startID);
+		uid -= (uint)startID;
 		int i = (int)((long)uid / (long)cellCount);
 		int i2 = (int)((long)uid % (long)cellCount);
 		return new Vector3(GridToPosition(i), 0f, GridToPosition(i2));
@@ -166,7 +166,7 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		{
 			return;
 		}
-		iD = (uint)((int)iD - startID);
+		iD -= (uint)startID;
 		int num = (int)((long)iD / (long)cellCount);
 		int num2 = (int)((long)iD % (long)cellCount);
 		groups.Add(Net.sv.visibility.Get(CoordToID(num, num2)));

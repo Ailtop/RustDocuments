@@ -1,6 +1,6 @@
+using System;
 using Apex.AI;
 using Apex.Serialization;
-using System;
 using UnityEngine;
 
 namespace Rust.Ai

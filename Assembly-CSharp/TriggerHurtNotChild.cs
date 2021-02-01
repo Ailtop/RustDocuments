@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class TriggerHurtNotChild : TriggerBase, IServerComponent
@@ -128,52 +128,53 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent
 
 	private void OnTick()
 	{
-		if (!CollectionEx.IsNullOrEmpty(entityContents))
+		if (CollectionEx.IsNullOrEmpty(entityContents))
 		{
-			List<BaseEntity> obj = Pool.GetList<BaseEntity>();
-			obj.AddRange(entityContents);
-			IHurtTriggerUser hurtTriggerUser = SourceEntity as IHurtTriggerUser;
-			foreach (BaseEntity item in obj)
+			return;
+		}
+		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
+		obj.AddRange(entityContents);
+		IHurtTriggerUser hurtTriggerUser = SourceEntity as IHurtTriggerUser;
+		foreach (BaseEntity item in obj)
+		{
+			float value;
+			if (BaseEntityEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
 			{
-				float value;
-				if (BaseEntityEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
+				float num = DamagePerSecond * 1f / DamageTickRate;
+				if (UseSourceEntityDamageMultiplier && hurtTriggerUser != null)
 				{
-					float num = DamagePerSecond * 1f / DamageTickRate;
-					if (UseSourceEntityDamageMultiplier && hurtTriggerUser != null)
-					{
-						num *= hurtTriggerUser.GetPlayerDamageMultiplier();
-					}
-					if (item.IsNpc)
-					{
-						num *= npcMultiplier;
-					}
-					if (item is ResourceEntity)
-					{
-						num *= resourceMultiplier;
-					}
-					Vector3 vector = item.transform.position + Vector3.up * 1f;
-					HitInfo hitInfo = new HitInfo
-					{
-						DoHitEffects = true,
-						HitEntity = item,
-						HitPositionWorld = vector,
-						HitPositionLocal = item.transform.InverseTransformPoint(vector),
-						HitNormalWorld = Vector3.up,
-						HitMaterial = ((item is BaseCombatEntity) ? StringPool.Get("Flesh") : 0u),
-						Initiator = hurtTriggerUser?.GetPlayerDamageInitiator()
-					};
-					hitInfo.damageTypes = new DamageTypeList();
-					hitInfo.damageTypes.Set(damageType, num);
-					item.OnAttacked(hitInfo);
-					hurtTriggerUser?.OnHurtTriggerOccupant(item, damageType, num);
-					if (triggerHitImpacts)
-					{
-						Effect.server.ImpactEffect(hitInfo);
-					}
+					num *= hurtTriggerUser.GetPlayerDamageMultiplier();
+				}
+				if (item.IsNpc)
+				{
+					num *= npcMultiplier;
+				}
+				if (item is ResourceEntity)
+				{
+					num *= resourceMultiplier;
+				}
+				Vector3 vector = item.transform.position + Vector3.up * 1f;
+				HitInfo hitInfo = new HitInfo
+				{
+					DoHitEffects = true,
+					HitEntity = item,
+					HitPositionWorld = vector,
+					HitPositionLocal = item.transform.InverseTransformPoint(vector),
+					HitNormalWorld = Vector3.up,
+					HitMaterial = ((item is BaseCombatEntity) ? StringPool.Get("Flesh") : 0u),
+					Initiator = hurtTriggerUser?.GetPlayerDamageInitiator()
+				};
+				hitInfo.damageTypes = new DamageTypeList();
+				hitInfo.damageTypes.Set(damageType, num);
+				item.OnAttacked(hitInfo);
+				hurtTriggerUser?.OnHurtTriggerOccupant(item, damageType, num);
+				if (triggerHitImpacts)
+				{
+					Effect.server.ImpactEffect(hitInfo);
 				}
 			}
-			Pool.FreeList(ref obj);
-			RemoveInvalidEntities();
 		}
+		Pool.FreeList(ref obj);
+		RemoveInvalidEntities();
 	}
 }

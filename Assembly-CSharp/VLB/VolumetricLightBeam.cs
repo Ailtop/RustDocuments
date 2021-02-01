@@ -282,7 +282,7 @@ namespace VLB
 		{
 			get
 			{
-				Mesh mesh = m_BeamGeom ? m_BeamGeom.coneMesh : null;
+				Mesh mesh = (m_BeamGeom ? m_BeamGeom.coneMesh : null);
 				if ((bool)mesh)
 				{
 					return $"Cone angle: {coneAngle:0.0} degrees\nMesh: {mesh.vertexCount} vertices, {mesh.triangles.Length / 3} triangles";

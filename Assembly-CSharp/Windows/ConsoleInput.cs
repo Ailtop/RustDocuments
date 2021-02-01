@@ -101,42 +101,43 @@ namespace Windows
 
 		public void Update()
 		{
-			if (valid)
+			if (!valid)
 			{
-				if (nextUpdate < Time.realtimeSinceStartup)
-				{
-					RedrawInputLine();
-					nextUpdate = Time.realtimeSinceStartup + 0.5f;
-				}
-				try
-				{
-					if (!Console.KeyAvailable)
-					{
-						return;
-					}
-				}
-				catch (Exception)
+				return;
+			}
+			if (nextUpdate < Time.realtimeSinceStartup)
+			{
+				RedrawInputLine();
+				nextUpdate = Time.realtimeSinceStartup + 0.5f;
+			}
+			try
+			{
+				if (!Console.KeyAvailable)
 				{
 					return;
 				}
-				ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
-				if (consoleKeyInfo.Key == ConsoleKey.Enter)
-				{
-					OnEnter();
-				}
-				else if (consoleKeyInfo.Key == ConsoleKey.Backspace)
-				{
-					OnBackspace();
-				}
-				else if (consoleKeyInfo.Key == ConsoleKey.Escape)
-				{
-					OnEscape();
-				}
-				else if (consoleKeyInfo.KeyChar != 0)
-				{
-					inputString += consoleKeyInfo.KeyChar.ToString();
-					RedrawInputLine();
-				}
+			}
+			catch (Exception)
+			{
+				return;
+			}
+			ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
+			if (consoleKeyInfo.Key == ConsoleKey.Enter)
+			{
+				OnEnter();
+			}
+			else if (consoleKeyInfo.Key == ConsoleKey.Backspace)
+			{
+				OnBackspace();
+			}
+			else if (consoleKeyInfo.Key == ConsoleKey.Escape)
+			{
+				OnEscape();
+			}
+			else if (consoleKeyInfo.KeyChar != 0)
+			{
+				inputString += consoleKeyInfo.KeyChar;
+				RedrawInputLine();
 			}
 		}
 	}

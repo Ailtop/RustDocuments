@@ -1,5 +1,5 @@
-using Rust;
 using System.Collections.Generic;
+using Rust;
 using UnityEngine;
 
 public class WaterVisibilityTrigger : EnvironmentVolumeTrigger
@@ -57,7 +57,7 @@ public class WaterVisibilityTrigger : EnvironmentVolumeTrigger
 	{
 		bool num = other.gameObject.GetComponent<PlayerWalkMovement>() != null;
 		bool flag = other.gameObject.CompareTag("MainCamera");
-		if ((num | flag) && !tracker.ContainsValue(this))
+		if ((num || flag) && !tracker.ContainsValue(this))
 		{
 			enteredTick = ticks++;
 			tracker.Add(enteredTick, this);
@@ -73,7 +73,7 @@ public class WaterVisibilityTrigger : EnvironmentVolumeTrigger
 	{
 		bool num = other.gameObject.GetComponent<PlayerWalkMovement>() != null;
 		bool flag = other.gameObject.CompareTag("MainCamera");
-		if ((num | flag) && tracker.ContainsValue(this))
+		if ((num || flag) && tracker.ContainsValue(this))
 		{
 			tracker.Remove(enteredTick);
 			if (tracker.Count > 0)

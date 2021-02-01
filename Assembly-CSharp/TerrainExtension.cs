@@ -1,5 +1,5 @@
-using Facepunch.Extend;
 using System;
+using Facepunch.Extend;
 using UnityEngine;
 
 [RequireComponent(typeof(TerrainMeta))]
@@ -28,6 +28,6 @@ public abstract class TerrainExtension : MonoBehaviour
 
 	public void LogSize(object obj, ulong size)
 	{
-		Debug.Log(obj.GetType() + " allocated: " + size.FormatBytes());
+		Debug.Log(string.Concat(obj.GetType(), " allocated: ", size.FormatBytes()));
 	}
 }

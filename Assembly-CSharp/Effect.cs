@@ -258,7 +258,7 @@ public class Effect : EffectData
 			Debug.LogWarning("Effect.Init - invalid entity");
 		}
 		entity = (BaseEntityEx.IsValid(ent) ? ent.net.ID : 0u);
-		source = (sourceConnection?.userid ?? 0);
+		source = sourceConnection?.userid ?? 0;
 		bone = boneID;
 	}
 
@@ -275,7 +275,7 @@ public class Effect : EffectData
 		origin = worldPos;
 		normal = worldNrm;
 		bone = 0u;
-		source = (sourceConnection?.userid ?? 0);
+		source = sourceConnection?.userid ?? 0;
 	}
 
 	public void Clear()

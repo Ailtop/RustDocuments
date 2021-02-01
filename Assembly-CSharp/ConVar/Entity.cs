@@ -25,7 +25,7 @@ namespace ConVar
 			{
 				entity = src;
 				BaseEntity baseEntity = entity as BaseEntity;
-				BaseEntity x = (baseEntity != null) ? baseEntity.GetParentEntity() : null;
+				BaseEntity x = ((baseEntity != null) ? baseEntity.GetParentEntity() : null);
 				entityID = ((entity != null && entity.net != null) ? entity.net.ID : 0u);
 				groupID = ((entity != null && entity.net != null && entity.net.group != null) ? entity.net.group.ID : 0u);
 				parentID = ((baseEntity != null) ? baseEntity.parentEntity.uid : 0u);
@@ -128,7 +128,7 @@ namespace ConVar
 			if (!(player == null))
 			{
 				uint filter = args.GetUInt(0, 10u);
-				TextTable entityTable = GetEntityTable((EntityInfo info) => Vector3.Distance(info.entity.transform.position, player.transform.position) <= (float)(double)filter);
+				TextTable entityTable = GetEntityTable((EntityInfo info) => Vector3.Distance(info.entity.transform.position, player.transform.position) <= (float)filter);
 				args.ReplyWith(entityTable.ToString());
 			}
 		}
@@ -217,7 +217,7 @@ namespace ConVar
 			}
 			baseEntity.Spawn();
 			Debug.Log($"{arg} spawned \"{baseEntity}\" at {pos}");
-			return "spawned " + baseEntity + " at " + pos;
+			return string.Concat("spawned ", baseEntity, " at ", pos);
 		}
 
 		[ServerVar(Name = "spawnitem")]
@@ -254,7 +254,7 @@ namespace ConVar
 			}
 			BaseEntity arg2 = item.CreateWorldObject(pos);
 			Debug.Log($"{arg} spawned \"{arg2}\" at {pos} (via spawnitem)");
-			return "spawned " + item + " at " + pos;
+			return string.Concat("spawned ", item, " at ", pos);
 		}
 
 		[ServerVar]

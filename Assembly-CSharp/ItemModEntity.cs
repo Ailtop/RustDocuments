@@ -14,11 +14,13 @@ public class ItemModEntity : ItemMod
 			if (baseEntity == null)
 			{
 				Debug.LogWarning("Couldn't create item entity " + item.info.displayName.english + " (" + entityPrefab.resourcePath + ")");
-				return;
 			}
-			baseEntity.skinID = item.skin;
-			baseEntity.Spawn();
-			item.SetHeldEntity(baseEntity);
+			else
+			{
+				baseEntity.skinID = item.skin;
+				baseEntity.Spawn();
+				item.SetHeldEntity(baseEntity);
+			}
 		}
 	}
 

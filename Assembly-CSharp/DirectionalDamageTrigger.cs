@@ -1,6 +1,6 @@
-using Rust;
 using System.Collections.Generic;
 using System.Linq;
+using Rust;
 using UnityEngine;
 
 public class DirectionalDamageTrigger : TriggerBase

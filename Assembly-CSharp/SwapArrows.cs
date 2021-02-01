@@ -1,5 +1,5 @@
-using Rust;
 using System;
+using Rust;
 using UnityEngine;
 
 public class SwapArrows : MonoBehaviour, IClientComponent

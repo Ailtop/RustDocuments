@@ -1,7 +1,7 @@
-using Rust;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rust;
 using UnityEngine;
 
 public class WildlifeTrap : StorageContainer
@@ -65,14 +65,15 @@ public class WildlifeTrap : StorageContainer
 		foreach (Item item in base.inventory.itemList)
 		{
 			ItemModConsumable component = item.info.GetComponent<ItemModConsumable>();
-			if (!(component == null) && !ignoreBait.Contains(item.info))
+			if (component == null || ignoreBait.Contains(item.info))
 			{
-				foreach (ItemModConsumable.ConsumableEffect effect in component.effects)
+				continue;
+			}
+			foreach (ItemModConsumable.ConsumableEffect effect in component.effects)
+			{
+				if (effect.type == MetabolismAttribute.Type.Calories && effect.amount > 0f)
 				{
-					if (effect.type == MetabolismAttribute.Type.Calories && effect.amount > 0f)
-					{
-						num += Mathf.CeilToInt(effect.amount * (float)item.amount);
-					}
+					num += Mathf.CeilToInt(effect.amount * (float)item.amount);
 				}
 			}
 		}
@@ -83,28 +84,20 @@ public class WildlifeTrap : StorageContainer
 	{
 		int count = base.inventory.itemList.Count;
 		int num = UnityEngine.Random.Range(0, count);
-		int num2 = 0;
-		Item item;
-		while (true)
+		for (int i = 0; i < count; i++)
 		{
-			if (num2 < count)
+			int num2 = num + i;
+			if (num2 >= count)
 			{
-				int num3 = num + num2;
-				if (num3 >= count)
-				{
-					num3 -= count;
-				}
-				item = base.inventory.itemList[num3];
-				if (item != null && !(item.info.GetComponent<ItemModConsumable>() == null))
-				{
-					break;
-				}
-				num2++;
-				continue;
+				num2 -= count;
 			}
-			return;
+			Item item = base.inventory.itemList[num2];
+			if (item != null && !(item.info.GetComponent<ItemModConsumable>() == null))
+			{
+				item.UseItem();
+				break;
+			}
 		}
-		item.UseItem();
 	}
 
 	public void UseBaitCalories(int numToUse)

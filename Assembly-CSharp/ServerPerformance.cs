@@ -1,8 +1,8 @@
-using Facepunch;
-using Rust;
 using System;
 using System.IO;
 using System.Linq;
+using Facepunch;
+using Rust;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -93,7 +93,7 @@ public class ServerPerformance : BaseMonoBehaviour
 		{
 			return "null";
 		}
-		string str = obj.activeSelf ? "" : " (inactive)";
+		string str = (obj.activeSelf ? "" : " (inactive)");
 		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
 		if ((bool)baseEntity)
 		{

@@ -17,18 +17,19 @@ namespace ConVar
 		[ClientVar]
 		public static void monuments(Arg arg)
 		{
-			if ((bool)TerrainMeta.Path)
+			if (!TerrainMeta.Path)
 			{
-				TextTable textTable = new TextTable();
-				textTable.AddColumn("type");
-				textTable.AddColumn("name");
-				textTable.AddColumn("pos");
-				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
-				{
-					textTable.AddRow(monument.Type.ToString(), monument.name, monument.transform.position.ToString());
-				}
-				arg.ReplyWith(textTable.ToString());
+				return;
 			}
+			TextTable textTable = new TextTable();
+			textTable.AddColumn("type");
+			textTable.AddColumn("name");
+			textTable.AddColumn("pos");
+			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+			{
+				textTable.AddRow(monument.Type.ToString(), monument.name, monument.transform.position.ToString());
+			}
+			arg.ReplyWith(textTable.ToString());
 		}
 
 		[ServerVar(Clientside = true, Help = "Renders a high resolution PNG of the current map")]

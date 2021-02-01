@@ -1,7 +1,7 @@
+using System;
 using ConVar;
 using Facepunch;
 using ProtoBuf;
-using System;
 using UnityEngine;
 
 public class PlanterBox : StorageContainer, ISplashable
@@ -119,22 +119,24 @@ public class PlanterBox : StorageContainer, ISplashable
 	public void FertilizeGrowables()
 	{
 		int num = GetFertilizerCount();
-		if (num > 0)
+		if (num <= 0)
 		{
-			foreach (BaseEntity child in children)
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			if (child == null)
 			{
-				if (!(child == null))
+				continue;
+			}
+			GrowableEntity growableEntity = child as GrowableEntity;
+			if (!(growableEntity == null) && !growableEntity.Fertilized && ConsumeFertilizer())
+			{
+				growableEntity.Fertilize();
+				num--;
+				if (num == 0)
 				{
-					GrowableEntity growableEntity = child as GrowableEntity;
-					if (!(growableEntity == null) && !growableEntity.Fertilized && ConsumeFertilizer())
-					{
-						growableEntity.Fertilize();
-						num--;
-						if (num == 0)
-						{
-							break;
-						}
-					}
+					break;
 				}
 			}
 		}
@@ -216,15 +218,16 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	private void RefreshGrowables(GrowableEntity ignoreEntity = null)
 	{
-		if (children != null)
+		if (children == null)
 		{
-			foreach (BaseEntity child in children)
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			GrowableEntity growableEntity;
+			if (!(child == null) && !(child == ignoreEntity) && (object)(growableEntity = child as GrowableEntity) != null)
 			{
-				GrowableEntity growableEntity;
-				if (!(child == null) && !(child == ignoreEntity) && (object)(growableEntity = (child as GrowableEntity)) != null)
-				{
-					growableEntity.QueueForQualityUpdate();
-				}
+				growableEntity.QueueForQualityUpdate();
 			}
 		}
 	}

@@ -1,5 +1,5 @@
-using Facepunch;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class SocketMod_Attraction : SocketMod
@@ -31,28 +31,30 @@ public class SocketMod_Attraction : SocketMod
 		Vis.Entities(vector, outerRadius * 2f, obj);
 		foreach (BaseEntity item in obj)
 		{
-			if (item.isServer == isServer)
+			if (item.isServer != isServer)
 			{
-				AttractionPoint[] array = prefabAttribute.FindAll<AttractionPoint>(item.prefabID);
-				if (array != null)
+				continue;
+			}
+			AttractionPoint[] array = prefabAttribute.FindAll<AttractionPoint>(item.prefabID);
+			if (array == null)
+			{
+				continue;
+			}
+			AttractionPoint[] array2 = array;
+			foreach (AttractionPoint attractionPoint in array2)
+			{
+				if (!(attractionPoint.groupName != groupName))
 				{
-					AttractionPoint[] array2 = array;
-					foreach (AttractionPoint attractionPoint in array2)
+					Vector3 a = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
+					float magnitude = (a - vector).magnitude;
+					if (!(magnitude > outerRadius))
 					{
-						if (!(attractionPoint.groupName != groupName))
-						{
-							Vector3 a = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
-							float magnitude = (a - vector).magnitude;
-							if (!(magnitude > outerRadius))
-							{
-								Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, a - place.position, Vector3.up);
-								float num = Mathf.InverseLerp(outerRadius, innerRadius, magnitude);
-								place.rotation = Quaternion.Lerp(place.rotation, b, num);
-								vector = place.position + place.rotation * worldPosition;
-								Vector3 a2 = a - vector;
-								place.position += a2 * num;
-							}
-						}
+						Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, a - place.position, Vector3.up);
+						float num = Mathf.InverseLerp(outerRadius, innerRadius, magnitude);
+						place.rotation = Quaternion.Lerp(place.rotation, b, num);
+						vector = place.position + place.rotation * worldPosition;
+						Vector3 a2 = a - vector;
+						place.position += a2 * num;
 					}
 				}
 			}

@@ -1,5 +1,5 @@
-using Rust;
 using System.Collections.Generic;
+using Rust;
 using UnityEngine;
 
 public class BaseFirework : BaseCombatEntity, IIgniteable

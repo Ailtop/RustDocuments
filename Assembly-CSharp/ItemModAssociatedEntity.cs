@@ -84,7 +84,7 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 			{
 				return ownerPlayer;
 			}
-			BaseEntity baseEntity = (item.parent == null) ? null : item.parent.entityOwner;
+			BaseEntity baseEntity = ((item.parent == null) ? null : item.parent.entityOwner);
 			if (baseEntity != null)
 			{
 				return baseEntity;

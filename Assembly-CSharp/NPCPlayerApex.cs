@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.AI.Components;
 using Apex.AI.Serialization;
@@ -5,9 +8,6 @@ using Apex.LoadBalancing;
 using ConVar;
 using Oxide.Core;
 using Rust.Ai;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -1308,7 +1308,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		}
 		if (GetFact(Facts.IsAggro) == 0 && IsWithinAggroRange(range))
 		{
-			float a = ((int)range <= 1) ? 1f : Stats.Defensiveness;
+			float a = (((int)range <= 1) ? 1f : Stats.Defensiveness);
 			a = Mathf.Max(a, Stats.Hostility);
 			if (UnityEngine.Time.realtimeSinceStartup > lastAggroChanceCalcTime + 5f)
 			{
@@ -1347,7 +1347,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		bool triggerCallback = true;
 		if (float.IsInfinity(base.SecondsSinceDealtDamage) || float.IsNegativeInfinity(base.SecondsSinceDealtDamage) || float.IsNaN(base.SecondsSinceDealtDamage))
 		{
-			flag = (UnityEngine.Time.realtimeSinceStartup > aggroTimeout);
+			flag = UnityEngine.Time.realtimeSinceStartup > aggroTimeout;
 		}
 		else
 		{
@@ -1389,7 +1389,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			}
 		}
 		bool flag = UnityEngine.Random.value < Stats.HealthThresholdFleeChance;
-		SetFact(Facts.IsUnderHealthThreshold, (byte)(flag ? 1 : 0));
+		SetFact(Facts.IsUnderHealthThreshold, (byte)(flag ? 1u : 0u));
 		return flag;
 	}
 
@@ -1432,60 +1432,62 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		AiContext.CoverSet.Reset();
 		foreach (CoverPoint sampledCoverPoint in AiContext.sampledCoverPoints)
 		{
-			if (!sampledCoverPoint.IsReserved && !sampledCoverPoint.IsCompromised && sampledCoverPoint.ProvidesCoverFromPoint(position, -0.8f))
+			if (sampledCoverPoint.IsReserved || sampledCoverPoint.IsCompromised || !sampledCoverPoint.ProvidesCoverFromPoint(position, -0.8f))
 			{
-				Vector3 vector = sampledCoverPoint.Position - ServerPosition;
-				Vector3 vector2 = position - ServerPosition;
-				float num4 = Vector3.Dot(vector.normalized, vector2.normalized);
-				if (!(num4 > 0.5f) || !(vector.sqrMagnitude > vector2.sqrMagnitude))
+				continue;
+			}
+			Vector3 vector = sampledCoverPoint.Position - ServerPosition;
+			Vector3 vector2 = position - ServerPosition;
+			float num4 = Vector3.Dot(vector.normalized, vector2.normalized);
+			if (num4 > 0.5f && vector.sqrMagnitude > vector2.sqrMagnitude)
+			{
+				continue;
+			}
+			if (num4 <= -0.5f)
+			{
+				if (vector.sqrMagnitude < MinDistanceToRetreatCover * MinDistanceToRetreatCover)
 				{
-					if (num4 <= -0.5f)
+					num4 = 0.1f;
+				}
+				else
+				{
+					float num5 = num4 * -1f;
+					if (num5 > num)
 					{
-						if (vector.sqrMagnitude < MinDistanceToRetreatCover * MinDistanceToRetreatCover)
-						{
-							num4 = 0.1f;
-						}
-						else
-						{
-							float num5 = num4 * -1f;
-							if (num5 > num)
-							{
-								num = num5;
-								retreat = sampledCoverPoint;
-							}
-						}
+						num = num5;
+						retreat = sampledCoverPoint;
 					}
-					if (num4 >= 0.5f)
+				}
+			}
+			if (num4 >= 0.5f)
+			{
+				float sqrMagnitude = vector.sqrMagnitude;
+				if (sqrMagnitude > vector2.sqrMagnitude)
+				{
+					continue;
+				}
+				float num6 = num4;
+				if (num6 > num3)
+				{
+					if (AI.npc_cover_use_path_distance && IsNavRunning() && AttackTarget != null && !PathDistanceIsValid(AttackTarget.ServerPosition, sampledCoverPoint.Position))
 					{
-						float sqrMagnitude = vector.sqrMagnitude;
-						if (sqrMagnitude > vector2.sqrMagnitude)
-						{
-							continue;
-						}
-						float num6 = num4;
-						if (num6 > num3)
-						{
-							if (AI.npc_cover_use_path_distance && IsNavRunning() && AttackTarget != null && !PathDistanceIsValid(AttackTarget.ServerPosition, sampledCoverPoint.Position))
-							{
-								continue;
-							}
-							if ((sampledCoverPoint.Position - position).sqrMagnitude < sqrMagnitude)
-							{
-								num6 *= 0.9f;
-							}
-							num3 = num6;
-							advance = sampledCoverPoint;
-						}
+						continue;
 					}
-					if (num4 >= -0.1f && num4 <= 0.1f)
+					if ((sampledCoverPoint.Position - position).sqrMagnitude < sqrMagnitude)
 					{
-						float num7 = 1f - Mathf.Abs(num4);
-						if (num7 > num2 && (!AI.npc_cover_use_path_distance || !IsNavRunning() || !(AttackTarget != null) || PathDistanceIsValid(AttackTarget.ServerPosition, sampledCoverPoint.Position)))
-						{
-							num2 = 0.1f - Mathf.Abs(num7);
-							flank = sampledCoverPoint;
-						}
+						num6 *= 0.9f;
 					}
+					num3 = num6;
+					advance = sampledCoverPoint;
+				}
+			}
+			if (num4 >= -0.1f && num4 <= 0.1f)
+			{
+				float num7 = 1f - Mathf.Abs(num4);
+				if (num7 > num2 && (!AI.npc_cover_use_path_distance || !IsNavRunning() || !(AttackTarget != null) || PathDistanceIsValid(AttackTarget.ServerPosition, sampledCoverPoint.Position)))
+				{
+					num2 = 0.1f - Mathf.Abs(num7);
+					flank = sampledCoverPoint;
 				}
 			}
 		}
@@ -2050,7 +2052,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public void TickReasoningSystem()
 	{
-		SetFact(Facts.HasEnemy, (byte)((AttackTarget != null) ? 1 : 0));
+		SetFact(Facts.HasEnemy, (byte)((AttackTarget != null) ? 1u : 0u));
 		_GatherPlayerTargetFacts();
 		if (base.isMounted)
 		{
@@ -2098,9 +2100,9 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			SetFact(Facts.EnemyRange, (byte)ToEnemyRangeEnum(num));
 			SetFact(Facts.EnemyEngagementRange, (byte)ToEnemyEngagementRangeEnum(num));
 			SetFact(Facts.AfraidRange, (byte)ToAfraidRangeEnum(num));
-			SetFact(Facts.HasLineOfSight, (byte)((b > 0) ? 1 : 0));
-			SetFact(Facts.HasLineOfSightStanding, (byte)((b == 1 || b == 3) ? 1 : 0));
-			SetFact(Facts.HasLineOfSightCrouched, (byte)((b == 2 || b == 3) ? 1 : 0));
+			SetFact(Facts.HasLineOfSight, (byte)((b > 0) ? 1u : 0u));
+			SetFact(Facts.HasLineOfSightStanding, (byte)((b == 1 || b == 3) ? 1u : 0u));
+			SetFact(Facts.HasLineOfSightCrouched, (byte)((b == 2 || b == 3) ? 1u : 0u));
 		}
 		else
 		{
@@ -2121,11 +2123,11 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	private void _UpdateMountedSelfFacts()
 	{
 		SetFact(Facts.Health, (byte)ToHealthEnum(base.healthFraction));
-		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1 : 0));
-		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1 : 0));
-		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1 : 0));
-		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1 : 0));
-		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1 : 0));
+		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1u : 0u));
+		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1u : 0u));
+		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1u : 0u));
+		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1u : 0u));
+		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1u : 0u));
 		SetFact(Facts.CurrentAmmoState, (byte)GetCurrentAmmoStateEnum());
 		SetFact(Facts.CurrentWeaponType, (byte)GetCurrentWeaponTypeEnum());
 	}
@@ -2133,21 +2135,21 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	private void _UpdateGroundedSelfFacts()
 	{
 		SetFact(Facts.Health, (byte)ToHealthEnum(base.healthFraction));
-		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1 : 0));
-		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1 : 0));
+		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1u : 0u));
+		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1u : 0u));
 		SetFact(Facts.Speed, (byte)ToSpeedEnum(TargetSpeed / Stats.Speed));
-		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1 : 0));
-		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1 : 0));
-		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1 : 0));
+		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1u : 0u));
+		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1u : 0u));
+		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1u : 0u));
 		SetFact(Facts.IsMoving, IsMoving(), true, false);
-		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1 : 0));
-		SetFact(Facts.CanSwitchTool, (byte)((UnityEngine.Time.realtimeSinceStartup > NextToolSwitchTime) ? 1 : 0));
+		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1u : 0u));
+		SetFact(Facts.CanSwitchTool, (byte)((UnityEngine.Time.realtimeSinceStartup > NextToolSwitchTime) ? 1u : 0u));
 		SetFact(Facts.CurrentAmmoState, (byte)GetCurrentAmmoStateEnum());
 		SetFact(Facts.CurrentWeaponType, (byte)GetCurrentWeaponTypeEnum());
 		SetFact(Facts.CurrentToolType, (byte)GetCurrentToolTypeEnum());
-		SetFact(Facts.ExplosiveInRange, (byte)((AiContext.DeployedExplosives.Count > 0) ? 1 : 0));
-		SetFact(Facts.IsMobile, (byte)(Stats.IsMobile ? 1 : 0));
-		SetFact(Facts.HasWaypoints, (byte)((WaypointSet != null && WaypointSet.Points.Count > 0) ? 1 : 0));
+		SetFact(Facts.ExplosiveInRange, (byte)((AiContext.DeployedExplosives.Count > 0) ? 1u : 0u));
+		SetFact(Facts.IsMobile, (byte)(Stats.IsMobile ? 1u : 0u));
+		SetFact(Facts.HasWaypoints, (byte)((WaypointSet != null && WaypointSet.Points.Count > 0) ? 1u : 0u));
 		EnemyRangeEnum rangeToSpawnPoint = GetRangeToSpawnPoint();
 		SetFact(Facts.RangeToSpawnLocation, (byte)rangeToSpawnPoint);
 		if ((int)rangeToSpawnPoint < (int)Stats.MaxRangeToSpawnLoc || (Stats.MaxRangeToSpawnLoc == EnemyRangeEnum.CloseAttackRange && rangeToSpawnPoint == EnemyRangeEnum.CloseAttackRange))
@@ -2164,10 +2166,10 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	{
 		if (GetFact(Facts.HasEnemy) == 1)
 		{
-			SetFact(Facts.RetreatCoverInRange, (byte)((AiContext.CoverSet.Retreat.ReservedCoverPoint != null) ? 1 : 0));
-			SetFact(Facts.FlankCoverInRange, (byte)((AiContext.CoverSet.Flank.ReservedCoverPoint != null) ? 1 : 0));
-			SetFact(Facts.AdvanceCoverInRange, (byte)((AiContext.CoverSet.Advance.ReservedCoverPoint != null) ? 1 : 0));
-			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1 : 0));
+			SetFact(Facts.RetreatCoverInRange, (byte)((AiContext.CoverSet.Retreat.ReservedCoverPoint != null) ? 1u : 0u));
+			SetFact(Facts.FlankCoverInRange, (byte)((AiContext.CoverSet.Flank.ReservedCoverPoint != null) ? 1u : 0u));
+			SetFact(Facts.AdvanceCoverInRange, (byte)((AiContext.CoverSet.Advance.ReservedCoverPoint != null) ? 1u : 0u));
+			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1u : 0u));
 			if (GetFact(Facts.IsMovingToCover) == 1)
 			{
 				SetFact(Facts.IsMovingToCover, IsMoving());
@@ -2177,11 +2179,11 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			{
 				if (base.isMounted)
 				{
-					SetFact(Facts.AimsAtTarget, (byte)((extendedInfo.Dot > AI.npc_valid_mounted_aim_cone) ? 1 : 0));
+					SetFact(Facts.AimsAtTarget, (byte)((extendedInfo.Dot > AI.npc_valid_mounted_aim_cone) ? 1u : 0u));
 				}
 				else
 				{
-					SetFact(Facts.AimsAtTarget, (byte)((extendedInfo.Dot > AI.npc_valid_aim_cone) ? 1 : 0));
+					SetFact(Facts.AimsAtTarget, (byte)((extendedInfo.Dot > AI.npc_valid_aim_cone) ? 1u : 0u));
 				}
 			}
 		}
@@ -2190,17 +2192,17 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			SetFact(Facts.RetreatCoverInRange, 0);
 			SetFact(Facts.FlankCoverInRange, 0);
 			SetFact(Facts.AdvanceCoverInRange, 0);
-			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1 : 0));
+			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1u : 0u));
 			SetFact(Facts.IsMovingToCover, 0);
 			SetFact(Facts.AimsAtTarget, 0);
 		}
 		if (AiContext.CoverSet.Closest.ReservedCoverPoint != null)
 		{
-			byte b = (byte)(((AiContext.CoverSet.Closest.ReservedCoverPoint.Position - ServerPosition).sqrMagnitude < 0.5625f) ? 1 : 0);
+			byte b = (byte)(((AiContext.CoverSet.Closest.ReservedCoverPoint.Position - ServerPosition).sqrMagnitude < 0.5625f) ? 1u : 0u);
 			SetFact(Facts.IsInCover, b);
 			if (b == 1)
 			{
-				SetFact(Facts.IsCoverCompromised, (byte)(AiContext.CoverSet.Closest.ReservedCoverPoint.IsCompromised ? 1 : 0));
+				SetFact(Facts.IsCoverCompromised, (byte)(AiContext.CoverSet.Closest.ReservedCoverPoint.IsCompromised ? 1u : 0u));
 			}
 		}
 		if (GetFact(Facts.IsRetreatingToCover) == 1)
@@ -2406,23 +2408,24 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			AiContext.CurrentCoverVolume = SingletonComponent<AiManager>.Instance.GetCoverVolumeContaining(AiContext.Position);
 			bool flag = AiContext.CurrentCoverVolume == null;
 		}
-		if (AiContext.CurrentCoverVolume != null)
+		if (!(AiContext.CurrentCoverVolume != null))
 		{
-			foreach (CoverPoint coverPoint in AiContext.CurrentCoverVolume.CoverPoints)
+			return;
+		}
+		foreach (CoverPoint coverPoint in AiContext.CurrentCoverVolume.CoverPoints)
+		{
+			if (!coverPoint.IsReserved)
 			{
-				if (!coverPoint.IsReserved)
+				Vector3 position = coverPoint.Position;
+				if (!((AiContext.Position - position).sqrMagnitude > MaxDistanceToCover * MaxDistanceToCover))
 				{
-					Vector3 position = coverPoint.Position;
-					if (!((AiContext.Position - position).sqrMagnitude > MaxDistanceToCover * MaxDistanceToCover))
-					{
-						AiContext.sampledCoverPoints.Add(coverPoint);
-					}
+					AiContext.sampledCoverPoints.Add(coverPoint);
 				}
 			}
-			if (AiContext.sampledCoverPoints.Count > 0)
-			{
-				AiContext.sampledCoverPoints.Sort(coverPointComparer);
-			}
+		}
+		if (AiContext.sampledCoverPoints.Count > 0)
+		{
+			AiContext.sampledCoverPoints.Sort(coverPointComparer);
 		}
 	}
 
@@ -2514,25 +2517,26 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		BasePlayer player = null;
 		foreach (BasePlayer player2 in AiContext.Players)
 		{
-			if (!player2.IsDead() && !player2.IsDestroyed && (!Stats.OnlyAggroMarkedTargets || HostilityConsideration(player2)))
+			if (player2.IsDead() || player2.IsDestroyed || (Stats.OnlyAggroMarkedTargets && !HostilityConsideration(player2)))
 			{
-				bool flag = IsVisibleMounted(player2);
-				if (flag)
+				continue;
+			}
+			bool flag = IsVisibleMounted(player2);
+			if (flag)
+			{
+				AiContext.Memory.Update(player2);
+			}
+			Vector3 vector = player2.ServerPosition - ServerPosition;
+			BaseMountable mounted = GetMounted();
+			if (!(Vector3.Dot(vector.normalized, mounted.transform.forward) < -0.1f))
+			{
+				float sqrMagnitude = vector.sqrMagnitude;
+				if (sqrMagnitude < num)
 				{
-					AiContext.Memory.Update(player2);
-				}
-				Vector3 vector = player2.ServerPosition - ServerPosition;
-				BaseMountable mounted = GetMounted();
-				if (!(Vector3.Dot(vector.normalized, mounted.transform.forward) < -0.1f))
-				{
-					float sqrMagnitude = vector.sqrMagnitude;
-					if (sqrMagnitude < num)
-					{
-						num = sqrMagnitude;
-						player = player2;
-						lineOfSightStanding = flag;
-						lineOfSightCrouched = flag;
-					}
+					num = sqrMagnitude;
+					player = player2;
+					lineOfSightStanding = flag;
+					lineOfSightCrouched = flag;
 				}
 			}
 		}
@@ -2552,69 +2556,71 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		float sqrRange = float.MaxValue;
 		foreach (BasePlayer player in AiContext.Players)
 		{
-			if (!player.IsDead() && !player.IsDestroyed && (!(blockTargetingThisEnemy != null) || player.net == null || blockTargetingThisEnemy.net == null || player.net.ID != blockTargetingThisEnemy.net.ID) && (!Stats.OnlyAggroMarkedTargets || HostilityConsideration(player)))
+			if (player.IsDead() || player.IsDestroyed || (blockTargetingThisEnemy != null && player.net != null && blockTargetingThisEnemy.net != null && player.net.ID == blockTargetingThisEnemy.net.ID) || (Stats.OnlyAggroMarkedTargets && !HostilityConsideration(player)))
 			{
-				NPCPlayerApex nPCPlayerApex = player as NPCPlayerApex;
-				if (!(nPCPlayerApex != null) || Stats.Family != nPCPlayerApex.Stats.Family)
+				continue;
+			}
+			NPCPlayerApex nPCPlayerApex = player as NPCPlayerApex;
+			if (nPCPlayerApex != null && Stats.Family == nPCPlayerApex.Stats.Family)
+			{
+				continue;
+			}
+			float num3 = 0f;
+			Vector3 vector = player.ServerPosition - ServerPosition;
+			float sqrMagnitude = vector.sqrMagnitude;
+			if (sqrMagnitude < num)
+			{
+				num = sqrMagnitude;
+			}
+			if (sqrMagnitude < Stats.VisionRange * Stats.VisionRange)
+			{
+				num3 += VisionRangeScore;
+			}
+			if (sqrMagnitude < Stats.AggressionRange * Stats.AggressionRange)
+			{
+				num3 += AggroRangeScore;
+			}
+			switch (ToEnemyRangeEnum(sqrMagnitude))
+			{
+			case EnemyRangeEnum.LongAttackRange:
+				num3 += LongRangeScore;
+				break;
+			case EnemyRangeEnum.MediumAttackRange:
+				num3 += MediumRangeScore;
+				break;
+			case EnemyRangeEnum.CloseAttackRange:
+				num3 += CloseRangeScore;
+				break;
+			}
+			bool flag3 = IsVisibleStanding(player);
+			bool flag4 = false;
+			if (!flag3)
+			{
+				flag4 = IsVisibleCrouched(player);
+			}
+			if (!flag3 && !flag4)
+			{
+				if (AiContext.Memory.GetInfo(player).Entity == null || !IsWithinAggroRange(sqrMagnitude))
 				{
-					float num3 = 0f;
-					Vector3 vector = player.ServerPosition - ServerPosition;
-					float sqrMagnitude = vector.sqrMagnitude;
-					if (sqrMagnitude < num)
-					{
-						num = sqrMagnitude;
-					}
-					if (sqrMagnitude < Stats.VisionRange * Stats.VisionRange)
-					{
-						num3 += VisionRangeScore;
-					}
-					if (sqrMagnitude < Stats.AggressionRange * Stats.AggressionRange)
-					{
-						num3 += AggroRangeScore;
-					}
-					switch (ToEnemyRangeEnum(sqrMagnitude))
-					{
-					case EnemyRangeEnum.LongAttackRange:
-						num3 += LongRangeScore;
-						break;
-					case EnemyRangeEnum.MediumAttackRange:
-						num3 += MediumRangeScore;
-						break;
-					case EnemyRangeEnum.CloseAttackRange:
-						num3 += CloseRangeScore;
-						break;
-					}
-					bool flag3 = IsVisibleStanding(player);
-					bool flag4 = false;
-					if (!flag3)
-					{
-						flag4 = IsVisibleCrouched(player);
-					}
-					if (!flag3 && !flag4)
-					{
-						if (AiContext.Memory.GetInfo(player).Entity == null || !IsWithinAggroRange(sqrMagnitude))
-						{
-							continue;
-						}
-						num3 *= 0.75f;
-					}
-					else
-					{
-						AiContext.Memory.Update(player);
-					}
-					float dist = Mathf.Sqrt(sqrMagnitude);
-					num3 *= VisibilityScoreModifier(player, vector, dist, flag3, flag4);
-					if (num3 > num2)
-					{
-						basePlayer = player;
-						baseNpc = null;
-						zero = vector;
-						sqrRange = sqrMagnitude;
-						num2 = num3;
-						flag = flag3;
-						flag2 = flag4;
-					}
+					continue;
 				}
+				num3 *= 0.75f;
+			}
+			else
+			{
+				AiContext.Memory.Update(player);
+			}
+			float dist = Mathf.Sqrt(sqrMagnitude);
+			num3 *= VisibilityScoreModifier(player, vector, dist, flag3, flag4);
+			if (num3 > num2)
+			{
+				basePlayer = player;
+				baseNpc = null;
+				zero = vector;
+				sqrRange = sqrMagnitude;
+				num2 = num3;
+				flag = flag3;
+				flag2 = flag4;
 			}
 		}
 		List<AiAnswer_ShareEnemyTarget> answers;
@@ -2646,35 +2652,37 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			bool flag5 = basePlayer != null && num <= Stats.AggressionRange;
 			foreach (BaseNpc npc in AiContext.Npcs)
 			{
-				if (!npc.IsDead() && !npc.IsDestroyed && Stats.Family != npc.Stats.Family)
+				if (npc.IsDead() || npc.IsDestroyed || Stats.Family == npc.Stats.Family)
 				{
-					Vector3 vector2 = npc.ServerPosition - ServerPosition;
-					float sqrMagnitude2 = vector2.sqrMagnitude;
-					if (sqrMagnitude2 < num)
+					continue;
+				}
+				Vector3 vector2 = npc.ServerPosition - ServerPosition;
+				float sqrMagnitude2 = vector2.sqrMagnitude;
+				if (!(sqrMagnitude2 < num))
+				{
+					continue;
+				}
+				EnemyRangeEnum enemyRangeEnum = ToEnemyRangeEnum(sqrMagnitude2);
+				if ((!flag5 || (int)enemyRangeEnum <= 0) && (int)enemyRangeEnum <= 1)
+				{
+					num = sqrMagnitude2;
+					baseNpc = npc;
+					basePlayer = null;
+					zero = vector2;
+					sqrRange = sqrMagnitude2;
+					flag2 = false;
+					flag = IsVisibleStanding(npc);
+					if (!flag)
 					{
-						EnemyRangeEnum enemyRangeEnum = ToEnemyRangeEnum(sqrMagnitude2);
-						if ((!flag5 || (int)enemyRangeEnum <= 0) && (int)enemyRangeEnum <= 1)
-						{
-							num = sqrMagnitude2;
-							baseNpc = npc;
-							basePlayer = null;
-							zero = vector2;
-							sqrRange = sqrMagnitude2;
-							flag2 = false;
-							flag = IsVisibleStanding(npc);
-							if (!flag)
-							{
-								flag2 = IsVisibleCrouched(npc);
-							}
-							if (flag | flag2)
-							{
-								AiContext.Memory.Update(npc);
-							}
-							if (num < 0.1f)
-							{
-								break;
-							}
-						}
+						flag2 = IsVisibleCrouched(npc);
+					}
+					if (flag || flag2)
+					{
+						AiContext.Memory.Update(npc);
+					}
+					if (num < 0.1f)
+					{
+						break;
 					}
 				}
 			}
@@ -2697,10 +2705,10 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			AfraidRangeEnum value = ToAfraidRangeEnum(sqrRange);
 			SetFact(Facts.EnemyRange, (byte)enemyRangeEnum2);
 			SetFact(Facts.AfraidRange, (byte)value);
-			bool flag6 = flag | flag2;
-			SetFact(Facts.HasLineOfSight, (byte)(flag6 ? 1 : 0));
-			SetFact(Facts.HasLineOfSightCrouched, (byte)(flag2 ? 1 : 0));
-			SetFact(Facts.HasLineOfSightStanding, (byte)(flag ? 1 : 0));
+			bool flag6 = flag || flag2;
+			SetFact(Facts.HasLineOfSight, (byte)(flag6 ? 1u : 0u));
+			SetFact(Facts.HasLineOfSightCrouched, (byte)(flag2 ? 1u : 0u));
+			SetFact(Facts.HasLineOfSightStanding, (byte)(flag ? 1u : 0u));
 			if (basePlayer != null && flag6)
 			{
 				lastSeenPlayerTime = UnityEngine.Time.time;
@@ -2731,10 +2739,10 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			AfraidRangeEnum value = ToAfraidRangeEnum(sqrDistance);
 			SetFact(Facts.EnemyRange, (byte)enemyRangeEnum);
 			SetFact(Facts.AfraidRange, (byte)value);
-			bool flag = lineOfSightStanding | lineOfSightCrouched;
-			SetFact(Facts.HasLineOfSight, (byte)(flag ? 1 : 0));
-			SetFact(Facts.HasLineOfSightCrouched, (byte)(lineOfSightCrouched ? 1 : 0));
-			SetFact(Facts.HasLineOfSightStanding, (byte)(lineOfSightStanding ? 1 : 0));
+			bool flag = lineOfSightStanding || lineOfSightCrouched;
+			SetFact(Facts.HasLineOfSight, (byte)(flag ? 1u : 0u));
+			SetFact(Facts.HasLineOfSightCrouched, (byte)(lineOfSightCrouched ? 1u : 0u));
+			SetFact(Facts.HasLineOfSightStanding, (byte)(lineOfSightStanding ? 1u : 0u));
 			if (flag)
 			{
 				lastSeenPlayerTime = UnityEngine.Time.time;
@@ -2771,7 +2779,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			AttackTarget = null;
 			return 0f;
 		}
-		float num = target.IsDucked() ? 0.5f : 1f;
+		float num = (target.IsDucked() ? 0.5f : 1f);
 		num *= (target.IsRunning() ? 1.5f : 1f);
 		num *= ((target.estimatedSpeed <= 0.01f) ? 0.5f : 1f);
 		float value = 1f;
@@ -2858,11 +2866,11 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	private void UpdateMountedSelfFacts()
 	{
 		SetFact(Facts.Health, (byte)ToHealthEnum(base.healthFraction));
-		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1 : 0));
-		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1 : 0));
-		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1 : 0));
-		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1 : 0));
-		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1 : 0));
+		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1u : 0u));
+		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1u : 0u));
+		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1u : 0u));
+		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1u : 0u));
+		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1u : 0u));
 		SetFact(Facts.CurrentAmmoState, (byte)GetCurrentAmmoStateEnum());
 		SetFact(Facts.CurrentWeaponType, (byte)GetCurrentWeaponTypeEnum());
 	}
@@ -2878,21 +2886,21 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			alertness = Mathf.Clamp01(alertness - AI.npc_alertness_drain_rate);
 		}
 		SetFact(Facts.Health, (byte)ToHealthEnum(base.healthFraction));
-		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1 : 0));
-		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1 : 0));
+		SetFact(Facts.IsWeaponAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= NextAttackTime()) ? 1u : 0u));
+		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1u : 0u));
 		SetFact(Facts.Speed, (byte)ToSpeedEnum(TargetSpeed / Stats.Speed));
-		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1 : 0));
-		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1 : 0));
-		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1 : 0));
+		SetFact(Facts.AttackedLately, (byte)((base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1u : 0u));
+		SetFact(Facts.AttackedVeryRecently, (byte)((base.SecondsSinceAttacked < 2f) ? 1u : 0u));
+		SetFact(Facts.AttackedRecently, (byte)((base.SecondsSinceAttacked < 7f) ? 1u : 0u));
 		SetFact(Facts.IsMoving, IsMoving(), true, false);
-		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1 : 0));
-		SetFact(Facts.CanSwitchTool, (byte)((UnityEngine.Time.realtimeSinceStartup > NextToolSwitchTime) ? 1 : 0));
+		SetFact(Facts.CanSwitchWeapon, (byte)((UnityEngine.Time.realtimeSinceStartup > NextWeaponSwitchTime) ? 1u : 0u));
+		SetFact(Facts.CanSwitchTool, (byte)((UnityEngine.Time.realtimeSinceStartup > NextToolSwitchTime) ? 1u : 0u));
 		SetFact(Facts.CurrentAmmoState, (byte)GetCurrentAmmoStateEnum());
 		SetFact(Facts.CurrentWeaponType, (byte)GetCurrentWeaponTypeEnum());
 		SetFact(Facts.CurrentToolType, (byte)GetCurrentToolTypeEnum());
-		SetFact(Facts.ExplosiveInRange, (byte)((AiContext.DeployedExplosives.Count > 0) ? 1 : 0));
-		SetFact(Facts.IsMobile, (byte)(Stats.IsMobile ? 1 : 0));
-		SetFact(Facts.HasWaypoints, (byte)((WaypointSet != null && WaypointSet.Points.Count > 0) ? 1 : 0));
+		SetFact(Facts.ExplosiveInRange, (byte)((AiContext.DeployedExplosives.Count > 0) ? 1u : 0u));
+		SetFact(Facts.IsMobile, (byte)(Stats.IsMobile ? 1u : 0u));
+		SetFact(Facts.HasWaypoints, (byte)((WaypointSet != null && WaypointSet.Points.Count > 0) ? 1u : 0u));
 		EnemyRangeEnum rangeToSpawnPoint = GetRangeToSpawnPoint();
 		SetFact(Facts.RangeToSpawnLocation, (byte)rangeToSpawnPoint);
 		if ((int)rangeToSpawnPoint < (int)Stats.MaxRangeToSpawnLoc)
@@ -2906,10 +2914,10 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		if (GetFact(Facts.HasEnemy) == 1)
 		{
 			FindCoverFromEnemy();
-			SetFact(Facts.RetreatCoverInRange, (byte)((AiContext.CoverSet.Retreat.ReservedCoverPoint != null) ? 1 : 0));
-			SetFact(Facts.FlankCoverInRange, (byte)((AiContext.CoverSet.Flank.ReservedCoverPoint != null) ? 1 : 0));
-			SetFact(Facts.AdvanceCoverInRange, (byte)((AiContext.CoverSet.Advance.ReservedCoverPoint != null) ? 1 : 0));
-			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1 : 0));
+			SetFact(Facts.RetreatCoverInRange, (byte)((AiContext.CoverSet.Retreat.ReservedCoverPoint != null) ? 1u : 0u));
+			SetFact(Facts.FlankCoverInRange, (byte)((AiContext.CoverSet.Flank.ReservedCoverPoint != null) ? 1u : 0u));
+			SetFact(Facts.AdvanceCoverInRange, (byte)((AiContext.CoverSet.Advance.ReservedCoverPoint != null) ? 1u : 0u));
+			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1u : 0u));
 			if (GetFact(Facts.IsMovingToCover) == 1)
 			{
 				SetFact(Facts.IsMovingToCover, IsMoving());
@@ -2918,11 +2926,11 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			float num = Vector3.Dot(eyes.BodyForward(), normalized);
 			if (base.isMounted)
 			{
-				SetFact(Facts.AimsAtTarget, (byte)((num > AI.npc_valid_mounted_aim_cone) ? 1 : 0));
+				SetFact(Facts.AimsAtTarget, (byte)((num > AI.npc_valid_mounted_aim_cone) ? 1u : 0u));
 			}
 			else
 			{
-				SetFact(Facts.AimsAtTarget, (byte)((num > AI.npc_valid_aim_cone) ? 1 : 0));
+				SetFact(Facts.AimsAtTarget, (byte)((num > AI.npc_valid_aim_cone) ? 1u : 0u));
 			}
 		}
 		else
@@ -2931,17 +2939,17 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			SetFact(Facts.RetreatCoverInRange, 0);
 			SetFact(Facts.FlankCoverInRange, 0);
 			SetFact(Facts.AdvanceCoverInRange, 0);
-			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1 : 0));
+			SetFact(Facts.CoverInRange, (byte)((AiContext.CoverSet.Closest.ReservedCoverPoint != null) ? 1u : 0u));
 			SetFact(Facts.IsMovingToCover, 0);
 			SetFact(Facts.AimsAtTarget, 0);
 		}
 		if (AiContext.CoverSet.Closest.ReservedCoverPoint != null)
 		{
-			byte b = (byte)(((AiContext.CoverSet.Closest.ReservedCoverPoint.Position - ServerPosition).sqrMagnitude < 0.5625f) ? 1 : 0);
+			byte b = (byte)(((AiContext.CoverSet.Closest.ReservedCoverPoint.Position - ServerPosition).sqrMagnitude < 0.5625f) ? 1u : 0u);
 			SetFact(Facts.IsInCover, b);
 			if (b == 1)
 			{
-				SetFact(Facts.IsCoverCompromised, (byte)(AiContext.CoverSet.Closest.ReservedCoverPoint.IsCompromised ? 1 : 0));
+				SetFact(Facts.IsCoverCompromised, (byte)(AiContext.CoverSet.Closest.ReservedCoverPoint.IsCompromised ? 1u : 0u));
 			}
 		}
 		if (GetFact(Facts.IsRetreatingToCover) == 1)
@@ -2963,7 +2971,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	private byte IsMoving()
 	{
-		return (byte)((IsNavRunning() && NavAgent.hasPath && NavAgent.remainingDistance > NavAgent.stoppingDistance && !IsStuck && !IsStopped) ? 1 : 0);
+		return (byte)((IsNavRunning() && NavAgent.hasPath && NavAgent.remainingDistance > NavAgent.stoppingDistance && !IsStuck && !IsStopped) ? 1u : 0u);
 	}
 
 	private float NextAttackTime()
@@ -3173,8 +3181,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 					{
 						PathToPlayerTarget = new NavMeshPath();
 					}
-					flag = ((NavAgent != null && NavAgent.isOnNavMesh && !NavAgent.CalculatePath(AiContext.EnemyPlayer.ServerPosition, PathToPlayerTarget)) || PathToPlayerTarget.status != NavMeshPathStatus.PathComplete);
-					SetFact(Facts.IncompletePathToTarget, (byte)(flag ? 1 : 0));
+					flag = (NavAgent != null && NavAgent.isOnNavMesh && !NavAgent.CalculatePath(AiContext.EnemyPlayer.ServerPosition, PathToPlayerTarget)) || PathToPlayerTarget.status != NavMeshPathStatus.PathComplete;
+					SetFact(Facts.IncompletePathToTarget, (byte)(flag ? 1u : 0u));
 				}
 				if (!flag)
 				{
@@ -3229,37 +3237,39 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	private void _FindPlayersInVisionRange()
 	{
-		if (!AI.ignoreplayers && !(base.transform == null) && Interface.CallHook("IOnNpcSenseVision", this) == null)
+		if (AI.ignoreplayers || base.transform == null || Interface.CallHook("IOnNpcSenseVision", this) != null)
 		{
-			PlayerQueryResultCount = Query.Server.GetPlayersInSphere(base.transform.position, Stats.VisionRange, PlayerQueryResults, delegate(BasePlayer player)
-			{
-				if (player == null || !player.isServer || player.IsDead())
-				{
-					return false;
-				}
-				if (player.IsSleeping() && player.secondsSleeping < NPCAutoTurret.sleeperhostiledelay)
-				{
-					return false;
-				}
-				float num = Stats.VisionRange * Stats.VisionRange;
-				return (!((player.ServerPosition - ServerPosition).sqrMagnitude > num)) ? true : false;
-			});
+			return;
 		}
+		PlayerQueryResultCount = Query.Server.GetPlayersInSphere(base.transform.position, Stats.VisionRange, PlayerQueryResults, delegate(BasePlayer player)
+		{
+			if (player == null || !player.isServer || player.IsDead())
+			{
+				return false;
+			}
+			if (player.IsSleeping() && player.secondsSleeping < NPCAutoTurret.sleeperhostiledelay)
+			{
+				return false;
+			}
+			float num = Stats.VisionRange * Stats.VisionRange;
+			return (!((player.ServerPosition - ServerPosition).sqrMagnitude > num)) ? true : false;
+		});
 	}
 
 	private void _FindEntitiesInCloseRange()
 	{
-		if (Interface.CallHook("IOnNpcSenseClose", this) == null)
+		if (Interface.CallHook("IOnNpcSenseClose", this) != null)
 		{
-			EntityQueryResultCount = Query.Server.GetInSphere(base.transform.position, Stats.CloseRange, EntityQueryResults, delegate(BaseEntity entity)
-			{
-				if (entity == null || !entity.isServer || entity.IsDestroyed)
-				{
-					return false;
-				}
-				return (entity is BaseNpc || entity is TimedExplosive) ? true : false;
-			});
+			return;
 		}
+		EntityQueryResultCount = Query.Server.GetInSphere(base.transform.position, Stats.CloseRange, EntityQueryResults, delegate(BaseEntity entity)
+		{
+			if (entity == null || !entity.isServer || entity.IsDestroyed)
+			{
+				return false;
+			}
+			return (entity is BaseNpc || entity is TimedExplosive) ? true : false;
+		});
 	}
 
 	private bool _FindCoverPointsInVolume()
@@ -3514,7 +3524,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	float? ILoadBalanced.ExecuteUpdate(float deltaTime, float nextInterval)
 	{
 		float time = UnityEngine.Time.time;
-		IsInvinsible = (time - lastInvinsibleStartTime < InvinsibleTime);
+		IsInvinsible = time - lastInvinsibleStartTime < InvinsibleTime;
 		if (time > nextSensorySystemTick)
 		{
 			using (TimeWarning.New("NPC.TickSensorySystem"))
@@ -3639,7 +3649,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	public override void MovementUpdate(float delta)
 	{
 		BaseMountable mounted = GetMounted();
-		modelState.mounted = (mounted != null);
+		modelState.mounted = mounted != null;
 		modelState.poseType = (int)(modelState.mounted ? mounted.mountPose : PlayerModel.MountPoses.Chair);
 		if (!AI.move || (!base.isMounted && !IsNavRunning()))
 		{
@@ -3663,7 +3673,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		{
 			timeAtDestination = 0f;
 		}
-		modelState.aiming = (timeAtDestination > 0.25f && AttackTarget != null && GetFact(Facts.HasLineOfSight) > 0 && GetFact(Facts.IsRetreatingToCover) == 0);
+		modelState.aiming = timeAtDestination > 0.25f && AttackTarget != null && GetFact(Facts.HasLineOfSight) > 0 && GetFact(Facts.IsRetreatingToCover) == 0;
 		TickStuck(delta);
 	}
 
@@ -3783,7 +3793,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	public override float DesiredMoveSpeed()
 	{
 		float running = 0f;
-		float ducking = modelState.ducked ? 1f : 0f;
+		float ducking = (modelState.ducked ? 1f : 0f);
 		float num = 1f;
 		if (CurrentBehaviour == BaseNpc.Behaviour.Wander)
 		{
@@ -3850,7 +3860,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		}
 		if (_traversingNavMeshLink)
 		{
-			Vector3 vector = (!(AttackTarget != null)) ? (NavAgent.destination - ServerPosition) : (AttackTarget.ServerPosition - ServerPosition);
+			Vector3 vector = ((!(AttackTarget != null)) ? (NavAgent.destination - ServerPosition) : (AttackTarget.ServerPosition - ServerPosition));
 			if (vector.sqrMagnitude > 1f)
 			{
 				vector = _currentNavMeshLinkEndPos - ServerPosition;

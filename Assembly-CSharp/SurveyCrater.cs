@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -19,7 +19,7 @@ public class SurveyCrater : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AnalysisComplete ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AnalysisComplete "));
 				}
 				using (TimeWarning.New("AnalysisComplete"))
 				{

@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -42,7 +42,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ConversationAction ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ConversationAction "));
 				}
 				using (TimeWarning.New("ConversationAction"))
 				{
@@ -71,7 +71,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_BeginTalking ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_BeginTalking "));
 				}
 				using (TimeWarning.New("Server_BeginTalking"))
 				{
@@ -100,7 +100,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_EndTalking ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_EndTalking "));
 				}
 				using (TimeWarning.New("Server_EndTalking"))
 				{
@@ -129,7 +129,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_ResponsePressed ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_ResponsePressed "));
 				}
 				using (TimeWarning.New("Server_ResponsePressed"))
 				{
@@ -332,56 +332,48 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		}
 		ItemDefinition itemDefinition = ItemManager.FindItemDefinition("scrap");
 		NPCConversationResultAction[] array = conversationResultActions;
-		int num = 0;
-		NPCConversationResultAction nPCConversationResultAction;
-		while (true)
+		foreach (NPCConversationResultAction nPCConversationResultAction in array)
 		{
-			if (num < array.Length)
+			if (!(nPCConversationResultAction.action == action))
 			{
-				nPCConversationResultAction = array[num];
-				if (nPCConversationResultAction.action == action)
+				continue;
+			}
+			CleanupConversingPlayers();
+			foreach (BasePlayer conversingPlayer in conversingPlayers)
+			{
+				if (!(conversingPlayer == player) && !(conversingPlayer == null))
+				{
+					int speechNodeIndex = GetConversationFor(player).GetSpeechNodeIndex("startbusy");
+					ForceSpeechNode(conversingPlayer, speechNodeIndex);
+				}
+			}
+			int num = nPCConversationResultAction.scrapCost;
+			List<Item> list = player.inventory.FindItemIDs(itemDefinition.itemid);
+			foreach (Item item in list)
+			{
+				num -= item.amount;
+			}
+			if (num > 0)
+			{
+				int speechNodeIndex2 = GetConversationFor(player).GetSpeechNodeIndex("toopoor");
+				ForceSpeechNode(player, speechNodeIndex2);
+				break;
+			}
+			num = nPCConversationResultAction.scrapCost;
+			foreach (Item item2 in list)
+			{
+				int num2 = Mathf.Min(num, item2.amount);
+				item2.UseItem(num2);
+				num -= num2;
+				if (num <= 0)
 				{
 					break;
 				}
-				num++;
-				continue;
 			}
-			return;
+			lastActionPlayer = player;
+			BroadcastEntityMessage(nPCConversationResultAction.broadcastMessage, nPCConversationResultAction.broadcastRange);
+			lastActionPlayer = null;
+			break;
 		}
-		CleanupConversingPlayers();
-		foreach (BasePlayer conversingPlayer in conversingPlayers)
-		{
-			if (!(conversingPlayer == player) && !(conversingPlayer == null))
-			{
-				int speechNodeIndex = GetConversationFor(player).GetSpeechNodeIndex("startbusy");
-				ForceSpeechNode(conversingPlayer, speechNodeIndex);
-			}
-		}
-		int num2 = nPCConversationResultAction.scrapCost;
-		List<Item> list = player.inventory.FindItemIDs(itemDefinition.itemid);
-		foreach (Item item in list)
-		{
-			num2 -= item.amount;
-		}
-		if (num2 > 0)
-		{
-			int speechNodeIndex2 = GetConversationFor(player).GetSpeechNodeIndex("toopoor");
-			ForceSpeechNode(player, speechNodeIndex2);
-			return;
-		}
-		num2 = nPCConversationResultAction.scrapCost;
-		foreach (Item item2 in list)
-		{
-			int num3 = Mathf.Min(num2, item2.amount);
-			item2.UseItem(num3);
-			num2 -= num3;
-			if (num2 <= 0)
-			{
-				break;
-			}
-		}
-		lastActionPlayer = player;
-		BroadcastEntityMessage(nPCConversationResultAction.broadcastMessage, nPCConversationResultAction.broadcastRange);
-		lastActionPlayer = null;
 	}
 }

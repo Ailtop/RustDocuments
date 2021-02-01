@@ -124,17 +124,17 @@ public sealed class ByteQuadtree
 				uint value2 = child2.Value;
 				uint value3 = child3.Value;
 				uint value4 = child4.Value;
-				float num = (float)(double)(value + value2 + value3 + value4);
+				float num = value + value2 + value3 + value4;
 				float value5 = UnityEngine.Random.value;
-				if ((float)(double)value / num >= value5)
+				if ((float)value / num >= value5)
 				{
 					return child;
 				}
-				if ((float)(double)(value + value2) / num >= value5)
+				if ((float)(value + value2) / num >= value5)
 				{
 					return child2;
 				}
-				if ((float)(double)(value + value2 + value3) / num >= value5)
+				if ((float)(value + value2 + value3) / num >= value5)
 				{
 					return child3;
 				}
@@ -173,7 +173,7 @@ public sealed class ByteQuadtree
 		for (int i = 1; i < levels; i++)
 		{
 			ByteMap byteMap = values[i - 1];
-			ByteMap byteMap2 = values[i] = CreateLevel(i);
+			ByteMap byteMap2 = (values[i] = CreateLevel(i));
 			for (int j = 0; j < byteMap2.Size; j++)
 			{
 				for (int k = 0; k < byteMap2.Size; k++)

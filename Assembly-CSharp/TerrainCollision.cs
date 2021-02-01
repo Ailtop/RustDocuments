@@ -15,14 +15,15 @@ public class TerrainCollision : TerrainExtension
 
 	public void Clear()
 	{
-		if ((bool)terrainCollider)
+		if (!terrainCollider)
 		{
-			foreach (Collider key in ignoredColliders.Keys)
-			{
-				Physics.IgnoreCollision(key, terrainCollider, false);
-			}
-			ignoredColliders.Clear();
+			return;
 		}
+		foreach (Collider key in ignoredColliders.Keys)
+		{
+			Physics.IgnoreCollision(key, terrainCollider, false);
+		}
+		ignoredColliders.Clear();
 	}
 
 	public void Reset(Collider collider)

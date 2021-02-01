@@ -66,12 +66,12 @@ namespace Rust.Ai
 				if (base.currentPopulation > 0)
 				{
 					_lastSpawnCallHadMaxAliveMembers = false;
-					_lastSpawnCallHadAliveMembers = (base.currentPopulation > 0);
+					_lastSpawnCallHadAliveMembers = base.currentPopulation > 0;
 					return;
 				}
 			}
 			_lastSpawnCallHadMaxAliveMembers = false;
-			_lastSpawnCallHadAliveMembers = (base.currentPopulation > 0);
+			_lastSpawnCallHadAliveMembers = base.currentPopulation > 0;
 			base.Spawn(numToSpawn);
 		}
 
@@ -91,9 +91,9 @@ namespace Rust.Ai
 					component.LookAtInterestPointsStationary = LookAtInterestPointsStationary;
 				}
 				component.RadioEffectRepeatRange = RadioEffectRepeatRange;
-				component.SetFact(NPCPlayerApex.Facts.IsPeacekeeper, (byte)(IsPeacekeeper ? 1 : 0));
-				component.SetFact(NPCPlayerApex.Facts.IsBandit, (byte)(IsBandit ? 1 : 0));
-				component.SetFact(NPCPlayerApex.Facts.IsMilitaryTunnelLab, (byte)(IsMilitaryTunnelLab ? 1 : 0));
+				component.SetFact(NPCPlayerApex.Facts.IsPeacekeeper, (byte)(IsPeacekeeper ? 1u : 0u));
+				component.SetFact(NPCPlayerApex.Facts.IsBandit, (byte)(IsBandit ? 1u : 0u));
+				component.SetFact(NPCPlayerApex.Facts.IsMilitaryTunnelLab, (byte)(IsMilitaryTunnelLab ? 1u : 0u));
 				component.Stats.MaxRangeToSpawnLoc = MaxRangeToSpawnLoc;
 				if (!SpawnHostile)
 				{

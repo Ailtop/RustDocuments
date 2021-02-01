@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.AI.Components;
 using Apex.AI.Core.HTN;
 using Apex.Ai.HTN;
 using Rust.Ai.HTN.Reasoning;
 using Rust.Ai.HTN.Sensors;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -219,14 +219,15 @@ namespace Rust.Ai.HTN
 		{
 			PlannerContext.IsWorldStateDirty = false;
 			PlannerAiClient.Execute();
-			if ((PlannerContext.PlanResult == PlanResultType.FoundNewPlan || PlannerContext.PlanResult == PlanResultType.ReplacedPlan) && PlannerContext.CurrentTask != null)
+			if ((PlannerContext.PlanResult != PlanResultType.FoundNewPlan && PlannerContext.PlanResult != PlanResultType.ReplacedPlan) || PlannerContext.CurrentTask == null)
 			{
-				foreach (IOperator @operator in PlannerContext.CurrentTask.Operators)
-				{
-					@operator?.Abort(PlannerContext, PlannerContext.CurrentTask);
-				}
-				PlannerContext.CurrentTask = null;
+				return;
 			}
+			foreach (IOperator @operator in PlannerContext.CurrentTask.Operators)
+			{
+				@operator?.Abort(PlannerContext, PlannerContext.CurrentTask);
+			}
+			PlannerContext.CurrentTask = null;
 		}
 
 		public virtual void Tick(float time)

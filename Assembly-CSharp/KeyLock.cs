@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -27,7 +27,7 @@ public class KeyLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_CreateKey ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_CreateKey "));
 				}
 				using (TimeWarning.New("RPC_CreateKey"))
 				{
@@ -63,7 +63,7 @@ public class KeyLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Lock ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Lock "));
 				}
 				using (TimeWarning.New("RPC_Lock"))
 				{
@@ -99,7 +99,7 @@ public class KeyLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Unlock ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Unlock "));
 				}
 				using (TimeWarning.New("RPC_Unlock"))
 				{

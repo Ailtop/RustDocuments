@@ -1,8 +1,8 @@
+using System;
+using System.Collections.Generic;
 using Facepunch.Math;
 using Facepunch.Sqlite;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UserPersistance : IDisposable
@@ -135,17 +135,18 @@ public class UserPersistance : IDisposable
 
 	public void AddLifeStory(ulong playerID, PlayerLifeStory lifeStory)
 	{
-		if (deaths != null && lifeStory != null)
+		if (deaths == null || lifeStory == null)
 		{
-			using (TimeWarning.New("AddLifeStory"))
+			return;
+		}
+		using (TimeWarning.New("AddLifeStory"))
+		{
+			byte[] array;
+			using (TimeWarning.New("ToProtoBytes"))
 			{
-				byte[] array;
-				using (TimeWarning.New("ToProtoBytes"))
-				{
-					array = lifeStory.ToProtoBytes();
-				}
-				deaths.Execute("INSERT INTO data ( userid, born, died, info ) VALUES ( ?, ?, ?, ? )", playerID.ToString(), (int)lifeStory.timeBorn, (int)lifeStory.timeDied, array);
+				array = lifeStory.ToProtoBytes();
 			}
+			deaths.Execute("INSERT INTO data ( userid, born, died, info ) VALUES ( ?, ?, ?, ? )", playerID.ToString(), (int)lifeStory.timeBorn, (int)lifeStory.timeDied, array);
 		}
 	}
 

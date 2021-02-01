@@ -87,8 +87,8 @@ public class TerrainWaterMap : TerrainMap<short>
 		num5 = ((num5 >= 0) ? num5 : 0);
 		num4 = ((num4 <= num) ? num4 : num);
 		num5 = ((num5 <= num) ? num5 : num);
-		int num8 = (num2 < (float)num) ? 1 : 0;
-		int num9 = (num3 < (float)num) ? res : 0;
+		int num8 = ((num2 < (float)num) ? 1 : 0);
+		int num9 = ((num3 < (float)num) ? res : 0);
 		int num10 = num5 * res + num4;
 		int num11 = num10 + num8;
 		int num12 = num10 + num9;
@@ -162,8 +162,8 @@ public class TerrainWaterMap : TerrainMap<short>
 		num3 = ((num3 >= 0) ? num3 : 0);
 		num2 = ((num2 <= num) ? num2 : num);
 		num3 = ((num3 <= num) ? num3 : num);
-		int num4 = (num2 < num) ? 1 : 0;
-		int num5 = (num3 < num) ? res : 0;
+		int num4 = ((num2 < num) ? 1 : 0);
+		int num5 = ((num3 < num) ? res : 0);
 		int num6 = num3 * res + num2;
 		int num7 = num6 + num4;
 		int num8 = num6 + num5;

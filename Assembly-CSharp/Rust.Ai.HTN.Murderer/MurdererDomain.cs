@@ -1,3 +1,6 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using Apex.AI;
 using Apex.AI.Components;
 using Apex.Ai.HTN;
@@ -7,9 +10,6 @@ using Rust.Ai.HTN.Murderer.Reasoners;
 using Rust.Ai.HTN.Murderer.Sensors;
 using Rust.Ai.HTN.Reasoning;
 using Rust.Ai.HTN.Sensors;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -1350,7 +1350,7 @@ namespace Rust.Ai.HTN.Murderer
 
 			public override float Score(MurdererContext c)
 			{
-				byte b = (byte)(Value ? 1 : 0);
+				byte b = (byte)(Value ? 1u : 0u);
 				if (c.GetWorldState(Fact) != b)
 				{
 					return 0f;
@@ -1919,7 +1919,7 @@ namespace Rust.Ai.HTN.Murderer
 			{
 				if (_murdererDefinition == null)
 				{
-					_murdererDefinition = (_context.Body.AiDefinition as MurdererDefinition);
+					_murdererDefinition = _context.Body.AiDefinition as MurdererDefinition;
 				}
 				return _murdererDefinition;
 			}
@@ -2590,33 +2590,34 @@ namespace Rust.Ai.HTN.Murderer
 		private void OnGunshotSensation(ref Sensation info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberGunshot(ref info, item, initiatorPlayer))
 				{
-					if (RememberGunshot(ref info, item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null || _context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == initiatorPlayer)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null || _context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == initiatorPlayer)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
-				}
-				if (!flag)
-				{
-					_context.IncrementFact(Facts.Vulnerability, 1);
+					_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
 					_context.IncrementFact(Facts.Alertness, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 1);
+				_context.IncrementFact(Facts.Alertness, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
+				{
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 
@@ -2628,56 +2629,58 @@ namespace Rust.Ai.HTN.Murderer
 				return;
 			}
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberThrownItem(ref info, item, initiatorPlayer))
 				{
-					if (RememberThrownItem(ref info, item, initiatorPlayer))
+					if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
 					{
-						if (_context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player == null)
-						{
-							_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
-						}
-						_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
+						_context.Memory.RememberPrimaryEnemyPlayer(initiatorPlayer);
 					}
+					_context.IncrementFact(Facts.Vulnerability, (!_context.IsFact(Facts.CanSeeEnemy)) ? 1 : 0);
+					_context.IncrementFact(Facts.Alertness, 1);
+					flag = true;
+					break;
 				}
-				if (!flag)
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 1);
+				_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
 				{
-					_context.IncrementFact(Facts.Vulnerability, 1);
-					_context.PlayersOutsideDetectionRange.Add(new NpcPlayerInfo
-					{
-						Player = initiatorPlayer,
-						Time = UnityEngine.Time.time
-					});
-				}
+					Player = initiatorPlayer,
+					Time = UnityEngine.Time.time
+				});
 			}
 		}
 
 		private void OnExplosionSensation(ref Sensation info)
 		{
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
-			if (initiatorPlayer != null && initiatorPlayer != _context.Body)
+			if (!(initiatorPlayer != null) || !(initiatorPlayer != _context.Body))
 			{
-				bool flag = false;
-				foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+				return;
+			}
+			bool flag = false;
+			foreach (NpcPlayerInfo item in _context.EnemyPlayersInRange)
+			{
+				if (RememberExplosion(ref info, item, initiatorPlayer))
 				{
-					if (RememberExplosion(ref info, item, initiatorPlayer))
-					{
-						_context.IncrementFact(Facts.Vulnerability, _context.IsFact(Facts.CanSeeEnemy) ? 1 : 2);
-						_context.IncrementFact(Facts.Alertness, 1);
-						flag = true;
-						break;
-					}
-				}
-				if (!flag)
-				{
-					_context.IncrementFact(Facts.Vulnerability, 1);
+					_context.IncrementFact(Facts.Vulnerability, _context.IsFact(Facts.CanSeeEnemy) ? 1 : 2);
 					_context.IncrementFact(Facts.Alertness, 1);
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				_context.IncrementFact(Facts.Vulnerability, 1);
+				_context.IncrementFact(Facts.Alertness, 1);
 			}
 		}
 

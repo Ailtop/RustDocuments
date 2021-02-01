@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using Facepunch;
 using Rust;
 using Rust.Registry;
-using System.Collections.Generic;
 
 namespace UnityEngine
 {

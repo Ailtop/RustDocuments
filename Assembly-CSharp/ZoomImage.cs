@@ -22,7 +22,7 @@ public class ZoomImage : MonoBehaviour, IScrollHandler, IEventSystemHandler
 
 	private void Awake()
 	{
-		_thisTransform = (base.transform as RectTransform);
+		_thisTransform = base.transform as RectTransform;
 		_scale.Set(_initialScale, _initialScale, 1f);
 		_thisTransform.localScale = _scale;
 	}

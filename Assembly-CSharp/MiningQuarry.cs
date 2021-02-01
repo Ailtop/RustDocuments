@@ -1,7 +1,7 @@
+using System;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine;
 
 public class MiningQuarry : BaseResourceExtractor
@@ -101,7 +101,7 @@ public class MiningQuarry : BaseResourceExtractor
 		base.ServerInit();
 		if (!isStatic)
 		{
-			ResourceDepositManager.ResourceDeposit resourceDeposit = _linkedDeposit = ResourceDepositManager.GetOrCreate(base.transform.position);
+			ResourceDepositManager.ResourceDeposit resourceDeposit = (_linkedDeposit = ResourceDepositManager.GetOrCreate(base.transform.position));
 		}
 		else
 		{
@@ -163,34 +163,36 @@ public class MiningQuarry : BaseResourceExtractor
 
 	public void ProcessResources()
 	{
-		if (_linkedDeposit != null && !(hopperPrefab.instance == null))
+		if (_linkedDeposit == null || hopperPrefab.instance == null)
 		{
-			foreach (ResourceDepositManager.ResourceDeposit.ResourceDepositEntry resource in _linkedDeposit._resources)
+			return;
+		}
+		foreach (ResourceDepositManager.ResourceDeposit.ResourceDepositEntry resource in _linkedDeposit._resources)
+		{
+			if ((!canExtractLiquid && resource.isLiquid) || (!canExtractSolid && !resource.isLiquid))
 			{
-				if ((canExtractLiquid || !resource.isLiquid) && (canExtractSolid || resource.isLiquid))
+				continue;
+			}
+			resource.workDone += workToAdd;
+			if (!(resource.workDone < resource.workNeeded))
+			{
+				int num = Mathf.FloorToInt(resource.workDone / resource.workNeeded);
+				resource.workDone -= (float)num * resource.workNeeded;
+				Item item = ItemManager.Create(resource.type, num, 0uL);
+				if (Interface.CallHook("OnQuarryGather", this, item) != null)
 				{
-					resource.workDone += workToAdd;
-					if (!(resource.workDone < resource.workNeeded))
-					{
-						int num = Mathf.FloorToInt(resource.workDone / resource.workNeeded);
-						resource.workDone -= (float)num * resource.workNeeded;
-						Item item = ItemManager.Create(resource.type, num, 0uL);
-						if (Interface.CallHook("OnQuarryGather", this, item) != null)
-						{
-							item.Remove();
-						}
-						else if (!item.MoveToContainer(hopperPrefab.instance.GetComponent<StorageContainer>().inventory))
-						{
-							item.Remove();
-							SetOn(false);
-						}
-					}
+					item.Remove();
+				}
+				else if (!item.MoveToContainer(hopperPrefab.instance.GetComponent<StorageContainer>().inventory))
+				{
+					item.Remove();
+					SetOn(false);
 				}
 			}
-			if (!FuelCheck())
-			{
-				SetOn(false);
-			}
+		}
+		if (!FuelCheck())
+		{
+			SetOn(false);
 		}
 	}
 

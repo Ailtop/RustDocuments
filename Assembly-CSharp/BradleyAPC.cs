@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -5,8 +7,6 @@ using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.AI;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -47,7 +47,7 @@ public class BradleyAPC : BaseCombatEntity
 			{
 				float value = Vector3.Distance(entity.transform.position, apc.transform.position);
 				float num = (1f - Mathf.InverseLerp(10f, 80f, value)) * 50f;
-				float value2 = (basePlayer.GetHeldEntity() == null) ? 0f : basePlayer.GetHeldEntity().hostileScore;
+				float value2 = ((basePlayer.GetHeldEntity() == null) ? 0f : basePlayer.GetHeldEntity().hostileScore);
 				float num2 = Mathf.InverseLerp(4f, 20f, value2) * 100f;
 				float num3 = Mathf.InverseLerp(10f, 3f, UnityEngine.Time.time - lastSeenTime) * 100f;
 				float num4 = Mathf.InverseLerp(0f, 100f, damageReceivedFrom) * 50f;
@@ -486,26 +486,27 @@ public class BradleyAPC : BaseCombatEntity
 
 	public void AddOrUpdateTarget(BaseEntity ent, Vector3 pos, float damageFrom = 0f)
 	{
-		if (ent is BasePlayer)
+		if (!(ent is BasePlayer))
 		{
-			TargetInfo targetInfo = null;
-			foreach (TargetInfo target in targetList)
-			{
-				if (target.entity == ent)
-				{
-					targetInfo = target;
-					break;
-				}
-			}
-			if (targetInfo == null)
-			{
-				targetInfo = Facepunch.Pool.Get<TargetInfo>();
-				targetInfo.Setup(ent, UnityEngine.Time.time - 1f);
-				targetList.Add(targetInfo);
-			}
-			targetInfo.lastSeenPosition = pos;
-			targetInfo.damageReceivedFrom += damageFrom;
+			return;
 		}
+		TargetInfo targetInfo = null;
+		foreach (TargetInfo target in targetList)
+		{
+			if (target.entity == ent)
+			{
+				targetInfo = target;
+				break;
+			}
+		}
+		if (targetInfo == null)
+		{
+			targetInfo = Facepunch.Pool.Get<TargetInfo>();
+			targetInfo.Setup(ent, UnityEngine.Time.time - 1f);
+			targetList.Add(targetInfo);
+		}
+		targetInfo.lastSeenPosition = pos;
+		targetInfo.damageReceivedFrom += damageFrom;
 	}
 
 	public void UpdateTargetList()
@@ -514,28 +515,30 @@ public class BradleyAPC : BaseCombatEntity
 		Vis.Entities(base.transform.position, searchRange, obj, 133120);
 		foreach (BaseEntity item in obj)
 		{
-			if (item is BasePlayer)
+			if (!(item is BasePlayer))
 			{
-				BasePlayer basePlayer = item as BasePlayer;
-				if (!basePlayer.IsDead() && !(basePlayer is Scientist) && VisibilityTest(item))
+				continue;
+			}
+			BasePlayer basePlayer = item as BasePlayer;
+			if (basePlayer.IsDead() || basePlayer is Scientist || !VisibilityTest(item))
+			{
+				continue;
+			}
+			bool flag = false;
+			foreach (TargetInfo target in targetList)
+			{
+				if (target.entity == item)
 				{
-					bool flag = false;
-					foreach (TargetInfo target in targetList)
-					{
-						if (target.entity == item)
-						{
-							target.lastSeenTime = UnityEngine.Time.time;
-							flag = true;
-							break;
-						}
-					}
-					if (!flag)
-					{
-						TargetInfo targetInfo = Facepunch.Pool.Get<TargetInfo>();
-						targetInfo.Setup(item, UnityEngine.Time.time);
-						targetList.Add(targetInfo);
-					}
+					target.lastSeenTime = UnityEngine.Time.time;
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				TargetInfo targetInfo = Facepunch.Pool.Get<TargetInfo>();
+				targetInfo.Setup(item, UnityEngine.Time.time);
+				targetList.Add(targetInfo);
 			}
 		}
 		for (int num = targetList.Count - 1; num >= 0; num--)
@@ -582,7 +585,7 @@ public class BradleyAPC : BaseCombatEntity
 		{
 			BasePlayer basePlayer = ent as BasePlayer;
 			Vector3 position = mainTurret.transform.position;
-			flag = (IsVisible(basePlayer.eyes.position, position) || IsVisible(basePlayer.transform.position, position));
+			flag = IsVisible(basePlayer.eyes.position, position) || IsVisible(basePlayer.transform.position, position);
 		}
 		else
 		{
@@ -662,7 +665,7 @@ public class BradleyAPC : BaseCombatEntity
 
 	public void FireGun(Vector3 targetPos, float aimCone, bool isCoax)
 	{
-		Transform transform = isCoax ? coaxMuzzle : topTurretMuzzle;
+		Transform transform = (isCoax ? coaxMuzzle : topTurretMuzzle);
 		Vector3 vector = transform.transform.position - transform.forward * 0.25f;
 		Vector3 normalized = (targetPos - vector).normalized;
 		Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(aimCone, normalized);
@@ -1034,7 +1037,7 @@ public class BradleyAPC : BaseCombatEntity
 		{
 			if (targetList[0].IsValid() && targetList[0].IsVisible())
 			{
-				mainGunTarget = (targetList[0].entity as BaseCombatEntity);
+				mainGunTarget = targetList[0].entity as BaseCombatEntity;
 			}
 			else
 			{
@@ -1089,67 +1092,68 @@ public class BradleyAPC : BaseCombatEntity
 
 	public void DoPhysicsMove()
 	{
-		if (!base.isClient)
+		if (base.isClient)
 		{
-			Vector3 velocity = myRigidBody.velocity;
-			throttle = Mathf.Clamp(throttle, -1f, 1f);
-			leftThrottle = throttle;
-			rightThrottle = throttle;
-			if (turning > 0f)
-			{
-				rightThrottle = 0f - turning;
-				leftThrottle = turning;
-			}
-			else if (turning < 0f)
-			{
-				leftThrottle = turning;
-				rightThrottle = turning * -1f;
-			}
-			Vector3.Distance(base.transform.position, GetFinalDestination());
-			float num = Vector3.Distance(base.transform.position, GetCurrentPathDestination());
-			float num2 = 15f;
-			if (num < 20f)
-			{
-				float value = Vector3.Dot(PathDirection(currentPathIndex), PathDirection(currentPathIndex + 1));
-				float num3 = Mathf.InverseLerp(2f, 10f, num);
-				float num4 = Mathf.InverseLerp(0.5f, 0.8f, value);
-				num2 = 15f - 14f * ((1f - num4) * (1f - num3));
-			}
-			float num8 = 20f;
-			if (patrolPath != null)
-			{
-				float num5 = num2;
-				foreach (PathSpeedZone speedZone in patrolPath.speedZones)
-				{
-					if (speedZone.WorldSpaceBounds().Contains(base.transform.position))
-					{
-						num5 = Mathf.Min(num5, speedZone.GetMaxSpeed());
-					}
-				}
-				currentSpeedZoneLimit = Mathf.Lerp(currentSpeedZoneLimit, num5, UnityEngine.Time.deltaTime);
-				num2 = Mathf.Min(num2, currentSpeedZoneLimit);
-			}
-			if (PathComplete())
-			{
-				num2 = 0f;
-			}
-			if (ConVar.Global.developer > 1)
-			{
-				Debug.Log("velocity:" + velocity.magnitude + "max : " + num2);
-			}
-			brake = (velocity.magnitude >= num2);
-			ApplyBrakes(brake ? 1f : 0f);
-			float num6 = throttle;
-			leftThrottle = Mathf.Clamp(leftThrottle + num6, -1f, 1f);
-			rightThrottle = Mathf.Clamp(rightThrottle + num6, -1f, 1f);
-			float t = Mathf.InverseLerp(2f, 1f, velocity.magnitude * Mathf.Abs(Vector3.Dot(velocity.normalized, base.transform.forward)));
-			float torqueAmount = Mathf.Lerp(moveForceMax, turnForce, t);
-			float num7 = Mathf.InverseLerp(5f, 1.5f, velocity.magnitude * Mathf.Abs(Vector3.Dot(velocity.normalized, base.transform.forward)));
-			ScaleSidewaysFriction(1f - num7);
-			SetMotorTorque(leftThrottle, false, torqueAmount);
-			SetMotorTorque(rightThrottle, true, torqueAmount);
-			impactDamager.damageEnabled = (myRigidBody.velocity.magnitude > 2f);
+			return;
 		}
+		Vector3 velocity = myRigidBody.velocity;
+		throttle = Mathf.Clamp(throttle, -1f, 1f);
+		leftThrottle = throttle;
+		rightThrottle = throttle;
+		if (turning > 0f)
+		{
+			rightThrottle = 0f - turning;
+			leftThrottle = turning;
+		}
+		else if (turning < 0f)
+		{
+			leftThrottle = turning;
+			rightThrottle = turning * -1f;
+		}
+		Vector3.Distance(base.transform.position, GetFinalDestination());
+		float num = Vector3.Distance(base.transform.position, GetCurrentPathDestination());
+		float num2 = 15f;
+		if (num < 20f)
+		{
+			float value = Vector3.Dot(PathDirection(currentPathIndex), PathDirection(currentPathIndex + 1));
+			float num3 = Mathf.InverseLerp(2f, 10f, num);
+			float num4 = Mathf.InverseLerp(0.5f, 0.8f, value);
+			num2 = 15f - 14f * ((1f - num4) * (1f - num3));
+		}
+		float num8 = 20f;
+		if (patrolPath != null)
+		{
+			float num5 = num2;
+			foreach (PathSpeedZone speedZone in patrolPath.speedZones)
+			{
+				if (speedZone.WorldSpaceBounds().Contains(base.transform.position))
+				{
+					num5 = Mathf.Min(num5, speedZone.GetMaxSpeed());
+				}
+			}
+			currentSpeedZoneLimit = Mathf.Lerp(currentSpeedZoneLimit, num5, UnityEngine.Time.deltaTime);
+			num2 = Mathf.Min(num2, currentSpeedZoneLimit);
+		}
+		if (PathComplete())
+		{
+			num2 = 0f;
+		}
+		if (ConVar.Global.developer > 1)
+		{
+			Debug.Log("velocity:" + velocity.magnitude + "max : " + num2);
+		}
+		brake = velocity.magnitude >= num2;
+		ApplyBrakes(brake ? 1f : 0f);
+		float num6 = throttle;
+		leftThrottle = Mathf.Clamp(leftThrottle + num6, -1f, 1f);
+		rightThrottle = Mathf.Clamp(rightThrottle + num6, -1f, 1f);
+		float t = Mathf.InverseLerp(2f, 1f, velocity.magnitude * Mathf.Abs(Vector3.Dot(velocity.normalized, base.transform.forward)));
+		float torqueAmount = Mathf.Lerp(moveForceMax, turnForce, t);
+		float num7 = Mathf.InverseLerp(5f, 1.5f, velocity.magnitude * Mathf.Abs(Vector3.Dot(velocity.normalized, base.transform.forward)));
+		ScaleSidewaysFriction(1f - num7);
+		SetMotorTorque(leftThrottle, false, torqueAmount);
+		SetMotorTorque(rightThrottle, true, torqueAmount);
+		impactDamager.damageEnabled = myRigidBody.velocity.magnitude > 2f;
 	}
 
 	public void ApplyBrakes(float amount)
@@ -1161,7 +1165,7 @@ public class BradleyAPC : BaseCombatEntity
 	public float GetMotorTorque(bool rightSide)
 	{
 		float num = 0f;
-		WheelCollider[] array = rightSide ? rightWheels : leftWheels;
+		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		foreach (WheelCollider wheelCollider in array)
 		{
 			num += wheelCollider.motorTorque;
@@ -1192,9 +1196,9 @@ public class BradleyAPC : BaseCombatEntity
 	{
 		newThrottle = Mathf.Clamp(newThrottle, -1f, 1f);
 		float num = torqueAmount * newThrottle;
-		int num2 = rightSide ? rightWheels.Length : leftWheels.Length;
+		int num2 = (rightSide ? rightWheels.Length : leftWheels.Length);
 		int num3 = 0;
-		WheelCollider[] array = rightSide ? rightWheels : leftWheels;
+		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		for (int i = 0; i < array.Length; i++)
 		{
 			WheelHit hit;
@@ -1225,7 +1229,7 @@ public class BradleyAPC : BaseCombatEntity
 
 	public void ApplyBrakeTorque(float amount, bool rightSide)
 	{
-		WheelCollider[] array = rightSide ? rightWheels : leftWheels;
+		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].brakeTorque = brakeForce * amount;
@@ -1253,19 +1257,20 @@ public class BradleyAPC : BaseCombatEntity
 		for (int i = 0; i < 12 - maxCratesToSpawn; i++)
 		{
 			BaseEntity baseEntity = GameManager.server.CreateEntity(this.fireBall.resourcePath, base.transform.position, base.transform.rotation);
-			if ((bool)baseEntity)
+			if (!baseEntity)
 			{
-				float min = 3f;
-				float max = 10f;
-				Vector3 onUnitSphere = UnityEngine.Random.onUnitSphere;
-				baseEntity.transform.position = base.transform.position + new Vector3(0f, 1.5f, 0f) + onUnitSphere * UnityEngine.Random.Range(-4f, 4f);
-				Collider component = baseEntity.GetComponent<Collider>();
-				baseEntity.Spawn();
-				baseEntity.SetVelocity(zero + onUnitSphere * UnityEngine.Random.Range(min, max));
-				foreach (ServerGib item in list)
-				{
-					UnityEngine.Physics.IgnoreCollision(component, item.GetCollider(), true);
-				}
+				continue;
+			}
+			float min = 3f;
+			float max = 10f;
+			Vector3 onUnitSphere = UnityEngine.Random.onUnitSphere;
+			baseEntity.transform.position = base.transform.position + new Vector3(0f, 1.5f, 0f) + onUnitSphere * UnityEngine.Random.Range(-4f, 4f);
+			Collider component = baseEntity.GetComponent<Collider>();
+			baseEntity.Spawn();
+			baseEntity.SetVelocity(zero + onUnitSphere * UnityEngine.Random.Range(min, max));
+			foreach (ServerGib item in list)
+			{
+				UnityEngine.Physics.IgnoreCollision(component, item.GetCollider(), true);
 			}
 		}
 		for (int j = 0; j < maxCratesToSpawn; j++)

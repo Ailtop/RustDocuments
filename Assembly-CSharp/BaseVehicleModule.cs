@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
 using Rust;
 using Rust.Modular;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -117,7 +117,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Use ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Use "));
 				}
 				using (TimeWarning.New("RPC_Use"))
 				{
@@ -272,23 +272,14 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 			}
 		}
 		VehicleModuleButtonComponent[] array2 = buttonComponents;
-		int i = 0;
-		VehicleModuleButtonComponent vehicleModuleButtonComponent;
-		while (true)
+		foreach (VehicleModuleButtonComponent vehicleModuleButtonComponent in array2)
 		{
-			if (i < array2.Length)
+			if (PlayerIsLookingAtUsable(lookingAtColldierName, vehicleModuleButtonComponent.interactionColliderName))
 			{
-				vehicleModuleButtonComponent = array2[i];
-				if (PlayerIsLookingAtUsable(lookingAtColldierName, vehicleModuleButtonComponent.interactionColliderName))
-				{
-					break;
-				}
-				i++;
-				continue;
+				vehicleModuleButtonComponent.ServerUse(player, this);
+				break;
 			}
-			return;
 		}
-		vehicleModuleButtonComponent.ServerUse(player, this);
 	}
 
 	public virtual void ScaleDamageForPlayer(BasePlayer player, HitInfo info)
@@ -433,16 +424,17 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	public void RefreshConditionals(bool canGib)
 	{
-		if (IsOnAVehicle && Vehicle.HasInited)
+		if (!IsOnAVehicle || !Vehicle.HasInited)
 		{
-			foreach (ConditionalObject conditional in conditionals)
-			{
-				RefreshConditional(conditional, canGib);
-			}
-			prevRefreshHealth = Health();
-			prevRefreshVehicleIsDead = Vehicle.IsDead();
-			prevRefreshVehicleIsLockable = Vehicle.IsLockable;
+			return;
 		}
+		foreach (ConditionalObject conditional in conditionals)
+		{
+			RefreshConditional(conditional, canGib);
+		}
+		prevRefreshHealth = Health();
+		prevRefreshVehicleIsDead = Vehicle.IsDead();
+		prevRefreshVehicleIsLockable = Vehicle.IsLockable;
 	}
 
 	private void RefreshConditional(ConditionalObject conditional, bool canGib)
@@ -461,7 +453,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 		}
 		if (flag && IsOnAVehicle && conditional.restrictOnLockable)
 		{
-			flag = (Vehicle.IsLockable == conditional.lockableRestriction);
+			flag = Vehicle.IsLockable == conditional.lockableRestriction;
 		}
 		if (flag && conditional.restrictOnAdjacent)
 		{
@@ -479,7 +471,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 			switch (conditional.adjacentRestriction)
 			{
 			case ConditionalObject.AdjacentCondition.BothDifferent:
-				flag = (!flag2 && !flag3);
+				flag = !flag2 && !flag3;
 				break;
 			case ConditionalObject.AdjacentCondition.SameInFront:
 				flag = flag2;
@@ -494,7 +486,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 				flag = !flag3;
 				break;
 			case ConditionalObject.AdjacentCondition.BothSame:
-				flag = (flag2 && flag3);
+				flag = flag2 && flag3;
 				break;
 			}
 		}

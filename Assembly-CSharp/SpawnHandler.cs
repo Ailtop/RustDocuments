@@ -1,10 +1,10 @@
-using ConVar;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ConVar;
 using UnityEngine;
 
 public class SpawnHandler : SingletonComponent<SpawnHandler>
@@ -76,24 +76,25 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 	{
 		for (int i = 0; i < 60; i++)
 		{
-			if (SingletonComponent<SpawnHandler>.Instance.CharDistribution.Sample(out spawnPoint.pos, out spawnPoint.rot))
+			if (!SingletonComponent<SpawnHandler>.Instance.CharDistribution.Sample(out spawnPoint.pos, out spawnPoint.rot))
 			{
-				bool flag = true;
-				if (TerrainMeta.Path != null)
+				continue;
+			}
+			bool flag = true;
+			if (TerrainMeta.Path != null)
+			{
+				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 				{
-					foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+					if (monument.Distance(spawnPoint.pos) < 50f)
 					{
-						if (monument.Distance(spawnPoint.pos) < 50f)
-						{
-							flag = false;
-							break;
-						}
+						flag = false;
+						break;
 					}
 				}
-				if (flag)
-				{
-					return true;
-				}
+			}
+			if (flag)
+			{
+				return true;
 			}
 		}
 		return false;
@@ -109,7 +110,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		population2distribution = new Dictionary<SpawnPopulation, SpawnDistribution>();
 		Vector3 size = TerrainMeta.Size;
 		Vector3 position = TerrainMeta.Position;
-		int pop_res = Mathf.NextPowerOfTwo((int)((float)(double)World.Size * 0.25f));
+		int pop_res = Mathf.NextPowerOfTwo((int)((float)World.Size * 0.25f));
 		for (int i = 0; i < AllSpawnPopulations.Length; i++)
 		{
 			SpawnPopulation spawnPopulation = AllSpawnPopulations[i];
@@ -131,10 +132,10 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 					map2[z * pop_res + k] = (byte)((factor2 >= cutoff2) ? (255f * factor2) : 0f);
 				}
 			});
-			SpawnDistribution value = SpawnDistributions[i] = new SpawnDistribution(this, map2, position, size);
+			SpawnDistribution value = (SpawnDistributions[i] = new SpawnDistribution(this, map2, position, size));
 			population2distribution.Add(spawnPopulation, value);
 		}
-		int char_res = Mathf.NextPowerOfTwo((int)((float)(double)World.Size * 0.5f));
+		int char_res = Mathf.NextPowerOfTwo((int)((float)World.Size * 0.5f));
 		byte[] map = new byte[char_res * char_res];
 		SpawnFilter filter = CharacterSpawn;
 		float cutoff = CharacterSpawnCutoff;
@@ -222,25 +223,27 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 			for (int i = 0; i < AllSpawnPopulations.Length; i++)
 			{
 				SpawnPopulation spawnPopulation = AllSpawnPopulations[i];
-				if (!(spawnPopulation == null))
+				if (spawnPopulation == null)
 				{
-					SpawnDistribution spawnDistribution = SpawnDistributions[i];
-					if (spawnDistribution != null)
+					continue;
+				}
+				SpawnDistribution spawnDistribution = SpawnDistributions[i];
+				if (spawnDistribution == null)
+				{
+					continue;
+				}
+				try
+				{
+					if (SpawnDistributions != null)
 					{
-						try
-						{
-							if (SpawnDistributions != null)
-							{
-								SpawnRepeating(spawnPopulation, spawnDistribution);
-							}
-						}
-						catch (Exception message)
-						{
-							Debug.LogError(message);
-						}
-						yield return CoroutineEx.waitForEndOfFrame;
+						SpawnRepeating(spawnPopulation, spawnDistribution);
 					}
 				}
+				catch (Exception message)
+				{
+					Debug.LogError(message);
+				}
+				yield return CoroutineEx.waitForEndOfFrame;
 			}
 		}
 	}
@@ -279,22 +282,23 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		while (true)
 		{
 			yield return CoroutineEx.waitForEndOfFrame;
-			if (spawnTick && ConVar.Spawn.respawn_individuals)
+			if (!spawnTick || !ConVar.Spawn.respawn_individuals)
 			{
-				yield return CoroutineEx.waitForSeconds(ConVar.Spawn.tick_individuals);
-				for (int i = 0; i < SpawnIndividuals.Count; i++)
+				continue;
+			}
+			yield return CoroutineEx.waitForSeconds(ConVar.Spawn.tick_individuals);
+			for (int i = 0; i < SpawnIndividuals.Count; i++)
+			{
+				SpawnIndividual spawnIndividual = SpawnIndividuals[i];
+				try
 				{
-					SpawnIndividual spawnIndividual = SpawnIndividuals[i];
-					try
-					{
-						Spawn(Prefab.Load<Spawnable>(spawnIndividual.PrefabID), spawnIndividual.Position, spawnIndividual.Rotation);
-					}
-					catch (Exception message)
-					{
-						Debug.LogError(message);
-					}
-					yield return CoroutineEx.waitForEndOfFrame;
+					Spawn(Prefab.Load<Spawnable>(spawnIndividual.PrefabID), spawnIndividual.Position, spawnIndividual.Rotation);
 				}
+				catch (Exception message)
+				{
+					Debug.LogError(message);
+				}
+				yield return CoroutineEx.waitForEndOfFrame;
 			}
 		}
 	}
@@ -470,22 +474,23 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 	{
 		int targetCount = GetTargetCount(population, distribution);
 		Spawnable[] array = FindAll(population);
-		if (array.Length > targetCount)
+		if (array.Length <= targetCount)
 		{
-			Debug.Log(population + " has " + array.Length + " objects, but max allowed is " + targetCount);
-			int num = array.Length - targetCount;
-			Debug.Log(" - deleting " + num + " objects");
-			foreach (Spawnable item in array.Take(num))
+			return;
+		}
+		Debug.Log(string.Concat(population, " has ", array.Length, " objects, but max allowed is ", targetCount));
+		int num = array.Length - targetCount;
+		Debug.Log(" - deleting " + num + " objects");
+		foreach (Spawnable item in array.Take(num))
+		{
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
+			if (BaseEntityEx.IsValid(baseEntity))
 			{
-				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-				if (BaseEntityEx.IsValid(baseEntity))
-				{
-					baseEntity.Kill();
-				}
-				else
-				{
-					GameManager.Destroy(item.gameObject);
-				}
+				baseEntity.Kill();
+			}
+			else
+			{
+				GameManager.Destroy(item.gameObject);
 			}
 		}
 	}

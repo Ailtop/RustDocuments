@@ -210,22 +210,23 @@ public class GameManager
 
 	public void Retire(GameObject instance)
 	{
-		if ((bool)instance)
+		if (!instance)
 		{
-			using (TimeWarning.New("GameManager.Retire"))
+			return;
+		}
+		using (TimeWarning.New("GameManager.Retire"))
+		{
+			if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
 			{
-				if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
-				{
-					Debug.LogError("Trying to retire an entity without killing it first: " + instance.name);
-				}
-				if (!Rust.Application.isQuitting && ConVar.Pool.enabled && PoolableEx.SupportsPooling(instance))
-				{
-					pool.Push(instance);
-				}
-				else
-				{
-					Object.Destroy(instance);
-				}
+				Debug.LogError("Trying to retire an entity without killing it first: " + instance.name);
+			}
+			if (!Rust.Application.isQuitting && ConVar.Pool.enabled && PoolableEx.SupportsPooling(instance))
+			{
+				pool.Push(instance);
+			}
+			else
+			{
+				Object.Destroy(instance);
 			}
 		}
 	}

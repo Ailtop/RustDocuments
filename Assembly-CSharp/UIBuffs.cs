@@ -8,18 +8,20 @@ public class UIBuffs : SingletonComponent<UIBuffs>
 
 	public void Refresh(PlayerModifiers modifiers)
 	{
-		if (Enabled)
+		if (!Enabled)
 		{
-			RemoveAll();
-			if (!(modifiers == null))
+			return;
+		}
+		RemoveAll();
+		if (modifiers == null)
+		{
+			return;
+		}
+		foreach (Modifier item in modifiers.All)
+		{
+			if (item != null)
 			{
-				foreach (Modifier item in modifiers.All)
-				{
-					if (item != null)
-					{
-						Object.Instantiate(PrefabBuffIcon).SetParent(base.transform);
-					}
-				}
+				Object.Instantiate(PrefabBuffIcon).SetParent(base.transform);
 			}
 		}
 	}

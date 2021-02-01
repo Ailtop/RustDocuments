@@ -1,6 +1,6 @@
-using ConVar;
 using System;
 using System.Collections.Generic;
+using ConVar;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.NPCTurret
@@ -117,22 +117,17 @@ namespace Rust.Ai.HTN.NPCTurret
 					return;
 				}
 				int num = MaxPopulation - Spawned.Count;
-				int num2 = 0;
-				BaseEntity baseEntity;
-				while (true)
+				for (int i = 0; i < num; i++)
 				{
-					if (num2 >= num)
-					{
-						return;
-					}
 					Vector3 pos;
 					Quaternion rot;
 					if (!(GetSpawnPoint(out pos, out rot) == null))
 					{
-						baseEntity = GameManager.server.CreateEntity(NPCTurretPrefab.resourcePath, pos, rot, false);
+						BaseEntity baseEntity = GameManager.server.CreateEntity(NPCTurretPrefab.resourcePath, pos, rot, false);
 						NPCTurretDomain component = baseEntity.GetComponent<NPCTurretDomain>();
 						if (!component)
 						{
+							baseEntity.Kill();
 							break;
 						}
 						baseEntity.enableSaving = false;
@@ -146,9 +141,7 @@ namespace Rust.Ai.HTN.NPCTurret
 						component.BurstAtLongRange = BurstAtLongRange;
 						Spawned.Add(component);
 					}
-					num2++;
 				}
-				baseEntity.Kill();
 			}
 		}
 

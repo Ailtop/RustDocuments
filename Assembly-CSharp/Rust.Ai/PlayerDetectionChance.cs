@@ -34,7 +34,7 @@ namespace Rust.Ai
 					bool flag = Random.value < FovDetection(dot, option);
 					bool flag2 = Random.value < NoiseLevel(option);
 					bool flag3 = Random.value < LightDetection(option);
-					nPCPlayerApex.LastDetectionCheckResult = (flag | flag2 | flag3);
+					nPCPlayerApex.LastDetectionCheckResult = flag || flag2 || flag3;
 				}
 				return nPCPlayerApex.LastDetectionCheckResult;
 			}
@@ -48,7 +48,7 @@ namespace Rust.Ai
 
 		private static float NoiseLevel(BasePlayer option)
 		{
-			float num = option.IsDucked() ? 0.5f : 1f;
+			float num = (option.IsDucked() ? 0.5f : 1f);
 			num *= (option.IsRunning() ? 1.5f : 1f);
 			num *= ((option.estimatedSpeed <= 0.01f) ? 0.1f : 1f);
 			if (option.inventory.containerWear.itemList.Count == 0)

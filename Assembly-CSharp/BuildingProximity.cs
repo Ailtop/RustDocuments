@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class BuildingProximity : PrefabAttribute
@@ -40,8 +40,8 @@ public class BuildingProximity : PrefabAttribute
 			ProximityInfo proximity = GetProximity(construction, position, rotation, blockDefinition, position2, rotation2);
 			ProximityInfo proximity2 = GetProximity(blockDefinition, position2, rotation2, construction, position, rotation);
 			ProximityInfo proximityInfo = default(ProximityInfo);
-			proximityInfo.hit = (proximity.hit || proximity2.hit);
-			proximityInfo.connection = (proximity.connection || proximity2.connection);
+			proximityInfo.hit = proximity.hit || proximity2.hit;
+			proximityInfo.connection = proximity.connection || proximity2.connection;
 			if (proximity.sqrDist <= proximity2.sqrDist)
 			{
 				proximityInfo.line = proximity.line;

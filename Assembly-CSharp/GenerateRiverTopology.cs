@@ -29,7 +29,7 @@ public class GenerateRiverTopology : ProceduralComponent
 		int res = topomap.res;
 		ImageProcessing.Dilate2D(map, res, res, 49152, 6, delegate(int x, int y)
 		{
-			if ((map[x * res + y] & 0x31) != 0)
+			if (((uint)map[x * res + y] & 0x31u) != 0)
 			{
 				map[x * res + y] |= 32768;
 			}

@@ -1,6 +1,6 @@
-using Rust;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Rust;
 using UnityEngine;
 
 public class LoadBalancer : SingletonComponent<LoadBalancer>

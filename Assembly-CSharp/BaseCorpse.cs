@@ -1,7 +1,7 @@
+using System;
 using ConVar;
 using Facepunch;
 using ProtoBuf;
-using System;
 using UnityEngine;
 
 public class BaseCorpse : BaseCombatEntity
@@ -80,15 +80,16 @@ public class BaseCorpse : BaseCombatEntity
 
 	public void TakeChildren(BaseEntity takeChildrenFrom)
 	{
-		if (takeChildrenFrom.children != null)
+		if (takeChildrenFrom.children == null)
 		{
-			using (TimeWarning.New("Corpse.TakeChildren"))
+			return;
+		}
+		using (TimeWarning.New("Corpse.TakeChildren"))
+		{
+			BaseEntity[] array = takeChildrenFrom.children.ToArray();
+			for (int i = 0; i < array.Length; i++)
 			{
-				BaseEntity[] array = takeChildrenFrom.children.ToArray();
-				for (int i = 0; i < array.Length; i++)
-				{
-					array[i].SwitchParent(this);
-				}
+				array[i].SwitchParent(this);
 			}
 		}
 	}
@@ -166,7 +167,7 @@ public class BaseCorpse : BaseCombatEntity
 	{
 		if (base.isServer)
 		{
-			parentEnt = (BaseNetworkable.serverEntities.Find(corpse.parentID) as BaseEntity);
+			parentEnt = BaseNetworkable.serverEntities.Find(corpse.parentID) as BaseEntity;
 		}
 		bool isClient = base.isClient;
 	}

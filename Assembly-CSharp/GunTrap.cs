@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GunTrap : StorageContainer
@@ -75,40 +75,34 @@ public class GunTrap : StorageContainer
 		List<RaycastHit> list = Pool.GetList<RaycastHit>();
 		int layerMask = 1219701505;
 		GamePhysics.TraceAll(new Ray(vector, vector2), 0.1f, list, 300f, layerMask);
-		int num = 0;
-		RaycastHit hit;
-		while (true)
+		for (int i = 0; i < list.Count; i++)
 		{
-			if (num >= list.Count)
-			{
-				return;
-			}
-			hit = list[num];
+			RaycastHit hit = list[i];
 			BaseEntity entity = RaycastHitEx.GetEntity(hit);
-			if (!(entity != null) || (!(entity == this) && !entity.EqualNetID(this)))
+			if (entity != null && (entity == this || entity.EqualNetID(this)))
 			{
-				if (entity as BaseCombatEntity != null)
+				continue;
+			}
+			if (entity as BaseCombatEntity != null)
+			{
+				HitInfo info = new HitInfo(this, entity, DamageType.Bullet, damageAmount, hit.point);
+				entity.OnAttacked(info);
+				if (entity is BasePlayer || entity is BaseNpc)
 				{
-					HitInfo info = new HitInfo(this, entity, DamageType.Bullet, damageAmount, hit.point);
-					entity.OnAttacked(info);
-					if (entity is BasePlayer || entity is BaseNpc)
+					Effect.server.ImpactEffect(new HitInfo
 					{
-						Effect.server.ImpactEffect(new HitInfo
-						{
-							HitPositionWorld = hit.point,
-							HitNormalWorld = -hit.normal,
-							HitMaterial = StringPool.Get("Flesh")
-						});
-					}
-				}
-				if (!(entity != null) || entity.ShouldBlockProjectiles())
-				{
-					break;
+						HitPositionWorld = hit.point,
+						HitNormalWorld = -hit.normal,
+						HitMaterial = StringPool.Get("Flesh")
+					});
 				}
 			}
-			num++;
+			if (!(entity != null) || entity.ShouldBlockProjectiles())
+			{
+				arg = hit.point;
+				break;
+			}
 		}
-		arg = hit.point;
 	}
 
 	public override void ServerInit()
@@ -135,33 +129,34 @@ public class GunTrap : StorageContainer
 			foreach (BaseEntity item in entityContents)
 			{
 				BasePlayer component = item.GetComponent<BasePlayer>();
-				if (!component.IsSleeping() && component.IsAlive() && !component.IsBuildingAuthed())
+				if (component.IsSleeping() || !component.IsAlive() || component.IsBuildingAuthed())
 				{
-					object obj2 = Interface.CallHook("CanBeTargeted", component, this);
-					if (obj2 is bool)
+					continue;
+				}
+				object obj2 = Interface.CallHook("CanBeTargeted", component, this);
+				if (obj2 is bool)
+				{
+					Pool.FreeList(ref obj);
+					return (bool)obj2;
+				}
+				obj.Clear();
+				GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);
+				for (int i = 0; i < obj.Count; i++)
+				{
+					BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
+					if (entity != null && (entity == this || entity.EqualNetID(this)))
 					{
-						Pool.FreeList(ref obj);
-						return (bool)obj2;
+						flag = true;
+						break;
 					}
-					obj.Clear();
-					GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);
-					for (int i = 0; i < obj.Count; i++)
-					{
-						BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
-						if (entity != null && (entity == this || entity.EqualNetID(this)))
-						{
-							flag = true;
-							break;
-						}
-						if (!(entity != null) || entity.ShouldBlockProjectiles())
-						{
-							break;
-						}
-					}
-					if (flag)
+					if (!(entity != null) || entity.ShouldBlockProjectiles())
 					{
 						break;
 					}
+				}
+				if (flag)
+				{
+					break;
 				}
 			}
 		}

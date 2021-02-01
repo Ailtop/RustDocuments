@@ -1,6 +1,6 @@
+using System;
 using Apex.AI;
 using Apex.AI.Components;
-using System;
 
 namespace Rust.Ai.HTN
 {

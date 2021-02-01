@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -49,7 +49,7 @@ public class HackableLockedCrate : LootContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Hack ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Hack "));
 				}
 				using (TimeWarning.New("RPC_Hack"))
 				{

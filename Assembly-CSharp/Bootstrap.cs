@@ -1,3 +1,7 @@
+using System.Collections;
+using System.Globalization;
+using System.Linq;
+using System.Threading;
 using CCTVRender;
 using CompanionServer;
 using ConVar;
@@ -9,10 +13,6 @@ using Network;
 using Oxide.Core;
 using Rust;
 using Rust.Ai;
-using System.Collections;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -98,7 +98,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 	{
 		Rust.Global.Init();
 		Facepunch.Application.Initialize(new Integration());
-		Facepunch.Performance.GetMemoryUsage = (() => SystemInfoEx.systemMemoryUsed);
+		Facepunch.Performance.GetMemoryUsage = () => SystemInfoEx.systemMemoryUsed;
 	}
 
 	public static void Init_Config()
@@ -127,7 +127,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		if (!UnityEngine.Application.isEditor)
 		{
 			ExceptionReporter.InitializeFromUrl("https://83df169465e84da091c1a3cd2fbffeee:3671b903f9a840ecb68411cf946ab9b6@sentry.io/51080");
-			ExceptionReporter.Disabled = (!Facepunch.Utility.CommandLine.Full.Contains("-official") && !Facepunch.Utility.CommandLine.Full.Contains("+official"));
+			ExceptionReporter.Disabled = !Facepunch.Utility.CommandLine.Full.Contains("-official") && !Facepunch.Utility.CommandLine.Full.Contains("+official");
 			BuildInfo current = BuildInfo.Current;
 			if (current.Scm.Branch != null && current.Scm.Branch.StartsWith("main"))
 			{

@@ -10,7 +10,7 @@ public abstract class DecorComponent : PrefabAttribute
 	protected override void AttributeSetup(GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
 		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
-		isRoot = (rootObj == base.gameObject);
+		isRoot = rootObj == base.gameObject;
 	}
 
 	protected override Type GetIndexedType()

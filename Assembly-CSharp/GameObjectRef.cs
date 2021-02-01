@@ -1,5 +1,5 @@
-using Facepunch;
 using System;
+using Facepunch;
 using UnityEngine;
 
 [Serializable]

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using ConVar;
 using EasyAntiCheat.Server;
 using EasyAntiCheat.Server.Cerberus;
@@ -5,9 +8,6 @@ using EasyAntiCheat.Server.Hydra;
 using EasyAntiCheat.Server.Scout;
 using Network;
 using Oxide.Core;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public static class EACServer
@@ -94,8 +94,12 @@ public static class EACServer
 			{
 				Debug.LogError("EAC status update for invalid client: " + client.ClientID);
 			}
-			else if (!ShouldIgnore(connection))
+			else
 			{
+				if (ShouldIgnore(connection))
+				{
+					return;
+				}
 				if (clientStatus.RequiresKick)
 				{
 					string text = clientStatus.Message;
@@ -138,6 +142,7 @@ public static class EACServer
 				{
 					OnAuthenticatedRemote(connection);
 				}
+				return;
 			}
 		}
 	}

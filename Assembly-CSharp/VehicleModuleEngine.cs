@@ -1,7 +1,7 @@
+using System;
 using Oxide.Core;
 using Rust;
 using Rust.Modular;
-using System;
 using UnityEngine;
 
 public class VehicleModuleEngine : VehicleModuleStorage
@@ -153,7 +153,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 			return 0f;
 		}
 		float num = Mathf.Lerp(0f, 0.25f, base.healthFraction);
-		float num2 = (base.healthFraction != 0f) ? (statBoostPercent * 0.75f) : 0f;
+		float num2 = ((base.healthFraction != 0f) ? (statBoostPercent * 0.75f) : 0f);
 		return num + num2;
 	}
 
@@ -211,7 +211,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 
 	private float BiasedLerp(float x, float bias)
 	{
-		float num = (!(bias <= 0.5f)) ? (1f - Bias(1f - Mathf.Abs(x), 1f - bias)) : Bias(Mathf.Abs(x), bias);
+		float num = ((!(bias <= 0.5f)) ? (1f - Bias(1f - Mathf.Abs(x), 1f - bias)) : Bias(Mathf.Abs(x), bias));
 		if (!(x < 0f))
 		{
 			return num;

@@ -1,7 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -137,7 +137,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_DestroyLock ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DestroyLock "));
 				}
 				using (TimeWarning.New("RPC_DestroyLock"))
 				{
@@ -231,8 +231,8 @@ public class VehicleModuleSeating : BaseVehicleModule
 	public override void ModuleAdded(BaseModularVehicle vehicle, int firstSocketIndex)
 	{
 		base.ModuleAdded(vehicle, firstSocketIndex);
-		Car = (vehicle as ModularCar);
-		VehicleLockUser = (vehicle as IVehicleLockUser);
+		Car = vehicle as ModularCar;
+		VehicleLockUser = vehicle as IVehicleLockUser;
 		if (!HasSeating || !base.isServer)
 		{
 			return;

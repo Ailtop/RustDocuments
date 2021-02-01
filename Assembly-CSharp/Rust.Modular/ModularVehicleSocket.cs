@@ -46,19 +46,19 @@ namespace Rust.Modular
 				switch (LocationType)
 				{
 				case SocketLocationType.Back:
-					flag = (locationRestriction == ConditionalSocketSettings.LocationCondition.Back || locationRestriction == ConditionalSocketSettings.LocationCondition.NotFront || locationRestriction == ConditionalSocketSettings.LocationCondition.NotMiddle);
+					flag = locationRestriction == ConditionalSocketSettings.LocationCondition.Back || locationRestriction == ConditionalSocketSettings.LocationCondition.NotFront || locationRestriction == ConditionalSocketSettings.LocationCondition.NotMiddle;
 					break;
 				case SocketLocationType.Front:
-					flag = (locationRestriction == ConditionalSocketSettings.LocationCondition.Front || locationRestriction == ConditionalSocketSettings.LocationCondition.NotBack || locationRestriction == ConditionalSocketSettings.LocationCondition.NotMiddle);
+					flag = locationRestriction == ConditionalSocketSettings.LocationCondition.Front || locationRestriction == ConditionalSocketSettings.LocationCondition.NotBack || locationRestriction == ConditionalSocketSettings.LocationCondition.NotMiddle;
 					break;
 				case SocketLocationType.Middle:
-					flag = (locationRestriction == ConditionalSocketSettings.LocationCondition.Middle || locationRestriction == ConditionalSocketSettings.LocationCondition.NotFront || locationRestriction == ConditionalSocketSettings.LocationCondition.NotBack);
+					flag = locationRestriction == ConditionalSocketSettings.LocationCondition.Middle || locationRestriction == ConditionalSocketSettings.LocationCondition.NotFront || locationRestriction == ConditionalSocketSettings.LocationCondition.NotBack;
 					break;
 				}
 			}
 			if (flag && modelSettings.restrictOnWheel)
 			{
-				flag = (WheelType == modelSettings.wheelRestriction);
+				flag = WheelType == modelSettings.wheelRestriction;
 			}
 			return flag;
 		}

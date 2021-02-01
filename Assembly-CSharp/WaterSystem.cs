@@ -269,45 +269,46 @@ public class WaterSystem : MonoBehaviour
 				nativePathState = NativePathState.Failed;
 			}
 		}
-		if (nativePathState != NativePathState.Failed)
+		if (nativePathState == NativePathState.Failed)
 		{
-			try
+			return;
+		}
+		try
+		{
+			int shoreMapSize = 1;
+			Vector3[] shoreMap = emptyShoreMap;
+			if (terrainTexturing != null && terrainTexturing.ShoreMap != null)
 			{
-				int shoreMapSize = 1;
-				Vector3[] shoreMap = emptyShoreMap;
-				if (terrainTexturing != null && terrainTexturing.ShoreMap != null)
-				{
-					shoreMapSize = terrainTexturing.ShoreMapSize;
-					shoreMap = terrainTexturing.ShoreMap;
-				}
-				int waterHeightMapSize = 1;
-				short[] src = emptyWaterMap;
-				if (terrainWaterMap != null && terrainWaterMap.src != null && terrainWaterMap.src.Length != 0)
-				{
-					waterHeightMapSize = terrainWaterMap.res;
-					src = terrainWaterMap.src;
-				}
-				int terrainHeightMapSize = 1;
-				short[] src2 = emptyHeightMap;
-				if (terrainHeightMap != null && terrainHeightMap.src != null && terrainHeightMap.src.Length != 0)
-				{
-					terrainHeightMapSize = terrainHeightMap.res;
-					src2 = terrainHeightMap.src;
-				}
-				Vector4 packedParams = default(Vector4);
-				packedParams.x = OceanLevel;
-				packedParams.y = ((instance != null) ? 1f : 0f);
-				packedParams.z = ((TerrainTexturing.Instance != null) ? 1f : 0f);
-				packedParams.w = 0f;
-				SetBaseConstants_Native(shoreMapSize, ref shoreMap[0], waterHeightMapSize, ref src[0], packedParams);
-				SetTerrainConstants_Native(terrainHeightMapSize, ref src2[0], TerrainMeta.Position, TerrainMeta.Size);
-				SetGerstnerConstants_Native(globalParams0, globalParams1, ref openWaves[0], ref shoreWaves[0]);
-				nativePathState = NativePathState.Ready;
+				shoreMapSize = terrainTexturing.ShoreMapSize;
+				shoreMap = terrainTexturing.ShoreMap;
 			}
-			catch (EntryPointNotFoundException)
+			int waterHeightMapSize = 1;
+			short[] src = emptyWaterMap;
+			if (terrainWaterMap != null && terrainWaterMap.src != null && terrainWaterMap.src.Length != 0)
 			{
-				nativePathState = NativePathState.Failed;
+				waterHeightMapSize = terrainWaterMap.res;
+				src = terrainWaterMap.src;
 			}
+			int terrainHeightMapSize = 1;
+			short[] src2 = emptyHeightMap;
+			if (terrainHeightMap != null && terrainHeightMap.src != null && terrainHeightMap.src.Length != 0)
+			{
+				terrainHeightMapSize = terrainHeightMap.res;
+				src2 = terrainHeightMap.src;
+			}
+			Vector4 packedParams = default(Vector4);
+			packedParams.x = OceanLevel;
+			packedParams.y = ((instance != null) ? 1f : 0f);
+			packedParams.z = ((TerrainTexturing.Instance != null) ? 1f : 0f);
+			packedParams.w = 0f;
+			SetBaseConstants_Native(shoreMapSize, ref shoreMap[0], waterHeightMapSize, ref src[0], packedParams);
+			SetTerrainConstants_Native(terrainHeightMapSize, ref src2[0], TerrainMeta.Position, TerrainMeta.Size);
+			SetGerstnerConstants_Native(globalParams0, globalParams1, ref openWaves[0], ref shoreWaves[0]);
+			nativePathState = NativePathState.Ready;
+		}
+		catch (EntryPointNotFoundException)
+		{
+			nativePathState = NativePathState.Failed;
 		}
 	}
 
@@ -317,11 +318,11 @@ public class WaterSystem : MonoBehaviour
 		uv.x = (pos.x - TerrainMeta.Position.x) * TerrainMeta.OneOverSize.x;
 		uv.y = (pos.z - TerrainMeta.Position.z) * TerrainMeta.OneOverSize.z;
 		float num = OceanLevel;
-		float num2 = (TerrainMeta.WaterMap != null) ? TerrainMeta.WaterMap.GetHeightFast(uv) : 0f;
-		float num3 = (TerrainMeta.HeightMap != null) ? TerrainMeta.HeightMap.GetHeightFast(uv) : 0f;
+		float num2 = ((TerrainMeta.WaterMap != null) ? TerrainMeta.WaterMap.GetHeightFast(uv) : 0f);
+		float num3 = ((TerrainMeta.HeightMap != null) ? TerrainMeta.HeightMap.GetHeightFast(uv) : 0f);
 		if (instance != null && (double)num2 <= (double)num + 0.01)
 		{
-			Vector3 shore = (TerrainTexturing.Instance != null) ? TerrainTexturing.Instance.GetCoarseVectorToShore(uv) : Vector3.zero;
+			Vector3 shore = ((TerrainTexturing.Instance != null) ? TerrainTexturing.Instance.GetCoarseVectorToShore(uv) : Vector3.zero);
 			float num4 = Mathf.Clamp01(Mathf.Abs(num - num3) * 0.1f);
 			num2 = WaterGerstner.SampleHeight(instance, pos, shore) * num4;
 		}
@@ -346,7 +347,7 @@ public class WaterSystem : MonoBehaviour
 		{
 			Vector2 uv = posUV[j];
 			terrainHeight[j] = ((TerrainMeta.HeightMap != null) ? TerrainMeta.HeightMap.GetHeightFast(uv) : 0f);
-			float num2 = (TerrainMeta.WaterMap != null) ? TerrainMeta.WaterMap.GetHeightFast(uv) : 0f;
+			float num2 = ((TerrainMeta.WaterMap != null) ? TerrainMeta.WaterMap.GetHeightFast(uv) : 0f);
 			if (instance != null && (double)num2 <= (double)num + 0.01)
 			{
 				float num3 = Mathf.Clamp01(Mathf.Abs(num - terrainHeight[j]) * 0.1f);
@@ -361,7 +362,7 @@ public class WaterSystem : MonoBehaviour
 
 	public static float GetHeight(Vector3 pos)
 	{
-		float val = (nativePathState != NativePathState.Ready) ? GetHeight_Managed(pos) : GetHeight_Native(pos);
+		float val = ((nativePathState != NativePathState.Ready) ? GetHeight_Managed(pos) : GetHeight_Native(pos));
 		return Math.Max(val, OceanLevel);
 	}
 

@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
 using Rust.Modular;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMoveFrom, IPrefabPreProcess
@@ -595,7 +595,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	public override void OnChildAdded(BaseEntity childEntity)
 	{
 		BaseVehicleModule module;
-		if ((object)(module = (childEntity as BaseVehicleModule)) != null)
+		if ((object)(module = childEntity as BaseVehicleModule) != null)
 		{
 			Action action = delegate
 			{
@@ -609,7 +609,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	public override void OnChildRemoved(BaseEntity childEntity)
 	{
 		BaseVehicleModule removedModule;
-		if ((object)(removedModule = (childEntity as BaseVehicleModule)) != null)
+		if ((object)(removedModule = childEntity as BaseVehicleModule) != null)
 		{
 			ModuleEntityRemoved(removedModule);
 		}

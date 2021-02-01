@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,7 +29,7 @@ public class RepairBench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ChangeSkin ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ChangeSkin "));
 				}
 				using (TimeWarning.New("ChangeSkin"))
 				{
@@ -65,7 +65,7 @@ public class RepairBench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RepairItem ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RepairItem "));
 				}
 				using (TimeWarning.New("RepairItem"))
 				{
@@ -118,23 +118,24 @@ public class RepairBench : StorageContainer
 		}
 		foreach (ItemAmount ingredient2 in bp.ingredients)
 		{
-			if (ingredient2.itemDef.category == ItemCategory.Component && ingredient2.itemDef.Blueprint != null)
+			if (ingredient2.itemDef.category != ItemCategory.Component || !(ingredient2.itemDef.Blueprint != null))
 			{
-				bool flag = false;
-				ItemAmount itemAmount = ingredient2.itemDef.Blueprint.ingredients[0];
-				foreach (ItemAmount allIngredient in allIngredients)
+				continue;
+			}
+			bool flag = false;
+			ItemAmount itemAmount = ingredient2.itemDef.Blueprint.ingredients[0];
+			foreach (ItemAmount allIngredient in allIngredients)
+			{
+				if (allIngredient.itemDef == itemAmount.itemDef)
 				{
-					if (allIngredient.itemDef == itemAmount.itemDef)
-					{
-						allIngredient.amount += itemAmount.amount * ingredient2.amount;
-						flag = true;
-						break;
-					}
+					allIngredient.amount += itemAmount.amount * ingredient2.amount;
+					flag = true;
+					break;
 				}
-				if (!flag)
-				{
-					allIngredients.Add(new ItemAmount(itemAmount.itemDef, itemAmount.amount * ingredient2.amount));
-				}
+			}
+			if (!flag)
+			{
+				allIngredients.Add(new ItemAmount(itemAmount.itemDef, itemAmount.amount * ingredient2.amount));
 			}
 		}
 	}
@@ -181,7 +182,7 @@ public class RepairBench : StorageContainer
 			Skin = ItemDefinition.FindSkin(slot.info.isRedirectOf.itemid, num);
 			skin = slot.info.isRedirectOf.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => (ulong)x.id == Skin);
 		}
-		ItemSkin itemSkin = (skin.id == 0) ? null : (skin.invItem as ItemSkin);
+		ItemSkin itemSkin = ((skin.id == 0) ? null : (skin.invItem as ItemSkin));
 		if ((bool)itemSkin && (itemSkin.Redirect != null || slot.info.isRedirectOf != null))
 		{
 			ItemDefinition template = itemSkin.Redirect;
@@ -189,7 +190,7 @@ public class RepairBench : StorageContainer
 			if (itemSkin.Redirect == null && slot.info.isRedirectOf != null)
 			{
 				template = slot.info.isRedirectOf;
-				flag2 = (num != 0);
+				flag2 = num != 0;
 			}
 			float condition = slot.condition;
 			float maxCondition = slot.maxCondition;
@@ -261,7 +262,7 @@ public class RepairBench : StorageContainer
 		}
 		if (mustKnowBlueprint)
 		{
-			ItemDefinition itemDefinition = (info.isRedirectOf != null) ? info.isRedirectOf : info;
+			ItemDefinition itemDefinition = ((info.isRedirectOf != null) ? info.isRedirectOf : info);
 			if (!player.blueprints.HasUnlocked(itemDefinition) && (!(itemDefinition.Blueprint != null) || itemDefinition.Blueprint.isResearchable))
 			{
 				return;

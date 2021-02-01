@@ -43,7 +43,7 @@ namespace UnityEngine.UI.Extensions
 
 		protected override void OnPopulateMesh(VertexHelper vh)
 		{
-			int num = (!ArcInvert) ? 1 : (-1);
+			int num = ((!ArcInvert) ? 1 : (-1));
 			float num2 = ((base.rectTransform.rect.width < base.rectTransform.rect.height) ? base.rectTransform.rect.width : base.rectTransform.rect.height) - (float)Padding;
 			float num3 = (0f - base.rectTransform.pivot.x) * num2;
 			float num4 = (0f - base.rectTransform.pivot.x) * num2 + Thickness;

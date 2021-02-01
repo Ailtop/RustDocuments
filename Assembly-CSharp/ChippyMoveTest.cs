@@ -10,7 +10,7 @@ public class ChippyMoveTest : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		float num = (Mathf.Abs(heading.magnitude) > 0f) ? 1f : 0f;
+		float num = ((Mathf.Abs(heading.magnitude) > 0f) ? 1f : 0f);
 		speed = Mathf.MoveTowards(speed, maxSpeed * num, Time.fixedDeltaTime * ((num == 0f) ? 2f : 2f));
 		Ray ray = new Ray(base.transform.position, new Vector3(heading.x, heading.y, 0f).normalized);
 		if (!Physics.Raycast(ray, speed * Time.fixedDeltaTime, 16777216))

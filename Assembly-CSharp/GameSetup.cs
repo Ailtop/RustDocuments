@@ -1,7 +1,7 @@
+using System.Collections;
 using ConVar;
 using Network;
 using Rust;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

@@ -86,7 +86,7 @@ namespace CompanionServer.Handlers
 				return ValidationResult.Rejected;
 			}
 			UserId = Request.playerId;
-			Player = (BasePlayer.FindByID(UserId) ?? BasePlayer.FindSleeping(UserId));
+			Player = BasePlayer.FindByID(UserId) ?? BasePlayer.FindSleeping(UserId);
 			Client.Subscribe(new PlayerTarget(UserId));
 			return ValidationResult.Success;
 		}

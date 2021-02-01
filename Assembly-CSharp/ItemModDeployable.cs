@@ -25,7 +25,7 @@ public class ItemModDeployable : MonoBehaviour
 			player.GiveAchievement(UnlockAchievement);
 		}
 		BuildingPrivlidge buildingPrivlidge;
-		if ((object)(buildingPrivlidge = (ent as BuildingPrivlidge)) != null)
+		if ((object)(buildingPrivlidge = ent as BuildingPrivlidge) != null)
 		{
 			buildingPrivlidge.AddPlayer(player);
 		}

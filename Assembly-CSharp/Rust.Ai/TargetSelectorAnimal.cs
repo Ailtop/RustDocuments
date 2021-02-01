@@ -1,7 +1,7 @@
-using Apex.AI;
-using Apex.Serialization;
 using System;
 using System.Collections.Generic;
+using Apex.AI;
+using Apex.Serialization;
 
 namespace Rust.Ai
 {
@@ -53,7 +53,7 @@ namespace Rust.Ai
 			}
 			if (baseEntity != null)
 			{
-				best = (baseEntity as BaseNpc);
+				best = baseEntity as BaseNpc;
 			}
 			return best != null;
 		}

@@ -41,7 +41,7 @@ public class TakeCollisionDamage : FacepunchBehaviour
 			return;
 		}
 		Rigidbody rigidbody = collision.rigidbody;
-		float num = (rigidbody == null) ? 100f : rigidbody.mass;
+		float num = ((rigidbody == null) ? 100f : rigidbody.mass);
 		float value = collision.relativeVelocity.magnitude * (entity.RealisticMass + num) / Time.fixedDeltaTime;
 		float num2 = Mathf.InverseLerp(forceForAnyDamage, forceForMaxDamage, value);
 		if (num2 > 0f)

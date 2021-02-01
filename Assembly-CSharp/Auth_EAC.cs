@@ -1,5 +1,5 @@
-using Network;
 using System.Collections;
+using Network;
 
 public static class Auth_EAC
 {

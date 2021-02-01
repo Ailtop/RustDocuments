@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 namespace CCTVRender
@@ -37,31 +37,32 @@ namespace CCTVRender
 
 		public static void Update()
 		{
-			if (Settings.Enabled && !((float)_lastCleanup < 3f))
+			if (!Settings.Enabled || (float)_lastCleanup < 3f)
 			{
-				_lastCleanup = 0f;
-				using (TimeWarning.New("CCTVRender.Manager.Update"))
+				return;
+			}
+			_lastCleanup = 0f;
+			using (TimeWarning.New("CCTVRender.Manager.Update"))
+			{
+				float realtimeSinceStartup = Time.realtimeSinceStartup;
+				List<KeyValuePair<ulong, Job>> obj = Pool.GetList<KeyValuePair<ulong, Job>>();
+				foreach (KeyValuePair<ulong, Job> playerAssignment in _playerAssignments)
 				{
-					float realtimeSinceStartup = Time.realtimeSinceStartup;
-					List<KeyValuePair<ulong, Job>> obj = Pool.GetList<KeyValuePair<ulong, Job>>();
-					foreach (KeyValuePair<ulong, Job> playerAssignment in _playerAssignments)
+					if (realtimeSinceStartup - playerAssignment.Value.Assigned >= Settings.AssignmentTimeout)
 					{
-						if (realtimeSinceStartup - playerAssignment.Value.Assigned >= Settings.AssignmentTimeout)
-						{
-							obj.Add(playerAssignment);
-						}
+						obj.Add(playerAssignment);
 					}
-					foreach (KeyValuePair<ulong, Job> item in obj)
-					{
-						_playerAssignments.Remove(item.Key);
-						RenderState value;
-						if (_renderStates.TryGetValue(item.Value.NetId, out value))
-						{
-							value.AbortRequest();
-						}
-					}
-					Pool.FreeList(ref obj);
 				}
+				foreach (KeyValuePair<ulong, Job> item in obj)
+				{
+					_playerAssignments.Remove(item.Key);
+					RenderState value;
+					if (_renderStates.TryGetValue(item.Value.NetId, out value))
+					{
+						value.AbortRequest();
+					}
+				}
+				Pool.FreeList(ref obj);
 			}
 		}
 
@@ -114,29 +115,25 @@ namespace CCTVRender
 			if (!Settings.Enabled)
 			{
 				DebugEx.LogWarning($"CompleteRequest from player {player.userID} when feature is disabled");
+				return;
 			}
-			else
+			using (TimeWarning.New("CCTVRender.Manager.CompleteRequest"))
 			{
-				using (TimeWarning.New("CCTVRender.Manager.CompleteRequest"))
+				Job value;
+				if (player == null || !_playerAssignments.TryGetValue(player.userID, out value))
 				{
-					Job value;
-					if (player == null || !_playerAssignments.TryGetValue(player.userID, out value))
-					{
-						DebugEx.LogWarning("CompleteRequest with null or unassigned player");
-					}
-					else
-					{
-						_playerAssignments.Remove(player.userID);
-						RenderState value2;
-						if (!_renderStates.TryGetValue(value.NetId, out value2))
-						{
-							DebugEx.LogWarning("Job completed but RenderState wasn't found!");
-						}
-						else
-						{
-							value2.CompleteRequest(jpgImage);
-						}
-					}
+					DebugEx.LogWarning("CompleteRequest with null or unassigned player");
+					return;
+				}
+				_playerAssignments.Remove(player.userID);
+				RenderState value2;
+				if (!_renderStates.TryGetValue(value.NetId, out value2))
+				{
+					DebugEx.LogWarning("Job completed but RenderState wasn't found!");
+				}
+				else
+				{
+					value2.CompleteRequest(jpgImage);
 				}
 			}
 		}

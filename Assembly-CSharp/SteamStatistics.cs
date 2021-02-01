@@ -1,6 +1,6 @@
-using ConVar;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ConVar;
 using UnityEngine;
 
 public class SteamStatistics
@@ -35,31 +35,30 @@ public class SteamStatistics
 
 	public void Add(string name, int var)
 	{
-		if (PlatformService.Instance.IsValid && refresh != null && refresh.IsCompleted)
+		if (!PlatformService.Instance.IsValid || refresh == null || !refresh.IsCompleted)
 		{
-			using (TimeWarning.New("PlayerStats.Add"))
+			return;
+		}
+		using (TimeWarning.New("PlayerStats.Add"))
+		{
+			int value = 0;
+			if (intStats.TryGetValue(name, out value))
 			{
-				int value = 0;
-				if (intStats.TryGetValue(name, out value))
+				intStats[name] += var;
+				PlatformService.Instance.SetPlayerStatInt(player.userID, name, intStats[name]);
+				return;
+			}
+			value = (int)PlatformService.Instance.GetPlayerStatInt(player.userID, name, 0L);
+			if (!PlatformService.Instance.SetPlayerStatInt(player.userID, name, value + var))
+			{
+				if (Global.developer > 0)
 				{
-					intStats[name] += var;
-					PlatformService.Instance.SetPlayerStatInt(player.userID, name, intStats[name]);
+					Debug.LogWarning("[STEAMWORKS] Couldn't SetUserStat: " + name);
 				}
-				else
-				{
-					value = (int)PlatformService.Instance.GetPlayerStatInt(player.userID, name, 0L);
-					if (!PlatformService.Instance.SetPlayerStatInt(player.userID, name, value + var))
-					{
-						if (Global.developer > 0)
-						{
-							Debug.LogWarning("[STEAMWORKS] Couldn't SetUserStat: " + name);
-						}
-					}
-					else
-					{
-						intStats.Add(name, value + var);
-					}
-				}
+			}
+			else
+			{
+				intStats.Add(name, value + var);
 			}
 		}
 	}

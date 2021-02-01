@@ -18,19 +18,17 @@ public class WorldNetworking
 			{
 			case WorldMessage.MessageType.Request:
 				SendWorldData(message.connection);
-				break;
-			default:
-				if (worldMessage.prefabs != null)
-				{
-					serialization.world.prefabs.AddRange(worldMessage.prefabs);
-					worldMessage.prefabs.Clear();
-				}
-				if (worldMessage.paths != null)
-				{
-					serialization.world.paths.AddRange(worldMessage.paths);
-					worldMessage.paths.Clear();
-				}
-				break;
+				return;
+			}
+			if (worldMessage.prefabs != null)
+			{
+				serialization.world.prefabs.AddRange(worldMessage.prefabs);
+				worldMessage.prefabs.Clear();
+			}
+			if (worldMessage.paths != null)
+			{
+				serialization.world.paths.AddRange(worldMessage.paths);
+				worldMessage.paths.Clear();
 			}
 		}
 	}

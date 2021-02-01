@@ -1,12 +1,12 @@
+using System.Collections.Generic;
+using System.Globalization;
+using System.Threading.Tasks;
 using CompanionServer.Handlers;
 using ConVar;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
 using ProtoBuf;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace CompanionServer

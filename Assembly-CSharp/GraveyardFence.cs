@@ -1,5 +1,5 @@
-using Facepunch;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class GraveyardFence : SimpleBuildingBlock

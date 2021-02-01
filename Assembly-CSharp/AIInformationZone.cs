@@ -114,31 +114,32 @@ public class AIInformationZone : MonoBehaviour
 		float num = 0f;
 		foreach (AICoverPoint coverPoint in coverPoints)
 		{
-			if (!coverPoint.InUse() || coverPoint.IsUsedBy(forObject))
+			if (coverPoint.InUse() && !coverPoint.IsUsedBy(forObject))
 			{
-				Vector3 position = coverPoint.transform.position;
-				Vector3 normalized = (hideFromPosition - position).normalized;
-				float num2 = Vector3.Dot(coverPoint.transform.forward, normalized);
-				if (!(num2 < 1f - coverPoint.coverDot))
+				continue;
+			}
+			Vector3 position = coverPoint.transform.position;
+			Vector3 normalized = (hideFromPosition - position).normalized;
+			float num2 = Vector3.Dot(coverPoint.transform.forward, normalized);
+			if (!(num2 < 1f - coverPoint.coverDot))
+			{
+				float value = Vector3.Distance(currentPosition, position);
+				float num3 = 0f;
+				if (minRange > 0f)
 				{
-					float value = Vector3.Distance(currentPosition, position);
-					float num3 = 0f;
-					if (minRange > 0f)
-					{
-						num3 -= (1f - Mathf.InverseLerp(0f, minRange, value)) * 100f;
-					}
-					float value2 = Mathf.Abs(position.y - currentPosition.y);
-					num3 += (1f - Mathf.InverseLerp(1f, 5f, value2)) * 500f;
-					num3 += Mathf.InverseLerp(1f - coverPoint.coverDot, 1f, num2) * 50f;
-					num3 += (1f - Mathf.InverseLerp(2f, maxRange, value)) * 100f;
-					float num4 = 1f - Mathf.InverseLerp(4f, 10f, Vector3.Distance(currentPosition, hideFromPosition));
-					float value3 = Vector3.Dot((coverPoint.transform.position - currentPosition).normalized, normalized);
-					num3 -= Mathf.InverseLerp(-1f, 0.25f, value3) * 50f * num4;
-					if (num3 > num)
-					{
-						aICoverPoint = coverPoint;
-						num = num3;
-					}
+					num3 -= (1f - Mathf.InverseLerp(0f, minRange, value)) * 100f;
+				}
+				float value2 = Mathf.Abs(position.y - currentPosition.y);
+				num3 += (1f - Mathf.InverseLerp(1f, 5f, value2)) * 500f;
+				num3 += Mathf.InverseLerp(1f - coverPoint.coverDot, 1f, num2) * 50f;
+				num3 += (1f - Mathf.InverseLerp(2f, maxRange, value)) * 100f;
+				float num4 = 1f - Mathf.InverseLerp(4f, 10f, Vector3.Distance(currentPosition, hideFromPosition));
+				float value3 = Vector3.Dot((coverPoint.transform.position - currentPosition).normalized, normalized);
+				num3 -= Mathf.InverseLerp(-1f, 0.25f, value3) * 50f * num4;
+				if (num3 > num)
+				{
+					aICoverPoint = coverPoint;
+					num = num3;
 				}
 			}
 		}

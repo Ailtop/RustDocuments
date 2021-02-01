@@ -1,5 +1,5 @@
-using Facepunch;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class MusicClipLoader
@@ -31,24 +31,16 @@ public class MusicClipLoader
 				return;
 			}
 		}
-		int num2 = clipsToUnload.Count - 1;
-		AudioClip audioClip2;
-		while (true)
+		for (int num2 = clipsToUnload.Count - 1; num2 >= 0; num2--)
 		{
-			if (num2 >= 0)
+			AudioClip audioClip2 = clipsToUnload[num2];
+			if (audioClip2.loadState == AudioDataLoadState.Loaded)
 			{
-				audioClip2 = clipsToUnload[num2];
-				if (audioClip2.loadState == AudioDataLoadState.Loaded)
-				{
-					break;
-				}
-				num2--;
-				continue;
+				audioClip2.UnloadAudioData();
+				clipsToUnload.RemoveAt(num2);
+				break;
 			}
-			return;
 		}
-		audioClip2.UnloadAudioData();
-		clipsToUnload.RemoveAt(num2);
 	}
 
 	public void Refresh()

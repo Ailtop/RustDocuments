@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -560,32 +560,33 @@ public sealed class ItemContainer
 		List<Item> obj = Pool.GetList<Item>();
 		foreach (Item item2 in itemList)
 		{
-			if (item2.info.itemid == itemid)
+			if (item2.info.itemid != itemid)
 			{
-				int num2 = iAmount - num;
-				if (num2 > 0)
+				continue;
+			}
+			int num2 = iAmount - num;
+			if (num2 > 0)
+			{
+				if (item2.amount > num2)
 				{
-					if (item2.amount > num2)
-					{
-						item2.MarkDirty();
-						item2.amount -= num2;
-						num += num2;
-						Item item = ItemManager.CreateByItemID(itemid, 1, 0uL);
-						item.amount = num2;
-						item.CollectedForCrafting(playerOwner);
-						collect?.Add(item);
-						break;
-					}
-					if (item2.amount <= num2)
-					{
-						num += item2.amount;
-						obj.Add(item2);
-						collect?.Add(item2);
-					}
-					if (num == iAmount)
-					{
-						break;
-					}
+					item2.MarkDirty();
+					item2.amount -= num2;
+					num += num2;
+					Item item = ItemManager.CreateByItemID(itemid, 1, 0uL);
+					item.amount = num2;
+					item.CollectedForCrafting(playerOwner);
+					collect?.Add(item);
+					break;
+				}
+				if (item2.amount <= num2)
+				{
+					num += item2.amount;
+					obj.Add(item2);
+					collect?.Add(item2);
+				}
+				if (num == iAmount)
+				{
+					break;
 				}
 			}
 		}
@@ -748,7 +749,7 @@ public sealed class ItemContainer
 			{
 				for (int i = 0; i < 32; i++)
 				{
-					if (((int)item2.info.occupySlots & (1 << i)) != 0)
+					if (((uint)item2.info.occupySlots & (uint)(1 << i)) != 0)
 					{
 						array[i]--;
 					}
@@ -756,7 +757,7 @@ public sealed class ItemContainer
 			}
 			for (int j = 0; j < 32; j++)
 			{
-				if (((int)item.info.occupySlots & (1 << j)) != 0 && array[j] <= 0)
+				if (((uint)item.info.occupySlots & (uint)(1 << j)) != 0 && array[j] <= 0)
 				{
 					return CanAcceptResult.CannotAcceptRightNow;
 				}

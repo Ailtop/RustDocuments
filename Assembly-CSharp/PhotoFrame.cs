@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -30,7 +30,7 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - LockSign ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - LockSign "));
 				}
 				using (TimeWarning.New("LockSign"))
 				{
@@ -66,7 +66,7 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UnLockSign ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UnLockSign "));
 				}
 				using (TimeWarning.New("UnLockSign"))
 				{
@@ -102,7 +102,7 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UpdateSign ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateSign "));
 				}
 				using (TimeWarning.New("UpdateSign"))
 				{
@@ -264,8 +264,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 	public override void OnItemAddedOrRemoved(Item item, bool added)
 	{
 		base.OnItemAddedOrRemoved(item, added);
-		Item item2 = (base.inventory.itemList.Count > 0) ? base.inventory.itemList[0] : null;
-		uint num = (item2 != null && item2.IsValid()) ? item2.instanceData.subEntity : 0u;
+		Item item2 = ((base.inventory.itemList.Count > 0) ? base.inventory.itemList[0] : null);
+		uint num = ((item2 != null && item2.IsValid()) ? item2.instanceData.subEntity : 0u);
 		if (num != _photoEntity.uid)
 		{
 			_photoEntity.uid = num;

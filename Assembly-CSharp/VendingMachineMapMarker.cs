@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 
 public class VendingMachineMapMarker : MapMarker
 {
@@ -17,27 +17,28 @@ public class VendingMachineMapMarker : MapMarker
 		base.Save(info);
 		info.msg.vendingMachine = new ProtoBuf.VendingMachine();
 		info.msg.vendingMachine.shopName = markerShopName;
-		if (server_vendingMachine != null)
+		if (!(server_vendingMachine != null))
 		{
-			info.msg.vendingMachine.sellOrderContainer = new ProtoBuf.VendingMachine.SellOrderContainer();
-			info.msg.vendingMachine.sellOrderContainer.ShouldPool = false;
-			info.msg.vendingMachine.sellOrderContainer.sellOrders = new List<ProtoBuf.VendingMachine.SellOrder>();
-			foreach (ProtoBuf.VendingMachine.SellOrder sellOrder2 in server_vendingMachine.sellOrders.sellOrders)
+			return;
+		}
+		info.msg.vendingMachine.sellOrderContainer = new ProtoBuf.VendingMachine.SellOrderContainer();
+		info.msg.vendingMachine.sellOrderContainer.ShouldPool = false;
+		info.msg.vendingMachine.sellOrderContainer.sellOrders = new List<ProtoBuf.VendingMachine.SellOrder>();
+		foreach (ProtoBuf.VendingMachine.SellOrder sellOrder2 in server_vendingMachine.sellOrders.sellOrders)
+		{
+			ProtoBuf.VendingMachine.SellOrder sellOrder = new ProtoBuf.VendingMachine.SellOrder
 			{
-				ProtoBuf.VendingMachine.SellOrder sellOrder = new ProtoBuf.VendingMachine.SellOrder
-				{
-					ShouldPool = false
-				};
-				sellOrder2.CopyTo(sellOrder);
-				info.msg.vendingMachine.sellOrderContainer.sellOrders.Add(sellOrder);
-			}
+				ShouldPool = false
+			};
+			sellOrder2.CopyTo(sellOrder);
+			info.msg.vendingMachine.sellOrderContainer.sellOrders.Add(sellOrder);
 		}
 	}
 
 	public override AppMarker GetAppMarkerData()
 	{
 		AppMarker appMarkerData = base.GetAppMarkerData();
-		appMarkerData.name = (markerShopName ?? "");
+		appMarkerData.name = markerShopName ?? "";
 		appMarkerData.outOfStock = !HasFlag(Flags.Busy);
 		if (server_vendingMachine != null)
 		{

@@ -1,5 +1,5 @@
-using Rust;
 using System;
+using Rust;
 
 public class PlayerInput : EntityComponent<BasePlayer>
 {

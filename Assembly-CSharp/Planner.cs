@@ -1,11 +1,11 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -24,7 +24,7 @@ public class Planner : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoPlace ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoPlace "));
 				}
 				using (TimeWarning.New("DoPlace"))
 				{
@@ -116,7 +116,7 @@ public class Planner : HeldEntity
 		BaseEntity baseEntity = null;
 		if (msg.entity != 0)
 		{
-			baseEntity = (BaseNetworkable.serverEntities.Find(msg.entity) as BaseEntity);
+			baseEntity = BaseNetworkable.serverEntities.Find(msg.entity) as BaseEntity;
 			if (!baseEntity)
 			{
 				ownerPlayer.ChatMessage("Couldn't find entity " + msg.entity);
@@ -202,7 +202,7 @@ public class Planner : HeldEntity
 			Vector3 center = ownerPlayer.eyes.center;
 			Vector3 position = ownerPlayer.eyes.position;
 			Vector3 origin = target.ray.origin;
-			Vector3 p = (target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position;
+			Vector3 p = ((target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position);
 			if (target.entity != null)
 			{
 				DeployShell deployShell = PrefabAttribute.server.Find<DeployShell>(target.entity.prefabID);
@@ -212,7 +212,7 @@ public class Planner : HeldEntity
 				}
 			}
 			int num = 2097152;
-			int num2 = ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688;
+			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
 			if (!GamePhysics.LineOfSight(padding: (target.socket != null) ? 0.5f : 0.01f, layerMask: (target.socket != null) ? num : num2, p0: center, p1: position, p2: origin, p3: p))
 			{
 				ownerPlayer.ChatMessage("Line of sight blocked.");
@@ -332,23 +332,24 @@ public class Planner : HeldEntity
 
 	public void PayForPlacement(BasePlayer player, Construction component)
 	{
-		if (Interface.CallHook("OnPayForPlacement", player, this, component) == null)
+		if (Interface.CallHook("OnPayForPlacement", player, this, component) != null)
 		{
-			if (isTypeDeployable)
-			{
-				GetItem().UseItem();
-				return;
-			}
-			List<Item> list = new List<Item>();
-			foreach (ItemAmount item in component.defaultGrade.costToBuild)
-			{
-				player.inventory.Take(list, item.itemDef.itemid, (int)item.amount);
-				player.Command("note.inv", item.itemDef.itemid, item.amount * -1f);
-			}
-			foreach (Item item2 in list)
-			{
-				item2.Remove();
-			}
+			return;
+		}
+		if (isTypeDeployable)
+		{
+			GetItem().UseItem();
+			return;
+		}
+		List<Item> list = new List<Item>();
+		foreach (ItemAmount item in component.defaultGrade.costToBuild)
+		{
+			player.inventory.Take(list, item.itemDef.itemid, (int)item.amount);
+			player.Command("note.inv", item.itemDef.itemid, item.amount * -1f);
+		}
+		foreach (Item item2 in list)
+		{
+			item2.Remove();
 		}
 	}
 

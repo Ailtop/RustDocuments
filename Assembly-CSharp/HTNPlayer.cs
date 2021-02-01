@@ -210,7 +210,7 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 		if ((bool)baseCorpse)
 		{
 			PlayerCorpse playerCorpse;
-			if ((object)(playerCorpse = (baseCorpse as PlayerCorpse)) != null)
+			if ((object)(playerCorpse = baseCorpse as PlayerCorpse) != null)
 			{
 				playerCorpse.playerName = LootPanelName;
 			}
@@ -372,8 +372,7 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 		BaseEntity parentEntity = GetParentEntity();
 		if ((bool)parentEntity)
 		{
-			Vector3 vector = parentEntity.transform.InverseTransformDirection(forward);
-			Vector3 forward2 = new Vector3(forward.x, vector.y, forward.z);
+			Vector3 forward2 = new Vector3(y: parentEntity.transform.InverseTransformDirection(forward).y, x: forward.x, z: forward.z);
 			eyes.rotation = Quaternion.LookRotation(forward2, parentEntity.transform.up);
 			if (OnlyRotateAroundYAxis)
 			{

@@ -1,6 +1,6 @@
+using System;
 using ConVar;
 using Rust.Ai.HTN.Sensors;
-using System;
 
 namespace Rust.Ai.HTN.Bear.Sensors
 {

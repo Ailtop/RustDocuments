@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -54,7 +54,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AddSelfAuthorize ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddSelfAuthorize "));
 				}
 				using (TimeWarning.New("AddSelfAuthorize"))
 				{
@@ -90,7 +90,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ClearList ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClearList "));
 				}
 				using (TimeWarning.New("ClearList"))
 				{
@@ -126,7 +126,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RemoveSelfAuthorize ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RemoveSelfAuthorize "));
 				}
 				using (TimeWarning.New("RemoveSelfAuthorize"))
 				{
@@ -162,7 +162,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Rotate ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Rotate "));
 				}
 				using (TimeWarning.New("RPC_Rotate"))
 				{
@@ -218,13 +218,14 @@ public class BuildingPrivlidge : StorageContainer
 	public void CalculateUpkeepCostAmounts(List<ItemAmount> itemAmounts)
 	{
 		BuildingManager.Building building = GetBuilding();
-		if (building != null && building.HasDecayEntities())
+		if (building == null || !building.HasDecayEntities())
 		{
-			float multiplier = CalculateUpkeepCostFraction();
-			foreach (DecayEntity decayEntity in building.decayEntities)
-			{
-				decayEntity.CalculateUpkeepCostAmounts(itemAmounts, multiplier);
-			}
+			return;
+		}
+		float multiplier = CalculateUpkeepCostFraction();
+		foreach (DecayEntity decayEntity in building.decayEntities)
+		{
+			decayEntity.CalculateUpkeepCostAmounts(itemAmounts, multiplier);
 		}
 	}
 
@@ -354,21 +355,22 @@ public class BuildingPrivlidge : StorageContainer
 		{
 			ItemAmount itemAmount = upkeepBuffer[i];
 			int num = (int)itemAmount.amount;
-			if (num >= 1)
+			if (num < 1)
 			{
-				base.inventory.Take(obj, itemAmount.itemid, num);
-				foreach (Item item in obj)
-				{
-					if (IsDebugging())
-					{
-						Debug.Log(ToString() + ": Using " + item.amount + " of " + item.info.shortname);
-					}
-					item.UseItem(item.amount);
-				}
-				obj.Clear();
-				itemAmount.amount -= num;
-				upkeepBuffer[i] = itemAmount;
+				continue;
 			}
+			base.inventory.Take(obj, itemAmount.itemid, num);
+			foreach (Item item in obj)
+			{
+				if (IsDebugging())
+				{
+					Debug.Log(ToString() + ": Using " + item.amount + " of " + item.info.shortname);
+				}
+				item.UseItem(item.amount);
+			}
+			obj.Clear();
+			itemAmount.amount -= num;
+			upkeepBuffer[i] = itemAmount;
 		}
 		Facepunch.Pool.FreeList(ref obj);
 	}
@@ -441,23 +443,25 @@ public class BuildingPrivlidge : StorageContainer
 	public void PurchaseUpkeepTime(float deltaTime)
 	{
 		BuildingManager.Building building = GetBuilding();
-		if (building != null && building.HasDecayEntities())
+		if (building == null || !building.HasDecayEntities())
 		{
-			float num = Mathf.Min(GetProtectedMinutes(true) * 60f, deltaTime);
-			if (num > 0f)
+			return;
+		}
+		float num = Mathf.Min(GetProtectedMinutes(true) * 60f, deltaTime);
+		if (!(num > 0f))
+		{
+			return;
+		}
+		foreach (DecayEntity decayEntity in building.decayEntities)
+		{
+			float protectedSeconds = decayEntity.GetProtectedSeconds();
+			if (num > protectedSeconds)
 			{
-				foreach (DecayEntity decayEntity in building.decayEntities)
+				float num2 = PurchaseUpkeepTime(decayEntity, num - protectedSeconds);
+				decayEntity.AddUpkeepTime(num2);
+				if (IsDebugging())
 				{
-					float protectedSeconds = decayEntity.GetProtectedSeconds();
-					if (num > protectedSeconds)
-					{
-						float num2 = PurchaseUpkeepTime(decayEntity, num - protectedSeconds);
-						decayEntity.AddUpkeepTime(num2);
-						if (IsDebugging())
-						{
-							Debug.Log(ToString() + " purchased upkeep time for " + decayEntity.ToString() + ": " + protectedSeconds + " + " + num2 + " = " + decayEntity.GetProtectedSeconds());
-						}
-					}
+					Debug.Log(ToString() + " purchased upkeep time for " + decayEntity.ToString() + ": " + protectedSeconds + " + " + num2 + " = " + decayEntity.GetProtectedSeconds());
 				}
 			}
 		}
@@ -591,9 +595,10 @@ public class BuildingPrivlidge : StorageContainer
 	[RPC_Server]
 	public void RemoveSelfAuthorize(RPCMessage rpc)
 	{
-		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardDeauthorize", this, rpc.player) == null)
+		RPCMessage rpc2 = rpc;
+		if (rpc2.player.CanInteract() && CanAdministrate(rpc2.player) && Interface.CallHook("OnCupboardDeauthorize", this, rpc.player) == null)
 		{
-			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc.player.userID);
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
 			SendNetworkUpdate();
 		}
 	}

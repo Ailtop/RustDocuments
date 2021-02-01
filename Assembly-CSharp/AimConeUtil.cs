@@ -5,7 +5,7 @@ public class AimConeUtil
 	public static Vector3 GetModifiedAimConeDirection(float aimCone, Vector3 inputVec, bool anywhereInside = true)
 	{
 		Quaternion lhs = Quaternion.LookRotation(inputVec);
-		Vector2 vector = anywhereInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized;
+		Vector2 vector = (anywhereInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized);
 		return lhs * Quaternion.Euler(vector.x * aimCone * 0.5f, vector.y * aimCone * 0.5f, 0f) * Vector3.forward;
 	}
 

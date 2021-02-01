@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -43,7 +43,7 @@ public class Workbench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_BeginExperiment ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_BeginExperiment "));
 				}
 				using (TimeWarning.New("RPC_BeginExperiment"))
 				{
@@ -79,7 +79,7 @@ public class Workbench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_TechTreeUnlock ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TechTreeUnlock "));
 				}
 				using (TimeWarning.New("RPC_TechTreeUnlock"))
 				{

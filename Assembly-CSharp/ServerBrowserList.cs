@@ -1,5 +1,5 @@
-using Facepunch;
 using System;
+using Facepunch;
 using UnityEngine;
 
 public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource

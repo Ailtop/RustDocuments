@@ -85,39 +85,40 @@ namespace ConVar
 		[ServerVar]
 		public static void del(Arg args)
 		{
-			if (args.HasArgs())
+			if (!args.HasArgs())
 			{
-				IEnumerable<Transform> enumerable = from x in GetCurrent()
-					where x.name.ToLower() == args.FullString.ToLower()
-					select x;
-				if (enumerable.Count() == 0)
-				{
-					enumerable = from x in GetCurrent()
-						where x.name.StartsWith(args.FullString, StringComparison.CurrentCultureIgnoreCase)
-						select x;
-				}
-				if (enumerable.Count() == 0)
-				{
-					args.ReplyWith("Couldn't find  " + args.FullString);
-					return;
-				}
-				foreach (Transform item in enumerable)
-				{
-					BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-					if (BaseEntityEx.IsValid(baseEntity))
-					{
-						if (baseEntity.isServer)
-						{
-							baseEntity.Kill();
-						}
-					}
-					else
-					{
-						GameManager.Destroy(item.gameObject);
-					}
-				}
-				args.ReplyWith("Deleted " + enumerable.Count() + " objects");
+				return;
 			}
+			IEnumerable<Transform> enumerable = from x in GetCurrent()
+				where x.name.ToLower() == args.FullString.ToLower()
+				select x;
+			if (enumerable.Count() == 0)
+			{
+				enumerable = from x in GetCurrent()
+					where x.name.StartsWith(args.FullString, StringComparison.CurrentCultureIgnoreCase)
+					select x;
+			}
+			if (enumerable.Count() == 0)
+			{
+				args.ReplyWith("Couldn't find  " + args.FullString);
+				return;
+			}
+			foreach (Transform item in enumerable)
+			{
+				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
+				if (BaseEntityEx.IsValid(baseEntity))
+				{
+					if (baseEntity.isServer)
+					{
+						baseEntity.Kill();
+					}
+				}
+				else
+				{
+					GameManager.Destroy(item.gameObject);
+				}
+			}
+			args.ReplyWith("Deleted " + enumerable.Count() + " objects");
 		}
 	}
 }

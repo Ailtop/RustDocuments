@@ -41,22 +41,24 @@ namespace Rust.Ai
 					nPCHumanContext.CurrentCoverVolume = AiManager.CreateNewCoverVolume(nPCHumanContext.Position, null);
 				}
 			}
-			if (nPCHumanContext.CurrentCoverVolume != null)
+			if (!(nPCHumanContext.CurrentCoverVolume != null))
 			{
-				foreach (CoverPoint coverPoint in nPCHumanContext.CurrentCoverVolume.CoverPoints)
+				return;
+			}
+			foreach (CoverPoint coverPoint in nPCHumanContext.CurrentCoverVolume.CoverPoints)
+			{
+				if (coverPoint.IsReserved)
 				{
-					if (!coverPoint.IsReserved)
+					continue;
+				}
+				Vector3 position = coverPoint.Position;
+				if (!((nPCHumanContext.Position - position).sqrMagnitude > MaxDistanceToCover))
+				{
+					Vector3 normalized = (position - nPCHumanContext.AIAgent.AttackTargetMemory.Position).normalized;
+					if (ProvidesCoverFromDirection(coverPoint, normalized, CoverArcThreshold))
 					{
-						Vector3 position = coverPoint.Position;
-						if (!((nPCHumanContext.Position - position).sqrMagnitude > MaxDistanceToCover))
-						{
-							Vector3 normalized = (position - nPCHumanContext.AIAgent.AttackTargetMemory.Position).normalized;
-							if (ProvidesCoverFromDirection(coverPoint, normalized, CoverArcThreshold))
-							{
-								nPCHumanContext.sampledCoverPointTypes.Add(coverPoint.NormalCoverType);
-								nPCHumanContext.sampledCoverPoints.Add(coverPoint);
-							}
-						}
+						nPCHumanContext.sampledCoverPointTypes.Add(coverPoint.NormalCoverType);
+						nPCHumanContext.sampledCoverPoints.Add(coverPoint);
 					}
 				}
 			}

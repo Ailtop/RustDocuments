@@ -50,18 +50,19 @@ public class TriggerPlayerForce : TriggerBase, IServerComponent
 
 	private void HackDisableTick()
 	{
-		if (entityContents != null && base.enabled)
+		if (entityContents == null || !base.enabled)
 		{
-			foreach (BaseEntity entityContent in entityContents)
+			return;
+		}
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if (IsInterested(entityContent))
 			{
-				if (IsInterested(entityContent))
+				BasePlayer basePlayer = entityContent.ToPlayer();
+				if (basePlayer != null && !basePlayer.IsNpc)
 				{
-					BasePlayer basePlayer = entityContent.ToPlayer();
-					if (basePlayer != null && !basePlayer.IsNpc)
-					{
-						basePlayer.PauseVehicleNoClipDetection(4f);
-						basePlayer.PauseSpeedHackDetection(4f);
-					}
+					basePlayer.PauseVehicleNoClipDetection(4f);
+					basePlayer.PauseSpeedHackDetection(4f);
 				}
 			}
 		}
@@ -69,15 +70,16 @@ public class TriggerPlayerForce : TriggerBase, IServerComponent
 
 	protected void FixedUpdate()
 	{
-		if (entityContents != null)
+		if (entityContents == null)
 		{
-			foreach (BaseEntity entityContent in entityContents)
+			return;
+		}
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if ((!requireUpAxis || !(Vector3.Dot(entityContent.transform.up, base.transform.up) < 0f)) && IsInterested(entityContent))
 			{
-				if ((!requireUpAxis || !(Vector3.Dot(entityContent.transform.up, base.transform.up) < 0f)) && IsInterested(entityContent))
-				{
-					Vector3 velocity = GetPushVelocity(entityContent.gameObject);
-					entityContent.ApplyInheritedVelocity(velocity);
-				}
+				Vector3 velocity = GetPushVelocity(entityContent.gameObject);
+				entityContent.ApplyInheritedVelocity(velocity);
 			}
 		}
 	}

@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -24,7 +24,7 @@ public class Lift : AnimatedBuildingBlock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_UseLift ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_UseLift "));
 				}
 				using (TimeWarning.New("RPC_UseLift"))
 				{

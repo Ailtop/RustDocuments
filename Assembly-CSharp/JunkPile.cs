@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Rust.Ai.HTN.ScientistJunkpile;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class JunkPile : BaseEntity

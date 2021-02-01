@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -41,7 +41,7 @@ public class ShopFront : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - AcceptClicked ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AcceptClicked "));
 				}
 				using (TimeWarning.New("AcceptClicked"))
 				{
@@ -77,7 +77,7 @@ public class ShopFront : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - CancelClicked ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - CancelClicked "));
 				}
 				using (TimeWarning.New("CancelClicked"))
 				{

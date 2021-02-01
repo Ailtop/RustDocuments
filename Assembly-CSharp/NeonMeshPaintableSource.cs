@@ -1,21 +1,8 @@
 using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class NeonMeshPaintableSource : MeshPaintableSource
 {
-	[StructLayout(LayoutKind.Auto)]
-	[CompilerGenerated]
-	private struct _003C_003Ec__DisplayClass8_0
-	{
-		public int width;
-
-		public Color32[] pixels;
-
-		public NeonMeshPaintableSource _003C_003E4__this;
-	}
-
 	public NeonSign neonSign;
 
 	public float editorEmissionScale = 2f;
@@ -70,29 +57,5 @@ public class NeonMeshPaintableSource : MeshPaintableSource
 		bottomLeft = _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(0, 0, num, num2, ref _003C_003Ec__DisplayClass8_);
 		bottomRight = _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(num, 0, num, num2, ref _003C_003Ec__DisplayClass8_);
 		return _003C_003Ec__DisplayClass8_.pixels;
-	}
-
-	[CompilerGenerated]
-	private Color _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(int x, int y, int regionWidth, int regionHeight, ref _003C_003Ec__DisplayClass8_0 P_4)
-	{
-		float num = 0f;
-		float num2 = 0f;
-		float num3 = 0f;
-		int num4 = y + regionHeight;
-		for (int i = y; i < num4; i++)
-		{
-			int num5 = i * P_4.width + x;
-			int num6 = num5 + regionWidth;
-			for (int j = num5; j < num6; j++)
-			{
-				Color32 color = P_4.pixels[j];
-				float num7 = (float)(int)color.a / 255f;
-				num += (float)(int)color.r * num7;
-				num2 += (float)(int)color.g * num7;
-				num3 += (float)(int)color.b * num7;
-			}
-		}
-		int num8 = regionWidth * regionHeight * 255;
-		return new Color(lightingCurve.Evaluate(num / (float)num8), lightingCurve.Evaluate(num2 / (float)num8), lightingCurve.Evaluate(num3 / (float)num8), 1f);
 	}
 }

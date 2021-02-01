@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DecayEntity : BaseCombatEntity
@@ -105,32 +105,35 @@ public class DecayEntity : BaseCombatEntity
 			return;
 		}
 		float num = upkeep.upkeepMultiplier * multiplier;
-		if (num != 0f)
+		if (num == 0f)
 		{
-			List<ItemAmount> list = BuildCost();
-			if (list != null)
+			return;
+		}
+		List<ItemAmount> list = BuildCost();
+		if (list == null)
+		{
+			return;
+		}
+		foreach (ItemAmount item in list)
+		{
+			if (item.itemDef.category != ItemCategory.Resources)
 			{
-				foreach (ItemAmount item in list)
+				continue;
+			}
+			float num2 = item.amount * num;
+			bool flag = false;
+			foreach (ItemAmount itemAmount in itemAmounts)
+			{
+				if (itemAmount.itemDef == item.itemDef)
 				{
-					if (item.itemDef.category == ItemCategory.Resources)
-					{
-						float num2 = item.amount * num;
-						bool flag = false;
-						foreach (ItemAmount itemAmount in itemAmounts)
-						{
-							if (itemAmount.itemDef == item.itemDef)
-							{
-								itemAmount.amount += num2;
-								flag = true;
-								break;
-							}
-						}
-						if (!flag)
-						{
-							itemAmounts.Add(new ItemAmount(item.itemDef, num2));
-						}
-					}
+					itemAmount.amount += num2;
+					flag = true;
+					break;
 				}
+			}
+			if (!flag)
+			{
+				itemAmounts.Add(new ItemAmount(item.itemDef, num2));
 			}
 		}
 	}
@@ -265,34 +268,35 @@ public class DecayEntity : BaseCombatEntity
 			upkeepTimer = 1f;
 		}
 		decayTimer += num2;
-		if (!(decayTimer < decay.GetDecayDelay(this)))
+		if (decayTimer < decay.GetDecayDelay(this))
 		{
-			using (TimeWarning.New("DecayTick"))
+			return;
+		}
+		using (TimeWarning.New("DecayTick"))
+		{
+			float num4 = 1f;
+			if (ConVar.Decay.upkeep)
 			{
-				float num4 = 1f;
-				if (ConVar.Decay.upkeep)
+				if (!IsOutside())
 				{
-					if (!IsOutside())
+					num4 *= ConVar.Decay.upkeep_inside_decay_scale;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < decayPoints.Length; i++)
+				{
+					DecayPoint decayPoint = decayPoints[i];
+					if (decayPoint.IsOccupied(this))
 					{
-						num4 *= ConVar.Decay.upkeep_inside_decay_scale;
+						num4 -= decayPoint.protection;
 					}
 				}
-				else
-				{
-					for (int i = 0; i < decayPoints.Length; i++)
-					{
-						DecayPoint decayPoint = decayPoints[i];
-						if (decayPoint.IsOccupied(this))
-						{
-							num4 -= decayPoint.protection;
-						}
-					}
-				}
-				if (num4 > 0f)
-				{
-					float num5 = num2 / decay.GetDecayDuration(this) * MaxHealth();
-					Hurt(num5 * num4 * decayVariance, DamageType.Decay);
-				}
+			}
+			if (num4 > 0f)
+			{
+				float num5 = num2 / decay.GetDecayDuration(this) * MaxHealth();
+				Hurt(num5 * num4 * decayVariance, DamageType.Decay);
 			}
 		}
 	}

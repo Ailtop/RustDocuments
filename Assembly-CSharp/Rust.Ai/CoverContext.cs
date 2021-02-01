@@ -1,5 +1,5 @@
-using Apex.AI;
 using System.Collections.Generic;
+using Apex.AI;
 using UnityEngine;
 
 namespace Rust.Ai

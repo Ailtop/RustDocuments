@@ -1,7 +1,7 @@
-using ConVar;
-using Rust;
 using System;
 using System.Collections.Generic;
+using ConVar;
+using Rust;
 using UnityEngine;
 
 public class Projectile : BaseMonoBehaviour

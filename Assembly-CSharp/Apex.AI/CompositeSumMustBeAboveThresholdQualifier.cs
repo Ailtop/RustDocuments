@@ -1,5 +1,5 @@
-using Apex.Serialization;
 using System.Collections.Generic;
+using Apex.Serialization;
 using UnityEngine;
 
 namespace Apex.AI

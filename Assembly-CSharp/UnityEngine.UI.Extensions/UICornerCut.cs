@@ -157,7 +157,7 @@ namespace UnityEngine.UI.Extensions
 			bool flag2 = m_cutLL | m_cutLR;
 			bool flag3 = m_cutLL | m_cutUL;
 			bool flag4 = m_cutLR | m_cutUR;
-			if (!(flag | flag2) || !(cornerSize.sqrMagnitude > 0f))
+			if (!(flag || flag2) || !(cornerSize.sqrMagnitude > 0f))
 			{
 				return;
 			}

@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class ConsoleNetwork

@@ -1,7 +1,7 @@
-using ConVar;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using ConVar;
 
 namespace CompanionServer
 {
@@ -52,23 +52,24 @@ namespace CompanionServer
 
 		public void Remove(IPAddress address)
 		{
-			if (address != null)
+			if (address == null)
 			{
-				lock (_sync)
+				return;
+			}
+			lock (_sync)
+			{
+				int value;
+				if (_addressCounts.TryGetValue(address, out value))
 				{
-					int value;
-					if (_addressCounts.TryGetValue(address, out value))
+					if (value <= 1)
 					{
-						if (value <= 1)
-						{
-							_addressCounts.Remove(address);
-						}
-						else
-						{
-							_addressCounts[address] = value - 1;
-						}
-						_overallCount--;
+						_addressCounts.Remove(address);
 					}
+					else
+					{
+						_addressCounts[address] = value - 1;
+					}
+					_overallCount--;
 				}
 			}
 		}

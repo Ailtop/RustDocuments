@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Assertions;
@@ -75,7 +75,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_CloseDoor ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_CloseDoor "));
 				}
 				using (TimeWarning.New("RPC_CloseDoor"))
 				{
@@ -111,7 +111,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_KnockDoor ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_KnockDoor "));
 				}
 				using (TimeWarning.New("RPC_KnockDoor"))
 				{
@@ -147,7 +147,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenDoor ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenDoor "));
 				}
 				using (TimeWarning.New("RPC_OpenDoor"))
 				{
@@ -183,7 +183,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_ToggleHatch ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_ToggleHatch "));
 				}
 				using (TimeWarning.New("RPC_ToggleHatch"))
 				{
@@ -562,32 +562,33 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 
 	public void OnObjects(TriggerNotify trigger)
 	{
-		if (base.isServer)
+		if (!base.isServer)
 		{
-			bool flag = false;
-			foreach (BaseEntity entityContent in trigger.entityContents)
+			return;
+		}
+		bool flag = false;
+		foreach (BaseEntity entityContent in trigger.entityContents)
+		{
+			BaseMountable baseMountable;
+			if ((object)(baseMountable = entityContent as BaseMountable) != null && baseMountable.BlocksDoors)
 			{
-				BaseMountable baseMountable;
-				if ((object)(baseMountable = (entityContent as BaseMountable)) != null && baseMountable.BlocksDoors)
-				{
-					flag = true;
-					break;
-				}
-				BaseVehicleModule baseVehicleModule;
-				if ((object)(baseVehicleModule = (entityContent as BaseVehicleModule)) != null && baseVehicleModule.Vehicle != null && baseVehicleModule.Vehicle.BlocksDoors)
-				{
-					flag = true;
-					break;
-				}
+				flag = true;
+				break;
 			}
-			if (flag)
+			BaseVehicleModule baseVehicleModule;
+			if ((object)(baseVehicleModule = entityContent as BaseVehicleModule) != null && baseVehicleModule.Vehicle != null && baseVehicleModule.Vehicle.BlocksDoors)
 			{
-				bool flag2 = HasFlag(Flags.Open);
-				SetOpen(!flag2, true);
-				ReverseDoorAnimation(flag2);
-				StopCheckingForBlockages();
-				ClientRPC(null, "OnDoorInterrupted", flag2 ? 1 : 0);
+				flag = true;
+				break;
 			}
+		}
+		if (flag)
+		{
+			bool flag2 = HasFlag(Flags.Open);
+			SetOpen(!flag2, true);
+			ReverseDoorAnimation(flag2);
+			StopCheckingForBlockages();
+			ClientRPC(null, "OnDoorInterrupted", flag2 ? 1 : 0);
 		}
 	}
 

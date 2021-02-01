@@ -1,5 +1,5 @@
-using Rust;
 using System.Collections.Generic;
+using Rust;
 using UnityEngine;
 
 public class BaseHelicopterVehicle : BaseVehicle
@@ -354,32 +354,34 @@ public class BaseHelicopterVehicle : BaseVehicle
 			for (int i = 0; i < 12; i++)
 			{
 				BaseEntity baseEntity = GameManager.server.CreateEntity(fireBall.resourcePath, vector2, base.transform.rotation);
-				if ((bool)baseEntity)
+				if (!baseEntity)
 				{
-					float min = 3f;
-					float max = 10f;
-					Vector3 onUnitSphere = Random.onUnitSphere;
-					onUnitSphere.Normalize();
-					float num = Random.Range(0.5f, 4f);
-					RaycastHit hitInfo;
-					bool num2 = Physics.Raycast(vector2, onUnitSphere, out hitInfo, num, 1218652417);
-					Vector3 position = hitInfo.point;
-					if (!num2)
-					{
-						position = vector2 + onUnitSphere * num;
-					}
-					position -= onUnitSphere * 0.5f;
-					baseEntity.transform.position = position;
-					Collider component = baseEntity.GetComponent<Collider>();
-					baseEntity.Spawn();
-					baseEntity.SetVelocity(vector + onUnitSphere * Random.Range(min, max));
-					if (list != null)
-					{
-						foreach (ServerGib item in list)
-						{
-							Physics.IgnoreCollision(component, item.GetCollider(), true);
-						}
-					}
+					continue;
+				}
+				float min = 3f;
+				float max = 10f;
+				Vector3 onUnitSphere = Random.onUnitSphere;
+				onUnitSphere.Normalize();
+				float num = Random.Range(0.5f, 4f);
+				RaycastHit hitInfo;
+				bool num2 = Physics.Raycast(vector2, onUnitSphere, out hitInfo, num, 1218652417);
+				Vector3 position = hitInfo.point;
+				if (!num2)
+				{
+					position = vector2 + onUnitSphere * num;
+				}
+				position -= onUnitSphere * 0.5f;
+				baseEntity.transform.position = position;
+				Collider component = baseEntity.GetComponent<Collider>();
+				baseEntity.Spawn();
+				baseEntity.SetVelocity(vector + onUnitSphere * Random.Range(min, max));
+				if (list == null)
+				{
+					continue;
+				}
+				foreach (ServerGib item in list)
+				{
+					Physics.IgnoreCollision(component, item.GetCollider(), true);
 				}
 			}
 		}

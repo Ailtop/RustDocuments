@@ -1,14 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using CompanionServer.Handlers;
 using ConVar;
 using Facepunch;
 using Fleck;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace CompanionServer
@@ -25,131 +23,6 @@ namespace CompanionServer
 			{
 				Connection = connection;
 				Buffer = buffer;
-			}
-		}
-
-		[CompilerGenerated]
-		private sealed class _003C_003Ec__DisplayClass15_0
-		{
-			public IPAddress address;
-
-			public Connection conn;
-
-			public Listener _003C_003E4__this;
-
-			internal void _003C_002Ector_003Eb__1()
-			{
-				_003C_003E4__this.Limiter.Remove(address);
-				conn.OnClose();
-			}
-		}
-
-		[StructLayout(LayoutKind.Auto)]
-		[CompilerGenerated]
-		private struct _003C_003Ec__DisplayClass19_0
-		{
-			public AppRequest request;
-
-			public Listener _003C_003E4__this;
-
-			public Message message;
-		}
-
-		[Serializable]
-		[CompilerGenerated]
-		private sealed class _003C_003Ec
-		{
-			public static readonly _003C_003Ec _003C_003E9 = new _003C_003Ec();
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_0;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_1;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_2;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_3;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_4;
-
-			public static Func<AppRequest, AppSendMessage> _003C_003E9__19_5;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_6;
-
-			public static Func<AppRequest, AppSetEntityValue> _003C_003E9__19_7;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_8;
-
-			public static Func<AppRequest, AppFlag> _003C_003E9__19_9;
-
-			public static Func<AppRequest, AppEmpty> _003C_003E9__19_10;
-
-			public static Func<AppRequest, AppCameraFrameRequest> _003C_003E9__19_11;
-
-			public static Func<AppRequest, AppPromoteToLeader> _003C_003E9__19_12;
-
-			internal AppEmpty _003CDispatch_003Eb__19_0(AppRequest r)
-			{
-				return r.getInfo;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_1(AppRequest r)
-			{
-				return r.getTime;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_2(AppRequest r)
-			{
-				return r.getMap;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_3(AppRequest r)
-			{
-				return r.getTeamInfo;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_4(AppRequest r)
-			{
-				return r.getTeamChat;
-			}
-
-			internal AppSendMessage _003CDispatch_003Eb__19_5(AppRequest r)
-			{
-				return r.sendTeamMessage;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_6(AppRequest r)
-			{
-				return r.getEntityInfo;
-			}
-
-			internal AppSetEntityValue _003CDispatch_003Eb__19_7(AppRequest r)
-			{
-				return r.setEntityValue;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_8(AppRequest r)
-			{
-				return r.checkSubscription;
-			}
-
-			internal AppFlag _003CDispatch_003Eb__19_9(AppRequest r)
-			{
-				return r.setSubscription;
-			}
-
-			internal AppEmpty _003CDispatch_003Eb__19_10(AppRequest r)
-			{
-				return r.getMapMarkers;
-			}
-
-			internal AppCameraFrameRequest _003CDispatch_003Eb__19_11(AppRequest r)
-			{
-				return r.getCameraFrame;
-			}
-
-			internal AppPromoteToLeader _003CDispatch_003Eb__19_12(AppRequest r)
-			{
-				return r.promoteToLeader;
 			}
 		}
 
@@ -194,7 +67,6 @@ namespace CompanionServer
 			_server = new WebSocketServer($"ws://{Address}:{Port}/");
 			_server.Start(delegate(IWebSocketConnection socket)
 			{
-				Listener listener = this;
 				IPAddress address = socket.ConnectionInfo.ClientIpAddress;
 				if (!Limiter.TryAdd(address) || _ipBans.IsBanned(address))
 				{
@@ -205,7 +77,7 @@ namespace CompanionServer
 					Connection conn = new Connection(this, socket);
 					socket.OnClose = delegate
 					{
-						listener.Limiter.Remove(address);
+						Limiter.Remove(address);
 						conn.OnClose();
 					};
 					socket.OnBinary = conn.OnMessage;
@@ -229,39 +101,38 @@ namespace CompanionServer
 				if (!App.update || _messageQueue.Count >= App.queuelimit)
 				{
 					data.Dispose();
+					return;
 				}
-				else
-				{
-					Message item = new Message(connection, data);
-					_messageQueue.Enqueue(item);
-				}
+				Message item = new Message(connection, data);
+				_messageQueue.Enqueue(item);
 			}
 		}
 
 		public void Update()
 		{
-			if (App.update)
+			if (!App.update)
 			{
-				using (TimeWarning.New("CompanionServer.MessageQueue"))
+				return;
+			}
+			using (TimeWarning.New("CompanionServer.MessageQueue"))
+			{
+				lock (_messageQueue)
 				{
-					lock (_messageQueue)
+					_stopwatch.Restart();
+					while (_messageQueue.Count > 0 && _stopwatch.Elapsed.TotalMilliseconds < 5.0)
 					{
-						_stopwatch.Restart();
-						while (_messageQueue.Count > 0 && _stopwatch.Elapsed.TotalMilliseconds < 5.0)
-						{
-							Message message = _messageQueue.Dequeue();
-							Dispatch(message);
-						}
+						Message message = _messageQueue.Dequeue();
+						Dispatch(message);
 					}
 				}
-				if ((float)_lastCleanup >= 3f)
-				{
-					_lastCleanup = 0f;
-					_ipTokenBuckets.Cleanup();
-					_ipBans.Cleanup();
-					_playerTokenBuckets.Cleanup();
-					_pairingTokenBuckets.Cleanup();
-				}
+			}
+			if ((float)_lastCleanup >= 3f)
+			{
+				_lastCleanup = 0f;
+				_ipTokenBuckets.Cleanup();
+				_ipBans.Cleanup();
+				_playerTokenBuckets.Cleanup();
+				_pairingTokenBuckets.Cleanup();
 			}
 		}
 
@@ -311,14 +182,16 @@ namespace CompanionServer
 					requestHandler.SendError("server_error");
 				}
 				Facepunch.Pool.FreeDynamic(ref requestHandler);
-				return;
 			}
-			AppResponse appResponse = Facepunch.Pool.Get<AppResponse>();
-			appResponse.seq = _003C_003Ec__DisplayClass19_.request.seq;
-			appResponse.error = Facepunch.Pool.Get<AppError>();
-			appResponse.error.error = "unhandled";
-			_003C_003Ec__DisplayClass19_.message.Connection.Send(appResponse);
-			_003C_003Ec__DisplayClass19_.request.Dispose();
+			else
+			{
+				AppResponse appResponse = Facepunch.Pool.Get<AppResponse>();
+				appResponse.seq = _003C_003Ec__DisplayClass19_.request.seq;
+				appResponse.error = Facepunch.Pool.Get<AppError>();
+				appResponse.error.error = "unhandled";
+				_003C_003Ec__DisplayClass19_.message.Connection.Send(appResponse);
+				_003C_003Ec__DisplayClass19_.request.Dispose();
+			}
 		}
 
 		public void BroadcastTo(List<Connection> targets, AppBroadcast broadcast)
@@ -348,21 +221,6 @@ namespace CompanionServer
 		public bool CanSendPairingNotification(ulong playerId)
 		{
 			return _pairingTokenBuckets.Get(playerId).TryTake(1.0);
-		}
-
-		[CompilerGenerated]
-		private bool _003CDispatch_003Eg__Handle_007C19_13<TProto, THandler>(Func<AppRequest, TProto> protoSelector, out CompanionServer.Handlers.IHandler requestHandler, ref _003C_003Ec__DisplayClass19_0 P_2) where TProto : class where THandler : BaseHandler<TProto>, new()
-		{
-			TProto val = protoSelector(P_2.request);
-			if (val == null)
-			{
-				requestHandler = null;
-				return false;
-			}
-			THandler val2 = Facepunch.Pool.Get<THandler>();
-			val2.Initialize(_playerTokenBuckets, P_2.message.Connection, P_2.request, val);
-			requestHandler = val2;
-			return true;
 		}
 	}
 }

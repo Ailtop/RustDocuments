@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -67,7 +67,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoReload ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoReload "));
 				}
 				using (TimeWarning.New("DoReload"))
 				{
@@ -103,7 +103,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_SetAttacking ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetAttacking "));
 				}
 				using (TimeWarning.New("Server_SetAttacking"))
 				{
@@ -139,7 +139,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_StartEngine ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StartEngine "));
 				}
 				using (TimeWarning.New("Server_StartEngine"))
 				{
@@ -175,7 +175,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Server_StopEngine ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StopEngine "));
 				}
 				using (TimeWarning.New("Server_StopEngine"))
 				{

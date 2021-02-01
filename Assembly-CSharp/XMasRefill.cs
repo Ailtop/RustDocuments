@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using ConVar;
 using Network;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class XMasRefill : BaseEntity
@@ -102,7 +102,7 @@ public class XMasRefill : BaseEntity
 	{
 		int intVal = 1235288065;
 		int num = 8454144;
-		if ((bool)TerrainMeta.TopologyMap && (TerrainMeta.TopologyMap.GetTopology(pos) & 0x14080) != 0)
+		if ((bool)TerrainMeta.TopologyMap && ((uint)TerrainMeta.TopologyMap.GetTopology(pos) & 0x14080u) != 0)
 		{
 			return false;
 		}

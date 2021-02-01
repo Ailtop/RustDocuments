@@ -1,5 +1,5 @@
-using Rust.Instruments;
 using System;
+using Rust.Instruments;
 using UnityEngine;
 
 [CreateAssetMenu]

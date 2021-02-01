@@ -1,5 +1,5 @@
-using Oxide.Core;
 using System;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -471,7 +471,7 @@ public class NPCPlayer : BasePlayer
 	{
 		if (!ValidBounds.Test(moveToPosition) && base.transform != null && !base.IsDestroyed)
 		{
-			Debug.Log("Invalid NavAgent Position: " + this + " " + moveToPosition.ToString() + " (destroying)");
+			Debug.Log(string.Concat("Invalid NavAgent Position: ", this, " ", moveToPosition.ToString(), " (destroying)"));
 			Kill();
 			return false;
 		}

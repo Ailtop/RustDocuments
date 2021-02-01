@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
-using ConVar;
-using Network;
 using System;
 using System.Collections.Generic;
+using ConVar;
+using Network;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -17,7 +17,7 @@ public class LiquidVessel : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoEmpty ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoEmpty "));
 				}
 				using (TimeWarning.New("DoEmpty"))
 				{
@@ -87,18 +87,20 @@ public class LiquidVessel : HeldEntity
 	[RPC_Server.IsActiveItem]
 	private void DoEmpty(RPCMessage msg)
 	{
-		if (msg.player.CanInteract())
+		if (!msg.player.CanInteract())
 		{
-			Item item = GetItem();
-			if (item != null && item.contents != null && msg.player.metabolism.CanConsume())
+			return;
+		}
+		Item item = GetItem();
+		if (item == null || item.contents == null || !msg.player.metabolism.CanConsume())
+		{
+			return;
+		}
+		using (List<Item>.Enumerator enumerator = item.contents.itemList.GetEnumerator())
+		{
+			if (enumerator.MoveNext())
 			{
-				using (List<Item>.Enumerator enumerator = item.contents.itemList.GetEnumerator())
-				{
-					if (enumerator.MoveNext())
-					{
-						enumerator.Current.UseItem(50);
-					}
-				}
+				enumerator.Current.UseItem(50);
 			}
 		}
 	}

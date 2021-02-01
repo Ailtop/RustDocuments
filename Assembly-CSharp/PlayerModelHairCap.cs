@@ -15,7 +15,7 @@ public class PlayerModelHairCap : MonoBehaviour
 		}
 		for (int i = 0; i < 5; i++)
 		{
-			if (((int)hairCapMask & (1 << i)) == 0)
+			if (((uint)hairCapMask & (uint)(1 << i)) == 0)
 			{
 				continue;
 			}

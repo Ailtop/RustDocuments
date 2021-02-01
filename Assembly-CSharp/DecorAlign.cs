@@ -13,7 +13,7 @@ public class DecorAlign : DecorComponent
 	public override void Apply(ref Vector3 pos, ref Quaternion rot, ref Vector3 scale)
 	{
 		Vector3 normal = TerrainMeta.HeightMap.GetNormal(pos);
-		Vector3 vector = (normal == Vector3.up) ? Vector3.forward : Vector3.Cross(normal, Vector3.up);
+		Vector3 vector = ((normal == Vector3.up) ? Vector3.forward : Vector3.Cross(normal, Vector3.up));
 		Vector3 vector2 = Vector3.Cross(normal, vector);
 		if (SlopeOffset != Vector3.zero || SlopeScale != Vector3.one)
 		{

@@ -52,7 +52,7 @@ namespace Rust.Modular
 			{
 				return;
 			}
-			float num = flag ? (dt / moveTime) : (0f - dt / moveTime);
+			float num = (flag ? (dt / moveTime) : (0f - dt / moveTime));
 			positionPercent = Mathf.Clamp01(positionPercent + num);
 			SlidingPart[] array = slidingParts;
 			foreach (SlidingPart slidingPart in array)

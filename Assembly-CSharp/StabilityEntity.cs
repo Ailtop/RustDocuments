@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class StabilityEntity : DecayEntity
@@ -41,26 +41,27 @@ public class StabilityEntity : DecayEntity
 	{
 		protected override void RunJob(Bounds bounds)
 		{
-			if (ConVar.Server.stability)
+			if (!ConVar.Server.stability)
 			{
-				List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-				Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj, 2263296);
-				foreach (BaseEntity item in obj)
+				return;
+			}
+			List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+			Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj, 2263296);
+			foreach (BaseEntity item in obj)
+			{
+				if (!item.IsDestroyed && !item.isClient)
 				{
-					if (!item.IsDestroyed && !item.isClient)
+					if (item is StabilityEntity)
 					{
-						if (item is StabilityEntity)
-						{
-							(item as StabilityEntity).OnPhysicsNeighbourChanged();
-						}
-						else
-						{
-							item.BroadcastMessage("OnPhysicsNeighbourChanged", SendMessageOptions.DontRequireReceiver);
-						}
+						(item as StabilityEntity).OnPhysicsNeighbourChanged();
+					}
+					else
+					{
+						item.BroadcastMessage("OnPhysicsNeighbourChanged", SendMessageOptions.DontRequireReceiver);
 					}
 				}
-				Facepunch.Pool.FreeList(ref obj);
 			}
+			Facepunch.Pool.FreeList(ref obj);
 		}
 	}
 

@@ -1,7 +1,7 @@
-using Facepunch;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Facepunch;
 using UnityEngine;
 
 namespace ConVar

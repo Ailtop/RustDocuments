@@ -31,7 +31,7 @@ namespace VLB
 			Debug.Assert(numSegments >= 0);
 			Mesh mesh = new Mesh();
 			bool flag = false;
-			flag = (cap && radiusStart > 0f);
+			flag = cap && radiusStart > 0f;
 			radiusStart = Mathf.Max(radiusStart, 0.001f);
 			int num = numSides * (numSegments + 2);
 			int num2 = num;
@@ -163,7 +163,7 @@ namespace VLB
 				}
 				mesh.triangles = array6;
 			}
-			Bounds bounds2 = mesh.bounds = new Bounds(new Vector3(0f, 0f, lengthZ * 0.5f), new Vector3(Mathf.Max(radiusStart, radiusEnd) * 2f, Mathf.Max(radiusStart, radiusEnd) * 2f, lengthZ));
+			Bounds bounds2 = (mesh.bounds = new Bounds(new Vector3(0f, 0f, lengthZ * 0.5f), new Vector3(Mathf.Max(radiusStart, radiusEnd) * 2f, Mathf.Max(radiusStart, radiusEnd) * 2f, lengthZ)));
 			Debug.Assert(mesh.vertexCount == GetVertexCount(numSides, numSegments, flag));
 			Debug.Assert(mesh.triangles.Length == GetIndicesCount(numSides, numSegments, flag));
 			return mesh;

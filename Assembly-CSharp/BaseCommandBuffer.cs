@@ -58,14 +58,15 @@ public class BaseCommandBuffer : MonoBehaviour
 		{
 			Camera key = camera.Key;
 			Dictionary<int, CommandBuffer> value = camera.Value;
-			if ((bool)key)
+			if (!key)
 			{
-				foreach (KeyValuePair<int, CommandBuffer> item in value)
-				{
-					int key2 = item.Key;
-					CommandBuffer value2 = item.Value;
-					key.RemoveCommandBuffer((CameraEvent)key2, value2);
-				}
+				continue;
+			}
+			foreach (KeyValuePair<int, CommandBuffer> item in value)
+			{
+				int key2 = item.Key;
+				CommandBuffer value2 = item.Value;
+				key.RemoveCommandBuffer((CameraEvent)key2, value2);
 			}
 		}
 	}

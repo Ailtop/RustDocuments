@@ -1,7 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +28,7 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_KickPassengers ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_KickPassengers "));
 				}
 				using (TimeWarning.New("RPC_KickPassengers"))
 				{
@@ -102,18 +102,19 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 
 	private void KickPassengers()
 	{
-		if (base.IsOnAVehicle)
+		if (!base.IsOnAVehicle)
 		{
-			foreach (BaseVehicle.MountPointInfo mountPoint in base.Vehicle.mountPoints)
+			return;
+		}
+		foreach (BaseVehicle.MountPointInfo mountPoint in base.Vehicle.mountPoints)
+		{
+			if (ModuleHasMountPoint(mountPoint))
 			{
-				if (ModuleHasMountPoint(mountPoint))
+				BaseMountable mountable = mountPoint.mountable;
+				BasePlayer mounted = mountable.GetMounted();
+				if (mounted != null && mountable.HasValidDismountPosition(mounted))
 				{
-					BaseMountable mountable = mountPoint.mountable;
-					BasePlayer mounted = mountable.GetMounted();
-					if (mounted != null && mountable.HasValidDismountPosition(mounted))
-					{
-						mountable.AttemptDismount(mounted);
-					}
+					mountable.AttemptDismount(mounted);
 				}
 			}
 		}

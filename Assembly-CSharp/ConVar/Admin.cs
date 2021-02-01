@@ -1,13 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
 using Network;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using UnityEngine;
 
 namespace ConVar
@@ -81,7 +81,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				str = str + "hostname: " + Server.hostname + "\n";
-				str = str + "version : " + 2275.ToString() + " secure (secure mode enabled, connected to Steam3)\n";
+				str = str + "version : " + 2275 + " secure (secure mode enabled, connected to Steam3)\n";
 				str = str + "map     : " + Server.level + "\n";
 				str += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -98,31 +98,30 @@ namespace ConVar
 			{
 				try
 				{
-					if (BaseEntityEx.IsValid(activePlayer))
+					if (!BaseEntityEx.IsValid(activePlayer))
 					{
-						string userIDString = activePlayer.UserIDString;
-						if (activePlayer.net.connection == null)
-						{
-							textTable.AddRow(userIDString, "NO CONNECTION");
-						}
-						else
-						{
-							string text = activePlayer.net.connection.ownerid.ToString();
-							string text2 = activePlayer.displayName.QuoteSafe();
-							string text3 = Network.Net.sv.GetAveragePing(activePlayer.net.connection).ToString();
-							string text4 = activePlayer.net.connection.ipaddress;
-							string text5 = activePlayer.violationLevel.ToString("0.0");
-							string text6 = activePlayer.GetAntiHackKicks().ToString();
-							if (!arg.IsAdmin && !arg.IsRcon)
-							{
-								text4 = "xx.xxx.xx.xxx";
-							}
-							string text7 = activePlayer.net.connection.GetSecondsConnected().ToString() + "s";
-							if (@string.Length <= 0 || text2.Contains(@string, CompareOptions.IgnoreCase) || userIDString.Contains(@string) || text.Contains(@string) || text4.Contains(@string))
-							{
-								textTable.AddRow(userIDString, text2, text3, text7, text4, (text == userIDString) ? string.Empty : text, text5, text6);
-							}
-						}
+						continue;
+					}
+					string userIDString = activePlayer.UserIDString;
+					if (activePlayer.net.connection == null)
+					{
+						textTable.AddRow(userIDString, "NO CONNECTION");
+						continue;
+					}
+					string text = activePlayer.net.connection.ownerid.ToString();
+					string text2 = activePlayer.displayName.QuoteSafe();
+					string text3 = Network.Net.sv.GetAveragePing(activePlayer.net.connection).ToString();
+					string text4 = activePlayer.net.connection.ipaddress;
+					string text5 = activePlayer.violationLevel.ToString("0.0");
+					string text6 = activePlayer.GetAntiHackKicks().ToString();
+					if (!arg.IsAdmin && !arg.IsRcon)
+					{
+						text4 = "xx.xxx.xx.xxx";
+					}
+					string text7 = activePlayer.net.connection.GetSecondsConnected() + "s";
+					if (@string.Length <= 0 || text2.Contains(@string, CompareOptions.IgnoreCase) || userIDString.Contains(@string) || text.Contains(@string) || text4.Contains(@string))
+					{
+						textTable.AddRow(userIDString, text2, text3, text7, text4, (text == userIDString) ? string.Empty : text, text5, text6);
 					}
 				}
 				catch (Exception ex)
@@ -487,7 +486,7 @@ namespace ConVar
 				text = text + activePlayer.userID + ":\"" + activePlayer.displayName + "\"\n";
 				num++;
 			}
-			text = text + num.ToString() + "users\n";
+			text = text + num + "users\n";
 			arg.ReplyWith(text);
 		}
 
@@ -509,27 +508,28 @@ namespace ConVar
 		public static void sleepingusersinrange(Arg arg)
 		{
 			BasePlayer fromPlayer = ArgEx.Player(arg);
-			if (!(fromPlayer == null))
+			if (fromPlayer == null)
 			{
-				float range = arg.GetFloat(0);
-				string str = "<slot:userid:\"name\">\n";
-				int num = 0;
-				List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-				foreach (BasePlayer sleepingPlayer in BasePlayer.sleepingPlayerList)
-				{
-					obj.Add(sleepingPlayer);
-				}
-				obj.RemoveAll((BasePlayer p) => p.Distance2D(fromPlayer) > range);
-				obj.Sort((BasePlayer player, BasePlayer basePlayer) => (!(player.Distance2D(fromPlayer) < basePlayer.Distance2D(fromPlayer))) ? 1 : (-1));
-				foreach (BasePlayer item in obj)
-				{
-					str += $"{item.userID}:{item.displayName}:{item.Distance2D(fromPlayer)}m\n";
-					num++;
-				}
-				Facepunch.Pool.FreeList(ref obj);
-				str += $"{num} sleeping users within {range}m\n";
-				arg.ReplyWith(str);
+				return;
 			}
+			float range = arg.GetFloat(0);
+			string str = "<slot:userid:\"name\">\n";
+			int num = 0;
+			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+			foreach (BasePlayer sleepingPlayer in BasePlayer.sleepingPlayerList)
+			{
+				obj.Add(sleepingPlayer);
+			}
+			obj.RemoveAll((BasePlayer p) => p.Distance2D(fromPlayer) > range);
+			obj.Sort((BasePlayer player, BasePlayer basePlayer) => (!(player.Distance2D(fromPlayer) < basePlayer.Distance2D(fromPlayer))) ? 1 : (-1));
+			foreach (BasePlayer item in obj)
+			{
+				str += $"{item.userID}:{item.displayName}:{item.Distance2D(fromPlayer)}m\n";
+				num++;
+			}
+			Facepunch.Pool.FreeList(ref obj);
+			str += $"{num} sleeping users within {range}m\n";
+			arg.ReplyWith(str);
 		}
 
 		[ServerVar(Help = "List of banned users (sourceds compat)")]
@@ -641,7 +641,7 @@ namespace ConVar
 				{
 					text5 = "Broken";
 				}
-				string text6 = (item.TotalMaxHealth() != 0f) ? $"{item.TotalHealth() / item.TotalMaxHealth():0%}" : "0";
+				string text6 = ((item.TotalMaxHealth() != 0f) ? $"{item.TotalHealth() / item.TotalMaxHealth():0%}" : "0");
 				string text7;
 				if (item.IsOutside())
 				{
@@ -739,13 +739,13 @@ namespace ConVar
 			{
 				BuildingPrivlidge buildingPrivlidge;
 				List<PlayerNameID> authorizedPlayers;
-				if ((object)(buildingPrivlidge = (ent as BuildingPrivlidge)) == null)
+				if ((object)(buildingPrivlidge = ent as BuildingPrivlidge) == null)
 				{
 					AutoTurret autoTurret;
-					if ((object)(autoTurret = (ent as AutoTurret)) == null)
+					if ((object)(autoTurret = ent as AutoTurret) == null)
 					{
 						CodeLock codeLock;
-						if ((object)(codeLock = (ent as CodeLock)) != null)
+						if ((object)(codeLock = ent as CodeLock) != null)
 						{
 							return CodeLockAuthList(codeLock);
 						}

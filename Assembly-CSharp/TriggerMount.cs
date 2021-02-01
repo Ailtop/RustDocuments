@@ -65,35 +65,38 @@ public class TriggerMount : TriggerBase, IServerComponent
 
 	private void CheckForMount()
 	{
-		if (entityContents != null && entryInfo != null)
+		if (entityContents == null || entryInfo == null)
 		{
-			foreach (KeyValuePair<BaseEntity, EntryInfo> item in entryInfo)
+			return;
+		}
+		foreach (KeyValuePair<BaseEntity, EntryInfo> item in entryInfo)
+		{
+			BaseEntity key = item.Key;
+			if (!BaseEntityEx.IsValid(key))
 			{
-				BaseEntity key = item.Key;
-				if (BaseEntityEx.IsValid(key))
+				continue;
+			}
+			EntryInfo value = item.Value;
+			BasePlayer basePlayer = key.ToPlayer();
+			bool flag = (basePlayer.IsAdmin || basePlayer.IsDeveloper) && basePlayer.IsFlying;
+			if (!(basePlayer != null) || !basePlayer.IsAlive() || flag)
+			{
+				continue;
+			}
+			bool flag2 = false;
+			if (!basePlayer.isMounted && !basePlayer.IsSleeping() && value.entryTime + 3.5f < Time.time && Vector3.Distance(key.transform.position, value.entryPos) < 0.5f)
+			{
+				BaseVehicle componentInParent = GetComponentInParent<BaseVehicle>();
+				if (componentInParent != null && !componentInParent.IsDead())
 				{
-					EntryInfo value = item.Value;
-					BasePlayer basePlayer = key.ToPlayer();
-					bool flag = (basePlayer.IsAdmin || basePlayer.IsDeveloper) && basePlayer.IsFlying;
-					if (basePlayer != null && basePlayer.IsAlive() && !flag)
-					{
-						bool flag2 = false;
-						if (!basePlayer.isMounted && !basePlayer.IsSleeping() && value.entryTime + 3.5f < Time.time && Vector3.Distance(key.transform.position, value.entryPos) < 0.5f)
-						{
-							BaseVehicle componentInParent = GetComponentInParent<BaseVehicle>();
-							if (componentInParent != null && !componentInParent.IsDead())
-							{
-								componentInParent.AttemptMount(basePlayer);
-								flag2 = true;
-							}
-						}
-						if (!flag2)
-						{
-							value.Set(Time.time, key.transform.position);
-							Invoke(CheckForMount, 3.6f);
-						}
-					}
+					componentInParent.AttemptMount(basePlayer);
+					flag2 = true;
 				}
+			}
+			if (!flag2)
+			{
+				value.Set(Time.time, key.transform.position);
+				Invoke(CheckForMount, 3.6f);
 			}
 		}
 	}

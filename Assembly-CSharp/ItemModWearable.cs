@@ -55,7 +55,7 @@ public class ItemModWearable : ItemMod
 	{
 		if (string.IsNullOrEmpty(entityPrefab.resourcePath))
 		{
-			Debug.LogWarning(this + " - entityPrefab is null or something.. - " + entityPrefab.guid);
+			Debug.LogWarning(string.Concat(this, " - entityPrefab is null or something.. - ", entityPrefab.guid));
 		}
 	}
 

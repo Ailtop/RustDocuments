@@ -36,7 +36,7 @@ public class JiggleBone : BaseMonoBehaviour
 
 	private void Awake()
 	{
-		Vector3 vector = dynamicPos = base.transform.position + base.transform.TransformDirection(new Vector3(boneAxis.x * targetDistance, boneAxis.y * targetDistance, boneAxis.z * targetDistance));
+		Vector3 vector = (dynamicPos = base.transform.position + base.transform.TransformDirection(new Vector3(boneAxis.x * targetDistance, boneAxis.y * targetDistance, boneAxis.z * targetDistance)));
 	}
 
 	private void LateUpdate()
@@ -60,9 +60,9 @@ public class JiggleBone : BaseMonoBehaviour
 		if (SquashAndStretch)
 		{
 			float magnitude = (dynamicPos - vector2).magnitude;
-			float x = (boneAxis.x != 0f) ? (1f + magnitude * frontStretch) : (1f + (0f - magnitude) * sideStretch);
-			float y = (boneAxis.y != 0f) ? (1f + magnitude * frontStretch) : (1f + (0f - magnitude) * sideStretch);
-			float z = (boneAxis.z != 0f) ? (1f + magnitude * frontStretch) : (1f + (0f - magnitude) * sideStretch);
+			float x = ((boneAxis.x != 0f) ? (1f + magnitude * frontStretch) : (1f + (0f - magnitude) * sideStretch));
+			float y = ((boneAxis.y != 0f) ? (1f + magnitude * frontStretch) : (1f + (0f - magnitude) * sideStretch));
+			float z = ((boneAxis.z != 0f) ? (1f + magnitude * frontStretch) : (1f + (0f - magnitude) * sideStretch));
 			base.transform.localScale = new Vector3(x, y, z);
 		}
 		if (debugMode)

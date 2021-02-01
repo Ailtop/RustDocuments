@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -33,7 +33,7 @@ public class PhotoEntity : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ImageRequested ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ImageRequested "));
 				}
 				using (TimeWarning.New("ImageRequested"))
 				{

@@ -37,7 +37,7 @@ public class AnimatedBuildingBlock : StabilityEntity
 			return;
 		}
 		bool num = animatorNeedsInitializing || animatorIsOpen != IsOpen() || (init && isAnimating);
-		bool flag = animatorNeedsInitializing | init;
+		bool flag = animatorNeedsInitializing || init;
 		if (num)
 		{
 			isAnimating = true;

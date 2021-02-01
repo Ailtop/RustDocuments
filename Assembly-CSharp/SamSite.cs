@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SamSite : ContainerIOEntity
@@ -214,40 +214,41 @@ public class SamSite : ContainerIOEntity
 		{
 			currentTarget = null;
 		}
-		if (!HasValidTarget() && !IsDead())
+		if (HasValidTarget() || IsDead())
 		{
-			List<BaseCombatEntity> obj = Pool.GetList<BaseCombatEntity>();
-			Vis.Entities(eyePoint.transform.position, scanRadius, obj, 32768, QueryTriggerInteraction.Ignore);
-			BaseCombatEntity baseCombatEntity = null;
-			foreach (BaseCombatEntity item in obj)
+			return;
+		}
+		List<BaseCombatEntity> obj = Pool.GetList<BaseCombatEntity>();
+		Vis.Entities(eyePoint.transform.position, scanRadius, obj, 32768, QueryTriggerInteraction.Ignore);
+		BaseCombatEntity baseCombatEntity = null;
+		foreach (BaseCombatEntity item in obj)
+		{
+			if (!item.isClient && !(EntityCenterPoint(item).y < eyePoint.transform.position.y) && item.IsVisible(eyePoint.transform.position, scanRadius * 2f) && Interface.CallHook("OnSamSiteTarget", this, item) == null)
 			{
-				if (!item.isClient && !(EntityCenterPoint(item).y < eyePoint.transform.position.y) && item.IsVisible(eyePoint.transform.position, scanRadius * 2f) && Interface.CallHook("OnSamSiteTarget", this, item) == null)
+				BaseVehicle component = item.GetComponent<BaseVehicle>();
+				if ((staticRespawn || !(component != null) || !component.InSafeZone()) && (item.GetComponent<ISamSiteTarget>()?.IsValidSAMTarget() ?? alltarget))
 				{
-					BaseVehicle component = item.GetComponent<BaseVehicle>();
-					if ((staticRespawn || !(component != null) || !component.InSafeZone()) && (item.GetComponent<ISamSiteTarget>()?.IsValidSAMTarget() ?? alltarget))
-					{
-						baseCombatEntity = item;
-					}
+					baseCombatEntity = item;
 				}
 			}
-			if (baseCombatEntity != null && currentTarget != baseCombatEntity)
-			{
-				lockOnTime = Time.time + 0.5f;
-			}
-			currentTarget = baseCombatEntity;
-			if (currentTarget != null)
-			{
-				lastTargetVisibleTime = Time.time;
-			}
-			Pool.FreeList(ref obj);
-			if (currentTarget == null)
-			{
-				CancelInvoke(WeaponTick);
-			}
-			else
-			{
-				InvokeRandomized(WeaponTick, 0f, 0.5f, 0.2f);
-			}
+		}
+		if (baseCombatEntity != null && currentTarget != baseCombatEntity)
+		{
+			lockOnTime = Time.time + 0.5f;
+		}
+		currentTarget = baseCombatEntity;
+		if (currentTarget != null)
+		{
+			lastTargetVisibleTime = Time.time;
+		}
+		Pool.FreeList(ref obj);
+		if (currentTarget == null)
+		{
+			CancelInvoke(WeaponTick);
+		}
+		else
+		{
+			InvokeRandomized(WeaponTick, 0f, 0.5f, 0.2f);
 		}
 	}
 
@@ -321,7 +322,7 @@ public class SamSite : ContainerIOEntity
 			}
 			firedCount++;
 			FireProjectile(tubes[currentTubeIndex].position, currentAimDir, currentTarget);
-			Effect.server.Run(muzzleFlashTest.resourcePath, this, StringPool.Get("Tube " + (currentTubeIndex + 1).ToString()), Vector3.zero, Vector3.up);
+			Effect.server.Run(muzzleFlashTest.resourcePath, this, StringPool.Get("Tube " + (currentTubeIndex + 1)), Vector3.zero, Vector3.up);
 			currentTubeIndex++;
 			if (currentTubeIndex >= tubes.Length)
 			{

@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PaddlingPool : LiquidContainer, ISplashable
@@ -88,7 +88,7 @@ public class PaddlingPool : LiquidContainer, ISplashable
 	private void UpdatePoolFillAmount(float normalisedAmount)
 	{
 		poolWaterVisual.gameObject.SetActive(normalisedAmount > 0f);
-		waterVolume.waterEnabled = (normalisedAmount > 0f);
+		waterVolume.waterEnabled = normalisedAmount > 0f;
 		float y = Mathf.Lerp(minimumWaterHeight, maximumWaterHeight, normalisedAmount);
 		Vector3 localPosition = poolWaterVolume.localPosition;
 		localPosition.y = y;
@@ -102,7 +102,7 @@ public class PaddlingPool : LiquidContainer, ISplashable
 			foreach (BaseEntity entityContent in waterVolume.entityContents)
 			{
 				PoolVehicle poolVehicle;
-				if ((poolVehicle = (entityContent as PoolVehicle)) != null)
+				if ((poolVehicle = entityContent as PoolVehicle) != null)
 				{
 					poolVehicle.WakeUp();
 				}
@@ -119,25 +119,26 @@ public class PaddlingPool : LiquidContainer, ISplashable
 	public override void DestroyShared()
 	{
 		base.DestroyShared();
-		if (base.isServer)
+		if (!base.isServer)
 		{
-			List<PoolVehicle> obj = Pool.GetList<PoolVehicle>();
-			if (waterVolume.entityContents != null)
+			return;
+		}
+		List<PoolVehicle> obj = Pool.GetList<PoolVehicle>();
+		if (waterVolume.entityContents != null)
+		{
+			foreach (BaseEntity entityContent in waterVolume.entityContents)
 			{
-				foreach (BaseEntity entityContent in waterVolume.entityContents)
+				PoolVehicle item;
+				if ((item = entityContent as PoolVehicle) != null)
 				{
-					PoolVehicle item;
-					if ((item = (entityContent as PoolVehicle)) != null)
-					{
-						obj.Add(item);
-					}
+					obj.Add(item);
 				}
 			}
-			foreach (PoolVehicle item2 in obj)
-			{
-				item2.OnPoolDestroyed();
-			}
-			Pool.FreeList(ref obj);
 		}
+		foreach (PoolVehicle item2 in obj)
+		{
+			item2.OnPoolDestroyed();
+		}
+		Pool.FreeList(ref obj);
 	}
 }

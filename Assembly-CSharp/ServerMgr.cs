@@ -1,3 +1,9 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using CCTVRender;
 using CompanionServer;
 using ConVar;
@@ -11,12 +17,6 @@ using ProtoBuf;
 using Rust;
 using Steamworks;
 using Steamworks.Data;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
@@ -119,120 +119,125 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.Ready:
-			if (packet.connection.connected)
+			if (!packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
-				{
-					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Client Ready", packet.connection.connected);
-					break;
-				}
-				using (TimeWarning.New("ClientReady", 20))
-				{
-					try
-					{
-						ClientReady(packet);
-					}
-					catch (Exception e9)
-					{
-						Log(e9);
-						Network.Net.sv.Kick(packet.connection, "Invalid Packet: Client Ready");
-					}
-				}
-				packet.connection.AddPacketsPerSecond(packet.type);
+				break;
 			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
+			{
+				Network.Net.sv.Kick(packet.connection, "Packet Flooding: Client Ready", packet.connection.connected);
+				break;
+			}
+			using (TimeWarning.New("ClientReady", 20))
+			{
+				try
+				{
+					ClientReady(packet);
+				}
+				catch (Exception e9)
+				{
+					Log(e9);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: Client Ready");
+				}
+			}
+			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.RPCMessage:
-			if (packet.connection.connected)
+			if (!packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_rpc)
-				{
-					Network.Net.sv.Kick(packet.connection, "Paket Flooding: RPC Message");
-					break;
-				}
-				using (TimeWarning.New("OnRPCMessage", 20))
-				{
-					try
-					{
-						OnRPCMessage(packet);
-					}
-					catch (Exception e8)
-					{
-						Log(e8);
-						Network.Net.sv.Kick(packet.connection, "Invalid Packet: RPC Message");
-					}
-				}
-				packet.connection.AddPacketsPerSecond(packet.type);
+				break;
 			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_rpc)
+			{
+				Network.Net.sv.Kick(packet.connection, "Paket Flooding: RPC Message");
+				break;
+			}
+			using (TimeWarning.New("OnRPCMessage", 20))
+			{
+				try
+				{
+					OnRPCMessage(packet);
+				}
+				catch (Exception e8)
+				{
+					Log(e8);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: RPC Message");
+				}
+			}
+			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.ConsoleCommand:
-			if (packet.connection.connected)
+			if (!packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_command)
-				{
-					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Client Command", packet.connection.connected);
-					break;
-				}
-				using (TimeWarning.New("OnClientCommand", 20))
-				{
-					try
-					{
-						ConsoleNetwork.OnClientCommand(packet);
-					}
-					catch (Exception e5)
-					{
-						Log(e5);
-						Network.Net.sv.Kick(packet.connection, "Invalid Packet: Client Command");
-					}
-				}
-				packet.connection.AddPacketsPerSecond(packet.type);
+				break;
 			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_command)
+			{
+				Network.Net.sv.Kick(packet.connection, "Packet Flooding: Client Command", packet.connection.connected);
+				break;
+			}
+			using (TimeWarning.New("OnClientCommand", 20))
+			{
+				try
+				{
+					ConsoleNetwork.OnClientCommand(packet);
+				}
+				catch (Exception e5)
+				{
+					Log(e5);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: Client Command");
+				}
+			}
+			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.DisconnectReason:
-			if (packet.connection.connected)
+			if (!packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
-				{
-					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Disconnect Reason", packet.connection.connected);
-					break;
-				}
-				using (TimeWarning.New("ReadDisconnectReason", 20))
-				{
-					try
-					{
-						ReadDisconnectReason(packet);
-						Network.Net.sv.Disconnect(packet.connection);
-					}
-					catch (Exception e2)
-					{
-						Log(e2);
-						Network.Net.sv.Kick(packet.connection, "Invalid Packet: Disconnect Reason");
-					}
-				}
-				packet.connection.AddPacketsPerSecond(packet.type);
+				break;
 			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= 1)
+			{
+				Network.Net.sv.Kick(packet.connection, "Packet Flooding: Disconnect Reason", packet.connection.connected);
+				break;
+			}
+			using (TimeWarning.New("ReadDisconnectReason", 20))
+			{
+				try
+				{
+					ReadDisconnectReason(packet);
+					Network.Net.sv.Disconnect(packet.connection);
+				}
+				catch (Exception e2)
+				{
+					Log(e2);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: Disconnect Reason");
+				}
+			}
+			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.Tick:
-			if (packet.connection.connected)
+			if (!packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_tick)
-				{
-					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Player Tick", packet.connection.connected);
-					break;
-				}
-				using (TimeWarning.New("OnPlayerTick", 20))
-				{
-					try
-					{
-						OnPlayerTick(packet);
-					}
-					catch (Exception e4)
-					{
-						Log(e4);
-						Network.Net.sv.Kick(packet.connection, "Invalid Packet: Player Tick");
-					}
-				}
-				packet.connection.AddPacketsPerSecond(packet.type);
+				break;
 			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_tick)
+			{
+				Network.Net.sv.Kick(packet.connection, "Packet Flooding: Player Tick", packet.connection.connected);
+				break;
+			}
+			using (TimeWarning.New("OnPlayerTick", 20))
+			{
+				try
+				{
+					OnPlayerTick(packet);
+				}
+				catch (Exception e4)
+				{
+					Log(e4);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: Player Tick");
+				}
+			}
+			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		case Message.Type.EAC:
 			using (TimeWarning.New("OnEACMessage", 20))
@@ -249,51 +254,51 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			break;
 		case Message.Type.World:
-			if (World.Transfer && packet.connection.connected)
+			if (!World.Transfer || !packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_world)
+				break;
+			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_world)
+			{
+				Network.Net.sv.Kick(packet.connection, "Packet Flooding: World", packet.connection.connected);
+				break;
+			}
+			using (TimeWarning.New("OnWorldMessage", 20))
+			{
+				try
 				{
-					Network.Net.sv.Kick(packet.connection, "Packet Flooding: World", packet.connection.connected);
+					WorldNetworking.OnMessageReceived(packet);
 				}
-				else
+				catch (Exception e6)
 				{
-					using (TimeWarning.New("OnWorldMessage", 20))
-					{
-						try
-						{
-							WorldNetworking.OnMessageReceived(packet);
-						}
-						catch (Exception e6)
-						{
-							Log(e6);
-							Network.Net.sv.Kick(packet.connection, "Invalid Packet: World");
-						}
-					}
+					Log(e6);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: World");
 				}
 			}
 			break;
 		case Message.Type.VoiceData:
-			if (packet.connection.connected)
+			if (!packet.connection.connected)
 			{
-				if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_voice)
-				{
-					Network.Net.sv.Kick(packet.connection, "Packet Flooding: Disconnect Reason", packet.connection.connected);
-					break;
-				}
-				using (TimeWarning.New("OnPlayerVoice", 20))
-				{
-					try
-					{
-						OnPlayerVoice(packet);
-					}
-					catch (Exception e)
-					{
-						Log(e);
-						Network.Net.sv.Kick(packet.connection, "Invalid Packet: Player Voice");
-					}
-				}
-				packet.connection.AddPacketsPerSecond(packet.type);
+				break;
 			}
+			if (packet.connection.GetPacketsPerSecond(packet.type) >= (ulong)ConVar.Server.maxpacketspersecond_voice)
+			{
+				Network.Net.sv.Kick(packet.connection, "Packet Flooding: Disconnect Reason", packet.connection.connected);
+				break;
+			}
+			using (TimeWarning.New("OnPlayerVoice", 20))
+			{
+				try
+				{
+					OnPlayerVoice(packet);
+				}
+				catch (Exception e)
+				{
+					Log(e);
+					Network.Net.sv.Kick(packet.connection, "Invalid Packet: Player Voice");
+				}
+			}
+			packet.connection.AddPacketsPerSecond(packet.type);
 			break;
 		default:
 			ProcessUnhandledPacket(packet);
@@ -485,30 +490,30 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		Interface.CallHook("OnClientAuth", packet.connection);
 		if (branch != string.Empty && branch != text)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their branch is '" + text + "' not '" + branch + "'");
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
-			return;
 		}
-		if (packet.connection.protocol > 2275)
+		else if (packet.connection.protocol > 2275)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2275);
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2275));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
-			return;
 		}
-		if (packet.connection.protocol < 2275)
+		else if (packet.connection.protocol < 2275)
 		{
-			DebugEx.Log("Kicking " + packet.connection + " - their protocol is " + packet.connection.protocol + " not " + 2275);
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2275));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
-			return;
-		}
-		packet.connection.token = packet.read.BytesWithSize(512u);
-		if (packet.connection.token == null || packet.connection.token.Length < 1)
-		{
-			Network.Net.sv.Kick(packet.connection, "Invalid Token");
 		}
 		else
 		{
-			auth.OnNewConnection(packet.connection);
+			packet.connection.token = packet.read.BytesWithSize(512u);
+			if (packet.connection.token == null || packet.connection.token.Length < 1)
+			{
+				Network.Net.sv.Kick(packet.connection, "Invalid Token");
+			}
+			else
+			{
+				auth.OnNewConnection(packet.connection);
+			}
 		}
 	}
 
@@ -613,7 +618,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	public void OpenConnection()
 	{
-		useQueryPort = (ConVar.Server.queryport > 0 && ConVar.Server.queryport != ConVar.Server.port);
+		useQueryPort = ConVar.Server.queryport > 0 && ConVar.Server.queryport != ConVar.Server.port;
 		if (!useQueryPort && !Network.Net.sv.AllowPassthroughMessages)
 		{
 			ConVar.Server.queryport = Math.Max(ConVar.Server.port, RCon.Port) + 1;
@@ -731,10 +736,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 		switch (Status)
 		{
-		case AuthResponse.TimedOut:
-			return;
 		case AuthResponse.OK:
 			UnityEngine.Debug.LogWarning($"Steam gave us a 'ok' ticket response for already connected id {SteamId}");
+			return;
+		case AuthResponse.TimedOut:
 			return;
 		case AuthResponse.VACBanned:
 		case AuthResponse.PublisherBanned:
@@ -748,7 +753,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 		UnityEngine.Debug.Log($"Kicking {connection.ipaddress}/{connection.userid}/{connection.username} (Steam Status \"{Status.ToString()}\")");
 		connection.authStatus = Status.ToString();
-		Network.Net.sv.Kick(connection, "Steam: " + Status.ToString());
+		Network.Net.sv.Kick(connection, "Steam: " + Status);
 	}
 
 	private void EACUpdate()
@@ -758,152 +763,153 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private void Update()
 	{
-		if (runFrameUpdate)
+		if (!runFrameUpdate)
 		{
-			using (TimeWarning.New("ServerMgr.Update", 500))
+			return;
+		}
+		using (TimeWarning.New("ServerMgr.Update", 500))
+		{
+			if (EACServer.playerTracker != null)
 			{
-				if (EACServer.playerTracker != null)
+				EACServer.playerTracker.BeginFrame();
+			}
+			try
+			{
+				using (TimeWarning.New("PlatformService.Update", 100))
 				{
-					EACServer.playerTracker.BeginFrame();
+					PlatformService.Instance.Update();
 				}
-				try
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Platform Service Update");
+				UnityEngine.Debug.LogException(exception, this);
+			}
+			try
+			{
+				using (TimeWarning.New("Net.sv.Cycle", 100))
 				{
-					using (TimeWarning.New("PlatformService.Update", 100))
+					Network.Net.sv.Cycle();
+				}
+			}
+			catch (Exception exception2)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Network Cycle");
+				UnityEngine.Debug.LogException(exception2, this);
+			}
+			try
+			{
+				using (TimeWarning.New("ServerBuildingManager.Cycle"))
+				{
+					BuildingManager.server.Cycle();
+				}
+			}
+			catch (Exception exception3)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Building Manager");
+				UnityEngine.Debug.LogException(exception3, this);
+			}
+			try
+			{
+				using (TimeWarning.New("BasePlayer.ServerCycle"))
+				{
+					bool batchsynctransforms = ConVar.Physics.batchsynctransforms;
+					bool autosynctransforms = ConVar.Physics.autosynctransforms;
+					if (batchsynctransforms && autosynctransforms)
 					{
-						PlatformService.Instance.Update();
+						UnityEngine.Physics.autoSyncTransforms = false;
+					}
+					if (!UnityEngine.Physics.autoSyncTransforms)
+					{
+						UnityEngine.Physics.SyncTransforms();
+					}
+					BasePlayer.ServerCycle(UnityEngine.Time.deltaTime);
+					if (batchsynctransforms && autosynctransforms)
+					{
+						UnityEngine.Physics.autoSyncTransforms = true;
 					}
 				}
-				catch (Exception exception)
+			}
+			catch (Exception exception4)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Player Update");
+				UnityEngine.Debug.LogException(exception4, this);
+			}
+			try
+			{
+				using (TimeWarning.New("SteamQueryResponse"))
 				{
-					UnityEngine.Debug.LogWarning("Server Exception: Platform Service Update");
-					UnityEngine.Debug.LogException(exception, this);
+					SteamQueryResponse();
 				}
-				try
+			}
+			catch (Exception exception5)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Steam Query");
+				UnityEngine.Debug.LogException(exception5, this);
+			}
+			try
+			{
+				using (TimeWarning.New("connectionQueue.Cycle"))
 				{
-					using (TimeWarning.New("Net.sv.Cycle", 100))
-					{
-						Network.Net.sv.Cycle();
-					}
+					connectionQueue.Cycle(AvailableSlots);
 				}
-				catch (Exception exception2)
+			}
+			catch (Exception exception6)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Connection Queue");
+				UnityEngine.Debug.LogException(exception6, this);
+			}
+			try
+			{
+				using (TimeWarning.New("IOEntity.ProcessQueue"))
 				{
-					UnityEngine.Debug.LogWarning("Server Exception: Network Cycle");
-					UnityEngine.Debug.LogException(exception2, this);
+					IOEntity.ProcessQueue();
 				}
-				try
+			}
+			catch (Exception exception7)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: IOEntity.ProcessQueue");
+				UnityEngine.Debug.LogException(exception7, this);
+			}
+			try
+			{
+				using (TimeWarning.New("AIThinkManager.ProcessQueue"))
 				{
-					using (TimeWarning.New("ServerBuildingManager.Cycle"))
-					{
-						BuildingManager.server.Cycle();
-					}
+					AIThinkManager.ProcessQueue();
 				}
-				catch (Exception exception3)
+			}
+			catch (Exception exception8)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: AIThinkManager.ProcessQueue");
+				UnityEngine.Debug.LogException(exception8, this);
+			}
+			try
+			{
+				using (TimeWarning.New("BaseRidableAnimal.ProcessQueue"))
 				{
-					UnityEngine.Debug.LogWarning("Server Exception: Building Manager");
-					UnityEngine.Debug.LogException(exception3, this);
+					BaseRidableAnimal.ProcessQueue();
 				}
-				try
+			}
+			catch (Exception exception9)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: BaseRidableAnimal.ProcessQueue");
+				UnityEngine.Debug.LogException(exception9, this);
+			}
+			try
+			{
+				using (TimeWarning.New("GrowableEntity.BudgetedUpdate"))
 				{
-					using (TimeWarning.New("BasePlayer.ServerCycle"))
-					{
-						bool batchsynctransforms = ConVar.Physics.batchsynctransforms;
-						bool autosynctransforms = ConVar.Physics.autosynctransforms;
-						if (batchsynctransforms & autosynctransforms)
-						{
-							UnityEngine.Physics.autoSyncTransforms = false;
-						}
-						if (!UnityEngine.Physics.autoSyncTransforms)
-						{
-							UnityEngine.Physics.SyncTransforms();
-						}
-						BasePlayer.ServerCycle(UnityEngine.Time.deltaTime);
-						if (batchsynctransforms & autosynctransforms)
-						{
-							UnityEngine.Physics.autoSyncTransforms = true;
-						}
-					}
+					GrowableEntity.BudgetedUpdate();
 				}
-				catch (Exception exception4)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: Player Update");
-					UnityEngine.Debug.LogException(exception4, this);
-				}
-				try
-				{
-					using (TimeWarning.New("SteamQueryResponse"))
-					{
-						SteamQueryResponse();
-					}
-				}
-				catch (Exception exception5)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: Steam Query");
-					UnityEngine.Debug.LogException(exception5, this);
-				}
-				try
-				{
-					using (TimeWarning.New("connectionQueue.Cycle"))
-					{
-						connectionQueue.Cycle(AvailableSlots);
-					}
-				}
-				catch (Exception exception6)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: Connection Queue");
-					UnityEngine.Debug.LogException(exception6, this);
-				}
-				try
-				{
-					using (TimeWarning.New("IOEntity.ProcessQueue"))
-					{
-						IOEntity.ProcessQueue();
-					}
-				}
-				catch (Exception exception7)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: IOEntity.ProcessQueue");
-					UnityEngine.Debug.LogException(exception7, this);
-				}
-				try
-				{
-					using (TimeWarning.New("AIThinkManager.ProcessQueue"))
-					{
-						AIThinkManager.ProcessQueue();
-					}
-				}
-				catch (Exception exception8)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: AIThinkManager.ProcessQueue");
-					UnityEngine.Debug.LogException(exception8, this);
-				}
-				try
-				{
-					using (TimeWarning.New("BaseRidableAnimal.ProcessQueue"))
-					{
-						BaseRidableAnimal.ProcessQueue();
-					}
-				}
-				catch (Exception exception9)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: BaseRidableAnimal.ProcessQueue");
-					UnityEngine.Debug.LogException(exception9, this);
-				}
-				try
-				{
-					using (TimeWarning.New("GrowableEntity.BudgetedUpdate"))
-					{
-						GrowableEntity.BudgetedUpdate();
-					}
-				}
-				catch (Exception exception10)
-				{
-					UnityEngine.Debug.LogWarning("Server Exception: GrowableEntity.BudgetedUpdate");
-					UnityEngine.Debug.LogException(exception10, this);
-				}
-				if (EACServer.playerTracker != null)
-				{
-					EACServer.playerTracker.EndFrame();
-				}
+			}
+			catch (Exception exception10)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: GrowableEntity.BudgetedUpdate");
+				UnityEngine.Debug.LogException(exception10, this);
+			}
+			if (EACServer.playerTracker != null)
+			{
+				EACServer.playerTracker.EndFrame();
 			}
 		}
 	}
@@ -929,15 +935,16 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private void SteamQueryResponse()
 	{
-		if (SteamServer.IsValid && Network.Net.sv.AllowPassthroughMessages)
+		if (!SteamServer.IsValid || !Network.Net.sv.AllowPassthroughMessages)
 		{
-			using (TimeWarning.New("SteamGameServer.GetNextOutgoingPacket"))
+			return;
+		}
+		using (TimeWarning.New("SteamGameServer.GetNextOutgoingPacket"))
+		{
+			OutgoingPacket packet;
+			while (SteamServer.GetOutgoingPacket(out packet))
 			{
-				OutgoingPacket packet;
-				while (SteamServer.GetOutgoingPacket(out packet))
-				{
-					Network.Net.sv.SendUnconnected(packet.Address, packet.Port, packet.Data, packet.Size);
-				}
+				Network.Net.sv.SendUnconnected(packet.Address, packet.Port, packet.Data, packet.Size);
 			}
 		}
 	}
@@ -990,67 +997,68 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private void UpdateServerInformation()
 	{
-		if (SteamServer.IsValid)
+		if (!SteamServer.IsValid)
 		{
-			using (TimeWarning.New("UpdateServerInformation"))
+			return;
+		}
+		using (TimeWarning.New("UpdateServerInformation"))
+		{
+			SteamServer.ServerName = ConVar.Server.hostname;
+			SteamServer.MaxPlayers = ConVar.Server.maxplayers;
+			SteamServer.Passworded = false;
+			SteamServer.MapName = World.Name;
+			string text = "stok";
+			if (Restarting)
 			{
-				SteamServer.ServerName = ConVar.Server.hostname;
-				SteamServer.MaxPlayers = ConVar.Server.maxplayers;
-				SteamServer.Passworded = false;
-				SteamServer.MapName = World.Name;
-				string text = "stok";
-				if (Restarting)
-				{
-					text = "strst";
-				}
-				string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
-				string text3 = $"gm{GamemodeName()}";
-				string text4 = ConVar.Server.pve ? ",pve" : string.Empty;
-				SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2275}{text4},h{AssemblyHash},{text},{text2},{text3}";
-				Interface.CallHook("IOnUpdateServerInformation");
-				if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
-				{
-					string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();
-					Interface.CallHook("IOnUpdateServerDescription");
-					for (int i = 0; i < 16; i++)
-					{
-						if (i < array.Length)
-						{
-							SteamServer.SetKey($"description_{i:00}", array[i]);
-						}
-						else
-						{
-							SteamServer.SetKey($"description_{i:00}", string.Empty);
-						}
-					}
-				}
-				else
-				{
-					SteamServer.SetKey("description_0", ConVar.Server.description);
-					for (int j = 1; j < 16; j++)
-					{
-						SteamServer.SetKey($"description_{j:00}", string.Empty);
-					}
-				}
-				SteamServer.SetKey("hash", AssemblyHash);
-				SteamServer.SetKey("world.seed", World.Seed.ToString());
-				SteamServer.SetKey("world.size", World.Size.ToString());
-				SteamServer.SetKey("pve", ConVar.Server.pve.ToString());
-				SteamServer.SetKey("headerimage", ConVar.Server.headerimage);
-				SteamServer.SetKey("logoimage", ConVar.Server.logoimage);
-				SteamServer.SetKey("url", ConVar.Server.url);
-				SteamServer.SetKey("gmn", GamemodeName());
-				SteamServer.SetKey("gmt", GamemodeTitle());
-				SteamServer.SetKey("gmd", GamemodeDesc());
-				SteamServer.SetKey("gmu", GamemodeUrl());
-				SteamServer.SetKey("uptime", ((int)UnityEngine.Time.realtimeSinceStartup).ToString());
-				SteamServer.SetKey("gc_mb", Performance.report.memoryAllocations.ToString());
-				SteamServer.SetKey("gc_cl", Performance.report.memoryCollections.ToString());
-				SteamServer.SetKey("fps", Performance.report.frameRate.ToString());
-				SteamServer.SetKey("fps_avg", Performance.report.frameRateAverage.ToString("0.00"));
-				SteamServer.SetKey("ent_cnt", BaseNetworkable.serverEntities.Count.ToString());
-				SteamServer.SetKey("build", BuildInfo.Current.Scm.ChangeId);
+				text = "strst";
 			}
+			string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
+			string text3 = $"gm{GamemodeName()}";
+			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2275}{text4},h{AssemblyHash},{text},{text2},{text3}";
+			Interface.CallHook("IOnUpdateServerInformation");
+			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
+			{
+				string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();
+				Interface.CallHook("IOnUpdateServerDescription");
+				for (int i = 0; i < 16; i++)
+				{
+					if (i < array.Length)
+					{
+						SteamServer.SetKey($"description_{i:00}", array[i]);
+					}
+					else
+					{
+						SteamServer.SetKey($"description_{i:00}", string.Empty);
+					}
+				}
+			}
+			else
+			{
+				SteamServer.SetKey("description_0", ConVar.Server.description);
+				for (int j = 1; j < 16; j++)
+				{
+					SteamServer.SetKey($"description_{j:00}", string.Empty);
+				}
+			}
+			SteamServer.SetKey("hash", AssemblyHash);
+			SteamServer.SetKey("world.seed", World.Seed.ToString());
+			SteamServer.SetKey("world.size", World.Size.ToString());
+			SteamServer.SetKey("pve", ConVar.Server.pve.ToString());
+			SteamServer.SetKey("headerimage", ConVar.Server.headerimage);
+			SteamServer.SetKey("logoimage", ConVar.Server.logoimage);
+			SteamServer.SetKey("url", ConVar.Server.url);
+			SteamServer.SetKey("gmn", GamemodeName());
+			SteamServer.SetKey("gmt", GamemodeTitle());
+			SteamServer.SetKey("gmd", GamemodeDesc());
+			SteamServer.SetKey("gmu", GamemodeUrl());
+			SteamServer.SetKey("uptime", ((int)UnityEngine.Time.realtimeSinceStartup).ToString());
+			SteamServer.SetKey("gc_mb", Performance.report.memoryAllocations.ToString());
+			SteamServer.SetKey("gc_cl", Performance.report.memoryCollections.ToString());
+			SteamServer.SetKey("fps", Performance.report.frameRate.ToString());
+			SteamServer.SetKey("fps_avg", Performance.report.frameRateAverage.ToString("0.00"));
+			SteamServer.SetKey("ent_cnt", BaseNetworkable.serverEntities.Count.ToString());
+			SteamServer.SetKey("build", BuildInfo.Current.Scm.ChangeId);
 		}
 	}
 
@@ -1252,71 +1260,74 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	public static void SendReplicatedVars(string filter)
 	{
-		if (Network.Net.sv.write.Start())
+		if (!Network.Net.sv.write.Start())
 		{
-			List<Network.Connection> obj = Facepunch.Pool.GetList<Network.Connection>();
-			foreach (Network.Connection connection in Network.Net.sv.connections)
-			{
-				if (connection.connected)
-				{
-					obj.Add(connection);
-				}
-			}
-			List<ConsoleSystem.Command> obj2 = Facepunch.Pool.GetList<ConsoleSystem.Command>();
-			foreach (ConsoleSystem.Command item in ConsoleSystem.Index.Server.Replicated)
-			{
-				if (item.FullName.StartsWith(filter))
-				{
-					obj2.Add(item);
-				}
-			}
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
-			Network.Net.sv.write.Int32(obj2.Count);
-			foreach (ConsoleSystem.Command item2 in obj2)
-			{
-				Network.Net.sv.write.String(item2.FullName);
-				Network.Net.sv.write.String(item2.String);
-			}
-			Network.Net.sv.write.Send(new SendInfo(obj));
-			Facepunch.Pool.FreeList(ref obj2);
-			Facepunch.Pool.FreeList(ref obj);
+			return;
 		}
+		List<Network.Connection> obj = Facepunch.Pool.GetList<Network.Connection>();
+		foreach (Network.Connection connection in Network.Net.sv.connections)
+		{
+			if (connection.connected)
+			{
+				obj.Add(connection);
+			}
+		}
+		List<ConsoleSystem.Command> obj2 = Facepunch.Pool.GetList<ConsoleSystem.Command>();
+		foreach (ConsoleSystem.Command item in ConsoleSystem.Index.Server.Replicated)
+		{
+			if (item.FullName.StartsWith(filter))
+			{
+				obj2.Add(item);
+			}
+		}
+		Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
+		Network.Net.sv.write.Int32(obj2.Count);
+		foreach (ConsoleSystem.Command item2 in obj2)
+		{
+			Network.Net.sv.write.String(item2.FullName);
+			Network.Net.sv.write.String(item2.String);
+		}
+		Network.Net.sv.write.Send(new SendInfo(obj));
+		Facepunch.Pool.FreeList(ref obj2);
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public static void SendReplicatedVars(Network.Connection connection)
 	{
-		if (Network.Net.sv.write.Start())
+		if (!Network.Net.sv.write.Start())
 		{
-			List<ConsoleSystem.Command> replicated = ConsoleSystem.Index.Server.Replicated;
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
-			Network.Net.sv.write.Int32(replicated.Count);
-			foreach (ConsoleSystem.Command item in replicated)
-			{
-				Network.Net.sv.write.String(item.FullName);
-				Network.Net.sv.write.String(item.String);
-			}
-			Network.Net.sv.write.Send(new SendInfo(connection));
+			return;
 		}
+		List<ConsoleSystem.Command> replicated = ConsoleSystem.Index.Server.Replicated;
+		Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
+		Network.Net.sv.write.Int32(replicated.Count);
+		foreach (ConsoleSystem.Command item in replicated)
+		{
+			Network.Net.sv.write.String(item.FullName);
+			Network.Net.sv.write.String(item.String);
+		}
+		Network.Net.sv.write.Send(new SendInfo(connection));
 	}
 
 	private static void OnReplicatedVarChanged(string fullName, string value)
 	{
-		if (Network.Net.sv.write.Start())
+		if (!Network.Net.sv.write.Start())
 		{
-			List<Network.Connection> obj = Facepunch.Pool.GetList<Network.Connection>();
-			foreach (Network.Connection connection in Network.Net.sv.connections)
-			{
-				if (connection.connected)
-				{
-					obj.Add(connection);
-				}
-			}
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
-			Network.Net.sv.write.Int32(1);
-			Network.Net.sv.write.String(fullName);
-			Network.Net.sv.write.String(value);
-			Network.Net.sv.write.Send(new SendInfo(obj));
-			Facepunch.Pool.FreeList(ref obj);
+			return;
 		}
+		List<Network.Connection> obj = Facepunch.Pool.GetList<Network.Connection>();
+		foreach (Network.Connection connection in Network.Net.sv.connections)
+		{
+			if (connection.connected)
+			{
+				obj.Add(connection);
+			}
+		}
+		Network.Net.sv.write.PacketID(Message.Type.ConsoleReplicatedVars);
+		Network.Net.sv.write.Int32(1);
+		Network.Net.sv.write.String(fullName);
+		Network.Net.sv.write.String(value);
+		Network.Net.sv.write.Send(new SendInfo(obj));
+		Facepunch.Pool.FreeList(ref obj);
 	}
 }

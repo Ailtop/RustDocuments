@@ -177,7 +177,7 @@ public class PlaceCliffs : ProceduralComponent
 			ParentSocketType x = prefab.Attribute.Find<ParentSocketType>(prefab.ID);
 			ChildSocketType val2 = prefab.Attribute.Find<ChildSocketType>(prefab.ID);
 			bool flag = (PrefabAttribute)x != (PrefabAttribute)null;
-			if ((cliffPlacement != null && cliffPlacement.count > target_count && cliffPlacement.score > target_length) & flag)
+			if (cliffPlacement != null && cliffPlacement.count > target_count && cliffPlacement.score > target_length && flag)
 			{
 				continue;
 			}

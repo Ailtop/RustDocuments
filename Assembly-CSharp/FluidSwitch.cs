@@ -29,7 +29,7 @@ public class FluidSwitch : ElectricSwitch
 		if (inputSlot == 2)
 		{
 			bool num = pumpEnabled;
-			pumpEnabled = (inputAmount > 0);
+			pumpEnabled = inputAmount > 0;
 			if (num != pumpEnabled)
 			{
 				lastPassthroughEnergy = -1;

@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ServerGib : BaseCombatEntity
@@ -37,7 +37,7 @@ public class ServerGib : BaseCombatEntity
 				component2.transform.SetPositionAndRotation(vector, quaternion);
 				component2._gibName = meshRenderer.name;
 				MeshCollider component3 = meshRenderer.GetComponent<MeshCollider>();
-				Mesh physicsMesh = (component3 != null) ? component3.sharedMesh : component.sharedMesh;
+				Mesh physicsMesh = ((component3 != null) ? component3.sharedMesh : component.sharedMesh);
 				component2.PhysicsInit(physicsMesh);
 				Vector3 b = meshRenderer.transform.localPosition.normalized * spreadVelocity;
 				component2.rigidBody.velocity = inheritVelocity + b;

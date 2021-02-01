@@ -13,7 +13,7 @@ public class ModularCarCentralLockingSwitch : VehicleModuleButtonComponent
 	public override void ServerUse(BasePlayer player, BaseVehicleModule parentModule)
 	{
 		ModularCar modularCar;
-		if ((object)(modularCar = (parentModule.Vehicle as ModularCar)) != null)
+		if ((object)(modularCar = parentModule.Vehicle as ModularCar) != null)
 		{
 			modularCar.carLock.ToggleCentralLocking();
 		}

@@ -29,7 +29,7 @@ public class TriggerParentEnclosed : TriggerParent
 		Bounds bounds = new Bounds(boxCollider.center, boxCollider.size);
 		bounds.Expand(Padding);
 		OBB oBB = new OBB(boxCollider.transform, bounds);
-		Vector3 target = (intersectionMode == TriggerMode.TriggerPoint) ? ent.TriggerPoint() : ent.PivotPoint();
+		Vector3 target = ((intersectionMode == TriggerMode.TriggerPoint) ? ent.TriggerPoint() : ent.PivotPoint());
 		return oBB.Contains(target);
 	}
 }

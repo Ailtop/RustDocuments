@@ -26,7 +26,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 				{
 					bestCoverPoint.SetUsedBy(GetEntity(), 10f);
 				}
-				Vector3 vector = (bestCoverPoint == null) ? GetEntity().transform.position : bestCoverPoint.transform.position;
+				Vector3 vector = ((bestCoverPoint == null) ? GetEntity().transform.position : bestCoverPoint.transform.position);
 				GetEntity().SetDestination(vector);
 				brain.mainInterestPoint = vector;
 			}
@@ -156,7 +156,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 					{
 						entryPointNear.Occupy(delta * 2f);
 					}
-					Vector3 destination = (entryPointNear == null) ? desiredDestination : entryPointNear.transform.position;
+					Vector3 destination = ((entryPointNear == null) ? desiredDestination : entryPointNear.transform.position);
 					GetEntity().SetDestination(destination);
 					area.SetBusyFor(delta * 2f);
 				}
@@ -168,7 +168,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 						entryPointNear2.Occupy();
 						GetEntity().SetStationaryAimPoint(area.GetClosestEntry(GetEntity().transform.position).position);
 					}
-					Vector3 destination2 = (entryPointNear2 == null) ? GetEntity().transform.position : entryPointNear2.transform.position;
+					Vector3 destination2 = ((entryPointNear2 == null) ? GetEntity().transform.position : entryPointNear2.transform.position);
 					GetEntity().SetDestination(destination2);
 					waiting = true;
 					isTraversing = false;
@@ -251,7 +251,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 		{
 			base.StateThink(delta);
 			bool flag = Time.time - lastDestinationTime > 25f;
-			if (((Vector3.Distance(GetEntity().finalDestination, GetEntity().transform.position) < 2f) | flag) && nextRoamPositionTime == -1f)
+			if ((Vector3.Distance(GetEntity().finalDestination, GetEntity().transform.position) < 2f || flag) && nextRoamPositionTime == -1f)
 			{
 				nextRoamPositionTime = Time.time + Random.Range(5f, 10f);
 			}
@@ -264,7 +264,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 					bestRoamPosition.MarkUsedForRoam(num + 11f);
 				}
 				lastDestinationTime = Time.time;
-				Vector3 destination = (bestRoamPosition == null) ? GetEntity().transform.position : bestRoamPosition.transform.position;
+				Vector3 destination = ((bestRoamPosition == null) ? GetEntity().transform.position : bestRoamPosition.transform.position);
 				GetEntity().SetDestination(destination);
 				nextRoamPositionTime = -1f;
 			}
@@ -318,7 +318,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 
 		public override bool CanInterrupt()
 		{
-			float num = GetEntity().currentTarget ? 2f : 8f;
+			float num = (GetEntity().currentTarget ? 2f : 8f);
 			if (TimeInState() > 5f)
 			{
 				if (inCover)
@@ -355,20 +355,20 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 			float num2 = 0f;
 			if (Time.time > lastCoverTime + num && !isFleeing)
 			{
-				Vector3 hideFromPosition = GetEntity().currentTarget ? GetEntity().currentTarget.transform.position : (GetEntity().transform.position + GetEntity().LastAttackedDir * 30f);
-				float num3 = (GetEntity().currentTarget != null) ? GetEntity().DistanceToTarget() : 30f;
+				Vector3 hideFromPosition = (GetEntity().currentTarget ? GetEntity().currentTarget.transform.position : (GetEntity().transform.position + GetEntity().LastAttackedDir * 30f));
+				float num3 = ((GetEntity().currentTarget != null) ? GetEntity().DistanceToTarget() : 30f);
 				AIInformationZone informationZone = GetEntity().GetInformationZone();
 				if (informationZone != null)
 				{
 					float secondsSinceAttacked = GetEntity().SecondsSinceAttacked;
-					float minRange = (secondsSinceAttacked < 2f) ? 2f : 0f;
+					float minRange = ((secondsSinceAttacked < 2f) ? 2f : 0f);
 					float maxRange = 20f;
 					AICoverPoint bestCoverPoint = informationZone.GetBestCoverPoint(GetEntity().transform.position, hideFromPosition, minRange, maxRange, GetEntity());
 					if ((bool)bestCoverPoint)
 					{
 						bestCoverPoint.SetUsedBy(GetEntity());
 					}
-					Vector3 vector = (bestCoverPoint == null) ? GetEntity().transform.position : bestCoverPoint.transform.position;
+					Vector3 vector = ((bestCoverPoint == null) ? GetEntity().transform.position : bestCoverPoint.transform.position);
 					GetEntity().SetDestination(vector);
 					float num4 = Vector3.Distance(vector, GetEntity().transform.position);
 					GetEntity().DistanceToTarget();
@@ -376,7 +376,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 					int num5;
 					if (secondsSinceAttacked < 4f)
 					{
-						flag2 = (GetEntity().AmmoFractionRemaining() <= 0.25f);
+						flag2 = GetEntity().AmmoFractionRemaining() <= 0.25f;
 					}
 					else
 						num5 = 0;
@@ -384,7 +384,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 					int num6;
 					if (GetEntity().healthFraction < 0.5f && secondsSinceAttacked < 1f)
 					{
-						flag3 = (Time.time > num2);
+						flag3 = Time.time > num2;
 					}
 					else
 						num6 = 0;

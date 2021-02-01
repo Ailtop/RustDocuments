@@ -6,17 +6,17 @@ public class ItemModRFListener : ItemModAssociatedEntity<PagerEntity>
 	{
 		base.ServerCommand(item, command, player);
 		PagerEntity associatedEntity = ItemModAssociatedEntity<PagerEntity>.GetAssociatedEntity(item);
-		if (command == "stop")
+		switch (command)
 		{
+		case "stop":
 			associatedEntity.SetOff();
-		}
-		else if (command == "silenton")
-		{
+			break;
+		case "silenton":
 			associatedEntity.SetSilentMode(true);
-		}
-		else if (command == "silentoff")
-		{
+			break;
+		case "silentoff":
 			associatedEntity.SetSilentMode(false);
+			break;
 		}
 	}
 }

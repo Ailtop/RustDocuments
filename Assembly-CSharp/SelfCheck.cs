@@ -1,6 +1,6 @@
-using Facepunch;
 using System;
 using System.Runtime.InteropServices;
+using Facepunch;
 using UnityEngine;
 
 public static class SelfCheck

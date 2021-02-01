@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using ConVar;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class BaseModifiers

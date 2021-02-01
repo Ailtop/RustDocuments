@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using Oxide.Core;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SurveyCharge : TimedExplosive
@@ -61,7 +61,7 @@ public class SurveyCharge : TimedExplosive
 		}
 		if (flag)
 		{
-			string strPrefab = flag2 ? craterPrefab_Oil.resourcePath : craterPrefab.resourcePath;
+			string strPrefab = (flag2 ? craterPrefab_Oil.resourcePath : craterPrefab.resourcePath);
 			BaseEntity baseEntity = GameManager.server.CreateEntity(strPrefab, point, Quaternion.identity);
 			if ((bool)baseEntity)
 			{

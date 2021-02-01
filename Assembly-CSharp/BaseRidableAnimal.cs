@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -226,7 +226,7 @@ public class BaseRidableAnimal : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Claim ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Claim "));
 				}
 				using (TimeWarning.New("RPC_Claim"))
 				{
@@ -262,7 +262,7 @@ public class BaseRidableAnimal : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_Lead ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Lead "));
 				}
 				using (TimeWarning.New("RPC_Lead"))
 				{
@@ -298,7 +298,7 @@ public class BaseRidableAnimal : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenLoot ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLoot "));
 				}
 				using (TimeWarning.New("RPC_OpenLoot"))
 				{
@@ -634,7 +634,7 @@ public class BaseRidableAnimal : BaseVehicle
 		else
 		{
 			float num = 1f / decayminutes;
-			float num2 = (!IsOutside()) ? 2f : 1f;
+			float num2 = ((!IsOutside()) ? 2f : 1f);
 			Hurt(MaxHealth() * num * num2, DamageType.Decay, this, false);
 		}
 	}
@@ -806,51 +806,54 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public virtual void EatNearbyFood()
 	{
-		if (!(UnityEngine.Time.time < nextEatTime))
+		if (UnityEngine.Time.time < nextEatTime)
 		{
-			float num = StaminaCoreFraction();
-			nextEatTime = UnityEngine.Time.time + UnityEngine.Random.Range(2f, 3f) + Mathf.InverseLerp(0.5f, 1f, num) * 4f;
-			if (!(num >= 1f))
+			return;
+		}
+		float num = StaminaCoreFraction();
+		nextEatTime = UnityEngine.Time.time + UnityEngine.Random.Range(2f, 3f) + Mathf.InverseLerp(0.5f, 1f, num) * 4f;
+		if (num >= 1f)
+		{
+			return;
+		}
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		Vis.Entities(base.transform.position + base.transform.forward * 1.5f, 2f, obj, 67109377);
+		obj.Sort((BaseEntity a, BaseEntity b) => (b is DroppedItem).CompareTo(a is DroppedItem));
+		foreach (BaseEntity item in obj)
+		{
+			if (item.isClient)
 			{
-				List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-				Vis.Entities(base.transform.position + base.transform.forward * 1.5f, 2f, obj, 67109377);
-				obj.Sort((BaseEntity a, BaseEntity b) => (b is DroppedItem).CompareTo(a is DroppedItem));
-				foreach (BaseEntity item in obj)
+				continue;
+			}
+			DroppedItem droppedItem = item as DroppedItem;
+			if ((bool)droppedItem && droppedItem.item != null && droppedItem.item.info.category == ItemCategory.Food)
+			{
+				ItemModConsumable component = droppedItem.item.info.GetComponent<ItemModConsumable>();
+				if ((bool)component)
 				{
-					if (!item.isClient)
+					ReplenishFromFood(component);
+					droppedItem.item.UseItem();
+					if (droppedItem.item.amount <= 0)
 					{
-						DroppedItem droppedItem = item as DroppedItem;
-						if ((bool)droppedItem && droppedItem.item != null && droppedItem.item.info.category == ItemCategory.Food)
-						{
-							ItemModConsumable component = droppedItem.item.info.GetComponent<ItemModConsumable>();
-							if ((bool)component)
-							{
-								ReplenishFromFood(component);
-								droppedItem.item.UseItem();
-								if (droppedItem.item.amount <= 0)
-								{
-									droppedItem.Kill();
-								}
-								break;
-							}
-						}
-						CollectibleEntity collectibleEntity = item as CollectibleEntity;
-						if ((bool)collectibleEntity && collectibleEntity.IsFood())
-						{
-							collectibleEntity.DoPickup(null);
-							break;
-						}
-						GrowableEntity growableEntity = item as GrowableEntity;
-						if ((bool)growableEntity && growableEntity.CanPick())
-						{
-							growableEntity.PickFruit(null);
-							break;
-						}
+						droppedItem.Kill();
 					}
+					break;
 				}
-				Facepunch.Pool.FreeList(ref obj);
+			}
+			CollectibleEntity collectibleEntity = item as CollectibleEntity;
+			if ((bool)collectibleEntity && collectibleEntity.IsFood())
+			{
+				collectibleEntity.DoPickup(null);
+				break;
+			}
+			GrowableEntity growableEntity = item as GrowableEntity;
+			if ((bool)growableEntity && growableEntity.CanPick())
+			{
+				growableEntity.PickFruit(null);
+				break;
 			}
 		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public void SwitchMoveState(RunState newState)
@@ -870,7 +873,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			nextIdealTerrainCheckTime = UnityEngine.Time.time + UnityEngine.Random.Range(1f, 2f);
 			onIdealTerrain = false;
-			if (TerrainMeta.TopologyMap != null && (TerrainMeta.TopologyMap.GetTopology(base.transform.position) & 0x800) != 0)
+			if (TerrainMeta.TopologyMap != null && ((uint)TerrainMeta.TopologyMap.GetTopology(base.transform.position) & 0x800u) != 0)
 			{
 				onIdealTerrain = true;
 			}
@@ -1084,7 +1087,7 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public void UpdateGroundNormal(bool force = false)
 	{
-		if ((UnityEngine.Time.time >= nextGroundNormalUpdateTime) | force)
+		if (UnityEngine.Time.time >= nextGroundNormalUpdateTime || force)
 		{
 			nextGroundNormalUpdateTime = UnityEngine.Time.time + UnityEngine.Random.Range(0.2f, 0.3f);
 			targetUp = averagedUp;
@@ -1297,7 +1300,7 @@ public class BaseRidableAnimal : BaseVehicle
 		float num8 = 1f - Mathf.InverseLerp(20f, 35f, Vector3.Angle(Vector3.up, averagedUp));
 		num7 = num6 * 0.1f + num7 * 0.9f;
 		float num9 = Mathf.Min(Mathf.Clamp01(Mathf.Min(num8 + 0.2f, num7)) * GetRunSpeed(), desiredVelocity);
-		float num10 = (num9 < currentSpeed) ? 3f : 1f;
+		float num10 = ((num9 < currentSpeed) ? 3f : 1f);
 		if (Mathf.Abs(currentSpeed) < 2f && desiredVelocity == 0f)
 		{
 			currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, delta * 3f);
@@ -1355,7 +1358,7 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public bool DropToGround(Vector3 targetPos, bool force = false)
 	{
-		float range = force ? 10000f : (maxStepHeight + maxStepDownHeight);
+		float range = (force ? 10000f : (maxStepHeight + maxStepDownHeight));
 		Vector3 pos;
 		Vector3 normal;
 		if (TransformUtil.GetGroundInfo(targetPos, out pos, out normal, range, 278986753))
@@ -1465,7 +1468,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			float runSpeed2 = runSpeed;
 			float num = Mathf.InverseLerp(maxStaminaSeconds * 0.5f, maxStaminaSeconds, currentMaxStaminaSeconds) * staminaCoreSpeedBonus;
-			float num2 = onIdealTerrain ? roadSpeedBonus : 0f;
+			float num2 = (onIdealTerrain ? roadSpeedBonus : 0f);
 			return runSpeed + num + num2;
 		}
 		return runSpeed;

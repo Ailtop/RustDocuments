@@ -1,4 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using ConVar;
 using Facepunch;
 using Network;
@@ -7,12 +13,6 @@ using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.Registry;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -315,18 +315,20 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	{
 		LogEntry(LogEntryType.Network, 2, "OnNetworkLimitStart");
 		List<Connection> subscribers = GetSubscribers();
-		if (subscribers != null)
+		if (subscribers == null)
 		{
-			subscribers = subscribers.ToList();
-			subscribers.RemoveAll((Connection x) => ShouldNetworkTo(x.player as BasePlayer));
-			OnNetworkSubscribersLeave(subscribers);
-			if (children != null)
-			{
-				foreach (BaseEntity child in children)
-				{
-					child.OnNetworkLimitStart();
-				}
-			}
+			return;
+		}
+		subscribers = subscribers.ToList();
+		subscribers.RemoveAll((Connection x) => ShouldNetworkTo(x.player as BasePlayer));
+		OnNetworkSubscribersLeave(subscribers);
+		if (children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.OnNetworkLimitStart();
 		}
 	}
 
@@ -334,16 +336,18 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	{
 		LogEntry(LogEntryType.Network, 2, "OnNetworkLimitEnd");
 		List<Connection> subscribers = GetSubscribers();
-		if (subscribers != null)
+		if (subscribers == null)
 		{
-			OnNetworkSubscribersEnter(subscribers);
-			if (children != null)
-			{
-				foreach (BaseEntity child in children)
-				{
-					child.OnNetworkLimitEnd();
-				}
-			}
+			return;
+		}
+		OnNetworkSubscribersEnter(subscribers);
+		if (children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.OnNetworkLimitEnd();
 		}
 	}
 
@@ -542,81 +546,84 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public void SendNetworkUpdate(BasePlayer.NetworkQueue queue = BasePlayer.NetworkQueue.Update)
 	{
-		if (!Rust.Application.isLoading && !Rust.Application.isLoadingSave && !IsDestroyed && net != null && isSpawned)
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
 		{
-			using (TimeWarning.New("SendNetworkUpdate"))
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdate"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate");
+			InvalidateNetworkCache();
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null && subscribers.Count > 0)
 			{
-				LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate");
-				InvalidateNetworkCache();
-				List<Connection> subscribers = GetSubscribers();
-				if (subscribers != null && subscribers.Count > 0)
+				for (int i = 0; i < subscribers.Count; i++)
 				{
-					for (int i = 0; i < subscribers.Count; i++)
+					BasePlayer basePlayer = subscribers[i].player as BasePlayer;
+					if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
 					{
-						BasePlayer basePlayer = subscribers[i].player as BasePlayer;
-						if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
-						{
-							basePlayer.QueueUpdate(queue, this);
-						}
+						basePlayer.QueueUpdate(queue, this);
 					}
 				}
 			}
-			OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
 		}
+		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
 	}
 
 	public void SendNetworkUpdateImmediate(bool justCreated = false)
 	{
-		if (!Rust.Application.isLoading && !Rust.Application.isLoadingSave && !IsDestroyed && net != null && isSpawned)
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
 		{
-			using (TimeWarning.New("SendNetworkUpdateImmediate"))
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdateImmediate"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdateImmediate");
+			InvalidateNetworkCache();
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null && subscribers.Count > 0)
 			{
-				LogEntry(LogEntryType.Network, 2, "SendNetworkUpdateImmediate");
-				InvalidateNetworkCache();
-				List<Connection> subscribers = GetSubscribers();
-				if (subscribers != null && subscribers.Count > 0)
+				for (int i = 0; i < subscribers.Count; i++)
 				{
-					for (int i = 0; i < subscribers.Count; i++)
+					Connection connection = subscribers[i];
+					BasePlayer basePlayer = connection.player as BasePlayer;
+					if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
 					{
-						Connection connection = subscribers[i];
-						BasePlayer basePlayer = connection.player as BasePlayer;
-						if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
-						{
-							SendAsSnapshot(connection, justCreated);
-						}
+						SendAsSnapshot(connection, justCreated);
 					}
 				}
 			}
-			OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
 		}
+		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
 	}
 
 	protected void SendNetworkUpdate_Position()
 	{
-		if (!Rust.Application.isLoading && !Rust.Application.isLoadingSave && !IsDestroyed && net != null && isSpawned)
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
 		{
-			using (TimeWarning.New("SendNetworkUpdate_Position"))
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdate_Position"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Position");
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
 			{
-				LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Position");
-				List<Connection> subscribers = GetSubscribers();
-				if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
+				Network.Net.sv.write.PacketID(Message.Type.EntityPosition);
+				Network.Net.sv.write.EntityID(net.ID);
+				Network.Net.sv.write.Vector3(GetNetworkPosition());
+				Network.Net.sv.write.Vector3(GetNetworkRotation().eulerAngles);
+				Network.Net.sv.write.Float(GetNetworkTime());
+				uint uid = parentEntity.uid;
+				if (uid != 0)
 				{
-					Network.Net.sv.write.PacketID(Message.Type.EntityPosition);
-					Network.Net.sv.write.EntityID(net.ID);
-					Network.Net.sv.write.Vector3(GetNetworkPosition());
-					Network.Net.sv.write.Vector3(GetNetworkRotation().eulerAngles);
-					Network.Net.sv.write.Float(GetNetworkTime());
-					uint uid = parentEntity.uid;
-					if (uid != 0)
-					{
-						Network.Net.sv.write.EntityID(uid);
-					}
-					SendInfo sendInfo = new SendInfo(subscribers);
-					sendInfo.method = SendMethod.ReliableUnordered;
-					sendInfo.priority = Priority.Immediate;
-					SendInfo info = sendInfo;
-					Network.Net.sv.write.Send(info);
+					Network.Net.sv.write.EntityID(uid);
 				}
+				SendInfo sendInfo = new SendInfo(subscribers);
+				sendInfo.method = SendMethod.ReliableUnordered;
+				sendInfo.priority = Priority.Immediate;
+				SendInfo info = sendInfo;
+				Network.Net.sv.write.Send(info);
 			}
 		}
 	}
@@ -628,11 +635,11 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			Save(saveInfo);
 			if (saveInfo.msg.baseEntity == null)
 			{
-				Debug.LogError(this + ": ToStream - no BaseEntity!?");
+				Debug.LogError(string.Concat(this, ": ToStream - no BaseEntity!?"));
 			}
 			if (saveInfo.msg.baseNetworkable == null)
 			{
-				Debug.LogError(this + ": ToStream - no baseNetworkable!?");
+				Debug.LogError(string.Concat(this, ": ToStream - no baseNetworkable!?"));
 			}
 			Interface.CallHook("IOnEntitySaved", this, saveInfo);
 			saveInfo.msg.ToProto(stream);
@@ -709,14 +716,15 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	public virtual void UpdateNetworkGroup()
 	{
 		Assert.IsTrue(isServer, "UpdateNetworkGroup called on clientside entity!");
-		if (net != null)
+		if (net == null)
 		{
-			using (TimeWarning.New("UpdateGroups"))
+			return;
+		}
+		using (TimeWarning.New("UpdateGroups"))
+		{
+			if (net.UpdateGroups(base.transform.position))
 			{
-				if (net.UpdateGroups(base.transform.position))
-				{
-					SendNetworkGroupChange();
-				}
+				SendNetworkGroupChange();
 			}
 		}
 	}
@@ -807,33 +815,35 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public void OnNetworkGroupChange()
 	{
-		if (children != null)
+		if (children == null)
 		{
-			foreach (BaseEntity child in children)
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			if (child.ShouldInheritNetworkGroup())
 			{
-				if (child.ShouldInheritNetworkGroup())
-				{
-					child.net.SwitchGroup(net.group);
-				}
-				else if (isServer)
-				{
-					child.UpdateNetworkGroup();
-				}
+				child.net.SwitchGroup(net.group);
+			}
+			else if (isServer)
+			{
+				child.UpdateNetworkGroup();
 			}
 		}
 	}
 
 	public void OnNetworkSubscribersEnter(List<Connection> connections)
 	{
-		if (Network.Net.sv.IsConnected())
+		if (!Network.Net.sv.IsConnected())
 		{
-			foreach (Connection connection in connections)
+			return;
+		}
+		foreach (Connection connection in connections)
+		{
+			BasePlayer basePlayer = connection.player as BasePlayer;
+			if (!(basePlayer == null))
 			{
-				BasePlayer basePlayer = connection.player as BasePlayer;
-				if (!(basePlayer == null))
-				{
-					basePlayer.QueueUpdate(BasePlayer.NetworkQueue.Update, this as BaseEntity);
-				}
+				basePlayer.QueueUpdate(BasePlayer.NetworkQueue.Update, this as BaseEntity);
 			}
 		}
 	}
@@ -907,7 +917,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		}
 		if (!info.forDisk)
 		{
-			info.msg.createdThisFrame = (creationFrame == UnityEngine.Time.frameCount);
+			info.msg.createdThisFrame = creationFrame == UnityEngine.Time.frameCount;
 		}
 	}
 

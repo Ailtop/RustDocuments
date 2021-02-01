@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Oxide.Core;
 using Rust;
 using Rust.Ai;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,7 +29,7 @@ public class ThrownWeapon : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoDrop ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoDrop "));
 				}
 				using (TimeWarning.New("DoDrop"))
 				{
@@ -65,7 +65,7 @@ public class ThrownWeapon : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - DoThrow ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoThrow "));
 				}
 				using (TimeWarning.New("DoThrow"))
 				{
@@ -226,39 +226,40 @@ public class ThrownWeapon : AttackEntity
 		Interface.CallHook("OnExplosiveThrown", msg.player, baseEntity, this);
 		UseItemAmount(1);
 		BasePlayer player = msg.player;
-		if (player != null)
+		if (!(player != null))
 		{
-			TimedExplosive timedExplosive = baseEntity as TimedExplosive;
-			Sensation sensation;
-			if (timedExplosive != null)
+			return;
+		}
+		TimedExplosive timedExplosive = baseEntity as TimedExplosive;
+		Sensation sensation;
+		if (timedExplosive != null)
+		{
+			float num = 0f;
+			foreach (DamageTypeEntry damageType in timedExplosive.damageTypes)
 			{
-				float num = 0f;
-				foreach (DamageTypeEntry damageType in timedExplosive.damageTypes)
-				{
-					num += damageType.amount;
-				}
-				sensation = default(Sensation);
-				sensation.Type = SensationType.ThrownWeapon;
-				sensation.Position = player.transform.position;
-				sensation.Radius = 50f;
-				sensation.DamagePotential = num;
-				sensation.InitiatorPlayer = player;
-				sensation.Initiator = player;
-				sensation.UsedEntity = timedExplosive;
-				Sense.Stimulate(sensation);
+				num += damageType.amount;
 			}
-			else
-			{
-				sensation = default(Sensation);
-				sensation.Type = SensationType.ThrownWeapon;
-				sensation.Position = player.transform.position;
-				sensation.Radius = 50f;
-				sensation.DamagePotential = 0f;
-				sensation.InitiatorPlayer = player;
-				sensation.Initiator = player;
-				sensation.UsedEntity = this;
-				Sense.Stimulate(sensation);
-			}
+			sensation = default(Sensation);
+			sensation.Type = SensationType.ThrownWeapon;
+			sensation.Position = player.transform.position;
+			sensation.Radius = 50f;
+			sensation.DamagePotential = num;
+			sensation.InitiatorPlayer = player;
+			sensation.Initiator = player;
+			sensation.UsedEntity = timedExplosive;
+			Sense.Stimulate(sensation);
+		}
+		else
+		{
+			sensation = default(Sensation);
+			sensation.Type = SensationType.ThrownWeapon;
+			sensation.Position = player.transform.position;
+			sensation.Radius = 50f;
+			sensation.DamagePotential = 0f;
+			sensation.InitiatorPlayer = player;
+			sensation.Initiator = player;
+			sensation.UsedEntity = this;
+			Sense.Stimulate(sensation);
 		}
 	}
 

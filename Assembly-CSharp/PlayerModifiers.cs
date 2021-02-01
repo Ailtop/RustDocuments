@@ -35,16 +35,17 @@ public class PlayerModifiers : BaseModifiers<BasePlayer>
 	public void Load(ProtoBuf.PlayerModifiers m)
 	{
 		RemoveAll();
-		if (m != null && m.modifiers != null)
+		if (m == null || m.modifiers == null)
 		{
-			foreach (ProtoBuf.Modifier modifier2 in m.modifiers)
+			return;
+		}
+		foreach (ProtoBuf.Modifier modifier2 in m.modifiers)
+		{
+			if (modifier2 != null)
 			{
-				if (modifier2 != null)
-				{
-					Modifier modifier = new Modifier();
-					modifier.Init((Modifier.ModifierType)modifier2.type, (Modifier.ModifierSource)modifier2.source, modifier2.value, modifier2.duration, modifier2.timeRemaing);
-					Add(modifier);
-				}
+				Modifier modifier = new Modifier();
+				modifier.Init((Modifier.ModifierType)modifier2.type, (Modifier.ModifierSource)modifier2.source, modifier2.value, modifier2.duration, modifier2.timeRemaing);
+				Add(modifier);
 			}
 		}
 	}

@@ -1,10 +1,10 @@
+using System;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
 using UnityEngine;
 
 public class PlayerMetabolism : BaseMetabolism<BasePlayer>
@@ -72,17 +72,17 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 	internal bool HasChanged()
 	{
 		bool flag = isDirty;
-		flag = (calories.HasChanged() | flag);
-		flag = (hydration.HasChanged() | flag);
-		flag = (heartrate.HasChanged() | flag);
-		flag = (poison.HasChanged() | flag);
-		flag = (radiation_level.HasChanged() | flag);
-		flag = (radiation_poison.HasChanged() | flag);
-		flag = (temperature.HasChanged() | flag);
-		flag = (wetness.HasChanged() | flag);
-		flag = (dirtyness.HasChanged() | flag);
-		flag = (comfort.HasChanged() | flag);
-		return pending_health.HasChanged() | flag;
+		flag = calories.HasChanged() || flag;
+		flag = hydration.HasChanged() || flag;
+		flag = heartrate.HasChanged() || flag;
+		flag = poison.HasChanged() || flag;
+		flag = radiation_level.HasChanged() || flag;
+		flag = radiation_poison.HasChanged() || flag;
+		flag = temperature.HasChanged() || flag;
+		flag = wetness.HasChanged() || flag;
+		flag = dirtyness.HasChanged() || flag;
+		flag = comfort.HasChanged() || flag;
+		return pending_health.HasChanged() || flag;
 	}
 
 	protected override void DoMetabolismDamage(BaseCombatEntity ownerEntity, float delta)

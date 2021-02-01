@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class DamageUtil
@@ -16,27 +16,28 @@ public static class DamageUtil
 			for (int i = 0; i < obj3.Count; i++)
 			{
 				BaseEntity baseEntity = obj3[i];
-				if (baseEntity.isServer && !obj2.Contains(baseEntity))
+				if (!baseEntity.isServer || obj2.Contains(baseEntity))
 				{
-					Vector3 vector = baseEntity.ClosestPoint(pos);
-					float num = Mathf.Clamp01((Vector3.Distance(vector, pos) - minradius) / (radius - minradius));
-					if (!(num > 1f))
+					continue;
+				}
+				Vector3 vector = baseEntity.ClosestPoint(pos);
+				float num = Mathf.Clamp01((Vector3.Distance(vector, pos) - minradius) / (radius - minradius));
+				if (!(num > 1f))
+				{
+					float amount = 1f - num;
+					if (!useLineOfSight || baseEntity.IsVisible(pos))
 					{
-						float amount = 1f - num;
-						if (!useLineOfSight || baseEntity.IsVisible(pos))
-						{
-							HitInfo hitInfo = new HitInfo();
-							hitInfo.Initiator = attackingPlayer;
-							hitInfo.WeaponPrefab = weaponPrefab;
-							hitInfo.damageTypes.Add(damage);
-							hitInfo.damageTypes.ScaleAll(amount);
-							hitInfo.HitPositionWorld = vector;
-							hitInfo.HitNormalWorld = (pos - vector).normalized;
-							hitInfo.PointStart = pos;
-							hitInfo.PointEnd = hitInfo.HitPositionWorld;
-							obj.Add(hitInfo);
-							obj2.Add(baseEntity);
-						}
+						HitInfo hitInfo = new HitInfo();
+						hitInfo.Initiator = attackingPlayer;
+						hitInfo.WeaponPrefab = weaponPrefab;
+						hitInfo.damageTypes.Add(damage);
+						hitInfo.damageTypes.ScaleAll(amount);
+						hitInfo.HitPositionWorld = vector;
+						hitInfo.HitNormalWorld = (pos - vector).normalized;
+						hitInfo.PointStart = pos;
+						hitInfo.PointEnd = hitInfo.HitPositionWorld;
+						obj.Add(hitInfo);
+						obj2.Add(baseEntity);
 					}
 				}
 			}

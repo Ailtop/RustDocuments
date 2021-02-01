@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Network;
 using Oxide.Core;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ConnectionQueue
@@ -17,23 +17,15 @@ public class ConnectionQueue
 
 	public void SkipQueue(ulong userid)
 	{
-		int num = 0;
-		Connection connection;
-		while (true)
+		for (int i = 0; i < queue.Count; i++)
 		{
-			if (num < queue.Count)
+			Connection connection = queue[i];
+			if (connection.userid == userid)
 			{
-				connection = queue[num];
-				if (connection.userid == userid)
-				{
-					break;
-				}
-				num++;
-				continue;
+				JoinGame(connection);
+				break;
 			}
-			return;
 		}
-		JoinGame(connection);
 	}
 
 	internal void Join(Connection connection)

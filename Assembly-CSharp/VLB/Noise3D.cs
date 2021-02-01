@@ -21,7 +21,7 @@ namespace VLB
 			{
 				if (!ms_IsSupportedChecked)
 				{
-					ms_IsSupported = (SystemInfo.graphicsShaderLevel >= 35);
+					ms_IsSupported = SystemInfo.graphicsShaderLevel >= 35;
 					if (!ms_IsSupported)
 					{
 						Debug.LogWarning(isNotSupportedString);

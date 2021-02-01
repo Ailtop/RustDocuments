@@ -1,10 +1,10 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -62,7 +62,7 @@ public class NeonSign : Signage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetAnimationSpeed ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetAnimationSpeed "));
 				}
 				using (TimeWarning.New("SetAnimationSpeed"))
 				{
@@ -102,7 +102,7 @@ public class NeonSign : Signage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UpdateNeonColors ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateNeonColors "));
 				}
 				using (TimeWarning.New("UpdateNeonColors"))
 				{
@@ -149,22 +149,23 @@ public class NeonSign : Signage
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.neonSign != null)
+		if (info.msg.neonSign == null)
 		{
-			if (frameLighting != null)
-			{
-				foreach (ProtoBuf.NeonSign.Lights item in frameLighting)
-				{
-					ProtoBuf.NeonSign.Lights obj = item;
-					Facepunch.Pool.Free(ref obj);
-				}
-				Facepunch.Pool.FreeList(ref frameLighting);
-			}
-			frameLighting = info.msg.neonSign.frameLighting;
-			info.msg.neonSign.frameLighting = null;
-			currentFrame = Mathf.Clamp(info.msg.neonSign.currentFrame, 0, paintableSources.Length);
-			animationSpeed = Mathf.Clamp(info.msg.neonSign.animationSpeed, 0.5f, 5f);
+			return;
 		}
+		if (frameLighting != null)
+		{
+			foreach (ProtoBuf.NeonSign.Lights item in frameLighting)
+			{
+				ProtoBuf.NeonSign.Lights obj = item;
+				Facepunch.Pool.Free(ref obj);
+			}
+			Facepunch.Pool.FreeList(ref frameLighting);
+		}
+		frameLighting = info.msg.neonSign.frameLighting;
+		info.msg.neonSign.frameLighting = null;
+		currentFrame = Mathf.Clamp(info.msg.neonSign.currentFrame, 0, paintableSources.Length);
+		animationSpeed = Mathf.Clamp(info.msg.neonSign.animationSpeed, 0.5f, 5f);
 	}
 
 	public override void ServerInit()
@@ -247,7 +248,7 @@ public class NeonSign : Signage
 	[RPC_Server.CallsPerSecond(5uL)]
 	public void SetAnimationSpeed(RPCMessage msg)
 	{
-		float num = animationSpeed = Mathf.Clamp(msg.read.Float(), 0.5f, 5f);
+		float num = (animationSpeed = Mathf.Clamp(msg.read.Float(), 0.5f, 5f));
 		if (isAnimating)
 		{
 			CancelInvoke(animationLoopAction);

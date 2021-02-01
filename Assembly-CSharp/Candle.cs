@@ -1,8 +1,8 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
 using Rust;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -21,7 +21,7 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetWantsOn ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetWantsOn "));
 				}
 				using (TimeWarning.New("SetWantsOn"))
 				{

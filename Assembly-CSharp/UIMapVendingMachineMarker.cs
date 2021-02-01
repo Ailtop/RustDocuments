@@ -44,6 +44,6 @@ public class UIMapVendingMachineMarker : MonoBehaviour
 				}
 			}
 		}
-		toolTip.enabled = (toolTip.Text != "");
+		toolTip.enabled = toolTip.Text != "";
 	}
 }

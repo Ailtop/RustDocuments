@@ -1,6 +1,6 @@
-using Rust.Ai.HTN.Sensors;
 using System;
 using System.Collections.Generic;
+using Rust.Ai.HTN.Sensors;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.Bear.Sensors

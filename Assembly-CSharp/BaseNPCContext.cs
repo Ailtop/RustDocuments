@@ -9,6 +9,6 @@ public class BaseNPCContext : BaseContext
 	public BaseNPCContext(IAIAgent agent)
 		: base(agent)
 	{
-		Human = (agent as NPCPlayerApex);
+		Human = agent as NPCPlayerApex;
 	}
 }

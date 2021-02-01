@@ -73,7 +73,7 @@ public class ImpostorInstanceData
 			Transform transform = Renderer.transform;
 			Vector3 position = transform.position;
 			Vector3 lossyScale = transform.lossyScale;
-			float w = Renderer.enabled ? lossyScale.x : (0f - lossyScale.x);
+			float w = (Renderer.enabled ? lossyScale.x : (0f - lossyScale.x));
 			positionAndScale = new Vector4(position.x, position.y, position.z, w);
 		}
 		return positionAndScale;

@@ -1,5 +1,5 @@
-using ProtoBuf;
 using System.Text;
+using ProtoBuf;
 
 public static class GrowableGeneEncoding
 {

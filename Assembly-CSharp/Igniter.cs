@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Facepunch;
 using Rust;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Igniter : IOEntity
@@ -42,22 +42,23 @@ public class Igniter : IOEntity
 		int num = 0;
 		foreach (BaseEntity item in obj)
 		{
-			if (!item.HasFlag(Flags.On) && item.IsVisible(LineOfSightEyes.position))
+			if (item.HasFlag(Flags.On) || !item.IsVisible(LineOfSightEyes.position))
 			{
-				IIgniteable igniteable;
-				if (item.isServer && item is BaseOven)
+				continue;
+			}
+			IIgniteable igniteable;
+			if (item.isServer && item is BaseOven)
+			{
+				(item as BaseOven).StartCooking();
+				if (item.HasFlag(Flags.On))
 				{
-					(item as BaseOven).StartCooking();
-					if (item.HasFlag(Flags.On))
-					{
-						num++;
-					}
-				}
-				else if (item.isServer && (igniteable = (item as IIgniteable)) != null && igniteable.CanIgnite())
-				{
-					igniteable.Ignite();
 					num++;
 				}
+			}
+			else if (item.isServer && (igniteable = item as IIgniteable) != null && igniteable.CanIgnite())
+			{
+				igniteable.Ignite();
+				num++;
 			}
 		}
 		Pool.FreeList(ref obj);

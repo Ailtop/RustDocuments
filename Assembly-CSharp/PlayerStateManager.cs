@@ -1,7 +1,7 @@
+using System;
 using Facepunch;
 using Network;
 using ProtoBuf;
-using System;
 using UnityEngine;
 
 public class PlayerStateManager

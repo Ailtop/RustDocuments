@@ -173,7 +173,7 @@ public class PositionLerp : IDisposable
 			return;
 		}
 		float interpolationInertia = target.GetInterpolationInertia();
-		float num = (interpolationInertia > 0f) ? Mathf.InverseLerp(0f, interpolationInertia, Time.time - enabledTime) : 1f;
+		float num = ((interpolationInertia > 0f) ? Mathf.InverseLerp(0f, interpolationInertia, Time.time - enabledTime) : 1f);
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolation = target.GetInterpolationDelay() * num;
 		float num2 = target.GetInterpolationSmoothing() * num;

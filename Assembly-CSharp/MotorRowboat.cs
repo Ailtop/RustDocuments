@@ -1,12 +1,12 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -135,7 +135,7 @@ public class MotorRowboat : BaseBoat
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_EngineToggle ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_EngineToggle "));
 				}
 				using (TimeWarning.New("RPC_EngineToggle"))
 				{
@@ -164,7 +164,7 @@ public class MotorRowboat : BaseBoat
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - RPC_OpenFuel ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -410,7 +410,7 @@ public class MotorRowboat : BaseBoat
 		}
 		if (EngineOn())
 		{
-			float num5 = HasFlag(Flags.Reserved2) ? 1f : 0.0333f;
+			float num5 = (HasFlag(Flags.Reserved2) ? 1f : 0.0333f);
 			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime * num5, fuelPerSec);
 			timeSinceLastUsedFuel = 0f;
 		}

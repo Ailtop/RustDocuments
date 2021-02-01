@@ -233,7 +233,7 @@ public class WaterDynamics : MonoBehaviour
 
 		private RenderTexture CreateRenderTexture(int size)
 		{
-			RenderTextureFormat format = SystemInfoEx.SupportsRenderTextureFormat(RenderTextureFormat.RHalf) ? RenderTextureFormat.RHalf : RenderTextureFormat.RFloat;
+			RenderTextureFormat format = (SystemInfoEx.SupportsRenderTextureFormat(RenderTextureFormat.RHalf) ? RenderTextureFormat.RHalf : RenderTextureFormat.RFloat);
 			RenderTexture renderTexture = new RenderTexture(size, size, 0, format, RenderTextureReadWrite.Linear);
 			renderTexture.filterMode = FilterMode.Bilinear;
 			renderTexture.wrapMode = TextureWrapMode.Clamp;
@@ -457,11 +457,11 @@ public class WaterDynamics : MonoBehaviour
 				}
 			}
 		}
-		num = ((num + 255) & -256);
-		num2 = ((num2 + 255) & -256);
-		int num11 = (!IsTopLeft(p1, p2)) ? (-1) : 0;
-		int num12 = (!IsTopLeft(p2, p0)) ? (-1) : 0;
-		int num13 = (!IsTopLeft(p0, p1)) ? (-1) : 0;
+		num = (num + 255) & -256;
+		num2 = (num2 + 255) & -256;
+		int num11 = ((!IsTopLeft(p1, p2)) ? (-1) : 0);
+		int num12 = ((!IsTopLeft(p2, p0)) ? (-1) : 0);
+		int num13 = ((!IsTopLeft(p0, p1)) ? (-1) : 0);
 		Point2D c = new Point2D(num, num2);
 		int num14 = EdgeFunction(p1, p2, c) + num11;
 		int num15 = EdgeFunction(p2, p0, c) + num12;
@@ -492,8 +492,8 @@ public class WaterDynamics : MonoBehaviour
 			{
 				if ((num32 | num33 | num34) >= 0)
 				{
-					int num37 = (num35 > 0) ? num35 : 0;
-					int num38 = (num36 > 0) ? num36 : 0;
+					int num37 = ((num35 > 0) ? num35 : 0);
+					int num38 = ((num36 > 0) ? num36 : 0);
 					int num39 = num37 >> 16;
 					int num40 = num38 >> 16;
 					byte b = (byte)((num37 & 0xFFFF) >> 8);
@@ -502,8 +502,8 @@ public class WaterDynamics : MonoBehaviour
 					num40 = ((num40 > 0) ? num40 : 0);
 					num39 = ((num39 < maxWidth) ? num39 : maxWidth);
 					num40 = ((num40 < maxHeight) ? num40 : maxHeight);
-					int num41 = (num39 < maxWidth) ? 1 : 0;
-					int num42 = (num40 < maxHeight) ? width : 0;
+					int num41 = ((num39 < maxWidth) ? 1 : 0);
+					int num42 = ((num40 < maxHeight) ? width : 0);
 					int num43 = (num40 << widthShift) + num39;
 					int num44 = num43 + num41;
 					int num45 = num43 + num42;

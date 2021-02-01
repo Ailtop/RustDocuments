@@ -69,7 +69,7 @@ public class Modifier
 	public void Tick(BaseCombatEntity ownerEntity, float delta)
 	{
 		TimeRemaining -= delta;
-		Expired = (TimeRemaining <= 0f);
+		Expired = TimeRemaining <= 0f;
 	}
 
 	public ProtoBuf.Modifier Save()

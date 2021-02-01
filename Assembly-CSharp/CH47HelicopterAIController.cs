@@ -256,17 +256,18 @@ public class CH47HelicopterAIController : CH47Helicopter
 		Invoke(UnHostile, 120f);
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			if (mountPoint.mountable != null)
+			if (!(mountPoint.mountable != null))
 			{
-				BasePlayer mounted = mountPoint.mountable.GetMounted();
-				if ((bool)mounted)
+				continue;
+			}
+			BasePlayer mounted = mountPoint.mountable.GetMounted();
+			if ((bool)mounted)
+			{
+				NPCPlayerApex nPCPlayerApex = mounted as NPCPlayerApex;
+				if ((bool)nPCPlayerApex)
 				{
-					NPCPlayerApex nPCPlayerApex = mounted as NPCPlayerApex;
-					if ((bool)nPCPlayerApex)
-					{
-						nPCPlayerApex.Stats.Hostility = 1f;
-						nPCPlayerApex.Stats.Defensiveness = 1f;
-					}
+					nPCPlayerApex.Stats.Hostility = 1f;
+					nPCPlayerApex.Stats.Defensiveness = 1f;
 				}
 			}
 		}
@@ -276,17 +277,18 @@ public class CH47HelicopterAIController : CH47Helicopter
 	{
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			if (mountPoint.mountable != null)
+			if (!(mountPoint.mountable != null))
 			{
-				BasePlayer mounted = mountPoint.mountable.GetMounted();
-				if ((bool)mounted)
+				continue;
+			}
+			BasePlayer mounted = mountPoint.mountable.GetMounted();
+			if ((bool)mounted)
+			{
+				NPCPlayerApex nPCPlayerApex = mounted as NPCPlayerApex;
+				if ((bool)nPCPlayerApex)
 				{
-					NPCPlayerApex nPCPlayerApex = mounted as NPCPlayerApex;
-					if ((bool)nPCPlayerApex)
-					{
-						nPCPlayerApex.Stats.Hostility = 0f;
-						nPCPlayerApex.Stats.Defensiveness = 0f;
-					}
+					nPCPlayerApex.Stats.Hostility = 0f;
+					nPCPlayerApex.Stats.Defensiveness = 0f;
 				}
 			}
 		}
@@ -381,7 +383,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 		float num2 = Mathf.Max(y, num + hoverHeight);
 		if (altitudeProtection)
 		{
-			Vector3 rhs = (rigidBody.velocity.magnitude < 0.1f) ? base.transform.forward : rigidBody.velocity.normalized;
+			Vector3 rhs = ((rigidBody.velocity.magnitude < 0.1f) ? base.transform.forward : rigidBody.velocity.normalized);
 			Vector3 normalized = (Vector3.Cross(Vector3.Cross(base.transform.up, rhs), Vector3.up) + Vector3.down * 0.3f).normalized;
 			RaycastHit hitInfo;
 			RaycastHit hitInfo2;
@@ -442,8 +444,8 @@ public class CH47HelicopterAIController : CH47Helicopter
 		currentInputState.roll += num15 * ((num < 0f) ? (-1f) : 1f);
 		if (aimDirOverride || num3 > 30f)
 		{
-			Vector3 rhs = aimDirOverride ? GetAimDirectionOverride() : Vector3Ex.Direction2D(GetMoveTarget(), base.transform.position);
-			Vector3 to = aimDirOverride ? GetAimDirectionOverride() : Vector3Ex.Direction2D(GetMoveTarget(), base.transform.position);
+			Vector3 rhs = (aimDirOverride ? GetAimDirectionOverride() : Vector3Ex.Direction2D(GetMoveTarget(), base.transform.position));
+			Vector3 to = (aimDirOverride ? GetAimDirectionOverride() : Vector3Ex.Direction2D(GetMoveTarget(), base.transform.position));
 			float num16 = Vector3.Dot(vector2, rhs);
 			float f = Vector3.Angle(vector, to);
 			float num17 = Mathf.InverseLerp(0f, 70f, Mathf.Abs(f));

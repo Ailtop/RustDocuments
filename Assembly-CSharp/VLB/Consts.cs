@@ -142,7 +142,7 @@ namespace VLB
 				{
 					return HideFlags.HideAndDontSave;
 				}
-				return HideFlags.DontSaveInEditor | HideFlags.NotEditable | HideFlags.DontSaveInBuild | HideFlags.DontUnloadUnusedAsset;
+				return HideFlags.DontSave | HideFlags.NotEditable;
 			}
 		}
 	}

@@ -24,10 +24,12 @@ namespace UnityStandardAssets.CinematicEffects
 				if (!m_TemporaryRTs.Contains(rt))
 				{
 					Debug.LogErrorFormat("Attempting to remove texture that was not allocated: {0}", rt);
-					return;
 				}
-				m_TemporaryRTs.Remove(rt);
-				RenderTexture.ReleaseTemporary(rt);
+				else
+				{
+					m_TemporaryRTs.Remove(rt);
+					RenderTexture.ReleaseTemporary(rt);
+				}
 			}
 		}
 

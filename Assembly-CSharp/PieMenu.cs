@@ -1,7 +1,7 @@
-using Facepunch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -163,27 +163,21 @@ public class PieMenu : UIBehaviour
 	public void SetDefaultOption()
 	{
 		defaultOption = null;
-		int num = 0;
-		while (true)
+		for (int i = 0; i < options.Length; i++)
 		{
-			if (num >= options.Length)
-			{
-				return;
-			}
-			if (!options[num].disabled)
+			if (!options[i].disabled)
 			{
 				if (defaultOption == null)
 				{
-					defaultOption = options[num];
+					defaultOption = options[i];
 				}
-				if (options[num].selected)
+				if (options[i].selected)
 				{
+					defaultOption = options[i];
 					break;
 				}
 			}
-			num++;
 		}
-		defaultOption = options[num];
 	}
 
 	public void PlayOpenSound()
@@ -254,11 +248,11 @@ public class PieMenu : UIBehaviour
 				{
 					if (i > 0)
 					{
-						flag |= (options[i].order == options[i - 1].order);
+						flag |= options[i].order == options[i - 1].order;
 					}
 					if (i < options.Length - 1)
 					{
-						flag |= (options[i].order == options[i + 1].order);
+						flag |= options[i].order == options[i + 1].order;
 					}
 				}
 				options[i].wantsMerge = flag;
@@ -272,8 +266,8 @@ public class PieMenu : UIBehaviour
 			float num7 = startRadius - radiusSize / (float)num4 * 0.25f;
 			for (int j = 0; j < options.Length; j++)
 			{
-				float num8 = options[j].wantsMerge ? 0.8f : 1f;
-				float num9 = options[j].wantsMerge ? num5 : num6;
+				float num8 = (options[j].wantsMerge ? 0.8f : 1f);
+				float num9 = (options[j].wantsMerge ? num5 : num6);
 				GameObject gameObject = Facepunch.Instantiate.GameObject(pieOptionPrefab);
 				gameObject.transform.SetParent(optionsCanvas.transform, false);
 				options[j].option = gameObject.GetComponent<PieOption>();

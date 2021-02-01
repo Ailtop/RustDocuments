@@ -1,6 +1,3 @@
-using ConVar;
-using Oxide.Core;
-using ProtoBuf;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ConVar;
+using Oxide.Core;
+using ProtoBuf;
 using UnityEngine;
 
 public static class World
@@ -136,10 +136,10 @@ public static class World
 
 	public static void CleanupOldFiles()
 	{
-		Regex regex = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
+		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
 		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 202 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
-			where regex.IsMatch(path) && !regex2.IsMatch(path)
+			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
 		{
 			try

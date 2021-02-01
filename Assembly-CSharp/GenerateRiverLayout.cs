@@ -36,7 +36,7 @@ public class GenerateRiverLayout : ProceduralComponent
 			for (float num2 = TerrainMeta.Position.x; num2 < TerrainMeta.Position.x + TerrainMeta.Size.x; num2 += 50f)
 			{
 				Vector3 vector = new Vector3(num2, 0f, num);
-				float num3 = vector.y = heightMap.GetHeight(vector);
+				float num3 = (vector.y = heightMap.GetHeight(vector));
 				if (vector.y <= 5f)
 				{
 					continue;
@@ -104,7 +104,7 @@ public class GenerateRiverLayout : ProceduralComponent
 		}
 		list.Sort((PathList a, PathList b) => b.Path.Points.Length.CompareTo(a.Path.Points.Length));
 		int num8 = Mathf.RoundToInt(10f * TerrainMeta.Size.x * TerrainMeta.Size.z * 1E-06f);
-		int num9 = Mathf.NextPowerOfTwo((int)((float)(double)World.Size / 24f));
+		int num9 = Mathf.NextPowerOfTwo((int)((float)World.Size / 24f));
 		bool[,] array = new bool[num9, num9];
 		for (int j = 0; j < list.Count; j++)
 		{

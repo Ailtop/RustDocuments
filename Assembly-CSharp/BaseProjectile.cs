@@ -1,4 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using EasyAntiCheat.Server.Cerberus;
 using EasyAntiCheat.Server.Hydra;
@@ -9,9 +12,6 @@ using ProtoBuf;
 using Rust;
 using Rust.Ai;
 using Rust.Ai.HTN;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -290,7 +290,7 @@ public class BaseProjectile : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - CLProject ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - CLProject "));
 				}
 				using (TimeWarning.New("CLProject"))
 				{
@@ -330,7 +330,7 @@ public class BaseProjectile : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - Reload ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Reload "));
 				}
 				using (TimeWarning.New("Reload"))
 				{
@@ -366,7 +366,7 @@ public class BaseProjectile : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - ServerFractionalReloadInsert ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerFractionalReloadInsert "));
 				}
 				using (TimeWarning.New("ServerFractionalReloadInsert"))
 				{
@@ -402,7 +402,7 @@ public class BaseProjectile : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - StartReload ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartReload "));
 				}
 				using (TimeWarning.New("StartReload"))
 				{
@@ -438,7 +438,7 @@ public class BaseProjectile : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SwitchAmmoTo ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SwitchAmmoTo "));
 				}
 				using (TimeWarning.New("SwitchAmmoTo"))
 				{
@@ -578,8 +578,8 @@ public class BaseProjectile : AttackEntity
 	{
 		float num = UnityEngine.Time.time * (aimSwaySpeed * 1f + aiAimSwayOffset);
 		float num2 = Mathf.Sin(UnityEngine.Time.time * 2f);
-		float num3 = (num2 < 0f) ? (1f - Mathf.Clamp(Mathf.Abs(num2) / 1f, 0f, 1f)) : 1f;
-		float num4 = false ? 0.6f : 1f;
+		float num3 = ((num2 < 0f) ? (1f - Mathf.Clamp(Mathf.Abs(num2) / 1f, 0f, 1f)) : 1f);
+		float num4 = (false ? 0.6f : 1f);
 		float num5 = (aimSway * 1f + aiAimSwayOffset) * num4 * num3 * swayModifier;
 		eulerInput.y += (Mathf.PerlinNoise(num, num) - 0.5f) * num5 * UnityEngine.Time.deltaTime;
 		eulerInput.x += (Mathf.PerlinNoise(num + 0.1f, num + 0.2f) - 0.5f) * num5 * UnityEngine.Time.deltaTime;
@@ -639,7 +639,7 @@ public class BaseProjectile : AttackEntity
 			}
 		}
 		StartAttackCooldown(repeatDelay);
-		UnityEngine.Vector3 vector = flag ? ownerPlayer.eyes.position : MuzzlePoint.transform.position;
+		UnityEngine.Vector3 vector = (flag ? ownerPlayer.eyes.position : MuzzlePoint.transform.position);
 		UnityEngine.Vector3 inputVec = MuzzlePoint.transform.forward;
 		if (originOverride != null)
 		{
@@ -673,7 +673,7 @@ public class BaseProjectile : AttackEntity
 		}
 		for (int i = 0; i < component.numProjectiles; i++)
 		{
-			UnityEngine.Vector3 vector2 = (!flag3) ? AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + GetAimCone() + GetAIAimcone() * 1f, inputVec) : AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + aimCone, inputVec);
+			UnityEngine.Vector3 vector2 = ((!flag3) ? AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + GetAimCone() + GetAIAimcone() * 1f, inputVec) : AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + aimCone, inputVec));
 			List<RaycastHit> obj = Facepunch.Pool.GetList<RaycastHit>();
 			GamePhysics.TraceAll(new Ray(vector, vector2), 0f, obj, 300f, 1219701505);
 			for (int j = 0; j < obj.Count; j++)
@@ -724,7 +724,7 @@ public class BaseProjectile : AttackEntity
 				}
 			}
 			Facepunch.Pool.FreeList(ref obj);
-			UnityEngine.Vector3 b = (flag && ownerPlayer.isMounted) ? (vector2 * 6f) : UnityEngine.Vector3.zero;
+			UnityEngine.Vector3 b = ((flag && ownerPlayer.isMounted) ? (vector2 * 6f) : UnityEngine.Vector3.zero);
 			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + b, vector2 * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
 		}
 	}
@@ -795,14 +795,15 @@ public class BaseProjectile : AttackEntity
 	public override void SetLightsOn(bool isOn)
 	{
 		base.SetLightsOn(isOn);
-		if (children != null)
+		if (children == null)
 		{
-			foreach (ProjectileWeaponMod item in from ProjectileWeaponMod x in children
-				where x != null && x.isLight
-				select x)
-			{
-				item.SetFlag(Flags.On, isOn);
-			}
+			return;
+		}
+		foreach (ProjectileWeaponMod item in from ProjectileWeaponMod x in children
+			where x != null && x.isLight
+			select x)
+		{
+			item.SetFlag(Flags.On, isOn);
 		}
 	}
 

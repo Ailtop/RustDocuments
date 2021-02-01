@@ -1,6 +1,6 @@
-using ConVar;
 using System;
 using System.Linq;
+using ConVar;
 using UnityEngine;
 
 public class Poolable : MonoBehaviour, IClientComponent, IPrefabPostProcess
@@ -171,21 +171,19 @@ public class Poolable : MonoBehaviour, IClientComponent, IPrefabPostProcess
 					obj.Stop();
 					obj.Clear();
 				}
+				return;
 			}
-			else
+			for (int k = 0; k < particles.Length; k++)
 			{
-				for (int k = 0; k < particles.Length; k++)
+				ParticleSystem particleSystem = particles[k];
+				if (particleSystem.playOnAwake)
 				{
-					ParticleSystem particleSystem = particles[k];
-					if (particleSystem.playOnAwake)
-					{
-						particleSystem.Play();
-					}
+					particleSystem.Play();
 				}
-				for (int l = 0; l < behaviours.Length; l++)
-				{
-					behaviours[l].enabled = behaviourStates[l];
-				}
+			}
+			for (int l = 0; l < behaviours.Length; l++)
+			{
+				behaviours[l].enabled = behaviourStates[l];
 			}
 		}
 		catch (Exception ex)

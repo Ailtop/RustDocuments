@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
 using Rust.Ai;
 using Rust.AI;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -582,29 +582,30 @@ public class HumanNPC : NPCPlayer, IThinker
 		AIMovePoint result = null;
 		foreach (AIMovePoint movePoint in informationZone.movePoints)
 		{
-			if (movePoint.transform.parent.gameObject.activeSelf)
+			if (!movePoint.transform.parent.gameObject.activeSelf)
 			{
-				float num2 = 0f;
-				float value = Vector3.Dot(eyes.BodyForward(), Vector3Ex.Direction2D(movePoint.transform.position, eyes.position));
-				num2 += Mathf.InverseLerp(-1f, 1f, value) * 100f;
-				float num3 = Vector3.Distance(base.transform.position, movePoint.transform.position);
-				if (!movePoint.IsUsedForRoaming())
+				continue;
+			}
+			float num2 = 0f;
+			float value = Vector3.Dot(eyes.BodyForward(), Vector3Ex.Direction2D(movePoint.transform.position, eyes.position));
+			num2 += Mathf.InverseLerp(-1f, 1f, value) * 100f;
+			float num3 = Vector3.Distance(base.transform.position, movePoint.transform.position);
+			if (!movePoint.IsUsedForRoaming())
+			{
+				num2 += 1000f;
+			}
+			float num4 = Mathf.Abs(base.transform.position.y - movePoint.transform.position.y);
+			num2 += (1f - Mathf.InverseLerp(1f, 10f, num4)) * 100f;
+			if (!(movePoint.transform.position.y < WaterSystem.OceanLevel) && (!(base.transform.position.y >= WaterSystem.OceanLevel) || !(num4 > 5f)))
+			{
+				if (num3 > 5f)
 				{
-					num2 += 1000f;
+					num2 += (1f - Mathf.InverseLerp(5f, 20f, num3)) * 50f;
 				}
-				float num4 = Mathf.Abs(base.transform.position.y - movePoint.transform.position.y);
-				num2 += (1f - Mathf.InverseLerp(1f, 10f, num4)) * 100f;
-				if (!(movePoint.transform.position.y < WaterSystem.OceanLevel) && (!(base.transform.position.y >= WaterSystem.OceanLevel) || !(num4 > 5f)))
+				if (num2 > num)
 				{
-					if (num3 > 5f)
-					{
-						num2 += (1f - Mathf.InverseLerp(5f, 20f, num3)) * 50f;
-					}
-					if (num2 > num)
-					{
-						result = movePoint;
-						num = num2;
-					}
+					result = movePoint;
+					num = num2;
 				}
 			}
 		}

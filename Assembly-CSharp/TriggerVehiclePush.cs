@@ -47,37 +47,39 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 
 	public void FixedUpdate()
 	{
-		if (!(thisEntity == null) && entityContents != null)
+		if (thisEntity == null || entityContents == null)
 		{
-			Vector3 position = base.transform.position;
-			foreach (BaseEntity entityContent in entityContents)
+			return;
+		}
+		Vector3 position = base.transform.position;
+		foreach (BaseEntity entityContent in entityContents)
+		{
+			if (!BaseEntityEx.IsValid(entityContent) || entityContent.EqualNetID(thisEntity))
 			{
-				if (BaseEntityEx.IsValid(entityContent) && !entityContent.EqualNetID(thisEntity))
+				continue;
+			}
+			Rigidbody rigidbody = entityContent.GetComponent<Rigidbody>();
+			if (rigidbody == null && allowParentRigidbody)
+			{
+				rigidbody = entityContent.GetComponentInParent<Rigidbody>();
+			}
+			if ((bool)rigidbody && !rigidbody.isKinematic)
+			{
+				float value = Vector3Ex.Distance2D(useRigidbodyPosition ? rigidbody.transform.position : entityContent.transform.position, base.transform.position);
+				float d = 1f - Mathf.InverseLerp(minRadius, maxRadius, value);
+				float num = 1f - Mathf.InverseLerp(minRadius - 1f, minRadius, value);
+				Vector3 vector = entityContent.ClosestPoint(position);
+				Vector3 vector2 = Vector3Ex.Direction2D(vector, position);
+				vector2 = Vector3Ex.Direction2D(useCentreOfMass ? rigidbody.worldCenterOfMass : vector, position);
+				if (snapToAxis)
 				{
-					Rigidbody rigidbody = entityContent.GetComponent<Rigidbody>();
-					if (rigidbody == null && allowParentRigidbody)
-					{
-						rigidbody = entityContent.GetComponentInParent<Rigidbody>();
-					}
-					if ((bool)rigidbody && !rigidbody.isKinematic)
-					{
-						float value = Vector3Ex.Distance2D(useRigidbodyPosition ? rigidbody.transform.position : entityContent.transform.position, base.transform.position);
-						float d = 1f - Mathf.InverseLerp(minRadius, maxRadius, value);
-						float num = 1f - Mathf.InverseLerp(minRadius - 1f, minRadius, value);
-						Vector3 vector = entityContent.ClosestPoint(position);
-						Vector3 vector2 = Vector3Ex.Direction2D(vector, position);
-						vector2 = Vector3Ex.Direction2D(useCentreOfMass ? rigidbody.worldCenterOfMass : vector, position);
-						if (snapToAxis)
-						{
-							Vector3 from = base.transform.InverseTransformDirection(vector2);
-							vector2 = ((!(Vector3.Angle(from, axisToSnapTo) < Vector3.Angle(from, -axisToSnapTo))) ? (-base.transform.TransformDirection(axisToSnapTo)) : base.transform.TransformDirection(axisToSnapTo));
-						}
-						rigidbody.AddForceAtPosition(vector2 * maxPushVelocity * d, vector, ForceMode.Acceleration);
-						if (num > 0f)
-						{
-							rigidbody.AddForceAtPosition(vector2 * 1f * num, vector, ForceMode.VelocityChange);
-						}
-					}
+					Vector3 from = base.transform.InverseTransformDirection(vector2);
+					vector2 = ((!(Vector3.Angle(from, axisToSnapTo) < Vector3.Angle(from, -axisToSnapTo))) ? (-base.transform.TransformDirection(axisToSnapTo)) : base.transform.TransformDirection(axisToSnapTo));
+				}
+				rigidbody.AddForceAtPosition(vector2 * maxPushVelocity * d, vector, ForceMode.Acceleration);
+				if (num > 0f)
+				{
+					rigidbody.AddForceAtPosition(vector2 * 1f * num, vector, ForceMode.VelocityChange);
 				}
 			}
 		}

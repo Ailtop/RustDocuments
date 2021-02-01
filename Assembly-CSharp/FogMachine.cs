@@ -1,7 +1,7 @@
 #define UNITY_ASSERTIONS
+using System;
 using ConVar;
 using Network;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -186,7 +186,7 @@ public class FogMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetFogOff ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetFogOff "));
 				}
 				using (TimeWarning.New("SetFogOff"))
 				{
@@ -222,7 +222,7 @@ public class FogMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetFogOn ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetFogOn "));
 				}
 				using (TimeWarning.New("SetFogOn"))
 				{
@@ -258,7 +258,7 @@ public class FogMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - SetMotionDetection ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetMotionDetection "));
 				}
 				using (TimeWarning.New("SetMotionDetection"))
 				{

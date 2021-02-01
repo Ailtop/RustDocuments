@@ -1,12 +1,12 @@
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Text;
 using CompanionServer.Handlers;
 using ConVar;
 using Facepunch;
 using Newtonsoft.Json;
 using ProtoBuf;
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Text;
 using UnityEngine;
 
 namespace CompanionServer
@@ -99,16 +99,15 @@ namespace CompanionServer
 				}
 				StringContent content = new StringContent(serverToken, Encoding.UTF8, "text/plain");
 				HttpResponseMessage httpResponseMessage = await Http.PostAsync("https://companion-rust.facepunch.com/api/server/refresh", content);
-				if (!httpResponseMessage.IsSuccessStatusCode)
+				if (httpResponseMessage.IsSuccessStatusCode)
 				{
-					Debug.LogWarning("Failed to refresh server ID - registering a new one");
-					goto IL_0185;
+					SetServerRegistration(await httpResponseMessage.Content.ReadAsStringAsync());
+					return;
 				}
-				SetServerRegistration(await httpResponseMessage.Content.ReadAsStringAsync());
-				goto end_IL_001e;
+				Debug.LogWarning("Failed to refresh server ID - registering a new one");
+				goto IL_0185;
 				IL_0185:
 				SetServerRegistration(await Http.GetStringAsync("https://companion-rust.facepunch.com/api/server/register"));
-				end_IL_001e:;
 			}
 			catch (Exception arg)
 			{

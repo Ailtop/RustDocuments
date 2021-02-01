@@ -48,13 +48,13 @@ public class AIHelicopterAnimation : MonoBehaviour
 		float num4 = 1f - Mathf.Clamp01(num2 / degreeMax);
 		float num5 = 1f - Mathf.Clamp01(num3 / degreeMax);
 		float b = (num4 - num5) * num;
-		float num6 = lastForwardBackScalar = Mathf.Lerp(lastForwardBackScalar, b, Time.deltaTime * 2f);
+		float num6 = (lastForwardBackScalar = Mathf.Lerp(lastForwardBackScalar, b, Time.deltaTime * 2f));
 		float num7 = Vector3.Angle(moveDirection, base.transform.right);
 		float num8 = Vector3.Angle(moveDirection, -base.transform.right);
 		float num9 = 1f - Mathf.Clamp01(num7 / degreeMax);
 		float num10 = 1f - Mathf.Clamp01(num8 / degreeMax);
 		float b2 = (num9 - num10) * num;
-		float num11 = lastStrafeScalar = Mathf.Lerp(lastStrafeScalar, b2, Time.deltaTime * 2f);
+		float num11 = (lastStrafeScalar = Mathf.Lerp(lastStrafeScalar, b2, Time.deltaTime * 2f));
 		Vector3 zero = Vector3.zero;
 		zero.x += num6 * swayAmount;
 		zero.z -= num11 * swayAmount;

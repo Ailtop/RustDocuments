@@ -267,20 +267,22 @@ namespace ConVar
 				textTable2.AddColumn("hasFoodTarget");
 				textTable2.AddRow(baseAnimalNPC.Stats.Family.ToString(), baseAnimalNPC.IsDormant ? "dormant" : "awake", baseAnimalNPC.syncPosition.ToString(), baseAnimalNPC.health.ToString("N2"), baseAnimalNPC.stuckDuration.ToString("N2"), baseAnimalNPC.HasPath.ToString(), (baseAnimalNPC.AttackTarget != null).ToString(), (baseAnimalNPC.FoodTarget != null).ToString());
 				args.ReplyWith(textTable2.ToString());
-				return;
 			}
-			HTNPlayer hTNPlayer = baseEntity as HTNPlayer;
-			if (hTNPlayer != null)
+			else
 			{
-				TextTable textTable3 = new TextTable();
-				textTable3.AddColumn("type");
-				textTable3.AddColumn("state");
-				textTable3.AddColumn("posSync");
-				textTable3.AddColumn("health");
-				textTable3.AddColumn("hasEnemyTarget");
-				textTable3.AddColumn("isMounted");
-				textTable3.AddRow(hTNPlayer.Family.ToString(), hTNPlayer.IsDormant ? "dormant" : "awake", hTNPlayer.syncPosition.ToString(), hTNPlayer.health.ToString("N2"), (hTNPlayer.MainTarget != null).ToString(), hTNPlayer.isMounted ? "true" : "false");
-				args.ReplyWith(textTable3.ToString());
+				HTNPlayer hTNPlayer = baseEntity as HTNPlayer;
+				if (hTNPlayer != null)
+				{
+					TextTable textTable3 = new TextTable();
+					textTable3.AddColumn("type");
+					textTable3.AddColumn("state");
+					textTable3.AddColumn("posSync");
+					textTable3.AddColumn("health");
+					textTable3.AddColumn("hasEnemyTarget");
+					textTable3.AddColumn("isMounted");
+					textTable3.AddRow(hTNPlayer.Family.ToString(), hTNPlayer.IsDormant ? "dormant" : "awake", hTNPlayer.syncPosition.ToString(), hTNPlayer.health.ToString("N2"), (hTNPlayer.MainTarget != null).ToString(), hTNPlayer.isMounted ? "true" : "false");
+					args.ReplyWith(textTable3.ToString());
+				}
 			}
 		}
 

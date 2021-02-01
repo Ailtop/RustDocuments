@@ -1,6 +1,6 @@
-using ConVar;
 using System;
 using System.Collections.Generic;
+using ConVar;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.Murderer
@@ -134,22 +134,17 @@ namespace Rust.Ai.HTN.Murderer
 					return;
 				}
 				int num = MaxPopulation - Spawned.Count;
-				int num2 = 0;
-				BaseEntity baseEntity;
-				while (true)
+				for (int i = 0; i < num; i++)
 				{
-					if (num2 >= num)
-					{
-						return;
-					}
 					Vector3 pos;
 					Quaternion rot;
 					if (!(GetSpawnPoint(out pos, out rot) == null))
 					{
-						baseEntity = GameManager.server.CreateEntity(MurdererPrefab.resourcePath, pos, rot, false);
+						BaseEntity baseEntity = GameManager.server.CreateEntity(MurdererPrefab.resourcePath, pos, rot, false);
 						MurdererDomain component = baseEntity.GetComponent<MurdererDomain>();
 						if (!component)
 						{
+							baseEntity.Kill();
 							break;
 						}
 						baseEntity.enableSaving = false;
@@ -160,9 +155,7 @@ namespace Rust.Ai.HTN.Murderer
 						component.ReducedLongRangeAccuracy = ReducedLongRangeAccuracy;
 						Spawned.Add(component);
 					}
-					num2++;
 				}
-				baseEntity.Kill();
 			}
 		}
 

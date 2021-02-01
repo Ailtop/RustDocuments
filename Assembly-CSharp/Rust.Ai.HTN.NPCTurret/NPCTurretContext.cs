@@ -1,6 +1,6 @@
-using Apex.Ai.HTN;
 using System;
 using System.Collections.Generic;
+using Apex.Ai.HTN;
 using UnityEngine;
 
 namespace Rust.Ai.HTN.NPCTurret
@@ -348,17 +348,18 @@ namespace Rust.Ai.HTN.NPCTurret
 			{
 				Memory = new NPCTurretMemory(this);
 			}
-			if (Location == null)
+			if (!(Location == null))
 			{
-				float num = float.MaxValue;
-				foreach (AiLocationManager manager in AiLocationManager.Managers)
+				return;
+			}
+			float num = float.MaxValue;
+			foreach (AiLocationManager manager in AiLocationManager.Managers)
+			{
+				float sqrMagnitude = (manager.transform.position - Body.transform.position).sqrMagnitude;
+				if (sqrMagnitude < num)
 				{
-					float sqrMagnitude = (manager.transform.position - Body.transform.position).sqrMagnitude;
-					if (sqrMagnitude < num)
-					{
-						num = sqrMagnitude;
-						Location = manager;
-					}
+					num = sqrMagnitude;
+					Location = manager;
 				}
 			}
 		}
@@ -413,7 +414,7 @@ namespace Rust.Ai.HTN.NPCTurret
 
 		public void SetFact(Facts fact, bool value, bool invokeChangedEvent = true, bool setAsDirty = true, bool checkValueDiff = true)
 		{
-			SetFact(fact, (byte)(value ? 1 : 0), invokeChangedEvent, setAsDirty, checkValueDiff);
+			SetFact(fact, (byte)(value ? 1u : 0u), invokeChangedEvent, setAsDirty, checkValueDiff);
 		}
 
 		public void SetFact(Facts fact, int value, bool invokeChangedEvent = true, bool setAsDirty = true, bool checkValueDiff = true)
@@ -480,7 +481,7 @@ namespace Rust.Ai.HTN.NPCTurret
 
 		public void PushFactChangeDuringPlanning(Facts fact, bool value, bool temporary)
 		{
-			PushFactChangeDuringPlanning((byte)fact, (byte)(value ? 1 : 0), temporary);
+			PushFactChangeDuringPlanning((byte)fact, (byte)(value ? 1u : 0u), temporary);
 		}
 
 		public void PushFactChangeDuringPlanning(Facts fact, int value, bool temporary)

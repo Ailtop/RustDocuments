@@ -1,6 +1,6 @@
+using System;
 using ConVar;
 using Rust;
-using System;
 using UnityEngine;
 
 public class BradleySpawner : MonoBehaviour, IServerComponent

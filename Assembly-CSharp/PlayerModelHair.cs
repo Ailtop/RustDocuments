@@ -1,5 +1,5 @@
-using Facepunch;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class PlayerModelHair : MonoBehaviour
@@ -15,7 +15,7 @@ public class PlayerModelHair : MonoBehaviour
 		public RendererMaterials(Renderer r)
 		{
 			original = r.sharedMaterials;
-			replacement = (original.Clone() as Material[]);
+			replacement = original.Clone() as Material[];
 			names = new string[original.Length];
 			for (int i = 0; i < original.Length; i++)
 			{
@@ -32,18 +32,19 @@ public class PlayerModelHair : MonoBehaviour
 
 	private void CacheOriginalMaterials()
 	{
-		if (materials == null)
+		if (materials != null)
 		{
-			List<SkinnedMeshRenderer> obj = Pool.GetList<SkinnedMeshRenderer>();
-			base.gameObject.GetComponentsInChildren(true, obj);
-			materials = new Dictionary<Renderer, RendererMaterials>();
-			materials.Clear();
-			foreach (SkinnedMeshRenderer item in obj)
-			{
-				materials.Add(item, new RendererMaterials(item));
-			}
-			Pool.FreeList(ref obj);
+			return;
 		}
+		List<SkinnedMeshRenderer> obj = Pool.GetList<SkinnedMeshRenderer>();
+		base.gameObject.GetComponentsInChildren(true, obj);
+		materials = new Dictionary<Renderer, RendererMaterials>();
+		materials.Clear();
+		foreach (SkinnedMeshRenderer item in obj)
+		{
+			materials.Add(item, new RendererMaterials(item));
+		}
+		Pool.FreeList(ref obj);
 	}
 
 	private void Setup(HairType type, HairSetCollection hair, int meshIndex, float typeNum, float dyeNum, MaterialPropertyBlock block)

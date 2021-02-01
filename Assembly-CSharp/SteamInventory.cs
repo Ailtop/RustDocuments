@@ -1,9 +1,9 @@
 #define UNITY_ASSERTIONS
-using ConVar;
-using Network;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using ConVar;
+using Network;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -20,7 +20,7 @@ public class SteamInventory : EntityComponent<BasePlayer>
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log("SV_RPCMessage: " + player + " - UpdateSteamInventory ");
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateSteamInventory "));
 				}
 				using (TimeWarning.New("UpdateSteamInventory"))
 				{

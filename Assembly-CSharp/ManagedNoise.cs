@@ -570,7 +570,7 @@ public static class ManagedNoise
 	{
 		double num = 0.0;
 		int num2;
-		int num3 = num2 = Floor(x);
+		int num3 = (num2 = Floor(x));
 		double num4 = x - (double)num2;
 		double num5 = 1.0 - num4 * num4;
 		if (num5 > 0.0)
@@ -600,7 +600,7 @@ public static class ManagedNoise
 		double num = 0.0;
 		dx = 0.0;
 		int num2;
-		int num3 = num2 = Floor(x);
+		int num3 = (num2 = Floor(x));
 		double num4 = x - (double)num2;
 		double num5 = 1.0 - num4 * num4;
 		if (num5 > 0.0)

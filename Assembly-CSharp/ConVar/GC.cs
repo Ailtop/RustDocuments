@@ -52,7 +52,7 @@ namespace ConVar
 			}
 			set
 			{
-				GarbageCollector.incrementalTimeSliceNanoseconds = (ulong)(1000000L * (long)Mathf.Max(value, 0));
+				GarbageCollector.incrementalTimeSliceNanoseconds = 1000000uL * (ulong)Mathf.Max(value, 0);
 			}
 		}
 

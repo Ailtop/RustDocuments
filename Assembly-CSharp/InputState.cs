@@ -20,11 +20,11 @@ public class InputState
 		{
 			return false;
 		}
-		if ((SwallowedButtons & (int)btn) == (int)btn)
+		if (((uint)SwallowedButtons & (uint)btn) == (uint)btn)
 		{
 			return false;
 		}
-		return (current.buttons & (int)btn) == (int)btn;
+		return ((uint)current.buttons & (uint)btn) == (uint)btn;
 	}
 
 	public bool WasDown(BUTTON btn)
@@ -33,7 +33,7 @@ public class InputState
 		{
 			return false;
 		}
-		return (previous.buttons & (int)btn) == (int)btn;
+		return ((uint)previous.buttons & (uint)btn) == (uint)btn;
 	}
 
 	public bool WasJustPressed(BUTTON btn)

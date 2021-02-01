@@ -1,5 +1,5 @@
-using ConVar;
 using System.Linq;
+using ConVar;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -78,7 +78,7 @@ public class SpawnPopulation : BaseScriptableObject
 		for (int i = 0; i < Prefabs.Length; i++)
 		{
 			Prefab<Spawnable> prefab = Prefabs[i];
-			int num2 = (!prefab.Parameters) ? 1 : prefab.Parameters.Count;
+			int num2 = ((!prefab.Parameters) ? 1 : prefab.Parameters.Count);
 			num += num2;
 		}
 		int num3 = Mathf.CeilToInt((float)targetCount / (float)num);
@@ -86,7 +86,7 @@ public class SpawnPopulation : BaseScriptableObject
 		for (int j = 0; j < Prefabs.Length; j++)
 		{
 			Prefab<Spawnable> prefab2 = Prefabs[j];
-			int num4 = (!prefab2.Parameters) ? 1 : prefab2.Parameters.Count;
+			int num4 = ((!prefab2.Parameters) ? 1 : prefab2.Parameters.Count);
 			int count = distribution.GetCount(prefab2.ID);
 			int num5 = Mathf.Max(num4 * num3 - count, 0);
 			numToSpawn[j] = num5;
