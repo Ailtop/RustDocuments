@@ -70,6 +70,21 @@ public class ProjectileWeaponMod : BaseEntity
 		base.limitNetworking = HasFlag(Flags.Disabled);
 	}
 
+	public static float Mult(BaseEntity parentEnt, Func<ProjectileWeaponMod, Modifier> selector_modifier, Func<Modifier, float> selector_value, float def)
+	{
+		if (parentEnt.children == null)
+		{
+			return def;
+		}
+		IEnumerable<float> mods = GetMods(parentEnt, selector_modifier, selector_value);
+		float num = 1f;
+		foreach (float item in mods)
+		{
+			num *= item;
+		}
+		return num;
+	}
+
 	public static float Sum(BaseEntity parentEnt, Func<ProjectileWeaponMod, Modifier> selector_modifier, Func<Modifier, float> selector_value, float def)
 	{
 		if (parentEnt.children == null)

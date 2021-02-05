@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class IconSkinPicker : MonoBehaviour
 {
@@ -8,4 +9,6 @@ public class IconSkinPicker : MonoBehaviour
 	public GameObject container;
 
 	public Action skinChangedEvent;
+
+	public ScrollRect scroller;
 }

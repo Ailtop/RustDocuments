@@ -131,8 +131,12 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public const Flags Flag_Equipped = Flags.Reserved3;
 
+	public const Flags Flag_MaxAuths = Flags.Reserved4;
+
 	[NonSerialized]
 	public List<PlayerNameID> authorizedPlayers = new List<PlayerNameID>();
+
+	public virtual bool RequiresMouse => false;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -619,6 +623,20 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return false;
 	}
 
+	public bool AtMaxAuthCapacity()
+	{
+		return HasFlag(Flags.Reserved4);
+	}
+
+	public void UpdateMaxAuthCapacity()
+	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		if ((bool)activeGameMode && activeGameMode.limitTeamAuths)
+		{
+			SetFlag(Flags.Reserved4, authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize());
+		}
+	}
+
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	private void FlipAim(RPCMessage rpc)
@@ -630,18 +648,19 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
 		RPCMessage rpc2 = rpc;
-		if (!IsOnline() && rpc2.player.CanBuild() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
+		if (!IsOnline() && rpc2.player.CanBuild() && !AtMaxAuthCapacity() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
 		{
 			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
 			PlayerNameID playerNameID = new PlayerNameID();
 			playerNameID.userid = rpc2.player.userID;
 			playerNameID.username = rpc2.player.displayName;
 			authorizedPlayers.Add(playerNameID);
+			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
@@ -654,23 +673,25 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		if (!booting && !IsOnline() && IsAuthed(rpc2.player) && Interface.CallHook("OnTurretDeauthorize", this, rpc.player) == null)
 		{
 			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
+			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void ClearList(RPCMessage rpc)
 	{
 		if (!booting && !IsOnline() && IsAuthed(rpc.player) && Interface.CallHook("OnTurretClearList", this, rpc.player) == null)
 		{
 			authorizedPlayers.Clear();
+			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void SERVER_Peacekeeper(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -679,8 +700,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void SERVER_AttackAll(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -1024,9 +1045,17 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	public void EnsureReloaded()
+	public void EnsureReloaded(bool onlyReloadIfEmpty = true)
 	{
-		if (!HasClipAmmo() && HasReserveAmmo())
+		bool flag = HasReserveAmmo();
+		if (onlyReloadIfEmpty)
+		{
+			if (flag && !HasClipAmmo())
+			{
+				Reload();
+			}
+		}
+		else if (flag)
 		{
 			Reload();
 		}
@@ -1117,7 +1146,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	public override void PlayerStoppedLooting(BasePlayer player)
 	{
 		base.PlayerStoppedLooting(player);
-		EnsureReloaded();
+		UpdateTotalAmmo();
+		EnsureReloaded(false);
 		UpdateTotalAmmo();
 		nextShotTime = UnityEngine.Time.time;
 	}

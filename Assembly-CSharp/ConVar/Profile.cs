@@ -19,8 +19,8 @@ namespace ConVar
 		{
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void stop(Arg arg)
 		{
 		}

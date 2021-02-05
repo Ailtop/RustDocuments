@@ -22,6 +22,10 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 
 	public static void PhysicsChanged(GameObject obj)
 	{
+		if (obj == null)
+		{
+			return;
+		}
 		Collider component = obj.GetComponent<Collider>();
 		if (!component)
 		{
@@ -38,6 +42,20 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 			}
 		}
 		Facepunch.Pool.FreeList(ref obj2);
+	}
+
+	public static void PhysicsChanged(Vector3 origin, float radius, int layerMask)
+	{
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		Vis.Entities(origin, radius, obj, layerMask);
+		foreach (BaseEntity item in obj)
+		{
+			if (!item.IsDestroyed && !item.isClient && !(item is BuildingBlock))
+			{
+				item.BroadcastMessage("OnPhysicsNeighbourChanged", SendMessageOptions.DontRequireReceiver);
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	private void OnPhysicsNeighbourChanged()

@@ -156,8 +156,8 @@ public class BaseRidableAnimal : BaseVehicle
 	[ServerVar]
 	public static float framebudgetms = 1f;
 
-	[ServerVar]
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
+	[ServerVar]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -538,8 +538,8 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

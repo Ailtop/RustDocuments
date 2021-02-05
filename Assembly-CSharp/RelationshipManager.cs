@@ -157,8 +157,7 @@ public class RelationshipManager : BaseEntity
 		}
 	}
 
-	[ServerVar]
-	public static int maxTeamSize = 8;
+	public static int maxTeamSize_Internal = 8;
 
 	public static RelationshipManager _instance;
 
@@ -170,7 +169,34 @@ public class RelationshipManager : BaseEntity
 
 	public ulong lastTeamIndex = 1uL;
 
+	[ServerVar]
+	public static int maxTeamSize
+	{
+		get
+		{
+			return maxTeamSize_Internal;
+		}
+		set
+		{
+			maxTeamSize_Internal = value;
+			if ((bool)Instance)
+			{
+				Instance.SendNetworkUpdate();
+			}
+		}
+	}
+
 	public static RelationshipManager Instance => _instance;
+
+	public int GetMaxTeamSize()
+	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		if ((bool)activeGameMode)
+		{
+			return activeGameMode.GetMaxRelationshipTeamSize();
+		}
+		return maxTeamSize;
+	}
 
 	public void OnEnable()
 	{

@@ -279,8 +279,8 @@ public class BuildingBlock : StabilityEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void DoImmediateDemolish(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && msg.player.IsAdmin && Interface.CallHook("OnStructureDemolish", this, msg.player, true) == null)
@@ -422,6 +422,7 @@ public class BuildingBlock : StabilityEntity
 				SendNetworkUpdate();
 				UpdateSkin();
 				ResetUpkeepTime();
+				UpdateSurroundingEntities();
 				BuildingManager.server.GetBuilding(buildingID)?.Dirty();
 				Effect.server.Run("assets/bundled/prefabs/fx/build/promote_" + @enum.ToString().ToLower() + ".prefab", this, 0u, Vector3.zero, Vector3.zero);
 			}

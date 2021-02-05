@@ -236,8 +236,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public class JunkpileTimeBlockNavigationEffect : EffectBase<ScientistJunkpileContext>
 		{
-			[FriendlyName("Time (Seconds)")]
 			[ApexSerialization]
+			[FriendlyName("Time (Seconds)")]
 			public float Time;
 
 			public override void Apply(ScientistJunkpileContext context, bool fromPlanner, bool temporary)
@@ -2120,12 +2120,12 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		}
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isRegisteredWithAgency;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private static List<ScientistJunkpileDomain> _allJunkpileNPCs;
 
 		private Vector3 missOffset;
@@ -2146,8 +2146,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private ScientistJunkpileContext _context;
 
 		[SerializeField]
@@ -2155,13 +2155,13 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2206,9 +2206,9 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Reasoners")]
-		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerMarkTooCloseReasoner
@@ -2305,17 +2305,17 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isFiring;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;

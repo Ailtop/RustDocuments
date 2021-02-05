@@ -1132,22 +1132,22 @@ namespace Rust.Ai.HTN.Bear
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private BearContext _context;
 
 		[Header("Navigation")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new BearPlayersInRangeSensor
@@ -1188,9 +1188,9 @@ namespace Rust.Ai.HTN.Bear
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Reasoners")]
-		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner

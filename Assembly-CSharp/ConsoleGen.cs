@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[696]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[707]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2144,6 +2144,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "projectile_backtracking",
+			Parent = "antihack",
+			FullName = "antihack.projectile_backtracking",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.projectile_backtracking.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_backtracking = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "projectile_clientframes",
 			Parent = "antihack",
 			FullName = "antihack.projectile_clientframes",
@@ -2439,6 +2452,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.terrain_timeslice = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tickhistoryforgiveness",
+			Parent = "antihack",
+			FullName = "antihack.tickhistoryforgiveness",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.tickhistoryforgiveness.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.tickhistoryforgiveness = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -3841,6 +3867,30 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				FPS.limit = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "set",
+			Parent = "gamemode",
+			FullName = "gamemode.set",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				gamemode.set(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "setteam",
+			Parent = "gamemode",
+			FullName = "gamemode.setteam",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				gamemode.setteam(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5950,6 +6000,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "gamemode",
+			Parent = "server",
+			FullName = "server.gamemode",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.gamemode.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.gamemode = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "globalchat",
 			Parent = "server",
 			FullName = "server.globalchat",
@@ -5967,6 +6030,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.headerimage",
 			ServerAdmin = true,
+			Saved = true,
 			Variable = true,
 			GetOveride = () => Server.headerimage.ToString(),
 			SetOveride = delegate(string str)
@@ -6123,6 +6187,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.logoimage",
 			ServerAdmin = true,
+			Saved = true,
 			Variable = true,
 			GetOveride = () => Server.logoimage.ToString(),
 			SetOveride = delegate(string str)
@@ -6695,6 +6760,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "rewounddelay",
+			Parent = "server",
+			FullName = "server.rewounddelay",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => Server.rewounddelay.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.rewounddelay = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "rpclog",
 			Parent = "server",
 			FullName = "server.rpclog",
@@ -6955,6 +7034,21 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Server.stop(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tags",
+			Parent = "server",
+			FullName = "server.tags",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Comma-separated server browser tag values (see wiki)",
+			Variable = true,
+			GetOveride = () => Server.tags.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.tags = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -8362,6 +8456,45 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "reclaim_fraction_belt",
+			Parent = "gamemodesoftcore",
+			FullName = "gamemodesoftcore.reclaim_fraction_belt",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => GameModeSoftcore.reclaim_fraction_belt.ToString(),
+			SetOveride = delegate(string str)
+			{
+				GameModeSoftcore.reclaim_fraction_belt = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "reclaim_fraction_main",
+			Parent = "gamemodesoftcore",
+			FullName = "gamemodesoftcore.reclaim_fraction_main",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => GameModeSoftcore.reclaim_fraction_main.ToString(),
+			SetOveride = delegate(string str)
+			{
+				GameModeSoftcore.reclaim_fraction_main = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "reclaim_fraction_wear",
+			Parent = "gamemodesoftcore",
+			FullName = "gamemodesoftcore.reclaim_fraction_wear",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => GameModeSoftcore.reclaim_fraction_wear.ToString(),
+			SetOveride = delegate(string str)
+			{
+				GameModeSoftcore.reclaim_fraction_wear = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "framebudgetms",
 			Parent = "growableentity",
 			FullName = "growableentity.framebudgetms",
@@ -8683,6 +8816,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				PlayerInventory.forceBirthday = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "reclaim_expire_minutes",
+			Parent = "reclaimmanager",
+			FullName = "reclaimmanager.reclaim_expire_minutes",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ReclaimManager.reclaim_expire_minutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ReclaimManager.reclaim_expire_minutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

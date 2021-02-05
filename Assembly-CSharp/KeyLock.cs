@@ -204,6 +204,7 @@ public class KeyLock : BaseLock
 	{
 		base.OnDeployed(parent, deployedBy);
 		keyCode = UnityEngine.Random.Range(1, 100000);
+		Lock(deployedBy);
 	}
 
 	public override bool OnTryToOpen(BasePlayer player)
@@ -234,8 +235,8 @@ public class KeyLock : BaseLock
 		return !IsLocked();
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Unlock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && HasLockPermission(rpc.player))
@@ -249,15 +250,20 @@ public class KeyLock : BaseLock
 	[RPC_Server]
 	private void RPC_Lock(RPCMessage rpc)
 	{
-		if (rpc.player.CanInteract() && !IsLocked() && Interface.CallHook("CanLock", rpc.player, this) == null && HasLockPermission(rpc.player))
+		Lock(rpc.player);
+	}
+
+	private void Lock(BasePlayer player)
+	{
+		if (!(player == null) && player.CanInteract() && !IsLocked() && Interface.CallHook("CanLock", player, this) == null && HasLockPermission(player))
 		{
-			LockLock(rpc.player);
+			LockLock(player);
 			SendNetworkUpdate();
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_CreateKey(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || (IsLocked() && !HasLockPermission(rpc.player)))

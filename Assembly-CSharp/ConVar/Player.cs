@@ -15,8 +15,8 @@ namespace ConVar
 		[ServerVar]
 		public static int tickrate_sv = 16;
 
-		[ClientVar(AllowRunFromServer = true)]
 		[ServerUserVar]
+		[ClientVar(AllowRunFromServer = true)]
 		public static void cinematic_play(Arg arg)
 		{
 			if (!arg.HasArgs() || !arg.IsServerside)

@@ -149,9 +149,9 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity();
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -353,8 +353,8 @@ public class BaseMelee : AttackEntity
 		ownerItem.LoseCondition(conditionLoss);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void PlayerAttack(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -393,13 +393,15 @@ public class BaseMelee : AttackEntity
 				BasePlayer basePlayer = hitInfo.HitEntity as BasePlayer;
 				bool flag = basePlayer != null;
 				bool flag2 = flag && basePlayer.IsSleeping();
-				bool flag3 = hitEntity != null;
-				bool flag4 = flag3 && hitEntity.IsNpc;
+				bool flag3 = flag && basePlayer.IsWounded();
+				bool flag4 = flag && basePlayer.isMounted;
+				bool flag5 = hitEntity != null;
+				bool flag6 = flag5 && hitEntity.IsNpc;
 				if (ConVar.AntiHack.melee_protection <= 0)
 				{
-					goto IL_087d;
+					goto IL_08ec;
 				}
-				bool flag5 = true;
+				bool flag7 = true;
 				float num = 1f + ConVar.AntiHack.melee_forgiveness;
 				float melee_clientframes = ConVar.AntiHack.melee_clientframes;
 				float melee_serverframes = ConVar.AntiHack.melee_serverframes;
@@ -413,11 +415,11 @@ public class BaseMelee : AttackEntity
 					string shortPrefabName3 = basePlayer.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.MeleeHack, "Bone is invalid  (" + shortPrefabName2 + " on " + shortPrefabName3 + " bone " + hitInfo.HitBone + ")");
 					player.stats.combat.Log(hitInfo, "melee_bone");
-					flag5 = false;
+					flag7 = false;
 				}
 				if (ConVar.AntiHack.melee_protection >= 2)
 				{
-					if (flag3)
+					if (flag5)
 					{
 						float num5 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
 						float num6 = hitEntity.BoundsPadding() + num4 * num5;
@@ -428,13 +430,13 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName5 = hitEntity.ShortPrefabName;
 							AntiHack.Log(player, AntiHackType.MeleeHack, "Entity too far away (" + shortPrefabName4 + " on " + shortPrefabName5 + " with " + num7 + "m > " + num6 + "m in " + num4 + "s)");
 							player.stats.combat.Log(hitInfo, "melee_target");
-							flag5 = false;
+							flag7 = false;
 						}
 					}
-					if (ConVar.AntiHack.melee_protection >= 4 && flag5 && flag && !flag4 && !flag2)
+					if (ConVar.AntiHack.melee_protection >= 4 && flag7 && flag && !flag6 && !flag2 && !flag3 && !flag4)
 					{
 						float magnitude = basePlayer.GetParentVelocity().magnitude;
-						float num8 = basePlayer.BoundsPadding() + num4 * magnitude;
+						float num8 = basePlayer.BoundsPadding() + num4 * magnitude + ConVar.AntiHack.tickhistoryforgiveness;
 						float num9 = basePlayer.tickHistory.Distance(basePlayer, hitInfo.HitPositionWorld);
 						if (num9 > num8)
 						{
@@ -442,7 +444,7 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName7 = basePlayer.ShortPrefabName;
 							AntiHack.Log(player, AntiHackType.ProjectileHack, "Player too far away (" + shortPrefabName6 + " on " + shortPrefabName7 + " with " + num9 + "m > " + num8 + "m in " + num4 + "s)");
 							player.stats.combat.Log(hitInfo, "player_distance");
-							flag5 = false;
+							flag7 = false;
 						}
 					}
 				}
@@ -456,10 +458,10 @@ public class BaseMelee : AttackEntity
 						if (num11 > num10)
 						{
 							string shortPrefabName8 = base.ShortPrefabName;
-							string text = (flag3 ? hitEntity.ShortPrefabName : "world");
+							string text = (flag5 ? hitEntity.ShortPrefabName : "world");
 							AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName8 + " on " + text + " with " + num11 + "m > " + num10 + "m in " + num4 + "s)");
 							player.stats.combat.Log(hitInfo, "melee_initiator");
-							flag5 = false;
+							flag7 = false;
 						}
 					}
 					else
@@ -470,16 +472,16 @@ public class BaseMelee : AttackEntity
 						if (num14 > num13)
 						{
 							string shortPrefabName9 = base.ShortPrefabName;
-							string text2 = (flag3 ? hitEntity.ShortPrefabName : "world");
+							string text2 = (flag5 ? hitEntity.ShortPrefabName : "world");
 							AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName9 + " on " + text2 + " with " + num14 + "m > " + num13 + "m in " + num4 + "s)");
 							player.stats.combat.Log(hitInfo, "melee_initiator");
-							flag5 = false;
+							flag7 = false;
 						}
 					}
 				}
 				if (ConVar.AntiHack.melee_protection >= 3)
 				{
-					if (flag3)
+					if (flag5)
 					{
 						Vector3 pointStart = hitInfo.PointStart;
 						Vector3 vector = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
@@ -503,31 +505,31 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName11 = hitEntity.ShortPrefabName;
 							AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName10, " on ", shortPrefabName11, ") ", center, " ", position, " ", vector2, " ", vector3, " ", vector4));
 							player.stats.combat.Log(hitInfo, "melee_los");
-							flag5 = false;
+							flag7 = false;
 						}
 					}
-					if (flag)
+					if (flag7 && flag && !flag6)
 					{
 						Vector3 vector5 = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
 						Vector3 position2 = basePlayer.eyes.position;
 						Vector3 vector6 = basePlayer.CenterPoint();
-						if (!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.losforgiveness) && !GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.losforgiveness))
+						if ((!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(position2, vector5, layerMask, ConVar.AntiHack.losforgiveness, 0f)) && (!GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(vector6, vector5, layerMask, ConVar.AntiHack.losforgiveness, 0f)))
 						{
 							string shortPrefabName12 = base.ShortPrefabName;
 							string shortPrefabName13 = basePlayer.ShortPrefabName;
 							AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName12, " on ", shortPrefabName13, ") ", vector5, " ", position2, " or ", vector5, " ", vector6));
 							player.stats.combat.Log(hitInfo, "melee_los");
-							flag5 = false;
+							flag7 = false;
 						}
 					}
 				}
-				if (flag5)
+				if (flag7)
 				{
-					goto IL_087d;
+					goto IL_08ec;
 				}
 				AntiHack.AddViolation(player, AntiHackType.MeleeHack, ConVar.AntiHack.melee_penalty);
 				goto end_IL_0031;
-				IL_087d:
+				IL_08ec:
 				player.metabolism.UseHeart(heartStress * 0.2f);
 				using (TimeWarning.New("DoAttackShared", 50))
 				{

@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
+public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 {
 	public GameObjectRef SignEditorDialog;
 
@@ -19,6 +19,10 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 	private EntityRef _photoEntity;
 
 	public uint _overlayTextureCrc;
+
+	public Vector2i TextureSize => new Vector2i(PaintableSource.texWidth, PaintableSource.texHeight);
+
+	public int TextureCount => 1;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -112,7 +116,7 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 						{
 							return true;
 						}
-						if (!RPC_Server.MaxDistance.Test(1255380462u, "UpdateSign", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(1255380462u, "UpdateSign", this, player, 5f))
 						{
 							return true;
 						}
@@ -181,9 +185,9 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver
 		return CanUpdateSign(player);
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
+	[RPC_Server.MaxDistance(5f)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (!(msg.player == null) && CanUpdateSign(msg.player))

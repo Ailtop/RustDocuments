@@ -103,12 +103,6 @@ namespace ConVar
 		public static string description = "No server description has been provided.";
 
 		[ServerVar]
-		public static string headerimage = "";
-
-		[ServerVar]
-		public static string logoimage = "";
-
-		[ServerVar]
 		public static string url = "";
 
 		[ServerVar]
@@ -119,6 +113,12 @@ namespace ConVar
 
 		[ServerVar]
 		public static int ipQueriesPerMin = 30;
+
+		[ServerVar(Saved = true)]
+		public static string headerimage = "";
+
+		[ServerVar(Saved = true)]
+		public static string logoimage = "";
 
 		[ServerVar(Saved = true)]
 		public static int saveBackupCount = 2;
@@ -208,6 +208,9 @@ namespace ConVar
 		public static float modifierTickRate = 1f;
 
 		[ServerVar(Saved = true)]
+		public static float rewounddelay = 60f;
+
+		[ServerVar(Saved = true)]
 		public static bool woundingenabled = true;
 
 		[ServerVar(Saved = true)]
@@ -260,6 +263,12 @@ namespace ConVar
 
 		[ServerVar]
 		public static int idlekickadmins = 0;
+
+		[ServerVar]
+		public static string gamemode = "";
+
+		[ServerVar(Help = "Comma-separated server browser tag values (see wiki)", Saved = true)]
+		public static string tags = "";
 
 		[ServerVar(Help = "Censors the Steam player list to make player tracking more difficult")]
 		public static bool censorplayerlist = false;

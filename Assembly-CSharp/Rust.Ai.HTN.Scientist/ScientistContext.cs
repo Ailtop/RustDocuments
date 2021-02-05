@@ -17,16 +17,16 @@ namespace Rust.Ai.HTN.Scientist
 		[SerializeField]
 		private byte[] _worldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private byte[] _previousWorldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private int _decompositionScore;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;

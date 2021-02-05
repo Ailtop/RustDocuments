@@ -34,12 +34,12 @@ public class DynamicMouseCursor : MonoBehaviour
 				UpdateCursor(RegularCursor, RegularCursorPos);
 				return;
 			}
-			if (gameObject != null && gameObject.GetComponentInParent<ISubmitHandler>() != null)
+			if (gameObject.GetComponentInParent<ISubmitHandler>() != null)
 			{
 				UpdateCursor(HoverCursor, HoverCursorPos);
 				return;
 			}
-			if (gameObject != null && gameObject.GetComponentInParent<IPointerDownHandler>() != null)
+			if (gameObject.GetComponentInParent<IPointerDownHandler>() != null)
 			{
 				UpdateCursor(HoverCursor, HoverCursorPos);
 				return;

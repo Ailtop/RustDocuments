@@ -296,6 +296,8 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		SaveRestore.GetSaveCache();
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
+		BaseGameMode.CreateGameMode();
+		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		serverMgr.OpenConnection();
 		CompanionServer.Server.Initialize();
 		Manager.Initialize();

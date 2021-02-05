@@ -28,9 +28,15 @@ public class MapView : FacepunchBehaviour
 
 	public List<SleepingBagClusterMapMarker> SleepingBagClusters = new List<SleepingBagClusterMapMarker>();
 
-	public bool followingPlayer = true;
-
 	public bool ShowGrid;
 
 	public bool ShowPointOfInterestMarkers;
+
+	public bool ShowDeathMarker = true;
+
+	public bool ShowSleepingBags = true;
+
+	public bool ShowLocalPlayer = true;
+
+	public bool ShowTeamMembers = true;
 }

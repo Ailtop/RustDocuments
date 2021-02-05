@@ -27,13 +27,15 @@ public class SleepingBag : DecayEntity
 
 	public RespawnInformation.SpawnOptions.RespawnType RespawnType = RespawnInformation.SpawnOptions.RespawnType.SleepingBag;
 
+	public bool isStatic;
+
 	public bool canBePublic;
 
 	public float unlockTime;
 
 	public static List<SleepingBag> sleepingBags = new List<SleepingBag>();
 
-	public float unlockSeconds
+	public virtual float unlockSeconds
 	{
 		get
 		{
@@ -203,9 +205,27 @@ public class SleepingBag : DecayEntity
 		return HasFlag(Flags.Reserved3);
 	}
 
+	public virtual float GetUnlockSeconds(ulong playerID)
+	{
+		return unlockSeconds;
+	}
+
+	public virtual bool ValidForPlayer(ulong playerID, bool ignoreTimers)
+	{
+		if (deployerUserID == playerID)
+		{
+			if (!ignoreTimers)
+			{
+				return unlockTime < UnityEngine.Time.realtimeSinceStartup;
+			}
+			return true;
+		}
+		return false;
+	}
+
 	public static SleepingBag[] FindForPlayer(ulong playerID, bool ignoreTimers)
 	{
-		return sleepingBags.Where((SleepingBag x) => x.deployerUserID == playerID && (ignoreTimers || x.unlockTime < UnityEngine.Time.realtimeSinceStartup)).ToArray();
+		return sleepingBags.Where((SleepingBag x) => x.ValidForPlayer(playerID, ignoreTimers)).ToArray();
 	}
 
 	public static SleepingBag FindForPlayer(ulong playerID, uint sleepingBagID, bool ignoreTimers)
@@ -217,7 +237,7 @@ public class SleepingBag : DecayEntity
 	{
 		BasePlayer player2 = player;
 		SleepingBag[] array = FindForPlayer(player2.userID, true);
-		SleepingBag sleepingBag2 = array.FirstOrDefault((SleepingBag x) => x.deployerUserID == player2.userID && x.net.ID == sleepingBag && x.unlockTime < UnityEngine.Time.realtimeSinceStartup);
+		SleepingBag sleepingBag2 = array.FirstOrDefault((SleepingBag x) => x.ValidForPlayer(player2.userID, false) && x.net.ID == sleepingBag && x.unlockTime < UnityEngine.Time.realtimeSinceStartup);
 		if (sleepingBag2 == null)
 		{
 			return false;
@@ -227,18 +247,24 @@ public class SleepingBag : DecayEntity
 		{
 			sleepingBag2 = (SleepingBag)obj;
 		}
-		Vector3 vector = sleepingBag2.transform.position + sleepingBag2.spawnOffset;
-		Quaternion rotation = Quaternion.Euler(0f, sleepingBag2.transform.rotation.eulerAngles.y, 0f);
-		player2.RespawnAt(vector, rotation);
+		Vector3 pos;
+		Quaternion rot;
+		sleepingBag2.GetSpawnPos(out pos, out rot);
+		player2.RespawnAt(pos, rot);
 		SleepingBag[] array2 = array;
 		foreach (SleepingBag sleepingBag3 in array2)
 		{
-			if (Vector3.Distance(vector, sleepingBag3.transform.position) <= ConVar.Server.respawnresetrange)
+			if (Vector3.Distance(pos, sleepingBag3.transform.position) <= ConVar.Server.respawnresetrange)
 			{
-				sleepingBag3.unlockTime = UnityEngine.Time.realtimeSinceStartup + sleepingBag3.secondsBetweenReuses;
+				sleepingBag3.SetUnlockTime(UnityEngine.Time.realtimeSinceStartup + sleepingBag3.secondsBetweenReuses);
 			}
 		}
 		return true;
+	}
+
+	public virtual void SetUnlockTime(float newTime)
+	{
+		unlockTime = newTime;
 	}
 
 	public static bool DestroyBag(BasePlayer player, uint sleepingBag)
@@ -264,6 +290,12 @@ public class SleepingBag : DecayEntity
 		player.SendRespawnOptions();
 		Interface.CallHook("OnSleepingBagDestroyed", sleepingBag2, player);
 		return true;
+	}
+
+	public virtual void GetSpawnPos(out Vector3 pos, out Quaternion rot)
+	{
+		pos = base.transform.position + spawnOffset;
+		rot = Quaternion.Euler(0f, base.transform.rotation.eulerAngles.y, 0f);
 	}
 
 	public void SetPublic(bool isPublic)
@@ -314,8 +346,8 @@ public class SleepingBag : DecayEntity
 		info.msg.sleepingBag.deployerID = deployerUserID;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void Rename(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -374,8 +406,8 @@ public class SleepingBag : DecayEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_MakeBed(RPCMessage msg)
 	{
 		if (canBePublic && IsPublic() && msg.player.CanInteract())

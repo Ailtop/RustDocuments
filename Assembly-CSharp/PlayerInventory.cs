@@ -276,11 +276,15 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		{
 			return false;
 		}
+		if ((bool)BaseGameMode.GetActiveGameMode(true))
+		{
+			return BaseGameMode.GetActiveGameMode(true).CanMoveItemsFrom(this, entity, item);
+		}
 		return true;
 	}
 
-	[BaseEntity.RPC_Server]
 	[BaseEntity.RPC_Server.FromOwner]
+	[BaseEntity.RPC_Server]
 	private void ItemCmd(BaseEntity.RPCMessage msg)
 	{
 		if (msg.player != null && msg.player.IsWounded())
@@ -757,6 +761,12 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			return;
 		}
 		Strip();
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		if (activeGameMode != null && activeGameMode.HasLoadouts())
+		{
+			BaseGameMode.GetActiveGameMode(true).LoadoutPlayer(base.baseEntity);
+			return;
+		}
 		ulong skin = 0uL;
 		int infoInt = base.baseEntity.GetInfoInt("client.rockskin", 0);
 		if (infoInt > 0 && base.baseEntity.blueprints.steamInventory.HasItem(infoInt))

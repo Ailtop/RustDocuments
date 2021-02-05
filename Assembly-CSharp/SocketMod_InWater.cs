@@ -13,7 +13,13 @@ public class SocketMod_InWater : SocketMod
 
 	public override bool DoCheck(Construction.Placement place)
 	{
-		if (WaterLevel.Test(place.position + place.rotation * worldPosition) == wantsInWater)
+		Vector3 vector = place.position + place.rotation * worldPosition;
+		bool flag = WaterLevel.Test(vector);
+		if (!flag && wantsInWater && GamePhysics.CheckSphere(vector, 0.1f, 16))
+		{
+			flag = true;
+		}
+		if (flag == wantsInWater)
 		{
 			return true;
 		}

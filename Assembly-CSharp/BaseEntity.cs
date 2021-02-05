@@ -2045,8 +2045,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2496,11 +2496,32 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public bool IsVisible(Vector3 position, float maxDistance = float.PositiveInfinity)
 	{
-		if (!IsVisible(position, CenterPoint(), maxDistance))
+		Vector3 target = CenterPoint();
+		if (IsVisible(position, target, maxDistance))
 		{
-			return IsVisible(position, ClosestPoint(position), maxDistance);
+			return true;
 		}
-		return true;
+		Vector3 target2 = ClosestPoint(position);
+		if (IsVisible(position, target2, maxDistance))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public bool IsVisibleAndCanSee(Vector3 position, float maxDistance = float.PositiveInfinity)
+	{
+		Vector3 vector = CenterPoint();
+		if (IsVisible(position, vector, maxDistance) && IsVisible(vector, position, maxDistance))
+		{
+			return true;
+		}
+		Vector3 vector2 = ClosestPoint(position);
+		if (IsVisible(position, vector2, maxDistance) && IsVisible(vector2, position, maxDistance))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public bool IsOlderThan(BaseEntity other)

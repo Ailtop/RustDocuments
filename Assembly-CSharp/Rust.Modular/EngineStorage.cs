@@ -28,8 +28,8 @@ namespace Rust.Modular
 		[SerializeField]
 		public VehicleModuleEngineItems allEngineItems;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public int accelerationBoostSlots;
 
 		[SerializeField]

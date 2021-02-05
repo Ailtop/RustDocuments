@@ -10,23 +10,23 @@ namespace Rust.Ai.HTN.Murderer
 	{
 		public delegate void WorldStateChangedEvent(MurdererContext context, Facts fact, byte oldValue, byte newValue);
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
 		private byte[] _worldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private byte[] _previousWorldState;
 
 		[SerializeField]
 		[ReadOnly]
 		private int _decompositionScore;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;

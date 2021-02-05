@@ -17,8 +17,8 @@ namespace UnityEngine.UI.Extensions
 		[Range(0f, 1000f)]
 		public int ArcSteps = 100;
 
-		[Range(0f, 360f)]
 		[Tooltip("The Arc Rotation property permits adjusting the geometry orientation around the Z axis.")]
+		[Range(0f, 360f)]
 		public int ArcRotation;
 
 		[Range(0f, 1f)]

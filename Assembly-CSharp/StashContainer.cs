@@ -124,6 +124,23 @@ public class StashContainer : StorageContainer
 		return false;
 	}
 
+	public void DoOccludedCheck()
+	{
+		if (UnityEngine.Physics.SphereCast(new Ray(base.transform.position + Vector3.up * 5f, Vector3.down), 0.25f, 5f, 2097152))
+		{
+			DropItems();
+			Kill();
+		}
+	}
+
+	public void OnPhysicsNeighbourChanged()
+	{
+		if (!IsInvoking(DoOccludedCheck))
+		{
+			Invoke(DoOccludedCheck, UnityEngine.Random.Range(5f, 10f));
+		}
+	}
+
 	public void SetHidden(bool isHidden)
 	{
 		if (!(UnityEngine.Time.realtimeSinceStartup - lastToggleTime < 3f) && isHidden != HasFlag(Flags.Reserved5))

@@ -31,6 +31,12 @@ public class ItemDefinition : MonoBehaviour
 		public WorldSpawnCondition foundCondition;
 	}
 
+	public enum RedirectVendingBehaviour
+	{
+		NoListing,
+		ListAsUniqueItem
+	}
+
 	[Flags]
 	public enum Flag
 	{
@@ -49,8 +55,8 @@ public class ItemDefinition : MonoBehaviour
 		Generic
 	}
 
-	[Header("Item")]
 	[ReadOnly]
+	[Header("Item")]
 	public int itemid;
 
 	[Tooltip("The shortname should be unique. A hash will be generated from it to identify the item type. If this name changes at any point it will make all saves incompatible")]
@@ -116,6 +122,8 @@ public class ItemDefinition : MonoBehaviour
 	public GameObjectRef worldModelPrefab;
 
 	public ItemDefinition isRedirectOf;
+
+	public RedirectVendingBehaviour redirectVendingBehaviour;
 
 	[NonSerialized]
 	public ItemMod[] itemMods;

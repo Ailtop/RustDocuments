@@ -59,12 +59,12 @@ namespace UnityEngine.UI.Extensions
 
 		private static Vector2[] fullUvs;
 
-		[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
 		[SerializeField]
+		[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
 		internal List<Vector2> m_points;
 
-		[Tooltip("Thickness of the line")]
 		[SerializeField]
+		[Tooltip("Thickness of the line")]
 		internal float lineThickness = 2f;
 
 		[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
@@ -79,8 +79,8 @@ namespace UnityEngine.UI.Extensions
 		[SerializeField]
 		internal bool lineCaps;
 
-		[Tooltip("Resolution of the Bezier curve, different to line Resolution")]
 		[SerializeField]
+		[Tooltip("Resolution of the Bezier curve, different to line Resolution")]
 		internal int bezierSegmentsPerCurve = 10;
 
 		[Tooltip("The type of Join used between lines, Square/Mitre or Curved/Bevel")]

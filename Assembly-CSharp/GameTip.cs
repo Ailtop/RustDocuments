@@ -13,6 +13,8 @@ public class GameTip : SingletonComponent<GameTip>
 		public Color BackgroundColor;
 
 		public Color ForegroundColor;
+
+		public float duration;
 	}
 
 	public CanvasGroup canvasGroup;

@@ -23,7 +23,7 @@ public class CursorManager : SingletonComponent<CursorManager>
 		}
 	}
 
-	private void SwitchToGame()
+	public void SwitchToGame()
 	{
 		if (Cursor.lockState != CursorLockMode.Locked)
 		{

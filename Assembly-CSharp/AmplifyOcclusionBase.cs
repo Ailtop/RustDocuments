@@ -41,8 +41,8 @@ public class AmplifyOcclusionBase : MonoBehaviour
 
 	public Color Tint = Color.black;
 
-	[Range(0f, 32f)]
 	[Tooltip("Radius spread of the occlusion.")]
+	[Range(0f, 32f)]
 	public float Radius = 2f;
 
 	[NonSerialized]
@@ -51,20 +51,20 @@ public class AmplifyOcclusionBase : MonoBehaviour
 	public int PixelRadiusLimit = 512;
 
 	[NonSerialized]
-	[Range(0f, 2f)]
 	[Tooltip("Occlusion contribution amount on relation to radius.")]
+	[Range(0f, 2f)]
 	public float RadiusIntensity = 1f;
 
-	[Range(0f, 16f)]
 	[Tooltip("Power exponent attenuation of the occlusion.")]
+	[Range(0f, 16f)]
 	public float PowerExponent = 1.8f;
 
 	[Range(0f, 0.99f)]
 	[Tooltip("Controls the initial occlusion contribution offset.")]
 	public float Bias = 0.05f;
 
-	[Range(0f, 1f)]
 	[Tooltip("Controls the thickness occlusion contribution.")]
+	[Range(0f, 1f)]
 	public float Thickness = 1f;
 
 	[Tooltip("Compute the Occlusion and Blur at half of the resolution.")]
@@ -80,8 +80,8 @@ public class AmplifyOcclusionBase : MonoBehaviour
 	[Tooltip("Length distance to performe the transition.")]
 	public float FadeLength = 50f;
 
-	[Tooltip("Final Intensity parameter.")]
 	[Range(0f, 1f)]
+	[Tooltip("Final Intensity parameter.")]
 	public float FadeToIntensity;
 
 	public Color FadeToTint = Color.black;
@@ -90,8 +90,8 @@ public class AmplifyOcclusionBase : MonoBehaviour
 	[Range(0f, 32f)]
 	public float FadeToRadius = 2f;
 
-	[Range(0f, 16f)]
 	[Tooltip("Final PowerExponent parameter.")]
+	[Range(0f, 16f)]
 	public float FadeToPowerExponent = 1.8f;
 
 	[Tooltip("Final Thickness parameter.")]
@@ -101,24 +101,24 @@ public class AmplifyOcclusionBase : MonoBehaviour
 	[Header("Bilateral Blur")]
 	public bool BlurEnabled = true;
 
-	[Tooltip("Radius in screen pixels.")]
 	[Range(1f, 4f)]
+	[Tooltip("Radius in screen pixels.")]
 	public int BlurRadius = 3;
 
-	[Tooltip("Number of times that the Blur will repeat.")]
 	[Range(1f, 4f)]
+	[Tooltip("Number of times that the Blur will repeat.")]
 	public int BlurPasses = 1;
 
-	[Tooltip("0 - Blured, 1 - Sharpened.")]
 	[Range(0f, 20f)]
+	[Tooltip("0 - Blured, 1 - Sharpened.")]
 	public float BlurSharpness = 10f;
 
-	[Tooltip("Accumulates the effect over the time.")]
 	[Header("Temporal Filter")]
+	[Tooltip("Accumulates the effect over the time.")]
 	public bool FilterEnabled = true;
 
-	[Range(0f, 1f)]
 	[Tooltip("Controls the accumulation decayment. 0 - Faster update, more flicker. 1 - Slow update (ghosting on moving objects), less flicker.")]
+	[Range(0f, 1f)]
 	public float FilterBlending = 0.5f;
 
 	[Range(0f, 1f)]

@@ -848,6 +848,7 @@ public class Item
 		amount -= split_Amount;
 		Item item = ItemManager.CreateByItemID(info.itemid, 1, 0uL);
 		item.amount = split_Amount;
+		item.skin = skin;
 		if (IsBlueprint())
 		{
 			item.blueprintTarget = blueprintTarget;

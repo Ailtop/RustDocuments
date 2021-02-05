@@ -1,8 +1,8 @@
 using Rust;
 using UnityEngine;
 
-[RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(BaseCombatEntity))]
+[RequireComponent(typeof(Collider))]
 public class TakeCollisionDamage : FacepunchBehaviour
 {
 	public interface ICanRestoreVelocity

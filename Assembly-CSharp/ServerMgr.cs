@@ -359,7 +359,11 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		basePlayer.Spawn();
 		basePlayer.limitNetworking = false;
 		basePlayer.PlayerInit(connection);
-		if (UnityEngine.Application.isEditor || (SleepingBag.FindForPlayer(basePlayer.userID, true).Length == 0 && !basePlayer.hasPreviousLife))
+		if ((bool)BaseGameMode.GetActiveGameMode(true))
+		{
+			BaseGameMode.GetActiveGameMode(true).OnNewPlayer(basePlayer);
+		}
+		else if (UnityEngine.Application.isEditor || (SleepingBag.FindForPlayer(basePlayer.userID, true).Length == 0 && !basePlayer.hasPreviousLife))
 		{
 			basePlayer.Respawn();
 		}
@@ -493,14 +497,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2275)
+		else if (packet.connection.protocol > 2279)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2275));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2279));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2275)
+		else if (packet.connection.protocol < 2279)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2275));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2279));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -691,7 +695,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		CreateImportantEntity<TreeManager>("assets/bundled/prefabs/system/tree_manager.prefab");
 	}
 
-	private void CreateImportantEntity<T>(string prefabName) where T : BaseEntity
+	public void CreateImportantEntity<T>(string prefabName) where T : BaseEntity
 	{
 		if (!BaseNetworkable.serverEntities.Any((BaseNetworkable x) => x is T))
 		{
@@ -1015,7 +1019,9 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text2 = $"born{Epoch.FromDateTime(SaveRestore.SaveCreatedTime)}";
 			string text3 = $"gm{GamemodeName()}";
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2275}{text4},h{AssemblyHash},{text},{text2},{text3}";
+			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
+			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2279}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
@@ -1129,14 +1135,23 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 	}
 
-	public static BasePlayer.SpawnPoint FindSpawnPoint()
+	public static BasePlayer.SpawnPoint FindSpawnPoint(BasePlayer forPlayer = null)
 	{
-		object obj = Interface.CallHook("OnFindSpawnPoint");
+		object obj = Interface.CallHook("OnFindSpawnPoint", forPlayer);
 		if (obj is BasePlayer.SpawnPoint)
 		{
 			return (BasePlayer.SpawnPoint)obj;
 		}
 		bool flag = false;
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		if ((bool)activeGameMode && activeGameMode.useCustomSpawns)
+		{
+			BasePlayer.SpawnPoint playerSpawn = activeGameMode.GetPlayerSpawn(forPlayer);
+			if (playerSpawn != null)
+			{
+				return playerSpawn;
+			}
+		}
 		if (SingletonComponent<SpawnHandler>.Instance != null && !flag)
 		{
 			BasePlayer.SpawnPoint spawnPoint = SpawnHandler.GetSpawnPoint();

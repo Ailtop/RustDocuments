@@ -28,7 +28,10 @@ namespace CompanionServer.Handlers
 			}
 			foreach (MapMarker serverMapMarker in MapMarker.serverMapMarkers)
 			{
-				appMapMarkers.markers.Add(serverMapMarker.GetAppMarkerData());
+				if (serverMapMarker.appType != 0)
+				{
+					appMapMarkers.markers.Add(serverMapMarker.GetAppMarkerData());
+				}
 			}
 			AppResponse appResponse = Pool.Get<AppResponse>();
 			appResponse.mapMarkers = appMapMarkers;

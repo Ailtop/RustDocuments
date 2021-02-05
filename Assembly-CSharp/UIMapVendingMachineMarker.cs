@@ -1,4 +1,6 @@
+using System;
 using ProtoBuf;
+using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +16,18 @@ public class UIMapVendingMachineMarker : MonoBehaviour
 
 	public Tooltip toolTip;
 
-	private bool isInStock;
+	public RustButton button;
+
+	[NonSerialized]
+	public bool isInStock;
+
+	[NonSerialized]
+	public EntityRef<VendingMachine> vendingMachine;
+
+	[NonSerialized]
+	public ProtoBuf.VendingMachine vendingMachineData;
+
+	public static event Action<UIMapVendingMachineMarker> onClicked;
 
 	public void SetOutOfStock(bool stock)
 	{
@@ -22,16 +35,17 @@ public class UIMapVendingMachineMarker : MonoBehaviour
 		isInStock = stock;
 	}
 
-	public void UpdateDisplayName(string newName, ProtoBuf.VendingMachine.SellOrderContainer sellOrderContainer)
+	public void UpdateInfo(ProtoBuf.VendingMachine vendingMachineData)
 	{
-		newName = newName.Replace('>', ' ');
-		newName = newName.Replace('<', ' ');
-		displayName = newName;
+		vendingMachine = new EntityRef<VendingMachine>(vendingMachineData.networkID);
+		this.vendingMachineData?.Dispose();
+		this.vendingMachineData = vendingMachineData.Copy();
+		displayName = vendingMachineData.shopName.EscapeRichText();
 		toolTip.Text = displayName;
-		if (isInStock && sellOrderContainer != null && sellOrderContainer.sellOrders != null && sellOrderContainer.sellOrders.Count > 0)
+		if (isInStock && vendingMachineData?.sellOrderContainer?.sellOrders != null && vendingMachineData.sellOrderContainer.sellOrders.Count > 0)
 		{
 			toolTip.Text += "\n";
-			foreach (ProtoBuf.VendingMachine.SellOrder sellOrder in sellOrderContainer.sellOrders)
+			foreach (ProtoBuf.VendingMachine.SellOrder sellOrder in vendingMachineData.sellOrderContainer.sellOrders)
 			{
 				if (sellOrder.inStock > 0)
 				{
@@ -45,5 +59,19 @@ public class UIMapVendingMachineMarker : MonoBehaviour
 			}
 		}
 		toolTip.enabled = toolTip.Text != "";
+		if (button != null)
+		{
+			button.SetDisabled(UIMapVendingMachineMarker.onClicked == null);
+		}
+	}
+
+	public void Clicked()
+	{
+		UIMapVendingMachineMarker.onClicked?.Invoke(this);
+	}
+
+	public static void RemoveAllHandlers()
+	{
+		UIMapVendingMachineMarker.onClicked = null;
 	}
 }

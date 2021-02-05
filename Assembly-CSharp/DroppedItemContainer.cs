@@ -20,6 +20,8 @@ public class DroppedItemContainer : BaseCombatEntity
 	[NonSerialized]
 	public string _playerName;
 
+	public bool onlyOwnerLoot;
+
 	public ItemContainer inventory;
 
 	public string playerName
@@ -81,6 +83,10 @@ public class DroppedItemContainer : BaseCombatEntity
 	public override bool OnStartBeingLooted(BasePlayer baseEntity)
 	{
 		if (baseEntity.InSafeZone() && baseEntity.userID != playerSteamID)
+		{
+			return false;
+		}
+		if (onlyOwnerLoot && baseEntity.userID != playerSteamID)
 		{
 			return false;
 		}
@@ -173,8 +179,8 @@ public class DroppedItemContainer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)

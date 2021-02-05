@@ -4,8 +4,8 @@ using UnityEngine.Sprites;
 
 namespace UnityEngine.UI.Extensions
 {
-	[RequireComponent(typeof(RectTransform))]
 	[AddComponentMenu("UI/Extensions/Primitives/UILineRenderer")]
+	[RequireComponent(typeof(RectTransform))]
 	public class UILineRenderer : UIPrimitiveBase
 	{
 		private enum SegmentType
@@ -71,16 +71,16 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Thickness of the line")]
 		internal float lineThickness = 2f;
 
-		[SerializeField]
 		[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
+		[SerializeField]
 		internal bool relativeSize;
 
-		[SerializeField]
 		[Tooltip("Do the points identify a single line or split pairs of lines")]
+		[SerializeField]
 		internal bool lineList;
 
-		[SerializeField]
 		[Tooltip("Add end caps to each line\nMultiple caps when used with Line List")]
+		[SerializeField]
 		internal bool lineCaps;
 
 		[SerializeField]

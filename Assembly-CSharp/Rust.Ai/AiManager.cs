@@ -363,8 +363,8 @@ namespace Rust.Ai
 
 		private int lastWakeUpDormantIndex;
 
-		[Header("Cover System")]
 		[SerializeField]
+		[Header("Cover System")]
 		public bool UseCover = true;
 
 		public float CoverPointVolumeCellSize = 20f;

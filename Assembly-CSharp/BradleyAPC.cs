@@ -585,7 +585,11 @@ public class BradleyAPC : BaseCombatEntity
 		{
 			BasePlayer basePlayer = ent as BasePlayer;
 			Vector3 position = mainTurret.transform.position;
-			flag = IsVisible(basePlayer.eyes.position, position) || IsVisible(basePlayer.transform.position, position);
+			flag = IsVisible(basePlayer.eyes.position, position) || IsVisible(basePlayer.transform.position + Vector3.up * 0.1f, position);
+			if (flag)
+			{
+				flag = !UnityEngine.Physics.SphereCast(new Ray(position, Vector3Ex.Direction(basePlayer.eyes.position, position)), 0.05f, Vector3.Distance(basePlayer.eyes.position, position), 10551297);
+			}
 		}
 		else
 		{
@@ -996,6 +1000,17 @@ public class BradleyAPC : BaseCombatEntity
 					stack = path;
 					num = pathCost;
 					basePathNode = item2;
+				}
+			}
+			if (stack == null && nearNodes.Count > 0)
+			{
+				Stack<BasePathNode> path2 = new Stack<BasePathNode>();
+				BasePathNode basePathNode2 = nearNodes[UnityEngine.Random.Range(0, nearNodes.Count)];
+				float pathCost2;
+				if (AStarPath.FindPath(start, basePathNode2, out path2, out pathCost2) && pathCost2 < num)
+				{
+					stack = path2;
+					basePathNode = basePathNode2;
 				}
 			}
 			if (stack != null)

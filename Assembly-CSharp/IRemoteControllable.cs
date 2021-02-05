@@ -2,6 +2,11 @@ using UnityEngine;
 
 public interface IRemoteControllable
 {
+	bool RequiresMouse
+	{
+		get;
+	}
+
 	Transform GetEyes();
 
 	BaseEntity GetEnt();

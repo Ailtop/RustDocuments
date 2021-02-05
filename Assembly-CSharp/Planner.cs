@@ -196,6 +196,11 @@ public class Planner : HeldEntity
 				ownerPlayer.ChatMessage("Target socket is occupied. (" + target.socket.socketName + ")");
 				return;
 			}
+			if (target.onTerrain)
+			{
+				ownerPlayer.ChatMessage("Target on terrain is not allowed when attaching to socket. (" + target.socket.socketName + ")");
+				return;
+			}
 		}
 		if (ConVar.AntiHack.eye_protection >= 2)
 		{

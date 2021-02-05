@@ -13,11 +13,20 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 {
 	public static List<IRemoteControllable> allControllables = new List<IRemoteControllable>();
 
+	[Header("RC Entity")]
 	public string rcIdentifier = "NONE";
 
 	public Transform viewEyes;
 
 	public GameObjectRef IDPanelPrefab;
+
+	public bool IsBeingControlled
+	{
+		get;
+		private set;
+	}
+
+	public virtual bool RequiresMouse => false;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -87,12 +96,14 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	{
 	}
 
-	public void InitializeControl(BasePlayer controller)
+	public virtual void InitializeControl(BasePlayer controller)
 	{
+		IsBeingControlled = true;
 	}
 
-	public void StopControl()
+	public virtual void StopControl()
 	{
+		IsBeingControlled = false;
 	}
 
 	public void UpdateIdentifier(string newID, bool clientSend = false)
@@ -155,6 +166,10 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	[RPC_Server.MaxDistance(3f)]
 	public void Server_SetID(RPCMessage msg)
 	{
+		if (!CanControl())
+		{
+			return;
+		}
 		string text = msg.read.String();
 		if (ComputerStation.IsValidIdentifier(text))
 		{

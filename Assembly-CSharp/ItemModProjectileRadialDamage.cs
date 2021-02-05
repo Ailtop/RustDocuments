@@ -28,12 +28,13 @@ public class ItemModProjectileRadialDamage : ItemModProjectileMod
 			{
 				continue;
 			}
+			item.CenterPoint();
 			Vector3 a = item.ClosestPoint(info.HitPositionWorld);
 			float num = Vector3.Distance(a, info.HitPositionWorld) / radius;
 			if (!(num > 1f))
 			{
 				float num2 = 1f - num;
-				if (item.IsVisible(info.HitPositionWorld - info.ProjectileVelocity.normalized * 0.1f) && item.IsVisible(info.HitPositionWorld - (a - info.HitPositionWorld).normalized * 0.1f))
+				if (item.IsVisibleAndCanSee(info.HitPositionWorld - info.ProjectileVelocity.normalized * 0.1f) && item.IsVisibleAndCanSee(info.HitPositionWorld - (a - info.HitPositionWorld).normalized * 0.1f))
 				{
 					obj.Add(item);
 					item.OnAttacked(new HitInfo(info.Initiator, item, damage.type, damage.amount * num2));

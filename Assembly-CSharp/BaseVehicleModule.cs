@@ -32,8 +32,8 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	private const float TIME_BETWEEN_LOCK_REFRESH = 1f;
 
-	[Header("Vehicle Module")]
 	[SerializeField]
+	[Header("Vehicle Module")]
 	private Transform centreOfMassTransform;
 
 	[SerializeField]
@@ -47,12 +47,12 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	public LODLevel[] lodRenderers;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<ConditionalObject> conditionals;
 
-	[Header("Trigger Parent")]
 	[SerializeField]
+	[Header("Trigger Parent")]
 	private TriggerParent[] triggerParents;
 
 	[Header("Sliding Components")]

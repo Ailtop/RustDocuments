@@ -18,12 +18,12 @@ namespace UnityEngine.UI.Extensions
 		[SerializeField]
 		private bool m_cutLR;
 
-		[Tooltip("Up-Down colors become Left-Right colors")]
 		[SerializeField]
+		[Tooltip("Up-Down colors become Left-Right colors")]
 		private bool m_makeColumns;
 
-		[Header("Color the cut bars differently")]
 		[SerializeField]
+		[Header("Color the cut bars differently")]
 		private bool m_useColorUp;
 
 		[SerializeField]

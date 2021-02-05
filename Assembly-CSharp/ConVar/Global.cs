@@ -21,8 +21,8 @@ namespace ConVar
 		[ServerVar]
 		public static int maxthreads = 8;
 
-		[ClientVar(Saved = true)]
 		[ServerVar(Saved = true)]
+		[ClientVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -31,8 +31,8 @@ namespace ConVar
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int developer
 		{
 			get
@@ -69,8 +69,8 @@ namespace ConVar
 			ServerPerformance.DoReport();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void objects(Arg args)
 		{
 			UnityEngine.Object[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Object>();
@@ -109,8 +109,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void textures(Arg args)
 		{
 			UnityEngine.Texture[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Texture>();
@@ -124,8 +124,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void colliders(Arg args)
 		{
 			int num = (from x in UnityEngine.Object.FindObjectsOfType<Collider>()
@@ -138,15 +138,15 @@ namespace ConVar
 			args.ReplyWith(strValue);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void error(Arg args)
 		{
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void queue(Arg args)
 		{
 			string str = "";
@@ -214,9 +214,14 @@ namespace ConVar
 				}
 				basePlayer.SendNetworkUpdate();
 			}
+			else if (basePlayer.CanRespawn())
+			{
+				basePlayer.MarkRespawn();
+				basePlayer.Respawn();
+			}
 			else
 			{
-				basePlayer.Respawn();
+				basePlayer.ConsoleMessage("You can't respawn again so quickly, wait a while");
 			}
 		}
 
@@ -253,17 +258,29 @@ namespace ConVar
 		public static void respawn_sleepingbag(Arg args)
 		{
 			BasePlayer basePlayer = ArgEx.Player(args);
-			if ((bool)basePlayer && basePlayer.IsDead())
+			if (!basePlayer || !basePlayer.IsDead())
 			{
-				uint uInt = args.GetUInt(0);
-				if (uInt == 0)
+				return;
+			}
+			uint uInt = args.GetUInt(0);
+			if (uInt == 0)
+			{
+				args.ReplyWith("Missing sleeping bag ID");
+			}
+			else if (basePlayer.CanRespawn())
+			{
+				if (SleepingBag.SpawnPlayer(basePlayer, uInt))
 				{
-					args.ReplyWith("Missing sleeping bag ID");
+					basePlayer.MarkRespawn();
 				}
-				else if (!SleepingBag.SpawnPlayer(basePlayer, uInt))
+				else
 				{
 					args.ReplyWith("Couldn't spawn in sleeping bag!");
 				}
+			}
+			else
+			{
+				basePlayer.ConsoleMessage("You can't respawn again so quickly, wait a while");
 			}
 		}
 
@@ -456,8 +473,8 @@ namespace ConVar
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);

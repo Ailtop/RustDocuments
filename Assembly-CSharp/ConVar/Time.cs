@@ -9,8 +9,8 @@ namespace ConVar
 		[Help("Pause time while loading")]
 		public static bool pausewhileloading = true;
 
-		[Help("Fixed delta time in seconds")]
 		[ServerVar]
+		[Help("Fixed delta time in seconds")]
 		public static float fixeddelta
 		{
 			get
@@ -23,8 +23,8 @@ namespace ConVar
 			}
 		}
 
-		[Help("The minimum amount of times to tick per frame")]
 		[ServerVar]
+		[Help("The minimum amount of times to tick per frame")]
 		public static float maxdelta
 		{
 			get
@@ -37,8 +37,8 @@ namespace ConVar
 			}
 		}
 
-		[Help("The time scale")]
 		[ServerVar]
+		[Help("The time scale")]
 		public static float timescale
 		{
 			get

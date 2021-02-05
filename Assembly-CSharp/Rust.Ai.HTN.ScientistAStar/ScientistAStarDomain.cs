@@ -1952,8 +1952,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		}
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isRegisteredWithAgency;
 
 		private Vector3 missOffset;
@@ -1968,8 +1968,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		private Vector3 _lastNavigationHeading = Vector3.zero;
 
-		[Header("Pathfinding")]
 		[ReadOnly]
+		[Header("Pathfinding")]
 		public BasePath Path;
 
 		[ReadOnly]
@@ -1991,8 +1991,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[SerializeField]
 		[Header("Context")]
+		[SerializeField]
 		private ScientistAStarContext _context;
 
 		[SerializeField]
@@ -2000,9 +2000,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 		[Header("Navigation")]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor

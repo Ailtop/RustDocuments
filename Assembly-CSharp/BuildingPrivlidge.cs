@@ -44,6 +44,8 @@ public class BuildingPrivlidge : StorageContainer
 
 	public List<PlayerNameID> authorizedPlayers = new List<PlayerNameID>();
 
+	public const Flags Flag_MaxAuths = Flags.Reserved5;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BuildingPrivlidge.OnRpcMessage"))
@@ -534,6 +536,20 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
+	public bool AtMaxAuthCapacity()
+	{
+		return HasFlag(Flags.Reserved5);
+	}
+
+	public void UpdateMaxAuthCapacity()
+	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		if ((bool)activeGameMode && activeGameMode.limitTeamAuths)
+		{
+			SetFlag(Flags.Reserved5, authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize());
+		}
+	}
+
 	protected override void OnInventoryDirty()
 	{
 		base.OnInventoryDirty();
@@ -584,21 +600,26 @@ public class BuildingPrivlidge : StorageContainer
 
 	public void AddPlayer(BasePlayer player)
 	{
-		authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == player.userID);
-		PlayerNameID playerNameID = new PlayerNameID();
-		playerNameID.userid = player.userID;
-		playerNameID.username = player.displayName;
-		authorizedPlayers.Add(playerNameID);
+		if (!AtMaxAuthCapacity())
+		{
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == player.userID);
+			PlayerNameID playerNameID = new PlayerNameID();
+			playerNameID.userid = player.userID;
+			playerNameID.username = player.displayName;
+			authorizedPlayers.Add(playerNameID);
+			UpdateMaxAuthCapacity();
+		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RemoveSelfAuthorize(RPCMessage rpc)
 	{
 		RPCMessage rpc2 = rpc;
 		if (rpc2.player.CanInteract() && CanAdministrate(rpc2.player) && Interface.CallHook("OnCupboardDeauthorize", this, rpc.player) == null)
 		{
 			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
+			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
@@ -610,12 +631,13 @@ public class BuildingPrivlidge : StorageContainer
 		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardClearList", this, rpc.player) == null)
 		{
 			authorizedPlayers.Clear();
+			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Rotate(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

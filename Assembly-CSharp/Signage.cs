@@ -10,7 +10,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class Signage : IOEntity, ILOD
+public class Signage : IOEntity, ILOD, ISignage
 {
 	private const float TextureRequestTimeout = 15f;
 
@@ -20,6 +20,32 @@ public class Signage : IOEntity, ILOD
 
 	[NonSerialized]
 	public uint[] textureIDs;
+
+	public Vector2i TextureSize
+	{
+		get
+		{
+			if (paintableSources == null || paintableSources.Length == 0)
+			{
+				return Vector2i.zero;
+			}
+			MeshPaintableSource meshPaintableSource = paintableSources[0];
+			return new Vector2i(meshPaintableSource.texWidth, meshPaintableSource.texHeight);
+		}
+	}
+
+	public int TextureCount
+	{
+		get
+		{
+			MeshPaintableSource[] array = paintableSources;
+			if (array == null)
+			{
+				return 0;
+			}
+			return array.Length;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -113,7 +139,7 @@ public class Signage : IOEntity, ILOD
 						{
 							return true;
 						}
-						if (!RPC_Server.MaxDistance.Test(1255380462u, "UpdateSign", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(1255380462u, "UpdateSign", this, player, 5f))
 						{
 							return true;
 						}
@@ -158,7 +184,7 @@ public class Signage : IOEntity, ILOD
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server.CallsPerSecond(5uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
@@ -307,8 +333,8 @@ public class Signage : IOEntity, ILOD
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -320,8 +346,8 @@ public class Signage : IOEntity, ILOD
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))

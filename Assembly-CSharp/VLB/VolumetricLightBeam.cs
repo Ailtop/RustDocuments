@@ -16,8 +16,8 @@ namespace VLB
 
 		public ColorMode colorMode;
 
-		[ColorUsage(true, true)]
 		[FormerlySerializedAs("colorValue")]
+		[ColorUsage(true, true)]
 		public Color color = Consts.FlatColor;
 
 		public Gradient colorGradient;

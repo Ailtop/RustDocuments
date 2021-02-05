@@ -42,8 +42,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int incremental_milliseconds
 		{
 			get
@@ -56,8 +56,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled
 		{
 			get
@@ -77,15 +77,15 @@ namespace ConVar
 			Rust.GC.Collect();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void unload()
 		{
 			Resources.UnloadUnusedAssets();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void alloc(Arg args)
 		{
 			byte[] array = new byte[args.GetInt(0, 1048576)];

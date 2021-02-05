@@ -22,8 +22,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool waterlogged;
 
-	[Header("Modular Vehicle")]
 	[HideInInspector]
+	[Header("Modular Vehicle")]
 	public float mass;
 
 	[SerializeField]

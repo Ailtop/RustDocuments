@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Rust;
 using UnityEngine;
 
 public class PuzzleReset : FacepunchBehaviour
@@ -76,8 +77,21 @@ public class PuzzleReset : FacepunchBehaviour
 		}
 	}
 
+	public void CleanupSleepers()
+	{
+		for (int num = BasePlayer.sleepingPlayerList.Count - 1; num >= 0; num--)
+		{
+			BasePlayer basePlayer = BasePlayer.sleepingPlayerList[num];
+			if (basePlayer.IsSleeping() && Vector3.Distance(basePlayer.transform.position, playerDetectionOrigin.position) <= playerDetectionRadius)
+			{
+				basePlayer.Hurt(1000f, DamageType.Suicide, basePlayer, false);
+			}
+		}
+	}
+
 	public void DoReset()
 	{
+		CleanupSleepers();
 		IOEntity component = GetComponent<IOEntity>();
 		if (component != null)
 		{

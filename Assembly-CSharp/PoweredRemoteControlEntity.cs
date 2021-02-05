@@ -19,6 +19,8 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 
 	public bool isStatic;
 
+	public virtual bool RequiresMouse => false;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("PoweredRemoteControlEntity.OnRpcMessage"))

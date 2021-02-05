@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects
 {
-	[ImageEffectAllowedInSceneView]
-	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	[ExecuteInEditMode]
+	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
+	[ImageEffectAllowedInSceneView]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -67,8 +67,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("The highest possible exposure value; adjust this value to modify the darkest areas of your level.")]
 			public float max;
 
-			[Tooltip("Speed of linear adaptation. Higher is faster.")]
 			[Min(0f)]
+			[Tooltip("Speed of linear adaptation. Higher is faster.")]
 			public float speed;
 
 			[Tooltip("Displays a luminosity helper in the GameView.")]
@@ -109,8 +109,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Tonemapping technique to use. ACES is the recommended one.")]
 			public Tonemapper tonemapper;
 
-			[Tooltip("Adjusts the overall exposure of the scene.")]
 			[Min(0f)]
+			[Tooltip("Adjusts the overall exposure of the scene.")]
 			public float exposure;
 
 			[Tooltip("Custom tonemapping curve.")]
@@ -215,9 +215,9 @@ namespace UnityStandardAssets.CinematicEffects
 			[Range(-2f, 2f)]
 			public float tint;
 
+			[Tooltip("Shift the hue of all colors.")]
 			[Range(-0.5f, 0.5f)]
 			[Space]
-			[Tooltip("Shift the hue of all colors.")]
 			public float hue;
 
 			[Range(0f, 2f)]
@@ -228,12 +228,12 @@ namespace UnityStandardAssets.CinematicEffects
 			[Range(-1f, 1f)]
 			public float vibrance;
 
-			[Tooltip("Brightens or darkens all colors.")]
 			[Range(0f, 10f)]
+			[Tooltip("Brightens or darkens all colors.")]
 			public float value;
 
-			[Space]
 			[Range(0f, 2f)]
+			[Space]
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			public float contrast;
 
@@ -379,16 +379,16 @@ namespace UnityStandardAssets.CinematicEffects
 			}
 		}
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private EyeAdaptationSettings m_EyeAdaptation = EyeAdaptationSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private TonemappingSettings m_Tonemapping = TonemappingSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
 		[SerializeField]

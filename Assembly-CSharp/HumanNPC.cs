@@ -38,12 +38,12 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	public BaseCombatEntity currentTarget;
 
-	private HumanBrain _brain;
+	public HumanBrain _brain;
 
 	public float lastDismountTime;
 
 	[NonSerialized]
-	protected bool lightsOn;
+	public bool lightsOn;
 
 	private bool navmeshEnabled;
 
@@ -53,7 +53,7 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	public float nextZoneSearchTime;
 
-	private AIInformationZone cachedInfoZone;
+	public AIInformationZone cachedInfoZone;
 
 	[NonSerialized]
 	public bool currentTargetLOS;
@@ -61,20 +61,20 @@ public class HumanNPC : NPCPlayer, IThinker
 	[NonSerialized]
 	public BaseEntity[] QueryResults = new BaseEntity[64];
 
-	private SimpleAIMemory myMemory = new SimpleAIMemory();
+	public SimpleAIMemory myMemory = new SimpleAIMemory();
 
 	[NonSerialized]
 	public float memoryDuration = 10f;
 
-	private bool pendingDucked;
+	public bool pendingDucked;
 
-	private float timeSinceItemTick = 0.1f;
+	public float timeSinceItemTick = 0.1f;
 
-	private float timeSinceTargetUpdate = 0.5f;
+	public float timeSinceTargetUpdate = 0.5f;
 
-	private float targetAimedDuration;
+	public float targetAimedDuration;
 
-	private Vector3 aimOverridePosition = Vector3.zero;
+	public Vector3 aimOverridePosition = Vector3.zero;
 
 	public override float StartHealth()
 	{
