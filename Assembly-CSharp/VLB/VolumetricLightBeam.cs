@@ -98,8 +98,8 @@ namespace VLB
 		[SerializeField]
 		private int pluginVersion = -1;
 
-		[FormerlySerializedAs("trackChangesDuringPlaytime")]
 		[SerializeField]
+		[FormerlySerializedAs("trackChangesDuringPlaytime")]
 		private bool _TrackChangesDuringPlaytime;
 
 		[SerializeField]

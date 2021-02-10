@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -69,8 +69,8 @@ namespace ConVar
 			ServerPerformance.DoReport();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void objects(Arg args)
 		{
 			UnityEngine.Object[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Object>();
@@ -109,8 +109,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void textures(Arg args)
 		{
 			UnityEngine.Texture[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Texture>();
@@ -138,15 +138,15 @@ namespace ConVar
 			args.ReplyWith(strValue);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void error(Arg args)
 		{
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void queue(Arg args)
 		{
 			string str = "";
@@ -448,8 +448,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -466,15 +466,15 @@ namespace ConVar
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);

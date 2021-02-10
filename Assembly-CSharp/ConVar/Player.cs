@@ -46,8 +46,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar(AllowRunFromServer = true)]
 		[ServerUserVar]
+		[ClientVar(AllowRunFromServer = true)]
 		public static void cinematic_stop(Arg arg)
 		{
 			if (!arg.IsServerside)

@@ -4,8 +4,8 @@ namespace ConVar
 {
 	public class Manifest
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static object PrintManifest()
 		{
 			return Application.Manifest;

@@ -121,4 +121,28 @@ public class ConnectionQueue
 		}
 		return false;
 	}
+
+	public bool IsQueued(ulong userid)
+	{
+		for (int i = 0; i < queue.Count; i++)
+		{
+			if (queue[i].userid == userid)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool IsJoining(ulong userid)
+	{
+		for (int i = 0; i < joining.Count; i++)
+		{
+			if (joining[i].userid == userid)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

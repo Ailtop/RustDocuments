@@ -4004,36 +4004,30 @@ public class BasePlayer : BaseCombatEntity
 
 	public virtual void StartSleeping()
 	{
-		if (IsSleeping())
+		if (!IsSleeping())
 		{
-			return;
+			Interface.CallHook("OnPlayerSleep", this);
+			if (InSafeZone() && !IsInvoking(ScheduledDeath))
+			{
+				Invoke(ScheduledDeath, NPCAutoTurret.sleeperhostiledelay);
+			}
+			EnsureDismounted();
+			SetPlayerFlag(PlayerFlags.Sleeping, true);
+			sleepStartTime = UnityEngine.Time.time;
+			sleepingPlayerList.Add(this);
+			bots.Remove(this);
+			CancelInvoke(InventoryUpdate);
+			CancelInvoke(TeamUpdate);
+			inventory.loot.Clear();
+			inventory.crafting.CancelAll(true);
+			inventory.containerMain.OnChanged();
+			inventory.containerBelt.OnChanged();
+			inventory.containerWear.OnChanged();
+			TurnOffAllLights();
+			EnablePlayerCollider();
+			RemovePlayerRigidbody();
+			EnableServerFall(true);
 		}
-		Interface.CallHook("OnPlayerSleep", this);
-		if (IsWounded())
-		{
-			Hurt(10000f, DamageType.Suicide);
-			return;
-		}
-		if (InSafeZone() && !IsInvoking(ScheduledDeath))
-		{
-			Invoke(ScheduledDeath, NPCAutoTurret.sleeperhostiledelay);
-		}
-		EnsureDismounted();
-		SetPlayerFlag(PlayerFlags.Sleeping, true);
-		sleepStartTime = UnityEngine.Time.time;
-		sleepingPlayerList.Add(this);
-		bots.Remove(this);
-		CancelInvoke(InventoryUpdate);
-		CancelInvoke(TeamUpdate);
-		inventory.loot.Clear();
-		inventory.crafting.CancelAll(true);
-		inventory.containerMain.OnChanged();
-		inventory.containerBelt.OnChanged();
-		inventory.containerWear.OnChanged();
-		TurnOffAllLights();
-		EnablePlayerCollider();
-		RemovePlayerRigidbody();
-		EnableServerFall(true);
 	}
 
 	private void TurnOffAllLights()
@@ -5798,10 +5792,6 @@ public class BasePlayer : BaseCombatEntity
 				EACServer.playerTracker.LogPlayerRevive(client, client2);
 			}
 		}
-		if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
-		{
-			BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerRevived(source, this);
-		}
 	}
 
 	public void ProlongWounding(float delay)
@@ -5839,6 +5829,10 @@ public class BasePlayer : BaseCombatEntity
 	private void RecoverFromWounded()
 	{
 		SetPlayerFlag(PlayerFlags.Wounded, false);
+		if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
+		{
+			BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerRevived(null, this);
+		}
 	}
 
 	private bool WoundingCausingImmportality()

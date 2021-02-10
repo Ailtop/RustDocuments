@@ -21,12 +21,12 @@ namespace ConVar
 		[Help("Turns on debug display of protection")]
 		public static bool protection;
 
-		[ServerVar]
 		[Help("Turns on debug display of weakspots")]
+		[ServerVar]
 		public static bool weakspots;
 
-		[Help("Show trigger entries")]
 		[ServerVar]
+		[Help("Show trigger entries")]
 		public static bool triggers;
 
 		[ServerVar]
@@ -37,8 +37,8 @@ namespace ConVar
 		[Help("Turns on debug display of line of sight checks")]
 		public static bool lineofsight;
 
-		[ServerVar]
 		[Help("Turns on debug display of senses, which are received by Ai")]
+		[ServerVar]
 		public static bool sense;
 	}
 }

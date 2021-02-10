@@ -79,10 +79,14 @@ public class PuzzleReset : FacepunchBehaviour
 
 	public void CleanupSleepers()
 	{
+		if (playerDetectionOrigin == null || BasePlayer.sleepingPlayerList == null)
+		{
+			return;
+		}
 		for (int num = BasePlayer.sleepingPlayerList.Count - 1; num >= 0; num--)
 		{
 			BasePlayer basePlayer = BasePlayer.sleepingPlayerList[num];
-			if (basePlayer.IsSleeping() && Vector3.Distance(basePlayer.transform.position, playerDetectionOrigin.position) <= playerDetectionRadius)
+			if (!(basePlayer == null) && basePlayer.IsSleeping() && Vector3.Distance(basePlayer.transform.position, playerDetectionOrigin.position) <= playerDetectionRadius)
 			{
 				basePlayer.Hurt(1000f, DamageType.Suicide, basePlayer, false);
 			}

@@ -13,12 +13,25 @@ public class ConnectionAuth : MonoBehaviour
 	[NonSerialized]
 	public static List<Connection> m_AuthConnection = new List<Connection>();
 
-	public bool IsConnected(ulong iSteamID)
+	public bool IsAuthed(ulong iSteamID)
 	{
 		if ((bool)BasePlayer.FindByID(iSteamID))
 		{
 			return true;
 		}
+		if (SingletonComponent<ServerMgr>.Instance.connectionQueue.IsJoining(iSteamID))
+		{
+			return true;
+		}
+		if (SingletonComponent<ServerMgr>.Instance.connectionQueue.IsQueued(iSteamID))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public bool IsAuthing(ulong iSteamID)
+	{
 		return m_AuthConnection.Any((Connection item) => item.userid == iSteamID);
 	}
 
@@ -85,7 +98,7 @@ public class ConnectionAuth : MonoBehaviour
 			DebugEx.Log(connection.ToString() + " is a developer");
 			connection.authLevel = 3u;
 		}
-		if (IsConnected(connection.userid))
+		if (IsAuthed(connection.userid) || IsAuthing(connection.userid))
 		{
 			Reject(connection, "You are already connected!");
 		}
@@ -103,8 +116,7 @@ public class ConnectionAuth : MonoBehaviour
 		yield return StartCoroutine(Auth_CentralizedBans.Run(connection));
 		if (!connection.rejected && connection.active)
 		{
-			BasePlayer basePlayer = BasePlayer.FindByID(connection.userid);
-			if ((bool)basePlayer && basePlayer.net.connection != null)
+			if (IsAuthed(connection.userid))
 			{
 				Reject(connection, "You are already connected as a player!");
 			}

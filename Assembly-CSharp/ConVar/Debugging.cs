@@ -37,8 +37,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void renderinfo(Arg arg)
 		{
 			RenderInfo.GenerateReport();

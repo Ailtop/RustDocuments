@@ -60,8 +60,8 @@ namespace Rust.Modular
 		[Tooltip("Copied automatically from the WheelColliders")]
 		public float suspensionDistance;
 
-		[ReadOnly]
 		[Tooltip("Copied automatically from the WheelColliders")]
+		[ReadOnly]
 		public float springTargetPosition;
 	}
 }

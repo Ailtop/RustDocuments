@@ -2120,8 +2120,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		[SerializeField]
@@ -2150,18 +2150,18 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[Header("Context")]
 		private ScientistJunkpileContext _context;
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Navigation")]
+		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
 		[SerializeField]
 		[ReadOnly]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2206,8 +2206,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
@@ -2310,12 +2310,12 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isFiring;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;

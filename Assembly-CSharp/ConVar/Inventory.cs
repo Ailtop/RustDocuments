@@ -501,8 +501,8 @@ namespace ConVar
 			arg.ReplyWith(obj);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void reloaddefs(Arg arg)
 		{
 			Steamworks.SteamInventory.LoadItemDefinitions();

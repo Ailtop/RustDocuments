@@ -22,8 +22,8 @@ namespace ConVar
 			return Output.HistoryOutput.Skip(num);
 		}
 
-		[Help("Search the console for a particular string")]
 		[ServerVar]
+		[Help("Search the console for a particular string")]
 		public static IEnumerable<Output.Entry> search(Arg arg)
 		{
 			string search = arg.GetString(0, null);

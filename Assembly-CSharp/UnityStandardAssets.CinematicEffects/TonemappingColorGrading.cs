@@ -162,8 +162,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Custom lookup texture (strip format, e.g. 256x16).")]
 			public Texture texture;
 
-			[Tooltip("Blending factor.")]
 			[Range(0f, 1f)]
+			[Tooltip("Blending factor.")]
 			public float contribution;
 
 			public static LUTSettings defaultSettings
@@ -207,8 +207,8 @@ namespace UnityStandardAssets.CinematicEffects
 		[Serializable]
 		public struct BasicsSettings
 		{
-			[Range(-2f, 2f)]
 			[Tooltip("Sets the white balance to a custom color temperature.")]
+			[Range(-2f, 2f)]
 			public float temperatureShift;
 
 			[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
@@ -341,8 +341,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[IndentedGroup]
 			public BasicsSettings basics;
 
-			[Space]
 			[ChannelMixer]
+			[Space]
 			public ChannelMixerSettings channelMixer;
 
 			[Space]
