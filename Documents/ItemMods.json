@@ -473,6 +473,9 @@
   "computerstation": [
     "ItemModEntity"
   ],
+  "drone": [
+    "ItemModEntity"
+  ],
   "dropbox": [
     "ItemModEntity"
   ],
@@ -793,6 +796,9 @@
   "stash.small": [
     "ItemModEntity"
   ],
+  "sofa": [
+    "ItemModEntity"
+  ],
   "spinner.wheel": [
     "ItemModEntity"
   ],
@@ -1084,6 +1090,9 @@
   "newyeargong": [
     "ItemModEntity"
   ],
+  "hat.oxmask": [
+    "ItemModWearable"
+  ],
   "hat.ratmask": [
     "ItemModWearable"
   ],
@@ -1330,6 +1339,12 @@
   "twitch.headset": [
     "ItemModWearable"
   ],
+  "hobobarrel": [
+    "ItemModEntity"
+  ],
+  "door.hinged.industrial.a": [
+    "ItemModEntity"
+  ],
   "candycaneclub": [
     "ItemModEntity",
     "ItemModConsume",
@@ -1345,7 +1360,28 @@
   "giantcandycanedecor": [
     "ItemModEntity"
   ],
+  "wall.ice.wall": [
+    "ItemModEntity"
+  ],
+  "wall.external.high.ice": [
+    "ItemModEntity"
+  ],
   "giantlollipops": [
+    "ItemModEntity"
+  ],
+  "sign.neon.125x125": [
+    "ItemModEntity"
+  ],
+  "sign.neon.125x215.animated": [
+    "ItemModEntity"
+  ],
+  "sign.neon.125x215": [
+    "ItemModEntity"
+  ],
+  "sign.neon.xl.animated": [
+    "ItemModEntity"
+  ],
+  "sign.neon.xl": [
     "ItemModEntity"
   ],
   "pookie.bear": [
@@ -1366,11 +1402,21 @@
     "ItemModUpgrade",
     "ItemModUnwrap"
   ],
+  "sled.xmas": [
+    "ItemModEntity"
+  ],
+  "sled": [
+    "ItemModEntity"
+  ],
   "snowmachine": [
     "ItemModEntity",
     "ItemModContainer"
   ],
   "snowball": [
+    "ItemModEntity"
+  ],
+  "ammo.snowballgun": [],
+  "snowballgun": [
     "ItemModEntity"
   ],
   "snowman": [

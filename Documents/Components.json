@@ -2589,6 +2589,13 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "drone.deployed": [
+    "Drone",
+    "RemoteControlEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "dropbox.deployed": [
     "DropBox",
     "Mailbox",
@@ -3303,102 +3310,119 @@
   ],
   "sign.hanging.banner.large": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.hanging.ornate": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.hanging": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.huge.wood": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.large.wood": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.medium.wood": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.pictureframe.landscape": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.pictureframe.portrait": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.pictureframe.tall": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.pictureframe.xl": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.pictureframe.xxl": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.pole.banner.large": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.post.double": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.post.single": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.post.town": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.post.town.roof": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
   "sign.small.wood": [
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -3426,9 +3450,24 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "sofaseat": [
+    "BaseChair",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sofa.deployed": [
+    "BaseVehicle",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "spinner.wheel.deployed": [
     "SpinnerWheel",
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -3710,6 +3749,85 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "deathmatch": [
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "kingofthehilldm": [
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "kingofthehillteam": [
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "capturepoint": [
+    "GameModeCapturePoint",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "reclaimbackpack": [
+    "ReclaimBackpack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "reclaimmanager": [
+    "ReclaimManager",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "reclaimterminal": [
+    "ReclaimTerminal",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "onedeath": [
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "staticrespawnzonebandit": [
+    "StaticRespawnArea",
+    "SleepingBag",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "staticrespawnzonecompound": [
+    "StaticRespawnArea",
+    "SleepingBag",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "softcore": [
+    "GameModeSoftcore",
+    "GameModeVanilla",
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "teamdeathmatch": [
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "vanilla": [
+    "BaseGameMode",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "bass.weapon": [
     "InstrumentToolGuitar",
     "InstrumentTool",
@@ -3893,6 +4011,7 @@
     "BigWheelGame",
     "SpinnerWheel",
     "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -4277,6 +4396,33 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "deliverydronemarker": [
+    "MapMarkerDeliveryDrone",
+    "MapMarker",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "drone.delivery": [
+    "DeliveryDrone",
+    "Drone",
+    "RemoteControlEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "marketplace": [
+    "Marketplace",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "marketterminal": [
+    "MarketTerminal",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "orebonus_generic": [
     "OreHotSpot",
     "BaseCombatEntity",
@@ -4436,6 +4582,23 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "hobobarrel.deployed": [
+    "BaseOven",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.industrial.a": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "candy_cane.entity": [
     "BaseMelee",
     "AttackEntity",
@@ -4471,9 +4634,69 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "icewall": [
+    "IceFence",
+    "GraveyardFence",
+    "SimpleBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "wall.external.high.ice": [
+    "IceFence",
+    "GraveyardFence",
+    "SimpleBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "giantlollipops.deployed": [
     "DecorDeployable",
     "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sign.neon.125x125": [
+    "NeonSign",
+    "Signage",
+    "IOEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sign.neon.125x215.animated": [
+    "NeonSign",
+    "Signage",
+    "IOEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sign.neon.125x215": [
+    "NeonSign",
+    "Signage",
+    "IOEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sign.neon.xl.animated": [
+    "NeonSign",
+    "Signage",
+    "IOEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sign.neon.xl": [
+    "NeonSign",
+    "Signage",
+    "IOEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -4492,6 +4715,22 @@
   "xmas.advanced.lights.deployed": [
     "AdvancedChristmasLights",
     "IOEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sled.deployed.xmas": [
+    "Sled",
+    "BaseVehicle",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sled.deployed": [
+    "Sled",
+    "BaseVehicle",
+    "BaseMountable",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -4521,6 +4760,14 @@
   ],
   "snowball.entity": [
     "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "snowballgun.entity": [
+    "SnowballGun",
+    "BaseProjectile",
     "AttackEntity",
     "HeldEntity",
     "BaseEntity",
@@ -5406,6 +5653,24 @@
     "BaseNetworkable"
   ],
   "saddletest": [
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sledseatfront": [
+    "SledSeat",
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sledseatrear": [
+    "SledSeat",
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
     "BaseMountable",

@@ -7020,6 +7020,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/ui/dialogs/ui.dialog.sign.update.neon.prefab",
+    "guid": "9822211daaf428b42b32f5dc4938d157",
+    "hash": 1906883989,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/ui/dialogs/ui.dialog.sign.update.prefab",
     "guid": "609fcad18bdacc647a96fae2724cc8f5",
     "hash": 2800747705,
@@ -7188,6 +7194,12 @@
     "pool": true
   },
   {
+    "name": "assets/bundled/prefabs/ui/lootpanels/lootpanel.genericsmall.prefab",
+    "guid": "4ac014d48eae3174798aecc380c2a3cf",
+    "hash": 450528603,
+    "pool": true
+  },
+  {
     "name": "assets/bundled/prefabs/ui/lootpanels/lootpanel.lantern.prefab",
     "guid": "a7b4dbc443b5d6b41ba8b45a7a7c0a91",
     "hash": 3331590796,
@@ -7251,6 +7263,12 @@
     "name": "assets/bundled/prefabs/ui/lootpanels/lootpanel.player_corpse.prefab",
     "guid": "a650d611fe7ad734c8f5c4feb1eeef33",
     "hash": 952584140,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/ui/lootpanels/lootpanel.reclaim.prefab",
+    "guid": "a3659d3260d8e5249b9c713cbeae9222",
+    "hash": 2448727396,
     "pool": true
   },
   {
@@ -7923,6 +7941,24 @@
     "name": "assets/content/effects/muzzleflashes/other/eoka_flint_spark.prefab",
     "guid": "61f312ce922019c40b65cf4ca1877af7",
     "hash": 3415828110,
+    "pool": false
+  },
+  {
+    "name": "assets/content/effects/muzzleflashes/other/muzzle_flash_snowballgun.prefab",
+    "guid": "8a0495476cf6f144f919f71c44441119",
+    "hash": 2462024273,
+    "pool": false
+  },
+  {
+    "name": "assets/content/effects/muzzleflashes/other/projectilefx_snowballgun.prefab",
+    "guid": "19b4c598f58f9e645ae00371b13b412e",
+    "hash": 3756063040,
+    "pool": false
+  },
+  {
+    "name": "assets/content/effects/muzzleflashes/other/projectilefx_snowballgun_impact.prefab",
+    "guid": "55c9872ed38279c42aedfa88f74aec2e",
+    "hash": 2015163394,
     "pool": false
   },
   {
@@ -12996,6 +13032,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/rubble_piles/snow_pile_18x18.prefab",
+    "guid": "cecdcd632f97434408331f521ebbe530",
+    "hash": 2678964558,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/scrap_heli_wreck/scrap_heli_wreck.prefab",
     "guid": "44665a1a302d90a4180b6e3957264d2f",
     "hash": 2717168649,
@@ -17316,6 +17358,36 @@
     "pool": false
   },
   {
+    "name": "assets/content/structures/road_tunnels/road_tunnel_double_bend_a_36m.prefab",
+    "guid": "357e335c543044a41bdd0fa56e9b3278",
+    "hash": 3650896779,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/road_tunnels/road_tunnel_double_exit_a_36m.prefab",
+    "guid": "facbc3a19eaa1b94c9e7a3fc229b3e8b",
+    "hash": 151676791,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/road_tunnels/road_tunnel_double_slope_a_72m.prefab",
+    "guid": "07e9e00d645acfe4081bd9a05fc48d39",
+    "hash": 103939342,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/road_tunnels/road_tunnel_double_slope_b_72m.prefab",
+    "guid": "66cce8b7fc7c833479be898d0782e44e",
+    "hash": 3996375751,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/road_tunnels/road_tunnel_double_str_a_36m.prefab",
+    "guid": "8beb8fff538f2d4459a1c9d0b161e7f3",
+    "hash": 2944704725,
+    "pool": false
+  },
+  {
     "name": "assets/content/structures/roads/carpark_a.prefab",
     "guid": "9d9d40d7d75853345990c36359966d87",
     "hash": 4028826801,
@@ -20016,6 +20088,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/ui/gameui/scoreboardcanvas.prefab",
+    "guid": "27e67a23ba710c04c93819254e8291d4",
+    "hash": 1105684649,
+    "pool": false
+  },
+  {
     "name": "assets/content/ui/gameui/teamdisplay/teammember.prefab",
     "guid": "4ae3342df37b7fc49ad4625660adf107",
     "hash": 1954099525,
@@ -20196,6 +20274,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/ui/gameui/ui.item.pending.prefab",
+    "guid": "c59f0b117dcd53e4fb1266f7796d1d81",
+    "hash": 2808130797,
+    "pool": false
+  },
+  {
     "name": "assets/content/ui/gameui/ui.item.pickup.prefab",
     "guid": "9c59e5a2f990d9b48be9482e897e8b32",
     "hash": 294030399,
@@ -20295,6 +20379,12 @@
     "name": "assets/content/ui/gameui/workshopitemrow.prefab",
     "guid": "9a765084ef31b7e4083fa04f628a4609",
     "hash": 150869484,
+    "pool": false
+  },
+  {
+    "name": "assets/content/ui/menuui/menuiui.suicide.prefab",
+    "guid": "d490b017755cdd444841d9942655b125",
+    "hash": 3770881033,
     "pool": false
   },
   {
@@ -20481,6 +20571,12 @@
     "name": "assets/content/ui/menuui/ui.serverbrowser.list.prefab",
     "guid": "26c3ef451020b074289e8b662eb53161",
     "hash": 2468234189,
+    "pool": false
+  },
+  {
+    "name": "assets/content/ui/menuui/ui.serverbrowser.tag.prefab",
+    "guid": "a09ef0582fbf11e4ba1b759ff3393c59",
+    "hash": 227433652,
     "pool": false
   },
   {
@@ -23784,6 +23880,12 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building/door.hinged.industrial/models/industrial_doors_a_a.gibs.red.prefab",
+    "guid": "a334cd36b100035409949b06dd14b1fa",
+    "hash": 2047419285,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/building/door.hinged/door.hinged.metal.item.prefab",
     "guid": "7314fea4273a8e449ba5f55fca53a529",
     "hash": 117242065,
@@ -27018,6 +27120,18 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/deployable/drone/drone.deployed.prefab",
+    "guid": "4b623c90fac38ed4f82954d4fc407e6a",
+    "hash": 1191314495,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/drone/drone.item.prefab",
+    "guid": "9dfc8c50fcd966546913c146e69cb200",
+    "hash": 645121459,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/deployable/drone/drone.prefab",
     "guid": "257673f7b24081a40906cf4a407ca883",
     "hash": 2478500425,
@@ -28932,6 +29046,36 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/deployable/sofa/effects/sofa-deploy.prefab",
+    "guid": "164ccd557f8dc4a42b529041e1f3ecc9",
+    "hash": 74938577,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/sofa/effects/sofa-destroy.prefab",
+    "guid": "93ab006049a8e4a548c54f3012132390",
+    "hash": 542620432,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/sofa/seats/sofaseat.prefab",
+    "guid": "8c3824ed69f9f674bac121d58c48d380",
+    "hash": 2119696825,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/sofa/sofa.deployed.prefab",
+    "guid": "3aeb527f854e77147911913062bfae0a",
+    "hash": 51176708,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/sofa/sofa.item.prefab",
+    "guid": "50a1b170f91389b4fa2f92e3817d5fa7",
+    "hash": 3790146395,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/deployable/spinner_wheel/effects/spinner-wheel-deploy.prefab",
     "guid": "d10dc5a95aa7e48f9afba82548b40d9f",
     "hash": 858827807,
@@ -30132,6 +30276,108 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/gamemodes/deathmatch.prefab",
+    "guid": "9e47e7fed5dd96441bbabc89ac6257a2",
+    "hash": 3323268180,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/kingofthehilldm.prefab",
+    "guid": "4d1ccd2cc12627843817eff0b5116b61",
+    "hash": 825419898,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/kingofthehillteam.prefab",
+    "guid": "b18ddb304728d024b8a7c1606f7e27e5",
+    "hash": 4276462027,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/capturepoint/capturepoint.prefab",
+    "guid": "26cac699ae626b54bb94c2a403885486",
+    "hash": 3788504645,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/capturepoint/effects/capturepoint_progress_beep.prefab",
+    "guid": "74f54892239d7d94f9d3060e7e539e09",
+    "hash": 1986010371,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/capturepoint/effects/capturepoint_progress_complete.prefab",
+    "guid": "34b756f9aa8bbc84098e042465d730a1",
+    "hash": 54002641,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/reclaim/reclaimbackpack.prefab",
+    "guid": "66ec989d3019ae34aa22357429cb0d24",
+    "hash": 1658485694,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/reclaim/reclaimcontainerstatic.prefab",
+    "guid": "2412bdd313c4009428a7931c9b5eaad4",
+    "hash": 3273404916,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/reclaim/reclaimmanager.prefab",
+    "guid": "abf1f4b9b3f15324d9e2be856cb6a3cb",
+    "hash": 3866571115,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/reclaim/reclaimsign.prefab",
+    "guid": "543cb11aa13b92e4f91c2baf5860794e",
+    "hash": 2623655678,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/objects/reclaim/reclaimterminal.prefab",
+    "guid": "5da6da00f33574543a8d19909ba81147",
+    "hash": 2564311448,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/onedeath.prefab",
+    "guid": "dbb9ef5599f068347a4403943d2a5578",
+    "hash": 3275115225,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/softcore.prefab",
+    "guid": "41b904457042f6549bee76bb0059fa21",
+    "hash": 1954920076,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/softcore/staticrespawnzonebandit.prefab",
+    "guid": "108662db0c5270a4aa20d12e8db391c9",
+    "hash": 3810400291,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/softcore/staticrespawnzonecompound.prefab",
+    "guid": "63f56d32056372a47a0989461f03577e",
+    "hash": 1919922518,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/teamdeathmatch.prefab",
+    "guid": "615f7d4965e3c7b45b8bf4c9fa4c8e66",
+    "hash": 18701516,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/gamemodes/vanilla.prefab",
+    "guid": "2aaedd8d94155104187610733d764793",
+    "hash": 2957505463,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/instruments/bass/bass.item.prefab",
     "guid": "4197e2fff18fa1a4899451fcf78cad71",
     "hash": 3808590700,
@@ -30759,6 +31005,24 @@
     "name": "assets/prefabs/misc/chinesenewyear/newyeargong/newyeargong.item.prefab",
     "guid": "9325b4a15b223f941b0a79c6b8574966",
     "hash": 3594052206,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/chinesenewyear/oxmask/bullmask.wearable.prefab",
+    "guid": "58b935549b65d9846863be05abfd10dc",
+    "hash": 3996472123,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/chinesenewyear/oxmask/bullmask.world.prefab",
+    "guid": "332ca83c15368d446b5eceae58050110",
+    "hash": 4079651010,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/chinesenewyear/oxmask/hat.bullmask.item.prefab",
+    "guid": "e82a4de72b9c8ca418a7ae2924d62db4",
+    "hash": 2561856741,
     "pool": false
   },
   {
@@ -32106,6 +32370,36 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/misc/marketplace/deliverydronemarker.prefab",
+    "guid": "b2a8190edceacc6418959031a547bc30",
+    "hash": 3742716325,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/marketplace/drone.delivery.prefab",
+    "guid": "c6c8c80bfde00d54cacf7a6bbee932b7",
+    "hash": 2325891644,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/marketplace/marketplace.prefab",
+    "guid": "8fc688fb7cdb9924184dfb006e038826",
+    "hash": 3953076030,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/marketplace/marketterminal.prefab",
+    "guid": "e235e1f91666dd048b767e54b1e31f8b",
+    "hash": 407767262,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/marketplace/ui.dialog.marketterminal.prefab",
+    "guid": "f0324c1fd21e78442ad865e83bdde6c2",
+    "hash": 3945898597,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/misc/movember/movember_moustache_card/movember_moustache_card.item.prefab",
     "guid": "3cd4b391360c83c48b2148d9aff8cdbf",
     "hash": 1510258795,
@@ -33294,6 +33588,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/misc/twitch/hobobarrel/hobobarrel.deployed.prefab",
+    "guid": "a25b133dc4def4043a3aac10c3fb4f88",
+    "hash": 1748062128,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/twitch/hobobarrel/hobobarrel.item.prefab",
+    "guid": "0aad1f5bd1308a844b4416ec51f6b768",
+    "hash": 4184197102,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/twitch/industrialdoora/door.hinged.industrial.a.prefab",
+    "guid": "e8ad68e9d4437d94bba7e62af135718e",
+    "hash": 358326125,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/twitch/industrialdoora/door.hinged.metal.industrial.a.item.prefab",
+    "guid": "ab0c34b522b4e164c8cfe3d2e5b80a98",
+    "hash": 2100475784,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/misc/twitch/underwear/femaleunderwear_twitch_legs.prefab",
     "guid": "ffe0837ac412efc4e97c965472d991ef",
     "hash": 2870584534,
@@ -33534,6 +33852,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/misc/xmas/icewalls/icewall.item.prefab",
+    "guid": "a91f8357197849c4aae32357ae941755",
+    "hash": 1202001486,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/icewalls/icewall.prefab",
+    "guid": "3110c445ad727ea4e935280e9a7d41c8",
+    "hash": 797759041,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/icewalls/wall.external.high.ice.item.prefab",
+    "guid": "67935afaabeb9c541982279f993aebcb",
+    "hash": 1072904583,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/icewalls/wall.external.high.ice.prefab",
+    "guid": "691edfedf027d8a4c8b1089cd1c1f812",
+    "hash": 921229511,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/misc/xmas/lollipop_bundle/giantlollipops.deployed.prefab",
     "guid": "90035a52e4f3ba249a82c79963bc6f99",
     "hash": 2711960434,
@@ -33543,6 +33885,66 @@
     "name": "assets/prefabs/misc/xmas/lollipop_bundle/giantlollipops.item.prefab",
     "guid": "790f50cfe55b3f24f873574b522b239f",
     "hash": 4267953314,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.125x125.item.prefab",
+    "guid": "1461337c288aa47489e8dbb8f77142dd",
+    "hash": 2097470988,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.125x125.prefab",
+    "guid": "9d3d3a89a40a3d741a8807b35420949b",
+    "hash": 3919686896,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.125x215.animated.item.prefab",
+    "guid": "0df84b1ad85db5448970e7898c7c5786",
+    "hash": 145981767,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.125x215.animated.prefab",
+    "guid": "3168b92810a13fd44944c884562ac4a3",
+    "hash": 3591916872,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.125x215.item.prefab",
+    "guid": "bb9bad90a7e703c49915e8b82c088546",
+    "hash": 2129804599,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.125x215.prefab",
+    "guid": "feb74974f48cae6459e176f627072d72",
+    "hash": 2628005754,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.xl.animated.item.prefab",
+    "guid": "435fdf861a2865b4cb059b37d72df878",
+    "hash": 3262904258,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.xl.animated.prefab",
+    "guid": "adf8c608cca78494c8efac90f9ff7927",
+    "hash": 708840119,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.xl.item.prefab",
+    "guid": "6dee491c34f42df4fb9e7c080ca96573",
+    "hash": 2291847021,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/neon_sign/sign.neon.xl.prefab",
+    "guid": "78d6baa7a2a23794ca3910a8686fd28a",
+    "hash": 3168507223,
     "pool": false
   },
   {
@@ -33654,6 +34056,54 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/misc/xmas/sled/effects/sled-deploy.prefab",
+    "guid": "f94488791080143d580028f0ef4a8e01",
+    "hash": 1553126150,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/effects/vfx_sled_trails.prefab",
+    "guid": "9701f32a9846ebd40aa7fb5b5fbc5c92",
+    "hash": 1028869578,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/skins/sled.deployed.xmas.prefab",
+    "guid": "7bc03e93e7786fd4c8f7631a00878531",
+    "hash": 3689934812,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/skins/sled.item.xmas.prefab",
+    "guid": "4105dfd728ae62f4f8a795c13f34f685",
+    "hash": 1514403436,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/sled.deployed.prefab",
+    "guid": "62e1e15f5a782104b96f0e9a5fae8cc2",
+    "hash": 4063253222,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/sled.item.prefab",
+    "guid": "ae3adc640ee894c449fcdc43549a1fd5",
+    "hash": 2419761749,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/sled.prefab",
+    "guid": "ce076759793b9d949b9eec9724ca9015",
+    "hash": 601485963,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/sled/sled_xmas.prefab",
+    "guid": "c991c56223fedb840bead6ebac91155a",
+    "hash": 1178179798,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/misc/xmas/sleigh/presentdrop.prefab",
     "guid": "15d34fa32b887ea4480eab93916fedc2",
     "hash": 1473303316,
@@ -33748,6 +34198,84 @@
     "guid": "7702b5daabe6daa4180e1a684d901856",
     "hash": 3065355106,
     "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/ammo_snowballgun.item.prefab",
+    "guid": "a3b8fba02516259428af4643ed5539b5",
+    "hash": 2038313369,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/attack.prefab",
+    "guid": "aa1f29dea2aa61648917db6250015f00",
+    "hash": 2942239164,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/deploy.prefab",
+    "guid": "0631ced34ee1e49739423cc47e75155c",
+    "hash": 263833745,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/reload_end.prefab",
+    "guid": "840b2658736cd4274991742826659672",
+    "hash": 104776533,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/reload_single_insert.prefab",
+    "guid": "31dc10ec49a9c43e0a9b36f15741b98e",
+    "hash": 691990722,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/reload_single_spin.prefab",
+    "guid": "773c9dbef03ac423c9b6e7a7057f44c9",
+    "hash": 1751842840,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/reload_single_start.prefab",
+    "guid": "d3d1b309f116648da8eae797bf5c0633",
+    "hash": 1278052795,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/effects/reload_start.prefab",
+    "guid": "a314815b010e445d7b37faa058c51c65",
+    "hash": 1511660267,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/snowballgun.entity.prefab",
+    "guid": "96a216db5647c564bb179e098decb76d",
+    "hash": 3228215527,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/snowballgun.item.prefab",
+    "guid": "04f703c850ba0c4448b29590b500796b",
+    "hash": 3236341456,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/snowballgun.viewmodel.prefab",
+    "guid": "811fdd197463e854580fab9dce1ae14c",
+    "hash": 1177206578,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/snowballgun.worldmodel.prefab",
+    "guid": "23c325429b3e9d442a7fc2a1717bf2d4",
+    "hash": 3316392790,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/xmas/snowballgun/snowballgunbullet.prefab",
+    "guid": "2f053691bc1988c4c8e9e686e6e09da8",
+    "hash": 2018030618,
+    "pool": true
   },
   {
     "name": "assets/prefabs/misc/xmas/snowman/snowman.deployed.prefab",
@@ -36612,6 +37140,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/tools/map/ui/ui.map.deliverydrone.prefab",
+    "guid": "bfb4532c8b31f4447bfa1e506bc88e85",
+    "hash": 3484323926,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/tools/map/ui/ui.map.explosion.prefab",
     "guid": "4d197725eb3a1154798ffef967681406",
     "hash": 3151507324,
@@ -37059,6 +37593,18 @@
     "name": "assets/prefabs/vehicle/seats/saddletest.prefab",
     "guid": "100a5a21d9248f2428785b4f71e7d6f6",
     "hash": 750623658,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/vehicle/seats/sledseatfront.prefab",
+    "guid": "e972ba1b6fc70dc4db462dcaa260d9f5",
+    "hash": 1212881407,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/vehicle/seats/sledseatrear.prefab",
+    "guid": "578f5012337fefd4ba126dc2fc6efc23",
+    "hash": 518673090,
     "pool": false
   },
   {
@@ -43680,6 +44226,18 @@
     "pool": false
   },
   {
+    "name": "assets/scenes/release/hapisislandterrain/roadsv2signs/__fog volume.prefab",
+    "guid": "88d6a37cb69b53d44a7e5fb93eb43218",
+    "hash": 2197939707,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/release/hapisislandterrain/roadsv2signs/road signs.prefab",
+    "guid": "3e55f147de9e0bc428f66b22abb7e69c",
+    "hash": 3578721290,
+    "pool": false
+  },
+  {
     "name": "assets/scenes/release/hapisislandterrain/waterfall/waterfall.prefab",
     "guid": "4e407d4f767ea4640a7664ee1c46a11f",
     "hash": 3477681128,
@@ -43731,6 +44289,66 @@
     "name": "assets/standard assets/third party/time of day/prefabs/sky dome.prefab",
     "guid": "b2498b078e1b54bd68239c9a29c28a81",
     "hash": 2593612458,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/_preset editors/road types.prefab",
+    "guid": "dbcf3803d269bd44e89b29f1c0177ff5",
+    "hash": 3499768871,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/dynamic prefabs/default t crossing.prefab",
+    "guid": "89141500ea2b95f488191219f049f7c5",
+    "hash": 571780199,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/dynamic prefabs/default x crossing.prefab",
+    "guid": "945a03d9bc818b0409e89d4b48fe8e67",
+    "hash": 1898748852,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/dynamic prefabs/roundabout 4 connections.prefab",
+    "guid": "9ffc7008938e99440a9171aaacf2d0bd",
+    "hash": 911665973,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/erprojectlog.prefab",
+    "guid": "b2b629637819a1049a5cebc7e93cab52",
+    "hash": 3713950661,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/erproroad.prefab",
+    "guid": "1f87f95e79e2c104f808bba536652594",
+    "hash": 275471890,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/erroadnetwork.prefab",
+    "guid": "efbc7fb2513d6744ab1bcfac40f0823d",
+    "hash": 260349535,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/ersideobjectslog.prefab",
+    "guid": "cc575db0b8a41314d9782ad8cfb2ebc6",
+    "hash": 1697603886,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/standard prefabs/roundabout.prefab",
+    "guid": "d64a68955a9637b4a9d3b294d3675426",
+    "hash": 3475068460,
+    "pool": false
+  },
+  {
+    "name": "assets/third party/easyroads3d/resources/standard prefabs/x crossing.prefab",
+    "guid": "00255404c1ef8e94eb1f25764c27f2ff",
+    "hash": 556603489,
     "pool": false
   },
   {
