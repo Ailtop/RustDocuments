@@ -151,4 +151,9 @@ public class ScientistNPC : HumanNPC
 			lightsOn = true;
 		}
 	}
+
+	protected override string OverrideCorpseName()
+	{
+		return "Scientist";
+	}
 }

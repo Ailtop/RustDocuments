@@ -106,8 +106,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			Player
 		}
 
-		[Tooltip("Ai will be less likely to fight animals that are larger than them, and more likely to flee from them.")]
 		[Range(0f, 1f)]
+		[Tooltip("Ai will be less likely to fight animals that are larger than them, and more likely to flee from them.")]
 		public float Size;
 
 		[Tooltip("How fast we can move")]
@@ -119,8 +119,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		[Tooltip("How fast can we turn around")]
 		public float TurnSpeed;
 
-		[Range(0f, 1f)]
 		[Tooltip("Determines things like how near we'll allow other species to get")]
+		[Range(0f, 1f)]
 		public float Tolerance;
 
 		[Tooltip("How far this NPC can see")]
@@ -292,8 +292,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private float nextAttackTime;
 
-	[SerializeField]
 	[InspectorFlags]
+	[SerializeField]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
 	[InspectorFlags]

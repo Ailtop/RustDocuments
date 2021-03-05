@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -5,7 +6,7 @@ using Oxide.Core;
 
 namespace Oxide.Plugins
 {
-    [Info("Everlight", "Wulf/lukespragg/Arainrr", "3.4.9")]
+    [Info("Everlight", "Wulf/lukespragg/Arainrr", "3.4.13")]
     [Description("Allows infinite light from configured objects by not consuming fuel")]
     public class Everlight : RustPlugin
     {
@@ -27,6 +28,7 @@ namespace Oxide.Plugins
             ["Skull Fire Pit"] = new EverlightEntry("skull_fire_pit", new EverlightS(false, false, "everlight.skull_fire_pit")),
             ["Small Oil Refinery"] = new EverlightEntry("refinery_small_deployed", new EverlightS(false, false, "everlight.refinery_small")),
             ["Tuna Can Lamp"] = new EverlightEntry("tunalight.deployed", new EverlightS(false, false, "everlight.tunalight")),
+            ["Hobo Barrel"] = new EverlightEntry("hobobarrel.deployed", new EverlightS(false, false, "everlight.hobobarrel")),
             //OnItemUse,
             ["Miners Hat"] = new EverlightEntry("hat.miner", new EverlightS(false, false, "everlight.hat.miner")),
             ["Candle Hat"] = new EverlightEntry("hat.candle", new EverlightS(false, false, "everlight.hat.candle")),
@@ -42,20 +44,24 @@ namespace Oxide.Plugins
             ["Deluxe Christmas Lights"] = new EverlightEntry("xmas.advanced.lights.deployed", new EverlightS(false, false, "everlight.advanced.lights")),
             ["Igniter"] = new EverlightEntry("igniter.deployed", new EverlightS(false, false, "everlight.igniter")),
             ["Firework"] = new EverlightEntry("firework", new EverlightS(false, false, "everlight.firework")),
+            ["Neon Sign"] = new EverlightEntry("neonSign", new EverlightS(false, false, "everlight.neonSign")),
+            ["Night Vision Goggles"] = new EverlightEntry("nightvisiongoggles", new EverlightS(false, false, "everlight.nightvisiongoggles")),
         };
 
         private readonly Dictionary<string, List<string>> hookItems = new Dictionary<string, List<string>>
         {
             [nameof(OnItemUse)] = new List<string> { "Miners Hat", "Candle Hat" },
-            [nameof(OnEntitySpawned)] = new List<string> { "Search Light", "Small Candle Set", "Large Candle Set", "Ceiling Light", "Siren Light", "Flasher Light", "Simple Light", "Strobe Light", "Deluxe Christmas Lights", "Igniter", "Firework" },
-            [nameof(OnFindBurnable)] = new List<string> { "Barbeque", "Camp Fire", "Cursed Cauldron", "Chinese Lantern", "Stone Fireplace", "Furnace", "Large Furnace", "Jack O Lantern Angry", "Jack O Lantern Happy", "Lantern", "Skull Fire Pit", "Small Oil Refinery", "Tuna Can Lamp" },
-            [nameof(OnEntityDistanceCheck)] = new List<string> { "Barbeque", "Camp Fire", "Cursed Cauldron", "Chinese Lantern", "Stone Fireplace", "Furnace", "Large Furnace", "Jack O Lantern Angry", "Jack O Lantern Happy", "Lantern", "Skull Fire Pit", "Small Oil Refinery", "Tuna Can Lamp" },
+            [nameof(OnLoseCondition)] = new List<string> { "Night Vision Goggles" },
+            [nameof(OnEntitySpawned)] = new List<string> { "Search Light", "Small Candle Set", "Large Candle Set", "Ceiling Light", "Siren Light", "Flasher Light", "Simple Light", "Strobe Light", "Deluxe Christmas Lights", "Igniter", "Firework", "Neon Sign" },
+            [nameof(OnFindBurnable)] = new List<string> { "Barbeque", "Camp Fire", "Cursed Cauldron", "Chinese Lantern", "Stone Fireplace", "Furnace", "Large Furnace", "Jack O Lantern Angry", "Jack O Lantern Happy", "Lantern", "Skull Fire Pit", "Small Oil Refinery", "Tuna Can Lamp", "Hobo Barrel" },
+            [nameof(OnEntityDistanceCheck)] = new List<string> { "Barbeque", "Camp Fire", "Cursed Cauldron", "Chinese Lantern", "Stone Fireplace", "Furnace", "Large Furnace", "Jack O Lantern Angry", "Jack O Lantern Happy", "Lantern", "Skull Fire Pit", "Small Oil Refinery", "Tuna Can Lamp", "Hobo Barrel" },
         };
 
         private void Init()
         {
             UpdateConfig();
             Unsubscribe(nameof(OnItemUse));
+            Unsubscribe(nameof(OnLoseCondition));
             Unsubscribe(nameof(OnEntitySpawned));
             Unsubscribe(nameof(OnFindBurnable));
             Unsubscribe(nameof(OnEntityDistanceCheck));
@@ -109,7 +115,9 @@ namespace Oxide.Plugins
             if (baseCombatEntity == null) return;
             if (baseCombatEntity is Candle || baseCombatEntity is IOEntity || baseCombatEntity is StrobeLight || baseCombatEntity is BaseFirework)
             {
-                if (!CanEverlight(baseCombatEntity is BaseFirework ? "firework" : baseCombatEntity.ShortPrefabName, baseCombatEntity.OwnerID.ToString())) return;
+                if (!CanEverlight(baseCombatEntity is NeonSign ? "neonSign"
+                    : baseCombatEntity is BaseFirework ? "firework"
+                    : baseCombatEntity.ShortPrefabName, baseCombatEntity.OwnerID.ToString())) return;
                 var candle = baseCombatEntity as Candle;
                 if (candle != null)
                 {
@@ -130,8 +138,11 @@ namespace Oxide.Plugins
                     baseFirework.limitActiveCount = false;
                     baseFirework.StaggeredTryLightFuse();
                     baseFirework.Invoke(() => baseFirework.CancelInvoke(baseFirework.OnExhausted), baseFirework.fuseLength + 1);
-                    if (baseFirework is RepeatingFirework)
-                        (baseFirework as RepeatingFirework).maxRepeats = int.MaxValue;
+                    var repeatingFirework = baseFirework as RepeatingFirework;
+                    if (repeatingFirework != null)
+                    {
+                        repeatingFirework.maxRepeats = int.MaxValue;
+                    }
                     return;
                 }
 
@@ -141,8 +152,20 @@ namespace Oxide.Plugins
                 iOEntity.SendNetworkUpdate();
 
                 var igniter = iOEntity as Igniter;
-                if (igniter != null) igniter.SelfDamagePerIgnite = 0;
+                if (igniter != null)
+                {
+                    igniter.SelfDamagePerIgnite = 0;
+                }
             }
+        }
+
+        private void OnLoseCondition(Item item, ref float amount)
+        {
+            if (item?.info.shortname != "nightvisiongoggles") return;
+            var player = item.GetOwnerPlayer();
+            if (player == null) return;
+            if (!CanEverlight(item.info.shortname, player.UserIDString)) return;
+            amount = 0;
         }
 
         private object OnFindBurnable(BaseOven baseOven)
@@ -150,7 +173,6 @@ namespace Oxide.Plugins
             if (baseOven == null) return null;
             if (!CanEverlight(baseOven.ShortPrefabName, baseOven.OwnerID.ToString())) return null;
             var itemID = itemModBurnables.FirstOrDefault(x => baseOven.fuelType == null || x.Value == baseOven.fuelType).Value?.itemid ?? 0;
-            //var itemID = baseOven.inventory?.itemList?.FirstOrDefault(x => x.info.GetComponent<ItemModBurnable>() != null && (baseOven.fuelType == null || x.info == baseOven.fuelType))?.info?.itemid ?? 0;
             return itemID == 0 ? null : ItemManager.CreateByItemID(itemID);
         }
 
@@ -174,16 +196,6 @@ namespace Oxide.Plugins
                 }
             }
         }
-
-        /*private void OnClothingItemChanged(PlayerInventory playerInventory, Item item, bool added)
-        {
-            if(!added)return;
-            var player = playerInventory.GetComponent<BasePlayer>();
-            if (player == null ||! player.userID.IsSteamId()) return;
-            if (item.info.shortname != "hat.candle" && item.info.shortname != "hat.miner") return ;
-            item.SetFlag(global::Item.Flag.IsOn, true);
-            item.MarkDirty();
-        }*/
 
         private object OnItemUse(Item item, int amount)
         {
@@ -263,9 +275,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

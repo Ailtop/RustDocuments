@@ -6,8 +6,8 @@ namespace ConVar
 	[Factory("data")]
 	public class Data : ConsoleSystem
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void export(Arg args)
 		{
 			string @string = args.GetString(0, "none");

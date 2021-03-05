@@ -114,14 +114,15 @@ namespace Rust.Ai
 			numToSpawn = Mathf.Min(numToSpawn, maxPopulation - base.currentPopulation);
 			for (int i = 0; i < numToSpawn; i++)
 			{
+				GameObjectRef prefab = GetPrefab();
 				Vector3 pos;
 				Quaternion rot;
-				BaseSpawnPoint spawnPoint = GetSpawnPoint(out pos, out rot);
+				BaseSpawnPoint spawnPoint = GetSpawnPoint(prefab, out pos, out rot);
 				if (!spawnPoint)
 				{
 					continue;
 				}
-				BaseEntity baseEntity = GameManager.server.CreateEntity(GetPrefab(), pos, rot);
+				BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot);
 				if (!baseEntity)
 				{
 					continue;
@@ -146,9 +147,9 @@ namespace Rust.Ai
 			}
 		}
 
-		protected override BaseSpawnPoint GetSpawnPoint(out Vector3 pos, out Quaternion rot)
+		protected override BaseSpawnPoint GetSpawnPoint(GameObjectRef prefabRef, out Vector3 pos, out Quaternion rot)
 		{
-			return base.GetSpawnPoint(out pos, out rot);
+			return base.GetSpawnPoint(prefabRef, out pos, out rot);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Oxide.Core.Plugins;
@@ -13,7 +14,7 @@ namespace Oxide.Plugins
         private object OnRotateVendingMachine(VendingMachine machine, BasePlayer player)
         {
             if (machine == null || player == null || machine.OwnerID == 0) return null;
-            if (AreFriends(player.userID, machine.OwnerID)) return null;
+            if (AreFriends(machine.OwnerID, player.userID)) return null;
             Print(player, Lang("CantRotateVendor", player.UserIDString));
             return false;
         }
@@ -21,9 +22,9 @@ namespace Oxide.Plugins
         private bool AreFriends(ulong playerID, ulong friendID)
         {
             if (playerID == friendID) return true;
-            if (configData.useTeam && SameTeam(friendID, playerID)) return true;
-            if (configData.useFriends && HasFriend(friendID, playerID)) return true;
-            if (configData.useClans && SameClan(friendID, playerID)) return true;
+            if (configData.useTeam && SameTeam(playerID, friendID)) return true;
+            if (configData.useFriends && HasFriend(playerID, friendID)) return true;
+            if (configData.useClans && SameClan(playerID, friendID)) return true;
             return false;
         }
 
@@ -91,9 +92,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

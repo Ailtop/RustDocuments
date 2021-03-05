@@ -1,8 +1,8 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Oxide.Core.Plugins;
-using Oxide.Game.Rust;
 
 namespace Oxide.Plugins
 {
@@ -94,14 +94,14 @@ namespace Oxide.Plugins
             }
         }
 
-        private void CheckQuarries(BasePlayer otherPlayer = null, bool isOn = false)
+        private void CheckQuarries(BasePlayer player = null, bool isOn = false)
         {
             foreach (var miningQuarry in miningQuarries)
             {
                 if (miningQuarry == null) continue;
-                if (otherPlayer != null)
+                if (player != null)
                 {
-                    if (CheckPlayer(miningQuarry.OwnerID, otherPlayer.userID) || miningQuarry.OwnerID == otherPlayer.userID)
+                    if (CheckPlayer(miningQuarry.OwnerID, player.userID) || miningQuarry.OwnerID == player.userID)
                         miningQuarry.SetOn(isOn);
                     continue;
                 }
@@ -110,50 +110,55 @@ namespace Oxide.Plugins
             }
         }
 
-        private bool CheckPlayer(ulong playerID, ulong otherPlayerID = 0)
+        private bool CheckPlayer(ulong playerID, ulong friendID = 0)
         {
-            var player = RustCore.FindPlayerById(playerID);
-            if (otherPlayerID == 0)
+            if (friendID == 0)
             {
-                foreach (var otherPlayer in BasePlayer.activePlayerList)
-                {
-                    if (otherPlayer == null) continue;
-                    if (playerID == otherPlayer.userID) return true;
-                    if (player != null && SameTeam(player, otherPlayer)) return true;
-                    if (HasFriend(playerID, otherPlayer.userID)) return true;
-                    if (SameClan(playerID, otherPlayer.userID)) return true;
-                }
+                foreach (var friend in BasePlayer.activePlayerList)
+                    if (AreFriends(playerID, friend.userID)) return true;
             }
-            else
-            {
-                if (playerID == otherPlayerID) return true;
-                var otherPlayer = RustCore.FindPlayerById(otherPlayerID);
-                if (player != null && otherPlayer != null && SameTeam(player, otherPlayer)) return true;
-                if (HasFriend(playerID, otherPlayerID)) return true;
-                if (SameClan(playerID, otherPlayerID)) return true;
-            }
+            else if (AreFriends(playerID, friendID))
+                return true;
             return false;
         }
 
-        private bool HasFriend(ulong playerID, ulong otherPlayerID)
+        private bool AreFriends(ulong playerID, ulong friendID)
         {
-            if (Friends == null || !configData.useFriends) return false;
-            return (bool)Friends.Call("HasFriend", playerID, otherPlayerID);
+            if (playerID == friendID) return true;
+            if (configData.useTeam && SameTeam(friendID, playerID)) return true;
+            if (configData.useFriends && HasFriend(friendID, playerID)) return true;
+            if (configData.useClans && SameClan(friendID, playerID)) return true;
+            return false;
         }
 
-        private bool SameTeam(BasePlayer player, BasePlayer otherPlayer)
+        private bool SameTeam(ulong playerID, ulong friendID)
         {
-            if (player.currentTeam == 0 || otherPlayer.currentTeam == 0 || !configData.useTeam) return false;
-            return player.currentTeam == otherPlayer.currentTeam;
+            if (!RelationshipManager.TeamsEnabled()) return false;
+            var playerTeam = RelationshipManager.Instance.FindPlayersTeam(playerID);
+            if (playerTeam == null) return false;
+            var friendTeam = RelationshipManager.Instance.FindPlayersTeam(friendID);
+            if (friendTeam == null) return false;
+            return playerTeam == friendTeam;
         }
 
-        private bool SameClan(ulong playerID, ulong otherPlayerID)
+        private bool HasFriend(ulong playerID, ulong friendID)
         {
-            if (Clans == null || !configData.useClans) return false;
-            var playerClan = (string)Clans.Call("GetClanOf", playerID);
-            var otherPlayerClan = (string)Clans.Call("GetClanOf", otherPlayerID);
-            if (playerClan == null || otherPlayerClan == null) return false;
-            return playerClan == otherPlayerClan;
+            if (Friends == null) return false;
+            return (bool)Friends.Call("HasFriend", playerID, friendID);
+        }
+
+        private bool SameClan(ulong playerID, ulong friendID)
+        {
+            if (Clans == null) return false;
+            //Clans
+            var isMember = Clans.Call("IsClanMember", playerID.ToString(), friendID.ToString());
+            if (isMember != null) return (bool)isMember;
+            //Rust:IO Clans
+            var playerClan = Clans.Call("GetClanOf", playerID);
+            if (playerClan == null) return false;
+            var friendClan = Clans.Call("GetClanOf", friendID);
+            if (friendClan == null) return false;
+            return (string)playerClan == (string)friendClan;
         }
 
         #region ConfigurationFile
@@ -190,9 +195,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

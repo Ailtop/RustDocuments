@@ -21,8 +21,8 @@ namespace ConVar
 		[ServerVar]
 		public static int maxthreads = 8;
 
-		[ServerVar(Saved = true)]
 		[ClientVar(Saved = true)]
+		[ServerVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -31,8 +31,8 @@ namespace ConVar
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int developer
 		{
 			get
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -466,8 +466,8 @@ namespace ConVar
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);

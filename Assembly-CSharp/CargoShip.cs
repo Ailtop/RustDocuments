@@ -64,23 +64,23 @@ public class CargoShip : BaseEntity
 	[ServerVar]
 	public static float loot_round_spacing_minutes = 10f;
 
-	private BaseEntity mapMarkerInstance;
+	public BaseEntity mapMarkerInstance;
 
-	private Vector3 currentVelocity = Vector3.zero;
+	public Vector3 currentVelocity = Vector3.zero;
 
-	private float currentThrottle;
+	public float currentThrottle;
 
-	private float currentTurnSpeed;
+	public float currentTurnSpeed;
 
-	private float turnScale;
+	public float turnScale;
 
-	private int lootRoundsPassed;
+	public int lootRoundsPassed;
 
-	private int hornCount;
+	public int hornCount;
 
-	private float currentRadiation;
+	public float currentRadiation;
 
-	private bool egressing;
+	public bool egressing;
 
 	public override float GetNetworkTime()
 	{

@@ -16,6 +16,8 @@ public class PuzzleReset : FacepunchBehaviour
 
 	public float playerDetectionRadius;
 
+	public float playerHeightDetectionMinMax = -1f;
+
 	public Transform playerDetectionOrigin;
 
 	public float timeBetweenResets = 30f;
@@ -127,7 +129,8 @@ public class PuzzleReset : FacepunchBehaviour
 		{
 			if (!(item2 == null))
 			{
-				item2.Spawn();
+				item2.Clear();
+				item2.DelayedSpawn();
 			}
 		}
 		Facepunch.Pool.FreeList(ref obj2);

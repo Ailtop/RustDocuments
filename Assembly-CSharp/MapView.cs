@@ -28,6 +28,8 @@ public class MapView : FacepunchBehaviour
 
 	public List<SleepingBagClusterMapMarker> SleepingBagClusters = new List<SleepingBagClusterMapMarker>();
 
+	public RawImage TrainLayer;
+
 	public bool ShowGrid;
 
 	public bool ShowPointOfInterestMarkers;
@@ -39,4 +41,6 @@ public class MapView : FacepunchBehaviour
 	public bool ShowLocalPlayer = true;
 
 	public bool ShowTeamMembers = true;
+
+	public bool ShowTrainLayer;
 }

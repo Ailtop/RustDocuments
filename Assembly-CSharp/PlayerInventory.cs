@@ -826,23 +826,29 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		int num = 0;
 		if (containerMain != null)
 		{
-			num += containerMain.Take(collect, itemid, amount);
+			int num2 = containerMain.Take(collect, itemid, amount);
+			num += num2;
+			amount -= num2;
 		}
-		if (amount == num)
+		if (amount <= 0)
 		{
 			return num;
 		}
 		if (containerBelt != null)
 		{
-			num += containerBelt.Take(collect, itemid, amount);
+			int num3 = containerBelt.Take(collect, itemid, amount);
+			num += num3;
+			amount -= num3;
 		}
-		if (amount == num)
+		if (amount <= 0)
 		{
 			return num;
 		}
 		if (containerWear != null)
 		{
-			num += containerWear.Take(collect, itemid, amount);
+			int num4 = containerWear.Take(collect, itemid, amount);
+			num += num4;
+			amount -= num4;
 		}
 		return num;
 	}

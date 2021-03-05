@@ -1,5 +1,6 @@
-//Requires: ZoneManager
+﻿//Requires: ZoneManager
 
+using System;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -10,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Zone PVx Info", "BuzZ[PHOQUE]/Arainrr", "1.0.2")]
+    [Info("Zone PVx Info", "BuzZ[PHOQUE]/Arainrr", "1.0.3")]
     [Description("HUD on PVx name defined Zones")]
     public class ZonePVxInfo : RustPlugin
     {
@@ -37,27 +38,31 @@ namespace Oxide.Plugins
 
         private void OnServerInitialized()
         {
-            foreach (var player in BasePlayer.activePlayerList) OnPlayerConnected(player);
+            foreach (var player in BasePlayer.activePlayerList)
+            {
+                OnPlayerConnected(player);
+            }
         }
 
         private void Unload()
         {
-            foreach (var player in BasePlayer.activePlayerList) DestroyUI(player);
+            foreach (var player in BasePlayer.activePlayerList)
+            {
+                DestroyUI(player);
+            }
         }
 
         private void OnPlayerConnected(BasePlayer player)
         {
             if (player == null || !player.userID.IsSteamId()) return;
-            if (player.IsReceivingSnapshot)
-            {
-                timer.Once(1f, () => OnPlayerConnected(player));
-                return;
-            }
-
             if (pvpAll)
-                CratePVxUI(player, PVxType.PVP);
+            {
+                CreatePVxUI(player, PVxType.PVP);
+            }
             else
+            {
                 CheckPlayerZone(player);
+            }
         }
 
         #endregion Oxide Hooks
@@ -97,7 +102,7 @@ namespace Oxide.Plugins
                     case PVxType.PVE:
                         if (zoneName.Contains("pvp", CompareOptions.IgnoreCase))
                         {
-                            CratePVxUI(player, PVxType.PVP);
+                            CreatePVxUI(player, PVxType.PVP);
                             return;
                         }
 
@@ -105,7 +110,7 @@ namespace Oxide.Plugins
                     case PVxType.PVP:
                         if (zoneName.Contains("pve", CompareOptions.IgnoreCase))
                         {
-                            CratePVxUI(player, PVxType.PVE);
+                            CreatePVxUI(player, PVxType.PVE);
                             return;
                         }
 
@@ -114,7 +119,7 @@ namespace Oxide.Plugins
                 }
             }
 
-            CratePVxUI(player, configData.defaultType);
+            CreatePVxUI(player, configData.defaultType);
         }
 
         #endregion ZoneManager
@@ -124,12 +129,20 @@ namespace Oxide.Plugins
         private void OnPlayerEnteredRaidableBase(BasePlayer player, Vector3 location, bool allowPVP)
         {
             if (pvpAll) return;
-            CratePVxUI(player, allowPVP ? PVxType.PVP : PVxType.PVE);
+            CreatePVxUI(player, allowPVP ? PVxType.PVP : PVxType.PVE);
         }
 
         private void OnPlayerExitedRaidableBase(BasePlayer player, Vector3 location, bool allowPVP)
         {
             CheckPlayerZone(player);
+        }
+
+        private void OnRaidableBaseEnded(Vector3 raidPos, int mode, float loadingTime)
+        {
+            foreach (var player in BasePlayer.activePlayerList)
+            {
+                CheckPlayerZone(player);
+            }
         }
 
         #endregion RaidableBases
@@ -153,7 +166,7 @@ namespace Oxide.Plugins
                 case "on":
                 case "true":
                     pvpAll = true;
-                    foreach (var player in BasePlayer.activePlayerList) CratePVxUI(player, PVxType.PVP);
+                    foreach (var player in BasePlayer.activePlayerList) CreatePVxUI(player, PVxType.PVP);
                     return;
             }
         }
@@ -213,7 +226,7 @@ namespace Oxide.Plugins
             }.ToJson();
         }
 
-        private void CratePVxUI(BasePlayer player, PVxType type)
+        private void CreatePVxUI(BasePlayer player, PVxType type)
         {
             string uiJson;
             switch (type)
@@ -286,9 +299,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
 

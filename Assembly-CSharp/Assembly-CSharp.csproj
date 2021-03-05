@@ -108,6 +108,9 @@
     <Reference Include="com.unity.postprocessing.Runtime">
       <HintPath>D:\Rust\rustserver\RustDedicated_Data\Managed\com.unity.postprocessing.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="Facepunch.Input">
+      <HintPath>D:\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>D:\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
@@ -170,9 +173,6 @@
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
       <HintPath>D:\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-    </Reference>
-    <Reference Include="Facepunch.Input">
-      <HintPath>D:\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.SteamNetworking">
       <HintPath>D:\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.SteamNetworking.dll</HintPath>

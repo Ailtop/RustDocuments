@@ -7,10 +7,10 @@ public class ModularCarSeat : BaseVehicleSeat
 	private bool supportsMouseSteer;
 
 	[SerializeField]
-	private Vector3 leftFootIKPos;
+	public Vector3 leftFootIKPos;
 
 	[SerializeField]
-	private Vector3 rightFootIKPos;
+	public Vector3 rightFootIKPos;
 
 	public VehicleModuleSeating associatedSeatingModule;
 

@@ -207,6 +207,7 @@ public class ComputerStation : BaseMountable
 		SendNetworkUpdate();
 		SendControlBookmarks(ply);
 		CancelInvoke(ControlCheck);
+		Interface.CallHook("OnBookmarkControlEnded", this, ply, baseEntity);
 	}
 
 	public bool IsPlayerAdmin(BasePlayer player)
@@ -279,6 +280,7 @@ public class ComputerStation : BaseMountable
 			SendControlBookmarks(player);
 			component.InitializeControl(player);
 			InvokeRepeating(ControlCheck, 0f, 0f);
+			Interface.CallHook("OnBookmarkControlStarted", this, player, text, component);
 		}
 	}
 
@@ -377,6 +379,10 @@ public class ComputerStation : BaseMountable
 			if (component != null && component.CanControl())
 			{
 				flag = true;
+				if (_mounted != null)
+				{
+					_mounted.net.SwitchSecondaryGroup(baseEntity.net.group);
+				}
 			}
 		}
 		if (!flag)

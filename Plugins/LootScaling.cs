@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Oxide.Plugins
 {
@@ -27,7 +28,7 @@ namespace Oxide.Plugins
                 {
                     //Well since FacePunch already implemented it all for us, we should probably use it.
                     spawnPopulation.ScaleWithServerPopulation = configData.populationScaling[spawnPopulation.name];
-                    newConfig.Add(spawnPopulation.name, configData.populationScaling[spawnPopulation.name]); 
+                    newConfig.Add(spawnPopulation.name, configData.populationScaling[spawnPopulation.name]);
                 }
                 else
                     newConfig.Add(spawnPopulation.name, false);
@@ -65,9 +66,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

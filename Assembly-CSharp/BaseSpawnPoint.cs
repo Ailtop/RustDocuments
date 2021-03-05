@@ -8,6 +8,11 @@ public abstract class BaseSpawnPoint : MonoBehaviour, IServerComponent
 
 	public abstract void ObjectRetired(SpawnPointInstance instance);
 
+	public virtual bool IsAvailableTo(GameObjectRef prefabRef)
+	{
+		return base.gameObject.activeSelf;
+	}
+
 	protected void DropToGround(ref Vector3 pos, ref Quaternion rot)
 	{
 		if ((bool)TerrainMeta.HeightMap && (bool)TerrainMeta.Collision && !TerrainMeta.Collision.GetIgnore(pos))

@@ -21,6 +21,8 @@ public class MonumentInfo : MonoBehaviour, IPrefabPreProcess
 
 	public Translate.Phrase displayPhrase;
 
+	public Sprite mapIcon;
+
 	protected void Awake()
 	{
 		if ((bool)TerrainMeta.Path)

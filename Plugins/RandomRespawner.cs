@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Facepunch;
 using Newtonsoft.Json;
 using Oxide.Core;
 using Rust;
@@ -9,11 +11,10 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Random Respawner", "Egor Blagov/Arainrr", "1.2.1")]
+    [Info("Random Respawner", "Egor Blagov/Arainrr", "1.2.3")]
     [Description("Plugin respawns player in random place")]
     internal class RandomRespawner : RustPlugin
     {
-        private const int MaxTrials = 200;
         private const string PERMISSION_USE = "randomrespawner.use";
         private const int MASK_BIOME = (int)(TerrainBiome.Enum.Arid | TerrainBiome.Enum.Temperate | TerrainBiome.Enum.Tundra | TerrainBiome.Enum.Arctic);
         private const int MASK_SPLAT = (int)(TerrainSplat.Enum.Dirt | TerrainSplat.Enum.Snow | TerrainSplat.Enum.Sand | TerrainSplat.Enum.Rock | TerrainSplat.Enum.Grass | TerrainSplat.Enum.Forest | TerrainSplat.Enum.Stones | TerrainSplat.Enum.Gravel);
@@ -21,46 +22,71 @@ namespace Oxide.Plugins
         private Coroutine findSpawnPosCoroutine;
         private readonly List<Vector3> spawnPositionCache = new List<Vector3>();
 
+        private List<Collider> colliders;
+        private List<BaseEntity> entities;
+        private List<BasePlayer> players;
+
         #region Oxide Hooks
 
         private void Init()
         {
+            colliders = Pool.GetList<Collider>();
+            entities = Pool.GetList<BaseEntity>();
+            players = Pool.GetList<BasePlayer>();
             permission.RegisterPermission(PERMISSION_USE, this);
         }
 
         private void OnServerInitialized()
         {
-            findSpawnPosCoroutine = ServerMgr.Instance.StartCoroutine(FindSpawnPositions());
+            findSpawnPosCoroutine = ServerMgr.Instance.StartCoroutine(FindSpawnPositions(5000));
         }
 
         private void Unload()
         {
-            if (findSpawnPosCoroutine != null) ServerMgr.Instance.StopCoroutine(findSpawnPosCoroutine);
+            Pool.Free(ref entities);
+            Pool.Free(ref colliders);
+            Pool.Free(ref players);
+            if (findSpawnPosCoroutine != null)
+            {
+                ServerMgr.Instance.StopCoroutine(findSpawnPosCoroutine);
+            }
         }
 
-        private IEnumerator FindSpawnPositions()
+        private IEnumerator FindSpawnPositions(int attempts = 1500)
         {
+            List<Vector3> list = Pool.GetList<Vector3>();
             float mapSizeX = TerrainMeta.Size.x / 2;
             float mapSizeZ = TerrainMeta.Size.z / 2;
             Vector3 randomPos = Vector3.zero;
-            for (int i = 0; i < 3000; i++)
+            for (int i = 0; i < attempts; i++)
             {
                 randomPos.x = UnityEngine.Random.Range(-mapSizeX, mapSizeX);
                 randomPos.z = UnityEngine.Random.Range(-mapSizeZ, mapSizeZ);
                 if (TestPos(ref randomPos))
                 {
-                    spawnPositionCache.Add(randomPos);
+                    list.Add(randomPos);
                 }
-
-                if (i % 20 == 0) yield return CoroutineEx.waitForFixedUpdate;
+                if (i % 20 == 0) yield return CoroutineEx.waitForEndOfFrame;
             }
-            PrintWarning($"Successfully found {spawnPositionCache.Count} spawn positions.");
+            spawnPositionCache.AddRange(list);
+            PrintWarning($"Successfully found {list.Count} spawn positions.");
+            Pool.FreeList(ref list);
             findSpawnPosCoroutine = null;
-            yield break;
         }
+
+        //private void OnPlayerDeath(BasePlayer player, HitInfo info) {
+        //    PrintError($"OnPlayerDeath: {player?.displayName}: {info?.damageTypes.Total()} - {info?.damageTypes?.GetMajorityDamageType()} - {player?.transform.position}");
+        //    System.Diagnostics.StackTrace stackTrace = new System.Diagnostics.StackTrace();
+        //    System.Diagnostics.StackFrame[] stackFrames = stackTrace.GetFrames();
+        //    foreach (var sf in stackFrames)
+        //    {
+        //        PrintError($"{ sf.GetMethod().ReflectedType?.Name} - {sf.GetMethod().Name} - {sf.GetFileName()}");
+        //    }
+        //}
 
         private object OnPlayerRespawn(BasePlayer player)
         {
+            if (player == null || !player.userID.IsSteamId()) return null;
             if (!permission.UserHasPermission(player.UserIDString, PERMISSION_USE))
             {
                 return null;
@@ -88,16 +114,20 @@ namespace Oxide.Plugins
 
         private Vector3? GetRandomSpawnPos()
         {
-            Vector3 spawnPos;
-            for (int i = 0; i < MaxTrials; i++)
+            for (int i = 0; i < configData.maxAttempts; i++)
             {
-                spawnPos = spawnPositionCache.GetRandom();
+                if (spawnPositionCache.Count <= 0) return null;
+                var spawnPos = spawnPositionCache.GetRandom();
                 if (TestPosAgain(spawnPos))
                 {
                     return spawnPos;
                 }
+                spawnPositionCache.Remove(spawnPos);
+                if (spawnPositionCache.Count < 50 && findSpawnPosCoroutine == null)
+                {
+                    findSpawnPosCoroutine = ServerMgr.Instance.StartCoroutine(FindSpawnPositions());
+                }
             }
-
             return null;
         }
 
@@ -111,10 +141,6 @@ namespace Oxide.Plugins
             }
 
             randomPos.y = hitInfo.point.y;
-            if (ConVar.AntiHack.terrain_kill && AntiHack.TestInsideTerrain(randomPos))
-            {
-                return false;
-            }
 
             var slope = GetPosSlope(randomPos);
             if (slope < configData.minSlope || slope > configData.maxSlope)
@@ -134,6 +160,14 @@ namespace Oxide.Plugins
             {
                 return false;
             }
+            if (AntiHack.TestInsideTerrain(randomPos))
+            {
+                return false;
+            }
+            if (!ValidBounds.Test(randomPos))
+            {
+                return false;
+            }
             return TestPosAgain(randomPos);
         }
 
@@ -144,12 +178,7 @@ namespace Oxide.Plugins
                 return false;
             }
 
-            if (!ValidBounds.Test(spawnPos))
-            {
-                return false;
-            }
-
-            var colliders = Facepunch.Pool.GetList<Collider>();
+            colliders.Clear();
             Vis.Colliders(spawnPos, 3f, colliders);
             foreach (var collider in colliders)
             {
@@ -158,29 +187,23 @@ namespace Oxide.Plugins
                     case (int)Layer.Prevent_Building:
                         if (configData.preventSpawnAtMonument)
                         {
-                            Facepunch.Pool.FreeList(ref colliders);
                             return false;
                         }
-
                         break;
 
-                    //case (int)Layer.Water:
                     case (int)Layer.Vehicle_Large: //cargoshiptest
                     case (int)Layer.Vehicle_World:
                     case (int)Layer.Vehicle_Detailed:
-                        Facepunch.Pool.FreeList(ref colliders);
                         return false;
                 }
 
                 if (configData.preventSpawnAtZone && collider.name.Contains("zonemanager", CompareOptions.IgnoreCase))
                 {
-                    Facepunch.Pool.FreeList(ref colliders);
                     return false;
                 }
 
                 if (configData.preventSpawnAtRadZone && collider.name.Contains("radiation", CompareOptions.IgnoreCase))
                 {
-                    Facepunch.Pool.FreeList(ref colliders);
                     return false;
                 }
 
@@ -188,32 +211,33 @@ namespace Oxide.Plugins
                     collider.name.Contains("iceberg", CompareOptions.IgnoreCase) ||
                     collider.name.Contains("ice_sheet", CompareOptions.IgnoreCase))
                 {
-                    Facepunch.Pool.FreeList(ref colliders);
                     return false;
                 }
             }
 
-            Facepunch.Pool.FreeList(ref colliders);
-            bool flag;
             if (configData.radiusFromPlayers > 0)
             {
-                var players = Facepunch.Pool.GetList<BasePlayer>();
-                Vis.Entities(spawnPos, configData.radiusFromPlayers, players);
-                flag = players.Count(x => !x.IsSleeping()) > 0;
-                Facepunch.Pool.FreeList(ref players);
-                if (flag) return false;
+                players.Clear();
+                Vis.Entities(spawnPos, configData.radiusFromPlayers, players, Layers.Mask.Player_Server);
+                foreach (var player in players)
+                {
+                    if (!player.IsSleeping())
+                    {
+                        return false;
+                    }
+                }
             }
-
-            var entities = Facepunch.Pool.GetList<BaseEntity>();
-            Vis.Entities(spawnPos, 20f, entities, Layers.PlayerBuildings);
-            flag = entities.Count > 0;
-            Facepunch.Pool.FreeList(ref entities);
-            if (flag) return false;
+            if (configData.radiusFromBuilding > 0)
+            {
+                entities.Clear();
+                Vis.Entities(spawnPos, configData.radiusFromBuilding, entities, Layers.PlayerBuildings);
+                if (entities.Any()) return false;
+            }
 
             return true;
         }
 
-        #region Methods
+        #region Helpers
 
         private static TerrainBiome.Enum GetPosBiome(Vector3 position) => (TerrainBiome.Enum)TerrainMeta.BiomeMap.GetBiomeMaxType(position, MASK_BIOME);
 
@@ -221,7 +245,7 @@ namespace Oxide.Plugins
 
         private static float GetPosSlope(Vector3 position) => TerrainMeta.HeightMap.GetSlope(position);
 
-        #endregion Methods
+        #endregion Helpers
 
         #region ConfigurationFile
 
@@ -229,8 +253,14 @@ namespace Oxide.Plugins
 
         private class ConfigData
         {
-            [JsonProperty(PropertyName = "Min Distance From Other Playes On Respawn (Including NPC Players)")]
+            [JsonProperty(PropertyName = "Maximum Attempts To Find A Respawn Position")]
+            public int maxAttempts = 200;
+
+            [JsonProperty(PropertyName = "Minimum Distance From Other Players (Including NPC Players)")]
             public float radiusFromPlayers = 20.0f;
+
+            [JsonProperty(PropertyName = "Minimum Distance From Building")]
+            public float radiusFromBuilding = 20.0f;
 
             [JsonProperty(PropertyName = "Prevent Players To Be Respawn At Monuments")]
             public bool preventSpawnAtMonument = true;
@@ -279,9 +309,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
 

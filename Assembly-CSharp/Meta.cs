@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using Facepunch;
+using UnityEngine;
+
 [Factory("meta")]
 public class Meta : ConsoleSystem
 {
@@ -49,6 +53,27 @@ public class Meta : ConsoleSystem
 		if (!@bool)
 		{
 			ConsoleSystem.Run(Option.Client, @string, @bool);
+		}
+	}
+
+	[ClientVar(Help = "reset_cycle <key> - resets a cycled bind to the beginning")]
+	public static void reset_cycle(Arg args)
+	{
+		string name = args.GetString(0);
+		List<KeyCode> keys;
+		KeyCombos.TryParse(ref name, out keys);
+		Facepunch.Input.Button button = Facepunch.Input.GetButton(name);
+		if (button == null)
+		{
+			args.ReplyWith("Button not found");
+		}
+		else if (!button.Cycle)
+		{
+			args.ReplyWith("Button does not have a cycled bind");
+		}
+		else
+		{
+			button.CycleIndex = 0;
 		}
 	}
 

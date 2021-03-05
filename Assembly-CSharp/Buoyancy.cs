@@ -211,7 +211,7 @@ public class Buoyancy : ListComponent<Buoyancy>
 			float waterHeight = pointWaterHeightArray[j];
 			WaterLevel.WaterInfo buoyancyWaterInfo = WaterLevel.GetBuoyancyWaterInfo(position2, posUV, terrainHeight, waterHeight, forEntity);
 			bool flag = false;
-			if (position2.y < buoyancyWaterInfo.surfaceLevel)
+			if (position2.y < buoyancyWaterInfo.surfaceLevel && buoyancyWaterInfo.isValid)
 			{
 				flag = true;
 				num++;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -17,7 +18,6 @@ namespace Oxide.Plugins
             Unsubscribe(nameof(OnEntitySpawned));
             permission.RegisterPermission(PERMISSION_IGNORE, this);
         }
-         
 
         private void OnServerInitialized()
         {
@@ -32,7 +32,7 @@ namespace Oxide.Plugins
 
         private void OnEntitySpawned(MiningQuarry miningQuarry)
         {
-            if (miningQuarry == null) return; 
+            if (miningQuarry == null) return;
         }
 
         private class QuarryInfo
@@ -124,9 +124,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

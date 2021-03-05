@@ -123,8 +123,8 @@ public class TorchWeapon : BaseMelee
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Ignite(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())
@@ -133,8 +133,8 @@ public class TorchWeapon : BaseMelee
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void Extinguish(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())

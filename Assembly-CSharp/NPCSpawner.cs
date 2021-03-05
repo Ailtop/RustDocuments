@@ -1,3 +1,4 @@
+using ConVar;
 using UnityEngine;
 
 public class NPCSpawner : SpawnGroup
@@ -25,7 +26,11 @@ public class NPCSpawner : SpawnGroup
 		{
 			return monumentNavMesh.IsBuilding;
 		}
-		return false;
+		if (!DungeonNavmesh.NavReady())
+		{
+			return true;
+		}
+		return !AI.move;
 	}
 
 	public void LateSpawn()

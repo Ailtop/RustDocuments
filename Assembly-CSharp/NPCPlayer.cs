@@ -41,6 +41,10 @@ public class NPCPlayer : BasePlayer
 
 	private float lastThinkTime;
 
+	private float lastPositionUpdateTime;
+
+	private float lastMovementTickTime;
+
 	public Vector3 lastPos;
 
 	public bool AgencyUpdateRequired
@@ -229,6 +233,7 @@ public class NPCPlayer : BasePlayer
 				NavAgent.updateRotation = false;
 				NavAgent.updatePosition = false;
 			}
+			InvokeRandomized(TickMovement, 1f, PositionTickRate, PositionTickRate * 0.1f);
 		}
 	}
 
@@ -434,7 +439,22 @@ public class NPCPlayer : BasePlayer
 
 	public virtual void TickAi(float delta)
 	{
+	}
+
+	public void TickMovement()
+	{
+		float delta = Time.realtimeSinceStartup - lastMovementTickTime;
+		lastMovementTickTime = Time.realtimeSinceStartup;
 		MovementUpdate(delta);
+	}
+
+	public override float GetNetworkTime()
+	{
+		if (Time.realtimeSinceStartup - lastPositionUpdateTime > PositionTickRate * 2f)
+		{
+			return Time.time;
+		}
+		return lastPositionUpdateTime;
 	}
 
 	public virtual void MovementUpdate(float delta)
@@ -486,6 +506,7 @@ public class NPCPlayer : BasePlayer
 
 	protected virtual void UpdatePositionAndRotation(Vector3 moveToPosition)
 	{
+		lastPositionUpdateTime = Time.time;
 		ServerPosition = moveToPosition;
 		SetAimDirection(GetAimDirection());
 	}
@@ -528,6 +549,7 @@ public class NPCPlayer : BasePlayer
 			eyes.rotation = Quaternion.LookRotation(newAim, Vector3.up);
 			viewAngles = eyes.rotation.eulerAngles;
 			ServerRotation = eyes.rotation;
+			lastPositionUpdateTime = Time.time;
 		}
 	}
 }

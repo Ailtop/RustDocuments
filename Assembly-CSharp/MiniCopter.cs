@@ -3,13 +3,12 @@ using System;
 using ConVar;
 using Facepunch;
 using Network;
-using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
+public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity, SamSite.ISamSiteTarget
 {
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
@@ -57,8 +56,6 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 
 	public Animator animator;
 
-	public const Flags Flag_EngineStart = Flags.Reserved4;
-
 	public float maxRotorSpeed = 10f;
 
 	public float timeUntilMaxRotorSpeed = 7f;
@@ -88,15 +85,41 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 	[ServerVar(Help = "How long before a minicopter is killed while indoors")]
 	public static float insidedecayminutes = 2880f;
 
+	public VehicleEngineController engineController;
+
 	public bool isPushing;
 
-	public float lastEngineTime;
+	public float lastEngineOnTime;
 
 	public float cachedPitch;
 
 	public float cachedYaw;
 
 	public float cachedRoll;
+
+	public bool IsStartingUp
+	{
+		get
+		{
+			if (engineController != null)
+			{
+				return engineController.IsStarting;
+			}
+			return false;
+		}
+	}
+
+	public VehicleEngineController.EngineState CurEngineState
+	{
+		get
+		{
+			if (engineController == null)
+			{
+				return VehicleEngineController.EngineState.Off;
+			}
+			return engineController.CurEngineState;
+		}
+	}
 
 	public float GetFuelFraction()
 	{
@@ -127,13 +150,9 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 		}
 	}
 
-	public bool IsStartingUp()
-	{
-		return HasFlag(Flags.Reserved4);
-	}
-
 	public override void InitShared()
 	{
+		engineController = new VehicleEngineController(this, base.isServer, 5f, Flags.Reserved4);
 		fuelSystem = new EntityFuelSystem(this, base.isServer);
 	}
 
@@ -150,9 +169,9 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 	public override void PilotInput(InputState inputState, BasePlayer player)
 	{
 		base.PilotInput(inputState, player);
-		if (!IsOn() && !IsStartingUp() && HasDriver() && inputState.IsDown(BUTTON.FORWARD) && fuelSystem.HasFuel())
+		if (!IsOn() && !IsStartingUp && inputState.IsDown(BUTTON.FORWARD))
 		{
-			EngineStartup();
+			engineController.TryStartEngine(player);
 		}
 		currentInputState.groundControl = inputState.IsDown(BUTTON.DUCK);
 		if (currentInputState.groundControl)
@@ -272,36 +291,10 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 		}
 	}
 
-	public void EngineStartup()
-	{
-		if (!Waterlogged() && Interface.CallHook("OnEngineStart", this, GetDriver()) == null)
-		{
-			Invoke(EngineOn, 5f);
-			SetFlag(Flags.Reserved4, true);
-		}
-	}
-
-	public void EngineOn()
-	{
-		SetFlag(Flags.On, true);
-		SetFlag(Flags.Reserved4, false);
-		Interface.CallHook("OnEngineStarted", this, GetDriver());
-	}
-
-	public void EngineOff()
-	{
-		if (IsOn() || IsStartingUp())
-		{
-			CancelInvoke(EngineOn);
-			SetFlag(Flags.On, false);
-			SetFlag(Flags.Reserved4, false);
-			lastEngineTime = UnityEngine.Time.time;
-		}
-	}
-
 	public override void ServerInit()
 	{
 		base.ServerInit();
+		lastEngineOnTime = UnityEngine.Time.realtimeSinceStartup;
 		rigidBody.inertiaTensor = rigidBody.inertiaTensor;
 		preventBuildingObject.SetActive(true);
 		InvokeRandomized(UpdateNetwork, 0f, 0.2f, 0.05f);
@@ -310,7 +303,7 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 
 	public void DecayTick()
 	{
-		if (base.healthFraction != 0f && !IsOn() && !(UnityEngine.Time.time < lastEngineTime + 600f))
+		if (base.healthFraction != 0f && !IsOn() && !(UnityEngine.Time.time < lastEngineOnTime + 600f))
 		{
 			float num = 1f / (IsOutside() ? outsidedecayminutes : insidedecayminutes);
 			Hurt(MaxHealth() * num, DamageType.Decay, this, false);
@@ -338,28 +331,41 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 		return IsOn();
 	}
 
+	public bool CanRunEngines()
+	{
+		if (HasDriver() && fuelSystem.HasFuel() && !Waterlogged())
+		{
+			return !IsDead();
+		}
+		return false;
+	}
+
+	public void OnEngineStartFailed()
+	{
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (base.isServer && CurEngineState == VehicleEngineController.EngineState.Off)
+		{
+			lastEngineOnTime = UnityEngine.Time.time;
+		}
+	}
+
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (isSpawned)
 		{
-			if ((IsOn() || IsStartingUp()) && ((UnityEngine.Time.time > lastPlayerInputTime + 1f && !HasDriver()) || !fuelSystem.HasFuel() || Waterlogged()))
+			if ((IsOn() || IsStartingUp) && ((UnityEngine.Time.time > lastPlayerInputTime + 1f && !HasDriver()) || !fuelSystem.HasFuel() || Waterlogged()))
 			{
-				EngineOff();
+				engineController.StopEngine();
 			}
 			if (IsOn())
 			{
 				fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelPerSec);
 			}
-			bool flag;
-			int num;
-			if (!HasDriver())
-			{
-				flag = currentInputState.throttle <= 0f;
-			}
-			else
-				num = 0;
-			WheelFrictionCurve forwardFriction = leftWheel.forwardFriction;
 		}
 	}
 
@@ -452,7 +458,7 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 		}
 	}
 
-	protected override bool CanPushNow(BasePlayer pusher)
+	public override bool CanPushNow(BasePlayer pusher)
 	{
 		if (base.CanPushNow(pusher))
 		{
@@ -503,5 +509,15 @@ public class MiniCopter : BaseHelicopterVehicle, SamSite.ISamSiteTarget
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	void IEngineControllerUser.Invoke(Action action, float time)
+	{
+		Invoke(action, time);
+	}
+
+	void IEngineControllerUser.CancelInvoke(Action action)
+	{
+		CancelInvoke(action);
 	}
 }

@@ -15,6 +15,7 @@ using Rust;
 using Rust.Ai;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Bootstrap : SingletonComponent<Bootstrap>
 {
@@ -280,6 +281,17 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 					{
 						yield return monument.StartCoroutine(monument.GetMonumentNavMesh().UpdateNavMeshAndWait());
 					}
+				}
+				if ((bool)TerrainMeta.Path && (bool)TerrainMeta.Path.DungeonRoot)
+				{
+					DungeonNavmesh dungeonNavmesh = TerrainMeta.Path.DungeonRoot.AddComponent<DungeonNavmesh>();
+					dungeonNavmesh.NavMeshCollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
+					dungeonNavmesh.LayerMask = 65537;
+					yield return dungeonNavmesh.StartCoroutine(dungeonNavmesh.UpdateNavMeshAndWait());
+				}
+				else
+				{
+					Debug.LogError("Failed to find DungeonRoot, NOT generating Dungeon navmesh");
 				}
 			}
 		}

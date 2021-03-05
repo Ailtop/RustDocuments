@@ -1,23 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Oxide.Core.Plugins;
 using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Laptop Crate Hack", "TheSurgeon/Arainrr", "1.1.2")]
+    [Info("Laptop Crate Hack", "TheSurgeon/Arainrr", "1.1.4")]
     [Description("Require a laptop to hack a crate.")]
     public class LaptopCrateHack : RustPlugin
     {
+        #region Fields
+
         [PluginReference] private readonly Plugin Friends, Clans;
         private const int LAPTOP_ITEMID = 1523195708;
 
         private Dictionary<uint, int> extraHackTimes;
+        private Dictionary<ulong, float> cooldowns;
+
+        #endregion Fields
+
+        #region Oxide Hooks
 
         private void Init()
         {
             if (!configData.ownCrate) Unsubscribe(nameof(CanLootEntity));
             if (!configData.extraHack) Unsubscribe(nameof(OnPlayerInput));
+            if (configData.hackCooldown > 0) cooldowns = new Dictionary<ulong, float>();
             if (configData.maxExtraHack < 0)
             {
                 Unsubscribe(nameof(OnEntityKill));
@@ -30,6 +39,7 @@ namespace Oxide.Plugins
 
         private object CanHackCrate(BasePlayer player, HackableLockedCrate crate)
         {
+            if (crate == null || crate.OwnerID.IsSteamId()) return null;
             if (configData.requireInHand)
             {
                 var activeItem = player.GetActiveItem();
@@ -45,20 +55,41 @@ namespace Oxide.Plugins
                 Print(player, Lang("YouNeed", player.UserIDString, configData.numberRequired, amount));
                 return false;
             }
+            if (configData.hackCooldown > 0)
+            {
+                float lastUse;
+                if (cooldowns.TryGetValue(player.userID, out lastUse))
+                {
+                    var timeLeft = configData.hackCooldown - (Time.realtimeSinceStartup - lastUse);
+                    if (timeLeft > 0)
+                    {
+                        Print(player, Lang("OnCooldown", player.UserIDString, Mathf.CeilToInt(timeLeft)));
+                        return false;
+                    }
+                }
+                cooldowns[player.userID] = Time.realtimeSinceStartup;
+            }
             if (configData.consumeLaptop)
             {
                 List<Item> collect = new List<Item>();
                 player.inventory.Take(collect, LAPTOP_ITEMID, configData.numberRequired);
                 foreach (Item item in collect) item.Remove();
             }
-            if (configData.ownCrate) crate.OwnerID = player.userID;
-            crate.hackSeconds = HackableLockedCrate.requiredHackSeconds - configData.unlockTime;
+
+            if (configData.ownCrate)
+            {
+                crate.OwnerID = player.userID;
+            }
+            if (configData.unlockTime > 0)
+            {
+                crate.hackSeconds = HackableLockedCrate.requiredHackSeconds - configData.unlockTime;
+            }
             return null;
         }
 
         private object CanLootEntity(BasePlayer player, HackableLockedCrate crate)
         {
-            if (crate.OwnerID.IsSteamId() && !AreFriends(player.userID, crate.OwnerID))
+            if (crate.OwnerID.IsSteamId() && !AreFriends(crate.OwnerID, player.userID))
             {
                 Print(player, Lang("YouDontOwn", player.UserIDString));
                 return false;
@@ -104,20 +135,16 @@ namespace Oxide.Plugins
             extraHackTimes.Remove(crate.net.ID);
         }
 
-        private static HackableLockedCrate GetLookEntity(BasePlayer player)
-        {
-            RaycastHit hitInfo;
-            if (Physics.Raycast(player.eyes.HeadRay(), out hitInfo, 20f, Rust.Layers.Solid))
-                return hitInfo.GetEntity() as HackableLockedCrate;
-            return null;
-        }
+        #endregion Oxide Hooks
+
+        #region Methods
 
         private bool AreFriends(ulong playerID, ulong friendID)
         {
             if (playerID == friendID) return true;
-            if (configData.useTeams && SameTeam(friendID, playerID)) return true;
-            if (configData.useFriends && HasFriend(friendID, playerID)) return true;
-            if (configData.useClans && SameClan(friendID, playerID)) return true;
+            if (configData.useTeams && SameTeam(playerID, friendID)) return true;
+            if (configData.useFriends && HasFriend(playerID, friendID)) return true;
+            if (configData.useClans && SameClan(playerID, friendID)) return true;
             return false;
         }
 
@@ -151,6 +178,20 @@ namespace Oxide.Plugins
             return (string)playerClan == (string)friendClan;
         }
 
+        #endregion Methods
+
+        #region Helpers
+
+        private static HackableLockedCrate GetLookEntity(BasePlayer player)
+        {
+            RaycastHit hitInfo;
+            if (Physics.Raycast(player.eyes.HeadRay(), out hitInfo, 20f, Rust.Layers.Solid))
+                return hitInfo.GetEntity() as HackableLockedCrate;
+            return null;
+        }
+
+        #endregion Helpers
+
         #region ConfigurationFile
 
         private ConfigData configData;
@@ -181,6 +222,9 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Only player that hacked can loot? (True/False)")]
             public bool ownCrate = false;
 
+            [JsonProperty(PropertyName = "Hack cooldown")]
+            public float hackCooldown = 0;
+
             [JsonProperty(PropertyName = "Use Teams")]
             public bool useTeams = false;
 
@@ -196,10 +240,7 @@ namespace Oxide.Plugins
             public class ChatSettings
             {
                 [JsonProperty(PropertyName = "Chat Prefix")]
-                public string prefix = "[LaptopCrateHack]: ";
-
-                [JsonProperty(PropertyName = "Chat Prefix Color")]
-                public string prefixColor = "#00FFFF";
+                public string prefix = "<color=#00FFFF>[LaptopCrateHack]</color>: ";
 
                 [JsonProperty(PropertyName = "Chat SteamID Icon")]
                 public ulong steamIDIcon = 0;
@@ -215,9 +256,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -235,12 +276,7 @@ namespace Oxide.Plugins
 
         #region LanguageFile
 
-        private void Print(BasePlayer player, string message)
-        {
-            if (string.IsNullOrEmpty(configData.chatS.prefix))
-                Player.Message(player, message, string.Empty, configData.chatS.steamIDIcon);
-            else Player.Message(player, message, $"<color={configData.chatS.prefixColor}>{configData.chatS.prefix}</color>", configData.chatS.steamIDIcon);
-        }
+        private void Print(BasePlayer player, string message) => Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);
 
@@ -248,15 +284,17 @@ namespace Oxide.Plugins
         {
             lang.RegisterMessages(new Dictionary<string, string>
             {
-                ["YouNeed"] = "Error: You need {0} Targeting Computers and you only have {1}.",
-                ["NotHolding"] = "Error: You must be holding a Targeting Computer in your hand to hack this crate.",
-                ["YouDontOwn"] = "Error: Only the player that hacked this crate can loot it."
+                ["YouNeed"] = "You need <color=#FF1919>{0}</color> Targeting Computers and you only have <color=#009EFF>{1}</color>.",
+                ["NotHolding"] = "You must be holding a Targeting Computer in your hand to hack this crate.",
+                ["YouDontOwn"] = "Only the player that hacked this crate can loot it.",
+                ["OnCooldown"] = "You must wait <color=#FF1919>{0}</color> seconds before you can hack the next crate."
             }, this);
             lang.RegisterMessages(new Dictionary<string, string>
             {
-                ["YouNeed"] = "破解黑客箱需要 {0} 个计算机，但是您只有 {1} 个.",
+                ["YouNeed"] = "破解黑客箱需要 <color=#FF1919>{0}</color> 个计算机，但是您只有 <color=#009EFF>{1}</color> 个.",
                 ["NotHolding"] = "您手上必须拿着计算机才可以破解黑客箱",
-                ["YouDontOwn"] = "只有破解这个黑客箱的玩家才可以掠夺它"
+                ["YouDontOwn"] = "只有破解这个黑客箱的玩家才可以掠夺它",
+                ["OnCooldown"] = "您必须等待 <color=#FF1919>{0}</color> 秒后才能解锁下个黑客箱"
             }, this, "zh-CN");
         }
 

@@ -164,7 +164,7 @@ public class PathFinder
 		int cost = Cost(start);
 		int heuristic = Heuristic(start, end);
 		intrusiveMinHeap.Add(new Node(start, cost, heuristic));
-		visited[start.y, start.x] = true;
+		visited[start.x, start.y] = true;
 		while (!intrusiveMinHeap.Empty && depth-- > 0)
 		{
 			Node node = intrusiveMinHeap.Pop();
@@ -175,9 +175,9 @@ public class PathFinder
 			for (int i = 0; i < neighbors.Length; i++)
 			{
 				Point point = node.point + neighbors[i];
-				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.y, point.x])
+				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.x, point.y])
 				{
-					visited[point.y, point.x] = true;
+					visited[point.x, point.y] = true;
 					int num5 = Cost(point);
 					if (num5 != int.MaxValue)
 					{
@@ -233,7 +233,7 @@ public class PathFinder
 			int cost = Cost(start);
 			int heuristic = Heuristic(start, endList);
 			intrusiveMinHeap.Add(new Node(start, cost, heuristic));
-			visited[start.y, start.x] = true;
+			visited[start.x, start.y] = true;
 		}
 		while (!intrusiveMinHeap.Empty && depth-- > 0)
 		{
@@ -245,9 +245,9 @@ public class PathFinder
 			for (int i = 0; i < neighbors.Length; i++)
 			{
 				Point point = node.point + neighbors[i];
-				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.y, point.x])
+				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.x, point.y])
 				{
-					visited[point.y, point.x] = true;
+					visited[point.x, point.y] = true;
 					int num5 = Cost(point);
 					if (num5 != int.MaxValue)
 					{
@@ -275,11 +275,27 @@ public class PathFinder
 		int num2 = costmap.GetLength(0) - 1;
 		int num3 = 0;
 		int num4 = costmap.GetLength(1) - 1;
+		if (start.x < num)
+		{
+			return null;
+		}
+		if (start.x > num2)
+		{
+			return null;
+		}
+		if (start.y < num3)
+		{
+			return null;
+		}
+		if (start.y > num4)
+		{
+			return null;
+		}
 		IntrusiveMinHeap<Node> intrusiveMinHeap = default(IntrusiveMinHeap<Node>);
 		int cost = 1;
 		int heuristic = Heuristic(start);
 		intrusiveMinHeap.Add(new Node(start, cost, heuristic));
-		visited[start.y, start.x] = true;
+		visited[start.x, start.y] = true;
 		while (!intrusiveMinHeap.Empty && depth-- > 0)
 		{
 			Node node = intrusiveMinHeap.Pop();
@@ -290,9 +306,9 @@ public class PathFinder
 			for (int i = 0; i < neighbors.Length; i++)
 			{
 				Point point = node.point + neighbors[i];
-				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.y, point.x])
+				if (point.x >= num && point.x <= num2 && point.y >= num3 && point.y <= num4 && !visited[point.x, point.y])
 				{
-					visited[point.y, point.x] = true;
+					visited[point.x, point.y] = true;
 					int cost2 = node.cost + 1;
 					int heuristic2 = Heuristic(point);
 					intrusiveMinHeap.Add(new Node(point, cost2, heuristic2, node));
@@ -304,7 +320,7 @@ public class PathFinder
 
 	public bool IsWalkable(Point point)
 	{
-		return costmap[point.y, point.x] != int.MaxValue;
+		return costmap[point.x, point.y] != int.MaxValue;
 	}
 
 	public Node Reverse(Node start)
@@ -341,7 +357,7 @@ public class PathFinder
 
 	public int Cost(Point a)
 	{
-		int num = costmap[a.y, a.x];
+		int num = costmap[a.x, a.y];
 		int num2 = 0;
 		if (num != int.MaxValue && PushMultiplier > 0)
 		{
@@ -354,7 +370,7 @@ public class PathFinder
 
 	public int Heuristic(Point a)
 	{
-		if (costmap[a.y, a.x] != int.MaxValue)
+		if (costmap[a.x, a.y] != int.MaxValue)
 		{
 			return 0;
 		}

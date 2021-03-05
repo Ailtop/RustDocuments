@@ -1,10 +1,11 @@
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
 {
-    [Info("No Durability", "Wulf/lukespragg/Arainrr", "2.2.3", ResourceId = 1061)]
+    [Info("No Durability", "Wulf/lukespragg/Arainrr", "2.2.4", ResourceId = 1061)]
     public class NoDurability : RustPlugin
     {
         [PluginReference] private readonly Plugin ZoneManager, DynamicPVP;
@@ -14,40 +15,42 @@ namespace Oxide.Plugins
 
         private void OnLoseCondition(Item item, ref float amount)
         {
-            if (item?.info == null) return;
+            if (item == null || configData.itemExcludeList.Contains(item.info.shortname)) return;
             var player = item.GetOwnerPlayer() ?? item.GetRootContainer()?.GetOwnerPlayer();
-            if (player == null) return;
-            if (!configData.itemExcludeList.Contains(item.info.shortname) && permission.UserHasPermission(player.UserIDString, PERMISSION_USE))
+            if (player == null || !permission.UserHasPermission(player.UserIDString, PERMISSION_USE)) return;
+            if (configData.useZoneManager && ZoneManager != null)
             {
-                if (configData.useZoneManager && ZoneManager != null)
+                var zoneIDs = GetPlayerZoneIDs(player);
+                if (zoneIDs != null && zoneIDs.Length > 0)
                 {
-                    var zoneIDs = GetPlayerZoneIDs(player);
-                    if (zoneIDs != null && zoneIDs.Length > 0)
+                    if (configData.excludeAllZone)
                     {
-                        if (configData.excludeAllZone)
+                        return;
+                    }
+                    if (configData.excludeDynPVPZone && DynamicPVP != null)
+                    {
+                        foreach (var zoneID in zoneIDs)
                         {
-                            return;
-                        }
-                        if (configData.excludeDynPVPZone && DynamicPVP != null)
-                        {
-                            foreach (var zoneID in zoneIDs)
-                            {
-                                if (IsPlayerInZone(zoneID, player) && IsDynamicPVPZone(zoneID))
-                                {
-                                    return;
-                                }
-                            }
-                            return;
-                        }
-                        foreach (var zoneID in configData.zoneExcludeList)
-                        {
-                            if (IsPlayerInZone(zoneID, player))
+                            if (IsPlayerInZone(zoneID, player) && IsDynamicPVPZone(zoneID))
                             {
                                 return;
                             }
                         }
+                        return;
+                    }
+                    foreach (var zoneID in configData.zoneExcludeList)
+                    {
+                        if (IsPlayerInZone(zoneID, player))
+                        {
+                            return;
+                        }
                     }
                 }
+            }
+
+            amount = 0;
+            if (configData.keepMaxDurability)
+            {
                 item.condition = item.maxCondition;
             }
         }
@@ -66,6 +69,9 @@ namespace Oxide.Plugins
         {
             [JsonProperty(PropertyName = "Use ZoneManager")]
             public bool useZoneManager;
+
+            [JsonProperty(PropertyName = "Keep Max Durability")]
+            public bool keepMaxDurability = true;
 
             [JsonProperty(PropertyName = "Exclude all zone")]
             public bool excludeAllZone;
@@ -89,9 +95,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

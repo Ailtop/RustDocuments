@@ -12,19 +12,22 @@ namespace ConVar
 	[Factory("debug")]
 	public class Debugging : ConsoleSystem
 	{
-		[ServerVar]
 		[ClientVar]
-		public static bool checktriggers;
+		[ServerVar]
+		public static bool checktriggers = false;
+
+		[ServerVar]
+		public static bool checkparentingtriggers = true;
 
 		[ServerVar(Help = "Do not damage any items")]
-		public static bool disablecondition;
+		public static bool disablecondition = false;
 
-		[ClientVar]
 		[ServerVar]
-		public static bool callbacks;
+		[ClientVar]
+		public static bool callbacks = false;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool log
 		{
 			get
@@ -37,8 +40,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void renderinfo(Arg arg)
 		{
 			RenderInfo.GenerateReport();

@@ -35,4 +35,19 @@ public static class NavMeshTools
 		Debug.Log($"Navmesh Source Collecting took {UnityEngine.Time.realtimeSinceStartup - time:0.00} seconds");
 		callback?.Invoke();
 	}
+
+	public static IEnumerator CollectSourcesAsync(Transform root, int mask, NavMeshCollectGeometry geometry, int area, List<NavMeshBuildSource> sources, Action<List<NavMeshBuildSource>> append, Action callback)
+	{
+		while (!AI.move && !AiManager.nav_wait)
+		{
+			yield return CoroutineEx.waitForSeconds(1f);
+		}
+		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
+		Debug.Log("Starting Navmesh Source Collecting");
+		List<NavMeshBuildMarkup> markups = new List<NavMeshBuildMarkup>();
+		NavMeshBuilder.CollectSources(root, mask, geometry, area, markups, sources);
+		append?.Invoke(sources);
+		Debug.Log($"Navmesh Source Collecting took {UnityEngine.Time.realtimeSinceStartup - realtimeSinceStartup:0.00} seconds");
+		callback?.Invoke();
+	}
 }

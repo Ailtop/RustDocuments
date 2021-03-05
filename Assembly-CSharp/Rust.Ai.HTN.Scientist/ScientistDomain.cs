@@ -236,8 +236,8 @@ namespace Rust.Ai.HTN.Scientist
 
 		public class TimeBlockNavigationEffect : EffectBase<ScientistContext>
 		{
-			[ApexSerialization]
 			[FriendlyName("Time (Seconds)")]
+			[ApexSerialization]
 			public float Time;
 
 			public override void Apply(ScientistContext context, bool fromPlanner, bool temporary)
@@ -2108,8 +2108,8 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		private Vector3 missOffset;
@@ -2130,17 +2130,17 @@ namespace Rust.Ai.HTN.Scientist
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private ScientistContext _context;
 
-		[ReadOnly]
 		[Header("Navigation")]
 		[SerializeField]
+		[ReadOnly]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
@@ -2192,8 +2192,8 @@ namespace Rust.Ai.HTN.Scientist
 		};
 
 		[Header("Reasoners")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2283,12 +2283,12 @@ namespace Rust.Ai.HTN.Scientist
 		};
 
 		[ReadOnly]
-		[SerializeField]
 		[Header("Firearm Utility")]
+		[SerializeField]
 		private float _lastFirearmUsageTime;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isFiring;
 
 		[SerializeField]

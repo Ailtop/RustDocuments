@@ -26,8 +26,8 @@ public class BaseProjectile : AttackEntity
 			[Tooltip("Set to 0 to not use inbuilt mag")]
 			public int builtInSize;
 
-			[InspectorFlags]
 			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
+			[InspectorFlags]
 			public AmmoTypes ammoTypes;
 		}
 
@@ -612,7 +612,7 @@ public class BaseProjectile : AttackEntity
 		if (primaryMagazine.contents <= 0)
 		{
 			SignalBroadcast(Signal.DryFire);
-			StartAttackCooldown(1f);
+			StartAttackCooldownRaw(1f);
 			return;
 		}
 		primaryMagazine.contents--;
@@ -638,7 +638,7 @@ public class BaseProjectile : AttackEntity
 				}
 			}
 		}
-		StartAttackCooldown(repeatDelay);
+		StartAttackCooldownRaw(repeatDelay);
 		UnityEngine.Vector3 vector = (flag ? ownerPlayer.eyes.position : MuzzlePoint.transform.position);
 		UnityEngine.Vector3 inputVec = MuzzlePoint.transform.forward;
 		if (originOverride != null)
@@ -889,8 +889,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -931,8 +931,8 @@ public class BaseProjectile : AttackEntity
 		fractionalInsertCounter = 0;
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void StartReload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1065,8 +1065,8 @@ public class BaseProjectile : AttackEntity
 	}
 
 	[RPC_Server.FromOwner]
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

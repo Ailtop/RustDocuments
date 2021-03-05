@@ -103,6 +103,7 @@ public class MonumentNavMesh : FacepunchBehaviour, IServerComponent
 			{
 				UnityEngine.Debug.LogWarning("Calling UpdateNavMesh took " + num);
 			}
+			NotifyInformationZonesOfCompletion();
 		}
 	}
 
@@ -152,6 +153,14 @@ public class MonumentNavMesh : FacepunchBehaviour, IServerComponent
 		}
 	}
 
+	public void NotifyInformationZonesOfCompletion()
+	{
+		foreach (AIInformationZone zone in AIInformationZone.zones)
+		{
+			zone.NavmeshBuildingComplete();
+		}
+	}
+
 	private void AppendModifierVolumes(List<NavMeshBuildSource> sources)
 	{
 		foreach (NavMeshModifierVolume activeModifier in NavMeshModifierVolume.activeModifiers)
@@ -190,6 +199,6 @@ public class MonumentNavMesh : FacepunchBehaviour, IServerComponent
 	public void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.magenta * new Color(1f, 1f, 1f, 0.5f);
-		Gizmos.DrawCube(base.transform.position, Bounds.size);
+		Gizmos.DrawCube(base.transform.position + Bounds.center, Bounds.size);
 	}
 }

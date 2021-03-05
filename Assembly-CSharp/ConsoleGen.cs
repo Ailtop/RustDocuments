@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[707]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[712]
 	{
 		new ConsoleSystem.Command
 		{
@@ -48,6 +48,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				BaseFirework.maxActiveFireworks = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "lifestoryframebudgetms",
+			Parent = "baseplayer",
+			FullName = "baseplayer.lifestoryframebudgetms",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BasePlayer.lifeStoryFramebudgetms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BasePlayer.lifeStoryFramebudgetms = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -2968,6 +2981,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Debugging.callbacks = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "checkparentingtriggers",
+			Parent = "debug",
+			FullName = "debug.checkparentingtriggers",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Debugging.checkparentingtriggers.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Debugging.checkparentingtriggers = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7581,6 +7607,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "cinematictrains",
+			Parent = "vehicle",
+			FullName = "vehicle.cinematictrains",
+			ServerAdmin = true,
+			Description = "If true, trains always explode when destroyed, and hitting a barrier always destroys the train immediately. Default: false",
+			Variable = true,
+			GetOveride = () => vehicle.cinematictrains.ToString(),
+			SetOveride = delegate(string str)
+			{
+				vehicle.cinematictrains = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "fixcars",
 			Parent = "vehicle",
 			FullName = "vehicle.fixcars",
@@ -8235,6 +8275,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "rendertunnels",
+			Parent = "world",
+			FullName = "world.rendertunnels",
+			ServerAdmin = true,
+			Client = true,
+			Description = "Renders a PNG of the current map's tunnel network",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.World.rendertunnels(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "enabled",
 			Parent = "xmas",
 			FullName = "xmas.enabled",
@@ -8331,6 +8385,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				DiagnosticsConSys.dump(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "use_baked_terrain_mesh",
+			Parent = "dungeonnavmesh",
+			FullName = "dungeonnavmesh.use_baked_terrain_mesh",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => DungeonNavmesh.use_baked_terrain_mesh.ToString(),
+			SetOveride = delegate(string str)
+			{
+				DungeonNavmesh.use_baked_terrain_mesh = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command

@@ -6,9 +6,21 @@ public class AICoverPoint : BaseMonoBehaviour
 
 	private BaseEntity currentUser;
 
+	private bool disabled;
+
 	public bool InUse()
 	{
 		return currentUser != null;
+	}
+
+	public void SetDisabled(bool wants)
+	{
+		disabled = wants;
+	}
+
+	public bool IsDisabled()
+	{
+		return disabled;
 	}
 
 	public bool IsUsedBy(BaseEntity user)
@@ -33,6 +45,14 @@ public class AICoverPoint : BaseMonoBehaviour
 	public void ClearUsed()
 	{
 		currentUser = null;
+	}
+
+	public void ClearIfUsedBy(BaseEntity user)
+	{
+		if (currentUser == user)
+		{
+			ClearUsed();
+		}
 	}
 
 	public void OnDrawGizmos()

@@ -1,5 +1,6 @@
 ﻿//Requires: Kits
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
@@ -235,6 +236,7 @@ namespace Oxide.Plugins
                 Text = { Text = "X", Align = TextAnchor.MiddleCenter, Color = "0 0 0 1", FontSize = 22 },
                 RectTransform = { AnchorMin = "0.885 0.05", AnchorMax = "0.995 0.95" }
             }, titlePanel);
+
             CuiHelper.DestroyUi(player, UINAME_MAIN);
             CuiHelper.AddUi(player, container);
             var playerData = GetPlayerData(player.userID, true);
@@ -384,7 +386,7 @@ namespace Oxide.Plugins
             }
 
             [JsonProperty(PropertyName = "Version")]
-            public VersionNumber version = new VersionNumber(1, 2, 4);
+            public VersionNumber version;
         }
 
         protected override void LoadConfig()
@@ -398,9 +400,9 @@ namespace Oxide.Plugins
                 else
                     UpdateConfigValues();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
 
@@ -411,6 +413,7 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig()
@@ -422,15 +425,28 @@ namespace Oxide.Plugins
         {
             if (configData.version < Version)
             {
-                if (configData.version <= new VersionNumber(1, 2, 4))
+                if (configData.version <= default(VersionNumber))
                 {
-                    if (configData.chatS.prefix == "[CustomAutoKits]: ")
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
                     {
-                        configData.chatS.prefix = "<color=#00FFFF>[CustomAutoKits]</color>: ";
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
                     }
                 }
                 configData.version = Version;
             }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
         }
 
         #endregion ConfigurationFile

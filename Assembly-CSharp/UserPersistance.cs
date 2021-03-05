@@ -50,7 +50,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT )");
 		}
 		playerState = new Database();
-		playerState.Open(strFolder + "/player.states." + 203 + ".db");
+		playerState.Open(strFolder + "/player.states." + 204 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

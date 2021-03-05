@@ -40,7 +40,7 @@ public class Elevator : IOEntity, IFlagNotify
 
 	public Transform CableRoot;
 
-	public const Flags TopFloorFlag = Flags.Reserved1;
+	protected const Flags TopFloorFlag = Flags.Reserved1;
 
 	public const Flags ElevatorPowered = Flags.Reserved2;
 
@@ -50,13 +50,17 @@ public class Elevator : IOEntity, IFlagNotify
 
 	public int[] previousPowerAmount = new int[2];
 
+	public virtual bool IsStatic => false;
+
 	public int Floor
 	{
 		get;
 		set;
 	}
 
-	private bool IsTop => HasFlag(Flags.Reserved1);
+	public bool IsTop => HasFlag(Flags.Reserved1);
+
+	public virtual float FloorHeight => 3f;
 
 	public override void Load(LoadInfo info)
 	{
@@ -83,7 +87,7 @@ public class Elevator : IOEntity, IFlagNotify
 		SetFlag(Flags.Reserved1, true);
 	}
 
-	public void CallElevator()
+	public virtual void CallElevator()
 	{
 		EntityLinkBroadcast(delegate(Elevator elevatorEnt)
 		{
@@ -134,7 +138,7 @@ public class Elevator : IOEntity, IFlagNotify
 		{
 			return false;
 		}
-		if (ioEntity != null && !ioEntity.IsPowered())
+		if (!IsStatic && ioEntity != null && !ioEntity.IsPowered())
 		{
 			return false;
 		}
@@ -146,6 +150,12 @@ public class Elevator : IOEntity, IFlagNotify
 		{
 			return false;
 		}
+		if (LiftPositionToFloor() == targetFloor)
+		{
+			OnLiftCalledWhenAtTargetFloor();
+			return false;
+		}
+		OnMoveBegin();
 		Vector3 worldSpaceFloorPosition = GetWorldSpaceFloorPosition(targetFloor);
 		Vector3 vector = base.transform.InverseTransformPoint(worldSpaceFloorPosition);
 		timeToTravel = TimeToTravelDistance(Mathf.Abs(liftEntity.transform.localPosition.y - vector.y));
@@ -164,20 +174,28 @@ public class Elevator : IOEntity, IFlagNotify
 		return true;
 	}
 
+	public virtual void OnLiftCalledWhenAtTargetFloor()
+	{
+	}
+
+	public virtual void OnMoveBegin()
+	{
+	}
+
 	public float TimeToTravelDistance(float distance)
 	{
 		return distance / LiftSpeedPerMetre;
 	}
 
-	public Vector3 GetWorldSpaceFloorPosition(int targetFloor)
+	public virtual Vector3 GetWorldSpaceFloorPosition(int targetFloor)
 	{
 		int num = Floor - targetFloor;
-		Vector3 b = Vector3.up * ((float)num * 3f);
+		Vector3 b = Vector3.up * ((float)num * FloorHeight);
 		b.y -= 1f;
 		return base.transform.position - b;
 	}
 
-	public void ClearBusy()
+	public virtual void ClearBusy()
 	{
 		SetFlag(Flags.Busy, false);
 		if (liftEntity != null)
@@ -191,7 +209,7 @@ public class Elevator : IOEntity, IFlagNotify
 		}
 	}
 
-	public bool IsValidFloor(int targetFloor)
+	public virtual bool IsValidFloor(int targetFloor)
 	{
 		if (targetFloor <= Floor)
 		{
@@ -233,7 +251,7 @@ public class Elevator : IOEntity, IFlagNotify
 			{
 				FindExistingIOChild();
 			}
-			if (ioEntity == null)
+			if (ioEntity == null && IoEntityPrefab.isValid)
 			{
 				ioEntity = GameManager.server.CreateEntity(IoEntityPrefab.resourcePath, IoEntitySpawnPoint.position, IoEntitySpawnPoint.rotation) as IOEntity;
 				ioEntity.SetParent(this, true);
@@ -253,7 +271,7 @@ public class Elevator : IOEntity, IFlagNotify
 		}
 	}
 
-	private void FindExistingIOChild()
+	public void FindExistingIOChild()
 	{
 		foreach (BaseEntity child in children)
 		{
@@ -336,13 +354,13 @@ public class Elevator : IOEntity, IFlagNotify
 
 	private void OnPhysicsNeighbourChanged()
 	{
-		if (GetElevatorInDirection(Direction.Down) == null && !HasFloorSocketConnection())
+		if (!IsStatic && GetElevatorInDirection(Direction.Down) == null && !HasFloorSocketConnection())
 		{
 			Kill(DestroyMode.Gib);
 		}
 	}
 
-	private bool HasFloorSocketConnection()
+	public bool HasFloorSocketConnection()
 	{
 		EntityLink entityLink = FindLink("elevator/sockets/block-male");
 		if (entityLink != null && !entityLink.IsEmpty())
@@ -376,7 +394,7 @@ public class Elevator : IOEntity, IFlagNotify
 		}
 	}
 
-	private void FindExistingLiftChild()
+	public void FindExistingLiftChild()
 	{
 		foreach (BaseEntity child in children)
 		{

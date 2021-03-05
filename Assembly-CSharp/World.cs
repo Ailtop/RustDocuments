@@ -104,7 +104,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 203 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 204 + ".map";
 		}
 	}
 
@@ -116,9 +116,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 203 + ".sav";
+				return Name + "." + 204 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 203 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 204 + ".sav";
 		}
 	}
 
@@ -137,7 +137,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 203 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 204 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -174,7 +174,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 203 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 204 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -359,16 +359,21 @@ public static class World
 		}
 	}
 
-	public static void Spawn(string category, string folder)
+	public static void Spawn(string category, string folder = null)
 	{
 		for (int i = SpawnIndex; i < Serialization.world.prefabs.Count; i++)
 		{
 			PrefabData prefabData = Serialization.world.prefabs[i];
-			if (!(prefabData.category != category) && StringPool.Get(prefabData.id).StartsWith(folder))
+			if (!(prefabData.category != category))
 			{
-				Spawn(prefabData);
-				SpawnIndex++;
-				continue;
+				string text = StringPool.Get(prefabData.id);
+				if (string.IsNullOrEmpty(folder) || text.StartsWith(folder))
+				{
+					Spawn(prefabData);
+					SpawnIndex++;
+					continue;
+				}
+				break;
 			}
 			break;
 		}

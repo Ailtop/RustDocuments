@@ -1,3 +1,4 @@
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
@@ -75,7 +76,7 @@ public class ItemModConsume : ItemMod
 				player.metabolism.ApplyChange(effect.type, effect.amount * num3 * num4, effect.time * num3 * num4);
 			}
 		}
-		if (player.modifiers != null)
+		if (player.modifiers != null && Interface.CallHook("OnPlayerAddModifiers", player, item, consumable) == null)
 		{
 			player.modifiers.Add(consumable.modifiers);
 		}

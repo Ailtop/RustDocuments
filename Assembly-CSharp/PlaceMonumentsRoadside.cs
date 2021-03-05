@@ -24,6 +24,33 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 		public List<SpawnInfo> candidates;
 	}
 
+	private struct DistanceInfo
+	{
+		public float minDistanceSameType;
+
+		public float maxDistanceSameType;
+
+		public float minDistanceDifferentType;
+
+		public float maxDistanceDifferentType;
+	}
+
+	public enum DistanceMode
+	{
+		Any,
+		Min,
+		Max
+	}
+
+	public enum RoadMode
+	{
+		SideRoadOrRingRoad,
+		SideRoad,
+		RingRoad,
+		SideRoadOrDesireTrail,
+		DesireTrail
+	}
+
 	public SpawnFilter Filter;
 
 	public string ResourceFolder = string.Empty;
@@ -36,9 +63,19 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 	[FormerlySerializedAs("MinSize")]
 	public int MinWorldSize;
 
-	private const int Candidates = 10;
+	[Tooltip("Distance to monuments of the same type")]
+	public DistanceMode DistanceSameType = DistanceMode.Max;
 
-	private static Quaternion rot90 = Quaternion.Euler(0f, 90f, 0f);
+	[Tooltip("Distance to monuments of a different type")]
+	public DistanceMode DistanceDifferentType;
+
+	public RoadMode RoadType;
+
+	public const int GroupCandidates = 10;
+
+	public const int IndividualCandidates = 100;
+
+	public static Quaternion rot90 = Quaternion.Euler(0f, 90f, 0f);
 
 	public override void Process(uint seed)
 	{
@@ -97,13 +134,61 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				}
 				foreach (PathList road in TerrainMeta.Path.Roads)
 				{
+					switch (RoadType)
+					{
+					case RoadMode.SideRoadOrRingRoad:
+						if (road.IsExtraNarrow)
+						{
+							continue;
+						}
+						break;
+					case RoadMode.SideRoad:
+						if (road.IsExtraNarrow || road.IsExtraWide)
+						{
+							continue;
+						}
+						break;
+					case RoadMode.RingRoad:
+						if (!road.IsExtraWide)
+						{
+							continue;
+						}
+						break;
+					case RoadMode.SideRoadOrDesireTrail:
+						if (road.IsExtraWide)
+						{
+							continue;
+						}
+						break;
+					case RoadMode.DesireTrail:
+						if (!road.IsExtraNarrow)
+						{
+							continue;
+						}
+						break;
+					}
 					if (road.IsExtraNarrow)
 					{
-						continue;
+						if (road.Start)
+						{
+							MonumentInfo monumentInfo = TerrainMeta.Path.FindClosest(TerrainMeta.Path.Monuments, road.Path.GetStartPoint());
+							if (monumentInfo.Type == MonumentType.WaterWell || (monumentInfo.Type == MonumentType.Building && monumentInfo.displayPhrase.token.StartsWith("mining_quarry")) || (monumentInfo.Type == MonumentType.Radtown && monumentInfo.displayPhrase.token.StartsWith("swamp")))
+							{
+								continue;
+							}
+						}
+						if (road.End)
+						{
+							MonumentInfo monumentInfo2 = TerrainMeta.Path.FindClosest(TerrainMeta.Path.Monuments, road.Path.GetEndPoint());
+							if (monumentInfo2.Type == MonumentType.WaterWell || (monumentInfo2.Type == MonumentType.Building && monumentInfo2.displayPhrase.token.StartsWith("mining_quarry")) || (monumentInfo2.Type == MonumentType.Radtown && monumentInfo2.displayPhrase.token.StartsWith("swamp")))
+							{
+								continue;
+							}
+						}
 					}
 					PathInterpolator path = road.Path;
-					float num = 20f;
-					float num2 = 10f;
+					float num = 5f;
+					float num2 = 5f;
 					float num3 = path.StartOffset + num2;
 					float num4 = path.Length - path.EndOffset - num2;
 					for (float num5 = num3; num5 <= num4; num5 += num)
@@ -168,18 +253,58 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 						continue;
 					}
 					int num9 = (int)((!prefab4.Parameters) ? PrefabPriority.Low : (prefab4.Parameters.Priority + 1));
-					int num10 = num9 * num9 * num9 * num9;
+					int num10 = 100000 * num9 * num9 * num9 * num9;
+					int num11 = 0;
+					int num12 = 0;
+					SpawnInfo item2 = default(SpawnInfo);
 					spawnInfoGroup4.candidates.Shuffle(ref seed);
-					for (int num11 = 0; num11 < spawnInfoGroup4.candidates.Count; num11++)
+					for (int num13 = 0; num13 < spawnInfoGroup4.candidates.Count; num13++)
 					{
-						SpawnInfo item2 = spawnInfoGroup4.candidates[num11];
-						int num12 = Mathf.Max(MinDistance, prefab4.Component ? prefab4.Component.MinDistance : 0);
-						if (!CheckRadius(a, item2.position, num12))
+						SpawnInfo spawnInfo = spawnInfoGroup4.candidates[num13];
+						int num14 = Mathf.Max(MinDistance, prefab4.Component ? prefab4.Component.MinDistance : 0);
+						DistanceInfo distanceInfo = GetDistanceInfo(a, spawnInfo.position);
+						if (distanceInfo.minDistanceSameType < (float)num14)
 						{
-							a.Add(item2);
-							num7 += num10;
+							continue;
+						}
+						int num15 = num10;
+						if (distanceInfo.minDistanceSameType != float.MaxValue)
+						{
+							if (DistanceSameType == DistanceMode.Min)
+							{
+								num15 -= Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+							}
+							else if (DistanceSameType == DistanceMode.Max)
+							{
+								num15 += Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+							}
+						}
+						if (distanceInfo.minDistanceDifferentType != float.MaxValue)
+						{
+							if (DistanceDifferentType == DistanceMode.Min)
+							{
+								num15 -= Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+							}
+							else if (DistanceDifferentType == DistanceMode.Max)
+							{
+								num15 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+							}
+						}
+						if (num15 > num12)
+						{
+							num12 = num15;
+							item2 = spawnInfo;
+						}
+						num11++;
+						if (num11 >= 100 || DistanceDifferentType == DistanceMode.Any)
+						{
 							break;
 						}
+					}
+					if (num12 > 0)
+					{
+						a.Add(item2);
+						num7 += num12;
 					}
 					if (TargetCount > 0 && a.Count >= TargetCount)
 					{
@@ -199,16 +324,59 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 		}
 	}
 
-	public bool CheckRadius(List<SpawnInfo> spawns, Vector3 pos, float radius)
+	public DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 pos)
 	{
-		float num = radius * radius;
-		foreach (SpawnInfo spawn in spawns)
+		DistanceInfo result = default(DistanceInfo);
+		result.minDistanceDifferentType = float.MaxValue;
+		result.maxDistanceDifferentType = float.MinValue;
+		result.minDistanceSameType = float.MaxValue;
+		result.maxDistanceSameType = float.MinValue;
+		if (TerrainMeta.Path != null)
 		{
-			if ((spawn.position - pos).sqrMagnitude < num)
+			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				return true;
+				float sqrMagnitude = (monument.transform.position - pos).sqrMagnitude;
+				if (sqrMagnitude < result.minDistanceDifferentType)
+				{
+					result.minDistanceDifferentType = sqrMagnitude;
+				}
+				if (sqrMagnitude > result.maxDistanceDifferentType)
+				{
+					result.maxDistanceDifferentType = sqrMagnitude;
+				}
+			}
+			if (result.minDistanceDifferentType != float.MaxValue)
+			{
+				result.minDistanceDifferentType = Mathf.Sqrt(result.minDistanceDifferentType);
+			}
+			if (result.maxDistanceDifferentType != float.MinValue)
+			{
+				result.maxDistanceDifferentType = Mathf.Sqrt(result.maxDistanceDifferentType);
 			}
 		}
-		return false;
+		if (spawns != null)
+		{
+			foreach (SpawnInfo spawn in spawns)
+			{
+				float sqrMagnitude2 = (spawn.position - pos).sqrMagnitude;
+				if (sqrMagnitude2 < result.minDistanceSameType)
+				{
+					result.minDistanceSameType = sqrMagnitude2;
+				}
+				if (sqrMagnitude2 > result.maxDistanceSameType)
+				{
+					result.maxDistanceSameType = sqrMagnitude2;
+				}
+			}
+			if (result.minDistanceSameType != float.MaxValue)
+			{
+				result.minDistanceSameType = Mathf.Sqrt(result.minDistanceSameType);
+			}
+			if (result.maxDistanceSameType != float.MinValue)
+			{
+				result.maxDistanceSameType = Mathf.Sqrt(result.maxDistanceSameType);
+			}
+		}
+		return result;
 	}
 }

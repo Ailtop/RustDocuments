@@ -2045,8 +2045,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2812,11 +2812,28 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
+		BaseEntity baseEntity = parentEntity.Get(base.isServer);
 		info.msg.baseEntity = Facepunch.Pool.Get<ProtoBuf.BaseEntity>();
 		if (info.forDisk)
 		{
-			info.msg.baseEntity.pos = base.transform.localPosition;
-			info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
+			if (this is BasePlayer)
+			{
+				if (baseEntity == null || baseEntity.enableSaving)
+				{
+					info.msg.baseEntity.pos = base.transform.localPosition;
+					info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
+				}
+				else
+				{
+					info.msg.baseEntity.pos = base.transform.position;
+					info.msg.baseEntity.rot = base.transform.rotation.eulerAngles;
+				}
+			}
+			else
+			{
+				info.msg.baseEntity.pos = base.transform.localPosition;
+				info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
+			}
 		}
 		else
 		{
@@ -2826,7 +2843,16 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		info.msg.baseEntity.flags = (int)flags;
 		info.msg.baseEntity.skinid = skinID;
-		if (parentEntity.IsValid(base.isServer))
+		if (info.forDisk && this is BasePlayer)
+		{
+			if (baseEntity != null && baseEntity.enableSaving)
+			{
+				info.msg.parent = Facepunch.Pool.Get<ParentInfo>();
+				info.msg.parent.uid = parentEntity.uid;
+				info.msg.parent.bone = parentBone;
+			}
+		}
+		else if (baseEntity != null)
 		{
 			info.msg.parent = Facepunch.Pool.Get<ParentInfo>();
 			info.msg.parent.uid = parentEntity.uid;

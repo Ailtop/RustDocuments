@@ -75,6 +75,8 @@ public class Drone : RemoteControlEntity
 
 	public override bool RequiresMouse => true;
 
+	protected override bool PositionTickFixedTime => true;
+
 	public override void UserInput(InputState inputState, BasePlayer player)
 	{
 		currentInput.Reset();
@@ -109,7 +111,8 @@ public class Drone : RemoteControlEntity
 		lastInputTime = Time.time;
 		if (position.y - height > 1f)
 		{
-			currentInput.movement = base.transform.InverseTransformVector(direction);
+			float d = Mathf.Clamp01(magnitude);
+			currentInput.movement = base.transform.InverseTransformVector(direction) * d;
 			if (magnitude > 0.5f)
 			{
 				float y = base.transform.rotation.eulerAngles.y;
@@ -185,5 +188,10 @@ public class Drone : RemoteControlEntity
 		{
 			lastCollision = TimeEx.currentTimestamp;
 		}
+	}
+
+	public override float GetNetworkTime()
+	{
+		return Time.fixedTime;
 	}
 }

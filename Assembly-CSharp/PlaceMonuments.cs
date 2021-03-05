@@ -15,6 +15,24 @@ public class PlaceMonuments : ProceduralComponent
 		public Vector3 scale;
 	}
 
+	private struct DistanceInfo
+	{
+		public float minDistanceSameType;
+
+		public float maxDistanceSameType;
+
+		public float minDistanceDifferentType;
+
+		public float maxDistanceDifferentType;
+	}
+
+	public enum DistanceMode
+	{
+		Any,
+		Min,
+		Max
+	}
+
 	public SpawnFilter Filter;
 
 	public string ResourceFolder = string.Empty;
@@ -27,9 +45,17 @@ public class PlaceMonuments : ProceduralComponent
 	[FormerlySerializedAs("MinSize")]
 	public int MinWorldSize;
 
-	private const int Candidates = 10;
+	[Tooltip("Distance to monuments of the same type")]
+	public DistanceMode DistanceSameType = DistanceMode.Max;
 
-	private const int Attempts = 10000;
+	[Tooltip("Distance to monuments of a different type")]
+	public DistanceMode DistanceDifferentType;
+
+	public const int GroupCandidates = 10;
+
+	public const int IndividualCandidates = 100;
+
+	public const int Attempts = 10000;
 
 	public override void Process(uint seed)
 	{
@@ -73,16 +99,19 @@ public class PlaceMonuments : ProceduralComponent
 						continue;
 					}
 					int num3 = (int)((!prefab.Parameters) ? PrefabPriority.Low : (prefab.Parameters.Priority + 1));
-					int num4 = num3 * num3 * num3 * num3;
+					int num4 = 100000 * num3 * num3 * num3 * num3;
+					int num5 = 0;
+					int num6 = 0;
+					SpawnInfo item = default(SpawnInfo);
 					for (int k = 0; k < 10000; k++)
 					{
 						float x2 = SeedRandom.Range(ref seed, x, max);
 						float z2 = SeedRandom.Range(ref seed, z, max2);
 						float normX = TerrainMeta.NormalizeX(x2);
 						float normZ = TerrainMeta.NormalizeZ(z2);
-						float num5 = SeedRandom.Value(ref seed);
+						float num7 = SeedRandom.Value(ref seed);
 						float factor = Filter.GetFactor(normX, normZ);
-						if (factor * factor < num5)
+						if (factor * factor < num7)
 						{
 							continue;
 						}
@@ -90,22 +119,60 @@ public class PlaceMonuments : ProceduralComponent
 						Vector3 pos = new Vector3(x2, height, z2);
 						Quaternion rot = prefab.Object.transform.localRotation;
 						Vector3 scale = prefab.Object.transform.localScale;
-						int num6 = Mathf.Max(MinDistance, prefab.Component ? prefab.Component.MinDistance : 0);
-						if (!CheckRadius(a, pos, num6))
+						int num8 = Mathf.Max(MinDistance, prefab.Component ? prefab.Component.MinDistance : 0);
+						DistanceInfo distanceInfo = GetDistanceInfo(a, pos);
+						if (distanceInfo.minDistanceSameType < (float)num8)
 						{
-							prefab.ApplyDecorComponents(ref pos, ref rot, ref scale);
-							if ((!prefab.Component || prefab.Component.CheckPlacement(pos, rot, scale)) && prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) && prefab.ApplyTerrainChecks(pos, rot, scale, Filter) && prefab.ApplyTerrainFilters(pos, rot, scale) && prefab.ApplyWaterChecks(pos, rot, scale) && !prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground))
+							continue;
+						}
+						prefab.ApplyDecorComponents(ref pos, ref rot, ref scale);
+						if (((bool)prefab.Component && !prefab.Component.CheckPlacement(pos, rot, scale)) || !prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground))
+						{
+							continue;
+						}
+						SpawnInfo spawnInfo = default(SpawnInfo);
+						spawnInfo.prefab = prefab;
+						spawnInfo.position = pos;
+						spawnInfo.rotation = rot;
+						spawnInfo.scale = scale;
+						int num9 = num4;
+						if (distanceInfo.minDistanceSameType != float.MaxValue)
+						{
+							if (DistanceSameType == DistanceMode.Min)
 							{
-								SpawnInfo item = default(SpawnInfo);
-								item.prefab = prefab;
-								item.position = pos;
-								item.rotation = rot;
-								item.scale = scale;
-								a.Add(item);
-								num += num4;
-								break;
+								num9 -= Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+							}
+							else if (DistanceSameType == DistanceMode.Max)
+							{
+								num9 += Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
 							}
 						}
+						if (distanceInfo.minDistanceDifferentType != float.MaxValue)
+						{
+							if (DistanceDifferentType == DistanceMode.Min)
+							{
+								num9 -= Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+							}
+							else if (DistanceDifferentType == DistanceMode.Max)
+							{
+								num9 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+							}
+						}
+						if (num9 > num6)
+						{
+							num6 = num9;
+							item = spawnInfo;
+						}
+						num5++;
+						if (num5 >= 100 || DistanceDifferentType == DistanceMode.Any)
+						{
+							break;
+						}
+					}
+					if (num6 > 0)
+					{
+						a.Add(item);
+						num += num6;
 					}
 					if (TargetCount > 0 && a.Count >= TargetCount)
 					{
@@ -125,16 +192,59 @@ public class PlaceMonuments : ProceduralComponent
 		}
 	}
 
-	public bool CheckRadius(List<SpawnInfo> spawns, Vector3 pos, float radius)
+	public DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 pos)
 	{
-		float num = radius * radius;
-		foreach (SpawnInfo spawn in spawns)
+		DistanceInfo result = default(DistanceInfo);
+		result.minDistanceDifferentType = float.MaxValue;
+		result.maxDistanceDifferentType = float.MinValue;
+		result.minDistanceSameType = float.MaxValue;
+		result.maxDistanceSameType = float.MinValue;
+		if (TerrainMeta.Path != null)
 		{
-			if ((spawn.position - pos).sqrMagnitude < num)
+			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				return true;
+				float sqrMagnitude = (monument.transform.position - pos).sqrMagnitude;
+				if (sqrMagnitude < result.minDistanceDifferentType)
+				{
+					result.minDistanceDifferentType = sqrMagnitude;
+				}
+				if (sqrMagnitude > result.maxDistanceDifferentType)
+				{
+					result.maxDistanceDifferentType = sqrMagnitude;
+				}
+			}
+			if (result.minDistanceDifferentType != float.MaxValue)
+			{
+				result.minDistanceDifferentType = Mathf.Sqrt(result.minDistanceDifferentType);
+			}
+			if (result.maxDistanceDifferentType != float.MinValue)
+			{
+				result.maxDistanceDifferentType = Mathf.Sqrt(result.maxDistanceDifferentType);
 			}
 		}
-		return false;
+		if (spawns != null)
+		{
+			foreach (SpawnInfo spawn in spawns)
+			{
+				float sqrMagnitude2 = (spawn.position - pos).sqrMagnitude;
+				if (sqrMagnitude2 < result.minDistanceSameType)
+				{
+					result.minDistanceSameType = sqrMagnitude2;
+				}
+				if (sqrMagnitude2 > result.maxDistanceSameType)
+				{
+					result.maxDistanceSameType = sqrMagnitude2;
+				}
+			}
+			if (result.minDistanceSameType != float.MaxValue)
+			{
+				result.minDistanceSameType = Mathf.Sqrt(result.minDistanceSameType);
+			}
+			if (result.maxDistanceSameType != float.MinValue)
+			{
+				result.maxDistanceSameType = Mathf.Sqrt(result.maxDistanceSameType);
+			}
+		}
+		return result;
 	}
 }

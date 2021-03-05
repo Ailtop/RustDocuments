@@ -25,6 +25,7 @@ public class PlayerModel : ListComponent<PlayerModel>
 		SitSummer_Chair = 18,
 		SitRaft_NoPaddle = 19,
 		Sit_SecretLab = 20,
+		Sit_Workcart = 21,
 		Standing = 0x80
 	}
 
@@ -144,8 +145,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public SubsurfaceProfile subsurfaceProfile;
 
-	[Range(0f, 1f)]
 	[Header("Parameters")]
+	[Range(0f, 1f)]
 	public float voiceVolume;
 
 	[Range(0f, 1f)]

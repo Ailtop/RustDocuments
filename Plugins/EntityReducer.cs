@@ -1,7 +1,10 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ConVar;
 using Newtonsoft.Json;
+using Oxide.Core;
 using UnityEngine;
 
 namespace Oxide.Plugins
@@ -10,15 +13,27 @@ namespace Oxide.Plugins
     [Description("Control all spawn populations on your server")]
     public class EntityReducer : RustPlugin
     {
-        private static SpawnHandler spawnHandler;  
-        private float densityToMaxPopulation;
+        private static SpawnHandler spawnHandler;
 
         private void OnServerInitialized()
         {
             spawnHandler = SingletonComponent<SpawnHandler>.Instance;
-            densityToMaxPopulation = TerrainMeta.Size.x * TerrainMeta.Size.z * 1E-06f;
+            if (spawnHandler == null || spawnHandler.AllSpawnPopulations == null)
+            {
+                PrintError("The SpawnHandler is missing on your server, the plugin cannot be used");
+                Interface.Oxide.UnloadPlugin(Name);
+                return;
+            }
             UpdateConfig();
-            SpawnHandlerHelper();
+            if (configData.pluginEnabled)
+            {
+                ApplySpawnHandler();
+            }
+        }
+
+        private void Unload()
+        {
+            spawnHandler = null;
         }
 
         private void UpdateConfig()
@@ -26,25 +41,19 @@ namespace Oxide.Plugins
             Dictionary<string, int> newPopulationSettings = new Dictionary<string, int>();
             for (int i = 0; i < spawnHandler.AllSpawnPopulations.Length; i++)
             {
-                if (spawnHandler.AllSpawnPopulations[i] == null) continue;
                 var spawnPopulation = spawnHandler.AllSpawnPopulations[i];
+                if (spawnPopulation == null) continue;
                 var spawnDistribution = spawnHandler.SpawnDistributions[i];
-                if (spawnPopulation != null && spawnDistribution != null)
-                {
-                    int targetCount = spawnHandler.GetTargetCount(spawnPopulation, spawnDistribution);
-                    if (configData.populationSettings.ContainsKey(spawnPopulation.name))
-                        newPopulationSettings.Add(spawnPopulation.name, configData.populationSettings[spawnPopulation.name]);
-                    else newPopulationSettings.Add(spawnPopulation.name, targetCount);
-                }
+                if (spawnDistribution == null) continue;
+                int targetCount = spawnHandler.GetTargetCount(spawnPopulation, spawnDistribution);
+                int value;
+                newPopulationSettings.Add(spawnPopulation.name,
+                    configData.populationSettings.TryGetValue(spawnPopulation.name, out value)
+                        ? value
+                        : targetCount);
             }
             configData.populationSettings = newPopulationSettings;
             SaveConfig();
-        }
-
-        private void SpawnHandlerHelper()
-        {
-            if (configData.pluginEnabled)
-                ApplySpawnHandler();
         }
 
         private void ApplySpawnHandler()
@@ -52,18 +61,26 @@ namespace Oxide.Plugins
             foreach (var spawnPopulation in spawnHandler.AllSpawnPopulations)
             {
                 if (spawnPopulation == null) continue;
-                if (configData.populationSettings.ContainsKey(spawnPopulation.name))
+                int targetCount;
+                if (configData.populationSettings.TryGetValue(spawnPopulation.name, out targetCount))
                 {
+                    float num = TerrainMeta.Size.x * TerrainMeta.Size.z;
+                    if (!spawnPopulation.ScaleWithLargeMaps)
+                    {
+                        num = Mathf.Min(num, 1.6E+07f);
+                    }
+                    var densityToMaxPopulation = num * 1E-06f * Spawn.max_density;
                     spawnPopulation.ScaleWithSpawnFilter = false;
                     spawnPopulation.ScaleWithServerPopulation = false;
                     spawnPopulation.EnforcePopulationLimits = true;
-                    if (spawnPopulation is ConvarControlledSpawnPopulation)
+                    spawnPopulation.ScaleWithLargeMaps = true;
+                    var convarControlledSpawnPopulation = spawnPopulation as ConvarControlledSpawnPopulation;
+                    if (convarControlledSpawnPopulation != null)
                     {
-                        var populationConvar = (spawnPopulation as ConvarControlledSpawnPopulation).PopulationConvar;
-                        ConsoleSystem.Command command = ConsoleSystem.Index.Server.Find(populationConvar);
-                        command?.Set(configData.populationSettings[spawnPopulation.name] / densityToMaxPopulation);
+                        ConsoleSystem.Command command = ConsoleSystem.Index.Server.Find(convarControlledSpawnPopulation.PopulationConvar);
+                        command?.Set(targetCount / densityToMaxPopulation);
                     }
-                    else spawnPopulation._targetDensity = configData.populationSettings[spawnPopulation.name] / densityToMaxPopulation;
+                    else spawnPopulation._targetDensity = targetCount / densityToMaxPopulation;
                 }
             }
             EnforceLimits();
@@ -74,11 +91,13 @@ namespace Oxide.Plugins
         [ConsoleCommand("er.enforcelimits")]
         private void CmdEnforceLimits(ConsoleSystem.Arg arg)
         {
-            if (EnforceLimits()) Print(arg, "Successfully enforced all population limits");
-            else Print(arg, "Unsuccessful enforced all population limits");
+            SendReply(arg,
+                EnforceLimits()
+                    ? "Successfully enforced all population limits"
+                    : "Unsuccessful enforced all population limits");
         }
 
-        private bool EnforceLimits()
+        private static bool EnforceLimits()
         {
             if (spawnHandler.SpawnDistributions == null) return false;
             var spawnables = UnityEngine.Object.FindObjectsOfType<Spawnable>()?.Where(x => x.gameObject.activeInHierarchy && x.Population != null)?.GroupBy(x => x.Population)?.ToDictionary(x => x.Key, y => y.ToArray());
@@ -87,13 +106,16 @@ namespace Oxide.Plugins
             {
                 var spawnPopulation = spawnHandler.AllSpawnPopulations[i];
                 var spawnDistribution = spawnHandler.SpawnDistributions[i];
-                if (spawnPopulation != null && spawnDistribution != null && spawnables.ContainsKey(spawnPopulation))
-                    EnforceLimits(spawnPopulation, spawnDistribution, spawnables[spawnPopulation]);
+                Spawnable[] array;
+                if (spawnPopulation != null && spawnDistribution != null && spawnables.TryGetValue(spawnPopulation, out array))
+                {
+                    EnforceLimits(spawnPopulation, spawnDistribution, array);
+                }
             }
             return true;
         }
 
-        private void EnforceLimits(SpawnPopulation population, SpawnDistribution distribution, Spawnable[] array)
+        private static void EnforceLimits(SpawnPopulation population, SpawnDistribution distribution, Spawnable[] array)
         {
             int targetCount = spawnHandler.GetTargetCount(population, distribution);
             if (array.Length > targetCount)
@@ -101,10 +123,10 @@ namespace Oxide.Plugins
                 Debug.Log(population + " has " + array.Length + " objects, but max allowed is " + targetCount);
                 int num = array.Length - targetCount;
                 Debug.Log(" - deleting " + num + " objects");
-                foreach (Spawnable item in array.Take(num))
+                foreach (Spawnable item in array.Take(num).ToArray())
                 {
-                    BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-                    if (BaseEntityEx.IsValid(baseEntity)) baseEntity.Kill();
+                    BaseEntity baseEntity = item.gameObject.ToBaseEntity();
+                    if (baseEntity.IsValid()) baseEntity.Kill();
                     else GameManager.Destroy(item.gameObject);
                 }
             }
@@ -116,44 +138,35 @@ namespace Oxide.Plugins
         private void CmdFillPopulations(ConsoleSystem.Arg arg)
         {
             spawnHandler.FillPopulations();
-            Print(arg, "Successfully filled all populations");
+            SendReply(arg, "Successfully filled all populations");
         }
 
         [ConsoleCommand("er.getreport")]
-        private void CmdGetReport(ConsoleSystem.Arg arg) => Print(arg, GetReport());
+        private void CmdGetReport(ConsoleSystem.Arg arg) => SendReply(arg, GetReport());
 
         public string GetReport()
         {
-            SpawnPopulation[] AllSpawnPopulations = spawnHandler.AllSpawnPopulations;
-            SpawnDistribution[] SpawnDistributions = spawnHandler.SpawnDistributions;
+            SpawnPopulation[] allSpawnPopulations = spawnHandler.AllSpawnPopulations;
+            SpawnDistribution[] spawnDistributions = spawnHandler.SpawnDistributions;
             StringBuilder stringBuilder = new StringBuilder();
-            if (AllSpawnPopulations == null) stringBuilder.AppendLine("Spawn population array is null.");
-            if (SpawnDistributions == null) stringBuilder.AppendLine("Spawn distribution array is null.");
-            if (AllSpawnPopulations != null && SpawnDistributions != null)
+            if (allSpawnPopulations == null) stringBuilder.AppendLine("Spawn population array is null.");
+            if (spawnDistributions == null) stringBuilder.AppendLine("Spawn distribution array is null.");
+            if (allSpawnPopulations != null && spawnDistributions != null)
             {
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine("SpawnPopulationName".PadRight(40) + "MaximumPopulation".PadRight(25) + "CurrentPopulation");
-                for (int i = 0; i < AllSpawnPopulations.Length; i++)
+                for (int i = 0; i < allSpawnPopulations.Length; i++)
                 {
-                    if (AllSpawnPopulations[i] == null) continue;
-                    SpawnPopulation spawnPopulation = AllSpawnPopulations[i];
-                    SpawnDistribution spawnDistribution = SpawnDistributions[i];
-                    if (spawnPopulation != null && spawnDistribution != null)
-                    {
-                        int currentCount = spawnHandler.GetCurrentCount(spawnPopulation, spawnDistribution);
-                        int targetCount = spawnHandler.GetTargetCount(spawnPopulation, spawnDistribution);
-                        stringBuilder.AppendLine(spawnPopulation.name.PadRight(40) + targetCount.ToString().PadRight(25) + currentCount);
-                    }
+                    var spawnPopulation = allSpawnPopulations[i];
+                    if (spawnPopulation == null) continue;
+                    var spawnDistribution = spawnDistributions[i];
+                    if (spawnDistribution == null) continue;
+                    int currentCount = spawnHandler.GetCurrentCount(spawnPopulation, spawnDistribution);
+                    int targetCount = spawnHandler.GetTargetCount(spawnPopulation, spawnDistribution);
+                    stringBuilder.AppendLine(spawnPopulation.name.PadRight(40) + targetCount.ToString().PadRight(25) + currentCount);
                 }
             }
             return stringBuilder.ToString();
-        }
-
-        private void Print(ConsoleSystem.Arg arg, string message)
-        {
-            var player = arg?.Player();
-            if (player == null) Puts(message);
-            else PrintToConsole(player, message);
         }
 
         #region ConfigurationFile
@@ -178,9 +191,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

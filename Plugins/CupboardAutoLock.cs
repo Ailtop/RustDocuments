@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -32,7 +33,7 @@ namespace Oxide.Plugins
                 if (configData.cupboardNoRefill) codeLock.SetFlag(BaseEntity.Flags.Locked, true, false);
                 else
                 {
-                    codeLock.code = Random.Range(1000, 10000).ToString();
+                    codeLock.code = UnityEngine.Random.Range(1000, 10000).ToString();
                     codeLock.whitelistPlayers.Add(buildingPrivlidge.OwnerID);
                     codeLock.SetFlag(BaseEntity.Flags.Locked, true);
                 }
@@ -61,9 +62,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Oxide.Core;
 using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
@@ -171,7 +173,7 @@ namespace Oxide.Plugins
 
         #region Methods
 
-        private static bool IsBarrel(string shortPrefabName) => shortPrefabName.Contains("barrel");
+        private static bool IsBarrel(string shortPrefabName) => shortPrefabName.Contains("barrel") || shortPrefabName.Contains("roadsign");
 
         private void DropItems(LootContainer lootContainer)
         {
@@ -230,8 +232,10 @@ namespace Oxide.Plugins
             {
                 var lootContainer = GameManager.server.FindPrefab(prefab.ToLower())?.GetComponent<LootContainer>();
                 if (lootContainer == null || string.IsNullOrEmpty(lootContainer.ShortPrefabName)) continue;
-                if (!configData.lootContainerS.ContainsKey(lootContainer.ShortPrefabName))
-                    configData.lootContainerS.Add(lootContainer.ShortPrefabName, !lootContainer.ShortPrefabName.Contains("stocking"));
+                if (!configData.lootContainerS.ContainsKey(lootContainer.ShortPrefabName)) 
+                {
+                    configData.lootContainerS.Add(lootContainer.ShortPrefabName, !lootContainer.ShortPrefabName.Contains("stocking") && !lootContainer.ShortPrefabName.Contains("roadsign"));
+                }
             }
             SaveConfig();
         }
@@ -262,17 +266,23 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Remove instead bouncing")]
             public bool removeItems = false;
 
-            [JsonProperty(PropertyName = "Chat prefix")]
-            public string prefix = "[LootBouncer]:";
+            [JsonProperty(PropertyName = "Chat Settings")]
+            public ChatSettings chatS = new ChatSettings();
 
-            [JsonProperty(PropertyName = "Chat prefix color")]
-            public string prefixColor = "#00FFFF";
+            public class ChatSettings
+            {
+                [JsonProperty(PropertyName = "Chat Prefix")]
+                public string prefix = "<color=#00FFFF>[BackPumpJack]</color>: ";
 
-            [JsonProperty(PropertyName = "Chat steamID icon")]
-            public ulong steamIDIcon = 0;
+                [JsonProperty(PropertyName = "Chat SteamID Icon")]
+                public ulong steamIDIcon = 0;
+            }
 
             [JsonProperty(PropertyName = "Loot container settings")]
             public Dictionary<string, bool> lootContainerS = new Dictionary<string, bool>();
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version;
         }
 
         protected override void LoadConfig()
@@ -282,11 +292,17 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -296,9 +312,44 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= default(VersionNumber))
+                {
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat prefix") && GetConfigValue(out prefixColor, "Chat prefix color"))
+                    {
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
+                    }
+
+                    ulong steamID;
+                    if (GetConfigValue(out steamID, "Chat steamID icon"))
+                    {
+                        configData.chatS.steamIDIcon = steamID;
+                    }
+                }
+                configData.version = Version;
+            }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
+        }
 
         #endregion ConfigurationFile
 
@@ -306,7 +357,7 @@ namespace Oxide.Plugins
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);
 
-        private void Print(BasePlayer player, string message) => Player.Message(player, message, $"<color={configData.prefixColor}>{configData.prefix}</color>", configData.steamIDIcon);
+        private void Print(BasePlayer player, string message) => Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
 
         protected override void LoadDefaultMessages()
         {

@@ -1,4 +1,4 @@
-namespace Oxide.Plugins
+﻿namespace Oxide.Plugins
 {
     [Info("Healthy Guns", "Wulf/lukespragg/Arainrr", "3.0.3", ResourceId = 2262)]
     [Description("Makes weapons in barrels/crates spawn in good condition")]

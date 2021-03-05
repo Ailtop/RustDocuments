@@ -22,8 +22,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool waterlogged;
 
-	[HideInInspector]
 	[Header("Modular Vehicle")]
+	[HideInInspector]
 	public float mass;
 
 	[SerializeField]
@@ -206,7 +206,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	public void DisablePhysics()
 	{
 		disablePhysics = true;
-		rigidBody.collisionDetectionMode = CollisionDetectionMode.Discrete;
 		rigidBody.isKinematic = true;
 	}
 
@@ -474,7 +473,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		{
 			return 0f;
 		}
-		return Velocity.magnitude * Vector3.Dot(Velocity.normalized, base.transform.forward);
+		return Vector3.Dot(Velocity, base.transform.forward);
 	}
 
 	public abstract float GetMaxForwardSpeed();

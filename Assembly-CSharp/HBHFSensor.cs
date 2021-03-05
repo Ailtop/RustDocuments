@@ -170,8 +170,8 @@ public class HBHFSensor : BaseDetector
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetIncludeOthers(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();

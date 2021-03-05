@@ -1996,8 +1996,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 		private ScientistAStarContext _context;
 
 		[SerializeField]
-		[Header("Navigation")]
 		[ReadOnly]
+		[Header("Navigation")]
 		private Vector3 _spawnPosition;
 
 		[SerializeField]
@@ -2142,13 +2142,13 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
-		[ReadOnly]
 		[Header("Firearm Utility")]
 		[SerializeField]
+		[ReadOnly]
 		private float _lastFirearmUsageTime;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isFiring;
 
 		private HTNUtilityAiClient _aiClient;

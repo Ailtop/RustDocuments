@@ -378,8 +378,8 @@ public class WireTool : HeldEntity
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

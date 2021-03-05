@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Automatic Authorization", "k1lly0u/Arainrr", "1.2.4", ResourceId = 2063)]
+    [Info("Automatic Authorization", "k1lly0u/Arainrr", "1.2.5", ResourceId = 2063)]
     public class AutomaticAuthorization : RustPlugin
     {
         #region Fields
@@ -154,15 +154,8 @@ namespace Oxide.Plugins
 
         private static bool CanUnlockEntity(BaseEntity parentEntity, ConfigData.LockSettings lockSettings)
         {
-            if (parentEntity is Door)
-            {
-                return lockSettings.shareDoor;
-            }
-            if (parentEntity is BoxStorage)
-            {
-                return lockSettings.shareBox;
-            }
-            return lockSettings.shareOtherEntity;
+            return parentEntity is Door ? lockSettings.shareDoor :
+                parentEntity is BoxStorage ? lockSettings.shareBox : lockSettings.shareOtherEntity;
         }
 
         private static bool SendUnlockedEffect(CodeLock codeLock)
@@ -352,27 +345,27 @@ namespace Oxide.Plugins
                 {
                     friendsShare = new StoredData.ShareEntry
                     {
-                        enabled = configData.friendsShareS.enabled,
-                        turret = configData.friendsShareS.shareTurret,
-                        cupboard = configData.friendsShareS.shareCupboard,
-                        keyLock = configData.friendsShareS.keyLockS.enabled,
-                        codeLock = configData.friendsShareS.codeLockS.enabled,
+                        enabled = configData.friendsShareS.enabledByDefault,
+                        turret = configData.friendsShareS.shareTurretByDefault,
+                        cupboard = configData.friendsShareS.shareCupboardByDefault,
+                        keyLock = configData.friendsShareS.keyLockS.enabledByDefault,
+                        codeLock = configData.friendsShareS.codeLockS.enabledByDefault,
                     },
                     clanShare = new StoredData.ShareEntry
                     {
-                        enabled = configData.clanShareS.enabled,
-                        turret = configData.clanShareS.shareTurret,
-                        cupboard = configData.clanShareS.shareCupboard,
-                        keyLock = configData.clanShareS.keyLockS.enabled,
-                        codeLock = configData.clanShareS.codeLockS.enabled,
+                        enabled = configData.clanShareS.enabledByDefault,
+                        turret = configData.clanShareS.shareTurretByDefault,
+                        cupboard = configData.clanShareS.shareCupboardByDefault,
+                        keyLock = configData.clanShareS.keyLockS.enabledByDefault,
+                        codeLock = configData.clanShareS.codeLockS.enabledByDefault,
                     },
                     teamShare = new StoredData.ShareEntry
                     {
-                        enabled = configData.teamShareS.enabled,
-                        turret = configData.teamShareS.shareTurret,
-                        cupboard = configData.teamShareS.shareCupboard,
-                        keyLock = configData.teamShareS.keyLockS.enabled,
-                        codeLock = configData.teamShareS.codeLockS.enabled,
+                        enabled = configData.teamShareS.enabledByDefault,
+                        turret = configData.teamShareS.shareTurretByDefault,
+                        cupboard = configData.teamShareS.shareCupboardByDefault,
+                        keyLock = configData.teamShareS.keyLockS.enabledByDefault,
+                        codeLock = configData.teamShareS.codeLockS.enabledByDefault,
                     }
                 };
                 if (readOnly)
@@ -386,25 +379,25 @@ namespace Oxide.Plugins
 
         private void UpdateData()
         {
-            foreach (var entry in storedData.playerShareData)
+            foreach (var shareData in storedData.playerShareData.Values)
             {
-                if (!configData.friendsShareS.enabled) entry.Value.friendsShare.enabled = false;
-                if (!configData.friendsShareS.shareCupboard) entry.Value.friendsShare.cupboard = false;
-                if (!configData.friendsShareS.shareTurret) entry.Value.friendsShare.turret = false;
-                if (!configData.friendsShareS.keyLockS.enabled) entry.Value.friendsShare.keyLock = false;
-                if (!configData.friendsShareS.codeLockS.enabled) entry.Value.friendsShare.codeLock = false;
+                if (!configData.friendsShareS.enabled) shareData.friendsShare.enabled = false;
+                if (!configData.friendsShareS.shareCupboard) shareData.friendsShare.cupboard = false;
+                if (!configData.friendsShareS.shareTurret) shareData.friendsShare.turret = false;
+                if (!configData.friendsShareS.keyLockS.enabled) shareData.friendsShare.keyLock = false;
+                if (!configData.friendsShareS.codeLockS.enabled) shareData.friendsShare.codeLock = false;
 
-                if (!configData.clanShareS.enabled) entry.Value.clanShare.enabled = false;
-                if (!configData.clanShareS.shareCupboard) entry.Value.clanShare.cupboard = false;
-                if (!configData.clanShareS.shareTurret) entry.Value.clanShare.turret = false;
-                if (!configData.clanShareS.keyLockS.enabled) entry.Value.clanShare.keyLock = false;
-                if (!configData.clanShareS.codeLockS.enabled) entry.Value.clanShare.codeLock = false;
+                if (!configData.clanShareS.enabled) shareData.clanShare.enabled = false;
+                if (!configData.clanShareS.shareCupboard) shareData.clanShare.cupboard = false;
+                if (!configData.clanShareS.shareTurret) shareData.clanShare.turret = false;
+                if (!configData.clanShareS.keyLockS.enabled) shareData.clanShare.keyLock = false;
+                if (!configData.clanShareS.codeLockS.enabled) shareData.clanShare.codeLock = false;
 
-                if (!configData.teamShareS.enabled) entry.Value.teamShare.enabled = false;
-                if (!configData.teamShareS.shareCupboard) entry.Value.teamShare.cupboard = false;
-                if (!configData.teamShareS.shareTurret) entry.Value.teamShare.turret = false;
-                if (!configData.teamShareS.keyLockS.enabled) entry.Value.teamShare.keyLock = false;
-                if (!configData.teamShareS.codeLockS.enabled) entry.Value.teamShare.codeLock = false;
+                if (!configData.teamShareS.enabled) shareData.teamShare.enabled = false;
+                if (!configData.teamShareS.shareCupboard) shareData.teamShare.cupboard = false;
+                if (!configData.teamShareS.shareTurret) shareData.teamShare.turret = false;
+                if (!configData.teamShareS.keyLockS.enabled) shareData.teamShare.keyLock = false;
+                if (!configData.teamShareS.codeLockS.enabled) shareData.teamShare.codeLock = false;
             }
             SaveData();
         }
@@ -540,10 +533,7 @@ namespace Oxide.Plugins
 
         #region Clans Reborn Hooks
 
-        private void OnClanMemberGone(string playerID, List<string> memberUserIDs)
-        {
-            UpdateAuthList(ulong.Parse(playerID), AutoAuthType.All);
-        }
+        private void OnClanMemberGone(string playerID, List<string> memberUserIDs) => UpdateAuthList(ulong.Parse(playerID), AutoAuthType.All);
 
         #endregion Clans Reborn Hooks
 
@@ -630,7 +620,7 @@ namespace Oxide.Plugins
             {
                 Button = { Color = "0.95 0.1 0.1 0.95", Close = UINAME_MAIN },
                 Text = { Text = "X", Align = TextAnchor.MiddleCenter, Color = "0 0 0 1", FontSize = 22 },
-                RectTransform = { AnchorMin = "0.885 0.05", AnchorMax = "0.995 0.95" }
+                RectTransform = { AnchorMin = "0.885 0", AnchorMax = "0.998 0.99" }
             }, titlePanel);
             container.Add(new CuiPanel
             {
@@ -662,7 +652,7 @@ namespace Oxide.Plugins
                     var anchors = GetMenuSubAnchors(i, total);
                     CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Teams);
                     CreateMenuSubUI(ref container, shareData.teamShare, player.UserIDString, ShareType.Teams,
-                        $"{anchors[0]} 0.05", $"{anchors[1]} 0.95");
+                        $"{anchors[0]} 0.03", $"{anchors[1]} 0.95");
                 }
                 i++;
             }
@@ -678,7 +668,7 @@ namespace Oxide.Plugins
                     var anchors = GetMenuSubAnchors(i, total);
                     CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Friends);
                     CreateMenuSubUI(ref container, shareData.friendsShare, player.UserIDString, ShareType.Friends,
-                        $"{anchors[0]} 0.05", $"{anchors[1]} 0.95");
+                        $"{anchors[0]} 0.03", $"{anchors[1]} 0.95");
                 }
                 i++;
             }
@@ -694,7 +684,7 @@ namespace Oxide.Plugins
                     var anchors = GetMenuSubAnchors(i, total);
                     CuiHelper.DestroyUi(player, UINAME_MENU + ShareType.Clans);
                     CreateMenuSubUI(ref container, shareData.clanShare, player.UserIDString, ShareType.Clans,
-                        $"{anchors[0]} 0.05", $"{anchors[1]} 0.95");
+                        $"{anchors[0]} 0.03", $"{anchors[1]} 0.95");
                 }
             }
 
@@ -707,13 +697,13 @@ namespace Oxide.Plugins
         {
             var panelName = container.Add(new CuiPanel
             {
-                Image = { Color = "0.1 0.1 0.1 0.6" },
+                Image = { Color = "0.1 0.1 0.1 0.5" },
                 RectTransform = { AnchorMin = anchorMin, AnchorMax = anchorMax },
             }, UINAME_MENU, UINAME_MENU + type);
             var titlePanel = container.Add(new CuiPanel
             {
-                Image = { Color = "0.1 0.1 0.1 0.6" },
-                RectTransform = { AnchorMin = "0 0.85", AnchorMax = "1 1" },
+                Image = { Color = "0.1 0.1 0.1 0.5" },
+                RectTransform = { AnchorMin = "0 0.852", AnchorMax = "1 1" },
             }, panelName);
             container.Add(new CuiLabel
             {
@@ -722,28 +712,34 @@ namespace Oxide.Plugins
             }, titlePanel);
             var contentPanel = container.Add(new CuiPanel
             {
-                Image = { Color = "0.1 0.1 0.1 0.6" },
-                RectTransform = { AnchorMin = "0 0", AnchorMax = "0.995 0.845" },
+                Image = { Color = "0.1 0.1 0.1 0.55" },
+                RectTransform = { AnchorMin = "0 0", AnchorMax = "1 0.848" },
             }, panelName);
             int i = 0;
-            var spacing = 1f / 5;
-            var anchors = GetEntryAnchors(i++, spacing);
+            const float entrySize = 0.181f;
+            const float spacingY = 0.022f;
+
+            var anchors = GetEntryAnchors(i++, entrySize, spacingY);
             CreateEntry(ref container, contentPanel, $"AutoAuthUI {type}", Lang($"UI_{type}Share", playerID),
                 shareEntry.enabled ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
                 $"0.995 {anchors[1]}");
-            anchors = GetEntryAnchors(i++, spacing);
+
+            anchors = GetEntryAnchors(i++, entrySize, spacingY);
             CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} Cupboard", Lang($"UI_{type}Cupboard", playerID),
                 shareEntry.cupboard ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
                 $"0.995 {anchors[1]}");
-            anchors = GetEntryAnchors(i++, spacing);
+
+            anchors = GetEntryAnchors(i++, entrySize, spacingY);
             CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} Turret", Lang($"UI_{type}Turret", playerID),
                 shareEntry.turret ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
                 $"0.995 {anchors[1]}");
-            anchors = GetEntryAnchors(i++, spacing);
+
+            anchors = GetEntryAnchors(i++, entrySize, spacingY);
             CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} KeyLock", Lang($"UI_{type}KeyLock", playerID),
                 shareEntry.keyLock ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
                 $"0.995 {anchors[1]}");
-            anchors = GetEntryAnchors(i++, spacing);
+
+            anchors = GetEntryAnchors(i++, entrySize, spacingY);
             CreateEntry(ref container, contentPanel, $"AutoAuthUI {type} CodeLock", Lang($"UI_{type}CodeLock", playerID),
                 shareEntry.codeLock ? Lang("Enabled", playerID) : Lang("Disabled", playerID), $"0 {anchors[0]}",
                 $"0.995 {anchors[1]}");
@@ -759,46 +755,36 @@ namespace Oxide.Plugins
             container.Add(new CuiLabel
             {
                 Text = { Color = "0 1 1 1", FontSize = 14, Align = TextAnchor.MiddleLeft, Text = leftText },
-                RectTransform = { AnchorMin = "0.1 0", AnchorMax = "0.695 1" }
+                RectTransform = { AnchorMin = "0.05 0", AnchorMax = "0.7 1" }
             }, panelName);
             container.Add(new CuiButton
             {
                 Button = { Color = "0 0 0 0.7", Command = command },
                 Text = { Text = rightText, Align = TextAnchor.MiddleCenter, Color = "1 1 1 1", FontSize = 14 },
-                RectTransform = { AnchorMin = "0.7 0.01", AnchorMax = "0.995 0.99" },
+                RectTransform = { AnchorMin = "0.7 0.2", AnchorMax = "0.985 0.8" },
             }, panelName);
         }
 
-        private static float[] GetEntryAnchors(int i, float spacing)
+        private static float[] GetEntryAnchors(int i, float entrySize, float spacingY)
         {
-            return new[] { 1f - (i + 1) * spacing, 1f - i * spacing };
+            return new[] { 1f - (i + 1) * entrySize - i * spacingY, 1f - i * (entrySize + spacingY) };
         }
 
         private static float[] GetMenuSubAnchors(int i, int total)
         {
             switch (total)
             {
-                case 1:
-                    return new[] { 0.3f, 0.7f };
-
-                case 2:
-                    return i == 0 ? new[] { 0.15f, 0.48f } : new[] { 0.52f, 0.85f };
-
+                case 1: return new[] { 0.3f, 0.7f };
+                case 2: return i == 0 ? new[] { 0.15f, 0.48f } : new[] { 0.52f, 0.85f };
                 case 3:
                     switch (i)
                     {
-                        case 0:
-                            return new[] { 0.02f, 0.32f };
-
-                        case 1:
-                            return new[] { 0.335f, 0.665f };
-
-                        default:
-                            return new[] { 0.68f, 0.98f };
+                        case 0: return new[] { 0.02f, 0.32f };
+                        case 1: return new[] { 0.335f, 0.665f };
+                        default: return new[] { 0.68f, 0.98f };
                     }
 
-                default:
-                    return null;
+                default: return null;
             }
         }
 
@@ -1309,11 +1295,20 @@ namespace Oxide.Plugins
                 [JsonProperty(PropertyName = "Enabled")]
                 public bool enabled = true;
 
+                [JsonProperty(PropertyName = "Enabled By Default")]
+                public bool enabledByDefault = true;
+
                 [JsonProperty(PropertyName = "Share Cupboard")]
                 public bool shareCupboard = true;
 
+                [JsonProperty(PropertyName = "Share Cupboard By Default")]
+                public bool shareCupboardByDefault = true;
+
                 [JsonProperty(PropertyName = "Share Turret")]
                 public bool shareTurret = true;
+
+                [JsonProperty(PropertyName = "Share Turret By Default")]
+                public bool shareTurretByDefault = true;
 
                 [JsonProperty(PropertyName = "Key Lock Settings")]
                 public LockSettings keyLockS = new LockSettings();
@@ -1327,14 +1322,26 @@ namespace Oxide.Plugins
                 [JsonProperty(PropertyName = "Enabled")]
                 public bool enabled = true;
 
+                [JsonProperty(PropertyName = "Enabled By Default")]
+                public bool enabledByDefault = true;
+
                 [JsonProperty(PropertyName = "Share Door")]
                 public bool shareDoor = true;
+
+                [JsonProperty(PropertyName = "Share Door By Default")]
+                public bool shareDoorByDefault = true;
 
                 [JsonProperty(PropertyName = "Share Box")]
                 public bool shareBox = true;
 
+                [JsonProperty(PropertyName = "Share Box By Default")]
+                public bool shareBoxByDefault = true;
+
                 [JsonProperty(PropertyName = "Share Other Locked Entities")]
                 public bool shareOtherEntity = true;
+
+                [JsonProperty(PropertyName = "Share Other Locked Entities By Default")]
+                public bool shareOtherEntityByDefault = true;
             }
         }
 
@@ -1353,9 +1360,9 @@ namespace Oxide.Plugins
                     UpdateConfigValues();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -1368,21 +1375,34 @@ namespace Oxide.Plugins
             configData.version = Version;
         }
 
-        protected override void SaveConfig() => Config.WriteObject(configData, true);
+        protected override void SaveConfig() => Config.WriteObject(configData);
 
         private void UpdateConfigValues()
         {
             if (configData.version < Version)
             {
-                if (configData.version <= new VersionNumber(1, 2, 0))
+                if (configData.version <= default(VersionNumber))
                 {
-                    if (configData.chatS.prefix == "[AutoAuth]: ")
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
                     {
-                        configData.chatS.prefix = "<color=#00FFFF>[AutoAuth]</color>: ";
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
                     }
                 }
                 configData.version = Version;
             }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
         }
 
         #endregion ConfigurationFile

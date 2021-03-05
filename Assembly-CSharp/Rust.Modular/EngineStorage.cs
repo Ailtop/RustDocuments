@@ -28,16 +28,16 @@ namespace Rust.Modular
 		[SerializeField]
 		public VehicleModuleEngineItems allEngineItems;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public int accelerationBoostSlots;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public int topSpeedBoostSlots;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public int fuelEconomyBoostSlots;
 
 		public bool isUsable

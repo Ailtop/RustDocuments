@@ -1,23 +1,43 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Oxide.Core;
 using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Don't Target Me", "Quantum/Arainrr", "1.1.1")]
+    [Info("Don't Target Me", "Quantum/Arainrr", "1.1.2")]
     [Description("Makes turrets, player npcs and normal npcs ignore you.")]
-    internal class DontTargetMe : RustPlugin
+    public class DontTargetMe : RustPlugin
     {
+        #region Fileds
+
         private const string PERMISSION_ALL = "donttargetme.all";
         private const string PERMISSION_NPC = "donttargetme.npc";
         private const string PERMISSION_APC = "donttargetme.apc";
         private const string PERMISSION_SAM = "donttargetme.sam";
         private const string PERMISSION_HELI = "donttargetme.heli";
         private const string PERMISSION_TURRETS = "donttargetme.turrets";
+
+        //Reduce boxing
+        private static readonly object True = true, False = false, Null = null;
+
         private readonly Dictionary<ulong, TargetFlags> playerFlags = new Dictionary<ulong, TargetFlags>();
 
-        #region Hooks
+        [Flags]
+        private enum TargetFlags
+        {
+            None = 0,
+            Npc = 1,
+            Sam = 1 << 1,
+            Turret = 1 << 2,
+            Bradley = 1 << 3,
+            Helicopter = 1 << 4,
+        }
+
+        #endregion Fileds
+
+        #region Oxide Hooks
 
         private void Init()
         {
@@ -45,64 +65,105 @@ namespace Oxide.Plugins
 
         private void OnPlayerConnected(BasePlayer player)
         {
-            if (player == null) return;
+            if (player == null || !player.userID.IsSteamId()) return;
             if (PlayerFlagsInit(player))
-                CheckHooks();
-        }
-
-        private void OnPlayerDisconnected(BasePlayer player, string reason)
-        {
-            if (player == null) return;
-            if (playerFlags.ContainsKey(player.userID))
             {
-                playerFlags.Remove(player.userID);
                 CheckHooks();
             }
         }
 
-        private object CanBeTargeted(BasePlayer player, MonoBehaviour behaviour) => player != null && HasTargetFlags(player, TargetFlags.Turret) ? false : (object)null;
-
-        private object OnNpcTarget(BaseEntity npc, BasePlayer player) => player != null && HasTargetFlags(player, TargetFlags.Npc) ? true : (object)null;
-
-        private object CanBradleyApcTarget(BradleyAPC apc, BasePlayer player) => player != null && HasTargetFlags(player, TargetFlags.Bradley) ? false : (object)null;
-
-        private object CanHelicopterTarget(PatrolHelicopterAI heli, BasePlayer player) => player != null && HasTargetFlags(player, TargetFlags.Helicopter) ? (object)false : null;
-
-        private object CanHelicopterStrafeTarget(PatrolHelicopterAI heli, BasePlayer player) => player != null && HasTargetFlags(player, TargetFlags.Helicopter) ? (object)false : null;
-
-        private object OnSamSiteTarget(SamSite samSite, BaseVehicle vehicle)
+        private void OnPlayerDisconnected(BasePlayer player, string reason)
         {
-            var driver = vehicle?.GetDriver();
-            if (driver != null && HasTargetFlags(driver, TargetFlags.Sam)) return false;
-            return null;
+            if (player == null || !player.userID.IsSteamId()) return;
+            if (playerFlags.Remove(player.userID))
+            {
+                CheckHooks();
+            }
         }
 
-        #endregion Hooks
+        private object CanBeTargeted(BasePlayer player, MonoBehaviour behaviour) => HasTargetFlags(player, TargetFlags.Turret) ? False : Null;
 
-        #region Helper
+        private object OnNpcTarget(BaseEntity npc, BasePlayer player) => HasTargetFlags(player, TargetFlags.Npc) ? True : Null;
 
-        [Flags]
-        private enum TargetFlags
+        private object CanBradleyApcTarget(BradleyAPC apc, BasePlayer player) => HasTargetFlags(player, TargetFlags.Bradley) ? False : Null;
+
+        private object CanHelicopterTarget(PatrolHelicopterAI heli, BasePlayer player) => HasTargetFlags(player, TargetFlags.Helicopter) ? False : Null;
+
+        private object CanHelicopterStrafeTarget(PatrolHelicopterAI heli, BasePlayer player) => HasTargetFlags(player, TargetFlags.Helicopter) ? False : Null;
+
+        private object OnSamSiteTarget(SamSite samSite, BaseCombatEntity baseCombatEntity) => AnyHasTargetFlags(baseCombatEntity, TargetFlags.Sam) ? False : Null;
+
+        #endregion Oxide Hooks
+
+        #region Methods
+
+        private bool AnyHasTargetFlags(BaseCombatEntity baseCombatEntity, TargetFlags flag)
         {
-            None = 0,
-            Npc = 1,
-            Sam = 1 << 1,
-            Turret = 1 << 2,
-            Bradley = 1 << 3,
-            Helicopter = 1 << 4,
+            var baseVehicle = baseCombatEntity as BaseVehicle;
+            if (baseVehicle != null)
+            {
+                var mountedPlayers = GetMountedPlayers(baseVehicle);
+                foreach (var mountedPlayer in mountedPlayers)
+                {
+                    if (HasTargetFlags(mountedPlayer, flag))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            var children = baseCombatEntity.GetComponentsInChildren<BasePlayer>();
+            if (children != null && children.Length > 0)
+            {
+                foreach (var child in children)
+                {
+                    if (HasTargetFlags(child, flag))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static IEnumerable<BasePlayer> GetMountedPlayers(BaseVehicle baseVehicle)
+        {
+            if (!baseVehicle.HasMountPoints())
+            {
+                var mountedPlayer = baseVehicle.GetMounted();
+                if (mountedPlayer != null)
+                {
+                    yield return mountedPlayer;
+                }
+            }
+
+            foreach (var mountPointInfo in baseVehicle.mountPoints)
+            {
+                if (mountPointInfo.mountable != null)
+                {
+                    var mountedPlayer = mountPointInfo.mountable.GetMounted();
+                    if (mountedPlayer != null)
+                    {
+                        yield return mountedPlayer;
+                    }
+                }
+            }
         }
 
         private bool HasTargetFlags(BasePlayer player, TargetFlags flag)
         {
+            if (player == null || !player.userID.IsSteamId()) return false;
             TargetFlags flags;
             if (playerFlags.TryGetValue(player.userID, out flags))
+            {
                 return flags.HasFlag(flag);
+            }
             return false;
         }
 
         private bool PlayerFlagsInit(BasePlayer player)
         {
-            if (playerFlags.ContainsKey(player.userID)) playerFlags.Remove(player.userID);
+            playerFlags.Remove(player.userID);
             TargetFlags flags = TargetFlags.None;
             if (permission.UserHasPermission(player.UserIDString, PERMISSION_ALL))
             {
@@ -176,19 +237,23 @@ namespace Oxide.Plugins
             }
         }
 
-        #endregion Helper
+        #endregion Methods
+
+        #region Commands
 
         private void CmdToggle(BasePlayer player, string command, string[] args)
         {
             if (player == null) return;
-            if (playerFlags.ContainsKey(player.userID))
+            if (playerFlags.Remove(player.userID))
             {
-                playerFlags.Remove(player.userID);
                 Print(player, Lang("Toggle", player.UserIDString, Lang("Disabled", player.UserIDString)));
             }
             else
             {
-                if (PlayerFlagsInit(player)) Print(player, Lang("Toggle", player.UserIDString, Lang("Enabled", player.UserIDString)));
+                if (PlayerFlagsInit(player))
+                {
+                    Print(player, Lang("Toggle", player.UserIDString, Lang("Enabled", player.UserIDString)));
+                }
                 else
                 {
                     Print(player, Lang("NotAllowed", player.UserIDString));
@@ -198,13 +263,15 @@ namespace Oxide.Plugins
             CheckHooks();
         }
 
+        #endregion Commands
+
         #region ConfigurationFile
 
         private ConfigData configData;
 
         private class ConfigData
         {
-            [JsonProperty(PropertyName = "Disable when player disconneted")]
+            [JsonProperty(PropertyName = "Disable when player disconnected")]
             public bool disableWhenDis = true;
 
             [JsonProperty(PropertyName = "Enable when player connected")]
@@ -219,14 +286,14 @@ namespace Oxide.Plugins
                 public string command = "dtm";
 
                 [JsonProperty(PropertyName = "Chat Prefix")]
-                public string prefix = "[DontTargetMe]: ";
-
-                [JsonProperty(PropertyName = "Chat Prefix Color")]
-                public string prefixColor = "#00FFFF";
+                public string prefix = "<color=#00FFFF>[DontTargetMe]</color>: ";
 
                 [JsonProperty(PropertyName = "Chat SteamID Icon")]
                 public ulong steamIDIcon = 0;
             }
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version;
         }
 
         protected override void LoadConfig()
@@ -236,11 +303,17 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -250,15 +323,44 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= default(VersionNumber))
+                {
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
+                    {
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
+                    }
+                }
+                configData.version = Version;
+            }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
+        }
 
         #endregion ConfigurationFile
 
         #region LanguageFile
 
-        private void Print(BasePlayer player, string message) => Player.Message(player, message, $"<color={configData.chatS.prefixColor}>{configData.chatS.prefix}</color>", configData.chatS.steamIDIcon);
+        private void Print(BasePlayer player, string message) => Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);
 
@@ -273,7 +375,7 @@ namespace Oxide.Plugins
             }, this);
             lang.RegisterMessages(new Dictionary<string, string>
             {
-                ["NotAllowed"] = "您没有权限使用该命令",
+                ["NotAllowed"] = "您没有使用该命令的权限",
                 ["Toggle"] = "不要瞄准我 {0}",
                 ["Enabled"] = "<color=#8ee700>已启用</color>",
                 ["Disabled"] = "<color=#ce422b>已禁用</color>",

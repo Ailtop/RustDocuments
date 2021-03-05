@@ -1,4 +1,5 @@
 using System;
+using Oxide.Core;
 using UnityEngine;
 
 public class SupplySignal : TimedExplosive
@@ -18,6 +19,7 @@ public class SupplySignal : TimedExplosive
 			Vector3 b = new Vector3(UnityEngine.Random.Range(-20f, 20f), 0f, UnityEngine.Random.Range(-20f, 20f));
 			baseEntity.SendMessage("InitDropPosition", base.transform.position + b, SendMessageOptions.DontRequireReceiver);
 			baseEntity.Spawn();
+			Interface.CallHook("OnCargoPlaneSignaled", baseEntity, this);
 		}
 		Invoke(FinishUp, 210f);
 		SetFlag(Flags.On, true);

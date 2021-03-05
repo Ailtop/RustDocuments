@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Facepunch.Extend;
 using Facepunch.Math;
 using Network;
@@ -30,14 +29,9 @@ public class ConnectionAuth : MonoBehaviour
 		return false;
 	}
 
-	public bool IsAuthing(ulong iSteamID)
+	public static void Reject(Connection connection, string strReason, string strReasonPrivate = null)
 	{
-		return m_AuthConnection.Any((Connection item) => item.userid == iSteamID);
-	}
-
-	public static void Reject(Connection connection, string strReason)
-	{
-		DebugEx.Log(connection.ToString() + " Rejecting connection - " + strReason);
+		DebugEx.Log(connection.ToString() + " Rejecting connection - " + (string.IsNullOrEmpty(strReasonPrivate) ? strReason : strReasonPrivate));
 		Net.sv.Kick(connection, strReason);
 		m_AuthConnection.Remove(connection);
 	}
@@ -66,7 +60,7 @@ public class ConnectionAuth : MonoBehaviour
 			Reject(connection, "Invalid SteamID");
 			return;
 		}
-		if (connection.protocol != 2279)
+		if (connection.protocol != 2283)
 		{
 			if (!DeveloperList.Contains(connection.userid))
 			{
@@ -98,11 +92,7 @@ public class ConnectionAuth : MonoBehaviour
 			DebugEx.Log(connection.ToString() + " is a developer");
 			connection.authLevel = 3u;
 		}
-		if (IsAuthed(connection.userid) || IsAuthing(connection.userid))
-		{
-			Reject(connection, "You are already connected!");
-		}
-		else if (Interface.CallHook("IOnUserApprove", connection) == null)
+		if (Interface.CallHook("IOnUserApprove", connection) == null)
 		{
 			m_AuthConnection.Add(connection);
 			StartCoroutine(AuthorisationRoutine(connection));

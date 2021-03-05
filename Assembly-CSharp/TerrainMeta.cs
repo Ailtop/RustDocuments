@@ -385,6 +385,8 @@ public class TerrainMeta : MonoBehaviour
 	public static void InitNoTerrain()
 	{
 		Size = new Vector3(4096f, 4096f, 4096f);
+		OneOverSize = Size.Inverse();
+		Position = -0.5f * Size;
 	}
 
 	public void SetupComponents()

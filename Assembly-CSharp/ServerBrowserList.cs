@@ -32,7 +32,7 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 
 	public QueryType queryType;
 
-	public static string VersionTag = "v" + 2279;
+	public static string VersionTag = "v" + 2283;
 
 	public ServerKeyvalues[] keyValues = new ServerKeyvalues[0];
 
@@ -51,6 +51,10 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 	public Rules[] rules;
 
 	public bool hideOfficialServers;
+
+	public bool excludeEmptyServersUsingQuery;
+
+	public bool alwaysIncludeEmptyServers;
 
 	public int GetItemCount()
 	{

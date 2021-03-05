@@ -1,18 +1,42 @@
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Oxide.Core;
 
 namespace Oxide.Plugins
 {
-    [Info("Chainsaw Options", "Arainrr", "1.1.0")]
+    [Info("Chainsaw Options", "Arainrr", "1.1.1")]
     [Description("Control player's chainsaws")]
     public class ChainsawOptions : RustPlugin
     {
+        private const string PREFAB_CHAINSAW = "assets/prefabs/weapons/chainsaw/chainsaw.entity.prefab";
+
+        private int defaultMaxAmmo;
+        private float defaultFuelPerSec;
+        private float defaultEngineStartChance;
+
         private void Init()
         {
             foreach (var permissionS in configData.permissionList)
             {
                 if (!permission.PermissionExists(permissionS.permission, this))
                     permission.RegisterPermission(permissionS.permission, this);
+            }
+        }
+
+        private void OnServerInitialized()
+        {
+            var chainsaw = GameManager.server.FindPrefab(PREFAB_CHAINSAW)?.GetComponent<Chainsaw>();
+            if (chainsaw != null)
+            {
+                defaultMaxAmmo = chainsaw.maxAmmo;
+                defaultFuelPerSec = chainsaw.fuelPerSec;
+                defaultEngineStartChance = chainsaw.engineStartChance;
+            }
+            else
+            {
+                PrintError("An error occurred. please notify the plugin developer");
+                NextTick(() => Interface.Oxide.UnloadPlugin(Name));
             }
         }
 
@@ -26,9 +50,9 @@ namespace Oxide.Plugins
                 var permissionS = GetPermissionS(player);
                 if (permissionS == null)
                 {
-                    chainsaw.engineStartChance = 0.4f;
-                    chainsaw.maxAmmo = 50;
-                    chainsaw.fuelPerSec = 1;
+                    chainsaw.maxAmmo = defaultMaxAmmo;
+                    chainsaw.fuelPerSec = defaultFuelPerSec;
+                    chainsaw.engineStartChance = defaultEngineStartChance;
                     return;
                 }
                 chainsaw.engineStartChance = permissionS.chance;
@@ -107,9 +131,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

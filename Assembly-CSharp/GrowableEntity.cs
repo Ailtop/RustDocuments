@@ -12,6 +12,27 @@ using UnityEngine.Assertions;
 
 public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 {
+	public class GrowableEntityUpdateQueue : ObjectWorkQueue<GrowableEntity>
+	{
+		protected override void RunJob(GrowableEntity entity)
+		{
+			if (ShouldAdd(entity))
+			{
+				entity.CalculateQualities_Water();
+				entity.SendNetworkUpdate();
+			}
+		}
+
+		protected override bool ShouldAdd(GrowableEntity entity)
+		{
+			if (base.ShouldAdd(entity))
+			{
+				return BaseEntityEx.IsValid(entity);
+			}
+			return false;
+		}
+	}
+
 	public const float artificalLightQuality = 1f;
 
 	public const float planterGroundModifierBase = 0.6f;
@@ -40,11 +61,11 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public TimeCachedValue<float> artificialTemperatureExposure;
 
-	private static Queue<GrowableEntity> queuedForUpdate = new Queue<GrowableEntity>();
-
 	[ServerVar]
 	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
 	public static float framebudgetms = 0.25f;
+
+	public static GrowableEntityUpdateQueue growableEntityUpdateQueue = new GrowableEntityUpdateQueue();
 
 	public bool underWater;
 
@@ -276,22 +297,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public void QueueForQualityUpdate()
 	{
-		queuedForUpdate.Enqueue(this);
-	}
-
-	public static void BudgetedUpdate()
-	{
-		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
-		float num = framebudgetms / 1000f;
-		while (queuedForUpdate.Count > 0 && UnityEngine.Time.realtimeSinceStartup < realtimeSinceStartup + num)
-		{
-			GrowableEntity growableEntity = queuedForUpdate.Dequeue();
-			if (BaseEntityEx.IsValid(growableEntity))
-			{
-				growableEntity.CalculateQualities_Water();
-				growableEntity.SendNetworkUpdate();
-			}
-		}
+		growableEntityUpdateQueue.Add(this);
 	}
 
 	public void CalculateQualities(bool firstTime, bool forceArtificialLightUpdates = false, bool forceArtificialTemperatureUpdates = false)
@@ -338,7 +344,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	public void CalculateQualities_Water()
+	private void CalculateQualities_Water()
 	{
 		CalculateWaterQuality();
 		CalculateWaterConsumption();
@@ -861,16 +867,16 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_RemoveDying(RPCMessage msg)
 	{
 		RemoveDying(msg.player);

@@ -47,7 +47,9 @@ public class MarketTerminal : StorageContainer
 
 	private ulong _customerSteamId;
 
-	private ulong _customerExpiry;
+	private string _customerName;
+
+	private TimeUntil _timeUntilCustomerExpiry;
 
 	private EntityRef<Marketplace> _marketplace;
 
@@ -179,7 +181,7 @@ public class MarketTerminal : StorageContainer
 		}
 		ProtoBuf.MarketTerminal.PendingOrder pendingOrder = Facepunch.Pool.Get<ProtoBuf.MarketTerminal.PendingOrder>();
 		pendingOrder.vendingMachineId = vendingMachine.net.ID;
-		pendingOrder.expiry = GetTimestamp() + orderTimeout;
+		pendingOrder.timeUntilExpiry = orderTimeout;
 		pendingOrder.droneId = num;
 		pendingOrders.Add(pendingOrder);
 		CheckForExpiredOrders();
@@ -209,13 +211,12 @@ public class MarketTerminal : StorageContainer
 	{
 		if (pendingOrders != null && pendingOrders.Count > 0)
 		{
-			ulong timestamp = GetTimestamp();
 			bool flag = false;
-			ulong? num = null;
+			float? num = null;
 			for (int i = 0; i < pendingOrders.Count; i++)
 			{
 				ProtoBuf.MarketTerminal.PendingOrder pendingOrder = pendingOrders[i];
-				if (pendingOrder.expiry <= timestamp)
+				if ((float)pendingOrder.timeUntilExpiry <= 0f)
 				{
 					DeliveryDrone entity;
 					if (new EntityRef<DeliveryDrone>(pendingOrder.droneId).TryGet(true, out entity))
@@ -231,9 +232,9 @@ public class MarketTerminal : StorageContainer
 					i--;
 					flag = true;
 				}
-				else if (!num.HasValue || pendingOrder.expiry < num.Value)
+				else if (!num.HasValue || (float)pendingOrder.timeUntilExpiry < num.Value)
 				{
-					num = pendingOrder.expiry;
+					num = pendingOrder.timeUntilExpiry;
 				}
 			}
 			if (flag)
@@ -243,8 +244,7 @@ public class MarketTerminal : StorageContainer
 			}
 			if (num.HasValue)
 			{
-				ulong num2 = num.Value - timestamp;
-				Invoke(_checkForExpiredOrdersCached, num2);
+				Invoke(_checkForExpiredOrdersCached, num.Value);
 			}
 		}
 		else
@@ -257,7 +257,7 @@ public class MarketTerminal : StorageContainer
 	{
 		if (_customerSteamId == player.userID)
 		{
-			_customerExpiry = GetTimestamp() + lockToCustomerDuration;
+			_timeUntilCustomerExpiry = lockToCustomerDuration;
 			SendNetworkUpdate();
 			return;
 		}
@@ -266,7 +266,8 @@ public class MarketTerminal : StorageContainer
 			Debug.LogError("Overwriting player restriction! It should be cleared first.", this);
 		}
 		_customerSteamId = player.userID;
-		_customerExpiry = GetTimestamp() + lockToCustomerDuration;
+		_customerName = player.displayName;
+		_timeUntilCustomerExpiry = lockToCustomerDuration;
 		SendNetworkUpdateImmediate();
 		ClientRPC(null, "Client_CloseMarketUI", _customerSteamId);
 		RemoveAnyLooters();
@@ -281,14 +282,15 @@ public class MarketTerminal : StorageContainer
 		if (_customerSteamId != 0L)
 		{
 			_customerSteamId = 0uL;
-			_customerExpiry = 0uL;
+			_customerName = null;
+			_timeUntilCustomerExpiry = 0f;
 			SendNetworkUpdateImmediate();
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(3uL)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.CallsPerSecond(3uL)]
 	public void Server_TryOpenMarket(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))
@@ -338,9 +340,9 @@ public class MarketTerminal : StorageContainer
 		try
 		{
 			_transactionActive = true;
-			int num4 = deliveryFeeAmount * num3;
+			int num4 = deliveryFeeAmount;
 			ProtoBuf.VendingMachine.SellOrder sellOrder = vendingMachine.sellOrders.sellOrders[num2];
-			if (!CanPlayerAffordDeliveryFee(msg.player, sellOrder, num3))
+			if (!CanPlayerAffordOrderAndDeliveryFee(msg.player, sellOrder, num3))
 			{
 				return;
 			}
@@ -406,7 +408,8 @@ public class MarketTerminal : StorageContainer
 		base.Save(info);
 		info.msg.marketTerminal = Facepunch.Pool.Get<ProtoBuf.MarketTerminal>();
 		info.msg.marketTerminal.customerSteamId = _customerSteamId;
-		info.msg.marketTerminal.customerExpiry = _customerExpiry;
+		info.msg.marketTerminal.customerName = _customerName;
+		info.msg.marketTerminal.timeUntilExpiry = _timeUntilCustomerExpiry;
 		info.msg.marketTerminal.marketplaceId = _marketplace.uid;
 		info.msg.marketTerminal.orders = Facepunch.Pool.GetList<ProtoBuf.MarketTerminal.PendingOrder>();
 		if (pendingOrders == null)
@@ -501,10 +504,10 @@ public class MarketTerminal : StorageContainer
 		}
 	}
 
-	public bool CanPlayerAffordDeliveryFee(BasePlayer player, ProtoBuf.VendingMachine.SellOrder sellOrder, int numberOfTransactions)
+	public bool CanPlayerAffordOrderAndDeliveryFee(BasePlayer player, ProtoBuf.VendingMachine.SellOrder sellOrder, int numberOfTransactions)
 	{
 		int num = player.inventory.FindItemIDs(deliveryFeeCurrency.itemid).Sum((Item i) => i.amount);
-		int num2 = deliveryFeeAmount * numberOfTransactions;
+		int num2 = deliveryFeeAmount;
 		if (num < num2)
 		{
 			return false;
@@ -531,7 +534,7 @@ public class MarketTerminal : StorageContainer
 		{
 			return false;
 		}
-		if (_customerSteamId == 0L || GetTimestamp() >= _customerExpiry)
+		if (_customerSteamId == 0L || (float)_timeUntilCustomerExpiry <= 0f)
 		{
 			return true;
 		}
@@ -546,7 +549,8 @@ public class MarketTerminal : StorageContainer
 			return;
 		}
 		_customerSteamId = info.msg.marketTerminal.customerSteamId;
-		_customerExpiry = info.msg.marketTerminal.customerExpiry;
+		_customerName = info.msg.marketTerminal.customerName;
+		_timeUntilCustomerExpiry = info.msg.marketTerminal.timeUntilExpiry;
 		_marketplace = new EntityRef<Marketplace>(info.msg.marketTerminal.marketplaceId);
 		if (pendingOrders == null)
 		{
@@ -566,10 +570,5 @@ public class MarketTerminal : StorageContainer
 			ProtoBuf.MarketTerminal.PendingOrder item = order.Copy();
 			pendingOrders.Add(item);
 		}
-	}
-
-	private static ulong GetTimestamp()
-	{
-		return (ulong)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 	}
 }

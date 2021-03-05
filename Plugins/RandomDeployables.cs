@@ -1,28 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine;
+
 //using Oxide.Core;
 
 namespace Oxide.Plugins
 {
-    [Info("Random Deployables", "Norn/Arainrr", "1.0.3", ResourceId = 2187)]
+    [Info("Random Deployables", "Norn/Arainrr", "1.0.4", ResourceId = 2187)]
     [Description("Randomize deployable skins")]
     public class RandomDeployables : RustPlugin
     {
         private const string PERMISSION_USE = "randomdeployables.use";
-        private Dictionary<string, string> deployedToItem = new Dictionary<string, string>();
-        private Hash<string, List<ulong>> itemSkins = new Hash<string, List<ulong>>();
+        private readonly Dictionary<string, string> deployedToItem = new Dictionary<string, string>();
+        private readonly Hash<string, List<ulong>> itemSkins = new Hash<string, List<ulong>>();
 
         private void Init() => permission.RegisterPermission(PERMISSION_USE, this);
 
         private void OnServerInitialized()
         {
-            /*if (!PlatformService.Instance.IsValid || PlatformService.Instance.ItemDefinitions == null)
-            {
-                timer.Once(1f, OnServerInitialized);
-                return;
-            }*/
             var approvedSkins = new Dictionary<string, List<ulong>>();
             foreach (var skinInfo in Rust.Workshop.Approved.All.Values)
             {
@@ -57,19 +54,15 @@ namespace Oxide.Plugins
             //Interface.Oxide.DataFileSystem.WriteObject(Name, itemSkins);
         }
 
-        private static List<ulong> GetSkins(ItemDefinition itemDefinition)
+        private static IEnumerable<ulong> GetSkins(ItemDefinition itemDefinition)
         {
-            List<ulong> skins = new List<ulong>();
             if (itemDefinition.skins != null && itemDefinition.skins.Length > 0)
             {
-                skins.AddRange(itemDefinition.skins.Select(skin => ItemSkinDirectory.FindByInventoryDefinitionId(skin.id).invItem.workshopID));
+                foreach (var itemDefinitionSkin in itemDefinition.skins)
+                {
+                    yield return (ulong)itemDefinitionSkin.id;
+                }
             }
-
-            /*if (itemDefinition.skins2 != null && itemDefinition.skins2.Length > 0)
-            {
-                skins.AddRange(itemDefinition.skins2.Select(skin => ItemDefinition.FindSkin(itemDefinition.itemid, skin.Id)));
-            }*/
-            return skins;
         }
 
         private void OnEntityBuilt(Planner planner, GameObject obj)
@@ -121,9 +114,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

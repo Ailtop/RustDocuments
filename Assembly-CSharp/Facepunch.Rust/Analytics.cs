@@ -29,5 +29,14 @@ namespace Facepunch.Rust
 				GA.DesignEvent("excavatorstopped", activeDuration);
 			}
 		}
+
+		public static void SlotMachineTransaction(int scrapSpent, int scrapReceived)
+		{
+			if (Server.official)
+			{
+				GA.DesignEvent("slotsScrapSpent", scrapSpent);
+				GA.DesignEvent("slotsScrapReceived", scrapReceived);
+			}
+		}
 	}
 }

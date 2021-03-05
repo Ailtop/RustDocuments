@@ -4,13 +4,21 @@ public class BaseAIBrain<T> : EntityComponent<T> where T : BaseEntity
 {
 	public class BasicAIState
 	{
-		private int myIndex;
-
 		public BaseAIBrain<T> brain;
 
 		protected float _timeInState;
 
 		protected float _lastStateExitTime;
+
+		private int myIndex;
+
+		public void SetIndex(int newIndex)
+		{
+			if (myIndex == 0)
+			{
+				myIndex = newIndex;
+			}
+		}
 
 		public virtual void StateEnter()
 		{
@@ -36,14 +44,6 @@ public class BaseAIBrain<T> : EntityComponent<T> where T : BaseEntity
 		public virtual float GetWeight()
 		{
 			return 0f;
-		}
-
-		public void SetIndex(int newIndex)
-		{
-			if (myIndex == 0)
-			{
-				myIndex = newIndex;
-			}
 		}
 
 		public float TimeInState()

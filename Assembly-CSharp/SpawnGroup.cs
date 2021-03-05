@@ -35,6 +35,8 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public bool temporary;
 
+	public bool forceInitialSpawn;
+
 	protected bool fillOnSpawn;
 
 	public BaseSpawnPoint[] spawnPoints;
@@ -67,6 +69,10 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	protected void Awake()
 	{
+		if (TerrainMeta.TopologyMap == null)
+		{
+			return;
+		}
 		int topology = TerrainMeta.TopologyMap.GetTopology(base.transform.position);
 		int num = 469762048;
 		int num2 = MonumentInfo.TierToMask(Tier);
@@ -80,6 +86,10 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 			if (!temporary && (bool)SingletonComponent<SpawnHandler>.Instance)
 			{
 				SingletonComponent<SpawnHandler>.Instance.SpawnGroups.Add(this);
+			}
+			if (forceInitialSpawn)
+			{
+				Invoke(SpawnInitial, 1f);
 			}
 		}
 	}
@@ -142,6 +152,11 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		spawnInstances.Remove(instance);
 	}
 
+	public void DelayedSpawn()
+	{
+		Invoke(Spawn, 1f);
+	}
+
 	public void Spawn()
 	{
 		Spawn(UnityEngine.Random.Range(numToSpawnPerTickMin, numToSpawnPerTickMax + 1));
@@ -152,12 +167,13 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		numToSpawn = Mathf.Min(numToSpawn, maxPopulation - currentPopulation);
 		for (int i = 0; i < numToSpawn; i++)
 		{
+			GameObjectRef prefab = GetPrefab();
 			Vector3 pos;
 			Quaternion rot;
-			BaseSpawnPoint spawnPoint = GetSpawnPoint(out pos, out rot);
+			BaseSpawnPoint spawnPoint = GetSpawnPoint(prefab, out pos, out rot);
 			if ((bool)spawnPoint)
 			{
-				BaseEntity baseEntity = GameManager.server.CreateEntity(GetPrefab(), pos, rot, false);
+				BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot, false);
 				if ((bool)baseEntity)
 				{
 					baseEntity.enableSaving = false;
@@ -177,7 +193,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 	{
 	}
 
-	protected string GetPrefab()
+	protected GameObjectRef GetPrefab()
 	{
 		float num = prefabs.Sum((SpawnEntry x) => x.weight);
 		if (num == 0f)
@@ -189,13 +205,13 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		{
 			if ((num2 -= (float)prefab.weight) <= 0f)
 			{
-				return prefab.prefab.resourcePath;
+				return prefab.prefab;
 			}
 		}
-		return prefabs[prefabs.Count - 1].prefab.resourcePath;
+		return prefabs[prefabs.Count - 1].prefab;
 	}
 
-	protected virtual BaseSpawnPoint GetSpawnPoint(out Vector3 pos, out Quaternion rot)
+	protected virtual BaseSpawnPoint GetSpawnPoint(GameObjectRef prefabRef, out Vector3 pos, out Quaternion rot)
 	{
 		BaseSpawnPoint baseSpawnPoint = null;
 		pos = Vector3.zero;
@@ -203,9 +219,10 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		int num = UnityEngine.Random.Range(0, spawnPoints.Length);
 		for (int i = 0; i < spawnPoints.Length; i++)
 		{
-			baseSpawnPoint = spawnPoints[(num + i) % spawnPoints.Length];
-			if ((bool)baseSpawnPoint && baseSpawnPoint.gameObject.activeSelf)
+			BaseSpawnPoint baseSpawnPoint2 = spawnPoints[(num + i) % spawnPoints.Length];
+			if (!(baseSpawnPoint2 == null) && baseSpawnPoint2.IsAvailableTo(prefabRef))
 			{
+				baseSpawnPoint = baseSpawnPoint2;
 				break;
 			}
 		}

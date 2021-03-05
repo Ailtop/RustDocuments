@@ -1,9 +1,8 @@
-using System.Linq;
 using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Land On Cargo Ship", "Arainrr", "1.0.0")]
+    [Info("Land On Cargo Ship", "Arainrr", "1.0.1")]
     [Description("Allow the mini copter to land on the cargo ship")]
     public class LandOnCargoShip : RustPlugin
     {
@@ -53,12 +52,23 @@ namespace Oxide.Plugins
 
         private void Unload()
         {
-            foreach (var miniCopter in BaseNetworkable.serverEntities.OfType<MiniCopter>())
+            foreach (var serverEntity in BaseNetworkable.serverEntities)
             {
-                var child = miniCopter.transform.Find("ParentTrigger");
-                if (child != null)
+                var miniCopter = serverEntity as MiniCopter;
+                if (miniCopter != null)
                 {
-                    UnityEngine.Object.Destroy(child.gameObject);
+                    var child = miniCopter.transform.Find("ParentTrigger");
+                    if (child != null)
+                    {
+                        UnityEngine.Object.Destroy(child.gameObject);
+                    }
+                    continue;
+                }
+                var cargoShip = serverEntity as CargoShip;
+                if (cargoShip != null)
+                {
+                    var triggerParent = cargoShip.GetComponentInChildren<TriggerParent>();
+                    if (triggerParent != null) triggerParent.interestLayers &= ~(1 << (int)Rust.Layer.Reserved1);
                 }
             }
         }

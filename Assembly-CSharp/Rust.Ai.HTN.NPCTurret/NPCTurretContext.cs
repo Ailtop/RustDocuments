@@ -10,8 +10,8 @@ namespace Rust.Ai.HTN.NPCTurret
 	{
 		public delegate void WorldStateChangedEvent(NPCTurretContext context, Facts fact, byte oldValue, byte newValue);
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
@@ -21,8 +21,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		private byte[] _previousWorldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private int _decompositionScore;
 
 		[SerializeField]

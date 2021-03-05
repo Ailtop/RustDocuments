@@ -16,6 +16,8 @@ public class PressButton : IOEntity
 
 	public const Flags Flag_EmittingPower = Flags.Reserved3;
 
+	public bool smallBurst;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("PressButton.OnRpcMessage"))
@@ -73,7 +75,7 @@ public class PressButton : IOEntity
 	{
 		if (IsOn())
 		{
-			if (HasFlag(Flags.Reserved3) && sourceItem != null)
+			if (HasFlag(Flags.Reserved3) && (sourceItem != null || smallBurst))
 			{
 				return pressPowerAmount;
 			}
@@ -94,8 +96,8 @@ public class PressButton : IOEntity
 		SetFlag(Flags.On, false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Press(RPCMessage msg)
 	{
 		if (!IsOn() && Interface.CallHook("OnButtonPress", this, msg.player) == null)

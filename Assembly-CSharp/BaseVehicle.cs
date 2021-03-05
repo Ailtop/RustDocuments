@@ -57,15 +57,17 @@ public class BaseVehicle : BaseMountable
 	[FormerlySerializedAs("seatClipCheck")]
 	public bool continuousClippingCheck;
 
-	private Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
+	public Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
 
-	private Action clearRecentDriverAction;
+	public Action clearRecentDriverAction;
 
 	public float safeAreaRadius;
 
 	public Vector3 safeAreaOrigin;
 
 	public float spawnTime = -1f;
+
+	public override float RealisticMass => rigidBody.mass;
 
 	protected override bool PositionTickFixedTime => true;
 
@@ -125,7 +127,7 @@ public class BaseVehicle : BaseMountable
 		return !HasFlag(Flags.Reserved7);
 	}
 
-	protected virtual bool CanPushNow(BasePlayer pusher)
+	public virtual bool CanPushNow(BasePlayer pusher)
 	{
 		return !IsOn();
 	}
@@ -162,7 +164,7 @@ public class BaseVehicle : BaseMountable
 		return false;
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (continuousClippingCheck && HasAnyPassengers())
@@ -644,7 +646,7 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	private void ClearRecentDriver()
+	public void ClearRecentDriver()
 	{
 		if (recentDrivers.Count > 0)
 		{
@@ -680,7 +682,7 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	protected BaseMountable GetIdealMountPointFor(BasePlayer player)
+	public BaseMountable GetIdealMountPointFor(BasePlayer player)
 	{
 		return GetIdealMountPoint(player.eyes.position, player.eyes.position + player.eyes.HeadForward() * 1f);
 	}
@@ -734,7 +736,7 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	private BaseMountable SpawnMountPoint(MountPointInfo mountToSpawn, Model model)
+	public BaseMountable SpawnMountPoint(MountPointInfo mountToSpawn, Model model)
 	{
 		Vector3 vector = Quaternion.Euler(mountToSpawn.rot) * Vector3.forward;
 		Vector3 pos = mountToSpawn.pos;

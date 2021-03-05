@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -690,7 +690,7 @@ namespace Oxide.Plugins
             public Dictionary<string, ResearchSettings> researchS = new Dictionary<string, ResearchSettings>();
 
             [JsonProperty(PropertyName = "Version")]
-            public VersionNumber version = new VersionNumber(1, 1, 1);
+            public VersionNumber version;
 
             public class ChatSettings
             {
@@ -777,9 +777,9 @@ namespace Oxide.Plugins
                     UpdateConfigValues();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -789,6 +789,7 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
@@ -797,15 +798,28 @@ namespace Oxide.Plugins
         {
             if (configData.version < Version)
             {
-                if (configData.version <= new VersionNumber(1, 1, 1))
+                if (configData.version <= default(VersionNumber))
                 {
-                    if (configData.chatS.prefix == "[BetterResearching]: ")
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
                     {
-                        configData.chatS.prefix = "<color=#00FFFF>[BetterResearching]</color>: ";
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
                     }
                 }
                 configData.version = Version;
             }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
         }
 
         #endregion ConfigurationFile

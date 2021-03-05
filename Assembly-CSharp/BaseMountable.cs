@@ -279,8 +279,8 @@ public class BaseMountable : BaseCombatEntity
 		base.OnKilled(info);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

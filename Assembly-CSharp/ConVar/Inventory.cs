@@ -483,8 +483,8 @@ namespace ConVar
 			arg.ReplyWith(stringBuilder.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void defs(Arg arg)
 		{
 			if (Steamworks.SteamInventory.Definitions == null)
@@ -501,8 +501,8 @@ namespace ConVar
 			arg.ReplyWith(obj);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void reloaddefs(Arg arg)
 		{
 			Steamworks.SteamInventory.LoadItemDefinitions();

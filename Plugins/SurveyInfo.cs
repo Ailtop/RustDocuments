@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Facepunch;
@@ -65,7 +66,7 @@ namespace Oxide.Plugins
             {
                 var list = Pool.GetList<SurveyCrater>();
                 Vis.Entities(checkPosition, 1f, list, Rust.Layers.Mask.Default);
-                var surveyItems = new List<SurveyItem>();
+                var surveyItems = Pool.GetList<SurveyItem>();
                 foreach (var surveyCrater in list)
                 {
                     if (surveyCrater == null || surveyCrater.net == null) return;
@@ -79,8 +80,9 @@ namespace Oxide.Plugins
                     }
                     checkedCraters.Add(surveyCrater.net.ID);
                 }
-                Pool.FreeList(ref list);
                 if (surveyItems.Count > 0) SendMineralAnalysis(player, surveyItems);
+                Pool.FreeList(ref list);
+                Pool.FreeList(ref surveyItems);
             });
         }
 
@@ -113,7 +115,7 @@ namespace Oxide.Plugins
                 currentItemID = player.svActiveItemID;
             }
 
-            private void FixedUpdate()
+            private void Update()
             {
                 if (player == null || !player.IsConnected || !player.CanInteract())
                 {
@@ -187,7 +189,7 @@ namespace Oxide.Plugins
                 return;
             }
             var surveyCrater = hitInfo.GetEntity() as SurveyCrater;
-            var surveyItems = new List<SurveyItem>();
+            var surveyItems = Pool.GetList<SurveyItem>();
             var deposit = ResourceDepositManager.GetOrCreate(surveyCrater.transform.position);
             if (deposit != null)
             {
@@ -209,6 +211,7 @@ namespace Oxide.Plugins
                 return;
             }
             SendMineralAnalysis(player, surveyItems);
+            Pool.FreeList(ref surveyItems);
         }
 
         #endregion Chat Command
@@ -240,7 +243,7 @@ namespace Oxide.Plugins
             Print(player, stringBuilder.ToString());
         }
 
-        private class SurveyItem
+        private struct SurveyItem
         {
             public string displayName;
             public int amount;
@@ -277,9 +280,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

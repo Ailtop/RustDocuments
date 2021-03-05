@@ -28,8 +28,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool incremental_enabled
 		{
 			get
@@ -42,8 +42,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int incremental_milliseconds
 		{
 			get
@@ -84,8 +84,8 @@ namespace ConVar
 			Resources.UnloadUnusedAssets();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void alloc(Arg args)
 		{
 			byte[] array = new byte[args.GetInt(0, 1048576)];

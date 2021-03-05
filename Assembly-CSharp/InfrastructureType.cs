@@ -2,5 +2,6 @@ public enum InfrastructureType
 {
 	Road,
 	Power,
-	Trail
+	Trail,
+	Tunnel
 }

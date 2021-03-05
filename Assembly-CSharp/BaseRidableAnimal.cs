@@ -152,8 +152,8 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
@@ -538,8 +538,8 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -556,8 +556,8 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -634,7 +634,7 @@ public class BaseRidableAnimal : BaseVehicle
 		else
 		{
 			float num = 1f / decayminutes;
-			float num2 = ((!IsOutside()) ? 2f : 1f);
+			float num2 = ((!IsOutside()) ? 1f : 0.5f);
 			Hurt(MaxHealth() * num * num2, DamageType.Decay, this, false);
 		}
 	}
@@ -1294,10 +1294,9 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 		float desiredVelocity = GetDesiredVelocity();
 		Vector3 direction = Vector3.forward * Mathf.Sign(desiredVelocity);
-		base.transform.hasChanged = true;
 		float num6 = Mathf.InverseLerp(0.85f, 1f, obstacleDistance);
 		float num7 = Mathf.InverseLerp(1.25f, 10f, obstacleDistance);
-		float num8 = 1f - Mathf.InverseLerp(20f, 35f, Vector3.Angle(Vector3.up, averagedUp));
+		float num8 = 1f - Mathf.InverseLerp(20f, 45f, Vector3.Angle(Vector3.up, averagedUp));
 		num7 = num6 * 0.1f + num7 * 0.9f;
 		float num9 = Mathf.Min(Mathf.Clamp01(Mathf.Min(num8 + 0.2f, num7)) * GetRunSpeed(), desiredVelocity);
 		float num10 = ((num9 < currentSpeed) ? 3f : 1f);

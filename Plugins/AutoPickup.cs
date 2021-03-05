@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Auto Pickup", "Arainrr", "1.2.9")]
+    [Info("Auto Pickup", "Arainrr", "1.2.11")]
     [Description("Automatically pickup hemp, pumpkin, ore, pickable items, corpse, etc.")]
     public class AutoPickup : RustPlugin
     {
@@ -21,10 +21,14 @@ namespace Oxide.Plugins
 
         private static AutoPickup instance;
         private static PickupType enabledPickupTypes;
+
+        //Reduce boxing
+        private static readonly object True = true, False = false, Null = null;
+
         private const string PERMISSION_USE = "autopickup.use";
-        private readonly HashSet<ulong> autoClonePlayers = new HashSet<ulong>();
 
         [Flags]
+        //[JsonConverter(typeof(StringEnumConverter))]
         private enum PickupType
         {
             None = 0,
@@ -46,12 +50,18 @@ namespace Oxide.Plugins
         private void Init()
         {
             LoadData();
-            UpdateConfig();
             instance = this;
+            enabledPickupTypes = PickupType.None;
+            Unsubscribe(nameof(CanLootEntity));
+            Unsubscribe(nameof(OnPlayerAttack));
             Unsubscribe(nameof(OnEntitySpawned));
             permission.RegisterPermission(PERMISSION_USE, this);
             cmd.AddChatCommand(configData.chatS.command, this, nameof(CmdAutoPickup));
-            enabledPickupTypes = PickupType.None;
+        }
+
+        private void OnServerInitialized()
+        {
+            UpdateConfig();
             foreach (var entry in configData.autoPickupS)
             {
                 if (entry.Value.enabled)
@@ -59,10 +69,113 @@ namespace Oxide.Plugins
                     enabledPickupTypes |= entry.Key;
                 }
             }
-            if (!enabledPickupTypes.HasFlag(PickupType.LootContainer))
+            if (enabledPickupTypes.HasFlag(PickupType.LootContainer))
             {
-                Unsubscribe(nameof(CanLootEntity));
+                bool enabledBarrel = false, enabledLoot = false;
+                foreach (var entry in configData.lootContainerS)
+                {
+                    if (!entry.Value) continue;
+                    if (IsBarrel(entry.Key))
+                    {
+                        enabledBarrel = true;
+                    }
+                    else
+                    {
+                        enabledLoot = true;
+                    }
+                }
+
+                if (enabledBarrel)
+                {
+                    Subscribe(nameof(OnPlayerAttack));
+                }
+                if (enabledLoot)
+                {
+                    Subscribe(nameof(CanLootEntity));
+                }
             }
+            Subscribe(nameof(OnEntitySpawned));
+            foreach (var baseNetworkable in BaseNetworkable.serverEntities)
+            {
+                CheckEntity(baseNetworkable);
+            }
+        }
+
+        private void OnServerSave() => timer.Once(UnityEngine.Random.Range(0f, 60f), SaveData);
+
+        private void Unload()
+        {
+            if (AutoPickupHelper.autoPickupHelpers != null)
+            {
+                foreach (var autoPickupEntity in AutoPickupHelper.autoPickupHelpers.ToArray())
+                {
+                    UnityEngine.Object.Destroy(autoPickupEntity);
+                }
+                AutoPickupHelper.autoPickupHelpers = null;
+            }
+
+            foreach (var player in BasePlayer.activePlayerList)
+            {
+                DestroyUI(player);
+            }
+            SaveData();
+            instance = null;
+            configData = null;
+        }
+
+        private void OnPlayerAttack(BasePlayer attacker, HitInfo info)
+        {
+            if (attacker == null || !attacker.userID.IsSteamId()) return;
+            var barrel = info?.HitEntity as LootContainer;
+            if (barrel == null || barrel.net == null) return;
+            if (!IsBarrel(barrel.ShortPrefabName)) return;
+            if (permission.UserHasPermission(attacker.UserIDString, PERMISSION_USE))
+            {
+                if (TryPickupLootContainer(barrel, attacker, info))
+                {
+                }
+            }
+        }
+
+        private object CanLootEntity(BasePlayer player, LootContainer lootContainer)
+        {
+            if (player == null || lootContainer == null) return Null;
+            if (permission.UserHasPermission(player.UserIDString, PERMISSION_USE))
+            {
+                if (TryPickupLootContainer(lootContainer, player))
+                {
+                    return False;
+                }
+            }
+            return Null;
+        }
+
+        private void OnEntitySpawned(BaseNetworkable baseNetworkable) => CheckEntity(baseNetworkable, true);
+
+        #endregion Oxide Hooks
+
+        #region Methods
+
+        private bool TryPickupLootContainer(LootContainer lootContainer, BasePlayer player, HitInfo info = null)
+        {
+            bool enabled;
+            if (configData.lootContainerS.TryGetValue(lootContainer.ShortPrefabName, out enabled) && !enabled)
+            {
+                return false;
+            }
+            if (configData.settings.preventPickupLoot && lootContainer.OwnerID.IsSteamId() && !AreFriends(lootContainer.OwnerID, player.userID))
+            {
+                return false;
+            }
+            var autoPickData = GetAutoPickupData(player.userID, true);
+            if (autoPickData.enabled && !autoPickData.blockPickupTypes.HasFlag(PickupType.LootContainer))
+            {
+                if (CanAutoPickup(player, lootContainer) && PickupLootContainer(player, lootContainer, info))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void UpdateConfig()
@@ -86,16 +199,16 @@ namespace Oxide.Plugins
             {
                 var entity = GameManager.server.FindPrefab(prefab.ToLower())?.GetComponent<BaseEntity>();
                 if (entity == null || string.IsNullOrEmpty(entity.ShortPrefabName)) continue;
-                var lootContainer = entity.GetComponent<LootContainer>();
+                var lootContainer = entity as LootContainer;
                 if (lootContainer != null)
                 {
                     if (!configData.lootContainerS.ContainsKey(lootContainer.ShortPrefabName))
                     {
-                        configData.lootContainerS.Add(lootContainer.ShortPrefabName, true);
+                        configData.lootContainerS.Add(lootContainer.ShortPrefabName, !lootContainer.ShortPrefabName.Contains("stocking"));
                     }
                     continue;
                 }
-                var collectibleEntity = entity.GetComponent<CollectibleEntity>();
+                var collectibleEntity = entity as CollectibleEntity;
                 if (collectibleEntity != null)
                 {
                     if (!configData.collectibleEntityS.ContainsKey(collectibleEntity.ShortPrefabName))
@@ -104,7 +217,7 @@ namespace Oxide.Plugins
                     }
                     continue;
                 }
-                var plantEntity = entity.GetComponent<GrowableEntity>();
+                var plantEntity = entity as GrowableEntity;
                 if (plantEntity != null)
                 {
                     if (!configData.plantEntityS.ContainsKey(plantEntity.ShortPrefabName))
@@ -115,256 +228,6 @@ namespace Oxide.Plugins
                 }
             }
             SaveConfig();
-        }
-
-        private void OnServerInitialized()
-        {
-            Subscribe(nameof(OnEntitySpawned));
-            foreach (var baseNetworkable in BaseNetworkable.serverEntities)
-            {
-                CheckEntity(baseNetworkable);
-            }
-        }
-
-        private void OnServerSave() => timer.Once(UnityEngine.Random.Range(0f, 60f), SaveData);
-
-        private void Unload()
-        {
-            if (AutoPickupHelper.autoPickupHelpers != null)
-            {
-                foreach (var autoPickupEntity in AutoPickupHelper.autoPickupHelpers.ToArray())
-                {
-                    UnityEngine.Object.Destroy(autoPickupEntity);
-                }
-                AutoPickupHelper.autoPickupHelpers.Clear();
-            }
-
-            foreach (var player in BasePlayer.activePlayerList)
-            {
-                DestroyUI(player);
-            }
-            SaveData();
-            instance = null;
-            configData = null;
-        }
-
-        private object CanLootEntity(BasePlayer player, LootContainer lootContainer)
-        {
-            if (player == null || lootContainer == null) return null;
-            if (permission.UserHasPermission(player.UserIDString, PERMISSION_USE))
-            {
-                bool enabled;
-                if (configData.lootContainerS.TryGetValue(lootContainer.ShortPrefabName, out enabled) && !enabled)
-                {
-                    return null;
-                }
-                if (configData.settings.preventPickupLoot && lootContainer.OwnerID.IsSteamId() && !AreFriends(lootContainer.OwnerID, player.userID))
-                {
-                    return null;
-                }
-                var autoPickData = GetAutoPickupData(player.userID, true);
-                if (autoPickData.enabled && !autoPickData.blockPickupTypes.HasFlag(PickupType.LootContainer))
-                {
-                    if (CanAutoPickup(player, lootContainer) && PickupLootContainer(player, lootContainer))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return null;
-        }
-
-        private void OnEntitySpawned(BaseNetworkable baseNetworkable) => CheckEntity(baseNetworkable, true);
-
-        #endregion Oxide Hooks
-
-        #region Methods
-
-        private static void CheckEntity(BaseNetworkable baseNetworkable, bool justCreated = false)
-        {
-            if (baseNetworkable == null) return;
-            PickupType pickupType;
-            switch (baseNetworkable.ShortPrefabName)
-            {
-                case "murderer_corpse": pickupType = PickupType.MurdererCorpse; break;
-                case "scientist_corpse": pickupType = PickupType.ScientistCorpse; break;
-                case "player_corpse": pickupType = PickupType.PlayerCorpse; break;
-                case "item_drop": pickupType = PickupType.ItemDrop; break;
-                case "item_drop_backpack": pickupType = PickupType.ItemDropBackpack; break;
-                default:
-                    if (baseNetworkable is GrowableEntity)
-                    {
-                        pickupType = PickupType.PlantEntity;
-                        break;
-                    }
-                    if (baseNetworkable is CollectibleEntity)
-                    {
-                        pickupType = PickupType.CollectibleEntity;
-                        break;
-                    }
-                    if (baseNetworkable is WorldItem)
-                    {
-                        pickupType = PickupType.WorldItem;
-                        break;
-                    }
-                    return;
-            }
-            if (!enabledPickupTypes.HasFlag(pickupType))
-            {
-                return;
-            }
-            var autoPickupEntity = baseNetworkable.gameObject.GetComponent<AutoPickupHelper>();
-            if (autoPickupEntity != null)
-            {
-                UnityEngine.Object.Destroy(autoPickupEntity);
-            }
-
-            switch (pickupType)
-            {
-                case PickupType.CollectibleEntity:
-                    {
-                        bool enabled;
-                        if (configData.collectibleEntityS.TryGetValue(baseNetworkable.ShortPrefabName, out enabled) && !enabled)
-                        {
-                            return;
-                        }
-                    }
-                    break;
-
-                case PickupType.PlantEntity:
-                    {
-                        bool enabled;
-                        if (configData.plantEntityS.TryGetValue(baseNetworkable.ShortPrefabName, out enabled) && !enabled)
-                        {
-                            return;
-                        }
-                    }
-                    break;
-
-                case PickupType.MurdererCorpse:
-                case PickupType.ScientistCorpse:
-                case PickupType.PlayerCorpse:
-                case PickupType.ItemDrop:
-                case PickupType.ItemDropBackpack:
-                    break;
-
-                case PickupType.WorldItem:
-                    {
-                        var worldItem = baseNetworkable as WorldItem;
-                        if (worldItem != null)
-                        {
-                            var item = worldItem.GetItem();
-                            if (item != null)
-                            {
-                                if (configData.worldItemS.itemBlockList.Contains(item.info.shortname)) return;
-                                bool enabled;
-                                if (configData.worldItemS.itemCategoryS.TryGetValue(item.info.category, out enabled) && !enabled)
-                                {
-                                    return;
-                                }
-                            }
-                        }
-                        if (justCreated)
-                        {
-                            var collisionDetection = baseNetworkable.gameObject.GetComponent<WorldItemCollisionDetection>();
-                            if (collisionDetection != null)
-                            {
-                                UnityEngine.Object.Destroy(collisionDetection);
-                            }
-                            baseNetworkable.gameObject.AddComponent<WorldItemCollisionDetection>();
-                            return;
-                        }
-                    }
-                    break;
-            }
-            CreateAutoPickupHelper(baseNetworkable.gameObject, pickupType);
-        }
-
-        private static void CreateAutoPickupHelper(GameObject entity, PickupType pickupType)
-        {
-            var newObject = new GameObject("AutoPickHelper");
-            newObject.transform.SetParent(entity.transform);
-            newObject.transform.position = entity.transform.position;
-            newObject.AddComponent<AutoPickupHelper>().SetPickupType(pickupType);
-        }
-
-        private static bool PickupLootContainer(BasePlayer player, LootContainer lootContainer)
-        {
-            var itemContainer = lootContainer?.inventory;
-            if (itemContainer != null)
-            {
-                for (int i = itemContainer.itemList.Count - 1; i >= 0; i--)
-                {
-                    player.GiveItem(itemContainer.itemList[i], BaseEntity.GiveItemReason.PickedUp);
-                }
-                if (itemContainer.itemList == null || itemContainer.itemList.Count <= 0)
-                {
-                    lootContainer.Kill();
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private static bool InventoryExistItem(BasePlayer player, Item item)
-        {
-            return player.inventory.containerMain.FindItemByItemID(item.info.itemid) != null
-                   || player.inventory.containerBelt.FindItemByItemID(item.info.itemid) != null;
-        }
-
-        private static bool InventoryIsFull(BasePlayer player, Item item)
-        {
-            if (player.inventory.containerMain.IsFull() && player.inventory.containerBelt.IsFull())
-            {
-                var item1 = player.inventory.containerMain.FindItemByItemID(item.info.itemid);
-                var item2 = player.inventory.containerBelt.FindItemByItemID(item.info.itemid);
-                return (item1 == null || !item.CanStack(item1)) && (item2 == null || !item.CanStack(item2));
-            }
-            return false;
-        }
-
-        private static bool PickupDroppedItemContainer(BasePlayer player, DroppedItemContainer droppedItemContainer)
-        {
-            var itemContainer = droppedItemContainer?.inventory;
-            if (itemContainer != null)
-            {
-                for (int i = itemContainer.itemList.Count - 1; i >= 0; i--)
-                {
-                    player.GiveItem(itemContainer.itemList[i], BaseEntity.GiveItemReason.PickedUp);
-                }
-                if (itemContainer.itemList == null || itemContainer.itemList.Count <= 0)
-                {
-                    droppedItemContainer.Kill();
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private static bool PickupPlayerCorpse(BasePlayer player, PlayerCorpse playerCorpse)
-        {
-            var itemContainers = playerCorpse?.containers;
-            if (itemContainers != null)
-            {
-                for (int i = itemContainers.Length - 1; i >= 0; i--)
-                {
-                    var itemContainer = itemContainers[i];
-                    if (itemContainer != null)
-                    {
-                        for (int j = itemContainer.itemList.Count - 1; j >= 0; j--)
-                        {
-                            player.GiveItem(itemContainer.itemList[j], BaseEntity.GiveItemReason.PickedUp);
-                        }
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-
-        private static bool CanAutoPickup(BasePlayer player, BaseEntity entity)
-        {
-            return entity != null && player.CanInteract() && Interface.CallHook("OnAutoPickupEntity", player, entity) == null;
         }
 
         #region AreFriends
@@ -410,28 +273,252 @@ namespace Oxide.Plugins
 
         #endregion AreFriends
 
+        private StoredData.AutoPickData GetAutoPickupData(ulong playerID, bool readOnly = false)
+        {
+            StoredData.AutoPickData autoPickData;
+            if (!storedData.playerAutoPickupData.TryGetValue(playerID, out autoPickData))
+            {
+                autoPickData = new StoredData.AutoPickData
+                {
+                    enabled = configData.settings.defaultEnabled
+                };
+                if (readOnly)
+                {
+                    return autoPickData;
+                }
+                storedData.playerAutoPickupData.Add(playerID, autoPickData);
+            }
+
+            return autoPickData;
+        }
+
         #endregion Methods
+
+        #region Helpers
+
+        private static void CheckEntity(BaseNetworkable baseNetworkable, bool justCreated = false)
+        {
+            if (baseNetworkable == null) return;
+            var pickupType = GetPickupTypeFromEntity(baseNetworkable);
+            if (pickupType == PickupType.None) return;
+            if (!enabledPickupTypes.HasFlag(pickupType))
+            {
+                return;
+            }
+            var autoPickupEntity = baseNetworkable.GetComponent<AutoPickupHelper>();
+            if (autoPickupEntity != null)
+            {
+                UnityEngine.Object.Destroy(autoPickupEntity);
+            }
+
+            switch (pickupType)
+            {
+                case PickupType.CollectibleEntity:
+                    {
+                        bool enabled;
+                        if (configData.collectibleEntityS.TryGetValue(baseNetworkable.ShortPrefabName, out enabled) && !enabled)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+
+                case PickupType.PlantEntity:
+                    {
+                        bool enabled;
+                        if (configData.plantEntityS.TryGetValue(baseNetworkable.ShortPrefabName, out enabled) && !enabled)
+                        {
+                            return;
+                        }
+                        break;
+                    }
+
+                case PickupType.MurdererCorpse:
+                case PickupType.ScientistCorpse:
+                case PickupType.PlayerCorpse:
+                case PickupType.ItemDrop:
+                case PickupType.ItemDropBackpack:
+                    break;
+
+                case PickupType.WorldItem:
+                    {
+                        var worldItem = baseNetworkable as WorldItem;
+                        if (worldItem != null)
+                        {
+                            var item = worldItem.GetItem();
+                            if (item != null)
+                            {
+                                if (configData.worldItemS.itemBlockList.Contains(item.info.shortname)) return;
+                                bool enabled;
+                                if (configData.worldItemS.itemCategoryS.TryGetValue(item.info.category, out enabled) && !enabled)
+                                {
+                                    return;
+                                }
+                            }
+                        }
+                        if (justCreated)
+                        {
+                            var collisionDetection = baseNetworkable.GetComponent<WorldItemCollisionDetection>();
+                            if (collisionDetection != null)
+                            {
+                                UnityEngine.Object.Destroy(collisionDetection);
+                            }
+                            baseNetworkable.gameObject.AddComponent<WorldItemCollisionDetection>();
+                            return;
+                        }
+                        break;
+                    }
+            }
+            CreateAutoPickupHelper(baseNetworkable.transform, pickupType);
+        }
+
+        private static PickupType GetPickupTypeFromEntity(BaseNetworkable baseNetworkable)
+        {
+            switch (baseNetworkable.ShortPrefabName)
+            {
+                case "murderer_corpse": return PickupType.MurdererCorpse;
+                case "scientist_corpse": return PickupType.ScientistCorpse;
+                case "player_corpse": return PickupType.PlayerCorpse;
+                case "item_drop": return PickupType.ItemDrop;
+                case "item_drop_backpack": return PickupType.ItemDropBackpack;
+                default:
+                    if (baseNetworkable is GrowableEntity)
+                    {
+                        return PickupType.PlantEntity;
+                    }
+                    if (baseNetworkable is CollectibleEntity)
+                    {
+                        return PickupType.CollectibleEntity;
+                    }
+                    if (baseNetworkable is WorldItem)
+                    {
+                        return PickupType.WorldItem;
+                    }
+                    return PickupType.None;
+            }
+        }
+
+        private static void CreateAutoPickupHelper(Transform transform, PickupType pickupType)
+        {
+            var newObject = new GameObject("AutoPickHelper");
+            newObject.transform.SetParent(transform);
+            newObject.transform.position = transform.position;
+            newObject.AddComponent<AutoPickupHelper>().Init(pickupType);
+        }
+
+        private static bool PickupLootContainer(BasePlayer player, LootContainer lootContainer, HitInfo info = null)
+        {
+            var itemContainer = lootContainer?.inventory;
+            if (itemContainer != null)
+            {
+                for (int i = itemContainer.itemList.Count - 1; i >= 0; i--)
+                {
+                    player.GiveItem(itemContainer.itemList[i], BaseEntity.GiveItemReason.PickedUp);
+                }
+                if (itemContainer.itemList == null || itemContainer.itemList.Count <= 0)
+                {
+                    if (info != null)
+                    {
+                        lootContainer.Invoke(() => lootContainer.Die(info), 0.2f);
+                    }
+                    else
+                    {
+                        lootContainer.Invoke(() => lootContainer.Kill(BaseNetworkable.DestroyMode.Gib), 0.2f);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private static bool InventoryExistItem(BasePlayer player, Item item)
+        {
+            return player.inventory.containerMain.FindItemByItemID(item.info.itemid) != null
+                   || player.inventory.containerBelt.FindItemByItemID(item.info.itemid) != null;
+        }
+
+        private static bool InventoryIsFull(BasePlayer player, Item item)
+        {
+            if (player.inventory.containerMain.IsFull() && player.inventory.containerBelt.IsFull())
+            {
+                var item1 = player.inventory.containerMain.FindItemByItemID(item.info.itemid);
+                var item2 = player.inventory.containerBelt.FindItemByItemID(item.info.itemid);
+                return (item1 == null || !item.CanStack(item1)) && (item2 == null || !item.CanStack(item2));
+            }
+            return false;
+        }
+
+        private static bool PickupDroppedItemContainer(BasePlayer player, DroppedItemContainer droppedItemContainer)
+        {
+            var itemContainer = droppedItemContainer?.inventory;
+            if (itemContainer != null)
+            {
+                for (int i = itemContainer.itemList.Count - 1; i >= 0; i--)
+                {
+                    player.GiveItem(itemContainer.itemList[i], BaseEntity.GiveItemReason.PickedUp);
+                }
+                if (itemContainer.itemList == null || itemContainer.itemList.Count <= 0)
+                {
+                    droppedItemContainer.Kill(BaseNetworkable.DestroyMode.Gib);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private static bool PickupPlayerCorpse(BasePlayer player, PlayerCorpse playerCorpse)
+        {
+            var itemContainers = playerCorpse?.containers;
+            if (itemContainers != null)
+            {
+                for (int i = itemContainers.Length - 1; i >= 0; i--)
+                {
+                    var itemContainer = itemContainers[i];
+                    if (itemContainer != null)
+                    {
+                        for (int j = itemContainer.itemList.Count - 1; j >= 0; j--)
+                        {
+                            player.GiveItem(itemContainer.itemList[j], BaseEntity.GiveItemReason.PickedUp);
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private static bool CanAutoPickup(BasePlayer player, BaseEntity entity)
+        {
+            return entity != null && player.CanInteract() && Interface.CallHook("OnAutoPickupEntity", player, entity) == null;
+        }
+
+        private static bool IsBarrel(string shortPrefabName) => shortPrefabName.Contains("barrel") || shortPrefabName.Contains("roadsign");
+
+        #endregion Helpers
+
+        #region Components
 
         private class WorldItemCollisionDetection : MonoBehaviour
         {
-            private bool waiting;
+            private bool collided;
 
             private void OnCollisionEnter(Collision collision)
             {
-                if (waiting || collision?.gameObject?.layer == null) return;
-                waiting = true;
+                if (collided || collision?.gameObject == null) return;
+                collided = true;
                 Invoke(nameof(AddAutoPickupComponent), configData.worldItemS.pickupDelay);
             }
 
             private void AddAutoPickupComponent()
             {
-                CreateAutoPickupHelper(gameObject, PickupType.WorldItem);
+                CreateAutoPickupHelper(transform, PickupType.WorldItem);
                 DestroyImmediate(this);
             }
         }
 
         private class AutoPickupHelper : FacepunchBehaviour
         {
+            private const int LAYER_PLAYER = (int)Rust.Layer.Player_Server;
             public static List<AutoPickupHelper> autoPickupHelpers;
 
             private BaseEntity entity;
@@ -448,8 +535,13 @@ namespace Oxide.Plugins
                 entity = GetComponentInParent<BaseEntity>();
             }
 
-            public void SetPickupType(PickupType pickupType)
+            public void Init(PickupType pickupType)
             {
+                if (gameObject == null || entity == null)
+                {
+                    Destroy(this);
+                    return;
+                }
                 this.pickupType = pickupType;
                 transform.position = entity.CenterPoint();
                 CreateCollider();
@@ -483,8 +575,9 @@ namespace Oxide.Plugins
 
             private void OnTriggerEnter(Collider collider)
             {
-                if (collider?.gameObject?.layer != (int)Rust.Layer.Player_Server) return;
-                var player = collider.gameObject.GetComponentInParent<BasePlayer>();
+                if (collider == null || collider.gameObject == null) return;
+                if (collider.gameObject.layer != LAYER_PLAYER) return;
+                var player = collider.ToBaseEntity() as BasePlayer;
                 if (player == null || !player.userID.IsSteamId()) return;
                 if (instance.permission.UserHasPermission(player.UserIDString, PERMISSION_USE))
                 {
@@ -498,7 +591,7 @@ namespace Oxide.Plugins
                                 if (configData.settings.preventPickupPlant && plantEntity.OwnerID.IsSteamId() && !instance.AreFriends(plantEntity.OwnerID, player.userID)) return;
                                 if (CanAutoPickup(player, plantEntity))
                                 {
-                                    if (instance.autoClonePlayers.Contains(player.userID))
+                                    if (autoPickData.autoClone)
                                     {
                                         plantEntity.TakeClones(player);
                                     }
@@ -578,24 +671,7 @@ namespace Oxide.Plugins
             }
         }
 
-        private StoredData.AutoPickData GetAutoPickupData(ulong playerID, bool readOnly = false)
-        {
-            StoredData.AutoPickData autoPickData;
-            if (!storedData.playerAutoPickupData.TryGetValue(playerID, out autoPickData))
-            {
-                autoPickData = new StoredData.AutoPickData
-                {
-                    enabled = configData.settings.defaultEnabled
-                };
-                if (readOnly)
-                {
-                    return autoPickData;
-                }
-                storedData.playerAutoPickupData.Add(playerID, autoPickData);
-            }
-
-            return autoPickData;
-        }
+        #endregion Components
 
         #region UI
 
@@ -618,7 +694,7 @@ namespace Oxide.Plugins
             }, UINAME_MAIN);
             var titlePanel = container.Add(new CuiPanel
             {
-                Image = { Color = "0.42 0.88 0.88 1" },
+                Image = { Color = "0.31 0.88 0.71 1" },
                 RectTransform = { AnchorMin = "0 0.902", AnchorMax = "0.995 1" },
             }, UINAME_MAIN);
             container.Add(new CuiElement
@@ -635,7 +711,7 @@ namespace Oxide.Plugins
             {
                 Button = { Color = "0.95 0.1 0.1 0.95", Close = UINAME_MAIN },
                 Text = { Text = "X", Align = TextAnchor.MiddleCenter, Color = "0 0 0 1", FontSize = 22 },
-                RectTransform = { AnchorMin = "0.885 0.05", AnchorMax = "0.995 0.95" }
+                RectTransform = { AnchorMin = "0.885 0.005", AnchorMax = "1 0.995" }
             }, titlePanel);
             CuiHelper.DestroyUi(player, UINAME_MAIN);
             CuiHelper.AddUi(player, container);
@@ -643,7 +719,7 @@ namespace Oxide.Plugins
             UpdateMenuUI(player, autoPickData);
         }
 
-        private static void UpdateMenuUI(BasePlayer player, StoredData.AutoPickData autoPickData, PickupType type = PickupType.None)
+        private static void UpdateMenuUI(BasePlayer player, StoredData.AutoPickData autoPickData)
         {
             if (player == null) return;
             var container = new CuiElementContainer();
@@ -675,7 +751,7 @@ namespace Oxide.Plugins
                     anchors = GetEntryAnchors(i++, spacing);
                     CreateEntry(ref container, $"AutoPickupUI Clone",
                         instance.Lang("AutoClonePlants", player.UserIDString),
-                        instance.autoClonePlayers.Contains(player.userID)
+                        autoPickData.autoClone
                             ? instance.Lang("Enabled", player.UserIDString)
                             : instance.Lang("Disabled", player.UserIDString), $"0 {anchors[0]}", $"0.995 {anchors[1]}");
                 }
@@ -721,6 +797,7 @@ namespace Oxide.Plugins
         {
             var player = arg.Player();
             if (player == null) return;
+            if (!permission.UserHasPermission(player.UserIDString, PERMISSION_USE)) return;
             var autoPickData = GetAutoPickupData(player.userID);
             switch (arg.Args[0].ToLower())
             {
@@ -729,14 +806,7 @@ namespace Oxide.Plugins
                     break;
 
                 case "clone":
-                    if (autoClonePlayers.Contains(player.userID))
-                    {
-                        autoClonePlayers.Remove(player.userID);
-                    }
-                    else
-                    {
-                        autoClonePlayers.Add(player.userID);
-                    }
+                    autoPickData.autoClone = !autoPickData.autoClone;
                     break;
 
                 default:
@@ -799,6 +869,9 @@ namespace Oxide.Plugins
 
             public class Settings
             {
+                [JsonProperty(PropertyName = "Clear Data On Map Wipe")]
+                public bool clearDataOnWipe = false;
+
                 [JsonProperty(PropertyName = "Use Teams")]
                 public bool useTeams = false;
 
@@ -864,7 +937,7 @@ namespace Oxide.Plugins
             }
 
             [JsonProperty(PropertyName = "Version")]
-            public VersionNumber version = new VersionNumber(1, 2, 7);
+            public VersionNumber version;
         }
 
         protected override void LoadConfig()
@@ -882,9 +955,9 @@ namespace Oxide.Plugins
                     UpdateConfigValues();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -894,6 +967,7 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
@@ -902,15 +976,28 @@ namespace Oxide.Plugins
         {
             if (configData.version < Version)
             {
-                if (configData.version <= new VersionNumber(1, 2, 7))
+                if (configData.version <= default(VersionNumber))
                 {
-                    if (configData.chatS.prefix == "[AutoPickup]:")
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
                     {
-                        configData.chatS.prefix = "<color=#00FFFF>[AutoPickup]</color>: ";
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
                     }
                 }
                 configData.version = Version;
             }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
         }
 
         #endregion ConfigurationFile
@@ -926,8 +1013,7 @@ namespace Oxide.Plugins
             public class AutoPickData
             {
                 public bool enabled;
-
-                //[JsonConverter(typeof(StringEnumConverter))]
+                public bool autoClone;
                 public PickupType blockPickupTypes;
             }
         }
@@ -957,6 +1043,14 @@ namespace Oxide.Plugins
         {
             storedData = new StoredData();
             SaveData();
+        }
+
+        private void OnNewSave(string filename)
+        {
+            if (configData.settings.clearDataOnWipe)
+            {
+                ClearData();
+            }
         }
 
         #endregion DataFile

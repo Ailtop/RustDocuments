@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
-public class AIThinkManager : BaseMonoBehaviour
+public class AIThinkManager : BaseMonoBehaviour, IServerComponent
 {
 	public static ListHashSet<IThinker> _processQueue = new ListHashSet<IThinker>();
 
@@ -24,12 +25,24 @@ public class AIThinkManager : BaseMonoBehaviour
 			}
 			_removalQueue.Clear();
 		}
+		AIInformationZone.BudgetedTick();
 		while (lastIndex < _processQueue.Count && Time.realtimeSinceStartup < realtimeSinceStartup + num)
 		{
-			_processQueue[lastIndex]?.TryThink();
+			IThinker thinker = _processQueue[lastIndex];
+			if (thinker != null)
+			{
+				try
+				{
+					thinker.TryThink();
+				}
+				catch (Exception message)
+				{
+					Debug.LogWarning(message);
+				}
+			}
 			lastIndex++;
 		}
-		if (lastIndex == _processQueue.Count)
+		if (lastIndex >= _processQueue.Count)
 		{
 			lastIndex = 0;
 		}

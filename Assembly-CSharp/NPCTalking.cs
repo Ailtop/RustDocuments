@@ -197,6 +197,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	public void ForceEndConversation(BasePlayer player)
 	{
 		ClientRPCPlayer(null, player, "Client_EndConversation");
+		Interface.CallHook("OnNpcConversationEnded", this, player);
 	}
 
 	public void ForceSpeechNode(BasePlayer player, int speechNodeIndex)
@@ -256,6 +257,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	public void Server_EndTalking(RPCMessage msg)
 	{
 		OnConversationEnded(msg.player);
+		Interface.CallHook("OnNpcConversationEnded", this, msg.player);
 	}
 
 	[RPC_Server]

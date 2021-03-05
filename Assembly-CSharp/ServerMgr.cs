@@ -497,14 +497,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2279)
+		else if (packet.connection.protocol > 2283)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2279));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2283));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2279)
+		else if (packet.connection.protocol < 2283)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2279));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2283));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -664,6 +664,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		using (TimeWarning.New("RCon.Shutdown"))
 		{
 			RCon.Shutdown();
+		}
+		using (TimeWarning.New("PlatformService.Shutdown"))
+		{
+			PlatformService.Instance?.Shutdown();
 		}
 		using (TimeWarning.New("CompanionServer.Shutdown"))
 		{
@@ -903,13 +907,37 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			{
 				using (TimeWarning.New("GrowableEntity.BudgetedUpdate"))
 				{
-					GrowableEntity.BudgetedUpdate();
+					GrowableEntity.growableEntityUpdateQueue.RunQueue(GrowableEntity.framebudgetms);
 				}
 			}
 			catch (Exception exception10)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: GrowableEntity.BudgetedUpdate");
 				UnityEngine.Debug.LogException(exception10, this);
+			}
+			try
+			{
+				using (TimeWarning.New("FlameTurret.BudgetedUpdate"))
+				{
+					FlameTurret.updateFlameTurretQueueServer.RunQueue(0.25);
+				}
+			}
+			catch (Exception exception11)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: FlameTurret.BudgetedUpdate");
+				UnityEngine.Debug.LogException(exception11, this);
+			}
+			try
+			{
+				using (TimeWarning.New("BasePlayer.BudgetedLifeStoryUpdate"))
+				{
+					BasePlayer.lifeStoryQueue.RunQueue(BasePlayer.lifeStoryFramebudgetms);
+				}
+			}
+			catch (Exception exception12)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: BasePlayer.BudgetedLifeStoryUpdate");
+				UnityEngine.Debug.LogException(exception12, this);
 			}
 			if (EACServer.playerTracker != null)
 			{
@@ -1021,7 +1049,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2279}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2283}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{

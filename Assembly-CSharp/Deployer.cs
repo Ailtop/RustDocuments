@@ -111,8 +111,8 @@ public class Deployer : HeldEntity
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoDeploy(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -187,7 +187,7 @@ public class Deployer : HeldEntity
 			}
 		}
 		modDeployable.OnDeployed(baseEntity2, ownerPlayer);
-		Interface.CallHook("OnItemDeployed", this, baseEntity);
+		Interface.CallHook("OnItemDeployed", this, baseEntity, baseEntity2);
 		UseItemAmount(1);
 	}
 

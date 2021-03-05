@@ -1,7 +1,6 @@
 using Rust;
 using UnityEngine;
 
-[RequireComponent(typeof(BaseCombatEntity))]
 [RequireComponent(typeof(Collider))]
 public class TakeCollisionDamage : FacepunchBehaviour
 {

@@ -52,7 +52,7 @@ public class EntityFuelSystem
 		return null;
 	}
 
-	public void SpawnFuelStorage(GameObjectRef fuelStoragePrefab, Transform fuelStoragePoint, Collider colliderToIgnore = null)
+	public void SpawnFuelStorage(GameObjectRef fuelStoragePrefab, Transform fuelStoragePoint)
 	{
 		if (fuelStoragePrefab != null && !(fuelStoragePoint == null) && !Rust.Application.isLoadingSave)
 		{
@@ -62,11 +62,6 @@ public class EntityFuelSystem
 			baseEntity.SetParent(owner);
 			baseEntity.Spawn();
 			fuelStorageInstance.Set(baseEntity);
-			Collider component = baseEntity.GetComponent<Collider>();
-			if (colliderToIgnore != null && component != null)
-			{
-				Physics.IgnoreCollision(component, colliderToIgnore, true);
-			}
 		}
 	}
 
@@ -115,26 +110,22 @@ public class EntityFuelSystem
 		return cachedHasFuel;
 	}
 
-	public bool TryUseFuel(float seconds, float fuelUsedPerSecond)
+	public int TryUseFuel(float seconds, float fuelUsedPerSecond)
 	{
 		StorageContainer fuelContainer = GetFuelContainer();
 		object obj = Interface.CallHook("CanUseFuel", this, fuelContainer, seconds, fuelUsedPerSecond);
-		if (obj != null)
+		if (obj is int)
 		{
-			if (!(obj is bool))
-			{
-				return false;
-			}
-			return (bool)obj;
+			return (int)obj;
 		}
 		if (fuelContainer == null)
 		{
-			return false;
+			return 0;
 		}
 		Item slot = fuelContainer.inventory.GetSlot(0);
 		if (slot == null || slot.amount < 1)
 		{
-			return false;
+			return 0;
 		}
 		pendingFuel += seconds * fuelUsedPerSecond;
 		if (pendingFuel >= 1f)
@@ -142,8 +133,9 @@ public class EntityFuelSystem
 			int num = Mathf.FloorToInt(pendingFuel);
 			slot.UseItem(num);
 			pendingFuel -= num;
+			return num;
 		}
-		return true;
+		return 0;
 	}
 
 	public void LootFuel(BasePlayer player)

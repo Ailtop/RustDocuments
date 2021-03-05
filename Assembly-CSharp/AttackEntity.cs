@@ -89,6 +89,11 @@ public class AttackEntity : HeldEntity
 	{
 	}
 
+	protected void StartAttackCooldownRaw(float cooldown)
+	{
+		nextAttackTime = UnityEngine.Time.time + cooldown;
+	}
+
 	public void StartAttackCooldown(float cooldown)
 	{
 		nextAttackTime = CalculateCooldownTime(nextAttackTime, cooldown, true);

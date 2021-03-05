@@ -18,7 +18,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 		{
 			base.StateEnter();
 			GetEntity().SetDesiredSpeed(HumanNPC.SpeedType.Sprint);
-			AIInformationZone informationZone = GetEntity().GetInformationZone();
+			AIInformationZone informationZone = GetEntity().GetInformationZone(GetEntity().transform.position);
 			if (informationZone != null)
 			{
 				AICoverPoint bestCoverPoint = informationZone.GetBestCoverPoint(GetEntity().transform.position, GetEntity().transform.position, 25f, 50f, GetEntity());
@@ -264,7 +264,10 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 					bestRoamPosition.MarkUsedForRoam(num + 11f);
 				}
 				lastDestinationTime = Time.time;
-				Vector3 destination = ((bestRoamPosition == null) ? GetEntity().transform.position : bestRoamPosition.transform.position);
+				Vector3 insideUnitSphere = Random.insideUnitSphere;
+				insideUnitSphere.y = 0f;
+				insideUnitSphere.Normalize();
+				Vector3 destination = ((bestRoamPosition == null) ? GetEntity().transform.position : (bestRoamPosition.transform.position + insideUnitSphere * bestRoamPosition.radius));
 				GetEntity().SetDestination(destination);
 				nextRoamPositionTime = -1f;
 			}
@@ -280,6 +283,8 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 		private bool inCover;
 
 		private float timeInCover;
+
+		private AICoverPoint currentCover;
 
 		public override float GetWeight()
 		{
@@ -338,6 +343,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 			inCover = false;
 			timeInCover = -1f;
 			GetEntity().ClearStationaryAimPoint();
+			currentCover = null;
 			base.StateEnter();
 		}
 
@@ -346,6 +352,11 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 			base.StateLeave();
 			GetEntity().SetDucked(false);
 			GetEntity().ClearStationaryAimPoint();
+			if ((bool)currentCover)
+			{
+				currentCover.ClearIfUsedBy(GetEntity());
+				currentCover = null;
+			}
 		}
 
 		public override void StateThink(float delta)
@@ -357,16 +368,22 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 			{
 				Vector3 hideFromPosition = (GetEntity().currentTarget ? GetEntity().currentTarget.transform.position : (GetEntity().transform.position + GetEntity().LastAttackedDir * 30f));
 				float num3 = ((GetEntity().currentTarget != null) ? GetEntity().DistanceToTarget() : 30f);
-				AIInformationZone informationZone = GetEntity().GetInformationZone();
+				AIInformationZone informationZone = GetEntity().GetInformationZone(GetEntity().transform.position);
 				if (informationZone != null)
 				{
 					float secondsSinceAttacked = GetEntity().SecondsSinceAttacked;
 					float minRange = ((secondsSinceAttacked < 2f) ? 2f : 0f);
-					float maxRange = 20f;
+					float maxRange = 25f;
+					if (currentCover != null)
+					{
+						currentCover.ClearIfUsedBy(GetEntity());
+						currentCover = null;
+					}
 					AICoverPoint bestCoverPoint = informationZone.GetBestCoverPoint(GetEntity().transform.position, hideFromPosition, minRange, maxRange, GetEntity());
 					if ((bool)bestCoverPoint)
 					{
-						bestCoverPoint.SetUsedBy(GetEntity());
+						bestCoverPoint.SetUsedBy(GetEntity(), 15f);
+						currentCover = bestCoverPoint;
 					}
 					Vector3 vector = ((bestCoverPoint == null) ? GetEntity().transform.position : bestCoverPoint.transform.position);
 					GetEntity().SetDestination(vector);
@@ -388,7 +405,7 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 					}
 					else
 						num6 = 0;
-					if ((num3 > 6f && num4 > 6f) || GetEntity().currentTarget == null)
+					if ((num3 > 6f && num4 > 8f) || GetEntity().currentTarget == null)
 					{
 						isFleeing = true;
 						num2 = Time.time + Random.Range(4f, 7f);
@@ -547,12 +564,13 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 			{
 				return;
 			}
-			float num = Vector3.Distance(GetEntity().currentTarget.transform.position, GetEntity().transform.position);
-			if (num < 5f)
+			float num = GetEntity().EngagementRange();
+			float num2 = Vector3.Distance(GetEntity().currentTarget.transform.position, GetEntity().transform.position);
+			if (num2 < 5f)
 			{
 				GetEntity().SetDesiredSpeed(HumanNPC.SpeedType.SlowWalk);
 			}
-			else if (num < 10f)
+			else if (num2 < 10f)
 			{
 				GetEntity().SetDesiredSpeed(HumanNPC.SpeedType.Walk);
 			}
@@ -560,26 +578,23 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 			{
 				GetEntity().SetDesiredSpeed(HumanNPC.SpeedType.Sprint);
 			}
-			if (!(Time.time > nextPositionUpdateTime))
+			if (Time.time > nextPositionUpdateTime)
 			{
-				return;
-			}
-			Random.Range(1f, 2f);
-			Vector3 destination = GetEntity().transform.position;
-			if (!(GetEntity().GetInformationZone() == null))
-			{
-				AIMovePoint bestMovePointNear = GetEntity().GetInformationZone().GetBestMovePointNear(GetEntity().currentTarget.transform.position, GetEntity().transform.position, 0f, 35f, true);
+				Random.Range(1f, 2f);
+				Vector3 position = GetEntity().transform.position;
+				AIMovePoint bestMovePointNear = GetEntity().GetInformationZone(GetEntity().currentTarget.transform.position).GetBestMovePointNear(GetEntity().currentTarget.transform.position, GetEntity().transform.position, 0f, Mathf.Min(35f, num * 0.75f), true, GetEntity(), true);
 				if ((bool)bestMovePointNear)
 				{
 					bestMovePointNear.MarkUsedForEngagement(5f, GetEntity());
-					destination = bestMovePointNear.transform.position;
-					destination = GetEntity().GetRandomPositionAround(destination, 0f, bestMovePointNear.radius - 0.3f);
+					position = bestMovePointNear.transform.position;
+					position = GetEntity().GetRandomPositionAround(position, 0f, bestMovePointNear.radius - 0.3f);
 				}
 				else
 				{
-					GetEntity().GetRandomPositionAround(GetEntity().currentTarget.transform.position, 1f);
+					position = GetEntity().GetRandomPositionAround(GetEntity().currentTarget.transform.position, 1f);
 				}
-				GetEntity().SetDestination(destination);
+				GetEntity().SetDestination(position);
+				nextPositionUpdateTime = Time.time + 1f;
 			}
 		}
 	}
@@ -607,6 +622,8 @@ public class HumanBrain : BaseAIBrain<HumanNPC>
 	public const int HumanState_Alert = 11;
 
 	public const int HumanState_Investigate = 12;
+
+	public const int HumanState_Guard = 13;
 
 	private float thinkRate = 0.25f;
 

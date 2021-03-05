@@ -4,8 +4,8 @@ using UnityEngine.Sprites;
 
 namespace UnityEngine.UI.Extensions
 {
-	[RequireComponent(typeof(RectTransform))]
 	[AddComponentMenu("UI/Extensions/Primitives/UILineRendererList")]
+	[RequireComponent(typeof(RectTransform))]
 	public class UILineRendererList : UIPrimitiveBase
 	{
 		private enum SegmentType

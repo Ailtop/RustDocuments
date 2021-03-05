@@ -176,6 +176,23 @@ public class BasePlayer : BaseCombatEntity
 		Driving = 0x40
 	}
 
+	public class LifeStoryWorkQueue : ObjectWorkQueue<BasePlayer>
+	{
+		protected override void RunJob(BasePlayer entity)
+		{
+			entity.UpdateTimeCategory();
+		}
+
+		protected override bool ShouldAdd(BasePlayer entity)
+		{
+			if (base.ShouldAdd(entity))
+			{
+				return BaseEntityEx.IsValid(entity);
+			}
+			return false;
+		}
+	}
+
 	public class SpawnPoint
 	{
 		public UnityEngine.Vector3 pos;
@@ -311,6 +328,10 @@ public class BasePlayer : BaseCombatEntity
 
 	private const int DRIVING = 64;
 
+	[Help("How many milliseconds to budget for processing life story updates per frame")]
+	[ServerVar]
+	public static float lifeStoryFramebudgetms = 0.25f;
+
 	[NonSerialized]
 	public PlayerLifeStory lifeStory;
 
@@ -336,6 +357,10 @@ public class BasePlayer : BaseCombatEntity
 	private bool LifeStorySwimming;
 
 	private bool LifeStoryDriving;
+
+	private bool waitingForLifeStoryUpdate;
+
+	public static LifeStoryWorkQueue lifeStoryQueue = new LifeStoryWorkQueue();
 
 	[NonSerialized]
 	public PlayerStatistics stats;
@@ -501,7 +526,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public float eggVision;
 
-	private PhoneController activeTelephone;
+	public PhoneController activeTelephone;
 
 	[NonSerialized]
 	public IPlayer IPlayer;
@@ -1649,8 +1674,8 @@ public class BasePlayer : BaseCombatEntity
 		rpcHistory.Clear();
 	}
 
-	[RPC_Server.CallsPerSecond(3uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(3uL)]
 	public void HandleCCTVRenderComplete(RPCMessage msg)
 	{
 		if (!Settings.Enabled)
@@ -1698,8 +1723,8 @@ public class BasePlayer : BaseCombatEntity
 		return true;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_LootPlayer(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1714,8 +1739,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Assist(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerAssist", this, msg.player) == null)
@@ -1726,8 +1751,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_KeepAlive(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerKeepAlive", this, msg.player) == null)
@@ -2495,8 +2520,8 @@ public class BasePlayer : BaseCombatEntity
 		return false;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileAttack(RPCMessage msg)
 	{
 		PlayerProjectileAttack playerProjectileAttack = PlayerProjectileAttack.Deserialize(msg.read);
@@ -2841,8 +2866,8 @@ public class BasePlayer : BaseCombatEntity
 		playerProjectileAttack = null;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -3342,10 +3367,11 @@ public class BasePlayer : BaseCombatEntity
 		{
 			lifeStory.secondsAlive += deltaTime;
 			nextTimeCategoryUpdate -= deltaTime * ((moveSpeed > 0.1f) ? 1f : 0.25f);
-			if (nextTimeCategoryUpdate <= 0f)
+			if (nextTimeCategoryUpdate <= 0f && !waitingForLifeStoryUpdate)
 			{
-				UpdateTimeCategory();
 				nextTimeCategoryUpdate = 7f + 7f * UnityEngine.Random.Range(0.2f, 1f);
+				waitingForLifeStoryUpdate = true;
+				lifeStoryQueue.Add(this);
 			}
 			if (LifeStoryInWilderness)
 			{
@@ -3390,73 +3416,77 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	private void UpdateTimeCategory()
+	public void UpdateTimeCategory()
 	{
-		int currentTimeCategory = this.currentTimeCategory;
-		this.currentTimeCategory = 1;
-		if (IsBuildingAuthed())
+		using (TimeWarning.New("UpdateTimeCategory"))
 		{
-			this.currentTimeCategory = 4;
-		}
-		UnityEngine.Vector3 position = base.transform.position;
-		if (((uint)TerrainMeta.TopologyMap.GetTopology(position) & 0x400u) != 0)
-		{
-			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+			waitingForLifeStoryUpdate = false;
+			int currentTimeCategory = this.currentTimeCategory;
+			this.currentTimeCategory = 1;
+			if (IsBuildingAuthed())
 			{
-				if (monument.shouldDisplayOnMap && monument.IsInBounds(position))
+				this.currentTimeCategory = 4;
+			}
+			UnityEngine.Vector3 position = base.transform.position;
+			if (TerrainMeta.TopologyMap != null && ((uint)TerrainMeta.TopologyMap.GetTopology(position) & 0x400u) != 0)
+			{
+				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 				{
-					this.currentTimeCategory = 2;
-					break;
+					if (monument.shouldDisplayOnMap && monument.IsInBounds(position))
+					{
+						this.currentTimeCategory = 2;
+						break;
+					}
 				}
 			}
-		}
-		if (IsSwimming())
-		{
-			this.currentTimeCategory |= 32;
-		}
-		BaseMountable baseMountable2;
-		if (isMounted)
-		{
-			BaseMountable baseMountable = GetMounted();
-			if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Boating)
+			if (IsSwimming())
 			{
-				this.currentTimeCategory |= 16;
+				this.currentTimeCategory |= 32;
 			}
-			else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Flying)
+			BaseMountable baseMountable2;
+			if (isMounted)
 			{
-				this.currentTimeCategory |= 8;
+				BaseMountable baseMountable = GetMounted();
+				if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Boating)
+				{
+					this.currentTimeCategory |= 16;
+				}
+				else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Flying)
+				{
+					this.currentTimeCategory |= 8;
+				}
+				else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Driving)
+				{
+					this.currentTimeCategory |= 64;
+				}
 			}
-			else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Driving)
+			else if (HasParent() && (object)(baseMountable2 = GetParentEntity() as BaseMountable) != null)
 			{
-				this.currentTimeCategory |= 64;
+				if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Boating)
+				{
+					this.currentTimeCategory |= 16;
+				}
+				else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Flying)
+				{
+					this.currentTimeCategory |= 8;
+				}
+				else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Driving)
+				{
+					this.currentTimeCategory |= 64;
+				}
 			}
-		}
-		else if (HasParent() && (object)(baseMountable2 = GetParentEntity() as BaseMountable) != null)
-		{
-			if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Boating)
+			if (currentTimeCategory != this.currentTimeCategory || !hasSentPresenceState)
 			{
-				this.currentTimeCategory |= 16;
+				LifeStoryInWilderness = (1 & this.currentTimeCategory) != 0;
+				LifeStoryInMonument = (2 & this.currentTimeCategory) != 0;
+				LifeStoryInBase = (4 & this.currentTimeCategory) != 0;
+				LifeStoryFlying = (8 & this.currentTimeCategory) != 0;
+				LifeStoryBoating = (0x10 & this.currentTimeCategory) != 0;
+				LifeStorySwimming = (0x20 & this.currentTimeCategory) != 0;
+				LifeStoryDriving = (0x40 & this.currentTimeCategory) != 0;
+				ClientRPCPlayer(null, this, "UpdateRichPresenceState", this.currentTimeCategory);
+				hasSentPresenceState = true;
 			}
-			else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Flying)
-			{
-				this.currentTimeCategory |= 8;
-			}
-			else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Driving)
-			{
-				this.currentTimeCategory |= 64;
-			}
-		}
-		if (currentTimeCategory != this.currentTimeCategory || !hasSentPresenceState)
-		{
-			LifeStoryInWilderness = (1 & this.currentTimeCategory) != 0;
-			LifeStoryInMonument = (2 & this.currentTimeCategory) != 0;
-			LifeStoryInBase = (4 & this.currentTimeCategory) != 0;
-			LifeStoryFlying = (8 & this.currentTimeCategory) != 0;
-			LifeStoryBoating = (0x10 & this.currentTimeCategory) != 0;
-			LifeStorySwimming = (0x20 & this.currentTimeCategory) != 0;
-			LifeStoryDriving = (0x40 & this.currentTimeCategory) != 0;
-			ClientRPCPlayer(null, this, "UpdateRichPresenceState", this.currentTimeCategory);
-			hasSentPresenceState = true;
 		}
 	}
 
@@ -3678,9 +3708,9 @@ public class BasePlayer : BaseCombatEntity
 
 	public void MovePosition(UnityEngine.Vector3 newPos)
 	{
-		ticksPerSecond.Increment();
 		base.transform.position = newPos;
 		tickInterpolator.Reset(newPos);
+		ticksPerSecond.Increment();
 		tickHistory.AddPoint(newPos, tickHistoryCapacity);
 		NetworkPositionTick();
 	}
@@ -3870,15 +3900,15 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void ClientKeepConnectionAlive(RPCMessage msg)
 	{
 		lastTickTime = UnityEngine.Time.time;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void ClientLoadingComplete(RPCMessage msg)
 	{
 	}
@@ -3989,9 +4019,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -4951,8 +4981,8 @@ public class BasePlayer : BaseCombatEntity
 		return net.connection.info.GetInt(key, defaultVal);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -5512,9 +5542,7 @@ public class BasePlayer : BaseCombatEntity
 			}
 			else
 			{
-				ticksPerSecond.Increment();
 				tickInterpolator.AddPoint(tick.position);
-				tickHistory.AddPoint(tick.position, tickHistoryCapacity);
 				tickNeedsFinalizing = true;
 			}
 		}
@@ -5593,6 +5621,8 @@ public class BasePlayer : BaseCombatEntity
 				if (AntiHack.ValidateMove(this, tickInterpolator, tickDeltaTime))
 				{
 					base.transform.localPosition = tickInterpolator.EndPoint;
+					ticksPerSecond.Increment();
+					tickHistory.AddPoint(tickInterpolator.EndPoint, tickHistoryCapacity);
 					AntiHack.FadeViolations(this, tickDeltaTime);
 				}
 				else
@@ -6385,7 +6415,7 @@ public class BasePlayer : BaseCombatEntity
 		return WaterFactor() > 0.75f;
 	}
 
-	public bool IsOnGround()
+	public virtual bool IsOnGround()
 	{
 		return modelState.onground;
 	}

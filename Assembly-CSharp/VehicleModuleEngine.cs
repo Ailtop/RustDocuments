@@ -96,7 +96,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		{
 			if (base.Car != null)
 			{
-				return base.Car.CurEngineState == ModularCar.EngineState.On;
+				return base.Car.CurEngineState == VehicleEngineController.EngineState.On;
 			}
 			return false;
 		}
@@ -108,7 +108,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
 	}
 
-	public override void OnEngineStateChanged(ModularCar.EngineState oldState, ModularCar.EngineState newState)
+	public override void OnEngineStateChanged(VehicleEngineController.EngineState oldState, VehicleEngineController.EngineState newState)
 	{
 		base.OnEngineStateChanged(oldState, newState);
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
@@ -166,7 +166,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 	public override void VehicleFixedUpdate(bool vehicleIsActive)
 	{
 		base.VehicleFixedUpdate(vehicleIsActive);
-		if (vehicleIsActive && !(base.Car == null) && base.Car.CurEngineState == ModularCar.EngineState.On)
+		if (vehicleIsActive && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController.EngineState.On)
 		{
 			float num = Mathf.Lerp(engine.idleFuelPerSec, engine.maxFuelPerSec, Mathf.Abs(base.Car.GetThrottleInput()));
 			num /= PerformanceFractionFuelEconomy;

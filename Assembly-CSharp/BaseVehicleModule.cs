@@ -32,8 +32,8 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	private const float TIME_BETWEEN_LOCK_REFRESH = 1f;
 
-	[SerializeField]
 	[Header("Vehicle Module")]
+	[SerializeField]
 	private Transform centreOfMassTransform;
 
 	[SerializeField]
@@ -41,9 +41,9 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	public VisualGroup visualGroup;
 
-	[HideInInspector]
 	[SerializeField]
-	private ModularVehicleLight[] lights;
+	[HideInInspector]
+	private VehicleLight[] lights;
 
 	public LODLevel[] lodRenderers;
 
@@ -55,15 +55,15 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 	[Header("Trigger Parent")]
 	private TriggerParent[] triggerParents;
 
-	[Header("Sliding Components")]
 	[SerializeField]
+	[Header("Sliding Components")]
 	private VehicleModuleSlidingComponent[] slidingComponents;
 
 	[SerializeField]
 	private VehicleModuleButtonComponent[] buttonComponents;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private DamageRenderer damageRenderer;
 
 	private TimeSince TimeSinceAddedToVehicle;
@@ -310,7 +310,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 		base.PreProcess(process, rootObj, name, serverside, clientside, bundling);
 		damageRenderer = GetComponent<DamageRenderer>();
 		RefreshParameters();
-		lights = GetComponentsInChildren<ModularVehicleLight>();
+		lights = GetComponentsInChildren<VehicleLight>();
 	}
 
 	public void RefreshParameters()
@@ -377,7 +377,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 		RefreshConditionals(false);
 	}
 
-	public virtual void OnEngineStateChanged(ModularCar.EngineState oldState, ModularCar.EngineState newState)
+	public virtual void OnEngineStateChanged(VehicleEngineController.EngineState oldState, VehicleEngineController.EngineState newState)
 	{
 	}
 

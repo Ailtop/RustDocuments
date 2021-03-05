@@ -7,7 +7,7 @@ public class PathInterpolator
 
 	public Vector3[] Tangents;
 
-	private bool initialized;
+	protected bool initialized;
 
 	public int MinIndex
 	{
@@ -21,13 +21,13 @@ public class PathInterpolator
 		set;
 	}
 
-	public float Length
+	public virtual float Length
 	{
 		get;
 		private set;
 	}
 
-	public float StepSize
+	public virtual float StepSize
 	{
 		get;
 		private set;
@@ -59,6 +59,18 @@ public class PathInterpolator
 		Circular = Vector3.Distance(points[0], points[points.Length - 1]) < 0.1f;
 	}
 
+	public PathInterpolator(Vector3[] points, Vector3[] tangents)
+		: this(points)
+	{
+		if (tangents.Length != points.Length)
+		{
+			throw new ArgumentException("Points and tangents lengths must match. Points: " + points.Length + " Tangents: " + tangents.Length);
+		}
+		Tangents = tangents;
+		RecalculateLength();
+		initialized = true;
+	}
+
 	public void RecalculateTangents()
 	{
 		if (Tangents == null || Tangents.Length != Points.Length)
@@ -85,7 +97,7 @@ public class PathInterpolator
 		initialized = true;
 	}
 
-	private void RecalculateLength()
+	protected virtual void RecalculateLength()
 	{
 		float num = 0f;
 		for (int i = 0; i < Points.Length - 1; i++)
@@ -205,7 +217,7 @@ public class PathInterpolator
 		return Vector3.Lerp(a, b, t);
 	}
 
-	public Vector3 GetTangent(float distance)
+	public virtual Vector3 GetTangent(float distance)
 	{
 		if (!initialized)
 		{
@@ -227,11 +239,15 @@ public class PathInterpolator
 		return Vector3.Slerp(a, b, t);
 	}
 
-	public Vector3 GetPointCubicHermite(float distance)
+	public virtual Vector3 GetPointCubicHermite(float distance)
 	{
 		if (!initialized)
 		{
 			throw new Exception("Tangents have not been calculated yet or are outdated.");
+		}
+		if (Length == 0f)
+		{
+			return GetStartPoint();
 		}
 		float num = distance / Length * (float)(Points.Length - 1);
 		int num2 = (int)num;

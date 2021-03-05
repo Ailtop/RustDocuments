@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Automated Events", "k1lly0u/mspeedie/Arainrr", "1.0.9")]
+    [Info("Automated Events", "k1lly0u/mspeedie/Arainrr", "1.0.10")]
     internal class AutomatedEvents : RustPlugin
     {
         #region Fields
@@ -31,9 +31,9 @@ namespace Oxide.Plugins
         private const string PREFAB_CHRISTMAS = "assets/prefabs/misc/xmas/xmasrefill.prefab";
 
         private static AutomatedEvents instance;
-        private Dictionary<EventType, BaseEntity> eventEntities;
+        private Dictionary<BaseEntity, EventType> eventEntities;
         private readonly Dictionary<EventType, Timer> eventTimers = new Dictionary<EventType, Timer>();
-        private Dictionary<EventSchedule, EventType> disabledVanillaEvents = new Dictionary<EventSchedule, EventType>();
+        private readonly Dictionary<EventSchedule, EventType> disabledVanillaEvents = new Dictionary<EventSchedule, EventType>();
 
         private readonly Dictionary<string, EventType> eventSchedulePrefabShortNames = new Dictionary<string, EventType>
         {
@@ -67,15 +67,17 @@ namespace Oxide.Plugins
         private void Init()
         {
             instance = this;
+            LoadDefaultMessages();
             permission.RegisterPermission(PERMISSION_USE, this);
             permission.RegisterPermission(PERMISSION_NEXT, this);
             AddCovalenceCommand(configData.chatS.nextEventCommand, nameof(CmdNextEvent));
             AddCovalenceCommand(configData.chatS.runEventCommand, nameof(CmdRunEvent));
             AddCovalenceCommand(configData.chatS.killEventCommand, nameof(CmdKillEvent));
 
-            var eventTypes = new List<EventType>(Enum.GetValues(typeof(EventType)).Cast<EventType>().Where(x => x != EventType.None));
+            var eventTypes = new List<EventType>(Enum.GetValues(typeof(EventType)).Cast<EventType>());
             if (!eventTypes.Any(x =>
             {
+                if (x == EventType.None) return false;
                 var baseEventS = GetBaseEventS(x);
                 return baseEventS.enabled && baseEventS.restartTimerOnKill;
             }))
@@ -84,7 +86,7 @@ namespace Oxide.Plugins
             }
             else
             {
-                eventEntities = new Dictionary<EventType, BaseEntity>();
+                eventEntities = new Dictionary<BaseEntity, EventType>();
             }
         }
 
@@ -148,48 +150,41 @@ namespace Oxide.Plugins
                 }
             }
 
-            if (disabledVanillaEvents != null)
+            foreach (var entry in disabledVanillaEvents)
             {
-                foreach (var entry in disabledVanillaEvents)
-                {
-                    entry.Key.enabled = true;
-                    Puts($"The vanilla {entry.Value} event is enabled");
-                }
+                entry.Key.enabled = true;
+                Puts($"The vanilla {entry.Value} event is enabled");
             }
-
             foreach (var value in eventTimers.Values)
             {
                 value?.Destroy();
             }
-
             instance = null;
         }
 
         private void OnEntityKill(BaseEntity entity)
         {
             if (entity == null) return;
-            if (!eventEntities.ContainsValue(entity)) return;
-            var eventType = GetEventTypeFromEntity(entity);
-            if (eventType == EventType.None) return;
-            StartEventTimer(eventType);
+            EventType eventType;
+            if (!eventEntities.TryGetValue(entity, out eventType)) return;
+            StartEventTimer(eventType, onKill: true);
         }
 
         private object OnEventTrigger(TriggeredEventPrefab eventPrefab)
         {
             if (eventPrefab == null) return null;
-            EventType eventType;
             var prefabShortName = GetPrefabShortName(eventPrefab.name);
             if (string.IsNullOrEmpty(prefabShortName))
             {
                 PrintError($"Failed to get prefab short name ({eventPrefab.name}). Please notify the plugin developer");
                 return null;
             }
+            EventType eventType;
             if (eventSchedulePrefabShortNames.TryGetValue(prefabShortName, out eventType))
             {
                 var baseEventS = GetBaseEventS(eventType);
                 if (baseEventS.disableVanillaEvent)
                 {
-                    PrintWarning($"The vanilla {eventType} event is disabled");
                     var eventSchedule = eventPrefab.GetComponent<EventSchedule>();
                     if (eventSchedule == null)
                     {
@@ -198,6 +193,7 @@ namespace Oxide.Plugins
                     }
                     eventSchedule.enabled = false;
                     disabledVanillaEvents.Add(eventSchedule, eventType);
+                    PrintWarning($"The vanilla {eventType} event is disabled");
                     return false;
                 }
                 if (!baseEventS.enabled) return null;
@@ -208,42 +204,61 @@ namespace Oxide.Plugins
                         {
                             return false;
                         }
-                        return null;
+                        break;
 
                     case EventType.CargoShip:
                         if (!CanRunEvent<CargoShip>(eventType, baseEventS))
                         {
                             return false;
                         }
-                        return null;
+                        break;
 
                     case EventType.Chinook:
                         if (!CanRunEvent<CH47HelicopterAIController>(eventType, baseEventS))
                         {
                             return false;
                         }
-                        return null;
+                        break;
 
                     case EventType.Helicopter:
                         if (!CanRunEvent<BaseHelicopter>(eventType, baseEventS))
                         {
                             return false;
                         }
-                        return null;
+                        break;
 
                     case EventType.Christmas:
                         if (!CanRunEvent<XMasRefill>(eventType, baseEventS))
                         {
                             return false;
                         }
-                        return null;
+                        break;
 
                     case EventType.Easter:
+                        if (!CanRunHuntEvent<EggHuntEvent>(eventType, baseEventS))
+                        {
+                            return false;
+                        }
+                        break;
+
                     case EventType.Halloween:
+                        if (!CanRunHuntEvent<HalloweenHunt>(eventType, baseEventS))
+                        {
+                            return false;
+                        }
+                        break;
+
+                    default:
+                        PrintError($"The vanilla {eventType} event was triggered, but not handled. Please notify the plugin developer");
                         return null;
                 }
+                if (configData.globalS.announceEventTriggered)
+                {
+                    SendEventTriggeredMessage(eventType.ToString());
+                }
+                return null;
             }
-            else PrintError($"Unknown Event Schedule: {eventPrefab.name}");
+            PrintError($"Unknown Vanilla Event Schedule: {eventPrefab.name} ({prefabShortName})");
             return null;
         }
 
@@ -280,25 +295,21 @@ namespace Oxide.Plugins
             }
         }
 
-        private void StartEventTimer(EventType eventType, bool announce = true, float time = 0f)
+        private void StartEventTimer(EventType eventType, bool announce = true, float timeOverride = 0f, bool onKill = false)
         {
-            if (eventType == EventType.None)
-            {
-                return;
-            }
-
+            if (eventType == EventType.None) return;
             var baseEventS = GetBaseEventS(eventType);
             if (!baseEventS.enabled)
             {
                 Puts($"Unable to running {eventType} event, because the event is disabled");
                 return;
             }
-            var randomTime = time <= 0f
-                 ? baseEventS.minimumTimeBetween <= baseEventS.maximumTimeBetween
-                     ? UnityEngine.Random.Range(baseEventS.minimumTimeBetween, baseEventS.maximumTimeBetween)
-                     : UnityEngine.Random.Range(baseEventS.maximumTimeBetween, baseEventS.minimumTimeBetween)
-                 : time;
-
+            var randomTime = timeOverride <= 0f
+                ? baseEventS.minimumTimeBetween <= baseEventS.maximumTimeBetween
+                    ? UnityEngine.Random.Range(baseEventS.minimumTimeBetween, baseEventS.maximumTimeBetween)
+                    : UnityEngine.Random.Range(baseEventS.maximumTimeBetween, baseEventS.minimumTimeBetween)
+                : timeOverride;
+            randomTime += baseEventS.startOffset;
             var nextDateTime = DateTime.UtcNow.AddMinutes(randomTime);
             baseEventS.nextRunTime = Facepunch.Math.Epoch.FromDateTime(nextDateTime);
 
@@ -307,23 +318,22 @@ namespace Oxide.Plugins
             {
                 value?.Destroy();
             }
-
             eventTimers[eventType] = timer.Once(randomTime * 60f, () => RunEvent(eventType));
-            var timeLeft = TimeSpan.FromSeconds(baseEventS.nextRunTime - Facepunch.Math.Epoch.Current).ToShortString();
-            Puts($"Next {eventType} event will be ran after {timeLeft}");
-            if (announce && baseEventS.announceNext)
+
+            if (onKill || !baseEventS.restartTimerOnKill)
             {
-                SendMessageToPlayers(eventType, timeLeft);
+                var timeLeft = TimeSpan.FromSeconds(baseEventS.nextRunTime - Facepunch.Math.Epoch.Current).ToShortString();
+                Puts($"Next {eventType} event will be ran after {timeLeft}");
+                if (announce && baseEventS.announceNext)
+                {
+                    SendEventNextRunMessage(eventType, timeLeft);
+                }
             }
         }
 
         private void RunEvent(EventType eventType, bool runOnce = false, bool bypass = false)
         {
-            if (eventType == EventType.None)
-            {
-                return;
-            }
-
+            if (eventType == EventType.None) return;
             BaseEntity eventEntity = null;
             string eventTypeStr = null;
             var baseEventS = GetBaseEventS(eventType);
@@ -354,7 +364,6 @@ namespace Oxide.Plugins
                             bradley.transform.position = position;
                             bradley.DoAI = true;
                             bradley.InstallPatrolPath(bradleySpawner.path);
-                            //bradleySpawner.CancelInvoke(nameof(bradleySpawner.CheckIfRespawnNeeded));
                         }
                     }
                     break;
@@ -567,10 +576,10 @@ namespace Oxide.Plugins
                                         return;
                                     }
 
-                                    bool flag = ConVar.XMas.enabled;
-                                    if (!flag) ConVar.XMas.enabled = true;
+                                    bool temp = ConVar.XMas.enabled;
+                                    ConVar.XMas.enabled = true;
                                     xMasRefill.Spawn();
-                                    xMasRefill.Invoke(() => ConVar.XMas.enabled = flag, 0.5f);
+                                    ConVar.XMas.enabled = temp;
                                     eventEntity = xMasRefill;
                                     eventTypeStr = eventType.ToString();
                                     break;
@@ -587,55 +596,63 @@ namespace Oxide.Plugins
 
                 case EventType.Easter:
                     {
-                        if (EggHuntEvent.serverEvent != null)//EggHuntEvent.serverEvent.IsEventActive()
+                        if (bypass || CanRunHuntEvent<EggHuntEvent>(eventType, baseEventS, false))
                         {
-                            var timeLeft = EggHuntEvent.durationSeconds - EggHuntEvent.serverEvent.timeAlive + EggHuntEvent.serverEvent.warmupTime + 60f;
-                            PrintWarning($"There is an {(EggHuntEvent.serverEvent.ShortPrefabName == "egghunt" ? eventType : EventType.Halloween)} event running, so the {eventType} event will be delayed until {Mathf.RoundToInt(timeLeft)} seconds later");
-                            if (!runOnce)
+                            if (EggHuntEvent.serverEvent != null) //EggHuntEvent.serverEvent.IsEventActive()
                             {
-                                StartEventTimer(eventType, true, timeLeft / 60f);
+                                var timeLeft = EggHuntEvent.durationSeconds - EggHuntEvent.serverEvent.timeAlive + EggHuntEvent.serverEvent.warmupTime + 60f;
+                                PrintWarning($"There is an {(EggHuntEvent.serverEvent.ShortPrefabName == "egghunt" ? eventType : EventType.Halloween)} event running, so the {eventType} event will be delayed until {Mathf.RoundToInt(timeLeft)} seconds later");
+                                if (!runOnce)
+                                {
+                                    StartEventTimer(eventType, timeOverride: timeLeft / 60f);
+                                }
+
+                                return;
                             }
-                            return;
-                        }
 
-                        Puts("Happy Easter Egg Hunt is occurring");
-                        var eggHuntEvent = GameManager.server.CreateEntity(PREFAB_EASTER) as EggHuntEvent;
-                        if (eggHuntEvent == null)
-                        {
-                            PrintError($"{eventType} prefab does not exist. Please notify the plugin developer");
-                            return;
-                        }
+                            Puts("Happy Easter Egg Hunt is occurring");
+                            var eggHuntEvent = GameManager.server.CreateEntity(PREFAB_EASTER) as EggHuntEvent;
+                            if (eggHuntEvent == null)
+                            {
+                                PrintError($"{eventType} prefab does not exist. Please notify the plugin developer");
+                                return;
+                            }
 
-                        eggHuntEvent.Spawn();
-                        eventEntity = eggHuntEvent;
-                        eventTypeStr = eventType.ToString();
+                            eggHuntEvent.Spawn();
+                            eventEntity = eggHuntEvent;
+                            eventTypeStr = eventType.ToString();
+                        }
                     }
                     break;
 
                 case EventType.Halloween:
                     {
-                        if (EggHuntEvent.serverEvent != null)//EggHuntEvent.serverEvent.IsEventActive()
+                        if (bypass || CanRunHuntEvent<HalloweenHunt>(eventType, baseEventS, false))
                         {
-                            var timeLeft = EggHuntEvent.durationSeconds - EggHuntEvent.serverEvent.timeAlive + EggHuntEvent.serverEvent.warmupTime + 60f;
-                            PrintWarning($"There is an {(EggHuntEvent.serverEvent.ShortPrefabName == "egghunt" ? EventType.Easter : eventType)} event running, so the {eventType} event will be delayed until {Mathf.RoundToInt(timeLeft)} seconds later");
-                            if (!runOnce)
+                            if (EggHuntEvent.serverEvent != null) //EggHuntEvent.serverEvent.IsEventActive()
                             {
-                                StartEventTimer(eventType, true, timeLeft / 60f);
+                                var timeLeft = EggHuntEvent.durationSeconds - EggHuntEvent.serverEvent.timeAlive + EggHuntEvent.serverEvent.warmupTime + 60f;
+                                PrintWarning($"There is an {(EggHuntEvent.serverEvent.ShortPrefabName == "egghunt" ? EventType.Easter : eventType)} event running, so the {eventType} event will be delayed until {Mathf.RoundToInt(timeLeft)} seconds later");
+                                if (!runOnce)
+                                {
+                                    StartEventTimer(eventType, timeOverride: timeLeft / 60f);
+                                }
+
+                                return;
                             }
-                            return;
-                        }
 
-                        Puts("Spooky Halloween Hunt is occurring");
-                        var halloweenHunt = GameManager.server.CreateEntity(PREFAB_HALLOWEEN) as HalloweenHunt;
-                        if (halloweenHunt == null)
-                        {
-                            PrintError($"{eventType} prefab does not exist. Please notify the plugin developer");
-                            return;
-                        }
+                            Puts("Spooky Halloween Hunt is occurring");
+                            var halloweenHunt = GameManager.server.CreateEntity(PREFAB_HALLOWEEN) as HalloweenHunt;
+                            if (halloweenHunt == null)
+                            {
+                                PrintError($"{eventType} prefab does not exist. Please notify the plugin developer");
+                                return;
+                            }
 
-                        halloweenHunt.Spawn();
-                        eventEntity = halloweenHunt;
-                        eventTypeStr = eventType.ToString();
+                            halloweenHunt.Spawn();
+                            eventEntity = halloweenHunt;
+                            eventTypeStr = eventType.ToString();
+                        }
                     }
                     break;
 
@@ -646,10 +663,21 @@ namespace Oxide.Plugins
 
             if (eventEntity != null && baseEventS.enabled && baseEventS.restartTimerOnKill)
             {
-                eventEntities[eventType] = eventEntity;
+                foreach (var entry in eventEntities.ToArray())
+                {
+                    if (entry.Value == eventType)
+                    {
+                        eventEntities.Remove(entry.Key);
+                    }
+                }
+                eventEntities.Add(eventEntity, eventType);
             }
             if (!string.IsNullOrEmpty(eventTypeStr))
             {
+                if (configData.globalS.announceEventTriggered)
+                {
+                    SendEventTriggeredMessage(eventTypeStr);
+                }
                 Interface.CallHook("OnAutoEventTriggered", eventTypeStr, eventEntity, runOnce);
             }
             if (!runOnce)
@@ -778,7 +806,7 @@ namespace Oxide.Plugins
             return baseEventS.displayName;
         }
 
-        private void SendMessageToPlayers(EventType eventType, string timeLeft)
+        private void SendEventNextRunMessage(EventType eventType, string timeLeft)
         {
             if (configData.globalS.useGUIAnnouncements && GUIAnnouncements != null)
             {
@@ -792,6 +820,32 @@ namespace Oxide.Plugins
                 foreach (var player in BasePlayer.activePlayerList)
                 {
                     Print(player, Lang("NextRunTime", player.UserIDString, GetEventTypeDisplayName(eventType), timeLeft));
+                }
+            }
+        }
+
+        private void SendEventTriggeredMessage(string eventTypeStr)
+        {
+            if (configData.globalS.useGUIAnnouncements && GUIAnnouncements != null)
+            {
+                foreach (var player in BasePlayer.activePlayerList)
+                {
+                    var message = Lang(eventTypeStr, player.UserIDString);
+                    if (!string.IsNullOrWhiteSpace(message))
+                    {
+                        GUIAnnouncements.Call("CreateAnnouncement", message, "Purple", "White", player);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var player in BasePlayer.activePlayerList)
+                {
+                    var message = Lang(eventTypeStr, player.UserIDString);
+                    if (!string.IsNullOrWhiteSpace(message))
+                    {
+                        Print(player, message);
+                    }
                 }
             }
         }
@@ -869,8 +923,8 @@ namespace Oxide.Plugins
                 Print(iPlayer, Lang("UnknownEvent", iPlayer.Id, args[0]));
                 return;
             }
-            Print(iPlayer, Lang("Running", iPlayer.Id, iPlayer.Name, GetEventTypeDisplayName(eventType)));
             RunEvent(eventType, true, true);
+            Print(iPlayer, Lang("Running", iPlayer.Id, iPlayer.Name, GetEventTypeDisplayName(eventType)));
         }
 
         private void CmdKillEvent(IPlayer iPlayer, string command, string[] args)
@@ -892,8 +946,8 @@ namespace Oxide.Plugins
                 Print(iPlayer, Lang("UnknownEvent", iPlayer.Id, args[0]));
                 return;
             }
-            Print(iPlayer, Lang("Removing", iPlayer.Id, iPlayer.Name, GetEventTypeDisplayName(eventType)));
             KillEvent(eventType);
+            Print(iPlayer, Lang("Removing", iPlayer.Id, iPlayer.Name, GetEventTypeDisplayName(eventType)));
         }
 
         #endregion Commands
@@ -935,8 +989,8 @@ namespace Oxide.Plugins
             if (baseEntity is XMasRefill) return EventType.Christmas;
             if (baseEntity is HalloweenHunt) return EventType.Halloween;
             if (baseEntity is EggHuntEvent) return EventType.Easter;
-            var controller = baseEntity as CH47HelicopterAIController;
-            if (controller != null && controller.landingTarget == Vector3.zero) return EventType.Chinook;
+            var ch47HelicopterAiController = baseEntity as CH47HelicopterAIController;
+            if (ch47HelicopterAiController != null && ch47HelicopterAiController.landingTarget == Vector3.zero) return EventType.Chinook;
             return EventType.None;
         }
 
@@ -971,6 +1025,11 @@ namespace Oxide.Plugins
 
         private static bool CanRunEvent<T>(EventType eventType, BaseEventS baseEventS, bool vanilla = true, Func<T, bool> filter = null) where T : BaseEntity
         {
+            return CheckOnlinePlayers(eventType, baseEventS, vanilla) && CanRunCoexistEvent(eventType, baseEventS, vanilla, filter);
+        }
+
+        private static bool CheckOnlinePlayers(EventType eventType, BaseEventS baseEventS, bool vanilla = true)
+        {
             var onlinePlayers = BasePlayer.activePlayerList.Count;
             if (baseEventS.minimumOnlinePlayers > 0 && onlinePlayers < baseEventS.minimumOnlinePlayers)
             {
@@ -982,9 +1041,13 @@ namespace Oxide.Plugins
                 instance?.PrintWarning($"The online players is greater than {baseEventS.maximumOnlinePlayers}, so the {eventType} {(vanilla ? "vanilla" : "auto")} event cannot run");
                 return false;
             }
+            return true;
+        }
 
+        private static bool CanRunCoexistEvent<T>(EventType eventType, BaseEventS baseEventS, bool vanilla = true, Func<T, bool> filter = null) where T : BaseEntity
+        {
             var coexistEventS = baseEventS as CoexistEventS;
-            if (coexistEventS != null)
+            if (coexistEventS != null && coexistEventS.serverMaximumNumber > 0)
             {
                 if (BaseNetworkable.serverEntities.Count(x =>
                 {
@@ -998,6 +1061,12 @@ namespace Oxide.Plugins
                     return false;
                 }
             }
+            return true;
+        }
+
+        private static bool CanRunHuntEvent<T>(EventType eventType, BaseEventS baseEventS, bool vanilla = true) where T : EggHuntEvent
+        {
+            if (!CheckOnlinePlayers(eventType, baseEventS, vanilla)) return false;
             return true;
         }
 
@@ -1016,6 +1085,9 @@ namespace Oxide.Plugins
             {
                 [JsonProperty(PropertyName = "Announce On Plugin Loaded")]
                 public bool announceOnLoaded;
+
+                [JsonProperty(PropertyName = "Announce On Event Triggered")]
+                public bool announceEventTriggered;
 
                 [JsonProperty(PropertyName = "Use GUIAnnouncements Plugin")]
                 public bool useGUIAnnouncements;
@@ -1135,25 +1207,28 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Disable Vanilla Event", Order = 3)]
             public bool disableVanillaEvent;
 
-            [JsonProperty(PropertyName = "Minimum Time Between (Minutes)", Order = 4)]
+            [JsonProperty(PropertyName = "Event Start Offset (Minutes)", Order = 4)]
+            public float startOffset;
+
+            [JsonProperty(PropertyName = "Minimum Time Between (Minutes)", Order = 5)]
             public float minimumTimeBetween;
 
-            [JsonProperty(PropertyName = "Maximum Time Between (Minutes)", Order = 5)]
+            [JsonProperty(PropertyName = "Maximum Time Between (Minutes)", Order = 6)]
             public float maximumTimeBetween;
 
-            [JsonProperty(PropertyName = "Minimum Online Players Required (0 = Disabled)", Order = 6)]
+            [JsonProperty(PropertyName = "Minimum Online Players Required (0 = Disabled)", Order = 7)]
             public int minimumOnlinePlayers = 0;
 
-            [JsonProperty(PropertyName = "Maximum Online Players Required (0 = Disabled)", Order = 7)]
+            [JsonProperty(PropertyName = "Maximum Online Players Required (0 = Disabled)", Order = 8)]
             public int maximumOnlinePlayers = 0;
 
-            [JsonProperty(PropertyName = "Announce Next Run Time", Order = 8)]
+            [JsonProperty(PropertyName = "Announce Next Run Time", Order = 9)]
             public bool announceNext;
 
-            [JsonProperty(PropertyName = "Restart Timer On Entity Kill", Order = 9)]
+            [JsonProperty(PropertyName = "Restart Timer On Entity Kill", Order = 10)]
             public bool restartTimerOnKill = true;
 
-            [JsonProperty(PropertyName = "Kill Existing Event On Plugin Loaded", Order = 10)]
+            [JsonProperty(PropertyName = "Kill Existing Event On Plugin Loaded", Order = 11)]
             public bool killEventOnLoaded;
 
             [JsonIgnore] public double nextRunTime;
@@ -1161,10 +1236,10 @@ namespace Oxide.Plugins
 
         private class CoexistEventS : BaseEventS
         {
-            [JsonProperty(PropertyName = "Maximum Number On Server", Order = 11)]
+            [JsonProperty(PropertyName = "Maximum Number On Server", Order = 19)]
             public int serverMaximumNumber = 1;
 
-            [JsonProperty(PropertyName = "Exclude Player's Entity", Order = 12)]
+            [JsonProperty(PropertyName = "Exclude Player's Entity", Order = 20)]
             public bool excludePlayerEntity = true;
         }
 
@@ -1219,9 +1294,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -1269,6 +1344,22 @@ namespace Oxide.Plugins
                 ["NextRunTime"] = "Next '{0}' event will be ran after {1}",
                 ["Running"] = "'{0}' attempting to run automated event: {1}",
                 ["Removing"] = "'{0}' attempting to remove any current running event: {1}",
+
+                ["Bradley"] = "Bradley event has been triggered",
+                ["CargoPlane"] = "CargoPlane event has been triggered",
+                ["FancyDrop"] = "FancyDrop event has been triggered",
+                ["PlaneCrash"] = "PlaneCrash event has been triggered",
+                ["CargoShip"] = "CargoShip event has been triggered",
+                ["RustTanic"] = "RustTanic event has been triggered",
+                ["Chinook"] = "Chinook event has been triggered",
+                ["Helicopter"] = "Helicopter event has been triggered",
+                ["PilotEject"] = "PilotEject event has been triggered",
+                ["HeliRefuel"] = "HeliRefuel event has been triggered",
+                ["SantaSleigh"] = "SantaSleigh event has been triggered",
+                ["Christmas"] = "Christmas event has been triggered",
+                ["AlphaChristmas"] = "AlphaChristmas event has been triggered",
+                ["Easter"] = "Easter event has been triggered",
+                ["Halloween"] = "Halloween event has been triggered",
             }, this);
             lang.RegisterMessages(new Dictionary<string, string>
             {
@@ -1279,6 +1370,22 @@ namespace Oxide.Plugins
                 ["NextRunTime"] = "下次 '{0}' 事件将在 {1} 后运行",
                 ["Running"] = "'{0}' 通过命令运行了 {1} 事件",
                 ["Removing"] = "'{0}' 通过命令删除了 {1} 事件",
+
+                ["Bradley"] = "坦克出来装逼了",
+                ["CargoPlane"] = "货机事件触发了",
+                ["FancyDrop"] = "货机事件触发了",
+                ["PlaneCrash"] = "货机坠毁事件触发了",
+                ["CargoShip"] = "货船事件触发了",
+                ["RustTanic"] = "冰山货船事件触发了",
+                ["Chinook"] = "双螺旋飞机来咯",
+                ["Helicopter"] = "武直出来装逼了",
+                ["PilotEject"] = "武直驾驶员弹出事件触发了",
+                ["HeliRefuel"] = "武直加油事件触发了",
+                ["SantaSleigh"] = "圣诞老人骑着它的雪橇来送礼物咯",
+                ["Christmas"] = "圣诞节事件触发了，快点去看看您那臭袜子",
+                ["AlphaChristmas"] = "圣诞节事件触发了，快点去看看您那臭袜子",
+                ["Easter"] = "复活节事件触发了，快点去捡彩蛋啊",
+                ["Halloween"] = "万圣节事件触发了，快点去捡糖果吧",
             }, this, "zh-CN");
         }
 

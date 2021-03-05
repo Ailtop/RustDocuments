@@ -15,6 +15,12 @@ public class TerrainPath : TerrainExtension
 
 	public List<LakeInfo> LakeObjs = new List<LakeInfo>();
 
+	internal List<DungeonInfo> DungeonEntrances = new List<DungeonInfo>();
+
+	internal List<DungeonCell> DungeonCells = new List<DungeonCell>();
+
+	internal GameObject DungeonRoot;
+
 	public List<Vector3> OceanPatrolClose = new List<Vector3>();
 
 	public List<Vector3> OceanPatrolFar = new List<Vector3>();
@@ -47,6 +53,22 @@ public class TerrainPath : TerrainExtension
 		Powerlines.Clear();
 	}
 
+	public T FindClosest<T>(List<T> list, Vector3 pos) where T : MonoBehaviour
+	{
+		T result = null;
+		float num = float.MaxValue;
+		foreach (T item in list)
+		{
+			float num2 = Vector3Ex.Distance2D(item.transform.position, pos);
+			if (!(num2 >= num))
+			{
+				result = item;
+				num = num2;
+			}
+		}
+		return result;
+	}
+
 	public static int[,] CreatePowerlineCostmap(ref uint seed)
 	{
 		float radius = 5f;
@@ -67,19 +89,19 @@ public class TerrainPath : TerrainExtension
 				int num4 = 512;
 				if ((topology & num2) != 0)
 				{
-					array[i, j] = int.MaxValue;
+					array[j, i] = int.MaxValue;
 				}
 				else if ((topology & num3) != 0)
 				{
-					array[i, j] = 2500;
+					array[j, i] = 2500;
 				}
 				else if ((topology & num4) != 0)
 				{
-					array[i, j] = 1000;
+					array[j, i] = 1000;
 				}
 				else
 				{
-					array[i, j] = 1 + (int)(slope * slope * 10f);
+					array[j, i] = 1 + (int)(slope * slope * 10f);
 				}
 			}
 		}
@@ -106,15 +128,15 @@ public class TerrainPath : TerrainExtension
 				int num4 = 49152;
 				if (slope > 20f || (topology & num3) != 0)
 				{
-					array[i, j] = int.MaxValue;
+					array[j, i] = int.MaxValue;
 				}
 				else if ((topology & num4) != 0)
 				{
-					array[i, j] = 2500;
+					array[j, i] = 2500;
 				}
 				else
 				{
-					array[i, j] = 1 + (int)(slope * slope * 10f) + num2;
+					array[j, i] = 1 + (int)(slope * slope * 10f) + num2;
 				}
 			}
 		}

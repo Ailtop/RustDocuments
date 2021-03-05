@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -99,7 +100,7 @@ namespace Oxide.Plugins
             if (configData.usePermission && !permission.UserHasPermission(player.UserIDString, PERMISSION_USE)) return;
 
             var playerData = GetPlayerData(player.userID, true);
-            if (!playerData.doorS.enabled) return;
+            if (!playerData.doorData.enabled) return;
             float autoCloseTime;
             var doorID = door.net.ID;
             StoredData.DoorData doorData;
@@ -113,7 +114,7 @@ namespace Oxide.Plugins
                 if (!doorData.enabled) return;
                 autoCloseTime = doorData.time;
             }
-            else autoCloseTime = playerData.doorS.time;
+            else autoCloseTime = playerData.doorData.time;
 
             if (autoCloseTime <= 0) return;
             if (Interface.CallHook("OnDoorAutoClose", player, door) != null) return;
@@ -167,7 +168,7 @@ namespace Oxide.Plugins
             {
                 playerData = new StoredData.PlayerData
                 {
-                    doorS = new StoredData.DoorData
+                    doorData = new StoredData.DoorData
                     {
                         enabled = configData.globalS.defaultEnabled,
                         time = configData.globalS.defaultDelay,
@@ -233,8 +234,8 @@ namespace Oxide.Plugins
             var playerData = GetPlayerData(player.userID);
             if (args == null || args.Length == 0)
             {
-                playerData.doorS.enabled = !playerData.doorS.enabled;
-                Print(player, Lang("AutoDoor", player.UserIDString, playerData.doorS.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
+                playerData.doorData.enabled = !playerData.doorData.enabled;
+                Print(player, Lang("AutoDoor", player.UserIDString, playerData.doorData.enabled ? Lang("Enabled", player.UserIDString) : Lang("Disabled", player.UserIDString)));
                 return;
             }
             float time;
@@ -242,8 +243,8 @@ namespace Oxide.Plugins
             {
                 if (time <= configData.globalS.maximumDelay && time >= configData.globalS.minimumDelay)
                 {
-                    playerData.doorS.time = time;
-                    if (!playerData.doorS.enabled) playerData.doorS.enabled = true;
+                    playerData.doorData.time = time;
+                    if (!playerData.doorData.enabled) playerData.doorData.enabled = true;
                     Print(player, Lang("AutoDoorDelay", player.UserIDString, time));
                     return;
                 }
@@ -261,7 +262,7 @@ namespace Oxide.Plugins
                             {
                                 if (time <= configData.globalS.maximumDelay && time >= configData.globalS.minimumDelay)
                                 {
-                                    playerData.doorS.time = time;
+                                    playerData.doorData.time = time;
                                     playerData.doorTypeS.Clear();
                                     playerData.theDoorS.Clear();
                                     Print(player, Lang("AutoDoorDelayAll", player.UserIDString, time));
@@ -475,7 +476,7 @@ namespace Oxide.Plugins
             }
 
             [JsonProperty(PropertyName = "Version")]
-            public VersionNumber version = new VersionNumber(3, 2, 6);
+            public VersionNumber version;
         }
 
         protected override void LoadConfig()
@@ -493,9 +494,9 @@ namespace Oxide.Plugins
                     UpdateConfigValues();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -505,6 +506,7 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
@@ -513,15 +515,28 @@ namespace Oxide.Plugins
         {
             if (configData.version < Version)
             {
-                if (configData.version <= new VersionNumber(3, 2, 6))
+                if (configData.version <= default(VersionNumber))
                 {
-                    if (configData.chatS.prefix == "[AutoDoors]: ")
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
                     {
-                        configData.chatS.prefix = "<color=#00FFFF>[AutoDoors]</color>: ";
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
                     }
                 }
                 configData.version = Version;
             }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
         }
 
         #endregion ConfigurationFile
@@ -536,7 +551,7 @@ namespace Oxide.Plugins
 
             public class PlayerData
             {
-                public DoorData doorS = new DoorData();
+                public DoorData doorData = new DoorData();
                 public readonly Dictionary<uint, DoorData> theDoorS = new Dictionary<uint, DoorData>();
                 public readonly Dictionary<string, DoorData> doorTypeS = new Dictionary<string, DoorData>();
             }

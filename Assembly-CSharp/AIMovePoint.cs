@@ -2,6 +2,17 @@ using UnityEngine;
 
 public class AIMovePoint : MonoBehaviour
 {
+	public class DistTo
+	{
+		public float distance;
+
+		public AIMovePoint target;
+	}
+
+	public ListDictionary<AIMovePoint, float> distances = new ListDictionary<AIMovePoint, float>();
+
+	public ListDictionary<AICoverPoint, float> distancesToCover = new ListDictionary<AICoverPoint, float>();
+
 	public float radius = 1f;
 
 	public float nextAvailableRoamTime;
@@ -22,7 +33,7 @@ public class AIMovePoint : MonoBehaviour
 		{
 			return true;
 		}
-		return IsUsed();
+		return !IsUsed();
 	}
 
 	public bool IsUsed()

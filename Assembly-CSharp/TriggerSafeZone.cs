@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class TriggerSafeZone : TriggerBase
 {
+	public float maxDepth = 20f;
+
+	public float maxAltitude = -1f;
+
 	internal override GameObject InterestedInObject(GameObject obj)
 	{
 		obj = base.InterestedInObject(obj);
@@ -21,8 +25,27 @@ public class TriggerSafeZone : TriggerBase
 		return baseEntity.gameObject;
 	}
 
+	public bool PassesHeightChecks(Vector3 entPos)
+	{
+		Vector3 position = base.transform.position;
+		float num = Mathf.Abs(position.y - entPos.y);
+		if (maxDepth != -1f && entPos.y < position.y && num > maxDepth)
+		{
+			return false;
+		}
+		if (maxAltitude != -1f && entPos.y > position.y && num > maxAltitude)
+		{
+			return false;
+		}
+		return true;
+	}
+
 	public float GetSafeLevel(Vector3 pos)
 	{
+		if (!PassesHeightChecks(pos))
+		{
+			return 0f;
+		}
 		return 1f;
 	}
 }

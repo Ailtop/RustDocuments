@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Facepunch;
 using Newtonsoft.Json;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Back PumpJack", "Arainrr", "1.4.9")]
+    [Info("Back PumpJack", "Arainrr", "1.4.10")]
     [Description("Obtain oil crater using survey charge.")]
     internal class BackPumpJack : RustPlugin
     {
@@ -17,6 +18,7 @@ namespace Oxide.Plugins
         private readonly List<QuarryData> activeCraters = new List<QuarryData>();
         private readonly HashSet<SurveyCrater> checkedCraters = new HashSet<SurveyCrater>();
         private readonly Dictionary<uint, ConfigData.PermissionS> activeSurveyCharges = new Dictionary<uint, ConfigData.PermissionS>();
+        private readonly List<MiningQuarry> miningQuarries = new List<MiningQuarry>();
 
         #region Oxide Hooks
 
@@ -30,16 +32,25 @@ namespace Oxide.Plugins
                     permission.RegisterPermission(permissionS.permission, this);
                 }
             }
-            if (!configData.settings.cantDeploy) Unsubscribe(nameof(CanBuild));
-            if (!configData.settings.cantDamage) Unsubscribe(nameof(OnEntityTakeDamage));
+            Unsubscribe(nameof(CanBuild));
+            Unsubscribe(nameof(OnEntitySpawned));
+            Unsubscribe(nameof(OnEntityTakeDamage));
         }
 
-        private void OnServerInitialized()
+        private void OnServerInitialized(bool initial)
         {
-            List<MiningQuarry> miningQuarries = new List<MiningQuarry>();
-            foreach (var baseNetworkable in BaseNetworkable.serverEntities)
+            if (configData.settings.cantDeploy)
             {
-                var surveyCrater = baseNetworkable as SurveyCrater;
+                Subscribe(nameof(CanBuild));
+            }
+            if (configData.settings.cantDamage)
+            {
+                Subscribe(nameof(OnEntityTakeDamage));
+            }
+
+            foreach (var serverEntity in BaseNetworkable.serverEntities)
+            {
+                var surveyCrater = serverEntity as SurveyCrater;
                 if (surveyCrater != null)
                 {
                     if (!surveyCrater.OwnerID.IsSteamId()) continue;
@@ -49,17 +60,36 @@ namespace Oxide.Plugins
                     activeCraters.Add(new QuarryData { position = surveyCrater.transform.position, isLiquid = surveyCrater.ShortPrefabName == "survey_crater_oil", mineralItems = mineralItemDataList });
                     continue;
                 }
-
-                var miningQuarry = baseNetworkable as MiningQuarry;
+                var miningQuarry = serverEntity as MiningQuarry;
                 if (miningQuarry != null)
                 {
-                    if (miningQuarry.OwnerID.IsSteamId())
-                    {
-                        miningQuarries.Add(miningQuarry);
-                    }
+                    OnEntitySpawned(miningQuarry);
                 }
             }
-            CheckValidData(miningQuarries);
+
+            CheckValidData();
+            if (initial)
+            {
+                timer.Once(10f, () => RefillMiningQuarries());
+            }
+            else
+            {
+                RefillMiningQuarries();
+            }
+        }
+
+        private void OnServerSave() => timer.Once(UnityEngine.Random.Range(0f, 60f), () => RefillMiningQuarries());
+
+        private void OnEntitySpawned(MiningQuarry miningQuarry)
+        {
+            if (miningQuarry == null || !miningQuarry.OwnerID.IsSteamId()) return;
+            miningQuarries.Add(miningQuarry);
+        }
+
+        private void OnEntityKill(MiningQuarry miningQuarry)
+        {
+            if (miningQuarry == null || !miningQuarry.OwnerID.IsSteamId()) return;
+            miningQuarries.Remove(miningQuarry);
         }
 
         private void OnExplosiveThrown(BasePlayer player, SurveyCharge surveyCharge)
@@ -132,7 +162,24 @@ namespace Oxide.Plugins
 
         #region Methods
 
-        private void CheckValidData(List<MiningQuarry> miningQuarries)
+        private int RefillMiningQuarries()
+        {
+            int count = 0;
+            foreach (var miningQuarry in miningQuarries)
+            {
+                foreach (var quarryData in storedData.quarryDataList)
+                {
+                    if (Vector3.Distance(quarryData.position, miningQuarry.transform.position) < 2f)
+                    {
+                        count++;
+                        CreateResourceDeposit(miningQuarry, quarryData);
+                    }
+                }
+            }
+            return count;
+        }
+
+        private void CheckValidData()
         {
             if (miningQuarries.Count <= 0) return;
             foreach (var quarryData in storedData.quarryDataList.ToArray())
@@ -142,7 +189,6 @@ namespace Oxide.Plugins
                 {
                     if (Vector3.Distance(quarryData.position, miningQuarry.transform.position) < 2f)
                     {
-                        CreateResourceDeposit(miningQuarry, quarryData);
                         validData = true;
                         break;
                     }
@@ -151,18 +197,18 @@ namespace Oxide.Plugins
             }
             SaveData();
         }
- 
+
         private static void CreateResourceDeposit(MiningQuarry miningQuarry, QuarryData quarryData)
         {
             if (quarryData.isLiquid) miningQuarry.canExtractLiquid = true;
             else miningQuarry.canExtractSolid = true;
- 
+
             miningQuarry._linkedDeposit._resources.Clear();
             foreach (var mineralItem in quarryData.mineralItems)
             {
                 var itemDefinition = ItemManager.FindItemDefinition(mineralItem.shortname);
                 if (itemDefinition == null) continue;
-				miningQuarry._linkedDeposit.Add(itemDefinition, 1f, mineralItem.amount, mineralItem.workNeeded, ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM, quarryData.isLiquid);
+                miningQuarry._linkedDeposit.Add(itemDefinition, 1f, mineralItem.amount, mineralItem.workNeeded, ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM, quarryData.isLiquid);
             }
             miningQuarry.SendNetworkUpdateImmediate();
         }
@@ -173,7 +219,7 @@ namespace Oxide.Plugins
             int priority = 0;
             foreach (var p in configData.permissionList)
             {
-                if (permission.UserHasPermission(player.UserIDString, p.permission) && p.priority >= priority)
+                if (p.priority >= priority && permission.UserHasPermission(player.UserIDString, p.permission))
                 {
                     priority = p.priority;
                     permissionS = p;
@@ -252,9 +298,7 @@ namespace Oxide.Plugins
             });
         }
 
-        #endregion Methods
-
-        #region Helper
+        #region AreFriends
 
         private bool AreFriends(ulong playerID, ulong friendID)
         {
@@ -295,27 +339,16 @@ namespace Oxide.Plugins
             return (string)playerClan == (string)friendClan;
         }
 
-        #endregion Helper
+        #endregion AreFriends
+
+        #endregion Methods
 
         #region Commands
 
         [ConsoleCommand("backpumpjack.refill")]
         private void CCmdRefresh(ConsoleSystem.Arg arg)
         {
-            int count = 0;
-            foreach (var miningQuarry in BaseNetworkable.serverEntities.OfType<MiningQuarry>())
-            {
-                if (!miningQuarry.OwnerID.IsSteamId()) continue;
-                foreach (var quarryData in storedData.quarryDataList)
-                {
-                    if (Vector3.Distance(quarryData.position, miningQuarry.transform.position) < 2f)
-                    {
-                        count++;
-                        CreateResourceDeposit(miningQuarry, quarryData);
-                        break;
-                    }
-                }
-            }
+            var count = RefillMiningQuarries();
             SendReply(arg, $"Refreshed {count} quarry resources.");
         }
 
@@ -354,10 +387,7 @@ namespace Oxide.Plugins
             public class ChatSettings
             {
                 [JsonProperty(PropertyName = "Chat Prefix")]
-                public string prefix = "[BackPumpJack]: ";
-
-                [JsonProperty(PropertyName = "Chat Prefix Color")]
-                public string prefixColor = "#00FFFF";
+                public string prefix = "<color=#00FFFF>[BackPumpJack]</color>: ";
 
                 [JsonProperty(PropertyName = "Chat SteamID Icon")]
                 public ulong steamIDIcon = 0;
@@ -488,6 +518,9 @@ namespace Oxide.Plugins
                     }
                 }
             }
+
+            [JsonProperty(PropertyName = "Version")]
+            public VersionNumber version;
         }
 
         protected override void LoadConfig()
@@ -497,11 +530,17 @@ namespace Oxide.Plugins
             {
                 configData = Config.ReadObject<ConfigData>();
                 if (configData == null)
+                {
                     LoadDefaultConfig();
+                }
+                else
+                {
+                    UpdateConfigValues();
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -511,9 +550,38 @@ namespace Oxide.Plugins
         {
             PrintWarning("Creating a new configuration file");
             configData = new ConfigData();
+            configData.version = Version;
         }
 
         protected override void SaveConfig() => Config.WriteObject(configData);
+
+        private void UpdateConfigValues()
+        {
+            if (configData.version < Version)
+            {
+                if (configData.version <= default(VersionNumber))
+                {
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat Settings", "Chat Prefix") && GetConfigValue(out prefixColor, "Chat Settings", "Chat Prefix Color"))
+                    {
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
+                    }
+                }
+                configData.version = Version;
+            }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
+        }
 
         #endregion ConfigurationFile
 
@@ -575,7 +643,7 @@ namespace Oxide.Plugins
 
         private void Print(BasePlayer player, string message)
         {
-            Player.Message(player, message, string.IsNullOrEmpty(configData.chatS.prefix) ? string.Empty : $"<color={configData.chatS.prefixColor}>{configData.chatS.prefix}</color>", configData.chatS.steamIDIcon);
+            Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
         }
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);

@@ -3643,10 +3643,11 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public override void TickAi(float delta)
 	{
-		MovementUpdate(delta);
+		base.TickAi(delta);
+		UpdateModelState(delta);
 	}
 
-	public override void MovementUpdate(float delta)
+	public void UpdateModelState(float delta)
 	{
 		BaseMountable mounted = GetMounted();
 		modelState.mounted = mounted != null;
@@ -3660,7 +3661,6 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			StopMoving();
 			return;
 		}
-		base.MovementUpdate(delta);
 		if (base.isMounted)
 		{
 			timeAtDestination += delta;

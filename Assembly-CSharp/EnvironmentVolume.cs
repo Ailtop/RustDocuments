@@ -4,6 +4,7 @@ public class EnvironmentVolume : MonoBehaviour
 {
 	public bool StickyGizmos;
 
+	[InspectorFlags]
 	public EnvironmentType Type = EnvironmentType.Underground;
 
 	public Vector3 Center = Vector3.zero;

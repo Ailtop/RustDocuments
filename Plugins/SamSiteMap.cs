@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Sam Site Map", "Arainrr", "1.3.5")]
+    [Info("Sam Site Map", "Arainrr", "1.3.6")]
     [Description("Mark all samsites in the map")]
     internal class SamSiteMap : RustPlugin
     {
@@ -16,18 +17,25 @@ namespace Oxide.Plugins
 
         private void Init()
         {
-            Unsubscribe(nameof(OnEntitySpawned));
             permission.RegisterPermission(PERMISSION_USE, this);
-            if (!configData.usePermission) Unsubscribe(nameof(CanNetworkTo));
+
+            Unsubscribe(nameof(OnEntitySpawned));
+            if (!configData.usePermission)
+            {
+                Unsubscribe(nameof(CanNetworkTo));
+            }
         }
 
         private void OnServerInitialized()
         {
             Subscribe(nameof(OnEntitySpawned));
-            foreach (var baseNetworkable in BaseNetworkable.serverEntities)
+            foreach (var severEntity in BaseNetworkable.serverEntities)
             {
-                if (baseNetworkable is SamSite)
-                    OnEntitySpawned(baseNetworkable as SamSite);
+                var samSite = severEntity as SamSite;
+                if (samSite != null)
+                {
+                    OnEntitySpawned(samSite);
+                }
             }
         }
 
@@ -36,7 +44,7 @@ namespace Oxide.Plugins
             if (marker == null || player == null) return null;
             if (!mapMarkers.Contains(marker)) return null;
             if (permission.UserHasPermission(player.UserIDString, PERMISSION_USE)) return null;
-            else return false;
+            return false;
         }
 
         private void OnPlayerConnected(BasePlayer player)
@@ -52,8 +60,9 @@ namespace Oxide.Plugins
                 if (entry.Value == null) continue;
                 foreach (var mapMarker in entry.Value.GetComponentsInChildren<MapMarker>())
                 {
-                    if (mapMarker is MapMarkerGenericRadius)
-                        (mapMarker as MapMarkerGenericRadius).SendUpdate();
+                    var mapMarkerGenericRadius = mapMarker as MapMarkerGenericRadius;
+                    if (mapMarkerGenericRadius != null)
+                        mapMarkerGenericRadius.SendUpdate();
                     else mapMarker.SendNetworkUpdate();
                 }
                 entry.Value.SendUpdate();
@@ -83,14 +92,17 @@ namespace Oxide.Plugins
         private void Unload()
         {
             foreach (var entry in samSiteMarkers)
+            {
                 KillMapMarker(entry.Value);
-            samSiteMarkers.Clear();
+            }
         }
 
         private void KillMapMarker(MapMarkerGenericRadius mapMarker)
         {
             if (mapMarker != null && !mapMarker.IsDestroyed)
+            {
                 mapMarker.KillMessage();
+            }
         }
 
         private void CreateMapMarker(SamSite samSite, bool isStatic = false)
@@ -109,6 +121,10 @@ namespace Oxide.Plugins
                     mapMarkers.Add(machineMapMarker);
                     machineMapMarker.Spawn();
                     machineMapMarker.SendNetworkUpdate();
+                    if (configData.usePermission)
+                    {
+                        MapMarker.serverMapMarkers.Remove(machineMapMarker);
+                    }
                 }
             }
             //Attack range map marker
@@ -136,6 +152,10 @@ namespace Oxide.Plugins
                     mapMarkers.Add(radiusMapMarker);
                     radiusMapMarker.Spawn();
                     radiusMapMarker.SendUpdate();
+                    if (configData.usePermission)
+                    {
+                        MapMarker.serverMapMarkers.Remove(radiusMapMarker);
+                    }
                 }
             }
             //Sam map marker
@@ -160,6 +180,10 @@ namespace Oxide.Plugins
                 mapMarkers.Add(mapMarker);
                 mapMarker.Spawn();
                 mapMarker.SendUpdate();
+                if (configData.usePermission)
+                {
+                    MapMarker.serverMapMarkers.Remove(mapMarker);
+                }
             }
 
             if (radiusMapMarker != null) radiusMapMarker.SetParent(mapMarker, true);
@@ -272,9 +296,9 @@ namespace Oxide.Plugins
                 if (configData == null)
                     LoadDefaultConfig();
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();

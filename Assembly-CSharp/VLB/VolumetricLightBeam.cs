@@ -7,8 +7,8 @@ using UnityEngine.Serialization;
 namespace VLB
 {
 	[ExecuteInEditMode]
-	[DisallowMultipleComponent]
 	[SelectionBase]
+	[DisallowMultipleComponent]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	public class VolumetricLightBeam : MonoBehaviour
 	{
@@ -16,8 +16,8 @@ namespace VLB
 
 		public ColorMode colorMode;
 
-		[FormerlySerializedAs("colorValue")]
 		[ColorUsage(true, true)]
+		[FormerlySerializedAs("colorValue")]
 		public Color color = Consts.FlatColor;
 
 		public Gradient colorGradient;

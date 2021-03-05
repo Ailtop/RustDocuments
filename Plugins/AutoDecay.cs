@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Oxide.Core;
@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Auto Decay", "Hougan/Arainrr", "1.2.8")]
+    [Info("Auto Decay", "Hougan/Arainrr", "1.2.10")]
     [Description("Auto damage to objects, that are not in building zone")]
     public class AutoDecay : RustPlugin
     {
@@ -56,8 +56,6 @@ namespace Oxide.Plugins
                 }
             }
         }
-
-        private void OnNewSave(string filename) => UpdateData();
 
         private void Unload()
         {
@@ -112,7 +110,7 @@ namespace Oxide.Plugins
             }
         }
 
-        private void UpdateConfig(bool crate)
+        private void UpdateConfig(bool newConfig)
         {
             foreach (var itemDefinition in ItemManager.GetItemDefinitions())
             {
@@ -124,18 +122,18 @@ namespace Oxide.Plugins
 
                 configData.decayEntitySettings.Add(baseCombatEntity.ShortPrefabName, new DecayEntityS
                 {
-                    enabled = crate && !(itemDefinition.category == ItemCategory.Food || defaultDisabled.Contains(baseCombatEntity.ShortPrefabName)),
+                    enabled = newConfig && !(itemDefinition.category == ItemCategory.Food || defaultDisabled.Contains(baseCombatEntity.ShortPrefabName)),
                     checkOwner = true,
                     delayTime = 600f,
                     destroyTime = 3600f,
                     tickRate = 10f,
                 });
             }
-            if (crate) UpdateData(true);
-            else SaveConfig();
+            UpdateData(true);
+            SaveConfig();
         }
 
-        private void UpdateData(bool saveConfig = false)
+        private void UpdateData(bool updateConfig = false)
         {
             storedData.entityShortPrefabNames.Clear();
             foreach (var prefab in GameManifest.Current.entities)
@@ -143,7 +141,7 @@ namespace Oxide.Plugins
                 var baseCombatEntity = GameManager.server.FindPrefab(prefab.ToLower())?.GetComponent<BaseCombatEntity>();
                 if (baseCombatEntity == null || string.IsNullOrEmpty(baseCombatEntity.ShortPrefabName)) continue;
                 storedData.entityShortPrefabNames.Add(baseCombatEntity.ShortPrefabName);
-                if (saveConfig)
+                if (updateConfig)
                 {
                     if (baseCombatEntity is BuildingBlock || baseCombatEntity is BaseVehicle)
                     {
@@ -159,7 +157,6 @@ namespace Oxide.Plugins
                     }
                 }
             }
-            if (saveConfig) SaveConfig();
             SaveData();
         }
 
@@ -312,17 +309,23 @@ namespace Oxide.Plugins
             [JsonProperty(PropertyName = "Notify player interval")]
             public float notifyInterval = 10f;
 
-            [JsonProperty(PropertyName = "Chat prefix")]
-            public string prefix = "<color=#00FFFF>[AutoDecay]</color>: ";
+            [JsonProperty(PropertyName = "Chat Settings")]
+            public ChatSettings chatS = new ChatSettings();
 
-            [JsonProperty(PropertyName = "Chat steamID icon")]
-            public ulong steamIDIcon = 0;
+            public class ChatSettings
+            {
+                [JsonProperty(PropertyName = "Chat Prefix")]
+                public string prefix = "<color=#00FFFF>[AutoDecay]</color>: ";
+
+                [JsonProperty(PropertyName = "Chat SteamID Icon")]
+                public ulong steamIDIcon = 0;
+            }
 
             [JsonProperty(PropertyName = "Decay entity list")]
             public Dictionary<string, DecayEntityS> decayEntitySettings = new Dictionary<string, DecayEntityS>();
 
             [JsonProperty(PropertyName = "Version")]
-            public VersionNumber version = new VersionNumber(1, 2, 6);
+            public VersionNumber version;
         }
 
         private class DecayEntityS
@@ -358,9 +361,9 @@ namespace Oxide.Plugins
                     UpdateConfigValues();
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                PrintError("The configuration file is corrupted");
+                PrintError($"The configuration file is corrupted. \n{ex}");
                 LoadDefaultConfig();
             }
             SaveConfig();
@@ -379,15 +382,48 @@ namespace Oxide.Plugins
         {
             if (configData.version < Version)
             {
-                if (configData.version <= new VersionNumber(1, 2, 7))
+                if (configData.version <= default(VersionNumber))
                 {
-                    if (configData.prefix == "[AutoDecay]:")
+                    string prefix, prefixColor;
+                    if (GetConfigValue(out prefix, "Chat prefix") && GetConfigValue(out prefixColor, "Chat prefix color"))
                     {
-                        configData.prefix = "<color=#00FFFF>[AutoDecay]</color>: ";
+                        configData.chatS.prefix = $"<color={prefixColor}>{prefix}</color>: ";
+                    }
+
+                    ulong steamID;
+                    if (GetConfigValue(out steamID, "Chat steamID icon"))
+                    {
+                        configData.chatS.steamIDIcon = steamID;
+                    }
+                }
+                if (configData.version <= new VersionNumber(1, 2, 9))
+                {
+                    string prefix;
+                    if (GetConfigValue(out prefix, "Chat prefix"))
+                    {
+                        configData.chatS.prefix = prefix;
+                    }
+
+                    ulong steamID;
+                    if (GetConfigValue(out steamID, "Chat steamID icon"))
+                    {
+                        configData.chatS.steamIDIcon = steamID;
                     }
                 }
                 configData.version = Version;
             }
+        }
+
+        private bool GetConfigValue<T>(out T value, params string[] path)
+        {
+            var configValue = Config.Get(path);
+            if (configValue == null)
+            {
+                value = default(T);
+                return false;
+            }
+            value = Config.ConvertValue<T>(configValue);
+            return true;
         }
 
         #endregion ConfigurationFile
@@ -430,7 +466,7 @@ namespace Oxide.Plugins
 
         private void Print(BasePlayer player, string message)
         {
-            Player.Message(player, message, configData.prefix, configData.steamIDIcon);
+            Player.Message(player, message, configData.chatS.prefix, configData.chatS.steamIDIcon);
         }
 
         private string Lang(string key, string id = null, params object[] args) => string.Format(lang.GetMessage(key, this, id), args);

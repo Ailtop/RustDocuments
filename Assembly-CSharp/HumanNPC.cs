@@ -47,6 +47,9 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	private bool navmeshEnabled;
 
+	[NonSerialized]
+	private new Vector3 spawnPos;
+
 	private const float TargetUpdateRate = 0.5f;
 
 	private const float TickItemRate = 0.1f;
@@ -73,6 +76,8 @@ public class HumanNPC : NPCPlayer, IThinker
 	public float timeSinceTargetUpdate = 0.5f;
 
 	public float targetAimedDuration;
+
+	private float lastAimSetTime;
 
 	public Vector3 aimOverridePosition = Vector3.zero;
 
@@ -105,6 +110,11 @@ public class HumanNPC : NPCPlayer, IThinker
 		return true;
 	}
 
+	public virtual float GetMaxRoamDistFromSpawn()
+	{
+		return -1f;
+	}
+
 	public override void ServerInit()
 	{
 		base.ServerInit();
@@ -113,6 +123,7 @@ public class HumanNPC : NPCPlayer, IThinker
 		{
 			AIThinkManager.Add(this);
 			Invoke(EnableNavAgent, 0.25f);
+			spawnPos = base.transform.position;
 		}
 	}
 
@@ -194,6 +205,10 @@ public class HumanNPC : NPCPlayer, IThinker
 	{
 		if (newSpeed != desiredSpeed)
 		{
+			if (NavAgent != null)
+			{
+				NavAgent.avoidancePriority = UnityEngine.Random.Range(0, 21) + Mathf.FloorToInt(Mathf.InverseLerp(0.8f, 5f, SpeedFromEnum(newSpeed)) * 80f);
+			}
 			desiredSpeed = newSpeed;
 		}
 	}
@@ -224,11 +239,11 @@ public class HumanNPC : NPCPlayer, IThinker
 		return _targets;
 	}
 
-	public AIInformationZone GetInformationZone()
+	public AIInformationZone GetInformationZone(Vector3 pos)
 	{
 		if (cachedInfoZone == null || UnityEngine.Time.time > nextZoneSearchTime)
 		{
-			cachedInfoZone = AIInformationZone.GetForPoint(base.transform.position, this);
+			cachedInfoZone = AIInformationZone.GetForPoint(pos, this);
 			nextZoneSearchTime = UnityEngine.Time.time + 5f;
 		}
 		return cachedInfoZone;
@@ -445,7 +460,7 @@ public class HumanNPC : NPCPlayer, IThinker
 		}
 		if (currentTargetLOS)
 		{
-			if (Vector3.Dot(eyes.BodyForward(), currentTarget.CenterPoint() - eyes.position) > 0.8f)
+			if (Vector3.Dot(eyes.BodyForward(), currentTarget.CenterPoint() - eyes.position) > 0.85f)
 			{
 				targetAimedDuration += delta;
 			}
@@ -454,7 +469,7 @@ public class HumanNPC : NPCPlayer, IThinker
 		{
 			targetAimedDuration = 0f;
 		}
-		if (targetAimedDuration > 0.2f)
+		if (targetAimedDuration > 0.5f)
 		{
 			AttackEntity attackEntity = GetAttackEntity();
 			if ((bool)attackEntity && DistanceToTarget() < attackEntity.effectiveRange * (attackEntity.aiOnlyInRange ? 1f : 2f))
@@ -483,23 +498,35 @@ public class HumanNPC : NPCPlayer, IThinker
 		NavAgent.agentTypeID = NavAgent.agentTypeID;
 		if (on)
 		{
+			int areaMask = 1 << NavMesh.GetAreaFromName("HumanNPC");
 			NavMeshHit hit;
-			if (NavMesh.SamplePosition(base.transform.position + Vector3.up * 1f, out hit, 5f, -1))
+			if (NavMesh.SamplePosition(base.transform.position, out hit, 5f, areaMask))
 			{
-				NavAgent.Warp(hit.position);
+				base.transform.position = hit.position;
 				NavAgent.enabled = true;
 				base.transform.position = hit.position;
 			}
 			else
 			{
-				Debug.Log("Failed to sample navmesh");
+				if (Global.developer > 0)
+				{
+					Debug.Log(base.name + " Failed to sample navmesh on enable at : " + base.transform.position);
+				}
+				on = false;
+				if (!IsInvoking(EnableNavAgent))
+				{
+					Invoke(EnableNavAgent, UnityEngine.Random.Range(0.9f, 1f));
+				}
 			}
 		}
 		navmeshEnabled = on;
 		if (!on)
 		{
-			NavAgent.isStopped = true;
-			NavAgent.enabled = false;
+			if (NavAgent.enabled)
+			{
+				NavAgent.isStopped = true;
+				NavAgent.enabled = false;
+			}
 		}
 		else
 		{
@@ -519,6 +546,14 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	public void LogAttacker(BaseEntity attacker)
 	{
+	}
+
+	public void KeepFresh(BaseEntity ent)
+	{
+		if (ent != null && !ent.EqualNetID(this))
+		{
+			myMemory.Update(ent);
+		}
 	}
 
 	public override void Hurt(HitInfo info)
@@ -548,7 +583,10 @@ public class HumanNPC : NPCPlayer, IThinker
 		if (IsNavRunning())
 		{
 			base.SetDestination(newDestination);
-			NavAgent.SetDestination(newDestination);
+			if (NavAgent.enabled)
+			{
+				NavAgent.SetDestination(newDestination);
+			}
 		}
 	}
 
@@ -562,18 +600,20 @@ public class HumanNPC : NPCPlayer, IThinker
 		BasePlayer basePlayer = aimat as BasePlayer;
 		if (basePlayer != null)
 		{
-			if (basePlayer.IsSleeping())
+			if (basePlayer.IsSleeping() || basePlayer.IsWounded())
 			{
 				return basePlayer.transform.position + Vector3.up * 0.1f;
 			}
-			return basePlayer.eyes.position - Vector3.up * 0.05f;
+			return basePlayer.eyes.position - Vector3.up * 0.15f;
 		}
 		return aimat.CenterPoint();
 	}
 
 	public AIMovePoint GetBestRoamPosition(Vector3 start)
 	{
-		AIInformationZone informationZone = GetInformationZone();
+		float maxRoamDistFromSpawn = GetMaxRoamDistFromSpawn();
+		bool flag = maxRoamDistFromSpawn != -1f;
+		AIInformationZone informationZone = GetInformationZone(flag ? spawnPos : base.transform.position);
 		if (informationZone == null)
 		{
 			return null;
@@ -586,26 +626,40 @@ public class HumanNPC : NPCPlayer, IThinker
 			{
 				continue;
 			}
-			float num2 = 0f;
-			float value = Vector3.Dot(eyes.BodyForward(), Vector3Ex.Direction2D(movePoint.transform.position, eyes.position));
-			num2 += Mathf.InverseLerp(-1f, 1f, value) * 100f;
-			float num3 = Vector3.Distance(base.transform.position, movePoint.transform.position);
+			float num2 = Vector3.Distance(base.transform.position, movePoint.transform.position);
+			float num3 = 0f;
+			float num4 = 100f;
+			if (maxRoamDistFromSpawn != -1f)
+			{
+				float value = Vector3.Distance(spawnPos, movePoint.transform.position);
+				if (num2 > 3f)
+				{
+					num3 += (1f - Mathf.InverseLerp(maxRoamDistFromSpawn * 0f, maxRoamDistFromSpawn, value)) * 200f * UnityEngine.Random.Range(0.8f, 1f);
+					num4 = 0f;
+				}
+			}
+			if (num4 != 0f)
+			{
+				float value2 = Vector3.Dot(eyes.BodyForward(), Vector3Ex.Direction2D(movePoint.transform.position, eyes.position));
+				num3 += Mathf.InverseLerp(-1f, 1f, value2) * num4;
+			}
 			if (!movePoint.IsUsedForRoaming())
 			{
-				num2 += 1000f;
+				num3 += 1000f;
 			}
-			float num4 = Mathf.Abs(base.transform.position.y - movePoint.transform.position.y);
-			num2 += (1f - Mathf.InverseLerp(1f, 10f, num4)) * 100f;
-			if (!(movePoint.transform.position.y < WaterSystem.OceanLevel) && (!(base.transform.position.y >= WaterSystem.OceanLevel) || !(num4 > 5f)))
+			float num5 = Mathf.Abs(base.transform.position.y - movePoint.transform.position.y);
+			num3 += (1f - Mathf.InverseLerp(1f, 10f, num5)) * 100f;
+			bool flag2 = base.transform.position.y < WaterSystem.OceanLevel;
+			if (flag2 || ((flag2 || !(movePoint.transform.position.y < WaterSystem.OceanLevel)) && (!(base.transform.position.y >= WaterSystem.OceanLevel) || !(num5 > 5f))))
 			{
-				if (num3 > 5f)
+				if (num2 > 3f)
 				{
-					num2 += (1f - Mathf.InverseLerp(5f, 20f, num3)) * 50f;
+					num3 += Mathf.InverseLerp(3f, 15f, num2) * 50f;
 				}
-				if (num2 > num)
+				if (num3 > num)
 				{
 					result = movePoint;
-					num = num2;
+					num = num3;
 				}
 			}
 		}
@@ -621,6 +675,8 @@ public class HumanNPC : NPCPlayer, IThinker
 	{
 		if (!(newAim == Vector3.zero))
 		{
+			float num = UnityEngine.Time.time - lastAimSetTime;
+			lastAimSetTime = UnityEngine.Time.time;
 			AttackEntity attackEntity = GetAttackEntity();
 			if ((bool)attackEntity)
 			{
@@ -636,7 +692,7 @@ public class HumanNPC : NPCPlayer, IThinker
 				Quaternion rotation2 = Quaternion.Euler(Mathf.Clamp(eulerAngles2.x, mounted.pitchClamp.x, mounted.pitchClamp.y), Mathf.Clamp(eulerAngles2.y, mounted.yawClamp.x, mounted.yawClamp.y), eulerAngles.z);
 				newAim = BaseMountable.ConvertVector(Quaternion.LookRotation(base.transform.TransformDirection(rotation2 * Vector3.forward), base.transform.up).eulerAngles);
 			}
-			eyes.rotation = (base.isMounted ? Quaternion.Slerp(eyes.rotation, Quaternion.Euler(newAim), UnityEngine.Time.smoothDeltaTime * 70f) : Quaternion.Lerp(eyes.rotation, Quaternion.LookRotation(newAim, base.transform.up), UnityEngine.Time.deltaTime * 25f));
+			eyes.rotation = (base.isMounted ? Quaternion.Slerp(eyes.rotation, Quaternion.Euler(newAim), num * 70f) : Quaternion.Lerp(eyes.rotation, Quaternion.LookRotation(newAim, base.transform.up), num * 25f));
 			viewAngles = eyes.rotation.eulerAngles;
 			ServerRotation = eyes.rotation;
 		}
@@ -668,7 +724,12 @@ public class HumanNPC : NPCPlayer, IThinker
 			}
 			return Vector3.zero;
 		}
+		float num2 = Vector3.Distance(currentTarget.transform.position, base.transform.position);
 		if (flag && desiredSpeed != SpeedType.Sprint)
+		{
+			return (AimOffset(currentTarget) - eyes.position).normalized;
+		}
+		if (num2 < 5f)
 		{
 			return (AimOffset(currentTarget) - eyes.position).normalized;
 		}
@@ -713,6 +774,7 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	public bool IsVisibleToUs(BasePlayer player)
 	{
+		bool flag = false;
 		if (base.isMounted)
 		{
 			return IsVisibleMounted(player);
@@ -755,7 +817,7 @@ public class HumanNPC : NPCPlayer, IThinker
 				nPCPlayerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
 				nPCPlayerCorpse.SetFlag(Flags.Reserved2, true);
 				nPCPlayerCorpse.TakeFrom(inventory.containerMain, inventory.containerWear, inventory.containerBelt);
-				nPCPlayerCorpse.playerName = base.displayName;
+				nPCPlayerCorpse.playerName = OverrideCorpseName();
 				nPCPlayerCorpse.playerSteamID = userID;
 				nPCPlayerCorpse.Spawn();
 				nPCPlayerCorpse.TakeChildren(this);
@@ -789,10 +851,20 @@ public class HumanNPC : NPCPlayer, IThinker
 		}
 	}
 
+	protected virtual string OverrideCorpseName()
+	{
+		return base.displayName;
+	}
+
 	public override void AttackerInfo(PlayerLifeStory.DeathInfo info)
 	{
 		base.AttackerInfo(info);
 		info.inflictorName = inventory.containerBelt.GetSlot(0).info.shortname;
 		info.attackerName = "scientist";
+	}
+
+	public override bool IsOnGround()
+	{
+		return true;
 	}
 }

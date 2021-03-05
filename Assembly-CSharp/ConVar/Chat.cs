@@ -64,8 +64,8 @@ namespace ConVar
 
 		private const float textVolumeBoost = 0.2f;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool enabled = true;
 
 		public static List<ChatEntry> History = new List<ChatEntry>();
@@ -256,8 +256,8 @@ namespace ConVar
 			return false;
 		}
 
-		[Help("Return the last x lines of the console. Default is 200")]
 		[ServerVar]
+		[Help("Return the last x lines of the console. Default is 200")]
 		public static IEnumerable<ChatEntry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);
@@ -269,8 +269,8 @@ namespace ConVar
 			return History.Skip(num);
 		}
 
-		[Help("Search the console for a particular string")]
 		[ServerVar]
+		[Help("Search the console for a particular string")]
 		public static IEnumerable<ChatEntry> search(Arg arg)
 		{
 			string search = arg.GetString(0, null);

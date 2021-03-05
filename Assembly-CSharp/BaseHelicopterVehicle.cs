@@ -77,7 +77,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 
 	public float thrustLerpSpeed = 1f;
 
-	private float avgTerrainHeight;
+	public float avgTerrainHeight;
 
 	public const Flags Flag_InternalLights = Flags.Reserved6;
 
@@ -87,13 +87,13 @@ public class BaseHelicopterVehicle : BaseVehicle
 
 	public float hoverForceScale = 0.99f;
 
-	protected Vector3 damageTorque;
+	public Vector3 damageTorque;
 
-	private float nextDamageTime;
+	public float nextDamageTime;
 
-	private float nextEffectTime;
+	public float nextEffectTime;
 
-	private float pendingImpactDamage;
+	public float pendingImpactDamage;
 
 	public virtual float GetServiceCeiling()
 	{
@@ -181,7 +181,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 		return true;
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (!base.isClient)
@@ -202,7 +202,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 		}
 	}
 
-	private void OnPhysicsNeighbourChanged()
+	public void OnPhysicsNeighbourChanged()
 	{
 		if (rigidBody != null)
 		{
@@ -325,7 +325,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 		Invoke(DelayedImpactDamage, 0.015f);
 	}
 
-	private void OnCollisionEnter(Collision collision)
+	public void OnCollisionEnter(Collision collision)
 	{
 		ProcessCollision(collision);
 	}

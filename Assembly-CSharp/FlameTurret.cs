@@ -7,6 +7,28 @@ using UnityEngine;
 
 public class FlameTurret : StorageContainer
 {
+	public class UpdateFlameTurretWorkQueue : ObjectWorkQueue<FlameTurret>
+	{
+		protected override void RunJob(FlameTurret entity)
+		{
+			if (ShouldAdd(entity))
+			{
+				entity.ServerThink();
+			}
+		}
+
+		protected override bool ShouldAdd(FlameTurret entity)
+		{
+			if (base.ShouldAdd(entity))
+			{
+				return BaseEntityEx.IsValid(entity);
+			}
+			return false;
+		}
+	}
+
+	public static UpdateFlameTurretWorkQueue updateFlameTurretQueueServer = new UpdateFlameTurretWorkQueue();
+
 	public Transform upper;
 
 	public Vector3 aimDir;
@@ -37,9 +59,11 @@ public class FlameTurret : StorageContainer
 
 	private int turnDir = 1;
 
-	private float lastServerThink;
+	private float lastMovementUpdate;
 
 	private float triggeredTime;
+
+	private float lastServerThink;
 
 	private float triggerCheckRate = 2f;
 
@@ -63,14 +87,6 @@ public class FlameTurret : StorageContainer
 	public Vector3 GetEyePosition()
 	{
 		return eyeTransform.position;
-	}
-
-	public void Update()
-	{
-		if (base.isServer)
-		{
-			ServerThink();
-		}
 	}
 
 	public override bool CanPickup(BasePlayer player)
@@ -99,7 +115,11 @@ public class FlameTurret : StorageContainer
 
 	public void SendAimDir()
 	{
+		float delta = Time.realtimeSinceStartup - lastMovementUpdate;
+		lastMovementUpdate = Time.realtimeSinceStartup;
+		MovementUpdate(delta);
 		ClientRPC(null, "CLIENT_ReceiveAimDir", aimDir);
+		updateFlameTurretQueueServer.Add(this);
 	}
 
 	public float GetSpinSpeed()
@@ -131,29 +151,25 @@ public class FlameTurret : StorageContainer
 
 	public void ServerThink()
 	{
-		float num = Time.realtimeSinceStartup - lastServerThink;
-		if (!(num < 0.1f))
+		bool num = IsTriggered();
+		float delta = Time.realtimeSinceStartup - lastServerThink;
+		lastServerThink = Time.realtimeSinceStartup;
+		if (IsTriggered() && (Time.realtimeSinceStartup - triggeredTime > triggeredDuration || !HasFuel()))
 		{
-			bool num2 = IsTriggered();
-			lastServerThink = Time.realtimeSinceStartup;
-			MovementUpdate(num);
-			if (IsTriggered() && (Time.realtimeSinceStartup - triggeredTime > triggeredDuration || !HasFuel()))
-			{
-				SetTriggered(false);
-			}
-			if (!IsTriggered() && HasFuel() && CheckTrigger())
-			{
-				SetTriggered(true);
-				Effect.server.Run(triggeredEffect.resourcePath, base.transform.position, Vector3.up);
-			}
-			if (num2 != IsTriggered())
-			{
-				SendNetworkUpdateImmediate();
-			}
-			if (IsTriggered())
-			{
-				DoFlame(num);
-			}
+			SetTriggered(false);
+		}
+		if (!IsTriggered() && HasFuel() && CheckTrigger())
+		{
+			SetTriggered(true);
+			Effect.server.Run(triggeredEffect.resourcePath, base.transform.position, Vector3.up);
+		}
+		if (num != IsTriggered())
+		{
+			SendNetworkUpdateImmediate();
+		}
+		if (IsTriggered())
+		{
+			DoFlame(delta);
 		}
 	}
 
@@ -172,7 +188,7 @@ public class FlameTurret : StorageContainer
 			foreach (BaseEntity item in entityContents)
 			{
 				BasePlayer component = item.GetComponent<BasePlayer>();
-				if (component.IsSleeping() || !component.IsAlive() || component.IsBuildingAuthed())
+				if (component.IsSleeping() || !component.IsAlive())
 				{
 					continue;
 				}
@@ -182,7 +198,7 @@ public class FlameTurret : StorageContainer
 					Pool.FreeList(ref obj);
 					return (bool)obj2;
 				}
-				if (component.transform.position.y > GetEyePosition().y + 0.5f)
+				if (!(component.transform.position.y <= GetEyePosition().y + 0.5f) || component.IsBuildingAuthed())
 				{
 					continue;
 				}

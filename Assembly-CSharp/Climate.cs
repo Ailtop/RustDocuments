@@ -180,10 +180,16 @@ public class Climate : SingletonComponent<Climate>
 		set;
 	}
 
-	public WeatherPreset WeatherClamps
+	public WeatherPreset WeatherClampsMin
 	{
 		get;
-		set;
+		private set;
+	}
+
+	public WeatherPreset WeatherClampsMax
+	{
+		get;
+		private set;
 	}
 
 	public WeatherPreset WeatherOverrides
@@ -202,10 +208,12 @@ public class Climate : SingletonComponent<Climate>
 	{
 		base.Awake();
 		WeatherState = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
-		WeatherClamps = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
+		WeatherClampsMin = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
+		WeatherClampsMax = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
 		WeatherOverrides = ScriptableObject.CreateInstance(typeof(WeatherPreset)) as WeatherPreset;
 		WeatherState.Reset();
-		WeatherClamps.Reset();
+		WeatherClampsMin.Reset();
+		WeatherClampsMax.Reset();
 		WeatherOverrides.Reset();
 		Overrides = new LegacyWeatherState(WeatherOverrides);
 	}
@@ -219,9 +227,13 @@ public class Climate : SingletonComponent<Climate>
 			{
 				UnityEngine.Object.Destroy(WeatherState);
 			}
-			if (WeatherClamps != null)
+			if (WeatherClampsMin != null)
 			{
-				UnityEngine.Object.Destroy(WeatherClamps);
+				UnityEngine.Object.Destroy(WeatherClampsMin);
+			}
+			if (WeatherClampsMax != null)
+			{
+				UnityEngine.Object.Destroy(WeatherClampsMax);
 			}
 			if (WeatherOverrides != null)
 			{
@@ -230,9 +242,9 @@ public class Climate : SingletonComponent<Climate>
 		}
 	}
 
-	protected void Update()
+	public void Update()
 	{
-		if (!Rust.Application.isReceiving && !Rust.Application.isLoading && (bool)TerrainMeta.BiomeMap && (bool)TOD_Sky.Instance)
+		if (!Rust.Application.isReceiving && !Rust.Application.isLoading && (bool)TOD_Sky.Instance)
 		{
 			TOD_Sky instance = TOD_Sky.Instance;
 			long num = World.Seed + instance.Cycle.Ticks;
@@ -273,7 +285,7 @@ public class Climate : SingletonComponent<Climate>
 		{
 			return false;
 		}
-		if (!SingletonComponent<Climate>.Instance.WeatherClamps)
+		if (!SingletonComponent<Climate>.Instance.WeatherClampsMin)
 		{
 			return false;
 		}
@@ -518,8 +530,8 @@ public class Climate : SingletonComponent<Climate>
 		}
 		if (TerrainMeta.BiomeMap == null)
 		{
-			src = null;
-			dst = null;
+			src = Temperate;
+			dst = Temperate;
 			return 0.5f;
 		}
 		int biomeMaxType = TerrainMeta.BiomeMap.GetBiomeMaxType(pos);

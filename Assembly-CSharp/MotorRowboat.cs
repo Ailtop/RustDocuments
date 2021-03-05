@@ -223,8 +223,7 @@ public class MotorRowboat : BaseBoat
 			baseEntity.SetParent(this);
 			baseEntity.Spawn();
 			storageUnitInstance.Set(baseEntity);
-			UnityEngine.Physics.IgnoreCollision(baseEntity.GetComponent<Collider>(), mainCollider, true);
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint, mainCollider);
+			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
 		}
 	}
 
@@ -372,7 +371,6 @@ public class MotorRowboat : BaseBoat
 			return;
 		}
 		float num = TimeSinceDriver();
-		bool b = EngineOn() && !IsFlipped() && base.healthFraction > 0f && fuelSystem.HasFuel() && num < 75f;
 		if (num > 15f)
 		{
 			steering += Mathf.InverseLerp(15f, 30f, num);
@@ -382,15 +380,7 @@ public class MotorRowboat : BaseBoat
 				gasPedal = 0f;
 			}
 		}
-		SetFlag(Flags.Reserved3, steering > 0f, false, false);
-		SetFlag(Flags.Reserved4, steering < 0f, false, false);
-		SetFlag(Flags.Reserved1, b, false, false);
-		SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, false, false);
-		SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, false, false);
-		SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), false, false);
-		SetFlag(Flags.Reserved7, rigidBody.velocity.magnitude < 1f, false, false);
-		SetFlag(Flags.Reserved8, base.RecentlyPushed, false, false);
-		SendNetworkUpdate_Flags();
+		SetFlags();
 		UpdateDrag();
 		if (dying)
 		{
@@ -414,6 +404,32 @@ public class MotorRowboat : BaseBoat
 			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime * num5, fuelPerSec);
 			timeSinceLastUsedFuel = 0f;
 		}
+	}
+
+	private void SetFlags()
+	{
+		using (TimeWarning.New("SetFlag"))
+		{
+			bool b = EngineOn() && !IsFlipped() && base.healthFraction > 0f && fuelSystem.HasFuel() && TimeSinceDriver() < 75f;
+			Flags flags = base.flags;
+			SetFlag(Flags.Reserved3, steering > 0f, false, false);
+			SetFlag(Flags.Reserved4, steering < 0f, false, false);
+			SetFlag(Flags.Reserved1, b, false, false);
+			SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, false, false);
+			SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, false, false);
+			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), false, false);
+			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !HasAnyPassengers(), false, false);
+			SetFlag(Flags.Reserved8, base.RecentlyPushed, false, false);
+			if (flags != base.flags)
+			{
+				Invoke(base.SendNetworkUpdate_Flags, 0f);
+			}
+		}
+	}
+
+	public override Vector3 GetLocalVelocityServer()
+	{
+		return rigidBody.velocity;
 	}
 
 	public override void SeatClippedWorld(BaseMountable mountable)

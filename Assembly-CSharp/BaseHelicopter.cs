@@ -134,9 +134,9 @@ public class BaseHelicopter : BaseCombatEntity
 
 	private Sound flightThwopsSound;
 
-	private SoundModulation.Modulator flightEngineGainMod;
+	public SoundModulation.Modulator flightEngineGainMod;
 
-	private SoundModulation.Modulator flightThwopsGainMod;
+	public SoundModulation.Modulator flightThwopsGainMod;
 
 	public float rotorGainModSmoothing = 0.25f;
 
@@ -166,7 +166,7 @@ public class BaseHelicopter : BaseCombatEntity
 
 	public PatrolHelicopterAI myAI;
 
-	private float lastNetworkUpdate = float.NegativeInfinity;
+	public float lastNetworkUpdate = float.NegativeInfinity;
 
 	private const float networkUpdateRate = 0.25f;
 
