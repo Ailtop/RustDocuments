@@ -25,6 +25,7 @@ public class BaseVehicle : BaseMountable
 
 		public GameObjectRef prefab;
 
+		[HideInInspector]
 		public BaseMountable mountable;
 	}
 
@@ -70,6 +71,8 @@ public class BaseVehicle : BaseMountable
 	public override float RealisticMass => rigidBody.mass;
 
 	protected override bool PositionTickFixedTime => true;
+
+	protected virtual bool CanSwapSeats => true;
 
 	protected bool RecentlyPushed => (float)timeSinceLastPush < 1f;
 
@@ -454,7 +457,7 @@ public class BaseVehicle : BaseMountable
 
 	public void SwapSeats(BasePlayer player, int targetSeat = 0)
 	{
-		if (!HasMountPoints())
+		if (!HasMountPoints() || !CanSwapSeats)
 		{
 			return;
 		}
@@ -517,7 +520,7 @@ public class BaseVehicle : BaseMountable
 	{
 		if (spawnTime != -1f)
 		{
-			return spawnTime + 120f < UnityEngine.Time.realtimeSinceStartup;
+			return spawnTime + 300f < UnityEngine.Time.realtimeSinceStartup;
 		}
 		return true;
 	}
@@ -565,11 +568,19 @@ public class BaseVehicle : BaseMountable
 		base.ScaleDamageForPlayer(player, info);
 	}
 
-	public BaseMountable GetIdealMountPoint(Vector3 eyePos, Vector3 pos)
+	public BaseMountable GetIdealMountPoint(Vector3 eyePos, Vector3 pos, BasePlayer playerFor = null)
 	{
 		if (!HasMountPoints())
 		{
 			return this;
+		}
+		BasePlayer basePlayer = creatorEntity as BasePlayer;
+		bool flag = basePlayer != null;
+		bool flag2 = flag && basePlayer.Team != null;
+		bool flag3 = flag && playerFor == basePlayer;
+		if (!flag3 && flag && OnlyOwnerAccessible() && playerFor != null && (playerFor.Team == null || !playerFor.Team.members.Contains(basePlayer.userID)))
+		{
+			return null;
 		}
 		BaseMountable result = null;
 		float num = float.PositiveInfinity;
@@ -598,7 +609,7 @@ public class BaseVehicle : BaseMountable
 					Debug.Log($"Skipping seat {mountPoint.mountable} - it's not visible");
 				}
 			}
-			else if (!OnlyOwnerAccessible() || mountPoint.isDriver)
+			else if (!(OnlyOwnerAccessible() && flag3) || flag2 || mountPoint.isDriver)
 			{
 				result = mountPoint.mountable;
 				num = num2;
@@ -616,7 +627,11 @@ public class BaseVehicle : BaseMountable
 	{
 		if (creatorEntity != null && OnlyOwnerAccessible() && player != creatorEntity)
 		{
-			return false;
+			BasePlayer basePlayer = creatorEntity as BasePlayer;
+			if (basePlayer != null && basePlayer.Team != null && !basePlayer.Team.members.Contains(player.userID))
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -634,6 +649,10 @@ public class BaseVehicle : BaseMountable
 	}
 
 	public virtual void PlayerMounted(BasePlayer player, BaseMountable seat)
+	{
+	}
+
+	public virtual void PrePlayerDismount(BasePlayer player, BaseMountable seat)
 	{
 	}
 
@@ -684,7 +703,7 @@ public class BaseVehicle : BaseMountable
 
 	public BaseMountable GetIdealMountPointFor(BasePlayer player)
 	{
-		return GetIdealMountPoint(player.eyes.position, player.eyes.position + player.eyes.HeadForward() * 1f);
+		return GetIdealMountPoint(player.eyes.position, player.eyes.position + player.eyes.HeadForward() * 1f, player);
 	}
 
 	public override bool GetDismountPosition(BasePlayer player, out Vector3 res)
@@ -773,8 +792,8 @@ public class BaseVehicle : BaseMountable
 		return baseMountable;
 	}
 
-	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(5f)]
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

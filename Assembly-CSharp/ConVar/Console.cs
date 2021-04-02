@@ -9,8 +9,8 @@ namespace ConVar
 	[Factory("console")]
 	public class Console : ConsoleSystem
 	{
-		[ServerVar]
 		[Help("Return the last x lines of the console. Default is 200")]
+		[ServerVar]
 		public static IEnumerable<Output.Entry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);
@@ -22,8 +22,8 @@ namespace ConVar
 			return Output.HistoryOutput.Skip(num);
 		}
 
-		[ServerVar]
 		[Help("Search the console for a particular string")]
+		[ServerVar]
 		public static IEnumerable<Output.Entry> search(Arg arg)
 		{
 			string search = arg.GetString(0, null);

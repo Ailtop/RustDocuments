@@ -17,8 +17,8 @@ namespace ConVar
 			return new DirectoryInfo(path).FullName;
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void managed(Arg arg)
 		{
 			MemoryProfiler.TakeSnapshot(NeedProfileFolder() + "/memdump-" + DateTime.Now.ToString("MM-dd-yyyy-h-mm-ss") + ".snap", null, CaptureFlags.ManagedObjects);

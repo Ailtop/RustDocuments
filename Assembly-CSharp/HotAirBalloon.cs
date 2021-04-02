@@ -329,11 +329,14 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelPerSec);
 		}
 		SetFlag(Flags.Reserved6, fuelSystem.HasFuel());
+		bool flag = (IsFullyInflated && myRigidbody.velocity.y < 0f) || myRigidbody.velocity.y < 0.75f;
 		GameObject[] array = killTriggers;
-		foreach (GameObject obj in array)
+		foreach (GameObject gameObject in array)
 		{
-			bool active = (IsFullyInflated && myRigidbody.velocity.y < 0f) || myRigidbody.velocity.y < 0.75f;
-			obj.SetActive(active);
+			if (gameObject.activeSelf != flag)
+			{
+				gameObject.SetActive(flag);
+			}
 		}
 		float num = inflationLevel;
 		if (IsOn() && !IsFullyInflated)
@@ -359,10 +362,14 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			SendNetworkUpdate();
 			float inflationLevel2 = inflationLevel;
 		}
+		bool flag2 = !myRigidbody.IsSleeping() || inflationLevel > 0f;
 		array = balloonColliders;
-		for (int i = 0; i < array.Length; i++)
+		foreach (GameObject gameObject2 in array)
 		{
-			array[i].SetActive(!myRigidbody.IsSleeping() || inflationLevel > 0f);
+			if (gameObject2.activeSelf != flag2)
+			{
+				gameObject2.SetActive(flag2);
+			}
 		}
 		if (IsOn())
 		{

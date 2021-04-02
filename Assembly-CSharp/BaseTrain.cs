@@ -7,81 +7,81 @@ using UnityEngine;
 
 public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, TrainTrackSpline.ITrainTrackUser, ITrainCollidable
 {
-	private enum StaticCollisionState
+	public enum StaticCollisionState
 	{
 		Free,
 		StaticColliding,
 		StayingStill
 	}
 
-	private StaticCollisionState staticCollidingAtFront;
+	public StaticCollisionState staticCollidingAtFront;
 
-	private StaticCollisionState staticCollidingAtRear;
+	public StaticCollisionState staticCollidingAtRear;
 
 	private const float MIN_COLLISION_FORCE = 50000f;
 
-	private float nextCollisionFXTime;
+	public float nextCollisionFXTime;
 
 	private const float MIN_TIME_BETWEEN_COLLISION_FX = 0.5f;
 
-	private Dictionary<Rigidbody, float> prevTrackSpeeds = new Dictionary<Rigidbody, float>();
+	public Dictionary<Rigidbody, float> prevTrackSpeeds = new Dictionary<Rigidbody, float>();
 
 	protected bool trainDebug;
 
 	private TrainTrackSpline _frontTrackSection;
 
-	private float lastMovingTime = float.MinValue;
+	public float lastMovingTime = float.MinValue;
 
 	private const float SLEEP_SPEED = 0.25f;
 
 	private const float SLEEP_DELAY = 10f;
 
-	private float distFrontToBackWheel;
+	public float distFrontToBackWheel;
 
-	private float initialSpawnTime;
+	public float initialSpawnTime;
 
-	[SerializeField]
 	[Header("Base Train")]
-	private float corpseSeconds = 60f;
+	[SerializeField]
+	public float corpseSeconds = 60f;
 
 	[SerializeField]
-	private TriggerTrainCollisions frontCollisionTrigger;
+	public TriggerTrainCollisions frontCollisionTrigger;
 
 	[SerializeField]
-	private TriggerTrainCollisions rearCollisionTrigger;
+	public TriggerTrainCollisions rearCollisionTrigger;
 
 	[Tooltip("How much impact energy is retained on collisions. 1.0 = 100% retained, 0.0 = 100% loss of energy")]
 	[SerializeField]
-	private float impactEnergyFraction = 0.75f;
+	public float impactEnergyFraction = 0.75f;
 
 	[SerializeField]
-	private float collisionDamageDivide = 100000f;
+	public float collisionDamageDivide = 100000f;
 
 	[SerializeField]
-	private float derailCollisionForce = 130000f;
+	public float derailCollisionForce = 130000f;
 
 	[SerializeField]
-	private GameObjectRef collisionEffect;
+	public GameObjectRef collisionEffect;
 
 	[SerializeField]
-	private TriggerHurtNotChild hurtTriggerFront;
+	public TriggerHurtNotChild hurtTriggerFront;
 
 	[SerializeField]
-	private TriggerHurtNotChild hurtTriggerRear;
+	public TriggerHurtNotChild hurtTriggerRear;
 
 	[SerializeField]
-	private float hurtTriggerMinSpeed = 1f;
+	public float hurtTriggerMinSpeed = 1f;
 
 	[SerializeField]
-	private CapsuleCollider frontWheelWorldCol;
+	public CapsuleCollider frontWheelWorldCol;
 
 	[SerializeField]
-	private CapsuleCollider rearWheelWorldCol;
+	public CapsuleCollider rearWheelWorldCol;
 
 	[SerializeField]
-	private Transform centreOfMassTransform;
+	public Transform centreOfMassTransform;
 
-	protected TrainTrackSpline.TrackSelection curTrackSelection;
+	public TrainTrackSpline.TrackSelection curTrackSelection;
 
 	public float TrackSpeed
 	{
@@ -126,21 +126,19 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 		set;
 	}
 
-	public static bool IsAtAStation
+	public bool IsAtAStation
 	{
 		get
 		{
-			//IL_0006: Expected O, but got Unknown
-			//IL_0014: Expected O, but got Unknown
-			if (((BaseTrain)/*Error: ldarg 0 (out-of-bounds)*/).FrontTrackSection != null)
+			if (FrontTrackSection != null)
 			{
-				return ((BaseTrain)/*Error near IL_000e: ldarg 0 (out-of-bounds)*/).FrontTrackSection.isStation;
+				return FrontTrackSection.isStation;
 			}
 			return false;
 		}
 	}
 
-	private bool RecentlySpawned => UnityEngine.Time.time < initialSpawnTime + 2f;
+	public bool RecentlySpawned => UnityEngine.Time.time < initialSpawnTime + 2f;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -279,7 +277,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	{
 		Vector3 pushDirection = (front ? base.transform.forward : (-base.transform.forward));
 		float num = Vector3.Angle(base.transform.forward, theirTrain.transform.forward);
-		if (num > 45f && num < 135f)
+		float f = Vector3.Dot(rhs: (theirTrain.transform.position - base.transform.position).normalized, lhs: base.transform.forward);
+		if ((num > 30f && num < 150f) || Mathf.Abs(f) < 0.975f)
 		{
 			trackSpeed = (front ? (-0.5f) : 0.5f);
 		}
@@ -498,7 +497,7 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public override Vector3 GetLocalVelocityServer()
 	{
-		return rigidBody.velocity;
+		return base.transform.forward * TrackSpeed;
 	}
 
 	public override Quaternion GetAngularVelocityServer()
@@ -649,7 +648,7 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public override float InheritedVelocityScale()
 	{
-		return 1f;
+		return 0.5f;
 	}
 
 	public virtual void SetTrackSelection(TrainTrackSpline.TrackSelection trackSelection)

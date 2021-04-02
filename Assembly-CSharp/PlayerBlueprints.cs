@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Facepunch;
 using Oxide.Core;
 using ProtoBuf;
 
@@ -8,47 +8,51 @@ public class PlayerBlueprints : EntityComponent<BasePlayer>
 
 	public void Reset()
 	{
-		PersistantPlayer playerInfo = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(base.baseEntity.userID);
-		playerInfo.unlockedItems = new List<int>();
-		SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerInfo(base.baseEntity.userID, playerInfo);
+		PersistantPlayer persistantPlayerInfo = base.baseEntity.PersistantPlayerInfo;
+		if (persistantPlayerInfo.unlockedItems != null)
+		{
+			persistantPlayerInfo.unlockedItems.Clear();
+		}
+		else
+		{
+			persistantPlayerInfo.unlockedItems = Pool.GetList<int>();
+		}
+		base.baseEntity.PersistantPlayerInfo = persistantPlayerInfo;
 		base.baseEntity.SendNetworkUpdate();
 	}
 
 	public void UnlockAll()
 	{
+		PersistantPlayer persistantPlayerInfo = base.baseEntity.PersistantPlayerInfo;
 		foreach (ItemBlueprint bp in ItemManager.bpList)
 		{
-			if (bp.userCraftable && !bp.defaultBlueprint)
+			if (bp.userCraftable && !bp.defaultBlueprint && !persistantPlayerInfo.unlockedItems.Contains(bp.targetItem.itemid))
 			{
-				PersistantPlayer playerInfo = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(base.baseEntity.userID);
-				if (!playerInfo.unlockedItems.Contains(bp.targetItem.itemid))
-				{
-					playerInfo.unlockedItems.Add(bp.targetItem.itemid);
-					SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerInfo(base.baseEntity.userID, playerInfo);
-				}
+				persistantPlayerInfo.unlockedItems.Add(bp.targetItem.itemid);
 			}
 		}
+		base.baseEntity.PersistantPlayerInfo = persistantPlayerInfo;
 		base.baseEntity.SendNetworkUpdateImmediate();
 		base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UnlockedBlueprint", 0);
 	}
 
 	public bool IsUnlocked(ItemDefinition itemDef)
 	{
-		PersistantPlayer playerInfo = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(base.baseEntity.userID);
-		if (playerInfo.unlockedItems != null)
+		PersistantPlayer persistantPlayerInfo = base.baseEntity.PersistantPlayerInfo;
+		if (persistantPlayerInfo.unlockedItems != null)
 		{
-			return playerInfo.unlockedItems.Contains(itemDef.itemid);
+			return persistantPlayerInfo.unlockedItems.Contains(itemDef.itemid);
 		}
 		return false;
 	}
 
 	public void Unlock(ItemDefinition itemDef)
 	{
-		PersistantPlayer playerInfo = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(base.baseEntity.userID);
-		if (!playerInfo.unlockedItems.Contains(itemDef.itemid))
+		PersistantPlayer persistantPlayerInfo = base.baseEntity.PersistantPlayerInfo;
+		if (!persistantPlayerInfo.unlockedItems.Contains(itemDef.itemid))
 		{
-			playerInfo.unlockedItems.Add(itemDef.itemid);
-			SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerInfo(base.baseEntity.userID, playerInfo);
+			persistantPlayerInfo.unlockedItems.Add(itemDef.itemid);
+			base.baseEntity.PersistantPlayerInfo = persistantPlayerInfo;
 			base.baseEntity.SendNetworkUpdateImmediate();
 			base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UnlockedBlueprint", itemDef.itemid);
 			base.baseEntity.stats.Add("blueprint_studied", 1, (Stats)5);

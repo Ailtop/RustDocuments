@@ -23,7 +23,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	public bool IsBeingControlled
 	{
 		get;
-		private set;
+		set;
 	}
 
 	public virtual bool RequiresMouse => false;

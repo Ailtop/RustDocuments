@@ -137,8 +137,8 @@ public class Workbench : StorageContainer
 		return HasFlag(Flags.On);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_TechTreeUnlock(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -198,7 +198,7 @@ public class Workbench : StorageContainer
 		{
 			return;
 		}
-		PersistantPlayer playerInfo = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(player.userID);
+		PersistantPlayer persistantPlayerInfo = player.PersistantPlayerInfo;
 		int num = UnityEngine.Random.Range(0, experimentalItems.subSpawn.Length);
 		for (int i = 0; i < experimentalItems.subSpawn.Length; i++)
 		{
@@ -208,7 +208,7 @@ public class Workbench : StorageContainer
 				num2 -= experimentalItems.subSpawn.Length;
 			}
 			ItemDefinition itemDef = experimentalItems.subSpawn[num2].category.items[0].itemDef;
-			if ((bool)itemDef.Blueprint && !itemDef.Blueprint.defaultBlueprint && itemDef.Blueprint.userCraftable && itemDef.Blueprint.isResearchable && !itemDef.Blueprint.NeedsSteamItem && !itemDef.Blueprint.NeedsSteamDLC && !playerInfo.unlockedItems.Contains(itemDef.itemid))
+			if ((bool)itemDef.Blueprint && !itemDef.Blueprint.defaultBlueprint && itemDef.Blueprint.userCraftable && itemDef.Blueprint.isResearchable && !itemDef.Blueprint.NeedsSteamItem && !itemDef.Blueprint.NeedsSteamDLC && !persistantPlayerInfo.unlockedItems.Contains(itemDef.itemid))
 			{
 				pendingBlueprint = itemDef;
 				break;

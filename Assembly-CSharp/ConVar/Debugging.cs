@@ -12,8 +12,8 @@ namespace ConVar
 	[Factory("debug")]
 	public class Debugging : ConsoleSystem
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool checktriggers = false;
 
 		[ServerVar]
@@ -26,8 +26,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool callbacks = false;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool log
 		{
 			get
@@ -179,21 +179,6 @@ namespace ConVar
 				if (item.info.shortname.Contains(@string, CompareOptions.IgnoreCase) && item.hasCondition)
 				{
 					item.LoseCondition(item.condition * 2f);
-				}
-			}
-		}
-
-		[ServerUserVar]
-		public static void gesture(Arg arg)
-		{
-			string @string = arg.GetString(0);
-			if (!string.IsNullOrEmpty(@string))
-			{
-				BasePlayer basePlayer = ArgEx.Player(arg);
-				if (!(basePlayer == null))
-				{
-					basePlayer.UpdateActiveItem(0u);
-					basePlayer.SignalBroadcast(BaseEntity.Signal.Gesture, @string);
 				}
 			}
 		}

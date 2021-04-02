@@ -472,7 +472,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 		return PhoneName;
 	}
 
-	private static string PositionToGridCoord(Vector3 position)
+	public static string PositionToGridCoord(Vector3 position)
 	{
 		Vector2 a = new Vector2(TerrainMeta.NormalizeX(position.x), TerrainMeta.NormalizeZ(position.z));
 		float num = TerrainMeta.Size.x / 1024f;

@@ -1748,8 +1748,8 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		private Vector3 missOffset;
@@ -1772,22 +1772,22 @@ namespace Rust.Ai.HTN.Murderer
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private MurdererContext _context;
 
 		[Header("Navigation")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
+		[SerializeField]
 		[Header("Sensors")]
 		[ReadOnly]
-		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -1829,8 +1829,8 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
-		[ReadOnly]
 		[Header("Reasoners")]
+		[ReadOnly]
 		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
@@ -1896,17 +1896,17 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
-		[Header("Firearm Utility")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
+		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]
 		[SerializeField]
 		private bool _isFiring;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;

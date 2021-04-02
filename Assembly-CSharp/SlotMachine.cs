@@ -31,6 +31,9 @@ public class SlotMachine : BaseMountable
 		LuckySeven
 	}
 
+	[ServerVar]
+	public static int ForcePayoutIndex = -1;
+
 	[Header("Slot Machine")]
 	public Transform Reel1;
 
@@ -64,8 +67,6 @@ public class SlotMachine : BaseMountable
 
 	private int SpinResultPrevious3;
 
-	private bool IsSpinning;
-
 	private float SpinTime;
 
 	public GameObjectRef StoragePrefab;
@@ -78,7 +79,11 @@ public class SlotMachine : BaseMountable
 
 	public SlotMachinePayoutSettings PayoutSettings;
 
+	public Transform HandIkTarget;
+
 	private const Flags HasScrapForSpin = Flags.Reserved1;
+
+	private const Flags IsSpinningFlag = Flags.Reserved2;
 
 	public Material PayoutIconMaterial;
 
@@ -93,6 +98,15 @@ public class SlotMachine : BaseMountable
 	public Color PulseTo;
 
 	private BasePlayer CurrentSpinPlayer;
+
+	private bool IsSpinning => HasFlag(Flags.Reserved2);
+
+	public int CurrentMultiplier
+	{
+		get;
+		private set;
+	} = 1;
+
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -171,6 +185,46 @@ public class SlotMachine : BaseMountable
 				}
 				return true;
 			}
+			if (rpc == 3942337446u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestMultiplierChange "));
+				}
+				using (TimeWarning.New("Server_RequestMultiplierChange"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(3942337446u, "Server_RequestMultiplierChange", this, player, 5uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(3942337446u, "Server_RequestMultiplierChange", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							Server_RequestMultiplierChange(msg2);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in Server_RequestMultiplierChange");
+					}
+				}
+				return true;
+			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
 	}
@@ -188,6 +242,7 @@ public class SlotMachine : BaseMountable
 		info.msg.slotMachine.isSpinning = IsSpinning;
 		info.msg.slotMachine.spinTime = SpinTime;
 		info.msg.slotMachine.storageID = StorageInstance.uid;
+		info.msg.slotMachine.multiplier = CurrentMultiplier;
 	}
 
 	public override void Load(LoadInfo info)
@@ -201,12 +256,16 @@ public class SlotMachine : BaseMountable
 			SpinResult1 = info.msg.slotMachine.newResult1;
 			SpinResult2 = info.msg.slotMachine.newResult2;
 			SpinResult3 = info.msg.slotMachine.newResult3;
-			IsSpinning = info.msg.slotMachine.isSpinning;
+			CurrentMultiplier = info.msg.slotMachine.multiplier;
 			if (base.isServer)
 			{
 				SpinTime = info.msg.slotMachine.spinTime;
 			}
 			StorageInstance.uid = info.msg.slotMachine.storageID;
+			if (info.fromDisk && base.isServer)
+			{
+				SetFlag(Flags.Reserved2, false);
+			}
 		}
 	}
 
@@ -227,29 +286,56 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
+	private int GetBettingAmount()
+	{
+		SlotMachineStorage component = StorageInstance.Get(base.isServer).GetComponent<SlotMachineStorage>();
+		if (component == null)
+		{
+			return 0;
+		}
+		return component.inventory.GetSlot(0)?.amount ?? 0;
+	}
+
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Spin(RPCMessage rpc)
 	{
-		if (!IsSpinning && !(rpc.player != GetMounted()))
+		if (IsSpinning || rpc.player != GetMounted())
 		{
-			SlotMachineStorage component = StorageInstance.Get(base.isServer).GetComponent<SlotMachineStorage>();
-			int num = (int)PayoutSettings.SpinCost.amount;
-			if (component.inventory.GetAmount(PayoutSettings.SpinCost.itemid, true) >= num && !(rpc.player == null))
+			return;
+		}
+		SlotMachineStorage component = StorageInstance.Get(base.isServer).GetComponent<SlotMachineStorage>();
+		int num = (int)PayoutSettings.SpinCost.amount * CurrentMultiplier;
+		if (GetBettingAmount() < num || rpc.player == null)
+		{
+			return;
+		}
+		BasePlayer basePlayer = (CurrentSpinPlayer = rpc.player);
+		Item slot = component.inventory.GetSlot(0);
+		int amount = 0;
+		if (slot != null)
+		{
+			if (slot.amount > num)
 			{
-				BasePlayer basePlayer = (CurrentSpinPlayer = rpc.player);
-				component.inventory.Take(null, PayoutSettings.SpinCost.itemid, num);
-				component.UpdateAmount(component.inventory.GetAmount(PayoutSettings.SpinCost.itemid, true));
-				IsSpinning = true;
-				SpinResultPrevious1 = SpinResult1;
-				SpinResultPrevious2 = SpinResult2;
-				SpinResultPrevious3 = SpinResult3;
-				CalculateSpinResults();
-				SpinTime = UnityEngine.Time.time;
-				ClientRPC(null, "RPC_OnSpin", (sbyte)SpinResult1, (sbyte)SpinResult2, (sbyte)SpinResult3);
-				Invoke(CheckPayout, SpinDuration);
+				slot.MarkDirty();
+				slot.amount -= num;
+				amount = slot.amount;
+			}
+			else
+			{
+				slot.amount -= num;
+				slot.RemoveFromContainer();
 			}
 		}
+		component.UpdateAmount(amount);
+		SetFlag(Flags.Reserved2, true);
+		SpinResultPrevious1 = SpinResult1;
+		SpinResultPrevious2 = SpinResult2;
+		SpinResultPrevious3 = SpinResult3;
+		CalculateSpinResults();
+		SpinTime = UnityEngine.Time.time;
+		ClientRPC(null, "RPC_OnSpin", (sbyte)SpinResult1, (sbyte)SpinResult2, (sbyte)SpinResult3);
+		Invoke(CheckPayout, SpinDuration);
 	}
 
 	[RPC_Server.MaxDistance(3f)]
@@ -265,14 +351,14 @@ public class SlotMachine : BaseMountable
 
 	private void CheckPayout()
 	{
-		IsSpinning = false;
+		bool flag = false;
 		if (PayoutSettings != null && BaseEntityEx.IsValid(CurrentSpinPlayer) && CurrentSpinPlayer == _mounted)
 		{
 			SlotMachinePayoutSettings.PayoutInfo info;
 			int bonus;
 			if (CalculatePayout(out info, out bonus))
 			{
-				int num = (int)info.Item.amount + bonus;
+				int num = ((int)info.Item.amount + bonus) * CurrentMultiplier;
 				BaseEntity baseEntity = StorageInstance.Get(true);
 				SlotMachineStorage slotMachineStorage;
 				if (baseEntity != null && (object)(slotMachineStorage = baseEntity as SlotMachineStorage) != null)
@@ -288,8 +374,8 @@ public class SlotMachine : BaseMountable
 						ItemManager.Create(info.Item.itemDef, num, 0uL).MoveToContainer(slotMachineStorage.inventory, 1);
 					}
 				}
-				CurrentSpinPlayer.ChatMessage($"You received {(int)info.Item.amount + bonus}x {info.Item.itemDef.displayName.english} for slots payout!");
-				Analytics.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount, (int)info.Item.amount + bonus);
+				CurrentSpinPlayer.ChatMessage($"You received {num}x {info.Item.itemDef.displayName.english} for slots payout!");
+				Analytics.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, num);
 				if (info.OverrideWinEffect != null && info.OverrideWinEffect.isValid)
 				{
 					Effect.server.Run(info.OverrideWinEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
@@ -298,25 +384,51 @@ public class SlotMachine : BaseMountable
 				{
 					Effect.server.Run(PayoutSettings.DefaultWinEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
 				}
+				if (info.OverrideWinEffect != null && info.OverrideWinEffect.isValid)
+				{
+					flag = true;
+				}
 			}
 			else
 			{
-				Analytics.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount, 0);
+				Analytics.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, 0);
 			}
+		}
+		if (!flag)
+		{
+			SetFlag(Flags.Reserved2, false);
+		}
+		else
+		{
+			Invoke(DelayedSpinningReset, 4f);
 		}
 		CurrentSpinPlayer = null;
 	}
 
+	private void DelayedSpinningReset()
+	{
+		SetFlag(Flags.Reserved2, false);
+	}
+
 	private void CalculateSpinResults()
 	{
-		SpinResult1 = RandomSpinResult();
-		SpinResult2 = RandomSpinResult();
-		SpinResult3 = RandomSpinResult();
+		if (ForcePayoutIndex != -1)
+		{
+			SpinResult1 = PayoutSettings.Payouts[ForcePayoutIndex].Result1;
+			SpinResult2 = PayoutSettings.Payouts[ForcePayoutIndex].Result2;
+			SpinResult3 = PayoutSettings.Payouts[ForcePayoutIndex].Result3;
+		}
+		else
+		{
+			SpinResult1 = RandomSpinResult();
+			SpinResult2 = RandomSpinResult();
+			SpinResult3 = RandomSpinResult();
+		}
 	}
 
 	private int RandomSpinResult()
 	{
-		int num = new System.Random(UnityEngine.Random.Range(0, 1000)).Next(PayoutSettings.TotalStops, 500000) % PayoutSettings.TotalStops;
+		int num = new System.Random(UnityEngine.Random.Range(0, 1000)).Next(0, PayoutSettings.TotalStops);
 		int num2 = 0;
 		int num3 = 0;
 		int[] virtualFaces = PayoutSettings.VirtualFaces;
@@ -343,9 +455,22 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	private void Server_RequestMultiplierChange(RPCMessage msg)
+	{
+		if (!(msg.player != _mounted))
+		{
+			CurrentMultiplier = Mathf.Clamp(msg.read.Int32(), 1, 5);
+			OnBettingScrapUpdated(GetBettingAmount());
+			SendNetworkUpdate();
+		}
+	}
+
 	public void OnBettingScrapUpdated(int amount)
 	{
-		SetFlag(Flags.Reserved1, (float)amount >= PayoutSettings.SpinCost.amount);
+		SetFlag(Flags.Reserved1, (float)amount >= PayoutSettings.SpinCost.amount * (float)CurrentMultiplier);
 	}
 
 	private bool CalculatePayout(out SlotMachinePayoutSettings.PayoutInfo info, out int bonus)

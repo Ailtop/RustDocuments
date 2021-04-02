@@ -15,14 +15,14 @@ namespace VLB
 
 		public bool forceSinglePass;
 
-		[SerializeField]
 		[HighlightNull]
+		[SerializeField]
 		private Shader beamShader1Pass;
 
-		[FormerlySerializedAs("BeamShader")]
 		[HighlightNull]
 		[SerializeField]
 		[FormerlySerializedAs("beamShader")]
+		[FormerlySerializedAs("BeamShader")]
 		private Shader beamShader2Pass;
 
 		public int sharedMeshSides = 24;

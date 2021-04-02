@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using Facepunch.Math;
 using Facepunch.Sqlite;
 using ProtoBuf;
@@ -7,15 +8,15 @@ using UnityEngine;
 
 public class UserPersistance : IDisposable
 {
-	public static Database blueprints;
+	public static Facepunch.Sqlite.Database blueprints;
 
-	public static Database deaths;
+	public static Facepunch.Sqlite.Database deaths;
 
-	private static Database identities;
+	private static Facepunch.Sqlite.Database identities;
 
-	private static Database tokens;
+	private static Facepunch.Sqlite.Database tokens;
 
-	private static Database playerState;
+	private static Facepunch.Sqlite.Database playerState;
 
 	private static Dictionary<ulong, string> nameCache;
 
@@ -23,13 +24,13 @@ public class UserPersistance : IDisposable
 
 	public UserPersistance(string strFolder)
 	{
-		blueprints = new Database();
+		blueprints = new Facepunch.Sqlite.Database();
 		blueprints.Open(strFolder + "/player.blueprints." + 4 + ".db");
 		if (!blueprints.TableExists("data"))
 		{
 			blueprints.Execute("CREATE TABLE data ( userid TEXT PRIMARY KEY, info BLOB, updated INTEGER )");
 		}
-		deaths = new Database();
+		deaths = new Facepunch.Sqlite.Database();
 		deaths.Open(strFolder + "/player.deaths." + 4 + ".db");
 		if (!deaths.TableExists("data"))
 		{
@@ -37,20 +38,20 @@ public class UserPersistance : IDisposable
 			deaths.Execute("CREATE INDEX IF NOT EXISTS userindex ON data ( userid )");
 			deaths.Execute("CREATE INDEX IF NOT EXISTS diedindex ON data ( died )");
 		}
-		identities = new Database();
+		identities = new Facepunch.Sqlite.Database();
 		identities.Open(strFolder + "/player.identities." + 4 + ".db");
 		if (!identities.TableExists("data"))
 		{
 			identities.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, username TEXT )");
 		}
-		tokens = new Database();
+		tokens = new Facepunch.Sqlite.Database();
 		tokens.Open(strFolder + "/player.tokens.db");
 		if (!tokens.TableExists("data"))
 		{
 			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT )");
 		}
-		playerState = new Database();
-		playerState.Open(strFolder + "/player.states." + 204 + ".db");
+		playerState = new Facepunch.Sqlite.Database();
+		playerState.Open(strFolder + "/player.states." + 205 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");
@@ -93,12 +94,11 @@ public class UserPersistance : IDisposable
 		PersistantPlayer persistantPlayer = FetchFromDatabase(playerID);
 		if (persistantPlayer == null)
 		{
-			persistantPlayer = new PersistantPlayer();
+			persistantPlayer = Pool.Get<PersistantPlayer>();
 		}
-		persistantPlayer.ShouldPool = false;
 		if (persistantPlayer.unlockedItems == null)
 		{
-			persistantPlayer.unlockedItems = new List<int>();
+			persistantPlayer.unlockedItems = Pool.GetList<int>();
 		}
 		return persistantPlayer;
 	}
@@ -107,10 +107,10 @@ public class UserPersistance : IDisposable
 	{
 		try
 		{
-			Row row = blueprints.QueryRow("SELECT info FROM data WHERE userid = ?", playerID.ToString());
-			if (row != null)
+			byte[] array = blueprints.QueryBlob("SELECT info FROM data WHERE userid = ?", playerID.ToString());
+			if (array != null)
 			{
-				return PersistantPlayer.Deserialize(row.GetBlob("info"));
+				return PersistantPlayer.Deserialize(array);
 			}
 		}
 		catch (Exception ex)
@@ -124,12 +124,12 @@ public class UserPersistance : IDisposable
 	{
 		using (TimeWarning.New("SetPlayerInfo"))
 		{
-			byte[] array;
+			byte[] arg;
 			using (TimeWarning.New("ToProtoBytes"))
 			{
-				array = info.ToProtoBytes();
+				arg = info.ToProtoBytes();
 			}
-			blueprints.Execute("INSERT OR REPLACE INTO data ( userid, info, updated ) VALUES ( ?, ?, ? )", playerID.ToString(), array, Epoch.Current);
+			blueprints.Execute("INSERT OR REPLACE INTO data ( userid, info, updated ) VALUES ( ?, ?, ? )", playerID.ToString(), arg, Epoch.Current);
 		}
 	}
 
@@ -141,12 +141,12 @@ public class UserPersistance : IDisposable
 		}
 		using (TimeWarning.New("AddLifeStory"))
 		{
-			byte[] array;
+			byte[] arg;
 			using (TimeWarning.New("ToProtoBytes"))
 			{
-				array = lifeStory.ToProtoBytes();
+				arg = lifeStory.ToProtoBytes();
 			}
-			deaths.Execute("INSERT INTO data ( userid, born, died, info ) VALUES ( ?, ?, ?, ? )", playerID.ToString(), (int)lifeStory.timeBorn, (int)lifeStory.timeDied, array);
+			deaths.Execute("INSERT INTO data ( userid, born, died, info ) VALUES ( ?, ?, ?, ? )", playerID.ToString(), (int)lifeStory.timeBorn, (int)lifeStory.timeDied, arg);
 		}
 	}
 

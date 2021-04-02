@@ -63,15 +63,15 @@ public class Drone : RemoteControlEntity
 
 	public AnimationCurve movementLoopPitchCurve;
 
-	protected Vector3? targetPosition;
+	public Vector3? targetPosition;
 
-	private DroneInputState currentInput;
+	public DroneInputState currentInput;
 
-	private float lastInputTime;
+	public float lastInputTime;
 
-	private double lastCollision = -1000.0;
+	public double lastCollision = -1000.0;
 
-	private bool isGrounded;
+	public bool isGrounded;
 
 	public override bool RequiresMouse => true;
 

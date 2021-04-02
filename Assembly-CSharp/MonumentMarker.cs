@@ -14,7 +14,7 @@ public class MonumentMarker : MonoBehaviour
 
 	public Color nightColor;
 
-	public void Setup(MonumentInfo info)
+	public void Setup(LandmarkInfo info)
 	{
 		text.text = (info.displayPhrase.IsValid() ? info.displayPhrase.translated : info.transform.root.name);
 		if (info.mapIcon != null)

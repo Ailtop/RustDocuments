@@ -572,7 +572,7 @@ public class Item
 		return true;
 	}
 
-	public bool MoveToContainer(ItemContainer newcontainer, int iTargetPos = -1, bool allowStack = true)
+	public bool MoveToContainer(ItemContainer newcontainer, int iTargetPos = -1, bool allowStack = true, bool ignoreStackLimit = false)
 	{
 		using (TimeWarning.New("MoveToContainer"))
 		{
@@ -589,6 +589,10 @@ public class Item
 					int num = slot.MaxStackable();
 					if (slot.CanStack(this))
 					{
+						if (ignoreStackLimit)
+						{
+							num = int.MaxValue;
+						}
 						if (slot.amount >= num)
 						{
 							return false;
@@ -644,6 +648,10 @@ public class Item
 				if (item2 != null && item2.CanStack(this))
 				{
 					int num3 = item2.MaxStackable();
+					if (ignoreStackLimit)
+					{
+						num3 = int.MaxValue;
+					}
 					if (item2.amount < num3)
 					{
 						item2.amount += amount;
@@ -672,7 +680,7 @@ public class Item
 				}
 				return true;
 			}
-			if (!newcontainer.CanTake(this))
+			if (!newcontainer.CanAccept(this))
 			{
 				return false;
 			}

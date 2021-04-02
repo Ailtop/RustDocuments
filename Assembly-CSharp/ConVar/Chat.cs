@@ -18,7 +18,8 @@ namespace ConVar
 		{
 			Global,
 			Team,
-			Server
+			Server,
+			Cards
 		}
 
 		public struct ChatEntry
@@ -104,6 +105,12 @@ namespace ConVar
 			sayImpl(ChatChannel.Team, arg);
 		}
 
+		[ServerUserVar]
+		public static void cardgamesay(Arg arg)
+		{
+			sayImpl(ChatChannel.Cards, arg);
+		}
+
 		private static void sayImpl(ChatChannel targetChannel, Arg arg)
 		{
 			if (!enabled)
@@ -184,13 +191,17 @@ namespace ConVar
 			{
 				ServerConsole.PrintColoured(ConsoleColor.DarkYellow, string.Concat("[", targetChannel, "] ", username, ": "), ConsoleColor.DarkGreen, text);
 				string str = player?.ToString() ?? $"{username}[{userId}]";
-				if (targetChannel == ChatChannel.Team)
+				switch (targetChannel)
 				{
+				case ChatChannel.Team:
 					DebugEx.Log("[TEAM CHAT] " + str + " : " + text);
-				}
-				else
-				{
+					break;
+				case ChatChannel.Cards:
+					DebugEx.Log("[CARDS CHAT] " + str + " : " + text);
+					break;
+				default:
 					DebugEx.Log("[CHAT] " + str + " : " + text);
+					break;
 				}
 			}
 			bool flag = userGroup == ServerUsers.UserGroup.Owner || userGroup == ServerUsers.UserGroup.Moderator;
@@ -217,6 +228,30 @@ namespace ConVar
 			RCon.Broadcast(RCon.LogType.Chat, chatEntry2);
 			switch (targetChannel)
 			{
+			case ChatChannel.Cards:
+			{
+				if (player == null)
+				{
+					return false;
+				}
+				if (!player.isMounted)
+				{
+					return false;
+				}
+				CardTable cardTable = player.GetMountedVehicle() as CardTable;
+				if (cardTable == null || !cardTable.GameController.PlayerIsInGame(player))
+				{
+					return false;
+				}
+				List<Network.Connection> obj2 = Facepunch.Pool.GetList<Network.Connection>();
+				cardTable.GameController.GetConnectionsInGame(obj2);
+				if (obj2.Count > 0)
+				{
+					ConsoleNetwork.SendClientCommand(obj2, "chat.add2", 3, userId, text, text3, text2, 1f);
+				}
+				Facepunch.Pool.FreeList(ref obj2);
+				return true;
+			}
 			case ChatChannel.Global:
 				if (Server.globalchat)
 				{
@@ -256,8 +291,8 @@ namespace ConVar
 			return false;
 		}
 
-		[ServerVar]
 		[Help("Return the last x lines of the console. Default is 200")]
+		[ServerVar]
 		public static IEnumerable<ChatEntry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);

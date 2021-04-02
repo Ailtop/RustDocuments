@@ -118,8 +118,8 @@ public class Locker : StorageContainer
 		return GetRowType(targetSlot) == RowType.Belt;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Equip(RPCMessage msg)
 	{
 		int num = msg.read.Int32();

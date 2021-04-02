@@ -8,12 +8,14 @@ public static class NetworkWriteEx
 	{
 		if (typeof(T) == typeof(Vector3))
 		{
-			write.Vector3(GenericsUtil.Cast<T, Vector3>(obj));
+			Vector3 obj2 = GenericsUtil.Cast<T, Vector3>(obj);
+			write.Vector3(ref obj2);
 			return;
 		}
 		if (typeof(T) == typeof(Ray))
 		{
-			write.Ray(GenericsUtil.Cast<T, Ray>(obj));
+			Ray obj3 = GenericsUtil.Cast<T, Ray>(obj);
+			write.Ray(ref obj3);
 			return;
 		}
 		if (typeof(T) == typeof(float))
@@ -78,7 +80,8 @@ public static class NetworkWriteEx
 		}
 		if (typeof(T) == typeof(Color))
 		{
-			write.Color(GenericsUtil.Cast<T, Color>(obj));
+			Color obj4 = GenericsUtil.Cast<T, Color>(obj);
+			write.Color(ref obj4);
 			return;
 		}
 		IProto proto;

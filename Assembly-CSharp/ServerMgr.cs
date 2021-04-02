@@ -497,14 +497,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2283)
+		else if (packet.connection.protocol > 2293)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2283));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2293));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2283)
+		else if (packet.connection.protocol < 2293)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2283));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2293));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -832,16 +832,40 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						UnityEngine.Physics.SyncTransforms();
 					}
 					BasePlayer.ServerCycle(UnityEngine.Time.deltaTime);
+					try
+					{
+						using (TimeWarning.New("FlameTurret.BudgetedUpdate"))
+						{
+							FlameTurret.updateFlameTurretQueueServer.RunQueue(0.25);
+						}
+					}
+					catch (Exception exception4)
+					{
+						UnityEngine.Debug.LogWarning("Server Exception: FlameTurret.BudgetedUpdate");
+						UnityEngine.Debug.LogException(exception4, this);
+					}
+					try
+					{
+						using (TimeWarning.New("AutoTurret.BudgetedUpdate"))
+						{
+							AutoTurret.updateAutoTurretScanQueue.RunQueue(0.5);
+						}
+					}
+					catch (Exception exception5)
+					{
+						UnityEngine.Debug.LogWarning("Server Exception: AutoTurret.BudgetedUpdate");
+						UnityEngine.Debug.LogException(exception5, this);
+					}
 					if (batchsynctransforms && autosynctransforms)
 					{
 						UnityEngine.Physics.autoSyncTransforms = true;
 					}
 				}
 			}
-			catch (Exception exception4)
+			catch (Exception exception6)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: Player Update");
-				UnityEngine.Debug.LogException(exception4, this);
+				UnityEngine.Debug.LogException(exception6, this);
 			}
 			try
 			{
@@ -850,10 +874,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					SteamQueryResponse();
 				}
 			}
-			catch (Exception exception5)
+			catch (Exception exception7)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: Steam Query");
-				UnityEngine.Debug.LogException(exception5, this);
+				UnityEngine.Debug.LogException(exception7, this);
 			}
 			try
 			{
@@ -862,10 +886,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					connectionQueue.Cycle(AvailableSlots);
 				}
 			}
-			catch (Exception exception6)
+			catch (Exception exception8)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: Connection Queue");
-				UnityEngine.Debug.LogException(exception6, this);
+				UnityEngine.Debug.LogException(exception8, this);
 			}
 			try
 			{
@@ -874,10 +898,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					IOEntity.ProcessQueue();
 				}
 			}
-			catch (Exception exception7)
+			catch (Exception exception9)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: IOEntity.ProcessQueue");
-				UnityEngine.Debug.LogException(exception7, this);
+				UnityEngine.Debug.LogException(exception9, this);
 			}
 			try
 			{
@@ -886,10 +910,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					AIThinkManager.ProcessQueue();
 				}
 			}
-			catch (Exception exception8)
+			catch (Exception exception10)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: AIThinkManager.ProcessQueue");
-				UnityEngine.Debug.LogException(exception8, this);
+				UnityEngine.Debug.LogException(exception10, this);
 			}
 			try
 			{
@@ -898,10 +922,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					BaseRidableAnimal.ProcessQueue();
 				}
 			}
-			catch (Exception exception9)
+			catch (Exception exception11)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: BaseRidableAnimal.ProcessQueue");
-				UnityEngine.Debug.LogException(exception9, this);
+				UnityEngine.Debug.LogException(exception11, this);
 			}
 			try
 			{
@@ -910,22 +934,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					GrowableEntity.growableEntityUpdateQueue.RunQueue(GrowableEntity.framebudgetms);
 				}
 			}
-			catch (Exception exception10)
+			catch (Exception exception12)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: GrowableEntity.BudgetedUpdate");
-				UnityEngine.Debug.LogException(exception10, this);
-			}
-			try
-			{
-				using (TimeWarning.New("FlameTurret.BudgetedUpdate"))
-				{
-					FlameTurret.updateFlameTurretQueueServer.RunQueue(0.25);
-				}
-			}
-			catch (Exception exception11)
-			{
-				UnityEngine.Debug.LogWarning("Server Exception: FlameTurret.BudgetedUpdate");
-				UnityEngine.Debug.LogException(exception11, this);
+				UnityEngine.Debug.LogException(exception12, this);
 			}
 			try
 			{
@@ -934,10 +946,22 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					BasePlayer.lifeStoryQueue.RunQueue(BasePlayer.lifeStoryFramebudgetms);
 				}
 			}
-			catch (Exception exception12)
+			catch (Exception exception13)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: BasePlayer.BudgetedLifeStoryUpdate");
-				UnityEngine.Debug.LogException(exception12, this);
+				UnityEngine.Debug.LogException(exception13, this);
+			}
+			try
+			{
+				using (TimeWarning.New("JunkPileWater.UpdateNearbyPlayers"))
+				{
+					JunkPileWater.junkpileWaterWorkQueue.RunQueue(JunkPileWater.framebudgetms);
+				}
+			}
+			catch (Exception exception14)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: BasePlayer.BudgetedLifeStoryUpdate");
+				UnityEngine.Debug.LogException(exception14, this);
 			}
 			if (EACServer.playerTracker != null)
 			{
@@ -1049,7 +1073,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2283}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2293}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{

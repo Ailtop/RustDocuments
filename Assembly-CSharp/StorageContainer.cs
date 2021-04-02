@@ -107,7 +107,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		}
 	}
 
-	public void OnDrawGizmos()
+	public virtual void OnDrawGizmos()
 	{
 		Gizmos.matrix = base.transform.localToWorldMatrix;
 		Gizmos.color = Color.yellow;
@@ -244,8 +244,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (isLootable)

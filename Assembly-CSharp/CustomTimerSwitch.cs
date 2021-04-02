@@ -62,8 +62,8 @@ public class CustomTimerSwitch : TimerSwitch
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SERVER_SetTime(RPCMessage msg)
 	{
 		if (CanPlayerAdmin(msg.player))

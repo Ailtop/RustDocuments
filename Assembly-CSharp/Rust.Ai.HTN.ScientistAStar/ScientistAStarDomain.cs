@@ -1991,18 +1991,18 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private ScientistAStarContext _context;
 
+		[Header("Navigation")]
 		[SerializeField]
 		[ReadOnly]
-		[Header("Navigation")]
 		private Vector3 _spawnPosition;
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Sensors")]
+		[ReadOnly]
+		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2047,9 +2047,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Reasoners")]
+		[ReadOnly]
+		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2142,9 +2142,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
-		[Header("Firearm Utility")]
 		[SerializeField]
 		[ReadOnly]
+		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
 		[SerializeField]

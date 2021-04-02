@@ -35,6 +35,8 @@ public class LiquidContainer : ContainerIOEntity
 
 	private Action updateDrainAmountAction;
 
+	private Action updatePushLiquidTargetsAction;
+
 	private Action pushLiquidAction;
 
 	private Action deductFuelAction;
@@ -128,6 +130,7 @@ public class LiquidContainer : ContainerIOEntity
 		updateDrainAmountAction = UpdateDrainAmount;
 		pushLiquidAction = PushLiquidThroughOutputs;
 		deductFuelAction = DeductFuel;
+		updatePushLiquidTargetsAction = UpdatePushLiquidTargets;
 		base.ServerInit();
 		if (startingAmount > 0)
 		{
@@ -148,7 +151,7 @@ public class LiquidContainer : ContainerIOEntity
 		Invoke(updateDrainAmountAction, 0.1f);
 		if (autofillOutputs && HasLiquidItem())
 		{
-			UpdatePushLiquidTargets();
+			Invoke(updatePushLiquidTargetsAction, 0.1f);
 		}
 	}
 
@@ -176,7 +179,7 @@ public class LiquidContainer : ContainerIOEntity
 		}
 		if (HasLiquidItem() && autofillOutputs)
 		{
-			UpdatePushLiquidTargets();
+			Invoke(updatePushLiquidTargetsAction, 0.1f);
 		}
 	}
 
@@ -397,7 +400,7 @@ public class LiquidContainer : ContainerIOEntity
 			}
 			foreach (ContainerIOEntity pushTarget in pushTargets)
 			{
-				if (pushTarget.inventory.CanAcceptItem(liquidItem, 0) == ItemContainer.CanAcceptResult.CanAccept && (pushTarget.inventory.CanTake(liquidItem) || pushTarget.inventory.FindItemByItemID(liquidItem.info.itemid) != null))
+				if (pushTarget.inventory.CanAcceptItem(liquidItem, 0) == ItemContainer.CanAcceptResult.CanAccept && (pushTarget.inventory.CanAccept(liquidItem) || pushTarget.inventory.FindItemByItemID(liquidItem.info.itemid) != null))
 				{
 					int num2 = Mathf.Clamp(num, 0, pushTarget.inventory.GetMaxTransferAmount(liquidItem.info));
 					pushTarget.inventory.AddItem(liquidItem.info, num2, 0uL);

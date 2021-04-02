@@ -100,8 +100,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar(Help = "The slowest physics steps will operate")]
 		[ClientVar]
+		[ServerVar(Help = "The slowest physics steps will operate")]
 		public static float minsteps
 		{
 			get

@@ -102,8 +102,8 @@ public class ElevatorLift : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Server_RaiseLowerFloor(RPCMessage msg)
 	{
 		if (!CanMove())

@@ -25,8 +25,8 @@ public class NGSS_Directional : MonoBehaviour
 	[Range(0f, 0.5f)]
 	public float PCSS_FILTER_DIR_MAX = 0.25f;
 
-	[Range(0f, 10f)]
 	[Tooltip("Amount of banding or noise. Example: 0.0 gives 100 % Banding and 10.0 gives 100 % Noise.")]
+	[Range(0f, 10f)]
 	public float BANDING_NOISE_AMOUNT = 1f;
 
 	[Tooltip("Recommended values: Mobile = 16, Consoles = 25, Desktop Low = 32, Desktop High = 64")]

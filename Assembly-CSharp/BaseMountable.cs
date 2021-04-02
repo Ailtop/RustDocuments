@@ -32,13 +32,11 @@ public class BaseMountable : BaseCombatEntity
 	public bool relativeViewAngles = true;
 
 	[Header("Mounting")]
+	public Transform mountAnchor;
+
 	public PlayerModel.MountPoses mountPose;
 
 	public float maxMountDistance = 1.5f;
-
-	public Transform mountAnchor;
-
-	public Transform dismountAnchor;
 
 	public Transform[] dismountPositions;
 
@@ -279,8 +277,8 @@ public class BaseMountable : BaseCombatEntity
 		base.OnKilled(info);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -382,6 +380,10 @@ public class BaseMountable : BaseCombatEntity
 		Vector3 res;
 		if (lite)
 		{
+			if (baseVehicle != null)
+			{
+				baseVehicle.PrePlayerDismount(player, this);
+			}
 			_mounted.DismountObject();
 			_mounted = null;
 			SetFlag(Flags.Busy, false);
@@ -392,6 +394,10 @@ public class BaseMountable : BaseCombatEntity
 		}
 		else if (!GetDismountPosition(player, out res) || Distance(res) > 10f)
 		{
+			if (baseVehicle != null)
+			{
+				baseVehicle.PrePlayerDismount(player, this);
+			}
 			res = player.transform.position;
 			_mounted.DismountObject();
 			_mounted.MovePosition(res);
@@ -408,6 +414,10 @@ public class BaseMountable : BaseCombatEntity
 		}
 		else
 		{
+			if (baseVehicle != null)
+			{
+				baseVehicle.PrePlayerDismount(player, this);
+			}
 			_mounted.DismountObject();
 			_mounted.transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
 			_mounted.MovePosition(res);
@@ -438,11 +448,12 @@ public class BaseMountable : BaseCombatEntity
 		if (!UnityEngine.Physics.CheckCapsule(disPos + new Vector3(0f, 0.5f, 0f), disPos + new Vector3(0f, 1.3f, 0f), 0.5f, 1537286401))
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
-			if (IsVisible(vector) && !UnityEngine.Physics.Linecast(visualCheckOrigin, vector, 1486946561))
+			RaycastHit hitInfo;
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C57_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, maxDistance, 1486946561))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C57_0(hitInfo))
 				{
 					return true;
 				}

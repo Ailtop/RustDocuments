@@ -113,9 +113,11 @@ public class WorldItem : BaseEntity
 	[RPC_Server.IsVisible(3f)]
 	public void Pickup(RPCMessage msg)
 	{
-		if (msg.player.CanInteract() && item != null && allowPickup && Interface.CallHook("OnItemPickup", item, msg.player) == null)
+		if (msg.player.CanInteract() && this.item != null && allowPickup && Interface.CallHook("OnItemPickup", this.item, msg.player) == null)
 		{
 			ClientRPC(null, "PickupSound");
+			Item item = this.item;
+			RemoveItem();
 			msg.player.GiveItem(item, GiveItemReason.PickedUp);
 			msg.player.SignalBroadcast(Signal.Gesture, "pickup_item");
 		}

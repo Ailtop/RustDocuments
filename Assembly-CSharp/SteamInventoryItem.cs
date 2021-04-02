@@ -53,6 +53,9 @@ public class SteamInventoryItem : ScriptableObject
 
 	public SteamDLCItem DlcItem;
 
+	[Tooltip("Does nothing currently")]
+	public bool forceCraftableItemDesc;
+
 	public ItemDefinition itemDefinition => ItemManager.FindItemDefinition(itemname);
 
 	public virtual bool HasUnlocked(ulong playerId)

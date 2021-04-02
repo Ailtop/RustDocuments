@@ -23,7 +23,7 @@ public class TrainTrackSpline : WorldSpline
 		Reverse
 	}
 
-	private class ConnectedTrackInfo
+	public class ConnectedTrackInfo
 	{
 		public TrainTrackSpline track;
 
@@ -65,19 +65,19 @@ public class TrainTrackSpline : WorldSpline
 
 	public bool forceAsSecondary;
 
-	private List<ConnectedTrackInfo> nextTracks = new List<ConnectedTrackInfo>();
+	public List<ConnectedTrackInfo> nextTracks = new List<ConnectedTrackInfo>();
 
-	private int straightestNextIndex;
+	public int straightestNextIndex;
 
-	private List<ConnectedTrackInfo> prevTracks = new List<ConnectedTrackInfo>();
+	public List<ConnectedTrackInfo> prevTracks = new List<ConnectedTrackInfo>();
 
-	private int straightestPrevIndex;
+	public int straightestPrevIndex;
 
-	private HashSet<ITrainTrackUser> trackUsers = new HashSet<ITrainTrackUser>();
+	public HashSet<ITrainTrackUser> trackUsers = new HashSet<ITrainTrackUser>();
 
-	private bool HasNextTrack => nextTracks.Count > 0;
+	public bool HasNextTrack => nextTracks.Count > 0;
 
-	private bool HasPrevTrack => prevTracks.Count > 0;
+	public bool HasPrevTrack => prevTracks.Count > 0;
 
 	public float GetSplineDistAfterMove(float prevSplineDist, Vector3 askerForward, float distMoved, TrackSelection trackSelection, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltTrack = null)
 	{
@@ -85,7 +85,7 @@ public class TrainTrackSpline : WorldSpline
 		return GetSplineDistAfterMove(prevSplineDist, distMoved, trackSelection, facingForward, out onSpline, out atEndOfLine, preferredAltTrack);
 	}
 
-	private float GetSplineDistAfterMove(float prevSplineDist, float distMoved, TrackSelection trackSelection, bool facingForward, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltTrack = null)
+	public float GetSplineDistAfterMove(float prevSplineDist, float distMoved, TrackSelection trackSelection, bool facingForward, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltTrack = null)
 	{
 		WorldSplineData data = GetData();
 		float num = (facingForward ? (prevSplineDist + distMoved) : (prevSplineDist - distMoved));
@@ -336,7 +336,7 @@ public class TrainTrackSpline : WorldSpline
 		return true;
 	}
 
-	private bool HasClearTrackSpace(ITrainTrackUser asker)
+	public bool HasClearTrackSpace(ITrainTrackUser asker)
 	{
 		foreach (ITrainTrackUser trackUser in trackUsers)
 		{
@@ -348,7 +348,7 @@ public class TrainTrackSpline : WorldSpline
 		return true;
 	}
 
-	private Vector3 GetOverallVector(TrackOrientation o = TrackOrientation.Same)
+	public Vector3 GetOverallVector(TrackOrientation o = TrackOrientation.Same)
 	{
 		if (o == TrackOrientation.Reverse)
 		{
@@ -370,7 +370,7 @@ public class TrainTrackSpline : WorldSpline
 		}
 	}
 
-	private ConnectedTrackInfo GetTrackSelection(List<ConnectedTrackInfo> trackOptions, int straightestIndex, TrackSelection trackSelection, bool nextTrack, bool trainForward, TrainTrackSpline preferredAltTrack)
+	public ConnectedTrackInfo GetTrackSelection(List<ConnectedTrackInfo> trackOptions, int straightestIndex, TrackSelection trackSelection, bool nextTrack, bool trainForward, TrainTrackSpline preferredAltTrack)
 	{
 		if (trackOptions.Count == 1)
 		{

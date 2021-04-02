@@ -5,8 +5,8 @@ using UnityEngine.Serialization;
 
 public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpline.ITrainTrackUser
 {
-	[SerializeField]
 	[FormerlySerializedAs("damagePerMPS")]
+	[SerializeField]
 	private float trainDamagePerMPS = 10f;
 
 	[SerializeField]
@@ -100,7 +100,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 			}
 			else
 			{
-				float amount = hitTrain.TrackSpeed * trainDamagePerMPS;
+				float amount = Mathf.Abs(hitTrain.TrackSpeed) * trainDamagePerMPS;
 				hitTrain.Hurt(amount, DamageType.Collision, this, false);
 			}
 		}

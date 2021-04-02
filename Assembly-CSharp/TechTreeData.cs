@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Oxide.Core;
 using UnityEngine;
 
@@ -37,10 +38,25 @@ public class TechTreeData : ScriptableObject
 
 	public int nextID;
 
+	private Dictionary<int, NodeInstance> _idToNode;
+
+	private NodeInstance _entryNode;
+
 	public List<NodeInstance> nodes = new List<NodeInstance>();
 
 	public NodeInstance GetByID(int id)
 	{
+		if (Application.isPlaying)
+		{
+			if (_idToNode == null)
+			{
+				_idToNode = nodes.ToDictionary((NodeInstance n) => n.id, (NodeInstance n) => n);
+			}
+			NodeInstance value;
+			_idToNode.TryGetValue(id, out value);
+			return value;
+		}
+		_idToNode = null;
 		foreach (NodeInstance node in nodes)
 		{
 			if (node.id == id)
@@ -53,10 +69,16 @@ public class TechTreeData : ScriptableObject
 
 	public NodeInstance GetEntryNode()
 	{
+		if (Application.isPlaying && _entryNode != null && _entryNode.groupName == "Entry")
+		{
+			return _entryNode;
+		}
+		_entryNode = null;
 		foreach (NodeInstance node in nodes)
 		{
 			if (node.groupName == "Entry")
 			{
+				_entryNode = node;
 				return node;
 			}
 		}

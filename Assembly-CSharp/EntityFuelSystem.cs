@@ -47,7 +47,7 @@ public class EntityFuelSystem
 		BaseEntity baseEntity = fuelStorageInstance.Get(isServer);
 		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
 		{
-			return baseEntity.GetComponent<StorageContainer>();
+			return baseEntity as StorageContainer;
 		}
 		return null;
 	}

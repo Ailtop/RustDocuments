@@ -77,15 +77,26 @@ public class BasePlayer : BaseCombatEntity
 			{
 				if (group != null)
 				{
-					if (!group.isGlobal)
+					if (group.isGlobal)
 					{
-						queueInternal.RemoveWhere((BaseNetworkable x) => x == null || x.net == null || x.net.group == null || x.net.group == group);
+						return;
 					}
+					List<BaseNetworkable> obj = Facepunch.Pool.GetList<BaseNetworkable>();
+					foreach (BaseNetworkable item in queueInternal)
+					{
+						if (item == null || item.net?.group == null || item.net.group == group)
+						{
+							obj.Add(item);
+						}
+					}
+					foreach (BaseNetworkable item2 in obj)
+					{
+						queueInternal.Remove(item2);
+					}
+					Facepunch.Pool.FreeList(ref obj);
+					return;
 				}
-				else
-				{
-					queueInternal.RemoveWhere((BaseNetworkable x) => x == null || x.net == null || x.net.group == null || !x.net.group.isGlobal);
-				}
+				queueInternal.RemoveWhere((BaseNetworkable x) => x == null || x.net?.group == null || !x.net.group.isGlobal);
 			}
 		}
 	}
@@ -258,6 +269,8 @@ public class BasePlayer : BaseCombatEntity
 
 	private static readonly byte[] CCTVBuffer = new byte[153600];
 
+	public ViewModel GestureViewModel;
+
 	private const float drinkRange = 1.5f;
 
 	private const float drinkMovementSpeed = 0.1f;
@@ -271,6 +284,16 @@ public class BasePlayer : BaseCombatEntity
 
 	[NonSerialized]
 	private NetworkQueueList SnapshotQueue = new NetworkQueueList();
+
+	public const string GestureCancelString = "cancel";
+
+	public GestureCollection gestureList;
+
+	private TimeUntil gestureFinishedTime;
+
+	private TimeSince blockHeldInputTimer;
+
+	private GestureConfig currentGesture;
 
 	public ulong currentTeam;
 
@@ -328,8 +351,8 @@ public class BasePlayer : BaseCombatEntity
 
 	private const int DRIVING = 64;
 
-	[Help("How many milliseconds to budget for processing life story updates per frame")]
 	[ServerVar]
+	[Help("How many milliseconds to budget for processing life story updates per frame")]
 	public static float lifeStoryFramebudgetms = 0.25f;
 
 	[NonSerialized]
@@ -402,6 +425,8 @@ public class BasePlayer : BaseCombatEntity
 	public float nextCheckTime;
 
 	private int? cachedAppToken;
+
+	private PersistantPlayer cachedPersistantPlayer;
 
 	private int SpectateOffset = 1000000;
 
@@ -574,6 +599,36 @@ public class BasePlayer : BaseCombatEntity
 			return false;
 		}
 	}
+
+	public bool InGesture
+	{
+		get
+		{
+			if (currentGesture != null)
+			{
+				if (!((float)gestureFinishedTime > 0f))
+				{
+					return currentGesture.animationType == GestureConfig.AnimationType.Loop;
+				}
+				return true;
+			}
+			return false;
+		}
+	}
+
+	private bool CurrentGestureBlocksMovement
+	{
+		get
+		{
+			if (InGesture)
+			{
+				return currentGesture.movementMode == GestureConfig.MovementCapabilities.NoMovement;
+			}
+			return false;
+		}
+	}
+
+	private bool InGestureCancelCooldown => (float)blockHeldInputTimer < 0.5f;
 
 	public RelationshipManager.PlayerTeam Team
 	{
@@ -808,6 +863,27 @@ public class BasePlayer : BaseCombatEntity
 			int orGenerateAppToken = SingletonComponent<ServerMgr>.Instance.persistance.GetOrGenerateAppToken(userID);
 			cachedAppToken = orGenerateAppToken;
 			return orGenerateAppToken;
+		}
+	}
+
+	public PersistantPlayer PersistantPlayerInfo
+	{
+		get
+		{
+			if (cachedPersistantPlayer == null)
+			{
+				cachedPersistantPlayer = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(userID);
+			}
+			return cachedPersistantPlayer;
+		}
+		set
+		{
+			if (value == null)
+			{
+				throw new ArgumentNullException("value");
+			}
+			cachedPersistantPlayer = value;
+			SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerInfo(userID, value);
 		}
 	}
 
@@ -1458,6 +1534,46 @@ public class BasePlayer : BaseCombatEntity
 				}
 				return true;
 			}
+			if (rpc == 1005040107 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_CancelGesture "));
+				}
+				using (TimeWarning.New("Server_CancelGesture"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(1005040107u, "Server_CancelGesture", this, player, 1uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.FromOwner.Test(1005040107u, "Server_CancelGesture", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg17 = rPCMessage;
+							Server_CancelGesture(msg17);
+						}
+					}
+					catch (Exception exception16)
+					{
+						Debug.LogException(exception16);
+						player.Kick("RPC Error in Server_CancelGesture");
+					}
+				}
+				return true;
+			}
 			if (rpc == 706157120 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -1482,13 +1598,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg17 = rPCMessage;
-							Server_ClearMapMarkers(msg17);
+							RPCMessage msg18 = rPCMessage;
+							Server_ClearMapMarkers(msg18);
 						}
 					}
-					catch (Exception exception16)
+					catch (Exception exception17)
 					{
-						Debug.LogException(exception16);
+						Debug.LogException(exception17);
 						player.Kick("RPC Error in Server_ClearMapMarkers");
 					}
 				}
@@ -1518,13 +1634,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg18 = rPCMessage;
-							Server_RemovePointOfInterest(msg18);
+							RPCMessage msg19 = rPCMessage;
+							Server_RemovePointOfInterest(msg19);
 						}
 					}
-					catch (Exception exception17)
+					catch (Exception exception18)
 					{
-						Debug.LogException(exception17);
+						Debug.LogException(exception18);
 						player.Kick("RPC Error in Server_RemovePointOfInterest");
 					}
 				}
@@ -1554,14 +1670,54 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg19 = rPCMessage;
-							Server_RequestMarkers(msg19);
+							RPCMessage msg20 = rPCMessage;
+							Server_RequestMarkers(msg20);
 						}
 					}
-					catch (Exception exception18)
+					catch (Exception exception19)
 					{
-						Debug.LogException(exception18);
+						Debug.LogException(exception19);
 						player.Kick("RPC Error in Server_RequestMarkers");
+					}
+				}
+				return true;
+			}
+			if (rpc == 1572722245 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StartGesture "));
+				}
+				using (TimeWarning.New("Server_StartGesture"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(1572722245u, "Server_StartGesture", this, player, 1uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.FromOwner.Test(1572722245u, "Server_StartGesture", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg21 = rPCMessage;
+							Server_StartGesture(msg21);
+						}
+					}
+					catch (Exception exception20)
+					{
+						Debug.LogException(exception20);
+						player.Kick("RPC Error in Server_StartGesture");
 					}
 				}
 				return true;
@@ -1583,13 +1739,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg20 = rPCMessage;
-							ServerRPC_UnderwearChange(msg20);
+							RPCMessage msg22 = rPCMessage;
+							ServerRPC_UnderwearChange(msg22);
 						}
 					}
-					catch (Exception exception19)
+					catch (Exception exception21)
 					{
-						Debug.LogException(exception19);
+						Debug.LogException(exception21);
 						player.Kick("RPC Error in ServerRPC_UnderwearChange");
 					}
 				}
@@ -1612,13 +1768,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg21 = rPCMessage;
-							SV_Drink(msg21);
+							RPCMessage msg23 = rPCMessage;
+							SV_Drink(msg23);
 						}
 					}
-					catch (Exception exception20)
+					catch (Exception exception22)
 					{
-						Debug.LogException(exception20);
+						Debug.LogException(exception22);
 						player.Kick("RPC Error in SV_Drink");
 					}
 				}
@@ -1674,8 +1830,8 @@ public class BasePlayer : BaseCombatEntity
 		rpcHistory.Clear();
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
 	public void HandleCCTVRenderComplete(RPCMessage msg)
 	{
 		if (!Settings.Enabled)
@@ -2005,6 +2161,59 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
+	[RPC_Server]
+	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
+	private void Server_StartGesture(RPCMessage msg)
+	{
+		if (!InGesture && !IsGestureBlocked())
+		{
+			uint id = msg.read.UInt32();
+			GestureConfig toPlay = gestureList.IdToGesture(id);
+			Server_StartGesture(toPlay);
+		}
+	}
+
+	private void Server_StartGesture(GestureConfig toPlay)
+	{
+		if (toPlay != null && toPlay.IsOwnedBy(this))
+		{
+			if (toPlay.animationType == GestureConfig.AnimationType.OneShot)
+			{
+				Invoke(TimeoutGestureServer, toPlay.duration);
+			}
+			ClientRPC(null, "Client_StartGesture", toPlay.gestureId);
+			gestureFinishedTime = toPlay.duration;
+			currentGesture = toPlay;
+			GestureConfig.GestureActionType actionType = toPlay.actionType;
+			int num = 1;
+		}
+	}
+
+	private void TimeoutGestureServer()
+	{
+		currentGesture = null;
+	}
+
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.FromOwner]
+	private void Server_CancelGesture(RPCMessage msg)
+	{
+		currentGesture = null;
+		blockHeldInputTimer = 0f;
+		SignalBroadcast(Signal.Gesture, "cancel");
+	}
+
+	private bool IsGestureBlocked()
+	{
+		if (!isMounted && !IsWounded() && !IsSwimming() && !(currentGesture != null) && !IsDead())
+		{
+			return IsSleeping();
+		}
+		return true;
+	}
+
 	public void DelayedTeamUpdate()
 	{
 		UpdateTeam(currentTeam);
@@ -2202,8 +2411,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_RemovePointOfInterest(RPCMessage msg)
 	{
 		if (ServerCurrentMapNote != null && Interface.CallHook("OnMapMarkerRemove", this, ServerCurrentMapNote) == null)
@@ -2215,15 +2424,15 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_RequestMarkers(RPCMessage msg)
 	{
 		SendMarkersToClient();
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void Server_ClearMapMarkers(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMapMarkersClear", this, ServerCurrentMapNote) == null)
@@ -2330,6 +2539,20 @@ public class BasePlayer : BaseCombatEntity
 		SendNetworkUpdate();
 		PauseSpeedHackDetection(5f);
 		PauseVehicleNoClipDetection(5f);
+	}
+
+	public void HandleMountedOnLoad()
+	{
+		if (mounted.IsValid(base.isServer))
+		{
+			BaseMountable baseMountable = mounted.Get(base.isServer) as BaseMountable;
+			mounted.Set(null);
+			UnityEngine.Vector3 res;
+			if (baseMountable != null && baseMountable.GetDismountPosition(this, out res))
+			{
+				Teleport(res);
+			}
+		}
 	}
 
 	public void DirtyPlayerState()
@@ -2866,8 +3089,8 @@ public class BasePlayer : BaseCombatEntity
 		playerProjectileAttack = null;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -3220,6 +3443,12 @@ public class BasePlayer : BaseCombatEntity
 		return false;
 	}
 
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		HandleMountedOnLoad();
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
@@ -3261,13 +3490,32 @@ public class BasePlayer : BaseCombatEntity
 		modelState.sleeping = IsSleeping();
 		modelState.relaxed = IsRelaxed();
 		info.msg.basePlayer.modelState = modelState.Copy();
-		if (!info.forDisk)
+		if (info.forDisk)
+		{
+			BaseEntity baseEntity = mounted.Get(base.isServer);
+			if (BaseEntityEx.IsValid(baseEntity))
+			{
+				if (baseEntity.enableSaving)
+				{
+					info.msg.basePlayer.mounted = mounted.uid;
+				}
+				else
+				{
+					BaseVehicle mountedVehicle = GetMountedVehicle();
+					if (BaseEntityEx.IsValid(mountedVehicle) && mountedVehicle.enableSaving)
+					{
+						info.msg.basePlayer.mounted = mountedVehicle.net.ID;
+					}
+				}
+			}
+		}
+		else
 		{
 			info.msg.basePlayer.mounted = mounted.uid;
 		}
 		if (flag)
 		{
-			info.msg.basePlayer.persistantData = SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerInfo(userID);
+			info.msg.basePlayer.persistantData = PersistantPlayerInfo.Copy();
 		}
 		if (info.forDisk)
 		{
@@ -3336,6 +3584,7 @@ public class BasePlayer : BaseCombatEntity
 			{
 				LifeStoryStart();
 			}
+			mounted.uid = info.msg.basePlayer.mounted;
 		}
 	}
 
@@ -3752,6 +4001,10 @@ public class BasePlayer : BaseCombatEntity
 		}
 		sleepingPlayerList.Remove(this);
 		SavePlayerState();
+		if (cachedPersistantPlayer != null)
+		{
+			Facepunch.Pool.Free(ref cachedPersistantPlayer);
+		}
 	}
 
 	protected void ServerUpdate(float deltaTime)
@@ -4019,8 +4272,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
@@ -4641,7 +4894,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			if (initiatorPlayer.InSafeZone() || InSafeZone())
 			{
-				initiatorPlayer.MarkHostileFor(1800f);
+				initiatorPlayer.MarkHostileFor(300f);
 			}
 			if (initiatorPlayer.IsNpc && initiatorPlayer.Family == BaseNpc.AiStatistics.FamilyEnum.Murderer && info.damageTypes.Get(DamageType.Explosion) > 0f)
 			{
@@ -4728,6 +4981,12 @@ public class BasePlayer : BaseCombatEntity
 			}
 			return null;
 		}
+	}
+
+	public static bool TryFindByID(ulong userID, out BasePlayer basePlayer)
+	{
+		basePlayer = FindByID(userID);
+		return basePlayer != null;
 	}
 
 	public static BasePlayer FindSleeping(ulong userID)
@@ -4981,8 +5240,8 @@ public class BasePlayer : BaseCombatEntity
 		return net.connection.info.GetInt(key, defaultVal);
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -6508,6 +6767,7 @@ public class BasePlayer : BaseCombatEntity
 		bool flag2 = false;
 		float num4 = 0f;
 		eggVision = 0f;
+		base.Weight = 0f;
 		foreach (Item item in inventory.containerWear.itemList)
 		{
 			ItemModWearable component = item.info.GetComponent<ItemModWearable>();
@@ -6523,6 +6783,7 @@ public class BasePlayer : BaseCombatEntity
 				}
 				num4 += component.accuracyBonus;
 				eggVision += component.eggVision;
+				base.Weight += component.weight;
 				if (component.movementProperties != null)
 				{
 					num2 += component.movementProperties.speedReduction;

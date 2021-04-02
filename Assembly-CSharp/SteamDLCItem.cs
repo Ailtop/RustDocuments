@@ -23,4 +23,13 @@ public class SteamDLCItem : ScriptableObject
 		}
 		return PlatformService.Instance.PlayerOwnsDownloadableContent(steamid, dlcAppID);
 	}
+
+	public bool CanUse(BasePlayer player)
+	{
+		if (player.isServer)
+		{
+			return HasLicense(player.userID);
+		}
+		return false;
+	}
 }

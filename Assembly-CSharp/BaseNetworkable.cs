@@ -185,8 +185,8 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	private MemoryStream _SaveCache;
 
-	[Header("BaseNetworkable")]
 	[ReadOnly]
+	[Header("BaseNetworkable")]
 	public uint prefabID;
 
 	[Tooltip("If enabled the entity will send to everyone on the server - regardless of position")]
@@ -203,7 +203,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	private const bool isServersideEntity = true;
 
-	private static List<Connection> connectionsInSphereList = new List<Connection>();
+	public static List<Connection> connectionsInSphereList = new List<Connection>();
 
 	public bool limitNetworking
 	{
@@ -510,7 +510,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		return player.net.subscriber.IsSubscribed(net.group);
 	}
 
-	protected void SendNetworkGroupChange()
+	public void SendNetworkGroupChange()
 	{
 		if (isSpawned && Network.Net.sv.IsConnected())
 		{
@@ -597,7 +597,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
 	}
 
-	protected void SendNetworkUpdate_Position()
+	public void SendNetworkUpdate_Position()
 	{
 		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
 		{
@@ -611,8 +611,12 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			{
 				Network.Net.sv.write.PacketID(Message.Type.EntityPosition);
 				Network.Net.sv.write.EntityID(net.ID);
-				Network.Net.sv.write.Vector3(GetNetworkPosition());
-				Network.Net.sv.write.Vector3(GetNetworkRotation().eulerAngles);
+				NetWrite write = Network.Net.sv.write;
+				Vector3 obj = GetNetworkPosition();
+				write.Vector3(ref obj);
+				NetWrite write2 = Network.Net.sv.write;
+				obj = GetNetworkRotation().eulerAngles;
+				write2.Vector3(ref obj);
 				Network.Net.sv.write.Float(GetNetworkTime());
 				uint uid = parentEntity.uid;
 				if (uid != 0)
@@ -985,5 +989,37 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			}
 		}
 		return connectionsInSphereList;
+	}
+
+	public static bool HasCloseConnections(Vector3 position, float distance)
+	{
+		if (Network.Net.sv == null)
+		{
+			return false;
+		}
+		if (Network.Net.sv.visibility == null)
+		{
+			return false;
+		}
+		float num = distance * distance;
+		Group group = Network.Net.sv.visibility.GetGroup(position);
+		if (group == null)
+		{
+			return false;
+		}
+		List<Connection> subscribers = group.subscribers;
+		for (int i = 0; i < subscribers.Count; i++)
+		{
+			Connection connection = subscribers[i];
+			if (connection.active)
+			{
+				BasePlayer basePlayer = connection.player as BasePlayer;
+				if (!(basePlayer == null) && !(basePlayer.SqrDistance(position) > num))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

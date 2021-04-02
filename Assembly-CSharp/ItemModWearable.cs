@@ -25,6 +25,8 @@ public class ItemModWearable : ItemMod
 
 	public float eggVision;
 
+	public float weight;
+
 	public GameObjectRef viewmodelAddition;
 
 	public Wearable targetWearable

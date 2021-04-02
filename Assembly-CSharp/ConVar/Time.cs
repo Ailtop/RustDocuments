@@ -5,8 +5,8 @@ namespace ConVar
 	[Factory("time")]
 	public class Time : ConsoleSystem
 	{
-		[ServerVar]
 		[Help("Pause time while loading")]
+		[ServerVar]
 		public static bool pausewhileloading = true;
 
 		[ServerVar]
@@ -23,8 +23,8 @@ namespace ConVar
 			}
 		}
 
-		[Help("The minimum amount of times to tick per frame")]
 		[ServerVar]
+		[Help("The minimum amount of times to tick per frame")]
 		public static float maxdelta
 		{
 			get
@@ -37,8 +37,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[Help("The time scale")]
+		[ServerVar]
 		public static float timescale
 		{
 			get

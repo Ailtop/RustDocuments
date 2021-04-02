@@ -688,6 +688,12 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual TraitFlag Traits => TraitFlag.None;
 
+	public float Weight
+	{
+		get;
+		protected set;
+	}
+
 	public EntityComponentBase[] Components => _components ?? (_components = GetComponentsInChildren<EntityComponentBase>(true));
 
 	public virtual bool IsNpc => false;
@@ -930,7 +936,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	protected void SendNetworkUpdate_Flags()
+	public void SendNetworkUpdate_Flags()
 	{
 		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || base.IsDestroyed || net == null || !isSpawned)
 		{
@@ -2045,8 +2051,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");

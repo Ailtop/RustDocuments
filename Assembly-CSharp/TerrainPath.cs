@@ -9,17 +9,19 @@ public class TerrainPath : TerrainExtension
 
 	public List<PathList> Powerlines = new List<PathList>();
 
+	internal List<LandmarkInfo> Landmarks = new List<LandmarkInfo>();
+
 	public List<MonumentInfo> Monuments = new List<MonumentInfo>();
 
 	public List<RiverInfo> RiverObjs = new List<RiverInfo>();
 
 	public List<LakeInfo> LakeObjs = new List<LakeInfo>();
 
-	internal List<DungeonInfo> DungeonEntrances = new List<DungeonInfo>();
+	public List<DungeonInfo> DungeonEntrances = new List<DungeonInfo>();
 
-	internal List<DungeonCell> DungeonCells = new List<DungeonCell>();
+	public List<DungeonCell> DungeonCells = new List<DungeonCell>();
 
-	internal GameObject DungeonRoot;
+	public GameObject DungeonRoot;
 
 	public List<Vector3> OceanPatrolClose = new List<Vector3>();
 

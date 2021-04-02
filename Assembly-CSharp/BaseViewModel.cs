@@ -9,6 +9,8 @@ public class BaseViewModel : MonoBehaviour
 
 	public Transform pivot;
 
+	public bool useViewModelCamera = true;
+
 	public bool wantsHeldItemFlags;
 
 	public GameObject[] hideSightMeshes;

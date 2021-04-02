@@ -597,6 +597,11 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
+	public float TimeUntilNextDecay()
+	{
+		return nextDecayTime - UnityEngine.Time.time;
+	}
+
 	public void AddDecayDelay(float amount)
 	{
 		if (nextDecayTime < UnityEngine.Time.time)
@@ -713,6 +718,18 @@ public class BaseRidableAnimal : BaseVehicle
 		RiderInput(inputState, player);
 	}
 
+	public void DismountHeavyPlayers()
+	{
+		if (HasFlag(Flags.On))
+		{
+			BasePlayer driver = GetDriver();
+			if ((bool)driver && IsPlayerTooHeavy(driver))
+			{
+				DismountAllPlayers();
+			}
+		}
+	}
+
 	public BaseMountable GetSaddle()
 	{
 		if (!saddleRef.IsValid(base.isServer))
@@ -724,6 +741,7 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public void BudgetedUpdate()
 	{
+		DismountHeavyPlayers();
 		UpdateOnIdealTerrain();
 		UpdateStamina(UnityEngine.Time.fixedDeltaTime);
 		if (currentRunState == RunState.stopped)
@@ -1471,5 +1489,10 @@ public class BaseRidableAnimal : BaseVehicle
 			return runSpeed + num + num2;
 		}
 		return runSpeed;
+	}
+
+	public bool IsPlayerTooHeavy(BasePlayer player)
+	{
+		return player.Weight >= 10f;
 	}
 }

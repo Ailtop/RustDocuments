@@ -889,8 +889,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -931,8 +931,8 @@ public class BaseProjectile : AttackEntity
 		fractionalInsertCounter = 0;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void StartReload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -955,8 +955,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void ServerFractionalReloadInsert(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1013,8 +1013,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Reload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1064,9 +1064,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1115,6 +1115,10 @@ public class BaseProjectile : AttackEntity
 			return;
 		}
 		Interface.CallHook("OnWeaponFired", this, msg.player, component, projectileShoot);
+		if (player.InGesture)
+		{
+			return;
+		}
 		SignalBroadcast(Signal.Attack, string.Empty, msg.connection);
 		player.CleanupExpiredProjectiles();
 		foreach (ProjectileShoot.Projectile projectile in projectileShoot.projectiles)

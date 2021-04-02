@@ -51,8 +51,8 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public Vector3 engineLocalOffset;
 
-	[Header("Train Engine")]
 	[SerializeField]
+	[Header("Train Engine")]
 	public Transform leftHandLever;
 
 	[SerializeField]
@@ -80,7 +80,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public float engineStartupTime = 1f;
 
 	[SerializeField]
-	private GameObjectRef fuelStoragePrefab;
+	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
 	public Transform fuelStoragePoint;
@@ -153,7 +153,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public VehicleEngineController engineController;
 
-	private EntityFuelSystem fuelSystem;
+	public EntityFuelSystem fuelSystem;
 
 	[Header("Brake Effects")]
 	public ParticleSystemContainer[] sparks;
@@ -472,7 +472,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		SetFlag(Flags.Reserved10, false);
 	}
 
-	private float GetCurTopSpeed()
+	public float GetCurTopSpeed()
 	{
 		float num = maxSpeed * GetEnginePowerMultiplier(0.5f);
 		if (EngineIsSlowed)
@@ -490,7 +490,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public void DecayTick()
 	{
 		bool flag = HasDriver() || AnyPlayersOnTrain();
-		bool num = BaseTrain.IsAtAStation && Vector3.Distance(spawnOrigin, base.transform.position) < 50f;
+		bool num = base.IsAtAStation && Vector3.Distance(spawnOrigin, base.transform.position) < 50f;
 		if (flag)
 		{
 			decayingFor = 0f;
@@ -642,7 +642,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		return 0;
 	}
 
-	private bool PlayerIsInParentTrigger(BasePlayer player)
+	public bool PlayerIsInParentTrigger(BasePlayer player)
 	{
 		if (base.isServer)
 		{

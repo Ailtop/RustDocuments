@@ -7,8 +7,8 @@ using UnityEngine.Assertions;
 
 public class VehicleModuleTaxi : VehicleModuleStorage
 {
-	[Header("Taxi")]
 	[SerializeField]
+	[Header("Taxi")]
 	private SoundDefinition kickButtonSound;
 
 	[SerializeField]
@@ -89,8 +89,8 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 		return false;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_KickPassengers(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

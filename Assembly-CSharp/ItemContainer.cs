@@ -266,7 +266,7 @@ public sealed class ItemContainer
 		return itemList.Count == 0;
 	}
 
-	public bool CanTake(Item item)
+	public bool CanAccept(Item item)
 	{
 		if (IsFull())
 		{

@@ -17,12 +17,12 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int maxthreads = 8;
 
-		[ClientVar(Saved = true)]
 		[ServerVar(Saved = true)]
+		[ClientVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -124,8 +124,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void colliders(Arg args)
 		{
 			int num = (from x in UnityEngine.Object.FindObjectsOfType<Collider>()
@@ -138,15 +138,15 @@ namespace ConVar
 			args.ReplyWith(strValue);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void error(Arg args)
 		{
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void queue(Arg args)
 		{
 			string str = "";
@@ -448,8 +448,20 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		public static void teleport2death(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (basePlayer.ServerCurrentDeathNote == null)
+			{
+				arg.ReplyWith("You don't have a current death note!");
+			}
+			Vector3 worldPosition = basePlayer.ServerCurrentDeathNote.worldPosition;
+			basePlayer.Teleport(worldPosition);
+		}
+
+		[ServerVar]
+		[ClientVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -459,8 +471,8 @@ namespace ConVar
 			GC.unload();
 		}
 
-		[ClientVar]
 		[ServerVar(ServerUser = true)]
+		[ClientVar]
 		public static void version(Arg arg)
 		{
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
@@ -473,8 +485,8 @@ namespace ConVar
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);

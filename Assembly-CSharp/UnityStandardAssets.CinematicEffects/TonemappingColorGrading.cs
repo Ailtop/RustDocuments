@@ -109,8 +109,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Tonemapping technique to use. ACES is the recommended one.")]
 			public Tonemapper tonemapper;
 
-			[Tooltip("Adjusts the overall exposure of the scene.")]
 			[Min(0f)]
+			[Tooltip("Adjusts the overall exposure of the scene.")]
 			public float exposure;
 
 			[Tooltip("Custom tonemapping curve.")]
@@ -215,9 +215,9 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 			public float tint;
 
+			[Range(-0.5f, 0.5f)]
 			[Tooltip("Shift the hue of all colors.")]
 			[Space]
-			[Range(-0.5f, 0.5f)]
 			public float hue;
 
 			[Tooltip("Pushes the intensity of all colors.")]
@@ -228,12 +228,12 @@ namespace UnityStandardAssets.CinematicEffects
 			[Range(-1f, 1f)]
 			public float vibrance;
 
-			[Range(0f, 10f)]
 			[Tooltip("Brightens or darkens all colors.")]
+			[Range(0f, 10f)]
 			public float value;
 
-			[Space]
 			[Range(0f, 2f)]
+			[Space]
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			public float contrast;
 
@@ -345,8 +345,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Space]
 			public ChannelMixerSettings channelMixer;
 
-			[Space]
 			[IndentedGroup]
+			[Space]
 			public CurvesSettings curves;
 
 			[Space]
@@ -379,20 +379,20 @@ namespace UnityStandardAssets.CinematicEffects
 			}
 		}
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private EyeAdaptationSettings m_EyeAdaptation = EyeAdaptationSettings.defaultSettings;
 
-		[SettingsGroup]
 		[SerializeField]
+		[SettingsGroup]
 		private TonemappingSettings m_Tonemapping = TonemappingSettings.defaultSettings;
 
 		[SerializeField]
 		[SettingsGroup]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SettingsGroup]
 		[SerializeField]
+		[SettingsGroup]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

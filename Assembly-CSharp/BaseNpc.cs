@@ -119,8 +119,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		[Tooltip("How fast can we turn around")]
 		public float TurnSpeed;
 
-		[Tooltip("Determines things like how near we'll allow other species to get")]
 		[Range(0f, 1f)]
+		[Tooltip("Determines things like how near we'll allow other species to get")]
 		public float Tolerance;
 
 		[Tooltip("How far this NPC can see")]

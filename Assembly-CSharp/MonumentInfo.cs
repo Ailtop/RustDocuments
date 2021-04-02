@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class MonumentInfo : MonoBehaviour, IPrefabPreProcess
+public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 {
+	[Header("MonumentInfo")]
 	public MonumentType Type = MonumentType.Building;
 
 	[InspectorFlags]
@@ -17,14 +18,9 @@ public class MonumentInfo : MonoBehaviour, IPrefabPreProcess
 
 	public bool IsSafeZone;
 
-	public bool shouldDisplayOnMap;
-
-	public Translate.Phrase displayPhrase;
-
-	public Sprite mapIcon;
-
-	protected void Awake()
+	protected override void Awake()
 	{
+		base.Awake();
 		if ((bool)TerrainMeta.Path)
 		{
 			TerrainMeta.Path.Monuments.Add(this);

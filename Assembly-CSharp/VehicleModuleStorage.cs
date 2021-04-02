@@ -73,7 +73,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
 		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
 		{
-			return baseEntity.GetComponent<IItemContainerEntity>();
+			return baseEntity as IItemContainerEntity;
 		}
 		return null;
 	}
@@ -149,12 +149,11 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		if (IsFullySpawned() && base.isServer && !storageUnitInstance.IsValid(base.isServer))
 		{
 			BaseEntity baseEntity = GameManager.server.CreateEntity(storage.storageUnitPrefab.resourcePath, storage.storageUnitPoint.localPosition, storage.storageUnitPoint.localRotation);
+			storageUnitInstance.Set(baseEntity);
 			baseEntity.SetParent(this);
 			baseEntity.Spawn();
-			storageUnitInstance.Set(baseEntity);
 			ItemContainer inventory = GetContainer().inventory;
 			inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
-			SendNetworkUpdate();
 		}
 	}
 

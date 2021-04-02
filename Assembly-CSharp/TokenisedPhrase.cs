@@ -24,7 +24,8 @@ public class TokenisedPhrase : Translate.Phrase
 			translated = translated.Replace("[+altlook]", string.Format("[{0}]", TranslateMouseButton(Input.GetButtonWithBind("+altlook")).ToUpper()));
 			translated = translated.Replace("[+reload]", string.Format("[{0}]", TranslateMouseButton(Input.GetButtonWithBind("+reload")).ToUpper()));
 			translated = translated.Replace("[+voice]", string.Format("[{0}]", TranslateMouseButton(Input.GetButtonWithBind("+voice")).ToUpper()));
-			return translated.Replace("[+lockBreakHealthPercent]", $"{0.15f:0%}");
+			translated = translated.Replace("[+lockBreakHealthPercent]", $"{0.15f:0%}");
+			return translated.Replace("[+gestures]", string.Format("[{0}]", TranslateMouseButton(Input.GetButtonWithBind("+gestures")).ToUpper()));
 		}
 	}
 

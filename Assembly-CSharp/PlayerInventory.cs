@@ -283,8 +283,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return true;
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private void ItemCmd(BaseEntity.RPCMessage msg)
 	{
 		if (msg.player != null && msg.player.IsWounded())
@@ -771,10 +771,14 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		int infoInt = base.baseEntity.GetInfoInt("client.rockskin", 0);
 		if (infoInt > 0 && base.baseEntity.blueprints.steamInventory.HasItem(infoInt))
 		{
-			IPlayerItemDefinition itemDefinition = PlatformService.Instance.GetItemDefinition(infoInt);
-			if (itemDefinition != null)
+			ItemDefinition itemDefinition = ItemManager.FindItemDefinition("rock");
+			if (itemDefinition != null && ItemDefinition.FindSkin(itemDefinition.itemid, infoInt) != 0L)
 			{
-				skin = itemDefinition.WorkshopDownload;
+				IPlayerItemDefinition itemDefinition2 = PlatformService.Instance.GetItemDefinition(infoInt);
+				if (itemDefinition2 != null)
+				{
+					skin = itemDefinition2.WorkshopDownload;
+				}
 			}
 		}
 		GiveItem(ItemManager.CreateByName("rock", 1, skin), containerBelt);

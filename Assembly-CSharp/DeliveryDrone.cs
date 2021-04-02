@@ -41,21 +41,21 @@ public class DeliveryDrone : Drone
 
 	public EntityRef<VendingMachine> targetVendingMachine;
 
-	private State _state;
+	public State _state;
 
-	private RealTimeSince _sinceLastStateChange;
+	public RealTimeSince _sinceLastStateChange;
 
-	private Vector3? _stateGoalPosition;
+	public Vector3? _stateGoalPosition;
 
-	private float? _goToY;
+	public float? _goToY;
 
-	private TimeSince _sinceLastObstacleBlock;
+	public TimeSince _sinceLastObstacleBlock;
 
-	private float? _minimumYLock;
+	public float? _minimumYLock;
 
-	private int _pickUpTicks;
+	public int _pickUpTicks;
 
-	private BaseEntity _mapMarkerInstance;
+	public BaseEntity _mapMarkerInstance;
 
 	public void Setup(Marketplace marketplace, MarketTerminal terminal, VendingMachine vendingMachine)
 	{
@@ -87,7 +87,7 @@ public class DeliveryDrone : Drone
 		_mapMarkerInstance = baseEntity;
 	}
 
-	private void Think()
+	public void Think()
 	{
 		_003C_003Ec__DisplayClass24_0 _003C_003Ec__DisplayClass24_ = default(_003C_003Ec__DisplayClass24_0);
 		_003C_003Ec__DisplayClass24_._003C_003E4__this = this;
@@ -229,7 +229,7 @@ public class DeliveryDrone : Drone
 		}
 	}
 
-	private void ForceRemove()
+	public void ForceRemove()
 	{
 		Marketplace entity;
 		if (sourceMarketplace.TryGet(true, out entity))

@@ -185,9 +185,9 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 		return CanUpdateSign(player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (!(msg.player == null) && CanUpdateSign(msg.player))

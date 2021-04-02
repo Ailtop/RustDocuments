@@ -25,8 +25,8 @@ namespace ConVar
 		[ClientVar]
 		public static bool enabled = true;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool debug = false;
 
 		[ClientVar]
@@ -54,8 +54,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void print_prefabs(Arg arg)
 		{
 			PrefabPoolCollection pool = GameManager.server.pool;
@@ -82,8 +82,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void print_assets(Arg arg)
 		{
 			if (AssetPool.storage.Count == 0)
@@ -116,15 +116,15 @@ namespace ConVar
 			Facepunch.Pool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void clear_prefabs(Arg arg)
 		{
 			GameManager.server.pool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void clear_assets(Arg arg)
 		{
 			AssetPool.Clear();

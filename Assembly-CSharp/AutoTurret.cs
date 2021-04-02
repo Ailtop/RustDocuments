@@ -18,6 +18,26 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		public const Flags Peacekeeper = Flags.Reserved1;
 	}
 
+	public class UpdateAutoTurretScanQueue : ObjectWorkQueue<AutoTurret>
+	{
+		protected override void RunJob(AutoTurret entity)
+		{
+			if (ShouldAdd(entity))
+			{
+				entity.TargetScan();
+			}
+		}
+
+		protected override bool ShouldAdd(AutoTurret entity)
+		{
+			if (base.ShouldAdd(entity))
+			{
+				return BaseEntityEx.IsValid(entity);
+			}
+			return false;
+		}
+	}
+
 	public GameObjectRef gun_fire_effect;
 
 	public GameObjectRef bulletEffect;
@@ -25,6 +45,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	public float bulletSpeed = 200f;
 
 	public AmbienceEmitter ambienceEmitter;
+
+	public static UpdateAutoTurretScanQueue updateAutoTurretScanQueue = new UpdateAutoTurretScanQueue();
 
 	private BasePlayer playerController;
 
@@ -648,8 +670,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
 		RPCMessage rpc2 = rpc;
@@ -678,8 +700,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void ClearList(RPCMessage rpc)
 	{
 		if (!booting && !IsOnline() && IsAuthed(rpc.player) && Interface.CallHook("OnTurretClearList", this, rpc.player) == null)
@@ -722,7 +744,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
 		InvokeRepeating(ServerTick, UnityEngine.Random.Range(0f, 1f), 0.015f);
 		InvokeRandomized(SendAimDir, UnityEngine.Random.Range(0f, 1f), 0.2f, 0.05f);
-		InvokeRandomized(TargetScan, UnityEngine.Random.Range(0f, 1f), TargetScanRate(), 0.2f);
+		InvokeRandomized(ScheduleForTargetScan, UnityEngine.Random.Range(0f, 1f), TargetScanRate(), 0.2f);
 		targetTrigger.GetComponent<SphereCollider>().radius = sightRange;
 	}
 
@@ -871,7 +893,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		if (PeacekeeperMode() && entity == target)
 		{
-			target.MarkHostileFor(1800f);
+			target.MarkHostileFor(300f);
 		}
 		HitInfo info = new HitInfo(this, entity, DamageType.Bullet, num, point);
 		entity.OnAttacked(info);
@@ -1243,6 +1265,11 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			return false;
 		}
 		return true;
+	}
+
+	private void ScheduleForTargetScan()
+	{
+		updateAutoTurretScanQueue.Add(this);
 	}
 
 	public void TargetScan()

@@ -55,8 +55,8 @@ public class ItemDefinition : MonoBehaviour
 		Generic
 	}
 
-	[Header("Item")]
 	[ReadOnly]
+	[Header("Item")]
 	public int itemid;
 
 	[Tooltip("The shortname should be unique. A hash will be generated from it to identify the item type. If this name changes at any point it will make all saves incompatible")]

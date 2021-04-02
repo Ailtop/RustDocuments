@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[712]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[715]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2758,6 +2758,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "cardgamesay",
+			Parent = "chat",
+			FullName = "chat.cardgamesay",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Chat.cardgamesay(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "enabled",
 			Parent = "chat",
 			FullName = "chat.enabled",
@@ -3058,18 +3070,6 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Debugging.flushgroup(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "gesture",
-			Parent = "debug",
-			FullName = "debug.gesture",
-			ServerUser = true,
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				Debugging.gesture(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4296,6 +4296,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Global.teleport(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "teleport2death",
+			Parent = "global",
+			FullName = "global.teleport2death",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.teleport2death(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8709,6 +8721,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "framebudgetms",
+			Parent = "junkpilewater",
+			FullName = "junkpilewater.framebudgetms",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => JunkPileWater.framebudgetms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				JunkPileWater.framebudgetms = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "add",
 			Parent = "meta",
 			FullName = "meta.add",
@@ -9331,6 +9356,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ScrapTransportHelicopter.population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "forcepayoutindex",
+			Parent = "slotmachine",
+			FullName = "slotmachine.forcepayoutindex",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SlotMachine.ForcePayoutIndex.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SlotMachine.ForcePayoutIndex = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

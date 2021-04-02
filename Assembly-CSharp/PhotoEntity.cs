@@ -93,8 +93,8 @@ public class PhotoEntity : BaseEntity
 		PhotographerSteamId = steamId;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
 	private void ImageRequested(RPCMessage msg)
 	{
 		if (msg.player == null)

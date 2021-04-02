@@ -5,8 +5,8 @@ namespace UnityEngine.UI.Extensions
 	{
 		public Vector2 cornerSize = new Vector2(16f, 16f);
 
-		[SerializeField]
 		[Header("Corners to cut")]
+		[SerializeField]
 		private bool m_cutUL = true;
 
 		[SerializeField]
