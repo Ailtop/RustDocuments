@@ -4,14 +4,7 @@ public class ModelConditionTest_WallCornerLeft : ModelConditionTest
 {
 	private const string socket = "sockets/stability/2";
 
-	private static string[] sockets = new string[5]
-	{
-		"wall/sockets/stability/2",
-		"wall.half/sockets/stability/2",
-		"wall.low/sockets/stability/2",
-		"wall.doorway/sockets/stability/2",
-		"wall.window/sockets/stability/2"
-	};
+	private static string[] sockets = new string[5] { "wall/sockets/stability/2", "wall.half/sockets/stability/2", "wall.low/sockets/stability/2", "wall.doorway/sockets/stability/2", "wall.window/sockets/stability/2" };
 
 	public override bool DoTest(BaseEntity ent)
 	{

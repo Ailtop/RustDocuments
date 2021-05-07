@@ -3,11 +3,7 @@ using UnityEngine;
 
 public class VehicleLiftOccupantTrigger : TriggerBase
 {
-	public ModularCar carOccupant
-	{
-		get;
-		private set;
-	}
+	public ModularCar carOccupant { get; private set; }
 
 	protected override void OnDisable()
 	{

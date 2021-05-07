@@ -33,9 +33,9 @@ public class WaterVolume : TriggerBase
 				info = default(WaterLevel.WaterInfo);
 				return false;
 			}
-			Vector3 a = new Plane(cachedBounds.up, cachedBounds.position).ClosestPointOnPlane(pos);
-			float y = (a + cachedBounds.up * cachedBounds.extents.y).y;
-			float y2 = (a + -cachedBounds.up * cachedBounds.extents.y).y;
+			Vector3 vector = new Plane(cachedBounds.up, cachedBounds.position).ClosestPointOnPlane(pos);
+			float y = (vector + cachedBounds.up * cachedBounds.extents.y).y;
+			float y2 = (vector + -cachedBounds.up * cachedBounds.extents.y).y;
 			info.isValid = true;
 			info.currentDepth = Mathf.Max(0f, y - pos.y);
 			info.overallDepth = Mathf.Max(0f, y - y2);
@@ -61,9 +61,9 @@ public class WaterVolume : TriggerBase
 				info = default(WaterLevel.WaterInfo);
 				return false;
 			}
-			Vector3 a = new Plane(cachedBounds.up, cachedBounds.position).ClosestPointOnPlane(bounds.center);
-			float y = (a + cachedBounds.up * cachedBounds.extents.y).y;
-			float y2 = (a + -cachedBounds.up * cachedBounds.extents.y).y;
+			Vector3 vector = new Plane(cachedBounds.up, cachedBounds.position).ClosestPointOnPlane(bounds.center);
+			float y = (vector + cachedBounds.up * cachedBounds.extents.y).y;
+			float y2 = (vector + -cachedBounds.up * cachedBounds.extents.y).y;
 			info.isValid = true;
 			info.currentDepth = Mathf.Max(0f, y - bounds.min.y);
 			info.overallDepth = Mathf.Max(0f, y - y2);

@@ -41,34 +41,17 @@ namespace CompanionServer
 				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindTeam(player.currentTeam);
 				Dictionary<string, string> serverPairingData = GetServerPairingData();
 				serverPairingData.Add("type", "login");
-				serverPairingData.Add("targetId", player.UserIDString);
-				serverPairingData.Add("targetName", player.displayName.Truncate(128));
 				playerTeam?.SendNotification(NotificationChannel.PlayerLoggedIn, player.displayName + " is now online", ConVar.Server.hostname, serverPairingData, player.userID);
 			}
 		}
 
-		public static void SendDeathNotification(BasePlayer player, BaseEntity killer)
+		public static void SendDeathNotification(BasePlayer player, string killerName)
 		{
-			BasePlayer basePlayer;
-			string value;
-			string text;
-			if ((object)(basePlayer = killer as BasePlayer) != null)
-			{
-				value = basePlayer.UserIDString;
-				text = basePlayer.displayName;
-			}
-			else
-			{
-				value = "-1";
-				text = killer.ShortPrefabName;
-			}
-			if (!(player == null) && !string.IsNullOrEmpty(text))
+			if (!(player == null) && !string.IsNullOrEmpty(killerName))
 			{
 				Dictionary<string, string> serverPairingData = GetServerPairingData();
 				serverPairingData.Add("type", "death");
-				serverPairingData.Add("targetId", value);
-				serverPairingData.Add("targetName", text.Truncate(128));
-				NotificationList.SendNotificationTo(player.userID, NotificationChannel.PlayerDied, "You were killed by " + text, ConVar.Server.hostname, serverPairingData);
+				NotificationList.SendNotificationTo(player.userID, NotificationChannel.PlayerDied, "You were killed by " + killerName, ConVar.Server.hostname, serverPairingData);
 			}
 		}
 

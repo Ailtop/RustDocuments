@@ -113,8 +113,8 @@ public class CH47FlightTest : MonoBehaviour
 		float num = Mathf.InverseLerp(liftDotMax, 1f, value);
 		Vector3 force = Vector3.up * engineThrustMax * 0.5f * currentThrottle * num;
 		Vector3 force2 = (base.transform.up - Vector3.up).normalized * engineThrustMax * currentThrottle * (1f - num);
-		float d = rigidBody.mass * (0f - Physics.gravity.y);
-		rigidBody.AddForce(base.transform.up * d * num * 0.99f, ForceMode.Force);
+		float num2 = rigidBody.mass * (0f - Physics.gravity.y);
+		rigidBody.AddForce(base.transform.up * num2 * num * 0.99f, ForceMode.Force);
 		rigidBody.AddForce(force, ForceMode.Force);
 		rigidBody.AddForce(force2, ForceMode.Force);
 		for (int i = 0; i < GroundEffects.Length; i++)
@@ -139,10 +139,10 @@ public class CH47FlightTest : MonoBehaviour
 		Gizmos.color = Color.yellow;
 		Gizmos.DrawSphere(AIMoveTarget.transform.position, 1f);
 		Vector3 vector = Vector3.Cross(base.transform.right, Vector3.up);
-		Vector3 a = Vector3.Cross(vector, Vector3.up);
+		Vector3 vector2 = Vector3.Cross(vector, Vector3.up);
 		Gizmos.color = Color.blue;
 		Gizmos.DrawLine(base.transform.position, base.transform.position + vector * 10f);
 		Gizmos.color = Color.red;
-		Gizmos.DrawLine(base.transform.position, base.transform.position + a * 10f);
+		Gizmos.DrawLine(base.transform.position, base.transform.position + vector2 * 10f);
 	}
 }

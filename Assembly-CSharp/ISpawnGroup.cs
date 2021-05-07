@@ -1,9 +1,6 @@
 public interface ISpawnGroup
 {
-	int currentPopulation
-	{
-		get;
-	}
+	int currentPopulation { get; }
 
 	void Clear();
 

@@ -86,11 +86,11 @@ public class TriggerPlayerForce : TriggerBase, IServerComponent
 
 	private Vector3 GetPushVelocity(GameObject obj)
 	{
-		Vector3 a = -(base.transform.position + triggerCollider.center - obj.transform.position);
-		a.Normalize();
-		a.y = 0.2f;
-		a.Normalize();
-		return a * pushVelocity;
+		Vector3 vector = -(base.transform.position + triggerCollider.center - obj.transform.position);
+		vector.Normalize();
+		vector.y = 0.2f;
+		vector.Normalize();
+		return vector * pushVelocity;
 	}
 
 	private bool IsInterested(BaseEntity entity)

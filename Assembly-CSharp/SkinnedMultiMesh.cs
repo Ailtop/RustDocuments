@@ -48,9 +48,6 @@ public class SkinnedMultiMesh : MonoBehaviour
 
 	public SkinSetCollection SkinCollection;
 
-	public List<Renderer> Renderers
-	{
-		get;
-	} = new List<Renderer>(32);
+	public List<Renderer> Renderers { get; } = new List<Renderer>(32);
 
 }

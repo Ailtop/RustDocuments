@@ -50,9 +50,9 @@ namespace CompanionServer
 		{
 			if (App.update && App.queuelimit > 0)
 			{
-				MemoryBuffer buffer = new MemoryBuffer(data.Length);
-				data.CopyTo(buffer);
-				_listener.Enqueue(this, buffer.Slice(data.Length));
+				MemoryBuffer memoryBuffer = new MemoryBuffer(data.Length);
+				data.CopyTo(memoryBuffer);
+				_listener.Enqueue(this, memoryBuffer.Slice(data.Length));
 			}
 		}
 

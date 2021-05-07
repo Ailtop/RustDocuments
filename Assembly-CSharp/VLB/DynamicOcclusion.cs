@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace VLB
 {
+	[HelpURL("http://saladgamer.com/vlb-doc/comp-dynocclusion/")]
+	[ExecuteInEditMode]
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(VolumetricLightBeam))]
-	[ExecuteInEditMode]
-	[HelpURL("http://saladgamer.com/vlb-doc/comp-dynocclusion/")]
 	public class DynamicOcclusion : MonoBehaviour
 	{
 		private enum Direction
@@ -143,8 +143,8 @@ namespace VLB
 					{
 						Vector3 direction = GetDirection(num + m_PrevNonSubHitDirectionId);
 						Vector3 vector = base.transform.position + direction * m_Master.coneRadiusStart * (minSurfaceRatio * 2f - 1f);
-						Vector3 a = base.transform.position + base.transform.forward * m_Master.fadeEnd + direction * m_Master.coneRadiusEnd * (minSurfaceRatio * 2f - 1f);
-						RaycastHit bestHit = GetBestHit(vector, a - vector);
+						Vector3 vector2 = base.transform.position + base.transform.forward * m_Master.fadeEnd + direction * m_Master.coneRadiusEnd * (minSurfaceRatio * 2f - 1f);
+						RaycastHit bestHit = GetBestHit(vector, vector2 - vector);
 						if (IsHitValid(bestHit))
 						{
 							if (bestHit.distance > hit.distance)

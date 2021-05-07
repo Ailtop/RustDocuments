@@ -1,35 +1,35 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-[ImageEffectAllowedInSceneView]
 [AddComponentMenu("KriptoFX/Explosion_Bloom")]
+[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
+[ImageEffectAllowedInSceneView]
 public class Explosion_Bloom : MonoBehaviour
 {
 	[Serializable]
 	public struct Settings
 	{
-		[Tooltip("Filters out pixels under this level of brightness.")]
 		[SerializeField]
+		[Tooltip("Filters out pixels under this level of brightness.")]
 		public float threshold;
 
-		[Range(0f, 1f)]
 		[SerializeField]
+		[Range(0f, 1f)]
 		[Tooltip("Makes transition between under/over-threshold gradual.")]
 		public float softKnee;
 
-		[SerializeField]
 		[Range(1f, 7f)]
 		[Tooltip("Changes extent of veiling effects in a screen resolution-independent fashion.")]
+		[SerializeField]
 		public float radius;
 
 		[Tooltip("Blend factor of the result image.")]
 		[SerializeField]
 		public float intensity;
 
-		[Tooltip("Controls filter quality and buffer resolution.")]
 		[SerializeField]
+		[Tooltip("Controls filter quality and buffer resolution.")]
 		public bool highQuality;
 
 		[SerializeField]
@@ -79,8 +79,8 @@ public class Explosion_Bloom : MonoBehaviour
 	[SerializeField]
 	public Settings settings = Settings.defaultSettings;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Shader m_Shader;
 
 	private Material m_Material;
@@ -220,8 +220,8 @@ public class Explosion_Bloom : MonoBehaviour
 		float thresholdLinear = settings.thresholdLinear;
 		material.SetFloat(m_Threshold, thresholdLinear);
 		float num6 = thresholdLinear * settings.softKnee + 1E-05f;
-		Vector3 v = new Vector3(thresholdLinear - num6, num6 * 2f, 0.25f / num6);
-		material.SetVector(m_Curve, v);
+		Vector3 vector = new Vector3(thresholdLinear - num6, num6 * 2f, 0.25f / num6);
+		material.SetVector(m_Curve, vector);
 		bool flag = !settings.highQuality && settings.antiFlicker;
 		material.SetFloat(m_PrefilterOffs, flag ? (-0.5f) : 0f);
 		material.SetFloat(m_SampleScale, 0.5f + num3 - (float)num4);

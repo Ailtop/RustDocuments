@@ -20,8 +20,8 @@ public class PlacementTest : MonoBehaviour
 	{
 		degreesOffset = Mathf.Clamp(degreesOffset / 180f, -180f, 180f);
 		Vector2 insideUnitCircle = Random.insideUnitCircle;
-		Vector3 b = new Vector3(insideUnitCircle.x * degreesOffset, Random.Range(-1f, 1f) * degreesOffset, insideUnitCircle.y * degreesOffset);
-		return (input + b).normalized;
+		Vector3 vector = new Vector3(insideUnitCircle.x * degreesOffset, Random.Range(-1f, 1f) * degreesOffset, insideUnitCircle.y * degreesOffset);
+		return (input + vector).normalized;
 	}
 
 	public Vector3 RandomCylinderPointAroundVector(Vector3 input, float distance, float minHeight = 0f, float maxHeight = 0f)

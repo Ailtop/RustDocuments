@@ -10,8 +10,6 @@ using UnityEngine.Assertions;
 
 public class TreeManager : BaseEntity
 {
-	public static ListHashSet<BaseEntity> entities = new ListHashSet<BaseEntity>();
-
 	public static TreeManager server;
 
 	private const int maxTreesPerPacket = 100;
@@ -84,47 +82,33 @@ public class TreeManager : BaseEntity
 		server = this;
 	}
 
-	public static void OnTreeDestroyed(BaseEntity billboardEntity)
+	public static void OnTreeDestroyed(TreeEntity treeEntity)
 	{
-		entities.Remove(billboardEntity);
 		if (!Rust.Application.isLoading && !Rust.Application.isQuitting)
 		{
-			server.ClientRPC(null, "CLIENT_TreeDestroyed", billboardEntity.net.ID);
+			server.ClientRPC(null, "CLIENT_TreeDestroyed", treeEntity.net.ID);
 		}
 	}
 
-	public static void OnTreeSpawned(BaseEntity billboardEntity)
+	private static void ExtractTreeNetworkData(TreeEntity treeEntity, ProtoBuf.Tree tree)
 	{
-		entities.Add(billboardEntity);
-		if (!Rust.Application.isLoading && !Rust.Application.isQuitting)
-		{
-			using (ProtoBuf.Tree tree = Facepunch.Pool.Get<ProtoBuf.Tree>())
-			{
-				ExtractTreeNetworkData(billboardEntity, tree);
-				server.ClientRPC(null, "CLIENT_TreeSpawned", tree);
-			}
-		}
+		tree.netId = treeEntity.net.ID;
+		tree.prefabId = treeEntity.prefabID;
+		tree.position = Vec3ToProtoHalf3(treeEntity.transform.position);
+		tree.scale = treeEntity.transform.lossyScale.y;
 	}
 
-	private static void ExtractTreeNetworkData(BaseEntity billboardEntity, ProtoBuf.Tree tree)
-	{
-		tree.netId = billboardEntity.net.ID;
-		tree.prefabId = billboardEntity.prefabID;
-		tree.position = Vec3ToProtoHalf3(billboardEntity.transform.position);
-		tree.scale = billboardEntity.transform.lossyScale.y;
-	}
-
-	[RPC_Server.CallsPerSecond(0uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(0uL)]
 	private void SERVER_RequestTrees(RPCMessage msg)
 	{
-		BufferList<BaseEntity> values = entities.Values;
+		BufferList<TreeEntity> values = TreeEntity.activeTreeList.Values;
 		TreeList treeList = null;
 		for (int i = 0; i < values.Count; i++)
 		{
-			BaseEntity billboardEntity = values[i];
+			TreeEntity treeEntity = values[i];
 			ProtoBuf.Tree tree = Facepunch.Pool.Get<ProtoBuf.Tree>();
-			ExtractTreeNetworkData(billboardEntity, tree);
+			ExtractTreeNetworkData(treeEntity, tree);
 			if (treeList == null)
 			{
 				treeList = Facepunch.Pool.Get<TreeList>();

@@ -7,12 +7,7 @@ namespace Windows
 	{
 		public string inputString = "";
 
-		public string[] statusText = new string[3]
-		{
-			"",
-			"",
-			""
-		};
+		public string[] statusText = new string[3] { "", "", "" };
 
 		internal float nextUpdate;
 

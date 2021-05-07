@@ -27,8 +27,8 @@ public class TrainEngineAudio : MonoBehaviour
 	[SerializeField]
 	private Transform cockpitSoundPosition;
 
-	[Header("Engine")]
 	[SerializeField]
+	[Header("Engine")]
 	private SoundDefinition engineStartSound;
 
 	[SerializeField]

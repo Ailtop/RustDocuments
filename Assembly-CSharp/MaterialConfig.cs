@@ -28,13 +28,7 @@ public class MaterialConfig : ScriptableObject
 			}
 			if (climates == null || climates.Length == 0)
 			{
-				climates = new T[4]
-				{
-					Arid,
-					Temperate,
-					Tundra,
-					Arctic
-				};
+				climates = new T[4] { Arid, Temperate, Tundra, Arctic };
 			}
 			int biomeMaxType = TerrainMeta.BiomeMap.GetBiomeMaxType(pos);
 			int biomeMaxType2 = TerrainMeta.BiomeMap.GetBiomeMaxType(pos, ~biomeMaxType);
@@ -51,13 +45,7 @@ public class MaterialConfig : ScriptableObject
 			}
 			if (climates == null || climates.Length == 0)
 			{
-				climates = new T[4]
-				{
-					Arid,
-					Temperate,
-					Tundra,
-					Arctic
-				};
+				climates = new T[4] { Arid, Temperate, Tundra, Arctic };
 			}
 			int biomeMaxType = TerrainMeta.BiomeMap.GetBiomeMaxType(pos);
 			return climates[TerrainBiome.TypeToIndex(biomeMaxType)];

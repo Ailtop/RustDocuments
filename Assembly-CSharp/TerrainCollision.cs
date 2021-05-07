@@ -68,10 +68,7 @@ public class TerrainCollision : TerrainExtension
 		{
 			if (ignore)
 			{
-				List<Collider> val = new List<Collider>
-				{
-					trigger
-				};
+				List<Collider> val = new List<Collider> { trigger };
 				Physics.IgnoreCollision(collider, terrainCollider, true);
 				ignoredColliders.Add(collider, val);
 			}

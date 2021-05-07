@@ -157,7 +157,7 @@ public class Effect : EffectData
 
 		public static void ImpactEffect(HitInfo info)
 		{
-			if (((bool)info.InitiatorPlayer && info.InitiatorPlayer.limitNetworking) || !info.DoHitEffects)
+			if (!info.DoHitEffects)
 			{
 				return;
 			}

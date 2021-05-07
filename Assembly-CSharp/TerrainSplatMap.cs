@@ -13,7 +13,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 	{
 		res = terrain.terrainData.alphamapResolution;
 		this.num = config.Splats.Length;
-		src = (base.dst = new byte[this.num * res * res]);
+		src = (dst = new byte[this.num * res * res]);
 		if (SplatTexture0 != null)
 		{
 			if (SplatTexture0.width == SplatTexture0.height && SplatTexture0.width == res)
@@ -29,21 +29,21 @@ public class TerrainSplatMap : TerrainMap<byte>
 						Color32 color = pixels[num];
 						if (this.num > 0)
 						{
-							byte[] dst = base.dst;
+							byte[] array = dst;
 							int re = res;
-							dst[(0 + i) * res + num2] = color.r;
+							array[(0 + i) * res + num2] = color.r;
 						}
 						if (this.num > 1)
 						{
-							base.dst[(res + i) * res + num2] = color.g;
+							dst[(res + i) * res + num2] = color.g;
 						}
 						if (this.num > 2)
 						{
-							base.dst[(2 * res + i) * res + num2] = color.b;
+							dst[(2 * res + i) * res + num2] = color.b;
 						}
 						if (this.num > 3)
 						{
-							base.dst[(3 * res + i) * res + num2] = color.a;
+							dst[(3 * res + i) * res + num2] = color.a;
 						}
 						num2++;
 						num++;
@@ -72,19 +72,19 @@ public class TerrainSplatMap : TerrainMap<byte>
 					Color32 color2 = pixels2[num3];
 					if (this.num > 4)
 					{
-						base.dst[(4 * res + j) * res + num4] = color2.r;
+						dst[(4 * res + j) * res + num4] = color2.r;
 					}
 					if (this.num > 5)
 					{
-						base.dst[(5 * res + j) * res + num4] = color2.g;
+						dst[(5 * res + j) * res + num4] = color2.g;
 					}
 					if (this.num > 6)
 					{
-						base.dst[(6 * res + j) * res + num4] = color2.b;
+						dst[(6 * res + j) * res + num4] = color2.b;
 					}
 					if (this.num > 7)
 					{
-						base.dst[(7 * res + j) * res + num4] = color2.a;
+						dst[(7 * res + j) * res + num4] = color2.a;
 					}
 					num4++;
 					num3++;
@@ -114,14 +114,14 @@ public class TerrainSplatMap : TerrainMap<byte>
 				}
 				else
 				{
-					byte[] src = base.src;
+					byte[] array = src;
 					int re = res;
-					num = src[(0 + z) * res + j];
+					num = array[(0 + z) * res + j];
 				}
 				byte r2 = (byte)num;
-				byte g2 = (byte)((this.num > 1) ? base.src[(res + z) * res + j] : 0);
-				byte b2 = (byte)((this.num > 2) ? base.src[(2 * res + z) * res + j] : 0);
-				byte a2 = (byte)((this.num > 3) ? base.src[(3 * res + z) * res + j] : 0);
+				byte g2 = (byte)((this.num > 1) ? src[(res + z) * res + j] : 0);
+				byte b2 = (byte)((this.num > 2) ? src[(2 * res + z) * res + j] : 0);
+				byte a2 = (byte)((this.num > 3) ? src[(3 * res + z) * res + j] : 0);
 				cols[z * res + j] = new Color32(r2, g2, b2, a2);
 			}
 		});
@@ -328,32 +328,32 @@ public class TerrainSplatMap : TerrainMap<byte>
 			float num2 = 1f - opacity * num;
 			if (num2 == 0f && opacity == 1f)
 			{
-				byte[] dst = base.dst;
+				byte[] array = dst;
 				int re = res;
-				dst[(0 + z) * res + x] = BitUtility.Float2Byte(v1.x);
-				base.dst[(res + z) * res + x] = BitUtility.Float2Byte(v1.y);
-				base.dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(v1.z);
-				base.dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(v1.w);
-				base.dst[(4 * res + z) * res + x] = BitUtility.Float2Byte(v2.x);
-				base.dst[(5 * res + z) * res + x] = BitUtility.Float2Byte(v2.y);
-				base.dst[(6 * res + z) * res + x] = BitUtility.Float2Byte(v2.z);
-				base.dst[(7 * res + z) * res + x] = BitUtility.Float2Byte(v2.w);
+				array[(0 + z) * res + x] = BitUtility.Float2Byte(v1.x);
+				dst[(res + z) * res + x] = BitUtility.Float2Byte(v1.y);
+				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(v1.z);
+				dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(v1.w);
+				dst[(4 * res + z) * res + x] = BitUtility.Float2Byte(v2.x);
+				dst[(5 * res + z) * res + x] = BitUtility.Float2Byte(v2.y);
+				dst[(6 * res + z) * res + x] = BitUtility.Float2Byte(v2.z);
+				dst[(7 * res + z) * res + x] = BitUtility.Float2Byte(v2.w);
 			}
 			else
 			{
-				byte[] dst2 = base.dst;
+				byte[] array2 = dst;
 				int re2 = res;
 				int num3 = (0 + z) * res + x;
-				byte[] src = base.src;
+				byte[] array3 = src;
 				int re3 = res;
-				dst2[num3] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(0 + z) * res + x]) * num2 + v1.x * opacity);
-				base.dst[(res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(res + z) * res + x]) * num2 + v1.y * opacity);
-				base.dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(2 * res + z) * res + x]) * num2 + v1.z * opacity);
-				base.dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(3 * res + z) * res + x]) * num2 + v1.w * opacity);
-				base.dst[(4 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(4 * res + z) * res + x]) * num2 + v2.x * opacity);
-				base.dst[(5 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(5 * res + z) * res + x]) * num2 + v2.y * opacity);
-				base.dst[(6 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(6 * res + z) * res + x]) * num2 + v2.z * opacity);
-				base.dst[(7 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(7 * res + z) * res + x]) * num2 + v2.w * opacity);
+				array2[num3] = BitUtility.Float2Byte(BitUtility.Byte2Float(array3[(0 + z) * res + x]) * num2 + v1.x * opacity);
+				dst[(res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(res + z) * res + x]) * num2 + v1.y * opacity);
+				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(2 * res + z) * res + x]) * num2 + v1.z * opacity);
+				dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(3 * res + z) * res + x]) * num2 + v1.w * opacity);
+				dst[(4 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(4 * res + z) * res + x]) * num2 + v2.x * opacity);
+				dst[(5 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(5 * res + z) * res + x]) * num2 + v2.y * opacity);
+				dst[(6 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(6 * res + z) * res + x]) * num2 + v2.z * opacity);
+				dst[(7 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(7 * res + z) * res + x]) * num2 + v2.w * opacity);
 			}
 		}
 	}

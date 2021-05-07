@@ -26,11 +26,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 
 	public Vector3 Position => base.transform.position;
 
-	public float FrontWheelSplineDist
-	{
-		get;
-		private set;
-	}
+	public float FrontWheelSplineDist { get; private set; }
 
 	public bool CustomCollision(BaseTrain train, TriggerTrainCollisions trainTrigger)
 	{

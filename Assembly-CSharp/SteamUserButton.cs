@@ -16,15 +16,7 @@ public class SteamUserButton : MonoBehaviour
 
 	public Color textColorNormal;
 
-	public ulong SteamId
-	{
-		get;
-		private set;
-	}
+	public ulong SteamId { get; private set; }
 
-	public string Username
-	{
-		get;
-		private set;
-	}
+	public string Username { get; private set; }
 }

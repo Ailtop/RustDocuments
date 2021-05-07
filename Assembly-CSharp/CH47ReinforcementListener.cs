@@ -25,8 +25,8 @@ public class CH47ReinforcementListener : BaseEntity
 			CH47LandingZone closest = CH47LandingZone.GetClosest(base.transform.position);
 			Vector3 zero = Vector3.zero;
 			zero.y = closest.transform.position.y;
-			Vector3 a = Vector3Ex.Direction2D(closest.transform.position, zero);
-			Vector3 position = closest.transform.position + a * startDist;
+			Vector3 vector = Vector3Ex.Direction2D(closest.transform.position, zero);
+			Vector3 position = closest.transform.position + vector * startDist;
 			position.y = closest.transform.position.y;
 			component.transform.position = position;
 			component.SetLandingTarget(closest.transform.position);

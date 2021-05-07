@@ -9,11 +9,7 @@ public class DeferredAction
 
 	private ActionPriority priority = ActionPriority.Medium;
 
-	public bool Idle
-	{
-		get;
-		private set;
-	}
+	public bool Idle { get; private set; }
 
 	public int Index => (int)priority;
 

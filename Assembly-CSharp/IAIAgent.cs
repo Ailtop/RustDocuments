@@ -7,188 +7,73 @@ using UnityEngine.AI;
 
 public interface IAIAgent
 {
-	BaseNpc.AiStatistics GetStats
-	{
-		get;
-	}
+	BaseNpc.AiStatistics GetStats { get; }
 
-	NavMeshAgent GetNavAgent
-	{
-		get;
-	}
+	NavMeshAgent GetNavAgent { get; }
 
-	bool AgencyUpdateRequired
-	{
-		get;
-		set;
-	}
+	bool AgencyUpdateRequired { get; set; }
 
-	bool IsOnOffmeshLinkAndReachedNewCoord
-	{
-		get;
-		set;
-	}
+	bool IsOnOffmeshLinkAndReachedNewCoord { get; set; }
 
-	Vector3 Destination
-	{
-		get;
-		set;
-	}
+	Vector3 Destination { get; set; }
 
-	bool IsStopped
-	{
-		get;
-		set;
-	}
+	bool IsStopped { get; set; }
 
-	bool AutoBraking
-	{
-		get;
-		set;
-	}
+	bool AutoBraking { get; set; }
 
-	bool HasPath
-	{
-		get;
-	}
+	bool HasPath { get; }
 
-	bool IsDormant
-	{
-		get;
-		set;
-	}
+	bool IsDormant { get; set; }
 
-	float TimeAtDestination
-	{
-		get;
-	}
+	float TimeAtDestination { get; }
 
-	bool IsStuck
-	{
-		get;
-	}
+	bool IsStuck { get; }
 
-	float TargetSpeed
-	{
-		get;
-		set;
-	}
+	float TargetSpeed { get; set; }
 
-	BaseEntity FoodTarget
-	{
-		get;
-		set;
-	}
+	BaseEntity FoodTarget { get; set; }
 
-	float GetAttackRate
-	{
-		get;
-	}
+	float GetAttackRate { get; }
 
-	float GetAttackRange
-	{
-		get;
-	}
+	float GetAttackRange { get; }
 
-	Vector3 GetAttackOffset
-	{
-		get;
-	}
+	Vector3 GetAttackOffset { get; }
 
-	BaseEntity AttackTarget
-	{
-		get;
-		set;
-	}
+	BaseEntity AttackTarget { get; set; }
 
-	float AttackTargetVisibleFor
-	{
-		get;
-	}
+	float AttackTargetVisibleFor { get; }
 
-	Memory.SeenInfo AttackTargetMemory
-	{
-		get;
-		set;
-	}
+	Memory.SeenInfo AttackTargetMemory { get; set; }
 
-	BaseCombatEntity CombatTarget
-	{
-		get;
-	}
+	BaseCombatEntity CombatTarget { get; }
 
-	Vector3 AttackPosition
-	{
-		get;
-	}
+	Vector3 AttackPosition { get; }
 
-	Vector3 CrouchedAttackPosition
-	{
-		get;
-	}
+	Vector3 CrouchedAttackPosition { get; }
 
-	Vector3 CurrentAimAngles
-	{
-		get;
-	}
+	Vector3 CurrentAimAngles { get; }
 
-	Vector3 SpawnPosition
-	{
-		get;
-		set;
-	}
+	Vector3 SpawnPosition { get; set; }
 
-	BaseCombatEntity Entity
-	{
-		get;
-	}
+	BaseCombatEntity Entity { get; }
 
-	float GetAttackCost
-	{
-		get;
-	}
+	float GetAttackCost { get; }
 
-	float GetStamina
-	{
-		get;
-	}
+	float GetStamina { get; }
 
-	float GetEnergy
-	{
-		get;
-	}
+	float GetEnergy { get; }
 
-	float GetSleep
-	{
-		get;
-	}
+	float GetSleep { get; }
 
-	float GetStuckDuration
-	{
-		get;
-	}
+	float GetStuckDuration { get; }
 
-	float GetLastStuckTime
-	{
-		get;
-	}
+	float GetLastStuckTime { get; }
 
-	float currentBehaviorDuration
-	{
-		get;
-	}
+	float currentBehaviorDuration { get; }
 
-	BaseNpc.Behaviour CurrentBehaviour
-	{
-		get;
-		set;
-	}
+	BaseNpc.Behaviour CurrentBehaviour { get; set; }
 
-	int AgentTypeIndex
-	{
-		get;
-		set;
-	}
+	int AgentTypeIndex { get; set; }
 
 	IAIContext GetContext(Guid aiId);
 

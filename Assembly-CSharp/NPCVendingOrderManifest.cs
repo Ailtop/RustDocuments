@@ -13,8 +13,8 @@ public class NPCVendingOrderManifest : ScriptableObject
 		}
 		for (int i = 0; i < orderList.Length; i++)
 		{
-			NPCVendingOrder y = orderList[i];
-			if (sample == y)
+			NPCVendingOrder nPCVendingOrder = orderList[i];
+			if (sample == nPCVendingOrder)
 			{
 				return i;
 			}

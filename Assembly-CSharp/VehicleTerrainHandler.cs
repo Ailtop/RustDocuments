@@ -2,50 +2,27 @@ using UnityEngine;
 
 public class VehicleTerrainHandler
 {
-	public enum Surface
-	{
-		Default,
-		Road,
-		Snow,
-		Ice,
-		Sand,
-		Frictionless
-	}
-
 	public string CurGroundPhysicsMatName;
 
-	public Surface OnSurface;
+	public bool IsOnRoad;
+
+	public bool IsOnSnowOrIce;
+
+	public bool IsOnSand;
+
+	public bool IsOnIce;
 
 	public bool IsGrounded;
 
 	public float RayLength = 1.5f;
 
-	private readonly string[] TerrainRoad = new string[5]
-	{
-		"rock",
-		"concrete",
-		"gravel",
-		"metal",
-		"path"
-	};
+	private readonly string[] TerrainRoad = new string[5] { "rock", "concrete", "gravel", "metal", "path" };
 
 	private const float SECONDS_BETWEEN_TERRAIN_SAMPLE = 0.25f;
 
 	private TimeSince timeSinceTerrainCheck;
 
 	private readonly BaseVehicle vehicle;
-
-	public bool IsOnSnowOrIce
-	{
-		get
-		{
-			if (OnSurface != Surface.Snow)
-			{
-				return OnSurface == Surface.Ice;
-			}
-			return true;
-		}
-	}
 
 	public VehicleTerrainHandler(BaseVehicle vehicle)
 	{
@@ -65,44 +42,23 @@ public class VehicleTerrainHandler
 		timeSinceTerrainCheck = Random.Range(-0.025f, 0.025f);
 		Transform transform = vehicle.transform;
 		RaycastHit hitInfo;
-		if (Physics.Raycast(transform.position + transform.up * 0.5f, -transform.up, out hitInfo, RayLength, 27328513, QueryTriggerInteraction.Ignore))
+		if (Physics.Raycast(transform.position + transform.up * 0.5f, -transform.up, out hitInfo, RayLength, 27328512, QueryTriggerInteraction.Ignore))
 		{
 			CurGroundPhysicsMatName = hitInfo.collider.GetMaterialAt(hitInfo.point).GetNameLower();
-			if (GetOnRoad(CurGroundPhysicsMatName))
-			{
-				OnSurface = Surface.Road;
-			}
-			else if (CurGroundPhysicsMatName == "snow")
-			{
-				if (hitInfo.collider.name.ToLower().Contains("ice"))
-				{
-					OnSurface = Surface.Ice;
-				}
-				else
-				{
-					OnSurface = Surface.Snow;
-				}
-			}
-			else if (CurGroundPhysicsMatName == "sand")
-			{
-				OnSurface = Surface.Sand;
-			}
-			else if (CurGroundPhysicsMatName.Contains("zero friction"))
-			{
-				OnSurface = Surface.Frictionless;
-			}
-			else
-			{
-				OnSurface = Surface.Default;
-			}
+			IsOnSnowOrIce = CurGroundPhysicsMatName == "snow";
+			IsOnSand = CurGroundPhysicsMatName == "sand";
+			IsOnIce = IsOnSnowOrIce && hitInfo.collider.name.ToLower().Contains("ice");
 			IsGrounded = true;
 		}
 		else
 		{
 			CurGroundPhysicsMatName = "concrete";
-			OnSurface = Surface.Default;
+			IsOnSnowOrIce = false;
+			IsOnSand = false;
+			IsOnIce = false;
 			IsGrounded = false;
 		}
+		IsOnRoad = GetOnRoad(CurGroundPhysicsMatName);
 	}
 
 	private bool GetOnRoad(string physicMat)

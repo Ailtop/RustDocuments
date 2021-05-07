@@ -1,9 +1,6 @@
 public interface IItemContainerEntity
 {
-	ItemContainer inventory
-	{
-		get;
-	}
+	ItemContainer inventory { get; }
 
 	void DropItems(BaseEntity initiator = null);
 

@@ -6,10 +6,10 @@ public class Mountain : TerrainPlacement
 
 	protected void OnDrawGizmosSelected()
 	{
-		Vector3 b = Vector3.up * (0.5f * Fade);
+		Vector3 vector = Vector3.up * (0.5f * Fade);
 		Gizmos.color = new Color(0.5f, 0.5f, 0.5f, 1f);
-		Gizmos.DrawCube(base.transform.position + b, new Vector3(size.x, Fade, size.z));
-		Gizmos.DrawWireCube(base.transform.position + b, new Vector3(size.x, Fade, size.z));
+		Gizmos.DrawCube(base.transform.position + vector, new Vector3(size.x, Fade, size.z));
+		Gizmos.DrawWireCube(base.transform.position + vector, new Vector3(size.x, Fade, size.z));
 	}
 
 	protected override void ApplyHeight(Matrix4x4 localToWorld, Matrix4x4 worldToLocal)

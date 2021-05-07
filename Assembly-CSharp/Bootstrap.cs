@@ -89,8 +89,8 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		}
 		if (!UnityEngine.Application.isEditor)
 		{
-			string str = Facepunch.CommandLine.Full.Replace(Facepunch.CommandLine.GetSwitch("-rcon.password", Facepunch.CommandLine.GetSwitch("+rcon.password", "RCONPASSWORD")), "******");
-			WriteToLog("Command Line: " + str);
+			string text = Facepunch.CommandLine.Full.Replace(Facepunch.CommandLine.GetSwitch("-rcon.password", Facepunch.CommandLine.GetSwitch("+rcon.password", "RCONPASSWORD")), "******");
+			WriteToLog("Command Line: " + text);
 		}
 		Interface.Initialize();
 	}

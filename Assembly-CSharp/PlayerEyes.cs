@@ -80,11 +80,7 @@ public class PlayerEyes : EntityComponent<BasePlayer>
 		}
 	}
 
-	public Quaternion bodyRotation
-	{
-		get;
-		set;
-	}
+	public Quaternion bodyRotation { get; set; }
 
 	public Quaternion parentRotation
 	{

@@ -106,11 +106,11 @@ public class ItemListTools : MonoBehaviour
 		{
 			if (!item.hidden && (!flag || item.displayName.translated.ToLower().Contains(value)))
 			{
-				GameObject gameObject = Object.Instantiate(itemButton);
-				gameObject.transform.SetParent(itemButton.transform.parent, false);
-				gameObject.GetComponentInChildren<TextMeshProUGUI>().text = item.displayName.translated;
-				gameObject.GetComponentInChildren<ItemButtonTools>().itemDef = item;
-				gameObject.GetComponentInChildren<ItemButtonTools>().image.sprite = item.iconSprite;
+				GameObject obj2 = Object.Instantiate(itemButton);
+				obj2.transform.SetParent(itemButton.transform.parent, false);
+				obj2.GetComponentInChildren<TextMeshProUGUI>().text = item.displayName.translated;
+				obj2.GetComponentInChildren<ItemButtonTools>().itemDef = item;
+				obj2.GetComponentInChildren<ItemButtonTools>().image.sprite = item.iconSprite;
 				num++;
 				if (num >= 160)
 				{

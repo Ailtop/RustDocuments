@@ -12,17 +12,9 @@ public class PhotoEntity : BaseEntity
 {
 	private byte[] _imageData;
 
-	public ulong PhotographerSteamId
-	{
-		get;
-		private set;
-	}
+	public ulong PhotographerSteamId { get; private set; }
 
-	public uint ImageCrc
-	{
-		get;
-		private set;
-	}
+	public uint ImageCrc { get; private set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{

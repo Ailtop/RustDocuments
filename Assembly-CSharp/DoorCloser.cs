@@ -69,7 +69,7 @@ public class DoorCloser : BaseEntity
 
 	public void SendClose()
 	{
-		BaseEntity parentEntity = GetParentEntity();
+		BaseEntity baseEntity = GetParentEntity();
 		if (children != null)
 		{
 			foreach (BaseEntity child in children)
@@ -81,9 +81,9 @@ public class DoorCloser : BaseEntity
 				}
 			}
 		}
-		if ((bool)parentEntity)
+		if ((bool)baseEntity)
 		{
-			parentEntity.SendMessage("CloseRequest");
+			baseEntity.SendMessage("CloseRequest");
 		}
 	}
 

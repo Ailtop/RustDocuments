@@ -28,17 +28,9 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 		}
 	}
 
-	public static bool WantsSkip
-	{
-		get;
-		private set;
-	}
+	public static bool WantsSkip { get; private set; }
 
-	public static string Text
-	{
-		get;
-		private set;
-	}
+	public static string Text { get; private set; }
 
 	public static void Update(string strType)
 	{

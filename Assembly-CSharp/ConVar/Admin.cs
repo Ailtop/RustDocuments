@@ -77,13 +77,13 @@ namespace ConVar
 		public static void status(Arg arg)
 		{
 			string @string = arg.GetString(0);
-			string str = string.Empty;
+			string text = string.Empty;
 			if (@string.Length == 0)
 			{
-				str = str + "hostname: " + Server.hostname + "\n";
-				str = str + "version : " + 2301 + " secure (secure mode enabled, connected to Steam3)\n";
-				str = str + "map     : " + Server.level + "\n";
-				str += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
+				text = text + "hostname: " + Server.hostname + "\n";
+				text = text + "version : " + 2293 + " secure (secure mode enabled, connected to Steam3)\n";
+				text = text + "map     : " + Server.level + "\n";
+				text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
 			TextTable textTable = new TextTable();
 			textTable.AddColumn("id");
@@ -108,20 +108,20 @@ namespace ConVar
 						textTable.AddRow(userIDString, "NO CONNECTION");
 						continue;
 					}
-					string text = activePlayer.net.connection.ownerid.ToString();
-					string text2 = activePlayer.displayName.QuoteSafe();
-					string text3 = Network.Net.sv.GetAveragePing(activePlayer.net.connection).ToString();
-					string text4 = activePlayer.net.connection.ipaddress;
-					string text5 = activePlayer.violationLevel.ToString("0.0");
-					string text6 = activePlayer.GetAntiHackKicks().ToString();
+					string text2 = activePlayer.net.connection.ownerid.ToString();
+					string text3 = activePlayer.displayName.QuoteSafe();
+					string text4 = Network.Net.sv.GetAveragePing(activePlayer.net.connection).ToString();
+					string text5 = activePlayer.net.connection.ipaddress;
+					string text6 = activePlayer.violationLevel.ToString("0.0");
+					string text7 = activePlayer.GetAntiHackKicks().ToString();
 					if (!arg.IsAdmin && !arg.IsRcon)
 					{
-						text4 = "xx.xxx.xx.xxx";
+						text5 = "xx.xxx.xx.xxx";
 					}
-					string text7 = activePlayer.net.connection.GetSecondsConnected() + "s";
-					if (@string.Length <= 0 || text2.Contains(@string, CompareOptions.IgnoreCase) || userIDString.Contains(@string) || text.Contains(@string) || text4.Contains(@string))
+					string text8 = activePlayer.net.connection.GetSecondsConnected() + "s";
+					if (@string.Length <= 0 || text3.Contains(@string, CompareOptions.IgnoreCase) || userIDString.Contains(@string) || text2.Contains(@string) || text5.Contains(@string))
 					{
-						textTable.AddRow(userIDString, text2, text3, text7, text4, (text == userIDString) ? string.Empty : text, text5, text6);
+						textTable.AddRow(userIDString, text3, text4, text8, text5, (text2 == userIDString) ? string.Empty : text2, text6, text7);
 					}
 				}
 				catch (Exception ex)
@@ -129,7 +129,7 @@ namespace ConVar
 					textTable.AddRow(activePlayer.UserIDString, ex.Message.QuoteSafe());
 				}
 			}
-			arg.ReplyWith(str + textTable.ToString());
+			arg.ReplyWith(text + textTable.ToString());
 		}
 
 		[ServerVar(Help = "Print out stats of currently connected clients")]
@@ -152,13 +152,13 @@ namespace ConVar
 				string text3 = storage.Get("kill_player").ToString();
 				string text4 = (storage.Get("deaths") - storage.Get("death_suicide")).ToString();
 				string text5 = storage.Get("death_suicide").ToString();
-				string str = storage.Get("hit_player_direct_los").ToString();
-				string str2 = storage.Get("hit_player_indirect_los").ToString();
-				string str3 = storage.Get("hit_building_direct_los").ToString();
-				string str4 = storage.Get("hit_building_indirect_los").ToString();
-				string str5 = storage.Get("hit_entity_direct_los").ToString();
-				string str6 = storage.Get("hit_entity_indirect_los").ToString();
-				table.AddRow(id.ToString(), name, text2, text3, text4, text5, str + " / " + str2, str3 + " / " + str4, str5 + " / " + str6);
+				string text6 = storage.Get("hit_player_direct_los").ToString();
+				string text7 = storage.Get("hit_player_indirect_los").ToString();
+				string text8 = storage.Get("hit_building_direct_los").ToString();
+				string text9 = storage.Get("hit_building_indirect_los").ToString();
+				string text10 = storage.Get("hit_entity_direct_los").ToString();
+				string text11 = storage.Get("hit_entity_indirect_los").ToString();
+				table.AddRow(id.ToString(), name, text2, text3, text4, text5, text6 + " / " + text7, text8 + " / " + text9, text10 + " / " + text11);
 			};
 			ulong uInt = arg.GetUInt64(0, 0uL);
 			if (uInt == 0L)
@@ -493,15 +493,15 @@ namespace ConVar
 		[ServerVar(Help = "Show user info for players on server.")]
 		public static void sleepingusers(Arg arg)
 		{
-			string str = "<slot:userid:\"name\">\n";
+			string text = "<slot:userid:\"name\">\n";
 			int num = 0;
 			foreach (BasePlayer sleepingPlayer in BasePlayer.sleepingPlayerList)
 			{
-				str += $"{sleepingPlayer.userID}:{sleepingPlayer.displayName}\n";
+				text += $"{sleepingPlayer.userID}:{sleepingPlayer.displayName}\n";
 				num++;
 			}
-			str += $"{num} sleeping users\n";
-			arg.ReplyWith(str);
+			text += $"{num} sleeping users\n";
+			arg.ReplyWith(text);
 		}
 
 		[ServerVar(Help = "Show user info for players on server in range of the player.")]
@@ -513,7 +513,7 @@ namespace ConVar
 				return;
 			}
 			float range = arg.GetFloat(0);
-			string str = "<slot:userid:\"name\">\n";
+			string text = "<slot:userid:\"name\">\n";
 			int num = 0;
 			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
 			foreach (BasePlayer sleepingPlayer in BasePlayer.sleepingPlayerList)
@@ -524,12 +524,12 @@ namespace ConVar
 			obj.Sort((BasePlayer player, BasePlayer basePlayer) => (!(player.Distance2D(fromPlayer) < basePlayer.Distance2D(fromPlayer))) ? 1 : (-1));
 			foreach (BasePlayer item in obj)
 			{
-				str += $"{item.userID}:{item.displayName}:{item.Distance2D(fromPlayer)}m\n";
+				text += $"{item.userID}:{item.displayName}:{item.Distance2D(fromPlayer)}m\n";
 				num++;
 			}
 			Facepunch.Pool.FreeList(ref obj);
-			str += $"{num} sleeping users within {range}m\n";
-			arg.ReplyWith(str);
+			text += $"{num} sleeping users within {range}m\n";
+			arg.ReplyWith(text);
 		}
 
 		[ServerVar(Help = "List of banned users (sourceds compat)")]
@@ -654,11 +654,11 @@ namespace ConVar
 				}
 				textTable.AddRow(text, text2, text3, text4, text5, text6, text7);
 			}
-			string str = "";
-			str = ((count != 1) ? (str + $"\nThe world contains {count} modular cars.") : (str + "\nThe world contains 1 modular car."));
-			str = ((num != 1) ? (str + $"\n{num} ({(float)num / (float)count:0%}) are in a completed state.") : (str + $"\n1 ({1f / (float)count:0%}) is in a completed state."));
-			str = ((num2 != 1) ? (str + $"\n{num2} ({(float)num2 / (float)count:0%}) are driveable.") : (str + $"\n1 ({1f / (float)count:0%}) is driveable."));
-			arg.ReplyWith(string.Concat(str1: (num3 != 1) ? (str + $"\n{num3} ({(float)num3 / (float)count:0%}) are sheltered indoors.") : (str + $"\n1 ({1f / (float)count:0%}) is sheltered indoors."), str0: textTable.ToString()));
+			string text8 = "";
+			text8 = ((count != 1) ? (text8 + $"\nThe world contains {count} modular cars.") : (text8 + "\nThe world contains 1 modular car."));
+			text8 = ((num != 1) ? (text8 + $"\n{num} ({(float)num / (float)count:0%}) are in a completed state.") : (text8 + $"\n1 ({1f / (float)count:0%}) is in a completed state."));
+			text8 = ((num2 != 1) ? (text8 + $"\n{num2} ({(float)num2 / (float)count:0%}) are driveable.") : (text8 + $"\n1 ({1f / (float)count:0%}) is driveable."));
+			arg.ReplyWith(string.Concat(str1: (num3 != 1) ? (text8 + $"\n{num3} ({(float)num3 / (float)count:0%}) are sheltered indoors.") : (text8 + $"\n1 ({1f / (float)count:0%}) is sheltered indoors."), str0: textTable.ToString()));
 		}
 
 		[ServerVar]

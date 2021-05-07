@@ -21,8 +21,8 @@ namespace ConVar
 		[ServerVar]
 		public static int maxthreads = 8;
 
-		[ServerVar(Saved = true)]
 		[ClientVar(Saved = true)]
+		[ServerVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -69,8 +69,8 @@ namespace ConVar
 			ServerPerformance.DoReport();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void objects(Arg args)
 		{
 			UnityEngine.Object[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Object>();
@@ -145,14 +145,14 @@ namespace ConVar
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void queue(Arg args)
 		{
-			string str = "";
-			str = str + "stabilityCheckQueue:\t\t" + StabilityEntity.stabilityCheckQueue.Info() + "\n";
-			str = str + "updateSurroundingsQueue:\t" + StabilityEntity.updateSurroundingsQueue.Info() + "\n";
-			args.ReplyWith(str);
+			string text = "";
+			text = text + "stabilityCheckQueue:\t\t" + StabilityEntity.stabilityCheckQueue.Info() + "\n";
+			text = text + "updateSurroundingsQueue:\t" + StabilityEntity.updateSurroundingsQueue.Info() + "\n";
+			args.ReplyWith(text);
 		}
 
 		[ServerUserVar]
@@ -478,8 +478,8 @@ namespace ConVar
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
@@ -503,8 +503,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();

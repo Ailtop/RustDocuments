@@ -22,8 +22,8 @@ namespace ConVar
 		[ServerVar]
 		public static float groundwatchdelay = 0.1f;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool batchsynctransforms = true;
 
 		[ServerVar]
@@ -100,8 +100,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar(Help = "The slowest physics steps will operate")]
 		[ClientVar]
+		[ServerVar(Help = "The slowest physics steps will operate")]
 		public static float minsteps
 		{
 			get
@@ -122,8 +122,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool autosynctransforms
 		{
 			get

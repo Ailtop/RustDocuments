@@ -34,11 +34,7 @@ public class ModelConditionTest_RoofLeft : ModelConditionTest
 
 	private const string socket_left = "sockets/neighbour/4";
 
-	private static string[] sockets_left = new string[2]
-	{
-		"roof/sockets/neighbour/4",
-		"roof.triangle/sockets/neighbour/4"
-	};
+	private static string[] sockets_left = new string[2] { "roof/sockets/neighbour/4", "roof.triangle/sockets/neighbour/4" };
 
 	private bool IsConvex => angle > (AngleType)10;
 

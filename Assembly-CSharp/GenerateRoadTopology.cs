@@ -12,21 +12,18 @@ public class GenerateRoadTopology : ProceduralComponent
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		foreach (PathList item in roads)
 		{
-			if (!World.Networked)
+			PathInterpolator path = item.Path;
+			Vector3[] points = path.Points;
+			for (int i = 0; i < points.Length; i++)
 			{
-				PathInterpolator path = item.Path;
-				Vector3[] points = path.Points;
-				for (int i = 0; i < points.Length; i++)
-				{
-					Vector3 vector = points[i];
-					vector.y = heightMap.GetHeight(vector);
-					points[i] = vector;
-				}
-				item.TrimTopology(2048);
-				path.Smoothen(8, Vector3.up);
-				path.RecalculateTangents();
-				item.ResetTrims();
+				Vector3 vector = points[i];
+				vector.y = heightMap.GetHeight(vector);
+				points[i] = vector;
 			}
+			item.TrimTopology(2048);
+			path.Smoothen(8, Vector3.up);
+			path.RecalculateTangents();
+			item.ResetTrims();
 			heightMap.Push();
 			item.AdjustTerrainHeight();
 			heightMap.Pop();

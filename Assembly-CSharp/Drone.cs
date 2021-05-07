@@ -75,13 +75,7 @@ public class Drone : RemoteControlEntity
 
 	public override bool RequiresMouse => true;
 
-	public override bool PositionTickFixedTime
-	{
-		protected get
-		{
-			return true;
-		}
-	}
+	protected override bool PositionTickFixedTime => true;
 
 	public override void UserInput(InputState inputState, BasePlayer player)
 	{
@@ -108,17 +102,17 @@ public class Drone : RemoteControlEntity
 		{
 			v.y = Mathf.Max(v.y, height + 1f);
 		}
-		Vector2 a = v.XZ2D();
-		Vector2 b = position.XZ2D();
+		Vector2 vector = v.XZ2D();
+		Vector2 vector2 = position.XZ2D();
 		Vector3 direction;
 		float magnitude;
-		(a - b).XZ3D().ToDirectionAndMagnitude(out direction, out magnitude);
+		(vector - vector2).XZ3D().ToDirectionAndMagnitude(out direction, out magnitude);
 		currentInput.Reset();
 		lastInputTime = Time.time;
 		if (position.y - height > 1f)
 		{
-			float d = Mathf.Clamp01(magnitude);
-			currentInput.movement = base.transform.InverseTransformVector(direction) * d;
+			float num = Mathf.Clamp01(magnitude);
+			currentInput.movement = base.transform.InverseTransformVector(direction) * num;
 			if (magnitude > 0.5f)
 			{
 				float y = base.transform.rotation.eulerAngles.y;
@@ -153,25 +147,25 @@ public class Drone : RemoteControlEntity
 		float magnitude;
 		body.velocity.WithY(0f).ToDirectionAndMagnitude(out direction, out magnitude);
 		float num3 = Mathf.Clamp01(magnitude / leanMaxVelocity);
-		Vector3 a = (Mathf.Approximately(vector.sqrMagnitude, 0f) ? ((0f - num3) * direction) : vector);
-		Vector3 normalized = (Vector3.up + a * leanWeight * num3).normalized;
+		Vector3 vector2 = (Mathf.Approximately(vector.sqrMagnitude, 0f) ? ((0f - num3) * direction) : vector);
+		Vector3 normalized = (Vector3.up + vector2 * leanWeight * num3).normalized;
 		Vector3 up = base.transform.up;
 		float num4 = Mathf.Max(Vector3.Dot(normalized, up), 0f);
 		if (!num2 || isGrounded)
 		{
-			Vector3 a2 = ((isGrounded && currentInput.throttle <= 0f) ? Vector3.zero : (-1f * base.transform.up * Physics.gravity.y));
-			Vector3 b = (isGrounded ? Vector3.zero : (vector * movementAcceleration));
-			Vector3 b2 = base.transform.up * currentInput.throttle * altitudeAcceleration;
-			Vector3 a3 = a2 + b + b2;
-			body.AddForce(a3 * num4, ForceMode.Acceleration);
+			Vector3 obj = ((isGrounded && currentInput.throttle <= 0f) ? Vector3.zero : (-1f * base.transform.up * Physics.gravity.y));
+			Vector3 vector3 = (isGrounded ? Vector3.zero : (vector * movementAcceleration));
+			Vector3 vector4 = base.transform.up * currentInput.throttle * altitudeAcceleration;
+			Vector3 vector5 = obj + vector3 + vector4;
+			body.AddForce(vector5 * num4, ForceMode.Acceleration);
 		}
 		if (!num2 && !isGrounded)
 		{
-			Vector3 a4 = base.transform.TransformVector(0f, currentInput.yaw * yawSpeed, 0f);
-			Vector3 a5 = Vector3.Cross(Quaternion.Euler(body.angularVelocity * uprightPrediction) * up, normalized) * uprightSpeed;
-			float d = ((num4 < uprightDot) ? 0f : num4);
-			Vector3 a6 = a4 * num4 + a5 * d;
-			body.AddTorque(a6 * num4, ForceMode.Acceleration);
+			Vector3 vector6 = base.transform.TransformVector(0f, currentInput.yaw * yawSpeed, 0f);
+			Vector3 vector7 = Vector3.Cross(Quaternion.Euler(body.angularVelocity * uprightPrediction) * up, normalized) * uprightSpeed;
+			float num5 = ((num4 < uprightDot) ? 0f : num4);
+			Vector3 vector8 = vector6 * num4 + vector7 * num5;
+			body.AddTorque(vector8 * num4, ForceMode.Acceleration);
 		}
 	}
 

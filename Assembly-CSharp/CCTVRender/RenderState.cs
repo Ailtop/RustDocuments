@@ -18,23 +18,11 @@ namespace CCTVRender
 
 		private float _imageCacheTime;
 
-		public uint NetId
-		{
-			get;
-			private set;
-		}
+		public uint NetId { get; private set; }
 
-		public bool IsLocked
-		{
-			get;
-			private set;
-		}
+		public bool IsLocked { get; private set; }
 
-		public uint Frame
-		{
-			get;
-			private set;
-		}
+		public uint Frame { get; private set; }
 
 		public bool WasRecentlyRendered => Time.realtimeSinceStartup - _lastRendered < 1f;
 

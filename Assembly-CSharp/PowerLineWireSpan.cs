@@ -20,15 +20,15 @@ public class PowerLineWireSpan : MonoBehaviour
 			WireLength = Vector3.Distance(start.position, end.position);
 			for (int i = 0; i < connections.Count; i++)
 			{
-				Vector3 a = start.TransformPoint(connections[i].outOffset);
-				Vector3 vector = end.TransformPoint(connections[i].inOffset);
-				WireLength = (a - vector).magnitude;
-				GameObject gameObject = wirePrefab.Instantiate(base.transform);
-				gameObject.name = "WIRE";
-				gameObject.transform.position = Vector3.Lerp(a, vector, 0.5f);
-				gameObject.transform.LookAt(vector);
-				gameObject.transform.localScale = new Vector3(1f, 1f, Vector3.Distance(a, vector));
-				gameObject.SetActive(true);
+				Vector3 vector = start.TransformPoint(connections[i].outOffset);
+				Vector3 vector2 = end.TransformPoint(connections[i].inOffset);
+				WireLength = (vector - vector2).magnitude;
+				GameObject obj = wirePrefab.Instantiate(base.transform);
+				obj.name = "WIRE";
+				obj.transform.position = Vector3.Lerp(vector, vector2, 0.5f);
+				obj.transform.LookAt(vector2);
+				obj.transform.localScale = new Vector3(1f, 1f, Vector3.Distance(vector, vector2));
+				obj.SetActive(true);
 			}
 		}
 	}

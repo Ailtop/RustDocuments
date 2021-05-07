@@ -4,29 +4,9 @@ using UnityEngine;
 
 public static class ImageProcessing
 {
-	private static byte[] signaturePNG = new byte[8]
-	{
-		137,
-		80,
-		78,
-		71,
-		13,
-		10,
-		26,
-		10
-	};
+	private static byte[] signaturePNG = new byte[8] { 137, 80, 78, 71, 13, 10, 26, 10 };
 
-	private static byte[] signatureIHDR = new byte[8]
-	{
-		0,
-		0,
-		0,
-		13,
-		73,
-		72,
-		68,
-		82
-	};
+	private static byte[] signatureIHDR = new byte[8] { 0, 0, 0, 13, 73, 72, 68, 82 };
 
 	public static void GaussianBlur2D(float[] data, int len1, int len2, int iterations = 1)
 	{

@@ -55,8 +55,8 @@ public class ItemDefinition : MonoBehaviour
 		Generic
 	}
 
-	[ReadOnly]
 	[Header("Item")]
+	[ReadOnly]
 	public int itemid;
 
 	[Tooltip("The shortname should be unique. A hash will be generated from it to identify the item type. If this name changes at any point it will make all saves incompatible")]
@@ -165,23 +165,11 @@ public class ItemDefinition : MonoBehaviour
 
 	public bool isWearable => ItemModWearable != null;
 
-	public ItemModWearable ItemModWearable
-	{
-		get;
-		private set;
-	}
+	public ItemModWearable ItemModWearable { get; private set; }
 
-	public bool isHoldable
-	{
-		get;
-		private set;
-	}
+	public bool isHoldable { get; private set; }
 
-	public bool isUsable
-	{
-		get;
-		private set;
-	}
+	public bool isUsable { get; private set; }
 
 	public bool HasSkins
 	{
@@ -199,11 +187,7 @@ public class ItemDefinition : MonoBehaviour
 		}
 	}
 
-	public bool CraftableWithSkin
-	{
-		get;
-		private set;
-	}
+	public bool CraftableWithSkin { get; private set; }
 
 	public void InvalidateWorkshopSkinCache()
 	{

@@ -2,17 +2,9 @@ namespace CCTVRender
 {
 	public class ClientState
 	{
-		public ulong UserId
-		{
-			get;
-			private set;
-		}
+		public ulong UserId { get; private set; }
 
-		public float LastAssigned
-		{
-			get;
-			set;
-		}
+		public float LastAssigned { get; set; }
 
 		public void Initialize(ulong userId)
 		{

@@ -47,8 +47,8 @@ public class ExplosionsShaderColorGradient : MonoBehaviour
 		float num = Time.time - startTime;
 		if (canUpdate)
 		{
-			Color a = Color.Evaluate(num / TimeMultiplier);
-			matInstance.SetColor(propertyID, a * oldColor);
+			Color color = Color.Evaluate(num / TimeMultiplier);
+			matInstance.SetColor(propertyID, color * oldColor);
 		}
 		if (num >= TimeMultiplier)
 		{

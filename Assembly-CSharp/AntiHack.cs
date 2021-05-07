@@ -240,7 +240,7 @@ public static class AntiHack
 			bool num = ply.transform.parent == null;
 			Matrix4x4 matrix4x = (num ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix);
 			Vector3 vector = (num ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint));
-			Vector3 a = (num ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
+			Vector3 obj = (num ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
 			float running = 1f;
 			float ducking = 0f;
 			if (ConVar.AntiHack.speedhack_protection >= 2)
@@ -252,7 +252,7 @@ public static class AntiHack
 				ducking = ((flag || flag2) ? 1f : 0f);
 			}
 			float speed = ply.GetSpeed(running, ducking);
-			Vector3 v = a - vector;
+			Vector3 v = obj - vector;
 			float num3 = v.Magnitude2D();
 			float num4 = deltaTime * speed;
 			if (num3 > num4)

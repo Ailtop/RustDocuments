@@ -19,11 +19,7 @@ public class MainCamera : RustCamera<MainCamera>
 		}
 	}
 
-	public static Vector3 velocity
-	{
-		get;
-		private set;
-	}
+	public static Vector3 velocity { get; private set; }
 
 	public static Vector3 position
 	{

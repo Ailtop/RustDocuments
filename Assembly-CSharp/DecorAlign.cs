@@ -34,7 +34,7 @@ public class DecorAlign : DecorComponent
 			}
 		}
 		Vector3 up = Vector3.Lerp(rot * Vector3.up, normal, NormalAlignment);
-		Quaternion lhs = QuaternionEx.LookRotationForcedUp(Vector3.Lerp(rot * Vector3.forward, vector2, GradientAlignment), up);
-		rot = lhs * rot;
+		Quaternion quaternion = QuaternionEx.LookRotationForcedUp(Vector3.Lerp(rot * Vector3.forward, vector2, GradientAlignment), up);
+		rot = quaternion * rot;
 	}
 }

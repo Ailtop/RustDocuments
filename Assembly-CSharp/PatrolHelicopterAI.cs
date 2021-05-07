@@ -329,11 +329,11 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public Quaternion GetYawRotationTo(Vector3 targetDest)
 	{
-		Vector3 a = targetDest;
-		a.y = 0f;
+		Vector3 vector = targetDest;
+		vector.y = 0f;
 		Vector3 position = base.transform.position;
 		position.y = 0f;
-		return Quaternion.LookRotation((a - position).normalized);
+		return Quaternion.LookRotation((vector - position).normalized);
 	}
 
 	public void SetTargetDestination(Vector3 targetDest, float minDist = 5f, float minDistForFacingRotation = 30f)
@@ -355,11 +355,11 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public void MoveToDestination()
 	{
-		Vector3 a = (_lastMoveDir = Vector3.Lerp(_lastMoveDir, (destination - base.transform.position).normalized, UnityEngine.Time.deltaTime / courseAdjustLerpTime));
+		Vector3 vector = (_lastMoveDir = Vector3.Lerp(_lastMoveDir, (destination - base.transform.position).normalized, UnityEngine.Time.deltaTime / courseAdjustLerpTime));
 		throttleSpeed = Mathf.Lerp(throttleSpeed, targetThrottleSpeed, UnityEngine.Time.deltaTime / 3f);
-		float d = throttleSpeed * maxSpeed;
+		float num = throttleSpeed * maxSpeed;
 		TerrainPushback();
-		base.transform.position += a * d * UnityEngine.Time.deltaTime;
+		base.transform.position += vector * num * UnityEngine.Time.deltaTime;
 		windVec = Vector3.Lerp(windVec, targetWindVec, UnityEngine.Time.deltaTime);
 		base.transform.position += windVec * windForce * UnityEngine.Time.deltaTime;
 		moveSpeed = Mathf.Lerp(moveSpeed, Vector3.Distance(_lastPos, base.transform.position) / UnityEngine.Time.deltaTime, UnityEngine.Time.deltaTime * 2f);
@@ -382,18 +382,18 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			if (UnityEngine.Physics.SphereCast(ray, num, out hitInfo, num2 - num * 0.5f, mask))
 			{
 				float num3 = 1f - hitInfo.distance / num2;
-				float d = terrainPushForce * num3;
-				b2 = Vector3.up * d;
+				float num4 = terrainPushForce * num3;
+				b2 = Vector3.up * num4;
 			}
 			Ray ray2 = new Ray(vector, _lastMoveDir);
-			float num4 = Mathf.Min(10f, b);
+			float num5 = Mathf.Min(10f, b);
 			RaycastHit hitInfo2;
-			if (UnityEngine.Physics.SphereCast(ray2, num, out hitInfo2, num4 - num * 0.5f, mask))
+			if (UnityEngine.Physics.SphereCast(ray2, num, out hitInfo2, num5 - num * 0.5f, mask))
 			{
-				float num5 = 1f - hitInfo2.distance / num4;
-				float d2 = obstaclePushForce * num5;
-				b2 += _lastMoveDir * d2 * -1f;
-				b2 += Vector3.up * d2;
+				float num6 = 1f - hitInfo2.distance / num5;
+				float num7 = obstaclePushForce * num6;
+				b2 += _lastMoveDir * num7 * -1f;
+				b2 += Vector3.up * num7;
 			}
 			pushVec = Vector3.Lerp(pushVec, b2, UnityEngine.Time.deltaTime);
 			base.transform.position += pushVec * UnityEngine.Time.deltaTime;
@@ -624,8 +624,8 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		float num = UnityEngine.Time.realtimeSinceStartup * 0.25f;
 		float x = Mathf.Sin((float)Math.PI * 2f * num) * 10f;
 		float z = Mathf.Cos((float)Math.PI * 2f * num) * 10f;
-		Vector3 b = new Vector3(x, 0f, z);
-		SetAimTarget(base.transform.position + b, true);
+		Vector3 vector = new Vector3(x, 0f, z);
+		SetAimTarget(base.transform.position + vector, true);
 		Ray ray = new Ray(base.transform.position, GetLastMoveDir());
 		int mask = LayerMask.GetMask("Terrain", "World", "Construction", "Water");
 		RaycastHit hitInfo;
@@ -640,10 +640,10 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		maxRotationSpeed *= 8f;
 		_currentState = aiState.DEATH;
 		Vector3 randomOffset = GetRandomOffset(base.transform.position, 20f, 60f);
-		int intVal = 1236478737;
+		int num = 1236478737;
 		Vector3 pos;
 		Vector3 normal;
-		TransformUtil.GetGroundInfo(randomOffset - Vector3.up * 2f, out pos, out normal, 500f, intVal);
+		TransformUtil.GetGroundInfo(randomOffset - Vector3.up * 2f, out pos, out normal, 500f, num);
 		SetTargetDestination(pos);
 		targetThrottleSpeed = 0.5f;
 		deathTimeout = UnityEngine.Time.realtimeSinceStartup + 10f;
@@ -735,8 +735,8 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 	{
 		float x = Mathf.Sin((float)Math.PI * 2f * rate) * currentOrbitDistance;
 		float z = Mathf.Cos((float)Math.PI * 2f * rate) * currentOrbitDistance;
-		Vector3 b = new Vector3(x, 20f, z);
-		return interestZoneOrigin + b;
+		Vector3 vector = new Vector3(x, 20f, z);
+		return interestZoneOrigin + vector;
 	}
 
 	public void State_Orbit_Enter(float orbitDistance)

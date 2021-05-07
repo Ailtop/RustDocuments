@@ -84,8 +84,8 @@ public class InstantCameraTool : HeldEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server.FromOwner]
 	private void TakePhoto(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -134,9 +134,9 @@ public class InstantCameraTool : HeldEntity
 		if (!hasSentAchievement && !string.IsNullOrEmpty("SUMMER_PAPARAZZI"))
 		{
 			Vector3 position = GetOwnerPlayer().eyes.position;
-			Vector3 a = GetOwnerPlayer().eyes.HeadForward();
+			Vector3 vector = GetOwnerPlayer().eyes.HeadForward();
 			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-			Vis.Entities(position + a * 5f, 5f, obj, 131072);
+			Vis.Entities(position + vector * 5f, 5f, obj, 131072);
 			foreach (BasePlayer item3 in obj)
 			{
 				if (item3.isServer && item3 != GetOwnerPlayer() && item3.IsVisible(GetOwnerPlayer().eyes.position))

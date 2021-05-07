@@ -85,9 +85,9 @@ public class MetabolismAttribute
 
 	public bool HasGreatlyChanged()
 	{
-		float greatFraction = this.greatFraction;
-		bool result = lastGreatFraction != greatFraction;
-		lastGreatFraction = greatFraction;
+		float num = greatFraction;
+		bool result = lastGreatFraction != num;
+		lastGreatFraction = num;
 		return result;
 	}
 

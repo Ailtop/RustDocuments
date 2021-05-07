@@ -9,17 +9,17 @@ public class TerrainMargin
 		Material marginMaterial = TerrainMeta.Config.MarginMaterial;
 		Vector3 center = TerrainMeta.Center;
 		Vector3 size = TerrainMeta.Size;
-		Vector3 b = new Vector3(size.x, 0f, 0f);
-		Vector3 b2 = new Vector3(0f, 0f, size.z);
+		Vector3 vector = new Vector3(size.x, 0f, 0f);
+		Vector3 vector2 = new Vector3(0f, 0f, size.z);
 		center.y = TerrainMeta.HeightMap.GetHeight(0, 0);
-		Create(center - b2, size, marginMaterial);
-		Create(center - b2 - b, size, marginMaterial);
-		Create(center - b2 + b, size, marginMaterial);
-		Create(center - b, size, marginMaterial);
-		Create(center + b, size, marginMaterial);
-		Create(center + b2, size, marginMaterial);
-		Create(center + b2 - b, size, marginMaterial);
-		Create(center + b2 + b, size, marginMaterial);
+		Create(center - vector2, size, marginMaterial);
+		Create(center - vector2 - vector, size, marginMaterial);
+		Create(center - vector2 + vector, size, marginMaterial);
+		Create(center - vector, size, marginMaterial);
+		Create(center + vector, size, marginMaterial);
+		Create(center + vector2, size, marginMaterial);
+		Create(center + vector2 - vector, size, marginMaterial);
+		Create(center + vector2 + vector, size, marginMaterial);
 	}
 
 	private static void Create(Vector3 position, Vector3 size, Material material)

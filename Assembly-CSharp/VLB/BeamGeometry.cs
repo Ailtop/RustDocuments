@@ -5,9 +5,9 @@ using UnityEngine.Rendering;
 
 namespace VLB
 {
-	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
-	[ExecuteInEditMode]
 	[AddComponentMenu("")]
+	[ExecuteInEditMode]
+	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	public class BeamGeometry : MonoBehaviour
 	{
 		private VolumetricLightBeam m_Master;
@@ -16,29 +16,13 @@ namespace VLB
 
 		private MeshType m_CurrentMeshType;
 
-		public MeshRenderer meshRenderer
-		{
-			get;
-			private set;
-		}
+		public MeshRenderer meshRenderer { get; private set; }
 
-		public MeshFilter meshFilter
-		{
-			get;
-			private set;
-		}
+		public MeshFilter meshFilter { get; private set; }
 
-		public Material material
-		{
-			get;
-			private set;
-		}
+		public Material material { get; private set; }
 
-		public Mesh coneMesh
-		{
-			get;
-			private set;
-		}
+		public Mesh coneMesh { get; private set; }
 
 		public bool visible
 		{
@@ -181,8 +165,8 @@ namespace VLB
 			material.renderQueue = Config.Instance.geometryRenderQueue;
 			float f = m_Master.coneAngle * ((float)Math.PI / 180f) / 2f;
 			material.SetVector("_ConeSlopeCosSin", new Vector2(Mathf.Cos(f), Mathf.Sin(f)));
-			Vector2 v = new Vector2(Mathf.Max(m_Master.coneRadiusStart, 0.0001f), Mathf.Max(m_Master.coneRadiusEnd, 0.0001f));
-			material.SetVector("_ConeRadius", v);
+			Vector2 vector = new Vector2(Mathf.Max(m_Master.coneRadiusStart, 0.0001f), Mathf.Max(m_Master.coneRadiusEnd, 0.0001f));
+			material.SetVector("_ConeRadius", vector);
 			float value = Mathf.Sign(m_Master.coneApexOffsetZ) * Mathf.Max(Mathf.Abs(m_Master.coneApexOffsetZ), 0.0001f);
 			material.SetFloat("_ConeApexOffsetZ", value);
 			if (m_Master.colorMode == ColorMode.Gradient)

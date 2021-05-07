@@ -39,8 +39,8 @@ public class ServerGib : BaseCombatEntity
 				MeshCollider component3 = meshRenderer.GetComponent<MeshCollider>();
 				Mesh physicsMesh = ((component3 != null) ? component3.sharedMesh : component.sharedMesh);
 				component2.PhysicsInit(physicsMesh);
-				Vector3 b = meshRenderer.transform.localPosition.normalized * spreadVelocity;
-				component2.rigidBody.velocity = inheritVelocity + b;
+				Vector3 vector2 = meshRenderer.transform.localPosition.normalized * spreadVelocity;
+				component2.rigidBody.velocity = inheritVelocity + vector2;
 				component2.rigidBody.angularVelocity = Vector3Ex.Range(-1f, 1f).normalized * 1f;
 				component2.rigidBody.WakeUp();
 				component2.Spawn();

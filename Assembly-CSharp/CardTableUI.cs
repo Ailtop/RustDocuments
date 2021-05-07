@@ -39,10 +39,7 @@ public class CardTableUI : UIDialog
 
 	public interface ICardGameSubUI
 	{
-		int DynamicBetAmount
-		{
-			get;
-		}
+		int DynamicBetAmount { get; }
 
 		void UpdateInGameUI(CardTableUI ui, CardGameController game);
 

@@ -23,8 +23,8 @@ public class AverageVelocity
 		{
 			if (pos.sqrMagnitude > 0f)
 			{
-				Vector3 a = newPos - pos;
-				averageVelocity = a * (1f / num);
+				Vector3 vector = newPos - pos;
+				averageVelocity = vector * (1f / num);
 				averageSpeed = averageVelocity.magnitude;
 			}
 			time = Time.time;

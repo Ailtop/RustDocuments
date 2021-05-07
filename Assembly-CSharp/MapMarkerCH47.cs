@@ -7,12 +7,12 @@ public class MapMarkerCH47 : MapMarker
 
 	private float GetRotation()
 	{
-		BaseEntity parentEntity = GetParentEntity();
-		if (!parentEntity)
+		BaseEntity baseEntity = GetParentEntity();
+		if (!baseEntity)
 		{
 			return 0f;
 		}
-		Vector3 forward = parentEntity.transform.forward;
+		Vector3 forward = baseEntity.transform.forward;
 		forward.y = 0f;
 		forward.Normalize();
 		return Mathf.Atan2(forward.x, 0f - forward.z) * 57.29578f + 180f;

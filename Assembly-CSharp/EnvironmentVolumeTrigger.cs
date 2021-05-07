@@ -8,11 +8,7 @@ public class EnvironmentVolumeTrigger : MonoBehaviour
 	[HideInInspector]
 	public Vector3 Size = Vector3.one;
 
-	public EnvironmentVolume volume
-	{
-		get;
-		private set;
-	}
+	public EnvironmentVolume volume { get; private set; }
 
 	protected void Awake()
 	{

@@ -255,14 +255,14 @@ public static class GamePhysics
 		{
 			return false;
 		}
-		Vector3 a = p1 - p0;
-		float magnitude = a.magnitude;
+		Vector3 vector = p1 - p0;
+		float magnitude = vector.magnitude;
 		if (magnitude <= padding0 + padding1)
 		{
 			return true;
 		}
-		Vector3 vector = a / magnitude;
-		Ray ray = new Ray(p0 + vector * padding0, vector);
+		Vector3 vector2 = vector / magnitude;
+		Ray ray = new Ray(p0 + vector2 * padding0, vector2);
 		float maxDistance = magnitude - padding0 - padding1;
 		bool flag;
 		RaycastHit hitInfo;

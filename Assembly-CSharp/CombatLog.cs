@@ -44,11 +44,7 @@ public class CombatLog
 
 	private static Dictionary<ulong, Queue<Event>> players = new Dictionary<ulong, Queue<Event>>();
 
-	public float LastActive
-	{
-		get;
-		private set;
-	}
+	public float LastActive { get; private set; }
 
 	public CombatLog(BasePlayer player)
 	{

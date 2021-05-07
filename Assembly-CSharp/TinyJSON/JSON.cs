@@ -116,10 +116,7 @@ namespace TinyJSON
 			{
 				if (type.GetArrayRank() == 1)
 				{
-					return (T)decodeArrayMethod.MakeGenericMethod(type.GetElementType()).Invoke(null, new object[1]
-					{
-						data
-					});
+					return (T)decodeArrayMethod.MakeGenericMethod(type.GetElementType()).Invoke(null, new object[1] { data });
 				}
 				ProxyArray proxyArray = data as ProxyArray;
 				if (proxyArray == null)
@@ -138,13 +135,7 @@ namespace TinyJSON
 					MethodInfo methodInfo = decodeMultiRankArrayMethod.MakeGenericMethod(elementType);
 					try
 					{
-						methodInfo.Invoke(null, new object[4]
-						{
-							proxyArray,
-							array2,
-							1,
-							array
-						});
+						methodInfo.Invoke(null, new object[4] { proxyArray, array2, 1, array });
 					}
 					catch (Exception innerException)
 					{
@@ -156,17 +147,11 @@ namespace TinyJSON
 			}
 			if (typeof(IList).IsAssignableFrom(type))
 			{
-				return (T)decodeListMethod.MakeGenericMethod(type.GetGenericArguments()).Invoke(null, new object[1]
-				{
-					data
-				});
+				return (T)decodeListMethod.MakeGenericMethod(type.GetGenericArguments()).Invoke(null, new object[1] { data });
 			}
 			if (typeof(IDictionary).IsAssignableFrom(type))
 			{
-				return (T)decodeDictionaryMethod.MakeGenericMethod(type.GetGenericArguments()).Invoke(null, new object[1]
-				{
-					data
-				});
+				return (T)decodeDictionaryMethod.MakeGenericMethod(type.GetGenericArguments()).Invoke(null, new object[1] { data });
 			}
 			ProxyObject obj = data as ProxyObject;
 			if (obj == null)
@@ -233,18 +218,12 @@ namespace TinyJSON
 						if (type.IsValueType)
 						{
 							object obj3 = val;
-							fieldInfo.SetValue(obj3, methodInfo2.Invoke(null, new object[1]
-							{
-								item.Value
-							}));
+							fieldInfo.SetValue(obj3, methodInfo2.Invoke(null, new object[1] { item.Value }));
 							val = (T)obj3;
 						}
 						else
 						{
-							fieldInfo.SetValue(val, methodInfo2.Invoke(null, new object[1]
-							{
-								item.Value
-							}));
+							fieldInfo.SetValue(val, methodInfo2.Invoke(null, new object[1] { item.Value }));
 						}
 					}
 				}
@@ -271,18 +250,12 @@ namespace TinyJSON
 					if (type.IsValueType)
 					{
 						object obj5 = val;
-						propertyInfo.SetValue(obj5, methodInfo3.Invoke(null, new object[1]
-						{
-							item.Value
-						}), null);
+						propertyInfo.SetValue(obj5, methodInfo3.Invoke(null, new object[1] { item.Value }), null);
 						val = (T)obj5;
 					}
 					else
 					{
-						propertyInfo.SetValue(val, methodInfo3.Invoke(null, new object[1]
-						{
-							item.Value
-						}), null);
+						propertyInfo.SetValue(val, methodInfo3.Invoke(null, new object[1] { item.Value }), null);
 					}
 				}
 			}
@@ -291,10 +264,7 @@ namespace TinyJSON
 			{
 				if (methodInfo4.GetCustomAttributes(false).AnyOfType(typeof(AfterDecode)))
 				{
-					methodInfo4.Invoke(val, (methodInfo4.GetParameters().Length == 0) ? null : new object[1]
-					{
-						data
-					});
+					methodInfo4.Invoke(val, (methodInfo4.GetParameters().Length == 0) ? null : new object[1] { data });
 				}
 			}
 			return val;

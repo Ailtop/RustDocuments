@@ -265,13 +265,13 @@ public class BaseHelicopterVehicle : BaseVehicle
 			avgTerrainHeight = Mathf.Lerp(avgTerrainHeight, TerrainMeta.HeightMap.GetHeight(base.transform.position), Time.deltaTime);
 			float num2 = 1f - Mathf.InverseLerp(avgTerrainHeight + serviceCeiling - 20f, avgTerrainHeight + serviceCeiling, base.transform.position.y);
 			num *= num2;
-			float d = 1f - Mathf.InverseLerp(altForceDotMin, 1f, value);
+			float num3 = 1f - Mathf.InverseLerp(altForceDotMin, 1f, value);
 			Vector3 force = Vector3.up * engineThrustMax * liftFraction * currentThrottle * num;
-			Vector3 force2 = (base.transform.up - Vector3.up).normalized * engineThrustMax * currentThrottle * d;
+			Vector3 force2 = (base.transform.up - Vector3.up).normalized * engineThrustMax * currentThrottle * num3;
 			if (ShouldApplyHoverForce())
 			{
-				float d2 = rigidBody.mass * (0f - Physics.gravity.y);
-				rigidBody.AddForce(base.transform.up * d2 * num * hoverForceScale, ForceMode.Force);
+				float num4 = rigidBody.mass * (0f - Physics.gravity.y);
+				rigidBody.AddForce(base.transform.up * num4 * num * hoverForceScale, ForceMode.Force);
 			}
 			rigidBody.AddForce(force, ForceMode.Force);
 			rigidBody.AddForce(force2, ForceMode.Force);

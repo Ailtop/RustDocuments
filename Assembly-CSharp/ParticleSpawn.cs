@@ -8,9 +8,5 @@ public class ParticleSpawn : SingletonComponent<ParticleSpawn>, IClientComponent
 
 	public int PatchSize = 100;
 
-	public Vector3 Origin
-	{
-		get;
-		private set;
-	}
+	public Vector3 Origin { get; private set; }
 }

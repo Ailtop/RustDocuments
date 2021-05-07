@@ -67,10 +67,10 @@ public class BigWheelGame : SpinnerWheel
 
 	public override void Update_Server()
 	{
-		float velocity = base.velocity;
+		float num = velocity;
 		base.Update_Server();
-		float velocity2 = base.velocity;
-		if (velocity > 0f && velocity2 == 0f && spinNumber > lastPaidSpinNumber)
+		float num2 = velocity;
+		if (num > 0f && num2 == 0f && spinNumber > lastPaidSpinNumber)
 		{
 			Payout();
 			lastPaidSpinNumber = spinNumber;

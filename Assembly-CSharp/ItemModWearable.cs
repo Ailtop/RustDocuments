@@ -153,13 +153,13 @@ public class ItemModWearable : ItemMod
 		{
 			return true;
 		}
-		Wearable targetWearable = this.targetWearable;
-		Wearable targetWearable2 = wearable.targetWearable;
-		if ((targetWearable.occupationOver & targetWearable2.occupationOver) != 0)
+		Wearable wearable2 = targetWearable;
+		Wearable wearable3 = wearable.targetWearable;
+		if ((wearable2.occupationOver & wearable3.occupationOver) != 0)
 		{
 			return false;
 		}
-		if ((targetWearable.occupationUnder & targetWearable2.occupationUnder) != 0)
+		if ((wearable2.occupationUnder & wearable3.occupationUnder) != 0)
 		{
 			return false;
 		}

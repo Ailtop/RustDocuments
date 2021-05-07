@@ -34,29 +34,29 @@ public class Socket_Specific : Socket_Base
 
 	public override Construction.Placement DoPlacement(Construction.Target target)
 	{
-		Quaternion rhs = target.socket.rotation;
+		Quaternion quaternion = target.socket.rotation;
 		if (target.socket.male && target.socket.female)
 		{
-			rhs = target.socket.rotation * Quaternion.Euler(180f, 0f, 180f);
+			quaternion = target.socket.rotation * Quaternion.Euler(180f, 0f, 180f);
 		}
 		Transform transform = target.entity.transform;
-		Vector3 a = transform.localToWorldMatrix.MultiplyPoint3x4(target.socket.position);
-		Quaternion lhs;
+		Vector3 vector = transform.localToWorldMatrix.MultiplyPoint3x4(target.socket.position);
+		Quaternion quaternion2;
 		if (useFemaleRotation)
 		{
-			lhs = transform.rotation * rhs;
+			quaternion2 = transform.rotation * quaternion;
 		}
 		else
 		{
-			Vector3 a2 = new Vector3(a.x, 0f, a.z);
-			Vector3 b = new Vector3(target.player.eyes.position.x, 0f, target.player.eyes.position.z);
-			lhs = Quaternion.LookRotation((a2 - b).normalized) * rhs;
+			Vector3 vector2 = new Vector3(vector.x, 0f, vector.z);
+			Vector3 vector3 = new Vector3(target.player.eyes.position.x, 0f, target.player.eyes.position.z);
+			quaternion2 = Quaternion.LookRotation((vector2 - vector3).normalized) * quaternion;
 		}
 		Construction.Placement placement = new Construction.Placement();
-		Quaternion rotation = lhs * Quaternion.Inverse(base.rotation);
-		Vector3 b2 = rotation * position;
-		placement.position = a - b2;
-		placement.rotation = rotation;
+		Quaternion quaternion3 = quaternion2 * Quaternion.Inverse(rotation);
+		Vector3 vector4 = quaternion3 * position;
+		placement.position = vector - vector4;
+		placement.rotation = quaternion3;
 		return placement;
 	}
 }

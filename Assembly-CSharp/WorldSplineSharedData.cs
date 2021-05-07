@@ -9,11 +9,7 @@ public class WorldSplineSharedData : ScriptableObject
 
 	public static WorldSplineSharedData instance;
 
-	private static string[] worldSplineFolders = new string[2]
-	{
-		"Assets/Content/Structures",
-		"Assets/bundled/Prefabs/autospawn"
-	};
+	private static string[] worldSplineFolders = new string[2] { "Assets/Content/Structures", "Assets/bundled/Prefabs/autospawn" };
 
 	[RuntimeInitializeOnLoadMethod]
 	private static void Init()

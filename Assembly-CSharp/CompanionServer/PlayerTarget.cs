@@ -4,10 +4,7 @@ namespace CompanionServer
 {
 	public struct PlayerTarget : IEquatable<PlayerTarget>
 	{
-		public ulong SteamId
-		{
-			get;
-		}
+		public ulong SteamId { get; }
 
 		public PlayerTarget(ulong steamId)
 		{

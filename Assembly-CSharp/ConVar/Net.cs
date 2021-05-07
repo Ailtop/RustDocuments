@@ -4,15 +4,9 @@ namespace ConVar
 	public class Net : ConsoleSystem
 	{
 		[ServerVar]
-		public static bool visdebug = false;
+		public static bool visdebug;
 
 		[ClientVar]
-		public static bool debug = false;
-
-		[ServerVar]
-		public static int visibilityRadiusFarOverride = -1;
-
-		[ServerVar]
-		public static int visibilityRadiusNearOverride = -1;
+		public static bool debug;
 	}
 }

@@ -12,77 +12,29 @@ using UnityEngine;
 
 public static class World
 {
-	public static uint Seed
-	{
-		get;
-		set;
-	}
+	public static uint Seed { get; set; }
 
-	public static uint Salt
-	{
-		get;
-		set;
-	}
+	public static uint Salt { get; set; }
 
-	public static uint Size
-	{
-		get;
-		set;
-	}
+	public static uint Size { get; set; }
 
-	public static string Checksum
-	{
-		get;
-		set;
-	}
+	public static string Checksum { get; set; }
 
-	public static string Url
-	{
-		get;
-		set;
-	}
+	public static string Url { get; set; }
 
-	public static bool Procedural
-	{
-		get;
-		set;
-	}
+	public static bool Procedural { get; set; }
 
-	public static bool Cached
-	{
-		get;
-		set;
-	}
+	public static bool Cached { get; set; }
 
-	public static bool Networked
-	{
-		get;
-		set;
-	}
+	public static bool Networked { get; set; }
 
-	public static bool Receiving
-	{
-		get;
-		set;
-	}
+	public static bool Receiving { get; set; }
 
-	public static bool Transfer
-	{
-		get;
-		set;
-	}
+	public static bool Transfer { get; set; }
 
-	public static int SpawnIndex
-	{
-		get;
-		set;
-	}
+	public static int SpawnIndex { get; set; }
 
-	public static WorldSerialization Serialization
-	{
-		get;
-		set;
-	}
+	public static WorldSerialization Serialization { get; set; }
 
 	public static string Name
 	{
@@ -104,7 +56,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 212 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 205 + ".map";
 		}
 	}
 
@@ -116,9 +68,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 212 + ".sav";
+				return Name + "." + 205 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 212 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 205 + ".sav";
 		}
 	}
 
@@ -137,7 +89,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 212 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 205 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -174,7 +126,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 212 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 205 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)

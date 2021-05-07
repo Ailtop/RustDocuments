@@ -115,8 +115,8 @@ public class SamSite : ContainerIOEntity
 		if (staticRespawn)
 		{
 			currentTarget = null;
-			Quaternion rotation = Quaternion.Euler(0f, Quaternion.LookRotation(currentAimDir, Vector3.up).eulerAngles.y, 0f);
-			currentAimDir = rotation * Vector3.forward;
+			Quaternion quaternion = Quaternion.Euler(0f, Quaternion.LookRotation(currentAimDir, Vector3.up).eulerAngles.y, 0f);
+			currentAimDir = quaternion * Vector3.forward;
 			Invoke(SelfHeal, staticrepairseconds);
 			lifestate = LifeState.Dead;
 			base.health = 0f;
@@ -135,22 +135,22 @@ public class SamSite : ContainerIOEntity
 
 	public void FixedUpdate()
 	{
-		Vector3 rhs = currentAimDir;
+		Vector3 vector = currentAimDir;
 		if (currentTarget != null && IsPowered())
 		{
 			float speed = projectileTest.Get().GetComponent<ServerProjectile>().speed;
-			Vector3 a = EntityCenterPoint(currentTarget);
-			float num = Vector3.Distance(a, eyePoint.transform.position);
-			float d = num / speed;
-			Vector3 a2 = a + currentTarget.GetWorldVelocity() * d;
-			d = Vector3.Distance(a2, eyePoint.transform.position) / speed;
-			a2 = a + currentTarget.GetWorldVelocity() * d;
+			Vector3 vector2 = EntityCenterPoint(currentTarget);
+			float num = Vector3.Distance(vector2, eyePoint.transform.position);
+			float num2 = num / speed;
+			Vector3 a = vector2 + currentTarget.GetWorldVelocity() * num2;
+			num2 = Vector3.Distance(a, eyePoint.transform.position) / speed;
+			a = vector2 + currentTarget.GetWorldVelocity() * num2;
 			if (currentTarget.GetWorldVelocity().magnitude > 0.1f)
 			{
-				float d2 = Mathf.Sin(Time.time * 3f) * (1f + d * 0.5f);
-				a2 += currentTarget.GetWorldVelocity().normalized * d2;
+				float num3 = Mathf.Sin(Time.time * 3f) * (1f + num2 * 0.5f);
+				a += currentTarget.GetWorldVelocity().normalized * num3;
 			}
-			currentAimDir = (a2 - eyePoint.transform.position).normalized;
+			currentAimDir = (a - eyePoint.transform.position).normalized;
 			if (num > scanRadius)
 			{
 				currentTarget = null;
@@ -164,7 +164,7 @@ public class SamSite : ContainerIOEntity
 		yaw.transform.localRotation = localRotation;
 		Quaternion localRotation2 = Quaternion.Euler(pitch.transform.localRotation.eulerAngles.x, pitch.transform.localRotation.eulerAngles.y, z);
 		pitch.transform.localRotation = localRotation2;
-		if (currentAimDir != rhs)
+		if (currentAimDir != vector)
 		{
 			SendNetworkUpdate();
 		}

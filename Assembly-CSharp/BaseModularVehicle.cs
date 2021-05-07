@@ -22,8 +22,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool waterlogged;
 
-	[Header("Modular Vehicle")]
 	[HideInInspector]
+	[Header("Modular Vehicle")]
 	public float mass;
 
 	[SerializeField]
@@ -42,11 +42,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public Dictionary<BaseVehicleModule, Action> moduleAddActions = new Dictionary<BaseVehicleModule, Action>();
 
-	public ModularVehicleInventory Inventory
-	{
-		get;
-		set;
-	}
+	public ModularVehicleInventory Inventory { get; set; }
 
 	public Vector3 CentreOfMass => centreOfMassTransform.localPosition;
 
@@ -54,10 +50,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool HasAnyModules => AttachedModuleEntities.Count > 0;
 
-	public List<BaseVehicleModule> AttachedModuleEntities
-	{
-		get;
-	} = new List<BaseVehicleModule>();
+	public List<BaseVehicleModule> AttachedModuleEntities { get; } = new List<BaseVehicleModule>();
 
 
 	public int TotalSockets => moduleSockets.Count;
@@ -75,17 +68,9 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		}
 	}
 
-	public float TotalMass
-	{
-		get;
-		set;
-	}
+	public float TotalMass { get; set; }
 
-	public Vector3 Velocity
-	{
-		get;
-		set;
-	}
+	public Vector3 Velocity { get; set; }
 
 	public bool LightsAreOn => HasFlag(Flags.Reserved5);
 
@@ -105,11 +90,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public virtual bool IsLockable => false;
 
-	public bool HasInited
-	{
-		get;
-		private set;
-	}
+	public bool HasInited { get; private set; }
 
 	public static ItemDefinition AssociatedItemDef => ((BaseCombatEntity)/*Error: ldarg 0 (out-of-bounds)*/).repair.itemTarget;
 
@@ -525,8 +506,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		if (base.isServer)
 		{
 			float num = TotalMass - moduleMass;
-			Vector3 a = base.transform.InverseTransformPoint(moduleWorldPos) + moduleCOM;
-			Vector3 cOM = (realLocalCOM - a * (moduleMass / TotalMass)) / (num / TotalMass);
+			Vector3 vector = base.transform.InverseTransformPoint(moduleWorldPos) + moduleCOM;
+			Vector3 cOM = (realLocalCOM - vector * (moduleMass / TotalMass)) / (num / TotalMass);
 			SetMass(num);
 			SetCOM(cOM);
 		}

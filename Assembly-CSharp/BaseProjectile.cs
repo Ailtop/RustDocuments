@@ -26,8 +26,8 @@ public class BaseProjectile : AttackEntity
 			[Tooltip("Set to 0 to not use inbuilt mag")]
 			public int builtInSize;
 
-			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
 			[InspectorFlags]
+			[Tooltip("If using inbuilt mag, will accept these types of ammo")]
 			public AmmoTypes ammoTypes;
 		}
 
@@ -724,8 +724,8 @@ public class BaseProjectile : AttackEntity
 				}
 			}
 			Facepunch.Pool.FreeList(ref obj);
-			UnityEngine.Vector3 b = ((flag && ownerPlayer.isMounted) ? (vector2 * 6f) : UnityEngine.Vector3.zero);
-			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + b, vector2 * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
+			UnityEngine.Vector3 vector3 = ((flag && ownerPlayer.isMounted) ? (vector2 * 6f) : UnityEngine.Vector3.zero);
+			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + vector3, vector2 * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
 		}
 	}
 
@@ -889,8 +889,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -955,8 +955,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void ServerFractionalReloadInsert(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1064,9 +1064,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1131,10 +1131,7 @@ public class BaseProjectile : AttackEntity
 			else if (ValidateEyePos(player, projectile.startPos))
 			{
 				player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, primaryMagazineAmmo);
-				if (!player.limitNetworking)
-				{
-					CreateProjectileEffectClientside(component.projectileObject.resourcePath, projectile.startPos, projectile.startVel, projectile.seed, msg.connection, IsSilenced());
-				}
+				CreateProjectileEffectClientside(component.projectileObject.resourcePath, projectile.startPos, projectile.startVel, projectile.seed, msg.connection, IsSilenced());
 			}
 		}
 		player.stats.Add(component.category + "_fired", projectileShoot.projectiles.Count(), (Stats)5);

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class TreeMarkerData : PrefabAttribute, IServerComponent
+public class TreeMarkerData : ScriptableObject
 {
 	[Serializable]
 	public struct MarkerLocation
@@ -37,9 +37,37 @@ public class TreeMarkerData : PrefabAttribute, IServerComponent
 
 	public bool ProcessAngleChecks;
 
-	protected override Type GetIndexedType()
+	public Vector3 ClampToClosestPointInLocalSpace(Vector3 v, ref int ignoreIndex, ref int ignoreIndex2, out Vector3 normal)
 	{
-		return typeof(TreeMarkerData);
+		float num = float.MaxValue;
+		int num2 = -1;
+		for (int i = 0; i < Markers.Length; i++)
+		{
+			if (i == ignoreIndex || i == ignoreIndex2)
+			{
+				continue;
+			}
+			MarkerLocation markerLocation = Markers[i];
+			if (!(markerLocation.LocalPosition.y < MinY))
+			{
+				float sqrMagnitude = (markerLocation.LocalPosition - v).sqrMagnitude;
+				if (sqrMagnitude < num)
+				{
+					num = sqrMagnitude;
+					num2 = i;
+				}
+			}
+		}
+		if (num2 > -1)
+		{
+			normal = Markers[num2].LocalNormal;
+			ignoreIndex2 = ignoreIndex;
+			ignoreIndex = num2;
+			return Markers[num2].LocalPosition;
+		}
+		ignoreIndex = -1;
+		normal = Markers[0].LocalNormal;
+		return Markers[0].LocalPosition;
 	}
 
 	public Vector3 GetNearbyPoint(Vector3 point, ref int ignoreIndex, out Vector3 normal)

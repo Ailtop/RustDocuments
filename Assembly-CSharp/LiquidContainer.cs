@@ -140,8 +140,8 @@ public class LiquidContainer : ContainerIOEntity
 		{
 			UpdatePushLiquidTargets();
 		}
-		ItemContainer inventory = base.inventory;
-		inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
 	}
 
 	public override void OnCircuitChanged(bool forceUpdate)
@@ -215,8 +215,8 @@ public class LiquidContainer : ContainerIOEntity
 		Item liquidItem = GetLiquidItem();
 		if (liquidItem != null)
 		{
-			IOSlot[] outputs = base.outputs;
-			foreach (IOSlot iOSlot in outputs)
+			IOSlot[] array = outputs;
+			foreach (IOSlot iOSlot in array)
 			{
 				if (iOSlot.connectedTo.Get() != null)
 				{
@@ -252,8 +252,8 @@ public class LiquidContainer : ContainerIOEntity
 		{
 			return;
 		}
-		IOSlot[] outputs = ent.outputs;
-		foreach (IOSlot iOSlot in outputs)
+		IOSlot[] array = ent.outputs;
+		foreach (IOSlot iOSlot in array)
 		{
 			if (iOSlot.connectedTo.Get() != null && iOSlot.connectedTo.Get() != ent)
 			{
@@ -364,8 +364,8 @@ public class LiquidContainer : ContainerIOEntity
 		Item liquidItem = GetLiquidItem();
 		using (TimeWarning.New("UpdatePushTargets"))
 		{
-			IOSlot[] outputs = base.outputs;
-			foreach (IOSlot iOSlot in outputs)
+			IOSlot[] array = outputs;
+			foreach (IOSlot iOSlot in array)
 			{
 				if (iOSlot.type == IOType.Fluidic)
 				{
@@ -441,8 +441,8 @@ public class LiquidContainer : ContainerIOEntity
 			pushTargets.Add(containerIOEntity);
 			return;
 		}
-		IOSlot[] outputs = connected.outputs;
-		foreach (IOSlot iOSlot in outputs)
+		IOSlot[] array = connected.outputs;
+		foreach (IOSlot iOSlot in array)
 		{
 			IOEntity iOEntity2 = iOSlot.connectedTo.Get();
 			Vector3 sourceWorldPosition = connected.transform.TransformPoint(iOSlot.handlePosition);

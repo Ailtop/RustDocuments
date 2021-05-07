@@ -34,8 +34,8 @@ public class ElectricGenerator : IOEntity
 	public override void UpdateOutputs()
 	{
 		currentEnergy = GetCurrentEnergy();
-		IOSlot[] outputs = base.outputs;
-		foreach (IOSlot iOSlot in outputs)
+		IOSlot[] array = outputs;
+		foreach (IOSlot iOSlot in array)
 		{
 			if (iOSlot.connectedTo.Get() != null)
 			{

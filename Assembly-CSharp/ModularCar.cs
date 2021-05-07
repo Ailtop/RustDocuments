@@ -158,26 +158,26 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public ProtectionProperties mortalProtection;
 
-	[SerializeField]
 	[Header("Spawn")]
+	[SerializeField]
 	public SpawnSettings spawnSettings;
 
-	[Header("Fuel")]
 	[SerializeField]
+	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[Header("Audio/FX")]
 	[SerializeField]
+	[Header("Audio/FX")]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]
 	public GameObjectRef collisionEffect;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	public MeshRenderer[] damageShowingRenderers;
 
 	[ServerVar(Help = "Population active on the server")]
@@ -199,18 +199,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public EntityFuelSystem fuelSystem;
 
 	public float cachedFuelFraction;
-
-	public VehicleTerrainHandler.Surface OnSurface
-	{
-		get
-		{
-			if (serverTerrainHandler == null)
-			{
-				return VehicleTerrainHandler.Surface.Default;
-			}
-			return serverTerrainHandler.OnSurface;
-		}
-	}
 
 	public float DriveWheelVelocity
 	{
@@ -341,11 +329,11 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	{
 		if (!base.isClient && !hurtEntity.IsDestroyed)
 		{
-			Vector3 a = hurtEntity.GetWorldVelocity() - base.Velocity;
+			Vector3 vector = hurtEntity.GetWorldVelocity() - base.Velocity;
 			Vector3 position = ClosestPoint(hurtEntity.transform.position);
-			Vector3 a2 = hurtEntity.RealisticMass * a;
-			rigidBody.AddForceAtPosition(a2 * 1.25f, position, ForceMode.Impulse);
-			QueueCollisionDamage(this, a2.magnitude * 0.75f / UnityEngine.Time.deltaTime);
+			Vector3 vector2 = hurtEntity.RealisticMass * vector;
+			rigidBody.AddForceAtPosition(vector2 * 1.25f, position, ForceMode.Impulse);
+			QueueCollisionDamage(this, vector2.magnitude * 0.75f / UnityEngine.Time.deltaTime);
 			carPhysics.SetTempDrag(2.25f, 1f);
 		}
 	}
@@ -377,6 +365,24 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			}
 		}
 		return false;
+	}
+
+	public bool IsOnRoad()
+	{
+		if (serverTerrainHandler == null)
+		{
+			return false;
+		}
+		return serverTerrainHandler.IsOnRoad;
+	}
+
+	public bool IsOnIce()
+	{
+		if (serverTerrainHandler == null)
+		{
+			return false;
+		}
+		return serverTerrainHandler.IsOnIce;
 	}
 
 	public override void VehicleFixedUpdate()

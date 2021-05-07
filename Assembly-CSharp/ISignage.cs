@@ -2,15 +2,9 @@ using UnityEngine;
 
 public interface ISignage
 {
-	Vector2i TextureSize
-	{
-		get;
-	}
+	Vector2i TextureSize { get; }
 
-	int TextureCount
-	{
-		get;
-	}
+	int TextureCount { get; }
 
 	bool CanUpdateSign(BasePlayer player);
 

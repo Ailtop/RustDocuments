@@ -3,23 +3,21 @@ using UnityEngine;
 
 public class GenerateRiverLayout : ProceduralComponent
 {
-	public const float Width = 36f;
+	public const float Width = 24f;
 
-	public const float InnerPadding = 1f;
+	public const float InnerPadding = 0.5f;
 
-	public const float OuterPadding = 1f;
+	public const float OuterPadding = 0.5f;
 
-	public const float InnerFade = 10f;
+	public const float InnerFade = 8f;
 
-	public const float OuterFade = 20f;
+	public const float OuterFade = 16f;
 
 	public const float RandomScale = 0.75f;
 
-	public const float MeshOffset = -0.5f;
+	public const float MeshOffset = -0.4f;
 
-	public const float TerrainOffset = -1.5f;
-
-	private const int Smoothen = 4;
+	public const float TerrainOffset = -2f;
 
 	public override void Process(uint seed)
 	{
@@ -50,8 +48,8 @@ public class GenerateRiverLayout : ProceduralComponent
 				}
 				Vector2 normalized = new Vector2(normal.x, normal.z).normalized;
 				list2.Add(vector);
-				float radius = 18f;
-				int num4 = 18;
+				float radius = 12f;
+				int num4 = 12;
 				for (int i = 0; i < 10000; i++)
 				{
 					vector.x += normalized.x;
@@ -65,32 +63,30 @@ public class GenerateRiverLayout : ProceduralComponent
 					{
 						break;
 					}
-					float num5 = Mathf.Min(height, num3);
-					vector.y = Mathf.Lerp(vector.y, num5, 0.15f);
+					vector.y = Mathf.Min(height, num3);
+					list2.Add(vector);
 					int topology = topologyMap.GetTopology(vector, radius);
 					int topology2 = topologyMap.GetTopology(vector);
-					int num6 = 2694148;
-					int num7 = 128;
-					if ((topology & num6) != 0)
+					int num5 = 2694148;
+					int num6 = 128;
+					if ((topology & num5) != 0)
 					{
-						list2.Add(vector);
 						break;
 					}
-					if ((topology2 & num7) != 0 && --num4 <= 0)
+					if ((topology2 & num6) != 0 && --num4 <= 0)
 					{
-						list2.Add(vector);
-						if (list2.Count >= 25)
+						if (list2.Count >= 300)
 						{
-							int num8 = TerrainMeta.Path.Rivers.Count + list.Count;
-							PathList pathList = new PathList("River " + num8, list2.ToArray());
-							pathList.Width = 36f;
-							pathList.InnerPadding = 1f;
-							pathList.OuterPadding = 1f;
-							pathList.InnerFade = 10f;
-							pathList.OuterFade = 20f;
+							int num7 = TerrainMeta.Path.Rivers.Count + list.Count;
+							PathList pathList = new PathList("River " + num7, list2.ToArray());
+							pathList.Width = 24f;
+							pathList.InnerPadding = 0.5f;
+							pathList.OuterPadding = 0.5f;
+							pathList.InnerFade = 8f;
+							pathList.OuterFade = 16f;
 							pathList.RandomScale = 0.75f;
-							pathList.MeshOffset = -0.5f;
-							pathList.TerrainOffset = -1.5f;
+							pathList.MeshOffset = -0.4f;
+							pathList.TerrainOffset = -2f;
 							pathList.Topology = 16384;
 							pathList.Splat = 64;
 							pathList.Start = true;
@@ -99,24 +95,20 @@ public class GenerateRiverLayout : ProceduralComponent
 						}
 						break;
 					}
-					if (i % 12 == 0)
-					{
-						list2.Add(vector);
-					}
 					normal = heightMap.GetNormal(vector);
 					normalized = new Vector2(normalized.x + 0.15f * normal.x, normalized.y + 0.15f * normal.z).normalized;
-					num3 = num5;
+					num3 = vector.y;
 				}
 				list2.Clear();
 			}
 		}
 		list.Sort((PathList a, PathList b) => b.Path.Points.Length.CompareTo(a.Path.Points.Length));
-		int num9 = Mathf.RoundToInt(10f * TerrainMeta.Size.x * TerrainMeta.Size.z * 1E-06f);
-		int num10 = Mathf.NextPowerOfTwo((int)((float)World.Size / 36f));
-		bool[,] array = new bool[num10, num10];
+		int num8 = Mathf.RoundToInt(10f * TerrainMeta.Size.x * TerrainMeta.Size.z * 1E-06f);
+		int num9 = Mathf.NextPowerOfTwo((int)((float)World.Size / 24f));
+		bool[,] array = new bool[num9, num9];
 		for (int j = 0; j < list.Count; j++)
 		{
-			if (j >= num9)
+			if (j >= num8)
 			{
 				list.RemoveUnordered(j--);
 				continue;
@@ -129,23 +121,23 @@ public class GenerateRiverLayout : ProceduralComponent
 					list.RemoveUnordered(j--);
 				}
 			}
+			int num10 = -1;
 			int num11 = -1;
-			int num12 = -1;
 			for (int l = 0; l < pathList2.Path.Points.Length; l++)
 			{
 				Vector3 vector2 = pathList2.Path.Points[l];
-				int num13 = Mathf.Clamp((int)(TerrainMeta.NormalizeX(vector2.x) * (float)num10), 0, num10 - 1);
-				int num14 = Mathf.Clamp((int)(TerrainMeta.NormalizeZ(vector2.z) * (float)num10), 0, num10 - 1);
-				if (num11 != num13 || num12 != num14)
+				int num12 = Mathf.Clamp((int)(TerrainMeta.NormalizeX(vector2.x) * (float)num9), 0, num9 - 1);
+				int num13 = Mathf.Clamp((int)(TerrainMeta.NormalizeZ(vector2.z) * (float)num9), 0, num9 - 1);
+				if (num10 != num12 || num11 != num13)
 				{
-					if (array[num14, num13])
+					if (array[num13, num12])
 					{
 						list.RemoveUnordered(j--);
 						break;
 					}
+					num10 = num12;
 					num11 = num13;
-					num12 = num14;
-					array[num14, num13] = true;
+					array[num13, num12] = true;
 				}
 			}
 		}
@@ -155,7 +147,6 @@ public class GenerateRiverLayout : ProceduralComponent
 		}
 		foreach (PathList item in list)
 		{
-			item.Path.Smoothen(4);
 			item.Path.RecalculateTangents();
 		}
 		TerrainMeta.Path.Rivers.AddRange(list);

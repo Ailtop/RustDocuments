@@ -16,8 +16,8 @@ public class SupplySignal : TimedExplosive
 		BaseEntity baseEntity = GameManager.server.CreateEntity(EntityToCreate.resourcePath);
 		if ((bool)baseEntity)
 		{
-			Vector3 b = new Vector3(UnityEngine.Random.Range(-20f, 20f), 0f, UnityEngine.Random.Range(-20f, 20f));
-			baseEntity.SendMessage("InitDropPosition", base.transform.position + b, SendMessageOptions.DontRequireReceiver);
+			Vector3 vector = new Vector3(UnityEngine.Random.Range(-20f, 20f), 0f, UnityEngine.Random.Range(-20f, 20f));
+			baseEntity.SendMessage("InitDropPosition", base.transform.position + vector, SendMessageOptions.DontRequireReceiver);
 			baseEntity.Spawn();
 			Interface.CallHook("OnCargoPlaneSignaled", baseEntity, this);
 		}

@@ -52,11 +52,7 @@ public class Elevator : IOEntity, IFlagNotify
 
 	public virtual bool IsStatic => false;
 
-	public int Floor
-	{
-		get;
-		set;
-	}
+	public int Floor { get; set; }
 
 	public bool IsTop => HasFlag(Flags.Reserved1);
 
@@ -155,12 +151,8 @@ public class Elevator : IOEntity, IFlagNotify
 			OnLiftCalledWhenAtTargetFloor();
 			return false;
 		}
-		Vector3 worldSpaceFloorPosition = GetWorldSpaceFloorPosition(targetFloor);
-		if (!GamePhysics.LineOfSight(liftEntity.transform.position, worldSpaceFloorPosition, 2097152))
-		{
-			return false;
-		}
 		OnMoveBegin();
+		Vector3 worldSpaceFloorPosition = GetWorldSpaceFloorPosition(targetFloor);
 		Vector3 vector = base.transform.InverseTransformPoint(worldSpaceFloorPosition);
 		timeToTravel = TimeToTravelDistance(Mathf.Abs(liftEntity.transform.localPosition.y - vector.y));
 		LeanTween.moveLocalY(liftEntity.gameObject, vector.y, timeToTravel);
@@ -194,9 +186,9 @@ public class Elevator : IOEntity, IFlagNotify
 	public virtual Vector3 GetWorldSpaceFloorPosition(int targetFloor)
 	{
 		int num = Floor - targetFloor;
-		Vector3 b = Vector3.up * ((float)num * FloorHeight);
-		b.y -= 1f;
-		return base.transform.position - b;
+		Vector3 vector = Vector3.up * ((float)num * FloorHeight);
+		vector.y -= 1f;
+		return base.transform.position - vector;
 	}
 
 	public virtual void ClearBusy()

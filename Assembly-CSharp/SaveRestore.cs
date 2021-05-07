@@ -86,7 +86,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						binaryReader.ReadChar();
 						SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 					}
-					if (binaryReader.ReadUInt32() != 212)
+					if (binaryReader.ReadUInt32() != 205)
 					{
 						if (allowOutOfDateSaves)
 						{
@@ -362,7 +362,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			writer.Write((sbyte)82);
 			writer.Write((sbyte)68);
 			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(212u);
+			writer.Write(205u);
 			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 			saveInfo.forDisk = true;
 			if (!AndWait)
@@ -424,9 +424,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						SaveBuffer.CopyTo(destination);
 					}
 				}
-				catch (Exception arg)
+				catch (Exception ex)
 				{
-					UnityEngine.Debug.LogError("Couldn't write save file! We got an exception: " + arg);
+					UnityEngine.Debug.LogError("Couldn't write save file! We got an exception: " + ex);
 					if (File.Exists(text))
 					{
 						File.Delete(text);
@@ -436,9 +436,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				File.Copy(text, strFilename, true);
 				File.Delete(text);
 			}
-			catch (Exception arg2)
+			catch (Exception ex2)
 			{
-				UnityEngine.Debug.LogError("Error when saving to disk: " + arg2);
+				UnityEngine.Debug.LogError("Error when saving to disk: " + ex2);
 				yield break;
 			}
 		}

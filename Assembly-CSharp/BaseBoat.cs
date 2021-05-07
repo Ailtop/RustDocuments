@@ -187,8 +187,8 @@ public class BaseBoat : BaseVehicle
 			float num5 = (float)i / (float)num3 * 360f;
 			list.Add(new Vector3(Mathf.Sin(num5 * ((float)Math.PI / 180f)) * num4, y, Mathf.Cos(num5 * ((float)Math.PI / 180f)) * num4));
 		}
-		float d = 4f;
-		float num6 = 200f;
+		float num6 = 4f;
+		float num7 = 200f;
 		bool flag = true;
 		for (int j = 0; j < AI.ocean_patrol_path_iterations && flag; j++)
 		{
@@ -202,17 +202,17 @@ public class BaseBoat : BaseVehicle
 				Vector3 b2 = list[index];
 				Vector3 origin = vector;
 				Vector3 normalized = (Vector3.zero - vector).normalized;
-				Vector3 vector2 = vector + normalized * d;
-				if (Vector3.Distance(vector2, b) > num6 || Vector3.Distance(vector2, b2) > num6)
+				Vector3 vector2 = vector + normalized * num6;
+				if (Vector3.Distance(vector2, b) > num7 || Vector3.Distance(vector2, b2) > num7)
 				{
 					continue;
 				}
 				bool flag2 = true;
-				int num7 = 16;
-				for (int l = 0; l < num7; l++)
+				int num8 = 16;
+				for (int l = 0; l < num8; l++)
 				{
-					float num8 = (float)l / (float)num7 * 360f;
-					Vector3 normalized2 = new Vector3(Mathf.Sin(num8 * ((float)Math.PI / 180f)), y, Mathf.Cos(num8 * ((float)Math.PI / 180f))).normalized;
+					float num9 = (float)l / (float)num8 * 360f;
+					Vector3 normalized2 = new Vector3(Mathf.Sin(num9 * ((float)Math.PI / 180f)), y, Mathf.Cos(num9 * ((float)Math.PI / 180f))).normalized;
 					Vector3 vector3 = vector2 + normalized2 * 1f;
 					GetWaterDepth(vector3);
 					Vector3 direction = normalized;

@@ -31,12 +31,12 @@ public class Construction : PrefabAttribute
 
 		public Quaternion GetWorldRotation(bool female)
 		{
-			Quaternion rhs = socket.rotation;
+			Quaternion quaternion = socket.rotation;
 			if (socket.male && socket.female && female)
 			{
-				rhs = socket.rotation * Quaternion.Euler(180f, 0f, 180f);
+				quaternion = socket.rotation * Quaternion.Euler(180f, 0f, 180f);
 			}
-			return entity.transform.rotation * rhs;
+			return entity.transform.rotation * quaternion;
 		}
 
 		public Vector3 GetWorldPosition()

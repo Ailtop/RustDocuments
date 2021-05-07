@@ -48,10 +48,10 @@ public struct CachedTransform<T> where T : Component
 
 	public void RotateAround(Vector3 center, Vector3 axis, float angle)
 	{
-		Quaternion rhs = Quaternion.AngleAxis(angle, axis);
-		Vector3 b = rhs * (position - center);
-		position = center + b;
-		rotation *= Quaternion.Inverse(rotation) * rhs * rotation;
+		Quaternion quaternion = Quaternion.AngleAxis(angle, axis);
+		Vector3 vector = quaternion * (position - center);
+		position = center + vector;
+		rotation *= Quaternion.Inverse(rotation) * quaternion * rotation;
 	}
 
 	public static implicit operator bool(CachedTransform<T> instance)

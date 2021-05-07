@@ -168,9 +168,9 @@ public static class GizmosUtil
 		DrawWireCircleY(a, thickness);
 		DrawWireCircleY(b, thickness);
 		Vector3 normalized = (b - a).normalized;
-		Vector3 a2 = Quaternion.Euler(0f, 90f, 0f) * normalized;
-		Gizmos.DrawLine(b + a2 * thickness, a + a2 * thickness);
-		Gizmos.DrawLine(b - a2 * thickness, a - a2 * thickness);
+		Vector3 vector = Quaternion.Euler(0f, 90f, 0f) * normalized;
+		Gizmos.DrawLine(b + vector * thickness, a + vector * thickness);
+		Gizmos.DrawLine(b - vector * thickness, a - vector * thickness);
 	}
 
 	public static void DrawSemiCircle(float radius)

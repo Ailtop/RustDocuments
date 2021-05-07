@@ -65,8 +65,8 @@ public class SlidingProgressDoor : ProgressDoor
 			storedEnergy = Mathf.Clamp(storedEnergy, 0f, energyForOpen);
 			if (num2 > 0f)
 			{
-				IOSlot[] outputs = base.outputs;
-				foreach (IOSlot iOSlot in outputs)
+				IOSlot[] array = outputs;
+				foreach (IOSlot iOSlot in array)
 				{
 					if (iOSlot.connectedTo.Get() != null)
 					{

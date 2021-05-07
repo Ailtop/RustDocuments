@@ -93,9 +93,9 @@ public class LoadBalancer : SingletonComponent<LoadBalancer>
 
 	private static void CreateInstance()
 	{
-		GameObject gameObject = new GameObject();
-		gameObject.name = "LoadBalancer";
-		gameObject.AddComponent<LoadBalancer>();
-		Object.DontDestroyOnLoad(gameObject);
+		GameObject obj = new GameObject();
+		obj.name = "LoadBalancer";
+		obj.AddComponent<LoadBalancer>();
+		Object.DontDestroyOnLoad(obj);
 	}
 }

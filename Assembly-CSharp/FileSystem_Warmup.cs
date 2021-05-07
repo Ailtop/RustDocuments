@@ -13,16 +13,7 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	public static string[] ExcludeFilter = new string[11]
 	{
-		"/bundled/prefabs/autospawn/monument",
-		"/bundled/prefabs/autospawn/mountain",
-		"/bundled/prefabs/autospawn/canyon",
-		"/bundled/prefabs/autospawn/decor",
-		"/bundled/prefabs/navmesh",
-		"/content/ui/",
-		"/prefabs/ui/",
-		"/prefabs/world/",
-		"/prefabs/system/",
-		"/standard assets/",
+		"/bundled/prefabs/autospawn/monument", "/bundled/prefabs/autospawn/mountain", "/bundled/prefabs/autospawn/canyon", "/bundled/prefabs/autospawn/decor", "/bundled/prefabs/navmesh", "/content/ui/", "/prefabs/ui/", "/prefabs/world/", "/prefabs/system/", "/standard assets/",
 		"/third party/"
 	};
 

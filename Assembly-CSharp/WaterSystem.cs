@@ -132,10 +132,7 @@ public class WaterSystem : MonoBehaviour
 
 	private static WaterSystem instance;
 
-	private static Vector3[] emptyShoreMap = new Vector3[1]
-	{
-		Vector3.one
-	};
+	private static Vector3[] emptyShoreMap = new Vector3[1] { Vector3.one };
 
 	private static short[] emptyWaterMap = new short[1];
 
@@ -151,50 +148,22 @@ public class WaterSystem : MonoBehaviour
 
 	public Vector4 Global1 => global1;
 
-	public float ShoreWavesRcpFadeDistance
-	{
-		get;
-		private set;
-	} = 0.04f;
+	public float ShoreWavesRcpFadeDistance { get; private set; } = 0.04f;
 
 
-	public float TerrainRcpFadeDistance
-	{
-		get;
-		private set;
-	} = 0.1f;
+	public float TerrainRcpFadeDistance { get; private set; } = 0.1f;
 
 
-	public bool IsInitialized
-	{
-		get;
-		private set;
-	}
+	public bool IsInitialized { get; private set; }
 
-	public static WaterCollision Collision
-	{
-		get;
-		private set;
-	}
+	public static WaterCollision Collision { get; private set; }
 
-	public static WaterDynamics Dynamics
-	{
-		get;
-		private set;
-	}
+	public static WaterDynamics Dynamics { get; private set; }
 
-	public static WaterBody Ocean
-	{
-		get;
-		private set;
-	} = null;
+	public static WaterBody Ocean { get; private set; } = null;
 
 
-	public static HashSet<WaterBody> WaterBodies
-	{
-		get;
-		private set;
-	} = new HashSet<WaterBody>();
+	public static HashSet<WaterBody> WaterBodies { get; private set; } = new HashSet<WaterBody>();
 
 
 	public static float OceanLevel
@@ -214,11 +183,7 @@ public class WaterSystem : MonoBehaviour
 		}
 	}
 
-	public static float WaveTime
-	{
-		get;
-		private set;
-	} = 0f;
+	public static float WaveTime { get; private set; } = 0f;
 
 
 	public static WaterSystem Instance => instance;

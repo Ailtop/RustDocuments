@@ -292,8 +292,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private float nextAttackTime;
 
-	[SerializeField]
 	[InspectorFlags]
+	[SerializeField]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
 	[InspectorFlags]
@@ -399,23 +399,11 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 	}
 
-	public bool IsStuck
-	{
-		get;
-		set;
-	}
+	public bool IsStuck { get; set; }
 
-	public bool AgencyUpdateRequired
-	{
-		get;
-		set;
-	}
+	public bool AgencyUpdateRequired { get; set; }
 
-	public bool IsOnOffmeshLinkAndReachedNewCoord
-	{
-		get;
-		set;
-	}
+	public bool IsOnOffmeshLinkAndReachedNewCoord { get; set; }
 
 	public float GetAttackRate => AttackRate;
 
@@ -459,17 +447,9 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public float SecondsSinceLastHeardGunshot => UnityEngine.Time.time - _lastHeardGunshotTime;
 
-	public Vector3 LastHeardGunshotDirection
-	{
-		get;
-		set;
-	}
+	public Vector3 LastHeardGunshotDirection { get; set; }
 
-	public float TargetSpeed
-	{
-		get;
-		set;
-	}
+	public float TargetSpeed { get; set; }
 
 	public override bool IsNpc => true;
 
@@ -576,31 +556,15 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 	}
 
-	public BaseEntity AttackTarget
-	{
-		get;
-		set;
-	}
+	public BaseEntity AttackTarget { get; set; }
 
-	public Memory.SeenInfo AttackTargetMemory
-	{
-		get;
-		set;
-	}
+	public Memory.SeenInfo AttackTargetMemory { get; set; }
 
-	public BaseEntity FoodTarget
-	{
-		get;
-		set;
-	}
+	public BaseEntity FoodTarget { get; set; }
 
 	public BaseCombatEntity CombatTarget => AttackTarget as BaseCombatEntity;
 
-	public Vector3 SpawnPosition
-	{
-		get;
-		set;
-	}
+	public Vector3 SpawnPosition { get; set; }
 
 	public float AttackTargetVisibleFor => 0f;
 
@@ -654,11 +618,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public float currentBehaviorDuration => 0f;
 
-	public Behaviour CurrentBehaviour
-	{
-		get;
-		set;
-	}
+	public Behaviour CurrentBehaviour { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -701,10 +661,10 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public static Vector3 GetNewNavPosWithVelocity(BaseEntity ent, Vector3 velocity)
 	{
-		BaseEntity parentEntity = ent.GetParentEntity();
-		if (parentEntity != null)
+		BaseEntity baseEntity = ent.GetParentEntity();
+		if (baseEntity != null)
 		{
-			velocity = parentEntity.transform.InverseTransformDirection(velocity);
+			velocity = baseEntity.transform.InverseTransformDirection(velocity);
 		}
 		Vector3 targetPosition = ent.ServerPosition + velocity * UnityEngine.Time.fixedDeltaTime;
 		NavMeshHit hit;
@@ -718,16 +678,16 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public override string DebugText()
 	{
-		string str = base.DebugText();
-		str += $"\nBehaviour: {CurrentBehaviour}";
-		str += $"\nAttackTarget: {AttackTarget}";
-		str += $"\nFoodTarget: {FoodTarget}";
-		str += $"\nSleep: {Sleep:0.00}";
+		string text = base.DebugText();
+		text += $"\nBehaviour: {CurrentBehaviour}";
+		text += $"\nAttackTarget: {AttackTarget}";
+		text += $"\nFoodTarget: {FoodTarget}";
+		text += $"\nSleep: {Sleep:0.00}";
 		if (AiContext != null)
 		{
-			str += $"\nVisible Ents: {AiContext.Memory.Visible.Count}";
+			text += $"\nVisible Ents: {AiContext.Memory.Visible.Count}";
 		}
-		return str;
+		return text;
 	}
 
 	public void TickAi()

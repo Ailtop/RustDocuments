@@ -10,18 +10,18 @@ public static class TerrainFilterEx
 		}
 		foreach (TerrainFilter terrainFilter in filters)
 		{
-			Vector3 point = Vector3.Scale(terrainFilter.worldPosition, scale);
-			point = rot * point;
-			Vector3 vector = pos + point;
-			if (TerrainMeta.OutOfBounds(vector))
+			Vector3 vector = Vector3.Scale(terrainFilter.worldPosition, scale);
+			vector = rot * vector;
+			Vector3 vector2 = pos + vector;
+			if (TerrainMeta.OutOfBounds(vector2))
 			{
 				return false;
 			}
-			if (globalFilter != null && globalFilter.GetFactor(vector) == 0f)
+			if (globalFilter != null && globalFilter.GetFactor(vector2) == 0f)
 			{
 				return false;
 			}
-			if (!terrainFilter.Check(vector))
+			if (!terrainFilter.Check(vector2))
 			{
 				return false;
 			}

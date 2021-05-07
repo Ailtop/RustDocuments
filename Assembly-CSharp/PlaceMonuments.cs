@@ -24,10 +24,6 @@ public class PlaceMonuments : ProceduralComponent
 		public float minDistanceDifferentType;
 
 		public float maxDistanceDifferentType;
-
-		public float minDistanceDungeonEntrance;
-
-		public float maxDistanceDungeonEntrance;
 	}
 
 	public enum DistanceMode
@@ -98,12 +94,10 @@ public class PlaceMonuments : ProceduralComponent
 				Prefab<MonumentInfo>[] array2 = array;
 				foreach (Prefab<MonumentInfo> prefab in array2)
 				{
-					MonumentInfo component = prefab.Component;
-					if ((bool)component && World.Size < component.MinWorldSize)
+					if ((bool)prefab.Component && World.Size < prefab.Component.MinWorldSize)
 					{
 						continue;
 					}
-					DungeonInfo dungeonInfo = (component ? component.DungeonEntrance : null);
 					int num3 = (int)((!prefab.Parameters) ? PrefabPriority.Low : (prefab.Parameters.Priority + 1));
 					int num4 = 100000 * num3 * num3 * num3 * num3;
 					int num5 = 0;
@@ -125,10 +119,14 @@ public class PlaceMonuments : ProceduralComponent
 						Vector3 pos = new Vector3(x2, height, z2);
 						Quaternion rot = prefab.Object.transform.localRotation;
 						Vector3 scale = prefab.Object.transform.localScale;
+						int num8 = Mathf.Max(MinDistance, prefab.Component ? prefab.Component.MinDistance : 0);
+						DistanceInfo distanceInfo = GetDistanceInfo(a, pos);
+						if (distanceInfo.minDistanceSameType < (float)num8)
+						{
+							continue;
+						}
 						prefab.ApplyDecorComponents(ref pos, ref rot, ref scale);
-						int num8 = Mathf.Max(MinDistance, component ? component.MinDistance : 0);
-						DistanceInfo distanceInfo = GetDistanceInfo(a, pos, pos + rot * Vector3.Scale(scale, dungeonInfo ? dungeonInfo.transform.position : Vector3.zero));
-						if (distanceInfo.minDistanceSameType < (float)num8 || ((bool)dungeonInfo && distanceInfo.minDistanceDungeonEntrance < (float)dungeonInfo.CellSize) || ((bool)prefab.Component && !prefab.Component.CheckPlacement(pos, rot, scale)) || !prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground))
+						if (((bool)prefab.Component && !prefab.Component.CheckPlacement(pos, rot, scale)) || !prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground))
 						{
 							continue;
 						}
@@ -194,20 +192,18 @@ public class PlaceMonuments : ProceduralComponent
 		}
 	}
 
-	public DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 monumentPos, Vector3 dungeonPos)
+	public DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 pos)
 	{
 		DistanceInfo result = default(DistanceInfo);
-		result.minDistanceSameType = float.MaxValue;
-		result.maxDistanceSameType = float.MinValue;
 		result.minDistanceDifferentType = float.MaxValue;
 		result.maxDistanceDifferentType = float.MinValue;
-		result.minDistanceDungeonEntrance = float.MaxValue;
-		result.maxDistanceDungeonEntrance = float.MinValue;
+		result.minDistanceSameType = float.MaxValue;
+		result.maxDistanceSameType = float.MinValue;
 		if (TerrainMeta.Path != null)
 		{
 			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				float sqrMagnitude = (monument.transform.position - monumentPos).sqrMagnitude;
+				float sqrMagnitude = (monument.transform.position - pos).sqrMagnitude;
 				if (sqrMagnitude < result.minDistanceDifferentType)
 				{
 					result.minDistanceDifferentType = sqrMagnitude;
@@ -226,41 +222,18 @@ public class PlaceMonuments : ProceduralComponent
 				result.maxDistanceDifferentType = Mathf.Sqrt(result.maxDistanceDifferentType);
 			}
 		}
-		if (TerrainMeta.Path != null)
-		{
-			foreach (DungeonInfo dungeonEntrance in TerrainMeta.Path.DungeonEntrances)
-			{
-				float sqrMagnitude2 = (dungeonEntrance.transform.position - dungeonPos).sqrMagnitude;
-				if (sqrMagnitude2 < result.minDistanceDungeonEntrance)
-				{
-					result.minDistanceDungeonEntrance = sqrMagnitude2;
-				}
-				if (sqrMagnitude2 > result.maxDistanceDungeonEntrance)
-				{
-					result.maxDistanceDungeonEntrance = sqrMagnitude2;
-				}
-			}
-			if (result.minDistanceDungeonEntrance != float.MaxValue)
-			{
-				result.minDistanceDungeonEntrance = Mathf.Sqrt(result.minDistanceDungeonEntrance);
-			}
-			if (result.maxDistanceDungeonEntrance != float.MinValue)
-			{
-				result.maxDistanceDungeonEntrance = Mathf.Sqrt(result.maxDistanceDungeonEntrance);
-			}
-		}
 		if (spawns != null)
 		{
 			foreach (SpawnInfo spawn in spawns)
 			{
-				float sqrMagnitude3 = (spawn.position - monumentPos).sqrMagnitude;
-				if (sqrMagnitude3 < result.minDistanceSameType)
+				float sqrMagnitude2 = (spawn.position - pos).sqrMagnitude;
+				if (sqrMagnitude2 < result.minDistanceSameType)
 				{
-					result.minDistanceSameType = sqrMagnitude3;
+					result.minDistanceSameType = sqrMagnitude2;
 				}
-				if (sqrMagnitude3 > result.maxDistanceSameType)
+				if (sqrMagnitude2 > result.maxDistanceSameType)
 				{
-					result.maxDistanceSameType = sqrMagnitude3;
+					result.maxDistanceSameType = sqrMagnitude2;
 				}
 			}
 			if (result.minDistanceSameType != float.MaxValue)

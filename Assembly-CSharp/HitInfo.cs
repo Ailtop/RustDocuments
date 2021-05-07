@@ -130,10 +130,10 @@ public class HitInfo
 	{
 		get
 		{
-			Translate.Phrase bonePhrase = this.bonePhrase;
-			if (bonePhrase != null)
+			Translate.Phrase phrase = bonePhrase;
+			if (phrase != null)
 			{
-				return bonePhrase.english;
+				return phrase.english;
 			}
 			return "N/A";
 		}

@@ -19,8 +19,8 @@ public class Composter : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		ItemContainer inventory = base.inventory;
-		inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(InventoryItemFilter));
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(InventoryItemFilter));
 		InvokeRandomized(UpdateComposting, UpdateInterval, UpdateInterval, UpdateInterval * 0.1f);
 	}
 

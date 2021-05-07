@@ -90,8 +90,8 @@ public class AsyncTerrainNavMeshBake : CustomYieldInstruction
 
 	private void DoWork()
 	{
-		Vector3 b = new Vector3(width / 2, 0f, height / 2);
-		Vector3 b2 = new Vector3(pivot.x - b.x, 0f, pivot.z - b.z);
+		Vector3 vector = new Vector3(width / 2, 0f, height / 2);
+		Vector3 vector2 = new Vector3(pivot.x - vector.x, 0f, pivot.z - vector.z);
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		TerrainAlphaMap alphaMap = TerrainMeta.AlphaMap;
 		int num = 0;
@@ -100,8 +100,8 @@ public class AsyncTerrainNavMeshBake : CustomYieldInstruction
 			int num2 = 0;
 			while (num2 <= width)
 			{
-				Vector3 worldPos = new Vector3(num2, 0f, i) + b2;
-				Vector3 item = new Vector3(num2, 0f, i) - b;
+				Vector3 worldPos = new Vector3(num2, 0f, i) + vector2;
+				Vector3 item = new Vector3(num2, 0f, i) - vector;
 				float num3 = heightMap.GetHeight(worldPos);
 				if (num3 < -1f)
 				{

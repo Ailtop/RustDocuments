@@ -24,49 +24,25 @@ namespace ConVar
 
 		public struct ChatEntry
 		{
-			public ChatChannel Channel
-			{
-				get;
-				set;
-			}
+			public ChatChannel Channel { get; set; }
 
-			public string Message
-			{
-				get;
-				set;
-			}
+			public string Message { get; set; }
 
-			public string UserId
-			{
-				get;
-				set;
-			}
+			public string UserId { get; set; }
 
-			public string Username
-			{
-				get;
-				set;
-			}
+			public string Username { get; set; }
 
-			public string Color
-			{
-				get;
-				set;
-			}
+			public string Color { get; set; }
 
-			public int Time
-			{
-				get;
-				set;
-			}
+			public int Time { get; set; }
 		}
 
 		private const float textRange = 50f;
 
 		private const float textVolumeBoost = 0.2f;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool enabled = true;
 
 		public static List<ChatEntry> History = new List<ChatEntry>();
@@ -190,38 +166,38 @@ namespace ConVar
 			if (serverlog)
 			{
 				ServerConsole.PrintColoured(ConsoleColor.DarkYellow, string.Concat("[", targetChannel, "] ", username, ": "), ConsoleColor.DarkGreen, text);
-				string str = player?.ToString() ?? $"{username}[{userId}]";
+				string text2 = player?.ToString() ?? $"{username}[{userId}]";
 				switch (targetChannel)
 				{
 				case ChatChannel.Team:
-					DebugEx.Log("[TEAM CHAT] " + str + " : " + text);
+					DebugEx.Log("[TEAM CHAT] " + text2 + " : " + text);
 					break;
 				case ChatChannel.Cards:
-					DebugEx.Log("[CARDS CHAT] " + str + " : " + text);
+					DebugEx.Log("[CARDS CHAT] " + text2 + " : " + text);
 					break;
 				default:
-					DebugEx.Log("[CHAT] " + str + " : " + text);
+					DebugEx.Log("[CHAT] " + text2 + " : " + text);
 					break;
 				}
 			}
 			bool flag = userGroup == ServerUsers.UserGroup.Owner || userGroup == ServerUsers.UserGroup.Moderator;
 			bool num = ((player != null) ? player.IsDeveloper : DeveloperList.Contains(userId));
-			string text2 = "#5af";
+			string text3 = "#5af";
 			if (flag)
 			{
-				text2 = "#af5";
+				text3 = "#af5";
 			}
 			if (num)
 			{
-				text2 = "#fa5";
+				text3 = "#fa5";
 			}
-			string text3 = username.EscapeRichText();
+			string text4 = username.EscapeRichText();
 			ChatEntry chatEntry = default(ChatEntry);
 			chatEntry.Channel = targetChannel;
 			chatEntry.Message = text;
 			chatEntry.UserId = ((player != null) ? player.UserIDString : userId.ToString());
 			chatEntry.Username = username;
-			chatEntry.Color = text2;
+			chatEntry.Color = text3;
 			chatEntry.Time = Epoch.Current;
 			ChatEntry chatEntry2 = chatEntry;
 			History.Add(chatEntry2);
@@ -247,7 +223,7 @@ namespace ConVar
 				cardTable.GameController.GetConnectionsInGame(obj2);
 				if (obj2.Count > 0)
 				{
-					ConsoleNetwork.SendClientCommand(obj2, "chat.add2", 3, userId, text, text3, text2, 1f);
+					ConsoleNetwork.SendClientCommand(obj2, "chat.add2", 3, userId, text, text4, text3, 1f);
 				}
 				Facepunch.Pool.FreeList(ref obj2);
 				return true;
@@ -255,7 +231,7 @@ namespace ConVar
 			case ChatChannel.Global:
 				if (Server.globalchat)
 				{
-					ConsoleNetwork.BroadcastToAllClients("chat.add2", 0, userId, text, text3, text2, 1f);
+					ConsoleNetwork.BroadcastToAllClients("chat.add2", 0, userId, text, text4, text3, 1f);
 					return true;
 				}
 				break;
@@ -269,9 +245,9 @@ namespace ConVar
 				List<Network.Connection> onlineMemberConnections = playerTeam.GetOnlineMemberConnections();
 				if (onlineMemberConnections != null)
 				{
-					ConsoleNetwork.SendClientCommand(onlineMemberConnections, "chat.add2", 1, userId, text, text3, text2, 1f);
+					ConsoleNetwork.SendClientCommand(onlineMemberConnections, "chat.add2", 1, userId, text, text4, text3, 1f);
 				}
-				playerTeam.BroadcastTeamChat(userId, text3, text, text2);
+				playerTeam.BroadcastTeamChat(userId, text4, text, text3);
 				return true;
 			}
 			}
@@ -283,7 +259,7 @@ namespace ConVar
 					float sqrMagnitude = (activePlayer.transform.position - player.transform.position).sqrMagnitude;
 					if (!(sqrMagnitude > num2))
 					{
-						ConsoleNetwork.SendClientCommand(activePlayer.net.connection, "chat.add2", 0, userId, text, text3, text2, Mathf.Clamp01(num2 - sqrMagnitude + 0.2f));
+						ConsoleNetwork.SendClientCommand(activePlayer.net.connection, "chat.add2", 0, userId, text, text4, text3, Mathf.Clamp01(num2 - sqrMagnitude + 0.2f));
 					}
 				}
 				return true;
@@ -291,8 +267,8 @@ namespace ConVar
 			return false;
 		}
 
-		[Help("Return the last x lines of the console. Default is 200")]
 		[ServerVar]
+		[Help("Return the last x lines of the console. Default is 200")]
 		public static IEnumerable<ChatEntry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);
@@ -304,8 +280,8 @@ namespace ConVar
 			return History.Skip(num);
 		}
 
-		[ServerVar]
 		[Help("Search the console for a particular string")]
+		[ServerVar]
 		public static IEnumerable<ChatEntry> search(Arg arg)
 		{
 			string search = arg.GetString(0, null);

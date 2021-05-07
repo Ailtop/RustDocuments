@@ -4,19 +4,11 @@ public class ModelConditionTest_SpiralStairs : ModelConditionTest
 {
 	private const string stairs_socket_female = "sockets/stairs-female/1";
 
-	private static string[] stairs_sockets_female = new string[2]
-	{
-		"block.stair.spiral/sockets/stairs-female/1",
-		"block.stair.spiral.triangle/sockets/stairs-female/1"
-	};
+	private static string[] stairs_sockets_female = new string[2] { "block.stair.spiral/sockets/stairs-female/1", "block.stair.spiral.triangle/sockets/stairs-female/1" };
 
 	private const string floor_socket_female = "sockets/floor-female/1";
 
-	private static string[] floor_sockets_female = new string[2]
-	{
-		"block.stair.spiral/sockets/floor-female/1",
-		"block.stair.spiral.triangle/sockets/floor-female/1"
-	};
+	private static string[] floor_sockets_female = new string[2] { "block.stair.spiral/sockets/floor-female/1", "block.stair.spiral.triangle/sockets/floor-female/1" };
 
 	protected void OnDrawGizmosSelected()
 	{

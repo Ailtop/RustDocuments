@@ -29,7 +29,7 @@ public class Socket_Terrain : Socket_Base
 
 	public override Construction.Placement DoPlacement(Construction.Target target)
 	{
-		Vector3 eulerAngles = base.rotation.eulerAngles;
+		Vector3 eulerAngles = rotation.eulerAngles;
 		eulerAngles.x = 0f;
 		eulerAngles.z = 0f;
 		Vector3 direction = target.ray.direction;
@@ -40,13 +40,13 @@ public class Socket_Terrain : Socket_Base
 		{
 			upwards = target.normal;
 		}
-		Quaternion rotation = Quaternion.LookRotation(direction, upwards) * Quaternion.Euler(0f, eulerAngles.y, 0f) * Quaternion.Euler(target.rotation);
-		Vector3 position = target.position;
-		position -= rotation * base.position;
+		Quaternion quaternion = Quaternion.LookRotation(direction, upwards) * Quaternion.Euler(0f, eulerAngles.y, 0f) * Quaternion.Euler(target.rotation);
+		Vector3 vector = target.position;
+		vector -= quaternion * position;
 		return new Construction.Placement
 		{
-			rotation = rotation,
-			position = position
+			rotation = quaternion,
+			position = vector
 		};
 	}
 }

@@ -66,8 +66,8 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 			if ((bool)rigidbody && !rigidbody.isKinematic)
 			{
 				float value = Vector3Ex.Distance2D(useRigidbodyPosition ? rigidbody.transform.position : entityContent.transform.position, base.transform.position);
-				float d = 1f - Mathf.InverseLerp(minRadius, maxRadius, value);
-				float num = 1f - Mathf.InverseLerp(minRadius - 1f, minRadius, value);
+				float num = 1f - Mathf.InverseLerp(minRadius, maxRadius, value);
+				float num2 = 1f - Mathf.InverseLerp(minRadius - 1f, minRadius, value);
 				Vector3 vector = entityContent.ClosestPoint(position);
 				Vector3 vector2 = Vector3Ex.Direction2D(vector, position);
 				vector2 = Vector3Ex.Direction2D(useCentreOfMass ? rigidbody.worldCenterOfMass : vector, position);
@@ -76,10 +76,10 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 					Vector3 from = base.transform.InverseTransformDirection(vector2);
 					vector2 = ((!(Vector3.Angle(from, axisToSnapTo) < Vector3.Angle(from, -axisToSnapTo))) ? (-base.transform.TransformDirection(axisToSnapTo)) : base.transform.TransformDirection(axisToSnapTo));
 				}
-				rigidbody.AddForceAtPosition(vector2 * maxPushVelocity * d, vector, ForceMode.Acceleration);
-				if (num > 0f)
+				rigidbody.AddForceAtPosition(vector2 * maxPushVelocity * num, vector, ForceMode.Acceleration);
+				if (num2 > 0f)
 				{
-					rigidbody.AddForceAtPosition(vector2 * 1f * num, vector, ForceMode.VelocityChange);
+					rigidbody.AddForceAtPosition(vector2 * 1f * num2, vector, ForceMode.VelocityChange);
 				}
 			}
 		}
@@ -94,8 +94,8 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 		if (snapToAxis)
 		{
 			Gizmos.color = Color.cyan;
-			Vector3 b = base.transform.TransformDirection(axisToSnapTo);
-			Gizmos.DrawLine(base.transform.position + b, base.transform.position - b);
+			Vector3 vector = base.transform.TransformDirection(axisToSnapTo);
+			Gizmos.DrawLine(base.transform.position + vector, base.transform.position - vector);
 		}
 	}
 }

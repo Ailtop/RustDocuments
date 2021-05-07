@@ -81,10 +81,7 @@ public class WaterCollision : MonoBehaviour
 		{
 			if (ignore)
 			{
-				List<Collider> val = new List<Collider>
-				{
-					trigger
-				};
+				List<Collider> val = new List<Collider> { trigger };
 				HashSet<Collider>.Enumerator enumerator = waterColliders.GetEnumerator();
 				while (enumerator.MoveNext())
 				{

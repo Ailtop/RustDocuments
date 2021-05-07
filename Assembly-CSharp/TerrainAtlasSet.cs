@@ -8,7 +8,8 @@ public class TerrainAtlasSet : ScriptableObject
 	{
 		ALBEDO,
 		NORMAL,
-		PACKED,
+		SPECULAR,
+		HEIGHT,
 		COUNT
 	}
 
@@ -44,30 +45,15 @@ public class TerrainAtlasSet : ScriptableObject
 
 	public const int SplatsPerLine = 3;
 
-	public const int SourceTypeCount = 3;
+	public const int SourceTypeCount = 4;
 
 	public const int AtlasMipCount = 10;
 
-	public static string[] sourceTypeNames = new string[3]
-	{
-		"Albedo",
-		"Normal",
-		"Packed"
-	};
+	public static string[] sourceTypeNames = new string[4] { "Albedo", "Normal", "Specular", "Height" };
 
-	public static string[] sourceTypeNamesExt = new string[3]
-	{
-		"Albedo (rgb)",
-		"Normal (rgb)",
-		"Metal[ignored]_Height_AO_Gloss (rgba)"
-	};
+	public static string[] sourceTypeNamesExt = new string[4] { "Albedo (rgb)", "Normal (rgb)", "Specular (rgba)", "Height (gray)" };
 
-	public static string[] sourceTypePostfix = new string[3]
-	{
-		"_albedo",
-		"_normal",
-		"_metal_hm_ao_gloss"
-	};
+	public static string[] sourceTypePostfix = new string[4] { "_albedo", "_normal", "_specular", "_height" };
 
 	public string[] splatNames;
 
@@ -101,17 +87,7 @@ public class TerrainAtlasSet : ScriptableObject
 	{
 		if (splatNames == null)
 		{
-			splatNames = new string[8]
-			{
-				"Dirt",
-				"Snow",
-				"Sand",
-				"Rock",
-				"Grass",
-				"Forest",
-				"Stones",
-				"Gravel"
-			};
+			splatNames = new string[8] { "Dirt", "Snow", "Sand", "Rock", "Grass", "Forest", "Stones", "Gravel" };
 		}
 		else if (splatNames.Length != 8)
 		{
@@ -135,26 +111,27 @@ public class TerrainAtlasSet : ScriptableObject
 		}
 		if (defaultValues == null)
 		{
-			defaultValues = new Color[3]
+			defaultValues = new Color[4]
 			{
 				new Color(1f, 1f, 1f, 0.5f),
 				new Color(0.5f, 0.5f, 1f, 0f),
-				new Color(0f, 0f, 1f, 0.5f)
+				new Color(0.5f, 0.5f, 0.5f, 0.5f),
+				Color.black
 			};
 		}
-		else if (defaultValues.Length != 3)
+		else if (defaultValues.Length != 4)
 		{
-			Array.Resize(ref defaultValues, 3);
+			Array.Resize(ref defaultValues, 4);
 		}
 		if (sourceMaps == null)
 		{
-			sourceMaps = new SourceMapSet[3];
+			sourceMaps = new SourceMapSet[4];
 		}
-		else if (sourceMaps.Length != 3)
+		else if (sourceMaps.Length != 4)
 		{
-			Array.Resize(ref sourceMaps, 3);
+			Array.Resize(ref sourceMaps, 4);
 		}
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			sourceMaps[i] = ((sourceMaps[i] != null) ? sourceMaps[i] : new SourceMapSet());
 			sourceMaps[i].CheckReset();

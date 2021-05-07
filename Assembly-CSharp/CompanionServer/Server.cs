@@ -28,11 +28,7 @@ namespace CompanionServer
 
 		internal static string Token;
 
-		public static Listener Listener
-		{
-			get;
-			private set;
-		}
+		public static Listener Listener { get; private set; }
 
 		public static void Initialize()
 		{

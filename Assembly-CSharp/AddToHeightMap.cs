@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class AddToHeightMap : ProceduralObject
 {
-	public bool DestroyGameObject;
-
 	public override void Process()
 	{
 		Collider component = GetComponent<Collider>();
@@ -32,13 +30,6 @@ public class AddToHeightMap : ProceduralObject
 				}
 			}
 		}
-		if (DestroyGameObject)
-		{
-			GameManager.Destroy(base.gameObject);
-		}
-		else
-		{
-			GameManager.Destroy(this);
-		}
+		GameManager.Destroy(this);
 	}
 }

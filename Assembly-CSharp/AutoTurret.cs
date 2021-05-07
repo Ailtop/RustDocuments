@@ -84,12 +84,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public Vector3 lastSentAimDir = Vector3.zero;
 
-	private static float[] visibilityOffsets = new float[3]
-	{
-		0f,
-		0.15f,
-		-0.15f
-	};
+	private static float[] visibilityOffsets = new float[3] { 0f, 0.15f, -0.15f };
 
 	public int peekIndex;
 
@@ -424,10 +419,10 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		float x = Mathf.Clamp(0f - inputState.current.mouseDelta.y, -1f, 1f) * rcTurnSensitivity;
 		float y = Mathf.Clamp(inputState.current.mouseDelta.x, -1f, 1f) * rcTurnSensitivity;
-		Quaternion lhs = Quaternion.LookRotation(aimDir, base.transform.up);
-		Quaternion rhs = Quaternion.Euler(x, y, 0f);
-		Quaternion rotation = lhs * rhs;
-		aimDir = rotation * Vector3.forward;
+		Quaternion quaternion = Quaternion.LookRotation(aimDir, base.transform.up);
+		Quaternion quaternion2 = Quaternion.Euler(x, y, 0f);
+		Quaternion quaternion3 = quaternion * quaternion2;
+		aimDir = quaternion3 * Vector3.forward;
 		if (inputState.IsDown(BUTTON.RELOAD))
 		{
 			Reload();
@@ -659,8 +654,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void FlipAim(RPCMessage rpc)
 	{
 		if (!IsOnline() && IsAuthed(rpc.player) && !booting && Interface.CallHook("OnTurretRotate", this, rpc.player) == null)
@@ -687,8 +682,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RemoveSelfAuthorize(RPCMessage rpc)
 	{
 		RPCMessage rpc2 = rpc;
@@ -722,8 +717,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void SERVER_AttackAll(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -740,8 +735,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		ItemContainer inventory = base.inventory;
-		inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
 		InvokeRepeating(ServerTick, UnityEngine.Random.Range(0f, 1f), 0.015f);
 		InvokeRandomized(SendAimDir, UnityEngine.Random.Range(0f, 1f), 0.2f, 0.05f);
 		InvokeRandomized(ScheduleForTargetScan, UnityEngine.Random.Range(0f, 1f), TargetScanRate(), 0.2f);
@@ -786,12 +781,12 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		List<RaycastHit> obj3 = Facepunch.Pool.GetList<RaycastHit>();
 		Vector3 position = eyePos.transform.position;
-		Vector3 a = AimOffset(obj);
-		float num = Vector3.Distance(a, position);
-		Vector3 a2 = Vector3.Cross((a - position).normalized, Vector3.up);
+		Vector3 vector = AimOffset(obj);
+		float num = Vector3.Distance(vector, position);
+		Vector3 vector2 = Vector3.Cross((vector - position).normalized, Vector3.up);
 		for (int i = 0; (float)i < (CheckPeekers() ? 3f : 1f); i++)
 		{
-			Vector3 normalized = (a + a2 * visibilityOffsets[i] - position).normalized;
+			Vector3 normalized = (vector + vector2 * visibilityOffsets[i] - position).normalized;
 			obj3.Clear();
 			GamePhysics.TraceAll(new Ray(position, normalized), 0f, obj3, num * 1.1f, 1218652417);
 			for (int j = 0; j < obj3.Count; j++)
@@ -913,9 +908,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		if (UnityEngine.Time.realtimeSinceStartup > nextIdleAimTime)
 		{
 			nextIdleAimTime = UnityEngine.Time.realtimeSinceStartup + UnityEngine.Random.Range(4f, 5f);
-			Quaternion rotation = Quaternion.LookRotation(base.transform.forward, Vector3.up);
-			rotation *= Quaternion.AngleAxis(UnityEngine.Random.Range(-45f, 45f), Vector3.up);
-			targetAimDir = rotation * Vector3.forward;
+			Quaternion quaternion = Quaternion.LookRotation(base.transform.forward, Vector3.up);
+			quaternion *= Quaternion.AngleAxis(UnityEngine.Random.Range(-45f, 45f), Vector3.up);
+			targetAimDir = quaternion * Vector3.forward;
 		}
 		if (!HasTarget())
 		{
@@ -1144,8 +1139,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		transform.rotation *= quaternion;
 		Vector3 vector = socketTransform.InverseTransformPoint(muzzleTransform.position);
 		transform.localPosition = Vector3.left * vector.x;
-		float d = Vector3.Distance(muzzleTransform.position, transform.position);
-		transform.localPosition += Vector3.forward * d * attachedWeaponZOffsetScale;
+		float num = Vector3.Distance(muzzleTransform.position, transform.position);
+		transform.localPosition += Vector3.forward * num * attachedWeaponZOffsetScale;
 		heldEntity.SetGenericVisible(true);
 		AttachedWeapon = heldEntity;
 		totalAmmoDirty = true;
@@ -1369,15 +1364,15 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		if (target != null && targetVisible)
 		{
-			Vector3 a = AimOffset(target);
+			Vector3 vector = AimOffset(target);
 			if (peekIndex != 0)
 			{
 				Vector3 position = eyePos.transform.position;
-				Vector3.Distance(a, position);
-				Vector3 a2 = Vector3.Cross((a - position).normalized, Vector3.up);
-				a += a2 * visibilityOffsets[peekIndex];
+				Vector3.Distance(vector, position);
+				Vector3 vector2 = Vector3.Cross((vector - position).normalized, Vector3.up);
+				vector += vector2 * visibilityOffsets[peekIndex];
 			}
-			Vector3 vector = (a - eyePos.transform.position).normalized;
+			Vector3 vector3 = (vector - eyePos.transform.position).normalized;
 			if (currentAmmoGravity != 0f)
 			{
 				float num = 0.2f;
@@ -1389,12 +1384,12 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 						num = num2;
 					}
 				}
-				a = target.transform.position + Vector3.up * num;
-				float angle = GetAngle(eyePos.transform.position, a, currentAmmoVelocity, currentAmmoGravity);
-				Vector3 normalized = (a.XZ3D() - eyePos.transform.position.XZ3D()).normalized;
-				vector = Quaternion.LookRotation(normalized) * Quaternion.Euler(angle, 0f, 0f) * Vector3.forward;
+				vector = target.transform.position + Vector3.up * num;
+				float angle = GetAngle(eyePos.transform.position, vector, currentAmmoVelocity, currentAmmoGravity);
+				Vector3 normalized = (vector.XZ3D() - eyePos.transform.position.XZ3D()).normalized;
+				vector3 = Quaternion.LookRotation(normalized) * Quaternion.Euler(angle, 0f, 0f) * Vector3.forward;
 			}
-			aimDir = vector;
+			aimDir = vector3;
 		}
 		UpdateAiming();
 	}

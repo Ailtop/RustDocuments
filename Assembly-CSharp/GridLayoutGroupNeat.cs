@@ -12,17 +12,17 @@ public class GridLayoutGroupNeat : GridLayoutGroup
 
 	public override void SetLayoutHorizontal()
 	{
-		Vector2 cellSize = m_CellSize;
-		m_CellSize.x = IdealCellWidth(cellSize.x);
+		Vector2 vector = m_CellSize;
+		m_CellSize.x = IdealCellWidth(vector.x);
 		base.SetLayoutHorizontal();
-		m_CellSize = cellSize;
+		m_CellSize = vector;
 	}
 
 	public override void SetLayoutVertical()
 	{
-		Vector2 cellSize = m_CellSize;
-		m_CellSize.x = IdealCellWidth(cellSize.x);
+		Vector2 vector = m_CellSize;
+		m_CellSize.x = IdealCellWidth(vector.x);
 		base.SetLayoutVertical();
-		m_CellSize = cellSize;
+		m_CellSize = vector;
 	}
 }

@@ -45,16 +45,16 @@ public class SocketMod_Attraction : SocketMod
 			{
 				if (!(attractionPoint.groupName != groupName))
 				{
-					Vector3 a = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
-					float magnitude = (a - vector).magnitude;
+					Vector3 vector2 = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
+					float magnitude = (vector2 - vector).magnitude;
 					if (!(magnitude > outerRadius))
 					{
-						Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, a - place.position, Vector3.up);
+						Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, vector2 - place.position, Vector3.up);
 						float num = Mathf.InverseLerp(outerRadius, innerRadius, magnitude);
 						place.rotation = Quaternion.Lerp(place.rotation, b, num);
 						vector = place.position + place.rotation * worldPosition;
-						Vector3 a2 = a - vector;
-						place.position += a2 * num;
+						Vector3 vector3 = vector2 - vector;
+						place.position += vector3 * num;
 					}
 				}
 			}

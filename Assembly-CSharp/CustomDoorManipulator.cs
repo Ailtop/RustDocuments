@@ -131,20 +131,20 @@ public class CustomDoorManipulator : DoorManipulator
 		SetTargetDoor(null);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void DoPair(RPCMessage msg)
 	{
-		Door targetDoor = base.targetDoor;
-		Door door = FindDoor(PairWithLockedDoors());
-		if (door != targetDoor)
+		Door door = targetDoor;
+		Door door2 = FindDoor(PairWithLockedDoors());
+		if (door2 != door)
 		{
-			SetTargetDoor(door);
+			SetTargetDoor(door2);
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerActionChange(RPCMessage msg)
 	{
 	}

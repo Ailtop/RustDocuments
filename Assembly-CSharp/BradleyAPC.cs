@@ -285,13 +285,7 @@ public class BradleyAPC : BaseCombatEntity
 
 	public float currentSpeedZoneLimit;
 
-	public override float PositionTickRate
-	{
-		protected get
-		{
-			return 0.1f;
-		}
-	}
+	protected override float PositionTickRate => 0.1f;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -852,8 +846,8 @@ public class BradleyAPC : BaseCombatEntity
 		Vector3 rhs = fromPos - start;
 		float num = Vector3.Dot(vector, rhs);
 		float num2 = Vector3.SqrMagnitude(end - start);
-		float d = Mathf.Clamp01(num / num2);
-		return start + vector * d;
+		float num3 = Mathf.Clamp01(num / num2);
+		return start + vector * num3;
 	}
 
 	public void FireGunTest()

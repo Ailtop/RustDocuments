@@ -68,15 +68,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 		public int Count => entityList.Count;
 
-		protected abstract Manager visibilityManager
-		{
-			get;
-		}
-
-		public bool Contains(uint uid)
-		{
-			return entityList.Contains(uid);
-		}
+		protected abstract Manager visibilityManager { get; }
 
 		public BaseNetworkable Find(uint uid)
 		{
@@ -190,8 +182,8 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	private MemoryStream _SaveCache;
 
-	[ReadOnly]
 	[Header("BaseNetworkable")]
+	[ReadOnly]
 	public uint prefabID;
 
 	[Tooltip("If enabled the entity will send to everyone on the server - regardless of position")]
@@ -262,11 +254,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public static Group LimboNetworkGroup => Network.Net.sv.visibility.Get(1u);
 
-	public bool IsDestroyed
-	{
-		get;
-		private set;
-	}
+	public bool IsDestroyed { get; private set; }
 
 	public string PrefabName
 	{

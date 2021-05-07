@@ -51,8 +51,8 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public Vector3 engineLocalOffset;
 
-	[Header("Train Engine")]
 	[SerializeField]
+	[Header("Train Engine")]
 	public Transform leftHandLever;
 
 	[SerializeField]
@@ -168,11 +168,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public bool EngineIsSlowed => HasFlag(Flags.Reserved10);
 
-	public EngineSpeeds CurThrottleSetting
-	{
-		get;
-		set;
-	} = EngineSpeeds.Zero;
+	public EngineSpeeds CurThrottleSetting { get; set; } = EngineSpeeds.Zero;
 
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)

@@ -49,13 +49,7 @@ public class RidableHorse : BaseRidableAnimal
 
 	public override float RealisticMass => 550f;
 
-	public override float PositionTickRate
-	{
-		protected get
-		{
-			return 0.05f;
-		}
-	}
+	protected override float PositionTickRate => 0.05f;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -112,9 +106,9 @@ public class RidableHorse : BaseRidableAnimal
 
 	public override float GetRunSpeed()
 	{
-		float runSpeed = base.GetRunSpeed();
+		float num = base.GetRunSpeed();
 		HorseBreed breed = GetBreed();
-		return runSpeed * breed.maxSpeed + equipmentSpeedMod;
+		return num * breed.maxSpeed + equipmentSpeedMod;
 	}
 
 	public override void SetupCorpse(BaseCorpse corpse)
@@ -211,8 +205,6 @@ public class RidableHorse : BaseRidableAnimal
 				ItemModConsumable component = foodItem.info.GetComponent<ItemModConsumable>();
 				if ((bool)component)
 				{
-					float amount = component.GetIfType(MetabolismAttribute.Type.Calories) * currentHitch.caloriesToDecaySeconds;
-					AddDecayDelay(amount);
 					ReplenishFromFood(component);
 					foodItem.UseItem();
 					nextEatTime = Time.time + Random.Range(2f, 3f) + Mathf.InverseLerp(0.5f, 1f, StaminaCoreFraction()) * 4f;

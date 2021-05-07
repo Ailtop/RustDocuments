@@ -29,17 +29,9 @@ public class MixingTable : StorageContainer
 
 	public ItemDefinition currentProductionItem;
 
-	public float RemainingMixTime
-	{
-		get;
-		set;
-	}
+	public float RemainingMixTime { get; set; }
 
-	public float TotalMixTime
-	{
-		get;
-		set;
-	}
+	public float TotalMixTime { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -88,8 +80,8 @@ public class MixingTable : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		ItemContainer inventory = base.inventory;
-		inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
 		base.inventory.onItemAddedRemoved = OnItemAddedOrRemoved;
 		RecipeDictionary.CacheRecipes(Recipes);
 	}

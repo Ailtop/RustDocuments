@@ -54,35 +54,15 @@ public class VehicleModuleEngine : VehicleModuleStorage
 
 	public override bool HasAnEngine => true;
 
-	public bool IsUsable
-	{
-		get;
-		set;
-	}
+	public bool IsUsable { get; set; }
 
-	public float PerformanceFractionAcceleration
-	{
-		get;
-		set;
-	}
+	public float PerformanceFractionAcceleration { get; set; }
 
-	public float PerformanceFractionTopSpeed
-	{
-		get;
-		set;
-	}
+	public float PerformanceFractionTopSpeed { get; set; }
 
-	public float PerformanceFractionFuelEconomy
-	{
-		get;
-		set;
-	}
+	public float PerformanceFractionFuelEconomy { get; set; }
 
-	public float OverallPerformanceFraction
-	{
-		get;
-		set;
-	}
+	public float OverallPerformanceFraction { get; set; }
 
 	public bool AtLowPerformance => OverallPerformanceFraction <= 0.5f;
 

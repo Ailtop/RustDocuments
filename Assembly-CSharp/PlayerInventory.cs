@@ -204,8 +204,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 		if (bAdded)
 		{
-			BasePlayer baseEntity = base.baseEntity;
-			if (!baseEntity.HasPlayerFlag(BasePlayer.PlayerFlags.DisplaySash) && baseEntity.IsHostileItem(item))
+			BasePlayer basePlayer = base.baseEntity;
+			if (!basePlayer.HasPlayerFlag(BasePlayer.PlayerFlags.DisplaySash) && basePlayer.IsHostileItem(item))
 			{
 				base.baseEntity.SetPlayerFlag(BasePlayer.PlayerFlags.DisplaySash, true);
 			}
@@ -324,8 +324,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private void MoveItem(BaseEntity.RPCMessage msg)
 	{
 		uint num = msg.read.UInt32();

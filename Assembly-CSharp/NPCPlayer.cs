@@ -47,17 +47,9 @@ public class NPCPlayer : BasePlayer
 
 	public Vector3 lastPos;
 
-	public bool AgencyUpdateRequired
-	{
-		get;
-		set;
-	}
+	public bool AgencyUpdateRequired { get; set; }
 
-	public bool IsOnOffmeshLinkAndReachedNewCoord
-	{
-		get;
-		set;
-	}
+	public bool IsOnOffmeshLinkAndReachedNewCoord { get; set; }
 
 	public override bool IsNpc => true;
 
@@ -74,13 +66,7 @@ public class NPCPlayer : BasePlayer
 		}
 	}
 
-	public override float PositionTickRate
-	{
-		protected get
-		{
-			return 0.1f;
-		}
-	}
+	protected override float PositionTickRate => 0.1f;
 
 	public virtual bool IsOnNavMeshLink
 	{
@@ -250,8 +236,8 @@ public class NPCPlayer : BasePlayer
 
 	public void RandomMove()
 	{
-		float d = 8f;
-		Vector2 vector = UnityEngine.Random.insideUnitCircle * d;
+		float num = 8f;
+		Vector2 vector = UnityEngine.Random.insideUnitCircle * num;
 		SetDestination(spawnPos + new Vector3(vector.x, 0f, vector.y));
 	}
 

@@ -119,10 +119,10 @@ public class BaseGameMode : BaseEntity
 			gameModeScores.teams.Add(teamInfo);
 		}
 		string[] array2 = scoreColumns;
-		foreach (string name in array2)
+		foreach (string text in array2)
 		{
 			GameMode.ScoreColumn scoreColumn = new GameMode.ScoreColumn();
-			scoreColumn.name = name;
+			scoreColumn.name = text;
 			scoreColumn.ShouldPool = false;
 			gameModeScores.scoreColumns.Add(scoreColumn);
 		}

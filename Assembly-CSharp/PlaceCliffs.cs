@@ -116,18 +116,18 @@ public class PlaceCliffs : ProceduralComponent
 			}
 			float height = heightMap.GetHeight(normX, normZ);
 			Vector3 vector = new Vector3(x2, height, z2);
-			Quaternion lhs = QuaternionEx.LookRotationForcedUp(normal, Vector3.up);
+			Quaternion quaternion = QuaternionEx.LookRotationForcedUp(normal, Vector3.up);
 			float num3 = Mathf.Max((MaxScale - MinScale) / (float)max_scale_attempts, min_scale_delta);
 			for (float num4 = MaxScale; num4 >= MinScale; num4 -= num3)
 			{
 				Vector3 pos = vector;
-				Quaternion quaternion = lhs * random.Object.transform.localRotation;
+				Quaternion quaternion2 = quaternion * random.Object.transform.localRotation;
 				Vector3 vector2 = num4 * random.Object.transform.localScale;
-				if (random.ApplyTerrainAnchors(ref pos, quaternion, vector2) && random.ApplyTerrainChecks(pos, quaternion, vector2) && random.ApplyTerrainFilters(pos, quaternion, vector2) && random.ApplyWaterChecks(pos, quaternion, vector2))
+				if (random.ApplyTerrainAnchors(ref pos, quaternion2, vector2) && random.ApplyTerrainChecks(pos, quaternion2, vector2) && random.ApplyTerrainFilters(pos, quaternion2, vector2) && random.ApplyWaterChecks(pos, quaternion2, vector2))
 				{
-					CliffPlacement cliffPlacement = PlaceMale(array3, ref seed, random, pos, quaternion, vector2);
-					CliffPlacement cliffPlacement2 = PlaceFemale(array4, ref seed, random, pos, quaternion, vector2);
-					World.AddPrefab("Decor", random, pos, quaternion, vector2);
+					CliffPlacement cliffPlacement = PlaceMale(array3, ref seed, random, pos, quaternion2, vector2);
+					CliffPlacement cliffPlacement2 = PlaceFemale(array4, ref seed, random, pos, quaternion2, vector2);
+					World.AddPrefab("Decor", random, pos, quaternion2, vector2);
 					while (cliffPlacement != null && cliffPlacement.prefab != null)
 					{
 						World.AddPrefab("Decor", cliffPlacement.prefab, cliffPlacement.pos, cliffPlacement.rot, cliffPlacement.scale);
@@ -165,7 +165,7 @@ public class PlaceCliffs : ProceduralComponent
 		}
 		int num = SeedRandom.Range(ref seed, 0, prefabs.Length);
 		ParentSocketType val = parentPrefab.Attribute.Find<ParentSocketType>(parentPrefab.ID);
-		Vector3 a = parentPos + parentRot * Vector3.Scale(val.worldPosition, parentScale);
+		Vector3 vector = parentPos + parentRot * Vector3.Scale(val.worldPosition, parentScale);
 		float num2 = Mathf.Max((MaxScale - MinScale) / (float)max_scale_attempts, min_scale_delta);
 		for (int i = 0; i < prefabs.Length; i++)
 		{
@@ -174,9 +174,9 @@ public class PlaceCliffs : ProceduralComponent
 			{
 				continue;
 			}
-			ParentSocketType x = prefab.Attribute.Find<ParentSocketType>(prefab.ID);
-			ChildSocketType val2 = prefab.Attribute.Find<ChildSocketType>(prefab.ID);
-			bool flag = (PrefabAttribute)x != (PrefabAttribute)null;
+			ParentSocketType val2 = prefab.Attribute.Find<ParentSocketType>(prefab.ID);
+			ChildSocketType val3 = prefab.Attribute.Find<ChildSocketType>(prefab.ID);
+			bool flag = (PrefabAttribute)val2 != (PrefabAttribute)null;
 			if (cliffPlacement != null && cliffPlacement.count > target_count && cliffPlacement.score > target_length && flag)
 			{
 				continue;
@@ -185,7 +185,7 @@ public class PlaceCliffs : ProceduralComponent
 			while (num3 >= MinScale)
 			{
 				int j;
-				Vector3 vector;
+				Vector3 vector3;
 				Quaternion quaternion;
 				Vector3 pos;
 				for (j = min_rotation; j <= max_rotation; j += rotation_delta)
@@ -196,29 +196,29 @@ public class PlaceCliffs : ProceduralComponent
 						int num4 = 0;
 						while (num4 < array.Length)
 						{
-							Vector3 b = array[num4];
-							vector = parentScale * num3;
+							Vector3 vector2 = array[num4];
+							vector3 = parentScale * num3;
 							quaternion = Quaternion.Euler(0f, k * j, 0f) * parentRot;
-							pos = a - quaternion * (Vector3.Scale(val2.worldPosition, vector) + b);
-							if (Filter.GetFactor(pos) < 0.5f || !prefab.ApplyTerrainAnchors(ref pos, quaternion, vector) || !prefab.ApplyTerrainChecks(pos, quaternion, vector) || !prefab.ApplyTerrainFilters(pos, quaternion, vector) || !prefab.ApplyWaterChecks(pos, quaternion, vector))
+							pos = vector - quaternion * (Vector3.Scale(val3.worldPosition, vector3) + vector2);
+							if (Filter.GetFactor(pos) < 0.5f || !prefab.ApplyTerrainAnchors(ref pos, quaternion, vector3) || !prefab.ApplyTerrainChecks(pos, quaternion, vector3) || !prefab.ApplyTerrainFilters(pos, quaternion, vector3) || !prefab.ApplyWaterChecks(pos, quaternion, vector3))
 							{
 								num4++;
 								continue;
 							}
-							goto IL_01dd;
+							goto IL_01dc;
 						}
 					}
 				}
 				num3 -= num2;
 				continue;
-				IL_01dd:
+				IL_01dc:
 				int parentAngle2 = parentAngle + j;
 				int num5 = parentCount + 1;
 				int num6 = parentScore + Mathf.CeilToInt(Vector3Ex.Distance2D(parentPos, pos));
 				CliffPlacement cliffPlacement2 = null;
 				if (flag)
 				{
-					cliffPlacement2 = Place<ParentSocketType, ChildSocketType>(prefabs, ref seed, prefab, pos, quaternion, vector, parentAngle2, num5, num6);
+					cliffPlacement2 = Place<ParentSocketType, ChildSocketType>(prefabs, ref seed, prefab, pos, quaternion, vector3, parentAngle2, num5, num6);
 					if (cliffPlacement2 != null)
 					{
 						num5 = cliffPlacement2.count;
@@ -241,7 +241,7 @@ public class PlaceCliffs : ProceduralComponent
 					cliffPlacement.prefab = prefab;
 					cliffPlacement.pos = pos;
 					cliffPlacement.rot = quaternion;
-					cliffPlacement.scale = vector;
+					cliffPlacement.scale = vector3;
 				}
 				break;
 			}

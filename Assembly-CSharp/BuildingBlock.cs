@@ -55,8 +55,6 @@ public class BuildingBlock : StabilityEntity
 
 	public static UpdateSkinWorkQueue updateSkinQueueServer = new UpdateSkinWorkQueue();
 
-	public bool CullBushes;
-
 	[NonSerialized]
 	public Construction blockDefinition;
 
@@ -415,7 +413,7 @@ public class BuildingBlock : StabilityEntity
 		{
 			BuildingGrade.Enum @enum = (BuildingGrade.Enum)msg.read.Int32();
 			ConstructionGrade constructionGrade = GetGrade(@enum);
-			if (!(constructionGrade == null) && CanChangeToGrade(@enum, msg.player) && CanAffordUpgrade(@enum, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum) == null && !(base.SecondsSinceAttacked < 30f))
+			if (!(constructionGrade == null) && CanChangeToGrade(@enum, msg.player) && CanAffordUpgrade(@enum, msg.player) && !(base.SecondsSinceAttacked < 30f) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum) == null)
 			{
 				PayForUpgrade(constructionGrade, msg.player);
 				SetGrade(@enum);
@@ -534,18 +532,18 @@ public class BuildingBlock : StabilityEntity
 		{
 			return;
 		}
-		ConstructionGrade currentGrade = this.currentGrade;
-		if (currentGrade.skinObject.isValid)
+		ConstructionGrade constructionGrade = currentGrade;
+		if (constructionGrade.skinObject.isValid)
 		{
-			ChangeSkin(currentGrade.skinObject);
+			ChangeSkin(constructionGrade.skinObject);
 			return;
 		}
 		ConstructionGrade[] grades = blockDefinition.grades;
-		foreach (ConstructionGrade constructionGrade in grades)
+		foreach (ConstructionGrade constructionGrade2 in grades)
 		{
-			if (constructionGrade.skinObject.isValid)
+			if (constructionGrade2.skinObject.isValid)
 			{
-				ChangeSkin(constructionGrade.skinObject);
+				ChangeSkin(constructionGrade2.skinObject);
 				return;
 			}
 		}
@@ -742,20 +740,6 @@ public class BuildingBlock : StabilityEntity
 		{
 			StartBeingDemolishable();
 		}
-		if (!CullBushes || Rust.Application.isLoadingSave)
-		{
-			return;
-		}
-		List<BushEntity> obj = Facepunch.Pool.GetList<BushEntity>();
-		Vis.Entities(WorldSpaceBounds(), obj, 67108864);
-		foreach (BushEntity item in obj)
-		{
-			if (item.isServer)
-			{
-				item.Kill();
-			}
-		}
-		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public override void Hurt(HitInfo info)
@@ -819,12 +803,12 @@ public class BuildingBlock : StabilityEntity
 	public override bool IsOutside()
 	{
 		float outside_test_range = ConVar.Decay.outside_test_range;
-		Vector3 a = PivotPoint();
+		Vector3 vector = PivotPoint();
 		for (int i = 0; i < outsideLookupOffsets.Length; i++)
 		{
-			Vector3 a2 = outsideLookupOffsets[i];
-			Vector3 origin = a + a2 * outside_test_range;
-			if (!UnityEngine.Physics.Raycast(new Ray(origin, -a2), outside_test_range - 0.5f, 2097152))
+			Vector3 vector2 = outsideLookupOffsets[i];
+			Vector3 origin = vector + vector2 * outside_test_range;
+			if (!UnityEngine.Physics.Raycast(new Ray(origin, -vector2), outside_test_range - 0.5f, 2097152))
 			{
 				return true;
 			}

@@ -15,8 +15,6 @@ public class PowerCounter : IOEntity
 
 	public int targetCounterNumber = 10;
 
-	public Canvas canvas;
-
 	public CanvasGroup screenAlpha;
 
 	public Text screenText;
@@ -139,8 +137,8 @@ public class PowerCounter : IOEntity
 		base.ResetState();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SERVER_SetTarget(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -151,8 +149,8 @@ public class PowerCounter : IOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ToggleDisplayMode(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

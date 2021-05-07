@@ -2,11 +2,7 @@ using UnityEngine;
 
 public class PathInterestNode : MonoBehaviour
 {
-	public float NextVisitTime
-	{
-		get;
-		set;
-	}
+	public float NextVisitTime { get; set; }
 
 	public void OnDrawGizmos()
 	{

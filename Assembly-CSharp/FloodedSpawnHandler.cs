@@ -3,16 +3,7 @@ using UnityEngine;
 
 public static class FloodedSpawnHandler
 {
-	private static readonly int[] SpreadSteps = new int[7]
-	{
-		0,
-		1,
-		-1,
-		2,
-		-2,
-		3,
-		-3
-	};
+	private static readonly int[] SpreadSteps = new int[7] { 0, 1, -1, 2, -2, 3, -3 };
 
 	public static bool GetSpawnPoint(BasePlayer.SpawnPoint spawnPoint, float searchHeight)
 	{
@@ -50,12 +41,12 @@ public static class FloodedSpawnHandler
 
 	private static Vector3 FindSpawnPoint(float searchHeight)
 	{
-		Vector3 b = (TerrainMeta.Size / 2f).WithY(0f);
-		float magnitude = b.magnitude;
+		Vector3 vector = (TerrainMeta.Size / 2f).WithY(0f);
+		float magnitude = vector.magnitude;
 		float distance = magnitude / 50f;
 		float num = RandomAngle();
 		float num2 = num + (float)Math.PI;
-		Vector3 vector = TerrainMeta.Position + b + Step(num, magnitude);
+		Vector3 vector2 = TerrainMeta.Position + vector + Step(num, magnitude);
 		for (int i = 0; i < 50; i++)
 		{
 			float num3 = float.MinValue;
@@ -65,23 +56,23 @@ public static class FloodedSpawnHandler
 			foreach (int num5 in spreadSteps)
 			{
 				float num6 = num2 + (float)num5 * 0.17453292f;
-				Vector3 vector2 = vector + Step(num6, distance);
-				float height = TerrainMeta.HeightMap.GetHeight(vector2);
+				Vector3 vector3 = vector2 + Step(num6, distance);
+				float height = TerrainMeta.HeightMap.GetHeight(vector3);
 				if (height > num3)
 				{
 					num3 = height;
-					v = vector2;
+					v = vector3;
 					num4 = num6;
 				}
 			}
-			vector = v.WithY(num3);
+			vector2 = v.WithY(num3);
 			num2 = (num2 + num4) / 2f;
 			if (num3 >= searchHeight)
 			{
 				break;
 			}
 		}
-		return vector;
+		return vector2;
 	}
 
 	private static Vector3 Step(float angle, float distance)

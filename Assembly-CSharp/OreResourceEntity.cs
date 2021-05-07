@@ -29,9 +29,9 @@ public class OreResourceEntity : StagedResourceEntity
 
 	public override void UpdateNetworkStage()
 	{
-		int stage = base.stage;
+		int num = stage;
 		base.UpdateNetworkStage();
-		if (base.stage != stage && (bool)_hotSpot)
+		if (stage != num && (bool)_hotSpot)
 		{
 			DelayedBonusSpawn();
 		}
@@ -138,13 +138,13 @@ public class OreResourceEntity : StagedResourceEntity
 		}
 		else
 		{
-			Vector3 a = Vector3.Cross(lastNodeDir, Vector3.up);
-			float d = Random.Range(0.25f, 0.5f);
-			float d2 = ((Random.Range(0, 2) == 0) ? (-1f) : 1f);
-			Vector3 direction = (lastNodeDir = (lastNodeDir + a * d * d2).normalized);
+			Vector3 vector4 = Vector3.Cross(lastNodeDir, Vector3.up);
+			float num = Random.Range(0.25f, 0.5f);
+			float num2 = ((Random.Range(0, 2) == 0) ? (-1f) : 1f);
+			Vector3 direction = (lastNodeDir = (lastNodeDir + vector4 * num * num2).normalized);
 			zero = base.transform.position + base.transform.TransformDirection(direction) * 2f;
-			float num = Random.Range(1f, 1.5f);
-			zero += base.transform.up * (vector.y + num);
+			float num3 = Random.Range(1f, 1.5f);
+			zero += base.transform.up * (vector.y + num3);
 		}
 		bonusesSpawned++;
 		Vector3 normalized = (stageComponent.bounds.center - zero).normalized;
@@ -169,8 +169,8 @@ public class OreResourceEntity : StagedResourceEntity
 	{
 		degreesOffset = Mathf.Clamp(degreesOffset / 180f, -180f, 180f);
 		Vector2 vector = (allowInside ? Random.insideUnitCircle : Random.insideUnitCircle.normalized);
-		Vector3 b = new Vector3(vector.x * degreesOffset, changeHeight ? (Random.Range(-1f, 1f) * degreesOffset) : 0f, vector.y * degreesOffset);
-		return (input + b).normalized;
+		Vector3 vector2 = new Vector3(vector.x * degreesOffset, changeHeight ? (Random.Range(-1f, 1f) * degreesOffset) : 0f, vector.y * degreesOffset);
+		return (input + vector2).normalized;
 	}
 
 	public Vector3 ClampToHemisphere(Vector3 hemiInput, float degreesOffset, Vector3 inputVec)

@@ -154,47 +154,19 @@ public class NPCHumanContext : BaseNPCContext
 		}
 	}
 
-	public CoverPointVolume CurrentCoverVolume
-	{
-		get;
-		set;
-	}
+	public CoverPointVolume CurrentCoverVolume { get; set; }
 
-	public List<CoverPoint> sampledCoverPoints
-	{
-		get;
-		private set;
-	}
+	public List<CoverPoint> sampledCoverPoints { get; private set; }
 
-	public List<CoverPoint.CoverType> sampledCoverPointTypes
-	{
-		get;
-		private set;
-	}
+	public List<CoverPoint.CoverType> sampledCoverPointTypes { get; private set; }
 
-	public List<CoverPoint> EnemyCoverPoints
-	{
-		get;
-		private set;
-	}
+	public List<CoverPoint> EnemyCoverPoints { get; private set; }
 
-	public CoverPoint EnemyHideoutGuess
-	{
-		get;
-		set;
-	}
+	public CoverPoint EnemyHideoutGuess { get; set; }
 
-	public List<HideoutPoint> CheckedHideoutPoints
-	{
-		get;
-		set;
-	}
+	public List<HideoutPoint> CheckedHideoutPoints { get; set; }
 
-	public PathInterestNode CurrentPatrolPoint
-	{
-		get;
-		set;
-	}
+	public PathInterestNode CurrentPatrolPoint { get; set; }
 
 	public NPCHumanContext(NPCPlayerApex human)
 		: base(human)

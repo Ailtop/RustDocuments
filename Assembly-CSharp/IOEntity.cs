@@ -109,8 +109,8 @@ public class IOEntity : BaseCombatEntity
 	[NonSerialized]
 	public int lastResetIndex;
 
-	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]
@@ -365,8 +365,8 @@ public class IOEntity : BaseCombatEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server]
 	[RPC_Server.IsVisible(6f)]
 	private void Server_RequestData(RPCMessage msg)
 	{
@@ -797,9 +797,9 @@ public class IOEntity : BaseCombatEntity
 				iOConnection2.linePointList.Clear();
 				for (int j = 0; j < iOSlot2.linePoints.Length; j++)
 				{
-					Vector3 v = iOSlot2.linePoints[j];
+					Vector3 vector = iOSlot2.linePoints[j];
 					ProtoBuf.IOEntity.IOConnection.LineVec lineVec = Facepunch.Pool.Get<ProtoBuf.IOEntity.IOConnection.LineVec>();
-					lineVec.vec = v;
+					lineVec.vec = vector;
 					if (iOSlot2.slackLevels.Length > j)
 					{
 						lineVec.vec.w = iOSlot2.slackLevels[j];

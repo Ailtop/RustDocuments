@@ -101,66 +101,26 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	public PlantProperties.State State
-	{
-		get;
-		set;
-	}
+	public PlantProperties.State State { get; set; }
 
-	public float Age
-	{
-		get;
-		private set;
-	}
+	public float Age { get; private set; }
 
-	public float LightQuality
-	{
-		get;
-		set;
-	}
+	public float LightQuality { get; set; }
 
-	public float GroundQuality
-	{
-		get;
-		set;
-	} = 1f;
+	public float GroundQuality { get; set; } = 1f;
 
 
-	public float WaterQuality
-	{
-		get;
-		set;
-	}
+	public float WaterQuality { get; set; }
 
-	public float WaterConsumption
-	{
-		get;
-		set;
-	}
+	public float WaterConsumption { get; set; }
 
-	public bool Fertilized
-	{
-		get;
-		set;
-	}
+	public bool Fertilized { get; set; }
 
-	public float TemperatureQuality
-	{
-		get;
-		set;
-	}
+	public float TemperatureQuality { get; set; }
 
-	public float OverallQuality
-	{
-		get;
-		set;
-	}
+	public float OverallQuality { get; set; }
 
-	public float Yield
-	{
-		get;
-		set;
-	}
+	public float Yield { get; set; }
 
 	public float StageProgressFraction => stageAge / currentStage.lifeLengthSeconds;
 
@@ -610,10 +570,10 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	{
 		if (planter == null)
 		{
-			BaseEntity parentEntity = GetParentEntity();
-			if (parentEntity != null)
+			BaseEntity baseEntity = GetParentEntity();
+			if (baseEntity != null)
 			{
-				planter = parentEntity as PlanterBox;
+				planter = baseEntity as PlanterBox;
 			}
 		}
 		return planter;
@@ -835,17 +795,17 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			return;
 		}
-		bool enabled = Properties.pickupItem.condition.enabled;
-		if (enabled)
+		bool flag = Properties.pickupItem.condition.enabled;
+		if (flag)
 		{
 			for (int i = 0; i < amount; i++)
 			{
-				GiveFruit(player, 1, enabled);
+				GiveFruit(player, 1, flag);
 			}
 		}
 		else
 		{
-			GiveFruit(player, amount, enabled);
+			GiveFruit(player, amount, flag);
 		}
 	}
 
@@ -867,16 +827,16 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_RemoveDying(RPCMessage msg)
 	{
 		RemoveDying(msg.player);

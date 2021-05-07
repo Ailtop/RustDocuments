@@ -124,8 +124,8 @@ public class DungeonNavmesh : FacepunchBehaviour, IServerComponent
 		for (int num = sources.Count - 1; num >= 0; num--)
 		{
 			NavMeshBuildSource item = sources[num];
-			Matrix4x4 transform = item.transform;
-			Vector3 vector = new Vector3(transform[0, 3], transform[1, 3], transform[2, 3]);
+			Matrix4x4 matrix4x = item.transform;
+			Vector3 vector = new Vector3(matrix4x[0, 3], matrix4x[1, 3], matrix4x[2, 3]);
 			bool flag = false;
 			foreach (AIInformationZone zone in AIInformationZone.zones)
 			{

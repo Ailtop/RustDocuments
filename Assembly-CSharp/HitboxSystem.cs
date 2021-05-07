@@ -27,11 +27,7 @@ public class HitboxSystem : MonoBehaviour, IPrefabPreProcess
 
 		public Quaternion Rotation => transform.rotation;
 
-		public Vector3 Size
-		{
-			get;
-			private set;
-		}
+		public Vector3 Size { get; private set; }
 
 		public void UpdateTransform()
 		{

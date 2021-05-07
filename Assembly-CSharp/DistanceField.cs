@@ -4,16 +4,7 @@ using UnityEngine;
 
 public class DistanceField
 {
-	private static readonly int[] GaussOffsets = new int[7]
-	{
-		-6,
-		-4,
-		-2,
-		0,
-		2,
-		4,
-		6
-	};
+	private static readonly int[] GaussOffsets = new int[7] { -6, -4, -2, 0, 2, 4, 6 };
 
 	private static readonly float[] GaussWeights = new float[7]
 	{

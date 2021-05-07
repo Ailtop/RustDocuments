@@ -16,9 +16,6 @@ public class TreeLOD : LODComponent
 
 		[NonSerialized]
 		public ShadowCastingMode shadowMode;
-
-		[NonSerialized]
-		public bool isImpostor;
 	}
 
 	[Horizontal(1, 0)]

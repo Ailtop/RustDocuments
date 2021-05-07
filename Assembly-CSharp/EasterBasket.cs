@@ -85,8 +85,8 @@ public class EasterBasket : AttackEntity
 		GetAmmo()?.UseItem();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void ThrowEgg(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -104,17 +104,17 @@ public class EasterBasket : AttackEntity
 			Vector3 vector = msg.read.Vector3();
 			Vector3 vector2 = msg.read.Vector3().normalized;
 			bool num = msg.read.Bit();
-			BaseEntity baseEntity = player.GetParentEntity();
-			if (baseEntity == null)
+			BaseEntity mounted = player.GetParentEntity();
+			if (mounted == null)
 			{
-				baseEntity = player.GetMounted();
+				mounted = player.GetMounted();
 			}
 			if (num)
 			{
-				if (baseEntity != null)
+				if (mounted != null)
 				{
-					vector = baseEntity.transform.TransformPoint(vector);
-					vector2 = baseEntity.transform.TransformDirection(vector2);
+					vector = mounted.transform.TransformPoint(vector);
+					vector2 = mounted.transform.TransformDirection(vector2);
 				}
 				else
 				{
@@ -137,16 +137,16 @@ public class EasterBasket : AttackEntity
 			{
 				num3 = hitInfo.distance - 0.1f;
 			}
-			BaseEntity baseEntity2 = GameManager.server.CreateEntity(eggProjectile.resourcePath, vector + vector2 * num3);
-			if (!(baseEntity2 == null))
+			BaseEntity baseEntity = GameManager.server.CreateEntity(eggProjectile.resourcePath, vector + vector2 * num3);
+			if (!(baseEntity == null))
 			{
-				baseEntity2.creatorEntity = player;
-				ServerProjectile component = baseEntity2.GetComponent<ServerProjectile>();
+				baseEntity.creatorEntity = player;
+				ServerProjectile component = baseEntity.GetComponent<ServerProjectile>();
 				if ((bool)component)
 				{
 					component.InitializeVelocity(GetInheritedVelocity(player) + vector2 * component.speed);
 				}
-				baseEntity2.Spawn();
+				baseEntity.Spawn();
 				GetOwnerItem()?.LoseCondition(UnityEngine.Random.Range(1f, 2f));
 			}
 		}

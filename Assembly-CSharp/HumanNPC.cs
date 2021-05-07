@@ -684,13 +684,13 @@ public class HumanNPC : NPCPlayer, IThinker
 			}
 			if (base.isMounted)
 			{
-				BaseMountable mounted = GetMounted();
-				Vector3 eulerAngles = mounted.transform.eulerAngles;
-				Quaternion rotation = Quaternion.Euler(Quaternion.LookRotation(newAim, mounted.transform.up).eulerAngles);
-				Vector3 eulerAngles2 = Quaternion.LookRotation(base.transform.InverseTransformDirection(rotation * Vector3.forward), base.transform.up).eulerAngles;
+				BaseMountable baseMountable = GetMounted();
+				Vector3 eulerAngles = baseMountable.transform.eulerAngles;
+				Quaternion quaternion = Quaternion.Euler(Quaternion.LookRotation(newAim, baseMountable.transform.up).eulerAngles);
+				Vector3 eulerAngles2 = Quaternion.LookRotation(base.transform.InverseTransformDirection(quaternion * Vector3.forward), base.transform.up).eulerAngles;
 				eulerAngles2 = BaseMountable.ConvertVector(eulerAngles2);
-				Quaternion rotation2 = Quaternion.Euler(Mathf.Clamp(eulerAngles2.x, mounted.pitchClamp.x, mounted.pitchClamp.y), Mathf.Clamp(eulerAngles2.y, mounted.yawClamp.x, mounted.yawClamp.y), eulerAngles.z);
-				newAim = BaseMountable.ConvertVector(Quaternion.LookRotation(base.transform.TransformDirection(rotation2 * Vector3.forward), base.transform.up).eulerAngles);
+				Quaternion quaternion2 = Quaternion.Euler(Mathf.Clamp(eulerAngles2.x, baseMountable.pitchClamp.x, baseMountable.pitchClamp.y), Mathf.Clamp(eulerAngles2.y, baseMountable.yawClamp.x, baseMountable.yawClamp.y), eulerAngles.z);
+				newAim = BaseMountable.ConvertVector(Quaternion.LookRotation(base.transform.TransformDirection(quaternion2 * Vector3.forward), base.transform.up).eulerAngles);
 			}
 			eyes.rotation = (base.isMounted ? Quaternion.Slerp(eyes.rotation, Quaternion.Euler(newAim), num * 70f) : Quaternion.Lerp(eyes.rotation, Quaternion.LookRotation(newAim, base.transform.up), num * 25f));
 			viewAngles = eyes.rotation.eulerAngles;

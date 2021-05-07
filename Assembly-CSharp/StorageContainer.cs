@@ -47,11 +47,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 
 	public bool onlyOneUser;
 
-	public ItemContainer inventory
-	{
-		get;
-		set;
-	}
+	public ItemContainer inventory { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -244,8 +240,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (isLootable)

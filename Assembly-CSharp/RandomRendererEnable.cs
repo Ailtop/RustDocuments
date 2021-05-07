@@ -4,11 +4,7 @@ public class RandomRendererEnable : MonoBehaviour
 {
 	public Renderer[] randoms;
 
-	public int EnabledIndex
-	{
-		get;
-		private set;
-	}
+	public int EnabledIndex { get; private set; }
 
 	public void OnEnable()
 	{

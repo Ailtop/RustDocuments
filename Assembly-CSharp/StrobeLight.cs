@@ -61,8 +61,8 @@ public class StrobeLight : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetStrobeSpeed(RPCMessage msg)
 	{
 		int num = (currentSpeed = msg.read.Int32());

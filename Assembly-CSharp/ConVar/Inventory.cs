@@ -483,8 +483,8 @@ namespace ConVar
 			arg.ReplyWith(stringBuilder.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void defs(Arg arg)
 		{
 			if (Steamworks.SteamInventory.Definitions == null)

@@ -233,8 +233,8 @@ public class ServerBuildingManager : BuildingManager
 			}
 			return;
 		}
-		Vector3 b = new Vector3(World.Size, World.Size, World.Size);
-		Vector3 a = new Vector3(0L - (long)World.Size, 0L - (long)World.Size, 0L - (long)World.Size);
+		Vector3 vector = new Vector3(World.Size, World.Size, World.Size);
+		Vector3 vector2 = new Vector3(0L - (long)World.Size, 0L - (long)World.Size, 0L - (long)World.Size);
 		int count = building.navmeshCarvers.Count;
 		if (count > 0)
 		{
@@ -247,24 +247,24 @@ public class ServerBuildingManager : BuildingManager
 				}
 				for (int k = 0; k < 3; k++)
 				{
-					if (navMeshObstacle.transform.position[k] < b[k])
+					if (navMeshObstacle.transform.position[k] < vector[k])
 					{
-						b[k] = navMeshObstacle.transform.position[k];
+						vector[k] = navMeshObstacle.transform.position[k];
 					}
-					if (navMeshObstacle.transform.position[k] > a[k])
+					if (navMeshObstacle.transform.position[k] > vector2[k])
 					{
-						a[k] = navMeshObstacle.transform.position[k];
+						vector2[k] = navMeshObstacle.transform.position[k];
 					}
 				}
 			}
-			Vector3 position = (a + b) * 0.5f;
+			Vector3 position = (vector2 + vector) * 0.5f;
 			Vector3 zero = Vector3.zero;
-			float num = Mathf.Abs(position.x - b.x);
-			float num2 = Mathf.Abs(position.y - b.y);
-			float num3 = Mathf.Abs(position.z - b.z);
-			float num4 = Mathf.Abs(a.x - position.x);
-			float num5 = Mathf.Abs(a.y - position.y);
-			float num6 = Mathf.Abs(a.z - position.z);
+			float num = Mathf.Abs(position.x - vector.x);
+			float num2 = Mathf.Abs(position.y - vector.y);
+			float num3 = Mathf.Abs(position.z - vector.z);
+			float num4 = Mathf.Abs(vector2.x - position.x);
+			float num5 = Mathf.Abs(vector2.y - position.y);
+			float num6 = Mathf.Abs(vector2.z - position.z);
 			zero.x = Mathf.Max((num > num4) ? num : num4, AI.nav_carve_min_base_size);
 			zero.y = Mathf.Max((num2 > num5) ? num2 : num5, AI.nav_carve_min_base_size);
 			zero.z = Mathf.Max((num3 > num6) ? num3 : num6, AI.nav_carve_min_base_size);

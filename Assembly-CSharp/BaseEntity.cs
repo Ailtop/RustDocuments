@@ -531,11 +531,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	[NonSerialized]
 	public BaseEntity creatorEntity;
 
-	public int ticksSinceStopped;
+	private int ticksSinceStopped;
 
 	private int doneMovingWithoutARigidBodyCheck = 1;
 
-	public bool isCallingUpdateNetworkGroup;
+	private bool isCallingUpdateNetworkGroup;
 
 	private EntityRef[] entitySlots = new EntityRef[8];
 
@@ -595,10 +595,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				if (!(triggerRadiation == null))
 				{
 					Vector3 position = GetNetworkPosition();
-					BaseEntity parentEntity = GetParentEntity();
-					if (parentEntity != null)
+					BaseEntity baseEntity = GetParentEntity();
+					if (baseEntity != null)
 					{
-						position = parentEntity.transform.TransformPoint(position);
+						position = baseEntity.transform.TransformPoint(position);
 					}
 					num = Mathf.Max(num, triggerRadiation.GetRadiation(position, RadiationProtection()));
 				}
@@ -650,9 +650,9 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	public virtual float PositionTickRate => 0.1f;
+	protected virtual float PositionTickRate => 0.1f;
 
-	public virtual bool PositionTickFixedTime => false;
+	protected virtual bool PositionTickFixedTime => false;
 
 	public virtual Vector3 ServerPosition
 	{
@@ -688,21 +688,13 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual TraitFlag Traits => TraitFlag.None;
 
-	public float Weight
-	{
-		get;
-		protected set;
-	}
+	public float Weight { get; protected set; }
 
 	public EntityComponentBase[] Components => _components ?? (_components = GetComponentsInChildren<EntityComponentBase>(true));
 
 	public virtual bool IsNpc => false;
 
-	public ulong OwnerID
-	{
-		get;
-		set;
-	}
+	public ulong OwnerID { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -830,12 +822,12 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public bool ParentHasFlag(Flags f)
 	{
-		BaseEntity parentEntity = GetParentEntity();
-		if (parentEntity == null)
+		BaseEntity baseEntity = GetParentEntity();
+		if (baseEntity == null)
 		{
 			return false;
 		}
-		return parentEntity.HasFlag(f);
+		return baseEntity.HasFlag(f);
 	}
 
 	public void SetFlag(Flags f, bool b, bool recursive = false, bool networkupdate = true)
@@ -1278,10 +1270,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			return true;
 		}
-		BaseEntity parentEntity = c.GetParentEntity();
-		if (parentEntity != null)
+		BaseEntity baseEntity = c.GetParentEntity();
+		if (baseEntity != null)
 		{
-			return HasChild(parentEntity);
+			return HasChild(baseEntity);
 		}
 		return false;
 	}
@@ -1302,14 +1294,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			}
 		}
 		LogEntry(LogEntryType.Hierarchy, 2, "SetParent {0} {1}", entity, boneID);
-		BaseEntity parentEntity = GetParentEntity();
-		if ((bool)parentEntity)
+		BaseEntity baseEntity = GetParentEntity();
+		if ((bool)baseEntity)
 		{
-			parentEntity.RemoveChild(this);
+			baseEntity.RemoveChild(this);
 		}
-		if (base.limitNetworking && parentEntity != null && parentEntity != entity)
+		if (base.limitNetworking && baseEntity != null && baseEntity != entity)
 		{
-			BasePlayer basePlayer = parentEntity as BasePlayer;
+			BasePlayer basePlayer = baseEntity as BasePlayer;
 			if (basePlayer.IsValid())
 			{
 				DestroyOnClient(basePlayer.net.connection);
@@ -1317,8 +1309,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		if (entity == null)
 		{
-			OnParentChanging(parentEntity, null);
-			base.parentEntity.Set(null);
+			OnParentChanging(baseEntity, null);
+			parentEntity.Set(null);
 			base.transform.SetParent(null, worldPositionStays);
 			parentBone = 0u;
 			UpdateNetworkGroup();
@@ -1338,8 +1330,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Debug.Assert(entity.net != null, "Setting parent to entity that hasn't spawned yet! (net is null)");
 		Debug.Assert(entity.net.ID != 0, "Setting parent to entity that hasn't spawned yet! (id = 0)");
 		entity.AddChild(this);
-		OnParentChanging(parentEntity, entity);
-		base.parentEntity.Set(entity);
+		OnParentChanging(baseEntity, entity);
+		parentEntity.Set(entity);
 		if (boneID != 0 && boneID != StringPool.closest)
 		{
 			base.transform.SetParent(entity.FindBone(StringPool.Get(boneID)), worldPositionStays);
@@ -1381,7 +1373,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	public void SendChildrenNetworkUpdate()
+	private void SendChildrenNetworkUpdate()
 	{
 		if (children == null)
 		{
@@ -1394,7 +1386,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	public void SendChildrenNetworkUpdateImmediate()
+	private void SendChildrenNetworkUpdateImmediate()
 	{
 		if (children == null)
 		{
@@ -1753,7 +1745,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 	}
 
-	public void NetworkPositionTick()
+	protected void NetworkPositionTick()
 	{
 		if (!base.transform.hasChanged)
 		{
@@ -1921,25 +1913,25 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 					SendNetworkGroupChange();
 				}
 			}
-			else if (ShouldInheritNetworkGroup() && base.parentEntity.IsSet())
+			else if (ShouldInheritNetworkGroup() && parentEntity.IsSet())
 			{
-				BaseEntity parentEntity = GetParentEntity();
-				if (!parentEntity.IsValid())
+				BaseEntity baseEntity = GetParentEntity();
+				if (!baseEntity.IsValid())
 				{
-					Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + base.parentEntity.uid);
+					Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + parentEntity.uid);
 					Invoke(UpdateNetworkGroup, 2f);
 					isCallingUpdateNetworkGroup = true;
 				}
-				else if (parentEntity != null)
+				else if (baseEntity != null)
 				{
-					if (net.SwitchGroup(parentEntity.net.group))
+					if (net.SwitchGroup(baseEntity.net.group))
 					{
 						SendNetworkGroupChange();
 					}
 				}
 				else
 				{
-					Debug.LogWarning(string.Concat(base.gameObject, ": has parent id - but couldn't find parent! ", base.parentEntity));
+					Debug.LogWarning(string.Concat(base.gameObject, ": has parent id - but couldn't find parent! ", parentEntity));
 				}
 			}
 			else if (base.limitNetworking && !(this is BasePlayer))
@@ -1971,26 +1963,26 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			return true;
 		}
-		BaseEntity parentEntity = GetParentEntity();
+		BaseEntity baseEntity = GetParentEntity();
 		if (base.limitNetworking)
 		{
-			if (parentEntity == null)
+			if (baseEntity == null)
 			{
 				return false;
 			}
-			if (parentEntity != player)
+			if (baseEntity != player)
 			{
 				return false;
 			}
 		}
-		if (parentEntity != null)
+		if (baseEntity != null)
 		{
 			object obj = Interface.CallHook("CanNetworkTo", this, player);
 			if (obj is bool)
 			{
 				return (bool)obj;
 			}
-			return parentEntity.ShouldNetworkTo(player);
+			return baseEntity.ShouldNetworkTo(player);
 		}
 		return base.ShouldNetworkTo(player);
 	}
@@ -2051,8 +2043,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2489,15 +2481,15 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public bool IsVisible(Vector3 position, Vector3 target, float maxDistance = float.PositiveInfinity)
 	{
-		Vector3 a = target - position;
-		float magnitude = a.magnitude;
+		Vector3 vector = target - position;
+		float magnitude = vector.magnitude;
 		if (magnitude < Mathf.Epsilon)
 		{
 			return true;
 		}
-		Vector3 vector = a / magnitude;
-		Vector3 b = vector * Mathf.Min(magnitude, 0.01f);
-		return IsVisible(new Ray(position + b, vector), maxDistance);
+		Vector3 vector2 = vector / magnitude;
+		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
+		return IsVisible(new Ray(position + vector3, vector2), maxDistance);
 	}
 
 	public bool IsVisible(Vector3 position, float maxDistance = float.PositiveInfinity)

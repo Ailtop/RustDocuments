@@ -119,12 +119,12 @@ public class HeldEntity : BaseEntity
 
 	public BasePlayer GetOwnerPlayer()
 	{
-		BaseEntity parentEntity = GetParentEntity();
-		if (!parentEntity.IsValid())
+		BaseEntity baseEntity = GetParentEntity();
+		if (!baseEntity.IsValid())
 		{
 			return null;
 		}
-		BasePlayer basePlayer = parentEntity.ToPlayer();
+		BasePlayer basePlayer = baseEntity.ToPlayer();
 		if (basePlayer == null)
 		{
 			return null;

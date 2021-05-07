@@ -86,13 +86,13 @@ public class JunkPileWater : JunkPile
 			Vector3 rhs = vector2 - vector;
 			Vector3 vector4 = Vector3.Cross(vector3 - vector, rhs);
 			Vector3 eulerAngles = Quaternion.LookRotation(new Vector3(vector4.x, vector4.z, vector4.y)).eulerAngles;
-			Quaternion lhs = Quaternion.Euler(0f - eulerAngles.x, 0f, 0f - eulerAngles.y);
+			Quaternion quaternion = Quaternion.Euler(0f - eulerAngles.x, 0f, 0f - eulerAngles.y);
 			if (first)
 			{
 				baseRotation = Quaternion.Euler(0f, base.transform.rotation.eulerAngles.y, 0f);
 				first = false;
 			}
-			base.transform.SetPositionAndRotation(position2, lhs * baseRotation);
+			base.transform.SetPositionAndRotation(position2, quaternion * baseRotation);
 		}
 	}
 

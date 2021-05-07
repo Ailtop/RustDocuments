@@ -11,7 +11,7 @@ public class NetworkCryptographyServer : NetworkCryptography
 		}
 		else
 		{
-			Craptography.XOR(2301u, src, srcOffset, dst, dstOffset);
+			Craptography.XOR(2293u, src, srcOffset, dst, dstOffset);
 		}
 	}
 
@@ -23,7 +23,7 @@ public class NetworkCryptographyServer : NetworkCryptography
 		}
 		else
 		{
-			Craptography.XOR(2301u, src, srcOffset, dst, dstOffset);
+			Craptography.XOR(2293u, src, srcOffset, dst, dstOffset);
 		}
 	}
 }

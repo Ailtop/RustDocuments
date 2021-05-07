@@ -77,10 +77,10 @@ public class Kayak : BaseBoat, PoolVehicle
 		}
 		bool flag = inputState.IsDown(BUTTON.BACKWARD);
 		bool flag2 = false;
-		Vector3 a = base.transform.forward;
+		Vector3 vector = base.transform.forward;
 		if (flag)
 		{
-			a = -a;
+			vector = -vector;
 		}
 		float num = forwardPaddleForce;
 		if (NumMounted() >= 2)
@@ -90,14 +90,14 @@ public class Kayak : BaseBoat, PoolVehicle
 		if (inputState.IsDown(BUTTON.LEFT) || inputState.IsDown(BUTTON.FIRE_PRIMARY))
 		{
 			flag2 = true;
-			rigidBody.AddForceAtPosition(a * num, GetPaddlePoint(playerSeat, PaddleDirection.Left), ForceMode.Impulse);
+			rigidBody.AddForceAtPosition(vector * num, GetPaddlePoint(playerSeat, PaddleDirection.Left), ForceMode.Impulse);
 			rigidBody.angularVelocity += -base.transform.up * rotatePaddleForce;
 			ClientRPC(null, "OnPaddled", flag ? 2 : 0, playerSeat);
 		}
 		else if (inputState.IsDown(BUTTON.RIGHT) || inputState.IsDown(BUTTON.FIRE_SECONDARY))
 		{
 			flag2 = true;
-			rigidBody.AddForceAtPosition(a * num, GetPaddlePoint(playerSeat, PaddleDirection.Right), ForceMode.Impulse);
+			rigidBody.AddForceAtPosition(vector * num, GetPaddlePoint(playerSeat, PaddleDirection.Right), ForceMode.Impulse);
 			rigidBody.angularVelocity += base.transform.up * rotatePaddleForce;
 			ClientRPC(null, "OnPaddled", (!flag) ? 1 : 3, playerSeat);
 		}
@@ -107,7 +107,7 @@ public class Kayak : BaseBoat, PoolVehicle
 			if (!flag)
 			{
 				Vector3 velocity = rigidBody.velocity;
-				rigidBody.velocity = Vector3.Lerp(velocity, a * velocity.magnitude, 0.4f);
+				rigidBody.velocity = Vector3.Lerp(velocity, vector * velocity.magnitude, 0.4f);
 			}
 		}
 	}
@@ -131,15 +131,15 @@ public class Kayak : BaseBoat, PoolVehicle
 		}
 		else
 		{
-			Vector3 b = Vector3Ex.Direction2D(player.transform.position + player.eyes.BodyForward() * 3f, player.transform.position);
-			b = (Vector3.up * 0.1f + b).normalized;
+			Vector3 vector = Vector3Ex.Direction2D(player.transform.position + player.eyes.BodyForward() * 3f, player.transform.position);
+			vector = (Vector3.up * 0.1f + vector).normalized;
 			Vector3 position = base.transform.position;
 			float num = 5f;
 			if (IsInWater())
 			{
 				num *= 0.75f;
 			}
-			rigidBody.AddForceAtPosition(b * num, position, ForceMode.VelocityChange);
+			rigidBody.AddForceAtPosition(vector * num, position, ForceMode.VelocityChange);
 		}
 		if (IsInWater())
 		{

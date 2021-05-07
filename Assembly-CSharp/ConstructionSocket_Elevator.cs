@@ -11,9 +11,9 @@ public class ConstructionSocket_Elevator : ConstructionSocket
 		{
 			return false;
 		}
-		Vector3 worldPosition = target.GetWorldPosition();
-		Quaternion worldRotation = target.GetWorldRotation(true);
-		if (GamePhysics.CheckOBB(new OBB(worldPosition, new Vector3(2f, 0.5f, 2f), worldRotation), 2097152))
+		Vector3 vector = target.GetWorldPosition();
+		Quaternion quaternion = target.GetWorldRotation(true);
+		if (GamePhysics.CheckOBB(new OBB(vector, new Vector3(2f, 0.5f, 2f), quaternion), 2097152))
 		{
 			return false;
 		}
@@ -26,7 +26,7 @@ public class ConstructionSocket_Elevator : ConstructionSocket
 		{
 			return false;
 		}
-		Vector3 position2 = Matrix4x4.TRS(position, rotation, Vector3.one).MultiplyPoint3x4(worldPosition);
-		return !GamePhysics.CheckOBB(new OBB(position2, new Vector3(2f, 0.5f, 2f), rotation), 2097152);
+		Vector3 vector = Matrix4x4.TRS(position, rotation, Vector3.one).MultiplyPoint3x4(worldPosition);
+		return !GamePhysics.CheckOBB(new OBB(vector, new Vector3(2f, 0.5f, 2f), rotation), 2097152);
 	}
 }

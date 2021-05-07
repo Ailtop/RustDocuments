@@ -23,8 +23,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[Help("The minimum amount of times to tick per frame")]
+		[ServerVar]
 		public static float maxdelta
 		{
 			get

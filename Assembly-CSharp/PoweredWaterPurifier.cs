@@ -40,22 +40,22 @@ public class PoweredWaterPurifier : WaterPurifier
 		{
 			foreach (BaseEntity child in children)
 			{
-				LiquidContainer waterStorage;
-				if ((object)(waterStorage = child as LiquidContainer) != null)
+				LiquidContainer liquidContainer;
+				if ((object)(liquidContainer = child as LiquidContainer) != null)
 				{
-					base.waterStorage = waterStorage;
+					waterStorage = liquidContainer;
 				}
 			}
 		}
-		if (base.waterStorage != null)
+		if (waterStorage != null)
 		{
-			base.waterStorage.SetConnectedTo(this);
+			waterStorage.SetConnectedTo(this);
 			return;
 		}
-		base.waterStorage = GameManager.server.CreateEntity(storagePrefab.resourcePath, storagePrefabAnchor.position, storagePrefabAnchor.rotation) as LiquidContainer;
-		base.waterStorage.SetParent(this, true);
-		base.waterStorage.Spawn();
-		base.waterStorage.SetConnectedTo(this);
+		waterStorage = GameManager.server.CreateEntity(storagePrefab.resourcePath, storagePrefabAnchor.position, storagePrefabAnchor.rotation) as LiquidContainer;
+		waterStorage.SetParent(this, true);
+		waterStorage.Spawn();
+		waterStorage.SetConnectedTo(this);
 	}
 
 	public override void OnItemAddedOrRemoved(Item item, bool added)

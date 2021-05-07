@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class EnvironmentVolume : MonoBehaviour
 {
+	public bool StickyGizmos;
+
 	[InspectorFlags]
 	public EnvironmentType Type = EnvironmentType.Underground;
 
@@ -9,10 +11,33 @@ public class EnvironmentVolume : MonoBehaviour
 
 	public Vector3 Size = Vector3.one;
 
-	public BoxCollider trigger
+	public BoxCollider trigger { get; private set; }
+
+	protected void OnDrawGizmos()
 	{
-		get;
-		private set;
+		if (StickyGizmos)
+		{
+			DrawGizmos();
+		}
+	}
+
+	protected void OnDrawGizmosSelected()
+	{
+		if (!StickyGizmos)
+		{
+			DrawGizmos();
+		}
+	}
+
+	private void DrawGizmos()
+	{
+		Vector3 lossyScale = base.transform.lossyScale;
+		Quaternion rotation = base.transform.rotation;
+		Vector3 pos = base.transform.position + rotation * Vector3.Scale(lossyScale, Center);
+		Vector3 size = Vector3.Scale(lossyScale, Size);
+		Gizmos.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+		GizmosUtil.DrawCube(pos, size, rotation);
+		GizmosUtil.DrawWireCube(pos, size, rotation);
 	}
 
 	protected virtual void Awake()

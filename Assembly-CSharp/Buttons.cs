@@ -6,11 +6,7 @@ public class Buttons
 	{
 		private int frame;
 
-		public bool IsDown
-		{
-			get;
-			set;
-		}
+		public bool IsDown { get; set; }
 
 		public bool JustPressed
 		{

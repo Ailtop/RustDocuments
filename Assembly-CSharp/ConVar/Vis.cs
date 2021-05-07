@@ -25,20 +25,20 @@ namespace ConVar
 		[ServerVar]
 		public static bool weakspots;
 
-		[Help("Show trigger entries")]
 		[ServerVar]
+		[Help("Show trigger entries")]
 		public static bool triggers;
 
 		[ServerVar]
 		[Help("Turns on debug display of hitboxes")]
 		public static bool hitboxes;
 
-		[ServerVar]
 		[Help("Turns on debug display of line of sight checks")]
+		[ServerVar]
 		public static bool lineofsight;
 
-		[ServerVar]
 		[Help("Turns on debug display of senses, which are received by Ai")]
+		[ServerVar]
 		public static bool sense;
 	}
 }

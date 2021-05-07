@@ -33,7 +33,7 @@ public class TabToggle : MonoBehaviour
 
 	public void SwitchTo(Button sourceTab)
 	{
-		string name = sourceTab.transform.name;
+		string text = sourceTab.transform.name;
 		if ((bool)TabHolder)
 		{
 			for (int i = 0; i < TabHolder.childCount; i++)
@@ -41,7 +41,7 @@ public class TabToggle : MonoBehaviour
 				Button component = TabHolder.GetChild(i).GetComponent<Button>();
 				if ((bool)component)
 				{
-					component.interactable = component.name != name;
+					component.interactable = component.name != text;
 				}
 			}
 		}
@@ -52,7 +52,7 @@ public class TabToggle : MonoBehaviour
 		for (int j = 0; j < ContentHolder.childCount; j++)
 		{
 			Transform child = ContentHolder.GetChild(j);
-			if (child.name == name)
+			if (child.name == text)
 			{
 				Show(child.gameObject);
 			}

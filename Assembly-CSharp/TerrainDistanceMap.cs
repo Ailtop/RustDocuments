@@ -72,12 +72,12 @@ public class TerrainDistanceMap : TerrainMap<byte>
 
 	public Vector2i GetDistance(int x, int z)
 	{
-		byte[] src = base.src;
+		byte[] array = src;
 		int re = res;
-		byte b = src[(0 + z) * res + x];
-		byte b2 = base.src[(res + z) * res + x];
-		byte b3 = base.src[(2 * res + z) * res + x];
-		byte b4 = base.src[(3 * res + z) * res + x];
+		byte b = array[(0 + z) * res + x];
+		byte b2 = src[(res + z) * res + x];
+		byte b3 = src[(2 * res + z) * res + x];
+		byte b4 = src[(3 * res + z) * res + x];
 		if (b == byte.MaxValue && b2 == byte.MaxValue && b3 == byte.MaxValue && b4 == byte.MaxValue)
 		{
 			return new Vector2i(256, 256);
@@ -87,11 +87,11 @@ public class TerrainDistanceMap : TerrainMap<byte>
 
 	public void SetDistance(int x, int z, Vector2i v)
 	{
-		byte[] dst = base.dst;
+		byte[] array = dst;
 		int re = res;
-		dst[(0 + z) * res + x] = (byte)Mathf.Clamp(v.x, 0, 255);
-		base.dst[(res + z) * res + x] = (byte)Mathf.Clamp(-v.x, 0, 255);
-		base.dst[(2 * res + z) * res + x] = (byte)Mathf.Clamp(v.y, 0, 255);
-		base.dst[(3 * res + z) * res + x] = (byte)Mathf.Clamp(-v.y, 0, 255);
+		array[(0 + z) * res + x] = (byte)Mathf.Clamp(v.x, 0, 255);
+		dst[(res + z) * res + x] = (byte)Mathf.Clamp(-v.x, 0, 255);
+		dst[(2 * res + z) * res + x] = (byte)Mathf.Clamp(v.y, 0, 255);
+		dst[(3 * res + z) * res + x] = (byte)Mathf.Clamp(-v.y, 0, 255);
 	}
 }

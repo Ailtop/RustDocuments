@@ -72,13 +72,13 @@ public class ElectricWindmill : IOEntity
 	public bool AmIVisible()
 	{
 		int num = 15;
-		Vector3 a = base.transform.position + Vector3.up * 6f;
-		if (!IsVisible(a + base.transform.up * num, num + 1))
+		Vector3 vector = base.transform.position + Vector3.up * 6f;
+		if (!IsVisible(vector + base.transform.up * num, num + 1))
 		{
 			return false;
 		}
 		Vector3 windAimDir = GetWindAimDir(Time.time);
-		if (!IsVisible(a + windAimDir * num, num + 1))
+		if (!IsVisible(vector + windAimDir * num, num + 1))
 		{
 			return false;
 		}

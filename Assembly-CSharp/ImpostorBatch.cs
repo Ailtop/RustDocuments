@@ -10,29 +10,13 @@ public class ImpostorBatch
 
 	private Queue<int> recycle = new Queue<int>(32);
 
-	public Mesh Mesh
-	{
-		get;
-		private set;
-	}
+	public Mesh Mesh { get; private set; }
 
-	public Material Material
-	{
-		get;
-		private set;
-	}
+	public Material Material { get; private set; }
 
-	public ComputeBuffer PositionBuffer
-	{
-		get;
-		private set;
-	}
+	public ComputeBuffer PositionBuffer { get; private set; }
 
-	public ComputeBuffer ArgsBuffer
-	{
-		get;
-		private set;
-	}
+	public ComputeBuffer ArgsBuffer { get; private set; }
 
 	public int Count => Positions.Count;
 

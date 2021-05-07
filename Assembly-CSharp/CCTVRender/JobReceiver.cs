@@ -4,15 +4,9 @@ namespace CCTVRender
 {
 	public struct JobReceiver
 	{
-		public uint RequestId
-		{
-			get;
-		}
+		public uint RequestId { get; }
 
-		public IReceiver Receiver
-		{
-			get;
-		}
+		public IReceiver Receiver { get; }
 
 		public JobReceiver(uint requestId, IReceiver receiver)
 		{

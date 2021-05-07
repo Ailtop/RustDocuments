@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Apex.Ai.HTN;
 using ConVar;
 using Rust.Ai;
@@ -32,10 +33,10 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 	{
 		get
 		{
-			BaseEntity parentEntity = GetParentEntity();
-			if (parentEntity != null)
+			BaseEntity baseEntity = GetParentEntity();
+			if (baseEntity != null)
 			{
-				return BodyPosition + parentEntity.transform.up * PlayerEyes.EyeOffset.y;
+				return BodyPosition + baseEntity.transform.up * PlayerEyes.EyeOffset.y;
 			}
 			return eyes.position;
 		}
@@ -43,23 +44,13 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 
 	public Quaternion EyeRotation => eyes.rotation;
 
-	public override float PositionTickRate
-	{
-		protected get
-		{
-			return 0.05f;
-		}
-	}
+	protected override float PositionTickRate => 0.05f;
 
 	public override BaseNpc.AiStatistics.FamilyEnum Family => AiDefinition.Info.ToFamily(AiDefinition.Info.Family);
 
 	public BaseNpcDefinition AiDefinition => _aiDefinition;
 
-	public bool OnlyRotateAroundYAxis
-	{
-		get;
-		set;
-	}
+	public bool OnlyRotateAroundYAxis { get; set; }
 
 	public HTNDomain AiDomain => _aiDomain;
 
@@ -303,10 +294,10 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 		Vector3 moveToPosition = AiDomain.GetNextPosition(delta);
 		if (_ValidateNextPosition(ref moveToPosition))
 		{
-			BaseEntity parentEntity = GetParentEntity();
-			if ((bool)parentEntity)
+			BaseEntity baseEntity = GetParentEntity();
+			if ((bool)baseEntity)
 			{
-				base.transform.localPosition = parentEntity.transform.InverseTransformPoint(moveToPosition);
+				base.transform.localPosition = baseEntity.transform.InverseTransformPoint(moveToPosition);
 			}
 			else
 			{
@@ -375,11 +366,11 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 		{
 			return;
 		}
-		BaseEntity parentEntity = GetParentEntity();
-		if ((bool)parentEntity)
+		BaseEntity baseEntity = GetParentEntity();
+		if ((bool)baseEntity)
 		{
-			Vector3 forward2 = new Vector3(y: parentEntity.transform.InverseTransformDirection(forward).y, x: forward.x, z: forward.z);
-			eyes.rotation = Quaternion.LookRotation(forward2, parentEntity.transform.up);
+			Vector3 forward2 = new Vector3(y: baseEntity.transform.InverseTransformDirection(forward).y, x: forward.x, z: forward.z);
+			eyes.rotation = Quaternion.LookRotation(forward2, baseEntity.transform.up);
 			if (OnlyRotateAroundYAxis)
 			{
 				eyes.rotation = Quaternion.Euler(new Vector3(0f, eyes.rotation.eulerAngles.y, 0f));
@@ -402,6 +393,7 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 		return ++serverMaxProjectileID;
 	}
 
+	[SpecialName]
 	Transform IHTNAgent.get_transform()
 	{
 		return base.transform;

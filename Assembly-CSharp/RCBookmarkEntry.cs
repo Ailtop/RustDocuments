@@ -26,21 +26,9 @@ public class RCBookmarkEntry : MonoBehaviour
 
 	public EventTrigger eventTrigger;
 
-	public string identifier
-	{
-		get;
-		private set;
-	}
+	public string identifier { get; private set; }
 
-	public uint netid
-	{
-		get;
-		private set;
-	}
+	public uint netid { get; private set; }
 
-	public bool isControlling
-	{
-		get;
-		private set;
-	}
+	public bool isControlling { get; private set; }
 }

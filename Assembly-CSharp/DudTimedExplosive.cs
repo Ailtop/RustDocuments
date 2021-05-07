@@ -88,8 +88,8 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 		return randomTimerTime * num;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Pickup(RPCMessage msg)
 	{
 		if (!IsWickBurning())
@@ -144,15 +144,15 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 		Vector3 position = base.transform.position;
 		Quaternion rotation = base.transform.rotation;
 		bool flag = false;
-		EntityRef parentEntity = base.parentEntity;
-		while (parentEntity.IsValid(base.isServer) && !flag)
+		EntityRef entityRef = parentEntity;
+		while (entityRef.IsValid(base.isServer) && !flag)
 		{
-			BaseEntity baseEntity = parentEntity.Get(base.isServer);
+			BaseEntity baseEntity = entityRef.Get(base.isServer);
 			if (baseEntity.syncPosition)
 			{
 				flag = true;
 			}
-			parentEntity = baseEntity.parentEntity;
+			entityRef = baseEntity.parentEntity;
 		}
 		if (flag)
 		{

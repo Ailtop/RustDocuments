@@ -225,9 +225,9 @@ namespace Facepunch
 					{
 						socket.Send(memoryStream.GetBuffer(), (int)memoryStream.Position, SocketFlags.None);
 					}
-					catch (Exception arg)
+					catch (Exception ex)
 					{
-						Debug.LogWarning("Error sending rcon reply: " + arg);
+						Debug.LogWarning("Error sending rcon reply: " + ex);
 						Close("Exception");
 					}
 				}

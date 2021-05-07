@@ -80,20 +80,15 @@ namespace CompanionServer
 			Facepunch.Pool.FreeList(ref obj);
 		}
 
-		public Task<NotificationSendResult> SendNotification(NotificationChannel channel, string title, string body, string type)
+		public Task<NotificationSendResult> SendNotification(NotificationChannel channel, string title, string body)
 		{
 			double realtimeSinceStartup = TimeEx.realtimeSinceStartup;
 			if (realtimeSinceStartup - _lastSend < 15.0)
 			{
 				return Task.FromResult(NotificationSendResult.RateLimited);
 			}
-			Dictionary<string, string> serverPairingData = Util.GetServerPairingData();
-			if (!string.IsNullOrWhiteSpace(type))
-			{
-				serverPairingData["type"] = type;
-			}
 			_lastSend = realtimeSinceStartup;
-			return SendNotificationImpl(_subscriptions, channel, title, body, serverPairingData);
+			return SendNotificationImpl(_subscriptions, channel, title, body, Util.GetServerPairingData());
 		}
 
 		public static async Task<NotificationSendResult> SendNotificationTo(ICollection<ulong> steamIds, NotificationChannel channel, string title, string body, Dictionary<string, string> data)

@@ -20,10 +20,7 @@ public class GenerateRoadMeshes : ProceduralComponent
 	{
 		if (RoadMeshes == null || RoadMeshes.Length == 0)
 		{
-			RoadMeshes = new Mesh[1]
-			{
-				RoadMesh
-			};
+			RoadMeshes = new Mesh[1] { RoadMesh };
 		}
 		foreach (PathList road in TerrainMeta.Path.Roads)
 		{
@@ -33,16 +30,16 @@ public class GenerateRoadMeshes : ProceduralComponent
 			}
 			foreach (PathList.MeshObject item in road.CreateMesh(RoadMeshes, 0f))
 			{
-				GameObject gameObject = new GameObject("Road Mesh");
-				gameObject.transform.position = item.Position;
-				gameObject.layer = 16;
-				gameObject.SetHierarchyGroup(road.Name);
-				gameObject.SetActive(false);
-				MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+				GameObject obj = new GameObject("Road Mesh");
+				obj.transform.position = item.Position;
+				obj.layer = 16;
+				obj.SetHierarchyGroup(road.Name);
+				obj.SetActive(false);
+				MeshCollider meshCollider = obj.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RoadPhysicMaterial;
 				meshCollider.sharedMesh = item.Meshes[0];
-				gameObject.AddComponent<AddToHeightMap>();
-				gameObject.SetActive(true);
+				obj.AddComponent<AddToHeightMap>();
+				obj.SetActive(true);
 			}
 		}
 	}

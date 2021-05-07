@@ -122,11 +122,7 @@ public class BaseCombatEntity : BaseEntity
 
 	public int lastNotifyFrame;
 
-	public Vector3 LastAttackedDir
-	{
-		get;
-		set;
-	}
+	public Vector3 LastAttackedDir { get; set; }
 
 	public float SecondsSinceAttacked => UnityEngine.Time.time - lastAttackedTime;
 
@@ -142,11 +138,11 @@ public class BaseCombatEntity : BaseEntity
 		}
 		set
 		{
-			float health = _health;
+			float num = _health;
 			_health = Mathf.Clamp(value, 0f, MaxHealth());
-			if (base.isServer && _health != health)
+			if (base.isServer && _health != num)
 			{
-				OnHealthChanged(health, _health);
+				OnHealthChanged(num, _health);
 			}
 		}
 	}
@@ -226,8 +222,8 @@ public class BaseCombatEntity : BaseEntity
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_PickupStart(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanPickup(rpc.player))
@@ -411,7 +407,7 @@ public class BaseCombatEntity : BaseEntity
 		}
 		using (TimeWarning.New("Hurt( HitInfo )", 50))
 		{
-			float health = this.health;
+			float num = health;
 			ScaleDamage(info);
 			if (info.PointStart != Vector3.zero)
 			{
@@ -438,11 +434,11 @@ public class BaseCombatEntity : BaseEntity
 				return;
 			}
 			DebugHurt(info);
-			this.health = health - info.damageTypes.Total();
+			health = num - info.damageTypes.Total();
 			SendNetworkUpdate();
 			if (ConVar.Global.developer > 1)
 			{
-				Debug.Log(string.Concat("[Combat]".PadRight(10), base.gameObject.name, " hurt ", info.damageTypes.GetMajorityDamageType(), "/", info.damageTypes.Total(), " - ", this.health.ToString("0"), " health left"));
+				Debug.Log(string.Concat("[Combat]".PadRight(10), base.gameObject.name, " hurt ", info.damageTypes.GetMajorityDamageType(), "/", info.damageTypes.Total(), " - ", health.ToString("0"), " health left"));
 			}
 			lastDamage = info.damageTypes.GetMajorityDamageType();
 			lastAttacker = info.Initiator;
@@ -476,11 +472,11 @@ public class BaseCombatEntity : BaseEntity
 			{
 				if (IsDead())
 				{
-					initiatorPlayer.stats.combat.Log(info, health, this.health, "killed");
+					initiatorPlayer.stats.combat.Log(info, num, health, "killed");
 				}
 				else
 				{
-					initiatorPlayer.stats.combat.Log(info, health, this.health);
+					initiatorPlayer.stats.combat.Log(info, num, health);
 				}
 			}
 		}
@@ -522,14 +518,7 @@ public class BaseCombatEntity : BaseEntity
 			float num = info.damageTypes.types[i];
 			if (num != 0f)
 			{
-				string[] obj = new string[5]
-				{
-					text,
-					" ",
-					null,
-					null,
-					null
-				};
+				string[] obj = new string[5] { text, " ", null, null, null };
 				DamageType damageType = (DamageType)i;
 				obj[2] = damageType.ToString().PadRight(10);
 				obj[3] = num.ToString("0.00");

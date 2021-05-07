@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[717]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[715]
 	{
 		new ConsoleSystem.Command
 		{
@@ -4848,32 +4848,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Net.visdebug = str.ToBool();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "visibilityradiusfaroverride",
-			Parent = "net",
-			FullName = "net.visibilityradiusfaroverride",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Net.visibilityRadiusFarOverride.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Net.visibilityRadiusFarOverride = str.ToInt();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "visibilityradiusnearoverride",
-			Parent = "net",
-			FullName = "net.visibilityradiusnearoverride",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Net.visibilityRadiusNearOverride.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Net.visibilityRadiusNearOverride = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

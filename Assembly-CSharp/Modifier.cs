@@ -18,43 +18,19 @@ public class Modifier
 		Tea
 	}
 
-	public ModifierType Type
-	{
-		get;
-		private set;
-	}
+	public ModifierType Type { get; private set; }
 
-	public ModifierSource Source
-	{
-		get;
-		private set;
-	}
+	public ModifierSource Source { get; private set; }
 
-	public float Value
-	{
-		get;
-		private set;
-	} = 1f;
+	public float Value { get; private set; } = 1f;
 
 
-	public float Duration
-	{
-		get;
-		private set;
-	} = 10f;
+	public float Duration { get; private set; } = 10f;
 
 
-	public float TimeRemaining
-	{
-		get;
-		private set;
-	}
+	public float TimeRemaining { get; private set; }
 
-	public bool Expired
-	{
-		get;
-		private set;
-	}
+	public bool Expired { get; private set; }
 
 	public void Init(ModifierType type, ModifierSource source, float value, float duration, float remaining)
 	{

@@ -13,14 +13,14 @@ public class NetworkInfoGeneralText : MonoBehaviour
 
 	private void UpdateText()
 	{
-		string str = "";
+		string text = "";
 		if (Net.sv != null)
 		{
-			str += "Server\n";
-			str += Net.sv.GetDebug(null);
-			str += "\n";
+			text += "Server\n";
+			text += Net.sv.GetDebug(null);
+			text += "\n";
 		}
-		text.text = str;
+		this.text.text = text;
 	}
 
 	private static string ChannelStat(int window, int left)

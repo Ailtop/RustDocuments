@@ -464,8 +464,8 @@ public class CH47HelicopterAIController : CH47Helicopter
 		float y = vector.y;
 		float value = Mathf.Abs(num - y);
 		bool flag = num > y;
-		float d = Mathf.InverseLerp(0f, 10f, value) * AiAltitudeForce * (flag ? 1f : (-1f));
-		rigidBody.AddForce(Vector3.up * d, ForceMode.Force);
+		float num2 = Mathf.InverseLerp(0f, 10f, value) * AiAltitudeForce * (flag ? 1f : (-1f));
+		rigidBody.AddForce(Vector3.up * num2, ForceMode.Force);
 	}
 
 	protected override void VehicleFixedUpdate()

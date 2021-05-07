@@ -50,10 +50,10 @@ public class PowerLineWire : MonoBehaviour
 			wire.poles.Add(objs[0].transform);
 			for (int i = 0; i < objs.Count - 1; i++)
 			{
-				GameObject gameObject2 = new GameObject();
-				gameObject2.name = name + " Span Mesh " + i;
-				gameObject2.transform.parent = gameObject.transform;
-				PowerLineWireSpan powerLineWireSpan = gameObject2.AddComponent<PowerLineWireSpan>();
+				GameObject obj = new GameObject();
+				obj.name = name + " Span Mesh " + i;
+				obj.transform.parent = gameObject.transform;
+				PowerLineWireSpan powerLineWireSpan = obj.AddComponent<PowerLineWireSpan>();
 				powerLineWireSpan.wirePrefab = wirePrefab;
 				powerLineWireSpan.start = objs[i].transform;
 				powerLineWireSpan.end = objs[i + 1].transform;

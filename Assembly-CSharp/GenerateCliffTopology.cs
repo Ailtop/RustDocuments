@@ -6,6 +6,8 @@ public class GenerateCliffTopology : ProceduralComponent
 
 	private const int filter = 8389632;
 
+	private const int filter_del = 55296;
+
 	public static void Process(int x, int z)
 	{
 		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
@@ -19,7 +21,7 @@ public class GenerateCliffTopology : ProceduralComponent
 			{
 				topologyMap.AddTopology(x, z, 2);
 			}
-			else
+			else if (slope < 20f && splat < 0.2f)
 			{
 				topologyMap.RemoveTopology(x, z, 2);
 			}
@@ -40,7 +42,7 @@ public class GenerateCliffTopology : ProceduralComponent
 			{
 				topologyMap.AddTopology(x, z, 2);
 			}
-			else if (!keepExisting)
+			else if (!keepExisting && slope < 20f && splat < 0.2f && ((uint)topology & 0xD800u) != 0)
 			{
 				topologyMap.RemoveTopology(x, z, 2);
 			}

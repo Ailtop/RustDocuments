@@ -5,11 +5,7 @@ namespace TinyJSON
 {
 	public sealed class ProxyNumber : Variant
 	{
-		private static readonly char[] floatingPointCharacters = new char[2]
-		{
-			'.',
-			'e'
-		};
+		private static readonly char[] floatingPointCharacters = new char[2] { '.', 'e' };
 
 		private readonly IConvertible value;
 

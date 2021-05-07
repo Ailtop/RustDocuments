@@ -29,9 +29,9 @@ public class Socket_Specific_Female : Socket_Base
 	public bool CanAccept(Socket_Specific socket)
 	{
 		string[] array = allowedMaleSockets;
-		foreach (string b in array)
+		foreach (string text in array)
 		{
-			if (socket.targetSocketName == b)
+			if (socket.targetSocketName == text)
 			{
 				return true;
 			}

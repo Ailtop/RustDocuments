@@ -132,77 +132,29 @@ public class Climate : SingletonComponent<Climate>
 
 	private ClimateParameters[] climateLookup;
 
-	public float WeatherStateBlend
-	{
-		get;
-		set;
-	}
+	public float WeatherStateBlend { get; set; }
 
-	public uint WeatherSeedPrevious
-	{
-		get;
-		set;
-	}
+	public uint WeatherSeedPrevious { get; set; }
 
-	public uint WeatherSeedTarget
-	{
-		get;
-		set;
-	}
+	public uint WeatherSeedTarget { get; set; }
 
-	public uint WeatherSeedNext
-	{
-		get;
-		set;
-	}
+	public uint WeatherSeedNext { get; set; }
 
-	public WeatherPreset WeatherStatePrevious
-	{
-		get;
-		set;
-	}
+	public WeatherPreset WeatherStatePrevious { get; set; }
 
-	public WeatherPreset WeatherStateTarget
-	{
-		get;
-		set;
-	}
+	public WeatherPreset WeatherStateTarget { get; set; }
 
-	public WeatherPreset WeatherStateNext
-	{
-		get;
-		set;
-	}
+	public WeatherPreset WeatherStateNext { get; set; }
 
-	public WeatherPreset WeatherState
-	{
-		get;
-		set;
-	}
+	public WeatherPreset WeatherState { get; set; }
 
-	public WeatherPreset WeatherClampsMin
-	{
-		get;
-		private set;
-	}
+	public WeatherPreset WeatherClampsMin { get; private set; }
 
-	public WeatherPreset WeatherClampsMax
-	{
-		get;
-		private set;
-	}
+	public WeatherPreset WeatherClampsMax { get; private set; }
 
-	public WeatherPreset WeatherOverrides
-	{
-		get;
-		set;
-	}
+	public WeatherPreset WeatherOverrides { get; set; }
 
-	public LegacyWeatherState Overrides
-	{
-		get;
-		set;
-	}
+	public LegacyWeatherState Overrides { get; set; }
 
 	protected override void Awake()
 	{
@@ -520,13 +472,7 @@ public class Climate : SingletonComponent<Climate>
 	{
 		if (climateLookup == null)
 		{
-			climateLookup = new ClimateParameters[4]
-			{
-				Arid,
-				Temperate,
-				Tundra,
-				Arctic
-			};
+			climateLookup = new ClimateParameters[4] { Arid, Temperate, Tundra, Arctic };
 		}
 		if (TerrainMeta.BiomeMap == null)
 		{

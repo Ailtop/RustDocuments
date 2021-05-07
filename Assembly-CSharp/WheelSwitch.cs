@@ -131,8 +131,8 @@ public class WheelSwitch : IOEntity
 	{
 		CancelInvoke(RotateProgress);
 		SetFlag(BeingRotated, false);
-		IOSlot[] outputs = base.outputs;
-		foreach (IOSlot iOSlot in outputs)
+		IOSlot[] array = outputs;
+		foreach (IOSlot iOSlot in array)
 		{
 			if (iOSlot.connectedTo.Get() != null)
 			{
@@ -150,8 +150,8 @@ public class WheelSwitch : IOEntity
 			return;
 		}
 		float num = kineticEnergyPerSec * progressTickRate;
-		IOSlot[] outputs = base.outputs;
-		foreach (IOSlot iOSlot in outputs)
+		IOSlot[] array = outputs;
+		foreach (IOSlot iOSlot in array)
 		{
 			if (iOSlot.connectedTo.Get() != null)
 			{
@@ -190,8 +190,8 @@ public class WheelSwitch : IOEntity
 	public void Powered()
 	{
 		float inputAmount = kineticEnergyPerSec * progressTickRate;
-		IOSlot[] outputs = base.outputs;
-		foreach (IOSlot iOSlot in outputs)
+		IOSlot[] array = outputs;
+		foreach (IOSlot iOSlot in array)
 		{
 			if (iOSlot.connectedTo.Get() != null)
 			{

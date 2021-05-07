@@ -21,25 +21,25 @@ public class RHIBAIController : FacepunchBehaviour
 			float num5 = (float)i / (float)num3 * 360f;
 			nodes.Add(new Vector3(Mathf.Sin(num5 * ((float)Math.PI / 180f)) * num4, y, Mathf.Cos(num5 * ((float)Math.PI / 180f)) * num4));
 		}
-		float d = 2f;
-		float num6 = 200f;
+		float num6 = 2f;
+		float num7 = 200f;
 		float maxDistance = 150f;
-		float num7 = 8f;
+		float num8 = 8f;
 		bool flag = true;
-		int num8 = 1;
-		float num9 = 20f;
+		int num9 = 1;
+		float num10 = 20f;
 		Vector3[] array = new Vector3[5]
 		{
 			new Vector3(0f, 0f, 0f),
-			new Vector3(num9, 0f, 0f),
-			new Vector3(0f - num9, 0f, 0f),
-			new Vector3(0f, 0f, num9),
-			new Vector3(0f, 0f, 0f - num9)
+			new Vector3(num10, 0f, 0f),
+			new Vector3(0f - num10, 0f, 0f),
+			new Vector3(0f, 0f, num10),
+			new Vector3(0f, 0f, 0f - num10)
 		};
 		while (flag)
 		{
-			Debug.Log("Loop # :" + num8);
-			num8++;
+			Debug.Log("Loop # :" + num9);
+			num9++;
 			flag = false;
 			for (int j = 0; j < num3; j++)
 			{
@@ -50,8 +50,8 @@ public class RHIBAIController : FacepunchBehaviour
 				Vector3 b2 = nodes[index];
 				Vector3 vector2 = vector;
 				Vector3 normalized = (Vector3.zero - vector).normalized;
-				Vector3 vector3 = vector + normalized * d;
-				if (Vector3.Distance(vector3, b) > num6 || Vector3.Distance(vector3, b2) > num6)
+				Vector3 vector3 = vector + normalized * num6;
+				if (Vector3.Distance(vector3, b) > num7 || Vector3.Distance(vector3, b2) > num7)
 				{
 					continue;
 				}
@@ -59,7 +59,7 @@ public class RHIBAIController : FacepunchBehaviour
 				for (int k = 0; k < array.Length; k++)
 				{
 					Vector3 vector4 = vector3 + array[k];
-					if (GetWaterDepth(vector4) < num7)
+					if (GetWaterDepth(vector4) < num8)
 					{
 						flag2 = false;
 					}

@@ -117,27 +117,27 @@ public class ThrownWeapon : AttackEntity
 			return;
 		}
 		Vector3 position = ownerPlayer.eyes.position;
-		Vector3 a = ownerPlayer.eyes.BodyForward();
-		float d = 1f;
+		Vector3 vector = ownerPlayer.eyes.BodyForward();
+		float num = 1f;
 		SignalBroadcast(Signal.Throw, string.Empty);
-		BaseEntity baseEntity = GameManager.server.CreateEntity(prefabToThrow.resourcePath, position, Quaternion.LookRotation((overrideAngle == Vector3.zero) ? (-a) : overrideAngle));
+		BaseEntity baseEntity = GameManager.server.CreateEntity(prefabToThrow.resourcePath, position, Quaternion.LookRotation((overrideAngle == Vector3.zero) ? (-vector) : overrideAngle));
 		if (baseEntity == null)
 		{
 			return;
 		}
 		baseEntity.creatorEntity = ownerPlayer;
-		Vector3 vector = a + Quaternion.AngleAxis(10f, Vector3.right) * Vector3.up;
-		float num = GetThrowVelocity(position, targetPosition, vector);
-		if (float.IsNaN(num))
+		Vector3 vector2 = vector + Quaternion.AngleAxis(10f, Vector3.right) * Vector3.up;
+		float num2 = GetThrowVelocity(position, targetPosition, vector2);
+		if (float.IsNaN(num2))
 		{
-			vector = a + Quaternion.AngleAxis(20f, Vector3.right) * Vector3.up;
-			num = GetThrowVelocity(position, targetPosition, vector);
-			if (float.IsNaN(num))
+			vector2 = vector + Quaternion.AngleAxis(20f, Vector3.right) * Vector3.up;
+			num2 = GetThrowVelocity(position, targetPosition, vector2);
+			if (float.IsNaN(num2))
 			{
-				num = 5f;
+				num2 = 5f;
 			}
 		}
-		baseEntity.SetVelocity(vector * num * d);
+		baseEntity.SetVelocity(vector2 * num2 * num);
 		if (tumbleVelocity > 0f)
 		{
 			baseEntity.SetAngularVelocity(new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * tumbleVelocity);
@@ -149,16 +149,16 @@ public class ThrownWeapon : AttackEntity
 		Sensation sensation;
 		if (timedExplosive != null)
 		{
-			float num2 = 0f;
+			float num3 = 0f;
 			foreach (DamageTypeEntry damageType in timedExplosive.damageTypes)
 			{
-				num2 += damageType.amount;
+				num3 += damageType.amount;
 			}
 			sensation = default(Sensation);
 			sensation.Type = SensationType.ThrownWeapon;
 			sensation.Position = ownerPlayer.transform.position;
 			sensation.Radius = 50f;
-			sensation.DamagePotential = num2;
+			sensation.DamagePotential = num3;
 			sensation.InitiatorPlayer = ownerPlayer;
 			sensation.Initiator = ownerPlayer;
 			sensation.UsedEntity = timedExplosive;
@@ -199,7 +199,7 @@ public class ThrownWeapon : AttackEntity
 		}
 		Vector3 vector = msg.read.Vector3();
 		Vector3 normalized = msg.read.Vector3().normalized;
-		float d = Mathf.Clamp01(msg.read.Float());
+		float num = Mathf.Clamp01(msg.read.Float());
 		if (msg.player.isMounted || msg.player.HasParent())
 		{
 			vector = msg.player.eyes.position;
@@ -215,7 +215,7 @@ public class ThrownWeapon : AttackEntity
 		}
 		baseEntity.creatorEntity = msg.player;
 		baseEntity.skinID = skinID;
-		baseEntity.SetVelocity(GetInheritedVelocity(msg.player) + normalized * maxThrowVelocity * d + msg.player.estimatedVelocity * 0.5f);
+		baseEntity.SetVelocity(GetInheritedVelocity(msg.player) + normalized * maxThrowVelocity * num + msg.player.estimatedVelocity * 0.5f);
 		if (tumbleVelocity > 0f)
 		{
 			baseEntity.SetAngularVelocity(new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * tumbleVelocity);
@@ -234,16 +234,16 @@ public class ThrownWeapon : AttackEntity
 		Sensation sensation;
 		if (timedExplosive != null)
 		{
-			float num = 0f;
+			float num2 = 0f;
 			foreach (DamageTypeEntry damageType in timedExplosive.damageTypes)
 			{
-				num += damageType.amount;
+				num2 += damageType.amount;
 			}
 			sensation = default(Sensation);
 			sensation.Type = SensationType.ThrownWeapon;
 			sensation.Position = player.transform.position;
 			sensation.Radius = 50f;
-			sensation.DamagePotential = num;
+			sensation.DamagePotential = num2;
 			sensation.InitiatorPlayer = player;
 			sensation.Initiator = player;
 			sensation.UsedEntity = timedExplosive;
@@ -263,8 +263,8 @@ public class ThrownWeapon : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoDrop(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())

@@ -1,4 +1,3 @@
-using Oxide.Core;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Rust/Gestures/Gesture Config")]
@@ -70,11 +69,6 @@ public class GestureConfig : ScriptableObject
 
 	public bool IsOwnedBy(BasePlayer player)
 	{
-		object obj = Interface.CallHook("CanUseGesture", player, this);
-		if (obj is bool)
-		{
-			return (bool)obj;
-		}
 		if (forceUnlock)
 		{
 			return true;
@@ -88,21 +82,5 @@ public class GestureConfig : ScriptableObject
 			return true;
 		}
 		return false;
-	}
-
-	public bool CanBeUsedBy(BasePlayer player)
-	{
-		if (player.isMounted)
-		{
-			if (playerModelLayer == PlayerModelLayer.FullBody)
-			{
-				return false;
-			}
-			if (player.GetMounted().allowedGestures == BaseMountable.MountGestureType.None)
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 }

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Apex.Ai.HTN;
 using ConVar;
 using Network;
@@ -58,13 +59,7 @@ public class HTNAnimal : BaseCombatEntity, IHTNAgent
 
 	public Quaternion EyeRotation => base.transform.rotation;
 
-	public override float PositionTickRate
-	{
-		protected get
-		{
-			return 0.1f;
-		}
-	}
+	protected override float PositionTickRate => 0.1f;
 
 	public BaseNpc.AiStatistics.FamilyEnum Family => AiDefinition.Info.ToFamily(AiDefinition.Info.Family);
 
@@ -72,11 +67,7 @@ public class HTNAnimal : BaseCombatEntity, IHTNAgent
 
 	public HTNDomain AiDomain => _aiDomain;
 
-	public Vector3 estimatedVelocity
-	{
-		get;
-		set;
-	}
+	public Vector3 estimatedVelocity { get; set; }
 
 	public bool IsDormant
 	{
@@ -320,6 +311,7 @@ public class HTNAnimal : BaseCombatEntity, IHTNAgent
 		}
 	}
 
+	[SpecialName]
 	Transform IHTNAgent.get_transform()
 	{
 		return base.transform;

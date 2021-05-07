@@ -53,169 +53,61 @@ public class TerrainMeta : MonoBehaviour
 	[HideInInspector]
 	public PaintMode currentPaintMode;
 
-	public static TerrainConfig Config
-	{
-		get;
-		private set;
-	}
+	public static TerrainConfig Config { get; private set; }
 
-	public static Terrain Terrain
-	{
-		get;
-		private set;
-	}
+	public static Terrain Terrain { get; private set; }
 
-	public static Transform Transform
-	{
-		get;
-		private set;
-	}
+	public static Transform Transform { get; private set; }
 
-	public static Vector3 Position
-	{
-		get;
-		private set;
-	}
+	public static Vector3 Position { get; private set; }
 
-	public static Vector3 Size
-	{
-		get;
-		private set;
-	}
+	public static Vector3 Size { get; private set; }
 
 	public static Vector3 Center => Position + Size * 0.5f;
 
-	public static Vector3 OneOverSize
-	{
-		get;
-		private set;
-	}
+	public static Vector3 OneOverSize { get; private set; }
 
-	public static Vector3 HighestPoint
-	{
-		get;
-		set;
-	}
+	public static Vector3 HighestPoint { get; set; }
 
-	public static Vector3 LowestPoint
-	{
-		get;
-		set;
-	}
+	public static Vector3 LowestPoint { get; set; }
 
-	public static float LootAxisAngle
-	{
-		get;
-		private set;
-	}
+	public static float LootAxisAngle { get; private set; }
 
-	public static float BiomeAxisAngle
-	{
-		get;
-		private set;
-	}
+	public static float BiomeAxisAngle { get; private set; }
 
-	public static TerrainData Data
-	{
-		get;
-		private set;
-	}
+	public static TerrainData Data { get; private set; }
 
-	public static TerrainCollider Collider
-	{
-		get;
-		private set;
-	}
+	public static TerrainCollider Collider { get; private set; }
 
-	public static TerrainCollision Collision
-	{
-		get;
-		private set;
-	}
+	public static TerrainCollision Collision { get; private set; }
 
-	public static TerrainPhysics Physics
-	{
-		get;
-		private set;
-	}
+	public static TerrainPhysics Physics { get; private set; }
 
-	public static TerrainColors Colors
-	{
-		get;
-		private set;
-	}
+	public static TerrainColors Colors { get; private set; }
 
-	public static TerrainQuality Quality
-	{
-		get;
-		private set;
-	}
+	public static TerrainQuality Quality { get; private set; }
 
-	public static TerrainPath Path
-	{
-		get;
-		private set;
-	}
+	public static TerrainPath Path { get; private set; }
 
-	public static TerrainBiomeMap BiomeMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainBiomeMap BiomeMap { get; private set; }
 
-	public static TerrainAlphaMap AlphaMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainAlphaMap AlphaMap { get; private set; }
 
-	public static TerrainBlendMap BlendMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainBlendMap BlendMap { get; private set; }
 
-	public static TerrainHeightMap HeightMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainHeightMap HeightMap { get; private set; }
 
-	public static TerrainSplatMap SplatMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainSplatMap SplatMap { get; private set; }
 
-	public static TerrainTopologyMap TopologyMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainTopologyMap TopologyMap { get; private set; }
 
-	public static TerrainWaterMap WaterMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainWaterMap WaterMap { get; private set; }
 
-	public static TerrainDistanceMap DistanceMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainDistanceMap DistanceMap { get; private set; }
 
-	public static TerrainPlacementMap PlacementMap
-	{
-		get;
-		private set;
-	}
+	public static TerrainPlacementMap PlacementMap { get; private set; }
 
-	public static TerrainTexturing Texturing
-	{
-		get;
-		private set;
-	}
+	public static TerrainTexturing Texturing { get; private set; }
 
 	public static bool OutOfBounds(Vector3 worldPos)
 	{
@@ -366,7 +258,7 @@ public class TerrainMeta : MonoBehaviour
 		DistanceMap = terrain.GetComponent<TerrainDistanceMap>();
 		PlacementMap = terrain.GetComponent<TerrainPlacementMap>();
 		Texturing = terrain.GetComponent<TerrainTexturing>();
-		terrain.drawInstanced = false;
+		terrain.drawInstanced = true;
 		HighestPoint = new Vector3(Position.x, Position.y + Size.y, Position.z);
 		LowestPoint = new Vector3(Position.x, Position.y, Position.z);
 		TerrainExtension[] components = GetComponents<TerrainExtension>();

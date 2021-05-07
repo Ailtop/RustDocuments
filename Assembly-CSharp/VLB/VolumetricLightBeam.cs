@@ -6,8 +6,8 @@ using UnityEngine.Serialization;
 
 namespace VLB
 {
-	[SelectionBase]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
+	[SelectionBase]
 	[DisallowMultipleComponent]
 	[ExecuteInEditMode]
 	public class VolumetricLightBeam : MonoBehaviour
@@ -16,8 +16,8 @@ namespace VLB
 
 		public ColorMode colorMode;
 
-		[FormerlySerializedAs("colorValue")]
 		[ColorUsage(true, true)]
+		[FormerlySerializedAs("colorValue")]
 		public Color color = Consts.FlatColor;
 
 		public Gradient colorGradient;
@@ -98,8 +98,8 @@ namespace VLB
 		[SerializeField]
 		private int pluginVersion = -1;
 
-		[FormerlySerializedAs("trackChangesDuringPlaytime")]
 		[SerializeField]
+		[FormerlySerializedAs("trackChangesDuringPlaytime")]
 		private bool _TrackChangesDuringPlaytime;
 
 		[SerializeField]
@@ -123,8 +123,8 @@ namespace VLB
 			get
 			{
 				float num = coneRadiusStart;
-				float coneRadiusEnd = this.coneRadiusEnd;
-				return (float)Math.PI / 3f * (num * num + num * coneRadiusEnd + coneRadiusEnd * coneRadiusEnd) * fadeEnd;
+				float num2 = coneRadiusEnd;
+				return (float)Math.PI / 3f * (num * num + num * num2 + num2 * num2) * fadeEnd;
 			}
 		}
 
@@ -356,10 +356,7 @@ namespace VLB
 			{
 				return false;
 			}
-			return !GeometryUtility.TestPlanesAABB(new Plane[1]
-			{
-				m_PlaneWS
-			}, collider.bounds);
+			return !GeometryUtility.TestPlanesAABB(new Plane[1] { m_PlaneWS }, collider.bounds);
 		}
 
 		public float GetInsideBeamFactor(Vector3 posWS)

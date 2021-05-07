@@ -47,15 +47,9 @@ public class TrainTrackSpline : WorldSpline
 
 	public interface ITrainTrackUser
 	{
-		Vector3 Position
-		{
-			get;
-		}
+		Vector3 Position { get; }
 
-		float FrontWheelSplineDist
-		{
-			get;
-		}
+		float FrontWheelSplineDist { get; }
 
 		Vector3 GetWorldVelocity();
 	}

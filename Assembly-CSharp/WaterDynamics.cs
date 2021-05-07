@@ -44,11 +44,7 @@ public class WaterDynamics : MonoBehaviour
 
 		public byte[] pixels;
 
-		public Texture2D texture
-		{
-			get;
-			private set;
-		}
+		public Texture2D texture { get; private set; }
 
 		public Image(Texture2D tex)
 		{
@@ -174,10 +170,10 @@ public class WaterDynamics : MonoBehaviour
 
 		public Vector3 WorldToRaster(Vector3 pos)
 		{
-			Vector2 v = default(Vector2);
-			v.x = (pos.x - areaOffset.x) * areaToMapXY.x;
-			v.y = (pos.z - areaOffset.y) * areaToMapXY.y;
-			return v;
+			Vector2 vector = default(Vector2);
+			vector.x = (pos.x - areaOffset.x) * areaToMapXY.x;
+			vector.y = (pos.z - areaOffset.y) * areaToMapXY.y;
+			return vector;
 		}
 	}
 
@@ -345,11 +341,7 @@ public class WaterDynamics : MonoBehaviour
 
 	private static HashSet<WaterInteraction> interactions = new HashSet<WaterInteraction>();
 
-	public bool IsInitialized
-	{
-		get;
-		private set;
-	}
+	public bool IsInitialized { get; private set; }
 
 	private void RasterBindImage(Image image)
 	{
@@ -367,28 +359,28 @@ public class WaterDynamics : MonoBehaviour
 
 	private void RasterInteraction(Vector2 pos, Vector2 scale, float rotation, float disp, float dist)
 	{
-		Vector2 a = targetDesc.WorldToRaster(pos);
+		Vector2 vector = targetDesc.WorldToRaster(pos);
 		float f = (0f - rotation) * ((float)Math.PI / 180f);
 		float s = Mathf.Sin(f);
 		float c = Mathf.Cos(f);
 		float num = Mathf.Min((float)imageDesc.width * scale.x, 1024f) * 0.5f;
 		float num2 = Mathf.Min((float)imageDesc.height * scale.y, 1024f) * 0.5f;
-		Vector2 vector = a + Rotate2D(new Vector2(0f - num, 0f - num2), s, c);
-		Vector2 vector2 = a + Rotate2D(new Vector2(num, 0f - num2), s, c);
-		Vector2 vector3 = a + Rotate2D(new Vector2(num, num2), s, c);
-		Vector2 vector4 = a + Rotate2D(new Vector2(0f - num, num2), s, c);
-		Point2D p = new Point2D(vector.x * 256f, vector.y * 256f);
-		Point2D p2 = new Point2D(vector2.x * 256f, vector2.y * 256f);
-		Point2D point2D = new Point2D(vector3.x * 256f, vector3.y * 256f);
-		Point2D p3 = new Point2D(vector4.x * 256f, vector4.y * 256f);
+		Vector2 vector2 = vector + Rotate2D(new Vector2(0f - num, 0f - num2), s, c);
+		Vector2 vector3 = vector + Rotate2D(new Vector2(num, 0f - num2), s, c);
+		Vector2 vector4 = vector + Rotate2D(new Vector2(num, num2), s, c);
+		Vector2 vector5 = vector + Rotate2D(new Vector2(0f - num, num2), s, c);
+		Point2D p = new Point2D(vector2.x * 256f, vector2.y * 256f);
+		Point2D p2 = new Point2D(vector3.x * 256f, vector3.y * 256f);
+		Point2D point2D = new Point2D(vector4.x * 256f, vector4.y * 256f);
+		Point2D p3 = new Point2D(vector5.x * 256f, vector5.y * 256f);
 		Vector2 uv = new Vector2(-0.5f, -0.5f);
 		Vector2 uv2 = new Vector2((float)imageDesc.width - 0.5f, -0.5f);
-		Vector2 vector5 = new Vector2((float)imageDesc.width - 0.5f, (float)imageDesc.height - 0.5f);
+		Vector2 vector6 = new Vector2((float)imageDesc.width - 0.5f, (float)imageDesc.height - 0.5f);
 		Vector2 uv3 = new Vector2(-0.5f, (float)imageDesc.height - 0.5f);
 		byte disp2 = (byte)(disp * 255f);
 		byte dist2 = (byte)(dist * 255f);
-		RasterizeTriangle(p, p2, point2D, uv, uv2, vector5, disp2, dist2);
-		RasterizeTriangle(p, point2D, p3, uv, vector5, uv3, disp2, dist2);
+		RasterizeTriangle(p, p2, point2D, uv, uv2, vector6, disp2, dist2);
+		RasterizeTriangle(p, point2D, p3, uv, vector6, uv3, disp2, dist2);
 	}
 
 	private float Frac(float x)

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 [AddComponentMenu("Image Effects/Natural Bloom and Dirty Lens")]
+[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
 public class NaturalBloomAndDirtyLens : MonoBehaviour
 {
@@ -28,15 +28,7 @@ public class NaturalBloomAndDirtyLens : MonoBehaviour
 	[Range(1f, 10f)]
 	public int mips = 6;
 
-	public float[] mipWeights = new float[6]
-	{
-		0.5f,
-		0.6f,
-		0.6f,
-		0.45f,
-		0.35f,
-		0.23f
-	};
+	public float[] mipWeights = new float[6] { 0.5f, 0.6f, 0.6f, 0.45f, 0.35f, 0.23f };
 
 	public bool highPrecision;
 

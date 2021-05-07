@@ -114,7 +114,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 			CancelInvoke(UpdatePhysicsMaterial);
 		}
 		SetFlag(Flags.Reserved2, terrainHandler.IsOnSnowOrIce);
-		SetFlag(Flags.Reserved4, terrainHandler.OnSurface == VehicleTerrainHandler.Surface.Sand);
+		SetFlag(Flags.Reserved4, terrainHandler.IsOnSand);
 	}
 
 	private void UpdateGroundedFlag()
@@ -132,7 +132,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		{
 			return BrakeMaterial;
 		}
-		bool flag = terrainHandler.IsOnSnowOrIce || terrainHandler.OnSurface == VehicleTerrainHandler.Surface.Sand;
+		bool flag = terrainHandler.IsOnSnowOrIce || terrainHandler.IsOnSand;
 		if (flag)
 		{
 			leftIce = 0f;
@@ -174,8 +174,8 @@ public class Sled : BaseVehicle, INotifyTrigger
 	private void ApplyInitialForce()
 	{
 		Vector3 forward = base.transform.forward;
-		Vector3 a = ((Vector3.Dot(forward, -Vector3.up) > Vector3.Dot(-forward, -Vector3.up)) ? forward : (-forward));
-		rigidBody.AddForce(a * initialForceScale * (terrainHandler.IsOnSnowOrIce ? 1f : 0.25f), ForceMode.Acceleration);
+		Vector3 vector = ((Vector3.Dot(forward, -Vector3.up) > Vector3.Dot(-forward, -Vector3.up)) ? forward : (-forward));
+		rigidBody.AddForce(vector * initialForceScale * (terrainHandler.IsOnSnowOrIce ? 1f : 0.25f), ForceMode.Acceleration);
 		initialForceScale += InitialForceIncreaseRate;
 		if (initialForceScale >= InitialForceCutoff && (rigidBody.velocity.magnitude > 1f || !terrainHandler.IsOnSnowOrIce))
 		{

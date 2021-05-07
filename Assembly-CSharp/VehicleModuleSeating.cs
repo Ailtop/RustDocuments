@@ -69,24 +69,24 @@ public class VehicleModuleSeating : BaseVehicleModule
 	[SerializeField]
 	private Vector3 steerAngle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 accelAngle;
 
 	[HideInInspector]
 	[SerializeField]
 	private Vector3 brakeAngle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 speedometerAngle;
 
 	[HideInInspector]
 	[SerializeField]
 	private Vector3 fuelAngle;
 
-	[Header("Horn")]
 	[SerializeField]
+	[Header("Horn")]
 	private SoundDefinition hornLoop;
 
 	[SerializeField]
@@ -116,11 +116,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 
 	public override bool HasSeating => seating.mountPoints.Length != 0;
 
-	protected ModularCar Car
-	{
-		get;
-		private set;
-	}
+	protected ModularCar Car { get; private set; }
 
 	protected bool IsOnACar => Car != null;
 
@@ -346,8 +342,8 @@ public class VehicleModuleSeating : BaseVehicleModule
 		return false;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_DestroyLock(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

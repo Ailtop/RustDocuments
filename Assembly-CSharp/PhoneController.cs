@@ -64,11 +64,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public EntityRef currentPlayerRef;
 
-	public Telephone.CallState serverState
-	{
-		get;
-		set;
-	}
+	public Telephone.CallState serverState { get; set; }
 
 	public BasePlayer currentPlayer
 	{
@@ -88,17 +84,9 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	private bool isServer => base.baseEntity.isServer;
 
-	public int lastDialedNumber
-	{
-		get;
-		set;
-	}
+	public int lastDialedNumber { get; set; }
 
-	public PhoneDirectory savedNumbers
-	{
-		get;
-		set;
-	}
+	public PhoneDirectory savedNumbers { get; set; }
 
 	public BaseEntity ParentEntity => base.baseEntity;
 
@@ -474,13 +462,13 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public static string PositionToGridCoord(Vector3 position)
 	{
-		Vector2 a = new Vector2(TerrainMeta.NormalizeX(position.x), TerrainMeta.NormalizeZ(position.z));
+		Vector2 vector = new Vector2(TerrainMeta.NormalizeX(position.x), TerrainMeta.NormalizeZ(position.z));
 		float num = TerrainMeta.Size.x / 1024f;
 		int num2 = 7;
-		Vector2 vector = a * num * num2;
-		float num3 = Mathf.Floor(vector.x) + 1f;
-		float num4 = Mathf.Floor(num * (float)num2 - vector.y);
-		string str = string.Empty;
+		Vector2 vector2 = vector * num * num2;
+		float num3 = Mathf.Floor(vector2.x) + 1f;
+		float num4 = Mathf.Floor(num * (float)num2 - vector2.y);
+		string text = string.Empty;
 		float num5 = num3 / 26f;
 		float num6 = num3 % 26f;
 		if (num6 == 0f)
@@ -489,10 +477,10 @@ public class PhoneController : EntityComponent<BaseEntity>
 		}
 		if (num5 > 1f)
 		{
-			str += Convert.ToChar(64 + (int)num5);
+			text += Convert.ToChar(64 + (int)num5);
 		}
-		str += Convert.ToChar(64 + (int)num6);
-		return $"{str}{num4}";
+		text += Convert.ToChar(64 + (int)num6);
+		return $"{text}{num4}";
 	}
 
 	private bool IsPowered()

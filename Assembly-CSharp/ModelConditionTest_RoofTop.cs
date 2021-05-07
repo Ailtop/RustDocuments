@@ -14,17 +14,9 @@ public class ModelConditionTest_RoofTop : ModelConditionTest
 
 	private const string socket_top_left = "sockets/neighbour/6";
 
-	private static string[] sockets_top_right = new string[2]
-	{
-		"roof/sockets/neighbour/5",
-		"roof.triangle/sockets/neighbour/5"
-	};
+	private static string[] sockets_top_right = new string[2] { "roof/sockets/neighbour/5", "roof.triangle/sockets/neighbour/5" };
 
-	private static string[] sockets_top_left = new string[2]
-	{
-		"roof/sockets/neighbour/6",
-		"roof.triangle/sockets/neighbour/6"
-	};
+	private static string[] sockets_top_left = new string[2] { "roof/sockets/neighbour/6", "roof.triangle/sockets/neighbour/6" };
 
 	protected void OnDrawGizmosSelected()
 	{

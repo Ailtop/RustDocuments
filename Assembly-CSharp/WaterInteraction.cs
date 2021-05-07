@@ -27,31 +27,15 @@ public class WaterInteraction : MonoBehaviour
 		}
 	}
 
-	public WaterDynamics.Image Image
-	{
-		get;
-		private set;
-	}
+	public WaterDynamics.Image Image { get; private set; }
 
-	public Vector2 Position
-	{
-		get;
-		private set;
-	} = Vector2.zero;
+	public Vector2 Position { get; private set; } = Vector2.zero;
 
 
-	public Vector2 Scale
-	{
-		get;
-		private set;
-	} = Vector2.one;
+	public Vector2 Scale { get; private set; } = Vector2.one;
 
 
-	public float Rotation
-	{
-		get;
-		private set;
-	}
+	public float Rotation { get; private set; }
 
 	protected void OnEnable()
 	{

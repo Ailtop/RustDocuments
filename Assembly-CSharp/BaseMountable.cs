@@ -18,12 +18,6 @@ public class BaseMountable : BaseCombatEntity
 		Driving
 	}
 
-	public enum MountGestureType
-	{
-		None,
-		UpperBody
-	}
-
 	public BasePlayer _mounted;
 
 	[Header("View")]
@@ -63,8 +57,6 @@ public class BaseMountable : BaseCombatEntity
 
 	public MountStatType mountTimeStatType;
 
-	public MountGestureType allowedGestures;
-
 	[Header("Camera")]
 	public BasePlayer.CameraMode MountedCameraMode;
 
@@ -76,13 +68,7 @@ public class BaseMountable : BaseCombatEntity
 
 	public const float playerRadius = 0.5f;
 
-	public override float PositionTickRate
-	{
-		protected get
-		{
-			return 0.05f;
-		}
-	}
+	protected override float PositionTickRate => 0.05f;
 
 	public virtual bool IsSummerDlcVehicle => false;
 
@@ -224,10 +210,10 @@ public class BaseMountable : BaseCombatEntity
 
 	public override float MaxVelocity()
 	{
-		BaseEntity parentEntity = GetParentEntity();
-		if ((bool)parentEntity)
+		BaseEntity baseEntity = GetParentEntity();
+		if ((bool)baseEntity)
 		{
-			return parentEntity.MaxVelocity();
+			return baseEntity.MaxVelocity();
 		}
 		return base.MaxVelocity();
 	}
@@ -445,8 +431,8 @@ public class BaseMountable : BaseCombatEntity
 			player.ForceUpdateTriggers();
 			if ((bool)player.GetParentEntity())
 			{
-				BaseEntity parentEntity = player.GetParentEntity();
-				player.ClientRPCPlayer(null, player, "ForcePositionToParentOffset", parentEntity.transform.InverseTransformPoint(res), parentEntity.net.ID);
+				BaseEntity baseEntity = player.GetParentEntity();
+				player.ClientRPCPlayer(null, player, "ForcePositionToParentOffset", baseEntity.transform.InverseTransformPoint(res), baseEntity.net.ID);
 			}
 			else
 			{
@@ -463,11 +449,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
 			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C59_0(hitInfo)))
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C57_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C59_0(hitInfo))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C57_0(hitInfo))
 				{
 					return true;
 				}
@@ -585,8 +571,8 @@ public class BaseMountable : BaseCombatEntity
 				{
 					return true;
 				}
-				BaseEntity parentEntity = entity.GetParentEntity();
-				if (hitInfo.IsOnLayer(Rust.Layer.Vehicle_Detailed) && (parentEntity == this || EqualNetID(parentEntity)))
+				BaseEntity baseEntity = entity.GetParentEntity();
+				if (hitInfo.IsOnLayer(Rust.Layer.Vehicle_Detailed) && (baseEntity == this || EqualNetID(baseEntity)))
 				{
 					return true;
 				}

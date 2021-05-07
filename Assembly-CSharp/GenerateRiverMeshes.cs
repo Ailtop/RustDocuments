@@ -16,27 +16,24 @@ public class GenerateRiverMeshes : ProceduralComponent
 
 	public override void Process(uint seed)
 	{
-		RiverMeshes = new Mesh[1]
-		{
-			RiverMesh
-		};
+		RiverMeshes = new Mesh[1] { RiverMesh };
 		foreach (PathList river in TerrainMeta.Path.Rivers)
 		{
 			foreach (PathList.MeshObject item in river.CreateMesh(RiverMeshes, 0.1f))
 			{
-				GameObject gameObject = new GameObject("River Mesh");
-				gameObject.transform.position = item.Position;
-				gameObject.tag = "River";
-				gameObject.layer = 4;
-				gameObject.SetHierarchyGroup(river.Name);
-				gameObject.SetActive(false);
-				MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+				GameObject obj = new GameObject("River Mesh");
+				obj.transform.position = item.Position;
+				obj.tag = "River";
+				obj.layer = 4;
+				obj.SetHierarchyGroup(river.Name);
+				obj.SetActive(false);
+				MeshCollider meshCollider = obj.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RiverPhysicMaterial;
 				meshCollider.sharedMesh = item.Meshes[0];
-				gameObject.AddComponent<RiverInfo>();
-				gameObject.AddComponent<WaterBody>();
-				gameObject.AddComponent<AddToWaterMap>();
-				gameObject.SetActive(true);
+				obj.AddComponent<RiverInfo>();
+				obj.AddComponent<WaterBody>();
+				obj.AddComponent<AddToWaterMap>();
+				obj.SetActive(true);
 			}
 		}
 	}

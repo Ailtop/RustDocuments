@@ -152,8 +152,8 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
@@ -402,8 +402,8 @@ public class BaseRidableAnimal : BaseVehicle
 		return true;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -538,8 +538,8 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -818,7 +818,7 @@ public class BaseRidableAnimal : BaseVehicle
 			float num = consumable.GetIfType(MetabolismAttribute.Type.Health) + consumable.GetIfType(MetabolismAttribute.Type.HealthOverTime);
 			ApplyDungCalories(ifType);
 			ReplenishStaminaCore(ifType, ifType2);
-			Heal(num * 4f);
+			Heal(num * 2f);
 		}
 	}
 
@@ -1165,9 +1165,9 @@ public class BaseRidableAnimal : BaseVehicle
 			float num6 = 0f;
 			Vector3 pos = Vector3.zero;
 			Vector3 normal = Vector3.up;
-			Vector3 a = vector2;
-			Vector3 origin = a + Vector3.up * (maxStepHeight + obstacleDetectionRadius);
-			Vector3 a2 = a + vector * num5;
+			Vector3 vector3 = vector2;
+			Vector3 origin = vector3 + Vector3.up * (maxStepHeight + obstacleDetectionRadius);
+			Vector3 vector4 = vector3 + vector * num5;
 			float num7 = maxStepDownHeight + obstacleDetectionRadius;
 			RaycastHit hitInfo;
 			if (UnityEngine.Physics.SphereCast(origin, obstacleDetectionRadius, vector, out hitInfo, num5, 1486954753))
@@ -1179,11 +1179,11 @@ public class BaseRidableAnimal : BaseVehicle
 			}
 			if (!flag)
 			{
-				if (!TransformUtil.GetGroundInfo(a2 + Vector3.up * 2f, out pos, out normal, 2f + num7, 278986753))
+				if (!TransformUtil.GetGroundInfo(vector4 + Vector3.up * 2f, out pos, out normal, 2f + num7, 278986753))
 				{
 					return num4;
 				}
-				num6 = Vector3.Distance(a, pos);
+				num6 = Vector3.Distance(vector3, pos);
 				if (WaterLevel.Test(pos + Vector3.one * maxWaterDepth, true, this))
 				{
 					normal = -base.transform.forward;
@@ -1197,27 +1197,27 @@ public class BaseRidableAnimal : BaseVehicle
 				float num9 = Vector3.Angle(normal, Vector3.up);
 				if (num8 > maxWallClimbSlope || num9 > maxWallClimbSlope)
 				{
-					Vector3 vector3 = normal;
+					Vector3 vector5 = normal;
 					float num10 = pos.y;
 					int num11 = 1;
 					for (int j = 0; j < normalOffsets.Length; j++)
 					{
-						Vector3 a3 = a2 + normalOffsets[j].x * base.transform.right;
+						Vector3 vector6 = vector4 + normalOffsets[j].x * base.transform.right;
 						float num12 = maxStepHeight * 2.5f;
 						Vector3 pos2;
 						Vector3 normal2;
-						if (TransformUtil.GetGroundInfo(a3 + Vector3.up * num12 + normalOffsets[j].z * base.transform.forward, out pos2, out normal2, num7 + num12, 278986753))
+						if (TransformUtil.GetGroundInfo(vector6 + Vector3.up * num12 + normalOffsets[j].z * base.transform.forward, out pos2, out normal2, num7 + num12, 278986753))
 						{
 							num11++;
-							vector3 += normal2;
+							vector5 += normal2;
 							num10 += pos2.y;
 						}
 					}
 					num10 /= (float)num11;
-					vector3.Normalize();
-					float num13 = Vector3.Angle(up, vector3);
-					num9 = Vector3.Angle(vector3, Vector3.up);
-					if (num13 > maxWallClimbSlope || num9 > maxWallClimbSlope || Mathf.Abs(num10 - a2.y) > maxStepHeight)
+					vector5.Normalize();
+					float num13 = Vector3.Angle(up, vector5);
+					num9 = Vector3.Angle(vector5, Vector3.up);
+					if (num13 > maxWallClimbSlope || num9 > maxWallClimbSlope || Mathf.Abs(num10 - vector4.y) > maxStepHeight)
 					{
 						return num4;
 					}
@@ -1342,23 +1342,23 @@ public class BaseRidableAnimal : BaseVehicle
 				base.transform.rotation = rotation;
 			}
 		}
-		Vector3 a = base.transform.TransformDirection(direction);
-		Vector3 normalized = a.normalized;
+		Vector3 vector = base.transform.TransformDirection(direction);
+		Vector3 normalized = vector.normalized;
 		float num12 = currentSpeed * delta;
-		Vector3 a2 = base.transform.position + normalized * num12 * Mathf.Sign(currentSpeed);
-		currentVelocity = a * currentSpeed;
+		Vector3 vector2 = base.transform.position + normalized * num12 * Mathf.Sign(currentSpeed);
+		currentVelocity = vector * currentSpeed;
 		UpdateGroundNormal();
 		if (!(currentSpeed > 0f) && !(timeAlive < 2f) && !((float)dropUntilTime > 0f))
 		{
 			return;
 		}
-		Vector3 vector = base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up;
+		Vector3 vector3 = base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up;
 		RaycastHit hitInfo;
 		bool flag2 = UnityEngine.Physics.SphereCast(animalFront.transform.position, obstacleDetectionRadius, normalized, out hitInfo, num12, 1503731969);
 		bool flag3 = UnityEngine.Physics.SphereCast(base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up, obstacleDetectionRadius, normalized, out hitInfo, num12, 1503731969);
 		if (!Vis.AnyColliders(animalFront.transform.position + normalized * num12, obstacleDetectionRadius, 1503731969) && !flag2 && !flag3)
 		{
-			if (DropToGround(a2 + Vector3.up * maxStepHeight))
+			if (DropToGround(vector2 + Vector3.up * maxStepHeight))
 			{
 				MarkDistanceTravelled(num12);
 			}

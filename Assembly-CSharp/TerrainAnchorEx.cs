@@ -18,24 +18,24 @@ public static class TerrainAnchorEx
 		float num3 = float.MaxValue;
 		foreach (TerrainAnchor terrainAnchor in anchors)
 		{
-			Vector3 point = Vector3.Scale(terrainAnchor.worldPosition, scale);
-			point = rot * point;
-			Vector3 vector = pos + point;
-			if (TerrainMeta.OutOfBounds(vector))
+			Vector3 vector = Vector3.Scale(terrainAnchor.worldPosition, scale);
+			vector = rot * vector;
+			Vector3 vector2 = pos + vector;
+			if (TerrainMeta.OutOfBounds(vector2))
 			{
 				return false;
 			}
-			if (filter != null && filter.GetFactor(vector) == 0f)
+			if (filter != null && filter.GetFactor(vector2) == 0f)
 			{
 				return false;
 			}
 			float height;
 			float min;
 			float max;
-			terrainAnchor.Apply(out height, out min, out max, vector, scale);
-			num += height - point.y;
-			num2 = Mathf.Max(num2, min - point.y);
-			num3 = Mathf.Min(num3, max - point.y);
+			terrainAnchor.Apply(out height, out min, out max, vector2, scale);
+			num += height - vector.y;
+			num2 = Mathf.Max(num2, min - vector.y);
+			num3 = Mathf.Min(num3, max - vector.y);
 			if (num3 < num2)
 			{
 				return false;

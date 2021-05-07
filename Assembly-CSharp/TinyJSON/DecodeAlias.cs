@@ -5,11 +5,7 @@ namespace TinyJSON
 	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
 	public class DecodeAlias : Attribute
 	{
-		public string[] Names
-		{
-			get;
-			private set;
-		}
+		public string[] Names { get; private set; }
 
 		public DecodeAlias(params string[] names)
 		{

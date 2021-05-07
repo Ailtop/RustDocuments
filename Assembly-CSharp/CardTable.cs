@@ -36,8 +36,8 @@ public class CardTable : BaseVehicle
 
 	public EntityRef PotInstance;
 
-	[Header("Card Table")]
 	[SerializeField]
+	[Header("Card Table")]
 	private GameObjectRef uiPrefab;
 
 	[SerializeField]
@@ -524,8 +524,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_Play(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

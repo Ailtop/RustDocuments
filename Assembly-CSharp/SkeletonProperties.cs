@@ -62,9 +62,9 @@ public class SkeletonProperties : ScriptableObject
 				quickLookup.Add(num, boneProperty);
 				continue;
 			}
-			string name = boneProperty.bone.name;
-			string name2 = quickLookup[num].bone.name;
-			Debug.LogWarning("Duplicate bone id " + num + " for " + name + " and " + name2);
+			string text = boneProperty.bone.name;
+			string text2 = quickLookup[num].bone.name;
+			Debug.LogWarning("Duplicate bone id " + num + " for " + text + " and " + text2);
 		}
 	}
 

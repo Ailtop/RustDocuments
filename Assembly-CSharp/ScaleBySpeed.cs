@@ -30,7 +30,7 @@ public class ScaleBySpeed : MonoBehaviour
 		Vector3 position = base.transform.position;
 		float sqrMagnitude = (position - prevPosition).sqrMagnitude;
 		float num = minScale;
-		bool enabled = WaterSystem.GetHeight(position) > position.y - submergedThickness;
+		bool flag = WaterSystem.GetHeight(position) > position.y - submergedThickness;
 		if (sqrMagnitude > 0.0001f)
 		{
 			sqrMagnitude = Mathf.Sqrt(sqrMagnitude);
@@ -38,7 +38,7 @@ public class ScaleBySpeed : MonoBehaviour
 			num = Mathf.Lerp(minScale, maxScale, Mathf.Clamp01(value));
 			if (component != null && toggleComponent)
 			{
-				component.enabled = enabled;
+				component.enabled = flag;
 			}
 		}
 		else if (component != null && toggleComponent)

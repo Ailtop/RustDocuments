@@ -32,7 +32,7 @@ public class HairSet : ScriptableObject
 		{
 			if (!(item.sharedMesh == null) && !(item.sharedMaterial == null))
 			{
-				string name = item.sharedMesh.name;
+				string materialName = item.sharedMesh.name;
 				string name2 = item.sharedMaterial.name;
 				if (!item.gameObject.activeSelf)
 				{
@@ -40,7 +40,7 @@ public class HairSet : ScriptableObject
 				}
 				for (int i = 0; i < MeshReplacements.Length; i++)
 				{
-					MeshReplacements[i].Test(name);
+					MeshReplacements[i].Test(materialName);
 				}
 				if (dye != null && item.gameObject.activeSelf)
 				{

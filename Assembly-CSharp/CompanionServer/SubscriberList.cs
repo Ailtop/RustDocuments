@@ -29,10 +29,7 @@ namespace CompanionServer
 					value2.Add(value);
 					return;
 				}
-				value2 = new HashSet<TTarget>
-				{
-					value
-				};
+				value2 = new HashSet<TTarget> { value };
 				_subscriptions.Add(key, value2);
 			}
 		}

@@ -25,6 +25,8 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 
 	private float treeDistanceUponFalling;
 
+	public static ListHashSet<TreeEntity> activeTreeList = new ListHashSet<TreeEntity>();
+
 	public GameObjectRef prefab;
 
 	public bool hasBonusGame = true;
@@ -36,6 +38,8 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 	public Collider serverCollider;
 
 	public Collider clientCollider;
+
+	public TreeMarkerData MarkerData;
 
 	public SoundDefinition smallCrackSoundDef;
 
@@ -76,12 +80,13 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 	{
 		base.ServerInit();
 		lastDirection = ((UnityEngine.Random.Range(0, 2) != 0) ? 1 : (-1));
-		TreeManager.OnTreeSpawned(this);
+		activeTreeList.Add(this);
 	}
 
 	internal override void DoServerDestroy()
 	{
 		base.DoServerDestroy();
+		activeTreeList.Remove(this);
 		CleanupMarker();
 		TreeManager.OnTreeDestroyed(this);
 	}
@@ -92,7 +97,7 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		{
 			return false;
 		}
-		if (PrefabAttribute.server.Find<TreeMarkerData>(prefabID) != null)
+		if (MarkerData != null)
 		{
 			if (new Bounds(xMarker.transform.position, Vector3.one * 0.2f).Contains(info.HitPositionWorld))
 			{
@@ -102,6 +107,10 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		else
 		{
 			Vector3 lhs = Vector3Ex.Direction2D(base.transform.position, xMarker.transform.position);
+			if (MarkerData != null)
+			{
+				lhs = xMarker.transform.forward;
+			}
 			Vector3 attackNormal = info.attackNormal;
 			float num = Vector3.Dot(lhs, attackNormal);
 			float num2 = Vector3.Distance(xMarker.transform.position, info.HitPositionWorld);
@@ -152,11 +161,10 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		}
 		Vector3 vector = ((xMarker != null) ? xMarker.transform.position : info.HitPositionWorld);
 		CleanupMarker();
-		TreeMarkerData treeMarkerData = PrefabAttribute.server.Find<TreeMarkerData>(prefabID);
-		if (treeMarkerData != null)
+		if (MarkerData != null)
 		{
 			Vector3 normal;
-			Vector3 nearbyPoint = treeMarkerData.GetNearbyPoint(base.transform.InverseTransformPoint(vector), ref lastHitMarkerIndex, out normal);
+			Vector3 nearbyPoint = MarkerData.GetNearbyPoint(base.transform.InverseTransformPoint(vector), ref lastHitMarkerIndex, out normal);
 			nearbyPoint = base.transform.TransformPoint(nearbyPoint);
 			Quaternion rot = QuaternionEx.LookRotationNormal(base.transform.TransformDirection(normal));
 			xMarker = GameManager.server.CreateEntity("assets/content/nature/treesprefabs/trees/effects/tree_marking_nospherecast.prefab", nearbyPoint, rot);
@@ -164,26 +172,26 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		else
 		{
 			Vector3 vector2 = Vector3Ex.Direction2D(base.transform.position, vector);
-			Vector3 a = Vector3.Cross(vector2, Vector3.up);
-			float d = lastDirection;
-			Vector3 vector3 = Vector3.Lerp(t: UnityEngine.Random.Range(0.5f, 0.5f), a: -vector2, b: a * d);
-			Vector3 vector4 = base.transform.InverseTransformDirection(vector3.normalized) * 2.5f;
-			vector4 = base.transform.InverseTransformPoint(GetCollider().ClosestPoint(base.transform.TransformPoint(vector4)));
-			Vector3 aimFrom = base.transform.TransformPoint(vector4);
-			vector4.y = base.transform.InverseTransformPoint(info.HitPositionWorld).y;
-			Vector3 vector5 = base.transform.InverseTransformPoint(info.Initiator.CenterPoint());
-			float min = Mathf.Max(0.75f, vector5.y);
-			float max = vector5.y + 0.5f;
-			vector4.y = Mathf.Clamp(vector4.y + UnityEngine.Random.Range(0.1f, 0.2f) * ((UnityEngine.Random.Range(0, 2) == 0) ? (-1f) : 1f), min, max);
-			Vector3 vector6 = Vector3Ex.Direction2D(base.transform.position, aimFrom);
-			Vector3 a2 = vector6;
-			vector6 = base.transform.InverseTransformDirection(vector6);
-			Quaternion quaternion = QuaternionEx.LookRotationNormal(-vector6, Vector3.zero);
-			vector4 = base.transform.TransformPoint(vector4);
-			quaternion = QuaternionEx.LookRotationNormal(-a2, Vector3.zero);
-			vector4 = GetCollider().ClosestPoint(vector4);
-			quaternion = QuaternionEx.LookRotationNormal(-Vector3Ex.Direction(new Line(GetCollider().transform.TransformPoint(new Vector3(0f, 10f, 0f)), GetCollider().transform.TransformPoint(new Vector3(0f, -10f, 0f))).ClosestPoint(vector4), vector4));
-			xMarker = GameManager.server.CreateEntity("assets/content/nature/treesprefabs/trees/effects/tree_marking.prefab", vector4, quaternion);
+			Vector3 vector3 = Vector3.Cross(vector2, Vector3.up);
+			float num2 = lastDirection;
+			Vector3 vector4 = Vector3.Lerp(t: UnityEngine.Random.Range(0.5f, 0.5f), a: -vector2, b: vector3 * num2);
+			Vector3 vector5 = base.transform.InverseTransformDirection(vector4.normalized) * 2.5f;
+			vector5 = base.transform.InverseTransformPoint(GetCollider().ClosestPoint(base.transform.TransformPoint(vector5)));
+			Vector3 aimFrom = base.transform.TransformPoint(vector5);
+			vector5.y = base.transform.InverseTransformPoint(info.HitPositionWorld).y;
+			Vector3 vector6 = base.transform.InverseTransformPoint(info.Initiator.CenterPoint());
+			float min = Mathf.Max(0.75f, vector6.y);
+			float max = vector6.y + 0.5f;
+			vector5.y = Mathf.Clamp(vector5.y + UnityEngine.Random.Range(0.1f, 0.2f) * ((UnityEngine.Random.Range(0, 2) == 0) ? (-1f) : 1f), min, max);
+			Vector3 vector7 = Vector3Ex.Direction2D(base.transform.position, aimFrom);
+			Vector3 vector8 = vector7;
+			vector7 = base.transform.InverseTransformDirection(vector7);
+			Quaternion quaternion = QuaternionEx.LookRotationNormal(-vector7, Vector3.zero);
+			vector5 = base.transform.TransformPoint(vector5);
+			quaternion = QuaternionEx.LookRotationNormal(-vector8, Vector3.zero);
+			vector5 = GetCollider().ClosestPoint(vector5);
+			quaternion = QuaternionEx.LookRotationNormal(-Vector3Ex.Direction(new Line(GetCollider().transform.TransformPoint(new Vector3(0f, 10f, 0f)), GetCollider().transform.TransformPoint(new Vector3(0f, -10f, 0f))).ClosestPoint(vector5), vector5));
+			xMarker = GameManager.server.CreateEntity("assets/content/nature/treesprefabs/trees/effects/tree_marking.prefab", vector5, quaternion);
 		}
 		xMarker.Spawn();
 		if (num > 5f)
@@ -194,12 +202,12 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		if (health > 0f)
 		{
 			lastAttackDamage = info.damageTypes.Total();
-			int num2 = Mathf.CeilToInt(health / lastAttackDamage);
-			if (num2 < 2)
+			int num3 = Mathf.CeilToInt(health / lastAttackDamage);
+			if (num3 < 2)
 			{
 				ClientRPC(null, "CrackSound", 1);
 			}
-			else if (num2 < 5)
+			else if (num3 < 5)
 			{
 				ClientRPC(null, "CrackSound", 0);
 			}

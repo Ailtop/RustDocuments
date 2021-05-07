@@ -6,8 +6,8 @@ public static class TerrainModifierEx
 	{
 		foreach (TerrainModifier obj in modifiers)
 		{
-			Vector3 point = Vector3.Scale(obj.worldPosition, scale);
-			Vector3 pos2 = pos + rot * point;
+			Vector3 vector = Vector3.Scale(obj.worldPosition, scale);
+			Vector3 pos2 = pos + rot * vector;
 			float y = scale.y;
 			obj.Apply(pos2, y);
 		}

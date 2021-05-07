@@ -93,11 +93,7 @@ public class InstrumentKeyController : MonoBehaviour
 
 	private const string ALL_NOTES_STATNAME = "played_notes";
 
-	public bool PlayedNoteThisFrame
-	{
-		get;
-		private set;
-	}
+	public bool PlayedNoteThisFrame { get; private set; }
 
 	public void ProcessServerPlayedNote(BasePlayer forPlayer)
 	{

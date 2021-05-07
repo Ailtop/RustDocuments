@@ -301,8 +301,8 @@ public class FlameTurret : StorageContainer
 		if (Time.realtimeSinceStartup >= nextFireballTime)
 		{
 			nextFireballTime = Time.realtimeSinceStartup + UnityEngine.Random.Range(1f, 2f);
-			Vector3 a = ((UnityEngine.Random.Range(0, 10) <= 7 && flag) ? hitInfo.point : (ray.origin + ray.direction * (flag ? hitInfo.distance : flameRange) * UnityEngine.Random.Range(0.4f, 1f)));
-			BaseEntity baseEntity = GameManager.server.CreateEntity(fireballPrefab.resourcePath, a - ray.direction * 0.25f);
+			Vector3 vector = ((UnityEngine.Random.Range(0, 10) <= 7 && flag) ? hitInfo.point : (ray.origin + ray.direction * (flag ? hitInfo.distance : flameRange) * UnityEngine.Random.Range(0.4f, 1f)));
+			BaseEntity baseEntity = GameManager.server.CreateEntity(fireballPrefab.resourcePath, vector - ray.direction * 0.25f);
 			if ((bool)baseEntity)
 			{
 				baseEntity.creatorEntity = this;

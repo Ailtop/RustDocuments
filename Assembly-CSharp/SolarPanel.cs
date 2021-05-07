@@ -36,27 +36,27 @@ public class SolarPanel : IOEntity
 
 	public void SunUpdate()
 	{
-		int currentEnergy = base.currentEnergy;
+		int num = currentEnergy;
 		if (TOD_Sky.Instance.IsNight)
 		{
-			currentEnergy = 0;
+			num = 0;
 		}
 		else
 		{
 			Vector3 normalized = (TOD_Sky.Instance.Components.Sun.transform.position - sunSampler.transform.position).normalized;
 			float value = Vector3.Dot(sunSampler.transform.forward, normalized);
-			float num = Mathf.InverseLerp(dot_minimum, dot_maximum, value);
-			if (num > 0f && !IsVisible(sunSampler.transform.position + normalized * 100f, 101f))
+			float num2 = Mathf.InverseLerp(dot_minimum, dot_maximum, value);
+			if (num2 > 0f && !IsVisible(sunSampler.transform.position + normalized * 100f, 101f))
 			{
-				num = 0f;
+				num2 = 0f;
 			}
-			currentEnergy = Mathf.FloorToInt((float)maximalPowerOutput * num * base.healthFraction);
+			num = Mathf.FloorToInt((float)maximalPowerOutput * num2 * base.healthFraction);
 		}
-		if (Interface.CallHook("OnSolarPanelSunUpdate", this, currentEnergy) == null)
+		if (Interface.CallHook("OnSolarPanelSunUpdate", this, num) == null)
 		{
-			bool num2 = base.currentEnergy != currentEnergy;
-			base.currentEnergy = currentEnergy;
-			if (num2)
+			bool num3 = currentEnergy != num;
+			currentEnergy = num;
+			if (num3)
 			{
 				MarkDirty();
 			}

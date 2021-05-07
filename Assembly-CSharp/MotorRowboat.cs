@@ -249,14 +249,14 @@ public class MotorRowboat : BaseBoat
 		}
 		else
 		{
-			Vector3 a = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
-			Vector3 b = Vector3Ex.Direction2D(player.transform.position + player.eyes.BodyForward() * 3f, player.transform.position);
-			b = (Vector3.up * 0.1f + b).normalized;
-			Vector3 position = base.transform.position + a * 2f;
+			Vector3 vector = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
+			Vector3 vector2 = Vector3Ex.Direction2D(player.transform.position + player.eyes.BodyForward() * 3f, player.transform.position);
+			vector2 = (Vector3.up * 0.1f + vector2).normalized;
+			Vector3 position = base.transform.position + vector * 2f;
 			float num = 3f;
-			float value = Vector3.Dot(base.transform.forward, b);
+			float value = Vector3.Dot(base.transform.forward, vector2);
 			num += Mathf.InverseLerp(0.8f, 1f, value) * 3f;
-			rigidBody.AddForceAtPosition(b * num, position, ForceMode.VelocityChange);
+			rigidBody.AddForceAtPosition(vector2 * num, position, ForceMode.VelocityChange);
 		}
 		if (HasFlag(Flags.Reserved5))
 		{
@@ -411,7 +411,7 @@ public class MotorRowboat : BaseBoat
 		using (TimeWarning.New("SetFlag"))
 		{
 			bool b = EngineOn() && !IsFlipped() && base.healthFraction > 0f && fuelSystem.HasFuel() && TimeSinceDriver() < 75f;
-			Flags flags = base.flags;
+			Flags num = flags;
 			SetFlag(Flags.Reserved3, steering > 0f, false, false);
 			SetFlag(Flags.Reserved4, steering < 0f, false, false);
 			SetFlag(Flags.Reserved1, b, false, false);
@@ -420,7 +420,7 @@ public class MotorRowboat : BaseBoat
 			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), false, false);
 			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !HasAnyPassengers(), false, false);
 			SetFlag(Flags.Reserved8, base.RecentlyPushed, false, false);
-			if (flags != base.flags)
+			if (num != flags)
 			{
 				Invoke(base.SendNetworkUpdate_Flags, 0f);
 			}

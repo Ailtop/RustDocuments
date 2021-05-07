@@ -101,7 +101,7 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 	public void UpdateCullingBounds()
 	{
 		Vector3 vector = Vector3.zero;
-		Vector3 a = Vector3.zero;
+		Vector3 vector2 = Vector3.zero;
 		bool flag = false;
 		int num = ((renderers != null) ? renderers.Count : 0);
 		int num2 = ((colliders != null) ? colliders.Count : 0);
@@ -117,16 +117,16 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 					if (!flag)
 					{
 						vector = min;
-						a = max;
+						vector2 = max;
 						flag = true;
 						continue;
 					}
 					vector.x = ((vector.x < min.x) ? vector.x : min.x);
 					vector.y = ((vector.y < min.y) ? vector.y : min.y);
 					vector.z = ((vector.z < min.z) ? vector.z : min.z);
-					a.x = ((a.x > max.x) ? a.x : max.x);
-					a.y = ((a.y > max.y) ? a.y : max.y);
-					a.z = ((a.z > max.z) ? a.z : max.z);
+					vector2.x = ((vector2.x > max.x) ? vector2.x : max.x);
+					vector2.y = ((vector2.y > max.y) ? vector2.y : max.y);
+					vector2.z = ((vector2.z > max.z) ? vector2.z : max.z);
 				}
 			}
 		}
@@ -134,7 +134,7 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 		{
 			flag = true;
 			vector = colliders[0].bounds.min;
-			a = colliders[0].bounds.max;
+			vector2 = colliders[0].bounds.max;
 			for (int j = 1; j < colliders.Count; j++)
 			{
 				Bounds bounds2 = colliders[j].bounds;
@@ -143,18 +143,18 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 				vector.x = ((vector.x < min2.x) ? vector.x : min2.x);
 				vector.y = ((vector.y < min2.y) ? vector.y : min2.y);
 				vector.z = ((vector.z < min2.z) ? vector.z : min2.z);
-				a.x = ((a.x > max2.x) ? a.x : max2.x);
-				a.y = ((a.y > max2.y) ? a.y : max2.y);
-				a.z = ((a.z > max2.z) ? a.z : max2.z);
+				vector2.x = ((vector2.x > max2.x) ? vector2.x : max2.x);
+				vector2.y = ((vector2.y > max2.y) ? vector2.y : max2.y);
+				vector2.z = ((vector2.z > max2.z) ? vector2.z : max2.z);
 			}
 		}
 		if (!flag)
 		{
 			return;
 		}
-		Vector3 a2 = a - vector;
-		Vector3 position = vector + a2 * 0.5f;
-		float radius = Mathf.Max(Mathf.Max(a2.x, a2.y), a2.z) * 0.5f;
+		Vector3 vector3 = vector2 - vector;
+		Vector3 position = vector + vector3 * 0.5f;
+		float radius = Mathf.Max(Mathf.Max(vector3.x, vector3.y), vector3.z) * 0.5f;
 		OcclusionCulling.Sphere sphere = new OcclusionCulling.Sphere(position, radius);
 		if (localOccludee.IsRegistered)
 		{

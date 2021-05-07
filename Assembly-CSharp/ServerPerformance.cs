@@ -93,13 +93,13 @@ public class ServerPerformance : BaseMonoBehaviour
 		{
 			return "null";
 		}
-		string str = (obj.activeSelf ? "" : " (inactive)");
+		string text = (obj.activeSelf ? "" : " (inactive)");
 		BaseEntity baseEntity = obj.ToBaseEntity();
 		if ((bool)baseEntity)
 		{
-			return baseEntity.PrefabName + str;
+			return baseEntity.PrefabName + text;
 		}
-		return obj.name + str;
+		return obj.name + text;
 	}
 
 	public static void ComponentReport(string filename, string Title, UnityEngine.Object[] objects)

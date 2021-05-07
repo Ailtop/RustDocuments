@@ -70,13 +70,7 @@ public class BaseVehicle : BaseMountable
 
 	public override float RealisticMass => rigidBody.mass;
 
-	public override bool PositionTickFixedTime
-	{
-		protected get
-		{
-			return true;
-		}
-	}
+	protected override bool PositionTickFixedTime => true;
 
 	protected virtual bool CanSwapSeats => true;
 
@@ -721,8 +715,8 @@ public class BaseVehicle : BaseMountable
 		}
 		List<Vector3> obj = Facepunch.Pool.GetList<Vector3>();
 		Vector3 visualCheckOrigin = player.TriggerPoint();
-		Transform[] dismountPositions = base.dismountPositions;
-		foreach (Transform transform in dismountPositions)
+		Transform[] array = dismountPositions;
+		foreach (Transform transform in array)
 		{
 			if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
 			{
@@ -798,8 +792,8 @@ public class BaseVehicle : BaseMountable
 		return baseMountable;
 	}
 
-	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(5f)]
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

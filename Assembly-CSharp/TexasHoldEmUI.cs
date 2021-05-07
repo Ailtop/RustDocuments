@@ -41,9 +41,6 @@ public class TexasHoldEmUI : MonoBehaviour
 	private Translate.Phrase phraseScrapReturned;
 
 	[SerializeField]
-	private Translate.Phrase phraseWinningHand;
-
-	[SerializeField]
 	private Translate.Phrase phraseRoyalFlush;
 
 	[SerializeField]

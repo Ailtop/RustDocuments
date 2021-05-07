@@ -78,17 +78,9 @@ public class PathFinder
 
 		public int heuristic;
 
-		public Node next
-		{
-			get;
-			set;
-		}
+		public Node next { get; set; }
 
-		public Node child
-		{
-			get;
-			set;
-		}
+		public Node child { get; set; }
 
 		public int order => cost + heuristic;
 

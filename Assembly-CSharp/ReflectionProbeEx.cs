@@ -75,78 +75,14 @@ public class ReflectionProbeEx : MonoBehaviour
 
 	private static float[] octaVerts = new float[72]
 	{
-		0f,
-		1f,
-		0f,
-		0f,
-		0f,
-		-1f,
-		1f,
-		0f,
-		0f,
-		0f,
-		1f,
-		0f,
-		1f,
-		0f,
-		0f,
-		0f,
-		0f,
-		1f,
-		0f,
-		1f,
-		0f,
-		0f,
-		0f,
-		1f,
-		-1f,
-		0f,
-		0f,
-		0f,
-		1f,
-		0f,
-		-1f,
-		0f,
-		0f,
-		0f,
-		0f,
-		-1f,
-		0f,
-		-1f,
-		0f,
-		1f,
-		0f,
-		0f,
-		0f,
-		0f,
-		-1f,
-		0f,
-		-1f,
-		0f,
-		0f,
-		0f,
-		1f,
-		1f,
-		0f,
-		0f,
-		0f,
-		-1f,
-		0f,
-		-1f,
-		0f,
-		0f,
-		0f,
-		0f,
-		1f,
-		0f,
-		-1f,
-		0f,
-		0f,
-		0f,
-		-1f,
-		-1f,
-		0f,
-		0f
+		0f, 1f, 0f, 0f, 0f, -1f, 1f, 0f, 0f, 0f,
+		1f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 1f,
+		0f, 0f, 0f, 1f, -1f, 0f, 0f, 0f, 1f, 0f,
+		-1f, 0f, 0f, 0f, 0f, -1f, 0f, -1f, 0f, 1f,
+		0f, 0f, 0f, 0f, -1f, 0f, -1f, 0f, 0f, 0f,
+		1f, 1f, 0f, 0f, 0f, -1f, 0f, -1f, 0f, 0f,
+		0f, 0f, 1f, 0f, -1f, 0f, 0f, 0f, -1f, -1f,
+		0f, 0f
 	};
 
 	private static readonly CubemapFaceMatrices[] cubemapFaceMatrices = new CubemapFaceMatrices[6]
@@ -183,38 +119,10 @@ public class ReflectionProbeEx : MonoBehaviour
 
 	private static readonly int[] tab32 = new int[32]
 	{
-		0,
-		9,
-		1,
-		10,
-		13,
-		21,
-		2,
-		29,
-		11,
-		14,
-		16,
-		18,
-		22,
-		25,
-		3,
-		30,
-		8,
-		12,
-		20,
-		28,
-		15,
-		17,
-		24,
-		7,
-		19,
-		27,
-		23,
-		6,
-		26,
-		5,
-		4,
-		31
+		0, 9, 1, 10, 13, 21, 2, 29, 11, 14,
+		16, 18, 22, 25, 3, 30, 8, 12, 20, 28,
+		15, 17, 24, 7, 19, 27, 23, 6, 26, 5,
+		4, 31
 	};
 
 	public ReflectionProbeRefreshMode refreshMode = ReflectionProbeRefreshMode.EveryFrame;
@@ -297,15 +205,7 @@ public class ReflectionProbeEx : MonoBehaviour
 			new Vector2(1f, 1f),
 			new Vector2(1f, 0f)
 		};
-		mesh.triangles = new int[6]
-		{
-			0,
-			1,
-			2,
-			0,
-			2,
-			3
-		};
+		mesh.triangles = new int[6] { 0, 1, 2, 0, 2, 3 };
 		return mesh;
 	}
 

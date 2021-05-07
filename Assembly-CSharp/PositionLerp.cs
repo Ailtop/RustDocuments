@@ -156,11 +156,6 @@ public class PositionLerp : IDisposable
 	public void Wipe()
 	{
 		interpolator.Clear();
-		timeOffsetCount = 0;
-		timeOffset0 = float.MaxValue;
-		timeOffset1 = float.MaxValue;
-		timeOffset2 = float.MaxValue;
-		timeOffset3 = float.MaxValue;
 	}
 
 	public static void WipeAll()

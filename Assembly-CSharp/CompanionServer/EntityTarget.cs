@@ -4,10 +4,7 @@ namespace CompanionServer
 {
 	public struct EntityTarget : IEquatable<EntityTarget>
 	{
-		public uint EntityId
-		{
-			get;
-		}
+		public uint EntityId { get; }
 
 		public EntityTarget(uint entityId)
 		{

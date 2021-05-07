@@ -73,8 +73,8 @@ public abstract class TerrainMap : TerrainExtension
 		int y = Mathx.Min(v0.y, v1.y, v2.y);
 		int y2 = Mathx.Max(v0.y, v1.y, v2.y);
 		Vector2i base_min = new Vector2i(x, y);
-		Vector2i a = new Vector2i(x2, y2);
-		Vector2i base_count = a - base_min + Vector2i.one;
+		Vector2i vector2i = new Vector2i(x2, y2);
+		Vector2i base_count = vector2i - base_min + Vector2i.one;
 		Parallel.Call(delegate(int thread_id, int thread_count)
 		{
 			Vector2i min = base_min + base_count * thread_id / thread_count;

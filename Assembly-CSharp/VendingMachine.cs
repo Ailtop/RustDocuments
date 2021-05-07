@@ -442,8 +442,8 @@ public class VendingMachine : StorageContainer
 			SetFlag(Flags.Reserved2, false);
 			base.inventory.onItemAddedRemoved = OnItemAddedOrRemoved;
 			RefreshSellOrderStockLevel();
-			ItemContainer inventory = base.inventory;
-			inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
+			ItemContainer itemContainer = base.inventory;
+			itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
 			UpdateMapMarker();
 			fullUpdateCached = FullUpdate;
 		}
@@ -590,8 +590,8 @@ public class VendingMachine : StorageContainer
 	}
 
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))
@@ -785,8 +785,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_UpdateShopName(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -827,8 +827,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_OpenShop(RPCMessage msg)
 	{
 		if (OccupiedCheck(msg.player))
@@ -961,8 +961,8 @@ public class VendingMachine : StorageContainer
 	public void AddSellOrder(int itemToSellID, int itemToSellAmount, int currencyToUseID, int currencyAmount, byte bpState)
 	{
 		ItemDefinition itemDefinition = ItemManager.FindItemDefinition(itemToSellID);
-		ItemDefinition x = ItemManager.FindItemDefinition(currencyToUseID);
-		if (!(itemDefinition == null) && !(x == null))
+		ItemDefinition itemDefinition2 = ItemManager.FindItemDefinition(currencyToUseID);
+		if (!(itemDefinition == null) && !(itemDefinition2 == null))
 		{
 			currencyAmount = Mathf.Clamp(currencyAmount, 1, 10000);
 			itemToSellAmount = Mathf.Clamp(itemToSellAmount, 1, itemDefinition.stackable);

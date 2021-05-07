@@ -45,12 +45,12 @@ public class Socket_Free : Socket_Base
 			normalized2.y = 0f;
 			identity = Quaternion.LookRotation(normalized2, idealPlacementNormal) * Quaternion.Euler(target.rotation);
 		}
-		Vector3 position = target.position;
-		position -= identity * base.position;
+		Vector3 vector = target.position;
+		vector -= identity * position;
 		return new Construction.Placement
 		{
 			rotation = identity,
-			position = position
+			position = vector
 		};
 	}
 }

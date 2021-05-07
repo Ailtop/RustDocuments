@@ -420,12 +420,12 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	{
 		player.metabolism.calories.Subtract(3f);
 		player.metabolism.SendChangesToClient();
-		Vector3 a = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
-		Vector3 a2 = player.eyes.BodyForward();
-		a2.y = 0.25f;
-		Vector3 position = base.transform.position + a * 2f;
-		float d = rigidBody.mass * 2f;
-		rigidBody.AddForceAtPosition(a2 * d, position, ForceMode.Impulse);
+		Vector3 vector = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
+		Vector3 vector2 = player.eyes.BodyForward();
+		vector2.y = 0.25f;
+		Vector3 position = base.transform.position + vector * 2f;
+		float num = rigidBody.mass * 2f;
+		rigidBody.AddForceAtPosition(vector2 * num, position, ForceMode.Impulse);
 		rigidBody.AddForce(Vector3.up * 3f, ForceMode.Impulse);
 		if (rigidBody.IsSleeping())
 		{

@@ -72,9 +72,9 @@ public class Item
 		}
 		set
 		{
-			float condition = _condition;
+			float f = _condition;
 			_condition = Mathf.Clamp(value, 0f, maxCondition);
-			if (isServer && Mathf.Ceil(value) != Mathf.Ceil(condition))
+			if (isServer && Mathf.Ceil(value) != Mathf.Ceil(f))
 			{
 				MarkDirty();
 			}
@@ -233,13 +233,13 @@ public class Item
 	{
 		if (hasCondition && !Debugging.disablecondition && Interface.CallHook("IOnLoseCondition", this, amount) == null)
 		{
-			float condition = this.condition;
-			this.condition -= amount;
+			float num = condition;
+			condition -= amount;
 			if (ConVar.Global.developer > 0)
 			{
-				Debug.Log(info.shortname + " was damaged by: " + amount + "cond is: " + this.condition + "/" + maxCondition);
+				Debug.Log(info.shortname + " was damaged by: " + amount + "cond is: " + condition + "/" + maxCondition);
 			}
-			if (this.condition <= 0f && this.condition < condition)
+			if (condition <= 0f && condition < num)
 			{
 				OnBroken();
 			}
@@ -612,9 +612,7 @@ public class Item
 							}
 							slot.amount = num;
 						}
-						bool result = true;
-						Interface.CallHook("OnItemStacked", slot, this, newcontainer);
-						return result;
+						return true;
 					}
 				}
 				if (parent != null)

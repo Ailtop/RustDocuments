@@ -126,8 +126,8 @@ public class WaterRadialMesh
 		{
 			ray.direction = new Vector3(ray.direction.x, 0f - ray.direction.y + 0.02f, ray.direction.z);
 		}
-		float d = (0f - (ray.origin.y - planeHeight)) / ray.direction.y;
-		return Quaternion.AngleAxis(0f - camera.transform.eulerAngles.y, Vector3.up) * (ray.direction * d);
+		float num = (0f - (ray.origin.y - planeHeight)) / ray.direction.y;
+		return Quaternion.AngleAxis(0f - camera.transform.eulerAngles.y, Vector3.up) * (ray.direction * num);
 	}
 
 	public Matrix4x4 ComputeLocalToWorldMatrix(Camera camera, float oceanWaterLevel)

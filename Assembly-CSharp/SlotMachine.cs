@@ -101,11 +101,7 @@ public class SlotMachine : BaseMountable
 
 	private bool IsSpinning => HasFlag(Flags.Reserved2);
 
-	public int CurrentMultiplier
-	{
-		get;
-		private set;
-	} = 1;
+	public int CurrentMultiplier { get; private set; } = 1;
 
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -296,8 +292,8 @@ public class SlotMachine : BaseMountable
 		return component.inventory.GetSlot(0)?.amount ?? 0;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Spin(RPCMessage rpc)
 	{
 		if (IsSpinning || rpc.player != GetMounted())
@@ -455,9 +451,9 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	private void Server_RequestMultiplierChange(RPCMessage msg)
 	{
 		if (!(msg.player != _mounted))

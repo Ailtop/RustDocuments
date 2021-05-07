@@ -27,7 +27,6 @@ public class PlayerModel : ListComponent<PlayerModel>
 		Sit_SecretLab = 20,
 		Sit_Workcart = 21,
 		Sit_Cardgame = 22,
-		Sit_Crane = 23,
 		Standing = 0x80
 	}
 
@@ -174,11 +173,7 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public uint underwearSkin;
 
-	public ulong overrideSkinSeed
-	{
-		get;
-		private set;
-	}
+	public ulong overrideSkinSeed { get; private set; }
 
 	public bool IsFemale => skinType == 1;
 
@@ -194,17 +189,9 @@ public class PlayerModel : ListComponent<PlayerModel>
 		}
 	}
 
-	public Quaternion AimAngles
-	{
-		get;
-		set;
-	}
+	public Quaternion AimAngles { get; set; }
 
-	public Quaternion LookAngles
-	{
-		get;
-		set;
-	}
+	public Quaternion LookAngles { get; set; }
 
 	private static Vector3 GetFlat(Vector3 dir)
 	{

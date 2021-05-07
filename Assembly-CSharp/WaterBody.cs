@@ -11,11 +11,7 @@ public class WaterBody : MonoBehaviour
 
 	public bool IsOcean;
 
-	public Transform Transform
-	{
-		get;
-		private set;
-	}
+	public Transform Transform { get; private set; }
 
 	private void Awake()
 	{

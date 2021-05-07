@@ -75,8 +75,8 @@ public class ChildrenScreenshot : MonoBehaviour
 				bounds.Encapsulate(renderer.bounds);
 			}
 		}
-		float d = bounds.size.magnitude * 0.5f / Mathf.Tan(cam.fieldOfView * 0.5f * ((float)Math.PI / 180f));
-		cam.transform.position = bounds.center + obj.transform.TransformVector(offsetAngle.normalized) * d;
+		float num = bounds.size.magnitude * 0.5f / Mathf.Tan(cam.fieldOfView * 0.5f * ((float)Math.PI / 180f));
+		cam.transform.position = bounds.center + obj.transform.TransformVector(offsetAngle.normalized) * num;
 		cam.transform.LookAt(bounds.center);
 	}
 }

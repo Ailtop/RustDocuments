@@ -75,7 +75,7 @@ public class GenerateDungeon : ProceduralComponent
 
 	public InfrastructureType ConnectionType = InfrastructureType.Tunnel;
 
-	public int CellSize = 216;
+	public int CellSize = 200;
 
 	public float LinkHeight = 1.5f;
 
@@ -119,7 +119,7 @@ public class GenerateDungeon : ProceduralComponent
 			return;
 		}
 		array4 = array4.OrderByDescending((Prefab<DungeonLink> x) => x.Component.Priority).ToArray();
-		List<DungeonInfo> list = (TerrainMeta.Path ? TerrainMeta.Path.DungeonEntrances : null);
+		List<MonumentInfo> list = (TerrainMeta.Path ? TerrainMeta.Path.Monuments : null);
 		WorldSpaceGrid<Prefab<DungeonCell>> worldSpaceGrid = new WorldSpaceGrid<Prefab<DungeonCell>>(TerrainMeta.Size.x * 2f, CellSize);
 		int[,] array5 = new int[worldSpaceGrid.CellCount, worldSpaceGrid.CellCount];
 		_003C_003Ec__DisplayClass16_0 _003C_003Ec__DisplayClass16_ = default(_003C_003Ec__DisplayClass16_0);
@@ -146,10 +146,10 @@ public class GenerateDungeon : ProceduralComponent
 		_003C_003Ec__DisplayClass16_1 _003C_003Ec__DisplayClass16_2 = default(_003C_003Ec__DisplayClass16_1);
 		_003C_003Ec__DisplayClass16_2 _003C_003Ec__DisplayClass16_3 = default(_003C_003Ec__DisplayClass16_2);
 		_003C_003Ec__DisplayClass16_3 _003C_003Ec__DisplayClass16_4 = default(_003C_003Ec__DisplayClass16_3);
-		foreach (DungeonInfo item in list)
+		foreach (MonumentInfo item in list)
 		{
-			_003C_003Ec__DisplayClass16_2.entrance = item;
-			TerrainPathConnect[] componentsInChildren = _003C_003Ec__DisplayClass16_2.entrance.GetComponentsInChildren<TerrainPathConnect>(true);
+			_003C_003Ec__DisplayClass16_2.monument = item;
+			TerrainPathConnect[] componentsInChildren = _003C_003Ec__DisplayClass16_2.monument.GetComponentsInChildren<TerrainPathConnect>(true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
 				if (terrainPathConnect.Type != ConnectionType)
@@ -181,14 +181,14 @@ public class GenerateDungeon : ProceduralComponent
 						continue;
 					}
 					DungeonLinkBlockVolume componentInChildren = prefab6.Object.GetComponentInChildren<DungeonLinkBlockVolume>();
-					DungeonLinkBlockVolume componentInChildren2 = _003C_003Ec__DisplayClass16_2.entrance.GetComponentInChildren<DungeonLinkBlockVolume>();
+					DungeonLinkBlockVolume componentInChildren2 = _003C_003Ec__DisplayClass16_2.monument.GetComponentInChildren<DungeonLinkBlockVolume>();
 					OBB bounds = componentInChildren.GetBounds(worldSpaceGrid.GridToWorldCoords(cellPos), Quaternion.identity);
-					OBB bounds2 = componentInChildren2.GetBounds(_003C_003Ec__DisplayClass16_2.entrance.transform.position, _003C_003Ec__DisplayClass16_2.entrance.transform.rotation);
+					OBB bounds2 = componentInChildren2.GetBounds(_003C_003Ec__DisplayClass16_2.monument.transform.position, _003C_003Ec__DisplayClass16_2.monument.transform.rotation);
 					if (!bounds.Intersects2D(bounds2))
 					{
-						DungeonLink componentInChildren3 = prefab6.Object.GetComponentInChildren<DungeonLink>();
-						Vector3 b = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y)) + componentInChildren3.UpSocket.localPosition;
-						float num4 = (terrainPathConnect.transform.position - b).Magnitude2D();
+						DungeonLink component = prefab6.Object.GetComponent<DungeonLink>();
+						Vector3 vector = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y)) + component.UpSocket.localPosition;
+						float num4 = (terrainPathConnect.transform.position - vector).Magnitude2D();
 						if (!(num3 < num4))
 						{
 							prefab5 = prefab6;
@@ -218,10 +218,10 @@ public class GenerateDungeon : ProceduralComponent
 						_003CProcess_003Eg__AddNode_007C16_1(cellPos.x, cellPos.y + 1, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3, ref _003C_003Ec__DisplayClass16_4);
 					}
 					PathLink pathLink = new PathLink();
-					DungeonLink componentInChildren4 = _003C_003Ec__DisplayClass16_2.entrance.gameObject.GetComponentInChildren<DungeonLink>();
-					Vector3 position = _003C_003Ec__DisplayClass16_2.entrance.transform.position;
-					Vector3 eulerAngles = _003C_003Ec__DisplayClass16_2.entrance.transform.rotation.eulerAngles;
-					DungeonLink componentInChildren5 = prefab5.Object.GetComponentInChildren<DungeonLink>();
+					DungeonLink component2 = _003C_003Ec__DisplayClass16_2.monument.gameObject.GetComponent<DungeonLink>();
+					Vector3 position = _003C_003Ec__DisplayClass16_2.monument.transform.position;
+					Vector3 eulerAngles = _003C_003Ec__DisplayClass16_2.monument.transform.rotation.eulerAngles;
+					DungeonLink component3 = prefab5.Object.GetComponent<DungeonLink>();
 					Vector3 position2 = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y));
 					Vector3 zero = Vector3.zero;
 					pathLink.downwards = new PathLinkSide();
@@ -229,14 +229,14 @@ public class GenerateDungeon : ProceduralComponent
 					pathLink.downwards.origin.position = position;
 					pathLink.downwards.origin.rotation = Quaternion.Euler(eulerAngles);
 					pathLink.downwards.origin.scale = Vector3.one;
-					pathLink.downwards.origin.link = componentInChildren4;
+					pathLink.downwards.origin.link = component2;
 					pathLink.downwards.segments = new List<PathLinkSegment>();
 					pathLink.upwards = new PathLinkSide();
 					pathLink.upwards.origin = new PathLinkSegment();
 					pathLink.upwards.origin.position = position2;
 					pathLink.upwards.origin.rotation = Quaternion.Euler(zero);
 					pathLink.upwards.origin.scale = Vector3.one;
-					pathLink.upwards.origin.link = componentInChildren5;
+					pathLink.upwards.origin.link = component3;
 					pathLink.upwards.segments = new List<PathLinkSegment>();
 					list3.Add(pathLink);
 				}
@@ -383,7 +383,7 @@ public class GenerateDungeon : ProceduralComponent
 		}
 		Vector3 zero2 = Vector3.zero;
 		Vector3 zero3 = Vector3.zero;
-		Vector3 b2 = Vector3.up * 10f;
+		Vector3 vector2 = Vector3.up * 10f;
 		do
 		{
 			zero3 = zero2;
@@ -395,8 +395,8 @@ public class GenerateDungeon : ProceduralComponent
 					if (prefab12 != null)
 					{
 						Vector2i cellPos2 = new Vector2i(num6, num7);
-						Vector3 b3 = worldSpaceGrid.GridToWorldCoords(cellPos2);
-						while (!prefab12.CheckEnvironmentVolumesInsideTerrain(zero2 + b3 + b2, Quaternion.identity, Vector3.one, EnvironmentType.Underground) || prefab12.CheckEnvironmentVolumes(zero2 + b3, Quaternion.identity, Vector3.one, EnvironmentType.Underground))
+						Vector3 vector3 = worldSpaceGrid.GridToWorldCoords(cellPos2);
+						while (!prefab12.CheckEnvironmentVolumesInsideTerrain(zero2 + vector3 + vector2, Quaternion.identity, Vector3.one, EnvironmentType.Underground) || prefab12.CheckEnvironmentVolumes(zero2 + vector3, Quaternion.identity, Vector3.one, EnvironmentType.Underground))
 						{
 							zero2.y -= 9f;
 						}
@@ -417,8 +417,8 @@ public class GenerateDungeon : ProceduralComponent
 				if (prefab13 != null)
 				{
 					Vector2i cellPos3 = new Vector2i(num8, num9);
-					Vector3 b4 = worldSpaceGrid.GridToWorldCoords(cellPos3);
-					World.AddPrefab("Dungeon", prefab13, zero2 + b4, Quaternion.identity, Vector3.one);
+					Vector3 vector4 = worldSpaceGrid.GridToWorldCoords(cellPos3);
+					World.AddPrefab("Dungeon", prefab13, zero2 + vector4, Quaternion.identity, Vector3.one);
 				}
 			}
 		}
@@ -439,8 +439,8 @@ public class GenerateDungeon : ProceduralComponent
 						if (prefab17.Component.West == prefab14.Component.East && prefab17.Component.East == prefab15.Component.West && prefab17.Component.WestVariant == prefab14.Component.EastVariant && prefab17.Component.EastVariant == prefab15.Component.WestVariant)
 						{
 							Vector2i cellPos4 = new Vector2i(num10, num11);
-							Vector3 b5 = worldSpaceGrid.GridToWorldCoords(cellPos4) + new Vector3(worldSpaceGrid.CellSizeHalf, 0f, 0f);
-							World.AddPrefab("Dungeon", prefab17, zero2 + b5, Quaternion.identity, Vector3.one);
+							Vector3 vector5 = worldSpaceGrid.GridToWorldCoords(cellPos4) + new Vector3(worldSpaceGrid.CellSizeHalf, 0f, 0f);
+							World.AddPrefab("Dungeon", prefab17, zero2 + vector5, Quaternion.identity, Vector3.one);
 							break;
 						}
 					}
@@ -456,8 +456,8 @@ public class GenerateDungeon : ProceduralComponent
 					if (prefab18.Component.South == prefab14.Component.North && prefab18.Component.North == prefab16.Component.South && prefab18.Component.SouthVariant == prefab14.Component.NorthVariant && prefab18.Component.NorthVariant == prefab16.Component.SouthVariant)
 					{
 						Vector2i cellPos5 = new Vector2i(num10, num11);
-						Vector3 b6 = worldSpaceGrid.GridToWorldCoords(cellPos5) + new Vector3(0f, 0f, worldSpaceGrid.CellSizeHalf);
-						World.AddPrefab("Dungeon", prefab18, zero2 + b6, Quaternion.identity, Vector3.one);
+						Vector3 vector6 = worldSpaceGrid.GridToWorldCoords(cellPos5) + new Vector3(0f, 0f, worldSpaceGrid.CellSizeHalf);
+						World.AddPrefab("Dungeon", prefab18, zero2 + vector6, Quaternion.identity, Vector3.one);
 						break;
 					}
 				}
@@ -465,8 +465,8 @@ public class GenerateDungeon : ProceduralComponent
 		}
 		foreach (PathLink item4 in list3)
 		{
-			Vector3 b7 = item4.upwards.origin.position + item4.upwards.origin.rotation * Vector3.Scale(item4.upwards.origin.upSocket.localPosition, item4.upwards.origin.scale);
-			Vector3 a = item4.downwards.origin.position + item4.downwards.origin.rotation * Vector3.Scale(item4.downwards.origin.downSocket.localPosition, item4.downwards.origin.scale) - b7;
+			Vector3 vector7 = item4.upwards.origin.position + item4.upwards.origin.rotation * Vector3.Scale(item4.upwards.origin.upSocket.localPosition, item4.upwards.origin.scale);
+			Vector3 vector8 = item4.downwards.origin.position + item4.downwards.origin.rotation * Vector3.Scale(item4.downwards.origin.downSocket.localPosition, item4.downwards.origin.scale) - vector7;
 			Vector3[] array7 = new Vector3[2]
 			{
 				new Vector3(0f, 1f, 0f),
@@ -474,43 +474,43 @@ public class GenerateDungeon : ProceduralComponent
 			};
 			for (int k = 0; k < array7.Length; k++)
 			{
-				Vector3 b8 = array7[k];
+				Vector3 b = array7[k];
 				int num12 = 0;
 				int num13 = 0;
-				while (a.magnitude > 1f && (num12 < 8 || num13 < 8))
+				while (vector8.magnitude > 1f && (num12 < 8 || num13 < 8))
 				{
 					bool flag2 = num12 > 2 && num13 > 2;
 					bool flag3 = num12 > 4 && num13 > 4;
 					Prefab<DungeonLink> prefab19 = null;
-					Vector3 vector = Vector3.zero;
+					Vector3 vector9 = Vector3.zero;
 					int num14 = int.MinValue;
 					PathLinkSegment prevSegment = item4.downwards.prevSegment;
-					Vector3 a2 = prevSegment.position + prevSegment.rotation * Vector3.Scale(prevSegment.scale, prevSegment.downSocket.localPosition);
-					Quaternion lhs = prevSegment.rotation * prevSegment.downSocket.localRotation;
+					Vector3 vector10 = prevSegment.position + prevSegment.rotation * Vector3.Scale(prevSegment.scale, prevSegment.downSocket.localPosition);
+					Quaternion quaternion = prevSegment.rotation * prevSegment.downSocket.localRotation;
 					Prefab<DungeonLink>[] array8 = array4;
 					foreach (Prefab<DungeonLink> prefab20 in array8)
 					{
 						float num15 = SeedRandom.Value(ref seed);
-						DungeonLink component = prefab20.Component;
-						if (prevSegment.downType != component.UpType || (flag2 && component.DownType != 0))
+						DungeonLink component4 = prefab20.Component;
+						if (prevSegment.downType != component4.UpType || (flag2 && component4.DownType != 0))
 						{
 							continue;
 						}
-						Vector3 vector2 = lhs * Quaternion.Inverse(component.UpSocket.localRotation) * (component.DownSocket.localPosition - component.UpSocket.localPosition);
-						int num16 = ((!flag2) ? component.Priority : 0);
+						Vector3 vector11 = quaternion * Quaternion.Inverse(component4.UpSocket.localRotation) * (component4.DownSocket.localPosition - component4.UpSocket.localPosition);
+						int num16 = ((!flag2) ? component4.Priority : 0);
 						if (num14 > num16)
 						{
 							continue;
 						}
-						Vector3 a3 = a + vector;
-						Vector3 a4 = a + vector2;
-						float magnitude = a3.magnitude;
-						float magnitude2 = a4.magnitude;
-						Vector3 vector3 = Vector3.Scale(a3, b8);
-						Vector3 vector4 = Vector3.Scale(a4, b8);
-						float magnitude3 = vector3.magnitude;
-						float magnitude4 = vector4.magnitude;
-						if (vector != Vector3.zero)
+						Vector3 a = vector8 + vector9;
+						Vector3 a2 = vector8 + vector11;
+						float magnitude = a.magnitude;
+						float magnitude2 = a2.magnitude;
+						Vector3 vector12 = Vector3.Scale(a, b);
+						Vector3 vector13 = Vector3.Scale(a2, b);
+						float magnitude3 = vector12.magnitude;
+						float magnitude4 = vector13.magnitude;
+						if (vector9 != Vector3.zero)
 						{
 							if (magnitude3 < magnitude4 || (magnitude3 == magnitude4 && magnitude < magnitude2) || (magnitude3 == magnitude4 && magnitude == magnitude2 && num15 < 0.5f))
 							{
@@ -521,97 +521,97 @@ public class GenerateDungeon : ProceduralComponent
 						{
 							continue;
 						}
-						if (Mathf.Abs(vector4.x) - Mathf.Abs(vector3.x) > 0.01f || (Mathf.Abs(vector4.x) > 0.01f && a3.x * a4.x < 0f) || Mathf.Abs(vector4.y) - Mathf.Abs(vector3.y) > 0.01f || (Mathf.Abs(vector4.y) > 0.01f && a3.y * a4.y < 0f) || Mathf.Abs(vector4.z) - Mathf.Abs(vector3.z) > 0.01f || (Mathf.Abs(vector4.z) > 0.01f && a3.z * a4.z < 0f))
+						if (Mathf.Abs(vector13.x) - Mathf.Abs(vector12.x) > 0.01f || (Mathf.Abs(vector13.x) > 0.01f && a.x * a2.x < 0f) || Mathf.Abs(vector13.y) - Mathf.Abs(vector12.y) > 0.01f || (Mathf.Abs(vector13.y) > 0.01f && a.y * a2.y < 0f) || Mathf.Abs(vector13.z) - Mathf.Abs(vector12.z) > 0.01f || (Mathf.Abs(vector13.z) > 0.01f && a.z * a2.z < 0f))
 						{
 							continue;
 						}
-						if (flag2 && b8.x == 0f && b8.z == 0f)
+						if (flag2 && b.x == 0f && b.z == 0f)
 						{
-							if ((Mathf.Abs(a4.x) > 0.01f && Mathf.Abs(a4.x) < LinkRadius * 2f - 0.1f) || (Mathf.Abs(a4.z) > 0.01f && Mathf.Abs(a4.z) < LinkRadius * 2f - 0.1f))
+							if ((Mathf.Abs(a2.x) > 0.01f && Mathf.Abs(a2.x) < LinkRadius * 2f - 0.1f) || (Mathf.Abs(a2.z) > 0.01f && Mathf.Abs(a2.z) < LinkRadius * 2f - 0.1f))
 							{
 								continue;
 							}
 							PathLinkSegment prevSegment2 = item4.upwards.prevSegment;
-							Quaternion a5 = prevSegment2.rotation * prevSegment2.upSocket.localRotation;
-							Quaternion b9 = lhs * Quaternion.Inverse(component.UpSocket.localRotation) * component.DownSocket.localRotation;
-							if (Quaternion.Angle(a5, b9) > 10f)
+							Quaternion a3 = prevSegment2.rotation * prevSegment2.upSocket.localRotation;
+							Quaternion b2 = quaternion * Quaternion.Inverse(component4.UpSocket.localRotation) * component4.DownSocket.localRotation;
+							if (Quaternion.Angle(a3, b2) > 10f)
 							{
 								continue;
 							}
 						}
 						num14 = num16;
-						if (b8.x == 0f && b8.z == 0f)
+						if (b.x == 0f && b.z == 0f)
 						{
-							if (!flag2 && Mathf.Abs(a4.y) < LinkHeight * 2f - 0.1f)
+							if (!flag2 && Mathf.Abs(a2.y) < LinkHeight * 2f - 0.1f)
 							{
 								continue;
 							}
 						}
-						else if ((!flag2 && magnitude4 > 0.01f && (Mathf.Abs(a4.x) < LinkRadius * 2f - 0.1f || Mathf.Abs(a4.z) < LinkRadius * 2f - 0.1f)) || (!flag3 && magnitude4 > 0.01f && (Mathf.Abs(a4.x) < LinkRadius * 1f - 0.1f || Mathf.Abs(a4.z) < LinkRadius * 1f - 0.1f)))
+						else if ((!flag2 && magnitude4 > 0.01f && (Mathf.Abs(a2.x) < LinkRadius * 2f - 0.1f || Mathf.Abs(a2.z) < LinkRadius * 2f - 0.1f)) || (!flag3 && magnitude4 > 0.01f && (Mathf.Abs(a2.x) < LinkRadius * 1f - 0.1f || Mathf.Abs(a2.z) < LinkRadius * 1f - 0.1f)))
 						{
 							continue;
 						}
 						if (flag2 && magnitude4 < 0.01f && magnitude2 < 0.01f)
 						{
 							PathLinkSegment prevSegment3 = item4.upwards.prevSegment;
-							Quaternion a6 = prevSegment3.rotation * prevSegment3.upSocket.localRotation;
-							Quaternion b10 = lhs * Quaternion.Inverse(component.UpSocket.localRotation) * component.DownSocket.localRotation;
-							if (Quaternion.Angle(a6, b10) > 10f)
+							Quaternion a4 = prevSegment3.rotation * prevSegment3.upSocket.localRotation;
+							Quaternion b3 = quaternion * Quaternion.Inverse(component4.UpSocket.localRotation) * component4.DownSocket.localRotation;
+							if (Quaternion.Angle(a4, b3) > 10f)
 							{
 								continue;
 							}
 						}
 						prefab19 = prefab20;
-						vector = vector2;
+						vector9 = vector11;
 						num14 = num16;
 					}
-					if (vector != Vector3.zero)
+					if (vector9 != Vector3.zero)
 					{
 						PathLinkSegment pathLinkSegment = new PathLinkSegment();
-						pathLinkSegment.position = a2 - lhs * Quaternion.Inverse(prefab19.Component.UpSocket.localRotation) * prefab19.Component.UpSocket.localPosition;
-						pathLinkSegment.rotation = lhs * Quaternion.Inverse(prefab19.Component.UpSocket.localRotation);
+						pathLinkSegment.position = vector10 - quaternion * Quaternion.Inverse(prefab19.Component.UpSocket.localRotation) * prefab19.Component.UpSocket.localPosition;
+						pathLinkSegment.rotation = quaternion * Quaternion.Inverse(prefab19.Component.UpSocket.localRotation);
 						pathLinkSegment.scale = Vector3.one;
 						pathLinkSegment.prefab = prefab19;
 						pathLinkSegment.link = prefab19.Component;
 						item4.downwards.segments.Add(pathLinkSegment);
-						a += vector;
+						vector8 += vector9;
 					}
 					else
 					{
 						num13++;
 					}
-					if (b8.x > 0f || b8.z > 0f)
+					if (b.x > 0f || b.z > 0f)
 					{
 						Prefab<DungeonLink> prefab21 = null;
-						Vector3 vector5 = Vector3.zero;
+						Vector3 vector14 = Vector3.zero;
 						int num17 = int.MinValue;
 						PathLinkSegment prevSegment4 = item4.upwards.prevSegment;
-						Vector3 a7 = prevSegment4.position + prevSegment4.rotation * Vector3.Scale(prevSegment4.scale, prevSegment4.upSocket.localPosition);
-						Quaternion lhs2 = prevSegment4.rotation * prevSegment4.upSocket.localRotation;
+						Vector3 vector15 = prevSegment4.position + prevSegment4.rotation * Vector3.Scale(prevSegment4.scale, prevSegment4.upSocket.localPosition);
+						Quaternion quaternion2 = prevSegment4.rotation * prevSegment4.upSocket.localRotation;
 						array8 = array4;
 						foreach (Prefab<DungeonLink> prefab22 in array8)
 						{
 							float num18 = SeedRandom.Value(ref seed);
-							DungeonLink component2 = prefab22.Component;
-							if (prevSegment4.upType != component2.DownType || (flag2 && component2.UpType != 0))
+							DungeonLink component5 = prefab22.Component;
+							if (prevSegment4.upType != component5.DownType || (flag2 && component5.UpType != 0))
 							{
 								continue;
 							}
-							Vector3 vector6 = lhs2 * Quaternion.Inverse(component2.DownSocket.localRotation) * (component2.UpSocket.localPosition - component2.DownSocket.localPosition);
-							int num19 = ((!flag2) ? component2.Priority : 0);
+							Vector3 vector16 = quaternion2 * Quaternion.Inverse(component5.DownSocket.localRotation) * (component5.UpSocket.localPosition - component5.DownSocket.localPosition);
+							int num19 = ((!flag2) ? component5.Priority : 0);
 							if (num17 > num19)
 							{
 								continue;
 							}
-							Vector3 a8 = a - vector5;
-							Vector3 a9 = a - vector6;
-							float magnitude5 = a8.magnitude;
-							float magnitude6 = a9.magnitude;
-							Vector3 vector7 = Vector3.Scale(a8, b8);
-							Vector3 vector8 = Vector3.Scale(a9, b8);
-							float magnitude7 = vector7.magnitude;
-							float magnitude8 = vector8.magnitude;
-							if (vector5 != Vector3.zero)
+							Vector3 a5 = vector8 - vector14;
+							Vector3 a6 = vector8 - vector16;
+							float magnitude5 = a5.magnitude;
+							float magnitude6 = a6.magnitude;
+							Vector3 vector17 = Vector3.Scale(a5, b);
+							Vector3 vector18 = Vector3.Scale(a6, b);
+							float magnitude7 = vector17.magnitude;
+							float magnitude8 = vector18.magnitude;
+							if (vector14 != Vector3.zero)
 							{
 								if (magnitude7 < magnitude8 || (magnitude7 == magnitude8 && magnitude5 < magnitude6) || (magnitude7 == magnitude8 && magnitude5 == magnitude6 && num18 < 0.5f))
 								{
@@ -622,60 +622,60 @@ public class GenerateDungeon : ProceduralComponent
 							{
 								continue;
 							}
-							if (Mathf.Abs(vector8.x) - Mathf.Abs(vector7.x) > 0.01f || (Mathf.Abs(vector8.x) > 0.01f && a8.x * a9.x < 0f) || Mathf.Abs(vector8.y) - Mathf.Abs(vector7.y) > 0.01f || (Mathf.Abs(vector8.y) > 0.01f && a8.y * a9.y < 0f) || Mathf.Abs(vector8.z) - Mathf.Abs(vector7.z) > 0.01f || (Mathf.Abs(vector8.z) > 0.01f && a8.z * a9.z < 0f))
+							if (Mathf.Abs(vector18.x) - Mathf.Abs(vector17.x) > 0.01f || (Mathf.Abs(vector18.x) > 0.01f && a5.x * a6.x < 0f) || Mathf.Abs(vector18.y) - Mathf.Abs(vector17.y) > 0.01f || (Mathf.Abs(vector18.y) > 0.01f && a5.y * a6.y < 0f) || Mathf.Abs(vector18.z) - Mathf.Abs(vector17.z) > 0.01f || (Mathf.Abs(vector18.z) > 0.01f && a5.z * a6.z < 0f))
 							{
 								continue;
 							}
-							if (flag2 && b8.x == 0f && b8.z == 0f)
+							if (flag2 && b.x == 0f && b.z == 0f)
 							{
-								if ((Mathf.Abs(a9.x) > 0.01f && Mathf.Abs(a9.x) < LinkRadius * 2f - 0.1f) || (Mathf.Abs(a9.z) > 0.01f && Mathf.Abs(a9.z) < LinkRadius * 2f - 0.1f))
+								if ((Mathf.Abs(a6.x) > 0.01f && Mathf.Abs(a6.x) < LinkRadius * 2f - 0.1f) || (Mathf.Abs(a6.z) > 0.01f && Mathf.Abs(a6.z) < LinkRadius * 2f - 0.1f))
 								{
 									continue;
 								}
 								PathLinkSegment prevSegment5 = item4.downwards.prevSegment;
-								Quaternion a10 = prevSegment5.rotation * prevSegment5.downSocket.localRotation;
-								Quaternion b11 = lhs2 * Quaternion.Inverse(component2.DownSocket.localRotation) * component2.UpSocket.localRotation;
-								if (Quaternion.Angle(a10, b11) > 10f)
+								Quaternion a7 = prevSegment5.rotation * prevSegment5.downSocket.localRotation;
+								Quaternion b4 = quaternion2 * Quaternion.Inverse(component5.DownSocket.localRotation) * component5.UpSocket.localRotation;
+								if (Quaternion.Angle(a7, b4) > 10f)
 								{
 									continue;
 								}
 							}
 							num17 = num19;
-							if (b8.x == 0f && b8.z == 0f)
+							if (b.x == 0f && b.z == 0f)
 							{
-								if (!flag2 && Mathf.Abs(a9.y) < LinkHeight * 2f - 0.1f)
+								if (!flag2 && Mathf.Abs(a6.y) < LinkHeight * 2f - 0.1f)
 								{
 									continue;
 								}
 							}
-							else if ((!flag2 && magnitude8 > 0.01f && (Mathf.Abs(a9.x) < LinkRadius * 2f - 0.1f || Mathf.Abs(a9.z) < LinkRadius * 2f - 0.1f)) || (!flag3 && magnitude8 > 0.01f && (Mathf.Abs(a9.x) < LinkRadius * 1f - 0.1f || Mathf.Abs(a9.z) < LinkRadius * 1f - 0.1f)))
+							else if ((!flag2 && magnitude8 > 0.01f && (Mathf.Abs(a6.x) < LinkRadius * 2f - 0.1f || Mathf.Abs(a6.z) < LinkRadius * 2f - 0.1f)) || (!flag3 && magnitude8 > 0.01f && (Mathf.Abs(a6.x) < LinkRadius * 1f - 0.1f || Mathf.Abs(a6.z) < LinkRadius * 1f - 0.1f)))
 							{
 								continue;
 							}
 							if (flag2 && magnitude8 < 0.01f && magnitude6 < 0.01f)
 							{
 								PathLinkSegment prevSegment6 = item4.downwards.prevSegment;
-								Quaternion a11 = prevSegment6.rotation * prevSegment6.downSocket.localRotation;
-								Quaternion b12 = lhs2 * Quaternion.Inverse(component2.DownSocket.localRotation) * component2.UpSocket.localRotation;
-								if (Quaternion.Angle(a11, b12) > 10f)
+								Quaternion a8 = prevSegment6.rotation * prevSegment6.downSocket.localRotation;
+								Quaternion b5 = quaternion2 * Quaternion.Inverse(component5.DownSocket.localRotation) * component5.UpSocket.localRotation;
+								if (Quaternion.Angle(a8, b5) > 10f)
 								{
 									continue;
 								}
 							}
 							prefab21 = prefab22;
-							vector5 = vector6;
+							vector14 = vector16;
 							num17 = num19;
 						}
-						if (vector5 != Vector3.zero)
+						if (vector14 != Vector3.zero)
 						{
 							PathLinkSegment pathLinkSegment2 = new PathLinkSegment();
-							pathLinkSegment2.position = a7 - lhs2 * Quaternion.Inverse(prefab21.Component.DownSocket.localRotation) * prefab21.Component.DownSocket.localPosition;
-							pathLinkSegment2.rotation = lhs2 * Quaternion.Inverse(prefab21.Component.DownSocket.localRotation);
+							pathLinkSegment2.position = vector15 - quaternion2 * Quaternion.Inverse(prefab21.Component.DownSocket.localRotation) * prefab21.Component.DownSocket.localPosition;
+							pathLinkSegment2.rotation = quaternion2 * Quaternion.Inverse(prefab21.Component.DownSocket.localRotation);
 							pathLinkSegment2.scale = Vector3.one;
 							pathLinkSegment2.prefab = prefab21;
 							pathLinkSegment2.link = prefab21.Component;
 							item4.upwards.segments.Add(pathLinkSegment2);
-							a -= vector5;
+							vector8 -= vector14;
 						}
 						else
 						{

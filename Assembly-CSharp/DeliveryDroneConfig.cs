@@ -19,20 +19,20 @@ public class DeliveryDroneConfig : BaseScriptableObject
 		float num = maxDistanceFromVendingMachine / 4f;
 		for (int i = 0; i <= 4; i++)
 		{
-			Vector3 b = Vector3.forward * (num * (float)i);
-			Vector3 vector = vendingMachine.transform.TransformPoint(vendingMachineOffset + b);
-			Vector3 vector2 = vector + Vector3.up * testHeight;
+			Vector3 vector = Vector3.forward * (num * (float)i);
+			Vector3 vector2 = vendingMachine.transform.TransformPoint(vendingMachineOffset + vector);
+			Vector3 vector3 = vector2 + Vector3.up * testHeight;
 			RaycastHit hitInfo;
-			if (!Physics.BoxCast(vector2, halfExtents, Vector3.down, out hitInfo, vendingMachine.transform.rotation, testHeight, layerMask))
+			if (!Physics.BoxCast(vector3, halfExtents, Vector3.down, out hitInfo, vendingMachine.transform.rotation, testHeight, layerMask))
 			{
-				waitPosition = vector;
-				descendPosition = vector2.WithY(currentY);
+				waitPosition = vector2;
+				descendPosition = vector3.WithY(currentY);
 				return;
 			}
 			if (i == 4)
 			{
-				waitPosition = vector2 + Vector3.down * (hitInfo.distance - halfExtents.y * 2f);
-				descendPosition = vector2.WithY(currentY);
+				waitPosition = vector3 + Vector3.down * (hitInfo.distance - halfExtents.y * 2f);
+				descendPosition = vector3.WithY(currentY);
 				return;
 			}
 		}

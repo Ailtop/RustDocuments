@@ -204,8 +204,8 @@ public class ShopFront : StorageContainer
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void AcceptClicked(RPCMessage msg)
 	{
 		if (IsTradingPlayer(msg.player) && !(vendorPlayer == null) && !(customerPlayer == null) && Interface.CallHook("OnShopAcceptClick", this, msg.player) == null)
@@ -228,8 +228,8 @@ public class ShopFront : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void CancelClicked(RPCMessage msg)
 	{
 		if (IsTradingPlayer(msg.player) && Interface.CallHook("OnShopCancelClick", this, msg.player) == null)
@@ -248,8 +248,8 @@ public class ShopFront : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		ItemContainer vendorInventory = this.vendorInventory;
-		vendorInventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(vendorInventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptVendorItem));
+		ItemContainer itemContainer = vendorInventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptVendorItem));
 		if (customerInventory == null)
 		{
 			customerInventory = new ItemContainer();
@@ -261,8 +261,8 @@ public class ShopFront : StorageContainer
 			customerInventory.GiveUID();
 			customerInventory.onDirty += OnInventoryDirty;
 			customerInventory.onItemAddedRemoved = OnItemAddedOrRemoved;
-			ItemContainer itemContainer = customerInventory;
-			itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptCustomerItem));
+			ItemContainer itemContainer2 = customerInventory;
+			itemContainer2.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer2.canAcceptItem, new Func<Item, int, bool>(CanAcceptCustomerItem));
 			OnInventoryFirstCreated(customerInventory);
 		}
 	}

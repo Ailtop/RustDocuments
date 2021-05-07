@@ -100,8 +100,8 @@ public class XMasRefill : BaseEntity
 
 	protected bool DropToGround(ref Vector3 pos)
 	{
-		int intVal = 1235288065;
-		int num = 8454144;
+		int num = 1235288065;
+		int num2 = 8454144;
 		if ((bool)TerrainMeta.TopologyMap && ((uint)TerrainMeta.TopologyMap.GetTopology(pos) & 0x14080u) != 0)
 		{
 			return false;
@@ -112,11 +112,11 @@ public class XMasRefill : BaseEntity
 			pos.y = Mathf.Max(pos.y, height);
 		}
 		RaycastHit hitOut;
-		if (!TransformUtil.GetGroundInfo(pos, out hitOut, 80f, intVal))
+		if (!TransformUtil.GetGroundInfo(pos, out hitOut, 80f, num))
 		{
 			return false;
 		}
-		if (((1 << hitOut.transform.gameObject.layer) & num) == 0)
+		if (((1 << hitOut.transform.gameObject.layer) & num2) == 0)
 		{
 			return false;
 		}

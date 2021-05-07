@@ -13,12 +13,12 @@ namespace ConVar
 	[Factory("pool")]
 	public class Pool : ConsoleSystem
 	{
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int mode = 2;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool prewarm = true;
 
 		[ClientVar]
@@ -109,8 +109,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void clear_memory(Arg arg)
 		{
 			Facepunch.Pool.Clear();

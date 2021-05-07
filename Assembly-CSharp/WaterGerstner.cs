@@ -35,15 +35,7 @@ public class WaterGerstner
 		[Range(-10f, 10f)]
 		public float Speed = 0.6f;
 
-		public float[] DirectionAngles = new float[6]
-		{
-			0f,
-			57.3f,
-			114.5f,
-			171.9f,
-			229.2f,
-			286.5f
-		};
+		public float[] DirectionAngles = new float[6] { 0f, 57.3f, 114.5f, 171.9f, 229.2f, 286.5f };
 
 		public float DirectionVarFreq = 0.1f;
 
@@ -230,10 +222,10 @@ public class WaterGerstner
 		Vector2 pos = new Vector2(location.x, location.z);
 		Vector2 shoreVec = new Vector2(shore.x, shore.y);
 		float t = 1f - Mathf.Clamp01(shore.z * instance.ShoreWavesRcpFadeDistance);
-		float d = Mathf.Clamp01(shore.z * instance.TerrainRcpFadeDistance);
-		float num = Mathf.Cos(pos.x * precomputedShoreWaves.DirectionVarFreq) * precomputedShoreWaves.DirectionVarAmp;
-		float num2 = Mathf.Cos(pos.y * precomputedShoreWaves.DirectionVarFreq) * precomputedShoreWaves.DirectionVarAmp;
-		float variation_t = num + num2;
+		float num = Mathf.Clamp01(shore.z * instance.TerrainRcpFadeDistance);
+		float num2 = Mathf.Cos(pos.x * precomputedShoreWaves.DirectionVarFreq) * precomputedShoreWaves.DirectionVarAmp;
+		float num3 = Mathf.Cos(pos.y * precomputedShoreWaves.DirectionVarFreq) * precomputedShoreWaves.DirectionVarAmp;
+		float variation_t = num2 + num3;
 		Vector3 outP = Vector3.zero;
 		Vector3 outP2 = Vector3.zero;
 		for (int i = 0; i < 6; i++)
@@ -241,7 +233,7 @@ public class WaterGerstner
 			GerstnerWave(precomputedWaves[i], pos, shoreVec, ref outP);
 			GerstnerShoreWave(precomputedShoreWaves, precomputedShoreWaves.Directions[i], pos, shoreVec, variation_t, ref outP2);
 		}
-		return Vector3.Lerp(outP, outP2, t) * d;
+		return Vector3.Lerp(outP, outP2, t) * num;
 	}
 
 	private static float SampleHeightREF(WaterSystem instance, Vector3 location, Vector3 shore)

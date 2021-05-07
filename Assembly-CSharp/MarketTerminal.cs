@@ -288,8 +288,8 @@ public class MarketTerminal : StorageContainer
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(3uL)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.CallsPerSecond(3uL)]
 	[RPC_Server]
 	public void Server_TryOpenMarket(RPCMessage msg)
 	{
@@ -310,9 +310,9 @@ public class MarketTerminal : StorageContainer
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(10uL)]
 	public void Server_Purchase(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))
@@ -456,10 +456,10 @@ public class MarketTerminal : StorageContainer
 
 	private void RemoveAnyLooters()
 	{
-		ItemContainer inventory = base.inventory;
+		ItemContainer item = base.inventory;
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			if (!(activePlayer == null) && !(activePlayer.inventory == null) && !(activePlayer.inventory.loot == null) && activePlayer.inventory.loot.containers.Contains(inventory))
+			if (!(activePlayer == null) && !(activePlayer.inventory == null) && !(activePlayer.inventory.loot == null) && activePlayer.inventory.loot.containers.Contains(item))
 			{
 				activePlayer.inventory.loot.Clear();
 			}

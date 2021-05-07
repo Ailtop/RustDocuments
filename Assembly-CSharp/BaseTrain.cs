@@ -50,8 +50,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	[SerializeField]
 	public TriggerTrainCollisions rearCollisionTrigger;
 
-	[SerializeField]
 	[Tooltip("How much impact energy is retained on collisions. 1.0 = 100% retained, 0.0 = 100% loss of energy")]
+	[SerializeField]
 	public float impactEnergyFraction = 0.75f;
 
 	[SerializeField]
@@ -83,19 +83,11 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public TrainTrackSpline.TrackSelection curTrackSelection;
 
-	public float TrackSpeed
-	{
-		get;
-		set;
-	}
+	public float TrackSpeed { get; set; }
 
 	public Vector3 Position => base.transform.position;
 
-	public float FrontWheelSplineDist
-	{
-		get;
-		private set;
-	}
+	public float FrontWheelSplineDist { get; private set; }
 
 	public TrainTrackSpline FrontTrackSection
 	{
@@ -120,11 +112,7 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 		}
 	}
 
-	public TrainTrackSpline RearTrackSection
-	{
-		get;
-		set;
-	}
+	public TrainTrackSpline RearTrackSection { get; set; }
 
 	public bool IsAtAStation
 	{

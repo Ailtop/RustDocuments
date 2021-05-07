@@ -55,15 +55,15 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 	[Header("Trigger Parent")]
 	private TriggerParent[] triggerParents;
 
-	[Header("Sliding Components")]
 	[SerializeField]
+	[Header("Sliding Components")]
 	private VehicleModuleSlidingComponent[] slidingComponents;
 
 	[SerializeField]
 	private VehicleModuleButtonComponent[] buttonComponents;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private DamageRenderer damageRenderer;
 
 	private TimeSince TimeSinceAddedToVehicle;
@@ -74,24 +74,12 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	private bool prevRefreshVehicleIsLockable;
 
-	public bool PropagateDamage
-	{
-		get;
-		private set;
-	} = true;
+	public bool PropagateDamage { get; private set; } = true;
 
 
-	public BaseModularVehicle Vehicle
-	{
-		get;
-		private set;
-	}
+	public BaseModularVehicle Vehicle { get; private set; }
 
-	public int FirstSocketIndex
-	{
-		get;
-		private set;
-	} = -1;
+	public int FirstSocketIndex { get; private set; } = -1;
 
 
 	public Vector3 CentreOfMass => centreOfMassTransform.localPosition;
@@ -252,8 +240,8 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Use(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -14,7 +14,7 @@ public class TerrainBiomeMap : TerrainMap<byte>
 			{
 				res = BiomeTexture.width;
 				this.num = 4;
-				src = (base.dst = new byte[this.num * res * res]);
+				src = (dst = new byte[this.num * res * res]);
 				Color32[] pixels = BiomeTexture.GetPixels32();
 				int i = 0;
 				int num = 0;
@@ -24,12 +24,12 @@ public class TerrainBiomeMap : TerrainMap<byte>
 					while (num2 < res)
 					{
 						Color32 color = pixels[num];
-						byte[] dst = base.dst;
+						byte[] array = dst;
 						int re = res;
-						dst[(0 + i) * res + num2] = color.r;
-						base.dst[(res + i) * res + num2] = color.g;
-						base.dst[(2 * res + i) * res + num2] = color.b;
-						base.dst[(3 * res + i) * res + num2] = color.a;
+						array[(0 + i) * res + num2] = color.r;
+						dst[(res + i) * res + num2] = color.g;
+						dst[(2 * res + i) * res + num2] = color.b;
+						dst[(3 * res + i) * res + num2] = color.a;
 						num2++;
 						num++;
 					}
@@ -44,7 +44,7 @@ public class TerrainBiomeMap : TerrainMap<byte>
 		{
 			res = terrain.terrainData.alphamapResolution;
 			this.num = 4;
-			src = (base.dst = new byte[this.num * res * res]);
+			src = (dst = new byte[this.num * res * res]);
 		}
 	}
 
@@ -58,12 +58,12 @@ public class TerrainBiomeMap : TerrainMap<byte>
 		{
 			for (int i = 0; i < res; i++)
 			{
-				byte[] src = base.src;
+				byte[] array = src;
 				int re = res;
-				byte r = src[(0 + z) * res + i];
-				byte g = base.src[(res + z) * res + i];
-				byte b = base.src[(2 * res + z) * res + i];
-				byte a = base.src[(3 * res + z) * res + i];
+				byte r = array[(0 + z) * res + i];
+				byte g = src[(res + z) * res + i];
+				byte b = src[(2 * res + z) * res + i];
+				byte a = src[(3 * res + z) * res + i];
 				col[z * res + i] = new Color32(r, g, b, a);
 			}
 		});
@@ -248,24 +248,24 @@ public class TerrainBiomeMap : TerrainMap<byte>
 			float num2 = 1f - opacity * num;
 			if (num2 == 0f && opacity == 1f)
 			{
-				byte[] dst = base.dst;
+				byte[] array = dst;
 				int re = res;
-				dst[(0 + z) * res + x] = BitUtility.Float2Byte(v.x);
-				base.dst[(res + z) * res + x] = BitUtility.Float2Byte(v.y);
-				base.dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(v.z);
-				base.dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(v.w);
+				array[(0 + z) * res + x] = BitUtility.Float2Byte(v.x);
+				dst[(res + z) * res + x] = BitUtility.Float2Byte(v.y);
+				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(v.z);
+				dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(v.w);
 			}
 			else
 			{
-				byte[] dst2 = base.dst;
+				byte[] array2 = dst;
 				int re2 = res;
 				int num3 = (0 + z) * res + x;
-				byte[] src = base.src;
+				byte[] array3 = src;
 				int re3 = res;
-				dst2[num3] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(0 + z) * res + x]) * num2 + v.x * opacity);
-				base.dst[(res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(res + z) * res + x]) * num2 + v.y * opacity);
-				base.dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(2 * res + z) * res + x]) * num2 + v.z * opacity);
-				base.dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(base.src[(3 * res + z) * res + x]) * num2 + v.w * opacity);
+				array2[num3] = BitUtility.Float2Byte(BitUtility.Byte2Float(array3[(0 + z) * res + x]) * num2 + v.x * opacity);
+				dst[(res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(res + z) * res + x]) * num2 + v.y * opacity);
+				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(2 * res + z) * res + x]) * num2 + v.z * opacity);
+				dst[(3 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(3 * res + z) * res + x]) * num2 + v.w * opacity);
 			}
 		}
 	}

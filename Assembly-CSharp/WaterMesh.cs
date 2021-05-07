@@ -127,27 +127,27 @@ public class WaterMesh
 		}
 		int num4 = resolution * 4;
 		float num5 = (float)resolution * num;
-		Vector3 a = new Vector3(sizeInWorld, 0f, sizeInWorld) * 0.5f;
+		Vector3 vector = new Vector3(sizeInWorld, 0f, sizeInWorld) * 0.5f;
 		int k = 0;
 		int num6 = 0;
 		for (; k < ringCount + 1; k++)
 		{
-			Vector3 a2 = -a;
+			Vector3 vector2 = -vector;
 			for (int l = 0; l < resolution; l++)
 			{
-				array[num6++] = a2 + new Vector3((float)l * num, 0f, 0f);
+				array[num6++] = vector2 + new Vector3((float)l * num, 0f, 0f);
 			}
 			for (int m = 0; m < resolution; m++)
 			{
-				array[num6++] = a2 + new Vector3(num5, 0f, (float)m * num);
+				array[num6++] = vector2 + new Vector3(num5, 0f, (float)m * num);
 			}
 			for (int num7 = resolution; num7 > 0; num7--)
 			{
-				array[num6++] = a2 + new Vector3((float)num7 * num, 0f, num5);
+				array[num6++] = vector2 + new Vector3((float)num7 * num, 0f, num5);
 			}
 			for (int num8 = resolution; num8 > 0; num8--)
 			{
-				array[num6++] = a2 + new Vector3(0f, 0f, (float)num8 * num);
+				array[num6++] = vector2 + new Vector3(0f, 0f, (float)num8 * num);
 			}
 		}
 		int n = 0;

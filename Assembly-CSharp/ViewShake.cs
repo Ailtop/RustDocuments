@@ -24,17 +24,9 @@ public class ViewShake
 
 	protected List<ShakeParameters> Entries = new List<ShakeParameters>();
 
-	public Vector3 PositionOffset
-	{
-		get;
-		protected set;
-	}
+	public Vector3 PositionOffset { get; protected set; }
 
-	public Vector3 AnglesOffset
-	{
-		get;
-		protected set;
-	}
+	public Vector3 AnglesOffset { get; protected set; }
 
 	public void AddShake(float amplitude, float frequency, float duration)
 	{

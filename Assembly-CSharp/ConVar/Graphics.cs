@@ -91,9 +91,9 @@ namespace ConVar
 			}
 			set
 			{
-				int shadowcascades = Graphics.shadowcascades;
+				int num = shadowcascades;
 				QualitySettings.SetQualityLevel(value, true);
-				Graphics.shadowcascades = shadowcascades;
+				shadowcascades = num;
 			}
 		}
 

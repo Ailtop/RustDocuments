@@ -21,16 +21,16 @@ public class BenchmarkInfo : SingletonComponent<BenchmarkInfo>
 
 	private void Start()
 	{
-		string str = Environment.MachineName + "\n";
-		str = str + SystemInfo.operatingSystem + "\n";
-		str += $"{(double)SystemInfo.systemMemorySize / 1024.0:0}GB RAM\n";
-		str = str + SystemInfo.processorType + "\n";
-		str += $"{SystemInfo.graphicsDeviceName} ({(double)SystemInfo.graphicsMemorySize / 1024.0:0}GB)\n";
-		str += "\n";
-		str = str + BuildInfo.Current.Build.Node + " / " + BuildInfo.Current.Scm.Date + "\n";
-		str = str + BuildInfo.Current.Scm.Repo + "/" + BuildInfo.Current.Scm.Branch + "#" + BuildInfo.Current.Scm.ChangeId + "\n";
-		str = str + BuildInfo.Current.Scm.Author + " - " + BuildInfo.Current.Scm.Comment + "\n";
-		SystemInfoText.text = str;
+		string text = Environment.MachineName + "\n";
+		text = text + SystemInfo.operatingSystem + "\n";
+		text += $"{(double)SystemInfo.systemMemorySize / 1024.0:0}GB RAM\n";
+		text = text + SystemInfo.processorType + "\n";
+		text += $"{SystemInfo.graphicsDeviceName} ({(double)SystemInfo.graphicsMemorySize / 1024.0:0}GB)\n";
+		text += "\n";
+		text = text + BuildInfo.Current.Build.Node + " / " + BuildInfo.Current.Scm.Date + "\n";
+		text = text + BuildInfo.Current.Scm.Repo + "/" + BuildInfo.Current.Scm.Branch + "#" + BuildInfo.Current.Scm.ChangeId + "\n";
+		text = text + BuildInfo.Current.Scm.Author + " - " + BuildInfo.Current.Scm.Comment + "\n";
+		SystemInfoText.text = text;
 	}
 
 	private void Update()

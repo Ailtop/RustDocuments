@@ -30,10 +30,7 @@ public class NewsSource : MonoBehaviour
 
 	public HttpImage youtubeTemplate;
 
-	private static readonly string[] BulletSeparators = new string[1]
-	{
-		"[*]"
-	};
+	private static readonly string[] BulletSeparators = new string[1] { "[*]" };
 
 	public void Awake()
 	{
@@ -54,8 +51,8 @@ public class NewsSource : MonoBehaviour
 		container.DestroyAllChildren();
 		title.text = story.name;
 		authorName.text = "by " + story.author;
-		string str = NumberExtensions.FormatSecondsLong(Epoch.Current - story.date);
-		date.text = "Posted " + str + " ago";
+		string text = NumberExtensions.FormatSecondsLong(Epoch.Current - story.date);
+		date.text = "Posted " + text + " ago";
 		button.onClick.RemoveAllListeners();
 		button.onClick.AddListener(delegate
 		{

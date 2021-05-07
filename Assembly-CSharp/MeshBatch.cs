@@ -3,39 +3,17 @@ using UnityEngine;
 
 public abstract class MeshBatch : MonoBehaviour
 {
-	public bool NeedsRefresh
-	{
-		get;
-		private set;
-	}
+	public bool NeedsRefresh { get; private set; }
 
-	public int Count
-	{
-		get;
-		private set;
-	}
+	public int Count { get; private set; }
 
-	public int BatchedCount
-	{
-		get;
-		private set;
-	}
+	public int BatchedCount { get; private set; }
 
-	public int VertexCount
-	{
-		get;
-		private set;
-	}
+	public int VertexCount { get; private set; }
 
-	public abstract int VertexCapacity
-	{
-		get;
-	}
+	public abstract int VertexCapacity { get; }
 
-	public abstract int VertexCutoff
-	{
-		get;
-	}
+	public abstract int VertexCutoff { get; }
 
 	public int AvailableVertices => Mathf.Clamp(VertexCapacity, VertexCutoff, 65534) - VertexCount;
 

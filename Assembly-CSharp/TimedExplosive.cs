@@ -109,12 +109,12 @@ public class TimedExplosive : BaseEntity
 			if (onlyDamageParent)
 			{
 				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 166144, true);
-				BaseEntity parentEntity = GetParentEntity();
-				BaseCombatEntity baseCombatEntity = parentEntity as BaseCombatEntity;
-				while (baseCombatEntity == null && parentEntity != null && parentEntity.HasParent())
+				BaseEntity baseEntity = GetParentEntity();
+				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
+				while (baseCombatEntity == null && baseEntity != null && baseEntity.HasParent())
 				{
-					parentEntity = parentEntity.GetParentEntity();
-					baseCombatEntity = parentEntity as BaseCombatEntity;
+					baseEntity = baseEntity.GetParentEntity();
+					baseCombatEntity = baseEntity as BaseCombatEntity;
 				}
 				if ((bool)baseCombatEntity)
 				{

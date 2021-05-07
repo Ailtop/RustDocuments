@@ -220,8 +220,8 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 				RaycastHit hitInfo;
 				if (Physics.SphereCast(position, 15f, vector, out hitInfo, num, 1218511105))
 				{
-					Vector3 a = Vector3.Cross(vector, Vector3.up);
-					moveTarget = hitInfo.point + a * 50f;
+					Vector3 vector2 = Vector3.Cross(vector, Vector3.up);
+					moveTarget = hitInfo.point + vector2 * 50f;
 				}
 			}
 			brain.GetEntity().SetMoveTarget(moveTarget);
@@ -309,10 +309,10 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 			Vector3 position = entity.GetPosition();
 			Vector3 vector = Vector3Ex.Direction2D(orbitCenter, position);
 			Vector3 vector2 = Vector3.Cross(Vector3.up, vector);
-			float d = ((Vector3.Dot(Vector3.Cross(entity.transform.right, Vector3.up), vector2) < 0f) ? (-1f) : 1f);
-			float d2 = 75f;
-			Vector3 normalized = (-vector + vector2 * d * 0.6f).normalized;
-			Vector3 vector3 = orbitCenter + normalized * d2;
+			float num = ((Vector3.Dot(Vector3.Cross(entity.transform.right, Vector3.up), vector2) < 0f) ? (-1f) : 1f);
+			float num2 = 75f;
+			Vector3 normalized = (-vector + vector2 * num * 0.6f).normalized;
+			Vector3 vector3 = orbitCenter + normalized * num2;
 			entity.SetMoveTarget(vector3);
 			entity.SetAimDirection(Vector3Ex.Direction2D(vector3, position));
 			base.StateThink(delta);
@@ -361,8 +361,8 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 			Transform transform = brain.GetEntity().transform;
 			Rigidbody rigidBody = brain.GetEntity().rigidBody;
 			Vector3 rhs = ((rigidBody.velocity.magnitude < 0.1f) ? transform.forward : rigidBody.velocity.normalized);
-			Vector3 a = Vector3.Cross(Vector3.Cross(transform.up, rhs), Vector3.up);
-			brain.mainInterestPoint = transform.position + a * 8000f;
+			Vector3 vector = Vector3.Cross(Vector3.Cross(transform.up, rhs), Vector3.up);
+			brain.mainInterestPoint = transform.position + vector * 8000f;
 			brain.mainInterestPoint.y = 100f;
 			brain.GetEntity().SetMoveTarget(brain.mainInterestPoint);
 			base.StateEnter();

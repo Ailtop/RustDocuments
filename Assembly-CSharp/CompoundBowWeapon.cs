@@ -132,7 +132,7 @@ public class CompoundBowWeapon : BowWeapon
 
 	public float GetLastPlayerMovementTime()
 	{
-		bool isServer = base.isServer;
+		bool isServer2 = base.isServer;
 		return 0f;
 	}
 

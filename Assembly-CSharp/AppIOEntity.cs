@@ -16,10 +16,7 @@ public abstract class AppIOEntity : IOEntity
 
 	private BuildingPrivlidge _cache;
 
-	public abstract AppEntityType Type
-	{
-		get;
-	}
+	public abstract AppEntityType Type { get; }
 
 	public virtual bool Value
 	{

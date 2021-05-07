@@ -1,16 +1,8 @@
 public class GrowableGene
 {
-	public GrowableGenetics.GeneType Type
-	{
-		get;
-		private set;
-	}
+	public GrowableGenetics.GeneType Type { get; private set; }
 
-	public GrowableGenetics.GeneType PreviousType
-	{
-		get;
-		private set;
-	}
+	public GrowableGenetics.GeneType PreviousType { get; private set; }
 
 	public void Set(GrowableGenetics.GeneType geneType, bool firstSet = false)
 	{

@@ -27,17 +27,17 @@ namespace ConVar
 		[ServerVar]
 		public static void ls(Arg args)
 		{
-			string str = "";
+			string text = "";
 			string filter = args.GetString(0);
-			str = ((!currentDir) ? (str + "Listing .\n\n") : (str + "Listing " + currentDir.transform.GetRecursiveName() + "\n\n"));
+			text = ((!currentDir) ? (text + "Listing .\n\n") : (text + "Listing " + currentDir.transform.GetRecursiveName() + "\n\n"));
 			foreach (Transform item in (from x in GetCurrent()
 				where string.IsNullOrEmpty(filter) || x.name.Contains(filter)
 				select x).Take(40))
 			{
-				str += $"   {item.name} [{item.childCount}]\n";
+				text += $"   {item.name} [{item.childCount}]\n";
 			}
-			str += "\n";
-			args.ReplyWith(str);
+			text += "\n";
+			args.ReplyWith(text);
 		}
 
 		[ServerVar]

@@ -128,8 +128,8 @@ public class PoweredLightsDeployer : HeldEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void AddPoint(RPCMessage msg)
 	{
 		Vector3 vector = msg.read.Vector3();

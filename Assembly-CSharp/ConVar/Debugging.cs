@@ -26,8 +26,8 @@ namespace ConVar
 		[ServerVar]
 		public static bool callbacks = false;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool log
 		{
 			get
@@ -40,8 +40,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void renderinfo(Arg arg)
 		{
 			RenderInfo.GenerateReport();

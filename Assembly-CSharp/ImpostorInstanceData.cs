@@ -10,23 +10,11 @@ public class ImpostorInstanceData
 
 	private Vector4 positionAndScale = Vector4.zero;
 
-	public Renderer Renderer
-	{
-		get;
-		private set;
-	}
+	public Renderer Renderer { get; private set; }
 
-	public Mesh Mesh
-	{
-		get;
-		private set;
-	}
+	public Mesh Mesh { get; private set; }
 
-	public Material Material
-	{
-		get;
-		private set;
-	}
+	public Material Material { get; private set; }
 
 	public ImpostorInstanceData(Renderer renderer, Mesh mesh, Material material)
 	{

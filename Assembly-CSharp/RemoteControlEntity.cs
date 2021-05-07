@@ -20,11 +20,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 
 	public GameObjectRef IDPanelPrefab;
 
-	public bool IsBeingControlled
-	{
-		get;
-		set;
-	}
+	public bool IsBeingControlled { get; set; }
 
 	public virtual bool RequiresMouse => false;
 

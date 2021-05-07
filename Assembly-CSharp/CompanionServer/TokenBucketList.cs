@@ -7,15 +7,9 @@ namespace CompanionServer
 	{
 		private readonly Dictionary<TKey, TokenBucket> _buckets;
 
-		public double MaxTokens
-		{
-			get;
-		}
+		public double MaxTokens { get; }
 
-		public double TokensPerSec
-		{
-			get;
-		}
+		public double TokensPerSec { get; }
 
 		public TokenBucketList(double maxTokens, double tokensPerSec)
 		{

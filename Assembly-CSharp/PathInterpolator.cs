@@ -9,35 +9,15 @@ public class PathInterpolator
 
 	protected bool initialized;
 
-	public int MinIndex
-	{
-		get;
-		set;
-	}
+	public int MinIndex { get; set; }
 
-	public int MaxIndex
-	{
-		get;
-		set;
-	}
+	public int MaxIndex { get; set; }
 
-	public virtual float Length
-	{
-		get;
-		private set;
-	}
+	public virtual float Length { get; private set; }
 
-	public virtual float StepSize
-	{
-		get;
-		private set;
-	}
+	public virtual float StepSize { get; private set; }
 
-	public bool Circular
-	{
-		get;
-		private set;
-	}
+	public bool Circular { get; private set; }
 
 	public int DefaultMinIndex => 0;
 
@@ -89,9 +69,9 @@ public class PathInterpolator
 			{
 				num2 = (Circular ? 1 : (Points.Length - 1));
 			}
-			Vector3 b = Points[num];
-			Vector3 a = Points[num2];
-			Tangents[i] = (a - b).normalized;
+			Vector3 vector = Points[num];
+			Vector3 vector2 = Points[num2];
+			Tangents[i] = (vector2 - vector).normalized;
 		}
 		RecalculateLength();
 		initialized = true;
@@ -102,9 +82,9 @@ public class PathInterpolator
 		float num = 0f;
 		for (int i = 0; i < Points.Length - 1; i++)
 		{
-			Vector3 b = Points[i];
-			Vector3 a = Points[i + 1];
-			num += (a - b).magnitude;
+			Vector3 vector = Points[i];
+			Vector3 vector2 = Points[i + 1];
+			num += (vector2 - vector).magnitude;
 		}
 		Length = num;
 		StepSize = num / (float)Points.Length;
@@ -154,17 +134,17 @@ public class PathInterpolator
 		{
 			num = Points.Length - 2;
 		}
-		Vector3 a = Points[num];
-		Vector3 b = Points[i];
-		Vector3 b2 = Points[num2];
-		Vector3 vector = (a + b + b + b2) * 0.25f;
+		Vector3 vector = Points[num];
+		Vector3 vector2 = Points[i];
+		Vector3 vector3 = Points[num2];
+		Vector3 vector4 = (vector + vector2 + vector2 + vector3) * 0.25f;
 		if (multipliers != Vector3.one)
 		{
-			vector.x = Mathf.LerpUnclamped(b.x, vector.x, multipliers.x);
-			vector.y = Mathf.LerpUnclamped(b.y, vector.y, multipliers.y);
-			vector.z = Mathf.LerpUnclamped(b.z, vector.z, multipliers.z);
+			vector4.x = Mathf.LerpUnclamped(vector2.x, vector4.x, multipliers.x);
+			vector4.y = Mathf.LerpUnclamped(vector2.y, vector4.y, multipliers.y);
+			vector4.z = Mathf.LerpUnclamped(vector2.z, vector4.z, multipliers.z);
 		}
-		Points[i] = vector;
+		Points[i] = vector4;
 		if (i == 0)
 		{
 			Points[Points.Length - 1] = Points[0];
@@ -259,13 +239,13 @@ public class PathInterpolator
 		{
 			return GetEndPoint();
 		}
-		Vector3 a = Points[num2];
-		Vector3 a2 = Points[num2 + 1];
-		Vector3 a3 = Tangents[num2] * StepSize;
-		Vector3 a4 = Tangents[num2 + 1] * StepSize;
+		Vector3 vector = Points[num2];
+		Vector3 vector2 = Points[num2 + 1];
+		Vector3 vector3 = Tangents[num2] * StepSize;
+		Vector3 vector4 = Tangents[num2 + 1] * StepSize;
 		float num3 = num - (float)num2;
 		float num4 = num3 * num3;
 		float num5 = num3 * num4;
-		return (2f * num5 - 3f * num4 + 1f) * a + (num5 - 2f * num4 + num3) * a3 + (-2f * num5 + 3f * num4) * a2 + (num5 - num4) * a4;
+		return (2f * num5 - 3f * num4 + 1f) * vector + (num5 - 2f * num4 + num3) * vector3 + (-2f * num5 + 3f * num4) * vector2 + (num5 - num4) * vector4;
 	}
 }

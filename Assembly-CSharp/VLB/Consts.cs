@@ -101,12 +101,7 @@ namespace VLB
 			BlendMode.OneMinusSrcAlpha
 		};
 
-		public static readonly bool[] BlendingMode_AlphaAsBlack = new bool[3]
-		{
-			true,
-			true,
-			false
-		};
+		public static readonly bool[] BlendingMode_AlphaAsBlack = new bool[3] { true, true, false };
 
 		public const float DynOcclusionMinSurfaceRatioDefault = 0.5f;
 

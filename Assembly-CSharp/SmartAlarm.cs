@@ -31,11 +31,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 
 	public override AppEntityType Type => AppEntityType.Alarm;
 
-	public override bool Value
-	{
-		get;
-		set;
-	}
+	public override bool Value { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -165,7 +161,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 			{
 				_subscriptions.IntersectWith(buildingPrivilege.authorizedPlayers);
 			}
-			_subscriptions.SendNotification(NotificationChannel.SmartAlarm, _notificationTitle, _notificationBody, "alarm");
+			_subscriptions.SendNotification(NotificationChannel.SmartAlarm, _notificationTitle, _notificationBody);
 			_lastSentTime = UnityEngine.Time.realtimeSinceStartup;
 		}
 	}
@@ -201,8 +197,8 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	private void StartSetupNotification(RPCMessage rpc)
 	{
@@ -216,9 +212,9 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	private void SetNotificationTextImpl(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract())

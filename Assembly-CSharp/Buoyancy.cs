@@ -50,11 +50,7 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	public float waveHeightScale = 0.5f;
 
-	public float timeOutOfWater
-	{
-		get;
-		private set;
-	}
+	public float timeOutOfWater { get; private set; }
 
 	public static string DefaultWaterImpact()
 	{
@@ -141,10 +137,10 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 			Rigidbody component = GetComponent<Rigidbody>();
 			if (component != null)
 			{
-				GameObject gameObject = new GameObject("BuoyancyPoint");
-				gameObject.transform.parent = component.gameObject.transform;
-				gameObject.transform.localPosition = component.centerOfMass;
-				BuoyancyPoint buoyancyPoint = gameObject.AddComponent<BuoyancyPoint>();
+				GameObject obj = new GameObject("BuoyancyPoint");
+				obj.transform.parent = component.gameObject.transform;
+				obj.transform.localPosition = component.centerOfMass;
+				BuoyancyPoint buoyancyPoint = obj.AddComponent<BuoyancyPoint>();
 				buoyancyPoint.buoyancyForce = component.mass * (0f - Physics.gravity.y);
 				buoyancyPoint.buoyancyForce *= 1.32f;
 				buoyancyPoint.size = 0.2f;
@@ -240,8 +236,8 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 			if (buoyancyPoint.doSplashEffects && ((!buoyancyPoint.wasSubmergedLastFrame && flag) || (!flag && buoyancyPoint.wasSubmergedLastFrame)) && doEffects && rigidBody.GetRelativePointVelocity(localPosition).magnitude > 1f)
 			{
 				string strName = ((waterImpacts != null && waterImpacts.Length != 0 && waterImpacts[0].isValid) ? waterImpacts[0].resourcePath : DefaultWaterImpact());
-				Vector3 b = new Vector3(UnityEngine.Random.Range(-0.25f, 0.25f), 0f, UnityEngine.Random.Range(-0.25f, 0.25f));
-				Effect.server.Run(strName, position2 + b, Vector3.up);
+				Vector3 vector = new Vector3(UnityEngine.Random.Range(-0.25f, 0.25f), 0f, UnityEngine.Random.Range(-0.25f, 0.25f));
+				Effect.server.Run(strName, position2 + vector, Vector3.up);
 				buoyancyPoint.nexSplashTime = Time.time + 0.25f;
 			}
 			buoyancyPoint.wasSubmergedLastFrame = flag;

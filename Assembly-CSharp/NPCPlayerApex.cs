@@ -312,8 +312,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	private float accumPathPendingDelay;
 
-	[Header("Sensory")]
 	[Tooltip("Only care about sensations from our active enemy target, and nobody else.")]
+	[Header("Sensory")]
 	public bool OnlyTargetSensations;
 
 	private const int MaxPlayers = 128;
@@ -417,29 +417,13 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public float TimeAtDestination => timeAtDestination;
 
-	public int WaypointDirection
-	{
-		get;
-		set;
-	}
+	public int WaypointDirection { get; set; }
 
-	public bool IsWaitingAtWaypoint
-	{
-		get;
-		set;
-	}
+	public bool IsWaitingAtWaypoint { get; set; }
 
-	public int CurrentWaypointIndex
-	{
-		get;
-		set;
-	}
+	public int CurrentWaypointIndex { get; set; }
 
-	public float WaypointDelayTime
-	{
-		get;
-		set;
-	}
+	public float WaypointDelayTime { get; set; }
 
 	public Vector3 Destination
 	{
@@ -534,25 +518,13 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		}
 	}
 
-	public Vector3 SpawnPosition
-	{
-		get;
-		set;
-	}
+	public Vector3 SpawnPosition { get; set; }
 
 	public float AttackTargetVisibleFor => attackTargetVisibleFor;
 
-	public BaseEntity AttackTarget
-	{
-		get;
-		set;
-	}
+	public BaseEntity AttackTarget { get; set; }
 
-	public Memory.SeenInfo AttackTargetMemory
-	{
-		get;
-		set;
-	}
+	public Memory.SeenInfo AttackTargetMemory { get; set; }
 
 	public BaseCombatEntity CombatTarget => AttackTarget as BaseCombatEntity;
 
@@ -583,11 +555,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		}
 	}
 
-	public float currentBehaviorDuration
-	{
-		get;
-		set;
-	}
+	public float currentBehaviorDuration { get; set; }
 
 	public BaseCombatEntity Entity => this;
 
@@ -629,55 +597,23 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public float GetLastStuckTime => 0f;
 
-	public BaseEntity FoodTarget
-	{
-		get;
-		set;
-	}
+	public BaseEntity FoodTarget { get; set; }
 
-	public float TargetSpeed
-	{
-		get;
-		set;
-	}
+	public float TargetSpeed { get; set; }
 
 	public float SecondsSinceLastInRangeOfSpawnPosition => UnityEngine.Time.time - lastInRangeOfSpawnPositionTime;
 
-	public ActionCallback OnFleeExplosive
-	{
-		get;
-		set;
-	}
+	public ActionCallback OnFleeExplosive { get; set; }
 
-	public ActionCallback OnTakeCover
-	{
-		get;
-		set;
-	}
+	public ActionCallback OnTakeCover { get; set; }
 
-	public ActionCallback OnAggro
-	{
-		get;
-		set;
-	}
+	public ActionCallback OnAggro { get; set; }
 
-	public ActionCallback OnChatter
-	{
-		get;
-		set;
-	}
+	public ActionCallback OnChatter { get; set; }
 
-	public ActionCallback OnDeath
-	{
-		get;
-		set;
-	}
+	public ActionCallback OnDeath { get; set; }
 
-	public ActionCallback OnReload
-	{
-		get;
-		set;
-	}
+	public ActionCallback OnReload { get; set; }
 
 	public float SecondsSinceSeenPlayer => UnityEngine.Time.time - lastSeenPlayerTime;
 
@@ -790,11 +726,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public float SecondsSinceLastHeardGunshot => UnityEngine.Time.time - _lastHeardGunshotTime;
 
-	public Vector3 LastHeardGunshotDirection
-	{
-		get;
-		set;
-	}
+	public Vector3 LastHeardGunshotDirection { get; set; }
 
 	public override BaseNpc.AiStatistics.FamilyEnum Family => BaseNpc.AiStatistics.FamilyEnum.Scientist;
 
@@ -810,11 +742,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		}
 	}
 
-	public bool IsStuck
-	{
-		get;
-		set;
-	}
+	public bool IsStuck { get; set; }
 
 	public override bool IsDormant
 	{
@@ -952,8 +880,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public void Dismount()
 	{
-		BaseMountable mounted = GetMounted();
-		if (mounted != null && mounted.AttemptDismount(this))
+		BaseMountable baseMountable = GetMounted();
+		if (baseMountable != null && baseMountable.AttemptDismount(this))
 		{
 			SetFact(Facts.IsMounted, 0);
 			SetFact(Facts.WantsToDismount, 0);
@@ -2527,8 +2455,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 				AiContext.Memory.Update(player2);
 			}
 			Vector3 vector = player2.ServerPosition - ServerPosition;
-			BaseMountable mounted = GetMounted();
-			if (!(Vector3.Dot(vector.normalized, mounted.transform.forward) < -0.1f))
+			BaseMountable baseMountable = GetMounted();
+			if (!(Vector3.Dot(vector.normalized, baseMountable.transform.forward) < -0.1f))
 			{
 				float sqrMagnitude = vector.sqrMagnitude;
 				if (sqrMagnitude < num)
@@ -2767,8 +2695,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	{
 		if (base.isMounted)
 		{
-			BaseMountable mounted = GetMounted();
-			if (Vector3.Dot(dir.normalized, mounted.transform.forward) > -0.1f)
+			BaseMountable baseMountable = GetMounted();
+			if (Vector3.Dot(dir.normalized, baseMountable.transform.forward) > -0.1f)
 			{
 				return 1f;
 			}
@@ -3649,9 +3577,9 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 
 	public void UpdateModelState(float delta)
 	{
-		BaseMountable mounted = GetMounted();
-		modelState.mounted = mounted != null;
-		modelState.poseType = (int)(modelState.mounted ? mounted.mountPose : PlayerModel.MountPoses.Chair);
+		BaseMountable baseMountable = GetMounted();
+		modelState.mounted = baseMountable != null;
+		modelState.poseType = (int)(modelState.mounted ? baseMountable.mountPose : PlayerModel.MountPoses.Chair);
 		if (!AI.move || (!base.isMounted && !IsNavRunning()))
 		{
 			return;
@@ -3813,59 +3741,59 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	{
 		if (base.isMounted)
 		{
-			BaseMountable mounted = GetMounted();
+			BaseMountable baseMountable = GetMounted();
 			if (CurrentBehaviour == BaseNpc.Behaviour.Attack && AttackTarget != null)
 			{
-				Vector3 b = Vector3.zero;
+				Vector3 vector = Vector3.zero;
 				BasePlayer basePlayer = AttackTarget as BasePlayer;
 				if (basePlayer != null)
 				{
 					if (basePlayer.IsDucked())
 					{
-						b = PlayerEyes.DuckOffset;
+						vector = PlayerEyes.DuckOffset;
 					}
 					else if (basePlayer.IsSleeping())
 					{
-						b = new Vector3(0f, -1f, 0f);
+						vector = new Vector3(0f, -1f, 0f);
 					}
 				}
 				else if (AttackTarget as BaseNpc != null)
 				{
-					b = new Vector3(0f, -0.5f, 0f);
+					vector = new Vector3(0f, -0.5f, 0f);
 				}
-				Vector3 b2 = CenterPoint() + new Vector3(0f, 0f, 0f);
-				Vector3 a = AttackTarget.CenterPoint();
+				Vector3 vector2 = CenterPoint() + new Vector3(0f, 0f, 0f);
+				Vector3 vector3 = AttackTarget.CenterPoint();
 				if (!AttackTarget.IsVisible(eyes.position, AttackTarget.CenterPoint()))
 				{
 					Memory.SeenInfo info = AiContext.Memory.GetInfo(AttackTarget);
 					if (!(info.Entity != null) || !((info.Position - ServerPosition).sqrMagnitude > 4f))
 					{
-						return mounted.transform.forward;
+						return baseMountable.transform.forward;
 					}
-					a = info.Position;
+					vector3 = info.Position;
 				}
-				return (a + b - b2).normalized;
+				return (vector3 + vector - vector2).normalized;
 			}
-			return mounted.transform.forward;
+			return baseMountable.transform.forward;
 		}
 		if (LookAtEyes != null && LookAtEyes.transform != null && (CurrentBehaviour == BaseNpc.Behaviour.Wander || CurrentBehaviour == BaseNpc.Behaviour.Idle))
 		{
-			Vector3 b3 = CenterPoint();
-			return (LookAtEyes.position + PlayerEyes.DuckOffset - b3).normalized;
+			Vector3 vector4 = CenterPoint();
+			return (LookAtEyes.position + PlayerEyes.DuckOffset - vector4).normalized;
 		}
 		if (LookAtPoint != null && (CurrentBehaviour == BaseNpc.Behaviour.Wander || CurrentBehaviour == BaseNpc.Behaviour.Idle))
 		{
-			Vector3 b4 = CenterPoint();
-			return (LookAtPoint.position - b4).normalized;
+			Vector3 vector5 = CenterPoint();
+			return (LookAtPoint.position - vector5).normalized;
 		}
 		if (_traversingNavMeshLink)
 		{
-			Vector3 vector = ((!(AttackTarget != null)) ? (NavAgent.destination - ServerPosition) : (AttackTarget.ServerPosition - ServerPosition));
-			if (vector.sqrMagnitude > 1f)
+			Vector3 vector6 = ((!(AttackTarget != null)) ? (NavAgent.destination - ServerPosition) : (AttackTarget.ServerPosition - ServerPosition));
+			if (vector6.sqrMagnitude > 1f)
 			{
-				vector = _currentNavMeshLinkEndPos - ServerPosition;
+				vector6 = _currentNavMeshLinkEndPos - ServerPosition;
 			}
-			if (vector.sqrMagnitude > 0.001f)
+			if (vector6.sqrMagnitude > 0.001f)
 			{
 				return _currentNavMeshLinkOrientation * Vector3.forward;
 			}
@@ -3880,25 +3808,25 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		}
 		if (CurrentBehaviour == BaseNpc.Behaviour.Attack && AttackTarget != null)
 		{
-			Vector3 b5 = Vector3.zero;
+			Vector3 vector7 = Vector3.zero;
 			BasePlayer basePlayer2 = AttackTarget as BasePlayer;
 			if (basePlayer2 != null)
 			{
 				if (basePlayer2.IsDucked())
 				{
-					b5 = PlayerEyes.DuckOffset;
+					vector7 = PlayerEyes.DuckOffset;
 				}
 				else if (basePlayer2.IsSleeping())
 				{
-					b5 = new Vector3(0f, -1f, 0f);
+					vector7 = new Vector3(0f, -1f, 0f);
 				}
 			}
 			else if (AttackTarget as BaseNpc != null)
 			{
-				b5 = new Vector3(0f, -0.5f, 0f);
+				vector7 = new Vector3(0f, -0.5f, 0f);
 			}
-			Vector3 b6 = CenterPoint() + new Vector3(0f, 0f, 0f);
-			Vector3 a2 = AttackTarget.CenterPoint();
+			Vector3 vector8 = CenterPoint() + new Vector3(0f, 0f, 0f);
+			Vector3 vector9 = AttackTarget.CenterPoint();
 			Memory.ExtendedInfo extendedInfo = AiContext.Memory.GetExtendedInfo(AttackTarget);
 			if (extendedInfo.Entity == null || extendedInfo.LineOfSight == 0)
 			{
@@ -3908,7 +3836,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 				}
 				return base.transform.rotation * Vector3.forward;
 			}
-			return (a2 + b5 - b6).normalized;
+			return (vector9 + vector7 - vector8).normalized;
 		}
 		if (IsNavRunning() && NavAgent.desiredVelocity.sqrMagnitude > 0.01f)
 		{
@@ -3929,13 +3857,13 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			}
 			if (base.isMounted)
 			{
-				BaseMountable mounted = GetMounted();
-				Vector3 eulerAngles = mounted.transform.eulerAngles;
-				Quaternion rotation = Quaternion.Euler(Quaternion.LookRotation(newAim, mounted.transform.up).eulerAngles);
-				Vector3 eulerAngles2 = Quaternion.LookRotation(base.transform.InverseTransformDirection(rotation * Vector3.forward), base.transform.up).eulerAngles;
+				BaseMountable baseMountable = GetMounted();
+				Vector3 eulerAngles = baseMountable.transform.eulerAngles;
+				Quaternion quaternion = Quaternion.Euler(Quaternion.LookRotation(newAim, baseMountable.transform.up).eulerAngles);
+				Vector3 eulerAngles2 = Quaternion.LookRotation(base.transform.InverseTransformDirection(quaternion * Vector3.forward), base.transform.up).eulerAngles;
 				eulerAngles2 = BaseMountable.ConvertVector(eulerAngles2);
-				Quaternion rotation2 = Quaternion.Euler(Mathf.Clamp(eulerAngles2.x, mounted.pitchClamp.x, mounted.pitchClamp.y), Mathf.Clamp(eulerAngles2.y, mounted.yawClamp.x, mounted.yawClamp.y), eulerAngles.z);
-				newAim = BaseMountable.ConvertVector(Quaternion.LookRotation(base.transform.TransformDirection(rotation2 * Vector3.forward), base.transform.up).eulerAngles);
+				Quaternion quaternion2 = Quaternion.Euler(Mathf.Clamp(eulerAngles2.x, baseMountable.pitchClamp.x, baseMountable.pitchClamp.y), Mathf.Clamp(eulerAngles2.y, baseMountable.yawClamp.x, baseMountable.yawClamp.y), eulerAngles.z);
+				newAim = BaseMountable.ConvertVector(Quaternion.LookRotation(base.transform.TransformDirection(quaternion2 * Vector3.forward), base.transform.up).eulerAngles);
 			}
 			eyes.rotation = (base.isMounted ? Quaternion.Slerp(eyes.rotation, Quaternion.Euler(newAim), UnityEngine.Time.smoothDeltaTime * 70f) : Quaternion.LookRotation(newAim, base.transform.up));
 			viewAngles = eyes.rotation.eulerAngles;

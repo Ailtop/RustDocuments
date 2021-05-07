@@ -43,8 +43,8 @@ public class PlanterBox : StorageContainer, ISplashable
 		base.ServerInit();
 		base.inventory.onItemAddedRemoved = OnItemAddedOrRemoved;
 		base.inventory.onlyAllowedItem = allowedItem;
-		ItemContainer inventory = base.inventory;
-		inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(InventoryItemFilter));
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(InventoryItemFilter));
 		sunExposure = new TimeCachedValue<float>
 		{
 			refreshCooldown = 30f,

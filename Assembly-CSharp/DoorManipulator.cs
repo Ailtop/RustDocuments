@@ -26,11 +26,11 @@ public class DoorManipulator : IOEntity
 
 	public virtual void SetTargetDoor(Door newTargetDoor)
 	{
-		Door x = targetDoor;
+		Door door = targetDoor;
 		targetDoor = newTargetDoor;
 		SetFlag(Flags.On, targetDoor != null);
 		entityRef.Set(newTargetDoor);
-		if (x != targetDoor && targetDoor != null)
+		if (door != targetDoor && targetDoor != null)
 		{
 			DoAction();
 		}

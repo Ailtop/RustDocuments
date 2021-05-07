@@ -129,8 +129,8 @@ public class ConstructionSocket : Socket_Base
 	{
 		if (restrictPlacementAngle)
 		{
-			Quaternion rotation = Quaternion.Euler(0f, faceAngle, 0f) * suggestedAng;
-			float num = target.ray.direction.XZ3D().DotDegrees(rotation * Vector3.forward);
+			Quaternion quaternion = Quaternion.Euler(0f, faceAngle, 0f) * suggestedAng;
+			float num = target.ray.direction.XZ3D().DotDegrees(quaternion * Vector3.forward);
 			if (num > angleAllowed * 0.5f)
 			{
 				return false;
@@ -154,8 +154,8 @@ public class ConstructionSocket : Socket_Base
 			return null;
 		}
 		ConstructionSocket constructionSocket = target.socket as ConstructionSocket;
-		Vector3 worldPosition = target.GetWorldPosition();
-		Quaternion worldRotation = target.GetWorldRotation(true);
+		Vector3 vector = target.GetWorldPosition();
+		Quaternion quaternion = target.GetWorldRotation(true);
 		if (constructionSocket != null && !IsCompatible(constructionSocket))
 		{
 			return null;
@@ -167,9 +167,9 @@ public class ConstructionSocket : Socket_Base
 			float num2 = 0f;
 			for (int i = 0; i < 360; i += rotationDegrees)
 			{
-				Quaternion lhs = Quaternion.Euler(0f, rotationOffset + i, 0f);
+				Quaternion quaternion2 = Quaternion.Euler(0f, rotationOffset + i, 0f);
 				Vector3 direction = target.ray.direction;
-				Vector3 to = lhs * worldRotation * Vector3.up;
+				Vector3 to = quaternion2 * quaternion * Vector3.up;
 				float num3 = Vector3.Angle(direction, to);
 				if (num3 < num)
 				{
@@ -179,13 +179,13 @@ public class ConstructionSocket : Socket_Base
 			}
 			for (int j = 0; j < 360; j += rotationDegrees)
 			{
-				Quaternion rhs = worldRotation * Quaternion.Inverse(base.rotation);
-				Quaternion lhs2 = Quaternion.Euler(target.rotation);
-				Quaternion rhs2 = Quaternion.Euler(0f, (float)(rotationOffset + j) + num2, 0f);
-				Quaternion rotation = lhs2 * rhs2 * rhs;
-				Vector3 b = rotation * position;
-				placement.position = worldPosition - b;
-				placement.rotation = rotation;
+				Quaternion quaternion3 = quaternion * Quaternion.Inverse(rotation);
+				Quaternion quaternion4 = Quaternion.Euler(target.rotation);
+				Quaternion quaternion5 = Quaternion.Euler(0f, (float)(rotationOffset + j) + num2, 0f);
+				Quaternion quaternion6 = quaternion4 * quaternion5 * quaternion3;
+				Vector3 vector2 = quaternion6 * position;
+				placement.position = vector - vector2;
+				placement.rotation = quaternion6;
 				if (CheckSocketMods(placement))
 				{
 					return placement;
@@ -193,11 +193,11 @@ public class ConstructionSocket : Socket_Base
 			}
 		}
 		Construction.Placement placement2 = new Construction.Placement();
-		Quaternion rotation2 = worldRotation * Quaternion.Inverse(base.rotation);
-		Vector3 b2 = rotation2 * position;
-		placement2.position = worldPosition - b2;
-		placement2.rotation = rotation2;
-		if (!TestRestrictedAngles(worldPosition, worldRotation, target))
+		Quaternion quaternion7 = quaternion * Quaternion.Inverse(rotation);
+		Vector3 vector3 = quaternion7 * position;
+		placement2.position = vector - vector3;
+		placement2.rotation = quaternion7;
+		if (!TestRestrictedAngles(vector, quaternion, target))
 		{
 			return null;
 		}

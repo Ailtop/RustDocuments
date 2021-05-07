@@ -52,16 +52,11 @@ public class TriggerHurt : TriggerBase
 			if (baseEntity.IsValid())
 			{
 				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
-				if (!(baseCombatEntity == null) && CanHurt(baseCombatEntity))
+				if (!(baseCombatEntity == null))
 				{
 					baseCombatEntity.Hurt(DamagePerSecond * (1f / DamageTickRate), damageType, attacker);
 				}
 			}
 		}
-	}
-
-	protected virtual bool CanHurt(BaseCombatEntity ent)
-	{
-		return true;
 	}
 }

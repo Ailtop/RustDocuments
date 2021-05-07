@@ -813,10 +813,7 @@ public class OcclusionCulling : MonoBehaviour
 
 	private static OcclusionCulling instance;
 
-	private static GraphicsDeviceType[] supportedDeviceTypes = new GraphicsDeviceType[1]
-	{
-		GraphicsDeviceType.Direct3D11
-	};
+	private static GraphicsDeviceType[] supportedDeviceTypes = new GraphicsDeviceType[1] { GraphicsDeviceType.Direct3D11 };
 
 	private static bool _enabled = false;
 
@@ -1142,10 +1139,10 @@ public class OcclusionCulling : MonoBehaviour
 		ExtractFrustum(matrix4x, ref planes);
 		for (int i = 0; i < planes.Length; i++)
 		{
-			Vector3 a = new Vector3(planes[i].x, planes[i].y, planes[i].z);
+			Vector3 vector = new Vector3(planes[i].x, planes[i].y, planes[i].z);
 			float w = planes[i].w;
-			Vector3 vector = -a * w;
-			Gizmos.DrawLine(vector, vector * 2f);
+			Vector3 vector2 = -vector * w;
+			Gizmos.DrawLine(vector2, vector2 * 2f);
 		}
 	}
 
@@ -1616,7 +1613,7 @@ public class OcclusionCulling : MonoBehaviour
 
 	private void PrepareAndDispatch()
 	{
-		Vector2 v = new Vector2(hiZWidth, hiZHeight);
+		Vector2 vector = new Vector2(hiZWidth, hiZHeight);
 		ExtractFrustum(viewProjMatrix, ref frustumPlanes);
 		bool flag = true;
 		if (usePixelShaderFallback)
@@ -1627,7 +1624,7 @@ public class OcclusionCulling : MonoBehaviour
 			fallbackMat.SetMatrix("_ProjMatrix", projMatrix);
 			fallbackMat.SetMatrix("_ViewProjMatrix", viewProjMatrix);
 			fallbackMat.SetVector("_CameraWorldPos", base.transform.position);
-			fallbackMat.SetVector("_ViewportSize", v);
+			fallbackMat.SetVector("_ViewportSize", vector);
 			fallbackMat.SetFloat("_FrustumCull", flag ? 0f : 1f);
 			for (int i = 0; i < 6; i++)
 			{
@@ -1642,7 +1639,7 @@ public class OcclusionCulling : MonoBehaviour
 			computeShader.SetFloats("_ProjMatrix", MatrixToFloatArray(projMatrix));
 			computeShader.SetFloats("_ViewProjMatrix", MatrixToFloatArray(viewProjMatrix));
 			computeShader.SetVector("_CameraWorldPos", base.transform.position);
-			computeShader.SetVector("_ViewportSize", v);
+			computeShader.SetVector("_ViewportSize", vector);
 			computeShader.SetFloat("_FrustumCull", flag ? 0f : 1f);
 			for (int j = 0; j < 6; j++)
 			{

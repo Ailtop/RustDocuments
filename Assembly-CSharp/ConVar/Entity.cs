@@ -25,13 +25,13 @@ namespace ConVar
 			{
 				entity = src;
 				BaseEntity baseEntity = entity as BaseEntity;
-				BaseEntity x = ((baseEntity != null) ? baseEntity.GetParentEntity() : null);
+				BaseEntity baseEntity2 = ((baseEntity != null) ? baseEntity.GetParentEntity() : null);
 				entityID = ((entity != null && entity.net != null) ? entity.net.ID : 0u);
 				groupID = ((entity != null && entity.net != null && entity.net.group != null) ? entity.net.group.ID : 0u);
 				parentID = ((baseEntity != null) ? baseEntity.parentEntity.uid : 0u);
 				if (baseEntity != null && baseEntity.parentEntity.uid != 0)
 				{
-					if (x == null)
+					if (baseEntity2 == null)
 					{
 						status = "orphan";
 					}
@@ -93,8 +93,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void find_group(Arg args)
 		{
 			uint filter = args.GetUInt(0);
@@ -120,8 +120,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void find_radius(Arg args)
 		{
 			BasePlayer player = args.Player();
@@ -133,8 +133,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_self(Arg args)
 		{
 			BasePlayer basePlayer = args.Player();

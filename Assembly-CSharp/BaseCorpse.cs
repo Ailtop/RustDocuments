@@ -174,7 +174,7 @@ public class BaseCorpse : BaseCombatEntity
 		{
 			parentEnt = BaseNetworkable.serverEntities.Find(corpse.parentID) as BaseEntity;
 		}
-		bool isClient = base.isClient;
+		bool isClient2 = base.isClient;
 	}
 
 	public override void OnAttacked(HitInfo info)

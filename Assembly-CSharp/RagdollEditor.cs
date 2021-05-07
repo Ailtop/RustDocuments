@@ -90,10 +90,10 @@ public class RagdollEditor : SingletonComponent<RagdollEditor>
 	{
 		if (!(grabbedRigid == null))
 		{
-			Vector3 a = base.transform.TransformPoint(grabOffset);
-			Vector3 vector = grabbedRigid.transform.TransformPoint(grabPos);
-			Vector3 a2 = a - vector;
-			grabbedRigid.AddForceAtPosition(a2 * 100f, vector, ForceMode.Acceleration);
+			Vector3 vector = base.transform.TransformPoint(grabOffset);
+			Vector3 vector2 = grabbedRigid.transform.TransformPoint(grabPos);
+			Vector3 vector3 = vector - vector2;
+			grabbedRigid.AddForceAtPosition(vector3 * 100f, vector2, ForceMode.Acceleration);
 		}
 	}
 
