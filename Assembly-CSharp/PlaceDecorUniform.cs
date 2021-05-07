@@ -39,7 +39,7 @@ public class PlaceDecorUniform : ProceduralComponent
 				float normZ = TerrainMeta.NormalizeZ(z2);
 				float num5 = SeedRandom.Value(ref seed);
 				float factor = Filter.GetFactor(normX, normZ);
-				Prefab random = ArrayEx.GetRandom(array, ref seed);
+				Prefab random = array.GetRandom(ref seed);
 				if (!(factor * factor < num5))
 				{
 					float height = heightMap.GetHeight(normX, normZ);

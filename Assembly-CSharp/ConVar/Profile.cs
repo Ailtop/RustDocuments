@@ -13,14 +13,14 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void start(Arg arg)
 		{
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void stop(Arg arg)
 		{
 		}

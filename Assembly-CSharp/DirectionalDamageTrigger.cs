@@ -18,7 +18,7 @@ public class DirectionalDamageTrigger : TriggerBase
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -57,7 +57,7 @@ public class DirectionalDamageTrigger : TriggerBase
 		BaseEntity[] array = entityContents.ToArray();
 		foreach (BaseEntity baseEntity in array)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity.IsValid())
 			{
 				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
 				if (!(baseCombatEntity == null))

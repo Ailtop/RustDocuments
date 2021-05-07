@@ -15,6 +15,6 @@ public static class TerrainModifierEx
 
 	public static void ApplyTerrainModifiers(this Transform transform, TerrainModifier[] modifiers)
 	{
-		ApplyTerrainModifiers(transform, modifiers, transform.position, transform.rotation, transform.lossyScale);
+		transform.ApplyTerrainModifiers(modifiers, transform.position, transform.rotation, transform.lossyScale);
 	}
 }

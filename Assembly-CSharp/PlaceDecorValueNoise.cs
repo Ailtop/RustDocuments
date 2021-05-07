@@ -44,7 +44,7 @@ public class PlaceDecorValueNoise : ProceduralComponent
 			float normZ = TerrainMeta.NormalizeZ(num5);
 			float num6 = SeedRandom.Value(ref seed);
 			float factor = Filter.GetFactor(normX, normZ);
-			Prefab random = ArrayEx.GetRandom(array, ref seed);
+			Prefab random = array.GetRandom(ref seed);
 			if (!(factor <= 0f) && !((offset + Noise.Turbulence(num2 + num4, num3 + num5, octaves, frequency, amplitude)) * factor * factor < num6))
 			{
 				float height = heightMap.GetHeight(normX, normZ);

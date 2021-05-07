@@ -35,7 +35,7 @@ public static class EffectNetwork
 			if (effect.entity != 0)
 			{
 				BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(effect.entity) as BaseEntity;
-				if (!BaseEntityEx.IsValid(baseEntity))
+				if (!baseEntity.IsValid())
 				{
 					return;
 				}

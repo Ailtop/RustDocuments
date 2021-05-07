@@ -44,12 +44,12 @@ namespace ConVar
 		[ServerUserVar]
 		public static async void pair(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null))
 			{
 				Dictionary<string, string> playerPairingData = Util.GetPlayerPairingData(basePlayer);
 				NotificationSendResult notificationSendResult = await Util.SendPairNotification("server", basePlayer, Server.hostname.Truncate(128), "Tap to pair with this server.", playerPairingData);
-				arg.ReplyWith((notificationSendResult == NotificationSendResult.Sent) ? "Sent pairing notification." : Util.ToErrorMessage(notificationSendResult));
+				arg.ReplyWith((notificationSendResult == NotificationSendResult.Sent) ? "Sent pairing notification." : notificationSendResult.ToErrorMessage());
 			}
 		}
 

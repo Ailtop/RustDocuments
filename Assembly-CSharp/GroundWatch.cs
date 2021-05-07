@@ -111,7 +111,7 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 		Vis.Colliders(base.transform.TransformPoint(groundPosition), radius, obj, layers);
 		foreach (Collider item in obj)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
+			BaseEntity baseEntity = item.gameObject.ToBaseEntity();
 			if (!baseEntity || (!(baseEntity == component) && !baseEntity.IsDestroyed && !baseEntity.isClient))
 			{
 				DecayEntity decayEntity = component as DecayEntity;

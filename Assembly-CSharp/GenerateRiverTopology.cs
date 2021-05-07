@@ -1,18 +1,29 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class GenerateRiverTopology : ProceduralComponent
 {
+	private const int Smoothen = 8;
+
 	public override void Process(uint seed)
 	{
 		List<PathList> rivers = TerrainMeta.Path.Rivers;
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
-		heightMap.Push();
 		foreach (PathList item in rivers)
 		{
+			if (!World.Networked)
+			{
+				PathInterpolator path = item.Path;
+				item.TrimTopology(16384);
+				path.Smoothen(8, Vector3.up);
+				path.RecalculateTangents();
+				item.ResetTrims();
+			}
+			heightMap.Push();
 			item.AdjustTerrainHeight();
+			heightMap.Pop();
 		}
-		heightMap.Pop();
 		foreach (PathList item2 in rivers.AsEnumerable().Reverse())
 		{
 			item2.AdjustTerrainTexture();

@@ -679,7 +679,7 @@ public class BaseProjectile : AttackEntity
 			for (int j = 0; j < obj.Count; j++)
 			{
 				RaycastHit hit = obj[j];
-				BaseEntity entity = RaycastHitEx.GetEntity(hit);
+				BaseEntity entity = hit.GetEntity();
 				if ((entity != null && (entity == this || entity.EqualNetID(this))) || (entity != null && entity.isClient))
 				{
 					continue;
@@ -889,8 +889,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -931,8 +931,8 @@ public class BaseProjectile : AttackEntity
 		fractionalInsertCounter = 0;
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void StartReload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -955,8 +955,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void ServerFractionalReloadInsert(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1013,8 +1013,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void Reload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1064,9 +1064,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1131,7 +1131,10 @@ public class BaseProjectile : AttackEntity
 			else if (ValidateEyePos(player, projectile.startPos))
 			{
 				player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, primaryMagazineAmmo);
-				CreateProjectileEffectClientside(component.projectileObject.resourcePath, projectile.startPos, projectile.startVel, projectile.seed, msg.connection, IsSilenced());
+				if (!player.limitNetworking)
+				{
+					CreateProjectileEffectClientside(component.projectileObject.resourcePath, projectile.startPos, projectile.startVel, projectile.seed, msg.connection, IsSilenced());
+				}
 			}
 		}
 		player.stats.Add(component.category + "_fired", projectileShoot.projectiles.Count(), (Stats)5);

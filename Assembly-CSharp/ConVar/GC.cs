@@ -28,8 +28,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool incremental_enabled
 		{
 			get

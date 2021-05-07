@@ -7,7 +7,7 @@ public class TriggerRagdollRelocate : TriggerBase
 	internal override void OnObjectAdded(GameObject obj, Collider col)
 	{
 		base.OnObjectAdded(obj, col);
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj.transform);
+		BaseEntity baseEntity = obj.transform.ToBaseEntity();
 		if (baseEntity != null && baseEntity.isServer)
 		{
 			RepositionTransform(baseEntity.transform);

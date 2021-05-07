@@ -78,7 +78,7 @@ public class GunTrap : StorageContainer
 		for (int i = 0; i < list.Count; i++)
 		{
 			RaycastHit hit = list[i];
-			BaseEntity entity = RaycastHitEx.GetEntity(hit);
+			BaseEntity entity = hit.GetEntity();
 			if (entity != null && (entity == this || entity.EqualNetID(this)))
 			{
 				continue;
@@ -143,7 +143,7 @@ public class GunTrap : StorageContainer
 				GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);
 				for (int i = 0; i < obj.Count; i++)
 				{
-					BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
+					BaseEntity entity = obj[i].GetEntity();
 					if (entity != null && (entity == this || entity.EqualNetID(this)))
 					{
 						flag = true;

@@ -127,7 +127,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 							break;
 						}
 						baseEntity.enableSaving = false;
-						PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+						baseEntity.gameObject.AwakeFromInstantiate();
 						baseEntity.Spawn();
 						component.InstallPath(Path);
 						Spawned.Add(component);

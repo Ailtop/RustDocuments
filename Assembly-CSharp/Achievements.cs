@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Achievements : SingletonComponent<Achievements>
+public class Achievements : SingletonComponent<global::Achievements>
 {
 	public SoundDefinition listComplete;
 

@@ -10,7 +10,7 @@ public class ApplyTerrainAnchors : MonoBehaviour
 		{
 			anchors = PrefabAttribute.server.FindAll<TerrainAnchor>(component.prefabID);
 		}
-		TerrainAnchorEx.ApplyTerrainAnchors(base.transform, anchors);
+		base.transform.ApplyTerrainAnchors(anchors);
 		GameManager.Destroy(this);
 	}
 }

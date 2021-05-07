@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[715]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[717]
 	{
 		new ConsoleSystem.Command
 		{
@@ -216,10 +216,10 @@ public class ConsoleGen
 			FullName = "cctvrender.assignmentcooldown",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Settings.AssignmentCooldown.ToString(),
+			GetOveride = () => CCTVRender.Settings.AssignmentCooldown.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Settings.AssignmentCooldown = str.ToFloat();
+				CCTVRender.Settings.AssignmentCooldown = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -229,10 +229,10 @@ public class ConsoleGen
 			FullName = "cctvrender.assignmenttimeout",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Settings.AssignmentTimeout.ToString(),
+			GetOveride = () => CCTVRender.Settings.AssignmentTimeout.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Settings.AssignmentTimeout = str.ToFloat();
+				CCTVRender.Settings.AssignmentTimeout = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -242,10 +242,10 @@ public class ConsoleGen
 			FullName = "cctvrender.combattime",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Settings.CombatTime.ToString(),
+			GetOveride = () => CCTVRender.Settings.CombatTime.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Settings.CombatTime = str.ToFloat();
+				CCTVRender.Settings.CombatTime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -255,10 +255,10 @@ public class ConsoleGen
 			FullName = "cctvrender.enabled",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Settings.Enabled.ToString(),
+			GetOveride = () => CCTVRender.Settings.Enabled.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Settings.Enabled = str.ToBool();
+				CCTVRender.Settings.Enabled = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -268,10 +268,10 @@ public class ConsoleGen
 			FullName = "cctvrender.idletime",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Settings.IdleTime.ToString(),
+			GetOveride = () => CCTVRender.Settings.IdleTime.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Settings.IdleTime = str.ToFloat();
+				CCTVRender.Settings.IdleTime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -281,10 +281,10 @@ public class ConsoleGen
 			FullName = "cctvrender.maxdistance",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Settings.MaxDistance.ToString(),
+			GetOveride = () => CCTVRender.Settings.MaxDistance.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Settings.MaxDistance = str.ToFloat();
+				CCTVRender.Settings.MaxDistance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -2953,7 +2953,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Data.export(arg);
+				ConVar.Data.export(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3570,7 +3570,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval14 = Demo.record(arg);
+				string rval14 = ConVar.Demo.record(arg);
 				arg.ReplyWithObject(rval14);
 			}
 		},
@@ -3582,10 +3582,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Demo.recordlist.ToString(),
+			GetOveride = () => ConVar.Demo.recordlist.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Demo.recordlist = str;
+				ConVar.Demo.recordlist = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -3595,10 +3595,10 @@ public class ConsoleGen
 			FullName = "demo.splitmegabytes",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Demo.splitmegabytes.ToString(),
+			GetOveride = () => ConVar.Demo.splitmegabytes.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Demo.splitmegabytes = str.ToFloat();
+				ConVar.Demo.splitmegabytes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -3608,10 +3608,10 @@ public class ConsoleGen
 			FullName = "demo.splitseconds",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Demo.splitseconds.ToString(),
+			GetOveride = () => ConVar.Demo.splitseconds.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Demo.splitseconds = str.ToFloat();
+				ConVar.Demo.splitseconds = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -3623,7 +3623,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval13 = Demo.stop(arg);
+				string rval13 = ConVar.Demo.stop(arg);
 				arg.ReplyWithObject(rval13);
 			}
 		},
@@ -4848,6 +4848,32 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Net.visdebug = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "visibilityradiusfaroverride",
+			Parent = "net",
+			FullName = "net.visibilityradiusfaroverride",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Net.visibilityRadiusFarOverride.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Net.visibilityRadiusFarOverride = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "visibilityradiusnearoverride",
+			Parent = "net",
+			FullName = "net.visibilityradiusnearoverride",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Net.visibilityRadiusNearOverride.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Net.visibilityRadiusNearOverride = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

@@ -30,7 +30,7 @@ public class TriggerMount : TriggerBase, IServerComponent
 
 	internal override GameObject InterestedInObject(GameObject obj)
 	{
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -72,7 +72,7 @@ public class TriggerMount : TriggerBase, IServerComponent
 		foreach (KeyValuePair<BaseEntity, EntryInfo> item in entryInfo)
 		{
 			BaseEntity key = item.Key;
-			if (!BaseEntityEx.IsValid(key))
+			if (!key.IsValid())
 			{
 				continue;
 			}

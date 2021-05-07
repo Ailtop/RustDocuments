@@ -289,8 +289,8 @@ public class MarketTerminal : StorageContainer
 	}
 
 	[RPC_Server.CallsPerSecond(3uL)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Server_TryOpenMarket(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))
@@ -310,9 +310,9 @@ public class MarketTerminal : StorageContainer
 		}
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Server_Purchase(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))
@@ -328,7 +328,7 @@ public class MarketTerminal : StorageContainer
 		int num2 = msg.read.Int32();
 		int num3 = msg.read.Int32();
 		VendingMachine vendingMachine = BaseNetworkable.serverEntities.Find(num) as VendingMachine;
-		if (vendingMachine == null || !BaseEntityEx.IsValid(vendingMachine) || num2 < 0 || num2 >= vendingMachine.sellOrders.sellOrders.Count || num3 <= 0 || base.inventory.IsFull())
+		if (vendingMachine == null || !vendingMachine.IsValid() || num2 < 0 || num2 >= vendingMachine.sellOrders.sellOrders.Count || num3 <= 0 || base.inventory.IsFull())
 		{
 			return;
 		}

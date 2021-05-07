@@ -50,8 +50,8 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 			{
 				return;
 			}
-			ArrayEx.Shuffle(array, seed);
-			ArrayEx.BubbleSort(array);
+			array.Shuffle(seed);
+			array.BubbleSort();
 			Vector3 position = TerrainMeta.Position;
 			Vector3 size = TerrainMeta.Size;
 			float min = position.x - (float)MaxDistanceFromTerrain;

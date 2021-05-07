@@ -22,7 +22,7 @@ public class EntityComponent<T> : EntityComponentBase where T : BaseEntity
 	{
 		if ((bool)this && (bool)base.gameObject)
 		{
-			_baseEntity = GameObjectEx.ToBaseEntity(base.gameObject) as T;
+			_baseEntity = base.gameObject.ToBaseEntity() as T;
 		}
 	}
 

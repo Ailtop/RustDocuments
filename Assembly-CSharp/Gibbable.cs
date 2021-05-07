@@ -20,6 +20,8 @@ public class Gibbable : PrefabAttribute, IClientComponent
 		public float CapsuleHeight;
 
 		public int CapsuleDirection;
+
+		public bool BlockMaterialCopy;
 	}
 
 	public enum ColliderType
@@ -35,6 +37,16 @@ public class Gibbable : PrefabAttribute, IClientComponent
 		GibsOnly,
 		FXOnly,
 		All
+	}
+
+	public enum BoundsEffectType
+	{
+		None,
+		Electrical,
+		Glass,
+		Scrap,
+		Stone,
+		Wood
 	}
 
 	public GameObject gibSource;
@@ -59,6 +71,11 @@ public class Gibbable : PrefabAttribute, IClientComponent
 	public float scaleOverride = 1f;
 
 	public int uniqueId;
+
+	public BoundsEffectType boundsEffectType;
+
+	[ReadOnly]
+	public Bounds effectBounds;
 
 	public List<OverrideMesh> MeshOverrides = new List<OverrideMesh>();
 

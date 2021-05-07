@@ -371,7 +371,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		}
 		Vector3 scale = Vector3.one;
 		DecorComponent[] components = PrefabAttribute.server.FindAll<DecorComponent>(randomPrefab.ID);
-		DecorComponentEx.ApplyDecorComponents(randomPrefab.Object.transform, components, ref pos, ref rot, ref scale);
+		randomPrefab.Object.transform.ApplyDecorComponents(components, ref pos, ref rot, ref scale);
 		if (!randomPrefab.ApplyTerrainAnchors(ref pos, rot, scale, TerrainAnchorMode.MinimizeMovement, population.Filter))
 		{
 			return null;
@@ -407,7 +407,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		{
 			component.Population = population;
 		}
-		PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+		baseEntity.gameObject.AwakeFromInstantiate();
 		baseEntity.Spawn();
 		return baseEntity.gameObject;
 	}
@@ -483,8 +483,8 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		Debug.Log(" - deleting " + num + " objects");
 		foreach (Spawnable item in array.Take(num))
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-			if (BaseEntityEx.IsValid(baseEntity))
+			BaseEntity baseEntity = item.gameObject.ToBaseEntity();
+			if (baseEntity.IsValid())
 			{
 				baseEntity.Kill();
 			}

@@ -4,7 +4,7 @@ namespace UnityEngine
 	{
 		public static BaseEntity GetEntity(this Collision col)
 		{
-			return GameObjectEx.ToBaseEntity(col.transform);
+			return col.transform.ToBaseEntity();
 		}
 	}
 }

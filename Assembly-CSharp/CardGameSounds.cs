@@ -10,7 +10,8 @@ public class CardGameSounds : PrefabAttribute
 		Play,
 		Shuffle,
 		Win,
-		YourTurn
+		YourTurn,
+		Check
 	}
 
 	public SoundDefinition ChipsSfx;
@@ -24,6 +25,8 @@ public class CardGameSounds : PrefabAttribute
 	public SoundDefinition WinSfx;
 
 	public SoundDefinition YourTurnSfx;
+
+	public SoundDefinition CheckSfx;
 
 	protected override Type GetIndexedType()
 	{
@@ -51,6 +54,9 @@ public class CardGameSounds : PrefabAttribute
 			break;
 		case SoundType.YourTurn:
 			YourTurnSfx.Play(forGameObject);
+			break;
+		case SoundType.Check:
+			CheckSfx.Play(forGameObject);
 			break;
 		default:
 			throw new ArgumentOutOfRangeException("sound", sound, null);

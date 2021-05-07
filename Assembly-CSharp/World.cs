@@ -104,7 +104,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 205 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 212 + ".map";
 		}
 	}
 
@@ -116,9 +116,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 205 + ".sav";
+				return Name + "." + 212 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 205 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 212 + ".sav";
 		}
 	}
 
@@ -137,7 +137,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 205 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 212 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -162,7 +162,7 @@ public static class World
 	{
 		if (seed == 0)
 		{
-			seed = MurmurHashEx.MurmurHashUnsigned(SeedIdentifier()) % 2147483647u;
+			seed = SeedIdentifier().MurmurHashUnsigned() % 2147483647u;
 		}
 		if (seed == 0)
 		{
@@ -174,7 +174,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 205 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 212 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -186,7 +186,7 @@ public static class World
 	{
 		if (salt == 0)
 		{
-			salt = MurmurHashEx.MurmurHashUnsigned(SaltIdentifier()) % 2147483647u;
+			salt = SaltIdentifier().MurmurHashUnsigned() % 2147483647u;
 		}
 		if (salt == 0)
 		{
@@ -397,7 +397,7 @@ public static class World
 			if ((bool)gameObject)
 			{
 				Interface.CallHook("OnWorldPrefabSpawned", gameObject, category);
-				GameObjectEx.SetHierarchyGroup(gameObject, category);
+				gameObject.SetHierarchyGroup(category);
 			}
 		}
 	}

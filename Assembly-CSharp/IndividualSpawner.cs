@@ -78,7 +78,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 	{
 		if (IsSpawned)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(spawnInstance.gameObject);
+			BaseEntity baseEntity = spawnInstance.gameObject.ToBaseEntity();
 			if (baseEntity != null)
 			{
 				baseEntity.Kill();
@@ -118,7 +118,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		if (baseEntity != null)
 		{
 			baseEntity.enableSaving = false;
-			PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+			baseEntity.gameObject.AwakeFromInstantiate();
 			baseEntity.Spawn();
 			SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
 			spawnPointInstance.parentSpawnPointUser = this;

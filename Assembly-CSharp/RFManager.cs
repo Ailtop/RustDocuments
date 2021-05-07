@@ -154,7 +154,7 @@ public class RFManager
 		bool flag3 = false;
 		foreach (IRFObject item in listenList)
 		{
-			if (!BaseEntityEx.IsValidEntityReference(item))
+			if (!item.IsValidEntityReference())
 			{
 				flag2 = true;
 				continue;
@@ -164,7 +164,7 @@ public class RFManager
 				flag = false;
 				foreach (IRFObject item2 in broadcasterList)
 				{
-					if (!BaseEntityEx.IsValidEntityReference(item2))
+					if (!item2.IsValidEntityReference())
 					{
 						flag3 = true;
 					}

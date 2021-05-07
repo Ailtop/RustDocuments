@@ -21,8 +21,8 @@ namespace UnityEngine.UI.Extensions
 		[Range(0f, 360f)]
 		public int ArcRotation;
 
-		[Tooltip("The Progress property allows the primitive to be used as a progression indicator.")]
 		[Range(0f, 1f)]
+		[Tooltip("The Progress property allows the primitive to be used as a progression indicator.")]
 		public float Progress;
 
 		private float _progress;

@@ -63,59 +63,59 @@ public class Prefab : IComparable<Prefab>
 	public bool ApplyTerrainAnchors(ref Vector3 pos, Quaternion rot, Vector3 scale, TerrainAnchorMode mode, SpawnFilter filter = null)
 	{
 		TerrainAnchor[] anchors = Attribute.FindAll<TerrainAnchor>(ID);
-		return TerrainAnchorEx.ApplyTerrainAnchors(Object.transform, anchors, ref pos, rot, scale, mode, filter);
+		return Object.transform.ApplyTerrainAnchors(anchors, ref pos, rot, scale, mode, filter);
 	}
 
 	public bool ApplyTerrainAnchors(ref Vector3 pos, Quaternion rot, Vector3 scale, SpawnFilter filter = null)
 	{
 		TerrainAnchor[] anchors = Attribute.FindAll<TerrainAnchor>(ID);
-		return TerrainAnchorEx.ApplyTerrainAnchors(Object.transform, anchors, ref pos, rot, scale, filter);
+		return Object.transform.ApplyTerrainAnchors(anchors, ref pos, rot, scale, filter);
 	}
 
 	public bool ApplyTerrainChecks(Vector3 pos, Quaternion rot, Vector3 scale, SpawnFilter filter = null)
 	{
 		TerrainCheck[] anchors = Attribute.FindAll<TerrainCheck>(ID);
-		return TerrainCheckEx.ApplyTerrainChecks(Object.transform, anchors, pos, rot, scale, filter);
+		return Object.transform.ApplyTerrainChecks(anchors, pos, rot, scale, filter);
 	}
 
 	public bool ApplyTerrainFilters(Vector3 pos, Quaternion rot, Vector3 scale, SpawnFilter filter = null)
 	{
 		TerrainFilter[] filters = Attribute.FindAll<TerrainFilter>(ID);
-		return TerrainFilterEx.ApplyTerrainFilters(Object.transform, filters, pos, rot, scale, filter);
+		return Object.transform.ApplyTerrainFilters(filters, pos, rot, scale, filter);
 	}
 
 	public void ApplyTerrainModifiers(Vector3 pos, Quaternion rot, Vector3 scale)
 	{
 		TerrainModifier[] modifiers = Attribute.FindAll<TerrainModifier>(ID);
-		TerrainModifierEx.ApplyTerrainModifiers(Object.transform, modifiers, pos, rot, scale);
+		Object.transform.ApplyTerrainModifiers(modifiers, pos, rot, scale);
 	}
 
 	public void ApplyTerrainPlacements(Vector3 pos, Quaternion rot, Vector3 scale)
 	{
 		TerrainPlacement[] placements = Attribute.FindAll<TerrainPlacement>(ID);
-		TerrainPlacementEx.ApplyTerrainPlacements(Object.transform, placements, pos, rot, scale);
+		Object.transform.ApplyTerrainPlacements(placements, pos, rot, scale);
 	}
 
 	public bool ApplyWaterChecks(Vector3 pos, Quaternion rot, Vector3 scale)
 	{
 		WaterCheck[] anchors = Attribute.FindAll<WaterCheck>(ID);
-		return WaterCheckEx.ApplyWaterChecks(Object.transform, anchors, pos, rot, scale);
+		return Object.transform.ApplyWaterChecks(anchors, pos, rot, scale);
 	}
 
 	public void ApplyDecorComponents(ref Vector3 pos, ref Quaternion rot, ref Vector3 scale)
 	{
 		DecorComponent[] components = Attribute.FindAll<DecorComponent>(ID);
-		DecorComponentEx.ApplyDecorComponents(Object.transform, components, ref pos, ref rot, ref scale);
+		Object.transform.ApplyDecorComponents(components, ref pos, ref rot, ref scale);
 	}
 
 	public bool CheckEnvironmentVolumes(Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type)
 	{
-		return EnvironmentVolumeEx.CheckEnvironmentVolumes(Object.transform, pos, rot, scale, type);
+		return Object.transform.CheckEnvironmentVolumes(pos, rot, scale, type);
 	}
 
 	public bool CheckEnvironmentVolumesInsideTerrain(Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type)
 	{
-		return EnvironmentVolumeEx.CheckEnvironmentVolumesInsideTerrain(Object.transform, pos, rot, scale, type);
+		return Object.transform.CheckEnvironmentVolumesInsideTerrain(pos, rot, scale, type);
 	}
 
 	public GameObject Spawn(Transform transform, bool active = true)

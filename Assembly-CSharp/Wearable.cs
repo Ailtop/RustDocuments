@@ -119,8 +119,8 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[Tooltip("If this is true, we'll hide this item in the first person view. Usually done for items that you definitely won't see in first person view, like facemasks and hats.")]
 	public bool HideInFirstPerson;
 
-	[Range(0f, 5f)]
 	[Tooltip("Use this if the clothing item clips into the player view. It'll push the chest legs model backwards.")]
+	[Range(0f, 5f)]
 	public float ExtraLeanBack;
 
 	public Renderer[] RenderersLod0;
@@ -175,7 +175,7 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		{
 			return;
 		}
-		Transform transform = SkinnedMeshRendererEx.FindRig(skinnedMeshRenderer);
+		Transform transform = skinnedMeshRenderer.FindRig();
 		if (!(transform != null))
 		{
 			return;

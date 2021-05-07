@@ -46,7 +46,7 @@ namespace ConVar
 		[ServerVar]
 		public static string record(Arg arg)
 		{
-			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(arg, 0);
+			BasePlayer playerOrSleeper = arg.GetPlayerOrSleeper(0);
 			if (!playerOrSleeper || playerOrSleeper.net == null || playerOrSleeper.net.connection == null)
 			{
 				return "Player not found";
@@ -62,7 +62,7 @@ namespace ConVar
 		[ServerVar]
 		public static string stop(Arg arg)
 		{
-			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(arg, 0);
+			BasePlayer playerOrSleeper = arg.GetPlayerOrSleeper(0);
 			if (!playerOrSleeper || playerOrSleeper.net == null || playerOrSleeper.net.connection == null)
 			{
 				return "Player not found";

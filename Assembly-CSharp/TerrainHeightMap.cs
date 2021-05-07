@@ -85,7 +85,7 @@ public class TerrainHeightMap : TerrainMap<short>
 		{
 			return;
 		}
-		int normalres = res - 1;
+		int normalres = (res - 1) / 2;
 		Color32[] normals = new Color32[normalres * normalres];
 		Parallel.For(0, normalres, delegate(int z)
 		{
@@ -94,6 +94,9 @@ public class TerrainHeightMap : TerrainMap<short>
 			{
 				float normX = ((float)i + 0.5f) / (float)normalres;
 				Vector3 normal = GetNormal(normX, normZ);
+				float value = Vector3.Angle(Vector3.up, normal);
+				float t = Mathf.InverseLerp(50f, 70f, value);
+				normal = Vector3.Slerp(normal, Vector3.up, t);
 				normals[z * normalres + i] = BitUtility.EncodeNormal(normal);
 			}
 		});
@@ -171,6 +174,26 @@ public class TerrainHeightMap : TerrainMap<short>
 		int num5 = Mathf.Clamp((int)num3, 0, num);
 		int x = Mathf.Min(num4 + 1, num);
 		int z = Mathf.Min(num5 + 1, num);
+		float height = GetHeight01(num4, num5);
+		float height2 = GetHeight01(x, num5);
+		float height3 = GetHeight01(num4, z);
+		float height4 = GetHeight01(x, z);
+		float t = num2 - (float)num4;
+		float t2 = num3 - (float)num5;
+		float a = Mathf.Lerp(height, height2, t);
+		float b = Mathf.Lerp(height3, height4, t);
+		return Mathf.Lerp(a, b, t2);
+	}
+
+	public float GetTriangulatedHeight01(float normX, float normZ)
+	{
+		int num = res - 1;
+		float num2 = normX * (float)num;
+		float num3 = normZ * (float)num;
+		int num4 = Mathf.Clamp((int)num2, 0, num);
+		int num5 = Mathf.Clamp((int)num3, 0, num);
+		int x = Mathf.Min(num4 + 1, num);
+		int z = Mathf.Min(num5 + 1, num);
 		float num6 = num2 - (float)num4;
 		float num7 = num3 - (float)num5;
 		float height = GetHeight01(num4, num5);
@@ -221,9 +244,9 @@ public class TerrainHeightMap : TerrainMap<short>
 		Vector3 normal4 = GetNormal(x, z);
 		float t = num2 - (float)num4;
 		float t2 = num3 - (float)num5;
-		Vector3 a = Vector3.Lerp(normal, normal2, t);
-		Vector3 b = Vector3.Lerp(normal3, normal4, t);
-		return Vector3.Lerp(a, b, t2).normalized;
+		Vector3 a = Vector3.Slerp(normal, normal2, t);
+		Vector3 b = Vector3.Slerp(normal3, normal4, t);
+		return Vector3.Slerp(a, b, t2).normalized;
 	}
 
 	public Vector3 GetNormal(int x, int z)
@@ -329,7 +352,7 @@ public class TerrainHeightMap : TerrainMap<short>
 
 	public void SetHeight(int x, int z, float height, float opacity)
 	{
-		float height2 = Mathf.SmoothStep(GetDstHeight01(x, z), height, opacity);
+		float height2 = Mathf.SmoothStep(GetSrcHeight01(x, z), height, opacity);
 		SetHeight(x, z, height2);
 	}
 

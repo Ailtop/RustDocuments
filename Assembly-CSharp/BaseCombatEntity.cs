@@ -429,13 +429,13 @@ public class BaseCombatEntity : BaseEntity
 			info.damageTypes.Scale(DamageType.Blunt, ConVar.Server.meleedamage);
 			info.damageTypes.Scale(DamageType.Stab, ConVar.Server.meleedamage);
 			info.damageTypes.Scale(DamageType.Bleeding, ConVar.Server.bleedingdamage);
-			if (Interface.CallHook("IOnBaseCombatEntityHurt", this, info) != null)
-			{
-				return;
-			}
 			if (!(this is BasePlayer))
 			{
 				info.damageTypes.Scale(DamageType.Fun_Water, 0f);
+			}
+			if (Interface.CallHook("IOnBaseCombatEntityHurt", this, info) != null)
+			{
+				return;
 			}
 			DebugHurt(info);
 			this.health = health - info.damageTypes.Total();
@@ -459,7 +459,7 @@ public class BaseCombatEntity : BaseEntity
 			{
 				baseCombatEntity2.MarkHostileFor();
 			}
-			if (DamageTypeEx.IsConsideredAnAttack(lastDamage))
+			if (lastDamage.IsConsideredAnAttack())
 			{
 				lastAttackedTime = UnityEngine.Time.time;
 				if (lastAttacker != null)

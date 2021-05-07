@@ -131,7 +131,7 @@ namespace Rust.Ai.HTN.NPCTurret
 							break;
 						}
 						baseEntity.enableSaving = false;
-						PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+						baseEntity.gameObject.AwakeFromInstantiate();
 						baseEntity.Spawn();
 						if (OnlyRotateAroundYAxis && component.NPCTurretContext != null && component.NPCTurretContext.Body != null)
 						{

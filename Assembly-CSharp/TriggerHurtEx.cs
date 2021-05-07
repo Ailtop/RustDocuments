@@ -61,7 +61,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -95,7 +95,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 					hitInfo.damageTypes.ScaleAll(multiply);
 					hitInfo.DoHitEffects = true;
 					hitInfo.DidHit = true;
-					hitInfo.Initiator = GameObjectEx.ToBaseEntity(base.gameObject);
+					hitInfo.Initiator = base.gameObject.ToBaseEntity();
 					hitInfo.PointStart = base.transform.position;
 					hitInfo.PointEnd = baseCombatEntity.transform.position;
 					if (type == HurtType.Simple)
@@ -164,7 +164,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 		for (int i = 0; i < array.Length; i++)
 		{
 			KeyValuePair<BaseEntity, EntityTriggerInfo> keyValuePair = array[i];
-			if (BaseEntityEx.IsValid(keyValuePair.Key))
+			if (keyValuePair.Key.IsValid())
 			{
 				Vector3 position = keyValuePair.Key.transform.position;
 				float magnitude = (position - keyValuePair.Value.lastPosition).magnitude;
@@ -184,7 +184,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 		{
 			foreach (BaseEntity entityAdd in entityAddList)
 			{
-				if (BaseEntityEx.IsValid(entityAdd))
+				if (entityAdd.IsValid())
 				{
 					DoDamage(entityAdd, hurtTypeOnEnter, damageOnEnter, effectOnEnter);
 					if (entityInfo == null)
@@ -208,7 +208,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent
 		}
 		foreach (BaseEntity entityLeave in entityLeaveList)
 		{
-			if (!BaseEntityEx.IsValid(entityLeave))
+			if (!entityLeave.IsValid())
 			{
 				continue;
 			}

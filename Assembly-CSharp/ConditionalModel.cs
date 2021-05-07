@@ -41,7 +41,7 @@ public class ConditionalModel : PrefabAttribute
 		{
 			gameObject.transform.localPosition = worldPosition;
 			gameObject.transform.localRotation = worldRotation;
-			PoolableEx.AwakeFromInstantiate(gameObject);
+			gameObject.AwakeFromInstantiate();
 		}
 		return gameObject;
 	}

@@ -9,12 +9,12 @@ namespace UnityEngine
 	{
 		public static BaseEntity ToBaseEntity(this GameObject go)
 		{
-			return ToBaseEntity(go.transform);
+			return go.transform.ToBaseEntity();
 		}
 
 		public static BaseEntity ToBaseEntity(this Collider collider)
 		{
-			return ToBaseEntity(collider.transform);
+			return collider.transform.ToBaseEntity();
 		}
 
 		public static BaseEntity ToBaseEntity(this Transform transform)
@@ -29,7 +29,7 @@ namespace UnityEngine
 
 		public static bool IsOnLayer(this GameObject go, Layer rustLayer)
 		{
-			return IsOnLayer(go, (int)rustLayer);
+			return go.IsOnLayer((int)rustLayer);
 		}
 
 		public static bool IsOnLayer(this GameObject go, int layer)

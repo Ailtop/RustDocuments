@@ -401,8 +401,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_OpenDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
@@ -461,8 +461,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_CloseDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !canHandOpen || !IsOpen() || IsBusy() || IsLocked())
@@ -506,8 +506,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		Interface.CallHook("OnDoorKnocked", this, rpc.player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_ToggleHatch(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && hasHatch)

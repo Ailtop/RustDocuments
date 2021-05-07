@@ -47,6 +47,12 @@ public class TexasHoldEmPlayerWidget : MonoBehaviour
 	private Sprite bigBlindChip;
 
 	[SerializeField]
+	private Sprite canSeeIcon;
+
+	[SerializeField]
+	private Sprite cannotSeeIcon;
+
+	[SerializeField]
 	private Sprite noChip;
 
 	[SerializeField]

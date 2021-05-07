@@ -120,7 +120,7 @@ public class HeldEntity : BaseEntity
 	public BasePlayer GetOwnerPlayer()
 	{
 		BaseEntity parentEntity = GetParentEntity();
-		if (!BaseEntityEx.IsValid(parentEntity))
+		if (!parentEntity.IsValid())
 		{
 			return null;
 		}
@@ -154,7 +154,7 @@ public class HeldEntity : BaseEntity
 	{
 		Assert.IsTrue(base.isServer, "Should be server!");
 		Assert.IsTrue(player.isServer, "Player should be serverside!");
-		TransformEx.Identity(base.gameObject);
+		base.gameObject.Identity();
 		SetParent(player, handBone);
 		SetHeld(false);
 	}

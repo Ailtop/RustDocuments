@@ -18,7 +18,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -80,14 +80,14 @@ public class TriggerParent : TriggerBase, IServerComponent
 			BasePlayer basePlayer = ent.ToPlayer();
 			if (!(basePlayer != null) || !basePlayer.isMounted)
 			{
-				ent.SetParent(GameObjectEx.ToBaseEntity(base.gameObject), true, true);
+				ent.SetParent(base.gameObject.ToBaseEntity(), true, true);
 			}
 		}
 	}
 
 	protected void Unparent(BaseEntity ent)
 	{
-		if (!(ent.GetParentEntity() != GameObjectEx.ToBaseEntity(base.gameObject)))
+		if (!(ent.GetParentEntity() != base.gameObject.ToBaseEntity()))
 		{
 			ent.SetParent(null, true, true);
 			BasePlayer basePlayer = ent.ToPlayer();
@@ -114,14 +114,14 @@ public class TriggerParent : TriggerBase, IServerComponent
 		{
 			return;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(base.gameObject);
-		if (!BaseEntityEx.IsValid(baseEntity) || baseEntity.IsDestroyed)
+		BaseEntity baseEntity = base.gameObject.ToBaseEntity();
+		if (!baseEntity.IsValid() || baseEntity.IsDestroyed)
 		{
 			return;
 		}
 		foreach (BaseEntity entityContent in entityContents)
 		{
-			if (BaseEntityEx.IsValid(entityContent) && !entityContent.IsDestroyed)
+			if (entityContent.IsValid() && !entityContent.IsDestroyed)
 			{
 				if (ShouldParent(entityContent))
 				{

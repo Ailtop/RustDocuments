@@ -100,7 +100,7 @@ public class ImagePainter : MonoBehaviour, IPointerDownHandler, IEventSystemHand
 			return;
 		}
 		PointerState pointerState = this.pointerState[(int)button];
-		Vector2 vector = UIEx.Unpivot(rectTransform, position);
+		Vector2 vector = rectTransform.Unpivot(position);
 		if (pointerState.isDown)
 		{
 			Vector2 vector2 = pointerState.lastPos - vector;

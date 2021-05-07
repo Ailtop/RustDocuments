@@ -17,7 +17,7 @@ namespace UnityEngine
 		{
 			if (col != null)
 			{
-				return GameObjectEx.IsOnLayer(col.gameObject, rustLayer);
+				return col.gameObject.IsOnLayer(rustLayer);
 			}
 			return false;
 		}
@@ -26,7 +26,7 @@ namespace UnityEngine
 		{
 			if (col != null)
 			{
-				return GameObjectEx.IsOnLayer(col.gameObject, layer);
+				return col.gameObject.IsOnLayer(layer);
 			}
 			return false;
 		}

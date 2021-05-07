@@ -17,7 +17,7 @@ public class TriggerPlayerForce : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity != null)
 		{
 			return baseEntity.gameObject;

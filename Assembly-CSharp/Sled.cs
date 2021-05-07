@@ -114,7 +114,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 			CancelInvoke(UpdatePhysicsMaterial);
 		}
 		SetFlag(Flags.Reserved2, terrainHandler.IsOnSnowOrIce);
-		SetFlag(Flags.Reserved4, terrainHandler.IsOnSand);
+		SetFlag(Flags.Reserved4, terrainHandler.OnSurface == VehicleTerrainHandler.Surface.Sand);
 	}
 
 	private void UpdateGroundedFlag()
@@ -132,7 +132,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		{
 			return BrakeMaterial;
 		}
-		bool flag = terrainHandler.IsOnSnowOrIce || terrainHandler.IsOnSand;
+		bool flag = terrainHandler.IsOnSnowOrIce || terrainHandler.OnSurface == VehicleTerrainHandler.Surface.Sand;
 		if (flag)
 		{
 			leftIce = 0f;

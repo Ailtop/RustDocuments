@@ -162,22 +162,22 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[Header("Spawn")]
 	public SpawnSettings spawnSettings;
 
-	[SerializeField]
 	[Header("Fuel")]
+	[SerializeField]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[SerializeField]
 	[Header("Audio/FX")]
+	[SerializeField]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]
 	public GameObjectRef collisionEffect;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	public MeshRenderer[] damageShowingRenderers;
 
 	[ServerVar(Help = "Population active on the server")]
@@ -199,6 +199,18 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public EntityFuelSystem fuelSystem;
 
 	public float cachedFuelFraction;
+
+	public VehicleTerrainHandler.Surface OnSurface
+	{
+		get
+		{
+			if (serverTerrainHandler == null)
+			{
+				return VehicleTerrainHandler.Surface.Default;
+			}
+			return serverTerrainHandler.OnSurface;
+		}
+	}
 
 	public float DriveWheelVelocity
 	{
@@ -365,24 +377,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			}
 		}
 		return false;
-	}
-
-	public bool IsOnRoad()
-	{
-		if (serverTerrainHandler == null)
-		{
-			return false;
-		}
-		return serverTerrainHandler.IsOnRoad;
-	}
-
-	public bool IsOnIce()
-	{
-		if (serverTerrainHandler == null)
-		{
-			return false;
-		}
-		return serverTerrainHandler.IsOnIce;
 	}
 
 	public override void VehicleFixedUpdate()
@@ -831,11 +825,11 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		BaseEntity baseEntity = null;
 		if (contact.otherCollider.attachedRigidbody == rigidBody)
 		{
-			baseEntity = GameObjectEx.ToBaseEntity(contact.otherCollider);
+			baseEntity = contact.otherCollider.ToBaseEntity();
 		}
 		else if (contact.thisCollider.attachedRigidbody == rigidBody)
 		{
-			baseEntity = GameObjectEx.ToBaseEntity(contact.thisCollider);
+			baseEntity = contact.thisCollider.ToBaseEntity();
 		}
 		if (baseEntity != null)
 		{
@@ -911,7 +905,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 
 	public void SpawnPreassignedModules()
 	{
-		if (!spawnSettings.useSpawnSettings || CollectionEx.IsNullOrEmpty(spawnSettings.configurationOptions))
+		if (!spawnSettings.useSpawnSettings || spawnSettings.configurationOptions.IsNullOrEmpty())
 		{
 			return;
 		}

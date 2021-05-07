@@ -4,7 +4,7 @@ public static class TerrainAnchorEx
 {
 	public static bool ApplyTerrainAnchors(this Transform transform, TerrainAnchor[] anchors, ref Vector3 pos, Quaternion rot, Vector3 scale, SpawnFilter filter = null)
 	{
-		return ApplyTerrainAnchors(transform, anchors, ref pos, rot, scale, TerrainAnchorMode.MinimizeError, filter);
+		return transform.ApplyTerrainAnchors(anchors, ref pos, rot, scale, TerrainAnchorMode.MinimizeError, filter);
 	}
 
 	public static bool ApplyTerrainAnchors(this Transform transform, TerrainAnchor[] anchors, ref Vector3 pos, Quaternion rot, Vector3 scale, TerrainAnchorMode mode, SpawnFilter filter = null)
@@ -55,7 +55,7 @@ public static class TerrainAnchorEx
 	public static void ApplyTerrainAnchors(this Transform transform, TerrainAnchor[] anchors)
 	{
 		Vector3 pos = transform.position;
-		ApplyTerrainAnchors(transform, anchors, ref pos, transform.rotation, transform.lossyScale);
+		transform.ApplyTerrainAnchors(anchors, ref pos, transform.rotation, transform.lossyScale);
 		transform.position = pos;
 	}
 }

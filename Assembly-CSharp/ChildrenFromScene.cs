@@ -20,7 +20,7 @@ public class ChildrenFromScene : MonoBehaviour
 		foreach (GameObject gameObject in rootGameObjects)
 		{
 			gameObject.transform.SetParent(base.transform, false);
-			TransformEx.Identity(gameObject);
+			gameObject.Identity();
 			RectTransform rectTransform = gameObject.transform as RectTransform;
 			if ((bool)rectTransform)
 			{

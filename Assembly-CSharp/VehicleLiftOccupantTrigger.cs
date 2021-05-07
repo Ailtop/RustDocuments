@@ -27,7 +27,7 @@ public class VehicleLiftOccupantTrigger : TriggerBase
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null || baseEntity.isClient)
 		{
 			return null;

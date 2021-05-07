@@ -158,7 +158,7 @@ public class Mailbox : StorageContainer
 	public void SubmitInputItems(BasePlayer fromPlayer)
 	{
 		Item slot = base.inventory.GetSlot(mailInputSlot);
-		if (IsFull() || slot == null)
+		if (IsFull() || slot == null || Interface.CallHook("OnItemSubmit", slot, this, fromPlayer) != null)
 		{
 			return;
 		}

@@ -36,10 +36,10 @@ public class ChildrenScreenshot : MonoBehaviour
 		{
 			PositionCamera(camera, item.gameObject);
 			int layer = item.gameObject.layer;
-			TransformEx.SetLayerRecursive(item.gameObject, 1);
+			item.gameObject.SetLayerRecursive(1);
 			camera.Render();
-			TransformEx.SetLayerRecursive(item.gameObject, layer);
-			string recursiveName = TransformEx.GetRecursiveName(item);
+			item.gameObject.SetLayerRecursive(layer);
+			string recursiveName = item.GetRecursiveName();
 			recursiveName = recursiveName.Replace('/', '.');
 			RenderTexture.active = renderTexture;
 			texture2D.ReadPixels(new Rect(0f, 0f, renderTexture.width, renderTexture.height), 0, 0, false);

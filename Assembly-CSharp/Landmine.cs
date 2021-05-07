@@ -117,7 +117,7 @@ public class Landmine : BaseTrap
 			}
 			else if (Interface.CallHook("OnTrapTrigger", this, obj) == null)
 			{
-				BasePlayer ply = GameObjectEx.ToBaseEntity(obj) as BasePlayer;
+				BasePlayer ply = obj.ToBaseEntity() as BasePlayer;
 				Trigger(ply);
 			}
 		}
@@ -181,8 +181,8 @@ public class Landmine : BaseTrap
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Disarm(RPCMessage rpc)
 	{
 		if (rpc.player.net.ID != triggerPlayerID && Armed() && Interface.CallHook("OnTrapDisarm", this, rpc.player) == null)

@@ -4,11 +4,15 @@ using UnityEngine;
 public class DungeonInfo : LandmarkInfo
 {
 	[Header("DungeonInfo")]
+	public int CellSize = 216;
+
 	public float LinkHeight = 1.5f;
 
 	public float LinkRadius = 3f;
 
 	public const float LinkRotation = 90f;
+
+	internal MonumentInfo Monument;
 
 	internal List<GameObject> Links = new List<GameObject>();
 
@@ -24,6 +28,7 @@ public class DungeonInfo : LandmarkInfo
 		position.z = (float)Mathf.RoundToInt(position.z / LinkRadius) * LinkRadius;
 		base.transform.SetPositionAndRotation(position, Quaternion.Euler(eulerAngles));
 		base.Awake();
+		Monument = base.transform.GetComponentInParent<MonumentInfo>();
 		if ((bool)TerrainMeta.Path)
 		{
 			TerrainMeta.Path.DungeonEntrances.Add(this);
@@ -32,6 +37,6 @@ public class DungeonInfo : LandmarkInfo
 
 	protected void Start()
 	{
-		TransformEx.SetHierarchyGroup(base.transform, "Dungeon");
+		base.transform.SetHierarchyGroup("Dungeon");
 	}
 }

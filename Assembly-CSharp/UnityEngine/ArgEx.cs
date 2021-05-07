@@ -48,7 +48,7 @@ namespace UnityEngine
 			{
 				return BasePlayer.FindBot(value);
 			}
-			return GetPlayerOrSleeper(arg, iArgNum);
+			return arg.GetPlayerOrSleeper(iArgNum);
 		}
 	}
 }

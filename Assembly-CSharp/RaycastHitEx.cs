@@ -20,14 +20,14 @@ public static class RaycastHitEx
 
 	public static BaseEntity GetEntity(this RaycastHit hit)
 	{
-		return GameObjectEx.ToBaseEntity(hit.collider);
+		return hit.collider.ToBaseEntity();
 	}
 
 	public static bool IsOnLayer(this RaycastHit hit, Layer rustLayer)
 	{
 		if (hit.collider != null)
 		{
-			return GameObjectEx.IsOnLayer(hit.collider.gameObject, rustLayer);
+			return hit.collider.gameObject.IsOnLayer(rustLayer);
 		}
 		return false;
 	}
@@ -36,7 +36,7 @@ public static class RaycastHitEx
 	{
 		if (hit.collider != null)
 		{
-			return GameObjectEx.IsOnLayer(hit.collider.gameObject, layer);
+			return hit.collider.gameObject.IsOnLayer(layer);
 		}
 		return false;
 	}

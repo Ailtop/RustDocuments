@@ -31,7 +31,7 @@ public class TriggerWetness : TriggerBase
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;

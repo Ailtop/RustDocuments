@@ -9,16 +9,16 @@ namespace Rust.Ai
 	[FriendlyName("Scan for Positions", "Scanning positions and storing them in the context")]
 	public sealed class ScanForPositions : BaseAction
 	{
-		[ApexSerialization(defaultValue = 12f)]
 		[FriendlyName("Sampling Range", "How large a range points are sampled in, in a square with the entity in the center")]
+		[ApexSerialization(defaultValue = 12f)]
 		public float SamplingRange = 12f;
 
 		[FriendlyName("Sampling Density", "How much distance there is between individual samples")]
 		[ApexSerialization(defaultValue = 1.5f)]
 		public int SampleRings = 3;
 
-		[FriendlyName("Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Should be used for fallbacks/stuck-detection only?")]
 		[ApexSerialization(defaultValue = false)]
+		[FriendlyName("Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Should be used for fallbacks/stuck-detection only?")]
 		public bool CalculatePath;
 
 		[FriendlyName("Percentage of Inner Circle for Calculate Path", "Calculating the path to each position ensures connectivity, but is expensive. Here we can define what percentage of the sampling range (it's inner circle) we want to calculate paths for.")]

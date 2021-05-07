@@ -61,7 +61,7 @@ namespace Facepunch.Unity
 				result.Distance = Vector3.Distance(renderer.bounds.center, Camera.main.transform.position);
 				result.MaterialCount = renderer.sharedMaterials.Length;
 				result.RenderType = renderer.GetType().Name;
-				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(renderer.gameObject);
+				BaseEntity baseEntity = renderer.gameObject.ToBaseEntity();
 				if ((bool)baseEntity)
 				{
 					result.EntityName = baseEntity.PrefabName;
@@ -72,7 +72,7 @@ namespace Facepunch.Unity
 				}
 				else
 				{
-					result.ObjectName = TransformEx.GetRecursiveName(renderer.transform);
+					result.ObjectName = renderer.transform.GetRecursiveName();
 				}
 				if (renderer is MeshRenderer)
 				{

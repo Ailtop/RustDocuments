@@ -5,8 +5,8 @@ namespace ConVar
 	[Factory("time")]
 	public class Time : ConsoleSystem
 	{
-		[Help("Pause time while loading")]
 		[ServerVar]
+		[Help("Pause time while loading")]
 		public static bool pausewhileloading = true;
 
 		[ServerVar]
@@ -37,8 +37,8 @@ namespace ConVar
 			}
 		}
 
-		[Help("The time scale")]
 		[ServerVar]
+		[Help("The time scale")]
 		public static float timescale
 		{
 			get

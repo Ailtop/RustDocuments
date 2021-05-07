@@ -118,7 +118,7 @@ public class DroppedItem : WorldItem
 		gameObject.transform.SetParent(base.transform, false);
 		gameObject.transform.localPosition = Vector3.zero;
 		gameObject.transform.localRotation = Quaternion.identity;
-		TransformEx.SetLayerRecursive(gameObject, base.gameObject.layer);
+		gameObject.SetLayerRecursive(base.gameObject.layer);
 		childCollider = gameObject.GetComponent<Collider>();
 		if ((bool)childCollider)
 		{

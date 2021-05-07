@@ -17,7 +17,8 @@ namespace Facepunch.CardGames
 			AllIn = 0x8,
 			Check = 0x10,
 			Raise = 0x20,
-			Bet = 0x40
+			Bet = 0x40,
+			RevealHand = 0x80
 		}
 
 		public enum Playability
@@ -74,21 +75,9 @@ namespace Facepunch.CardGames
 			private set;
 		}
 
-		protected override bool SendAllCards => !base.HasRoundInProgress;
-
 		public TexasHoldEmController(CardTable owner)
 			: base(owner)
 		{
-		}
-
-		public Playability GetPlayabilityStatus(BasePlayer bp)
-		{
-			CardPlayerData cardPlayer;
-			if (TryGetCardPlayerData(bp, out cardPlayer))
-			{
-				return GetPlayabilityStatus(cardPlayer);
-			}
-			return Playability.NoPlayer;
 		}
 
 		public Playability GetPlayabilityStatus(CardPlayerData cpd)
@@ -127,7 +116,7 @@ namespace Facepunch.CardGames
 			{
 				if (cardPlayerData.HasUserInCurrentRound)
 				{
-					num = Mathf.Max(num, cardPlayerData.BetThisTurn);
+					num = Mathf.Max(num, cardPlayerData.betThisTurn);
 				}
 			}
 			return num;
@@ -140,49 +129,55 @@ namespace Facepunch.CardGames
 
 		public bool TryGetActivePlayer(out CardPlayerData activePlayer)
 		{
-			return ToCardPlayerData(activePlayerIndex, NumPlayersInCurrentRound(), out activePlayer);
+			return ToCardPlayerData(activePlayerIndex, false, out activePlayer);
 		}
 
-		public bool TryGetActivePlayer(int numPlayers, out CardPlayerData activePlayer)
+		public bool TryGetDealer(out CardPlayerData dealer)
 		{
-			return ToCardPlayerData(activePlayerIndex, numPlayers, out activePlayer);
+			return ToCardPlayerData(dealerIndex, true, out dealer);
 		}
 
-		public bool TryGetDealer(int numPlayers, out CardPlayerData dealer)
+		public bool TryGetSmallBlind(out CardPlayerData smallBlind)
 		{
-			return ToCardPlayerData(dealerIndex, numPlayers, out dealer);
+			int relIndex = ((NumPlayersInGame() < 3) ? dealerIndex : (dealerIndex + 1));
+			return ToCardPlayerData(relIndex, true, out smallBlind);
 		}
 
-		public bool TryGetSmallBlind(int numPlayers, out CardPlayerData smallBlind)
+		public bool TryGetBigBlind(out CardPlayerData bigBlind)
 		{
-			int relIndex = ((numPlayers < 3) ? dealerIndex : (dealerIndex + 1));
-			return ToCardPlayerData(relIndex, numPlayers, out smallBlind);
+			int relIndex = ((NumPlayersInGame() < 3) ? (dealerIndex + 1) : (dealerIndex + 2));
+			return ToCardPlayerData(relIndex, true, out bigBlind);
 		}
 
-		public bool TryGetBigBlind(int numPlayers, out CardPlayerData bigBlind)
+		public int GetFirstPlayerRelIndex(bool startOfRound)
 		{
-			int relIndex = ((numPlayers < 3) ? (dealerIndex + 1) : (dealerIndex + 2));
-			return ToCardPlayerData(relIndex, numPlayers, out bigBlind);
-		}
-
-		public int GetFirstPlayerRelIndex(bool startOfRound, int numPlayers)
-		{
-			if (startOfRound && numPlayers == 2)
+			int num = NumPlayersInGame();
+			if (startOfRound && num == 2)
 			{
 				return dealerIndex;
 			}
-			return dealerIndex + 1 % numPlayers;
+			return (dealerIndex + 1) % num;
 		}
 
-		private bool ToCardPlayerData(int relIndex, int numPlayers, out CardPlayerData result)
+		private void SetActivePlayerIndex(int index)
+		{
+			activePlayerIndex = index;
+			if (base.IsServer)
+			{
+				base.Owner.SendNetworkUpdate();
+			}
+		}
+
+		private bool ToCardPlayerData(int relIndex, bool includeFolded, out CardPlayerData result)
 		{
 			if (!base.HasRoundInProgress)
 			{
-				Debug.LogWarning(GetType().Name + ": Tried to call GetTruePlayerIndex while no round was in progress. Returning null.");
+				Debug.LogWarning(GetType().Name + ": Tried to call ToCardPlayerData while no round was in progress. Returning null.");
 				result = null;
 				return false;
 			}
-			int index = RelToAbsIndex(relIndex % numPlayers);
+			int num = (includeFolded ? NumPlayersInGame() : NumPlayersInCurrentRound());
+			int index = RelToAbsIndex(relIndex % num, includeFolded);
 			return TryGetCardPlayerData(index, out result);
 		}
 
@@ -211,7 +206,7 @@ namespace Facepunch.CardGames
 
 		public int GetCurrentMinRaise(CardPlayerData playerData)
 		{
-			return Mathf.Max(10, GetCurrentBet() - playerData.BetThisTurn + biggestRaiseThisTurn);
+			return Mathf.Max(10, GetCurrentBet() - playerData.betThisTurn + biggestRaiseThisTurn);
 		}
 
 		public override void Save(ProtoBuf.CardTable syncData)
@@ -241,79 +236,140 @@ namespace Facepunch.CardGames
 			LastActionValue = 0;
 			IncrementDealer();
 			DealHoleCards();
-			int numPlayers = NumPlayersInCurrentRound();
-			activePlayerIndex = GetFirstPlayerRelIndex(true, numPlayers);
+			SetActivePlayerIndex(GetFirstPlayerRelIndex(true));
 			ServerPlaySound(CardGameSounds.SoundType.Shuffle);
 			CardPlayerData activePlayer;
-			TryGetActivePlayer(numPlayers, out activePlayer);
+			TryGetActivePlayer(out activePlayer);
 			activePlayer.availableInputs = SubGetAvailableInputsForPlayer(activePlayer);
 			if ((activePlayer.availableInputs & 0x40) == 64)
 			{
-				ReceivedInputFromPlayer(activePlayer, 64, 5, false);
+				ReceivedInputFromPlayer(activePlayer, 64, false, 5, false);
 			}
 			else
 			{
-				ReceivedInputFromPlayer(activePlayer, 8, 5, false);
+				ReceivedInputFromPlayer(activePlayer, 8, false, 5, false);
 			}
-			TryGetActivePlayer(numPlayers, out activePlayer);
+			TryGetActivePlayer(out activePlayer);
 			activePlayer.availableInputs = SubGetAvailableInputsForPlayer(activePlayer);
 			if ((activePlayer.availableInputs & 0x20) == 32)
 			{
-				ReceivedInputFromPlayer(activePlayer, 32, 10, false);
+				ReceivedInputFromPlayer(activePlayer, 32, false, 10, false);
 			}
 			else
 			{
-				ReceivedInputFromPlayer(activePlayer, 8, 10, false);
+				ReceivedInputFromPlayer(activePlayer, 8, false, 10, false);
 			}
 		}
 
 		protected override void SubEndRound()
 		{
-			List<CardPlayerData> list = Pool.GetList<CardPlayerData>();
-			GetPlayersInRound(list);
-			if (list.Count == 0)
+			int num = 0;
+			List<CardPlayerData> obj = Pool.GetList<CardPlayerData>();
+			CardPlayerData[] playerData = base.playerData;
+			foreach (CardPlayerData cardPlayerData in playerData)
+			{
+				if (cardPlayerData.betThisRound > 0)
+				{
+					obj.Add(cardPlayerData);
+				}
+				if (cardPlayerData.HasUserInCurrentRound)
+				{
+					num++;
+				}
+			}
+			if (obj.Count == 0)
 			{
 				return;
 			}
-			list.Sort();
 			ClearWinnerInfo();
+			bool flag = num > 1;
 			SingletonComponent<InvokeHandler>.Instance.CancelInvoke(TimeoutTurn);
-			int num = GetScrapInPot();
-			foreach (CardPlayerData item in list)
+			int num2 = GetScrapInPot();
+			playerData = base.playerData;
+			foreach (CardPlayerData cardPlayerData2 in playerData)
 			{
-				num -= item.BetThisRound;
+				if (cardPlayerData2.HasUserInGame)
+				{
+					num2 -= cardPlayerData2.betThisRound;
+				}
 			}
-			bool primaryWinner = true;
-			while (GetScrapInPot() > 0 && list.Count > 0)
+			bool flag2 = true;
+			playerData = base.playerData;
+			foreach (CardPlayerData obj2 in playerData)
 			{
-				int num2 = 1;
-				if (list.Count > 1)
+				obj2.remainingToPayOut = obj2.betThisRound;
+			}
+			while (obj.Count > 1)
+			{
+				int num3 = int.MaxValue;
+				int num4 = 0;
+				playerData = base.playerData;
+				foreach (CardPlayerData cardPlayerData3 in playerData)
 				{
-					for (int i = 1; i < list.Count && list[i].finalScore == list[0].finalScore; i++)
+					if (cardPlayerData3.betThisRound > 0)
 					{
-						num2++;
+						if (cardPlayerData3.betThisRound < num3)
+						{
+							num3 = cardPlayerData3.betThisRound;
+						}
+						num4++;
 					}
 				}
-				int num3 = Mathf.CeilToInt(num / num2);
-				for (int j = 0; j < num2; j++)
+				int num5 = num3 * num4;
+				foreach (CardPlayerData item in obj)
 				{
-					int b = Mathf.CeilToInt(GetScrapInPot() / (num2 - j));
-					CardPlayerData cardPlayerData = list[j];
-					int betThisRound = cardPlayerData.BetThisRound;
-					int num4 = 0;
-					CardPlayerData[] playerData = base.playerData;
-					foreach (CardPlayerData cardPlayerData2 in playerData)
-					{
-						num4 += Mathf.Min(cardPlayerData2.BetThisRound, betThisRound);
-					}
-					int num5 = Mathf.Min(num4, b);
-					num5 += num3;
-					num -= num3;
-					PayOut(cardPlayerData, num5);
-					_003CSubEndRound_003Eg__AddWinner_007C47_0(cardPlayerData, num5, primaryWinner);
+					item.betThisRound -= num3;
 				}
-				list.RemoveRange(0, num2);
-				primaryWinner = false;
+				int num6 = int.MaxValue;
+				foreach (CardPlayerData item2 in obj)
+				{
+					if (item2.HasUserInCurrentRound && item2.finalScore < num6)
+					{
+						num6 = item2.finalScore;
+					}
+				}
+				if (flag2)
+				{
+					base.winnerInfo.winningScore = num6;
+				}
+				int num7 = 0;
+				foreach (CardPlayerData item3 in obj)
+				{
+					if (item3.HasUserInCurrentRound && item3.finalScore == num6)
+					{
+						num7++;
+					}
+				}
+				int num8 = Mathf.CeilToInt((float)(num5 + num2) / (float)num7);
+				num2 = 0;
+				foreach (CardPlayerData item4 in obj)
+				{
+					if (item4.HasUserInCurrentRound && item4.finalScore == num6)
+					{
+						if (flag)
+						{
+							item4.EnableSendingCards();
+						}
+						PayOut(item4, num8);
+						_003CSubEndRound_003Eg__AddWinner_007C46_0(item4, num8, flag2);
+					}
+				}
+				for (int num9 = obj.Count - 1; num9 >= 0; num9--)
+				{
+					if (obj[num9].betThisRound == 0)
+					{
+						obj.RemoveAt(num9);
+					}
+				}
+				flag2 = false;
+			}
+			if (obj.Count == 1)
+			{
+				int num10 = obj[0].betThisRound + num2;
+				num2 = 0;
+				PayOut(obj[0], num10);
+				bool primaryWinner = base.winnerInfo.winners.Count == 0;
+				_003CSubEndRound_003Eg__AddWinner_007C46_0(obj[0], num10, primaryWinner);
 			}
 			base.Owner.ClientRPC(null, "OnWinnersDeclared", base.winnerInfo);
 			StorageContainer pot = base.Owner.GetPot();
@@ -322,9 +378,11 @@ namespace Facepunch.CardGames
 				int amount = pot.inventory.GetAmount(base.ScrapItemID, true);
 				if (amount > 0)
 				{
-					Debug.LogWarning($"{GetType().Name}: Something went wrong in the winner calculation. Pot still has {amount} scrap left over after payouts. Expected 0.");
+					Debug.LogError($"{GetType().Name}: Something went wrong in the winner calculation. Pot still has {amount} scrap left over after payouts. Expected 0. Clearing it.");
+					pot.inventory.Clear();
 				}
 			}
+			Pool.FreeList(ref obj);
 		}
 
 		protected override void SubEndGameplay()
@@ -334,39 +392,20 @@ namespace Facepunch.CardGames
 		private void IncrementDealer()
 		{
 			int num = NumPlayersInGame();
+			if (num == 0)
+			{
+				dealerIndex = 0;
+				return;
+			}
 			dealerIndex = Mathf.Clamp(dealerIndex, 0, num - 1);
-			if (num != 0)
-			{
-				dealerIndex = ++dealerIndex % num;
-			}
-		}
-
-		private void IncrementActivePlayer()
-		{
-			if (!base.HasRoundInProgress)
-			{
-				Debug.LogError(GetType().Name + ": Can't increment active player when no round is in progress.");
-			}
-			int num = NumPlayersInCurrentRound();
-			if (num != 0)
-			{
-				if (ShouldEndTurn())
-				{
-					EndTurn();
-				}
-				else
-				{
-					activePlayerIndex = ++activePlayerIndex % num;
-				}
-			}
+			dealerIndex = ++dealerIndex % num;
 		}
 
 		private void DealHoleCards()
 		{
-			CardPlayerData[] playerData;
 			for (int i = 0; i < 2; i++)
 			{
-				playerData = base.playerData;
+				CardPlayerData[] playerData = base.playerData;
 				foreach (CardPlayerData cardPlayerData in playerData)
 				{
 					if (cardPlayerData.HasUserInCurrentRound)
@@ -383,29 +422,15 @@ namespace Facepunch.CardGames
 					}
 				}
 			}
-			playerData = base.playerData;
-			foreach (CardPlayerData cardPlayerData2 in playerData)
-			{
-				if (!cardPlayerData2.HasUserInCurrentRound)
-				{
-					continue;
-				}
-				BasePlayer basePlayer = BasePlayer.FindByID(cardPlayerData2.UserID);
-				if (!(basePlayer != null))
-				{
-					continue;
-				}
-				localPlayerCards.cards.Clear();
-				foreach (PlayingCard card2 in cardPlayerData2.Cards)
-				{
-					localPlayerCards.cards.Add(card2.GetIndex());
-				}
-				base.Owner.ClientRPCPlayer(null, basePlayer, "ReceiveCardsForPlayer", localPlayerCards);
-			}
+			SyncAllLocalPlayerCards();
 		}
 
 		private bool DealFlop()
 		{
+			if (!base.HasRoundInProgress)
+			{
+				return false;
+			}
 			if (flopCards.Count == 0)
 			{
 				for (int i = 0; i < 3; i++)
@@ -437,99 +462,141 @@ namespace Facepunch.CardGames
 			CardPlayerData activePlayer;
 			if (TryGetActivePlayer(out activePlayer))
 			{
-				ReceivedInputFromPlayer(activePlayer, 2, 0, false);
+				ReceivedInputFromPlayer(activePlayer, 2, true, 0, false);
 			}
 		}
 
-		protected override void SubReceivedInputFromPlayer(CardPlayerData playerData, int input, int value)
+		protected override void SubReceivedInputFromPlayer(CardPlayerData playerData, int input, int value, bool countAsAction)
 		{
-			CardPlayerData activePlayer;
-			if (!base.HasRoundInProgress || !TryGetActivePlayer(out activePlayer) || activePlayer != playerData)
+			if (!Enum.IsDefined(typeof(PokerInputOption), input))
 			{
 				return;
 			}
-			bool flag = false;
-			if ((playerData.availableInputs & input) != input)
-			{
-				return;
-			}
-			switch (input)
-			{
-			case 2:
-				playerData.LeaveCurrentRound(true);
-				flag = true;
-				LastActionValue = 0;
-				playerData.SetHasActedThisTurn(true);
-				break;
-			case 4:
-			{
-				int currentBet = GetCurrentBet();
-				int num = (LastActionValue = AddToPot(playerData, currentBet - playerData.BetThisTurn));
-				playerData.SetHasActedThisTurn(true);
-				break;
-			}
-			case 32:
-			case 64:
-			{
-				int currentBet = GetCurrentBet();
-				int biggestRaiseThisTurn = this.biggestRaiseThisTurn;
-				if (playerData.BetThisTurn + value < currentBet + biggestRaiseThisTurn)
-				{
-					value = currentBet + biggestRaiseThisTurn - playerData.BetThisTurn;
-				}
-				int num = AddToPot(playerData, value);
-				this.biggestRaiseThisTurn = Mathf.Max(this.biggestRaiseThisTurn, num - currentBet);
-				LastActionValue = num;
-				playerData.SetHasActedThisTurn(true);
-				break;
-			}
-			case 8:
-			{
-				int currentBet = GetCurrentBet();
-				int num = AddAllToPot(playerData);
-				this.biggestRaiseThisTurn = Mathf.Max(this.biggestRaiseThisTurn, num - currentBet);
-				LastActionValue = num;
-				playerData.SetHasActedThisTurn(true);
-				break;
-			}
-			case 16:
-				LastActionValue = 0;
-				playerData.SetHasActedThisTurn(true);
-				break;
-			}
-			LastActionTarget = playerData.UserID;
-			LastAction = (PokerInputOption)input;
-			if (flag && NumPlayersInCurrentRound() == 1)
-			{
-				EndRound();
-				return;
-			}
-			IncrementActivePlayer();
 			if (!base.HasRoundInProgress)
 			{
-				return;
+				if (input == 128)
+				{
+					playerData.EnableSendingCards();
+				}
+				LastActionTarget = playerData.UserID;
+				LastAction = (PokerInputOption)input;
+				LastActionValue = 0;
 			}
-			int num3 = 0;
-			int num4 = 0;
-			CardPlayerData activePlayer2;
-			TryGetActivePlayer(out activePlayer2);
-			while (SubGetAvailableInputsForPlayer(activePlayer2) == 1 && num3 <= NumPlayersInGame() && num4 < 200)
+			else
 			{
-				num4++;
-				int count = flopCards.Count;
-				IncrementActivePlayer();
+				CardPlayerData activePlayer;
+				if (!TryGetActivePlayer(out activePlayer) || activePlayer != playerData)
+				{
+					return;
+				}
+				bool flag = false;
+				if ((playerData.availableInputs & input) != input)
+				{
+					return;
+				}
+				switch (input)
+				{
+				case 2:
+					playerData.LeaveCurrentRound(false, true);
+					flag = true;
+					LastActionValue = 0;
+					break;
+				case 4:
+				{
+					int currentBet = GetCurrentBet();
+					int num = (LastActionValue = AddToPot(playerData, currentBet - playerData.betThisTurn));
+					break;
+				}
+				case 32:
+				case 64:
+				{
+					int currentBet = GetCurrentBet();
+					int biggestRaiseThisTurn = this.biggestRaiseThisTurn;
+					if (playerData.betThisTurn + value < currentBet + biggestRaiseThisTurn)
+					{
+						value = currentBet + biggestRaiseThisTurn - playerData.betThisTurn;
+					}
+					int num = AddToPot(playerData, value);
+					this.biggestRaiseThisTurn = Mathf.Max(this.biggestRaiseThisTurn, num - currentBet);
+					LastActionValue = num;
+					break;
+				}
+				case 8:
+				{
+					int currentBet = GetCurrentBet();
+					int num = AddAllToPot(playerData);
+					this.biggestRaiseThisTurn = Mathf.Max(this.biggestRaiseThisTurn, num - currentBet);
+					LastActionValue = num;
+					break;
+				}
+				case 16:
+					LastActionValue = 0;
+					break;
+				}
+				if (countAsAction && input != 1)
+				{
+					playerData.SetHasActedThisTurn(true);
+				}
+				LastActionTarget = playerData.UserID;
+				LastAction = (PokerInputOption)input;
+				if (flag && NumPlayersInCurrentRound() == 1)
+				{
+					EndRound();
+					return;
+				}
+				int num3 = activePlayerIndex;
+				if (flag)
+				{
+					if (activePlayerIndex > NumPlayersInCurrentRound() - 1)
+					{
+						num3 = 0;
+					}
+				}
+				else
+				{
+					num3 = (activePlayerIndex + 1) % NumPlayersInCurrentRound();
+				}
+				if (ShouldEndTurn())
+				{
+					EndTurn();
+				}
+				else
+				{
+					SetActivePlayerIndex(num3);
+				}
 				if (!base.HasRoundInProgress)
 				{
 					return;
 				}
+				int num4 = 0;
+				int num5 = 0;
+				CardPlayerData activePlayer2;
 				TryGetActivePlayer(out activePlayer2);
-				num3++;
-				if (flopCards.Count != count)
+				while (SubGetAvailableInputsForPlayer(activePlayer2) == 1 && num4 <= NumPlayersInGame() && num5 < 200)
 				{
-					num3 = 0;
+					num5++;
+					int count = flopCards.Count;
+					if (ShouldEndTurn())
+					{
+						EndTurn();
+					}
+					else
+					{
+						SetActivePlayerIndex((activePlayerIndex + 1) % NumPlayersInCurrentRound());
+					}
+					if (!base.HasRoundInProgress)
+					{
+						return;
+					}
+					TryGetActivePlayer(out activePlayer2);
+					num4++;
+					if (flopCards.Count != count)
+					{
+						num4 = 0;
+					}
 				}
+				StartTurnTimer(MaxTurnTime);
 			}
-			StartTurnTimer(MaxTurnTime);
 		}
 
 		private bool ShouldEndTurn()
@@ -537,7 +604,7 @@ namespace Facepunch.CardGames
 			CardPlayerData[] playerData = base.playerData;
 			foreach (CardPlayerData cardPlayerData in playerData)
 			{
-				if (cardPlayerData.HasUserInCurrentRound && cardPlayerData.GetScrapAmount() > 0 && (cardPlayerData.BetThisTurn != GetCurrentBet() || !cardPlayerData.hasActedThisTurn))
+				if (cardPlayerData.HasUserInCurrentRound && cardPlayerData.GetScrapAmount() > 0 && (cardPlayerData.betThisTurn != GetCurrentBet() || !cardPlayerData.hasActedThisTurn))
 				{
 					return false;
 				}
@@ -553,19 +620,40 @@ namespace Facepunch.CardGames
 				playerData[i].SetHasActedThisTurn(false);
 			}
 			biggestRaiseThisTurn = 0;
-			activePlayerIndex = GetFirstPlayerRelIndex(false, NumPlayersInCurrentRound());
+			int num = GetFirstPlayerRelIndex(false);
+			int num2 = NumPlayersInGame();
+			int num3 = 0;
+			CardPlayerData result;
+			while (!ToCardPlayerData(num, true, out result) || !result.HasUserInCurrentRound)
+			{
+				num = ++num % num2;
+				num3++;
+				if (num3 > num2)
+				{
+					Debug.LogError(GetType().Name + ": This should never happen. Ended turn with no players in game?.");
+					EndRound();
+					return;
+				}
+			}
+			int num4 = GameToRoundIndex(num);
+			if (num4 < 0 || num4 > NumPlayersInCurrentRound())
+			{
+				Debug.LogError($"EndTurn NewActiveIndex is out of range: {num4}. Clamping it to between 0 and {NumPlayersInCurrentRound()}.");
+				num4 = Mathf.Clamp(num4, 0, NumPlayersInCurrentRound());
+			}
+			SetActivePlayerIndex(num4);
 			if (DealFlop())
 			{
-				int num = 0;
+				int num5 = 0;
 				playerData = base.playerData;
 				foreach (CardPlayerData cardPlayerData in playerData)
 				{
 					if (cardPlayerData.HasUserInCurrentRound && cardPlayerData.GetScrapAmount() > 0)
 					{
-						num++;
+						num5++;
 					}
 				}
-				if (num == 1)
+				if (num5 == 1)
 				{
 					EndTurn();
 				}
@@ -589,23 +677,35 @@ namespace Facepunch.CardGames
 
 		protected override int SubGetAvailableInputsForPlayer(CardPlayerData playerData)
 		{
-			CardPlayerData activePlayer;
-			if (!base.HasRoundInProgress || playerData == null || !TryGetActivePlayer(out activePlayer) || playerData != activePlayer)
-			{
-				return 1;
-			}
 			PokerInputOption pokerInputOption = PokerInputOption.None;
+			if (playerData == null)
+			{
+				return (int)pokerInputOption;
+			}
+			if (!base.HasRoundInProgress)
+			{
+				if (!playerData.LeftRoundEarly && playerData.Cards.Count > 0 && !playerData.SendCardDetails)
+				{
+					pokerInputOption |= PokerInputOption.RevealHand;
+				}
+				return (int)pokerInputOption;
+			}
+			CardPlayerData activePlayer;
+			if (!TryGetActivePlayer(out activePlayer) || playerData != activePlayer)
+			{
+				return (int)pokerInputOption;
+			}
 			int scrapAmount = playerData.GetScrapAmount();
 			if (scrapAmount > 0)
 			{
 				pokerInputOption |= PokerInputOption.AllIn;
 				pokerInputOption |= PokerInputOption.Fold;
 				int currentBet = GetCurrentBet();
-				if (playerData.BetThisTurn >= currentBet)
+				if (playerData.betThisTurn >= currentBet)
 				{
 					pokerInputOption |= PokerInputOption.Check;
 				}
-				if (currentBet > playerData.BetThisTurn && scrapAmount >= currentBet - playerData.BetThisTurn)
+				if (currentBet > playerData.betThisTurn && scrapAmount >= currentBet - playerData.betThisTurn)
 				{
 					pokerInputOption |= PokerInputOption.Call;
 				}
@@ -641,17 +741,16 @@ namespace Facepunch.CardGames
 
 		protected override void SubOnPlayerLeaving(CardPlayerData playerData)
 		{
-			if (base.HasRoundInProgress)
+			CardPlayerData activePlayer;
+			if (base.HasRoundInProgress && TryGetActivePlayer(out activePlayer))
 			{
-				CardPlayerData activePlayer;
-				if (TryGetActivePlayer(out activePlayer) && playerData == activePlayer)
+				if (playerData == activePlayer)
 				{
-					ReceivedInputFromPlayer(activePlayer, 2, 0, false);
+					ReceivedInputFromPlayer(activePlayer, 2, true, 0, false);
 				}
-				playerData.LeaveCurrentRound(true);
-				if (NumPlayersInCurrentRound() == 1)
+				else if (playerData.HasUserInCurrentRound && playerData.mountIndex < activePlayer.mountIndex && activePlayerIndex > 0)
 				{
-					EndRound();
+					SetActivePlayerIndex(activePlayerIndex - 1);
 				}
 			}
 		}

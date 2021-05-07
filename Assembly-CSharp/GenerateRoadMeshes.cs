@@ -36,7 +36,7 @@ public class GenerateRoadMeshes : ProceduralComponent
 				GameObject gameObject = new GameObject("Road Mesh");
 				gameObject.transform.position = item.Position;
 				gameObject.layer = 16;
-				GameObjectEx.SetHierarchyGroup(gameObject, road.Name);
+				gameObject.SetHierarchyGroup(road.Name);
 				gameObject.SetActive(false);
 				MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RoadPhysicMaterial;

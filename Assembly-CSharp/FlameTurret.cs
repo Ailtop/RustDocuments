@@ -21,7 +21,7 @@ public class FlameTurret : StorageContainer
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return entity.IsValid();
 			}
 			return false;
 		}
@@ -206,7 +206,7 @@ public class FlameTurret : StorageContainer
 				GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);
 				for (int i = 0; i < obj.Count; i++)
 				{
-					BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
+					BaseEntity entity = obj[i].GetEntity();
 					if (entity != null && (entity == this || entity.EqualNetID(this)))
 					{
 						flag = true;

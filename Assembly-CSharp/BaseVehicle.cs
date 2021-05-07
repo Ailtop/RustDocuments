@@ -70,7 +70,13 @@ public class BaseVehicle : BaseMountable
 
 	public override float RealisticMass => rigidBody.mass;
 
-	protected override bool PositionTickFixedTime => true;
+	public override bool PositionTickFixedTime
+	{
+		protected get
+		{
+			return true;
+		}
+	}
 
 	protected virtual bool CanSwapSeats => true;
 
@@ -792,8 +798,8 @@ public class BaseVehicle : BaseMountable
 		return baseMountable;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server]
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

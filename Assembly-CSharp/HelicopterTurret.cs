@@ -163,7 +163,7 @@ public class HelicopterTurret : MonoBehaviour
 			float num = Vector3.Distance(position, muzzleTransform.position);
 			Vector3 normalized = (position - muzzleTransform.position).normalized;
 			RaycastHit hitInfo;
-			if (num < maxTargetRange && InFiringArc(_target) && GamePhysics.Trace(new Ray(muzzleTransform.position + normalized * 6f, normalized), 0f, out hitInfo, num * 1.1f, 1218652417) && GameObjectEx.ToBaseEntity(hitInfo.collider.gameObject) == _target)
+			if (num < maxTargetRange && InFiringArc(_target) && GamePhysics.Trace(new Ray(muzzleTransform.position + normalized * 6f, normalized), 0f, out hitInfo, num * 1.1f, 1218652417) && hitInfo.collider.gameObject.ToBaseEntity() == _target)
 			{
 				flag = true;
 			}

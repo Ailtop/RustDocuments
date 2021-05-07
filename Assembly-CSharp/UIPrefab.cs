@@ -14,7 +14,7 @@ public class UIPrefab : MonoBehaviour
 			createdGameObject = Facepunch.Instantiate.GameObject(prefabSource);
 			createdGameObject.name = prefabSource.name;
 			createdGameObject.transform.SetParent(base.transform, false);
-			TransformEx.Identity(createdGameObject);
+			createdGameObject.Identity();
 		}
 	}
 

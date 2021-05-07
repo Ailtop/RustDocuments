@@ -1,3 +1,4 @@
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
@@ -139,6 +140,10 @@ public class WaterPurifier : LiquidContainer
 				return;
 			}
 		}
+		if (Interface.CallHook("OnWaterPurify", this, timeCooked) != null)
+		{
+			return;
+		}
 		float num = timeCooked * ((float)waterToProcessPerMinute / 60f);
 		dirtyWaterProcssed += num;
 		if (dirtyWaterProcssed >= 1f)
@@ -177,6 +182,7 @@ public class WaterPurifier : LiquidContainer
 			slot3.amount = Mathf.Clamp(slot3.amount, 0, waterStorage.maxStackSize);
 			waterStorage.inventory.MarkDirty();
 		}
+		Interface.CallHook("OnWaterPurified", this, timeCooked);
 		waterStorage.SendNetworkUpdate();
 	}
 

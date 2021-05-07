@@ -8,7 +8,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void setteam(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer == null)
 			{
 				return;

@@ -22,7 +22,7 @@ namespace ConVar
 		[ServerVar]
 		public static void drop(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				Debug.Log("heli called to : " + basePlayer.transform.position);
@@ -38,7 +38,7 @@ namespace ConVar
 		[ServerVar]
 		public static void calltome(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				Debug.Log("heli called to : " + basePlayer.transform.position);
@@ -54,7 +54,7 @@ namespace ConVar
 		[ServerVar]
 		public static void call(Arg arg)
 		{
-			if ((bool)ArgEx.Player(arg))
+			if ((bool)arg.Player())
 			{
 				Debug.Log("Helicopter inbound");
 				BaseEntity baseEntity = GameManager.server.CreateEntity("assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab");
@@ -68,7 +68,7 @@ namespace ConVar
 		[ServerVar]
 		public static void strafe(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				PatrolHelicopterAI heliInstance = PatrolHelicopterAI.heliInstance;
@@ -94,7 +94,7 @@ namespace ConVar
 		[ServerVar]
 		public static void testpuzzle(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				bool isDeveloper = basePlayer.IsDeveloper;

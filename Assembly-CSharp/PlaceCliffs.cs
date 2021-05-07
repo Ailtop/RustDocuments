@@ -104,7 +104,7 @@ public class PlaceCliffs : ProceduralComponent
 			float normZ = TerrainMeta.NormalizeZ(z2);
 			float num2 = SeedRandom.Value(ref seed);
 			float factor = Filter.GetFactor(normX, normZ);
-			Prefab random = ArrayEx.GetRandom(array2, ref seed);
+			Prefab random = array2.GetRandom(ref seed);
 			if (factor * factor < num2)
 			{
 				continue;
@@ -205,13 +205,13 @@ public class PlaceCliffs : ProceduralComponent
 								num4++;
 								continue;
 							}
-							goto IL_01dc;
+							goto IL_01dd;
 						}
 					}
 				}
 				num3 -= num2;
 				continue;
-				IL_01dc:
+				IL_01dd:
 				int parentAngle2 = parentAngle + j;
 				int num5 = parentCount + 1;
 				int num6 = parentScore + Mathf.CeilToInt(Vector3Ex.Distance2D(parentPos, pos));

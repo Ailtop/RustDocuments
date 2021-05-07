@@ -58,7 +58,13 @@ public class HTNAnimal : BaseCombatEntity, IHTNAgent
 
 	public Quaternion EyeRotation => base.transform.rotation;
 
-	protected override float PositionTickRate => 0.1f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return 0.1f;
+		}
+	}
 
 	public BaseNpc.AiStatistics.FamilyEnum Family => AiDefinition.Info.ToFamily(AiDefinition.Info.Family);
 

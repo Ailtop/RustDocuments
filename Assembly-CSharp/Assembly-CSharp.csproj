@@ -36,11 +36,14 @@
     <Reference Include="System.Core">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\System.Core.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.VehiclesModule">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+    <Reference Include="Rust.Localization">
+      <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Unity">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
@@ -50,9 +53,6 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Rust.Localization">
-      <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.System">
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
@@ -193,7 +193,7 @@
       <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Oxide.Core.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>D:\YX\RUST\rustserver\RustDedicated_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>D:\YX\Skul The Hero Slayer\Skul The Hero Slayer\Skul_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

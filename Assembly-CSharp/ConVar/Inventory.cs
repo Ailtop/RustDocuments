@@ -108,7 +108,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void lighttoggle(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer && !basePlayer.IsDead() && !basePlayer.IsSleeping())
 			{
 				basePlayer.LightToggle();
@@ -118,7 +118,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void endloot(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer && !basePlayer.IsDead() && !basePlayer.IsSleeping())
 			{
 				basePlayer.inventory.loot.Clear();
@@ -128,7 +128,7 @@ namespace ConVar
 		[ServerVar]
 		public static void give(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer)
 			{
 				return;
@@ -163,7 +163,7 @@ namespace ConVar
 		[ServerVar]
 		public static void resetbp(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				basePlayer.blueprints.Reset();
@@ -173,7 +173,7 @@ namespace ConVar
 		[ServerVar]
 		public static void unlockall(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				basePlayer.blueprints.UnlockAll();
@@ -185,9 +185,9 @@ namespace ConVar
 		{
 			Item item = null;
 			string text = "SERVER";
-			if (ArgEx.Player(arg) != null)
+			if (arg.Player() != null)
 			{
-				text = ArgEx.Player(arg).displayName;
+				text = arg.Player().displayName;
 			}
 			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 			{
@@ -218,9 +218,9 @@ namespace ConVar
 		public static void giveto(Arg arg)
 		{
 			string text = "SERVER";
-			if (ArgEx.Player(arg) != null)
+			if (arg.Player() != null)
 			{
-				text = ArgEx.Player(arg).displayName;
+				text = arg.Player().displayName;
 			}
 			BasePlayer basePlayer = BasePlayer.Find(arg.GetString(0));
 			if (basePlayer == null)
@@ -250,7 +250,7 @@ namespace ConVar
 		[ServerVar]
 		public static void giveid(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer)
 			{
 				return;
@@ -284,7 +284,7 @@ namespace ConVar
 		[ServerVar]
 		public static void givearm(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer)
 			{
 				return;
@@ -318,7 +318,7 @@ namespace ConVar
 		[ServerVar(Help = "Copies the players inventory to the player in front of them")]
 		public static void copyTo(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic) || basePlayer == null)
 			{
 				return;
@@ -326,7 +326,7 @@ namespace ConVar
 			BasePlayer basePlayer2 = null;
 			if (arg.HasArgs() && arg.GetString(0).ToLower() != "true")
 			{
-				basePlayer2 = ArgEx.GetPlayer(arg, 0);
+				basePlayer2 = arg.GetPlayer(0);
 				if (basePlayer2 == null)
 				{
 					uint uInt = arg.GetUInt(0);
@@ -378,7 +378,7 @@ namespace ConVar
 		[ServerVar(Help = "Deploys a loadout to players in a radius eg. inventory.deployLoadoutInRange testloadout 30")]
 		public static void deployLoadoutInRange(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic) || basePlayer == null)
 			{
 				return;
@@ -409,11 +409,11 @@ namespace ConVar
 		[ServerVar(Help = "Deploys the given loadout to a target player. eg. inventory.deployLoadout testloadout jim")]
 		public static void deployLoadout(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic) && !(basePlayer == null))
 			{
 				string @string = arg.GetString(0);
-				BasePlayer playerOrSleeperOrBot = ArgEx.GetPlayerOrSleeperOrBot(arg, 1);
+				BasePlayer playerOrSleeperOrBot = arg.GetPlayerOrSleeperOrBot(1);
 				SavedLoadout so;
 				if (playerOrSleeperOrBot == null)
 				{
@@ -439,7 +439,7 @@ namespace ConVar
 		[ServerVar(Help = "Saves the current equipped loadout of the calling player. eg. inventory.saveLoadout loaduoutname")]
 		public static void saveloadout(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
 			{
 				string @string = arg.GetString(0);
@@ -469,7 +469,7 @@ namespace ConVar
 		[ServerVar(Help = "Prints all saved inventory loadouts")]
 		public static void listloadouts(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer == null || (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic))
 			{
 				return;
@@ -501,8 +501,8 @@ namespace ConVar
 			arg.ReplyWith(obj);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void reloaddefs(Arg arg)
 		{
 			Steamworks.SteamInventory.LoadItemDefinitions();
@@ -511,7 +511,7 @@ namespace ConVar
 		[ServerVar]
 		public static void equipslottarget(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic) && !(basePlayer == null))
 			{
 				BasePlayer lookingAtPlayer = RelationshipManager.GetLookingAtPlayer(basePlayer);
@@ -527,7 +527,7 @@ namespace ConVar
 		[ServerVar]
 		public static void equipslot(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic) || basePlayer == null)
 			{
 				return;
@@ -535,7 +535,7 @@ namespace ConVar
 			BasePlayer basePlayer2 = null;
 			if (arg.HasArgs(2))
 			{
-				basePlayer2 = ArgEx.GetPlayer(arg, 1);
+				basePlayer2 = arg.GetPlayer(1);
 				if (basePlayer2 == null)
 				{
 					uint uInt = arg.GetUInt(1);

@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System.Collections.Generic;
+using ConVar;
 using Network;
 using Network.Visibility;
 using Rust;
@@ -23,17 +24,17 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 
 	private void Awake()
 	{
-		Debug.Assert(Net.sv != null, "Network.Net.sv is NULL when creating Visibility Grid");
-		Debug.Assert(Net.sv.visibility == null, "Network.Net.sv.visibility is being set multiple times");
-		Net.sv.visibility = new Manager(this);
+		Debug.Assert(Network.Net.sv != null, "Network.Net.sv is NULL when creating Visibility Grid");
+		Debug.Assert(Network.Net.sv.visibility == null, "Network.Net.sv.visibility is being set multiple times");
+		Network.Net.sv.visibility = new Manager(this);
 	}
 
 	private void OnDisable()
 	{
-		if (!Rust.Application.isQuitting && Net.sv != null && Net.sv.visibility != null)
+		if (!Rust.Application.isQuitting && Network.Net.sv != null && Network.Net.sv.visibility != null)
 		{
-			Net.sv.visibility.Dispose();
-			Net.sv.visibility = null;
+			Network.Net.sv.visibility.Dispose();
+			Network.Net.sv.visibility = null;
 		}
 	}
 
@@ -139,7 +140,7 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		{
 			return null;
 		}
-		Group group = Net.sv.visibility.Get(iD);
+		Group group = Network.Net.sv.visibility.Get(iD);
 		if (!IsInside(group, vPos))
 		{
 			float num = group.bounds.SqrDistance(vPos);
@@ -150,17 +151,21 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 
 	public void GetVisibleFromFar(Group group, List<Group> groups)
 	{
-		GetVisibleFrom(group, groups, visibilityRadiusFar);
+		int visibilityRadiusFarOverride = ConVar.Net.visibilityRadiusFarOverride;
+		int radius = ((visibilityRadiusFarOverride > 0) ? visibilityRadiusFarOverride : visibilityRadiusFar);
+		GetVisibleFrom(group, groups, radius);
 	}
 
 	public void GetVisibleFromNear(Group group, List<Group> groups)
 	{
-		GetVisibleFrom(group, groups, visibilityRadiusNear);
+		int visibilityRadiusNearOverride = ConVar.Net.visibilityRadiusNearOverride;
+		int radius = ((visibilityRadiusNearOverride > 0) ? visibilityRadiusNearOverride : visibilityRadiusNear);
+		GetVisibleFrom(group, groups, radius);
 	}
 
 	private void GetVisibleFrom(Group group, List<Group> groups, int radius)
 	{
-		groups.Add(Net.sv.visibility.Get(0u));
+		groups.Add(Network.Net.sv.visibility.Get(0u));
 		uint iD = group.ID;
 		if (iD < startID)
 		{
@@ -169,28 +174,28 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		iD -= (uint)startID;
 		int num = (int)((long)iD / (long)cellCount);
 		int num2 = (int)((long)iD % (long)cellCount);
-		groups.Add(Net.sv.visibility.Get(CoordToID(num, num2)));
+		groups.Add(Network.Net.sv.visibility.Get(CoordToID(num, num2)));
 		for (int i = 1; i <= radius; i++)
 		{
-			groups.Add(Net.sv.visibility.Get(CoordToID(num - i, num2)));
-			groups.Add(Net.sv.visibility.Get(CoordToID(num + i, num2)));
-			groups.Add(Net.sv.visibility.Get(CoordToID(num, num2 - i)));
-			groups.Add(Net.sv.visibility.Get(CoordToID(num, num2 + i)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num, num2 - i)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num, num2 + i)));
 			for (int j = 1; j < i; j++)
 			{
-				groups.Add(Net.sv.visibility.Get(CoordToID(num - i, num2 - j)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num - i, num2 + j)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num + i, num2 - j)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num + i, num2 + j)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num - j, num2 - i)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num + j, num2 - i)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num - j, num2 + i)));
-				groups.Add(Net.sv.visibility.Get(CoordToID(num + j, num2 + i)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 - j)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 + j)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 - j)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 + j)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - j, num2 - i)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + j, num2 - i)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - j, num2 + i)));
+				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + j, num2 + i)));
 			}
-			groups.Add(Net.sv.visibility.Get(CoordToID(num - i, num2 - i)));
-			groups.Add(Net.sv.visibility.Get(CoordToID(num - i, num2 + i)));
-			groups.Add(Net.sv.visibility.Get(CoordToID(num + i, num2 - i)));
-			groups.Add(Net.sv.visibility.Get(CoordToID(num + i, num2 + i)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 - i)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 + i)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 - i)));
+			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 + i)));
 		}
 	}
 }

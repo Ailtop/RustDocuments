@@ -42,7 +42,7 @@ public class TriggerParentEnclosed : TriggerParent
 		{
 			return false;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider);
+		BaseEntity baseEntity = collider.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return false;

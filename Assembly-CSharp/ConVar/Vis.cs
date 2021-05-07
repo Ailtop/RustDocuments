@@ -11,9 +11,9 @@ namespace ConVar
 		[Help("Turns on debug display of damages")]
 		public static bool damage;
 
-		[Help("Turns on debug display of attacks")]
 		[ServerVar]
 		[ClientVar]
+		[Help("Turns on debug display of attacks")]
 		public static bool attack;
 
 		[Help("Turns on debug display of protection")]
@@ -25,16 +25,16 @@ namespace ConVar
 		[ServerVar]
 		public static bool weakspots;
 
-		[ServerVar]
 		[Help("Show trigger entries")]
+		[ServerVar]
 		public static bool triggers;
 
-		[Help("Turns on debug display of hitboxes")]
 		[ServerVar]
+		[Help("Turns on debug display of hitboxes")]
 		public static bool hitboxes;
 
-		[Help("Turns on debug display of line of sight checks")]
 		[ServerVar]
+		[Help("Turns on debug display of line of sight checks")]
 		public static bool lineofsight;
 
 		[ServerVar]

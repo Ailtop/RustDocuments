@@ -94,7 +94,7 @@ public class ServerPerformance : BaseMonoBehaviour
 			return "null";
 		}
 		string str = (obj.activeSelf ? "" : " (inactive)");
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if ((bool)baseEntity)
 		{
 			return baseEntity.PrefabName + str;

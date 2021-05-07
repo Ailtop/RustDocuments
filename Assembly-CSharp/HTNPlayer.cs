@@ -43,7 +43,13 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 
 	public Quaternion EyeRotation => eyes.rotation;
 
-	protected override float PositionTickRate => 0.05f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return 0.05f;
+		}
+	}
 
 	public override BaseNpc.AiStatistics.FamilyEnum Family => AiDefinition.Info.ToFamily(AiDefinition.Info.Family);
 

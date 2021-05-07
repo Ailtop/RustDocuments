@@ -480,7 +480,7 @@ public class BaseLiquidVessel : AttackEntity
 		RaycastHit hitInfo;
 		if (UnityEngine.Physics.Raycast(ownerPlayer.eyes.HeadRay(), out hitInfo, 2f, 1236478737))
 		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			BaseEntity entity = hitInfo.GetEntity();
 			if ((bool)entity && !hitInfo.collider.gameObject.CompareTag("Not Player Usable") && !hitInfo.collider.gameObject.CompareTag("Usable Primary"))
 			{
 				entity = entity.ToServer<BaseEntity>();

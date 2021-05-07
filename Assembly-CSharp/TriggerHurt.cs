@@ -17,7 +17,7 @@ public class TriggerHurt : TriggerBase
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -41,7 +41,7 @@ public class TriggerHurt : TriggerBase
 
 	private void OnTick()
 	{
-		BaseEntity attacker = GameObjectEx.ToBaseEntity(base.gameObject);
+		BaseEntity attacker = base.gameObject.ToBaseEntity();
 		if (entityContents == null)
 		{
 			return;
@@ -49,14 +49,19 @@ public class TriggerHurt : TriggerBase
 		BaseEntity[] array = entityContents.ToArray();
 		foreach (BaseEntity baseEntity in array)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity.IsValid())
 			{
 				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
-				if (!(baseCombatEntity == null))
+				if (!(baseCombatEntity == null) && CanHurt(baseCombatEntity))
 				{
 					baseCombatEntity.Hurt(DamagePerSecond * (1f / DamageTickRate), damageType, attacker);
 				}
 			}
 		}
+	}
+
+	protected virtual bool CanHurt(BaseCombatEntity ent)
+	{
+		return true;
 	}
 }

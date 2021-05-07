@@ -103,7 +103,7 @@ public class MaterialEffect : ScriptableObject
 			}
 			return;
 		}
-		PhysicMaterial materialAt = ColliderEx.GetMaterialAt(hitInfo.collider, hitInfo.point);
+		PhysicMaterial materialAt = hitInfo.collider.GetMaterialAt(hitInfo.point);
 		Entry entryFromMaterial = GetEntryFromMaterial(materialAt);
 		if (entryFromMaterial == null)
 		{

@@ -110,7 +110,7 @@ public class BearTrap : BaseTrap
 	{
 		if ((bool)hurtTarget)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(hurtTarget);
+			BaseEntity baseEntity = hurtTarget.ToBaseEntity();
 			if (baseEntity != null)
 			{
 				HitInfo hitInfo = new HitInfo(this, baseEntity, DamageType.Bite, 50f, base.transform.position);

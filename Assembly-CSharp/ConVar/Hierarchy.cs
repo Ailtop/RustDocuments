@@ -29,7 +29,7 @@ namespace ConVar
 		{
 			string str = "";
 			string filter = args.GetString(0);
-			str = ((!currentDir) ? (str + "Listing .\n\n") : (str + "Listing " + TransformEx.GetRecursiveName(currentDir.transform) + "\n\n"));
+			str = ((!currentDir) ? (str + "Listing .\n\n") : (str + "Listing " + currentDir.transform.GetRecursiveName() + "\n\n"));
 			foreach (Transform item in (from x in GetCurrent()
 				where string.IsNullOrEmpty(filter) || x.name.Contains(filter)
 				select x).Take(40))
@@ -58,7 +58,7 @@ namespace ConVar
 				currentDir = null;
 				if ((bool)currentDir)
 				{
-					args.ReplyWith("Changed to " + TransformEx.GetRecursiveName(currentDir.transform));
+					args.ReplyWith("Changed to " + currentDir.transform.GetRecursiveName());
 				}
 				else
 				{
@@ -74,7 +74,7 @@ namespace ConVar
 			if ((bool)transform)
 			{
 				currentDir = transform.gameObject;
-				args.ReplyWith("Changed to " + TransformEx.GetRecursiveName(currentDir.transform));
+				args.ReplyWith("Changed to " + currentDir.transform.GetRecursiveName());
 			}
 			else
 			{
@@ -105,8 +105,8 @@ namespace ConVar
 			}
 			foreach (Transform item in enumerable)
 			{
-				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-				if (BaseEntityEx.IsValid(baseEntity))
+				BaseEntity baseEntity = item.gameObject.ToBaseEntity();
+				if (baseEntity.IsValid())
 				{
 					if (baseEntity.isServer)
 					{

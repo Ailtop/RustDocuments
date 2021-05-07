@@ -20,7 +20,7 @@ public class UISleepingScreen : SingletonComponent<UISleepingScreen>, IUIScreen
 		{
 			visible = b;
 			canvasGroup.alpha = (visible ? 1f : 0f);
-			GameObjectEx.SetChildComponentsEnabled<TMP_Text>(SingletonComponent<UISleepingScreen>.Instance.gameObject, visible);
+			SingletonComponent<UISleepingScreen>.Instance.gameObject.SetChildComponentsEnabled<TMP_Text>(visible);
 		}
 	}
 }

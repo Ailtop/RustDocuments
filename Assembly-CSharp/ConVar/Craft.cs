@@ -11,7 +11,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void add(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if (!basePlayer || basePlayer.IsDead())
 			{
 				return;
@@ -59,7 +59,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void canceltask(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && !basePlayer.IsDead())
 			{
 				int @int = args.GetInt(0);
@@ -73,7 +73,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void cancel(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && !basePlayer.IsDead())
 			{
 				int @int = args.GetInt(0);
@@ -84,7 +84,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void fasttracktask(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && !basePlayer.IsDead())
 			{
 				int @int = args.GetInt(0);

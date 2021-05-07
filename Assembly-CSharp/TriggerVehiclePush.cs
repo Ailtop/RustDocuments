@@ -29,7 +29,7 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -54,7 +54,7 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 		Vector3 position = base.transform.position;
 		foreach (BaseEntity entityContent in entityContents)
 		{
-			if (!BaseEntityEx.IsValid(entityContent) || entityContent.EqualNetID(thisEntity))
+			if (!entityContent.IsValid() || entityContent.EqualNetID(thisEntity))
 			{
 				continue;
 			}

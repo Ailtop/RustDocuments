@@ -9,7 +9,7 @@ public class SpawnPointInstance : MonoBehaviour
 
 	public void Notify()
 	{
-		if (!ObjectEx.IsUnityNull(parentSpawnPointUser))
+		if (!parentSpawnPointUser.IsUnityNull())
 		{
 			parentSpawnPointUser.ObjectSpawned(this);
 		}
@@ -23,7 +23,7 @@ public class SpawnPointInstance : MonoBehaviour
 	{
 		if (!Rust.Application.isQuitting)
 		{
-			if (!ObjectEx.IsUnityNull(parentSpawnPointUser))
+			if (!parentSpawnPointUser.IsUnityNull())
 			{
 				parentSpawnPointUser.ObjectRetired(this);
 			}

@@ -198,7 +198,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return entity.IsValid();
 			}
 			return false;
 		}
@@ -271,9 +271,9 @@ public class BasePlayer : BaseCombatEntity
 
 	public ViewModel GestureViewModel;
 
-	private const float drinkRange = 1.5f;
+	public const float drinkRange = 1.5f;
 
-	private const float drinkMovementSpeed = 0.1f;
+	public const float drinkMovementSpeed = 0.1f;
 
 	[NonSerialized]
 	private NetworkQueueList[] networkQueue = new NetworkQueueList[2]
@@ -289,11 +289,11 @@ public class BasePlayer : BaseCombatEntity
 
 	public GestureCollection gestureList;
 
-	private TimeUntil gestureFinishedTime;
+	public TimeUntil gestureFinishedTime;
 
-	private TimeSince blockHeldInputTimer;
+	public TimeSince blockHeldInputTimer;
 
-	private GestureConfig currentGesture;
+	public GestureConfig currentGesture;
 
 	public ulong currentTeam;
 
@@ -320,7 +320,7 @@ public class BasePlayer : BaseCombatEntity
 	};
 
 	[NonSerialized]
-	private ModelState modelStateTick;
+	public ModelState modelStateTick;
 
 	[NonSerialized]
 	private bool wantsSendModelState;
@@ -331,7 +331,7 @@ public class BasePlayer : BaseCombatEntity
 	[NonSerialized]
 	public EntityRef mounted;
 
-	private float nextSeatSwapTime;
+	public float nextSeatSwapTime;
 
 	private bool _playerStateDirty;
 
@@ -361,9 +361,9 @@ public class BasePlayer : BaseCombatEntity
 	[NonSerialized]
 	public PlayerLifeStory previousLifeStory;
 
-	private const float TimeCategoryUpdateFrequency = 7f;
+	public const float TimeCategoryUpdateFrequency = 7f;
 
-	private float nextTimeCategoryUpdate;
+	public float nextTimeCategoryUpdate;
 
 	private bool hasSentPresenceState;
 
@@ -408,11 +408,11 @@ public class BasePlayer : BaseCombatEntity
 
 	public float sleepStartTime = -1f;
 
-	private float fallTickRate = 0.1f;
+	public float fallTickRate = 0.1f;
 
 	public float lastFallTime;
 
-	private float fallVelocity;
+	public float fallVelocity;
 
 	public static ListHashSet<BasePlayer> activePlayerList = new ListHashSet<BasePlayer>();
 
@@ -428,7 +428,7 @@ public class BasePlayer : BaseCombatEntity
 
 	private PersistantPlayer cachedPersistantPlayer;
 
-	private int SpectateOffset = 1000000;
+	public int SpectateOffset = 1000000;
 
 	public string spectateFilter = "";
 
@@ -477,7 +477,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public TickHistory tickHistory = new TickHistory();
 
-	private float nextUnderwearValidationTime;
+	public float nextUnderwearValidationTime;
 
 	public uint lastValidUnderwearSkin;
 
@@ -514,7 +514,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public PlayerBelt Belt;
 
-	private Rigidbody playerRigidbody;
+	public Rigidbody playerRigidbody;
 
 	[NonSerialized]
 	public ulong userID;
@@ -529,15 +529,15 @@ public class BasePlayer : BaseCombatEntity
 
 	public string _lastSetName;
 
-	private CapsuleColliderInfo playerColliderStanding;
+	public CapsuleColliderInfo playerColliderStanding;
 
-	private CapsuleColliderInfo playerColliderDucked;
+	public CapsuleColliderInfo playerColliderDucked;
 
-	private CapsuleColliderInfo playerColliderLyingDown;
+	public CapsuleColliderInfo playerColliderLyingDown;
 
 	public ProtectionProperties cachedProtection;
 
-	private float nextColliderRefreshTime = -1f;
+	public float nextColliderRefreshTime = -1f;
 
 	public bool clothingBlocksAiming;
 
@@ -702,7 +702,13 @@ public class BasePlayer : BaseCombatEntity
 
 	public virtual BaseNpc.AiStatistics.FamilyEnum Family => BaseNpc.AiStatistics.FamilyEnum.Player;
 
-	protected override float PositionTickRate => -1f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return -1f;
+		}
+	}
 
 	public UnityEngine.Vector3 estimatedVelocity
 	{
@@ -1834,7 +1840,7 @@ public class BasePlayer : BaseCombatEntity
 	[RPC_Server]
 	public void HandleCCTVRenderComplete(RPCMessage msg)
 	{
-		if (!Settings.Enabled)
+		if (!CCTVRender.Settings.Enabled)
 		{
 			DebugEx.LogWarning($"Received CCTV image from {msg.player.userID}, but the feature is disabled");
 			return;
@@ -1907,8 +1913,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_KeepAlive(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerKeepAlive", this, msg.player) == null)
@@ -2161,10 +2167,10 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.CallsPerSecond(1uL)]
-	private void Server_StartGesture(RPCMessage msg)
+	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
 		{
@@ -2174,9 +2180,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	private void Server_StartGesture(GestureConfig toPlay)
+	public void Server_StartGesture(GestureConfig toPlay)
 	{
-		if (toPlay != null && toPlay.IsOwnedBy(this))
+		if (toPlay != null && toPlay.IsOwnedBy(this) && toPlay.CanBeUsedBy(this))
 		{
 			if (toPlay.animationType == GestureConfig.AnimationType.OneShot)
 			{
@@ -2195,9 +2201,9 @@ public class BasePlayer : BaseCombatEntity
 		currentGesture = null;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void Server_CancelGesture(RPCMessage msg)
 	{
 		currentGesture = null;
@@ -2207,7 +2213,11 @@ public class BasePlayer : BaseCombatEntity
 
 	private bool IsGestureBlocked()
 	{
-		if (!isMounted && !IsWounded() && !IsSwimming() && !(currentGesture != null) && !IsDead())
+		if (isMounted && GetMounted().allowedGestures == BaseMountable.MountGestureType.None)
+		{
+			return true;
+		}
+		if (!IsWounded() && !IsSwimming() && !(currentGesture != null) && !IsDead())
 		{
 			return IsSleeping();
 		}
@@ -2396,8 +2406,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_AddMarker(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMapMarkerAdd", this, MapNote.Deserialize(msg.read)) == null)
@@ -2411,8 +2421,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void Server_RemovePointOfInterest(RPCMessage msg)
 	{
 		if (ServerCurrentMapNote != null && Interface.CallHook("OnMapMarkerRemove", this, ServerCurrentMapNote) == null)
@@ -2424,8 +2434,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void Server_RequestMarkers(RPCMessage msg)
 	{
 		SendMarkersToClient();
@@ -2550,7 +2560,7 @@ public class BasePlayer : BaseCombatEntity
 			UnityEngine.Vector3 res;
 			if (baseMountable != null && baseMountable.GetDismountPosition(this, out res))
 			{
-				Teleport(res);
+				MovePosition(res);
 			}
 		}
 	}
@@ -3089,8 +3099,8 @@ public class BasePlayer : BaseCombatEntity
 		playerProjectileAttack = null;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -3493,7 +3503,7 @@ public class BasePlayer : BaseCombatEntity
 		if (info.forDisk)
 		{
 			BaseEntity baseEntity = mounted.Get(base.isServer);
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity.IsValid())
 			{
 				if (baseEntity.enableSaving)
 				{
@@ -3502,7 +3512,7 @@ public class BasePlayer : BaseCombatEntity
 				else
 				{
 					BaseVehicle mountedVehicle = GetMountedVehicle();
-					if (BaseEntityEx.IsValid(mountedVehicle) && mountedVehicle.enableSaving)
+					if (mountedVehicle.IsValid() && mountedVehicle.enableSaving)
 					{
 						info.msg.basePlayer.mounted = mountedVehicle.net.ID;
 					}
@@ -4147,7 +4157,7 @@ public class BasePlayer : BaseCombatEntity
 			EACServer.OnFinishLoading(net.connection);
 		}
 		Debug.Log($"{this} has spawned");
-		if (Demo.recordlist.Contains(UserIDString))
+		if (ConVar.Demo.recordlist.Contains(UserIDString))
 		{
 			StartDemoRecording();
 		}
@@ -4160,8 +4170,8 @@ public class BasePlayer : BaseCombatEntity
 		lastTickTime = UnityEngine.Time.time;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void ClientLoadingComplete(RPCMessage msg)
 	{
 	}
@@ -4272,9 +4282,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.FromOwner]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -4515,8 +4525,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void OnPlayerLanded(RPCMessage msg)
 	{
 		float num = msg.read.Float();
@@ -4744,9 +4754,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		if (net.connection == null && info?.Initiator != null && info.Initiator != this)
 		{
-			BasePlayer basePlayer3;
-			string killerName = (((object)(basePlayer3 = info.Initiator as BasePlayer) != null) ? basePlayer3.displayName : info.Initiator.ShortPrefabName);
-			CompanionServer.Util.SendDeathNotification(this, killerName);
+			CompanionServer.Util.SendDeathNotification(this, info.Initiator);
 		}
 		SendNetworkUpdateImmediate();
 		LifeStoryLogDeath(info, lastDamage);
@@ -5020,7 +5028,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	private static BasePlayer Find(string strNameOrIDOrIP, IEnumerable<BasePlayer> list)
+	public static BasePlayer Find(string strNameOrIDOrIP, IEnumerable<BasePlayer> list)
 	{
 		BasePlayer basePlayer = list.FirstOrDefault((BasePlayer x) => x.UserIDString == strNameOrIDOrIP);
 		if ((bool)basePlayer)
@@ -5240,8 +5248,8 @@ public class BasePlayer : BaseCombatEntity
 		return net.connection.info.GetInt(key, defaultVal);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -5274,7 +5282,7 @@ public class BasePlayer : BaseCombatEntity
 
 	internal void GiveAchievement(string name)
 	{
-		if (Rust.GameInfo.HasAchievements)
+		if (GameInfo.HasAchievements)
 		{
 			ClientRPCPlayer(null, this, "RecieveAchievement", name);
 		}
@@ -5311,9 +5319,9 @@ public class BasePlayer : BaseCombatEntity
 			if (Interface.CallHook("OnDemoRecordingStart", text, this) == null)
 			{
 				Debug.Log(ToString() + " recording started: " + text);
-				net.connection.StartRecording(text, new Demo.Header
+				net.connection.StartRecording(text, new ConVar.Demo.Header
 				{
-					version = Demo.Version,
+					version = ConVar.Demo.Version,
 					level = UnityEngine.Application.loadedLevelName,
 					levelSeed = World.Seed,
 					levelSize = World.Size,
@@ -5347,7 +5355,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public void MonitorDemoRecording()
 	{
-		if (net != null && net.connection != null && net.connection.IsRecording && (net.connection.RecordTimeElapsed.TotalSeconds >= (double)Demo.splitseconds || (float)net.connection.RecordFilesize >= Demo.splitmegabytes * 1024f * 1024f))
+		if (net != null && net.connection != null && net.connection.IsRecording && (net.connection.RecordTimeElapsed.TotalSeconds >= (double)ConVar.Demo.splitseconds || (float)net.connection.RecordFilesize >= ConVar.Demo.splitmegabytes * 1024f * 1024f))
 		{
 			StopDemoRecording();
 			StartDemoRecording();
@@ -5425,7 +5433,7 @@ public class BasePlayer : BaseCombatEntity
 			{
 				SendEntitySnapshot(baseEntity);
 			}
-			UnityEngine.TransformEx.Identity(base.gameObject);
+			base.gameObject.Identity();
 			using (TimeWarning.New("SetParent"))
 			{
 				SetParent(baseEntity);
@@ -5438,7 +5446,7 @@ public class BasePlayer : BaseCombatEntity
 		if (!IsSpectating() && Interface.CallHook("OnPlayerSpectate", this, spectateFilter) == null)
 		{
 			SetPlayerFlag(PlayerFlags.Spectating, true);
-			UnityEngine.TransformEx.SetLayerRecursive(base.gameObject, 10);
+			base.gameObject.SetLayerRecursive(10);
 			CancelInvoke(InventoryUpdate);
 			ChatMessage("Becoming Spectator");
 			UpdateSpectateTarget(spectateFilter);
@@ -5451,7 +5459,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			SetParent(null);
 			SetPlayerFlag(PlayerFlags.Spectating, false);
-			UnityEngine.TransformEx.SetLayerRecursive(base.gameObject, 17);
+			base.gameObject.SetLayerRecursive(17);
 		}
 	}
 
@@ -5496,7 +5504,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		lastUpdateTime = UnityEngine.Time.realtimeSinceStartup;
 		cachedThreatLevel = 0f;
-		if (IsSleeping())
+		if (IsSleeping() || Interface.CallHook("OnThreatLevelUpdate", this) != null)
 		{
 			return;
 		}
@@ -5605,6 +5613,11 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
+	public void ResetInputIdleTime()
+	{
+		lastInputTime = UnityEngine.Time.time;
+	}
+
 	private void EACStateUpdate()
 	{
 		if (net == null || net.connection == null || EACServer.playerTracker == null || IsReceivingSnapshot)
@@ -5668,7 +5681,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		if (serverInput.current.buttons != serverInput.previous.buttons)
 		{
-			lastInputTime = UnityEngine.Time.time;
+			ResetInputIdleTime();
 		}
 		if (Interface.CallHook("OnPlayerInput", this, serverInput) != null || IsReceivingSnapshot)
 		{
@@ -6483,7 +6496,10 @@ public class BasePlayer : BaseCombatEntity
 				{
 					SignalBroadcast(Signal.Flinch_Head, string.Empty);
 				}
-				Effect.server.Run("assets/bundled/prefabs/fx/headshot.prefab", this, 0u, new UnityEngine.Vector3(0f, 2f, 0f), UnityEngine.Vector3.zero, (initiatorPlayer != null) ? initiatorPlayer.net.connection : null);
+				if (!initiatorPlayer || !initiatorPlayer.limitNetworking)
+				{
+					Effect.server.Run("assets/bundled/prefabs/fx/headshot.prefab", this, 0u, new UnityEngine.Vector3(0f, 2f, 0f), UnityEngine.Vector3.zero, (initiatorPlayer != null) ? initiatorPlayer.net.connection : null);
+				}
 				if ((bool)initiatorPlayer)
 				{
 					initiatorPlayer.stats.Add("headshot", 1, (Stats)5);
@@ -6543,7 +6559,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			nextColliderRefreshTime = UnityEngine.Time.time + 0.25f + UnityEngine.Random.Range(-0.05f, 0.05f);
 			BaseMountable baseMountable = GetMounted();
-			CapsuleColliderInfo capsuleColliderInfo = ((baseMountable != null && BaseEntityEx.IsValid(baseMountable)) ? ((!baseMountable.modifiesPlayerCollider) ? playerColliderStanding : baseMountable.customPlayerCollider) : ((IsWounded() || IsSleeping()) ? playerColliderLyingDown : ((!modelState.ducked) ? playerColliderStanding : playerColliderDucked)));
+			CapsuleColliderInfo capsuleColliderInfo = ((baseMountable != null && baseMountable.IsValid()) ? ((!baseMountable.modifiesPlayerCollider) ? playerColliderStanding : baseMountable.customPlayerCollider) : ((IsWounded() || IsSleeping()) ? playerColliderLyingDown : ((!modelState.ducked) ? playerColliderStanding : playerColliderDucked)));
 			if (playerCollider.height != capsuleColliderInfo.height || playerCollider.radius != capsuleColliderInfo.radius || playerCollider.center != capsuleColliderInfo.center)
 			{
 				playerCollider.height = capsuleColliderInfo.height;
@@ -6901,7 +6917,7 @@ public class BasePlayer : BaseCombatEntity
 			GamePhysics.TraceAll(new Ray(item.eyes.position, (entityEyePos - item.eyes.position).normalized), 0f, obj, 9f, 1218519297);
 			for (int i = 0; i < obj.Count; i++)
 			{
-				BaseEntity entity = RaycastHitEx.GetEntity(obj[i]);
+				BaseEntity entity = obj[i].GetEntity();
 				if (entity != null && (entity == source || entity.EqualNetID(source)))
 				{
 					flag = true;
@@ -6931,7 +6947,7 @@ public class BasePlayer : BaseCombatEntity
 		RaycastHit hitInfo;
 		if (UnityEngine.Physics.SphereCast(base.transform.position + UnityEngine.Vector3.up * (0.25f + GetRadius()), GetRadius() * 0.95f, UnityEngine.Vector3.down, out hitInfo, 4f, layerMask))
 		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			BaseEntity entity = hitInfo.GetEntity();
 			if (entity != null)
 			{
 				if (entity.EqualNetID(standingOn))

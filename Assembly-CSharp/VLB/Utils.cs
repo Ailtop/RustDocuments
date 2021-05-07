@@ -42,7 +42,7 @@ namespace VLB
 
 		public static T GetOrAddComponent<T>(this MonoBehaviour self) where T : Component
 		{
-			return GetOrAddComponent<T>(self.gameObject);
+			return self.gameObject.GetOrAddComponent<T>();
 		}
 
 		public static bool HasFlag(this Enum mask, Enum flags)
@@ -130,7 +130,7 @@ namespace VLB
 			for (int i = 0; i < 16; i++)
 			{
 				Color color = self.Evaluate(Mathf.Clamp01((float)i / 15f));
-				result[i] = PackToFloat(color, floatPackingPrecision);
+				result[i] = color.PackToFloat(floatPackingPrecision);
 			}
 			return result;
 		}

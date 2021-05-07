@@ -94,7 +94,7 @@ public class RelationshipManager : BaseEntity
 				if (basePlayer != null)
 				{
 					basePlayer.ClearTeam();
-					CompanionServer.Util.BroadcastAppTeamRemoval(basePlayer);
+					basePlayer.BroadcastAppTeamRemoval();
 				}
 				if (teamLeader == playerID)
 				{
@@ -135,7 +135,7 @@ public class RelationshipManager : BaseEntity
 					basePlayer.UpdateTeam(teamID);
 				}
 			}
-			CompanionServer.Util.BroadcastAppTeamUpdate(this);
+			this.BroadcastAppTeamUpdate();
 		}
 
 		public List<Network.Connection> GetOnlineMemberConnections()
@@ -324,7 +324,7 @@ public class RelationshipManager : BaseEntity
 			arg.ReplyWith("Teams are disabled on this server");
 			return;
 		}
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (basePlayer.currentTeam == 0L && Interface.CallHook("OnTeamCreate", basePlayer) == null)
 		{
 			PlayerTeam playerTeam = Instance.CreateTeam();
@@ -337,7 +337,7 @@ public class RelationshipManager : BaseEntity
 	[ServerUserVar]
 	public static void promote(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (basePlayer.currentTeam == 0L)
 		{
 			return;
@@ -356,7 +356,7 @@ public class RelationshipManager : BaseEntity
 	[ServerUserVar]
 	public static void leaveteam(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (!(basePlayer == null) && basePlayer.currentTeam != 0L)
 		{
 			PlayerTeam playerTeam = Instance.FindTeam(basePlayer.currentTeam);
@@ -371,7 +371,7 @@ public class RelationshipManager : BaseEntity
 	[ServerUserVar]
 	public static void acceptinvite(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (!(basePlayer == null) && basePlayer.currentTeam == 0L)
 		{
 			ulong uLong = arg.GetULong(0, 0uL);
@@ -390,7 +390,7 @@ public class RelationshipManager : BaseEntity
 	[ServerUserVar]
 	public static void rejectinvite(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (!(basePlayer == null) && basePlayer.currentTeam == 0L)
 		{
 			ulong uLong = arg.GetULong(0, 0uL);
@@ -411,7 +411,7 @@ public class RelationshipManager : BaseEntity
 		RaycastHit hitInfo;
 		if (Physics.Raycast(source.eyes.position, source.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			BaseEntity entity = hitInfo.GetEntity();
 			if ((bool)entity)
 			{
 				return entity.GetComponent<BasePlayer>();
@@ -423,13 +423,13 @@ public class RelationshipManager : BaseEntity
 	[ServerVar]
 	public static void sleeptoggle(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		RaycastHit hitInfo;
 		if (basePlayer == null || !Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			return;
 		}
-		BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+		BaseEntity entity = hitInfo.GetEntity();
 		if (!entity)
 		{
 			return;
@@ -451,7 +451,7 @@ public class RelationshipManager : BaseEntity
 	[ServerUserVar]
 	public static void kickmember(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (basePlayer == null)
 		{
 			return;
@@ -470,14 +470,14 @@ public class RelationshipManager : BaseEntity
 	[ServerUserVar]
 	public static void sendinvite(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		PlayerTeam playerTeam = Instance.FindTeam(basePlayer.currentTeam);
 		RaycastHit hitInfo;
 		if (playerTeam == null || playerTeam.GetLeader() == null || playerTeam.GetLeader() != basePlayer || !Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			return;
 		}
-		BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+		BaseEntity entity = hitInfo.GetEntity();
 		if ((bool)entity)
 		{
 			BasePlayer component = entity.GetComponent<BasePlayer>();
@@ -491,7 +491,7 @@ public class RelationshipManager : BaseEntity
 	[ServerVar]
 	public static void fakeinvite(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		ulong uLong = arg.GetULong(0, 0uL);
 		PlayerTeam playerTeam = Instance.FindTeam(uLong);
 		if (playerTeam != null)
@@ -508,14 +508,14 @@ public class RelationshipManager : BaseEntity
 	[ServerVar]
 	public static void addtoteam(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		PlayerTeam playerTeam = Instance.FindTeam(basePlayer.currentTeam);
 		RaycastHit hitInfo;
 		if (playerTeam == null || playerTeam.GetLeader() == null || playerTeam.GetLeader() != basePlayer || !Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			return;
 		}
-		BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+		BaseEntity entity = hitInfo.GetEntity();
 		if ((bool)entity)
 		{
 			BasePlayer component = entity.GetComponent<BasePlayer>();

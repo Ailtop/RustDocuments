@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace VLB
 {
-	[HelpURL("http://saladgamer.com/vlb-doc/comp-triggerzone/")]
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(VolumetricLightBeam))]
+	[HelpURL("http://saladgamer.com/vlb-doc/comp-triggerzone/")]
 	public class TriggerZone : MonoBehaviour
 	{
 		public bool setIsTrigger = true;
@@ -21,7 +21,7 @@ namespace VLB
 			VolumetricLightBeam component = GetComponent<VolumetricLightBeam>();
 			if ((bool)component)
 			{
-				MeshCollider orAddComponent = Utils.GetOrAddComponent<MeshCollider>(base.gameObject);
+				MeshCollider orAddComponent = base.gameObject.GetOrAddComponent<MeshCollider>();
 				Debug.Assert(orAddComponent);
 				float lengthZ = component.fadeEnd * rangeMultiplier;
 				float radiusEnd = Mathf.LerpUnclamped(component.coneRadiusStart, component.coneRadiusEnd, rangeMultiplier);

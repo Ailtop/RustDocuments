@@ -59,8 +59,8 @@ public class Planner : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoPlace(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())
@@ -180,7 +180,7 @@ public class Planner : HeldEntity
 	public void DoBuild(Construction.Target target, Construction component)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
-		if (!ownerPlayer || RayEx.IsNaNOrInfinity(target.ray) || target.position.IsNaNOrInfinity() || target.normal.IsNaNOrInfinity())
+		if (!ownerPlayer || target.ray.IsNaNOrInfinity() || target.position.IsNaNOrInfinity() || target.normal.IsNaNOrInfinity())
 		{
 			return;
 		}
@@ -238,7 +238,7 @@ public class Planner : HeldEntity
 		Deployable deployable = GetDeployable();
 		if (deployable != null)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
+			BaseEntity baseEntity = gameObject.ToBaseEntity();
 			if (deployable.setSocketParent && target.entity != null && target.entity.SupportsChildDeployables() && (bool)baseEntity)
 			{
 				baseEntity.SetParent(target.entity, true);
@@ -288,7 +288,7 @@ public class Planner : HeldEntity
 				num = ownerItem.conditionNormalized;
 			}
 		}
-		PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+		baseEntity.gameObject.AwakeFromInstantiate();
 		BuildingBlock buildingBlock = baseEntity as BuildingBlock;
 		if ((bool)buildingBlock)
 		{
@@ -310,7 +310,7 @@ public class Planner : HeldEntity
 		}
 		if (Interface.CallHook("OnConstructionPlace", baseEntity, component, placement, ownerPlayer) != null)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity.IsValid())
 			{
 				baseEntity.KillMessage();
 			}

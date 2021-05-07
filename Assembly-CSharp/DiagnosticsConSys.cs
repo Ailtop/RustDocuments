@@ -18,7 +18,7 @@ public class DiagnosticsConSys : ConsoleSystem
 		Animator[] array2 = array;
 		foreach (Animator animator in array2)
 		{
-			stringBuilder.AppendFormat("{1}\t{0}", TransformEx.GetRecursiveName(animator.transform), animator.enabled);
+			stringBuilder.AppendFormat("{1}\t{0}", animator.transform.GetRecursiveName(), animator.enabled);
 			stringBuilder.AppendLine();
 		}
 		WriteTextToFile(targetFolder + "UnityEngine.Animators.List.txt", stringBuilder.ToString());
@@ -26,11 +26,11 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder2.AppendLine("All animators - grouped by object name");
 		stringBuilder2.AppendLine();
 		foreach (IGrouping<string, Animator> item in from x in array
-			group x by TransformEx.GetRecursiveName(x.transform) into x
+			group x by x.transform.GetRecursiveName() into x
 			orderby x.Count() descending
 			select x)
 		{
-			stringBuilder2.AppendFormat("{1:N0}\t{0}", TransformEx.GetRecursiveName(item.First().transform), item.Count());
+			stringBuilder2.AppendFormat("{1:N0}\t{0}", item.First().transform.GetRecursiveName(), item.Count());
 			stringBuilder2.AppendLine();
 		}
 		WriteTextToFile(targetFolder + "UnityEngine.Animators.Counts.txt", stringBuilder2.ToString());
@@ -38,11 +38,11 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder3.AppendLine("All animators - grouped by enabled/disabled");
 		stringBuilder3.AppendLine();
 		foreach (IGrouping<string, Animator> item2 in from x in array
-			group x by TransformEx.GetRecursiveName(x.transform, x.enabled ? "" : " (DISABLED)") into x
+			group x by x.transform.GetRecursiveName(x.enabled ? "" : " (DISABLED)") into x
 			orderby x.Count() descending
 			select x)
 		{
-			stringBuilder3.AppendFormat("{1:N0}\t{0}", TransformEx.GetRecursiveName(item2.First().transform, item2.First().enabled ? "" : " (DISABLED)"), item2.Count());
+			stringBuilder3.AppendFormat("{1:N0}\t{0}", item2.First().transform.GetRecursiveName(item2.First().enabled ? "" : " (DISABLED)"), item2.Count());
 			stringBuilder3.AppendLine();
 		}
 		WriteTextToFile(targetFolder + "UnityEngine.Animators.Counts.Enabled.txt", stringBuilder3.ToString());
@@ -97,7 +97,7 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder.AppendLine("LODGroups");
 		stringBuilder.AppendLine();
 		foreach (IGrouping<string, LODGroup> item in from x in source
-			group x by TransformEx.GetRecursiveName(x.transform) into x
+			group x by x.transform.GetRecursiveName() into x
 			orderby x.Count() descending
 			select x)
 		{
@@ -200,7 +200,7 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder.AppendLine("Physics Colliders");
 		stringBuilder.AppendLine();
 		foreach (IGrouping<string, Collider> item in from x in source
-			group x by TransformEx.GetRecursiveName(x.transform) into x
+			group x by x.transform.GetRecursiveName() into x
 			orderby x.Count() descending
 			select x)
 		{
@@ -220,7 +220,7 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder2.AppendLine("RigidBody");
 		stringBuilder2.AppendLine();
 		foreach (IGrouping<string, Rigidbody> item in from x in source
-			group x by TransformEx.GetRecursiveName(x.transform) into x
+			group x by x.transform.GetRecursiveName() into x
 			orderby x.Count() descending
 			select x)
 		{
@@ -280,7 +280,7 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder.AppendLine();
 		foreach (KeyValuePair<Transform, int> item2 in from x in rootObjects
 			group x by x.name into x
-			select new KeyValuePair<Transform, int>(x.First(), x.Sum((Transform y) => TransformEx.GetAllChildren(y).Count)) into x
+			select new KeyValuePair<Transform, int>(x.First(), x.Sum((Transform y) => y.GetAllChildren().Count)) into x
 			orderby x.Value descending
 			select x)
 		{

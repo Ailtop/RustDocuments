@@ -17,7 +17,7 @@ namespace UnityEngine
 					return;
 				}
 			}
-			animator.SetFloat(id, value, deltaTime, deltaTime);
+			animator.SetFloat(id, value, dampTime, deltaTime);
 		}
 	}
 }

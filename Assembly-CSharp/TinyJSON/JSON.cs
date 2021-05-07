@@ -54,7 +54,7 @@ namespace TinyJSON
 					MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 					foreach (MethodInfo methodInfo in methods)
 					{
-						if (Extensions.AnyOfType(methodInfo.GetCustomAttributes(false), typeof(BeforeEncode)) && methodInfo.GetParameters().Length == 0)
+						if (methodInfo.GetCustomAttributes(false).AnyOfType(typeof(BeforeEncode)) && methodInfo.GetParameters().Length == 0)
 						{
 							methodInfo.Invoke(data, null);
 						}
@@ -265,7 +265,7 @@ namespace TinyJSON
 						}
 					}
 				}
-				if (propertyInfo != null && propertyInfo.CanWrite && Extensions.AnyOfType(propertyInfo.GetCustomAttributes(false), includeAttrType))
+				if (propertyInfo != null && propertyInfo.CanWrite && propertyInfo.GetCustomAttributes(false).AnyOfType(includeAttrType))
 				{
 					MethodInfo methodInfo3 = decodeTypeMethod.MakeGenericMethod(propertyInfo.PropertyType);
 					if (type.IsValueType)
@@ -289,7 +289,7 @@ namespace TinyJSON
 			MethodInfo[] methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 			foreach (MethodInfo methodInfo4 in methods)
 			{
-				if (Extensions.AnyOfType(methodInfo4.GetCustomAttributes(false), typeof(AfterDecode)))
+				if (methodInfo4.GetCustomAttributes(false).AnyOfType(typeof(AfterDecode)))
 				{
 					methodInfo4.Invoke(val, (methodInfo4.GetParameters().Length == 0) ? null : new object[1]
 					{

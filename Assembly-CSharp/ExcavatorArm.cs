@@ -57,7 +57,13 @@ public class ExcavatorArm : BaseEntity
 
 	public int resourceMiningIndex;
 
-	protected override float PositionTickRate => 0.05f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return 0.05f;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -246,8 +252,8 @@ public class ExcavatorArm : BaseEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_SetResourceTarget(RPCMessage msg)
 	{
 		string text = msg.read.String();
@@ -275,8 +281,8 @@ public class ExcavatorArm : BaseEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_StopMining(RPCMessage msg)
 	{
 	}

@@ -531,11 +531,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	[NonSerialized]
 	public BaseEntity creatorEntity;
 
-	private int ticksSinceStopped;
+	public int ticksSinceStopped;
 
 	private int doneMovingWithoutARigidBodyCheck = 1;
 
-	private bool isCallingUpdateNetworkGroup;
+	public bool isCallingUpdateNetworkGroup;
 
 	private EntityRef[] entitySlots = new EntityRef[8];
 
@@ -650,9 +650,9 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	protected virtual float PositionTickRate => 0.1f;
+	public virtual float PositionTickRate => 0.1f;
 
-	protected virtual bool PositionTickFixedTime => false;
+	public virtual bool PositionTickFixedTime => false;
 
 	public virtual Vector3 ServerPosition
 	{
@@ -791,7 +791,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		else
 		{
-			UnityEngine.TransformEx.RemoveComponent<EntityCollisionMessage>(base.gameObject.transform);
+			base.gameObject.transform.RemoveComponent<EntityCollisionMessage>();
 		}
 	}
 
@@ -956,7 +956,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 					SendInfo info = new SendInfo(subscribers);
 					Network.Net.sv.write.Send(info);
 				}
-				OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this);
+				base.gameObject.SendOnSendNetworkUpdate(this);
 			}
 		}
 	}
@@ -1221,7 +1221,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			if (base.isServer)
 			{
-				EntityLinkEx.AddLinks(links, this, PrefabAttribute.server.FindAll<Socket_Base>(prefabID));
+				links.AddLinks(this, PrefabAttribute.server.FindAll<Socket_Base>(prefabID));
 			}
 		}
 	}
@@ -1230,7 +1230,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		using (TimeWarning.New("FreeEntityLinks"))
 		{
-			EntityLinkEx.FreeLinks(links);
+			links.FreeLinks();
 			linkedToNeighbours = false;
 		}
 	}
@@ -1239,7 +1239,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		using (TimeWarning.New("RefreshEntityLinks"))
 		{
-			EntityLinkEx.ClearLinks(links);
+			links.ClearLinks();
 			LinkToNeighbours();
 		}
 	}
@@ -1310,7 +1310,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		if (base.limitNetworking && parentEntity != null && parentEntity != entity)
 		{
 			BasePlayer basePlayer = parentEntity as BasePlayer;
-			if (BaseEntityEx.IsValid(basePlayer))
+			if (basePlayer.IsValid())
 			{
 				DestroyOnClient(basePlayer.net.connection);
 			}
@@ -1381,7 +1381,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	private void SendChildrenNetworkUpdate()
+	public void SendChildrenNetworkUpdate()
 	{
 		if (children == null)
 		{
@@ -1394,7 +1394,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	private void SendChildrenNetworkUpdateImmediate()
+	public void SendChildrenNetworkUpdateImmediate()
 	{
 		if (children == null)
 		{
@@ -1469,8 +1469,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public void SV_RPCMessage(uint nameID, Message message)
 	{
 		Assert.IsTrue(base.isServer, "Should be server!");
-		BasePlayer basePlayer = NetworkPacketEx.Player(message);
-		if (!BaseEntityEx.IsValid(basePlayer))
+		BasePlayer basePlayer = message.Player();
+		if (!basePlayer.IsValid())
 		{
 			if (ConVar.Global.developer > 0)
 			{
@@ -1666,7 +1666,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private void ClientRPCWrite<T>(T arg)
 	{
-		NetworkWriteEx.WriteObject(Network.Net.sv.write, arg);
+		Network.Net.sv.write.WriteObject(arg);
 	}
 
 	private void ClientRPCSend(SendInfo sendInfo)
@@ -1753,7 +1753,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 	}
 
-	protected void NetworkPositionTick()
+	public void NetworkPositionTick()
 	{
 		if (!base.transform.hasChanged)
 		{
@@ -1817,7 +1817,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public override void Spawn()
 	{
 		base.Spawn();
-		OnParentSpawningEx.BroadcastOnParentSpawning(base.gameObject);
+		base.gameObject.BroadcastOnParentSpawning();
 	}
 
 	public void OnParentSpawning()
@@ -1924,7 +1924,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			else if (ShouldInheritNetworkGroup() && base.parentEntity.IsSet())
 			{
 				BaseEntity parentEntity = GetParentEntity();
-				if (!BaseEntityEx.IsValid(parentEntity))
+				if (!parentEntity.IsValid())
 				{
 					Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + base.parentEntity.uid);
 					Invoke(UpdateNetworkGroup, 2f);
@@ -2051,8 +2051,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2470,12 +2470,12 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		RaycastHit hitInfo;
 		if (GamePhysics.Trace(ray, 0f, out hitInfo, maxDistance, 1218519041))
 		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			BaseEntity entity = hitInfo.GetEntity();
 			if (entity == this)
 			{
 				return true;
 			}
-			if (entity != null && (bool)GetParentEntity() && GetParentEntity().EqualNetID(entity) && RaycastHitEx.IsOnLayer(hitInfo, Rust.Layer.Vehicle_Detailed))
+			if (entity != null && (bool)GetParentEntity() && GetParentEntity().EqualNetID(entity) && hitInfo.IsOnLayer(Rust.Layer.Vehicle_Detailed))
 			{
 				return true;
 			}
@@ -2558,8 +2558,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			{
 				continue;
 			}
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(hitInfo.collider);
-			if (baseEntity != null && BaseEntityEx.HasEntityInParents(baseEntity, this))
+			BaseEntity baseEntity = hitInfo.collider.ToBaseEntity();
+			if (baseEntity != null && baseEntity.HasEntityInParents(this))
 			{
 				if (hitInfo.point.y > position.y + 0.2f)
 				{

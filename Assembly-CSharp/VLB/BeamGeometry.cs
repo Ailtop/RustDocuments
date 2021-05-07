@@ -5,9 +5,9 @@ using UnityEngine.Rendering;
 
 namespace VLB
 {
+	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	[ExecuteInEditMode]
 	[AddComponentMenu("")]
-	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	public class BeamGeometry : MonoBehaviour
 	{
 		private VolumetricLightBeam m_Master;
@@ -121,7 +121,7 @@ namespace VLB
 			base.transform.SetParent(master.transform, false);
 			material = new Material(shader);
 			material.hideFlags = proceduralObjectsHideFlags;
-			meshRenderer = Utils.GetOrAddComponent<MeshRenderer>(base.gameObject);
+			meshRenderer = base.gameObject.GetOrAddComponent<MeshRenderer>();
 			meshRenderer.hideFlags = proceduralObjectsHideFlags;
 			meshRenderer.material = material;
 			meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
@@ -136,7 +136,7 @@ namespace VLB
 				Debug.LogError($"Beam '{Utils.GetPath(m_Master.transform)}' has an invalid sortingLayerID ({m_Master.sortingLayerID}). Please fix it by setting a valid layer.");
 			}
 			sortingOrder = m_Master.sortingOrder;
-			meshFilter = Utils.GetOrAddComponent<MeshFilter>(base.gameObject);
+			meshFilter = base.gameObject.GetOrAddComponent<MeshFilter>();
 			meshFilter.hideFlags = proceduralObjectsHideFlags;
 			base.gameObject.hideFlags = proceduralObjectsHideFlags;
 		}
@@ -189,7 +189,7 @@ namespace VLB
 			{
 				Utils.FloatPackingPrecision floatPackingPrecision = Utils.GetFloatPackingPrecision();
 				material.EnableKeyword((floatPackingPrecision == Utils.FloatPackingPrecision.High) ? "VLB_COLOR_GRADIENT_MATRIX_HIGH" : "VLB_COLOR_GRADIENT_MATRIX_LOW");
-				m_ColorGradientMatrix = Utils.SampleInMatrix(m_Master.colorGradient, (int)floatPackingPrecision);
+				m_ColorGradientMatrix = m_Master.colorGradient.SampleInMatrix((int)floatPackingPrecision);
 			}
 			else
 			{

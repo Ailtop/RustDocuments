@@ -51,8 +51,8 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public Vector3 engineLocalOffset;
 
-	[SerializeField]
 	[Header("Train Engine")]
+	[SerializeField]
 	public Transform leftHandLever;
 
 	[SerializeField]

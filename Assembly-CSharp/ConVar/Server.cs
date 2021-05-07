@@ -591,7 +591,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void cheatreport(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null))
 			{
 				ulong uInt = arg.GetUInt64(0, 0uL);
@@ -607,10 +607,10 @@ namespace ConVar
 		[ServerAllVar(Help = "Get the player combat log")]
 		public static string combatlog(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (arg.HasArgs() && arg.IsAdmin)
 			{
-				basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+				basePlayer = arg.GetPlayerOrSleeper(0);
 			}
 			if (basePlayer == null)
 			{
@@ -622,10 +622,10 @@ namespace ConVar
 		[ServerVar(Help = "Print the current player position.")]
 		public static string printpos(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (arg.HasArgs())
 			{
-				basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+				basePlayer = arg.GetPlayerOrSleeper(0);
 			}
 			if (!(basePlayer == null))
 			{
@@ -637,10 +637,10 @@ namespace ConVar
 		[ServerVar(Help = "Print the current player rotation.")]
 		public static string printrot(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (arg.HasArgs())
 			{
-				basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+				basePlayer = arg.GetPlayerOrSleeper(0);
 			}
 			if (!(basePlayer == null))
 			{
@@ -652,10 +652,10 @@ namespace ConVar
 		[ServerVar(Help = "Print the current player eyes.")]
 		public static string printeyes(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (arg.HasArgs())
 			{
-				basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+				basePlayer = arg.GetPlayerOrSleeper(0);
 			}
 			if (!(basePlayer == null))
 			{
@@ -667,7 +667,7 @@ namespace ConVar
 		[ServerVar(ServerAdmin = true, Help = "This sends a snapshot of all the entities in the client's pvs. This is mostly redundant, but we request this when the client starts recording a demo.. so they get all the information.")]
 		public static void snapshot(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null))
 			{
 				UnityEngine.Debug.Log("Sending full snapshot to " + basePlayer);

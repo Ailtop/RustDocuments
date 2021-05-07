@@ -14,7 +14,7 @@ public class TriggerPlayerTimer : TriggerBase
 		obj = base.InterestedInObject(obj);
 		if (obj != null)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+			BaseEntity baseEntity = obj.ToBaseEntity();
 			BasePlayer basePlayer;
 			if ((object)(basePlayer = baseEntity as BasePlayer) != null && baseEntity.isServer && !basePlayer.isMounted)
 			{

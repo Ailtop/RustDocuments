@@ -77,12 +77,12 @@ public class ItemManager
 				UnityEngine.Debug.LogWarning("Item ID duplicate " + item.itemid + " (" + item.name + ") - have you given your items unique shortnames?", item.gameObject);
 				UnityEngine.Debug.LogWarning("Other item is " + itemDefinition.name, itemDefinition);
 			}
+			else if (string.IsNullOrEmpty(item.shortname))
+			{
+				UnityEngine.Debug.LogWarning($"{item} has a null short name! id: {item.itemid} {item.displayName.english}");
+			}
 			else
 			{
-				if (string.IsNullOrEmpty(item.shortname))
-				{
-					UnityEngine.Debug.LogWarning($"{item} has a null short name! id: {item.itemid} {item.displayName.english}");
-				}
 				dictionary.Add(item.itemid, item);
 				dictionary2.Add(item.shortname, item);
 			}

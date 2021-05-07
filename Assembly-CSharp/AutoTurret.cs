@@ -32,7 +32,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return entity.IsValid();
 			}
 			return false;
 		}
@@ -50,9 +50,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	private BasePlayer playerController;
 
-	private string rcIdentifier = "TURRET";
+	public string rcIdentifier = "TURRET";
 
-	private Vector3 initialAimDir;
+	public Vector3 initialAimDir;
 
 	public float rcTurnSensitivity = 4f;
 
@@ -91,7 +91,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		-0.15f
 	};
 
-	private int peekIndex;
+	public int peekIndex;
 
 	[NonSerialized]
 	public int numConsecutiveMisses;
@@ -722,8 +722,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SERVER_AttackAll(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -796,7 +796,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			GamePhysics.TraceAll(new Ray(position, normalized), 0f, obj3, num * 1.1f, 1218652417);
 			for (int j = 0; j < obj3.Count; j++)
 			{
-				BaseEntity entity = RaycastHitEx.GetEntity(obj3[j]);
+				BaseEntity entity = obj3[j].GetEntity();
 				if ((!(entity != null) || !entity.isClient) && (!(entity != null) || !(entity.ToPlayer() != null) || entity.EqualNetID(obj)) && (!(entity != null) || !entity.EqualNetID(this)))
 				{
 					if (entity != null && (entity == obj || entity.EqualNetID(obj)))
@@ -845,7 +845,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		for (int i = 0; i < obj.Count; i++)
 		{
 			RaycastHit hit = obj[i];
-			BaseEntity entity = RaycastHitEx.GetEntity(hit);
+			BaseEntity entity = hit.GetEntity();
 			if ((entity != null && (entity == this || entity.EqualNetID(this))) || (PeacekeeperMode() && target != null && entity != null && entity.GetComponent<BasePlayer>() != null && !entity.EqualNetID(target)))
 			{
 				continue;
@@ -884,7 +884,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		Facepunch.Pool.FreeList(ref obj);
 	}
 
-	private void ApplyDamage(BaseCombatEntity entity, Vector3 point, Vector3 normal)
+	public void ApplyDamage(BaseCombatEntity entity, Vector3 point, Vector3 normal)
 	{
 		float num = 15f * UnityEngine.Random.Range(0.9f, 1.1f);
 		if (entity is BasePlayer && entity != target)
@@ -1093,7 +1093,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return false;
 	}
 
-	private bool HasGenericFireable()
+	public bool HasGenericFireable()
 	{
 		if (AttachedWeapon != null)
 		{
@@ -1267,7 +1267,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return true;
 	}
 
-	private void ScheduleForTargetScan()
+	public void ScheduleForTargetScan()
 	{
 		updateAutoTurretScanQueue.Add(this);
 	}
@@ -1399,7 +1399,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		UpdateAiming();
 	}
 
-	private float GetAngle(Vector3 launchPosition, Vector3 targetPosition, float launchVelocity, float gravityScale)
+	public float GetAngle(Vector3 launchPosition, Vector3 targetPosition, float launchVelocity, float gravityScale)
 	{
 		float num = UnityEngine.Physics.gravity.y * gravityScale;
 		float num2 = Vector3.Distance(launchPosition.XZ3D(), targetPosition.XZ3D());

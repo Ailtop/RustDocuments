@@ -198,7 +198,7 @@ public class TerrainPath : TerrainExtension
 			if ((bool)powerLineWire)
 			{
 				powerLineWire.enabled = false;
-				GameObjectEx.SetHierarchyGroup(powerLineWire.gameObject, name);
+				powerLineWire.gameObject.SetHierarchyGroup(name);
 			}
 		}
 	}

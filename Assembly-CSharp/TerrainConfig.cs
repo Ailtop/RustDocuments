@@ -6,6 +6,24 @@ using UnityEngine.Serialization;
 public class TerrainConfig : ScriptableObject
 {
 	[Serializable]
+	public class SplatOverlay
+	{
+		public Color Color = new Color(1f, 1f, 1f, 0f);
+
+		[Range(0f, 1f)]
+		public float Smoothness;
+
+		[Range(0f, 1f)]
+		public float NormalIntensity = 1f;
+
+		[Range(0f, 8f)]
+		public float BlendFactor = 0.5f;
+
+		[Range(0.01f, 32f)]
+		public float BlendFalloff = 0.5f;
+	}
+
+	[Serializable]
 	public class SplatType
 	{
 		public string Name = "";
@@ -13,14 +31,22 @@ public class TerrainConfig : ScriptableObject
 		[FormerlySerializedAs("WarmColor")]
 		public Color AridColor = Color.white;
 
+		public SplatOverlay AridOverlay = new SplatOverlay();
+
 		[FormerlySerializedAs("Color")]
 		public Color TemperateColor = Color.white;
+
+		public SplatOverlay TemperateOverlay = new SplatOverlay();
 
 		[FormerlySerializedAs("ColdColor")]
 		public Color TundraColor = Color.white;
 
+		public SplatOverlay TundraOverlay = new SplatOverlay();
+
 		[FormerlySerializedAs("ColdColor")]
 		public Color ArcticColor = Color.white;
+
+		public SplatOverlay ArcticOverlay = new SplatOverlay();
 
 		public PhysicMaterial Material;
 
@@ -88,6 +114,18 @@ public class TerrainConfig : ScriptableObject
 		return array;
 	}
 
+	public void GetAridOverlayConstants(out Color[] color, out Vector4[] param)
+	{
+		color = new Color[Splats.Length];
+		param = new Vector4[Splats.Length];
+		for (int i = 0; i < Splats.Length; i++)
+		{
+			SplatOverlay aridOverlay = Splats[i].AridOverlay;
+			color[i] = aridOverlay.Color.linear;
+			param[i] = new Vector4(aridOverlay.Smoothness, aridOverlay.NormalIntensity, aridOverlay.BlendFactor, aridOverlay.BlendFalloff);
+		}
+	}
+
 	public Color[] GetTemperateColors()
 	{
 		Color[] array = new Color[Splats.Length];
@@ -96,6 +134,18 @@ public class TerrainConfig : ScriptableObject
 			array[i] = Splats[i].TemperateColor;
 		}
 		return array;
+	}
+
+	public void GetTemperateOverlayConstants(out Color[] color, out Vector4[] param)
+	{
+		color = new Color[Splats.Length];
+		param = new Vector4[Splats.Length];
+		for (int i = 0; i < Splats.Length; i++)
+		{
+			SplatOverlay temperateOverlay = Splats[i].TemperateOverlay;
+			color[i] = temperateOverlay.Color.linear;
+			param[i] = new Vector4(temperateOverlay.Smoothness, temperateOverlay.NormalIntensity, temperateOverlay.BlendFactor, temperateOverlay.BlendFalloff);
+		}
 	}
 
 	public Color[] GetTundraColors()
@@ -108,6 +158,18 @@ public class TerrainConfig : ScriptableObject
 		return array;
 	}
 
+	public void GetTundraOverlayConstants(out Color[] color, out Vector4[] param)
+	{
+		color = new Color[Splats.Length];
+		param = new Vector4[Splats.Length];
+		for (int i = 0; i < Splats.Length; i++)
+		{
+			SplatOverlay tundraOverlay = Splats[i].TundraOverlay;
+			color[i] = tundraOverlay.Color.linear;
+			param[i] = new Vector4(tundraOverlay.Smoothness, tundraOverlay.NormalIntensity, tundraOverlay.BlendFactor, tundraOverlay.BlendFalloff);
+		}
+	}
+
 	public Color[] GetArcticColors()
 	{
 		Color[] array = new Color[Splats.Length];
@@ -116,6 +178,18 @@ public class TerrainConfig : ScriptableObject
 			array[i] = Splats[i].ArcticColor;
 		}
 		return array;
+	}
+
+	public void GetArcticOverlayConstants(out Color[] color, out Vector4[] param)
+	{
+		color = new Color[Splats.Length];
+		param = new Vector4[Splats.Length];
+		for (int i = 0; i < Splats.Length; i++)
+		{
+			SplatOverlay arcticOverlay = Splats[i].ArcticOverlay;
+			color[i] = arcticOverlay.Color.linear;
+			param[i] = new Vector4(arcticOverlay.Smoothness, arcticOverlay.NormalIntensity, arcticOverlay.BlendFactor, arcticOverlay.BlendFalloff);
+		}
 	}
 
 	public float[] GetSplatTiling()

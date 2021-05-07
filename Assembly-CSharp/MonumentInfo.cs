@@ -18,6 +18,15 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 
 	public bool IsSafeZone;
 
+	[HideInInspector]
+	public bool WantsDungeonLink;
+
+	[HideInInspector]
+	public bool HasDungeonLink;
+
+	[HideInInspector]
+	public DungeonInfo DungeonEntrance;
+
 	protected override void Awake()
 	{
 		base.Awake();
@@ -126,5 +135,35 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 
 	public void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
+		HasDungeonLink = DetermineHasDungeonLink();
+		WantsDungeonLink = DetermineWantsDungeonLink();
+		DungeonEntrance = FindDungeonEntrance();
+	}
+
+	private DungeonInfo FindDungeonEntrance()
+	{
+		return GetComponentInChildren<DungeonInfo>();
+	}
+
+	private bool DetermineHasDungeonLink()
+	{
+		return GetComponentInChildren<DungeonLink>() != null;
+	}
+
+	private bool DetermineWantsDungeonLink()
+	{
+		if (Type == MonumentType.WaterWell)
+		{
+			return false;
+		}
+		if (Type == MonumentType.Building && displayPhrase.token.StartsWith("mining_quarry"))
+		{
+			return false;
+		}
+		if (Type == MonumentType.Radtown && displayPhrase.token.StartsWith("swamp"))
+		{
+			return false;
+		}
+		return true;
 	}
 }

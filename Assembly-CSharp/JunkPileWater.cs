@@ -16,7 +16,7 @@ public class JunkPileWater : JunkPile
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return entity.IsValid();
 			}
 			return false;
 		}

@@ -83,8 +83,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Add end caps to each line\nMultiple caps when used with Line List")]
 		internal bool lineCaps;
 
-		[SerializeField]
 		[Tooltip("Resolution of the Bezier curve, different to line Resolution")]
+		[SerializeField]
 		internal int bezierSegmentsPerCurve = 10;
 
 		[Tooltip("The type of Join used between lines, Square/Mitre or Curved/Bevel")]

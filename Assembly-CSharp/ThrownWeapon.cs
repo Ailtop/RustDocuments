@@ -263,8 +263,8 @@ public class ThrownWeapon : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoDrop(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())
@@ -291,7 +291,7 @@ public class ThrownWeapon : AttackEntity
 		{
 			Vector3 point = hitInfo.point;
 			Vector3 normal = hitInfo.normal;
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			BaseEntity entity = hitInfo.GetEntity();
 			if ((bool)entity && entity is StabilityEntity && baseEntity is TimedExplosive)
 			{
 				entity = entity.ToServer<BaseEntity>();

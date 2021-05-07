@@ -27,7 +27,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return entity.IsValid();
 			}
 			return false;
 		}
@@ -61,8 +61,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public TimeCachedValue<float> artificialTemperatureExposure;
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
+	[ServerVar]
 	public static float framebudgetms = 0.25f;
 
 	public static GrowableEntityUpdateQueue growableEntityUpdateQueue = new GrowableEntityUpdateQueue();
@@ -772,8 +772,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_TakeClone(RPCMessage msg)
 	{
 		TakeClones(msg.player);
@@ -867,9 +867,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);
@@ -906,7 +906,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	[ServerVar(ServerAdmin = true)]
 	public static void GrowAll(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (!basePlayer.IsAdmin)
 		{
 			return;

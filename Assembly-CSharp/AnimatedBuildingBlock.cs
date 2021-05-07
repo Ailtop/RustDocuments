@@ -82,7 +82,7 @@ public class AnimatedBuildingBlock : StabilityEntity
 	{
 		if (!model || !model.animator)
 		{
-			Debug.LogWarning(TransformEx.GetRecursiveName(base.transform) + " has missing model/animator", base.gameObject);
+			Debug.LogWarning(base.transform.GetRecursiveName() + " has missing model/animator", base.gameObject);
 			return;
 		}
 		model.animator.enabled = false;

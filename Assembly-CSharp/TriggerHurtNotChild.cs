@@ -47,7 +47,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -118,7 +118,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent
 					return false;
 				}
 			}
-			if (SourceEntity != null && BaseEntityEx.HasEntityInParents(basePlayer, SourceEntity))
+			if (SourceEntity != null && basePlayer.HasEntityInParents(SourceEntity))
 			{
 				return false;
 			}
@@ -128,7 +128,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent
 
 	private void OnTick()
 	{
-		if (CollectionEx.IsNullOrEmpty(entityContents))
+		if (entityContents.IsNullOrEmpty())
 		{
 			return;
 		}
@@ -138,7 +138,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent
 		foreach (BaseEntity item in obj)
 		{
 			float value;
-			if (BaseEntityEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
+			if (item.IsValid() && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
 			{
 				float num = DamagePerSecond * 1f / DamageTickRate;
 				if (UseSourceEntityDamageMultiplier && hurtTriggerUser != null)

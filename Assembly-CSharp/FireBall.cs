@@ -135,7 +135,7 @@ public class FireBall : BaseEntity, ISplashable
 		hitInfo.DoHitEffects = true;
 		hitInfo.DidHit = true;
 		hitInfo.HitBone = 0u;
-		hitInfo.Initiator = ((creatorEntity == null) ? GameObjectEx.ToBaseEntity(base.gameObject) : creatorEntity);
+		hitInfo.Initiator = ((creatorEntity == null) ? base.gameObject.ToBaseEntity() : creatorEntity);
 		hitInfo.PointStart = base.transform.position;
 		foreach (Collider item in obj)
 		{
@@ -143,7 +143,7 @@ public class FireBall : BaseEntity, ISplashable
 			{
 				continue;
 			}
-			BaseCombatEntity baseCombatEntity = GameObjectEx.ToBaseEntity(item.gameObject) as BaseCombatEntity;
+			BaseCombatEntity baseCombatEntity = item.gameObject.ToBaseEntity() as BaseCombatEntity;
 			if (!(baseCombatEntity == null) && baseCombatEntity.isServer && baseCombatEntity.IsAlive() && (!ignoreNPC || !baseCombatEntity.IsNpc) && baseCombatEntity.IsVisible(position))
 			{
 				if (baseCombatEntity is BasePlayer)
@@ -182,7 +182,7 @@ public class FireBall : BaseEntity, ISplashable
 			Vis.Colliders(base.transform.position, 0.5f, obj, 512);
 			foreach (Collider item in obj)
 			{
-				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
+				BaseEntity baseEntity = item.gameObject.ToBaseEntity();
 				if ((bool)baseEntity)
 				{
 					FireBall fireBall = baseEntity.ToServer<FireBall>();

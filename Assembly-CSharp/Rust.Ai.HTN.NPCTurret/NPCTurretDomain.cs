@@ -570,8 +570,8 @@ namespace Rust.Ai.HTN.NPCTurret
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[SerializeField]
 		[Header("Context")]
+		[SerializeField]
 		private NPCTurretContext _context;
 
 		[SerializeField]
@@ -666,8 +666,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		};
 
 		[SerializeField]
-		[Header("Firearm Utility")]
 		[ReadOnly]
+		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
 		[SerializeField]

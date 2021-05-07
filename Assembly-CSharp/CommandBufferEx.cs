@@ -51,6 +51,6 @@ public static class CommandBufferEx
 
 	public static void BlitMip(this CommandBuffer cb, Mesh blitMesh, Texture source, Texture target, int mip, int slice, Material mat, int pass = 0)
 	{
-		BlitArrayMip(cb, blitMesh, source, mip, slice, target, mip, slice, mat, pass);
+		cb.BlitArrayMip(blitMesh, source, mip, slice, target, mip, slice, mat, pass);
 	}
 }

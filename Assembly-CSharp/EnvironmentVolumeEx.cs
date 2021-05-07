@@ -25,7 +25,7 @@ public static class EnvironmentVolumeEx
 
 	public static bool CheckEnvironmentVolumes(this Transform transform, EnvironmentType type)
 	{
-		return CheckEnvironmentVolumes(transform, transform.position, transform.rotation, transform.lossyScale, type);
+		return transform.CheckEnvironmentVolumes(transform.position, transform.rotation, transform.lossyScale, type);
 	}
 
 	public static bool CheckEnvironmentVolumesInsideTerrain(this Transform transform, Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type)
@@ -66,6 +66,6 @@ public static class EnvironmentVolumeEx
 
 	public static bool CheckEnvironmentVolumesInsideTerrain(this Transform transform, EnvironmentType type)
 	{
-		return CheckEnvironmentVolumesInsideTerrain(transform, transform.position, transform.rotation, transform.lossyScale, type);
+		return transform.CheckEnvironmentVolumesInsideTerrain(transform.position, transform.rotation, transform.lossyScale, type);
 	}
 }

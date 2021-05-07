@@ -80,7 +80,7 @@ public class Sprinkler : IOEntity
 				int amount = num / cachedSplashables.Count;
 				foreach (ISplashable cachedSplashable in cachedSplashables)
 				{
-					if (!ObjectEx.IsUnityNull(cachedSplashable) && cachedSplashable.WantsSplash(currentFuelType, amount))
+					if (!cachedSplashable.IsUnityNull() && cachedSplashable.WantsSplash(currentFuelType, amount))
 					{
 						int num2 = cachedSplashable.DoSplash(currentFuelType, amount);
 						num -= num2;

@@ -152,8 +152,8 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing ridable animals per frame")]
+	[ServerVar]
 	public static float framebudgetms = 1f;
 
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
@@ -556,8 +556,8 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -818,7 +818,7 @@ public class BaseRidableAnimal : BaseVehicle
 			float num = consumable.GetIfType(MetabolismAttribute.Type.Health) + consumable.GetIfType(MetabolismAttribute.Type.HealthOverTime);
 			ApplyDungCalories(ifType);
 			ReplenishStaminaCore(ifType, ifType2);
-			Heal(num * 2f);
+			Heal(num * 4f);
 		}
 	}
 

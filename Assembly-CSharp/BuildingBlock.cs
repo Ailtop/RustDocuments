@@ -31,7 +31,7 @@ public class BuildingBlock : StabilityEntity
 
 		protected override bool ShouldAdd(BuildingBlock entity)
 		{
-			return BaseEntityEx.IsValid(entity);
+			return entity.IsValid();
 		}
 	}
 
@@ -54,6 +54,8 @@ public class BuildingBlock : StabilityEntity
 	private MeshCollider placeholderCollider;
 
 	public static UpdateSkinWorkQueue updateSkinQueueServer = new UpdateSkinWorkQueue();
+
+	public bool CullBushes;
 
 	[NonSerialized]
 	public Construction blockDefinition;
@@ -269,8 +271,8 @@ public class BuildingBlock : StabilityEntity
 		return player.IsBuildingAuthed(base.transform.position, base.transform.rotation, bounds);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void DoDemolish(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanDemolish(msg.player) && Interface.CallHook("OnStructureDemolish", this, msg.player, false) == null)
@@ -413,7 +415,7 @@ public class BuildingBlock : StabilityEntity
 		{
 			BuildingGrade.Enum @enum = (BuildingGrade.Enum)msg.read.Int32();
 			ConstructionGrade constructionGrade = GetGrade(@enum);
-			if (!(constructionGrade == null) && CanChangeToGrade(@enum, msg.player) && CanAffordUpgrade(@enum, msg.player) && !(base.SecondsSinceAttacked < 30f) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum) == null)
+			if (!(constructionGrade == null) && CanChangeToGrade(@enum, msg.player) && CanAffordUpgrade(@enum, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum) == null && !(base.SecondsSinceAttacked < 30f))
 			{
 				PayForUpgrade(constructionGrade, msg.player);
 				SetGrade(@enum);
@@ -668,8 +670,8 @@ public class BuildingBlock : StabilityEntity
 		return !player.IsBuildingBlocked(base.transform.position, base.transform.rotation, bounds);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void DoRotation(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanRotate(msg.player) && blockDefinition.canRotateAfterPlacement && Interface.CallHook("OnStructureRotate", this, msg.player) == null)
@@ -740,6 +742,20 @@ public class BuildingBlock : StabilityEntity
 		{
 			StartBeingDemolishable();
 		}
+		if (!CullBushes || Rust.Application.isLoadingSave)
+		{
+			return;
+		}
+		List<BushEntity> obj = Facepunch.Pool.GetList<BushEntity>();
+		Vis.Entities(WorldSpaceBounds(), obj, 67108864);
+		foreach (BushEntity item in obj)
+		{
+			if (item.isServer)
+			{
+				item.Kill();
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public override void Hurt(HitInfo info)

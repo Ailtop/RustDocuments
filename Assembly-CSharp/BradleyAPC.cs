@@ -285,7 +285,13 @@ public class BradleyAPC : BaseCombatEntity
 
 	public float currentSpeedZoneLimit;
 
-	protected override float PositionTickRate => 0.1f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return 0.1f;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -679,7 +685,7 @@ public class BradleyAPC : BaseCombatEntity
 		for (int i = 0; i < obj.Count; i++)
 		{
 			RaycastHit hit = obj[i];
-			BaseEntity entity = RaycastHitEx.GetEntity(hit);
+			BaseEntity entity = hit.GetEntity();
 			if (!(entity != null) || (!(entity == this) && !entity.EqualNetID(this)))
 			{
 				BaseCombatEntity baseCombatEntity = entity as BaseCombatEntity;

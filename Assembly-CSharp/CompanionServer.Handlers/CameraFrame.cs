@@ -9,7 +9,7 @@ namespace CompanionServer.Handlers
 
 		public override void Execute()
 		{
-			if (!Settings.Enabled)
+			if (!CCTVRender.Settings.Enabled)
 			{
 				SendError("disabled");
 				return;

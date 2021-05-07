@@ -19,7 +19,7 @@ public static class DecorComponentEx
 		Vector3 pos = transform.position;
 		Quaternion rot = transform.rotation;
 		Vector3 scale = transform.localScale;
-		ApplyDecorComponents(transform, components, ref pos, ref rot, ref scale);
+		transform.ApplyDecorComponents(components, ref pos, ref rot, ref scale);
 		transform.position = pos;
 		transform.rotation = rot;
 		transform.localScale = scale;
@@ -30,7 +30,7 @@ public static class DecorComponentEx
 		Vector3 pos = transform.position;
 		Quaternion rot = transform.rotation;
 		Vector3 scale = transform.localScale;
-		ApplyDecorComponents(transform, components, ref pos, ref rot, ref scale);
+		transform.ApplyDecorComponents(components, ref pos, ref rot, ref scale);
 		transform.localScale = scale;
 	}
 }

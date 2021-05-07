@@ -29,7 +29,7 @@ public class SendMessageToEntityOnAnimationFinish : StateMachineBehaviour
 				}
 			}
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(animator.gameObject);
+		BaseEntity baseEntity = animator.gameObject.ToBaseEntity();
 		if ((bool)baseEntity)
 		{
 			baseEntity.SendMessage(messageToSendToEntity);

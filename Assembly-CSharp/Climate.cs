@@ -508,7 +508,7 @@ public class Climate : SingletonComponent<Climate>
 		{
 			presetLookup.Add(type, value = CacheWeatherPresets(type));
 		}
-		return ArrayEx.GetRandom(value, ref seed);
+		return value.GetRandom(ref seed);
 	}
 
 	public WeatherPreset[] CacheWeatherPresets(WeatherPresetType type)

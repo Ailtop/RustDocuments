@@ -49,7 +49,13 @@ public class RidableHorse : BaseRidableAnimal
 
 	public override float RealisticMass => 550f;
 
-	protected override float PositionTickRate => 0.05f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return 0.05f;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -205,6 +211,8 @@ public class RidableHorse : BaseRidableAnimal
 				ItemModConsumable component = foodItem.info.GetComponent<ItemModConsumable>();
 				if ((bool)component)
 				{
+					float amount = component.GetIfType(MetabolismAttribute.Type.Calories) * currentHitch.caloriesToDecaySeconds;
+					AddDecayDelay(amount);
 					ReplenishFromFood(component);
 					foodItem.UseItem();
 					nextEatTime = Time.time + Random.Range(2f, 3f) + Mathf.InverseLerp(0.5f, 1f, StaminaCoreFraction()) * 4f;
@@ -393,7 +401,7 @@ public class RidableHorse : BaseRidableAnimal
 	[ServerVar]
 	public static void setHorseBreed(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if (basePlayer == null || !basePlayer.IsDeveloper)
 		{
 			return;

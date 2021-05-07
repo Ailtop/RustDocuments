@@ -17,16 +17,16 @@ namespace ConVar
 		[ClientVar]
 		public static int mode = 2;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool prewarm = true;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled = true;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool debug = false;
 
 		[ClientVar]
@@ -82,8 +82,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void print_assets(Arg arg)
 		{
 			if (AssetPool.storage.Count == 0)
@@ -109,8 +109,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void clear_memory(Arg arg)
 		{
 			Facepunch.Pool.Clear();

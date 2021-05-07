@@ -71,7 +71,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	public IItemContainerEntity GetContainer()
 	{
 		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && baseEntity.IsValid())
 		{
 			return baseEntity as IItemContainerEntity;
 		}
@@ -106,7 +106,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	{
 		base.PostServerLoad();
 		IItemContainerEntity container = GetContainer();
-		if (!ObjectEx.IsUnityNull(container))
+		if (!container.IsUnityNull())
 		{
 			ItemContainer inventory = container.inventory;
 			inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
@@ -130,7 +130,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	internal override void DoServerDestroy()
 	{
 		IItemContainerEntity container = GetContainer();
-		if (!ObjectEx.IsUnityNull(container) && vehicle.carsdroploot)
+		if (!container.IsUnityNull() && vehicle.carsdroploot)
 		{
 			container.DropItems();
 		}
@@ -164,7 +164,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 			return;
 		}
 		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
-		if (BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity.IsValid())
 		{
 			BaseCombatEntity baseCombatEntity;
 			if ((object)(baseCombatEntity = baseEntity as BaseCombatEntity) != null)
@@ -178,15 +178,15 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Open(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
 		if (!(player == null) && CanBeLooted(player))
 		{
 			IItemContainerEntity container = GetContainer();
-			if (!ObjectEx.IsUnityNull(container))
+			if (!container.IsUnityNull())
 			{
 				container.PlayerOpenLoot(player);
 			}
@@ -200,7 +200,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	protected override bool CanBeMovedNowOnVehicle()
 	{
 		IItemContainerEntity container = GetContainer();
-		if (!ObjectEx.IsUnityNull(container) && !container.inventory.IsEmpty())
+		if (!container.IsUnityNull() && !container.inventory.IsEmpty())
 		{
 			return false;
 		}

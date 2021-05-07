@@ -6,7 +6,7 @@ public class EntityDebug : EntityComponent<BaseEntity>
 
 	private void Update()
 	{
-		if (!BaseEntityEx.IsValid(base.baseEntity) || !base.baseEntity.IsDebugging())
+		if (!base.baseEntity.IsValid() || !base.baseEntity.IsDebugging())
 		{
 			base.enabled = false;
 		}

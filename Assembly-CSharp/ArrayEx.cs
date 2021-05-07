@@ -41,7 +41,7 @@ public static class ArrayEx
 
 	public static void Shuffle<T>(this T[] array, uint seed)
 	{
-		Shuffle(array, ref seed);
+		array.Shuffle(ref seed);
 	}
 
 	public static void Shuffle<T>(this T[] array, ref uint seed)

@@ -55,8 +55,8 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		RaycastHit hitInfo;
 		if (GamePhysics.Trace(new Ray(base.transform.position, currentVelocity.normalized), radius, out hitInfo, num2 + scanRange, 1236478737))
 		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
-			if (!BaseEntityEx.IsValid(entity) || !BaseEntityEx.IsValid(base.baseEntity.creatorEntity) || entity.net.ID != base.baseEntity.creatorEntity.net.ID)
+			BaseEntity entity = hitInfo.GetEntity();
+			if (!entity.IsValid() || !base.baseEntity.creatorEntity.IsValid() || entity.net.ID != base.baseEntity.creatorEntity.net.ID)
 			{
 				base.transform.position += base.transform.forward * Mathf.Max(0f, hitInfo.distance - 0.1f);
 				SendMessage("ProjectileImpact", hitInfo, SendMessageOptions.DontRequireReceiver);

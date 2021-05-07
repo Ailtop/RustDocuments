@@ -366,7 +366,7 @@ public class TerrainMeta : MonoBehaviour
 		DistanceMap = terrain.GetComponent<TerrainDistanceMap>();
 		PlacementMap = terrain.GetComponent<TerrainPlacementMap>();
 		Texturing = terrain.GetComponent<TerrainTexturing>();
-		terrain.drawInstanced = true;
+		terrain.drawInstanced = false;
 		HighestPoint = new Vector3(Position.x, Position.y + Size.y, Position.z);
 		LowestPoint = new Vector3(Position.x, Position.y, Position.z);
 		TerrainExtension[] components = GetComponents<TerrainExtension>();

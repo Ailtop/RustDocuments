@@ -103,7 +103,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 	{
 		foreach (SpawnPointInstance spawnInstance in spawnInstances)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(spawnInstance.gameObject);
+			BaseEntity baseEntity = spawnInstance.gameObject.ToBaseEntity();
 			if ((bool)baseEntity)
 			{
 				baseEntity.Kill();
@@ -177,7 +177,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 				if ((bool)baseEntity)
 				{
 					baseEntity.enableSaving = false;
-					PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+					baseEntity.gameObject.AwakeFromInstantiate();
 					baseEntity.Spawn();
 					PostSpawnProcess(baseEntity, spawnPoint);
 					SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();

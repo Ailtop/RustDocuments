@@ -75,7 +75,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			{
 				if (!(item == null) && !(item.gameObject == null) && !(item.transform == null))
 				{
-					BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
+					BaseEntity baseEntity = item.gameObject.ToBaseEntity();
 					if ((bool)baseEntity)
 					{
 						baseEntity.Kill();
@@ -192,7 +192,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 						break;
 					}
 					baseEntity.enableSaving = false;
-					PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+					baseEntity.gameObject.AwakeFromInstantiate();
 					baseEntity.Spawn();
 					component.Movement = Movement;
 					component.MovementRadius = MovementRadius;

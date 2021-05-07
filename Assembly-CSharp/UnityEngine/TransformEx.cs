@@ -16,7 +16,7 @@ namespace UnityEngine
 			}
 			if (transform.parent != null)
 			{
-				text = GetRecursiveName(transform.parent, text);
+				text = transform.parent.GetRecursiveName(text);
 			}
 			return text;
 		}
@@ -65,7 +65,7 @@ namespace UnityEngine
 			List<Transform> list = new List<Transform>();
 			if (transform != null)
 			{
-				AddAllChildren(transform, list);
+				transform.AddAllChildren(list);
 			}
 			return list;
 		}
@@ -78,14 +78,14 @@ namespace UnityEngine
 				Transform child = transform.GetChild(i);
 				if (!(child == null))
 				{
-					AddAllChildren(child, list);
+					child.AddAllChildren(list);
 				}
 			}
 		}
 
 		public static Transform[] GetChildrenWithTag(this Transform transform, string strTag)
 		{
-			return (from x in GetAllChildren(transform)
+			return (from x in transform.GetAllChildren()
 				where x.CompareTag(strTag)
 				select x).ToArray();
 		}
@@ -101,7 +101,7 @@ namespace UnityEngine
 		{
 			GameObject gameObject = new GameObject();
 			gameObject.transform.parent = go.transform;
-			Identity(gameObject);
+			gameObject.Identity();
 			return gameObject;
 		}
 
@@ -109,7 +109,7 @@ namespace UnityEngine
 		{
 			GameObject gameObject = Instantiate.GameObject(prefab);
 			gameObject.transform.SetParent(go.transform, false);
-			Identity(gameObject);
+			gameObject.Identity();
 			return gameObject;
 		}
 
@@ -121,7 +121,7 @@ namespace UnityEngine
 			}
 			for (int i = 0; i < go.transform.childCount; i++)
 			{
-				SetLayerRecursive(go.transform.GetChild(i).gameObject, Layer);
+				go.transform.GetChild(i).gameObject.SetLayerRecursive(Layer);
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace UnityEngine
 		{
 			Vector3 pos;
 			Vector3 normal;
-			if (GetGroundInfo(transform, out pos, out normal, fRange))
+			if (transform.GetGroundInfo(out pos, out normal, fRange))
 			{
 				transform.position = pos;
 				if (alignToNormal)
@@ -264,7 +264,7 @@ namespace UnityEngine
 					{
 						Matrix4x4 matrix = transform.worldToLocalMatrix * meshFilter.transform.localToWorldMatrix;
 						Bounds bounds = meshFilter.sharedMesh.bounds;
-						result.Encapsulate(BoundsEx.Transform(bounds, matrix));
+						result.Encapsulate(bounds.Transform(matrix));
 					}
 				}
 				SkinnedMeshRenderer[] componentsInChildren2 = transform.GetComponentsInChildren<SkinnedMeshRenderer>(includeInactive);
@@ -274,7 +274,7 @@ namespace UnityEngine
 					{
 						Matrix4x4 matrix2 = transform.worldToLocalMatrix * skinnedMeshRenderer.transform.localToWorldMatrix;
 						Bounds bounds2 = skinnedMeshRenderer.sharedMesh.bounds;
-						result.Encapsulate(BoundsEx.Transform(bounds2, matrix2));
+						result.Encapsulate(bounds2.Transform(matrix2));
 					}
 				}
 			}
@@ -287,7 +287,7 @@ namespace UnityEngine
 					{
 						Matrix4x4 matrix3 = transform.worldToLocalMatrix * meshCollider.transform.localToWorldMatrix;
 						Bounds bounds3 = meshCollider.sharedMesh.bounds;
-						result.Encapsulate(BoundsEx.Transform(bounds3, matrix3));
+						result.Encapsulate(bounds3.Transform(matrix3));
 					}
 				}
 			}

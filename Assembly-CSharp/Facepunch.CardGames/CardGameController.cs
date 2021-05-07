@@ -49,7 +49,7 @@ namespace Facepunch.CardGames
 
 		public virtual float MaxTurnTime => 30f;
 
-		public virtual int TimeBetweenRounds => 6;
+		public virtual int TimeBetweenRounds => 8;
 
 		protected CardTable Owner
 		{
@@ -59,9 +59,9 @@ namespace Facepunch.CardGames
 
 		protected int ScrapItemID => Owner.ScrapItemID;
 
-		private bool IsServer => Owner.isServer;
+		protected bool IsServer => Owner.isServer;
 
-		private bool IsClient => Owner.isClient;
+		protected bool IsClient => Owner.isClient;
 
 		public ProtoBuf.CardTable.WinnerBreakdown winnerInfo
 		{
@@ -69,14 +69,13 @@ namespace Facepunch.CardGames
 			private set;
 		}
 
-		protected virtual bool SendAllCards => true;
-
 		public CardGameController(CardTable owner)
 		{
 			Owner = owner;
 			playerData = new CardPlayerData[MaxPlayersAtTable()];
 			winnerInfo = Pool.Get<ProtoBuf.CardTable.WinnerBreakdown>();
 			winnerInfo.winners = Pool.GetList<ProtoBuf.CardTable.WinnerBreakdown.Winner>();
+			winnerInfo.winningScore = 0;
 			localPlayerCards = Pool.Get<ProtoBuf.CardTable.CardList>();
 			localPlayerCards.cards = Pool.GetList<int>();
 			if (IsServer)
@@ -112,7 +111,7 @@ namespace Facepunch.CardGames
 			return num;
 		}
 
-		public int RelToAbsIndex(int relIndex)
+		public int RelToAbsIndex(int relIndex, bool includeFolded)
 		{
 			if (!HasRoundInProgress)
 			{
@@ -122,7 +121,7 @@ namespace Facepunch.CardGames
 			int num = 0;
 			for (int i = 0; i < playerData.Length; i++)
 			{
-				if (playerData[i].HasUserInCurrentRound)
+				if (includeFolded ? playerData[i].HasUserInGame : playerData[i].HasUserInCurrentRound)
 				{
 					if (num == relIndex)
 					{
@@ -133,6 +132,39 @@ namespace Facepunch.CardGames
 			}
 			Debug.LogError($"{GetType().Name}: No absolute index found for relative index {relIndex}. Only {NumPlayersInCurrentRound()} total players are in the round. Returning -1.");
 			return -1;
+		}
+
+		public int GameToRoundIndex(int gameRelIndex)
+		{
+			if (!HasRoundInProgress)
+			{
+				Debug.LogError(GetType().Name + ": Called GameToRoundIndex outside of a round. No-one is playing. Returning 0.");
+				return 0;
+			}
+			int num = 0;
+			int num2 = 0;
+			for (int i = 0; i < playerData.Length; i++)
+			{
+				if (playerData[i].HasUserInCurrentRound)
+				{
+					if (num == gameRelIndex)
+					{
+						return num2;
+					}
+					num++;
+					num2++;
+				}
+				else if (playerData[i].HasUserInGame)
+				{
+					if (num == gameRelIndex)
+					{
+						return num2;
+					}
+					num++;
+				}
+			}
+			Debug.LogError($"{GetType().Name}: No round index found for game index {gameRelIndex}. Only {NumPlayersInCurrentRound()} total players are in the round. Returning 0.");
+			return 0;
 		}
 
 		public int NumPlayersInGame()
@@ -251,6 +283,7 @@ namespace Facepunch.CardGames
 
 		protected void ClearWinnerInfo()
 		{
+			winnerInfo.winningScore = 0;
 			if (winnerInfo.winners == null)
 			{
 				return;
@@ -265,6 +298,25 @@ namespace Facepunch.CardGames
 		public void JoinTable(BasePlayer player)
 		{
 			JoinTable(player.userID);
+		}
+
+		protected void SyncAllLocalPlayerCards()
+		{
+			CardPlayerData[] array = playerData;
+			foreach (CardPlayerData cardPlayerData in array)
+			{
+				BasePlayer basePlayer = BasePlayer.FindByID(cardPlayerData.UserID);
+				if (!(basePlayer != null))
+				{
+					continue;
+				}
+				localPlayerCards.cards.Clear();
+				foreach (PlayingCard card in cardPlayerData.Cards)
+				{
+					localPlayerCards.cards.Add(card.GetIndex());
+				}
+				Owner.ClientRPCPlayer(null, basePlayer, "ReceiveCardsForPlayer", localPlayerCards);
+			}
 		}
 
 		private void JoinTable(ulong userID)
@@ -295,28 +347,20 @@ namespace Facepunch.CardGames
 		public void LeaveTable(ulong userID)
 		{
 			CardPlayerData cardPlayer;
-			if (!TryGetCardPlayerData(userID, out cardPlayer))
+			if (TryGetCardPlayerData(userID, out cardPlayer))
 			{
-				return;
-			}
-			SubOnPlayerLeaving(cardPlayer);
-			if (HasGameInProgress && State != CardGameState.InGameBetweenRounds)
-			{
-				if (NumPlayersAllowedToPlay(cardPlayer) < MinPlayers)
-				{
-					EndGameplay();
-				}
-				else if (NumPlayersInCurrentRound() < MinPlayers)
+				SubOnPlayerLeaving(cardPlayer);
+				cardPlayer.ClearAllData();
+				if (HasRoundInProgress && NumPlayersInCurrentRound() < MinPlayers)
 				{
 					EndRound();
 				}
+				if (cardPlayer.HasUserInGame)
+				{
+					Owner.ClientRPC(null, "ClientOnPlayerLeft", cardPlayer.UserID);
+				}
+				Owner.SendNetworkUpdate();
 			}
-			if (cardPlayer.HasUserInGame)
-			{
-				Owner.ClientRPC(null, "ClientOnPlayerLeft", cardPlayer.UserID);
-			}
-			cardPlayer.ClearAllData();
-			Owner.SendNetworkUpdate();
 		}
 
 		protected int AddToPot(CardPlayerData playerData, int maxAmount)
@@ -341,7 +385,8 @@ namespace Facepunch.CardGames
 			{
 				Debug.LogError(GetType().Name + ": TryAddToPot: Null storage.");
 			}
-			playerData.AddBetAmount(num);
+			playerData.betThisRound += num;
+			playerData.betThisTurn += num;
 			return num;
 		}
 
@@ -407,7 +452,7 @@ namespace Facepunch.CardGames
 			CardPlayerData[] array = playerData;
 			for (int i = 0; i < array.Length; i++)
 			{
-				array[i].Save(syncData.players, SendAllCards);
+				array[i].Save(syncData.players);
 			}
 			syncData.pot = GetScrapInPot();
 		}
@@ -429,7 +474,7 @@ namespace Facepunch.CardGames
 				BasePlayer basePlayer;
 				if (State == CardGameState.NotPlaying)
 				{
-					cardPlayerData.lastActionTime = Time.time;
+					cardPlayerData.lastActionTime = Time.unscaledTime;
 				}
 				else if (cardPlayerData.HasBeenIdleFor(600) && BasePlayer.TryFindByID(cardPlayerData.UserID, out basePlayer))
 				{
@@ -463,7 +508,7 @@ namespace Facepunch.CardGames
 
 		protected abstract void SubStartRound();
 
-		protected abstract void SubReceivedInputFromPlayer(CardPlayerData playerData, int input, int value);
+		protected abstract void SubReceivedInputFromPlayer(CardPlayerData playerData, int input, int value, bool countAsAction);
 
 		protected abstract int SubGetAvailableInputsForPlayer(CardPlayerData playerData);
 
@@ -490,7 +535,7 @@ namespace Facepunch.CardGames
 						basePlayer.metabolism.ApplyChange(MetabolismAttribute.Type.Hydration, 2f, 0f);
 					}
 				}
-				cardPlayerData.LeaveCurrentRound(false);
+				cardPlayerData.LeaveCurrentRound(true, false);
 			}
 			Owner.SendNetworkUpdate();
 			Owner.Invoke(InvokeStartNewRound, TimeBetweenRounds);
@@ -507,28 +552,33 @@ namespace Facepunch.CardGames
 				{
 					array[i].LeaveGame();
 				}
+				SyncAllLocalPlayerCards();
 				Owner.SendNetworkUpdate();
 			}
 		}
 
-		public void ReceivedInputFromPlayer(BasePlayer player, int input, int value = 0)
+		public void ReceivedInputFromPlayer(BasePlayer player, int input, bool countAsAction, int value = 0)
 		{
-			CardPlayerData cardPlayer;
-			if (TryGetCardPlayerData(player, out cardPlayer))
+			if (!(player == null))
 			{
-				ReceivedInputFromPlayer(cardPlayer, input, value);
+				player.ResetInputIdleTime();
+				CardPlayerData cardPlayer;
+				if (TryGetCardPlayerData(player, out cardPlayer))
+				{
+					ReceivedInputFromPlayer(cardPlayer, input, countAsAction, value);
+				}
 			}
 		}
 
-		protected void ReceivedInputFromPlayer(CardPlayerData pData, int input, int value = 0, bool playerInitiated = true)
+		protected void ReceivedInputFromPlayer(CardPlayerData pData, int input, bool countAsAction, int value = 0, bool playerInitiated = true)
 		{
-			if (HasRoundInProgress && pData != null)
+			if (HasGameInProgress && pData != null)
 			{
 				if (playerInitiated)
 				{
 					pData.lastActionTime = Time.unscaledTime;
 				}
-				SubReceivedInputFromPlayer(pData, input, value);
+				SubReceivedInputFromPlayer(pData, input, value, countAsAction);
 				for (int i = 0; i < playerData.Length; i++)
 				{
 					playerData[i].availableInputs = SubGetAvailableInputsForPlayer(playerData[i]);
@@ -548,19 +598,6 @@ namespace Facepunch.CardGames
 		protected void ServerPlaySound(CardGameSounds.SoundType type)
 		{
 			Owner.ClientRPC(null, "ClientPlaySound", (int)type);
-		}
-
-		public void GetPlayersInRound(List<CardPlayerData> activePlayers)
-		{
-			activePlayers.Clear();
-			CardPlayerData[] array = playerData;
-			foreach (CardPlayerData cardPlayerData in array)
-			{
-				if (cardPlayerData.HasUserInCurrentRound)
-				{
-					activePlayers.Add(cardPlayerData);
-				}
-			}
 		}
 
 		public void GetConnectionsInGame(List<Connection> connections)

@@ -34,7 +34,7 @@ public class ResourceEntity : BaseEntity
 		if (base.isServer)
 		{
 			DecorComponent[] components = PrefabAttribute.server.FindAll<DecorComponent>(prefabID);
-			DecorComponentEx.ApplyDecorComponentsScaleOnly(base.transform, components);
+			base.transform.ApplyDecorComponentsScaleOnly(components);
 		}
 	}
 

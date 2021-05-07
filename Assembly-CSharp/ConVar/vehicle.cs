@@ -5,8 +5,8 @@ namespace ConVar
 	[Factory("vehicle")]
 	public class vehicle : ConsoleSystem
 	{
-		[Help("how long until boat corpses despawn")]
 		[ServerVar]
+		[Help("how long until boat corpses despawn")]
 		public static float boat_corpse_seconds = 300f;
 
 		[ServerVar(Help = "If true, trains always explode when destroyed, and hitting a barrier always destroys the train immediately. Default: false")]
@@ -22,7 +22,7 @@ namespace ConVar
 		public static void swapseats(Arg arg)
 		{
 			int targetSeat = 0;
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer == null || basePlayer.SwapSeatCooldown())
 			{
 				return;
@@ -45,7 +45,7 @@ namespace ConVar
 		[ServerVar]
 		public static void fixcars(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer == null)
 			{
 				arg.ReplyWith("Null player.");

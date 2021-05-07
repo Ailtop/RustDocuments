@@ -87,17 +87,17 @@ namespace Rust
 
 		public bool IsMeleeType()
 		{
-			return DamageTypeEx.IsMeleeType(GetMajorityDamageType());
+			return GetMajorityDamageType().IsMeleeType();
 		}
 
 		public bool IsBleedCausing()
 		{
-			return DamageTypeEx.IsBleedCausing(GetMajorityDamageType());
+			return GetMajorityDamageType().IsBleedCausing();
 		}
 
 		public bool IsConsideredAnAttack()
 		{
-			return DamageTypeEx.IsConsideredAnAttack(GetMajorityDamageType());
+			return GetMajorityDamageType().IsConsideredAnAttack();
 		}
 	}
 }

@@ -29,7 +29,7 @@ public class MonumentNode : MonoBehaviour
 		Prefab<MonumentInfo>[] array = Prefab.Load<MonumentInfo>("assets/bundled/prefabs/autospawn/" + ResourceFolder);
 		if (array != null && array.Length != 0)
 		{
-			Prefab<MonumentInfo> random = ArrayEx.GetRandom(array, ref seed);
+			Prefab<MonumentInfo> random = array.GetRandom(ref seed);
 			float height = TerrainMeta.HeightMap.GetHeight(base.transform.position);
 			Vector3 pos = new Vector3(base.transform.position.x, height, base.transform.position.z);
 			Quaternion rot = random.Object.transform.localRotation;

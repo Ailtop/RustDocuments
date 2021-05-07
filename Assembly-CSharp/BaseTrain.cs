@@ -50,8 +50,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	[SerializeField]
 	public TriggerTrainCollisions rearCollisionTrigger;
 
-	[Tooltip("How much impact energy is retained on collisions. 1.0 = 100% retained, 0.0 = 100% loss of energy")]
 	[SerializeField]
+	[Tooltip("How much impact energy is retained on collisions. 1.0 = 100% retained, 0.0 = 100% loss of energy")]
 	public float impactEnergyFraction = 0.75f;
 
 	[SerializeField]

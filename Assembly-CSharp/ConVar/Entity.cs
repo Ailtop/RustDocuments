@@ -75,8 +75,8 @@ namespace ConVar
 			return textTable;
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_entity(Arg args)
 		{
 			string filter = args.GetString(0);
@@ -93,8 +93,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_group(Arg args)
 		{
 			uint filter = args.GetUInt(0);
@@ -111,8 +111,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_status(Arg args)
 		{
 			string filter = args.GetString(0);
@@ -120,11 +120,11 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void find_radius(Arg args)
 		{
-			BasePlayer player = ArgEx.Player(args);
+			BasePlayer player = args.Player();
 			if (!(player == null))
 			{
 				uint filter = args.GetUInt(0, 10u);
@@ -137,7 +137,7 @@ namespace ConVar
 		[ServerVar]
 		public static void find_self(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if (!(basePlayer == null) && basePlayer.net != null)
 			{
 				uint filter = basePlayer.net.ID;
@@ -182,7 +182,7 @@ namespace ConVar
 		[ServerVar(Name = "spawn")]
 		public static string svspawn(string name, Vector3 pos, Vector3 dir)
 		{
-			BasePlayer arg = ArgEx.Player(ConsoleSystem.CurrentArgs);
+			BasePlayer arg = ConsoleSystem.CurrentArgs.Player();
 			if (string.IsNullOrEmpty(name))
 			{
 				return "No entity name provided";
@@ -223,7 +223,7 @@ namespace ConVar
 		[ServerVar(Name = "spawnitem")]
 		public static string svspawnitem(string name, Vector3 pos)
 		{
-			BasePlayer arg = ArgEx.Player(ConsoleSystem.CurrentArgs);
+			BasePlayer arg = ConsoleSystem.CurrentArgs.Player();
 			if (string.IsNullOrEmpty(name))
 			{
 				return "No entity name provided";
@@ -260,7 +260,7 @@ namespace ConVar
 		[ServerVar]
 		public static void spawnlootfrom(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			string @string = args.GetString(0, string.Empty);
 			int @int = args.GetInt(1, 1);
 			Vector3 vector = args.GetVector3(1, basePlayer ? basePlayer.CenterPoint() : Vector3.zero);

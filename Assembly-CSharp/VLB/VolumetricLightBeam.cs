@@ -6,10 +6,10 @@ using UnityEngine.Serialization;
 
 namespace VLB
 {
-	[ExecuteInEditMode]
-	[DisallowMultipleComponent]
 	[SelectionBase]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
+	[DisallowMultipleComponent]
+	[ExecuteInEditMode]
 	public class VolumetricLightBeam : MonoBehaviour
 	{
 		public bool colorFromLight = true;
@@ -25,8 +25,8 @@ namespace VLB
 		[Range(0f, 1f)]
 		public float alphaInside = 1f;
 
-		[FormerlySerializedAs("alpha")]
 		[Range(0f, 1f)]
+		[FormerlySerializedAs("alpha")]
 		public float alphaOutside = 1f;
 
 		public BlendingMode blendingMode;
@@ -352,7 +352,7 @@ namespace VLB
 		public bool IsColliderHiddenByDynamicOccluder(Collider collider)
 		{
 			Debug.Assert(collider, "You should pass a valid Collider to VLB.VolumetricLightBeam.IsColliderHiddenByDynamicOccluder");
-			if (!Utils.IsValid(m_PlaneWS))
+			if (!m_PlaneWS.IsValid())
 			{
 				return false;
 			}
@@ -373,7 +373,7 @@ namespace VLB
 			{
 				return -1f;
 			}
-			Vector2 normalized = new Vector2(Utils.xy(posOS).magnitude, posOS.z + coneApexOffsetZ).normalized;
+			Vector2 normalized = new Vector2(posOS.xy().magnitude, posOS.z + coneApexOffsetZ).normalized;
 			return Mathf.Clamp((Mathf.Abs(Mathf.Sin(coneAngle * ((float)Math.PI / 180f) / 2f)) - Mathf.Abs(normalized.x)) / 0.1f, -1f, 1f);
 		}
 

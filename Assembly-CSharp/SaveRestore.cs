@@ -86,7 +86,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						binaryReader.ReadChar();
 						SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 					}
-					if (binaryReader.ReadUInt32() != 205)
+					if (binaryReader.ReadUInt32() != 212)
 					{
 						if (allowOutOfDateSaves)
 						{
@@ -163,7 +163,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				info.msg = item.Value;
 				key.Spawn();
 				key.Load(info);
-				if (BaseEntityEx.IsValid(key))
+				if (key.IsValid())
 				{
 					num2++;
 					if (stopwatch.Elapsed.TotalMilliseconds > 2000.0)
@@ -180,7 +180,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				if (!(key2 == null))
 				{
 					RCon.Update();
-					if (BaseEntityEx.IsValid(key2))
+					if (key2.IsValid())
 					{
 						key2.PostServerLoad();
 					}
@@ -216,7 +216,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		for (int i = 0; i < array.Length; i++)
 		{
 			BaseEntity baseEntity = array[i];
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity.IsValid())
 			{
 				baseEntity.GetSaveCache();
 				if (stopwatch.Elapsed.TotalMilliseconds > 2000.0)
@@ -326,7 +326,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			BaseEntity[] array = BaseEntity.saveList.ToArray();
 			foreach (BaseEntity baseEntity in array)
 			{
-				if (baseEntity == null || !BaseEntityEx.IsValid(baseEntity))
+				if (baseEntity == null || !baseEntity.IsValid())
 				{
 					continue;
 				}
@@ -362,7 +362,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			writer.Write((sbyte)82);
 			writer.Write((sbyte)68);
 			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(205u);
+			writer.Write(212u);
 			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 			saveInfo.forDisk = true;
 			if (!AndWait)

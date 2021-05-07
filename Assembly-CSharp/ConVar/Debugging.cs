@@ -22,12 +22,12 @@ namespace ConVar
 		[ServerVar(Help = "Do not damage any items")]
 		public static bool disablecondition = false;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool callbacks = false;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static bool log
 		{
 			get
@@ -40,8 +40,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void renderinfo(Arg arg)
 		{
 			RenderInfo.GenerateReport();
@@ -59,7 +59,7 @@ namespace ConVar
 		[ServerVar(Help = "Takes you in and out of your current network group, causing you to delete and then download all entities in your PVS again")]
 		public static void flushgroup(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null))
 			{
 				basePlayer.net.SwitchGroup(BaseNetworkable.LimboNetworkGroup);
@@ -70,14 +70,14 @@ namespace ConVar
 		[ServerVar(Help = "Break the current held object")]
 		public static void breakheld(Arg arg)
 		{
-			Item activeItem = ArgEx.Player(arg).GetActiveItem();
+			Item activeItem = arg.Player().GetActiveItem();
 			activeItem?.LoseCondition(activeItem.condition * 2f);
 		}
 
 		[ServerVar(Help = "reset all puzzles")]
 		public static void puzzlereset(Arg arg)
 		{
-			if (!(ArgEx.Player(arg) == null))
+			if (!(arg.Player() == null))
 			{
 				PuzzleReset[] array = Object.FindObjectsOfType<PuzzleReset>();
 				Debug.Log("iterating...");
@@ -174,7 +174,7 @@ namespace ConVar
 		public static void breakitem(Arg arg)
 		{
 			string @string = arg.GetString(0);
-			foreach (Item item in ArgEx.Player(arg).inventory.containerMain.itemList)
+			foreach (Item item in arg.Player().inventory.containerMain.itemList)
 			{
 				if (item.info.shortname.Contains(@string, CompareOptions.IgnoreCase) && item.hasCondition)
 				{
@@ -186,33 +186,33 @@ namespace ConVar
 		[ServerVar]
 		public static void refillvitals(Arg arg)
 		{
-			AdjustHealth(ArgEx.Player(arg), 1000f);
-			AdjustCalories(ArgEx.Player(arg), 1000f);
-			AdjustHydration(ArgEx.Player(arg), 1000f);
+			AdjustHealth(arg.Player(), 1000f);
+			AdjustCalories(arg.Player(), 1000f);
+			AdjustHydration(arg.Player(), 1000f);
 		}
 
 		[ServerVar]
 		public static void heal(Arg arg)
 		{
-			AdjustHealth(ArgEx.Player(arg), arg.GetInt(0, 1));
+			AdjustHealth(arg.Player(), arg.GetInt(0, 1));
 		}
 
 		[ServerVar]
 		public static void hurt(Arg arg)
 		{
-			AdjustHealth(ArgEx.Player(arg), -arg.GetInt(0, 1), arg.GetString(1, string.Empty));
+			AdjustHealth(arg.Player(), -arg.GetInt(0, 1), arg.GetString(1, string.Empty));
 		}
 
 		[ServerVar]
 		public static void eat(Arg arg)
 		{
-			AdjustCalories(ArgEx.Player(arg), arg.GetInt(0, 1), arg.GetInt(1, 1));
+			AdjustCalories(arg.Player(), arg.GetInt(0, 1), arg.GetInt(1, 1));
 		}
 
 		[ServerVar]
 		public static void drink(Arg arg)
 		{
-			AdjustHydration(ArgEx.Player(arg), arg.GetInt(0, 1), arg.GetInt(1, 1));
+			AdjustHydration(arg.Player(), arg.GetInt(0, 1), arg.GetInt(1, 1));
 		}
 
 		private static void AdjustHealth(BasePlayer player, float amount, string bone = null)

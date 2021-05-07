@@ -3,8 +3,8 @@ namespace ConVar
 	[Factory("antihack")]
 	public class AntiHack : ConsoleSystem
 	{
-		[Help("report violations to the anti cheat backend")]
 		[ServerVar]
+		[Help("report violations to the anti cheat backend")]
 		public static bool reporting = true;
 
 		[ServerVar]
@@ -19,8 +19,8 @@ namespace ConVar
 		[Help("use antihack to verify model state sent by players")]
 		public static bool modelstate = true;
 
-		[Help("whether or not to force the position on the client")]
 		[ServerVar]
+		[Help("whether or not to force the position on the client")]
 		public static bool forceposition = true;
 
 		[ServerVar]
@@ -31,20 +31,20 @@ namespace ConVar
 		[Help("0 == no enforcement, 1 == kick, 2 == ban (DISABLED)")]
 		public static int enforcementlevel = 1;
 
-		[Help("max allowed client desync, lower value = more false positives")]
 		[ServerVar]
+		[Help("max allowed client desync, lower value = more false positives")]
 		public static float maxdesync = 1f;
 
-		[Help("max allowed client tick interval delta time, lower value = more false positives")]
 		[ServerVar]
+		[Help("max allowed client tick interval delta time, lower value = more false positives")]
 		public static float maxdeltatime = 1f;
 
 		[Help("line of sight sphere cast radius, 0 == raycast")]
 		[ServerVar]
 		public static float losradius = 0f;
 
-		[Help("line of sight directional forgiveness when checking eye or center position")]
 		[ServerVar]
+		[Help("line of sight directional forgiveness when checking eye or center position")]
 		public static float losforgiveness = 0.2f;
 
 		[ServerVar]
@@ -71,16 +71,16 @@ namespace ConVar
 		[Help("0 == disabled, 1 == enabled")]
 		public static int terrain_protection = 1;
 
-		[Help("how many slices to subdivide players into for the terrain check")]
 		[ServerVar]
+		[Help("how many slices to subdivide players into for the terrain check")]
 		public static int terrain_timeslice = 64;
 
 		[ServerVar]
 		[Help("how far to penetrate the terrain before violating")]
 		public static float terrain_padding = 2f;
 
-		[ServerVar]
 		[Help("violation penalty to hand out when terrain is detected")]
+		[ServerVar]
 		public static float terrain_penalty = 0f;
 
 		[ServerVar]
@@ -103,36 +103,36 @@ namespace ConVar
 		[ServerVar]
 		public static float noclip_margin = 0.09f;
 
-		[ServerVar]
 		[Help("collider backtracking when checking for noclipping")]
+		[ServerVar]
 		public static float noclip_backtracking = 0.01f;
 
-		[ServerVar]
 		[Help("movement curve step size, lower value = less false positives")]
+		[ServerVar]
 		public static float noclip_stepsize = 0.1f;
 
-		[ServerVar]
 		[Help("movement curve max steps, lower value = more false positives")]
+		[ServerVar]
 		public static int noclip_maxsteps = 15;
 
-		[ServerVar]
 		[Help("0 == disabled, 1 == simple, 2 == advanced")]
+		[ServerVar]
 		public static int speedhack_protection = 2;
 
-		[ServerVar]
 		[Help("whether or not to reject movement when speedhack is detected")]
+		[ServerVar]
 		public static bool speedhack_reject = true;
 
-		[Help("violation penalty to hand out when speedhack is detected")]
 		[ServerVar]
+		[Help("violation penalty to hand out when speedhack is detected")]
 		public static float speedhack_penalty = 0f;
 
-		[Help("speed threshold to assume speedhacking, lower value = more false positives")]
 		[ServerVar]
+		[Help("speed threshold to assume speedhacking, lower value = more false positives")]
 		public static float speedhack_forgiveness = 2f;
 
-		[Help("speed threshold to assume speedhacking, lower value = more false positives")]
 		[ServerVar]
+		[Help("speed threshold to assume speedhacking, lower value = more false positives")]
 		public static float speedhack_forgiveness_inertia = 10f;
 
 		[ServerVar]
@@ -143,12 +143,12 @@ namespace ConVar
 		[Help("0 == disabled, 1 == client, 2 == capsule, 3 == curve")]
 		public static int flyhack_protection = 3;
 
-		[Help("whether or not to reject movement when flyhack is detected")]
 		[ServerVar]
+		[Help("whether or not to reject movement when flyhack is detected")]
 		public static bool flyhack_reject = false;
 
-		[Help("violation penalty to hand out when flyhack is detected")]
 		[ServerVar]
+		[Help("violation penalty to hand out when flyhack is detected")]
 		public static float flyhack_penalty = 100f;
 
 		[Help("distance threshold to assume flyhacking, lower value = more false positives")]
@@ -159,12 +159,12 @@ namespace ConVar
 		[Help("distance threshold to assume flyhacking, lower value = more false positives")]
 		public static float flyhack_forgiveness_vertical_inertia = 10f;
 
-		[ServerVar]
 		[Help("distance threshold to assume flyhacking, lower value = more false positives")]
+		[ServerVar]
 		public static float flyhack_forgiveness_horizontal = 1.5f;
 
-		[Help("distance threshold to assume flyhacking, lower value = more false positives")]
 		[ServerVar]
+		[Help("distance threshold to assume flyhacking, lower value = more false positives")]
 		public static float flyhack_forgiveness_horizontal_inertia = 10f;
 
 		[ServerVar]
@@ -179,16 +179,16 @@ namespace ConVar
 		[Help("movement curve step size, lower value = less false positives")]
 		public static float flyhack_stepsize = 0.1f;
 
-		[Help("movement curve max steps, lower value = more false positives")]
 		[ServerVar]
+		[Help("movement curve max steps, lower value = more false positives")]
 		public static int flyhack_maxsteps = 15;
 
 		[ServerVar]
 		[Help("0 == disabled, 1 == speed, 2 == speed + entity, 3 == speed + entity + LOS, 4 == speed + entity + LOS + trajectory, 5 == speed + entity + LOS + trajectory + update, 6 == speed + entity + LOS + trajectory + tickhistory")]
 		public static int projectile_protection = 6;
 
-		[ServerVar]
 		[Help("violation penalty to hand out when projectile hack is detected")]
+		[ServerVar]
 		public static float projectile_penalty = 0f;
 
 		[ServerVar]
@@ -199,24 +199,24 @@ namespace ConVar
 		[Help("projectile server frames to include in delay, lower value = more false positives")]
 		public static float projectile_serverframes = 2f;
 
-		[ServerVar]
 		[Help("projectile client frames to include in delay, lower value = more false positives")]
+		[ServerVar]
 		public static float projectile_clientframes = 2f;
 
-		[ServerVar]
 		[Help("projectile trajectory forgiveness, lower value = more false positives")]
+		[ServerVar]
 		public static float projectile_trajectory = 1f;
 
-		[ServerVar]
 		[Help("projectile penetration angle change, lower value = more false positives")]
+		[ServerVar]
 		public static float projectile_anglechange = 60f;
 
 		[ServerVar]
 		[Help("projectile penetration velocity change, lower value = more false positives")]
 		public static float projectile_velocitychange = 1.1f;
 
-		[ServerVar]
 		[Help("projectile desync forgiveness, lower value = more false positives")]
+		[ServerVar]
 		public static float projectile_desync = 1f;
 
 		[ServerVar]
@@ -227,12 +227,12 @@ namespace ConVar
 		[Help("whether or not to include terrain in the projectile LOS checks")]
 		public static bool projectile_terraincheck = true;
 
-		[ServerVar]
 		[Help("0 == disabled, 1 == initiator, 2 == initiator + target, 3 == initiator + target + LOS, 4 == initiator + target + LOS + tickhistory")]
+		[ServerVar]
 		public static int melee_protection = 4;
 
-		[Help("violation penalty to hand out when melee hack is detected")]
 		[ServerVar]
+		[Help("violation penalty to hand out when melee hack is detected")]
 		public static float melee_penalty = 0f;
 
 		[ServerVar]
@@ -247,8 +247,8 @@ namespace ConVar
 		[Help("melee client frames to include in delay, lower value = more false positives")]
 		public static float melee_clientframes = 2f;
 
-		[ServerVar]
 		[Help("whether or not to include terrain in the melee LOS checks")]
+		[ServerVar]
 		public static bool melee_terraincheck = true;
 
 		[ServerVar]
@@ -279,8 +279,8 @@ namespace ConVar
 		[Help("whether or not to include terrain in the build LOS checks")]
 		public static bool build_terraincheck = true;
 
-		[ServerVar]
 		[Help("0 == silent, 1 == print max violation, 2 == print nonzero violation, 3 == print any violation")]
+		[ServerVar]
 		public static int debuglevel = 1;
 	}
 }

@@ -169,7 +169,7 @@ namespace CompanionServer
 						_003C_003Ec__DisplayClass19_.message.Connection.Close();
 						break;
 					default:
-						requestHandler.SendError(Util.ToErrorCode(validationResult));
+						requestHandler.SendError(validationResult.ToErrorCode());
 						break;
 					case ValidationResult.Success:
 						requestHandler.Execute();

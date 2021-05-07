@@ -32,8 +32,8 @@ namespace Rust.Modular
 		[SerializeField]
 		public int accelerationBoostSlots;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public int topSpeedBoostSlots;
 
 		[SerializeField]

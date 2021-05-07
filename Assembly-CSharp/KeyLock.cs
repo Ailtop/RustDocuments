@@ -235,8 +235,8 @@ public class KeyLock : BaseLock
 		return !IsLocked();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Unlock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && HasLockPermission(rpc.player))
@@ -294,7 +294,7 @@ public class KeyLock : BaseLock
 	public void LockLock(BasePlayer player)
 	{
 		SetFlag(Flags.Locked, true);
-		if (BaseEntityEx.IsValid(player))
+		if (player.IsValid())
 		{
 			player.GiveAchievement("LOCK_LOCK");
 		}

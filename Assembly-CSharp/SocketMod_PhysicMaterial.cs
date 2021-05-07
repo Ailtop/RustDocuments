@@ -11,7 +11,7 @@ public class SocketMod_PhysicMaterial : SocketMod
 		RaycastHit hitInfo;
 		if (Physics.Raycast(place.position + place.rotation.eulerAngles.normalized * 0.5f, -place.rotation.eulerAngles.normalized, out hitInfo, 1f, 27328512, QueryTriggerInteraction.Ignore))
 		{
-			foundMaterial = ColliderEx.GetMaterialAt(hitInfo.collider, hitInfo.point);
+			foundMaterial = hitInfo.collider.GetMaterialAt(hitInfo.point);
 			PhysicMaterial[] validMaterials = ValidMaterials;
 			for (int i = 0; i < validMaterials.Length; i++)
 			{

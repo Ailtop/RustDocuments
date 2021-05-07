@@ -10,7 +10,7 @@ public class ApplyTerrainModifiers : MonoBehaviour
 		{
 			modifiers = PrefabAttribute.server.FindAll<TerrainModifier>(component.prefabID);
 		}
-		TerrainModifierEx.ApplyTerrainModifiers(base.transform, modifiers);
+		base.transform.ApplyTerrainModifiers(modifiers);
 		GameManager.Destroy(this);
 	}
 }

@@ -109,7 +109,7 @@ public abstract class DeployVolume : PrefabAttribute
 			{
 				return true;
 			}
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(list[i]);
+			BaseEntity baseEntity = list[i].ToBaseEntity();
 			bool flag = false;
 			if (baseEntity != null)
 			{

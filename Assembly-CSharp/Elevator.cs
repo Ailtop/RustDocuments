@@ -155,8 +155,12 @@ public class Elevator : IOEntity, IFlagNotify
 			OnLiftCalledWhenAtTargetFloor();
 			return false;
 		}
-		OnMoveBegin();
 		Vector3 worldSpaceFloorPosition = GetWorldSpaceFloorPosition(targetFloor);
+		if (!GamePhysics.LineOfSight(liftEntity.transform.position, worldSpaceFloorPosition, 2097152))
+		{
+			return false;
+		}
+		OnMoveBegin();
 		Vector3 vector = base.transform.InverseTransformPoint(worldSpaceFloorPosition);
 		timeToTravel = TimeToTravelDistance(Mathf.Abs(liftEntity.transform.localPosition.y - vector.y));
 		LeanTween.moveLocalY(liftEntity.gameObject, vector.y, timeToTravel);

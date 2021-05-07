@@ -75,7 +75,13 @@ public class Drone : RemoteControlEntity
 
 	public override bool RequiresMouse => true;
 
-	protected override bool PositionTickFixedTime => true;
+	public override bool PositionTickFixedTime
+	{
+		protected get
+		{
+			return true;
+		}
+	}
 
 	public override void UserInput(InputState inputState, BasePlayer player)
 	{

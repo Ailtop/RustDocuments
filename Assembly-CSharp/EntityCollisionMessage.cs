@@ -8,7 +8,7 @@ public class EntityCollisionMessage : EntityComponent<BaseEntity>
 		{
 			return;
 		}
-		BaseEntity baseEntity = CollisionEx.GetEntity(collision);
+		BaseEntity baseEntity = collision.GetEntity();
 		if (baseEntity == base.baseEntity)
 		{
 			return;

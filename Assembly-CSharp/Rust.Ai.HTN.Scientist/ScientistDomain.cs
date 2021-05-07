@@ -2134,8 +2134,8 @@ namespace Rust.Ai.HTN.Scientist
 		[Header("Context")]
 		private ScientistContext _context;
 
-		[SerializeField]
 		[Header("Navigation")]
+		[SerializeField]
 		[ReadOnly]
 		private NavMeshAgent _navAgent;
 
@@ -2143,9 +2143,9 @@ namespace Rust.Ai.HTN.Scientist
 		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor

@@ -221,7 +221,7 @@ public static class GizmosUtil
 
 	public static void DrawBounds(Transform transform)
 	{
-		Bounds bounds = TransformEx.GetBounds(transform, true, false);
+		Bounds bounds = transform.GetBounds(true, false);
 		Vector3 lossyScale = transform.lossyScale;
 		Quaternion rotation = transform.rotation;
 		Vector3 pos = transform.position + rotation * Vector3.Scale(lossyScale, bounds.center);

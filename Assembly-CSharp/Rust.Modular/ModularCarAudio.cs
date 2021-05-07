@@ -12,8 +12,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private ModularCarChassisVisuals chassisVisuals;
 
-		[SerializeField]
 		[Header("Engine")]
+		[SerializeField]
 		private SoundDefinition engineStartSound;
 
 		[SerializeField]
@@ -25,8 +25,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private BlendedLoopEngineSound blendedEngineLoops;
 
-		[Header("Skid")]
 		[SerializeField]
+		[Header("Skid")]
 		private SoundDefinition skidSoundLoop;
 
 		[SerializeField]
@@ -41,8 +41,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private float skidMaxSlip = 25f;
 
-		[SerializeField]
 		[Header("Movement & Suspension")]
+		[SerializeField]
 		private SoundDefinition movementStartOneshot;
 
 		[SerializeField]
@@ -72,8 +72,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private float suspensionLurchMinTimeBetweenSounds = 0.25f;
 
-		[Header("Water")]
 		[SerializeField]
+		[Header("Water")]
 		private SoundDefinition waterSplashSoundDef;
 
 		[SerializeField]
@@ -82,12 +82,12 @@ namespace Rust.Modular
 		[SerializeField]
 		private float waterSoundsMaxSpeed = 10f;
 
-		[SerializeField]
 		[Header("Brakes")]
+		[SerializeField]
 		private SoundDefinition brakeSoundDef;
 
-		[Header("Lights")]
 		[SerializeField]
+		[Header("Lights")]
 		private SoundDefinition lightsToggleSound;
 
 		[SerializeField]

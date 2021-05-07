@@ -73,6 +73,11 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			get;
 		}
 
+		public bool Contains(uint uid)
+		{
+			return entityList.Contains(uid);
+		}
+
 		public BaseNetworkable Find(uint uid)
 		{
 			BaseNetworkable val = null;
@@ -179,7 +184,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public bool isSpawned;
 
-	private MemoryStream _NetworkCache;
+	public MemoryStream _NetworkCache;
 
 	public static Queue<MemoryStream> EntityMemoryStreamPool = new Queue<MemoryStream>();
 
@@ -407,7 +412,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		SendNetworkUpdateImmediate(true);
 		if (Rust.Application.isLoading && !Rust.Application.isLoadingSave)
 		{
-			OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+			base.gameObject.SendOnSendNetworkUpdate(this as BaseEntity);
 		}
 	}
 
@@ -456,7 +461,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		}
 		else if (Interface.CallHook("OnEntityKill", this) == null)
 		{
-			OnParentDestroyingEx.BroadcastOnParentDestroying(base.gameObject);
+			base.gameObject.BroadcastOnParentDestroying();
 			DoEntityDestroy();
 			TerminateOnClient(mode);
 			TerminateOnServer();
@@ -567,7 +572,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 				}
 			}
 		}
-		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+		base.gameObject.SendOnSendNetworkUpdate(this as BaseEntity);
 	}
 
 	public void SendNetworkUpdateImmediate(bool justCreated = false)
@@ -594,7 +599,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 				}
 			}
 		}
-		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+		base.gameObject.SendOnSendNetworkUpdate(this as BaseEntity);
 	}
 
 	public void SendNetworkUpdate_Position()
@@ -632,7 +637,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		}
 	}
 
-	private void ToStream(Stream stream, SaveInfo saveInfo)
+	public void ToStream(Stream stream, SaveInfo saveInfo)
 	{
 		using (saveInfo.msg = Facepunch.Pool.Get<ProtoBuf.Entity>())
 		{
@@ -762,7 +767,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public BaseEntity LookupPrefab()
 	{
-		return GameObjectEx.ToBaseEntity(gameManager.FindPrefab(PrefabName));
+		return gameManager.FindPrefab(PrefabName).ToBaseEntity();
 	}
 
 	public bool EqualNetID(BaseNetworkable other)
@@ -910,7 +915,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	{
 		if (prefabID == 0)
 		{
-			Debug.LogError("PrefabID is 0! " + TransformEx.GetRecursiveName(base.transform), base.gameObject);
+			Debug.LogError("PrefabID is 0! " + base.transform.GetRecursiveName(), base.gameObject);
 		}
 		info.msg.baseNetworkable = Facepunch.Pool.Get<ProtoBuf.BaseNetworkable>();
 		info.msg.baseNetworkable.uid = net.ID;
@@ -954,7 +959,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public virtual void PostServerLoad()
 	{
-		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+		base.gameObject.SendOnSendNetworkUpdate(this as BaseEntity);
 	}
 
 	public T ToServer<T>() where T : BaseNetworkable

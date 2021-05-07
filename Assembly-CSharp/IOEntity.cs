@@ -109,8 +109,8 @@ public class IOEntity : BaseCombatEntity
 	[NonSerialized]
 	public int lastResetIndex;
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing io entities per server frame")]
+	[ServerVar]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]
@@ -365,9 +365,9 @@ public class IOEntity : BaseCombatEntity
 		return false;
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server.IsVisible(6f)]
-	[RPC_Server]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -411,7 +411,7 @@ public class IOEntity : BaseCombatEntity
 		while (_processQueue.Count > 0 && UnityEngine.Time.realtimeSinceStartup < realtimeSinceStartup + num && !_processQueue.Peek().HasBlockedUpdatedOutputsThisFrame)
 		{
 			IOEntity iOEntity = _processQueue.Dequeue();
-			if (BaseEntityEx.IsValid(iOEntity))
+			if (iOEntity.IsValid())
 			{
 				iOEntity.UpdateOutputs();
 			}

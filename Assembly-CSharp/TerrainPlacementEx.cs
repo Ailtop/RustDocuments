@@ -17,6 +17,6 @@ public static class TerrainPlacementEx
 
 	public static void ApplyTerrainPlacements(this Transform transform, TerrainPlacement[] placements)
 	{
-		ApplyTerrainPlacements(transform, placements, transform.position, transform.rotation, transform.lossyScale);
+		transform.ApplyTerrainPlacements(placements, transform.position, transform.rotation, transform.lossyScale);
 	}
 }

@@ -254,7 +254,7 @@ public class Construction : PrefabAttribute
 		{
 			return true;
 		}
-		StabilityEntity stabilityEntity = RaycastHitEx.GetEntity(hitInfo) as StabilityEntity;
+		StabilityEntity stabilityEntity = hitInfo.GetEntity() as StabilityEntity;
 		if (stabilityEntity != null && target.entity == stabilityEntity)
 		{
 			return true;
@@ -313,10 +313,10 @@ public class Construction : PrefabAttribute
 	{
 		GameObject gameObject = GameManager.server.CreatePrefab(fullName, Vector3.zero, Quaternion.identity, false);
 		bool flag = UpdatePlacement(gameObject.transform, this, ref target);
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
+		BaseEntity baseEntity = gameObject.ToBaseEntity();
 		if (bNeedsValidPlacement && !flag)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity.IsValid())
 			{
 				baseEntity.Kill();
 			}

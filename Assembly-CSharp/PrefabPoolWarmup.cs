@@ -60,7 +60,7 @@ public class PrefabPoolWarmup
 			return;
 		}
 		GameObject gameObject = GameManager.server.FindPrefab(path);
-		if (gameObject != null && PoolableEx.SupportsPooling(gameObject))
+		if (gameObject != null && gameObject.SupportsPooling())
 		{
 			int serverCount = gameObject.GetComponent<Poolable>().ServerCount;
 			List<GameObject> list = new List<GameObject>();

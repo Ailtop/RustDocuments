@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Facepunch.CardGames
 {
-	public class CardPlayerData : IDisposable, IComparable<CardPlayerData>
+	public class CardPlayerData : IDisposable
 	{
 		public enum CardPlayerState
 		{
@@ -17,15 +17,21 @@ namespace Facepunch.CardGames
 
 		public List<PlayingCard> Cards;
 
+		public readonly int mountIndex;
+
 		private readonly bool isServer;
 
-		private readonly int mountIndex;
-
 		public int availableInputs;
+
+		public int betThisRound;
+
+		public int betThisTurn;
 
 		public int finalScore;
 
 		public float lastActionTime;
+
+		public int remainingToPayOut;
 
 		private Func<int, StorageContainer> getStorage;
 
@@ -51,13 +57,13 @@ namespace Facepunch.CardGames
 
 		private bool IsClient => !isServer;
 
-		public int BetThisRound
+		public bool LeftRoundEarly
 		{
 			get;
 			private set;
 		}
 
-		public int BetThisTurn
+		public bool SendCardDetails
 		{
 			get;
 			private set;
@@ -106,32 +112,12 @@ namespace Facepunch.CardGames
 			return 0;
 		}
 
-		public int CompareTo(CardPlayerData other)
-		{
-			if (other == null)
-			{
-				return -1;
-			}
-			int num = finalScore.CompareTo(other.finalScore);
-			if (num == 0)
-			{
-				return BetThisRound.CompareTo(other.BetThisRound);
-			}
-			return num;
-		}
-
-		public void AddBetAmount(int amount)
-		{
-			BetThisRound += amount;
-			BetThisTurn += amount;
-		}
-
 		public void SetHasActedThisTurn(bool hasActed)
 		{
 			hasActedThisTurn = hasActed;
 			if (!hasActed)
 			{
-				BetThisTurn = 0;
+				betThisTurn = 0;
 			}
 		}
 
@@ -162,10 +148,12 @@ namespace Facepunch.CardGames
 			UserID = 0uL;
 			Cards.Clear();
 			availableInputs = 0;
-			BetThisRound = 0;
-			BetThisTurn = 0;
+			betThisRound = 0;
+			betThisTurn = 0;
 			finalScore = 0;
+			LeftRoundEarly = false;
 			hasActedThisTurn = false;
+			SendCardDetails = false;
 			State = CardPlayerState.None;
 		}
 
@@ -175,25 +163,29 @@ namespace Facepunch.CardGames
 			{
 				State = CardPlayerState.InCurrentRound;
 				Cards.Clear();
-				BetThisRound = 0;
-				BetThisTurn = 0;
+				betThisRound = 0;
+				betThisTurn = 0;
 				finalScore = 0;
+				LeftRoundEarly = false;
 				hasActedThisTurn = false;
+				SendCardDetails = false;
 			}
 		}
 
-		public void LeaveCurrentRound(bool clearCards)
+		public void LeaveCurrentRound(bool clearBets, bool leftRoundEarly)
 		{
 			if (HasUserInCurrentRound)
 			{
-				if (clearCards)
-				{
-					Cards.Clear();
-				}
 				availableInputs = 0;
 				finalScore = 0;
 				hasActedThisTurn = false;
+				if (clearBets)
+				{
+					betThisRound = 0;
+					betThisTurn = 0;
+				}
 				State = CardPlayerState.InGame;
+				LeftRoundEarly = leftRoundEarly;
 			}
 		}
 
@@ -204,8 +196,15 @@ namespace Facepunch.CardGames
 				Cards.Clear();
 				availableInputs = 0;
 				finalScore = 0;
+				SendCardDetails = false;
+				LeftRoundEarly = false;
 				State = CardPlayerState.WantsToPlay;
 			}
+		}
+
+		public void EnableSendingCards()
+		{
+			SendCardDetails = true;
 		}
 
 		public string HandToString()
@@ -223,13 +222,13 @@ namespace Facepunch.CardGames
 			return text;
 		}
 
-		public void Save(List<ProtoBuf.CardTable.CardPlayer> playersMsg, bool sendCards)
+		public void Save(List<ProtoBuf.CardTable.CardPlayer> playersMsg)
 		{
 			ProtoBuf.CardTable.CardPlayer cardPlayer = Pool.Get<ProtoBuf.CardTable.CardPlayer>();
 			cardPlayer.userid = UserID;
-			if (sendCards)
+			cardPlayer.cards = Pool.GetList<int>();
+			if (SendCardDetails)
 			{
-				cardPlayer.cards = Pool.GetList<int>();
 				foreach (PlayingCard card in Cards)
 				{
 					cardPlayer.cards.Add(card.GetIndex());
@@ -238,8 +237,11 @@ namespace Facepunch.CardGames
 			cardPlayer.scrap = GetScrapAmount();
 			cardPlayer.state = (int)State;
 			cardPlayer.availableInputs = availableInputs;
-			cardPlayer.betThisRound = BetThisRound;
-			cardPlayer.betThisTurn = BetThisTurn;
+			cardPlayer.betThisRound = betThisRound;
+			cardPlayer.betThisTurn = betThisTurn;
+			cardPlayer.trueCardCount = Cards.Count;
+			cardPlayer.leftRoundEarly = LeftRoundEarly;
+			cardPlayer.sendCardDetails = SendCardDetails;
 			playersMsg.Add(cardPlayer);
 		}
 	}

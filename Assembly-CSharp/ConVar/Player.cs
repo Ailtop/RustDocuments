@@ -23,7 +23,7 @@ namespace ConVar
 			{
 				return;
 			}
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null))
 			{
 				string strCommand = string.Empty;
@@ -46,15 +46,15 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar(AllowRunFromServer = true)]
 		[ServerUserVar]
+		[ClientVar(AllowRunFromServer = true)]
 		public static void cinematic_stop(Arg arg)
 		{
 			if (!arg.IsServerside)
 			{
 				return;
 			}
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!(basePlayer == null))
 			{
 				string strCommand = string.Empty;
@@ -80,7 +80,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void copyrotation(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic)
 			{
 				uint uInt = arg.GetUInt(0);
@@ -100,7 +100,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void mount(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic)
 			{
 				return;
@@ -116,7 +116,7 @@ namespace ConVar
 			{
 				return;
 			}
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			BaseEntity entity = hitInfo.GetEntity();
 			if (!entity)
 			{
 				return;
@@ -148,7 +148,7 @@ namespace ConVar
 		[ServerVar]
 		public static void gotosleep(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic)
 			{
 				return;
@@ -172,7 +172,7 @@ namespace ConVar
 		[ServerVar]
 		public static void dismount(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic)
 			{
 				uint uInt = arg.GetUInt(0);
@@ -191,7 +191,7 @@ namespace ConVar
 		[ServerVar]
 		public static void swapseat(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic)
 			{
 				return;
@@ -215,7 +215,7 @@ namespace ConVar
 		[ServerVar]
 		public static void wakeup(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic)
 			{
 				BasePlayer basePlayer2 = BasePlayer.FindSleeping(arg.GetUInt(0).ToString());
@@ -229,7 +229,7 @@ namespace ConVar
 		[ServerVar]
 		public static void wakeupall(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer.IsAdmin && !basePlayer.IsDeveloper && !Server.cinematic)
 			{
 				return;
@@ -249,7 +249,7 @@ namespace ConVar
 		[ServerVar]
 		public static void printstats(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer)
 			{
 				return;
@@ -298,7 +298,7 @@ namespace ConVar
 		[ServerVar]
 		public static void printpresence(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			bool flag = (basePlayer.currentTimeCategory & 1) != 0;
 			bool flag2 = (basePlayer.currentTimeCategory & 4) != 0;
 			bool flag3 = (basePlayer.currentTimeCategory & 2) != 0;
@@ -311,7 +311,7 @@ namespace ConVar
 		[ServerVar(Help = "Resets the PlayerState of the given player")]
 		public static void resetstate(Arg args)
 		{
-			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(args, 0);
+			BasePlayer playerOrSleeper = args.GetPlayerOrSleeper(0);
 			if (playerOrSleeper == null)
 			{
 				args.ReplyWith("Player not found");
@@ -325,7 +325,7 @@ namespace ConVar
 		public static void fillwater(Arg arg)
 		{
 			bool num = arg.GetString(0).ToLower() == "salt";
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			ItemDefinition liquidType = ItemManager.FindItemDefinition(num ? "water.salt" : "water");
 			for (int i = 0; i < PlayerBelt.MaxBeltSlots; i++)
 			{
@@ -348,7 +348,7 @@ namespace ConVar
 		public static void createskull(Arg arg)
 		{
 			string text = arg.GetString(0);
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (string.IsNullOrEmpty(text))
 			{
 				text = RandomUsernames.Get(Random.Range(0, 1000));
@@ -361,7 +361,7 @@ namespace ConVar
 		[ServerVar]
 		public static void markhostile(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer != null)
 			{
 				basePlayer.MarkHostileFor();

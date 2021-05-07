@@ -75,7 +75,7 @@ public class GenerateDungeon : ProceduralComponent
 
 	public InfrastructureType ConnectionType = InfrastructureType.Tunnel;
 
-	public int CellSize = 200;
+	public int CellSize = 216;
 
 	public float LinkHeight = 1.5f;
 
@@ -119,7 +119,7 @@ public class GenerateDungeon : ProceduralComponent
 			return;
 		}
 		array4 = array4.OrderByDescending((Prefab<DungeonLink> x) => x.Component.Priority).ToArray();
-		List<MonumentInfo> list = (TerrainMeta.Path ? TerrainMeta.Path.Monuments : null);
+		List<DungeonInfo> list = (TerrainMeta.Path ? TerrainMeta.Path.DungeonEntrances : null);
 		WorldSpaceGrid<Prefab<DungeonCell>> worldSpaceGrid = new WorldSpaceGrid<Prefab<DungeonCell>>(TerrainMeta.Size.x * 2f, CellSize);
 		int[,] array5 = new int[worldSpaceGrid.CellCount, worldSpaceGrid.CellCount];
 		_003C_003Ec__DisplayClass16_0 _003C_003Ec__DisplayClass16_ = default(_003C_003Ec__DisplayClass16_0);
@@ -146,10 +146,10 @@ public class GenerateDungeon : ProceduralComponent
 		_003C_003Ec__DisplayClass16_1 _003C_003Ec__DisplayClass16_2 = default(_003C_003Ec__DisplayClass16_1);
 		_003C_003Ec__DisplayClass16_2 _003C_003Ec__DisplayClass16_3 = default(_003C_003Ec__DisplayClass16_2);
 		_003C_003Ec__DisplayClass16_3 _003C_003Ec__DisplayClass16_4 = default(_003C_003Ec__DisplayClass16_3);
-		foreach (MonumentInfo item in list)
+		foreach (DungeonInfo item in list)
 		{
-			_003C_003Ec__DisplayClass16_2.monument = item;
-			TerrainPathConnect[] componentsInChildren = _003C_003Ec__DisplayClass16_2.monument.GetComponentsInChildren<TerrainPathConnect>(true);
+			_003C_003Ec__DisplayClass16_2.entrance = item;
+			TerrainPathConnect[] componentsInChildren = _003C_003Ec__DisplayClass16_2.entrance.GetComponentsInChildren<TerrainPathConnect>(true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
 				if (terrainPathConnect.Type != ConnectionType)
@@ -172,7 +172,7 @@ public class GenerateDungeon : ProceduralComponent
 				Prefab<DungeonCell> prefab4 = ((cellPos.y < num2) ? worldSpaceGrid[cellPos.x, cellPos.y + 1] : null);
 				Prefab<DungeonCell> prefab5 = null;
 				float num3 = float.MaxValue;
-				ArrayEx.Shuffle(array2, ref seed);
+				array2.Shuffle(ref seed);
 				Prefab<DungeonCell>[] array6 = array2;
 				foreach (Prefab<DungeonCell> prefab6 in array6)
 				{
@@ -181,13 +181,13 @@ public class GenerateDungeon : ProceduralComponent
 						continue;
 					}
 					DungeonLinkBlockVolume componentInChildren = prefab6.Object.GetComponentInChildren<DungeonLinkBlockVolume>();
-					DungeonLinkBlockVolume componentInChildren2 = _003C_003Ec__DisplayClass16_2.monument.GetComponentInChildren<DungeonLinkBlockVolume>();
+					DungeonLinkBlockVolume componentInChildren2 = _003C_003Ec__DisplayClass16_2.entrance.GetComponentInChildren<DungeonLinkBlockVolume>();
 					OBB bounds = componentInChildren.GetBounds(worldSpaceGrid.GridToWorldCoords(cellPos), Quaternion.identity);
-					OBB bounds2 = componentInChildren2.GetBounds(_003C_003Ec__DisplayClass16_2.monument.transform.position, _003C_003Ec__DisplayClass16_2.monument.transform.rotation);
+					OBB bounds2 = componentInChildren2.GetBounds(_003C_003Ec__DisplayClass16_2.entrance.transform.position, _003C_003Ec__DisplayClass16_2.entrance.transform.rotation);
 					if (!bounds.Intersects2D(bounds2))
 					{
-						DungeonLink component = prefab6.Object.GetComponent<DungeonLink>();
-						Vector3 b = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y)) + component.UpSocket.localPosition;
+						DungeonLink componentInChildren3 = prefab6.Object.GetComponentInChildren<DungeonLink>();
+						Vector3 b = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y)) + componentInChildren3.UpSocket.localPosition;
 						float num4 = (terrainPathConnect.transform.position - b).Magnitude2D();
 						if (!(num3 < num4))
 						{
@@ -218,10 +218,10 @@ public class GenerateDungeon : ProceduralComponent
 						_003CProcess_003Eg__AddNode_007C16_1(cellPos.x, cellPos.y + 1, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3, ref _003C_003Ec__DisplayClass16_4);
 					}
 					PathLink pathLink = new PathLink();
-					DungeonLink component2 = _003C_003Ec__DisplayClass16_2.monument.gameObject.GetComponent<DungeonLink>();
-					Vector3 position = _003C_003Ec__DisplayClass16_2.monument.transform.position;
-					Vector3 eulerAngles = _003C_003Ec__DisplayClass16_2.monument.transform.rotation.eulerAngles;
-					DungeonLink component3 = prefab5.Object.GetComponent<DungeonLink>();
+					DungeonLink componentInChildren4 = _003C_003Ec__DisplayClass16_2.entrance.gameObject.GetComponentInChildren<DungeonLink>();
+					Vector3 position = _003C_003Ec__DisplayClass16_2.entrance.transform.position;
+					Vector3 eulerAngles = _003C_003Ec__DisplayClass16_2.entrance.transform.rotation.eulerAngles;
+					DungeonLink componentInChildren5 = prefab5.Object.GetComponentInChildren<DungeonLink>();
 					Vector3 position2 = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y));
 					Vector3 zero = Vector3.zero;
 					pathLink.downwards = new PathLinkSide();
@@ -229,14 +229,14 @@ public class GenerateDungeon : ProceduralComponent
 					pathLink.downwards.origin.position = position;
 					pathLink.downwards.origin.rotation = Quaternion.Euler(eulerAngles);
 					pathLink.downwards.origin.scale = Vector3.one;
-					pathLink.downwards.origin.link = component2;
+					pathLink.downwards.origin.link = componentInChildren4;
 					pathLink.downwards.segments = new List<PathLinkSegment>();
 					pathLink.upwards = new PathLinkSide();
 					pathLink.upwards.origin = new PathLinkSegment();
 					pathLink.upwards.origin.position = position2;
 					pathLink.upwards.origin.rotation = Quaternion.Euler(zero);
 					pathLink.upwards.origin.scale = Vector3.one;
-					pathLink.upwards.origin.link = component3;
+					pathLink.upwards.origin.link = componentInChildren5;
 					pathLink.upwards.segments = new List<PathLinkSegment>();
 					list3.Add(pathLink);
 				}
@@ -348,7 +348,7 @@ public class GenerateDungeon : ProceduralComponent
 				{
 					continue;
 				}
-				ArrayEx.Shuffle(array, ref seed);
+				array.Shuffle(ref seed);
 				Prefab<DungeonCell>[] array6 = array;
 				foreach (Prefab<DungeonCell> prefab7 in array6)
 				{
@@ -432,7 +432,7 @@ public class GenerateDungeon : ProceduralComponent
 				Prefab<DungeonCell>[] array6;
 				if (prefab14 != null && prefab15 != null && prefab14.Component.EastVariant != prefab15.Component.WestVariant)
 				{
-					ArrayEx.Shuffle(array3, ref seed);
+					array3.Shuffle(ref seed);
 					array6 = array3;
 					foreach (Prefab<DungeonCell> prefab17 in array6)
 					{
@@ -449,7 +449,7 @@ public class GenerateDungeon : ProceduralComponent
 				{
 					continue;
 				}
-				ArrayEx.Shuffle(array3, ref seed);
+				array3.Shuffle(ref seed);
 				array6 = array3;
 				foreach (Prefab<DungeonCell> prefab18 in array6)
 				{
@@ -491,13 +491,13 @@ public class GenerateDungeon : ProceduralComponent
 					foreach (Prefab<DungeonLink> prefab20 in array8)
 					{
 						float num15 = SeedRandom.Value(ref seed);
-						DungeonLink component4 = prefab20.Component;
-						if (prevSegment.downType != component4.UpType || (flag2 && component4.DownType != 0))
+						DungeonLink component = prefab20.Component;
+						if (prevSegment.downType != component.UpType || (flag2 && component.DownType != 0))
 						{
 							continue;
 						}
-						Vector3 vector2 = lhs * Quaternion.Inverse(component4.UpSocket.localRotation) * (component4.DownSocket.localPosition - component4.UpSocket.localPosition);
-						int num16 = ((!flag2) ? component4.Priority : 0);
+						Vector3 vector2 = lhs * Quaternion.Inverse(component.UpSocket.localRotation) * (component.DownSocket.localPosition - component.UpSocket.localPosition);
+						int num16 = ((!flag2) ? component.Priority : 0);
 						if (num14 > num16)
 						{
 							continue;
@@ -533,7 +533,7 @@ public class GenerateDungeon : ProceduralComponent
 							}
 							PathLinkSegment prevSegment2 = item4.upwards.prevSegment;
 							Quaternion a5 = prevSegment2.rotation * prevSegment2.upSocket.localRotation;
-							Quaternion b9 = lhs * Quaternion.Inverse(component4.UpSocket.localRotation) * component4.DownSocket.localRotation;
+							Quaternion b9 = lhs * Quaternion.Inverse(component.UpSocket.localRotation) * component.DownSocket.localRotation;
 							if (Quaternion.Angle(a5, b9) > 10f)
 							{
 								continue;
@@ -555,7 +555,7 @@ public class GenerateDungeon : ProceduralComponent
 						{
 							PathLinkSegment prevSegment3 = item4.upwards.prevSegment;
 							Quaternion a6 = prevSegment3.rotation * prevSegment3.upSocket.localRotation;
-							Quaternion b10 = lhs * Quaternion.Inverse(component4.UpSocket.localRotation) * component4.DownSocket.localRotation;
+							Quaternion b10 = lhs * Quaternion.Inverse(component.UpSocket.localRotation) * component.DownSocket.localRotation;
 							if (Quaternion.Angle(a6, b10) > 10f)
 							{
 								continue;
@@ -592,13 +592,13 @@ public class GenerateDungeon : ProceduralComponent
 						foreach (Prefab<DungeonLink> prefab22 in array8)
 						{
 							float num18 = SeedRandom.Value(ref seed);
-							DungeonLink component5 = prefab22.Component;
-							if (prevSegment4.upType != component5.DownType || (flag2 && component5.UpType != 0))
+							DungeonLink component2 = prefab22.Component;
+							if (prevSegment4.upType != component2.DownType || (flag2 && component2.UpType != 0))
 							{
 								continue;
 							}
-							Vector3 vector6 = lhs2 * Quaternion.Inverse(component5.DownSocket.localRotation) * (component5.UpSocket.localPosition - component5.DownSocket.localPosition);
-							int num19 = ((!flag2) ? component5.Priority : 0);
+							Vector3 vector6 = lhs2 * Quaternion.Inverse(component2.DownSocket.localRotation) * (component2.UpSocket.localPosition - component2.DownSocket.localPosition);
+							int num19 = ((!flag2) ? component2.Priority : 0);
 							if (num17 > num19)
 							{
 								continue;
@@ -634,7 +634,7 @@ public class GenerateDungeon : ProceduralComponent
 								}
 								PathLinkSegment prevSegment5 = item4.downwards.prevSegment;
 								Quaternion a10 = prevSegment5.rotation * prevSegment5.downSocket.localRotation;
-								Quaternion b11 = lhs2 * Quaternion.Inverse(component5.DownSocket.localRotation) * component5.UpSocket.localRotation;
+								Quaternion b11 = lhs2 * Quaternion.Inverse(component2.DownSocket.localRotation) * component2.UpSocket.localRotation;
 								if (Quaternion.Angle(a10, b11) > 10f)
 								{
 									continue;
@@ -656,7 +656,7 @@ public class GenerateDungeon : ProceduralComponent
 							{
 								PathLinkSegment prevSegment6 = item4.downwards.prevSegment;
 								Quaternion a11 = prevSegment6.rotation * prevSegment6.downSocket.localRotation;
-								Quaternion b12 = lhs2 * Quaternion.Inverse(component5.DownSocket.localRotation) * component5.UpSocket.localRotation;
+								Quaternion b12 = lhs2 * Quaternion.Inverse(component2.DownSocket.localRotation) * component2.UpSocket.localRotation;
 								if (Quaternion.Angle(a11, b12) > 10f)
 								{
 									continue;

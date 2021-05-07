@@ -20,7 +20,7 @@ public class Gib : ListComponent<Gib>
 
 	public static string GetEffect(PhysicMaterial physicMaterial)
 	{
-		switch (AssetNameCache.GetNameLower(physicMaterial))
+		switch (physicMaterial.GetNameLower())
 		{
 		case "wood":
 			return "assets/bundled/prefabs/fx/building/wood_gib.prefab";

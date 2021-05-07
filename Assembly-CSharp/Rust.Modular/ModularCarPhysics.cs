@@ -4,7 +4,7 @@ namespace Rust.Modular
 {
 	public class ModularCarPhysics
 	{
-		private class ServerWheelData
+		public class ServerWheelData
 		{
 			public ModularCar.Wheel wheel;
 
@@ -39,34 +39,34 @@ namespace Rust.Modular
 			public bool hasThrottleInput;
 		}
 
-		private readonly ServerWheelData[] wheelData;
+		public readonly ServerWheelData[] wheelData;
 
-		private readonly ModularCar modularCar;
+		public readonly ModularCar modularCar;
 
-		private readonly Transform transform;
+		public readonly Transform transform;
 
-		private readonly Rigidbody rBody;
+		public readonly Rigidbody rBody;
 
-		private readonly ModularCarSettings vehicleSettings;
+		public readonly ModularCarSettings vehicleSettings;
 
-		private float speedAngle;
+		public float speedAngle;
 
-		private bool wasSleeping = true;
+		public bool wasSleeping = true;
 
-		private bool hasDriver;
+		public bool hasDriver;
 
-		private bool hadDriver;
+		public bool hadDriver;
 
-		private float lastMovingTime = float.MinValue;
+		public float lastMovingTime = float.MinValue;
 
-		private WheelFrictionCurve zeroFriction = new WheelFrictionCurve
+		public WheelFrictionCurve zeroFriction = new WheelFrictionCurve
 		{
 			stiffness = 0f
 		};
 
-		private Vector3 prevLocalCOM;
+		public Vector3 prevLocalCOM;
 
-		private readonly float midWheelPos;
+		public readonly float midWheelPos;
 
 		private const int NUM_WHEELS = 4;
 
@@ -84,37 +84,37 @@ namespace Rust.Modular
 
 		private const float ICE_GROUND_GRIP = 0.25f;
 
-		private bool slowSpeedExitFlag;
+		public bool slowSpeedExitFlag;
 
 		private const float SLOW_SPEED_EXIT_SPEED = 4f;
 
-		private float dragMod;
+		public float dragMod;
 
-		private float dragModDuration;
+		public float dragModDuration;
 
-		private TimeSince timeSinceDragModSet;
+		public TimeSince timeSinceDragModSet;
 
 		public TimeSince timeSinceWaterCheck;
 
 		public float DriveWheelVelocity
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public float DriveWheelSlip
 		{
 			get;
-			private set;
+			set;
 		}
 
 		public float SteerAngle
 		{
 			get;
-			private set;
+			set;
 		}
 
-		private bool InSlowSpeedExitMode
+		public bool InSlowSpeedExitMode
 		{
 			get
 			{
@@ -260,7 +260,14 @@ namespace Rust.Modular
 					{
 						ServerWheelData serverWheelData = wheelData[j];
 						serverWheelData.wheelCollider.motorTorque = 1E-05f;
-						serverWheelData.wheelCollider.brakeTorque = (flag ? 10000f : 0f);
+						if (flag && modularCar.OnSurface != VehicleTerrainHandler.Surface.Frictionless)
+						{
+							serverWheelData.wheelCollider.brakeTorque = 10000f;
+						}
+						else
+						{
+							serverWheelData.wheelCollider.brakeTorque = 0f;
+						}
 						if (serverWheelData.wheel.steerWheel)
 						{
 							serverWheelData.wheel.wheelCollider.steerAngle = SteerAngle;
@@ -320,7 +327,7 @@ namespace Rust.Modular
 			return (1f - Mathf.InverseLerp(0f, dragModDuration, timeSinceDragModSet)) * dragMod;
 		}
 
-		private void COMChanged()
+		public void COMChanged()
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -330,7 +337,7 @@ namespace Rust.Modular
 			prevLocalCOM = rBody.centerOfMass;
 		}
 
-		private void ComputeSteerAngle(float dt, float speed)
+		public void ComputeSteerAngle(float dt, float speed)
 		{
 			float num = vehicleSettings.maxSteerAngle * modularCar.GetSteerInput();
 			float num2 = Mathf.InverseLerp(0f, vehicleSettings.minSteerLimitSpeed, speed);
@@ -367,12 +374,12 @@ namespace Rust.Modular
 			}
 		}
 
-		private float GetWheelForceDistance(WheelCollider col)
+		public float GetWheelForceDistance(WheelCollider col)
 		{
 			return rBody.centerOfMass.y - transform.InverseTransformPoint(col.transform.position).y + col.radius + (1f - col.suspensionSpring.targetPosition) * col.suspensionDistance;
 		}
 
-		private void UpdateSuspension(ServerWheelData wd)
+		public void UpdateSuspension(ServerWheelData wd)
 		{
 			wd.isGrounded = wd.wheelCollider.GetGroundHit(out wd.hit);
 			wd.origin = wd.wheelColliderTransform.TransformPoint(wd.wheelCollider.center);
@@ -396,7 +403,7 @@ namespace Rust.Modular
 			}
 		}
 
-		private void AdjustHitForces(int groundedWheels, float neutralForcePerWheel)
+		public void AdjustHitForces(int groundedWheels, float neutralForcePerWheel)
 		{
 			float num = neutralForcePerWheel * 0.25f;
 			for (int i = 0; i < 4; i++)
@@ -425,7 +432,7 @@ namespace Rust.Modular
 			}
 		}
 
-		private void UpdateLocalFrame(ServerWheelData wd, float dt)
+		public void UpdateLocalFrame(ServerWheelData wd, float dt)
 		{
 			if (!wd.isGrounded)
 			{
@@ -469,7 +476,7 @@ namespace Rust.Modular
 			wd.localRigForce = a + zero;
 		}
 
-		private void ComputeTireForces(ServerWheelData wd, float speed, float maxDriveForce, float maxSpeed, float throttleInput, float brakeInput, float driveForceMultiplier)
+		public void ComputeTireForces(ServerWheelData wd, float speed, float maxDriveForce, float maxSpeed, float throttleInput, float brakeInput, float driveForceMultiplier)
 		{
 			float absSpeed = Mathf.Abs(speed);
 			float num = (wd.wheel.powerWheel ? throttleInput : 0f);
@@ -506,7 +513,22 @@ namespace Rust.Modular
 			{
 				wd.tireSlip.x = wd.localVelocity.x;
 				wd.tireSlip.y = wd.localVelocity.y - wd.angularVelocity * wd.wheelCollider.radius;
-				float num7 = (modularCar.IsOnRoad() ? 1f : ((!modularCar.IsOnIce()) ? 0.75f : 0.25f));
+				float num7;
+				switch (modularCar.OnSurface)
+				{
+				case VehicleTerrainHandler.Surface.Road:
+					num7 = 1f;
+					break;
+				case VehicleTerrainHandler.Surface.Ice:
+					num7 = 0.25f;
+					break;
+				case VehicleTerrainHandler.Surface.Frictionless:
+					num7 = 0f;
+					break;
+				default:
+					num7 = 0.75f;
+					break;
+				}
 				float num8 = vehicleSettings.tireFriction * wd.downforce * num7;
 				float num9 = 0f;
 				if (!wd.isBraking)
@@ -569,7 +591,7 @@ namespace Rust.Modular
 			wd.angularVelocity = Mathf.Clamp(wd.angularVelocity, 0f, maxSpeed / wd.wheelCollider.radius);
 		}
 
-		private float ComputeDriveForce(float speed, float absSpeed, float demandedForce, float maxForce, float maxForwardSpeed, float driveForceMultiplier)
+		public float ComputeDriveForce(float speed, float absSpeed, float demandedForce, float maxForce, float maxForwardSpeed, float driveForceMultiplier)
 		{
 			float num = ((speed >= 0f) ? maxForwardSpeed : (maxForwardSpeed * vehicleSettings.reversePercentSpeed));
 			if (absSpeed < num)
@@ -588,7 +610,7 @@ namespace Rust.Modular
 			return num2;
 		}
 
-		private void ComputeOverallForces()
+		public void ComputeOverallForces()
 		{
 			DriveWheelVelocity = 0f;
 			DriveWheelSlip = 0f;
@@ -614,7 +636,7 @@ namespace Rust.Modular
 			}
 		}
 
-		private static float ComputeCombinedSlip(Vector2 localVelocity, Vector2 tireSlip)
+		public static float ComputeCombinedSlip(Vector2 localVelocity, Vector2 tireSlip)
 		{
 			float magnitude = localVelocity.magnitude;
 			if (magnitude > 0.01f)
@@ -626,7 +648,7 @@ namespace Rust.Modular
 			return tireSlip.magnitude;
 		}
 
-		private void ApplyTireForces(ServerWheelData wd)
+		public void ApplyTireForces(ServerWheelData wd)
 		{
 			if (wd.isGrounded)
 			{
@@ -638,7 +660,7 @@ namespace Rust.Modular
 			}
 		}
 
-		private Vector3 GetSidewaysForceAppPoint(ServerWheelData wd, Vector3 contactPoint)
+		public Vector3 GetSidewaysForceAppPoint(ServerWheelData wd, Vector3 contactPoint)
 		{
 			Vector3 result = contactPoint + wd.wheelColliderTransform.up * wd.forceDistance;
 			float num = (wd.wheel.steerWheel ? SteerAngle : 0f);

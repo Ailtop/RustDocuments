@@ -26,7 +26,7 @@ public class CardTable : BaseVehicle
 		public CardTablePlayerStorage GetStorage()
 		{
 			BaseEntity baseEntity = storageInstance.Get(true);
-			if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity != null && baseEntity.IsValid())
 			{
 				return baseEntity as CardTablePlayerStorage;
 			}
@@ -306,7 +306,7 @@ public class CardTable : BaseVehicle
 	public StorageContainer GetPot()
 	{
 		BaseEntity baseEntity = PotInstance.Get(true);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && baseEntity.IsValid())
 		{
 			return baseEntity as StorageContainer;
 		}
@@ -472,8 +472,8 @@ public class CardTable : BaseVehicle
 		return null;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Editor_SpawnTestPlayer(RPCMessage msg)
 	{
 		if (!UnityEngine.Application.isEditor)
@@ -514,8 +514,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Editor_MakeRandomMove(RPCMessage msg)
 	{
 		if (UnityEngine.Application.isEditor)
@@ -524,8 +524,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_Play(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -535,8 +535,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -557,7 +557,7 @@ public class CardTable : BaseVehicle
 	[RPC_Server]
 	private void RPC_PlayerInput(RPCMessage msg)
 	{
-		GameController.ReceivedInputFromPlayer(msg.player, msg.read.Int32(), msg.read.Int32());
+		GameController.ReceivedInputFromPlayer(msg.player, msg.read.Int32(), true, msg.read.Int32());
 	}
 
 	public override void DestroyShared()

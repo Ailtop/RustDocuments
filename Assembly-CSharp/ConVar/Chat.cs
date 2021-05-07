@@ -65,8 +65,8 @@ namespace ConVar
 
 		private const float textVolumeBoost = 0.2f;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled = true;
 
 		public static List<ChatEntry> History = new List<ChatEntry>();
@@ -118,7 +118,7 @@ namespace ConVar
 				arg.ReplyWith("Chat is disabled.");
 				return;
 			}
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (!basePlayer || basePlayer.HasPlayerFlag(BasePlayer.PlayerFlags.ChatMute))
 			{
 				return;
@@ -271,7 +271,7 @@ namespace ConVar
 				{
 					ConsoleNetwork.SendClientCommand(onlineMemberConnections, "chat.add2", 1, userId, text, text3, text2, 1f);
 				}
-				Util.BroadcastTeamChat(playerTeam, userId, text3, text, text2);
+				playerTeam.BroadcastTeamChat(userId, text3, text, text2);
 				return true;
 			}
 			}

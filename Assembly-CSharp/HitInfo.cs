@@ -213,7 +213,7 @@ public class HitInfo
 		Ray ray = new Ray(PointStart, attackNormal);
 		if (ProjectilePrefab == null)
 		{
-			return RayEx.ClosestPoint(ray, position);
+			return ray.ClosestPoint(position);
 		}
 		RaycastHit hit;
 		if (new Sphere(position, ProjectilePrefab.thickness).Trace(ray, out hit))

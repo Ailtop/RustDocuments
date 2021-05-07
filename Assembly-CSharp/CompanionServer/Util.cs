@@ -41,20 +41,34 @@ namespace CompanionServer
 				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindTeam(player.currentTeam);
 				Dictionary<string, string> serverPairingData = GetServerPairingData();
 				serverPairingData.Add("type", "login");
-				if (playerTeam != null)
-				{
-					SendNotification(playerTeam, NotificationChannel.PlayerLoggedIn, player.displayName + " is now online", ConVar.Server.hostname, serverPairingData, player.userID);
-				}
+				serverPairingData.Add("targetId", player.UserIDString);
+				serverPairingData.Add("targetName", player.displayName.Truncate(128));
+				playerTeam?.SendNotification(NotificationChannel.PlayerLoggedIn, player.displayName + " is now online", ConVar.Server.hostname, serverPairingData, player.userID);
 			}
 		}
 
-		public static void SendDeathNotification(BasePlayer player, string killerName)
+		public static void SendDeathNotification(BasePlayer player, BaseEntity killer)
 		{
-			if (!(player == null) && !string.IsNullOrEmpty(killerName))
+			BasePlayer basePlayer;
+			string value;
+			string text;
+			if ((object)(basePlayer = killer as BasePlayer) != null)
+			{
+				value = basePlayer.UserIDString;
+				text = basePlayer.displayName;
+			}
+			else
+			{
+				value = "-1";
+				text = killer.ShortPrefabName;
+			}
+			if (!(player == null) && !string.IsNullOrEmpty(text))
 			{
 				Dictionary<string, string> serverPairingData = GetServerPairingData();
 				serverPairingData.Add("type", "death");
-				NotificationList.SendNotificationTo(player.userID, NotificationChannel.PlayerDied, "You were killed by " + killerName, ConVar.Server.hostname, serverPairingData);
+				serverPairingData.Add("targetId", value);
+				serverPairingData.Add("targetName", text.Truncate(128));
+				NotificationList.SendNotificationTo(player.userID, NotificationChannel.PlayerDied, "You were killed by " + text, ConVar.Server.hostname, serverPairingData);
 			}
 		}
 
@@ -104,7 +118,7 @@ namespace CompanionServer
 			AppBroadcast appBroadcast = Facepunch.Pool.Get<AppBroadcast>();
 			appBroadcast.teamChanged = Facepunch.Pool.Get<AppTeamChanged>();
 			appBroadcast.teamChanged.playerId = player.userID;
-			appBroadcast.teamChanged.teamInfo = AppPlayerExtensions.GetAppTeamInfo(player, player.userID);
+			appBroadcast.teamChanged.teamInfo = player.GetAppTeamInfo(player.userID);
 			Server.Broadcast(new PlayerTarget(player.userID), appBroadcast);
 		}
 
@@ -116,7 +130,7 @@ namespace CompanionServer
 			foreach (ulong member in team.members)
 			{
 				appBroadcast.teamChanged.playerId = member;
-				appBroadcast.teamChanged.teamInfo = AppPlayerExtensions.GetAppTeamInfo(team, member);
+				appBroadcast.teamChanged.teamInfo = team.GetAppTeamInfo(member);
 				Server.Broadcast(new PlayerTarget(member), appBroadcast);
 			}
 			appBroadcast.ShouldPool = true;

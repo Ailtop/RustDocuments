@@ -81,7 +81,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				str = str + "hostname: " + Server.hostname + "\n";
-				str = str + "version : " + 2293 + " secure (secure mode enabled, connected to Steam3)\n";
+				str = str + "version : " + 2301 + " secure (secure mode enabled, connected to Steam3)\n";
 				str = str + "map     : " + Server.level + "\n";
 				str += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -98,7 +98,7 @@ namespace ConVar
 			{
 				try
 				{
-					if (!BaseEntityEx.IsValid(activePlayer))
+					if (!activePlayer.IsValid())
 					{
 						continue;
 					}
@@ -148,7 +148,7 @@ namespace ConVar
 			Action<ulong, string> action = delegate(ulong id, string name)
 			{
 				ServerStatistics.Storage storage = ServerStatistics.Get(id);
-				string text2 = TimeSpanEx.ToShortString(TimeSpan.FromSeconds(storage.Get("time")));
+				string text2 = TimeSpan.FromSeconds(storage.Get("time")).ToShortString();
 				string text3 = storage.Get("kill_player").ToString();
 				string text4 = (storage.Get("deaths") - storage.Get("death_suicide")).ToString();
 				string text5 = storage.Get("death_suicide").ToString();
@@ -168,7 +168,7 @@ namespace ConVar
 				{
 					try
 					{
-						if (BaseEntityEx.IsValid(activePlayer))
+						if (activePlayer.IsValid())
 						{
 							string text = activePlayer.displayName.QuoteSafe();
 							if (@string.Length <= 0 || text.Contains(@string, CompareOptions.IgnoreCase))
@@ -199,7 +199,7 @@ namespace ConVar
 		[ServerVar]
 		public static void killplayer(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+			BasePlayer basePlayer = arg.GetPlayerOrSleeper(0);
 			if (!basePlayer)
 			{
 				basePlayer = BasePlayer.FindBotClosestMatch(arg.GetString(0));
@@ -217,7 +217,7 @@ namespace ConVar
 		[ServerVar]
 		public static void kick(Arg arg)
 		{
-			BasePlayer player = ArgEx.GetPlayer(arg, 0);
+			BasePlayer player = arg.GetPlayer(0);
 			if (!player || player.net == null || player.net.connection == null)
 			{
 				arg.ReplyWith("Player not found");
@@ -242,7 +242,7 @@ namespace ConVar
 		[ServerVar(Help = "ban <player> <reason> [optional duration]")]
 		public static void ban(Arg arg)
 		{
-			BasePlayer player = ArgEx.GetPlayer(arg, 0);
+			BasePlayer player = arg.GetPlayer(0);
 			if (!player || player.net == null || player.net.connection == null)
 			{
 				arg.ReplyWith("Player not found");
@@ -507,7 +507,7 @@ namespace ConVar
 		[ServerVar(Help = "Show user info for players on server in range of the player.")]
 		public static void sleepingusersinrange(Arg arg)
 		{
-			BasePlayer fromPlayer = ArgEx.Player(arg);
+			BasePlayer fromPlayer = arg.Player();
 			if (fromPlayer == null)
 			{
 				return;
@@ -553,7 +553,7 @@ namespace ConVar
 		[ServerVar]
 		public static void mute(Arg arg)
 		{
-			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(arg, 0);
+			BasePlayer playerOrSleeper = arg.GetPlayerOrSleeper(0);
 			if (!playerOrSleeper || playerOrSleeper.net == null || playerOrSleeper.net.connection == null)
 			{
 				arg.ReplyWith("Player not found");
@@ -567,7 +567,7 @@ namespace ConVar
 		[ServerVar]
 		public static void unmute(Arg arg)
 		{
-			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(arg, 0);
+			BasePlayer playerOrSleeper = arg.GetPlayerOrSleeper(0);
 			if (!playerOrSleeper || playerOrSleeper.net == null || playerOrSleeper.net.connection == null)
 			{
 				arg.ReplyWith("Player not found");
@@ -667,7 +667,7 @@ namespace ConVar
 			ulong num = arg.GetUInt64(0, 0uL);
 			if (num == 0L)
 			{
-				BasePlayer player = ArgEx.GetPlayer(arg, 0);
+				BasePlayer player = arg.GetPlayer(0);
 				if (player == null)
 				{
 					return "Player not found";
@@ -699,9 +699,9 @@ namespace ConVar
 			if (!(baseEntity == null) && !(baseEntity is BasePlayer))
 			{
 				string @string = arg.GetString(0);
-				if (ArgEx.Player(arg) != null)
+				if (arg.Player() != null)
 				{
-					Debug.Log("[ENTCMD] " + ArgEx.Player(arg).displayName + "/" + ArgEx.Player(arg).userID + " used *" + @string + "* on ent: " + baseEntity.name);
+					Debug.Log("[ENTCMD] " + arg.Player().displayName + "/" + arg.Player().userID + " used *" + @string + "* on ent: " + baseEntity.name);
 				}
 				switch (@string)
 				{

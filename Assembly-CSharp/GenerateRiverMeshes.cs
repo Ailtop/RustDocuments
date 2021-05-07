@@ -28,7 +28,7 @@ public class GenerateRiverMeshes : ProceduralComponent
 				gameObject.transform.position = item.Position;
 				gameObject.tag = "River";
 				gameObject.layer = 4;
-				GameObjectEx.SetHierarchyGroup(gameObject, river.Name);
+				gameObject.SetHierarchyGroup(river.Name);
 				gameObject.SetActive(false);
 				MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RiverPhysicMaterial;

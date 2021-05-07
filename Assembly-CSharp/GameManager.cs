@@ -77,7 +77,7 @@ public class GameManager
 			gameObject.transform.localScale = scale;
 			if (active)
 			{
-				PoolableEx.AwakeFromInstantiate(gameObject);
+				gameObject.AwakeFromInstantiate();
 			}
 		}
 		return gameObject;
@@ -88,7 +88,7 @@ public class GameManager
 		GameObject gameObject = Instantiate(strPrefab, pos, rot);
 		if ((bool)gameObject && active)
 		{
-			PoolableEx.AwakeFromInstantiate(gameObject);
+			gameObject.AwakeFromInstantiate();
 		}
 		return gameObject;
 	}
@@ -98,7 +98,7 @@ public class GameManager
 		GameObject gameObject = Instantiate(strPrefab, Vector3.zero, Quaternion.identity);
 		if ((bool)gameObject && active)
 		{
-			PoolableEx.AwakeFromInstantiate(gameObject);
+			gameObject.AwakeFromInstantiate();
 		}
 		return gameObject;
 	}
@@ -109,10 +109,10 @@ public class GameManager
 		if ((bool)gameObject)
 		{
 			gameObject.transform.SetParent(parent, false);
-			TransformEx.Identity(gameObject);
+			gameObject.Identity();
 			if (active)
 			{
-				PoolableEx.AwakeFromInstantiate(gameObject);
+				gameObject.AwakeFromInstantiate();
 			}
 		}
 		return gameObject;
@@ -171,7 +171,7 @@ public class GameManager
 
 	public static void Destroy(Component component, float delay = 0f)
 	{
-		if (BaseEntityEx.IsValid(component as BaseEntity))
+		if ((component as BaseEntity).IsValid())
 		{
 			Debug.LogError("Trying to destroy an entity without killing it first: " + component.name);
 		}
@@ -182,7 +182,7 @@ public class GameManager
 	{
 		if ((bool)instance)
 		{
-			if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
+			if (instance.GetComponent<BaseEntity>().IsValid())
 			{
 				Debug.LogError("Trying to destroy an entity without killing it first: " + instance.name);
 			}
@@ -192,7 +192,7 @@ public class GameManager
 
 	public static void DestroyImmediate(Component component, bool allowDestroyingAssets = false)
 	{
-		if (BaseEntityEx.IsValid(component as BaseEntity))
+		if ((component as BaseEntity).IsValid())
 		{
 			Debug.LogError("Trying to destroy an entity without killing it first: " + component.name);
 		}
@@ -201,7 +201,7 @@ public class GameManager
 
 	public static void DestroyImmediate(GameObject instance, bool allowDestroyingAssets = false)
 	{
-		if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
+		if (instance.GetComponent<BaseEntity>().IsValid())
 		{
 			Debug.LogError("Trying to destroy an entity without killing it first: " + instance.name);
 		}
@@ -216,11 +216,11 @@ public class GameManager
 		}
 		using (TimeWarning.New("GameManager.Retire"))
 		{
-			if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
+			if (instance.GetComponent<BaseEntity>().IsValid())
 			{
 				Debug.LogError("Trying to retire an entity without killing it first: " + instance.name);
 			}
-			if (!Rust.Application.isQuitting && ConVar.Pool.enabled && PoolableEx.SupportsPooling(instance))
+			if (!Rust.Application.isQuitting && ConVar.Pool.enabled && instance.SupportsPooling())
 			{
 				pool.Push(instance);
 			}

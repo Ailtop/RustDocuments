@@ -4,8 +4,8 @@ using UnityEngine;
 namespace UnityStandardAssets.CinematicEffects
 {
 	[ExecuteInEditMode]
-	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	[ImageEffectAllowedInSceneView]
+	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -67,8 +67,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("The highest possible exposure value; adjust this value to modify the darkest areas of your level.")]
 			public float max;
 
-			[Tooltip("Speed of linear adaptation. Higher is faster.")]
 			[Min(0f)]
+			[Tooltip("Speed of linear adaptation. Higher is faster.")]
 			public float speed;
 
 			[Tooltip("Displays a luminosity helper in the GameView.")]
@@ -162,8 +162,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Custom lookup texture (strip format, e.g. 256x16).")]
 			public Texture texture;
 
-			[Tooltip("Blending factor.")]
 			[Range(0f, 1f)]
+			[Tooltip("Blending factor.")]
 			public float contribution;
 
 			public static LUTSettings defaultSettings
@@ -215,21 +215,21 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 			public float tint;
 
-			[Range(-0.5f, 0.5f)]
 			[Tooltip("Shift the hue of all colors.")]
+			[Range(-0.5f, 0.5f)]
 			[Space]
 			public float hue;
 
-			[Tooltip("Pushes the intensity of all colors.")]
 			[Range(0f, 2f)]
+			[Tooltip("Pushes the intensity of all colors.")]
 			public float saturation;
 
-			[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
 			[Range(-1f, 1f)]
+			[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
 			public float vibrance;
 
-			[Tooltip("Brightens or darkens all colors.")]
 			[Range(0f, 10f)]
+			[Tooltip("Brightens or darkens all colors.")]
 			public float value;
 
 			[Range(0f, 2f)]
@@ -237,8 +237,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			public float contrast;
 
-			[Tooltip("Contrast gain curve. Controls the steepness of the curve.")]
 			[Range(0.01f, 5f)]
+			[Tooltip("Contrast gain curve. Controls the steepness of the curve.")]
 			public float gain;
 
 			[Range(0.01f, 5f)]
@@ -333,12 +333,12 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Internal LUT precision. \"Normal\" is 256x16, \"High\" is 1024x32. Prefer \"Normal\" on mobile devices.")]
 			public ColorGradingPrecision precision;
 
-			[ColorWheelGroup]
 			[Space]
+			[ColorWheelGroup]
 			public ColorWheelsSettings colorWheels;
 
-			[IndentedGroup]
 			[Space]
+			[IndentedGroup]
 			public BasicsSettings basics;
 
 			[ChannelMixer]
@@ -349,8 +349,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Space]
 			public CurvesSettings curves;
 
-			[Space]
 			[Tooltip("Use dithering to try and minimize color banding in dark areas.")]
+			[Space]
 			public bool useDithering;
 
 			[Tooltip("Displays the generated LUT in the top left corner of the GameView.")]
@@ -387,12 +387,12 @@ namespace UnityStandardAssets.CinematicEffects
 		[SettingsGroup]
 		private TonemappingSettings m_Tonemapping = TonemappingSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

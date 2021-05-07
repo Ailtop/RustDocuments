@@ -20,8 +20,8 @@ namespace Rust.Ai.HTN.Bear
 		[SerializeField]
 		private byte[] _previousWorldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private int _decompositionScore;
 
 		[ReadOnly]

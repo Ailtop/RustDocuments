@@ -17,9 +17,9 @@ public class TriggerBase : BaseMonoBehaviour
 	[NonSerialized]
 	public HashSet<BaseEntity> entityContents;
 
-	public bool HasAnyContents => !CollectionEx.IsNullOrEmpty(contents);
+	public bool HasAnyContents => !contents.IsNullOrEmpty();
 
-	public bool HasAnyEntityContents => !CollectionEx.IsNullOrEmpty(entityContents);
+	public bool HasAnyEntityContents => !entityContents.IsNullOrEmpty();
 
 	public virtual GameObject InterestedInObject(GameObject obj)
 	{
@@ -71,7 +71,7 @@ public class TriggerBase : BaseMonoBehaviour
 	{
 		if (!(obj == null))
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+			BaseEntity baseEntity = obj.ToBaseEntity();
 			if ((bool)baseEntity)
 			{
 				baseEntity.EnterTrigger(this);
@@ -86,7 +86,7 @@ public class TriggerBase : BaseMonoBehaviour
 		{
 			return;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (!baseEntity)
 		{
 			return;
@@ -98,7 +98,7 @@ public class TriggerBase : BaseMonoBehaviour
 			{
 				Debug.LogWarning("Trigger " + ToString() + " contains null object.");
 			}
-			else if (GameObjectEx.ToBaseEntity(content) == baseEntity)
+			else if (content.ToBaseEntity() == baseEntity)
 			{
 				flag = true;
 				break;
@@ -113,7 +113,7 @@ public class TriggerBase : BaseMonoBehaviour
 
 	public void RemoveInvalidEntities()
 	{
-		if (CollectionEx.IsNullOrEmpty(entityContents))
+		if (entityContents.IsNullOrEmpty())
 		{
 			return;
 		}

@@ -36,7 +36,7 @@ public class PlaceDecorWhiteNoise : ProceduralComponent
 			float normZ = TerrainMeta.NormalizeZ(z2);
 			float num2 = SeedRandom.Value(ref seed);
 			float factor = Filter.GetFactor(normX, normZ);
-			Prefab random = ArrayEx.GetRandom(array, ref seed);
+			Prefab random = array.GetRandom(ref seed);
 			if (!(factor * factor < num2))
 			{
 				float height = heightMap.GetHeight(normX, normZ);

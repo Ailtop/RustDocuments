@@ -10,7 +10,7 @@ public struct EntityRef
 	{
 		get
 		{
-			if (BaseEntityEx.IsValid(ent_cached))
+			if (ent_cached.IsValid())
 			{
 				id_cached = ent_cached.net.ID;
 			}
@@ -23,7 +23,7 @@ public struct EntityRef
 			{
 				ent_cached = null;
 			}
-			else if (!BaseEntityEx.IsValid(ent_cached) || ent_cached.net.ID != id_cached)
+			else if (!ent_cached.IsValid() || ent_cached.net.ID != id_cached)
 			{
 				ent_cached = null;
 			}
@@ -37,14 +37,14 @@ public struct EntityRef
 
 	public bool IsValid(bool serverside)
 	{
-		return BaseEntityEx.IsValid(Get(serverside));
+		return Get(serverside).IsValid();
 	}
 
 	public void Set(BaseEntity ent)
 	{
 		ent_cached = ent;
 		id_cached = 0u;
-		if (BaseEntityEx.IsValid(ent_cached))
+		if (ent_cached.IsValid())
 		{
 			id_cached = ent_cached.net.ID;
 		}
@@ -63,7 +63,7 @@ public struct EntityRef
 				Debug.LogWarning("EntityRef: Looking for clientside entities on pure server!");
 			}
 		}
-		if (!BaseEntityEx.IsValid(ent_cached))
+		if (!ent_cached.IsValid())
 		{
 			ent_cached = null;
 		}
@@ -98,7 +98,7 @@ public struct EntityRef<T> where T : BaseEntity
 
 	public bool IsValid(bool serverside)
 	{
-		return BaseEntityEx.IsValid(Get(serverside));
+		return Get(serverside).IsValid();
 	}
 
 	public void Set(T entity)

@@ -25,8 +25,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 		[ReadOnly]
 		private int _decompositionScore;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;
@@ -48,8 +48,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 		[ReadOnly]
 		public AiLocationManager Location;
 
-		[ReadOnly]
 		[Header("Cover")]
+		[ReadOnly]
 		public CoverPointVolume CoverVolume;
 
 		[ReadOnly]

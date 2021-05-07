@@ -242,7 +242,7 @@ public class Deployer : HeldEntity
 			baseEntity.OwnerID = ownerPlayer.userID;
 			baseEntity.Spawn();
 			modDeployable.OnDeployed(baseEntity, ownerPlayer);
-			Interface.CallHook("OnItemDeployed", this, modDeployable);
+			Interface.CallHook("OnItemDeployed", this, modDeployable, baseEntity);
 			UseItemAmount(1);
 		}
 	}

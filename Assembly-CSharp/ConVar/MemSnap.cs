@@ -17,15 +17,15 @@ namespace ConVar
 			return new DirectoryInfo(path).FullName;
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void managed(Arg arg)
 		{
 			MemoryProfiler.TakeSnapshot(NeedProfileFolder() + "/memdump-" + DateTime.Now.ToString("MM-dd-yyyy-h-mm-ss") + ".snap", null, CaptureFlags.ManagedObjects);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void native(Arg arg)
 		{
 			MemoryProfiler.TakeSnapshot(NeedProfileFolder() + "/memdump-" + DateTime.Now.ToString("MM-dd-yyyy-h-mm-ss") + ".snap", null, CaptureFlags.NativeObjects);

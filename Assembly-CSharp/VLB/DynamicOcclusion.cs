@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace VLB
 {
-	[ExecuteInEditMode]
 	[DisallowMultipleComponent]
 	[RequireComponent(typeof(VolumetricLightBeam))]
+	[ExecuteInEditMode]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-dynocclusion/")]
 	public class DynamicOcclusion : MonoBehaviour
 	{
@@ -92,7 +92,7 @@ namespace VLB
 			float num2 = float.MaxValue;
 			for (int i = 0; i < array.Length; i++)
 			{
-				if (!array[i].collider.isTrigger && Utils.GetMaxArea2D(array[i].collider.bounds) >= minOccluderArea && array[i].distance < num2)
+				if (!array[i].collider.isTrigger && array[i].collider.bounds.GetMaxArea2D() >= minOccluderArea && array[i].distance < num2)
 				{
 					num2 = array[i].distance;
 					num = i;
@@ -186,7 +186,7 @@ namespace VLB
 
 		private void SetClippingPlane(Plane planeWS)
 		{
-			planeWS = Utils.TranslateCustom(planeWS, planeWS.normal * planeOffset);
+			planeWS = planeWS.TranslateCustom(planeWS.normal * planeOffset);
 			m_Master.SetClippingPlane(planeWS);
 		}
 

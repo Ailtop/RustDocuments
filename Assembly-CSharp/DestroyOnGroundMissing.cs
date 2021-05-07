@@ -5,7 +5,7 @@ public class DestroyOnGroundMissing : MonoBehaviour, IServerComponent
 {
 	private void OnGroundMissing()
 	{
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(base.gameObject);
+		BaseEntity baseEntity = base.gameObject.ToBaseEntity();
 		if (baseEntity != null && Interface.CallHook("OnEntityGroundMissing", baseEntity) == null)
 		{
 			BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;

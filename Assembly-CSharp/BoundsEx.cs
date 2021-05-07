@@ -50,7 +50,7 @@ public static class BoundsEx
 
 	public static Rect ToCanvasRect(this Bounds b, RectTransform target, Camera cam)
 	{
-		Rect result = ToScreenRect(b, cam);
+		Rect result = b.ToScreenRect(cam);
 		result.min = result.min.ToCanvas(target);
 		result.max = result.max.ToCanvas(target);
 		return result;

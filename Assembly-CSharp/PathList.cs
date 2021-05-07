@@ -180,7 +180,7 @@ public class PathList
 
 	private bool SpawnObject(ref uint seed, Prefab[] prefabs, Vector3 position, Quaternion rotation, SpawnFilter filter = null)
 	{
-		Prefab random = ArrayEx.GetRandom(prefabs, ref seed);
+		Prefab random = prefabs.GetRandom(ref seed);
 		Vector3 pos = position;
 		Quaternion rot = rotation;
 		Vector3 scale = random.Object.transform.localScale;
@@ -613,46 +613,75 @@ public class PathList
 		Vector3 startTangent = Path.GetStartTangent();
 		Vector3 normalized = startTangent.XZ3D().normalized;
 		Vector3 a = rot90 * normalized;
-		Vector3 v = startPoint - a * (num2 + outerPadding + outerFade);
-		Vector3 v2 = startPoint + a * (num2 + outerPadding + outerFade);
+		Vector3 vector = startPoint;
+		Line prev_line = new Line(startPoint, startPoint + startTangent * num);
+		Vector3 vector2 = startPoint - a * (num2 + outerPadding + outerFade);
+		Vector3 vector3 = startPoint + a * (num2 + outerPadding + outerFade);
+		Vector3 vector4 = vector;
+		Vector3 v = startTangent;
+		Line cur_line = prev_line;
+		Vector3 vector5 = vector2;
+		Vector3 vector6 = vector3;
 		float num3 = Path.Length + num;
 		for (float num4 = 0f; num4 < num3; num4 += num)
 		{
-			Vector3 vector = (Spline ? Path.GetPointCubicHermite(num4) : Path.GetPoint(num4));
+			Vector3 vector7 = (Spline ? Path.GetPointCubicHermite(num4 + num) : Path.GetPoint(num4 + num));
+			Vector3 tangent = Path.GetTangent(num4 + num);
+			Line next_line = new Line(vector7, vector7 + tangent * num);
 			float opacity = 1f;
-			float radius = Mathf.Lerp(num2, num2 * randomScale, Noise.Billow(vector.x, vector.z, 2, 0.005f));
+			float radius = Mathf.Lerp(num2, num2 * randomScale, Noise.Billow(vector4.x, vector4.z, 2, 0.005f));
 			if (!Path.Circular)
 			{
-				float a2 = (startPoint - vector).Magnitude2D();
-				float b = (endPoint - vector).Magnitude2D();
+				float a2 = (startPoint - vector4).Magnitude2D();
+				float b = (endPoint - vector4).Magnitude2D();
 				opacity = Mathf.InverseLerp(0f, num2, Mathf.Min(a2, b));
 			}
-			startTangent = Path.GetTangent(num4);
-			normalized = startTangent.XZ3D().normalized;
+			normalized = v.XZ3D().normalized;
 			a = rot90 * normalized;
-			Ray ray = new Ray(vector, startTangent);
-			Vector3 vector2 = vector - a * (radius + outerPadding + outerFade);
-			Vector3 vector3 = vector + a * (radius + outerPadding + outerFade);
-			float yn = TerrainMeta.NormalizeY(vector.y);
-			heightmap.ForEach(v, v2, vector2, vector3, delegate(int x, int z)
+			vector5 = vector4 - a * (radius + outerPadding + outerFade);
+			vector6 = vector4 + a * (radius + outerPadding + outerFade);
+			float yn = TerrainMeta.NormalizeY((vector4.y + vector.y) * 0.5f);
+			heightmap.ForEach(vector2, vector3, vector5, vector6, delegate(int x, int z)
 			{
 				float num5 = heightmap.Coordinate(x);
 				float num6 = heightmap.Coordinate(z);
 				if ((topomap.GetTopology(num5, num6) & Topology) == 0)
 				{
-					Vector3 vector4 = TerrainMeta.Denormalize(new Vector3(num5, yn, num6));
-					Vector3 b2 = RayEx.ClosestPoint(ray, vector4);
-					float value = (vector4 - b2).Magnitude2D();
-					float t = Mathf.InverseLerp(radius + outerPadding + outerFade, radius + outerPadding, value);
-					float t2 = Mathf.InverseLerp(radius - innerPadding, radius - innerPadding - innerFade, value);
-					float num7 = TerrainMeta.NormalizeY(b2.y);
-					t = Mathf.SmoothStep(0f, 1f, t);
-					t2 = Mathf.SmoothStep(0f, 1f, t2);
-					heightmap.SetHeight(x, z, num7 + offset * t2, opacity * t);
+					Vector3 vector8 = TerrainMeta.Denormalize(new Vector3(num5, yn, num6));
+					Vector3 vector9 = prev_line.ClosestPoint2D(vector8);
+					Vector3 vector10 = cur_line.ClosestPoint2D(vector8);
+					Vector3 vector11 = next_line.ClosestPoint2D(vector8);
+					float num7 = (vector8 - vector9).Magnitude2D();
+					float num8 = (vector8 - vector10).Magnitude2D();
+					float num9 = (vector8 - vector11).Magnitude2D();
+					float value = num8;
+					Vector3 vector12 = vector10;
+					if (!(num8 <= num7) || !(num8 <= num9))
+					{
+						if (num7 <= num9)
+						{
+							value = num7;
+							vector12 = vector9;
+						}
+						else
+						{
+							value = num9;
+							vector12 = vector11;
+						}
+					}
+					float num10 = Mathf.InverseLerp(radius + outerPadding + outerFade, radius + outerPadding, value);
+					float t = Mathf.InverseLerp(radius - innerPadding, radius - innerPadding - innerFade, value);
+					float num11 = TerrainMeta.NormalizeY(vector12.y);
+					heightmap.SetHeight(x, z, num11 + Mathf.SmoothStep(0f, offset, t), opacity * num10);
 				}
 			});
-			v = vector2;
-			v2 = vector3;
+			vector = vector4;
+			vector2 = vector5;
+			vector3 = vector6;
+			prev_line = cur_line;
+			vector4 = vector7;
+			v = tangent;
+			cur_line = next_line;
 		}
 	}
 
@@ -697,7 +726,7 @@ public class PathList
 			splatmap.ForEach(v, v2, vector2, vector3, delegate(int x, int z)
 			{
 				Vector3 vector4 = TerrainMeta.Denormalize(new Vector3(splatmap.Coordinate(x), z: splatmap.Coordinate(z), y: yn));
-				Vector3 b2 = RayEx.ClosestPoint(ray, vector4);
+				Vector3 b2 = ray.ClosestPoint(vector4);
 				float value = (vector4 - b2).Magnitude2D();
 				float num5 = Mathf.InverseLerp(radius + outerPadding, radius - innerPadding, value);
 				splatmap.SetSplat(x, z, Splat, num5 * opacity);
@@ -748,7 +777,7 @@ public class PathList
 			topomap.ForEach(v, v2, vector2, vector3, delegate(int x, int z)
 			{
 				Vector3 vector4 = TerrainMeta.Denormalize(new Vector3(topomap.Coordinate(x), z: topomap.Coordinate(z), y: yn));
-				Vector3 b2 = RayEx.ClosestPoint(ray, vector4);
+				Vector3 b2 = ray.ClosestPoint(vector4);
 				float value = (vector4 - b2).Magnitude2D();
 				if (Mathf.InverseLerp(radius + outerPadding, radius - innerPadding, value) * opacity > 0.3f)
 				{
@@ -786,7 +815,7 @@ public class PathList
 			placementmap.ForEach(v, v2, vector2, vector3, delegate(int x, int z)
 			{
 				Vector3 vector4 = TerrainMeta.Denormalize(new Vector3(placementmap.Coordinate(x), z: placementmap.Coordinate(z), y: yn));
-				Vector3 b = RayEx.ClosestPoint(ray, vector4);
+				Vector3 b = ray.ClosestPoint(vector4);
 				if ((vector4 - b).Magnitude2D() <= radius)
 				{
 					placementmap.SetBlocked(x, z);

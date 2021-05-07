@@ -187,7 +187,7 @@ public class Projectile : BaseMonoBehaviour
 
 	public static bool ShouldStopProjectile(RaycastHit hit)
 	{
-		BaseEntity entity = RaycastHitEx.GetEntity(hit);
+		BaseEntity entity = hit.GetEntity();
 		if (entity != null && !entity.ShouldBlockProjectiles())
 		{
 			return false;

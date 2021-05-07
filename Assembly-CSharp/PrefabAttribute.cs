@@ -161,7 +161,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 		if (!bundling)
 		{
 			fullName = name;
-			hierachyName = TransformEx.GetRecursiveName(base.transform);
+			hierachyName = base.transform.GetRecursiveName();
 			prefabID = StringPool.Get(name);
 			instanceID = GetInstanceID();
 			worldPosition = base.transform.position;

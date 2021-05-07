@@ -67,7 +67,7 @@ public static class Vis
 			Collider collider = colBuffer[i];
 			if (!(collider == null) && collider.enabled)
 			{
-				T val = GameObjectEx.ToBaseEntity(collider) as T;
+				T val = collider.ToBaseEntity() as T;
 				if (!((Object)val == (Object)null))
 				{
 					list.Add(val);
@@ -86,7 +86,7 @@ public static class Vis
 			{
 				continue;
 			}
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider);
+			BaseEntity baseEntity = collider.ToBaseEntity();
 			if (!(baseEntity == null))
 			{
 				T component = baseEntity.GetComponent<T>();
@@ -152,7 +152,7 @@ public static class Vis
 			Collider collider = colBuffer[i];
 			if (!(collider == null) && collider.enabled)
 			{
-				T val = GameObjectEx.ToBaseEntity(collider) as T;
+				T val = collider.ToBaseEntity() as T;
 				if (!((Object)val == (Object)null))
 				{
 					list.Add(val);
@@ -171,7 +171,7 @@ public static class Vis
 			{
 				continue;
 			}
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider);
+			BaseEntity baseEntity = collider.ToBaseEntity();
 			if (!(baseEntity == null))
 			{
 				T component = baseEntity.GetComponent<T>();
@@ -207,7 +207,7 @@ public static class Vis
 			Collider collider = colBuffer[i];
 			if (!(collider == null) && collider.enabled)
 			{
-				T val = GameObjectEx.ToBaseEntity(collider) as T;
+				T val = collider.ToBaseEntity() as T;
 				if (!((Object)val == (Object)null))
 				{
 					list.Add(val);

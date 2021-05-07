@@ -149,9 +149,9 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -601,7 +601,7 @@ public class BaseMelee : AttackEntity
 			for (int j = 0; j < obj.Count; j++)
 			{
 				RaycastHit hit = obj[j];
-				BaseEntity entity = RaycastHitEx.GetEntity(hit);
+				BaseEntity entity = hit.GetEntity();
 				if (entity == null || (entity != null && (entity == ownerPlayer || entity.EqualNetID(ownerPlayer))) || (entity != null && entity.isClient) || entity.Categorize() == ownerPlayer.Categorize())
 				{
 					continue;
@@ -622,7 +622,7 @@ public class BaseMelee : AttackEntity
 				}
 				else
 				{
-					obj2.HitMaterial = StringPool.Get((RaycastHitEx.GetCollider(hit).sharedMaterial != null) ? AssetNameCache.GetName(RaycastHitEx.GetCollider(hit).sharedMaterial) : "generic");
+					obj2.HitMaterial = StringPool.Get((hit.GetCollider().sharedMaterial != null) ? hit.GetCollider().sharedMaterial.GetName() : "generic");
 				}
 				ServerUse_OnHit(obj2);
 				Effect.server.ImpactEffect(obj2);

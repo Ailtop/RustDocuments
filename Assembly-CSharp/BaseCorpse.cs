@@ -77,7 +77,7 @@ public class BaseCorpse : BaseCombatEntity
 	{
 		base.Save(info);
 		info.msg.corpse = Facepunch.Pool.Get<Corpse>();
-		if (BaseEntityEx.IsValid(parentEnt))
+		if (parentEnt.IsValid())
 		{
 			info.msg.corpse.parentID = parentEnt.net.ID;
 		}

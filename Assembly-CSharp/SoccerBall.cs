@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class SoccerBall : BaseCombatEntity
 {
-	[SerializeField]
 	[Header("Soccer Ball")]
+	[SerializeField]
 	private Rigidbody rigidBody;
 
 	[SerializeField]
@@ -23,7 +23,7 @@ public class SoccerBall : BaseCombatEntity
 
 	protected void OnCollisionEnter(Collision collision)
 	{
-		if (!base.isClient && collision.impulse.magnitude > 0f && collision.collider.attachedRigidbody != null && !ComponentEx.HasComponent<SoccerBall>(collision.collider.attachedRigidbody))
+		if (!base.isClient && collision.impulse.magnitude > 0f && collision.collider.attachedRigidbody != null && !collision.collider.attachedRigidbody.HasComponent<SoccerBall>())
 		{
 			Vector3 a = rigidBody.position - collision.collider.attachedRigidbody.position;
 			float magnitude = collision.impulse.magnitude;

@@ -168,7 +168,7 @@ public class SantaSleigh : BaseEntity
 	[ServerVar]
 	public static void drop(ConsoleSystem.Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer = arg.Player();
 		if ((bool)basePlayer)
 		{
 			Debug.Log("Santa Inbound");

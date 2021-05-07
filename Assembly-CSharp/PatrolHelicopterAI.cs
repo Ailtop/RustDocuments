@@ -253,7 +253,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		float num = Vector3.Distance(position, vector);
 		Vector3 normalized = (position - vector).normalized;
 		RaycastHit hitInfo;
-		if (GamePhysics.Trace(new Ray(vector + normalized * 5f, normalized), 0f, out hitInfo, num * 1.1f, 1218652417) && GameObjectEx.ToBaseEntity(hitInfo.collider.gameObject) == ply)
+		if (GamePhysics.Trace(new Ray(vector + normalized * 5f, normalized), 0f, out hitInfo, num * 1.1f, 1218652417) && hitInfo.collider.gameObject.ToBaseEntity() == ply)
 		{
 			return true;
 		}
@@ -522,7 +522,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			targetPos = hitInfo.point;
 			if ((bool)hitInfo.collider)
 			{
-				BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+				BaseEntity entity = hitInfo.GetEntity();
 				if ((bool)entity && entity != helicopterBase)
 				{
 					BaseCombatEntity baseCombatEntity = entity as BaseCombatEntity;

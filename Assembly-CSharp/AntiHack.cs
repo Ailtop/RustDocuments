@@ -348,7 +348,7 @@ public static class AntiHack
 					int num = UnityEngine.Physics.OverlapCapsuleNonAlloc(vector2, vector3, radius2, buffer, 131072, QueryTriggerInteraction.Ignore);
 					for (int i = 0; i < num; i++)
 					{
-						BasePlayer basePlayer = GameObjectEx.ToBaseEntity(buffer[i].gameObject) as BasePlayer;
+						BasePlayer basePlayer = buffer[i].gameObject.ToBaseEntity() as BasePlayer;
 						if (!(basePlayer == null) && !(basePlayer == ply) && !basePlayer.isInAir && !basePlayer.isOnPlayer && !basePlayer.TriggeredAntiHack() && !basePlayer.IsSleeping())
 						{
 							ply.isOnPlayer = true;

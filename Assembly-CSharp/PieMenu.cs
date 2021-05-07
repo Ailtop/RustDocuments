@@ -122,7 +122,7 @@ public class PieMenu : UIBehaviour
 		canvasGroup.blocksRaycasts = false;
 		IsOpen = false;
 		isClosing = true;
-		GameObjectEx.SetChildComponentsEnabled<TMP_Text>(base.gameObject, false);
+		base.gameObject.SetChildComponentsEnabled<TMP_Text>(false);
 	}
 
 	public void Clear()
@@ -151,7 +151,7 @@ public class PieMenu : UIBehaviour
 		LeanTween.alphaCanvas(GetComponent<CanvasGroup>(), 1f, 0.1f).setEase(LeanTweenType.easeOutCirc);
 		scaleTarget.transform.localScale = Vector3.one * 1.5f;
 		LeanTween.scale(scaleTarget, Vector3.one, 0.1f).setEase(LeanTweenType.easeOutBounce);
-		GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, true);
+		Instance.gameObject.SetChildComponentsEnabled<TMP_Text>(true);
 	}
 
 	protected override void OnEnable()
@@ -202,7 +202,7 @@ public class PieMenu : UIBehaviour
 			LeanTween.cancel(scaleTarget);
 			LeanTween.alphaCanvas(GetComponent<CanvasGroup>(), 0f, 0.2f).setEase(LeanTweenType.easeOutCirc);
 			LeanTween.scale(scaleTarget, Vector3.one * (success ? 1.5f : 0.5f), 0.2f).setEase(LeanTweenType.easeOutCirc);
-			GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, false);
+			Instance.gameObject.SetChildComponentsEnabled<TMP_Text>(false);
 			IsOpen = false;
 		}
 	}
@@ -328,12 +328,12 @@ public class PieMenu : UIBehaviour
 					}
 					if (selectedOption != null)
 					{
-						UIEx.RebuildHackUnity2019(selectedOption.option.imageIcon);
+						selectedOption.option.imageIcon.RebuildHackUnity2019();
 					}
 					selectedOption = options[i];
 					if (selectedOption != null)
 					{
-						UIEx.RebuildHackUnity2019(selectedOption.option.imageIcon);
+						selectedOption.option.imageIcon.RebuildHackUnity2019();
 					}
 				}
 			}

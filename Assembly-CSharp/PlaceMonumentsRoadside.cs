@@ -95,8 +95,8 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			{
 				return;
 			}
-			ArrayEx.Shuffle(array, seed);
-			ArrayEx.BubbleSort(array);
+			array.Shuffle(seed);
+			array.BubbleSort();
 			SpawnInfoGroup[] array2 = new SpawnInfoGroup[array.Length];
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -167,25 +167,6 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 						}
 						break;
 					}
-					if (road.IsExtraNarrow)
-					{
-						if (road.Start)
-						{
-							MonumentInfo monumentInfo = TerrainMeta.Path.FindClosest(TerrainMeta.Path.Monuments, road.Path.GetStartPoint());
-							if (monumentInfo.Type == MonumentType.WaterWell || (monumentInfo.Type == MonumentType.Building && monumentInfo.displayPhrase.token.StartsWith("mining_quarry")) || (monumentInfo.Type == MonumentType.Radtown && monumentInfo.displayPhrase.token.StartsWith("swamp")))
-							{
-								continue;
-							}
-						}
-						if (road.End)
-						{
-							MonumentInfo monumentInfo2 = TerrainMeta.Path.FindClosest(TerrainMeta.Path.Monuments, road.Path.GetEndPoint());
-							if (monumentInfo2.Type == MonumentType.WaterWell || (monumentInfo2.Type == MonumentType.Building && monumentInfo2.displayPhrase.token.StartsWith("mining_quarry")) || (monumentInfo2.Type == MonumentType.Radtown && monumentInfo2.displayPhrase.token.StartsWith("swamp")))
-							{
-								continue;
-							}
-						}
-					}
 					PathInterpolator path = road.Path;
 					float num = 5f;
 					float num2 = 5f;
@@ -243,7 +224,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			{
 				num7 = 0;
 				a.Clear();
-				ArrayEx.Shuffle(array2, ref seed);
+				array2.Shuffle(ref seed);
 				array3 = array2;
 				foreach (SpawnInfoGroup spawnInfoGroup4 in array3)
 				{
@@ -262,7 +243,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 					{
 						SpawnInfo spawnInfo = spawnInfoGroup4.candidates[num13];
 						int num14 = Mathf.Max(MinDistance, prefab4.Component ? prefab4.Component.MinDistance : 0);
-						DistanceInfo distanceInfo = GetDistanceInfo(a, spawnInfo.position);
+						DistanceInfo distanceInfo = GetDistanceInfo(a, spawnInfo.position, prefab4.Component);
 						if (distanceInfo.minDistanceSameType < (float)num14)
 						{
 							continue;
@@ -324,7 +305,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 		}
 	}
 
-	public DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 pos)
+	private DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 pos, MonumentInfo info)
 	{
 		DistanceInfo result = default(DistanceInfo);
 		result.minDistanceDifferentType = float.MaxValue;
@@ -335,14 +316,17 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 		{
 			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				float sqrMagnitude = (monument.transform.position - pos).sqrMagnitude;
-				if (sqrMagnitude < result.minDistanceDifferentType)
+				if (!info || !info.HasDungeonLink || (!monument.HasDungeonLink && monument.WantsDungeonLink))
 				{
-					result.minDistanceDifferentType = sqrMagnitude;
-				}
-				if (sqrMagnitude > result.maxDistanceDifferentType)
-				{
-					result.maxDistanceDifferentType = sqrMagnitude;
+					float sqrMagnitude = (monument.transform.position - pos).sqrMagnitude;
+					if (sqrMagnitude < result.minDistanceDifferentType)
+					{
+						result.minDistanceDifferentType = sqrMagnitude;
+					}
+					if (sqrMagnitude > result.maxDistanceDifferentType)
+					{
+						result.maxDistanceDifferentType = sqrMagnitude;
+					}
 				}
 			}
 			if (result.minDistanceDifferentType != float.MaxValue)
@@ -366,6 +350,36 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				if (sqrMagnitude2 > result.maxDistanceSameType)
 				{
 					result.maxDistanceSameType = sqrMagnitude2;
+				}
+			}
+			if ((bool)info && info.HasDungeonLink)
+			{
+				foreach (MonumentInfo monument2 in TerrainMeta.Path.Monuments)
+				{
+					if (monument2.HasDungeonLink || !monument2.WantsDungeonLink)
+					{
+						float sqrMagnitude3 = (monument2.transform.position - pos).sqrMagnitude;
+						if (sqrMagnitude3 < result.minDistanceSameType)
+						{
+							result.minDistanceSameType = sqrMagnitude3;
+						}
+						if (sqrMagnitude3 > result.maxDistanceSameType)
+						{
+							result.maxDistanceSameType = sqrMagnitude3;
+						}
+					}
+				}
+				foreach (DungeonInfo dungeonEntrance in TerrainMeta.Path.DungeonEntrances)
+				{
+					float sqrMagnitude4 = (dungeonEntrance.transform.position - pos).sqrMagnitude;
+					if (sqrMagnitude4 < result.minDistanceSameType)
+					{
+						result.minDistanceSameType = sqrMagnitude4;
+					}
+					if (sqrMagnitude4 > result.maxDistanceSameType)
+					{
+						result.maxDistanceSameType = sqrMagnitude4;
+					}
 				}
 			}
 			if (result.minDistanceSameType != float.MaxValue)

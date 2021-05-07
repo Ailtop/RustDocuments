@@ -17,7 +17,7 @@ namespace ConVar
 		[ServerVar]
 		public static void quickrespawn(Arg arg)
 		{
-			if (!ArgEx.Player(arg))
+			if (!arg.Player())
 			{
 				return;
 			}

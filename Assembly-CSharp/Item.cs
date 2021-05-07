@@ -466,7 +466,7 @@ public class Item
 			{
 				contents.OnRemovedFromWorld();
 			}
-			if (BaseEntityEx.IsValid(worldEntity))
+			if (worldEntity.IsValid())
 			{
 				worldEntity.Kill();
 			}
@@ -612,7 +612,9 @@ public class Item
 							}
 							slot.amount = num;
 						}
-						return true;
+						bool result = true;
+						Interface.CallHook("OnItemStacked", slot, this, newcontainer);
+						return result;
 					}
 				}
 				if (parent != null)
@@ -804,7 +806,7 @@ public class Item
 			RemoveFromContainer();
 		}
 		BaseEntity baseEntity = GetHeldEntity();
-		if (BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity.IsValid())
 		{
 			Debug.LogWarning("Item's Held Entity not removed!" + info.displayName.english + " -> " + baseEntity, baseEntity);
 		}
@@ -946,7 +948,7 @@ public class Item
 
 	public void SetWorldEntity(BaseEntity ent)
 	{
-		if (!BaseEntityEx.IsValid(ent))
+		if (!ent.IsValid())
 		{
 			worldEnt.Set(null);
 			MarkDirty();
@@ -979,7 +981,7 @@ public class Item
 
 	public void SetHeldEntity(BaseEntity ent)
 	{
-		if (!BaseEntityEx.IsValid(ent))
+		if (!ent.IsValid())
 		{
 			this.heldEntity.Set(null);
 			MarkDirty();
@@ -992,7 +994,7 @@ public class Item
 			}
 			this.heldEntity.Set(ent);
 			MarkDirty();
-			if (BaseEntityEx.IsValid(ent))
+			if (ent.IsValid())
 			{
 				HeldEntity heldEntity = ent as HeldEntity;
 				if (heldEntity != null)

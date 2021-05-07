@@ -32,7 +32,7 @@ public class SkeletonProperties : ScriptableObject
 			return;
 		}
 		List<BoneProperty> list = bones.ToList();
-		foreach (Transform child in TransformEx.GetAllChildren(boneReference.transform))
+		foreach (Transform child in boneReference.transform.GetAllChildren())
 		{
 			if (list.All((BoneProperty x) => x.bone != child.gameObject))
 			{

@@ -324,8 +324,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 	}
 
-	[BaseEntity.RPC_Server]
 	[BaseEntity.RPC_Server.FromOwner]
+	[BaseEntity.RPC_Server]
 	private void MoveItem(BaseEntity.RPCMessage msg)
 	{
 		uint num = msg.read.UInt32();

@@ -272,7 +272,9 @@ public class ComputerStation : BaseMountable
 			BaseEntity baseEntity = currentlyControllingEnt.Get(true);
 			if ((bool)baseEntity)
 			{
-				baseEntity.GetComponent<IRemoteControllable>()?.StopControl();
+				IRemoteControllable component2 = baseEntity.GetComponent<IRemoteControllable>();
+				component2?.StopControl();
+				Interface.CallHook("OnBookmarkControlEnded", this, player, component2);
 			}
 			player.net.SwitchSecondaryGroup(baseNetworkable.net.group);
 			currentlyControllingEnt.uid = baseNetworkable.net.ID;

@@ -35,7 +35,7 @@ public class GraveyardFence : SimpleBuildingBlock
 			{
 				if (collider.CompareTag("Usable Auxiliary"))
 				{
-					BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider.gameObject);
+					BaseEntity baseEntity = collider.gameObject.ToBaseEntity();
 					if (!(baseEntity == null) && !EqualNetID(baseEntity) && collider != boxCollider)
 					{
 						boxCollider.gameObject.SetActive(false);

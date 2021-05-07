@@ -215,8 +215,8 @@ public class BaseOven : StorageContainer, ISplashable
 		Interface.CallHook("OnFuelConsumed", this, fuel, burnable);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void SVSwitch(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

@@ -2,15 +2,19 @@ using UnityEngine;
 
 public class VehicleTerrainHandler
 {
+	public enum Surface
+	{
+		Default,
+		Road,
+		Snow,
+		Ice,
+		Sand,
+		Frictionless
+	}
+
 	public string CurGroundPhysicsMatName;
 
-	public bool IsOnRoad;
-
-	public bool IsOnSnowOrIce;
-
-	public bool IsOnSand;
-
-	public bool IsOnIce;
+	public Surface OnSurface;
 
 	public bool IsGrounded;
 
@@ -31,6 +35,18 @@ public class VehicleTerrainHandler
 
 	private readonly BaseVehicle vehicle;
 
+	public bool IsOnSnowOrIce
+	{
+		get
+		{
+			if (OnSurface != Surface.Snow)
+			{
+				return OnSurface == Surface.Ice;
+			}
+			return true;
+		}
+	}
+
 	public VehicleTerrainHandler(BaseVehicle vehicle)
 	{
 		this.vehicle = vehicle;
@@ -49,23 +65,44 @@ public class VehicleTerrainHandler
 		timeSinceTerrainCheck = Random.Range(-0.025f, 0.025f);
 		Transform transform = vehicle.transform;
 		RaycastHit hitInfo;
-		if (Physics.Raycast(transform.position + transform.up * 0.5f, -transform.up, out hitInfo, RayLength, 27328512, QueryTriggerInteraction.Ignore))
+		if (Physics.Raycast(transform.position + transform.up * 0.5f, -transform.up, out hitInfo, RayLength, 27328513, QueryTriggerInteraction.Ignore))
 		{
-			CurGroundPhysicsMatName = AssetNameCache.GetNameLower(ColliderEx.GetMaterialAt(hitInfo.collider, hitInfo.point));
-			IsOnSnowOrIce = CurGroundPhysicsMatName == "snow";
-			IsOnSand = CurGroundPhysicsMatName == "sand";
-			IsOnIce = IsOnSnowOrIce && hitInfo.collider.name.ToLower().Contains("ice");
+			CurGroundPhysicsMatName = hitInfo.collider.GetMaterialAt(hitInfo.point).GetNameLower();
+			if (GetOnRoad(CurGroundPhysicsMatName))
+			{
+				OnSurface = Surface.Road;
+			}
+			else if (CurGroundPhysicsMatName == "snow")
+			{
+				if (hitInfo.collider.name.ToLower().Contains("ice"))
+				{
+					OnSurface = Surface.Ice;
+				}
+				else
+				{
+					OnSurface = Surface.Snow;
+				}
+			}
+			else if (CurGroundPhysicsMatName == "sand")
+			{
+				OnSurface = Surface.Sand;
+			}
+			else if (CurGroundPhysicsMatName.Contains("zero friction"))
+			{
+				OnSurface = Surface.Frictionless;
+			}
+			else
+			{
+				OnSurface = Surface.Default;
+			}
 			IsGrounded = true;
 		}
 		else
 		{
 			CurGroundPhysicsMatName = "concrete";
-			IsOnSnowOrIce = false;
-			IsOnSand = false;
-			IsOnIce = false;
+			OnSurface = Surface.Default;
 			IsGrounded = false;
 		}
-		IsOnRoad = GetOnRoad(CurGroundPhysicsMatName);
 	}
 
 	private bool GetOnRoad(string physicMat)

@@ -17,8 +17,8 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int maxthreads = 8;
 
 		[ServerVar(Saved = true)]
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -109,8 +109,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void textures(Arg args)
 		{
 			UnityEngine.Texture[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Texture>();
@@ -124,8 +124,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void colliders(Arg args)
 		{
 			int num = (from x in UnityEngine.Object.FindObjectsOfType<Collider>()
@@ -158,7 +158,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void setinfo(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer)
 			{
 				string @string = args.GetString(0, null);
@@ -173,7 +173,7 @@ namespace ConVar
 		[ServerVar]
 		public static void sleep(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && !basePlayer.IsSleeping() && !basePlayer.IsSpectating() && !basePlayer.IsDead())
 			{
 				basePlayer.StartSleeping();
@@ -183,7 +183,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void kill(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && !basePlayer.IsSpectating() && !basePlayer.IsDead())
 			{
 				if (basePlayer.CanSuicide())
@@ -201,7 +201,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void respawn(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if (!basePlayer)
 			{
 				return;
@@ -228,7 +228,7 @@ namespace ConVar
 		[ServerVar]
 		public static void injure(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && !basePlayer.IsDead())
 			{
 				basePlayer.StartWounded();
@@ -238,7 +238,7 @@ namespace ConVar
 		[ServerVar]
 		public static void spectate(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer)
 			{
 				if (!basePlayer.IsDead())
@@ -257,7 +257,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void respawn_sleepingbag(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if (!basePlayer || !basePlayer.IsDead())
 			{
 				return;
@@ -287,7 +287,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void respawn_sleepingbag_remove(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer)
 			{
 				uint uInt = args.GetUInt(0);
@@ -305,7 +305,7 @@ namespace ConVar
 		[ServerUserVar]
 		public static void status_sv(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer)
 			{
 				args.ReplyWith(basePlayer.GetDebugStatus());
@@ -322,10 +322,10 @@ namespace ConVar
 		{
 			if (args.HasArgs(2))
 			{
-				BasePlayer playerOrSleeperOrBot = ArgEx.GetPlayerOrSleeperOrBot(args, 0);
+				BasePlayer playerOrSleeperOrBot = args.GetPlayerOrSleeperOrBot(0);
 				if ((bool)playerOrSleeperOrBot && playerOrSleeperOrBot.IsAlive())
 				{
-					BasePlayer playerOrSleeperOrBot2 = ArgEx.GetPlayerOrSleeperOrBot(args, 1);
+					BasePlayer playerOrSleeperOrBot2 = args.GetPlayerOrSleeperOrBot(1);
 					if ((bool)playerOrSleeperOrBot2 && playerOrSleeperOrBot2.IsAlive())
 					{
 						playerOrSleeperOrBot.Teleport(playerOrSleeperOrBot2);
@@ -333,10 +333,10 @@ namespace ConVar
 				}
 				return;
 			}
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && basePlayer.IsAlive())
 			{
-				BasePlayer playerOrSleeperOrBot3 = ArgEx.GetPlayerOrSleeperOrBot(args, 0);
+				BasePlayer playerOrSleeperOrBot3 = args.GetPlayerOrSleeperOrBot(0);
 				if ((bool)playerOrSleeperOrBot3 && playerOrSleeperOrBot3.IsAlive())
 				{
 					basePlayer.Teleport(playerOrSleeperOrBot3);
@@ -347,7 +347,7 @@ namespace ConVar
 		[ServerVar]
 		public static void teleport2me(Arg args)
 		{
-			BasePlayer playerOrSleeperOrBot = ArgEx.GetPlayerOrSleeperOrBot(args, 0);
+			BasePlayer playerOrSleeperOrBot = args.GetPlayerOrSleeperOrBot(0);
 			if (playerOrSleeperOrBot == null)
 			{
 				args.ReplyWith("Player or bot not found");
@@ -358,7 +358,7 @@ namespace ConVar
 				args.ReplyWith("Target is not alive");
 				return;
 			}
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && basePlayer.IsAlive())
 			{
 				playerOrSleeperOrBot.Teleport(basePlayer);
@@ -368,7 +368,7 @@ namespace ConVar
 		[ServerVar]
 		public static void teleportany(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && basePlayer.IsAlive())
 			{
 				basePlayer.Teleport(args.GetString(0), false);
@@ -378,7 +378,7 @@ namespace ConVar
 		[ServerVar]
 		public static void teleportpos(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && basePlayer.IsAlive())
 			{
 				basePlayer.Teleport(args.GetVector3(0, Vector3.zero));
@@ -388,7 +388,7 @@ namespace ConVar
 		[ServerVar]
 		public static void teleportlos(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer && basePlayer.IsAlive())
 			{
 				Ray ray = basePlayer.eyes.HeadRay();
@@ -408,8 +408,8 @@ namespace ConVar
 		[ServerVar]
 		public static void teleport2owneditem(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
-			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(arg, 0);
+			BasePlayer basePlayer = arg.Player();
+			BasePlayer playerOrSleeper = arg.GetPlayerOrSleeper(0);
 			ulong result;
 			if (playerOrSleeper != null)
 			{
@@ -435,7 +435,7 @@ namespace ConVar
 		[ServerVar]
 		public static void teleport2marker(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer.ServerCurrentMapNote == null)
 			{
 				arg.ReplyWith("You don't have a marker set");
@@ -451,7 +451,7 @@ namespace ConVar
 		[ServerVar]
 		public static void teleport2death(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if (basePlayer.ServerCurrentDeathNote == null)
 			{
 				arg.ReplyWith("You don't have a current death note!");
@@ -460,8 +460,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -495,7 +495,7 @@ namespace ConVar
 		[ServerVar]
 		public static void breakitem(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
+			BasePlayer basePlayer = args.Player();
 			if ((bool)basePlayer)
 			{
 				Item activeItem = basePlayer.GetActiveItem();
@@ -503,14 +503,14 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();
 			textTable.AddColumn("realm");
 			textTable.AddColumn("group");
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				foreach (Group item in basePlayer.net.subscriber.subscribed)

@@ -74,7 +74,13 @@ public class NPCPlayer : BasePlayer
 		}
 	}
 
-	protected override float PositionTickRate => 0.1f;
+	public override float PositionTickRate
+	{
+		protected get
+		{
+			return 0.1f;
+		}
+	}
 
 	public virtual bool IsOnNavMeshLink
 	{

@@ -10,7 +10,7 @@ namespace ConVar
 		[ServerVar]
 		public static void drop(Arg arg)
 		{
-			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer basePlayer = arg.Player();
 			if ((bool)basePlayer)
 			{
 				Debug.Log("Supply Drop Inbound");
@@ -26,7 +26,7 @@ namespace ConVar
 		[ServerVar]
 		public static void call(Arg arg)
 		{
-			if ((bool)ArgEx.Player(arg))
+			if ((bool)arg.Player())
 			{
 				Debug.Log("Supply Drop Inbound");
 				BaseEntity baseEntity = GameManager.server.CreateEntity("assets/prefabs/npc/cargo plane/cargo_plane.prefab");

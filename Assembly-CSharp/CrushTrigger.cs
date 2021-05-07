@@ -4,6 +4,8 @@ public class CrushTrigger : TriggerHurt
 {
 	public bool includeNPCs = true;
 
+	public bool requireCentreBelowPosition;
+
 	internal override GameObject InterestedInObject(GameObject obj)
 	{
 		obj = base.InterestedInObject(obj);
@@ -11,7 +13,7 @@ public class CrushTrigger : TriggerHurt
 		{
 			return null;
 		}
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+		BaseEntity baseEntity = obj.ToBaseEntity();
 		if (baseEntity == null)
 		{
 			return null;
@@ -25,5 +27,14 @@ public class CrushTrigger : TriggerHurt
 			return null;
 		}
 		return baseEntity.gameObject;
+	}
+
+	protected override bool CanHurt(BaseCombatEntity ent)
+	{
+		if (requireCentreBelowPosition && ent.CenterPoint().y > base.transform.position.y)
+		{
+			return false;
+		}
+		return base.CanHurt(ent);
 	}
 }
