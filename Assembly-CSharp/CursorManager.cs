@@ -1,54 +1,25 @@
+using UI;
 using UnityEngine;
 
-public class CursorManager : SingletonComponent<CursorManager>
+public class CursorManager : MonoBehaviour
 {
-	private static int iHoldOpen;
+	private const float _timeToHide = 3f;
 
-	private static int iPreviousOpen;
+	private float _remainTimeToHide;
 
 	private void Update()
 	{
-		if (!(SingletonComponent<CursorManager>.Instance != this))
-		{
-			if (iHoldOpen == 0 && iPreviousOpen == 0)
-			{
-				SwitchToGame();
-			}
-			else
-			{
-				SwitchToUI();
-			}
-			iPreviousOpen = iHoldOpen;
-			iHoldOpen = 0;
-		}
-	}
-
-	public void SwitchToGame()
-	{
-		if (Cursor.lockState != CursorLockMode.Locked)
-		{
-			Cursor.lockState = CursorLockMode.Locked;
-		}
-		if (Cursor.visible)
+		if (!Input.mousePresent)
 		{
 			Cursor.visible = false;
+			return;
 		}
-	}
-
-	private void SwitchToUI()
-	{
-		if (Cursor.lockState != 0)
+		if (Mathf.Abs(Input.GetAxis("Mouse X")) > 0f || Mathf.Abs(Input.GetAxis("Mouse Y")) > 0f || Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
 		{
-			Cursor.lockState = CursorLockMode.None;
+			_remainTimeToHide = 3f;
 		}
-		if (!Cursor.visible)
-		{
-			Cursor.visible = true;
-		}
-	}
-
-	public static void HoldOpen(bool cursorVisible = false)
-	{
-		iHoldOpen++;
+		_remainTimeToHide -= Time.unscaledDeltaTime;
+		Dialogue current = Dialogue.GetCurrent();
+		Cursor.visible = _remainTimeToHide > 0f || (current != null && !(current is NpcConversationBody));
 	}
 }
