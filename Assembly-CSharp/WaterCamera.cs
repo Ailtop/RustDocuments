@@ -1,9 +1,9 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-[RequireComponent(typeof(CommandBufferManager))]
 [RequireComponent(typeof(PostOpaqueDepth))]
+[RequireComponent(typeof(CommandBufferManager))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
 public class WaterCamera : MonoBehaviour
 {
 }

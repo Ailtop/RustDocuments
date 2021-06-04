@@ -52,9 +52,9 @@ public class ThrownWeapon : AttackEntity
 							DoDrop(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in DoDrop");
 					}
 				}
@@ -88,9 +88,9 @@ public class ThrownWeapon : AttackEntity
 							DoThrow(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in DoThrow");
 					}
 				}
@@ -189,8 +189,8 @@ public class ThrownWeapon : AttackEntity
 		return Mathf.Sqrt(0.5f * y3 * magnitude * magnitude / (magnitude2 * (magnitude2 * y - y2 * magnitude)));
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoThrow(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())
@@ -263,8 +263,8 @@ public class ThrownWeapon : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoDrop(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())

@@ -162,15 +162,15 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[Header("Spawn")]
 	public SpawnSettings spawnSettings;
 
-	[Header("Fuel")]
 	[SerializeField]
+	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
 	public Transform fuelStoragePoint;
 
-	[Header("Audio/FX")]
 	[SerializeField]
+	[Header("Audio/FX")]
 	public ModularCarAudio carAudio;
 
 	[SerializeField]
@@ -281,9 +281,9 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 							RPC_OpenFuel(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_OpenFuel");
 					}
 				}
@@ -312,7 +312,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		}
 		lastEngineOnTime = UnityEngine.Time.realtimeSinceStartup;
 		allCarsList.Add(this);
-		InvokeRandomized(UpdateNetwork, 0f, 0.15f, 0.02f);
+		InvokeRandomized(UpdateClients, 0f, 0.15f, 0.02f);
 		InvokeRandomized(DecayTick, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
 	}
 
@@ -781,11 +781,10 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		return groundedCOMMultiplier;
 	}
 
-	public void UpdateNetwork()
+	public void UpdateClients()
 	{
 		if (HasDriver())
 		{
-			SendNetworkUpdate();
 			byte b = (byte)((GetThrottleInput() + 1f) * 7f);
 			byte b2 = (byte)(GetBrakeInput() * 15f);
 			ClientRPC(null, "ModularCarUpdate", SteerAngle, (byte)(b + (b2 << 4)), DriveWheelVelocity, (byte)(GetFuelFraction() * 255f));

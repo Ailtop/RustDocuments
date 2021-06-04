@@ -181,9 +181,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_DeselectedLootItem(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_DeselectedLootItem");
 					}
 				}
@@ -221,9 +221,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_OpenEditing(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in RPC_OpenEditing");
 					}
 				}
@@ -261,9 +261,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_RepairItem(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in RPC_RepairItem");
 					}
 				}
@@ -301,9 +301,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_RequestAddLock(msg5);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in RPC_RequestAddLock");
 					}
 				}
@@ -341,9 +341,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_RequestCarKey(msg6);
 						}
 					}
-					catch (Exception ex5)
+					catch (Exception exception5)
 					{
-						Debug.LogException(ex5);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in RPC_RequestCarKey");
 					}
 				}
@@ -381,9 +381,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_RequestRemoveLock(msg7);
 						}
 					}
-					catch (Exception ex6)
+					catch (Exception exception6)
 					{
-						Debug.LogException(ex6);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in RPC_RequestRemoveLock");
 					}
 				}
@@ -417,9 +417,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_SelectedLootItem(msg8);
 						}
 					}
-					catch (Exception ex7)
+					catch (Exception exception7)
 					{
-						Debug.LogException(ex7);
+						Debug.LogException(exception7);
 						player.Kick("RPC Error in RPC_SelectedLootItem");
 					}
 				}
@@ -461,9 +461,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_StartDestroyingChassis(msg9);
 						}
 					}
-					catch (Exception ex8)
+					catch (Exception exception8)
 					{
-						Debug.LogException(ex8);
+						Debug.LogException(exception8);
 						player.Kick("RPC Error in RPC_StartDestroyingChassis");
 					}
 				}
@@ -505,9 +505,9 @@ public class ModularCarGarage : ContainerIOEntity
 							RPC_StopDestroyingChassis(msg10);
 						}
 					}
-					catch (Exception ex9)
+					catch (Exception exception9)
 					{
-						Debug.LogException(ex9);
+						Debug.LogException(exception9);
 						player.Kick("RPC Error in RPC_StopDestroyingChassis");
 					}
 				}
@@ -743,9 +743,9 @@ public class ModularCarGarage : ContainerIOEntity
 		SetFlag(Flags.Reserved6, false);
 	}
 
+	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.MaxDistance(3f)]
 	public void RPC_RepairItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -759,14 +759,14 @@ public class ModularCarGarage : ContainerIOEntity
 			}
 			else
 			{
-				Debug.LogError(((object)this).GetType().Name + ": Couldn't get item to repair, with ID: " + num);
+				Debug.LogError(GetType().Name + ": Couldn't get item to repair, with ID: " + num);
 			}
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server]
 	public void RPC_OpenEditing(RPCMessage msg)
 	{
 		//IL_0016: Incompatible stack heights: 0 vs 1
@@ -777,8 +777,8 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_SelectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -811,8 +811,8 @@ public class ModularCarGarage : ContainerIOEntity
 		Interface.CallHook("OnVehicleModuleSelected", vehicleItem, this, player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_DeselectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -827,8 +827,8 @@ public class ModularCarGarage : ContainerIOEntity
 	}
 
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_RequestAddLock(RPCMessage msg)
 	{
 		if (!HasOccupant || carOccupant.carLock.HasALock)
@@ -848,9 +848,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_RequestRemoveLock(RPCMessage msg)
 	{
 		if (HasOccupant && carOccupant.carLock.HasALock)
@@ -874,10 +874,10 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void RPC_StartDestroyingChassis(RPCMessage msg)
 	{
 		if (!carOccupant.HasAnyModules)
@@ -887,10 +887,10 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_StopDestroyingChassis(RPCMessage msg)
 	{
 		StopChassisDestroy();

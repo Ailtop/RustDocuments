@@ -43,9 +43,9 @@ public class SteamInventory : EntityComponent<BasePlayer>
 							UpdateSteamInventory(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in UpdateSteamInventory");
 					}
 				}
@@ -72,8 +72,8 @@ public class SteamInventory : EntityComponent<BasePlayer>
 		return false;
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private async Task UpdateSteamInventory(BaseEntity.RPCMessage msg)
 	{
 		byte[] array = msg.read.BytesWithSize();

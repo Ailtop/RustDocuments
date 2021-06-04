@@ -27,7 +27,7 @@ public class HairSet : ScriptableObject
 	public void Process(PlayerModelHair playerModelHair, HairDyeCollection dyeCollection, HairDye dye, MaterialPropertyBlock block)
 	{
 		List<SkinnedMeshRenderer> obj = Pool.GetList<SkinnedMeshRenderer>();
-		playerModelHair.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true, obj);
+		playerModelHair.gameObject.GetComponentsInChildren(true, obj);
 		foreach (SkinnedMeshRenderer item in obj)
 		{
 			if (!(item.sharedMesh == null) && !(item.sharedMaterial == null))

@@ -9,15 +9,15 @@ namespace Rust.Ai.HTN.Bear
 	{
 		public delegate void WorldStateChangedEvent(BearContext context, Facts fact, byte oldValue, byte newValue);
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
 		private byte[] _worldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private byte[] _previousWorldState;
 
 		[ReadOnly]

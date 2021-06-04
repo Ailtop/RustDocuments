@@ -126,7 +126,7 @@ public class MonumentNavMesh : FacepunchBehaviour, IServerComponent
 		}
 		else
 		{
-			((MonoBehaviour)this).StartCoroutine(enumerator);
+			StartCoroutine(enumerator);
 		}
 		if (!AiManager.nav_wait)
 		{

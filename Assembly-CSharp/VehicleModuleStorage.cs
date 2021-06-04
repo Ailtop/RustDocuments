@@ -56,9 +56,9 @@ public class VehicleModuleStorage : VehicleModuleSeating
 							RPC_Open(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_Open");
 					}
 				}
@@ -178,8 +178,8 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -192,7 +192,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 			}
 			else
 			{
-				Debug.LogError(((object)this).GetType().Name + ": No container component found.");
+				Debug.LogError(GetType().Name + ": No container component found.");
 			}
 		}
 	}

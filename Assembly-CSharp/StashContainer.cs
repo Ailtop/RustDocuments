@@ -58,9 +58,9 @@ public class StashContainer : StorageContainer
 							RPC_HideStash(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_HideStash");
 					}
 				}
@@ -94,9 +94,9 @@ public class StashContainer : StorageContainer
 							RPC_WantsUnhide(rpc3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in RPC_WantsUnhide");
 					}
 				}
@@ -187,8 +187,8 @@ public class StashContainer : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_WantsUnhide(RPCMessage rpc)
 	{
 		if (IsHidden())

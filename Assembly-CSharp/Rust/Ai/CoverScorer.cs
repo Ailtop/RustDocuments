@@ -7,8 +7,8 @@ namespace Rust.Ai
 {
 	public class CoverScorer : OptionScorerBase<CoverPoint>
 	{
-		[ApexSerialization]
 		[Range(-1f, 1f)]
+		[ApexSerialization]
 		public float coverFromPointArcThreshold = -0.8f;
 
 		public override float Score(IAIContext context, CoverPoint option)

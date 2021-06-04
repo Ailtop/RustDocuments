@@ -1,12 +1,5 @@
-public class TunnelDweller : HumanNPC
+public class TunnelDweller : HumanNPCNew
 {
-	private float maxRoamDist = 8f;
-
-	public override float GetMaxRoamDistFromSpawn()
-	{
-		return maxRoamDist;
-	}
-
 	protected override string OverrideCorpseName()
 	{
 		return "Tunnel Dweller";

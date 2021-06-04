@@ -21,7 +21,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		public GameObjectRef ScientistPrefab;
 
 		[NonSerialized]
-		public List<ScientistJunkpileDomain> Spawned = new List<ScientistJunkpileDomain>();
+		public List<BaseCombatEntity> Spawned = new List<BaseCombatEntity>();
 
 		[NonSerialized]
 		public BaseSpawnPoint[] SpawnPoints;
@@ -71,7 +71,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			{
 				return;
 			}
-			foreach (ScientistJunkpileDomain item in Spawned)
+			foreach (BaseCombatEntity item in Spawned)
 			{
 				if (!(item == null) && !(item.gameObject == null) && !(item.transform == null))
 				{
@@ -129,8 +129,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			int num = 0;
 			while (num < Spawned.Count)
 			{
-				ScientistJunkpileDomain scientistJunkpileDomain = Spawned[num];
-				if (scientistJunkpileDomain == null || scientistJunkpileDomain.transform == null || scientistJunkpileDomain.ScientistContext == null || scientistJunkpileDomain.ScientistContext.Body == null || scientistJunkpileDomain.ScientistContext.Body.IsDestroyed || scientistJunkpileDomain.ScientistContext.Body.IsDead())
+				BaseCombatEntity baseCombatEntity = Spawned[num];
+				if (baseCombatEntity == null || baseCombatEntity.transform == null || baseCombatEntity.IsDestroyed || baseCombatEntity.IsDead())
 				{
 					Spawned.RemoveAt(num);
 					num--;
@@ -185,19 +185,14 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 				if (!(GetSpawnPoint(out pos, out rot) == null))
 				{
 					BaseEntity baseEntity = GameManager.server.CreateEntity(ScientistPrefab.resourcePath, pos, rot, false);
-					ScientistJunkpileDomain component = baseEntity.GetComponent<ScientistJunkpileDomain>();
-					if (!component)
+					if (!(baseEntity != null))
 					{
-						baseEntity.Kill();
 						break;
 					}
 					baseEntity.enableSaving = false;
 					PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
 					baseEntity.Spawn();
-					component.Movement = Movement;
-					component.MovementRadius = MovementRadius;
-					component.ReducedLongRangeAccuracy = ReducedLongRangeAccuracy;
-					Spawned.Add(component);
+					Spawned.Add((BaseCombatEntity)baseEntity);
 				}
 			}
 		}

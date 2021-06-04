@@ -29,17 +29,17 @@ public class FileStorage : IDisposable
 
 	private CRC32 crc = new CRC32();
 
-	private Dictionary<uint, CacheData> _cache = new Dictionary<uint, CacheData>();
+	private MruDictionary<uint, CacheData> _cache = new MruDictionary<uint, CacheData>(1000);
 
-	public static FileStorage server = new FileStorage("sv.files." + 212, true);
+	public static FileStorage server = new FileStorage("sv.files." + 213, true);
 
 	protected FileStorage(string name, bool server)
 	{
 		if (server)
 		{
-			string text = Server.rootFolder + "/" + name + ".db";
+			string path = Server.rootFolder + "/" + name + ".db";
 			db = new Database();
-			db.Open(text);
+			db.Open(path, true);
 			if (!db.TableExists("data"))
 			{
 				db.Execute("CREATE TABLE data ( crc INTEGER PRIMARY KEY, data BLOB, updated INTEGER, entid INTEGER, filetype INTEGER, part INTEGER )");
@@ -64,10 +64,13 @@ public class FileStorage : IDisposable
 
 	private uint GetCRC(byte[] data, Type type)
 	{
-		crc.Reset();
-		crc.SlurpBlock(data, 0, data.Length);
-		crc.UpdateCRC((byte)type);
-		return (uint)crc.Crc32Result;
+		using (TimeWarning.New("FileStorage.GetCRC"))
+		{
+			crc.Reset();
+			crc.SlurpBlock(data, 0, data.Length);
+			crc.UpdateCRC((byte)type);
+			return (uint)crc.Crc32Result;
+		}
 	}
 
 	public uint Store(byte[] data, Type type, uint entityID, uint numID = 0u)
@@ -128,10 +131,7 @@ public class FileStorage : IDisposable
 			{
 				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ?", (int)crc, (int)type, (int)entityID);
 			}
-			if (_cache.ContainsKey(crc))
-			{
-				_cache.Remove(crc);
-			}
+			_cache.Remove(crc);
 		}
 	}
 
@@ -143,10 +143,7 @@ public class FileStorage : IDisposable
 			{
 				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ?", (int)crc, (int)type, (int)entityID, (int)numid);
 			}
-			if (_cache.ContainsKey(crc))
-			{
-				_cache.Remove(crc);
-			}
+			_cache.Remove(crc);
 		}
 	}
 

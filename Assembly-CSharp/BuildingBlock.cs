@@ -123,9 +123,9 @@ public class BuildingBlock : StabilityEntity
 							DoDemolish(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in DoDemolish");
 					}
 				}
@@ -159,9 +159,9 @@ public class BuildingBlock : StabilityEntity
 							DoImmediateDemolish(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in DoImmediateDemolish");
 					}
 				}
@@ -195,9 +195,9 @@ public class BuildingBlock : StabilityEntity
 							DoRotation(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in DoRotation");
 					}
 				}
@@ -231,9 +231,9 @@ public class BuildingBlock : StabilityEntity
 							DoUpgradeToGrade(msg5);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in DoUpgradeToGrade");
 					}
 				}
@@ -281,8 +281,8 @@ public class BuildingBlock : StabilityEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void DoImmediateDemolish(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && msg.player.IsAdmin && Interface.CallHook("OnStructureDemolish", this, msg.player, true) == null)
@@ -407,8 +407,8 @@ public class BuildingBlock : StabilityEntity
 		base.health = MaxHealth();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void DoUpgradeToGrade(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())
@@ -670,8 +670,8 @@ public class BuildingBlock : StabilityEntity
 		return !player.IsBuildingBlocked(base.transform.position, base.transform.rotation, bounds);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void DoRotation(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanRotate(msg.player) && blockDefinition.canRotateAfterPlacement && Interface.CallHook("OnStructureRotate", this, msg.player) == null)

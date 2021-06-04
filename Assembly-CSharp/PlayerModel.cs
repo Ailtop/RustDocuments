@@ -99,6 +99,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public EyeController eyeController;
 
+	public EyeBlink blinkController;
+
 	public Transform[] SpineBones;
 
 	public Transform leftFootBone;

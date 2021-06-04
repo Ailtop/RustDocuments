@@ -68,15 +68,15 @@ namespace ConVar
 					EntityInfo arg = new EntityInfo(serverEntity);
 					if (filter(arg))
 					{
-						textTable.AddRow("sv", arg.entityID.ToString(), arg.groupID.ToString(), arg.parentID.ToString(), arg.entity.ShortPrefabName, ((object)arg.entity.transform.position).ToString(), ((object)arg.entity.transform.localPosition).ToString(), ((object)arg.entity.transform.rotation.eulerAngles).ToString(), ((object)arg.entity.transform.localRotation.eulerAngles).ToString(), arg.status, arg.entity.InvokeString());
+						textTable.AddRow("sv", arg.entityID.ToString(), arg.groupID.ToString(), arg.parentID.ToString(), arg.entity.ShortPrefabName, arg.entity.transform.position.ToString(), arg.entity.transform.localPosition.ToString(), arg.entity.transform.rotation.eulerAngles.ToString(), arg.entity.transform.localRotation.eulerAngles.ToString(), arg.status, arg.entity.InvokeString());
 					}
 				}
 			}
 			return textTable;
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void find_entity(Arg args)
 		{
 			string filter = args.GetString(0);
@@ -120,8 +120,8 @@ namespace ConVar
 			args.ReplyWith(entityTable.ToString());
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void find_radius(Arg args)
 		{
 			BasePlayer player = ArgEx.Player(args);

@@ -28,8 +28,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool incremental_enabled
 		{
 			get
@@ -77,8 +77,8 @@ namespace ConVar
 			Rust.GC.Collect();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void unload()
 		{
 			Resources.UnloadUnusedAssets();

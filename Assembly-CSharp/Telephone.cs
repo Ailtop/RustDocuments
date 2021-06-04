@@ -90,9 +90,9 @@ public class Telephone : ContainerIOEntity
 							AnswerPhone(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in AnswerPhone");
 					}
 				}
@@ -126,9 +126,9 @@ public class Telephone : ContainerIOEntity
 							ClearCurrentUser(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in ClearCurrentUser");
 					}
 				}
@@ -162,9 +162,9 @@ public class Telephone : ContainerIOEntity
 							InitiateCall(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in InitiateCall");
 					}
 				}
@@ -202,9 +202,9 @@ public class Telephone : ContainerIOEntity
 							Server_AddSavedNumber(msg5);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in Server_AddSavedNumber");
 					}
 				}
@@ -242,9 +242,9 @@ public class Telephone : ContainerIOEntity
 							Server_RemoveSavedNumber(msg6);
 						}
 					}
-					catch (Exception ex5)
+					catch (Exception exception5)
 					{
-						Debug.LogException(ex5);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in Server_RemoveSavedNumber");
 					}
 				}
@@ -282,9 +282,9 @@ public class Telephone : ContainerIOEntity
 							Server_RequestPhoneDirectory(msg7);
 						}
 					}
-					catch (Exception ex6)
+					catch (Exception exception6)
 					{
-						Debug.LogException(ex6);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in Server_RequestPhoneDirectory");
 					}
 				}
@@ -311,9 +311,9 @@ public class Telephone : ContainerIOEntity
 							ServerHangUp(msg8);
 						}
 					}
-					catch (Exception ex7)
+					catch (Exception exception7)
 					{
-						Debug.LogException(ex7);
+						Debug.LogException(exception7);
 						player.Kick("RPC Error in ServerHangUp");
 					}
 				}
@@ -347,9 +347,9 @@ public class Telephone : ContainerIOEntity
 							SetCurrentUser(currentUser);
 						}
 					}
-					catch (Exception ex8)
+					catch (Exception exception8)
 					{
-						Debug.LogException(ex8);
+						Debug.LogException(exception8);
 						player.Kick("RPC Error in SetCurrentUser");
 					}
 				}
@@ -387,9 +387,9 @@ public class Telephone : ContainerIOEntity
 							UpdatePhoneName(msg9);
 						}
 					}
-					catch (Exception ex9)
+					catch (Exception exception9)
 					{
-						Debug.LogException(ex9);
+						Debug.LogException(exception9);
 						player.Kick("RPC Error in UpdatePhoneName");
 					}
 				}
@@ -443,8 +443,8 @@ public class Telephone : ContainerIOEntity
 		Controller.ClearCurrentUser(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void SetCurrentUser(RPCMessage msg)
 	{
 		Controller.SetCurrentUser(msg);
@@ -489,33 +489,33 @@ public class Telephone : ContainerIOEntity
 		Controller.DestroyShared();
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void UpdatePhoneName(RPCMessage msg)
 	{
 		Controller.UpdatePhoneName(msg);
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server]
 	public void Server_RequestPhoneDirectory(RPCMessage msg)
 	{
 		Controller.Server_RequestPhoneDirectory(msg);
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
 	public void Server_AddSavedNumber(RPCMessage msg)
 	{
 		Controller.Server_AddSavedNumber(msg);
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_RemoveSavedNumber(RPCMessage msg)
 	{
 		Controller.Server_RemoveSavedNumber(msg);

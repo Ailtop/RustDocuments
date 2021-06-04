@@ -46,9 +46,9 @@ public class RHIB : MotorRowboat
 							Server_Release(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in Server_Release");
 					}
 				}
@@ -58,8 +58,8 @@ public class RHIB : MotorRowboat
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(6f)]
+	[RPC_Server]
 	public void Server_Release(RPCMessage msg)
 	{
 		if (!(GetParentEntity() == null))

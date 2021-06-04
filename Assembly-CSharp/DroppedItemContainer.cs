@@ -68,9 +68,9 @@ public class DroppedItemContainer : BaseCombatEntity
 							RPC_OpenLoot(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_OpenLoot");
 					}
 				}
@@ -179,8 +179,8 @@ public class DroppedItemContainer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -234,7 +234,7 @@ public class DroppedItemContainer : BaseCombatEntity
 			}
 			else
 			{
-				Debug.LogWarning("Dropped item container without inventory: " + ((object)this).ToString());
+				Debug.LogWarning("Dropped item container without inventory: " + ToString());
 			}
 		}
 	}
@@ -255,7 +255,7 @@ public class DroppedItemContainer : BaseCombatEntity
 			}
 			else
 			{
-				Debug.LogWarning("Dropped item container without inventory: " + ((object)this).ToString());
+				Debug.LogWarning("Dropped item container without inventory: " + ToString());
 			}
 		}
 	}

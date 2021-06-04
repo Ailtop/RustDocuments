@@ -79,9 +79,9 @@ public class BuildingPrivlidge : StorageContainer
 							AddSelfAuthorize(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in AddSelfAuthorize");
 					}
 				}
@@ -115,9 +115,9 @@ public class BuildingPrivlidge : StorageContainer
 							ClearList(rpc3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in ClearList");
 					}
 				}
@@ -151,9 +151,9 @@ public class BuildingPrivlidge : StorageContainer
 							RemoveSelfAuthorize(rpc4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in RemoveSelfAuthorize");
 					}
 				}
@@ -187,9 +187,9 @@ public class BuildingPrivlidge : StorageContainer
 							RPC_Rotate(msg2);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in RPC_Rotate");
 					}
 				}
@@ -366,7 +366,7 @@ public class BuildingPrivlidge : StorageContainer
 			{
 				if (IsDebugging())
 				{
-					Debug.Log(((object)this).ToString() + ": Using " + item.amount + " of " + item.info.shortname);
+					Debug.Log(ToString() + ": Using " + item.amount + " of " + item.info.shortname);
 				}
 				item.UseItem(item.amount);
 			}
@@ -390,7 +390,7 @@ public class BuildingPrivlidge : StorageContainer
 					item.amount += itemAmount.amount;
 					if (IsDebugging())
 					{
-						Debug.Log(((object)this).ToString() + ": Adding " + itemAmount.amount + " of " + itemAmount.itemDef.shortname + " to " + item.amount);
+						Debug.Log(ToString() + ": Adding " + itemAmount.amount + " of " + itemAmount.itemDef.shortname + " to " + item.amount);
 					}
 					flag = true;
 					break;
@@ -400,7 +400,7 @@ public class BuildingPrivlidge : StorageContainer
 			{
 				if (IsDebugging())
 				{
-					Debug.Log(((object)this).ToString() + ": Adding " + itemAmount.amount + " of " + itemAmount.itemDef.shortname);
+					Debug.Log(ToString() + ": Adding " + itemAmount.amount + " of " + itemAmount.itemDef.shortname);
 				}
 				upkeepBuffer.Add(new ItemAmount(itemAmount.itemDef, itemAmount.amount));
 			}
@@ -416,7 +416,7 @@ public class BuildingPrivlidge : StorageContainer
 			{
 				if (IsDebugging())
 				{
-					Debug.Log(((object)this).ToString() + ": Can't afford " + itemAmount.amount + " of " + itemAmount.itemDef.shortname);
+					Debug.Log(ToString() + ": Can't afford " + itemAmount.amount + " of " + itemAmount.itemDef.shortname);
 				}
 				return false;
 			}
@@ -463,7 +463,7 @@ public class BuildingPrivlidge : StorageContainer
 				decayEntity.AddUpkeepTime(num2);
 				if (IsDebugging())
 				{
-					Debug.Log(((object)this).ToString() + " purchased upkeep time for " + ((object)decayEntity).ToString() + ": " + protectedSeconds + " + " + num2 + " = " + decayEntity.GetProtectedSeconds());
+					Debug.Log(ToString() + " purchased upkeep time for " + decayEntity.ToString() + ": " + protectedSeconds + " + " + num2 + " = " + decayEntity.GetProtectedSeconds());
 				}
 			}
 		}
@@ -587,8 +587,8 @@ public class BuildingPrivlidge : StorageContainer
 		return baseLock.OnTryToOpen(player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void AddSelfAuthorize(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardAuthorize", this, rpc.player) == null)

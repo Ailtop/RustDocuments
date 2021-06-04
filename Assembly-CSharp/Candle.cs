@@ -44,9 +44,9 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 							SetWantsOn(wantsOn);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in SetWantsOn");
 					}
 				}
@@ -56,8 +56,8 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetWantsOn(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();

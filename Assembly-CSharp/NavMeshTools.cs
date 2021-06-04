@@ -17,8 +17,8 @@ public static class NavMeshTools
 		float time = UnityEngine.Time.realtimeSinceStartup;
 		Debug.Log("Starting Navmesh Source Collecting");
 		mask = ((!useBakedTerrainMesh) ? (mask | 0x800000) : (mask & -8388609));
-		List<NavMeshBuildMarkup> list = new List<NavMeshBuildMarkup>();
-		NavMeshBuilder.CollectSources(bounds, mask, geometry, area, list, sources);
+		List<NavMeshBuildMarkup> markups = new List<NavMeshBuildMarkup>();
+		NavMeshBuilder.CollectSources(bounds, mask, geometry, area, markups, sources);
 		if (useBakedTerrainMesh && TerrainMeta.HeightMap != null)
 		{
 			for (float x = 0f - bounds.extents.x; x < bounds.extents.x - (float)(cellSize / 2); x += (float)cellSize)
@@ -44,8 +44,8 @@ public static class NavMeshTools
 		}
 		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
 		Debug.Log("Starting Navmesh Source Collecting");
-		List<NavMeshBuildMarkup> list = new List<NavMeshBuildMarkup>();
-		NavMeshBuilder.CollectSources(root, mask, geometry, area, list, sources);
+		List<NavMeshBuildMarkup> markups = new List<NavMeshBuildMarkup>();
+		NavMeshBuilder.CollectSources(root, mask, geometry, area, markups, sources);
 		append?.Invoke(sources);
 		Debug.Log($"Navmesh Source Collecting took {UnityEngine.Time.realtimeSinceStartup - realtimeSinceStartup:0.00} seconds");
 		callback?.Invoke();

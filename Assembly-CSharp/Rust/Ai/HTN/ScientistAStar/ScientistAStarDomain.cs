@@ -1000,7 +1000,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
+				context.Body.StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(ScientistAStarContext context, PrimitiveTaskSelector task)
@@ -1015,7 +1015,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 			public override void Abort(ScientistAStarContext context, PrimitiveTaskSelector task)
 			{
-				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
+				context.Body.StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1037,7 +1037,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 			public override void Execute(ScientistAStarContext context)
 			{
 				context.SetFact(Facts.IsStandingUp, true);
-				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, 0.2f));
+				context.Body.StartCoroutine(AsyncTimer(context, 0.2f));
 			}
 
 			public override OperatorStateType Tick(ScientistAStarContext context, PrimitiveTaskSelector task)
@@ -1052,7 +1052,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 			public override void Abort(ScientistAStarContext context, PrimitiveTaskSelector task)
 			{
-				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
+				context.Body.StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1138,7 +1138,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
+				context.Body.StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(ScientistAStarContext context, PrimitiveTaskSelector task)
@@ -1188,7 +1188,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 			public override void Execute(ScientistAStarContext context)
 			{
 				context.SetFact(Facts.IsLookingAround, true);
-				((MonoBehaviour)context.Body).StartCoroutine(LookAroundAsync(context));
+				context.Body.StartCoroutine(LookAroundAsync(context));
 			}
 
 			public override OperatorStateType Tick(ScientistAStarContext context, PrimitiveTaskSelector task)
@@ -1229,7 +1229,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 			public override void Execute(ScientistAStarContext context)
 			{
 				SwitchToItem(context, _item);
-				((MonoBehaviour)context.Body).StartCoroutine(WaitAsync(context));
+				context.Body.StartCoroutine(WaitAsync(context));
 			}
 
 			public override OperatorStateType Tick(ScientistAStarContext context, PrimitiveTaskSelector task)
@@ -1308,7 +1308,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 			public override void Execute(ScientistAStarContext context)
 			{
-				((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
+				context.Body.StartCoroutine(UseItem(context));
 			}
 
 			public override OperatorStateType Tick(ScientistAStarContext context, PrimitiveTaskSelector task)
@@ -1401,7 +1401,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 			{
 				if (context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player != null)
 				{
-					((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
+					context.Body.StartCoroutine(UseItem(context));
 				}
 			}
 
@@ -1968,8 +1968,8 @@ namespace Rust.Ai.HTN.ScientistAStar
 
 		private Vector3 _lastNavigationHeading = Vector3.zero;
 
-		[Header("Pathfinding")]
 		[ReadOnly]
+		[Header("Pathfinding")]
 		public BasePath Path;
 
 		[ReadOnly]
@@ -1995,9 +1995,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 		[SerializeField]
 		private ScientistAStarContext _context;
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Navigation")]
+		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
 		[SerializeField]
@@ -2295,7 +2295,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 		{
 			if (!(proj == null))
 			{
-				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, 4f));
+				StartCoroutine(HoldTriggerLogic(proj, time, 4f));
 			}
 		}
 
@@ -2303,7 +2303,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 		{
 			if (!(proj == null))
 			{
-				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
+				StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
 			}
 		}
 
@@ -2383,7 +2383,7 @@ namespace Rust.Ai.HTN.ScientistAStar
 		{
 			if ((bool)proj && _context.IsBodyAlive() && proj.primaryMagazine.contents < proj.primaryMagazine.capacity)
 			{
-				((MonoBehaviour)this).StartCoroutine(ReloadHandler(proj));
+				StartCoroutine(ReloadHandler(proj));
 			}
 		}
 

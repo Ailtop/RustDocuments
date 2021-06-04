@@ -19,6 +19,10 @@ namespace Facepunch.UI
 
 		public Color TeamColor;
 
+		public Color AllyColor = Color.blue;
+
+		public Color EnemyColor;
+
 		public QueryVis visCheck;
 
 		public BasePlayer Entity { get; set; }

@@ -76,9 +76,9 @@ public class ElevatorLift : BaseCombatEntity
 							Server_RaiseLowerFloor(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in Server_RaiseLowerFloor");
 					}
 				}

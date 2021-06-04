@@ -135,7 +135,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 				{
 					if (baseNetworkable.net.group.ID != uid)
 					{
-						Debug.LogWarning("Group ID mismatch: " + ((object)baseNetworkable).ToString());
+						Debug.LogWarning("Group ID mismatch: " + baseNetworkable.ToString());
 					}
 					else
 					{
@@ -514,7 +514,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		{
 			if (net.group == null)
 			{
-				Debug.LogWarning(((object)this).ToString() + " changed its network group to null");
+				Debug.LogWarning(ToString() + " changed its network group to null");
 			}
 			else if (Network.Net.sv.write.Start())
 			{
@@ -987,6 +987,33 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			}
 		}
 		return connectionsInSphereList;
+	}
+
+	public static void GetCloseConnections(Vector3 position, float distance, List<BasePlayer> players)
+	{
+		if (Network.Net.sv == null || Network.Net.sv.visibility == null)
+		{
+			return;
+		}
+		float num = distance * distance;
+		Group group = Network.Net.sv.visibility.GetGroup(position);
+		if (group == null)
+		{
+			return;
+		}
+		List<Connection> subscribers = group.subscribers;
+		for (int i = 0; i < subscribers.Count; i++)
+		{
+			Connection connection = subscribers[i];
+			if (connection.active)
+			{
+				BasePlayer basePlayer = connection.player as BasePlayer;
+				if (!(basePlayer == null) && !(basePlayer.SqrDistance(position) > num))
+				{
+					players.Add(basePlayer);
+				}
+			}
+		}
 	}
 
 	public static bool HasCloseConnections(Vector3 position, float distance)

@@ -4,6 +4,7 @@ using Facepunch;
 using Network;
 using Rust;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, TrainTrackSpline.ITrainTrackUser, ITrainCollidable
 {
@@ -18,7 +19,7 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public StaticCollisionState staticCollidingAtRear;
 
-	private const float MIN_COLLISION_FORCE = 50000f;
+	private const float MIN_COLLISION_FORCE = 70000f;
 
 	public float nextCollisionFXTime;
 
@@ -40,8 +41,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public float initialSpawnTime;
 
-	[Header("Base Train")]
 	[SerializeField]
+	[Header("Base Train")]
 	public float corpseSeconds = 60f;
 
 	[SerializeField]
@@ -80,6 +81,13 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	[SerializeField]
 	public Transform centreOfMassTransform;
+
+	[SerializeField]
+	private ParticleSystemContainer[] sparks;
+
+	[FormerlySerializedAs("brakeSparkLights")]
+	[SerializeField]
+	private Light[] sparkLights;
 
 	public TrainTrackSpline.TrackSelection curTrackSelection;
 
@@ -314,7 +322,7 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public float ApplyCollisionDamage(float forceMagnitude)
 	{
-		if (forceMagnitude < 50000f)
+		if (forceMagnitude < 70000f)
 		{
 			return 0f;
 		}
@@ -399,9 +407,9 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 		float distResult;
 		if (TrainTrackSpline.TryFindTrackNearby(GetFrontWheelPos(), 2f, out splineResult, out distResult) && splineResult.HasClearTrackSpaceNear(this))
 		{
-			FrontTrackSection = splineResult;
 			FrontWheelSplineDist = distResult;
-			SetTheRestFromFrontWheelData(FrontTrackSection, FrontTrackSection.GetPosition(FrontWheelSplineDist));
+			SetTheRestFromFrontWheelData(ref splineResult, splineResult.GetPosition(FrontWheelSplineDist));
+			FrontTrackSection = splineResult;
 		}
 		else
 		{
@@ -584,16 +592,17 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 		TrackSpeed += num2 * deltaTime;
 		TrackSpeed = ApplyCollisionsToTrackSpeed(TrackSpeed, deltaTime);
 		float distMoved = TrackSpeed * deltaTime;
+		TrainTrackSpline preferredAltTrack = ((RearTrackSection != FrontTrackSection) ? RearTrackSection : null);
 		TrainTrackSpline onSpline;
 		bool atEndOfLine;
-		FrontWheelSplineDist = FrontTrackSection.GetSplineDistAfterMove(FrontWheelSplineDist, base.transform.forward, distMoved, curTrackSelection, out onSpline, out atEndOfLine);
+		FrontWheelSplineDist = FrontTrackSection.GetSplineDistAfterMove(FrontWheelSplineDist, base.transform.forward, distMoved, curTrackSelection, out onSpline, out atEndOfLine, preferredAltTrack);
 		Vector3 position = onSpline.GetPosition(FrontWheelSplineDist);
+		SetTheRestFromFrontWheelData(ref onSpline, position);
 		FrontTrackSection = onSpline;
-		SetTheRestFromFrontWheelData(onSpline, position);
 		return TrackSpeed;
 	}
 
-	public void SetTheRestFromFrontWheelData(TrainTrackSpline frontTS, Vector3 targetFrontWheelPos)
+	public void SetTheRestFromFrontWheelData(ref TrainTrackSpline frontTS, Vector3 targetFrontWheelPos)
 	{
 		TrainTrackSpline onSpline;
 		bool atEndOfLine;
@@ -602,7 +611,7 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 		if (atEndOfLine)
 		{
 			bool atEndOfLine2;
-			FrontWheelSplineDist = onSpline.GetSplineDistAfterMove(splineDistAfterMove, base.transform.forward, distFrontToBackWheel, curTrackSelection, out frontTS, out atEndOfLine2);
+			FrontWheelSplineDist = onSpline.GetSplineDistAfterMove(splineDistAfterMove, base.transform.forward, distFrontToBackWheel, curTrackSelection, out frontTS, out atEndOfLine2, onSpline);
 		}
 		RearTrackSection = onSpline;
 		Vector3 vector = targetFrontWheelPos - position;

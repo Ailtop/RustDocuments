@@ -72,9 +72,9 @@ public class HackableLockedCrate : LootContainer
 							RPC_Hack(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_Hack");
 					}
 				}
@@ -197,8 +197,8 @@ public class HackableLockedCrate : LootContainer
 		SetFlag(Flags.Reserved1, false);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Hack(RPCMessage msg)
 	{
 		if (!IsBeingHacked() && Interface.CallHook("CanHackCrate", msg.player, this) == null)

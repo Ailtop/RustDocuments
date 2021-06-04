@@ -47,9 +47,9 @@ public class TorchWeapon : BaseMelee
 							Extinguish(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in Extinguish");
 					}
 				}
@@ -83,9 +83,9 @@ public class TorchWeapon : BaseMelee
 							Ignite(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in Ignite");
 					}
 				}
@@ -123,8 +123,8 @@ public class TorchWeapon : BaseMelee
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void Ignite(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())
@@ -133,8 +133,8 @@ public class TorchWeapon : BaseMelee
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void Extinguish(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())

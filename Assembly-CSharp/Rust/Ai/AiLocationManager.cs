@@ -44,13 +44,13 @@ namespace Rust.Ai
 			{
 				return;
 			}
-			ManualCoverPoint[] componentsInChildren = CoverPointGroup.GetComponentsInChildren<ManualCoverPoint>();
-			foreach (ManualCoverPoint manualCoverPoint in componentsInChildren)
+			AICoverPoint[] componentsInChildren = CoverPointGroup.GetComponentsInChildren<AICoverPoint>();
+			foreach (AICoverPoint aICoverPoint in componentsInChildren)
 			{
 				NavMeshHit hit;
-				if (NavMesh.SamplePosition(manualCoverPoint.Position, out hit, 4f, -1))
+				if (NavMesh.SamplePosition(aICoverPoint.transform.position, out hit, 4f, -1))
 				{
-					manualCoverPoint.transform.position = hit.position;
+					aICoverPoint.transform.position = hit.position;
 				}
 			}
 		}

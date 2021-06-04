@@ -67,7 +67,7 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 
 	public float fuelPerSec;
 
-	protected EntityFuelSystem fuelSystem;
+	public EntityFuelSystem fuelSystem;
 
 	public GameObject[] OnTriggers;
 
@@ -85,19 +85,19 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 
 	public float throttle;
 
-	private float lastExtensionArmState;
+	public float lastExtensionArmState;
 
-	private float lastRaiseArmState;
+	public float lastRaiseArmState;
 
-	private float lastYawState;
+	public float lastYawState;
 
-	private bool handbrakeOn = true;
+	public bool handbrakeOn = true;
 
 	private float nextSelfHealTime;
 
-	private Vector3 lastDamagePos = Vector3.zero;
+	public Vector3 lastDamagePos = Vector3.zero;
 
-	private float lastDrivenTime;
+	public float lastDrivenTime;
 
 	private float testPreviousYaw = 5f;
 
@@ -498,9 +498,9 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 							RPC_OpenFuel(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_OpenFuel");
 					}
 				}

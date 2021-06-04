@@ -86,7 +86,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						binaryReader.ReadChar();
 						SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 					}
-					if (binaryReader.ReadUInt32() != 212)
+					if (binaryReader.ReadUInt32() != 213)
 					{
 						if (allowOutOfDateSaves)
 						{
@@ -112,10 +112,10 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						{
 							entData = ProtoBuf.Entity.DeserializeLength(fileStream, (int)num);
 						}
-						catch (Exception ex)
+						catch (Exception exception)
 						{
 							UnityEngine.Debug.LogWarning("Skipping entity since it could not be deserialized - stream position: " + position + " size: " + num);
-							UnityEngine.Debug.LogException(ex);
+							UnityEngine.Debug.LogException(exception);
 							fileStream.Position = position + num;
 							continue;
 						}
@@ -196,10 +196,10 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			Rust.Application.isLoadingSave = false;
 			return true;
 		}
-		catch (Exception ex2)
+		catch (Exception exception2)
 		{
 			UnityEngine.Debug.LogWarning("Error loading save (" + strFilename + ")");
-			UnityEngine.Debug.LogException(ex2);
+			UnityEngine.Debug.LogException(exception2);
 			return false;
 		}
 	}
@@ -334,9 +334,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				{
 					baseEntity.GetSaveCache();
 				}
-				catch (Exception ex)
+				catch (Exception exception)
 				{
-					UnityEngine.Debug.LogException(ex);
+					UnityEngine.Debug.LogException(exception);
 				}
 				if (sw.Elapsed.TotalMilliseconds > 5.0)
 				{
@@ -362,7 +362,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			writer.Write((sbyte)82);
 			writer.Write((sbyte)68);
 			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(212u);
+			writer.Write(213u);
 			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 			saveInfo.forDisk = true;
 			if (!AndWait)
@@ -381,9 +381,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				{
 					memoryStream = save.GetSaveCache();
 				}
-				catch (Exception ex2)
+				catch (Exception exception2)
 				{
-					UnityEngine.Debug.LogException(ex2);
+					UnityEngine.Debug.LogException(exception2);
 				}
 				if (memoryStream == null || memoryStream.Length <= 0)
 				{
@@ -424,9 +424,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						SaveBuffer.CopyTo(destination);
 					}
 				}
-				catch (Exception ex3)
+				catch (Exception ex)
 				{
-					UnityEngine.Debug.LogError("Couldn't write save file! We got an exception: " + ex3);
+					UnityEngine.Debug.LogError("Couldn't write save file! We got an exception: " + ex);
 					if (File.Exists(text))
 					{
 						File.Delete(text);
@@ -436,9 +436,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				File.Copy(text, strFilename, true);
 				File.Delete(text);
 			}
-			catch (Exception ex4)
+			catch (Exception ex2)
 			{
-				UnityEngine.Debug.LogError("Error when saving to disk: " + ex4);
+				UnityEngine.Debug.LogError("Error when saving to disk: " + ex2);
 				yield break;
 			}
 		}
@@ -492,7 +492,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 
 	private void Start()
 	{
-		((MonoBehaviour)this).StartCoroutine(SaveRegularly());
+		StartCoroutine(SaveRegularly());
 	}
 
 	private IEnumerator SaveRegularly()
@@ -502,7 +502,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			yield return CoroutineEx.waitForSeconds(ConVar.Server.saveinterval);
 			if (timedSave && timedSavePause <= 0)
 			{
-				yield return ((MonoBehaviour)this).StartCoroutine(DoAutomatedSave());
+				yield return StartCoroutine(DoAutomatedSave());
 			}
 		}
 	}

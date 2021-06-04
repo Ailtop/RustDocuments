@@ -86,7 +86,7 @@ public class Marketplace : BaseEntity
 				MarketTerminal marketTerminal;
 				if ((object)(marketTerminal = baseEntity as MarketTerminal) == null)
 				{
-					Debug.LogError("Marketplace.terminalPrefab did not spawn a MarketTerminal (it spawned " + ((object)baseEntity).GetType().FullName + ")");
+					Debug.LogError("Marketplace.terminalPrefab did not spawn a MarketTerminal (it spawned " + baseEntity.GetType().FullName + ")");
 					baseEntity.Kill();
 				}
 				else

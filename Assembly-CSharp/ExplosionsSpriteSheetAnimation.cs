@@ -90,7 +90,7 @@ internal class ExplosionsSpriteSheetAnimation : MonoBehaviour
 			}
 			else
 			{
-				base.StartCoroutine(UpdateCorutine());
+				StartCoroutine(UpdateCorutine());
 			}
 			isCorutineStarted = true;
 		}
@@ -98,7 +98,7 @@ internal class ExplosionsSpriteSheetAnimation : MonoBehaviour
 
 	private void PlayDelay()
 	{
-		base.StartCoroutine(UpdateCorutine());
+		StartCoroutine(UpdateCorutine());
 	}
 
 	private void OnEnable()

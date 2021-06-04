@@ -29,7 +29,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			if (!_isRadioEffectRunning)
 			{
 				_isRadioEffectRunning = true;
-				((MonoBehaviour)target).StartCoroutine(RadioChatter(target));
+				target.StartCoroutine(RadioChatter(target));
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 				if (playerInventoryProperties != null)
 				{
 					playerInventoryProperties.GiveToPlayer(target);
-					((MonoBehaviour)target).StartCoroutine(EquipTool(target));
+					target.StartCoroutine(EquipTool(target));
 				}
 			}
 			else

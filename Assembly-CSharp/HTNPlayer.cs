@@ -317,7 +317,7 @@ public class HTNPlayer : BasePlayer, IHTNAgent
 	{
 		if (!ValidBounds.Test(moveToPosition) && base.transform != null && !base.IsDestroyed)
 		{
-			Debug.Log($"Invalid NavAgent Position: {this} {((object)moveToPosition).ToString()} (destroying)");
+			Debug.Log($"Invalid NavAgent Position: {this} {moveToPosition.ToString()} (destroying)");
 			Kill();
 			return false;
 		}

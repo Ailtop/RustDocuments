@@ -116,9 +116,9 @@ public class BaseMountable : BaseCombatEntity
 							RPC_WantsDismount(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_WantsDismount");
 					}
 				}
@@ -152,9 +152,9 @@ public class BaseMountable : BaseCombatEntity
 							RPC_WantsMount(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in RPC_WantsMount");
 					}
 				}
@@ -291,8 +291,8 @@ public class BaseMountable : BaseCombatEntity
 		base.OnKilled(info);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

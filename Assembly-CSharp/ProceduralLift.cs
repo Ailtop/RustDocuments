@@ -57,9 +57,9 @@ public class ProceduralLift : BaseEntity
 							RPC_UseLift(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_UseLift");
 					}
 				}

@@ -40,9 +40,9 @@ public class LiquidVessel : HeldEntity
 							DoEmpty(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in DoEmpty");
 					}
 				}

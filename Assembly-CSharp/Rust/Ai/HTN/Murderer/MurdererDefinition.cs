@@ -38,7 +38,7 @@ namespace Rust.Ai.HTN.Murderer
 				if (playerInventoryProperties != null)
 				{
 					playerInventoryProperties.GiveToPlayer(target);
-					((MonoBehaviour)target).StartCoroutine(EquipWeapon(target));
+					target.StartCoroutine(EquipWeapon(target));
 				}
 			}
 			else
@@ -67,7 +67,7 @@ namespace Rust.Ai.HTN.Murderer
 						target.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, 0uL), target.inventory.containerBelt);
 					}
 				}
-				((MonoBehaviour)target).StartCoroutine(EquipWeapon(target));
+				target.StartCoroutine(EquipWeapon(target));
 			}
 			else
 			{

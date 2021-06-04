@@ -7,7 +7,7 @@ public static class OnParentDestroyingEx
 	public static void BroadcastOnParentDestroying(this GameObject go)
 	{
 		List<IOnParentDestroying> obj = Pool.GetList<IOnParentDestroying>();
-		go.GetComponentsInChildren<IOnParentDestroying>(obj);
+		go.GetComponentsInChildren(obj);
 		for (int i = 0; i < obj.Count; i++)
 		{
 			obj[i].OnParentDestroying();
@@ -18,7 +18,7 @@ public static class OnParentDestroyingEx
 	public static void SendOnParentDestroying(this GameObject go)
 	{
 		List<IOnParentDestroying> obj = Pool.GetList<IOnParentDestroying>();
-		go.GetComponents<IOnParentDestroying>(obj);
+		go.GetComponents(obj);
 		for (int i = 0; i < obj.Count; i++)
 		{
 			obj[i].OnParentDestroying();

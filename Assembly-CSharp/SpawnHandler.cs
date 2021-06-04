@@ -53,9 +53,9 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 	protected void OnEnable()
 	{
 		AllSpawnPopulations = SpawnPopulations.Concat(ConvarSpawnPopulations).ToArray();
-		((MonoBehaviour)this).StartCoroutine(SpawnTick());
-		((MonoBehaviour)this).StartCoroutine(SpawnGroupTick());
-		((MonoBehaviour)this).StartCoroutine(SpawnIndividualTick());
+		StartCoroutine(SpawnTick());
+		StartCoroutine(SpawnGroupTick());
+		StartCoroutine(SpawnIndividualTick());
 	}
 
 	public static BasePlayer.SpawnPoint GetSpawnPoint()

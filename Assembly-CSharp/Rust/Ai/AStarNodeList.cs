@@ -27,7 +27,7 @@ namespace Rust.AI
 			for (int i = 0; i < base.Count; i++)
 			{
 				AStarNode aStarNode = base[i];
-				if (aStarNode != null && ((object)aStarNode.Node).Equals((object)n))
+				if (aStarNode != null && aStarNode.Node.Equals(n))
 				{
 					return true;
 				}
@@ -40,7 +40,7 @@ namespace Rust.AI
 			for (int i = 0; i < base.Count; i++)
 			{
 				AStarNode aStarNode = base[i];
-				if (aStarNode != null && ((object)aStarNode.Node).Equals((object)n))
+				if (aStarNode != null && aStarNode.Node.Equals(n))
 				{
 					return aStarNode;
 				}

@@ -41,6 +41,10 @@ public static class TerrainAnchorEx
 				return false;
 			}
 		}
+		if (num3 > 1f && num2 < 1f)
+		{
+			num2 = 1f;
+		}
 		if (mode == TerrainAnchorMode.MinimizeError)
 		{
 			pos.y = Mathf.Clamp(num / (float)anchors.Length, num2, num3);

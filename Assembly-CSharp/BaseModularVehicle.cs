@@ -22,8 +22,8 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool waterlogged;
 
-	[Header("Modular Vehicle")]
 	[HideInInspector]
+	[Header("Modular Vehicle")]
 	public float mass;
 
 	[SerializeField]
@@ -306,13 +306,13 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		string failureReason;
 		if (!ModuleCanBeAdded(moduleItem, socketIndex, out failureReason))
 		{
-			Debug.LogError(((object)this).GetType().Name + ": Can't add module: " + failureReason);
+			Debug.LogError(GetType().Name + ": Can't add module: " + failureReason);
 			return false;
 		}
 		bool num = Inventory.TryAddModuleItem(moduleItem, socketIndex);
 		if (!num)
 		{
-			Debug.LogError(((object)this).GetType().Name + ": Couldn't add new item!");
+			Debug.LogError(GetType().Name + ": Couldn't add new item!");
 		}
 		return num;
 	}
@@ -554,7 +554,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 			}
 			else
 			{
-				Debug.LogWarning("Module Manager without inventory: " + ((object)this).ToString());
+				Debug.LogWarning("Module Manager without inventory: " + ToString());
 			}
 		}
 	}
@@ -616,7 +616,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		}
 		if (index == -1 && !TryDeduceSocketIndex(addedModule, out index))
 		{
-			string text = $"{((object)this).GetType().Name}: Couldn't get socket index from position ({addedModule.transform.position}).";
+			string text = $"{GetType().Name}: Couldn't get socket index from position ({addedModule.transform.position}).";
 			for (int i = 0; i < moduleSockets.Count; i++)
 			{
 				text += $" Sqr dist to socket {i} at {moduleSockets[i].WorldPosition} is {Vector3.SqrMagnitude(moduleSockets[i].WorldPosition - addedModule.transform.position)}.";

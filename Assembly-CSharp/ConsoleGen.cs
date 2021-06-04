@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using CCTVRender;
 using ConVar;
 using Facepunch;
 using Facepunch.Extend;
@@ -9,8 +8,21 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[717]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[732]
 	{
+		new ConsoleSystem.Command
+		{
+			Name = "animalframebudgetms",
+			Parent = "aithinkmanager",
+			FullName = "aithinkmanager.animalframebudgetms",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AIThinkManager.animalframebudgetms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AIThinkManager.animalframebudgetms = str.ToFloat();
+			}
+		},
 		new ConsoleSystem.Command
 		{
 			Name = "framebudgetms",
@@ -207,84 +219,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				CargoShip.loot_rounds = str.ToInt();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "assignmentcooldown",
-			Parent = "cctvrender",
-			FullName = "cctvrender.assignmentcooldown",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Settings.AssignmentCooldown.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Settings.AssignmentCooldown = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "assignmenttimeout",
-			Parent = "cctvrender",
-			FullName = "cctvrender.assignmenttimeout",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Settings.AssignmentTimeout.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Settings.AssignmentTimeout = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "combattime",
-			Parent = "cctvrender",
-			FullName = "cctvrender.combattime",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Settings.CombatTime.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Settings.CombatTime = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "enabled",
-			Parent = "cctvrender",
-			FullName = "cctvrender.enabled",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Settings.Enabled.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Settings.Enabled = str.ToBool();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "idletime",
-			Parent = "cctvrender",
-			FullName = "cctvrender.idletime",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Settings.IdleTime.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Settings.IdleTime = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "maxdistance",
-			Parent = "cctvrender",
-			FullName = "cctvrender.maxdistance",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Settings.MaxDistance.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Settings.MaxDistance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -748,6 +682,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "accuratevisiondistance",
+			Parent = "ai",
+			FullName = "ai.accuratevisiondistance",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.accuratevisiondistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.accuratevisiondistance = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "aidebug_loadbalanceoverduereportserver",
 			Parent = "ai",
 			FullName = "ai.aidebug_loadbalanceoverduereportserver",
@@ -798,6 +745,24 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "allowdesigning",
+			Parent = "ai",
+			FullName = "ai.allowdesigning",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Saved = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => AI.allowdesigning.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.allowdesigning = str.ToBool();
+			},
+			Default = "True"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "animal_ignore_food",
 			Parent = "ai",
 			FullName = "ai.animal_ignore_food",
@@ -825,6 +790,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "brainstats",
+			Parent = "ai",
+			FullName = "ai.brainstats",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.brainstats(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "defaultloadbalancerupdateinterval",
 			Parent = "ai",
 			FullName = "ai.defaultloadbalancerupdateinterval",
@@ -847,6 +824,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.frametime = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "groups",
+			Parent = "ai",
+			FullName = "ai.groups",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.groups.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.groups = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -943,6 +933,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.nav_carve_use_building_optimization = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "navthink",
+			Parent = "ai",
+			FullName = "ai.navthink",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.navthink.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.navthink = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -1534,6 +1537,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "npcswimming",
+			Parent = "ai",
+			FullName = "ai.npcswimming",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.npcswimming.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.npcswimming = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "ocean_patrol_path_iterations",
 			Parent = "ai",
 			FullName = "ai.ocean_patrol_path_iterations",
@@ -1572,6 +1588,57 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "setdestinationsamplenavmesh",
+			Parent = "ai",
+			FullName = "ai.setdestinationsamplenavmesh",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.setdestinationsamplenavmesh.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.setdestinationsamplenavmesh = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "sleepwake",
+			Parent = "ai",
+			FullName = "ai.sleepwake",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.sleepwake.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.sleepwake = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "sleepwakestats",
+			Parent = "ai",
+			FullName = "ai.sleepwakestats",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.sleepwakestats(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "spliceupdates",
+			Parent = "ai",
+			FullName = "ai.spliceupdates",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.spliceupdates.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.spliceupdates = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "think",
 			Parent = "ai",
 			FullName = "ai.think",
@@ -1594,6 +1661,31 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.tickrate = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "usegrid",
+			Parent = "ai",
+			FullName = "ai.usegrid",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.usegrid.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.usegrid = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wakesleepingai",
+			Parent = "ai",
+			FullName = "ai.wakesleepingai",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.wakesleepingai(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8975,6 +9067,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "contacts",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.contacts",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => RelationshipManager.contacts.ToString(),
+			SetOveride = delegate(string str)
+			{
+				RelationshipManager.contacts = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "fakeinvite",
 			Parent = "relationshipmanager",
 			FullName = "relationshipmanager.fakeinvite",
@@ -8983,6 +9088,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				RelationshipManager.fakeinvite(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "forgetafterminutes",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.forgetafterminutes",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => RelationshipManager.forgetafterminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				RelationshipManager.forgetafterminutes = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9011,6 +9129,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "maxplayerrelationships",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.maxplayerrelationships",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => RelationshipManager.maxplayerrelationships.ToString(),
+			SetOveride = delegate(string str)
+			{
+				RelationshipManager.maxplayerrelationships = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxteamsize",
 			Parent = "relationshipmanager",
 			FullName = "relationshipmanager.maxteamsize",
@@ -9020,6 +9151,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				RelationshipManager.maxTeamSize = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "mugshotupdateinterval",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.mugshotupdateinterval",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => RelationshipManager.mugshotUpdateInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				RelationshipManager.mugshotUpdateInterval = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9044,6 +9188,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				RelationshipManager.rejectinvite(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "seendistance",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.seendistance",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => RelationshipManager.seendistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				RelationshipManager.seendistance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9080,6 +9237,30 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				RelationshipManager.trycreateteam(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipe_all_contacts",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.wipe_all_contacts",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				RelationshipManager.wipe_all_contacts(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipecontacts",
+			Parent = "relationshipmanager",
+			FullName = "relationshipmanager.wipecontacts",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				RelationshipManager.wipecontacts(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -9274,6 +9455,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AiManager.pathfindingIterationsPerFrame = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "setdestination_navmesh_failsafe",
+			Parent = "aimanager",
+			FullName = "aimanager.setdestination_navmesh_failsafe",
+			ServerAdmin = true,
+			Description = "If set to true, npcs will attempt to place themselves on the navmesh if not on a navmesh when set destination is called.",
+			Variable = true,
+			GetOveride = () => AiManager.setdestination_navmesh_failsafe.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AiManager.setdestination_navmesh_failsafe = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command

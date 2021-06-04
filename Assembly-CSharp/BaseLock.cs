@@ -43,9 +43,9 @@ public class BaseLock : BaseEntity
 							RPC_TakeLock(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_TakeLock");
 					}
 				}
@@ -75,8 +75,8 @@ public class BaseLock : BaseEntity
 		return true;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_TakeLock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && !IsLocked() && Interface.CallHook("CanPickupLock", rpc.player, this) == null)

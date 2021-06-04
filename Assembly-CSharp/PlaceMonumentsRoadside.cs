@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -6,7 +7,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 {
 	public struct SpawnInfo
 	{
-		public Prefab prefab;
+		public Prefab<MonumentInfo> prefab;
 
 		public Vector3 position;
 
@@ -57,8 +58,10 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 
 	public int TargetCount;
 
-	[FormerlySerializedAs("Distance")]
-	public int MinDistance = 500;
+	[FormerlySerializedAs("MinDistance")]
+	public int MinDistanceSameType = 500;
+
+	public int MinDistanceDifferentType;
 
 	[FormerlySerializedAs("MinSize")]
 	public int MinWorldSize;
@@ -79,9 +82,11 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 
 	public override void Process(uint seed)
 	{
+		string[] array = (from folder in ResourceFolder.Split(',')
+			select "assets/bundled/prefabs/autospawn/" + folder + "/").ToArray();
 		if (World.Networked)
 		{
-			World.Spawn("Monument", "assets/bundled/prefabs/autospawn/" + ResourceFolder + "/");
+			World.Spawn("Monument", array);
 		}
 		else
 		{
@@ -90,21 +95,28 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				return;
 			}
 			TerrainHeightMap heightMap = TerrainMeta.HeightMap;
-			Prefab<MonumentInfo>[] array = Prefab.Load<MonumentInfo>("assets/bundled/prefabs/autospawn/" + ResourceFolder);
-			if (array == null || array.Length == 0)
+			List<Prefab<MonumentInfo>> list = new List<Prefab<MonumentInfo>>();
+			string[] array2 = array;
+			for (int i = 0; i < array2.Length; i++)
+			{
+				Prefab<MonumentInfo>[] array3 = Prefab.Load<MonumentInfo>(array2[i]);
+				ArrayEx.Shuffle(array3, ref seed);
+				list.AddRange(array3);
+			}
+			Prefab<MonumentInfo>[] array4 = list.ToArray();
+			if (array4 == null || array4.Length == 0)
 			{
 				return;
 			}
-			ArrayEx.Shuffle(array, seed);
-			ArrayEx.BubbleSort(array);
-			SpawnInfoGroup[] array2 = new SpawnInfoGroup[array.Length];
-			for (int i = 0; i < array.Length; i++)
+			ArrayEx.BubbleSort(array4);
+			SpawnInfoGroup[] array5 = new SpawnInfoGroup[array4.Length];
+			for (int j = 0; j < array4.Length; j++)
 			{
-				Prefab<MonumentInfo> prefab = array[i];
+				Prefab<MonumentInfo> prefab = array4[j];
 				SpawnInfoGroup spawnInfoGroup = null;
-				for (int j = 0; j < i; j++)
+				for (int k = 0; k < j; k++)
 				{
-					SpawnInfoGroup spawnInfoGroup2 = array2[j];
+					SpawnInfoGroup spawnInfoGroup2 = array5[k];
 					Prefab<MonumentInfo> prefab2 = spawnInfoGroup2.prefab;
 					if (prefab == prefab2)
 					{
@@ -115,23 +127,25 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				if (spawnInfoGroup == null)
 				{
 					spawnInfoGroup = new SpawnInfoGroup();
-					spawnInfoGroup.prefab = array[i];
+					spawnInfoGroup.prefab = array4[j];
 					spawnInfoGroup.candidates = new List<SpawnInfo>();
 				}
-				array2[i] = spawnInfoGroup;
+				array5[j] = spawnInfoGroup;
 			}
-			SpawnInfoGroup[] array3 = array2;
-			foreach (SpawnInfoGroup spawnInfoGroup3 in array3)
+			SpawnInfoGroup[] array6 = array5;
+			foreach (SpawnInfoGroup spawnInfoGroup3 in array6)
 			{
 				if (spawnInfoGroup3.processed)
 				{
 					continue;
 				}
 				Prefab<MonumentInfo> prefab3 = spawnInfoGroup3.prefab;
-				if ((bool)prefab3.Component && World.Size < prefab3.Component.MinWorldSize)
+				MonumentInfo component = prefab3.Component;
+				if (component == null || World.Size < component.MinWorldSize)
 				{
 					continue;
 				}
+				DungeonInfo dungeonEntrance = component.DungeonEntrance;
 				foreach (PathList road in TerrainMeta.Path.Roads)
 				{
 					switch (RoadType)
@@ -197,12 +211,14 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 							Vector3 pos = vector;
 							Quaternion quaternion2 = quaternion;
 							Vector3 localScale = prefab3.Object.transform.localScale;
+							Vector3 position = pos + quaternion2 * Vector3.Scale(localScale, dungeonEntrance ? dungeonEntrance.transform.position : Vector3.zero);
+							Quaternion rotation = quaternion2 * (dungeonEntrance ? dungeonEntrance.transform.rotation : Quaternion.identity);
 							if (zero != Vector3.zero)
 							{
 								quaternion2 *= Quaternion.LookRotation(rot90 * -zero.XZ3D());
 								pos -= quaternion2 * zero;
 							}
-							if ((!prefab3.Component || prefab3.Component.CheckPlacement(pos, quaternion2, localScale)) && prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground))
+							if (component.CheckPlacement(pos, quaternion2, localScale) && prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground) && (!dungeonEntrance || dungeonEntrance.IsValidSpawnPosition(position, rotation)))
 							{
 								SpawnInfo item = default(SpawnInfo);
 								item.prefab = prefab3;
@@ -224,12 +240,13 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			{
 				num7 = 0;
 				a.Clear();
-				ArrayEx.Shuffle(array2, ref seed);
-				array3 = array2;
-				foreach (SpawnInfoGroup spawnInfoGroup4 in array3)
+				ArrayEx.Shuffle(array5, ref seed);
+				array6 = array5;
+				foreach (SpawnInfoGroup spawnInfoGroup4 in array6)
 				{
 					Prefab<MonumentInfo> prefab4 = spawnInfoGroup4.prefab;
-					if ((bool)prefab4.Component && World.Size < prefab4.Component.MinWorldSize)
+					MonumentInfo component2 = prefab4.Component;
+					if (component2 == null || World.Size < component2.MinWorldSize)
 					{
 						continue;
 					}
@@ -242,38 +259,37 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 					for (int num13 = 0; num13 < spawnInfoGroup4.candidates.Count; num13++)
 					{
 						SpawnInfo spawnInfo = spawnInfoGroup4.candidates[num13];
-						int num14 = Mathf.Max(MinDistance, prefab4.Component ? prefab4.Component.MinDistance : 0);
-						DistanceInfo distanceInfo = GetDistanceInfo(a, spawnInfo.position, prefab4.Component);
-						if (distanceInfo.minDistanceSameType < (float)num14)
+						DistanceInfo distanceInfo = GetDistanceInfo(a, prefab4, spawnInfo.position, spawnInfo.rotation, spawnInfo.scale);
+						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType)
 						{
 							continue;
 						}
-						int num15 = num10;
+						int num14 = num10;
 						if (distanceInfo.minDistanceSameType != float.MaxValue)
 						{
 							if (DistanceSameType == DistanceMode.Min)
 							{
-								num15 -= Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+								num14 -= Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
 							}
 							else if (DistanceSameType == DistanceMode.Max)
 							{
-								num15 += Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+								num14 += Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
 							}
 						}
 						if (distanceInfo.minDistanceDifferentType != float.MaxValue)
 						{
 							if (DistanceDifferentType == DistanceMode.Min)
 							{
-								num15 -= Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+								num14 -= Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
 							}
 							else if (DistanceDifferentType == DistanceMode.Max)
 							{
-								num15 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+								num14 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
 							}
 						}
-						if (num15 > num12)
+						if (num14 > num12)
 						{
-							num12 = num15;
+							num12 = num14;
 							item2 = spawnInfo;
 						}
 						num11++;
@@ -305,27 +321,28 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 		}
 	}
 
-	private DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Vector3 pos, MonumentInfo info)
+	private DistanceInfo GetDistanceInfo(List<SpawnInfo> spawns, Prefab<MonumentInfo> prefab, Vector3 monumentPos, Quaternion monumentRot, Vector3 monumentScale)
 	{
 		DistanceInfo result = default(DistanceInfo);
 		result.minDistanceDifferentType = float.MaxValue;
 		result.maxDistanceDifferentType = float.MinValue;
 		result.minDistanceSameType = float.MaxValue;
 		result.maxDistanceSameType = float.MinValue;
+		OBB oBB = new OBB(monumentPos, monumentScale, monumentRot, prefab.Component.Bounds);
 		if (TerrainMeta.Path != null)
 		{
 			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				if (!info || !info.HasDungeonLink || (!monument.HasDungeonLink && monument.WantsDungeonLink))
+				if (!prefab.Component.HasDungeonLink || (!monument.HasDungeonLink && monument.WantsDungeonLink))
 				{
-					float sqrMagnitude = (monument.transform.position - pos).sqrMagnitude;
-					if (sqrMagnitude < result.minDistanceDifferentType)
+					float num = monument.SqrDistance(oBB);
+					if (num < result.minDistanceDifferentType)
 					{
-						result.minDistanceDifferentType = sqrMagnitude;
+						result.minDistanceDifferentType = num;
 					}
-					if (sqrMagnitude > result.maxDistanceDifferentType)
+					if (num > result.maxDistanceDifferentType)
 					{
-						result.maxDistanceDifferentType = sqrMagnitude;
+						result.maxDistanceDifferentType = num;
 					}
 				}
 			}
@@ -342,43 +359,43 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 		{
 			foreach (SpawnInfo spawn in spawns)
 			{
-				float sqrMagnitude2 = (spawn.position - pos).sqrMagnitude;
-				if (sqrMagnitude2 < result.minDistanceSameType)
+				float num2 = new OBB(spawn.position, spawn.scale, spawn.rotation, spawn.prefab.Component.Bounds).SqrDistance(oBB);
+				if (num2 < result.minDistanceSameType)
 				{
-					result.minDistanceSameType = sqrMagnitude2;
+					result.minDistanceSameType = num2;
 				}
-				if (sqrMagnitude2 > result.maxDistanceSameType)
+				if (num2 > result.maxDistanceSameType)
 				{
-					result.maxDistanceSameType = sqrMagnitude2;
+					result.maxDistanceSameType = num2;
 				}
 			}
-			if ((bool)info && info.HasDungeonLink)
+			if (prefab.Component.HasDungeonLink)
 			{
 				foreach (MonumentInfo monument2 in TerrainMeta.Path.Monuments)
 				{
 					if (monument2.HasDungeonLink || !monument2.WantsDungeonLink)
 					{
-						float sqrMagnitude3 = (monument2.transform.position - pos).sqrMagnitude;
-						if (sqrMagnitude3 < result.minDistanceSameType)
+						float num3 = monument2.SqrDistance(oBB);
+						if (num3 < result.minDistanceSameType)
 						{
-							result.minDistanceSameType = sqrMagnitude3;
+							result.minDistanceSameType = num3;
 						}
-						if (sqrMagnitude3 > result.maxDistanceSameType)
+						if (num3 > result.maxDistanceSameType)
 						{
-							result.maxDistanceSameType = sqrMagnitude3;
+							result.maxDistanceSameType = num3;
 						}
 					}
 				}
 				foreach (DungeonInfo dungeonEntrance in TerrainMeta.Path.DungeonEntrances)
 				{
-					float sqrMagnitude4 = (dungeonEntrance.transform.position - pos).sqrMagnitude;
-					if (sqrMagnitude4 < result.minDistanceSameType)
+					float num4 = dungeonEntrance.SqrDistance(monumentPos);
+					if (num4 < result.minDistanceSameType)
 					{
-						result.minDistanceSameType = sqrMagnitude4;
+						result.minDistanceSameType = num4;
 					}
-					if (sqrMagnitude4 > result.maxDistanceSameType)
+					if (num4 > result.maxDistanceSameType)
 					{
-						result.maxDistanceSameType = sqrMagnitude4;
+						result.maxDistanceSameType = num4;
 					}
 				}
 			}

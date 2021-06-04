@@ -111,7 +111,7 @@ public class CoverageQueries : MonoBehaviour
 		{
 			if (asyncRequests.Count < 10)
 			{
-				asyncRequests.Enqueue(AsyncGPUReadback.Request((Texture)resultTexture, 0, (Action<AsyncGPUReadbackRequest>)null));
+				asyncRequests.Enqueue(AsyncGPUReadback.Request(resultTexture));
 			}
 		}
 
@@ -131,7 +131,7 @@ public class CoverageQueries : MonoBehaviour
 				}
 				if (asyncGPUReadbackRequest.done)
 				{
-					NativeArray<Color32> data = asyncGPUReadbackRequest.GetData<Color32>(0);
+					NativeArray<Color32> data = asyncGPUReadbackRequest.GetData<Color32>();
 					for (int i = 0; i < data.Length; i++)
 					{
 						resultData[i] = data[i];

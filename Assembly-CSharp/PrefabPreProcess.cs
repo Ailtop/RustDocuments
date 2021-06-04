@@ -308,7 +308,7 @@ public class PrefabPreProcess : IPrefabProcessor
 
 	private bool HasComponents(Transform transform, Type t)
 	{
-		if (((Component)transform).GetComponent(t) != null)
+		if (transform.GetComponent(t) != null)
 		{
 			return true;
 		}
@@ -350,7 +350,7 @@ public class PrefabPreProcess : IPrefabProcessor
 
 	public void FindComponents(Transform transform, List<Component> list, Type t)
 	{
-		list.AddRange(((Component)transform).GetComponents(t));
+		list.AddRange(transform.GetComponents(t));
 		foreach (Transform item in transform)
 		{
 			if (!ShouldExclude(item))

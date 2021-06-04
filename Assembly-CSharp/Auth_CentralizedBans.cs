@@ -4,6 +4,7 @@ using ConVar;
 using Facepunch.Extend;
 using Facepunch.Math;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -22,33 +23,62 @@ public static class Auth_CentralizedBans
 
 	public static IEnumerator Run(Connection connection)
 	{
-		if (!connection.active || connection.rejected || string.IsNullOrWhiteSpace(ConVar.Server.bansServerEndpoint) || !ConVar.Server.bansServerEndpoint.StartsWith("http"))
+		int num = default(int);
+		UnityWebRequest ownerRequest = default(UnityWebRequest);
+		UnityWebRequest userRequest = default(UnityWebRequest);
+		while (true)
 		{
-			yield break;
-		}
-		connection.authStatus = "";
-		if (!ConVar.Server.bansServerEndpoint.EndsWith("/"))
-		{
-			ConVar.Server.bansServerEndpoint += "/";
-		}
-		if (connection.ownerid != 0L && connection.ownerid != connection.userid)
-		{
-			string uri = ConVar.Server.bansServerEndpoint + connection.ownerid;
-			UnityWebRequest ownerRequest = UnityWebRequest.Get(uri);
-			ownerRequest.timeout = ConVar.Server.bansServerTimeout;
-			yield return ownerRequest.SendWebRequest();
-			if (CheckIfPlayerBanned(connection.ownerid, connection, ownerRequest))
+			object obj = Interface.CallHook("OnCentralizedBanCheck", connection);
+			if (obj != null)
 			{
-				yield break;
+				break;
 			}
-		}
-		string uri2 = ConVar.Server.bansServerEndpoint + connection.userid;
-		UnityWebRequest userRequest = UnityWebRequest.Get(uri2);
-		userRequest.timeout = ConVar.Server.bansServerTimeout;
-		yield return userRequest.SendWebRequest();
-		if (!CheckIfPlayerBanned(connection.userid, connection, userRequest))
-		{
-			connection.authStatus = "ok";
+			string uri2;
+			switch (num)
+			{
+			default:
+				yield break;
+			case 0:
+				if (!connection.active || connection.rejected || string.IsNullOrWhiteSpace(ConVar.Server.bansServerEndpoint) || !ConVar.Server.bansServerEndpoint.StartsWith("http"))
+				{
+					yield break;
+				}
+				connection.authStatus = "";
+				if (!ConVar.Server.bansServerEndpoint.EndsWith("/"))
+				{
+					ConVar.Server.bansServerEndpoint += "/";
+				}
+				if (connection.ownerid != 0L && connection.ownerid != connection.userid)
+				{
+					string uri = ConVar.Server.bansServerEndpoint + connection.ownerid;
+					ownerRequest = UnityWebRequest.Get(uri);
+					ownerRequest.timeout = ConVar.Server.bansServerTimeout;
+					yield return ownerRequest.SendWebRequest();
+					break;
+				}
+				goto IL_0152;
+			case 1:
+				if (CheckIfPlayerBanned(connection.ownerid, connection, ownerRequest))
+				{
+					yield break;
+				}
+				ownerRequest = null;
+				goto IL_0152;
+			case 2:
+				{
+					if (!CheckIfPlayerBanned(connection.userid, connection, userRequest))
+					{
+						connection.authStatus = "ok";
+					}
+					yield break;
+				}
+				IL_0152:
+				uri2 = ConVar.Server.bansServerEndpoint + connection.userid;
+				userRequest = UnityWebRequest.Get(uri2);
+				userRequest.timeout = ConVar.Server.bansServerTimeout;
+				yield return userRequest.SendWebRequest();
+				break;
+			}
 		}
 	}
 
@@ -105,10 +135,10 @@ public static class Auth_CentralizedBans
 			_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("You are banned from this server" + text2 + " (" + text + ")", ref _003C_003Ec__DisplayClass2_);
 			return true;
 		}
-		catch (Exception ex)
+		catch (Exception exception)
 		{
 			Debug.LogError("Failed to check centralized bans due to a malformed response: " + request.downloadHandler.text);
-			Debug.LogException(ex);
+			Debug.LogException(exception);
 			if (ConVar.Server.bansServerFailureMode == 1)
 			{
 				_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("Centralized Ban Error: Malformed Response", ref _003C_003Ec__DisplayClass2_);

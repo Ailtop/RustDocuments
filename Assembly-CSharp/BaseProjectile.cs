@@ -317,9 +317,9 @@ public class BaseProjectile : AttackEntity
 							CLProject(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in CLProject");
 					}
 				}
@@ -353,9 +353,9 @@ public class BaseProjectile : AttackEntity
 							Reload(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in Reload");
 					}
 				}
@@ -389,9 +389,9 @@ public class BaseProjectile : AttackEntity
 							ServerFractionalReloadInsert(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in ServerFractionalReloadInsert");
 					}
 				}
@@ -425,9 +425,9 @@ public class BaseProjectile : AttackEntity
 							StartReload(msg5);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in StartReload");
 					}
 				}
@@ -461,9 +461,9 @@ public class BaseProjectile : AttackEntity
 							SwitchAmmoTo(msg6);
 						}
 					}
-					catch (Exception ex5)
+					catch (Exception exception5)
 					{
-						Debug.LogException(ex5);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in SwitchAmmoTo");
 					}
 				}
@@ -1137,6 +1137,7 @@ public class BaseProjectile : AttackEntity
 				}
 			}
 		}
+		player.MakeNoise(player.transform.position, BaseCombatEntity.ActionVolume.Loud);
 		player.stats.Add(component.category + "_fired", projectileShoot.projectiles.Count(), (Stats)5);
 		player.LifeStoryShotFired(this);
 		StartAttackCooldown(ScaleRepeatDelay(repeatDelay) + animationDelay);

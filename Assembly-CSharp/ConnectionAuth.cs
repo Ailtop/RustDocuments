@@ -60,7 +60,7 @@ public class ConnectionAuth : MonoBehaviour
 			Reject(connection, "Invalid SteamID");
 			return;
 		}
-		if (connection.protocol != 2301)
+		if (connection.protocol != 2303)
 		{
 			if (!DeveloperList.Contains(connection.userid))
 			{
@@ -95,15 +95,15 @@ public class ConnectionAuth : MonoBehaviour
 		if (Interface.CallHook("IOnUserApprove", connection) == null)
 		{
 			m_AuthConnection.Add(connection);
-			base.StartCoroutine(AuthorisationRoutine(connection));
+			StartCoroutine(AuthorisationRoutine(connection));
 		}
 	}
 
 	public IEnumerator AuthorisationRoutine(Connection connection)
 	{
-		yield return base.StartCoroutine(Auth_Steam.Run(connection));
-		yield return base.StartCoroutine(Auth_EAC.Run(connection));
-		yield return base.StartCoroutine(Auth_CentralizedBans.Run(connection));
+		yield return StartCoroutine(Auth_Steam.Run(connection));
+		yield return StartCoroutine(Auth_EAC.Run(connection));
+		yield return StartCoroutine(Auth_CentralizedBans.Run(connection));
 		if (!connection.rejected && connection.active)
 		{
 			if (IsAuthed(connection.userid))

@@ -38,6 +38,6 @@ public struct ViewModelDrawEvent : IEquatable<ViewModelDrawEvent>
 
 	public override int GetHashCode()
 	{
-		return (((((((((((viewModelRenderer != null) ? ((object)viewModelRenderer).GetHashCode() : 0) * 397) ^ ((renderer != null) ? ((object)renderer).GetHashCode() : 0)) * 397) ^ skipDepthPrePass.GetHashCode()) * 397) ^ ((material != null) ? ((object)material).GetHashCode() : 0)) * 397) ^ subMesh) * 397) ^ pass;
+		return (((((((((((viewModelRenderer != null) ? viewModelRenderer.GetHashCode() : 0) * 397) ^ ((renderer != null) ? renderer.GetHashCode() : 0)) * 397) ^ skipDepthPrePass.GetHashCode()) * 397) ^ ((material != null) ? material.GetHashCode() : 0)) * 397) ^ subMesh) * 397) ^ pass;
 	}
 }

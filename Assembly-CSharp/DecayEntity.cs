@@ -17,7 +17,7 @@ public class DecayEntity : BaseCombatEntity
 
 	public float upkeepTimer;
 
-	private Upkeep upkeep;
+	public Upkeep upkeep;
 
 	public Decay decay;
 

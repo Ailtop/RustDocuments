@@ -1,9 +1,8 @@
-using CCTVRender;
 using ProtoBuf;
 
 namespace CompanionServer
 {
-	public interface IConnection : IReceiver
+	public interface IConnection
 	{
 		void Send(AppResponse response);
 

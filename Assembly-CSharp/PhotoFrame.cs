@@ -57,9 +57,9 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 							LockSign(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in LockSign");
 					}
 				}
@@ -93,9 +93,9 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 							UnLockSign(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in UnLockSign");
 					}
 				}
@@ -133,9 +133,9 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 							UpdateSign(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in UpdateSign");
 					}
 				}
@@ -185,8 +185,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 		return CanUpdateSign(player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
@@ -203,8 +203,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -216,8 +216,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))

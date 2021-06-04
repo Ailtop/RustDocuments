@@ -37,7 +37,7 @@ public class PlayerModelHair : MonoBehaviour
 			return;
 		}
 		List<SkinnedMeshRenderer> obj = Pool.GetList<SkinnedMeshRenderer>();
-		base.gameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true, obj);
+		base.gameObject.GetComponentsInChildren(true, obj);
 		materials = new Dictionary<Renderer, RendererMaterials>();
 		materials.Clear();
 		foreach (SkinnedMeshRenderer item in obj)

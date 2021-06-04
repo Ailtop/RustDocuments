@@ -39,7 +39,7 @@ public class GameSetup : MonoBehaviour
 			Bootstrap.Init_Systems();
 			Bootstrap.Init_Config();
 		}
-		base.StartCoroutine(DoGameSetup());
+		StartCoroutine(DoGameSetup());
 	}
 
 	private IEnumerator DoGameSetup()
@@ -58,7 +58,7 @@ public class GameSetup : MonoBehaviour
 		}
 		if (startServer)
 		{
-			yield return base.StartCoroutine(StartServer());
+			yield return StartCoroutine(StartServer());
 		}
 		yield return null;
 		Rust.Application.isLoading = false;
@@ -70,6 +70,6 @@ public class GameSetup : MonoBehaviour
 		ConVar.GC.unload();
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
-		yield return base.StartCoroutine(Bootstrap.StartServer(loadSave, loadSaveFile, true));
+		yield return StartCoroutine(Bootstrap.StartServer(loadSave, loadSaveFile, true));
 	}
 }

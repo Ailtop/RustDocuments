@@ -47,6 +47,8 @@ namespace Facepunch.CardGames
 
 		public bool HasUserInCurrentRound => State == CardPlayerState.InCurrentRound;
 
+		public bool HasAvailableInputs => availableInputs > 0;
+
 		private bool IsClient => !isServer;
 
 		public bool LeftRoundEarly { get; private set; }

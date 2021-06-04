@@ -39,9 +39,9 @@ public class BowWeapon : BaseProjectile
 							BowReload(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in BowReload");
 					}
 				}
@@ -51,8 +51,8 @@ public class BowWeapon : BaseProjectile
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void BowReload(RPCMessage msg)
 	{
 		ReloadMagazine();

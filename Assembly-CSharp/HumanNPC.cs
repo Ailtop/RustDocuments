@@ -38,7 +38,7 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	public BaseCombatEntity currentTarget;
 
-	public HumanBrain _brain;
+	public BaseAIBrain<HumanNPC> _brain;
 
 	public float lastDismountTime;
 
@@ -68,8 +68,6 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	[NonSerialized]
 	public float memoryDuration = 10f;
-
-	public bool pendingDucked;
 
 	public float timeSinceItemTick = 0.1f;
 
@@ -118,7 +116,7 @@ public class HumanNPC : NPCPlayer, IThinker
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		_brain = GetComponent<HumanBrain>();
+		_brain = GetComponent<BaseAIBrain<HumanNPC>>();
 		if (!base.isClient)
 		{
 			AIThinkManager.Add(this);
@@ -243,7 +241,7 @@ public class HumanNPC : NPCPlayer, IThinker
 	{
 		if (cachedInfoZone == null || UnityEngine.Time.time > nextZoneSearchTime)
 		{
-			cachedInfoZone = AIInformationZone.GetForPoint(pos, this);
+			cachedInfoZone = AIInformationZone.GetForPoint(pos);
 			nextZoneSearchTime = UnityEngine.Time.time + 5f;
 		}
 		return cachedInfoZone;
@@ -321,7 +319,7 @@ public class HumanNPC : NPCPlayer, IThinker
 				BasePlayer basePlayer = baseEntity as BasePlayer;
 				if (!(basePlayer != null) || baseEntity.IsNpc || (!AI.ignoreplayers && IsVisibleToUs(basePlayer)))
 				{
-					myMemory.Update(baseEntity);
+					myMemory.SetKnown(baseEntity, this, null);
 				}
 			}
 		}
@@ -405,23 +403,17 @@ public class HumanNPC : NPCPlayer, IThinker
 		}
 	}
 
-	public void SetDucked(bool wantsDucked)
+	public void SetDucked(bool flag)
 	{
 		if (Interface.CallHook("OnNpcDuck", this) == null)
 		{
-			pendingDucked = wantsDucked;
-			ApplyPendingDucked();
+			if (flag)
+			{
+				SetDesiredSpeed(SpeedType.Crouch);
+			}
+			modelState.ducked = flag;
+			SendNetworkUpdate();
 		}
-	}
-
-	public void ApplyPendingDucked()
-	{
-		if (pendingDucked)
-		{
-			SetDesiredSpeed(SpeedType.Crouch);
-		}
-		modelState.ducked = pendingDucked;
-		SendNetworkUpdate();
 	}
 
 	public virtual void TryThink()
@@ -432,7 +424,7 @@ public class HumanNPC : NPCPlayer, IThinker
 	public override void ServerThink(float delta)
 	{
 		base.ServerThink(delta);
-		if (_brain.ShouldThink())
+		if (_brain.ShouldServerThink())
 		{
 			_brain.DoThink();
 		}
@@ -498,21 +490,10 @@ public class HumanNPC : NPCPlayer, IThinker
 		NavAgent.agentTypeID = NavAgent.agentTypeID;
 		if (on)
 		{
-			int areaMask = 1 << NavMesh.GetAreaFromName("HumanNPC");
-			NavMeshHit hit;
-			if (NavMesh.SamplePosition(base.transform.position, out hit, 5f, areaMask))
+			on = PlaceOnNavMesh();
+			if (!on)
 			{
-				base.transform.position = hit.position;
-				NavAgent.enabled = true;
-				base.transform.position = hit.position;
-			}
-			else
-			{
-				if (Global.developer > 0)
-				{
-					Debug.Log(base.name + " Failed to sample navmesh on enable at : " + base.transform.position);
-				}
-				on = false;
+				Debug.Log(base.name + " Failed to sample navmesh on enable at : " + base.transform.position);
 				if (!IsInvoking(EnableNavAgent))
 				{
 					Invoke(EnableNavAgent, UnityEngine.Random.Range(0.9f, 1f));
@@ -536,23 +517,34 @@ public class HumanNPC : NPCPlayer, IThinker
 		}
 	}
 
+	private bool PlaceOnNavMesh()
+	{
+		int areaMask = 1 << NavMesh.GetAreaFromName("HumanNPC");
+		NavMeshHit hit;
+		if (NavMesh.SamplePosition(base.transform.position, out hit, 5f, areaMask))
+		{
+			base.transform.position = hit.position;
+			NavAgent.enabled = true;
+			base.transform.position = hit.position;
+			if (!NavAgent.isOnNavMesh)
+			{
+				Debug.LogWarning("Agent still not on navmesh after a warp. No navmesh areas matching agent type? Agent type: " + NavAgent.agentTypeID, base.gameObject);
+				return false;
+			}
+			return true;
+		}
+		if (Global.developer > 0)
+		{
+			Debug.Log(base.name + " Failed to sample navmesh on enable at : " + base.transform.position);
+		}
+		return false;
+	}
+
 	public void EnableNavAgent()
 	{
 		if (!base.isMounted)
 		{
 			SetNavMeshEnabled(true);
-		}
-	}
-
-	public void LogAttacker(BaseEntity attacker)
-	{
-	}
-
-	public void KeepFresh(BaseEntity ent)
-	{
-		if (ent != null && !ent.EqualNetID(this))
-		{
-			myMemory.Update(ent);
 		}
 	}
 
@@ -566,7 +558,7 @@ public class HumanNPC : NPCPlayer, IThinker
 		BaseEntity initiator = info.Initiator;
 		if (initiator != null && !initiator.EqualNetID(this))
 		{
-			myMemory.Update(initiator);
+			myMemory.SetKnown(initiator, this, null);
 		}
 	}
 
@@ -582,6 +574,10 @@ public class HumanNPC : NPCPlayer, IThinker
 	{
 		if (IsNavRunning())
 		{
+			if (AiManager.setdestination_navmesh_failsafe && !NavAgent.isOnNavMesh)
+			{
+				PlaceOnNavMesh();
+			}
 			base.SetDestination(newDestination);
 			if (NavAgent.enabled)
 			{
@@ -607,63 +603,6 @@ public class HumanNPC : NPCPlayer, IThinker
 			return basePlayer.eyes.position - Vector3.up * 0.15f;
 		}
 		return aimat.CenterPoint();
-	}
-
-	public AIMovePoint GetBestRoamPosition(Vector3 start)
-	{
-		float maxRoamDistFromSpawn = GetMaxRoamDistFromSpawn();
-		bool flag = maxRoamDistFromSpawn != -1f;
-		AIInformationZone informationZone = GetInformationZone(flag ? spawnPos : base.transform.position);
-		if (informationZone == null)
-		{
-			return null;
-		}
-		float num = -1f;
-		AIMovePoint result = null;
-		foreach (AIMovePoint movePoint in informationZone.movePoints)
-		{
-			if (!movePoint.transform.parent.gameObject.activeSelf)
-			{
-				continue;
-			}
-			float num2 = Vector3.Distance(base.transform.position, movePoint.transform.position);
-			float num3 = 0f;
-			float num4 = 100f;
-			if (maxRoamDistFromSpawn != -1f)
-			{
-				float value = Vector3.Distance(spawnPos, movePoint.transform.position);
-				if (num2 > 3f)
-				{
-					num3 += (1f - Mathf.InverseLerp(maxRoamDistFromSpawn * 0f, maxRoamDistFromSpawn, value)) * 200f * UnityEngine.Random.Range(0.8f, 1f);
-					num4 = 0f;
-				}
-			}
-			if (num4 != 0f)
-			{
-				float value2 = Vector3.Dot(eyes.BodyForward(), Vector3Ex.Direction2D(movePoint.transform.position, eyes.position));
-				num3 += Mathf.InverseLerp(-1f, 1f, value2) * num4;
-			}
-			if (!movePoint.IsUsedForRoaming())
-			{
-				num3 += 1000f;
-			}
-			float num5 = Mathf.Abs(base.transform.position.y - movePoint.transform.position.y);
-			num3 += (1f - Mathf.InverseLerp(1f, 10f, num5)) * 100f;
-			bool flag2 = base.transform.position.y < WaterSystem.OceanLevel;
-			if (flag2 || ((flag2 || !(movePoint.transform.position.y < WaterSystem.OceanLevel)) && (!(base.transform.position.y >= WaterSystem.OceanLevel) || !(num5 > 5f))))
-			{
-				if (num2 > 3f)
-				{
-					num3 += Mathf.InverseLerp(3f, 15f, num2) * 50f;
-				}
-				if (num3 > num)
-				{
-					result = movePoint;
-					num = num3;
-				}
-			}
-		}
-		return result;
 	}
 
 	public float GetAimSwayScalar()
@@ -724,12 +663,11 @@ public class HumanNPC : NPCPlayer, IThinker
 			}
 			return Vector3.zero;
 		}
-		float num2 = Vector3.Distance(currentTarget.transform.position, base.transform.position);
 		if (flag && desiredSpeed != SpeedType.Sprint)
 		{
 			return (AimOffset(currentTarget) - eyes.position).normalized;
 		}
-		if (num2 < 5f)
+		if (Vector3.Distance(currentTarget.transform.position, base.transform.position) < 5f)
 		{
 			return (AimOffset(currentTarget) - eyes.position).normalized;
 		}
@@ -774,7 +712,6 @@ public class HumanNPC : NPCPlayer, IThinker
 
 	public bool IsVisibleToUs(BasePlayer player)
 	{
-		bool flag = false;
 		if (base.isMounted)
 		{
 			return IsVisibleMounted(player);

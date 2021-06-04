@@ -93,6 +93,8 @@ public class IOEntity : BaseCombatEntity
 
 		public bool mainPowerSlot;
 
+		public WireTool.WireColour wireColour;
+
 		public void Clear()
 		{
 			connectedTo.Clear();
@@ -109,8 +111,8 @@ public class IOEntity : BaseCombatEntity
 	[NonSerialized]
 	public int lastResetIndex;
 
-	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing io entities per server frame")]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]
@@ -191,9 +193,9 @@ public class IOEntity : BaseCombatEntity
 							Server_RequestData(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in Server_RequestData");
 					}
 				}
@@ -365,9 +367,9 @@ public class IOEntity : BaseCombatEntity
 		return false;
 	}
 
+	[RPC_Server.IsVisible(6f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(10uL)]
-	[RPC_Server.IsVisible(6f)]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -780,6 +782,7 @@ public class IOEntity : BaseCombatEntity
 			iOConnection.niceName = iOSlot.niceName;
 			iOConnection.type = (int)iOSlot.type;
 			iOConnection.inUse = iOConnection.connectedID != 0;
+			iOConnection.colour = (int)iOSlot.wireColour;
 			info.msg.ioEntity.inputs.Add(iOConnection);
 		}
 		array = outputs;
@@ -791,6 +794,7 @@ public class IOEntity : BaseCombatEntity
 			iOConnection2.niceName = iOSlot2.niceName;
 			iOConnection2.type = (int)iOSlot2.type;
 			iOConnection2.inUse = iOConnection2.connectedID != 0;
+			iOConnection2.colour = (int)iOSlot2.wireColour;
 			if (iOSlot2.linePoints != null)
 			{
 				iOConnection2.linePointList = Facepunch.Pool.GetList<ProtoBuf.IOEntity.IOConnection.LineVec>();
@@ -877,6 +881,7 @@ public class IOEntity : BaseCombatEntity
 				inputs[i].connectedToSlot = iOConnection.connectedToSlot;
 				inputs[i].niceName = iOConnection.niceName;
 				inputs[i].type = (IOType)iOConnection.type;
+				inputs[i].wireColour = (WireTool.WireColour)iOConnection.colour;
 			}
 		}
 		if (info.msg.ioEntity.outputs == null)
@@ -921,6 +926,7 @@ public class IOEntity : BaseCombatEntity
 			outputs[l].connectedToSlot = iOConnection2.connectedToSlot;
 			outputs[l].niceName = iOConnection2.niceName;
 			outputs[l].type = (IOType)iOConnection2.type;
+			outputs[l].wireColour = (WireTool.WireColour)iOConnection2.colour;
 			if (info.fromDisk || base.isClient)
 			{
 				List<ProtoBuf.IOEntity.IOConnection.LineVec> linePointList = iOConnection2.linePointList;

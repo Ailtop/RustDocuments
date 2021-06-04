@@ -73,9 +73,9 @@ public class CodeLock : BaseLock
 							RPC_ChangeCode(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_ChangeCode");
 					}
 				}
@@ -109,9 +109,9 @@ public class CodeLock : BaseLock
 							TryLock(rpc3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in TryLock");
 					}
 				}
@@ -145,9 +145,9 @@ public class CodeLock : BaseLock
 							TryUnlock(rpc4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in TryUnlock");
 					}
 				}
@@ -181,9 +181,9 @@ public class CodeLock : BaseLock
 							UnlockWithCode(rpc5);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in UnlockWithCode");
 					}
 				}
@@ -338,8 +338,8 @@ public class CodeLock : BaseLock
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void TryLock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && !IsLocked() && code.Length == 4 && Interface.CallHook("CanLock", rpc.player, this) == null && whitelistPlayers.Contains(rpc.player.userID))
@@ -350,8 +350,8 @@ public class CodeLock : BaseLock
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void UnlockWithCode(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !IsLocked())

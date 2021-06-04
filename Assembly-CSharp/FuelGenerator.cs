@@ -48,9 +48,9 @@ public class FuelGenerator : ContainerIOEntity
 							RPC_EngineSwitch(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_EngineSwitch");
 					}
 				}

@@ -9,6 +9,8 @@ public class AnimationEvents : BaseMonoBehaviour
 	[Tooltip("Path to the effect folder for these animations. Relative to this object.")]
 	public string effectFolder;
 
+	public bool enforceClipWeights;
+
 	public string localFolder;
 
 	public bool IsBusy;

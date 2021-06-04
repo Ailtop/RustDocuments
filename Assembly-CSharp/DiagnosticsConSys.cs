@@ -138,11 +138,11 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder.AppendLine("All active UnityEngine.Object, ordered by count");
 		stringBuilder.AppendLine();
 		foreach (IGrouping<Type, UnityEngine.Object> item in from x in source
-			group x by ((object)x).GetType() into x
+			group x by x.GetType() into x
 			orderby x.Count() descending
 			select x)
 		{
-			stringBuilder.AppendFormat("{1:N0}\t{0}", ((object)item.First()).GetType().Name, item.Count());
+			stringBuilder.AppendFormat("{1:N0}\t{0}", item.First().GetType().Name, item.Count());
 			stringBuilder.AppendLine();
 		}
 		WriteTextToFile(targetFolder + "UnityEngine.Object.Count.txt", stringBuilder.ToString());
@@ -151,11 +151,11 @@ public class DiagnosticsConSys : ConsoleSystem
 		stringBuilder2.AppendLine();
 		foreach (IGrouping<Type, UnityEngine.Object> item2 in from x in source
 			where x is ScriptableObject
-			group x by ((object)x).GetType() into x
+			group x by x.GetType() into x
 			orderby x.Count() descending
 			select x)
 		{
-			stringBuilder2.AppendFormat("{1:N0}\t{0}", ((object)item2.First()).GetType().Name, item2.Count());
+			stringBuilder2.AppendFormat("{1:N0}\t{0}", item2.First().GetType().Name, item2.Count());
 			stringBuilder2.AppendLine();
 		}
 		WriteTextToFile(targetFolder + "UnityEngine.ScriptableObject.Count.txt", stringBuilder2.ToString());
@@ -313,7 +313,7 @@ public class DiagnosticsConSys : ConsoleSystem
 					{
 						str.Append(" ");
 					}
-					str.AppendFormat("[c] {0}", (component == null) ? "NULL" : ((object)component).GetType().ToString());
+					str.AppendFormat("[c] {0}", (component == null) ? "NULL" : component.GetType().ToString());
 					str.AppendLine();
 				}
 			}
@@ -324,8 +324,8 @@ public class DiagnosticsConSys : ConsoleSystem
 		}
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void dump(Arg args)
 	{
 		if (Directory.Exists("diagnostics"))

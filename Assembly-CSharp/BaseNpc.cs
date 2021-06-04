@@ -106,8 +106,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			Player
 		}
 
-		[Tooltip("Ai will be less likely to fight animals that are larger than them, and more likely to flee from them.")]
 		[Range(0f, 1f)]
+		[Tooltip("Ai will be less likely to fight animals that are larger than them, and more likely to flee from them.")]
 		public float Size;
 
 		[Tooltip("How fast we can move")]
@@ -204,6 +204,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		[Tooltip("The water depth at which they will start swimming.")]
 		public float WaterLevelNeck;
 
+		public float WaterLevelNeckOffset;
+
 		[Tooltip("The range we consider using close range weapons.")]
 		public float CloseRange;
 
@@ -240,6 +242,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 	public int agentTypeIndex;
 
 	public bool NewAI;
+
+	public bool LegacyNavigation = true;
 
 	private Vector3 stepDirection;
 
@@ -292,8 +296,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private float nextAttackTime;
 
-	[SerializeField]
 	[InspectorFlags]
+	[SerializeField]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
 	[InspectorFlags]
@@ -712,7 +716,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		{
 			TickNavigation();
 		}
-		if (!AiManager.ai_dormant || GetNavAgent.enabled)
+		if (!AiManager.ai_dormant || GetNavAgent.enabled || CurrentBehaviour == Behaviour.Sleep || NewAI)
 		{
 			using (TimeWarning.New("TickMetabolism"))
 			{
@@ -725,6 +729,10 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private void TickSpeed()
 	{
+		if (!LegacyNavigation)
+		{
+			return;
+		}
 		float speed = Stats.Speed;
 		if (NewAI)
 		{
@@ -844,7 +852,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public void TickNavigationWater()
 	{
-		if (!AI.move || !IsNavRunning())
+		if (!LegacyNavigation || !AI.move || !IsNavRunning())
 		{
 			return;
 		}
@@ -878,7 +886,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public void TickNavigation()
 	{
-		if (!AI.move || !IsNavRunning())
+		if (!LegacyNavigation || !AI.move || !IsNavRunning())
 		{
 			return;
 		}
@@ -952,7 +960,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			return false;
 		}
 		_currentNavMeshLink = currentOffMeshLinkData;
-		_currentNavMeshLinkName = ((object)_currentNavMeshLink.linkType).ToString();
+		_currentNavMeshLinkName = _currentNavMeshLink.linkType.ToString();
 		if (currentOffMeshLinkData.offMeshLink.biDirectional)
 		{
 			if ((currentOffMeshLinkData.endPos - ServerPosition).sqrMagnitude < 0.05f)
@@ -1188,6 +1196,23 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 	}
 
+	public void Attack(BaseCombatEntity target)
+	{
+		if (!(target == null))
+		{
+			Vector3 vector = target.ServerPosition - ServerPosition;
+			if (vector.magnitude > 0.001f)
+			{
+				ServerRotation = Quaternion.LookRotation(vector.normalized);
+			}
+			nextAttackTime = UnityEngine.Time.realtimeSinceStartup + AttackRate;
+			target.Hurt(AttackDamage, AttackDamageType, this);
+			Stamina.Use(AttackCost);
+			SignalBroadcast(Signal.Attack);
+			ClientRPC(null, "Attack", target.ServerPosition);
+		}
+	}
+
 	public virtual void Eat()
 	{
 		if ((bool)FoodTarget)
@@ -1228,7 +1253,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		return false;
 	}
 
-	private bool IsAfraidOf(AiStatistics.FamilyEnum family)
+	protected bool IsAfraidOf(AiStatistics.FamilyEnum family)
 	{
 		AiStatistics.FamilyEnum[] isAfraidOf = Stats.IsAfraidOf;
 		foreach (AiStatistics.FamilyEnum familyEnum in isAfraidOf)
@@ -2158,6 +2183,10 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		{
 			NavAgent.updateRotation = false;
 			NavAgent.updatePosition = false;
+			if (!LegacyNavigation)
+			{
+				base.transform.gameObject.GetComponent<BaseNavigator>().Init(this, NavAgent);
+			}
 		}
 		IsStuck = false;
 		AgencyUpdateRequired = false;
@@ -2288,7 +2317,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 	{
 		if (!GetNavAgent.isOnNavMesh)
 		{
-			((MonoBehaviour)this).StartCoroutine(TryForceToNavmesh());
+			StartCoroutine(TryForceToNavmesh());
 			return;
 		}
 		GetNavAgent.enabled = true;
@@ -2394,7 +2423,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		{
 			return 0f;
 		}
-		if (((object)target).GetType() == ((object)this).GetType())
+		if (target.GetType() == GetType())
 		{
 			return 1f - Stats.Tolerance;
 		}

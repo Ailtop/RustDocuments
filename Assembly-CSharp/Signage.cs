@@ -80,9 +80,9 @@ public class Signage : IOEntity, ILOD, ISignage
 							LockSign(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						UnityEngine.Debug.LogException(ex);
+						UnityEngine.Debug.LogException(exception);
 						player.Kick("RPC Error in LockSign");
 					}
 				}
@@ -116,9 +116,9 @@ public class Signage : IOEntity, ILOD, ISignage
 							UnLockSign(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						UnityEngine.Debug.LogException(ex2);
+						UnityEngine.Debug.LogException(exception2);
 						player.Kick("RPC Error in UnLockSign");
 					}
 				}
@@ -156,9 +156,9 @@ public class Signage : IOEntity, ILOD, ISignage
 							UpdateSign(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						UnityEngine.Debug.LogException(ex3);
+						UnityEngine.Debug.LogException(exception3);
 						player.Kick("RPC Error in UpdateSign");
 					}
 				}
@@ -184,8 +184,8 @@ public class Signage : IOEntity, ILOD, ISignage
 	}
 
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))
@@ -333,8 +333,8 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))

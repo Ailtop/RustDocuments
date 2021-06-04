@@ -33,8 +33,8 @@ public class FogMachine : StorageContainer
 		return HasFlag(Flags.Reserved5);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetFogOn(RPCMessage msg)
 	{
 		if (!IsEmitting() && !IsOn() && HasFuel() && msg.player.CanBuild())
@@ -44,8 +44,8 @@ public class FogMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetFogOff(RPCMessage msg)
 	{
 		if (IsOn() && msg.player.CanBuild())
@@ -55,8 +55,8 @@ public class FogMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetMotionDetection(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();
@@ -209,9 +209,9 @@ public class FogMachine : StorageContainer
 							SetFogOff(fogOff);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in SetFogOff");
 					}
 				}
@@ -245,9 +245,9 @@ public class FogMachine : StorageContainer
 							SetFogOn(fogOn);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in SetFogOn");
 					}
 				}
@@ -281,9 +281,9 @@ public class FogMachine : StorageContainer
 							SetMotionDetection(motionDetection);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in SetMotionDetection");
 					}
 				}

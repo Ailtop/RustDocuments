@@ -19,8 +19,8 @@ public class EffectRecycle : BaseMonoBehaviour, IClientComponent, IRagdollInhert
 	[FormerlySerializedAs("lifeTime")]
 	public float detachTime;
 
-	[ReadOnly]
 	[FormerlySerializedAs("lifeTime")]
+	[ReadOnly]
 	public float recycleTime;
 
 	public PlayMode playMode;

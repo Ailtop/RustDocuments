@@ -87,7 +87,7 @@ namespace Rust.Ai
 		{
 			if (!IsCompromised && Volume != null)
 			{
-				((MonoBehaviour)Volume).StartCoroutine(StartCooldown(cooldown));
+				Volume.StartCoroutine(StartCooldown(cooldown));
 			}
 		}
 

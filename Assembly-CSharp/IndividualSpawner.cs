@@ -38,7 +38,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		}
 		else
 		{
-			Debug.LogWarning(((object)this).GetType().Name + ": SpawnHandler instance not found.");
+			Debug.LogWarning(GetType().Name + ": SpawnHandler instance not found.");
 		}
 	}
 

@@ -10,6 +10,8 @@ public static class GamePhysics
 
 	private static RaycastHit[] hitBuffer = new RaycastHit[8192];
 
+	private static RaycastHit[] hitBufferB = new RaycastHit[8192];
+
 	private static Collider[] colBuffer = new Collider[8192];
 
 	public static bool CheckSphere(Vector3 position, float radius, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
@@ -34,6 +36,54 @@ public static class GamePhysics
 	{
 		layerMask = HandleTerrainCollision(bounds.center, layerMask);
 		return UnityEngine.Physics.CheckBox(bounds.center, bounds.extents, Quaternion.identity, layerMask, triggerInteraction);
+	}
+
+	public static bool CheckInsideNonConvexMesh(Vector3 point, int layerMask = -5)
+	{
+		bool queriesHitBackfaces = UnityEngine.Physics.queriesHitBackfaces;
+		UnityEngine.Physics.queriesHitBackfaces = true;
+		int num = UnityEngine.Physics.RaycastNonAlloc(point, Vector3.up, hitBuffer, 100f, layerMask);
+		int num2 = UnityEngine.Physics.RaycastNonAlloc(point, -Vector3.up, hitBufferB, 100f, layerMask);
+		if (num >= hitBuffer.Length)
+		{
+			Debug.LogWarning("CheckInsideNonConvexMesh query is exceeding hitBuffer length.");
+			return false;
+		}
+		if (num2 > hitBufferB.Length)
+		{
+			Debug.LogWarning("CheckInsideNonConvexMesh query is exceeding hitBufferB length.");
+			return false;
+		}
+		for (int i = 0; i < num; i++)
+		{
+			for (int j = 0; j < num2; j++)
+			{
+				if (hitBuffer[i].collider == hitBufferB[j].collider)
+				{
+					UnityEngine.Physics.queriesHitBackfaces = queriesHitBackfaces;
+					return true;
+				}
+			}
+		}
+		UnityEngine.Physics.queriesHitBackfaces = queriesHitBackfaces;
+		return false;
+	}
+
+	public static bool CheckInsideAnyCollider(Vector3 point, int layerMask = -5)
+	{
+		if (UnityEngine.Physics.CheckSphere(point, 0f, layerMask))
+		{
+			return true;
+		}
+		if (CheckInsideNonConvexMesh(point, layerMask))
+		{
+			return true;
+		}
+		if (TerrainMeta.HeightMap != null && TerrainMeta.HeightMap.GetHeight(point) > point.y)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public static void OverlapSphere(Vector3 position, float radius, List<Collider> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)

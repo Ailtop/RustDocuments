@@ -45,9 +45,9 @@ public class ElectricalBranch : IOEntity
 							SetBranchOffPower(branchOffPower);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in SetBranchOffPower");
 					}
 				}
@@ -57,8 +57,8 @@ public class ElectricalBranch : IOEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetBranchOffPower(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

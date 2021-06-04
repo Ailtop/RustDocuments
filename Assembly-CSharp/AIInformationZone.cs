@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ConVar;
 using UnityEngine;
@@ -5,15 +6,31 @@ using UnityEngine.AI;
 
 public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 {
+	public bool ShouldSleepAI;
+
+	public bool Virtual;
+
+	public bool UseCalculatedCoverDistances = true;
+
 	public static List<AIInformationZone> zones = new List<AIInformationZone>();
 
 	public List<AICoverPoint> coverPoints = new List<AICoverPoint>();
 
 	public List<AIMovePoint> movePoints = new List<AIMovePoint>();
 
+	private AICoverPoint[] coverPointArray;
+
+	private AIMovePoint[] movePointArray;
+
 	public List<NavMeshLink> navMeshLinks = new List<NavMeshLink>();
 
+	public List<AIMovePointPath> paths = new List<AIMovePointPath>();
+
 	public Bounds bounds;
+
+	private AIInformationGrid grid;
+
+	private List<IAISleepable> sleepables = new List<IAISleepable>();
 
 	private OBB areaBox;
 
@@ -35,11 +52,78 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	private static float lastNavmeshBuildTime = 0f;
 
-	public void OnValidate()
+	public bool Sleeping { get; private set; }
+
+	public int SleepingCount
 	{
+		get
+		{
+			if (!Sleeping)
+			{
+				return 0;
+			}
+			return sleepables.Count;
+		}
 	}
 
-	public void AddCoverPoint(AICoverPoint point)
+	public void Start()
+	{
+		AddInitialPoints();
+		areaBox = new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
+		if (!Virtual)
+		{
+			zones.Add(this);
+		}
+		grid = GetComponent<AIInformationGrid>();
+		if (grid != null)
+		{
+			grid.Init();
+		}
+	}
+
+	public void RegisterSleepableEntity(IAISleepable sleepable)
+	{
+		if (sleepable != null && sleepable.AllowedToSleep() && !sleepables.Contains(sleepable))
+		{
+			sleepables.Add(sleepable);
+			if (Sleeping && sleepable.AllowedToSleep())
+			{
+				sleepable.SleepAI();
+			}
+		}
+	}
+
+	public void UnregisterSleepableEntity(IAISleepable sleepable)
+	{
+		if (sleepable != null)
+		{
+			sleepables.Remove(sleepable);
+		}
+	}
+
+	public void SleepAI()
+	{
+		if (!AI.sleepwake || !ShouldSleepAI)
+		{
+			return;
+		}
+		foreach (IAISleepable sleepable in sleepables)
+		{
+			sleepable?.SleepAI();
+		}
+		Sleeping = true;
+	}
+
+	public void WakeAI()
+	{
+		foreach (IAISleepable sleepable in sleepables)
+		{
+			sleepable?.WakeAI();
+		}
+		Sleeping = false;
+	}
+
+	private void AddCoverPoint(AICoverPoint point)
 	{
 		if (!coverPoints.Contains(point))
 		{
@@ -48,13 +132,13 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 	}
 
-	public void RemoveCoverPoint(AICoverPoint point)
+	private void RemoveCoverPoint(AICoverPoint point)
 	{
 		coverPoints.Remove(point);
 		MarkDirty();
 	}
 
-	public void AddMovePoint(AIMovePoint point)
+	private void AddMovePoint(AIMovePoint point)
 	{
 		if (!movePoints.Contains(point))
 		{
@@ -63,7 +147,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 	}
 
-	public void RemoveMovePoint(AIMovePoint point)
+	private void RemoveMovePoint(AIMovePoint point)
 	{
 		movePoints.Remove(point);
 		MarkDirty();
@@ -131,7 +215,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			}
 			foreach (AICoverPoint coverPoint in coverPoints)
 			{
-				if (aIMovePoint.distancesToCover.Contains(coverPoint))
+				if (coverPoint == null || aIMovePoint.distancesToCover.Contains(coverPoint))
 				{
 					continue;
 				}
@@ -218,39 +302,11 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		lastFrameAnyDirty = flag;
 	}
 
-	private float PathDistance(int count, ref Vector3[] path, float maxDistance)
-	{
-		if (count < 2)
-		{
-			return 0f;
-		}
-		Vector3 a = path[0];
-		float num = 0f;
-		for (int i = 0; i < count; i++)
-		{
-			Vector3 vector = path[i];
-			num += Vector3.Distance(a, vector);
-			a = vector;
-			if (num > maxDistance)
-			{
-				return num;
-			}
-		}
-		return num;
-	}
-
 	public void NavmeshBuildingComplete()
 	{
 		lastNavmeshBuildTime = UnityEngine.Time.realtimeSinceStartup;
 		buildTimeTest = UnityEngine.Time.realtimeSinceStartup + 15f;
 		MarkDirty(true);
-	}
-
-	public void Start()
-	{
-		AddInitialPoints();
-		areaBox = new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
-		zones.Add(this);
 	}
 
 	public Vector3 ClosestPointTo(Vector3 target)
@@ -265,7 +321,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		Gizmos.DrawCube(bounds.center, bounds.size);
 	}
 
-	public void AddInitialPoints()
+	private void AddInitialPoints()
 	{
 		AICoverPoint[] componentsInChildren = base.transform.GetComponentsInChildren<AICoverPoint>();
 		foreach (AICoverPoint point in componentsInChildren)
@@ -277,9 +333,87 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		{
 			AddMovePoint(point2);
 		}
+		RefreshPointArrays();
+		NavMeshLink[] componentsInChildren3 = base.transform.GetComponentsInChildren<NavMeshLink>(true);
+		navMeshLinks.AddRange(componentsInChildren3);
+		AIMovePointPath[] componentsInChildren4 = base.transform.GetComponentsInChildren<AIMovePointPath>();
+		paths.AddRange(componentsInChildren4);
 	}
 
-	public static AIInformationZone GetForPoint(Vector3 point, BaseEntity from = null)
+	private void RefreshPointArrays()
+	{
+		movePointArray = movePoints?.ToArray();
+		coverPointArray = coverPoints?.ToArray();
+	}
+
+	public void AddDynamicAIPoints(AIMovePoint[] movePoints, AICoverPoint[] coverPoints, Func<Vector3, bool> validatePoint = null)
+	{
+		if (movePoints != null)
+		{
+			foreach (AIMovePoint aIMovePoint in movePoints)
+			{
+				if (validatePoint == null || (validatePoint != null && validatePoint(aIMovePoint.transform.position)))
+				{
+					AddMovePoint(aIMovePoint);
+				}
+			}
+		}
+		if (coverPoints != null)
+		{
+			foreach (AICoverPoint aICoverPoint in coverPoints)
+			{
+				if (validatePoint == null || (validatePoint != null && validatePoint(aICoverPoint.transform.position)))
+				{
+					AddCoverPoint(aICoverPoint);
+				}
+			}
+		}
+		RefreshPointArrays();
+	}
+
+	public void RemoveDynamicAIPoints(AIMovePoint[] movePoints, AICoverPoint[] coverPoints)
+	{
+		if (movePoints != null)
+		{
+			foreach (AIMovePoint point in movePoints)
+			{
+				RemoveMovePoint(point);
+			}
+		}
+		if (coverPoints != null)
+		{
+			foreach (AICoverPoint point2 in coverPoints)
+			{
+				RemoveCoverPoint(point2);
+			}
+		}
+		RefreshPointArrays();
+	}
+
+	public AIMovePointPath GetNearestPath(Vector3 position)
+	{
+		if (paths == null || paths.Count == 0)
+		{
+			return null;
+		}
+		float num = float.MaxValue;
+		AIMovePointPath result = null;
+		foreach (AIMovePointPath path in paths)
+		{
+			foreach (AIMovePoint point in path.Points)
+			{
+				float num2 = Vector3.SqrMagnitude(point.transform.position - position);
+				if (num2 < num)
+				{
+					num = num2;
+					result = path;
+				}
+			}
+		}
+		return result;
+	}
+
+	public static AIInformationZone GetForPoint(Vector3 point, bool fallBackToNearest = true)
 	{
 		if (zones == null || zones.Count == 0)
 		{
@@ -287,20 +421,27 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 		foreach (AIInformationZone zone in zones)
 		{
-			if (zone.areaBox.Contains(point))
+			if (!(zone == null) && zone.areaBox.Contains(point))
 			{
 				return zone;
 			}
+		}
+		if (!fallBackToNearest)
+		{
+			return null;
 		}
 		float num = float.PositiveInfinity;
 		AIInformationZone result = zones[0];
 		foreach (AIInformationZone zone2 in zones)
 		{
-			float num2 = Vector3.Distance(zone2.transform.position, point);
-			if (num2 < num)
+			if (!(zone2 == null) && !(zone2.transform == null))
 			{
-				num = num2;
-				result = zone2;
+				float num2 = Vector3.Distance(zone2.transform.position, point);
+				if (num2 < num)
+				{
+					num = num2;
+					result = zone2;
+				}
 			}
 		}
 		return result;
@@ -308,68 +449,72 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	public AIMovePoint GetBestMovePointNear(Vector3 targetPosition, Vector3 fromPosition, float minRange, float maxRange, bool checkLOS = false, BaseEntity forObject = null, bool returnClosest = false)
 	{
-		AIMovePoint aIMovePoint = null;
-		AIMovePoint result = null;
+		AIPoint aIPoint = null;
+		AIPoint aIPoint2 = null;
 		float num = -1f;
 		float num2 = float.PositiveInfinity;
-		foreach (AIMovePoint movePoint in movePoints)
+		int pointCount;
+		AIPoint[] movePointsInRange = GetMovePointsInRange(targetPosition, maxRange, out pointCount);
+		if (movePointsInRange == null || pointCount <= 0)
 		{
-			float num3 = 0f;
-			Vector3 position = movePoint.transform.position;
-			float num4 = Vector3.Distance(targetPosition, position);
-			if (num4 > maxRange || !movePoint.transform.parent.gameObject.activeSelf || (!(fromPosition.y < WaterSystem.OceanLevel) && movePoint.transform.position.y < WaterSystem.OceanLevel))
+			return null;
+		}
+		for (int i = 0; i < pointCount; i++)
+		{
+			AIPoint aIPoint3 = movePointsInRange[i];
+			if (!aIPoint3.transform.parent.gameObject.activeSelf || (!(fromPosition.y < WaterSystem.OceanLevel) && aIPoint3.transform.position.y < WaterSystem.OceanLevel))
 			{
 				continue;
 			}
-			num3 += (movePoint.CanBeUsedBy(forObject) ? 100f : 0f);
+			float num3 = 0f;
+			Vector3 position = aIPoint3.transform.position;
+			float num4 = Vector3.Distance(targetPosition, position);
+			if (num4 > maxRange)
+			{
+				continue;
+			}
+			num3 += (aIPoint3.CanBeUsedBy(forObject) ? 100f : 0f);
 			num3 += (1f - Mathf.InverseLerp(minRange, maxRange, num4)) * 100f;
 			if (!(num3 < num))
 			{
 				if (num4 < num2)
 				{
-					result = movePoint;
+					aIPoint2 = aIPoint3;
 				}
 				if ((!checkLOS || !UnityEngine.Physics.Linecast(targetPosition + Vector3.up * 1f, position + Vector3.up * 1f, 1218519297, QueryTriggerInteraction.Ignore)) && num3 > num)
 				{
-					aIMovePoint = movePoint;
+					aIPoint = aIPoint3;
 					num = num3;
 				}
 			}
 		}
-		if (aIMovePoint == null && returnClosest)
+		if (aIPoint == null && returnClosest)
 		{
-			return result;
+			return aIPoint2 as AIMovePoint;
 		}
-		return aIMovePoint;
+		return aIPoint as AIMovePoint;
 	}
 
-	public Vector3 GetBestPositionNear(Vector3 targetPosition, Vector3 fromPosition, float minRange, float maxRange, bool checkLOS = false)
+	public AIPoint[] GetMovePointsInRange(Vector3 currentPos, float maxRange, out int pointCount)
 	{
-		AIMovePoint aIMovePoint = null;
-		float num = -1f;
-		foreach (AIMovePoint movePoint in movePoints)
+		pointCount = 0;
+		AIMovePoint[] movePointsInRange;
+		if (grid != null && AI.usegrid)
 		{
-			float num2 = 0f;
-			Vector3 position = movePoint.transform.position;
-			float num3 = Vector3.Distance(targetPosition, position);
-			if (!(num3 > maxRange) && movePoint.transform.parent.gameObject.activeSelf)
+			movePointsInRange = grid.GetMovePointsInRange(currentPos, maxRange, out pointCount);
+		}
+		else
+		{
+			movePointsInRange = movePointArray;
+			if (movePointsInRange != null)
 			{
-				num2 += (1f - Mathf.InverseLerp(minRange, maxRange, num3)) * 100f;
-				if ((!checkLOS || !UnityEngine.Physics.Linecast(targetPosition + Vector3.up * 1f, position + Vector3.up * 1f, 1218650369, QueryTriggerInteraction.Ignore)) && num2 > num)
-				{
-					aIMovePoint = movePoint;
-					num = num2;
-				}
+				pointCount = movePointsInRange.Length;
 			}
 		}
-		if (aIMovePoint != null)
-		{
-			return aIMovePoint.transform.position;
-		}
-		return targetPosition;
+		return movePointsInRange;
 	}
 
-	public AIMovePoint GetClosestRaw(Vector3 pos, bool onlyIncludeWithCover = false)
+	private AIMovePoint GetClosestRaw(Vector3 pos, bool onlyIncludeWithCover = false)
 	{
 		AIMovePoint result = null;
 		float num = float.PositiveInfinity;
@@ -388,28 +533,31 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		return result;
 	}
 
-	public AICoverPoint GetBestCoverPoint(Vector3 currentPosition, Vector3 hideFromPosition, float minRange = 0f, float maxRange = 20f, BaseEntity forObject = null)
+	public AICoverPoint GetBestCoverPoint(Vector3 currentPosition, Vector3 hideFromPosition, float minRange = 0f, float maxRange = 20f, BaseEntity forObject = null, bool allowObjectToReuse = true)
 	{
 		AICoverPoint aICoverPoint = null;
 		float num = 0f;
 		AIMovePoint closestRaw = GetClosestRaw(currentPosition, true);
-		foreach (AICoverPoint coverPoint in coverPoints)
+		int pointCount;
+		AICoverPoint[] coverPointsInRange = GetCoverPointsInRange(currentPosition, maxRange, out pointCount);
+		if (coverPointsInRange == null || pointCount <= 0)
 		{
-			if (coverPoint.InUse() && !coverPoint.IsUsedBy(forObject))
-			{
-				continue;
-			}
-			Vector3 position = coverPoint.transform.position;
+			return null;
+		}
+		for (int i = 0; i < pointCount; i++)
+		{
+			AICoverPoint aICoverPoint2 = coverPointsInRange[i];
+			Vector3 position = aICoverPoint2.transform.position;
 			Vector3 normalized = (hideFromPosition - position).normalized;
-			float num2 = Vector3.Dot(coverPoint.transform.forward, normalized);
-			if (num2 < 1f - coverPoint.coverDot)
+			float num2 = Vector3.Dot(aICoverPoint2.transform.forward, normalized);
+			if (num2 < 1f - aICoverPoint2.coverDot)
 			{
 				continue;
 			}
 			float num3 = -1f;
-			if (closestRaw != null && closestRaw.distancesToCover.Contains(coverPoint) && !isDirty)
+			if (UseCalculatedCoverDistances && closestRaw != null && closestRaw.distancesToCover.Contains(aICoverPoint2) && !isDirty)
 			{
-				num3 = closestRaw.distancesToCover[coverPoint];
+				num3 = closestRaw.distancesToCover[aICoverPoint2];
 				if (num3 == -2f)
 				{
 					continue;
@@ -420,20 +568,28 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 				num3 = Vector3.Distance(currentPosition, position);
 			}
 			float num4 = 0f;
+			if (aICoverPoint2.InUse())
+			{
+				bool flag = aICoverPoint2.IsUsedBy(forObject);
+				if (!(allowObjectToReuse && flag))
+				{
+					num4 -= 1000f;
+				}
+			}
 			if (minRange > 0f)
 			{
 				num4 -= (1f - Mathf.InverseLerp(0f, minRange, num3)) * 100f;
 			}
 			float value = Mathf.Abs(position.y - currentPosition.y);
 			num4 += (1f - Mathf.InverseLerp(1f, 5f, value)) * 500f;
-			num4 += Mathf.InverseLerp(1f - coverPoint.coverDot, 1f, num2) * 50f;
+			num4 += Mathf.InverseLerp(1f - aICoverPoint2.coverDot, 1f, num2) * 50f;
 			num4 += (1f - Mathf.InverseLerp(2f, maxRange, num3)) * 100f;
 			float num5 = 1f - Mathf.InverseLerp(4f, 10f, Vector3.Distance(currentPosition, hideFromPosition));
-			float value2 = Vector3.Dot((coverPoint.transform.position - currentPosition).normalized, normalized);
+			float value2 = Vector3.Dot((aICoverPoint2.transform.position - currentPosition).normalized, normalized);
 			num4 -= Mathf.InverseLerp(-1f, 0.25f, value2) * 50f * num5;
 			if (num4 > num)
 			{
-				aICoverPoint = coverPoint;
+				aICoverPoint = aICoverPoint2;
 				num = num4;
 			}
 		}
@@ -442,6 +598,25 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			return aICoverPoint;
 		}
 		return null;
+	}
+
+	private AICoverPoint[] GetCoverPointsInRange(Vector3 position, float maxRange, out int pointCount)
+	{
+		pointCount = 0;
+		AICoverPoint[] coverPointsInRange;
+		if (grid != null && AI.usegrid)
+		{
+			coverPointsInRange = grid.GetCoverPointsInRange(position, maxRange, out pointCount);
+		}
+		else
+		{
+			coverPointsInRange = coverPointArray;
+			if (coverPointsInRange != null)
+			{
+				pointCount = coverPointsInRange.Length;
+			}
+		}
+		return coverPointsInRange;
 	}
 
 	public NavMeshLink GetClosestNavMeshLink(Vector3 pos)

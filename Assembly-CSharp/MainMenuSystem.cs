@@ -21,4 +21,8 @@ public class MainMenuSystem : SingletonComponent<MainMenuSystem>
 	public GameObject DemoBrowser;
 
 	public GameObject DemoBrowserButton;
+
+	public GameObject SuicideButton;
+
+	public GameObject EndDemoButton;
 }

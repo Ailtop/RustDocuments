@@ -56,6 +56,11 @@ public class SkeletonProperties : ScriptableObject
 		BoneProperty[] array = bones;
 		foreach (BoneProperty boneProperty in array)
 		{
+			if (boneProperty == null || boneProperty.bone == null || boneProperty.bone.name == null)
+			{
+				Debug.LogWarning("Bone error in SkeletonProperties.BuildDictionary for " + ((boneReference != null) ? boneReference.name : "?"));
+				continue;
+			}
 			uint num = StringPool.Get(boneProperty.bone.name);
 			if (!quickLookup.ContainsKey(num))
 			{

@@ -63,7 +63,11 @@ public class NPCAutoTurret : AutoTurret
 
 	protected override bool Ignore(BasePlayer player)
 	{
-		return player as Scientist;
+		if (!(player as Scientist))
+		{
+			return player is ScientistNPCNew;
+		}
+		return true;
 	}
 
 	public override bool IsEntityHostile(BaseCombatEntity ent)
@@ -73,7 +77,7 @@ public class NPCAutoTurret : AutoTurret
 		{
 			if (basePlayer.IsNpc)
 			{
-				if (basePlayer is Scientist)
+				if (basePlayer is Scientist || basePlayer is ScientistNPCNew)
 				{
 					return false;
 				}

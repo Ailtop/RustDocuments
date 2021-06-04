@@ -271,7 +271,7 @@ namespace ConVar
 		public static string tags = "";
 
 		[ServerVar(Help = "Censors the Steam player list to make player tracking more difficult")]
-		public static bool censorplayerlist = false;
+		public static bool censorplayerlist = true;
 
 		[ServerVar(Help = "HTTP API endpoint for centralized banning (see wiki)")]
 		public static string bansServerEndpoint = "";
@@ -629,7 +629,7 @@ namespace ConVar
 			}
 			if (!(basePlayer == null))
 			{
-				return ((object)basePlayer.transform.position).ToString();
+				return basePlayer.transform.position.ToString();
 			}
 			return "invalid player";
 		}
@@ -644,7 +644,7 @@ namespace ConVar
 			}
 			if (!(basePlayer == null))
 			{
-				return ((object)basePlayer.transform.rotation.eulerAngles).ToString();
+				return basePlayer.transform.rotation.eulerAngles.ToString();
 			}
 			return "invalid player";
 		}
@@ -659,7 +659,7 @@ namespace ConVar
 			}
 			if (!(basePlayer == null))
 			{
-				return ((object)basePlayer.eyes.rotation.eulerAngles).ToString();
+				return basePlayer.eyes.rotation.eulerAngles.ToString();
 			}
 			return "invalid player";
 		}
@@ -694,7 +694,7 @@ namespace ConVar
 			textTable.AddColumns("SteamID", "DisplayName", "POS", "ROT");
 			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 			{
-				textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, ((object)activePlayer.transform.position).ToString(), ((object)activePlayer.transform.rotation.eulerAngles).ToString());
+				textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, activePlayer.transform.position.ToString(), activePlayer.transform.rotation.eulerAngles.ToString());
 			}
 			arg.ReplyWith(textTable.ToString());
 		}

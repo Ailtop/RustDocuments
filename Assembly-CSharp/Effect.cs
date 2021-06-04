@@ -7,7 +7,8 @@ public class Effect : EffectData
 	public enum Type : uint
 	{
 		Generic,
-		Projectile
+		Projectile,
+		GenericGlobal
 	}
 
 	public static class client
@@ -25,7 +26,7 @@ public class Effect : EffectData
 		{
 		}
 
-		public static void Run(string strName, Vector3 posWorld = default(Vector3), Vector3 normWorld = default(Vector3), Vector3 up = default(Vector3))
+		public static void Run(string strName, Vector3 posWorld = default(Vector3), Vector3 normWorld = default(Vector3), Vector3 up = default(Vector3), Type overrideType = Type.Generic)
 		{
 			string.IsNullOrEmpty(strName);
 		}
@@ -75,8 +76,9 @@ public class Effect : EffectData
 			}
 			else
 			{
-				Run(strName, info.HitPositionWorld, info.HitNormalWorld);
-				Run(decal, info.HitPositionWorld, info.HitNormalWorld);
+				Type overrideType = Type.Generic;
+				Run(strName, info.HitPositionWorld, info.HitNormalWorld, default(Vector3), overrideType);
+				Run(decal, info.HitPositionWorld, info.HitNormalWorld, default(Vector3), overrideType);
 			}
 			if ((bool)info.WeaponPrefab)
 			{

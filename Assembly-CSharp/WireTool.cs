@@ -11,6 +11,15 @@ using UnityEngine.Assertions;
 
 public class WireTool : HeldEntity
 {
+	public enum WireColour
+	{
+		Default,
+		Red,
+		Green,
+		Blue,
+		Yellow
+	}
+
 	public struct PendingPlug_t
 	{
 		public IOEntity ent;
@@ -38,7 +47,39 @@ public class WireTool : HeldEntity
 
 	public IOEntity.IOType wireType;
 
+	public static Translate.Phrase Default = new Translate.Phrase("wiretoolcolour.default", "Default");
+
+	public static Translate.Phrase DefaultDesc = new Translate.Phrase("wiretoolcolour.default.desc", "Default connection color");
+
+	public static Translate.Phrase Red = new Translate.Phrase("wiretoolcolour.red", "Red");
+
+	public static Translate.Phrase RedDesc = new Translate.Phrase("wiretoolcolour.red.desc", "Red connection color");
+
+	public static Translate.Phrase Green = new Translate.Phrase("wiretoolcolour.green", "Green");
+
+	public static Translate.Phrase GreenDesc = new Translate.Phrase("wiretoolcolour.green.desc", "Green connection color");
+
+	public static Translate.Phrase Blue = new Translate.Phrase("wiretoolcolour.blue", "Blue");
+
+	public static Translate.Phrase BlueDesc = new Translate.Phrase("wiretoolcolour.blue.desc", "Blue connection color");
+
+	public static Translate.Phrase Yellow = new Translate.Phrase("wiretoolcolour.yellow", "Yellow");
+
+	public static Translate.Phrase YellowDesc = new Translate.Phrase("wiretoolcolour.yellow.desc", "Yellow connection color");
+
 	public PendingPlug_t pending;
+
+	public bool CanChangeColours
+	{
+		get
+		{
+			if (wireType != 0)
+			{
+				return wireType == IOEntity.IOType.Fluidic;
+			}
+			return true;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -73,9 +114,9 @@ public class WireTool : HeldEntity
 							AddLine(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in AddLine");
 					}
 				}
@@ -109,9 +150,9 @@ public class WireTool : HeldEntity
 							MakeConnection(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in MakeConnection");
 					}
 				}
@@ -145,9 +186,9 @@ public class WireTool : HeldEntity
 							RequestClear(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in RequestClear");
 					}
 				}
@@ -174,9 +215,9 @@ public class WireTool : HeldEntity
 							SetPlugged(plugged);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in SetPlugged");
 					}
 				}
@@ -210,9 +251,9 @@ public class WireTool : HeldEntity
 							TryClear(msg5);
 						}
 					}
-					catch (Exception ex5)
+					catch (Exception exception5)
 					{
-						Debug.LogException(ex5);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in TryClear");
 					}
 				}
@@ -317,8 +358,8 @@ public class WireTool : HeldEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -332,8 +373,8 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -345,6 +386,7 @@ public class WireTool : HeldEntity
 		int num = msg.read.Int32();
 		uint uid2 = msg.read.UInt32();
 		int num2 = msg.read.Int32();
+		WireColour wireColour = IntToColour(msg.read.Int32());
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
 		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (iOEntity == null)
@@ -355,16 +397,18 @@ public class WireTool : HeldEntity
 		IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
 		if (!(iOEntity2 == null) && !(Vector3.Distance(baseNetworkable2.transform.position, baseNetworkable.transform.position) > maxWireLength) && num < iOEntity.inputs.Length && num2 < iOEntity2.outputs.Length && !(iOEntity.inputs[num].connectedTo.Get() != null) && !(iOEntity2.outputs[num2].connectedTo.Get() != null) && (!iOEntity.inputs[num].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity) && CanModifyEntity(player, iOEntity2))
 		{
-			if (Interface.CallHook("OnWireConnect", msg.player, iOEntity, num, iOEntity2, num2) != null)
+			if (Interface.CallHook("OnWireConnect", msg.player, baseNetworkable, num, baseNetworkable2, num2) != null)
 			{
-				iOEntity2.outputs[num2].linePoints = null;
+				((IOEntity)baseNetworkable2).outputs[num2].linePoints = null;
 				return;
 			}
 			iOEntity.inputs[num].connectedTo.Set(iOEntity2);
 			iOEntity.inputs[num].connectedToSlot = num2;
+			iOEntity.inputs[num].wireColour = wireColour;
 			iOEntity.inputs[num].connectedTo.Init();
 			iOEntity2.outputs[num2].connectedTo.Set(iOEntity);
 			iOEntity2.outputs[num2].connectedToSlot = num;
+			iOEntity2.outputs[num2].wireColour = wireColour;
 			iOEntity2.outputs[num2].connectedTo.Init();
 			iOEntity2.MarkDirtyForceUpdateOutputs();
 			iOEntity2.SendNetworkUpdate();
@@ -378,8 +422,8 @@ public class WireTool : HeldEntity
 	{
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -465,6 +509,7 @@ public class WireTool : HeldEntity
 		int num2 = msg.read.Int32();
 		uint uid2 = msg.read.UInt32();
 		int num3 = msg.read.Int32();
+		WireColour wireColour = IntToColour(msg.read.Int32());
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
 		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (!(iOEntity == null))
@@ -474,9 +519,28 @@ public class WireTool : HeldEntity
 			if (!(iOEntity2 == null) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
 			{
 				iOEntity2.outputs[num3].linePoints = list.ToArray();
+				iOEntity2.outputs[num3].wireColour = wireColour;
 				iOEntity2.SendNetworkUpdate();
 			}
 		}
+	}
+
+	private WireColour IntToColour(int i)
+	{
+		if (i < 0)
+		{
+			i = 0;
+		}
+		if (i > 4)
+		{
+			i = 4;
+		}
+		WireColour wireColour = (WireColour)i;
+		if (wireType == IOEntity.IOType.Fluidic && wireColour == WireColour.Green)
+		{
+			wireColour = WireColour.Default;
+		}
+		return wireColour;
 	}
 
 	public bool ValidateLine(List<Vector3> lineList)

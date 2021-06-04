@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class CardTableUI : UIDialog
 {
 	[Serializable]
-	private class PlayingCardImage
+	public class PlayingCardImage
 	{
 		public Rank rank;
 

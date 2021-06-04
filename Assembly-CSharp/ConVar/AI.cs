@@ -7,14 +7,41 @@ namespace ConVar
 	[Factory("ai")]
 	public class AI : ConsoleSystem
 	{
+		[ReplicatedVar(Saved = true)]
+		public static bool allowdesigning = true;
+
 		[ServerVar]
 		public static bool think = true;
+
+		[ServerVar]
+		public static bool navthink = true;
 
 		[ServerVar]
 		public static bool ignoreplayers = false;
 
 		[ServerVar]
+		public static bool groups = true;
+
+		[ServerVar]
+		public static bool spliceupdates = true;
+
+		[ServerVar]
+		public static bool setdestinationsamplenavmesh = true;
+
+		[ServerVar]
+		public static bool npcswimming = true;
+
+		[ServerVar]
+		public static bool accuratevisiondistance = true;
+
+		[ServerVar]
 		public static bool move = true;
+
+		[ServerVar]
+		public static bool usegrid = true;
+
+		[ServerVar]
+		public static bool sleepwake = true;
 
 		[ServerVar]
 		public static float sensetime = 1f;
@@ -168,6 +195,50 @@ namespace ConVar
 
 		[ServerVar]
 		public static float tickrate = 5f;
+
+		[ServerVar]
+		public static void sleepwakestats(Arg args)
+		{
+			int num = 0;
+			int num2 = 0;
+			int num3 = 0;
+			foreach (AIInformationZone zone in AIInformationZone.zones)
+			{
+				if (!(zone == null) && zone.ShouldSleepAI)
+				{
+					num++;
+					if (zone.Sleeping)
+					{
+						num2++;
+						num3 += zone.SleepingCount;
+					}
+				}
+			}
+			args.ReplyWith("Sleeping AIZs: " + num2 + " / " + num + ". Total sleeping ents: " + num3);
+		}
+
+		[ServerVar]
+		public static void wakesleepingai(Arg args)
+		{
+			int num = 0;
+			int num2 = 0;
+			foreach (AIInformationZone zone in AIInformationZone.zones)
+			{
+				if (!(zone == null) && zone.ShouldSleepAI && zone.Sleeping)
+				{
+					num++;
+					num2 += zone.SleepingCount;
+					zone.WakeAI();
+				}
+			}
+			args.ReplyWith("Woke " + num + " sleeping AIZs containing " + num2 + " sleeping entities.");
+		}
+
+		[ServerVar]
+		public static void brainstats(Arg args)
+		{
+			args.ReplyWith("Animal: " + AnimalBrain.Count + ". Scientist: " + ScientistBrain.Count + ". Total: " + (AnimalBrain.Count + ScientistBrain.Count));
+		}
 
 		public static float TickDelta()
 		{

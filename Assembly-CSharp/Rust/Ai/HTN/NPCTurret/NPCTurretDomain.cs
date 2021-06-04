@@ -259,7 +259,7 @@ namespace Rust.Ai.HTN.NPCTurret
 			public override void Execute(NPCTurretContext context)
 			{
 				SwitchToItem(context, _item);
-				((MonoBehaviour)context.Body).StartCoroutine(WaitAsync(context));
+				context.Body.StartCoroutine(WaitAsync(context));
 			}
 
 			public override OperatorStateType Tick(NPCTurretContext context, PrimitiveTaskSelector task)
@@ -574,14 +574,14 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		private NPCTurretContext _context;
 
-		[SerializeField]
 		[Header("Navigation")]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
+		[SerializeField]
 		[Header("Sensors")]
 		[ReadOnly]
-		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -622,9 +622,9 @@ namespace Rust.Ai.HTN.NPCTurret
 			}
 		};
 
-		[Header("Reasoners")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
+		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -678,8 +678,8 @@ namespace Rust.Ai.HTN.NPCTurret
 		[ReadOnly]
 		public bool ReducedLongRangeAccuracy;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool BurstAtLongRange;
 
 		private HTNUtilityAiClient _aiClient;
@@ -785,7 +785,7 @@ namespace Rust.Ai.HTN.NPCTurret
 		{
 			if (!(proj == null))
 			{
-				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, 4f));
+				StartCoroutine(HoldTriggerLogic(proj, time, 4f));
 			}
 		}
 
@@ -793,7 +793,7 @@ namespace Rust.Ai.HTN.NPCTurret
 		{
 			if (!(proj == null))
 			{
-				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
+				StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
 			}
 		}
 
@@ -876,7 +876,7 @@ namespace Rust.Ai.HTN.NPCTurret
 		{
 			if ((bool)proj && _context.IsBodyAlive() && proj.primaryMagazine.contents < proj.primaryMagazine.capacity)
 			{
-				((MonoBehaviour)this).StartCoroutine(ReloadHandler(proj));
+				StartCoroutine(ReloadHandler(proj));
 			}
 		}
 

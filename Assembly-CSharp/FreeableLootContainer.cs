@@ -49,9 +49,9 @@ public class FreeableLootContainer : LootContainer
 							RPC_FreeCrate(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_FreeCrate");
 					}
 				}

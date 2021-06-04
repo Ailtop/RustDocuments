@@ -189,6 +189,11 @@ namespace Facepunch.CardGames
 			return IsAtTable(player.userID);
 		}
 
+		public virtual List<PlayingCard> GetTableCards()
+		{
+			return null;
+		}
+
 		public void StartTurnTimer(float turnTime)
 		{
 			if (IsServer)
@@ -489,7 +494,7 @@ namespace Facepunch.CardGames
 
 		protected abstract void SubReceivedInputFromPlayer(CardPlayerData playerData, int input, int value, bool countAsAction);
 
-		protected abstract int SubGetAvailableInputsForPlayer(CardPlayerData playerData);
+		protected abstract int GetAvailableInputsForPlayer(CardPlayerData playerData);
 
 		protected abstract void SubOnPlayerLeaving(CardPlayerData playerData);
 
@@ -558,11 +563,16 @@ namespace Facepunch.CardGames
 					pData.lastActionTime = Time.unscaledTime;
 				}
 				SubReceivedInputFromPlayer(pData, input, value, countAsAction);
-				for (int i = 0; i < playerData.Length; i++)
-				{
-					playerData[i].availableInputs = SubGetAvailableInputsForPlayer(playerData[i]);
-				}
+				UpdateAllAvailableInputs();
 				Owner.SendNetworkUpdate();
+			}
+		}
+
+		protected void UpdateAllAvailableInputs()
+		{
+			for (int i = 0; i < playerData.Length; i++)
+			{
+				playerData[i].availableInputs = GetAvailableInputsForPlayer(playerData[i]);
 			}
 		}
 

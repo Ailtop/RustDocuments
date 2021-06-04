@@ -27,7 +27,7 @@ namespace VLB
 
 		public static T NewWithComponent<T>(string name) where T : Component
 		{
-			return new GameObject(name, new Type[1] { typeof(T) }).GetComponent<T>();
+			return new GameObject(name, typeof(T)).GetComponent<T>();
 		}
 
 		public static T GetOrAddComponent<T>(this GameObject self) where T : Component

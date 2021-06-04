@@ -48,9 +48,9 @@ public class TreeManager : BaseEntity
 							SERVER_RequestTrees(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in SERVER_RequestTrees");
 					}
 				}
@@ -114,8 +114,8 @@ public class TreeManager : BaseEntity
 		tree.scale = billboardEntity.transform.lossyScale.y;
 	}
 
-	[RPC_Server.CallsPerSecond(0uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(0uL)]
 	private void SERVER_RequestTrees(RPCMessage msg)
 	{
 		BufferList<BaseEntity> values = entities.Values;

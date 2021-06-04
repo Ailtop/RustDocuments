@@ -143,18 +143,16 @@ public class CH47HelicopterAIController : CH47Helicopter
 	public void SpawnPassenger(Vector3 spawnPos, string prefabPath)
 	{
 		Quaternion identity = Quaternion.identity;
-		HumanNPC component = GameManager.server.CreateEntity(prefabPath, spawnPos, identity).GetComponent<HumanNPC>();
+		HumanNPCNew component = GameManager.server.CreateEntity(prefabPath, spawnPos, identity).GetComponent<HumanNPCNew>();
 		component.Spawn();
-		component.SetNavMeshEnabled(false);
 		AttemptMount(component);
 	}
 
 	public void SpawnPassenger(Vector3 spawnPos)
 	{
 		Quaternion identity = Quaternion.identity;
-		HumanNPC component = GameManager.server.CreateEntity(dismountablePrefab.resourcePath, spawnPos, identity).GetComponent<HumanNPC>();
+		HumanNPCNew component = GameManager.server.CreateEntity(dismountablePrefab.resourcePath, spawnPos, identity).GetComponent<HumanNPCNew>();
 		component.Spawn();
-		component.SetNavMeshEnabled(false);
 		AttemptMount(component);
 	}
 

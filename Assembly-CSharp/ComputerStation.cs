@@ -58,9 +58,9 @@ public class ComputerStation : BaseMountable
 							AddBookmark(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in AddBookmark");
 					}
 				}
@@ -87,9 +87,9 @@ public class ComputerStation : BaseMountable
 							BeginControllingBookmark(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in BeginControllingBookmark");
 					}
 				}
@@ -116,9 +116,9 @@ public class ComputerStation : BaseMountable
 							DeleteBookmark(msg4);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in DeleteBookmark");
 					}
 				}
@@ -145,9 +145,9 @@ public class ComputerStation : BaseMountable
 							Server_DisconnectControl(msg5);
 						}
 					}
-					catch (Exception ex4)
+					catch (Exception exception4)
 					{
-						Debug.LogException(ex4);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in Server_DisconnectControl");
 					}
 				}

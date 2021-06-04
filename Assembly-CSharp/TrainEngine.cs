@@ -51,8 +51,8 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public Vector3 engineLocalOffset;
 
-	[Header("Train Engine")]
 	[SerializeField]
+	[Header("Train Engine")]
 	public Transform leftHandLever;
 
 	[SerializeField]
@@ -155,13 +155,6 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public EntityFuelSystem fuelSystem;
 
-	[Header("Brake Effects")]
-	public ParticleSystemContainer[] sparks;
-
-	public SoundPlayer brakeSound;
-
-	public Light[] brakeSparkLights;
-
 	public bool LightsAreOn => HasFlag(Flags.Reserved5);
 
 	public bool CloseToHazard => HasFlag(Flags.Reserved6);
@@ -196,9 +189,9 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 							RPC_OpenFuel(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_OpenFuel");
 					}
 				}
@@ -405,6 +398,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		else if (!next.HasFlag(Flags.On) && old.HasFlag(Flags.On))
 		{
 			CancelInvoke(CheckForHazards);
+			SetFlag(Flags.Reserved6, false);
 		}
 	}
 

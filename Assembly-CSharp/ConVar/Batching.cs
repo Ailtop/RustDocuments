@@ -18,8 +18,8 @@ namespace ConVar
 		[ClientVar]
 		public static int renderer_submeshes = 1;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int verbose = 0;
 	}
 }

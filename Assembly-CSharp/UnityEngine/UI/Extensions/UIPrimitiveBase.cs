@@ -353,7 +353,7 @@ namespace UnityEngine.UI.Extensions
 			}
 			catch (UnityException ex)
 			{
-				Debug.LogError("Using clickAlphaThreshold lower than 1 on Image whose sprite texture cannot be read. " + ((Exception)(object)ex).Message + " Also make sure to disable sprite packing for this sprite.", this);
+				Debug.LogError("Using clickAlphaThreshold lower than 1 on Image whose sprite texture cannot be read. " + ex.Message + " Also make sure to disable sprite packing for this sprite.", this);
 				return true;
 			}
 		}

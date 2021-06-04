@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -79,7 +78,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 	{
 		if (texelDensityCamera != null)
 		{
-			UnityEngine.Object.DestroyImmediate(texelDensityCamera.gameObject);
+			Object.DestroyImmediate(texelDensityCamera.gameObject);
 			texelDensityCamera = null;
 		}
 		if (texelDensityGradTex != null)
@@ -89,7 +88,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 		}
 		if (texelDensityOverlayMat != null)
 		{
-			UnityEngine.Object.DestroyImmediate(texelDensityOverlayMat);
+			Object.DestroyImmediate(texelDensityOverlayMat);
 			texelDensityOverlayMat = null;
 		}
 	}
@@ -100,7 +99,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 		{
 			Graphics.SetRenderTarget(null);
 			texelDensityRT.Release();
-			UnityEngine.Object.DestroyImmediate(texelDensityRT);
+			Object.DestroyImmediate(texelDensityRT);
 			texelDensityRT = null;
 		}
 	}
@@ -109,7 +108,7 @@ public class VisualizeTexelDensity : MonoBehaviour
 	{
 		if (texelDensityCamera == null)
 		{
-			GameObject gameObject = new GameObject("Texel Density Camera", new Type[1] { typeof(Camera) })
+			GameObject gameObject = new GameObject("Texel Density Camera", typeof(Camera))
 			{
 				hideFlags = HideFlags.HideAndDontSave
 			};

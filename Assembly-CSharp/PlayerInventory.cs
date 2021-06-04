@@ -75,9 +75,9 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 							ItemCmd(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in ItemCmd");
 					}
 				}
@@ -111,9 +111,9 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 							MoveItem(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in MoveItem");
 					}
 				}
@@ -324,8 +324,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private void MoveItem(BaseEntity.RPCMessage msg)
 	{
 		uint num = msg.read.UInt32();

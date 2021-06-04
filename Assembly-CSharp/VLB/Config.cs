@@ -15,12 +15,12 @@ namespace VLB
 
 		public bool forceSinglePass;
 
-		[SerializeField]
 		[HighlightNull]
+		[SerializeField]
 		private Shader beamShader1Pass;
 
-		[FormerlySerializedAs("BeamShader")]
 		[FormerlySerializedAs("beamShader")]
+		[FormerlySerializedAs("BeamShader")]
 		[SerializeField]
 		[HighlightNull]
 		private Shader beamShader2Pass;

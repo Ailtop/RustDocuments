@@ -92,9 +92,9 @@ public class FlameThrower : AttackEntity
 							DoReload(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in DoReload");
 					}
 				}
@@ -128,9 +128,9 @@ public class FlameThrower : AttackEntity
 							SetFiring(firing);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in SetFiring");
 					}
 				}
@@ -164,9 +164,9 @@ public class FlameThrower : AttackEntity
 							TogglePilotLight(msg3);
 						}
 					}
-					catch (Exception ex3)
+					catch (Exception exception3)
 					{
-						Debug.LogException(ex3);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in TogglePilotLight");
 					}
 				}
@@ -373,8 +373,8 @@ public class FlameThrower : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void TogglePilotLight(RPCMessage msg)
 	{
 		PilotLightToggle_Shared();

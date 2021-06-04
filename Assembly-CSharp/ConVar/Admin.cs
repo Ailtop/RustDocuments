@@ -81,7 +81,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				text = text + "hostname: " + Server.hostname + "\n";
-				text = text + "version : " + 2301 + " secure (secure mode enabled, connected to Steam3)\n";
+				text = text + "version : " + 2303 + " secure (secure mode enabled, connected to Steam3)\n";
 				text = text + "map     : " + Server.level + "\n";
 				text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -674,7 +674,7 @@ namespace ConVar
 				}
 				num = player.userID;
 			}
-			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindPlayersTeam(num);
+			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindPlayersTeam(num);
 			if (playerTeam == null)
 			{
 				return "Player is not in a team";

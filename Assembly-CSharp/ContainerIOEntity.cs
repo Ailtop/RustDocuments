@@ -62,9 +62,9 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 							RPC_OpenLoot(rpc2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_OpenLoot");
 					}
 				}
@@ -137,7 +137,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 			}
 			else
 			{
-				Debug.LogWarning("Storage container without inventory: " + ((object)this).ToString());
+				Debug.LogWarning("Storage container without inventory: " + ToString());
 			}
 		}
 	}
@@ -168,8 +168,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -245,7 +245,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 			}
 			else
 			{
-				Debug.LogWarning("Storage container without inventory: " + ((object)this).ToString());
+				Debug.LogWarning("Storage container without inventory: " + ToString());
 			}
 		}
 	}

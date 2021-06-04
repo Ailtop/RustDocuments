@@ -48,9 +48,9 @@ public class PhotoEntity : BaseEntity
 							ImageRequested(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in ImageRequested");
 					}
 				}
@@ -85,8 +85,8 @@ public class PhotoEntity : BaseEntity
 		PhotographerSteamId = steamId;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
 	private void ImageRequested(RPCMessage msg)
 	{
 		if (msg.player == null)

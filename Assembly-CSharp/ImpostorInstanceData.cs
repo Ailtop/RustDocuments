@@ -36,7 +36,7 @@ public class ImpostorInstanceData
 
 	private int GenerateHashCode()
 	{
-		return (17 * 31 + ((object)Material).GetHashCode()) * 31 + ((object)Mesh).GetHashCode();
+		return (17 * 31 + Material.GetHashCode()) * 31 + Mesh.GetHashCode();
 	}
 
 	public override bool Equals(object obj)

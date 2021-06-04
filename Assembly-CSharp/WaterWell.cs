@@ -61,9 +61,9 @@ public class WaterWell : LiquidContainer
 							RPC_Pump(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_Pump");
 					}
 				}

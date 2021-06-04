@@ -56,9 +56,9 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 							RPC_Pickup(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in RPC_Pickup");
 					}
 				}

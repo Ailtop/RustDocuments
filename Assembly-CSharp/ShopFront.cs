@@ -64,9 +64,9 @@ public class ShopFront : StorageContainer
 							AcceptClicked(msg2);
 						}
 					}
-					catch (Exception ex)
+					catch (Exception exception)
 					{
-						Debug.LogException(ex);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in AcceptClicked");
 					}
 				}
@@ -100,9 +100,9 @@ public class ShopFront : StorageContainer
 							CancelClicked(msg3);
 						}
 					}
-					catch (Exception ex2)
+					catch (Exception exception2)
 					{
-						Debug.LogException(ex2);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in CancelClicked");
 					}
 				}
