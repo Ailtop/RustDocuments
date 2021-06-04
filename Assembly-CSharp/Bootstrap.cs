@@ -2,6 +2,7 @@ using System.Collections;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using CCTVRender;
 using CompanionServer;
 using ConVar;
 using Facepunch;
@@ -140,7 +141,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 			AssetBundleBackend newBackend = new AssetBundleBackend();
 			using (BenchmarkTimer.New("bootstrap;bundles"))
 			{
-				yield return StartCoroutine(LoadingUpdate("Opening Bundles"));
+				yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Opening Bundles"));
 				newBackend.Load("Bundles/Bundles");
 				FileSystem.Backend = newBackend;
 			}
@@ -170,20 +171,20 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		}
 		using (BenchmarkTimer.New("bootstrap;gamemanifest"))
 		{
-			yield return StartCoroutine(LoadingUpdate("Loading Game Manifest"));
+			yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Loading Game Manifest"));
 			GameManifest.Load();
-			yield return StartCoroutine(LoadingUpdate("DONE!"));
+			yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("DONE!"));
 		}
 		using (BenchmarkTimer.New("bootstrap;selfcheck"))
 		{
-			yield return StartCoroutine(LoadingUpdate("Running Self Check"));
+			yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Running Self Check"));
 			SelfCheck.Run();
 		}
 		if (isErrored)
 		{
 			yield break;
 		}
-		yield return StartCoroutine(LoadingUpdate("Bootstrap Tier0"));
+		yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Bootstrap Tier0"));
 		using (BenchmarkTimer.New("bootstrap;tier0"))
 		{
 			Init_Tier0();
@@ -192,26 +193,26 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		{
 			ConsoleSystem.UpdateValuesFromCommandLine();
 		}
-		yield return StartCoroutine(LoadingUpdate("Bootstrap Systems"));
+		yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Bootstrap Systems"));
 		using (BenchmarkTimer.New("bootstrap;init_systems"))
 		{
 			Init_Systems();
 		}
-		yield return StartCoroutine(LoadingUpdate("Bootstrap Config"));
+		yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Bootstrap Config"));
 		using (BenchmarkTimer.New("bootstrap;init_config"))
 		{
 			Init_Config();
 		}
 		if (!isErrored)
 		{
-			yield return StartCoroutine(LoadingUpdate("Loading Items"));
+			yield return ((MonoBehaviour)this).StartCoroutine(LoadingUpdate("Loading Items"));
 			using (BenchmarkTimer.New("bootstrap;itemmanager"))
 			{
 				ItemManager.Initialize();
 			}
 			if (!isErrored)
 			{
-				yield return StartCoroutine(DedicatedServerStartup());
+				yield return ((MonoBehaviour)this).StartCoroutine(DedicatedServerStartup());
 				timer?.Dispose();
 				GameManager.Destroy(base.gameObject);
 			}
@@ -241,8 +242,8 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		LevelManager.LoadLevel(ConVar.Server.level);
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
-		yield return StartCoroutine(FileSystem_Warmup.Run(2f, WriteToLog, "Asset Warmup ({0}/{1})"));
-		yield return StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", false));
+		yield return ((MonoBehaviour)this).StartCoroutine(FileSystem_Warmup.Run(2f, WriteToLog, "Asset Warmup ({0}/{1})"));
+		yield return ((MonoBehaviour)this).StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", false));
 		if (!Object.FindObjectOfType<Performance>())
 		{
 			Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/performance.prefab"));
@@ -263,11 +264,11 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		BaseEntity.Query.Server = new BaseEntity.Query.EntityTree(8096f);
 		if ((bool)SingletonComponent<WorldSetup>.Instance)
 		{
-			yield return SingletonComponent<WorldSetup>.Instance.StartCoroutine(SingletonComponent<WorldSetup>.Instance.InitCoroutine());
+			yield return ((MonoBehaviour)SingletonComponent<WorldSetup>.Instance).StartCoroutine(SingletonComponent<WorldSetup>.Instance.InitCoroutine());
 		}
 		if ((bool)SingletonComponent<DynamicNavMesh>.Instance && SingletonComponent<DynamicNavMesh>.Instance.enabled && !AiManager.nav_disable)
 		{
-			yield return SingletonComponent<DynamicNavMesh>.Instance.StartCoroutine(SingletonComponent<DynamicNavMesh>.Instance.UpdateNavMeshAndWait());
+			yield return ((MonoBehaviour)SingletonComponent<DynamicNavMesh>.Instance).StartCoroutine(SingletonComponent<DynamicNavMesh>.Instance.UpdateNavMeshAndWait());
 		}
 		if ((bool)SingletonComponent<AiManager>.Instance && SingletonComponent<AiManager>.Instance.enabled)
 		{
@@ -278,7 +279,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 				{
 					if (monument.HasNavmesh)
 					{
-						yield return monument.StartCoroutine(monument.GetMonumentNavMesh().UpdateNavMeshAndWait());
+						yield return ((MonoBehaviour)monument).StartCoroutine(monument.GetMonumentNavMesh().UpdateNavMeshAndWait());
 					}
 				}
 				if ((bool)TerrainMeta.Path && (bool)TerrainMeta.Path.DungeonRoot)
@@ -286,7 +287,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 					DungeonNavmesh dungeonNavmesh = TerrainMeta.Path.DungeonRoot.AddComponent<DungeonNavmesh>();
 					dungeonNavmesh.NavMeshCollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
 					dungeonNavmesh.LayerMask = 65537;
-					yield return dungeonNavmesh.StartCoroutine(dungeonNavmesh.UpdateNavMeshAndWait());
+					yield return ((MonoBehaviour)dungeonNavmesh).StartCoroutine(dungeonNavmesh.UpdateNavMeshAndWait());
 				}
 				else
 				{
@@ -311,6 +312,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		serverMgr.OpenConnection();
 		CompanionServer.Server.Initialize();
+		Manager.Initialize();
 		if (ConVar.Time.pausewhileloading)
 		{
 			UnityEngine.Time.timeScale = timeScale;

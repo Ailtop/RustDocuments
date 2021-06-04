@@ -41,9 +41,9 @@ public class CameraTool : HeldEntity
 							SVNoteScreenshot(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SVNoteScreenshot");
 					}
 				}
@@ -53,8 +53,8 @@ public class CameraTool : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void SVNoteScreenshot(RPCMessage msg)
 	{
 	}

@@ -90,9 +90,9 @@ public class Chainsaw : BaseMelee
 							DoReload(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in DoReload");
 					}
 				}
@@ -126,9 +126,9 @@ public class Chainsaw : BaseMelee
 							Server_SetAttacking(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in Server_SetAttacking");
 					}
 				}
@@ -162,9 +162,9 @@ public class Chainsaw : BaseMelee
 							Server_StartEngine(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in Server_StartEngine");
 					}
 				}
@@ -198,9 +198,9 @@ public class Chainsaw : BaseMelee
 							Server_StopEngine(msg5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in Server_StopEngine");
 					}
 				}
@@ -370,8 +370,8 @@ public class Chainsaw : BaseMelee
 		ReduceAmmo(fuelPerSec);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Server_StartEngine(RPCMessage msg)
 	{
 		if (ammo > 0 && !EngineOn())
@@ -391,8 +391,8 @@ public class Chainsaw : BaseMelee
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Server_StopEngine(RPCMessage msg)
 	{
 		SetEngineStatus(false);

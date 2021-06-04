@@ -85,12 +85,12 @@ public class ImpostorBatch
 		}
 		if (PositionBuffer != null)
 		{
-			PositionBuffer.SetData(Positions.Array, 0, 0, Positions.Count);
+			PositionBuffer.SetData<Vector4>(Positions.Array, 0, 0, Positions.Count);
 		}
 		if (ArgsBuffer != null && flag)
 		{
 			args[1] = (uint)Positions.Count;
-			ArgsBuffer.SetData(args.Array, 0, 0, args.Count);
+			ArgsBuffer.SetData<uint>(args.Array, 0, 0, args.Count);
 		}
 	}
 }

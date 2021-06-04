@@ -7,7 +7,7 @@ public static class OnPostNetworkUpdateEx
 	public static void BroadcastOnPostNetworkUpdate(this GameObject go, BaseEntity entity)
 	{
 		List<IOnPostNetworkUpdate> obj = Pool.GetList<IOnPostNetworkUpdate>();
-		go.GetComponentsInChildren(obj);
+		go.GetComponentsInChildren<IOnPostNetworkUpdate>(obj);
 		for (int i = 0; i < obj.Count; i++)
 		{
 			obj[i].OnPostNetworkUpdate(entity);
@@ -18,7 +18,7 @@ public static class OnPostNetworkUpdateEx
 	public static void SendOnPostNetworkUpdate(this GameObject go, BaseEntity entity)
 	{
 		List<IOnPostNetworkUpdate> obj = Pool.GetList<IOnPostNetworkUpdate>();
-		go.GetComponents(obj);
+		go.GetComponents<IOnPostNetworkUpdate>(obj);
 		for (int i = 0; i < obj.Count; i++)
 		{
 			obj[i].OnPostNetworkUpdate(entity);

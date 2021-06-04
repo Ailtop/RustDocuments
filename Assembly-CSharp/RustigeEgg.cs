@@ -44,9 +44,9 @@ public class RustigeEgg : BaseCombatEntity
 							RPC_Open(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Open");
 					}
 				}
@@ -80,9 +80,9 @@ public class RustigeEgg : BaseCombatEntity
 							RPC_Spin(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_Spin");
 					}
 				}
@@ -103,8 +103,8 @@ public class RustigeEgg : BaseCombatEntity
 	{
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Open(RPCMessage msg)
 	{
 		if (msg.player == null)

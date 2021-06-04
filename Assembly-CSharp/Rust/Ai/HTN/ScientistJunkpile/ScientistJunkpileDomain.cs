@@ -1159,7 +1159,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				context.Body.StartCoroutine(AsyncTimer(context, time));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(ScientistJunkpileContext context, PrimitiveTaskSelector task)
@@ -1174,7 +1174,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 			public override void Abort(ScientistJunkpileContext context, PrimitiveTaskSelector task)
 			{
-				context.Body.StopCoroutine(AsyncTimer(context, 0f));
+				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1196,7 +1196,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			public override void Execute(ScientistJunkpileContext context)
 			{
 				context.SetFact(Facts.IsStandingUp, true);
-				context.Body.StartCoroutine(AsyncTimer(context, 0.2f));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, 0.2f));
 			}
 
 			public override OperatorStateType Tick(ScientistJunkpileContext context, PrimitiveTaskSelector task)
@@ -1211,7 +1211,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 			public override void Abort(ScientistJunkpileContext context, PrimitiveTaskSelector task)
 			{
-				context.Body.StopCoroutine(AsyncTimer(context, 0f));
+				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1297,7 +1297,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				context.Body.StartCoroutine(AsyncTimer(context, time));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(ScientistJunkpileContext context, PrimitiveTaskSelector task)
@@ -1347,7 +1347,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			public override void Execute(ScientistJunkpileContext context)
 			{
 				context.SetFact(Facts.IsLookingAround, true);
-				context.Body.StartCoroutine(LookAroundAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(LookAroundAsync(context));
 			}
 
 			public override OperatorStateType Tick(ScientistJunkpileContext context, PrimitiveTaskSelector task)
@@ -1388,7 +1388,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			public override void Execute(ScientistJunkpileContext context)
 			{
 				SwitchToItem(context, _item);
-				context.Body.StartCoroutine(WaitAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(WaitAsync(context));
 			}
 
 			public override OperatorStateType Tick(ScientistJunkpileContext context, PrimitiveTaskSelector task)
@@ -1468,7 +1468,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 			public override void Execute(ScientistJunkpileContext context)
 			{
-				context.Body.StartCoroutine(UseItem(context));
+				((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
 			}
 
 			public override OperatorStateType Tick(ScientistJunkpileContext context, PrimitiveTaskSelector task)
@@ -1561,7 +1561,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			{
 				if (context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player != null)
 				{
-					context.Body.StartCoroutine(UseItem(context));
+					((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
 				}
 			}
 
@@ -2124,8 +2124,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private static List<ScientistJunkpileDomain> _allJunkpileNPCs;
 
 		private Vector3 missOffset;
@@ -2146,13 +2146,13 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private ScientistJunkpileContext _context;
 
+		[Header("Navigation")]
 		[SerializeField]
 		[ReadOnly]
-		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
 		[SerializeField]
@@ -2160,8 +2160,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		private Vector3 _spawnPosition;
 
 		[ReadOnly]
-		[SerializeField]
 		[Header("Sensors")]
+		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2206,9 +2206,9 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
-		[Header("Reasoners")]
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
+		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerMarkTooCloseReasoner
@@ -2305,17 +2305,17 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Firearm Utility")]
-		[SerializeField]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]
 		[SerializeField]
 		private bool _isFiring;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;
@@ -2473,7 +2473,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		{
 			if (!(proj == null))
 			{
-				StartCoroutine(HoldTriggerLogic(proj, time, 4f));
+				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, 4f));
 			}
 		}
 
@@ -2481,7 +2481,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		{
 			if (!(proj == null))
 			{
-				StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
+				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
 			}
 		}
 
@@ -2583,7 +2583,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		{
 			if ((bool)proj && _context.IsBodyAlive() && proj.primaryMagazine.contents < proj.primaryMagazine.capacity)
 			{
-				StartCoroutine(ReloadHandler(proj));
+				((MonoBehaviour)this).StartCoroutine(ReloadHandler(proj));
 			}
 		}
 
@@ -2712,7 +2712,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			{
 				if (!NavAgent.isOnNavMesh)
 				{
-					StartCoroutine(TryForceToNavmesh());
+					((MonoBehaviour)this).StartCoroutine(TryForceToNavmesh());
 					return;
 				}
 				NavAgent.enabled = true;

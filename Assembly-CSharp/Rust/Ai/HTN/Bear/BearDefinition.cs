@@ -49,7 +49,7 @@ namespace Rust.Ai.HTN.Bear
 			if (!_isEffectRunning)
 			{
 				_isEffectRunning = true;
-				target.StartCoroutine(PlayEffects(target));
+				((MonoBehaviour)target).StartCoroutine(PlayEffects(target));
 			}
 		}
 

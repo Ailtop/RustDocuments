@@ -3,8 +3,8 @@ namespace ConVar
 	[Factory("construct")]
 	public class Construct : ConsoleSystem
 	{
-		[ServerVar]
 		[Help("How many minutes before a placed frame gets destroyed")]
+		[ServerVar]
 		public static float frameminutes = 30f;
 	}
 }

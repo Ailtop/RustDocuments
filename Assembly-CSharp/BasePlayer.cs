@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CCTVRender;
 using CompanionServer;
 using ConVar;
 using EasyAntiCheat.Server.Cerberus;
@@ -266,6 +267,8 @@ public class BasePlayer : BaseCombatEntity
 	[NonSerialized]
 	public TimeAverageValueLookup<uint> rpcHistory = new TimeAverageValueLookup<uint>();
 
+	private static readonly byte[] CCTVBuffer = new byte[153600];
+
 	public ViewModel GestureViewModel;
 
 	public const float drinkRange = 1.5f;
@@ -522,9 +525,6 @@ public class BasePlayer : BaseCombatEntity
 	[NonSerialized]
 	public int gamemodeteam = -1;
 
-	[NonSerialized]
-	public int reputation;
-
 	protected string _displayName;
 
 	public string _lastSetName;
@@ -552,8 +552,6 @@ public class BasePlayer : BaseCombatEntity
 	public float eggVision;
 
 	public PhoneController activeTelephone;
-
-	public BaseEntity designingAIEntity;
 
 	[NonSerialized]
 	public IPlayer IPlayer;
@@ -636,11 +634,11 @@ public class BasePlayer : BaseCombatEntity
 	{
 		get
 		{
-			if (RelationshipManager.ServerInstance == null)
+			if (RelationshipManager.Instance == null)
 			{
 				return null;
 			}
-			return RelationshipManager.ServerInstance.FindTeam(currentTeam);
+			return RelationshipManager.Instance.FindTeam(currentTeam);
 		}
 	}
 
@@ -972,8 +970,6 @@ public class BasePlayer : BaseCombatEntity
 
 	public bool HasActiveTelephone => activeTelephone != null;
 
-	public bool IsDesigningAI => designingAIEntity != null;
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BasePlayer.OnRpcMessage"))
@@ -1007,9 +1003,9 @@ public class BasePlayer : BaseCombatEntity
 							ClientKeepConnectionAlive(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ClientKeepConnectionAlive");
 					}
 				}
@@ -1043,10 +1039,46 @@ public class BasePlayer : BaseCombatEntity
 							ClientLoadingComplete(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in ClientLoadingComplete");
+					}
+				}
+				return true;
+			}
+			if (rpc == 386918208 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - HandleCCTVRenderComplete "));
+				}
+				using (TimeWarning.New("HandleCCTVRenderComplete"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(386918208u, "HandleCCTVRenderComplete", this, player, 3uL))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							HandleCCTVRenderComplete(msg4);
+						}
+					}
+					catch (Exception ex3)
+					{
+						Debug.LogException(ex3);
+						player.Kick("RPC Error in HandleCCTVRenderComplete");
 					}
 				}
 				return true;
@@ -1075,13 +1107,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg4 = rPCMessage;
-							OnPlayerLanded(msg4);
+							RPCMessage msg5 = rPCMessage;
+							OnPlayerLanded(msg5);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in OnPlayerLanded");
 					}
 				}
@@ -1111,13 +1143,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg5 = rPCMessage;
-							OnPlayerReported(msg5);
+							RPCMessage msg6 = rPCMessage;
+							OnPlayerReported(msg6);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex5)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex5);
 						player.Kick("RPC Error in OnPlayerReported");
 					}
 				}
@@ -1147,13 +1179,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg6 = rPCMessage;
-							OnProjectileAttack(msg6);
+							RPCMessage msg7 = rPCMessage;
+							OnProjectileAttack(msg7);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception ex6)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(ex6);
 						player.Kick("RPC Error in OnProjectileAttack");
 					}
 				}
@@ -1183,13 +1215,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg7 = rPCMessage;
-							OnProjectileRicochet(msg7);
+							RPCMessage msg8 = rPCMessage;
+							OnProjectileRicochet(msg8);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception ex7)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(ex7);
 						player.Kick("RPC Error in OnProjectileRicochet");
 					}
 				}
@@ -1219,13 +1251,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg8 = rPCMessage;
-							OnProjectileUpdate(msg8);
+							RPCMessage msg9 = rPCMessage;
+							OnProjectileUpdate(msg9);
 						}
 					}
-					catch (Exception exception7)
+					catch (Exception ex8)
 					{
-						Debug.LogException(exception7);
+						Debug.LogException(ex8);
 						player.Kick("RPC Error in OnProjectileUpdate");
 					}
 				}
@@ -1255,13 +1287,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg9 = rPCMessage;
-							PerformanceReport(msg9);
+							RPCMessage msg10 = rPCMessage;
+							PerformanceReport(msg10);
 						}
 					}
-					catch (Exception exception8)
+					catch (Exception ex9)
 					{
-						Debug.LogException(exception8);
+						Debug.LogException(ex9);
 						player.Kick("RPC Error in PerformanceReport");
 					}
 				}
@@ -1295,13 +1327,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg10 = rPCMessage;
-							RequestRespawnInformation(msg10);
+							RPCMessage msg11 = rPCMessage;
+							RequestRespawnInformation(msg11);
 						}
 					}
-					catch (Exception exception9)
+					catch (Exception ex10)
 					{
-						Debug.LogException(exception9);
+						Debug.LogException(ex10);
 						player.Kick("RPC Error in RequestRespawnInformation");
 					}
 				}
@@ -1331,13 +1363,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg11 = rPCMessage;
-							RPC_Assist(msg11);
+							RPCMessage msg12 = rPCMessage;
+							RPC_Assist(msg12);
 						}
 					}
-					catch (Exception exception10)
+					catch (Exception ex11)
 					{
-						Debug.LogException(exception10);
+						Debug.LogException(ex11);
 						player.Kick("RPC Error in RPC_Assist");
 					}
 				}
@@ -1367,13 +1399,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg12 = rPCMessage;
-							RPC_KeepAlive(msg12);
+							RPCMessage msg13 = rPCMessage;
+							RPC_KeepAlive(msg13);
 						}
 					}
-					catch (Exception exception11)
+					catch (Exception ex12)
 					{
-						Debug.LogException(exception11);
+						Debug.LogException(ex12);
 						player.Kick("RPC Error in RPC_KeepAlive");
 					}
 				}
@@ -1403,13 +1435,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg13 = rPCMessage;
-							RPC_LootPlayer(msg13);
+							RPCMessage msg14 = rPCMessage;
+							RPC_LootPlayer(msg14);
 						}
 					}
-					catch (Exception exception12)
+					catch (Exception ex13)
 					{
-						Debug.LogException(exception12);
+						Debug.LogException(ex13);
 						player.Kick("RPC Error in RPC_LootPlayer");
 					}
 				}
@@ -1432,13 +1464,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg14 = rPCMessage;
-							RPC_StartClimb(msg14);
+							RPCMessage msg15 = rPCMessage;
+							RPC_StartClimb(msg15);
 						}
 					}
-					catch (Exception exception13)
+					catch (Exception ex14)
 					{
-						Debug.LogException(exception13);
+						Debug.LogException(ex14);
 						player.Kick("RPC Error in RPC_StartClimb");
 					}
 				}
@@ -1468,13 +1500,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg15 = rPCMessage;
-							Server_AddMarker(msg15);
+							RPCMessage msg16 = rPCMessage;
+							Server_AddMarker(msg16);
 						}
 					}
-					catch (Exception exception14)
+					catch (Exception ex15)
 					{
-						Debug.LogException(exception14);
+						Debug.LogException(ex15);
 						player.Kick("RPC Error in Server_AddMarker");
 					}
 				}
@@ -1508,13 +1540,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg16 = rPCMessage;
-							Server_CancelGesture(msg16);
+							RPCMessage msg17 = rPCMessage;
+							Server_CancelGesture(msg17);
 						}
 					}
-					catch (Exception exception15)
+					catch (Exception ex16)
 					{
-						Debug.LogException(exception15);
+						Debug.LogException(ex16);
 						player.Kick("RPC Error in Server_CancelGesture");
 					}
 				}
@@ -1544,13 +1576,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg17 = rPCMessage;
-							Server_ClearMapMarkers(msg17);
+							RPCMessage msg18 = rPCMessage;
+							Server_ClearMapMarkers(msg18);
 						}
 					}
-					catch (Exception exception16)
+					catch (Exception ex17)
 					{
-						Debug.LogException(exception16);
+						Debug.LogException(ex17);
 						player.Kick("RPC Error in Server_ClearMapMarkers");
 					}
 				}
@@ -1580,13 +1612,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg18 = rPCMessage;
-							Server_RemovePointOfInterest(msg18);
+							RPCMessage msg19 = rPCMessage;
+							Server_RemovePointOfInterest(msg19);
 						}
 					}
-					catch (Exception exception17)
+					catch (Exception ex18)
 					{
-						Debug.LogException(exception17);
+						Debug.LogException(ex18);
 						player.Kick("RPC Error in Server_RemovePointOfInterest");
 					}
 				}
@@ -1616,13 +1648,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg19 = rPCMessage;
-							Server_RequestMarkers(msg19);
+							RPCMessage msg20 = rPCMessage;
+							Server_RequestMarkers(msg20);
 						}
 					}
-					catch (Exception exception18)
+					catch (Exception ex19)
 					{
-						Debug.LogException(exception18);
+						Debug.LogException(ex19);
 						player.Kick("RPC Error in Server_RequestMarkers");
 					}
 				}
@@ -1656,13 +1688,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg20 = rPCMessage;
-							Server_StartGesture(msg20);
+							RPCMessage msg21 = rPCMessage;
+							Server_StartGesture(msg21);
 						}
 					}
-					catch (Exception exception19)
+					catch (Exception ex20)
 					{
-						Debug.LogException(exception19);
+						Debug.LogException(ex20);
 						player.Kick("RPC Error in Server_StartGesture");
 					}
 				}
@@ -1685,13 +1717,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg21 = rPCMessage;
-							ServerRPC_UnderwearChange(msg21);
+							RPCMessage msg22 = rPCMessage;
+							ServerRPC_UnderwearChange(msg22);
 						}
 					}
-					catch (Exception exception20)
+					catch (Exception ex21)
 					{
-						Debug.LogException(exception20);
+						Debug.LogException(ex21);
 						player.Kick("RPC Error in ServerRPC_UnderwearChange");
 					}
 				}
@@ -1714,13 +1746,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg22 = rPCMessage;
-							SV_Drink(msg22);
+							RPCMessage msg23 = rPCMessage;
+							SV_Drink(msg23);
 						}
 					}
-					catch (Exception exception21)
+					catch (Exception ex22)
 					{
-						Debug.LogException(exception21);
+						Debug.LogException(ex22);
 						player.Kick("RPC Error in SV_Drink");
 					}
 				}
@@ -1776,6 +1808,37 @@ public class BasePlayer : BaseCombatEntity
 		rpcHistory.Clear();
 	}
 
+	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
+	public void HandleCCTVRenderComplete(RPCMessage msg)
+	{
+		if (!Settings.Enabled)
+		{
+			DebugEx.LogWarning($"Received CCTV image from {msg.player.userID}, but the feature is disabled");
+			return;
+		}
+		int num = msg.read.Int32();
+		if (num < 0)
+		{
+			Debug.LogError($"Received CCTV image from {msg.player.userID} with negative length: {num}");
+			return;
+		}
+		if (num > CCTVBuffer.Length)
+		{
+			DebugEx.LogWarning($"Received CCTV image that's too large: {num} bytes");
+			return;
+		}
+		int num2 = msg.read.Read(CCTVBuffer, 0, num);
+		if (num2 != num)
+		{
+			DebugEx.LogWarning($"Failed to read whole CCTV image: read {num2} bytes, expected {num} bytes");
+		}
+		else
+		{
+			CCTVRender.Manager.CompleteRequest(jpgImage: new Span<byte>(CCTVBuffer, 0, num), player: msg.player);
+		}
+	}
+
 	public override bool CanBeLooted(BasePlayer player)
 	{
 		object obj = Interface.CallHook("CanLootPlayer", this, player);
@@ -1794,8 +1857,8 @@ public class BasePlayer : BaseCombatEntity
 		return true;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_LootPlayer(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1822,8 +1885,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_KeepAlive(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerKeepAlive", this, msg.player) == null)
@@ -2110,9 +2173,9 @@ public class BasePlayer : BaseCombatEntity
 		currentGesture = null;
 	}
 
-	[RPC_Server]
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void Server_CancelGesture(RPCMessage msg)
 	{
 		currentGesture = null;
@@ -2144,7 +2207,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return;
 		}
-		RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindTeam(currentTeam);
+		RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindTeam(currentTeam);
 		if (playerTeam == null)
 		{
 			return;
@@ -2216,7 +2279,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			currentTeam = newTeam;
 			SendNetworkUpdate();
-			if (RelationshipManager.ServerInstance.FindTeam(newTeam) == null)
+			if (RelationshipManager.Instance.FindTeam(newTeam) == null)
 			{
 				ClearTeam();
 			}
@@ -2662,8 +2725,8 @@ public class BasePlayer : BaseCombatEntity
 		return false;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileAttack(RPCMessage msg)
 	{
 		PlayerProjectileAttack playerProjectileAttack = PlayerProjectileAttack.Deserialize(msg.read);
@@ -3008,8 +3071,8 @@ public class BasePlayer : BaseCombatEntity
 		playerProjectileAttack = null;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -3378,7 +3441,6 @@ public class BasePlayer : BaseCombatEntity
 		info.msg.basePlayer.playerFlags = (int)playerFlags;
 		info.msg.basePlayer.currentTeam = currentTeam;
 		info.msg.basePlayer.heldEntity = svActiveItemID;
-		info.msg.basePlayer.reputation = reputation;
 		if (IsConnected && (IsAdmin || IsDeveloper))
 		{
 			info.msg.basePlayer.skinCol = net.connection.info.GetFloat("global.skincol", -1f);
@@ -3462,7 +3524,6 @@ public class BasePlayer : BaseCombatEntity
 			}
 			playerFlags = (PlayerFlags)basePlayer.playerFlags;
 			currentTeam = basePlayer.currentTeam;
-			reputation = basePlayer.reputation;
 			if (basePlayer.metabolism != null)
 			{
 				metabolism.Load(basePlayer.metabolism);
@@ -4074,15 +4135,15 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void ClientKeepConnectionAlive(RPCMessage msg)
 	{
 		lastTickTime = UnityEngine.Time.time;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void ClientLoadingComplete(RPCMessage msg)
 	{
 	}
@@ -4099,7 +4160,7 @@ public class BasePlayer : BaseCombatEntity
 			UserIDString = userID.ToString();
 			displayName = c.username;
 			c.player = this;
-			currentTeam = RelationshipManager.ServerInstance.FindPlayersTeam(userID)?.teamID ?? 0;
+			currentTeam = RelationshipManager.Instance.FindPlayersTeam(userID)?.teamID ?? 0;
 			SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerName(userID, displayName);
 			tickInterpolator.Reset(base.transform.position);
 			tickHistory.Reset(base.transform.position);
@@ -4189,14 +4250,13 @@ public class BasePlayer : BaseCombatEntity
 			}
 			respawnInformation.previousLife = previousLifeStory;
 			respawnInformation.fadeIn = previousLifeStory != null && previousLifeStory.timeDied > Epoch.Current - 5;
-			Interface.CallHook("OnRespawnInformationGiven", this, respawnInformation);
 			ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
 		}
 	}
 
 	[RPC_Server]
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.FromOwner]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -4348,10 +4408,6 @@ public class BasePlayer : BaseCombatEntity
 		SetPlayerFlag(PlayerFlags.Sleeping, false);
 		sleepStartTime = -1f;
 		sleepingPlayerList.Remove(this);
-		if (userID < 10000000 && !bots.Contains(this))
-		{
-			bots.Add(this);
-		}
 		CancelInvoke(ScheduledDeath);
 		InvokeRepeating(InventoryUpdate, 1f, 0.1f * UnityEngine.Random.Range(0.99f, 1.01f));
 		if (RelationshipManager.TeamsEnabled())
@@ -4392,7 +4448,6 @@ public class BasePlayer : BaseCombatEntity
 	{
 		stats.Save();
 		EndLooting();
-		ClearDesigningAIEntity();
 		if (IsAlive() || IsSleeping())
 		{
 			StartSleeping();
@@ -4549,12 +4604,6 @@ public class BasePlayer : BaseCombatEntity
 		EndSleeping();
 		EndLooting();
 		stats.Add("deaths", 1, Stats.All);
-		if (info != null && info.InitiatorPlayer != null && !info.InitiatorPlayer.IsNpc && !IsNpc)
-		{
-			RelationshipManager.ServerInstance.SetSeen(info.InitiatorPlayer, this);
-			RelationshipManager.ServerInstance.SetSeen(this, info.InitiatorPlayer);
-			RelationshipManager.ServerInstance.SetRelationship(this, info.InitiatorPlayer, RelationshipManager.RelationshipType.Enemy);
-		}
 		if ((bool)BaseGameMode.GetActiveGameMode(true))
 		{
 			BasePlayer instigator = info?.InitiatorPlayer;
@@ -4607,7 +4656,7 @@ public class BasePlayer : BaseCombatEntity
 			{
 				if (info.Initiator == this)
 				{
-					text = ToString() + " was suicide by " + lastDamage;
+					text = ((object)this).ToString() + " was suicide by " + lastDamage;
 					text2 = "You died: suicide by " + lastDamage;
 					if (lastDamage == DamageType.Suicide)
 					{
@@ -4623,7 +4672,7 @@ public class BasePlayer : BaseCombatEntity
 				else if (info.Initiator is BasePlayer)
 				{
 					BasePlayer basePlayer2 = info.Initiator.ToPlayer();
-					text = ToString() + " was killed by " + basePlayer2.ToString();
+					text = ((object)this).ToString() + " was killed by " + ((object)basePlayer2).ToString();
 					text2 = "You died: killed by " + basePlayer2.displayName + " (" + basePlayer2.userID + ")";
 					basePlayer2.stats.Add("kill_player", 1, Stats.All);
 					basePlayer2.LifeStoryKill(this);
@@ -4647,7 +4696,7 @@ public class BasePlayer : BaseCombatEntity
 				}
 				else
 				{
-					text = ToString() + " was killed by " + info.Initiator.ShortPrefabName + " (" + info.Initiator.Categorize() + ")";
+					text = ((object)this).ToString() + " was killed by " + info.Initiator.ShortPrefabName + " (" + info.Initiator.Categorize() + ")";
 					text2 = "You died: killed by " + info.Initiator.Categorize();
 					stats.Add("death_" + info.Initiator.Categorize(), 1);
 					Facepunch.Rust.Analytics.Death(info.Initiator.Categorize());
@@ -4655,19 +4704,19 @@ public class BasePlayer : BaseCombatEntity
 			}
 			else if (lastDamage == DamageType.Fall)
 			{
-				text = ToString() + " was killed by fall!";
+				text = ((object)this).ToString() + " was killed by fall!";
 				text2 = "You died: killed by fall!";
 				Facepunch.Rust.Analytics.Death("fall");
 			}
 			else
 			{
-				text = ToString() + " was killed by " + info.damageTypes.GetMajorityDamageType();
+				text = ((object)this).ToString() + " was killed by " + info.damageTypes.GetMajorityDamageType();
 				text2 = "You died: " + info.damageTypes.GetMajorityDamageType();
 			}
 		}
 		else
 		{
-			text = string.Concat(ToString(), " died (", lastDamage, ")");
+			text = string.Concat(((object)this).ToString(), " died (", lastDamage, ")");
 			text2 = "You died: " + lastDamage;
 		}
 		using (TimeWarning.New("LogMessage"))
@@ -5171,8 +5220,8 @@ public class BasePlayer : BaseCombatEntity
 		return net.connection.info.GetInt(key, defaultVal);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -5211,8 +5260,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void OnPlayerReported(RPCMessage msg)
 	{
 		string text = msg.read.String();
@@ -5241,7 +5290,7 @@ public class BasePlayer : BaseCombatEntity
 			string text = $"demos/{UserIDString}/{DateTime.Now:yyyy-MM-dd-hhmmss}.dem";
 			if (Interface.CallHook("OnDemoRecordingStart", text, this) == null)
 			{
-				Debug.Log(ToString() + " recording started: " + text);
+				Debug.Log(((object)this).ToString() + " recording started: " + text);
 				net.connection.StartRecording(text, new Demo.Header
 				{
 					version = Demo.Version,
@@ -5269,7 +5318,7 @@ public class BasePlayer : BaseCombatEntity
 	{
 		if (net != null && net.connection != null && net.connection.IsRecording && Interface.CallHook("OnDemoRecordingStop", net.connection.recordFilename, this) == null)
 		{
-			Debug.Log(ToString() + " recording stopped: " + net.connection.RecordFilename);
+			Debug.Log(((object)this).ToString() + " recording stopped: " + net.connection.RecordFilename);
 			net.connection.StopRecording();
 			CancelInvoke(MonitorDemoRecording);
 			Interface.CallHook("OnDemoRecordingStopped", net.connection.recordFilename, this);
@@ -5283,65 +5332,6 @@ public class BasePlayer : BaseCombatEntity
 			StopDemoRecording();
 			StartDemoRecording();
 		}
-	}
-
-	public bool IsPlayerVisibleToUs(BasePlayer otherPlayer)
-	{
-		if (otherPlayer == null)
-		{
-			return false;
-		}
-		if (isMounted)
-		{
-			return IsVisibleMounted(otherPlayer);
-		}
-		if (IsDucked())
-		{
-			return IsVisibleCrouched(otherPlayer);
-		}
-		return IsVisibleStanding(otherPlayer);
-	}
-
-	private bool IsVisibleMounted(BasePlayer player)
-	{
-		UnityEngine.Vector3 worldMountedPosition = eyes.worldMountedPosition;
-		if (!player.IsVisible(worldMountedPosition, player.CenterPoint()) && !player.IsVisible(worldMountedPosition, player.transform.position) && !player.IsVisible(worldMountedPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldMountedPosition) && !IsVisible(player.transform.position, worldMountedPosition) && !IsVisible(player.eyes.position, worldMountedPosition))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private bool IsVisibleCrouched(BasePlayer player)
-	{
-		UnityEngine.Vector3 worldCrouchedPosition = eyes.worldCrouchedPosition;
-		if (!player.IsVisible(worldCrouchedPosition, player.CenterPoint()) && !player.IsVisible(worldCrouchedPosition, player.transform.position) && !player.IsVisible(worldCrouchedPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldCrouchedPosition) && !IsVisible(player.transform.position, worldCrouchedPosition) && !IsVisible(player.eyes.position, worldCrouchedPosition))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private bool IsVisibleStanding(BasePlayer player)
-	{
-		UnityEngine.Vector3 worldStandingPosition = eyes.worldStandingPosition;
-		if (!player.IsVisible(worldStandingPosition, player.CenterPoint()) && !player.IsVisible(worldStandingPosition, player.transform.position) && !player.IsVisible(worldStandingPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldStandingPosition) && !IsVisible(player.transform.position, worldStandingPosition) && !IsVisible(player.eyes.position, worldStandingPosition))
-		{
-			return false;
-		}
-		return true;
 	}
 
 	private void Tick_Spectator()
@@ -5409,7 +5399,7 @@ public class BasePlayer : BaseCombatEntity
 			}
 			else
 			{
-				ChatMessage("Spectating: " + baseEntity.ToString());
+				ChatMessage("Spectating: " + ((object)baseEntity).ToString());
 			}
 			using (TimeWarning.New("SendEntitySnapshot"))
 			{
@@ -5642,11 +5632,11 @@ public class BasePlayer : BaseCombatEntity
 			{
 				EACServer.playerTracker.LogPlayerTick(client, eventParams);
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
 				Debug.LogWarning("Disabling EAC Logging due to exception");
 				EACServer.playerTracker = null;
-				Debug.LogException(exception);
+				Debug.LogException(ex);
 			}
 		}
 	}
@@ -6302,14 +6292,6 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return false;
 		}
-		if (RelationshipManager.ServerInstance != null)
-		{
-			if ((IsSleeping() || IsWounded()) && !RelationshipManager.ServerInstance.HasRelations(baseEntity.userID, userID))
-			{
-				RelationshipManager.ServerInstance.SetRelationship(baseEntity, this, RelationshipManager.RelationshipType.Acquaintance);
-			}
-			RelationshipManager.ServerInstance.SetSeen(baseEntity, this);
-		}
 		return base.OnStartBeingLooted(baseEntity);
 	}
 
@@ -6854,7 +6836,7 @@ public class BasePlayer : BaseCombatEntity
 	public string GetDebugStatus()
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.AppendFormat("Entity: {0}\n", ToString());
+		stringBuilder.AppendFormat("Entity: {0}\n", ((object)this).ToString());
 		stringBuilder.AppendFormat("Name: {0}\n", displayName);
 		stringBuilder.AppendFormat("SteamID: {0}\n", userID);
 		foreach (PlayerFlags value in Enum.GetValues(typeof(PlayerFlags)))
@@ -6957,14 +6939,5 @@ public class BasePlayer : BaseCombatEntity
 	public void SetActiveTelephone(PhoneController t)
 	{
 		activeTelephone = t;
-	}
-
-	public void ClearDesigningAIEntity()
-	{
-		if (IsDesigningAI)
-		{
-			designingAIEntity.GetComponent<IAIDesign>()?.StopDesigning();
-		}
-		designingAIEntity = null;
 	}
 }

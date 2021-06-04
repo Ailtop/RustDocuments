@@ -513,8 +513,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void load(Arg args)
 		{
 			if (!SingletonComponent<Climate>.Instance)
@@ -540,8 +540,8 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void reset(Arg args)
 		{
 			if ((bool)SingletonComponent<Climate>.Instance)
@@ -575,7 +575,7 @@ namespace ConVar
 				{
 					textTable.AddRow("previous", "|", "current", "|", "up next");
 				}
-				args.ReplyWith(textTable.ToString() + Environment.NewLine + SingletonComponent<Climate>.Instance.WeatherState.ToString());
+				args.ReplyWith(textTable.ToString() + Environment.NewLine + ((object)SingletonComponent<Climate>.Instance.WeatherState).ToString());
 			}
 		}
 	}

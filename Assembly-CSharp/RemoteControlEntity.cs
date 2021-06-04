@@ -56,9 +56,9 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 							Server_SetID(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in Server_SetID");
 					}
 				}

@@ -58,9 +58,9 @@ public class CardReader : IOEntity
 							ServerCardSwiped(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ServerCardSwiped");
 					}
 				}
@@ -118,8 +118,8 @@ public class CardReader : IOEntity
 		Effect.server.Run(accessGrantedEffect.resourcePath, audioPosition.position, Vector3.up);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ServerCardSwiped(RPCMessage msg)
 	{
 		if (!IsPowered() || Vector3Ex.Distance2D(msg.player.transform.position, base.transform.position) > 1f || IsInvoking(GrantCard) || IsInvoking(FailCard))

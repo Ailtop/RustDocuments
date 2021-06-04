@@ -53,9 +53,9 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 							Server_SetID(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in Server_SetID");
 					}
 				}
@@ -141,8 +141,8 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_SetID(RPCMessage msg)
 	{
 		if (IsStatic())

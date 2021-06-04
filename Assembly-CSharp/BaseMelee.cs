@@ -53,8 +53,8 @@ public class BaseMelee : AttackEntity
 
 	public List<MaterialFX> materialStrikeFX = new List<MaterialFX>();
 
-	[Header("Other")]
 	[Range(0f, 1f)]
+	[Header("Other")]
 	public float heartStress = 0.5f;
 
 	public ResourceDispenser.GatherProperties gathering;
@@ -96,9 +96,9 @@ public class BaseMelee : AttackEntity
 							CLProject(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in CLProject");
 					}
 				}
@@ -132,9 +132,9 @@ public class BaseMelee : AttackEntity
 							PlayerAttack(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in PlayerAttack");
 					}
 				}

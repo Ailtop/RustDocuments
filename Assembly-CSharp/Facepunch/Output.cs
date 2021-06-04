@@ -53,7 +53,7 @@ namespace Facepunch
 			{
 				Message = log,
 				Stacktrace = stacktrace,
-				Type = type.ToString(),
+				Type = ((object)type).ToString(),
 				Time = Epoch.Current
 			});
 			while (HistoryOutput.Count > 65536)

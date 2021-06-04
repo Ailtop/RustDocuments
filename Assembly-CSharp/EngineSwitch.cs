@@ -41,9 +41,9 @@ public class EngineSwitch : BaseEntity
 							StartEngine(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in StartEngine");
 					}
 				}
@@ -77,9 +77,9 @@ public class EngineSwitch : BaseEntity
 							StopEngine(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in StopEngine");
 					}
 				}
@@ -89,8 +89,8 @@ public class EngineSwitch : BaseEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void StopEngine(RPCMessage msg)
 	{
 		MiningQuarry miningQuarry = GetParentEntity() as MiningQuarry;

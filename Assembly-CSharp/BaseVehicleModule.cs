@@ -41,8 +41,8 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	public VisualGroup visualGroup;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private VehicleLight[] lights;
 
 	public LODLevel[] lodRenderers;
@@ -51,19 +51,19 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 	[HideInInspector]
 	private List<ConditionalObject> conditionals;
 
-	[Header("Trigger Parent")]
 	[SerializeField]
+	[Header("Trigger Parent")]
 	private TriggerParent[] triggerParents;
 
-	[SerializeField]
 	[Header("Sliding Components")]
+	[SerializeField]
 	private VehicleModuleSlidingComponent[] slidingComponents;
 
 	[SerializeField]
 	private VehicleModuleButtonComponent[] buttonComponents;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private DamageRenderer damageRenderer;
 
 	private TimeSince TimeSinceAddedToVehicle;
@@ -128,9 +128,9 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 							RPC_Use(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Use");
 					}
 				}

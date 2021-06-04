@@ -6,7 +6,7 @@ namespace CompanionServer.Handlers
 	{
 		public override void Execute()
 		{
-			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindPlayersTeam(base.UserId);
+			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindPlayersTeam(base.UserId);
 			if (playerTeam == null)
 			{
 				SendError("no_team");

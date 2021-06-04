@@ -28,16 +28,16 @@ namespace Rust.Modular
 		[SerializeField]
 		public VehicleModuleEngineItems allEngineItems;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public int accelerationBoostSlots;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public int topSpeedBoostSlots;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		public int fuelEconomyBoostSlots;
 
 		public bool isUsable { get; set; }
@@ -190,7 +190,7 @@ namespace Rust.Modular
 		{
 			if (base.inventory == null)
 			{
-				Debug.LogWarning(GetType().Name + ": Null inventory on " + base.name);
+				Debug.LogWarning(((object)this).GetType().Name + ": Null inventory on " + base.name);
 				return;
 			}
 			for (int i = 0; i < base.inventory.capacity; i++)
@@ -216,7 +216,7 @@ namespace Rust.Modular
 					}
 					else
 					{
-						Debug.LogError(GetType().Name + ": Failed to create engine storage item.");
+						Debug.LogError(((object)this).GetType().Name + ": Failed to create engine storage item.");
 					}
 				}
 			}
@@ -247,7 +247,7 @@ namespace Rust.Modular
 			case 3:
 				return 1f;
 			default:
-				Debug.LogError(GetType().Name + ": Unrecognised item tier: " + tier);
+				Debug.LogError(((object)this).GetType().Name + ": Unrecognised item tier: " + tier);
 				return 0f;
 			}
 		}

@@ -54,7 +54,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		}
 		UpdateMaterials(block, null, false, isSelected);
 		List<Renderer> obj = Pool.GetList<Renderer>();
-		(applyToAllRenderers ? base.transform.root : base.transform).GetComponentsInChildren(true, obj);
+		((Component)(applyToAllRenderers ? base.transform.root : base.transform)).GetComponentsInChildren<Renderer>(true, obj);
 		foreach (Renderer item in obj)
 		{
 			item.SetPropertyBlock(block);

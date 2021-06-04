@@ -48,9 +48,9 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 							Pickup(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in Pickup");
 					}
 				}
@@ -107,8 +107,8 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		Kill();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Pickup(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())

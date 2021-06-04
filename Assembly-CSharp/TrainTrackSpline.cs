@@ -412,7 +412,7 @@ public class TrainTrackSpline : WorldSpline
 			float num = float.MaxValue;
 			foreach (Collider item in obj)
 			{
-				item.GetComponentsInParent(false, obj2);
+				((Component)item).GetComponentsInParent<TrainTrackSpline>(false, obj2);
 				if (obj2.Count <= 0)
 				{
 					continue;

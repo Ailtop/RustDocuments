@@ -89,7 +89,7 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 		World.CleanupOldFiles();
 		if (AutomaticallySetup)
 		{
-			StartCoroutine(InitCoroutine());
+			((MonoBehaviour)this).StartCoroutine(InitCoroutine());
 		}
 	}
 

@@ -20,8 +20,6 @@ public class SkinnedMultiMesh : MonoBehaviour
 
 	internal bool IsVisible = true;
 
-	public bool eyesView;
-
 	public Skeleton skeleton;
 
 	public SkeletonSkinLod skeletonSkinLod;

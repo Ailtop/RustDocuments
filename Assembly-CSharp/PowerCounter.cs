@@ -62,9 +62,9 @@ public class PowerCounter : IOEntity
 							SERVER_SetTarget(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SERVER_SetTarget");
 					}
 				}
@@ -98,9 +98,9 @@ public class PowerCounter : IOEntity
 							ToggleDisplayMode(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in ToggleDisplayMode");
 					}
 				}
@@ -139,8 +139,8 @@ public class PowerCounter : IOEntity
 		base.ResetState();
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SERVER_SetTarget(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -151,8 +151,8 @@ public class PowerCounter : IOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ToggleDisplayMode(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

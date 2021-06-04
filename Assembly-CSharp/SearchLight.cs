@@ -60,9 +60,9 @@ public class SearchLight : IOEntity
 							RPC_UseLight(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_UseLight");
 					}
 				}
@@ -151,8 +151,8 @@ public class SearchLight : IOEntity
 		return Mathf.Clamp(currentEnergy - base.ConsumptionAmount(), 0, currentEnergy);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_UseLight(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

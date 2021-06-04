@@ -54,13 +54,6 @@ public class BaseCombatEntity : BaseEntity
 		public GameObjectRef repairFailedEffect;
 	}
 
-	public enum ActionVolume
-	{
-		Quiet,
-		Normal,
-		Loud
-	}
-
 	public enum LifeState
 	{
 		Alive,
@@ -85,16 +78,12 @@ public class BaseCombatEntity : BaseEntity
 	[NonSerialized]
 	public BaseEntity lastAttacker;
 
-	public BaseEntity lastDealtDamageTo;
-
 	[NonSerialized]
 	public bool ResetLifeStateOnSpawn = true;
 
 	public DirectionProperties[] propDirection;
 
 	public float unHostileTime;
-
-	public float lastNoiseTime;
 
 	[Header("BaseCombatEntity")]
 	public SkeletonProperties skeletonProperties;
@@ -132,12 +121,6 @@ public class BaseCombatEntity : BaseEntity
 	public float lastDealtDamageTime = float.NegativeInfinity;
 
 	public int lastNotifyFrame;
-
-	public float TimeSinceLastNoise => UnityEngine.Time.time - lastNoiseTime;
-
-	public ActionVolume LastNoiseVolume { get; private set; }
-
-	public Vector3 LastNoisePosition { get; private set; }
 
 	public Vector3 LastAttackedDir { get; set; }
 
@@ -196,9 +179,9 @@ public class BaseCombatEntity : BaseEntity
 							RPC_PickupStart(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_PickupStart");
 					}
 				}
@@ -239,8 +222,8 @@ public class BaseCombatEntity : BaseEntity
 	{
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_PickupStart(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanPickup(rpc.player))
@@ -465,7 +448,6 @@ public class BaseCombatEntity : BaseEntity
 				if (baseCombatEntity != null)
 				{
 					baseCombatEntity.lastDealtDamageTime = UnityEngine.Time.time;
-					baseCombatEntity.lastDealtDamageTo = this;
 				}
 			}
 			BaseCombatEntity baseCombatEntity2 = lastAttacker as BaseCombatEntity;
@@ -607,22 +589,6 @@ public class BaseCombatEntity : BaseEntity
 	public void UpdateSurroundings()
 	{
 		StabilityEntity.updateSurroundingsQueue.Add(WorldSpaceBounds().ToBounds());
-	}
-
-	public void MakeNoise(Vector3 position, ActionVolume loudness)
-	{
-		LastNoisePosition = position;
-		LastNoiseVolume = loudness;
-		lastNoiseTime = UnityEngine.Time.time;
-	}
-
-	public bool CanLastNoiseBeHeard(Vector3 listenPosition, float listenRange)
-	{
-		if (listenRange <= 0f)
-		{
-			return false;
-		}
-		return Vector3.Distance(listenPosition, LastNoisePosition) <= listenRange;
 	}
 
 	public virtual bool IsDead()

@@ -76,7 +76,7 @@ public class Socket_Base : PrefabAttribute
 		{
 			return false;
 		}
-		return socket.GetType() == GetType();
+		return ((object)socket).GetType() == ((object)this).GetType();
 	}
 
 	public virtual bool CanConnect(Vector3 position, Quaternion rotation, Socket_Base socket, Vector3 socketPosition, Quaternion socketRotation)

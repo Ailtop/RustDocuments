@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Facepunch;
@@ -49,12 +50,12 @@ namespace UnityEngine
 
 		public static List<Transform> GetChildren(this Transform transform)
 		{
-			return transform.Cast<Transform>().ToList();
+			return ((IEnumerable)transform).Cast<Transform>().ToList();
 		}
 
 		public static void OrderChildren(this Transform tx, Func<Transform, object> selector)
 		{
-			foreach (Transform item in tx.Cast<Transform>().OrderBy(selector))
+			foreach (Transform item in ((IEnumerable)tx).Cast<Transform>().OrderBy(selector))
 			{
 				item.SetAsLastSibling();
 			}
@@ -232,7 +233,7 @@ namespace UnityEngine
 		public static T GetComponentInChildrenIncludeDisabled<T>(this Transform transform) where T : Component
 		{
 			List<T> obj = Pool.GetList<T>();
-			transform.GetComponentsInChildren(true, obj);
+			((Component)transform).GetComponentsInChildren<T>(true, obj);
 			T result = ((obj.Count > 0) ? obj[0] : null);
 			Pool.FreeList(ref obj);
 			return result;
@@ -241,7 +242,7 @@ namespace UnityEngine
 		public static bool HasComponentInChildrenIncludeDisabled<T>(this Transform transform) where T : Component
 		{
 			List<T> obj = Pool.GetList<T>();
-			transform.GetComponentsInChildren(true, obj);
+			((Component)transform).GetComponentsInChildren<T>(true, obj);
 			bool result = obj.Count > 0;
 			Pool.FreeList(ref obj);
 			return result;

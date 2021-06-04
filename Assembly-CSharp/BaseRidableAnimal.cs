@@ -156,8 +156,8 @@ public class BaseRidableAnimal : BaseVehicle
 	[ServerVar]
 	public static float framebudgetms = 1f;
 
-	[ServerVar]
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
+	[ServerVar]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -249,9 +249,9 @@ public class BaseRidableAnimal : BaseVehicle
 							RPC_Claim(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Claim");
 					}
 				}
@@ -285,9 +285,9 @@ public class BaseRidableAnimal : BaseVehicle
 							RPC_Lead(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_Lead");
 					}
 				}
@@ -321,9 +321,9 @@ public class BaseRidableAnimal : BaseVehicle
 							RPC_OpenLoot(rpc2);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in RPC_OpenLoot");
 					}
 				}
@@ -375,7 +375,7 @@ public class BaseRidableAnimal : BaseVehicle
 			}
 			else
 			{
-				Debug.LogWarning("Storage container without inventory: " + ToString());
+				Debug.LogWarning("Storage container without inventory: " + ((object)this).ToString());
 			}
 		}
 	}
@@ -447,7 +447,7 @@ public class BaseRidableAnimal : BaseVehicle
 			}
 			else
 			{
-				Debug.LogWarning("Storage container without inventory: " + ToString());
+				Debug.LogWarning("Storage container without inventory: " + ((object)this).ToString());
 			}
 		}
 	}
@@ -538,8 +538,8 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -556,8 +556,8 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

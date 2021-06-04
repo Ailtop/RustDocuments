@@ -38,7 +38,7 @@ namespace CompanionServer
 		{
 			if (!(player == null) && player.currentTeam != 0L)
 			{
-				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindTeam(player.currentTeam);
+				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindTeam(player.currentTeam);
 				Dictionary<string, string> serverPairingData = GetServerPairingData();
 				serverPairingData.Add("type", "login");
 				serverPairingData.Add("targetId", player.UserIDString);
@@ -55,14 +55,14 @@ namespace CompanionServer
 			BasePlayer basePlayer;
 			string value;
 			string text;
-			if ((object)(basePlayer = killer as BasePlayer) != null && basePlayer.GetType() == typeof(BasePlayer))
+			if ((object)(basePlayer = killer as BasePlayer) != null)
 			{
 				value = basePlayer.UserIDString;
 				text = basePlayer.displayName;
 			}
 			else
 			{
-				value = "";
+				value = "-1";
 				text = killer.ShortPrefabName;
 			}
 			if (!(player == null) && !string.IsNullOrEmpty(text))

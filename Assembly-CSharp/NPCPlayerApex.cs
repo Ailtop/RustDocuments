@@ -840,7 +840,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		{
 			if (Interface.CallHook("OnNpcResume", this) == null)
 			{
-				StartCoroutine(TryForceToNavmesh());
+				((MonoBehaviour)this).StartCoroutine(TryForceToNavmesh());
 			}
 			return;
 		}
@@ -993,7 +993,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 		{
 			return 0f;
 		}
-		if (target.GetType() == GetType())
+		if (((object)target).GetType() == ((object)this).GetType())
 		{
 			return 0f;
 		}

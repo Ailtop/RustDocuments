@@ -50,9 +50,9 @@ public class KeyLock : BaseLock
 							RPC_CreateKey(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_CreateKey");
 					}
 				}
@@ -86,9 +86,9 @@ public class KeyLock : BaseLock
 							RPC_Lock(rpc3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_Lock");
 					}
 				}
@@ -122,9 +122,9 @@ public class KeyLock : BaseLock
 							RPC_Unlock(rpc4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in RPC_Unlock");
 					}
 				}
@@ -246,8 +246,8 @@ public class KeyLock : BaseLock
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Lock(RPCMessage rpc)
 	{
 		Lock(rpc.player);

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 public class Prefab<T> : Prefab, IComparable<Prefab<T>> where T : Component
@@ -24,8 +23,6 @@ public class Prefab : IComparable<Prefab>
 
 	public string Name;
 
-	public string Folder;
-
 	public GameObject Object;
 
 	public GameManager Manager;
@@ -42,7 +39,6 @@ public class Prefab : IComparable<Prefab>
 	{
 		ID = StringPool.Get(name);
 		Name = name;
-		Folder = Path.GetDirectoryName(name);
 		Object = prefab;
 		Manager = manager;
 		Attribute = attribute;

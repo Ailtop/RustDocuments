@@ -48,15 +48,39 @@ public class NPCDwelling : BaseEntity
 	public void UpdateInformationZone(bool remove)
 	{
 		AIInformationZone forPoint = AIInformationZone.GetForPoint(base.transform.position);
-		if (!(forPoint == null))
+		if (!forPoint)
+		{
+			return;
+		}
+		if (movePoints != null)
+		{
+			AIMovePoint[] array = movePoints;
+			foreach (AIMovePoint aIMovePoint in array)
+			{
+				if (remove)
+				{
+					forPoint.RemoveMovePoint(aIMovePoint);
+				}
+				else if (ValidateAIPoint(aIMovePoint.transform.position))
+				{
+					forPoint.AddMovePoint(aIMovePoint);
+				}
+			}
+		}
+		if (coverPoints == null)
+		{
+			return;
+		}
+		AICoverPoint[] array2 = coverPoints;
+		foreach (AICoverPoint aICoverPoint in array2)
 		{
 			if (remove)
 			{
-				forPoint.RemoveDynamicAIPoints(movePoints, coverPoints);
+				forPoint.RemoveCoverPoint(aICoverPoint);
 			}
-			else
+			else if (ValidateAIPoint(aICoverPoint.transform.position))
 			{
-				forPoint.AddDynamicAIPoints(movePoints, coverPoints, ValidateAIPoint);
+				forPoint.AddCoverPoint(aICoverPoint);
 			}
 		}
 	}

@@ -96,7 +96,7 @@ public class TriggerBase : BaseMonoBehaviour
 		{
 			if (content == null)
 			{
-				Debug.LogWarning("Trigger " + ToString() + " contains null object.");
+				Debug.LogWarning("Trigger " + ((object)this).ToString() + " contains null object.");
 			}
 			else if (GameObjectEx.ToBaseEntity(content) == baseEntity)
 			{
@@ -131,7 +131,7 @@ public class TriggerBase : BaseMonoBehaviour
 			{
 				if (Debugging.checktriggers)
 				{
-					Debug.LogWarning("Trigger " + ToString() + " contains destroyed entity.");
+					Debug.LogWarning("Trigger " + ((object)this).ToString() + " contains destroyed entity.");
 				}
 				if (obj == null)
 				{
@@ -143,7 +143,7 @@ public class TriggerBase : BaseMonoBehaviour
 			{
 				if (Debugging.checktriggers)
 				{
-					Debug.LogWarning("Trigger " + ToString() + " contains entity that is too far away: " + entityContent.ToString());
+					Debug.LogWarning("Trigger " + ((object)this).ToString() + " contains entity that is too far away: " + ((object)entityContent).ToString());
 				}
 				if (obj == null)
 				{

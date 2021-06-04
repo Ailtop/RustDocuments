@@ -72,8 +72,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private float suspensionLurchMinTimeBetweenSounds = 0.25f;
 
-		[Header("Water")]
 		[SerializeField]
+		[Header("Water")]
 		private SoundDefinition waterSplashSoundDef;
 
 		[SerializeField]
@@ -82,16 +82,16 @@ namespace Rust.Modular
 		[SerializeField]
 		private float waterSoundsMaxSpeed = 10f;
 
-		[SerializeField]
 		[Header("Brakes")]
+		[SerializeField]
 		private SoundDefinition brakeSoundDef;
 
 		[SerializeField]
 		[Header("Lights")]
 		private SoundDefinition lightsToggleSound;
 
-		[Header("Wheels")]
 		[SerializeField]
+		[Header("Wheels")]
 		private SoundDefinition tyreRollingSoundDef;
 
 		[SerializeField]

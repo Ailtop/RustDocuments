@@ -111,7 +111,7 @@ public class DynamicNavMesh : SingletonComponent<DynamicNavMesh>, IServerCompone
 		}
 		else
 		{
-			StartCoroutine(enumerator);
+			((MonoBehaviour)this).StartCoroutine(enumerator);
 		}
 		if (!AiManager.nav_wait)
 		{

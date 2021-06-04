@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -32,7 +33,7 @@ public class ChildrenScreenshot : MonoBehaviour
 		camera.backgroundColor = new Color(0f, 0f, 0f, 0f);
 		camera.renderingPath = RenderingPath.DeferredShading;
 		Texture2D texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.ARGB32, false);
-		foreach (Transform item in base.transform.Cast<Transform>())
+		foreach (Transform item in ((IEnumerable)base.transform).Cast<Transform>())
 		{
 			PositionCamera(camera, item.gameObject);
 			int layer = item.gameObject.layer;

@@ -71,9 +71,9 @@ public class InstantCameraTool : HeldEntity
 							TakePhoto(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in TakePhoto");
 					}
 				}
@@ -83,9 +83,9 @@ public class InstantCameraTool : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.CallsPerSecond(3uL)]
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(3uL)]
 	private void TakePhoto(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

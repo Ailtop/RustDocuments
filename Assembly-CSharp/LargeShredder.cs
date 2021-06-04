@@ -34,9 +34,9 @@ public class LargeShredder : BaseEntity
 
 	private Quaternion entryRotation;
 
-	public bool isShredding;
+	private bool isShredding;
 
-	public float shredStartTime;
+	private float shredStartTime;
 
 	public virtual void OnEntityEnteredTrigger(BaseEntity ent)
 	{

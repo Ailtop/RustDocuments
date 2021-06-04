@@ -80,9 +80,9 @@ public class SleepingBag : DecayEntity
 							AssignToFriend(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in AssignToFriend");
 					}
 				}
@@ -116,9 +116,9 @@ public class SleepingBag : DecayEntity
 							Rename(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in Rename");
 					}
 				}
@@ -152,9 +152,9 @@ public class SleepingBag : DecayEntity
 							RPC_MakeBed(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in RPC_MakeBed");
 					}
 				}
@@ -188,9 +188,9 @@ public class SleepingBag : DecayEntity
 							RPC_MakePublic(msg5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in RPC_MakePublic");
 					}
 				}
@@ -212,11 +212,6 @@ public class SleepingBag : DecayEntity
 
 	public virtual bool ValidForPlayer(ulong playerID, bool ignoreTimers)
 	{
-		object obj = Interface.CallHook("OnSleepingBagValidCheck", this, playerID, ignoreTimers);
-		if (obj is bool)
-		{
-			return (bool)obj;
-		}
 		if (deployerUserID == playerID)
 		{
 			if (!ignoreTimers)
@@ -351,8 +346,8 @@ public class SleepingBag : DecayEntity
 		info.msg.sleepingBag.deployerID = deployerUserID;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void Rename(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -391,8 +386,8 @@ public class SleepingBag : DecayEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_MakePublic(RPCMessage msg)
 	{
 		if (!canBePublic || !msg.player.CanInteract() || (deployerUserID != msg.player.userID && !msg.player.CanBuild()))
@@ -411,8 +406,8 @@ public class SleepingBag : DecayEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_MakeBed(RPCMessage msg)
 	{
 		if (canBePublic && IsPublic() && msg.player.CanInteract())

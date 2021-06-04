@@ -1,7 +1,9 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using CCTVRender;
 using ConVar;
 using Facepunch;
 using Fleck;
@@ -10,7 +12,7 @@ using UnityEngine;
 
 namespace CompanionServer
 {
-	public class Connection : IConnection
+	public class Connection : IConnection, IReceiver
 	{
 		private static readonly MemoryStream MessageStream = new MemoryStream(1048576);
 
@@ -118,6 +120,19 @@ namespace CompanionServer
 			{
 				Debug.LogError($"Failed to send message to app client {_connection.ConnectionInfo.ClientIpAddress}: {arg}");
 			}
+		}
+
+		public void RenderCompleted(uint requestId, uint frame, Span<byte> jpgImage)
+		{
+			byte[] array = ArrayPool<byte>.Shared.Rent(jpgImage.Length);
+			jpgImage.CopyTo(MemoryExtensions.AsSpan(array));
+			ArraySegment<byte> jpgImage2 = new ArraySegment<byte>(array, 0, jpgImage.Length);
+			AppResponse appResponse = Facepunch.Pool.Get<AppResponse>();
+			appResponse.seq = requestId;
+			appResponse.cameraFrame = Facepunch.Pool.Get<AppCameraFrame>();
+			appResponse.cameraFrame.frame = frame;
+			appResponse.cameraFrame.jpgImage = jpgImage2;
+			Send(appResponse);
 		}
 	}
 }

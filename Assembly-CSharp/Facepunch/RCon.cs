@@ -491,10 +491,10 @@ namespace Facepunch
 				bannedAddresses.RemoveAll((BannedAddresses x) => x.banTime < UnityEngine.Time.realtimeSinceStartup);
 				listener.Cycle();
 			}
-			catch (Exception exception)
+			catch (Exception ex)
 			{
 				Debug.LogWarning("Rcon Exception");
-				Debug.LogException(exception);
+				Debug.LogException(ex);
 			}
 		}
 

@@ -59,8 +59,8 @@ namespace UnityEngine.UI.Extensions
 
 		private static Vector2[] fullUvs;
 
-		[SerializeField]
 		[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
+		[SerializeField]
 		internal Vector2[] m_points;
 
 		[Tooltip("Segments to be drawn\n This is a list of arrays of points")]
@@ -71,8 +71,8 @@ namespace UnityEngine.UI.Extensions
 		[SerializeField]
 		internal float lineThickness = 2f;
 
-		[SerializeField]
 		[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
+		[SerializeField]
 		internal bool relativeSize;
 
 		[SerializeField]

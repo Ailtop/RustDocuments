@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class TriggerParent : TriggerBase, IServerComponent
 {
-	[SerializeField]
 	[Tooltip("Deparent if the parented entity clips into an obstacle")]
+	[SerializeField]
 	private bool doClippingCheck;
 
 	[Tooltip("If deparenting via clipping, this will be used (if assigned) to also move the entity to a valid dismount position")]
 	public BaseMountable associatedMountable;
-
-	public bool ParentNPCPlayers;
 
 	public const int CLIP_CHECK_MASK = 1210122497;
 
@@ -34,7 +32,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 
 	public override void OnEntityEnter(BaseEntity ent)
 	{
-		if (!(ent is NPCPlayer) || ParentNPCPlayers)
+		if (!(ent is NPCPlayer))
 		{
 			if (ShouldParent(ent))
 			{

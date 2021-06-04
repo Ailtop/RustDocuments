@@ -64,9 +64,9 @@ public class Locker : StorageContainer
 							RPC_Equip(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Equip");
 					}
 				}
@@ -118,8 +118,8 @@ public class Locker : StorageContainer
 		return GetRowType(targetSlot) == RowType.Belt;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Equip(RPCMessage msg)
 	{
 		int num = msg.read.Int32();

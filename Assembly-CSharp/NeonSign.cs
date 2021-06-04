@@ -89,9 +89,9 @@ public class NeonSign : Signage
 							SetAnimationSpeed(rPCMessage2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SetAnimationSpeed");
 					}
 				}
@@ -129,9 +129,9 @@ public class NeonSign : Signage
 							UpdateNeonColors(msg2);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in UpdateNeonColors");
 					}
 				}
@@ -243,9 +243,9 @@ public class NeonSign : Signage
 		info.msg.neonSign.animationSpeed = animationSpeed;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
 	public void SetAnimationSpeed(RPCMessage msg)
 	{
 		float num = (animationSpeed = Mathf.Clamp(msg.read.Float(), 0.5f, 5f));
@@ -258,8 +258,8 @@ public class NeonSign : Signage
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
 	public void UpdateNeonColors(RPCMessage msg)
 	{
 		if (CanUpdateSign(msg.player))

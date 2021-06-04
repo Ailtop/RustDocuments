@@ -32,9 +32,9 @@ public class Jackhammer : BaseMelee
 							Server_SetEngineStatus(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in Server_SetEngineStatus");
 					}
 				}

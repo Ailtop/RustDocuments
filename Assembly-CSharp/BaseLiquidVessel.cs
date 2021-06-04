@@ -77,9 +77,9 @@ public class BaseLiquidVessel : AttackEntity
 							DoDrink(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in DoDrink");
 					}
 				}
@@ -106,9 +106,9 @@ public class BaseLiquidVessel : AttackEntity
 							SendFilling(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in SendFilling");
 					}
 				}
@@ -135,9 +135,9 @@ public class BaseLiquidVessel : AttackEntity
 							ThrowContents(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in ThrowContents");
 					}
 				}
@@ -378,8 +378,8 @@ public class BaseLiquidVessel : AttackEntity
 		nextFreeTime = UnityEngine.Time.realtimeSinceStartup - 1f;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoDrink(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())

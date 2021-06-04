@@ -7,7 +7,7 @@ namespace CompanionServer.Handlers
 	{
 		public override void Execute()
 		{
-			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindPlayersTeam(base.UserId);
+			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindPlayersTeam(base.UserId);
 			AppTeamInfo teamInfo = ((playerTeam == null) ? AppPlayerExtensions.GetAppTeamInfo(base.Player, base.UserId) : AppPlayerExtensions.GetAppTeamInfo(playerTeam, base.UserId));
 			AppResponse appResponse = Pool.Get<AppResponse>();
 			appResponse.teamInfo = teamInfo;

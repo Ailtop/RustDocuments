@@ -12,9 +12,9 @@ public class SpawnPopulation : BaseScriptableObject
 	public GameObjectRef[] ResourceList;
 
 	[SerializeField]
-	[Header("Spawn Info")]
-	[FormerlySerializedAs("TargetDensity")]
 	[Tooltip("Usually per square km")]
+	[FormerlySerializedAs("TargetDensity")]
+	[Header("Spawn Info")]
 	public float _targetDensity = 1f;
 
 	public float SpawnRate = 1f;

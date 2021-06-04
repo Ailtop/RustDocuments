@@ -65,24 +65,24 @@ public class VehicleModuleSeating : BaseVehicleModule
 	[SerializeField]
 	private Seating seating;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 steerAngle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 accelAngle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 brakeAngle;
 
 	[HideInInspector]
 	[SerializeField]
 	private Vector3 speedometerAngle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 fuelAngle;
 
 	[Header("Horn")]
@@ -156,9 +156,9 @@ public class VehicleModuleSeating : BaseVehicleModule
 							RPC_DestroyLock(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_DestroyLock");
 					}
 				}

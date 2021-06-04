@@ -52,9 +52,9 @@ public class RepairBench : StorageContainer
 							ChangeSkin(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ChangeSkin");
 					}
 				}
@@ -88,9 +88,9 @@ public class RepairBench : StorageContainer
 							RepairItem(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RepairItem");
 					}
 				}

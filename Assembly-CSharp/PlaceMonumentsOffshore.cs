@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -35,11 +34,9 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 
 	public override void Process(uint seed)
 	{
-		string[] array = (from folder in ResourceFolder.Split(',')
-			select "assets/bundled/prefabs/autospawn/" + folder + "/").ToArray();
 		if (World.Networked)
 		{
-			World.Spawn("Monument", array);
+			World.Spawn("Monument", "assets/bundled/prefabs/autospawn/" + ResourceFolder + "/");
 		}
 		else
 		{
@@ -48,20 +45,13 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 				return;
 			}
 			TerrainHeightMap heightMap = TerrainMeta.HeightMap;
-			List<Prefab<MonumentInfo>> list = new List<Prefab<MonumentInfo>>();
-			string[] array2 = array;
-			for (int i = 0; i < array2.Length; i++)
-			{
-				Prefab<MonumentInfo>[] array3 = Prefab.Load<MonumentInfo>(array2[i]);
-				ArrayEx.Shuffle(array3, ref seed);
-				list.AddRange(array3);
-			}
-			Prefab<MonumentInfo>[] array4 = list.ToArray();
-			if (array4 == null || array4.Length == 0)
+			Prefab<MonumentInfo>[] array = Prefab.Load<MonumentInfo>("assets/bundled/prefabs/autospawn/" + ResourceFolder);
+			if (array == null || array.Length == 0)
 			{
 				return;
 			}
-			ArrayEx.BubbleSort(array4);
+			ArrayEx.Shuffle(array, seed);
+			ArrayEx.BubbleSort(array);
 			Vector3 position = TerrainMeta.Position;
 			Vector3 size = TerrainMeta.Size;
 			float min = position.x - (float)MaxDistanceFromTerrain;
@@ -76,12 +66,12 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 			List<SpawnInfo> a = new List<SpawnInfo>();
 			int num3 = 0;
 			List<SpawnInfo> b = new List<SpawnInfo>();
-			for (int j = 0; j < 10; j++)
+			for (int i = 0; i < 10; i++)
 			{
 				num2 = 0;
 				a.Clear();
-				Prefab<MonumentInfo>[] array5 = array4;
-				foreach (Prefab<MonumentInfo> prefab in array5)
+				Prefab<MonumentInfo>[] array2 = array;
+				foreach (Prefab<MonumentInfo> prefab in array2)
 				{
 					int num4 = (int)((!prefab.Parameters) ? PrefabPriority.Low : (prefab.Parameters.Priority + 1));
 					int num5 = num4 * num4 * num4 * num4;

@@ -91,9 +91,9 @@ public class LiquidContainer : ContainerIOEntity
 							SVDrink(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SVDrink");
 					}
 				}
@@ -335,8 +335,8 @@ public class LiquidContainer : ContainerIOEntity
 		return GetLiquidItem().amount;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void SVDrink(RPCMessage rpc)
 	{
 		if (!rpc.player.metabolism.CanConsume())

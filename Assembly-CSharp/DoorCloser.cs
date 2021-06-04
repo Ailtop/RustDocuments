@@ -45,9 +45,9 @@ public class DoorCloser : BaseEntity
 							RPC_Take(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Take");
 					}
 				}
@@ -87,8 +87,8 @@ public class DoorCloser : BaseEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Take(RPCMessage rpc)
 	{
 		if (Interface.CallHook("ICanPickupEntity", rpc.player, this) != null || !rpc.player.CanInteract() || !rpc.player.CanBuild())

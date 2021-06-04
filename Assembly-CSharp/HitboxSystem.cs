@@ -105,7 +105,7 @@ public class HitboxSystem : MonoBehaviour, IPrefabPreProcess
 	public void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
 		List<HitboxDefinition> obj = Pool.GetList<HitboxDefinition>();
-		GetComponentsInChildren(obj);
+		((Component)this).GetComponentsInChildren<HitboxDefinition>(obj);
 		if (serverside)
 		{
 			foreach (HitboxDefinition item2 in obj)

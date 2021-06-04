@@ -85,9 +85,9 @@ public class BaseArcadeMachine : BaseVehicle
 							BroadcastEntityMessage(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in BroadcastEntityMessage");
 					}
 				}
@@ -121,9 +121,9 @@ public class BaseArcadeMachine : BaseVehicle
 							DestroyMessageFromHost(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in DestroyMessageFromHost");
 					}
 				}
@@ -161,9 +161,9 @@ public class BaseArcadeMachine : BaseVehicle
 							GetSnapshotFromClient(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in GetSnapshotFromClient");
 					}
 				}
@@ -197,9 +197,9 @@ public class BaseArcadeMachine : BaseVehicle
 							RequestAddScore(msg5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in RequestAddScore");
 					}
 				}
@@ -221,8 +221,8 @@ public class BaseArcadeMachine : BaseVehicle
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RequestAddScore(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -305,8 +305,8 @@ public class BaseArcadeMachine : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void DestroyMessageFromHost(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -322,9 +322,9 @@ public class BaseArcadeMachine : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(7uL)]
+	[RPC_Server.IsVisible(3f)]
 	public void BroadcastEntityMessage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using ConVar;
 using Facepunch;
 using Facepunch.Extend;
@@ -126,64 +125,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Reserved10 = 0x40000
 	}
 
-	[IsReadOnly]
-	private struct ServerFileRequest : IEquatable<ServerFileRequest>
-	{
-		public readonly FileStorage.Type Type;
-
-		public readonly uint NumId;
-
-		public readonly uint Crc;
-
-		public readonly IServerFileReceiver Receiver;
-
-		public readonly float Time;
-
-		public ServerFileRequest(FileStorage.Type type, uint numId, uint crc, IServerFileReceiver receiver)
-		{
-			Type = type;
-			NumId = numId;
-			Crc = crc;
-			Receiver = receiver;
-			Time = UnityEngine.Time.realtimeSinceStartup;
-		}
-
-		public bool Equals(ServerFileRequest other)
-		{
-			if (Type == other.Type && NumId == other.NumId && Crc == other.Crc)
-			{
-				return object.Equals(Receiver, other.Receiver);
-			}
-			return false;
-		}
-
-		public override bool Equals(object obj)
-		{
-			object obj2;
-			if ((obj2 = obj) is ServerFileRequest)
-			{
-				ServerFileRequest other = (ServerFileRequest)obj2;
-				return Equals(other);
-			}
-			return false;
-		}
-
-		public override int GetHashCode()
-		{
-			return (int)(((((uint)((int)Type * 397) ^ NumId) * 397) ^ Crc) * 397) ^ ((Receiver != null) ? Receiver.GetHashCode() : 0);
-		}
-
-		public static bool operator ==(ServerFileRequest left, ServerFileRequest right)
-		{
-			return left.Equals(right);
-		}
-
-		public static bool operator !=(ServerFileRequest left, ServerFileRequest right)
-		{
-			return !left.Equals(right);
-		}
-	}
-
 	public static class Query
 	{
 		public class EntityTree
@@ -192,13 +133,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 			private Grid<BasePlayer> PlayerGrid;
 
-			private Grid<BaseEntity> BrainGrid;
-
 			public EntityTree(float worldSize)
 			{
 				Grid = new Grid<BaseEntity>(32, worldSize);
 				PlayerGrid = new Grid<BasePlayer>(32, worldSize);
-				BrainGrid = new Grid<BaseEntity>(32, worldSize);
 			}
 
 			public void Add(BaseEntity ent)
@@ -211,12 +149,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			{
 				Vector3 position = player.transform.position;
 				PlayerGrid.Add(player, position.x, position.z);
-			}
-
-			public void AddBrain(BaseEntity entity)
-			{
-				Vector3 position = entity.transform.position;
-				BrainGrid.Add(entity, position.x, position.z);
 			}
 
 			public void Remove(BaseEntity ent, bool isPlayer = false)
@@ -237,11 +169,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				PlayerGrid.Remove(player);
 			}
 
-			public void RemoveBrain(BaseEntity entity)
-			{
-				BrainGrid.Remove(entity);
-			}
-
 			public void Move(BaseEntity ent)
 			{
 				Vector3 position = ent.transform.position;
@@ -251,22 +178,12 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				{
 					MovePlayer(basePlayer);
 				}
-				if (ent.HasBrain)
-				{
-					MoveBrain(ent);
-				}
 			}
 
 			public void MovePlayer(BasePlayer player)
 			{
 				Vector3 position = player.transform.position;
 				PlayerGrid.Move(player, position.x, position.z);
-			}
-
-			public void MoveBrain(BaseEntity entity)
-			{
-				Vector3 position = entity.transform.position;
-				BrainGrid.Move(entity, position.x, position.z);
 			}
 
 			public int GetInSphere(Vector3 position, float distance, BaseEntity[] results, Func<BaseEntity, bool> filter = null)
@@ -277,11 +194,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			public int GetPlayersInSphere(Vector3 position, float distance, BasePlayer[] results, Func<BasePlayer, bool> filter = null)
 			{
 				return PlayerGrid.Query(position.x, position.z, distance, results, filter);
-			}
-
-			public int GetBrainsInSphere(Vector3 position, float distance, BaseEntity[] results, Func<BaseEntity, bool> filter = null)
-			{
-				return BrainGrid.Query(position.x, position.z, distance, results, filter);
 			}
 		}
 
@@ -659,8 +571,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private EntityComponentBase[] _components;
 
-	public bool HasBrain;
-
 	[NonSerialized]
 	public string _name;
 
@@ -819,9 +729,9 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 							BroadcastSignalFromClient(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in BroadcastSignalFromClient");
 					}
 				}
@@ -848,9 +758,9 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 							SV_RequestFile(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in SV_RequestFile");
 					}
 				}
@@ -1340,7 +1250,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			{
 				channel = 2,
 				method = SendMethod.Reliable
-			}, null, funcName, num, (uint)array.Length, array, num2, (byte)type);
+			}, null, funcName, num, (uint)array.Length, array, num2);
 		}
 	}
 
@@ -2133,8 +2043,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2812,11 +2722,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		if (base.isClient)
 		{
-			Debug.Log("<color=#ffa>[" + ToString() + "] " + str + "</color>", base.gameObject);
+			Debug.Log("<color=#ffa>[" + ((object)this).ToString() + "] " + str + "</color>", base.gameObject);
 		}
 		else
 		{
-			Debug.Log("<color=#aff>[" + ToString() + "] " + str + "</color>", base.gameObject);
+			Debug.Log("<color=#aff>[" + ((object)this).ToString() + "] " + str + "</color>", base.gameObject);
 		}
 	}
 
@@ -2986,7 +2896,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			{
 				if (baseEntity.pos.IsNaNOrInfinity())
 				{
-					Debug.LogWarning(ToString() + " has broken position - " + baseEntity.pos);
+					Debug.LogWarning(((object)this).ToString() + " has broken position - " + baseEntity.pos);
 					baseEntity.pos = Vector3.zero;
 				}
 				base.transform.localPosition = baseEntity.pos;

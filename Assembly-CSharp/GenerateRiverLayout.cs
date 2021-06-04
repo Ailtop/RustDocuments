@@ -122,19 +122,12 @@ public class GenerateRiverLayout : ProceduralComponent
 				continue;
 			}
 			PathList pathList2 = list[j];
-			bool flag = false;
 			for (int k = 0; k < j; k++)
 			{
 				if (Vector3.Distance(list[k].Path.GetStartPoint(), pathList2.Path.GetStartPoint()) < 100f)
 				{
 					list.RemoveUnordered(j--);
-					flag = true;
-					break;
 				}
-			}
-			if (flag)
-			{
-				continue;
 			}
 			int num11 = -1;
 			int num12 = -1;
@@ -143,32 +136,13 @@ public class GenerateRiverLayout : ProceduralComponent
 				Vector3 vector2 = pathList2.Path.Points[l];
 				int num13 = Mathf.Clamp((int)(TerrainMeta.NormalizeX(vector2.x) * (float)num10), 0, num10 - 1);
 				int num14 = Mathf.Clamp((int)(TerrainMeta.NormalizeZ(vector2.z) * (float)num10), 0, num10 - 1);
-				if (num11 == num13 && num12 == num14)
+				if (num11 != num13 || num12 != num14)
 				{
-					continue;
-				}
-				if (array[num14, num13])
-				{
-					list.RemoveUnordered(j--);
-					flag = true;
-					break;
-				}
-				if (num11 != num13 && num12 != num14)
-				{
-					if (num11 != -1)
+					if (array[num14, num13])
 					{
-						array[num14, num11] = true;
+						list.RemoveUnordered(j--);
+						break;
 					}
-					if (num12 != -1)
-					{
-						array[num12, num13] = true;
-					}
-					num11 = num13;
-					num12 = num14;
-					array[num14, num13] = true;
-				}
-				else
-				{
 					num11 = num13;
 					num12 = num14;
 					array[num14, num13] = true;

@@ -1148,7 +1148,7 @@ namespace Rust.Ai.HTN.Scientist
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				context.Body.StartCoroutine(AsyncTimer(context, time));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(ScientistContext context, PrimitiveTaskSelector task)
@@ -1163,7 +1163,7 @@ namespace Rust.Ai.HTN.Scientist
 
 			public override void Abort(ScientistContext context, PrimitiveTaskSelector task)
 			{
-				context.Body.StopCoroutine(AsyncTimer(context, 0f));
+				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1184,7 +1184,7 @@ namespace Rust.Ai.HTN.Scientist
 		{
 			public override void Execute(ScientistContext context)
 			{
-				context.Body.StartCoroutine(AsyncTimer(context, 0.3f));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, 0.3f));
 			}
 
 			public override OperatorStateType Tick(ScientistContext context, PrimitiveTaskSelector task)
@@ -1199,7 +1199,7 @@ namespace Rust.Ai.HTN.Scientist
 
 			public override void Abort(ScientistContext context, PrimitiveTaskSelector task)
 			{
-				context.Body.StopCoroutine(AsyncTimer(context, 0f));
+				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1286,7 +1286,7 @@ namespace Rust.Ai.HTN.Scientist
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				context.Body.StartCoroutine(AsyncTimer(context, time));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(ScientistContext context, PrimitiveTaskSelector task)
@@ -1336,7 +1336,7 @@ namespace Rust.Ai.HTN.Scientist
 			public override void Execute(ScientistContext context)
 			{
 				context.SetFact(Facts.IsLookingAround, true);
-				context.Body.StartCoroutine(LookAroundAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(LookAroundAsync(context));
 			}
 
 			public override OperatorStateType Tick(ScientistContext context, PrimitiveTaskSelector task)
@@ -1377,7 +1377,7 @@ namespace Rust.Ai.HTN.Scientist
 			public override void Execute(ScientistContext context)
 			{
 				SwitchToItem(context, _item);
-				context.Body.StartCoroutine(WaitAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(WaitAsync(context));
 			}
 
 			public override OperatorStateType Tick(ScientistContext context, PrimitiveTaskSelector task)
@@ -1456,7 +1456,7 @@ namespace Rust.Ai.HTN.Scientist
 
 			public override void Execute(ScientistContext context)
 			{
-				context.Body.StartCoroutine(UseItem(context));
+				((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
 			}
 
 			public override OperatorStateType Tick(ScientistContext context, PrimitiveTaskSelector task)
@@ -1549,7 +1549,7 @@ namespace Rust.Ai.HTN.Scientist
 			{
 				if (context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player != null)
 				{
-					context.Body.StartCoroutine(UseItem(context));
+					((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
 				}
 			}
 
@@ -2108,8 +2108,8 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		}
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isRegisteredWithAgency;
 
 		private Vector3 missOffset;
@@ -2134,18 +2134,18 @@ namespace Rust.Ai.HTN.Scientist
 		[Header("Context")]
 		private ScientistContext _context;
 
-		[ReadOnly]
 		[Header("Navigation")]
 		[SerializeField]
+		[ReadOnly]
 		private NavMeshAgent _navAgent;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2287,12 +2287,12 @@ namespace Rust.Ai.HTN.Scientist
 		[SerializeField]
 		private float _lastFirearmUsageTime;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isFiring;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;
@@ -2414,7 +2414,7 @@ namespace Rust.Ai.HTN.Scientist
 		{
 			if (!(proj == null))
 			{
-				StartCoroutine(HoldTriggerLogic(proj, time, 4f));
+				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, 4f));
 			}
 		}
 
@@ -2422,7 +2422,7 @@ namespace Rust.Ai.HTN.Scientist
 		{
 			if (!(proj == null))
 			{
-				StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
+				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
 			}
 		}
 
@@ -2526,7 +2526,7 @@ namespace Rust.Ai.HTN.Scientist
 		{
 			if ((bool)proj && _context.IsBodyAlive() && proj.primaryMagazine.contents < proj.primaryMagazine.capacity)
 			{
-				StartCoroutine(ReloadHandler(proj));
+				((MonoBehaviour)this).StartCoroutine(ReloadHandler(proj));
 			}
 		}
 
@@ -2660,7 +2660,7 @@ namespace Rust.Ai.HTN.Scientist
 			{
 				if (!NavAgent.isOnNavMesh)
 				{
-					StartCoroutine(TryForceToNavmesh());
+					((MonoBehaviour)this).StartCoroutine(TryForceToNavmesh());
 					return;
 				}
 				NavAgent.enabled = true;

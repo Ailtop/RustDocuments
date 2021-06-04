@@ -135,8 +135,8 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		return fuelSystem;
 	}
 
-	[RPC_Server.IsVisible(6f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(6f)]
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -499,9 +499,9 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 							RPC_OpenFuel(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_OpenFuel");
 					}
 				}

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects
 {
-	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
-	[ImageEffectAllowedInSceneView]
 	[ExecuteInEditMode]
+	[ImageEffectAllowedInSceneView]
+	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -57,8 +57,8 @@ namespace UnityStandardAssets.CinematicEffects
 		{
 			public bool enabled;
 
-			[Min(0f)]
 			[Tooltip("Midpoint Adjustment.")]
+			[Min(0f)]
 			public float middleGrey;
 
 			[Tooltip("The lowest possible exposure value; adjust this value to modify the brightest areas of your level.")]
@@ -109,8 +109,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Tonemapping technique to use. ACES is the recommended one.")]
 			public Tonemapper tonemapper;
 
-			[Tooltip("Adjusts the overall exposure of the scene.")]
 			[Min(0f)]
+			[Tooltip("Adjusts the overall exposure of the scene.")]
 			public float exposure;
 
 			[Tooltip("Custom tonemapping curve.")]
@@ -216,8 +216,8 @@ namespace UnityStandardAssets.CinematicEffects
 			public float tint;
 
 			[Tooltip("Shift the hue of all colors.")]
-			[Space]
 			[Range(-0.5f, 0.5f)]
+			[Space]
 			public float hue;
 
 			[Range(0f, 2f)]
@@ -232,8 +232,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Brightens or darkens all colors.")]
 			public float value;
 
-			[Space]
 			[Range(0f, 2f)]
+			[Space]
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			public float contrast;
 
@@ -333,12 +333,12 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Internal LUT precision. \"Normal\" is 256x16, \"High\" is 1024x32. Prefer \"Normal\" on mobile devices.")]
 			public ColorGradingPrecision precision;
 
-			[ColorWheelGroup]
 			[Space]
+			[ColorWheelGroup]
 			public ColorWheelsSettings colorWheels;
 
-			[IndentedGroup]
 			[Space]
+			[IndentedGroup]
 			public BasicsSettings basics;
 
 			[ChannelMixer]
@@ -349,8 +349,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Space]
 			public CurvesSettings curves;
 
-			[Space]
 			[Tooltip("Use dithering to try and minimize color banding in dark areas.")]
+			[Space]
 			public bool useDithering;
 
 			[Tooltip("Displays the generated LUT in the top left corner of the GameView.")]
@@ -379,20 +379,20 @@ namespace UnityStandardAssets.CinematicEffects
 			}
 		}
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private EyeAdaptationSettings m_EyeAdaptation = EyeAdaptationSettings.defaultSettings;
 
-		[SettingsGroup]
 		[SerializeField]
+		[SettingsGroup]
 		private TonemappingSettings m_Tonemapping = TonemappingSettings.defaultSettings;
 
 		[SettingsGroup]
 		[SerializeField]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

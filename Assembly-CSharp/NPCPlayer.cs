@@ -15,8 +15,6 @@ public class NPCPlayer : BasePlayer
 
 	protected Vector3 _currentNavMeshLinkEndPos;
 
-	public AIInformationZone VirtualInfoZone;
-
 	public Vector3 finalDestination;
 
 	[NonSerialized]
@@ -28,8 +26,6 @@ public class NPCPlayer : BasePlayer
 	public PlayerInventoryProperties[] loadouts;
 
 	public LayerMask movementMask = 429990145;
-
-	public bool LegacyNavigation = true;
 
 	public NavMeshAgent NavAgent;
 
@@ -132,7 +128,7 @@ public class NPCPlayer : BasePlayer
 			return false;
 		}
 		_currentNavMeshLink = currentOffMeshLinkData;
-		_currentNavMeshLinkName = currentOffMeshLinkData.linkType.ToString();
+		_currentNavMeshLinkName = ((object)currentOffMeshLinkData.linkType).ToString();
 		if ((ServerPosition - currentOffMeshLinkData.startPos).sqrMagnitude > (ServerPosition - currentOffMeshLinkData.endPos).sqrMagnitude)
 		{
 			_currentNavMeshLinkEndPos = currentOffMeshLinkData.startPos;
@@ -203,45 +199,40 @@ public class NPCPlayer : BasePlayer
 
 	public override void ServerInit()
 	{
-		if (base.isClient)
+		if (!base.isClient)
 		{
-			return;
-		}
-		spawnPos = GetPosition();
-		randomOffset = UnityEngine.Random.Range(0f, 1f);
-		base.ServerInit();
-		UpdateNetworkGroup();
-		if (loadouts != null && loadouts.Length != 0)
-		{
-			loadouts[UnityEngine.Random.Range(0, loadouts.Length)].GiveToPlayer(this);
-		}
-		else
-		{
-			Debug.LogWarningFormat("Loadout for NPC {0} was empty.", base.name);
-		}
-		if (!IsLoadBalanced())
-		{
-			InvokeRepeating(ServerThink_Internal, 0f, 0.1f);
-			lastThinkTime = Time.time;
-		}
-		Invoke(EquipTest, 0.25f);
-		finalDestination = base.transform.position;
-		AgencyUpdateRequired = false;
-		IsOnOffmeshLinkAndReachedNewCoord = false;
-		if (NavAgent == null)
-		{
-			NavAgent = GetComponent<NavMeshAgent>();
-		}
-		if ((bool)NavAgent)
-		{
-			NavAgent.updateRotation = false;
-			NavAgent.updatePosition = false;
-			if (!LegacyNavigation)
+			spawnPos = GetPosition();
+			randomOffset = UnityEngine.Random.Range(0f, 1f);
+			base.ServerInit();
+			UpdateNetworkGroup();
+			if (loadouts != null && loadouts.Length != 0)
 			{
-				base.transform.gameObject.GetComponent<BaseNavigator>().Init(this, NavAgent);
+				loadouts[UnityEngine.Random.Range(0, loadouts.Length)].GiveToPlayer(this);
 			}
+			else
+			{
+				Debug.LogWarningFormat("Loadout for NPC {0} was empty.", base.name);
+			}
+			if (!IsLoadBalanced())
+			{
+				InvokeRepeating(ServerThink_Internal, 0f, 0.1f);
+				lastThinkTime = Time.time;
+			}
+			Invoke(EquipTest, 0.25f);
+			finalDestination = base.transform.position;
+			AgencyUpdateRequired = false;
+			IsOnOffmeshLinkAndReachedNewCoord = false;
+			if (NavAgent == null)
+			{
+				NavAgent = GetComponent<NavMeshAgent>();
+			}
+			if ((bool)NavAgent)
+			{
+				NavAgent.updateRotation = false;
+				NavAgent.updatePosition = false;
+			}
+			InvokeRandomized(TickMovement, 1f, PositionTickRate, PositionTickRate * 0.1f);
 		}
-		InvokeRandomized(TickMovement, 1f, PositionTickRate, PositionTickRate * 0.1f);
 	}
 
 	public override void ApplyInheritedVelocity(Vector3 velocity)
@@ -466,7 +457,7 @@ public class NPCPlayer : BasePlayer
 
 	public virtual void MovementUpdate(float delta)
 	{
-		if (!LegacyNavigation || base.isClient || !IsAlive() || IsWounded() || (!base.isMounted && !IsNavRunning()))
+		if (base.isClient || !IsAlive() || IsWounded() || (!base.isMounted && !IsNavRunning()))
 		{
 			return;
 		}
@@ -498,7 +489,7 @@ public class NPCPlayer : BasePlayer
 	{
 		if (!ValidBounds.Test(moveToPosition) && base.transform != null && !base.IsDestroyed)
 		{
-			Debug.Log(string.Concat("Invalid NavAgent Position: ", this, " ", moveToPosition.ToString(), " (destroying)"));
+			Debug.Log(string.Concat("Invalid NavAgent Position: ", this, " ", ((object)moveToPosition).ToString(), " (destroying)"));
 			Kill();
 			return false;
 		}

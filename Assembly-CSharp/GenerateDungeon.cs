@@ -144,15 +144,14 @@ public class GenerateDungeon : ProceduralComponent
 		List<PathFinder.Point> list6 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list7 = new List<PathFinder.Point>();
 		_003C_003Ec__DisplayClass16_1 _003C_003Ec__DisplayClass16_2 = default(_003C_003Ec__DisplayClass16_1);
-		_003C_003Ec__DisplayClass16_3 _003C_003Ec__DisplayClass16_3 = default(_003C_003Ec__DisplayClass16_3);
+		_003C_003Ec__DisplayClass16_2 _003C_003Ec__DisplayClass16_3 = default(_003C_003Ec__DisplayClass16_2);
+		_003C_003Ec__DisplayClass16_3 _003C_003Ec__DisplayClass16_4 = default(_003C_003Ec__DisplayClass16_3);
 		foreach (DungeonInfo item in list)
 		{
 			_003C_003Ec__DisplayClass16_2.entrance = item;
 			TerrainPathConnect[] componentsInChildren = _003C_003Ec__DisplayClass16_2.entrance.GetComponentsInChildren<TerrainPathConnect>(true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
-				_003C_003Ec__DisplayClass16_2 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass16_2();
-				CS_0024_003C_003E8__locals0._003C_003E4__this = this;
 				if (terrainPathConnect.Type != ConnectionType)
 				{
 					continue;
@@ -162,8 +161,8 @@ public class GenerateDungeon : ProceduralComponent
 				{
 					continue;
 				}
-				CS_0024_003C_003E8__locals0.stationNode = _003C_003Ec__DisplayClass16_.pathFinder.FindClosestWalkable(new PathFinder.Point(cellPos.x, cellPos.y), 1);
-				if (CS_0024_003C_003E8__locals0.stationNode == null)
+				_003C_003Ec__DisplayClass16_3.stationNode = _003C_003Ec__DisplayClass16_.pathFinder.FindClosestWalkable(new PathFinder.Point(cellPos.x, cellPos.y), 1);
+				if (_003C_003Ec__DisplayClass16_3.stationNode == null)
 				{
 					continue;
 				}
@@ -201,24 +200,22 @@ public class GenerateDungeon : ProceduralComponent
 				{
 					worldSpaceGrid[cellPos.x, cellPos.y] = prefab5;
 					array5[cellPos.x, cellPos.y] = int.MaxValue;
-					_003C_003Ec__DisplayClass16_3.isStartPoint = _003C_003Ec__DisplayClass16_.secondaryNodeList.Count == 0;
-					_003C_003Ec__DisplayClass16_.secondaryNodeList.RemoveAll((PathNode x) => x.node.point == CS_0024_003C_003E8__locals0.stationNode.point);
-					_003C_003Ec__DisplayClass16_.unconnectedNodeList.RemoveAll((PathNode x) => x.node.point == CS_0024_003C_003E8__locals0.stationNode.point);
+					_003C_003Ec__DisplayClass16_4.isStartPoint = _003C_003Ec__DisplayClass16_.secondaryNodeList.Count == 0;
 					if (prefab5.Component.West != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x - 1, cellPos.y, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3);
+						_003CProcess_003Eg__AddNode_007C16_1(cellPos.x - 1, cellPos.y, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3, ref _003C_003Ec__DisplayClass16_4);
 					}
 					if (prefab5.Component.East != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x + 1, cellPos.y, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3);
+						_003CProcess_003Eg__AddNode_007C16_1(cellPos.x + 1, cellPos.y, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3, ref _003C_003Ec__DisplayClass16_4);
 					}
 					if (prefab5.Component.South != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x, cellPos.y - 1, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3);
+						_003CProcess_003Eg__AddNode_007C16_1(cellPos.x, cellPos.y - 1, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3, ref _003C_003Ec__DisplayClass16_4);
 					}
 					if (prefab5.Component.North != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x, cellPos.y + 1, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3);
+						_003CProcess_003Eg__AddNode_007C16_1(cellPos.x, cellPos.y + 1, ref _003C_003Ec__DisplayClass16_, ref _003C_003Ec__DisplayClass16_2, ref _003C_003Ec__DisplayClass16_3, ref _003C_003Ec__DisplayClass16_4);
 					}
 					PathLink pathLink = new PathLink();
 					DungeonLink componentInChildren4 = _003C_003Ec__DisplayClass16_2.entrance.gameObject.GetComponentInChildren<DungeonLink>();

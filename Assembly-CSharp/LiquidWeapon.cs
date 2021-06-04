@@ -115,9 +115,9 @@ public class LiquidWeapon : BaseLiquidVessel
 							PumpWater(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in PumpWater");
 					}
 				}
@@ -151,9 +151,9 @@ public class LiquidWeapon : BaseLiquidVessel
 							StartFiring(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in StartFiring");
 					}
 				}
@@ -182,9 +182,9 @@ public class LiquidWeapon : BaseLiquidVessel
 							StopFiring();
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in StopFiring");
 					}
 				}
@@ -194,8 +194,8 @@ public class LiquidWeapon : BaseLiquidVessel
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void StartFiring(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -220,8 +220,8 @@ public class LiquidWeapon : BaseLiquidVessel
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void StopFiring()
 	{
 		CancelInvoke("FireTick");

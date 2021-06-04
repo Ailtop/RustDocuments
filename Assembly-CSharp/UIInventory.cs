@@ -15,6 +15,4 @@ public class UIInventory : SingletonComponent<UIInventory>
 	public GameObject QuickCraft;
 
 	public Transform InventoryIconContainer;
-
-	public ContactsPanel contactsPanel;
 }

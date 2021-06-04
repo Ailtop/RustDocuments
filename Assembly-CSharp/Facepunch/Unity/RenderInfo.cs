@@ -60,7 +60,7 @@ namespace Facepunch.Unity
 				result.Size = renderer.bounds.size.magnitude;
 				result.Distance = Vector3.Distance(renderer.bounds.center, Camera.main.transform.position);
 				result.MaterialCount = renderer.sharedMaterials.Length;
-				result.RenderType = renderer.GetType().Name;
+				result.RenderType = ((object)renderer).GetType().Name;
 				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(renderer.gameObject);
 				if ((bool)baseEntity)
 				{

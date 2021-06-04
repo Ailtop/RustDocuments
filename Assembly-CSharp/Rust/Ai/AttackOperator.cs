@@ -8,8 +8,7 @@ namespace Rust.Ai
 		{
 			CloseRange,
 			MediumRange,
-			LongRange,
-			Unused
+			LongRange
 		}
 
 		public enum AttackTargetType

@@ -50,9 +50,9 @@ public class PressButton : IOEntity
 							Press(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in Press");
 					}
 				}
@@ -96,8 +96,8 @@ public class PressButton : IOEntity
 		SetFlag(Flags.On, false);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void Press(RPCMessage msg)
 	{
 		if (!IsOn() && Interface.CallHook("OnButtonPress", this, msg.player) == null)

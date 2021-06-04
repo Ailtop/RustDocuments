@@ -61,8 +61,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public TimeCachedValue<float> artificialTemperatureExposure;
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
+	[ServerVar]
 	public static float framebudgetms = 0.25f;
 
 	public static GrowableEntityUpdateQueue growableEntityUpdateQueue = new GrowableEntityUpdateQueue();
@@ -171,9 +171,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							RPC_PickFruit(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_PickFruit");
 					}
 				}
@@ -207,9 +207,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							RPC_RemoveDying(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_RemoveDying");
 					}
 				}
@@ -243,9 +243,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							RPC_TakeClone(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in RPC_TakeClone");
 					}
 				}
@@ -732,8 +732,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_TakeClone(RPCMessage msg)
 	{
 		TakeClones(msg.player);
@@ -827,9 +827,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);

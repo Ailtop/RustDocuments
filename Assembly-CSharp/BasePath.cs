@@ -13,64 +13,6 @@ public class BasePath : MonoBehaviour
 	{
 	}
 
-	private void AddChildren()
-	{
-		if (nodes != null)
-		{
-			nodes.Clear();
-			nodes.AddRange(GetComponentsInChildren<BasePathNode>());
-			foreach (BasePathNode node in nodes)
-			{
-				node.Path = this;
-			}
-		}
-		if (interestZones != null)
-		{
-			interestZones.Clear();
-			interestZones.AddRange(GetComponentsInChildren<PathInterestNode>());
-		}
-		if (speedZones != null)
-		{
-			speedZones.Clear();
-			speedZones.AddRange(GetComponentsInChildren<PathSpeedZone>());
-		}
-	}
-
-	private void ClearChildren()
-	{
-		if (nodes != null)
-		{
-			foreach (BasePathNode node in nodes)
-			{
-				node.linked.Clear();
-			}
-		}
-		nodes.Clear();
-	}
-
-	public static void AutoGenerateLinks(BasePath path)
-	{
-		path.AddChildren();
-		foreach (BasePathNode node in path.nodes)
-		{
-			if (node.linked == null)
-			{
-				node.linked = new List<BasePathNode>();
-			}
-			else
-			{
-				node.linked.Clear();
-			}
-			foreach (BasePathNode node2 in path.nodes)
-			{
-				if (!(node == node2) && GamePhysics.LineOfSight(node.transform.position, node2.transform.position, 429990145) && GamePhysics.LineOfSight(node2.transform.position, node.transform.position, 429990145))
-				{
-					node.linked.Add(node2);
-				}
-			}
-		}
-	}
-
 	public void GetNodesNear(Vector3 point, ref List<BasePathNode> nearNodes, float dist = 10f)
 	{
 		foreach (BasePathNode node in nodes)

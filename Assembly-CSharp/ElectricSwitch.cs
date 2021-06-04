@@ -40,9 +40,9 @@ public class ElectricSwitch : IOEntity
 							SVSwitch(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SVSwitch");
 					}
 				}
@@ -111,8 +111,8 @@ public class ElectricSwitch : IOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SVSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnSwitchToggle", this, msg.player) == null)

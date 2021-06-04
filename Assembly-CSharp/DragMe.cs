@@ -15,8 +15,6 @@ public class DragMe : MonoBehaviour, IBeginDragHandler, IEventSystemHandler, IDr
 
 	public bool DraggableWhenWounded;
 
-	protected virtual Canvas TopCanvas => UIRootScaled.DragOverlayCanvas;
-
 	public virtual void OnBeginDrag(PointerEventData eventData)
 	{
 	}

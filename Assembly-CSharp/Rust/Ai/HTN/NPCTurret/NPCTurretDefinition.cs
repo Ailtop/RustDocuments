@@ -29,7 +29,7 @@ namespace Rust.Ai.HTN.NPCTurret
 			if (!_isRadioEffectRunning)
 			{
 				_isRadioEffectRunning = true;
-				target.StartCoroutine(RadioChatter(target));
+				((MonoBehaviour)target).StartCoroutine(RadioChatter(target));
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Rust.Ai.HTN.NPCTurret
 				if (playerInventoryProperties != null)
 				{
 					playerInventoryProperties.GiveToPlayer(target);
-					target.StartCoroutine(EquipWeapon(target));
+					((MonoBehaviour)target).StartCoroutine(EquipWeapon(target));
 				}
 			}
 			else

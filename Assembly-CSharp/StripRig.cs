@@ -23,7 +23,7 @@ public class StripRig : MonoBehaviour, IPrefabPreProcess
 	public void Strip(IPrefabProcessor preProcess, SkinnedMeshRenderer skinnedMeshRenderer)
 	{
 		List<Transform> obj = Pool.GetList<Transform>();
-		root.GetComponentsInChildren(obj);
+		((Component)root).GetComponentsInChildren<Transform>(obj);
 		for (int num = obj.Count - 1; num >= 0; num--)
 		{
 			if (preProcess != null)

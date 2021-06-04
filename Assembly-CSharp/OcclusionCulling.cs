@@ -156,7 +156,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			else
 			{
-				inputBuffer.SetData(inputData);
+				inputBuffer.SetData((Array)inputData);
 			}
 		}
 
@@ -193,7 +193,7 @@ public class OcclusionCulling : MonoBehaviour
 			{
 				if (asyncRequests.Count < 10)
 				{
-					AsyncGPUReadbackRequest item = ((!culling.usePixelShaderFallback) ? AsyncGPUReadback.Request(resultBuffer) : AsyncGPUReadback.Request(resultTexture));
+					AsyncGPUReadbackRequest item = ((!culling.usePixelShaderFallback) ? AsyncGPUReadback.Request(resultBuffer, (Action<AsyncGPUReadbackRequest>)null) : AsyncGPUReadback.Request((Texture)resultTexture, 0, (Action<AsyncGPUReadbackRequest>)null));
 					asyncRequests.Enqueue(item);
 				}
 			}
@@ -223,7 +223,7 @@ public class OcclusionCulling : MonoBehaviour
 						}
 						if (asyncGPUReadbackRequest.done)
 						{
-							NativeArray<Color32> data = asyncGPUReadbackRequest.GetData<Color32>();
+							NativeArray<Color32> data = asyncGPUReadbackRequest.GetData<Color32>(0);
 							for (int i = 0; i < data.Length; i++)
 							{
 								resultData[i] = data[i];
@@ -248,7 +248,7 @@ public class OcclusionCulling : MonoBehaviour
 			}
 			else
 			{
-				resultBuffer.GetData(resultData);
+				resultBuffer.GetData((Array)resultData);
 			}
 		}
 	}

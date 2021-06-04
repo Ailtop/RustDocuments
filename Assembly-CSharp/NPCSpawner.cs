@@ -7,14 +7,6 @@ public class NPCSpawner : SpawnGroup
 
 	public bool shouldFillOnSpawn;
 
-	[Header("InfoZone Config")]
-	public AIInformationZone VirtualInfoZone;
-
-	[Header("Navigator Config")]
-	public AIMovePointPath Path;
-
-	public BasePath AStarGraph;
-
 	public override void SpawnInitial()
 	{
 		fillOnSpawn = shouldFillOnSpawn;
@@ -51,32 +43,6 @@ public class NPCSpawner : SpawnGroup
 		else
 		{
 			Invoke(LateSpawn, 5f);
-		}
-	}
-
-	protected override void PostSpawnProcess(BaseEntity entity, BaseSpawnPoint spawnPoint)
-	{
-		base.PostSpawnProcess(entity, spawnPoint);
-		BaseNavigator component = entity.GetComponent<BaseNavigator>();
-		if (VirtualInfoZone != null)
-		{
-			if (VirtualInfoZone.Virtual)
-			{
-				NPCPlayer nPCPlayer = entity as NPCPlayer;
-				if (nPCPlayer != null)
-				{
-					nPCPlayer.VirtualInfoZone = VirtualInfoZone;
-				}
-			}
-			else
-			{
-				Debug.LogError("NPCSpawner trying to set a virtual info zone without the Virtual property!");
-			}
-		}
-		if (component != null)
-		{
-			component.Path = Path;
-			component.AStarGraph = AStarGraph;
 		}
 	}
 }

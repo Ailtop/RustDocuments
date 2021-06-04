@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class AIMovePoint : AIPoint
+public class AIMovePoint : MonoBehaviour
 {
 	public class DistTo
 	{
@@ -16,65 +15,55 @@ public class AIMovePoint : AIPoint
 
 	public float radius = 1f;
 
-	public float WaitTime;
+	public float nextAvailableRoamTime;
 
-	public List<Transform> LookAtPoints;
+	public float nextAvailableEngagementTime;
+
+	public BaseEntity lastUser;
 
 	public void OnDrawGizmos()
 	{
-		Color color = Gizmos.color;
 		Gizmos.color = Color.green;
 		GizmosUtil.DrawWireCircleY(base.transform.position, radius);
-		Gizmos.color = color;
 	}
 
-	public void DrawLookAtPoints()
+	public bool CanBeUsedBy(BaseEntity user)
 	{
-		Color color = Gizmos.color;
-		Gizmos.color = Color.gray;
-		if (LookAtPoints != null)
+		if (user != null && lastUser == user)
 		{
-			foreach (Transform lookAtPoint in LookAtPoints)
-			{
-				if (!(lookAtPoint == null))
-				{
-					Gizmos.DrawSphere(lookAtPoint.position, 0.2f);
-					Gizmos.DrawLine(base.transform.position, lookAtPoint.position);
-				}
-			}
+			return true;
 		}
-		Gizmos.color = color;
+		return !IsUsed();
 	}
 
-	public void Clear()
+	public bool IsUsed()
 	{
-		LookAtPoints = null;
-	}
-
-	public void AddLookAtPoint(Transform transform)
-	{
-		if (LookAtPoints == null)
+		if (!IsUsedForRoaming())
 		{
-			LookAtPoints = new List<Transform>();
+			return IsUsedForEngagement();
 		}
-		LookAtPoints.Add(transform);
+		return true;
 	}
 
-	public bool HasLookAtPoints()
+	public void MarkUsedForRoam(float dur = 10f, BaseEntity user = null)
 	{
-		if (LookAtPoints != null)
-		{
-			return LookAtPoints.Count > 0;
-		}
-		return false;
+		nextAvailableRoamTime = Time.time + dur;
+		lastUser = user;
 	}
 
-	public Transform GetRandomLookAtPoint()
+	public void MarkUsedForEngagement(float dur = 5f, BaseEntity user = null)
 	{
-		if (LookAtPoints == null || LookAtPoints.Count == 0)
-		{
-			return null;
-		}
-		return LookAtPoints[Random.Range(0, LookAtPoints.Count)];
+		nextAvailableEngagementTime = Time.time + dur;
+		lastUser = user;
+	}
+
+	public bool IsUsedForRoaming()
+	{
+		return Time.time < nextAvailableRoamTime;
+	}
+
+	public bool IsUsedForEngagement()
+	{
+		return Time.time < nextAvailableEngagementTime;
 	}
 }

@@ -70,9 +70,9 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 							SetNotificationTextImpl(notificationTextImpl);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SetNotificationTextImpl");
 					}
 				}
@@ -110,9 +110,9 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 							StartSetupNotification(rpc2);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in StartSetupNotification");
 					}
 				}

@@ -54,9 +54,9 @@ public class PagerEntity : BaseEntity, IRFObject
 							ServerSetFrequency(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ServerSetFrequency");
 					}
 				}

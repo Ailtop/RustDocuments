@@ -656,7 +656,7 @@ namespace Rust.Ai.HTN.Bear
 			public override void Execute(BearContext context)
 			{
 				context.SetFact(Facts.IsLookingAround, true);
-				context.Body.StartCoroutine(LookAroundAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(LookAroundAsync(context));
 			}
 
 			public override OperatorStateType Tick(BearContext context, PrimitiveTaskSelector task)
@@ -712,7 +712,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				context.Domain.StopNavigating();
 				context.Body.ClientRPC(null, "PlayAnimationTrigger", "standUp");
-				context.Body.StartCoroutine(AsyncTimer(context, _standUpTime));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, _standUpTime));
 			}
 
 			public override OperatorStateType Tick(BearContext context, PrimitiveTaskSelector task)
@@ -750,7 +750,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				context.Domain.StopNavigating();
 				context.Body.ClientRPC(null, "PlayAnimationTrigger", "standDown");
-				context.Body.StartCoroutine(AsyncTimer(context, _standDownTime));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, _standDownTime));
 			}
 
 			public override OperatorStateType Tick(BearContext context, PrimitiveTaskSelector task)
@@ -788,7 +788,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				context.Domain.StopNavigating();
 				context.Body.ClientRPC(null, "PlayAnimationTrigger", animationStr);
-				context.Body.StartCoroutine(AsyncTimer(context, _timeout));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, _timeout));
 			}
 
 			public override OperatorStateType Tick(BearContext context, PrimitiveTaskSelector task)
@@ -829,7 +829,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				context.Domain.StopNavigating();
 				context.Body.ClientRPC(null, "PlayAnimationBool", animationStr, animationValue);
-				context.Body.StartCoroutine(AsyncTimer(context, _timeout));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, _timeout));
 			}
 
 			public override OperatorStateType Tick(BearContext context, PrimitiveTaskSelector task)
@@ -870,7 +870,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				context.Domain.StopNavigating();
 				context.Body.ClientRPC(null, "PlayAnimationInt", animationStr, animationValue);
-				context.Body.StartCoroutine(AsyncTimer(context, _timeout));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, _timeout));
 			}
 
 			public override OperatorStateType Tick(BearContext context, PrimitiveTaskSelector task)
@@ -1141,13 +1141,13 @@ namespace Rust.Ai.HTN.Bear
 		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new BearPlayersInRangeSensor
@@ -1188,9 +1188,9 @@ namespace Rust.Ai.HTN.Bear
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Reasoners")]
-		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -1331,7 +1331,7 @@ namespace Rust.Ai.HTN.Bear
 			{
 				if (!NavAgent.isOnNavMesh)
 				{
-					StartCoroutine(TryForceToNavmesh());
+					((MonoBehaviour)this).StartCoroutine(TryForceToNavmesh());
 					return;
 				}
 				NavAgent.enabled = true;

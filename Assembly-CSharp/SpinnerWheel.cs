@@ -66,9 +66,9 @@ public class SpinnerWheel : Signage
 							RPC_AnyoneSpin(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_AnyoneSpin");
 					}
 				}
@@ -102,9 +102,9 @@ public class SpinnerWheel : Signage
 							RPC_Spin(rpc3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_Spin");
 					}
 				}
@@ -175,8 +175,8 @@ public class SpinnerWheel : Signage
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Spin(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && AllowPlayerSpins() && (AnyoneSpin() || rpc.player.CanBuild()) && Interface.CallHook("OnSpinWheel", rpc.player, this) == null && !(velocity > 15f))

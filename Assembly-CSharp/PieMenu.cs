@@ -25,8 +25,6 @@ public class PieMenu : UIBehaviour
 
 		public int order;
 
-		public Color? overrideColor;
-
 		[NonSerialized]
 		public Action<BasePlayer> action;
 
@@ -111,10 +109,6 @@ public class PieMenu : UIBehaviour
 	public bool IsOpen;
 
 	internal MenuOption selectedOption;
-
-	private static Color pieSelectionColor = new Color(0.804f, 0.255f, 0.169f, 1f);
-
-	private static Color middleImageColor = new Color(0.804f, 0.255f, 0.169f, 0.784f);
 
 	private static AnimationCurve easePunch = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.112586f, 0.9976035f), new Keyframe(0.3120486f, 0.01720615f), new Keyframe(0.4316337f, 0.170306817f), new Keyframe(0.5524869f, 0.03141804f), new Keyframe(0.6549395f, 0.002909959f), new Keyframe(0.770987f, 0.009817753f), new Keyframe(0.8838775f, 0.001939224f), new Keyframe(1f, 0f));
 
@@ -312,18 +306,6 @@ public class PieMenu : UIBehaviour
 					pieSelection.startRadius = options[i].option.background.startRadius;
 					pieSelection.endRadius = options[i].option.background.endRadius;
 				}
-				if (options[i].overrideColor.HasValue)
-				{
-					Color value = options[i].overrideColor.Value;
-					pieSelection.color = options[i].overrideColor.Value;
-					value.a = middleImageColor.a;
-					middleImage.color = value;
-				}
-				else
-				{
-					pieSelection.color = pieSelectionColor;
-					middleImage.color = middleImageColor;
-				}
 				pieSelection.SetVerticesDirty();
 				middleImage.sprite = options[i].sprite;
 				middleTitle.text = options[i].name;
@@ -354,10 +336,6 @@ public class PieMenu : UIBehaviour
 						UIEx.RebuildHackUnity2019(selectedOption.option.imageIcon);
 					}
 				}
-			}
-			else if (options[i].overrideColor.HasValue)
-			{
-				options[i].option.imageIcon.color = options[i].overrideColor.Value;
 			}
 			else
 			{

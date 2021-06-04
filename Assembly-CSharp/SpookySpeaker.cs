@@ -45,9 +45,9 @@ public class SpookySpeaker : BaseCombatEntity
 							SetWantsOn(wantsOn);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SetWantsOn");
 					}
 				}

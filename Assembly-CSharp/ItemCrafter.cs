@@ -79,7 +79,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 	}
 
-	public void CollectIngredient(int item, int amount, List<Item> collect)
+	private void CollectIngredient(int item, int amount, List<Item> collect)
 	{
 		foreach (ItemContainer container in containers)
 		{
@@ -91,12 +91,8 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 	}
 
-	public void CollectIngredients(ItemBlueprint bp, ItemCraftTask task, int amount = 1, BasePlayer player = null)
+	private void CollectIngredients(ItemBlueprint bp, ItemCraftTask task, int amount = 1, BasePlayer player = null)
 	{
-		if (Interface.CallHook("OnIngredientsCollect", this, bp, task, amount, player) != null)
-		{
-			return;
-		}
 		List<Item> list = new List<Item>();
 		foreach (ItemAmount ingredient in bp.ingredients)
 		{
@@ -274,7 +270,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 	}
 
-	public bool DoesHaveUsableItem(int item, int iAmount)
+	private bool DoesHaveUsableItem(int item, int iAmount)
 	{
 		int num = 0;
 		foreach (ItemContainer container in containers)

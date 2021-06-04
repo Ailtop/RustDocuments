@@ -40,9 +40,9 @@ public class BaseLauncher : BaseProjectile
 							SV_Launch(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SV_Launch");
 					}
 				}
@@ -116,8 +116,8 @@ public class BaseLauncher : BaseProjectile
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void SV_Launch(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

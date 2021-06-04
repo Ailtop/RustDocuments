@@ -935,7 +935,7 @@ namespace Rust.Ai.HTN.Murderer
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				context.Body.StartCoroutine(AsyncTimer(context, time));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(MurdererContext context, PrimitiveTaskSelector task)
@@ -950,7 +950,7 @@ namespace Rust.Ai.HTN.Murderer
 
 			public override void Abort(MurdererContext context, PrimitiveTaskSelector task)
 			{
-				context.Body.StopCoroutine(AsyncTimer(context, 0f));
+				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -972,7 +972,7 @@ namespace Rust.Ai.HTN.Murderer
 			public override void Execute(MurdererContext context)
 			{
 				context.SetFact(Facts.IsStandingUp, true);
-				context.Body.StartCoroutine(AsyncTimer(context, 0.2f));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, 0.2f));
 			}
 
 			public override OperatorStateType Tick(MurdererContext context, PrimitiveTaskSelector task)
@@ -987,7 +987,7 @@ namespace Rust.Ai.HTN.Murderer
 
 			public override void Abort(MurdererContext context, PrimitiveTaskSelector task)
 			{
-				context.Body.StopCoroutine(AsyncTimer(context, 0f));
+				((MonoBehaviour)context.Body).StopCoroutine(AsyncTimer(context, 0f));
 				Reset(context);
 			}
 
@@ -1073,7 +1073,7 @@ namespace Rust.Ai.HTN.Murderer
 					_duckTimeMax = duckTimeMin;
 				}
 				float time = UnityEngine.Random.value * (_duckTimeMax - _duckTimeMin) + _duckTimeMin;
-				context.Body.StartCoroutine(AsyncTimer(context, time));
+				((MonoBehaviour)context.Body).StartCoroutine(AsyncTimer(context, time));
 			}
 
 			public override OperatorStateType Tick(MurdererContext context, PrimitiveTaskSelector task)
@@ -1123,7 +1123,7 @@ namespace Rust.Ai.HTN.Murderer
 			public override void Execute(MurdererContext context)
 			{
 				context.SetFact(Facts.IsLookingAround, true);
-				context.Body.StartCoroutine(LookAroundAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(LookAroundAsync(context));
 			}
 
 			public override OperatorStateType Tick(MurdererContext context, PrimitiveTaskSelector task)
@@ -1164,7 +1164,7 @@ namespace Rust.Ai.HTN.Murderer
 			public override void Execute(MurdererContext context)
 			{
 				SwitchToItem(context, _item);
-				context.Body.StartCoroutine(WaitAsync(context));
+				((MonoBehaviour)context.Body).StartCoroutine(WaitAsync(context));
 			}
 
 			public override OperatorStateType Tick(MurdererContext context, PrimitiveTaskSelector task)
@@ -1269,7 +1269,7 @@ namespace Rust.Ai.HTN.Murderer
 			{
 				if (context.Memory.PrimaryKnownEnemyPlayer.PlayerInfo.Player != null)
 				{
-					context.Body.StartCoroutine(UseItem(context));
+					((MonoBehaviour)context.Body).StartCoroutine(UseItem(context));
 				}
 			}
 
@@ -1772,22 +1772,22 @@ namespace Rust.Ai.HTN.Murderer
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[Header("Context")]
 		[SerializeField]
+		[Header("Context")]
 		private MurdererContext _context;
 
-		[SerializeField]
 		[Header("Navigation")]
 		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
 		[ReadOnly]
 		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -1829,8 +1829,8 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
-		[Header("Reasoners")]
 		[ReadOnly]
+		[Header("Reasoners")]
 		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
@@ -1896,13 +1896,13 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
-		[ReadOnly]
 		[Header("Firearm Utility")]
+		[ReadOnly]
 		[SerializeField]
 		private float _lastFirearmUsageTime;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isFiring;
 
 		[ReadOnly]
@@ -2048,7 +2048,7 @@ namespace Rust.Ai.HTN.Murderer
 		{
 			if (!(proj == null))
 			{
-				StartCoroutine(HoldTriggerLogic(proj, time, 4f));
+				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, 4f));
 			}
 		}
 
@@ -2056,7 +2056,7 @@ namespace Rust.Ai.HTN.Murderer
 		{
 			if (!(proj == null))
 			{
-				StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
+				((MonoBehaviour)this).StartCoroutine(HoldTriggerLogic(proj, time, UnityEngine.Random.Range(proj.attackLengthMin, proj.attackLengthMax)));
 			}
 		}
 
@@ -2158,7 +2158,7 @@ namespace Rust.Ai.HTN.Murderer
 		{
 			if ((bool)proj && _context.IsBodyAlive() && proj.primaryMagazine.contents < proj.primaryMagazine.capacity)
 			{
-				StartCoroutine(ReloadHandler(proj));
+				((MonoBehaviour)this).StartCoroutine(ReloadHandler(proj));
 			}
 		}
 
@@ -2287,7 +2287,7 @@ namespace Rust.Ai.HTN.Murderer
 			{
 				if (!NavAgent.isOnNavMesh)
 				{
-					StartCoroutine(TryForceToNavmesh());
+					((MonoBehaviour)this).StartCoroutine(TryForceToNavmesh());
 					return;
 				}
 				NavAgent.enabled = true;
@@ -2753,7 +2753,7 @@ namespace Rust.Ai.HTN.Murderer
 			_aiClient.Initialize();
 			_context.Body.Resume();
 			InitializeAgency();
-			StartCoroutine(DelayedForcedThink());
+			((MonoBehaviour)this).StartCoroutine(DelayedForcedThink());
 		}
 
 		private IEnumerator DelayedForcedThink()

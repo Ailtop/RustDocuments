@@ -66,9 +66,9 @@ public class Workbench : StorageContainer
 							RPC_BeginExperiment(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_BeginExperiment");
 					}
 				}
@@ -102,9 +102,9 @@ public class Workbench : StorageContainer
 							RPC_TechTreeUnlock(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_TechTreeUnlock");
 					}
 				}
@@ -189,8 +189,8 @@ public class Workbench : StorageContainer
 		return blueprintBaseDef;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_BeginExperiment(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -21,14 +21,12 @@ public static class ConsoleNetwork
 		if (packet.connection == null || !packet.connection.connected)
 		{
 			Debug.LogWarning("Client without connection tried to run command: " + text);
+			return;
 		}
-		else if (Interface.CallHook("OnClientCommand", packet.connection, text) == null)
+		string text2 = ConsoleSystem.Run(ConsoleSystem.Option.Server.FromConnection(packet.connection).Quiet(), text);
+		if (!string.IsNullOrEmpty(text2))
 		{
-			string text2 = ConsoleSystem.Run(ConsoleSystem.Option.Server.FromConnection(packet.connection).Quiet(), text);
-			if (!string.IsNullOrEmpty(text2))
-			{
-				SendClientReply(packet.connection, text2);
-			}
+			SendClientReply(packet.connection, text2);
 		}
 	}
 

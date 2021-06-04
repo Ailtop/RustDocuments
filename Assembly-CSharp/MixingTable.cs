@@ -65,9 +65,9 @@ public class MixingTable : StorageContainer
 							SVSwitch(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SVSwitch");
 					}
 				}

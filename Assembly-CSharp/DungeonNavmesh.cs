@@ -158,7 +158,7 @@ public class DungeonNavmesh : FacepunchBehaviour, IServerComponent
 		}
 		else
 		{
-			StartCoroutine(enumerator);
+			((MonoBehaviour)this).StartCoroutine(enumerator);
 		}
 		if (!AiManager.nav_wait)
 		{

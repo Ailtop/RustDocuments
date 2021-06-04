@@ -29,7 +29,7 @@ namespace Rust.Ai.HTN.Scientist
 			if (!_isRadioEffectRunning)
 			{
 				_isRadioEffectRunning = true;
-				target.StartCoroutine(RadioChatter(target));
+				((MonoBehaviour)target).StartCoroutine(RadioChatter(target));
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Rust.Ai.HTN.Scientist
 				if (playerInventoryProperties != null)
 				{
 					playerInventoryProperties.GiveToPlayer(target);
-					target.StartCoroutine(EquipWeapon(target));
+					((MonoBehaviour)target).StartCoroutine(EquipWeapon(target));
 				}
 			}
 			else

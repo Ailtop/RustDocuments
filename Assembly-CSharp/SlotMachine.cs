@@ -137,9 +137,9 @@ public class SlotMachine : BaseMountable
 							RPC_Deposit(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Deposit");
 					}
 				}
@@ -173,9 +173,9 @@ public class SlotMachine : BaseMountable
 							RPC_Spin(rpc3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_Spin");
 					}
 				}
@@ -213,9 +213,9 @@ public class SlotMachine : BaseMountable
 							Server_RequestMultiplierChange(msg2);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in Server_RequestMultiplierChange");
 					}
 				}
@@ -292,8 +292,8 @@ public class SlotMachine : BaseMountable
 		return component.inventory.GetSlot(0)?.amount ?? 0;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Spin(RPCMessage rpc)
 	{
 		if (IsSpinning || rpc.player != GetMounted())
@@ -452,8 +452,8 @@ public class SlotMachine : BaseMountable
 	}
 
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void Server_RequestMultiplierChange(RPCMessage msg)
 	{
 		if (!(msg.player != _mounted))

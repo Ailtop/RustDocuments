@@ -7,8 +7,8 @@ namespace ConVar
 	[Factory("world")]
 	public class World : ConsoleSystem
 	{
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool cache = true;
 
 		[ClientVar]
@@ -27,7 +27,7 @@ namespace ConVar
 			textTable.AddColumn("pos");
 			foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 			{
-				textTable.AddRow(monument.Type.ToString(), monument.name, monument.transform.position.ToString());
+				textTable.AddRow(monument.Type.ToString(), monument.name, ((object)monument.transform.position).ToString());
 			}
 			arg.ReplyWith(textTable.ToString());
 		}

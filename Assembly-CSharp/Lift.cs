@@ -47,9 +47,9 @@ public class Lift : AnimatedBuildingBlock
 							RPC_UseLift(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_UseLift");
 					}
 				}

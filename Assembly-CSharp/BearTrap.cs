@@ -47,9 +47,9 @@ public class BearTrap : BaseTrap
 							RPC_Arm(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Arm");
 					}
 				}
@@ -145,8 +145,8 @@ public class BearTrap : BaseTrap
 		base.OnAttacked(info);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Arm(RPCMessage rpc)
 	{
 		if (!Armed() && Interface.CallHook("OnTrapArm", this, rpc.player) == null)

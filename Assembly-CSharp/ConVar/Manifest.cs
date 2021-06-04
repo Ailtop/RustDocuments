@@ -11,8 +11,8 @@ namespace ConVar
 			return Application.Manifest;
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static object PrintManifestRaw()
 		{
 			return Facepunch.Manifest.Contents;

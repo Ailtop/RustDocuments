@@ -25,7 +25,7 @@ public class DamageRenderer : MonoBehaviour, IClientComponent
 	[HideInInspector]
 	private List<DamageShowingRenderer> damageShowingRenderers;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<GlassPane> damageShowingGlassRenderers;
 }

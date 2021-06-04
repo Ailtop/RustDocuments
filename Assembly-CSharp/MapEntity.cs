@@ -53,9 +53,9 @@ public class MapEntity : HeldEntity
 							ImageUpdate(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ImageUpdate");
 					}
 				}
@@ -91,9 +91,9 @@ public class MapEntity : HeldEntity
 		info.msg.mapEntity.paintImages.AddRange(paintImages);
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	public void ImageUpdate(RPCMessage msg)
 	{
 		if (msg.player == null)

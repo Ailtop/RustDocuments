@@ -386,9 +386,6 @@ namespace Rust.Ai
 		[ServerVar(Help = "If set to true the navmesh won't generate.. which means Ai that uses the navmesh won't be able to move")]
 		public static bool nav_disable = false;
 
-		[ServerVar(Help = "If set to true, npcs will attempt to place themselves on the navmesh if not on a navmesh when set destination is called.")]
-		public static bool setdestination_navmesh_failsafe = false;
-
 		[ServerVar(Help = "If ai_dormant is true, any npc outside the range of players will render itself dormant and take up less resources, but wildlife won't simulate as well.")]
 		public static bool ai_dormant = true;
 

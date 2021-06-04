@@ -41,9 +41,9 @@ public class CustomTimerSwitch : TimerSwitch
 							SERVER_SetTime(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SERVER_SetTime");
 					}
 				}

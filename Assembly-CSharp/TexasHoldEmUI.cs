@@ -1,6 +1,5 @@
 using Rust.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class TexasHoldEmUI : MonoBehaviour
@@ -9,8 +8,7 @@ public class TexasHoldEmUI : MonoBehaviour
 	private Image[] holeCardImages;
 
 	[SerializeField]
-	[FormerlySerializedAs("flopCardImages")]
-	private Image[] communityCardImages;
+	private Image[] flopCardImages;
 
 	[SerializeField]
 	private RustText potText;

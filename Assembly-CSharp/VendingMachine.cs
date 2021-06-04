@@ -91,9 +91,9 @@ public class VendingMachine : StorageContainer
 							BuyItem(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in BuyItem");
 					}
 				}
@@ -127,9 +127,9 @@ public class VendingMachine : StorageContainer
 							RPC_AddSellOrder(msg2);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_AddSellOrder");
 					}
 				}
@@ -163,9 +163,9 @@ public class VendingMachine : StorageContainer
 							RPC_Broadcast(msg3);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in RPC_Broadcast");
 					}
 				}
@@ -199,9 +199,9 @@ public class VendingMachine : StorageContainer
 							RPC_DeleteSellOrder(msg4);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in RPC_DeleteSellOrder");
 					}
 				}
@@ -235,9 +235,9 @@ public class VendingMachine : StorageContainer
 							RPC_OpenAdmin(msg5);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception ex5)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(ex5);
 						player.Kick("RPC Error in RPC_OpenAdmin");
 					}
 				}
@@ -271,9 +271,9 @@ public class VendingMachine : StorageContainer
 							RPC_OpenShop(msg6);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception ex6)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(ex6);
 						player.Kick("RPC Error in RPC_OpenShop");
 					}
 				}
@@ -307,9 +307,9 @@ public class VendingMachine : StorageContainer
 							RPC_RotateVM(msg7);
 						}
 					}
-					catch (Exception exception7)
+					catch (Exception ex7)
 					{
-						Debug.LogException(exception7);
+						Debug.LogException(ex7);
 						player.Kick("RPC Error in RPC_RotateVM");
 					}
 				}
@@ -343,9 +343,9 @@ public class VendingMachine : StorageContainer
 							RPC_UpdateShopName(msg8);
 						}
 					}
-					catch (Exception exception8)
+					catch (Exception ex8)
 					{
-						Debug.LogException(exception8);
+						Debug.LogException(ex8);
 						player.Kick("RPC Error in RPC_UpdateShopName");
 					}
 				}
@@ -379,9 +379,9 @@ public class VendingMachine : StorageContainer
 							TransactionStart(rpc3);
 						}
 					}
-					catch (Exception exception9)
+					catch (Exception ex9)
 					{
-						Debug.LogException(exception9);
+						Debug.LogException(ex9);
 						player.Kick("RPC Error in TransactionStart");
 					}
 				}
@@ -771,8 +771,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Broadcast(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -785,8 +785,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_UpdateShopName(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -827,8 +827,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenShop(RPCMessage msg)
 	{
 		if (OccupiedCheck(msg.player))
@@ -839,8 +839,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenAdmin(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -922,8 +922,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_RotateVM(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnRotateVendingMachine", this, msg.player) == null && CanRotate())

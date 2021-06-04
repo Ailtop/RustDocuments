@@ -28,7 +28,7 @@ public class SocketMod_EntityType : SocketMod
 		Vis.Entities(position, sphereRadius, obj, layerMask.value, queryTriggers);
 		foreach (BaseEntity item in obj)
 		{
-			bool flag = item.GetType().IsAssignableFrom(searchType.GetType());
+			bool flag = ((object)item).GetType().IsAssignableFrom(((object)searchType).GetType());
 			if (flag && wantsCollide)
 			{
 				Pool.FreeList(ref obj);

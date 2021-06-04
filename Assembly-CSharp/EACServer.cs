@@ -28,7 +28,7 @@ public static class EACServer
 	{
 		if (easyAntiCheat != null)
 		{
-			easyAntiCheat.NetProtect.ProtectMessage(GetClient(connection), src, srcOffset, dst, dstOffset);
+			easyAntiCheat.NetProtect.ProtectMessage(GetClient(connection), src, (long)srcOffset, dst, (long)dstOffset);
 		}
 	}
 
@@ -36,7 +36,7 @@ public static class EACServer
 	{
 		if (easyAntiCheat != null)
 		{
-			easyAntiCheat.NetProtect.UnprotectMessage(GetClient(connection), src, srcOffset, dst, dstOffset);
+			easyAntiCheat.NetProtect.UnprotectMessage(GetClient(connection), src, (long)srcOffset, dst, (long)dstOffset);
 		}
 	}
 
@@ -105,14 +105,14 @@ public static class EACServer
 					string text = clientStatus.Message;
 					if (string.IsNullOrEmpty(text))
 					{
-						text = clientStatus.Status.ToString();
+						text = ((object)clientStatus.Status).ToString();
 					}
 					Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({text})");
 					connection.authStatus = "eac";
 					Network.Net.sv.Kick(connection, "EAC: " + text);
 					Interface.CallHook("OnPlayerKicked", connection, text);
-					DateTime? timeBanExpires;
-					if (clientStatus.IsBanned(out timeBanExpires))
+					DateTime? dateTime = default(DateTime?);
+					if (clientStatus.IsBanned(ref dateTime))
 					{
 						connection.authStatus = "eacbanned";
 						object[] args = new object[3]
@@ -123,7 +123,7 @@ public static class EACServer
 						};
 						Interface.CallHook("OnPlayerBanned", connection, text);
 						ConsoleNetwork.BroadcastToAllClients("chat.add", args);
-						if (!timeBanExpires.HasValue)
+						if (!dateTime.HasValue)
 						{
 							Entity.DeleteBy(connection.userid);
 						}
@@ -170,7 +170,7 @@ public static class EACServer
 			client2connection.Clear();
 			connection2client.Clear();
 			connection2status.Clear();
-			Log.SetOut(new StreamWriter(ConVar.Server.rootFolder + "/Log.EAC.txt", false)
+			Log.SetOut((TextWriter)new StreamWriter(ConVar.Server.rootFolder + "/Log.EAC.txt", false)
 			{
 				AutoFlush = true
 			});

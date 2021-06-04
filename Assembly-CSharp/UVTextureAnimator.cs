@@ -79,7 +79,7 @@ internal class UVTextureAnimator : MonoBehaviour
 			}
 			else
 			{
-				StartCoroutine(UpdateCorutine());
+				base.StartCoroutine(UpdateCorutine());
 			}
 			isCorutineStarted = true;
 		}
@@ -87,7 +87,7 @@ internal class UVTextureAnimator : MonoBehaviour
 
 	private void PlayDelay()
 	{
-		StartCoroutine(UpdateCorutine());
+		base.StartCoroutine(UpdateCorutine());
 	}
 
 	private void OnEnable()

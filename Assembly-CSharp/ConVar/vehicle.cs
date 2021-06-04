@@ -5,8 +5,8 @@ namespace ConVar
 	[Factory("vehicle")]
 	public class vehicle : ConsoleSystem
 	{
-		[Help("how long until boat corpses despawn")]
 		[ServerVar]
+		[Help("how long until boat corpses despawn")]
 		public static float boat_corpse_seconds = 300f;
 
 		[ServerVar(Help = "If true, trains always explode when destroyed, and hitting a barrier always destroys the train immediately. Default: false")]

@@ -115,14 +115,12 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[HideInInspector]
 	public List<ComponentInfo> componentInfos = new List<ComponentInfo>();
 
-	public bool HideInEyesView;
-
 	[Header("First Person Legs")]
 	[Tooltip("If this is true, we'll hide this item in the first person view. Usually done for items that you definitely won't see in first person view, like facemasks and hats.")]
 	public bool HideInFirstPerson;
 
-	[Range(0f, 5f)]
 	[Tooltip("Use this if the clothing item clips into the player view. It'll push the chest legs model backwards.")]
+	[Range(0f, 5f)]
 	public float ExtraLeanBack;
 
 	public Renderer[] RenderersLod0;
@@ -154,12 +152,12 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		playerModelHairCap = GetComponent<PlayerModelHairCap>();
 		playerModelHair = GetComponent<PlayerModelHair>();
 		wearableReplacementByRace = GetComponent<WearableReplacementByRace>();
-		GetComponentsInChildren(true, renderers);
-		GetComponentsInChildren(true, playerModelSkins);
-		GetComponentsInChildren(true, boneRetargets);
-		GetComponentsInChildren(true, skinnedRenderers);
-		GetComponentsInChildren(true, skeletonSkins);
-		GetComponentsInChildren(true, componentInfos);
+		((Component)this).GetComponentsInChildren<Renderer>(true, renderers);
+		((Component)this).GetComponentsInChildren<PlayerModelSkin>(true, playerModelSkins);
+		((Component)this).GetComponentsInChildren<BoneRetarget>(true, boneRetargets);
+		((Component)this).GetComponentsInChildren<SkinnedMeshRenderer>(true, skinnedRenderers);
+		((Component)this).GetComponentsInChildren<SkeletonSkin>(true, skeletonSkins);
+		((Component)this).GetComponentsInChildren<ComponentInfo>(true, componentInfos);
 		RenderersLod0 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("0")).ToArray();
 		RenderersLod1 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("1")).ToArray();
 		RenderersLod2 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("2")).ToArray();
@@ -183,7 +181,7 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 			return;
 		}
 		List<Transform> obj = Pool.GetList<Transform>();
-		transform.GetComponentsInChildren(obj);
+		((Component)transform).GetComponentsInChildren<Transform>(obj);
 		for (int num = obj.Count - 1; num >= 0; num--)
 		{
 			if (preProcess != null)

@@ -51,9 +51,9 @@ public class HBHFSensor : BaseDetector
 							SetIncludeAuth(includeAuth);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in SetIncludeAuth");
 					}
 				}
@@ -87,9 +87,9 @@ public class HBHFSensor : BaseDetector
 							SetIncludeOthers(includeOthers);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in SetIncludeOthers");
 					}
 				}
@@ -159,8 +159,8 @@ public class HBHFSensor : BaseDetector
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetIncludeAuth(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();
@@ -170,8 +170,8 @@ public class HBHFSensor : BaseDetector
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetIncludeOthers(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();

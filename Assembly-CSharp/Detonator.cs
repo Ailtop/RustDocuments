@@ -48,9 +48,9 @@ public class Detonator : HeldEntity, IRFObject
 							ServerSetFrequency(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ServerSetFrequency");
 					}
 				}
@@ -77,9 +77,9 @@ public class Detonator : HeldEntity, IRFObject
 							SetPressed(pressed);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in SetPressed");
 					}
 				}

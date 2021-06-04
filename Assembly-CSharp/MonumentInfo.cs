@@ -10,6 +10,8 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 
 	public int MinWorldSize;
 
+	public int MinDistance;
+
 	public Bounds Bounds = new Bounds(Vector3.zero, Vector3.zero);
 
 	public bool HasNavmesh;
@@ -69,21 +71,6 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 	public float Distance(Vector3 position)
 	{
 		return new OBB(base.transform.position, base.transform.rotation, Bounds).Distance(position);
-	}
-
-	public float SqrDistance(Vector3 position)
-	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).SqrDistance(position);
-	}
-
-	public float Distance(OBB obb)
-	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).Distance(obb);
-	}
-
-	public float SqrDistance(OBB obb)
-	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).SqrDistance(obb);
 	}
 
 	public bool IsInBounds(Vector3 position)

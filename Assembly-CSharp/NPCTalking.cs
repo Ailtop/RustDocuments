@@ -58,9 +58,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 							ConversationAction(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in ConversationAction");
 					}
 				}
@@ -87,9 +87,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 							Server_BeginTalking(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in Server_BeginTalking");
 					}
 				}
@@ -116,9 +116,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 							Server_EndTalking(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in Server_EndTalking");
 					}
 				}
@@ -145,9 +145,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 							Server_ResponsePressed(msg5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in Server_ResponsePressed");
 					}
 				}

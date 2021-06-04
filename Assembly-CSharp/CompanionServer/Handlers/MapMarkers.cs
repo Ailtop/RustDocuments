@@ -10,7 +10,7 @@ namespace CompanionServer.Handlers
 		{
 			AppMapMarkers appMapMarkers = Pool.Get<AppMapMarkers>();
 			appMapMarkers.markers = Pool.GetList<AppMarker>();
-			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindPlayersTeam(base.UserId);
+			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindPlayersTeam(base.UserId);
 			if (playerTeam != null)
 			{
 				foreach (ulong member in playerTeam.members)

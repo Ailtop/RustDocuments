@@ -86,7 +86,7 @@ namespace UnityEngine
 		public static void SetChildComponentsEnabled<T>(this GameObject gameObject, bool enabled) where T : MonoBehaviour
 		{
 			List<T> obj = Pool.GetList<T>();
-			gameObject.GetComponentsInChildren(true, obj);
+			gameObject.GetComponentsInChildren<T>(true, obj);
 			foreach (T item in obj)
 			{
 				item.enabled = enabled;

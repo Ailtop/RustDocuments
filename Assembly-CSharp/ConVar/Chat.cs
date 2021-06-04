@@ -41,8 +41,8 @@ namespace ConVar
 
 		private const float textVolumeBoost = 0.2f;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled = true;
 
 		public static List<ChatEntry> History = new List<ChatEntry>();
@@ -166,7 +166,7 @@ namespace ConVar
 			if (serverlog)
 			{
 				ServerConsole.PrintColoured(ConsoleColor.DarkYellow, string.Concat("[", targetChannel, "] ", username, ": "), ConsoleColor.DarkGreen, text);
-				string text2 = player?.ToString() ?? $"{username}[{userId}]";
+				string text2 = ((object)player)?.ToString() ?? $"{username}[{userId}]";
 				switch (targetChannel)
 				{
 				case ChatChannel.Team:
@@ -237,7 +237,7 @@ namespace ConVar
 				break;
 			case ChatChannel.Team:
 			{
-				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindPlayersTeam(userId);
+				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.Instance.FindPlayersTeam(userId);
 				if (playerTeam == null)
 				{
 					return false;
@@ -267,8 +267,8 @@ namespace ConVar
 			return false;
 		}
 
-		[ServerVar]
 		[Help("Return the last x lines of the console. Default is 200")]
+		[ServerVar]
 		public static IEnumerable<ChatEntry> tail(Arg arg)
 		{
 			int @int = arg.GetInt(0, 200);

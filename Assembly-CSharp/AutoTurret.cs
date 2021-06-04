@@ -188,9 +188,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							AddSelfAuthorize(rpc2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in AddSelfAuthorize");
 					}
 				}
@@ -224,9 +224,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							ClearList(rpc3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in ClearList");
 					}
 				}
@@ -260,9 +260,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							FlipAim(rpc4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in FlipAim");
 					}
 				}
@@ -296,9 +296,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							RemoveSelfAuthorize(rpc5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in RemoveSelfAuthorize");
 					}
 				}
@@ -332,9 +332,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							SERVER_AttackAll(rpc6);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception ex5)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(ex5);
 						player.Kick("RPC Error in SERVER_AttackAll");
 					}
 				}
@@ -368,9 +368,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							SERVER_Peacekeeper(rpc7);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception ex6)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(ex6);
 						player.Kick("RPC Error in SERVER_Peacekeeper");
 					}
 				}
@@ -654,8 +654,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void FlipAim(RPCMessage rpc)
 	{
 		if (!IsOnline() && IsAuthed(rpc.player) && !booting && Interface.CallHook("OnTurretRotate", this, rpc.player) == null)
@@ -665,8 +665,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
 		RPCMessage rpc2 = rpc;
@@ -682,8 +682,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RemoveSelfAuthorize(RPCMessage rpc)
 	{
 		RPCMessage rpc2 = rpc;
@@ -707,8 +707,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void SERVER_Peacekeeper(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -717,8 +717,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SERVER_AttackAll(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))

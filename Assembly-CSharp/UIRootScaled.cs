@@ -6,10 +6,6 @@ public class UIRootScaled : UIRoot
 {
 	private static UIRootScaled Instance;
 
-	public bool OverrideReference;
-
-	public Vector2 TargetReference = new Vector2(1280f, 720f);
-
 	public CanvasScaler scaler;
 
 	public static Canvas DragOverlayCanvas => Instance.overlayCanvas;
@@ -23,10 +19,6 @@ public class UIRootScaled : UIRoot
 	protected override void Refresh()
 	{
 		Vector2 vector = new Vector2(1280f / ConVar.Graphics.uiscale, 720f / ConVar.Graphics.uiscale);
-		if (OverrideReference)
-		{
-			vector = new Vector2(TargetReference.x / ConVar.Graphics.uiscale, TargetReference.y / ConVar.Graphics.uiscale);
-		}
 		if (scaler.referenceResolution != vector)
 		{
 			scaler.referenceResolution = vector;

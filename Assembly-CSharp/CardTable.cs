@@ -8,27 +8,9 @@ using ProtoBuf;
 using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.UI;
 
 public class CardTable : BaseVehicle
 {
-	[Serializable]
-	public class ChipStack : IComparable<ChipStack>
-	{
-		public int chipValue;
-
-		public GameObject[] chips;
-
-		public int CompareTo(ChipStack other)
-		{
-			if (other == null)
-			{
-				return 1;
-			}
-			return chipValue.CompareTo(other.chipValue);
-		}
-	}
-
 	public enum CardGameOption
 	{
 		TexasHoldEm
@@ -54,8 +36,8 @@ public class CardTable : BaseVehicle
 
 	public EntityRef PotInstance;
 
-	[SerializeField]
 	[Header("Card Table")]
+	[SerializeField]
 	private GameObjectRef uiPrefab;
 
 	[SerializeField]
@@ -65,31 +47,10 @@ public class CardTable : BaseVehicle
 	private GameObjectRef potPrefab;
 
 	[SerializeField]
+	private GameObject onTableVisuals;
+
+	[SerializeField]
 	private ViewModel viewModel;
-
-	[SerializeField]
-	private CardTableUI.PlayingCardImage[] tableCards;
-
-	[SerializeField]
-	private Renderer[] tableCardBackings;
-
-	[SerializeField]
-	private Canvas cardUICanvas;
-
-	[SerializeField]
-	private Image[] tableCardImages;
-
-	[SerializeField]
-	private Sprite blankCard;
-
-	[SerializeField]
-	private Transform chipStacksParent;
-
-	[SerializeField]
-	private ChipStack[] chipStacks;
-
-	[SerializeField]
-	private ChipStack[] fillerStacks;
 
 	public ItemDefinition scrapItemDef;
 
@@ -150,9 +111,9 @@ public class CardTable : BaseVehicle
 							RPC_Editor_MakeRandomMove(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception ex)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(ex);
 						player.Kick("RPC Error in RPC_Editor_MakeRandomMove");
 					}
 				}
@@ -186,9 +147,9 @@ public class CardTable : BaseVehicle
 							RPC_Editor_SpawnTestPlayer(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception ex2)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(ex2);
 						player.Kick("RPC Error in RPC_Editor_SpawnTestPlayer");
 					}
 				}
@@ -222,9 +183,9 @@ public class CardTable : BaseVehicle
 							RPC_LeaveTable(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception ex3)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(ex3);
 						player.Kick("RPC Error in RPC_LeaveTable");
 					}
 				}
@@ -258,9 +219,9 @@ public class CardTable : BaseVehicle
 							RPC_OpenLoot(msg5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception ex4)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(ex4);
 						player.Kick("RPC Error in RPC_OpenLoot");
 					}
 				}
@@ -294,9 +255,9 @@ public class CardTable : BaseVehicle
 							RPC_Play(msg6);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception ex5)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(ex5);
 						player.Kick("RPC Error in RPC_Play");
 					}
 				}
@@ -330,9 +291,9 @@ public class CardTable : BaseVehicle
 							RPC_PlayerInput(msg7);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception ex6)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(ex6);
 						player.Kick("RPC Error in RPC_PlayerInput");
 					}
 				}
@@ -400,7 +361,7 @@ public class CardTable : BaseVehicle
 		}
 		else
 		{
-			Debug.LogError(GetType().Name + ": Spawned prefab is not a StorageContainer as expected.");
+			Debug.LogError(((object)this).GetType().Name + ": Spawned prefab is not a StorageContainer as expected.");
 		}
 		PlayerStorageInfo[] array = playerStoragePoints;
 		foreach (PlayerStorageInfo playerStorageInfo in array)
@@ -416,7 +377,7 @@ public class CardTable : BaseVehicle
 			}
 			else
 			{
-				Debug.LogError(GetType().Name + ": Spawned prefab is not a CardTablePlayerStorage as expected.");
+				Debug.LogError(((object)this).GetType().Name + ": Spawned prefab is not a CardTablePlayerStorage as expected.");
 			}
 		}
 	}
@@ -474,7 +435,7 @@ public class CardTable : BaseVehicle
 		}
 		if (num < 0)
 		{
-			Debug.LogError(GetType().Name + ": Couldn't find mount point for this player.");
+			Debug.LogError(((object)this).GetType().Name + ": Couldn't find mount point for this player.");
 		}
 		return num;
 	}
@@ -563,8 +524,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_Play(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -574,8 +535,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -592,8 +553,8 @@ public class CardTable : BaseVehicle
 		GameController.LeaveTable(msg.player.userID);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_PlayerInput(RPCMessage msg)
 	{
 		GameController.ReceivedInputFromPlayer(msg.player, msg.read.Int32(), true, msg.read.Int32());

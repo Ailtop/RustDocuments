@@ -17,8 +17,8 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int maxthreads = 8;
 
 		[ServerVar(Saved = true)]
@@ -31,8 +31,8 @@ namespace ConVar
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int developer
 		{
 			get
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -81,21 +81,21 @@ namespace ConVar
 			foreach (UnityEngine.Object @object in array2)
 			{
 				int runtimeMemorySize = Profiler.GetRuntimeMemorySize(@object);
-				if (dictionary.ContainsKey(@object.GetType()))
+				if (dictionary.ContainsKey(((object)@object).GetType()))
 				{
-					dictionary[@object.GetType()]++;
+					dictionary[((object)@object).GetType()]++;
 				}
 				else
 				{
-					dictionary.Add(@object.GetType(), 1);
+					dictionary.Add(((object)@object).GetType(), 1);
 				}
-				if (dictionary2.ContainsKey(@object.GetType()))
+				if (dictionary2.ContainsKey(((object)@object).GetType()))
 				{
-					dictionary2[@object.GetType()] += runtimeMemorySize;
+					dictionary2[((object)@object).GetType()] += runtimeMemorySize;
 				}
 				else
 				{
-					dictionary2.Add(@object.GetType(), runtimeMemorySize);
+					dictionary2.Add(((object)@object).GetType(), runtimeMemorySize);
 				}
 			}
 			foreach (KeyValuePair<Type, long> item in dictionary2.OrderByDescending(delegate(KeyValuePair<Type, long> x)
@@ -119,7 +119,7 @@ namespace ConVar
 			foreach (UnityEngine.Texture texture in array2)
 			{
 				string text2 = Profiler.GetRuntimeMemorySize(texture).FormatBytes();
-				text = text + texture.ToString().PadRight(30) + texture.name.PadRight(30) + text2 + "\n";
+				text = text + ((object)texture).ToString().PadRight(30) + texture.name.PadRight(30) + text2 + "\n";
 			}
 			args.ReplyWith(text);
 		}
@@ -138,15 +138,15 @@ namespace ConVar
 			args.ReplyWith(strValue);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void error(Arg args)
 		{
 			((GameObject)null).transform.position = Vector3.zero;
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void queue(Arg args)
 		{
 			string text = "";
@@ -478,15 +478,15 @@ namespace ConVar
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);
@@ -503,8 +503,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();
