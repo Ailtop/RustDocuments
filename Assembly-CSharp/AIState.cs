@@ -1,0 +1,26 @@
+public enum AIState
+{
+	None,
+	Idle,
+	Roam,
+	Chase,
+	Cover,
+	Combat,
+	Mounted,
+	Exfil,
+	Patrol,
+	Orbit,
+	Egress,
+	Land,
+	DropCrate,
+	MoveTowards,
+	Flee,
+	Attack,
+	Sleep,
+	Reload,
+	TakeCover,
+	Dismounted,
+	FollowPath,
+	NavigateHome,
+	CombatStationary
+}
