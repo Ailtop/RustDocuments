@@ -213,6 +213,21 @@ namespace ConVar
 		[ServerVar(Saved = true)]
 		public static bool woundingenabled = true;
 
+		[ServerVar(Help = "Base chance of recovery after crawling wounded state", Saved = true)]
+		public static float woundedrecoverchance = 0.2f;
+
+		[ServerVar(Help = "Base chance of recovery after incapacitated wounded state", Saved = true)]
+		public static float incapacitatedrecoverchance = 0.1f;
+
+		[ServerVar(Help = "Maximum percent chance added to base wounded/incapacitated recovery chance, based on the player's food and water level", Saved = true)]
+		public static float woundedmaxfoodandwaterbonus = 0.25f;
+
+		[ServerVar(Help = "Minimum initial health given when a player dies and moves to crawling wounded state", Saved = true)]
+		public static int crawlingminhealth = 30;
+
+		[ServerVar(Help = "Maximum initial health given when a player dies and moves to crawling wounded state", Saved = true)]
+		public static int crawlingmaxhealth = 50;
+
 		[ServerVar(Saved = true)]
 		public static bool playerserverfall = true;
 

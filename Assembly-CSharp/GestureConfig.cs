@@ -31,7 +31,8 @@ public class GestureConfig : ScriptableObject
 	public enum GestureActionType
 	{
 		None,
-		ShowNameTag
+		ShowNameTag,
+		DanceAchievement
 	}
 
 	[ReadOnly]
@@ -59,6 +60,8 @@ public class GestureConfig : ScriptableObject
 	public AnimationType animationType;
 
 	public BasePlayer.CameraMode viewMode;
+
+	public bool useRootMotion;
 
 	public GestureActionType actionType;
 

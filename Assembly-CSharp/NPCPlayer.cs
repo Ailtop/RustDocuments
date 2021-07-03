@@ -526,7 +526,7 @@ public class NPCPlayer : BasePlayer
 	public virtual float DesiredMoveSpeed()
 	{
 		float running = Mathf.Sin(Time.time + randomOffset);
-		return GetSpeed(running, 0f);
+		return GetSpeed(running, 0f, 0f);
 	}
 
 	public override bool EligibleForWounding(HitInfo info)

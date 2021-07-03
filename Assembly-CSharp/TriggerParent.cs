@@ -11,7 +11,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 
 	public bool ParentNPCPlayers;
 
-	public const int CLIP_CHECK_MASK = 1210122497;
+	public const int CLIP_CHECK_MASK = 1218511105;
 
 	public override GameObject InterestedInObject(GameObject obj)
 	{
@@ -139,6 +139,6 @@ public class TriggerParent : TriggerBase, IServerComponent
 
 	private bool IsClipping(BaseEntity ent)
 	{
-		return GamePhysics.CheckOBB(ent.WorldSpaceBounds(), 1210122497, QueryTriggerInteraction.Ignore);
+		return GamePhysics.CheckOBB(ent.WorldSpaceBounds(), 1218511105, QueryTriggerInteraction.Ignore);
 	}
 }

@@ -55,8 +55,8 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 	[SerializeField]
 	private TriggerParent[] triggerParents;
 
-	[SerializeField]
 	[Header("Sliding Components")]
+	[SerializeField]
 	private VehicleModuleSlidingComponent[] slidingComponents;
 
 	[SerializeField]
@@ -238,6 +238,10 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 	{
 		SetHealth(MaxHealth());
 		SendNetworkUpdate();
+	}
+
+	public override void Die(HitInfo info = null)
+	{
 	}
 
 	[RPC_Server]

@@ -395,11 +395,6 @@ public class HeldEntity : BaseEntity
 		return false;
 	}
 
-	public virtual bool IsInstrument()
-	{
-		return false;
-	}
-
 	public virtual void ServerUse()
 	{
 	}
@@ -407,6 +402,11 @@ public class HeldEntity : BaseEntity
 	public virtual void ServerUse(float damageModifier, Transform originOverride = null)
 	{
 		ServerUse();
+	}
+
+	public virtual bool IsInstrument()
+	{
+		return false;
 	}
 
 	public override void Load(LoadInfo info)

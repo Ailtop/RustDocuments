@@ -14,8 +14,6 @@ public class PhoneDialler : UIDialog
 
 	public RustInput PhoneNameInput;
 
-	private string textEntered;
-
 	public RustText textDisplay;
 
 	public RustText CallTimeText;
@@ -26,11 +24,15 @@ public class PhoneDialler : UIDialog
 
 	public GameObject NumberDialRoot;
 
+	public GameObject PromptVoicemailRoot;
+
 	public RustButton ContactsButton;
 
 	public RustText FailText;
 
 	public NeedsCursor CursorController;
+
+	public NeedsKeyboard KeyboardController;
 
 	public Translate.Phrase WrongNumberPhrase;
 
@@ -61,4 +63,10 @@ public class PhoneDialler : UIDialog
 	public SoundDefinition DialToneSfx;
 
 	public Button[] NumberButtons;
+
+	public Translate.Phrase AnsweringMachine;
+
+	public VoicemailDialog Voicemail;
+
+	public GameObject VoicemailRoot;
 }

@@ -10,23 +10,23 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 	{
 		public delegate void WorldStateChangedEvent(ScientistJunkpileContext context, Facts fact, byte oldValue, byte newValue);
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
 		private byte[] _worldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private byte[] _previousWorldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private int _decompositionScore;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;
@@ -51,8 +51,8 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[ReadOnly]
 		public JunkPile Junkpile;
 
-		[ReadOnly]
 		[Header("Cover")]
+		[ReadOnly]
 		public CoverPointVolume CoverVolume;
 
 		[ReadOnly]
@@ -180,13 +180,17 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			if (primaryEnemyPlayerTarget.Player != null)
 			{
 				Vector3 vector = Vector3.zero;
-				if (primaryEnemyPlayerTarget.Player.IsDucked())
-				{
-					vector = PlayerEyes.DuckOffset;
-				}
 				if (primaryEnemyPlayerTarget.Player.IsSleeping())
 				{
 					vector = Vector3.down;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsDucked())
+				{
+					vector = PlayerEyes.DuckOffset;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsCrawling())
+				{
+					vector = PlayerEyes.CrawlOffset;
 				}
 				Vector3 vector2 = primaryEnemyPlayerTarget.Player.CenterPoint() + vector;
 				Vector3 vector3 = Body.CenterPoint();

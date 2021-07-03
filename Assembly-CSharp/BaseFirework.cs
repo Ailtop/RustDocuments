@@ -17,7 +17,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 	[ServerVar]
 	public static int maxActiveFireworks = 25;
 
-	public static List<BaseFirework> _activeFireworks = new List<BaseFirework>();
+	public static HashSet<BaseFirework> _activeFireworks = new HashSet<BaseFirework>();
 
 	public bool IsLit()
 	{
@@ -72,10 +72,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 
 	internal override void DoServerDestroy()
 	{
-		if (_activeFireworks.Contains(this))
-		{
-			_activeFireworks.Remove(this);
-		}
+		_activeFireworks.Remove(this);
 		base.DoServerDestroy();
 	}
 
@@ -95,6 +92,10 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 
 	public void StaggeredTryLightFuse()
 	{
+		if (IsExhausted() || IsLit())
+		{
+			return;
+		}
 		if (limitActiveCount)
 		{
 			if (NumActiveFireworks() >= maxActiveFireworks)

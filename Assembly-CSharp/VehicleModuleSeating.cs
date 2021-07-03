@@ -69,16 +69,16 @@ public class VehicleModuleSeating : BaseVehicleModule
 	[HideInInspector]
 	private Vector3 steerAngle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 accelAngle;
 
 	[SerializeField]
 	[HideInInspector]
 	private Vector3 brakeAngle;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private Vector3 speedometerAngle;
 
 	[SerializeField]

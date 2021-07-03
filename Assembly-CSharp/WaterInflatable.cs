@@ -138,7 +138,7 @@ public class WaterInflatable : BaseMountable, PoolVehicle, INotifyTrigger
 		{
 			forceClippingCheck = false;
 			lastClipCheckPosition = position;
-			if (GamePhysics.CheckSphere(headSpaceCheckPosition.position, headSpaceCheckRadius, 1210122497))
+			if (GamePhysics.CheckSphere(headSpaceCheckPosition.position, headSpaceCheckRadius, 1218511105))
 			{
 				DismountAllPlayers();
 			}

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[732]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[751]
 	{
 		new ConsoleSystem.Command
 		{
@@ -158,6 +158,51 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "backtracklength",
+			Parent = "boombox",
+			FullName = "boombox.backtracklength",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => BoomBox.BacktrackLength.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BoomBox.BacktrackLength = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearradiobyuser",
+			Parent = "boombox",
+			FullName = "boombox.clearradiobyuser",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				BoomBox.ClearRadioByUser(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "serverurllist",
+			Parent = "boombox",
+			FullName = "boombox.serverurllist",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Saved = true,
+			Description = "A list of radio stations that are valid on this server. Format: NAME,URL,NAME,URL,etc",
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => BoomBox.ServerUrlList.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BoomBox.ServerUrlList = str;
+			},
+			Default = ""
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "egress_duration_minutes",
 			Parent = "cargoship",
 			FullName = "cargoship.egress_duration_minutes",
@@ -220,6 +265,47 @@ public class ConsoleGen
 			{
 				CargoShip.loot_rounds = str.ToInt();
 			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearcassettes",
+			Parent = "cassette",
+			FullName = "cassette.clearcassettes",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Cassette.ClearCassettes(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearcassettesbyuser",
+			Parent = "cassette",
+			FullName = "cassette.clearcassettesbyuser",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Cassette.ClearCassettesByUser(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxcassettefilesizemb",
+			Parent = "cassette",
+			FullName = "cassette.maxcassettefilesizemb",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Cassette.MaxCassetteFileSizeMB.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Cassette.MaxCassetteFileSizeMB = str.ToFloat();
+			},
+			Default = "5"
 		},
 		new ConsoleSystem.Command
 		{
@@ -392,6 +478,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "injureplayer",
+			Parent = "global",
+			FullName = "global.injureplayer",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.injureplayer(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "kick",
 			Parent = "global",
 			FullName = "global.kick",
@@ -513,6 +611,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.players(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "recoverplayer",
+			Parent = "global",
+			FullName = "global.recoverplayer",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.recoverplayer(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1665,6 +1775,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "usecalculatepath",
+			Parent = "ai",
+			FullName = "ai.usecalculatepath",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.usecalculatepath.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.usecalculatepath = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "usegrid",
 			Parent = "ai",
 			FullName = "ai.usegrid",
@@ -1674,6 +1797,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.usegrid = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "usesetdestinationfallback",
+			Parent = "ai",
+			FullName = "ai.usesetdestinationfallback",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AI.usesetdestinationfallback.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.usesetdestinationfallback = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -4236,6 +4372,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "recover",
+			Parent = "global",
+			FullName = "global.recover",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.recover(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "report",
 			Parent = "global",
 			FullName = "global.report",
@@ -5329,6 +5477,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "gesture_radius",
+			Parent = "player",
+			FullName = "player.gesture_radius",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Player.gesture_radius(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "gotosleep",
 			Parent = "player",
 			FullName = "player.gotosleep",
@@ -5398,6 +5558,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Player.resetstate(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "stopgesture_radius",
+			Parent = "player",
+			FullName = "player.stopgesture_radius",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Player.stopgesture_radius(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5991,6 +6163,36 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "crawlingmaxhealth",
+			Parent = "server",
+			FullName = "server.crawlingmaxhealth",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Maximum initial health given when a player dies and moves to crawling wounded state",
+			Variable = true,
+			GetOveride = () => Server.crawlingmaxhealth.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.crawlingmaxhealth = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "crawlingminhealth",
+			Parent = "server",
+			FullName = "server.crawlingminhealth",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Minimum initial health given when a player dies and moves to crawling wounded state",
+			Variable = true,
+			GetOveride = () => Server.crawlingminhealth.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.crawlingminhealth = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "cycletime",
 			Parent = "server",
 			FullName = "server.cycletime",
@@ -6257,6 +6459,21 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.idlekickmode = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "incapacitatedrecoverchance",
+			Parent = "server",
+			FullName = "server.incapacitatedrecoverchance",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Base chance of recovery after incapacitated wounded state",
+			Variable = true,
+			GetOveride = () => Server.incapacitatedrecoverchance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.incapacitatedrecoverchance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7283,6 +7500,36 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.worldsize = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "woundedmaxfoodandwaterbonus",
+			Parent = "server",
+			FullName = "server.woundedmaxfoodandwaterbonus",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Maximum percent chance added to base wounded/incapacitated recovery chance, based on the player's food and water level",
+			Variable = true,
+			GetOveride = () => Server.woundedmaxfoodandwaterbonus.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.woundedmaxfoodandwaterbonus = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "woundedrecoverchance",
+			Parent = "server",
+			FullName = "server.woundedrecoverchance",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Base chance of recovery after crawling wounded state",
+			Variable = true,
+			GetOveride = () => Server.woundedrecoverchance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.woundedrecoverchance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8849,6 +9096,23 @@ public class ConsoleGen
 			{
 				JunkPileWater.framebudgetms = str.ToFloat();
 			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "megaphonevoicerange",
+			Parent = "megaphone",
+			FullName = "megaphone.megaphonevoicerange",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Megaphone.MegaphoneVoiceRange.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Megaphone.MegaphoneVoiceRange = str.ToFloat();
+			},
+			Default = "100"
 		},
 		new ConsoleSystem.Command
 		{

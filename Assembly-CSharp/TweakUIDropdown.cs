@@ -78,7 +78,6 @@ public class TweakUIDropdown : TweakUIBase
 		if (conVar != null && !(conVar.String == nameValue.value))
 		{
 			conVar.Set(nameValue.value);
-			ResetToConvar();
 		}
 	}
 

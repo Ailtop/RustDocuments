@@ -17,16 +17,16 @@ namespace Rust.Ai.HTN.Scientist
 		[SerializeField]
 		private byte[] _worldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private byte[] _previousWorldState;
 
 		[ReadOnly]
 		[SerializeField]
 		private int _decompositionScore;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<PrimitiveTaskSelector> _debugPlan;
 
 		private static Stack<WorldStateInfo>[] _worldStateChanges;
@@ -177,13 +177,17 @@ namespace Rust.Ai.HTN.Scientist
 			if (primaryEnemyPlayerTarget.Player != null)
 			{
 				Vector3 vector = Vector3.zero;
-				if (primaryEnemyPlayerTarget.Player.IsDucked())
-				{
-					vector = PlayerEyes.DuckOffset;
-				}
 				if (primaryEnemyPlayerTarget.Player.IsSleeping())
 				{
 					vector = Vector3.down;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsDucked())
+				{
+					vector = PlayerEyes.DuckOffset;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsCrawling())
+				{
+					vector = PlayerEyes.CrawlOffset;
 				}
 				Vector3 vector2 = primaryEnemyPlayerTarget.Player.CenterPoint() + vector;
 				Vector3 vector3 = Body.CenterPoint();

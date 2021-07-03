@@ -245,7 +245,7 @@ public class MotorRowboat : BaseBoat
 		player.metabolism.SendChangesToClient();
 		if (IsFlipped())
 		{
-			rigidBody.AddRelativeTorque(Vector3.forward * 5f, ForceMode.VelocityChange);
+			rigidBody.AddRelativeTorque(Vector3.forward * 6.5f, ForceMode.VelocityChange);
 		}
 		else
 		{

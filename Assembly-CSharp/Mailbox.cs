@@ -12,6 +12,8 @@ public class Mailbox : StorageContainer
 
 	public GameObjectRef mailDropSound;
 
+	public ItemDefinition[] allowedItems;
+
 	public bool autoSubmitWhenClosed;
 
 	public bool shouldMarkAsFull;
@@ -195,6 +197,23 @@ public class Mailbox : StorageContainer
 		if (flag)
 		{
 			return base.CanMoveFrom(player, item);
+		}
+		return false;
+	}
+
+	public override bool ItemFilter(Item item, int targetSlot)
+	{
+		if (allowedItems == null || allowedItems.Length == 0)
+		{
+			return base.ItemFilter(item, targetSlot);
+		}
+		ItemDefinition[] array = allowedItems;
+		foreach (ItemDefinition itemDefinition in array)
+		{
+			if (item.info == itemDefinition)
+			{
+				return true;
+			}
 		}
 		return false;
 	}

@@ -9,8 +9,8 @@ namespace ConVar
 		[Help("Pause time while loading")]
 		public static bool pausewhileloading = true;
 
-		[ServerVar]
 		[Help("Fixed delta time in seconds")]
+		[ServerVar]
 		public static float fixeddelta
 		{
 			get

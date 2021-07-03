@@ -32,4 +32,6 @@ public class RCMenu : ComputerMenu
 	public Text noSignalText;
 
 	public SoundDefinition bookmarkPressedSoundDef;
+
+	public GameObject[] hideIfStatic;
 }

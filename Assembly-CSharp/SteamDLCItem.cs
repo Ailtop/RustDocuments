@@ -28,7 +28,11 @@ public class SteamDLCItem : ScriptableObject
 	{
 		if (player.isServer)
 		{
-			return HasLicense(player.userID);
+			if (!HasLicense(player.userID))
+			{
+				return player.userID < 10000000;
+			}
+			return true;
 		}
 		return false;
 	}

@@ -526,7 +526,7 @@ public class BradleyAPC : BaseCombatEntity
 				continue;
 			}
 			BasePlayer basePlayer = item as BasePlayer;
-			if (basePlayer.IsDead() || basePlayer is Scientist || !VisibilityTest(item))
+			if (basePlayer.IsDead() || basePlayer is Scientist || basePlayer is HumanNPCNew || !VisibilityTest(item))
 			{
 				continue;
 			}

@@ -19,6 +19,8 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 
 	public bool isStatic;
 
+	public bool appendEntityIDToIdentifier;
+
 	public virtual bool RequiresMouse => false;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -88,6 +90,20 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		}
 	}
 
+	public override void Spawn()
+	{
+		base.Spawn();
+		string text = "#ID";
+		if (IsStatic() && rcIdentifier.Contains(text))
+		{
+			int length = rcIdentifier.IndexOf(text);
+			int length2 = text.Length;
+			string text2 = rcIdentifier.Substring(0, length);
+			text2 += net.ID;
+			UpdateIdentifier(text2);
+		}
+	}
+
 	public Transform GetEyes()
 	{
 		return viewEyes;
@@ -141,8 +157,8 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_SetID(RPCMessage msg)
 	{
 		if (IsStatic())

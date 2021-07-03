@@ -141,11 +141,25 @@ public class PlaceMonuments : ProceduralComponent
 						Vector3 pos = new Vector3(x2, height, z2);
 						Quaternion rot = prefab.Object.transform.localRotation;
 						Vector3 scale = prefab.Object.transform.localScale;
-						Vector3 vector = pos + rot * Vector3.Scale(scale, dungeonEntrance ? dungeonEntrance.transform.position : Vector3.zero);
-						Quaternion rotation = rot * (dungeonEntrance ? dungeonEntrance.transform.rotation : Quaternion.identity);
+						Vector3 vector = pos;
 						prefab.ApplyDecorComponents(ref pos, ref rot, ref scale);
+						if (!prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !component.CheckPlacement(pos, rot, scale))
+						{
+							continue;
+						}
+						if ((bool)dungeonEntrance)
+						{
+							Vector3 vector2 = pos + rot * Vector3.Scale(scale, dungeonEntrance.transform.position);
+							Vector3 vector3 = dungeonEntrance.SnapPosition(vector2);
+							pos += vector3 - vector2;
+							if (!dungeonEntrance.IsValidSpawnPosition(vector3))
+							{
+								continue;
+							}
+							vector = vector3;
+						}
 						DistanceInfo distanceInfo = GetDistanceInfo(a, prefab, pos, rot, scale, vector);
-						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < (float)dungeonEntrance.CellSize) || ((bool)prefab.Component && !prefab.Component.CheckPlacement(pos, rot, scale)) || !prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground) || ((bool)dungeonEntrance && !dungeonEntrance.IsValidSpawnPosition(vector, rotation)))
+						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < (float)dungeonEntrance.CellSize) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
 						{
 							continue;
 						}

@@ -152,12 +152,12 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
-	[ServerVar]
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
+	[ServerVar]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -538,8 +538,8 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -556,8 +556,8 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

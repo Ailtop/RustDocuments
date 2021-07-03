@@ -158,8 +158,8 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_SetID(RPCMessage msg)
 	{
 		if (!CanControl())

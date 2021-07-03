@@ -125,7 +125,7 @@ public class BasePathFinder
 		Vector3 vector = Quaternion.Euler(0f, offsetDegrees, 0f) * dirFromThreat;
 		Vector3 target = navigator.transform.position + vector * UnityEngine.Random.Range(minRange, maxRange);
 		Vector3 position;
-		if (!navigator.GetNearestNavmeshPosition(target, out position, 10f))
+		if (!navigator.GetNearestNavmeshPosition(target, out position, 20f))
 		{
 			return false;
 		}

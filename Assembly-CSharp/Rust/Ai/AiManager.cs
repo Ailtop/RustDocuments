@@ -5,6 +5,7 @@ using Apex.LoadBalancing;
 using Rust.Ai.HTN;
 using Rust.Ai.HTN.ScientistJunkpile;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Rust.Ai
 {
@@ -392,9 +393,6 @@ namespace Rust.Ai
 		[ServerVar(Help = "If ai_dormant is true, any npc outside the range of players will render itself dormant and take up less resources, but wildlife won't simulate as well.")]
 		public static bool ai_dormant = true;
 
-		[ServerVar(Help = "The maximum amount of nodes processed each frame in the asynchronous pathfinding process. Increasing this value will cause the paths to be processed faster, but can cause some hiccups in frame rate. Default value is 100, a good range for tuning is between 50 and 500.")]
-		public static int pathfindingIterationsPerFrame = 100;
-
 		[ServerVar(Help = "If an agent is beyond this distance to a player, it's flagged for becoming dormant.")]
 		public static float ai_to_player_distance_wakeup_range = 160f;
 
@@ -422,6 +420,19 @@ namespace Rust.Ai
 
 		public AgencyHTN HTNAgency { get; } = new AgencyHTN();
 
+
+		[ServerVar(Help = "The maximum amount of nodes processed each frame in the asynchronous pathfinding process. Increasing this value will cause the paths to be processed faster, but can cause some hiccups in frame rate. Default value is 100, a good range for tuning is between 50 and 500.")]
+		public static int pathfindingIterationsPerFrame
+		{
+			get
+			{
+				return NavMesh.pathfindingIterationsPerFrame;
+			}
+			set
+			{
+				NavMesh.pathfindingIterationsPerFrame = value;
+			}
+		}
 
 		public bool repeat => true;
 

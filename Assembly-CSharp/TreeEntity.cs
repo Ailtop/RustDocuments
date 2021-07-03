@@ -54,6 +54,10 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 
 	private int lastHitMarkerIndex = -1;
 
+	private float nextBirdTime;
+
+	private uint birdCycleIndex;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("TreeEntity.OnRpcMessage"))
@@ -134,11 +138,26 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		return xMarker != null;
 	}
 
+	private void DoBirds()
+	{
+		if (!base.isClient && !(UnityEngine.Time.realtimeSinceStartup < nextBirdTime) && !(bounds.extents.y < 6f))
+		{
+			uint seed = net.ID + birdCycleIndex;
+			if (SeedRandom.Range(ref seed, 0, 2) == 0)
+			{
+				Effect.server.Run("assets/prefabs/npc/birds/birdemission.prefab", base.transform.position + Vector3.up * UnityEngine.Random.Range(bounds.extents.y * 0.65f, bounds.extents.y * 0.9f), Vector3.up);
+			}
+			birdCycleIndex++;
+			nextBirdTime = UnityEngine.Time.realtimeSinceStartup + 90f;
+		}
+	}
+
 	public override void OnAttacked(HitInfo info)
 	{
 		bool canGather = info.CanGather;
 		float num = UnityEngine.Time.time - lastHitTime;
 		lastHitTime = UnityEngine.Time.time;
+		DoBirds();
 		if (!hasBonusGame || !canGather || info.Initiator == null || (BonusActive() && !DidHitMarker(info)))
 		{
 			base.OnAttacked(info);

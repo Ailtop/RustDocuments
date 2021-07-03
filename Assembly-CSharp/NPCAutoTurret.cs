@@ -63,9 +63,9 @@ public class NPCAutoTurret : AutoTurret
 
 	protected override bool Ignore(BasePlayer player)
 	{
-		if (!(player as Scientist))
+		if (!(player as Scientist) && !(player is ScientistNPCNew))
 		{
-			return player is ScientistNPCNew;
+			return player is BanditGuard;
 		}
 		return true;
 	}
@@ -77,7 +77,7 @@ public class NPCAutoTurret : AutoTurret
 		{
 			if (basePlayer.IsNpc)
 			{
-				if (basePlayer is Scientist || basePlayer is ScientistNPCNew)
+				if (basePlayer is Scientist || basePlayer is ScientistNPCNew || basePlayer is BanditGuard)
 				{
 					return false;
 				}

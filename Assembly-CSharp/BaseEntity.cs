@@ -32,6 +32,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			public Sprite icon;
 
 			public int order;
+
+			public bool usableWhileWounded;
 		}
 
 		public class Description : Attribute
@@ -65,6 +67,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			{
 				functionName = testFunc;
 			}
+		}
+
+		public class UsableWhileWounded : Attribute
+		{
 		}
 
 		public string TitleToken;
@@ -2133,8 +2139,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");

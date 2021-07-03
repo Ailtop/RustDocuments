@@ -1,10 +1,7 @@
-public class ColdOverlay : ImageEffectLayer
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
+
+public class ColdOverlay : MonoBehaviour
 {
-	internal bool isPlaying;
-
-	public ScreenOverlayEx screenOverlay;
-
-	public CC_Frost frost;
-
-	public LensDirtiness lensDirtyness;
+	public PostProcessVolume postProcessVolume;
 }

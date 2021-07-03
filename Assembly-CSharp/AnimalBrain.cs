@@ -9,6 +9,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 		public AttackState()
 			: base(AIState.Attack)
 		{
+			base.AgrresiveState = true;
 		}
 
 		public override void StateEnter()
@@ -100,6 +101,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 		public ChaseState()
 			: base(AIState.Chase)
 		{
+			base.AgrresiveState = true;
 		}
 
 		public override void StateEnter()
@@ -345,6 +347,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 		AddState(new AttackState());
 		AddState(new BaseSleepState());
 		AddState(new ChaseState());
+		AddState(new BaseCooldownState());
 	}
 
 	public override void InitializeAI()

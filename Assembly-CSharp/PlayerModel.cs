@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerModel : ListComponent<PlayerModel>
@@ -48,6 +49,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 	protected static int ducked = Animator.StringToHash("ducked");
 
 	protected static int grounded = Animator.StringToHash("grounded");
+
+	protected static int crawling = Animator.StringToHash("crawling");
 
 	protected static int waterlevel = Animator.StringToHash("waterlevel");
 
@@ -138,8 +141,11 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public RuntimeAnimatorController SleepGesture;
 
-	public RuntimeAnimatorController WoundedGesture;
+	public RuntimeAnimatorController CrawlToIncapacitatedGesture;
 
+	public RuntimeAnimatorController StandToIncapacitatedGesture;
+
+	[NonSerialized]
 	public RuntimeAnimatorController CurrentGesture;
 
 	[Header("Skin")]
@@ -149,8 +155,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public SubsurfaceProfile subsurfaceProfile;
 
-	[Range(0f, 1f)]
 	[Header("Parameters")]
+	[Range(0f, 1f)]
 	public float voiceVolume;
 
 	[Range(0f, 1f)]

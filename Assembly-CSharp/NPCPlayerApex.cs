@@ -3722,7 +3722,8 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 	{
 		float running = 0f;
 		float ducking = (modelState.ducked ? 1f : 0f);
-		float num = 1f;
+		float crawling = (modelState.crawling ? 1f : 0f);
+		float num;
 		if (CurrentBehaviour == BaseNpc.Behaviour.Wander)
 		{
 			num = AI.npc_speed_walk * 3f;
@@ -3734,7 +3735,7 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 			num2 = ((!(num2 > 0.75f)) ? 0f : Mathf.Clamp01((num2 - 0.75f) / 0.25f));
 			running = num2;
 		}
-		return GetSpeed(running, ducking) * num;
+		return GetSpeed(running, ducking, crawling) * num;
 	}
 
 	public override Vector3 GetAimDirection()
@@ -3819,6 +3820,10 @@ public class NPCPlayerApex : NPCPlayer, IContextProvider, IAIAgent, ILoadBalance
 				else if (basePlayer2.IsSleeping())
 				{
 					vector7 = new Vector3(0f, -1f, 0f);
+				}
+				else if (basePlayer2.IsCrawling())
+				{
+					vector7 = PlayerEyes.CrawlOffset;
 				}
 			}
 			else if (AttackTarget as BaseNpc != null)

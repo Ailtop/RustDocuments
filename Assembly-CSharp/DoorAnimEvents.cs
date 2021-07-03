@@ -11,11 +11,13 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 
 	public GameObjectRef closeEnd;
 
+	public bool checkAnimSpeed;
+
 	public Animator animator => GetComponent<Animator>();
 
 	private void DoorOpenStart()
 	{
-		if (!Rust.Application.isLoading && openStart.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f))
+		if (!Rust.Application.isLoading && openStart.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed < 0f)))
 		{
 			Effect.client.Run(openStart.resourcePath, base.gameObject);
 		}
@@ -23,7 +25,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 
 	private void DoorOpenEnd()
 	{
-		if (!Rust.Application.isLoading && openEnd.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f))
+		if (!Rust.Application.isLoading && openEnd.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed < 0f)))
 		{
 			Effect.client.Run(openEnd.resourcePath, base.gameObject);
 		}
@@ -31,7 +33,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 
 	private void DoorCloseStart()
 	{
-		if (!Rust.Application.isLoading && closeStart.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f))
+		if (!Rust.Application.isLoading && closeStart.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed > 0f)))
 		{
 			Effect.client.Run(closeStart.resourcePath, base.gameObject);
 		}
@@ -39,7 +41,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 
 	private void DoorCloseEnd()
 	{
-		if (!Rust.Application.isLoading && closeEnd.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f))
+		if (!Rust.Application.isLoading && closeEnd.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed > 0f)))
 		{
 			Effect.client.Run(closeEnd.resourcePath, base.gameObject);
 		}

@@ -263,8 +263,8 @@ public class ThrownWeapon : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoDrop(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())

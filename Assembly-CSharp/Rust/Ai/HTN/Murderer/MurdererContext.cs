@@ -17,12 +17,12 @@ namespace Rust.Ai.HTN.Murderer
 		[SerializeField]
 		private byte[] _worldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private byte[] _previousWorldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private int _decompositionScore;
 
 		[ReadOnly]
@@ -48,8 +48,8 @@ namespace Rust.Ai.HTN.Murderer
 		[ReadOnly]
 		public AiLocationManager Location;
 
-		[ReadOnly]
 		[Header("Cover")]
+		[ReadOnly]
 		public CoverPointVolume CoverVolume;
 
 		[ReadOnly]
@@ -177,13 +177,17 @@ namespace Rust.Ai.HTN.Murderer
 			if (primaryEnemyPlayerTarget.Player != null)
 			{
 				Vector3 vector = Vector3.zero;
-				if (primaryEnemyPlayerTarget.Player.IsDucked())
-				{
-					vector = PlayerEyes.DuckOffset;
-				}
 				if (primaryEnemyPlayerTarget.Player.IsSleeping())
 				{
 					vector = Vector3.down;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsDucked())
+				{
+					vector = PlayerEyes.DuckOffset;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsCrawling())
+				{
+					vector = PlayerEyes.CrawlOffset;
 				}
 				Vector3 vector2 = primaryEnemyPlayerTarget.Player.CenterPoint() + vector;
 				Vector3 vector3 = Body.CenterPoint();

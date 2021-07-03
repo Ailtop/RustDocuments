@@ -61,8 +61,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public TimeCachedValue<float> artificialTemperatureExposure;
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
+	[ServerVar]
 	public static float framebudgetms = 0.25f;
 
 	public static GrowableEntityUpdateQueue growableEntityUpdateQueue = new GrowableEntityUpdateQueue();
@@ -827,8 +827,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	public void RPC_PickFruit(RPCMessage msg)
 	{

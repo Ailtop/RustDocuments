@@ -1,8 +1,7 @@
-using UnityStandardAssets.ImageEffects;
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
-public class HotOverlay : ImageEffectLayer
+public class HotOverlay : MonoBehaviour
 {
-	public LensDirtiness lensDirtyness;
-
-	public VignetteAndChromaticAberration vingette;
+	public PostProcessVolume postProcessVolume;
 }

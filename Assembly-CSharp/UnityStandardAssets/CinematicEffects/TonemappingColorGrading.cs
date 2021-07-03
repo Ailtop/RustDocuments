@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects
 {
-	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
-	[ImageEffectAllowedInSceneView]
 	[ExecuteInEditMode]
+	[ImageEffectAllowedInSceneView]
+	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -109,8 +109,8 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Tonemapping technique to use. ACES is the recommended one.")]
 			public Tonemapper tonemapper;
 
-			[Tooltip("Adjusts the overall exposure of the scene.")]
 			[Min(0f)]
+			[Tooltip("Adjusts the overall exposure of the scene.")]
 			public float exposure;
 
 			[Tooltip("Custom tonemapping curve.")]
@@ -216,8 +216,8 @@ namespace UnityStandardAssets.CinematicEffects
 			public float tint;
 
 			[Tooltip("Shift the hue of all colors.")]
-			[Space]
 			[Range(-0.5f, 0.5f)]
+			[Space]
 			public float hue;
 
 			[Range(0f, 2f)]
@@ -228,13 +228,13 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
 			public float vibrance;
 
-			[Range(0f, 10f)]
 			[Tooltip("Brightens or darkens all colors.")]
+			[Range(0f, 10f)]
 			public float value;
 
-			[Space]
-			[Range(0f, 2f)]
 			[Tooltip("Expands or shrinks the overall range of tonal values.")]
+			[Range(0f, 2f)]
+			[Space]
 			public float contrast;
 
 			[Range(0.01f, 5f)]
@@ -341,12 +341,12 @@ namespace UnityStandardAssets.CinematicEffects
 			[Space]
 			public BasicsSettings basics;
 
-			[ChannelMixer]
 			[Space]
+			[ChannelMixer]
 			public ChannelMixerSettings channelMixer;
 
-			[IndentedGroup]
 			[Space]
+			[IndentedGroup]
 			public CurvesSettings curves;
 
 			[Space]
@@ -379,8 +379,8 @@ namespace UnityStandardAssets.CinematicEffects
 			}
 		}
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private EyeAdaptationSettings m_EyeAdaptation = EyeAdaptationSettings.defaultSettings;
 
 		[SettingsGroup]
@@ -391,8 +391,8 @@ namespace UnityStandardAssets.CinematicEffects
 		[SerializeField]
 		private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
-		[SerializeField]
 		[SettingsGroup]
+		[SerializeField]
 		private LUTSettings m_Lut = LUTSettings.defaultSettings;
 
 		[SerializeField]

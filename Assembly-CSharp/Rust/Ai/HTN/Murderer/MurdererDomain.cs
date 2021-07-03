@@ -1777,16 +1777,16 @@ namespace Rust.Ai.HTN.Murderer
 		private MurdererContext _context;
 
 		[SerializeField]
-		[Header("Navigation")]
 		[ReadOnly]
+		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
+		[Header("Sensors")]
 		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
@@ -1829,9 +1829,9 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
-		[Header("Reasoners")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -1896,9 +1896,9 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Firearm Utility")]
-		[SerializeField]
 		private float _lastFirearmUsageTime;
 
 		[SerializeField]

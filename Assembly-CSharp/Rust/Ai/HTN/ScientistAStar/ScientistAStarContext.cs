@@ -10,15 +10,15 @@ namespace Rust.Ai.HTN.ScientistAStar
 	{
 		public delegate void WorldStateChangedEvent(ScientistAStarContext context, Facts fact, byte oldValue, byte newValue);
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool _isWorldStateDirty;
 
 		[SerializeField]
 		private byte[] _worldState;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private byte[] _previousWorldState;
 
 		[ReadOnly]
@@ -179,13 +179,17 @@ namespace Rust.Ai.HTN.ScientistAStar
 			if (primaryEnemyPlayerTarget.Player != null)
 			{
 				Vector3 vector = Vector3.zero;
-				if (primaryEnemyPlayerTarget.Player.IsDucked())
-				{
-					vector = PlayerEyes.DuckOffset;
-				}
 				if (primaryEnemyPlayerTarget.Player.IsSleeping())
 				{
 					vector = Vector3.down;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsDucked())
+				{
+					vector = PlayerEyes.DuckOffset;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsCrawling())
+				{
+					vector = PlayerEyes.CrawlOffset;
 				}
 				Vector3 vector2 = primaryEnemyPlayerTarget.Player.CenterPoint() + vector;
 				Vector3 vector3 = Body.CenterPoint();

@@ -405,7 +405,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_OpenDoor(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract() || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
+		if (!rpc.player.CanInteract(true) || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
 		{
 			return;
 		}
@@ -461,11 +461,11 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_CloseDoor(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract() || !canHandOpen || !IsOpen() || IsBusy() || IsLocked())
+		if (!rpc.player.CanInteract(true) || !canHandOpen || !IsOpen() || IsBusy() || IsLocked())
 		{
 			return;
 		}
@@ -487,7 +487,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_KnockDoor(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract() || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)
+		if (!rpc.player.CanInteract(true) || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)
 		{
 			return;
 		}
@@ -506,11 +506,11 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		Interface.CallHook("OnDoorKnocked", this, rpc.player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_ToggleHatch(RPCMessage rpc)
 	{
-		if (rpc.player.CanInteract() && hasHatch)
+		if (rpc.player.CanInteract(true) && hasHatch)
 		{
 			BaseLock baseLock = GetSlot(Slot.Lock) as BaseLock;
 			if (!baseLock || baseLock.OnTryToOpen(rpc.player))

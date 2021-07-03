@@ -1,3 +1,4 @@
+using Oxide.Core;
 using UnityEngine;
 
 public class WaterCatcher : LiquidContainer
@@ -23,7 +24,7 @@ public class WaterCatcher : LiquidContainer
 
 	public void CollectWater()
 	{
-		if (!IsFull())
+		if (!IsFull() && Interface.CallHook("OnWaterCollect", this) == null)
 		{
 			float num = 0.25f;
 			num += Climate.GetFog(base.transform.position) * 2f;

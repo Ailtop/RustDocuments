@@ -1,3 +1,4 @@
+using Oxide.Core;
 using UnityEngine;
 
 public class ItemModDeployable : MonoBehaviour
@@ -25,7 +26,7 @@ public class ItemModDeployable : MonoBehaviour
 			player.GiveAchievement(UnlockAchievement);
 		}
 		BuildingPrivlidge buildingPrivlidge;
-		if ((object)(buildingPrivlidge = ent as BuildingPrivlidge) != null)
+		if ((object)(buildingPrivlidge = ent as BuildingPrivlidge) != null && Interface.CallHook("OnCupboardAuthorize", buildingPrivlidge, player) == null)
 		{
 			buildingPrivlidge.AddPlayer(player);
 		}

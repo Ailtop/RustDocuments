@@ -3,16 +3,16 @@ namespace ConVar
 	[Factory("vis")]
 	public class Vis : ConsoleSystem
 	{
-		[Help("Turns on debug display of lerp")]
 		[ClientVar]
+		[Help("Turns on debug display of lerp")]
 		public static bool lerp;
 
 		[Help("Turns on debug display of damages")]
 		[ServerVar]
 		public static bool damage;
 
-		[ClientVar]
 		[Help("Turns on debug display of attacks")]
+		[ClientVar]
 		[ServerVar]
 		public static bool attack;
 
@@ -21,8 +21,8 @@ namespace ConVar
 		[Help("Turns on debug display of protection")]
 		public static bool protection;
 
-		[ServerVar]
 		[Help("Turns on debug display of weakspots")]
+		[ServerVar]
 		public static bool weakspots;
 
 		[ServerVar]
@@ -33,12 +33,12 @@ namespace ConVar
 		[ServerVar]
 		public static bool hitboxes;
 
-		[ServerVar]
 		[Help("Turns on debug display of line of sight checks")]
+		[ServerVar]
 		public static bool lineofsight;
 
-		[ServerVar]
 		[Help("Turns on debug display of senses, which are received by Ai")]
+		[ServerVar]
 		public static bool sense;
 	}
 }

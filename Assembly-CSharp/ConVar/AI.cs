@@ -29,6 +29,12 @@ namespace ConVar
 		public static bool setdestinationsamplenavmesh = true;
 
 		[ServerVar]
+		public static bool usecalculatepath = true;
+
+		[ServerVar]
+		public static bool usesetdestinationfallback = true;
+
+		[ServerVar]
 		public static bool npcswimming = true;
 
 		[ServerVar]

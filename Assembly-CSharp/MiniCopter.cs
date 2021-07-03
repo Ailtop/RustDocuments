@@ -460,9 +460,9 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 
 	public override bool CanPushNow(BasePlayer pusher)
 	{
-		if (base.CanPushNow(pusher))
+		if (base.CanPushNow(pusher) && pusher.IsOnGround())
 		{
-			return pusher.IsOnGround();
+			return !pusher.isMounted;
 		}
 		return false;
 	}

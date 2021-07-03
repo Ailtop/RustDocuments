@@ -37,9 +37,13 @@ public static class TelephoneManager
 		return num;
 	}
 
-	public static void RegisterTelephone(PhoneController t)
+	public static void RegisterTelephone(PhoneController t, bool checkPhoneNumber = false)
 	{
-		if (!allTelephones.ContainsKey(t.PhoneNumber))
+		if (checkPhoneNumber && allTelephones.ContainsKey(t.PhoneNumber) && allTelephones[t.PhoneNumber] != t)
+		{
+			t.PhoneNumber = GetUnusedTelephoneNumber();
+		}
+		if (!allTelephones.ContainsKey(t.PhoneNumber) && t.PhoneNumber != 0)
 		{
 			allTelephones.Add(t.PhoneNumber, t);
 			maxAssignedPhoneNumber = Mathf.Max(maxAssignedPhoneNumber, t.PhoneNumber);

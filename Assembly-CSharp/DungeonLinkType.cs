@@ -1,5 +1,6 @@
 public enum DungeonLinkType
 {
 	Default,
-	Elevator
+	Elevator,
+	Transition
 }

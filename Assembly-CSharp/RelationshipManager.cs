@@ -619,7 +619,7 @@ public class RelationshipManager : BaseEntity
 		BaseNetworkable.GetCloseConnections(player.transform.position, GetAcquaintanceMaxDist(), obj);
 		foreach (BasePlayer item in obj)
 		{
-			if (item == player || item.isClient || !item.IsAlive() || item.IsSleeping())
+			if (item == player || item.isClient || !item.IsAlive() || item.IsSleeping() || item.limitNetworking)
 			{
 				continue;
 			}
@@ -715,7 +715,7 @@ public class RelationshipManager : BaseEntity
 		}
 		ulong userID = player.userID;
 		ulong userID2 = otherPlayer.userID;
-		if (player == null || player == otherPlayer || player.IsNpc || (otherPlayer != null && otherPlayer.IsNpc))
+		if (player == null || player == otherPlayer || player.IsNpc || (otherPlayer != null && otherPlayer.IsNpc) || Interface.CallHook("CanSetRelationship", player, otherPlayer, type, weight) != null)
 		{
 			return;
 		}
@@ -887,8 +887,8 @@ public class RelationshipManager : BaseEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(2uL)]
+	[RPC_Server]
 	public void SERVER_ChangeRelationship(RPCMessage msg)
 	{
 		ulong userID = msg.player.userID;
@@ -917,8 +917,8 @@ public class RelationshipManager : BaseEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server]
 	public void SERVER_UpdatePlayerNote(RPCMessage msg)
 	{
 		ulong userID = msg.player.userID;
@@ -928,8 +928,8 @@ public class RelationshipManager : BaseEntity
 		MarkRelationshipsDirtyFor(userID);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server]
 	public void SERVER_ReceiveMugshot(RPCMessage msg)
 	{
 		ulong userID = msg.player.userID;

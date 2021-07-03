@@ -1136,8 +1136,8 @@ namespace Rust.Ai.HTN.Bear
 		[SerializeField]
 		private BearContext _context;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
@@ -1146,8 +1146,8 @@ namespace Rust.Ai.HTN.Bear
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new BearPlayersInRangeSensor
@@ -1188,8 +1188,8 @@ namespace Rust.Ai.HTN.Bear
 			}
 		};
 
-		[ReadOnly]
 		[Header("Reasoners")]
+		[ReadOnly]
 		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{

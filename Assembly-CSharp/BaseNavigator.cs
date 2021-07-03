@@ -76,6 +76,10 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public bool SpeedBasedAvoidancePriority;
 
+	private NavMeshPath path;
+
+	private NavMeshQueryFilter navMeshQueryFilter;
+
 	private int defaultAreaMask;
 
 	[InspectorFlags]
@@ -169,6 +173,10 @@ public class BaseNavigator : BaseMonoBehaviour
 			Agent.acceleration = Acceleration;
 			Agent.angularSpeed = TurnSpeed;
 		}
+		navMeshQueryFilter = default(NavMeshQueryFilter);
+		navMeshQueryFilter.agentTypeID = Agent.agentTypeID;
+		navMeshQueryFilter.areaMask = defaultAreaMask;
+		path = new NavMeshPath();
 		SetCurrentNavigationType(NavigationType.None);
 	}
 
@@ -185,7 +193,14 @@ public class BaseNavigator : BaseMonoBehaviour
 		}
 		if (Agent.enabled)
 		{
-			Agent.isStopped = !flag;
+			if (flag)
+			{
+				Agent.isStopped = false;
+			}
+			else if (Agent.isOnNavMesh)
+			{
+				Agent.isStopped = true;
+			}
 		}
 		Agent.enabled = flag;
 		if (flag && CanEnableNavMeshNavigation())
@@ -327,6 +342,10 @@ public class BaseNavigator : BaseMonoBehaviour
 			}
 			return false;
 		}
+		if (AiManager.nav_disable)
+		{
+			return false;
+		}
 		if (updateInterval > 0f && !UpdateIntervalElapsed(updateInterval))
 		{
 			return true;
@@ -337,19 +356,44 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			return true;
 		}
-		NavMeshHit hit;
-		if (navmeshSampleDistance > 0f && AI.setdestinationsamplenavmesh && !NavMesh.SamplePosition(pos, out hit, navmeshSampleDistance, defaultAreaMask))
+		if (navmeshSampleDistance > 0f && AI.setdestinationsamplenavmesh)
 		{
-			return false;
+			NavMeshHit hit;
+			if (!NavMesh.SamplePosition(pos, out hit, navmeshSampleDistance, defaultAreaMask))
+			{
+				return false;
+			}
+			pos = hit.position;
 		}
 		SetCurrentNavigationType(NavigationType.NavMesh);
 		Destination = pos;
-		bool num = Agent.SetDestination(Destination);
-		if (num && SpeedBasedAvoidancePriority)
+		bool flag;
+		if (AI.usecalculatepath)
+		{
+			flag = NavMesh.CalculatePath(base.transform.position, Destination, navMeshQueryFilter, path);
+			if (flag)
+			{
+				Agent.SetPath(path);
+			}
+			else if (AI.usesetdestinationfallback)
+			{
+				flag = Agent.SetDestination(Destination);
+			}
+		}
+		else
+		{
+			flag = Agent.SetDestination(Destination);
+		}
+		if (flag && SpeedBasedAvoidancePriority)
 		{
 			Agent.avoidancePriority = Random.Range(0, 21) + Mathf.FloorToInt(speedFraction * 80f);
 		}
-		return num;
+		return flag;
+	}
+
+	public void SetCurrentSpeed(NavigationSpeed speed)
+	{
+		currentSpeedFraction = GetSpeedFraction(speed);
 	}
 
 	public bool UpdateIntervalElapsed(float updateInterval)
@@ -361,7 +405,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		return UnityEngine.Time.time - lastSetDestinationTime >= updateInterval;
 	}
 
-	protected float GetSpeedFraction(NavigationSpeed speed)
+	public float GetSpeedFraction(NavigationSpeed speed)
 	{
 		switch (speed)
 		{

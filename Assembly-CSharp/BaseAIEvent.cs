@@ -183,6 +183,10 @@ public class BaseAIEvent
 			return new TimeSinceThreatAIEvent();
 		case AIEventType.OnPositionMemorySet:
 			return new OnPositionMemorySetAIEvent();
+		case AIEventType.AggressionTimer:
+			return new AggressionTimerAIEvent();
+		case AIEventType.Reloading:
+			return new ReloadingAIEvent();
 		default:
 			Debug.LogWarning(string.Concat("No case for ", eventType, " event in BaseAIEvent.CreateEvent()!"));
 			return null;

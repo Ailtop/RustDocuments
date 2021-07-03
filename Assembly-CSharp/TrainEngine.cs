@@ -51,8 +51,8 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public Vector3 engineLocalOffset;
 
-	[SerializeField]
 	[Header("Train Engine")]
+	[SerializeField]
 	public Transform leftHandLever;
 
 	[SerializeField]
@@ -656,11 +656,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public bool CanMount(BasePlayer player)
 	{
-		if (!player.IsDead())
-		{
-			return PlayerIsInParentTrigger(player);
-		}
-		return false;
+		return PlayerIsInParentTrigger(player);
 	}
 
 	void IEngineControllerUser.Invoke(Action action, float time)

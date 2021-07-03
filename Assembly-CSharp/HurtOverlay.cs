@@ -1,10 +1,7 @@
-using UnityStandardAssets.ImageEffects;
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
-public class HurtOverlay : ImageEffectLayer
+public class HurtOverlay : MonoBehaviour
 {
-	public ScreenOverlayEx bloodOverlay;
-
-	public VignetteAndChromaticAberration vignetting;
-
-	public CC_Grayscale grayScale;
+	public PostProcessVolume postProcessVolume;
 }

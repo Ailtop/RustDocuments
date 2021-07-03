@@ -148,8 +148,8 @@ public class RepairBench : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ChangeSkin(RPCMessage msg)
 	{
 		if (UnityEngine.Time.realtimeSinceStartup < nextSkinChangeTime)
@@ -194,12 +194,14 @@ public class RepairBench : StorageContainer
 			}
 			float condition = slot.condition;
 			float maxCondition = slot.maxCondition;
+			int amount = slot.amount;
 			slot.Remove();
 			ItemManager.DoRemoves();
 			Item item = ItemManager.Create(template, 1, 0uL);
 			item.MoveToContainer(base.inventory, 0, false);
 			item.maxCondition = maxCondition;
 			item.condition = condition;
+			item.amount = amount;
 			if (flag2)
 			{
 				ApplySkinToItem(item, Skin);

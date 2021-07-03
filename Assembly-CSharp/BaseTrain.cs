@@ -51,8 +51,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	[SerializeField]
 	public TriggerTrainCollisions rearCollisionTrigger;
 
-	[SerializeField]
 	[Tooltip("How much impact energy is retained on collisions. 1.0 = 100% retained, 0.0 = 100% loss of energy")]
+	[SerializeField]
 	public float impactEnergyFraction = 0.75f;
 
 	[SerializeField]
@@ -85,8 +85,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	[SerializeField]
 	private ParticleSystemContainer[] sparks;
 
-	[FormerlySerializedAs("brakeSparkLights")]
 	[SerializeField]
+	[FormerlySerializedAs("brakeSparkLights")]
 	private Light[] sparkLights;
 
 	public TrainTrackSpline.TrackSelection curTrackSelection;

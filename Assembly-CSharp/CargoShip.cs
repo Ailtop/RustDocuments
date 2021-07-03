@@ -35,6 +35,14 @@ public class CargoShip : BaseEntity
 
 	public Transform escapeBoatPoint;
 
+	public GameObjectRef microphonePrefab;
+
+	public Transform microphonePoint;
+
+	public GameObjectRef speakerPrefab;
+
+	public Transform[] speakerPoints;
+
 	public GameObject radiation;
 
 	public GameObjectRef mapMarkerEntityPrefab;
@@ -184,6 +192,27 @@ public class CargoShip : BaseEntity
 			{
 				component.AddFuel(50);
 			}
+		}
+		MicrophoneStand microphoneStand = GameManager.server.CreateEntity(microphonePrefab.resourcePath, microphonePoint.position, microphonePoint.rotation) as MicrophoneStand;
+		if ((bool)microphoneStand)
+		{
+			microphoneStand.enableSaving = false;
+			microphoneStand.SetParent(this, true);
+			microphoneStand.Spawn();
+			microphoneStand.SpawnChildEntity();
+			IOEntity iOEntity = microphoneStand.ioEntity.Get(true);
+			Transform[] array = speakerPoints;
+			foreach (Transform transform in array)
+			{
+				IOEntity iOEntity2 = GameManager.server.CreateEntity(speakerPrefab.resourcePath, transform.position, transform.rotation) as IOEntity;
+				iOEntity2.enableSaving = false;
+				iOEntity2.SetParent(this, true);
+				iOEntity2.Spawn();
+				iOEntity.outputs[0].connectedTo.Set(iOEntity2);
+				iOEntity2.inputs[0].connectedTo.Set(iOEntity);
+				iOEntity = iOEntity2;
+			}
+			microphoneStand.ioEntity.Get(true).MarkDirtyForceUpdateOutputs();
 		}
 	}
 

@@ -140,13 +140,17 @@ namespace Rust.Ai.HTN.NPCTurret
 			if (primaryEnemyPlayerTarget.Player != null)
 			{
 				Vector3 vector = Vector3.zero;
-				if (primaryEnemyPlayerTarget.Player.IsDucked())
-				{
-					vector = PlayerEyes.DuckOffset;
-				}
 				if (primaryEnemyPlayerTarget.Player.IsSleeping())
 				{
 					vector = Vector3.down;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsDucked())
+				{
+					vector = PlayerEyes.DuckOffset;
+				}
+				else if (primaryEnemyPlayerTarget.Player.IsCrawling())
+				{
+					vector = PlayerEyes.CrawlOffset;
 				}
 				Vector3 vector2 = primaryEnemyPlayerTarget.Player.CenterPoint() + vector;
 				Vector3 vector3 = Body.CenterPoint();

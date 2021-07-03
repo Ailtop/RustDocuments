@@ -317,7 +317,7 @@ public class HumanNPC : NPCPlayer, IThinker
 			if (!(baseEntity == null) && !baseEntity.EqualNetID(this) && baseEntity.isServer && WithinVisionCone(baseEntity))
 			{
 				BasePlayer basePlayer = baseEntity as BasePlayer;
-				if (!(basePlayer != null) || baseEntity.IsNpc || (!AI.ignoreplayers && IsVisibleToUs(basePlayer)))
+				if (!(basePlayer != null) || baseEntity.IsNpc || (!AI.ignoreplayers && IsPlayerVisibleToUs(basePlayer)))
 				{
 					myMemory.SetKnown(baseEntity, this, null);
 				}
@@ -392,7 +392,7 @@ public class HumanNPC : NPCPlayer, IThinker
 				if (Interface.CallHook("OnNpcTarget", this, component) == null)
 				{
 					currentTarget = component;
-					currentTargetLOS = IsVisibleToUs(component);
+					currentTargetLOS = IsPlayerVisibleToUs(component);
 				}
 			}
 		}
@@ -596,9 +596,13 @@ public class HumanNPC : NPCPlayer, IThinker
 		BasePlayer basePlayer = aimat as BasePlayer;
 		if (basePlayer != null)
 		{
-			if (basePlayer.IsSleeping() || basePlayer.IsWounded())
+			if (basePlayer.IsSleeping() || IsIncapacitated())
 			{
 				return basePlayer.transform.position + Vector3.up * 0.1f;
+			}
+			if (basePlayer.IsWounded())
+			{
+				return basePlayer.transform.position + Vector3.up * 0.25f;
 			}
 			return basePlayer.eyes.position - Vector3.up * 0.15f;
 		}
@@ -680,61 +684,6 @@ public class HumanNPC : NPCPlayer, IThinker
 			return Vector3Ex.Direction2D(aimOverridePosition, base.transform.position);
 		}
 		return Vector3Ex.Direction2D(base.transform.position + eyes.BodyForward() * 1000f, base.transform.position);
-	}
-
-	public bool IsVisibleMounted(BasePlayer player)
-	{
-		Vector3 worldMountedPosition = eyes.worldMountedPosition;
-		if (!player.IsVisible(worldMountedPosition, player.CenterPoint()) && !player.IsVisible(worldMountedPosition, player.transform.position) && !player.IsVisible(worldMountedPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldMountedPosition) && !IsVisible(player.transform.position, worldMountedPosition) && !IsVisible(player.eyes.position, worldMountedPosition))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public bool IsVisibleCrouched(BasePlayer player)
-	{
-		Vector3 worldCrouchedPosition = eyes.worldCrouchedPosition;
-		if (!player.IsVisible(worldCrouchedPosition, player.CenterPoint()) && !player.IsVisible(worldCrouchedPosition, player.transform.position) && !player.IsVisible(worldCrouchedPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldCrouchedPosition) && !IsVisible(player.transform.position, worldCrouchedPosition) && !IsVisible(player.eyes.position, worldCrouchedPosition))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public bool IsVisibleToUs(BasePlayer player)
-	{
-		if (base.isMounted)
-		{
-			return IsVisibleMounted(player);
-		}
-		if (IsDucked())
-		{
-			return IsVisibleCrouched(player);
-		}
-		return IsVisibleStanding(player);
-	}
-
-	public bool IsVisibleStanding(BasePlayer player)
-	{
-		Vector3 worldStandingPosition = eyes.worldStandingPosition;
-		if (!player.IsVisible(worldStandingPosition, player.CenterPoint()) && !player.IsVisible(worldStandingPosition, player.transform.position) && !player.IsVisible(worldStandingPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldStandingPosition) && !IsVisible(player.transform.position, worldStandingPosition) && !IsVisible(player.eyes.position, worldStandingPosition))
-		{
-			return false;
-		}
-		return true;
 	}
 
 	public override bool ShouldDropActiveItem()

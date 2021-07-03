@@ -311,6 +311,10 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		serverMgr.OpenConnection();
 		CompanionServer.Server.Initialize();
+		using (BenchmarkTimer.New("Boombox.LoadStations"))
+		{
+			BoomBox.LoadStations();
+		}
 		if (ConVar.Time.pausewhileloading)
 		{
 			UnityEngine.Time.timeScale = timeScale;

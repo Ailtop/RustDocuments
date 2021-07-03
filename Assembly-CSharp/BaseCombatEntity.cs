@@ -117,9 +117,6 @@ public class BaseCombatEntity : BaseEntity
 
 	public bool markAttackerHostile = true;
 
-	[Tooltip("If diesAtZeroHealth is false, this can still take damagebut won't become 'dead' when it reaches zero health.")]
-	public bool diesAtZeroHealth = true;
-
 	public float _health;
 
 	public float _maxHealth = 100f;
@@ -481,7 +478,7 @@ public class BaseCombatEntity : BaseEntity
 					LastAttackedDir = (lastAttacker.transform.position - base.transform.position).normalized;
 				}
 			}
-			if (diesAtZeroHealth && Health() <= 0f)
+			if (Health() <= 0f)
 			{
 				Die(info);
 			}

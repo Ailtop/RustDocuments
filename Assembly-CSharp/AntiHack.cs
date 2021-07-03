@@ -33,6 +33,10 @@ public static class AntiHack
 			{
 				ply.lastAdminCheatTime = UnityEngine.Time.realtimeSinceStartup;
 			}
+			else if ((ply.IsAdmin || ply.IsDeveloper) && ply.lastAdminCheatTime == 0f)
+			{
+				ply.lastAdminCheatTime = UnityEngine.Time.realtimeSinceStartup;
+			}
 			if (ply.IsAdmin)
 			{
 				if (ConVar.AntiHack.userlevel < 1)
@@ -243,15 +247,18 @@ public static class AntiHack
 			Vector3 obj = (num ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
 			float running = 1f;
 			float ducking = 0f;
+			float crawling = 0f;
 			if (ConVar.AntiHack.speedhack_protection >= 2)
 			{
-				bool num2 = ply.IsRunning();
-				bool flag = ply.IsDucked();
-				bool flag2 = ply.IsSwimming();
-				running = (num2 ? 1f : 0f);
-				ducking = ((flag || flag2) ? 1f : 0f);
+				bool flag = ply.IsRunning();
+				bool flag2 = ply.IsDucked();
+				bool flag3 = ply.IsSwimming();
+				bool num2 = ply.IsCrawling();
+				running = (flag ? 1f : 0f);
+				ducking = ((flag2 || flag3) ? 1f : 0f);
+				crawling = (num2 ? 1f : 0f);
 			}
-			float speed = ply.GetSpeed(running, ducking);
+			float speed = ply.GetSpeed(running, ducking, crawling);
 			Vector3 v = obj - vector;
 			float num3 = v.Magnitude2D();
 			float num4 = deltaTime * speed;

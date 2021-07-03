@@ -12,6 +12,14 @@ using UnityEngine.Assertions;
 
 public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener where T : BaseEntity
 {
+	public class BaseCooldownState : BasicAIState
+	{
+		public BaseCooldownState()
+			: base(AIState.Cooldown)
+		{
+		}
+	}
+
 	public class BaseDismountedState : BasicAIState
 	{
 		public BaseDismountedState()
@@ -353,6 +361,8 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		public AIState StateType { get; private set; }
 
 		public float TimeInState { get; private set; }
+
+		public bool AgrresiveState { get; protected set; }
 
 		public virtual void StateEnter()
 		{
@@ -870,10 +880,19 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		if (!Rust.Application.isQuitting)
 		{
 			BaseEntity.Query.Server.RemoveBrain(GetEntity());
-			AIInformationZone forPoint = AIInformationZone.GetForPoint(base.transform.position);
-			if (forPoint != null)
+			AIInformationZone aIInformationZone = null;
+			HumanNPCNew humanNPCNew = GetEntity() as HumanNPCNew;
+			if (humanNPCNew != null)
 			{
-				forPoint.UnregisterSleepableEntity(this);
+				aIInformationZone = humanNPCNew.VirtualInfoZone;
+			}
+			if (aIInformationZone == null)
+			{
+				aIInformationZone = AIInformationZone.GetForPoint(base.transform.position);
+			}
+			if (aIInformationZone != null)
+			{
+				aIInformationZone.UnregisterSleepableEntity(this);
 			}
 			LeaveGroup();
 		}
@@ -973,6 +992,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		}
 		if (CurrentState != null)
 		{
+			UpdateAgressionTimer(delta);
 			StateStatus stateStatus = CurrentState.StateThink(delta);
 			if (Events != null)
 			{
@@ -1000,6 +1020,22 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		if (basicAIState != CurrentState)
 		{
 			SwitchToState(basicAIState);
+		}
+	}
+
+	private void UpdateAgressionTimer(float delta)
+	{
+		if (CurrentState == null)
+		{
+			Senses.TimeInAgressiveState = 0f;
+		}
+		else if (CurrentState.AgrresiveState)
+		{
+			Senses.TimeInAgressiveState += delta;
+		}
+		else
+		{
+			Senses.TimeInAgressiveState = 0f;
 		}
 	}
 

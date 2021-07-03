@@ -22,5 +22,6 @@ public enum AIState
 	Dismounted,
 	FollowPath,
 	NavigateHome,
-	CombatStationary
+	CombatStationary,
+	Cooldown
 }

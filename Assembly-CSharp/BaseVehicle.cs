@@ -32,6 +32,9 @@ public class BaseVehicle : BaseMountable
 	[Tooltip("Allow players to mount other mountables/ladders from this vehicle")]
 	public bool mountChaining = true;
 
+	[FormerlySerializedAs("seatClipCheck")]
+	public bool continuousClippingCheck;
+
 	public bool shouldShowHudHealth;
 
 	[Header("Rigidbody (Optional)")]
@@ -54,9 +57,6 @@ public class BaseVehicle : BaseMountable
 	private const float MIN_TIME_BETWEEN_PUSHES = 1f;
 
 	public TimeSince timeSinceLastPush;
-
-	[FormerlySerializedAs("seatClipCheck")]
-	public bool continuousClippingCheck;
 
 	public Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
 
@@ -179,10 +179,10 @@ public class BaseVehicle : BaseMountable
 		if (continuousClippingCheck && HasAnyPassengers())
 		{
 			Vector3 center = base.transform.TransformPoint(bounds.center);
-			int layerMask = 1210122497;
-			if (UnityEngine.Physics.OverlapBox(center, bounds.extents, base.transform.rotation, layerMask).Length != 0)
+			int num = (IsFlipped() ? 1218511105 : 1210122497);
+			if (UnityEngine.Physics.OverlapBox(center, bounds.extents, base.transform.rotation, num).Length != 0)
 			{
-				CheckSeatsForClipping();
+				CheckSeatsForClipping(num);
 			}
 		}
 		if ((bool)rigidBody)
@@ -247,16 +247,23 @@ public class BaseVehicle : BaseMountable
 		}
 		Vector3 position = mountable.transform.position;
 		Vector3 position2 = mountable.eyeOverride.transform.position;
-		Vector3 end = position + base.transform.up * 0.15f;
-		return GamePhysics.CheckCapsule(position2, end, 0.1f, mask);
+		Vector3 vector = position2 - position;
+		float num = 0.4f;
+		if (mountable.modifiesPlayerCollider)
+		{
+			num = Mathf.Min(num, mountable.customPlayerCollider.radius);
+		}
+		Vector3 start = position2 - vector * num;
+		Vector3 end = position + vector * (num + 0.05f);
+		return GamePhysics.CheckCapsule(start, end, num, mask);
 	}
 
-	public virtual void CheckSeatsForClipping()
+	public virtual void CheckSeatsForClipping(int mask)
 	{
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
 			BaseMountable mountable = mountPoint.mountable;
-			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable, 1210122497))
+			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable, mask))
 			{
 				SeatClippedWorld(mountable);
 			}

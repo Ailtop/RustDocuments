@@ -10,8 +10,6 @@ public class DungeonInfo : LandmarkInfo
 
 	public float LinkRadius = 3f;
 
-	public const float LinkRotation = 90f;
-
 	internal MonumentInfo Monument;
 
 	internal List<GameObject> Links = new List<GameObject>();
@@ -26,11 +24,9 @@ public class DungeonInfo : LandmarkInfo
 		return (base.transform.position - position).sqrMagnitude;
 	}
 
-	public bool IsValidSpawnPosition(Vector3 position, Quaternion rotation)
+	public bool IsValidSpawnPosition(Vector3 position)
 	{
-		Vector3 euler = SnapRotation(rotation.eulerAngles);
-		Vector3 position2 = SnapPosition(position);
-		OBB bounds = GetComponentInChildren<DungeonLinkBlockVolume>().GetBounds(position2, Quaternion.Euler(euler));
+		OBB bounds = GetComponentInChildren<DungeonLinkBlockVolume>().GetBounds(position, Quaternion.identity);
 		Vector3 vector = WorldSpaceGrid.ClosestGridCell(bounds.position, TerrainMeta.Size.x * 2f, CellSize);
 		Vector3 vector2 = bounds.position - vector;
 		if (!(Mathf.Abs(vector2.x) > 3f))
@@ -40,7 +36,7 @@ public class DungeonInfo : LandmarkInfo
 		return true;
 	}
 
-	private Vector3 SnapPosition(Vector3 pos)
+	public Vector3 SnapPosition(Vector3 pos)
 	{
 		pos.x = (float)Mathf.RoundToInt(pos.x / LinkRadius) * LinkRadius;
 		pos.y = (float)Mathf.CeilToInt(pos.y / LinkHeight) * LinkHeight;
@@ -48,19 +44,8 @@ public class DungeonInfo : LandmarkInfo
 		return pos;
 	}
 
-	private Vector3 SnapRotation(Vector3 rot)
-	{
-		rot.x = 0f;
-		rot.y = (float)Mathf.RoundToInt(rot.y / 90f) * 90f;
-		rot.z = 0f;
-		return rot;
-	}
-
 	protected override void Awake()
 	{
-		Vector3 euler = SnapRotation(base.transform.rotation.eulerAngles);
-		Vector3 position = SnapPosition(base.transform.position);
-		base.transform.SetPositionAndRotation(position, Quaternion.Euler(euler));
 		base.Awake();
 		Monument = base.transform.GetComponentInParent<MonumentInfo>();
 		if ((bool)TerrainMeta.Path)

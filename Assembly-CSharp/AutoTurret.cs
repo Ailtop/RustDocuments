@@ -717,8 +717,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SERVER_AttackAll(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -1308,7 +1308,10 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				}
 			}
 			SetTarget(component);
-			break;
+			if ((object)target != null)
+			{
+				break;
+			}
 		}
 	}
 

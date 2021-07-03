@@ -211,14 +211,26 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 							Vector3 pos = vector;
 							Quaternion quaternion2 = quaternion;
 							Vector3 localScale = prefab3.Object.transform.localScale;
-							Vector3 position = pos + quaternion2 * Vector3.Scale(localScale, dungeonEntrance ? dungeonEntrance.transform.position : Vector3.zero);
-							Quaternion rotation = quaternion2 * (dungeonEntrance ? dungeonEntrance.transform.rotation : Quaternion.identity);
 							if (zero != Vector3.zero)
 							{
 								quaternion2 *= Quaternion.LookRotation(rot90 * -zero.XZ3D());
 								pos -= quaternion2 * zero;
 							}
-							if (component.CheckPlacement(pos, quaternion2, localScale) && prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground) && (!dungeonEntrance || dungeonEntrance.IsValidSpawnPosition(position, rotation)))
+							if (!prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) || !component.CheckPlacement(pos, quaternion2, localScale))
+							{
+								continue;
+							}
+							if ((bool)dungeonEntrance)
+							{
+								Vector3 vector2 = pos + quaternion2 * Vector3.Scale(localScale, dungeonEntrance.transform.position);
+								Vector3 vector3 = dungeonEntrance.SnapPosition(vector2);
+								pos += vector3 - vector2;
+								if (!dungeonEntrance.IsValidSpawnPosition(vector3))
+								{
+									continue;
+								}
+							}
+							if (prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
 							{
 								SpawnInfo item = default(SpawnInfo);
 								item.prefab = prefab3;

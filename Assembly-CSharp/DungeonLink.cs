@@ -12,6 +12,8 @@ public class DungeonLink : MonoBehaviour
 
 	public int Priority;
 
+	public int Rotation;
+
 	protected void Start()
 	{
 		if (!(TerrainMeta.Path == null))

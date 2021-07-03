@@ -22,8 +22,8 @@ namespace ConVar
 		[ServerVar]
 		public static float groundwatchdelay = 0.1f;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool batchsynctransforms = true;
 
 		[ServerVar]

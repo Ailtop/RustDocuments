@@ -1,4 +1,5 @@
 using System;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 
@@ -12,8 +13,6 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 
 	public float lastDismountTime;
 
-	protected BaseAIBrain<HumanNPCNew> brain;
-
 	[NonSerialized]
 	protected bool lightsOn;
 
@@ -26,6 +25,8 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 	private float lastAimSetTime;
 
 	private Vector3 aimOverridePosition = Vector3.zero;
+
+	public BaseAIBrain<HumanNPCNew> Brain { get; private set; }
 
 	public override float StartHealth()
 	{
@@ -50,7 +51,7 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		brain = GetComponent<BaseAIBrain<HumanNPCNew>>();
+		Brain = GetComponent<BaseAIBrain<HumanNPCNew>>();
 		if (!base.isClient)
 		{
 			AIThinkManager.Add(this);
@@ -117,9 +118,9 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 		AttackEntity attackEntity = GetAttackEntity();
 		if ((bool)attackEntity)
 		{
-			return attackEntity.effectiveRange * (attackEntity.aiOnlyInRange ? 1f : 2f) * brain.AttackRangeMultiplier;
+			return attackEntity.effectiveRange * (attackEntity.aiOnlyInRange ? 1f : 2f) * Brain.AttackRangeMultiplier;
 		}
-		return brain.SenseRange;
+		return Brain.SenseRange;
 	}
 
 	public void SetDucked(bool flag)
@@ -136,9 +137,9 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 	public override void ServerThink(float delta)
 	{
 		base.ServerThink(delta);
-		if (brain.ShouldServerThink())
+		if (Brain.ShouldServerThink())
 		{
-			brain.DoThink();
+			Brain.DoThink();
 		}
 	}
 
@@ -195,7 +196,7 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 		BaseEntity initiator = info.Initiator;
 		if (initiator != null && !initiator.EqualNetID(this))
 		{
-			brain.Senses.Memory.SetKnown(initiator, this, null);
+			Brain.Senses.Memory.SetKnown(initiator, this, null);
 		}
 	}
 
@@ -206,9 +207,9 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 
 	public override Vector3 GetAimDirection()
 	{
-		if (brain != null && brain.Navigator != null && brain.Navigator.IsOverridingFacingDirection)
+		if (Brain != null && Brain.Navigator != null && Brain.Navigator.IsOverridingFacingDirection)
 		{
-			return brain.Navigator.FacingDirectionOverride;
+			return Brain.Navigator.FacingDirectionOverride;
 		}
 		return base.GetAimDirection();
 	}
@@ -291,6 +292,11 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 				}
 				if (LootSpawnSlots.Length != 0)
 				{
+					object obj = Interface.CallHook("OnCorpsePopulate", this, nPCPlayerCorpse);
+					if (obj is BaseCorpse)
+					{
+						return (BaseCorpse)obj;
+					}
 					LootContainer.LootSpawnSlot[] lootSpawnSlots = LootSpawnSlots;
 					for (int i = 0; i < lootSpawnSlots.Length; i++)
 					{
@@ -402,15 +408,15 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 	{
 		BaseEntity result = null;
 		float num = -1f;
-		foreach (BaseEntity player in brain.Senses.Players)
+		foreach (BaseEntity player in Brain.Senses.Players)
 		{
 			if (!(player == null) && !(player.Health() <= 0f))
 			{
 				float value = Vector3.Distance(player.transform.position, base.transform.position);
-				float num2 = 1f - Mathf.InverseLerp(1f, brain.SenseRange, value);
+				float num2 = 1f - Mathf.InverseLerp(1f, Brain.SenseRange, value);
 				float value2 = Vector3.Dot((player.transform.position - eyes.position).normalized, eyes.BodyForward());
-				num2 += Mathf.InverseLerp(brain.VisionCone, 1f, value2) / 2f;
-				num2 += (brain.Senses.Memory.IsLOS(player) ? 2f : 0f);
+				num2 += Mathf.InverseLerp(Brain.VisionCone, 1f, value2) / 2f;
+				num2 += (Brain.Senses.Memory.IsLOS(player) ? 2f : 0f);
 				if (num2 > num)
 				{
 					result = player;

@@ -359,6 +359,56 @@ namespace ConVar
 		}
 
 		[ServerVar]
+		public static void gesture_radius(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (basePlayer == null || !basePlayer.IsAdmin)
+			{
+				return;
+			}
+			float @float = arg.GetFloat(0);
+			List<string> list = Facepunch.Pool.GetList<string>();
+			for (int i = 0; i < 5; i++)
+			{
+				if (!string.IsNullOrEmpty(arg.GetString(i + 1)))
+				{
+					list.Add(arg.GetString(i + 1));
+				}
+			}
+			if (list.Count == 0)
+			{
+				arg.ReplyWith("No gestures provided. eg. player.gesture_radius 10f cabbagepatch raiseroof");
+				return;
+			}
+			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+			global::Vis.Entities(basePlayer.transform.position, @float, obj, 131072);
+			foreach (BasePlayer item in obj)
+			{
+				GestureConfig toPlay = basePlayer.gestureList.StringToGesture(list[Random.Range(0, list.Count)]);
+				item.Server_StartGesture(toPlay);
+			}
+			Facepunch.Pool.FreeList(ref obj);
+		}
+
+		[ServerVar]
+		public static void stopgesture_radius(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (basePlayer == null || !basePlayer.IsAdmin)
+			{
+				return;
+			}
+			float @float = arg.GetFloat(0);
+			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+			global::Vis.Entities(basePlayer.transform.position, @float, obj, 131072);
+			foreach (BasePlayer item in obj)
+			{
+				item.Server_CancelGesture();
+			}
+			Facepunch.Pool.FreeList(ref obj);
+		}
+
+		[ServerVar]
 		public static void markhostile(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);

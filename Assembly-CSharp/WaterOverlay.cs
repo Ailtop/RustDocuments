@@ -1,6 +1,8 @@
 using System;
+using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
-public class WaterOverlay : ImageEffectLayer, IClientComponent
+public class WaterOverlay : MonoBehaviour, IClientComponent
 {
 	[Serializable]
 	public struct EffectParams
@@ -27,6 +29,8 @@ public class WaterOverlay : ImageEffectLayer, IClientComponent
 			photoFilterDensity = 1f
 		};
 	}
+
+	public PostProcessVolume postProcessVolume;
 
 	public static bool goggles;
 

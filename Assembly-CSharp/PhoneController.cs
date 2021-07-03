@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
@@ -26,11 +27,15 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public bool AppendGridToName;
 
+	public bool IsMobile;
+
+	public bool CanSaveVoicemail;
+
 	public GameObjectRef PhoneDialog;
 
 	public VoiceProcessor VProcessor;
 
-	public SoundDefinition[] AllPreloadedContent;
+	public PreloadedCassetteContent PreloadedContent;
 
 	public SoundDefinition DialToneSfx;
 
@@ -64,7 +69,34 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public EntityRef currentPlayerRef;
 
+	public List<ProtoBuf.VoicemailEntry> savedVoicemail;
+
 	public Telephone.CallState serverState { get; set; }
+
+	public uint AnsweringMessageId
+	{
+		get
+		{
+			Telephone telephone;
+			if ((object)(telephone = base.baseEntity as Telephone) == null)
+			{
+				return 0u;
+			}
+			return telephone.AnsweringMessageId;
+		}
+	}
+
+	public int MaxVoicemailSlots
+	{
+		get
+		{
+			if (!(cachedCassette != null))
+			{
+				return 0;
+			}
+			return cachedCassette.MaximumVoicemailSlots;
+		}
+	}
 
 	public BasePlayer currentPlayer
 	{
@@ -82,13 +114,36 @@ public class PhoneController : EntityComponent<BaseEntity>
 		}
 	}
 
-	private bool isServer => base.baseEntity.isServer;
+	private bool isServer
+	{
+		get
+		{
+			if (base.baseEntity != null)
+			{
+				return base.baseEntity.isServer;
+			}
+			return false;
+		}
+	}
 
 	public int lastDialedNumber { get; set; }
 
 	public PhoneDirectory savedNumbers { get; set; }
 
 	public BaseEntity ParentEntity => base.baseEntity;
+
+	private Cassette cachedCassette
+	{
+		get
+		{
+			Telephone telephone;
+			if (!(base.baseEntity != null) || (object)(telephone = base.baseEntity as Telephone) == null)
+			{
+				return null;
+			}
+			return telephone.cachedCassette;
+		}
+	}
 
 	public void ServerInit()
 	{
@@ -254,7 +309,10 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		if (Interface.CallHook("OnPhoneDialTimeout", activeCallTo, this, activeCallTo.currentPlayer) == null)
 		{
-			activeCallTo.ServerPlayAnsweringMessage(this);
+			if (activeCallTo != null)
+			{
+				activeCallTo.ServerPlayAnsweringMessage(this);
+			}
 			SetPhoneState(Telephone.CallState.Idle);
 			Interface.CallHook("OnPhoneDialTimedOut", activeCallTo, this, activeCallTo.currentPlayer);
 		}
@@ -285,7 +343,27 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public void ServerPlayAnsweringMessage(PhoneController fromPhone)
 	{
-		OnDialFailed(Telephone.DialFailReason.TimedOut);
+		uint num = 0u;
+		uint num2 = 0u;
+		uint arg = 0u;
+		if (activeCallTo != null && activeCallTo.cachedCassette != null)
+		{
+			num = activeCallTo.cachedCassette.net.ID;
+			num2 = activeCallTo.cachedCassette.AudioId;
+			if (num2 == 0)
+			{
+				arg = StringPool.Get(activeCallTo.cachedCassette.PreloadedAudio.name);
+			}
+		}
+		if (num != 0)
+		{
+			base.baseEntity.ClientRPC(null, "ClientPlayAnsweringMessage", num, num2, arg, fromPhone.HasVoicemailSlot() ? 1 : 0, activeCallTo.PhoneNumber);
+			Invoke(TriggerTimeOut, activeCallTo.cachedCassette.MaxCassetteLength);
+		}
+		else
+		{
+			OnDialFailed(Telephone.DialFailReason.TimedOut);
+		}
 	}
 
 	private void TriggerTimeOut()
@@ -293,10 +371,15 @@ public class PhoneController : EntityComponent<BaseEntity>
 		OnDialFailed(Telephone.DialFailReason.TimedOut);
 	}
 
-	private void SetPhoneStateWithPlayer(Telephone.CallState state)
+	public void SetPhoneStateWithPlayer(Telephone.CallState state)
 	{
 		serverState = state;
 		base.baseEntity.ClientRPC(null, "SetClientState", (int)serverState, (activeCallTo != null) ? activeCallTo.PhoneNumber : 0);
+		MobilePhone mobilePhone;
+		if ((object)(mobilePhone = base.baseEntity as MobilePhone) != null)
+		{
+			mobilePhone.ToggleRinging(state == Telephone.CallState.Ringing);
+		}
 	}
 
 	private void SetPhoneState(Telephone.CallState state)
@@ -312,12 +395,21 @@ public class PhoneController : EntityComponent<BaseEntity>
 		{
 			telephone.MarkDirtyForceUpdateOutputs();
 		}
+		MobilePhone mobilePhone;
+		if ((object)(mobilePhone = base.baseEntity as MobilePhone) != null)
+		{
+			mobilePhone.ToggleRinging(state == Telephone.CallState.Ringing);
+		}
 	}
 
 	public void BeginCall()
 	{
 		if (Interface.CallHook("OnPhoneCallStart", this, activeCallTo, currentPlayer) == null)
 		{
+			if (IsMobile && activeCallTo != null && !activeCallTo.RequirePower)
+			{
+				bool flag = currentPlayer != null;
+			}
 			SetPhoneStateWithPlayer(Telephone.CallState.InProcess);
 			Invoke(TimeOutCall, TelephoneManager.MaxCallLength);
 			Interface.CallHook("OnPhoneCallStarted", this, activeCallTo, currentPlayer);
@@ -366,7 +458,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public void OnReceivedDataFromConnectedPhone(byte[] data)
 	{
-		base.baseEntity.ClientRPCEx(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.baseEntity.GetNetworkPosition(), 15f))
+		base.baseEntity.ClientRPCEx(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.transform.position, 15f))
 		{
 			priority = Priority.Immediate
 		}, null, "OnReceivedVoice", data.Length, data);
@@ -379,7 +471,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public void DestroyShared()
 	{
-		if (serverState != 0 && activeCallTo != null)
+		if (isServer && serverState != 0 && activeCallTo != null)
 		{
 			activeCallTo.RemoteHangUp();
 		}
@@ -481,6 +573,128 @@ public class PhoneController : EntityComponent<BaseEntity>
 		}
 		text += Convert.ToChar(64 + (int)num6);
 		return $"{text}{num4}";
+	}
+
+	public void WatchForDisconnects()
+	{
+		bool flag = false;
+		if (currentPlayer != null)
+		{
+			if (currentPlayer.IsSleeping())
+			{
+				flag = true;
+			}
+			if (currentPlayer.IsDead())
+			{
+				flag = true;
+			}
+			if (Vector3.Distance(base.transform.position, currentPlayer.transform.position) > 5f)
+			{
+				flag = true;
+			}
+		}
+		else
+		{
+			flag = true;
+		}
+		if (flag)
+		{
+			ServerHangUp();
+			ClearCurrentUser();
+		}
+	}
+
+	public void OnParentChanged(BaseEntity newParent)
+	{
+		if (newParent != null && newParent is BasePlayer)
+		{
+			TelephoneManager.RegisterTelephone(this, true);
+		}
+		else
+		{
+			TelephoneManager.DeregisterTelephone(this);
+		}
+	}
+
+	private bool HasVoicemailSlot()
+	{
+		return MaxVoicemailSlots > 0;
+	}
+
+	public void ServerSendVoicemail(BaseEntity.RPCMessage msg)
+	{
+		if (!(msg.player == null))
+		{
+			byte[] data = msg.read.BytesWithSize();
+			PhoneController telephone = TelephoneManager.GetTelephone(msg.read.Int32());
+			if (!(telephone == null) && Cassette.IsOggValid(data, telephone.cachedCassette))
+			{
+				telephone.SaveVoicemail(data, msg.player.displayName);
+			}
+		}
+	}
+
+	public void SaveVoicemail(byte[] data, string playerName)
+	{
+		uint audioId = FileStorage.server.Store(data, FileStorage.Type.ogg, base.baseEntity.net.ID);
+		if (savedVoicemail == null)
+		{
+			savedVoicemail = Pool.GetList<ProtoBuf.VoicemailEntry>();
+		}
+		ProtoBuf.VoicemailEntry voicemailEntry = Pool.Get<ProtoBuf.VoicemailEntry>();
+		voicemailEntry.audioId = audioId;
+		voicemailEntry.timestamp = DateTime.Now.ToBinary();
+		voicemailEntry.userName = playerName;
+		voicemailEntry.ShouldPool = false;
+		savedVoicemail.Add(voicemailEntry);
+		while (savedVoicemail.Count > MaxVoicemailSlots)
+		{
+			FileStorage.server.Remove(savedVoicemail[0].audioId, FileStorage.Type.ogg, base.baseEntity.net.ID);
+			savedVoicemail.RemoveAt(0);
+		}
+		base.baseEntity.SendNetworkUpdate();
+	}
+
+	public void ServerPlayVoicemail(BaseEntity.RPCMessage msg)
+	{
+		base.baseEntity.ClientRPC(null, "ClientToggleVoicemail", 1, msg.read.UInt32());
+	}
+
+	public void ServerStopVoicemail(BaseEntity.RPCMessage msg)
+	{
+		base.baseEntity.ClientRPC(null, "ClientToggleVoicemail", 0, msg.read.UInt32());
+	}
+
+	public void ServerDeleteVoicemail(BaseEntity.RPCMessage msg)
+	{
+		uint num = msg.read.UInt32();
+		for (int i = 0; i < savedVoicemail.Count; i++)
+		{
+			if (savedVoicemail[i].audioId == num)
+			{
+				ProtoBuf.VoicemailEntry obj = savedVoicemail[i];
+				FileStorage.server.Remove(obj.audioId, FileStorage.Type.ogg, base.baseEntity.net.ID);
+				obj.ShouldPool = true;
+				Pool.Free(ref obj);
+				savedVoicemail.RemoveAt(i);
+				base.baseEntity.SendNetworkUpdate();
+				break;
+			}
+		}
+	}
+
+	public void DeleteAllVoicemail()
+	{
+		if (savedVoicemail == null)
+		{
+			return;
+		}
+		foreach (ProtoBuf.VoicemailEntry item in savedVoicemail)
+		{
+			item.ShouldPool = true;
+			FileStorage.server.Remove(item.audioId, FileStorage.Type.ogg, base.baseEntity.net.ID);
+		}
+		Pool.FreeList(ref savedVoicemail);
 	}
 
 	private bool IsPowered()

@@ -26,6 +26,7 @@
     <Reference Include="Facepunch.Console">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="Rust.Global">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Global.dll</HintPath>
     </Reference>
@@ -35,7 +36,6 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
@@ -50,6 +50,9 @@
     </Reference>
     <Reference Include="Rust.Data">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>
@@ -78,9 +81,6 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
@@ -101,9 +101,6 @@
     </Reference>
     <Reference Include="Facepunch.Skeleton">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Skeleton.dll</HintPath>
-    </Reference>
-    <Reference Include="com.unity.postprocessing.Runtime">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\com.unity.postprocessing.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Input">
       <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>

@@ -13,16 +13,16 @@ namespace ConVar
 	[Factory("pool")]
 	public class Pool : ConsoleSystem
 	{
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int mode = 2;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool prewarm = true;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool enabled = true;
 
 		[ServerVar]
@@ -82,8 +82,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void print_assets(Arg arg)
 		{
 			if (AssetPool.storage.Count == 0)
@@ -109,8 +109,8 @@ namespace ConVar
 			arg.ReplyWith(textTable.ToString());
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void clear_memory(Arg arg)
 		{
 			Facepunch.Pool.Clear();
@@ -123,15 +123,15 @@ namespace ConVar
 			GameManager.server.pool.Clear();
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void clear_assets(Arg arg)
 		{
 			AssetPool.Clear();
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void export_prefabs(Arg arg)
 		{
 			PrefabPoolCollection pool = GameManager.server.pool;

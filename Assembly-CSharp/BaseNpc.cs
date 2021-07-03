@@ -106,8 +106,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			Player
 		}
 
-		[Range(0f, 1f)]
 		[Tooltip("Ai will be less likely to fight animals that are larger than them, and more likely to flee from them.")]
+		[Range(0f, 1f)]
 		public float Size;
 
 		[Tooltip("How fast we can move")]

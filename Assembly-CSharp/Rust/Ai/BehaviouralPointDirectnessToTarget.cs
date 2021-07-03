@@ -13,8 +13,8 @@ namespace Rust.Ai
 			Flank
 		}
 
-		[FriendlyName("Minimum Directness", "If Approach guided, this value should be greater than 0 to ensure we are approaching our target, but if Flank guided, we rather want this to be a slight negative number, -0.1 for instance.")]
 		[ApexSerialization]
+		[FriendlyName("Minimum Directness", "If Approach guided, this value should be greater than 0 to ensure we are approaching our target, but if Flank guided, we rather want this to be a slight negative number, -0.1 for instance.")]
 		private float minDirectness = -0.1f;
 
 		[FriendlyName("Maximum Directness", "If Retreat guided, this value should be less than 0 to ensure we are retreating from our target, but if Flank guided, we rather want this to be a slight positive number, 0.1 for instance.")]

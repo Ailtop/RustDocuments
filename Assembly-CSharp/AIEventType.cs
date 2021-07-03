@@ -22,5 +22,7 @@ public enum AIEventType
 	Chance,
 	TargetLost,
 	TimeSinceThreat,
-	OnPositionMemorySet
+	OnPositionMemorySet,
+	AggressionTimer,
+	Reloading
 }

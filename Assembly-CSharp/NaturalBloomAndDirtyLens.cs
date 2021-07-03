@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
 [AddComponentMenu("Image Effects/Natural Bloom and Dirty Lens")]
 public class NaturalBloomAndDirtyLens : MonoBehaviour
 {

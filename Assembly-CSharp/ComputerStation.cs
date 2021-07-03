@@ -6,6 +6,7 @@ using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
+using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -30,6 +31,10 @@ public class ComputerStation : BaseMountable
 
 	public SoundDefinition onLoopSoundDef;
 
+	public bool isStatic;
+
+	public float autoGatherRadius;
+
 	private float nextAddTime;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -40,7 +45,7 @@ public class ComputerStation : BaseMountable
 			if (rpc == 481778085 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddBookmark "));
 				}
@@ -69,7 +74,7 @@ public class ComputerStation : BaseMountable
 			if (rpc == 552248427 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BeginControllingBookmark "));
 				}
@@ -98,7 +103,7 @@ public class ComputerStation : BaseMountable
 			if (rpc == 2498687923u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DeleteBookmark "));
 				}
@@ -127,7 +132,7 @@ public class ComputerStation : BaseMountable
 			if (rpc == 2139261430 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_DisconnectControl "));
 				}
@@ -179,6 +184,48 @@ public class ComputerStation : BaseMountable
 		base.DestroyShared();
 	}
 
+	public override void ServerInit()
+	{
+		base.ServerInit();
+		Invoke(GatherStaticCameras, 5f);
+	}
+
+	public void GatherStaticCameras()
+	{
+		if (Rust.Application.isLoadingSave)
+		{
+			Invoke(GatherStaticCameras, 1f);
+		}
+		else
+		{
+			if (!isStatic || !(autoGatherRadius > 0f))
+			{
+				return;
+			}
+			List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+			Vis.Entities(base.transform.position, autoGatherRadius, obj, 256, QueryTriggerInteraction.Ignore);
+			foreach (BaseEntity item in obj)
+			{
+				IRemoteControllable component = item.GetComponent<IRemoteControllable>();
+				if (component != null)
+				{
+					CCTV_RC component2 = item.GetComponent<CCTV_RC>();
+					if ((!component2 || component2.IsStatic()) && !controlBookmarks.ContainsKey(component.GetIdentifier()))
+					{
+						ForceAddBookmark(component.GetIdentifier());
+					}
+				}
+			}
+			Facepunch.Pool.FreeList(ref obj);
+		}
+	}
+
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		GatherStaticCameras();
+	}
+
 	public void SetPlayerSecondaryGroupFor(BaseEntity ent)
 	{
 		BasePlayer mounted = _mounted;
@@ -219,7 +266,7 @@ public class ComputerStation : BaseMountable
 	public void DeleteBookmark(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!IsPlayerAdmin(player))
+		if (!IsPlayerAdmin(player) || isStatic)
 		{
 			return;
 		}
@@ -292,6 +339,10 @@ public class ComputerStation : BaseMountable
 		{
 			return false;
 		}
+		if (isStatic)
+		{
+			return false;
+		}
 		if (UnityEngine.Time.realtimeSinceStartup < nextAddTime)
 		{
 			return false;
@@ -304,11 +355,59 @@ public class ComputerStation : BaseMountable
 		return true;
 	}
 
+	public void ForceAddBookmark(string identifier)
+	{
+		if (controlBookmarks.Count >= 128 || !IsValidIdentifier(identifier))
+		{
+			return;
+		}
+		foreach (KeyValuePair<string, uint> controlBookmark in controlBookmarks)
+		{
+			if (controlBookmark.Key == identifier)
+			{
+				return;
+			}
+		}
+		uint num = 0u;
+		bool flag = false;
+		foreach (IRemoteControllable allControllable in RemoteControlEntity.allControllables)
+		{
+			if (allControllable != null && allControllable.GetIdentifier() == identifier)
+			{
+				if (!(allControllable.GetEnt() == null))
+				{
+					num = allControllable.GetEnt().net.ID;
+					flag = true;
+					break;
+				}
+				Debug.LogWarning("Computer station added bookmark with missing ent, likely a static CCTV (wipe the server)");
+			}
+		}
+		if (!flag)
+		{
+			return;
+		}
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(num);
+		if (baseNetworkable == null)
+		{
+			return;
+		}
+		IRemoteControllable component = baseNetworkable.GetComponent<IRemoteControllable>();
+		if (component != null)
+		{
+			string identifier2 = component.GetIdentifier();
+			if (identifier == identifier2)
+			{
+				controlBookmarks.Add(identifier, num);
+			}
+		}
+	}
+
 	[RPC_Server]
 	public void AddBookmark(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!IsPlayerAdmin(player))
+		if (!IsPlayerAdmin(player) || isStatic)
 		{
 			return;
 		}

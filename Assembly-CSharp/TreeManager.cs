@@ -114,8 +114,8 @@ public class TreeManager : BaseEntity
 		tree.scale = billboardEntity.transform.lossyScale.y;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(0uL)]
+	[RPC_Server]
 	private void SERVER_RequestTrees(RPCMessage msg)
 	{
 		BufferList<BaseEntity> values = entities.Values;

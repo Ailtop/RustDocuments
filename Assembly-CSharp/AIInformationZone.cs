@@ -70,10 +70,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 	{
 		AddInitialPoints();
 		areaBox = new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
-		if (!Virtual)
-		{
-			zones.Add(this);
-		}
+		zones.Add(this);
 		grid = GetComponent<AIInformationGrid>();
 		if (grid != null)
 		{
@@ -421,7 +418,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 		foreach (AIInformationZone zone in zones)
 		{
-			if (!(zone == null) && zone.areaBox.Contains(point))
+			if (!(zone == null) && !zone.Virtual && zone.areaBox.Contains(point))
 			{
 				return zone;
 			}
@@ -431,20 +428,24 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			return null;
 		}
 		float num = float.PositiveInfinity;
-		AIInformationZone result = zones[0];
+		AIInformationZone aIInformationZone = zones[0];
 		foreach (AIInformationZone zone2 in zones)
 		{
-			if (!(zone2 == null) && !(zone2.transform == null))
+			if (!(zone2 == null) && !(zone2.transform == null) && !zone2.Virtual)
 			{
 				float num2 = Vector3.Distance(zone2.transform.position, point);
 				if (num2 < num)
 				{
 					num = num2;
-					result = zone2;
+					aIInformationZone = zone2;
 				}
 			}
 		}
-		return result;
+		if (aIInformationZone.Virtual)
+		{
+			aIInformationZone = null;
+		}
+		return aIInformationZone;
 	}
 
 	public AIMovePoint GetBestMovePointNear(Vector3 targetPosition, Vector3 fromPosition, float minRange, float maxRange, bool checkLOS = false, BaseEntity forObject = null, bool returnClosest = false)
@@ -469,19 +470,16 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			float num3 = 0f;
 			Vector3 position = aIPoint3.transform.position;
 			float num4 = Vector3.Distance(targetPosition, position);
-			if (num4 > maxRange)
+			if (num4 < num2)
 			{
-				continue;
+				aIPoint2 = aIPoint3;
+				num2 = num4;
 			}
-			num3 += (aIPoint3.CanBeUsedBy(forObject) ? 100f : 0f);
-			num3 += (1f - Mathf.InverseLerp(minRange, maxRange, num4)) * 100f;
-			if (!(num3 < num))
+			if (!(num4 > maxRange))
 			{
-				if (num4 < num2)
-				{
-					aIPoint2 = aIPoint3;
-				}
-				if ((!checkLOS || !UnityEngine.Physics.Linecast(targetPosition + Vector3.up * 1f, position + Vector3.up * 1f, 1218519297, QueryTriggerInteraction.Ignore)) && num3 > num)
+				num3 += (aIPoint3.CanBeUsedBy(forObject) ? 100f : 0f);
+				num3 += (1f - Mathf.InverseLerp(minRange, maxRange, num4)) * 100f;
+				if (!(num3 < num) && (!checkLOS || !UnityEngine.Physics.Linecast(targetPosition + Vector3.up * 1f, position + Vector3.up * 1f, 1218519297, QueryTriggerInteraction.Ignore)) && num3 > num)
 				{
 					aIPoint = aIPoint3;
 					num = num3;

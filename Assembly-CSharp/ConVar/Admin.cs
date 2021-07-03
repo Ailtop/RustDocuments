@@ -81,7 +81,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				text = text + "hostname: " + Server.hostname + "\n";
-				text = text + "version : " + 2303 + " secure (secure mode enabled, connected to Steam3)\n";
+				text = text + "version : " + 2306 + " secure (secure mode enabled, connected to Steam3)\n";
 				text = text + "map     : " + Server.level + "\n";
 				text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -211,6 +211,42 @@ namespace ConVar
 			else
 			{
 				basePlayer.Hurt(1000f, DamageType.Suicide, basePlayer, false);
+			}
+		}
+
+		[ServerVar]
+		public static void injureplayer(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+			if (!basePlayer)
+			{
+				basePlayer = BasePlayer.FindBotClosestMatch(arg.GetString(0));
+			}
+			if (!basePlayer)
+			{
+				arg.ReplyWith("Player not found");
+			}
+			else
+			{
+				Global.InjurePlayer(basePlayer);
+			}
+		}
+
+		[ServerVar]
+		public static void recoverplayer(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+			if (!basePlayer)
+			{
+				basePlayer = BasePlayer.FindBotClosestMatch(arg.GetString(0));
+			}
+			if (!basePlayer)
+			{
+				arg.ReplyWith("Player not found");
+			}
+			else
+			{
+				Global.RecoverPlayer(basePlayer);
 			}
 		}
 

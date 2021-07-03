@@ -28,7 +28,7 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 
 	public virtual void TryThink()
 	{
-		if (brain.ShouldServerThink())
+		if (brain != null && HasBrain && brain.ShouldServerThink())
 		{
 			brain.DoThink();
 		}

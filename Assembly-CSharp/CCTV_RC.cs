@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -128,7 +129,7 @@ public class CCTV_RC : PoweredRemoteControlEntity
 		if (!IsStatic())
 		{
 			BasePlayer player = msg.player;
-			if (player.CanBuild() && player.IsBuildingAuthed())
+			if (player.CanBuild() && player.IsBuildingAuthed() && Interface.CallHook("OnCCTVDirectionChange", this, player) == null)
 			{
 				Vector3 direction = Vector3Ex.Direction(player.eyes.position, yaw.transform.position);
 				direction = base.transform.InverseTransformDirection(direction);

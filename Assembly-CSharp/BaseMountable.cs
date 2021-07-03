@@ -50,6 +50,9 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool disableMeshCullingForPlayers;
 
+	[SerializeField]
+	private bool unparentOnMount = true;
+
 	[FormerlySerializedAs("modifyPlayerCollider")]
 	public bool modifiesPlayerCollider;
 
@@ -304,7 +307,7 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual void AttemptMount(BasePlayer player, bool doMountChecks = true)
 	{
-		if (_mounted != null || IsDead())
+		if (_mounted != null || IsDead() || !player.CanMountMountablesNow())
 		{
 			return;
 		}
@@ -346,26 +349,30 @@ public class BaseMountable : BaseCombatEntity
 
 	public void MountPlayer(BasePlayer player)
 	{
-		if (!(_mounted != null) && !(mountAnchor == null) && Interface.CallHook("CanMountEntity", player, this) == null)
+		if (_mounted != null || mountAnchor == null || Interface.CallHook("CanMountEntity", player, this) != null)
 		{
-			player.EnsureDismounted();
-			_mounted = player;
+			return;
+		}
+		player.EnsureDismounted();
+		_mounted = player;
+		if (unparentOnMount)
+		{
 			TriggerParent triggerParent = player.FindTrigger<TriggerParent>();
 			if ((bool)triggerParent)
 			{
 				triggerParent.OnTriggerExit(player.GetComponent<Collider>());
 			}
-			player.MountObject(this);
-			player.MovePosition(mountAnchor.transform.position);
-			player.transform.rotation = mountAnchor.transform.rotation;
-			player.ServerRotation = mountAnchor.transform.rotation;
-			player.OverrideViewAngles(mountAnchor.transform.rotation.eulerAngles);
-			_mounted.eyes.NetworkUpdate(mountAnchor.transform.rotation);
-			player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
-			SetFlag(Flags.Busy, true);
-			OnPlayerMounted();
-			Interface.CallHook("OnEntityMounted", this, player);
 		}
+		player.MountObject(this);
+		player.MovePosition(mountAnchor.transform.position);
+		player.transform.rotation = mountAnchor.transform.rotation;
+		player.ServerRotation = mountAnchor.transform.rotation;
+		player.OverrideViewAngles(mountAnchor.transform.rotation.eulerAngles);
+		_mounted.eyes.NetworkUpdate(mountAnchor.transform.rotation);
+		player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
+		SetFlag(Flags.Busy, true);
+		OnPlayerMounted();
+		Interface.CallHook("OnEntityMounted", this, player);
 	}
 
 	public virtual void OnPlayerMounted()
@@ -405,6 +412,7 @@ public class BaseMountable : BaseCombatEntity
 			{
 				baseVehicle.PlayerDismounted(player, this);
 			}
+			Interface.CallHook("OnEntityDismounted", this, player);
 		}
 		else if (!GetDismountPosition(player, out res) || Distance(res) > 10f)
 		{
@@ -463,11 +471,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
 			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C59_0(hitInfo)))
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C60_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C59_0(hitInfo))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C60_0(hitInfo))
 				{
 					return true;
 				}

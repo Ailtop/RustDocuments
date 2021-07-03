@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ConVar;
+using Oxide.Core;
 using Rust.AI;
 using UnityEngine;
 
@@ -10,6 +11,8 @@ public class AIBrainSenses
 	public float MemoryDuration = 10f;
 
 	public float LastThreatTimestamp;
+
+	public float TimeInAgressiveState;
 
 	private static BaseEntity[] queryResults = new BaseEntity[64];
 
@@ -270,6 +273,10 @@ public class AIBrainSenses
 		{
 			if (!(entity == null) && !(entity.Health() <= 0f))
 			{
+				if (Interface.CallHook("OnNpcTarget", owner, entity) != null)
+				{
+					return null;
+				}
 				float num2 = Vector3.Distance(entity.transform.position, owner.transform.position);
 				if (num2 <= rangeFraction * maxRange && num2 < num)
 				{

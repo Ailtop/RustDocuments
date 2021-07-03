@@ -2134,18 +2134,18 @@ namespace Rust.Ai.HTN.Scientist
 		[Header("Context")]
 		private ScientistContext _context;
 
-		[ReadOnly]
 		[Header("Navigation")]
+		[ReadOnly]
 		[SerializeField]
 		private NavMeshAgent _navAgent;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2282,8 +2282,8 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[Header("Firearm Utility")]
 		[ReadOnly]
+		[Header("Firearm Utility")]
 		[SerializeField]
 		private float _lastFirearmUsageTime;
 

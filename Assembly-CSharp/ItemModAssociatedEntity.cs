@@ -15,12 +15,17 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 		if (item.instanceData == null)
 		{
 			BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, Vector3.zero);
+			OnAssociatedItemCreated(baseEntity.GetComponent<T>());
 			baseEntity.Spawn();
 			item.instanceData = new ProtoBuf.Item.InstanceData();
 			item.instanceData.ShouldPool = false;
 			item.instanceData.subEntity = baseEntity.net.ID;
 			item.MarkDirty();
 		}
+	}
+
+	protected virtual void OnAssociatedItemCreated(T ent)
+	{
 	}
 
 	public override void OnRemove(Item item)
@@ -105,11 +110,11 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 
 	public static T GetAssociatedEntity(Item item, bool isServer = true)
 	{
-		BaseNetworkable baseNetworkable = null;
-		if (item.instanceData == null)
+		if (item?.instanceData == null)
 		{
 			return null;
 		}
+		BaseNetworkable baseNetworkable = null;
 		if (isServer)
 		{
 			baseNetworkable = BaseNetworkable.serverEntities.Find(item.instanceData.subEntity);

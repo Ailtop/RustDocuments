@@ -12,6 +12,8 @@ public class MedicalTool : AttackEntity
 
 	public float healDurationOther = 4f;
 
+	public float healDurationOtherWounded = 7f;
+
 	public float maxDistanceOther = 2f;
 
 	public bool canUseOnOther = true;
@@ -99,8 +101,8 @@ public class MedicalTool : AttackEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void UseOther(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -121,8 +123,8 @@ public class MedicalTool : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void UseSelf(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

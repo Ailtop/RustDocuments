@@ -10,6 +10,8 @@ public class SocketMod_Attraction : SocketMod
 
 	public string groupName = "wallbottom";
 
+	public bool lockRotation;
+
 	private void OnDrawGizmosSelected()
 	{
 		Gizmos.matrix = base.transform.localToWorldMatrix;
@@ -29,6 +31,10 @@ public class SocketMod_Attraction : SocketMod
 		Vector3 vector = place.position + place.rotation * worldPosition;
 		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
 		Vis.Entities(vector, outerRadius * 2f, obj);
+		Vector3 position = Vector3.zero;
+		float num = float.MaxValue;
+		Vector3 position2 = place.position;
+		Quaternion rotation = Quaternion.identity;
 		foreach (BaseEntity item in obj)
 		{
 			if (item.isServer != isServer)
@@ -43,21 +49,38 @@ public class SocketMod_Attraction : SocketMod
 			AttractionPoint[] array2 = array;
 			foreach (AttractionPoint attractionPoint in array2)
 			{
-				if (!(attractionPoint.groupName != groupName))
+				if (attractionPoint.groupName != groupName)
 				{
-					Vector3 vector2 = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
-					float magnitude = (vector2 - vector).magnitude;
-					if (!(magnitude > outerRadius))
+					continue;
+				}
+				Vector3 vector2 = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
+				float magnitude = (vector2 - vector).magnitude;
+				if (lockRotation)
+				{
+					Vector3 vector3 = item.transform.TransformPoint(Vector3.LerpUnclamped(Vector3.zero, attractionPoint.worldPosition.WithY(0f), 2f));
+					float num2 = Vector3.Distance(vector3, position2);
+					if (num2 < num)
 					{
-						Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, vector2 - place.position, Vector3.up);
-						float num = Mathf.InverseLerp(outerRadius, innerRadius, magnitude);
-						place.rotation = Quaternion.Lerp(place.rotation, b, num);
-						vector = place.position + place.rotation * worldPosition;
-						Vector3 vector3 = vector2 - vector;
-						place.position += vector3 * num;
+						num = num2;
+						position = vector3;
+						rotation = item.transform.rotation;
 					}
 				}
+				if (!(magnitude > outerRadius))
+				{
+					Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, vector2 - place.position, Vector3.up);
+					float num3 = Mathf.InverseLerp(outerRadius, innerRadius, magnitude);
+					place.rotation = Quaternion.Lerp(place.rotation, b, num3);
+					vector = place.position + place.rotation * worldPosition;
+					Vector3 vector4 = vector2 - vector;
+					place.position += vector4 * num3;
+				}
 			}
+		}
+		if (num < float.MaxValue)
+		{
+			place.position = position;
+			place.rotation = rotation;
 		}
 		Pool.FreeList(ref obj);
 	}

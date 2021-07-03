@@ -2150,18 +2150,18 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[SerializeField]
 		private ScientistJunkpileContext _context;
 
-		[SerializeField]
-		[ReadOnly]
 		[Header("Navigation")]
+		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
 		[SerializeField]
 		[ReadOnly]
 		private Vector3 _spawnPosition;
 
+		[Header("Sensors")]
 		[ReadOnly]
 		[SerializeField]
-		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2305,13 +2305,13 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
+		[SerializeField]
 		[ReadOnly]
 		[Header("Firearm Utility")]
-		[SerializeField]
 		private float _lastFirearmUsageTime;
 
-		[ReadOnly]
 		[SerializeField]
+		[ReadOnly]
 		private bool _isFiring;
 
 		[ReadOnly]

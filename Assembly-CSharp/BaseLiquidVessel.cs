@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -238,6 +239,10 @@ public class BaseLiquidVessel : AttackEntity
 		float f = (UnityEngine.Time.realtimeSinceStartup - lastFillTime) * fillMlPerSec;
 		Vector3 pos = ownerPlayer.transform.position - new Vector3(0f, 1f, 0f);
 		LiquidContainer facingLiquidContainer = GetFacingLiquidContainer();
+		if (Interface.CallHook("OnLiquidVesselFill", this, ownerPlayer, facingLiquidContainer) != null)
+		{
+			return;
+		}
 		if (facingLiquidContainer == null && CanFillFromWorld())
 		{
 			AddLiquid(WaterResource.GetAtPoint(pos), Mathf.FloorToInt(f));

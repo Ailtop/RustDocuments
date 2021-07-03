@@ -17,12 +17,12 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static int maxthreads = 8;
 
-		[ServerVar(Saved = true)]
 		[ClientVar(Saved = true)]
+		[ServerVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -109,8 +109,8 @@ namespace ConVar
 			args.ReplyWith(text);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void textures(Arg args)
 		{
 			UnityEngine.Texture[] array = UnityEngine.Object.FindObjectsOfType<UnityEngine.Texture>();
@@ -228,10 +228,43 @@ namespace ConVar
 		[ServerVar]
 		public static void injure(Arg args)
 		{
-			BasePlayer basePlayer = ArgEx.Player(args);
-			if ((bool)basePlayer && !basePlayer.IsDead())
+			InjurePlayer(ArgEx.Player(args));
+		}
+
+		public static void InjurePlayer(BasePlayer ply)
+		{
+			if (ply == null || ply.IsDead())
 			{
-				basePlayer.StartWounded();
+				return;
+			}
+			if (Server.woundingenabled && !ply.IsIncapacitated() && !ply.IsSleeping() && !ply.isMounted)
+			{
+				if (ply.IsCrawling())
+				{
+					ply.GoToIncapacitated(null);
+				}
+				else
+				{
+					ply.BecomeWounded();
+				}
+			}
+			else
+			{
+				ply.ConsoleMessage("Can't go to wounded state right now.");
+			}
+		}
+
+		[ServerVar]
+		public static void recover(Arg args)
+		{
+			RecoverPlayer(ArgEx.Player(args));
+		}
+
+		public static void RecoverPlayer(BasePlayer ply)
+		{
+			if (!(ply == null) && !ply.IsDead())
+			{
+				ply.StopWounded();
 			}
 		}
 
@@ -471,22 +504,22 @@ namespace ConVar
 			GC.unload();
 		}
 
-		[ServerVar(ServerUser = true)]
 		[ClientVar]
+		[ServerVar(ServerUser = true)]
 		public static void version(Arg arg)
 		{
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);

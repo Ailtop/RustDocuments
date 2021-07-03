@@ -66,6 +66,11 @@ public class NPCSpawner : SpawnGroup
 				if (nPCPlayer != null)
 				{
 					nPCPlayer.VirtualInfoZone = VirtualInfoZone;
+					HumanNPCNew humanNPCNew = nPCPlayer as HumanNPCNew;
+					if (humanNPCNew != null)
+					{
+						humanNPCNew.VirtualInfoZone.RegisterSleepableEntity(humanNPCNew.Brain);
+					}
 				}
 			}
 			else

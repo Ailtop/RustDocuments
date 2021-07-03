@@ -54,8 +54,8 @@ public class CardTable : BaseVehicle
 
 	public EntityRef PotInstance;
 
-	[SerializeField]
 	[Header("Card Table")]
+	[SerializeField]
 	private GameObjectRef uiPrefab;
 
 	[SerializeField]
@@ -553,8 +553,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Editor_MakeRandomMove(RPCMessage msg)
 	{
 		if (UnityEngine.Application.isEditor)
@@ -574,8 +574,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

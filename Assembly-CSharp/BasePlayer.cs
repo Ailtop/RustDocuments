@@ -121,6 +121,7 @@ public class BasePlayer : BaseCombatEntity
 		Relaxed = 0x10000,
 		SafeZone = 0x20000,
 		ServerFall = 0x40000,
+		Incapacitated = 0x80000,
 		Workbench1 = 0x100000,
 		Workbench2 = 0x200000,
 		Workbench3 = 0x400000
@@ -311,10 +312,7 @@ public class BasePlayer : BaseCombatEntity
 	private BasePlayer teamLeaderBuffer;
 
 	[NonSerialized]
-	public ModelState modelState = new ModelState
-	{
-		onground = true
-	};
+	public ModelState modelState = new ModelState();
 
 	[NonSerialized]
 	public ModelState modelStateTick;
@@ -348,8 +346,8 @@ public class BasePlayer : BaseCombatEntity
 
 	private const int DRIVING = 64;
 
-	[ServerVar]
 	[Help("How many milliseconds to budget for processing life story updates per frame")]
+	[ServerVar]
 	public static float lifeStoryFramebudgetms = 0.25f;
 
 	[NonSerialized]
@@ -399,6 +397,8 @@ public class BasePlayer : BaseCombatEntity
 
 	public UnityEngine.Vector3 viewAngles;
 
+	public const int MaxBotIdRange = 10000000;
+
 	public float lastSubscriptionTick;
 
 	public float lastPlayerTick;
@@ -423,7 +423,7 @@ public class BasePlayer : BaseCombatEntity
 
 	private int? cachedAppToken;
 
-	private PersistantPlayer cachedPersistantPlayer;
+	public PersistantPlayer cachedPersistantPlayer;
 
 	public int SpectateOffset = 1000000;
 
@@ -480,9 +480,15 @@ public class BasePlayer : BaseCombatEntity
 
 	public float woundedDuration;
 
-	public float woundedStartTime;
+	public float lastWoundedStartTime = float.NegativeInfinity;
 
-	public float lastWoundedTime = float.NegativeInfinity;
+	public float healingWhileCrawling;
+
+	public bool woundedByFallDamage;
+
+	private const float INCAPACITATED_HEALTH_MIN = 2f;
+
+	private const float INCAPACITATED_HEALTH_MAX = 6f;
 
 	[Header("BasePlayer")]
 	public GameObjectRef fallDamageEffect;
@@ -529,9 +535,19 @@ public class BasePlayer : BaseCombatEntity
 
 	public string _lastSetName;
 
+	public const float crouchSpeed = 1.7f;
+
+	public const float walkSpeed = 2.8f;
+
+	public const float runSpeed = 5.5f;
+
+	public const float crawlSpeed = 0.72f;
+
 	public CapsuleColliderInfo playerColliderStanding;
 
 	public CapsuleColliderInfo playerColliderDucked;
+
+	public CapsuleColliderInfo playerColliderCrawling;
 
 	public CapsuleColliderInfo playerColliderLyingDown;
 
@@ -625,6 +641,30 @@ public class BasePlayer : BaseCombatEntity
 			if (InGesture)
 			{
 				return currentGesture.movementMode == GestureConfig.MovementCapabilities.NoMovement;
+			}
+			return false;
+		}
+	}
+
+	public bool CurrentGestureIsDance
+	{
+		get
+		{
+			if (InGesture)
+			{
+				return currentGesture.actionType == GestureConfig.GestureActionType.DanceAchievement;
+			}
+			return false;
+		}
+	}
+
+	public bool CurrentGestureIsFullBody
+	{
+		get
+		{
+			if (InGesture)
+			{
+				return currentGesture.playerModelLayer == GestureConfig.PlayerModelLayer.FullBody;
 			}
 			return false;
 		}
@@ -933,7 +973,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	public float secondsSinceWoundedStarted => UnityEngine.Time.realtimeSinceStartup - woundedStartTime;
+	public float TimeSinceWoundedStarted => UnityEngine.Time.realtimeSinceStartup - lastWoundedStartTime;
 
 	public Network.Connection Connection
 	{
@@ -1491,7 +1531,7 @@ public class BasePlayer : BaseCombatEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.CallsPerSecond.Test(1005040107u, "Server_CancelGesture", this, player, 1uL))
+						if (!RPC_Server.CallsPerSecond.Test(1005040107u, "Server_CancelGesture", this, player, 10uL))
 						{
 							return true;
 						}
@@ -1504,12 +1544,7 @@ public class BasePlayer : BaseCombatEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
-							rPCMessage.connection = msg.connection;
-							rPCMessage.player = player;
-							rPCMessage.read = msg.read;
-							RPCMessage msg16 = rPCMessage;
-							Server_CancelGesture(msg16);
+							Server_CancelGesture();
 						}
 					}
 					catch (Exception exception15)
@@ -1544,8 +1579,8 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg17 = rPCMessage;
-							Server_ClearMapMarkers(msg17);
+							RPCMessage msg16 = rPCMessage;
+							Server_ClearMapMarkers(msg16);
 						}
 					}
 					catch (Exception exception16)
@@ -1580,8 +1615,8 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg18 = rPCMessage;
-							Server_RemovePointOfInterest(msg18);
+							RPCMessage msg17 = rPCMessage;
+							Server_RemovePointOfInterest(msg17);
 						}
 					}
 					catch (Exception exception17)
@@ -1616,8 +1651,8 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg19 = rPCMessage;
-							Server_RequestMarkers(msg19);
+							RPCMessage msg18 = rPCMessage;
+							Server_RequestMarkers(msg18);
 						}
 					}
 					catch (Exception exception18)
@@ -1656,8 +1691,8 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg20 = rPCMessage;
-							Server_StartGesture(msg20);
+							RPCMessage msg19 = rPCMessage;
+							Server_StartGesture(msg19);
 						}
 					}
 					catch (Exception exception19)
@@ -1685,8 +1720,8 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg21 = rPCMessage;
-							ServerRPC_UnderwearChange(msg21);
+							RPCMessage msg20 = rPCMessage;
+							ServerRPC_UnderwearChange(msg20);
 						}
 					}
 					catch (Exception exception20)
@@ -1714,8 +1749,8 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg22 = rPCMessage;
-							SV_Drink(msg22);
+							RPCMessage msg21 = rPCMessage;
+							SV_Drink(msg21);
 						}
 					}
 					catch (Exception exception21)
@@ -1739,7 +1774,7 @@ public class BasePlayer : BaseCombatEntity
 		return true;
 	}
 
-	public bool UsedAdminCheat(float seconds = 1f)
+	public bool UsedAdminCheat(float seconds = 2f)
 	{
 		return UnityEngine.Time.realtimeSinceStartup - lastAdminCheatTime < seconds;
 	}
@@ -1768,6 +1803,7 @@ public class BasePlayer : BaseCombatEntity
 	{
 		violationLevel = 0f;
 		lastViolationTime = 0f;
+		lastAdminCheatTime = 0f;
 		speedhackPauseTime = 0f;
 		speedhackDistance = 0f;
 		flyhackPauseTime = 0f;
@@ -1794,8 +1830,8 @@ public class BasePlayer : BaseCombatEntity
 		return true;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_LootPlayer(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1822,8 +1858,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_KeepAlive(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && !(msg.player == this) && IsWounded() && Interface.CallHook("OnPlayerKeepAlive", this, msg.player) == null)
@@ -2076,9 +2112,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
@@ -2091,17 +2127,28 @@ public class BasePlayer : BaseCombatEntity
 
 	public void Server_StartGesture(GestureConfig toPlay)
 	{
-		if (toPlay != null && toPlay.IsOwnedBy(this) && toPlay.CanBeUsedBy(this))
+		if (!(toPlay != null) || !toPlay.IsOwnedBy(this) || !toPlay.CanBeUsedBy(this))
 		{
-			if (toPlay.animationType == GestureConfig.AnimationType.OneShot)
+			return;
+		}
+		if (toPlay.animationType == GestureConfig.AnimationType.OneShot)
+		{
+			Invoke(TimeoutGestureServer, toPlay.duration);
+		}
+		else if (toPlay.animationType == GestureConfig.AnimationType.Loop)
+		{
+			InvokeRepeating(MonitorLoopingGesture, 0f, 0f);
+		}
+		ClientRPC(null, "Client_StartGesture", toPlay.gestureId);
+		gestureFinishedTime = toPlay.duration;
+		currentGesture = toPlay;
+		if (toPlay.actionType == GestureConfig.GestureActionType.DanceAchievement)
+		{
+			TriggerDanceAchievement triggerDanceAchievement = FindTrigger<TriggerDanceAchievement>();
+			if (triggerDanceAchievement != null)
 			{
-				Invoke(TimeoutGestureServer, toPlay.duration);
+				triggerDanceAchievement.NotifyDanceStarted();
 			}
-			ClientRPC(null, "Client_StartGesture", toPlay.gestureId);
-			gestureFinishedTime = toPlay.duration;
-			currentGesture = toPlay;
-			GestureConfig.GestureActionType actionType = toPlay.actionType;
-			int num = 1;
 		}
 	}
 
@@ -2112,12 +2159,21 @@ public class BasePlayer : BaseCombatEntity
 
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.CallsPerSecond(1uL)]
-	private void Server_CancelGesture(RPCMessage msg)
+	[RPC_Server.CallsPerSecond(10uL)]
+	public void Server_CancelGesture()
 	{
 		currentGesture = null;
 		blockHeldInputTimer = 0f;
-		SignalBroadcast(Signal.Gesture, "cancel");
+		ClientRPC(null, "Client_RemoteCancelledGesture");
+		CancelInvoke(MonitorLoopingGesture);
+	}
+
+	private void MonitorLoopingGesture()
+	{
+		if (modelState.ducked || modelState.sleeping || IsWounded() || IsSwimming() || IsDead())
+		{
+			Server_CancelGesture();
+		}
 	}
 
 	private bool IsGestureBlocked()
@@ -2126,9 +2182,9 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return true;
 		}
-		if (!IsWounded() && !IsSwimming() && !(currentGesture != null) && !IsDead())
+		if (!IsWounded() && !IsSwimming() && !(currentGesture != null) && !IsDead() && !IsSleeping())
 		{
-			return IsSleeping();
+			return modelState.ducked;
 		}
 		return true;
 	}
@@ -2330,8 +2386,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_RemovePointOfInterest(RPCMessage msg)
 	{
 		if (ServerCurrentMapNote != null && Interface.CallHook("OnMapMarkerRemove", this, ServerCurrentMapNote) == null)
@@ -2343,15 +2399,15 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_RequestMarkers(RPCMessage msg)
 	{
 		SendMarkersToClient();
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_ClearMapMarkers(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMapMarkersClear", this, ServerCurrentMapNote) == null)
@@ -2405,7 +2461,8 @@ public class BasePlayer : BaseCombatEntity
 			modelState.sleeping = IsSleeping();
 			modelState.mounted = isMounted;
 			modelState.relaxed = IsRelaxed();
-			modelState.onPhone = HasActiveTelephone;
+			modelState.onPhone = HasActiveTelephone && !activeTelephone.IsMobile;
+			modelState.crawling = IsCrawling();
 			if (!base.limitNetworking && Interface.CallHook("OnSendModelState", this) == null)
 			{
 				ClientRPC(null, "OnModelState", modelState);
@@ -2436,6 +2493,15 @@ public class BasePlayer : BaseCombatEntity
 	public bool SwapSeatCooldown()
 	{
 		return UnityEngine.Time.time < nextSeatSwapTime;
+	}
+
+	public bool CanMountMountablesNow()
+	{
+		if (!IsDead())
+		{
+			return !IsWounded();
+		}
+		return false;
 	}
 
 	public void MountObject(BaseMountable mount, int desiredSeat = 0)
@@ -2738,12 +2804,13 @@ public class BasePlayer : BaseCombatEntity
 		bool flag2 = flag && basePlayer.IsSleeping();
 		bool flag3 = flag && basePlayer.IsWounded();
 		bool flag4 = flag && basePlayer.isMounted;
-		bool flag5 = hitEntity != null;
-		bool flag6 = flag5 && hitEntity.IsNpc;
-		bool flag7 = hitInfo.HitMaterial == Projectile.WaterMaterialID();
+		bool flag5 = flag && basePlayer.HasParent();
+		bool flag6 = hitEntity != null;
+		bool flag7 = flag6 && hitEntity.IsNpc;
+		bool flag8 = hitInfo.HitMaterial == Projectile.WaterMaterialID();
 		if (value.protection > 0)
 		{
-			bool flag8 = true;
+			bool flag9 = true;
 			float num2 = 1f + ConVar.AntiHack.projectile_forgiveness;
 			float projectile_clientframes = ConVar.AntiHack.projectile_clientframes;
 			float projectile_serverframes = ConVar.AntiHack.projectile_serverframes;
@@ -2759,33 +2826,33 @@ public class BasePlayer : BaseCombatEntity
 			if (flag && hitInfo.boneArea == (HitArea)(-1))
 			{
 				string text = hitInfo.ProjectilePrefab.name;
-				string text2 = (flag5 ? hitEntity.ShortPrefabName : "world");
+				string text2 = (flag6 ? hitEntity.ShortPrefabName : "world");
 				AntiHack.Log(this, AntiHackType.ProjectileHack, "Bone is invalid (" + text + " on " + text2 + " bone " + hitInfo.HitBone + ")");
 				stats.combat.Log(hitInfo, "projectile_bone");
-				flag8 = false;
+				flag9 = false;
 			}
-			if (flag7)
+			if (flag8)
 			{
-				if (flag5)
+				if (flag6)
 				{
 					string text3 = hitInfo.ProjectilePrefab.name;
-					string text4 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text4 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile water hit on entity (" + text3 + " on " + text4 + ")");
 					stats.combat.Log(hitInfo, "water_entity");
-					flag8 = false;
+					flag9 = false;
 				}
 				if (!WaterLevel.Test(hitInfo.HitPositionWorld, 0.5f, false, this))
 				{
 					string text5 = hitInfo.ProjectilePrefab.name;
-					string text6 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text6 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile water level (" + text5 + " on " + text6 + ")");
 					stats.combat.Log(hitInfo, "water_level");
-					flag8 = false;
+					flag9 = false;
 				}
 			}
 			if (value.protection >= 2)
 			{
-				if (flag5)
+				if (flag6)
 				{
 					float num12 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
 					float num13 = hitEntity.BoundsPadding() + num11 * num12;
@@ -2796,10 +2863,10 @@ public class BasePlayer : BaseCombatEntity
 						string shortPrefabName = hitEntity.ShortPrefabName;
 						AntiHack.Log(this, AntiHackType.ProjectileHack, "Entity too far away (" + text7 + " on " + shortPrefabName + " with " + num14 + "m > " + num13 + "m in " + num11 + "s)");
 						stats.combat.Log(hitInfo, "entity_distance");
-						flag8 = false;
+						flag9 = false;
 					}
 				}
-				if (value.protection >= 6 && flag8 && flag && !flag6 && !flag2 && !flag3 && !flag4)
+				if (value.protection >= 6 && flag9 && flag && !flag7 && !flag2 && !flag3 && !flag4 && !flag5)
 				{
 					float magnitude = basePlayer.GetParentVelocity().magnitude;
 					float num15 = basePlayer.BoundsPadding() + num11 * magnitude + ConVar.AntiHack.tickhistoryforgiveness;
@@ -2810,7 +2877,7 @@ public class BasePlayer : BaseCombatEntity
 						string shortPrefabName2 = basePlayer.ShortPrefabName;
 						AntiHack.Log(this, AntiHackType.ProjectileHack, "Player too far away (" + text8 + " on " + shortPrefabName2 + " with " + num16 + "m > " + num15 + "m in " + num11 + "s)");
 						stats.combat.Log(hitInfo, "player_distance");
-						flag8 = false;
+						flag9 = false;
 					}
 				}
 			}
@@ -2823,26 +2890,26 @@ public class BasePlayer : BaseCombatEntity
 				if (num19 > num17)
 				{
 					string text9 = hitInfo.ProjectilePrefab.name;
-					string text10 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text10 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too fast (" + text9 + " on " + text10 + " with " + num19 + "m > " + num17 + "m in " + num10 + "s)");
 					stats.combat.Log(hitInfo, "projectile_speed");
-					flag8 = false;
+					flag9 = false;
 				}
 				if (num19 > num18)
 				{
 					string text11 = hitInfo.ProjectilePrefab.name;
-					string text12 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text12 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too far away (" + text11 + " on " + text12 + " with " + num19 + "m > " + num18 + "m in " + num10 + "s)");
 					stats.combat.Log(hitInfo, "projectile_distance");
-					flag8 = false;
+					flag9 = false;
 				}
 				if (num6 > ConVar.AntiHack.projectile_desync)
 				{
 					string text13 = hitInfo.ProjectilePrefab.name;
-					string text14 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text14 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile desync (" + text13 + " on " + text14 + " with " + num6 + "s > " + ConVar.AntiHack.projectile_desync + "s)");
 					stats.combat.Log(hitInfo, "projectile_desync");
-					flag8 = false;
+					flag9 = false;
 				}
 			}
 			if (value.protection >= 3)
@@ -2851,43 +2918,43 @@ public class BasePlayer : BaseCombatEntity
 				UnityEngine.Vector3 pointStart = hitInfo.PointStart;
 				UnityEngine.Vector3 hitPositionWorld = hitInfo.HitPositionWorld;
 				UnityEngine.Vector3 vector = hitInfo.PositionOnRay(hitPositionWorld);
-				if (!flag7)
+				if (!flag8)
 				{
 					hitPositionWorld += hitInfo.HitNormalWorld.normalized * 0.001f;
 				}
 				bool num20 = GamePhysics.LineOfSight(position2, pointStart, vector, hitPositionWorld, layerMask);
 				if (!num20)
 				{
-					stats.Add("hit_" + (flag5 ? hitEntity.Categorize() : "world") + "_indirect_los", 1, Stats.Server);
+					stats.Add("hit_" + (flag6 ? hitEntity.Categorize() : "world") + "_indirect_los", 1, Stats.Server);
 				}
 				else
 				{
-					stats.Add("hit_" + (flag5 ? hitEntity.Categorize() : "world") + "_direct_los", 1, Stats.Server);
+					stats.Add("hit_" + (flag6 ? hitEntity.Categorize() : "world") + "_direct_los", 1, Stats.Server);
 				}
 				if (!num20)
 				{
 					string text15 = hitInfo.ProjectilePrefab.name;
-					string text16 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text16 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text15, " on ", text16, ") ", position2, " ", pointStart, " ", vector, " ", hitPositionWorld));
 					stats.combat.Log(hitInfo, "projectile_los");
-					flag8 = false;
+					flag9 = false;
 				}
-				if (flag8 && flag && !flag6)
+				if (flag9 && flag && !flag7)
 				{
 					UnityEngine.Vector3 hitPositionWorld2 = hitInfo.HitPositionWorld;
 					UnityEngine.Vector3 position3 = basePlayer.eyes.position;
 					UnityEngine.Vector3 vector2 = basePlayer.CenterPoint();
-					if (!flag7)
+					if (!flag8)
 					{
 						hitPositionWorld2 += hitInfo.HitNormalWorld.normalized * 0.001f;
 					}
 					if ((!GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(position3, hitPositionWorld2, layerMask, ConVar.AntiHack.losforgiveness, 0f)) && (!GamePhysics.LineOfSight(hitPositionWorld2, vector2, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(vector2, hitPositionWorld2, layerMask, ConVar.AntiHack.losforgiveness, 0f)))
 					{
 						string text17 = hitInfo.ProjectilePrefab.name;
-						string text18 = (flag5 ? hitEntity.ShortPrefabName : "world");
+						string text18 = (flag6 ? hitEntity.ShortPrefabName : "world");
 						AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text17, " on ", text18, ") ", hitPositionWorld2, " ", position3, " or ", hitPositionWorld2, " ", vector2));
 						stats.combat.Log(hitInfo, "projectile_los");
-						flag8 = false;
+						flag9 = false;
 					}
 				}
 			}
@@ -2903,18 +2970,18 @@ public class BasePlayer : BaseCombatEntity
 				if (num21 > ConVar.AntiHack.projectile_trajectory)
 				{
 					string text19 = value.projectilePrefab.name;
-					string text20 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text20 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + text19 + " on " + text20 + " with " + num21 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
 					stats.combat.Log(hitInfo, "trajectory_start");
-					flag8 = false;
+					flag9 = false;
 				}
 				if (num22 > ConVar.AntiHack.projectile_trajectory)
 				{
 					string text21 = value.projectilePrefab.name;
-					string text22 = (flag5 ? hitEntity.ShortPrefabName : "world");
+					string text22 = (flag6 ? hitEntity.ShortPrefabName : "world");
 					AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + text21 + " on " + text22 + " with " + num22 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
 					stats.combat.Log(hitInfo, "trajectory_end");
-					flag8 = false;
+					flag9 = false;
 				}
 				hitInfo.ProjectileVelocity = velocity;
 				if (playerProjectileAttack.hitVelocity != UnityEngine.Vector3.zero && velocity != UnityEngine.Vector3.zero)
@@ -2924,22 +2991,22 @@ public class BasePlayer : BaseCombatEntity
 					if (num23 > ConVar.AntiHack.projectile_anglechange)
 					{
 						string text23 = value.projectilePrefab.name;
-						string text24 = (flag5 ? hitEntity.ShortPrefabName : "world");
+						string text24 = (flag6 ? hitEntity.ShortPrefabName : "world");
 						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + text23 + " on " + text24 + " with " + num23 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
 						stats.combat.Log(hitInfo, "angle_change");
-						flag8 = false;
+						flag9 = false;
 					}
 					if (num24 > ConVar.AntiHack.projectile_velocitychange)
 					{
 						string text25 = value.projectilePrefab.name;
-						string text26 = (flag5 ? hitEntity.ShortPrefabName : "world");
+						string text26 = (flag6 ? hitEntity.ShortPrefabName : "world");
 						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + text25 + " on " + text26 + " with " + num24 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
 						stats.combat.Log(hitInfo, "velocity_change");
-						flag8 = false;
+						flag9 = false;
 					}
 				}
 			}
-			if (!flag8)
+			if (!flag9)
 			{
 				AntiHack.AddViolation(this, AntiHackType.ProjectileHack, ConVar.AntiHack.projectile_penalty);
 				playerProjectileAttack.ResetToPool();
@@ -2957,11 +3024,11 @@ public class BasePlayer : BaseCombatEntity
 		{
 			value.integrity = 0f;
 		}
-		else if (flag7)
+		else if (flag8)
 		{
 			value.integrity = Mathf.Clamp01(value.integrity - 0.1f);
 		}
-		else if (hitInfo.ProjectilePrefab.penetrationPower <= 0f || !flag5)
+		else if (hitInfo.ProjectilePrefab.penetrationPower <= 0f || !flag6)
 		{
 			value.integrity = 0f;
 		}
@@ -2971,7 +3038,7 @@ public class BasePlayer : BaseCombatEntity
 			value.integrity = Mathf.Clamp01(value.integrity - num25);
 			value.position += playerProjectileAttack.hitVelocity.normalized * 0.001f;
 		}
-		if (flag5)
+		if (flag6)
 		{
 			stats.Add(value.itemMod.category + "_hit_" + hitEntity.Categorize(), 1);
 		}
@@ -2991,9 +3058,9 @@ public class BasePlayer : BaseCombatEntity
 			}
 		}
 		firedProjectiles[playerAttack.projectileID] = value;
-		if (flag5)
+		if (flag6)
 		{
-			if (value.hits <= 1 || flag6 || (flag && !flag2))
+			if (value.hits <= 1 || flag7 || (flag && !flag2))
 			{
 				hitEntity.OnAttacked(hitInfo);
 			}
@@ -3008,8 +3075,8 @@ public class BasePlayer : BaseCombatEntity
 		playerProjectileAttack = null;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -3409,6 +3476,7 @@ public class BasePlayer : BaseCombatEntity
 		info.msg.basePlayer.inventory = inventory.Save(info.forDisk || flag);
 		modelState.sleeping = IsSleeping();
 		modelState.relaxed = IsRelaxed();
+		modelState.crawling = IsCrawling();
 		info.msg.basePlayer.modelState = modelState.Copy();
 		if (info.forDisk)
 		{
@@ -3506,6 +3574,10 @@ public class BasePlayer : BaseCombatEntity
 				LifeStoryStart();
 			}
 			mounted.uid = info.msg.basePlayer.mounted;
+			if (IsWounded())
+			{
+				Die();
+			}
 		}
 	}
 
@@ -4081,8 +4153,8 @@ public class BasePlayer : BaseCombatEntity
 		lastTickTime = UnityEngine.Time.time;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void ClientLoadingComplete(RPCMessage msg)
 	{
 	}
@@ -4195,8 +4267,8 @@ public class BasePlayer : BaseCombatEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.FromOwner]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -4231,7 +4303,7 @@ public class BasePlayer : BaseCombatEntity
 			TurnOffAllLights();
 			EnablePlayerCollider();
 			RemovePlayerRigidbody();
-			EnableServerFall(true);
+			SetServerFall(true);
 		}
 	}
 
@@ -4251,7 +4323,7 @@ public class BasePlayer : BaseCombatEntity
 
 	private void OnPhysicsNeighbourChanged()
 	{
-		if (IsSleeping() || IsWounded())
+		if (IsSleeping() || IsIncapacitated())
 		{
 			Invoke(DelayedServerFall, 0.05f);
 		}
@@ -4259,10 +4331,10 @@ public class BasePlayer : BaseCombatEntity
 
 	private void DelayedServerFall()
 	{
-		EnableServerFall(true);
+		SetServerFall(true);
 	}
 
-	public void EnableServerFall(bool wantsOn)
+	public void SetServerFall(bool wantsOn)
 	{
 		if (wantsOn && ConVar.Server.playerserverfall)
 		{
@@ -4283,9 +4355,9 @@ public class BasePlayer : BaseCombatEntity
 
 	public void ServerFall()
 	{
-		if (IsDead() || HasParent() || (!IsWounded() && !IsSleeping()))
+		if (IsDead() || HasParent() || (!IsIncapacitated() && !IsSleeping()))
 		{
-			EnableServerFall(false);
+			SetServerFall(false);
 			return;
 		}
 		float num = UnityEngine.Time.time - lastFallTime;
@@ -4302,7 +4374,7 @@ public class BasePlayer : BaseCombatEntity
 		RaycastHit hitInfo;
 		if (UnityEngine.Physics.SphereCast(origin, radius, UnityEngine.Vector3.down, out hitInfo, num5 + num2, 1537286401, QueryTriggerInteraction.Ignore))
 		{
-			EnableServerFall(false);
+			SetServerFall(false);
 			if (hitInfo.distance > num2)
 			{
 				position2 += UnityEngine.Vector3.down * (hitInfo.distance - num2);
@@ -4313,7 +4385,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		else if (UnityEngine.Physics.Raycast(origin, UnityEngine.Vector3.down, out hitInfo, num5 + radius + num2, 1537286401, QueryTriggerInteraction.Ignore))
 		{
-			EnableServerFall(false);
+			SetServerFall(false);
 			if (hitInfo.distance > num2 - radius)
 			{
 				position2 += UnityEngine.Vector3.down * (hitInfo.distance - num2 - radius);
@@ -4328,7 +4400,7 @@ public class BasePlayer : BaseCombatEntity
 			UpdateEstimatedVelocity(position, position2, num);
 			if (WaterLevel.Test(position2, true, this) || AntiHack.TestInsideTerrain(position2))
 			{
-				EnableServerFall(false);
+				SetServerFall(false);
 			}
 		}
 		MovePosition(position2);
@@ -4360,7 +4432,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		EnablePlayerCollider();
 		AddPlayerRigidbody();
-		EnableServerFall(false);
+		SetServerFall(false);
 		if (HasParent())
 		{
 			SetParent(null, true);
@@ -4442,8 +4514,8 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void OnPlayerLanded(RPCMessage msg)
 	{
 		float num = msg.read.Float();
@@ -4699,6 +4771,7 @@ public class BasePlayer : BaseCombatEntity
 		if (!activeGameMode || activeGameMode.CanPlayerRespawn(this))
 		{
 			SetPlayerFlag(PlayerFlags.Wounded, false);
+			SetPlayerFlag(PlayerFlags.Incapacitated, false);
 			SetPlayerFlag(PlayerFlags.Unused2, false);
 			SetPlayerFlag(PlayerFlags.Unused1, false);
 			SetPlayerFlag(PlayerFlags.ReceivingSnapshot, true);
@@ -4710,6 +4783,7 @@ public class BasePlayer : BaseCombatEntity
 			tickHistory.Reset(position);
 			lastTickTime = 0f;
 			StopWounded();
+			ResetWoundingVars();
 			StopSpectating();
 			UpdateNetworkGroup();
 			EnablePlayerCollider();
@@ -4748,13 +4822,13 @@ public class BasePlayer : BaseCombatEntity
 		RespawnAt(spawnPoint.pos, spawnPoint.rot);
 	}
 
-	public bool IsImmortal()
+	public bool IsImmortalTo(HitInfo info)
 	{
 		if (IsGod())
 		{
 			return true;
 		}
-		if (WoundingCausingImmportality())
+		if (WoundingCausingImmortality(info))
 		{
 			return true;
 		}
@@ -4768,7 +4842,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public override void Hurt(HitInfo info)
 	{
-		if (IsDead() || (IsImmortal() && info.damageTypes.Total() >= 0f) || Interface.CallHook("IOnBasePlayerHurt", this, info) != null)
+		if (IsDead() || (IsImmortalTo(info) && info.damageTypes.Total() >= 0f) || Interface.CallHook("IOnBasePlayerHurt", this, info) != null)
 		{
 			return;
 		}
@@ -4868,6 +4942,20 @@ public class BasePlayer : BaseCombatEntity
 		if (info.PointStart != UnityEngine.Vector3.zero && info.damageTypes.Total() >= 0f)
 		{
 			ClientRPCPlayer(null, this, "DirectionalDamage", info.PointStart, (int)info.damageTypes.GetMajorityDamageType());
+		}
+	}
+
+	public override void Heal(float amount)
+	{
+		if (IsCrawling())
+		{
+			float num = base.health;
+			base.Heal(amount);
+			healingWhileCrawling += base.health - num;
+		}
+		else
+		{
+			base.Heal(amount);
 		}
 	}
 
@@ -5291,53 +5379,12 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return false;
 		}
-		if (isMounted)
-		{
-			return IsVisibleMounted(otherPlayer);
-		}
-		if (IsDucked())
-		{
-			return IsVisibleCrouched(otherPlayer);
-		}
-		return IsVisibleStanding(otherPlayer);
-	}
-
-	private bool IsVisibleMounted(BasePlayer player)
-	{
-		UnityEngine.Vector3 worldMountedPosition = eyes.worldMountedPosition;
-		if (!player.IsVisible(worldMountedPosition, player.CenterPoint()) && !player.IsVisible(worldMountedPosition, player.transform.position) && !player.IsVisible(worldMountedPosition, player.eyes.position))
+		UnityEngine.Vector3 vector = (isMounted ? eyes.worldMountedPosition : (IsDucked() ? eyes.worldCrouchedPosition : ((!IsCrawling()) ? eyes.worldStandingPosition : eyes.worldCrawlingPosition)));
+		if (!otherPlayer.IsVisible(vector, otherPlayer.CenterPoint()) && !otherPlayer.IsVisible(vector, otherPlayer.transform.position) && !otherPlayer.IsVisible(vector, otherPlayer.eyes.position))
 		{
 			return false;
 		}
-		if (!IsVisible(player.CenterPoint(), worldMountedPosition) && !IsVisible(player.transform.position, worldMountedPosition) && !IsVisible(player.eyes.position, worldMountedPosition))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private bool IsVisibleCrouched(BasePlayer player)
-	{
-		UnityEngine.Vector3 worldCrouchedPosition = eyes.worldCrouchedPosition;
-		if (!player.IsVisible(worldCrouchedPosition, player.CenterPoint()) && !player.IsVisible(worldCrouchedPosition, player.transform.position) && !player.IsVisible(worldCrouchedPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldCrouchedPosition) && !IsVisible(player.transform.position, worldCrouchedPosition) && !IsVisible(player.eyes.position, worldCrouchedPosition))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	private bool IsVisibleStanding(BasePlayer player)
-	{
-		UnityEngine.Vector3 worldStandingPosition = eyes.worldStandingPosition;
-		if (!player.IsVisible(worldStandingPosition, player.CenterPoint()) && !player.IsVisible(worldStandingPosition, player.transform.position) && !player.IsVisible(worldStandingPosition, player.eyes.position))
-		{
-			return false;
-		}
-		if (!IsVisible(player.CenterPoint(), worldStandingPosition) && !IsVisible(player.transform.position, worldStandingPosition) && !IsVisible(player.eyes.position, worldStandingPosition))
+		if (!IsVisible(otherPlayer.CenterPoint(), vector) && !IsVisible(otherPlayer.transform.position, vector) && !IsVisible(otherPlayer.eyes.position, vector))
 		{
 			return false;
 		}
@@ -5694,7 +5741,7 @@ public class BasePlayer : BaseCombatEntity
 			}
 			UpdateActiveItem(msg.activeItem);
 			UpdateModelStateFromTick(msg);
-			if (!IsWounded())
+			if (!IsIncapacitated())
 			{
 				if (isMounted)
 				{
@@ -5958,21 +6005,37 @@ public class BasePlayer : BaseCombatEntity
 		return HasPlayerFlag(PlayerFlags.Wounded);
 	}
 
+	public bool IsCrawling()
+	{
+		if (HasPlayerFlag(PlayerFlags.Wounded))
+		{
+			return !HasPlayerFlag(PlayerFlags.Incapacitated);
+		}
+		return false;
+	}
+
+	public bool IsIncapacitated()
+	{
+		return HasPlayerFlag(PlayerFlags.Incapacitated);
+	}
+
 	private bool WoundInsteadOfDying(HitInfo info)
 	{
-		if (IsWounded())
-		{
-			return false;
-		}
 		if (!EligibleForWounding(info))
 		{
 			return false;
 		}
-		lastWoundedTime = UnityEngine.Time.realtimeSinceStartup;
-		base.health = UnityEngine.Random.Range(2, 6);
-		metabolism.bleeding.value = 0f;
-		StartWounded(info?.InitiatorPlayer, info);
+		BecomeWounded(info);
 		return true;
+	}
+
+	private void ResetWoundingVars()
+	{
+		CancelInvoke(WoundingTick);
+		woundedDuration = 0f;
+		lastWoundedStartTime = float.NegativeInfinity;
+		healingWhileCrawling = 0f;
+		woundedByFallDamage = false;
 	}
 
 	public virtual bool EligibleForWounding(HitInfo info)
@@ -5983,6 +6046,10 @@ public class BasePlayer : BaseCombatEntity
 			return (bool)obj;
 		}
 		if (!ConVar.Server.woundingenabled)
+		{
+			return false;
+		}
+		if (IsWounded())
 		{
 			return false;
 		}
@@ -5998,7 +6065,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return false;
 		}
-		if (UnityEngine.Time.realtimeSinceStartup - lastWoundedTime < ConVar.Server.rewounddelay)
+		if (!IsWounded() && UnityEngine.Time.realtimeSinceStartup - lastWoundedStartTime < ConVar.Server.rewounddelay)
 		{
 			return false;
 		}
@@ -6031,37 +6098,33 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	public void StartWounded(BasePlayer source = null, HitInfo info = null)
+	public void BecomeWounded(HitInfo info = null)
 	{
 		if (IsWounded() || Interface.CallHook("OnPlayerWound", this, info) != null)
 		{
 			return;
 		}
-		stats.Add("wounded", 1, (Stats)5);
-		woundedDuration = UnityEngine.Random.Range(40f, 50f);
-		woundedStartTime = UnityEngine.Time.realtimeSinceStartup;
-		SetPlayerFlag(PlayerFlags.Wounded, true);
-		EnableServerFall(true);
-		SendNetworkUpdateImmediate();
-		if (EACServer.playerTracker != null && net.connection != null && source != null && source.net.connection != null)
+		bool flag = info != null && info.damageTypes.GetMajorityDamageType() == DamageType.Fall;
+		if (IsCrawling())
 		{
-			using (TimeWarning.New("playerTracker.LogPlayerDowned"))
-			{
-				EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(net.connection);
-				EasyAntiCheat.Server.Hydra.Client client2 = EACServer.GetClient(source.net.connection);
-				EACServer.playerTracker.LogPlayerDowned(client, client2);
-			}
+			woundedByFallDamage |= flag;
+			GoToIncapacitated(info);
+			return;
 		}
-		Invoke(WoundingTick, 1f);
-		if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
+		woundedByFallDamage = flag;
+		if (flag)
 		{
-			BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerWounded(info.InitiatorPlayer, this, info);
+			GoToIncapacitated(info);
+		}
+		else
+		{
+			GoToCrawling(info);
 		}
 	}
 
 	public void StopWounded(BasePlayer source = null)
 	{
-		if (IsDead() || Interface.CallHook("OnPlayerRecover", this, source) != null)
+		if (!IsWounded())
 		{
 			return;
 		}
@@ -6080,7 +6143,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public void ProlongWounding(float delay)
 	{
-		woundedDuration = Mathf.Max(woundedDuration, Mathf.Min(secondsSinceWoundedStarted + delay, woundedDuration + delay));
+		woundedDuration = Mathf.Max(woundedDuration, Mathf.Min(TimeSinceWoundedStarted + delay, woundedDuration + delay));
 	}
 
 	private void WoundingTick()
@@ -6091,12 +6154,27 @@ public class BasePlayer : BaseCombatEntity
 			{
 				return;
 			}
-			if (secondsSinceWoundedStarted >= woundedDuration)
+			if (TimeSinceWoundedStarted >= woundedDuration)
 			{
-				if (UnityEngine.Random.Range(0, 100) < 20)
+				float num = (IsIncapacitated() ? ConVar.Server.incapacitatedrecoverchance : ConVar.Server.woundedrecoverchance);
+				float num2 = Mathf.Lerp(t: (metabolism.hydration.Fraction() + metabolism.calories.Fraction()) / 2f, a: 0f, b: ConVar.Server.woundedmaxfoodandwaterbonus);
+				float num3 = Mathf.Clamp01(num + num2);
+				if (UnityEngine.Random.value < num3)
 				{
 					RecoverFromWounded();
-					Interface.CallHook("OnPlayerRecovered", this);
+					return;
+				}
+				if (woundedByFallDamage)
+				{
+					Die();
+					return;
+				}
+				ItemDefinition itemDefinition = ItemManager.FindItemDefinition("largemedkit");
+				Item item = inventory.containerBelt.FindItemByItemID(itemDefinition.itemid);
+				if (item != null)
+				{
+					item.UseItem();
+					RecoverFromWounded();
 				}
 				else
 				{
@@ -6105,27 +6183,97 @@ public class BasePlayer : BaseCombatEntity
 			}
 			else
 			{
+				if (IsSwimming() && IsCrawling())
+				{
+					GoToIncapacitated(null);
+				}
 				Invoke(WoundingTick, 1f);
 			}
 		}
 	}
 
-	private void RecoverFromWounded()
+	private void GoToCrawling(HitInfo info)
 	{
-		SetPlayerFlag(PlayerFlags.Wounded, false);
+		base.health = UnityEngine.Random.Range(ConVar.Server.crawlingminhealth, ConVar.Server.crawlingmaxhealth);
+		metabolism.bleeding.value = 0f;
+		healingWhileCrawling = 0f;
+		WoundedStartSharedCode(info);
+		StartWoundedTick(40, 50);
+		SendNetworkUpdateImmediate();
+	}
+
+	public void GoToIncapacitated(HitInfo info)
+	{
+		if (!IsWounded())
+		{
+			WoundedStartSharedCode(info);
+		}
+		base.health = UnityEngine.Random.Range(2f, 6f);
+		metabolism.bleeding.value = 0f;
+		healingWhileCrawling = 0f;
+		SetPlayerFlag(PlayerFlags.Incapacitated, true);
+		SetServerFall(true);
+		BasePlayer basePlayer = info?.InitiatorPlayer;
+		if (EACServer.playerTracker != null && net.connection != null && basePlayer != null && basePlayer.net.connection != null)
+		{
+			using (TimeWarning.New("playerTracker.LogPlayerDowned"))
+			{
+				EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(net.connection);
+				EasyAntiCheat.Server.Hydra.Client client2 = EACServer.GetClient(basePlayer.net.connection);
+				EACServer.playerTracker.LogPlayerDowned(client, client2);
+			}
+		}
+		StartWoundedTick(10, 25);
+		SendNetworkUpdateImmediate();
+	}
+
+	private void WoundedStartSharedCode(HitInfo info)
+	{
+		stats.Add("wounded", 1, (Stats)5);
+		SetPlayerFlag(PlayerFlags.Wounded, true);
 		if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
 		{
-			BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerRevived(null, this);
+			BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerWounded(info.InitiatorPlayer, this, info);
 		}
 	}
 
-	private bool WoundingCausingImmportality()
+	private void StartWoundedTick(int minTime, int maxTime)
+	{
+		woundedDuration = UnityEngine.Random.Range(minTime, maxTime + 1);
+		lastWoundedStartTime = UnityEngine.Time.realtimeSinceStartup;
+		Invoke(WoundingTick, 1f);
+	}
+
+	private void RecoverFromWounded()
+	{
+		if (Interface.CallHook("OnPlayerRecover", this) == null)
+		{
+			if (IsCrawling())
+			{
+				base.health = UnityEngine.Random.Range(2f, 6f) + healingWhileCrawling;
+			}
+			healingWhileCrawling = 0f;
+			SetPlayerFlag(PlayerFlags.Wounded, false);
+			SetPlayerFlag(PlayerFlags.Incapacitated, false);
+			if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
+			{
+				BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerRevived(null, this);
+			}
+			Interface.CallHook("OnPlayerRecovered", this);
+		}
+	}
+
+	private bool WoundingCausingImmortality(HitInfo info)
 	{
 		if (!IsWounded())
 		{
 			return false;
 		}
-		if (secondsSinceWoundedStarted > 0.25f)
+		if (TimeSinceWoundedStarted > 0.25f)
+		{
+			return false;
+		}
+		if (info != null && info.damageTypes.GetMajorityDamageType() == DamageType.Fall)
 		{
 			return false;
 		}
@@ -6157,9 +6305,14 @@ public class BasePlayer : BaseCombatEntity
 
 	public bool CanInteract()
 	{
-		if (!IsDead() && !IsSleeping())
+		return CanInteract(false);
+	}
+
+	public bool CanInteract(bool usableWhileCrawling)
+	{
+		if (!IsDead() && !IsSleeping() && !IsSpectating() && (usableWhileCrawling ? (!IsIncapacitated()) : (!IsWounded())))
 		{
-			return !IsWounded();
+			return !HasActiveTelephone;
 		}
 		return false;
 	}
@@ -6235,6 +6388,7 @@ public class BasePlayer : BaseCombatEntity
 		eyes = GetComponent<PlayerEyes>();
 		playerColliderStanding = new CapsuleColliderInfo(playerCollider.height, playerCollider.radius, playerCollider.center);
 		playerColliderDucked = new CapsuleColliderInfo(1.5f, playerCollider.radius, UnityEngine.Vector3.up * 0.75f);
+		playerColliderCrawling = new CapsuleColliderInfo(playerCollider.radius, playerCollider.radius, UnityEngine.Vector3.up * playerCollider.radius);
 		playerColliderLyingDown = new CapsuleColliderInfo(0.4f, playerCollider.radius, UnityEngine.Vector3.up * 0.2f);
 		Belt = new PlayerBelt(this);
 	}
@@ -6304,11 +6458,15 @@ public class BasePlayer : BaseCombatEntity
 		}
 		if (RelationshipManager.ServerInstance != null)
 		{
-			if ((IsSleeping() || IsWounded()) && !RelationshipManager.ServerInstance.HasRelations(baseEntity.userID, userID))
+			if ((IsSleeping() || IsIncapacitated()) && !RelationshipManager.ServerInstance.HasRelations(baseEntity.userID, userID))
 			{
 				RelationshipManager.ServerInstance.SetRelationship(baseEntity, this, RelationshipManager.RelationshipType.Acquaintance);
 			}
 			RelationshipManager.ServerInstance.SetSeen(baseEntity, this);
+		}
+		if (IsCrawling())
+		{
+			GoToIncapacitated(null);
 		}
 		return base.OnStartBeingLooted(baseEntity);
 	}
@@ -6397,21 +6555,25 @@ public class BasePlayer : BaseCombatEntity
 
 	public float GetMinSpeed()
 	{
-		return GetSpeed(0f, 1f);
+		return GetSpeed(0f, 0f, 1f);
 	}
 
 	public float GetMaxSpeed()
 	{
-		return GetSpeed(1f, 0f);
+		return GetSpeed(1f, 0f, 0f);
 	}
 
-	public float GetSpeed(float running, float ducking)
+	public float GetSpeed(float running, float ducking, float crawling)
 	{
 		float num = 1f;
 		num -= clothingMoveSpeedReduction;
 		if (IsSwimming())
 		{
 			num += clothingWaterSpeedBonus;
+		}
+		if (crawling > 0f)
+		{
+			return Mathf.Lerp(2.8f, 0.72f, crawling) * num;
 		}
 		return Mathf.Lerp(Mathf.Lerp(2.8f, 5.5f, running), 1.7f, ducking) * num;
 	}
@@ -6453,7 +6615,7 @@ public class BasePlayer : BaseCombatEntity
 		base.OnAttacked(info);
 		if (base.isServer && base.isServer && info.hasDamage)
 		{
-			if (!info.damageTypes.Has(DamageType.Bleeding) && info.damageTypes.IsBleedCausing() && !IsWounded() && !IsImmortal())
+			if (!info.damageTypes.Has(DamageType.Bleeding) && info.damageTypes.IsBleedCausing() && !IsWounded() && !IsImmortalTo(info))
 			{
 				metabolism.bleeding.Add(info.damageTypes.Total() * 0.2f);
 			}
@@ -6549,7 +6711,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			nextColliderRefreshTime = UnityEngine.Time.time + 0.25f + UnityEngine.Random.Range(-0.05f, 0.05f);
 			BaseMountable baseMountable = GetMounted();
-			CapsuleColliderInfo capsuleColliderInfo = ((baseMountable != null && BaseEntityEx.IsValid(baseMountable)) ? ((!baseMountable.modifiesPlayerCollider) ? playerColliderStanding : baseMountable.customPlayerCollider) : ((IsWounded() || IsSleeping()) ? playerColliderLyingDown : ((!modelState.ducked) ? playerColliderStanding : playerColliderDucked)));
+			CapsuleColliderInfo capsuleColliderInfo = ((baseMountable != null && BaseEntityEx.IsValid(baseMountable)) ? ((!baseMountable.modifiesPlayerCollider) ? playerColliderStanding : baseMountable.customPlayerCollider) : ((IsIncapacitated() || IsSleeping()) ? playerColliderLyingDown : (IsCrawling() ? playerColliderCrawling : ((!modelState.ducked) ? playerColliderStanding : playerColliderDucked))));
 			if (playerCollider.height != capsuleColliderInfo.height || playerCollider.radius != capsuleColliderInfo.radius || playerCollider.center != capsuleColliderInfo.center)
 			{
 				playerCollider.height = capsuleColliderInfo.height;
@@ -6882,6 +7044,10 @@ public class BasePlayer : BaseCombatEntity
 		if (GetParentEntity() != null && GetParentEntity().BlocksWaterFor(this))
 		{
 			return 0f;
+		}
+		if (IsCrawling())
+		{
+			return Mathf.Clamp01(base.WaterFactor() * 2.5f);
 		}
 		return base.WaterFactor();
 	}

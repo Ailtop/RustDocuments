@@ -5,8 +5,8 @@ namespace UnityEngine.UI.Extensions
 	{
 		public Vector2 cornerSize = new Vector2(16f, 16f);
 
-		[SerializeField]
 		[Header("Corners to cut")]
+		[SerializeField]
 		private bool m_cutUL = true;
 
 		[SerializeField]
@@ -22,8 +22,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Up-Down colors become Left-Right colors")]
 		private bool m_makeColumns;
 
-		[SerializeField]
 		[Header("Color the cut bars differently")]
+		[SerializeField]
 		private bool m_useColorUp;
 
 		[SerializeField]
