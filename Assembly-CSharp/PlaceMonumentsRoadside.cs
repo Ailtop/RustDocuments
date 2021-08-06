@@ -145,7 +145,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				{
 					continue;
 				}
-				DungeonInfo dungeonEntrance = component.DungeonEntrance;
+				DungeonGridInfo dungeonEntrance = component.DungeonEntrance;
 				foreach (PathList road in TerrainMeta.Path.Roads)
 				{
 					switch (RoadType)
@@ -398,9 +398,9 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 						}
 					}
 				}
-				foreach (DungeonInfo dungeonEntrance in TerrainMeta.Path.DungeonEntrances)
+				foreach (DungeonGridInfo dungeonGridEntrance in TerrainMeta.Path.DungeonGridEntrances)
 				{
-					float num4 = dungeonEntrance.SqrDistance(monumentPos);
+					float num4 = dungeonGridEntrance.SqrDistance(monumentPos);
 					if (num4 < result.minDistanceSameType)
 					{
 						result.minDistanceSameType = num4;

@@ -57,6 +57,8 @@ public class Gibbable : PrefabAttribute, IClientComponent
 
 	public bool copyMaterialBlock = true;
 
+	public bool applyDamageTexture;
+
 	public PhysicMaterial physicsMaterial;
 
 	public GameObjectRef fxPrefab;

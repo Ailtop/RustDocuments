@@ -23,6 +23,8 @@ public class ItemModContainer : ItemMod
 
 	public List<ItemAmount> defaultContents = new List<ItemAmount>();
 
+	protected virtual bool ForceAcceptItemCheck => false;
+
 	public override void OnItemCreated(Item item)
 	{
 		if (!item.isServer || capacity <= 0)
@@ -40,9 +42,9 @@ public class ItemModContainer : ItemMod
 		item.contents = new ItemContainer();
 		item.contents.flags = containerFlags;
 		item.contents.allowedContents = ((onlyAllowedContents == (ItemContainer.ContentsType)0) ? ItemContainer.ContentsType.Generic : onlyAllowedContents);
-		item.contents.onlyAllowedItem = onlyAllowedItemType;
+		SetAllowedItems(item.contents);
 		item.contents.availableSlots = availableSlots;
-		if (validItemWhitelist != null && validItemWhitelist.Length != 0)
+		if ((validItemWhitelist != null && validItemWhitelist.Length != 0) || ForceAcceptItemCheck)
 		{
 			item.contents.canAcceptItem = CanAcceptItem;
 		}
@@ -51,7 +53,12 @@ public class ItemModContainer : ItemMod
 		item.contents.GiveUID();
 	}
 
-	private bool CanAcceptItem(Item item, int count)
+	protected virtual void SetAllowedItems(ItemContainer container)
+	{
+		container.SetOnlyAllowedItem(onlyAllowedItemType);
+	}
+
+	protected virtual bool CanAcceptItem(Item item, int count)
 	{
 		ItemDefinition[] array = validItemWhitelist;
 		for (int i = 0; i < array.Length; i++)

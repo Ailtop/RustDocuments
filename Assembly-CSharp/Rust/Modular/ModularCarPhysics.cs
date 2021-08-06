@@ -135,34 +135,6 @@ namespace Rust.Modular
 			lastMovingTime = Time.realtimeSinceStartup;
 		}
 
-		public void PushCar(BasePlayer player)
-		{
-			if (rBody.IsSleeping())
-			{
-				rBody.WakeUp();
-			}
-			if (modularCar.IsFlipped())
-			{
-				float num = rBody.mass * 8f;
-				Vector3 torque = Vector3.forward * num;
-				if (Vector3.Dot(transform.InverseTransformVector(transform.position - player.transform.position), Vector3.right) > 0f)
-				{
-					torque *= -1f;
-				}
-				if (transform.up.y < 0f)
-				{
-					torque *= -1f;
-				}
-				rBody.AddRelativeTorque(torque, ForceMode.Impulse);
-			}
-			else
-			{
-				Vector3 normalized = Vector3.ProjectOnPlane(transform.position - player.eyes.position, transform.up).normalized;
-				float num2 = rBody.mass * 4f;
-				rBody.AddForce(normalized * num2, ForceMode.Impulse);
-			}
-		}
-
 		public void FixedUpdate(float dt, float speed)
 		{
 			if (rBody.centerOfMass != prevLocalCOM)

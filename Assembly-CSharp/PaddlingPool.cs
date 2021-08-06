@@ -101,8 +101,8 @@ public class PaddlingPool : LiquidContainer, ISplashable
 		{
 			foreach (BaseEntity entityContent in waterVolume.entityContents)
 			{
-				PoolVehicle poolVehicle;
-				if ((poolVehicle = entityContent as PoolVehicle) != null)
+				IPoolVehicle poolVehicle;
+				if ((poolVehicle = entityContent as IPoolVehicle) != null)
 				{
 					poolVehicle.WakeUp();
 				}
@@ -123,19 +123,19 @@ public class PaddlingPool : LiquidContainer, ISplashable
 		{
 			return;
 		}
-		List<PoolVehicle> obj = Pool.GetList<PoolVehicle>();
+		List<IPoolVehicle> obj = Pool.GetList<IPoolVehicle>();
 		if (waterVolume.entityContents != null)
 		{
 			foreach (BaseEntity entityContent in waterVolume.entityContents)
 			{
-				PoolVehicle item;
-				if ((item = entityContent as PoolVehicle) != null)
+				IPoolVehicle item;
+				if ((item = entityContent as IPoolVehicle) != null)
 				{
 					obj.Add(item);
 				}
 			}
 		}
-		foreach (PoolVehicle item2 in obj)
+		foreach (IPoolVehicle item2 in obj)
 		{
 			item2.OnPoolDestroyed();
 		}

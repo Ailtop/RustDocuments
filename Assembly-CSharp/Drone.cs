@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Drone : RemoteControlEntity
 {
-	private struct DroneInputState
+	public struct DroneInputState
 	{
 		public Vector3 movement;
 

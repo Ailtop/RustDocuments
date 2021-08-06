@@ -95,6 +95,16 @@ public class EntityFuelSystem
 		return fuelItem.amount;
 	}
 
+	public float GetFuelFraction()
+	{
+		Item fuelItem = GetFuelItem();
+		if (fuelItem == null || fuelItem.amount < 1)
+		{
+			return 0f;
+		}
+		return Mathf.Clamp01((float)fuelItem.amount / (float)fuelItem.MaxStackable());
+	}
+
 	public bool HasFuel(bool forceCheck = false)
 	{
 		if (Time.time > nextFuelCheckTime || forceCheck)

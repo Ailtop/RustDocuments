@@ -156,8 +156,8 @@ public class BaseRidableAnimal : BaseVehicle
 	[Help("How many miliseconds to budget for processing ridable animals per frame")]
 	public static float framebudgetms = 1f;
 
-	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
 	[ServerVar]
+	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -352,7 +352,7 @@ public class BaseRidableAnimal : BaseVehicle
 		inventory = new ItemContainer();
 		inventory.entityOwner = this;
 		inventory.allowedContents = ((allowedContents == (ItemContainer.ContentsType)0) ? ItemContainer.ContentsType.Generic : allowedContents);
-		inventory.onlyAllowedItem = onlyAllowedItem;
+		inventory.SetOnlyAllowedItem(onlyAllowedItem);
 		inventory.maxStackSize = maxStackSize;
 		inventory.ServerInitialize(null, numSlots);
 		inventory.canAcceptItem = ItemFilter;
@@ -402,8 +402,8 @@ public class BaseRidableAnimal : BaseVehicle
 		return true;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -556,8 +556,8 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -783,17 +783,14 @@ public class BaseRidableAnimal : BaseVehicle
 		ItemManager.Create(Dung, 1, 0uL).Drop(base.transform.position + -base.transform.forward + Vector3.up * 1.1f + UnityEngine.Random.insideUnitSphere * 0.1f, -base.transform.forward);
 	}
 
-	public new void FixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
-		base.FixedUpdate();
-		if (!base.isClient)
+		base.VehicleFixedUpdate();
+		timeAlive += UnityEngine.Time.fixedDeltaTime;
+		if (!inQueue)
 		{
-			timeAlive += UnityEngine.Time.fixedDeltaTime;
-			if (!inQueue)
-			{
-				_processQueue.Enqueue(this);
-				inQueue = true;
-			}
+			_processQueue.Enqueue(this);
+			inQueue = true;
 		}
 	}
 

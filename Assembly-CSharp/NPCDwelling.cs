@@ -6,6 +6,8 @@ public class NPCDwelling : BaseEntity
 {
 	public NPCSpawner npcSpawner;
 
+	public float NPCSpawnChance = 1f;
+
 	public SpawnGroup[] spawnGroups;
 
 	public AIMovePoint[] movePoints;
@@ -16,7 +18,10 @@ public class NPCDwelling : BaseEntity
 	{
 		base.ServerInit();
 		UpdateInformationZone(false);
-		npcSpawner.SpawnInitial();
+		if (npcSpawner != null && Random.Range(0f, 1f) <= NPCSpawnChance)
+		{
+			npcSpawner.SpawnInitial();
+		}
 		SpawnGroup[] array = spawnGroups;
 		for (int i = 0; i < array.Length; i++)
 		{
@@ -63,7 +68,7 @@ public class NPCDwelling : BaseEntity
 
 	public void CheckDespawn()
 	{
-		if (!PlayersNearby() && npcSpawner.currentPopulation <= 0)
+		if (!PlayersNearby() && (!npcSpawner || npcSpawner.currentPopulation <= 0))
 		{
 			CleanupSpawned();
 			Kill();

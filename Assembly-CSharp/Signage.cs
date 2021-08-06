@@ -183,9 +183,9 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
-	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(5f)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))
@@ -225,7 +225,7 @@ public class Signage : IOEntity, ILOD, ISignage
 			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
 		}
 		SendNetworkUpdate();
-		Interface.CallHook("OnSignUpdated", this, msg.player);
+		Interface.CallHook("OnSignUpdated", this, msg.player, num);
 	}
 
 	public void EnsureInitialized()
@@ -346,8 +346,8 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))

@@ -22,17 +22,18 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	public float buoyancyScale = 1f;
 
-	public float submergedFraction;
-
 	public bool doEffects = true;
-
-	public Action<bool> SubmergedChanged;
 
 	public float flowMovementScale = 1f;
 
 	public float requiredSubmergedFraction;
 
+	public Action<bool> SubmergedChanged;
+
 	public BaseEntity forEntity;
+
+	[NonSerialized]
+	public float submergedFraction;
 
 	private BuoyancyPointData[] pointData;
 
@@ -47,6 +48,8 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 	private float[] pointWaterHeightArray;
 
 	private float timeInWater;
+
+	public float? ArtificialHeight;
 
 	public float waveHeightScale = 0.5f;
 
@@ -212,7 +215,12 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 			Vector2 posUV = pointPositionUVArray[j];
 			float terrainHeight = pointTerrainHeightArray[j];
 			float waterHeight = pointWaterHeightArray[j];
-			WaterLevel.WaterInfo buoyancyWaterInfo = WaterLevel.GetBuoyancyWaterInfo(position2, posUV, terrainHeight, waterHeight, forEntity);
+			if (ArtificialHeight.HasValue)
+			{
+				waterHeight = ArtificialHeight.Value;
+			}
+			bool doDeepwaterChecks = !ArtificialHeight.HasValue;
+			WaterLevel.WaterInfo buoyancyWaterInfo = WaterLevel.GetBuoyancyWaterInfo(position2, posUV, terrainHeight, waterHeight, doDeepwaterChecks, forEntity);
 			bool flag = false;
 			if (position2.y < buoyancyWaterInfo.surfaceLevel && buoyancyWaterInfo.isValid)
 			{

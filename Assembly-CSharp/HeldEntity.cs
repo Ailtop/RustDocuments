@@ -289,6 +289,11 @@ public class HeldEntity : BaseEntity
 		return false;
 	}
 
+	public virtual bool BlocksGestures()
+	{
+		return false;
+	}
+
 	protected Item GetOwnerItem()
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();

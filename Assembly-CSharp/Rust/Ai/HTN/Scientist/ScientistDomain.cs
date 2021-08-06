@@ -2130,13 +2130,13 @@ namespace Rust.Ai.HTN.Scientist
 
 		public OnPlanCompleted OnPlanCompletedEvent;
 
-		[SerializeField]
 		[Header("Context")]
+		[SerializeField]
 		private ScientistContext _context;
 
-		[Header("Navigation")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
 		[ReadOnly]
@@ -2191,9 +2191,9 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
+		[SerializeField]
 		[Header("Reasoners")]
 		[ReadOnly]
-		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2282,17 +2282,17 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[ReadOnly]
 		[Header("Firearm Utility")]
+		[ReadOnly]
 		[SerializeField]
 		private float _lastFirearmUsageTime;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private bool _isFiring;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		public bool ReducedLongRangeAccuracy;
 
 		private HTNUtilityAiClient _aiClient;

@@ -53,11 +53,31 @@ namespace ConVar
 		[ServerVar(Clientside = true, Help = "Renders a PNG of the current map's tunnel network")]
 		public static void rendertunnels(Arg arg)
 		{
+			RenderMapLayerToFile(arg, "tunnels", MapLayer.TrainTunnels);
+		}
+
+		[ServerVar(Clientside = true, Help = "Renders a PNG of the current map's underwater labs, for a specific floor")]
+		public static void renderlabs(Arg arg)
+		{
+			int underwaterLabFloorCount = MapLayerRenderer.GetOrCreate().GetUnderwaterLabFloorCount();
+			int @int = arg.GetInt(0);
+			if (@int < 0 || @int >= underwaterLabFloorCount)
+			{
+				arg.ReplyWith($"Floor number must be between 0 and {underwaterLabFloorCount}");
+			}
+			else
+			{
+				RenderMapLayerToFile(arg, $"labs_{@int}", (MapLayer)(1 + @int));
+			}
+		}
+
+		private static void RenderMapLayerToFile(Arg arg, string name, MapLayer layer)
+		{
 			try
 			{
-				TrainLayerRenderer orCreate = TrainLayerRenderer.GetOrCreate();
-				orCreate.Render();
-				string fullPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, $"tunnels_{global::World.Size}_{global::World.Seed}.png"));
+				MapLayerRenderer orCreate = MapLayerRenderer.GetOrCreate();
+				orCreate.Render(layer);
+				string fullPath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, $"{name}_{global::World.Size}_{global::World.Seed}.png"));
 				RenderTexture targetTexture = orCreate.renderCamera.targetTexture;
 				Texture2D texture2D = new Texture2D(targetTexture.width, targetTexture.height);
 				RenderTexture active = RenderTexture.active;
@@ -73,12 +93,12 @@ namespace ConVar
 					RenderTexture.active = active;
 					UnityEngine.Object.DestroyImmediate(texture2D);
 				}
-				arg.ReplyWith("Saved tunnels render to: " + fullPath);
+				arg.ReplyWith("Saved " + name + " render to: " + fullPath);
 			}
 			catch (Exception message)
 			{
 				Debug.LogWarning(message);
-				arg.ReplyWith("Failed to render the tunnels");
+				arg.ReplyWith("Failed to render " + name);
 			}
 		}
 	}

@@ -69,7 +69,7 @@ public class RHIB : MotorRowboat
 		}
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		gasPedal = Mathf.MoveTowards(gasPedal, targetGasPedal, UnityEngine.Time.fixedDeltaTime * 1f);
 		base.VehicleFixedUpdate();

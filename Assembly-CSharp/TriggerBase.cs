@@ -222,14 +222,9 @@ public class TriggerBase : BaseMonoBehaviour
 		Facepunch.Pool.FreeList(ref obj);
 	}
 
-	internal virtual bool SkipOnTriggerEnter(Collider collider)
-	{
-		return false;
-	}
-
 	public void OnTriggerEnter(Collider collider)
 	{
-		if (this == null || SkipOnTriggerEnter(collider))
+		if (this == null || !base.enabled)
 		{
 			return;
 		}

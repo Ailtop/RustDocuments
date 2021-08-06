@@ -23,7 +23,7 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 	public bool HasDungeonLink;
 
 	[HideInInspector]
-	public DungeonInfo DungeonEntrance;
+	public DungeonGridInfo DungeonEntrance;
 
 	protected override void Awake()
 	{
@@ -153,14 +153,14 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 		DungeonEntrance = FindDungeonEntrance();
 	}
 
-	private DungeonInfo FindDungeonEntrance()
+	private DungeonGridInfo FindDungeonEntrance()
 	{
-		return GetComponentInChildren<DungeonInfo>();
+		return GetComponentInChildren<DungeonGridInfo>();
 	}
 
 	private bool DetermineHasDungeonLink()
 	{
-		return GetComponentInChildren<DungeonLink>() != null;
+		return GetComponentInChildren<DungeonGridLink>() != null;
 	}
 
 	private bool DetermineWantsDungeonLink()

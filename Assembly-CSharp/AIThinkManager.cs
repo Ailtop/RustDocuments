@@ -17,12 +17,12 @@ public class AIThinkManager : BaseMonoBehaviour, IServerComponent
 
 	public static ListHashSet<IThinker> _animalremovalQueue = new ListHashSet<IThinker>();
 
-	[Help("How many miliseconds to budget for processing AI entities per server frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing AI entities per server frame")]
 	public static float framebudgetms = 2.5f;
 
-	[Help("How many miliseconds to budget for processing animal AI entities per server frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing animal AI entities per server frame")]
 	public static float animalframebudgetms = 2.5f;
 
 	private static int lastIndex = 0;

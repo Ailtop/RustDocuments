@@ -26,6 +26,12 @@ public class TokenisedPhrase : Translate.Phrase
 		str = str.Replace("[+voice]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+voice")).ToUpper()));
 		str = str.Replace("[+lockBreakHealthPercent]", $"{0.15f:0%}");
 		str = str.Replace("[+gestures]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+gestures")).ToUpper()));
+		str = str.Replace("[+left]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+left")).ToUpper()));
+		str = str.Replace("[+right]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+right")).ToUpper()));
+		str = str.Replace("[+backward]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+backward")).ToUpper()));
+		str = str.Replace("[+forward]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+forward")).ToUpper()));
+		str = str.Replace("[+sprint]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+sprint")).ToUpper());
+		str = str.Replace("[+duck]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+duck")).ToUpper());
 		return str;
 	}
 

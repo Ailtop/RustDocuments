@@ -85,6 +85,19 @@ public class VehicleEngineController
 		}
 	}
 
+	public EngineState EngineStateFrom(BaseEntity.Flags flags)
+	{
+		if (flags.HasFlag(engineStartingFlag))
+		{
+			return EngineState.Starting;
+		}
+		if (flags.HasFlag(BaseEntity.Flags.On))
+		{
+			return EngineState.On;
+		}
+		return EngineState.Off;
+	}
+
 	public void CancelEngineStart()
 	{
 		if (CurEngineState == EngineState.Starting)

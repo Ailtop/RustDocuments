@@ -83,19 +83,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 
 	public VehicleTerrainHandler serverTerrainHandler;
 
-	private const float MIN_TIME_BETWEEN_COLLISION_FX = 0.25f;
-
-	private const float MIN_COLLISION_FORCE = 20000f;
-
-	private const float MAX_COLLISION_FORCE = 2500000f;
-
 	public float nextCollisionFXTime;
-
-	private const float MIN_TIME_BETWEEN_COLLISION_DAMAGE = 0.33f;
-
-	private const float MIN_COLLISION_DAMAGE = 1f;
-
-	private const float MAX_COLLISION_DAMAGE = 200f;
 
 	public float nextCollisionDamageTime;
 
@@ -162,8 +150,8 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public SpawnSettings spawnSettings;
 
-	[SerializeField]
 	[Header("Fuel")]
+	[SerializeField]
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
@@ -176,14 +164,14 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[SerializeField]
 	public GameObjectRef collisionEffect;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	public MeshRenderer[] damageShowingRenderers;
 
 	[ServerVar(Help = "Population active on the server")]
 	public static float population = 3f;
 
-	[ServerVar(Help = "How many minutes before a ModularCar is killed while outside")]
+	[ServerVar(Help = "How many minutes before a ModularCar loses all its health while outside")]
 	public static float outsidedecayminutes = 216f;
 
 	public const BUTTON MouseSteerButton = BUTTON.DUCK;
@@ -332,6 +320,11 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		}
 	}
 
+	public override EntityFuelSystem GetFuelSystem()
+	{
+		return fuelSystem;
+	}
+
 	public float GetPlayerDamageMultiplier()
 	{
 		return Mathf.Abs(GetSpeed()) * 1f;
@@ -348,11 +341,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			QueueCollisionDamage(this, vector2.magnitude * 0.75f / UnityEngine.Time.deltaTime);
 			carPhysics.SetTempDrag(2.25f, 1f);
 		}
-	}
-
-	public override float GetComfort()
-	{
-		return 0f;
 	}
 
 	public float GetSteerInput()
@@ -476,14 +464,9 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			base.AttachedModuleEntities[i].PlayerServerInput(inputState, player);
 		}
-		if (!IsOn())
+		if (engineController.IsOff && ((inputState.IsDown(BUTTON.FORWARD) && !inputState.WasDown(BUTTON.FORWARD)) || (inputState.IsDown(BUTTON.BACKWARD) && !inputState.WasDown(BUTTON.BACKWARD))))
 		{
-			bool num2 = inputState.IsDown(BUTTON.FORWARD) && !inputState.WasDown(BUTTON.FORWARD);
-			bool flag = inputState.IsDown(BUTTON.BACKWARD) && !inputState.WasDown(BUTTON.BACKWARD) && !inputState.IsDown(BUTTON.FORWARD);
-			if (num2 || flag)
-			{
-				engineController.TryStartEngine(player);
-			}
+			engineController.TryStartEngine(player);
 		}
 	}
 
@@ -529,18 +512,9 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 
 	public override void Hurt(HitInfo info)
 	{
-		if (!IsDead())
+		if (!IsDead() && info.damageTypes.Get(DamageType.Decay) == 0f)
 		{
-			float num = info.damageTypes.Get(DamageType.Explosion) + info.damageTypes.Get(DamageType.AntiVehicle);
-			if (num > 3f)
-			{
-				float explosionForce = Mathf.Min(num * 650f, 150000f);
-				rigidBody.AddExplosionForce(explosionForce, info.HitPositionWorld, 1f, 2.5f);
-			}
-			if (info.damageTypes.Get(DamageType.Decay) == 0f)
-			{
-				PropagateDamageToModules(info, 0.5f / (float)base.NumAttachedModules, 0.9f / (float)base.NumAttachedModules, null);
-			}
+			PropagateDamageToModules(info, 0.5f / (float)base.NumAttachedModules, 0.9f / (float)base.NumAttachedModules, null);
 		}
 		base.Hurt(info);
 	}
@@ -586,11 +560,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			Hurt(damage, DamageType.Decay);
 		}
-	}
-
-	public override float GetSteering(BasePlayer player)
-	{
-		return SteerAngle;
 	}
 
 	public float GetAdjustedDriveForce(float absSpeed, float topSpeed)
@@ -765,13 +734,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		}
 	}
 
-	public override void DoPushAction(BasePlayer player)
-	{
-		player.metabolism.calories.Subtract(3f);
-		player.metabolism.SendChangesToClient();
-		carPhysics.PushCar(player);
-	}
-
 	public override Vector3 GetCOMMultiplier()
 	{
 		if (carPhysics == null || !carPhysics.IsGrounded() || !IsOn())
@@ -785,9 +747,11 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	{
 		if (HasDriver())
 		{
-			byte b = (byte)((GetThrottleInput() + 1f) * 7f);
-			byte b2 = (byte)(GetBrakeInput() * 15f);
-			ClientRPC(null, "ModularCarUpdate", SteerAngle, (byte)(b + (b2 << 4)), DriveWheelVelocity, (byte)(GetFuelFraction() * 255f));
+			byte num = (byte)((GetThrottleInput() + 1f) * 7f);
+			byte b = (byte)(GetBrakeInput() * 15f);
+			byte arg = (byte)(num + (b << 4));
+			byte arg2 = (byte)(GetFuelFraction() * 255f);
+			ClientRPC(null, "ModularCarUpdate", SteerAngle, arg, DriveWheelVelocity, arg2);
 		}
 	}
 
@@ -1068,15 +1032,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	{
 		if (base.isServer)
 		{
-			Item fuelItem = fuelSystem.GetFuelItem();
-			if (fuelItem == null || fuelItem.amount < 1)
-			{
-				cachedFuelFraction = 0f;
-			}
-			else
-			{
-				cachedFuelFraction = Mathf.Clamp01((float)fuelItem.amount / (float)fuelItem.MaxStackable());
-			}
+			return fuelSystem.GetFuelFraction();
 		}
 		return cachedFuelFraction;
 	}
@@ -1115,7 +1071,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return false;
 		}
-		if (pusher.isMounted || !pusher.IsOnGround())
+		if (pusher.isMounted || pusher.IsSwimming())
 		{
 			return false;
 		}

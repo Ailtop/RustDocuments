@@ -9,7 +9,7 @@ public class EnvironmentVolume : MonoBehaviour
 
 	public Vector3 Size = Vector3.one;
 
-	public BoxCollider trigger { get; private set; }
+	public Collider trigger { get; private set; }
 
 	protected virtual void Awake()
 	{
@@ -20,14 +20,18 @@ public class EnvironmentVolume : MonoBehaviour
 	{
 		if (!trigger)
 		{
-			trigger = base.gameObject.GetComponent<BoxCollider>();
+			trigger = base.gameObject.GetComponent<Collider>();
 		}
 		if (!trigger)
 		{
 			trigger = base.gameObject.AddComponent<BoxCollider>();
 		}
 		trigger.isTrigger = true;
-		trigger.center = Center;
-		trigger.size = Size;
+		BoxCollider boxCollider = trigger as BoxCollider;
+		if ((bool)boxCollider)
+		{
+			boxCollider.center = Center;
+			boxCollider.size = Size;
+		}
 	}
 }

@@ -22,8 +22,8 @@ namespace ConVar
 		[ServerVar(Help = "Do not damage any items")]
 		public static bool disablecondition = false;
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static bool callbacks = false;
 
 		[ServerVar]

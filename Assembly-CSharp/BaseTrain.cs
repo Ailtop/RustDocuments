@@ -41,8 +41,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 
 	public float initialSpawnTime;
 
-	[SerializeField]
 	[Header("Base Train")]
+	[SerializeField]
 	public float corpseSeconds = 60f;
 
 	[SerializeField]
@@ -85,8 +85,8 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	[SerializeField]
 	private ParticleSystemContainer[] sparks;
 
-	[SerializeField]
 	[FormerlySerializedAs("brakeSparkLights")]
+	[SerializeField]
 	private Light[] sparkLights;
 
 	public TrainTrackSpline.TrackSelection curTrackSelection;

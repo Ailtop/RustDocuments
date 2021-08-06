@@ -31,7 +31,7 @@ public class FileStorage : IDisposable
 
 	private MruDictionary<uint, CacheData> _cache = new MruDictionary<uint, CacheData>(1000);
 
-	public static FileStorage server = new FileStorage("sv.files." + 214, true);
+	public static FileStorage server = new FileStorage("sv.files." + 215, true);
 
 	protected FileStorage(string name, bool server)
 	{
@@ -165,7 +165,7 @@ public class FileStorage : IDisposable
 		}
 	}
 
-	internal void RemoveAllByEntity(uint entityid)
+	public void RemoveAllByEntity(uint entityid)
 	{
 		using (TimeWarning.New("FileStorage.RemoveAllByEntity"))
 		{

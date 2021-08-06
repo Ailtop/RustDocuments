@@ -31,7 +31,7 @@ public class GenerateRiverMeshes : ProceduralComponent
 				meshCollider.sharedMaterial = RiverPhysicMaterial;
 				meshCollider.sharedMesh = item.Meshes[0];
 				obj.AddComponent<RiverInfo>();
-				obj.AddComponent<WaterBody>();
+				obj.AddComponent<WaterBody>().FishingType = WaterBody.FishingTag.River;
 				obj.AddComponent<AddToWaterMap>();
 				obj.SetActive(true);
 			}

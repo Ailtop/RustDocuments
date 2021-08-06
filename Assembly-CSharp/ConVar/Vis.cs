@@ -7,13 +7,13 @@ namespace ConVar
 		[Help("Turns on debug display of lerp")]
 		public static bool lerp;
 
-		[Help("Turns on debug display of damages")]
 		[ServerVar]
+		[Help("Turns on debug display of damages")]
 		public static bool damage;
 
-		[Help("Turns on debug display of attacks")]
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
+		[Help("Turns on debug display of attacks")]
 		public static bool attack;
 
 		[ServerVar]
@@ -21,24 +21,24 @@ namespace ConVar
 		[Help("Turns on debug display of protection")]
 		public static bool protection;
 
-		[Help("Turns on debug display of weakspots")]
 		[ServerVar]
+		[Help("Turns on debug display of weakspots")]
 		public static bool weakspots;
 
 		[ServerVar]
 		[Help("Show trigger entries")]
 		public static bool triggers;
 
-		[Help("Turns on debug display of hitboxes")]
 		[ServerVar]
+		[Help("Turns on debug display of hitboxes")]
 		public static bool hitboxes;
 
-		[Help("Turns on debug display of line of sight checks")]
 		[ServerVar]
+		[Help("Turns on debug display of line of sight checks")]
 		public static bool lineofsight;
 
-		[Help("Turns on debug display of senses, which are received by Ai")]
 		[ServerVar]
+		[Help("Turns on debug display of senses, which are received by Ai")]
 		public static bool sense;
 	}
 }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[751]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[760]
 	{
 		new ConsoleSystem.Command
 		{
@@ -64,6 +64,48 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "forcefail",
+			Parent = "basefishingrod",
+			FullName = "basefishingrod.forcefail",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => BaseFishingRod.ForceFail.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseFishingRod.ForceFail = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "forcesuccess",
+			Parent = "basefishingrod",
+			FullName = "basefishingrod.forcesuccess",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => BaseFishingRod.ForceSuccess.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseFishingRod.ForceSuccess = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "immediatehook",
+			Parent = "basefishingrod",
+			FullName = "basefishingrod.immediatehook",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => BaseFishingRod.ImmediateHook.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseFishingRod.ImmediateHook = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "lifestoryframebudgetms",
 			Parent = "baseplayer",
 			FullName = "baseplayer.lifestoryframebudgetms",
@@ -113,6 +155,34 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				BaseRidableAnimal.framebudgetms = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "deepwaterdecayminutes",
+			Parent = "basesubmarine",
+			FullName = "basesubmarine.deepwaterdecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a submarine loses all its health while in deep water",
+			Variable = true,
+			GetOveride = () => BaseSubmarine.deepwaterdecayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseSubmarine.deepwaterdecayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "outsidedecayminutes",
+			Parent = "basesubmarine",
+			FullName = "basesubmarine.outsidedecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a submarine loses all its health while outside. If it's in deep water, deepwaterdecayminutes is used",
+			Variable = true,
+			GetOveride = () => BaseSubmarine.outsidedecayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseSubmarine.outsidedecayminutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -5405,6 +5475,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "cinematic_gesture",
+			Parent = "player",
+			FullName = "player.cinematic_gesture",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Player.cinematic_gesture(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "cinematic_play",
 			Parent = "player",
 			FullName = "player.cinematic_play",
@@ -8638,6 +8720,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "renderlabs",
+			Parent = "world",
+			FullName = "world.renderlabs",
+			ServerAdmin = true,
+			Client = true,
+			Description = "Renders a PNG of the current map's underwater labs, for a specific floor",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.World.renderlabs(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "rendermap",
 			Parent = "world",
 			FullName = "world.rendermap",
@@ -9010,7 +9106,7 @@ public class ConsoleGen
 			Parent = "hotairballoon",
 			FullName = "hotairballoon.outsidedecayminutes",
 			ServerAdmin = true,
-			Description = "How long before a HAB is killed while outside",
+			Description = "How long before a HAB loses all its health while outside",
 			Variable = true,
 			GetOveride = () => HotAirBalloon.outsidedecayminutes.ToString(),
 			SetOveride = delegate(string str)
@@ -9134,7 +9230,7 @@ public class ConsoleGen
 			Parent = "minicopter",
 			FullName = "minicopter.insidedecayminutes",
 			ServerAdmin = true,
-			Description = "How long before a minicopter is killed while indoors",
+			Description = "How long before a minicopter loses all its health while indoors",
 			Variable = true,
 			GetOveride = () => MiniCopter.insidedecayminutes.ToString(),
 			SetOveride = delegate(string str)
@@ -9148,7 +9244,7 @@ public class ConsoleGen
 			Parent = "minicopter",
 			FullName = "minicopter.outsidedecayminutes",
 			ServerAdmin = true,
-			Description = "How long before a minicopter is killed while outside",
+			Description = "How long before a minicopter loses all its health while outside",
 			Variable = true,
 			GetOveride = () => MiniCopter.outsidedecayminutes.ToString(),
 			SetOveride = delegate(string str)
@@ -9176,7 +9272,7 @@ public class ConsoleGen
 			Parent = "modularcar",
 			FullName = "modularcar.outsidedecayminutes",
 			ServerAdmin = true,
-			Description = "How many minutes before a ModularCar is killed while outside",
+			Description = "How many minutes before a ModularCar loses all its health while outside",
 			Variable = true,
 			GetOveride = () => ModularCar.outsidedecayminutes.ToString(),
 			SetOveride = delegate(string str)
@@ -9217,7 +9313,7 @@ public class ConsoleGen
 			Parent = "motorrowboat",
 			FullName = "motorrowboat.deepwaterdecayminutes",
 			ServerAdmin = true,
-			Description = "How long before a boat is killed while in deep water. If it's outside as well, the minimum of the two is used",
+			Description = "How long before a boat loses all its health while in deep water",
 			Variable = true,
 			GetOveride = () => MotorRowboat.deepwaterdecayminutes.ToString(),
 			SetOveride = delegate(string str)
@@ -9231,7 +9327,7 @@ public class ConsoleGen
 			Parent = "motorrowboat",
 			FullName = "motorrowboat.outsidedecayminutes",
 			ServerAdmin = true,
-			Description = "How long before a boat is killed while outside.  If it's in deep water as well, the minimum of the two is used",
+			Description = "How long before a boat loses all its health while outside. If it's in deep water, deepwaterdecayminutes is used",
 			Variable = true,
 			GetOveride = () => MotorRowboat.outsidedecayminutes.ToString(),
 			SetOveride = delegate(string str)
@@ -9841,6 +9937,32 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ScrapTransportHelicopter.population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "disable",
+			Parent = "simpleshark",
+			FullName = "simpleshark.disable",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SimpleShark.disable.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SimpleShark.disable = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "forcesurfaceamount",
+			Parent = "simpleshark",
+			FullName = "simpleshark.forcesurfaceamount",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SimpleShark.forceSurfaceAmount.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SimpleShark.forceSurfaceAmount = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

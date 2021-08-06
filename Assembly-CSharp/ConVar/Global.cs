@@ -17,12 +17,12 @@ namespace ConVar
 	{
 		private static int _developer;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int maxthreads = 8;
 
-		[ClientVar(Saved = true)]
 		[ServerVar(Saved = true)]
+		[ClientVar(Saved = true)]
 		public static int perf = 0;
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -31,8 +31,8 @@ namespace ConVar
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int developer
 		{
 			get
@@ -51,8 +51,8 @@ namespace ConVar
 			ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 		}
 
-		[ServerVar]
 		[ClientVar]
+		[ServerVar]
 		public static void quit(Arg args)
 		{
 			SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -493,8 +493,8 @@ namespace ConVar
 			basePlayer.Teleport(worldPosition);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void free(Arg args)
 		{
 			Pool.clear_prefabs(args);
@@ -504,22 +504,22 @@ namespace ConVar
 			GC.unload();
 		}
 
-		[ClientVar]
 		[ServerVar(ServerUser = true)]
+		[ClientVar]
 		public static void version(Arg arg)
 		{
 			arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysinfo(Arg arg)
 		{
 			arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void sysuid(Arg arg)
 		{
 			arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);
@@ -536,8 +536,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static void subscriptions(Arg arg)
 		{
 			TextTable textTable = new TextTable();

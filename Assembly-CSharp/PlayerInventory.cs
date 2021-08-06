@@ -283,8 +283,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return true;
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private void ItemCmd(BaseEntity.RPCMessage msg)
 	{
 		if (msg.player != null && msg.player.IsWounded())
@@ -324,8 +324,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private void MoveItem(BaseEntity.RPCMessage msg)
 	{
 		uint num = msg.read.UInt32();

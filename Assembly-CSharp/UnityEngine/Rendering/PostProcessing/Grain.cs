@@ -12,15 +12,15 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = true
 		};
 
-		[Tooltip("Grain strength. Higher values mean more visible grain.")]
 		[Range(0f, 1f)]
+		[Tooltip("Grain strength. Higher values mean more visible grain.")]
 		public FloatParameter intensity = new FloatParameter
 		{
 			value = 0f
 		};
 
-		[Tooltip("Grain particle size.")]
 		[Range(0.3f, 3f)]
+		[Tooltip("Grain particle size.")]
 		public FloatParameter size = new FloatParameter
 		{
 			value = 1f

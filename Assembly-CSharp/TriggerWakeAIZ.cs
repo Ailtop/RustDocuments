@@ -9,9 +9,13 @@ public class TriggerWakeAIZ : TriggerBase, IServerComponent
 
 	private AIInformationZone aiz;
 
-	private void Awake()
+	public void Init(AIInformationZone zone = null)
 	{
-		if (zones == null || zones.Count == 0)
+		if (zone != null)
+		{
+			aiz = zone;
+		}
+		else if (zones == null || zones.Count == 0)
 		{
 			Transform parent = base.transform.parent;
 			if (parent == null)
@@ -21,6 +25,11 @@ public class TriggerWakeAIZ : TriggerBase, IServerComponent
 			aiz = parent.GetComponentInChildren<AIInformationZone>();
 		}
 		SetZonesSleeping(true);
+	}
+
+	private void Awake()
+	{
+		Init();
 	}
 
 	private void SetZonesSleeping(bool flag)

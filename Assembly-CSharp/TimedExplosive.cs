@@ -21,6 +21,9 @@ public class TimedExplosive : BaseEntity
 
 	public GameObjectRef explosionEffect;
 
+	[Tooltip("Optional: Will fall back to explosionEffect if not assigned.")]
+	public GameObjectRef underwaterExplosionEffect;
+
 	public GameObjectRef stickEffect;
 
 	public GameObjectRef bounceEffect;
@@ -99,7 +102,16 @@ public class TimedExplosive : BaseEntity
 		{
 			component.enabled = false;
 		}
-		if (explosionEffect.isValid)
+		bool flag = false;
+		if (underwaterExplosionEffect.isValid)
+		{
+			flag = WaterLevel.GetWaterDepth(base.transform.position) > 1f;
+		}
+		if (flag)
+		{
+			Effect.server.Run(underwaterExplosionEffect.resourcePath, PivotPoint(), explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
+		}
+		else if (explosionEffect.isValid)
 		{
 			Effect.server.Run(explosionEffect.resourcePath, PivotPoint(), explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
 		}

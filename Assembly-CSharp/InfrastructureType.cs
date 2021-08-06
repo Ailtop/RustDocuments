@@ -3,5 +3,7 @@ public enum InfrastructureType
 	Road,
 	Power,
 	Trail,
-	Tunnel
+	Tunnel,
+	UnderwaterLab,
+	Boat
 }

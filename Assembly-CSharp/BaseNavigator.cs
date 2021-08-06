@@ -11,7 +11,8 @@ public class BaseNavigator : BaseMonoBehaviour
 	{
 		None,
 		NavMesh,
-		AStar
+		AStar,
+		Custom
 	}
 
 	public enum NavigationSpeed
@@ -35,6 +36,8 @@ public class BaseNavigator : BaseMonoBehaviour
 	public bool CanUseNavMesh = true;
 
 	public bool CanUseAStar = true;
+
+	public bool CanUseCustomNav;
 
 	public float StoppingDistance = 0.5f;
 
@@ -117,7 +120,7 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public BaseCombatEntity BaseEntity { get; private set; }
 
-	public Vector3 Destination { get; private set; }
+	public Vector3 Destination { get; protected set; }
 
 	public virtual bool IsOnNavMeshLink
 	{
@@ -323,6 +326,30 @@ public class BaseNavigator : BaseMonoBehaviour
 		return SetDestination(pos, GetSpeedFraction(speed), updateInterval, navmeshSampleDistance);
 	}
 
+	protected virtual bool SetCustomDestination(Vector3 pos, float speedFraction = 1f, float updateInterval = 0f)
+	{
+		if (!AI.move)
+		{
+			return false;
+		}
+		if (!AI.navthink)
+		{
+			return false;
+		}
+		if (!CanUseCustomNav)
+		{
+			return false;
+		}
+		paused = false;
+		if (ReachedPosition(pos))
+		{
+			return true;
+		}
+		currentSpeedFraction = speedFraction;
+		SetCurrentNavigationType(NavigationType.Custom);
+		return true;
+	}
+
 	public bool SetDestination(Vector3 pos, float speedFraction = 1f, float updateInterval = 0f, float navmeshSampleDistance = 0f)
 	{
 		if (!AI.move)
@@ -339,6 +366,10 @@ public class BaseNavigator : BaseMonoBehaviour
 			if (CanUseAStar && AStarGraph != null)
 			{
 				return SetDestination(AStarGraph, AStarGraph.GetClosestToPoint(pos), speedFraction);
+			}
+			if (CanUseCustomNav)
+			{
+				return SetCustomDestination(pos, speedFraction, updateInterval);
 			}
 			return false;
 		}
@@ -422,7 +453,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		}
 	}
 
-	private void SetCurrentNavigationType(NavigationType navType)
+	protected void SetCurrentNavigationType(NavigationType navType)
 	{
 		CurrentNavigationType = navType;
 		if (navType == NavigationType.NavMesh)
@@ -459,6 +490,9 @@ public class BaseNavigator : BaseMonoBehaviour
 		case NavigationType.NavMesh:
 			StopNavMesh();
 			break;
+		case NavigationType.Custom:
+			StopCustom();
+			break;
 		}
 		SetCurrentNavigationType(NavigationType.None);
 		paused = false;
@@ -473,6 +507,10 @@ public class BaseNavigator : BaseMonoBehaviour
 	{
 		currentAStarPath = null;
 		targetNode = null;
+	}
+
+	protected virtual void StopCustom()
+	{
 	}
 
 	public void Think(float delta)
@@ -500,6 +538,10 @@ public class BaseNavigator : BaseMonoBehaviour
 			else if (HasPath)
 			{
 				moveToPosition = GetNextPathPosition();
+			}
+			else if (CurrentNavigationType == NavigationType.Custom)
+			{
+				moveToPosition = Destination;
 			}
 			if (ValidateNextPosition(ref moveToPosition))
 			{
@@ -609,7 +651,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		facingDirectionEntity = null;
 	}
 
-	private bool ReachedPosition(Vector3 position)
+	protected bool ReachedPosition(Vector3 position)
 	{
 		return Vector3.Distance(position, base.transform.position) <= StoppingDistance;
 	}

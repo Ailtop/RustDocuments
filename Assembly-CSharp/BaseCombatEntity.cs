@@ -126,6 +126,7 @@ public class BaseCombatEntity : BaseEntity
 	[NonSerialized]
 	public float lastAttackedTime = float.NegativeInfinity;
 
+	[NonSerialized]
 	public float lastDealtDamageTime = float.NegativeInfinity;
 
 	public int lastNotifyFrame;
@@ -236,8 +237,8 @@ public class BaseCombatEntity : BaseEntity
 	{
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_PickupStart(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanPickup(rpc.player))

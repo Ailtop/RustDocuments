@@ -68,12 +68,16 @@ public class BaseMountable : BaseCombatEntity
 
 	public MountGestureType allowedGestures;
 
+	public bool canDrinkWhileMounted = true;
+
 	[Header("Camera")]
 	public BasePlayer.CameraMode MountedCameraMode;
 
 	public bool isMobile;
 
 	public float SideLeanAmount = 0.2f;
+
+	public static ListHashSet<BaseMountable> MobileMountables = new ListHashSet<BaseMountable>();
 
 	public const float playerHeight = 1.8f;
 
@@ -88,8 +92,6 @@ public class BaseMountable : BaseCombatEntity
 	}
 
 	public virtual bool IsSummerDlcVehicle => false;
-
-	public virtual bool CanDrinkWhileMounted => true;
 
 	public virtual bool BlocksDoors => true;
 
@@ -255,11 +257,6 @@ public class BaseMountable : BaseCombatEntity
 	{
 	}
 
-	public virtual float GetSteering(BasePlayer player)
-	{
-		return 0f;
-	}
-
 	public virtual void LightToggle(BasePlayer player)
 	{
 	}
@@ -341,7 +338,11 @@ public class BaseMountable : BaseCombatEntity
 	public void RPC_WantsDismount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (HasValidDismountPosition(player) && Interface.CallHook("OnPlayerWantsDismount", player, this) == null)
+		if (!HasValidDismountPosition(player))
+		{
+			Interface.CallHook("OnPlayerDismountFailed", player, this);
+		}
+		else if (Interface.CallHook("OnPlayerWantsDismount", player, this) == null)
 		{
 			AttemptDismount(player);
 		}
@@ -458,9 +459,9 @@ public class BaseMountable : BaseCombatEntity
 			}
 			else
 			{
-				Interface.CallHook("OnEntityDismounted", this, player);
 				player.ClientRPCPlayer(null, player, "ForcePositionTo", res);
 			}
+			Interface.CallHook("OnEntityDismounted", this, player);
 			OnPlayerDismounted(player);
 		}
 	}
@@ -471,11 +472,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
 			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C60_0(hitInfo)))
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C61_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C60_0(hitInfo))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C61_0(hitInfo))
 				{
 					return true;
 				}
@@ -530,29 +531,46 @@ public class BaseMountable : BaseCombatEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
+		if (isMobile)
+		{
+			MobileMountables.Add(this);
+		}
 	}
 
-	public void FixedUpdate()
+	internal override void DoServerDestroy()
 	{
-		if (!base.isClient && isMobile)
+		MobileMountables.Remove(this);
+		base.DoServerDestroy();
+	}
+
+	public static void FixedUpdateCycle()
+	{
+		for (int num = MobileMountables.Count - 1; num >= 0; num--)
 		{
-			VehicleFixedUpdate();
-			if ((bool)_mounted)
+			BaseMountable baseMountable = MobileMountables[num];
+			if (baseMountable == null)
 			{
-				_mounted.transform.rotation = mountAnchor.transform.rotation;
-				_mounted.ServerRotation = mountAnchor.transform.rotation;
-				_mounted.MovePosition(mountAnchor.transform.position);
+				MobileMountables.RemoveAt(num);
+			}
+			else
+			{
+				baseMountable.VehicleFixedUpdate();
 			}
 		}
 	}
 
-	protected virtual void VehicleFixedUpdate()
+	public virtual void VehicleFixedUpdate()
 	{
+		if ((bool)_mounted)
+		{
+			_mounted.transform.rotation = mountAnchor.transform.rotation;
+			_mounted.ServerRotation = mountAnchor.transform.rotation;
+			_mounted.MovePosition(mountAnchor.transform.position);
+		}
 	}
 
 	public virtual void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
-		bool flag = player != _mounted;
 	}
 
 	public virtual float GetComfort()

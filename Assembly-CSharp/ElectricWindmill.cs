@@ -1,5 +1,6 @@
 using System;
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 
@@ -87,19 +88,23 @@ public class ElectricWindmill : IOEntity
 
 	public void WindUpdate()
 	{
-		serverWindSpeed = GetWindSpeedScale();
-		if (!AmIVisible())
+		if (Interface.CallHook("OnWindUpdate", this) == null)
 		{
-			serverWindSpeed = 0f;
+			serverWindSpeed = GetWindSpeedScale();
+			if (!AmIVisible())
+			{
+				serverWindSpeed = 0f;
+			}
+			int num = Mathf.FloorToInt((float)maxPowerGeneration * serverWindSpeed);
+			bool num2 = currentEnergy != num;
+			currentEnergy = num;
+			if (num2)
+			{
+				MarkDirty();
+			}
+			SendNetworkUpdate();
+			Interface.CallHook("OnWindUpdated", this);
 		}
-		int num = Mathf.FloorToInt((float)maxPowerGeneration * serverWindSpeed);
-		bool num2 = currentEnergy != num;
-		currentEnergy = num;
-		if (num2)
-		{
-			MarkDirty();
-		}
-		SendNetworkUpdate();
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)

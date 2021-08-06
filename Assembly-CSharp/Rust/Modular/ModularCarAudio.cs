@@ -41,8 +41,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private float skidMaxSlip = 25f;
 
-		[SerializeField]
 		[Header("Movement & Suspension")]
+		[SerializeField]
 		private SoundDefinition movementStartOneshot;
 
 		[SerializeField]
@@ -72,8 +72,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private float suspensionLurchMinTimeBetweenSounds = 0.25f;
 
-		[SerializeField]
 		[Header("Water")]
+		[SerializeField]
 		private SoundDefinition waterSplashSoundDef;
 
 		[SerializeField]
@@ -86,8 +86,8 @@ namespace Rust.Modular
 		[SerializeField]
 		private SoundDefinition brakeSoundDef;
 
-		[SerializeField]
 		[Header("Lights")]
+		[SerializeField]
 		private SoundDefinition lightsToggleSound;
 
 		[Header("Wheels")]

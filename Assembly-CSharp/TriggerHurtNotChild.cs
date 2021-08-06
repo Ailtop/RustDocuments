@@ -3,7 +3,7 @@ using Facepunch;
 using Rust;
 using UnityEngine;
 
-public class TriggerHurtNotChild : TriggerBase, IServerComponent
+public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 {
 	public interface IHurtTriggerUser
 	{

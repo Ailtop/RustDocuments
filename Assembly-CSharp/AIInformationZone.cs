@@ -66,6 +66,58 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 	}
 
+	public static AIInformationZone Merge(List<AIInformationZone> zones, GameObject newRoot)
+	{
+		AIInformationZone aIInformationZone = newRoot.AddComponent<AIInformationZone>();
+		aIInformationZone.UseCalculatedCoverDistances = false;
+		foreach (AIInformationZone zone in zones)
+		{
+			if (zone == null)
+			{
+				continue;
+			}
+			foreach (AIMovePoint movePoint in zone.movePoints)
+			{
+				aIInformationZone.AddMovePoint(movePoint);
+				movePoint.transform.SetParent(newRoot.transform);
+			}
+			foreach (AICoverPoint coverPoint in zone.coverPoints)
+			{
+				aIInformationZone.AddCoverPoint(coverPoint);
+				coverPoint.transform.SetParent(newRoot.transform);
+			}
+		}
+		aIInformationZone.bounds = EncapsulateBounds(zones);
+		aIInformationZone.bounds.extents += new Vector3(5f, 0f, 5f);
+		aIInformationZone.bounds.center -= aIInformationZone.transform.position;
+		for (int num = zones.Count - 1; num >= 0; num--)
+		{
+			AIInformationZone aIInformationZone2 = zones[num];
+			if (!(aIInformationZone2 == null))
+			{
+				UnityEngine.Object.Destroy(aIInformationZone2);
+			}
+		}
+		return aIInformationZone;
+	}
+
+	public static Bounds EncapsulateBounds(List<AIInformationZone> zones)
+	{
+		Bounds result = default(Bounds);
+		result.center = zones[0].transform.position;
+		foreach (AIInformationZone zone in zones)
+		{
+			if (!(zone == null))
+			{
+				Vector3 center = zone.bounds.center + zone.transform.position;
+				Bounds bounds = zone.bounds;
+				bounds.center = center;
+				result.Encapsulate(bounds);
+			}
+		}
+		return result;
+	}
+
 	public void Start()
 	{
 		AddInitialPoints();
@@ -129,10 +181,13 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 	}
 
-	private void RemoveCoverPoint(AICoverPoint point)
+	private void RemoveCoverPoint(AICoverPoint point, bool markDirty = true)
 	{
 		coverPoints.Remove(point);
-		MarkDirty();
+		if (markDirty)
+		{
+			MarkDirty();
+		}
 	}
 
 	private void AddMovePoint(AIMovePoint point)
@@ -144,10 +199,13 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		}
 	}
 
-	private void RemoveMovePoint(AIMovePoint point)
+	private void RemoveMovePoint(AIMovePoint point, bool markDirty = true)
 	{
 		movePoints.Remove(point);
-		MarkDirty();
+		if (markDirty)
+		{
+			MarkDirty();
+		}
 	}
 
 	public void MarkDirty(bool completeRefresh = false)
@@ -180,6 +238,15 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	public bool ProcessDistancesAttempt()
 	{
+		return true;
+	}
+
+	private bool ProcessDistances()
+	{
+		if (!UseCalculatedCoverDistances)
+		{
+			return true;
+		}
 		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
 		float budgetSeconds = AIThinkManager.framebudgetms / 1000f * 0.25f;
 		if (realtimeSinceStartup < lastNavmeshBuildTime + 60f)
@@ -264,7 +331,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 				break;
 			}
 		}
-		return processIndex == movePoints.Count - 1;
+		return processIndex >= movePoints.Count - 1;
 	}
 
 	public static void BudgetedTick()
@@ -349,7 +416,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		{
 			foreach (AIMovePoint aIMovePoint in movePoints)
 			{
-				if (validatePoint == null || (validatePoint != null && validatePoint(aIMovePoint.transform.position)))
+				if (!(aIMovePoint == null) && (validatePoint == null || (validatePoint != null && validatePoint(aIMovePoint.transform.position))))
 				{
 					AddMovePoint(aIMovePoint);
 				}
@@ -359,7 +426,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		{
 			foreach (AICoverPoint aICoverPoint in coverPoints)
 			{
-				if (validatePoint == null || (validatePoint != null && validatePoint(aICoverPoint.transform.position)))
+				if (!(aICoverPoint == null) && (validatePoint == null || (validatePoint != null && validatePoint(aICoverPoint.transform.position))))
 				{
 					AddCoverPoint(aICoverPoint);
 				}
@@ -372,18 +439,25 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 	{
 		if (movePoints != null)
 		{
-			foreach (AIMovePoint point in movePoints)
+			foreach (AIMovePoint aIMovePoint in movePoints)
 			{
-				RemoveMovePoint(point);
+				if (!(aIMovePoint == null))
+				{
+					RemoveMovePoint(aIMovePoint, false);
+				}
 			}
 		}
 		if (coverPoints != null)
 		{
-			foreach (AICoverPoint point2 in coverPoints)
+			foreach (AICoverPoint aICoverPoint in coverPoints)
 			{
-				RemoveCoverPoint(point2);
+				if (!(aICoverPoint == null))
+				{
+					RemoveCoverPoint(aICoverPoint, false);
+				}
 			}
 		}
+		MarkDirty();
 		RefreshPointArrays();
 	}
 

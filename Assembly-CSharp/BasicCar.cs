@@ -75,11 +75,6 @@ public class BasicCar : BaseVehicle
 		return Vector3.zero;
 	}
 
-	public override float GetComfort()
-	{
-		return 0f;
-	}
-
 	public override void ServerInit()
 	{
 		if (!base.isClient)
@@ -112,7 +107,7 @@ public class BasicCar : BaseVehicle
 		baseEntity.SetParent(this);
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (!base.isClient)

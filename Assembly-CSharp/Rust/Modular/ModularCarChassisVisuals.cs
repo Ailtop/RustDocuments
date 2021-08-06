@@ -52,12 +52,12 @@ namespace Rust.Modular
 
 		public List<PhysicMaterial> stoneyGroundMaterials;
 
-		[Tooltip("Copied automatically from the WheelColliders")]
 		[ReadOnly]
+		[Tooltip("Copied automatically from the WheelColliders")]
 		public float wheelRadius;
 
-		[Tooltip("Copied automatically from the WheelColliders")]
 		[ReadOnly]
+		[Tooltip("Copied automatically from the WheelColliders")]
 		public float suspensionDistance;
 
 		[ReadOnly]

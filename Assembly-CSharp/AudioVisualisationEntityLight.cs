@@ -32,10 +32,7 @@ public class AudioVisualisationEntityLight : AudioVisualisationEntity
 
 	public LightColourSet PinkColour;
 
-	public Vector2[] LightIntensities = new Vector2[3]
-	{
-		new Vector2(0.05f, 15f),
-		new Vector2(0.05f, 20f),
-		new Vector2(0.05f, 25f)
-	};
+	public float lightMinIntensity = 0.05f;
+
+	public float lightMaxIntensity = 1f;
 }

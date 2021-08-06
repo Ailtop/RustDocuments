@@ -228,8 +228,8 @@ public class ShopFront : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void CancelClicked(RPCMessage msg)
 	{
 		if (IsTradingPlayer(msg.player) && Interface.CallHook("OnShopCancelClick", this, msg.player) == null)
@@ -254,7 +254,7 @@ public class ShopFront : StorageContainer
 		{
 			customerInventory = new ItemContainer();
 			customerInventory.allowedContents = ((allowedContents == (ItemContainer.ContentsType)0) ? ItemContainer.ContentsType.Generic : allowedContents);
-			customerInventory.onlyAllowedItem = allowedItem;
+			customerInventory.SetOnlyAllowedItem(allowedItem);
 			customerInventory.entityOwner = this;
 			customerInventory.maxStackSize = maxStackSize;
 			customerInventory.ServerInitialize(null, inventorySlots);

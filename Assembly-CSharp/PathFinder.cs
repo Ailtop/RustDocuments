@@ -133,6 +133,11 @@ public class PathFinder
 		neighbors = (diagonals ? mooreNeighbors : neumannNeighbors);
 	}
 
+	public int GetResolution(int index)
+	{
+		return costmap.GetLength(index);
+	}
+
 	public Node FindPath(Point start, Point end, int depth = int.MaxValue)
 	{
 		return FindPathReversed(end, start, depth);

@@ -301,6 +301,30 @@ public class IOEntity : BaseCombatEntity
 		return HasFlag(Flags.Reserved8);
 	}
 
+	public bool IsConnectedToAnySlot(IOEntity entity, int slot, int depth, bool defaultReturn = false)
+	{
+		if (depth > 0 && slot < inputs.Length)
+		{
+			IOEntity iOEntity = inputs[slot].connectedTo.Get();
+			if (iOEntity != null)
+			{
+				if (iOEntity == entity)
+				{
+					return true;
+				}
+				if (ConsiderConnectedTo(entity))
+				{
+					return true;
+				}
+				if (iOEntity.IsConnectedTo(entity, depth - 1, defaultReturn))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public bool IsConnectedTo(IOEntity entity, int slot, int depth, bool defaultReturn = false)
 	{
 		if (depth > 0 && slot < inputs.Length)

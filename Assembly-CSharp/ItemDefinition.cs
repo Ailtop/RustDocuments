@@ -55,8 +55,8 @@ public class ItemDefinition : MonoBehaviour
 		Generic
 	}
 
-	[ReadOnly]
 	[Header("Item")]
+	[ReadOnly]
 	public int itemid;
 
 	[Tooltip("The shortname should be unique. A hash will be generated from it to identify the item type. If this name changes at any point it will make all saves incompatible")]
@@ -87,8 +87,8 @@ public class ItemDefinition : MonoBehaviour
 
 	public bool quickDespawn;
 
-	[Tooltip("How rare this item is and how much it costs to research")]
 	[Header("Spawn Tables")]
+	[Tooltip("How rare this item is and how much it costs to research")]
 	public Rarity rarity;
 
 	public bool spawnAsBlueprint;

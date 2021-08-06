@@ -35,11 +35,11 @@ namespace Facepunch.CardGames
 
 		private Func<int, StorageContainer> getStorage;
 
-		private readonly int scrapItemID;
+		public readonly int scrapItemID;
 
-		public ulong UserID { get; private set; }
+		public ulong UserID { get; set; }
 
-		public CardPlayerState State { get; private set; }
+		public CardPlayerState State { get; set; }
 
 		public bool HasUser => State >= CardPlayerState.WantsToPlay;
 
@@ -51,11 +51,11 @@ namespace Facepunch.CardGames
 
 		private bool IsClient => !isServer;
 
-		public bool LeftRoundEarly { get; private set; }
+		public bool LeftRoundEarly { get; set; }
 
-		public bool SendCardDetails { get; private set; }
+		public bool SendCardDetails { get; set; }
 
-		public bool hasActedThisTurn { get; private set; }
+		public bool hasActedThisTurn { get; set; }
 
 		public CardPlayerData(int mountIndex, bool isServer)
 		{

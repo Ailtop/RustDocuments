@@ -2,7 +2,7 @@ using System.Linq;
 using Rust;
 using UnityEngine;
 
-public class TriggerHurt : TriggerBase
+public class TriggerHurt : TriggerBase, IServerComponent, IHurtTrigger
 {
 	public float DamagePerSecond = 1f;
 

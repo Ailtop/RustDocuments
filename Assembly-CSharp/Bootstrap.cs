@@ -281,17 +281,30 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 						yield return monument.StartCoroutine(monument.GetMonumentNavMesh().UpdateNavMeshAndWait());
 					}
 				}
-				if ((bool)TerrainMeta.Path && (bool)TerrainMeta.Path.DungeonRoot)
+				if ((bool)TerrainMeta.Path && (bool)TerrainMeta.Path.DungeonGridRoot)
 				{
-					DungeonNavmesh dungeonNavmesh = TerrainMeta.Path.DungeonRoot.AddComponent<DungeonNavmesh>();
+					DungeonNavmesh dungeonNavmesh = TerrainMeta.Path.DungeonGridRoot.AddComponent<DungeonNavmesh>();
 					dungeonNavmesh.NavMeshCollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
 					dungeonNavmesh.LayerMask = 65537;
 					yield return dungeonNavmesh.StartCoroutine(dungeonNavmesh.UpdateNavMeshAndWait());
 				}
 				else
 				{
-					Debug.LogError("Failed to find DungeonRoot, NOT generating Dungeon navmesh");
+					Debug.LogError("Failed to find DungeonGridRoot, NOT generating Dungeon navmesh");
 				}
+				if ((bool)TerrainMeta.Path && (bool)TerrainMeta.Path.DungeonBaseRoot)
+				{
+					DungeonNavmesh dungeonNavmesh2 = TerrainMeta.Path.DungeonBaseRoot.AddComponent<DungeonNavmesh>();
+					dungeonNavmesh2.NavmeshResolutionModifier = 0.3f;
+					dungeonNavmesh2.NavMeshCollectGeometry = NavMeshCollectGeometry.PhysicsColliders;
+					dungeonNavmesh2.LayerMask = 65537;
+					yield return dungeonNavmesh2.StartCoroutine(dungeonNavmesh2.UpdateNavMeshAndWait());
+				}
+				else
+				{
+					Debug.LogError("Failed to find DungeonBaseRoot , NOT generating Dungeon navmesh");
+				}
+				GenerateDungeonBase.SetupAI();
 			}
 		}
 		GameObject gameObject = GameManager.server.CreatePrefab("assets/bundled/prefabs/system/server.prefab");

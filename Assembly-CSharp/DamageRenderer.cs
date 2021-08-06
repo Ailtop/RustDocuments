@@ -22,10 +22,13 @@ public class DamageRenderer : MonoBehaviour, IClientComponent
 	private List<Material> damageShowingMats;
 
 	[SerializeField]
+	private float maxDamageOpacity = 0.9f;
+
+	[SerializeField]
 	[HideInInspector]
 	private List<DamageShowingRenderer> damageShowingRenderers;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private List<GlassPane> damageShowingGlassRenderers;
 }

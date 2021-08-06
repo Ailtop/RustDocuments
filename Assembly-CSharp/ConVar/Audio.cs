@@ -23,6 +23,9 @@ namespace ConVar
 		[ClientVar(Help = "Volume", Saved = true)]
 		public static float instruments = 1f;
 
+		[ClientVar(Help = "Volume", Saved = true)]
+		public static float voiceProps = 1f;
+
 		[ClientVar(Help = "Ambience System")]
 		public static bool ambience = true;
 

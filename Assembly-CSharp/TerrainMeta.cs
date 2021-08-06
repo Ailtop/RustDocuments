@@ -274,7 +274,7 @@ public class TerrainMeta : MonoBehaviour
 		BiomeAxisAngle = num + num2 + num3 * 90;
 	}
 
-	public static void InitNoTerrain()
+	public static void InitNoTerrain(bool createPath = false)
 	{
 		Size = new Vector3(4096f, 4096f, 4096f);
 		OneOverSize = Size.Inverse();

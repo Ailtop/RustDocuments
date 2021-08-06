@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -125,6 +126,49 @@ public class MicrophoneStand : BaseMountable
 	{
 		base.OnDeployed(parent, deployedBy);
 		SpawnChildEntity();
+	}
+
+	public override void PostMapEntitySpawn()
+	{
+		base.PostMapEntitySpawn();
+		if (!IsStatic)
+		{
+			return;
+		}
+		SpawnChildEntity();
+		int num = 128;
+		List<ConnectedSpeaker> obj = Facepunch.Pool.GetList<ConnectedSpeaker>();
+		GamePhysics.OverlapSphere(base.transform.position, num, obj, 256);
+		IOEntity iOEntity = ioEntity.Get(true);
+		List<MicrophoneStand> obj2 = Facepunch.Pool.GetList<MicrophoneStand>();
+		int num2 = 0;
+		foreach (ConnectedSpeaker item in obj)
+		{
+			bool flag = true;
+			obj2.Clear();
+			GamePhysics.OverlapSphere(item.transform.position, num, obj2, 256);
+			if (obj2.Count > 1)
+			{
+				float num3 = Distance(item);
+				foreach (MicrophoneStand item2 in obj2)
+				{
+					if (!item2.isClient && item2.Distance(item) < num3)
+					{
+						flag = false;
+						break;
+					}
+				}
+			}
+			if (flag)
+			{
+				iOEntity.outputs[0].connectedTo.Set(item);
+				item.inputs[0].connectedTo.Set(iOEntity);
+				iOEntity = item;
+				num2++;
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj2);
 	}
 
 	public override void Load(LoadInfo info)

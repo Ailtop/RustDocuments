@@ -17,12 +17,12 @@ namespace Rust.Ai.HTN.Murderer
 		[SerializeField]
 		private byte[] _worldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private byte[] _previousWorldState;
 
-		[SerializeField]
 		[ReadOnly]
+		[SerializeField]
 		private int _decompositionScore;
 
 		[ReadOnly]

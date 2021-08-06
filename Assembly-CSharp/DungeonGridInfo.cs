@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DungeonInfo : LandmarkInfo
+public class DungeonGridInfo : LandmarkInfo
 {
-	[Header("DungeonInfo")]
+	[Header("DungeonGridInfo")]
 	public int CellSize = 216;
 
 	public float LinkHeight = 1.5f;
@@ -26,7 +26,7 @@ public class DungeonInfo : LandmarkInfo
 
 	public bool IsValidSpawnPosition(Vector3 position)
 	{
-		OBB bounds = GetComponentInChildren<DungeonLinkBlockVolume>().GetBounds(position, Quaternion.identity);
+		OBB bounds = GetComponentInChildren<DungeonVolume>().GetBounds(position, Quaternion.identity);
 		Vector3 vector = WorldSpaceGrid.ClosestGridCell(bounds.position, TerrainMeta.Size.x * 2f, CellSize);
 		Vector3 vector2 = bounds.position - vector;
 		if (!(Mathf.Abs(vector2.x) > 3f))
@@ -50,7 +50,7 @@ public class DungeonInfo : LandmarkInfo
 		Monument = base.transform.GetComponentInParent<MonumentInfo>();
 		if ((bool)TerrainMeta.Path)
 		{
-			TerrainMeta.Path.DungeonEntrances.Add(this);
+			TerrainMeta.Path.DungeonGridEntrances.Add(this);
 		}
 	}
 

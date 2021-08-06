@@ -178,7 +178,10 @@ public class VehicleModuleEngine : VehicleModuleStorage
 	public override void OnHealthChanged(float oldValue, float newValue)
 	{
 		base.OnHealthChanged(oldValue, newValue);
-		RefreshPerformanceStats(GetContainer() as EngineStorage);
+		if (base.isServer)
+		{
+			RefreshPerformanceStats(GetContainer() as EngineStorage);
+		}
 	}
 
 	public override void AdminFixUp(int tier)

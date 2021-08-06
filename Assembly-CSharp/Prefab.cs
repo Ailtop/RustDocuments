@@ -117,9 +117,14 @@ public class Prefab : IComparable<Prefab>
 		return EnvironmentVolumeEx.CheckEnvironmentVolumes(Object.transform, pos, rot, scale, type);
 	}
 
-	public bool CheckEnvironmentVolumesInsideTerrain(Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type)
+	public bool CheckEnvironmentVolumesInsideTerrain(Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type, float padding = 0f)
 	{
-		return EnvironmentVolumeEx.CheckEnvironmentVolumesInsideTerrain(Object.transform, pos, rot, scale, type);
+		return EnvironmentVolumeEx.CheckEnvironmentVolumesInsideTerrain(Object.transform, pos, rot, scale, type, padding);
+	}
+
+	public bool CheckEnvironmentVolumesOutsideTerrain(Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type, float padding = 0f)
+	{
+		return EnvironmentVolumeEx.CheckEnvironmentVolumesOutsideTerrain(Object.transform, pos, rot, scale, type, padding);
 	}
 
 	public GameObject Spawn(Transform transform, bool active = true)

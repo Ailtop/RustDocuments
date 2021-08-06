@@ -28,7 +28,7 @@ public class DungeonNavmesh : FacepunchBehaviour, IServerComponent
 
 	public NavMeshCollectGeometry NavMeshCollectGeometry;
 
-	public static DungeonNavmesh _instance;
+	public static List<DungeonNavmesh> Instances = new List<DungeonNavmesh>();
 
 	[ServerVar]
 	public static bool use_baked_terrain_mesh = true;
@@ -59,11 +59,18 @@ public class DungeonNavmesh : FacepunchBehaviour, IServerComponent
 
 	public static bool NavReady()
 	{
-		if (_instance == null)
+		if (Instances == null || Instances.Count == 0)
 		{
 			return true;
 		}
-		return !_instance.IsBuilding;
+		foreach (DungeonNavmesh instance in Instances)
+		{
+			if (instance.IsBuilding)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void OnEnable()
@@ -73,7 +80,7 @@ public class DungeonNavmesh : FacepunchBehaviour, IServerComponent
 		sources = new List<NavMeshBuildSource>();
 		defaultArea = NavMesh.GetAreaFromName(DefaultAreaName);
 		InvokeRepeating(FinishBuildingNavmesh, 0f, 1f);
-		_instance = this;
+		Instances.Add(this);
 	}
 
 	private void OnDisable()
@@ -82,7 +89,7 @@ public class DungeonNavmesh : FacepunchBehaviour, IServerComponent
 		{
 			CancelInvoke(FinishBuildingNavmesh);
 			NavMeshDataInstance.Remove();
-			_instance = null;
+			Instances.Remove(this);
 		}
 	}
 

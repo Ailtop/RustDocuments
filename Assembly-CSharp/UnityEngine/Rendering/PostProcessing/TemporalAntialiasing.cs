@@ -17,8 +17,8 @@ namespace UnityEngine.Rendering.PostProcessing
 		[Range(0.1f, 1f)]
 		public float jitterSpread = 0.75f;
 
-		[Range(0f, 3f)]
 		[Tooltip("Controls the amount of sharpening applied to the color buffer. High values may introduce dark-border artifacts.")]
+		[Range(0f, 3f)]
 		public float sharpness = 0.25f;
 
 		[Tooltip("The blend coefficient for a stationary fragment. Controls the percentage of history sample blended into the final color.")]

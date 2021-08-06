@@ -324,8 +324,8 @@ public class DiagnosticsConSys : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void dump(Arg args)
 	{
 		if (Directory.Exists("diagnostics"))

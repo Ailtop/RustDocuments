@@ -76,7 +76,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public bool IsKinematic => HasFlag(Flags.Reserved6);
 
-	public bool VehicleIsActive
+	public bool IsMovingOrOn
 	{
 		get
 		{
@@ -206,7 +206,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 				SendNetworkUpdate();
 				prevEditable = IsEditableNow;
 			}
-			if (VehicleIsActive)
+			if (IsMovingOrOn)
 			{
 				Velocity = GetWorldVelocity();
 				waterlogged = WaterLevel.Test(waterSample.transform.position, true, this);
@@ -222,7 +222,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 			}
 			for (int i = 0; i < NumAttachedModules; i++)
 			{
-				AttachedModuleEntities[i].VehicleFixedUpdate(VehicleIsActive);
+				AttachedModuleEntities[i].VehicleFixedUpdate(IsMovingOrOn);
 			}
 		}
 	}

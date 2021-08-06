@@ -83,7 +83,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		UpdatePhysicsMaterial();
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (!HasAnyPassengers())

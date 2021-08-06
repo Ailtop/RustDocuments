@@ -164,6 +164,18 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public EngineSpeeds CurThrottleSetting { get; set; } = EngineSpeeds.Zero;
 
 
+	public bool IsMovingOrOn
+	{
+		get
+		{
+			if (!IsMoving())
+			{
+				return IsOn();
+			}
+			return true;
+		}
+	}
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("TrainEngine.OnRpcMessage"))
@@ -244,6 +256,11 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		info.msg.trainEngine.fuelAmount = GetFuelAmount();
 	}
 
+	public override EntityFuelSystem GetFuelSystem()
+	{
+		return fuelSystem;
+	}
+
 	public override void OnKilled(HitInfo info)
 	{
 		base.OnKilled(info);
@@ -263,31 +280,30 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
-		_003C_003Ec__DisplayClass20_0 _003C_003Ec__DisplayClass20_ = default(_003C_003Ec__DisplayClass20_0);
-		_003C_003Ec__DisplayClass20_.inputState = inputState;
-		_003C_003Ec__DisplayClass20_._003C_003E4__this = this;
-		_003C_003Ec__DisplayClass20_.player = player;
-		base.PlayerServerInput(_003C_003Ec__DisplayClass20_.inputState, _003C_003Ec__DisplayClass20_.player);
-		if (!IsDriver(_003C_003Ec__DisplayClass20_.player))
+		_003C_003Ec__DisplayClass21_0 _003C_003Ec__DisplayClass21_ = default(_003C_003Ec__DisplayClass21_0);
+		_003C_003Ec__DisplayClass21_.inputState = inputState;
+		_003C_003Ec__DisplayClass21_._003C_003E4__this = this;
+		_003C_003Ec__DisplayClass21_.player = player;
+		if (!IsDriver(_003C_003Ec__DisplayClass21_.player))
 		{
 			return;
 		}
 		if (engineController.IsOff)
 		{
-			if (_003C_003Ec__DisplayClass20_.inputState.IsDown(BUTTON.FORWARD) || _003C_003Ec__DisplayClass20_.inputState.IsDown(BUTTON.BACKWARD))
+			if ((_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.FORWARD) && !_003C_003Ec__DisplayClass21_.inputState.WasDown(BUTTON.FORWARD)) || (_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.BACKWARD) && !_003C_003Ec__DisplayClass21_.inputState.WasDown(BUTTON.BACKWARD)))
 			{
-				engineController.TryStartEngine(_003C_003Ec__DisplayClass20_.player);
+				engineController.TryStartEngine(_003C_003Ec__DisplayClass21_.player);
 			}
 		}
-		else if (!_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C20_0(BUTTON.FORWARD, IncreaseThrottle, ref _003C_003Ec__DisplayClass20_))
+		else if (!_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C21_0(BUTTON.FORWARD, IncreaseThrottle, ref _003C_003Ec__DisplayClass21_))
 		{
-			_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C20_0(BUTTON.BACKWARD, DecreaseThrottle, ref _003C_003Ec__DisplayClass20_);
+			_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C21_0(BUTTON.BACKWARD, DecreaseThrottle, ref _003C_003Ec__DisplayClass21_);
 		}
-		if (_003C_003Ec__DisplayClass20_.inputState.IsDown(BUTTON.LEFT))
+		if (_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.LEFT))
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Left);
 		}
-		else if (_003C_003Ec__DisplayClass20_.inputState.IsDown(BUTTON.RIGHT))
+		else if (_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.RIGHT))
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Right);
 		}

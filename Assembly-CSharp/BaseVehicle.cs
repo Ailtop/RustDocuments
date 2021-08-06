@@ -37,6 +37,8 @@ public class BaseVehicle : BaseMountable
 
 	public bool shouldShowHudHealth;
 
+	public bool keepsWaterOut;
+
 	[Header("Rigidbody (Optional)")]
 	public Rigidbody rigidBody;
 
@@ -47,6 +49,11 @@ public class BaseVehicle : BaseMountable
 
 	[Header("Damage")]
 	public DamageRenderer damageRenderer;
+
+	[FormerlySerializedAs("explosionDamageMultiplier")]
+	public float explosionForceMultiplier = 650f;
+
+	public float explosionForceMax = 150000f;
 
 	public const Flags Flag_OnlyOwnerEntry = Flags.Locked;
 
@@ -308,6 +315,20 @@ public class BaseVehicle : BaseMountable
 	{
 		base.Spawn();
 		SpawnSubEntities();
+	}
+
+	public override void Hurt(HitInfo info)
+	{
+		if (!IsDead() && rigidBody != null && !rigidBody.isKinematic)
+		{
+			float num = info.damageTypes.Get(DamageType.Explosion) + info.damageTypes.Get(DamageType.AntiVehicle);
+			if (num > 3f)
+			{
+				float explosionForce = Mathf.Min(num * explosionForceMultiplier, explosionForceMax);
+				rigidBody.AddExplosionForce(explosionForce, info.HitPositionWorld, 1f, 2.5f);
+			}
+		}
+		base.Hurt(info);
 	}
 
 	public bool AnyMounted()
@@ -805,20 +826,46 @@ public class BaseVehicle : BaseMountable
 		return baseMountable;
 	}
 
-	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(5f)]
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
 		if (!player.isMounted && !RecentlyPushed && CanPushNow(player) && (!OnlyOwnerAccessible() || !(player != creatorEntity)) && Interface.CallHook("OnVehiclePush", this, msg.player) == null)
 		{
+			player.metabolism.calories.Subtract(3f);
+			player.metabolism.SendChangesToClient();
+			if (rigidBody.IsSleeping())
+			{
+				rigidBody.WakeUp();
+			}
 			DoPushAction(player);
 			timeSinceLastPush = 0f;
 		}
 	}
 
-	protected virtual void DoPushAction(BasePlayer player)
+	public virtual void DoPushAction(BasePlayer player)
 	{
+		if (IsFlipped())
+		{
+			float num = rigidBody.mass * 8f;
+			Vector3 torque = Vector3.forward * num;
+			if (Vector3.Dot(base.transform.InverseTransformVector(base.transform.position - player.transform.position), Vector3.right) > 0f)
+			{
+				torque *= -1f;
+			}
+			if (base.transform.up.y < 0f)
+			{
+				torque *= -1f;
+			}
+			rigidBody.AddRelativeTorque(torque, ForceMode.Impulse);
+		}
+		else
+		{
+			Vector3 normalized = Vector3.ProjectOnPlane(base.transform.position - player.eyes.position, base.transform.up).normalized;
+			float num2 = rigidBody.mass * 4f;
+			rigidBody.AddForce(normalized * num2, ForceMode.Impulse);
+		}
 	}
 
 	public override bool SupportsChildDeployables()

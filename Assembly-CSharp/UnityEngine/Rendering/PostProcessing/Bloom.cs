@@ -7,8 +7,8 @@ namespace UnityEngine.Rendering.PostProcessing
 	[PostProcess(typeof(BloomRenderer), "Unity/Bloom", true)]
 	public sealed class Bloom : PostProcessEffectSettings
 	{
-		[Tooltip("Strength of the bloom filter. Values higher than 1 will make bloom contribute more energy to the final render.")]
 		[Min(0f)]
+		[Tooltip("Strength of the bloom filter. Values higher than 1 will make bloom contribute more energy to the final render.")]
 		public FloatParameter intensity = new FloatParameter
 		{
 			value = 0f
@@ -21,8 +21,8 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 1f
 		};
 
-		[Tooltip("Makes transitions between under/over-threshold gradual. 0 for a hard threshold, 1 for a soft threshold).")]
 		[Range(0f, 1f)]
+		[Tooltip("Makes transitions between under/over-threshold gradual. 0 for a hard threshold, 1 for a soft threshold).")]
 		public FloatParameter softKnee = new FloatParameter
 		{
 			value = 0.5f
@@ -55,8 +55,8 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = Color.white
 		};
 
-		[Tooltip("Boost performance by lowering the effect quality. This settings is meant to be used on mobile and other low-end platforms but can also provide a nice performance boost on desktops and consoles.")]
 		[FormerlySerializedAs("mobileOptimized")]
+		[Tooltip("Boost performance by lowering the effect quality. This settings is meant to be used on mobile and other low-end platforms but can also provide a nice performance boost on desktops and consoles.")]
 		public BoolParameter fastMode = new BoolParameter
 		{
 			value = false

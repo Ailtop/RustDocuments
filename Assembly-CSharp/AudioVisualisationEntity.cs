@@ -18,7 +18,7 @@ public class AudioVisualisationEntity : IOEntity
 		Pink
 	}
 
-	public enum VolumeRange
+	public enum VolumeSensitivity
 	{
 		Small,
 		Medium,
@@ -34,13 +34,11 @@ public class AudioVisualisationEntity : IOEntity
 
 	private EntityRef<BaseEntity> connectedTo;
 
-	public FFTWindow SpectrumWindowType;
-
 	public GameObjectRef SettingsDialog;
 
 	public LightColour currentColour { get; private set; }
 
-	public VolumeRange currentVolumeRange { get; private set; } = VolumeRange.Medium;
+	public VolumeSensitivity currentVolumeSensitivity { get; private set; } = VolumeSensitivity.Medium;
 
 
 	public Speed currentSpeed { get; private set; } = Speed.Medium;
@@ -160,24 +158,24 @@ public class AudioVisualisationEntity : IOEntity
 			info.msg.audioEntity = Facepunch.Pool.Get<AudioEntity>();
 		}
 		info.msg.audioEntity.colourMode = (int)currentColour;
-		info.msg.audioEntity.volumeRange = (int)currentVolumeRange;
+		info.msg.audioEntity.volumeRange = (int)currentVolumeSensitivity;
 		info.msg.audioEntity.speed = (int)currentSpeed;
 		info.msg.audioEntity.gradient = currentGradient;
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
 	public void ServerUpdateSettings(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
 		int num2 = msg.read.Int32();
 		int num3 = msg.read.Int32();
 		int num4 = msg.read.Int32();
-		if (currentColour != (LightColour)num || currentVolumeRange != (VolumeRange)num2 || currentSpeed != (Speed)num3 || currentGradient != num4)
+		if (currentColour != (LightColour)num || currentVolumeSensitivity != (VolumeSensitivity)num2 || currentSpeed != (Speed)num3 || currentGradient != num4)
 		{
 			currentColour = (LightColour)num;
-			currentVolumeRange = (VolumeRange)num2;
+			currentVolumeSensitivity = (VolumeSensitivity)num2;
 			currentSpeed = (Speed)num3;
 			currentGradient = num4;
 			MarkDirty();
@@ -191,7 +189,7 @@ public class AudioVisualisationEntity : IOEntity
 		if (info.msg.audioEntity != null)
 		{
 			currentColour = (LightColour)info.msg.audioEntity.colourMode;
-			currentVolumeRange = (VolumeRange)info.msg.audioEntity.volumeRange;
+			currentVolumeSensitivity = (VolumeSensitivity)info.msg.audioEntity.volumeRange;
 			currentSpeed = (Speed)info.msg.audioEntity.speed;
 			currentGradient = info.msg.audioEntity.gradient;
 		}

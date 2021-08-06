@@ -168,6 +168,10 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		for (int i = 0; i < numToSpawn; i++)
 		{
 			GameObjectRef prefab = GetPrefab();
+			if (prefab == null || string.IsNullOrEmpty(prefab.guid))
+			{
+				continue;
+			}
 			Vector3 pos;
 			Quaternion rot;
 			BaseSpawnPoint spawnPoint = GetSpawnPoint(prefab, out pos, out rot);

@@ -30,9 +30,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Min(0f)]
 		[DisplayName("Exposure Compensation")]
 		[Tooltip("Use this to scale the global exposure of the scene.")]
-		[Min(0f)]
 		public FloatParameter keyValue = new FloatParameter
 		{
 			value = 1f
@@ -52,8 +52,8 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 2f
 		};
 
-		[Tooltip("Adaptation speed from a light to a dark environment.")]
 		[Min(0f)]
+		[Tooltip("Adaptation speed from a light to a dark environment.")]
 		public FloatParameter speedDown = new FloatParameter
 		{
 			value = 1f

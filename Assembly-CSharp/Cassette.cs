@@ -28,9 +28,9 @@ public class Cassette : BaseEntity
 
 	public int MaximumVoicemailSlots = 1;
 
-	private int preloadedAudioId;
+	public int preloadedAudioId;
 
-	private ICassettePlayer currentCassettePlayer;
+	public ICassettePlayer currentCassettePlayer;
 
 	public uint AudioId { get; private set; }
 
@@ -178,7 +178,7 @@ public class Cassette : BaseEntity
 		}
 	}
 
-	private void DelayedCassetteInserted()
+	public void DelayedCassetteInserted()
 	{
 		if (currentCassettePlayer != null)
 		{
@@ -217,7 +217,7 @@ public class Cassette : BaseEntity
 		}
 	}
 
-	private bool ClearSavedAudio()
+	public bool ClearSavedAudio()
 	{
 		if (AudioId == 0)
 		{
@@ -241,7 +241,7 @@ public class Cassette : BaseEntity
 		return IsOggValid(data, c.MaxCassetteLength);
 	}
 
-	private static bool IsOggValid(byte[] data, float maxLength)
+	public static bool IsOggValid(byte[] data, float maxLength)
 	{
 		if (data == null)
 		{
@@ -261,12 +261,12 @@ public class Cassette : BaseEntity
 		return true;
 	}
 
-	private static float ByteToMegabyte(int byteSize)
+	public static float ByteToMegabyte(int byteSize)
 	{
 		return (float)byteSize / 1024f / 1024f;
 	}
 
-	private static double GetOggLength(byte[] t)
+	public static double GetOggLength(byte[] t)
 	{
 		int num = t.Length;
 		long num2 = -1L;

@@ -296,8 +296,8 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private float nextAttackTime;
 
-	[InspectorFlags]
 	[SerializeField]
+	[InspectorFlags]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
 	[InspectorFlags]

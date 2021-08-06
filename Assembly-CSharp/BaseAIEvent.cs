@@ -187,6 +187,8 @@ public class BaseAIEvent
 			return new AggressionTimerAIEvent();
 		case AIEventType.Reloading:
 			return new ReloadingAIEvent();
+		case AIEventType.InRangeOfHome:
+			return new InRangeOfHomeAIEvent();
 		default:
 			Debug.LogWarning(string.Concat("No case for ", eventType, " event in BaseAIEvent.CreateEvent()!"));
 			return null;

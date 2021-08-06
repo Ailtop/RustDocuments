@@ -6,8 +6,8 @@ namespace UnityEngine.Rendering.PostProcessing
 	[PostProcess(typeof(DepthOfFieldRenderer), "Unity/Depth of Field", false)]
 	public sealed class DepthOfField : PostProcessEffectSettings
 	{
-		[Tooltip("Distance to the point of focus.")]
 		[Min(0.1f)]
+		[Tooltip("Distance to the point of focus.")]
 		public FloatParameter focusDistance = new FloatParameter
 		{
 			value = 10f
@@ -20,8 +20,8 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 5.6f
 		};
 
-		[Tooltip("Distance between the lens and the film. The larger the value is, the shallower the depth of field is.")]
 		[Range(1f, 300f)]
+		[Tooltip("Distance between the lens and the film. The larger the value is, the shallower the depth of field is.")]
 		public FloatParameter focalLength = new FloatParameter
 		{
 			value = 50f

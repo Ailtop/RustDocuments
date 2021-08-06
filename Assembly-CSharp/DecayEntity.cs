@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
@@ -258,7 +259,7 @@ public class DecayEntity : BaseCombatEntity
 			}
 			if (upkeepTimer < 1f)
 			{
-				if (base.healthFraction < 1f && ConVar.Decay.upkeep_heal_scale > 0f && base.SecondsSinceAttacked > 600f)
+				if (base.healthFraction < 1f && ConVar.Decay.upkeep_heal_scale > 0f && base.SecondsSinceAttacked > 600f && Interface.CallHook("OnDecayHeal", this) == null)
 				{
 					float num3 = num / decay.GetDecayDuration(this) * ConVar.Decay.upkeep_heal_scale;
 					Heal(MaxHealth() * num3);
@@ -293,7 +294,7 @@ public class DecayEntity : BaseCombatEntity
 					}
 				}
 			}
-			if (num4 > 0f)
+			if (num4 > 0f && Interface.CallHook("OnDecayDamage", this) == null)
 			{
 				float num5 = num2 / decay.GetDecayDuration(this) * MaxHealth();
 				Hurt(num5 * num4 * decayVariance, DamageType.Decay);

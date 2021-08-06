@@ -92,6 +92,24 @@ public class BaseBoat : BaseVehicle
 		}
 	}
 
+	public void OnPoolDestroyed()
+	{
+		Kill(DestroyMode.Gib);
+	}
+
+	public void WakeUp()
+	{
+		if (rigidBody != null)
+		{
+			rigidBody.WakeUp();
+			rigidBody.AddForce(Vector3.up * 0.1f, ForceMode.Impulse);
+		}
+		if (buoyancy != null)
+		{
+			buoyancy.Wake();
+		}
+	}
+
 	public virtual bool EngineOn()
 	{
 		if (HasDriver())
@@ -101,31 +119,29 @@ public class BaseBoat : BaseVehicle
 		return false;
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
-		if (!base.isClient)
+		base.VehicleFixedUpdate();
+		if (!EngineOn())
 		{
-			if (!EngineOn())
-			{
-				gasPedal = 0f;
-				steering = 0f;
-			}
-			base.VehicleFixedUpdate();
-			bool flag = WaterLevel.Test(thrustPoint.position, true, this);
-			if (gasPedal != 0f && flag && buoyancy.submergedFraction > 0.3f)
-			{
-				Vector3 force = (base.transform.forward + base.transform.right * steering * steeringScale).normalized * gasPedal * engineThrust;
-				rigidBody.AddForceAtPosition(force, thrustPoint.position, ForceMode.Force);
-			}
+			gasPedal = 0f;
+			steering = 0f;
+		}
+		base.VehicleFixedUpdate();
+		bool flag = WaterLevel.Test(thrustPoint.position, true, this);
+		if (gasPedal != 0f && flag && buoyancy.submergedFraction > 0.3f)
+		{
+			Vector3 force = (base.transform.forward + base.transform.right * steering * steeringScale).normalized * gasPedal * engineThrust;
+			rigidBody.AddForceAtPosition(force, thrustPoint.position, ForceMode.Force);
 		}
 	}
 
-	public void BaseBoatDecay(float decayTickRate, float timeSinceLastUsed, float outsideDecayMinutes, float deepWaterDecayMinutes)
+	public static void WaterVehicleDecay(BaseCombatEntity entity, float decayTickRate, float timeSinceLastUsed, float outsideDecayMinutes, float deepWaterDecayMinutes)
 	{
-		if (!(timeSinceLastUsed < 2700f))
+		if (entity.healthFraction != 0f && !(timeSinceLastUsed < 2700f))
 		{
-			float overallWaterDepth = WaterLevel.GetOverallWaterDepth(base.transform.position);
-			float num = (IsOutside() ? outsideDecayMinutes : float.PositiveInfinity);
+			float overallWaterDepth = WaterLevel.GetOverallWaterDepth(entity.transform.position);
+			float num = (entity.IsOutside() ? outsideDecayMinutes : float.PositiveInfinity);
 			if (overallWaterDepth > 4f)
 			{
 				float t = Mathf.InverseLerp(4f, 12f, overallWaterDepth);
@@ -135,7 +151,7 @@ public class BaseBoat : BaseVehicle
 			if (!float.IsPositiveInfinity(num))
 			{
 				float num3 = decayTickRate / 60f / num;
-				Hurt(MaxHealth() * num3, DamageType.Decay, this, false);
+				entity.Hurt(entity.MaxHealth() * num3, DamageType.Decay, entity, false);
 			}
 		}
 	}

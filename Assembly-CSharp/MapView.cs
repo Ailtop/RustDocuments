@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using Rust.UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class MapView : FacepunchBehaviour
@@ -28,7 +30,8 @@ public class MapView : FacepunchBehaviour
 
 	public List<SleepingBagClusterMapMarker> SleepingBagClusters = new List<SleepingBagClusterMapMarker>();
 
-	public RawImage TrainLayer;
+	[FormerlySerializedAs("TrainLayer")]
+	public RawImage UndergroundLayer;
 
 	public bool ShowGrid;
 
@@ -42,5 +45,14 @@ public class MapView : FacepunchBehaviour
 
 	public bool ShowTeamMembers = true;
 
-	public bool ShowTrainLayer;
+	[FormerlySerializedAs("ShowTrainLayer")]
+	public bool ShowUndergroundLayers;
+
+	public RustImageButton LockButton;
+
+	public RustImageButton OverworldButton;
+
+	public RustImageButton TrainButton;
+
+	public RustImageButton[] UnderwaterButtons;
 }

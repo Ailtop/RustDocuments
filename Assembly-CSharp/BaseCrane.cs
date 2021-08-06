@@ -202,7 +202,7 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 		return IsOn();
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		bool flag = EngineOn();

@@ -499,14 +499,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2306)
+		else if (packet.connection.protocol > 2311)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2306));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2311));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2306)
+		else if (packet.connection.protocol < 2311)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2306));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2311));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -1004,19 +1004,31 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private void FixedUpdate()
 	{
-		using (TimeWarning.New("ServerMgr.FixedUpdate", 500))
+		using (TimeWarning.New("ServerMgr.FixedUpdate"))
 		{
 			try
 			{
-				using (TimeWarning.New("Buoyancy.Cycle", 100))
+				using (TimeWarning.New("BaseMountable.FixedUpdateCycle"))
 				{
-					Buoyancy.Cycle();
+					BaseMountable.FixedUpdateCycle();
 				}
 			}
 			catch (Exception exception)
 			{
-				UnityEngine.Debug.LogWarning("Server Exception: Buoyancy Cycle");
+				UnityEngine.Debug.LogWarning("Server Exception: Mountable Cycle");
 				UnityEngine.Debug.LogException(exception, this);
+			}
+			try
+			{
+				using (TimeWarning.New("Buoyancy.Cycle"))
+				{
+					Buoyancy.Cycle();
+				}
+			}
+			catch (Exception exception2)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Buoyancy Cycle");
+				UnityEngine.Debug.LogException(exception2, this);
 			}
 		}
 	}
@@ -1104,7 +1116,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2306}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2311}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{

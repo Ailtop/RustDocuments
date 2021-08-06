@@ -1,4 +1,4 @@
-public interface PoolVehicle
+public interface IPoolVehicle
 {
 	void OnPoolDestroyed();
 

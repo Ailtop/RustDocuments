@@ -42,8 +42,8 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
 		[ServerVar]
+		[ClientVar]
 		public static int incremental_milliseconds
 		{
 			get

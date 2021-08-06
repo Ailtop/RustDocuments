@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
-public abstract class RustCamera<T> : SingletonComponent<T> where T : MonoBehaviour
+public abstract class RustCamera<T> : SingletonComponent<T> where T : RustCamera<T>
 {
 	[SerializeField]
 	private AmplifyOcclusionEffect ssao;

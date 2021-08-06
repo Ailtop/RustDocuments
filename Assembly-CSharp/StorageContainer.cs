@@ -30,6 +30,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 
 	public ItemDefinition allowedItem;
 
+	public ItemDefinition allowedItem2;
+
 	public int maxStackSize;
 
 	public bool needsBuildingPrivilegeToUse;
@@ -197,7 +199,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		inventory = new ItemContainer();
 		inventory.entityOwner = this;
 		inventory.allowedContents = ((allowedContents == (ItemContainer.ContentsType)0) ? ItemContainer.ContentsType.Generic : allowedContents);
-		inventory.onlyAllowedItem = allowedItem;
+		inventory.SetOnlyAllowedItems(allowedItem, allowedItem2);
 		inventory.maxStackSize = maxStackSize;
 		inventory.ServerInitialize(null, inventorySlots);
 		if (giveUID)
@@ -240,8 +242,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (isLootable)

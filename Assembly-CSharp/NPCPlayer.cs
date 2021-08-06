@@ -401,8 +401,12 @@ public class NPCPlayer : BasePlayer
 
 	public virtual void EquipWeapon()
 	{
+		if (inventory == null || inventory.containerBelt == null)
+		{
+			return;
+		}
 		Item slot = inventory.containerBelt.GetSlot(0);
-		if (slot == null || Interface.CallHook("OnNpcEquipWeapon", this, slot) != null)
+		if (Interface.CallHook("OnNpcEquipWeapon", this, slot) != null || slot == null)
 		{
 			return;
 		}

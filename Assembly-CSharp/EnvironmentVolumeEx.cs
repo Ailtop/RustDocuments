@@ -28,7 +28,7 @@ public static class EnvironmentVolumeEx
 		return CheckEnvironmentVolumes(transform, transform.position, transform.rotation, transform.lossyScale, type);
 	}
 
-	public static bool CheckEnvironmentVolumesInsideTerrain(this Transform transform, Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type)
+	public static bool CheckEnvironmentVolumesInsideTerrain(this Transform transform, Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type, float padding = 0f)
 	{
 		if (TerrainMeta.HeightMap == null)
 		{
@@ -36,20 +36,29 @@ public static class EnvironmentVolumeEx
 		}
 		List<EnvironmentVolume> obj = Pool.GetList<EnvironmentVolume>();
 		transform.GetComponentsInChildren(true, obj);
+		if (obj.Count == 0)
+		{
+			Pool.FreeList(ref obj);
+			return true;
+		}
 		for (int i = 0; i < obj.Count; i++)
 		{
 			EnvironmentVolume environmentVolume = obj[i];
+			if ((environmentVolume.Type & type) == 0)
+			{
+				continue;
+			}
 			OBB oBB = new OBB(environmentVolume.transform, new Bounds(environmentVolume.Center, environmentVolume.Size));
 			oBB.Transform(pos, scale, rot);
 			Vector3 point = oBB.GetPoint(-1f, 0f, -1f);
 			Vector3 point2 = oBB.GetPoint(1f, 0f, -1f);
 			Vector3 point3 = oBB.GetPoint(-1f, 0f, 1f);
 			Vector3 point4 = oBB.GetPoint(1f, 0f, 1f);
-			float max = oBB.ToBounds().max.y;
+			float max = oBB.ToBounds().max.y + padding;
 			bool fail = false;
 			TerrainMeta.HeightMap.ForEachParallel(point, point2, point3, point4, delegate(int x, int z)
 			{
-				if (TerrainMeta.HeightMap.GetHeight(x, z) < max)
+				if (TerrainMeta.HeightMap.GetHeight(x, z) <= max)
 				{
 					fail = true;
 				}
@@ -67,5 +76,55 @@ public static class EnvironmentVolumeEx
 	public static bool CheckEnvironmentVolumesInsideTerrain(this Transform transform, EnvironmentType type)
 	{
 		return CheckEnvironmentVolumesInsideTerrain(transform, transform.position, transform.rotation, transform.lossyScale, type);
+	}
+
+	public static bool CheckEnvironmentVolumesOutsideTerrain(this Transform transform, Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type, float padding = 0f)
+	{
+		if (TerrainMeta.HeightMap == null)
+		{
+			return true;
+		}
+		List<EnvironmentVolume> obj = Pool.GetList<EnvironmentVolume>();
+		transform.GetComponentsInChildren(true, obj);
+		if (obj.Count == 0)
+		{
+			Pool.FreeList(ref obj);
+			return true;
+		}
+		for (int i = 0; i < obj.Count; i++)
+		{
+			EnvironmentVolume environmentVolume = obj[i];
+			if ((environmentVolume.Type & type) == 0)
+			{
+				continue;
+			}
+			OBB oBB = new OBB(environmentVolume.transform, new Bounds(environmentVolume.Center, environmentVolume.Size));
+			oBB.Transform(pos, scale, rot);
+			Vector3 point = oBB.GetPoint(-1f, 0f, -1f);
+			Vector3 point2 = oBB.GetPoint(1f, 0f, -1f);
+			Vector3 point3 = oBB.GetPoint(-1f, 0f, 1f);
+			Vector3 point4 = oBB.GetPoint(1f, 0f, 1f);
+			float min = oBB.ToBounds().min.y - padding;
+			bool fail = false;
+			TerrainMeta.HeightMap.ForEachParallel(point, point2, point3, point4, delegate(int x, int z)
+			{
+				if (TerrainMeta.HeightMap.GetHeight(x, z) >= min)
+				{
+					fail = true;
+				}
+			});
+			if (fail)
+			{
+				Pool.FreeList(ref obj);
+				return false;
+			}
+		}
+		Pool.FreeList(ref obj);
+		return true;
+	}
+
+	public static bool CheckEnvironmentVolumesOutsideTerrain(this Transform transform, EnvironmentType type)
+	{
+		return CheckEnvironmentVolumesOutsideTerrain(transform, transform.position, transform.rotation, transform.lossyScale, type);
 	}
 }

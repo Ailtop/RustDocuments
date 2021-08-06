@@ -68,7 +68,7 @@ public class Megaphone : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	private void UpdateItemCondition()
+	public void UpdateItemCondition()
 	{
 		Item ownerItem = GetOwnerItem();
 		if (ownerItem != null && ownerItem.hasCondition)

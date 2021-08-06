@@ -18,11 +18,11 @@ namespace Facepunch.CardGames
 
 		public const int IDLE_KICK_SECONDS = 600;
 
-		protected CardPlayerData[] playerData;
+		public CardPlayerData[] playerData;
 
-		protected ProtoBuf.CardTable.CardList localPlayerCards;
+		public ProtoBuf.CardTable.CardList localPlayerCards;
 
-		public CardGameState State { get; private set; }
+		public CardGameState State { get; set; }
 
 		public bool HasGameInProgress => State >= CardGameState.InGameBetweenRounds;
 
@@ -38,15 +38,15 @@ namespace Facepunch.CardGames
 
 		public virtual int TimeBetweenRounds => 8;
 
-		protected CardTable Owner { get; private set; }
+		public CardTable Owner { get; set; }
 
-		protected int ScrapItemID => Owner.ScrapItemID;
+		public int ScrapItemID => Owner.ScrapItemID;
 
 		protected bool IsServer => Owner.isServer;
 
 		protected bool IsClient => Owner.isClient;
 
-		public ProtoBuf.CardTable.WinnerBreakdown winnerInfo { get; private set; }
+		public ProtoBuf.CardTable.WinnerBreakdown winnerInfo { get; set; }
 
 		public CardGameController(CardTable owner)
 		{
@@ -204,7 +204,7 @@ namespace Facepunch.CardGames
 			}
 		}
 
-		private bool IsAtTable(ulong userID)
+		public bool IsAtTable(ulong userID)
 		{
 			return playerData.Any((CardPlayerData data) => data.UserID == userID);
 		}
@@ -265,7 +265,7 @@ namespace Facepunch.CardGames
 
 		public abstract bool IsAllowedToPlay(CardPlayerData cpd);
 
-		protected void ClearWinnerInfo()
+		public void ClearWinnerInfo()
 		{
 			winnerInfo.winningScore = 0;
 			if (winnerInfo.winners == null)
@@ -303,7 +303,7 @@ namespace Facepunch.CardGames
 			}
 		}
 
-		private void JoinTable(ulong userID)
+		public void JoinTable(ulong userID)
 		{
 			if (IsAtTable(userID) || NumPlayersAllowedToPlay() >= MaxPlayersAtTable())
 			{
@@ -347,7 +347,7 @@ namespace Facepunch.CardGames
 			}
 		}
 
-		protected int AddToPot(CardPlayerData playerData, int maxAmount)
+		public int AddToPot(CardPlayerData playerData, int maxAmount)
 		{
 			int num = 0;
 			StorageContainer storage = playerData.GetStorage();
@@ -374,12 +374,12 @@ namespace Facepunch.CardGames
 			return num;
 		}
 
-		protected int AddAllToPot(CardPlayerData playerData)
+		public int AddAllToPot(CardPlayerData playerData)
 		{
 			return AddToPot(playerData, int.MaxValue);
 		}
 
-		protected int PayOut(CardPlayerData playerData, int maxAmount)
+		public int PayOut(CardPlayerData playerData, int maxAmount)
 		{
 			int num = 0;
 			StorageContainer storage = playerData.GetStorage();
@@ -404,12 +404,12 @@ namespace Facepunch.CardGames
 			return num;
 		}
 
-		protected int PayOutAll(CardPlayerData playerData)
+		public int PayOutAll(CardPlayerData playerData)
 		{
 			return PayOut(playerData, int.MaxValue);
 		}
 
-		protected int RemoveScrapFromStorage(CardPlayerData data)
+		public int RemoveScrapFromStorage(CardPlayerData data)
 		{
 			StorageContainer storage = data.GetStorage();
 			BasePlayer basePlayer = BasePlayer.FindByID(data.UserID);
@@ -441,12 +441,12 @@ namespace Facepunch.CardGames
 			syncData.pot = GetScrapInPot();
 		}
 
-		private void InvokeStartNewRound()
+		public void InvokeStartNewRound()
 		{
 			TryStartNewRound();
 		}
 
-		private bool TryStartNewRound()
+		public bool TryStartNewRound()
 		{
 			if (HasRoundInProgress)
 			{
@@ -502,7 +502,7 @@ namespace Facepunch.CardGames
 
 		protected abstract void SubEndGameplay();
 
-		protected void EndRound()
+		public void EndRound()
 		{
 			State = CardGameState.InGameBetweenRounds;
 			SubEndRound();
@@ -525,7 +525,7 @@ namespace Facepunch.CardGames
 			Owner.Invoke(InvokeStartNewRound, TimeBetweenRounds);
 		}
 
-		private void EndGameplay()
+		public void EndGameplay()
 		{
 			if (HasGameInProgress)
 			{
@@ -554,7 +554,7 @@ namespace Facepunch.CardGames
 			}
 		}
 
-		protected void ReceivedInputFromPlayer(CardPlayerData pData, int input, bool countAsAction, int value = 0, bool playerInitiated = true)
+		public void ReceivedInputFromPlayer(CardPlayerData pData, int input, bool countAsAction, int value = 0, bool playerInitiated = true)
 		{
 			if (HasGameInProgress && pData != null)
 			{
@@ -568,7 +568,7 @@ namespace Facepunch.CardGames
 			}
 		}
 
-		protected void UpdateAllAvailableInputs()
+		public void UpdateAllAvailableInputs()
 		{
 			for (int i = 0; i < playerData.Length; i++)
 			{
@@ -584,7 +584,7 @@ namespace Facepunch.CardGames
 			}
 		}
 
-		protected void ServerPlaySound(CardGameSounds.SoundType type)
+		public void ServerPlaySound(CardGameSounds.SoundType type)
 		{
 			Owner.ClientRPC(null, "ClientPlaySound", (int)type);
 		}

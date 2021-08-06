@@ -466,7 +466,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 		rigidBody.AddForce(Vector3.up * num2, ForceMode.Force);
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		hoverForceScale = 1f;
 		base.VehicleFixedUpdate();

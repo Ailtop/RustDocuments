@@ -184,21 +184,18 @@ public class BaseHelicopterVehicle : BaseVehicle
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!base.isClient)
+		if (Time.time > lastPlayerInputTime + 0.5f)
 		{
-			if (Time.time > lastPlayerInputTime + 0.5f)
-			{
-				SetDefaultInputState();
-			}
-			EnableGlobalBroadcast(IsEngineOn());
-			MovementUpdate();
-			SetFlag(Flags.Reserved6, TOD_Sky.Instance.IsNight);
-			GameObject[] array = killTriggers;
-			foreach (GameObject obj in array)
-			{
-				bool active = rigidBody.velocity.y < 0f;
-				obj.SetActive(active);
-			}
+			SetDefaultInputState();
+		}
+		EnableGlobalBroadcast(IsEngineOn());
+		MovementUpdate();
+		SetFlag(Flags.Reserved6, TOD_Sky.Instance.IsNight);
+		GameObject[] array = killTriggers;
+		foreach (GameObject obj in array)
+		{
+			bool active = rigidBody.velocity.y < 0f;
+			obj.SetActive(active);
 		}
 	}
 
@@ -280,8 +277,11 @@ public class BaseHelicopterVehicle : BaseVehicle
 
 	public void DelayedImpactDamage()
 	{
+		float num = explosionForceMultiplier;
+		explosionForceMultiplier = 0f;
 		Hurt(pendingImpactDamage * MaxHealth(), DamageType.Explosion, this, false);
 		pendingImpactDamage = 0f;
+		explosionForceMultiplier = num;
 	}
 
 	public virtual bool CollisionDamageEnabled()

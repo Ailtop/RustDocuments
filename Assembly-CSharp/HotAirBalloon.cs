@@ -68,7 +68,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	[ServerVar(Help = "Population active on the server")]
 	public static float population = 1f;
 
-	[ServerVar(Help = "How long before a HAB is killed while outside")]
+	[ServerVar(Help = "How long before a HAB loses all its health while outside")]
 	public static float outsidedecayminutes = 180f;
 
 	public float windForce = 30000f;
@@ -277,8 +277,8 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void EngineSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnHotAirBalloonToggle", this, msg.player) == null)

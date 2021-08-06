@@ -114,7 +114,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 		inventory = new ItemContainer();
 		inventory.entityOwner = this;
 		inventory.allowedContents = ((allowedContents == (ItemContainer.ContentsType)0) ? ItemContainer.ContentsType.Generic : allowedContents);
-		inventory.onlyAllowedItem = onlyAllowedItem;
+		inventory.SetOnlyAllowedItem(onlyAllowedItem);
 		inventory.maxStackSize = maxStackSize;
 		inventory.ServerInitialize(null, numSlots);
 		if (giveUID)
@@ -168,8 +168,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)

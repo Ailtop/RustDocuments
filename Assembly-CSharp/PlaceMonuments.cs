@@ -68,6 +68,8 @@ public class PlaceMonuments : ProceduralComponent
 
 	public const int Attempts = 10000;
 
+	private const int MaxDepth = 100000;
+
 	public override void Process(uint seed)
 	{
 		string[] array = (from folder in ResourceFolder.Split(',')
@@ -83,6 +85,8 @@ public class PlaceMonuments : ProceduralComponent
 				return;
 			}
 			TerrainHeightMap heightMap = TerrainMeta.HeightMap;
+			PathFinder pathFinder = null;
+			List<PathFinder.Point> endList = null;
 			List<Prefab<MonumentInfo>> list = new List<Prefab<MonumentInfo>>();
 			string[] array2 = array;
 			for (int i = 0; i < array2.Length; i++)
@@ -119,7 +123,7 @@ public class PlaceMonuments : ProceduralComponent
 					{
 						continue;
 					}
-					DungeonInfo dungeonEntrance = component.DungeonEntrance;
+					DungeonGridInfo dungeonEntrance = component.DungeonEntrance;
 					int num3 = (int)((!prefab.Parameters) ? PrefabPriority.Low : (prefab.Parameters.Priority + 1));
 					int num4 = 100000 * num3 * num3 * num3 * num3;
 					int num5 = 0;
@@ -160,6 +164,41 @@ public class PlaceMonuments : ProceduralComponent
 						}
 						DistanceInfo distanceInfo = GetDistanceInfo(a, prefab, pos, rot, scale, vector);
 						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < (float)dungeonEntrance.CellSize) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
+						{
+							continue;
+						}
+						bool flag = false;
+						TerrainPathConnect[] componentsInChildren = prefab.Object.GetComponentsInChildren<TerrainPathConnect>(true);
+						foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
+						{
+							if (terrainPathConnect.Type == InfrastructureType.Boat)
+							{
+								if (pathFinder == null)
+								{
+									int[,] array6 = TerrainPath.CreateBoatCostmap(2f);
+									int length = array6.GetLength(0);
+									pathFinder = new PathFinder(array6);
+									endList = new List<PathFinder.Point>
+									{
+										new PathFinder.Point(0, 0),
+										new PathFinder.Point(0, length / 2),
+										new PathFinder.Point(0, length - 1),
+										new PathFinder.Point(length / 2, 0),
+										new PathFinder.Point(length / 2, length - 1),
+										new PathFinder.Point(length - 1, 0),
+										new PathFinder.Point(length - 1, length / 2),
+										new PathFinder.Point(length - 1, length - 1)
+									};
+								}
+								PathFinder.Point pathFinderPoint = terrainPathConnect.GetPathFinderPoint(pathFinder.GetResolution(0), pos + rot * Vector3.Scale(scale, terrainPathConnect.transform.localPosition));
+								if (pathFinder.FindPathUndirected(new List<PathFinder.Point> { pathFinderPoint }, endList, 100000) == null)
+								{
+									flag = true;
+									break;
+								}
+							}
+						}
+						if (flag)
 						{
 							continue;
 						}
@@ -298,9 +337,9 @@ public class PlaceMonuments : ProceduralComponent
 					result.maxDistanceDifferentType = num2;
 				}
 			}
-			foreach (DungeonInfo dungeonEntrance in TerrainMeta.Path.DungeonEntrances)
+			foreach (DungeonGridInfo dungeonGridEntrance in TerrainMeta.Path.DungeonGridEntrances)
 			{
-				float num3 = dungeonEntrance.SqrDistance(dungeonPos);
+				float num3 = dungeonGridEntrance.SqrDistance(dungeonPos);
 				if (num3 < result.minDistanceDungeonEntrance)
 				{
 					result.minDistanceDungeonEntrance = num3;

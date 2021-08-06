@@ -481,6 +481,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 		AddState(new BaseFollowPathState());
 		AddState(new BaseNavigateHomeState());
 		AddState(new CombatStationaryState());
+		AddState(new BaseMoveTorwardsState());
 	}
 
 	public override void InitializeAI()

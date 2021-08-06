@@ -104,6 +104,11 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		{
 			Effect.server.Run(pickupEffect.resourcePath, base.transform.position, base.transform.up);
 		}
+		RandomItemDispenser randomItemDispenser = PrefabAttribute.server.Find<RandomItemDispenser>(prefabID);
+		if (randomItemDispenser != null)
+		{
+			randomItemDispenser.DistributeItems(reciever, base.transform.position);
+		}
 		Kill();
 	}
 

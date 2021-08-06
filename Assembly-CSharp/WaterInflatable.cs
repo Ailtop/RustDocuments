@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class WaterInflatable : BaseMountable, PoolVehicle, INotifyTrigger
+public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 {
 	private enum PaddleDirection
 	{
@@ -91,8 +91,6 @@ public class WaterInflatable : BaseMountable, PoolVehicle, INotifyTrigger
 
 	private bool forceClippingCheck;
 
-	public override bool CanDrinkWhileMounted => false;
-
 	public override bool IsSummerDlcVehicle => true;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -122,7 +120,7 @@ public class WaterInflatable : BaseMountable, PoolVehicle, INotifyTrigger
 		}
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (rigidBody.velocity.magnitude > maxSpeed)

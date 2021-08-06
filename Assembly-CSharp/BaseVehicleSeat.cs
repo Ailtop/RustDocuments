@@ -43,11 +43,6 @@ public class BaseVehicleSeat : BaseVehicleMountPoint
 		}
 	}
 
-	public override float GetSteering(BasePlayer player)
-	{
-		return GetVehicleParent().GetSteering(player);
-	}
-
 	public override void SwitchParent(BaseEntity ent)
 	{
 	}

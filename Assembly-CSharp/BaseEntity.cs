@@ -194,11 +194,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		public class EntityTree
 		{
-			private Grid<BaseEntity> Grid;
+			public Grid<BaseEntity> Grid;
 
-			private Grid<BasePlayer> PlayerGrid;
+			public Grid<BasePlayer> PlayerGrid;
 
-			private Grid<BaseEntity> BrainGrid;
+			public Grid<BaseEntity> BrainGrid;
 
 			public EntityTree(float worldSize)
 			{
@@ -245,7 +245,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 			public void RemoveBrain(BaseEntity entity)
 			{
-				BrainGrid.Remove(entity);
+				if (!(entity == null))
+				{
+					BrainGrid.Remove(entity);
+				}
 			}
 
 			public void Move(BaseEntity ent)
@@ -2721,6 +2724,25 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			WaterVolume waterVolume;
 			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(bounds, out info))
+			{
+				return true;
+			}
+		}
+		info = default(WaterLevel.WaterInfo);
+		return false;
+	}
+
+	public bool WaterTestFromVolumes(Vector3 start, Vector3 end, float radius, out WaterLevel.WaterInfo info)
+	{
+		if (triggers == null)
+		{
+			info = default(WaterLevel.WaterInfo);
+			return false;
+		}
+		for (int i = 0; i < triggers.Count; i++)
+		{
+			WaterVolume waterVolume;
+			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(start, end, radius, out info))
 			{
 				return true;
 			}

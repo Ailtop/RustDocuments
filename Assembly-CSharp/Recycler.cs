@@ -67,6 +67,48 @@ public class Recycler : StorageContainer
 		base.ResetState();
 	}
 
+	private bool CanBeRecycled(Item item)
+	{
+		if (item != null)
+		{
+			return item.info.Blueprint != null;
+		}
+		return false;
+	}
+
+	public override void ServerInit()
+	{
+		base.ServerInit();
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(RecyclerItemFilter));
+	}
+
+	public bool RecyclerItemFilter(Item item, int targetSlot)
+	{
+		int num = Mathf.CeilToInt((float)base.inventory.capacity * 0.5f);
+		if (targetSlot == -1)
+		{
+			bool flag = false;
+			for (int i = 0; i < num; i++)
+			{
+				if (!base.inventory.SlotTaken(item, i))
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (!flag)
+			{
+				return false;
+			}
+		}
+		if (targetSlot < num)
+		{
+			return CanBeRecycled(item);
+		}
+		return true;
+	}
+
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	private void SVSwitch(RPCMessage msg)
@@ -158,9 +200,10 @@ public class Recycler : StorageContainer
 			if (num2 < 6)
 			{
 				Item slot = base.inventory.GetSlot(num2);
-				if (slot == null)
+				if (!CanBeRecycled(slot))
 				{
-					goto IL_034f;
+					num2++;
+					continue;
 				}
 				if (Interface.CallHook("OnRecycleItem", this, slot) != null)
 				{
@@ -169,10 +212,6 @@ public class Recycler : StorageContainer
 						StopRecycling();
 					}
 					break;
-				}
-				if (!(slot.info.Blueprint != null))
-				{
-					goto IL_034f;
 				}
 				if (slot.hasCondition)
 				{
@@ -259,8 +298,6 @@ public class Recycler : StorageContainer
 				StopRecycling();
 			}
 			break;
-			IL_034f:
-			num2++;
 		}
 	}
 

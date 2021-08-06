@@ -363,8 +363,10 @@ public class OcclusionCulling : MonoBehaviour
 				{
 					pool.Capacity += granularity;
 				}
-				val = new ValueType();
-				val.hashedPoolIndex = count;
+				val = new ValueType
+				{
+					hashedPoolIndex = count
+				};
 				pool.Add(val);
 				list.Add(val);
 			}

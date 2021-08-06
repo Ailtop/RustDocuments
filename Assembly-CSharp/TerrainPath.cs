@@ -9,7 +9,7 @@ public class TerrainPath : TerrainExtension
 
 	public List<PathList> Powerlines = new List<PathList>();
 
-	internal List<LandmarkInfo> Landmarks = new List<LandmarkInfo>();
+	public List<LandmarkInfo> Landmarks = new List<LandmarkInfo>();
 
 	public List<MonumentInfo> Monuments = new List<MonumentInfo>();
 
@@ -17,11 +17,15 @@ public class TerrainPath : TerrainExtension
 
 	public List<LakeInfo> LakeObjs = new List<LakeInfo>();
 
-	public List<DungeonInfo> DungeonEntrances = new List<DungeonInfo>();
+	public GameObject DungeonGridRoot;
 
-	public List<DungeonCell> DungeonCells = new List<DungeonCell>();
+	public List<DungeonGridInfo> DungeonGridEntrances = new List<DungeonGridInfo>();
 
-	public GameObject DungeonRoot;
+	public List<DungeonGridCell> DungeonGridCells = new List<DungeonGridCell>();
+
+	public GameObject DungeonBaseRoot;
+
+	public List<DungeonBaseInfo> DungeonBaseEntrances = new List<DungeonBaseInfo>();
 
 	public List<Vector3> OceanPatrolClose = new List<Vector3>();
 
@@ -139,6 +143,32 @@ public class TerrainPath : TerrainExtension
 				else
 				{
 					array[j, i] = 1 + (int)(slope * slope * 10f) + num2;
+				}
+			}
+		}
+		return array;
+	}
+
+	public static int[,] CreateBoatCostmap(float depth)
+	{
+		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
+		TerrainWaterMap waterMap = TerrainMeta.WaterMap;
+		int res = heightMap.res;
+		int[,] array = new int[res, res];
+		for (int i = 0; i < res; i++)
+		{
+			float normZ = ((float)i + 0.5f) / (float)res;
+			for (int j = 0; j < res; j++)
+			{
+				float normX = ((float)j + 0.5f) / (float)res;
+				float height = heightMap.GetHeight(normX, normZ);
+				if (waterMap.GetHeight(normX, normZ) - height < depth)
+				{
+					array[j, i] = int.MaxValue;
+				}
+				else
+				{
+					array[j, i] = 1;
 				}
 			}
 		}

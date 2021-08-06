@@ -149,9 +149,9 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity();
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -353,8 +353,8 @@ public class BaseMelee : AttackEntity
 		ownerItem.LoseCondition(conditionLoss);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void PlayerAttack(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

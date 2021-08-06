@@ -41,8 +41,8 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	public VisualGroup visualGroup;
 
-	[HideInInspector]
 	[SerializeField]
+	[HideInInspector]
 	private VehicleLight[] lights;
 
 	public LODLevel[] lodRenderers;
@@ -416,7 +416,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	public void RefreshConditionals(bool canGib)
 	{
-		if (!IsOnAVehicle || !Vehicle.HasInited)
+		if (base.IsDestroyed || !IsOnAVehicle || !Vehicle.HasInited)
 		{
 			return;
 		}
@@ -431,7 +431,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 
 	private void RefreshConditional(ConditionalObject conditional, bool canGib)
 	{
-		if (conditional.gameObject == null)
+		if (conditional == null || conditional.gameObject == null)
 		{
 			return;
 		}

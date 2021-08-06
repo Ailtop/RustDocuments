@@ -14,6 +14,8 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 
 	public const int MaxBacktrackHopsClient = 30;
 
+	public bool IsStatic;
+
 	public BaseEntity ToBaseEntity => this;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -134,7 +136,7 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 				BoxController.ServerTogglePlay(false);
 			}
 		}
-		else if (IsPowered())
+		else if (IsPowered() && !IsConnectedToAnySlot(this, inputSlot, IOEntity.backtracking))
 		{
 			BoxController.ServerTogglePlay(inputAmount > 0);
 		}
@@ -145,9 +147,13 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 		base.ServerInit();
 		base.inventory.canAcceptItem = ItemFilter;
 		BoxController.HurtCallback = HurtCallback;
+		if (IsStatic)
+		{
+			SetFlag(Flags.Reserved8, true);
+		}
 	}
 
-	private bool ItemFilter(Item item, int count)
+	public bool ItemFilter(Item item, int count)
 	{
 		ItemDefinition[] validCassettes = BoxController.ValidCassettes;
 		for (int i = 0; i < validCassettes.Length; i++)
@@ -178,17 +184,17 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 		return base.CalculateCurrentEnergy(inputAmount, inputSlot);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerTogglePlay(RPCMessage msg)
 	{
 		BoxController.ServerTogglePlay(msg);
 	}
 
+	[RPC_Server.CallsPerSecond(2uL)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(2uL)]
-	private void Server_UpdateRadioIP(RPCMessage msg)
+	public void Server_UpdateRadioIP(RPCMessage msg)
 	{
 		BoxController.Server_UpdateRadioIP(msg);
 	}
@@ -223,5 +229,9 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 	{
 		base.Load(info);
 		BoxController.Load(info);
+		if (base.isServer && IsStatic)
+		{
+			SetFlag(Flags.Reserved8, true);
+		}
 	}
 }

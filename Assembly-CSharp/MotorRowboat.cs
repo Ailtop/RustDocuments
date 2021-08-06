@@ -91,10 +91,10 @@ public class MotorRowboat : BaseBoat
 	[ServerVar(Help = "Population active on the server")]
 	public static float population = 1f;
 
-	[ServerVar(Help = "How long before a boat is killed while outside.  If it's in deep water as well, the minimum of the two is used")]
+	[ServerVar(Help = "How long before a boat loses all its health while outside. If it's in deep water, deepwaterdecayminutes is used")]
 	public static float outsidedecayminutes = 180f;
 
-	[ServerVar(Help = "How long before a boat is killed while in deep water. If it's outside as well, the minimum of the two is used")]
+	[ServerVar(Help = "How long before a boat loses all its health while in deep water")]
 	public static float deepwaterdecayminutes = 120f;
 
 	public EntityFuelSystem fuelSystem;
@@ -229,20 +229,14 @@ public class MotorRowboat : BaseBoat
 
 	public void BoatDecay()
 	{
-		if (!dying && base.healthFraction != 0f)
+		if (!dying)
 		{
-			BaseBoatDecay(60f, timeSinceLastUsedFuel, outsidedecayminutes, deepwaterdecayminutes);
+			BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsedFuel, outsidedecayminutes, deepwaterdecayminutes);
 		}
 	}
 
 	public override void DoPushAction(BasePlayer player)
 	{
-		if (player.isMounted || !IsStationary() || (!(player.WaterFactor() <= 0.6f) && !IsFlipped()) || (!IsFlipped() && player.IsStandingOnEntity(this, 8192)) || Vector3.Distance(player.transform.position, base.transform.position) > 5f || dying)
-		{
-			return;
-		}
-		player.metabolism.calories.Subtract(2f);
-		player.metabolism.SendChangesToClient();
 		if (IsFlipped())
 		{
 			rigidBody.AddRelativeTorque(Vector3.forward * 6.5f, ForceMode.VelocityChange);
@@ -340,11 +334,6 @@ public class MotorRowboat : BaseBoat
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
 		base.PlayerServerInput(inputState, player);
-	}
-
-	public override float GetSteering(BasePlayer player)
-	{
-		return 0f;
 	}
 
 	public override bool EngineOn()
@@ -552,6 +541,22 @@ public class MotorRowboat : BaseBoat
 	public override bool CanPushNow(BasePlayer pusher)
 	{
 		if (!base.CanPushNow(pusher))
+		{
+			return false;
+		}
+		if (!IsStationary() || (!(pusher.WaterFactor() <= 0.6f) && !IsFlipped()))
+		{
+			return false;
+		}
+		if (!IsFlipped() && pusher.IsStandingOnEntity(this, 8192))
+		{
+			return false;
+		}
+		if (Vector3.Distance(pusher.transform.position, base.transform.position) > 5f)
+		{
+			return false;
+		}
+		if (dying)
 		{
 			return false;
 		}

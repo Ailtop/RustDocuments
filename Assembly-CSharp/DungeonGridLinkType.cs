@@ -1,4 +1,4 @@
-public enum DungeonLinkType
+public enum DungeonGridLinkType
 {
 	Default,
 	Elevator,

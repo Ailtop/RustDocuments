@@ -24,6 +24,8 @@ public class AudioSettings : MonoBehaviour
 			mixer.SetFloat("WorldVol", LinearToDecibel(Audio.game));
 			mixer.SetFloat("VoiceVol", LinearToDecibel(Audio.voices));
 			mixer.SetFloat("InstrumentVol", LinearToDecibel(Audio.instruments));
+			float value2 = LinearToDecibel(Audio.voiceProps) - 28.7f;
+			mixer.SetFloat("VoicePropsVol", value2);
 		}
 	}
 

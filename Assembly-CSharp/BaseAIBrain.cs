@@ -12,6 +12,148 @@ using UnityEngine.Assertions;
 
 public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener where T : BaseEntity
 {
+	public class BaseAttackState : BasicAIState
+	{
+		private IAIAttack attack;
+
+		public BaseAttackState()
+			: base(AIState.Attack)
+		{
+			base.AgrresiveState = true;
+		}
+
+		public override void StateEnter()
+		{
+			base.StateEnter();
+			attack = GetEntity() as IAIAttack;
+			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+			if (baseEntity != null)
+			{
+				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
+				Vector3 aimDirection = GetAimDirection(brain.Navigator.transform.position, baseCombatEntity.transform.position);
+				brain.Navigator.SetFacingDirectionOverride(aimDirection);
+				if (attack.CanAttack(baseEntity))
+				{
+					StartAttacking(baseEntity);
+				}
+				brain.Navigator.SetDestination(baseEntity.transform.position, BaseNavigator.NavigationSpeed.Fast);
+			}
+		}
+
+		public override void StateLeave()
+		{
+			base.StateLeave();
+			brain.Navigator.ClearFacingDirectionOverride();
+			brain.Navigator.Stop();
+			StopAttacking();
+		}
+
+		private void StopAttacking()
+		{
+			attack.StopAttacking();
+		}
+
+		public override StateStatus StateThink(float delta)
+		{
+			base.StateThink(delta);
+			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+			if (attack == null)
+			{
+				return StateStatus.Error;
+			}
+			if (baseEntity == null)
+			{
+				brain.Navigator.ClearFacingDirectionOverride();
+				StopAttacking();
+				return StateStatus.Finished;
+			}
+			if (brain.Senses.ignoreSafeZonePlayers)
+			{
+				BasePlayer basePlayer = baseEntity as BasePlayer;
+				if (basePlayer != null && basePlayer.InSafeZone())
+				{
+					return StateStatus.Error;
+				}
+			}
+			if (!brain.Navigator.SetDestination(baseEntity.transform.position, BaseNavigator.NavigationSpeed.Fast, 0.25f))
+			{
+				return StateStatus.Error;
+			}
+			BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
+			Vector3 aimDirection = GetAimDirection(brain.Navigator.transform.position, baseCombatEntity.transform.position);
+			brain.Navigator.SetFacingDirectionOverride(aimDirection);
+			if (attack.CanAttack(baseEntity))
+			{
+				StartAttacking(baseEntity);
+			}
+			else
+			{
+				StopAttacking();
+			}
+			return StateStatus.Running;
+		}
+
+		private static Vector3 GetAimDirection(Vector3 from, Vector3 target)
+		{
+			return Vector3Ex.Direction2D(target, from);
+		}
+
+		private void StartAttacking(BaseEntity entity)
+		{
+			attack.StartAttacking(entity);
+		}
+	}
+
+	public class BaseChaseState : BasicAIState
+	{
+		public BaseChaseState()
+			: base(AIState.Chase)
+		{
+			base.AgrresiveState = true;
+		}
+
+		public override void StateEnter()
+		{
+			base.StateEnter();
+			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+			if (baseEntity != null)
+			{
+				brain.Navigator.SetDestination(baseEntity.transform.position, BaseNavigator.NavigationSpeed.Fast);
+			}
+		}
+
+		public override void StateLeave()
+		{
+			base.StateLeave();
+			Stop();
+		}
+
+		private void Stop()
+		{
+			brain.Navigator.Stop();
+		}
+
+		public override StateStatus StateThink(float delta)
+		{
+			base.StateThink(delta);
+			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+			if (baseEntity == null)
+			{
+				Stop();
+				return StateStatus.Error;
+			}
+			if (!brain.Navigator.SetDestination(baseEntity.transform.position, BaseNavigator.NavigationSpeed.Fast, 0.25f))
+			{
+				return StateStatus.Error;
+			}
+			if (!brain.Navigator.Moving)
+			{
+				return StateStatus.Finished;
+			}
+			return StateStatus.Running;
+		}
+	}
+
 	public class BaseCooldownState : BasicAIState
 	{
 		public BaseCooldownState()
@@ -25,6 +167,79 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		public BaseDismountedState()
 			: base(AIState.Dismounted)
 		{
+		}
+	}
+
+	public class BaseFleeState : BasicAIState
+	{
+		private float nextInterval = 2f;
+
+		private float stopFleeDistance;
+
+		public BaseFleeState()
+			: base(AIState.Flee)
+		{
+		}
+
+		public override void StateEnter()
+		{
+			base.StateEnter();
+			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+			if (baseEntity != null)
+			{
+				stopFleeDistance = UnityEngine.Random.Range(80f, 100f) + Mathf.Clamp(Vector3Ex.Distance2D(brain.Navigator.transform.position, baseEntity.transform.position), 0f, 50f);
+			}
+			FleeFrom(brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot), GetEntity());
+		}
+
+		public override void StateLeave()
+		{
+			base.StateLeave();
+			Stop();
+		}
+
+		private void Stop()
+		{
+			brain.Navigator.Stop();
+		}
+
+		public override StateStatus StateThink(float delta)
+		{
+			base.StateThink(delta);
+			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+			if (baseEntity == null)
+			{
+				return StateStatus.Finished;
+			}
+			if (Vector3Ex.Distance2D(brain.Navigator.transform.position, baseEntity.transform.position) >= stopFleeDistance)
+			{
+				return StateStatus.Finished;
+			}
+			if ((brain.Navigator.UpdateIntervalElapsed(nextInterval) || !brain.Navigator.Moving) && !FleeFrom(baseEntity, GetEntity()))
+			{
+				return StateStatus.Error;
+			}
+			return StateStatus.Running;
+		}
+
+		private bool FleeFrom(BaseEntity fleeFromEntity, BaseEntity thisEntity)
+		{
+			if (thisEntity == null || fleeFromEntity == null)
+			{
+				return false;
+			}
+			nextInterval = UnityEngine.Random.Range(3f, 6f);
+			Vector3 result;
+			if (!brain.PathFinder.GetBestFleePosition(brain.Navigator, brain.Senses, fleeFromEntity, brain.Events.Memory.Position.Get(4), 50f, 100f, out result))
+			{
+				return false;
+			}
+			bool num = brain.Navigator.SetDestination(result, BaseNavigator.NavigationSpeed.Fast);
+			if (!num)
+			{
+				Stop();
+			}
+			return num;
 		}
 	}
 
@@ -975,7 +1190,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 
 	public virtual void Think(float delta)
 	{
-		if (!AI.think)
+		if (this == null || !AI.think)
 		{
 			return;
 		}

@@ -1,7 +1,7 @@
 using Network;
 using UnityEngine;
 
-public class Kayak : BaseBoat, PoolVehicle
+public class Kayak : BaseBoat, IPoolVehicle
 {
 	private enum PaddleDirection
 	{
@@ -119,15 +119,9 @@ public class Kayak : BaseBoat, PoolVehicle
 
 	public override void DoPushAction(BasePlayer player)
 	{
-		if (HasDriver())
-		{
-			return;
-		}
-		player.metabolism.calories.Subtract(2f);
-		player.metabolism.SendChangesToClient();
 		if (IsFlipped())
 		{
-			rigidBody.AddRelativeTorque(Vector3.forward * 5f, ForceMode.VelocityChange);
+			rigidBody.AddRelativeTorque(Vector3.forward * 8f, ForceMode.VelocityChange);
 		}
 		else
 		{
@@ -154,7 +148,7 @@ public class Kayak : BaseBoat, PoolVehicle
 		}
 	}
 
-	protected override void VehicleFixedUpdate()
+	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
 		if (fixedDragUpdate == null)
@@ -185,28 +179,7 @@ public class Kayak : BaseBoat, PoolVehicle
 
 	public void BoatDecay()
 	{
-		if (base.healthFraction != 0f)
-		{
-			BaseBoatDecay(60f, timeSinceLastUsed, MotorRowboat.outsidedecayminutes, MotorRowboat.deepwaterdecayminutes);
-		}
-	}
-
-	public void OnPoolDestroyed()
-	{
-		Kill(DestroyMode.Gib);
-	}
-
-	public void WakeUp()
-	{
-		if (rigidBody != null)
-		{
-			rigidBody.WakeUp();
-			rigidBody.AddForce(Vector3.up * 0.1f, ForceMode.Impulse);
-		}
-		if (buoyancy != null)
-		{
-			buoyancy.Wake();
-		}
+		BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsed, MotorRowboat.outsidedecayminutes, MotorRowboat.deepwaterdecayminutes);
 	}
 
 	public override bool CanPickup(BasePlayer player)

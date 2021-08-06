@@ -101,7 +101,13 @@ public class CardTable : BaseVehicle
 
 	private const float MAX_STORAGE_INTERACTION_DIST = 1f;
 
-	protected override bool CanSwapSeats => false;
+	protected override bool CanSwapSeats
+	{
+		public get
+		{
+			return false;
+		}
+	}
 
 	public int ScrapItemID => scrapItemDef.itemid;
 
@@ -553,8 +559,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Editor_MakeRandomMove(RPCMessage msg)
 	{
 		if (UnityEngine.Application.isEditor)
@@ -563,8 +569,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_Play(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -585,8 +591,8 @@ public class CardTable : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_LeaveTable(RPCMessage msg)
 	{
 		GameController.LeaveTable(msg.player.userID);

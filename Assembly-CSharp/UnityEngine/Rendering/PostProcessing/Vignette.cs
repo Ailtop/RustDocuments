@@ -24,15 +24,15 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = new Vector2(0.5f, 0.5f)
 		};
 
-		[Tooltip("Amount of vignetting on screen.")]
 		[Range(0f, 1f)]
+		[Tooltip("Amount of vignetting on screen.")]
 		public FloatParameter intensity = new FloatParameter
 		{
 			value = 0f
 		};
 
-		[Tooltip("Smoothness of the vignette borders.")]
 		[Range(0.01f, 1f)]
+		[Tooltip("Smoothness of the vignette borders.")]
 		public FloatParameter smoothness = new FloatParameter
 		{
 			value = 0.2f

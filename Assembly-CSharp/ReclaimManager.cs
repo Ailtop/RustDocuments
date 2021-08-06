@@ -24,7 +24,7 @@ public class ReclaimManager : BaseEntity
 			inventory = Pool.Get<ItemContainer>();
 			inventory.entityOwner = instance;
 			inventory.allowedContents = ItemContainer.ContentsType.Generic;
-			inventory.onlyAllowedItem = null;
+			inventory.SetOnlyAllowedItem(null);
 			inventory.maxStackSize = 0;
 			inventory.ServerInitialize(null, 40);
 			inventory.canAcceptItem = null;

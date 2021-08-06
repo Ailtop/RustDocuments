@@ -79,10 +79,10 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	[ServerVar(Help = "Population active on the server")]
 	public static float population = 0f;
 
-	[ServerVar(Help = "How long before a minicopter is killed while outside")]
+	[ServerVar(Help = "How long before a minicopter loses all its health while outside")]
 	public static float outsidedecayminutes = 480f;
 
-	[ServerVar(Help = "How long before a minicopter is killed while indoors")]
+	[ServerVar(Help = "How long before a minicopter loses all its health while indoors")]
 	public static float insidedecayminutes = 2880f;
 
 	public VehicleEngineController engineController;
@@ -135,8 +135,8 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		return fuelSystem;
 	}
 
-	[RPC_Server.IsVisible(6f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(6f)]
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -169,7 +169,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	public override void PilotInput(InputState inputState, BasePlayer player)
 	{
 		base.PilotInput(inputState, player);
-		if (!IsOn() && !IsStartingUp && inputState.IsDown(BUTTON.FORWARD))
+		if (!IsOn() && !IsStartingUp && inputState.IsDown(BUTTON.FORWARD) && !inputState.WasDown(BUTTON.FORWARD))
 		{
 			engineController.TryStartEngine(player);
 		}
@@ -418,8 +418,6 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 
 	public override void DoPushAction(BasePlayer player)
 	{
-		player.metabolism.calories.Subtract(3f);
-		player.metabolism.SendChangesToClient();
 		Vector3 vector = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
 		Vector3 vector2 = player.eyes.BodyForward();
 		vector2.y = 0.25f;
@@ -427,10 +425,6 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		float num = rigidBody.mass * 2f;
 		rigidBody.AddForceAtPosition(vector2 * num, position, ForceMode.Impulse);
 		rigidBody.AddForce(Vector3.up * 3f, ForceMode.Impulse);
-		if (rigidBody.IsSleeping())
-		{
-			rigidBody.WakeUp();
-		}
 		isPushing = true;
 		Invoke(DisablePushing, 0.5f);
 	}

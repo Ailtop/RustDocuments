@@ -1,4 +1,4 @@
-public struct DungeonConnectionHash
+public struct DungeonGridConnectionHash
 {
 	public bool North;
 

@@ -78,6 +78,22 @@ namespace ConVar
 		}
 
 		[ServerUserVar]
+		public static void cinematic_gesture(Arg arg)
+		{
+			if (Server.cinematic)
+			{
+				string @string = arg.GetString(0);
+				BasePlayer basePlayer = ArgEx.GetPlayer(arg, 1);
+				if (basePlayer == null)
+				{
+					basePlayer = ArgEx.Player(arg);
+				}
+				basePlayer.UpdateActiveItem(0u);
+				basePlayer.SignalBroadcast(BaseEntity.Signal.Gesture, @string);
+			}
+		}
+
+		[ServerUserVar]
 		public static void copyrotation(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);

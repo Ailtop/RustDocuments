@@ -61,8 +61,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public TimeCachedValue<float> artificialTemperatureExposure;
 
-	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
 	[ServerVar]
+	[Help("How many miliseconds to budget for processing growable quality updates per frame")]
 	public static float framebudgetms = 0.25f;
 
 	public static GrowableEntityUpdateQueue growableEntityUpdateQueue = new GrowableEntityUpdateQueue();
@@ -732,8 +732,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_TakeClone(RPCMessage msg)
 	{
 		TakeClones(msg.player);
@@ -767,6 +767,11 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 		harvests++;
 		GiveFruit(player, CurrentPickAmount);
+		RandomItemDispenser randomItemDispenser = PrefabAttribute.server.Find<RandomItemDispenser>(prefabID);
+		if (randomItemDispenser != null)
+		{
+			randomItemDispenser.DistributeItems(player, base.transform.position);
+		}
 		ResetSeason();
 		if (Properties.pickEffect.isValid)
 		{
@@ -835,8 +840,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		PickFruit(msg.player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_RemoveDying(RPCMessage msg)
 	{
 		RemoveDying(msg.player);
@@ -964,7 +969,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public void ChangeState(PlantProperties.State state, bool resetAge, bool loading = false)
 	{
-		if (base.isServer && State == state)
+		if (Interface.CallHook("OnGrowableStateChange", this, state) != null || (base.isServer && State == state))
 		{
 			return;
 		}

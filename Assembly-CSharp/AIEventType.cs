@@ -24,5 +24,6 @@ public enum AIEventType
 	TimeSinceThreat,
 	OnPositionMemorySet,
 	AggressionTimer,
-	Reloading
+	Reloading,
+	InRangeOfHome
 }

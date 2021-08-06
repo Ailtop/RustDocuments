@@ -43,7 +43,7 @@ public sealed class ItemContainer
 
 	public ContentsType allowedContents;
 
-	public ItemDefinition onlyAllowedItem;
+	public ItemDefinition[] onlyAllowedItems;
 
 	public List<ItemSlot> availableSlots = new List<ItemSlot>();
 
@@ -74,6 +74,18 @@ public sealed class ItemContainer
 	public Action<Item, bool> onItemAddedRemoved;
 
 	public Action<Item> onPreItemRemove;
+
+	public bool HasLimitedAllowedItems
+	{
+		get
+		{
+			if (onlyAllowedItems != null)
+			{
+				return onlyAllowedItems.Length != 0;
+			}
+			return false;
+		}
+	}
 
 	public Vector3 dropPosition
 	{
@@ -287,6 +299,35 @@ public sealed class ItemContainer
 		return maxStackSize;
 	}
 
+	public void SetOnlyAllowedItem(ItemDefinition def)
+	{
+		SetOnlyAllowedItems(def);
+	}
+
+	public void SetOnlyAllowedItems(params ItemDefinition[] defs)
+	{
+		int num = 0;
+		ItemDefinition[] array = defs;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i] != null)
+			{
+				num++;
+			}
+		}
+		onlyAllowedItems = new ItemDefinition[num];
+		int num2 = 0;
+		array = defs;
+		foreach (ItemDefinition itemDefinition in array)
+		{
+			if (itemDefinition != null)
+			{
+				onlyAllowedItems[num2] = itemDefinition;
+				num2++;
+			}
+		}
+	}
+
 	public bool Insert(Item item)
 	{
 		if (itemList.Contains(item))
@@ -468,20 +509,27 @@ public sealed class ItemContainer
 		itemContainer.slots = capacity;
 		itemContainer.temperature = temperature;
 		itemContainer.allowedContents = (int)allowedContents;
-		itemContainer.allowedItem = ((onlyAllowedItem != null) ? onlyAllowedItem.itemid : 0);
+		if (HasLimitedAllowedItems)
+		{
+			itemContainer.allowedItems = Pool.GetList<int>();
+			for (int i = 0; i < onlyAllowedItems.Length; i++)
+			{
+				itemContainer.allowedItems.Add(onlyAllowedItems[i].itemid);
+			}
+		}
 		itemContainer.flags = (int)flags;
 		itemContainer.maxStackSize = maxStackSize;
 		if (availableSlots != null && availableSlots.Count > 0)
 		{
 			itemContainer.availableSlots = Pool.GetList<int>();
-			for (int i = 0; i < availableSlots.Count; i++)
+			for (int j = 0; j < availableSlots.Count; j++)
 			{
-				itemContainer.availableSlots.Add((int)availableSlots[i]);
+				itemContainer.availableSlots.Add((int)availableSlots[j]);
 			}
 		}
-		for (int j = 0; j < itemList.Count; j++)
+		for (int k = 0; k < itemList.Count; k++)
 		{
-			Item item = itemList[j];
+			Item item = itemList[k];
 			if (item.IsValid())
 			{
 				itemContainer.contents.Add(item.Save(true));
@@ -500,13 +548,24 @@ public sealed class ItemContainer
 			itemList = Pool.GetList<Item>();
 			temperature = container.temperature;
 			flags = (Flag)container.flags;
-			allowedContents = (ContentsType)((container.allowedContents == 0) ? 1 : container.allowedContents);
-			onlyAllowedItem = ((container.allowedItem != 0) ? ItemManager.FindItemDefinition(container.allowedItem) : null);
+			allowedContents = ((container.allowedContents == 0) ? ContentsType.Generic : ((ContentsType)container.allowedContents));
+			if (container.allowedItems != null && container.allowedItems.Count > 0)
+			{
+				onlyAllowedItems = new ItemDefinition[container.allowedItems.Count];
+				for (int i = 0; i < container.allowedItems.Count; i++)
+				{
+					onlyAllowedItems[i] = ItemManager.FindItemDefinition(container.allowedItems[i]);
+				}
+			}
+			else
+			{
+				onlyAllowedItems = null;
+			}
 			maxStackSize = container.maxStackSize;
 			availableSlots.Clear();
-			for (int i = 0; i < container.availableSlots.Count; i++)
+			for (int j = 0; j < container.availableSlots.Count; j++)
 			{
-				availableSlots.Add((ItemSlot)container.availableSlots[i]);
+				availableSlots.Add((ItemSlot)container.availableSlots[j]);
 			}
 			using (TimeWarning.New("container.contents"))
 			{
@@ -730,9 +789,21 @@ public sealed class ItemContainer
 		{
 			return CanAcceptResult.CannotAccept;
 		}
-		if (onlyAllowedItem != null && onlyAllowedItem != item.info)
+		if (HasLimitedAllowedItems)
 		{
-			return CanAcceptResult.CannotAccept;
+			bool flag = false;
+			for (int i = 0; i < onlyAllowedItems.Length; i++)
+			{
+				if (onlyAllowedItems[i] == item.info)
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (!flag)
+			{
+				return CanAcceptResult.CannotAccept;
+			}
 		}
 		if (availableSlots != null && availableSlots.Count > 0)
 		{
@@ -747,17 +818,17 @@ public sealed class ItemContainer
 			}
 			foreach (Item item2 in itemList)
 			{
-				for (int i = 0; i < 32; i++)
+				for (int j = 0; j < 32; j++)
 				{
-					if (((uint)item2.info.occupySlots & (uint)(1 << i)) != 0)
+					if (((uint)item2.info.occupySlots & (uint)(1 << j)) != 0)
 					{
-						array[i]--;
+						array[j]--;
 					}
 				}
 			}
-			for (int j = 0; j < 32; j++)
+			for (int k = 0; k < 32; k++)
 			{
-				if (((uint)item.info.occupySlots & (uint)(1 << j)) != 0 && array[j] <= 0)
+				if (((uint)item.info.occupySlots & (uint)(1 << k)) != 0 && array[k] <= 0)
 				{
 					return CanAcceptResult.CannotAcceptRightNow;
 				}

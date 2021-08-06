@@ -13,26 +13,88 @@ public class WaterOverlay : MonoBehaviour, IClientComponent
 
 		public float blurDistance;
 
+		public float blurSize;
+
+		public int blurIterations;
+
 		public bool wiggle;
 
-		public float doubleVisionAmount;
+		public float wiggleSpeed;
 
-		public float photoFilterDensity;
+		public bool chromaticAberration;
 
-		public static EffectParams DefaultGoggles = new EffectParams
+		public bool godRays;
+
+		public static EffectParams DefaultAdmin;
+
+		public static EffectParams DefaultGoggles;
+
+		public static EffectParams DefaultSubmarine;
+
+		public static EffectParams DefaultUnderwaterLab;
+
+		static EffectParams()
 		{
-			scatterCoefficient = 0.1f,
-			blur = false,
-			blurDistance = 10f,
-			wiggle = false,
-			doubleVisionAmount = 0.753f,
-			photoFilterDensity = 1f
-		};
+			EffectParams effectParams = new EffectParams
+			{
+				scatterCoefficient = 0.025f,
+				blur = false,
+				blurDistance = 10f,
+				blurSize = 2f,
+				wiggle = false,
+				wiggleSpeed = 0f,
+				chromaticAberration = true,
+				godRays = false
+			};
+			DefaultAdmin = effectParams;
+			effectParams = new EffectParams
+			{
+				scatterCoefficient = 0.05f,
+				blur = true,
+				blurDistance = 10f,
+				blurSize = 2f,
+				wiggle = true,
+				wiggleSpeed = 2f,
+				chromaticAberration = true,
+				godRays = true
+			};
+			DefaultGoggles = effectParams;
+			effectParams = new EffectParams
+			{
+				scatterCoefficient = 0.025f,
+				blur = false,
+				blurDistance = 10f,
+				blurSize = 2f,
+				wiggle = false,
+				wiggleSpeed = 0f,
+				chromaticAberration = false,
+				godRays = false
+			};
+			DefaultSubmarine = effectParams;
+			effectParams = new EffectParams
+			{
+				scatterCoefficient = 0.005f,
+				blur = false,
+				blurDistance = 10f,
+				blurSize = 2f,
+				wiggle = false,
+				wiggleSpeed = 0f,
+				chromaticAberration = true,
+				godRays = false
+			};
+			DefaultUnderwaterLab = effectParams;
+		}
 	}
 
 	public PostProcessVolume postProcessVolume;
 
-	public static bool goggles;
+	public EffectParams adminParams = EffectParams.DefaultAdmin;
 
 	public EffectParams gogglesParams = EffectParams.DefaultGoggles;
+
+	public EffectParams submarineParams = EffectParams.DefaultSubmarine;
+
+	public EffectParams underwaterLabParams = EffectParams.DefaultUnderwaterLab;
+
+	public Material[] UnderwaterFogMaterials;
 }

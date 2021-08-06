@@ -71,8 +71,8 @@ namespace UnityEngine.UI.Extensions
 		[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
 		internal bool relativeSize;
 
-		[Tooltip("Do the points identify a single line or split pairs of lines")]
 		[SerializeField]
+		[Tooltip("Do the points identify a single line or split pairs of lines")]
 		internal bool lineList;
 
 		[SerializeField]
