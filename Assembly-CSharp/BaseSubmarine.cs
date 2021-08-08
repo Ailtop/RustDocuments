@@ -20,11 +20,11 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		public Transform triggerWaterLevel;
 	}
 
-	private float targetClimbSpeed;
+	public float targetClimbSpeed;
 
 	private float nextCollisionFXTime;
 
-	private float maxDamageThisTick;
+	public float maxDamageThisTick;
 
 	private float nextCollisionDamageTime;
 
@@ -34,9 +34,9 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	private const float DECAY_TICK_TIME = 60f;
 
-	private TimeSince timeSinceLastUsed;
+	public TimeSince timeSinceLastUsed;
 
-	private TimeSince timeSinceTorpedoFired;
+	public TimeSince timeSinceTorpedoFired;
 
 	private TimeSince timeSinceFailRPCSent;
 
@@ -45,10 +45,10 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	private Transform centreOfMassTransform;
 
 	[SerializeField]
-	private Buoyancy buoyancy;
+	public Buoyancy buoyancy;
 
 	[SerializeField]
-	protected float maxRudderAngle = 35f;
+	public float maxRudderAngle = 35f;
 
 	[SerializeField]
 	private Transform rudderVisualTransform;
@@ -60,51 +60,51 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	private Transform propellerTransform;
 
 	[SerializeField]
-	private float timeUntilAutoSurface = 300f;
+	public float timeUntilAutoSurface = 300f;
 
 	[SerializeField]
-	private ParentTriggerInfo[] parentTriggers;
+	public ParentTriggerInfo[] parentTriggers;
 
 	[Header("Submarine Engine & Fuel")]
 	[SerializeField]
-	private float engineKW = 200f;
+	public float engineKW = 200f;
 
 	[SerializeField]
-	private float turnPower = 0.25f;
+	public float turnPower = 0.25f;
 
 	[SerializeField]
-	private float engineStartupTime = 0.5f;
+	public float engineStartupTime = 0.5f;
 
 	[SerializeField]
 	private GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
-	private Transform fuelStoragePoint;
+	public Transform fuelStoragePoint;
 
 	[SerializeField]
-	private float depthChangeTargetSpeed = 1f;
+	public float depthChangeTargetSpeed = 1f;
 
 	[SerializeField]
-	private float idleFuelPerSec = 0.03f;
+	public float idleFuelPerSec = 0.03f;
 
 	[SerializeField]
-	private float maxFuelPerSec = 0.15f;
+	public float maxFuelPerSec = 0.15f;
 
 	[SerializeField]
 	private bool internalAccessFuelTank;
 
 	[Header("Submarine Weaponry")]
 	[SerializeField]
-	private GameObjectRef torpedoStoragePrefab;
+	public GameObjectRef torpedoStoragePrefab;
 
 	[SerializeField]
-	private Transform torpedoStoragePoint;
+	public Transform torpedoStoragePoint;
 
 	[SerializeField]
-	private Transform torpedoFiringPoint;
+	public Transform torpedoFiringPoint;
 
 	[SerializeField]
-	private float maxFireRate = 1.5f;
+	public float maxFireRate = 1.5f;
 
 	[Header("Submarine Audio & FX")]
 	[SerializeField]
@@ -199,21 +199,21 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	private float _upDown;
 
-	protected VehicleEngineController engineController;
+	public VehicleEngineController engineController;
 
-	protected EntityFuelSystem fuelSystem;
+	public EntityFuelSystem fuelSystem;
 
-	protected float cachedFuelAmount;
+	public float cachedFuelAmount;
 
 	protected Vector3 steerAngle;
 
-	protected float waterSurfaceY;
+	public float waterSurfaceY;
 
-	protected float curSubDepthY;
+	public float curSubDepthY;
 
-	private EntityRef torpedoStorageInstance;
+	public EntityRef torpedoStorageInstance;
 
-	private int waterLayerMask;
+	public int waterLayerMask;
 
 	public bool IsMovingOrOn
 	{
@@ -581,7 +581,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			bool b2 = torpedoContainer.inventory.HasAmmo(AmmoTypes.TORPEDO);
 			SetFlag(Flags.Reserved6, b2);
 		}
-		if (primaryFireInput)
+		BasePlayer driver = GetDriver();
+		if (driver != null && primaryFireInput)
 		{
 			bool flag = true;
 			if (IsInWater && (float)timeSinceTorpedoFired >= maxFireRate && torpedoContainer != null)
@@ -610,12 +611,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 						vector += forward * (0f - num9);
 					}
 					component2.InitializeVelocity(vector);
-					BasePlayer driver = GetDriver();
-					if (driver != null)
-					{
-						baseEntity.creatorEntity = GetDriver();
-						driver.MarkHostileFor();
-					}
+					baseEntity.creatorEntity = driver;
+					driver.MarkHostileFor();
 					baseEntity.Spawn();
 					item.UseItem();
 				}
@@ -626,12 +623,12 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			if (!prevPrimaryFireInput && flag && (float)timeSinceFailRPCSent > 0.5f)
 			{
 				timeSinceFailRPCSent = 0f;
-				BasePlayer driver2 = GetDriver();
-				if (driver2 != null)
-				{
-					ClientRPCPlayer(null, driver2, "TorpedoFireFailed");
-				}
+				ClientRPCPlayer(null, driver, "TorpedoFireFailed");
 			}
+		}
+		else if (driver == null)
+		{
+			primaryFireInput = false;
 		}
 		prevPrimaryFireInput = primaryFireInput;
 		if ((float)timeSinceLastUsed > 300f && LightsAreOn)
@@ -760,7 +757,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	private void UpdateClients()
+	public void UpdateClients()
 	{
 		if (HasDriver())
 		{
@@ -787,7 +784,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	private void SubmarineDecay()
+	public void SubmarineDecay()
 	{
 		BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsed, outsidedecayminutes, deepwaterdecayminutes);
 	}
@@ -923,7 +920,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		rudderDetailedColliderTransform.localRotation = localRotation;
 	}
 
-	private void ResetInputs()
+	public void ResetInputs()
 	{
 		ThrottleInput = 0f;
 		RudderInput = 0f;

@@ -22,8 +22,6 @@ public class SkinnedMultiMesh : MonoBehaviour
 
 	public bool eyesView;
 
-	public bool hideHeadwear;
-
 	public Skeleton skeleton;
 
 	public SkeletonSkinLod skeletonSkinLod;

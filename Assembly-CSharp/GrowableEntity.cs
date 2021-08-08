@@ -103,7 +103,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public PlantProperties.State State { get; set; }
 
-	public float Age { get; private set; }
+	public float Age { get; set; }
 
 	public float LightQuality { get; set; }
 

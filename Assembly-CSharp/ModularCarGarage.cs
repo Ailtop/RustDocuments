@@ -859,9 +859,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.IsVisible(3f)]
 	public void RPC_RequestCarKey(RPCMessage msg)
 	{
 		if (HasOccupant && carOccupant.carLock.HasALock)

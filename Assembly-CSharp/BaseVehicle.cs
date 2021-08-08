@@ -39,6 +39,8 @@ public class BaseVehicle : BaseMountable
 
 	public bool keepsWaterOut;
 
+	public bool ignoreDamageFromOutside;
+
 	[Header("Rigidbody (Optional)")]
 	public Rigidbody rigidBody;
 

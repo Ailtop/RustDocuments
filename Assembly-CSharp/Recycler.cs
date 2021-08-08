@@ -69,6 +69,11 @@ public class Recycler : StorageContainer
 
 	private bool CanBeRecycled(Item item)
 	{
+		object obj = Interface.CallHook("CanBeRecycled", item, this);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (item != null)
 		{
 			return item.info.Blueprint != null;

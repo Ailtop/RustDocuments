@@ -4848,6 +4848,15 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return true;
 		}
+		BaseVehicle mountedVehicle = GetMountedVehicle();
+		if (mountedVehicle != null && mountedVehicle.ignoreDamageFromOutside)
+		{
+			BasePlayer initiatorPlayer = info.InitiatorPlayer;
+			if (initiatorPlayer != null && initiatorPlayer.GetMountedVehicle() != mountedVehicle)
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 

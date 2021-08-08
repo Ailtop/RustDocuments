@@ -589,9 +589,9 @@ public class VendingMachine : StorageContainer
 		ClientRPC(null, "CLIENT_CancelVendingSounds");
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))

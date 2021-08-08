@@ -216,6 +216,8 @@ public class SimpleShark : BaseCombatEntity
 
 	private SimpleState _currentState;
 
+	private bool sleeping;
+
 	public List<Vector3> patrolPath = new List<Vector3>();
 
 	private BasePlayer target;
@@ -242,7 +244,7 @@ public class SimpleShark : BaseCombatEntity
 
 	private float obstacleDetectionRange = 5f;
 
-	private float lastObstacleCheckTime;
+	private float timeSinceLastObstacleCheck;
 
 	private void GenerateIdlePoints(Vector3 center, float radius, float heightOffset, float staggerOffset = 0f)
 	{
@@ -313,6 +315,13 @@ public class SimpleShark : BaseCombatEntity
 		}
 		base.transform.position = WaterClamp(base.transform.position);
 		Init();
+		InvokeRandomized(CheckSleepState, 0f, 1f, 0.5f);
+	}
+
+	public void CheckSleepState()
+	{
+		bool flag = BaseNetworkable.HasCloseConnections(base.transform.position, 100f);
+		sleeping = !flag;
 	}
 
 	public void Init()
@@ -336,36 +345,42 @@ public class SimpleShark : BaseCombatEntity
 			{
 				Invoke(base.KillMessage, 0.01f);
 			}
-			return;
 		}
-		SimpleState simpleState = null;
-		float num = -1f;
-		SimpleState[] array = states;
-		foreach (SimpleState simpleState2 in array)
+		else
 		{
-			float num2 = simpleState2.State_Weight();
-			if (num2 > num)
+			if (sleeping)
 			{
-				simpleState = simpleState2;
-				num = num2;
+				return;
 			}
-		}
-		if (simpleState != _currentState && (_currentState == null || _currentState.CanInterrupt()))
-		{
-			if (_currentState != null)
+			SimpleState simpleState = null;
+			float num = -1f;
+			SimpleState[] array = states;
+			foreach (SimpleState simpleState2 in array)
 			{
-				_currentState.State_Exit();
+				float num2 = simpleState2.State_Weight();
+				if (num2 > num)
+				{
+					simpleState = simpleState2;
+					num = num2;
+				}
 			}
-			simpleState.State_Enter();
-			_currentState = simpleState;
+			if (simpleState != _currentState && (_currentState == null || _currentState.CanInterrupt()))
+			{
+				if (_currentState != null)
+				{
+					_currentState.State_Exit();
+				}
+				simpleState.State_Enter();
+				_currentState = simpleState;
+			}
+			UpdateTarget(delta);
+			_currentState.State_Think(delta);
+			UpdateObstacleAvoidance(delta);
+			UpdateDirection(delta);
+			UpdateSpeed(delta);
+			UpdatePosition(delta);
+			SetFlag(Flags.Open, HasTarget() && CanAttack());
 		}
-		UpdateTarget(delta);
-		_currentState.State_Think(delta);
-		UpdateObstacleAvoidance(delta);
-		UpdateDirection(delta);
-		UpdateSpeed(delta);
-		UpdatePosition(delta);
-		SetFlag(Flags.Open, HasTarget() && CanAttack());
 	}
 
 	public Vector3 WaterClamp(Vector3 point)
@@ -551,8 +566,8 @@ public class SimpleShark : BaseCombatEntity
 
 	private void UpdateObstacleAvoidance(float delta)
 	{
-		delta = Time.realtimeSinceStartup - lastObstacleCheckTime;
-		if (delta < 0.5f)
+		timeSinceLastObstacleCheck += delta;
+		if (timeSinceLastObstacleCheck < 0.5f)
 		{
 			return;
 		}
@@ -573,7 +588,7 @@ public class SimpleShark : BaseCombatEntity
 			RaycastHit hitInfo3;
 			if (Physics.SphereCast(position + Vector3.down * 0.25f - base.transform.right * 0.25f, obstacleDetectionRadius, forward, out hitInfo3, obstacleDetectionRange, layerMask))
 			{
-				vector2 = hitInfo2.point;
+				vector2 = hitInfo3.point;
 			}
 			if (vector != Vector3.zero && vector2 != Vector3.zero)
 			{
@@ -589,41 +604,44 @@ public class SimpleShark : BaseCombatEntity
 		}
 		else
 		{
-			obstacleAvoidanceScale = Mathf.MoveTowards(obstacleAvoidanceScale, 0f, delta * 2f);
+			obstacleAvoidanceScale = Mathf.MoveTowards(obstacleAvoidanceScale, 0f, timeSinceLastObstacleCheck * 2f);
 			if (obstacleAvoidanceScale == 0f)
 			{
 				cachedObstacleDistance = 0f;
 			}
 		}
+		timeSinceLastObstacleCheck = 0f;
 	}
 
 	private void UpdateDirection(float delta)
 	{
-		Vector3 forward2 = base.transform.forward;
-		Vector3 forward = Vector3Ex.Direction(WaterClamp(destination), base.transform.position);
+		Vector3 forward = base.transform.forward;
+		Vector3 vector = Vector3Ex.Direction(WaterClamp(destination), base.transform.position);
 		if (obstacleAvoidanceScale != 0f)
 		{
-			Vector3 vector;
+			Vector3 vector2;
 			if (cachedObstacleNormal != Vector3.zero)
 			{
 				Vector3 lhs = QuaternionEx.LookRotationForcedUp(cachedObstacleNormal, Vector3.up) * Vector3.forward;
-				vector = ((!(Vector3.Dot(lhs, base.transform.right) > Vector3.Dot(lhs, -base.transform.right))) ? (-base.transform.right) : base.transform.right);
+				vector2 = ((!(Vector3.Dot(lhs, base.transform.right) > Vector3.Dot(lhs, -base.transform.right))) ? (-base.transform.right) : base.transform.right);
 			}
 			else
 			{
-				vector = base.transform.right;
+				vector2 = base.transform.right;
 			}
-			forward = vector * obstacleAvoidanceScale;
-			forward.Normalize();
+			vector = vector2 * obstacleAvoidanceScale;
+			vector.Normalize();
 		}
-		Quaternion b = Quaternion.LookRotation(forward, Vector3.up);
-		base.transform.rotation = Quaternion.Lerp(base.transform.rotation, b, delta * GetTurnSpeed());
+		if (vector != Vector3.zero)
+		{
+			Quaternion b = Quaternion.LookRotation(vector, Vector3.up);
+			base.transform.rotation = Quaternion.Lerp(base.transform.rotation, b, delta * GetTurnSpeed());
+		}
 	}
 
 	private void UpdatePosition(float delta)
 	{
 		Vector3 forward = base.transform.forward;
-		Vector3.Distance(WaterClamp(destination), base.transform.position);
 		Vector3 point = base.transform.position + forward * GetCurrentSpeed() * delta;
 		point = WaterClamp(point);
 		base.transform.position = point;
