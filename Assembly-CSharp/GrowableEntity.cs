@@ -832,9 +832,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);

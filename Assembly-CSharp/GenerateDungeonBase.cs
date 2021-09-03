@@ -109,6 +109,7 @@ public class GenerateDungeonBase : ProceduralComponent
 				{
 					continue;
 				}
+				uint seed2 = seed++;
 				List<DungeonSegment> list = new List<DungeonSegment>();
 				DungeonSegment segmentStart = new DungeonSegment();
 				segmentStart.position = item.transform.position;
@@ -116,26 +117,46 @@ public class GenerateDungeonBase : ProceduralComponent
 				segmentStart.link = item.GetComponentInChildren<DungeonBaseLink>();
 				segmentStart.cost = 0;
 				segmentStart.floor = 0;
-				list.Add(segmentStart);
-				PlaceSegments(ref seed, int.MaxValue, 4, 3, true, false, list, array2);
-				list = list.OrderByDescending((DungeonSegment x) => (x.position - segmentStart.position).SqrMagnitude2D()).ToList();
-				PlaceSegments(ref seed, 1, 5, 3, true, false, list, array);
+				for (int j = 0; j < 5; j++)
+				{
+					if (list.Count <= 25)
+					{
+						List<DungeonSegment> list2 = new List<DungeonSegment>();
+						list2.Add(segmentStart);
+						PlaceSegments(ref seed2, int.MaxValue, 4, 3, true, false, list2, array2);
+						if (list2.Count > list.Count)
+						{
+							list = list2;
+						}
+					}
+				}
+				if (list.Count > 5)
+				{
+					list = list.OrderByDescending((DungeonSegment x) => (x.position - segmentStart.position).SqrMagnitude2D()).ToList();
+					PlaceSegments(ref seed2, 1, 5, 3, true, false, list, array);
+				}
+				if (list.Count > 25)
+				{
+					DungeonSegment segmentEnd = list[list.Count - 1];
+					list = list.OrderByDescending((DungeonSegment x) => Mathf.Min((x.position - segmentStart.position).SqrMagnitude2D(), (x.position - segmentEnd.position).SqrMagnitude2D())).ToList();
+					PlaceSegments(ref seed2, 1, 6, 3, true, false, list, array);
+				}
 				bool flag = true;
 				while (flag)
 				{
 					flag = false;
-					for (int j = 0; j < list.Count; j++)
+					for (int k = 0; k < list.Count; k++)
 					{
-						DungeonSegment dungeonSegment = list[j];
+						DungeonSegment dungeonSegment = list[k];
 						if (dungeonSegment.link.Cost <= 0 && !IsFullyOccupied(list, dungeonSegment))
 						{
-							list.RemoveAt(j--);
+							list.RemoveAt(k--);
 							flag = true;
 						}
 					}
 				}
-				PlaceSegments(ref seed, int.MaxValue, 6, 4, true, true, list, array3);
-				PlaceTransitions(ref seed, list, array4);
+				PlaceSegments(ref seed2, int.MaxValue, int.MaxValue, 4, true, true, list, array3);
+				PlaceTransitions(ref seed2, list, array4);
 				segmentsTotal.AddRange(list);
 			}
 		}
@@ -512,18 +533,23 @@ public class GenerateDungeonBase : ProceduralComponent
 				continue;
 			}
 			ArrayEx.Shuffle(rotations, ref seed);
-			for (int j = 0; j < rotations.Length; j++)
+			foreach (Quaternion quaternion in rotations)
 			{
-				Quaternion quaternion = rotations[j] * targetRot * QuaternionEx.LookRotationForcedUp(-dungeonBaseSocket.transform.forward, dungeonBaseSocket.transform.up);
-				Vector3 vector = targetPos - quaternion * dungeonBaseSocket.transform.localPosition;
-				if (!IsBlocked(segments, component, vector, quaternion))
+				Quaternion quaternion2 = Quaternion.FromToRotation(-dungeonBaseSocket.transform.forward, targetRot * Vector3.forward);
+				if (dungeonBaseSocket.Type != DungeonBaseSocketType.Vertical)
 				{
-					int num2 = SocketMatches(segments, component, vector, quaternion);
-					if (num2 > linkScore && prefab.CheckEnvironmentVolumesOutsideTerrain(vector, quaternion, Vector3.one, EnvironmentType.UnderwaterLab, 1f))
+					quaternion2 = QuaternionEx.LookRotationForcedUp(quaternion2 * Vector3.forward, Vector3.up);
+				}
+				Quaternion quaternion3 = quaternion * quaternion2;
+				Vector3 vector = targetPos - quaternion3 * dungeonBaseSocket.transform.localPosition;
+				if (!IsBlocked(segments, component, vector, quaternion3))
+				{
+					int num2 = SocketMatches(segments, component, vector, quaternion3);
+					if (num2 > linkScore && prefab.CheckEnvironmentVolumesOutsideTerrain(vector, quaternion3, Vector3.one, EnvironmentType.UnderwaterLab, 1f))
 					{
 						linkSocket = dungeonBaseSocket;
 						linkPos = vector;
-						linkRot = quaternion;
+						linkRot = quaternion3;
 						linkScore = num2;
 					}
 				}

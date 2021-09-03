@@ -21,4 +21,8 @@ public class EyeBlink : MonoBehaviour
 	public Vector2 TimeWithoutBlinking = new Vector2(1f, 10f);
 
 	public float BlinkSpeed = 0.2f;
+
+	public Vector3 LeftEyeInitial;
+
+	public Vector3 RightEyeInitial;
 }

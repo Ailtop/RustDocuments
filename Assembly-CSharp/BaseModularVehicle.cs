@@ -248,10 +248,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	{
 		base.Save(info);
 		info.msg.modularVehicle = Pool.Get<ModularVehicle>();
-		if (Inventory != null)
-		{
-			Inventory.Save(info);
-		}
 		info.msg.modularVehicle.editable = IsEditableNow;
 	}
 
@@ -546,17 +542,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.modularVehicle != null && base.isServer)
-		{
-			if (Inventory != null)
-			{
-				Inventory.Load(info);
-			}
-			else
-			{
-				Debug.LogWarning("Module Manager without inventory: " + ToString());
-			}
-		}
+		ModularVehicle modularVehicle = info.msg.modularVehicle;
 	}
 
 	public override bool CanPushNow(BasePlayer pusher)

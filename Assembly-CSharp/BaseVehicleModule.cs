@@ -499,7 +499,12 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 			{
 				for (int j = 0; j < conditional.socketSettings.Length; j++)
 				{
-					flag = Vehicle.GetSocket(FirstSocketIndex + j).ShouldBeActive(conditional.socketSettings[j]);
+					ModularVehicleSocket socket = Vehicle.GetSocket(FirstSocketIndex + j);
+					if (socket == null)
+					{
+						Debug.LogWarning($"{AssociatedItemDef.displayName.translated} module got NULL socket at index {FirstSocketIndex + j}. Total vehicle sockets: {Vehicle.TotalSockets} FirstSocketIndex: {FirstSocketIndex} Sockets taken: {conditional.socketSettings.Length}");
+					}
+					flag = socket?.ShouldBeActive(conditional.socketSettings[j]) ?? false;
 					if (!flag)
 					{
 						break;
@@ -589,7 +594,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.vehicleModule != null && FirstSocketIndex < 0 && info.msg.vehicleModule.socketIndex >= 0)
+		if (base.isClient && info.msg.vehicleModule != null && FirstSocketIndex < 0 && info.msg.vehicleModule.socketIndex >= 0)
 		{
 			FirstSocketIndex = info.msg.vehicleModule.socketIndex;
 		}

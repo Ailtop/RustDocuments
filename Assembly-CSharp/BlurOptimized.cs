@@ -9,13 +9,13 @@ public class BlurOptimized : PostProcessEffectSettings
 	[Range(0f, 2f)]
 	public FixedIntParameter downsample = new FixedIntParameter
 	{
-		value = 1
+		value = 0
 	};
 
 	[Range(1f, 4f)]
 	public FixedIntParameter blurIterations = new FixedIntParameter
 	{
-		value = 2
+		value = 1
 	};
 
 	[Range(0f, 10f)]

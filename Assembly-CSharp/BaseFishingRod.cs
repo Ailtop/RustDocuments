@@ -10,6 +10,26 @@ using UnityEngine.Assertions;
 
 public class BaseFishingRod : HeldEntity
 {
+	public class UpdateFishingRod : ObjectWorkQueue<BaseFishingRod>
+	{
+		protected override void RunJob(BaseFishingRod entity)
+		{
+			if (ShouldAdd(entity))
+			{
+				entity.CatchProcessBudgeted();
+			}
+		}
+
+		protected override bool ShouldAdd(BaseFishingRod entity)
+		{
+			if (base.ShouldAdd(entity))
+			{
+				return BaseEntityEx.IsValid(entity);
+			}
+			return false;
+		}
+	}
+
 	public enum CatchState
 	{
 		None,
@@ -44,6 +64,8 @@ public class BaseFishingRod : HeldEntity
 		PlayerMoved
 	}
 
+	public static UpdateFishingRod updateFishingRodQueue = new UpdateFishingRod();
+
 	private FishLookup fishLookup;
 
 	private TimeUntil nextFishStateChange;
@@ -72,13 +94,15 @@ public class BaseFishingRod : HeldEntity
 
 	private ItemModFishable lastFish;
 
-	[ServerVar(Saved = true)]
+	private bool inQueue;
+
+	[ServerVar]
 	public static bool ForceSuccess = false;
 
-	[ServerVar(Saved = true)]
+	[ServerVar]
 	public static bool ForceFail = false;
 
-	[ServerVar(Saved = true)]
+	[ServerVar]
 	public static bool ImmediateHook = false;
 
 	public GameObjectRef FishingBobberRef;
@@ -243,6 +267,7 @@ public class BaseFishingRod : HeldEntity
 		SetFlag(Flags.Busy, true);
 		CurrentState = CatchState.Waiting;
 		InvokeRepeating(CatchProcess, 0f, 0f);
+		inQueue = false;
 	}
 
 	private void FailedCast(FailReason reason)
@@ -253,9 +278,19 @@ public class BaseFishingRod : HeldEntity
 
 	private void CatchProcess()
 	{
+		if (!inQueue)
+		{
+			inQueue = true;
+			updateFishingRodQueue.Add(this);
+		}
+	}
+
+	private void CatchProcessBudgeted()
+	{
+		inQueue = false;
 		FishingBobber fishingBobber = currentBobber.Get(true);
 		BasePlayer ownerPlayer = GetOwnerPlayer();
-		if (ownerPlayer == null || ownerPlayer.IsSleeping() || ownerPlayer.IsWounded() || ownerPlayer.IsDead())
+		if (ownerPlayer == null || ownerPlayer.IsSleeping() || ownerPlayer.IsWounded() || ownerPlayer.IsDead() || fishingBobber == null)
 		{
 			Server_Cancel(FailReason.UserRequested);
 			return;
@@ -585,6 +620,12 @@ public class BaseFishingRod : HeldEntity
 		if (WaterLevel.GetOverallWaterDepth(pos, true, null, true) < 0.3f && ply.eyes.position.y > 0f)
 		{
 			reason = FailReason.TooShallow;
+			return false;
+		}
+		Vector3 p3 = Vector3.MoveTowards(ply.transform.position.WithY(pos.y), pos, 1f);
+		if (!GamePhysics.LineOfSight(ply.eyes.position, p3, 1218652417))
+		{
+			reason = FailReason.Obstructed;
 			return false;
 		}
 		reason = FailReason.Success;

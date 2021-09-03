@@ -27,6 +27,8 @@ public class ItemManager
 
 	public static int[] defaultBlueprints;
 
+	public static ItemDefinition blueprintBaseDef;
+
 	private static List<ItemRemove> ItemRemoves = new List<ItemRemove>();
 
 	public static void InvalidateWorkshopSkinCache()
@@ -99,6 +101,7 @@ public class ItemManager
 		bpList = list2;
 		itemDictionary = dictionary;
 		itemDictionaryByName = dictionary2;
+		blueprintBaseDef = FindItemDefinition("blueprintbase");
 	}
 
 	public static Item CreateByName(string strName, int iAmount = 1, ulong skin = 0uL)
@@ -186,6 +189,11 @@ public class ItemManager
 		if (created.info == null)
 		{
 			UnityEngine.Debug.LogWarning("Item loading failed - item is invalid");
+			return null;
+		}
+		if (created.info == blueprintBaseDef && created.blueprintTargetDef == null)
+		{
+			UnityEngine.Debug.LogWarning("Blueprint item loading failed - invalid item target");
 			return null;
 		}
 		return created;

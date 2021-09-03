@@ -30,8 +30,6 @@ public class ResearchTable : StorageContainer
 
 	public BasePlayer user;
 
-	public static ItemDefinition blueprintBaseDef;
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("ResearchTable.OnRpcMessage"))
@@ -256,15 +254,6 @@ public class ResearchTable : StorageContainer
 		}
 	}
 
-	public static ItemDefinition GetBlueprintTemplate()
-	{
-		if (blueprintBaseDef == null)
-		{
-			blueprintBaseDef = ItemManager.FindItemDefinition("blueprintbase");
-		}
-		return blueprintBaseDef;
-	}
-
 	public void ResearchAttemptFinished()
 	{
 		Item targetItem = GetTargetItem();
@@ -291,7 +280,7 @@ public class ResearchTable : StorageContainer
 				}
 				base.inventory.Remove(targetItem);
 				targetItem.Remove();
-				Item item = ItemManager.Create(GetBlueprintTemplate(), 1, 0uL);
+				Item item = ItemManager.Create(ItemManager.blueprintBaseDef, 1, 0uL);
 				item.blueprintTarget = ((targetItem.info.isRedirectOf != null) ? targetItem.info.isRedirectOf.itemid : targetItem.info.itemid);
 				if (!item.MoveToContainer(base.inventory, 0))
 				{

@@ -76,12 +76,12 @@ public class VehicleEngineController
 
 	public void StopEngine()
 	{
-		if (isServer && CurEngineState != 0 && Interface.CallHook("OnEngineStop", this) == null)
+		if (isServer && CurEngineState != 0 && Interface.CallHook("OnEngineStop", owner) == null)
 		{
 			CancelEngineStart();
 			owner.SetFlag(BaseEntity.Flags.On, false);
 			owner.SetFlag(engineStartingFlag, false);
-			Interface.CallHook("OnEngineStopped", this);
+			Interface.CallHook("OnEngineStopped", owner);
 		}
 	}
 

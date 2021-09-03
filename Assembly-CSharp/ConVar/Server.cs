@@ -222,11 +222,11 @@ namespace ConVar
 		[ServerVar(Help = "Maximum percent chance added to base wounded/incapacitated recovery chance, based on the player's food and water level", Saved = true)]
 		public static float woundedmaxfoodandwaterbonus = 0.25f;
 
-		[ServerVar(Help = "Minimum initial health given when a player dies and moves to crawling wounded state", Saved = true)]
-		public static int crawlingminhealth = 30;
+		[ServerVar(Help = "Minimum initial health given when a player dies and moves to crawling wounded state", Saved = false)]
+		public static int crawlingminimumhealth = 7;
 
-		[ServerVar(Help = "Maximum initial health given when a player dies and moves to crawling wounded state", Saved = true)]
-		public static int crawlingmaxhealth = 50;
+		[ServerVar(Help = "Maximum initial health given when a player dies and moves to crawling wounded state", Saved = false)]
+		public static int crawlingmaximumhealth = 12;
 
 		[ServerVar(Saved = true)]
 		public static bool playerserverfall = true;
@@ -627,11 +627,26 @@ namespace ConVar
 			{
 				basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
 			}
-			if (basePlayer == null)
+			if (basePlayer == null || basePlayer.net == null)
 			{
 				return "invalid player";
 			}
 			return basePlayer.stats.combat.Get(combatlogsize);
+		}
+
+		[ServerAllVar(Help = "Get the player combat log, only showing outgoing damage")]
+		public static string combatlog_outgoing(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (arg.HasArgs() && arg.IsAdmin)
+			{
+				basePlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+			}
+			if (basePlayer == null)
+			{
+				return "invalid player";
+			}
+			return basePlayer.stats.combat.Get(combatlogsize, basePlayer.net.ID);
 		}
 
 		[ServerVar(Help = "Print the current player position.")]

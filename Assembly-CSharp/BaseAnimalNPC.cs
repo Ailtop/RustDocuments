@@ -70,6 +70,10 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 
 	public bool CanAttack(BaseEntity entity)
 	{
+		if (entity == null)
+		{
+			return false;
+		}
 		if (NeedsToReload())
 		{
 			return false;

@@ -1160,6 +1160,10 @@ public class Item
 		flags = (Flag)load.flags;
 		worldEnt.uid = load.worldEntity;
 		heldEntity.uid = load.heldEntity;
+		if (isServer)
+		{
+			Network.Net.sv.RegisterUID(uid);
+		}
 		if (instanceData != null)
 		{
 			instanceData.ShouldPool = true;

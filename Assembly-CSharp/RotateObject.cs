@@ -24,15 +24,15 @@ public class RotateObject : MonoBehaviour
 			base.transform.Rotate(rotateVector * Time.deltaTime, Space.Self);
 			return;
 		}
-		if (rotateSpeed_X > 0f)
+		if (rotateSpeed_X != 0f)
 		{
 			base.transform.Rotate(Vector3.up, Time.deltaTime * rotateSpeed_X);
 		}
-		if (rotateSpeed_Y > 0f)
+		if (rotateSpeed_Y != 0f)
 		{
 			base.transform.Rotate(base.transform.forward, Time.deltaTime * rotateSpeed_Y);
 		}
-		if (rotateSpeed_Z > 0f)
+		if (rotateSpeed_Z != 0f)
 		{
 			base.transform.Rotate(base.transform.right, Time.deltaTime * rotateSpeed_Z);
 		}

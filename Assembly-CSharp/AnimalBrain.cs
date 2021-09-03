@@ -85,6 +85,14 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 
 		private static Vector3 GetAimDirection(BaseCombatEntity from, BaseCombatEntity target)
 		{
+			if (from == null || target == null)
+			{
+				if (!(from != null))
+				{
+					return Vector3.forward;
+				}
+				return from.transform.forward;
+			}
 			return Vector3Ex.Direction2D(target.transform.position, from.transform.position);
 		}
 

@@ -14,6 +14,8 @@ public class PuzzleReset : FacepunchBehaviour
 
 	public bool playersBlockReset;
 
+	public bool CheckSleepingAIZForPlayers;
+
 	public float playerDetectionRadius;
 
 	public float playerHeightDetectionMinMax = -1f;
@@ -26,6 +28,8 @@ public class PuzzleReset : FacepunchBehaviour
 
 	[HideInInspector]
 	public Vector3[] resetPositions;
+
+	private AIInformationZone zone;
 
 	private float resetTimeElapsed;
 
@@ -55,15 +59,45 @@ public class PuzzleReset : FacepunchBehaviour
 	{
 		if (playersBlockReset)
 		{
-			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+			if (CheckSleepingAIZForPlayers)
 			{
-				if (!activePlayer.IsSleeping() && activePlayer.IsAlive() && Vector3.Distance(activePlayer.transform.position, playerDetectionOrigin.position) < playerDetectionRadius)
-				{
-					return false;
-				}
+				return AIZSleeping();
 			}
+			return !PlayersWithinDistance();
 		}
 		return true;
+	}
+
+	private bool AIZSleeping()
+	{
+		if (zone != null)
+		{
+			if (!zone.PointInside(base.transform.position))
+			{
+				zone = AIInformationZone.GetForPoint(base.transform.position);
+			}
+		}
+		else
+		{
+			zone = AIInformationZone.GetForPoint(base.transform.position);
+		}
+		if (zone == null)
+		{
+			return false;
+		}
+		return zone.Sleeping;
+	}
+
+	private bool PlayersWithinDistance()
+	{
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			if (!activePlayer.IsSleeping() && activePlayer.IsAlive() && Vector3.Distance(activePlayer.transform.position, playerDetectionOrigin.position) < playerDetectionRadius)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void ResetTick()

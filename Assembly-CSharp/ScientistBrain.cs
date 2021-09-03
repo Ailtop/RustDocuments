@@ -51,7 +51,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 			}
 			HumanNPCNew entity = GetEntity();
 			float num = Vector3.Distance(baseEntity.transform.position, entity.transform.position);
-			if (brain.Senses.Memory.IsLOS(baseEntity) || num <= 5f)
+			if (brain.Senses.Memory.IsLOS(baseEntity) || num <= 10f)
 			{
 				brain.Navigator.SetFacingDirectionEntity(baseEntity);
 			}
@@ -498,5 +498,26 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 	{
 		base.OnDestroy();
 		Count--;
+	}
+
+	protected override void OnStateChanged()
+	{
+		base.OnStateChanged();
+		if (base.CurrentState != null)
+		{
+			switch (base.CurrentState.StateType)
+			{
+			case AIState.Idle:
+			case AIState.Roam:
+			case AIState.Patrol:
+			case AIState.FollowPath:
+			case AIState.Cooldown:
+				GetEntity().SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, true);
+				break;
+			default:
+				GetEntity().SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, false);
+				break;
+			}
+		}
 	}
 }

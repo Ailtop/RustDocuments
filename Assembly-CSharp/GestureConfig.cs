@@ -106,6 +106,10 @@ public class GestureConfig : ScriptableObject
 				return false;
 			}
 		}
+		if (player.IsSwimming() && playerModelLayer == PlayerModelLayer.FullBody)
+		{
+			return false;
+		}
 		return true;
 	}
 }

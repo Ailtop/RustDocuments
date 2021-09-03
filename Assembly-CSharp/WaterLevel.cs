@@ -35,15 +35,6 @@ public static class WaterLevel
 		}
 	}
 
-	public static bool Test(Vector3 pos, float radius, bool waves = true, BaseEntity forEntity = null)
-	{
-		using (TimeWarning.New("WaterLevel.Test"))
-		{
-			WaterInfo waterInfo = GetWaterInfo(pos, waves, forEntity);
-			return waterInfo.isValid && Mathf.Abs(waterInfo.surfaceLevel - pos.y) <= radius;
-		}
-	}
-
 	public static bool Test(Vector3 pos, bool waves = true, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.Test"))

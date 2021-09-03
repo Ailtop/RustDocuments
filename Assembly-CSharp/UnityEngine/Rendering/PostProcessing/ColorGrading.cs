@@ -131,9 +131,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Tooltip("Makes the image brighter or darker.")]
 		[DisplayName("Brightness")]
 		[Range(-100f, 100f)]
-		[Tooltip("Makes the image brighter or darker.")]
 		public FloatParameter brightness = new FloatParameter
 		{
 			value = 0f
@@ -154,17 +154,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[DisplayName("Red")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the red channel in the overall mix.")]
+		[DisplayName("Red")]
 		public FloatParameter mixerRedOutRedIn = new FloatParameter
 		{
 			value = 100f
 		};
 
-		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the green channel in the overall mix.")]
 		[DisplayName("Green")]
+		[Range(-200f, 200f)]
 		public FloatParameter mixerRedOutGreenIn = new FloatParameter
 		{
 			value = 0f
@@ -194,9 +194,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 100f
 		};
 
-		[DisplayName("Blue")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the blue channel in the overall mix.")]
+		[DisplayName("Blue")]
 		public FloatParameter mixerGreenOutBlueIn = new FloatParameter
 		{
 			value = 0f
@@ -210,9 +210,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[Tooltip("Modify influence of the green channel in the overall mix.")]
 		[DisplayName("Green")]
 		[Range(-200f, 200f)]
+		[Tooltip("Modify influence of the green channel in the overall mix.")]
 		public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 		{
 			value = 0f
@@ -226,9 +226,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 100f
 		};
 
+		[Trackball(TrackballAttribute.Mode.Lift)]
 		[DisplayName("Lift")]
 		[Tooltip("Controls the darkest portions of the render.")]
-		[Trackball(TrackballAttribute.Mode.Lift)]
 		public Vector4Parameter lift = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)

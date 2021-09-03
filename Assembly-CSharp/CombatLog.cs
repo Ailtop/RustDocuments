@@ -124,7 +124,7 @@ public class CombatLog
 		}
 	}
 
-	public string Get(int count)
+	public string Get(int count, uint filterByAttacker = 0u)
 	{
 		if (storage == null)
 		{
@@ -155,33 +155,35 @@ public class CombatLog
 			if (num > 0)
 			{
 				num--;
-				continue;
 			}
-			float num3 = UnityEngine.Time.realtimeSinceStartup - item.time;
-			if (num3 >= (float)combatlogdelay)
+			else if (filterByAttacker == 0 || item.attacker_id == filterByAttacker)
 			{
-				string text = num3.ToString("0.0s");
-				string attacker = item.attacker;
-				uint attacker_id = item.attacker_id;
-				string text2 = attacker_id.ToString();
-				string target = item.target;
-				attacker_id = item.target_id;
-				string text3 = attacker_id.ToString();
-				string weapon = item.weapon;
-				string ammo = item.ammo;
-				string text4 = HitAreaUtil.Format(item.area).ToLower();
-				float distance = item.distance;
-				string text5 = distance.ToString("0.0m");
-				distance = item.health_old;
-				string text6 = distance.ToString("0.0");
-				distance = item.health_new;
-				string text7 = distance.ToString("0.0");
-				string info = item.info;
-				textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info);
-			}
-			else
-			{
-				num2++;
+				float num3 = UnityEngine.Time.realtimeSinceStartup - item.time;
+				if (num3 >= (float)combatlogdelay)
+				{
+					string text = num3.ToString("0.0s");
+					string attacker = item.attacker;
+					uint attacker_id = item.attacker_id;
+					string text2 = attacker_id.ToString();
+					string target = item.target;
+					attacker_id = item.target_id;
+					string text3 = attacker_id.ToString();
+					string weapon = item.weapon;
+					string ammo = item.ammo;
+					string text4 = HitAreaUtil.Format(item.area).ToLower();
+					float distance = item.distance;
+					string text5 = distance.ToString("0.0m");
+					distance = item.health_old;
+					string text6 = distance.ToString("0.0");
+					distance = item.health_new;
+					string text7 = distance.ToString("0.0");
+					string info = item.info;
+					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info);
+				}
+				else
+				{
+					num2++;
+				}
 			}
 		}
 		string text8 = textTable.ToString();

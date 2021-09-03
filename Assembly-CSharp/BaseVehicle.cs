@@ -37,8 +37,6 @@ public class BaseVehicle : BaseMountable
 
 	public bool shouldShowHudHealth;
 
-	public bool keepsWaterOut;
-
 	public bool ignoreDamageFromOutside;
 
 	[Header("Rigidbody (Optional)")]

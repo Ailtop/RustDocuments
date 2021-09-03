@@ -71,7 +71,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		return true;
 	}
 
-	public void InitializeVelocity(Vector3 overrideVel)
+	public virtual void InitializeVelocity(Vector3 overrideVel)
 	{
 		base.transform.rotation = Quaternion.LookRotation(overrideVel.normalized);
 		initialVelocity = overrideVel;

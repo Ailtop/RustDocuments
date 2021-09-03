@@ -77,20 +77,6 @@ namespace Rust.Modular
 			return moduleItem.MoveToContainer(ModuleContainer, socketIndex, false);
 		}
 
-		public void Save(BaseNetworkable.SaveInfo info)
-		{
-			info.msg.modularVehicle.moduleContainer = ModuleContainer.Save();
-			info.msg.modularVehicle.chassisContainer = ChassisContainer.Save();
-		}
-
-		public void Load(BaseNetworkable.LoadInfo info)
-		{
-			ModuleContainer.Load(info.msg.modularVehicle.moduleContainer);
-			ModuleContainer.capacity = TotalSockets;
-			ChassisContainer.Load(info.msg.modularVehicle.chassisContainer);
-			ChassisContainer.capacity = 1;
-		}
-
 		public bool RemoveAndDestroy(Item itemToRemove)
 		{
 			bool result = ModuleContainer.Remove(itemToRemove);
@@ -141,7 +127,9 @@ namespace Rust.Modular
 			int numSocketsTaken = moduleEntity.GetNumSocketsTaken();
 			if (SocketsAreFree(firstSocketIndex, numSocketsTaken))
 			{
-				Item item = (moduleEntity.AssociatedItemInstance = ItemManager.Create(moduleEntity.AssociatedItemDef, 1, 0uL));
+				Item item = ItemManager.Create(moduleEntity.AssociatedItemDef, 1, 0uL);
+				item.condition = moduleEntity.health;
+				moduleEntity.AssociatedItemInstance = item;
 				if (TryAddModuleItem(item, firstSocketIndex))
 				{
 					vehicle.SetUpModule(moduleEntity, item);

@@ -7,19 +7,15 @@ public class TorpedoServerProjectile : ServerProjectile
 	private float minWaterDepth = 0.5f;
 
 	[SerializeField]
-	private float upwardDrift = 10f;
+	private float shallowWaterInaccuracy;
 
 	[SerializeField]
-	private float surfaceSpeed = 18f;
+	private float deepWaterInaccuracy;
 
-	private float initialGravModifier;
+	[SerializeField]
+	private float shallowWaterCutoff = 2f;
 
 	protected override int mask => 1236478721;
-
-	protected void Awake()
-	{
-		initialGravModifier = gravityModifier;
-	}
 
 	public override bool DoMovement()
 	{
@@ -34,30 +30,32 @@ public class TorpedoServerProjectile : ServerProjectile
 		}
 		else if (num <= minWaterDepth)
 		{
-			float value = minWaterDepth - num;
-			gravityModifier = Mathf.Clamp01(value);
+			currentVelocity.y = 0f;
+			gravityModifier = 0.1f;
+		}
+		else if (num > minWaterDepth + 0.3f && num <= minWaterDepth + 0.7f)
+		{
+			gravityModifier = -0.1f;
 		}
 		else
 		{
-			float num2 = minWaterDepth + currentVelocity.y * currentVelocity.y / 25f;
-			if ((double)currentVelocity.y > 0.0 && num < num2)
-			{
-				currentVelocity.y -= 25f * Time.fixedDeltaTime;
-				gravityModifier = 0f;
-			}
-			else
-			{
-				gravityModifier = initialGravModifier;
-				if (currentVelocity.y < upwardDrift)
-				{
-					currentVelocity.y += 15f * Time.fixedDeltaTime;
-				}
-			}
-		}
-		if (num < minWaterDepth + 1f && currentVelocity.magnitude < surfaceSpeed)
-		{
-			currentVelocity += currentVelocity.normalized * 10f * Time.fixedDeltaTime;
+			gravityModifier = Mathf.Clamp(currentVelocity.y, -0.1f, 0.1f);
 		}
 		return true;
+	}
+
+	public override void InitializeVelocity(Vector3 overrideVel)
+	{
+		base.InitializeVelocity(overrideVel);
+		float value = WaterLevel.GetWaterInfo(base.transform.position).surfaceLevel - base.transform.position.y;
+		float t = Mathf.InverseLerp(shallowWaterCutoff, shallowWaterCutoff + 2f, value);
+		float maxAngle = Mathf.Lerp(shallowWaterInaccuracy, deepWaterInaccuracy, t);
+		initialVelocity = GetWithInaccuracy(initialVelocity, maxAngle);
+		currentVelocity = initialVelocity;
+	}
+
+	private Vector3 GetWithInaccuracy(Vector3 original, float maxAngle)
+	{
+		return Quaternion.AngleAxis(Random.Range(0f - maxAngle, maxAngle), Vector3.up) * original;
 	}
 }

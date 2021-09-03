@@ -69,9 +69,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = null
 		};
 
+		[DisplayName("Intensity")]
 		[Min(0f)]
 		[Tooltip("The intensity of the lens dirtiness.")]
-		[DisplayName("Intensity")]
 		public FloatParameter dirtIntensity = new FloatParameter
 		{
 			value = 0f

@@ -142,9 +142,9 @@ public class BaseBoat : BaseVehicle
 		{
 			float overallWaterDepth = WaterLevel.GetOverallWaterDepth(entity.transform.position);
 			float num = (entity.IsOutside() ? outsideDecayMinutes : float.PositiveInfinity);
-			if (overallWaterDepth > 4f)
+			if (overallWaterDepth > 12f)
 			{
-				float t = Mathf.InverseLerp(4f, 12f, overallWaterDepth);
+				float t = Mathf.InverseLerp(12f, 16f, overallWaterDepth);
 				float num2 = Mathf.Lerp(0.1f, 1f, t);
 				num = Mathf.Min(num, deepWaterDecayMinutes / num2);
 			}

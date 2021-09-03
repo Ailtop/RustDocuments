@@ -137,6 +137,10 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public RuntimeAnimatorController CinematicAnimationController;
 
+	public Avatar DefaultAvatar;
+
+	public Avatar CinematicAvatar;
+
 	public RuntimeAnimatorController DefaultHoldType;
 
 	public RuntimeAnimatorController SleepGesture;

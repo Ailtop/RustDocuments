@@ -2676,6 +2676,15 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return WaterLevel.Factor(WorldSpaceBounds().ToBounds(), this);
 	}
 
+	public virtual float AirFactor()
+	{
+		if (!(WaterFactor() > 0.85f))
+		{
+			return 1f;
+		}
+		return 0f;
+	}
+
 	public bool WaterTestFromVolumes(Vector3 pos, out WaterLevel.WaterInfo info)
 	{
 		if (triggers == null)

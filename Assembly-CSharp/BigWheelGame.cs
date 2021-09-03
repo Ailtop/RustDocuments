@@ -94,44 +94,55 @@ public class BigWheelGame : SpinnerWheel
 
 	public void Payout()
 	{
+		//IL_00fa: Incompatible stack heights: 0 vs 1
 		HitNumber currentHitType = GetCurrentHitType();
-		foreach (BigWheelBettingTerminal terminal in terminals)
+		using (List<BigWheelBettingTerminal>.Enumerator enumerator = terminals.GetEnumerator())
 		{
-			if (terminal.isClient)
+			while (true)
 			{
-				continue;
-			}
-			bool flag = false;
-			bool flag2 = false;
-			Item slot = terminal.inventory.GetSlot((int)currentHitType.hitType);
-			if (slot != null)
-			{
-				int num = currentHitType.ColorToMultiplier(currentHitType.hitType);
-				if (Interface.CallHook("OnBigWheelWin", this, slot, terminal, num) != null)
+				IL_00f8:
+				enumerator.MoveNext();
+				while ((int)/*Error near IL_0104: Stack underflow*/ != 0)
 				{
-					return;
+					BigWheelBettingTerminal current = enumerator.Current;
+					if (!current.isClient)
+					{
+						bool flag = false;
+						bool flag2 = false;
+						Item slot = current.inventory.GetSlot((int)currentHitType.hitType);
+						if (slot != null)
+						{
+							int num = currentHitType.ColorToMultiplier(currentHitType.hitType);
+							if (Interface.CallHook("OnBigWheelWin", this, slot, current, num) != null)
+							{
+								continue;
+							}
+							slot.amount += slot.amount * num;
+							slot.RemoveFromContainer();
+							slot.MoveToContainer(current.inventory, 5);
+							flag = true;
+						}
+						for (int i = 0; i < 5; i++)
+						{
+							Item slot2 = current.inventory.GetSlot(i);
+							if (Interface.CallHook("OnBigWheelLoss", this, slot2, current) != null)
+							{
+								break;
+							}
+							if (slot2 != null)
+							{
+								slot2.Remove();
+								flag2 = true;
+							}
+						}
+						if (flag || flag2)
+						{
+							current.ClientRPC(null, "WinOrLoseSound", flag);
+						}
+					}
+					goto IL_00f8;
 				}
-				slot.amount += slot.amount * num;
-				slot.RemoveFromContainer();
-				slot.MoveToContainer(terminal.inventory, 5);
-				flag = true;
-			}
-			for (int i = 0; i < 5; i++)
-			{
-				Item slot2 = terminal.inventory.GetSlot(i);
-				if (Interface.CallHook("OnBigWheelLoss", this, slot2, terminal) != null)
-				{
-					return;
-				}
-				if (slot2 != null)
-				{
-					slot2.Remove();
-					flag2 = true;
-				}
-			}
-			if (flag || flag2)
-			{
-				terminal.ClientRPC(null, "WinOrLoseSound", flag);
+				break;
 			}
 		}
 		ItemManager.DoRemoves();

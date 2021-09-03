@@ -33,12 +33,12 @@ public class SharpenAndVignette : PostProcessEffectSettings
 	[Range(-100f, 100f)]
 	public FloatParameter sharpness = new FloatParameter
 	{
-		value = 45f
+		value = 0f
 	};
 
 	[Range(0f, 100f)]
 	public FloatParameter darkness = new FloatParameter
 	{
-		value = 24f
+		value = 0f
 	};
 }

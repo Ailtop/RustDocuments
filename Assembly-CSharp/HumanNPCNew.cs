@@ -149,18 +149,23 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 		{
 			return;
 		}
+		float num = Vector3.Dot(eyes.BodyForward(), (target.CenterPoint() - eyes.position).normalized);
 		if (targetIsLOS)
 		{
-			if (Vector3.Dot(eyes.BodyForward(), target.CenterPoint() - eyes.position) > 0.85f)
+			if (num > 0.2f)
 			{
 				targetAimedDuration += delta;
 			}
 		}
 		else
 		{
-			targetAimedDuration = 0f;
+			if (num < 0.5f)
+			{
+				targetAimedDuration = 0f;
+			}
+			CancelBurst();
 		}
-		if (targetAimedDuration > 0.5f)
+		if (targetAimedDuration >= 0.2f && targetIsLOS)
 		{
 			bool flag = false;
 			if ((object)this != null)

@@ -514,7 +514,10 @@ public sealed class ItemContainer
 			itemContainer.allowedItems = Pool.GetList<int>();
 			for (int i = 0; i < onlyAllowedItems.Length; i++)
 			{
-				itemContainer.allowedItems.Add(onlyAllowedItems[i].itemid);
+				if (onlyAllowedItems[i] != null)
+				{
+					itemContainer.allowedItems.Add(onlyAllowedItems[i].itemid);
+				}
 			}
 		}
 		itemContainer.flags = (int)flags;

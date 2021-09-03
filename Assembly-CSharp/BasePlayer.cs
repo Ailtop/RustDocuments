@@ -2112,9 +2112,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
@@ -2170,7 +2170,7 @@ public class BasePlayer : BaseCombatEntity
 
 	private void MonitorLoopingGesture()
 	{
-		if (modelState.ducked || modelState.sleeping || IsWounded() || IsSwimming() || IsDead())
+		if (modelState.ducked || modelState.sleeping || IsWounded() || IsSwimming() || IsDead() || (isMounted && GetMounted().allowedGestures == BaseMountable.MountGestureType.UpperBody && currentGesture.playerModelLayer == GestureConfig.PlayerModelLayer.FullBody) || (isMounted && GetMounted().allowedGestures == BaseMountable.MountGestureType.None))
 		{
 			Server_CancelGesture();
 		}
@@ -2194,7 +2194,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return true;
 		}
-		if (!IsWounded() && !IsSwimming() && !(currentGesture != null) && !IsDead() && !IsSleeping())
+		if (!IsWounded() && !(currentGesture != null) && !IsDead() && !IsSleeping())
 		{
 			return modelState.ducked;
 		}
@@ -2853,7 +2853,7 @@ public class BasePlayer : BaseCombatEntity
 					stats.combat.Log(hitInfo, "water_entity");
 					flag9 = false;
 				}
-				if (!WaterLevel.Test(hitInfo.HitPositionWorld, 0.5f, false, this))
+				if (!WaterLevel.Test(hitInfo.HitPositionWorld - 0.5f * UnityEngine.Vector3.up, false, this))
 				{
 					string text5 = hitInfo.ProjectilePrefab.name;
 					string text6 = (flag6 ? hitEntity.ShortPrefabName : "world");
@@ -6228,9 +6228,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	private void GoToCrawling(HitInfo info)
+	public void GoToCrawling(HitInfo info)
 	{
-		base.health = UnityEngine.Random.Range(ConVar.Server.crawlingminhealth, ConVar.Server.crawlingmaxhealth);
+		base.health = UnityEngine.Random.Range(ConVar.Server.crawlingminimumhealth, ConVar.Server.crawlingmaximumhealth);
 		metabolism.bleeding.value = 0f;
 		healingWhileCrawling = 0f;
 		WoundedStartSharedCode(info);
@@ -7073,7 +7073,7 @@ public class BasePlayer : BaseCombatEntity
 
 	public override float WaterFactor()
 	{
-		if (isMounted)
+		if (BaseEntityEx.IsValid(GetMounted()))
 		{
 			return GetMounted().WaterFactorForPlayer(this);
 		}
@@ -7086,6 +7086,56 @@ public class BasePlayer : BaseCombatEntity
 		UnityEngine.Vector3 start = playerCollider.transform.position + playerCollider.transform.rotation * (playerCollider.center - UnityEngine.Vector3.up * (num - radius));
 		UnityEngine.Vector3 end = playerCollider.transform.position + playerCollider.transform.rotation * (playerCollider.center + UnityEngine.Vector3.up * (num - radius));
 		return WaterLevel.Factor(start, end, radius, this);
+	}
+
+	public override float AirFactor()
+	{
+		float num = ((WaterFactor() > 0.85f) ? 0f : 1f);
+		BaseMountable baseMountable = GetMounted();
+		if (BaseEntityEx.IsValid(baseMountable) && baseMountable.BlocksWaterFor(this))
+		{
+			float num2 = baseMountable.AirFactor();
+			if (num2 < num)
+			{
+				num = num2;
+			}
+		}
+		return num;
+	}
+
+	public float GetOxygenTime(out ItemModGiveOxygen.AirSupplyType airSupplyType)
+	{
+		BaseVehicle mountedVehicle = GetMountedVehicle();
+		IAirSupply airSupply;
+		if (BaseEntityEx.IsValid(mountedVehicle) && (airSupply = mountedVehicle as IAirSupply) != null)
+		{
+			float airTimeRemaining = airSupply.GetAirTimeRemaining();
+			if (airTimeRemaining > 0f)
+			{
+				airSupplyType = airSupply.AirType;
+				return airTimeRemaining;
+			}
+		}
+		foreach (Item item in inventory.containerWear.itemList)
+		{
+			IAirSupply componentInChildren = item.info.GetComponentInChildren<IAirSupply>();
+			if (componentInChildren != null)
+			{
+				float airTimeRemaining2 = componentInChildren.GetAirTimeRemaining();
+				if (airTimeRemaining2 > 0f)
+				{
+					airSupplyType = componentInChildren.AirType;
+					return airTimeRemaining2;
+				}
+			}
+		}
+		airSupplyType = ItemModGiveOxygen.AirSupplyType.Lungs;
+		if (metabolism.oxygen.value > 0.5f)
+		{
+			float num = Mathf.InverseLerp(0.5f, 1f, metabolism.oxygen.value);
+			return 5f * num;
+		}
+		return 0f;
 	}
 
 	public override bool ShouldInheritNetworkGroup()

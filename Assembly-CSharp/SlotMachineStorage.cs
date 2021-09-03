@@ -45,4 +45,13 @@ public class SlotMachineStorage : StorageContainer
 			ClientRPC(null, "RPC_UpdateAmount", Amount);
 		}
 	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (!IsPlayerValid(player))
+		{
+			return false;
+		}
+		return base.CanBeLooted(player);
+	}
 }

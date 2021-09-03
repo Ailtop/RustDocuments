@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class DungeonBaseInfo : LandmarkInfo
 {
-	internal List<GameObject> Links = new List<GameObject>();
+	public List<GameObject> Links = new List<GameObject>();
 
-	internal List<DungeonBaseFloor> Floors = new List<DungeonBaseFloor>();
+	public List<DungeonBaseFloor> Floors = new List<DungeonBaseFloor>();
 
 	public float Distance(Vector3 position)
 	{

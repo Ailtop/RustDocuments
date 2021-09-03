@@ -235,6 +235,7 @@ public class BaseCombatEntity : BaseEntity
 
 	public virtual void OnPickedUp(Item createdItem, BasePlayer player)
 	{
+		Interface.CallHook("OnEntityPickedUp", this, createdItem, player);
 	}
 
 	[RPC_Server]

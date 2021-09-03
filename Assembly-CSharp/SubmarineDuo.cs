@@ -26,12 +26,6 @@ public class SubmarineDuo : BaseSubmarine
 	private Transform driverRightFoot;
 
 	[SerializeField]
-	private Transform passengerLeftFoot;
-
-	[SerializeField]
-	private Transform passengerRightFoot;
-
-	[SerializeField]
 	private Transform mphNeedle;
 
 	[SerializeField]
@@ -45,4 +39,7 @@ public class SubmarineDuo : BaseSubmarine
 
 	[SerializeField]
 	private SubmarineSonar sonar;
+
+	[SerializeField]
+	private Transform torpedoTubeHatch;
 }

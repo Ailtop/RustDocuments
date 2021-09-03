@@ -109,7 +109,7 @@ namespace ConVar
 		public static void lighttoggle(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);
-			if ((bool)basePlayer && !basePlayer.IsDead() && !basePlayer.IsSleeping())
+			if ((bool)basePlayer && !basePlayer.IsDead() && !basePlayer.IsSleeping() && !basePlayer.InGesture)
 			{
 				basePlayer.LightToggle();
 			}

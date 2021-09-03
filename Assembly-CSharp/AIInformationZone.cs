@@ -522,6 +522,11 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		return aIInformationZone;
 	}
 
+	public bool PointInside(Vector3 point)
+	{
+		return areaBox.Contains(point);
+	}
+
 	public AIMovePoint GetBestMovePointNear(Vector3 targetPosition, Vector3 fromPosition, float minRange, float maxRange, bool checkLOS = false, BaseEntity forObject = null, bool returnClosest = false)
 	{
 		AIPoint aIPoint = null;

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[760]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[763]
 	{
 		new ConsoleSystem.Command
 		{
@@ -68,7 +68,6 @@ public class ConsoleGen
 			Parent = "basefishingrod",
 			FullName = "basefishingrod.forcefail",
 			ServerAdmin = true,
-			Saved = true,
 			Variable = true,
 			GetOveride = () => BaseFishingRod.ForceFail.ToString(),
 			SetOveride = delegate(string str)
@@ -82,7 +81,6 @@ public class ConsoleGen
 			Parent = "basefishingrod",
 			FullName = "basefishingrod.forcesuccess",
 			ServerAdmin = true,
-			Saved = true,
 			Variable = true,
 			GetOveride = () => BaseFishingRod.ForceSuccess.ToString(),
 			SetOveride = delegate(string str)
@@ -96,7 +94,6 @@ public class ConsoleGen
 			Parent = "basefishingrod",
 			FullName = "basefishingrod.immediatehook",
 			ServerAdmin = true,
-			Saved = true,
 			Variable = true,
 			GetOveride = () => BaseFishingRod.ImmediateHook.ToString(),
 			SetOveride = delegate(string str)
@@ -183,6 +180,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				BaseSubmarine.outsidedecayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "oxygenminutes",
+			Parent = "basesubmarine",
+			FullName = "basesubmarine.oxygenminutes",
+			ServerAdmin = true,
+			Description = "How long a submarine can stay underwater until players start taking damage from low oxygen",
+			Variable = true,
+			GetOveride = () => BaseSubmarine.oxygenminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseSubmarine.oxygenminutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -491,8 +502,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				ServerUsers.User[] rval22 = Admin.Bans();
-				arg.ReplyWithObject(rval22);
+				ServerUsers.User[] rval23 = Admin.Bans();
+				arg.ReplyWithObject(rval23);
 			}
 		},
 		new ConsoleSystem.Command
@@ -505,8 +516,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				BuildInfo rval21 = Admin.BuildInfo();
-				arg.ReplyWithObject(rval21);
+				BuildInfo rval22 = Admin.BuildInfo();
+				arg.ReplyWithObject(rval22);
 			}
 		},
 		new ConsoleSystem.Command
@@ -666,8 +677,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Admin.PlayerInfo[] rval20 = Admin.playerlist();
-				arg.ReplyWithObject(rval20);
+				Admin.PlayerInfo[] rval21 = Admin.playerlist();
+				arg.ReplyWithObject(rval21);
 			}
 		},
 		new ConsoleSystem.Command
@@ -777,7 +788,7 @@ public class ConsoleGen
 			Parent = "global",
 			FullName = "global.sleepingusersinrange",
 			ServerAdmin = true,
-			Description = "Show user info for players on server in range of the player.",
+			Description = "Show user info for sleeping players on server in range of the player.",
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
@@ -819,8 +830,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval19 = Admin.teaminfo(arg);
-				arg.ReplyWithObject(rval19);
+				string rval20 = Admin.teaminfo(arg);
+				arg.ReplyWithObject(rval20);
 			}
 		},
 		new ConsoleSystem.Command
@@ -858,6 +869,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.users(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "usersinrange",
+			Parent = "global",
+			FullName = "global.usersinrange",
+			ServerAdmin = true,
+			Description = "Show user info for players on server in range of the player.",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.usersinrange(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3100,8 +3124,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval18 = Chat.search(arg);
-				arg.ReplyWithObject(rval18);
+				IEnumerable<Chat.ChatEntry> rval19 = Chat.search(arg);
+				arg.ReplyWithObject(rval19);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3126,8 +3150,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval17 = Chat.tail(arg);
-				arg.ReplyWithObject(rval17);
+				IEnumerable<Chat.ChatEntry> rval18 = Chat.tail(arg);
+				arg.ReplyWithObject(rval18);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3151,8 +3175,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval16 = Console.search(arg);
-				arg.ReplyWithObject(rval16);
+				IEnumerable<Output.Entry> rval17 = Console.search(arg);
+				arg.ReplyWithObject(rval17);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3164,8 +3188,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval15 = Console.tail(arg);
-				arg.ReplyWithObject(rval15);
+				IEnumerable<Output.Entry> rval16 = Console.tail(arg);
+				arg.ReplyWithObject(rval16);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3868,8 +3892,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval14 = Demo.record(arg);
-				arg.ReplyWithObject(rval14);
+				string rval15 = Demo.record(arg);
+				arg.ReplyWithObject(rval15);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3921,8 +3945,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval13 = Demo.stop(arg);
-				arg.ReplyWithObject(rval13);
+				string rval14 = Demo.stop(arg);
+				arg.ReplyWithObject(rval14);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4068,8 +4092,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval12 = Entity.svspawn(arg.GetString(0), arg.GetVector3(1, Vector3.zero), arg.GetVector3(2, Vector3.zero));
-				arg.ReplyWithObject(rval12);
+				string rval13 = Entity.svspawn(arg.GetString(0), arg.GetVector3(1, Vector3.zero), arg.GetVector3(2, Vector3.zero));
+				arg.ReplyWithObject(rval13);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4081,8 +4105,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval11 = Entity.svspawnitem(arg.GetString(0), arg.GetVector3(1, Vector3.zero));
-				arg.ReplyWithObject(rval11);
+				string rval12 = Entity.svspawnitem(arg.GetString(0), arg.GetVector3(1, Vector3.zero));
+				arg.ReplyWithObject(rval12);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5094,8 +5118,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				object rval10 = ConVar.Manifest.PrintManifest();
-				arg.ReplyWithObject(rval10);
+				object rval11 = ConVar.Manifest.PrintManifest();
+				arg.ReplyWithObject(rval11);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5107,8 +5131,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				object rval9 = ConVar.Manifest.PrintManifestRaw();
-				arg.ReplyWithObject(rval9);
+				object rval10 = ConVar.Manifest.PrintManifestRaw();
+				arg.ReplyWithObject(rval10);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6161,7 +6185,22 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval8 = Server.combatlog(arg);
+				string rval9 = Server.combatlog(arg);
+				arg.ReplyWithObject(rval9);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "combatlog_outgoing",
+			Parent = "server",
+			FullName = "server.combatlog_outgoing",
+			ServerAdmin = true,
+			ServerUser = true,
+			Description = "Get the player combat log, only showing outgoing damage",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval8 = Server.combatlog_outgoing(arg);
 				arg.ReplyWithObject(rval8);
 			}
 		},
@@ -6245,32 +6284,30 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "crawlingmaxhealth",
+			Name = "crawlingmaximumhealth",
 			Parent = "server",
-			FullName = "server.crawlingmaxhealth",
+			FullName = "server.crawlingmaximumhealth",
 			ServerAdmin = true,
-			Saved = true,
 			Description = "Maximum initial health given when a player dies and moves to crawling wounded state",
 			Variable = true,
-			GetOveride = () => Server.crawlingmaxhealth.ToString(),
+			GetOveride = () => Server.crawlingmaximumhealth.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.crawlingmaxhealth = str.ToInt();
+				Server.crawlingmaximumhealth = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "crawlingminhealth",
+			Name = "crawlingminimumhealth",
 			Parent = "server",
-			FullName = "server.crawlingminhealth",
+			FullName = "server.crawlingminimumhealth",
 			ServerAdmin = true,
-			Saved = true,
 			Description = "Minimum initial health given when a player dies and moves to crawling wounded state",
 			Variable = true,
-			GetOveride = () => Server.crawlingminhealth.ToString(),
+			GetOveride = () => Server.crawlingminimumhealth.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.crawlingminhealth = str.ToInt();
+				Server.crawlingminimumhealth = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

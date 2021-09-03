@@ -81,7 +81,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				text = text + "hostname: " + Server.hostname + "\n";
-				text = text + "version : " + 2311 + " secure (secure mode enabled, connected to Steam3)\n";
+				text = text + "version : " + 2314 + " secure (secure mode enabled, connected to Steam3)\n";
 				text = text + "map     : " + Server.level + "\n";
 				text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -540,7 +540,7 @@ namespace ConVar
 			arg.ReplyWith(text);
 		}
 
-		[ServerVar(Help = "Show user info for players on server in range of the player.")]
+		[ServerVar(Help = "Show user info for sleeping players on server in range of the player.")]
 		public static void sleepingusersinrange(Arg arg)
 		{
 			BasePlayer fromPlayer = ArgEx.Player(arg);
@@ -565,6 +565,34 @@ namespace ConVar
 			}
 			Facepunch.Pool.FreeList(ref obj);
 			text += $"{num} sleeping users within {range}m\n";
+			arg.ReplyWith(text);
+		}
+
+		[ServerVar(Help = "Show user info for players on server in range of the player.")]
+		public static void usersinrange(Arg arg)
+		{
+			BasePlayer fromPlayer = ArgEx.Player(arg);
+			if (fromPlayer == null)
+			{
+				return;
+			}
+			float range = arg.GetFloat(0);
+			string text = "<slot:userid:\"name\">\n";
+			int num = 0;
+			List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+			{
+				obj.Add(activePlayer);
+			}
+			obj.RemoveAll((BasePlayer p) => p.Distance2D(fromPlayer) > range);
+			obj.Sort((BasePlayer player, BasePlayer basePlayer) => (!(player.Distance2D(fromPlayer) < basePlayer.Distance2D(fromPlayer))) ? 1 : (-1));
+			foreach (BasePlayer item in obj)
+			{
+				text += $"{item.userID}:{item.displayName}:{item.Distance2D(fromPlayer)}m\n";
+				num++;
+			}
+			Facepunch.Pool.FreeList(ref obj);
+			text += $"{num} users within {range}m\n";
 			arg.ReplyWith(text);
 		}
 

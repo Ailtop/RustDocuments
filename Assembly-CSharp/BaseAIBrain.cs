@@ -1150,7 +1150,12 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 	{
 		if (states.ContainsKey(newState))
 		{
-			return SwitchToState(states[newState], stateContainerID);
+			bool num = SwitchToState(states[newState], stateContainerID);
+			if (num)
+			{
+				OnStateChanged();
+			}
+			return num;
 		}
 		return false;
 	}
@@ -1178,6 +1183,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		currentStateContainerID = stateContainerID;
 		AddEvents(stateContainerID);
 		return true;
+	}
+
+	protected virtual void OnStateChanged()
+	{
 	}
 
 	private void AddEvents(int stateContainerID)

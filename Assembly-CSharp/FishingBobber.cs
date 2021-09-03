@@ -121,20 +121,6 @@ public class FishingBobber : BaseCombatEntity
 		}
 	}
 
-	public bool IsDirectionValid(BaseFishingRod.FishState direction, float checkLength, Vector3 playerPos)
-	{
-		Vector3 vector = Vector3.zero;
-		if (FishStateExtensions.Contains(direction, BaseFishingRod.FishState.PullingLeft))
-		{
-			vector = base.transform.right;
-		}
-		if (FishStateExtensions.Contains(direction, BaseFishingRod.FishState.PullingRight))
-		{
-			vector = -base.transform.right;
-		}
-		return IsDirectionValid(base.transform.position + vector * checkLength, checkLength, playerPos);
-	}
-
 	private bool IsDirectionValid(Vector3 pos, float checkLength, Vector3 playerPos)
 	{
 		if (Vector3.Angle((pos - playerPos).normalized.WithY(0f), initialDirection) > 60f)

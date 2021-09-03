@@ -13,6 +13,12 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 
 	public const float ColdThreshold = 5f;
 
+	public const float OxygenHurtThreshold = 0.5f;
+
+	public const float OxygenDepleteTime = 10f;
+
+	public const float OxygenRefillTime = 1f;
+
 	public MetabolismAttribute temperature = new MetabolismAttribute();
 
 	public MetabolismAttribute poison = new MetabolismAttribute();
@@ -194,15 +200,9 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 			float num13 = Mathf.InverseLerp(20f, -100f, temperature.value);
 			heartrate.MoveTowards(Mathf.Lerp(0.2f, 1f, num13), delta * 2f * num13);
 		}
-		float num14 = owner.WaterFactor();
-		if (num14 > 0.85f)
-		{
-			oxygen.MoveTowards(0f, delta * 0.1f);
-		}
-		else
-		{
-			oxygen.MoveTowards(1f, delta * 1f);
-		}
+		float num14 = owner.AirFactor();
+		float num15 = ((num14 > oxygen.value) ? 1f : 0.1f);
+		oxygen.MoveTowards(num14, delta * num15);
 		float f = 0f;
 		float f2 = 0f;
 		if (owner.IsOutside(owner.eyes.position))
@@ -213,14 +213,15 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		bool flag = owner.baseProtection.amounts[4] > 0f;
 		float currentEnvironmentalWetness = owner.currentEnvironmentalWetness;
 		currentEnvironmentalWetness = Mathf.Clamp(currentEnvironmentalWetness, 0f, 0.8f);
-		if (!flag && num14 > 0f)
+		float num16 = owner.WaterFactor();
+		if (!flag && num16 > 0f)
 		{
-			wetness.value = Mathf.Max(wetness.value, Mathf.Clamp(num14, wetness.min, wetness.max));
+			wetness.value = Mathf.Max(wetness.value, Mathf.Clamp(num16, wetness.min, wetness.max));
 		}
-		float num15 = Mathx.Max(wetness.value, f, f2, currentEnvironmentalWetness);
-		num15 = Mathf.Min(num15, flag ? 0f : num15);
-		wetness.MoveTowards(num15, delta * 0.05f);
-		if (num14 < wetness.value && currentEnvironmentalWetness <= 0f)
+		float num17 = Mathx.Max(wetness.value, f, f2, currentEnvironmentalWetness);
+		num17 = Mathf.Min(num17, flag ? 0f : num17);
+		wetness.MoveTowards(num17, delta * 0.05f);
+		if (num16 < wetness.value && currentEnvironmentalWetness <= 0f)
 		{
 			wetness.MoveTowards(0f, delta * 0.2f * Mathf.InverseLerp(0f, 100f, currentTemperature));
 		}
@@ -239,15 +240,15 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		}
 		if (pending_health.value > 0f)
 		{
-			float num16 = Mathf.Min(1f * delta, pending_health.value);
-			ownerEntity.Heal(num16);
+			float num18 = Mathf.Min(1f * delta, pending_health.value);
+			ownerEntity.Heal(num18);
 			if (ownerEntity.healthFraction == 1f)
 			{
 				pending_health.value = 0f;
 			}
 			else
 			{
-				pending_health.Subtract(num16);
+				pending_health.Subtract(num18);
 			}
 		}
 	}

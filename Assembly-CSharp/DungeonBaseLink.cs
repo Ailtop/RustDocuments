@@ -16,7 +16,7 @@ public class DungeonBaseLink : MonoBehaviour
 	[Tooltip("If set to a positive number, all segments with the same MaxCountIdentifier are counted towards MaxCountLocal and MaxCountGlobal")]
 	public int MaxCountIdentifier = -1;
 
-	internal DungeonBaseInfo Dungeon;
+	public DungeonBaseInfo Dungeon;
 
 	public MeshRenderer[] MapRenderers;
 
