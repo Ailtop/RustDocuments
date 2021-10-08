@@ -83,9 +83,9 @@ public class InstantCameraTool : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(3uL)]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void TakePhoto(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -151,9 +151,9 @@ public class InstantCameraTool : HeldEntity
 		item.LoseCondition(1f);
 	}
 
-	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
-		base.OnDeployed(parent, deployedBy);
+		base.OnDeployed(parent, deployedBy, fromItem);
 		hasSentAchievement = false;
 	}
 }

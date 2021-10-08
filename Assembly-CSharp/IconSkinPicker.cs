@@ -11,4 +11,6 @@ public class IconSkinPicker : MonoBehaviour
 	public Action skinChangedEvent;
 
 	public ScrollRect scroller;
+
+	public SearchFilterInput searchFilter;
 }

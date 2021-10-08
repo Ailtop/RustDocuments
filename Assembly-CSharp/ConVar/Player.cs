@@ -114,6 +114,16 @@ namespace ConVar
 		}
 
 		[ServerUserVar]
+		public static void abandonmission(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (basePlayer.HasActiveMission())
+			{
+				basePlayer.AbandonActiveMission();
+			}
+		}
+
+		[ServerUserVar]
 		public static void mount(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);

@@ -229,7 +229,9 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
 		UnityEngine.Physics.solverIterationCount = 3;
+		int @int = PlayerPrefs.GetInt("UnityGraphicsQuality");
 		QualitySettings.SetQualityLevel(0);
+		PlayerPrefs.SetInt("UnityGraphicsQuality", @int);
 		Object.DontDestroyOnLoad(base.gameObject);
 		Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/server_console.prefab"));
 		StartupShared();

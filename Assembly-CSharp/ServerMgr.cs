@@ -54,7 +54,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private string _AssemblyHash;
 
-	private IEnumerator restartCoroutine;
+	public IEnumerator restartCoroutine;
 
 	public static int AvailableSlots => ConVar.Server.maxplayers - BasePlayer.activePlayerList.Count;
 
@@ -499,14 +499,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2314)
+		else if (packet.connection.protocol > 2318)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2314));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2318));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2314)
+		else if (packet.connection.protocol < 2318)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2314));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2318));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -602,7 +602,13 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 		if (loadSave)
 		{
-			skipInitialSpawn = SaveRestore.Load(saveFile, allowOutOfDateSaves);
+			World.LoadedFromSave = true;
+			World.LoadedFromSave = (skipInitialSpawn = SaveRestore.Load(saveFile, allowOutOfDateSaves));
+		}
+		else
+		{
+			SaveRestore.SaveCreatedTime = DateTime.UtcNow;
+			World.LoadedFromSave = false;
 		}
 		if ((bool)SingletonComponent<SpawnHandler>.Instance)
 		{
@@ -1128,7 +1134,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2314}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2318}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
@@ -1366,14 +1372,22 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	public static void RestartServer(string strNotice, int iSeconds)
 	{
-		if (!(SingletonComponent<ServerMgr>.Instance == null))
+		if (SingletonComponent<ServerMgr>.Instance == null)
 		{
-			if (SingletonComponent<ServerMgr>.Instance.restartCoroutine != null)
+			return;
+		}
+		if (SingletonComponent<ServerMgr>.Instance.restartCoroutine != null)
+		{
+			if (Interface.CallHook("OnServerRestartInterrupt") != null)
 			{
-				ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Restart interrupted!");
-				SingletonComponent<ServerMgr>.Instance.StopCoroutine(SingletonComponent<ServerMgr>.Instance.restartCoroutine);
-				SingletonComponent<ServerMgr>.Instance.restartCoroutine = null;
+				return;
 			}
+			ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Restart interrupted!");
+			SingletonComponent<ServerMgr>.Instance.StopCoroutine(SingletonComponent<ServerMgr>.Instance.restartCoroutine);
+			SingletonComponent<ServerMgr>.Instance.restartCoroutine = null;
+		}
+		if (Interface.CallHook("OnServerRestart", strNotice, iSeconds) == null)
+		{
 			SingletonComponent<ServerMgr>.Instance.restartCoroutine = SingletonComponent<ServerMgr>.Instance.ServerRestartWarning(strNotice, iSeconds);
 			SingletonComponent<ServerMgr>.Instance.StartCoroutine(SingletonComponent<ServerMgr>.Instance.restartCoroutine);
 			SingletonComponent<ServerMgr>.Instance.UpdateServerInformation();

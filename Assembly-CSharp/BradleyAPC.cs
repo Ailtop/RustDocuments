@@ -592,6 +592,10 @@ public class BradleyAPC : BaseCombatEntity
 			BasePlayer basePlayer = ent as BasePlayer;
 			Vector3 position = mainTurret.transform.position;
 			flag = IsVisible(basePlayer.eyes.position, position) || IsVisible(basePlayer.transform.position + Vector3.up * 0.1f, position);
+			if (!flag && basePlayer.isMounted && basePlayer.GetMounted().VehicleParent() != null && basePlayer.GetMounted().VehicleParent().AlwaysAllowBradleyTargeting)
+			{
+				flag = IsVisible(basePlayer.GetMounted().VehicleParent().bounds.center, position);
+			}
 			if (flag)
 			{
 				flag = !UnityEngine.Physics.SphereCast(new Ray(position, Vector3Ex.Direction(basePlayer.eyes.position, position)), 0.05f, Vector3.Distance(basePlayer.eyes.position, position), 10551297);

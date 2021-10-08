@@ -163,7 +163,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 
 	public override void Load(LoadInfo info)
 	{
-		base.Load(info);
 		BoxController.Load(info);
+		base.Load(info);
 	}
 }

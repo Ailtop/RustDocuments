@@ -209,6 +209,10 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			{
 				base.baseEntity.SetPlayerFlag(BasePlayer.PlayerFlags.DisplaySash, true);
 			}
+			if (bAdded)
+			{
+				basePlayer.ProcessMissionEvent(BaseMission.MissionEventType.ACQUIRE_ITEM, item.info.shortname, item.amount);
+			}
 		}
 	}
 

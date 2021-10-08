@@ -27,7 +27,11 @@ public class BaseMountable : BaseCombatEntity
 	public BasePlayer _mounted;
 
 	[Header("View")]
-	public Transform eyeOverride;
+	[FormerlySerializedAs("eyeOverride")]
+	public Transform eyePositionOverride;
+
+	[FormerlySerializedAs("eyeOverride")]
+	public Transform eyeCenterOverride;
 
 	public Vector2 pitchClamp = new Vector2(-80f, 50f);
 
@@ -49,9 +53,6 @@ public class BaseMountable : BaseCombatEntity
 	public bool checkPlayerLosOnMount;
 
 	public bool disableMeshCullingForPlayers;
-
-	[SerializeField]
-	private bool unparentOnMount = true;
 
 	[FormerlySerializedAs("modifyPlayerCollider")]
 	public bool modifiesPlayerCollider;
@@ -186,9 +187,9 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual Transform GetEyeOverride()
 	{
-		if (eyeOverride != null)
+		if (eyePositionOverride != null)
 		{
-			return eyeOverride;
+			return eyePositionOverride;
 		}
 		return base.transform;
 	}
@@ -219,7 +220,16 @@ public class BaseMountable : BaseCombatEntity
 		{
 			return Vector3.zero;
 		}
-		return eyeOverride.transform.position;
+		return eyePositionOverride.transform.position;
+	}
+
+	public virtual Vector3 EyeCenterForPlayer(BasePlayer player, Quaternion lookRot)
+	{
+		if (player.GetMounted() != this)
+		{
+			return Vector3.zero;
+		}
+		return eyeCenterOverride.transform.position;
 	}
 
 	public virtual float WaterFactorForPlayer(BasePlayer player)
@@ -350,30 +360,21 @@ public class BaseMountable : BaseCombatEntity
 
 	public void MountPlayer(BasePlayer player)
 	{
-		if (_mounted != null || mountAnchor == null || Interface.CallHook("CanMountEntity", player, this) != null)
+		if (!(_mounted != null) && !(mountAnchor == null) && Interface.CallHook("CanMountEntity", player, this) == null)
 		{
-			return;
+			player.EnsureDismounted();
+			_mounted = player;
+			player.MountObject(this);
+			player.MovePosition(mountAnchor.transform.position);
+			player.transform.rotation = mountAnchor.transform.rotation;
+			player.ServerRotation = mountAnchor.transform.rotation;
+			player.OverrideViewAngles(mountAnchor.transform.rotation.eulerAngles);
+			_mounted.eyes.NetworkUpdate(mountAnchor.transform.rotation);
+			player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
+			SetFlag(Flags.Busy, true);
+			OnPlayerMounted();
+			Interface.CallHook("OnEntityMounted", this, player);
 		}
-		player.EnsureDismounted();
-		_mounted = player;
-		if (unparentOnMount)
-		{
-			TriggerParent triggerParent = player.FindTrigger<TriggerParent>();
-			if ((bool)triggerParent)
-			{
-				triggerParent.OnTriggerExit(player.GetComponent<Collider>());
-			}
-		}
-		player.MountObject(this);
-		player.MovePosition(mountAnchor.transform.position);
-		player.transform.rotation = mountAnchor.transform.rotation;
-		player.ServerRotation = mountAnchor.transform.rotation;
-		player.OverrideViewAngles(mountAnchor.transform.rotation.eulerAngles);
-		_mounted.eyes.NetworkUpdate(mountAnchor.transform.rotation);
-		player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
-		SetFlag(Flags.Busy, true);
-		OnPlayerMounted();
-		Interface.CallHook("OnEntityMounted", this, player);
 	}
 
 	public virtual void OnPlayerMounted()
@@ -472,11 +473,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
 			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C61_0(hitInfo)))
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C62_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C61_0(hitInfo))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C62_0(hitInfo))
 				{
 					return true;
 				}

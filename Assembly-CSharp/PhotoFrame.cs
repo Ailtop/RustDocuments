@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
+public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 {
 	public GameObjectRef SignEditorDialog;
 
@@ -23,6 +23,8 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 	public Vector2i TextureSize => new Vector2i(PaintableSource.texWidth, PaintableSource.texHeight);
 
 	public int TextureCount => 1;
+
+	public uint NetworkID => net.ID;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -275,5 +277,52 @@ public class PhotoFrame : StorageContainer, ILOD, IPhotoReceiver, ISignage
 			_photoEntity.uid = num;
 			SendNetworkUpdate();
 		}
+	}
+
+	public override void OnPickedUpPreItemMove(Item createdItem, BasePlayer player)
+	{
+		base.OnPickedUpPreItemMove(createdItem, player);
+		ItemModSign component;
+		if (_overlayTextureCrc != 0 && createdItem.info.TryGetComponent<ItemModSign>(out component))
+		{
+			component.OnSignPickedUp(this, createdItem);
+		}
+	}
+
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
+	{
+		base.OnDeployed(parent, deployedBy, fromItem);
+		ItemModSign component;
+		if (fromItem.info.TryGetComponent<ItemModSign>(out component))
+		{
+			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
+			if (associatedEntity != null)
+			{
+				associatedEntity.CopyInfoToSign(this);
+			}
+		}
+	}
+
+	public uint[] GetTextureCRCs()
+	{
+		return new uint[1] { _overlayTextureCrc };
+	}
+
+	public void SetTextureCRCs(uint[] crcs)
+	{
+		if (crcs.Length != 0)
+		{
+			_overlayTextureCrc = crcs[0];
+			SendNetworkUpdate();
+		}
+	}
+
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (base.CanPickup(player))
+		{
+			return _photoEntity.uid == 0;
+		}
+		return false;
 	}
 }

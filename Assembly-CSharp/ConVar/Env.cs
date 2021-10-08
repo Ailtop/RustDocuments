@@ -25,7 +25,7 @@ namespace ConVar
 			}
 		}
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static float time
 		{
 			get

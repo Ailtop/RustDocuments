@@ -27,6 +27,8 @@ public class ItemModWearable : ItemMod
 
 	public float weight;
 
+	public bool equipOnRightClick = true;
+
 	public GameObjectRef viewmodelAddition;
 
 	public Wearable targetWearable

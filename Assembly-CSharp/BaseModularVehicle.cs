@@ -208,7 +208,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 			}
 			if (IsMovingOrOn)
 			{
-				Velocity = GetWorldVelocity();
+				Velocity = GetLocalVelocity();
 				waterlogged = WaterLevel.Test(waterSample.transform.position, true, this);
 			}
 			else
@@ -216,7 +216,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 				Velocity = Vector3.zero;
 			}
 			SetFlag(Flags.Reserved6, rigidBody.isKinematic);
-			if (LightsAreOn && !HasDriver())
+			if (LightsAreOn && !AnyMounted())
 			{
 				SetLightsState(false);
 			}
@@ -617,10 +617,15 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		AttachedModuleEntities.Add(addedModule);
 		addedModule.ModuleAdded(this, index);
 		AddMass(addedModule.Mass, addedModule.CentreOfMass, addedModule.transform.position);
-		RefreshModulesExcept(addedModule);
-		if (base.isServer)
+		if (base.isServer && !Inventory.TrySyncModuleInventory(addedModule, index))
 		{
-			Inventory.SyncModuleInventory(addedModule, index);
+			Debug.LogError($"{GetType().Name}: Unable to add module {addedModule.name} to socket ({index}). Destroying it.", base.gameObject);
+			addedModule.Kill();
+			AttachedModuleEntities.Remove(addedModule);
+		}
+		else
+		{
+			RefreshModulesExcept(addedModule);
 		}
 	}
 

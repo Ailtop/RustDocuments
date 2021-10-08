@@ -31,7 +31,7 @@ public class FileStorage : IDisposable
 
 	private MruDictionary<uint, CacheData> _cache = new MruDictionary<uint, CacheData>(1000);
 
-	public static FileStorage server = new FileStorage("sv.files." + 216, true);
+	public static FileStorage server = new FileStorage("sv.files." + 217, true);
 
 	protected FileStorage(string name, bool server)
 	{
@@ -172,6 +172,17 @@ public class FileStorage : IDisposable
 			if (db != null)
 			{
 				db.Execute("DELETE FROM data WHERE entid = ?", (int)entityid);
+			}
+		}
+	}
+
+	public void ReassignEntityId(uint oldId, uint newId)
+	{
+		using (TimeWarning.New("FileStorage.ReassignEntityId"))
+		{
+			if (db != null)
+			{
+				db.Execute("UPDATE data SET entid = ? WHERE entid = ?", (int)newId, (int)oldId);
 			}
 		}
 	}

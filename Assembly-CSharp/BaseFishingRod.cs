@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -242,32 +243,37 @@ public class BaseFishingRod : HeldEntity
 			FailedCast(reason);
 			return;
 		}
-		FishingBobber component = base.gameManager.CreateEntity(FishingBobberRef.resourcePath, base.transform.position + Vector3.up * 2.8f + ownerPlayer.eyes.BodyForward() * 1.8f, GetOwnerPlayer().ServerRotation).GetComponent<FishingBobber>();
-		component.transform.forward = GetOwnerPlayer().eyes.BodyForward();
-		component.Spawn();
-		component.InitialiseBobber(ownerPlayer, surfaceBody, pos);
-		lureUsed = currentLure.info;
-		currentLure.UseItem();
-		if (fishLookup == null)
+		object obj = Interface.CallHook("CanCastFishingRod", ownerPlayer, this, currentLure);
+		if (!(obj is bool) || (bool)obj)
 		{
-			fishLookup = PrefabAttribute.server.Find<FishLookup>(prefabID);
+			FishingBobber component = base.gameManager.CreateEntity(FishingBobberRef.resourcePath, base.transform.position + Vector3.up * 2.8f + ownerPlayer.eyes.BodyForward() * 1.8f, GetOwnerPlayer().ServerRotation).GetComponent<FishingBobber>();
+			component.transform.forward = GetOwnerPlayer().eyes.BodyForward();
+			component.Spawn();
+			component.InitialiseBobber(ownerPlayer, surfaceBody, pos);
+			lureUsed = currentLure.info;
+			currentLure.UseItem();
+			if (fishLookup == null)
+			{
+				fishLookup = PrefabAttribute.server.Find<FishLookup>(prefabID);
+			}
+			currentFishTarget = fishLookup.GetFish(component.transform.position, surfaceBody, lureUsed, out fishableModifier, lastFish);
+			lastFish = fishableModifier;
+			currentBobber.Set(component);
+			ClientRPC(null, "Client_ReceiveCastPoint", component.net.ID);
+			ownerPlayer.SignalBroadcast(Signal.Attack);
+			catchTime = (ImmediateHook ? 0f : UnityEngine.Random.Range(10f, 20f));
+			catchTime = (float)catchTime * fishableModifier.CatchWaitTimeMultiplier;
+			ItemModCompostable component2;
+			float val = (lureUsed.TryGetComponent<ItemModCompostable>(out component2) ? component2.BaitValue : 0f);
+			val = Mathx.RemapValClamped(val, 0f, 20f, 1f, 10f);
+			catchTime = Mathf.Clamp((float)catchTime - val, 3f, 20f);
+			playerStartPosition = ownerPlayer.transform.position;
+			SetFlag(Flags.Busy, true);
+			CurrentState = CatchState.Waiting;
+			InvokeRepeating(CatchProcess, 0f, 0f);
+			inQueue = false;
+			Interface.CallHook("OnFishingRodCast", this, ownerPlayer, currentLure);
 		}
-		currentFishTarget = fishLookup.GetFish(component.transform.position, surfaceBody, lureUsed, out fishableModifier, lastFish);
-		lastFish = fishableModifier;
-		currentBobber.Set(component);
-		ClientRPC(null, "Client_ReceiveCastPoint", component.net.ID);
-		ownerPlayer.SignalBroadcast(Signal.Attack);
-		catchTime = (ImmediateHook ? 0f : UnityEngine.Random.Range(10f, 20f));
-		catchTime = (float)catchTime * fishableModifier.CatchWaitTimeMultiplier;
-		ItemModCompostable component2;
-		float val = (lureUsed.TryGetComponent<ItemModCompostable>(out component2) ? component2.BaitValue : 0f);
-		val = Mathx.RemapValClamped(val, 0f, 20f, 1f, 10f);
-		catchTime = Mathf.Clamp((float)catchTime - val, 3f, 20f);
-		playerStartPosition = ownerPlayer.transform.position;
-		SetFlag(Flags.Busy, true);
-		CurrentState = CatchState.Waiting;
-		InvokeRepeating(CatchProcess, 0f, 0f);
-		inQueue = false;
 	}
 
 	private void FailedCast(FailReason reason)
@@ -444,9 +450,15 @@ public class BaseFishingRod : HeldEntity
 				return;
 			}
 			CurrentState = CatchState.Caught;
+			Item item = default(Item);
 			if (currentFishTarget != null)
 			{
-				Item item = ItemManager.Create(currentFishTarget, 1, 0uL);
+				item = ItemManager.Create(currentFishTarget, 1, 0uL);
+				object obj = Interface.CallHook("CanCatchFish", ownerPlayer, this, item);
+				if (obj is bool && !(bool)obj)
+				{
+					return;
+				}
 				ownerPlayer.GiveItem(item, GiveItemReason.Crafted);
 				if (currentFishTarget.shortname == "skull.human")
 				{
@@ -459,6 +471,7 @@ public class BaseFishingRod : HeldEntity
 			fishingBobber.Kill();
 			currentBobber.Set(null);
 			CancelInvoke(CatchProcess);
+			Interface.CallHook("OnFishCaught", item, this, ownerPlayer);
 		}
 	}
 
@@ -495,6 +508,7 @@ public class BaseFishingRod : HeldEntity
 			currentBobber.Set(null);
 		}
 		ClientRPC(null, "Client_ResetLine", (int)reason);
+		Interface.CallHook("OnFishingStopped", this, reason);
 	}
 
 	public override void OnHeldChanged()

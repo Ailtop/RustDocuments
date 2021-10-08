@@ -13,7 +13,7 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 
 	public static Dictionary<string, string> ServerValidStations;
 
-	[ReplicatedVar(Saved = true, Help = "A list of radio stations that are valid on this server. Format: NAME,URL,NAME,URL,etc")]
+	[ReplicatedVar(Saved = true, Help = "A list of radio stations that are valid on this server. Format: NAME,URL,NAME,URL,etc", ShowInAdminUI = true)]
 	public static string ServerUrlList = string.Empty;
 
 	public static string lastParsedServerList;

@@ -1776,9 +1776,9 @@ namespace Rust.Ai.HTN.Murderer
 		[SerializeField]
 		private MurdererContext _context;
 
-		[Header("Navigation")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Navigation")]
 		private NavMeshAgent _navAgent;
 
 		[ReadOnly]

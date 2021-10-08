@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[763]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[772]
 	{
 		new ConsoleSystem.Command
 		{
@@ -99,6 +99,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				BaseFishingRod.ImmediateHook = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "missionsenabled",
+			Parent = "basemission",
+			FullName = "basemission.missionsenabled",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BaseMission.missionsenabled.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseMission.missionsenabled = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -274,6 +287,7 @@ public class ConsoleGen
 			Saved = true,
 			Description = "A list of radio stations that are valid on this server. Format: NAME,URL,NAME,URL,etc",
 			Replicated = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => BoomBox.ServerUrlList.ToString(),
 			SetOveride = delegate(string str)
@@ -404,6 +418,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "hideobjects",
+			Parent = "cinematicentity",
+			FullName = "cinematicentity.hideobjects",
+			ServerAdmin = true,
+			Description = "Hides cinematic light source meshes (keeps lights visible)",
+			Variable = true,
+			GetOveride = () => CinematicEntity.HideObjects.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CinematicEntity.HideObjects = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "clothloddist",
 			Parent = "clothlod",
 			FullName = "clothlod.clothloddist",
@@ -438,6 +466,42 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Commands.Find(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_requestplayerlist",
+			Parent = "global",
+			FullName = "global.adminui_requestplayerlist",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_RequestPlayerList(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_requestserverconvars",
+			Parent = "global",
+			FullName = "global.adminui_requestserverconvars",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_RequestServerConvars(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_requestserverinfo",
+			Parent = "global",
+			FullName = "global.adminui_requestserverinfo",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_RequestServerInfo(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3470,6 +3534,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "resetsleepingbagtimers",
+			Parent = "debug",
+			FullName = "debug.resetsleepingbagtimers",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.ResetSleepingBagTimers(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "stall",
 			Parent = "debug",
 			FullName = "debug.stall",
@@ -3967,12 +4043,25 @@ public class ConsoleGen
 			Parent = "entity",
 			FullName = "entity.deleteby",
 			ServerAdmin = true,
-			Description = "Destroy all entities created by this user",
+			Description = "Destroy all entities created by provided users (separate users by space)",
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				int num = Entity.DeleteBy(arg.GetULong(0, 0uL));
+				int num = Entity.DeleteBy(arg);
 				arg.ReplyWithObject(num);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "deletebytextblock",
+			Parent = "entity",
+			FullName = "entity.deletebytextblock",
+			ServerAdmin = true,
+			Description = "Destroy all entities created by users in the provided text block (can use with copied results from ent auth)",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Entity.DeleteByTextBlock(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4183,6 +4272,7 @@ public class ConsoleGen
 			Parent = "env",
 			FullName = "env.time",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Env.time.ToString(),
 			SetOveride = delegate(string str)
@@ -5499,6 +5589,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "abandonmission",
+			Parent = "player",
+			FullName = "player.abandonmission",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Player.abandonmission(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "cinematic_gesture",
 			Parent = "player",
 			FullName = "player.cinematic_gesture",
@@ -6342,6 +6444,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.description",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.description.ToString(),
 			SetOveride = delegate(string str)
@@ -6508,6 +6611,7 @@ public class ConsoleGen
 			FullName = "server.headerimage",
 			ServerAdmin = true,
 			Saved = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.headerimage.ToString(),
 			SetOveride = delegate(string str)
@@ -6521,6 +6625,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.hostname",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.hostname.ToString(),
 			SetOveride = delegate(string str)
@@ -6547,6 +6652,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.idlekick",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.idlekick.ToString(),
 			SetOveride = delegate(string str)
@@ -6680,6 +6786,7 @@ public class ConsoleGen
 			FullName = "server.logoimage",
 			ServerAdmin = true,
 			Saved = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.logoimage.ToString(),
 			SetOveride = delegate(string str)
@@ -6823,6 +6930,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.maxplayers",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.maxplayers.ToString(),
 			SetOveride = delegate(string str)
@@ -6920,6 +7028,7 @@ public class ConsoleGen
 			Client = true,
 			Saved = true,
 			Replicated = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.motd.ToString(),
 			SetOveride = delegate(string str)
@@ -7217,6 +7326,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.radiation",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.radiation.ToString(),
 			SetOveride = delegate(string str)
@@ -7323,6 +7433,7 @@ public class ConsoleGen
 			FullName = "server.savebackupcount",
 			ServerAdmin = true,
 			Saved = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.saveBackupCount.ToString(),
 			SetOveride = delegate(string str)
@@ -7536,6 +7647,7 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Description = "Comma-separated server browser tag values (see wiki)",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.tags.ToString(),
 			SetOveride = delegate(string str)
@@ -7588,6 +7700,7 @@ public class ConsoleGen
 			Parent = "server",
 			FullName = "server.url",
 			ServerAdmin = true,
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Server.url.ToString(),
 			SetOveride = delegate(string str)
@@ -7676,6 +7789,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Server.writecfg(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cargoshipevent",
+			Parent = "spawn",
+			FullName = "spawn.cargoshipevent",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Spawn.cargoshipevent(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -9130,6 +9255,7 @@ public class ConsoleGen
 			FullName = "horse.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Horse.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -9158,6 +9284,7 @@ public class ConsoleGen
 			FullName = "hotairballoon.population",
 			ServerAdmin = true,
 			Description = "Population active on the server",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => HotAirBalloon.population.ToString(),
 			SetOveride = delegate(string str)
@@ -9296,6 +9423,7 @@ public class ConsoleGen
 			FullName = "minicopter.population",
 			ServerAdmin = true,
 			Description = "Population active on the server",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => MiniCopter.population.ToString(),
 			SetOveride = delegate(string str)
@@ -9324,6 +9452,7 @@ public class ConsoleGen
 			FullName = "modularcar.population",
 			ServerAdmin = true,
 			Description = "Population active on the server",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => ModularCar.population.ToString(),
 			SetOveride = delegate(string str)
@@ -9379,6 +9508,7 @@ public class ConsoleGen
 			FullName = "motorrowboat.population",
 			ServerAdmin = true,
 			Description = "Population active on the server",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => MotorRowboat.population.ToString(),
 			SetOveride = delegate(string str)
@@ -9667,6 +9797,7 @@ public class ConsoleGen
 			FullName = "rhib.rhibpopulation",
 			ServerAdmin = true,
 			Description = "Population active on the server",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => RHIB.rhibpopulation.ToString(),
 			SetOveride = delegate(string str)
@@ -9681,6 +9812,7 @@ public class ConsoleGen
 			FullName = "ridablehorse.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => RidableHorse.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -9969,6 +10101,7 @@ public class ConsoleGen
 			FullName = "scraptransporthelicopter.population",
 			ServerAdmin = true,
 			Description = "Population active on the server",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => ScrapTransportHelicopter.population.ToString(),
 			SetOveride = delegate(string str)
@@ -10022,6 +10155,7 @@ public class ConsoleGen
 			FullName = "stag.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Stag.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -10074,6 +10208,7 @@ public class ConsoleGen
 			FullName = "wolf.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Wolf.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -10088,6 +10223,7 @@ public class ConsoleGen
 			FullName = "zombie.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Zombie.Population.ToString(),
 			SetOveride = delegate(string str)

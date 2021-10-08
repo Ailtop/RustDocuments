@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Facepunch;
 using Network;
 using Oxide.Core;
+using ProtoBuf;
 using Rust;
 using UnityEngine;
 
@@ -57,6 +58,8 @@ public class CargoShip : BaseEntity
 
 	public GameObjectRef playerTest;
 
+	private uint layoutChoice;
+
 	[ServerVar]
 	public static bool event_enabled = true;
 
@@ -95,15 +98,20 @@ public class CargoShip : BaseEntity
 		return Time.fixedTime;
 	}
 
-	public void UpdateLayoutFromFlags()
+	public override void Load(LoadInfo info)
 	{
-		if (HasFlag(Flags.Reserved1))
+		base.Load(info);
+		if (info.msg.simpleUID != null)
 		{
-			layouts[0].SetActive(true);
+			layoutChoice = info.msg.simpleUID.uid;
 		}
-		else if (HasFlag(Flags.Reserved2))
+	}
+
+	public void RefreshActiveLayout()
+	{
+		for (int i = 0; i < layouts.Length; i++)
 		{
-			layouts[1].SetActive(true);
+			layouts[i].SetActive(layoutChoice == i);
 		}
 	}
 
@@ -216,6 +224,19 @@ public class CargoShip : BaseEntity
 		}
 	}
 
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		info.msg.simpleUID = Pool.Get<SimpleUID>();
+		info.msg.simpleUID.uid = layoutChoice;
+	}
+
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		RefreshActiveLayout();
+	}
+
 	public void PlayHorn()
 	{
 		ClientRPC(null, "DoHornSound");
@@ -227,39 +248,19 @@ public class CargoShip : BaseEntity
 		}
 	}
 
-	public void PickLayout()
-	{
-		if (!HasFlag(Flags.Reserved1) && !HasFlag(Flags.Reserved2))
-		{
-			switch (UnityEngine.Random.Range(0, layouts.Length))
-			{
-			case 0:
-				SetFlag(Flags.Reserved1, true);
-				break;
-			case 1:
-				SetFlag(Flags.Reserved2, true);
-				break;
-			}
-		}
-	}
-
 	public override void Spawn()
 	{
 		if (!Rust.Application.isLoadingSave)
 		{
-			PickLayout();
+			layoutChoice = (uint)UnityEngine.Random.Range(0, layouts.Length);
+			SendNetworkUpdate();
+			RefreshActiveLayout();
 		}
 		base.Spawn();
 	}
 
 	public override void ServerInit()
 	{
-		GameObject[] array = layouts;
-		for (int i = 0; i < array.Length; i++)
-		{
-			array[i].SetActive(false);
-		}
-		UpdateLayoutFromFlags();
 		base.ServerInit();
 		Invoke(FindInitialNode, 2f);
 		InvokeRepeating(BuildingCheck, 1f, 5f);

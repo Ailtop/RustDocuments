@@ -9,7 +9,7 @@ public class RHIB : MotorRowboat
 {
 	public GameObject steeringWheel;
 
-	[ServerVar(Help = "Population active on the server")]
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public static float rhibpopulation;
 
 	private float targetGasPedal;

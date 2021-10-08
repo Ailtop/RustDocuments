@@ -129,7 +129,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Reserved7 = 0x8000,
 		Reserved8 = 0x10000,
 		Reserved9 = 0x20000,
-		Reserved10 = 0x40000
+		Reserved10 = 0x40000,
+		Reserved11 = 0x80000
 	}
 
 	[IsReadOnly]
@@ -2052,7 +2053,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		baseNpc.AddCalories(100f);
 	}
 
-	public virtual void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public virtual void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
 	}
 

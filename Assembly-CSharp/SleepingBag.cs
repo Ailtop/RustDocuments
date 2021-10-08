@@ -31,6 +31,8 @@ public class SleepingBag : DecayEntity
 
 	public bool canBePublic;
 
+	public const Flags IsPublicFlag = Flags.Reserved3;
+
 	public float unlockTime;
 
 	public static List<SleepingBag> sleepingBags = new List<SleepingBag>();
@@ -252,10 +254,15 @@ public class SleepingBag : DecayEntity
 		{
 			sleepingBag2 = (SleepingBag)obj;
 		}
+		if (sleepingBag2.IsOccupied())
+		{
+			return false;
+		}
 		Vector3 pos;
 		Quaternion rot;
 		sleepingBag2.GetSpawnPos(out pos, out rot);
 		player2.RespawnAt(pos, rot);
+		sleepingBag2.PostPlayerSpawn(player2);
 		SleepingBag[] array2 = array;
 		foreach (SleepingBag sleepingBag3 in array2)
 		{
@@ -295,6 +302,15 @@ public class SleepingBag : DecayEntity
 		player.SendRespawnOptions();
 		Interface.CallHook("OnSleepingBagDestroyed", sleepingBag2, player);
 		return true;
+	}
+
+	public static void ResetTimersForPlayer(BasePlayer player)
+	{
+		SleepingBag[] array = FindForPlayer(player.userID, true);
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].unlockTime = 0f;
+		}
 	}
 
 	public virtual void GetSpawnPos(out Vector3 pos, out Quaternion rot)
@@ -393,7 +409,7 @@ public class SleepingBag : DecayEntity
 
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	public void RPC_MakePublic(RPCMessage msg)
+	public virtual void RPC_MakePublic(RPCMessage msg)
 	{
 		if (!canBePublic || !msg.player.CanInteract() || (deployerUserID != msg.player.userID && !msg.player.CanBuild()))
 		{
@@ -420,6 +436,15 @@ public class SleepingBag : DecayEntity
 			deployerUserID = msg.player.userID;
 			SendNetworkUpdate();
 		}
+	}
+
+	protected virtual void PostPlayerSpawn(BasePlayer p)
+	{
+	}
+
+	public virtual bool IsOccupied()
+	{
+		return false;
 	}
 
 	public override void Load(LoadInfo info)

@@ -58,11 +58,18 @@ public class DroppedItem : WorldItem
 		{
 			return;
 		}
-		if (di.item.info != null && di.item.info.amountType == ItemDefinition.AmountType.Genetics)
+		if (di.item.info != null)
 		{
-			int num = ((di.item.instanceData != null) ? di.item.instanceData.dataInt : (-1));
-			int num2 = ((item.instanceData != null) ? item.instanceData.dataInt : (-1));
-			if (num != num2)
+			if (di.item.info.amountType == ItemDefinition.AmountType.Genetics)
+			{
+				int num = ((di.item.instanceData != null) ? di.item.instanceData.dataInt : (-1));
+				int num2 = ((item.instanceData != null) ? item.instanceData.dataInt : (-1));
+				if (num != num2)
+				{
+					return;
+				}
+			}
+			if ((di.item.info.GetComponent<ItemModSign>() != null && ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(di.item) != null) || (item.info != null && item.info.GetComponent<ItemModSign>() != null && ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(item) != null))
 			{
 				return;
 			}

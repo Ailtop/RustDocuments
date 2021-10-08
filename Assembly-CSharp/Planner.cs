@@ -159,22 +159,10 @@ public class Planner : HeldEntity
 		target.rotation = msg.rotation;
 		target.player = ownerPlayer;
 		target.valid = true;
-		if (Interface.CallHook("CanBuild", this, construction, target) != null)
+		if (Interface.CallHook("CanBuild", this, construction, target) == null)
 		{
-			return;
+			DoBuild(target, construction);
 		}
-		if ((bool)deployable && deployable.placeEffect.isValid)
-		{
-			if ((bool)baseEntity && msg.socket != 0)
-			{
-				Effect.server.Run(deployable.placeEffect.resourcePath, baseEntity.transform.TransformPoint(target.socket.worldPosition), baseEntity.transform.up);
-			}
-			else
-			{
-				Effect.server.Run(deployable.placeEffect.resourcePath, msg.position, msg.normal);
-			}
-		}
-		DoBuild(target, construction);
 	}
 
 	public void DoBuild(Construction.Target target, Construction component)
@@ -260,7 +248,18 @@ public class Planner : HeldEntity
 			{
 				modDeployable.OnDeployed(baseEntity, ownerPlayer);
 			}
-			baseEntity.OnDeployed(baseEntity.GetParentEntity(), ownerPlayer);
+			baseEntity.OnDeployed(baseEntity.GetParentEntity(), ownerPlayer, GetOwnerItem());
+			if (deployable.placeEffect.isValid)
+			{
+				if ((bool)target.entity && target.socket != null)
+				{
+					Effect.server.Run(deployable.placeEffect.resourcePath, target.entity.transform.TransformPoint(target.socket.worldPosition), target.entity.transform.up);
+				}
+				else
+				{
+					Effect.server.Run(deployable.placeEffect.resourcePath, target.position, target.normal);
+				}
+			}
 		}
 		PayForPlacement(ownerPlayer, component);
 	}

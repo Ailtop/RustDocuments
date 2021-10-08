@@ -46,6 +46,17 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				}
 				using (TimeWarning.New("ConversationAction"))
 				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(4224060672u, "ConversationAction", this, player, 5uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(4224060672u, "ConversationAction", this, player, 3f))
+						{
+							return true;
+						}
+					}
 					try
 					{
 						using (TimeWarning.New("Call"))
@@ -75,6 +86,17 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				}
 				using (TimeWarning.New("Server_BeginTalking"))
 				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(2112414875u, "Server_BeginTalking", this, player, 1uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(2112414875u, "Server_BeginTalking", this, player, 3f))
+						{
+							return true;
+						}
+					}
 					try
 					{
 						using (TimeWarning.New("Call"))
@@ -104,6 +126,17 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				}
 				using (TimeWarning.New("Server_EndTalking"))
 				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(1597539152u, "Server_EndTalking", this, player, 1uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(1597539152u, "Server_EndTalking", this, player, 3f))
+						{
+							return true;
+						}
+					}
 					try
 					{
 						using (TimeWarning.New("Call"))
@@ -133,6 +166,17 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				}
 				using (TimeWarning.New("Server_ResponsePressed"))
 				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(2713250658u, "Server_ResponsePressed", this, player, 5uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(2713250658u, "Server_ResponsePressed", this, player, 3f))
+						{
+							return true;
+						}
+					}
 					try
 					{
 						using (TimeWarning.New("Call"))
@@ -169,7 +213,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		return -1;
 	}
 
-	public virtual string GetConversationStartSpeech()
+	public virtual string GetConversationStartSpeech(BasePlayer player)
 	{
 		return "intro";
 	}
@@ -208,7 +252,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		}
 	}
 
-	public void OnConversationEnded(BasePlayer player)
+	public virtual void OnConversationEnded(BasePlayer player)
 	{
 		if (conversingPlayers.Contains(player))
 		{
@@ -229,6 +273,8 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	}
 
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_BeginTalking(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -244,16 +290,23 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 			{
 				conversingPlayers.Add(player);
 				UpdateFlags();
-				ClientRPCPlayer(null, player, "Client_StartConversation", GetConversationIndex(conversationFor.shortname), GetConversationStartSpeech());
+				OnConversationStarted(player);
+				ClientRPCPlayer(null, player, "Client_StartConversation", GetConversationIndex(conversationFor.shortname), GetConversationStartSpeech(player));
 			}
 		}
+	}
+
+	public virtual void OnConversationStarted(BasePlayer speakingTo)
+	{
 	}
 
 	public virtual void UpdateFlags()
 	{
 	}
 
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void Server_EndTalking(RPCMessage msg)
 	{
 		OnConversationEnded(msg.player);
@@ -261,6 +314,8 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	}
 
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void ConversationAction(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -282,6 +337,8 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	}
 
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void Server_ResponsePressed(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

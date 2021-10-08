@@ -311,6 +311,14 @@ public class BasePlayer : BaseCombatEntity
 
 	private BasePlayer teamLeaderBuffer;
 
+	public List<BaseMission.MissionInstance> missions = new List<BaseMission.MissionInstance>();
+
+	private float thinkEvery = 1f;
+
+	private float timeSinceMissionThink;
+
+	private int _activeMission = -1;
+
 	[NonSerialized]
 	public ModelState modelState = new ModelState();
 
@@ -998,12 +1006,7 @@ public class BasePlayer : BaseCombatEntity
 			if (!(_lastSetName == value))
 			{
 				_lastSetName = value;
-				string value2 = value.ToPrintable(32).EscapeRichText().Trim();
-				if (string.IsNullOrWhiteSpace(value2))
-				{
-					value2 = userID.ToString();
-				}
-				_displayName = value2;
+				_displayName = SanitizePlayerNameString(value, userID);
 			}
 		}
 	}
@@ -2452,6 +2455,424 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
+	public bool HasAttemptedMission(uint missionID)
+	{
+		foreach (BaseMission.MissionInstance mission in missions)
+		{
+			if (mission.missionID == missionID)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool CanAcceptMission(uint missionID)
+	{
+		if (HasActiveMission())
+		{
+			return false;
+		}
+		if (!BaseMission.missionsenabled)
+		{
+			return false;
+		}
+		BaseMission fromID = MissionManifest.GetFromID(missionID);
+		if (fromID == null)
+		{
+			Debug.LogError("MISSION NOT FOUND IN MANIFEST, ID :" + missionID);
+			return false;
+		}
+		if (fromID.acceptDependancies != null && fromID.acceptDependancies.Length != 0)
+		{
+			BaseMission.MissionDependancy[] acceptDependancies = fromID.acceptDependancies;
+			foreach (BaseMission.MissionDependancy missionDependancy in acceptDependancies)
+			{
+				if (missionDependancy.everAttempted)
+				{
+					continue;
+				}
+				bool flag = false;
+				foreach (BaseMission.MissionInstance mission in missions)
+				{
+					if (mission.missionID == missionDependancy.targetMissionID && mission.status == missionDependancy.targetMissionDesiredStatus)
+					{
+						flag = true;
+					}
+				}
+				if (!flag)
+				{
+					return false;
+				}
+			}
+		}
+		if (IsMissionActive(missionID))
+		{
+			return false;
+		}
+		if (fromID.isRepeatable)
+		{
+			bool num = HasCompletedMission(missionID);
+			bool flag2 = HasFailedMission(missionID);
+			if (num && fromID.repeatDelaySecondsSuccess == -1)
+			{
+				return false;
+			}
+			if (flag2 && fromID.repeatDelaySecondsFailed == -1)
+			{
+				return false;
+			}
+			foreach (BaseMission.MissionInstance mission2 in missions)
+			{
+				if (mission2.missionID == missionID)
+				{
+					float num2 = 0f;
+					if (mission2.status == BaseMission.MissionStatus.Completed)
+					{
+						num2 = fromID.repeatDelaySecondsSuccess;
+					}
+					else if (mission2.status == BaseMission.MissionStatus.Failed)
+					{
+						num2 = fromID.repeatDelaySecondsFailed;
+					}
+					float endTime = mission2.endTime;
+					if (UnityEngine.Time.time - endTime < num2)
+					{
+						return false;
+					}
+				}
+			}
+		}
+		BaseMission.PositionGenerator[] positionGenerators = fromID.positionGenerators;
+		for (int i = 0; i < positionGenerators.Length; i++)
+		{
+			if (!positionGenerators[i].Validate(this))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public bool IsMissionActive(uint missionID)
+	{
+		foreach (BaseMission.MissionInstance mission in missions)
+		{
+			if (mission.missionID == missionID && (mission.status == BaseMission.MissionStatus.Active || mission.status == BaseMission.MissionStatus.Accomplished))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool HasCompletedMission(uint missionID)
+	{
+		foreach (BaseMission.MissionInstance mission in missions)
+		{
+			if (mission.missionID == missionID && mission.status == BaseMission.MissionStatus.Completed)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool HasFailedMission(uint missionID)
+	{
+		foreach (BaseMission.MissionInstance mission in missions)
+		{
+			if (mission.missionID == missionID && mission.status == BaseMission.MissionStatus.Failed)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void WipeMissions()
+	{
+		if (missions.Count > 0)
+		{
+			for (int num = missions.Count - 1; num >= 0; num--)
+			{
+				BaseMission.MissionInstance obj = missions[num];
+				if (obj != null)
+				{
+					obj.GetMission().MissionFailed(obj, this);
+					Facepunch.Pool.Free(ref obj);
+				}
+			}
+		}
+		missions.Clear();
+		SetActiveMission(-1);
+		MissionDirty();
+	}
+
+	public void AbandonActiveMission()
+	{
+		if (HasActiveMission())
+		{
+			int activeMission = GetActiveMission();
+			if (activeMission != -1 && activeMission < missions.Count)
+			{
+				BaseMission.MissionInstance missionInstance = missions[activeMission];
+				missionInstance.GetMission().MissionFailed(missionInstance, this);
+			}
+		}
+	}
+
+	public void AddMission(BaseMission.MissionInstance instance)
+	{
+		missions.Add(instance);
+		MissionDirty();
+	}
+
+	public void ThinkMissions(float delta)
+	{
+		if (!BaseMission.missionsenabled)
+		{
+			return;
+		}
+		if (timeSinceMissionThink < thinkEvery)
+		{
+			timeSinceMissionThink += delta;
+			return;
+		}
+		foreach (BaseMission.MissionInstance mission in missions)
+		{
+			mission.Think(this, timeSinceMissionThink);
+		}
+		timeSinceMissionThink = 0f;
+	}
+
+	public void ClearMissions()
+	{
+		missions.Clear();
+		State.missions = SaveMissions();
+		DirtyPlayerState();
+	}
+
+	public void MissionDirty(bool shouldSendNetworkUpdate = true)
+	{
+		if (BaseMission.missionsenabled)
+		{
+			State.missions = SaveMissions();
+			DirtyPlayerState();
+			if (shouldSendNetworkUpdate)
+			{
+				SendNetworkUpdate();
+			}
+		}
+	}
+
+	public void ProcessMissionEvent(BaseMission.MissionEventType type, string identifier, float amount)
+	{
+		if (!BaseMission.missionsenabled)
+		{
+			return;
+		}
+		foreach (BaseMission.MissionInstance mission in missions)
+		{
+			mission.ProcessMissionEvent(this, type, identifier, amount);
+		}
+	}
+
+	private Missions SaveMissions()
+	{
+		Missions missions = Facepunch.Pool.Get<Missions>();
+		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
+		missions.activeMission = GetActiveMission();
+		missions.protocol = 217;
+		missions.seed = World.Seed;
+		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
+		foreach (BaseMission.MissionInstance mission in this.missions)
+		{
+			MissionInstance missionInstance = Facepunch.Pool.Get<MissionInstance>();
+			missionInstance.providerID = mission.providerID;
+			missionInstance.missionID = mission.missionID;
+			missionInstance.missionStatus = (uint)mission.status;
+			missionInstance.completionScale = mission.completionScale;
+			missionInstance.startTime = UnityEngine.Time.realtimeSinceStartup - mission.startTime;
+			missionInstance.endTime = mission.endTime;
+			missionInstance.missionLocation = mission.missionLocation;
+			missionInstance.missionPoints = Facepunch.Pool.GetList<ProtoBuf.MissionPoint>();
+			foreach (KeyValuePair<string, UnityEngine.Vector3> missionPoint2 in mission.missionPoints)
+			{
+				ProtoBuf.MissionPoint missionPoint = Facepunch.Pool.Get<ProtoBuf.MissionPoint>();
+				missionPoint.identifier = missionPoint2.Key;
+				missionPoint.location = missionPoint2.Value;
+				missionInstance.missionPoints.Add(missionPoint);
+			}
+			missionInstance.objectiveStatuses = Facepunch.Pool.GetList<ObjectiveStatus>();
+			BaseMission.MissionInstance.ObjectiveStatus[] objectiveStatuses = mission.objectiveStatuses;
+			foreach (BaseMission.MissionInstance.ObjectiveStatus objectiveStatus in objectiveStatuses)
+			{
+				ObjectiveStatus objectiveStatus2 = Facepunch.Pool.Get<ObjectiveStatus>();
+				objectiveStatus2.completed = objectiveStatus.completed;
+				objectiveStatus2.failed = objectiveStatus.failed;
+				objectiveStatus2.started = objectiveStatus.started;
+				objectiveStatus2.genericFloat1 = objectiveStatus.genericFloat1;
+				objectiveStatus2.genericInt1 = objectiveStatus.genericInt1;
+				missionInstance.objectiveStatuses.Add(objectiveStatus2);
+			}
+			missionInstance.createdEntities = Facepunch.Pool.GetList<uint>();
+			if (mission.createdEntities != null)
+			{
+				foreach (MissionEntity createdEntity in mission.createdEntities)
+				{
+					if (!(createdEntity == null))
+					{
+						BaseEntity entity = createdEntity.GetEntity();
+						if ((bool)entity)
+						{
+							missionInstance.createdEntities.Add(entity.net.ID);
+						}
+					}
+				}
+			}
+			if (mission.rewards != null && mission.rewards.Length != 0)
+			{
+				missionInstance.rewards = Facepunch.Pool.GetList<MissionReward>();
+				ItemAmount[] rewards = mission.rewards;
+				foreach (ItemAmount itemAmount in rewards)
+				{
+					MissionReward missionReward = Facepunch.Pool.Get<MissionReward>();
+					missionReward.itemID = itemAmount.itemid;
+					missionReward.itemAmount = Mathf.FloorToInt(itemAmount.amount);
+					missionInstance.rewards.Add(missionReward);
+				}
+			}
+			missions.missions.Add(missionInstance);
+		}
+		return missions;
+	}
+
+	public void SetActiveMission(int index)
+	{
+		_activeMission = index;
+	}
+
+	public int GetActiveMission()
+	{
+		return _activeMission;
+	}
+
+	public bool HasActiveMission()
+	{
+		return GetActiveMission() != -1;
+	}
+
+	private void LoadMissions(Missions loadedMissions)
+	{
+		if (missions.Count > 0)
+		{
+			for (int num = missions.Count - 1; num >= 0; num--)
+			{
+				BaseMission.MissionInstance obj = missions[num];
+				if (obj != null)
+				{
+					Facepunch.Pool.Free(ref obj);
+				}
+			}
+		}
+		missions.Clear();
+		if (base.isServer && loadedMissions != null)
+		{
+			int protocol = loadedMissions.protocol;
+			uint seed = loadedMissions.seed;
+			int saveCreatedTime = loadedMissions.saveCreatedTime;
+			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
+			if (217 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			{
+				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
+				loadedMissions.activeMission = -1;
+				SetActiveMission(-1);
+				State.missions = SaveMissions();
+				return;
+			}
+		}
+		if (loadedMissions != null && loadedMissions.missions.Count > 0)
+		{
+			foreach (MissionInstance mission in loadedMissions.missions)
+			{
+				BaseMission.MissionInstance missionInstance = Facepunch.Pool.Get<BaseMission.MissionInstance>();
+				missionInstance.providerID = mission.providerID;
+				missionInstance.missionID = mission.missionID;
+				missionInstance.status = (BaseMission.MissionStatus)mission.missionStatus;
+				missionInstance.completionScale = mission.completionScale;
+				missionInstance.startTime = UnityEngine.Time.realtimeSinceStartup - mission.startTime;
+				missionInstance.endTime = mission.endTime;
+				missionInstance.missionLocation = mission.missionLocation;
+				if (mission.missionPoints != null)
+				{
+					foreach (ProtoBuf.MissionPoint missionPoint in mission.missionPoints)
+					{
+						missionInstance.missionPoints.Add(missionPoint.identifier, missionPoint.location);
+					}
+				}
+				missionInstance.objectiveStatuses = new BaseMission.MissionInstance.ObjectiveStatus[mission.objectiveStatuses.Count];
+				for (int i = 0; i < mission.objectiveStatuses.Count; i++)
+				{
+					ObjectiveStatus objectiveStatus = mission.objectiveStatuses[i];
+					BaseMission.MissionInstance.ObjectiveStatus objectiveStatus2 = new BaseMission.MissionInstance.ObjectiveStatus();
+					objectiveStatus2.completed = objectiveStatus.completed;
+					objectiveStatus2.failed = objectiveStatus.failed;
+					objectiveStatus2.started = objectiveStatus.started;
+					objectiveStatus2.genericInt1 = objectiveStatus.genericInt1;
+					objectiveStatus2.genericFloat1 = objectiveStatus.genericFloat1;
+					missionInstance.objectiveStatuses[i] = objectiveStatus2;
+				}
+				if (mission.createdEntities != null)
+				{
+					if (missionInstance.createdEntities == null)
+					{
+						missionInstance.createdEntities = Facepunch.Pool.GetList<MissionEntity>();
+					}
+					foreach (uint createdEntity in mission.createdEntities)
+					{
+						BaseNetworkable baseNetworkable = null;
+						if (base.isServer)
+						{
+							baseNetworkable = BaseNetworkable.serverEntities.Find(createdEntity);
+						}
+						if (baseNetworkable != null)
+						{
+							MissionEntity component = baseNetworkable.GetComponent<MissionEntity>();
+							if ((bool)component)
+							{
+								missionInstance.createdEntities.Add(component);
+							}
+						}
+					}
+				}
+				if (mission.rewards != null && mission.rewards.Count > 0)
+				{
+					missionInstance.rewards = new ItemAmount[mission.rewards.Count];
+					for (int j = 0; j < mission.rewards.Count; j++)
+					{
+						MissionReward missionReward = mission.rewards[j];
+						ItemAmount itemAmount = new ItemAmount();
+						ItemDefinition itemDefinition = ItemManager.FindItemDefinition(missionReward.itemID);
+						if (itemDefinition == null)
+						{
+							Debug.LogError("MISSION LOAD UNABLE TO FIND REWARD ITEM, HUGE ERROR!");
+						}
+						itemAmount.itemDef = itemDefinition;
+						itemAmount.amount = missionReward.itemAmount;
+						missionInstance.rewards[j] = itemAmount;
+					}
+				}
+				missions.Add(missionInstance);
+			}
+			SetActiveMission(loadedMissions.activeMission);
+		}
+		else
+		{
+			SetActiveMission(-1);
+		}
+	}
+
 	private void UpdateModelState()
 	{
 		if (!IsDead() && !IsSpectating())
@@ -2571,6 +2992,8 @@ public class BasePlayer : BaseCombatEntity
 		SingletonComponent<ServerMgr>.Instance.playerStateManager.Reset(userID);
 		ClientRPCPlayer(null, this, "SetHostileLength", 0f);
 		SendMarkersToClient();
+		WipeMissions();
+		MissionDirty();
 	}
 
 	public bool IsSleeping()
@@ -3072,7 +3495,7 @@ public class BasePlayer : BaseCombatEntity
 		firedProjectiles[playerAttack.projectileID] = value;
 		if (flag6)
 		{
-			if (value.hits <= 1 || flag7 || (flag && !flag2))
+			if (value.hits <= 1)
 			{
 				hitEntity.OnAttacked(hitInfo);
 			}
@@ -3520,6 +3943,10 @@ public class BasePlayer : BaseCombatEntity
 		if (flag)
 		{
 			info.msg.basePlayer.persistantData = PersistantPlayerInfo.Copy();
+			if (!info.forDisk && State.missions != null)
+			{
+				info.msg.basePlayer.missions = State.missions.Copy();
+			}
 		}
 		if (info.forDisk)
 		{
@@ -4024,6 +4451,7 @@ public class BasePlayer : BaseCombatEntity
 		}
 		LifeStoryUpdate(deltaTime, IsOnGround() ? estimatedSpeed : 0f);
 		FinalizeTick(deltaTime);
+		ThinkMissions(deltaTime);
 		desyncTimeRaw = Mathf.Max(timeSinceLastTick - deltaTime, 0f);
 		desyncTimeClamped = Mathf.Min(desyncTimeRaw, ConVar.AntiHack.maxdesync);
 		if (clientTickRate != Player.tickrate_cl)
@@ -4142,6 +4570,8 @@ public class BasePlayer : BaseCombatEntity
 		SetPlayerFlag(PlayerFlags.ReceivingSnapshot, false);
 		ClientRPCPlayer(null, this, "FinishLoading");
 		Invoke(DelayedTeamUpdate, 1f);
+		LoadMissions(State.missions);
+		MissionDirty();
 		double num = State.unHostileTimestamp - TimeEx.currentTimestamp;
 		if (num > 0.0)
 		{
@@ -4273,6 +4703,7 @@ public class BasePlayer : BaseCombatEntity
 				spawnOptions.worldPosition = sleepingBag.transform.position;
 				spawnOptions.type = sleepingBag.RespawnType;
 				spawnOptions.unlockSeconds = sleepingBag.GetUnlockSeconds(userID);
+				spawnOptions.occupied = sleepingBag.IsOccupied();
 				respawnInformation.spawnOptions.Add(spawnOptions);
 			}
 			respawnInformation.previousLife = previousLifeStory;
@@ -4504,6 +4935,7 @@ public class BasePlayer : BaseCombatEntity
 		{
 			BaseGameMode.GetActiveGameMode(true).OnPlayerDisconnected(this);
 		}
+		BaseMission.PlayerDisconnected(this);
 	}
 
 	private void InventoryUpdate()
@@ -4648,6 +5080,7 @@ public class BasePlayer : BaseCombatEntity
 			BasePlayer instigator = info?.InitiatorPlayer;
 			BaseGameMode.GetActiveGameMode(true).OnPlayerDeath(instigator, this, info);
 		}
+		BaseMission.PlayerKilled(this);
 		DisablePlayerCollider();
 		RemovePlayerRigidbody();
 		StopWounded();
@@ -5179,6 +5612,10 @@ public class BasePlayer : BaseCombatEntity
 		if (reason == GiveItemReason.ResourceHarvested)
 		{
 			stats.Add($"harvest.{item.info.shortname}", item.amount, (Stats)6);
+		}
+		if (reason == GiveItemReason.ResourceHarvested || reason == GiveItemReason.Crafted)
+		{
+			ProcessMissionEvent(BaseMission.MissionEventType.HARVEST, item.info.shortname, item.amount);
 		}
 		int amount = item.amount;
 		if (inventory.GiveItem(item))
@@ -6319,6 +6756,16 @@ public class BasePlayer : BaseCombatEntity
 	public override BasePlayer ToPlayer()
 	{
 		return this;
+	}
+
+	public static string SanitizePlayerNameString(string playerName, ulong userId)
+	{
+		playerName = playerName.ToPrintable(32).EscapeRichText().Trim();
+		if (string.IsNullOrWhiteSpace(playerName))
+		{
+			playerName = userId.ToString();
+		}
+		return playerName;
 	}
 
 	public bool IsGod()

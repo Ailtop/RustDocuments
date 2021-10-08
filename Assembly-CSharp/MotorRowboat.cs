@@ -88,7 +88,7 @@ public class MotorRowboat : BaseBoat
 
 	public Transform propellerRotate;
 
-	[ServerVar(Help = "Population active on the server")]
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public static float population = 1f;
 
 	[ServerVar(Help = "How long before a boat loses all its health while outside. If it's in deep water, deepwaterdecayminutes is used")]
@@ -118,6 +118,8 @@ public class MotorRowboat : BaseBoat
 	public float offAxisDot = 0.25f;
 
 	private const float DECAY_TICK_TIME = 60f;
+
+	private TimeSince startedFlip;
 
 	public float lastHadDriverTime;
 
@@ -239,18 +241,27 @@ public class MotorRowboat : BaseBoat
 	{
 		if (IsFlipped())
 		{
-			rigidBody.AddRelativeTorque(Vector3.forward * 6.5f, ForceMode.VelocityChange);
+			Vector3 vector = base.transform.InverseTransformPoint(player.transform.position);
+			float num = 4f;
+			if (vector.x > 0f)
+			{
+				num = 0f - num;
+			}
+			rigidBody.AddRelativeTorque(Vector3.forward * num, ForceMode.VelocityChange);
+			rigidBody.AddForce(Vector3.up * 4f, ForceMode.VelocityChange);
+			startedFlip = 0f;
+			InvokeRepeatingFixedTime(FlipMonitor);
 		}
 		else
 		{
-			Vector3 vector = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
-			Vector3 vector2 = Vector3Ex.Direction2D(player.transform.position + player.eyes.BodyForward() * 3f, player.transform.position);
-			vector2 = (Vector3.up * 0.1f + vector2).normalized;
-			Vector3 position = base.transform.position + vector * 2f;
-			float num = 3f;
-			float value = Vector3.Dot(base.transform.forward, vector2);
-			num += Mathf.InverseLerp(0.8f, 1f, value) * 3f;
-			rigidBody.AddForceAtPosition(vector2 * num, position, ForceMode.VelocityChange);
+			Vector3 vector2 = Vector3Ex.Direction2D(player.transform.position, base.transform.position);
+			Vector3 vector3 = Vector3Ex.Direction2D(player.transform.position + player.eyes.BodyForward() * 3f, player.transform.position);
+			vector3 = (Vector3.up * 0.1f + vector3).normalized;
+			Vector3 position = base.transform.position + vector2 * 2f;
+			float num2 = 3f;
+			float value = Vector3.Dot(base.transform.forward, vector3);
+			num2 += Mathf.InverseLerp(0.8f, 1f, value) * 3f;
+			rigidBody.AddForceAtPosition(vector3 * num2, position, ForceMode.VelocityChange);
 		}
 		if (HasFlag(Flags.Reserved5))
 		{
@@ -262,6 +273,16 @@ public class MotorRowboat : BaseBoat
 		else if (pushLandEffect.isValid)
 		{
 			Effect.server.Run(pushLandEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
+		}
+	}
+
+	private void FlipMonitor()
+	{
+		float num = Vector3.Dot(Vector3.up, base.transform.up);
+		rigidBody.angularVelocity = Vector3.Lerp(rigidBody.angularVelocity, Vector3.zero, UnityEngine.Time.fixedDeltaTime * 8f * num);
+		if ((float)startedFlip > 3f)
+		{
+			CancelInvokeFixedTime(FlipMonitor);
 		}
 	}
 

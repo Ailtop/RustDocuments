@@ -970,4 +970,25 @@ public class IOEntity : BaseCombatEntity
 			}
 		}
 	}
+
+	public bool HasConnections()
+	{
+		IOSlot[] array = inputs;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i].connectedTo.Get(base.isServer) != null)
+			{
+				return true;
+			}
+		}
+		array = outputs;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i].connectedTo.Get(base.isServer) != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

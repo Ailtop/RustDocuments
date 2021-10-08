@@ -46,6 +46,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public AmbienceEmitter ambienceEmitter;
 
+	public GameObject assignDialog;
+
 	public static UpdateAutoTurretScanQueue updateAutoTurretScanQueue = new UpdateAutoTurretScanQueue();
 
 	private BasePlayer playerController;
@@ -199,6 +201,42 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				}
 				return true;
 			}
+			if (rpc == 3057055788u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AssignToFriend "));
+				}
+				using (TimeWarning.New("AssignToFriend"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(3057055788u, "AssignToFriend", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							AssignToFriend(msg2);
+						}
+					}
+					catch (Exception exception2)
+					{
+						Debug.LogException(exception2);
+						player.Kick("RPC Error in AssignToFriend");
+					}
+				}
+				return true;
+			}
 			if (rpc == 253307592 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -227,9 +265,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							ClearList(rpc3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception exception3)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in ClearList");
 					}
 				}
@@ -263,9 +301,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							FlipAim(rpc4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception4)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in FlipAim");
 					}
 				}
@@ -299,9 +337,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							RemoveSelfAuthorize(rpc5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception5)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in RemoveSelfAuthorize");
 					}
 				}
@@ -335,9 +373,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							SERVER_AttackAll(rpc6);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception exception6)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in SERVER_AttackAll");
 					}
 				}
@@ -371,9 +409,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 							SERVER_Peacekeeper(rpc7);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception exception7)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(exception7);
 						player.Kick("RPC Error in SERVER_Peacekeeper");
 					}
 				}
@@ -672,13 +710,18 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	[RPC_Server.IsVisible(3f)]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
-		RPCMessage rpc2 = rpc;
-		if (!IsOnline() && rpc2.player.CanBuild() && !AtMaxAuthCapacity() && Interface.CallHook("OnTurretAuthorize", this, rpc.player) == null)
+		AddSelfAuthorize(rpc.player);
+	}
+
+	private void AddSelfAuthorize(BasePlayer player)
+	{
+		BasePlayer player2 = player;
+		if (!IsOnline() && player2.CanBuild() && !AtMaxAuthCapacity() && Interface.CallHook("OnTurretAuthorize", this, player) == null)
 		{
-			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == player2.userID);
 			PlayerNameID playerNameID = new PlayerNameID();
-			playerNameID.userid = rpc2.player.userID;
-			playerNameID.username = rpc2.player.displayName;
+			playerNameID.userid = player2.userID;
+			playerNameID.username = player2.displayName;
 			authorizedPlayers.Add(playerNameID);
 			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
@@ -707,6 +750,26 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			authorizedPlayers.Clear();
 			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	public void AssignToFriend(RPCMessage msg)
+	{
+		if (!AtMaxAuthCapacity() && msg.player.CanInteract())
+		{
+			ulong num = msg.read.UInt64();
+			if (num != 0L && !IsAuthed(num))
+			{
+				string username = BasePlayer.SanitizePlayerNameString(msg.read.String(), num);
+				PlayerNameID playerNameID = new PlayerNameID();
+				playerNameID.userid = num;
+				playerNameID.username = username;
+				authorizedPlayers.Add(playerNameID);
+				UpdateMaxAuthCapacity();
+				SendNetworkUpdate();
+			}
 		}
 	}
 
@@ -784,6 +847,10 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		List<RaycastHit> obj3 = Facepunch.Pool.GetList<RaycastHit>();
 		Vector3 position = eyePos.transform.position;
+		if (GamePhysics.CheckSphere(position, 0.1f, 2097152))
+		{
+			return false;
+		}
 		Vector3 vector = AimOffset(obj);
 		float num = Vector3.Distance(vector, position);
 		Vector3 vector2 = Vector3.Cross((vector - position).normalized, Vector3.up);
@@ -1424,6 +1491,12 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return num6;
 	}
 
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
+	{
+		base.OnDeployed(parent, deployedBy, fromItem);
+		AddSelfAuthorize(deployedBy);
+	}
+
 	public bool IsOnline()
 	{
 		return IsOn();
@@ -1550,6 +1623,11 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	private static Quaternion Lerp(Quaternion from, Quaternion to, float speed)
 	{
 		return Quaternion.Lerp(to, from, Mathf.Pow(2f, (0f - speed) * UnityEngine.Time.deltaTime));
+	}
+
+	public bool IsAuthed(ulong id)
+	{
+		return authorizedPlayers.Any((PlayerNameID x) => x.userid == id);
 	}
 
 	public bool IsAuthed(BasePlayer player)

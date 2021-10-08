@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Facepunch;
 using UnityEngine;
 
 namespace ConVar
@@ -286,23 +289,85 @@ namespace ConVar
 			baseEntity.Kill();
 		}
 
-		[ServerVar(Help = "Destroy all entities created by this user")]
-		public static int DeleteBy(ulong SteamId)
+		public static int DeleteBy(ulong id)
 		{
-			if (SteamId == 0L)
+			List<ulong> obj = Facepunch.Pool.GetList<ulong>();
+			obj.Add(id);
+			int result = DeleteBy(obj);
+			Facepunch.Pool.FreeList(ref obj);
+			return result;
+		}
+
+		[ServerVar(Help = "Destroy all entities created by provided users (separate users by space)")]
+		public static int DeleteBy(Arg arg)
+		{
+			if (!arg.HasArgs())
 			{
 				return 0;
 			}
+			List<ulong> obj = Facepunch.Pool.GetList<ulong>();
+			string[] args = arg.Args;
+			for (int i = 0; i < args.Length; i++)
+			{
+				ulong result;
+				if (ulong.TryParse(args[i], out result))
+				{
+					obj.Add(result);
+				}
+			}
+			int result2 = DeleteBy(obj);
+			Facepunch.Pool.FreeList(ref obj);
+			return result2;
+		}
+
+		private static int DeleteBy(List<ulong> ids)
+		{
 			int num = 0;
 			foreach (BaseEntity serverEntity in BaseNetworkable.serverEntities)
 			{
-				if (!(serverEntity == null) && serverEntity.OwnerID == SteamId)
+				if (serverEntity == null)
+				{
+					continue;
+				}
+				bool flag = false;
+				foreach (ulong id in ids)
+				{
+					if (serverEntity.OwnerID == id)
+					{
+						flag = true;
+						break;
+					}
+				}
+				if (flag)
 				{
 					serverEntity.Invoke(serverEntity.KillMessage, (float)num * 0.2f);
 					num++;
 				}
 			}
 			return num;
+		}
+
+		[ServerVar(Help = "Destroy all entities created by users in the provided text block (can use with copied results from ent auth)")]
+		public static void DeleteByTextBlock(Arg arg)
+		{
+			if (arg.Args.Length != 1)
+			{
+				arg.ReplyWith("Invalid arguments, provide a text block surrounded by \" and listing player id's at the start of each line");
+				return;
+			}
+			MatchCollection matchCollection = Regex.Matches(arg.GetString(0), "^\\b\\d{17}", RegexOptions.Multiline);
+			List<ulong> obj = Facepunch.Pool.GetList<ulong>();
+			foreach (Match item in matchCollection)
+			{
+				ulong result;
+				if (ulong.TryParse(item.Value, out result))
+				{
+					obj.Add(result);
+				}
+			}
+			int num = DeleteBy(obj);
+			Facepunch.Pool.FreeList(ref obj);
+			arg.ReplyWith($"Destroyed {num} entities");
 		}
 	}
 }

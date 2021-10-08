@@ -75,9 +75,9 @@ public class Sled : BaseVehicle, INotifyTrigger
 		InvokeRandomized(DecayOverTime, Random.Range(30f, 60f), 60f, 6f);
 	}
 
-	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
-		base.OnDeployed(parent, deployedBy);
+		base.OnDeployed(parent, deployedBy, fromItem);
 		SetFlag(Flags.Reserved1, true);
 		UpdateGroundedFlag();
 		UpdatePhysicsMaterial();

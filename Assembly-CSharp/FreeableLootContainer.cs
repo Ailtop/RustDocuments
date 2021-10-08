@@ -102,6 +102,11 @@ public class FreeableLootContainer : LootContainer
 			{
 				Effect.server.Run(freedEffect.resourcePath, base.transform.position, Vector3.up);
 			}
+			BasePlayer player = msg.player;
+			if ((bool)player)
+			{
+				player.ProcessMissionEvent(BaseMission.MissionEventType.FREE_CRATE, "", 1f);
+			}
 		}
 	}
 }

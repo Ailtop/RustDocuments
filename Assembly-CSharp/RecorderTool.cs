@@ -24,7 +24,7 @@ public class RecorderTool : ThrownWeapon, ICassettePlayer
 
 	public float ThrowScale = 3f;
 
-	public Cassette cachedCassette { get; private set; }
+	public Cassette cachedCassette { get; set; }
 
 	public Sprite LoadedCassetteIcon
 	{

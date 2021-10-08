@@ -186,7 +186,12 @@ public class BaseOven : StorageContainer, ISplashable
 		{
 			ConsumeFuel(item, component);
 		}
+		OnCooked();
 		Interface.CallHook("OnOvenCooked", this, item, slot);
+	}
+
+	protected virtual void OnCooked()
+	{
 	}
 
 	public void ConsumeFuel(Item fuel, ItemModBurnable burnable)
@@ -217,7 +222,7 @@ public class BaseOven : StorageContainer, ISplashable
 
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	private void SVSwitch(RPCMessage msg)
+	protected virtual void SVSwitch(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();
 		if (Interface.CallHook("OnOvenToggle", this, msg.player) == null && flag != IsOn() && (!needsBuildingPrivilegeToUse || msg.player.CanBuild()))

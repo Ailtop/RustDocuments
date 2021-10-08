@@ -168,7 +168,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	[HideInInspector]
 	public MeshRenderer[] damageShowingRenderers;
 
-	[ServerVar(Help = "Population active on the server")]
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public static float population = 3f;
 
 	[ServerVar(Help = "How many minutes before a ModularCar loses all its health while outside")]
@@ -199,6 +199,8 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			return serverTerrainHandler.OnSurface;
 		}
 	}
+
+	public override bool AlwaysAllowBradleyTargeting => true;
 
 	public float DriveWheelVelocity
 	{
@@ -334,7 +336,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	{
 		if (!base.isClient && !hurtEntity.IsDestroyed)
 		{
-			Vector3 vector = hurtEntity.GetWorldVelocity() - base.Velocity;
+			Vector3 vector = hurtEntity.GetLocalVelocity() - base.Velocity;
 			Vector3 position = ClosestPoint(hurtEntity.transform.position);
 			Vector3 vector2 = hurtEntity.RealisticMass * vector;
 			rigidBody.AddForceAtPosition(vector2 * 1.25f, position, ForceMode.Impulse);

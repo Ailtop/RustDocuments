@@ -2159,9 +2159,9 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 		[SerializeField]
 		private Vector3 _spawnPosition;
 
+		[SerializeField]
 		[Header("Sensors")]
 		[ReadOnly]
-		[SerializeField]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2305,9 +2305,9 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			}
 		};
 
-		[SerializeField]
 		[Header("Firearm Utility")]
 		[ReadOnly]
+		[SerializeField]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]

@@ -319,14 +319,12 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 				conditionalObject.healthRestrictionMin = Mathf.Clamp01(conditionalObject.healthRestrictionMin);
 				conditionalObject.healthRestrictionMax = Mathf.Clamp01(conditionalObject.healthRestrictionMax);
 			}
-			conditionalObject.gibId = -1;
 			if (conditionalObject.gameObject != null)
 			{
 				Gibbable component = conditionalObject.gameObject.GetComponent<Gibbable>();
 				if (component != null)
 				{
-					component.uniqueId = num;
-					conditionalObject.gibId = num;
+					component.isConditional = true;
 				}
 			}
 		}
@@ -427,6 +425,11 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 		prevRefreshHealth = Health();
 		prevRefreshVehicleIsDead = Vehicle.IsDead();
 		prevRefreshVehicleIsLockable = Vehicle.IsLockable;
+		PostConditionalRefresh();
+	}
+
+	protected virtual void PostConditionalRefresh()
+	{
 	}
 
 	private void RefreshConditional(ConditionalObject conditional, bool canGib)

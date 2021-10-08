@@ -234,5 +234,11 @@ namespace ConVar
 		{
 			player.metabolism.ApplyChange(MetabolismAttribute.Type.Hydration, amount, time);
 		}
+
+		[ServerVar]
+		public static void ResetSleepingBagTimers(Arg arg)
+		{
+			SleepingBag.ResetTimersForPlayer(ArgEx.Player(arg));
+		}
 	}
 }

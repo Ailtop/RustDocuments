@@ -61,7 +61,7 @@ public class PlayerEyes : EntityComponent<BasePlayer>
 		{
 			if ((bool)base.baseEntity && base.baseEntity.isMounted)
 			{
-				Vector3 vector = base.baseEntity.GetMounted().EyePositionForPlayer(base.baseEntity, GetLookRotation());
+				Vector3 vector = base.baseEntity.GetMounted().EyeCenterForPlayer(base.baseEntity, GetLookRotation());
 				if (vector != Vector3.zero)
 				{
 					return vector;

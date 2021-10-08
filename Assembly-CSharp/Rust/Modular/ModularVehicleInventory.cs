@@ -117,36 +117,35 @@ namespace Rust.Modular
 			return true;
 		}
 
-		public void SyncModuleInventory(BaseVehicleModule moduleEntity, int firstSocketIndex)
+		public bool TrySyncModuleInventory(BaseVehicleModule moduleEntity, int firstSocketIndex)
 		{
 			if (firstSocketIndex < 0)
 			{
 				Debug.LogError($"{GetType().Name}: Invalid socket index ({firstSocketIndex}) for new module entity.", vehicle.gameObject);
-				return;
+				return false;
 			}
+			Item slot = ModuleContainer.GetSlot(firstSocketIndex);
 			int numSocketsTaken = moduleEntity.GetNumSocketsTaken();
-			if (SocketsAreFree(firstSocketIndex, numSocketsTaken))
+			if (!SocketsAreFree(firstSocketIndex, numSocketsTaken) && (slot == null || moduleEntity.AssociatedItemInstance != slot))
+			{
+				Debug.LogError($"{GetType().Name}: Sockets are not free for new module entity. First: {firstSocketIndex} Taken: {numSocketsTaken}", vehicle.gameObject);
+				return false;
+			}
+			if (slot == null)
 			{
 				Item item = ItemManager.Create(moduleEntity.AssociatedItemDef, 1, 0uL);
 				item.condition = moduleEntity.health;
 				moduleEntity.AssociatedItemInstance = item;
-				if (TryAddModuleItem(item, firstSocketIndex))
+				bool num = TryAddModuleItem(item, firstSocketIndex);
+				if (num)
 				{
 					vehicle.SetUpModule(moduleEntity, item);
-					return;
+					return num;
 				}
-				Debug.LogError(GetType().Name + ": Couldn't add new item (SyncSocketInventory)!", vehicle.gameObject);
 				item.Remove();
-				moduleEntity.Kill();
+				return num;
 			}
-			else if (moduleEntity.AssociatedItemInstance == null)
-			{
-				Item slot = ModuleContainer.GetSlot(firstSocketIndex);
-				if (slot != null)
-				{
-					moduleEntity.AssociatedItemInstance = slot;
-				}
-			}
+			return true;
 		}
 
 		private bool SocketIsUsed(Item item, int slotIndex)

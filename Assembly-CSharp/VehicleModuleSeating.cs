@@ -94,7 +94,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 
 	private const Flags FLAG_HORN = Flags.Reserved8;
 
-	private BaseVehicle.MountPointInfo[] adjustedMountPoints;
+	protected BaseVehicle.MountPointInfo[] adjustedMountPoints;
 
 	private float steerPercent;
 
@@ -193,10 +193,10 @@ public class VehicleModuleSeating : BaseVehicleModule
 		}
 	}
 
-	public bool IsOnThisModule(BasePlayer player)
+	public virtual bool IsOnThisModule(BasePlayer player)
 	{
 		BaseMountable mounted = player.GetMounted();
-		if (mounted == null)
+		if (mounted == null || base.Vehicle == null)
 		{
 			return false;
 		}
@@ -237,7 +237,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 		for (int i = 0; i < seating.mountPoints.Length; i++)
 		{
 			BaseVehicle.MountPointInfo mountPointInfo = seating.mountPoints[i];
-			Vector3 pos = vehicle.transform.InverseTransformPoint(base.transform.position) + mountPointInfo.pos;
+			Vector3 pos = vehicle.transform.InverseTransformPoint(base.transform.position) + ModifySeatPositionLocalSpace(i, mountPointInfo.pos);
 			adjustedMountPoints[i] = new BaseVehicle.MountPointInfo
 			{
 				isDriver = mountPointInfo.isDriver,
@@ -254,6 +254,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 			if (modularCarSeat != null)
 			{
 				modularCarSeat.associatedSeatingModule = this;
+				adjustedMountPoints[j].mountable = modularCarSeat;
 			}
 		}
 	}
@@ -295,6 +296,11 @@ public class VehicleModuleSeating : BaseVehicleModule
 			return !VehicleLockUser.PlayerHasUnlockPermission(player);
 		}
 		return true;
+	}
+
+	protected BaseVehicleSeat GetSeatAtIndex(int index)
+	{
+		return adjustedMountPoints[index].mountable as BaseVehicleSeat;
 	}
 
 	public override void ScaleDamageForPlayer(BasePlayer player, HitInfo info)
@@ -351,5 +357,10 @@ public class VehicleModuleSeating : BaseVehicleModule
 		{
 			VehicleLockUser.RemoveLock();
 		}
+	}
+
+	protected virtual Vector3 ModifySeatPositionLocalSpace(int index, Vector3 desiredPos)
+	{
+		return desiredPos;
 	}
 }

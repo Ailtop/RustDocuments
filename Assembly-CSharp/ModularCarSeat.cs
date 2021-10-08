@@ -12,6 +12,17 @@ public class ModularCarSeat : BaseVehicleSeat
 	[SerializeField]
 	public Vector3 rightFootIKPos;
 
+	[SerializeField]
+	private Vector3 leftHandIKPos;
+
+	[SerializeField]
+	private Vector3 rightHandIKPos;
+
+	[SerializeField]
+	private bool forceHeadLookAt;
+
+	public float providesComfort;
+
 	public VehicleModuleSeating associatedSeatingModule;
 
 	public override bool CanSwapToThis(BasePlayer player)
@@ -30,5 +41,10 @@ public class ModularCarSeat : BaseVehicleSeat
 			}
 		}
 		return true;
+	}
+
+	public override float GetComfort()
+	{
+		return providesComfort;
 	}
 }

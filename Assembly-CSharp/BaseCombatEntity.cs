@@ -238,6 +238,10 @@ public class BaseCombatEntity : BaseEntity
 		Interface.CallHook("OnEntityPickedUp", this, createdItem, player);
 	}
 
+	public virtual void OnPickedUpPreItemMove(Item createdItem, BasePlayer player)
+	{
+	}
+
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_PickupStart(RPCMessage rpc)
@@ -249,6 +253,7 @@ public class BaseCombatEntity : BaseEntity
 			{
 				item.conditionNormalized = Mathf.Clamp01(healthFraction - pickup.subtractCondition);
 			}
+			OnPickedUpPreItemMove(item, rpc.player);
 			rpc.player.GiveItem(item, GiveItemReason.PickedUp);
 			OnPickedUp(item, rpc.player);
 			Kill();
@@ -573,19 +578,28 @@ public class BaseCombatEntity : BaseEntity
 
 	public virtual void Die(HitInfo info = null)
 	{
-		if (!IsDead())
+		if (IsDead())
 		{
-			if (ConVar.Global.developer > 1)
+			return;
+		}
+		if (ConVar.Global.developer > 1)
+		{
+			Debug.Log("[Combat]".PadRight(10) + base.gameObject.name + " died");
+		}
+		health = 0f;
+		lifestate = LifeState.Dead;
+		Interface.CallHook("OnEntityDeath", this, info);
+		if (info != null && (bool)info.InitiatorPlayer)
+		{
+			BasePlayer initiatorPlayer = info.InitiatorPlayer;
+			if (initiatorPlayer != null && initiatorPlayer.GetActiveMission() != -1 && !initiatorPlayer.IsNpc)
 			{
-				Debug.Log("[Combat]".PadRight(10) + base.gameObject.name + " died");
+				initiatorPlayer.ProcessMissionEvent(BaseMission.MissionEventType.KILL_ENTITY, prefabID.ToString(), 1f);
 			}
-			health = 0f;
-			lifestate = LifeState.Dead;
-			Interface.CallHook("OnEntityDeath", this, info);
-			using (TimeWarning.New("OnKilled"))
-			{
-				OnKilled(info);
-			}
+		}
+		using (TimeWarning.New("OnKilled"))
+		{
+			OnKilled(info);
 		}
 	}
 

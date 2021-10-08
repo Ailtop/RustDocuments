@@ -934,6 +934,14 @@ public class Item
 				return false;
 			}
 		}
+		if (instanceData != null && instanceData.subEntity != 0 && (bool)info.GetComponent<ItemModSign>())
+		{
+			return false;
+		}
+		if (item.instanceData != null && item.instanceData.subEntity != 0 && (bool)item.info.GetComponent<ItemModSign>())
+		{
+			return false;
+		}
 		return true;
 	}
 

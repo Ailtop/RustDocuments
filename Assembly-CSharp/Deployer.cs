@@ -178,7 +178,7 @@ public class Deployer : HeldEntity
 			baseEntity2.skinID = ownerItem.skin;
 			baseEntity2.SetParent(baseEntity, baseEntity.GetSlotAnchorName(deployable.slot));
 			baseEntity2.OwnerID = ownerPlayer.userID;
-			baseEntity2.OnDeployed(baseEntity, ownerPlayer);
+			baseEntity2.OnDeployed(baseEntity, ownerPlayer, ownerItem);
 			baseEntity2.Spawn();
 			baseEntity.SetSlot(deployable.slot, baseEntity2);
 			if (deployable.placeEffect.isValid)

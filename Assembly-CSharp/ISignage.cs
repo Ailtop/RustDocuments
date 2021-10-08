@@ -6,7 +6,13 @@ public interface ISignage
 
 	int TextureCount { get; }
 
+	uint NetworkID { get; }
+
 	bool CanUpdateSign(BasePlayer player);
 
 	float Distance(Vector3 position);
+
+	uint[] GetTextureCRCs();
+
+	void SetTextureCRCs(uint[] crcs);
 }

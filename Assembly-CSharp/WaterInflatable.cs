@@ -107,9 +107,9 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 		rigidBody.centerOfMass = centerOfMass.localPosition;
 	}
 
-	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
-		base.OnDeployed(parent, deployedBy);
+		base.OnDeployed(parent, deployedBy, fromItem);
 		if (deployedBy != null)
 		{
 			Vector3 estimatedVelocity = deployedBy.estimatedVelocity;

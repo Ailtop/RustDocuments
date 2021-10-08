@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class KeyCodeEntry : UIDialog
@@ -12,4 +13,6 @@ public class KeyCodeEntry : UIDialog
 	public Translate.Phrase masterCodePhrase;
 
 	public Translate.Phrase guestCodePhrase;
+
+	public GameObject memoryKeycodeButton;
 }

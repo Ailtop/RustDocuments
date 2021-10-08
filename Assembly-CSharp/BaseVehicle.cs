@@ -61,6 +61,8 @@ public class BaseVehicle : BaseMountable
 
 	public const Flags Flag_Stationary = Flags.Reserved7;
 
+	public const Flags Flag_SeatsFull = Flags.Reserved11;
+
 	private const float MIN_TIME_BETWEEN_PUSHES = 1f;
 
 	public TimeSince timeSinceLastPush;
@@ -88,6 +90,8 @@ public class BaseVehicle : BaseMountable
 	protected virtual bool CanSwapSeats => true;
 
 	protected bool RecentlyPushed => (float)timeSinceLastPush < 1f;
+
+	public virtual bool AlwaysAllowBradleyTargeting => false;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -253,14 +257,14 @@ public class BaseVehicle : BaseMountable
 			return false;
 		}
 		Vector3 position = mountable.transform.position;
-		Vector3 position2 = mountable.eyeOverride.transform.position;
+		Vector3 position2 = mountable.eyePositionOverride.transform.position;
 		Vector3 vector = position2 - position;
 		float num = 0.4f;
 		if (mountable.modifiesPlayerCollider)
 		{
 			num = Mathf.Min(num, mountable.customPlayerCollider.radius);
 		}
-		Vector3 start = position2 - vector * num;
+		Vector3 start = position2 - vector * (num - 0.15f);
 		Vector3 end = position + vector * (num + 0.05f);
 		return GamePhysics.CheckCapsule(start, end, num, mask);
 	}
@@ -351,6 +355,23 @@ public class BaseVehicle : BaseMountable
 		{
 			MountPointInfo mountPointInfo = mountPoints[i];
 			if (mountPointInfo.mountable != null && mountPointInfo.mountable.GetMounted() != null)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+
+	public int MaxMounted()
+	{
+		if (!HasMountPoints())
+		{
+			return 1;
+		}
+		int num = 0;
+		for (int i = 0; i < mountPoints.Count; i++)
+		{
+			if (mountPoints[i].mountable != null)
 			{
 				num++;
 			}
@@ -684,6 +705,7 @@ public class BaseVehicle : BaseMountable
 
 	public virtual void PlayerMounted(BasePlayer player, BaseMountable seat)
 	{
+		UpdateFullFlag();
 	}
 
 	public virtual void PrePlayerDismount(BasePlayer player, BaseMountable seat)
@@ -697,6 +719,13 @@ public class BaseVehicle : BaseMountable
 		{
 			Invoke(clearRecentDriverAction, 3f);
 		}
+		UpdateFullFlag();
+	}
+
+	private void UpdateFullFlag()
+	{
+		bool b = NumMounted() == MaxMounted();
+		SetFlag(Flags.Reserved11, b);
 	}
 
 	public void ClearRecentDriver()

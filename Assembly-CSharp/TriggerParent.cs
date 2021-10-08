@@ -9,7 +9,13 @@ public class TriggerParent : TriggerBase, IServerComponent
 	[Tooltip("If deparenting via clipping, this will be used (if assigned) to also move the entity to a valid dismount position")]
 	public BaseMountable associatedMountable;
 
+	[Tooltip("Needed if the player might dismount inside the trigger and the trigger might be moving. Being mounting inside the trigger lets them dismount in local trigger-space, which means client and server will sync up.Otherwise the client/server delay can have them dismounting into invalid space.")]
+	public bool parentMountedPlayers;
+
 	public bool ParentNPCPlayers;
+
+	[Tooltip("If the player is already parented to something else, they'll switch over to another parent only if this is true")]
+	public bool overrideOtherTriggers;
 
 	public const int CLIP_CHECK_MASK = 1218511105;
 
@@ -64,6 +70,11 @@ public class TriggerParent : TriggerBase, IServerComponent
 
 	protected virtual bool ShouldParent(BaseEntity ent)
 	{
+		BaseEntity parentEntity = ent.GetParentEntity();
+		if (!overrideOtherTriggers && BaseEntityEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
+		{
+			return false;
+		}
 		if (ent.FindTrigger<TriggerParentExclusion>() != null)
 		{
 			return false;
@@ -72,18 +83,22 @@ public class TriggerParent : TriggerBase, IServerComponent
 		{
 			return false;
 		}
+		if (!parentMountedPlayers)
+		{
+			BasePlayer basePlayer = ent.ToPlayer();
+			if (basePlayer != null && basePlayer.isMounted)
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
 	protected void Parent(BaseEntity ent)
 	{
-		if (!ent.HasParent())
+		if (!(ent.GetParentEntity() == GameObjectEx.ToBaseEntity(base.gameObject)))
 		{
-			BasePlayer basePlayer = ent.ToPlayer();
-			if (!(basePlayer != null) || !basePlayer.isMounted)
-			{
-				ent.SetParent(GameObjectEx.ToBaseEntity(base.gameObject), true, true);
-			}
+			ent.SetParent(GameObjectEx.ToBaseEntity(base.gameObject), true, true);
 		}
 	}
 

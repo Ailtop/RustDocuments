@@ -45,8 +45,6 @@ namespace Rust.Modular
 
 		public bool lockableRestriction;
 
-		public int gibId;
-
 		public bool? IsActive { get; private set; }
 
 		public ConditionalObject(GameObject conditionalGO, GameObject ownerGO, int socketsTaken)

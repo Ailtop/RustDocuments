@@ -98,9 +98,6 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public TriggerParent platformParentTrigger;
 
 	[SerializeField]
-	public BoxCollider platformParentTriggerCollider;
-
-	[SerializeField]
 	public ProtectionProperties driverProtection;
 
 	[SerializeField]
@@ -648,31 +645,14 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		return 0;
 	}
 
-	public bool PlayerIsInParentTrigger(BasePlayer player)
-	{
-		if (base.isServer)
-		{
-			if (platformParentTrigger.HasAnyEntityContents)
-			{
-				return platformParentTrigger.entityContents.Contains(player);
-			}
-			return false;
-		}
-		Vector3 position = player.transform.position + Vector3.up * player.GetHeight() * 0.5f;
-		Vector3 vector = platformParentTriggerCollider.transform.InverseTransformPoint(position) - platformParentTriggerCollider.center;
-		float num = platformParentTriggerCollider.size.x * 0.5f;
-		float num2 = platformParentTriggerCollider.size.y * 0.5f;
-		float num3 = platformParentTriggerCollider.size.z * 0.5f;
-		if (vector.x < num && vector.x > 0f - num && vector.y < num2 && vector.y > 0f - num2 && vector.z < num3)
-		{
-			return vector.z > 0f - num3;
-		}
-		return false;
-	}
-
 	public bool CanMount(BasePlayer player)
 	{
 		return PlayerIsInParentTrigger(player);
+	}
+
+	public bool PlayerIsInParentTrigger(BasePlayer player)
+	{
+		return player.GetParentEntity() == this;
 	}
 
 	void IEngineControllerUser.Invoke(Action action, float time)

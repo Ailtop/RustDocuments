@@ -1,9 +1,12 @@
+using ConVar;
 using Oxide.Core;
 using UnityEngine;
 
 public class SupplyDrop : LootContainer
 {
 	public GameObjectRef parachutePrefab;
+
+	private const Flags FlagNightLight = Flags.Reserved1;
 
 	public BaseEntity parachute;
 
@@ -21,6 +24,7 @@ public class SupplyDrop : LootContainer
 		}
 		isLootable = false;
 		Invoke(MakeLootable, 300f);
+		InvokeRepeating(CheckNightLight, 0f, 30f);
 	}
 
 	public override void PostServerLoad()
@@ -51,5 +55,10 @@ public class SupplyDrop : LootContainer
 			MakeLootable();
 		}
 		Interface.CallHook("OnSupplyDropLanded", this);
+	}
+
+	private void CheckNightLight()
+	{
+		SetFlag(Flags.Reserved1, Env.time > 20f || Env.time < 7f);
 	}
 }

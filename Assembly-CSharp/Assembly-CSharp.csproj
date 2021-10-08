@@ -12,180 +12,180 @@
   <ItemGroup />
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Network">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Network.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Network.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.UnityEngine">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Console">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="Rust.Global">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Global.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Global.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VehiclesModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Localization">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Unity">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Data">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Data.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Data.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.System">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
     </Reference>
     <Reference Include="ApexShared">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\ApexShared.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\ApexShared.dll</HintPath>
     </Reference>
     <Reference Include="ApexAI">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\ApexAI.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\ApexAI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.World">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.World.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.World.dll</HintPath>
     </Reference>
     <Reference Include="EasyAntiCheat.Server">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\EasyAntiCheat.Server.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\EasyAntiCheat.Server.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.UI">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.UI.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.UI.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Platform.Common">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Platform.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Platform.Common.dll</HintPath>
     </Reference>
     <Reference Include="EZhex1991.EZSoftBone">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\EZhex1991.EZSoftBone.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\EZhex1991.EZSoftBone.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="CurvedTextMeshPro">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\CurvedTextMeshPro.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\CurvedTextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Skeleton">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Skeleton.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Skeleton.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Input">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="NewAssembly">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\NewAssembly.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\NewAssembly.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ClothModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainPhysicsModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.WindModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.WindModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.WindModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Steamworks.Win64">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip.Reduced">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Ionic.Zip.Reduced.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Sqlite">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Sqlite.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Workshop">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Workshop.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Workshop.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VideoModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="EasyRoads3Dv3">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\EasyRoads3Dv3.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\EasyRoads3Dv3.dll</HintPath>
     </Reference>
     <Reference Include="Fleck">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Fleck.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Fleck.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\System.Memory.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="Facepunch.Rcon">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Rcon.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Rcon.dll</HintPath>
     </Reference>
     <Reference Include="ApexSerialization">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\ApexSerialization.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\ApexSerialization.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Platform">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Rust.Platform.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Platform.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.SteamNetworking">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.SteamNetworking.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.SteamNetworking.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Raknet">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Facepunch.Raknet.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Raknet.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
     <Reference Include="GA">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\GA.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\GA.dll</HintPath>
     </Reference>
     <Reference Include="Oxide.Core">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Oxide.Core.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Oxide.Core.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\YX\RUST\rustserver\RustDedicated_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

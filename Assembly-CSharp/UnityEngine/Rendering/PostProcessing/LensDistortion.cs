@@ -13,17 +13,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[Range(0f, 1f)]
 		[DisplayName("X Multiplier")]
 		[Tooltip("Intensity multiplier on the x-axis. Set it to 0 to disable distortion on this axis.")]
+		[Range(0f, 1f)]
 		public FloatParameter intensityX = new FloatParameter
 		{
 			value = 1f
 		};
 
-		[Range(0f, 1f)]
 		[DisplayName("Y Multiplier")]
 		[Tooltip("Intensity multiplier on the y-axis. Set it to 0 to disable distortion on this axis.")]
+		[Range(0f, 1f)]
 		public FloatParameter intensityY = new FloatParameter
 		{
 			value = 1f
@@ -44,9 +44,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Space]
 		[Range(0.01f, 5f)]
 		[Tooltip("Global screen scaling.")]
-		[Space]
 		public FloatParameter scale = new FloatParameter
 		{
 			value = 1f

@@ -18,6 +18,10 @@ public class MapView : FacepunchBehaviour
 
 	public GameObjectRef monumentMarkerPrefab;
 
+	public GameObject missionMarkerContainer;
+
+	public GameObjectRef missionMarkerPrefab;
+
 	public TeamMemberMapMarker[] teamPositions;
 
 	public PointOfInterestMapMarker PointOfInterestMarker;
@@ -44,6 +48,10 @@ public class MapView : FacepunchBehaviour
 	public bool ShowLocalPlayer = true;
 
 	public bool ShowTeamMembers = true;
+
+	public bool ShowTrainLayer;
+
+	public bool ShowMissions;
 
 	[FormerlySerializedAs("ShowTrainLayer")]
 	public bool ShowUndergroundLayers;

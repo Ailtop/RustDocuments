@@ -31,7 +31,11 @@ public class IOEntityMovementChecker : FacepunchBehaviour
 		if (!ioEntity.isClient && Vector3.SqrMagnitude(base.transform.position - prevPos) > 0.00250000018f)
 		{
 			prevPos = base.transform.position;
-			ioEntity.ClearConnections();
+			if (ioEntity.HasConnections())
+			{
+				ioEntity.SendChangedToRoot(true);
+				ioEntity.ClearConnections();
+			}
 		}
 	}
 }

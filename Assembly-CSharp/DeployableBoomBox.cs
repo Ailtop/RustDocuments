@@ -191,9 +191,9 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 		BoxController.ServerTogglePlay(msg);
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(2uL)]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
 	public void Server_UpdateRadioIP(RPCMessage msg)
 	{
 		BoxController.Server_UpdateRadioIP(msg);
@@ -227,8 +227,8 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 
 	public override void Load(LoadInfo info)
 	{
-		base.Load(info);
 		BoxController.Load(info);
+		base.Load(info);
 		if (base.isServer && IsStatic)
 		{
 			SetFlag(Flags.Reserved8, true);

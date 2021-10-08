@@ -47,6 +47,8 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
+	public uint NetworkID => net.ID;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("Signage.OnRpcMessage"))
@@ -183,9 +185,9 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))
@@ -385,9 +387,55 @@ public class Signage : IOEntity, ILOD, ISignage
 		base.OnKilled(info);
 	}
 
+	public override void OnPickedUpPreItemMove(Item createdItem, BasePlayer player)
+	{
+		base.OnPickedUpPreItemMove(createdItem, player);
+		bool flag = false;
+		uint[] array = textureIDs;
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (array[i] != 0)
+			{
+				flag = true;
+				break;
+			}
+		}
+		ItemModSign component;
+		if (flag && createdItem.info.TryGetComponent<ItemModSign>(out component))
+		{
+			component.OnSignPickedUp(this, createdItem);
+		}
+	}
+
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
+	{
+		base.OnDeployed(parent, deployedBy, fromItem);
+		ItemModSign component;
+		if (fromItem.info.TryGetComponent<ItemModSign>(out component))
+		{
+			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
+			if (associatedEntity != null)
+			{
+				associatedEntity.CopyInfoToSign(this);
+			}
+		}
+	}
+
 	public override bool ShouldNetworkOwnerInfo()
 	{
 		return true;
+	}
+
+	public uint[] GetTextureCRCs()
+	{
+		return textureIDs;
+	}
+
+	public void SetTextureCRCs(uint[] crcs)
+	{
+		textureIDs = new uint[crcs.Length];
+		crcs.CopyTo(textureIDs, 0);
+		SendNetworkUpdate();
 	}
 
 	public override int ConsumptionAmount()

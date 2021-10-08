@@ -954,7 +954,7 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 		bool flag = false;
 		List<Collider> obj = Facepunch.Pool.GetList<Collider>();
-		Vis.Colliders(mountPoints[0].mountable.eyeOverride.transform.position - base.transform.forward * 1f, 2f, obj, 2162689);
+		Vis.Colliders(mountPoints[0].mountable.eyePositionOverride.transform.position - base.transform.forward * 1f, 2f, obj, 2162689);
 		if (obj.Count > 0)
 		{
 			flag = true;

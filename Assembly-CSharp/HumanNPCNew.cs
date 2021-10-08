@@ -372,6 +372,10 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 		{
 			return true;
 		}
+		if (Interface.CallHook("OnNpcTarget", this, basePlayer) != null)
+		{
+			return false;
+		}
 		return IsPlayerVisibleToUs(basePlayer);
 	}
 

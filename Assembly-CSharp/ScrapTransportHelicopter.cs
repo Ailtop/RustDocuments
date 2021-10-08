@@ -4,6 +4,8 @@ public class ScrapTransportHelicopter : MiniCopter
 {
 	public Transform searchlightEye;
 
+	public BoxCollider parentTriggerCollider;
+
 	[Header("Damage Effects")]
 	public ParticleSystemContainer tailDamageLight;
 
@@ -35,7 +37,7 @@ public class ScrapTransportHelicopter : MiniCopter
 
 	public float compassOffset;
 
-	[ServerVar(Help = "Population active on the server")]
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public new static float population;
 
 	public override void OnHealthChanged(float oldvalue, float newvalue)

@@ -200,9 +200,9 @@ public class KeyLock : BaseLock
 		}
 	}
 
-	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
-		base.OnDeployed(parent, deployedBy);
+		base.OnDeployed(parent, deployedBy, fromItem);
 		keyCode = UnityEngine.Random.Range(1, 100000);
 		Lock(deployedBy);
 	}

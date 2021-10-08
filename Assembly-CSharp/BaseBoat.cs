@@ -21,10 +21,6 @@ public class BaseBoat : BaseVehicle
 
 	public Buoyancy buoyancy;
 
-	public GameObject clientCollider;
-
-	public GameObject serverCollider;
-
 	[ServerVar]
 	public static bool generate_paths = true;
 

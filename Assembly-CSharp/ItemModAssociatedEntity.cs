@@ -9,19 +9,32 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 
 	protected virtual bool AllowHeldEntityParenting => false;
 
+	protected virtual bool ShouldAutoCreateEntity => true;
+
 	public override void OnItemCreated(Item item)
 	{
 		base.OnItemCreated(item);
-		if (item.instanceData == null)
+		if (ShouldAutoCreateEntity)
 		{
-			BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, Vector3.zero);
-			OnAssociatedItemCreated(baseEntity.GetComponent<T>());
-			baseEntity.Spawn();
-			item.instanceData = new ProtoBuf.Item.InstanceData();
-			item.instanceData.ShouldPool = false;
-			item.instanceData.subEntity = baseEntity.net.ID;
-			item.MarkDirty();
+			CreateAssociatedEntity(item);
 		}
+	}
+
+	public T CreateAssociatedEntity(Item item)
+	{
+		if (item.instanceData != null)
+		{
+			return null;
+		}
+		BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, Vector3.zero);
+		T component = baseEntity.GetComponent<T>();
+		OnAssociatedItemCreated(component);
+		baseEntity.Spawn();
+		item.instanceData = new ProtoBuf.Item.InstanceData();
+		item.instanceData.ShouldPool = false;
+		item.instanceData.subEntity = baseEntity.net.ID;
+		item.MarkDirty();
+		return component;
 	}
 
 	protected virtual void OnAssociatedItemCreated(T ent)

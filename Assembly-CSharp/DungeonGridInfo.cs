@@ -10,8 +10,6 @@ public class DungeonGridInfo : LandmarkInfo
 
 	public float LinkRadius = 3f;
 
-	internal MonumentInfo Monument;
-
 	internal List<GameObject> Links = new List<GameObject>();
 
 	public float Distance(Vector3 position)
@@ -47,7 +45,6 @@ public class DungeonGridInfo : LandmarkInfo
 	protected override void Awake()
 	{
 		base.Awake();
-		Monument = base.transform.GetComponentInParent<MonumentInfo>();
 		if ((bool)TerrainMeta.Path)
 		{
 			TerrainMeta.Path.DungeonGridEntrances.Add(this);

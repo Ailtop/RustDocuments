@@ -122,9 +122,9 @@ public class MicrophoneStand : BaseMountable
 		SendNetworkUpdate();
 	}
 
-	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
-		base.OnDeployed(parent, deployedBy);
+		base.OnDeployed(parent, deployedBy, fromItem);
 		SpawnChildEntity();
 	}
 

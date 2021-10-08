@@ -72,9 +72,12 @@ public class Gibbable : PrefabAttribute, IClientComponent
 
 	public float scaleOverride = 1f;
 
+	[ReadOnly]
 	public int uniqueId;
 
 	public BoundsEffectType boundsEffectType;
+
+	public bool isConditional;
 
 	[ReadOnly]
 	public Bounds effectBounds;

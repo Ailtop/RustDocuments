@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace ConVar
 {
 	[Factory("spawn")]
@@ -88,6 +90,22 @@ namespace ConVar
 			textTable.AddRow("Population Density", SpawnHandler.PlayerLerp(min_density, max_density).ToString());
 			textTable.AddRow("Group Rate", SpawnHandler.PlayerScale(player_scale).ToString());
 			args.ReplyWith(textTable.ToString());
+		}
+
+		[ServerVar]
+		public static void cargoshipevent(Arg args)
+		{
+			BaseEntity baseEntity = GameManager.server.CreateEntity("assets/content/vehicles/boats/cargoship/cargoshiptest.prefab");
+			if (baseEntity != null)
+			{
+				baseEntity.SendMessage("TriggeredEventSpawn", SendMessageOptions.DontRequireReceiver);
+				baseEntity.Spawn();
+				args.ReplyWith("Cargo ship event has been started");
+			}
+			else
+			{
+				args.ReplyWith("Couldn't find cargo ship prefab - maybe it has been renamed?");
+			}
 		}
 	}
 }

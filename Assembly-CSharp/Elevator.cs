@@ -71,9 +71,9 @@ public class Elevator : IOEntity, IFlagNotify
 		}
 	}
 
-	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy)
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
-		base.OnDeployed(parent, deployedBy);
+		base.OnDeployed(parent, deployedBy, fromItem);
 		Elevator elevatorInDirection = GetElevatorInDirection(Direction.Down);
 		if (elevatorInDirection != null)
 		{

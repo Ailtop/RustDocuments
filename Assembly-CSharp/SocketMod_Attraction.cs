@@ -12,6 +12,8 @@ public class SocketMod_Attraction : SocketMod
 
 	public bool lockRotation;
 
+	public bool ignoreRotationForRadiusCheck;
+
 	private void OnDrawGizmosSelected()
 	{
 		Gizmos.matrix = base.transform.localToWorldMatrix;
@@ -55,7 +57,7 @@ public class SocketMod_Attraction : SocketMod
 				}
 				Vector3 vector2 = item.transform.position + item.transform.rotation * attractionPoint.worldPosition;
 				float magnitude = (vector2 - vector).magnitude;
-				if (lockRotation)
+				if (ignoreRotationForRadiusCheck)
 				{
 					Vector3 vector3 = item.transform.TransformPoint(Vector3.LerpUnclamped(Vector3.zero, attractionPoint.worldPosition.WithY(0f), 2f));
 					float num2 = Vector3.Distance(vector3, position2);
@@ -70,14 +72,27 @@ public class SocketMod_Attraction : SocketMod
 				{
 					Quaternion b = QuaternionEx.LookRotationWithOffset(worldPosition, vector2 - place.position, Vector3.up);
 					float num3 = Mathf.InverseLerp(outerRadius, innerRadius, magnitude);
-					place.rotation = Quaternion.Lerp(place.rotation, b, num3);
+					if (lockRotation)
+					{
+						num3 = 1f;
+					}
+					if (lockRotation)
+					{
+						Vector3 eulerAngles = place.rotation.eulerAngles;
+						eulerAngles -= new Vector3(eulerAngles.x % 90f, eulerAngles.y % 90f, eulerAngles.z % 90f);
+						place.rotation = Quaternion.Euler(eulerAngles + item.transform.eulerAngles);
+					}
+					else
+					{
+						place.rotation = Quaternion.Lerp(place.rotation, b, num3);
+					}
 					vector = place.position + place.rotation * worldPosition;
 					Vector3 vector4 = vector2 - vector;
 					place.position += vector4 * num3;
 				}
 			}
 		}
-		if (num < float.MaxValue)
+		if (num < float.MaxValue && ignoreRotationForRadiusCheck)
 		{
 			place.position = position;
 			place.rotation = rotation;

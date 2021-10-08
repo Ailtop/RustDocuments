@@ -65,7 +65,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public EntityFuelSystem fuelSystem;
 
-	[ServerVar(Help = "Population active on the server")]
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public static float population = 1f;
 
 	[ServerVar(Help = "How long before a HAB loses all its health while outside")]

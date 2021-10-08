@@ -76,7 +76,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 
 	public GameObject preventBuildingObject;
 
-	[ServerVar(Help = "Population active on the server")]
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public static float population = 0f;
 
 	[ServerVar(Help = "How long before a minicopter loses all its health while outside")]

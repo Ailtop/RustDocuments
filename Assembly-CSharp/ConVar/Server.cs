@@ -21,10 +21,10 @@ namespace ConVar
 		[ServerVar]
 		public static int queryport = 0;
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static int maxplayers = 500;
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static string hostname = "My Untitled Rust Server";
 
 		[ServerVar]
@@ -81,7 +81,7 @@ namespace ConVar
 		[ServerVar]
 		public static bool stability = true;
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static bool radiation = true;
 
 		[ServerVar]
@@ -99,10 +99,10 @@ namespace ConVar
 		[ServerVar]
 		public static bool cinematic = false;
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static string description = "No server description has been provided.";
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static string url = "";
 
 		[ServerVar]
@@ -114,16 +114,16 @@ namespace ConVar
 		[ServerVar]
 		public static int ipQueriesPerMin = 30;
 
-		[ServerVar(Saved = true)]
+		[ServerVar(Saved = true, ShowInAdminUI = true)]
 		public static string headerimage = "";
 
-		[ServerVar(Saved = true)]
+		[ServerVar(Saved = true, ShowInAdminUI = true)]
 		public static string logoimage = "";
 
-		[ServerVar(Saved = true)]
+		[ServerVar(Saved = true, ShowInAdminUI = true)]
 		public static int saveBackupCount = 2;
 
-		[ReplicatedVar(Saved = true)]
+		[ReplicatedVar(Saved = true, ShowInAdminUI = true)]
 		public static string motd = "";
 
 		[ServerVar(Saved = true)]
@@ -270,7 +270,7 @@ namespace ConVar
 		[ServerVar]
 		public static int playertimeout = 60;
 
-		[ServerVar]
+		[ServerVar(ShowInAdminUI = true)]
 		public static int idlekick = 30;
 
 		[ServerVar]
@@ -282,7 +282,7 @@ namespace ConVar
 		[ServerVar]
 		public static string gamemode = "";
 
-		[ServerVar(Help = "Comma-separated server browser tag values (see wiki)", Saved = true)]
+		[ServerVar(Help = "Comma-separated server browser tag values (see wiki)", Saved = true, ShowInAdminUI = true)]
 		public static string tags = "";
 
 		[ServerVar(Help = "Censors the Steam player list to make player tracking more difficult")]

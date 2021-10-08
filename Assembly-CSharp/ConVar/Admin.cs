@@ -6,15 +6,18 @@ using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
 using Network;
+using Newtonsoft.Json;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace ConVar
 {
 	[Factory("global")]
 	public class Admin : ConsoleSystem
 	{
+		[Preserve]
 		public struct PlayerInfo
 		{
 			public string SteamID;
@@ -38,6 +41,7 @@ namespace ConVar
 			public float Health;
 		}
 
+		[Preserve]
 		public struct ServerInfoOutput
 		{
 			public string Hostname;
@@ -73,6 +77,16 @@ namespace ConVar
 			public string SaveCreatedTime;
 		}
 
+		[Preserve]
+		public struct ServerConvarInfo
+		{
+			public string FullName;
+
+			public string Value;
+
+			public string Help;
+		}
+
 		[ServerVar(Help = "Print out currently connected clients")]
 		public static void status(Arg arg)
 		{
@@ -81,7 +95,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				text = text + "hostname: " + Server.hostname + "\n";
-				text = text + "version : " + 2314 + " secure (secure mode enabled, connected to Steam3)\n";
+				text = text + "version : " + 2318 + " secure (secure mode enabled, connected to Steam3)\n";
 				text = text + "map     : " + Server.level + "\n";
 				text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -930,6 +944,39 @@ namespace ConVar
 		public static BuildInfo BuildInfo()
 		{
 			return Facepunch.BuildInfo.Current;
+		}
+
+		[ServerVar]
+		public static void AdminUI_RequestPlayerList(Arg arg)
+		{
+			ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceivePlayerList", JsonConvert.SerializeObject(playerlist()));
+		}
+
+		[ServerVar]
+		public static void AdminUI_RequestServerInfo(Arg arg)
+		{
+			ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceiveServerInfo", JsonConvert.SerializeObject(ServerInfo()));
+		}
+
+		[ServerVar]
+		public static void AdminUI_RequestServerConvars(Arg arg)
+		{
+			List<ServerConvarInfo> obj = Facepunch.Pool.GetList<ServerConvarInfo>();
+			Command[] all = Index.All;
+			foreach (Command command in all)
+			{
+				if (command.Server && command.Variable && command.ServerAdmin && command.ShowInAdminUI)
+				{
+					obj.Add(new ServerConvarInfo
+					{
+						FullName = command.FullName,
+						Value = command.GetOveride?.Invoke(),
+						Help = command.Description
+					});
+				}
+			}
+			ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceiveCommands", JsonConvert.SerializeObject(obj));
+			Facepunch.Pool.FreeList(ref obj);
 		}
 	}
 }
