@@ -10,7 +10,7 @@ using Rust.Modular;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPrefabPreProcess
+public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 {
 	public enum VisualGroup
 	{
@@ -138,19 +138,6 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
-	}
-
-	public virtual bool IsValidSAMTarget()
-	{
-		if (SamSite.alltarget)
-		{
-			if (IsOnAVehicle)
-			{
-				return Vehicle.AnyMounted();
-			}
-			return false;
-		}
-		return false;
 	}
 
 	public virtual void NonUserSpawn()
@@ -582,7 +569,7 @@ public class BaseVehicleModule : BaseCombatEntity, SamSite.ISamSiteTarget, IPref
 		{
 			return false;
 		}
-		if (Vehicle.IsEditableNow || Vehicle.IsDead() || player.GetMountedVehicle() != Vehicle)
+		if (Vehicle.IsEditableNow || Vehicle.IsDead() || !Vehicle.PlayerIsMounted(player))
 		{
 			return false;
 		}

@@ -193,6 +193,10 @@ public class MedicalTool : AttackEntity
 					player.metabolism.ApplyChange(effect.type, effect.amount, effect.time);
 				}
 			}
+			if (player is BasePet)
+			{
+				player.SendNetworkUpdateImmediate();
+			}
 		}
 	}
 }

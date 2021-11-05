@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class LootableCorpse : BaseCorpse
+public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 {
 	public string lootPanelName = "generic";
 
@@ -32,6 +32,10 @@ public class LootableCorpse : BaseCorpse
 			_playerName = value;
 		}
 	}
+
+	public Translate.Phrase LootPanelTitle => playerName;
+
+	public Translate.Phrase LootPanelName => "N/A";
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{

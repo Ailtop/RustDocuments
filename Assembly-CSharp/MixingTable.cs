@@ -33,6 +33,8 @@ public class MixingTable : StorageContainer
 
 	public float TotalMixTime { get; set; }
 
+	public BasePlayer MixStartingPlayer { get; private set; }
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("MixingTable.OnRpcMessage"))
@@ -140,15 +142,16 @@ public class MixingTable : StorageContainer
 
 	public void StartMixing(BasePlayer player)
 	{
-		if (IsOn())
+		if (IsOn() || !CanStartMixing(player))
 		{
 			return;
 		}
+		MixStartingPlayer = player;
 		List<Item> orderedContainerItems = GetOrderedContainerItems(base.inventory);
 		int quantity;
 		currentRecipe = RecipeDictionary.GetMatchingRecipeAndQuantity(Recipes, orderedContainerItems, out quantity);
 		currentQuantity = quantity;
-		if (!(currentRecipe == null) && (!currentRecipe.RequiresBlueprint || player.blueprints.HasUnlocked(currentRecipe.ProducedItem)))
+		if (!(currentRecipe == null) && (!currentRecipe.RequiresBlueprint || !(currentRecipe.ProducedItem != null) || player.blueprints.HasUnlocked(currentRecipe.ProducedItem)))
 		{
 			if (base.isServer)
 			{
@@ -166,6 +169,11 @@ public class MixingTable : StorageContainer
 			SetFlag(Flags.On, true);
 			SendNetworkUpdateImmediate();
 		}
+	}
+
+	protected virtual bool CanStartMixing(BasePlayer player)
+	{
+		return true;
 	}
 
 	public void StopMixing()
@@ -254,7 +262,7 @@ public class MixingTable : StorageContainer
 		ItemManager.DoRemoves();
 	}
 
-	private void CreateRecipeItems(Recipe recipe, int quantity)
+	protected virtual void CreateRecipeItems(Recipe recipe, int quantity)
 	{
 		if (recipe == null || recipe.ProducedItem == null)
 		{

@@ -86,16 +86,19 @@ public class AIBrainSenses
 			return;
 		}
 		nextUpdateTime = UnityEngine.Time.time + UpdateInterval;
-		if (senseTypes == EntityType.Player)
+		if (senseTypes != 0)
 		{
-			SensePlayers();
-		}
-		else
-		{
-			SenseBrains();
-			if (senseTypes.HasFlag(EntityType.Player))
+			if (senseTypes == EntityType.Player)
 			{
 				SensePlayers();
+			}
+			else
+			{
+				SenseBrains();
+				if (senseTypes.HasFlag(EntityType.Player))
+				{
+					SensePlayers();
+				}
 			}
 		}
 		Memory.Forget(MemoryDuration);
@@ -184,15 +187,20 @@ public class AIBrainSenses
 				}
 			}
 		}
-		if (hostileTargetsOnly && baseCombatEntity != null && !baseCombatEntity.IsHostile())
+		if (hostileTargetsOnly)
 		{
-			return false;
+			HTNPlayer hTNPlayer;
+			bool flag = (object)(hTNPlayer = baseCombatEntity as HTNPlayer) != null && hTNPlayer.faction == BaseCombatEntity.Faction.Horror;
+			if (baseCombatEntity != null && !baseCombatEntity.IsHostile() && !flag)
+			{
+				return false;
+			}
 		}
 		if (checkLOS && ownerAttack != null)
 		{
-			bool flag = ownerAttack.CanSeeTarget(entity);
-			Memory.SetLOS(entity, flag);
-			if (!flag)
+			bool flag2 = ownerAttack.CanSeeTarget(entity);
+			Memory.SetLOS(entity, flag2);
+			if (!flag2)
 			{
 				return false;
 			}
@@ -207,6 +215,15 @@ public class AIBrainSenses
 		{
 			if (basePlayer.IsNpc)
 			{
+				HTNPlayer hTNPlayer;
+				if ((object)(hTNPlayer = ent as HTNPlayer) != null && hTNPlayer.faction == BaseCombatEntity.Faction.Horror)
+				{
+					return true;
+				}
+				if (ent is BasePet)
+				{
+					return true;
+				}
 				if (senseTypes.HasFlag(EntityType.BasePlayerNPC))
 				{
 					return true;

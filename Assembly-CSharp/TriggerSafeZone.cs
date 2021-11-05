@@ -1,10 +1,31 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TriggerSafeZone : TriggerBase
 {
+	public static List<TriggerSafeZone> allSafeZones = new List<TriggerSafeZone>();
+
 	public float maxDepth = 20f;
 
 	public float maxAltitude = -1f;
+
+	public Collider triggerCollider { get; private set; }
+
+	protected void Awake()
+	{
+		triggerCollider = GetComponent<Collider>();
+	}
+
+	protected void OnEnable()
+	{
+		allSafeZones.Add(this);
+	}
+
+	protected override void OnDisable()
+	{
+		base.OnDisable();
+		allSafeZones.Remove(this);
+	}
 
 	internal override GameObject InterestedInObject(GameObject obj)
 	{

@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 {
+	public interface IProjectileImpact
+	{
+		void ProjectileImpact(RaycastHit hitInfo, Vector3 rayOrigin);
+	}
+
 	public Vector3 initialVelocity;
 
 	public float drag;
@@ -22,13 +27,13 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 
 	public float swimRandom;
 
-	public Vector3 currentVelocity = Vector3.zero;
-
 	protected virtual int mask => 1236478737;
+
+	public Vector3 CurrentVelocity { get; set; }
 
 	protected void FixedUpdate()
 	{
-		if (base.baseEntity.isServer)
+		if (base.baseEntity != null && base.baseEntity.isServer)
 		{
 			DoMovement();
 		}
@@ -40,8 +45,8 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		{
 			return false;
 		}
-		currentVelocity += Physics.gravity * gravityModifier * Time.fixedDeltaTime * Time.timeScale;
-		Vector3 vector = currentVelocity;
+		CurrentVelocity += Physics.gravity * gravityModifier * Time.fixedDeltaTime * Time.timeScale;
+		Vector3 currentVelocity = CurrentVelocity;
 		if (swimScale != Vector3.zero)
 		{
 			if (swimRandom == 0f)
@@ -51,23 +56,33 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 			float num = Time.time + swimRandom;
 			Vector3 direction = new Vector3(Mathf.Sin(num * swimSpeed.x) * swimScale.x, Mathf.Cos(num * swimSpeed.y) * swimScale.y, Mathf.Sin(num * swimSpeed.z) * swimScale.z);
 			direction = base.transform.InverseTransformDirection(direction);
-			vector += direction;
+			currentVelocity += direction;
 		}
-		float num2 = vector.magnitude * Time.fixedDeltaTime;
+		float num2 = currentVelocity.magnitude * Time.fixedDeltaTime;
+		Vector3 position = base.transform.position;
 		RaycastHit hitInfo;
-		if (GamePhysics.Trace(new Ray(base.transform.position, vector.normalized), radius, out hitInfo, num2 + scanRange, mask))
+		if (GamePhysics.Trace(new Ray(position, currentVelocity.normalized), radius, out hitInfo, num2 + scanRange, mask, QueryTriggerInteraction.Ignore))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
-			if (!BaseEntityEx.IsValid(entity) || !BaseEntityEx.IsValid(base.baseEntity.creatorEntity) || entity.net.ID != base.baseEntity.creatorEntity.net.ID)
+			if (IsAValidHit(entity))
 			{
 				base.transform.position += base.transform.forward * Mathf.Max(0f, hitInfo.distance - 0.1f);
-				SendMessage("ProjectileImpact", hitInfo, SendMessageOptions.DontRequireReceiver);
+				GetComponent<IProjectileImpact>()?.ProjectileImpact(hitInfo, position);
 				impacted = true;
 				return false;
 			}
 		}
 		base.transform.position += base.transform.forward * num2;
-		base.transform.rotation = Quaternion.LookRotation(vector.normalized);
+		base.transform.rotation = Quaternion.LookRotation(currentVelocity.normalized);
+		return true;
+	}
+
+	protected virtual bool IsAValidHit(BaseEntity hitEnt)
+	{
+		if (BaseEntityEx.IsValid(hitEnt) && BaseEntityEx.IsValid(base.baseEntity.creatorEntity))
+		{
+			return hitEnt.net.ID != base.baseEntity.creatorEntity.net.ID;
+		}
 		return true;
 	}
 
@@ -75,6 +90,6 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 	{
 		base.transform.rotation = Quaternion.LookRotation(overrideVel.normalized);
 		initialVelocity = overrideVel;
-		currentVelocity = overrideVel;
+		CurrentVelocity = overrideVel;
 	}
 }

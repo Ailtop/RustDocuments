@@ -199,31 +199,28 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!base.isClient && isSpawned)
+		if (IsEditableNow != prevEditable)
 		{
-			if (IsEditableNow != prevEditable)
-			{
-				SendNetworkUpdate();
-				prevEditable = IsEditableNow;
-			}
-			if (IsMovingOrOn)
-			{
-				Velocity = GetLocalVelocity();
-				waterlogged = WaterLevel.Test(waterSample.transform.position, true, this);
-			}
-			else
-			{
-				Velocity = Vector3.zero;
-			}
-			SetFlag(Flags.Reserved6, rigidBody.isKinematic);
-			if (LightsAreOn && !AnyMounted())
-			{
-				SetLightsState(false);
-			}
-			for (int i = 0; i < NumAttachedModules; i++)
-			{
-				AttachedModuleEntities[i].VehicleFixedUpdate(IsMovingOrOn);
-			}
+			SendNetworkUpdate();
+			prevEditable = IsEditableNow;
+		}
+		if (IsMovingOrOn)
+		{
+			Velocity = GetLocalVelocity();
+			waterlogged = WaterLevel.Test(waterSample.transform.position, true, this);
+		}
+		else
+		{
+			Velocity = Vector3.zero;
+		}
+		SetFlag(Flags.Reserved6, rigidBody.isKinematic);
+		if (LightsAreOn && !AnyMounted())
+		{
+			SetLightsState(false);
+		}
+		for (int i = 0; i < NumAttachedModules; i++)
+		{
+			AttachedModuleEntities[i].VehicleFixedUpdate(IsMovingOrOn);
 		}
 	}
 

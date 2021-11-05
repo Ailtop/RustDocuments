@@ -450,14 +450,19 @@ public class BaseFishingRod : HeldEntity
 				return;
 			}
 			CurrentState = CatchState.Caught;
-			Item item = default(Item);
 			if (currentFishTarget != null)
 			{
-				item = ItemManager.Create(currentFishTarget, 1, 0uL);
+				Item item = ItemManager.Create(currentFishTarget, 1, 0uL);
 				object obj = Interface.CallHook("CanCatchFish", ownerPlayer, this, item);
 				if (obj is bool && !(bool)obj)
 				{
 					return;
+				}
+				object obj2 = Interface.CallHook("OnFishCatch", item, this, ownerPlayer);
+				if (obj2 is Item && obj2 as Item != item)
+				{
+					item.Remove();
+					item = (Item)obj2;
 				}
 				ownerPlayer.GiveItem(item, GiveItemReason.Crafted);
 				if (currentFishTarget.shortname == "skull.human")
@@ -471,7 +476,7 @@ public class BaseFishingRod : HeldEntity
 			fishingBobber.Kill();
 			currentBobber.Set(null);
 			CancelInvoke(CatchProcess);
-			Interface.CallHook("OnFishCaught", item, this, ownerPlayer);
+			Interface.CallHook("OnFishCaught", currentFishTarget, this, ownerPlayer);
 		}
 	}
 

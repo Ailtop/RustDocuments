@@ -110,6 +110,10 @@ public class GestureConfig : ScriptableObject
 		{
 			return false;
 		}
+		if (playerModelLayer == PlayerModelLayer.FullBody && player.modelState.ducked)
+		{
+			return false;
+		}
 		return true;
 	}
 }

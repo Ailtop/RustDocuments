@@ -26,6 +26,8 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 
 	public uint NetworkID => net.ID;
 
+	public FileStorage.Type FileType => FileStorage.Type.png;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("PhotoFrame.OnRpcMessage"))
@@ -259,6 +261,11 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 		}
 	}
 
+	public uint[] GetTextureCRCs()
+	{
+		return new uint[1] { _overlayTextureCrc };
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
@@ -301,11 +308,6 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 				associatedEntity.CopyInfoToSign(this);
 			}
 		}
-	}
-
-	public uint[] GetTextureCRCs()
-	{
-		return new uint[1] { _overlayTextureCrc };
 	}
 
 	public void SetTextureCRCs(uint[] crcs)

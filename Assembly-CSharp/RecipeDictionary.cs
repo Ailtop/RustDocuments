@@ -75,6 +75,10 @@ public static class RecipeDictionary
 			if (flag)
 			{
 				quantity = num;
+				if (quantity > 1 && !item2.CanQueueMultiple)
+				{
+					quantity = 1;
+				}
 				return item2;
 			}
 		}

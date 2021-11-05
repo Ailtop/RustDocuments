@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class ContainerIOEntity : IOEntity, IItemContainerEntity
+public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasLootPanel
 {
 	public ItemDefinition onlyAllowedItem;
 
@@ -20,6 +20,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 
 	public string lootPanelName = "generic";
 
+	public Translate.Phrase panelTitle = new Translate.Phrase("loot", "Loot");
+
 	public bool needsBuildingPrivilegeToUse;
 
 	public bool isLootable = true;
@@ -27,6 +29,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity
 	public float dropChance;
 
 	public bool onlyOneUser;
+
+	public Translate.Phrase LootPanelTitle => panelTitle;
 
 	public ItemContainer inventory { get; private set; }
 

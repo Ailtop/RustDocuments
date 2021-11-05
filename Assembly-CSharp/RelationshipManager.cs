@@ -629,7 +629,7 @@ public class RelationshipManager : BaseEntity
 				continue;
 			}
 			relations.lastSeenTime = UnityEngine.Time.realtimeSinceStartup;
-			if ((relations.type == RelationshipType.NONE || relations.type == RelationshipType.Acquaintance) && player.IsPlayerVisibleToUs(item))
+			if ((relations.type == RelationshipType.NONE || relations.type == RelationshipType.Acquaintance) && player.IsPlayerVisibleToUs(item, 1218519041))
 			{
 				int num = Mathf.CeilToInt(deltaSeconds);
 				if (player.InSafeZone() || item.InSafeZone())

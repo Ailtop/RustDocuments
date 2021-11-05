@@ -687,7 +687,7 @@ public class BaseCombatEntity : BaseEntity
 	{
 		if (!baseProtection)
 		{
-			return 1f;
+			return 100f;
 		}
 		return baseProtection.density;
 	}

@@ -760,7 +760,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		if (!AtMaxAuthCapacity() && msg.player.CanInteract())
 		{
 			ulong num = msg.read.UInt64();
-			if (num != 0L && !IsAuthed(num))
+			if (num != 0L && !IsAuthed(num) && Interface.CallHook("OnTurretAssign", this, num, msg.player) == null)
 			{
 				string username = BasePlayer.SanitizePlayerNameString(msg.read.String(), num);
 				PlayerNameID playerNameID = new PlayerNameID();
@@ -769,6 +769,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				authorizedPlayers.Add(playerNameID);
 				UpdateMaxAuthCapacity();
 				SendNetworkUpdate();
+				Interface.CallHook("OnTurretAssigned", this, num, msg.player);
 			}
 		}
 	}
@@ -1316,6 +1317,15 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public virtual bool IsEntityHostile(BaseCombatEntity ent)
 	{
+		BasePet basePet;
+		if ((object)(basePet = ent as BasePet) != null && basePet.Brain.OwningPlayer != null)
+		{
+			if (!basePet.Brain.OwningPlayer.IsHostile())
+			{
+				return ent.IsHostile();
+			}
+			return true;
+		}
 		return ent.IsHostile();
 	}
 
@@ -1326,6 +1336,11 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			return false;
 		}
 		if (targ is RidableHorse)
+		{
+			return false;
+		}
+		BasePet basePet;
+		if ((object)(basePet = targ as BasePet) != null && basePet.Brain.OwningPlayer != null && IsAuthed(basePet.Brain.OwningPlayer))
 		{
 			return false;
 		}

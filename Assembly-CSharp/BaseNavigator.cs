@@ -12,7 +12,8 @@ public class BaseNavigator : BaseMonoBehaviour
 		None,
 		NavMesh,
 		AStar,
-		Custom
+		Custom,
+		Base
 	}
 
 	public enum NavigationSpeed
@@ -30,6 +31,21 @@ public class BaseNavigator : BaseMonoBehaviour
 		Entity
 	}
 
+	[ServerVar(Help = "The max step-up height difference for pet base navigation")]
+	public static float maxStepUpDistance = 1.7f;
+
+	[ServerVar(Help = "How many frames between base navigation movement updates")]
+	public static int baseNavMovementFrameInterval = 2;
+
+	[ServerVar(Help = "How long we are not moving for before trigger the stuck event")]
+	public static float stuckTriggerDuration = 10f;
+
+	[ServerVar]
+	public static float navTypeHeightOffset = 0.5f;
+
+	[ServerVar]
+	public static float navTypeDistance = 1f;
+
 	[Header("General")]
 	public bool CanNavigateMounted;
 
@@ -37,11 +53,18 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public bool CanUseAStar = true;
 
+	public bool CanUseBaseNav;
+
 	public bool CanUseCustomNav;
 
 	public float StoppingDistance = 0.5f;
 
 	public string DefaultArea = "Walkable";
+
+	[Header("Stuck Detection")]
+	public bool TriggerStuckEvent;
+
+	public float StuckDistance = 1f;
 
 	[Header("Speed")]
 	public float Speed = 5f;
@@ -88,6 +111,10 @@ public class BaseNavigator : BaseMonoBehaviour
 	[InspectorFlags]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
+	private float stuckTimer;
+
+	private Vector3 stuckCheckPosition;
+
 	protected bool traversingNavMeshLink;
 
 	protected string currentNavMeshLinkName;
@@ -111,6 +138,10 @@ public class BaseNavigator : BaseMonoBehaviour
 	protected Vector3 facingDirectionOverride;
 
 	protected bool paused;
+
+	private int frameCount;
+
+	private float accumDelta;
 
 	public AIMovePointPath Path { get; set; }
 
@@ -137,6 +168,8 @@ public class BaseNavigator : BaseMonoBehaviour
 	public bool Moving => CurrentNavigationType != NavigationType.None;
 
 	public NavigationType CurrentNavigationType { get; private set; }
+
+	public NavigationType LastUsedNavigationType { get; private set; }
 
 	[HideInInspector]
 	public bool StuckOffNavmesh { get; private set; }
@@ -230,6 +263,22 @@ public class BaseNavigator : BaseMonoBehaviour
 		return true;
 	}
 
+	public void ForceToGround()
+	{
+		CancelInvoke(DelayedForceToGround);
+		Invoke(DelayedForceToGround, 0.5f);
+	}
+
+	private void DelayedForceToGround()
+	{
+		int layerMask = 10551296;
+		RaycastHit hitInfo;
+		if (UnityEngine.Physics.Raycast(base.transform.position + Vector3.up * 0.5f, Vector3.down, out hitInfo, 1000f, layerMask))
+		{
+			BaseEntity.ServerPosition = hitInfo.point;
+		}
+	}
+
 	public bool PlaceOnNavMesh()
 	{
 		if (Agent.isOnNavMesh)
@@ -241,20 +290,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		Vector3 position;
 		if (GetNearestNavmeshPosition(base.transform.position + Vector3.one * 2f, out position, maxRange))
 		{
-			Agent.Warp(position);
-			Agent.enabled = true;
-			base.transform.position = position;
-			if (!Agent.isOnNavMesh)
-			{
-				Debug.LogWarning("Agent still not on navmesh after a warp. No navmesh areas matching agent type? Agent type: " + Agent.agentTypeID, base.gameObject);
-				flag = false;
-				StuckOffNavmesh = true;
-			}
-			else
-			{
-				StuckOffNavmesh = false;
-				flag = true;
-			}
+			flag = Warp(position);
 		}
 		else
 		{
@@ -263,6 +299,21 @@ public class BaseNavigator : BaseMonoBehaviour
 			Debug.LogWarning(string.Concat(base.gameObject.name, " failed to sample navmesh at position ", base.transform.position, " on area: ", DefaultArea), base.gameObject);
 		}
 		return flag;
+	}
+
+	private bool Warp(Vector3 position)
+	{
+		Agent.Warp(position);
+		Agent.enabled = true;
+		base.transform.position = position;
+		if (!Agent.isOnNavMesh)
+		{
+			Debug.LogWarning("Agent still not on navmesh after a warp. No navmesh areas matching agent type? Agent type: " + Agent.agentTypeID, base.gameObject);
+			StuckOffNavmesh = true;
+			return false;
+		}
+		StuckOffNavmesh = false;
+		return true;
 	}
 
 	public bool GetNearestNavmeshPosition(Vector3 target, out Vector3 position, float maxRange)
@@ -279,6 +330,27 @@ public class BaseNavigator : BaseMonoBehaviour
 			result = false;
 		}
 		return result;
+	}
+
+	public bool SetBaseDestination(Vector3 pos, float speedFraction)
+	{
+		if (!AI.move)
+		{
+			return false;
+		}
+		if (!AI.navthink)
+		{
+			return false;
+		}
+		paused = false;
+		currentSpeedFraction = speedFraction;
+		if (ReachedPosition(pos))
+		{
+			return true;
+		}
+		Destination = pos;
+		SetCurrentNavigationType(NavigationType.Base);
+		return true;
 	}
 
 	public bool SetDestination(BasePath path, BasePathNode newTargetNode, float speedFraction)
@@ -360,10 +432,66 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			return false;
 		}
-		paused = false;
-		if (!CanUseNavMesh)
+		if (updateInterval > 0f && !UpdateIntervalElapsed(updateInterval))
 		{
-			if (CanUseAStar && AStarGraph != null)
+			return true;
+		}
+		lastSetDestinationTime = UnityEngine.Time.time;
+		paused = false;
+		currentSpeedFraction = speedFraction;
+		if (ReachedPosition(pos))
+		{
+			return true;
+		}
+		NavigationType navigationType = NavigationType.NavMesh;
+		bool num = CanUseBaseNav && CanUseNavMesh;
+		NavigationType navigationType2 = NavigationType.None;
+		if (num)
+		{
+			Vector3 navMeshPos;
+			NavigationType navigationType3 = DetermineNavigationType(base.transform.position, out navMeshPos);
+			Vector3 navMeshPos2;
+			navigationType2 = DetermineNavigationType(pos, out navMeshPos2);
+			if (navigationType2 == NavigationType.NavMesh && navigationType3 == NavigationType.NavMesh && (CurrentNavigationType == NavigationType.None || CurrentNavigationType == NavigationType.Base))
+			{
+				Warp(navMeshPos);
+			}
+			if (navigationType2 == NavigationType.Base && navigationType3 != NavigationType.Base)
+			{
+				BasePet basePet = BaseEntity as BasePet;
+				if (basePet != null)
+				{
+					BasePlayer basePlayer = basePet.Brain.Events.Memory.Entity.Get(5) as BasePlayer;
+					if (basePlayer != null)
+					{
+						BuildingPrivlidge buildingPrivilege = basePlayer.GetBuildingPrivilege(new OBB(pos, base.transform.rotation, BaseEntity.bounds));
+						if (buildingPrivilege != null && !buildingPrivilege.IsAuthed(basePlayer) && buildingPrivilege.AnyAuthed())
+						{
+							return false;
+						}
+					}
+				}
+			}
+			switch (navigationType2)
+			{
+			case NavigationType.Base:
+				navigationType = ((navigationType3 == NavigationType.Base) ? NavigationType.Base : ((!(Vector3.Distance(BaseEntity.ServerPosition, pos) <= 10f) || !(Mathf.Abs(BaseEntity.ServerPosition.y - pos.y) <= 3f)) ? NavigationType.NavMesh : NavigationType.Base));
+				break;
+			case NavigationType.NavMesh:
+				navigationType = ((navigationType3 == NavigationType.NavMesh) ? NavigationType.NavMesh : NavigationType.Base);
+				break;
+			}
+		}
+		else
+		{
+			navigationType = (CanUseNavMesh ? NavigationType.NavMesh : NavigationType.AStar);
+		}
+		switch (navigationType)
+		{
+		case NavigationType.Base:
+			return SetBaseDestination(pos, speedFraction);
+		case NavigationType.AStar:
+			if (AStarGraph != null)
 			{
 				return SetDestination(AStarGraph, AStarGraph.GetClosestToPoint(pos), speedFraction);
 			}
@@ -372,54 +500,62 @@ public class BaseNavigator : BaseMonoBehaviour
 				return SetCustomDestination(pos, speedFraction, updateInterval);
 			}
 			return false;
-		}
-		if (AiManager.nav_disable)
+		default:
 		{
-			return false;
-		}
-		if (updateInterval > 0f && !UpdateIntervalElapsed(updateInterval))
-		{
-			return true;
-		}
-		lastSetDestinationTime = UnityEngine.Time.time;
-		currentSpeedFraction = speedFraction;
-		if (ReachedPosition(pos))
-		{
-			return true;
-		}
-		if (navmeshSampleDistance > 0f && AI.setdestinationsamplenavmesh)
-		{
-			NavMeshHit hit;
-			if (!NavMesh.SamplePosition(pos, out hit, navmeshSampleDistance, defaultAreaMask))
+			if (AiManager.nav_disable)
 			{
 				return false;
 			}
-			pos = hit.position;
-		}
-		SetCurrentNavigationType(NavigationType.NavMesh);
-		Destination = pos;
-		bool flag;
-		if (AI.usecalculatepath)
-		{
-			flag = NavMesh.CalculatePath(base.transform.position, Destination, navMeshQueryFilter, path);
-			if (flag)
+			if (navmeshSampleDistance > 0f && AI.setdestinationsamplenavmesh)
 			{
-				Agent.SetPath(path);
+				NavMeshHit hit;
+				if (!NavMesh.SamplePosition(pos, out hit, navmeshSampleDistance, defaultAreaMask))
+				{
+					return false;
+				}
+				pos = hit.position;
 			}
-			else if (AI.usesetdestinationfallback)
+			SetCurrentNavigationType(NavigationType.NavMesh);
+			Destination = pos;
+			bool flag;
+			if (AI.usecalculatepath)
+			{
+				flag = NavMesh.CalculatePath(base.transform.position, Destination, navMeshQueryFilter, path);
+				if (flag)
+				{
+					Agent.SetPath(path);
+				}
+				else if (AI.usesetdestinationfallback)
+				{
+					flag = Agent.SetDestination(Destination);
+				}
+			}
+			else
 			{
 				flag = Agent.SetDestination(Destination);
 			}
+			if (flag && SpeedBasedAvoidancePriority)
+			{
+				Agent.avoidancePriority = Random.Range(0, 21) + Mathf.FloorToInt(speedFraction * 80f);
+			}
+			return flag;
 		}
-		else
+		}
+	}
+
+	private NavigationType DetermineNavigationType(Vector3 location, out Vector3 navMeshPos)
+	{
+		navMeshPos = location;
+		int layerMask = 2097152;
+		RaycastHit hitInfo;
+		if (UnityEngine.Physics.Raycast(location + Vector3.up * navTypeHeightOffset, Vector3.down, out hitInfo, navTypeDistance, layerMask))
 		{
-			flag = Agent.SetDestination(Destination);
+			return NavigationType.Base;
 		}
-		if (flag && SpeedBasedAvoidancePriority)
-		{
-			Agent.avoidancePriority = Random.Range(0, 21) + Mathf.FloorToInt(speedFraction * 80f);
-		}
-		return flag;
+		Vector3 position;
+		int result = (GetNearestNavmeshPosition(location + Vector3.up * navTypeHeightOffset, out position, navTypeDistance) ? 1 : 4);
+		navMeshPos = position;
+		return (NavigationType)result;
 	}
 
 	public void SetCurrentSpeed(NavigationSpeed speed)
@@ -455,10 +591,24 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	protected void SetCurrentNavigationType(NavigationType navType)
 	{
-		CurrentNavigationType = navType;
-		if (navType == NavigationType.NavMesh)
+		if (CurrentNavigationType == NavigationType.None)
 		{
+			stuckCheckPosition = base.transform.position;
+			stuckTimer = 0f;
+		}
+		CurrentNavigationType = navType;
+		if (CurrentNavigationType != 0)
+		{
+			LastUsedNavigationType = CurrentNavigationType;
+		}
+		switch (navType)
+		{
+		case NavigationType.None:
+			stuckTimer = 0f;
+			break;
+		case NavigationType.NavMesh:
 			SetNavMeshEnabled(true);
+			break;
 		}
 	}
 
@@ -528,27 +678,54 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	private void UpdateMovement(float delta)
 	{
-		if (AI.move && CanUpdateMovement())
+		if (!AI.move || !CanUpdateMovement())
 		{
-			Vector3 moveToPosition = base.transform.position;
-			if (IsOnNavMeshLink)
+			return;
+		}
+		Vector3 moveToPosition = base.transform.position;
+		if (TriggerStuckEvent)
+		{
+			stuckTimer += delta;
+			if (CurrentNavigationType != 0 && stuckTimer >= stuckTriggerDuration)
 			{
-				HandleNavMeshLinkTraversal(delta, ref moveToPosition);
+				if (Vector3.Distance(base.transform.position, stuckCheckPosition) <= StuckDistance)
+				{
+					OnStuck();
+				}
+				stuckTimer = 0f;
+				stuckCheckPosition = base.transform.position;
 			}
-			else if (HasPath)
-			{
-				moveToPosition = GetNextPathPosition();
-			}
-			else if (CurrentNavigationType == NavigationType.Custom)
-			{
-				moveToPosition = Destination;
-			}
-			if (ValidateNextPosition(ref moveToPosition))
-			{
-				bool swimming = IsSwimming();
-				UpdateSpeed(delta, swimming);
-				UpdatePositionAndRotation(moveToPosition, delta);
-			}
+		}
+		if (CurrentNavigationType == NavigationType.Base)
+		{
+			moveToPosition = Destination;
+		}
+		else if (IsOnNavMeshLink)
+		{
+			HandleNavMeshLinkTraversal(delta, ref moveToPosition);
+		}
+		else if (HasPath)
+		{
+			moveToPosition = GetNextPathPosition();
+		}
+		else if (CurrentNavigationType == NavigationType.Custom)
+		{
+			moveToPosition = Destination;
+		}
+		if (ValidateNextPosition(ref moveToPosition))
+		{
+			bool swimming = IsSwimming();
+			UpdateSpeed(delta, swimming);
+			UpdatePositionAndRotation(moveToPosition, delta);
+		}
+	}
+
+	public virtual void OnStuck()
+	{
+		BasePet basePet = BaseEntity as BasePet;
+		if (basePet != null && basePet.Brain != null)
+		{
+			basePet.Brain.LoadDefaultAIDesign();
 		}
 	}
 
@@ -619,6 +796,45 @@ public class BaseNavigator : BaseMonoBehaviour
 			if (BaseEntity != null)
 			{
 				BaseEntity.ServerPosition = moveToPosition;
+			}
+		}
+		if (CurrentNavigationType == NavigationType.Base)
+		{
+			frameCount++;
+			accumDelta += delta;
+			if (frameCount < baseNavMovementFrameInterval)
+			{
+				return;
+			}
+			frameCount = 0;
+			delta = accumDelta;
+			accumDelta = 0f;
+			int layerMask = 10551552;
+			Vector3 vector = Vector3Ex.Direction2D(Destination, BaseEntity.ServerPosition);
+			Vector3 vector2 = BaseEntity.ServerPosition + vector * delta * Agent.speed;
+			Vector3 vector3 = BaseEntity.ServerPosition + Vector3.up * maxStepUpDistance;
+			Vector3 direction = Vector3Ex.Direction(vector2 + Vector3.up * maxStepUpDistance, BaseEntity.ServerPosition + Vector3.up * maxStepUpDistance);
+			float maxDistance = Vector3.Distance(vector3, vector2 + Vector3.up * maxStepUpDistance) + 0.25f;
+			RaycastHit hitInfo;
+			if (UnityEngine.Physics.Raycast(vector3, direction, out hitInfo, maxDistance, layerMask))
+			{
+				return;
+			}
+			Vector3 origin = vector2 + Vector3.up * (maxStepUpDistance + 0.3f);
+			Vector3 vector4 = vector2;
+			if (!UnityEngine.Physics.SphereCast(origin, 0.25f, Vector3.down, out hitInfo, 10f, layerMask))
+			{
+				return;
+			}
+			vector4 = hitInfo.point;
+			if (vector4.y - BaseEntity.ServerPosition.y > maxStepUpDistance)
+			{
+				return;
+			}
+			BaseEntity.ServerPosition = vector4;
+			if (ReachedPosition(moveToPosition))
+			{
+				Stop();
 			}
 		}
 		if (overrideFacingDirectionMode != 0)

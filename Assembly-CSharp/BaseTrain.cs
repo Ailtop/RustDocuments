@@ -508,16 +508,13 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (IsFullySpawned())
+		float num = 0f;
+		if (!rigidBody.IsSleeping() || IsOn() || HasAnyCollisions())
 		{
-			float num = 0f;
-			if (!rigidBody.IsSleeping() || IsOn() || HasAnyCollisions())
-			{
-				num = FixedUpdateMoveTrain(UnityEngine.Time.fixedDeltaTime);
-			}
-			hurtTriggerFront.gameObject.SetActive(num > hurtTriggerMinSpeed);
-			hurtTriggerRear.gameObject.SetActive(num < 0f - hurtTriggerMinSpeed);
+			num = FixedUpdateMoveTrain(UnityEngine.Time.fixedDeltaTime);
 		}
+		hurtTriggerFront.gameObject.SetActive(num > hurtTriggerMinSpeed);
+		hurtTriggerRear.gameObject.SetActive(num < 0f - hurtTriggerMinSpeed);
 	}
 
 	public float FixedUpdateMoveTrain(float deltaTime)

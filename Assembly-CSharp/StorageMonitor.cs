@@ -5,7 +5,7 @@ using ProtoBuf;
 
 public class StorageMonitor : AppIOEntity
 {
-	private readonly Action<Item, bool> _onContainerChangedHandler;
+	public readonly Action<Item, bool> _onContainerChangedHandler;
 
 	private readonly Action _resetSwitchHandler;
 
@@ -112,7 +112,7 @@ public class StorageMonitor : AppIOEntity
 		}
 	}
 
-	private void OnContainerChanged(Item item, bool added)
+	public void OnContainerChanged(Item item, bool added)
 	{
 		if (HasFlag(Flags.Reserved8))
 		{

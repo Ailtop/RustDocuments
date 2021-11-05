@@ -29,5 +29,9 @@ public class MeshPaintController : MonoBehaviour, IClientComponent
 
 	public Toggle lastBrush;
 
+	public Button UndoButton;
+
+	public Button RedoButton;
+
 	private Vector3 lastPosition;
 }

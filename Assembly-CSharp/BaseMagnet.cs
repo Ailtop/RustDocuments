@@ -55,11 +55,6 @@ public class BaseMagnet : MonoBehaviour
 		}
 	}
 
-	public void Start()
-	{
-		colliderSource.GetComponentsInChildren<Collider>();
-	}
-
 	public virtual void SetMagnetEnabled(bool wantsOn)
 	{
 		if (isMagnetOn != wantsOn)

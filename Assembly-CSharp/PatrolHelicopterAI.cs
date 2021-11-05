@@ -111,7 +111,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public bool isDead;
 
-	private bool isRetiring;
+	public bool isRetiring;
 
 	public float spawnTime;
 

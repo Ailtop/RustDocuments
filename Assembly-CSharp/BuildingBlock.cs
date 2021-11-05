@@ -492,7 +492,7 @@ public class BuildingBlock : StabilityEntity
 		}
 	}
 
-	private void RefreshNeighbours(bool linkToNeighbours)
+	public void RefreshNeighbours(bool linkToNeighbours)
 	{
 		List<EntityLink> entityLinks = GetEntityLinks(linkToNeighbours);
 		for (int i = 0; i < entityLinks.Count; i++)
@@ -722,6 +722,19 @@ public class BuildingBlock : StabilityEntity
 			SetFlag(Flags.Reserved2, false);
 			SetFlag(Flags.Reserved1, false);
 			UpdateSkin();
+		}
+	}
+
+	public override void AttachToBuilding(DecayEntity other)
+	{
+		if (other != null && other is BuildingBlock)
+		{
+			AttachToBuilding(other.buildingID);
+			BuildingManager.server.CheckMerge(this);
+		}
+		else
+		{
+			AttachToBuilding(BuildingManager.server.NewBuildingID());
 		}
 	}
 

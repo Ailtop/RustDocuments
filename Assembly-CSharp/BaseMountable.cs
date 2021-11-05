@@ -1,6 +1,8 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
+using Facepunch;
 using Network;
 using Oxide.Core;
 using Rust;
@@ -71,14 +73,18 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool canDrinkWhileMounted = true;
 
+	[Help("Set this to true if the mountable is enclosed so it doesn't move inside cars and such")]
+	public bool animateClothInLocalSpace = true;
+
 	[Header("Camera")]
 	public BasePlayer.CameraMode MountedCameraMode;
 
-	public bool isMobile;
+	[FormerlySerializedAs("isMobile")]
+	public bool needsVehicleTick;
 
 	public float SideLeanAmount = 0.2f;
 
-	public static ListHashSet<BaseMountable> MobileMountables = new ListHashSet<BaseMountable>();
+	public static ListHashSet<BaseMountable> FixedUpdateMountables = new ListHashSet<BaseMountable>();
 
 	public const float playerHeight = 1.8f;
 
@@ -252,6 +258,20 @@ public class BaseMountable : BaseCombatEntity
 		return _mounted;
 	}
 
+	public virtual bool IsMounted()
+	{
+		return _mounted != null;
+	}
+
+	public virtual bool PlayerIsMounted(BasePlayer player)
+	{
+		if (BaseEntityEx.IsValid(player))
+		{
+			return player.GetMounted() == this;
+		}
+		return false;
+	}
+
 	public BaseVehicle VehicleParent()
 	{
 		return GetParentEntity() as BaseVehicle;
@@ -279,11 +299,6 @@ public class BaseMountable : BaseCombatEntity
 			return (bool)obj;
 		}
 		return true;
-	}
-
-	public virtual bool IsMounted()
-	{
-		return _mounted != null;
 	}
 
 	public override bool CanPickup(BasePlayer player)
@@ -473,11 +488,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
 			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C62_0(hitInfo)))
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C64_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C62_0(hitInfo))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C64_0(hitInfo))
 				{
 					return true;
 				}
@@ -532,28 +547,28 @@ public class BaseMountable : BaseCombatEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		if (isMobile)
+		if (needsVehicleTick)
 		{
-			MobileMountables.Add(this);
+			FixedUpdateMountables.Add(this);
 		}
 	}
 
 	internal override void DoServerDestroy()
 	{
-		MobileMountables.Remove(this);
+		FixedUpdateMountables.Remove(this);
 		base.DoServerDestroy();
 	}
 
 	public static void FixedUpdateCycle()
 	{
-		for (int num = MobileMountables.Count - 1; num >= 0; num--)
+		for (int num = FixedUpdateMountables.Count - 1; num >= 0; num--)
 		{
-			BaseMountable baseMountable = MobileMountables[num];
+			BaseMountable baseMountable = FixedUpdateMountables[num];
 			if (baseMountable == null)
 			{
-				MobileMountables.RemoveAt(num);
+				FixedUpdateMountables.RemoveAt(num);
 			}
-			else
+			else if (baseMountable.isSpawned)
 			{
 				baseMountable.VehicleFixedUpdate();
 			}
@@ -581,6 +596,57 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual void ScaleDamageForPlayer(BasePlayer player, HitInfo info)
 	{
+	}
+
+	public static bool TryFireProjectile(StorageContainer ammoStorage, AmmoTypes ammoType, Vector3 firingPos, Vector3 firingDir, BasePlayer driver, float launchOffset, float minSpeed, out ServerProjectile projectile)
+	{
+		projectile = null;
+		if (ammoStorage == null)
+		{
+			return false;
+		}
+		bool result = false;
+		List<Item> obj = Facepunch.Pool.GetList<Item>();
+		ammoStorage.inventory.FindAmmo(obj, ammoType);
+		for (int num = obj.Count - 1; num >= 0; num--)
+		{
+			if (obj[num].amount <= 0)
+			{
+				obj.RemoveAt(num);
+			}
+		}
+		if (obj.Count > 0)
+		{
+			RaycastHit hitInfo;
+			if (UnityEngine.Physics.Raycast(firingPos, firingDir, out hitInfo, launchOffset, 1236478737))
+			{
+				launchOffset = hitInfo.distance - 0.1f;
+			}
+			Item item = obj[obj.Count - 1];
+			ItemModProjectile component = item.info.GetComponent<ItemModProjectile>();
+			BaseEntity baseEntity = GameManager.server.CreateEntity(component.projectileObject.resourcePath, firingPos + firingDir * launchOffset);
+			projectile = baseEntity.GetComponent<ServerProjectile>();
+			Vector3 vector = projectile.initialVelocity + firingDir * projectile.speed;
+			if (minSpeed > 0f)
+			{
+				float num2 = Vector3.Dot(vector, firingDir) - minSpeed;
+				if (num2 < 0f)
+				{
+					vector += firingDir * (0f - num2);
+				}
+			}
+			projectile.InitializeVelocity(vector);
+			if (BaseEntityEx.IsValid(driver))
+			{
+				baseEntity.creatorEntity = driver;
+				baseEntity.OwnerID = driver.userID;
+			}
+			baseEntity.Spawn();
+			item.UseItem();
+			result = true;
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		return result;
 	}
 
 	public virtual bool IsInstrument()

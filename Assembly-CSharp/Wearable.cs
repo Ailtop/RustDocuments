@@ -67,6 +67,9 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	public RemoveSkin removeSkin;
 
 	[InspectorFlags]
+	public RemoveSkin removeSkinFirstPerson;
+
+	[InspectorFlags]
 	public RemoveHair removeHair;
 
 	[InspectorFlags]
@@ -87,6 +90,10 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	public string followBone;
 
 	public bool disableRigStripping;
+
+	public bool overrideDownLimit;
+
+	public float downLimit = 70f;
 
 	[HideInInspector]
 	public PlayerModelHair playerModelHair;
@@ -125,6 +132,9 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[Range(0f, 5f)]
 	public float ExtraLeanBack;
 
+	[Tooltip("Enable this to check for BoneRetargets which need to be preserved in first person view")]
+	public bool PreserveBones;
+
 	public Renderer[] RenderersLod0;
 
 	public Renderer[] RenderersLod1;
@@ -132,6 +142,8 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	public Renderer[] RenderersLod2;
 
 	public Renderer[] RenderersLod3;
+
+	public Renderer[] SkipInFirstPersonLegs;
 
 	private static LOD[] emptyLOD = new LOD[1];
 

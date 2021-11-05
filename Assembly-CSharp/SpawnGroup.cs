@@ -37,6 +37,8 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public bool forceInitialSpawn;
 
+	public bool preventDuplicates;
+
 	protected bool fillOnSpawn;
 
 	public BaseSpawnPoint[] spawnPoints;
@@ -112,6 +114,19 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		spawnInstances.Clear();
 	}
 
+	public bool HasSpawned(uint prefabID)
+	{
+		foreach (SpawnPointInstance spawnInstance in spawnInstances)
+		{
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(spawnInstance.gameObject);
+			if ((bool)baseEntity && baseEntity.prefabID == prefabID)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public virtual void SpawnInitial()
 	{
 		if (wantsInitialSpawn)
@@ -175,20 +190,24 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 			Vector3 pos;
 			Quaternion rot;
 			BaseSpawnPoint spawnPoint = GetSpawnPoint(prefab, out pos, out rot);
-			if ((bool)spawnPoint)
+			if (!spawnPoint)
 			{
-				BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot, false);
-				if ((bool)baseEntity)
+				continue;
+			}
+			BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot, false);
+			if ((bool)baseEntity)
+			{
+				if (baseEntity.enableSaving && !(spawnPoint is SpaceCheckingSpawnPoint))
 				{
 					baseEntity.enableSaving = false;
-					PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
-					baseEntity.Spawn();
-					PostSpawnProcess(baseEntity, spawnPoint);
-					SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
-					spawnPointInstance.parentSpawnPointUser = this;
-					spawnPointInstance.parentSpawnPoint = spawnPoint;
-					spawnPointInstance.Notify();
 				}
+				PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
+				baseEntity.Spawn();
+				PostSpawnProcess(baseEntity, spawnPoint);
+				SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
+				spawnPointInstance.parentSpawnPointUser = this;
+				spawnPointInstance.parentSpawnPoint = spawnPoint;
+				spawnPointInstance.Notify();
 			}
 		}
 	}
@@ -199,7 +218,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	protected GameObjectRef GetPrefab()
 	{
-		float num = prefabs.Sum((SpawnEntry x) => x.weight);
+		float num = prefabs.Sum((SpawnEntry x) => (!preventDuplicates || !HasSpawned(x.prefab.resourceID)) ? x.weight : 0);
 		if (num == 0f)
 		{
 			return null;
@@ -207,7 +226,8 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 		float num2 = UnityEngine.Random.Range(0f, num);
 		foreach (SpawnEntry prefab in prefabs)
 		{
-			if ((num2 -= (float)prefab.weight) <= 0f)
+			int num3 = ((!preventDuplicates || !HasSpawned(prefab.prefab.resourceID)) ? prefab.weight : 0);
+			if ((num2 -= (float)num3) <= 0f)
 			{
 				return prefab.prefab;
 			}

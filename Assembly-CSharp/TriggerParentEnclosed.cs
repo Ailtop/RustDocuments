@@ -16,7 +16,7 @@ public class TriggerParentEnclosed : TriggerParent
 
 	public bool CheckBoundsOnUnparent;
 
-	private BoxCollider boxCollider;
+	public BoxCollider boxCollider;
 
 	protected void OnEnable()
 	{
@@ -50,7 +50,7 @@ public class TriggerParentEnclosed : TriggerParent
 		return IsInside(baseEntity, 0f);
 	}
 
-	private bool IsInside(BaseEntity ent, float padding)
+	public bool IsInside(BaseEntity ent, float padding)
 	{
 		Bounds bounds = new Bounds(boxCollider.center, boxCollider.size);
 		if (padding > 0f)

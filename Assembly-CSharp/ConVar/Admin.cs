@@ -87,6 +87,9 @@ namespace ConVar
 			public string Help;
 		}
 
+		[ReplicatedVar(Help = "Controls whether the in-game admin UI is displayed to admins")]
+		public static bool allowAdminUI = true;
+
 		[ServerVar(Help = "Print out currently connected clients")]
 		public static void status(Arg arg)
 		{
@@ -95,7 +98,7 @@ namespace ConVar
 			if (@string.Length == 0)
 			{
 				text = text + "hostname: " + Server.hostname + "\n";
-				text = text + "version : " + 2318 + " secure (secure mode enabled, connected to Steam3)\n";
+				text = text + "version : " + 2321 + " secure (secure mode enabled, connected to Steam3)\n";
 				text = text + "map     : " + Server.level + "\n";
 				text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 			}
@@ -949,18 +952,28 @@ namespace ConVar
 		[ServerVar]
 		public static void AdminUI_RequestPlayerList(Arg arg)
 		{
-			ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceivePlayerList", JsonConvert.SerializeObject(playerlist()));
+			if (allowAdminUI)
+			{
+				ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceivePlayerList", JsonConvert.SerializeObject(playerlist()));
+			}
 		}
 
 		[ServerVar]
 		public static void AdminUI_RequestServerInfo(Arg arg)
 		{
-			ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceiveServerInfo", JsonConvert.SerializeObject(ServerInfo()));
+			if (allowAdminUI)
+			{
+				ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceiveServerInfo", JsonConvert.SerializeObject(ServerInfo()));
+			}
 		}
 
 		[ServerVar]
 		public static void AdminUI_RequestServerConvars(Arg arg)
 		{
+			if (!allowAdminUI)
+			{
+				return;
+			}
 			List<ServerConvarInfo> obj = Facepunch.Pool.GetList<ServerConvarInfo>();
 			Command[] all = Index.All;
 			foreach (Command command in all)

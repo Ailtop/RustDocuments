@@ -356,7 +356,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			{
 				num4 = item.amount;
 			}
-			num4 = Mathf.Clamp(num4, 1, item.MaxStackable());
+			num4 = Mathf.Clamp(num4, 1, item.info.stackable);
 			if (msg.player.GetActiveItem() == item)
 			{
 				msg.player.UpdateActiveItem(0u);
@@ -465,6 +465,14 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		if (obj is bool)
 		{
 			return (bool)obj;
+		}
+		if (component.npcOnly)
+		{
+			BasePlayer basePlayer = base.baseEntity;
+			if (basePlayer != null && !basePlayer.IsNpc)
+			{
+				return false;
+			}
 		}
 		Item[] array = containerWear.itemList.ToArray();
 		foreach (Item item2 in array)
@@ -771,8 +779,9 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			BaseGameMode.GetActiveGameMode(true).LoadoutPlayer(base.baseEntity);
 			return;
 		}
-		ulong skin = 0uL;
+		ulong num = 0uL;
 		int infoInt = base.baseEntity.GetInfoInt("client.rockskin", 0);
+		bool flag = false;
 		if (infoInt > 0 && base.baseEntity.blueprints.steamInventory.HasItem(infoInt))
 		{
 			ItemDefinition itemDefinition = ItemManager.FindItemDefinition("rock");
@@ -781,11 +790,29 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				IPlayerItemDefinition itemDefinition2 = PlatformService.Instance.GetItemDefinition(infoInt);
 				if (itemDefinition2 != null)
 				{
-					skin = itemDefinition2.WorkshopDownload;
+					num = itemDefinition2.WorkshopDownload;
+				}
+				if (num == 0L && itemDefinition.skins != null)
+				{
+					ItemSkinDirectory.Skin[] skins = itemDefinition.skins;
+					for (int i = 0; i < skins.Length; i++)
+					{
+						ItemSkinDirectory.Skin skin = skins[i];
+						ItemSkin itemSkin;
+						if (skin.id == infoInt && skin.invItem != null && (object)(itemSkin = skin.invItem as ItemSkin) != null && itemSkin.Redirect != null)
+						{
+							GiveItem(ItemManager.CreateByName(itemSkin.Redirect.shortname, 1, 0uL), containerBelt);
+							flag = true;
+							break;
+						}
+					}
 				}
 			}
 		}
-		GiveItem(ItemManager.CreateByName("rock", 1, skin), containerBelt);
+		if (!flag)
+		{
+			GiveItem(ItemManager.CreateByName("rock", 1, num), containerBelt);
+		}
 		GiveItem(ItemManager.CreateByName("torch", 1, 0uL), containerBelt);
 		if (IsBirthday())
 		{

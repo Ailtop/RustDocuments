@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 {
+	[Header("LOS")]
+	public int AdditionalLosBlockingLayer;
+
 	[Header("Loot")]
 	public LootContainer.LootSpawnSlot[] LootSpawnSlots;
 
@@ -339,9 +342,18 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 
 	public bool IsTarget(BaseEntity entity)
 	{
-		if (entity is BasePlayer)
+		if (entity is BasePlayer && !entity.IsNpc)
 		{
-			return !entity.IsNpc;
+			return true;
+		}
+		if (entity is BasePet)
+		{
+			return true;
+		}
+		HTNPlayer hTNPlayer;
+		if ((object)(hTNPlayer = entity as HTNPlayer) != null && hTNPlayer.faction == Faction.Horror)
+		{
+			return true;
 		}
 		return false;
 	}
@@ -376,7 +388,11 @@ public class HumanNPCNew : NPCPlayer, IAISenses, IAIAttack, IThinker
 		{
 			return false;
 		}
-		return IsPlayerVisibleToUs(basePlayer);
+		if (AdditionalLosBlockingLayer == 0)
+		{
+			return IsPlayerVisibleToUs(basePlayer, 1218519041);
+		}
+		return IsPlayerVisibleToUs(basePlayer, 0x48A12001 | (1 << AdditionalLosBlockingLayer));
 	}
 
 	public bool NeedsToReload()

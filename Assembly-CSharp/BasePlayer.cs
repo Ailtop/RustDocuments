@@ -22,7 +22,7 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BasePlayer : BaseCombatEntity
+public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 {
 	public enum CameraMode
 	{
@@ -336,6 +336,12 @@ public class BasePlayer : BaseCombatEntity
 
 	public float nextSeatSwapTime;
 
+	public BaseEntity PetEntity;
+
+	public IPet Pet;
+
+	private float lastPetCommandIssuedTime;
+
 	private bool _playerStateDirty;
 
 	public Dictionary<int, FiredProjectile> firedProjectiles = new Dictionary<int, FiredProjectile>();
@@ -578,6 +584,8 @@ public class BasePlayer : BaseCombatEntity
 
 	[NonSerialized]
 	public IPlayer IPlayer;
+
+	public Translate.Phrase LootPanelTitle => displayName;
 
 	public bool IsReceivingSnapshot => HasPlayerFlag(PlayerFlags.ReceivingSnapshot);
 
@@ -1094,6 +1102,64 @@ public class BasePlayer : BaseCombatEntity
 				}
 				return true;
 			}
+			if (rpc == 1497207530 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - IssuePetCommand "));
+				}
+				using (TimeWarning.New("IssuePetCommand"))
+				{
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							IssuePetCommand(msg4);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in IssuePetCommand");
+					}
+				}
+				return true;
+			}
+			if (rpc == 2041023702 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - IssuePetCommandRaycast "));
+				}
+				using (TimeWarning.New("IssuePetCommandRaycast"))
+				{
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg5 = rPCMessage;
+							IssuePetCommandRaycast(msg5);
+						}
+					}
+					catch (Exception exception4)
+					{
+						Debug.LogException(exception4);
+						player.Kick("RPC Error in IssuePetCommandRaycast");
+					}
+				}
+				return true;
+			}
 			if (rpc == 1998170713 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -1118,13 +1184,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg4 = rPCMessage;
-							OnPlayerLanded(msg4);
+							RPCMessage msg6 = rPCMessage;
+							OnPlayerLanded(msg6);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception5)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in OnPlayerLanded");
 					}
 				}
@@ -1154,13 +1220,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg5 = rPCMessage;
-							OnPlayerReported(msg5);
+							RPCMessage msg7 = rPCMessage;
+							OnPlayerReported(msg7);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception6)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in OnPlayerReported");
 					}
 				}
@@ -1190,13 +1256,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg6 = rPCMessage;
-							OnProjectileAttack(msg6);
+							RPCMessage msg8 = rPCMessage;
+							OnProjectileAttack(msg8);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception exception7)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(exception7);
 						player.Kick("RPC Error in OnProjectileAttack");
 					}
 				}
@@ -1226,13 +1292,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg7 = rPCMessage;
-							OnProjectileRicochet(msg7);
+							RPCMessage msg9 = rPCMessage;
+							OnProjectileRicochet(msg9);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception exception8)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(exception8);
 						player.Kick("RPC Error in OnProjectileRicochet");
 					}
 				}
@@ -1262,13 +1328,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg8 = rPCMessage;
-							OnProjectileUpdate(msg8);
+							RPCMessage msg10 = rPCMessage;
+							OnProjectileUpdate(msg10);
 						}
 					}
-					catch (Exception exception7)
+					catch (Exception exception9)
 					{
-						Debug.LogException(exception7);
+						Debug.LogException(exception9);
 						player.Kick("RPC Error in OnProjectileUpdate");
 					}
 				}
@@ -1298,13 +1364,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg9 = rPCMessage;
-							PerformanceReport(msg9);
+							RPCMessage msg11 = rPCMessage;
+							PerformanceReport(msg11);
 						}
 					}
-					catch (Exception exception8)
+					catch (Exception exception10)
 					{
-						Debug.LogException(exception8);
+						Debug.LogException(exception10);
 						player.Kick("RPC Error in PerformanceReport");
 					}
 				}
@@ -1338,13 +1404,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg10 = rPCMessage;
-							RequestRespawnInformation(msg10);
+							RPCMessage msg12 = rPCMessage;
+							RequestRespawnInformation(msg12);
 						}
 					}
-					catch (Exception exception9)
+					catch (Exception exception11)
 					{
-						Debug.LogException(exception9);
+						Debug.LogException(exception11);
 						player.Kick("RPC Error in RequestRespawnInformation");
 					}
 				}
@@ -1374,13 +1440,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg11 = rPCMessage;
-							RPC_Assist(msg11);
+							RPCMessage msg13 = rPCMessage;
+							RPC_Assist(msg13);
 						}
 					}
-					catch (Exception exception10)
+					catch (Exception exception12)
 					{
-						Debug.LogException(exception10);
+						Debug.LogException(exception12);
 						player.Kick("RPC Error in RPC_Assist");
 					}
 				}
@@ -1410,13 +1476,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg12 = rPCMessage;
-							RPC_KeepAlive(msg12);
+							RPCMessage msg14 = rPCMessage;
+							RPC_KeepAlive(msg14);
 						}
 					}
-					catch (Exception exception11)
+					catch (Exception exception13)
 					{
-						Debug.LogException(exception11);
+						Debug.LogException(exception13);
 						player.Kick("RPC Error in RPC_KeepAlive");
 					}
 				}
@@ -1446,13 +1512,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg13 = rPCMessage;
-							RPC_LootPlayer(msg13);
+							RPCMessage msg15 = rPCMessage;
+							RPC_LootPlayer(msg15);
 						}
 					}
-					catch (Exception exception12)
+					catch (Exception exception14)
 					{
-						Debug.LogException(exception12);
+						Debug.LogException(exception14);
 						player.Kick("RPC Error in RPC_LootPlayer");
 					}
 				}
@@ -1475,13 +1541,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg14 = rPCMessage;
-							RPC_StartClimb(msg14);
+							RPCMessage msg16 = rPCMessage;
+							RPC_StartClimb(msg16);
 						}
 					}
-					catch (Exception exception13)
+					catch (Exception exception15)
 					{
-						Debug.LogException(exception13);
+						Debug.LogException(exception15);
 						player.Kick("RPC Error in RPC_StartClimb");
 					}
 				}
@@ -1511,13 +1577,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg15 = rPCMessage;
-							Server_AddMarker(msg15);
+							RPCMessage msg17 = rPCMessage;
+							Server_AddMarker(msg17);
 						}
 					}
-					catch (Exception exception14)
+					catch (Exception exception16)
 					{
-						Debug.LogException(exception14);
+						Debug.LogException(exception16);
 						player.Kick("RPC Error in Server_AddMarker");
 					}
 				}
@@ -1550,9 +1616,9 @@ public class BasePlayer : BaseCombatEntity
 							Server_CancelGesture();
 						}
 					}
-					catch (Exception exception15)
+					catch (Exception exception17)
 					{
-						Debug.LogException(exception15);
+						Debug.LogException(exception17);
 						player.Kick("RPC Error in Server_CancelGesture");
 					}
 				}
@@ -1582,13 +1648,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg16 = rPCMessage;
-							Server_ClearMapMarkers(msg16);
+							RPCMessage msg18 = rPCMessage;
+							Server_ClearMapMarkers(msg18);
 						}
 					}
-					catch (Exception exception16)
+					catch (Exception exception18)
 					{
-						Debug.LogException(exception16);
+						Debug.LogException(exception18);
 						player.Kick("RPC Error in Server_ClearMapMarkers");
 					}
 				}
@@ -1618,13 +1684,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg17 = rPCMessage;
-							Server_RemovePointOfInterest(msg17);
+							RPCMessage msg19 = rPCMessage;
+							Server_RemovePointOfInterest(msg19);
 						}
 					}
-					catch (Exception exception17)
+					catch (Exception exception19)
 					{
-						Debug.LogException(exception17);
+						Debug.LogException(exception19);
 						player.Kick("RPC Error in Server_RemovePointOfInterest");
 					}
 				}
@@ -1654,13 +1720,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg18 = rPCMessage;
-							Server_RequestMarkers(msg18);
+							RPCMessage msg20 = rPCMessage;
+							Server_RequestMarkers(msg20);
 						}
 					}
-					catch (Exception exception18)
+					catch (Exception exception20)
 					{
-						Debug.LogException(exception18);
+						Debug.LogException(exception20);
 						player.Kick("RPC Error in Server_RequestMarkers");
 					}
 				}
@@ -1694,13 +1760,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg19 = rPCMessage;
-							Server_StartGesture(msg19);
+							RPCMessage msg21 = rPCMessage;
+							Server_StartGesture(msg21);
 						}
 					}
-					catch (Exception exception19)
+					catch (Exception exception21)
 					{
-						Debug.LogException(exception19);
+						Debug.LogException(exception21);
 						player.Kick("RPC Error in Server_StartGesture");
 					}
 				}
@@ -1723,13 +1789,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg20 = rPCMessage;
-							ServerRPC_UnderwearChange(msg20);
+							RPCMessage msg22 = rPCMessage;
+							ServerRPC_UnderwearChange(msg22);
 						}
 					}
-					catch (Exception exception20)
+					catch (Exception exception22)
 					{
-						Debug.LogException(exception20);
+						Debug.LogException(exception22);
 						player.Kick("RPC Error in ServerRPC_UnderwearChange");
 					}
 				}
@@ -1752,13 +1818,13 @@ public class BasePlayer : BaseCombatEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg21 = rPCMessage;
-							SV_Drink(msg21);
+							RPCMessage msg23 = rPCMessage;
+							SV_Drink(msg23);
 						}
 					}
-					catch (Exception exception21)
+					catch (Exception exception23)
 					{
-						Debug.LogException(exception21);
+						Debug.LogException(exception23);
 						player.Kick("RPC Error in SV_Drink");
 					}
 				}
@@ -2115,9 +2181,9 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
@@ -2197,9 +2263,9 @@ public class BasePlayer : BaseCombatEntity
 		{
 			return true;
 		}
-		if (!IsWounded() && !(currentGesture != null) && !IsDead() && !IsSleeping())
+		if (!IsWounded() && !(currentGesture != null) && !IsDead())
 		{
-			return modelState.ducked;
+			return IsSleeping();
 		}
 		return true;
 	}
@@ -2683,7 +2749,7 @@ public class BasePlayer : BaseCombatEntity
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 217;
+		missions.protocol = 218;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2783,7 +2849,7 @@ public class BasePlayer : BaseCombatEntity
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (217 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (218 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -2911,7 +2977,7 @@ public class BasePlayer : BaseCombatEntity
 	public BaseVehicle GetMountedVehicle()
 	{
 		BaseMountable baseMountable = GetMounted();
-		if (baseMountable == null)
+		if (!BaseEntityEx.IsValid(baseMountable))
 		{
 			return null;
 		}
@@ -2969,6 +3035,69 @@ public class BasePlayer : BaseCombatEntity
 			if (baseMountable != null && baseMountable.GetDismountPosition(this, out res))
 			{
 				MovePosition(res);
+			}
+		}
+	}
+
+	public void ClearClientPetLink()
+	{
+		ClientRPCPlayer(null, this, "CLIENT_SetPetPrefabID", 0, 0);
+	}
+
+	public void SendClientPetLink()
+	{
+		BasePet value;
+		if (PetEntity == null && BasePet.ActivePetByOwnerID.TryGetValue(userID, out value) && value.Brain != null)
+		{
+			value.Brain.SetOwningPlayer(this);
+		}
+		ClientRPCPlayer(null, this, "CLIENT_SetPetPrefabID", (PetEntity != null) ? PetEntity.prefabID : 0u, (PetEntity != null) ? PetEntity.net.ID : 0u);
+		if (PetEntity != null)
+		{
+			SendClientPetStateIndex();
+		}
+	}
+
+	public void SendClientPetStateIndex()
+	{
+		BasePet basePet = PetEntity as BasePet;
+		if (!(basePet == null))
+		{
+			ClientRPCPlayer(null, this, "CLIENT_SetPetPetLoadedStateIndex", basePet.Brain.LoadedDesignIndex());
+		}
+	}
+
+	[RPC_Server]
+	private void IssuePetCommand(RPCMessage msg)
+	{
+		ParsePetCommand(msg, false);
+	}
+
+	[RPC_Server]
+	private void IssuePetCommandRaycast(RPCMessage msg)
+	{
+		ParsePetCommand(msg, true);
+	}
+
+	private void ParsePetCommand(RPCMessage msg, bool raycast)
+	{
+		if (UnityEngine.Time.time - lastPetCommandIssuedTime <= 1f)
+		{
+			return;
+		}
+		lastPetCommandIssuedTime = UnityEngine.Time.time;
+		if (!(msg.player == null) && Pet != null && Pet.IsOwnedBy(msg.player))
+		{
+			int cmd = msg.read.Int32();
+			int param = msg.read.Int32();
+			if (raycast)
+			{
+				Ray value = msg.read.Ray();
+				Pet.IssuePetCommand((PetCommandType)cmd, param, value);
+			}
+			else
+			{
+				Pet.IssuePetCommand((PetCommandType)cmd, param, null);
 			}
 		}
 	}
@@ -3197,6 +3326,10 @@ public class BasePlayer : BaseCombatEntity
 			stats.combat.Log(hitInfo, "projectile_invalid");
 			return;
 		}
+		hitInfo.ProjectileHits = value.hits;
+		hitInfo.ProjectileIntegrity = value.integrity;
+		hitInfo.ProjectileTravelTime = value.travelTime;
+		hitInfo.ProjectileTrajectoryMismatch = value.trajectoryMismatch;
 		if (value.integrity <= 0f)
 		{
 			AntiHack.Log(this, AntiHackType.ProjectileHack, "Integrity is zero (" + playerAttack.projectileID + ")");
@@ -3495,7 +3628,7 @@ public class BasePlayer : BaseCombatEntity
 		firedProjectiles[playerAttack.projectileID] = value;
 		if (flag6)
 		{
-			if (value.hits <= 1)
+			if (value.hits <= 2)
 			{
 				hitEntity.OnAttacked(hitInfo);
 			}
@@ -4586,10 +4719,11 @@ public class BasePlayer : BaseCombatEntity
 			EACServer.OnFinishLoading(net.connection);
 		}
 		Debug.Log($"{this} has spawned");
-		if (Demo.recordlist.Contains(UserIDString))
+		if ((Demo.recordlistmode == 0) ? Demo.recordlist.Contains(UserIDString) : (!Demo.recordlist.Contains(UserIDString)))
 		{
 			StartDemoRecording();
 		}
+		SendClientPetLink();
 	}
 
 	[RPC_Server]
@@ -5835,18 +5969,18 @@ public class BasePlayer : BaseCombatEntity
 		}
 	}
 
-	public bool IsPlayerVisibleToUs(BasePlayer otherPlayer)
+	public bool IsPlayerVisibleToUs(BasePlayer otherPlayer, int layerMask)
 	{
 		if (otherPlayer == null)
 		{
 			return false;
 		}
 		UnityEngine.Vector3 vector = (isMounted ? eyes.worldMountedPosition : (IsDucked() ? eyes.worldCrouchedPosition : ((!IsCrawling()) ? eyes.worldStandingPosition : eyes.worldCrawlingPosition)));
-		if (!otherPlayer.IsVisible(vector, otherPlayer.CenterPoint()) && !otherPlayer.IsVisible(vector, otherPlayer.transform.position) && !otherPlayer.IsVisible(vector, otherPlayer.eyes.position))
+		if (!otherPlayer.IsVisibleSpecificLayers(vector, otherPlayer.CenterPoint(), layerMask) && !otherPlayer.IsVisibleSpecificLayers(vector, otherPlayer.transform.position, layerMask) && !otherPlayer.IsVisibleSpecificLayers(vector, otherPlayer.eyes.position, layerMask))
 		{
 			return false;
 		}
-		if (!IsVisible(otherPlayer.CenterPoint(), vector) && !IsVisible(otherPlayer.transform.position, vector) && !IsVisible(otherPlayer.eyes.position, vector))
+		if (!IsVisibleSpecificLayers(otherPlayer.CenterPoint(), vector, layerMask) && !IsVisibleSpecificLayers(otherPlayer.transform.position, vector, layerMask) && !IsVisibleSpecificLayers(otherPlayer.eyes.position, vector, layerMask))
 		{
 			return false;
 		}
@@ -7242,7 +7376,7 @@ public class BasePlayer : BaseCombatEntity
 		if (playerRigidbody != null)
 		{
 			RemoveFromTriggers();
-			GameManager.Destroy(playerRigidbody);
+			UnityEngine.Object.DestroyImmediate(playerRigidbody);
 			playerRigidbody = null;
 		}
 	}

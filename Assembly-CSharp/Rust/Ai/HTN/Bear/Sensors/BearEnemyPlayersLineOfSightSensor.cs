@@ -52,14 +52,14 @@ namespace Rust.Ai.HTN.Bear.Sensors
 			}
 			float maxDistance = bearDomain.BearDefinition.AggroRange(isStanding);
 			Ray ray = AimAtBody(npc, ref info);
-			if (info.Player.IsVisible(ray, maxDistance))
+			if (info.Player.IsVisible(ray, 1218519041, maxDistance))
 			{
 				info.BodyVisible = true;
 				npc.AiDomain.NpcContext.EnemyPlayersInLineOfSight.Add(info);
 				return;
 			}
 			ray = AimAtHead(npc, ref info);
-			if (info.Player.IsVisible(ray, maxDistance))
+			if (info.Player.IsVisible(ray, 1218519041, maxDistance))
 			{
 				info.HeadVisible = true;
 				npc.AiDomain.NpcContext.EnemyPlayersInLineOfSight.Add(info);

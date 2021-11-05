@@ -121,6 +121,8 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		}
 	}
 
+	public SamSite.SamTargetType SAMTargetType => SamSite.targetTypeVehicle;
+
 	public float GetFuelFraction()
 	{
 		if (base.isServer)
@@ -156,14 +158,18 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		fuelSystem = new EntityFuelSystem(this, base.isServer);
 	}
 
-	public bool IsValidSAMTarget()
-	{
-		return true;
-	}
-
 	public override float GetServiceCeiling()
 	{
 		return HotAirBalloon.serviceCeiling;
+	}
+
+	public bool IsValidSAMTarget(bool staticRespawn)
+	{
+		if (staticRespawn)
+		{
+			return true;
+		}
+		return !InSafeZone();
 	}
 
 	public override void PilotInput(InputState inputState, BasePlayer player)
@@ -356,16 +362,13 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (isSpawned)
+		if ((IsOn() || IsStartingUp) && ((UnityEngine.Time.time > lastPlayerInputTime + 1f && !HasDriver()) || !fuelSystem.HasFuel() || Waterlogged()))
 		{
-			if ((IsOn() || IsStartingUp) && ((UnityEngine.Time.time > lastPlayerInputTime + 1f && !HasDriver()) || !fuelSystem.HasFuel() || Waterlogged()))
-			{
-				engineController.StopEngine();
-			}
-			if (IsOn())
-			{
-				fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelPerSec);
-			}
+			engineController.StopEngine();
+		}
+		if (IsOn())
+		{
+			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelPerSec);
 		}
 	}
 

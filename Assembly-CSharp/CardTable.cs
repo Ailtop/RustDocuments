@@ -574,7 +574,7 @@ public class CardTable : BaseVehicle
 	private void RPC_Play(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (player != null && player.GetMountedVehicle() == this)
+		if (player != null && PlayerIsMounted(player))
 		{
 			GameController.JoinTable(player);
 		}
@@ -585,7 +585,7 @@ public class CardTable : BaseVehicle
 	private void RPC_OpenLoot(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (player != null && player.GetMountedVehicle() == this)
+		if (player != null && PlayerIsMounted(player))
 		{
 			GetPlayerStorage(player.userID).PlayerOpenLoot(player);
 		}

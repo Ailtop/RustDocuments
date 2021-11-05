@@ -2143,9 +2143,9 @@ namespace Rust.Ai.HTN.Scientist
 		[SerializeField]
 		private Vector3 _spawnPosition;
 
-		[Header("Sensors")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Sensors")]
 		private List<INpcSensor> _sensors = new List<INpcSensor>
 		{
 			new PlayersInRangeSensor
@@ -2191,9 +2191,9 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
-		[SerializeField]
 		[Header("Reasoners")]
 		[ReadOnly]
+		[SerializeField]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2282,9 +2282,9 @@ namespace Rust.Ai.HTN.Scientist
 			}
 		};
 
+		[SerializeField]
 		[Header("Firearm Utility")]
 		[ReadOnly]
-		[SerializeField]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]

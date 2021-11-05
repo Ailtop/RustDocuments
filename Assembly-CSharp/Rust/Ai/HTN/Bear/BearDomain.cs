@@ -1136,9 +1136,9 @@ namespace Rust.Ai.HTN.Bear
 		[SerializeField]
 		private BearContext _context;
 
-		[SerializeField]
 		[Header("Navigation")]
 		[ReadOnly]
+		[SerializeField]
 		private NavMeshAgent _navAgent;
 
 		[ReadOnly]

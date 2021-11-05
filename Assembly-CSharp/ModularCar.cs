@@ -372,10 +372,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (base.isClient || !isSpawned)
-		{
-			return;
-		}
 		float speed = GetSpeed();
 		carPhysics.FixedUpdate(UnityEngine.Time.fixedDeltaTime, speed);
 		if (CurEngineState != 0 && !CanRunEngines())

@@ -311,7 +311,7 @@ public class ShopFront : StorageContainer
 		return false;
 	}
 
-	public override bool CanOpenLootPanel(BasePlayer player, string panelName = "")
+	public override bool CanOpenLootPanel(BasePlayer player, string panelName)
 	{
 		if (base.CanOpenLootPanel(player, panelName))
 		{

@@ -722,6 +722,11 @@ public class VendingMachine : StorageContainer
 			else
 			{
 				num7 += item2.amount;
+				object obj3 = Interface.CallHook("CanPurchaseItem", buyer, item2, onItemPurchased, this, targetContainer);
+				if (obj3 is bool)
+				{
+					return (bool)obj3;
+				}
 				if (targetContainer == null)
 				{
 					GiveSoldItem(item2, buyer);
@@ -885,7 +890,7 @@ public class VendingMachine : StorageContainer
 		return CanPlayerAdmin(player);
 	}
 
-	public override bool CanOpenLootPanel(BasePlayer player, string panelName = "")
+	public override bool CanOpenLootPanel(BasePlayer player, string panelName)
 	{
 		object obj = Interface.CallHook("CanUseVending", player, this);
 		if (obj is bool)

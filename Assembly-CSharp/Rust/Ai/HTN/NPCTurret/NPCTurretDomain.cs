@@ -574,9 +574,9 @@ namespace Rust.Ai.HTN.NPCTurret
 		[SerializeField]
 		private NPCTurretContext _context;
 
-		[SerializeField]
 		[Header("Navigation")]
 		[ReadOnly]
+		[SerializeField]
 		private Vector3 _spawnPosition;
 
 		[Header("Sensors")]

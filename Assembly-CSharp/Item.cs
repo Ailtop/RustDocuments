@@ -1089,6 +1089,21 @@ public class Item
 		}
 	}
 
+	public int GetAmmoAmount(AmmoTypes ammoType)
+	{
+		int num = 0;
+		ItemModProjectile component;
+		if (info.TryGetComponent<ItemModProjectile>(out component) && component.IsAmmo(ammoType))
+		{
+			num += amount;
+		}
+		if (contents != null)
+		{
+			num += contents.GetAmmoAmount(ammoType);
+		}
+		return num;
+	}
+
 	public override string ToString()
 	{
 		return "Item." + info.shortname + "x" + amount + "." + uid;

@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInventory.ICanMoveFrom
+public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHasLootPanel, PlayerInventory.ICanMoveFrom
 {
 	public static readonly Translate.Phrase LockedMessage = new Translate.Phrase("storage.locked", "Can't loot right now");
 
@@ -26,6 +26,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 
 	public string panelName = "generic";
 
+	public Translate.Phrase panelTitle = new Translate.Phrase("loot", "Loot");
+
 	public ItemContainer.ContentsType allowedContents;
 
 	public ItemDefinition allowedItem;
@@ -35,6 +37,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 	public int maxStackSize;
 
 	public bool needsBuildingPrivilegeToUse;
+
+	public bool mustBeMountedToUse;
 
 	public SoundDefinition openSound;
 
@@ -48,6 +52,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 	public ItemCategory onlyAcceptCategory = ItemCategory.All;
 
 	public bool onlyOneUser;
+
+	public Translate.Phrase LootPanelTitle => panelTitle;
 
 	public ItemContainer inventory { get; set; }
 
@@ -263,9 +269,9 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 		return !inventory.IsLocked();
 	}
 
-	public virtual bool CanOpenLootPanel(BasePlayer player, string panelName = "")
+	public virtual bool CanOpenLootPanel(BasePlayer player, string panelName)
 	{
-		if (needsBuildingPrivilegeToUse && !player.CanBuild())
+		if (!CanBeLooted(player))
 		{
 			return false;
 		}
@@ -276,6 +282,19 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, PlayerInvento
 			return false;
 		}
 		return true;
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (needsBuildingPrivilegeToUse && !player.CanBuild())
+		{
+			return false;
+		}
+		if (mustBeMountedToUse && !player.isMounted)
+		{
+			return false;
+		}
+		return base.CanBeLooted(player);
 	}
 
 	public virtual void AddContainers(PlayerLoot loot)

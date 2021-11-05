@@ -161,17 +161,12 @@ public class DecayEntity : BaseCombatEntity
 		BuildingManager.server.CheckSplit(this);
 	}
 
-	public void AttachToBuilding(DecayEntity other)
+	public virtual void AttachToBuilding(DecayEntity other)
 	{
 		if (other != null)
 		{
 			AttachToBuilding(other.buildingID);
 			BuildingManager.server.CheckMerge(this);
-			return;
-		}
-		if (this is BuildingBlock)
-		{
-			AttachToBuilding(BuildingManager.server.NewBuildingID());
 			return;
 		}
 		BuildingBlock nearbyBuildingBlock = GetNearbyBuildingBlock();

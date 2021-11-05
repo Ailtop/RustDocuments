@@ -39,6 +39,8 @@ public class MonumentNavMesh : FacepunchBehaviour, IServerComponent
 
 	public NavMeshCollectGeometry NavMeshCollectGeometry;
 
+	public bool forceCollectTerrain;
+
 	[ServerVar]
 	public static bool use_baked_terrain_mesh = true;
 
@@ -119,7 +121,7 @@ public class MonumentNavMesh : FacepunchBehaviour, IServerComponent
 		{
 			Bounds.size = new Vector3(CellSize * CellCount, Height, CellSize * CellCount);
 		}
-		IEnumerator enumerator = NavMeshTools.CollectSourcesAsync(Bounds, LayerMask, NavMeshCollectGeometry, defaultArea, use_baked_terrain_mesh, CellSize, sources, AppendModifierVolumes, UpdateNavMeshAsync);
+		IEnumerator enumerator = NavMeshTools.CollectSourcesAsync(Bounds, LayerMask, NavMeshCollectGeometry, defaultArea, use_baked_terrain_mesh && !forceCollectTerrain, CellSize, sources, AppendModifierVolumes, UpdateNavMeshAsync);
 		if (AiManager.nav_wait)
 		{
 			yield return enumerator;

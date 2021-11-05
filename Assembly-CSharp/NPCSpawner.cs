@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class NPCSpawner : SpawnGroup
 {
+	public int AdditionalLOSBlockingLayer;
+
 	public MonumentNavMesh monumentNavMesh;
 
 	public bool shouldFillOnSpawn;
@@ -58,6 +60,11 @@ public class NPCSpawner : SpawnGroup
 	{
 		base.PostSpawnProcess(entity, spawnPoint);
 		BaseNavigator component = entity.GetComponent<BaseNavigator>();
+		HumanNPCNew humanNPCNew;
+		if (AdditionalLOSBlockingLayer != 0 && entity != null && (object)(humanNPCNew = entity as HumanNPCNew) != null)
+		{
+			humanNPCNew.AdditionalLosBlockingLayer = AdditionalLOSBlockingLayer;
+		}
 		if (VirtualInfoZone != null)
 		{
 			if (VirtualInfoZone.Virtual)
@@ -66,10 +73,10 @@ public class NPCSpawner : SpawnGroup
 				if (nPCPlayer != null)
 				{
 					nPCPlayer.VirtualInfoZone = VirtualInfoZone;
-					HumanNPCNew humanNPCNew = nPCPlayer as HumanNPCNew;
-					if (humanNPCNew != null)
+					HumanNPCNew humanNPCNew2 = nPCPlayer as HumanNPCNew;
+					if (humanNPCNew2 != null)
 					{
-						humanNPCNew.VirtualInfoZone.RegisterSleepableEntity(humanNPCNew.Brain);
+						humanNPCNew2.VirtualInfoZone.RegisterSleepableEntity(humanNPCNew2.Brain);
 					}
 				}
 			}

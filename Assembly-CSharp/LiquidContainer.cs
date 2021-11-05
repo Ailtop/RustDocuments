@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -339,7 +340,7 @@ public class LiquidContainer : ContainerIOEntity
 	[RPC_Server.MaxDistance(3f)]
 	public void SVDrink(RPCMessage rpc)
 	{
-		if (!rpc.player.metabolism.CanConsume())
+		if (!rpc.player.metabolism.CanConsume() || Interface.CallHook("OnPlayerDrink", rpc.player, this) != null)
 		{
 			return;
 		}

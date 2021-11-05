@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class SpaceCheckingSpawnPoint : GenericSpawnPoint
 {
-	[SerializeField]
-	private bool useCustomBoundsCheckMask;
+	public bool useCustomBoundsCheckMask;
 
-	[SerializeField]
-	private LayerMask customBoundsCheckMask;
+	public LayerMask customBoundsCheckMask;
+
+	public float customBoundsCheckScale = 1f;
 
 	public override bool IsAvailableTo(GameObjectRef prefabRef)
 	{
@@ -16,8 +16,8 @@ public class SpaceCheckingSpawnPoint : GenericSpawnPoint
 		}
 		if (useCustomBoundsCheckMask)
 		{
-			return SpawnHandler.CheckBounds(prefabRef.Get(), base.transform.position, base.transform.rotation, Vector3.one, customBoundsCheckMask);
+			return SpawnHandler.CheckBounds(prefabRef.Get(), base.transform.position, base.transform.rotation, Vector3.one * customBoundsCheckScale, customBoundsCheckMask);
 		}
-		return SingletonComponent<SpawnHandler>.Instance.CheckBounds(prefabRef.Get(), base.transform.position, base.transform.rotation, Vector3.one);
+		return SingletonComponent<SpawnHandler>.Instance.CheckBounds(prefabRef.Get(), base.transform.position, base.transform.rotation, Vector3.one * customBoundsCheckScale);
 	}
 }

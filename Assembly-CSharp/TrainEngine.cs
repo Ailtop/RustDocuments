@@ -65,7 +65,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public Transform rightHandGrip;
 
 	[SerializeField]
-	public Canvas monitorConvas;
+	public Canvas monitorCanvas;
 
 	[SerializeField]
 	public RustText monitorText;
@@ -222,10 +222,6 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!IsFullySpawned())
-		{
-			return;
-		}
 		if (!engineController.IsOff && (!CanRunEngines() || !AnyPlayersOnTrain()))
 		{
 			engineController.StopEngine();

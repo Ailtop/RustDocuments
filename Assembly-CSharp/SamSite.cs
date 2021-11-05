@@ -8,7 +8,33 @@ public class SamSite : ContainerIOEntity
 {
 	public interface ISamSiteTarget
 	{
-		bool IsValidSAMTarget();
+		SamTargetType SAMTargetType { get; }
+
+		bool isClient { get; }
+
+		bool IsValidSAMTarget(bool staticRespawn);
+
+		Vector3 CenterPoint();
+
+		Vector3 GetWorldVelocity();
+
+		bool IsVisible(Vector3 position, float maxDistance = float.PositiveInfinity);
+	}
+
+	public class SamTargetType
+	{
+		public readonly float scanRadius;
+
+		public readonly float speedMultiplier;
+
+		public readonly float timeBetweenBursts;
+
+		public SamTargetType(float scanRadius, float speedMultiplier, float timeBetweenBursts)
+		{
+			this.scanRadius = scanRadius;
+			this.speedMultiplier = speedMultiplier;
+			this.timeBetweenBursts = timeBetweenBursts;
+		}
 	}
 
 	public Animator pitchAnimator;
@@ -31,9 +57,9 @@ public class SamSite : ContainerIOEntity
 
 	public Vector3 targetAimDir = Vector3.forward;
 
-	public BaseCombatEntity currentTarget;
+	public float vehicleScanRadius = 350f;
 
-	public float scanRadius = 350f;
+	public float missileScanRadius = 500f;
 
 	public GameObjectRef projectileTest;
 
@@ -44,9 +70,6 @@ public class SamSite : ContainerIOEntity
 	public ItemDefinition ammoType;
 
 	public Transform[] tubes;
-
-	[ServerVar(Help = "targetmode, 1 = all air vehicles, 0 = only hot air ballons and helicopters")]
-	public static bool alltarget = false;
 
 	[ServerVar(Help = "how long until static sam sites auto repair")]
 	public static float staticrepairseconds = 1200f;
@@ -62,6 +85,16 @@ public class SamSite : ContainerIOEntity
 	public float pitchGainLerp = 10f;
 
 	public float pitchGainMovementSpeedMult = 0.5f;
+
+	public static SamTargetType targetTypeUnknown;
+
+	public static SamTargetType targetTypeVehicle;
+
+	public static SamTargetType targetTypeMissile;
+
+	private ISamSiteTarget currentTarget;
+
+	private SamTargetType mostRecentTargetType;
 
 	public Item ammoItem;
 
@@ -94,6 +127,39 @@ public class SamSite : ContainerIOEntity
 		base.Load(info);
 	}
 
+	private void SetTarget(ISamSiteTarget target)
+	{
+		currentTarget = target;
+		if (!ObjectEx.IsUnityNull(target))
+		{
+			mostRecentTargetType = target.SAMTargetType;
+		}
+	}
+
+	private void ClearTarget()
+	{
+		SetTarget(null);
+	}
+
+	public override void ServerInit()
+	{
+		base.ServerInit();
+		targetTypeUnknown = new SamTargetType(vehicleScanRadius, 1f, 5f);
+		targetTypeVehicle = new SamTargetType(vehicleScanRadius, 1f, 5f);
+		targetTypeMissile = new SamTargetType(missileScanRadius, 2.25f, 3.5f);
+		mostRecentTargetType = targetTypeUnknown;
+		ClearTarget();
+		InvokeRandomized(TargetScan, 1f, 3f, 1f);
+		currentAimDir = base.transform.forward;
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		info.msg.samSite = Pool.Get<SAMSite>();
+		info.msg.samSite.aimDir = GetAimDir();
+	}
+
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
@@ -114,7 +180,7 @@ public class SamSite : ContainerIOEntity
 	{
 		if (staticRespawn)
 		{
-			currentTarget = null;
+			ClearTarget();
 			Quaternion quaternion = Quaternion.Euler(0f, Quaternion.LookRotation(currentAimDir, Vector3.up).eulerAngles.y, 0f);
 			currentAimDir = quaternion * Vector3.forward;
 			Invoke(SelfHeal, staticrepairseconds);
@@ -128,32 +194,27 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
-	public Vector3 EntityCenterPoint(BaseEntity ent)
-	{
-		return ent.transform.TransformPoint(ent.bounds.center);
-	}
-
 	public void FixedUpdate()
 	{
 		Vector3 vector = currentAimDir;
-		if (currentTarget != null && IsPowered())
+		if (!ObjectEx.IsUnityNull(currentTarget) && IsPowered())
 		{
-			float speed = projectileTest.Get().GetComponent<ServerProjectile>().speed;
-			Vector3 vector2 = EntityCenterPoint(currentTarget);
-			float num = Vector3.Distance(vector2, eyePoint.transform.position);
-			float num2 = num / speed;
-			Vector3 a = vector2 + currentTarget.GetWorldVelocity() * num2;
-			num2 = Vector3.Distance(a, eyePoint.transform.position) / speed;
-			a = vector2 + currentTarget.GetWorldVelocity() * num2;
+			float num = projectileTest.Get().GetComponent<ServerProjectile>().speed * currentTarget.SAMTargetType.speedMultiplier;
+			Vector3 vector2 = currentTarget.CenterPoint();
+			float num2 = Vector3.Distance(vector2, eyePoint.transform.position);
+			float num3 = num2 / num;
+			Vector3 a = vector2 + currentTarget.GetWorldVelocity() * num3;
+			num3 = Vector3.Distance(a, eyePoint.transform.position) / num;
+			a = vector2 + currentTarget.GetWorldVelocity() * num3;
 			if (currentTarget.GetWorldVelocity().magnitude > 0.1f)
 			{
-				float num3 = Mathf.Sin(Time.time * 3f) * (1f + num2 * 0.5f);
-				a += currentTarget.GetWorldVelocity().normalized * num3;
+				float num4 = Mathf.Sin(Time.time * 3f) * (1f + num3 * 0.5f);
+				a += currentTarget.GetWorldVelocity().normalized * num4;
 			}
 			currentAimDir = (a - eyePoint.transform.position).normalized;
-			if (num > scanRadius)
+			if (num2 > currentTarget.SAMTargetType.scanRadius)
 			{
-				currentTarget = null;
+				ClearTarget();
 			}
 		}
 		Vector3 eulerAngles = Quaternion.LookRotation(currentAimDir, base.transform.up).eulerAngles;
@@ -175,23 +236,9 @@ public class SamSite : ContainerIOEntity
 		return currentAimDir;
 	}
 
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		info.msg.samSite = Pool.Get<SAMSite>();
-		info.msg.samSite.aimDir = GetAimDir();
-	}
-
-	public override void ServerInit()
-	{
-		base.ServerInit();
-		InvokeRandomized(TargetScan, 1f, 3f, 1f);
-		currentAimDir = base.transform.forward;
-	}
-
 	public bool HasValidTarget()
 	{
-		return currentTarget != null;
+		return !ObjectEx.IsUnityNull(currentTarget);
 	}
 
 	public override bool CanPickup(BasePlayer player)
@@ -212,37 +259,36 @@ public class SamSite : ContainerIOEntity
 		}
 		if (Time.time > lastTargetVisibleTime + 3f)
 		{
-			currentTarget = null;
+			ClearTarget();
 		}
 		if (HasValidTarget() || IsDead())
 		{
 			return;
 		}
-		List<BaseCombatEntity> obj = Pool.GetList<BaseCombatEntity>();
-		Vis.Entities(eyePoint.transform.position, scanRadius, obj, 32768, QueryTriggerInteraction.Ignore);
-		BaseCombatEntity baseCombatEntity = null;
-		foreach (BaseCombatEntity item in obj)
+		List<ISamSiteTarget> obj = Pool.GetList<ISamSiteTarget>();
+		_003CTargetScan_003Eg__AddTargetSet_007C48_0<BaseVehicle>(obj, 32768, targetTypeVehicle.scanRadius);
+		_003CTargetScan_003Eg__AddTargetSet_007C48_0<MLRSRocket>(obj, 1048576, targetTypeMissile.scanRadius);
+		Interface.CallHook("OnSamSiteTargetScan", this, obj);
+		ISamSiteTarget samSiteTarget = null;
+		foreach (ISamSiteTarget item in obj)
 		{
-			if (!item.isClient && !(EntityCenterPoint(item).y < eyePoint.transform.position.y) && item.IsVisible(eyePoint.transform.position, scanRadius * 2f) && Interface.CallHook("OnSamSiteTarget", this, item) == null)
+			if (!item.isClient && !(item.CenterPoint().y < eyePoint.transform.position.y) && item.IsVisible(eyePoint.transform.position, item.SAMTargetType.scanRadius * 2f) && item.IsValidSAMTarget(staticRespawn) && Interface.CallHook("OnSamSiteTarget", this, item) == null)
 			{
-				BaseVehicle component = item.GetComponent<BaseVehicle>();
-				if ((staticRespawn || !(component != null) || !component.InSafeZone()) && (item.GetComponent<ISamSiteTarget>()?.IsValidSAMTarget() ?? alltarget))
-				{
-					baseCombatEntity = item;
-				}
+				samSiteTarget = item;
+				break;
 			}
 		}
-		if (baseCombatEntity != null && currentTarget != baseCombatEntity)
+		if (!ObjectEx.IsUnityNull(samSiteTarget) && currentTarget != samSiteTarget)
 		{
 			lockOnTime = Time.time + 0.5f;
 		}
-		currentTarget = baseCombatEntity;
-		if (currentTarget != null)
+		SetTarget(samSiteTarget);
+		if (!ObjectEx.IsUnityNull(currentTarget))
 		{
 			lastTargetVisibleTime = Time.time;
 		}
 		Pool.FreeList(ref obj);
-		if (currentTarget == null)
+		if (ObjectEx.IsUnityNull(currentTarget))
 		{
 			CancelInvoke(WeaponTick);
 		}
@@ -309,19 +355,25 @@ public class SamSite : ContainerIOEntity
 		}
 		if (firedCount >= 6)
 		{
-			nextBurstTime = Time.time + 5f;
+			float timeBetweenBursts = mostRecentTargetType.timeBetweenBursts;
+			nextBurstTime = Time.time + timeBetweenBursts;
 			firedCount = 0;
 			return;
 		}
 		EnsureReloaded();
-		if (HasAmmo() && Interface.CallHook("CanSamSiteShoot", this) == null)
+		if (Interface.CallHook("CanSamSiteShoot", this) == null && HasAmmo())
 		{
 			if (!staticRespawn && ammoItem != null)
 			{
 				ammoItem.UseItem();
 			}
 			firedCount++;
-			FireProjectile(tubes[currentTubeIndex].position, currentAimDir, currentTarget);
+			float speedMultiplier = 1f;
+			if (!ObjectEx.IsUnityNull(currentTarget))
+			{
+				speedMultiplier = currentTarget.SAMTargetType.speedMultiplier;
+			}
+			FireProjectile(tubes[currentTubeIndex].position, currentAimDir, speedMultiplier);
 			Effect.server.Run(muzzleFlashTest.resourcePath, this, StringPool.Get("Tube " + (currentTubeIndex + 1)), Vector3.zero, Vector3.up);
 			currentTubeIndex++;
 			if (currentTubeIndex >= tubes.Length)
@@ -331,7 +383,7 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
-	public void FireProjectile(Vector3 origin, Vector3 direction, BaseCombatEntity target)
+	public void FireProjectile(Vector3 origin, Vector3 direction, float speedMultiplier)
 	{
 		BaseEntity baseEntity = GameManager.server.CreateEntity(projectileTest.resourcePath, origin, Quaternion.LookRotation(direction, Vector3.up));
 		if (!(baseEntity == null))
@@ -340,7 +392,7 @@ public class SamSite : ContainerIOEntity
 			ServerProjectile component = baseEntity.GetComponent<ServerProjectile>();
 			if ((bool)component)
 			{
-				component.InitializeVelocity(GetInheritedProjectileVelocity() + direction * component.speed);
+				component.InitializeVelocity(GetInheritedProjectileVelocity() + direction * component.speed * speedMultiplier);
 			}
 			baseEntity.Spawn();
 		}

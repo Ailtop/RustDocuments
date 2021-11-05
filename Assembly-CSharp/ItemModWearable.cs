@@ -29,6 +29,8 @@ public class ItemModWearable : ItemMod
 
 	public bool equipOnRightClick = true;
 
+	public bool npcOnly;
+
 	public GameObjectRef viewmodelAddition;
 
 	public Wearable targetWearable

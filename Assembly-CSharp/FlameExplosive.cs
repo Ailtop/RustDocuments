@@ -15,10 +15,10 @@ public class FlameExplosive : TimedExplosive
 
 	public override void Explode()
 	{
-		Explode(-base.transform.forward);
+		FlameExplode(-base.transform.forward);
 	}
 
-	public void Explode(Vector3 surfaceNormal)
+	public void FlameExplode(Vector3 surfaceNormal)
 	{
 		if (!base.isServer)
 		{
@@ -40,8 +40,8 @@ public class FlameExplosive : TimedExplosive
 		base.Explode();
 	}
 
-	public override void ProjectileImpact(RaycastHit info)
+	public override void ProjectileImpact(RaycastHit info, Vector3 rayOrigin)
 	{
-		Explode(info.normal);
+		FlameExplode(info.normal);
 	}
 }

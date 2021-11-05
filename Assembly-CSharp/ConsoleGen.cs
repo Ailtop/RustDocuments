@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[772]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[790]
 	{
 		new ConsoleSystem.Command
 		{
@@ -34,6 +34,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AIThinkManager.framebudgetms = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "petframebudgetms",
+			Parent = "aithinkmanager",
+			FullName = "aithinkmanager.petframebudgetms",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AIThinkManager.petframebudgetms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AIThinkManager.petframebudgetms = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -112,6 +125,113 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				BaseMission.missionsenabled = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "basenavmovementframeinterval",
+			Parent = "basenavigator",
+			FullName = "basenavigator.basenavmovementframeinterval",
+			ServerAdmin = true,
+			Description = "How many frames between base navigation movement updates",
+			Variable = true,
+			GetOveride = () => BaseNavigator.baseNavMovementFrameInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseNavigator.baseNavMovementFrameInterval = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxstepupdistance",
+			Parent = "basenavigator",
+			FullName = "basenavigator.maxstepupdistance",
+			ServerAdmin = true,
+			Description = "The max step-up height difference for pet base navigation",
+			Variable = true,
+			GetOveride = () => BaseNavigator.maxStepUpDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseNavigator.maxStepUpDistance = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "navtypedistance",
+			Parent = "basenavigator",
+			FullName = "basenavigator.navtypedistance",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BaseNavigator.navTypeDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseNavigator.navTypeDistance = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "navtypeheightoffset",
+			Parent = "basenavigator",
+			FullName = "basenavigator.navtypeheightoffset",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BaseNavigator.navTypeHeightOffset.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseNavigator.navTypeHeightOffset = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "stucktriggerduration",
+			Parent = "basenavigator",
+			FullName = "basenavigator.stucktriggerduration",
+			ServerAdmin = true,
+			Description = "How long we are not moving for before trigger the stuck event",
+			Variable = true,
+			GetOveride = () => BaseNavigator.stuckTriggerDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseNavigator.stuckTriggerDuration = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "movementupdatebudgetms",
+			Parent = "basepet",
+			FullName = "basepet.movementupdatebudgetms",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BasePet.movementupdatebudgetms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BasePet.movementupdatebudgetms = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "onlyqueuebasenavmovements",
+			Parent = "basepet",
+			FullName = "basepet.onlyqueuebasenavmovements",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BasePet.onlyQueueBaseNavMovements.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BasePet.onlyQueueBaseNavMovements = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "queuedmovementsallowed",
+			Parent = "basepet",
+			FullName = "basepet.queuedmovementsallowed",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BasePet.queuedMovementsAllowed.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BasePet.queuedMovementsAllowed = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -503,6 +623,24 @@ public class ConsoleGen
 			{
 				Admin.AdminUI_RequestServerInfo(arg);
 			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "allowadminui",
+			Parent = "global",
+			FullName = "global.allowadminui",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Description = "Controls whether the in-game admin UI is displayed to admins",
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Admin.allowAdminUI.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Admin.allowAdminUI = str.ToBool();
+			},
+			Default = "True"
 		},
 		new ConsoleSystem.Command
 		{
@@ -3984,6 +4122,21 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Demo.recordlist = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "recordlistmode",
+			Parent = "demo",
+			FullName = "demo.recordlistmode",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Controls the behavior of recordlist, 0=whitelist, 1=blacklist",
+			Variable = true,
+			GetOveride = () => Demo.recordlistmode.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Demo.recordlistmode = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9158,6 +9311,33 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "movetowardsrate",
+			Parent = "frankensteinbrain",
+			FullName = "frankensteinbrain.movetowardsrate",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => FrankensteinBrain.MoveTowardsRate.ToString(),
+			SetOveride = delegate(string str)
+			{
+				FrankensteinBrain.MoveTowardsRate = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "decayminutes",
+			Parent = "frankensteinpet",
+			FullName = "frankensteinpet.decayminutes",
+			ServerAdmin = true,
+			Description = "How long before a Frankenstein Pet dies un controlled and not asleep on table",
+			Variable = true,
+			GetOveride = () => FrankensteinPet.decayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				FrankensteinPet.decayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "reclaim_fraction_belt",
 			Parent = "gamemodesoftcore",
 			FullName = "gamemodesoftcore.reclaim_fraction_belt",
@@ -9433,6 +9613,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "brokendownminutes",
+			Parent = "mlrs",
+			FullName = "mlrs.brokendownminutes",
+			ServerAdmin = true,
+			Description = "How many minutes before the MLRS recovers from use and can be used again",
+			Variable = true,
+			GetOveride = () => MLRS.brokenDownMinutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				MLRS.brokenDownMinutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "outsidedecayminutes",
 			Parent = "modularcar",
 			FullName = "modularcar.outsidedecayminutes",
@@ -9540,6 +9734,75 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				NPCAutoTurret.sleeperhostiledelay = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "controldistance",
+			Parent = "petbrain",
+			FullName = "petbrain.controldistance",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => PetBrain.ControlDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PetBrain.ControlDistance = str.ToFloat();
+			},
+			Default = "100"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "drownindeepwater",
+			Parent = "petbrain",
+			FullName = "petbrain.drownindeepwater",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => PetBrain.DrownInDeepWater.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PetBrain.DrownInDeepWater = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "drowntimer",
+			Parent = "petbrain",
+			FullName = "petbrain.drowntimer",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => PetBrain.DrownTimer.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PetBrain.DrownTimer = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "idlewhenownermounted",
+			Parent = "petbrain",
+			FullName = "petbrain.idlewhenownermounted",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => PetBrain.IdleWhenOwnerMounted.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PetBrain.IdleWhenOwnerMounted = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "idlewhenownerofflineordead",
+			Parent = "petbrain",
+			FullName = "petbrain.idlewhenownerofflineordead",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => PetBrain.IdleWhenOwnerOfflineOrDead.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PetBrain.IdleWhenOwnerOfflineOrDead = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -10026,20 +10289,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				CoverPointVolume.cover_point_sample_step_size = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "alltarget",
-			Parent = "samsite",
-			FullName = "samsite.alltarget",
-			ServerAdmin = true,
-			Description = "targetmode, 1 = all air vehicles, 0 = only hot air ballons and helicopters",
-			Variable = true,
-			GetOveride = () => SamSite.alltarget.ToString(),
-			SetOveride = delegate(string str)
-			{
-				SamSite.alltarget = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command

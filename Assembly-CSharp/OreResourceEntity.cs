@@ -61,7 +61,15 @@ public class OreResourceEntity : StagedResourceEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		_hotSpot = SpawnBonusSpot(Vector3.zero);
+		Invoke(InitialSpawnBonusSpot, 0f);
+	}
+
+	private void InitialSpawnBonusSpot()
+	{
+		if (!base.IsDestroyed)
+		{
+			_hotSpot = SpawnBonusSpot(Vector3.zero);
+		}
 	}
 
 	public void FinishBonusAssigned()

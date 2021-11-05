@@ -68,7 +68,15 @@ namespace ConVar
 					num++;
 				}
 			}
-			arg.ReplyWith($"Fixed up {num} cars.");
+			MLRS[] array3 = Object.FindObjectsOfType<MLRS>();
+			foreach (MLRS mLRS in array3)
+			{
+				if (mLRS.isServer && Vector3.Distance(mLRS.transform.position, basePlayer.transform.position) <= 5f && mLRS.AdminFixUp())
+				{
+					num++;
+				}
+			}
+			arg.ReplyWith($"Fixed up {num} vehicles.");
 		}
 	}
 }

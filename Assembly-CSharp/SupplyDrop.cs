@@ -6,7 +6,7 @@ public class SupplyDrop : LootContainer
 {
 	public GameObjectRef parachutePrefab;
 
-	private const Flags FlagNightLight = Flags.Reserved1;
+	public const Flags FlagNightLight = Flags.Reserved1;
 
 	public BaseEntity parachute;
 
@@ -57,7 +57,7 @@ public class SupplyDrop : LootContainer
 		Interface.CallHook("OnSupplyDropLanded", this);
 	}
 
-	private void CheckNightLight()
+	public void CheckNightLight()
 	{
 		SetFlag(Flags.Reserved1, Env.time > 20f || Env.time < 7f);
 	}

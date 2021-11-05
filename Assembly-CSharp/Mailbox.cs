@@ -86,7 +86,7 @@ public class Mailbox : StorageContainer
 		return base.PlayerOpenLoot(player, PlayerIsOwner(player) ? ownerPanel : panelToOpen);
 	}
 
-	public override bool CanOpenLootPanel(BasePlayer player, string panelName = "")
+	public override bool CanOpenLootPanel(BasePlayer player, string panelName)
 	{
 		if (panelName == ownerPanel)
 		{

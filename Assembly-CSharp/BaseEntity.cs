@@ -387,7 +387,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				}
 				if (GamePhysics.LineOfSight(player.eyes.center, player.eyes.position, 2162688))
 				{
-					if (!ent.IsVisible(player.eyes.HeadRay(), maximumDistance))
+					if (!ent.IsVisible(player.eyes.HeadRay(), 1218519041, maximumDistance))
 					{
 						return ent.IsVisible(player.eyes.position, maximumDistance);
 					}
@@ -2540,7 +2540,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return SqrDistance(other.transform.position);
 	}
 
-	public bool IsVisible(Ray ray, float maxDistance = float.PositiveInfinity)
+	public bool IsVisible(Ray ray, int layerMask, float maxDistance)
 	{
 		if (ray.origin.IsNaNOrInfinity())
 		{
@@ -2560,7 +2560,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			return false;
 		}
 		RaycastHit hitInfo;
-		if (GamePhysics.Trace(ray, 0f, out hitInfo, maxDistance, 1218519041))
+		if (GamePhysics.Trace(ray, 0f, out hitInfo, maxDistance, layerMask))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
 			if (entity == this)
@@ -2579,6 +2579,19 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
+	public bool IsVisibleSpecificLayers(Vector3 position, Vector3 target, int layerMask, float maxDistance = float.PositiveInfinity)
+	{
+		Vector3 vector = target - position;
+		float magnitude = vector.magnitude;
+		if (magnitude < Mathf.Epsilon)
+		{
+			return true;
+		}
+		Vector3 vector2 = vector / magnitude;
+		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
+		return IsVisible(new Ray(position + vector3, vector2), layerMask, maxDistance);
+	}
+
 	public bool IsVisible(Vector3 position, Vector3 target, float maxDistance = float.PositiveInfinity)
 	{
 		Vector3 vector = target - position;
@@ -2589,7 +2602,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		Vector3 vector2 = vector / magnitude;
 		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
-		return IsVisible(new Ray(position + vector3, vector2), maxDistance);
+		return IsVisible(new Ray(position + vector3, vector2), 1218519041, maxDistance);
 	}
 
 	public bool IsVisible(Vector3 position, float maxDistance = float.PositiveInfinity)
@@ -2788,7 +2801,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual float PenetrationResistance(HitInfo info)
 	{
-		return 1f;
+		return 100f;
 	}
 
 	public virtual GameObjectRef GetImpactEffect(HitInfo info)

@@ -215,10 +215,6 @@ public class NPCPlayer : BasePlayer
 		{
 			loadouts[UnityEngine.Random.Range(0, loadouts.Length)].GiveToPlayer(this);
 		}
-		else
-		{
-			Debug.LogWarningFormat("Loadout for NPC {0} was empty.", base.name);
-		}
 		if (!IsLoadBalanced())
 		{
 			InvokeRepeating(ServerThink_Internal, 0f, 0.1f);

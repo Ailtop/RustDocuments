@@ -68,11 +68,6 @@ public class ReclaimTerminal : StorageContainer
 		base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
 	}
 
-	public override bool CanOpenLootPanel(BasePlayer player, string panelName = "")
-	{
-		return base.CanOpenLootPanel(player, panelName);
-	}
-
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]

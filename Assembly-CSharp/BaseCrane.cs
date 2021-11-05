@@ -470,6 +470,7 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 
 	public override void InitShared()
 	{
+		base.InitShared();
 		fuelSystem = new EntityFuelSystem(this, base.isServer);
 	}
 

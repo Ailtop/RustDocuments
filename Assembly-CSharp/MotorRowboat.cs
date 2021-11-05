@@ -376,10 +376,6 @@ public class MotorRowboat : BaseBoat
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!isSpawned)
-		{
-			return;
-		}
 		float num = TimeSinceDriver();
 		if (num > 15f)
 		{

@@ -23,5 +23,6 @@ public enum AIState
 	FollowPath,
 	NavigateHome,
 	CombatStationary,
-	Cooldown
+	Cooldown,
+	MoveToPoint
 }

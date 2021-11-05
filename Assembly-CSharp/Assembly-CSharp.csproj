@@ -90,6 +90,9 @@
     <Reference Include="Rust.Platform.Common">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Platform.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Facepunch.BurstCloth">
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.BurstCloth.dll</HintPath>
+    </Reference>
     <Reference Include="EZhex1991.EZSoftBone">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver\RustDedicated_Data\Managed\EZhex1991.EZSoftBone.dll</HintPath>
     </Reference>

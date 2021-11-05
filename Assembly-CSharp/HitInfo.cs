@@ -45,7 +45,15 @@ public class HitInfo
 
 	public int ProjectileID;
 
+	public int ProjectileHits;
+
 	public float ProjectileDistance;
+
+	public float ProjectileIntegrity;
+
+	public float ProjectileTravelTime;
+
+	public float ProjectileTrajectoryMismatch;
 
 	public Vector3 ProjectileVelocity;
 
@@ -263,6 +271,30 @@ public class HitInfo
 			return true;
 		}
 		if (float.IsInfinity(ProjectileDistance))
+		{
+			return true;
+		}
+		if (float.IsNaN(ProjectileIntegrity))
+		{
+			return true;
+		}
+		if (float.IsInfinity(ProjectileIntegrity))
+		{
+			return true;
+		}
+		if (float.IsNaN(ProjectileTravelTime))
+		{
+			return true;
+		}
+		if (float.IsInfinity(ProjectileTravelTime))
+		{
+			return true;
+		}
+		if (float.IsNaN(ProjectileTrajectoryMismatch))
+		{
+			return true;
+		}
+		if (float.IsInfinity(ProjectileTrajectoryMismatch))
 		{
 			return true;
 		}

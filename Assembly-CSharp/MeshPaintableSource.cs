@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class MeshPaintableSource : MonoBehaviour, IClientComponent
 {
+	public Vector4 uvRange = new Vector4(0f, 0f, 1f, 1f);
+
 	public int texWidth = 256;
 
 	public int texHeight = 128;

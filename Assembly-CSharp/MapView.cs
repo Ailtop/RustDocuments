@@ -56,6 +56,8 @@ public class MapView : FacepunchBehaviour
 	[FormerlySerializedAs("ShowTrainLayer")]
 	public bool ShowUndergroundLayers;
 
+	public bool MLRSMarkerMode;
+
 	public RustImageButton LockButton;
 
 	public RustImageButton OverworldButton;

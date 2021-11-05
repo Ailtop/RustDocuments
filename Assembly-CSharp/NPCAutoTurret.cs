@@ -85,6 +85,10 @@ public class NPCAutoTurret : AutoTurret
 				{
 					return false;
 				}
+				if (basePlayer is BasePet)
+				{
+					return base.IsEntityHostile(basePlayer);
+				}
 				return true;
 			}
 			if (basePlayer.IsSleeping() && basePlayer.secondsSleeping >= sleeperhostiledelay)

@@ -7,7 +7,7 @@ public class PerformedAttackAIEvent : BaseAIEvent
 	private BaseCombatEntity combatEntity;
 
 	public PerformedAttackAIEvent()
-		: base(AIEventType.Attacked)
+		: base(AIEventType.PerformedAttack)
 	{
 		base.Rate = ExecuteRate.Fast;
 	}
@@ -30,7 +30,12 @@ public class PerformedAttackAIEvent : BaseAIEvent
 		}
 		if (combatEntity.lastDealtDamageTime >= num)
 		{
-			if (!(combatEntity.lastDealtDamageTo == null) && !(combatEntity.lastDealtDamageTo == combatEntity))
+			if (combatEntity.lastDealtDamageTo == null || combatEntity.lastDealtDamageTo == combatEntity)
+			{
+				return;
+			}
+			BasePlayer basePlayer = combatEntity as BasePlayer;
+			if (!(basePlayer != null) || ((!(basePlayer == memory.Entity.Get(5)) || !(basePlayer.lastDealtDamageTo == base.Owner)) && (!(basePlayer == memory.Entity.Get(5)) || (basePlayer.lastDealtDamageTo.gameObject.layer != 21 && basePlayer.lastDealtDamageTo.gameObject.layer != 8))))
 			{
 				if (base.ShouldSetOutputEntityMemory)
 				{

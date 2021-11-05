@@ -8,6 +8,8 @@ public interface ISignage
 
 	uint NetworkID { get; }
 
+	FileStorage.Type FileType { get; }
+
 	bool CanUpdateSign(BasePlayer player);
 
 	float Distance(Vector3 position);

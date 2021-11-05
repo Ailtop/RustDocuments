@@ -94,6 +94,8 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public bool IsFullyInflated => inflationLevel >= 1f;
 
+	public SamSite.SamTargetType SAMTargetType => SamSite.targetTypeVehicle;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("HotAirBalloon.OnRpcMessage"))
@@ -196,9 +198,17 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		return WaterLevel.Test(engineHeight.position, true, this);
 	}
 
-	public bool IsValidSAMTarget()
+	public bool IsValidSAMTarget(bool staticRespawn)
 	{
-		return IsFullyInflated;
+		if (staticRespawn)
+		{
+			return IsFullyInflated;
+		}
+		if (IsFullyInflated)
+		{
+			return !BaseVehicle.InSafeZone(triggers, base.transform.position);
+		}
+		return false;
 	}
 
 	public override float GetNetworkTime()

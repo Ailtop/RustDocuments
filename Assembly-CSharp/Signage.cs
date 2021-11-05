@@ -49,6 +49,8 @@ public class Signage : IOEntity, ILOD, ISignage
 
 	public uint NetworkID => net.ID;
 
+	public FileStorage.Type FileType => FileStorage.Type.png;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("Signage.OnRpcMessage"))
@@ -185,9 +187,9 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(5f)]
-	[RPC_Server]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))
@@ -335,6 +337,11 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
+	public uint[] GetTextureCRCs()
+	{
+		return textureIDs;
+	}
+
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	public void LockSign(RPCMessage msg)
@@ -424,11 +431,6 @@ public class Signage : IOEntity, ILOD, ISignage
 	public override bool ShouldNetworkOwnerInfo()
 	{
 		return true;
-	}
-
-	public uint[] GetTextureCRCs()
-	{
-		return textureIDs;
 	}
 
 	public void SetTextureCRCs(uint[] crcs)

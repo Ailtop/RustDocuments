@@ -32,6 +32,14 @@ public class CombatLog
 		public float health_new;
 
 		public string info;
+
+		public int proj_hits;
+
+		public float proj_integrity;
+
+		public float proj_travel;
+
+		public float proj_mismatch;
 	}
 
 	private const string selfname = "you";
@@ -107,6 +115,10 @@ public class CombatLog
 		val.health_old = health_old;
 		val.health_new = health_new;
 		val.info = ((description != null) ? description : string.Empty);
+		val.proj_hits = info.ProjectileHits;
+		val.proj_integrity = info.ProjectileIntegrity;
+		val.proj_travel = info.ProjectileTravelTime;
+		val.proj_mismatch = info.ProjectileTrajectoryMismatch;
 		Log(val);
 	}
 
@@ -147,6 +159,10 @@ public class CombatLog
 		textTable.AddColumn("old_hp");
 		textTable.AddColumn("new_hp");
 		textTable.AddColumn("info");
+		textTable.AddColumn("hits");
+		textTable.AddColumn("integrity");
+		textTable.AddColumn("travel");
+		textTable.AddColumn("mismatch");
 		int num = storage.Count - count;
 		int combatlogdelay = Server.combatlogdelay;
 		int num2 = 0;
@@ -161,7 +177,7 @@ public class CombatLog
 				float num3 = UnityEngine.Time.realtimeSinceStartup - item.time;
 				if (num3 >= (float)combatlogdelay)
 				{
-					string text = num3.ToString("0.0s");
+					string text = num3.ToString("0.00s");
 					string attacker = item.attacker;
 					uint attacker_id = item.attacker_id;
 					string text2 = attacker_id.ToString();
@@ -178,7 +194,15 @@ public class CombatLog
 					distance = item.health_new;
 					string text7 = distance.ToString("0.0");
 					string info = item.info;
-					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info);
+					int proj_hits = item.proj_hits;
+					string text8 = proj_hits.ToString();
+					distance = item.proj_integrity;
+					string text9 = distance.ToString("0.00");
+					distance = item.proj_travel;
+					string text10 = distance.ToString("0.00s");
+					distance = item.proj_mismatch;
+					string text11 = distance.ToString("0.00m");
+					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info, text8, text9, text10, text11);
 				}
 				else
 				{
@@ -186,13 +210,13 @@ public class CombatLog
 				}
 			}
 		}
-		string text8 = textTable.ToString();
+		string text12 = textTable.ToString();
 		if (num2 > 0)
 		{
-			text8 = text8 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
-			text8 = text8 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
+			text12 = text12 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
+			text12 = text12 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
 		}
-		return text8;
+		return text12;
 	}
 
 	public static Queue<Event> Get(ulong id)

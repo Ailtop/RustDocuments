@@ -28,11 +28,11 @@ public class VehicleModuleCamper : VehicleModuleSeating
 
 	public Transform StoragePoint;
 
-	private EntityRef<BaseOven> activeBbq;
+	public EntityRef<BaseOven> activeBbq;
 
-	private EntityRef<Locker> activeLocker;
+	public EntityRef<Locker> activeLocker;
 
-	private EntityRef<StorageContainer> activeStorage;
+	public EntityRef<StorageContainer> activeStorage;
 
 	private bool wasLoaded;
 
@@ -324,6 +324,26 @@ public class VehicleModuleCamper : VehicleModuleSeating
 				Debug.LogError(GetType().Name + ": No container component found.");
 			}
 		}
+	}
+
+	public IItemContainerEntity GetContainer()
+	{
+		Locker locker = activeLocker.Get(base.isServer);
+		if (locker != null && BaseEntityEx.IsValid(locker) && !locker.inventory.IsEmpty())
+		{
+			return locker;
+		}
+		BaseOven baseOven = activeBbq.Get(base.isServer);
+		if (baseOven != null && BaseEntityEx.IsValid(baseOven) && !baseOven.inventory.IsEmpty())
+		{
+			return baseOven;
+		}
+		StorageContainer storageContainer = activeStorage.Get(base.isServer);
+		if (storageContainer != null && BaseEntityEx.IsValid(storageContainer) && !storageContainer.inventory.IsEmpty())
+		{
+			return storageContainer;
+		}
+		return null;
 	}
 
 	public override bool CanBeLooted(BasePlayer player)

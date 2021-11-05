@@ -5,8 +5,13 @@ using Rust;
 using Rust.Ai;
 using UnityEngine;
 
-public class TimedExplosive : BaseEntity
+public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 {
+	public interface IPreventSticking
+	{
+		bool CanStickTo(Collider collider);
+	}
+
 	public float timerAmountMin = 10f;
 
 	public float timerAmountMax = 20f;
@@ -90,12 +95,17 @@ public class TimedExplosive : BaseEntity
 		return UnityEngine.Random.Range(timerAmountMin, timerAmountMax);
 	}
 
-	public virtual void ProjectileImpact(RaycastHit info)
+	public virtual void ProjectileImpact(RaycastHit info, Vector3 rayOrigin)
 	{
 		Explode();
 	}
 
 	public virtual void Explode()
+	{
+		Explode(PivotPoint());
+	}
+
+	public virtual void Explode(Vector3 explosionFxPos)
 	{
 		Collider component = GetComponent<Collider>();
 		if ((bool)component)
@@ -109,11 +119,11 @@ public class TimedExplosive : BaseEntity
 		}
 		if (flag)
 		{
-			Effect.server.Run(underwaterExplosionEffect.resourcePath, PivotPoint(), explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
+			Effect.server.Run(underwaterExplosionEffect.resourcePath, explosionFxPos, explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
 		}
 		else if (explosionEffect.isValid)
 		{
-			Effect.server.Run(explosionEffect.resourcePath, PivotPoint(), explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
+			Effect.server.Run(explosionEffect.resourcePath, explosionFxPos, explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
 		}
 		if (damageTypes.Count > 0)
 		{
@@ -187,7 +197,7 @@ public class TimedExplosive : BaseEntity
 			bool flag = true;
 			if ((bool)hitEntity)
 			{
-				flag = CanStickTo(hitEntity);
+				flag = CanStickTo(hitEntity, collision.collider);
 				if (!flag)
 				{
 					Collider component = GetComponent<Collider>();
@@ -205,9 +215,9 @@ public class TimedExplosive : BaseEntity
 		DoBounceEffect();
 	}
 
-	public virtual bool CanStickTo(BaseEntity entity)
+	public virtual bool CanStickTo(BaseEntity entity, Collider collider)
 	{
-		return entity.GetComponent<DecorDeployable>() == null;
+		return entity.GetComponent<IPreventSticking>()?.CanStickTo(collider) ?? true;
 	}
 
 	private void DoBounceEffect()

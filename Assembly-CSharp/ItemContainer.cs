@@ -691,6 +691,16 @@ public sealed class ItemContainer
 		return false;
 	}
 
+	public int GetAmmoAmount(AmmoTypes ammoType)
+	{
+		int num = 0;
+		for (int i = 0; i < itemList.Count; i++)
+		{
+			num += itemList[i].GetAmmoAmount(ammoType);
+		}
+		return num;
+	}
+
 	public void AddItem(ItemDefinition itemToCreate, int p, ulong skin = 0uL)
 	{
 		for (int i = 0; i < itemList.Count; i++)

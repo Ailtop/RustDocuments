@@ -429,7 +429,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			return true;
 		}
-		if (player.GetMountedVehicle() == this)
+		if (PlayerIsMounted(player))
 		{
 			return true;
 		}

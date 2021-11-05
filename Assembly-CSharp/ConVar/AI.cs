@@ -243,7 +243,7 @@ namespace ConVar
 		[ServerVar]
 		public static void brainstats(Arg args)
 		{
-			args.ReplyWith("Animal: " + AnimalBrain.Count + ". Scientist: " + ScientistBrain.Count + ". Total: " + (AnimalBrain.Count + ScientistBrain.Count));
+			args.ReplyWith("Animal: " + AnimalBrain.Count + ". Scientist: " + ScientistBrain.Count + ". Pet: " + PetBrain.Count + ". Total: " + (AnimalBrain.Count + ScientistBrain.Count + PetBrain.Count));
 		}
 
 		public static float TickDelta()

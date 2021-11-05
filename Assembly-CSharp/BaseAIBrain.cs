@@ -10,7 +10,7 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener where T : BaseEntity
+public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener where T : BaseEntity
 {
 	public class BaseAttackState : BasicAIState
 	{
@@ -29,8 +29,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
-				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
-				Vector3 aimDirection = GetAimDirection(brain.Navigator.transform.position, baseCombatEntity.transform.position);
+				Vector3 aimDirection = GetAimDirection(brain.Navigator.transform.position, baseEntity.transform.position);
 				brain.Navigator.SetFacingDirectionOverride(aimDirection);
 				if (attack.CanAttack(baseEntity))
 				{
@@ -79,8 +78,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 			{
 				return StateStatus.Error;
 			}
-			BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
-			Vector3 aimDirection = GetAimDirection(brain.Navigator.transform.position, baseCombatEntity.transform.position);
+			Vector3 aimDirection = GetAimDirection(brain.Navigator.transform.position, baseEntity.transform.position);
 			brain.Navigator.SetFacingDirectionOverride(aimDirection);
 			if (attack.CanAttack(baseEntity))
 			{
@@ -650,9 +648,13 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		}
 	}
 
+	public bool UseQueuedMovementUpdates;
+
 	public bool AllowedToSleep = true;
 
 	public AIDesignSO DefaultDesignSO;
+
+	public List<AIDesignSO> Designs = new List<AIDesignSO>();
 
 	public ProtoBuf.AIDesign InstanceSpecificDesign;
 
@@ -684,7 +686,11 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 
 	public bool UseAIDesign;
 
+	public bool Pet;
+
 	public List<IAIGroupable> groupMembers = new List<IAIGroupable>();
+
+	protected int loadedDesignIndex;
 
 	public int currentStateContainerID = -1;
 
@@ -822,9 +828,84 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	public bool IsPet()
+	{
+		return Pet;
+	}
+
+	public void SetPetOwner(BasePlayer player)
+	{
+		T val = (T)(player.PetEntity = GetEntity());
+		GetEntity().OwnerID = player.userID;
+		BasePet.ActivePetByOwnerID[player.userID] = val as BasePet;
+	}
+
+	public bool IsOwnedBy(BasePlayer player)
+	{
+		if (OwningPlayer == null)
+		{
+			return false;
+		}
+		if (player == null)
+		{
+			return false;
+		}
+		if ((object)this == null)
+		{
+			return false;
+		}
+		return OwningPlayer == player;
+	}
+
+	public bool IssuePetCommand(PetCommandType cmd, int param, Ray? ray)
+	{
+		if (ray.HasValue)
+		{
+			int layerMask = 10551296;
+			RaycastHit hitInfo;
+			if (UnityEngine.Physics.Raycast(ray.Value, out hitInfo, 75f, layerMask))
+			{
+				Events.Memory.Position.Set(hitInfo.point, 6);
+			}
+			else
+			{
+				Events.Memory.Position.Set(base.transform.position, 6);
+			}
+		}
+		switch (cmd)
+		{
+		case PetCommandType.LoadDesign:
+			if (param < 0 || param >= Designs.Count)
+			{
+				return false;
+			}
+			LoadAIDesign(AIDesigns.GetByNameOrInstance(Designs[param].Filename, InstanceSpecificDesign), null, param);
+			return true;
+		case PetCommandType.SetState:
+		{
+			AIStateContainer stateContainerByID = AIDesign.GetStateContainerByID(param);
+			if (stateContainerByID == null)
+			{
+				return false;
+			}
+			return SwitchToState(stateContainerByID.State, param);
+		}
+		case PetCommandType.Destroy:
+			GetEntity().Kill();
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	public void ForceSetAge(float age)
 	{
 		Age = age;
+	}
+
+	public int LoadedDesignIndex()
+	{
+		return loadedDesignIndex;
 	}
 
 	bool IAIDesign.CanPlayerDesignAI(BasePlayer player)
@@ -873,7 +954,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 	private void SubmitAIDesign(BaseEntity.RPCMessage msg)
 	{
 		ProtoBuf.AIDesign aIDesign = ProtoBuf.AIDesign.Deserialize(msg.read);
-		if (!LoadAIDesign(aIDesign, msg.player))
+		if (!LoadAIDesign(aIDesign, msg.player, loadedDesignIndex))
 		{
 			return;
 		}
@@ -920,10 +1001,36 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 
 	void IAIDesign.LoadAIDesign(ProtoBuf.AIDesign design, BasePlayer player)
 	{
-		LoadAIDesign(design, player);
+		LoadAIDesign(design, player, loadedDesignIndex);
 	}
 
-	private bool LoadAIDesign(ProtoBuf.AIDesign design, BasePlayer player)
+	public bool LoadDefaultAIDesign()
+	{
+		if (loadedDesignIndex == 0)
+		{
+			return true;
+		}
+		return LoadAIDesignAtIndex(0);
+	}
+
+	public bool LoadAIDesignAtIndex(int index)
+	{
+		if (Designs == null)
+		{
+			return false;
+		}
+		if (index < 0 || index >= Designs.Count)
+		{
+			return false;
+		}
+		return LoadAIDesign(AIDesigns.GetByNameOrInstance(Designs[index].Filename, InstanceSpecificDesign), null, index);
+	}
+
+	public virtual void OnAIDesignLoadedAtIndex(int index)
+	{
+	}
+
+	protected bool LoadAIDesign(ProtoBuf.AIDesign design, BasePlayer player, int index)
 	{
 		if (design == null)
 		{
@@ -952,6 +1059,8 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		{
 			SwitchToState(defaultStateContainer.State, defaultStateContainer.ID);
 		}
+		loadedDesignIndex = index;
+		OnAIDesignLoadedAtIndex(loadedDesignIndex);
 		return true;
 	}
 
@@ -963,7 +1072,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 		}
 		ProtoBuf.AIDesign aIDesign = AIDesign.ToProto(currentStateContainerID);
 		string text = "cfg/ai/";
-		string filename = DefaultDesignSO.Filename;
+		string filename = Designs[loadedDesignIndex].Filename;
 		switch (AIDesign.Scope)
 		{
 		case AIDesignScope.Default:
@@ -1020,6 +1129,12 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 	{
 		OwningPlayer = owner;
 		Events.Memory.Entity.Set(OwningPlayer, 5);
+		IPet pet;
+		if ((pet = this) != null && pet.IsPet())
+		{
+			pet.SetPetOwner(owner);
+			owner.Pet = pet;
+		}
 	}
 
 	public virtual bool ShouldServerThink()
@@ -1073,13 +1188,18 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 			}
 			bool senseFriendlies = MaxGroupSize > 0;
 			Senses.Init(entity, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes);
-			if (DefaultDesignSO == null)
+			if (DefaultDesignSO == null && Designs.Count == 0)
 			{
 				Debug.LogWarning("Brain on " + base.gameObject.name + " is trying to load a null AI design!");
 				return;
 			}
 			Events.Memory.Position.Set(base.transform.position, 4);
-			LoadAIDesign(AIDesigns.GetByNameOrInstance(DefaultDesignSO.Filename, InstanceSpecificDesign), null);
+			if (Designs.Count == 0)
+			{
+				Designs.Add(DefaultDesignSO);
+			}
+			loadedDesignIndex = 0;
+			LoadAIDesign(AIDesigns.GetByNameOrInstance(Designs[loadedDesignIndex].Filename, InstanceSpecificDesign), null, loadedDesignIndex);
 			AIInformationZone forPoint = AIInformationZone.GetForPoint(base.transform.position, false);
 			if (forPoint != null)
 			{
@@ -1125,6 +1245,28 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 	}
 
 	public void TickMovement()
+	{
+		if (BasePet.queuedMovementsAllowed && UseQueuedMovementUpdates && Navigator != null)
+		{
+			if (BasePet.onlyQueueBaseNavMovements && Navigator.CurrentNavigationType != BaseNavigator.NavigationType.Base)
+			{
+				DoMovementTick();
+				return;
+			}
+			BasePet basePet = GetEntity() as BasePet;
+			if (basePet != null && !basePet.inQueue)
+			{
+				BasePet._movementProcessQueue.Enqueue(basePet);
+				basePet.inQueue = true;
+			}
+		}
+		else
+		{
+			DoMovementTick();
+		}
+	}
+
+	public void DoMovementTick()
 	{
 		float delta = UnityEngine.Time.realtimeSinceStartup - lastMovementTickTime;
 		lastMovementTickTime = UnityEngine.Time.realtimeSinceStartup;
@@ -1178,10 +1320,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IAISleepable, IAIDesign, IAIGr
 			}
 			CurrentState.StateLeave();
 		}
+		AddEvents(stateContainerID);
 		CurrentState = newState;
 		CurrentState.StateEnter();
 		currentStateContainerID = stateContainerID;
-		AddEvents(stateContainerID);
 		return true;
 	}
 

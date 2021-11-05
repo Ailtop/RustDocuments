@@ -764,9 +764,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenEditing(RPCMessage msg)
 	{
 		//IL_0016: Incompatible stack heights: 0 vs 1
@@ -794,14 +794,27 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 		bool flag = player.inventory.loot.RemoveContainerAt(3);
 		BaseVehicleModule result;
-		VehicleModuleStorage vehicleModuleStorage;
-		if (TryGetModuleForItem(vehicleItem, out result) && (object)(vehicleModuleStorage = result as VehicleModuleStorage) != null)
+		if (TryGetModuleForItem(vehicleItem, out result))
 		{
-			IItemContainerEntity container = vehicleModuleStorage.GetContainer();
-			if (!ObjectEx.IsUnityNull(container))
+			VehicleModuleStorage vehicleModuleStorage;
+			VehicleModuleCamper vehicleModuleCamper;
+			if ((object)(vehicleModuleStorage = result as VehicleModuleStorage) != null)
 			{
-				player.inventory.loot.AddContainer(container.inventory);
-				flag = true;
+				IItemContainerEntity container = vehicleModuleStorage.GetContainer();
+				if (!ObjectEx.IsUnityNull(container))
+				{
+					player.inventory.loot.AddContainer(container.inventory);
+					flag = true;
+				}
+			}
+			else if ((object)(vehicleModuleCamper = result as VehicleModuleCamper) != null)
+			{
+				IItemContainerEntity container2 = vehicleModuleCamper.GetContainer();
+				if (!ObjectEx.IsUnityNull(container2))
+				{
+					player.inventory.loot.AddContainer(container2.inventory);
+					flag = true;
+				}
 			}
 		}
 		if (flag)
@@ -848,9 +861,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_RequestRemoveLock(RPCMessage msg)
 	{
 		if (HasOccupant && carOccupant.carLock.HasALock)
@@ -875,9 +888,9 @@ public class ModularCarGarage : ContainerIOEntity
 	}
 
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(1uL)]
 	public void RPC_StartDestroyingChassis(RPCMessage msg)
 	{
 		if (!carOccupant.HasAnyModules)
@@ -887,9 +900,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
 	public void RPC_StopDestroyingChassis(RPCMessage msg)
 	{

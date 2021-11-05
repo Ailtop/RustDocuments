@@ -51,7 +51,7 @@ public class NPCPlayerNavigator : BaseNavigator
 			{
 				NPCPlayerEntity.SetAimDirection(base.Agent.desiredVelocity.normalized);
 			}
-			else if (base.CurrentNavigationType == NavigationType.AStar)
+			else if (base.CurrentNavigationType == NavigationType.AStar || base.CurrentNavigationType == NavigationType.Base)
 			{
 				NPCPlayerEntity.SetAimDirection(Vector3Ex.Direction2D(moveToPosition, base.transform.position));
 			}

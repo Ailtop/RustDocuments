@@ -43,7 +43,9 @@ public class SteamInventoryItem : ScriptableObject
 
 	public SteamInventoryCategory steamCategory;
 
-	[Tooltip("Dtop this item being broken down into cloth etc")]
+	public bool isLimitedTimeOffer = true;
+
+	[Tooltip("Stop this item being broken down into cloth etc")]
 	public bool PreventBreakingDown;
 
 	[Header("Meta")]

@@ -51,9 +51,9 @@ public class BaseVehicle : BaseMountable
 	public DamageRenderer damageRenderer;
 
 	[FormerlySerializedAs("explosionDamageMultiplier")]
-	public float explosionForceMultiplier = 650f;
+	public float explosionForceMultiplier = 400f;
 
-	public float explosionForceMax = 150000f;
+	public float explosionForceMax = 75000f;
 
 	public const Flags Flag_OnlyOwnerEntry = Flags.Locked;
 
@@ -147,6 +147,15 @@ public class BaseVehicle : BaseMountable
 		return !HasFlag(Flags.Reserved7);
 	}
 
+	public override bool PlayerIsMounted(BasePlayer player)
+	{
+		if (BaseEntityEx.IsValid(player))
+		{
+			return player.GetMountedVehicle() == this;
+		}
+		return false;
+	}
+
 	public virtual bool CanPushNow(BasePlayer pusher)
 	{
 		return !IsOn();
@@ -213,6 +222,11 @@ public class BaseVehicle : BaseMountable
 
 	public bool InSafeZone()
 	{
+		return InSafeZone(triggers, base.transform.position);
+	}
+
+	public static bool InSafeZone(List<TriggerBase> triggers, Vector3 position)
+	{
 		float num = 0f;
 		if (triggers != null)
 		{
@@ -221,7 +235,7 @@ public class BaseVehicle : BaseMountable
 				TriggerSafeZone triggerSafeZone = triggers[i] as TriggerSafeZone;
 				if (!(triggerSafeZone == null))
 				{
-					float safeLevel = triggerSafeZone.GetSafeLevel(base.transform.position);
+					float safeLevel = triggerSafeZone.GetSafeLevel(position);
 					if (safeLevel > num)
 					{
 						num = safeLevel;
@@ -266,7 +280,7 @@ public class BaseVehicle : BaseMountable
 		}
 		Vector3 start = position2 - vector * (num - 0.15f);
 		Vector3 end = position + vector * (num + 0.05f);
-		return GamePhysics.CheckCapsule(start, end, num, mask);
+		return GamePhysics.CheckCapsule(start, end, num, mask, QueryTriggerInteraction.Ignore);
 	}
 
 	public virtual void CheckSeatsForClipping(int mask)

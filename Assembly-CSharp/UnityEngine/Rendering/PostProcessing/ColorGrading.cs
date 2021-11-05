@@ -43,9 +43,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0.5f
 		};
 
-		[Tooltip("Affects the transition between the mid section and the shoulder of the curve. A value of 0 means no shoulder, a value of 1 means a very hard transition.")]
 		[DisplayName("Shoulder Strength")]
 		[Range(0f, 1f)]
+		[Tooltip("Affects the transition between the mid section and the shoulder of the curve. A value of 0 means no shoulder, a value of 1 means a very hard transition.")]
 		public FloatParameter toneCurveShoulderStrength = new FloatParameter
 		{
 			value = 0f
@@ -59,9 +59,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0.5f
 		};
 
+		[DisplayName("Shoulder Angle")]
 		[Range(0f, 1f)]
 		[Tooltip("Affects how much overshoot to add to the shoulder.")]
-		[DisplayName("Shoulder Angle")]
 		public FloatParameter toneCurveShoulderAngle = new FloatParameter
 		{
 			value = 0f
@@ -91,9 +91,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 1f
 		};
 
-		[Tooltip("Sets the white balance to a custom color temperature.")]
 		[DisplayName("Temperature")]
 		[Range(-100f, 100f)]
+		[Tooltip("Sets the white balance to a custom color temperature.")]
 		public FloatParameter temperature = new FloatParameter
 		{
 			value = 0f
@@ -115,17 +115,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = Color.white
 		};
 
-		[DisplayName("Hue Shift")]
 		[Range(-180f, 180f)]
 		[Tooltip("Shift the hue of all colors.")]
+		[DisplayName("Hue Shift")]
 		public FloatParameter hueShift = new FloatParameter
 		{
 			value = 0f
 		};
 
-		[Range(-100f, 100f)]
 		[Tooltip("Pushes the intensity of all colors.")]
 		[DisplayName("Saturation")]
+		[Range(-100f, 100f)]
 		public FloatParameter saturation = new FloatParameter
 		{
 			value = 0f
@@ -146,25 +146,25 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[DisplayName("Contrast")]
 		[Range(-100f, 100f)]
 		[Tooltip("Expands or shrinks the overall range of tonal values.")]
+		[DisplayName("Contrast")]
 		public FloatParameter contrast = new FloatParameter
 		{
 			value = 0f
 		};
 
+		[DisplayName("Red")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the red channel in the overall mix.")]
-		[DisplayName("Red")]
 		public FloatParameter mixerRedOutRedIn = new FloatParameter
 		{
 			value = 100f
 		};
 
-		[DisplayName("Green")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the green channel in the overall mix.")]
+		[DisplayName("Green")]
 		public FloatParameter mixerRedOutGreenIn = new FloatParameter
 		{
 			value = 0f
@@ -202,9 +202,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[DisplayName("Red")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the red channel in the overall mix.")]
+		[DisplayName("Red")]
 		public FloatParameter mixerBlueOutRedIn = new FloatParameter
 		{
 			value = 0f
@@ -242,9 +242,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = new Vector4(1f, 1f, 1f, 0f)
 		};
 
+		[Trackball(TrackballAttribute.Mode.Gain)]
 		[DisplayName("Gain")]
 		[Tooltip("Controls the lightest portions of the render.")]
-		[Trackball(TrackballAttribute.Mode.Gain)]
 		public Vector4Parameter gain = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)

@@ -317,7 +317,7 @@ public class HumanNPC : NPCPlayer, IThinker
 			if (!(baseEntity == null) && !baseEntity.EqualNetID(this) && baseEntity.isServer && WithinVisionCone(baseEntity))
 			{
 				BasePlayer basePlayer = baseEntity as BasePlayer;
-				if (!(basePlayer != null) || baseEntity.IsNpc || (!AI.ignoreplayers && IsPlayerVisibleToUs(basePlayer)))
+				if (!(basePlayer != null) || baseEntity.IsNpc || (!AI.ignoreplayers && IsPlayerVisibleToUs(basePlayer, 1218519041)))
 				{
 					myMemory.SetKnown(baseEntity, this, null);
 				}
@@ -392,7 +392,7 @@ public class HumanNPC : NPCPlayer, IThinker
 				if (Interface.CallHook("OnNpcTarget", this, component) == null)
 				{
 					currentTarget = component;
-					currentTargetLOS = IsPlayerVisibleToUs(component);
+					currentTargetLOS = IsPlayerVisibleToUs(component, 1218519041);
 				}
 			}
 		}

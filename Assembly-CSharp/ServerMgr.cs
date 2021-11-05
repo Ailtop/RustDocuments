@@ -499,14 +499,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2318)
+		else if (packet.connection.protocol > 2321)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2318));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2321));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2318)
+		else if (packet.connection.protocol < 2321)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2318));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2321));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -967,15 +967,39 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			}
 			try
 			{
+				using (TimeWarning.New("AIThinkManager.ProcessPetQueue"))
+				{
+					AIThinkManager.ProcessQueue(AIThinkManager.QueueType.Pets);
+				}
+			}
+			catch (Exception exception13)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: AIThinkManager.ProcessPetQueue");
+				UnityEngine.Debug.LogException(exception13, this);
+			}
+			try
+			{
+				using (TimeWarning.New("AIThinkManager.ProcessPetMovementQueue"))
+				{
+					BasePet.ProcessMovementQueue();
+				}
+			}
+			catch (Exception exception14)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: AIThinkManager.ProcessPetMovementQueue");
+				UnityEngine.Debug.LogException(exception14, this);
+			}
+			try
+			{
 				using (TimeWarning.New("BaseRidableAnimal.ProcessQueue"))
 				{
 					BaseRidableAnimal.ProcessQueue();
 				}
 			}
-			catch (Exception exception13)
+			catch (Exception exception15)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: BaseRidableAnimal.ProcessQueue");
-				UnityEngine.Debug.LogException(exception13, this);
+				UnityEngine.Debug.LogException(exception15, this);
 			}
 			try
 			{
@@ -984,10 +1008,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					GrowableEntity.growableEntityUpdateQueue.RunQueue(GrowableEntity.framebudgetms);
 				}
 			}
-			catch (Exception exception14)
+			catch (Exception exception16)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: GrowableEntity.BudgetedUpdate");
-				UnityEngine.Debug.LogException(exception14, this);
+				UnityEngine.Debug.LogException(exception16, this);
 			}
 			try
 			{
@@ -996,10 +1020,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					BasePlayer.lifeStoryQueue.RunQueue(BasePlayer.lifeStoryFramebudgetms);
 				}
 			}
-			catch (Exception exception15)
+			catch (Exception exception17)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: BasePlayer.BudgetedLifeStoryUpdate");
-				UnityEngine.Debug.LogException(exception15, this);
+				UnityEngine.Debug.LogException(exception17, this);
 			}
 			try
 			{
@@ -1008,10 +1032,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 					JunkPileWater.junkpileWaterWorkQueue.RunQueue(JunkPileWater.framebudgetms);
 				}
 			}
-			catch (Exception exception16)
+			catch (Exception exception18)
 			{
 				UnityEngine.Debug.LogWarning("Server Exception: JunkPileWater.UpdateNearbyPlayers");
-				UnityEngine.Debug.LogException(exception16, this);
+				UnityEngine.Debug.LogException(exception18, this);
 			}
 			if (EACServer.playerTracker != null)
 			{
@@ -1134,7 +1158,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2318}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2321}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{

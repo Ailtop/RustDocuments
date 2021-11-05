@@ -3,6 +3,7 @@ using System;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -25,7 +26,7 @@ public class ItemBasedFlowRestrictor : IOEntity
 
 	public float passthroughItemConditionLossPerSec = 1f;
 
-	private ItemContainer inventory;
+	public ItemContainer inventory;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -227,5 +228,6 @@ public class ItemBasedFlowRestrictor : IOEntity
 
 	public void PlayerStoppedLooting(BasePlayer player)
 	{
+		Interface.CallHook("OnLootEntityEnd", player, this);
 	}
 }

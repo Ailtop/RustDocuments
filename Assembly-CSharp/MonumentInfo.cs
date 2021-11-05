@@ -25,6 +25,12 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 	[HideInInspector]
 	public DungeonGridInfo DungeonEntrance;
 
+	[HideInInspector]
+	public float PreventBuildingRadius;
+
+	[HideInInspector]
+	public Vector3 PreventBuildingOrigin;
+
 	protected override void Awake()
 	{
 		base.Awake();
@@ -121,6 +127,8 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 		Gizmos.DrawCube(Bounds.center, Bounds.size);
 		Gizmos.color = new Color(0f, 0.7f, 1f, 1f);
 		Gizmos.DrawWireCube(Bounds.center, Bounds.size);
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(PreventBuildingOrigin, PreventBuildingRadius);
 	}
 
 	public MonumentNavMesh GetMonumentNavMesh()

@@ -1,6 +1,5 @@
 #define UNITY_ASSERTIONS
 using System;
-using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -560,7 +559,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			{
 				baseMountable.AttemptMount(player, doMountChecks);
 			}
-			if (player.GetMountedVehicle() == this)
+			if (PlayerIsMounted(player))
 			{
 				PlayerMounted(player, baseMountable);
 			}
@@ -608,10 +607,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!isSpawned)
-		{
-			return;
-		}
 		if (!IsMovingOrOn)
 		{
 			Velocity = Vector3.zero;
@@ -697,41 +692,17 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		if (driver != null && primaryFireInput)
 		{
 			bool flag = true;
-			if (IsInWater && (float)timeSinceTorpedoFired >= maxFireRate && torpedoContainer != null)
+			if (IsInWater && (float)timeSinceTorpedoFired >= maxFireRate)
 			{
-				List<Item> obj = Facepunch.Pool.GetList<Item>();
-				torpedoContainer.inventory.FindAmmo(obj, AmmoTypes.TORPEDO);
-				if (obj.Count > 0)
+				float minSpeed = GetSpeed() + 2f;
+				ServerProjectile projectile;
+				if (BaseMountable.TryFireProjectile(torpedoContainer, AmmoTypes.TORPEDO, torpedoFiringPoint.position, torpedoFiringPoint.forward, driver, 1f, minSpeed, out projectile))
 				{
-					Item item = obj[obj.Count - 1];
-					Vector3 forward = torpedoFiringPoint.forward;
-					Vector3 position = torpedoFiringPoint.position;
-					float num10 = 1f;
-					RaycastHit hitInfo;
-					if (UnityEngine.Physics.Raycast(position, forward, out hitInfo, num10, 1236478737))
-					{
-						num10 = hitInfo.distance - 0.1f;
-					}
-					ItemModProjectile component = item.info.GetComponent<ItemModProjectile>();
-					BaseEntity baseEntity = GameManager.server.CreateEntity(component.projectileObject.resourcePath, position + forward * num10);
-					ServerProjectile component2 = baseEntity.GetComponent<ServerProjectile>();
-					Vector3 vector = component2.initialVelocity + forward * component2.speed;
-					float num11 = GetSpeed() + 2f;
-					float num12 = Vector3.Dot(vector, forward) - num11;
-					if (num12 < 0f)
-					{
-						vector += forward * (0f - num12);
-					}
-					component2.InitializeVelocity(vector);
-					baseEntity.creatorEntity = driver;
+					timeSinceTorpedoFired = 0f;
+					flag = false;
 					driver.MarkHostileFor();
-					baseEntity.Spawn();
-					item.UseItem();
+					ClientRPC(null, "TorpedoFired");
 				}
-				Facepunch.Pool.FreeList(ref obj);
-				timeSinceTorpedoFired = 0f;
-				flag = false;
-				ClientRPC(null, "TorpedoFired");
 			}
 			if (!prevPrimaryFireInput && flag && (float)timeSinceFailRPCSent > 0.5f)
 			{
@@ -750,8 +721,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 		for (int i = 0; i < parentTriggers.Length; i++)
 		{
-			float num13 = parentTriggers[i].triggerWaterLevel.position.y - base.transform.position.y;
-			bool flag2 = curSubDepthY - num13 <= 0f;
+			float num10 = parentTriggers[i].triggerWaterLevel.position.y - base.transform.position.y;
+			bool flag2 = curSubDepthY - num10 <= 0f;
 			if (flag2 != parentTriggers[i].trigger.enabled)
 			{
 				parentTriggers[i].trigger.enabled = flag2;
@@ -929,7 +900,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public void RPC_OpenTorpedoStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && CanBeLooted(player) && !(player.GetMountedVehicle() != this))
+		if (!(player == null) && CanBeLooted(player) && PlayerIsMounted(player))
 		{
 			StorageContainer torpedoContainer = GetTorpedoContainer();
 			if (torpedoContainer != null)
@@ -1031,7 +1002,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		{
 			return false;
 		}
-		if (player.GetMountedVehicle() == this)
+		if (PlayerIsMounted(player))
 		{
 			return true;
 		}

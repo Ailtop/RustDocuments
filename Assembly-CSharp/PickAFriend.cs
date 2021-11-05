@@ -8,6 +8,8 @@ public class PickAFriend : UIDialog
 
 	public RustText headerText;
 
+	public bool AutoSelectInputField;
+
 	public Action<ulong, string> onSelected;
 
 	public Translate.Phrase sleepingBagHeaderPhrase = new Translate.Phrase("assign_to_friend", "Assign To a Friend");

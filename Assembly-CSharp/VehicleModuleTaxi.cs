@@ -77,7 +77,7 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 		{
 			return false;
 		}
-		if (player.GetMountedVehicle() != base.Vehicle)
+		if (!base.Vehicle.PlayerIsMounted(player))
 		{
 			return false;
 		}

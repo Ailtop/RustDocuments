@@ -12,6 +12,10 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 
 	public LayerMask customBoundsCheckMask;
 
+	[Tooltip("Simply spawns the entity once. No respawning. Entity can be saved if desired.")]
+	[SerializeField]
+	private bool oneTimeSpawner;
+
 	private SpawnPointInstance spawnInstance;
 
 	private float nextSpawnTime = -1f;
@@ -66,7 +70,10 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 
 	public void Fill()
 	{
-		TrySpawnEntity();
+		if (!oneTimeSpawner)
+		{
+			TrySpawnEntity();
+		}
 	}
 
 	public void SpawnInitial()
@@ -88,7 +95,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 
 	public void SpawnRepeating()
 	{
-		if (!IsSpawned && Time.time >= nextSpawnTime)
+		if (!IsSpawned && !oneTimeSpawner && Time.time >= nextSpawnTime)
 		{
 			TrySpawnEntity();
 		}
@@ -117,7 +124,10 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, base.transform.position, base.transform.rotation, false);
 		if (baseEntity != null)
 		{
-			baseEntity.enableSaving = false;
+			if (!oneTimeSpawner)
+			{
+				baseEntity.enableSaving = false;
+			}
 			PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
 			baseEntity.Spawn();
 			SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();

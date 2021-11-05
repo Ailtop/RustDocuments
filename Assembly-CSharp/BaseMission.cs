@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Facepunch;
+using Oxide.Core;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Rust/Missions/BaseMission")]
@@ -459,6 +460,10 @@ public class BaseMission : BaseScriptableObject
 
 	public virtual void MissionStart(MissionInstance instance, BasePlayer assignee)
 	{
+		if (Interface.CallHook("OnMissionStart", this, instance, assignee) != null)
+		{
+			return;
+		}
 		SetupRewards(instance, assignee);
 		SetupPositions(instance, assignee);
 		AddBlockers(instance);
@@ -484,6 +489,7 @@ public class BaseMission : BaseScriptableObject
 		{
 			createdEntity.MissionStarted(assignee, instance);
 		}
+		Interface.CallHook("OnMissionStarted", this, instance, assignee);
 	}
 
 	public void CheckObjectives(MissionInstance instance, BasePlayer assignee)
@@ -541,6 +547,7 @@ public class BaseMission : BaseScriptableObject
 		instance.status = MissionStatus.Accomplished;
 		MissionEnded(instance, assignee);
 		MissionComplete(instance, assignee);
+		Interface.CallHook("OnMissionSucceeded", this, instance, assignee);
 	}
 
 	public virtual void MissionFailed(MissionInstance instance, BasePlayer assignee)
@@ -549,6 +556,7 @@ public class BaseMission : BaseScriptableObject
 		DoMissionEffect(failedEffect.resourcePath, assignee);
 		instance.status = MissionStatus.Failed;
 		MissionEnded(instance, assignee);
+		Interface.CallHook("OnMissionFailed", this, instance, assignee);
 	}
 
 	public virtual void MissionEnded(MissionInstance instance, BasePlayer assignee)
@@ -598,6 +606,11 @@ public class BaseMission : BaseScriptableObject
 		{
 			return false;
 		}
+		object obj = Interface.CallHook("CanAssignMission", assignee, mission, provider);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		MissionInstance missionInstance = Pool.Get<MissionInstance>();
 		missionInstance.missionID = mission.id;
 		missionInstance.startTime = Time.time;
@@ -613,6 +626,7 @@ public class BaseMission : BaseScriptableObject
 		mission.MissionStart(missionInstance, assignee);
 		assignee.SetActiveMission(assignee.missions.Count - 1);
 		assignee.MissionDirty();
+		Interface.CallHook("OnMissionAssigned", mission, provider, assignee);
 		return true;
 	}
 

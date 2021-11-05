@@ -66,7 +66,7 @@ public class DieselEngine : StorageContainer
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public override bool CanOpenLootPanel(BasePlayer player, string panelName = "")
+	public override bool CanOpenLootPanel(BasePlayer player, string panelName)
 	{
 		return base.CanOpenLootPanel(player, panelName);
 	}

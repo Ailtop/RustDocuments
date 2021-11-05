@@ -130,9 +130,9 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 		}
 	}
 
-	public override bool CanStickTo(BaseEntity entity)
+	public override bool CanStickTo(BaseEntity entity, Collider collider)
 	{
-		if (base.CanStickTo(entity))
+		if (base.CanStickTo(entity, collider))
 		{
 			return IsWickBurning();
 		}

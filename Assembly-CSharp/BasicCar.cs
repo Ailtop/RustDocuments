@@ -68,7 +68,7 @@ public class BasicCar : BaseVehicle
 
 	public override Vector3 EyePositionForPlayer(BasePlayer player, Quaternion viewRot)
 	{
-		if (player.GetMounted() == this)
+		if (PlayerIsMounted(player))
 		{
 			return driverEye.transform.position;
 		}
@@ -110,18 +110,15 @@ public class BasicCar : BaseVehicle
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!base.isClient)
+		if (!HasDriver())
 		{
-			if (!HasDriver())
-			{
-				NoDriverInput();
-			}
-			ConvertInputToThrottle();
-			DoSteering();
-			ApplyForceAtWheels();
-			SetFlag(Flags.Reserved1, IsMounted());
-			SetFlag(Flags.Reserved2, IsMounted() && lightsOn);
+			NoDriverInput();
 		}
+		ConvertInputToThrottle();
+		DoSteering();
+		ApplyForceAtWheels();
+		SetFlag(Flags.Reserved1, IsMounted());
+		SetFlag(Flags.Reserved2, IsMounted() && lightsOn);
 	}
 
 	public void DoSteering()

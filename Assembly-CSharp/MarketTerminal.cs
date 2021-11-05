@@ -445,7 +445,7 @@ public class MarketTerminal : StorageContainer
 		UpdateHasItems();
 	}
 
-	public override bool CanOpenLootPanel(BasePlayer player, string panelName = "")
+	public override bool CanOpenLootPanel(BasePlayer player, string panelName)
 	{
 		if (CanPlayerInteract(player) && HasFlag(Flags.Reserved1))
 		{

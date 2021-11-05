@@ -30,7 +30,9 @@ public class TorpedoServerProjectile : ServerProjectile
 		}
 		else if (num <= minWaterDepth)
 		{
+			Vector3 currentVelocity = base.CurrentVelocity;
 			currentVelocity.y = 0f;
+			base.CurrentVelocity = currentVelocity;
 			gravityModifier = 0.1f;
 		}
 		else if (num > minWaterDepth + 0.3f && num <= minWaterDepth + 0.7f)
@@ -39,7 +41,7 @@ public class TorpedoServerProjectile : ServerProjectile
 		}
 		else
 		{
-			gravityModifier = Mathf.Clamp(currentVelocity.y, -0.1f, 0.1f);
+			gravityModifier = Mathf.Clamp(base.CurrentVelocity.y, -0.1f, 0.1f);
 		}
 		return true;
 	}
@@ -50,12 +52,7 @@ public class TorpedoServerProjectile : ServerProjectile
 		float value = WaterLevel.GetWaterInfo(base.transform.position).surfaceLevel - base.transform.position.y;
 		float t = Mathf.InverseLerp(shallowWaterCutoff, shallowWaterCutoff + 2f, value);
 		float maxAngle = Mathf.Lerp(shallowWaterInaccuracy, deepWaterInaccuracy, t);
-		initialVelocity = GetWithInaccuracy(initialVelocity, maxAngle);
-		currentVelocity = initialVelocity;
-	}
-
-	private Vector3 GetWithInaccuracy(Vector3 original, float maxAngle)
-	{
-		return Quaternion.AngleAxis(Random.Range(0f - maxAngle, maxAngle), Vector3.up) * original;
+		initialVelocity = initialVelocity.GetWithInaccuracy(maxAngle);
+		base.CurrentVelocity = initialVelocity;
 	}
 }

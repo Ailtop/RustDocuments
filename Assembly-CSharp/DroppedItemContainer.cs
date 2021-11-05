@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class DroppedItemContainer : BaseCombatEntity
+public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 {
 	public string lootPanelName = "generic";
 
@@ -23,6 +23,8 @@ public class DroppedItemContainer : BaseCombatEntity
 	public bool onlyOwnerLoot;
 
 	public ItemContainer inventory;
+
+	public Translate.Phrase LootPanelTitle => playerName;
 
 	public string playerName
 	{
