@@ -2047,9 +2047,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
+		[Header("Reasoners")]
 		[ReadOnly]
 		[SerializeField]
-		[Header("Reasoners")]
 		private List<INpcReasoner> _reasoners = new List<INpcReasoner>
 		{
 			new EnemyPlayerLineOfSightReasoner
@@ -2142,9 +2142,9 @@ namespace Rust.Ai.HTN.ScientistAStar
 			}
 		};
 
-		[SerializeField]
 		[Header("Firearm Utility")]
 		[ReadOnly]
+		[SerializeField]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]

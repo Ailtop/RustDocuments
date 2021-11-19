@@ -40,17 +40,17 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 
 	private float upDownInput;
 
-	private Vector3 lastSentTargetHitPos;
+	public Vector3 lastSentTargetHitPos;
 
-	private Vector3 lastSentTrueHitPos;
+	public Vector3 lastSentTrueHitPos;
 
-	private int nextRocketIndex;
+	public int nextRocketIndex;
 
-	private EntityRef rocketOwnerRef;
+	public EntityRef rocketOwnerRef;
 
-	private TimeSince timeSinceBroken;
+	public TimeSince timeSinceBroken;
 
-	private int radiusModIndex;
+	public int radiusModIndex;
 
 	private float[] radiusMods = new float[6]
 	{
@@ -62,7 +62,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		0.75f
 	};
 
-	private Vector3 trueTargetHitPos;
+	public Vector3 trueTargetHitPos;
 
 	[Header("MLRS Components")]
 	[SerializeField]
@@ -85,17 +85,17 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	private Transform hRotator;
 
 	[SerializeField]
-	private float hRotSpeed = 25f;
+	public float hRotSpeed = 25f;
 
 	[SerializeField]
 	private Transform vRotator;
 
 	[SerializeField]
-	private float vRotSpeed = 10f;
+	public float vRotSpeed = 10f;
 
 	[SerializeField]
 	[Range(50f, 90f)]
-	private float vRotMax = 85f;
+	public float vRotMax = 85f;
 
 	[SerializeField]
 	private Transform hydraulics;
@@ -116,7 +116,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	public Transform firingPoint;
 
 	[SerializeField]
-	private RocketTube[] rocketTubes;
+	public RocketTube[] rocketTubes;
 
 	[Header("MLRS Dashboard/FX")]
 	[SerializeField]
@@ -166,21 +166,21 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 
 	private EntityRef dashboardStorageInstance;
 
-	private float rocketBaseGravity;
+	public float rocketBaseGravity;
 
-	private float rocketSpeed;
+	public float rocketSpeed;
 
-	private float rocketDamageRadius;
+	public float rocketDamageRadius;
 
 	private bool isInitialLoad = true;
 
-	public Vector3 UserTargetHitPos { get; private set; }
+	public Vector3 UserTargetHitPos { get; set; }
 
-	public Vector3 TrueHitPos { get; private set; }
+	public Vector3 TrueHitPos { get; set; }
 
 	public bool HasAimingModule => HasFlag(Flags.Reserved8);
 
-	private bool CanBeUsed
+	public bool CanBeUsed
 	{
 		get
 		{
@@ -192,7 +192,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private bool CanFire
+	public bool CanFire
 	{
 		get
 		{
@@ -204,7 +204,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private float HRotation
+	public float HRotation
 	{
 		get
 		{
@@ -218,7 +218,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private float VRotation
+	public float VRotation
 	{
 		get
 		{
@@ -239,11 +239,11 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	public float CurGravityMultiplier { get; private set; }
+	public float CurGravityMultiplier { get; set; }
 
-	public int RocketAmmoCount { get; private set; }
+	public int RocketAmmoCount { get; set; }
 
-	public bool IsRealigning { get; private set; }
+	public bool IsRealigning { get; set; }
 
 	public bool IsFiringRockets => HasFlag(Flags.Reserved6);
 
@@ -446,7 +446,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 			float g;
 			HitPosToRotation(trueTargetHitPos, out hRot, out vRot, out g);
 			float num = g / (0f - UnityEngine.Physics.gravity.y);
-			IsRealigning = Mathf.DeltaAngle(VRotation, vRot) > 0.1f || Mathf.DeltaAngle(HRotation, hRot) > 0.1f || !Mathf.Approximately(CurGravityMultiplier, num);
+			IsRealigning = Mathf.Abs(Mathf.DeltaAngle(VRotation, vRot)) > 0.001f || Mathf.Abs(Mathf.DeltaAngle(HRotation, hRot)) > 0.001f || !Mathf.Approximately(CurGravityMultiplier, num);
 			if (IsRealigning)
 			{
 				if (isInitialLoad)
@@ -470,7 +470,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private Vector3 GetTrueHitPos()
+	public Vector3 GetTrueHitPos()
 	{
 		TheoreticalProjectile projectile = new TheoreticalProjectile(firingPoint.position, firingPoint.forward.normalized * rocketSpeed, CurGravityMultiplier);
 		int num = 0;
@@ -482,7 +482,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return projectile.pos;
 	}
 
-	private bool NextRayHitSomething(ref TheoreticalProjectile projectile, float dt)
+	public bool NextRayHitSomething(ref TheoreticalProjectile projectile, float dt)
 	{
 		float num = UnityEngine.Physics.gravity.y * projectile.gravityMult;
 		Vector3 pos = projectile.pos;
@@ -508,14 +508,14 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return false;
 	}
 
-	private float GetSurfaceHeight(Vector3 pos)
+	public float GetSurfaceHeight(Vector3 pos)
 	{
 		float height = TerrainMeta.HeightMap.GetHeight(pos);
 		float height2 = TerrainMeta.WaterMap.GetHeight(pos);
 		return Mathf.Max(height, height2);
 	}
 
-	private void SetRepaired()
+	public void SetRepaired()
 	{
 		SetFlag(Flags.Broken, false);
 	}
@@ -589,7 +589,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return true;
 	}
 
-	private void Fire(BasePlayer owner)
+	public void Fire(BasePlayer owner)
 	{
 		if (CanFire && !IsFiringRockets && !(_mounted == null))
 		{
@@ -601,7 +601,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private void EndFiring()
+	public void EndFiring()
 	{
 		CancelInvoke(FireNextRocket);
 		rocketOwnerRef.Set(null);
@@ -616,7 +616,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		timeSinceBroken = 0f;
 	}
 
-	private void FireNextRocket()
+	public void FireNextRocket()
 	{
 		if (nextRocketIndex < 0)
 		{
@@ -647,7 +647,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private bool TryGetAimingModule(out Item item)
+	public bool TryGetAimingModule(out Item item)
 	{
 		ItemContainer inventory = GetDashboardContainer().inventory;
 		if (!inventory.IsEmpty())
@@ -769,7 +769,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return true;
 	}
 
-	private void SetUserTargetHitPos(Vector3 worldPos)
+	public void SetUserTargetHitPos(Vector3 worldPos)
 	{
 		if (UserTargetHitPos == worldPos)
 		{
@@ -805,7 +805,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		}
 	}
 
-	private StorageContainer GetRocketContainer()
+	public StorageContainer GetRocketContainer()
 	{
 		BaseEntity baseEntity = rocketStorageInstance.Get(base.isServer);
 		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
@@ -815,7 +815,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return null;
 	}
 
-	private StorageContainer GetDashboardContainer()
+	public StorageContainer GetDashboardContainer()
 	{
 		BaseEntity baseEntity = dashboardStorageInstance.Get(base.isServer);
 		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
@@ -825,7 +825,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return null;
 	}
 
-	private void HitPosToRotation(Vector3 hitPos, out float hRot, out float vRot, out float g)
+	public void HitPosToRotation(Vector3 hitPos, out float hRot, out float vRot, out float g)
 	{
 		Vector3 aimToTarget = GetAimToTarget(hitPos, out g);
 		Vector3 eulerAngles = Quaternion.LookRotation(aimToTarget, Vector3.up).eulerAngles;
@@ -834,7 +834,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		hRot = eulerAngles.y;
 	}
 
-	private Vector3 GetAimToTarget(Vector3 targetPos, out float g)
+	public Vector3 GetAimToTarget(Vector3 targetPos, out float g)
 	{
 		g = rocketBaseGravity;
 		float num = rocketSpeed;
@@ -861,7 +861,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return vector;
 	}
 
-	private static float ProjectileDistToSpeed(float x, float y, float angle, float g, float fallbackV)
+	public static float ProjectileDistToSpeed(float x, float y, float angle, float g, float fallbackV)
 	{
 		float num = angle * ((float)Math.PI / 180f);
 		float num2 = Mathf.Sqrt(x * x * g / (x * Mathf.Sin(2f * num) - 2f * y * Mathf.Cos(num) * Mathf.Cos(num)));
@@ -872,7 +872,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return num2;
 	}
 
-	private static float ProjectileDistToGravity(float x, float y, float θ, float v)
+	public static float ProjectileDistToGravity(float x, float y, float θ, float v)
 	{
 		float num = θ * ((float)Math.PI / 180f);
 		float num2 = (v * v * x * Mathf.Sin(2f * num) - 2f * v * v * y * Mathf.Cos(num) * Mathf.Cos(num)) / (x * x);

@@ -665,9 +665,9 @@ namespace Rust.Ai.HTN.NPCTurret
 			}
 		};
 
-		[Header("Firearm Utility")]
 		[ReadOnly]
 		[SerializeField]
+		[Header("Firearm Utility")]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]

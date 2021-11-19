@@ -1,4 +1,4 @@
-internal interface IAISenses
+public interface IAISenses
 {
 	bool IsThreat(BaseEntity entity);
 

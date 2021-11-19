@@ -14,17 +14,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = new Vector2(50f, 95f)
 		};
 
+		[Range(-9f, 9f)]
 		[DisplayName("Minimum (EV)")]
 		[Tooltip("Minimum average luminance to consider for auto exposure. Unit is EV.")]
-		[Range(-9f, 9f)]
 		public FloatParameter minLuminance = new FloatParameter
 		{
 			value = 0f
 		};
 
+		[Tooltip("Maximum average luminance to consider for auto exposure. Unit is EV.")]
 		[Range(-9f, 9f)]
 		[DisplayName("Maximum (EV)")]
-		[Tooltip("Maximum average luminance to consider for auto exposure. Unit is EV.")]
 		public FloatParameter maxLuminance = new FloatParameter
 		{
 			value = 0f

@@ -1896,9 +1896,9 @@ namespace Rust.Ai.HTN.Murderer
 			}
 		};
 
-		[SerializeField]
 		[Header("Firearm Utility")]
 		[ReadOnly]
+		[SerializeField]
 		private float _lastFirearmUsageTime;
 
 		[ReadOnly]

@@ -1,4 +1,4 @@
-internal interface IAIMounted
+public interface IAIMounted
 {
 	bool IsMounted();
 }

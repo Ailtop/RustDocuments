@@ -356,7 +356,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			{
 				num4 = item.amount;
 			}
-			num4 = Mathf.Clamp(num4, 1, item.info.stackable);
+			num4 = Mathf.Clamp(num4, 1, item.MaxStackable());
 			if (msg.player.GetActiveItem() == item)
 			{
 				msg.player.UpdateActiveItem(0u);

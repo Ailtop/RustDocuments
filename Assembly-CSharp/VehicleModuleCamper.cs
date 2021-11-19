@@ -326,6 +326,26 @@ public class VehicleModuleCamper : VehicleModuleSeating
 		}
 	}
 
+	internal override void DoServerDestroy()
+	{
+		if (vehicle.carsdroploot)
+		{
+			if (activeStorage.IsValid(base.isServer))
+			{
+				activeStorage.Get(base.isServer).DropItems();
+			}
+			if (activeBbq.IsValid(base.isServer))
+			{
+				activeBbq.Get(base.isServer).DropItems();
+			}
+			if (activeLocker.IsValid(base.isServer))
+			{
+				activeLocker.Get(base.isServer).DropItems();
+			}
+		}
+		base.DoServerDestroy();
+	}
+
 	public IItemContainerEntity GetContainer()
 	{
 		Locker locker = activeLocker.Get(base.isServer);

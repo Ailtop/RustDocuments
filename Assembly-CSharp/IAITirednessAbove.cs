@@ -1,4 +1,4 @@
-internal interface IAITirednessAbove
+public interface IAITirednessAbove
 {
 	bool IsTirednessAbove(float val);
 }

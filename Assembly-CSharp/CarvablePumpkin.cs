@@ -231,7 +231,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		SendNetworkUpdate();
 	}
 
-	private void EnsureInitialized()
+	public void EnsureInitialized()
 	{
 		int num = Mathf.Max(paintableSources.Length, 1);
 		if (textureIDs == null || textureIDs.Length != num)

@@ -92,9 +92,9 @@ public class SamSite : ContainerIOEntity
 
 	public static SamTargetType targetTypeMissile;
 
-	private ISamSiteTarget currentTarget;
+	public ISamSiteTarget currentTarget;
 
-	private SamTargetType mostRecentTargetType;
+	public SamTargetType mostRecentTargetType;
 
 	public Item ammoItem;
 
@@ -127,7 +127,7 @@ public class SamSite : ContainerIOEntity
 		base.Load(info);
 	}
 
-	private void SetTarget(ISamSiteTarget target)
+	public void SetTarget(ISamSiteTarget target)
 	{
 		currentTarget = target;
 		if (!ObjectEx.IsUnityNull(target))
@@ -136,7 +136,7 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
-	private void ClearTarget()
+	public void ClearTarget()
 	{
 		SetTarget(null);
 	}
@@ -266,9 +266,11 @@ public class SamSite : ContainerIOEntity
 			return;
 		}
 		List<ISamSiteTarget> obj = Pool.GetList<ISamSiteTarget>();
-		_003CTargetScan_003Eg__AddTargetSet_007C48_0<BaseVehicle>(obj, 32768, targetTypeVehicle.scanRadius);
-		_003CTargetScan_003Eg__AddTargetSet_007C48_0<MLRSRocket>(obj, 1048576, targetTypeMissile.scanRadius);
-		Interface.CallHook("OnSamSiteTargetScan", this, obj);
+		if (Interface.CallHook("OnSamSiteTargetScan", this, obj) == null)
+		{
+			_003CTargetScan_003Eg__AddTargetSet_007C48_0<BaseVehicle>(obj, 32768, targetTypeVehicle.scanRadius);
+			_003CTargetScan_003Eg__AddTargetSet_007C48_0<MLRSRocket>(obj, 1048576, targetTypeMissile.scanRadius);
+		}
 		ISamSiteTarget samSiteTarget = null;
 		foreach (ISamSiteTarget item in obj)
 		{

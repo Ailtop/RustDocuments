@@ -1,4 +1,4 @@
-internal interface IAISleep
+public interface IAISleep
 {
 	void StartSleeping();
 

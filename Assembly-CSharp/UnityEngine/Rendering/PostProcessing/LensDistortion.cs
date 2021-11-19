@@ -21,17 +21,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 1f
 		};
 
+		[Range(0f, 1f)]
 		[DisplayName("Y Multiplier")]
 		[Tooltip("Intensity multiplier on the y-axis. Set it to 0 to disable distortion on this axis.")]
-		[Range(0f, 1f)]
 		public FloatParameter intensityY = new FloatParameter
 		{
 			value = 1f
 		};
 
+		[Space]
 		[Range(-1f, 1f)]
 		[Tooltip("Distortion center point (x-axis).")]
-		[Space]
 		public FloatParameter centerX = new FloatParameter
 		{
 			value = 0f

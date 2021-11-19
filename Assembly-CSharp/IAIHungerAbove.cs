@@ -1,4 +1,4 @@
-internal interface IAIHungerAbove
+public interface IAIHungerAbove
 {
 	bool IsHungerAbove(float val);
 }
