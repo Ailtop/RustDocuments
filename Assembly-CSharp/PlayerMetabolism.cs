@@ -287,7 +287,7 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 			isDirty = false;
 			using (ProtoBuf.PlayerMetabolism arg = Save())
 			{
-				base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateMetabolism", arg);
+				base.baseEntity.ClientRPCPlayerAndSpectators(null, base.baseEntity, "UpdateMetabolism", arg);
 			}
 		}
 	}

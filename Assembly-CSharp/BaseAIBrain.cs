@@ -682,6 +682,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 	public int MaxGroupSize;
 
+	public float MemoryDuration = 10f;
+
+	public bool RefreshKnownLOS;
+
 	public Vector3 mainInterestPoint;
 
 	public bool UseAIDesign;
@@ -697,6 +701,8 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 	private float lastMovementTickTime;
 
 	public bool sleeping;
+
+	private bool disabled;
 
 	public Dictionary<AIState, BasicAIState> states;
 
@@ -906,6 +912,11 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 	public int LoadedDesignIndex()
 	{
 		return loadedDesignIndex;
+	}
+
+	public void SetEnabled(bool flag)
+	{
+		disabled = !flag;
 	}
 
 	bool IAIDesign.CanPlayerDesignAI(BasePlayer player)
@@ -1187,7 +1198,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 				Events = new AIEvents();
 			}
 			bool senseFriendlies = MaxGroupSize > 0;
-			Senses.Init(entity, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes);
+			Senses.Init(entity, MemoryDuration, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes, RefreshKnownLOS);
 			if (DefaultDesignSO == null && Designs.Count == 0)
 			{
 				Debug.LogWarning("Brain on " + base.gameObject.name + " is trying to load a null AI design!");
@@ -1216,10 +1227,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 			BaseEntity.Query.Server.RemoveBrain(GetEntity());
 			AIInformationZone aIInformationZone = null;
-			HumanNPCNew humanNPCNew = GetEntity() as HumanNPCNew;
-			if (humanNPCNew != null)
+			HumanNPC humanNPC = GetEntity() as HumanNPC;
+			if (humanNPC != null)
 			{
-				aIInformationZone = humanNPCNew.VirtualInfoZone;
+				aIInformationZone = humanNPC.VirtualInfoZone;
 			}
 			if (aIInformationZone == null)
 			{
@@ -1346,7 +1357,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			return;
 		}
 		lastThinkTime = UnityEngine.Time.time;
-		if (sleeping)
+		if (sleeping || disabled)
 		{
 			return;
 		}

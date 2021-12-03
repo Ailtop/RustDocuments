@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
@@ -27,9 +28,22 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 
 	public float swimRandom;
 
+	public virtual bool HasRangeLimit => true;
+
 	protected virtual int mask => 1236478737;
 
 	public Vector3 CurrentVelocity { get; set; }
+
+	public float GetMaxRange(float maxFuseTime)
+	{
+		if (gravityModifier == 0f)
+		{
+			return float.PositiveInfinity;
+		}
+		float a = Mathf.Sin((float)Math.PI / 2f) * speed * speed / (0f - Physics.gravity.y * gravityModifier);
+		float b = speed * maxFuseTime;
+		return Mathf.Min(a, b);
+	}
 
 	protected void FixedUpdate()
 	{
@@ -51,7 +65,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		{
 			if (swimRandom == 0f)
 			{
-				swimRandom = Random.Range(0f, 20f);
+				swimRandom = UnityEngine.Random.Range(0f, 20f);
 			}
 			float num = Time.time + swimRandom;
 			Vector3 direction = new Vector3(Mathf.Sin(num * swimSpeed.x) * swimScale.x, Mathf.Cos(num * swimSpeed.y) * swimScale.y, Mathf.Sin(num * swimSpeed.z) * swimScale.z);

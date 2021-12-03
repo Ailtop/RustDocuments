@@ -93,6 +93,16 @@ public class NewsSource : MonoBehaviour
 				currentParagraph.Append(value4);
 				currentParagraph.Append("</size>");
 				break;
+			case "h3":
+				currentParagraph.Append("<size=175%>");
+				currentParagraph.Append(value4);
+				currentParagraph.Append("</size>");
+				break;
+			case "h4":
+				currentParagraph.Append("<size=150%>");
+				currentParagraph.Append(value4);
+				currentParagraph.Append("</size>");
+				break;
 			case "b":
 				currentParagraph.Append("<b>");
 				ParseBbcode(currentParagraph, value4, ref firstImage, depth + 1);

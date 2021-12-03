@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Facepunch;
 using Network;
-using Rust.Ai.HTN.ScientistJunkpile;
 using UnityEngine;
 
 public class JunkPile : BaseEntity
@@ -10,13 +9,7 @@ public class JunkPile : BaseEntity
 
 	public SpawnGroup[] spawngroups;
 
-	public ScientistJunkpileSpawner npcSpawnGroup;
-
 	private const float lifetimeMinutes = 30f;
-
-	private List<NPCPlayerApex> _npcs;
-
-	private List<HTNPlayer> _htnPlayers;
 
 	protected bool isSinking;
 
@@ -44,7 +37,6 @@ public class JunkPile : BaseEntity
 		{
 			array[i].SpawnInitial();
 		}
-		npcSpawnGroup?.SpawnInitial();
 	}
 
 	public bool SpawnGroupsEmpty()
@@ -56,11 +48,6 @@ public class JunkPile : BaseEntity
 			{
 				return false;
 			}
-		}
-		ScientistJunkpileSpawner scientistJunkpileSpawner = npcSpawnGroup;
-		if ((object)scientistJunkpileSpawner != null && scientistJunkpileSpawner.currentPopulation > 0)
-		{
-			return false;
 		}
 		return true;
 	}
@@ -102,33 +89,7 @@ public class JunkPile : BaseEntity
 		{
 			Invoke(TimeOut, 30f);
 		}
-		if (SpawnGroupsEmpty())
-		{
-			SinkAndDestroy();
-			return;
-		}
-		if (_npcs != null)
-		{
-			foreach (NPCPlayerApex npc in _npcs)
-			{
-				if (!(npc == null) && !(npc.transform == null) && !npc.IsDestroyed && !npc.IsDead())
-				{
-					npc.Kill();
-				}
-			}
-			_npcs.Clear();
-		}
-		if (_htnPlayers != null)
-		{
-			foreach (HTNPlayer htnPlayer in _htnPlayers)
-			{
-				if (!(htnPlayer == null) && !(htnPlayer.transform == null) && !htnPlayer.IsDestroyed && !htnPlayer.IsDead())
-				{
-					htnPlayer.Kill();
-				}
-			}
-			_htnPlayers.Clear();
-		}
+		SpawnGroupsEmpty();
 		SinkAndDestroy();
 	}
 
@@ -141,7 +102,6 @@ public class JunkPile : BaseEntity
 			array[i].Clear();
 		}
 		SetFlag(Flags.Reserved8, true, true);
-		npcSpawnGroup?.Clear();
 		ClientRPC(null, "CLIENT_StartSink");
 		base.transform.position -= new Vector3(0f, 5f, 0f);
 		isSinking = true;
@@ -151,23 +111,5 @@ public class JunkPile : BaseEntity
 	public void KillMe()
 	{
 		Kill();
-	}
-
-	public void AddNpc(NPCPlayerApex npc)
-	{
-		if (_npcs == null)
-		{
-			_npcs = new List<NPCPlayerApex>(1);
-		}
-		_npcs.Add(npc);
-	}
-
-	public void AddNpc(HTNPlayer npc)
-	{
-		if (_htnPlayers == null)
-		{
-			_htnPlayers = new List<HTNPlayer>();
-		}
-		_htnPlayers.Add(npc);
 	}
 }

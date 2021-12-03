@@ -13,13 +13,9 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
-	public Transform fuelStoragePoint;
-
 	public float fuelPerSec = 0.25f;
 
 	public float fuelGaugeMax = 100f;
-
-	public EntityFuelSystem fuelSystem;
 
 	public float cachedFuelFraction;
 
@@ -85,7 +81,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	[ServerVar(Help = "How long before a minicopter loses all its health while indoors")]
 	public static float insidedecayminutes = 2880f;
 
-	public VehicleEngineController engineController;
+	public VehicleEngineController<MiniCopter> engineController;
 
 	public bool isPushing;
 
@@ -109,13 +105,13 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		}
 	}
 
-	public VehicleEngineController.EngineState CurEngineState
+	public VehicleEngineController<MiniCopter>.EngineState CurEngineState
 	{
 		get
 		{
 			if (engineController == null)
 			{
-				return VehicleEngineController.EngineState.Off;
+				return VehicleEngineController<MiniCopter>.EngineState.Off;
 			}
 			return engineController.CurEngineState;
 		}
@@ -127,14 +123,23 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	{
 		if (base.isServer)
 		{
-			cachedFuelFraction = Mathf.Clamp01((float)fuelSystem.GetFuelAmount() / fuelGaugeMax);
+			cachedFuelFraction = Mathf.Clamp01((float)engineController.FuelSystem.GetFuelAmount() / fuelGaugeMax);
 		}
 		return cachedFuelFraction;
 	}
 
 	public override EntityFuelSystem GetFuelSystem()
 	{
-		return fuelSystem;
+		return engineController.FuelSystem;
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer && isSpawned)
+		{
+			GetFuelSystem().CheckNewChild(child);
+		}
 	}
 
 	[RPC_Server]
@@ -147,15 +152,14 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 			BasePlayer driver = GetDriver();
 			if ((!(driver != null) || !(driver != player)) && (!IsSafe() || !(player != creatorEntity)))
 			{
-				fuelSystem.LootFuel(player);
+				engineController.FuelSystem.LootFuel(player);
 			}
 		}
 	}
 
 	public override void InitShared()
 	{
-		engineController = new VehicleEngineController(this, base.isServer, 5f, Flags.Reserved4);
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		engineController = new VehicleEngineController<MiniCopter>(this, base.isServer, 5f, fuelStoragePrefab, waterSample, Flags.Reserved4);
 	}
 
 	public override float GetServiceCeiling()
@@ -316,17 +320,6 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		}
 	}
 
-	public override void SpawnSubEntities()
-	{
-		base.SpawnSubEntities();
-		fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-	}
-
-	public bool Waterlogged()
-	{
-		return WaterLevel.Test(waterSample.transform.position, true, this);
-	}
-
 	public override bool ShouldApplyHoverForce()
 	{
 		return IsOn();
@@ -337,13 +330,17 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		return IsOn();
 	}
 
-	public bool CanRunEngines()
+	public bool MeetsEngineRequirements()
 	{
-		if (HasDriver() && fuelSystem.HasFuel() && !Waterlogged())
+		if (engineController.IsOff)
 		{
-			return !IsDead();
+			return HasDriver();
 		}
-		return false;
+		if (!HasDriver())
+		{
+			return UnityEngine.Time.time <= lastPlayerInputTime + 1f;
+		}
+		return true;
 	}
 
 	public void OnEngineStartFailed()
@@ -353,7 +350,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	public override void OnFlagsChanged(Flags old, Flags next)
 	{
 		base.OnFlagsChanged(old, next);
-		if (base.isServer && CurEngineState == VehicleEngineController.EngineState.Off)
+		if (base.isServer && CurEngineState == VehicleEngineController<MiniCopter>.EngineState.Off)
 		{
 			lastEngineOnTime = UnityEngine.Time.time;
 		}
@@ -362,14 +359,8 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if ((IsOn() || IsStartingUp) && ((UnityEngine.Time.time > lastPlayerInputTime + 1f && !HasDriver()) || !fuelSystem.HasFuel() || Waterlogged()))
-		{
-			engineController.StopEngine();
-		}
-		if (IsOn())
-		{
-			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelPerSec);
-		}
+		engineController.CheckEngineState();
+		engineController.TickFuel(fuelPerSec);
 	}
 
 	public void UpdateNetwork()
@@ -397,7 +388,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	{
 		base.Save(info);
 		info.msg.miniCopter = Facepunch.Pool.Get<Minicopter>();
-		info.msg.miniCopter.fuelStorageID = fuelSystem.fuelStorageInstance.uid;
+		info.msg.miniCopter.fuelStorageID = engineController.FuelSystem.fuelStorageInstance.uid;
 		info.msg.miniCopter.fuelFraction = GetFuelFraction();
 		info.msg.miniCopter.pitch = currentInputState.pitch;
 		info.msg.miniCopter.roll = currentInputState.roll;
@@ -447,7 +438,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		base.Load(info);
 		if (info.msg.miniCopter != null)
 		{
-			fuelSystem.fuelStorageInstance.uid = info.msg.miniCopter.fuelStorageID;
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.miniCopter.fuelStorageID;
 			cachedFuelFraction = info.msg.miniCopter.fuelFraction;
 			cachedPitch = RemapValue(info.msg.miniCopter.pitch, 0.5f);
 			cachedRoll = RemapValue(info.msg.miniCopter.roll, 0.2f);

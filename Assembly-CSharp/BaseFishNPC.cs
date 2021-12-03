@@ -37,7 +37,8 @@ public class BaseFishNPC : BaseNpc, IAIAttack, IAISenses, IThinker
 		{
 			return false;
 		}
-		if (!IsTargetInRange(entity))
+		float dist;
+		if (!IsTargetInRange(entity, out dist))
 		{
 			return false;
 		}
@@ -58,9 +59,10 @@ public class BaseFishNPC : BaseNpc, IAIAttack, IAISenses, IThinker
 		return AttackRange * brain.AttackRangeMultiplier;
 	}
 
-	public bool IsTargetInRange(BaseEntity entity)
+	public bool IsTargetInRange(BaseEntity entity, out float dist)
 	{
-		return Vector3.Distance(entity.transform.position, base.AttackPosition) <= EngagementRange();
+		dist = Vector3.Distance(entity.transform.position, base.AttackPosition);
+		return dist <= EngagementRange();
 	}
 
 	public bool CanSeeTarget(BaseEntity entity)

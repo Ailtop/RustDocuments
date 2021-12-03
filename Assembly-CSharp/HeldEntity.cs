@@ -61,8 +61,6 @@ public class HeldEntity : BaseEntity
 
 	public AnimatorOverrideController HoldAnimationOverride;
 
-	public NPCPlayerApex.ToolTypeEnum toolType;
-
 	public bool isBuildingTool;
 
 	[Header("Hostility")]

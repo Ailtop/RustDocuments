@@ -1051,7 +1051,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		nextShotTime = Mathf.Max(nextShotTime, UnityEngine.Time.time + Mathf.Min(attachedWeapon.GetReloadDuration() * 0.5f, 2f));
 		AmmoTypes ammoTypes = attachedWeapon.primaryMagazine.definition.ammoTypes;
-		if (attachedWeapon.primaryMagazine.contents > 0)
+		if (attachedWeapon.primaryMagazine.contents > 0 && base.inventory.GetMaxTransferAmount(attachedWeapon.primaryMagazine.ammoType) > 0)
 		{
 			base.inventory.AddItem(attachedWeapon.primaryMagazine.ammoType, attachedWeapon.primaryMagazine.contents, 0uL);
 			attachedWeapon.primaryMagazine.contents = 0;

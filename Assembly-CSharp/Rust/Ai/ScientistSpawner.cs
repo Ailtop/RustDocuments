@@ -20,8 +20,6 @@ namespace Rust.Ai
 
 		public bool IsMilitaryTunnelLab;
 
-		public NPCPlayerApex.EnemyRangeEnum MaxRangeToSpawnLoc = NPCPlayerApex.EnemyRangeEnum.LongAttackRange;
-
 		public WaypointSet Waypoints;
 
 		public Transform[] LookAtInterestPointsStationary;
@@ -77,38 +75,6 @@ namespace Rust.Ai
 
 		protected override void PostSpawnProcess(BaseEntity entity, BaseSpawnPoint spawnPoint)
 		{
-			Scientist component = entity.GetComponent<Scientist>();
-			if ((bool)component)
-			{
-				component.Stats.Hostility = (SpawnHostile ? 1f : 0f);
-				component.Stats.Defensiveness = (SpawnHostile ? 1f : (IsBandit ? 1f : 0f));
-				component.Stats.OnlyAggroMarkedTargets = OnlyAggroMarkedTargets;
-				component.Stats.IsMobile = Mobile;
-				component.NeverMove = NeverMove;
-				component.WaypointSet = Waypoints;
-				if (LookAtInterestPointsStationary != null && LookAtInterestPointsStationary.Length != 0)
-				{
-					component.LookAtInterestPointsStationary = LookAtInterestPointsStationary;
-				}
-				component.RadioEffectRepeatRange = RadioEffectRepeatRange;
-				component.SetFact(NPCPlayerApex.Facts.IsPeacekeeper, (byte)(IsPeacekeeper ? 1u : 0u));
-				component.SetFact(NPCPlayerApex.Facts.IsBandit, (byte)(IsBandit ? 1u : 0u));
-				component.SetFact(NPCPlayerApex.Facts.IsMilitaryTunnelLab, (byte)(IsMilitaryTunnelLab ? 1u : 0u));
-				component.Stats.MaxRangeToSpawnLoc = MaxRangeToSpawnLoc;
-				if (!SpawnHostile)
-				{
-					component.SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, true);
-					component.SetFact(NPCPlayerApex.Facts.Speed, 0);
-				}
-				if (_mgr == null)
-				{
-					_mgr = GetComponentInParent<AiLocationManager>();
-				}
-				if (_mgr != null)
-				{
-					component.AiContext.AiLocationManager = _mgr;
-				}
-			}
 		}
 
 		protected override void OnDrawGizmos()

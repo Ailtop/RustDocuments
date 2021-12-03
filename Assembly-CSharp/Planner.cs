@@ -196,6 +196,15 @@ public class Planner : HeldEntity
 			Vector3 position = ownerPlayer.eyes.position;
 			Vector3 origin = target.ray.origin;
 			Vector3 p = ((target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position);
+			int num = 2097152;
+			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
+			float num3 = ((target.socket != null) ? 0f : ConVar.AntiHack.losradius);
+			float padding = ((target.socket != null) ? 0.5f : (ConVar.AntiHack.losradius + 0.01f));
+			int layerMask = ((target.socket != null) ? num : num2);
+			if (num3 > 0f)
+			{
+				p += target.normal.normalized * num3;
+			}
 			if (target.entity != null)
 			{
 				DeployShell deployShell = PrefabAttribute.server.Find<DeployShell>(target.entity.prefabID);
@@ -204,9 +213,7 @@ public class Planner : HeldEntity
 					p += target.normal.normalized * deployShell.LineOfSightPadding();
 				}
 			}
-			int num = 2097152;
-			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
-			if (!GamePhysics.LineOfSight(padding: (target.socket != null) ? 0.5f : 0.01f, layerMask: (target.socket != null) ? num : num2, p0: center, p1: position, p2: origin, p3: p))
+			if (!GamePhysics.LineOfSightRadius(center, position, origin, p, layerMask, num3, padding))
 			{
 				ownerPlayer.ChatMessage("Line of sight blocked.");
 				return;

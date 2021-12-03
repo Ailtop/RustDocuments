@@ -272,9 +272,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_BeginTalking(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -313,9 +313,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		Interface.CallHook("OnNpcConversationEnded", this, msg.player);
 	}
 
+	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server]
 	public void ConversationAction(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

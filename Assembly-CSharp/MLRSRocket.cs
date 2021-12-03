@@ -10,6 +10,9 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 	private GameObjectRef launchBlastFXPrefab;
 
 	[SerializeField]
+	private GameObjectRef explosionGroundFXPrefab;
+
+	[SerializeField]
 	private ServerProjectile serverProjectile;
 
 	private EntityRef mapMarkerInstanceRef;
@@ -26,6 +29,10 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 	public override void ProjectileImpact(RaycastHit info, Vector3 rayOrigin)
 	{
 		Explode(rayOrigin);
+		if (Physics.Raycast(info.point + Vector3.up, Vector3.down, 4f, 1218511121, QueryTriggerInteraction.Ignore))
+		{
+			Effect.server.Run(explosionGroundFXPrefab.resourcePath, info.point, Vector3.up, null, true);
+		}
 	}
 
 	private void CreateMapMarker()

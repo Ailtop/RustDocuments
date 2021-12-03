@@ -59,7 +59,7 @@ public static class Vis
 		}
 	}
 
-	public static void Entities<T>(Vector3 position, float radius, List<T> list, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide) where T : BaseEntity
+	public static void Entities<T>(Vector3 position, float radius, List<T> list, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide) where T : class
 	{
 		Buffer(position, radius, layerMask, triggerInteraction);
 		for (int i = 0; i < colCount; i++)
@@ -68,7 +68,7 @@ public static class Vis
 			if (!(collider == null) && collider.enabled)
 			{
 				T val = GameObjectEx.ToBaseEntity(collider) as T;
-				if (!((Object)val == (Object)null))
+				if (val != null)
 				{
 					list.Add(val);
 				}

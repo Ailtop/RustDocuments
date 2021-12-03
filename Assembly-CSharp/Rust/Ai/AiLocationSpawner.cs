@@ -107,7 +107,7 @@ namespace Rust.Ai
 				num = ConVar.AI.npc_junkpile_g_spawn_chance;
 				break;
 			}
-			if (numToSpawn == 0 || Random.value > num || ((Location == SquadSpawnerLocation.JunkpileA || Location == SquadSpawnerLocation.JunkpileG) && NPCPlayerApex.AllJunkpileNPCs.Count >= ConVar.AI.npc_max_junkpile_count))
+			if (numToSpawn == 0 || Random.value > num)
 			{
 				return;
 			}
@@ -118,32 +118,18 @@ namespace Rust.Ai
 				Vector3 pos;
 				Quaternion rot;
 				BaseSpawnPoint spawnPoint = GetSpawnPoint(prefab, out pos, out rot);
-				if (!spawnPoint)
+				if ((bool)spawnPoint)
 				{
-					continue;
-				}
-				BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot);
-				if (!baseEntity)
-				{
-					continue;
-				}
-				if (Manager != null)
-				{
-					NPCPlayerApex nPCPlayerApex = baseEntity as NPCPlayerApex;
-					if (nPCPlayerApex != null)
+					BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot);
+					if ((bool)baseEntity)
 					{
-						nPCPlayerApex.AiContext.AiLocationManager = Manager;
-						if (Junkpile != null)
-						{
-							Junkpile.AddNpc(nPCPlayerApex);
-						}
+						baseEntity.Spawn();
+						SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
+						spawnPointInstance.parentSpawnPointUser = this;
+						spawnPointInstance.parentSpawnPoint = spawnPoint;
+						spawnPointInstance.Notify();
 					}
 				}
-				baseEntity.Spawn();
-				SpawnPointInstance spawnPointInstance = baseEntity.gameObject.AddComponent<SpawnPointInstance>();
-				spawnPointInstance.parentSpawnPointUser = this;
-				spawnPointInstance.parentSpawnPoint = spawnPoint;
-				spawnPointInstance.Notify();
 			}
 		}
 

@@ -1,4 +1,4 @@
-public class TunnelDweller : HumanNPCNew
+public class TunnelDweller : HumanNPC
 {
 	protected override string OverrideCorpseName()
 	{

@@ -17,7 +17,12 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			base.StateEnter();
 			attack = GetEntity();
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
-			if (baseEntity != null)
+			BasePlayer basePlayer = baseEntity as BasePlayer;
+			if (basePlayer != null && basePlayer.IsDead())
+			{
+				StopAttacking();
+			}
+			else if (baseEntity != null && baseEntity.Health() > 0f)
 			{
 				BaseCombatEntity target = baseEntity as BaseCombatEntity;
 				Vector3 aimDirection = GetAimDirection(GetEntity(), target);
@@ -57,13 +62,26 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 				StopAttacking();
 				return StateStatus.Finished;
 			}
-			if (brain.Senses.ignoreSafeZonePlayers)
+			if (baseEntity.Health() <= 0f)
 			{
-				BasePlayer basePlayer = baseEntity as BasePlayer;
-				if (basePlayer != null && basePlayer.InSafeZone())
-				{
-					return StateStatus.Error;
-				}
+				StopAttacking();
+				return StateStatus.Finished;
+			}
+			BasePlayer basePlayer = baseEntity as BasePlayer;
+			if (basePlayer != null && basePlayer.IsDead())
+			{
+				StopAttacking();
+				return StateStatus.Finished;
+			}
+			BaseVehicle baseVehicle = ((basePlayer != null) ? basePlayer.GetMountedVehicle() : null);
+			if (baseVehicle != null && baseVehicle is BaseModularVehicle)
+			{
+				StopAttacking();
+				return StateStatus.Error;
+			}
+			if (brain.Senses.ignoreSafeZonePlayers && basePlayer != null && basePlayer.InSafeZone())
+			{
+				return StateStatus.Error;
 			}
 			if (!brain.Navigator.SetDestination(baseEntity.transform.position, BaseNavigator.NavigationSpeed.Fast, 0.25f, (baseEntity is BasePlayer && attack != null) ? attack.EngagementRange() : 0f))
 			{

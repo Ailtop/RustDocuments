@@ -516,7 +516,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Gesture,
 		PhysImpact,
 		Eat,
-		Startled
+		Startled,
+		Admire
 	}
 
 	public enum Slot
@@ -669,6 +670,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private EntityComponentBase[] _components;
 
+	[HideInInspector]
 	public bool HasBrain;
 
 	[NonSerialized]
@@ -1909,7 +1911,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public override void Spawn()
 	{
 		base.Spawn();
-		OnParentSpawningEx.BroadcastOnParentSpawning(base.gameObject);
+		if (base.isServer)
+		{
+			OnParentSpawningEx.BroadcastOnParentSpawning(base.gameObject);
+		}
 	}
 
 	public void OnParentSpawning()
@@ -1923,6 +1928,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			UnityEngine.Object.Destroy(base.gameObject);
 			return;
 		}
+		if (GameManager.server.preProcessed.NeedsProcessing(base.gameObject))
+		{
+			GameManager.server.preProcessed.ProcessObject(null, base.gameObject, false);
+		}
 		BaseEntity baseEntity = ((base.transform.parent != null) ? base.transform.parent.GetComponentInParent<BaseEntity>() : null);
 		Spawn();
 		if (baseEntity != null)
@@ -1935,6 +1944,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		if (net == null && !base.IsDestroyed && ((base.transform.parent != null) ? base.transform.parent.GetComponentInParent<BaseEntity>() : null) == null)
 		{
+			if (GameManager.server.preProcessed.NeedsProcessing(base.gameObject))
+			{
+				GameManager.server.preProcessed.ProcessObject(null, base.gameObject, false);
+			}
 			base.transform.parent = null;
 			SceneManager.MoveGameObjectToScene(base.gameObject, Rust.Server.EntityScene);
 			base.gameObject.SetActive(true);
@@ -2900,6 +2913,15 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			return model.FindBone(strName);
 		}
 		return base.transform;
+	}
+
+	public virtual uint FindBoneID(Transform boneTransform)
+	{
+		if ((bool)model)
+		{
+			return model.FindBoneID(boneTransform);
+		}
+		return StringPool.closest;
 	}
 
 	public virtual Transform FindClosestBone(Vector3 worldPos)

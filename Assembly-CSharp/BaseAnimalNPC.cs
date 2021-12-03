@@ -82,11 +82,18 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 		{
 			return false;
 		}
-		if (!IsTargetInRange(entity))
+		float dist;
+		if (!IsTargetInRange(entity, out dist))
 		{
 			return false;
 		}
 		if (!CanSeeTarget(entity))
+		{
+			return false;
+		}
+		BasePlayer basePlayer = entity as BasePlayer;
+		BaseVehicle baseVehicle = ((basePlayer != null) ? basePlayer.GetMountedVehicle() : null);
+		if (baseVehicle != null && baseVehicle is BaseModularVehicle)
 		{
 			return false;
 		}
@@ -103,9 +110,10 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 		return AttackRange * brain.AttackRangeMultiplier;
 	}
 
-	public bool IsTargetInRange(BaseEntity entity)
+	public bool IsTargetInRange(BaseEntity entity, out float dist)
 	{
-		return Vector3.Distance(entity.transform.position, base.AttackPosition) <= EngagementRange();
+		dist = Vector3.Distance(entity.transform.position, base.AttackPosition);
+		return dist <= EngagementRange();
 	}
 
 	public bool CanSeeTarget(BaseEntity entity)

@@ -52,7 +52,7 @@ public class BaseLauncher : BaseProjectile
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public override bool ForceSendMagazine()
+	public override bool ForceSendMagazine(SaveInfo saveInfo)
 	{
 		return true;
 	}

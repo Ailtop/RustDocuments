@@ -1,10 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Apex.AI;
-using Apex.AI.Components;
-using Apex.LoadBalancing;
 using ConVar;
 using Facepunch;
 using Network;
@@ -16,7 +12,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Assertions;
 
-public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAgent
+public class BaseNpc : BaseCombatEntity
 {
 	[Flags]
 	public enum AiFlags
@@ -218,9 +214,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		[Tooltip("How long can we be out of range of our spawn point before we time out and make our way back home (when idle).")]
 		public float OutOfRangeOfSpawnPointTimeout;
 
-		[Tooltip("What is the maximum distance we are allowed to have to our spawn location before we are being encourraged to go back home.")]
-		public NPCPlayerApex.EnemyRangeEnum MaxRangeToSpawnLoc;
-
 		[Tooltip("If this is set to true, then a target must hold special markers (like IsHostile) for the target to be considered for aggressive action.")]
 		public bool OnlyAggroMarkedTargets;
 	}
@@ -314,8 +307,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 	[NonSerialized]
 	public BaseEntity[] SensesResults = new BaseEntity[64];
 
-	private List<NavPointSample> navPointSamples = new List<NavPointSample>(8);
-
 	private float lastTickTime;
 
 	public float playerTargetDecisionStartTime;
@@ -358,9 +349,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public NavMeshAgent NavAgent;
 
-	[SerializeField]
-	private UtilityAIComponent utilityAiComponent;
-
 	public LayerMask movementMask = 429990145;
 
 	public float stuckDuration;
@@ -368,9 +356,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 	public float lastStuckTime;
 
 	public float idleDuration;
-
-	[NonSerialized]
-	public BaseContext AiContext;
 
 	private bool _isDormant;
 
@@ -446,8 +431,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			SetAiFlag(AiFlags.Sleeping, value);
 		}
 	}
-
-	bool ILoadBalanced.repeat => true;
 
 	public float SecondsSinceLastHeardGunshot => UnityEngine.Time.time - _lastHeardGunshotTime;
 
@@ -682,16 +665,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public override string DebugText()
 	{
-		string text = base.DebugText();
-		text += $"\nBehaviour: {CurrentBehaviour}";
-		text += $"\nAttackTarget: {AttackTarget}";
-		text += $"\nFoodTarget: {FoodTarget}";
-		text += $"\nSleep: {Sleep:0.00}";
-		if (AiContext != null)
-		{
-			text += $"\nVisible Ents: {AiContext.Memory.Visible.Count}";
-		}
-		return text;
+		return string.Concat(string.Concat(string.Concat(base.DebugText() + $"\nBehaviour: {CurrentBehaviour}", $"\nAttackTarget: {AttackTarget}"), $"\nFoodTarget: {FoodTarget}"), $"\nSleep: {Sleep:0.00}");
 	}
 
 	public void TickAi()
@@ -1174,28 +1148,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 	}
 
-	public void StartAttack(AttackOperator.AttackType type, BaseCombatEntity target)
-	{
-		if (target == null || GetFact(Facts.IsAttackReady) == 0)
-		{
-			return;
-		}
-		Vector3 vector = target.ServerPosition - ServerPosition;
-		float magnitude = vector.magnitude;
-		if (!(magnitude > AttackRange))
-		{
-			if (magnitude > 0.001f)
-			{
-				ServerRotation = Quaternion.LookRotation(vector.normalized);
-			}
-			nextAttackTime = UnityEngine.Time.realtimeSinceStartup + AttackRate;
-			target.Hurt(AttackDamage, AttackDamageType, this);
-			Stamina.Use(AttackCost);
-			SignalBroadcast(Signal.Attack);
-			ClientRPC(null, "Attack", target.ServerPosition);
-		}
-	}
-
 	public void Attack(BaseCombatEntity target)
 	{
 		if (!(target == null))
@@ -1236,19 +1188,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private bool IsAfraid()
 	{
-		if (GetFact(Facts.AfraidRange) == 0)
-		{
-			if (AiContext.EnemyNpc != null && IsAfraidOf(AiContext.EnemyNpc.Stats.Family))
-			{
-				SetFact(Facts.IsAfraid, 1);
-				return true;
-			}
-			if (AiContext.EnemyPlayer != null && IsAfraidOf(AiContext.EnemyPlayer.Family))
-			{
-				SetFact(Facts.IsAfraid, 1);
-				return true;
-			}
-		}
 		SetFact(Facts.IsAfraid, 0);
 		return false;
 	}
@@ -1325,18 +1264,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private void TickFlee()
 	{
-		bool flag = UnityEngine.Time.realtimeSinceStartup > maxFleeTime;
-		if (flag || (IsNavRunning() && NavAgent.remainingDistance <= NavAgent.stoppingDistance + 1f))
-		{
-			if (!flag && IsAfraid())
-			{
-				NavigateToOperator.FleeEnemy(AiContext);
-				return;
-			}
-			SetFact(Facts.WantsToFlee, 0);
-			SetFact(Facts.IsFleeing, 0);
-			Stats.HealthThresholdForFleeing = base.healthFraction * fleeHealthThresholdPercentage;
-		}
 	}
 
 	public bool BlockEnemyTargeting(float timeout)
@@ -1414,34 +1341,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private void TickAggro()
 	{
-		bool flag = false;
-		bool triggerCallback = true;
-		if (float.IsInfinity(base.SecondsSinceDealtDamage))
-		{
-			flag = UnityEngine.Time.realtimeSinceStartup > aggroTimeout;
-		}
-		else
-		{
-			BaseCombatEntity baseCombatEntity = AttackTarget as BaseCombatEntity;
-			flag = ((!(baseCombatEntity != null) || !(baseCombatEntity.lastAttacker != null) || net == null || baseCombatEntity.lastAttacker.net == null) ? (UnityEngine.Time.realtimeSinceStartup > aggroTimeout) : (baseCombatEntity.lastAttacker.net.ID == net.ID && base.SecondsSinceDealtDamage > Stats.DeaggroChaseTime));
-		}
-		if (!flag)
-		{
-			if (AiContext.EnemyNpc != null && (AiContext.EnemyNpc.IsDead() || AiContext.EnemyNpc.IsDestroyed))
-			{
-				flag = true;
-				triggerCallback = false;
-			}
-			else if (AiContext.EnemyPlayer != null && (AiContext.EnemyPlayer.IsDead() || AiContext.EnemyPlayer.IsDestroyed))
-			{
-				flag = true;
-				triggerCallback = false;
-			}
-		}
-		if (flag)
-		{
-			SetFact(Facts.IsAggro, 0, triggerCallback);
-		}
 	}
 
 	public bool StartEating(float timeout)
@@ -1597,20 +1496,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		}
 	}
 
-	public byte GetFact(NPCPlayerApex.Facts fact)
-	{
-		return 0;
-	}
-
-	public void SetFact(NPCPlayerApex.Facts fact, byte value, bool triggerCallback = true, bool onlyTriggerCallbackOnDiffValue = true)
-	{
-	}
-
-	public float ToSpeed(NPCPlayerApex.SpeedEnum speed)
-	{
-		return 0f;
-	}
-
 	public EnemyRangeEnum ToEnemyRangeEnum(float range)
 	{
 		if (range <= AttackRange)
@@ -1732,88 +1617,19 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private void TickSenses()
 	{
-		if (Query.Server != null && AiContext != null && !IsDormant)
+		if (Query.Server != null && !IsDormant)
 		{
 			if (UnityEngine.Time.realtimeSinceStartup > lastTickTime + SensesTickRate)
 			{
-				TickVision();
 				TickHearing();
 				TickSmell();
-				AiContext.Memory.Forget(ForgetUnseenEntityTime);
 				lastTickTime = UnityEngine.Time.realtimeSinceStartup;
 			}
-			TickEnemyAwareness();
 			if (!AI.animal_ignore_food)
 			{
 				TickFoodAwareness();
 			}
 			UpdateSelfFacts();
-		}
-	}
-
-	private void TickVision()
-	{
-		AiContext.Players.Clear();
-		AiContext.Npcs.Clear();
-		AiContext.PlayersBehindUs.Clear();
-		AiContext.NpcsBehindUs.Clear();
-		if (Query.Server == null || GetFact(Facts.IsSleeping) == 1)
-		{
-			return;
-		}
-		int inSphere = Query.Server.GetInSphere(base.transform.position, Stats.VisionRange, SensesResults, AiCaresAbout);
-		if (inSphere == 0)
-		{
-			return;
-		}
-		for (int i = 0; i < inSphere; i++)
-		{
-			BaseEntity baseEntity = SensesResults[i];
-			if (baseEntity == null || baseEntity == this || !baseEntity.isServer || baseEntity.transform == null || baseEntity.IsDestroyed)
-			{
-				continue;
-			}
-			if (!WithinVisionCone(this, baseEntity))
-			{
-				BasePlayer basePlayer = baseEntity as BasePlayer;
-				if (basePlayer != null)
-				{
-					if (!AI.ignoreplayers && (basePlayer.ServerPosition - ServerPosition).sqrMagnitude <= (AttackRange + 2f) * (AttackRange + 2f))
-					{
-						AiContext.PlayersBehindUs.Add(basePlayer);
-					}
-					continue;
-				}
-				BaseNpc baseNpc = baseEntity as BaseNpc;
-				if (baseNpc != null && (baseNpc.ServerPosition - ServerPosition).sqrMagnitude <= (AttackRange + 2f) * (AttackRange + 2f))
-				{
-					AiContext.NpcsBehindUs.Add(baseNpc);
-				}
-				continue;
-			}
-			BasePlayer basePlayer2 = baseEntity as BasePlayer;
-			if (basePlayer2 != null)
-			{
-				if (AI.ignoreplayers || basePlayer2 is HTNPlayer || basePlayer2 is NPCPlayer)
-				{
-					continue;
-				}
-				Vector3 attackPosition = AiContext.AIAgent.AttackPosition;
-				if (!basePlayer2.IsVisible(attackPosition, basePlayer2.CenterPoint()) && !basePlayer2.IsVisible(attackPosition, basePlayer2.eyes.position) && !basePlayer2.IsVisible(attackPosition, basePlayer2.transform.position))
-				{
-					continue;
-				}
-				AiContext.Players.Add(baseEntity as BasePlayer);
-			}
-			else
-			{
-				BaseNpc baseNpc2 = baseEntity as BaseNpc;
-				if (baseNpc2 != null)
-				{
-					AiContext.Npcs.Add(baseNpc2);
-				}
-			}
-			AiContext.Memory.Update(baseEntity);
 		}
 	}
 
@@ -1824,158 +1640,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private void TickSmell()
 	{
-	}
-
-	private void TickEnemyAwareness()
-	{
-		if (GetFact(Facts.CanTargetEnemies) == 0 && blockTargetingThisEnemy == null)
-		{
-			AiContext.EnemyNpc = null;
-			AiContext.EnemyPlayer = null;
-			SetFact(Facts.HasEnemy, 0);
-			SetFact(Facts.EnemyRange, 3);
-			SetFact(Facts.IsAggro, 0, false);
-		}
-		else
-		{
-			SelectEnemy();
-		}
-	}
-
-	private void SelectEnemy()
-	{
-		if (AiContext.Players.Count == 0 && AiContext.Npcs.Count == 0 && AiContext.PlayersBehindUs.Count == 0 && AiContext.NpcsBehindUs.Count == 0)
-		{
-			AiContext.EnemyNpc = null;
-			AiContext.EnemyPlayer = null;
-			SetFact(Facts.HasEnemy, 0);
-			SetFact(Facts.EnemyRange, 3);
-			SetFact(Facts.IsAggro, 0, false);
-		}
-		else
-		{
-			AggroClosestEnemy();
-		}
-	}
-
-	private void AggroClosestEnemy()
-	{
-		float num = float.MaxValue;
-		BasePlayer basePlayer = null;
-		BaseNpc baseNpc = null;
-		AiContext.AIAgent.AttackTarget = null;
-		Vector3 vector = Vector3.zero;
-		float num2 = 0f;
-		float num3 = 0f;
-		foreach (BasePlayer player in AiContext.Players)
-		{
-			if (player.IsDead() || player.IsDestroyed || (blockTargetingThisEnemy != null && player.net != null && blockTargetingThisEnemy.net != null && player.net.ID == blockTargetingThisEnemy.net.ID) || player.currentSafeLevel > 0f)
-			{
-				continue;
-			}
-			Vector3 vector2 = player.ServerPosition - ServerPosition;
-			float sqrMagnitude = vector2.sqrMagnitude;
-			num2 += Mathf.Min(Mathf.Sqrt(sqrMagnitude), Stats.VisionRange) / Stats.VisionRange;
-			if (sqrMagnitude < num)
-			{
-				num = sqrMagnitude;
-				basePlayer = player;
-				baseNpc = null;
-				vector = vector2;
-				if (num <= AttackRange)
-				{
-					break;
-				}
-			}
-		}
-		if (num > AttackRange)
-		{
-			foreach (BaseNpc npc in AiContext.Npcs)
-			{
-				if (npc.IsDead() || npc.IsDestroyed || Stats.Family == npc.Stats.Family)
-				{
-					continue;
-				}
-				Vector3 vector3 = npc.ServerPosition - ServerPosition;
-				float sqrMagnitude2 = vector3.sqrMagnitude;
-				num3 += Mathf.Min(Mathf.Sqrt(sqrMagnitude2), Stats.VisionRange) / Stats.VisionRange;
-				if (sqrMagnitude2 < num)
-				{
-					num = sqrMagnitude2;
-					baseNpc = npc;
-					basePlayer = null;
-					vector = vector3;
-					if (num < AttackRange)
-					{
-						break;
-					}
-				}
-			}
-		}
-		if (num > AttackRange)
-		{
-			if (AiContext.PlayersBehindUs.Count > 0)
-			{
-				basePlayer = AiContext.PlayersBehindUs[0];
-				baseNpc = null;
-			}
-			else if (AiContext.NpcsBehindUs.Count > 0)
-			{
-				basePlayer = null;
-				baseNpc = AiContext.NpcsBehindUs[0];
-			}
-		}
-		if (AiContext.EnemyPlayer == null || AiContext.EnemyPlayer.IsDestroyed || AiContext.EnemyPlayer.IsDead() || num2 > AiContext.LastEnemyPlayerScore + DecisionMomentumPlayerTarget())
-		{
-			AiContext.EnemyPlayer = basePlayer;
-			AiContext.LastEnemyPlayerScore = num2;
-			playerTargetDecisionStartTime = UnityEngine.Time.time;
-		}
-		else if (basePlayer == null && DecisionMomentumPlayerTarget() < 0.01f)
-		{
-			AiContext.EnemyPlayer = basePlayer;
-			AiContext.LastEnemyPlayerScore = 0f;
-			playerTargetDecisionStartTime = 0f;
-		}
-		if (AiContext.EnemyNpc == null || AiContext.EnemyNpc.IsDestroyed || AiContext.EnemyNpc.IsDead() || num3 > AiContext.LastEnemyNpcScore + DecisionMomentumAnimalTarget())
-		{
-			AiContext.EnemyNpc = baseNpc;
-			AiContext.LastEnemyNpcScore = num3;
-			animalTargetDecisionStartTime = UnityEngine.Time.time;
-		}
-		else if (baseNpc == null && DecisionMomentumAnimalTarget() < 0.01f)
-		{
-			AiContext.EnemyNpc = baseNpc;
-			AiContext.LastEnemyNpcScore = 0f;
-			animalTargetDecisionStartTime = 0f;
-		}
-		if (basePlayer != null || baseNpc != null)
-		{
-			SetFact(Facts.HasEnemy, 1);
-			if (basePlayer != null)
-			{
-				AiContext.AIAgent.AttackTarget = basePlayer;
-			}
-			else
-			{
-				AiContext.AIAgent.AttackTarget = baseNpc;
-			}
-			float magnitude = vector.magnitude;
-			if (Interface.CallHook("IOnNpcTarget", this, AiContext.AIAgent.AttackTarget) == null)
-			{
-				EnemyRangeEnum enemyRangeEnum = ToEnemyRangeEnum(magnitude);
-				AfraidRangeEnum value = ToAfraidRangeEnum(magnitude);
-				SetFact(Facts.EnemyRange, (byte)enemyRangeEnum);
-				SetFact(Facts.AfraidRange, (byte)value);
-				TryAggro(enemyRangeEnum);
-			}
-		}
-		else
-		{
-			SetFact(Facts.HasEnemy, 0);
-			SetFact(Facts.EnemyRange, 3);
-			SetFact(Facts.AfraidRange, 1);
-		}
 	}
 
 	private float DecisionMomentumPlayerTarget()
@@ -2013,68 +1677,14 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	private void SelectFood()
 	{
-		if (AiContext.Memory.Visible.Count == 0)
-		{
-			FoodTarget = null;
-			SetFact(Facts.FoodRange, 2);
-		}
-		else
-		{
-			SelectClosestFood();
-		}
 	}
 
 	private void SelectClosestFood()
 	{
-		float num = float.MaxValue;
-		Vector3 vector = Vector3.zero;
-		bool flag = false;
-		foreach (BaseEntity item in AiContext.Memory.Visible)
-		{
-			if (item.IsDestroyed || !WantsToEat(item))
-			{
-				continue;
-			}
-			Vector3 vector2 = item.ServerPosition - ServerPosition;
-			float sqrMagnitude = vector2.sqrMagnitude;
-			if (sqrMagnitude < num)
-			{
-				num = sqrMagnitude;
-				FoodTarget = item;
-				vector = vector2;
-				flag = true;
-				if (num <= 0.1f)
-				{
-					break;
-				}
-			}
-		}
-		if (flag)
-		{
-			FoodRangeEnum value = ToFoodRangeEnum(vector.magnitude);
-			SetFact(Facts.FoodRange, (byte)value);
-		}
-		else
-		{
-			FoodTarget = null;
-			SetFact(Facts.FoodRange, 2);
-		}
 	}
 
 	private void UpdateSelfFacts()
 	{
-		SetFact(Facts.Health, (byte)ToHealthEnum(base.healthFraction));
-		SetFact(Facts.IsTired, ToIsTired(Sleep));
-		SetFact(Facts.IsAttackReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= nextAttackTime) ? 1u : 0u));
-		SetFact(Facts.IsRoamReady, (byte)((UnityEngine.Time.realtimeSinceStartup >= AiContext.NextRoamTime && IsNavRunning()) ? 1u : 0u));
-		SetFact(Facts.Speed, (byte)ToSpeedEnum(TargetSpeed / Stats.Speed));
-		SetFact(Facts.IsHungry, (byte)((Energy.Level < 0.25f) ? 1u : 0u));
-		SetFact(Facts.AttackedLately, (byte)((!float.IsNegativeInfinity(base.SecondsSinceAttacked) && base.SecondsSinceAttacked < Stats.AttackedMemoryTime) ? 1u : 0u));
-		SetFact(Facts.IsMoving, IsMoving());
-		if (CheckHealthThresholdToFlee() || IsAfraid())
-		{
-			WantsToFlee();
-		}
 	}
 
 	private byte IsMoving()
@@ -2149,29 +1759,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		SetTargetPathStatus(accumPathPendingDelay);
 	}
 
-	public List<NavPointSample> RequestNavPointSamplesInCircle(NavPointSampler.SampleCount sampleCount, float radius, NavPointSampler.SampleFeatures features = NavPointSampler.SampleFeatures.None)
-	{
-		navPointSamples.Clear();
-		NavPointSampler.SampleCircle(sampleCount, ServerPosition, radius, new NavPointSampler.SampleScoreParams
-		{
-			WaterMaxDepth = Stats.MaxWaterDepth,
-			Agent = this,
-			Features = features
-		}, ref navPointSamples);
-		return navPointSamples;
-	}
-
-	public List<NavPointSample> RequestNavPointSamplesInCircleWaterDepthOnly(NavPointSampler.SampleCount sampleCount, float radius, float waterDepth)
-	{
-		navPointSamples.Clear();
-		NavPointSampler.SampleCircleWaterDepthOnly(sampleCount, ServerPosition, radius, new NavPointSampler.SampleScoreParams
-		{
-			WaterMaxDepth = waterDepth,
-			Agent = this
-		}, ref navPointSamples);
-		return navPointSamples;
-	}
-
 	public override void ServerInit()
 	{
 		base.ServerInit();
@@ -2200,55 +1787,16 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		{
 			InitFacts();
 			fleeHealthThresholdPercentage = Stats.HealthThresholdForFleeing;
-			AnimalSensesLoadBalancer.animalSensesLoadBalancer.Add(this);
 		}
 	}
 
 	internal override void DoServerDestroy()
 	{
 		base.DoServerDestroy();
-		if (NewAI)
-		{
-			AnimalSensesLoadBalancer.animalSensesLoadBalancer.Remove(this);
-		}
-	}
-
-	float? ILoadBalanced.ExecuteUpdate(float deltaTime, float nextInterval)
-	{
-		if (base.IsDestroyed || this == null || base.transform == null)
-		{
-			AnimalSensesLoadBalancer.animalSensesLoadBalancer.Remove(this);
-			return nextInterval;
-		}
-		using (TimeWarning.New("Animal.TickSenses"))
-		{
-			TickSenses();
-		}
-		using (TimeWarning.New("Animal.TickBehaviourState"))
-		{
-			TickBehaviourState();
-		}
-		return UnityEngine.Random.value * 0.1f + 0.1f;
 	}
 
 	public override void Hurt(HitInfo info)
 	{
-		if (info.Initiator != null && AiContext != null)
-		{
-			AiContext.Memory.Update(info.Initiator);
-			if (blockTargetingThisEnemy != null && blockTargetingThisEnemy.net != null && info.Initiator.net != null && blockTargetingThisEnemy.net.ID == info.Initiator.net.ID)
-			{
-				SetFact(Facts.CanTargetEnemies, 1);
-			}
-			if (GetFact(Facts.HasEnemy) == 0)
-			{
-				WantsToFlee();
-			}
-			else
-			{
-				TryAggro(EnemyRangeEnum.AggroRange);
-			}
-		}
 		base.Hurt(info);
 	}
 
@@ -2266,19 +1814,10 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public override void OnSensation(Sensation sensation)
 	{
-		if (AiContext != null)
-		{
-			SensationType type = sensation.Type;
-			if ((uint)type <= 1u)
-			{
-				OnSenseGunshot(sensation);
-			}
-		}
 	}
 
 	protected virtual void OnSenseGunshot(Sensation sensation)
 	{
-		AiContext.Memory.AddDanger(sensation.Position, 1f);
 		_lastHeardGunshotTime = UnityEngine.Time.time;
 		LastHeardGunshotDirection = (sensation.Position - base.transform.localPosition).normalized;
 		if (CurrentBehaviour != Behaviour.Attack)
@@ -2289,7 +1828,7 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 
 	public bool IsNavRunning()
 	{
-		if (!AiManager.nav_disable && GetNavAgent != null && GetNavAgent.enabled)
+		if (GetNavAgent != null && GetNavAgent.enabled)
 		{
 			return GetNavAgent.isOnNavMesh;
 		}
@@ -2302,15 +1841,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		{
 			GetNavAgent.enabled = false;
 		}
-		if (utilityAiComponent == null)
-		{
-			utilityAiComponent = Entity.GetComponent<UtilityAIComponent>();
-		}
-		if (utilityAiComponent != null)
-		{
-			utilityAiComponent.Pause();
-			utilityAiComponent.enabled = false;
-		}
 	}
 
 	public void Resume()
@@ -2318,17 +1848,10 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 		if (!GetNavAgent.isOnNavMesh)
 		{
 			StartCoroutine(TryForceToNavmesh());
-			return;
 		}
-		GetNavAgent.enabled = true;
-		if (utilityAiComponent == null)
+		else
 		{
-			utilityAiComponent = Entity.GetComponent<UtilityAIComponent>();
-		}
-		if (utilityAiComponent != null)
-		{
-			utilityAiComponent.enabled = true;
-			utilityAiComponent.Resume();
+			GetNavAgent.enabled = true;
 		}
 	}
 
@@ -2357,15 +1880,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 					ServerPosition = hit.position;
 					GetNavAgent.Warp(ServerPosition);
 					GetNavAgent.enabled = true;
-					if (utilityAiComponent == null)
-					{
-						utilityAiComponent = Entity.GetComponent<UtilityAIComponent>();
-					}
-					if (utilityAiComponent != null)
-					{
-						utilityAiComponent.enabled = true;
-						utilityAiComponent.Resume();
-					}
 					yield break;
 				}
 				yield return CoroutineEx.waitForSecondsRealtime(waitForRetryTime2);
@@ -2374,15 +1888,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 				continue;
 			}
 			GetNavAgent.enabled = true;
-			if (utilityAiComponent == null)
-			{
-				utilityAiComponent = Entity.GetComponent<UtilityAIComponent>();
-			}
-			if (utilityAiComponent != null)
-			{
-				utilityAiComponent.enabled = true;
-				utilityAiComponent.Resume();
-			}
 			yield break;
 		}
 		Debug.LogWarningFormat("Failed to spawn {0} on a valid navmesh.", base.name);
@@ -2428,20 +1933,6 @@ public class BaseNpc : BaseCombatEntity, ILoadBalanced, IContextProvider, IAIAge
 			return 1f - Stats.Tolerance;
 		}
 		return 1f;
-	}
-
-	protected virtual void SetupAiContext()
-	{
-		AiContext = new BaseContext(this);
-	}
-
-	public IAIContext GetContext(Guid aiId)
-	{
-		if (AiContext == null)
-		{
-			SetupAiContext();
-		}
-		return AiContext;
 	}
 
 	public override void Save(SaveInfo info)

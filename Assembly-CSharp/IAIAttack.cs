@@ -8,7 +8,7 @@ public interface IAIAttack
 
 	float EngagementRange();
 
-	bool IsTargetInRange(BaseEntity entity);
+	bool IsTargetInRange(BaseEntity entity, out float dist);
 
 	bool CanSeeTarget(BaseEntity entity);
 

@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 [AddComponentMenu("KriptoFX/Explosion_Bloom")]
-[ExecuteInEditMode]
 [ImageEffectAllowedInSceneView]
+[ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
 public class Explosion_Bloom : MonoBehaviour
 {
 	[Serializable]
@@ -14,9 +14,9 @@ public class Explosion_Bloom : MonoBehaviour
 		[Tooltip("Filters out pixels under this level of brightness.")]
 		public float threshold;
 
+		[Tooltip("Makes transition between under/over-threshold gradual.")]
 		[SerializeField]
 		[Range(0f, 1f)]
-		[Tooltip("Makes transition between under/over-threshold gradual.")]
 		public float softKnee;
 
 		[SerializeField]

@@ -8,7 +8,7 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
+public class MLRS : BaseMountable
 {
 	[Serializable]
 	public class RocketTube
@@ -52,14 +52,12 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 
 	public int radiusModIndex;
 
-	private float[] radiusMods = new float[6]
+	private float[] radiusMods = new float[4]
 	{
-		0.0833333358f,
-		355f / (678f * (float)Math.PI),
+		0.1f,
+		0.2f,
 		0.333333343f,
-		0.5f,
-		2f / 3f,
-		0.75f
+		2f / 3f
 	};
 
 	public Vector3 trueTargetHitPos;
@@ -69,16 +67,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	private GameObjectRef rocketStoragePrefab;
 
 	[SerializeField]
-	private Transform rocketStoragePoint;
-
-	[SerializeField]
 	private GameObjectRef dashboardStoragePrefab;
-
-	[SerializeField]
-	private Transform dashboardStoragePoint;
-
-	[SerializeField]
-	private Collider[] movingColliders;
 
 	[Header("MLRS Rotation")]
 	[SerializeField]
@@ -105,9 +94,9 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	[SerializeField]
 	public float minRange = 200f;
 
-	[Tooltip("The size of the area the the rockets may hit, at the target point.")]
+	[Tooltip("The size of the area that the rockets may hit, minus rocket damage radius.")]
 	[SerializeField]
-	public float targetAreaRadius = 10f;
+	public float targetAreaRadius = 30f;
 
 	[SerializeField]
 	private GameObjectRef mlrsRocket;
@@ -169,8 +158,6 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	public float rocketBaseGravity;
 
 	public float rocketSpeed;
-
-	public float rocketDamageRadius;
 
 	private bool isInitialLoad = true;
 
@@ -246,6 +233,8 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	public bool IsRealigning { get; set; }
 
 	public bool IsFiringRockets => HasFlag(Flags.Reserved6);
+
+	public float RocketDamageRadius { get; private set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -333,6 +322,13 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 				}
 				using (TimeWarning.New("RPC_Open_Rockets"))
 				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(1311007340u, "RPC_Open_Rockets", this, player, 3f))
+						{
+							return true;
+						}
+					}
 					try
 					{
 						using (TimeWarning.New("Call"))
@@ -393,24 +389,18 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public override void Spawn()
+	protected override void OnChildAdded(BaseEntity child)
 	{
-		base.Spawn();
-		if (!Rust.Application.isLoadingSave)
+		base.OnChildAdded(child);
+		if (base.isServer)
 		{
-			if (!rocketStorageInstance.IsValid(base.isServer))
+			if (child.prefabID == rocketStoragePrefab.GetEntity().prefabID)
 			{
-				BaseEntity baseEntity = GameManager.server.CreateEntity(rocketStoragePrefab.resourcePath, rocketStoragePoint.localPosition, rocketStoragePoint.localRotation);
-				rocketStorageInstance.Set(baseEntity);
-				baseEntity.SetParent(this);
-				baseEntity.Spawn();
+				rocketStorageInstance.Set(child);
 			}
-			if (!dashboardStorageInstance.IsValid(base.isServer))
+			if (child.prefabID == dashboardStoragePrefab.GetEntity().prefabID)
 			{
-				BaseEntity baseEntity2 = GameManager.server.CreateEntity(dashboardStoragePrefab.resourcePath, rocketStoragePoint.localPosition, rocketStoragePoint.localRotation);
-				dashboardStorageInstance.Set(baseEntity2);
-				baseEntity2.SetParent(this);
-				baseEntity2.Spawn();
+				dashboardStorageInstance.Set(child);
 			}
 		}
 	}
@@ -474,7 +464,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	{
 		TheoreticalProjectile projectile = new TheoreticalProjectile(firingPoint.position, firingPoint.forward.normalized * rocketSpeed, CurGravityMultiplier);
 		int num = 0;
-		float dt = ((projectile.forward.y > 0f) ? 3f : 2f);
+		float dt = ((projectile.forward.y > 0f) ? 2f : 0.66f);
 		while (!NextRayHitSomething(ref projectile, dt) && (float)num < 128f)
 		{
 			num++;
@@ -631,7 +621,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 			num = radiusMods[radiusModIndex];
 		}
 		radiusModIndex++;
-		Vector2 vector = UnityEngine.Random.insideUnitCircle * (targetAreaRadius - rocketDamageRadius) * num;
+		Vector2 vector = UnityEngine.Random.insideUnitCircle * (targetAreaRadius - RocketDamageRadius) * num;
 		Vector3 targetPos = TrueHitPos + new Vector3(vector.x, 0f, vector.y);
 		float g;
 		Vector3 aimToTarget = GetAimToTarget(targetPos, out g);
@@ -682,6 +672,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	}
 
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open_Rockets(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -726,7 +717,7 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 		rocketBaseGravity = (0f - UnityEngine.Physics.gravity.y) * component.gravityModifier;
 		rocketSpeed = component.speed;
 		TimedExplosive component2 = obj.GetComponent<TimedExplosive>();
-		rocketDamageRadius = component2.explosionRadius;
+		RocketDamageRadius = component2.explosionRadius;
 	}
 
 	public override void Load(LoadInfo info)
@@ -755,18 +746,6 @@ public class MLRS : BaseMountable, TimedExplosive.IPreventSticking
 	public override bool CanBeLooted(BasePlayer player)
 	{
 		return !IsFiringRockets;
-	}
-
-	public bool CanStickTo(Collider collider)
-	{
-		for (int i = 0; i < movingColliders.Length; i++)
-		{
-			if (movingColliders[i] == collider)
-			{
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public void SetUserTargetHitPos(Vector3 worldPos)

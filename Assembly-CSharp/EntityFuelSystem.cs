@@ -1,12 +1,14 @@
+using System.Collections.Generic;
 using Oxide.Core;
-using Rust;
 using UnityEngine;
 
 public class EntityFuelSystem
 {
 	public readonly bool isServer;
 
-	public readonly BaseEntity owner;
+	private readonly bool editorGiveFreeFuel;
+
+	private readonly uint fuelStorageID;
 
 	public EntityRef fuelStorageInstance;
 
@@ -16,10 +18,19 @@ public class EntityFuelSystem
 
 	public float pendingFuel;
 
-	public EntityFuelSystem(BaseEntity owner, bool isServer)
+	public EntityFuelSystem(bool isServer, GameObjectRef fuelStoragePrefab, List<BaseEntity> children, bool editorGiveFreeFuel = true)
 	{
 		this.isServer = isServer;
-		this.owner = owner;
+		this.editorGiveFreeFuel = editorGiveFreeFuel;
+		fuelStorageID = fuelStoragePrefab.GetEntity().prefabID;
+		if (!isServer)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			CheckNewChild(child);
+		}
 	}
 
 	public bool IsInFuelInteractionRange(BasePlayer player)
@@ -52,16 +63,11 @@ public class EntityFuelSystem
 		return null;
 	}
 
-	public void SpawnFuelStorage(GameObjectRef fuelStoragePrefab, Transform fuelStoragePoint)
+	public void CheckNewChild(BaseEntity child)
 	{
-		if (fuelStoragePrefab != null && !(fuelStoragePoint == null) && !Rust.Application.isLoadingSave)
+		if (child.prefabID == fuelStorageID)
 		{
-			Vector3 pos = owner.transform.InverseTransformPoint(fuelStoragePoint.position);
-			Quaternion rot = Quaternion.Inverse(owner.transform.rotation) * fuelStoragePoint.rotation;
-			BaseEntity baseEntity = GameManager.server.CreateEntity(fuelStoragePrefab.resourcePath, pos, rot);
-			baseEntity.SetParent(owner);
-			baseEntity.Spawn();
-			fuelStorageInstance.Set(baseEntity);
+			fuelStorageInstance.Set(child);
 		}
 	}
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ScientistBrain : BaseAIBrain<HumanNPCNew>
+public class ScientistBrain : BaseAIBrain<HumanNPC>
 {
 	public class ChaseState : BasicAIState
 	{
@@ -49,7 +49,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 			{
 				return StateStatus.Error;
 			}
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			float num = Vector3.Distance(baseEntity.transform.position, entity.transform.position);
 			if (brain.Senses.Memory.IsLOS(baseEntity) || num <= 10f)
 			{
@@ -136,7 +136,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 			FaceTarget();
 			if (Time.time > nextActionTime)
 			{
-				HumanNPCNew entity = GetEntity();
+				HumanNPC entity = GetEntity();
 				if (Random.Range(0, 3) == 1)
 				{
 					nextActionTime = Time.time + Random.Range(2f, 3f);
@@ -207,7 +207,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 		public override void StateEnter()
 		{
 			base.StateEnter();
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			entity.SetDucked(true);
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
 			if (aIPoint != null)
@@ -219,7 +219,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 		public override void StateLeave()
 		{
 			base.StateLeave();
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			entity.SetDucked(false);
 			brain.Navigator.ClearFacingDirectionOverride();
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
@@ -232,7 +232,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 		public override StateStatus StateThink(float delta)
 		{
 			base.StateThink(delta);
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			float num = entity.AmmoFractionRemaining();
 			if (num == 0f || (baseEntity != null && !brain.Senses.Memory.IsLOS(baseEntity) && num < 0.25f))
@@ -255,7 +255,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 		{
 			base.StateEnter();
 			status = StateStatus.Error;
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			if (brain.PathFinder == null)
 			{
 				return;
@@ -317,7 +317,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 			base.StateEnter();
 			status = StateStatus.Error;
 			ClearRoamPointUsage();
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			if (brain.PathFinder == null)
 			{
 				return;
@@ -410,7 +410,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPCNew>
 			{
 				return false;
 			}
-			HumanNPCNew entity = GetEntity();
+			HumanNPC entity = GetEntity();
 			Vector3 hideFromPosition = (coverFromEntity ? coverFromEntity.transform.position : (entity.transform.position + entity.LastAttackedDir * 30f));
 			AIInformationZone informationZone = entity.GetInformationZone(entity.transform.position);
 			if (informationZone == null)

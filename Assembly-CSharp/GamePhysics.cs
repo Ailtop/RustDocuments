@@ -258,44 +258,69 @@ public static class GamePhysics
 		}
 	}
 
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding0, float padding1)
+	{
+		return LineOfSightInternal(p0, p1, layerMask, radius, padding0, padding1);
+	}
+
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding = 0f)
+	{
+		return LineOfSightInternal(p0, p1, layerMask, radius, padding, padding);
+	}
+
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, Vector3 p2, int layerMask, float radius, float padding = 0f)
+	{
+		if (LineOfSightInternal(p0, p1, layerMask, radius, padding, 0f))
+		{
+			return LineOfSightInternal(p1, p2, layerMask, radius, 0f, padding);
+		}
+		return false;
+	}
+
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, int layerMask, float radius, float padding = 0f)
+	{
+		if (LineOfSightInternal(p0, p1, layerMask, radius, padding, 0f) && LineOfSightInternal(p1, p2, layerMask, radius, 0f, 0f))
+		{
+			return LineOfSightInternal(p2, p3, layerMask, radius, 0f, padding);
+		}
+		return false;
+	}
+
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, int layerMask, float radius, float padding = 0f)
+	{
+		if (LineOfSightInternal(p0, p1, layerMask, radius, padding, 0f) && LineOfSightInternal(p1, p2, layerMask, radius, 0f, 0f) && LineOfSightInternal(p2, p3, layerMask, radius, 0f, 0f))
+		{
+			return LineOfSightInternal(p3, p4, layerMask, radius, 0f, padding);
+		}
+		return false;
+	}
+
 	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding0, float padding1)
 	{
-		return LineOfSightInternal(p0, p1, layerMask, padding0, padding1);
+		return LineOfSightRadius(p0, p1, layerMask, 0f, padding0, padding1);
 	}
 
 	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding = 0f)
 	{
-		return LineOfSightInternal(p0, p1, layerMask, padding, padding);
+		return LineOfSightRadius(p0, p1, layerMask, 0f, padding);
 	}
 
 	public static bool LineOfSight(Vector3 p0, Vector3 p1, Vector3 p2, int layerMask, float padding = 0f)
 	{
-		if (LineOfSightInternal(p0, p1, layerMask, padding, 0f))
-		{
-			return LineOfSightInternal(p1, p2, layerMask, 0f, padding);
-		}
-		return false;
+		return LineOfSightRadius(p0, p1, p2, layerMask, 0f, padding);
 	}
 
 	public static bool LineOfSight(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, int layerMask, float padding = 0f)
 	{
-		if (LineOfSightInternal(p0, p1, layerMask, padding, 0f) && LineOfSightInternal(p1, p2, layerMask, 0f, 0f))
-		{
-			return LineOfSightInternal(p2, p3, layerMask, 0f, padding);
-		}
-		return false;
+		return LineOfSightRadius(p0, p1, p2, p3, layerMask, 0f, padding);
 	}
 
 	public static bool LineOfSight(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, int layerMask, float padding = 0f)
 	{
-		if (LineOfSightInternal(p0, p1, layerMask, padding, 0f) && LineOfSightInternal(p1, p2, layerMask, 0f, 0f) && LineOfSightInternal(p2, p3, layerMask, 0f, 0f))
-		{
-			return LineOfSightInternal(p3, p4, layerMask, 0f, padding);
-		}
-		return false;
+		return LineOfSightRadius(p0, p1, p2, p3, p4, layerMask, 0f, padding);
 	}
 
-	private static bool LineOfSightInternal(Vector3 p0, Vector3 p1, int layerMask, float padding0, float padding1)
+	private static bool LineOfSightInternal(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding0, float padding1)
 	{
 		if (!ValidBounds.Test(p0))
 		{
@@ -319,17 +344,17 @@ public static class GamePhysics
 		if (((uint)layerMask & 0x800000u) != 0)
 		{
 			flag = Trace(ray, 0f, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
-			if (ConVar.AntiHack.losradius > 0f && !flag)
+			if (radius > 0f && !flag)
 			{
-				flag = Trace(ray, ConVar.AntiHack.losradius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+				flag = Trace(ray, radius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
 			}
 		}
 		else
 		{
 			flag = UnityEngine.Physics.Raycast(ray, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
-			if (ConVar.AntiHack.losradius > 0f && !flag)
+			if (radius > 0f && !flag)
 			{
-				flag = UnityEngine.Physics.SphereCast(ray, ConVar.AntiHack.losradius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+				flag = UnityEngine.Physics.SphereCast(ray, radius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
 			}
 		}
 		if (!flag)

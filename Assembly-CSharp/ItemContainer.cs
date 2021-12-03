@@ -289,14 +289,19 @@ public sealed class ItemContainer
 
 	public int GetMaxTransferAmount(ItemDefinition def)
 	{
+		int num = maxStackSize;
 		foreach (Item item in itemList)
 		{
 			if (item.info == def)
 			{
-				return maxStackSize - item.amount;
+				num -= item.amount;
+				if (num <= 0)
+				{
+					return 0;
+				}
 			}
 		}
-		return maxStackSize;
+		return num;
 	}
 
 	public void SetOnlyAllowedItem(ItemDefinition def)

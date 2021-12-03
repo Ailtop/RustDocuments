@@ -11,7 +11,6 @@ using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.Ai;
-using Rust.Ai.HTN;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -628,15 +627,6 @@ public class BaseProjectile : AttackEntity
 			{
 				nPCPlayer.SetAimDirection(nPCPlayer.GetAimDirection());
 			}
-			else
-			{
-				HTNPlayer hTNPlayer = ownerPlayer as HTNPlayer;
-				if (hTNPlayer != null)
-				{
-					hTNPlayer.AiDomain.ForceProjectileOrientation();
-					hTNPlayer.ForceOrientationTick();
-				}
-			}
 		}
 		StartAttackCooldownRaw(repeatDelay);
 		UnityEngine.Vector3 vector = (flag ? ownerPlayer.eyes.position : MuzzlePoint.transform.position);
@@ -650,32 +640,15 @@ public class BaseProjectile : AttackEntity
 		SignalBroadcast(Signal.Attack, string.Empty);
 		Projectile component2 = component.projectileObject.Get().GetComponent<Projectile>();
 		BaseEntity baseEntity = null;
-		if (flag && ownerPlayer.IsNpc && AI.npc_only_hurt_active_target_in_safezone && ownerPlayer.InSafeZone())
-		{
-			IAIAgent iAIAgent = ownerPlayer as IAIAgent;
-			if (iAIAgent != null)
-			{
-				baseEntity = iAIAgent.AttackTarget;
-			}
-			else
-			{
-				IHTNAgent iHTNAgent = ownerPlayer as IHTNAgent;
-				if (iHTNAgent != null)
-				{
-					baseEntity = iHTNAgent.MainTarget;
-				}
-			}
-		}
-		bool flag3 = flag && ownerPlayer is IHTNAgent;
 		if (flag)
 		{
-			inputVec = ((!flag3) ? ownerPlayer.eyes.BodyForward() : (ownerPlayer.eyes.rotation * UnityEngine.Vector3.forward));
+			inputVec = ownerPlayer.eyes.BodyForward();
 		}
 		for (int i = 0; i < component.numProjectiles; i++)
 		{
-			UnityEngine.Vector3 vector2 = ((!flag3) ? AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + GetAimCone() + GetAIAimcone() * 1f, inputVec) : AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + aimCone, inputVec));
+			UnityEngine.Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + GetAimCone() + GetAIAimcone() * 1f, inputVec);
 			List<RaycastHit> obj = Facepunch.Pool.GetList<RaycastHit>();
-			GamePhysics.TraceAll(new Ray(vector, vector2), 0f, obj, 300f, 1219701505);
+			GamePhysics.TraceAll(new Ray(vector, modifiedAimConeDirection), 0f, obj, 300f, 1219701505);
 			for (int j = 0; j < obj.Count; j++)
 			{
 				RaycastHit hit = obj[j];
@@ -699,7 +672,7 @@ public class BaseProjectile : AttackEntity
 					hitInfo.IsPredicting = false;
 					hitInfo.DoHitEffects = component2.doDefaultHitEffects;
 					hitInfo.DidHit = true;
-					hitInfo.ProjectileVelocity = vector2 * 300f;
+					hitInfo.ProjectileVelocity = modifiedAimConeDirection * 300f;
 					hitInfo.PointStart = MuzzlePoint.position;
 					hitInfo.PointEnd = hit.point;
 					hitInfo.HitPositionWorld = hit.point;
@@ -724,8 +697,8 @@ public class BaseProjectile : AttackEntity
 				}
 			}
 			Facepunch.Pool.FreeList(ref obj);
-			UnityEngine.Vector3 vector3 = ((flag && ownerPlayer.isMounted) ? (vector2 * 6f) : UnityEngine.Vector3.zero);
-			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + vector3, vector2 * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
+			UnityEngine.Vector3 vector2 = ((flag && ownerPlayer.isMounted) ? (modifiedAimConeDirection * 6f) : UnityEngine.Vector3.zero);
+			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + vector2, modifiedAimConeDirection * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
 		}
 	}
 
@@ -1254,14 +1227,25 @@ public class BaseProjectile : AttackEntity
 	{
 		base.Save(info);
 		info.msg.baseProjectile = Facepunch.Pool.Get<ProtoBuf.BaseProjectile>();
-		if (info.forDisk || info.SendingTo(GetOwnerConnection()) || ForceSendMagazine())
+		if (info.forDisk || info.SendingTo(GetOwnerConnection()) || ForceSendMagazine(info))
 		{
 			info.msg.baseProjectile.primaryMagazine = primaryMagazine.Save();
 		}
 	}
 
-	public virtual bool ForceSendMagazine()
+	public virtual bool ForceSendMagazine(SaveInfo saveInfo)
 	{
+		BasePlayer ownerPlayer = GetOwnerPlayer();
+		if ((bool)ownerPlayer && ownerPlayer.IsBeingSpectated)
+		{
+			foreach (BaseEntity child in ownerPlayer.children)
+			{
+				if (child.net != null && child.net.connection == saveInfo.forConnection)
+				{
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 

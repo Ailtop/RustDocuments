@@ -83,9 +83,6 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
-	public Transform fuelStoragePoint;
-
-	[SerializeField]
 	public float idleFuelPerSec = 0.05f;
 
 	[SerializeField]
@@ -148,9 +145,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public const Flags Flag_EngineSlowed = Flags.Reserved10;
 
-	public VehicleEngineController engineController;
-
-	public EntityFuelSystem fuelSystem;
+	public VehicleEngineController<TrainEngine> engineController;
 
 	public bool LightsAreOn => HasFlag(Flags.Reserved5);
 
@@ -219,17 +214,23 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		engineLocalOffset = base.transform.InverseTransformPoint(engineWorldCol.transform.position + engineWorldCol.transform.rotation * engineWorldCol.center);
 	}
 
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer && isSpawned)
+		{
+			GetFuelSystem().CheckNewChild(child);
+		}
+	}
+
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!engineController.IsOff && (!CanRunEngines() || !AnyPlayersOnTrain()))
-		{
-			engineController.StopEngine();
-		}
+		engineController.CheckEngineState();
 		if (engineController.IsOn)
 		{
-			float fuelUsedPerSecond = Mathf.Lerp(idleFuelPerSec, maxFuelPerSec, Mathf.Abs(GetThrottleFraction()));
-			if (fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelUsedPerSecond) > 0)
+			float fuelPerSecond = Mathf.Lerp(idleFuelPerSec, maxFuelPerSec, Mathf.Abs(GetThrottleFraction()));
+			if (engineController.TickFuel(fuelPerSecond) > 0)
 			{
 				ClientRPC(null, "SetFuelAmount", GetFuelAmount());
 			}
@@ -245,13 +246,13 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		base.Save(info);
 		info.msg.trainEngine = Facepunch.Pool.Get<ProtoBuf.TrainEngine>();
 		info.msg.trainEngine.throttleSetting = (int)CurThrottleSetting;
-		info.msg.trainEngine.fuelStorageID = fuelSystem.fuelStorageInstance.uid;
+		info.msg.trainEngine.fuelStorageID = engineController.FuelSystem.fuelStorageInstance.uid;
 		info.msg.trainEngine.fuelAmount = GetFuelAmount();
 	}
 
 	public override EntityFuelSystem GetFuelSystem()
 	{
-		return fuelSystem;
+		return engineController.FuelSystem;
 	}
 
 	public override void OnKilled(HitInfo info)
@@ -273,30 +274,30 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
-		_003C_003Ec__DisplayClass21_0 _003C_003Ec__DisplayClass21_ = default(_003C_003Ec__DisplayClass21_0);
-		_003C_003Ec__DisplayClass21_.inputState = inputState;
-		_003C_003Ec__DisplayClass21_._003C_003E4__this = this;
-		_003C_003Ec__DisplayClass21_.player = player;
-		if (!IsDriver(_003C_003Ec__DisplayClass21_.player))
+		_003C_003Ec__DisplayClass22_0 _003C_003Ec__DisplayClass22_ = default(_003C_003Ec__DisplayClass22_0);
+		_003C_003Ec__DisplayClass22_.inputState = inputState;
+		_003C_003Ec__DisplayClass22_._003C_003E4__this = this;
+		_003C_003Ec__DisplayClass22_.player = player;
+		if (!IsDriver(_003C_003Ec__DisplayClass22_.player))
 		{
 			return;
 		}
 		if (engineController.IsOff)
 		{
-			if ((_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.FORWARD) && !_003C_003Ec__DisplayClass21_.inputState.WasDown(BUTTON.FORWARD)) || (_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.BACKWARD) && !_003C_003Ec__DisplayClass21_.inputState.WasDown(BUTTON.BACKWARD)))
+			if ((_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.FORWARD) && !_003C_003Ec__DisplayClass22_.inputState.WasDown(BUTTON.FORWARD)) || (_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.BACKWARD) && !_003C_003Ec__DisplayClass22_.inputState.WasDown(BUTTON.BACKWARD)))
 			{
-				engineController.TryStartEngine(_003C_003Ec__DisplayClass21_.player);
+				engineController.TryStartEngine(_003C_003Ec__DisplayClass22_.player);
 			}
 		}
-		else if (!_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C21_0(BUTTON.FORWARD, IncreaseThrottle, ref _003C_003Ec__DisplayClass21_))
+		else if (!_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C22_0(BUTTON.FORWARD, IncreaseThrottle, ref _003C_003Ec__DisplayClass22_))
 		{
-			_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C21_0(BUTTON.BACKWARD, DecreaseThrottle, ref _003C_003Ec__DisplayClass21_);
+			_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C22_0(BUTTON.BACKWARD, DecreaseThrottle, ref _003C_003Ec__DisplayClass22_);
 		}
-		if (_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.LEFT))
+		if (_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.LEFT))
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Left);
 		}
-		else if (_003C_003Ec__DisplayClass21_.inputState.IsDown(BUTTON.RIGHT))
+		else if (_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.RIGHT))
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Right);
 		}
@@ -312,26 +313,13 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		driverProtection.Scale(info.damageTypes);
 	}
 
-	public override void SpawnSubEntities()
-	{
-		base.SpawnSubEntities();
-		if (!Rust.Application.isLoadingSave)
-		{
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-		}
-	}
-
-	public bool CanRunEngines()
+	public bool MeetsEngineRequirements()
 	{
 		if (!HasDriver() && CurThrottleSetting == EngineSpeeds.Zero)
 		{
 			return false;
 		}
-		if (fuelSystem.HasFuel())
-		{
-			return !IsDead();
-		}
-		return false;
+		return AnyPlayersOnTrain();
 	}
 
 	public void OnEngineStartFailed()
@@ -514,15 +502,14 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		BasePlayer player = msg.player;
 		if (!(player == null) && CanBeLooted(player))
 		{
-			fuelSystem.LootFuel(player);
+			engineController.FuelSystem.LootFuel(player);
 		}
 	}
 
 	public override void InitShared()
 	{
 		base.InitShared();
-		engineController = new VehicleEngineController(this, base.isServer, engineStartupTime);
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		engineController = new VehicleEngineController<TrainEngine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
 		if (base.isServer)
 		{
 			bool b = SeedRandom.Range(net.ID, 0, 2) == 0;
@@ -535,7 +522,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		base.Load(info);
 		if (info.msg.trainEngine != null)
 		{
-			fuelSystem.fuelStorageInstance.uid = info.msg.trainEngine.fuelStorageID;
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.trainEngine.fuelStorageID;
 			SetThrottle((EngineSpeeds)info.msg.trainEngine.throttleSetting);
 		}
 	}
@@ -630,13 +617,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	{
 		if (base.isServer)
 		{
-			int result = 0;
-			Item fuelItem = fuelSystem.GetFuelItem();
-			if (fuelItem != null)
-			{
-				result = fuelItem.amount;
-			}
-			return result;
+			return engineController.FuelSystem.GetFuelAmount();
 		}
 		return 0;
 	}

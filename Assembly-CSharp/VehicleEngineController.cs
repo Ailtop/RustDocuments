@@ -1,6 +1,7 @@
 using Oxide.Core;
+using UnityEngine;
 
-public class VehicleEngineController
+public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngineControllerUser
 {
 	public enum EngineState
 	{
@@ -9,13 +10,15 @@ public class VehicleEngineController
 		On
 	}
 
-	public IEngineControllerUser owner;
+	public readonly TOwner owner;
 
-	private bool isServer;
+	private readonly bool isServer;
 
-	public float engineStartupTime;
+	public readonly float engineStartupTime;
 
-	public BaseEntity.Flags engineStartingFlag;
+	private readonly Transform waterloggedPoint;
+
+	public readonly BaseEntity.Flags engineStartingFlag;
 
 	public EngineState CurEngineState
 	{
@@ -39,35 +42,41 @@ public class VehicleEngineController
 
 	public bool IsStarting => CurEngineState == EngineState.Starting;
 
-	public VehicleEngineController(IEngineControllerUser owner, bool isServer, float engineStartupTime, BaseEntity.Flags engineStartingFlag = BaseEntity.Flags.Reserved1)
+	public bool IsStartingOrOn => CurEngineState != EngineState.Off;
+
+	public EntityFuelSystem FuelSystem { get; private set; }
+
+	public VehicleEngineController(TOwner owner, bool isServer, float engineStartupTime, GameObjectRef fuelStoragePrefab, Transform waterloggedPoint = null, BaseEntity.Flags engineStartingFlag = BaseEntity.Flags.Reserved1)
 	{
+		FuelSystem = new EntityFuelSystem(isServer, fuelStoragePrefab, owner.children);
 		this.owner = owner;
 		this.isServer = isServer;
 		this.engineStartupTime = engineStartupTime;
+		this.waterloggedPoint = waterloggedPoint;
 		this.engineStartingFlag = engineStartingFlag;
 	}
 
 	public void TryStartEngine(BasePlayer player)
 	{
-		if (isServer && !owner.IsDead() && CurEngineState == EngineState.Off && player.net != null)
+		if (isServer && !owner.IsDead() && !IsStartingOrOn && player.net != null)
 		{
-			if (!owner.CanRunEngines())
+			if (!CanRunEngine())
 			{
 				owner.OnEngineStartFailed();
 			}
-			else if (Interface.CallHook("OnEngineStart", owner, player) == null)
+			else if (Interface.CallHook("OnEngineStart", ((VehicleEngineController<>)(object)this).owner, player) == null)
 			{
 				owner.SetFlag(engineStartingFlag, true);
 				owner.SetFlag(BaseEntity.Flags.On, false);
 				owner.Invoke(FinishStartingEngine, engineStartupTime);
-				Interface.CallHook("OnEngineStarted", owner, player);
+				Interface.CallHook("OnEngineStarted", ((VehicleEngineController<>)(object)this).owner, player);
 			}
 		}
 	}
 
 	public void FinishStartingEngine()
 	{
-		if (isServer && !owner.IsDead() && CurEngineState != EngineState.On)
+		if (isServer && !owner.IsDead() && !IsOn)
 		{
 			owner.SetFlag(BaseEntity.Flags.On, true);
 			owner.SetFlag(engineStartingFlag, false);
@@ -76,12 +85,12 @@ public class VehicleEngineController
 
 	public void StopEngine()
 	{
-		if (isServer && CurEngineState != 0 && Interface.CallHook("OnEngineStop", owner) == null)
+		if (isServer && !IsOff && Interface.CallHook("OnEngineStop", ((VehicleEngineController<>)(object)this).owner) == null)
 		{
 			CancelEngineStart();
 			owner.SetFlag(BaseEntity.Flags.On, false);
 			owner.SetFlag(engineStartingFlag, false);
-			Interface.CallHook("OnEngineStopped", owner);
+			Interface.CallHook("OnEngineStopped", ((VehicleEngineController<>)(object)this).owner);
 		}
 	}
 
@@ -96,6 +105,41 @@ public class VehicleEngineController
 			return EngineState.On;
 		}
 		return EngineState.Off;
+	}
+
+	public void CheckEngineState()
+	{
+		if (IsStartingOrOn && !CanRunEngine())
+		{
+			StopEngine();
+		}
+	}
+
+	public bool CanRunEngine()
+	{
+		if (owner.MeetsEngineRequirements() && FuelSystem.HasFuel() && !IsWaterlogged())
+		{
+			return !owner.IsDead();
+		}
+		return false;
+	}
+
+	public bool IsWaterlogged()
+	{
+		if (waterloggedPoint != null)
+		{
+			return WaterLevel.Test(waterloggedPoint.position, true, owner);
+		}
+		return false;
+	}
+
+	public int TickFuel(float fuelPerSecond)
+	{
+		if (IsOn)
+		{
+			return FuelSystem.TryUseFuel(Time.fixedDeltaTime, fuelPerSecond);
+		}
+		return 0;
 	}
 
 	public void CancelEngineStart()

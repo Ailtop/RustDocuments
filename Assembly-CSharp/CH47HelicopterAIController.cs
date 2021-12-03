@@ -143,7 +143,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 	public void SpawnPassenger(Vector3 spawnPos, string prefabPath)
 	{
 		Quaternion identity = Quaternion.identity;
-		HumanNPCNew component = GameManager.server.CreateEntity(prefabPath, spawnPos, identity).GetComponent<HumanNPCNew>();
+		HumanNPC component = GameManager.server.CreateEntity(prefabPath, spawnPos, identity).GetComponent<HumanNPC>();
 		component.Spawn();
 		AttemptMount(component);
 	}
@@ -151,7 +151,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 	public void SpawnPassenger(Vector3 spawnPos)
 	{
 		Quaternion identity = Quaternion.identity;
-		HumanNPCNew component = GameManager.server.CreateEntity(dismountablePrefab.resourcePath, spawnPos, identity).GetComponent<HumanNPCNew>();
+		HumanNPC component = GameManager.server.CreateEntity(dismountablePrefab.resourcePath, spawnPos, identity).GetComponent<HumanNPC>();
 		component.Spawn();
 		AttemptMount(component);
 	}
@@ -159,17 +159,10 @@ public class CH47HelicopterAIController : CH47Helicopter
 	public void SpawnScientist(Vector3 spawnPos)
 	{
 		Quaternion identity = Quaternion.identity;
-		NPCPlayerApex component = GameManager.server.CreateEntity(scientistPrefab.resourcePath, spawnPos, identity).GetComponent<NPCPlayerApex>();
+		HumanNPC component = GameManager.server.CreateEntity(scientistPrefab.resourcePath, spawnPos, identity).GetComponent<HumanNPC>();
 		component.Spawn();
-		component.Mount(this);
-		component.Stats.VisionRange = 203f;
-		component.Stats.DeaggroRange = 202f;
-		component.Stats.AggressionRange = 201f;
-		component.Stats.LongRange = 200f;
-		component.Stats.Hostility = 0f;
-		component.Stats.Defensiveness = 0f;
-		component.Stats.OnlyAggroMarkedTargets = true;
-		component.InitFacts();
+		AttemptMount(component);
+		component.Brain.SetEnabled(false);
 	}
 
 	public void SpawnScientists()
@@ -261,11 +254,10 @@ public class CH47HelicopterAIController : CH47Helicopter
 			BasePlayer mounted = mountPoint.mountable.GetMounted();
 			if ((bool)mounted)
 			{
-				NPCPlayerApex nPCPlayerApex = mounted as NPCPlayerApex;
-				if ((bool)nPCPlayerApex)
+				ScientistNPC scientistNPC = mounted as ScientistNPC;
+				if (scientistNPC != null)
 				{
-					nPCPlayerApex.Stats.Hostility = 1f;
-					nPCPlayerApex.Stats.Defensiveness = 1f;
+					scientistNPC.Brain.SetEnabled(true);
 				}
 			}
 		}
@@ -282,11 +274,10 @@ public class CH47HelicopterAIController : CH47Helicopter
 			BasePlayer mounted = mountPoint.mountable.GetMounted();
 			if ((bool)mounted)
 			{
-				NPCPlayerApex nPCPlayerApex = mounted as NPCPlayerApex;
-				if ((bool)nPCPlayerApex)
+				ScientistNPC scientistNPC = mounted as ScientistNPC;
+				if (scientistNPC != null)
 				{
-					nPCPlayerApex.Stats.Hostility = 0f;
-					nPCPlayerApex.Stats.Defensiveness = 0f;
+					scientistNPC.Brain.SetEnabled(false);
 				}
 			}
 		}

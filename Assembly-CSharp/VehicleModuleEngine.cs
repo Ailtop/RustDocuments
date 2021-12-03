@@ -76,7 +76,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		{
 			if (base.Car != null)
 			{
-				return base.Car.CurEngineState == VehicleEngineController.EngineState.On;
+				return base.Car.CurEngineState == VehicleEngineController<ModularCar>.EngineState.On;
 			}
 			return false;
 		}
@@ -88,7 +88,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
 	}
 
-	public override void OnEngineStateChanged(VehicleEngineController.EngineState oldState, VehicleEngineController.EngineState newState)
+	public override void OnEngineStateChanged(VehicleEngineController<ModularCar>.EngineState oldState, VehicleEngineController<ModularCar>.EngineState newState)
 	{
 		base.OnEngineStateChanged(oldState, newState);
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
@@ -143,14 +143,17 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
 	}
 
-	public override void VehicleFixedUpdate(bool vehicleIsActive)
+	public override void VehicleFixedUpdate()
 	{
-		base.VehicleFixedUpdate(vehicleIsActive);
-		if (vehicleIsActive && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController.EngineState.On)
+		if (isSpawned && base.IsOnAVehicle)
 		{
-			float num = Mathf.Lerp(engine.idleFuelPerSec, engine.maxFuelPerSec, Mathf.Abs(base.Car.GetThrottleInput()));
-			num /= PerformanceFractionFuelEconomy;
-			base.Car.TryUseFuel(Time.fixedDeltaTime, num);
+			base.VehicleFixedUpdate();
+			if (base.Vehicle.IsMovingOrOn && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController<ModularCar>.EngineState.On)
+			{
+				float num = Mathf.Lerp(engine.idleFuelPerSec, engine.maxFuelPerSec, Mathf.Abs(base.Car.GetThrottleInput()));
+				num /= PerformanceFractionFuelEconomy;
+				base.Car.TickFuel(num);
+			}
 		}
 	}
 

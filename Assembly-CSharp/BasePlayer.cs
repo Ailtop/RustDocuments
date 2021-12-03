@@ -920,6 +920,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
+	public bool IsBeingSpectated { get; private set; }
+
 	public InputState serverInput { get; private set; } = new InputState();
 
 
@@ -2341,7 +2343,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 			if (Interface.CallHook("OnTeamUpdated", currentTeam, playerTeam2, this) == null)
 			{
-				ClientRPCPlayer(null, this, "CLIENT_ReceiveTeamInfo", playerTeam2);
+				ClientRPCPlayerAndSpectators(null, this, "CLIENT_ReceiveTeamInfo", playerTeam2);
 				playerTeam2.mapNote = null;
 			}
 		}
@@ -2367,7 +2369,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	public void ClearTeam()
 	{
 		currentTeam = 0uL;
-		ClientRPCPlayer(null, this, "CLIENT_ClearTeam");
+		ClientRPCPlayerAndSpectators(null, this, "CLIENT_ClearTeam");
 		SendNetworkUpdate();
 	}
 
@@ -2749,7 +2751,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 218;
+		missions.protocol = 219;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2849,7 +2851,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (218 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (219 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -2947,9 +2949,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
-	private void SendModelState()
+	public void SendModelState(bool force = false)
 	{
-		if (!wantsSendModelState || nextModelStateUpdate > UnityEngine.Time.time)
+		if (!force && (!wantsSendModelState || nextModelStateUpdate > UnityEngine.Time.time))
 		{
 			return;
 		}
@@ -3027,15 +3029,22 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public void HandleMountedOnLoad()
 	{
-		if (mounted.IsValid(base.isServer))
+		if (!mounted.IsValid(base.isServer))
 		{
-			BaseMountable baseMountable = mounted.Get(base.isServer) as BaseMountable;
-			mounted.Set(null);
-			UnityEngine.Vector3 res;
-			if (baseMountable != null && baseMountable.GetDismountPosition(this, out res))
+			return;
+		}
+		BaseMountable baseMountable = mounted.Get(base.isServer) as BaseMountable;
+		if (baseMountable != null)
+		{
+			baseMountable.MountPlayer(this);
+			if (!baseMountable.allowSleeperMounting)
 			{
-				MovePosition(res);
+				baseMountable.DismountPlayer(this);
 			}
+		}
+		else
+		{
+			mounted.Set(null);
 		}
 	}
 
@@ -4360,7 +4369,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		if (lifeStory != null)
 		{
-			if (killed is Scientist)
+			if (killed is ScientistNPC)
 			{
 				lifeStory.killedScientists++;
 			}
@@ -4847,9 +4856,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -4869,7 +4878,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			{
 				Invoke(ScheduledDeath, NPCAutoTurret.sleeperhostiledelay);
 			}
-			EnsureDismounted();
+			BaseMountable baseMountable = GetMounted();
+			if (baseMountable != null && !baseMountable.allowSleeperMounting)
+			{
+				EnsureDismounted();
+			}
 			SetPlayerFlag(PlayerFlags.Sleeping, true);
 			sleepStartTime = UnityEngine.Time.time;
 			sleepingPlayerList.Add(this);
@@ -5533,7 +5546,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		metabolism.SendChangesToClient();
 		if (info.PointStart != UnityEngine.Vector3.zero && info.damageTypes.Total() >= 0f)
 		{
-			ClientRPCPlayer(null, this, "DirectionalDamage", info.PointStart, (int)info.damageTypes.GetMajorityDamageType());
+			ClientRPCPlayerAndSpectators(null, this, "DirectionalDamage", info.PointStart, (int)info.damageTypes.GetMajorityDamageType());
 		}
 	}
 
@@ -6113,6 +6126,95 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		viewAngles = player.viewAngles;
 		SendNetworkUpdate_Position();
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (child is BasePlayer)
+		{
+			IsBeingSpectated = true;
+		}
+	}
+
+	protected override void OnChildRemoved(BaseEntity child)
+	{
+		base.OnChildRemoved(child);
+		if (!(child is BasePlayer))
+		{
+			return;
+		}
+		IsBeingSpectated = false;
+		foreach (BaseEntity child2 in children)
+		{
+			if (child2 is BasePlayer)
+			{
+				IsBeingSpectated = true;
+			}
+		}
+	}
+
+	public void ClientRPCPlayerAndSpectators(Network.Connection sourceConnection, BasePlayer player, string funcName)
+	{
+		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCEx(new SendInfo(player.net.connection), sourceConnection, funcName);
+		if (!IsBeingSpectated || children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			BasePlayer player2;
+			if ((object)(player2 = child as BasePlayer) != null)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName);
+			}
+		}
+	}
+
+	public void ClientRPCPlayerAndSpectators<T1>(Network.Connection sourceConnection, BasePlayer player, string funcName, T1 arg1)
+	{
+		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCEx(new SendInfo(player.net.connection), sourceConnection, funcName, arg1);
+		if (!IsBeingSpectated || children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			BasePlayer player2;
+			if ((object)(player2 = child as BasePlayer) != null)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName, arg1);
+			}
+		}
+	}
+
+	public void ClientRPCPlayerAndSpectators<T1, T2>(Network.Connection sourceConnection, BasePlayer player, string funcName, T1 arg1, T2 arg2)
+	{
+		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCPlayer(sourceConnection, player, funcName, arg1, arg2);
+		if (!IsBeingSpectated || children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			BasePlayer player2;
+			if ((object)(player2 = child as BasePlayer) != null)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2);
+			}
+		}
 	}
 
 	public override float GetThreatLevel()
@@ -7272,6 +7374,17 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				if ((bool)initiatorPlayer)
 				{
 					initiatorPlayer.stats.Add("headshot", 1, (Stats)5);
+					if (initiatorPlayer.IsBeingSpectated)
+					{
+						foreach (BaseEntity child in initiatorPlayer.children)
+						{
+							BasePlayer basePlayer;
+							if ((object)(basePlayer = child as BasePlayer) != null)
+							{
+								basePlayer.ClientRPCPlayer(null, basePlayer, "SpectatedPlayerHeadshot");
+							}
+						}
+					}
 				}
 			}
 			else if (flag)

@@ -292,12 +292,13 @@ public class ThrownWeapon : AttackEntity
 			Vector3 point = hitInfo.point;
 			Vector3 normal = hitInfo.normal;
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			Collider collider = hitInfo.collider;
 			if ((bool)entity && entity is StabilityEntity && baseEntity is TimedExplosive)
 			{
 				entity = entity.ToServer<BaseEntity>();
 				TimedExplosive obj = baseEntity as TimedExplosive;
 				obj.onlyDamageParent = true;
-				obj.DoStick(point, normal, entity);
+				obj.DoStick(point, normal, entity, collider);
 			}
 			else
 			{

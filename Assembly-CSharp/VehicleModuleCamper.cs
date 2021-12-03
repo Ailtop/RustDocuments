@@ -234,14 +234,14 @@ public class VehicleModuleCamper : VehicleModuleSeating
 			return;
 		}
 		CamperSeatConfig seatConfig = GetSeatConfig();
-		if (seatConfig != null && adjustedMountPoints != null)
+		if (seatConfig != null && mountPoints != null)
 		{
-			for (int i = 0; i < adjustedMountPoints.Length; i++)
+			for (int i = 0; i < mountPoints.Count; i++)
 			{
-				if (adjustedMountPoints[i].mountable != null)
+				if (mountPoints[i].mountable != null)
 				{
-					adjustedMountPoints[i].mountable.transform.position = seatConfig.SeatPositions[i].position;
-					adjustedMountPoints[i].mountable.SendNetworkUpdate();
+					mountPoints[i].mountable.transform.position = seatConfig.SeatPositions[i].position;
+					mountPoints[i].mountable.SendNetworkUpdate();
 				}
 			}
 		}

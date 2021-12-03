@@ -1,4 +1,4 @@
-public class UnderwaterDweller : HumanNPCNew
+public class UnderwaterDweller : HumanNPC
 {
 	protected override string OverrideCorpseName()
 	{

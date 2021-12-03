@@ -15,6 +15,8 @@ public class TorpedoServerProjectile : ServerProjectile
 	[SerializeField]
 	private float shallowWaterCutoff = 2f;
 
+	public override bool HasRangeLimit => false;
+
 	protected override int mask => 1236478721;
 
 	public override bool DoMovement()

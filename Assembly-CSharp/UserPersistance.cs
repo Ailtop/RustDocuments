@@ -25,13 +25,13 @@ public class UserPersistance : IDisposable
 	public UserPersistance(string strFolder)
 	{
 		blueprints = new Facepunch.Sqlite.Database();
-		blueprints.Open(strFolder + "/player.blueprints." + 4 + ".db");
+		blueprints.Open(strFolder + "/player.blueprints." + 5 + ".db");
 		if (!blueprints.TableExists("data"))
 		{
 			blueprints.Execute("CREATE TABLE data ( userid TEXT PRIMARY KEY, info BLOB, updated INTEGER )");
 		}
 		deaths = new Facepunch.Sqlite.Database();
-		deaths.Open(strFolder + "/player.deaths." + 4 + ".db");
+		deaths.Open(strFolder + "/player.deaths." + 5 + ".db");
 		if (!deaths.TableExists("data"))
 		{
 			deaths.Execute("CREATE TABLE data ( userid TEXT, born INTEGER, died INTEGER, info BLOB )");
@@ -39,7 +39,7 @@ public class UserPersistance : IDisposable
 			deaths.Execute("CREATE INDEX IF NOT EXISTS diedindex ON data ( died )");
 		}
 		identities = new Facepunch.Sqlite.Database();
-		identities.Open(strFolder + "/player.identities." + 4 + ".db");
+		identities.Open(strFolder + "/player.identities." + 5 + ".db");
 		if (!identities.TableExists("data"))
 		{
 			identities.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, username TEXT )");
@@ -51,7 +51,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT )");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 218 + ".db");
+		playerState.Open(strFolder + "/player.states." + 219 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

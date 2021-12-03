@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using Apex.LoadBalancing;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Rust.Ai
 {
-	public class CoverPointVolume : MonoBehaviour, IServerComponent, ILoadBalanced
+	public class CoverPointVolume : MonoBehaviour, IServerComponent
 	{
 		internal enum CoverType
 		{
@@ -42,19 +41,6 @@ namespace Rust.Ai
 
 		public bool repeat => true;
 
-		private void OnEnable()
-		{
-			Apex.LoadBalancing.LoadBalancer.defaultBalancer.Add(this);
-		}
-
-		private void OnDisable()
-		{
-			if (!Application.isQuitting)
-			{
-				Apex.LoadBalancing.LoadBalancer.defaultBalancer.Remove(this);
-			}
-		}
-
 		public float? ExecuteUpdate(float deltaTime, float nextInterval)
 		{
 			if (CoverPoints.Count == 0)
@@ -71,7 +57,6 @@ namespace Rust.Ai
 					GenerateCoverPoints(null);
 					if (CoverPoints.Count != 0)
 					{
-						Apex.LoadBalancing.LoadBalancer.defaultBalancer.Remove(this);
 						return null;
 					}
 					_dynNavMeshBuildCompletionTime = Time.realtimeSinceStartup;
@@ -79,7 +64,6 @@ namespace Rust.Ai
 					if (_genAttempts >= 4)
 					{
 						Object.Destroy(base.gameObject);
-						Apex.LoadBalancing.LoadBalancer.defaultBalancer.Remove(this);
 						return null;
 					}
 				}

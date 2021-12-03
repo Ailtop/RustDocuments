@@ -268,8 +268,8 @@ public class SamSite : ContainerIOEntity
 		List<ISamSiteTarget> obj = Pool.GetList<ISamSiteTarget>();
 		if (Interface.CallHook("OnSamSiteTargetScan", this, obj) == null)
 		{
-			_003CTargetScan_003Eg__AddTargetSet_007C48_0<BaseVehicle>(obj, 32768, targetTypeVehicle.scanRadius);
-			_003CTargetScan_003Eg__AddTargetSet_007C48_0<MLRSRocket>(obj, 1048576, targetTypeMissile.scanRadius);
+			_003CTargetScan_003Eg__AddTargetSet_007C48_0(obj, 32768, targetTypeVehicle.scanRadius);
+			_003CTargetScan_003Eg__AddTargetSet_007C48_0(obj, 1048576, targetTypeMissile.scanRadius);
 		}
 		ISamSiteTarget samSiteTarget = null;
 		foreach (ISamSiteTarget item in obj)

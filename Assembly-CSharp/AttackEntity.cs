@@ -27,8 +27,6 @@ public class AttackEntity : HeldEntity
 
 	public bool aiOnlyInRange;
 
-	public NPCPlayerApex.WeaponTypeEnum effectiveRangeType = NPCPlayerApex.WeaponTypeEnum.MediumRange;
-
 	public float CloseRangeAddition;
 
 	public float MediumRangeAddition;
@@ -242,15 +240,41 @@ public class AttackEntity : HeldEntity
 					flag = false;
 				}
 			}
+			if (ConVar.AntiHack.eye_protection >= 3)
+			{
+				float num8 = Mathf.Abs(player.GetParentVelocity().y);
+				float num9 = player.BoundsPadding() + num4 * num8 + player.GetJumpHeight();
+				float num10 = Mathf.Abs(player.eyes.position.y - eyePos.y);
+				if (num10 > num9)
+				{
+					string shortPrefabName3 = base.ShortPrefabName;
+					AntiHack.Log(player, AntiHackType.EyeHack, "Altitude (" + shortPrefabName3 + " on attack with " + num10 + "m > " + num9 + "m)");
+					player.stats.combat.Log(this, "eye_altitude");
+					flag = false;
+				}
+			}
 			if (ConVar.AntiHack.eye_protection >= 2)
 			{
 				Vector3 center = player.eyes.center;
 				Vector3 position = player.eyes.position;
-				if (!GamePhysics.LineOfSight(center, position, eyePos, layerMask))
+				Vector3 vector = eyePos;
+				if (!GamePhysics.LineOfSightRadius(center, position, vector, layerMask, ConVar.AntiHack.losradius))
 				{
-					string shortPrefabName3 = base.ShortPrefabName;
-					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName3, " on attack) ", center, " ", position, " ", eyePos));
+					string shortPrefabName4 = base.ShortPrefabName;
+					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName4, " on attack) ", center, " ", position, " ", vector));
 					player.stats.combat.Log(this, "eye_los");
+					flag = false;
+				}
+			}
+			if (ConVar.AntiHack.eye_protection >= 4 && !player.HasParent())
+			{
+				Vector3 position2 = player.transform.position;
+				Vector3 vector2 = eyePos - PlayerEyes.EyeOffset - PlayerEyes.DuckOffset;
+				if (Vector3.Distance(position2, vector2) > 0.01f && AntiHack.TestNoClipping(player, position2, vector2, ConVar.AntiHack.noclip_protection >= 2))
+				{
+					string shortPrefabName5 = base.ShortPrefabName;
+					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
+					player.stats.combat.Log(this, "eye_noclip");
 					flag = false;
 				}
 			}

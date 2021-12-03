@@ -63,8 +63,6 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
-	public Transform fuelStoragePoint;
-
 	public float fuelPerSec;
 
 	public EntityFuelSystem fuelSystem;
@@ -124,6 +122,15 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 		for (int i = 0; i < onTriggers.Length; i++)
 		{
 			onTriggers[i].SetActive(false);
+		}
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer && isSpawned)
+		{
+			fuelSystem.CheckNewChild(child);
 		}
 	}
 
@@ -413,15 +420,6 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 		return false;
 	}
 
-	public override void SpawnSubEntities()
-	{
-		base.SpawnSubEntities();
-		if (!Rust.Application.isLoadingSave)
-		{
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-		}
-	}
-
 	[RPC_Server]
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
@@ -471,7 +469,7 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 	public override void InitShared()
 	{
 		base.InitShared();
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		fuelSystem = new EntityFuelSystem(base.isServer, fuelStoragePrefab, children);
 	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)

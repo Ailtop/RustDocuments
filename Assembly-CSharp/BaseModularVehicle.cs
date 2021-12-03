@@ -20,8 +20,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	private bool disablePhysics;
 
-	public bool waterlogged;
-
 	[Header("Modular Vehicle")]
 	[HideInInspector]
 	public float mass;
@@ -207,7 +205,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		if (IsMovingOrOn)
 		{
 			Velocity = GetLocalVelocity();
-			waterlogged = WaterLevel.Test(waterSample.transform.position, true, this);
 		}
 		else
 		{
@@ -217,10 +214,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		if (LightsAreOn && !AnyMounted())
 		{
 			SetLightsState(false);
-		}
-		for (int i = 0; i < NumAttachedModules; i++)
-		{
-			AttachedModuleEntities[i].VehicleFixedUpdate(IsMovingOrOn);
 		}
 	}
 
@@ -557,6 +550,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public override void OnChildAdded(BaseEntity childEntity)
 	{
+		base.OnChildAdded(childEntity);
 		BaseVehicleModule module;
 		if ((object)(module = childEntity as BaseVehicleModule) != null)
 		{
@@ -571,6 +565,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public override void OnChildRemoved(BaseEntity childEntity)
 	{
+		base.OnChildRemoved(childEntity);
 		BaseVehicleModule removedModule;
 		if ((object)(removedModule = childEntity as BaseVehicleModule) != null)
 		{

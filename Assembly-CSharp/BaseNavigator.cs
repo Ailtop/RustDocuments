@@ -111,7 +111,7 @@ public class BaseNavigator : BaseMonoBehaviour
 	[InspectorFlags]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
-	private float stuckTimer;
+	public float stuckTimer;
 
 	private Vector3 stuckCheckPosition;
 
@@ -151,7 +151,7 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public BaseCombatEntity BaseEntity { get; private set; }
 
-	public Vector3 Destination { get; protected set; }
+	public Vector3 Destination { get; set; }
 
 	public virtual bool IsOnNavMeshLink
 	{
@@ -301,7 +301,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		return flag;
 	}
 
-	private bool Warp(Vector3 position)
+	public bool Warp(Vector3 position)
 	{
 		Agent.Warp(position);
 		Agent.enabled = true;

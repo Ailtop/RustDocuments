@@ -86,7 +86,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!HasAnyPassengers())
+		if (!AnyMounted())
 		{
 			return;
 		}
@@ -128,7 +128,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 
 	private PhysicMaterial GetPhysicMaterial()
 	{
-		if (HasFlag(Flags.Reserved1) || !HasAnyPassengers())
+		if (HasFlag(Flags.Reserved1) || !AnyMounted())
 		{
 			return BrakeMaterial;
 		}
@@ -214,7 +214,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 
 	private void DecayOverTime()
 	{
-		if (!HasAnyPassengers())
+		if (!AnyMounted())
 		{
 			Hurt(DecayAmount);
 		}

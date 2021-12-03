@@ -180,13 +180,13 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 
 	public ModularCarLock carLock;
 
-	public VehicleEngineController engineController;
+	public VehicleEngineController<ModularCar> engineController;
 
-	public VehicleEngineController.EngineState lastSetEngineState;
-
-	public EntityFuelSystem fuelSystem;
+	public VehicleEngineController<ModularCar>.EngineState lastSetEngineState;
 
 	public float cachedFuelFraction;
+
+	public override bool AlwaysAllowBradleyTargeting => true;
 
 	public VehicleTerrainHandler.Surface OnSurface
 	{
@@ -199,8 +199,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 			return serverTerrainHandler.OnSurface;
 		}
 	}
-
-	public override bool AlwaysAllowBradleyTargeting => true;
 
 	public float DriveWheelVelocity
 	{
@@ -244,7 +242,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 
 	public override bool IsLockable => carLock.HasALock;
 
-	public VehicleEngineController.EngineState CurEngineState => engineController.CurEngineState;
+	public VehicleEngineController<ModularCar>.EngineState CurEngineState => engineController.CurEngineState;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -322,9 +320,18 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		}
 	}
 
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer && isSpawned)
+		{
+			GetFuelSystem().CheckNewChild(child);
+		}
+	}
+
 	public override EntityFuelSystem GetFuelSystem()
 	{
-		return fuelSystem;
+		return engineController.FuelSystem;
 	}
 
 	public float GetPlayerDamageMultiplier()
@@ -374,10 +381,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		base.VehicleFixedUpdate();
 		float speed = GetSpeed();
 		carPhysics.FixedUpdate(UnityEngine.Time.fixedDeltaTime, speed);
-		if (CurEngineState != 0 && !CanRunEngines())
-		{
-			engineController.StopEngine();
-		}
+		engineController.CheckEngineState();
 		hurtTriggerFront.gameObject.SetActive(speed > hurtTriggerMinSpeed);
 		hurtTriggerRear.gameObject.SetActive(speed < 0f - hurtTriggerMinSpeed);
 		if (serverTerrainHandler != null)
@@ -411,7 +415,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
 		MountPointInfo playerSeatInfo = GetPlayerSeatInfo(player);
-		if (!playerSeatInfo.isDriver)
+		if (playerSeatInfo == null || !playerSeatInfo.isDriver)
 		{
 			return;
 		}
@@ -486,15 +490,6 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		carLock.EnableCentralLockingIfNoDriver();
 	}
 
-	public override void SpawnSubEntities()
-	{
-		base.SpawnSubEntities();
-		if (!Rust.Application.isLoadingSave)
-		{
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-		}
-	}
-
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
@@ -503,7 +498,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		info.msg.modularCar.driveWheelVel = DriveWheelVelocity;
 		info.msg.modularCar.throttleInput = GetThrottleInput();
 		info.msg.modularCar.brakeInput = GetBrakeInput();
-		info.msg.modularCar.fuelStorageID = fuelSystem.fuelStorageInstance.uid;
+		info.msg.modularCar.fuelStorageID = engineController.FuelSystem.fuelStorageInstance.uid;
 		info.msg.modularCar.fuelFraction = GetFuelFraction();
 		info.msg.modularCar.lockID = carLock.LockID;
 	}
@@ -517,9 +512,9 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		base.Hurt(info);
 	}
 
-	public int TryUseFuel(float seconds, float fuelUsedPerSecond)
+	public void TickFuel(float fuelUsedPerSecond)
 	{
-		return fuelSystem.TryUseFuel(seconds, fuelUsedPerSecond);
+		engineController.TickFuel(fuelUsedPerSecond);
 	}
 
 	public override bool MountEligable(BasePlayer player)
@@ -587,18 +582,18 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		return GetMaxDriveForce() > 0f;
 	}
 
-	public bool CanRunEngines()
+	public bool MeetsEngineRequirements()
 	{
-		if (HasAnyWorkingEngines() && HasDriver() && fuelSystem.HasFuel() && !waterlogged)
+		if (HasAnyWorkingEngines())
 		{
-			return !IsDead();
+			return HasDriver();
 		}
 		return false;
 	}
 
 	public void OnEngineStartFailed()
 	{
-		bool arg = !HasAnyWorkingEngines() || waterlogged;
+		bool arg = !HasAnyWorkingEngines() || engineController.IsWaterlogged();
 		ClientRPC(null, "EngineStartFailed", arg);
 	}
 
@@ -608,7 +603,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return false;
 		}
-		fuelSystem.AdminFillFuel();
+		engineController.FuelSystem.AdminFillFuel();
 		SetHealth(MaxHealth());
 		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
 		{
@@ -899,7 +894,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		BasePlayer player = msg.player;
 		if (!(player == null) && CanBeLooted(player))
 		{
-			fuelSystem.LootFuel(player);
+			engineController.FuelSystem.LootFuel(player);
 		}
 	}
 
@@ -925,8 +920,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	public override void InitShared()
 	{
 		base.InitShared();
-		engineController = new VehicleEngineController(this, base.isServer, carSettings.engineStartupTime);
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		engineController = new VehicleEngineController<ModularCar>(this, base.isServer, carSettings.engineStartupTime, fuelStoragePrefab, waterSample);
 		carLock = new ModularCarLock(this, base.isServer);
 	}
 
@@ -972,7 +966,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		if (info.msg.modularCar != null)
 		{
 			carLock.LockID = info.msg.modularCar.lockID;
-			fuelSystem.fuelStorageInstance.uid = info.msg.modularCar.fuelStorageID;
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.modularCar.fuelStorageID;
 			cachedFuelFraction = info.msg.modularCar.fuelFraction;
 		}
 	}
@@ -1030,7 +1024,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 	{
 		if (base.isServer)
 		{
-			return fuelSystem.GetFuelFraction();
+			return engineController.FuelSystem.GetFuelFraction();
 		}
 		return cachedFuelFraction;
 	}
@@ -1086,7 +1080,7 @@ public class ModularCar : BaseModularVehicle, TriggerHurtNotChild.IHurtTriggerUs
 		{
 			return false;
 		}
-		if (base.isServer && CurEngineState == VehicleEngineController.EngineState.Off)
+		if (base.isServer && CurEngineState == VehicleEngineController<ModularCar>.EngineState.Off)
 		{
 			lastEngineOnTime = UnityEngine.Time.time;
 		}

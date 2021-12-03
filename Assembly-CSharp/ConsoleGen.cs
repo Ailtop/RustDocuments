@@ -8,8 +8,47 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[790]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[789]
 	{
+		new ConsoleSystem.Command
+		{
+			Name = "humanknownplayerslosupdateinterval",
+			Parent = "aibrainsenses",
+			FullName = "aibrainsenses.humanknownplayerslosupdateinterval",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AIBrainSenses.HumanKnownPlayersLOSUpdateInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AIBrainSenses.HumanKnownPlayersLOSUpdateInterval = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "knownplayerslosupdateinterval",
+			Parent = "aibrainsenses",
+			FullName = "aibrainsenses.knownplayerslosupdateinterval",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AIBrainSenses.KnownPlayersLOSUpdateInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AIBrainSenses.KnownPlayersLOSUpdateInterval = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "updateinterval",
+			Parent = "aibrainsenses",
+			FullName = "aibrainsenses.updateinterval",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => AIBrainSenses.UpdateInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AIBrainSenses.UpdateInterval = str.ToFloat();
+			}
+		},
 		new ConsoleSystem.Command
 		{
 			Name = "animalframebudgetms",
@@ -336,6 +375,7 @@ public class ConsoleGen
 			FullName = "bear.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Bear.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -363,6 +403,7 @@ public class ConsoleGen
 			FullName = "boar.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Boar.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -529,6 +570,7 @@ public class ConsoleGen
 			FullName = "chicken.population",
 			ServerAdmin = true,
 			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => Chicken.Population.ToString(),
 			SetOveride = delegate(string str)
@@ -562,6 +604,32 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ClothLOD.clothLODDist = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "lockoutcooldown",
+			Parent = "codelock",
+			FullName = "codelock.lockoutcooldown",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CodeLock.lockoutCooldown.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CodeLock.lockoutCooldown = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxfailedattempts",
+			Parent = "codelock",
+			FullName = "codelock.maxfailedattempts",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CodeLock.maxFailedAttempts.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CodeLock.maxFailedAttempts = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -1101,56 +1169,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "aidebug_loadbalanceoverduereportserver",
-			Parent = "ai",
-			FullName = "ai.aidebug_loadbalanceoverduereportserver",
-			ServerAdmin = true,
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.aiDebug_LoadBalanceOverdueReportServer(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "aidebug_toggle",
-			Parent = "ai",
-			FullName = "ai.aidebug_toggle",
-			ServerAdmin = true,
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.aiDebug_toggle(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "ailoadbalancerupdateinterval",
-			Parent = "ai",
-			FullName = "ai.ailoadbalancerupdateinterval",
-			ServerAdmin = true,
-			Description = "Set the update interval for the behaviour ai of animals and npcs. (Default: 0.25)",
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.aiLoadBalancerUpdateInterval(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "aimanagerloadbalancerupdateinterval",
-			Parent = "ai",
-			FullName = "ai.aimanagerloadbalancerupdateinterval",
-			ServerAdmin = true,
-			Description = "Set the update interval for the agency of dormant and active animals and npcs. (Default: 2.0)",
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.aiManagerLoadBalancerUpdateInterval(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "allowdesigning",
 			Parent = "ai",
 			FullName = "ai.allowdesigning",
@@ -1183,19 +1201,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "animalsenseloadbalancerupdateinterval",
-			Parent = "ai",
-			FullName = "ai.animalsenseloadbalancerupdateinterval",
-			ServerAdmin = true,
-			Description = "Set the update interval for animal senses that updates the knowledge gathering of animals. (Default: 0.2)",
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.AnimalSenseLoadBalancerUpdateInterval(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "brainstats",
 			Parent = "ai",
 			FullName = "ai.brainstats",
@@ -1204,19 +1209,6 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				AI.brainstats(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "defaultloadbalancerupdateinterval",
-			Parent = "ai",
-			FullName = "ai.defaultloadbalancerupdateinterval",
-			ServerAdmin = true,
-			Description = "Set the update interval for the default load balancer, currently used for cover point generation. (Default: 2.5)",
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.defaultLoadBalancerUpdateInterval(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1926,19 +1918,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.npc_valid_mounted_aim_cone = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "npcsenseloadbalancerupdateinterval",
-			Parent = "ai",
-			FullName = "ai.npcsenseloadbalancerupdateinterval",
-			ServerAdmin = true,
-			Description = "Set the update interval for npc senses that updates the knowledge gathering of npcs. (Default: 0.2)",
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				AI.NpcSenseLoadBalancerUpdateInterval(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -9199,6 +9178,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				DynamicNavMesh.use_baked_terrain_mesh = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "chargeneededforsupplies",
+			Parent = "excavatorsignalcomputer",
+			FullName = "excavatorsignalcomputer.chargeneededforsupplies",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ExcavatorSignalComputer.chargeNeededForSupplies.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ExcavatorSignalComputer.chargeNeededForSupplies = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

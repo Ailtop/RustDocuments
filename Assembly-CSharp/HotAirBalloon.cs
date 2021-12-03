@@ -45,14 +45,10 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
-	public Transform fuelStoragePoint;
-
 	public float fuelPerSec = 0.25f;
 
 	[Header("Storage")]
 	public GameObjectRef storageUnitPrefab;
-
-	public Transform storageUnitPoint;
 
 	public EntityRef storageUnitInstance;
 
@@ -172,7 +168,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public override void InitShared()
 	{
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		fuelSystem = new EntityFuelSystem(base.isServer, fuelStoragePrefab, children);
 	}
 
 	public override void Load(LoadInfo info)
@@ -196,6 +192,22 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	public bool WaterLogged()
 	{
 		return WaterLevel.Test(engineHeight.position, true, this);
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer)
+		{
+			if (isSpawned)
+			{
+				fuelSystem.CheckNewChild(child);
+			}
+			if (child.prefabID == storageUnitPrefab.GetEntity().prefabID)
+			{
+				storageUnitInstance.Set(child);
+			}
+		}
 	}
 
 	public bool IsValidSAMTarget(bool staticRespawn)
@@ -222,18 +234,6 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		SetFlag(Flags.On, false);
 	}
 
-	public void SpawnSubEntities()
-	{
-		if (!Rust.Application.isLoadingSave)
-		{
-			BaseEntity baseEntity = GameManager.server.CreateEntity(storageUnitPrefab.resourcePath, storageUnitPoint.localPosition, storageUnitPoint.localRotation);
-			baseEntity.Spawn();
-			baseEntity.SetParent(this);
-			storageUnitInstance.Set(baseEntity);
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-		}
-	}
-
 	[RPC_Server]
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
@@ -242,12 +242,6 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		{
 			fuelSystem.LootFuel(player);
 		}
-	}
-
-	public override void Spawn()
-	{
-		base.Spawn();
-		SpawnSubEntities();
 	}
 
 	public override void Save(SaveInfo info)

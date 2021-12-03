@@ -17,22 +17,21 @@ public class TargetLostAIEvent : BaseAIEvent
 		if (baseEntity == null)
 		{
 			base.Result = !base.Inverted;
+			return;
 		}
-		else if (Vector3.Distance(baseEntity.transform.position, base.Owner.transform.position) > senses.TargetLostRange)
+		if (Vector3.Distance(baseEntity.transform.position, base.Owner.transform.position) > senses.TargetLostRange)
+		{
+			base.Result = !base.Inverted;
+			return;
+		}
+		BasePlayer basePlayer = baseEntity as BasePlayer;
+		if (baseEntity.Health() <= 0f || (basePlayer != null && basePlayer.IsDead()))
 		{
 			base.Result = !base.Inverted;
 		}
-		else if (baseEntity.Health() <= 0f)
+		else if (senses.ignoreSafeZonePlayers && basePlayer != null && basePlayer.InSafeZone())
 		{
 			base.Result = !base.Inverted;
-		}
-		else if (senses.ignoreSafeZonePlayers)
-		{
-			BasePlayer basePlayer = baseEntity as BasePlayer;
-			if (basePlayer != null && basePlayer.InSafeZone())
-			{
-				base.Result = !base.Inverted;
-			}
 		}
 	}
 }

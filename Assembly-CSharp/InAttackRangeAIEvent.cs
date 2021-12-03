@@ -15,7 +15,8 @@ public class InAttackRangeAIEvent : BaseAIEvent
 			IAIAttack iAIAttack = base.Owner as IAIAttack;
 			if (iAIAttack != null)
 			{
-				bool flag = iAIAttack.IsTargetInRange(baseEntity);
+				float dist;
+				bool flag = iAIAttack.IsTargetInRange(baseEntity, out dist);
 				base.Result = (base.Inverted ? (!flag) : flag);
 			}
 		}

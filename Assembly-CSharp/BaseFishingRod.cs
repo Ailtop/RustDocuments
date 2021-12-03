@@ -130,6 +130,10 @@ public class BaseFishingRod : HeldEntity
 
 	public ItemModFishable ForceFish;
 
+	public static Flags PullingLeftFlag = Flags.Reserved6;
+
+	public static Flags PullingRightFlag = Flags.Reserved7;
+
 	public static Flags ReelingInFlag = Flags.Reserved8;
 
 	public GameObjectRef BobberPreview;
@@ -537,6 +541,8 @@ public class BaseFishingRod : HeldEntity
 
 	private void UpdateFlags(bool inputLeft = false, bool inputRight = false, bool back = false)
 	{
+		SetFlag(PullingLeftFlag, CurrentState == CatchState.Catching && inputLeft);
+		SetFlag(PullingRightFlag, CurrentState == CatchState.Catching && inputRight);
 		SetFlag(ReelingInFlag, CurrentState == CatchState.Catching && back);
 	}
 

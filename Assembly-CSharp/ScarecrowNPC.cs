@@ -1,54 +1,48 @@
-using System.Collections;
-using Network;
 using Rust;
 using UnityEngine;
 
-public class FrankensteinPet : BasePet, IAISenses, IAIAttack
+public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 {
-	[Header("Frankenstein")]
-	[ServerVar(Help = "How long before a Frankenstein Pet dies un controlled and not asleep on table")]
-	public static float decayminutes = 180f;
+	public float BaseAttackRate = 2f;
 
-	[Header("Audio")]
-	public SoundDefinition AttackVocalSFX;
+	public float BaseAttackDamge = 10f;
+
+	public DamageType AttackDamageType = DamageType.Slash;
+
+	[Header("Loot")]
+	public LootContainer.LootSpawnSlot[] LootSpawnSlots;
 
 	private float nextAttackTime;
 
-	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
-	{
-		using (TimeWarning.New("FrankensteinPet.OnRpcMessage"))
-		{
-		}
-		return base.OnRpcMessage(player, rpc, msg);
-	}
+	public BaseAIBrain<ScarecrowNPC> Brain { get; protected set; }
 
 	public override void ServerInit()
 	{
 		base.ServerInit();
+		Brain = GetComponent<BaseAIBrain<ScarecrowNPC>>();
 		if (!base.isClient)
 		{
-			InvokeRandomized(TickDecay, Random.Range(30f, 60f), 60f, 6f);
+			AIThinkManager.Add(this);
 		}
 	}
 
-	public IEnumerator DelayEquipWeapon(ItemDefinition item, float delay)
+	internal override void DoServerDestroy()
 	{
-		yield return new WaitForSeconds(delay);
-		if (!(inventory == null) && inventory.containerBelt != null && !(item == null))
-		{
-			inventory.GiveItem(ItemManager.Create(item, 1, 0uL), inventory.containerBelt);
-			EquipWeapon();
-		}
+		AIThinkManager.Remove(this);
+		base.DoServerDestroy();
 	}
 
-	private void TickDecay()
+	public virtual void TryThink()
 	{
-		BasePlayer basePlayer = BasePlayer.FindByID(base.OwnerID);
-		if ((!(basePlayer != null) || basePlayer.IsSleeping()) && !(base.healthFraction <= 0f) && !base.IsDestroyed)
+		ServerThink_Internal();
+	}
+
+	public override void ServerThink(float delta)
+	{
+		base.ServerThink(delta);
+		if (Brain.ShouldServerThink())
 		{
-			float num = 1f / decayminutes;
-			float amount = MaxHealth() * num;
-			Hurt(amount, DamageType.Decay, this, false);
+			Brain.DoThink();
 		}
 	}
 
@@ -57,9 +51,9 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 		AttackEntity attackEntity = GetAttackEntity();
 		if ((bool)attackEntity)
 		{
-			return attackEntity.effectiveRange * (attackEntity.aiOnlyInRange ? 1f : 2f) * base.Brain.AttackRangeMultiplier;
+			return attackEntity.effectiveRange * (attackEntity.aiOnlyInRange ? 1f : 2f) * Brain.AttackRangeMultiplier;
 		}
-		return base.Brain.SenseRange;
+		return Brain.SenseRange;
 	}
 
 	public bool IsThreat(BaseEntity entity)
@@ -84,10 +78,6 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 	public bool CanAttack(BaseEntity entity)
 	{
 		if (entity == null)
-		{
-			return false;
-		}
-		if (entity.gameObject.layer == 21 || entity.gameObject.layer == 8)
 		{
 			return false;
 		}
@@ -173,7 +163,6 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 			}
 			target.Hurt(BaseAttackDamge, AttackDamageType, this);
 			SignalBroadcast(Signal.Attack);
-			ClientRPC(null, "OnAttack");
 			nextAttackTime = Time.realtimeSinceStartup + CooldownDuration();
 		}
 	}
@@ -221,6 +210,21 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 				{
 					containers[i].Clear();
 				}
+				if (LootSpawnSlots.Length != 0)
+				{
+					LootContainer.LootSpawnSlot[] lootSpawnSlots = LootSpawnSlots;
+					for (int i = 0; i < lootSpawnSlots.Length; i++)
+					{
+						LootContainer.LootSpawnSlot lootSpawnSlot = lootSpawnSlots[i];
+						for (int j = 0; j < lootSpawnSlot.numberToSpawn; j++)
+						{
+							if (Random.Range(0f, 1f) <= lootSpawnSlot.probability)
+							{
+								lootSpawnSlot.definition.SpawnIntoContainer(nPCPlayerCorpse.containers[0]);
+							}
+						}
+					}
+				}
 			}
 			return nPCPlayerCorpse;
 		}
@@ -228,6 +232,6 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 
 	protected virtual string OverrideCorpseName()
 	{
-		return "Frankenstein";
+		return "Scarecrow";
 	}
 }

@@ -13,8 +13,6 @@ namespace Rust.Ai
 		[ReadOnly]
 		public Vector2i NavmeshGridCoord;
 
-		private IAIAgent agent;
-
 		private bool isRegistered;
 
 		private void OnEnable()
@@ -23,19 +21,6 @@ namespace Rust.Ai
 			if (SingletonComponent<AiManager>.Instance == null || !SingletonComponent<AiManager>.Instance.enabled || AiManager.nav_disable)
 			{
 				base.enabled = false;
-				return;
-			}
-			agent = GetComponent<IAIAgent>();
-			if (agent != null)
-			{
-				if (agent.Entity.isClient)
-				{
-					base.enabled = false;
-					return;
-				}
-				agent.AgentTypeIndex = AgentTypeIndex;
-				float num = SeedRandom.Value((uint)Mathf.Abs(GetInstanceID()));
-				Invoke(DelayedRegistration, num * 3f);
 			}
 		}
 
@@ -43,16 +28,15 @@ namespace Rust.Ai
 		{
 			if (!isRegistered)
 			{
-				SingletonComponent<AiManager>.Instance.Add(agent);
 				isRegistered = true;
 			}
 		}
 
 		private void OnDisable()
 		{
-			if (!Application.isQuitting && !(SingletonComponent<AiManager>.Instance == null) && SingletonComponent<AiManager>.Instance.enabled && agent != null && !(agent.Entity == null) && !agent.Entity.isClient && isRegistered)
+			if (!Application.isQuitting && !(SingletonComponent<AiManager>.Instance == null) && SingletonComponent<AiManager>.Instance.enabled)
 			{
-				SingletonComponent<AiManager>.Instance.Remove(agent);
+				bool isRegistered2 = isRegistered;
 			}
 		}
 	}

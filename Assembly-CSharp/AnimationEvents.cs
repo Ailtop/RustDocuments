@@ -13,6 +13,9 @@ public class AnimationEvents : BaseMonoBehaviour
 
 	public string localFolder;
 
+	[Tooltip("If true the localFolder field won't update with manifest updates, use for custom paths")]
+	public bool customLocalFolder;
+
 	public bool IsBusy;
 
 	protected void OnEnable()

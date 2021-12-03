@@ -187,9 +187,9 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))

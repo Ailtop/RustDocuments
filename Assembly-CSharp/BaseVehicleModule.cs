@@ -10,7 +10,7 @@ using Rust.Modular;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
+public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 {
 	public enum VisualGroup
 	{
@@ -61,10 +61,6 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 
 	[SerializeField]
 	private VehicleModuleButtonComponent[] buttonComponents;
-
-	[SerializeField]
-	[HideInInspector]
-	private DamageRenderer damageRenderer;
 
 	private TimeSince TimeSinceAddedToVehicle;
 
@@ -144,20 +140,20 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 	{
 	}
 
-	public virtual void PlayerServerInput(InputState inputState, BasePlayer player)
+	public override void VehicleFixedUpdate()
 	{
-	}
-
-	public virtual void VehicleFixedUpdate(bool vehicleIsActive)
-	{
-		if (Vehicle.IsEditableNow && AssociatedItemInstance != null && (float)timeSinceItemLockRefresh > 1f)
+		if (isSpawned && IsOnAVehicle)
 		{
-			AssociatedItemInstance.LockUnlock(!CanBeMovedNow());
-			timeSinceItemLockRefresh = 0f;
-		}
-		for (int i = 0; i < slidingComponents.Length; i++)
-		{
-			slidingComponents[i].ServerUpdateTick(this);
+			base.VehicleFixedUpdate();
+			if (Vehicle.IsEditableNow && AssociatedItemInstance != null && (float)timeSinceItemLockRefresh > 1f)
+			{
+				AssociatedItemInstance.LockUnlock(!CanBeMovedNow());
+				timeSinceItemLockRefresh = 0f;
+			}
+			for (int i = 0; i < slidingComponents.Length; i++)
+			{
+				slidingComponents[i].ServerUpdateTick(this);
+			}
 		}
 	}
 
@@ -261,10 +257,6 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		}
 	}
 
-	public virtual void ScaleDamageForPlayer(BasePlayer player, HitInfo info)
-	{
-	}
-
 	public override void AdminKill()
 	{
 		if (IsOnAVehicle)
@@ -354,7 +346,7 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		RefreshConditionals(false);
 	}
 
-	public virtual void OnEngineStateChanged(VehicleEngineController.EngineState oldState, VehicleEngineController.EngineState newState)
+	public virtual void OnEngineStateChanged(VehicleEngineController<ModularCar>.EngineState oldState, VehicleEngineController<ModularCar>.EngineState newState)
 	{
 	}
 
@@ -588,5 +580,10 @@ public class BaseVehicleModule : BaseCombatEntity, IPrefabPreProcess
 		{
 			FirstSocketIndex = info.msg.vehicleModule.socketIndex;
 		}
+	}
+
+	public override bool IsVehicleRoot()
+	{
+		return false;
 	}
 }

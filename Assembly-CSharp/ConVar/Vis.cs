@@ -16,9 +16,9 @@ namespace ConVar
 		[Help("Turns on debug display of attacks")]
 		public static bool attack;
 
+		[Help("Turns on debug display of protection")]
 		[ServerVar]
 		[ClientVar]
-		[Help("Turns on debug display of protection")]
 		public static bool protection;
 
 		[ServerVar]

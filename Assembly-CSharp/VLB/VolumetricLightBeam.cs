@@ -6,9 +6,9 @@ using UnityEngine.Serialization;
 
 namespace VLB
 {
+	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	[DisallowMultipleComponent]
 	[ExecuteInEditMode]
-	[HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
 	[SelectionBase]
 	public class VolumetricLightBeam : MonoBehaviour
 	{

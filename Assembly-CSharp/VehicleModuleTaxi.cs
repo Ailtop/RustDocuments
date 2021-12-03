@@ -106,7 +106,7 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 		{
 			return;
 		}
-		foreach (BaseVehicle.MountPointInfo mountPoint in base.Vehicle.mountPoints)
+		foreach (MountPointInfo mountPoint in base.Vehicle.mountPoints)
 		{
 			if (ModuleHasMountPoint(mountPoint))
 			{

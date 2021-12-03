@@ -34,8 +34,6 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public float MaxRespawnTimeMinutes = 120f;
 
-		public HTNDomain.MovementRule Movement = HTNDomain.MovementRule.FreeMove;
-
 		public float MovementRadius = -1f;
 
 		public bool ReducedLongRangeAccuracy;
@@ -98,10 +96,6 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public void CheckIfRespawnNeeded()
 		{
-			if (!IsUnderGlobalSpawnThreshold())
-			{
-				return;
-			}
 			if (!pendingRespawn)
 			{
 				if (Spawned == null || Spawned.Count == 0 || IsAllSpawnedDead())
@@ -113,15 +107,6 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 			{
 				DoRespawn();
 			}
-		}
-
-		private bool IsUnderGlobalSpawnThreshold()
-		{
-			if (ScientistJunkpileDomain.AllJunkpileNPCs != null && ScientistJunkpileDomain.AllJunkpileNPCs.Count >= ConVar.AI.npc_max_junkpile_count)
-			{
-				return false;
-			}
-			return true;
 		}
 
 		private bool IsAllSpawnedDead()
@@ -159,7 +144,7 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 
 		public void SpawnScientist()
 		{
-			if (!ConVar.AI.npc_enable || Spawned == null || Spawned.Count >= MaxPopulation || !IsUnderGlobalSpawnThreshold())
+			if (!ConVar.AI.npc_enable || Spawned == null || Spawned.Count >= MaxPopulation)
 			{
 				return;
 			}

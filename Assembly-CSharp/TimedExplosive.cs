@@ -7,11 +7,6 @@ using UnityEngine;
 
 public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 {
-	public interface IPreventSticking
-	{
-		bool CanStickTo(Collider collider);
-	}
-
 	public float timerAmountMin = 10f;
 
 	public float timerAmountMax = 20f;
@@ -197,7 +192,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 			bool flag = true;
 			if ((bool)hitEntity)
 			{
-				flag = CanStickTo(hitEntity, collision.collider);
+				flag = CanStickTo(hitEntity);
 				if (!flag)
 				{
 					Collider component = GetComponent<Collider>();
@@ -215,9 +210,9 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		DoBounceEffect();
 	}
 
-	public virtual bool CanStickTo(BaseEntity entity, Collider collider)
+	public virtual bool CanStickTo(BaseEntity entity)
 	{
-		return entity.GetComponent<IPreventSticking>()?.CanStickTo(collider) ?? true;
+		return entity.GetComponent<DecorDeployable>() == null;
 	}
 
 	private void DoBounceEffect()
@@ -240,7 +235,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 	private void DoCollisionStick(Collision collision, BaseEntity ent)
 	{
 		ContactPoint contact = collision.GetContact(0);
-		DoStick(contact.point, contact.normal, ent);
+		DoStick(contact.point, contact.normal, ent, collision.collider);
 	}
 
 	public virtual void SetMotionEnabled(bool wantsMotion)
@@ -280,7 +275,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		return parentEntity.IsValid(true);
 	}
 
-	public void DoStick(Vector3 position, Vector3 normal, BaseEntity ent)
+	public void DoStick(Vector3 position, Vector3 normal, BaseEntity ent, Collider collider)
 	{
 		if (ent == null)
 		{
@@ -301,7 +296,14 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		{
 			base.transform.position = position;
 			base.transform.rotation = Quaternion.LookRotation(normal, base.transform.up);
-			SetParent(ent, StringPool.closest, true);
+			if (collider != null)
+			{
+				SetParent(ent, ent.FindBoneID(collider.transform), true);
+			}
+			else
+			{
+				SetParent(ent, StringPool.closest, true);
+			}
 			if (stickEffect.isValid)
 			{
 				Effect.server.Run(stickEffect.resourcePath, base.transform.position, Vector3.up, null, true);

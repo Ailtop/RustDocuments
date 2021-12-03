@@ -4,7 +4,7 @@ public class Speargun : CrossbowWeapon
 {
 	public GameObject worldAmmoModel;
 
-	public override bool ForceSendMagazine()
+	public override bool ForceSendMagazine(SaveInfo saveInfo)
 	{
 		return true;
 	}

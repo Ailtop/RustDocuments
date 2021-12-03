@@ -114,7 +114,7 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 	private void DoCollisionStick(Collision collision, BaseEntity ent)
 	{
 		ContactPoint contact = collision.GetContact(0);
-		DoStick(contact.point, contact.normal, ent);
+		DoStick(contact.point, contact.normal, ent, collision.collider);
 	}
 
 	public virtual void SetMotionEnabled(bool wantsMotion)
@@ -139,7 +139,7 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 		}
 	}
 
-	public void DoStick(Vector3 position, Vector3 normal, BaseEntity ent)
+	public void DoStick(Vector3 position, Vector3 normal, BaseEntity ent, Collider collider)
 	{
 		if (ent != null && ent is TimedExplosive)
 		{
@@ -156,7 +156,11 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 		{
 			base.transform.position = position;
 			base.transform.rotation = Quaternion.LookRotation(normal, base.transform.up);
-			if (ent != null)
+			if (collider != null)
+			{
+				SetParent(ent, ent.FindBoneID(collider.transform), true);
+			}
+			else
 			{
 				SetParent(ent, StringPool.closest, true);
 			}

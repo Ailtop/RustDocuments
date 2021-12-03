@@ -1,7 +1,7 @@
 using Oxide.Core;
 using UnityEngine;
 
-public class ScientistNPC : HumanNPC
+public class ScientistNPC : HumanNPC, IAIMounted
 {
 	public enum RadioChatterType
 	{
@@ -60,9 +60,9 @@ public class ScientistNPC : HumanNPC
 		}
 	}
 
-	public override bool ShotTest()
+	public override bool ShotTest(float targetDist)
 	{
-		bool result = base.ShotTest();
+		bool result = base.ShotTest(targetDist);
 		if (Time.time - lastGunShotTime < 5f)
 		{
 			Alert();
@@ -150,6 +150,11 @@ public class ScientistNPC : HumanNPC
 			LightToggle();
 			lightsOn = true;
 		}
+	}
+
+	public bool IsMounted()
+	{
+		return base.isMounted;
 	}
 
 	protected override string OverrideCorpseName()

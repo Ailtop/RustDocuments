@@ -60,10 +60,10 @@ public class NPCSpawner : SpawnGroup
 	{
 		base.PostSpawnProcess(entity, spawnPoint);
 		BaseNavigator component = entity.GetComponent<BaseNavigator>();
-		HumanNPCNew humanNPCNew;
-		if (AdditionalLOSBlockingLayer != 0 && entity != null && (object)(humanNPCNew = entity as HumanNPCNew) != null)
+		HumanNPC humanNPC;
+		if (AdditionalLOSBlockingLayer != 0 && entity != null && (object)(humanNPC = entity as HumanNPC) != null)
 		{
-			humanNPCNew.AdditionalLosBlockingLayer = AdditionalLOSBlockingLayer;
+			humanNPC.AdditionalLosBlockingLayer = AdditionalLOSBlockingLayer;
 		}
 		if (VirtualInfoZone != null)
 		{
@@ -73,10 +73,10 @@ public class NPCSpawner : SpawnGroup
 				if (nPCPlayer != null)
 				{
 					nPCPlayer.VirtualInfoZone = VirtualInfoZone;
-					HumanNPCNew humanNPCNew2 = nPCPlayer as HumanNPCNew;
-					if (humanNPCNew2 != null)
+					HumanNPC humanNPC2 = nPCPlayer as HumanNPC;
+					if (humanNPC2 != null)
 					{
-						humanNPCNew2.VirtualInfoZone.RegisterSleepableEntity(humanNPCNew2.Brain);
+						humanNPC2.VirtualInfoZone.RegisterSleepableEntity(humanNPC2.Brain);
 					}
 				}
 			}

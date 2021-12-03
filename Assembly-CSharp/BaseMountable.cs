@@ -26,8 +26,6 @@ public class BaseMountable : BaseCombatEntity
 		UpperBody
 	}
 
-	public BasePlayer _mounted;
-
 	[Header("View")]
 	[FormerlySerializedAs("eyeOverride")]
 	public Transform eyePositionOverride;
@@ -73,16 +71,20 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool canDrinkWhileMounted = true;
 
+	public bool allowSleeperMounting;
+
 	[Help("Set this to true if the mountable is enclosed so it doesn't move inside cars and such")]
 	public bool animateClothInLocalSpace = true;
 
 	[Header("Camera")]
 	public BasePlayer.CameraMode MountedCameraMode;
 
-	[FormerlySerializedAs("isMobile")]
-	public bool needsVehicleTick;
+	[FormerlySerializedAs("needsVehicleTick")]
+	public bool isMobile;
 
 	public float SideLeanAmount = 0.2f;
+
+	public BasePlayer _mounted;
 
 	public static ListHashSet<BaseMountable> FixedUpdateMountables = new ListHashSet<BaseMountable>();
 
@@ -220,6 +222,11 @@ public class BaseMountable : BaseCombatEntity
 		return yawClamp;
 	}
 
+	public virtual bool IsMounted()
+	{
+		return IsBusy();
+	}
+
 	public virtual Vector3 EyePositionForPlayer(BasePlayer player, Quaternion lookRot)
 	{
 		if (player.GetMounted() != this)
@@ -253,16 +260,6 @@ public class BaseMountable : BaseCombatEntity
 		return base.MaxVelocity();
 	}
 
-	public BasePlayer GetMounted()
-	{
-		return _mounted;
-	}
-
-	public virtual bool IsMounted()
-	{
-		return _mounted != null;
-	}
-
 	public virtual bool PlayerIsMounted(BasePlayer player)
 	{
 		if (BaseEntityEx.IsValid(player))
@@ -272,7 +269,7 @@ public class BaseMountable : BaseCombatEntity
 		return false;
 	}
 
-	public BaseVehicle VehicleParent()
+	public virtual BaseVehicle VehicleParent()
 	{
 		return GetParentEntity() as BaseVehicle;
 	}
@@ -280,7 +277,12 @@ public class BaseMountable : BaseCombatEntity
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, _mounted != null);
+	}
+
+	public BasePlayer GetMounted()
+	{
+		return _mounted;
 	}
 
 	public virtual void MounteeTookDamage(BasePlayer mountee, HitInfo info)
@@ -379,12 +381,13 @@ public class BaseMountable : BaseCombatEntity
 		{
 			player.EnsureDismounted();
 			_mounted = player;
+			Transform transform = mountAnchor.transform;
 			player.MountObject(this);
-			player.MovePosition(mountAnchor.transform.position);
-			player.transform.rotation = mountAnchor.transform.rotation;
-			player.ServerRotation = mountAnchor.transform.rotation;
-			player.OverrideViewAngles(mountAnchor.transform.rotation.eulerAngles);
-			_mounted.eyes.NetworkUpdate(mountAnchor.transform.rotation);
+			player.MovePosition(transform.position);
+			player.transform.rotation = transform.rotation;
+			player.ServerRotation = transform.rotation;
+			player.OverrideViewAngles(transform.rotation.eulerAngles);
+			_mounted.eyes.NetworkUpdate(transform.rotation);
 			player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
 			SetFlag(Flags.Busy, true);
 			OnPlayerMounted();
@@ -461,6 +464,7 @@ public class BaseMountable : BaseCombatEntity
 			_mounted.transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
 			_mounted.MovePosition(res);
 			_mounted.SendNetworkUpdateImmediate();
+			_mounted.SendModelState(true);
 			_mounted = null;
 			SetFlag(Flags.Busy, false);
 			if (baseVehicle != null)
@@ -488,11 +492,11 @@ public class BaseMountable : BaseCombatEntity
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
 			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C64_0(hitInfo)))
+			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C65_0(hitInfo)))
 			{
 				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C64_0(hitInfo))
+				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C65_0(hitInfo))
 				{
 					return true;
 				}
@@ -547,7 +551,7 @@ public class BaseMountable : BaseCombatEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		if (needsVehicleTick)
+		if (isMobile)
 		{
 			FixedUpdateMountables.Add(this);
 		}

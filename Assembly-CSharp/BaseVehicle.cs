@@ -1,10 +1,13 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
+using ProtoBuf;
 using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -28,6 +31,166 @@ public class BaseVehicle : BaseMountable
 		[HideInInspector]
 		public BaseMountable mountable;
 	}
+
+	[IsReadOnly]
+	public struct Enumerable : IEnumerable<MountPointInfo>, IEnumerable
+	{
+		private readonly BaseVehicle _vehicle;
+
+		public Enumerable(BaseVehicle vehicle)
+		{
+			if (vehicle == null)
+			{
+				throw new ArgumentNullException("vehicle");
+			}
+			_vehicle = vehicle;
+		}
+
+		public Enumerator GetEnumerator()
+		{
+			return new Enumerator(_vehicle);
+		}
+
+		IEnumerator<MountPointInfo> IEnumerable<MountPointInfo>.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+	}
+
+	public struct Enumerator : IEnumerator<MountPointInfo>, IEnumerator, IDisposable
+	{
+		private enum State
+		{
+			Direct,
+			EnterChild,
+			EnumerateChild,
+			Finished
+		}
+
+		private class Box : Facepunch.Pool.IPooled
+		{
+			public Enumerator Value;
+
+			public void EnterPool()
+			{
+				Value = default(Enumerator);
+			}
+
+			public void LeavePool()
+			{
+				Value = default(Enumerator);
+			}
+		}
+
+		private readonly BaseVehicle _vehicle;
+
+		private State _state;
+
+		private int _index;
+
+		private int _childIndex;
+
+		private Box _enumerator;
+
+		public MountPointInfo Current { get; private set; }
+
+		object IEnumerator.Current => Current;
+
+		public Enumerator(BaseVehicle vehicle)
+		{
+			if (vehicle == null)
+			{
+				throw new ArgumentNullException("vehicle");
+			}
+			_vehicle = vehicle;
+			_state = State.Direct;
+			_index = -1;
+			_childIndex = -1;
+			_enumerator = null;
+			Current = null;
+		}
+
+		public bool MoveNext()
+		{
+			Current = null;
+			switch (_state)
+			{
+			case State.Direct:
+				_index++;
+				if (_index >= _vehicle.mountPoints.Count)
+				{
+					_state = State.EnterChild;
+					goto case State.EnterChild;
+				}
+				Current = _vehicle.mountPoints[_index];
+				return true;
+			case State.EnterChild:
+				do
+				{
+					_childIndex++;
+				}
+				while (_childIndex < _vehicle.childVehicles.Count && _vehicle.childVehicles[_childIndex] == null);
+				if (_childIndex >= _vehicle.childVehicles.Count)
+				{
+					_state = State.Finished;
+					return false;
+				}
+				_enumerator = Facepunch.Pool.Get<Box>();
+				_enumerator.Value = _vehicle.childVehicles[_childIndex].allMountPoints.GetEnumerator();
+				_state = State.EnumerateChild;
+				goto case State.EnumerateChild;
+			case State.EnumerateChild:
+				if (_enumerator.Value.MoveNext())
+				{
+					Current = _enumerator.Value.Current;
+					return true;
+				}
+				_enumerator.Value.Dispose();
+				Facepunch.Pool.Free(ref _enumerator);
+				_state = State.EnterChild;
+				goto case State.EnterChild;
+			case State.Finished:
+				return false;
+			default:
+				throw new NotSupportedException();
+			}
+		}
+
+		public void Dispose()
+		{
+			if (_enumerator != null)
+			{
+				_enumerator.Value.Dispose();
+				Facepunch.Pool.Free(ref _enumerator);
+			}
+		}
+
+		public void Reset()
+		{
+			throw new NotSupportedException();
+		}
+	}
+
+	private const float MIN_TIME_BETWEEN_PUSHES = 1f;
+
+	public TimeSince timeSinceLastPush;
+
+	private ProtoBuf.BaseVehicle pendingLoad;
+
+	public Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
+
+	public Action clearRecentDriverAction;
+
+	public float safeAreaRadius;
+
+	public Vector3 safeAreaOrigin;
+
+	public float spawnTime = -1f;
 
 	[Tooltip("Allow players to mount other mountables/ladders from this vehicle")]
 	public bool mountChaining = true;
@@ -63,21 +226,11 @@ public class BaseVehicle : BaseMountable
 
 	public const Flags Flag_SeatsFull = Flags.Reserved11;
 
-	private const float MIN_TIME_BETWEEN_PUSHES = 1f;
+	private readonly List<BaseVehicle> childVehicles = new List<BaseVehicle>(0);
 
-	public TimeSince timeSinceLastPush;
+	public virtual bool AlwaysAllowBradleyTargeting => false;
 
-	public Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
-
-	public Action clearRecentDriverAction;
-
-	public float safeAreaRadius;
-
-	public Vector3 safeAreaOrigin;
-
-	public float spawnTime = -1f;
-
-	public override float RealisticMass => rigidBody.mass;
+	protected bool RecentlyPushed => (float)timeSinceLastPush < 1f;
 
 	public override bool PositionTickFixedTime
 	{
@@ -89,9 +242,9 @@ public class BaseVehicle : BaseMountable
 
 	protected virtual bool CanSwapSeats => true;
 
-	protected bool RecentlyPushed => (float)timeSinceLastPush < 1f;
+	public override float RealisticMass => rigidBody.mass;
 
-	public virtual bool AlwaysAllowBradleyTargeting => false;
+	public Enumerable allMountPoints => new Enumerable(this);
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -137,30 +290,6 @@ public class BaseVehicle : BaseMountable
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public bool IsStationary()
-	{
-		return HasFlag(Flags.Reserved7);
-	}
-
-	public bool IsMoving()
-	{
-		return !HasFlag(Flags.Reserved7);
-	}
-
-	public override bool PlayerIsMounted(BasePlayer player)
-	{
-		if (BaseEntityEx.IsValid(player))
-		{
-			return player.GetMountedVehicle() == this;
-		}
-		return false;
-	}
-
-	public virtual bool CanPushNow(BasePlayer pusher)
-	{
-		return !IsOn();
-	}
-
 	public override void OnAttacked(HitInfo info)
 	{
 		if (IsSafe() && !info.damageTypes.Has(DamageType.Decay))
@@ -174,6 +303,40 @@ public class BaseVehicle : BaseMountable
 	{
 		base.PostServerLoad();
 		ClearOwnerEntry();
+		CheckAndSpawnMountPoints();
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		if (!base.isServer || !info.forDisk)
+		{
+			return;
+		}
+		info.msg.baseVehicle = Facepunch.Pool.Get<ProtoBuf.BaseVehicle>();
+		info.msg.baseVehicle.mountPoints = Facepunch.Pool.GetList<ProtoBuf.BaseVehicle.MountPoint>();
+		for (int i = 0; i < mountPoints.Count; i++)
+		{
+			MountPointInfo mountPointInfo = mountPoints[i];
+			if (!(mountPointInfo.mountable == null))
+			{
+				ProtoBuf.BaseVehicle.MountPoint mountPoint = Facepunch.Pool.Get<ProtoBuf.BaseVehicle.MountPoint>();
+				mountPoint.index = i;
+				mountPoint.mountableId = mountPointInfo.mountable.net.ID;
+				info.msg.baseVehicle.mountPoints.Add(mountPoint);
+			}
+		}
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (base.isServer && info.fromDisk && info.msg.baseVehicle != null)
+		{
+			pendingLoad?.Dispose();
+			pendingLoad = info.msg.baseVehicle;
+			info.msg.baseVehicle = null;
+		}
 	}
 
 	public override float GetNetworkTime()
@@ -181,22 +344,15 @@ public class BaseVehicle : BaseMountable
 		return UnityEngine.Time.fixedTime;
 	}
 
-	public bool HasAnyPassengers()
+	public bool AnyMounted()
 	{
-		foreach (MountPointInfo mountPoint in mountPoints)
-		{
-			if (mountPoint.mountable != null && (bool)mountPoint.mountable.GetMounted())
-			{
-				return true;
-			}
-		}
-		return false;
+		return (float)NumMounted() > 0f;
 	}
 
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (continuousClippingCheck && HasAnyPassengers())
+		if (continuousClippingCheck && AnyMounted())
 		{
 			Vector3 center = base.transform.TransformPoint(bounds.center);
 			int num = (IsFlipped() ? 1218511105 : 1210122497);
@@ -207,7 +363,7 @@ public class BaseVehicle : BaseMountable
 		}
 		if ((bool)rigidBody)
 		{
-			SetFlag(Flags.Reserved7, rigidBody.IsSleeping() && !HasAnyPassengers());
+			SetFlag(Flags.Reserved7, rigidBody.IsSleeping() && !AnyMounted());
 		}
 		if (OnlyOwnerAccessible() && safeAreaRadius != -1f && Vector3.Distance(base.transform.position, safeAreaOrigin) > safeAreaRadius)
 		{
@@ -306,11 +462,11 @@ public class BaseVehicle : BaseMountable
 
 	public override void DismountAllPlayers()
 	{
-		foreach (MountPointInfo mountPoint in mountPoints)
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			if (mountPoint.mountable != null)
+			if (allMountPoint.mountable != null)
 			{
-				mountPoint.mountable.DismountAllPlayers();
+				allMountPoint.mountable.DismountAllPlayers();
 			}
 		}
 	}
@@ -323,6 +479,42 @@ public class BaseVehicle : BaseMountable
 
 	public virtual void SpawnSubEntities()
 	{
+		CheckAndSpawnMountPoints();
+	}
+
+	private void CheckAndSpawnMountPoints()
+	{
+		if (pendingLoad?.mountPoints != null)
+		{
+			foreach (ProtoBuf.BaseVehicle.MountPoint mountPoint in pendingLoad.mountPoints)
+			{
+				EntityRef<BaseMountable> entityRef = new EntityRef<BaseMountable>(mountPoint.mountableId);
+				if (!entityRef.IsValid(true))
+				{
+					Debug.LogError($"Loaded a mountpoint which doesn't exist: {mountPoint.index}", this);
+					continue;
+				}
+				if (mountPoint.index < 0 || mountPoint.index >= mountPoints.Count)
+				{
+					Debug.LogError($"Loaded a mountpoint which has no info: {mountPoint.index}", this);
+					entityRef.Get(true).Kill();
+					continue;
+				}
+				MountPointInfo mountPointInfo = mountPoints[mountPoint.index];
+				if (mountPointInfo.mountable != null)
+				{
+					Debug.LogError($"Loading a mountpoint after one was already set: {mountPoint.index}", this);
+					mountPointInfo.mountable.Kill();
+				}
+				mountPointInfo.mountable = entityRef.Get(true);
+				if (!mountPointInfo.mountable.enableSaving)
+				{
+					mountPointInfo.mountable.EnableSaving(true);
+				}
+			}
+		}
+		pendingLoad?.Dispose();
+		pendingLoad = null;
 		for (int i = 0; i < mountPoints.Count; i++)
 		{
 			SpawnMountPoint(mountPoints[i], model);
@@ -332,7 +524,10 @@ public class BaseVehicle : BaseMountable
 	public override void Spawn()
 	{
 		base.Spawn();
-		SpawnSubEntities();
+		if (base.isServer && !Rust.Application.isLoadingSave)
+		{
+			SpawnSubEntities();
+		}
 	}
 
 	public override void Hurt(HitInfo info)
@@ -349,11 +544,6 @@ public class BaseVehicle : BaseMountable
 		base.Hurt(info);
 	}
 
-	public bool AnyMounted()
-	{
-		return NumMounted() > 0;
-	}
-
 	public int NumMounted()
 	{
 		if (!HasMountPoints())
@@ -365,10 +555,9 @@ public class BaseVehicle : BaseMountable
 			return 1;
 		}
 		int num = 0;
-		for (int i = 0; i < mountPoints.Count; i++)
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			MountPointInfo mountPointInfo = mountPoints[i];
-			if (mountPointInfo.mountable != null && mountPointInfo.mountable.GetMounted() != null)
+			if (allMountPoint.mountable != null && allMountPoint.mountable.GetMounted() != null)
 			{
 				num++;
 			}
@@ -383,9 +572,9 @@ public class BaseVehicle : BaseMountable
 			return 1;
 		}
 		int num = 0;
-		for (int i = 0; i < mountPoints.Count; i++)
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			if (mountPoints[i].mountable != null)
+			if (allMountPoint.mountable != null)
 			{
 				num++;
 			}
@@ -397,9 +586,9 @@ public class BaseVehicle : BaseMountable
 	{
 		if (HasMountPoints())
 		{
-			foreach (MountPointInfo mountPoint in mountPoints)
+			foreach (MountPointInfo allMountPoint in allMountPoints)
 			{
-				if (mountPoint != null && mountPoint.mountable != null && mountPoint.isDriver && mountPoint.mountable.IsMounted())
+				if (allMountPoint != null && allMountPoint.mountable != null && allMountPoint.isDriver && allMountPoint.mountable.IsMounted())
 				{
 					return true;
 				}
@@ -413,11 +602,11 @@ public class BaseVehicle : BaseMountable
 	{
 		if (HasMountPoints())
 		{
-			foreach (MountPointInfo mountPoint in mountPoints)
+			foreach (MountPointInfo allMountPoint in allMountPoints)
 			{
-				if (mountPoint != null && mountPoint.mountable != null && mountPoint.isDriver)
+				if (allMountPoint != null && allMountPoint.mountable != null && allMountPoint.isDriver)
 				{
-					BasePlayer mounted = mountPoint.mountable.GetMounted();
+					BasePlayer mounted = allMountPoint.mountable.GetMounted();
 					if (mounted != null && mounted == player)
 					{
 						return true;
@@ -436,11 +625,11 @@ public class BaseVehicle : BaseMountable
 	{
 		if (HasMountPoints())
 		{
-			foreach (MountPointInfo mountPoint in mountPoints)
+			foreach (MountPointInfo allMountPoint in allMountPoints)
 			{
-				if (mountPoint != null && mountPoint.mountable != null && mountPoint.isDriver)
+				if (allMountPoint != null && allMountPoint.mountable != null && allMountPoint.isDriver)
 				{
-					BasePlayer mounted = mountPoint.mountable.GetMounted();
+					BasePlayer mounted = allMountPoint.mountable.GetMounted();
 					if (mounted != null)
 					{
 						return mounted;
@@ -459,11 +648,11 @@ public class BaseVehicle : BaseMountable
 	{
 		if (HasMountPoints())
 		{
-			foreach (MountPointInfo mountPoint in mountPoints)
+			foreach (MountPointInfo allMountPoint in allMountPoints)
 			{
-				if (mountPoint != null && mountPoint.mountable != null && mountPoint.isDriver)
+				if (allMountPoint != null && allMountPoint.mountable != null && allMountPoint.isDriver)
 				{
-					BasePlayer mounted = mountPoint.mountable.GetMounted();
+					BasePlayer mounted = allMountPoint.mountable.GetMounted();
 					if (mounted != null)
 					{
 						drivers.Add(mounted);
@@ -496,13 +685,14 @@ public class BaseVehicle : BaseMountable
 		{
 			return 0;
 		}
-		for (int i = 0; i < mountPoints.Count; i++)
+		int num = 0;
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			MountPointInfo mountPointInfo = mountPoints[i];
-			if (mountPointInfo.mountable != null && mountPointInfo.mountable.GetMounted() == player)
+			if (allMountPoint.mountable != null && allMountPoint.mountable.GetMounted() == player)
 			{
-				return i;
+				return num;
 			}
+			num++;
 		}
 		return -1;
 	}
@@ -513,12 +703,11 @@ public class BaseVehicle : BaseMountable
 		{
 			return null;
 		}
-		for (int i = 0; i < mountPoints.Count; i++)
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			MountPointInfo mountPointInfo = mountPoints[i];
-			if (mountPointInfo.mountable != null && mountPointInfo.mountable.GetMounted() == player)
+			if (allMountPoint.mountable != null && allMountPoint.mountable.GetMounted() == player)
 			{
-				return mountPointInfo;
+				return allMountPoint;
 			}
 		}
 		return null;
@@ -535,22 +724,23 @@ public class BaseVehicle : BaseMountable
 		{
 			return;
 		}
-		BaseMountable mountable = mountPoints[playerSeat].mountable;
+		BaseMountable mountable = GetMountPoint(playerSeat).mountable;
 		int num = playerSeat;
 		BaseMountable baseMountable = null;
 		if (baseMountable == null)
 		{
-			for (int i = 0; i < mountPoints.Count; i++)
+			int num2 = MaxMounted();
+			for (int i = 0; i < num2; i++)
 			{
 				num++;
-				if (num >= mountPoints.Count)
+				if (num >= num2)
 				{
 					num = 0;
 				}
-				MountPointInfo mountPointInfo = mountPoints[num];
-				if (mountPointInfo.mountable != null && !mountPointInfo.mountable.IsMounted() && mountPointInfo.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPointInfo.mountable) && IsSeatVisible(mountPointInfo.mountable, player.eyes.position))
+				MountPointInfo mountPoint = GetMountPoint(num);
+				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
 				{
-					baseMountable = mountPointInfo.mountable;
+					baseMountable = mountPoint.mountable;
 					break;
 				}
 			}
@@ -563,16 +753,11 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	public bool HasMountPoints()
-	{
-		return mountPoints.Count > 0;
-	}
-
 	public bool HasDriverMountPoints()
 	{
-		foreach (MountPointInfo mountPoint in mountPoints)
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			if (mountPoint.isDriver)
+			if (allMountPoint.isDriver)
 			{
 				return true;
 			}
@@ -653,43 +838,38 @@ public class BaseVehicle : BaseMountable
 		}
 		BaseMountable result = null;
 		float num = float.PositiveInfinity;
-		foreach (MountPointInfo mountPoint in mountPoints)
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			if (mountPoint.mountable.IsMounted())
+			if (allMountPoint.mountable.IsMounted())
 			{
 				continue;
 			}
-			float num2 = Vector3.Distance(mountPoint.mountable.mountAnchor.position, pos);
+			float num2 = Vector3.Distance(allMountPoint.mountable.mountAnchor.position, pos);
 			if (num2 > num)
 			{
 				continue;
 			}
-			if (IsSeatClipping(mountPoint.mountable))
+			if (IsSeatClipping(allMountPoint.mountable))
 			{
 				if (UnityEngine.Application.isEditor)
 				{
-					Debug.Log($"Skipping seat {mountPoint.mountable} - it's clipping");
+					Debug.Log($"Skipping seat {allMountPoint.mountable} - it's clipping");
 				}
 			}
-			else if (!IsSeatVisible(mountPoint.mountable, eyePos))
+			else if (!IsSeatVisible(allMountPoint.mountable, eyePos))
 			{
 				if (UnityEngine.Application.isEditor)
 				{
-					Debug.Log($"Skipping seat {mountPoint.mountable} - it's not visible");
+					Debug.Log($"Skipping seat {allMountPoint.mountable} - it's not visible");
 				}
 			}
-			else if (!(OnlyOwnerAccessible() && flag3) || flag2 || mountPoint.isDriver)
+			else if (!(OnlyOwnerAccessible() && flag3) || flag2 || allMountPoint.isDriver)
 			{
-				result = mountPoint.mountable;
+				result = allMountPoint.mountable;
 				num = num2;
 			}
 		}
 		return result;
-	}
-
-	public override bool IsMounted()
-	{
-		return HasDriver();
 	}
 
 	public virtual bool MountEligable(BasePlayer player)
@@ -707,12 +887,14 @@ public class BaseVehicle : BaseMountable
 
 	public int GetIndexFromSeat(BaseMountable seat)
 	{
-		for (int i = 0; i < mountPoints.Count; i++)
+		int num = 0;
+		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			if (mountPoints[i].mountable == seat)
+			if (allMountPoint.mountable == seat)
 			{
-				return i;
+				return num;
 			}
+			num++;
 		}
 		return -1;
 	}
@@ -814,26 +996,12 @@ public class BaseVehicle : BaseMountable
 		return true;
 	}
 
-	public BaseEntity AddMountPoint(MountPointInfo newMountPoint, Model model = null)
-	{
-		if (mountPoints.Contains(newMountPoint))
-		{
-			return newMountPoint.mountable;
-		}
-		mountPoints.Add(newMountPoint);
-		return SpawnMountPoint(newMountPoint, model);
-	}
-
-	public void RemoveMountPoint(MountPointInfo mountPoint)
-	{
-		if (mountPoints.Remove(mountPoint) && mountPoint.mountable != null)
-		{
-			mountPoint.mountable.Kill();
-		}
-	}
-
 	public BaseMountable SpawnMountPoint(MountPointInfo mountToSpawn, Model model)
 	{
+		if (mountToSpawn.mountable != null)
+		{
+			return mountToSpawn.mountable;
+		}
 		Vector3 vector = Quaternion.Euler(mountToSpawn.rot) * Vector3.forward;
 		Vector3 pos = mountToSpawn.pos;
 		Vector3 up = Vector3.up;
@@ -847,6 +1015,10 @@ public class BaseVehicle : BaseMountable
 		BaseMountable baseMountable = baseEntity as BaseMountable;
 		if (baseMountable != null)
 		{
+			if (!baseMountable.enableSaving)
+			{
+				baseMountable.EnableSaving(true);
+			}
 			if (mountToSpawn.bone != "")
 			{
 				baseMountable.SetParent(this, mountToSpawn.bone, true, true);
@@ -911,6 +1083,56 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
+	public bool IsStationary()
+	{
+		return HasFlag(Flags.Reserved7);
+	}
+
+	public bool IsMoving()
+	{
+		return !HasFlag(Flags.Reserved7);
+	}
+
+	public override bool PlayerIsMounted(BasePlayer player)
+	{
+		if (BaseEntityEx.IsValid(player))
+		{
+			return player.GetMountedVehicle() == this;
+		}
+		return false;
+	}
+
+	public virtual bool CanPushNow(BasePlayer pusher)
+	{
+		return !IsOn();
+	}
+
+	public bool HasMountPoints()
+	{
+		if (mountPoints.Count > 0)
+		{
+			return true;
+		}
+		using (Enumerator enumerator = allMountPoints.GetEnumerator())
+		{
+			if (enumerator.MoveNext())
+			{
+				MountPointInfo current = enumerator.Current;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public override bool IsMounted()
+	{
+		if (base.isServer)
+		{
+			return HasDriver();
+		}
+		throw new NotImplementedException("Please don't call BaseVehicle IsMounted on the client.");
+	}
+
 	public override bool SupportsChildDeployables()
 	{
 		return false;
@@ -919,5 +1141,65 @@ public class BaseVehicle : BaseMountable
 	public bool IsFlipped()
 	{
 		return Vector3.Dot(Vector3.up, base.transform.up) <= 0f;
+	}
+
+	public virtual bool IsVehicleRoot()
+	{
+		return true;
+	}
+
+	public override bool DirectlyMountable()
+	{
+		return IsVehicleRoot();
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		BaseVehicle baseVehicle;
+		if ((object)(baseVehicle = child as BaseVehicle) != null && !baseVehicle.IsVehicleRoot() && !childVehicles.Contains(baseVehicle))
+		{
+			childVehicles.Add(baseVehicle);
+		}
+	}
+
+	protected override void OnChildRemoved(BaseEntity child)
+	{
+		base.OnChildRemoved(child);
+		BaseVehicle baseVehicle;
+		if ((object)(baseVehicle = child as BaseVehicle) != null && !baseVehicle.IsVehicleRoot())
+		{
+			childVehicles.Remove(baseVehicle);
+		}
+	}
+
+	public MountPointInfo GetMountPoint(int index)
+	{
+		if (index < 0)
+		{
+			return null;
+		}
+		if (index < mountPoints.Count)
+		{
+			return mountPoints[index];
+		}
+		index -= mountPoints.Count;
+		int num = 0;
+		foreach (BaseVehicle childVehicle in childVehicles)
+		{
+			if (childVehicle == null)
+			{
+				continue;
+			}
+			foreach (MountPointInfo allMountPoint in childVehicle.allMountPoints)
+			{
+				if (num == index)
+				{
+					return allMountPoint;
+				}
+				num++;
+			}
+		}
+		return null;
 	}
 }

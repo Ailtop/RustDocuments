@@ -5,16 +5,6 @@ using UnityEngine.AI;
 
 public class NPCPlayer : BasePlayer
 {
-	protected bool _traversingNavMeshLink;
-
-	protected OffMeshLinkData _currentNavMeshLink;
-
-	protected string _currentNavMeshLinkName;
-
-	protected Quaternion _currentNavMeshLinkOrientation;
-
-	protected Vector3 _currentNavMeshLinkEndPos;
-
 	public AIInformationZone VirtualInfoZone;
 
 	public Vector3 finalDestination;
@@ -35,6 +25,10 @@ public class NPCPlayer : BasePlayer
 
 	public float damageScale = 1f;
 
+	public float shortRange = 10f;
+
+	public float attackLengthMaxShortRangeScale = 1f;
+
 	private bool _isDormant;
 
 	public float lastGunShotTime;
@@ -50,10 +44,6 @@ public class NPCPlayer : BasePlayer
 	private float lastMovementTickTime;
 
 	public Vector3 lastPos;
-
-	public bool AgencyUpdateRequired { get; set; }
-
-	public bool IsOnOffmeshLinkAndReachedNewCoord { get; set; }
 
 	public override bool IsNpc => true;
 
@@ -102,100 +92,6 @@ public class NPCPlayer : BasePlayer
 		}
 	}
 
-	private void HandleNavMeshLinkTraversal(float delta, ref Vector3 moveToPosition)
-	{
-		if (!_traversingNavMeshLink)
-		{
-			HandleNavMeshLinkTraversalStart(delta);
-		}
-		HandleNavMeshLinkTraversalTick(delta, ref moveToPosition);
-		if (IsNavMeshLinkTraversalComplete(delta, ref moveToPosition))
-		{
-			CompleteNavMeshLink();
-		}
-	}
-
-	private bool HandleNavMeshLinkTraversalStart(float delta)
-	{
-		OffMeshLinkData currentOffMeshLinkData = NavAgent.currentOffMeshLinkData;
-		if (!currentOffMeshLinkData.valid || !currentOffMeshLinkData.activated)
-		{
-			return false;
-		}
-		Vector3 normalized = (currentOffMeshLinkData.endPos - currentOffMeshLinkData.startPos).normalized;
-		normalized.y = 0f;
-		Vector3 desiredVelocity = NavAgent.desiredVelocity;
-		desiredVelocity.y = 0f;
-		if (Vector3.Dot(desiredVelocity, normalized) < 0.1f)
-		{
-			CompleteNavMeshLink();
-			return false;
-		}
-		_currentNavMeshLink = currentOffMeshLinkData;
-		_currentNavMeshLinkName = currentOffMeshLinkData.linkType.ToString();
-		if ((ServerPosition - currentOffMeshLinkData.startPos).sqrMagnitude > (ServerPosition - currentOffMeshLinkData.endPos).sqrMagnitude)
-		{
-			_currentNavMeshLinkEndPos = currentOffMeshLinkData.startPos;
-			_currentNavMeshLinkOrientation = Quaternion.LookRotation(currentOffMeshLinkData.startPos + Vector3.up * (currentOffMeshLinkData.endPos.y - currentOffMeshLinkData.startPos.y) - currentOffMeshLinkData.endPos);
-		}
-		else
-		{
-			_currentNavMeshLinkEndPos = currentOffMeshLinkData.endPos;
-			_currentNavMeshLinkOrientation = Quaternion.LookRotation(currentOffMeshLinkData.endPos + Vector3.up * (currentOffMeshLinkData.startPos.y - currentOffMeshLinkData.endPos.y) - currentOffMeshLinkData.startPos);
-		}
-		_traversingNavMeshLink = true;
-		NavAgent.ActivateCurrentOffMeshLink(false);
-		NavAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-		if (!(_currentNavMeshLinkName == "OpenDoorLink") && !(_currentNavMeshLinkName == "JumpRockLink"))
-		{
-			bool flag = _currentNavMeshLinkName == "JumpFoundationLink";
-		}
-		return true;
-	}
-
-	private void HandleNavMeshLinkTraversalTick(float delta, ref Vector3 moveToPosition)
-	{
-		if (_currentNavMeshLinkName == "OpenDoorLink")
-		{
-			moveToPosition = Vector3.MoveTowards(moveToPosition, _currentNavMeshLinkEndPos, NavAgent.speed * delta);
-		}
-		else if (_currentNavMeshLinkName == "JumpRockLink")
-		{
-			moveToPosition = Vector3.MoveTowards(moveToPosition, _currentNavMeshLinkEndPos, NavAgent.speed * delta);
-		}
-		else if (_currentNavMeshLinkName == "JumpFoundationLink")
-		{
-			moveToPosition = Vector3.MoveTowards(moveToPosition, _currentNavMeshLinkEndPos, NavAgent.speed * delta);
-		}
-		else
-		{
-			moveToPosition = Vector3.MoveTowards(moveToPosition, _currentNavMeshLinkEndPos, NavAgent.speed * delta);
-		}
-	}
-
-	private bool IsNavMeshLinkTraversalComplete(float delta, ref Vector3 moveToPosition)
-	{
-		if ((moveToPosition - _currentNavMeshLinkEndPos).sqrMagnitude < 0.01f)
-		{
-			moveToPosition = _currentNavMeshLinkEndPos;
-			_traversingNavMeshLink = false;
-			_currentNavMeshLink = default(OffMeshLinkData);
-			_currentNavMeshLinkName = string.Empty;
-			_currentNavMeshLinkOrientation = Quaternion.identity;
-			CompleteNavMeshLink();
-			return true;
-		}
-		return false;
-	}
-
-	private void CompleteNavMeshLink()
-	{
-		NavAgent.ActivateCurrentOffMeshLink(true);
-		NavAgent.CompleteOffMeshLink();
-		NavAgent.isStopped = false;
-		NavAgent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
-	}
-
 	public virtual bool IsLoadBalanced()
 	{
 		return false;
@@ -222,8 +118,6 @@ public class NPCPlayer : BasePlayer
 		}
 		Invoke(EquipTest, 0.25f);
 		finalDestination = base.transform.position;
-		AgencyUpdateRequired = false;
-		IsOnOffmeshLinkAndReachedNewCoord = false;
 		if (NavAgent == null)
 		{
 			NavAgent = GetComponent<NavMeshAgent>();
@@ -306,7 +200,7 @@ public class NPCPlayer : BasePlayer
 		}
 	}
 
-	public virtual bool ShotTest()
+	public virtual bool ShotTest(float targetDist)
 	{
 		AttackEntity attackEntity = GetHeldEntity() as AttackEntity;
 		if (attackEntity == null)
@@ -319,11 +213,6 @@ public class NPCPlayer : BasePlayer
 			if (baseProjectile.primaryMagazine.contents <= 0)
 			{
 				baseProjectile.ServerReload();
-				NPCPlayerApex nPCPlayerApex = this as NPCPlayerApex;
-				if ((bool)nPCPlayerApex && nPCPlayerApex.OnReload != null)
-				{
-					nPCPlayerApex.OnReload();
-				}
 				return false;
 			}
 			if (baseProjectile.NextAttackTime > Time.time)
@@ -342,7 +231,14 @@ public class NPCPlayer : BasePlayer
 				return true;
 			}
 			InvokeRepeating(TriggerDown, 0f, 0.01f);
-			triggerEndTime = Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax);
+			if (targetDist <= shortRange)
+			{
+				triggerEndTime = Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax * attackLengthMaxShortRangeScale);
+			}
+			else
+			{
+				triggerEndTime = Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax);
+			}
 			TriggerDown();
 			return true;
 		}
@@ -479,11 +375,7 @@ public class NPCPlayer : BasePlayer
 			return;
 		}
 		Vector3 moveToPosition = base.transform.position;
-		if (IsOnNavMeshLink)
-		{
-			HandleNavMeshLinkTraversal(delta, ref moveToPosition);
-		}
-		else if (HasPath)
+		if (HasPath)
 		{
 			moveToPosition = NavAgent.nextPosition;
 		}

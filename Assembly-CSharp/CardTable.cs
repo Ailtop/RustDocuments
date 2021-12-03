@@ -5,7 +5,6 @@ using Facepunch;
 using Facepunch.CardGames;
 using Network;
 using ProtoBuf;
-using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
@@ -131,7 +130,7 @@ public class CardTable : BaseVehicle
 			if (rpc == 2395020190u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
+				if (Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Editor_MakeRandomMove "));
 				}
@@ -167,7 +166,7 @@ public class CardTable : BaseVehicle
 			if (rpc == 1608700874 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
+				if (Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Editor_SpawnTestPlayer "));
 				}
@@ -203,7 +202,7 @@ public class CardTable : BaseVehicle
 			if (rpc == 1499640189 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
+				if (Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_LeaveTable "));
 				}
@@ -239,7 +238,7 @@ public class CardTable : BaseVehicle
 			if (rpc == 331989034 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
+				if (Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLoot "));
 				}
@@ -275,7 +274,7 @@ public class CardTable : BaseVehicle
 			if (rpc == 2847205856u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
+				if (Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Play "));
 				}
@@ -311,7 +310,7 @@ public class CardTable : BaseVehicle
 			if (rpc == 2495306863u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
+				if (Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PlayerInput "));
 				}
@@ -392,10 +391,6 @@ public class CardTable : BaseVehicle
 	public override void SpawnSubEntities()
 	{
 		base.SpawnSubEntities();
-		if (Rust.Application.isLoadingSave)
-		{
-			return;
-		}
 		BaseEntity baseEntity = GameManager.server.CreateEntity(potPrefab.resourcePath, Vector3.zero, Quaternion.identity);
 		StorageContainer storageContainer = baseEntity as StorageContainer;
 		if (storageContainer != null)

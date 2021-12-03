@@ -31,7 +31,7 @@ public class FileStorage : IDisposable
 
 	private MruDictionary<uint, CacheData> _cache = new MruDictionary<uint, CacheData>(1000);
 
-	public static FileStorage server = new FileStorage("sv.files." + 218, true);
+	public static FileStorage server = new FileStorage("sv.files." + 219, true);
 
 	protected FileStorage(string name, bool server)
 	{

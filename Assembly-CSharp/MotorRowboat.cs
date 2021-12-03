@@ -58,14 +58,10 @@ public class MotorRowboat : BaseBoat
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
 
-	public Transform fuelStoragePoint;
-
 	public float fuelPerSec;
 
 	[Header("Storage")]
 	public GameObjectRef storageUnitPrefab;
-
-	public Transform storageUnitPoint;
 
 	public EntityRef storageUnitInstance;
 
@@ -196,7 +192,7 @@ public class MotorRowboat : BaseBoat
 
 	public override void InitShared()
 	{
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		fuelSystem = new EntityFuelSystem(base.isServer, fuelStoragePrefab, children);
 	}
 
 	public override void ServerInit()
@@ -204,6 +200,22 @@ public class MotorRowboat : BaseBoat
 		base.ServerInit();
 		timeSinceLastUsedFuel = 0f;
 		InvokeRandomized(BoatDecay, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer)
+		{
+			if (isSpawned)
+			{
+				fuelSystem.CheckNewChild(child);
+			}
+			if (child.prefabID == storageUnitPrefab.GetEntity().prefabID)
+			{
+				storageUnitInstance.Set(child);
+			}
+		}
 	}
 
 	public override EntityFuelSystem GetFuelSystem()
@@ -214,19 +226,6 @@ public class MotorRowboat : BaseBoat
 	public override int StartingFuelUnits()
 	{
 		return 50;
-	}
-
-	public override void SpawnSubEntities()
-	{
-		base.SpawnSubEntities();
-		if (!Rust.Application.isLoadingSave)
-		{
-			BaseEntity baseEntity = GameManager.server.CreateEntity(storageUnitPrefab.resourcePath, storageUnitPoint.localPosition, storageUnitPoint.localRotation);
-			baseEntity.SetParent(this);
-			baseEntity.Spawn();
-			storageUnitInstance.Set(baseEntity);
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-		}
 	}
 
 	public void BoatDecay()
@@ -424,7 +423,7 @@ public class MotorRowboat : BaseBoat
 			SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, false, false);
 			SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, false, false);
 			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), false, false);
-			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !HasAnyPassengers(), false, false);
+			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !AnyMounted(), false, false);
 			SetFlag(Flags.Reserved8, base.RecentlyPushed, false, false);
 			if (num != flags)
 			{

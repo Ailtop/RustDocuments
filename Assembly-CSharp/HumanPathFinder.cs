@@ -13,14 +13,9 @@ public class HumanPathFinder : BasePathFinder
 	{
 		AIInformationZone aIInformationZone = null;
 		HumanNPC humanNPC;
-		HumanNPCNew humanNPCNew;
 		if ((object)(humanNPC = npc as HumanNPC) != null)
 		{
-			aIInformationZone = humanNPC.GetInformationZone(currentPos);
-		}
-		else if ((object)(humanNPCNew = npc as HumanNPCNew) != null)
-		{
-			aIInformationZone = ((!(humanNPCNew.VirtualInfoZone != null)) ? humanNPCNew.GetInformationZone(currentPos) : humanNPCNew.VirtualInfoZone);
+			aIInformationZone = ((!(humanNPC.VirtualInfoZone != null)) ? humanNPC.GetInformationZone(currentPos) : humanNPC.VirtualInfoZone);
 		}
 		if (aIInformationZone == null)
 		{

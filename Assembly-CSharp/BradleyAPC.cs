@@ -144,9 +144,9 @@ public class BradleyAPC : BaseCombatEntity
 
 	public static float sightUpdateRate = 0.5f;
 
-	public BaseCombatEntity mainGunTarget;
-
 	public List<TargetInfo> targetList = new List<TargetInfo>();
+
+	public BaseCombatEntity mainGunTarget;
 
 	[Header("Coax")]
 	public float coaxFireRate = 0.06667f;
@@ -526,7 +526,7 @@ public class BradleyAPC : BaseCombatEntity
 				continue;
 			}
 			BasePlayer basePlayer = item as BasePlayer;
-			if (basePlayer.IsDead() || basePlayer is Scientist || basePlayer is HumanNPCNew || !VisibilityTest(item))
+			if (basePlayer.IsDead() || basePlayer is HumanNPC || !VisibilityTest(item))
 			{
 				continue;
 			}

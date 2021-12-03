@@ -21,7 +21,9 @@ public class VehicleModuleSeating : BaseVehicleModule
 		[Header("Seating & Controls")]
 		public bool doorsAreLockable = true;
 
-		public BaseVehicle.MountPointInfo[] mountPoints;
+		[Obsolete("Use BaseVehicle.mountPoints instead")]
+		[HideInInspector]
+		public MountPointInfo[] mountPoints;
 
 		public Transform steeringWheel;
 
@@ -94,8 +96,6 @@ public class VehicleModuleSeating : BaseVehicleModule
 
 	private const Flags FLAG_HORN = Flags.Reserved8;
 
-	protected BaseVehicle.MountPointInfo[] adjustedMountPoints;
-
 	private float steerPercent;
 
 	private float throttlePercent;
@@ -114,7 +114,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 
 	private BasePlayer hornPlayer;
 
-	public override bool HasSeating => seating.mountPoints.Length != 0;
+	public override bool HasSeating => mountPoints.Count > 0;
 
 	protected ModularCar Car { get; private set; }
 
@@ -196,27 +196,18 @@ public class VehicleModuleSeating : BaseVehicleModule
 	public virtual bool IsOnThisModule(BasePlayer player)
 	{
 		BaseMountable mounted = player.GetMounted();
-		if (mounted == null || base.Vehicle == null)
+		if (mounted != null)
 		{
-			return false;
-		}
-		BaseVehicle.MountPointInfo[] mountPoints = seating.mountPoints;
-		foreach (BaseVehicle.MountPointInfo mountPointInfo in mountPoints)
-		{
-			if (Vector3.SqrMagnitude(base.Vehicle.transform.InverseTransformPoint(base.transform.position) + mountPointInfo.pos - mounted.transform.localPosition) < 0.1f)
-			{
-				return true;
-			}
+			return mounted.GetParentEntity() as VehicleModuleSeating == this;
 		}
 		return false;
 	}
 
 	public bool HasADriverSeat()
 	{
-		BaseVehicle.MountPointInfo[] mountPoints = seating.mountPoints;
-		for (int i = 0; i < mountPoints.Length; i++)
+		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			if (mountPoints[i].isDriver)
+			if (mountPoint.isDriver)
 			{
 				return true;
 			}
@@ -233,41 +224,18 @@ public class VehicleModuleSeating : BaseVehicleModule
 		{
 			return;
 		}
-		adjustedMountPoints = new BaseVehicle.MountPointInfo[seating.mountPoints.Length];
-		for (int i = 0; i < seating.mountPoints.Length; i++)
+		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			BaseVehicle.MountPointInfo mountPointInfo = seating.mountPoints[i];
-			Vector3 pos = vehicle.transform.InverseTransformPoint(base.transform.position) + ModifySeatPositionLocalSpace(i, mountPointInfo.pos);
-			adjustedMountPoints[i] = new BaseVehicle.MountPointInfo
-			{
-				isDriver = mountPointInfo.isDriver,
-				pos = pos,
-				rot = mountPointInfo.rot,
-				bone = mountPointInfo.bone,
-				prefab = mountPointInfo.prefab,
-				mountable = mountPointInfo.mountable
-			};
-		}
-		for (int j = 0; j < adjustedMountPoints.Length; j++)
-		{
-			ModularCarSeat modularCarSeat = vehicle.AddMountPoint(adjustedMountPoints[j]) as ModularCarSeat;
-			if (modularCarSeat != null)
+			ModularCarSeat modularCarSeat;
+			if ((object)(modularCarSeat = mountPoint.mountable as ModularCarSeat) != null)
 			{
 				modularCarSeat.associatedSeatingModule = this;
-				adjustedMountPoints[j].mountable = modularCarSeat;
 			}
 		}
 	}
 
 	public override void ModuleRemoved()
 	{
-		if (HasSeating && base.isServer)
-		{
-			for (int i = 0; i < adjustedMountPoints.Length; i++)
-			{
-				base.Vehicle.RemoveMountPoint(adjustedMountPoints[i]);
-			}
-		}
 		base.ModuleRemoved();
 		Car = null;
 		VehicleLockUser = null;
@@ -300,7 +268,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 
 	protected BaseVehicleSeat GetSeatAtIndex(int index)
 	{
-		return adjustedMountPoints[index].mountable as BaseVehicleSeat;
+		return mountPoints[index].mountable as BaseVehicleSeat;
 	}
 
 	public override void ScaleDamageForPlayer(BasePlayer player, HitInfo info)
@@ -338,7 +306,7 @@ public class VehicleModuleSeating : BaseVehicleModule
 		}
 	}
 
-	protected bool ModuleHasMountPoint(BaseVehicle.MountPointInfo mountPointInfo)
+	protected bool ModuleHasMountPoint(MountPointInfo mountPointInfo)
 	{
 		ModularCarSeat modularCarSeat = mountPointInfo.mountable as ModularCarSeat;
 		if (modularCarSeat != null)

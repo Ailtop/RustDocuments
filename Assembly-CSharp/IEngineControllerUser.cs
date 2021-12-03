@@ -9,11 +9,11 @@ public interface IEngineControllerUser : IEntity
 
 	void SetFlag(BaseEntity.Flags f, bool b, bool recursive = false, bool networkupdate = true);
 
-	bool CanRunEngines();
-
 	void Invoke(Action action, float time);
 
 	void CancelInvoke(Action action);
 
 	void OnEngineStartFailed();
+
+	bool MeetsEngineRequirements();
 }

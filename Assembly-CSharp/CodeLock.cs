@@ -26,6 +26,16 @@ public class CodeLock : BaseLock
 
 	public bool hasCode;
 
+	public const Flags Flag_CodeEntryBlocked = Flags.Reserved11;
+
+	public static readonly Translate.Phrase blockwarning = new Translate.Phrase("codelock.blockwarning", "Further failed attempts will block code entry for some time");
+
+	[ServerVar]
+	public static float maxFailedAttempts = 8f;
+
+	[ServerVar]
+	public static float lockoutCooldown = 900f;
+
 	public bool hasGuestCode;
 
 	public string code = string.Empty;
@@ -193,6 +203,11 @@ public class CodeLock : BaseLock
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	public bool IsCodeEntryBlocked()
+	{
+		return HasFlag(Flags.Reserved11);
+	}
+
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
@@ -323,7 +338,7 @@ public class CodeLock : BaseLock
 	[RPC_Server.MaxDistance(3f)]
 	private void TryUnlock(RPCMessage rpc)
 	{
-		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null)
+		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && !IsCodeEntryBlocked())
 		{
 			if (whitelistPlayers.Contains(rpc.player.userID))
 			{
@@ -350,11 +365,17 @@ public class CodeLock : BaseLock
 		}
 	}
 
+	public void ClearCodeEntryBlocked()
+	{
+		SetFlag(Flags.Reserved11, false);
+		wrongCodes = 0;
+	}
+
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	private void UnlockWithCode(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract() || !IsLocked())
+		if (!rpc.player.CanInteract() || !IsLocked() || IsCodeEntryBlocked())
 		{
 			return;
 		}
@@ -367,7 +388,7 @@ public class CodeLock : BaseLock
 		bool flag2 = text == code;
 		if (!(text == code) && (!hasGuestCode || !(text == guestCode)))
 		{
-			if (UnityEngine.Time.realtimeSinceStartup > lastWrongTime + 10f)
+			if (UnityEngine.Time.realtimeSinceStartup > lastWrongTime + 60f)
 			{
 				wrongCodes = 0;
 			}
@@ -375,6 +396,15 @@ public class CodeLock : BaseLock
 			DoEffect(effectShock.resourcePath);
 			rpc.player.Hurt((float)(wrongCodes + 1) * 5f, DamageType.ElectricShock, this, false);
 			wrongCodes++;
+			if (wrongCodes > 5)
+			{
+				rpc.player.ShowToast(1, blockwarning);
+			}
+			if ((float)wrongCodes >= maxFailedAttempts)
+			{
+				SetFlag(Flags.Reserved11, true);
+				Invoke(ClearCodeEntryBlocked, lockoutCooldown);
+			}
 			lastWrongTime = UnityEngine.Time.realtimeSinceStartup;
 			return;
 		}
@@ -385,6 +415,7 @@ public class CodeLock : BaseLock
 			{
 				DoEffect(effectCodeChanged.resourcePath);
 				whitelistPlayers.Add(rpc.player.userID);
+				wrongCodes = 0;
 			}
 		}
 		else if (flag && !guestPlayers.Contains(rpc.player.userID))
@@ -392,5 +423,11 @@ public class CodeLock : BaseLock
 			DoEffect(effectCodeChanged.resourcePath);
 			guestPlayers.Add(rpc.player.userID);
 		}
+	}
+
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		SetFlag(Flags.Reserved11, false);
 	}
 }

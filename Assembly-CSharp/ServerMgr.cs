@@ -499,14 +499,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2322)
+		else if (packet.connection.protocol > 2323)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2322));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2323));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2322)
+		else if (packet.connection.protocol < 2323)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2322));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2323));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -1158,7 +1158,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2322}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2323}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			Interface.CallHook("IOnUpdateServerInformation");
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
@@ -1250,24 +1250,20 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	internal void SpawnMapEntities()
 	{
-		PrefabPreProcess prefabPreProcess = new PrefabPreProcess(false, true);
+		new PrefabPreProcess(false, true);
 		BaseEntity[] array = UnityEngine.Object.FindObjectsOfType<BaseEntity>();
 		BaseEntity[] array2 = array;
-		foreach (BaseEntity baseEntity in array2)
+		for (int i = 0; i < array2.Length; i++)
 		{
-			if (prefabPreProcess.NeedsProcessing(baseEntity.gameObject))
-			{
-				prefabPreProcess.ProcessObject(null, baseEntity.gameObject, false);
-			}
-			baseEntity.SpawnAsMapEntity();
+			array2[i].SpawnAsMapEntity();
 		}
 		DebugEx.Log($"Map Spawned {array.Length} entities");
 		array2 = array;
-		foreach (BaseEntity baseEntity2 in array2)
+		foreach (BaseEntity baseEntity in array2)
 		{
-			if (baseEntity2 != null)
+			if (baseEntity != null)
 			{
-				baseEntity2.PostMapEntitySpawn();
+				baseEntity.PostMapEntitySpawn();
 			}
 		}
 	}

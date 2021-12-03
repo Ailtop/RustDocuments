@@ -79,9 +79,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	[SerializeField]
 	private GameObjectRef fuelStoragePrefab;
 
-	[SerializeField]
-	public Transform fuelStoragePoint;
-
 	[Header("Submarine Engine & Fuel")]
 	[SerializeField]
 	public float engineKW = 200f;
@@ -94,9 +91,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	[SerializeField]
 	private GameObjectRef itemStoragePrefab;
-
-	[SerializeField]
-	private Transform itemStoragePoint;
 
 	[SerializeField]
 	public float depthChangeTargetSpeed = 1f;
@@ -114,9 +108,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	[Header("Submarine Weaponry")]
 	[SerializeField]
 	public GameObjectRef torpedoStoragePrefab;
-
-	[SerializeField]
-	public Transform torpedoStoragePoint;
 
 	[SerializeField]
 	public Transform torpedoFiringPoint;
@@ -225,9 +216,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	private float _oxygen = 1f;
 
-	public VehicleEngineController engineController;
-
-	public EntityFuelSystem fuelSystem;
+	public VehicleEngineController<BaseSubmarine> engineController;
 
 	public float cachedFuelAmount;
 
@@ -257,7 +246,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	public VehicleEngineController.EngineState EngineState => engineController.CurEngineState;
+	public VehicleEngineController<BaseSubmarine>.EngineState EngineState => engineController.CurEngineState;
 
 	public Vector3 Velocity { get; private set; }
 
@@ -469,6 +458,26 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		InvokeRandomized(SubmarineDecay, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
 	}
 
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer)
+		{
+			if (isSpawned)
+			{
+				GetFuelSystem().CheckNewChild(child);
+			}
+			if (child.prefabID == itemStoragePrefab.GetEntity().prefabID)
+			{
+				itemStorageInstance.Set(child);
+			}
+			if (child.prefabID == torpedoStoragePrefab.GetEntity().prefabID)
+			{
+				torpedoStorageInstance.Set(child);
+			}
+		}
+	}
+
 	private void ServerFlagsChanged(Flags old, Flags next)
 	{
 		if (next.HasFlag(Flags.On) && !old.HasFlag(Flags.On))
@@ -485,33 +494,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	public override void SpawnSubEntities()
-	{
-		base.SpawnSubEntities();
-		if (!Rust.Application.isLoadingSave)
-		{
-			fuelSystem.SpawnFuelStorage(fuelStoragePrefab, fuelStoragePoint);
-			if (torpedoStoragePoint != null)
-			{
-				Vector3 pos = base.transform.InverseTransformPoint(torpedoStoragePoint.position);
-				Quaternion rot = Quaternion.Inverse(base.transform.rotation) * torpedoStoragePoint.rotation;
-				BaseEntity baseEntity = GameManager.server.CreateEntity(torpedoStoragePrefab.resourcePath, pos, rot);
-				baseEntity.SetParent(this);
-				baseEntity.Spawn();
-				torpedoStorageInstance.Set(baseEntity);
-			}
-			if (itemStoragePoint != null)
-			{
-				Vector3 pos2 = base.transform.InverseTransformPoint(itemStoragePoint.position);
-				Quaternion rot2 = Quaternion.Inverse(base.transform.rotation) * itemStoragePoint.rotation;
-				BaseEntity baseEntity2 = GameManager.server.CreateEntity(itemStoragePrefab.resourcePath, pos2, rot2);
-				baseEntity2.SetParent(this);
-				baseEntity2.Spawn();
-				itemStorageInstance.Set(baseEntity2);
-			}
-		}
-	}
-
 	public override float MaxVelocity()
 	{
 		return 10f;
@@ -524,7 +506,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public override EntityFuelSystem GetFuelSystem()
 	{
-		return fuelSystem;
+		return engineController.FuelSystem;
 	}
 
 	public override int StartingFuelUnits()
@@ -631,19 +613,16 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 				Oxygen += UnityEngine.Time.deltaTime / num2;
 			}
 		}
-		else if (HasAnyPassengers())
+		else if (AnyMounted())
 		{
 			float num3 = oxygenminutes * 60f * num;
 			Oxygen -= UnityEngine.Time.deltaTime / num3;
 		}
-		if (engineController.CurEngineState != 0 && !CanRunEngines())
-		{
-			engineController.StopEngine();
-		}
+		engineController.CheckEngineState();
 		if (engineController.IsOn)
 		{
-			float fuelUsedPerSecond = Mathf.Lerp(idleFuelPerSec, maxFuelPerSec, Mathf.Abs(ThrottleInput));
-			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelUsedPerSecond);
+			float fuelPerSecond = Mathf.Lerp(idleFuelPerSec, maxFuelPerSec, Mathf.Abs(ThrottleInput));
+			engineController.TickFuel(fuelPerSecond);
 		}
 		if (IsInWater)
 		{
@@ -794,20 +773,16 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		info.msg.submarine.throttle = ThrottleInput;
 		info.msg.submarine.upDown = UpDownInput;
 		info.msg.submarine.rudder = RudderInput;
-		info.msg.submarine.fuelStorageID = fuelSystem.fuelStorageInstance.uid;
+		info.msg.submarine.fuelStorageID = engineController.FuelSystem.fuelStorageInstance.uid;
 		info.msg.submarine.fuelAmount = GetFuelAmount();
 		info.msg.submarine.torpedoStorageID = torpedoStorageInstance.uid;
 		info.msg.submarine.oxygen = Oxygen;
 		info.msg.submarine.itemStorageID = itemStorageInstance.uid;
 	}
 
-	public bool CanRunEngines()
+	public bool MeetsEngineRequirements()
 	{
-		if (HasAnyPassengers() && fuelSystem.HasFuel())
-		{
-			return !IsDead();
-		}
-		return false;
+		return AnyMounted();
 	}
 
 	public void OnEngineStartFailed()
@@ -891,7 +866,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		BasePlayer player = msg.player;
 		if (!(player == null) && CanBeLooted(player))
 		{
-			fuelSystem.LootFuel(player);
+			engineController.FuelSystem.LootFuel(player);
 		}
 	}
 
@@ -929,8 +904,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	{
 		base.InitShared();
 		waterLayerMask = LayerMask.GetMask("Water");
-		engineController = new VehicleEngineController(this, base.isServer, engineStartupTime);
-		fuelSystem = new EntityFuelSystem(this, base.isServer);
+		engineController = new VehicleEngineController<BaseSubmarine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
 	}
 
 	public override void Load(LoadInfo info)
@@ -941,7 +915,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			ThrottleInput = info.msg.submarine.throttle;
 			UpDownInput = info.msg.submarine.upDown;
 			RudderInput = info.msg.submarine.rudder;
-			fuelSystem.fuelStorageInstance.uid = info.msg.submarine.fuelStorageID;
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.submarine.fuelStorageID;
 			cachedFuelAmount = info.msg.submarine.fuelAmount;
 			torpedoStorageInstance.uid = info.msg.submarine.torpedoStorageID;
 			Oxygen = info.msg.submarine.oxygen;
@@ -978,7 +952,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	{
 		if (base.isServer)
 		{
-			return fuelSystem.GetFuelAmount();
+			return engineController.FuelSystem.GetFuelAmount();
 		}
 		return cachedFuelAmount;
 	}

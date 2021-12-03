@@ -1,3 +1,3 @@
-public class BanditGuard : HumanNPCNew
+public class BanditGuard : HumanNPC
 {
 }

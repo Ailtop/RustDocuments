@@ -480,7 +480,7 @@ public static class AntiHack
 			ply.lastViolationType = type;
 			ply.lastViolationTime = UnityEngine.Time.realtimeSinceStartup;
 			ply.violationLevel += amount;
-			if ((ConVar.AntiHack.debuglevel >= 2 && amount > 0f) || ConVar.AntiHack.debuglevel >= 3)
+			if ((ConVar.AntiHack.debuglevel >= 2 && amount > 0f) || (ConVar.AntiHack.debuglevel >= 3 && type != AntiHackType.NoClip) || ConVar.AntiHack.debuglevel >= 4)
 			{
 				LogToConsole(ply, type, "Added violation of " + amount + " in frame " + UnityEngine.Time.frameCount + " (now has " + ply.violationLevel + ")");
 			}

@@ -41,7 +41,7 @@ namespace ConVar
 
 		[ServerVar]
 		[Help("line of sight sphere cast radius, 0 == raycast")]
-		public static float losradius = 0f;
+		public static float losradius = 0.2f;
 
 		[ServerVar]
 		[Help("line of sight directional forgiveness when checking eye or center position")]
@@ -77,7 +77,7 @@ namespace ConVar
 
 		[ServerVar]
 		[Help("how far to penetrate the terrain before violating")]
-		public static float terrain_padding = 0.5f;
+		public static float terrain_padding = 0.3f;
 
 		[ServerVar]
 		[Help("violation penalty to hand out when terrain is detected")]
@@ -252,8 +252,8 @@ namespace ConVar
 		public static bool melee_terraincheck = true;
 
 		[ServerVar]
-		[Help("0 == disabled, 1 == distance, 2 == distance + LOS")]
-		public static int eye_protection = 2;
+		[Help("0 == disabled, 1 == distance, 2 == distance + LOS, 3 = distance + LOS + altitude, 4 = distance + LOS + altitude + noclip")]
+		public static int eye_protection = 4;
 
 		[ServerVar]
 		[Help("violation penalty to hand out when eye hack is detected")]
@@ -280,7 +280,7 @@ namespace ConVar
 		public static bool build_terraincheck = true;
 
 		[ServerVar]
-		[Help("0 == silent, 1 == print max violation, 2 == print nonzero violation, 3 == print any violation")]
+		[Help("0 == silent, 1 == print max violation, 2 == print nonzero violation, 3 == print any violation except noclip, 4 == print any violation")]
 		public static int debuglevel = 1;
 	}
 }

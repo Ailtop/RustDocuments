@@ -6,7 +6,16 @@ using UnityEngine;
 
 public class AIBrainSenses
 {
-	public float UpdateInterval = 0.5f;
+	[ServerVar]
+	public static float UpdateInterval = 0.5f;
+
+	[ServerVar]
+	public static float HumanKnownPlayersLOSUpdateInterval = 0.2f;
+
+	[ServerVar]
+	public static float KnownPlayersLOSUpdateInterval = 0.5f;
+
+	private float knownPlayersLOSUpdateInterval = 0.2f;
 
 	public float MemoryDuration = 10f;
 
@@ -19,6 +28,8 @@ public class AIBrainSenses
 	private static BasePlayer[] playerQueryResults = new BasePlayer[64];
 
 	private float nextUpdateTime;
+
+	private float nextKnownPlayersLOSUpdateTime;
 
 	private BaseEntity owner;
 
@@ -44,6 +55,8 @@ public class AIBrainSenses
 
 	private bool senseFriendlies;
 
+	private bool refreshKnownLOS;
+
 	private EntityType senseTypes;
 
 	private IAIAttack ownerAttack;
@@ -59,9 +72,10 @@ public class AIBrainSenses
 
 	public List<BaseEntity> Players => Memory.Players;
 
-	public void Init(BaseEntity owner, float range, float targetLostRange, float visionCone, bool checkVision, bool checkLOS, bool ignoreNonVisionSneakers, float listenRange, bool hostileTargetsOnly, bool senseFriendlies, bool ignoreSafeZonePlayers, EntityType senseTypes)
+	public void Init(BaseEntity owner, float memoryDuration, float range, float targetLostRange, float visionCone, bool checkVision, bool checkLOS, bool ignoreNonVisionSneakers, float listenRange, bool hostileTargetsOnly, bool senseFriendlies, bool ignoreSafeZonePlayers, EntityType senseTypes, bool refreshKnownLOS)
 	{
 		this.owner = owner;
+		MemoryDuration = memoryDuration;
 		ownerAttack = owner as IAIAttack;
 		playerOwner = owner as BasePlayer;
 		maxRange = range;
@@ -76,12 +90,23 @@ public class AIBrainSenses
 		this.ignoreSafeZonePlayers = ignoreSafeZonePlayers;
 		this.senseTypes = senseTypes;
 		LastThreatTimestamp = UnityEngine.Time.realtimeSinceStartup;
+		this.refreshKnownLOS = refreshKnownLOS;
 		ownerSenses = owner as IAISenses;
+		knownPlayersLOSUpdateInterval = ((owner is HumanNPC) ? HumanKnownPlayersLOSUpdateInterval : KnownPlayersLOSUpdateInterval);
 	}
 
 	public void Update()
 	{
-		if (owner == null || UnityEngine.Time.time < nextUpdateTime)
+		if (!(owner == null))
+		{
+			UpdateSenses();
+			UpdateKnownPlayersLOS();
+		}
+	}
+
+	private void UpdateSenses()
+	{
+		if (UnityEngine.Time.time < nextUpdateTime)
 		{
 			return;
 		}
@@ -102,6 +127,27 @@ public class AIBrainSenses
 			}
 		}
 		Memory.Forget(MemoryDuration);
+	}
+
+	public void UpdateKnownPlayersLOS()
+	{
+		if (UnityEngine.Time.time < nextKnownPlayersLOSUpdateTime)
+		{
+			return;
+		}
+		nextKnownPlayersLOSUpdateTime = UnityEngine.Time.time + knownPlayersLOSUpdateInterval;
+		foreach (BaseEntity player in Memory.Players)
+		{
+			if (!(player == null) && !player.IsNpc)
+			{
+				bool flag = ownerAttack.CanSeeTarget(player);
+				Memory.SetLOS(player, flag);
+				if (refreshKnownLOS && owner != null && flag && Vector3.Distance(player.transform.position, owner.transform.position) <= TargetLostRange)
+				{
+					Memory.SetKnown(player, owner, this);
+				}
+			}
+		}
 	}
 
 	private void SensePlayers()
@@ -148,6 +194,10 @@ public class AIBrainSenses
 		}
 		BaseCombatEntity baseCombatEntity = entity as BaseCombatEntity;
 		BasePlayer basePlayer = entity as BasePlayer;
+		if (basePlayer != null && basePlayer.IsDead())
+		{
+			return false;
+		}
 		if (ignoreSafeZonePlayers && basePlayer != null && basePlayer.InSafeZone())
 		{
 			return false;
@@ -187,20 +237,15 @@ public class AIBrainSenses
 				}
 			}
 		}
-		if (hostileTargetsOnly)
+		if (hostileTargetsOnly && baseCombatEntity != null && !baseCombatEntity.IsHostile())
 		{
-			HTNPlayer hTNPlayer;
-			bool flag = (object)(hTNPlayer = baseCombatEntity as HTNPlayer) != null && hTNPlayer.faction == BaseCombatEntity.Faction.Horror;
-			if (baseCombatEntity != null && !baseCombatEntity.IsHostile() && !flag)
-			{
-				return false;
-			}
+			return false;
 		}
 		if (checkLOS && ownerAttack != null)
 		{
-			bool flag2 = ownerAttack.CanSeeTarget(entity);
-			Memory.SetLOS(entity, flag2);
-			if (!flag2)
+			bool flag = ownerAttack.CanSeeTarget(entity);
+			Memory.SetLOS(entity, flag);
+			if (!flag)
 			{
 				return false;
 			}
@@ -215,11 +260,6 @@ public class AIBrainSenses
 		{
 			if (basePlayer.IsNpc)
 			{
-				HTNPlayer hTNPlayer;
-				if ((object)(hTNPlayer = ent as HTNPlayer) != null && hTNPlayer.faction == BaseCombatEntity.Faction.Horror)
-				{
-					return true;
-				}
 				if (ent is BasePet)
 				{
 					return true;
