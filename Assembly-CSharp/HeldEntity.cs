@@ -78,13 +78,13 @@ public class HeldEntity : BaseEntity
 	[Range(0f, 1f)]
 	public float FirstPersonRotationStrength = 1f;
 
-	private bool holsterVisible;
+	public bool holsterVisible;
 
-	private bool genericVisible;
+	public bool genericVisible;
 
 	private heldEntityVisState currentVisState;
 
-	internal uint ownerItemUID;
+	public uint ownerItemUID;
 
 	public bool hostile => hostileScore > 0f;
 

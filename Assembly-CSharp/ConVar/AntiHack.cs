@@ -40,14 +40,6 @@ namespace ConVar
 		public static float maxdeltatime = 1f;
 
 		[ServerVar]
-		[Help("line of sight sphere cast radius, 0 == raycast")]
-		public static float losradius = 0.2f;
-
-		[ServerVar]
-		[Help("line of sight directional forgiveness when checking eye or center position")]
-		public static float losforgiveness = 0.2f;
-
-		[ServerVar]
 		[Help("for how many seconds to keep a tick history to use for distance checks")]
 		public static float tickhistorytime = 0.5f;
 
@@ -224,6 +216,10 @@ namespace ConVar
 		public static float projectile_backtracking = 0.01f;
 
 		[ServerVar]
+		[Help("line of sight directional forgiveness when checking eye or center position")]
+		public static float projectile_losforgiveness = 0.2f;
+
+		[ServerVar]
 		[Help("whether or not to include terrain in the projectile LOS checks")]
 		public static bool projectile_terraincheck = true;
 
@@ -248,11 +244,15 @@ namespace ConVar
 		public static float melee_clientframes = 2f;
 
 		[ServerVar]
+		[Help("line of sight directional forgiveness when checking eye or center position")]
+		public static float melee_losforgiveness = 0.2f;
+
+		[ServerVar]
 		[Help("whether or not to include terrain in the melee LOS checks")]
 		public static bool melee_terraincheck = true;
 
 		[ServerVar]
-		[Help("0 == disabled, 1 == distance, 2 == distance + LOS, 3 = distance + LOS + altitude, 4 = distance + LOS + altitude + noclip")]
+		[Help("0 == disabled, 1 == distance, 2 == distance + LOS, 3 = distance + LOS + altitude, 4 = distance + LOS + altitude + noclip, 5 = distance + LOS + altitude + noclip + history")]
 		public static int eye_protection = 4;
 
 		[ServerVar]
@@ -274,6 +274,34 @@ namespace ConVar
 		[ServerVar]
 		[Help("whether or not to include terrain in the eye LOS checks")]
 		public static bool eye_terraincheck = true;
+
+		[ServerVar]
+		[Help("distance at which to start testing eye noclipping")]
+		public static float eye_noclip_cutoff = 0.01f;
+
+		[ServerVar]
+		[Help("collider margin when checking for noclipping")]
+		public static float eye_noclip_margin = 0.21f;
+
+		[ServerVar]
+		[Help("collider backtracking when checking for noclipping")]
+		public static float eye_noclip_backtracking = 0.01f;
+
+		[ServerVar]
+		[Help("line of sight sphere cast radius, 0 == raycast")]
+		public static float eye_losradius = 0.2f;
+
+		[ServerVar]
+		[Help("violation penalty to hand out when eye history mismatch is detected")]
+		public static float eye_history_penalty = 100f;
+
+		[ServerVar]
+		[Help("how much forgiveness to add when checking the distance between player tick history and player eye history")]
+		public static float eye_history_forgiveness = 0.1f;
+
+		[ServerVar]
+		[Help("line of sight sphere cast radius, 0 == raycast")]
+		public static float build_losradius = 0.01f;
 
 		[ServerVar]
 		[Help("whether or not to include terrain in the build LOS checks")]

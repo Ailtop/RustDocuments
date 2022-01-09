@@ -1054,7 +1054,7 @@ public class BradleyAPC : BaseCombatEntity
 			return;
 		}
 		SetFlag(Flags.Reserved5, TOD_Sky.Instance.IsNight);
-		if (!DoAI)
+		if (Interface.CallHook("OnBradleyApcThink", this) != null || !DoAI)
 		{
 			return;
 		}

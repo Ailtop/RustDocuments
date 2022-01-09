@@ -29,7 +29,7 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 
 	public Vector3 aimOverridePosition = Vector3.zero;
 
-	public BaseAIBrain<HumanNPC> Brain { get; private set; }
+	public BaseAIBrain<HumanNPC> Brain { get; set; }
 
 	public override float StartHealth()
 	{
@@ -434,6 +434,10 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 		{
 			if (!(player == null) && !(player.Health() <= 0f))
 			{
+				if (Interface.CallHook("OnNpcTarget", this, player) != null)
+				{
+					return null;
+				}
 				float value = Vector3.Distance(player.transform.position, base.transform.position);
 				float num2 = 1f - Mathf.InverseLerp(1f, Brain.SenseRange, value);
 				float value2 = Vector3.Dot((player.transform.position - eyes.position).normalized, eyes.BodyForward());

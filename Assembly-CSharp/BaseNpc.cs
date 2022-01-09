@@ -287,7 +287,7 @@ public class BaseNpc : BaseCombatEntity
 
 	private Vector3 _currentNavMeshLinkEndPos;
 
-	private float nextAttackTime;
+	public float nextAttackTime;
 
 	[SerializeField]
 	[InspectorFlags]

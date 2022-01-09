@@ -65,7 +65,7 @@ public class StabilityEntity : DecayEntity
 		}
 	}
 
-	private class Support
+	public class Support
 	{
 		public StabilityEntity parent;
 

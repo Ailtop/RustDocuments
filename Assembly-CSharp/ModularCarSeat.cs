@@ -18,9 +18,6 @@ public class ModularCarSeat : BaseVehicleSeat
 	[SerializeField]
 	private Vector3 rightHandIKPos;
 
-	[SerializeField]
-	private bool forceHeadLookAt;
-
 	public float providesComfort;
 
 	public VehicleModuleSeating associatedSeatingModule;

@@ -16,7 +16,9 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 
 	public int inventorySlots = 6;
 
-	public float dropChance = 0.75f;
+	public bool dropsLoot = true;
+
+	public bool dropFloats;
 
 	public bool isLootable = true;
 
@@ -56,6 +58,12 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 	public Translate.Phrase LootPanelTitle => panelTitle;
 
 	public ItemContainer inventory { get; set; }
+
+	public Transform Transform => base.transform;
+
+	public bool DropsLoot => dropsLoot;
+
+	public bool DropFloats => dropFloats;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -120,12 +128,27 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 		Gizmos.DrawRay(dropPosition, dropVelocity);
 	}
 
-	public void MoveAllInventoryItems(ItemContainer source, ItemContainer dest)
+	public bool MoveAllInventoryItems(ItemContainer from)
 	{
+		return MoveAllInventoryItems(from, inventory);
+	}
+
+	public static bool MoveAllInventoryItems(ItemContainer source, ItemContainer dest)
+	{
+		bool flag = true;
 		for (int i = 0; i < Mathf.Min(source.capacity, dest.capacity); i++)
 		{
-			source.GetSlot(i)?.MoveToContainer(dest);
+			Item slot = source.GetSlot(i);
+			if (slot != null)
+			{
+				bool flag2 = slot.MoveToContainer(dest);
+				if (flag && !flag2)
+				{
+					flag = false;
+				}
+			}
 		}
+		return flag;
 	}
 
 	public virtual void ReceiveInventoryFromItem(Item item)
@@ -255,7 +278,10 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 		if (isLootable)
 		{
 			BasePlayer player = rpc.player;
-			PlayerOpenLoot(player);
+			if ((bool)player && player.CanInteract())
+			{
+				PlayerOpenLoot(player);
+			}
 		}
 	}
 
@@ -370,21 +396,28 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 
 	public void DropItems(BaseEntity initiator = null)
 	{
-		if (inventory == null || inventory.itemList == null || inventory.itemList.Count == 0 || dropChance == 0f)
+		DropItems(this, initiator);
+	}
+
+	public static void DropItems(IItemContainerEntity containerEntity, BaseEntity initiator = null)
+	{
+		ItemContainer itemContainer = containerEntity.inventory;
+		if (itemContainer == null || itemContainer.itemList == null || itemContainer.itemList.Count == 0 || !containerEntity.DropsLoot)
 		{
 			return;
 		}
-		if (ShouldDropItemsIndividually() || inventory.itemList.Count == 1)
+		if (containerEntity.ShouldDropItemsIndividually() || itemContainer.itemList.Count == 1)
 		{
 			if (initiator != null)
 			{
-				DropBonusItems(initiator, inventory);
+				containerEntity.DropBonusItems(initiator, itemContainer);
 			}
-			DropUtil.DropItems(inventory, GetDropPosition());
+			DropUtil.DropItems(itemContainer, containerEntity.GetDropPosition());
 		}
 		else
 		{
-			bool flag = inventory.Drop("assets/prefabs/misc/item drop/item_drop.prefab", GetDropPosition(), base.transform.rotation) != null;
+			string prefab = (containerEntity.DropFloats ? "assets/prefabs/misc/item drop/item_drop_buoyant.prefab" : "assets/prefabs/misc/item drop/item_drop.prefab");
+			bool flag = itemContainer.Drop(prefab, containerEntity.GetDropPosition(), containerEntity.Transform.rotation) != null;
 		}
 	}
 

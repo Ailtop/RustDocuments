@@ -88,11 +88,10 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 			}
 			if ((bool)reciever)
 			{
-				if (Interface.CallHook("OnCollectiblePickup", item, reciever, this) != null)
+				if (Interface.CallHook("OnCollectiblePickup", item, reciever, this) == null)
 				{
-					return;
+					reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
 				}
-				reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
 			}
 			else
 			{

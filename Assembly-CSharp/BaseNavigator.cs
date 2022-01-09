@@ -113,7 +113,7 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public float stuckTimer;
 
-	private Vector3 stuckCheckPosition;
+	public Vector3 stuckCheckPosition;
 
 	protected bool traversingNavMeshLink;
 
@@ -398,7 +398,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		return SetDestination(pos, GetSpeedFraction(speed), updateInterval, navmeshSampleDistance);
 	}
 
-	protected virtual bool SetCustomDestination(Vector3 pos, float speedFraction = 1f, float updateInterval = 0f)
+	public virtual bool SetCustomDestination(Vector3 pos, float speedFraction = 1f, float updateInterval = 0f)
 	{
 		if (!AI.move)
 		{
@@ -589,7 +589,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		}
 	}
 
-	protected void SetCurrentNavigationType(NavigationType navType)
+	public void SetCurrentNavigationType(NavigationType navType)
 	{
 		if (CurrentNavigationType == NavigationType.None)
 		{

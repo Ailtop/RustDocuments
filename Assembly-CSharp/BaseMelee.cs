@@ -514,7 +514,7 @@ public class BaseMelee : AttackEntity
 						Vector3 vector5 = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
 						Vector3 position2 = basePlayer.eyes.position;
 						Vector3 vector6 = basePlayer.CenterPoint();
-						if ((!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(position2, vector5, layerMask, ConVar.AntiHack.losforgiveness, 0f)) && (!GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(vector6, vector5, layerMask, ConVar.AntiHack.losforgiveness, 0f)))
+						if ((!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(position2, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)) && (!GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(vector6, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)))
 						{
 							string shortPrefabName12 = base.ShortPrefabName;
 							string shortPrefabName13 = basePlayer.ShortPrefabName;

@@ -97,6 +97,10 @@ public class WireTool : HeldEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
+						if (!RPC_Server.FromOwner.Test(678101026u, "AddLine", this, player))
+						{
+							return true;
+						}
 						if (!RPC_Server.IsActiveItem.Test(678101026u, "AddLine", this, player))
 						{
 							return true;
@@ -133,6 +137,10 @@ public class WireTool : HeldEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
+						if (!RPC_Server.FromOwner.Test(40328523u, "MakeConnection", this, player))
+						{
+							return true;
+						}
 						if (!RPC_Server.IsActiveItem.Test(40328523u, "MakeConnection", this, player))
 						{
 							return true;
@@ -169,6 +177,10 @@ public class WireTool : HeldEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
+						if (!RPC_Server.FromOwner.Test(2469840259u, "RequestClear", this, player))
+						{
+							return true;
+						}
 						if (!RPC_Server.IsActiveItem.Test(2469840259u, "RequestClear", this, player))
 						{
 							return true;
@@ -234,6 +246,10 @@ public class WireTool : HeldEntity
 				{
 					using (TimeWarning.New("Conditions"))
 					{
+						if (!RPC_Server.FromOwner.Test(210386477u, "TryClear", this, player))
+						{
+							return true;
+						}
 						if (!RPC_Server.IsActiveItem.Test(210386477u, "TryClear", this, player))
 						{
 							return true;
@@ -360,6 +376,7 @@ public class WireTool : HeldEntity
 
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -373,8 +390,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -424,6 +442,7 @@ public class WireTool : HeldEntity
 
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -483,6 +502,7 @@ public class WireTool : HeldEntity
 
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void AddLine(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -501,10 +521,6 @@ public class WireTool : HeldEntity
 			Vector3 item = msg.read.Vector3();
 			list.Add(item);
 		}
-		if (!ValidateLine(list))
-		{
-			return;
-		}
 		uint uid = msg.read.UInt32();
 		int num2 = msg.read.Int32();
 		uint uid2 = msg.read.UInt32();
@@ -516,7 +532,7 @@ public class WireTool : HeldEntity
 		{
 			BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
 			IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
-			if (!(iOEntity2 == null) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
+			if (!(iOEntity2 == null) && ValidateLine(list, iOEntity, iOEntity2) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
 			{
 				iOEntity2.outputs[num3].linePoints = list.ToArray();
 				iOEntity2.outputs[num3].wireColour = wireColour;
@@ -543,15 +559,20 @@ public class WireTool : HeldEntity
 		return wireColour;
 	}
 
-	public bool ValidateLine(List<Vector3> lineList)
+	private bool ValidateLine(List<Vector3> lineList, IOEntity inputEntity, IOEntity outputEntity)
 	{
 		if (lineList.Count < 2)
 		{
 			return false;
 		}
+		if (inputEntity == null || outputEntity == null)
+		{
+			return false;
+		}
 		Vector3 a = lineList[0];
 		float num = 0f;
-		for (int i = 1; i < lineList.Count; i++)
+		int count = lineList.Count;
+		for (int i = 1; i < count; i++)
 		{
 			Vector3 vector = lineList[i];
 			num += Vector3.Distance(a, vector);
@@ -560,6 +581,20 @@ public class WireTool : HeldEntity
 				return false;
 			}
 			a = vector;
+		}
+		Vector3 point = lineList[count - 1];
+		Bounds bounds = outputEntity.bounds;
+		bounds.Expand(0.5f);
+		if (!bounds.Contains(point))
+		{
+			return false;
+		}
+		point = inputEntity.transform.InverseTransformPoint(outputEntity.transform.TransformPoint(lineList[0]));
+		Bounds bounds2 = inputEntity.bounds;
+		bounds2.Expand(0.5f);
+		if (!bounds2.Contains(point))
+		{
+			return false;
 		}
 		return true;
 	}

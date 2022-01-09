@@ -15,8 +15,8 @@ namespace ConVar
 		[ServerVar(Help = "Determines whether modular cars turn into wrecks when destroyed, or just immediately gib. Default: true")]
 		public static bool carwrecks = true;
 
-		[ServerVar(Help = "Determines whether modular cars drop storage items when destroyed. Default: true")]
-		public static bool carsdroploot = true;
+		[ServerVar(Help = "Determines whether vehicles drop storage items when destroyed. Default: true")]
+		public static bool vehiclesdroploot = true;
 
 		[ServerUserVar]
 		public static void swapseats(Arg arg)

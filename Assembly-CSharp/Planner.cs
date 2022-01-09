@@ -198,8 +198,8 @@ public class Planner : HeldEntity
 			Vector3 p = ((target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position);
 			int num = 2097152;
 			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
-			float num3 = ((target.socket != null) ? 0f : ConVar.AntiHack.losradius);
-			float padding = ((target.socket != null) ? 0.5f : (ConVar.AntiHack.losradius + 0.01f));
+			float num3 = ((target.socket != null) ? 0f : ConVar.AntiHack.build_losradius);
+			float padding = ((target.socket != null) ? 0.5f : (ConVar.AntiHack.build_losradius + 0.01f));
 			int layerMask = ((target.socket != null) ? num : num2);
 			if (num3 > 0f)
 			{

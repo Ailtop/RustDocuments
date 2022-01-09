@@ -35,9 +35,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[DisplayName("Toe Length")]
 		[Range(0f, 1f)]
 		[Tooltip("Affects how much of the dynamic range is in the toe. With a small value, the toe will be very short and quickly transition into the linear section, with a larger value, the toe will be longer.")]
-		[DisplayName("Toe Length")]
 		public FloatParameter toneCurveToeLength = new FloatParameter
 		{
 			value = 0.5f
@@ -59,9 +59,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0.5f
 		};
 
-		[Tooltip("Affects how much overshoot to add to the shoulder.")]
 		[DisplayName("Shoulder Angle")]
 		[Range(0f, 1f)]
+		[Tooltip("Affects how much overshoot to add to the shoulder.")]
 		public FloatParameter toneCurveShoulderAngle = new FloatParameter
 		{
 			value = 0f
@@ -83,9 +83,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			defaultState = TextureParameterDefault.Lut2D
 		};
 
-		[Tooltip("How much of the lookup texture will contribute to the color grading effect.")]
 		[DisplayName("Contribution")]
 		[Range(0f, 1f)]
+		[Tooltip("How much of the lookup texture will contribute to the color grading effect.")]
 		public FloatParameter ldrLutContribution = new FloatParameter
 		{
 			value = 1f
@@ -99,9 +99,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 		[DisplayName("Tint")]
 		[Range(-100f, 100f)]
+		[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 		public FloatParameter tint = new FloatParameter
 		{
 			value = 0f
@@ -146,17 +146,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		[DisplayName("Contrast")]
 		[Range(-100f, 100f)]
-		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		public FloatParameter contrast = new FloatParameter
 		{
 			value = 0f
 		};
 
+		[Tooltip("Modify influence of the red channel in the overall mix.")]
 		[DisplayName("Red")]
 		[Range(-200f, 200f)]
-		[Tooltip("Modify influence of the red channel in the overall mix.")]
 		public FloatParameter mixerRedOutRedIn = new FloatParameter
 		{
 			value = 100f
@@ -210,33 +210,33 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the green channel in the overall mix.")]
 		[DisplayName("Green")]
-		[Range(-200f, 200f)]
 		public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 		{
 			value = 0f
 		};
 
+		[Tooltip("Modify influence of the blue channel in the overall mix.")]
 		[DisplayName("Blue")]
 		[Range(-200f, 200f)]
-		[Tooltip("Modify influence of the blue channel in the overall mix.")]
 		public FloatParameter mixerBlueOutBlueIn = new FloatParameter
 		{
 			value = 100f
 		};
 
+		[Trackball(TrackballAttribute.Mode.Lift)]
 		[DisplayName("Lift")]
 		[Tooltip("Controls the darkest portions of the render.")]
-		[Trackball(TrackballAttribute.Mode.Lift)]
 		public Vector4Parameter lift = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)
 		};
 
+		[Trackball(TrackballAttribute.Mode.Gamma)]
 		[DisplayName("Gamma")]
 		[Tooltip("Power function that controls mid-range tones.")]
-		[Trackball(TrackballAttribute.Mode.Gamma)]
 		public Vector4Parameter gamma = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)

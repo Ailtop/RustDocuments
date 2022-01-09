@@ -1,5 +1,6 @@
 using System.Collections;
 using Network;
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 	[Header("Audio")]
 	public SoundDefinition AttackVocalSFX;
 
-	private float nextAttackTime;
+	public float nextAttackTime;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -27,7 +28,7 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 		base.ServerInit();
 		if (!base.isClient)
 		{
-			InvokeRandomized(TickDecay, Random.Range(30f, 60f), 60f, 6f);
+			InvokeRandomized(TickDecay, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
 		}
 	}
 
@@ -221,6 +222,11 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 				{
 					containers[i].Clear();
 				}
+			}
+			object obj = Interface.CallHook("OnCorpsePopulate", this, nPCPlayerCorpse);
+			if (obj is BaseCorpse)
+			{
+				return (BaseCorpse)obj;
 			}
 			return nPCPlayerCorpse;
 		}

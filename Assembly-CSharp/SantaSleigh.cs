@@ -33,7 +33,7 @@ public class SantaSleigh : BaseEntity
 
 	private bool dropped;
 
-	private Vector3 dropPosition = Vector3.zero;
+	public Vector3 dropPosition = Vector3.zero;
 
 	public Vector3 swimScale;
 

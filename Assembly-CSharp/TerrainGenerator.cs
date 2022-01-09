@@ -1,3 +1,4 @@
+using Oxide.Core;
 using UnityEngine;
 
 public class TerrainGenerator : SingletonComponent<TerrainGenerator>
@@ -32,6 +33,7 @@ public class TerrainGenerator : SingletonComponent<TerrainGenerator>
 
 	public GameObject CreateTerrain(int heightmapResolution, int alphamapResolution)
 	{
+		Interface.CallHook("OnTerrainCreate", this);
 		Terrain component = Terrain.CreateTerrainGameObject(new TerrainData
 		{
 			baseMapResolution = GetBaseMapRes(),

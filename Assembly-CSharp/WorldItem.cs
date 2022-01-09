@@ -134,16 +134,10 @@ public class WorldItem : BaseEntity
 		}
 	}
 
-	public override void OnInvalidPosition()
-	{
-		DestroyItem();
-		base.OnInvalidPosition();
-	}
-
 	internal override void DoServerDestroy()
 	{
 		base.DoServerDestroy();
-		RemoveItem();
+		DestroyItem();
 	}
 
 	public override void SwitchParent(BaseEntity ent)

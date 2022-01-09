@@ -5,7 +5,7 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 {
 	public string deathStatName = "";
 
-	protected BaseAIBrain<BaseAnimalNPC> brain;
+	public BaseAIBrain<BaseAnimalNPC> brain;
 
 	public override void ServerInit()
 	{

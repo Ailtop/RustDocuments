@@ -710,33 +710,33 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 	protected float lastThinkTime;
 
-	public BasicAIState CurrentState { get; private set; }
+	public BasicAIState CurrentState { get; set; }
 
-	public AIThinkMode ThinkMode { get; protected set; } = AIThinkMode.Interval;
-
-
-	public float Age { get; private set; }
-
-	public AIBrainSenses Senses { get; private set; } = new AIBrainSenses();
+	public AIThinkMode ThinkMode { get; set; } = AIThinkMode.Interval;
 
 
-	public BasePathFinder PathFinder { get; protected set; }
+	public float Age { get; set; }
 
-	public AIEvents Events { get; private set; }
+	public AIBrainSenses Senses { get; set; } = new AIBrainSenses();
 
-	public AIDesign AIDesign { get; private set; }
 
-	public BasePlayer DesigningPlayer { get; private set; }
+	public BasePathFinder PathFinder { get; set; }
 
-	public BasePlayer OwningPlayer { get; private set; }
+	public AIEvents Events { get; set; }
 
-	public bool IsGroupLeader { get; private set; }
+	public AIDesign AIDesign { get; set; }
 
-	public bool IsGrouped { get; private set; }
+	public BasePlayer DesigningPlayer { get; set; }
 
-	public IAIGroupable GroupLeader { get; private set; }
+	public BasePlayer OwningPlayer { get; set; }
 
-	public BaseNavigator Navigator { get; private set; }
+	public bool IsGroupLeader { get; set; }
+
+	public bool IsGrouped { get; set; }
+
+	public IAIGroupable GroupLeader { get; set; }
+
+	public BaseNavigator Navigator { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{

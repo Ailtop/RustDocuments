@@ -10,7 +10,7 @@ public class EntityFuelSystem
 
 	private readonly uint fuelStorageID;
 
-	public EntityRef fuelStorageInstance;
+	public EntityRef<StorageContainer> fuelStorageInstance;
 
 	public float nextFuelCheckTime;
 
@@ -55,10 +55,10 @@ public class EntityFuelSystem
 
 	public StorageContainer GetFuelContainer()
 	{
-		BaseEntity baseEntity = fuelStorageInstance.Get(isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		StorageContainer storageContainer = fuelStorageInstance.Get(isServer);
+		if (storageContainer != null && BaseEntityEx.IsValid(storageContainer))
 		{
-			return baseEntity as StorageContainer;
+			return storageContainer;
 		}
 		return null;
 	}
@@ -67,7 +67,7 @@ public class EntityFuelSystem
 	{
 		if (child.prefabID == fuelStorageID)
 		{
-			fuelStorageInstance.Set(child);
+			fuelStorageInstance.Set((StorageContainer)child);
 		}
 	}
 

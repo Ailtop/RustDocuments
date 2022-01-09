@@ -89,9 +89,9 @@ public class MLRS : BaseMountable
 	[SerializeField]
 	private Transform hydraulics;
 
+	[SerializeField]
 	[Header("MLRS Weaponry")]
 	[Tooltip("Minimum distance from the MLRS to a targeted hit point. In metres.")]
-	[SerializeField]
 	public float minRange = 200f;
 
 	[Tooltip("The size of the area that the rockets may hit, minus rocket damage radius.")]

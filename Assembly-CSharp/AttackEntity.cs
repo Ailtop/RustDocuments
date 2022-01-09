@@ -46,7 +46,7 @@ public class AttackEntity : HeldEntity
 
 	public bool wantsRecoilComp;
 
-	private float nextAttackTime = float.NegativeInfinity;
+	public float nextAttackTime = float.NegativeInfinity;
 
 	public float NextAttackTime => nextAttackTime;
 
@@ -87,7 +87,7 @@ public class AttackEntity : HeldEntity
 	{
 	}
 
-	protected void StartAttackCooldownRaw(float cooldown)
+	public void StartAttackCooldownRaw(float cooldown)
 	{
 		nextAttackTime = UnityEngine.Time.time + cooldown;
 	}
@@ -242,7 +242,7 @@ public class AttackEntity : HeldEntity
 			}
 			if (ConVar.AntiHack.eye_protection >= 3)
 			{
-				float num8 = Mathf.Abs(player.GetParentVelocity().y);
+				float num8 = Mathf.Abs(player.GetMountVelocity().y + player.GetParentVelocity().y);
 				float num9 = player.BoundsPadding() + num4 * num8 + player.GetJumpHeight();
 				float num10 = Mathf.Abs(player.eyes.position.y - eyePos.y);
 				if (num10 > num9)
@@ -258,7 +258,7 @@ public class AttackEntity : HeldEntity
 				Vector3 center = player.eyes.center;
 				Vector3 position = player.eyes.position;
 				Vector3 vector = eyePos;
-				if (!GamePhysics.LineOfSightRadius(center, position, vector, layerMask, ConVar.AntiHack.losradius))
+				if (!GamePhysics.LineOfSightRadius(center, position, vector, layerMask, ConVar.AntiHack.eye_losradius))
 				{
 					string shortPrefabName4 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName4, " on attack) ", center, " ", position, " ", vector));
@@ -268,9 +268,9 @@ public class AttackEntity : HeldEntity
 			}
 			if (ConVar.AntiHack.eye_protection >= 4 && !player.HasParent())
 			{
-				Vector3 position2 = player.transform.position;
-				Vector3 vector2 = eyePos - PlayerEyes.EyeOffset - PlayerEyes.DuckOffset;
-				if (Vector3.Distance(position2, vector2) > 0.01f && AntiHack.TestNoClipping(player, position2, vector2, ConVar.AntiHack.noclip_protection >= 2))
+				Vector3 position2 = player.eyes.position;
+				Vector3 vector2 = eyePos;
+				if (Vector3.Distance(position2, vector2) > ConVar.AntiHack.eye_noclip_cutoff && AntiHack.TestNoClipping(player, position2, vector2, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2))
 				{
 					string shortPrefabName5 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
@@ -281,6 +281,10 @@ public class AttackEntity : HeldEntity
 			if (!flag)
 			{
 				AntiHack.AddViolation(player, AntiHackType.EyeHack, ConVar.AntiHack.eye_penalty);
+			}
+			else if (ConVar.AntiHack.eye_protection >= 5 && !player.HasParent() && !player.isMounted)
+			{
+				player.eyeHistory.PushBack(eyePos);
 			}
 		}
 		return flag;

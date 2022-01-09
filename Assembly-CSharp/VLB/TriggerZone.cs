@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace VLB
 {
+	[RequireComponent(typeof(VolumetricLightBeam))]
 	[HelpURL("http://saladgamer.com/vlb-doc/comp-triggerzone/")]
 	[DisallowMultipleComponent]
-	[RequireComponent(typeof(VolumetricLightBeam))]
 	public class TriggerZone : MonoBehaviour
 	{
 		public bool setIsTrigger = true;

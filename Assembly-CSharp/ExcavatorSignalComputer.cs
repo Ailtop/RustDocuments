@@ -3,6 +3,7 @@ using System;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -132,12 +133,12 @@ public class ExcavatorSignalComputer : BaseCombatEntity
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void RequestSupplies(RPCMessage rpc)
 	{
-		if (HasFlag(Flags.Reserved7) && IsPowered() && chargePower >= chargeNeededForSupplies)
+		if (HasFlag(Flags.Reserved7) && IsPowered() && chargePower >= chargeNeededForSupplies && Interface.CallHook("OnExcavatorSuppliesRequest", this, rpc.player) == null)
 		{
 			BaseEntity baseEntity = GameManager.server.CreateEntity(supplyPlanePrefab.resourcePath);
 			if ((bool)baseEntity)
@@ -147,6 +148,7 @@ public class ExcavatorSignalComputer : BaseCombatEntity
 				baseEntity.SendMessage("InitDropPosition", position + vector, SendMessageOptions.DontRequireReceiver);
 				baseEntity.Spawn();
 			}
+			Interface.CallHook("OnExcavatorSuppliesRequested", this, rpc.player, baseEntity);
 			chargePower -= chargeNeededForSupplies;
 			SetFlag(Flags.Reserved7, false);
 			SendNetworkUpdate();

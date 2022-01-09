@@ -328,7 +328,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 
 	internal override void DoServerDestroy()
 	{
-		if (vehicle.carsdroploot)
+		if (vehicle.vehiclesdroploot)
 		{
 			if (activeStorage.IsValid(base.isServer))
 			{

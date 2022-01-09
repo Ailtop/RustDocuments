@@ -28,6 +28,11 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	public float requiredSubmergedFraction;
 
+	public bool useUnderwaterDrag;
+
+	[Range(0f, 3f)]
+	public float underwaterDrag = 2f;
+
 	public Action<bool> SubmergedChanged;
 
 	public BaseEntity forEntity;
@@ -46,6 +51,10 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 	private float[] pointTerrainHeightArray;
 
 	private float[] pointWaterHeightArray;
+
+	private float defaultDrag;
+
+	private float defaultAngularDrag;
 
 	private float timeInWater;
 
@@ -101,12 +110,31 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	protected void DoCycle()
 	{
-		bool flag = submergedFraction > 0f;
+		bool num = submergedFraction > 0f;
 		BuoyancyFixedUpdate();
-		bool flag2 = submergedFraction > 0f;
-		if (SubmergedChanged != null && flag != flag2)
+		bool flag = submergedFraction > 0f;
+		if (num == flag)
 		{
-			SubmergedChanged(flag2);
+			return;
+		}
+		if (useUnderwaterDrag && rigidBody != null)
+		{
+			if (flag)
+			{
+				defaultDrag = rigidBody.drag;
+				defaultAngularDrag = rigidBody.angularDrag;
+				rigidBody.drag = underwaterDrag;
+				rigidBody.angularDrag = underwaterDrag;
+			}
+			else
+			{
+				rigidBody.drag = defaultDrag;
+				rigidBody.angularDrag = defaultAngularDrag;
+			}
+		}
+		if (SubmergedChanged != null)
+		{
+			SubmergedChanged(flag);
 		}
 	}
 

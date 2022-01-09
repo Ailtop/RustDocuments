@@ -1,3 +1,4 @@
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
@@ -12,9 +13,9 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	[Header("Loot")]
 	public LootContainer.LootSpawnSlot[] LootSpawnSlots;
 
-	private float nextAttackTime;
+	public float nextAttackTime;
 
-	public BaseAIBrain<ScarecrowNPC> Brain { get; protected set; }
+	public BaseAIBrain<ScarecrowNPC> Brain { get; set; }
 
 	public override void ServerInit()
 	{
@@ -212,13 +213,18 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 				}
 				if (LootSpawnSlots.Length != 0)
 				{
+					object obj = Interface.CallHook("OnCorpsePopulate", this, nPCPlayerCorpse);
+					if (obj is BaseCorpse)
+					{
+						return (BaseCorpse)obj;
+					}
 					LootContainer.LootSpawnSlot[] lootSpawnSlots = LootSpawnSlots;
 					for (int i = 0; i < lootSpawnSlots.Length; i++)
 					{
 						LootContainer.LootSpawnSlot lootSpawnSlot = lootSpawnSlots[i];
 						for (int j = 0; j < lootSpawnSlot.numberToSpawn; j++)
 						{
-							if (Random.Range(0f, 1f) <= lootSpawnSlot.probability)
+							if (UnityEngine.Random.Range(0f, 1f) <= lootSpawnSlot.probability)
 							{
 								lootSpawnSlot.definition.SpawnIntoContainer(nPCPlayerCorpse.containers[0]);
 							}

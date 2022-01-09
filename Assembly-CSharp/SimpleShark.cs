@@ -234,7 +234,7 @@ public class SimpleShark : BaseCombatEntity
 
 	private float lastTimeAttacked;
 
-	private float nextAttackTime;
+	public float nextAttackTime;
 
 	private Vector3 cachedObstacleNormal;
 

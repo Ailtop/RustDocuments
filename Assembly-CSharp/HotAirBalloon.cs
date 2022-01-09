@@ -50,7 +50,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	[Header("Storage")]
 	public GameObjectRef storageUnitPrefab;
 
-	public EntityRef storageUnitInstance;
+	public EntityRef<StorageContainer> storageUnitInstance;
 
 	[Header("Damage")]
 	public DamageRenderer damageRenderer;
@@ -205,9 +205,18 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			}
 			if (child.prefabID == storageUnitPrefab.GetEntity().prefabID)
 			{
-				storageUnitInstance.Set(child);
+				storageUnitInstance.Set((StorageContainer)child);
 			}
 		}
+	}
+
+	internal override void DoServerDestroy()
+	{
+		if (vehicle.vehiclesdroploot && storageUnitInstance.IsValid(base.isServer))
+		{
+			storageUnitInstance.Get(base.isServer).DropItems();
+		}
+		base.DoServerDestroy();
 	}
 
 	public bool IsValidSAMTarget(bool staticRespawn)

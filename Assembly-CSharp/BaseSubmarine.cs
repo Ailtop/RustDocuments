@@ -226,9 +226,9 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public float curSubDepthY;
 
-	public EntityRef torpedoStorageInstance;
+	public EntityRef<StorageContainer> torpedoStorageInstance;
 
-	private EntityRef itemStorageInstance;
+	private EntityRef<StorageContainer> itemStorageInstance;
 
 	public int waterLayerMask;
 
@@ -469,11 +469,11 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			}
 			if (child.prefabID == itemStoragePrefab.GetEntity().prefabID)
 			{
-				itemStorageInstance.Set(child);
+				itemStorageInstance.Set((StorageContainer)child);
 			}
 			if (child.prefabID == torpedoStoragePrefab.GetEntity().prefabID)
 			{
-				torpedoStorageInstance.Set(child);
+				torpedoStorageInstance.Set((StorageContainer)child);
 			}
 		}
 	}
@@ -484,6 +484,19 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		{
 			SetFlag(Flags.Reserved5, true);
 		}
+	}
+
+	internal override void DoServerDestroy()
+	{
+		if (vehicle.vehiclesdroploot)
+		{
+			StorageContainer storageContainer = itemStorageInstance.Get(base.isServer);
+			if (storageContainer != null && BaseEntityEx.IsValid(storageContainer))
+			{
+				storageContainer.DropItems();
+			}
+		}
+		base.DoServerDestroy();
 	}
 
 	protected void OnCollisionEnter(Collision collision)

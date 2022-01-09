@@ -26,13 +26,21 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 
 	public bool isLootable = true;
 
-	public float dropChance;
+	public bool dropsLoot;
+
+	public bool dropFloats;
 
 	public bool onlyOneUser;
 
 	public Translate.Phrase LootPanelTitle => panelTitle;
 
 	public ItemContainer inventory { get; private set; }
+
+	public Transform Transform => base.transform;
+
+	public bool DropsLoot => dropsLoot;
+
+	public bool DropFloats => dropFloats;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -166,10 +174,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 
 	public void DropItems(BaseEntity initiator = null)
 	{
-		if (inventory != null && inventory.itemList != null && inventory.itemList.Count != 0 && dropChance != 0f)
-		{
-			DropUtil.DropItems(inventory, GetDropPosition(), dropChance);
-		}
+		StorageContainer.DropItems(this, initiator);
 	}
 
 	[RPC_Server]
@@ -222,6 +227,15 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 		Interface.CallHook("OnLootEntityEnd", player, this);
 		SetFlag(Flags.Open, false);
 		SendNetworkUpdate();
+	}
+
+	public bool ShouldDropItemsIndividually()
+	{
+		return false;
+	}
+
+	public virtual void DropBonusItems(BaseEntity initiator, ItemContainer container)
+	{
 	}
 
 	public bool OccupiedCheck(BasePlayer player = null)

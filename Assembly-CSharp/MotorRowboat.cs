@@ -63,7 +63,7 @@ public class MotorRowboat : BaseBoat
 	[Header("Storage")]
 	public GameObjectRef storageUnitPrefab;
 
-	public EntityRef storageUnitInstance;
+	public EntityRef<StorageContainer> storageUnitInstance;
 
 	[Header("Effects")]
 	public Transform boatRear;
@@ -213,9 +213,18 @@ public class MotorRowboat : BaseBoat
 			}
 			if (child.prefabID == storageUnitPrefab.GetEntity().prefabID)
 			{
-				storageUnitInstance.Set(child);
+				storageUnitInstance.Set((StorageContainer)child);
 			}
 		}
+	}
+
+	internal override void DoServerDestroy()
+	{
+		if (vehicle.vehiclesdroploot && storageUnitInstance.IsValid(base.isServer))
+		{
+			storageUnitInstance.Get(base.isServer).DropItems();
+		}
+		base.DoServerDestroy();
 	}
 
 	public override EntityFuelSystem GetFuelSystem()

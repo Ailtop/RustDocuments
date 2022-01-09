@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
@@ -51,6 +52,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 		SetFlag(Flags.OnFire, false);
 		SetFlag(Flags.On, true, false, false);
 		SendNetworkUpdate_Flags();
+		Interface.CallHook("OnFireworkStarted", this);
 		Invoke(OnExhausted, activityLength);
 	}
 
@@ -61,6 +63,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 		SetFlag(Flags.On, false, false, false);
 		EnableGlobalBroadcast(false);
 		SendNetworkUpdate_Flags();
+		Interface.CallHook("OnFireworkExhausted", this);
 		Invoke(Cleanup, corpseDuration);
 		_activeFireworks.Remove(this);
 	}
@@ -79,7 +82,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 	public override void OnAttacked(HitInfo info)
 	{
 		base.OnAttacked(info);
-		if (base.isServer && info.damageTypes.Has(DamageType.Heat))
+		if (base.isServer && Interface.CallHook("OnFireworkDamage", this, info) == null && info.damageTypes.Has(DamageType.Heat))
 		{
 			StaggeredTryLightFuse();
 		}
@@ -107,7 +110,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 			_activeFireworks.Add(this);
 			SetFlag(Flags.OnFire, false, false, false);
 		}
-		Invoke(TryLightFuse, Random.Range(0.1f, 0.3f));
+		Invoke(TryLightFuse, UnityEngine.Random.Range(0.1f, 0.3f));
 	}
 
 	public bool CanIgnite()

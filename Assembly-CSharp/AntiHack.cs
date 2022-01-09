@@ -116,6 +116,22 @@ public static class AntiHack
 		}
 	}
 
+	public static void ValidateEyeHistory(BasePlayer ply)
+	{
+		using (TimeWarning.New("AntiHack.ValidateEyeHistory"))
+		{
+			for (int i = 0; i < ply.eyeHistory.Count; i++)
+			{
+				Vector3 point = ply.eyeHistory[i];
+				if (ply.tickHistory.Distance(ply, point) > ConVar.AntiHack.eye_history_forgiveness)
+				{
+					AddViolation(ply, AntiHackType.EyeHack, ConVar.AntiHack.eye_history_penalty);
+				}
+			}
+			ply.eyeHistory.Clear();
+		}
+	}
+
 	public static bool IsInsideTerrain(BasePlayer ply)
 	{
 		using (TimeWarning.New("AntiHack.IsInsideTerrain"))
@@ -160,6 +176,7 @@ public static class AntiHack
 	{
 		using (TimeWarning.New("AntiHack.IsNoClipping"))
 		{
+			ply.vehiclePauseTime = Mathf.Max(0f, ply.vehiclePauseTime - deltaTime);
 			if (ConVar.AntiHack.noclip_protection <= 0)
 			{
 				return false;
@@ -171,8 +188,11 @@ public static class AntiHack
 			}
 			bool flag = ply.transform.parent == null;
 			Matrix4x4 matrix4x = (flag ? Matrix4x4.identity : ply.transform.parent.localToWorldMatrix);
-			Vector3 oldPos = (flag ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint));
-			Vector3 newPos = (flag ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
+			Vector3 vector = (flag ? ticks.StartPoint : matrix4x.MultiplyPoint3x4(ticks.StartPoint));
+			Vector3 vector2 = (flag ? ticks.EndPoint : matrix4x.MultiplyPoint3x4(ticks.EndPoint));
+			Vector3 vector3 = ply.NoClipOffset();
+			float radius = ply.NoClipRadius(ConVar.AntiHack.noclip_margin);
+			float noclip_backtracking = ConVar.AntiHack.noclip_backtracking;
 			if (ConVar.AntiHack.noclip_protection >= 3)
 			{
 				float b = Mathf.Max(ConVar.AntiHack.noclip_stepsize, 0.1f);
@@ -180,22 +200,22 @@ public static class AntiHack
 				b = Mathf.Max(ticks.Length / (float)num, b);
 				while (ticks.MoveNext(b))
 				{
-					newPos = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
-					if (TestNoClipping(ply, oldPos, newPos, true, deltaTime))
+					vector2 = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
+					if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, true))
 					{
 						return true;
 					}
-					oldPos = newPos;
+					vector = vector2;
 				}
 			}
 			else if (ConVar.AntiHack.noclip_protection >= 2)
 			{
-				if (TestNoClipping(ply, oldPos, newPos, true, deltaTime))
+				if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, true))
 				{
 					return true;
 				}
 			}
-			else if (TestNoClipping(ply, oldPos, newPos, false, deltaTime))
+			else if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, false))
 			{
 				return true;
 			}
@@ -203,27 +223,21 @@ public static class AntiHack
 		}
 	}
 
-	public static bool TestNoClipping(BasePlayer ply, Vector3 oldPos, Vector3 newPos, bool sphereCast, float deltaTime = 0f)
+	public static bool TestNoClipping(BasePlayer ply, Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast)
 	{
-		ply.vehiclePauseTime = Mathf.Max(0f, ply.vehiclePauseTime - deltaTime);
 		int num = 429990145;
 		if (ply.vehiclePauseTime > 0f)
 		{
 			num &= -8193;
 		}
-		float noclip_backtracking = ConVar.AntiHack.noclip_backtracking;
-		float noclip_margin = ConVar.AntiHack.noclip_margin;
-		float radius = ply.GetRadius();
-		float height = ply.GetHeight(true);
 		Vector3 normalized = (newPos - oldPos).normalized;
-		float num2 = radius - noclip_margin;
-		Vector3 vector = oldPos + new Vector3(0f, height - radius, 0f) - normalized * noclip_backtracking;
-		float magnitude = (newPos + new Vector3(0f, height - radius, 0f) - vector).magnitude;
+		Vector3 vector = oldPos - normalized * backtracking;
+		float magnitude = (newPos - vector).magnitude;
 		RaycastHit hitInfo = default(RaycastHit);
-		bool flag = UnityEngine.Physics.Raycast(new Ray(vector, normalized), out hitInfo, magnitude + num2, num, QueryTriggerInteraction.Ignore);
+		bool flag = UnityEngine.Physics.Raycast(new Ray(vector, normalized), out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore);
 		if (!flag && sphereCast)
 		{
-			flag = UnityEngine.Physics.SphereCast(new Ray(vector, normalized), num2, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore);
+			flag = UnityEngine.Physics.SphereCast(new Ray(vector, normalized), radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore);
 		}
 		if (flag)
 		{

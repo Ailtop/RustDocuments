@@ -1037,9 +1037,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1165,17 +1165,20 @@ public class BaseProjectile : AttackEntity
 
 	public void CreateProjectileEffectClientside(string prefabName, UnityEngine.Vector3 pos, UnityEngine.Vector3 velocity, int seed, Connection sourceConnection, bool silenced = false, bool forceClientsideEffects = false)
 	{
-		Effect effect = reusableInstance;
-		effect.Clear();
-		effect.Init(Effect.Type.Projectile, pos, velocity, sourceConnection);
-		effect.scale = (silenced ? 0f : 1f);
-		if (forceClientsideEffects)
+		if (Interface.CallHook("OnClientProjectileEffectCreate", sourceConnection, this, prefabName) == null)
 		{
-			effect.scale = 2f;
+			Effect effect = reusableInstance;
+			effect.Clear();
+			effect.Init(Effect.Type.Projectile, pos, velocity, sourceConnection);
+			effect.scale = (silenced ? 0f : 1f);
+			if (forceClientsideEffects)
+			{
+				effect.scale = 2f;
+			}
+			effect.pooledString = prefabName;
+			effect.number = seed;
+			EffectNetwork.Send(effect);
 		}
-		effect.pooledString = prefabName;
-		effect.number = seed;
-		EffectNetwork.Send(effect);
 	}
 
 	public void UpdateItemCondition()

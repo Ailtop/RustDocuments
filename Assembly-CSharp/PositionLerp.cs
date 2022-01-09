@@ -63,10 +63,12 @@ public class PositionLerp : IDisposable
 		}
 	}
 
+	private static float LerpTime => Time.time;
+
 	private void OnEnable()
 	{
 		InstanceList.Add(this);
-		enabledTime = Time.time;
+		enabledTime = LerpTime;
 	}
 
 	private void OnDisable()
@@ -85,8 +87,8 @@ public class PositionLerp : IDisposable
 		float interpolationDelay = target.GetInterpolationDelay();
 		float interpolationSmoothing = target.GetInterpolationSmoothing();
 		float num = interpolationDelay + interpolationSmoothing + 1f;
-		float time = Time.time;
-		timeOffset0 = Mathf.Min(timeOffset0, time - serverTime);
+		float lerpTime = LerpTime;
+		timeOffset0 = Mathf.Min(timeOffset0, lerpTime - serverTime);
 		timeOffsetCount++;
 		if (timeOffsetCount >= TimeOffsetInterval / 4)
 		{
@@ -97,32 +99,32 @@ public class PositionLerp : IDisposable
 			timeOffsetCount = 0;
 		}
 		TimeOffset = Mathx.Min(timeOffset0, timeOffset1, timeOffset2, timeOffset3);
-		time = serverTime + TimeOffset;
+		lerpTime = serverTime + TimeOffset;
 		if (DebugLog && interpolator.list.Count > 0 && serverTime < lastServerTime)
 		{
 			Debug.LogWarning(target.ToString() + " adding tick from the past: server time " + serverTime + " < " + lastServerTime);
 		}
-		else if (DebugLog && interpolator.list.Count > 0 && time < lastClientTime)
+		else if (DebugLog && interpolator.list.Count > 0 && lerpTime < lastClientTime)
 		{
-			Debug.LogWarning(target.ToString() + " adding tick from the past: client time " + time + " < " + lastClientTime);
+			Debug.LogWarning(target.ToString() + " adding tick from the past: client time " + lerpTime + " < " + lastClientTime);
 		}
 		else
 		{
-			lastClientTime = time;
+			lastClientTime = lerpTime;
 			lastServerTime = serverTime;
 			interpolator.Add(new TransformInterpolator.Entry
 			{
-				time = time,
+				time = lerpTime,
 				pos = position,
 				rot = rotation
 			});
 		}
-		interpolator.Cull(time - num);
+		interpolator.Cull(lerpTime - num);
 	}
 
 	public void Snapshot(Vector3 position, Quaternion rotation)
 	{
-		Snapshot(position, rotation, Time.time - TimeOffset);
+		Snapshot(position, rotation, LerpTime - TimeOffset);
 	}
 
 	public void SnapTo(Vector3 position, Quaternion rotation, float serverTime)
@@ -139,7 +141,7 @@ public class PositionLerp : IDisposable
 		{
 			pos = position,
 			rot = rotation,
-			time = Time.time
+			time = LerpTime
 		};
 		Wipe();
 	}
@@ -147,7 +149,7 @@ public class PositionLerp : IDisposable
 	public void SnapToEnd()
 	{
 		float interpolationDelay = target.GetInterpolationDelay();
-		TransformInterpolator.Segment segment = interpolator.Query(Time.time, interpolationDelay, 0f, 0f);
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolationDelay, 0f, 0f);
 		target.SetNetworkPosition(segment.tick.pos);
 		target.SetNetworkRotation(segment.tick.rot);
 		Wipe();
@@ -178,11 +180,11 @@ public class PositionLerp : IDisposable
 			return;
 		}
 		float interpolationInertia = target.GetInterpolationInertia();
-		float num = ((interpolationInertia > 0f) ? Mathf.InverseLerp(0f, interpolationInertia, Time.time - enabledTime) : 1f);
+		float num = ((interpolationInertia > 0f) ? Mathf.InverseLerp(0f, interpolationInertia, LerpTime - enabledTime) : 1f);
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolation = target.GetInterpolationDelay() * num;
 		float num2 = target.GetInterpolationSmoothing() * num;
-		TransformInterpolator.Segment segment = interpolator.Query(Time.time, interpolation, extrapolationTime, num2);
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolation, extrapolationTime, num2);
 		if (segment.next.time >= interpolator.last.time)
 		{
 			extrapolatedTime = Mathf.Min(extrapolatedTime + Time.deltaTime, extrapolationTime);
@@ -203,7 +205,7 @@ public class PositionLerp : IDisposable
 		{
 			target.DrawInterpolationState(segment, interpolator.list);
 		}
-		if (Time.time - lastClientTime > 10f)
+		if (LerpTime - lastClientTime > 10f)
 		{
 			if (idleDisable == null)
 			{
@@ -236,7 +238,7 @@ public class PositionLerp : IDisposable
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolationDelay = target.GetInterpolationDelay();
 		float interpolationSmoothing = target.GetInterpolationSmoothing();
-		TransformInterpolator.Segment segment = interpolator.Query(Time.time, interpolationDelay, extrapolationTime, interpolationSmoothing);
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
 		TransformInterpolator.Entry next = segment.next;
 		TransformInterpolator.Entry prev = segment.prev;
 		if (next.time == prev.time)
@@ -255,7 +257,7 @@ public class PositionLerp : IDisposable
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolationDelay = target.GetInterpolationDelay();
 		float interpolationSmoothing = target.GetInterpolationSmoothing();
-		TransformInterpolator.Segment segment = interpolator.Query(Time.time, interpolationDelay, extrapolationTime, interpolationSmoothing);
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
 		TransformInterpolator.Entry next = segment.next;
 		TransformInterpolator.Entry prev = segment.prev;
 		if (next.time == prev.time)

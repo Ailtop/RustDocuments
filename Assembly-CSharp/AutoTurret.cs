@@ -1051,8 +1051,29 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		nextShotTime = Mathf.Max(nextShotTime, UnityEngine.Time.time + Mathf.Min(attachedWeapon.GetReloadDuration() * 0.5f, 2f));
 		AmmoTypes ammoTypes = attachedWeapon.primaryMagazine.definition.ammoTypes;
-		if (attachedWeapon.primaryMagazine.contents > 0 && base.inventory.GetMaxTransferAmount(attachedWeapon.primaryMagazine.ammoType) > 0)
+		if (attachedWeapon.primaryMagazine.contents > 0)
 		{
+			bool flag = false;
+			if (base.inventory.capacity > base.inventory.itemList.Count)
+			{
+				flag = true;
+			}
+			else
+			{
+				int num = 0;
+				foreach (Item item in base.inventory.itemList)
+				{
+					if (item.info == attachedWeapon.primaryMagazine.ammoType)
+					{
+						num += item.info.stackable - item.amount;
+					}
+				}
+				flag = num >= attachedWeapon.primaryMagazine.contents;
+			}
+			if (!flag)
+			{
+				return;
+			}
 			base.inventory.AddItem(attachedWeapon.primaryMagazine.ammoType, attachedWeapon.primaryMagazine.contents, 0uL);
 			attachedWeapon.primaryMagazine.contents = 0;
 		}
@@ -1063,17 +1084,17 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			Effect.server.Run(reloadEffect.resourcePath, this, StringPool.Get("WeaponAttachmentPoint"), Vector3.zero, Vector3.zero);
 			totalAmmoDirty = true;
 			attachedWeapon.primaryMagazine.ammoType = obj[0].info;
-			int num = 0;
-			while (attachedWeapon.primaryMagazine.contents < attachedWeapon.primaryMagazine.capacity && num < obj.Count)
+			int num2 = 0;
+			while (attachedWeapon.primaryMagazine.contents < attachedWeapon.primaryMagazine.capacity && num2 < obj.Count)
 			{
-				if (obj[num].info == attachedWeapon.primaryMagazine.ammoType)
+				if (obj[num2].info == attachedWeapon.primaryMagazine.ammoType)
 				{
 					int b = attachedWeapon.primaryMagazine.capacity - attachedWeapon.primaryMagazine.contents;
-					b = Mathf.Min(obj[num].amount, b);
-					obj[num].UseItem(b);
+					b = Mathf.Min(obj[num2].amount, b);
+					obj[num2].UseItem(b);
 					attachedWeapon.primaryMagazine.contents += b;
 				}
-				num++;
+				num2++;
 			}
 		}
 		ItemDefinition ammoType = attachedWeapon.primaryMagazine.ammoType;

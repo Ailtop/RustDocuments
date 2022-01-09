@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[789]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[796]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2114,6 +2114,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "build_losradius",
+			Parent = "antihack",
+			FullName = "antihack.build_losradius",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.build_losradius.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.build_losradius = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "build_terraincheck",
 			Parent = "antihack",
 			FullName = "antihack.build_terraincheck",
@@ -2175,6 +2188,84 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.eye_forgiveness = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_history_forgiveness",
+			Parent = "antihack",
+			FullName = "antihack.eye_history_forgiveness",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_history_forgiveness.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_history_forgiveness = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_history_penalty",
+			Parent = "antihack",
+			FullName = "antihack.eye_history_penalty",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_history_penalty.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_history_penalty = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_losradius",
+			Parent = "antihack",
+			FullName = "antihack.eye_losradius",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_losradius.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_losradius = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_noclip_backtracking",
+			Parent = "antihack",
+			FullName = "antihack.eye_noclip_backtracking",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_noclip_backtracking.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_noclip_backtracking = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_noclip_cutoff",
+			Parent = "antihack",
+			FullName = "antihack.eye_noclip_cutoff",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_noclip_cutoff.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_noclip_cutoff = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_noclip_margin",
+			Parent = "antihack",
+			FullName = "antihack.eye_noclip_margin",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_noclip_margin.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_noclip_margin = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -2387,32 +2478,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "losforgiveness",
-			Parent = "antihack",
-			FullName = "antihack.losforgiveness",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => ConVar.AntiHack.losforgiveness.ToString(),
-			SetOveride = delegate(string str)
-			{
-				ConVar.AntiHack.losforgiveness = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "losradius",
-			Parent = "antihack",
-			FullName = "antihack.losradius",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => ConVar.AntiHack.losradius.ToString(),
-			SetOveride = delegate(string str)
-			{
-				ConVar.AntiHack.losradius = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "maxdeltatime",
 			Parent = "antihack",
 			FullName = "antihack.maxdeltatime",
@@ -2474,6 +2539,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.melee_forgiveness = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "melee_losforgiveness",
+			Parent = "antihack",
+			FullName = "antihack.melee_losforgiveness",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.melee_losforgiveness.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.melee_losforgiveness = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -2708,6 +2786,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.projectile_forgiveness = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "projectile_losforgiveness",
+			Parent = "antihack",
+			FullName = "antihack.projectile_losforgiveness",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.projectile_losforgiveness.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_losforgiveness = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8332,20 +8423,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "carsdroploot",
-			Parent = "vehicle",
-			FullName = "vehicle.carsdroploot",
-			ServerAdmin = true,
-			Description = "Determines whether modular cars drop storage items when destroyed. Default: true",
-			Variable = true,
-			GetOveride = () => vehicle.carsdroploot.ToString(),
-			SetOveride = delegate(string str)
-			{
-				vehicle.carsdroploot = str.ToBool();
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "carwrecks",
 			Parent = "vehicle",
 			FullName = "vehicle.carwrecks",
@@ -8394,6 +8471,20 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				vehicle.swapseats(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "vehiclesdroploot",
+			Parent = "vehicle",
+			FullName = "vehicle.vehiclesdroploot",
+			ServerAdmin = true,
+			Description = "Determines whether vehicles drop storage items when destroyed. Default: true",
+			Variable = true,
+			GetOveride = () => vehicle.vehiclesdroploot.ToString(),
+			SetOveride = delegate(string str)
+			{
+				vehicle.vehiclesdroploot = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command

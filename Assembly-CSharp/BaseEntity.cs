@@ -623,7 +623,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	private uint broadcastProtocol;
 
-	private List<EntityLink> links = new List<EntityLink>();
+	public List<EntityLink> links = new List<EntityLink>();
 
 	private bool linkedToNeighbours;
 

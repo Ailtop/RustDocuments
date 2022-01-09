@@ -15,7 +15,7 @@ public class AIBrainSenses
 	[ServerVar]
 	public static float KnownPlayersLOSUpdateInterval = 0.5f;
 
-	private float knownPlayersLOSUpdateInterval = 0.2f;
+	public float knownPlayersLOSUpdateInterval = 0.2f;
 
 	public float MemoryDuration = 10f;
 
@@ -23,52 +23,52 @@ public class AIBrainSenses
 
 	public float TimeInAgressiveState;
 
-	private static BaseEntity[] queryResults = new BaseEntity[64];
+	public static BaseEntity[] queryResults = new BaseEntity[64];
 
-	private static BasePlayer[] playerQueryResults = new BasePlayer[64];
+	public static BasePlayer[] playerQueryResults = new BasePlayer[64];
 
-	private float nextUpdateTime;
+	public float nextUpdateTime;
 
-	private float nextKnownPlayersLOSUpdateTime;
+	public float nextKnownPlayersLOSUpdateTime;
 
-	private BaseEntity owner;
+	public BaseEntity owner;
 
-	private BasePlayer playerOwner;
+	public BasePlayer playerOwner;
 
-	private IAISenses ownerSenses;
+	public IAISenses ownerSenses;
 
-	private float maxRange;
+	public float maxRange;
 
-	private float targetLostRange;
+	public float targetLostRange;
 
-	private float visionCone;
+	public float visionCone;
 
-	private bool checkVision;
+	public bool checkVision;
 
-	private bool checkLOS;
+	public bool checkLOS;
 
-	private bool ignoreNonVisionSneakers;
+	public bool ignoreNonVisionSneakers;
 
-	private float listenRange;
+	public float listenRange;
 
-	private bool hostileTargetsOnly;
+	public bool hostileTargetsOnly;
 
-	private bool senseFriendlies;
+	public bool senseFriendlies;
 
-	private bool refreshKnownLOS;
+	public bool refreshKnownLOS;
 
-	private EntityType senseTypes;
+	public EntityType senseTypes;
 
-	private IAIAttack ownerAttack;
+	public IAIAttack ownerAttack;
 
 	public float TimeSinceThreat => UnityEngine.Time.realtimeSinceStartup - LastThreatTimestamp;
 
-	public SimpleAIMemory Memory { get; private set; } = new SimpleAIMemory();
+	public SimpleAIMemory Memory { get; set; } = new SimpleAIMemory();
 
 
 	public float TargetLostRange => targetLostRange;
 
-	public bool ignoreSafeZonePlayers { get; private set; }
+	public bool ignoreSafeZonePlayers { get; set; }
 
 	public List<BaseEntity> Players => Memory.Players;
 

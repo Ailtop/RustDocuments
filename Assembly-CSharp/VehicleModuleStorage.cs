@@ -129,10 +129,13 @@ public class VehicleModuleStorage : VehicleModuleSeating
 
 	internal override void DoServerDestroy()
 	{
-		IItemContainerEntity container = GetContainer();
-		if (!ObjectEx.IsUnityNull(container) && vehicle.carsdroploot)
+		if (vehicle.vehiclesdroploot)
 		{
-			container.DropItems();
+			IItemContainerEntity container = GetContainer();
+			if (!ObjectEx.IsUnityNull(container))
+			{
+				container.DropItems();
+			}
 		}
 		base.DoServerDestroy();
 	}

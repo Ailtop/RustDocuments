@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects
 {
+	[ImageEffectAllowedInSceneView]
 	[ExecuteInEditMode]
 	[AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
-	[ImageEffectAllowedInSceneView]
 	public class TonemappingColorGrading : MonoBehaviour
 	{
 		[AttributeUsage(AttributeTargets.Field)]
@@ -215,9 +215,9 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 			public float tint;
 
+			[Space]
 			[Range(-0.5f, 0.5f)]
 			[Tooltip("Shift the hue of all colors.")]
-			[Space]
 			public float hue;
 
 			[Range(0f, 2f)]

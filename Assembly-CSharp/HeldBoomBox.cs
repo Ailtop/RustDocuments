@@ -111,9 +111,9 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 		BoxController.ServerTogglePlay(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(2uL)]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Server_UpdateRadioIP(RPCMessage msg)
 	{
 		BoxController.Server_UpdateRadioIP(msg);

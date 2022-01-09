@@ -483,6 +483,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	private TickInterpolator tickInterpolator = new TickInterpolator();
 
+	public Deque<UnityEngine.Vector3> eyeHistory = new Deque<UnityEngine.Vector3>();
+
 	public TickHistory tickHistory = new TickHistory();
 
 	public float nextUnderwearValidationTime;
@@ -1977,7 +1979,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			return;
 		}
 		UnityEngine.Vector3 end = vector2 - (vector2 - player.eyes.position).normalized * 0.25f;
-		if (!GamePhysics.CheckCapsule(player.eyes.position, end, 0.25f, 1218519041) && !AntiHack.TestNoClipping(player, vector2, vector2, true))
+		if (!GamePhysics.CheckCapsule(player.eyes.position, end, 0.25f, 1218519041) && !AntiHack.TestNoClipping(player, vector2 + player.NoClipOffset(), vector2 + player.NoClipOffset(), player.NoClipRadius(ConVar.AntiHack.noclip_margin), ConVar.AntiHack.noclip_backtracking, true))
 		{
 			player.EnsureDismounted();
 			player.transform.position = vector2;
@@ -2183,9 +2185,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
@@ -2751,7 +2753,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 219;
+		missions.protocol = 220;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2851,7 +2853,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (219 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (220 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -3525,7 +3527,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						hitPositionWorld2 += hitInfo.HitNormalWorld.normalized * 0.001f;
 					}
-					if ((!GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(position3, hitPositionWorld2, layerMask, ConVar.AntiHack.losforgiveness, 0f)) && (!GamePhysics.LineOfSight(hitPositionWorld2, vector2, layerMask, 0f, ConVar.AntiHack.losforgiveness) || !GamePhysics.LineOfSight(vector2, hitPositionWorld2, layerMask, ConVar.AntiHack.losforgiveness, 0f)))
+					if ((!GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask, 0f, ConVar.AntiHack.projectile_losforgiveness) || !GamePhysics.LineOfSight(position3, hitPositionWorld2, layerMask, ConVar.AntiHack.projectile_losforgiveness, 0f)) && (!GamePhysics.LineOfSight(hitPositionWorld2, vector2, layerMask, 0f, ConVar.AntiHack.projectile_losforgiveness) || !GamePhysics.LineOfSight(vector2, hitPositionWorld2, layerMask, ConVar.AntiHack.projectile_losforgiveness, 0f)))
 					{
 						string text17 = hitInfo.ProjectilePrefab.name;
 						string text18 = (flag6 ? hitEntity.ShortPrefabName : "world");
@@ -4764,6 +4766,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerName(userID, displayName);
 			tickInterpolator.Reset(base.transform.position);
 			tickHistory.Reset(base.transform.position);
+			eyeHistory.Clear();
 			lastTickTime = 0f;
 			lastInputTime = 0f;
 			SetPlayerFlag(PlayerFlags.ReceivingSnapshot, true);
@@ -4856,9 +4859,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -5007,7 +5010,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public virtual void EndSleeping()
 	{
-		if (!IsSleeping())
+		if (!IsSleeping() || Interface.CallHook("OnPlayerSleepEnd", this) != null)
 		{
 			return;
 		}
@@ -5377,6 +5380,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			base.transform.SetPositionAndRotation(position, rotation);
 			tickInterpolator.Reset(position);
 			tickHistory.Reset(position);
+			eyeHistory.Clear();
 			lastTickTime = 0f;
 			StopWounded();
 			ResetWoundingVars();
@@ -6646,6 +6650,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				eyes.NetworkUpdate(UnityEngine.Quaternion.Euler(viewAngles));
 				NetworkPositionTick();
 			}
+			AntiHack.ValidateEyeHistory(this);
 		}
 		using (TimeWarning.New("ModelState"))
 		{
@@ -7064,6 +7069,16 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		return GetMaxSpeed();
 	}
 
+	public UnityEngine.Vector3 GetMountVelocity()
+	{
+		BaseMountable baseMountable = GetMounted();
+		if (!(baseMountable != null))
+		{
+			return UnityEngine.Vector3.zero;
+		}
+		return baseMountable.GetWorldVelocity();
+	}
+
 	public override UnityEngine.Vector3 GetInheritedProjectileVelocity()
 	{
 		BaseMountable baseMountable = GetMounted();
@@ -7264,7 +7279,17 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public override UnityEngine.Vector3 TriggerPoint()
 	{
-		return base.transform.position + new UnityEngine.Vector3(0f, GetHeight(true) - GetRadius(), 0f);
+		return base.transform.position + NoClipOffset();
+	}
+
+	public UnityEngine.Vector3 NoClipOffset()
+	{
+		return new UnityEngine.Vector3(0f, GetHeight(true) - GetRadius(), 0f);
+	}
+
+	public float NoClipRadius(float margin)
+	{
+		return GetRadius() - margin;
 	}
 
 	public float MaxDeployDistance(Item item)
@@ -7419,7 +7444,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public void EnablePlayerCollider()
 	{
-		if (!playerCollider.enabled)
+		if (!playerCollider.enabled && Interface.CallHook("OnPlayerColliderEnable", this, playerCollider) == null)
 		{
 			RefreshColliderSize(true);
 			playerCollider.enabled = true;

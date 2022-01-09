@@ -139,13 +139,13 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 				HumanNPC entity = GetEntity();
 				if (Random.Range(0, 3) == 1)
 				{
-					nextActionTime = Time.time + Random.Range(2f, 3f);
+					nextActionTime = Time.time + Random.Range(1f, 2f);
 					entity.SetDucked(true);
 					brain.Navigator.Stop();
 				}
 				else
 				{
-					nextActionTime = Time.time + Random.Range(3f, 4f);
+					nextActionTime = Time.time + Random.Range(2f, 3f);
 					entity.SetDucked(false);
 					brain.Navigator.SetDestination(brain.PathFinder.GetRandomPositionAround(combatStartPosition, 1f), BaseNavigator.NavigationSpeed.Normal);
 				}
