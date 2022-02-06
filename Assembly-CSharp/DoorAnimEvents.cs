@@ -11,6 +11,8 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 
 	public GameObjectRef closeEnd;
 
+	public GameObject soundTarget;
+
 	public bool checkAnimSpeed;
 
 	public Animator animator => GetComponent<Animator>();
@@ -19,7 +21,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 	{
 		if (!Rust.Application.isLoading && openStart.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed < 0f)))
 		{
-			Effect.client.Run(openStart.resourcePath, base.gameObject);
+			Effect.client.Run(openStart.resourcePath, (soundTarget == null) ? base.gameObject : soundTarget);
 		}
 	}
 
@@ -27,7 +29,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 	{
 		if (!Rust.Application.isLoading && openEnd.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed < 0f)))
 		{
-			Effect.client.Run(openEnd.resourcePath, base.gameObject);
+			Effect.client.Run(openEnd.resourcePath, (soundTarget == null) ? base.gameObject : soundTarget);
 		}
 	}
 
@@ -35,7 +37,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 	{
 		if (!Rust.Application.isLoading && closeStart.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed > 0f)))
 		{
-			Effect.client.Run(closeStart.resourcePath, base.gameObject);
+			Effect.client.Run(closeStart.resourcePath, (soundTarget == null) ? base.gameObject : soundTarget);
 		}
 	}
 
@@ -43,7 +45,7 @@ public class DoorAnimEvents : MonoBehaviour, IClientComponent
 	{
 		if (!Rust.Application.isLoading && closeEnd.isValid && !animator.IsInTransition(0) && !(animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 0.5f) && (!checkAnimSpeed || !(animator.GetCurrentAnimatorStateInfo(0).speed > 0f)))
 		{
-			Effect.client.Run(closeEnd.resourcePath, base.gameObject);
+			Effect.client.Run(closeEnd.resourcePath, (soundTarget == null) ? base.gameObject : soundTarget);
 		}
 	}
 }

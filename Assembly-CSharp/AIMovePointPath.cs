@@ -33,35 +33,37 @@ public class AIMovePointPath : MonoBehaviour
 
 	public AIMovePoint FindNearestPoint(Vector3 position)
 	{
+		return Points[FindNearestPointIndex(position)];
+	}
+
+	public int FindNearestPointIndex(Vector3 position)
+	{
 		float num = float.MaxValue;
-		AIMovePoint result = null;
+		int result = 0;
+		int num2 = 0;
 		foreach (AIMovePoint point in Points)
 		{
-			float num2 = Vector3.SqrMagnitude(position - point.transform.position);
-			if (num2 < num)
+			float num3 = Vector3.SqrMagnitude(position - point.transform.position);
+			if (num3 < num)
 			{
-				num = num2;
-				result = point;
+				num = num3;
+				result = num2;
 			}
+			num2++;
 		}
 		return result;
 	}
 
-	public AIMovePoint GetNextPoint(AIMovePoint current, ref PathDirection pathDirection)
+	public AIMovePoint GetPointAtIndex(int index)
 	{
-		int num = 0;
-		foreach (AIMovePoint point in Points)
+		if (index < 0 || index >= Points.Count)
 		{
-			if (point == current)
-			{
-				return GetNextPoint(num, ref pathDirection);
-			}
-			num++;
+			return null;
 		}
-		return null;
+		return Points[index];
 	}
 
-	private AIMovePoint GetNextPoint(int currentPointIndex, ref PathDirection pathDirection)
+	public int GetNextPointIndex(int currentPointIndex, ref PathDirection pathDirection)
 	{
 		int num = currentPointIndex + ((pathDirection == PathDirection.Forwards) ? 1 : (-1));
 		if (num < 0)
@@ -88,7 +90,7 @@ public class AIMovePointPath : MonoBehaviour
 				pathDirection = PathDirection.Backwards;
 			}
 		}
-		return Points[num];
+		return num;
 	}
 
 	private void OnDrawGizmos()

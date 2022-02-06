@@ -183,10 +183,10 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	private ParticleSystem fxExtWakeEffect;
 
 	[SerializeField]
-	private GameObjectRef aboveWatercollisionEffect;
+	public GameObjectRef aboveWatercollisionEffect;
 
 	[SerializeField]
-	private GameObjectRef underWatercollisionEffect;
+	public GameObjectRef underWatercollisionEffect;
 
 	[SerializeField]
 	private VolumetricLightBeam spotlightVolumetrics;
@@ -234,18 +234,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public ItemModGiveOxygen.AirSupplyType AirType => ItemModGiveOxygen.AirSupplyType.Submarine;
 
-	public bool IsMovingOrOn
-	{
-		get
-		{
-			if (!IsMoving())
-			{
-				return IsOn();
-			}
-			return true;
-		}
-	}
-
 	public VehicleEngineController<BaseSubmarine>.EngineState EngineState => engineController.CurEngineState;
 
 	public Vector3 Velocity { get; private set; }
@@ -264,7 +252,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			}
 			return _throttle;
 		}
-		set
+		protected set
 		{
 			_throttle = Mathf.Clamp(value, -1f, 1f);
 		}
@@ -276,7 +264,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		{
 			return _rudder;
 		}
-		set
+		protected set
 		{
 			_rudder = Mathf.Clamp(value, -1f, 1f);
 		}
@@ -300,7 +288,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			}
 			return _upDown;
 		}
-		set
+		protected set
 		{
 			_upDown = Mathf.Clamp(value, -1f, 1f);
 		}
@@ -312,7 +300,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		{
 			return _oxygen;
 		}
-		set
+		protected set
 		{
 			_oxygen = Mathf.Clamp(value, 0f, 1f);
 		}
@@ -449,7 +437,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	{
 		base.ServerInit();
 		rigidBody.centerOfMass = centreOfMassTransform.localPosition;
-		timeSinceLastUsed = 9999f;
+		timeSinceLastUsed = timeUntilAutoSurface;
 		buoyancy.buoyancyScale = 1f;
 		normalDrag = rigidBody.drag;
 		highDrag = normalDrag * 2.5f;
@@ -512,11 +500,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		return 10f;
 	}
 
-	public override Vector3 GetLocalVelocityServer()
-	{
-		return rigidBody.velocity;
-	}
-
 	public override EntityFuelSystem GetFuelSystem()
 	{
 		return engineController.FuelSystem;
@@ -525,24 +508,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public override int StartingFuelUnits()
 	{
 		return 50;
-	}
-
-	public override Quaternion GetAngularVelocityServer()
-	{
-		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
-		{
-			return Quaternion.identity;
-		}
-		return Quaternion.LookRotation(rigidBody.angularVelocity, base.transform.up);
-	}
-
-	public override bool MountEligable(BasePlayer player)
-	{
-		if (IsDead())
-		{
-			return false;
-		}
-		return base.MountEligable(player);
 	}
 
 	public override void AttemptMount(BasePlayer player, bool doMountChecks = true)
@@ -602,14 +567,14 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (!IsMovingOrOn)
+		if (!base.IsMovingOrOn)
 		{
 			Velocity = Vector3.zero;
 			targetClimbSpeed = 0f;
 			buoyancy.ArtificialHeight = null;
 			return;
 		}
-		Velocity = GetWorldVelocity();
+		Velocity = GetLocalVelocity();
 		UpdateWaterInfo();
 		buoyancy.ArtificialHeight = waterSurfaceY;
 		rigidBody.drag = (HasDriver() ? normalDrag : highDrag);
@@ -786,7 +751,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		info.msg.submarine.throttle = ThrottleInput;
 		info.msg.submarine.upDown = UpDownInput;
 		info.msg.submarine.rudder = RudderInput;
-		info.msg.submarine.fuelStorageID = engineController.FuelSystem.fuelStorageInstance.uid;
+		info.msg.submarine.fuelStorageID = GetFuelSystem().fuelStorageInstance.uid;
 		info.msg.submarine.fuelAmount = GetFuelAmount();
 		info.msg.submarine.torpedoStorageID = torpedoStorageInstance.uid;
 		info.msg.submarine.oxygen = Oxygen;
@@ -877,9 +842,9 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && CanBeLooted(player))
+		if (CanBeLooted(player))
 		{
-			engineController.FuelSystem.LootFuel(player);
+			GetFuelSystem().LootFuel(player);
 		}
 	}
 
@@ -888,7 +853,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public void RPC_OpenTorpedoStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && CanBeLooted(player) && PlayerIsMounted(player))
+		if (CanBeLooted(player) && PlayerIsMounted(player))
 		{
 			StorageContainer torpedoContainer = GetTorpedoContainer();
 			if (torpedoContainer != null)
@@ -903,7 +868,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public void RPC_OpenItemStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && CanBeLooted(player))
+		if (CanBeLooted(player))
 		{
 			StorageContainer itemContainer = GetItemContainer();
 			if (itemContainer != null)
@@ -981,11 +946,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public override bool CanBeLooted(BasePlayer player)
 	{
-		if (IsDead() || base.IsDestroyed)
-		{
-			return false;
-		}
-		if (player == null)
+		if (!base.CanBeLooted(player))
 		{
 			return false;
 		}
@@ -1025,20 +986,13 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	private void UpdatePhysicalRudder(float turnInput, float deltaTime)
 	{
 		float num = (0f - turnInput) * maxRudderAngle;
-		float y = ((!IsMovingOrOn) ? num : Mathf.MoveTowards(PhysicalRudderAngle, num, 200f * deltaTime));
+		float y = ((!base.IsMovingOrOn) ? num : Mathf.MoveTowards(PhysicalRudderAngle, num, 200f * deltaTime));
 		Quaternion localRotation = Quaternion.Euler(0f, y, 0f);
 		if (base.isClient)
 		{
 			rudderVisualTransform.localRotation = localRotation;
 		}
 		rudderDetailedColliderTransform.localRotation = localRotation;
-	}
-
-	public void ResetInputs()
-	{
-		ThrottleInput = 0f;
-		RudderInput = 0f;
-		UpDownInput = 0f;
 	}
 
 	private bool CanMount(BasePlayer player)

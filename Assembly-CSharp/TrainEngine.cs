@@ -156,18 +156,6 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public EngineSpeeds CurThrottleSetting { get; set; } = EngineSpeeds.Zero;
 
 
-	public bool IsMovingOrOn
-	{
-		get
-		{
-			if (!IsMoving())
-			{
-				return IsOn();
-			}
-			return true;
-		}
-	}
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("TrainEngine.OnRpcMessage"))
@@ -246,7 +234,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		base.Save(info);
 		info.msg.trainEngine = Facepunch.Pool.Get<ProtoBuf.TrainEngine>();
 		info.msg.trainEngine.throttleSetting = (int)CurThrottleSetting;
-		info.msg.trainEngine.fuelStorageID = engineController.FuelSystem.fuelStorageInstance.uid;
+		info.msg.trainEngine.fuelStorageID = GetFuelSystem().fuelStorageInstance.uid;
 		info.msg.trainEngine.fuelAmount = GetFuelAmount();
 	}
 
@@ -502,7 +490,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 		BasePlayer player = msg.player;
 		if (!(player == null) && CanBeLooted(player))
 		{
-			engineController.FuelSystem.LootFuel(player);
+			GetFuelSystem().LootFuel(player);
 		}
 	}
 
@@ -538,7 +526,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 
 	public override bool CanBeLooted(BasePlayer player)
 	{
-		if (player == null)
+		if (!base.CanBeLooted(player))
 		{
 			return false;
 		}

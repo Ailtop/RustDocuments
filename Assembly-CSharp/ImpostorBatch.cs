@@ -18,6 +18,8 @@ public class ImpostorBatch
 
 	public ComputeBuffer ArgsBuffer { get; private set; }
 
+	public bool IsDirty { get; set; }
+
 	public int Count => Positions.Count;
 
 	public bool Visible => Positions.Count - recycle.Count > 0;
@@ -64,6 +66,7 @@ public class ImpostorBatch
 			data.BatchIndex = Positions.Count;
 			Positions.Add(data.PositionAndScale());
 		}
+		IsDirty = true;
 	}
 
 	public void RemoveInstance(ImpostorInstanceData data)
@@ -72,25 +75,30 @@ public class ImpostorBatch
 		recycle.Enqueue(data.BatchIndex);
 		data.BatchIndex = 0;
 		data.Batch = null;
+		IsDirty = true;
 	}
 
 	public void UpdateBuffers()
 	{
-		bool flag = false;
-		if (PositionBuffer == null || PositionBuffer.count != Positions.Count)
+		if (IsDirty)
 		{
-			PositionBuffer = SafeRelease(PositionBuffer);
-			PositionBuffer = new ComputeBuffer(Positions.Count, 16);
-			flag = true;
-		}
-		if (PositionBuffer != null)
-		{
-			PositionBuffer.SetData(Positions.Array, 0, 0, Positions.Count);
-		}
-		if (ArgsBuffer != null && flag)
-		{
-			args[1] = (uint)Positions.Count;
-			ArgsBuffer.SetData(args.Array, 0, 0, args.Count);
+			bool flag = false;
+			if (PositionBuffer == null || PositionBuffer.count != Positions.Count)
+			{
+				PositionBuffer = SafeRelease(PositionBuffer);
+				PositionBuffer = new ComputeBuffer(Positions.Count, 16);
+				flag = true;
+			}
+			if (PositionBuffer != null)
+			{
+				PositionBuffer.SetData(Positions.Array, 0, 0, Positions.Count);
+			}
+			if (ArgsBuffer != null && flag)
+			{
+				args[1] = (uint)Positions.Count;
+				ArgsBuffer.SetData(args.Array, 0, 0, args.Count);
+			}
+			IsDirty = false;
 		}
 	}
 }

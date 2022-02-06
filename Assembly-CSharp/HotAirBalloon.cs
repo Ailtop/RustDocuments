@@ -423,20 +423,6 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		}
 	}
 
-	public override Vector3 GetLocalVelocityServer()
-	{
-		return myRigidbody.velocity;
-	}
-
-	public override Quaternion GetAngularVelocityServer()
-	{
-		if (myRigidbody.angularVelocity.sqrMagnitude < 0.1f)
-		{
-			return Quaternion.identity;
-		}
-		return Quaternion.LookRotation(myRigidbody.angularVelocity, base.transform.up);
-	}
-
 	public Vector3 GetWindAtPos(Vector3 pos)
 	{
 		float num = pos.y * 6f;

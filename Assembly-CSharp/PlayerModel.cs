@@ -29,6 +29,9 @@ public class PlayerModel : ListComponent<PlayerModel>
 		Sit_Workcart = 21,
 		Sit_Cardgame = 22,
 		Sit_Crane = 23,
+		Sit_Snowmobile_Shooting = 24,
+		Sit_RetroSnowmobile_Shooting = 25,
+		Driving_Snowmobile = 26,
 		Standing = 0x80
 	}
 
@@ -61,6 +64,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 	protected static int deploy = Animator.StringToHash("deploy");
 
 	protected static int reload = Animator.StringToHash("reload");
+
+	protected static int sitReaction = Animator.StringToHash("sitReaction");
 
 	protected static int throwWeapon = Animator.StringToHash("throw");
 

@@ -253,6 +253,8 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 		private AIMovePointPath.PathDirection pathDirection;
 
+		private int currentNodeIndex;
+
 		public BaseFollowPathState()
 			: base(AIState.FollowPath)
 		{
@@ -278,6 +280,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					return;
 				}
 			}
+			currentNodeIndex = path.FindNearestPointIndex(entity.ServerPosition);
 			currentTargetPoint = path.FindNearestPoint(entity.ServerPosition);
 			if (!(currentTargetPoint == null))
 			{
@@ -319,9 +322,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 				{
 					brain.Navigator.ClearFacingDirectionOverride();
 					currentWaitTime = 0f;
-					AIMovePoint aIMovePoint = currentTargetPoint;
-					currentTargetPoint = path.GetNextPoint(currentTargetPoint, ref pathDirection);
-					if ((!(currentTargetPoint != null) || !(currentTargetPoint == aIMovePoint)) && (currentTargetPoint == null || !brain.Navigator.SetDestination(currentTargetPoint.transform.position, BaseNavigator.NavigationSpeed.Slow)))
+					int num = currentNodeIndex;
+					currentNodeIndex = path.GetNextPointIndex(currentNodeIndex, ref pathDirection);
+					currentTargetPoint = path.GetPointAtIndex(currentNodeIndex);
+					if ((!(currentTargetPoint != null) || currentNodeIndex != num) && (currentTargetPoint == null || !brain.Navigator.SetDestination(currentTargetPoint.transform.position, BaseNavigator.NavigationSpeed.Slow)))
 					{
 						return StateStatus.Error;
 					}
@@ -693,6 +697,13 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 	public bool Pet;
 
 	public List<IAIGroupable> groupMembers = new List<IAIGroupable>();
+
+	[Header("Healing")]
+	public bool CanUseHealingItems;
+
+	public float HealChance = 0.5f;
+
+	public float HealBelowHealthFraction = 0.5f;
 
 	protected int loadedDesignIndex;
 

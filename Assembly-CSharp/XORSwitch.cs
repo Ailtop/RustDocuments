@@ -6,6 +6,14 @@ public class XORSwitch : IOEntity
 
 	private int input2Amount;
 
+	private bool firstRun = true;
+
+	public override void ResetState()
+	{
+		base.ResetState();
+		firstRun = true;
+	}
+
 	public override int GetPassthroughAmount(int outputSlot = 0)
 	{
 		if (input1Amount > 0 && input2Amount > 0)
@@ -45,6 +53,23 @@ public class XORSwitch : IOEntity
 			input2Amount = inputAmount;
 			break;
 		}
+		if (firstRun)
+		{
+			if (!IsInvoking(UpdateFlags))
+			{
+				Invoke(UpdateFlags, 0.1f);
+			}
+		}
+		else
+		{
+			UpdateFlags();
+		}
+		firstRun = false;
+		base.UpdateFromInput(inputAmount, slot);
+	}
+
+	private void UpdateFlags()
+	{
 		int num = ((input1Amount <= 0 || input2Amount <= 0) ? Mathf.Max(input1Amount, input2Amount) : 0);
 		bool b = num > 0;
 		SetFlag(Flags.Reserved1, input1Amount > 0, false, false);
@@ -52,6 +77,5 @@ public class XORSwitch : IOEntity
 		SetFlag(Flags.Reserved3, b, false, false);
 		SetFlag(Flags.Reserved4, input1Amount > 0 || input2Amount > 0, false, false);
 		SetFlag(Flags.On, num > 0);
-		base.UpdateFromInput(inputAmount, slot);
 	}
 }

@@ -46,7 +46,7 @@ public class StabilityEntity : DecayEntity
 				return;
 			}
 			List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-			Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj, 2263296);
+			Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj, 69372162);
 			foreach (BaseEntity item in obj)
 			{
 				if (!item.IsDestroyed && !item.isClient)

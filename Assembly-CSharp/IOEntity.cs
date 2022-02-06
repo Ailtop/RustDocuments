@@ -971,24 +971,40 @@ public class IOEntity : BaseCombatEntity
 		}
 	}
 
-	public bool HasConnections()
+	public int GetConnectedInputCount()
 	{
+		int num = 0;
 		IOSlot[] array = inputs;
 		for (int i = 0; i < array.Length; i++)
 		{
 			if (array[i].connectedTo.Get(base.isServer) != null)
 			{
-				return true;
+				num++;
 			}
 		}
-		array = outputs;
+		return num;
+	}
+
+	public int GetConnectedOutputCount()
+	{
+		int num = 0;
+		IOSlot[] array = outputs;
 		for (int i = 0; i < array.Length; i++)
 		{
 			if (array[i].connectedTo.Get(base.isServer) != null)
 			{
-				return true;
+				num++;
 			}
 		}
-		return false;
+		return num;
+	}
+
+	public bool HasConnections()
+	{
+		if (GetConnectedInputCount() <= 0)
+		{
+			return GetConnectedOutputCount() > 0;
+		}
+		return true;
 	}
 }

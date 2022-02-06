@@ -51,7 +51,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			}
 			HumanNPC entity = GetEntity();
 			float num = Vector3.Distance(baseEntity.transform.position, entity.transform.position);
-			if (brain.Senses.Memory.IsLOS(baseEntity) || num <= 10f)
+			if (brain.Senses.Memory.IsLOS(baseEntity) || num <= 10f || base.TimeInState <= 5f)
 			{
 				brain.Navigator.SetFacingDirectionEntity(baseEntity);
 			}
@@ -213,6 +213,19 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			if (aIPoint != null)
 			{
 				aIPoint.SetUsedBy(entity);
+			}
+			if (!(entity.healthFraction <= brain.HealBelowHealthFraction) || !(Random.Range(0f, 1f) <= brain.HealChance))
+			{
+				return;
+			}
+			Item item = entity.FindHealingItem();
+			if (item != null)
+			{
+				BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
+				if (baseEntity == null || (!brain.Senses.Memory.IsLOS(baseEntity) && Vector3.Distance(entity.transform.position, baseEntity.transform.position) >= 5f))
+				{
+					entity.UseHealingItem(item);
+				}
 			}
 		}
 
@@ -470,7 +483,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 	public override void AddStates()
 	{
 		base.AddStates();
-		AddState(new BaseIdleState());
+		AddState(new IdleState());
 		AddState(new RoamState());
 		AddState(new ChaseState());
 		AddState(new CombatState());

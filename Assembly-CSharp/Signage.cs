@@ -21,6 +21,8 @@ public class Signage : IOEntity, ILOD, ISignage
 	[NonSerialized]
 	public uint[] textureIDs;
 
+	public ItemDefinition RequiredHeldEntity;
+
 	public Vector2i TextureSize
 	{
 		get
@@ -266,6 +268,10 @@ public class Signage : IOEntity, ILOD, ISignage
 		{
 			return player.userID == base.OwnerID;
 		}
+		if (!HeldEntityCheck(player))
+		{
+			return false;
+		}
 		return true;
 	}
 
@@ -275,12 +281,20 @@ public class Signage : IOEntity, ILOD, ISignage
 		{
 			return false;
 		}
+		if (!HeldEntityCheck(player))
+		{
+			return false;
+		}
 		return CanUpdateSign(player);
 	}
 
 	public bool CanLockSign(BasePlayer player)
 	{
 		if (IsLocked())
+		{
+			return false;
+		}
+		if (!HeldEntityCheck(player))
 		{
 			return false;
 		}
@@ -335,6 +349,15 @@ public class Signage : IOEntity, ILOD, ISignage
 		{
 			SetFlag(Flags.Locked, false);
 		}
+	}
+
+	private bool HeldEntityCheck(BasePlayer player)
+	{
+		if (RequiredHeldEntity != null && (!player.GetHeldEntity() || player.GetHeldEntity().GetItem().info != RequiredHeldEntity))
+		{
+			return false;
+		}
+		return true;
 	}
 
 	public uint[] GetTextureCRCs()

@@ -67,9 +67,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Tooltip("Applies a gamma function to the curve.")]
 		[DisplayName("Gamma")]
 		[Min(0.001f)]
-		[Tooltip("Applies a gamma function to the curve.")]
 		public FloatParameter toneCurveGamma = new FloatParameter
 		{
 			value = 1f
@@ -91,9 +91,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 1f
 		};
 
-		[DisplayName("Temperature")]
 		[Range(-100f, 100f)]
 		[Tooltip("Sets the white balance to a custom color temperature.")]
+		[DisplayName("Temperature")]
 		public FloatParameter temperature = new FloatParameter
 		{
 			value = 0f
@@ -107,9 +107,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Tooltip("Tint the render by multiplying a color.")]
 		[DisplayName("Color Filter")]
 		[ColorUsage(false, true)]
-		[Tooltip("Tint the render by multiplying a color.")]
 		public ColorParameter colorFilter = new ColorParameter
 		{
 			value = Color.white
@@ -123,9 +123,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[DisplayName("Saturation")]
 		[Range(-100f, 100f)]
 		[Tooltip("Pushes the intensity of all colors.")]
+		[DisplayName("Saturation")]
 		public FloatParameter saturation = new FloatParameter
 		{
 			value = 0f
@@ -146,25 +146,25 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Range(-100f, 100f)]
 		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		[DisplayName("Contrast")]
-		[Range(-100f, 100f)]
 		public FloatParameter contrast = new FloatParameter
 		{
 			value = 0f
 		};
 
-		[Tooltip("Modify influence of the red channel in the overall mix.")]
 		[DisplayName("Red")]
 		[Range(-200f, 200f)]
+		[Tooltip("Modify influence of the red channel in the overall mix.")]
 		public FloatParameter mixerRedOutRedIn = new FloatParameter
 		{
 			value = 100f
 		};
 
-		[Tooltip("Modify influence of the green channel in the overall mix.")]
 		[DisplayName("Green")]
 		[Range(-200f, 200f)]
+		[Tooltip("Modify influence of the green channel in the overall mix.")]
 		public FloatParameter mixerRedOutGreenIn = new FloatParameter
 		{
 			value = 0f
@@ -194,9 +194,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 100f
 		};
 
-		[DisplayName("Blue")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the blue channel in the overall mix.")]
+		[DisplayName("Blue")]
 		public FloatParameter mixerGreenOutBlueIn = new FloatParameter
 		{
 			value = 0f
@@ -210,9 +210,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[DisplayName("Green")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the green channel in the overall mix.")]
-		[DisplayName("Green")]
 		public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 		{
 			value = 0f
@@ -226,17 +226,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 100f
 		};
 
-		[Trackball(TrackballAttribute.Mode.Lift)]
 		[DisplayName("Lift")]
 		[Tooltip("Controls the darkest portions of the render.")]
+		[Trackball(TrackballAttribute.Mode.Lift)]
 		public Vector4Parameter lift = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)
 		};
 
-		[Trackball(TrackballAttribute.Mode.Gamma)]
 		[DisplayName("Gamma")]
 		[Tooltip("Power function that controls mid-range tones.")]
+		[Trackball(TrackballAttribute.Mode.Gamma)]
 		public Vector4Parameter gamma = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)

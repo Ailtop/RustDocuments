@@ -688,11 +688,14 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public void UpdateMaxAuthCapacity()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
-		if ((bool)activeGameMode && activeGameMode.limitTeamAuths)
+		if (authorizedPlayers.Count >= 200)
 		{
-			SetFlag(Flags.Reserved4, authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize());
+			SetFlag(Flags.Reserved4, true);
+			return;
 		}
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		bool b = activeGameMode != null && activeGameMode.limitTeamAuths && authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize();
+		SetFlag(Flags.Reserved4, b);
 	}
 
 	[RPC_Server]
@@ -757,7 +760,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	[RPC_Server.IsVisible(3f)]
 	public void AssignToFriend(RPCMessage msg)
 	{
-		if (!AtMaxAuthCapacity() && msg.player.CanInteract())
+		if (!AtMaxAuthCapacity() && !(msg.player == null) && msg.player.CanInteract() && CanChangeSettings(msg.player))
 		{
 			ulong num = msg.read.UInt64();
 			if (num != 0L && !IsAuthed(num) && Interface.CallHook("OnTurretAssign", this, num, msg.player) == null)

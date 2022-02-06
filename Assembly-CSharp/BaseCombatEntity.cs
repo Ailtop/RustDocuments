@@ -317,6 +317,18 @@ public class BaseCombatEntity : BaseEntity
 		}
 	}
 
+	public virtual void OnRepairFailedResources(BasePlayer player, List<ItemAmount> requirements)
+	{
+		Effect.server.Run(repair.repairFailedEffect.isValid ? repair.repairFailedEffect.resourcePath : "assets/bundled/prefabs/fx/build/repair_failed.prefab", this, 0u, Vector3.zero, Vector3.zero);
+		if (player != null)
+		{
+			using (ItemAmountList arg = ItemAmount.SerialiseList(requirements))
+			{
+				player.ClientRPCPlayer(null, player, "Client_OnRepairFailedResources", arg);
+			}
+		}
+	}
+
 	public virtual void DoRepair(BasePlayer player)
 	{
 		BasePlayer player2 = player;
@@ -349,7 +361,7 @@ public class BaseCombatEntity : BaseEntity
 			a = Mathf.Min(a, 50f / num2);
 			if (a <= 0f)
 			{
-				OnRepairFailed(player2, "Unable to repair: Insufficient resources.");
+				OnRepairFailedResources(player2, list);
 				return;
 			}
 			int num5 = 0;

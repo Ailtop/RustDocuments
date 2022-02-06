@@ -76,7 +76,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		{
 			if (base.Car != null)
 			{
-				return base.Car.CurEngineState == VehicleEngineController<ModularCar>.EngineState.On;
+				return base.Car.CurEngineState == VehicleEngineController<GroundVehicle>.EngineState.On;
 			}
 			return false;
 		}
@@ -88,7 +88,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
 	}
 
-	public override void OnEngineStateChanged(VehicleEngineController<ModularCar>.EngineState oldState, VehicleEngineController<ModularCar>.EngineState newState)
+	public override void OnEngineStateChanged(VehicleEngineController<GroundVehicle>.EngineState oldState, VehicleEngineController<GroundVehicle>.EngineState newState)
 	{
 		base.OnEngineStateChanged(oldState, newState);
 		RefreshPerformanceStats(GetContainer() as EngineStorage);
@@ -148,7 +148,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		if (isSpawned && base.IsOnAVehicle)
 		{
 			base.VehicleFixedUpdate();
-			if (base.Vehicle.IsMovingOrOn && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController<ModularCar>.EngineState.On)
+			if (base.Vehicle.IsMovingOrOn && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController<GroundVehicle>.EngineState.On)
 			{
 				float num = Mathf.Lerp(engine.idleFuelPerSec, engine.maxFuelPerSec, Mathf.Abs(base.Car.GetThrottleInput()));
 				num /= PerformanceFractionFuelEconomy;
@@ -160,7 +160,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 	public override float GetAdjustedDriveForce(float absSpeed, float topSpeed)
 	{
 		float maxDriveForce = GetMaxDriveForce();
-		float num = BiasedLerp(bias: Mathf.Lerp(0.0002f, 0.7f, PerformanceFractionAcceleration), x: 1f - absSpeed / topSpeed);
+		float num = MathEx.BiasedLerp(bias: Mathf.Lerp(0.0002f, 0.7f, PerformanceFractionAcceleration), x: 1f - absSpeed / topSpeed);
 		return maxDriveForce * num;
 	}
 
@@ -187,39 +187,15 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		}
 	}
 
-	public override void AdminFixUp(int tier)
+	public override bool AdminFixUp(int tier)
 	{
-		base.AdminFixUp(tier);
+		if (!base.AdminFixUp(tier))
+		{
+			return false;
+		}
 		EngineStorage engineStorage = GetContainer() as EngineStorage;
 		engineStorage.AdminAddParts(tier);
 		RefreshPerformanceStats(engineStorage);
-	}
-
-	private float BiasedLerp(float x, float bias)
-	{
-		float num = ((!(bias <= 0.5f)) ? (1f - Bias(1f - Mathf.Abs(x), 1f - bias)) : Bias(Mathf.Abs(x), bias));
-		if (!(x < 0f))
-		{
-			return num;
-		}
-		return 0f - num;
-	}
-
-	private float Bias(float x, float bias)
-	{
-		if (x <= 0f || bias <= 0f)
-		{
-			return 0f;
-		}
-		if (x >= 1f || bias >= 1f)
-		{
-			return 1f;
-		}
-		if (bias == 0.5f)
-		{
-			return x;
-		}
-		float p = Mathf.Log(bias) * -1.4427f;
-		return Mathf.Pow(x, p);
+		return true;
 	}
 }

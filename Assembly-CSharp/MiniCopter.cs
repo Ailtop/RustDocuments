@@ -123,7 +123,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	{
 		if (base.isServer)
 		{
-			cachedFuelFraction = Mathf.Clamp01((float)engineController.FuelSystem.GetFuelAmount() / fuelGaugeMax);
+			cachedFuelFraction = Mathf.Clamp01((float)GetFuelSystem().GetFuelAmount() / fuelGaugeMax);
 		}
 		return cachedFuelFraction;
 	}

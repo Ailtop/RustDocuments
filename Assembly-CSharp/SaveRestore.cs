@@ -20,10 +20,6 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 {
 	public static bool IsSaving = false;
 
-	public bool timedSave = true;
-
-	public int timedSavePause;
-
 	public static DateTime SaveCreatedTime;
 
 	private static MemoryStream SaveBuffer = new MemoryStream(33554432);
@@ -86,7 +82,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 						binaryReader.ReadChar();
 						SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 					}
-					if (binaryReader.ReadUInt32() != 220)
+					if (binaryReader.ReadUInt32() != 221)
 					{
 						if (allowOutOfDateSaves)
 						{
@@ -362,7 +358,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			writer.Write((sbyte)82);
 			writer.Write((sbyte)68);
 			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(220u);
+			writer.Write(221u);
 			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 			saveInfo.forDisk = true;
 			if (!AndWait)
@@ -448,24 +444,24 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 
 	private static void ShiftSaveBackups(string fileName)
 	{
-		_003C_003Ec__DisplayClass12_0 _003C_003Ec__DisplayClass12_ = default(_003C_003Ec__DisplayClass12_0);
-		_003C_003Ec__DisplayClass12_.fileName = fileName;
+		_003C_003Ec__DisplayClass10_0 _003C_003Ec__DisplayClass10_ = default(_003C_003Ec__DisplayClass10_0);
+		_003C_003Ec__DisplayClass10_.fileName = fileName;
 		int num = Mathf.Max(ConVar.Server.saveBackupCount, 2);
-		if (!File.Exists(_003C_003Ec__DisplayClass12_.fileName))
+		if (!File.Exists(_003C_003Ec__DisplayClass10_.fileName))
 		{
 			return;
 		}
 		try
 		{
 			int num2 = 0;
-			for (int i = 1; i <= num && File.Exists(_003C_003Ec__DisplayClass12_.fileName + "." + i); i++)
+			for (int i = 1; i <= num && File.Exists(_003C_003Ec__DisplayClass10_.fileName + "." + i); i++)
 			{
 				num2++;
 			}
-			string text = _003CShiftSaveBackups_003Eg__GetBackupName_007C12_0(num2 + 1, ref _003C_003Ec__DisplayClass12_);
+			string text = _003CShiftSaveBackups_003Eg__GetBackupName_007C10_0(num2 + 1, ref _003C_003Ec__DisplayClass10_);
 			for (int num3 = num2; num3 > 0; num3--)
 			{
-				string text2 = _003CShiftSaveBackups_003Eg__GetBackupName_007C12_0(num3, ref _003C_003Ec__DisplayClass12_);
+				string text2 = _003CShiftSaveBackups_003Eg__GetBackupName_007C10_0(num3, ref _003C_003Ec__DisplayClass10_);
 				if (num3 == num)
 				{
 					File.Delete(text2);
@@ -480,7 +476,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				}
 				text = text2;
 			}
-			File.Copy(_003C_003Ec__DisplayClass12_.fileName, text, true);
+			File.Copy(_003C_003Ec__DisplayClass10_.fileName, text, true);
 		}
 		catch (Exception ex)
 		{
@@ -500,18 +496,15 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		while (true)
 		{
 			yield return CoroutineEx.waitForSeconds(ConVar.Server.saveinterval);
-			if (timedSave && timedSavePause <= 0)
-			{
-				yield return StartCoroutine(DoAutomatedSave());
-			}
+			yield return StartCoroutine(DoAutomatedSave());
 		}
 	}
 
-	[IteratorStateMachine(typeof(_003CDoAutomatedSave_003Ed__15))]
+	[IteratorStateMachine(typeof(_003CDoAutomatedSave_003Ed__13))]
 	private IEnumerator DoAutomatedSave(bool AndWait = false)
 	{
 		Interface.CallHook("OnServerSave");
-		return new _003CDoAutomatedSave_003Ed__15(0)
+		return new _003CDoAutomatedSave_003Ed__13(0)
 		{
 			_003C_003E4__this = this,
 			AndWait = AndWait

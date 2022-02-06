@@ -496,15 +496,6 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 		return base.transform.forward * TrackSpeed;
 	}
 
-	public override Quaternion GetAngularVelocityServer()
-	{
-		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
-		{
-			return Quaternion.identity;
-		}
-		return Quaternion.LookRotation(rigidBody.angularVelocity, base.transform.up);
-	}
-
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();

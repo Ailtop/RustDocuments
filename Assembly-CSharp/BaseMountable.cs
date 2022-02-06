@@ -490,18 +490,52 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool ValidDismountPosition(Vector3 disPos, Vector3 visualCheckOrigin)
 	{
-		if (!UnityEngine.Physics.CheckCapsule(disPos + new Vector3(0f, 0.5f, 0f), disPos + new Vector3(0f, 1.3f, 0f), 0.5f, 1537286401))
+		bool debugDismounts = Debugging.DebugDismounts;
+		if (debugDismounts)
+		{
+			Debug.Log($"ValidDismountPosition debug: Checking dismount point {disPos} from {visualCheckOrigin}.");
+		}
+		Vector3 start = disPos + new Vector3(0f, 0.5f, 0f);
+		Vector3 end = disPos + new Vector3(0f, 1.3f, 0f);
+		if (!UnityEngine.Physics.CheckCapsule(start, end, 0.5f, 1537286401))
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
-			RaycastHit hitInfo;
-			if (IsVisible(vector) && (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C66_0(hitInfo)))
+			if (IsVisible(vector))
 			{
-				Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
-				float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-				if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C66_0(hitInfo))
+				if (debugDismounts)
 				{
-					return true;
+					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
 				}
+				RaycastHit hitInfo;
+				if (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C66_0(hitInfo))
+				{
+					if (debugDismounts)
+					{
+						Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} linecast is OK.");
+					}
+					Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
+					float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
+					if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C66_0(hitInfo))
+					{
+						if (debugDismounts)
+						{
+							if (debugDismounts)
+							{
+								Debug.Log($"<color=green>ValidDismountPosition debug: Dismount point {disPos} is valid</color>.");
+							}
+							Debug.DrawLine(visualCheckOrigin, disPos, Color.green, 10f);
+						}
+						return true;
+					}
+				}
+			}
+		}
+		if (debugDismounts)
+		{
+			Debug.DrawLine(visualCheckOrigin, disPos, Color.red, 10f);
+			if (debugDismounts)
+			{
+				Debug.Log($"<color=red>ValidDismountPosition debug: Dismount point {disPos} is invalid</color>.");
 			}
 		}
 		return false;
@@ -683,6 +717,19 @@ public class BaseMountable : BaseCombatEntity
 				if (entity == this || EqualNetID(entity))
 				{
 					return true;
+				}
+				BasePlayer basePlayer;
+				if ((object)(basePlayer = entity as BasePlayer) != null)
+				{
+					BaseMountable mounted = basePlayer.GetMounted();
+					if (mounted == this)
+					{
+						return true;
+					}
+					if (mounted != null && mounted.VehicleParent() == this)
+					{
+						return true;
+					}
 				}
 				BaseEntity baseEntity = entity.GetParentEntity();
 				if (RaycastHitEx.IsOnLayer(hitInfo, Rust.Layer.Vehicle_Detailed) && (baseEntity == this || EqualNetID(baseEntity)))

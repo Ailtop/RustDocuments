@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
@@ -432,12 +433,8 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 		float num = -1f;
 		foreach (BaseEntity player in Brain.Senses.Players)
 		{
-			if (!(player == null) && !(player.Health() <= 0f))
+			if (!(player == null) && !(player.Health() <= 0f) && Interface.CallHook("OnNpcTarget", this, player) == null)
 			{
-				if (Interface.CallHook("OnNpcTarget", this, player) != null)
-				{
-					return null;
-				}
 				float value = Vector3.Distance(player.transform.position, base.transform.position);
 				float num2 = 1f - Mathf.InverseLerp(1f, Brain.SenseRange, value);
 				float value2 = Vector3.Dot((player.transform.position - eyes.position).normalized, eyes.BodyForward());
@@ -457,6 +454,51 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	{
 		BaseCombatEntity target2 = target as BaseCombatEntity;
 		TickAttack(delta, target2, targetIsLOS);
+	}
+
+	public void UseHealingItem(Item item)
+	{
+		StartCoroutine(Heal(item));
+	}
+
+	private IEnumerator Heal(Item item)
+	{
+		UpdateActiveItem(item.uid);
+		Item activeItem = GetActiveItem();
+		MedicalTool heldItem = activeItem.GetHeldEntity() as MedicalTool;
+		if (!(heldItem == null))
+		{
+			yield return new WaitForSeconds(1f);
+			heldItem.ServerUse();
+			Heal(MaxHealth());
+			yield return new WaitForSeconds(2f);
+			EquipTest();
+		}
+	}
+
+	public Item FindHealingItem()
+	{
+		if (Brain == null)
+		{
+			return null;
+		}
+		if (!Brain.CanUseHealingItems)
+		{
+			return null;
+		}
+		if (inventory == null || inventory.containerBelt == null)
+		{
+			return null;
+		}
+		for (int i = 0; i < inventory.containerBelt.capacity; i++)
+		{
+			Item slot = inventory.containerBelt.GetSlot(i);
+			if (slot != null && slot.amount > 1 && slot.GetHeldEntity() as MedicalTool != null)
+			{
+				return slot;
+			}
+		}
+		return null;
 	}
 
 	public override bool IsOnGround()

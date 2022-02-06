@@ -11,17 +11,17 @@ public class TerrainGenerator : SingletonComponent<TerrainGenerator>
 
 	private const float BaseMapRes = 0.01f;
 
-	private int GetHeightMapRes()
+	public static int GetHeightMapRes()
 	{
 		return Mathf.Min(4096, Mathf.ClosestPowerOfTwo((int)((float)World.Size * 1f))) + 1;
 	}
 
-	private int GetSplatMapRes()
+	public static int GetSplatMapRes()
 	{
 		return Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)World.Size * 0.5f)));
 	}
 
-	private int GetBaseMapRes()
+	public static int GetBaseMapRes()
 	{
 		return Mathf.Min(2048, Mathf.NextPowerOfTwo((int)((float)World.Size * 0.01f)));
 	}

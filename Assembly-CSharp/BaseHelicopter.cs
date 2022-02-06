@@ -166,9 +166,13 @@ public class BaseHelicopter : BaseCombatEntity
 
 	public PatrolHelicopterAI myAI;
 
+	public GameObjectRef mapMarkerEntityPrefab;
+
 	public float lastNetworkUpdate = float.NegativeInfinity;
 
 	private const float networkUpdateRate = 0.25f;
+
+	private BaseEntity mapMarkerInstance;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -269,6 +273,19 @@ public class BaseHelicopter : BaseCombatEntity
 			myAI.ExitCurrentState();
 			myAI.State_Patrol_Enter();
 		}
+		CreateMapMarker();
+	}
+
+	public void CreateMapMarker()
+	{
+		if ((bool)mapMarkerInstance)
+		{
+			mapMarkerInstance.Kill();
+		}
+		BaseEntity baseEntity = GameManager.server.CreateEntity(mapMarkerEntityPrefab.resourcePath, Vector3.zero, Quaternion.identity);
+		baseEntity.SetParent(this);
+		baseEntity.Spawn();
+		mapMarkerInstance = baseEntity;
 	}
 
 	public override void OnPositionalNetworkUpdate()

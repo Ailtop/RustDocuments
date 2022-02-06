@@ -390,9 +390,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -440,9 +440,9 @@ public class WireTool : HeldEntity
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

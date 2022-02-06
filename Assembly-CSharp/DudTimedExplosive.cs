@@ -178,7 +178,7 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 		info.msg.dudExplosive.fuseTimeLeft = explodeTime - UnityEngine.Time.realtimeSinceStartup;
 	}
 
-	public void Ignite()
+	public void Ignite(Vector3 fromPos)
 	{
 		SetFuse(GetRandomTimerTime());
 		ReceiveCollisionMessages(true);

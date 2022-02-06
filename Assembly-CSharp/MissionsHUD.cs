@@ -1,3 +1,4 @@
+using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,4 +13,8 @@ public class MissionsHUD : SingletonComponent<MissionsHUD>
 	public Canvas Canvas;
 
 	public Text titleText;
+
+	public GameObject timerObject;
+
+	public RustText timerText;
 }

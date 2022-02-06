@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using CompanionServer.Handlers;
 using ConVar;
 using Facepunch;
@@ -20,6 +24,11 @@ namespace CompanionServer
 			public string ServerToken;
 		}
 
+		private class TestConnectionResponse
+		{
+			public List<string> Messages;
+		}
+
 		private const string ApiEndpoint = "https://companion-rust.facepunch.com/api/server";
 
 		private static readonly HttpClient Http = new HttpClient();
@@ -30,11 +39,22 @@ namespace CompanionServer
 
 		public static Listener Listener { get; private set; }
 
+		public static bool IsEnabled
+		{
+			get
+			{
+				if (App.port >= 0 && !string.IsNullOrWhiteSpace(App.serverid))
+				{
+					return Listener != null;
+				}
+				return false;
+			}
+		}
+
 		public static void Initialize()
 		{
 			if (App.port >= 0)
 			{
-				SetupServerRegistration();
 				Map.PopulateCache();
 				if (App.port == 0)
 				{
@@ -48,6 +68,7 @@ namespace CompanionServer
 				{
 					Debug.LogError($"Companion server failed to start: {arg}");
 				}
+				PostInitializeServer();
 			}
 		}
 
@@ -82,7 +103,13 @@ namespace CompanionServer
 			return Listener?.CanSendPairingNotification(playerId) ?? false;
 		}
 
-		private static async void SetupServerRegistration()
+		private static async void PostInitializeServer()
+		{
+			await SetupServerRegistration();
+			await CheckConnectivity();
+		}
+
+		private static async Task SetupServerRegistration()
 		{
 			int num = 2;
 			try
@@ -145,7 +172,7 @@ namespace CompanionServer
 			{
 				Debug.LogError($"Failed to parse registration response JSON: {responseJson}\n\n{arg}");
 			}
-			ConsoleSystem.Index.Server.Find("app.serverid")?.Set(registerResponse?.ServerId);
+			SetServerId(registerResponse?.ServerId);
 			Token = registerResponse?.ServerToken;
 			if (registerResponse != null)
 			{
@@ -158,6 +185,56 @@ namespace CompanionServer
 					Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
 				}
 			}
+		}
+
+		private static async Task CheckConnectivity()
+		{
+			if (!IsEnabled)
+			{
+				SetServerId(null);
+				return;
+			}
+			try
+			{
+				StringContent content = new StringContent("", Encoding.UTF8, "text/plain");
+				HttpResponseMessage testResponse = await Http.PostAsync("https://companion-rust.facepunch.com/api/server" + $"/test_connection?address={App.GetPublicIP()}&port={App.port}", content);
+				string text = await testResponse.Content.ReadAsStringAsync();
+				TestConnectionResponse testConnectionResponse = null;
+				try
+				{
+					testConnectionResponse = JsonConvert.DeserializeObject<TestConnectionResponse>(text);
+				}
+				catch (Exception arg)
+				{
+					Debug.LogError($"Failed to parse connectivity test response JSON: {text}\n\n{arg}");
+				}
+				if (testConnectionResponse == null)
+				{
+					return;
+				}
+				IEnumerable<string> messages = testConnectionResponse.Messages;
+				string text2 = string.Join("\n", messages ?? Enumerable.Empty<string>());
+				if (testResponse.StatusCode == (HttpStatusCode)555)
+				{
+					Debug.LogError("Rust+ companion server connectivity test failed! Disabling Rust+ features.\n\n" + text2);
+					SetServerId(null);
+					return;
+				}
+				testResponse.EnsureSuccessStatusCode();
+				if (!string.IsNullOrWhiteSpace(text2))
+				{
+					Debug.LogWarning("Rust+ companion server connectivity test has warnings:\n" + text2);
+				}
+			}
+			catch (Exception arg2)
+			{
+				Debug.LogError($"Failed to check connectivity to the companion server: {arg2}");
+			}
+		}
+
+		private static void SetServerId(string serverId)
+		{
+			ConsoleSystem.Index.Server.Find("app.serverid")?.Set(serverId ?? "");
 		}
 
 		private static string GetServerIdPath()

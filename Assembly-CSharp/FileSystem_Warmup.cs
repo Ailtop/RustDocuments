@@ -3,6 +3,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using ConVar;
 using UnityEngine;
 
 public class FileSystem_Warmup : MonoBehaviour
@@ -19,7 +20,7 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	public static void Run()
 	{
-		if (run && !running)
+		if (!Global.skipassetwarmup && run && !running)
 		{
 			running = true;
 			string[] assetList = GetAssetList();
@@ -33,7 +34,7 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	public static IEnumerator Run(float deltaTime, Action<string> statusFunction = null, string format = null)
 	{
-		if (!run || running)
+		if (Global.skipassetwarmup || !run || running)
 		{
 			yield break;
 		}

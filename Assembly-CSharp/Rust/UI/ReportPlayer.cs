@@ -10,6 +10,8 @@ namespace Rust.UI
 
 		public GameObject Finished;
 
+		public GameObject RecentlyReported;
+
 		public Dropdown ReasonDropdown;
 
 		public RustInput Subject;

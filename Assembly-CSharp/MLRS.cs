@@ -3,6 +3,7 @@ using System;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
@@ -581,13 +582,14 @@ public class MLRS : BaseMountable
 
 	public void Fire(BasePlayer owner)
 	{
-		if (CanFire && !IsFiringRockets && !(_mounted == null))
+		if (CanFire && !IsFiringRockets && !(_mounted == null) && Interface.CallHook("OnMlrsFire", this, owner) == null)
 		{
 			nextRocketIndex = Mathf.Min(RocketAmmoCount - 1, rocketTubes.Length - 1);
 			rocketOwnerRef.Set(owner);
 			SetFlag(Flags.Reserved6, true);
 			radiusModIndex = 0;
 			InvokeRepeating(FireNextRocket, 0f, 0.5f);
+			Interface.CallHook("OnMlrsFired", this, owner);
 		}
 	}
 
@@ -604,6 +606,7 @@ public class MLRS : BaseMountable
 		SetFlag(Flags.Broken, true, false, false);
 		SendNetworkUpdate_Flags();
 		timeSinceBroken = 0f;
+		Interface.CallHook("OnMlrsFiringEnded", this);
 	}
 
 	public void FireNextRocket()
@@ -629,6 +632,7 @@ public class MLRS : BaseMountable
 		if (BaseMountable.TryFireProjectile(rocketContainer, AmmoTypes.MLRS_ROCKET, firingPos, aimToTarget, _mounted, 0f, 0f, out projectile))
 		{
 			projectile.gravityModifier = g / (0f - UnityEngine.Physics.gravity.y);
+			Interface.CallHook("OnMlrsRocketFired", this, projectile);
 			nextRocketIndex--;
 		}
 		else
@@ -762,26 +766,30 @@ public class MLRS : BaseMountable
 			worldPos.z = Mathf.Clamp(worldPos.z, position.z, vector.z);
 			worldPos.y = GetSurfaceHeight(worldPos);
 		}
-		UserTargetHitPos = worldPos;
-		if (!base.isServer)
+		if (Interface.CallHook("OnMlrsTarget", this, worldPos, _mounted) != null)
 		{
 			return;
 		}
-		trueTargetHitPos = UserTargetHitPos;
-		foreach (TriggerSafeZone allSafeZone in TriggerSafeZone.allSafeZones)
+		UserTargetHitPos = worldPos;
+		if (base.isServer)
 		{
-			Vector3 vector2 = allSafeZone.transform.position + ColliderEx.GetLocalCentre(allSafeZone.triggerCollider);
-			vector2.y = 0f;
-			float num = ColliderEx.GetRadius(allSafeZone.triggerCollider, allSafeZone.transform.localScale) + targetAreaRadius;
-			trueTargetHitPos.y = 0f;
-			if (Vector3.Distance(vector2, trueTargetHitPos) < num)
+			trueTargetHitPos = UserTargetHitPos;
+			foreach (TriggerSafeZone allSafeZone in TriggerSafeZone.allSafeZones)
 			{
-				Vector3 vector3 = trueTargetHitPos - vector2;
-				trueTargetHitPos = vector2 + vector3.normalized * num;
-				trueTargetHitPos.y = GetSurfaceHeight(trueTargetHitPos);
-				break;
+				Vector3 vector2 = allSafeZone.transform.position + ColliderEx.GetLocalCentre(allSafeZone.triggerCollider);
+				vector2.y = 0f;
+				float num = ColliderEx.GetRadius(allSafeZone.triggerCollider, allSafeZone.transform.localScale) + targetAreaRadius;
+				trueTargetHitPos.y = 0f;
+				if (Vector3.Distance(vector2, trueTargetHitPos) < num)
+				{
+					Vector3 vector3 = trueTargetHitPos - vector2;
+					trueTargetHitPos = vector2 + vector3.normalized * num;
+					trueTargetHitPos.y = GetSurfaceHeight(trueTargetHitPos);
+					break;
+				}
 			}
 		}
+		Interface.CallHook("OnMlrsTargetSet", this, trueTargetHitPos, _mounted);
 	}
 
 	public StorageContainer GetRocketContainer()

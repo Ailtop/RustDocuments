@@ -143,15 +143,20 @@ public class MedicalTool : AttackEntity
 
 	public override void ServerUse()
 	{
-		if (!base.isClient)
+		if (base.isClient)
 		{
-			BasePlayer ownerPlayer = GetOwnerPlayer();
-			if (!(ownerPlayer == null) && ownerPlayer.CanInteract() && HasItemAmount())
+			return;
+		}
+		BasePlayer ownerPlayer = GetOwnerPlayer();
+		if (!(ownerPlayer == null) && ownerPlayer.CanInteract() && HasItemAmount())
+		{
+			GiveEffectsTo(ownerPlayer);
+			UseItemAmount(1);
+			StartAttackCooldown(repeatDelay);
+			SignalBroadcast(Signal.Attack, string.Empty);
+			if (ownerPlayer.IsNpc)
 			{
-				GiveEffectsTo(ownerPlayer);
-				UseItemAmount(1);
-				StartAttackCooldown(repeatDelay);
-				SignalBroadcast(Signal.Attack, string.Empty);
+				ownerPlayer.SignalBroadcast(Signal.Attack);
 			}
 		}
 	}

@@ -5,7 +5,7 @@ using Network;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class VehicleModuleSeating : BaseVehicleModule
+public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 {
 	[Serializable]
 	public class MountHotSpot

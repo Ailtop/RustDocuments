@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[796]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[807]
 	{
 		new ConsoleSystem.Command
 		{
@@ -1248,6 +1248,18 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.ignoreplayers = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "killscientists",
+			Parent = "ai",
+			FullName = "ai.killscientists",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.killscientists(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3617,6 +3629,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "debugdismounts",
+			Parent = "debug",
+			FullName = "debug.debugdismounts",
+			ServerAdmin = true,
+			Description = "Shows some debug info for dismount attempts.",
+			Variable = true,
+			GetOveride = () => Debugging.DebugDismounts.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Debugging.DebugDismounts = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "disablecondition",
 			Parent = "debug",
 			FullName = "debug.disablecondition",
@@ -4631,6 +4657,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "breakclothing",
+			Parent = "global",
+			FullName = "global.breakclothing",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.breakclothing(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "breakitem",
 			Parent = "global",
 			FullName = "global.breakitem",
@@ -4863,6 +4901,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "skipassetwarmup",
+			Parent = "global",
+			FullName = "global.skipassetwarmup",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Global.skipassetwarmup.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.skipassetwarmup = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "sleep",
 			Parent = "global",
 			FullName = "global.sleep",
@@ -4883,6 +4934,36 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Global.spectate(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "sprayinauthduration",
+			Parent = "global",
+			FullName = "global.sprayinauthduration",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How long sprays will last when sprayed inside a players TC auth",
+			Variable = true,
+			GetOveride = () => Global.SprayInAuthDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.SprayInAuthDuration = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "spraynoauthduration",
+			Parent = "global",
+			FullName = "global.spraynoauthduration",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How long sprays will last when sprayed outside a players TC auth",
+			Variable = true,
+			GetOveride = () => Global.SprayNoAuthDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.SprayNoAuthDuration = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -4943,6 +5024,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Global.teleport(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "teleport2autheditem",
+			Parent = "global",
+			FullName = "global.teleport2autheditem",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.teleport2autheditem(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -9903,6 +9996,21 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "population",
+			Parent = "polarbear",
+			FullName = "polarbear.population",
+			ServerAdmin = true,
+			Description = "Population active on the server, per square km",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Polarbear.Population.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Polarbear.Population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "reclaim_expire_minutes",
 			Parent = "reclaimmanager",
 			FullName = "reclaimmanager.reclaim_expire_minutes",
@@ -10478,6 +10586,48 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				SlotMachine.ForcePayoutIndex = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "allowpassengeronly",
+			Parent = "snowmobile",
+			FullName = "snowmobile.allowpassengeronly",
+			ServerAdmin = true,
+			Description = "Allow mounting as a passenger when there's no driver",
+			Variable = true,
+			GetOveride = () => Snowmobile.allowPassengerOnly.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Snowmobile.allowPassengerOnly = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "allterrain",
+			Parent = "snowmobile",
+			FullName = "snowmobile.allterrain",
+			ServerAdmin = true,
+			Description = "If true, snowmobile goes fast on all terrain types",
+			Variable = true,
+			GetOveride = () => Snowmobile.allTerrain.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Snowmobile.allTerrain = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "outsidedecayminutes",
+			Parent = "snowmobile",
+			FullName = "snowmobile.outsidedecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a snowmobile loses all its health while outside",
+			Variable = true,
+			GetOveride = () => Snowmobile.outsideDecayMinutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Snowmobile.outsideDecayMinutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

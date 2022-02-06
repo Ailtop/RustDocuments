@@ -168,7 +168,7 @@ public class EntityFuelSystem
 		GetFuelContainer().inventory.AddItem(GetFuelContainer().allowedItem, Mathf.FloorToInt(amount), 0uL);
 	}
 
-	public void AdminFillFuel()
+	public void AdminAddFuel()
 	{
 		GetFuelContainer().inventory.AddItem(GetFuelContainer().allowedItem, GetFuelContainer().allowedItem.stackable, 0uL);
 	}

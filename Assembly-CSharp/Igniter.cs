@@ -38,7 +38,7 @@ public class Igniter : IOEntity
 	private void IgniteInRange()
 	{
 		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
-		Vis.Entities(LineOfSightEyes.position, IgniteRange, obj, 1236478737);
+		Vis.Entities(LineOfSightEyes.position, IgniteRange, obj, 1236495121);
 		int num = 0;
 		foreach (BaseEntity item in obj)
 		{
@@ -57,7 +57,7 @@ public class Igniter : IOEntity
 			}
 			else if (item.isServer && (igniteable = item as IIgniteable) != null && igniteable.CanIgnite())
 			{
-				igniteable.Ignite();
+				igniteable.Ignite(base.transform.position);
 				num++;
 			}
 		}

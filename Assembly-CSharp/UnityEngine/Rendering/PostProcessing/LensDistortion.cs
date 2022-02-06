@@ -44,9 +44,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Space]
 		[Range(0.01f, 5f)]
 		[Tooltip("Global screen scaling.")]
-		[Space]
 		public FloatParameter scale = new FloatParameter
 		{
 			value = 1f

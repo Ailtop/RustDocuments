@@ -22,9 +22,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Range(-9f, 9f)]
 		[DisplayName("Maximum (EV)")]
 		[Tooltip("Maximum average luminance to consider for auto exposure. Unit is EV.")]
-		[Range(-9f, 9f)]
 		public FloatParameter maxLuminance = new FloatParameter
 		{
 			value = 0f

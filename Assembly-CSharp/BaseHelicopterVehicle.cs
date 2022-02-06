@@ -100,20 +100,6 @@ public class BaseHelicopterVehicle : BaseVehicle
 		return 1000f;
 	}
 
-	public override Vector3 GetLocalVelocityServer()
-	{
-		return rigidBody.velocity;
-	}
-
-	public override Quaternion GetAngularVelocityServer()
-	{
-		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
-		{
-			return Quaternion.identity;
-		}
-		return Quaternion.LookRotation(rigidBody.angularVelocity, base.transform.up);
-	}
-
 	public override float MaxVelocity()
 	{
 		return 50f;
@@ -196,14 +182,6 @@ public class BaseHelicopterVehicle : BaseVehicle
 		{
 			bool active = rigidBody.velocity.y < 0f;
 			obj.SetActive(active);
-		}
-	}
-
-	public void OnPhysicsNeighbourChanged()
-	{
-		if (rigidBody != null)
-		{
-			rigidBody.WakeUp();
 		}
 	}
 

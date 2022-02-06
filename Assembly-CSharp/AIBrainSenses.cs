@@ -328,12 +328,8 @@ public class AIBrainSenses
 		BaseEntity result = null;
 		foreach (BaseEntity entity in entities)
 		{
-			if (!(entity == null) && !(entity.Health() <= 0f))
+			if (!(entity == null) && !(entity.Health() <= 0f) && Interface.CallHook("OnNpcTarget", owner, entity) == null)
 			{
-				if (Interface.CallHook("OnNpcTarget", owner, entity) != null)
-				{
-					return null;
-				}
 				float num2 = Vector3.Distance(entity.transform.position, owner.transform.position);
 				if (num2 <= rangeFraction * maxRange && num2 < num)
 				{

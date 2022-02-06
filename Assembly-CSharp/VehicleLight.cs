@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class VehicleLight : MonoBehaviour
+public class VehicleLight : MonoBehaviour, IClientComponent
 {
 	public bool IsBrake;
 
@@ -17,29 +16,4 @@ public class VehicleLight : MonoBehaviour
 
 	[ColorUsage(true, true)]
 	public Color brakesOnColour;
-
-	private static MaterialPropertyBlock materialPB;
-
-	private static int emissionColorID = Shader.PropertyToID("_EmissionColor");
-
-	public static void SetLightVisuals(IReadOnlyList<VehicleLight> lights, bool headlightsOn, bool brakesOn)
-	{
-		if (materialPB == null)
-		{
-			materialPB = new MaterialPropertyBlock();
-		}
-		foreach (VehicleLight light in lights)
-		{
-			if (light.toggleObject != null)
-			{
-				light.toggleObject.SetActive(headlightsOn);
-			}
-			if (light.lightRenderer != null)
-			{
-				Color value = (headlightsOn ? light.lightOnColour : ((!(light.IsBrake && brakesOn)) ? Color.black : light.brakesOnColour));
-				materialPB.SetColor(emissionColorID, value);
-				light.lightRenderer.SetPropertyBlock(materialPB, light.lightRendererMaterialIndex);
-			}
-		}
-	}
 }

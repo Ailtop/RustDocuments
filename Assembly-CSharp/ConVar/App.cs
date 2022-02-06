@@ -56,13 +56,13 @@ namespace ConVar
 		[ServerVar]
 		public static void info(Arg arg)
 		{
-			Listener listener = CompanionServer.Server.Listener;
-			if (listener == null)
+			if (!CompanionServer.Server.IsEnabled)
 			{
 				arg.ReplyWith("Companion server is not enabled");
 				return;
 			}
-			arg.ReplyWith($"Listening on: {listener.Address}:{listener.Port}\nApp connects to: {GetPublicIP()}:{port}");
+			Listener listener = CompanionServer.Server.Listener;
+			arg.ReplyWith($"Server ID: {serverid}\nListening on: {listener.Address}:{listener.Port}\nApp connects to: {GetPublicIP()}:{port}");
 		}
 
 		[ServerVar]

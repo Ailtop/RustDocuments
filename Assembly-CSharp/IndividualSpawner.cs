@@ -14,11 +14,11 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 
 	[Tooltip("Simply spawns the entity once. No respawning. Entity can be saved if desired.")]
 	[SerializeField]
-	private bool oneTimeSpawner;
+	public bool oneTimeSpawner;
 
-	private SpawnPointInstance spawnInstance;
+	public SpawnPointInstance spawnInstance;
 
-	private float nextSpawnTime = -1f;
+	public float nextSpawnTime = -1f;
 
 	public int currentPopulation
 	{
@@ -32,7 +32,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		}
 	}
 
-	private bool IsSpawned => spawnInstance != null;
+	public bool IsSpawned => spawnInstance != null;
 
 	protected void Awake()
 	{
@@ -110,7 +110,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		return SingletonComponent<SpawnHandler>.Instance.CheckBounds(entityPrefab.Get(), base.transform.position, base.transform.rotation, Vector3.one);
 	}
 
-	private void TrySpawnEntity()
+	public void TrySpawnEntity()
 	{
 		if (IsSpawned)
 		{
@@ -140,7 +140,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		}
 	}
 
-	private bool TryGetEntityBounds(out Bounds result)
+	public bool TryGetEntityBounds(out Bounds result)
 	{
 		if (entityPrefab != null)
 		{

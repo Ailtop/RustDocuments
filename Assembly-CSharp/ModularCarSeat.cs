@@ -1,11 +1,8 @@
 using Oxide.Core;
 using UnityEngine;
 
-public class ModularCarSeat : BaseVehicleSeat
+public class ModularCarSeat : MouseSteerableSeat
 {
-	[SerializeField]
-	private bool supportsMouseSteer;
-
 	[SerializeField]
 	public Vector3 leftFootIKPos;
 

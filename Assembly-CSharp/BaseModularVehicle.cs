@@ -6,7 +6,7 @@ using ProtoBuf;
 using Rust.Modular;
 using UnityEngine;
 
-public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMoveFrom, IPrefabPreProcess
+public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMoveFrom, IPrefabPreProcess
 {
 	public bool inEditableLocation;
 
@@ -68,23 +68,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 
 	public float TotalMass { get; set; }
 
-	public Vector3 Velocity { get; set; }
-
-	public bool LightsAreOn => HasFlag(Flags.Reserved5);
-
 	public bool IsKinematic => HasFlag(Flags.Reserved6);
-
-	public bool IsMovingOrOn
-	{
-		get
-		{
-			if (IsStationary())
-			{
-				return IsOn();
-			}
-			return true;
-		}
-	}
 
 	public virtual bool IsLockable => false;
 
@@ -157,20 +141,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		return Mathf.Max(GetMaxForwardSpeed() * 1.3f, 30f);
 	}
 
-	public override Vector3 GetLocalVelocityServer()
-	{
-		return rigidBody.velocity;
-	}
-
-	public override Quaternion GetAngularVelocityServer()
-	{
-		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
-		{
-			return Quaternion.identity;
-		}
-		return Quaternion.LookRotation(rigidBody.angularVelocity, base.transform.up);
-	}
-
 	public abstract bool IsComplete();
 
 	public bool CouldBeEdited()
@@ -202,19 +172,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 			SendNetworkUpdate();
 			prevEditable = IsEditableNow;
 		}
-		if (IsMovingOrOn)
-		{
-			Velocity = GetLocalVelocity();
-		}
-		else
-		{
-			Velocity = Vector3.zero;
-		}
 		SetFlag(Flags.Reserved6, rigidBody.isKinematic);
-		if (LightsAreOn && !AnyMounted())
-		{
-			SetLightsState(false);
-		}
 	}
 
 	public override bool MountEligable(BasePlayer player)
@@ -227,7 +185,7 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		{
 			return false;
 		}
-		if (HasDriver() && Velocity.magnitude >= 2f)
+		if (HasDriver() && base.Velocity.magnitude >= 2f)
 		{
 			return false;
 		}
@@ -239,14 +197,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 		base.Save(info);
 		info.msg.modularVehicle = Pool.Get<ModularVehicle>();
 		info.msg.modularVehicle.editable = IsEditableNow;
-	}
-
-	public override void LightToggle(BasePlayer player)
-	{
-		if (IsDriver(player))
-		{
-			SetLightsState(!LightsAreOn);
-		}
 	}
 
 	public bool CanMoveFrom(BasePlayer player, Item item)
@@ -269,19 +219,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 	}
 
 	protected abstract Vector3 GetCOMMultiplier();
-
-	public void OnPhysicsNeighbourChanged()
-	{
-		if (rigidBody != null)
-		{
-			rigidBody.WakeUp();
-		}
-	}
-
-	public void SetLightsState(bool on)
-	{
-		SetFlag(Flags.Reserved5, on);
-	}
 
 	public abstract void ModuleHurt(BaseVehicleModule hurtModule, HitInfo info);
 
@@ -433,17 +370,6 @@ public abstract class BaseModularVehicle : BaseVehicle, PlayerInventory.ICanMove
 			mass = component.mass;
 		}
 	}
-
-	public float GetSpeed()
-	{
-		if (IsStationary())
-		{
-			return 0f;
-		}
-		return Vector3.Dot(Velocity, base.transform.forward);
-	}
-
-	public abstract float GetMaxForwardSpeed();
 
 	public virtual bool PlayerCanUseThis(BasePlayer player, ModularCarLock.LockType lockType)
 	{

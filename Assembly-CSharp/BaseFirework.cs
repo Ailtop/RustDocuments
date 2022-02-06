@@ -88,7 +88,7 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 		}
 	}
 
-	public void Ignite()
+	public void Ignite(Vector3 fromPos)
 	{
 		StaggeredTryLightFuse();
 	}

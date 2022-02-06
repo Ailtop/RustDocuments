@@ -16,7 +16,7 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 
 	public readonly float engineStartupTime;
 
-	private readonly Transform waterloggedPoint;
+	public readonly Transform waterloggedPoint;
 
 	public readonly BaseEntity.Flags engineStartingFlag;
 

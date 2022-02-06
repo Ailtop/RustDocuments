@@ -101,7 +101,7 @@ public class BaseCrane : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser
 
 	public float GetPlayerDamageMultiplier()
 	{
-		return Mathf.Abs(GetWorldVelocity().magnitude) * 60f;
+		return Mathf.Abs(GetLocalVelocity().magnitude) * 60f;
 	}
 
 	public void OnHurtTriggerOccupant(BaseEntity hurtEntity, DamageType damageType, float damageTotal)

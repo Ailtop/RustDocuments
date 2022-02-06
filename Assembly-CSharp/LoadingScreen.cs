@@ -12,6 +12,8 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 
 	public Button skipButton;
 
+	public Button cancelButton;
+
 	public GameObject performanceWarning;
 
 	public AudioSource music;

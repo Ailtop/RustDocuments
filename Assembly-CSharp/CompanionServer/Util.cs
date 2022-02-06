@@ -77,7 +77,7 @@ namespace CompanionServer
 
 		public static Task<NotificationSendResult> SendPairNotification(string type, BasePlayer player, string title, string message, Dictionary<string, string> data)
 		{
-			if (App.port < 0)
+			if (!Server.IsEnabled)
 			{
 				return Task.FromResult(NotificationSendResult.Disabled);
 			}

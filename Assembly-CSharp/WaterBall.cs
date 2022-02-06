@@ -38,7 +38,7 @@ public class WaterBall : BaseEntity
 	public static bool DoSplash(Vector3 position, float radius, ItemDefinition liquidDef, int amount)
 	{
 		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
-		Vis.Entities(position, radius, obj, 1219701521);
+		Vis.Entities(position, radius, obj, 1219701523);
 		int num = 0;
 		int num2 = amount;
 		while (amount > 0 && num < 3)

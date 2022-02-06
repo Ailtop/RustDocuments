@@ -242,6 +242,16 @@ namespace ConVar
 			args.ReplyWith("Animal: " + AnimalBrain.Count + ". Scientist: " + ScientistBrain.Count + ". Pet: " + PetBrain.Count + ". Total: " + (AnimalBrain.Count + ScientistBrain.Count + PetBrain.Count));
 		}
 
+		[ServerVar]
+		public static void killscientists(Arg args)
+		{
+			ScientistNPC[] array = BaseEntity.Util.FindScientists();
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].Kill();
+			}
+		}
+
 		public static float TickDelta()
 		{
 			return 1f / tickrate;

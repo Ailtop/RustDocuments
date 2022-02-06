@@ -46,6 +46,8 @@ public class BuildingPrivlidge : StorageContainer
 
 	public const Flags Flag_MaxAuths = Flags.Reserved5;
 
+	public List<ItemDefinition> allowedConstructionItems = new List<ItemDefinition>();
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BuildingPrivlidge.OnRpcMessage"))
@@ -492,6 +494,26 @@ public class BuildingPrivlidge : StorageContainer
 
 	public override bool ItemFilter(Item item, int targetSlot)
 	{
+		bool flag = allowedConstructionItems.Contains(item.info);
+		if (!flag && targetSlot == -1)
+		{
+			int num = 0;
+			foreach (Item item2 in base.inventory.itemList)
+			{
+				if (!allowedConstructionItems.Contains(item2.info) && (item2.info != item.info || item2.amount == item2.MaxStackable()))
+				{
+					num++;
+				}
+			}
+			if (num >= 24)
+			{
+				return false;
+			}
+		}
+		if (targetSlot >= 24 && targetSlot <= 27)
+		{
+			return flag;
+		}
 		return base.ItemFilter(item, targetSlot);
 	}
 

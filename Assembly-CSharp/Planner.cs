@@ -113,43 +113,39 @@ public class Planner : HeldEntity
 			return;
 		}
 		Construction.Target target = default(Construction.Target);
-		BaseEntity baseEntity = null;
 		if (msg.entity != 0)
 		{
-			baseEntity = BaseNetworkable.serverEntities.Find(msg.entity) as BaseEntity;
-			if (!baseEntity)
+			target.entity = BaseNetworkable.serverEntities.Find(msg.entity) as BaseEntity;
+			if (target.entity == null)
 			{
 				ownerPlayer.ChatMessage("Couldn't find entity " + msg.entity);
 				return;
 			}
-			msg.position = baseEntity.transform.TransformPoint(msg.position);
-			msg.normal = baseEntity.transform.TransformDirection(msg.normal);
-			msg.rotation = baseEntity.transform.rotation * msg.rotation;
-			if (msg.socket == 0)
+			msg.position = target.entity.transform.TransformPoint(msg.position);
+			msg.normal = target.entity.transform.TransformDirection(msg.normal);
+			msg.rotation = target.entity.transform.rotation * msg.rotation;
+			if ((bool)deployable && deployable.setSocketParent && target.entity.Distance(msg.position) > 1f)
 			{
-				if ((bool)deployable && deployable.setSocketParent && baseEntity.Distance(msg.position) > 1f)
-				{
-					ownerPlayer.ChatMessage("Parent too far away: " + baseEntity.Distance(msg.position));
-					return;
-				}
-				if (baseEntity is Door)
-				{
-					ownerPlayer.ChatMessage("Can't deploy on door");
-					return;
-				}
+				ownerPlayer.ChatMessage("Parent too far away: " + target.entity.Distance(msg.position));
+				return;
 			}
-			target.entity = baseEntity;
 			if (msg.socket != 0)
 			{
 				string text = StringPool.Get(msg.socket);
-				if (text != "" && target.entity != null)
+				if (text != "")
 				{
 					target.socket = FindSocket(text, target.entity.prefabID);
 				}
-				else
+				if (target.socket == null)
 				{
-					ownerPlayer.ChatMessage("Invalid Socket!");
+					ownerPlayer.ChatMessage("Couldn't find socket " + msg.socket);
+					return;
 				}
+			}
+			else if (target.entity is Door)
+			{
+				ownerPlayer.ChatMessage("Can't deploy on door");
+				return;
 			}
 		}
 		target.ray = msg.ray;

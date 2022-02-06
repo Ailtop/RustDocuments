@@ -119,7 +119,7 @@ namespace CompanionServer
 
 		private static async Task<NotificationSendResult> SendNotificationImpl(ICollection<ulong> steamIds, NotificationChannel channel, string title, string body, Dictionary<string, string> data)
 		{
-			if (string.IsNullOrEmpty(App.serverid) || App.port < 0 || !App.notifications)
+			if (!Server.IsEnabled || !App.notifications)
 			{
 				return NotificationSendResult.Disabled;
 			}

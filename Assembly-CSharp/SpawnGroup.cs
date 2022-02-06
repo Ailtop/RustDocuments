@@ -39,11 +39,13 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public bool preventDuplicates;
 
-	protected bool fillOnSpawn;
+	public BoxCollider setFreeIfMovedBeyond;
+
+	public bool fillOnSpawn;
 
 	public BaseSpawnPoint[] spawnPoints;
 
-	private List<SpawnPointInstance> spawnInstances = new List<SpawnPointInstance>();
+	public List<SpawnPointInstance> spawnInstances = new List<SpawnPointInstance>();
 
 	public LocalClock spawnClock = new LocalClock();
 
@@ -103,10 +105,15 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public void Clear()
 	{
-		foreach (SpawnPointInstance spawnInstance in spawnInstances)
+		for (int num = spawnInstances.Count - 1; num >= 0; num--)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(spawnInstance.gameObject);
-			if ((bool)baseEntity)
+			SpawnPointInstance spawnPointInstance = spawnInstances[num];
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(spawnPointInstance.gameObject);
+			if (setFreeIfMovedBeyond != null && !setFreeIfMovedBeyond.bounds.Contains(baseEntity.transform.position))
+			{
+				spawnPointInstance.Retire();
+			}
+			else if ((bool)baseEntity)
 			{
 				baseEntity.Kill();
 			}

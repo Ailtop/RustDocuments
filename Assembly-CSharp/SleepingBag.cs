@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using ConVar;
 using Facepunch;
 using Network;
@@ -445,6 +446,16 @@ public class SleepingBag : DecayEntity
 	public virtual bool IsOccupied()
 	{
 		return false;
+	}
+
+	public override string Admin_Who()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendLine(base.Admin_Who());
+		stringBuilder.AppendLine($"Assigned bag ID: {deployerUserID}");
+		stringBuilder.AppendLine("Assigned player name: " + Admin.GetPlayerName(deployerUserID));
+		stringBuilder.AppendLine("Bag Name:" + niceName);
+		return stringBuilder.ToString();
 	}
 
 	public override void Load(LoadInfo info)

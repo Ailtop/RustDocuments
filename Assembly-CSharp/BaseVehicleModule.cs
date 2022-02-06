@@ -217,12 +217,6 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		PropagateDamage = true;
 	}
 
-	public virtual void AdminFixUp(int tier)
-	{
-		SetHealth(MaxHealth());
-		SendNetworkUpdate();
-	}
-
 	public override void Die(HitInfo info = null)
 	{
 	}
@@ -346,7 +340,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		RefreshConditionals(false);
 	}
 
-	public virtual void OnEngineStateChanged(VehicleEngineController<ModularCar>.EngineState oldState, VehicleEngineController<ModularCar>.EngineState newState)
+	public virtual void OnEngineStateChanged(VehicleEngineController<GroundVehicle>.EngineState oldState, VehicleEngineController<GroundVehicle>.EngineState newState)
 	{
 	}
 

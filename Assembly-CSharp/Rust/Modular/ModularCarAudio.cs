@@ -2,28 +2,9 @@ using UnityEngine;
 
 namespace Rust.Modular
 {
-	public class ModularCarAudio : MonoBehaviour
+	public class ModularCarAudio : GroundVehicleAudio
 	{
 		public bool showDebug;
-
-		[SerializeField]
-		private ModularCar modularCar;
-
-		[SerializeField]
-		private ModularCarChassisVisuals chassisVisuals;
-
-		[Header("Engine")]
-		[SerializeField]
-		private SoundDefinition engineStartSound;
-
-		[SerializeField]
-		private SoundDefinition engineStopSound;
-
-		[SerializeField]
-		private SoundDefinition engineStartFailSound;
-
-		[SerializeField]
-		private BlendedLoopEngineSound blendedEngineLoops;
 
 		[Header("Skid")]
 		[SerializeField]
@@ -71,24 +52,6 @@ namespace Rust.Modular
 
 		[SerializeField]
 		private float suspensionLurchMinTimeBetweenSounds = 0.25f;
-
-		[Header("Water")]
-		[SerializeField]
-		private SoundDefinition waterSplashSoundDef;
-
-		[SerializeField]
-		private BlendedSoundLoops waterLoops;
-
-		[SerializeField]
-		private float waterSoundsMaxSpeed = 10f;
-
-		[Header("Brakes")]
-		[SerializeField]
-		private SoundDefinition brakeSoundDef;
-
-		[Header("Lights")]
-		[SerializeField]
-		private SoundDefinition lightsToggleSound;
 
 		[Header("Wheels")]
 		[SerializeField]

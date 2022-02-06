@@ -24,6 +24,8 @@ public class Item
 		Cooking = 0x10
 	}
 
+	private static string DefaultArmourBreakEffectPath = string.Empty;
+
 	public float _condition;
 
 	public float _maxCondition = 100f;
@@ -306,10 +308,25 @@ public class Item
 			baseEntity.SetFlag(BaseEntity.Flags.Broken, true);
 		}
 		BasePlayer ownerPlayer = GetOwnerPlayer();
-		if ((bool)ownerPlayer && ownerPlayer.GetActiveItem() == this)
+		if ((bool)ownerPlayer)
 		{
-			Effect.server.Run("assets/bundled/prefabs/fx/item_break.prefab", ownerPlayer, 0u, Vector3.zero, Vector3.zero);
-			ownerPlayer.ChatMessage("Your active item was broken!");
+			if (ownerPlayer.GetActiveItem() == this)
+			{
+				Effect.server.Run("assets/bundled/prefabs/fx/item_break.prefab", ownerPlayer, 0u, Vector3.zero, Vector3.zero);
+				ownerPlayer.ChatMessage("Your active item was broken!");
+			}
+			ItemModWearable component;
+			if (info.TryGetComponent<ItemModWearable>(out component) && ownerPlayer.inventory.containerWear.itemList.Contains(this))
+			{
+				if (component.breakEffect.isValid)
+				{
+					Effect.server.Run(component.breakEffect.resourcePath, ownerPlayer, 0u, Vector3.zero, Vector3.zero);
+				}
+				else if (!string.IsNullOrEmpty(DefaultArmourBreakEffectPath))
+				{
+					Effect.server.Run(DefaultArmourBreakEffectPath, ownerPlayer, 0u, Vector3.zero, Vector3.zero);
+				}
+			}
 		}
 		if ((!info.condition.repairable && !info.GetComponent<ItemModRepair>()) || maxCondition <= 5f)
 		{

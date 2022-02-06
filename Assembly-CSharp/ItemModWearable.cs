@@ -31,6 +31,8 @@ public class ItemModWearable : ItemMod
 
 	public bool npcOnly;
 
+	public GameObjectRef breakEffect = new GameObjectRef();
+
 	public GameObjectRef viewmodelAddition;
 
 	public Wearable targetWearable

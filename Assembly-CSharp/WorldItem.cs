@@ -228,7 +228,7 @@ public class WorldItem : BaseEntity
 		{
 			if (base.isServer)
 			{
-				_name = string.Format("{1}[{0}] {2}", (net != null) ? net.ID : 0u, base.ShortPrefabName, base.name);
+				_name = string.Format("{1}[{0}] {2}", (net != null) ? net.ID : 0u, base.ShortPrefabName, ObjectEx.IsUnityNull(this) ? "NULL" : base.name);
 			}
 			else
 			{

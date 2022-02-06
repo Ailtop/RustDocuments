@@ -107,10 +107,7 @@ public class NPCPlayer : BasePlayer
 		randomOffset = UnityEngine.Random.Range(0f, 1f);
 		base.ServerInit();
 		UpdateNetworkGroup();
-		if (loadouts != null && loadouts.Length != 0)
-		{
-			loadouts[UnityEngine.Random.Range(0, loadouts.Length)].GiveToPlayer(this);
-		}
+		EquipLoadout(loadouts);
 		if (!IsLoadBalanced())
 		{
 			InvokeRepeating(ServerThink_Internal, 0f, 0.1f);
@@ -132,6 +129,14 @@ public class NPCPlayer : BasePlayer
 			}
 		}
 		InvokeRandomized(TickMovement, 1f, PositionTickRate, PositionTickRate * 0.1f);
+	}
+
+	public void EquipLoadout(PlayerInventoryProperties[] loads)
+	{
+		if (loads != null && loads.Length != 0)
+		{
+			loads[UnityEngine.Random.Range(0, loads.Length)].GiveToPlayer(this);
+		}
 	}
 
 	public override void ApplyInheritedVelocity(Vector3 velocity)

@@ -187,9 +187,9 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(5f)]
-	[RPC_Server]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))
@@ -229,6 +229,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
 		}
 		SendNetworkUpdate();
+		Interface.CallHook("OnSignUpdated", this, msg.player);
 	}
 
 	public void EnsureInitialized()

@@ -79,12 +79,11 @@ public class VehicleSpawner : BaseEntity
 		BaseEntity baseEntity = GameManager.server.CreateEntity(prefabToSpawn, spawnOffset.transform.position, spawnOffset.transform.rotation);
 		baseEntity.Spawn();
 		BaseVehicle component = baseEntity.GetComponent<BaseVehicle>();
-		EntityFuelSystem fuelSystem = component.GetFuelSystem();
 		if (newOwner != null)
 		{
 			component.SetupOwner(newOwner, spawnOffset.transform.position, safeRadius);
 		}
-		fuelSystem?.AddStartingFuel(component.StartingFuelUnits());
+		VehicleSpawnPoint.AddStartingFuel(component);
 		return component;
 	}
 

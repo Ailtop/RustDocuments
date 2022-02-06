@@ -305,16 +305,12 @@ public class CodeLock : BaseLock
 		}
 		string text = rpc.read.String();
 		bool flag = rpc.read.Bit();
-		if (IsLocked() || text.Length != 4 || !text.IsNumeric() || (!hasCode && flag))
+		if (!IsLocked() && text.Length == 4 && text.IsNumeric() && !(!hasCode && flag) && Interface.CallHook("CanChangeCode", rpc.player, this, text, flag) == null)
 		{
-			return;
-		}
-		if (!hasCode && !flag)
-		{
-			SetFlag(Flags.Locked, true);
-		}
-		if (Interface.CallHook("CanChangeCode", rpc.player, this, text, flag) == null)
-		{
+			if (!hasCode && !flag)
+			{
+				SetFlag(Flags.Locked, true);
+			}
 			if (!flag)
 			{
 				code = text;

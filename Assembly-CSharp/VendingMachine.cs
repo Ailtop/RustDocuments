@@ -589,9 +589,9 @@ public class VendingMachine : StorageContainer
 		ClientRPC(null, "CLIENT_CancelVendingSounds");
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))
@@ -655,7 +655,7 @@ public class VendingMachine : StorageContainer
 		{
 			return false;
 		}
-		object obj = Interface.CallHook("OnVendingTransaction", this, buyer, sellOrderId, numberOfTransactions);
+		object obj = Interface.CallHook("OnVendingTransaction", this, buyer, sellOrderId, numberOfTransactions, targetContainer);
 		if (obj is bool)
 		{
 			return (bool)obj;

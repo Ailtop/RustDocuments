@@ -58,12 +58,12 @@ namespace ConVar
 			}
 			int @int = arg.GetInt(0, 2);
 			@int = Mathf.Clamp(@int, 1, 3);
-			ModularCar[] array = Object.FindObjectsOfType<ModularCar>();
+			BaseVehicle[] array = Object.FindObjectsOfType<BaseVehicle>();
 			int num = 0;
-			ModularCar[] array2 = array;
-			foreach (ModularCar modularCar in array2)
+			BaseVehicle[] array2 = array;
+			foreach (BaseVehicle baseVehicle in array2)
 			{
-				if (modularCar.isServer && Vector3.Distance(modularCar.transform.position, basePlayer.transform.position) <= 5f && modularCar.AdminFixUp(@int))
+				if (baseVehicle.isServer && Vector3.Distance(baseVehicle.transform.position, basePlayer.transform.position) <= 5f && baseVehicle.AdminFixUp(@int))
 				{
 					num++;
 				}

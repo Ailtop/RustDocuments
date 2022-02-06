@@ -17,6 +17,22 @@ public class NPCSpawner : SpawnGroup
 
 	public BasePath AStarGraph;
 
+	[Header("Human Stat Replacements")]
+	public bool UseStatModifiers;
+
+	public float SenseRange = 30f;
+
+	public float TargetLostRange = 50f;
+
+	public float AttackRangeMultiplier = 1f;
+
+	public float ListenRange = 10f;
+
+	public float CanUseHealingItemsChance;
+
+	[Header("Loadout Replacements")]
+	public PlayerInventoryProperties[] Loadouts;
+
 	public override void SpawnInitial()
 	{
 		fillOnSpawn = shouldFillOnSpawn;
@@ -65,6 +81,15 @@ public class NPCSpawner : SpawnGroup
 		{
 			humanNPC.AdditionalLosBlockingLayer = AdditionalLOSBlockingLayer;
 		}
+		HumanNPC humanNPC2 = entity as HumanNPC;
+		if (humanNPC2 != null)
+		{
+			if (Loadouts != null && Loadouts.Length != 0)
+			{
+				humanNPC2.EquipLoadout(Loadouts);
+			}
+			ModifyHumanBrainStats(humanNPC2.Brain);
+		}
 		if (VirtualInfoZone != null)
 		{
 			if (VirtualInfoZone.Virtual)
@@ -73,7 +98,6 @@ public class NPCSpawner : SpawnGroup
 				if (nPCPlayer != null)
 				{
 					nPCPlayer.VirtualInfoZone = VirtualInfoZone;
-					HumanNPC humanNPC2 = nPCPlayer as HumanNPC;
 					if (humanNPC2 != null)
 					{
 						humanNPC2.VirtualInfoZone.RegisterSleepableEntity(humanNPC2.Brain);
@@ -89,6 +113,21 @@ public class NPCSpawner : SpawnGroup
 		{
 			component.Path = Path;
 			component.AStarGraph = AStarGraph;
+		}
+	}
+
+	private void ModifyHumanBrainStats(BaseAIBrain<HumanNPC> brain)
+	{
+		if (UseStatModifiers && !(brain == null))
+		{
+			brain.SenseRange = SenseRange;
+			brain.TargetLostRange *= TargetLostRange;
+			brain.AttackRangeMultiplier = AttackRangeMultiplier;
+			brain.ListenRange = ListenRange;
+			if (CanUseHealingItemsChance > 0f)
+			{
+				brain.CanUseHealingItems = Random.Range(0f, 1f) <= CanUseHealingItemsChance;
+			}
 		}
 	}
 }

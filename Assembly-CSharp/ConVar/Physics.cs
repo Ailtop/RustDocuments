@@ -78,7 +78,7 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
+		[ClientVar(ClientAdmin = true)]
 		[ServerVar(Help = "The amount of physics steps per second")]
 		public static float steps
 		{
@@ -100,7 +100,7 @@ namespace ConVar
 			}
 		}
 
-		[ClientVar]
+		[ClientVar(ClientAdmin = true)]
 		[ServerVar(Help = "The slowest physics steps will operate")]
 		public static float minsteps
 		{

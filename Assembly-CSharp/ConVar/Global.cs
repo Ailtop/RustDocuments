@@ -19,6 +19,10 @@ namespace ConVar
 
 		[ServerVar]
 		[ClientVar]
+		public static bool skipassetwarmup = false;
+
+		[ServerVar]
+		[ClientVar]
 		public static int maxthreads = 8;
 
 		[ServerVar(Saved = true)]
@@ -30,6 +34,12 @@ namespace ConVar
 
 		[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 		public static bool specnet = false;
+
+		[ServerVar(Saved = true, Help = "How long sprays will last when sprayed inside a players TC auth")]
+		public static float SprayInAuthDuration = 30f;
+
+		[ServerVar(Saved = true, Help = "How long sprays will last when sprayed outside a players TC auth")]
+		public static float SprayNoAuthDuration = 30f;
 
 		[ServerVar]
 		[ClientVar]
@@ -466,6 +476,33 @@ namespace ConVar
 		}
 
 		[ServerVar]
+		public static void teleport2autheditem(Arg arg)
+		{
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			BasePlayer playerOrSleeper = ArgEx.GetPlayerOrSleeper(arg, 0);
+			ulong result;
+			if (playerOrSleeper != null)
+			{
+				result = playerOrSleeper.userID;
+			}
+			else if (!ulong.TryParse(arg.GetString(0), out result))
+			{
+				arg.ReplyWith("No player with that id found");
+				return;
+			}
+			string @string = arg.GetString(1);
+			BaseEntity[] array = BaseEntity.Util.FindTargetsAuthedTo(result, @string);
+			if (array.Length == 0)
+			{
+				arg.ReplyWith("No targets found");
+				return;
+			}
+			int num = UnityEngine.Random.Range(0, array.Length);
+			arg.ReplyWith($"Teleporting to {array[num].ShortPrefabName} at {array[num].transform.position}");
+			basePlayer.Teleport(array[num].transform.position);
+		}
+
+		[ServerVar]
 		public static void teleport2marker(Arg arg)
 		{
 			BasePlayer basePlayer = ArgEx.Player(arg);
@@ -533,6 +570,20 @@ namespace ConVar
 			{
 				Item activeItem = basePlayer.GetActiveItem();
 				activeItem?.LoseCondition(activeItem.condition);
+			}
+		}
+
+		[ServerVar]
+		public static void breakclothing(Arg args)
+		{
+			BasePlayer basePlayer = ArgEx.Player(args);
+			if (!basePlayer)
+			{
+				return;
+			}
+			foreach (Item item in basePlayer.inventory.containerWear.itemList)
+			{
+				item?.LoseCondition(item.condition);
 			}
 		}
 

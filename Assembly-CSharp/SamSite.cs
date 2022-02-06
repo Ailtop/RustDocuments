@@ -1,8 +1,13 @@
+#define UNITY_ASSERTIONS
+using System;
 using System.Collections.Generic;
+using ConVar;
 using Facepunch;
+using Network;
 using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class SamSite : ContainerIOEntity
 {
@@ -86,6 +91,10 @@ public class SamSite : ContainerIOEntity
 
 	public float pitchGainMovementSpeedMult = 0.5f;
 
+	public int lowAmmoThreshold = 5;
+
+	public Flags Flag_DefenderMode = Flags.Reserved9;
+
 	public static SamTargetType targetTypeUnknown;
 
 	public static SamTargetType targetTypeVehicle;
@@ -102,11 +111,61 @@ public class SamSite : ContainerIOEntity
 
 	public float lastTargetVisibleTime;
 
+	private int lastAmmoCount;
+
 	public int currentTubeIndex;
 
 	private int firedCount;
 
 	public float nextBurstTime;
+
+	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
+	{
+		using (TimeWarning.New("SamSite.OnRpcMessage"))
+		{
+			if (rpc == 3160662357u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ToggleDefenderMode "));
+				}
+				using (TimeWarning.New("ToggleDefenderMode"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(3160662357u, "ToggleDefenderMode", this, player, 1uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.IsVisible.Test(3160662357u, "ToggleDefenderMode", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							ToggleDefenderMode(msg2);
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in ToggleDefenderMode");
+					}
+				}
+				return true;
+			}
+		}
+		return base.OnRpcMessage(player, rpc, msg);
+	}
 
 	public override bool IsPowered()
 	{
@@ -122,6 +181,11 @@ public class SamSite : ContainerIOEntity
 		return 25;
 	}
 
+	public bool IsInDefenderMode()
+	{
+		return HasFlag(Flag_DefenderMode);
+	}
+
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
@@ -129,10 +193,24 @@ public class SamSite : ContainerIOEntity
 
 	public void SetTarget(ISamSiteTarget target)
 	{
+		bool num = currentTarget != target;
 		currentTarget = target;
 		if (!ObjectEx.IsUnityNull(target))
 		{
 			mostRecentTargetType = target.SAMTargetType;
+		}
+		if (num)
+		{
+			MarkIODirty();
+		}
+	}
+
+	private void MarkIODirty()
+	{
+		if (!staticRespawn)
+		{
+			lastPassthroughEnergy = -1;
+			MarkDirtyForceUpdateOutputs();
 		}
 	}
 
@@ -151,12 +229,25 @@ public class SamSite : ContainerIOEntity
 		ClearTarget();
 		InvokeRandomized(TargetScan, 1f, 3f, 1f);
 		currentAimDir = base.transform.forward;
+		if (base.inventory != null && !staticRespawn)
+		{
+			base.inventory.onItemAddedRemoved = OnItemAddedRemoved;
+		}
+	}
+
+	private void OnItemAddedRemoved(Item arg1, bool arg2)
+	{
+		EnsureReloaded();
+		if (IsPowered())
+		{
+			MarkIODirty();
+		}
 	}
 
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
-		info.msg.samSite = Pool.Get<SAMSite>();
+		info.msg.samSite = Facepunch.Pool.Get<SAMSite>();
 		info.msg.samSite.aimDir = GetAimDir();
 	}
 
@@ -208,7 +299,7 @@ public class SamSite : ContainerIOEntity
 			a = vector2 + currentTarget.GetWorldVelocity() * num3;
 			if (currentTarget.GetWorldVelocity().magnitude > 0.1f)
 			{
-				float num4 = Mathf.Sin(Time.time * 3f) * (1f + num3 * 0.5f);
+				float num4 = Mathf.Sin(UnityEngine.Time.time * 3f) * (1f + num3 * 0.5f);
 				a += currentTarget.GetWorldVelocity().normalized * num4;
 			}
 			currentAimDir = (a - eyePoint.transform.position).normalized;
@@ -243,6 +334,10 @@ public class SamSite : ContainerIOEntity
 
 	public override bool CanPickup(BasePlayer player)
 	{
+		if (!base.CanPickup(player))
+		{
+			return false;
+		}
 		if (base.isServer && pickup.requireEmptyInv && base.inventory != null && base.inventory.itemList.Count > 0)
 		{
 			return false;
@@ -257,19 +352,33 @@ public class SamSite : ContainerIOEntity
 			lastTargetVisibleTime = 0f;
 			return;
 		}
-		if (Time.time > lastTargetVisibleTime + 3f)
+		if (UnityEngine.Time.time > lastTargetVisibleTime + 3f)
 		{
 			ClearTarget();
+		}
+		if (!staticRespawn)
+		{
+			int num = ((ammoItem != null && ammoItem.parent == base.inventory) ? ammoItem.amount : 0);
+			bool flag = lastAmmoCount < lowAmmoThreshold;
+			bool flag2 = num < lowAmmoThreshold;
+			if (num != lastAmmoCount && flag != flag2)
+			{
+				MarkIODirty();
+			}
+			lastAmmoCount = num;
 		}
 		if (HasValidTarget() || IsDead())
 		{
 			return;
 		}
-		List<ISamSiteTarget> obj = Pool.GetList<ISamSiteTarget>();
+		List<ISamSiteTarget> obj = Facepunch.Pool.GetList<ISamSiteTarget>();
 		if (Interface.CallHook("OnSamSiteTargetScan", this, obj) == null)
 		{
-			_003CTargetScan_003Eg__AddTargetSet_007C48_0(obj, 32768, targetTypeVehicle.scanRadius);
-			_003CTargetScan_003Eg__AddTargetSet_007C48_0(obj, 1048576, targetTypeMissile.scanRadius);
+			if (!IsInDefenderMode())
+			{
+				_003CTargetScan_003Eg__AddTargetSet_007C55_0(obj, 32768, targetTypeVehicle.scanRadius);
+			}
+			_003CTargetScan_003Eg__AddTargetSet_007C55_0(obj, 1048576, targetTypeMissile.scanRadius);
 		}
 		ISamSiteTarget samSiteTarget = null;
 		foreach (ISamSiteTarget item in obj)
@@ -282,14 +391,14 @@ public class SamSite : ContainerIOEntity
 		}
 		if (!ObjectEx.IsUnityNull(samSiteTarget) && currentTarget != samSiteTarget)
 		{
-			lockOnTime = Time.time + 0.5f;
+			lockOnTime = UnityEngine.Time.time + 0.5f;
 		}
 		SetTarget(samSiteTarget);
 		if (!ObjectEx.IsUnityNull(currentTarget))
 		{
-			lastTargetVisibleTime = Time.time;
+			lastTargetVisibleTime = UnityEngine.Time.time;
 		}
-		Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj);
 		if (ObjectEx.IsUnityNull(currentTarget))
 		{
 			CancelInvoke(WeaponTick);
@@ -346,7 +455,7 @@ public class SamSite : ContainerIOEntity
 
 	public void WeaponTick()
 	{
-		if (IsDead() || Time.time < lockOnTime || Time.time < nextBurstTime)
+		if (IsDead() || UnityEngine.Time.time < lockOnTime || UnityEngine.Time.time < nextBurstTime)
 		{
 			return;
 		}
@@ -358,13 +467,14 @@ public class SamSite : ContainerIOEntity
 		if (firedCount >= 6)
 		{
 			float timeBetweenBursts = mostRecentTargetType.timeBetweenBursts;
-			nextBurstTime = Time.time + timeBetweenBursts;
+			nextBurstTime = UnityEngine.Time.time + timeBetweenBursts;
 			firedCount = 0;
 			return;
 		}
 		EnsureReloaded();
 		if (Interface.CallHook("CanSamSiteShoot", this) == null && HasAmmo())
 		{
+			bool num = ammoItem != null && ammoItem.amount == lowAmmoThreshold;
 			if (!staticRespawn && ammoItem != null)
 			{
 				ammoItem.UseItem();
@@ -382,6 +492,10 @@ public class SamSite : ContainerIOEntity
 			{
 				currentTubeIndex = 0;
 			}
+			if (num)
+			{
+				MarkIODirty();
+			}
 		}
 	}
 
@@ -397,6 +511,54 @@ public class SamSite : ContainerIOEntity
 				component.InitializeVelocity(GetInheritedProjectileVelocity() + direction * component.speed * speedMultiplier);
 			}
 			baseEntity.Spawn();
+		}
+	}
+
+	public override int GetPassthroughAmount(int outputSlot = 0)
+	{
+		int result = Mathf.Min(1, GetCurrentEnergy());
+		switch (outputSlot)
+		{
+		case 0:
+			if (ObjectEx.IsUnityNull(currentTarget))
+			{
+				return 0;
+			}
+			return result;
+		case 1:
+			if (ammoItem == null || ammoItem.amount >= lowAmmoThreshold || ammoItem.parent != base.inventory)
+			{
+				return 0;
+			}
+			return result;
+		case 2:
+			if (HasAmmo())
+			{
+				return 0;
+			}
+			return result;
+		default:
+			return 0;
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.CallsPerSecond(1uL)]
+	private void ToggleDefenderMode(RPCMessage msg)
+	{
+		if (staticRespawn)
+		{
+			return;
+		}
+		BasePlayer player = msg.player;
+		if (!(player == null) && player.CanBuild())
+		{
+			bool flag = msg.read.Bit();
+			if (flag != IsInDefenderMode())
+			{
+				SetFlag(Flag_DefenderMode, flag);
+			}
 		}
 	}
 }

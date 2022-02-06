@@ -15,6 +15,13 @@ using UnityEngine.Serialization;
 
 public class BaseVehicle : BaseMountable
 {
+	public enum ClippingCheckMode
+	{
+		OnMountOnly,
+		Always,
+		AlwaysHeadOnly
+	}
+
 	[Serializable]
 	public class MountPointInfo
 	{
@@ -195,8 +202,7 @@ public class BaseVehicle : BaseMountable
 	[Tooltip("Allow players to mount other mountables/ladders from this vehicle")]
 	public bool mountChaining = true;
 
-	[FormerlySerializedAs("seatClipCheck")]
-	public bool continuousClippingCheck;
+	public ClippingCheckMode clippingChecks;
 
 	public bool shouldShowHudHealth;
 
@@ -242,7 +248,29 @@ public class BaseVehicle : BaseMountable
 
 	protected virtual bool CanSwapSeats => true;
 
-	public override float RealisticMass => rigidBody.mass;
+	public bool IsMovingOrOn
+	{
+		get
+		{
+			if (!IsMoving())
+			{
+				return IsOn();
+			}
+			return true;
+		}
+	}
+
+	public override float RealisticMass
+	{
+		get
+		{
+			if (rigidBody != null)
+			{
+				return rigidBody.mass;
+			}
+			return base.RealisticMass;
+		}
+	}
 
 	public Enumerable allMountPoints => new Enumerable(this);
 
@@ -352,16 +380,17 @@ public class BaseVehicle : BaseMountable
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (continuousClippingCheck && AnyMounted())
+		if (clippingChecks != 0 && AnyMounted())
 		{
 			Vector3 center = base.transform.TransformPoint(bounds.center);
 			int num = (IsFlipped() ? 1218511105 : 1210122497);
 			if (UnityEngine.Physics.OverlapBox(center, bounds.extents, base.transform.rotation, num).Length != 0)
 			{
-				CheckSeatsForClipping(num);
+				bool fullBodyCheck = clippingChecks != ClippingCheckMode.AlwaysHeadOnly;
+				CheckSeatsForClipping(fullBodyCheck, num);
 			}
 		}
-		if ((bool)rigidBody)
+		if (rigidBody != null)
 		{
 			SetFlag(Flags.Reserved7, rigidBody.IsSleeping() && !AnyMounted());
 		}
@@ -369,6 +398,28 @@ public class BaseVehicle : BaseMountable
 		{
 			ClearOwnerEntry();
 		}
+	}
+
+	public override Vector3 GetLocalVelocityServer()
+	{
+		if (rigidBody == null)
+		{
+			return Vector3.zero;
+		}
+		return rigidBody.velocity;
+	}
+
+	public override Quaternion GetAngularVelocityServer()
+	{
+		if (rigidBody == null)
+		{
+			return Quaternion.identity;
+		}
+		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
+		{
+			return Quaternion.identity;
+		}
+		return Quaternion.LookRotation(rigidBody.angularVelocity, base.transform.up);
 	}
 
 	public virtual int StartingFuelUnits()
@@ -416,7 +467,7 @@ public class BaseVehicle : BaseMountable
 		return GamePhysics.LineOfSight(eyePos, p, mask);
 	}
 
-	public virtual bool IsSeatClipping(BaseMountable mountable, int mask = 1218511105)
+	public virtual bool IsSeatClipping(BaseMountable mountable, bool fullBodyCheck, int mask = 1218511105)
 	{
 		if (!doClippingAndVisChecks)
 		{
@@ -426,25 +477,29 @@ public class BaseVehicle : BaseMountable
 		{
 			return false;
 		}
-		Vector3 position = mountable.transform.position;
-		Vector3 position2 = mountable.eyePositionOverride.transform.position;
-		Vector3 vector = position2 - position;
+		Vector3 position = mountable.eyePositionOverride.transform.position;
+		Vector3 position2 = mountable.transform.position;
+		Vector3 vector = position - position2;
 		float num = 0.4f;
 		if (mountable.modifiesPlayerCollider)
 		{
 			num = Mathf.Min(num, mountable.customPlayerCollider.radius);
 		}
-		Vector3 start = position2 - vector * (num - 0.15f);
-		Vector3 end = position + vector * (num + 0.05f);
-		return GamePhysics.CheckCapsule(start, end, num, mask, QueryTriggerInteraction.Ignore);
+		Vector3 vector2 = position - vector * (num - 0.15f);
+		if (fullBodyCheck)
+		{
+			Vector3 end = position2 + vector * (num + 0.05f);
+			return GamePhysics.CheckCapsule(vector2, end, num, mask, QueryTriggerInteraction.Ignore);
+		}
+		return GamePhysics.CheckSphere(vector2, num, mask, QueryTriggerInteraction.Ignore);
 	}
 
-	public virtual void CheckSeatsForClipping(int mask)
+	public virtual void CheckSeatsForClipping(bool fullBodyCheck, int mask)
 	{
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
 			BaseMountable mountable = mountPoint.mountable;
-			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable, mask))
+			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable, fullBodyCheck, mask))
 			{
 				SeatClippedWorld(mountable);
 			}
@@ -480,6 +535,26 @@ public class BaseVehicle : BaseMountable
 	public virtual void SpawnSubEntities()
 	{
 		CheckAndSpawnMountPoints();
+	}
+
+	public virtual bool AdminFixUp(int tier)
+	{
+		if (IsDead())
+		{
+			return false;
+		}
+		GetFuelSystem()?.AdminAddFuel();
+		SetHealth(MaxHealth());
+		SendNetworkUpdate();
+		return true;
+	}
+
+	private void OnPhysicsNeighbourChanged()
+	{
+		if (rigidBody != null)
+		{
+			rigidBody.WakeUp();
+		}
 	}
 
 	private void CheckAndSpawnMountPoints()
@@ -738,7 +813,7 @@ public class BaseVehicle : BaseMountable
 					num = 0;
 				}
 				MountPointInfo mountPoint = GetMountPoint(num);
-				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
+				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable, true) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
 				{
 					baseMountable = mountPoint.mountable;
 					break;
@@ -849,7 +924,7 @@ public class BaseVehicle : BaseMountable
 			{
 				continue;
 			}
-			if (IsSeatClipping(allMountPoint.mountable))
+			if (IsSeatClipping(allMountPoint.mountable, true))
 			{
 				if (UnityEngine.Application.isEditor)
 				{
@@ -1046,7 +1121,7 @@ public class BaseVehicle : BaseMountable
 	public void RPC_WantsPush(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!player.isMounted && !RecentlyPushed && CanPushNow(player) && (!OnlyOwnerAccessible() || !(player != creatorEntity)) && Interface.CallHook("OnVehiclePush", this, msg.player) == null)
+		if (!player.isMounted && !RecentlyPushed && CanPushNow(player) && !(rigidBody == null) && (!OnlyOwnerAccessible() || !(player != creatorEntity)) && Interface.CallHook("OnVehiclePush", this, msg.player) == null)
 		{
 			player.metabolism.calories.Subtract(3f);
 			player.metabolism.SendChangesToClient();
@@ -1061,6 +1136,10 @@ public class BaseVehicle : BaseMountable
 
 	public virtual void DoPushAction(BasePlayer player)
 	{
+		if (rigidBody == null)
+		{
+			return;
+		}
 		if (IsFlipped())
 		{
 			float num = rigidBody.mass * 8f;
@@ -1131,6 +1210,15 @@ public class BaseVehicle : BaseMountable
 			return HasDriver();
 		}
 		throw new NotImplementedException("Please don't call BaseVehicle IsMounted on the client.");
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (IsAlive() && !base.IsDestroyed)
+		{
+			return player != null;
+		}
+		return false;
 	}
 
 	public override bool SupportsChildDeployables()

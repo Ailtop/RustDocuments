@@ -441,11 +441,6 @@ public class MotorRowboat : BaseBoat
 		}
 	}
 
-	public override Vector3 GetLocalVelocityServer()
-	{
-		return rigidBody.velocity;
-	}
-
 	public override void SeatClippedWorld(BaseMountable mountable)
 	{
 		BasePlayer mounted = mountable.GetMounted();

@@ -8,4 +8,6 @@ public class DeferredDecal : MonoBehaviour
 	public Material material;
 
 	public DeferredDecalQueue queue;
+
+	public bool applyImmediately = true;
 }

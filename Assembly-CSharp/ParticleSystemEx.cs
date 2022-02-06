@@ -4,13 +4,16 @@ public static class ParticleSystemEx
 {
 	public static void SetPlayingState(this ParticleSystem ps, bool play)
 	{
-		if (play && !ps.isPlaying)
+		if (!(ps == null))
 		{
-			ps.Play();
-		}
-		else if (!play && ps.isPlaying)
-		{
-			ps.Stop();
+			if (play && !ps.isPlaying)
+			{
+				ps.Play();
+			}
+			else if (!play && ps.isPlaying)
+			{
+				ps.Stop();
+			}
 		}
 	}
 

@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using System.Collections.Generic;
+using System.Text;
 using ConVar;
 using Facepunch;
 using Network;
@@ -364,6 +365,22 @@ public class VehicleModuleCamper : VehicleModuleSeating
 			return storageContainer;
 		}
 		return null;
+	}
+
+	public override string Admin_Who()
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		int num = 0;
+		foreach (BaseEntity child in children)
+		{
+			SleepingBagCamper sleepingBagCamper;
+			if ((object)(sleepingBagCamper = child as SleepingBagCamper) != null)
+			{
+				stringBuilder.AppendLine($"Bag {num++}:");
+				stringBuilder.AppendLine(sleepingBagCamper.Admin_Who());
+			}
+		}
+		return stringBuilder.ToString();
 	}
 
 	public override bool CanBeLooted(BasePlayer player)

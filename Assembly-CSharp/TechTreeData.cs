@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch;
 using Oxide.Core;
 using UnityEngine;
 
@@ -46,7 +47,7 @@ public class TechTreeData : ScriptableObject
 
 	public NodeInstance GetByID(int id)
 	{
-		if (Application.isPlaying)
+		if (UnityEngine.Application.isPlaying)
 		{
 			if (_idToNode == null)
 			{
@@ -69,7 +70,7 @@ public class TechTreeData : ScriptableObject
 
 	public NodeInstance GetEntryNode()
 	{
-		if (Application.isPlaying && _entryNode != null && _entryNode.groupName == "Entry")
+		if (UnityEngine.Application.isPlaying && _entryNode != null && _entryNode.groupName == "Entry")
 		{
 			return _entryNode;
 		}
@@ -190,5 +191,43 @@ public class TechTreeData : ScriptableObject
 			}
 		}
 		return player.blueprints.HasUnlocked(node.itemDef);
+	}
+
+	public void GetNodesRequiredToUnlock(BasePlayer player, NodeInstance node, List<NodeInstance> foundNodes)
+	{
+		foundNodes.Add(node);
+		if (node == GetEntryNode())
+		{
+			return;
+		}
+		if (node.inputs.Count == 1)
+		{
+			GetNodesRequiredToUnlock(player, GetByID(node.inputs[0]), foundNodes);
+			return;
+		}
+		List<NodeInstance> obj = Pool.GetList<NodeInstance>();
+		int num = int.MaxValue;
+		foreach (int input in node.inputs)
+		{
+			List<NodeInstance> obj2 = Pool.GetList<NodeInstance>();
+			GetNodesRequiredToUnlock(player, GetByID(input), obj2);
+			int num2 = 0;
+			foreach (NodeInstance item in obj2)
+			{
+				if (!(item.itemDef == null) && !HasPlayerUnlocked(player, item))
+				{
+					num2 += ResearchTable.ScrapForResearch(item.itemDef);
+				}
+			}
+			if (num2 < num)
+			{
+				obj.Clear();
+				obj.AddRange(obj2);
+				num = num2;
+			}
+			Pool.FreeList(ref obj2);
+		}
+		foundNodes.AddRange(obj);
+		Pool.FreeList(ref obj);
 	}
 }

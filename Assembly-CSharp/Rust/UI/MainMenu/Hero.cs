@@ -12,6 +12,8 @@ namespace Rust.UI.MainMenu
 
 		public RustText ButtonText;
 
+		public HttpImage TitleImage;
+
 		[Header("Item Store Links")]
 		public RustButton ItemStoreButton;
 

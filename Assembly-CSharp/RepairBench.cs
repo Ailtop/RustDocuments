@@ -169,6 +169,7 @@ public class RepairBench : StorageContainer
 			debugprint("RepairBench.ChangeSkin player does not have item :" + num + ":");
 			return;
 		}
+		bool flag2 = slot.contents != null && !slot.contents.IsEmpty();
 		ulong Skin = ItemDefinition.FindSkin(slot.info.itemid, num);
 		if (Skin == slot.skin && slot.info.isRedirectOf == null)
 		{
@@ -186,12 +187,18 @@ public class RepairBench : StorageContainer
 		if ((bool)itemSkin && (itemSkin.Redirect != null || slot.info.isRedirectOf != null))
 		{
 			ItemDefinition template = itemSkin.Redirect;
-			bool flag2 = false;
+			bool flag3 = false;
 			if (itemSkin.Redirect == null && slot.info.isRedirectOf != null)
 			{
 				template = slot.info.isRedirectOf;
-				flag2 = num != 0;
+				flag3 = num != 0;
 			}
+			if (flag2)
+			{
+				player.ChatMessage("Remove attachments before reskinning");
+				return;
+			}
+			slot.CollectedForCrafting(player);
 			float condition = slot.condition;
 			float maxCondition = slot.maxCondition;
 			int amount = slot.amount;
@@ -202,13 +209,19 @@ public class RepairBench : StorageContainer
 			item.maxCondition = maxCondition;
 			item.condition = condition;
 			item.amount = amount;
-			if (flag2)
+			if (flag3)
 			{
 				ApplySkinToItem(item, Skin);
 			}
 		}
 		else if (!itemSkin && slot.info.isRedirectOf != null)
 		{
+			if (flag2)
+			{
+				player.ChatMessage("Remove attachments before reskinning");
+				return;
+			}
+			slot.CollectedForCrafting(player);
 			ItemDefinition isRedirectOf = slot.info.isRedirectOf;
 			float condition2 = slot.condition;
 			float maxCondition2 = slot.maxCondition;

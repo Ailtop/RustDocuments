@@ -14,9 +14,9 @@ using UnityEngine.Assertions;
 
 public class MarketTerminal : StorageContainer
 {
-	private Action<BasePlayer, Item> _onCurrencyRemovedCached;
+	public Action<BasePlayer, Item> _onCurrencyRemovedCached;
 
-	private Action<BasePlayer, Item> _onItemPurchasedCached;
+	public Action<BasePlayer, Item> _onItemPurchasedCached;
 
 	private Action _checkForExpiredOrdersCached;
 
@@ -310,9 +310,9 @@ public class MarketTerminal : StorageContainer
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(10uL)]
 	public void Server_Purchase(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))

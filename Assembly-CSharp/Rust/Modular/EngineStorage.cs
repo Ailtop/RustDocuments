@@ -86,7 +86,7 @@ namespace Rust.Modular
 			return false;
 		}
 
-		private int GetValidSlot(Item item)
+		public int GetValidSlot(Item item)
 		{
 			ItemModEngineItem component = item.info.GetComponent<ItemModEngineItem>();
 			if (component == null)

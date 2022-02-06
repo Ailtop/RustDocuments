@@ -51,7 +51,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT )");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 220 + ".db");
+		playerState.Open(strFolder + "/player.states." + 221 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

@@ -1,5 +1,6 @@
 using ConVar;
 using Oxide.Core;
+using Rust;
 using UnityEngine;
 
 public class SupplyDrop : LootContainer
@@ -13,24 +14,34 @@ public class SupplyDrop : LootContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		if (parachutePrefab.isValid)
+		if (!Rust.Application.isLoadingSave)
 		{
-			parachute = GameManager.server.CreateEntity(parachutePrefab.resourcePath);
-		}
-		if ((bool)parachute)
-		{
-			parachute.SetParent(this, "parachute_attach");
-			parachute.Spawn();
+			if (parachutePrefab.isValid)
+			{
+				parachute = GameManager.server.CreateEntity(parachutePrefab.resourcePath);
+			}
+			if ((bool)parachute)
+			{
+				parachute.SetParent(this, "parachute_attach");
+				parachute.Spawn();
+			}
 		}
 		isLootable = false;
 		Invoke(MakeLootable, 300f);
 		InvokeRepeating(CheckNightLight, 0f, 30f);
 	}
 
-	public override void PostServerLoad()
+	protected override void OnChildAdded(BaseEntity child)
 	{
-		base.PostServerLoad();
-		RemoveParachute();
+		base.OnChildAdded(child);
+		if (base.isServer && Rust.Application.isLoadingSave)
+		{
+			if (parachute != null)
+			{
+				Debug.LogWarning("More than one child entity was added to SupplyDrop! Expected only the parachute.", this);
+			}
+			parachute = child;
+		}
 	}
 
 	public void RemoveParachute()

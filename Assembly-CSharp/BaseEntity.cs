@@ -607,6 +607,59 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				})
 				select x as BaseEntity).ToArray();
 		}
+
+		public static BaseEntity[] FindTargetsAuthedTo(ulong authId, string strFilter)
+		{
+			bool hasFilter = !string.IsNullOrEmpty(strFilter);
+			return (from x in BaseNetworkable.serverEntities.Where(delegate(BaseNetworkable x)
+				{
+					BuildingPrivlidge buildingPrivlidge;
+					AutoTurret autoTurret;
+					CodeLock codeLock;
+					if ((object)(buildingPrivlidge = x as BuildingPrivlidge) != null)
+					{
+						if (!buildingPrivlidge.IsAuthed(authId))
+						{
+							return false;
+						}
+						if (!hasFilter || x.ShortPrefabName.Contains(strFilter))
+						{
+							return true;
+						}
+					}
+					else if ((object)(autoTurret = x as AutoTurret) != null)
+					{
+						if (!autoTurret.IsAuthed(authId))
+						{
+							return false;
+						}
+						if (!hasFilter || x.ShortPrefabName.Contains(strFilter))
+						{
+							return true;
+						}
+					}
+					else if ((object)(codeLock = x as CodeLock) != null)
+					{
+						if (!codeLock.whitelistPlayers.Contains(authId))
+						{
+							return false;
+						}
+						if (!hasFilter || x.ShortPrefabName.Contains(strFilter))
+						{
+							return true;
+						}
+					}
+					return false;
+				})
+				select x as BaseEntity).ToArray();
+		}
+
+		public static ScientistNPC[] FindScientists()
+		{
+			return (from x in BaseNetworkable.serverEntities
+				where (x is ScientistNPC) ? true : false
+				select x as ScientistNPC).ToArray();
+		}
 	}
 
 	public enum GiveItemReason
@@ -2156,6 +2209,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return true;
 	}
 
+	public virtual string Admin_Who()
+	{
+		return $"Owner ID: {OwnerID}";
+	}
+
 	[RPC_Server]
 	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
@@ -2240,6 +2298,16 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		entitySlots[(int)slot].Set(ent);
 		SendNetworkUpdate();
+	}
+
+	public EntityRef[] GetSlots()
+	{
+		return entitySlots;
+	}
+
+	public void SetSlots(EntityRef[] newSlots)
+	{
+		entitySlots = newSlots;
 	}
 
 	public virtual bool HasSlot(Slot slot)
