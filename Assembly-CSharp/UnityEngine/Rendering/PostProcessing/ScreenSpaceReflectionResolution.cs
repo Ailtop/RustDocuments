@@ -2,8 +2,8 @@ namespace UnityEngine.Rendering.PostProcessing
 {
 	public enum ScreenSpaceReflectionResolution
 	{
-		Downsampled,
-		FullSize,
-		Supersampled
+		Downsampled = 0,
+		FullSize = 1,
+		Supersampled = 2
 	}
 }

@@ -122,7 +122,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 	public static float population = 3f;
 
 	[ServerVar(Help = "How many minutes before a ModularCar loses all its health while outside")]
-	public static float outsidedecayminutes = 216f;
+	public static float outsidedecayminutes = 864f;
 
 	public const BUTTON RapidSteerButton = BUTTON.SPRINT;
 
@@ -254,20 +254,6 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		{
 			Kill();
 		}
-	}
-
-	protected override void OnChildAdded(BaseEntity child)
-	{
-		base.OnChildAdded(child);
-		if (base.isServer && isSpawned)
-		{
-			GetFuelSystem().CheckNewChild(child);
-		}
-	}
-
-	public override EntityFuelSystem GetFuelSystem()
-	{
-		return engineController.FuelSystem;
 	}
 
 	public float GetSteerInput()

@@ -9,10 +9,10 @@ public class MiningQuarry : BaseResourceExtractor
 	[Serializable]
 	public enum QuarryType
 	{
-		None,
-		Basic,
-		Sulfur,
-		HQM
+		None = 0,
+		Basic = 1,
+		Sulfur = 2,
+		HQM = 3
 	}
 
 	[Serializable]

@@ -30,7 +30,7 @@ public class CardTable : BaseVehicle
 
 	public enum CardGameOption
 	{
-		TexasHoldEm
+		TexasHoldEm = 0
 	}
 
 	[Serializable]

@@ -6,25 +6,25 @@ public class AmplifyOcclusionBase : MonoBehaviour
 {
 	public enum ApplicationMethod
 	{
-		PostEffect,
-		Deferred,
-		Debug
+		PostEffect = 0,
+		Deferred = 1,
+		Debug = 2
 	}
 
 	public enum PerPixelNormalSource
 	{
-		None,
-		Camera,
-		GBuffer,
-		GBufferOctaEncoded
+		None = 0,
+		Camera = 1,
+		GBuffer = 2,
+		GBufferOctaEncoded = 3
 	}
 
 	public enum SampleCountLevel
 	{
-		Low,
-		Medium,
-		High,
-		VeryHigh
+		Low = 0,
+		Medium = 1,
+		High = 2,
+		VeryHigh = 3
 	}
 
 	[Header("Ambient Occlusion")]

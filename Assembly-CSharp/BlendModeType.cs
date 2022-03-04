@@ -1,5 +1,5 @@
 public enum BlendModeType
 {
-	Screen,
-	Add
+	Screen = 0,
+	Add = 1
 }

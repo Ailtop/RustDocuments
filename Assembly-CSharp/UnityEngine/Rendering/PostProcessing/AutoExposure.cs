@@ -6,9 +6,9 @@ namespace UnityEngine.Rendering.PostProcessing
 	[PostProcess(typeof(AutoExposureRenderer), "Unity/Auto Exposure", true)]
 	public sealed class AutoExposure : PostProcessEffectSettings
 	{
-		[Tooltip("Filters the bright and dark parts of the histogram when computing the average luminance. This is to avoid very dark pixels and very bright pixels from contributing to the auto exposure. Unit is in percent.")]
 		[MinMax(1f, 99f)]
 		[DisplayName("Filtering (%)")]
+		[Tooltip("Filters the bright and dark parts of the histogram when computing the average luminance. This is to avoid very dark pixels and very bright pixels from contributing to the auto exposure. Unit is in percent.")]
 		public Vector2Parameter filtering = new Vector2Parameter
 		{
 			value = new Vector2(50f, 95f)
@@ -22,9 +22,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[Range(-9f, 9f)]
 		[DisplayName("Maximum (EV)")]
 		[Tooltip("Maximum average luminance to consider for auto exposure. Unit is EV.")]
+		[Range(-9f, 9f)]
 		public FloatParameter maxLuminance = new FloatParameter
 		{
 			value = 0f

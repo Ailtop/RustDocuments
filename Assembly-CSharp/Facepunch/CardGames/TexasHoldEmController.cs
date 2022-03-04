@@ -23,12 +23,12 @@ namespace Facepunch.CardGames
 
 		public enum Playability
 		{
-			OK,
-			NoPlayer,
-			NotEnoughBuyIn,
-			TooMuchBuyIn,
-			RanOutOfScrap,
-			Idle
+			OK = 0,
+			NoPlayer = 1,
+			NotEnoughBuyIn = 2,
+			TooMuchBuyIn = 3,
+			RanOutOfScrap = 4,
+			Idle = 5
 		}
 
 		public List<PlayingCard> communityCards = new List<PlayingCard>();

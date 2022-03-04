@@ -29,9 +29,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 1f
 		};
 
+		[Tooltip("Distortion center point (x-axis).")]
 		[Space]
 		[Range(-1f, 1f)]
-		[Tooltip("Distortion center point (x-axis).")]
 		public FloatParameter centerX = new FloatParameter
 		{
 			value = 0f

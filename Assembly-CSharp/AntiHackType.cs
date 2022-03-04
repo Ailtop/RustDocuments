@@ -1,14 +1,14 @@
 public enum AntiHackType
 {
-	None,
-	NoClip,
-	SpeedHack,
-	FlyHack,
-	ProjectileHack,
-	MeleeHack,
-	EyeHack,
-	AttackHack,
-	ReloadHack,
-	CooldownHack,
-	InsideTerrain
+	None = 0,
+	NoClip = 1,
+	SpeedHack = 2,
+	FlyHack = 3,
+	ProjectileHack = 4,
+	MeleeHack = 5,
+	EyeHack = 6,
+	AttackHack = 7,
+	ReloadHack = 8,
+	CooldownHack = 9,
+	InsideTerrain = 10
 }

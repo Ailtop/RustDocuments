@@ -5,8 +5,8 @@ public class FootstepSound : MonoBehaviour, IClientComponent
 	public enum Hardness
 	{
 		Light = 1,
-		Medium,
-		Hard
+		Medium = 2,
+		Hard = 3
 	}
 
 	public SoundDefinition lightSound;

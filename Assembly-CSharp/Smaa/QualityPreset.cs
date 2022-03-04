@@ -2,10 +2,10 @@ namespace Smaa
 {
 	public enum QualityPreset
 	{
-		Low,
-		Medium,
-		High,
-		Ultra,
-		Custom
+		Low = 0,
+		Medium = 1,
+		High = 2,
+		Ultra = 3,
+		Custom = 4
 	}
 }

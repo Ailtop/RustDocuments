@@ -1,6 +1,6 @@
 public enum CameraFocusMode
 {
-	Off,
-	Auto,
-	Manual
+	Off = 0,
+	Auto = 1,
+	Manual = 2
 }

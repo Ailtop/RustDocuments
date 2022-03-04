@@ -1,8 +1,8 @@
 public enum OverlayBlendMode
 {
-	Additive,
-	ScreenBlend,
-	Multiply,
-	Overlay,
-	AlphaBlend
+	Additive = 0,
+	ScreenBlend = 1,
+	Multiply = 2,
+	Overlay = 3,
+	AlphaBlend = 4
 }

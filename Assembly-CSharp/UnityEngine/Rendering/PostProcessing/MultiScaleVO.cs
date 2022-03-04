@@ -9,21 +9,21 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		internal enum MipLevel
 		{
-			Original,
-			L1,
-			L2,
-			L3,
-			L4,
-			L5,
-			L6
+			Original = 0,
+			L1 = 1,
+			L2 = 2,
+			L3 = 3,
+			L4 = 4,
+			L5 = 5,
+			L6 = 6
 		}
 
 		private enum Pass
 		{
-			DepthCopy,
-			CompositionDeferred,
-			CompositionForward,
-			DebugOverlay
+			DepthCopy = 0,
+			CompositionDeferred = 1,
+			CompositionForward = 2,
+			DebugOverlay = 3
 		}
 
 		private readonly float[] m_SampleThickness = new float[12]

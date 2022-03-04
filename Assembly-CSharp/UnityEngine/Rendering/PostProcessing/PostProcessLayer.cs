@@ -7,26 +7,26 @@ using UnityEngine.Scripting;
 
 namespace UnityEngine.Rendering.PostProcessing
 {
-	[AddComponentMenu("Rendering/Post-process Layer", 1000)]
-	[RequireComponent(typeof(Camera))]
 	[ExecuteAlways]
 	[DisallowMultipleComponent]
 	[ImageEffectAllowedInSceneView]
+	[AddComponentMenu("Rendering/Post-process Layer", 1000)]
+	[RequireComponent(typeof(Camera))]
 	public class PostProcessLayer : MonoBehaviour
 	{
 		private enum ScalingMode
 		{
-			NATIVE,
-			BILINEAR,
-			DLSS
+			NATIVE = 0,
+			BILINEAR = 1,
+			DLSS = 2
 		}
 
 		public enum Antialiasing
 		{
-			None,
-			FastApproximateAntialiasing,
-			SubpixelMorphologicalAntialiasing,
-			TemporalAntialiasing
+			None = 0,
+			FastApproximateAntialiasing = 1,
+			SubpixelMorphologicalAntialiasing = 2,
+			TemporalAntialiasing = 3
 		}
 
 		[Serializable]

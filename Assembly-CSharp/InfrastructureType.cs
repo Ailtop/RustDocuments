@@ -1,9 +1,9 @@
 public enum InfrastructureType
 {
-	Road,
-	Power,
-	Trail,
-	Tunnel,
-	UnderwaterLab,
-	Boat
+	Road = 0,
+	Power = 1,
+	Trail = 2,
+	Tunnel = 3,
+	UnderwaterLab = 4,
+	Boat = 5
 }

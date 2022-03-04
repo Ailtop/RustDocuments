@@ -4,8 +4,8 @@ public class HitboxDefinition : MonoBehaviour
 {
 	public enum Type
 	{
-		BOX,
-		CAPSULE
+		BOX = 0,
+		CAPSULE = 1
 	}
 
 	public Vector3 center;

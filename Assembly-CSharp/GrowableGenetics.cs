@@ -6,11 +6,11 @@ public static class GrowableGenetics
 {
 	public enum GeneType
 	{
-		Empty,
-		WaterRequirement,
-		GrowthSpeed,
-		Yield,
-		Hardiness
+		Empty = 0,
+		WaterRequirement = 1,
+		GrowthSpeed = 2,
+		Yield = 3,
+		Hardiness = 4
 	}
 
 	public struct GeneWeighting

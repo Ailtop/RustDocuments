@@ -10,7 +10,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 	protected GroundVehicleAudio gvAudio;
 
 	[SerializeField]
-	private GameObjectRef collisionEffect;
+	public GameObjectRef collisionEffect;
 
 	[SerializeField]
 	private GameObjectRef fuelStoragePrefab;
@@ -26,6 +26,9 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 
 	[SerializeField]
 	private float maxCollisionDamageForce = 2500000f;
+
+	[SerializeField]
+	private float collisionDamageMultiplier = 1f;
 
 	public VehicleEngineController<GroundVehicle> engineController;
 
@@ -173,7 +176,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 		float num = Mathf.InverseLerp(minCollisionDamageForce, maxCollisionDamageForce, forceMagnitude);
 		if (num > 0f)
 		{
-			float num2 = Mathf.Lerp(1f, 200f, num);
+			float num2 = Mathf.Lerp(1f, 200f, num) * collisionDamageMultiplier;
 			float value;
 			if (damageSinceLastTick.TryGetValue(hitEntity, out value))
 			{
@@ -238,6 +241,20 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 	public virtual float GetModifiedDrag()
 	{
 		return (1f - Mathf.InverseLerp(0f, dragModDuration, timeSinceDragModSet)) * dragMod;
+	}
+
+	public override EntityFuelSystem GetFuelSystem()
+	{
+		return engineController.FuelSystem;
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer && isSpawned)
+		{
+			GetFuelSystem().CheckNewChild(child);
+		}
 	}
 
 	private void SetTempDrag(float drag, float duration)

@@ -33,11 +33,11 @@ public class BaseFishingRod : HeldEntity
 
 	public enum CatchState
 	{
-		None,
-		Aiming,
-		Waiting,
-		Catching,
-		Caught
+		None = 0,
+		Aiming = 1,
+		Waiting = 2,
+		Catching = 3,
+		Caught = 4
 	}
 
 	[Flags]
@@ -50,19 +50,19 @@ public class BaseFishingRod : HeldEntity
 
 	public enum FailReason
 	{
-		UserRequested,
-		BadAngle,
-		TensionBreak,
-		Unequipped,
-		TimeOut,
-		Success,
-		NoWaterFound,
-		Obstructed,
-		NoLure,
-		TooShallow,
-		TooClose,
-		TooFarAway,
-		PlayerMoved
+		UserRequested = 0,
+		BadAngle = 1,
+		TensionBreak = 2,
+		Unequipped = 3,
+		TimeOut = 4,
+		Success = 5,
+		NoWaterFound = 6,
+		Obstructed = 7,
+		NoLure = 8,
+		TooShallow = 9,
+		TooClose = 10,
+		TooFarAway = 11,
+		PlayerMoved = 12
 	}
 
 	public static UpdateFishingRod updateFishingRodQueue = new UpdateFishingRod();
@@ -247,7 +247,7 @@ public class BaseFishingRod : HeldEntity
 			FailedCast(reason);
 			return;
 		}
-		object obj = Interface.CallHook("CanCastFishingRod", ownerPlayer, this, currentLure);
+		object obj = Interface.CallHook("CanCastFishingRod", ownerPlayer, this, currentLure, pos);
 		if (!(obj is bool) || (bool)obj)
 		{
 			FishingBobber component = base.gameManager.CreateEntity(FishingBobberRef.resourcePath, base.transform.position + Vector3.up * 2.8f + ownerPlayer.eyes.BodyForward() * 1.8f, GetOwnerPlayer().ServerRotation).GetComponent<FishingBobber>();

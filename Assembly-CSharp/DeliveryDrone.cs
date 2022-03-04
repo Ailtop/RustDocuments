@@ -6,14 +6,14 @@ public class DeliveryDrone : Drone
 {
 	private enum State
 	{
-		Invalid,
-		Takeoff,
-		FlyToVendingMachine,
-		DescendToVendingMachine,
-		PickUpItems,
-		AscendBeforeReturn,
-		ReturnToTerminal,
-		Landing
+		Invalid = 0,
+		Takeoff = 1,
+		FlyToVendingMachine = 2,
+		DescendToVendingMachine = 3,
+		PickUpItems = 4,
+		AscendBeforeReturn = 5,
+		ReturnToTerminal = 6,
+		Landing = 7
 	}
 
 	[Header("Delivery Drone")]

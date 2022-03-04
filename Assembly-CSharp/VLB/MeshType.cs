@@ -2,7 +2,7 @@ namespace VLB
 {
 	public enum MeshType
 	{
-		Shared,
-		Custom
+		Shared = 0,
+		Custom = 1
 	}
 }

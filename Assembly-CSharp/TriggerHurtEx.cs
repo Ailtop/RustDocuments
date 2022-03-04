@@ -7,8 +7,8 @@ public class TriggerHurtEx : TriggerBase, IServerComponent, IHurtTrigger
 {
 	public enum HurtType
 	{
-		Simple,
-		IncludeBleedingAndScreenShake
+		Simple = 0,
+		IncludeBleedingAndScreenShake = 1
 	}
 
 	public class EntityTriggerInfo

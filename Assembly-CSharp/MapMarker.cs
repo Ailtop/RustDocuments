@@ -8,8 +8,8 @@ public class MapMarker : BaseEntity
 {
 	public enum ClusterType
 	{
-		None,
-		Vending
+		None = 0,
+		Vending = 1
 	}
 
 	public AppMarkerType appType;

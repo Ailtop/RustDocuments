@@ -146,8 +146,8 @@ public class CoverageQueries : MonoBehaviour
 
 	public enum RadiusSpace
 	{
-		ScreenNormalized,
-		World
+		ScreenNormalized = 0,
+		World = 1
 	}
 
 	public class Query

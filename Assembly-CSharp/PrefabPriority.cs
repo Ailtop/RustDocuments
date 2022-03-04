@@ -1,8 +1,8 @@
 public enum PrefabPriority
 {
-	Lowest,
-	Low,
-	Default,
-	High,
-	Highest
+	Lowest = 0,
+	Low = 1,
+	Default = 2,
+	High = 3,
+	Highest = 4
 }

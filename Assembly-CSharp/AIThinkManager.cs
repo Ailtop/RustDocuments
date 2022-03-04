@@ -5,9 +5,9 @@ public class AIThinkManager : BaseMonoBehaviour, IServerComponent
 {
 	public enum QueueType
 	{
-		Human,
-		Animal,
-		Pets
+		Human = 0,
+		Animal = 1,
+		Pets = 2
 	}
 
 	public static ListHashSet<IThinker> _processQueue = new ListHashSet<IThinker>();

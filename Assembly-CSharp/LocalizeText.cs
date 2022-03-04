@@ -5,9 +5,9 @@ public class LocalizeText : MonoBehaviour, IClientComponent, ILocalize
 {
 	public enum SpecialMode
 	{
-		None,
-		AllUppercase,
-		AllLowercase
+		None = 0,
+		AllUppercase = 1,
+		AllLowercase = 2
 	}
 
 	public string token;

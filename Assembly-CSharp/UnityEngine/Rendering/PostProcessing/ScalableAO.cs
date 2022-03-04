@@ -9,14 +9,14 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		private enum Pass
 		{
-			OcclusionEstimationForward,
-			OcclusionEstimationDeferred,
-			HorizontalBlurForward,
-			HorizontalBlurDeferred,
-			VerticalBlur,
-			CompositionForward,
-			CompositionDeferred,
-			DebugOverlay
+			OcclusionEstimationForward = 0,
+			OcclusionEstimationDeferred = 1,
+			HorizontalBlurForward = 2,
+			HorizontalBlurDeferred = 3,
+			VerticalBlur = 4,
+			CompositionForward = 5,
+			CompositionDeferred = 6,
+			DebugOverlay = 7
 		}
 
 		private RenderTexture m_Result;

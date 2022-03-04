@@ -3,7 +3,7 @@ namespace Smaa
 	public enum EdgeDetectionMethod
 	{
 		Luma = 1,
-		Color,
-		Depth
+		Color = 2,
+		Depth = 3
 	}
 }

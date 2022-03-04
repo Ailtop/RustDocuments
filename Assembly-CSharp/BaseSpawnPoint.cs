@@ -13,6 +13,11 @@ public abstract class BaseSpawnPoint : MonoBehaviour, IServerComponent
 		return base.gameObject.activeSelf;
 	}
 
+	public virtual bool HasPlayersIntersecting()
+	{
+		return BaseNetworkable.HasCloseConnections(base.transform.position, 2f);
+	}
+
 	protected void DropToGround(ref Vector3 pos, ref Quaternion rot)
 	{
 		if ((bool)TerrainMeta.HeightMap && (bool)TerrainMeta.Collision && !TerrainMeta.Collision.GetIgnore(pos))

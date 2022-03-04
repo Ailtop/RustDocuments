@@ -146,7 +146,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		object obj = Interface.CallHook("OnItemCraft", itemCraftTask, owner, fromTempBlueprint);
 		if (obj is bool)
 		{
-			if (itemCraftTask.instanceData != null)
+			if (fromTempBlueprint != null && itemCraftTask.instanceData != null)
 			{
 				fromTempBlueprint.instanceData = itemCraftTask.instanceData;
 			}

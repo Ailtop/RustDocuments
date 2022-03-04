@@ -8,19 +8,19 @@ namespace Rust.Modular
 	{
 		public enum AdjacentCondition
 		{
-			SameInFront,
-			SameBehind,
-			DifferentInFront,
-			DifferentBehind,
-			BothDifferent,
-			BothSame
+			SameInFront = 0,
+			SameBehind = 1,
+			DifferentInFront = 2,
+			DifferentBehind = 3,
+			BothDifferent = 4,
+			BothSame = 5
 		}
 
 		public enum AdjacentMatchType
 		{
-			GroupOrExact,
-			ExactOnly,
-			GroupNotExact
+			GroupOrExact = 0,
+			ExactOnly = 1,
+			GroupNotExact = 2
 		}
 
 		public GameObject gameObject;

@@ -6,9 +6,9 @@ public class Effect : EffectData
 {
 	public enum Type : uint
 	{
-		Generic,
-		Projectile,
-		GenericGlobal
+		Generic = 0u,
+		Projectile = 1u,
+		GenericGlobal = 2u
 	}
 
 	public static class client

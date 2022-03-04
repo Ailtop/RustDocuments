@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -60,6 +61,17 @@ public class TerrainConfig : ScriptableObject
 		public float UVMIXDist = 100f;
 	}
 
+	public enum GroundType
+	{
+		None = 0,
+		HardSurface = 1,
+		Grass = 2,
+		Sand = 3,
+		Snow = 4,
+		Dirt = 5,
+		Gravel = 6
+	}
+
 	public bool CastShadows = true;
 
 	public LayerMask GroundMask = 0;
@@ -89,6 +101,16 @@ public class TerrainConfig : ScriptableObject
 	public float ShaderLodMax = 600f;
 
 	public SplatType[] Splats = new SplatType[8];
+
+	private string snowMatName;
+
+	private string grassMatName;
+
+	private string sandMatName;
+
+	private List<string> dirtMatNames;
+
+	private List<string> stoneyMatNames;
 
 	public Texture AlbedoArray => AlbedoArrays[Mathf.Clamp(QualitySettings.masterTextureLimit, 0, 2)];
 
@@ -236,5 +258,82 @@ public class TerrainConfig : ScriptableObject
 			array[i] = new Vector3(Splats[i].UVMIXMult, Splats[i].UVMIXStart, Splats[i].UVMIXDist);
 		}
 		return array;
+	}
+
+	public GroundType GetCurrentGroundType(bool isGrounded, RaycastHit hit)
+	{
+		if (string.IsNullOrEmpty(grassMatName))
+		{
+			dirtMatNames = new List<string>();
+			stoneyMatNames = new List<string>();
+			SplatType[] splats = Splats;
+			foreach (SplatType obj in splats)
+			{
+				string text = obj.Name.ToLower();
+				string item = obj.Material.name;
+				switch (text)
+				{
+				case "grass":
+					grassMatName = item;
+					break;
+				case "snow":
+					snowMatName = item;
+					break;
+				case "sand":
+					sandMatName = item;
+					break;
+				case "dirt":
+				case "forest":
+				case "tundra":
+					dirtMatNames.Add(item);
+					break;
+				case "stones":
+				case "gravel":
+					stoneyMatNames.Add(item);
+					break;
+				}
+			}
+		}
+		if (!isGrounded)
+		{
+			return GroundType.None;
+		}
+		if (hit.collider == null)
+		{
+			return GroundType.HardSurface;
+		}
+		PhysicMaterial materialAt = ColliderEx.GetMaterialAt(hit.collider, hit.point);
+		if (materialAt == null)
+		{
+			return GroundType.HardSurface;
+		}
+		string text2 = materialAt.name;
+		if (text2 == grassMatName)
+		{
+			return GroundType.Grass;
+		}
+		if (text2 == sandMatName)
+		{
+			return GroundType.Sand;
+		}
+		if (text2 == snowMatName)
+		{
+			return GroundType.Snow;
+		}
+		for (int j = 0; j < dirtMatNames.Count; j++)
+		{
+			if (dirtMatNames[j] == text2)
+			{
+				return GroundType.Dirt;
+			}
+		}
+		for (int k = 0; k < stoneyMatNames.Count; k++)
+		{
+			if (stoneyMatNames[k] == text2)
+			{
+				return GroundType.Gravel;
+			}
+		}
+		return GroundType.HardSurface;
 	}
 }

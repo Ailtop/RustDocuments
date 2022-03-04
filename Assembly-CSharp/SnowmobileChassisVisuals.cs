@@ -18,9 +18,6 @@ public class SnowmobileChassisVisuals : VehicleChassisVisuals<Snowmobile>, IClie
 	private SnowmobileAudio audioScript;
 
 	[SerializeField]
-	private VehiclePhysicMatList physicMatList;
-
-	[SerializeField]
 	private TreadRenderer[] treadRenderers;
 
 	[SerializeField]

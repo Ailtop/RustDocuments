@@ -15,5 +15,5 @@ public class ServerBrowserItem : MonoBehaviour
 
 	public Toggle favourited;
 
-	public ServerBrowserTag[] serverTags;
+	public ServerBrowserTagList serverTagList;
 }

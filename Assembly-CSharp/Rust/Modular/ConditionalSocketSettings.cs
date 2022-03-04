@@ -7,12 +7,12 @@ namespace Rust.Modular
 	{
 		public enum LocationCondition
 		{
-			Middle,
-			Front,
-			Back,
-			NotMiddle,
-			NotFront,
-			NotBack
+			Middle = 0,
+			Front = 1,
+			Back = 2,
+			NotMiddle = 3,
+			NotFront = 4,
+			NotBack = 5
 		}
 
 		public bool restrictOnLocation;

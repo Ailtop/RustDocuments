@@ -1,3 +1,4 @@
+using Rust.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,6 +18,22 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 	public GameObject performanceWarning;
 
 	public AudioSource music;
+
+	public RectTransform serverInfo;
+
+	public RustText serverName;
+
+	public RustText serverPlayers;
+
+	public RustLayout serverModeSection;
+
+	public RustText serverMode;
+
+	public RustText serverMap;
+
+	public RustLayout serverTagsSection;
+
+	public ServerBrowserTagList serverTags;
 
 	public static bool isOpen
 	{

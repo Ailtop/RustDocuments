@@ -7,14 +7,14 @@ namespace Rust.Ai
 	{
 		public enum SquadSpawnerLocation
 		{
-			MilitaryTunnels,
-			JunkpileA,
-			JunkpileG,
-			CH47,
-			None,
-			Compound,
-			BanditTown,
-			CargoShip
+			MilitaryTunnels = 0,
+			JunkpileA = 1,
+			JunkpileG = 2,
+			CH47 = 3,
+			None = 4,
+			Compound = 5,
+			BanditTown = 6,
+			CargoShip = 7
 		}
 
 		public SquadSpawnerLocation Location;

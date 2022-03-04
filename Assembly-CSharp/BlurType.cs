@@ -1,5 +1,5 @@
 public enum BlurType
 {
-	StandardGauss,
-	SgxGauss
+	StandardGauss = 0,
+	SgxGauss = 1
 }

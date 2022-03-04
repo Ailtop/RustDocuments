@@ -4,7 +4,7 @@ namespace Generated.AnimatorController
 	{
 		public enum Layers
 		{
-			Movement
+			Movement = 0
 		}
 
 		public static class Groups

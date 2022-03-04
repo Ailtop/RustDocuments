@@ -5,9 +5,9 @@ public class GameContentList : MonoBehaviour
 {
 	public enum ResourceType
 	{
-		Audio,
-		Textures,
-		Models
+		Audio = 0,
+		Textures = 1,
+		Models = 2
 	}
 
 	public ResourceType resourceType;

@@ -148,7 +148,7 @@ public class VehicleModuleEngine : VehicleModuleStorage
 		if (isSpawned && base.IsOnAVehicle)
 		{
 			base.VehicleFixedUpdate();
-			if (base.Vehicle.IsMovingOrOn && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController<GroundVehicle>.EngineState.On)
+			if (base.Vehicle.IsMovingOrOn && !(base.Car == null) && base.Car.CurEngineState == VehicleEngineController<GroundVehicle>.EngineState.On && IsUsable)
 			{
 				float num = Mathf.Lerp(engine.idleFuelPerSec, engine.maxFuelPerSec, Mathf.Abs(base.Car.GetThrottleInput()));
 				num /= PerformanceFractionFuelEconomy;

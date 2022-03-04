@@ -18,8 +18,8 @@ public class ModelConditionTest_RoofLeft : ModelConditionTest
 	public enum ShapeType
 	{
 		Any = -1,
-		Square,
-		Triangle
+		Square = 0,
+		Triangle = 1
 	}
 
 	public AngleType angle = AngleType.None;

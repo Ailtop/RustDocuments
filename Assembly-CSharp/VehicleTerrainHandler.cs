@@ -4,12 +4,12 @@ public class VehicleTerrainHandler
 {
 	public enum Surface
 	{
-		Default,
-		Road,
-		Snow,
-		Ice,
-		Sand,
-		Frictionless
+		Default = 0,
+		Road = 1,
+		Snow = 2,
+		Ice = 3,
+		Sand = 4,
+		Frictionless = 5
 	}
 
 	public string CurGroundPhysicsMatName;
@@ -67,7 +67,7 @@ public class VehicleTerrainHandler
 			}
 			else if (CurGroundPhysicsMatName == "snow")
 			{
-				if (hitInfo.collider.name.ToLower().Contains("ice"))
+				if (hitInfo.collider.CompareTag("TreatSnowAsIce"))
 				{
 					OnSurface = Surface.Ice;
 				}

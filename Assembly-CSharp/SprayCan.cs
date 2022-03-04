@@ -5,6 +5,7 @@ using System.Linq;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -12,12 +13,12 @@ public class SprayCan : HeldEntity
 {
 	private enum SprayFailReason
 	{
-		None,
-		MountedBlocked,
-		IOConnection,
-		LineOfSight,
-		SkinNotOwned,
-		InvalidItem
+		None = 0,
+		MountedBlocked = 1,
+		IOConnection = 2,
+		LineOfSight = 3,
+		SkinNotOwned = 4,
+		InvalidItem = 5
 	}
 
 	private struct ContainerSet
@@ -59,8 +60,6 @@ public class SprayCan : HeldEntity
 	public ParticleSystem OneShotWorldSpray;
 
 	public GameObjectRef ReskinEffect;
-
-	private Rigidbody resetRigidbody;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -110,7 +109,7 @@ public class SprayCan : HeldEntity
 	[RPC_Server.IsActiveItem]
 	private void ChangeItemSkin(RPCMessage msg)
 	{
-		_003C_003Ec__DisplayClass15_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass15_0();
+		_003C_003Ec__DisplayClass14_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass14_0();
 		CS_0024_003C_003E8__locals0._003C_003E4__this = this;
 		if (IsBusy())
 		{
@@ -138,6 +137,20 @@ public class SprayCan : HeldEntity
 				CS_0024_003C_003E8__locals0._003CChangeItemSkin_003Eg__SprayFailResponse_007C2(SprayFailReason.LineOfSight);
 				return;
 			}
+			Door door;
+			if ((object)(door = baseNetworkable as Door) != null)
+			{
+				if (!door.GetPlayerLockPermission(msg.player))
+				{
+					msg.player.ChatMessage("Door must be openable");
+					return;
+				}
+				if (door.IsOpen())
+				{
+					msg.player.ChatMessage("Door must be closed");
+					return;
+				}
+			}
 			ItemDefinition def;
 			if (!GetItemDefinitionForEntity(baseEntity, out def))
 			{
@@ -147,6 +160,10 @@ public class SprayCan : HeldEntity
 			ItemDefinition itemDefinition = null;
 			ulong num = ItemDefinition.FindSkin(def.itemid, CS_0024_003C_003E8__locals0.targetSkin);
 			ItemSkinDirectory.Skin skin = def.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => x.id == CS_0024_003C_003E8__locals0.targetSkin);
+			if (Interface.CallHook("OnEntityReskin", baseEntity, skin, msg.player) != null)
+			{
+				return;
+			}
 			ItemSkin itemSkin;
 			if (skin.invItem != null && (object)(itemSkin = skin.invItem as ItemSkin) != null)
 			{
@@ -187,11 +204,12 @@ public class SprayCan : HeldEntity
 				Quaternion rotation = baseEntity.transform.rotation;
 				BaseEntity entity = baseEntity.GetParentEntity();
 				float health = baseEntity.Health();
-				Rigidbody component = baseEntity.GetComponent<Rigidbody>();
 				EntityRef[] slots = baseEntity.GetSlots();
+				BaseCombatEntity baseCombatEntity;
+				float lastAttackedTime = (((object)(baseCombatEntity = baseEntity as BaseCombatEntity) != null) ? baseCombatEntity.lastAttackedTime : 0f);
 				bool flag2 = baseEntity is Door;
 				Dictionary<ContainerSet, List<Item>> dictionary = new Dictionary<ContainerSet, List<Item>>();
-				_003CChangeItemSkin_003Eg__SaveEntityStorage_007C15_0(baseEntity, dictionary, 0);
+				_003CChangeItemSkin_003Eg__SaveEntityStorage_007C14_0(baseEntity, dictionary, 0);
 				List<ChildPreserveInfo> obj = Facepunch.Pool.GetList<ChildPreserveInfo>();
 				if (flag2)
 				{
@@ -214,18 +232,11 @@ public class SprayCan : HeldEntity
 				{
 					for (int i = 0; i < baseEntity.children.Count; i++)
 					{
-						_003CChangeItemSkin_003Eg__SaveEntityStorage_007C15_0(baseEntity.children[i], dictionary, i + 1);
+						_003CChangeItemSkin_003Eg__SaveEntityStorage_007C14_0(baseEntity.children[i], dictionary, i + 1);
 					}
 				}
 				baseEntity.Kill();
 				baseEntity = GameManager.server.CreateEntity(resourcePath, position2, rotation);
-				Rigidbody component2;
-				if (component != null && baseEntity.TryGetComponent<Rigidbody>(out component2) && !component2.isKinematic && component2.useGravity)
-				{
-					component2.useGravity = false;
-					resetRigidbody = component2;
-					Invoke(RestoreRigidbody, 0.1f);
-				}
 				baseEntity.SetParent(entity);
 				ItemDefinition def2;
 				if (GetItemDefinitionForEntity(baseEntity, out def2, false) && def2.isRedirectOf != null)
@@ -236,20 +247,26 @@ public class SprayCan : HeldEntity
 				{
 					baseEntity.skinID = num;
 				}
-				baseEntity.Spawn();
-				BaseCombatEntity baseCombatEntity;
-				if ((object)(baseCombatEntity = baseEntity as BaseCombatEntity) != null)
+				DecayEntity decayEntity;
+				if ((object)(decayEntity = baseEntity as DecayEntity) != null)
 				{
-					baseCombatEntity.SetHealth(health);
+					decayEntity.AttachToBuilding(null);
+				}
+				baseEntity.Spawn();
+				BaseCombatEntity baseCombatEntity2;
+				if ((object)(baseCombatEntity2 = baseEntity as BaseCombatEntity) != null)
+				{
+					baseCombatEntity2.SetHealth(health);
+					baseCombatEntity2.lastAttackedTime = lastAttackedTime;
 				}
 				if (dictionary.Count > 0)
 				{
-					_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C15_1(baseEntity, 0, dictionary);
+					_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C14_1(baseEntity, 0, dictionary);
 					if (!flag2)
 					{
 						for (int j = 0; j < baseEntity.children.Count; j++)
 						{
-							_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C15_1(baseEntity.children[j], j + 1, dictionary);
+							_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C14_1(baseEntity.children[j], j + 1, dictionary);
 						}
 					}
 					foreach (KeyValuePair<ContainerSet, List<Item>> item2 in dictionary)
@@ -274,20 +291,12 @@ public class SprayCan : HeldEntity
 				}
 				Facepunch.Pool.FreeList(ref obj);
 			}
+			Interface.CallHook("OnEntityReskinned", baseEntity, skin, msg.player);
 			ClientRPC(null, "Client_ReskinResult", 1, baseEntity.net.ID);
 		}
 		LoseCondition(ConditionLossPerReskin);
 		SetFlag(Flags.Busy, true);
 		Invoke(ClearBusy, SprayCooldown);
-	}
-
-	private void RestoreRigidbody()
-	{
-		if (resetRigidbody != null)
-		{
-			resetRigidbody.useGravity = true;
-		}
-		resetRigidbody = null;
 	}
 
 	private bool GetEntityPrefabPath(ItemDefinition def, out string resourcePath)

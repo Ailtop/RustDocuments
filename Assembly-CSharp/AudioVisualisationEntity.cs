@@ -11,25 +11,25 @@ public class AudioVisualisationEntity : IOEntity
 {
 	public enum LightColour
 	{
-		Red,
-		Green,
-		Blue,
-		Yellow,
-		Pink
+		Red = 0,
+		Green = 1,
+		Blue = 2,
+		Yellow = 3,
+		Pink = 4
 	}
 
 	public enum VolumeSensitivity
 	{
-		Small,
-		Medium,
-		Large
+		Small = 0,
+		Medium = 1,
+		Large = 2
 	}
 
 	public enum Speed
 	{
-		Low,
-		Medium,
-		High
+		Low = 0,
+		Medium = 1,
+		High = 2
 	}
 
 	private EntityRef<BaseEntity> connectedTo;

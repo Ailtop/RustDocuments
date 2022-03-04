@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -66,7 +67,7 @@ namespace CompanionServer
 				}
 				catch (Exception arg)
 				{
-					Debug.LogError($"Companion server failed to start: {arg}");
+					UnityEngine.Debug.LogError($"Companion server failed to start: {arg}");
 				}
 				PostInitializeServer();
 			}
@@ -127,14 +128,14 @@ namespace CompanionServer
 					SetServerRegistration(await httpResponseMessage.Content.ReadAsStringAsync());
 					return;
 				}
-				Debug.LogWarning("Failed to refresh server ID - registering a new one");
+				UnityEngine.Debug.LogWarning("Failed to refresh server ID - registering a new one");
 				goto IL_0185;
 				IL_0185:
 				SetServerRegistration(await Http.GetStringAsync("https://companion-rust.facepunch.com/api/server/register"));
 			}
 			catch (Exception arg)
 			{
-				Debug.LogError($"Failed to setup companion server registration: {arg}");
+				UnityEngine.Debug.LogError($"Failed to setup companion server registration: {arg}");
 			}
 		}
 
@@ -156,7 +157,7 @@ namespace CompanionServer
 			}
 			catch (Exception arg)
 			{
-				Debug.LogError($"Failed to load companion server registration: {arg}");
+				UnityEngine.Debug.LogError($"Failed to load companion server registration: {arg}");
 				return false;
 			}
 		}
@@ -170,7 +171,7 @@ namespace CompanionServer
 			}
 			catch (Exception arg)
 			{
-				Debug.LogError($"Failed to parse registration response JSON: {responseJson}\n\n{arg}");
+				UnityEngine.Debug.LogError($"Failed to parse registration response JSON: {responseJson}\n\n{arg}");
 			}
 			SetServerId(registerResponse?.ServerId);
 			Token = registerResponse?.ServerToken;
@@ -182,7 +183,7 @@ namespace CompanionServer
 				}
 				catch (Exception arg2)
 				{
-					Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
+					UnityEngine.Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
 				}
 			}
 		}
@@ -196,17 +197,18 @@ namespace CompanionServer
 			}
 			try
 			{
+				string arg = await GetPublicIPAsync();
 				StringContent content = new StringContent("", Encoding.UTF8, "text/plain");
-				HttpResponseMessage testResponse = await Http.PostAsync("https://companion-rust.facepunch.com/api/server" + $"/test_connection?address={App.GetPublicIP()}&port={App.port}", content);
+				HttpResponseMessage testResponse = await Http.PostAsync("https://companion-rust.facepunch.com/api/server" + $"/test_connection?address={arg}&port={App.port}", content);
 				string text = await testResponse.Content.ReadAsStringAsync();
 				TestConnectionResponse testConnectionResponse = null;
 				try
 				{
 					testConnectionResponse = JsonConvert.DeserializeObject<TestConnectionResponse>(text);
 				}
-				catch (Exception arg)
+				catch (Exception arg2)
 				{
-					Debug.LogError($"Failed to parse connectivity test response JSON: {text}\n\n{arg}");
+					UnityEngine.Debug.LogError($"Failed to parse connectivity test response JSON: {text}\n\n{arg2}");
 				}
 				if (testConnectionResponse == null)
 				{
@@ -216,20 +218,37 @@ namespace CompanionServer
 				string text2 = string.Join("\n", messages ?? Enumerable.Empty<string>());
 				if (testResponse.StatusCode == (HttpStatusCode)555)
 				{
-					Debug.LogError("Rust+ companion server connectivity test failed! Disabling Rust+ features.\n\n" + text2);
+					UnityEngine.Debug.LogError("Rust+ companion server connectivity test failed! Disabling Rust+ features.\n\n" + text2);
 					SetServerId(null);
 					return;
 				}
 				testResponse.EnsureSuccessStatusCode();
 				if (!string.IsNullOrWhiteSpace(text2))
 				{
-					Debug.LogWarning("Rust+ companion server connectivity test has warnings:\n" + text2);
+					UnityEngine.Debug.LogWarning("Rust+ companion server connectivity test has warnings:\n" + text2);
 				}
 			}
-			catch (Exception arg2)
+			catch (Exception arg3)
 			{
-				Debug.LogError($"Failed to check connectivity to the companion server: {arg2}");
+				UnityEngine.Debug.LogError($"Failed to check connectivity to the companion server: {arg3}");
 			}
+		}
+
+		private static async Task<string> GetPublicIPAsync()
+		{
+			Stopwatch timer = Stopwatch.StartNew();
+			string publicIP;
+			while (true)
+			{
+				bool num = timer.Elapsed.TotalMinutes > 2.0;
+				publicIP = App.GetPublicIP();
+				if (num || (!string.IsNullOrWhiteSpace(publicIP) && publicIP != "0.0.0.0"))
+				{
+					break;
+				}
+				await Task.Delay(10000);
+			}
+			return publicIP;
 		}
 
 		private static void SetServerId(string serverId)

@@ -7,10 +7,10 @@ public class NGSS_Directional : MonoBehaviour
 {
 	public enum SAMPLER_COUNT
 	{
-		SAMPLERS_16,
-		SAMPLERS_25,
-		SAMPLERS_32,
-		SAMPLERS_64
+		SAMPLERS_16 = 0,
+		SAMPLERS_25 = 1,
+		SAMPLERS_32 = 2,
+		SAMPLERS_64 = 3
 	}
 
 	[Tooltip("Overall softness for both PCF and PCSS shadows.\nRecommended value: 0.01.")]

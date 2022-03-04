@@ -1,5 +1,5 @@
 public enum LODEnvironmentMode
 {
-	Default,
-	Underground
+	Default = 0,
+	Underground = 1
 }

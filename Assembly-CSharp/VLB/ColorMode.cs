@@ -2,7 +2,7 @@ namespace VLB
 {
 	public enum ColorMode
 	{
-		Flat,
-		Gradient
+		Flat = 0,
+		Gradient = 1
 	}
 }

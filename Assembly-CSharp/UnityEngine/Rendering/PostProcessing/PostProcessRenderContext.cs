@@ -6,10 +6,10 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		public enum StereoRenderingMode
 		{
-			MultiPass,
-			SinglePass,
-			SinglePassInstanced,
-			SinglePassMultiview
+			MultiPass = 0,
+			SinglePass = 1,
+			SinglePassInstanced = 2,
+			SinglePassMultiview = 3
 		}
 
 		public bool dlssEnabled;

@@ -33,8 +33,8 @@ public class ItemDefinition : MonoBehaviour
 
 	public enum RedirectVendingBehaviour
 	{
-		NoListing,
-		ListAsUniqueItem
+		NoListing = 0,
+		ListAsUniqueItem = 1
 	}
 
 	[Flags]
@@ -46,13 +46,13 @@ public class ItemDefinition : MonoBehaviour
 
 	public enum AmountType
 	{
-		Count,
-		Millilitre,
-		Feet,
-		Genetics,
-		OxygenSeconds,
-		Frequency,
-		Generic
+		Count = 0,
+		Millilitre = 1,
+		Feet = 2,
+		Genetics = 3,
+		OxygenSeconds = 4,
+		Frequency = 5,
+		Generic = 6
 	}
 
 	[Header("Item")]

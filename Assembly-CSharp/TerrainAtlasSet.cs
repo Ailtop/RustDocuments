@@ -6,10 +6,10 @@ public class TerrainAtlasSet : ScriptableObject
 {
 	public enum SourceType
 	{
-		ALBEDO,
-		NORMAL,
-		PACKED,
-		COUNT
+		ALBEDO = 0,
+		NORMAL = 1,
+		PACKED = 2,
+		COUNT = 3
 	}
 
 	[Serializable]

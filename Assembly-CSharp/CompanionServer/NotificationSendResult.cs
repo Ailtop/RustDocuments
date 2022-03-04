@@ -2,13 +2,13 @@ namespace CompanionServer
 {
 	public enum NotificationSendResult
 	{
-		Failed,
-		Sent,
-		Empty,
-		Disabled,
-		RateLimited,
-		ServerError,
-		NoTargetsFound,
-		TooManySubscribers
+		Failed = 0,
+		Sent = 1,
+		Empty = 2,
+		Disabled = 3,
+		RateLimited = 4,
+		ServerError = 5,
+		NoTargetsFound = 6,
+		TooManySubscribers = 7
 	}
 }

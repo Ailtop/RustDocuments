@@ -48,11 +48,11 @@ public class ReflectionProbeEx : MonoBehaviour
 	[Serializable]
 	public enum ConvolutionQuality
 	{
-		Lowest,
-		Low,
-		Medium,
-		High,
-		VeryHigh
+		Lowest = 0,
+		Low = 1,
+		Medium = 2,
+		High = 3,
+		VeryHigh = 4
 	}
 
 	[Serializable]

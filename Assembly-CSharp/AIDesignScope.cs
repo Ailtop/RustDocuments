@@ -1,6 +1,6 @@
 public enum AIDesignScope
 {
-	Default,
-	EntityServerWide,
-	EntityInstance
+	Default = 0,
+	EntityServerWide = 1,
+	EntityInstance = 2
 }

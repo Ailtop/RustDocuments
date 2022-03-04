@@ -6,8 +6,8 @@ namespace Sonar
 	{
 		public enum SType
 		{
-			MoonPool,
-			Sub
+			MoonPool = 0,
+			Sub = 1
 		}
 
 		[SerializeField]

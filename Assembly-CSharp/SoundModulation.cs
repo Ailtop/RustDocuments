@@ -5,10 +5,10 @@ public class SoundModulation : MonoBehaviour, IClientComponent
 {
 	public enum Parameter
 	{
-		Gain,
-		Pitch,
-		Spread,
-		MaxDistance
+		Gain = 0,
+		Pitch = 1,
+		Spread = 2,
+		MaxDistance = 3
 	}
 
 	[Serializable]

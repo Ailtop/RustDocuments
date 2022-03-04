@@ -163,8 +163,8 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public enum DestroyMode : byte
 	{
-		None,
-		Gib
+		None = 0,
+		Gib = 1
 	}
 
 	public List<Component> postNetworkUpdateComponents = new List<Component>();

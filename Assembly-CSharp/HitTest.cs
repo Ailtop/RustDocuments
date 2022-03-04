@@ -4,11 +4,11 @@ public class HitTest
 {
 	public enum Type
 	{
-		Generic,
-		ProjectileEffect,
-		Projectile,
-		MeleeAttack,
-		Use
+		Generic = 0,
+		ProjectileEffect = 1,
+		Projectile = 2,
+		MeleeAttack = 3,
+		Use = 4
 	}
 
 	public Type type;

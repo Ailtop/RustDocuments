@@ -37,6 +37,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public Transform[] Shoulders;
 
+	public Transform[] AdditionalSpineBones;
+
 	protected static int speed = Animator.StringToHash("speed");
 
 	protected static int acceleration = Animator.StringToHash("acceleration");
@@ -65,8 +67,6 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	protected static int reload = Animator.StringToHash("reload");
 
-	protected static int sitReaction = Animator.StringToHash("sitReaction");
-
 	protected static int throwWeapon = Animator.StringToHash("throw");
 
 	protected static int holster = Animator.StringToHash("holster");
@@ -92,6 +92,12 @@ public class PlayerModel : ListComponent<PlayerModel>
 	protected static int rightFootIK = Animator.StringToHash("rightFootIK");
 
 	protected static int vehicleSteering = Animator.StringToHash("vehicleSteering");
+
+	protected static int sitReaction = Animator.StringToHash("sitReaction");
+
+	protected static int forwardReaction = Animator.StringToHash("forwardReaction");
+
+	protected static int rightReaction = Animator.StringToHash("rightReaction");
 
 	public BoxCollider collision;
 

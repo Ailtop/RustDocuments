@@ -4,11 +4,11 @@ public class HitNumber : MonoBehaviour
 {
 	public enum HitType
 	{
-		Yellow,
-		Green,
-		Blue,
-		Purple,
-		Red
+		Yellow = 0,
+		Green = 1,
+		Blue = 2,
+		Purple = 3,
+		Red = 4
 	}
 
 	public HitType hitType;

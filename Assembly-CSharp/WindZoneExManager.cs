@@ -6,8 +6,8 @@ public class WindZoneExManager : MonoBehaviour
 {
 	private enum TestMode
 	{
-		Disabled,
-		Low
+		Disabled = 0,
+		Low = 1
 	}
 
 	public float maxAccumMain = 4f;

@@ -7,10 +7,10 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		public enum Mode
 		{
-			None,
-			Lift,
-			Gamma,
-			Gain
+			None = 0,
+			Lift = 1,
+			Gamma = 2,
+			Gain = 3
 		}
 
 		public readonly Mode mode;

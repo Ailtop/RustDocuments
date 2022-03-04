@@ -1,6 +1,6 @@
 public enum MemoryBankType
 {
-	Entity,
-	Position,
-	AIPoint
+	Entity = 0,
+	Position = 1,
+	AIPoint = 2
 }

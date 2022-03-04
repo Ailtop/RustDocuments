@@ -6,9 +6,9 @@ public class DoorManipulator : IOEntity
 {
 	public enum DoorEffect
 	{
-		Close,
-		Open,
-		Toggle
+		Close = 0,
+		Open = 1,
+		Toggle = 2
 	}
 
 	public EntityRef entityRef;

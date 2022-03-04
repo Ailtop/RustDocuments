@@ -6,21 +6,21 @@ public class TrainTrackSpline : WorldSpline
 {
 	public enum TrackSelection
 	{
-		Default,
-		Left,
-		Right
+		Default = 0,
+		Left = 1,
+		Right = 2
 	}
 
 	public enum TrackPosition
 	{
-		Next,
-		Prev
+		Next = 0,
+		Prev = 1
 	}
 
 	public enum TrackOrientation
 	{
-		Same,
-		Reverse
+		Same = 0,
+		Reverse = 1
 	}
 
 	public class ConnectedTrackInfo
@@ -41,8 +41,8 @@ public class TrainTrackSpline : WorldSpline
 
 	public enum DistanceType
 	{
-		SplineDistance,
-		WorldDistance
+		SplineDistance = 0,
+		WorldDistance = 1
 	}
 
 	public interface ITrainTrackUser

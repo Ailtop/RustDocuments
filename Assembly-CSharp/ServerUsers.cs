@@ -14,10 +14,10 @@ public static class ServerUsers
 {
 	public enum UserGroup
 	{
-		None,
-		Owner,
-		Moderator,
-		Banned
+		None = 0,
+		Owner = 1,
+		Moderator = 2,
+		Banned = 3
 	}
 
 	public class User
@@ -51,7 +51,7 @@ public static class ServerUsers
 
 	public static void Remove(ulong uid)
 	{
-		Interface.CallHook("IOnServerUsersRemove", uid);
+		Interface.CallHook("OnServerUserRemove", uid);
 		users.Remove(uid);
 	}
 
@@ -66,7 +66,7 @@ public static class ServerUsers
 			notes = notes,
 			expiry = expiry
 		};
-		Interface.CallHook("IOnServerUsersSet", uid, group, username, notes, expiry);
+		Interface.CallHook("OnServerUserSet", uid, group, username, notes, expiry);
 		users.Add(uid, value);
 	}
 

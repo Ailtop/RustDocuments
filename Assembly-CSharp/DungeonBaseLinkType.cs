@@ -1,6 +1,6 @@
 public enum DungeonBaseLinkType
 {
-	Room,
-	Corridor,
-	End
+	Room = 0,
+	Corridor = 1,
+	End = 2
 }

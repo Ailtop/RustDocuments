@@ -1,7 +1,7 @@
 internal enum FixAtlasMipLevelsState
 {
-	Skipped,
-	Initializing,
-	Succeeded,
-	Failed
+	Skipped = 0,
+	Initializing = 1,
+	Succeeded = 2,
+	Failed = 3
 }

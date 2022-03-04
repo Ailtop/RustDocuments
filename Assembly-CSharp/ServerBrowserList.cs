@@ -6,12 +6,12 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 {
 	public enum QueryType
 	{
-		RegularInternet,
-		Friends,
-		History,
-		LAN,
-		Favourites,
-		None
+		RegularInternet = 0,
+		Friends = 1,
+		History = 2,
+		LAN = 3,
+		Favourites = 4,
+		None = 5
 	}
 
 	[Serializable]
@@ -32,7 +32,7 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 
 	public QueryType queryType;
 
-	public static string VersionTag = "v" + 2328;
+	public static string VersionTag = "v" + 2330;
 
 	public ServerKeyvalues[] keyValues = new ServerKeyvalues[0];
 

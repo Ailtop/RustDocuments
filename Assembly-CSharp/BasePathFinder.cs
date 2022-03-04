@@ -61,7 +61,7 @@ public class BasePathFinder
 			{
 				topologySamples[num] = position;
 				num++;
-				if (navigator.IsPositionATopologyPreference(position))
+				if (navigator.IsPositionABiomePreference(position) && navigator.IsPositionATopologyPreference(position))
 				{
 					preferedTopologySamples[num2] = position;
 					num2++;

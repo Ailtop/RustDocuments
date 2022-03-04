@@ -5,10 +5,10 @@ public abstract class BaseMonoBehaviour : FacepunchBehaviour
 {
 	public enum LogEntryType
 	{
-		General,
-		Network,
-		Hierarchy,
-		Serialization
+		General = 0,
+		Network = 1,
+		Hierarchy = 2,
+		Serialization = 3
 	}
 
 	public virtual bool IsDebugging()

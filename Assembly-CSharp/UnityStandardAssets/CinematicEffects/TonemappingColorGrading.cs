@@ -92,13 +92,13 @@ namespace UnityStandardAssets.CinematicEffects
 
 		public enum Tonemapper
 		{
-			ACES,
-			Curve,
-			Hable,
-			HejlDawson,
-			Photographic,
-			Reinhard,
-			Neutral
+			ACES = 0,
+			Curve = 1,
+			Hable = 2,
+			HejlDawson = 3,
+			Photographic = 4,
+			Reinhard = 5,
+			Neutral = 6
 		}
 
 		[Serializable]
@@ -232,9 +232,9 @@ namespace UnityStandardAssets.CinematicEffects
 			[Tooltip("Brightens or darkens all colors.")]
 			public float value;
 
-			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			[Space]
 			[Range(0f, 2f)]
+			[Tooltip("Expands or shrinks the overall range of tonal values.")]
 			public float contrast;
 
 			[Range(0.01f, 5f)]

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -29,7 +30,7 @@ public class InstantCameraTool : HeldEntity
 	[Range(0f, 5f)]
 	public float cooldownSeconds = 3f;
 
-	private TimeSince _sinceLastPhoto;
+	public TimeSince _sinceLastPhoto;
 
 	private bool hasSentAchievement;
 
@@ -126,6 +127,10 @@ public class InstantCameraTool : HeldEntity
 			return;
 		}
 		photoEntity.SetImageData(player.userID, array);
+		if (Interface.CallHook("OnPhotoCapture", photoEntity, item, player, array) != null)
+		{
+			return;
+		}
 		if (!player.inventory.GiveItem(item2))
 		{
 			item2.Drop(player.GetDropPosition(), player.GetDropVelocity());
@@ -149,6 +154,7 @@ public class InstantCameraTool : HeldEntity
 			Facepunch.Pool.FreeList(ref obj);
 		}
 		item.LoseCondition(1f);
+		Interface.CallHook("OnPhotoCaptured", photoEntity, item, player, array);
 	}
 
 	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)

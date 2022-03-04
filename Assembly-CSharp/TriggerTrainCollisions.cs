@@ -6,8 +6,8 @@ public class TriggerTrainCollisions : TriggerBase
 {
 	public enum ColliderLocation
 	{
-		Front,
-		Rear
+		Front = 0,
+		Rear = 1
 	}
 
 	public Collider triggerCollider;

@@ -10,14 +10,14 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class IOEntity : BaseCombatEntity
+public class IOEntity : DecayEntity
 {
 	public enum IOType
 	{
-		Electric,
-		Fluidic,
-		Kinetic,
-		Generic
+		Electric = 0,
+		Fluidic = 1,
+		Kinetic = 2,
+		Generic = 3
 	}
 
 	[Serializable]
@@ -391,9 +391,9 @@ public class IOEntity : BaseCombatEntity
 		return false;
 	}
 
+	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(6f)]
-	[RPC_Server.CallsPerSecond(10uL)]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

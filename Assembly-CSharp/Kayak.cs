@@ -5,10 +5,10 @@ public class Kayak : BaseBoat, IPoolVehicle
 {
 	private enum PaddleDirection
 	{
-		Left,
-		Right,
-		LeftBack,
-		RightBack
+		Left = 0,
+		Right = 1,
+		LeftBack = 2,
+		RightBack = 3
 	}
 
 	public ItemDefinition OarItem;
@@ -146,6 +146,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 		{
 			Effect.server.Run(pushLandEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
 		}
+		WakeUp();
 	}
 
 	public override void VehicleFixedUpdate()

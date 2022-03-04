@@ -4,9 +4,9 @@ public class DecorFlip : DecorComponent
 {
 	public enum AxisType
 	{
-		X,
-		Y,
-		Z
+		X = 0,
+		Y = 1,
+		Z = 2
 	}
 
 	public AxisType FlipAxis = AxisType.Y;

@@ -4,8 +4,8 @@ public class SoundFade : MonoBehaviour, IClientComponent
 {
 	public enum Direction
 	{
-		In,
-		Out
+		In = 0,
+		Out = 1
 	}
 
 	public SoundFadeHQAudioFilter hqFadeFilter;

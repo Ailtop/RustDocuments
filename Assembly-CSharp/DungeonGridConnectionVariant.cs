@@ -1,5 +1,5 @@
 public enum DungeonGridConnectionVariant
 {
-	A,
-	B
+	A = 0,
+	B = 1
 }

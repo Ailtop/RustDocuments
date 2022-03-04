@@ -51,9 +51,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[Tooltip("Affects how many F-stops (EV) to add to the dynamic range of the curve.")]
 		[DisplayName("Shoulder Length")]
 		[Min(0f)]
-		[Tooltip("Affects how many F-stops (EV) to add to the dynamic range of the curve.")]
 		public FloatParameter toneCurveShoulderLength = new FloatParameter
 		{
 			value = 0.5f
@@ -91,9 +91,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 1f
 		};
 
+		[DisplayName("Temperature")]
 		[Range(-100f, 100f)]
 		[Tooltip("Sets the white balance to a custom color temperature.")]
-		[DisplayName("Temperature")]
 		public FloatParameter temperature = new FloatParameter
 		{
 			value = 0f
@@ -107,9 +107,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[Tooltip("Tint the render by multiplying a color.")]
 		[DisplayName("Color Filter")]
 		[ColorUsage(false, true)]
+		[Tooltip("Tint the render by multiplying a color.")]
 		public ColorParameter colorFilter = new ColorParameter
 		{
 			value = Color.white
@@ -123,17 +123,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[DisplayName("Saturation")]
 		[Range(-100f, 100f)]
 		[Tooltip("Pushes the intensity of all colors.")]
-		[DisplayName("Saturation")]
 		public FloatParameter saturation = new FloatParameter
 		{
 			value = 0f
 		};
 
+		[Tooltip("Makes the image brighter or darker.")]
 		[DisplayName("Brightness")]
 		[Range(-100f, 100f)]
-		[Tooltip("Makes the image brighter or darker.")]
 		public FloatParameter brightness = new FloatParameter
 		{
 			value = 0f
@@ -146,9 +146,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
+		[DisplayName("Contrast")]
 		[Range(-100f, 100f)]
 		[Tooltip("Expands or shrinks the overall range of tonal values.")]
-		[DisplayName("Contrast")]
 		public FloatParameter contrast = new FloatParameter
 		{
 			value = 0f
@@ -194,9 +194,9 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 100f
 		};
 
+		[DisplayName("Blue")]
 		[Range(-200f, 200f)]
 		[Tooltip("Modify influence of the blue channel in the overall mix.")]
-		[DisplayName("Blue")]
 		public FloatParameter mixerGreenOutBlueIn = new FloatParameter
 		{
 			value = 0f
@@ -218,17 +218,17 @@ namespace UnityEngine.Rendering.PostProcessing
 			value = 0f
 		};
 
-		[Tooltip("Modify influence of the blue channel in the overall mix.")]
 		[DisplayName("Blue")]
 		[Range(-200f, 200f)]
+		[Tooltip("Modify influence of the blue channel in the overall mix.")]
 		public FloatParameter mixerBlueOutBlueIn = new FloatParameter
 		{
 			value = 100f
 		};
 
-		[DisplayName("Lift")]
 		[Tooltip("Controls the darkest portions of the render.")]
 		[Trackball(TrackballAttribute.Mode.Lift)]
+		[DisplayName("Lift")]
 		public Vector4Parameter lift = new Vector4Parameter
 		{
 			value = new Vector4(1f, 1f, 1f, 0f)

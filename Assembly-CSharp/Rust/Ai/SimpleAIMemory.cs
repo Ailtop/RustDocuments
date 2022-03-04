@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ConVar;
+using Oxide.Core;
 using UnityEngine;
 
 namespace Rust.AI
@@ -31,6 +32,10 @@ namespace Rust.AI
 
 		public void SetKnown(BaseEntity ent, BaseEntity owner, AIBrainSenses brainSenses)
 		{
+			if (Interface.CallHook("OnNpcTargetSense", owner, ent, brainSenses) != null)
+			{
+				return;
+			}
 			IAISenses iAISenses = owner as IAISenses;
 			bool flag = false;
 			if (iAISenses != null && iAISenses.IsThreat(ent))

@@ -9,8 +9,8 @@ public class Locker : StorageContainer
 {
 	private enum RowType
 	{
-		Clothing,
-		Belt
+		Clothing = 0,
+		Belt = 1
 	}
 
 	public static class LockerFlags

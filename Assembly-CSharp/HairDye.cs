@@ -6,15 +6,15 @@ public class HairDye
 {
 	public enum CopyProperty
 	{
-		DyeColor,
-		RootColor,
-		TipColor,
-		Brightness,
-		DyeRoughness,
-		DyeScatter,
-		Specular,
-		Roughness,
-		Count
+		DyeColor = 0,
+		RootColor = 1,
+		TipColor = 2,
+		Brightness = 3,
+		DyeRoughness = 4,
+		DyeScatter = 5,
+		Specular = 6,
+		Roughness = 7,
+		Count = 8
 	}
 
 	[Flags]

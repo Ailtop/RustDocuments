@@ -6,14 +6,14 @@ public class MetabolismAttribute
 {
 	public enum Type
 	{
-		Calories,
-		Hydration,
-		Heartrate,
-		Poison,
-		Radiation,
-		Bleeding,
-		Health,
-		HealthOverTime
+		Calories = 0,
+		Hydration = 1,
+		Heartrate = 2,
+		Poison = 3,
+		Radiation = 4,
+		Bleeding = 5,
+		Health = 6,
+		HealthOverTime = 7
 	}
 
 	public float startMin;

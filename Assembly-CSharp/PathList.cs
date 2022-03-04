@@ -6,24 +6,24 @@ public class PathList
 {
 	public enum Side
 	{
-		Both,
-		Left,
-		Right,
-		Any
+		Both = 0,
+		Left = 1,
+		Right = 2,
+		Any = 3
 	}
 
 	public enum Placement
 	{
-		Center,
-		Side
+		Center = 0,
+		Side = 1
 	}
 
 	public enum Alignment
 	{
-		None,
-		Neighbor,
-		Forward,
-		Inward
+		None = 0,
+		Neighbor = 1,
+		Forward = 2,
+		Inward = 3
 	}
 
 	[Serializable]

@@ -25,9 +25,9 @@ public class CardTableUI : UIDialog
 	{
 		public enum Attitude
 		{
-			Neutral,
-			Good,
-			Bad
+			Neutral = 0,
+			Good = 1,
+			Bad = 2
 		}
 
 		public GameObject gameObj;

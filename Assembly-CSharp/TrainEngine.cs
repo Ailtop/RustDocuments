@@ -14,13 +14,13 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 {
 	public enum EngineSpeeds
 	{
-		Rev_Hi,
-		Rev_Med,
-		Rev_Lo,
-		Zero,
-		Fwd_Lo,
-		Fwd_Med,
-		Fwd_Hi
+		Rev_Hi = 0,
+		Rev_Med = 1,
+		Rev_Lo = 2,
+		Zero = 3,
+		Fwd_Lo = 4,
+		Fwd_Med = 5,
+		Fwd_Hi = 6
 	}
 
 	public float buttonHoldTime;

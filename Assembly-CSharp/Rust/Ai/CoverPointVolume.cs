@@ -8,9 +8,9 @@ namespace Rust.Ai
 	{
 		internal enum CoverType
 		{
-			None,
-			Partial,
-			Full
+			None = 0,
+			Partial = 1,
+			Full = 2
 		}
 
 		public float DefaultCoverPointScore = 1f;

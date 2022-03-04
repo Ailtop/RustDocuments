@@ -501,36 +501,36 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public enum Signal
 	{
-		Attack,
-		Alt_Attack,
-		DryFire,
-		Reload,
-		Deploy,
-		Flinch_Head,
-		Flinch_Chest,
-		Flinch_Stomach,
-		Flinch_RearHead,
-		Flinch_RearTorso,
-		Throw,
-		Relax,
-		Gesture,
-		PhysImpact,
-		Eat,
-		Startled,
-		Admire
+		Attack = 0,
+		Alt_Attack = 1,
+		DryFire = 2,
+		Reload = 3,
+		Deploy = 4,
+		Flinch_Head = 5,
+		Flinch_Chest = 6,
+		Flinch_Stomach = 7,
+		Flinch_RearHead = 8,
+		Flinch_RearTorso = 9,
+		Throw = 10,
+		Relax = 11,
+		Gesture = 12,
+		PhysImpact = 13,
+		Eat = 14,
+		Startled = 0xF,
+		Admire = 0x10
 	}
 
 	public enum Slot
 	{
-		Lock,
-		FireMod,
-		UpperModifier,
-		MiddleModifier,
-		LowerModifier,
-		CenterDecoration,
-		LowerCenterDecoration,
-		StorageMonitor,
-		Count
+		Lock = 0,
+		FireMod = 1,
+		UpperModifier = 2,
+		MiddleModifier = 3,
+		LowerModifier = 4,
+		CenterDecoration = 5,
+		LowerCenterDecoration = 6,
+		StorageMonitor = 7,
+		Count = 8
 	}
 
 	[Flags]
@@ -664,10 +664,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public enum GiveItemReason
 	{
-		Generic,
-		ResourceHarvested,
-		PickedUp,
-		Crafted
+		Generic = 0,
+		ResourceHarvested = 1,
+		PickedUp = 2,
+		Crafted = 3
 	}
 
 	private static Queue<BaseEntity> globalBroadcastQueue = new Queue<BaseEntity>();
@@ -2556,7 +2556,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return Quaternion.identity;
 	}
 
-	public OBB WorldSpaceBounds()
+	public virtual OBB WorldSpaceBounds()
 	{
 		return new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
 	}

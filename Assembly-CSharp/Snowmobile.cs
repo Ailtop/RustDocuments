@@ -24,7 +24,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 
 	public TimeSince timeSinceTerrainModCheck;
 
-	[Header("Snowmobile Settings")]
+	[Header("Snowmobile")]
 	[SerializeField]
 	private Transform centreOfMassTransform;
 
@@ -112,9 +112,6 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 	[SerializeField]
 	private Vector3 engineOnKeyRot;
 
-	[HideInInspector]
-	public float mass;
-
 	[ServerVar(Help = "How long before a snowmobile loses all its health while outside")]
 	public static float outsideDecayMinutes = 1440f;
 
@@ -130,13 +127,15 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 
 	private float _steer;
 
+	private float _mass = -1f;
+
+	public const Flags Flag_Slowmode = Flags.Reserved8;
+
 	private EntityRef<StorageContainer> itemStorageInstance;
 
 	private float cachedFuelFraction;
 
 	private const float FORCE_MULTIPLIER = 10f;
-
-	public const Flags Flag_Slowmode = Flags.Reserved8;
 
 	public VehicleTerrainHandler.Surface OnSurface
 	{
@@ -242,6 +241,18 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 			{
 				SetFlag(Flags.Reserved8, value);
 			}
+		}
+	}
+
+	private float Mass
+	{
+		get
+		{
+			if (base.isServer)
+			{
+				return rigidBody.mass;
+			}
+			return _mass;
 		}
 	}
 
@@ -412,11 +423,6 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 		}
 	}
 
-	public override EntityFuelSystem GetFuelSystem()
-	{
-		return engineController.FuelSystem;
-	}
-
 	public float GetAdjustedDriveForce(float absSpeed, float topSpeed)
 	{
 		float maxDriveForce = GetMaxDriveForce();
@@ -478,19 +484,15 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 
 	public override int StartingFuelUnits()
 	{
-		return 20;
+		return 0;
 	}
 
 	protected override void OnChildAdded(BaseEntity child)
 	{
 		base.OnChildAdded(child);
-		if (base.isServer && isSpawned)
+		if (base.isServer && isSpawned && child.prefabID == itemStoragePrefab.GetEntity().prefabID)
 		{
-			GetFuelSystem().CheckNewChild(child);
-			if (child.prefabID == itemStoragePrefab.GetEntity().prefabID)
-			{
-				itemStorageInstance.Set((StorageContainer)child);
-			}
+			itemStorageInstance.Set((StorageContainer)child);
 		}
 	}
 
@@ -602,16 +604,6 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 		}
 	}
 
-	public override void PreProcess(IPrefabProcessor process, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		base.PreProcess(process, rootObj, name, serverside, clientside, bundling);
-		Rigidbody component = GetComponent<Rigidbody>();
-		if (component != null)
-		{
-			mass = component.mass;
-		}
-	}
-
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
@@ -630,7 +622,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 
 	public override float GetMaxForwardSpeed()
 	{
-		return GetMaxDriveForce() / mass * 15f;
+		return GetMaxDriveForce() / Mass * 15f;
 	}
 
 	public override float GetThrottleInput()

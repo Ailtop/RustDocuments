@@ -5,10 +5,10 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 {
 	private enum PaddleDirection
 	{
-		Forward,
-		Left,
-		Right,
-		Back
+		Forward = 0,
+		Left = 1,
+		Right = 2,
+		Back = 3
 	}
 
 	public Rigidbody rigidBody;
@@ -91,6 +91,8 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 
 	private bool forceClippingCheck;
 
+	private bool prevSleeping;
+
 	public override bool IsSummerDlcVehicle => true;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -105,6 +107,7 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 	{
 		base.ServerInit();
 		rigidBody.centerOfMass = centerOfMass.localPosition;
+		prevSleeping = false;
 	}
 
 	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
@@ -123,6 +126,12 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
+		bool flag = rigidBody.IsSleeping();
+		if (prevSleeping && !flag && buoyancy != null)
+		{
+			buoyancy.Wake();
+		}
+		prevSleeping = flag;
 		if (rigidBody.velocity.magnitude > maxSpeed)
 		{
 			rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);

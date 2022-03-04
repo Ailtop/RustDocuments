@@ -11,22 +11,22 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 {
 	public enum CallState
 	{
-		Idle,
-		Dialing,
-		Ringing,
-		InProcess
+		Idle = 0,
+		Dialing = 1,
+		Ringing = 2,
+		InProcess = 3
 	}
 
 	public enum DialFailReason
 	{
-		TimedOut,
-		Engaged,
-		WrongNumber,
-		CallSelf,
-		RemoteHangUp,
-		NetworkBusy,
-		TimeOutDuringCall,
-		SelfHangUp
+		TimedOut = 0,
+		Engaged = 1,
+		WrongNumber = 2,
+		CallSelf = 3,
+		RemoteHangUp = 4,
+		NetworkBusy = 5,
+		TimeOutDuringCall = 6,
+		SelfHangUp = 7
 	}
 
 	public const int MaxPhoneNameLength = 20;
@@ -678,9 +678,9 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.DestroyShared();
 	}
 
+	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server]
 	public void UpdatePhoneName(RPCMessage msg)
 	{
 		Controller.UpdatePhoneName(msg);
@@ -702,9 +702,9 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.Server_AddSavedNumber(msg);
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void Server_RemoveSavedNumber(RPCMessage msg)
 	{
 		Controller.Server_RemoveSavedNumber(msg);
@@ -733,9 +733,9 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.ServerStopVoicemail(msg);
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void ServerDeleteVoicemail(RPCMessage msg)
 	{
 		Controller.ServerDeleteVoicemail(msg);

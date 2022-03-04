@@ -1,6 +1,6 @@
 public enum DungeonBaseSocketType
 {
-	Horizontal,
-	Vertical,
-	Pillar
+	Horizontal = 0,
+	Vertical = 1,
+	Pillar = 2
 }

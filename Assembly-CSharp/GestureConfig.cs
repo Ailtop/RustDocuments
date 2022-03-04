@@ -7,32 +7,32 @@ public class GestureConfig : ScriptableObject
 	public enum PlayerModelLayer
 	{
 		UpperBody = 3,
-		FullBody
+		FullBody = 4
 	}
 
 	public enum MovementCapabilities
 	{
-		FullMovement,
-		NoMovement
+		FullMovement = 0,
+		NoMovement = 1
 	}
 
 	public enum AnimationType
 	{
-		OneShot,
-		Loop
+		OneShot = 0,
+		Loop = 1
 	}
 
 	public enum ViewMode
 	{
-		FirstPerson,
-		ThirdPerson
+		FirstPerson = 0,
+		ThirdPerson = 1
 	}
 
 	public enum GestureActionType
 	{
-		None,
-		ShowNameTag,
-		DanceAchievement
+		None = 0,
+		ShowNameTag = 1,
+		DanceAchievement = 2
 	}
 
 	[ReadOnly]

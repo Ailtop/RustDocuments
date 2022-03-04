@@ -35,9 +35,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public enum NetworkQueue
 	{
-		Update,
-		UpdateDistance,
-		Count
+		Update = 0,
+		UpdateDistance = 1,
+		Count = 2
 	}
 
 	private class NetworkQueueList
@@ -129,8 +129,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public enum MapNoteType
 	{
-		Death,
-		PointOfInterest
+		Death = 0,
+		PointOfInterest = 1
 	}
 
 	public struct FiredProjectile
@@ -2185,9 +2185,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
@@ -2754,7 +2754,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 221;
+		missions.protocol = 222;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2854,7 +2854,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (221 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (222 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -7141,6 +7141,19 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			return GetMounted().MaxVelocity();
 		}
 		return GetMaxSpeed();
+	}
+
+	public override OBB WorldSpaceBounds()
+	{
+		if (IsSleeping())
+		{
+			UnityEngine.Vector3 center = bounds.center;
+			UnityEngine.Vector3 size = bounds.size;
+			center.y /= 2f;
+			size.y /= 2f;
+			return new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, new Bounds(center, size));
+		}
+		return base.WorldSpaceBounds();
 	}
 
 	public UnityEngine.Vector3 GetMountVelocity()

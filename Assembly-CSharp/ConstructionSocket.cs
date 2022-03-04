@@ -4,25 +4,25 @@ public class ConstructionSocket : Socket_Base
 {
 	public enum Type
 	{
-		None,
-		Foundation,
-		Floor,
-		Misc,
-		Doorway,
-		Wall,
-		Block,
-		Ramp,
-		StairsTriangle,
-		Stairs,
-		FloorFrameTriangle,
-		Window,
-		Shutters,
-		WallFrame,
-		FloorFrame,
-		WindowDressing,
-		DoorDressing,
-		Elevator,
-		DoubleDoorDressing
+		None = 0,
+		Foundation = 1,
+		Floor = 2,
+		Misc = 3,
+		Doorway = 4,
+		Wall = 5,
+		Block = 6,
+		Ramp = 7,
+		StairsTriangle = 8,
+		Stairs = 9,
+		FloorFrameTriangle = 10,
+		Window = 11,
+		Shutters = 12,
+		WallFrame = 13,
+		FloorFrame = 14,
+		WindowDressing = 0xF,
+		DoorDressing = 0x10,
+		Elevator = 17,
+		DoubleDoorDressing = 18
 	}
 
 	public Type socketType;

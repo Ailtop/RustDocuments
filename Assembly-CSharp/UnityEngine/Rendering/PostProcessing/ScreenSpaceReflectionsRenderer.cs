@@ -18,10 +18,10 @@ namespace UnityEngine.Rendering.PostProcessing
 
 		private enum Pass
 		{
-			Test,
-			Resolve,
-			Reproject,
-			Composite
+			Test = 0,
+			Resolve = 1,
+			Reproject = 2,
+			Composite = 3
 		}
 
 		private RenderTexture m_Resolve;

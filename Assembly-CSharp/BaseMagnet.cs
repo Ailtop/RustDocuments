@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class BaseMagnet : MonoBehaviour
 {
+	public BaseEntity entityOwner;
+
+	public BaseEntity.Flags magnetFlag = BaseEntity.Flags.Reserved6;
+
 	public TriggerMagnet magnetTrigger;
 
 	public FixedJoint fixedJoint;
@@ -67,6 +71,10 @@ public class BaseMagnet : MonoBehaviour
 			else
 			{
 				OnMagnetDisabled();
+			}
+			if (entityOwner != null)
+			{
+				entityOwner.SetFlag(magnetFlag, isMagnetOn);
 			}
 		}
 	}

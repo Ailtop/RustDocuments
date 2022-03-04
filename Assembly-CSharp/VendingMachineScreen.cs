@@ -5,11 +5,11 @@ public class VendingMachineScreen : MonoBehaviour
 {
 	public enum vmScreenState
 	{
-		ItemScroll,
-		Vending,
-		Message,
-		ShopName,
-		OutOfStock
+		ItemScroll = 0,
+		Vending = 1,
+		Message = 2,
+		ShopName = 3,
+		OutOfStock = 4
 	}
 
 	public RawImage largeIcon;

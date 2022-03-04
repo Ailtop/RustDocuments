@@ -5,9 +5,9 @@ public class ParticleCollisionLOD : LODComponentParticleSystem
 	public enum QualityLevel
 	{
 		Disabled = -1,
-		HighQuality,
-		MediumQuality,
-		LowQuality
+		HighQuality = 0,
+		MediumQuality = 1,
+		LowQuality = 2
 	}
 
 	[Serializable]

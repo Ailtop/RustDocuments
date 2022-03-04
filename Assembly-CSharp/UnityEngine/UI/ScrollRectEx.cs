@@ -6,24 +6,24 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
 {
-	[AddComponentMenu("UI/Scroll Rect Ex", 37)]
-	[SelectionBase]
-	[ExecuteInEditMode]
 	[RequireComponent(typeof(RectTransform))]
+	[AddComponentMenu("UI/Scroll Rect Ex", 37)]
+	[ExecuteInEditMode]
+	[SelectionBase]
 	public class ScrollRectEx : UIBehaviour, IInitializePotentialDragHandler, IEventSystemHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler, ICanvasElement, ILayoutGroup, ILayoutController
 	{
 		public enum MovementType
 		{
-			Unrestricted,
-			Elastic,
-			Clamped
+			Unrestricted = 0,
+			Elastic = 1,
+			Clamped = 2
 		}
 
 		public enum ScrollbarVisibility
 		{
-			Permanent,
-			AutoHide,
-			AutoHideAndExpandViewport
+			Permanent = 0,
+			AutoHide = 1,
+			AutoHideAndExpandViewport = 2
 		}
 
 		[Serializable]

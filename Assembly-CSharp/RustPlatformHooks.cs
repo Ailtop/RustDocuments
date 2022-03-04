@@ -29,7 +29,7 @@ public class RustPlatformHooks : IPlatformHooks
 			{
 				throw new Exception("Query port isn't set up properly");
 			}
-			return new ServerParameters("rust", "Rust", 2328.ToString(), ConVar.Server.secure, address, (ushort)Network.Net.sv.port, (ushort)(flag ? ((ushort)ConVar.Server.queryport) : 0));
+			return new ServerParameters("rust", "Rust", 2330.ToString(), ConVar.Server.secure, address, (ushort)Network.Net.sv.port, (ushort)(flag ? ((ushort)ConVar.Server.queryport) : 0));
 		}
 	}
 

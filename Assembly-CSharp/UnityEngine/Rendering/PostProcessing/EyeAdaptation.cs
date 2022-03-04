@@ -2,7 +2,7 @@ namespace UnityEngine.Rendering.PostProcessing
 {
 	public enum EyeAdaptation
 	{
-		Progressive,
-		Fixed
+		Progressive = 0,
+		Fixed = 1
 	}
 }

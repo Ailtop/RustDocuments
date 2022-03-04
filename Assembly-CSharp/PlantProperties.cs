@@ -6,14 +6,14 @@ public class PlantProperties : ScriptableObject
 {
 	public enum State
 	{
-		Seed,
-		Seedling,
-		Sapling,
-		Crossbreed,
-		Mature,
-		Fruiting,
-		Ripe,
-		Dying
+		Seed = 0,
+		Seedling = 1,
+		Sapling = 2,
+		Crossbreed = 3,
+		Mature = 4,
+		Fruiting = 5,
+		Ripe = 6,
+		Dying = 7
 	}
 
 	[Serializable]

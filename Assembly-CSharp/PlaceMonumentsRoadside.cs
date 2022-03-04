@@ -38,18 +38,18 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 
 	public enum DistanceMode
 	{
-		Any,
-		Min,
-		Max
+		Any = 0,
+		Min = 1,
+		Max = 2
 	}
 
 	public enum RoadMode
 	{
-		SideRoadOrRingRoad,
-		SideRoad,
-		RingRoad,
-		SideRoadOrDesireTrail,
-		DesireTrail
+		SideRoadOrRingRoad = 0,
+		SideRoad = 1,
+		RingRoad = 2,
+		SideRoadOrDesireTrail = 3,
+		DesireTrail = 4
 	}
 
 	public SpawnFilter Filter;

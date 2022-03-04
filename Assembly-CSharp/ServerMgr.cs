@@ -499,14 +499,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2328)
+		else if (packet.connection.protocol > 2330)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2328));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2330));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2328)
+		else if (packet.connection.protocol < 2330)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2328));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2330));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -1111,29 +1111,24 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		ItemManager.Heartbeat();
 	}
 
+	private static BaseGameMode Gamemode()
+	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		if (!(activeGameMode != null))
+		{
+			return null;
+		}
+		return activeGameMode;
+	}
+
 	public static string GamemodeName()
 	{
-		return "rust";
+		return Gamemode()?.shortname ?? "rust";
 	}
 
 	public static string GamemodeTitle()
 	{
-		return "Rust: Survival Mode";
-	}
-
-	public static string GamemodeDesc()
-	{
-		return "The default Rust survival gamemode";
-	}
-
-	public static string GamemodeImage()
-	{
-		return "https://files.facepunch.com/garry/3c96c182-ab06-40ff-b66e-f4a510053ca4.png";
-	}
-
-	public static string GamemodeUrl()
-	{
-		return "https://rust.facepunch.com";
+		return Gamemode()?.gamemodeTitle ?? "Survival";
 	}
 
 	private void UpdateServerInformation()
@@ -1158,7 +1153,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2328}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2330}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
 				string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();
@@ -1191,8 +1186,6 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			SteamServer.SetKey("url", ConVar.Server.url);
 			SteamServer.SetKey("gmn", GamemodeName());
 			SteamServer.SetKey("gmt", GamemodeTitle());
-			SteamServer.SetKey("gmd", GamemodeDesc());
-			SteamServer.SetKey("gmu", GamemodeUrl());
 			SteamServer.SetKey("uptime", ((int)UnityEngine.Time.realtimeSinceStartup).ToString());
 			SteamServer.SetKey("gc_mb", Performance.report.memoryAllocations.ToString());
 			SteamServer.SetKey("gc_cl", Performance.report.memoryCollections.ToString());
@@ -1275,10 +1268,10 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			return (BasePlayer.SpawnPoint)obj;
 		}
 		bool flag = false;
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
-		if ((bool)activeGameMode && activeGameMode.useCustomSpawns)
+		BaseGameMode baseGameMode = Gamemode();
+		if ((bool)baseGameMode && baseGameMode.useCustomSpawns)
 		{
-			BasePlayer.SpawnPoint playerSpawn = activeGameMode.GetPlayerSpawn(forPlayer);
+			BasePlayer.SpawnPoint playerSpawn = baseGameMode.GetPlayerSpawn(forPlayer);
 			if (playerSpawn != null)
 			{
 				return playerSpawn;

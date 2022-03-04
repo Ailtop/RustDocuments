@@ -10,9 +10,9 @@ public class BaseTrain : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Trai
 {
 	public enum StaticCollisionState
 	{
-		Free,
-		StaticColliding,
-		StayingStill
+		Free = 0,
+		StaticColliding = 1,
+		StayingStill = 2
 	}
 
 	public StaticCollisionState staticCollidingAtFront;

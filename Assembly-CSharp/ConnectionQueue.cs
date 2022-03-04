@@ -30,18 +30,21 @@ public class ConnectionQueue
 
 	internal void Join(Connection connection)
 	{
-		connection.state = Connection.State.InQueue;
-		queue.Add(connection);
-		nextMessageTime = 0f;
-		if (CanJumpQueue(connection))
+		if (Interface.CallHook("OnConnectionQueue", connection) == null)
 		{
-			JoinGame(connection);
+			connection.state = Connection.State.InQueue;
+			queue.Add(connection);
+			nextMessageTime = 0f;
+			if (CanJumpQueue(connection))
+			{
+				JoinGame(connection);
+			}
 		}
 	}
 
 	public void Cycle(int availableSlots)
 	{
-		if (queue.Count != 0)
+		if (Interface.CallHook("OnQueueCycle", availableSlots) == null && queue.Count != 0)
 		{
 			if (availableSlots - Joining > 0)
 			{
@@ -51,7 +54,7 @@ public class ConnectionQueue
 		}
 	}
 
-	private void SendMessages()
+	public void SendMessages()
 	{
 		if (!(nextMessageTime > Time.realtimeSinceStartup))
 		{
@@ -63,26 +66,32 @@ public class ConnectionQueue
 		}
 	}
 
-	private void SendMessage(Connection c, int position)
+	public void SendMessage(Connection c, int position)
 	{
-		string empty = string.Empty;
-		empty = ((position <= 0) ? string.Format("YOU'RE NEXT - {1:N0} PLAYERS BEHIND YOU", position, queue.Count - position - 1) : $"{position:N0} PLAYERS AHEAD OF YOU, {queue.Count - position - 1:N0} PLAYERS BEHIND");
-		if (Net.sv.write.Start())
+		if (Interface.CallHook("OnQueueMessage", c, position) == null)
 		{
-			Net.sv.write.PacketID(Message.Type.Message);
-			Net.sv.write.String("QUEUE");
-			Net.sv.write.String(empty);
-			Net.sv.write.Send(new SendInfo(c));
+			string empty = string.Empty;
+			empty = ((position <= 0) ? string.Format("YOU'RE NEXT - {1:N0} PLAYERS BEHIND YOU", position, queue.Count - position - 1) : $"{position:N0} PLAYERS AHEAD OF YOU, {queue.Count - position - 1:N0} PLAYERS BEHIND");
+			if (Net.sv.write.Start())
+			{
+				Net.sv.write.PacketID(Message.Type.Message);
+				Net.sv.write.String("QUEUE");
+				Net.sv.write.String(empty);
+				Net.sv.write.Send(new SendInfo(c));
+			}
 		}
 	}
 
 	public void RemoveConnection(Connection connection)
 	{
-		if (queue.Remove(connection))
+		if (Interface.CallHook("OnConnectionDequeue", connection) == null)
 		{
-			nextMessageTime = 0f;
+			if (queue.Remove(connection))
+			{
+				nextMessageTime = 0f;
+			}
+			joining.Remove(connection);
 		}
-		joining.Remove(connection);
 	}
 
 	private void JoinGame(Connection connection)

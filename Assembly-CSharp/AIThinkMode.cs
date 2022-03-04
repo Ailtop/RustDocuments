@@ -1,5 +1,5 @@
 public enum AIThinkMode
 {
-	FixedUpdate,
-	Interval
+	FixedUpdate = 0,
+	Interval = 1
 }

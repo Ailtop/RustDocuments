@@ -1,5 +1,5 @@
 public enum DungeonGridConnectionType
 {
-	None,
-	TrainTunnel
+	None = 0,
+	TrainTunnel = 1
 }

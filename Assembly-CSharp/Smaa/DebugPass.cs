@@ -2,8 +2,8 @@ namespace Smaa
 {
 	public enum DebugPass
 	{
-		Off,
-		Edges,
-		Weights
+		Off = 0,
+		Edges = 1,
+		Weights = 2
 	}
 }

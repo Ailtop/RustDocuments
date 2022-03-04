@@ -5,7 +5,7 @@ public class ItemModSound : ItemMod
 {
 	public enum Type
 	{
-		OnAttachToWeapon
+		OnAttachToWeapon = 0
 	}
 
 	public GameObjectRef effect = new GameObjectRef();

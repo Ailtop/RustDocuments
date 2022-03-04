@@ -12,33 +12,33 @@ public class InstrumentKeyController : MonoBehaviour
 
 	public enum IKType
 	{
-		LeftHand,
-		RightHand,
-		RightFoot
+		LeftHand = 0,
+		RightHand = 1,
+		RightFoot = 2
 	}
 
 	public enum NoteType
 	{
-		Regular,
-		Sharp
+		Regular = 0,
+		Sharp = 1
 	}
 
 	public enum InstrumentType
 	{
-		Note,
-		Hold
+		Note = 0,
+		Hold = 1
 	}
 
 	public enum AnimationSlot
 	{
-		None,
-		One,
-		Two,
-		Three,
-		Four,
-		Five,
-		Six,
-		Seven
+		None = 0,
+		One = 1,
+		Two = 2,
+		Three = 3,
+		Four = 4,
+		Five = 5,
+		Six = 6,
+		Seven = 7
 	}
 
 	[Serializable]

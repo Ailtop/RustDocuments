@@ -2,8 +2,8 @@ namespace UnityEngine.Rendering.PostProcessing
 {
 	public enum ColorBlindnessType
 	{
-		Deuteranopia,
-		Protanopia,
-		Tritanopia
+		Deuteranopia = 0,
+		Protanopia = 1,
+		Tritanopia = 2
 	}
 }

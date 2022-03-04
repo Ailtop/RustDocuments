@@ -8,8 +8,8 @@ public abstract class DeployVolume : PrefabAttribute
 {
 	public enum EntityMode
 	{
-		ExcludeList,
-		IncludeList
+		ExcludeList = 0,
+		IncludeList = 1
 	}
 
 	public LayerMask layers = 537001984;

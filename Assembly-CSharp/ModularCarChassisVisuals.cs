@@ -34,6 +34,4 @@ public class ModularCarChassisVisuals : VehicleChassisVisuals<ModularCar>, IClie
 	public Steering steering;
 
 	public LookAtTarget transmission;
-
-	public VehiclePhysicMatList physicMatList;
 }

@@ -4,9 +4,9 @@ public class PreloadedCassetteContent : ScriptableObject
 {
 	public enum PreloadType
 	{
-		Short,
-		Medium,
-		Long
+		Short = 0,
+		Medium = 1,
+		Long = 2
 	}
 
 	public SoundDefinition[] ShortTapeContent;

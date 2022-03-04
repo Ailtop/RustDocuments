@@ -5,8 +5,8 @@ public class TriggerParentEnclosed : TriggerParent
 {
 	public enum TriggerMode
 	{
-		TriggerPoint,
-		PivotPoint
+		TriggerPoint = 0,
+		PivotPoint = 1
 	}
 
 	public float Padding;

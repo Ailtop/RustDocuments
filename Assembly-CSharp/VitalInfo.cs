@@ -6,17 +6,17 @@ public class VitalInfo : MonoBehaviour, IClientComponent, IVitalNotice
 {
 	public enum Vital
 	{
-		BuildingBlocked,
-		CanBuild,
-		Crafting,
-		CraftLevel1,
-		CraftLevel2,
-		CraftLevel3,
-		DecayProtected,
-		Decaying,
-		SafeZone,
-		Buffed,
-		Pet
+		BuildingBlocked = 0,
+		CanBuild = 1,
+		Crafting = 2,
+		CraftLevel1 = 3,
+		CraftLevel2 = 4,
+		CraftLevel3 = 5,
+		DecayProtected = 6,
+		Decaying = 7,
+		SafeZone = 8,
+		Buffed = 9,
+		Pet = 10
 	}
 
 	public HudElement Element;

@@ -8,10 +8,10 @@ public class FloatConditions
 	{
 		public enum Types
 		{
-			Equal,
-			NotEqual,
-			Higher,
-			Lower
+			Equal = 0,
+			NotEqual = 1,
+			Higher = 2,
+			Lower = 3
 		}
 
 		public Types type;

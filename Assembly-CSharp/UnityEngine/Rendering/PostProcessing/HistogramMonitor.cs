@@ -7,10 +7,10 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		public enum Channel
 		{
-			Red,
-			Green,
-			Blue,
-			Master
+			Red = 0,
+			Green = 1,
+			Blue = 2,
+			Master = 3
 		}
 
 		public int width = 512;

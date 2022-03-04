@@ -1,6 +1,6 @@
 public enum DungeonGridLinkType
 {
-	Default,
-	Elevator,
-	Transition
+	Default = 0,
+	Elevator = 1,
+	Transition = 2
 }

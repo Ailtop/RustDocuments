@@ -475,18 +475,24 @@ public class Item
 	public void RemoveFromWorld()
 	{
 		BaseEntity worldEntity = GetWorldEntity();
-		if (!(worldEntity == null))
+		if (worldEntity == null)
 		{
-			SetWorldEntity(null);
-			OnRemovedFromWorld();
-			if (contents != null)
+			return;
+		}
+		SetWorldEntity(null);
+		OnRemovedFromWorld();
+		if (contents != null)
+		{
+			contents.OnRemovedFromWorld();
+		}
+		if (BaseEntityEx.IsValid(worldEntity))
+		{
+			WorldItem worldItem;
+			if ((object)(worldItem = worldEntity as WorldItem) != null)
 			{
-				contents.OnRemovedFromWorld();
+				worldItem.RemoveItem();
 			}
-			if (BaseEntityEx.IsValid(worldEntity))
-			{
-				worldEntity.Kill();
-			}
+			worldEntity.Kill();
 		}
 	}
 
@@ -675,6 +681,7 @@ public class Item
 					{
 						item2.amount += amount;
 						item2.MarkDirty();
+						Interface.CallHook("OnItemStacked", item2, this, newcontainer);
 						int num4 = item2.amount - num3;
 						if (num4 <= 0)
 						{

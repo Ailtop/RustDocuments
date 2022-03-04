@@ -5,10 +5,10 @@ public class BaseAIEvent
 {
 	public enum ExecuteRate
 	{
-		Slow,
-		Normal,
-		Fast,
-		VeryFast
+		Slow = 0,
+		Normal = 1,
+		Fast = 2,
+		VeryFast = 3
 	}
 
 	private float executeTimer;

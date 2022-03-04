@@ -10,25 +10,25 @@ namespace UnityEngine.UI.Extensions
 	{
 		private enum SegmentType
 		{
-			Start,
-			Middle,
-			End,
-			Full
+			Start = 0,
+			Middle = 1,
+			End = 2,
+			Full = 3
 		}
 
 		public enum JoinType
 		{
-			Bevel,
-			Miter
+			Bevel = 0,
+			Miter = 1
 		}
 
 		public enum BezierType
 		{
-			None,
-			Quick,
-			Basic,
-			Improved,
-			Catenary
+			None = 0,
+			Quick = 1,
+			Basic = 2,
+			Improved = 3,
+			Catenary = 4
 		}
 
 		private const float MIN_MITER_JOIN = (float)Math.PI / 12f;

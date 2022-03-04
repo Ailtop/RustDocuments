@@ -40,13 +40,13 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public enum aiState
 	{
-		IDLE,
-		MOVE,
-		ORBIT,
-		STRAFE,
-		PATROL,
-		GUARD,
-		DEATH
+		IDLE = 0,
+		MOVE = 1,
+		ORBIT = 2,
+		STRAFE = 3,
+		PATROL = 4,
+		GUARD = 5,
+		DEATH = 6
 	}
 
 	public List<targetinfo> _targetList = new List<targetinfo>();

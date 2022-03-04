@@ -16,10 +16,10 @@ namespace ConVar
 	{
 		public enum ChatChannel
 		{
-			Global,
-			Team,
-			Server,
-			Cards
+			Global = 0,
+			Team = 1,
+			Server = 2,
+			Cards = 3
 		}
 
 		public struct ChatEntry

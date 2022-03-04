@@ -11,9 +11,9 @@ namespace Facepunch.CardGames
 	{
 		public enum CardGameState
 		{
-			NotPlaying,
-			InGameBetweenRounds,
-			InGameRound
+			NotPlaying = 0,
+			InGameBetweenRounds = 1,
+			InGameRound = 2
 		}
 
 		public const int IDLE_KICK_SECONDS = 600;

@@ -7,12 +7,12 @@ public class BuildingGrade : ScriptableObject
 	public enum Enum
 	{
 		None = -1,
-		Twigs,
-		Wood,
-		Stone,
-		Metal,
-		TopTier,
-		Count
+		Twigs = 0,
+		Wood = 1,
+		Stone = 2,
+		Metal = 3,
+		TopTier = 4,
+		Count = 5
 	}
 
 	public Enum type;

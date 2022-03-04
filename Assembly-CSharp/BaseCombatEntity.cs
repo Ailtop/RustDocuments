@@ -56,25 +56,25 @@ public class BaseCombatEntity : BaseEntity
 
 	public enum ActionVolume
 	{
-		Quiet,
-		Normal,
-		Loud
+		Quiet = 0,
+		Normal = 1,
+		Loud = 2
 	}
 
 	public enum LifeState
 	{
-		Alive,
-		Dead
+		Alive = 0,
+		Dead = 1
 	}
 
 	[Serializable]
 	public enum Faction
 	{
-		Default,
-		Player,
-		Bandit,
-		Scientist,
-		Horror
+		Default = 0,
+		Player = 1,
+		Bandit = 2,
+		Scientist = 3,
+		Horror = 4
 	}
 
 	private const float MAX_HEALTH_REPAIR = 50f;

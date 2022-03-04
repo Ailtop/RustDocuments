@@ -6,9 +6,9 @@ public class LensDirtinessRenderer : PostProcessEffectRenderer<LensDirtinessEffe
 {
 	private enum Pass
 	{
-		Threshold,
-		Kawase,
-		Compose
+		Threshold = 0,
+		Kawase = 1,
+		Compose = 2
 	}
 
 	private int dataProperty = Shader.PropertyToID("_data");

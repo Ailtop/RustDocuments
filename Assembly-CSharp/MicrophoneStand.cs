@@ -13,9 +13,9 @@ public class MicrophoneStand : BaseMountable
 {
 	public enum SpeechMode
 	{
-		Normal,
-		HighPitch,
-		LowPitch
+		Normal = 0,
+		HighPitch = 1,
+		LowPitch = 2
 	}
 
 	public VoiceProcessor VoiceProcessor;

@@ -8,8 +8,8 @@ public class ModularCarLock
 {
 	public enum LockType
 	{
-		Door,
-		General
+		Door = 0,
+		General = 1
 	}
 
 	private readonly bool isServer;

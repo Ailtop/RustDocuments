@@ -282,6 +282,7 @@ public class MotorRowboat : BaseBoat
 		{
 			Effect.server.Run(pushLandEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
 		}
+		WakeUp();
 	}
 
 	private void FlipMonitor()

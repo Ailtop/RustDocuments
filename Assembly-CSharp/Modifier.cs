@@ -5,17 +5,17 @@ public class Modifier
 {
 	public enum ModifierType
 	{
-		Wood_Yield,
-		Ore_Yield,
-		Radiation_Resistance,
-		Radiation_Exposure_Resistance,
-		Max_Health,
-		Scrap_Yield
+		Wood_Yield = 0,
+		Ore_Yield = 1,
+		Radiation_Resistance = 2,
+		Radiation_Exposure_Resistance = 3,
+		Max_Health = 4,
+		Scrap_Yield = 5
 	}
 
 	public enum ModifierSource
 	{
-		Tea
+		Tea = 0
 	}
 
 	public ModifierType Type { get; private set; }

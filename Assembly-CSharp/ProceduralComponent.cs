@@ -5,7 +5,7 @@ public abstract class ProceduralComponent : MonoBehaviour
 	public enum Realm
 	{
 		Client = 1,
-		Server
+		Server = 2
 	}
 
 	[InspectorFlags]

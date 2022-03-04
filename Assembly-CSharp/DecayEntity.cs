@@ -24,7 +24,7 @@ public class DecayEntity : BaseCombatEntity
 
 	public DecayPoint[] decayPoints;
 
-	private float lastDecayTick;
+	public float lastDecayTick;
 
 	public float decayVariance = 1f;
 

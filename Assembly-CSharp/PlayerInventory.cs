@@ -15,9 +15,9 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 {
 	public enum Type
 	{
-		Main,
-		Belt,
-		Wear
+		Main = 0,
+		Belt = 1,
+		Wear = 2
 	}
 
 	public interface ICanMoveFrom

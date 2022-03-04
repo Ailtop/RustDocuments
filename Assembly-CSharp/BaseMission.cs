@@ -21,21 +21,21 @@ public class BaseMission : BaseScriptableObject
 
 	public enum MissionStatus
 	{
-		Default,
-		Active,
-		Accomplished,
-		Failed,
-		Completed
+		Default = 0,
+		Active = 1,
+		Accomplished = 2,
+		Failed = 3,
+		Completed = 4
 	}
 
 	public enum MissionEventType
 	{
-		CUSTOM,
-		HARVEST,
-		CONVERSATION,
-		KILL_ENTITY,
-		ACQUIRE_ITEM,
-		FREE_CRATE
+		CUSTOM = 0,
+		HARVEST = 1,
+		CONVERSATION = 2,
+		KILL_ENTITY = 3,
+		ACQUIRE_ITEM = 4,
+		FREE_CRATE = 5
 	}
 
 	[Serializable]
@@ -75,8 +75,8 @@ public class BaseMission : BaseScriptableObject
 
 		public enum ObjectiveType
 		{
-			MOVE,
-			KILL
+			MOVE = 0,
+			KILL = 1
 		}
 
 		private BaseEntity _cachedProviderEntity;
@@ -215,8 +215,8 @@ public class BaseMission : BaseScriptableObject
 	{
 		public enum PositionType
 		{
-			MissionPoint,
-			WorldPositionGenerator
+			MissionPoint = 0,
+			WorldPositionGenerator = 1
 		}
 
 		public string identifier;

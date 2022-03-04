@@ -5,9 +5,9 @@ public struct SubsurfaceScatteringParams
 {
 	public enum Quality
 	{
-		Low,
-		Medium,
-		High
+		Low = 0,
+		Medium = 1,
+		High = 2
 	}
 
 	public bool enabled;

@@ -13,11 +13,11 @@ public class WireTool : HeldEntity
 {
 	public enum WireColour
 	{
-		Default,
-		Red,
-		Green,
-		Blue,
-		Yellow
+		Default = 0,
+		Red = 1,
+		Green = 2,
+		Blue = 3,
+		Yellow = 4
 	}
 
 	public struct PendingPlug_t
@@ -390,9 +390,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -440,9 +440,9 @@ public class WireTool : HeldEntity
 	{
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
-	[RPC_Server]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

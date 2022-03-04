@@ -14,10 +14,10 @@ public class RelationshipManager : BaseEntity
 {
 	public enum RelationshipType
 	{
-		NONE,
-		Acquaintance,
-		Friend,
-		Enemy
+		NONE = 0,
+		Acquaintance = 1,
+		Friend = 2,
+		Enemy = 3
 	}
 
 	public class PlayerRelationshipInfo : Facepunch.Pool.IPooled, IServerFileReceiver

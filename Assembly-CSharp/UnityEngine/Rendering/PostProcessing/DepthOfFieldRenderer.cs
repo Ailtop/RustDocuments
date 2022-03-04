@@ -7,16 +7,16 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		private enum Pass
 		{
-			CoCCalculation,
-			CoCTemporalFilter,
-			DownsampleAndPrefilter,
-			BokehSmallKernel,
-			BokehMediumKernel,
-			BokehLargeKernel,
-			BokehVeryLargeKernel,
-			PostFilter,
-			Combine,
-			DebugOverlay
+			CoCCalculation = 0,
+			CoCTemporalFilter = 1,
+			DownsampleAndPrefilter = 2,
+			BokehSmallKernel = 3,
+			BokehMediumKernel = 4,
+			BokehLargeKernel = 5,
+			BokehVeryLargeKernel = 6,
+			PostFilter = 7,
+			Combine = 8,
+			DebugOverlay = 9
 		}
 
 		private const int k_NumEyes = 2;

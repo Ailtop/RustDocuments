@@ -2,7 +2,7 @@ namespace VLB
 {
 	public enum PlaneAlignment
 	{
-		Surface,
-		Beam
+		Surface = 0,
+		Beam = 1
 	}
 }

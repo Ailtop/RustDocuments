@@ -3,6 +3,6 @@ using System;
 [Serializable]
 public enum DeferredDecalQueue
 {
-	Background,
-	Foreground
+	Background = 0,
+	Foreground = 1
 }

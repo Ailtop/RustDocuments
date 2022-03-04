@@ -36,6 +36,15 @@ public class InputState
 		return ((uint)previous.buttons & (uint)btn) == (uint)btn;
 	}
 
+	public bool IsAnyDown()
+	{
+		if (current == null)
+		{
+			return false;
+		}
+		return (float)(current.buttons & ~SwallowedButtons) > 0f;
+	}
+
 	public bool WasJustPressed(BUTTON btn)
 	{
 		if (IsDown(btn))

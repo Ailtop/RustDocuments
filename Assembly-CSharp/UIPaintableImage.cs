@@ -5,10 +5,10 @@ public class UIPaintableImage : MonoBehaviour
 {
 	public enum DrawMode
 	{
-		AlphaBlended,
-		Additive,
-		Lighten,
-		Erase
+		AlphaBlended = 0,
+		Additive = 1,
+		Lighten = 2,
+		Erase = 3
 	}
 
 	public RawImage image;

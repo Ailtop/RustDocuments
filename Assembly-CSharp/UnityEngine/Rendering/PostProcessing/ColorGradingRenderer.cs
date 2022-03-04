@@ -8,9 +8,9 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		private enum Pass
 		{
-			LutGenLDRFromScratch,
-			LutGenLDR,
-			LutGenHDR2D
+			LutGenLDRFromScratch = 0,
+			LutGenLDR = 1,
+			LutGenHDR2D = 2
 		}
 
 		private Texture2D m_GradingCurves;

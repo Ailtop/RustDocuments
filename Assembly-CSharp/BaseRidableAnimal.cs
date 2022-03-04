@@ -15,10 +15,10 @@ public class BaseRidableAnimal : BaseVehicle
 	public enum RunState
 	{
 		stopped = 1,
-		walk,
-		run,
-		sprint,
-		LAST
+		walk = 2,
+		run = 3,
+		sprint = 4,
+		LAST = 5
 	}
 
 	public ItemDefinition onlyAllowedItem;

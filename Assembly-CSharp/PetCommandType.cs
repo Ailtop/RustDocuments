@@ -1,6 +1,6 @@
 public enum PetCommandType
 {
-	LoadDesign,
-	SetState,
-	Destroy
+	LoadDesign = 0,
+	SetState = 1,
+	Destroy = 2
 }

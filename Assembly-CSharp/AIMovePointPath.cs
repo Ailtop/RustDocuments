@@ -5,14 +5,14 @@ public class AIMovePointPath : MonoBehaviour
 {
 	public enum Mode
 	{
-		Loop,
-		Reverse
+		Loop = 0,
+		Reverse = 1
 	}
 
 	public enum PathDirection
 	{
-		Forwards,
-		Backwards
+		Forwards = 0,
+		Backwards = 1
 	}
 
 	public Color DebugPathColor = Color.green;

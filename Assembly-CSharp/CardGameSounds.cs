@@ -5,13 +5,13 @@ public class CardGameSounds : PrefabAttribute
 {
 	public enum SoundType
 	{
-		Chips,
-		Draw,
-		Play,
-		Shuffle,
-		Win,
-		YourTurn,
-		Check
+		Chips = 0,
+		Draw = 1,
+		Play = 2,
+		Shuffle = 3,
+		Win = 4,
+		YourTurn = 5,
+		Check = 6
 	}
 
 	public SoundDefinition ChipsSfx;

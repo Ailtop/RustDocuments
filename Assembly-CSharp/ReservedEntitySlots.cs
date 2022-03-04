@@ -1,6 +1,6 @@
 public enum ReservedEntitySlots
 {
 	Self = 4,
-	OwningPlayer,
-	GroupLeader
+	OwningPlayer = 5,
+	GroupLeader = 6
 }

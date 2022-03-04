@@ -11,9 +11,9 @@ public class ResourceDepositManager : BaseEntity
 		[Serializable]
 		public enum surveySpawnType
 		{
-			ITEM,
-			OIL,
-			WATER
+			ITEM = 0,
+			OIL = 1,
+			WATER = 2
 		}
 
 		[Serializable]

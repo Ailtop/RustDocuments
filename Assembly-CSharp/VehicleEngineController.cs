@@ -5,9 +5,9 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 {
 	public enum EngineState
 	{
-		Off,
-		Starting,
-		On
+		Off = 0,
+		Starting = 1,
+		On = 2
 	}
 
 	public readonly TOwner owner;

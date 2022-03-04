@@ -11,11 +11,11 @@ namespace Rust.Modular
 	{
 		public enum EngineItemTypes
 		{
-			Crankshaft,
-			Carburetor,
-			SparkPlug,
-			Piston,
-			Valve
+			Crankshaft = 0,
+			Carburetor = 1,
+			SparkPlug = 2,
+			Piston = 3,
+			Valve = 4
 		}
 
 		[Header("Engine Storage")]

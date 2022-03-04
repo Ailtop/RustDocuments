@@ -9,8 +9,8 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		private enum Pass
 		{
-			SolverDilate,
-			SolverNoDilate
+			SolverDilate = 0,
+			SolverNoDilate = 1
 		}
 
 		[Tooltip("The diameter (in texels) inside which jitter samples are spread. Smaller values result in crisper but more aliased output, while larger values result in more stable, but blurrier, output.")]

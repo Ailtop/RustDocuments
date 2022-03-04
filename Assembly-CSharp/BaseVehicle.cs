@@ -17,9 +17,9 @@ public class BaseVehicle : BaseMountable
 {
 	public enum ClippingCheckMode
 	{
-		OnMountOnly,
-		Always,
-		AlwaysHeadOnly
+		OnMountOnly = 0,
+		Always = 1,
+		AlwaysHeadOnly = 2
 	}
 
 	[Serializable]
@@ -73,10 +73,10 @@ public class BaseVehicle : BaseMountable
 	{
 		private enum State
 		{
-			Direct,
-			EnterChild,
-			EnumerateChild,
-			Finished
+			Direct = 0,
+			EnterChild = 1,
+			EnumerateChild = 2,
+			Finished = 3
 		}
 
 		private class Box : Facepunch.Pool.IPooled
@@ -186,6 +186,8 @@ public class BaseVehicle : BaseMountable
 	private const float MIN_TIME_BETWEEN_PUSHES = 1f;
 
 	public TimeSince timeSinceLastPush;
+
+	private bool prevSleeping;
 
 	private ProtoBuf.BaseVehicle pendingLoad;
 
@@ -392,7 +394,17 @@ public class BaseVehicle : BaseMountable
 		}
 		if (rigidBody != null)
 		{
-			SetFlag(Flags.Reserved7, rigidBody.IsSleeping() && !AnyMounted());
+			bool flag = rigidBody.IsSleeping();
+			SetFlag(Flags.Reserved7, flag && !AnyMounted());
+			if (prevSleeping && !flag)
+			{
+				OnServerWake();
+			}
+			else if (!prevSleeping && flag)
+			{
+				OnServerSleep();
+			}
+			prevSleeping = flag;
 		}
 		if (OnlyOwnerAccessible() && safeAreaRadius != -1f && Vector3.Distance(base.transform.position, safeAreaOrigin) > safeAreaRadius)
 		{
@@ -530,6 +542,7 @@ public class BaseVehicle : BaseMountable
 	{
 		base.ServerInit();
 		clearRecentDriverAction = ClearRecentDriver;
+		prevSleeping = false;
 	}
 
 	public virtual void SpawnSubEntities()
@@ -899,6 +912,10 @@ public class BaseVehicle : BaseMountable
 
 	public BaseMountable GetIdealMountPoint(Vector3 eyePos, Vector3 pos, BasePlayer playerFor = null)
 	{
+		if (playerFor == null)
+		{
+			return null;
+		}
 		if (!HasMountPoints())
 		{
 			return this;
@@ -1160,6 +1177,14 @@ public class BaseVehicle : BaseMountable
 			float num2 = rigidBody.mass * 4f;
 			rigidBody.AddForce(normalized * num2, ForceMode.Impulse);
 		}
+	}
+
+	protected virtual void OnServerWake()
+	{
+	}
+
+	protected virtual void OnServerSleep()
+	{
 	}
 
 	public bool IsStationary()

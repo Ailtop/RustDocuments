@@ -124,11 +124,6 @@ public class Planner : HeldEntity
 			msg.position = target.entity.transform.TransformPoint(msg.position);
 			msg.normal = target.entity.transform.TransformDirection(msg.normal);
 			msg.rotation = target.entity.transform.rotation * msg.rotation;
-			if ((bool)deployable && deployable.setSocketParent && target.entity.Distance(msg.position) > 1f)
-			{
-				ownerPlayer.ChatMessage("Parent too far away: " + target.entity.Distance(msg.position));
-				return;
-			}
 			if (msg.socket != 0)
 			{
 				string text = StringPool.Get(msg.socket);
@@ -155,10 +150,21 @@ public class Planner : HeldEntity
 		target.rotation = msg.rotation;
 		target.player = ownerPlayer;
 		target.valid = true;
-		if (Interface.CallHook("CanBuild", this, construction, target) == null)
+		if (Interface.CallHook("CanBuild", this, construction, target) != null)
 		{
-			DoBuild(target, construction);
+			return;
 		}
+		if (target.entity != null && deployable != null && deployable.setSocketParent)
+		{
+			Vector3 position = ((target.socket != null) ? target.GetWorldPosition() : target.position);
+			float num = target.entity.Distance(position);
+			if (num > 1f)
+			{
+				ownerPlayer.ChatMessage("Parent too far away: " + num);
+				return;
+			}
+		}
+		DoBuild(target, construction);
 	}
 
 	public void DoBuild(Construction.Target target, Construction component)

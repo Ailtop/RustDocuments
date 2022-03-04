@@ -9,13 +9,13 @@ public class ConversationData : ScriptableObject
 	{
 		public enum ConditionType
 		{
-			NONE,
-			HASHEALTH,
-			HASSCRAP,
-			PROVIDERBUSY,
-			MISSIONCOMPLETE,
-			MISSIONATTEMPTED,
-			CANACCEPT
+			NONE = 0,
+			HASHEALTH = 1,
+			HASSCRAP = 2,
+			PROVIDERBUSY = 3,
+			MISSIONCOMPLETE = 4,
+			MISSIONATTEMPTED = 5,
+			CANACCEPT = 6
 		}
 
 		public ConditionType conditionType;

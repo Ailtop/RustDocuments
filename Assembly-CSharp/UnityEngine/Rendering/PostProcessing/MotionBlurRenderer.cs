@@ -7,12 +7,12 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		private enum Pass
 		{
-			VelocitySetup,
-			TileMax1,
-			TileMax2,
-			TileMaxV,
-			NeighborMax,
-			Reconstruction
+			VelocitySetup = 0,
+			TileMax1 = 1,
+			TileMax2 = 2,
+			TileMaxV = 3,
+			NeighborMax = 4,
+			Reconstruction = 5
 		}
 
 		public override DepthTextureMode GetCameraFlags()

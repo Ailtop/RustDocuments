@@ -16,9 +16,9 @@ namespace UnityEngine.Rendering.PostProcessing
 
 		public enum Quality
 		{
-			Low,
-			Medium,
-			High
+			Low = 0,
+			Medium = 1,
+			High = 2
 		}
 
 		[Tooltip("Lower quality is faster at the expense of visual quality (Low = ~60%, Medium = ~80%).")]

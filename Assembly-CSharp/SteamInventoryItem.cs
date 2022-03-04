@@ -4,28 +4,28 @@ public class SteamInventoryItem : ScriptableObject
 {
 	public enum Category
 	{
-		None,
-		Clothing,
-		Weapon,
-		Decoration,
-		Crate,
-		Resource
+		None = 0,
+		Clothing = 1,
+		Weapon = 2,
+		Decoration = 3,
+		Crate = 4,
+		Resource = 5
 	}
 
 	public enum SubCategory
 	{
-		None,
-		Shirt,
-		Pants,
-		Jacket,
-		Hat,
-		Mask,
-		Footwear,
-		Weapon,
-		Misc,
-		Crate,
-		Resource,
-		CrateUncraftable
+		None = 0,
+		Shirt = 1,
+		Pants = 2,
+		Jacket = 3,
+		Hat = 4,
+		Mask = 5,
+		Footwear = 6,
+		Weapon = 7,
+		Misc = 8,
+		Crate = 9,
+		Resource = 10,
+		CrateUncraftable = 11
 	}
 
 	public int id;

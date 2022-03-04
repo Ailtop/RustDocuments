@@ -6,37 +6,37 @@ public class LifeInfographicStat : MonoBehaviour
 {
 	public enum DataType
 	{
-		None,
-		AliveTime_Short,
-		SleepingTime_Short,
-		KillerName,
-		KillerWeapon,
-		AliveTime_Long,
-		KillerDistance,
-		GenericStat,
-		DistanceTravelledWalk,
-		DistanceTravelledRun,
-		DamageTaken,
-		DamageHealed,
-		WeaponInfo,
-		SecondsWilderness,
-		SecondsSwimming,
-		SecondsInBase,
-		SecondsInMonument,
-		SecondsFlying,
-		SecondsBoating,
-		PlayersKilled,
-		ScientistsKilled,
-		AnimalsKilled,
-		SecondsDriving
+		None = 0,
+		AliveTime_Short = 1,
+		SleepingTime_Short = 2,
+		KillerName = 3,
+		KillerWeapon = 4,
+		AliveTime_Long = 5,
+		KillerDistance = 6,
+		GenericStat = 7,
+		DistanceTravelledWalk = 8,
+		DistanceTravelledRun = 9,
+		DamageTaken = 10,
+		DamageHealed = 11,
+		WeaponInfo = 12,
+		SecondsWilderness = 13,
+		SecondsSwimming = 14,
+		SecondsInBase = 0xF,
+		SecondsInMonument = 0x10,
+		SecondsFlying = 17,
+		SecondsBoating = 18,
+		PlayersKilled = 19,
+		ScientistsKilled = 20,
+		AnimalsKilled = 21,
+		SecondsDriving = 22
 	}
 
 	public enum WeaponInfoType
 	{
-		TotalShots,
-		ShotsHit,
-		ShotsMissed,
-		AccuracyPercentage
+		TotalShots = 0,
+		ShotsHit = 1,
+		ShotsMissed = 2,
+		AccuracyPercentage = 3
 	}
 
 	public DataType dataSource;

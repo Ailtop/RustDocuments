@@ -4,15 +4,15 @@ public class EffectRecycle : BaseMonoBehaviour, IClientComponent, IRagdollInhert
 {
 	public enum PlayMode
 	{
-		Once,
-		Looped
+		Once = 0,
+		Looped = 1
 	}
 
 	public enum ParentDestroyBehaviour
 	{
-		Detach,
-		Destroy,
-		DetachWaitDestroy
+		Detach = 0,
+		Destroy = 1,
+		DetachWaitDestroy = 2
 	}
 
 	[FormerlySerializedAs("lifeTime")]

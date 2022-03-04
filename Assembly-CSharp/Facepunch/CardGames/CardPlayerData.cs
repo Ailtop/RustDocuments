@@ -9,10 +9,10 @@ namespace Facepunch.CardGames
 	{
 		public enum CardPlayerState
 		{
-			None,
-			WantsToPlay,
-			InGame,
-			InCurrentRound
+			None = 0,
+			WantsToPlay = 1,
+			InGame = 2,
+			InCurrentRound = 3
 		}
 
 		public List<PlayingCard> Cards;

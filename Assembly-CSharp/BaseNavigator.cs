@@ -9,26 +9,26 @@ public class BaseNavigator : BaseMonoBehaviour
 {
 	public enum NavigationType
 	{
-		None,
-		NavMesh,
-		AStar,
-		Custom,
-		Base
+		None = 0,
+		NavMesh = 1,
+		AStar = 2,
+		Custom = 3,
+		Base = 4
 	}
 
 	public enum NavigationSpeed
 	{
-		Slowest,
-		Slow,
-		Normal,
-		Fast
+		Slowest = 0,
+		Slow = 1,
+		Normal = 2,
+		Fast = 3
 	}
 
 	protected enum OverrideFacingDirectionMode
 	{
-		None,
-		Direction,
-		Entity
+		None = 0,
+		Direction = 1,
+		Entity = 2
 	}
 
 	[ServerVar(Help = "The max step-up height difference for pet base navigation")]
@@ -109,6 +109,11 @@ public class BaseNavigator : BaseMonoBehaviour
 	private int defaultAreaMask;
 
 	[InspectorFlags]
+	public TerrainBiome.Enum biomePreference = (TerrainBiome.Enum)12;
+
+	public bool UseBiomePreference;
+
+	[InspectorFlags]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
 	public float stuckTimer;
@@ -178,6 +183,10 @@ public class BaseNavigator : BaseMonoBehaviour
 	{
 		get
 		{
+			if (Agent == null)
+			{
+				return false;
+			}
 			if (Agent.enabled && Agent.hasPath)
 			{
 				return true;
@@ -968,6 +977,23 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			int topology = TerrainMeta.TopologyMap.GetTopology(position);
 			if ((TopologyPreference() & topology) > 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool IsPositionABiomePreference(Vector3 position)
+	{
+		if (!UseBiomePreference)
+		{
+			return true;
+		}
+		if (TerrainMeta.BiomeMap != null)
+		{
+			int num = (int)biomePreference;
+			if ((TerrainMeta.BiomeMap.GetBiomeMaxType(position) & num) > 0)
 			{
 				return true;
 			}

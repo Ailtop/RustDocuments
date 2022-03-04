@@ -34,9 +34,9 @@ public sealed class ItemContainer
 
 	public enum CanAcceptResult
 	{
-		CanAccept,
-		CannotAccept,
-		CannotAcceptRightNow
+		CanAccept = 0,
+		CannotAccept = 1,
+		CannotAcceptRightNow = 2
 	}
 
 	public Flag flags;

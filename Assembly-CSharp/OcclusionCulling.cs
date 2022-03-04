@@ -255,11 +255,11 @@ public class OcclusionCulling : MonoBehaviour
 
 	public enum DebugFilter
 	{
-		Off,
-		Dynamic,
-		Static,
-		Grid,
-		All
+		Off = 0,
+		Dynamic = 1,
+		Static = 2,
+		Grid = 3,
+		All = 4
 	}
 
 	[Flags]

@@ -169,7 +169,6 @@ public class RepairBench : StorageContainer
 			debugprint("RepairBench.ChangeSkin player does not have item :" + num + ":");
 			return;
 		}
-		bool flag2 = slot.contents != null && !slot.contents.IsEmpty();
 		ulong Skin = ItemDefinition.FindSkin(slot.info.itemid, num);
 		if (Skin == slot.skin && slot.info.isRedirectOf == null)
 		{
@@ -184,24 +183,38 @@ public class RepairBench : StorageContainer
 			skin = slot.info.isRedirectOf.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => (ulong)x.id == Skin);
 		}
 		ItemSkin itemSkin = ((skin.id == 0) ? null : (skin.invItem as ItemSkin));
-		if ((bool)itemSkin && (itemSkin.Redirect != null || slot.info.isRedirectOf != null))
+		if (((bool)itemSkin && (itemSkin.Redirect != null || slot.info.isRedirectOf != null)) || (!itemSkin && slot.info.isRedirectOf != null))
 		{
-			ItemDefinition template = itemSkin.Redirect;
-			bool flag3 = false;
-			if (itemSkin.Redirect == null && slot.info.isRedirectOf != null)
+			ItemDefinition template = ((itemSkin != null) ? itemSkin.Redirect : slot.info.isRedirectOf);
+			bool flag2 = false;
+			if (itemSkin != null && itemSkin.Redirect == null && slot.info.isRedirectOf != null)
 			{
 				template = slot.info.isRedirectOf;
-				flag3 = num != 0;
+				flag2 = num != 0;
 			}
-			if (flag2)
-			{
-				player.ChatMessage("Remove attachments before reskinning");
-				return;
-			}
-			slot.CollectedForCrafting(player);
 			float condition = slot.condition;
 			float maxCondition = slot.maxCondition;
 			int amount = slot.amount;
+			int contents = 0;
+			ItemDefinition ammoType = null;
+			BaseProjectile baseProjectile;
+			if (slot.GetHeldEntity() != null && (object)(baseProjectile = slot.GetHeldEntity() as BaseProjectile) != null && baseProjectile.primaryMagazine != null)
+			{
+				contents = baseProjectile.primaryMagazine.contents;
+				ammoType = baseProjectile.primaryMagazine.ammoType;
+			}
+			List<Item> obj = Facepunch.Pool.GetList<Item>();
+			if (slot.contents != null && slot.contents.itemList != null && slot.contents.itemList.Count > 0)
+			{
+				foreach (Item item2 in slot.contents.itemList)
+				{
+					obj.Add(item2);
+				}
+				foreach (Item item3 in obj)
+				{
+					item3.RemoveFromContainer();
+				}
+			}
 			slot.Remove();
 			ItemManager.DoRemoves();
 			Item item = ItemManager.Create(template, 1, 0uL);
@@ -209,28 +222,24 @@ public class RepairBench : StorageContainer
 			item.maxCondition = maxCondition;
 			item.condition = condition;
 			item.amount = amount;
-			if (flag3)
+			BaseProjectile baseProjectile2;
+			if (item.GetHeldEntity() != null && (object)(baseProjectile2 = item.GetHeldEntity() as BaseProjectile) != null && baseProjectile2.primaryMagazine != null)
+			{
+				baseProjectile2.primaryMagazine.contents = contents;
+				baseProjectile2.primaryMagazine.ammoType = ammoType;
+			}
+			if (obj.Count > 0 && item.contents != null)
+			{
+				foreach (Item item4 in obj)
+				{
+					item4.MoveToContainer(item.contents);
+				}
+			}
+			Facepunch.Pool.FreeList(ref obj);
+			if (flag2)
 			{
 				ApplySkinToItem(item, Skin);
 			}
-		}
-		else if (!itemSkin && slot.info.isRedirectOf != null)
-		{
-			if (flag2)
-			{
-				player.ChatMessage("Remove attachments before reskinning");
-				return;
-			}
-			slot.CollectedForCrafting(player);
-			ItemDefinition isRedirectOf = slot.info.isRedirectOf;
-			float condition2 = slot.condition;
-			float maxCondition2 = slot.maxCondition;
-			slot.Remove();
-			ItemManager.DoRemoves();
-			Item item2 = ItemManager.Create(isRedirectOf, 1, Skin);
-			item2.MoveToContainer(base.inventory, 0, false);
-			item2.maxCondition = maxCondition2;
-			item2.condition = condition2;
 		}
 		else
 		{

@@ -24,65 +24,65 @@ public class BaseNpc : BaseCombatEntity
 
 	public enum Facts
 	{
-		HasEnemy,
-		EnemyRange,
-		CanTargetEnemies,
-		Health,
-		Speed,
-		IsTired,
-		IsSleeping,
-		IsAttackReady,
-		IsRoamReady,
-		IsAggro,
-		WantsToFlee,
-		IsHungry,
-		FoodRange,
-		AttackedLately,
-		LoudNoiseNearby,
-		CanTargetFood,
-		IsMoving,
-		IsFleeing,
-		IsEating,
-		IsAfraid,
-		AfraidRange,
-		IsUnderHealthThreshold,
-		CanNotMove,
-		PathToTargetStatus
+		HasEnemy = 0,
+		EnemyRange = 1,
+		CanTargetEnemies = 2,
+		Health = 3,
+		Speed = 4,
+		IsTired = 5,
+		IsSleeping = 6,
+		IsAttackReady = 7,
+		IsRoamReady = 8,
+		IsAggro = 9,
+		WantsToFlee = 10,
+		IsHungry = 11,
+		FoodRange = 12,
+		AttackedLately = 13,
+		LoudNoiseNearby = 14,
+		CanTargetFood = 0xF,
+		IsMoving = 0x10,
+		IsFleeing = 17,
+		IsEating = 18,
+		IsAfraid = 19,
+		AfraidRange = 20,
+		IsUnderHealthThreshold = 21,
+		CanNotMove = 22,
+		PathToTargetStatus = 23
 	}
 
 	public enum EnemyRangeEnum : byte
 	{
-		AttackRange,
-		AggroRange,
-		AwareRange,
-		OutOfRange
+		AttackRange = 0,
+		AggroRange = 1,
+		AwareRange = 2,
+		OutOfRange = 3
 	}
 
 	public enum FoodRangeEnum : byte
 	{
-		EatRange,
-		AwareRange,
-		OutOfRange
+		EatRange = 0,
+		AwareRange = 1,
+		OutOfRange = 2
 	}
 
 	public enum AfraidRangeEnum : byte
 	{
-		InAfraidRange,
-		OutOfRange
+		InAfraidRange = 0,
+		OutOfRange = 1
 	}
 
 	public enum HealthEnum : byte
 	{
-		Fine,
-		Medium,
-		Low
+		Fine = 0,
+		Medium = 1,
+		Low = 2
 	}
 
 	public enum SpeedEnum : byte
 	{
-		StandStill,
-		Walk,
-		Run
+		StandStill = 0,
+		Walk = 1,
+		Run = 2
 	}
 
 	[Serializable]
@@ -90,16 +90,16 @@ public class BaseNpc : BaseCombatEntity
 	{
 		public enum FamilyEnum
 		{
-			Bear,
-			Wolf,
-			Deer,
-			Boar,
-			Chicken,
-			Horse,
-			Zombie,
-			Scientist,
-			Murderer,
-			Player
+			Bear = 0,
+			Wolf = 1,
+			Deer = 2,
+			Boar = 3,
+			Chicken = 4,
+			Horse = 5,
+			Zombie = 6,
+			Scientist = 7,
+			Murderer = 8,
+			Player = 9
 		}
 
 		[Tooltip("Ai will be less likely to fight animals that are larger than them, and more likely to flee from them.")]
@@ -220,13 +220,13 @@ public class BaseNpc : BaseCombatEntity
 
 	public enum Behaviour
 	{
-		Idle,
-		Wander,
-		Attack,
-		Flee,
-		Eat,
-		Sleep,
-		RetreatingToCover
+		Idle = 0,
+		Wander = 1,
+		Attack = 2,
+		Flee = 3,
+		Eat = 4,
+		Sleep = 5,
+		RetreatingToCover = 6
 	}
 
 	[NonSerialized]

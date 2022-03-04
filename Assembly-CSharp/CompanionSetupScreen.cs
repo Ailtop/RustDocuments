@@ -5,14 +5,14 @@ public class CompanionSetupScreen : SingletonComponent<CompanionSetupScreen>
 {
 	public enum ScreenState
 	{
-		Loading,
-		Error,
-		NoServer,
-		NotSupported,
-		NotInstalled,
-		Disabled,
-		Enabled,
-		ShowHelp
+		Loading = 0,
+		Error = 1,
+		NoServer = 2,
+		NotSupported = 3,
+		NotInstalled = 4,
+		Disabled = 5,
+		Enabled = 6,
+		ShowHelp = 7
 	}
 
 	public const string PairedKey = "companionPaired";

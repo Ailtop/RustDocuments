@@ -538,6 +538,10 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			rigidBody.WakeUp();
 			rigidBody.AddForce(Vector3.up * 0.1f, ForceMode.Impulse);
 		}
+	}
+
+	protected override void OnServerWake()
+	{
 		if (buoyancy != null)
 		{
 			buoyancy.Wake();

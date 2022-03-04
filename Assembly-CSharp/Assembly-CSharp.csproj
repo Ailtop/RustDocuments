@@ -39,17 +39,17 @@
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.VehiclesModule">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
     </Reference>
-    <Reference Include="Rust.Localization">
-      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Unity">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Rust.Localization">
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>

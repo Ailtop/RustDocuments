@@ -14,9 +14,9 @@ public class HeldEntity : BaseEntity
 	{
 		public enum HolsterSlot
 		{
-			BACK,
-			RIGHT_THIGH,
-			LEFT_THIGH
+			BACK = 0,
+			RIGHT_THIGH = 1,
+			LEFT_THIGH = 2
 		}
 
 		public HolsterSlot slot;
@@ -39,11 +39,11 @@ public class HeldEntity : BaseEntity
 
 	public enum heldEntityVisState
 	{
-		UNSET,
-		Invis,
-		Hand,
-		Holster,
-		GenericVis
+		UNSET = 0,
+		Invis = 1,
+		Hand = 2,
+		Holster = 3,
+		GenericVis = 4
 	}
 
 	public Animator worldModelAnimator;

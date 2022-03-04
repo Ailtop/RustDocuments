@@ -2,8 +2,8 @@ namespace UnityEngine.Rendering.PostProcessing
 {
 	public enum PostProcessEvent
 	{
-		BeforeTransparent,
-		BeforeStack,
-		AfterStack
+		BeforeTransparent = 0,
+		BeforeStack = 1,
+		AfterStack = 2
 	}
 }

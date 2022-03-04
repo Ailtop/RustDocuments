@@ -8,18 +8,18 @@ namespace TinyJSON
 	{
 		private enum Token
 		{
-			None,
-			OpenBrace,
-			CloseBrace,
-			OpenBracket,
-			CloseBracket,
-			Colon,
-			Comma,
-			String,
-			Number,
-			True,
-			False,
-			Null
+			None = 0,
+			OpenBrace = 1,
+			CloseBrace = 2,
+			OpenBracket = 3,
+			CloseBracket = 4,
+			Colon = 5,
+			Comma = 6,
+			String = 7,
+			Number = 8,
+			True = 9,
+			False = 10,
+			Null = 11
 		}
 
 		private const string whiteSpace = " \t\n\r";

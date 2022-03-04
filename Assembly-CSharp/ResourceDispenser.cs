@@ -10,11 +10,11 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 {
 	public enum GatherType
 	{
-		Tree,
-		Ore,
-		Flesh,
-		UNSET,
-		LAST
+		Tree = 0,
+		Ore = 1,
+		Flesh = 2,
+		UNSET = 3,
+		LAST = 4
 	}
 
 	[Serializable]
@@ -335,6 +335,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		{
 			return 0;
 		}
+		amountToGive = Mathf.FloorToInt(amountToGive);
 		float num = 1f;
 		Modifier.ModifierType type;
 		switch (gatherType)

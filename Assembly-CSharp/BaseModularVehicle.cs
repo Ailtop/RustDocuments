@@ -21,9 +21,6 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 	private bool disablePhysics;
 
 	[Header("Modular Vehicle")]
-	[HideInInspector]
-	public float mass;
-
 	[SerializeField]
 	public List<ModularVehicleSocket> moduleSockets;
 
@@ -35,6 +32,8 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 
 	[SerializeField]
 	public LODGroup lodGroup;
+
+	private float _mass = -1f;
 
 	public const Flags FLAG_KINEMATIC = Flags.Reserved6;
 
@@ -63,6 +62,18 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 				num += AttachedModuleEntities[i].GetNumSocketsTaken();
 			}
 			return TotalSockets - num;
+		}
+	}
+
+	private float Mass
+	{
+		get
+		{
+			if (base.isServer)
+			{
+				return rigidBody.mass;
+			}
+			return _mass;
 		}
 	}
 
@@ -353,21 +364,11 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 	public override void InitShared()
 	{
 		base.InitShared();
-		AddMass(mass, CentreOfMass, base.transform.position);
+		AddMass(Mass, CentreOfMass, base.transform.position);
 		HasInited = true;
 		foreach (BaseVehicleModule attachedModuleEntity in AttachedModuleEntities)
 		{
 			attachedModuleEntity.RefreshConditionals(false);
-		}
-	}
-
-	public override void PreProcess(IPrefabProcessor process, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		base.PreProcess(process, rootObj, name, serverside, clientside, bundling);
-		Rigidbody component = GetComponent<Rigidbody>();
-		if (component != null)
-		{
-			mass = component.mass;
 		}
 	}
 

@@ -10,11 +10,11 @@ public class BaseOven : StorageContainer, ISplashable
 {
 	public enum TemperatureType
 	{
-		Normal,
-		Warming,
-		Cooking,
-		Smelting,
-		Fractioning
+		Normal = 0,
+		Warming = 1,
+		Cooking = 2,
+		Smelting = 3,
+		Fractioning = 4
 	}
 
 	public TemperatureType temperature;

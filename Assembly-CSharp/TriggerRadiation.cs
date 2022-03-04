@@ -4,10 +4,10 @@ public class TriggerRadiation : TriggerBase
 {
 	public enum RadiationTier
 	{
-		MINIMAL,
-		LOW,
-		MEDIUM,
-		HIGH
+		MINIMAL = 0,
+		LOW = 1,
+		MEDIUM = 2,
+		HIGH = 3
 	}
 
 	public RadiationTier radiationTier = RadiationTier.LOW;

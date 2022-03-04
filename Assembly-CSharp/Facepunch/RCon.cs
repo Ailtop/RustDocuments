@@ -31,11 +31,11 @@ namespace Facepunch
 
 		public enum LogType
 		{
-			Generic,
-			Error,
-			Warning,
-			Chat,
-			Report
+			Generic = 0,
+			Error = 1,
+			Warning = 2,
+			Chat = 3,
+			Report = 4
 		}
 
 		public struct Response

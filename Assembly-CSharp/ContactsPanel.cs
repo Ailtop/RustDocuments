@@ -6,8 +6,8 @@ public class ContactsPanel : SingletonComponent<ContactsPanel>
 {
 	public enum SortMode
 	{
-		None,
-		RecentlySeen
+		None = 0,
+		RecentlySeen = 1
 	}
 
 	public RectTransform alliesBucket;

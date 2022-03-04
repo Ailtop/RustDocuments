@@ -7,12 +7,12 @@ public class LootContainer : StorageContainer
 {
 	public enum spawnType
 	{
-		GENERIC,
-		PLAYER,
-		TOWN,
-		AIRDROP,
-		CRASHSITE,
-		ROADSIDE
+		GENERIC = 0,
+		PLAYER = 1,
+		TOWN = 2,
+		AIRDROP = 3,
+		CRASHSITE = 4,
+		ROADSIDE = 5
 	}
 
 	[Serializable]

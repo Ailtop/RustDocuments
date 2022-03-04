@@ -6,10 +6,10 @@ public class SwapArrows : MonoBehaviour, IClientComponent
 {
 	public enum ArrowType
 	{
-		One,
-		Two,
-		Three,
-		Four
+		One = 0,
+		Two = 1,
+		Three = 2,
+		Four = 3
 	}
 
 	public GameObject[] arrowModels;

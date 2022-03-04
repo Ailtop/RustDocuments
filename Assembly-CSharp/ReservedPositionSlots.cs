@@ -1,6 +1,6 @@
 public enum ReservedPositionSlots
 {
 	HomePoint = 4,
-	GroupRoamPoint,
-	RaycastTargetPoint
+	GroupRoamPoint = 5,
+	RaycastTargetPoint = 6
 }

@@ -7,9 +7,9 @@ namespace Rust.Ai
 	{
 		public enum CoverType
 		{
-			Full,
-			Partial,
-			None
+			Full = 0,
+			Partial = 1,
+			None = 2
 		}
 
 		public CoverType NormalCoverType;

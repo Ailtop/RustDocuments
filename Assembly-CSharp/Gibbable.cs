@@ -26,27 +26,27 @@ public class Gibbable : PrefabAttribute, IClientComponent
 
 	public enum ColliderType
 	{
-		Box,
-		Sphere,
-		Capsule
+		Box = 0,
+		Sphere = 1,
+		Capsule = 2
 	}
 
 	public enum ParentingType
 	{
-		None,
-		GibsOnly,
-		FXOnly,
-		All
+		None = 0,
+		GibsOnly = 1,
+		FXOnly = 2,
+		All = 3
 	}
 
 	public enum BoundsEffectType
 	{
-		None,
-		Electrical,
-		Glass,
-		Scrap,
-		Stone,
-		Wood
+		None = 0,
+		Electrical = 1,
+		Glass = 2,
+		Scrap = 3,
+		Stone = 4,
+		Wood = 5
 	}
 
 	public GameObject gibSource;

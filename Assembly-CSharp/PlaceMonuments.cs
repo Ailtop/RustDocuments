@@ -37,9 +37,9 @@ public class PlaceMonuments : ProceduralComponent
 
 	public enum DistanceMode
 	{
-		Any,
-		Min,
-		Max
+		Any = 0,
+		Min = 1,
+		Max = 2
 	}
 
 	public SpawnFilter Filter;

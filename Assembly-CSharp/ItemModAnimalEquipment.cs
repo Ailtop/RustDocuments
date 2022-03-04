@@ -2,11 +2,11 @@ public class ItemModAnimalEquipment : ItemMod
 {
 	public enum SlotType
 	{
-		Basic,
-		Armor,
-		Saddle,
-		Bit,
-		Feet
+		Basic = 0,
+		Armor = 1,
+		Saddle = 2,
+		Bit = 3,
+		Feet = 4
 	}
 
 	public BaseEntity.Flags WearableFlag;

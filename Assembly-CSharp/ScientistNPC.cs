@@ -5,9 +5,9 @@ public class ScientistNPC : HumanNPC, IAIMounted
 {
 	public enum RadioChatterType
 	{
-		NONE,
-		Idle,
-		Alert
+		NONE = 0,
+		Idle = 1,
+		Alert = 2
 	}
 
 	public GameObjectRef[] RadioChatterEffects;

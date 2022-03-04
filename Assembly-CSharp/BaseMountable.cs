@@ -14,16 +14,16 @@ public class BaseMountable : BaseCombatEntity
 {
 	public enum MountStatType
 	{
-		None,
-		Boating,
-		Flying,
-		Driving
+		None = 0,
+		Boating = 1,
+		Flying = 2,
+		Driving = 3
 	}
 
 	public enum MountGestureType
 	{
-		None,
-		UpperBody
+		None = 0,
+		UpperBody = 1
 	}
 
 	[Header("View")]

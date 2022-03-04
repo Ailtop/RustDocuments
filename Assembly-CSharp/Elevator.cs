@@ -8,8 +8,8 @@ public class Elevator : IOEntity, IFlagNotify
 {
 	public enum Direction
 	{
-		Up,
-		Down
+		Up = 0,
+		Down = 1
 	}
 
 	public Transform LiftRoot;

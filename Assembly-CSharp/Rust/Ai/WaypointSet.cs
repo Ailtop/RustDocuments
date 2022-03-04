@@ -8,8 +8,8 @@ namespace Rust.Ai
 	{
 		public enum NavModes
 		{
-			Loop,
-			PingPong
+			Loop = 0,
+			PingPong = 1
 		}
 
 		[Serializable]

@@ -4,9 +4,9 @@ public class PlayerModelSkin : MonoBehaviour, IPrefabPreProcess
 {
 	public enum SkinMaterialType
 	{
-		HEAD,
-		EYE,
-		BODY
+		HEAD = 0,
+		EYE = 1,
+		BODY = 2
 	}
 
 	public SkinMaterialType MaterialType;

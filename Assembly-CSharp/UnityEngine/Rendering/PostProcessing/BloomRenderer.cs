@@ -7,15 +7,15 @@ namespace UnityEngine.Rendering.PostProcessing
 	{
 		private enum Pass
 		{
-			Prefilter13,
-			Prefilter4,
-			Downsample13,
-			Downsample4,
-			UpsampleTent,
-			UpsampleBox,
-			DebugOverlayThreshold,
-			DebugOverlayTent,
-			DebugOverlayBox
+			Prefilter13 = 0,
+			Prefilter4 = 1,
+			Downsample13 = 2,
+			Downsample4 = 3,
+			UpsampleTent = 4,
+			UpsampleBox = 5,
+			DebugOverlayThreshold = 6,
+			DebugOverlayTent = 7,
+			DebugOverlayBox = 8
 		}
 
 		private struct Level

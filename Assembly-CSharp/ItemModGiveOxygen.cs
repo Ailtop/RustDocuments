@@ -4,9 +4,9 @@ public class ItemModGiveOxygen : ItemMod, IAirSupply
 {
 	public enum AirSupplyType
 	{
-		Lungs,
-		ScubaTank,
-		Submarine
+		Lungs = 0,
+		ScubaTank = 1,
+		Submarine = 2
 	}
 
 	public AirSupplyType airType = AirSupplyType.ScubaTank;

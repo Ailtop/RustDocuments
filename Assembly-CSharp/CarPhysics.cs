@@ -51,9 +51,9 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 
 		public Vector3 origin;
 
-		public Vector2 tireForce;
+		public Vector2 tyreForce;
 
-		public Vector2 tireSlip;
+		public Vector2 tyreSlip;
 
 		public Vector3 velocity;
 
@@ -62,6 +62,8 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		public bool hasThrottleInput;
 
 		public bool isFrontWheel;
+
+		public bool isLeftWheel;
 	}
 
 	private readonly ServerWheelData[] wheelData;
@@ -174,7 +176,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		{
 			slowSpeedExitFlag = false;
 		}
-		if (hasDriver && rBody.IsSleeping())
+		if ((hasDriver || !vehicleSettings.canSleep) && rBody.IsSleeping())
 		{
 			rBody.WakeUp();
 		}
@@ -184,7 +186,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 			{
 				lastMovingTime = Time.time;
 			}
-			if (!hasDriver && Time.time > lastMovingTime + 10f)
+			if (vehicleSettings.canSleep && !hasDriver && Time.time > lastMovingTime + 10f)
 			{
 				for (int i = 0; i < wheelData.Length; i++)
 				{
@@ -201,6 +203,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				float maxDriveForce = car.GetMaxDriveForce();
 				float maxForwardSpeed = car.GetMaxForwardSpeed();
 				float num2 = (car.IsOn() ? car.GetThrottleInput() : 0f);
+				float steerInput = car.GetSteerInput();
 				float brakeInput = (InSlowSpeedExitMode ? 1f : car.GetBrakeInput());
 				float num3 = 1f;
 				if (num < 3f)
@@ -215,7 +218,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				maxDriveForce *= num3;
 				if (car.IsOn())
 				{
-					ComputeSteerAngle(dt, speed);
+					ComputeSteerAngle(steerInput, dt, speed);
 				}
 				if ((float)timeSinceWaterCheck > 0.25f)
 				{
@@ -264,8 +267,8 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				{
 					ServerWheelData wd = wheelData[k];
 					UpdateLocalFrame(wd, dt);
-					ComputeTireForces(wd, speed, maxDriveForce, maxForwardSpeed, num2, brakeInput, num3);
-					ApplyTireForces(wd);
+					ComputeTyreForces(wd, speed, maxDriveForce, maxForwardSpeed, num2, steerInput, brakeInput, num3);
+					ApplyTyreForces(wd, num2, steerInput, speed);
 				}
 				ComputeOverallForces();
 			}
@@ -305,9 +308,14 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		prevLocalCOM = rBody.centerOfMass;
 	}
 
-	private void ComputeSteerAngle(float dt, float speed)
+	private void ComputeSteerAngle(float steerInput, float dt, float speed)
 	{
-		float num = vehicleSettings.maxSteerAngle * car.GetSteerInput();
+		if (vehicleSettings.tankSteering)
+		{
+			SteerAngle = 0f;
+			return;
+		}
+		float num = vehicleSettings.maxSteerAngle * steerInput;
 		float num2 = Mathf.InverseLerp(0f, vehicleSettings.minSteerLimitSpeed, speed);
 		if (vehicleSettings.steeringLimit)
 		{
@@ -444,9 +452,40 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		wd.localRigForce = vector2 + zero;
 	}
 
-	private void ComputeTireForces(ServerWheelData wd, float speed, float maxDriveForce, float maxSpeed, float throttleInput, float brakeInput, float driveForceMultiplier)
+	private void ComputeTyreForces(ServerWheelData wd, float speed, float maxDriveForce, float maxSpeed, float throttleInput, float steerInput, float brakeInput, float driveForceMultiplier)
 	{
 		float absSpeed = Mathf.Abs(speed);
+		if (vehicleSettings.tankSteering && brakeInput == 0f)
+		{
+			float tankSteerInvert = GetTankSteerInvert(throttleInput, speed);
+			if (wd.isLeftWheel)
+			{
+				if (throttleInput == 0f)
+				{
+					throttleInput = 0f - steerInput;
+				}
+				else if (steerInput > 0f)
+				{
+					throttleInput = Mathf.Lerp(throttleInput, -1f * tankSteerInvert, steerInput);
+				}
+				else if (steerInput < 0f)
+				{
+					throttleInput = Mathf.Lerp(throttleInput, 1f * tankSteerInvert, 0f - steerInput);
+				}
+			}
+			else if (throttleInput == 0f)
+			{
+				throttleInput = steerInput;
+			}
+			else if (steerInput > 0f)
+			{
+				throttleInput = Mathf.Lerp(throttleInput, 1f * tankSteerInvert, steerInput);
+			}
+			else if (steerInput < 0f)
+			{
+				throttleInput = Mathf.Lerp(throttleInput, -1f * tankSteerInvert, 0f - steerInput);
+			}
+		}
 		float num = (wd.wheel.powerWheel ? throttleInput : 0f);
 		wd.hasThrottleInput = num != 0f;
 		float num2 = vehicleSettings.maxDriveSlip;
@@ -479,8 +518,8 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		}
 		if (wd.isGrounded)
 		{
-			wd.tireSlip.x = wd.localVelocity.x;
-			wd.tireSlip.y = wd.localVelocity.y - wd.angularVelocity * wd.wheelCollider.radius;
+			wd.tyreSlip.x = wd.localVelocity.x;
+			wd.tyreSlip.y = wd.localVelocity.y - wd.angularVelocity * wd.wheelCollider.radius;
 			float num7;
 			switch (car.OnSurface)
 			{
@@ -501,34 +540,34 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 			float num9 = 0f;
 			if (!wd.isBraking)
 			{
-				num9 = Mathf.Min(Mathf.Abs(num6 * wd.tireSlip.x) / num8, num2);
+				num9 = Mathf.Min(Mathf.Abs(num6 * wd.tyreSlip.x) / num8, num2);
 				if (num6 != 0f && num9 < 0.1f)
 				{
 					num9 = 0.1f;
 				}
 			}
-			if (Mathf.Abs(wd.tireSlip.y) < num9)
+			if (Mathf.Abs(wd.tyreSlip.y) < num9)
 			{
-				wd.tireSlip.y = num9 * Mathf.Sign(wd.tireSlip.y);
+				wd.tyreSlip.y = num9 * Mathf.Sign(wd.tyreSlip.y);
 			}
-			Vector2 vector = (0f - num8) * wd.tireSlip.normalized;
+			Vector2 vector = (0f - num8) * wd.tyreSlip.normalized;
 			vector.x = Mathf.Abs(vector.x) * 1.5f;
 			vector.y = Mathf.Abs(vector.y);
-			wd.tireForce.x = Mathf.Clamp(wd.localRigForce.x, 0f - vector.x, vector.x);
+			wd.tyreForce.x = Mathf.Clamp(wd.localRigForce.x, 0f - vector.x, vector.x);
 			if (wd.isBraking)
 			{
 				float num10 = Mathf.Min(vector.y, num6);
-				wd.tireForce.y = Mathf.Clamp(wd.localRigForce.y, 0f - num10, num10);
+				wd.tyreForce.y = Mathf.Clamp(wd.localRigForce.y, 0f - num10, num10);
 			}
 			else
 			{
-				wd.tireForce.y = Mathf.Clamp(num6, 0f - vector.y, vector.y);
+				wd.tyreForce.y = Mathf.Clamp(num6, 0f - vector.y, vector.y);
 			}
 		}
 		else
 		{
-			wd.tireSlip = Vector2.zero;
-			wd.tireForce = Vector2.zero;
+			wd.tyreSlip = Vector2.zero;
+			wd.tyreForce = Vector2.zero;
 		}
 		if (wd.isGrounded)
 		{
@@ -540,7 +579,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 			else
 			{
 				float driveForceToMaxSlip = vehicleSettings.driveForceToMaxSlip;
-				num11 = Mathf.Clamp01((Mathf.Abs(num6) - Mathf.Abs(wd.tireForce.y)) / driveForceToMaxSlip) * num2 * Mathf.Sign(num6);
+				num11 = Mathf.Clamp01((Mathf.Abs(num6) - Mathf.Abs(wd.tyreForce.y)) / driveForceToMaxSlip) * num2 * Mathf.Sign(num6);
 			}
 			wd.angularVelocity = (wd.localVelocity.y + num11) / wd.wheelCollider.radius;
 			return;
@@ -591,7 +630,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				DriveWheelVelocity += serverWheelData.angularVelocity;
 				if (serverWheelData.isGrounded)
 				{
-					float num2 = ComputeCombinedSlip(serverWheelData.localVelocity, serverWheelData.tireSlip);
+					float num2 = ComputeCombinedSlip(serverWheelData.localVelocity, serverWheelData.tyreSlip);
 					DriveWheelSlip += num2;
 				}
 				num++;
@@ -604,24 +643,24 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		}
 	}
 
-	private static float ComputeCombinedSlip(Vector2 localVelocity, Vector2 tireSlip)
+	private static float ComputeCombinedSlip(Vector2 localVelocity, Vector2 tyreSlip)
 	{
 		float magnitude = localVelocity.magnitude;
 		if (magnitude > 0.01f)
 		{
-			float num = tireSlip.x * localVelocity.x / magnitude;
-			float y = tireSlip.y;
+			float num = tyreSlip.x * localVelocity.x / magnitude;
+			float y = tyreSlip.y;
 			return Mathf.Sqrt(num * num + y * y);
 		}
-		return tireSlip.magnitude;
+		return tyreSlip.magnitude;
 	}
 
-	private void ApplyTireForces(ServerWheelData wd)
+	private void ApplyTyreForces(ServerWheelData wd, float throttleInput, float steerInput, float speed)
 	{
 		if (wd.isGrounded)
 		{
-			Vector3 force = wd.hit.forwardDir * wd.tireForce.y;
-			Vector3 force2 = wd.hit.sidewaysDir * wd.tireForce.x;
+			Vector3 force = wd.hit.forwardDir * wd.tyreForce.y;
+			Vector3 force2 = wd.hit.sidewaysDir * wd.tyreForce.x;
 			Vector3 sidewaysForceAppPoint = GetSidewaysForceAppPoint(wd, wd.hit.point);
 			rBody.AddForceAtPosition(force, wd.hit.point, ForceMode.Force);
 			rBody.AddForceAtPosition(force2, sidewaysForceAppPoint, ForceMode.Force);
@@ -632,9 +671,27 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 	{
 		Vector3 result = contactPoint + wd.wheelColliderTransform.up * vehicleSettings.antiRoll * wd.forceDistance;
 		float num = (wd.wheel.steerWheel ? SteerAngle : 0f);
-		if (num != 0f && Mathf.Sign(num) != Mathf.Sign(wd.tireSlip.x))
+		if (num != 0f && Mathf.Sign(num) != Mathf.Sign(wd.tyreSlip.x))
 		{
 			result += wd.wheelColliderTransform.forward * midWheelPos * (vehicleSettings.handlingBias - 0.5f);
+		}
+		return result;
+	}
+
+	private float GetTankSteerInvert(float throttleInput, float speed)
+	{
+		float result = 1f;
+		if (throttleInput < 0f && speed < 1.75f)
+		{
+			result = -1f;
+		}
+		else if (throttleInput == 0f && speed < -1f)
+		{
+			result = -1f;
+		}
+		else if (speed < -1f)
+		{
+			result = -1f;
 		}
 		return result;
 	}

@@ -13,22 +13,22 @@ public class SlotMachine : BaseMountable
 {
 	public enum SlotFaces
 	{
-		Scrap,
-		Rope,
-		Apple,
-		LowGrade,
-		Wood,
-		Bandage,
-		Charcoal,
-		Gunpowder,
-		Rust,
-		Meat,
-		Hammer,
-		Sulfur,
-		TechScrap,
-		Frags,
-		Cloth,
-		LuckySeven
+		Scrap = 0,
+		Rope = 1,
+		Apple = 2,
+		LowGrade = 3,
+		Wood = 4,
+		Bandage = 5,
+		Charcoal = 6,
+		Gunpowder = 7,
+		Rust = 8,
+		Meat = 9,
+		Hammer = 10,
+		Sulfur = 11,
+		TechScrap = 12,
+		Frags = 13,
+		Cloth = 14,
+		LuckySeven = 0xF
 	}
 
 	[ServerVar]
@@ -451,9 +451,9 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	private void Server_RequestMultiplierChange(RPCMessage msg)
 	{
 		if (!(msg.player != _mounted))

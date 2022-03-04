@@ -1,6 +1,7 @@
 using System;
 using ConVar;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 
 public class TreeEntity : ResourceEntity, IPrefabPreProcess
@@ -95,6 +96,11 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		if (xMarker == null)
 		{
 			return false;
+		}
+		object obj = Interface.CallHook("OnTreeMarkerHit", this, info);
+		if (obj is bool)
+		{
+			return (bool)obj;
 		}
 		if (PrefabAttribute.server.Find<TreeMarkerData>(prefabID) != null)
 		{

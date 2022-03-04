@@ -8,16 +8,16 @@ namespace Rust.Modular
 	{
 		public enum SocketWheelType
 		{
-			NoWheel,
-			ForwardWheel,
-			BackWheel
+			NoWheel = 0,
+			ForwardWheel = 1,
+			BackWheel = 2
 		}
 
 		public enum SocketLocationType
 		{
-			Middle,
-			Front,
-			Back
+			Middle = 0,
+			Front = 1,
+			Back = 2
 		}
 
 		[SerializeField]

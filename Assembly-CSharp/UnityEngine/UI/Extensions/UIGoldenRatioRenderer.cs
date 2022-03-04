@@ -7,10 +7,10 @@ namespace UnityEngine.UI.Extensions
 	{
 		private enum Orientations
 		{
-			Left,
-			Top,
-			Right,
-			Bottom
+			Left = 0,
+			Top = 1,
+			Right = 2,
+			Bottom = 3
 		}
 
 		private readonly List<Vector2> _points = new List<Vector2>();

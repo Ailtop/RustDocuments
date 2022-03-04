@@ -1,6 +1,6 @@
 public enum flamethrowerState
 {
-	OFF,
-	PILOT_LIGHT,
-	FLAME_ON
+	OFF = 0,
+	PILOT_LIGHT = 1,
+	FLAME_ON = 2
 }

@@ -1,5 +1,5 @@
 public enum TerrainAnchorMode
 {
-	MinimizeError,
-	MinimizeMovement
+	MinimizeError = 0,
+	MinimizeMovement = 1
 }

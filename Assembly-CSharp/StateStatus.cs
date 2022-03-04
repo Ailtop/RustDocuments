@@ -1,6 +1,6 @@
 public enum StateStatus
 {
-	Running,
-	Finished,
-	Error
+	Running = 0,
+	Finished = 1,
+	Error = 2
 }

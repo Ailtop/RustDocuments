@@ -9,13 +9,13 @@ namespace Rust.Ai.HTN.ScientistJunkpile
 	{
 		public enum JunkpileType
 		{
-			A,
-			B,
-			C,
-			D,
-			E,
-			F,
-			G
+			A = 0,
+			B = 1,
+			C = 2,
+			D = 3,
+			E = 4,
+			F = 5,
+			G = 6
 		}
 
 		public GameObjectRef ScientistPrefab;

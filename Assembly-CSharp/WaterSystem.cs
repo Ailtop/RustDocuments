@@ -91,9 +91,9 @@ public class WaterSystem : MonoBehaviour
 
 	private enum NativePathState
 	{
-		Initializing,
-		Failed,
-		Ready
+		Initializing = 0,
+		Failed = 1,
+		Ready = 2
 	}
 
 	public WaterQuality Quality = WaterQuality.High;

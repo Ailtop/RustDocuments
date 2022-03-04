@@ -14,10 +14,10 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 {
 	public enum VisualGroup
 	{
-		None,
-		Engine,
-		Cabin,
-		Flatbed
+		None = 0,
+		Engine = 1,
+		Cabin = 2,
+		Flatbed = 3
 	}
 
 	[Serializable]
