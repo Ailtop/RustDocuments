@@ -129,7 +129,7 @@ public class ProceduralLift : BaseEntity
 		floorIndex = Mathf.Clamp(floor, 0, stops.Length - 1);
 		if (base.isServer)
 		{
-			SetFlag(Flags.Busy, true);
+			SetFlag(Flags.Busy, b: true);
 			SendNetworkUpdateImmediate();
 			CancelInvoke(ResetLift);
 		}
@@ -142,7 +142,7 @@ public class ProceduralLift : BaseEntity
 		cabin.transform.position = proceduralLiftStop.transform.position;
 		if (base.isServer)
 		{
-			SetFlag(Flags.Busy, false);
+			SetFlag(Flags.Busy, b: false);
 			SendNetworkUpdateImmediate();
 			CancelInvoke(ResetLift);
 		}
@@ -152,7 +152,7 @@ public class ProceduralLift : BaseEntity
 	{
 		if (base.isServer)
 		{
-			SetFlag(Flags.Busy, false);
+			SetFlag(Flags.Busy, b: false);
 			SendNetworkUpdateImmediate();
 			if (floorIndex != 0)
 			{

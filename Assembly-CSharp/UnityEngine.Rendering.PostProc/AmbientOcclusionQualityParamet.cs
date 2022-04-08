@@ -1,9 +1,8 @@
 using System;
 
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+[Serializable]
+public sealed class AmbientOcclusionQualityParameter : ParameterOverride<AmbientOcclusionQuality>
 {
-	[Serializable]
-	public sealed class AmbientOcclusionQualityParameter : ParameterOverride<AmbientOcclusionQuality>
-	{
-	}
 }

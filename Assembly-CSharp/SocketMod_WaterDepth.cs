@@ -30,7 +30,7 @@ public class SocketMod_WaterDepth : SocketMod
 			}
 		}
 		vector.y = WaterSystem.GetHeight(vector) - 0.1f;
-		float overallWaterDepth = WaterLevel.GetOverallWaterDepth(vector, false);
+		float overallWaterDepth = WaterLevel.GetOverallWaterDepth(vector, waves: false);
 		if (overallWaterDepth > MinimumWaterDepth && overallWaterDepth < MaximumWaterDepth)
 		{
 			return true;

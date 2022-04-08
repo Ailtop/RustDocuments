@@ -90,7 +90,7 @@ public class EggHuntEvent : BaseHuntEvent
 	{
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			BasePlayer basePlayer = activePlayer;
+			_ = activePlayer;
 		}
 	}
 
@@ -237,11 +237,11 @@ public class EggHuntEvent : BaseHuntEvent
 		{
 			if (timeAlive - warmupTime > durationSeconds - warnTime)
 			{
-				SetFlag(Flags.Reserved1, true);
+				SetFlag(Flags.Reserved1, b: true);
 			}
 			if (timeAlive - warmupTime > durationSeconds && !IsInvoking(Cooldown))
 			{
-				SetFlag(Flags.Reserved2, true);
+				SetFlag(Flags.Reserved2, b: true);
 				CleanupEggs();
 				PrintWinnersAndAward();
 				Invoke(Cooldown, 10f);

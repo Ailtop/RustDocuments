@@ -9,9 +9,9 @@ public class SwapKeycard : MonoBehaviour
 		GameObject[] array = accessLevels;
 		for (int i = 0; i < array.Length; i++)
 		{
-			array[i].SetActive(false);
+			array[i].SetActive(value: false);
 		}
-		accessLevels[level - 1].SetActive(true);
+		accessLevels[level - 1].SetActive(value: true);
 	}
 
 	public void SetRootActive(int index)

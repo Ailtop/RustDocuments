@@ -6,7 +6,7 @@ public class TerrainCollisionTrigger : EnvironmentVolumeTrigger
 	{
 		if ((bool)TerrainMeta.Collision && !other.isTrigger)
 		{
-			UpdateCollider(other, true);
+			UpdateCollider(other, state: true);
 		}
 	}
 
@@ -14,7 +14,7 @@ public class TerrainCollisionTrigger : EnvironmentVolumeTrigger
 	{
 		if ((bool)TerrainMeta.Collision && !other.isTrigger)
 		{
-			UpdateCollider(other, false);
+			UpdateCollider(other, state: false);
 		}
 	}
 

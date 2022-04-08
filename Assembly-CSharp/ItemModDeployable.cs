@@ -25,8 +25,7 @@ public class ItemModDeployable : MonoBehaviour
 		{
 			player.GiveAchievement(UnlockAchievement);
 		}
-		BuildingPrivlidge buildingPrivlidge;
-		if ((object)(buildingPrivlidge = ent as BuildingPrivlidge) != null && Interface.CallHook("OnCupboardAuthorize", buildingPrivlidge, player) == null)
+		if (ent is BuildingPrivlidge buildingPrivlidge && Interface.CallHook("OnCupboardAuthorize", buildingPrivlidge, player) == null)
 		{
 			buildingPrivlidge.AddPlayer(player);
 		}

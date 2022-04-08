@@ -73,7 +73,7 @@ public class Lift : AnimatedBuildingBlock
 	{
 		if (!IsOpen() && !IsBusy())
 		{
-			SetFlag(Flags.Open, true);
+			SetFlag(Flags.Open, b: true);
 			SendNetworkUpdateImmediate();
 		}
 	}
@@ -82,7 +82,7 @@ public class Lift : AnimatedBuildingBlock
 	{
 		if (IsOpen() && !IsBusy())
 		{
-			SetFlag(Flags.Open, false);
+			SetFlag(Flags.Open, b: false);
 			SendNetworkUpdateImmediate();
 		}
 	}

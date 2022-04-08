@@ -12,10 +12,10 @@ public class ItemModRFListener : ItemModAssociatedEntity<PagerEntity>
 			associatedEntity.SetOff();
 			break;
 		case "silenton":
-			associatedEntity.SetSilentMode(true);
+			associatedEntity.SetSilentMode(wantsSilent: true);
 			break;
 		case "silentoff":
-			associatedEntity.SetSilentMode(false);
+			associatedEntity.SetSilentMode(wantsSilent: false);
 			break;
 		}
 	}

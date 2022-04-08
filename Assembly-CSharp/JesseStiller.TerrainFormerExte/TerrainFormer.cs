@@ -1,12 +1,11 @@
 using UnityEngine;
 
-namespace JesseStiller.TerrainFormerExtension
+namespace JesseStiller.TerrainFormerExtension;
+
+public class TerrainFormer : MonoBehaviour
 {
-	public class TerrainFormer : MonoBehaviour
+	private void Awake()
 	{
-		private void Awake()
-		{
-			Object.Destroy(this);
-		}
+		Object.Destroy(this);
 	}
 }

@@ -60,7 +60,7 @@ public class MoveMission : BaseMission
 		{
 			if (instance.status == MissionStatus.Accomplished)
 			{
-				float minDistFromLocation2 = minDistFromLocation;
+				_ = minDistFromLocation;
 			}
 			base.Think(instance, assignee, delta);
 		}

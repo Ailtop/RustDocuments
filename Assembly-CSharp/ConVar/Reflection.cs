@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("reflection")]
+public class Reflection : ConsoleSystem
 {
-	[Factory("reflection")]
-	public class Reflection : ConsoleSystem
-	{
-	}
 }

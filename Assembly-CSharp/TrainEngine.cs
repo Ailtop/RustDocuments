@@ -216,7 +216,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		}
 		else if (LightsAreOn && !HasDriver())
 		{
-			SetFlag(Flags.Reserved5, false);
+			SetFlag(Flags.Reserved5, b: false);
 		}
 	}
 
@@ -239,7 +239,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		base.OnKilled(info);
 		if (base.IsDestroyed && fxFinalExplosion != null)
 		{
-			Effect.server.Run(fxFinalExplosion.resourcePath, engineWorldCol.transform.position + engineWorldCol.center, Vector3.up, null, true);
+			Effect.server.Run(fxFinalExplosion.resourcePath, engineWorldCol.transform.position + engineWorldCol.center, Vector3.up, null, broadcast: true);
 		}
 	}
 
@@ -253,36 +253,54 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
-		_003C_003Ec__DisplayClass22_0 _003C_003Ec__DisplayClass22_ = default(_003C_003Ec__DisplayClass22_0);
-		_003C_003Ec__DisplayClass22_.inputState = inputState;
-		_003C_003Ec__DisplayClass22_._003C_003E4__this = this;
-		_003C_003Ec__DisplayClass22_.player = player;
-		if (!IsDriver(_003C_003Ec__DisplayClass22_.player))
+		if (!IsDriver(player))
 		{
 			return;
 		}
 		if (engineController.IsOff)
 		{
-			if ((_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.FORWARD) && !_003C_003Ec__DisplayClass22_.inputState.WasDown(BUTTON.FORWARD)) || (_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.BACKWARD) && !_003C_003Ec__DisplayClass22_.inputState.WasDown(BUTTON.BACKWARD)))
+			if ((inputState.IsDown(BUTTON.FORWARD) && !inputState.WasDown(BUTTON.FORWARD)) || (inputState.IsDown(BUTTON.BACKWARD) && !inputState.WasDown(BUTTON.BACKWARD)))
 			{
-				engineController.TryStartEngine(_003C_003Ec__DisplayClass22_.player);
+				engineController.TryStartEngine(player);
 			}
 		}
-		else if (!_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C22_0(BUTTON.FORWARD, IncreaseThrottle, ref _003C_003Ec__DisplayClass22_))
+		else if (!ProcessThrottleInput(BUTTON.FORWARD, IncreaseThrottle))
 		{
-			_003CPlayerServerInput_003Eg__ProcessThrottleInput_007C22_0(BUTTON.BACKWARD, DecreaseThrottle, ref _003C_003Ec__DisplayClass22_);
+			ProcessThrottleInput(BUTTON.BACKWARD, DecreaseThrottle);
 		}
-		if (_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.LEFT))
+		if (inputState.IsDown(BUTTON.LEFT))
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Left);
 		}
-		else if (_003C_003Ec__DisplayClass22_.inputState.IsDown(BUTTON.RIGHT))
+		else if (inputState.IsDown(BUTTON.RIGHT))
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Right);
 		}
 		else
 		{
 			SetTrackSelection(TrainTrackSpline.TrackSelection.Default);
+		}
+		bool ProcessThrottleInput(BUTTON button, Action action)
+		{
+			if (inputState.IsDown(button))
+			{
+				if (!inputState.WasDown(button))
+				{
+					action();
+					buttonHoldTime = 0f;
+				}
+				else
+				{
+					buttonHoldTime += player.clientTickInterval;
+					if (buttonHoldTime > 0.55f)
+					{
+						action();
+						buttonHoldTime = 0.4f;
+					}
+				}
+				return true;
+			}
+			return false;
 		}
 	}
 
@@ -368,13 +386,13 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	{
 		if (next.HasFlag(Flags.On) && !old.HasFlag(Flags.On))
 		{
-			SetFlag(Flags.Reserved5, true);
+			SetFlag(Flags.Reserved5, b: true);
 			InvokeRandomized(CheckForHazards, 0f, 1f, 0.1f);
 		}
 		else if (!next.HasFlag(Flags.On) && old.HasFlag(Flags.On))
 		{
 			CancelInvoke(CheckForHazards);
-			SetFlag(Flags.Reserved6, false);
+			SetFlag(Flags.Reserved6, b: false);
 		}
 	}
 
@@ -423,19 +441,19 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		}
 		else
 		{
-			SetFlag(Flags.Reserved6, false);
+			SetFlag(Flags.Reserved6, b: false);
 		}
 	}
 
 	public void OnEngineTookHeavyDamage()
 	{
-		SetFlag(Flags.Reserved10, true);
+		SetFlag(Flags.Reserved10, b: true);
 		Invoke(ResetEngineToNormal, engineSlowedTime);
 	}
 
 	public void ResetEngineToNormal()
 	{
-		SetFlag(Flags.Reserved10, false);
+		SetFlag(Flags.Reserved10, b: false);
 	}
 
 	public float GetCurTopSpeed()
@@ -543,25 +561,17 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public float GetThrottleFraction()
 	{
-		switch (CurThrottleSetting)
+		return CurThrottleSetting switch
 		{
-		case EngineSpeeds.Rev_Hi:
-			return -1f;
-		case EngineSpeeds.Rev_Med:
-			return -0.5f;
-		case EngineSpeeds.Rev_Lo:
-			return -0.2f;
-		case EngineSpeeds.Zero:
-			return 0f;
-		case EngineSpeeds.Fwd_Lo:
-			return 0.2f;
-		case EngineSpeeds.Fwd_Med:
-			return 0.5f;
-		case EngineSpeeds.Fwd_Hi:
-			return 1f;
-		default:
-			return 0f;
-		}
+			EngineSpeeds.Rev_Hi => -1f, 
+			EngineSpeeds.Rev_Med => -0.5f, 
+			EngineSpeeds.Rev_Lo => -0.2f, 
+			EngineSpeeds.Zero => 0f, 
+			EngineSpeeds.Fwd_Lo => 0.2f, 
+			EngineSpeeds.Fwd_Med => 0.5f, 
+			EngineSpeeds.Fwd_Hi => 1f, 
+			_ => 0f, 
+		};
 	}
 
 	public bool IsNearDesiredSpeed(float leeway)

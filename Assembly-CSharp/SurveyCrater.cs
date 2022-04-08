@@ -55,7 +55,7 @@ public class SurveyCrater : BaseCombatEntity
 
 	public override void OnAttacked(HitInfo info)
 	{
-		bool isServer2 = base.isServer;
+		_ = base.isServer;
 		base.OnAttacked(info);
 	}
 

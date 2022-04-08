@@ -17,7 +17,7 @@ public class ElevatorStatic : Elevator
 	public override void Spawn()
 	{
 		base.Spawn();
-		SetFlag(Flags.Reserved2, true);
+		SetFlag(Flags.Reserved2, b: true);
 		SetFlag(Flags.Reserved1, StaticTop);
 		if (!base.IsTop)
 		{
@@ -81,13 +81,11 @@ public class ElevatorStatic : Elevator
 	{
 		if (ownerElevator != null)
 		{
-			float timeToTravel;
-			ownerElevator.RequestMoveLiftTo(base.Floor, out timeToTravel);
+			ownerElevator.RequestMoveLiftTo(base.Floor, out var _);
 		}
 		else if (base.IsTop)
 		{
-			float timeToTravel2;
-			RequestMoveLiftTo(base.Floor, out timeToTravel2);
+			RequestMoveLiftTo(base.Floor, out var _);
 		}
 	}
 
@@ -141,14 +139,14 @@ public class ElevatorStatic : Elevator
 
 	public void OnLiftArrivedAtFloor()
 	{
-		SetFlag(Flags.Reserved3, true);
+		SetFlag(Flags.Reserved3, b: true);
 		MarkDirty();
 		Invoke(ClearPowerOutput, 10f);
 	}
 
 	public void ClearPowerOutput()
 	{
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved3, b: false);
 		MarkDirty();
 	}
 
@@ -166,7 +164,7 @@ public class ElevatorStatic : Elevator
 		base.Load(info);
 		if (info.fromDisk)
 		{
-			SetFlag(Flags.Reserved3, false);
+			SetFlag(Flags.Reserved3, b: false);
 		}
 	}
 }

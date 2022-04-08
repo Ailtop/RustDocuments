@@ -171,7 +171,7 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 	{
 		if (rustWattSeconds < 5f)
 		{
-			SetDischarging(false);
+			SetDischarging(wantsOn: false);
 			return;
 		}
 		IOEntity iOEntity = outputs[0].connectedTo.Get();
@@ -182,7 +182,7 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 		}
 		else
 		{
-			SetDischarging(false);
+			SetDischarging(wantsOn: false);
 		}
 	}
 
@@ -249,13 +249,13 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 
 	public virtual void ChargeChanged(float oldCharge)
 	{
-		float rustWattSecond = rustWattSeconds;
+		_ = rustWattSeconds;
 		bool flag = rustWattSeconds > maxCapactiySeconds * 0.25f;
 		bool flag2 = rustWattSeconds > maxCapactiySeconds * 0.75f;
 		if (HasFlag(Flags.Reserved5) != flag || HasFlag(Flags.Reserved6) != flag2)
 		{
-			SetFlag(Flags.Reserved5, flag, false, false);
-			SetFlag(Flags.Reserved6, flag2, false, false);
+			SetFlag(Flags.Reserved5, flag, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved6, flag2, recursive: false, networkupdate: false);
 			SendNetworkUpdate();
 		}
 	}
@@ -293,7 +293,7 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 
 	public void Unbusy()
 	{
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 
 	public override void Save(SaveInfo info)

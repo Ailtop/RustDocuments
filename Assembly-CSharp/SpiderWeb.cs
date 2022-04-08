@@ -33,7 +33,7 @@ public class SpiderWeb : BaseCombatEntity
 				f = Flags.Reserved4;
 				break;
 			}
-			SetFlag(f, true);
+			SetFlag(f, b: true);
 		}
 	}
 }

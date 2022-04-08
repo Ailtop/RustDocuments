@@ -324,7 +324,7 @@ public class MotorRowboat : BaseBoat
 
 	public void EngineToggle(bool wantsOn)
 	{
-		if (!fuelSystem.HasFuel(true))
+		if (!fuelSystem.HasFuel(forceCheck: true))
 		{
 			return;
 		}
@@ -426,14 +426,14 @@ public class MotorRowboat : BaseBoat
 		{
 			bool b = EngineOn() && !IsFlipped() && base.healthFraction > 0f && fuelSystem.HasFuel() && TimeSinceDriver() < 75f;
 			Flags num = flags;
-			SetFlag(Flags.Reserved3, steering > 0f, false, false);
-			SetFlag(Flags.Reserved4, steering < 0f, false, false);
-			SetFlag(Flags.Reserved1, b, false, false);
-			SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, false, false);
-			SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, false, false);
-			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), false, false);
-			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !AnyMounted(), false, false);
-			SetFlag(Flags.Reserved8, base.RecentlyPushed, false, false);
+			SetFlag(Flags.Reserved3, steering > 0f, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved4, steering < 0f, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved1, b, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !AnyMounted(), recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved8, base.RecentlyPushed, recursive: false, networkupdate: false);
 			if (num != flags)
 			{
 				Invoke(base.SendNetworkUpdate_Flags, 0f);
@@ -454,7 +454,7 @@ public class MotorRowboat : BaseBoat
 			float num = Mathf.InverseLerp(4f, 20f, rigidBody.velocity.magnitude);
 			if (num > 0f)
 			{
-				mounted.Hurt(num * 100f, DamageType.Blunt, this, false);
+				mounted.Hurt(num * 100f, DamageType.Blunt, this, useProtection: false);
 			}
 			if (mounted != null && mounted.isMounted)
 			{

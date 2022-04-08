@@ -1,35 +1,33 @@
 using ProtoBuf;
 
-namespace CompanionServer.Handlers
+namespace CompanionServer.Handlers;
+
+public class SetSubscription : BaseEntityHandler<AppFlag>
 {
-	public class SetSubscription : BaseEntityHandler<AppFlag>
+	public override void Execute()
 	{
-		public override void Execute()
+		if (base.Entity is ISubscribable subscribable)
 		{
-			ISubscribable subscribable;
-			if ((subscribable = base.Entity as ISubscribable) != null)
+			if (base.Proto.value)
 			{
-				if (base.Proto.value)
+				if (subscribable.AddSubscription(base.UserId))
 				{
-					if (subscribable.AddSubscription(base.UserId))
-					{
-						SendSuccess();
-					}
-					else
-					{
-						SendError("too_many_subscribers");
-					}
+					SendSuccess();
 				}
 				else
 				{
-					subscribable.RemoveSubscription(base.UserId);
+					SendError("too_many_subscribers");
 				}
-				SendSuccess();
 			}
 			else
 			{
-				SendError("wrong_type");
+				subscribable.RemoveSubscription(base.UserId);
 			}
+			SendSuccess();
+		}
+		else
+		{
+			SendError("wrong_type");
 		}
 	}
 }

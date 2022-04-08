@@ -1,9 +1,8 @@
-namespace Network.Channel
-{
-	public static class Server
-	{
-		public const byte Default = 0;
+namespace Network.Channel;
 
-		public const byte Positions = 14;
-	}
+public static class Server
+{
+	public const byte Default = 0;
+
+	public const byte Positions = 14;
 }

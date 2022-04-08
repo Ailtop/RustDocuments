@@ -1,10 +1,9 @@
-namespace UnityEngine
+namespace UnityEngine;
+
+public static class CollisionEx
 {
-	public static class CollisionEx
+	public static BaseEntity GetEntity(this Collision col)
 	{
-		public static BaseEntity GetEntity(this Collision col)
-		{
-			return GameObjectEx.ToBaseEntity(col.transform);
-		}
+		return GameObjectEx.ToBaseEntity(col.transform);
 	}
 }

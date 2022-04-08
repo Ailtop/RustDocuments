@@ -48,8 +48,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 
 	protected void OnDrawGizmosSelected()
 	{
-		Bounds result;
-		if (TryGetEntityBounds(out result))
+		if (TryGetEntityBounds(out var result))
 		{
 			Gizmos.color = Color.yellow;
 			Gizmos.matrix = base.transform.localToWorldMatrix;
@@ -121,7 +120,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 			nextSpawnTime = Time.time + Random.Range(respawnDelayMin, respawnDelayMax);
 			return;
 		}
-		BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, base.transform.position, base.transform.rotation, false);
+		BaseEntity baseEntity = GameManager.server.CreateEntity(entityPrefab.resourcePath, base.transform.position, base.transform.rotation, startActive: false);
 		if (baseEntity != null)
 		{
 			if (!oneTimeSpawner)

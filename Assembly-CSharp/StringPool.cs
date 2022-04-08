@@ -25,8 +25,7 @@ public class StringPool
 		{
 			string str = gameManifest.pooledStrings[num].str;
 			uint hash = gameManifest.pooledStrings[num].hash;
-			string value;
-			if (toString.TryGetValue(hash, out value))
+			if (toString.TryGetValue(hash, out var value))
 			{
 				if (str != value)
 				{
@@ -50,8 +49,7 @@ public class StringPool
 			return string.Empty;
 		}
 		Init();
-		string value;
-		if (toString.TryGetValue(i, out value))
+		if (toString.TryGetValue(i, out var value))
 		{
 			return value;
 		}
@@ -66,8 +64,7 @@ public class StringPool
 			return 0u;
 		}
 		Init();
-		uint value;
-		if (toNumber.TryGetValue(str, out value))
+		if (toNumber.TryGetValue(str, out var value))
 		{
 			return value;
 		}

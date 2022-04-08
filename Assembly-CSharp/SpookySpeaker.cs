@@ -93,6 +93,6 @@ public class SpookySpeaker : BaseCombatEntity
 
 	public void DelayedOff()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 }

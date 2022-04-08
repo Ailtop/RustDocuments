@@ -91,8 +91,7 @@ public class Deployer : HeldEntity
 	{
 		using (TimeWarning.New("Deploy.CheckPlacement"))
 		{
-			RaycastHit hitInfo;
-			if (!UnityEngine.Physics.Raycast(ray, out hitInfo, fDistance, 1235288065))
+			if (!UnityEngine.Physics.Raycast(ray, out var hitInfo, fDistance, 1235288065))
 			{
 				return false;
 			}
@@ -212,8 +211,7 @@ public class Deployer : HeldEntity
 		}
 		else
 		{
-			RaycastHit hitInfo;
-			if (!CheckPlacement(deployable, ray, 8f) || !UnityEngine.Physics.Raycast(ray, out hitInfo, 8f, 1235288065))
+			if (!CheckPlacement(deployable, ray, 8f) || !UnityEngine.Physics.Raycast(ray, out var hitInfo, 8f, 1235288065))
 			{
 				return;
 			}

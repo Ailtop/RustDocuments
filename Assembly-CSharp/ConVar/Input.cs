@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("input")]
+public class Input : ConsoleSystem
 {
-	[Factory("input")]
-	public class Input : ConsoleSystem
-	{
-	}
 }

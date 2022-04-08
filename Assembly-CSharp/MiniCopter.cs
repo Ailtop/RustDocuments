@@ -306,7 +306,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		base.ServerInit();
 		lastEngineOnTime = UnityEngine.Time.realtimeSinceStartup;
 		rigidBody.inertiaTensor = rigidBody.inertiaTensor;
-		preventBuildingObject.SetActive(true);
+		preventBuildingObject.SetActive(value: true);
 		InvokeRandomized(UpdateNetwork, 0f, 0.2f, 0.05f);
 		InvokeRandomized(DecayTick, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
 	}
@@ -316,7 +316,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		if (base.healthFraction != 0f && !IsOn() && !(UnityEngine.Time.time < lastEngineOnTime + 600f))
 		{
 			float num = 1f / (IsOutside() ? outsidedecayminutes : insidedecayminutes);
-			Hurt(MaxHealth() * num, DamageType.Decay, this, false);
+			Hurt(MaxHealth() * num, DamageType.Decay, this, useProtection: false);
 		}
 	}
 
@@ -366,9 +366,9 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 	public void UpdateNetwork()
 	{
 		Flags flags = base.flags;
-		SetFlag(Flags.Reserved1, leftWheel.isGrounded, false, false);
-		SetFlag(Flags.Reserved2, rightWheel.isGrounded, false, false);
-		SetFlag(Flags.Reserved3, frontWheel.isGrounded, false, false);
+		SetFlag(Flags.Reserved1, leftWheel.isGrounded, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved2, rightWheel.isGrounded, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved3, frontWheel.isGrounded, recursive: false, networkupdate: false);
 		if (HasDriver())
 		{
 			SendNetworkUpdate();
@@ -404,7 +404,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 				BasePlayer mounted = mountPoint.mountable.GetMounted();
 				if ((bool)mounted)
 				{
-					mounted.Hurt(10000f, DamageType.Explosion, this, false);
+					mounted.Hurt(10000f, DamageType.Explosion, this, useProtection: false);
 				}
 			}
 		}

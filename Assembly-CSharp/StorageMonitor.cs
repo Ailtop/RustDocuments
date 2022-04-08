@@ -48,8 +48,7 @@ public class StorageMonitor : AppIOEntity
 			payload.items.Add(item);
 		}
 		payload.capacity = storageContainer.inventory.capacity;
-		BuildingPrivlidge buildingPrivlidge;
-		if ((object)(buildingPrivlidge = storageContainer as BuildingPrivlidge) != null)
+		if (storageContainer is BuildingPrivlidge buildingPrivlidge)
 		{
 			payload.hasProtection = true;
 			float protectedMinutes = buildingPrivlidge.GetProtectedMinutes();
@@ -119,7 +118,7 @@ public class StorageMonitor : AppIOEntity
 			Invoke(_resetSwitchHandler, 0.5f);
 			if (!IsOn())
 			{
-				SetFlag(Flags.On, true);
+				SetFlag(Flags.On, b: true);
 				SendNetworkUpdateImmediate();
 				MarkDirty();
 				BroadcastValueChange();
@@ -129,7 +128,7 @@ public class StorageMonitor : AppIOEntity
 
 	private void ResetSwitch()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		SendNetworkUpdateImmediate();
 		MarkDirty();
 		BroadcastValueChange();

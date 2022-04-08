@@ -90,13 +90,11 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 		{
 			return false;
 		}
-		float dist;
-		if (!IsTargetInRange(entity, out dist))
+		if (!IsTargetInRange(entity, out var _))
 		{
 			return false;
 		}
-		BasePlayer basePlayer;
-		if (InSafeZone() || ((object)(basePlayer = entity as BasePlayer) != null && basePlayer.InSafeZone()))
+		if (InSafeZone() || (entity is BasePlayer basePlayer && basePlayer.InSafeZone()))
 		{
 			return false;
 		}
@@ -201,7 +199,7 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 				nPCPlayerCorpse.transform.position = nPCPlayerCorpse.transform.position + Vector3.down * NavAgent.baseOffset;
 				nPCPlayerCorpse.SetLootableIn(2f);
 				nPCPlayerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
-				nPCPlayerCorpse.SetFlag(Flags.Reserved2, true);
+				nPCPlayerCorpse.SetFlag(Flags.Reserved2, b: true);
 				nPCPlayerCorpse.TakeFrom(inventory.containerMain, inventory.containerWear, inventory.containerBelt);
 				nPCPlayerCorpse.playerName = OverrideCorpseName();
 				nPCPlayerCorpse.playerSteamID = userID;

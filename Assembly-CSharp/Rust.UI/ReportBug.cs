@@ -1,23 +1,22 @@
 using UnityEngine;
 
-namespace Rust.UI
+namespace Rust.UI;
+
+public class ReportBug : UIDialog
 {
-	public class ReportBug : UIDialog
-	{
-		public GameObject GetInformation;
+	public GameObject GetInformation;
 
-		public GameObject Finished;
+	public GameObject Finished;
 
-		public RustInput Subject;
+	public RustInput Subject;
 
-		public RustInput Message;
+	public RustInput Message;
 
-		public RustButton ReportButton;
+	public RustButton ReportButton;
 
-		public RustButtonGroup Category;
+	public RustButtonGroup Category;
 
-		public RustIcon ProgressIcon;
+	public RustIcon ProgressIcon;
 
-		public RustText ProgressText;
-	}
+	public RustText ProgressText;
 }

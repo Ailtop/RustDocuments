@@ -183,8 +183,7 @@ public class UserPersistance : IDisposable
 		{
 			return null;
 		}
-		string value;
-		if (nameCache.TryGetValue(playerID, out value))
+		if (nameCache.TryGetValue(playerID, out var value))
 		{
 			return value;
 		}
@@ -217,8 +216,7 @@ public class UserPersistance : IDisposable
 		}
 		using (TimeWarning.New("GetOrGenerateAppToken"))
 		{
-			int value;
-			if (tokenCache.TryGetValue(playerID, out value))
+			if (tokenCache.TryGetValue(playerID, out var value))
 			{
 				return value;
 			}

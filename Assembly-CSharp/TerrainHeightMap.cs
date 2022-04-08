@@ -76,7 +76,7 @@ public class TerrainHeightMap : TerrainMap<short>
 					heights[z * res + j] = BitUtility.EncodeShort(src[z * res + j]);
 				}
 			});
-			HeightTexture = new Texture2D(res, res, TextureFormat.RGBA32, true, true);
+			HeightTexture = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: true, linear: true);
 			HeightTexture.name = "HeightTexture";
 			HeightTexture.wrapMode = TextureWrapMode.Clamp;
 			HeightTexture.SetPixels32(heights);
@@ -100,7 +100,7 @@ public class TerrainHeightMap : TerrainMap<short>
 				normals[z * normalres + i] = BitUtility.EncodeNormal(normal);
 			}
 		});
-		NormalTexture = new Texture2D(normalres, normalres, TextureFormat.RGBA32, false, true);
+		NormalTexture = new Texture2D(normalres, normalres, TextureFormat.RGBA32, mipChain: false, linear: true);
 		NormalTexture.name = "NormalTexture";
 		NormalTexture.wrapMode = TextureWrapMode.Clamp;
 		NormalTexture.SetPixels32(normals);
@@ -108,11 +108,11 @@ public class TerrainHeightMap : TerrainMap<short>
 
 	public void ApplyTextures()
 	{
-		HeightTexture.Apply(true, false);
-		NormalTexture.Apply(true, false);
-		NormalTexture.Compress(false);
-		HeightTexture.Apply(false, true);
-		NormalTexture.Apply(false, true);
+		HeightTexture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+		NormalTexture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+		NormalTexture.Compress(highQuality: false);
+		HeightTexture.Apply(updateMipmaps: false, makeNoLongerReadable: true);
+		NormalTexture.Apply(updateMipmaps: false, makeNoLongerReadable: true);
 	}
 
 	public float GetHeight(Vector3 worldPos)

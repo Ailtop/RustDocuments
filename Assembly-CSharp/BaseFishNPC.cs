@@ -37,8 +37,7 @@ public class BaseFishNPC : BaseNpc, IAIAttack, IAISenses, IThinker
 		{
 			return false;
 		}
-		float dist;
-		if (!IsTargetInRange(entity, out dist))
+		if (!IsTargetInRange(entity, out var _))
 		{
 			return false;
 		}

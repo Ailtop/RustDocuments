@@ -29,21 +29,15 @@ public class GrowableGene
 
 	public static string GetDisplayCharacter(GrowableGenetics.GeneType type)
 	{
-		switch (type)
+		return type switch
 		{
-		case GrowableGenetics.GeneType.Empty:
-			return "X";
-		case GrowableGenetics.GeneType.GrowthSpeed:
-			return "G";
-		case GrowableGenetics.GeneType.Hardiness:
-			return "H";
-		case GrowableGenetics.GeneType.WaterRequirement:
-			return "W";
-		case GrowableGenetics.GeneType.Yield:
-			return "Y";
-		default:
-			return "U";
-		}
+			GrowableGenetics.GeneType.Empty => "X", 
+			GrowableGenetics.GeneType.GrowthSpeed => "G", 
+			GrowableGenetics.GeneType.Hardiness => "H", 
+			GrowableGenetics.GeneType.WaterRequirement => "W", 
+			GrowableGenetics.GeneType.Yield => "Y", 
+			_ => "U", 
+		};
 	}
 
 	public string GetColourCodedDisplayCharacter()
@@ -58,21 +52,15 @@ public class GrowableGene
 
 	public static bool IsPositive(GrowableGenetics.GeneType type)
 	{
-		switch (type)
+		return type switch
 		{
-		case GrowableGenetics.GeneType.Empty:
-			return false;
-		case GrowableGenetics.GeneType.GrowthSpeed:
-			return true;
-		case GrowableGenetics.GeneType.Hardiness:
-			return true;
-		case GrowableGenetics.GeneType.WaterRequirement:
-			return false;
-		case GrowableGenetics.GeneType.Yield:
-			return true;
-		default:
-			return false;
-		}
+			GrowableGenetics.GeneType.Empty => false, 
+			GrowableGenetics.GeneType.GrowthSpeed => true, 
+			GrowableGenetics.GeneType.Hardiness => true, 
+			GrowableGenetics.GeneType.WaterRequirement => false, 
+			GrowableGenetics.GeneType.Yield => true, 
+			_ => false, 
+		};
 	}
 
 	public bool IsPositive()

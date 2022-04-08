@@ -1,11 +1,9 @@
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public static class MapImageRenderer
 {
-	[IsReadOnly]
-	private struct Array2D<T>
+	private readonly struct Array2D<T>
 	{
 		private readonly T[] _items;
 
@@ -67,7 +65,6 @@ public static class MapImageRenderer
 
 	public static byte[] Render(out int imageWidth, out int imageHeight, out Color background, float scale = 0.5f, bool lossy = true)
 	{
-		_003C_003Ec__DisplayClass17_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass17_0();
 		imageWidth = 0;
 		imageHeight = 0;
 		background = OffShoreColor;
@@ -78,56 +75,68 @@ public static class MapImageRenderer
 		}
 		Terrain component = instance.GetComponent<Terrain>();
 		TerrainMeta component2 = instance.GetComponent<TerrainMeta>();
-		CS_0024_003C_003E8__locals0.terrainHeightMap = instance.GetComponent<TerrainHeightMap>();
-		CS_0024_003C_003E8__locals0.terrainSplatMap = instance.GetComponent<TerrainSplatMap>();
-		if (component == null || component2 == null || CS_0024_003C_003E8__locals0.terrainHeightMap == null || CS_0024_003C_003E8__locals0.terrainSplatMap == null)
+		TerrainHeightMap terrainHeightMap = instance.GetComponent<TerrainHeightMap>();
+		TerrainSplatMap terrainSplatMap = instance.GetComponent<TerrainSplatMap>();
+		if (component == null || component2 == null || terrainHeightMap == null || terrainSplatMap == null)
 		{
 			return null;
 		}
-		CS_0024_003C_003E8__locals0.mapRes = (int)((float)World.Size * Mathf.Clamp(scale, 0.1f, 4f));
-		CS_0024_003C_003E8__locals0.invMapRes = 1f / (float)CS_0024_003C_003E8__locals0.mapRes;
-		if (CS_0024_003C_003E8__locals0.mapRes <= 0)
+		int mapRes = (int)((float)World.Size * Mathf.Clamp(scale, 0.1f, 4f));
+		float invMapRes = 1f / (float)mapRes;
+		if (mapRes <= 0)
 		{
 			return null;
 		}
-		imageWidth = CS_0024_003C_003E8__locals0.mapRes + 1000;
-		imageHeight = CS_0024_003C_003E8__locals0.mapRes + 1000;
+		imageWidth = mapRes + 1000;
+		imageHeight = mapRes + 1000;
 		Color[] array = new Color[imageWidth * imageHeight];
-		CS_0024_003C_003E8__locals0.output = new Array2D<Color>(array, imageWidth, imageHeight);
+		Array2D<Color> output = new Array2D<Color>(array, imageWidth, imageHeight);
 		Parallel.For(0, imageHeight, delegate(int y)
 		{
 			y -= 500;
-			float y2 = (float)y * CS_0024_003C_003E8__locals0.invMapRes;
-			int num = CS_0024_003C_003E8__locals0.mapRes + 500;
+			float y2 = (float)y * invMapRes;
+			int num = mapRes + 500;
 			for (int i = -500; i < num; i++)
 			{
-				float x = (float)i * CS_0024_003C_003E8__locals0.invMapRes;
+				float x2 = (float)i * invMapRes;
 				Vector3 startColor = StartColor;
-				float num2 = CS_0024_003C_003E8__locals0._003CRender_003Eg__GetHeight_007C0(x, y2);
-				float num3 = Math.Max(Vector3.Dot(CS_0024_003C_003E8__locals0._003CRender_003Eg__GetNormal_007C1(x, y2), SunDirection), 0f);
-				startColor = Vector3.Lerp(startColor, GravelColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 128) * GravelColor.w);
-				startColor = Vector3.Lerp(startColor, PebbleColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 64) * PebbleColor.w);
-				startColor = Vector3.Lerp(startColor, RockColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 8) * RockColor.w);
-				startColor = Vector3.Lerp(startColor, DirtColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 1) * DirtColor.w);
-				startColor = Vector3.Lerp(startColor, GrassColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 16) * GrassColor.w);
-				startColor = Vector3.Lerp(startColor, ForestColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 32) * ForestColor.w);
-				startColor = Vector3.Lerp(startColor, SandColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 4) * SandColor.w);
-				startColor = Vector3.Lerp(startColor, SnowColor, CS_0024_003C_003E8__locals0._003CRender_003Eg__GetSplat_007C2(x, y2, 2) * SnowColor.w);
-				float num4 = 0f - num2;
-				if (num4 > 0f)
+				float height = GetHeight(x2, y2);
+				float num2 = Math.Max(Vector3.Dot(GetNormal(x2, y2), SunDirection), 0f);
+				startColor = Vector3.Lerp(startColor, GravelColor, GetSplat(x2, y2, 128) * GravelColor.w);
+				startColor = Vector3.Lerp(startColor, PebbleColor, GetSplat(x2, y2, 64) * PebbleColor.w);
+				startColor = Vector3.Lerp(startColor, RockColor, GetSplat(x2, y2, 8) * RockColor.w);
+				startColor = Vector3.Lerp(startColor, DirtColor, GetSplat(x2, y2, 1) * DirtColor.w);
+				startColor = Vector3.Lerp(startColor, GrassColor, GetSplat(x2, y2, 16) * GrassColor.w);
+				startColor = Vector3.Lerp(startColor, ForestColor, GetSplat(x2, y2, 32) * ForestColor.w);
+				startColor = Vector3.Lerp(startColor, SandColor, GetSplat(x2, y2, 4) * SandColor.w);
+				startColor = Vector3.Lerp(startColor, SnowColor, GetSplat(x2, y2, 2) * SnowColor.w);
+				float num3 = 0f - height;
+				if (num3 > 0f)
 				{
-					startColor = Vector3.Lerp(startColor, WaterColor, Mathf.Clamp(0.5f + num4 / 5f, 0f, 1f));
-					startColor = Vector3.Lerp(startColor, OffShoreColor, Mathf.Clamp(num4 / 50f, 0f, 1f));
-					num3 = 0.5f;
+					startColor = Vector3.Lerp(startColor, WaterColor, Mathf.Clamp(0.5f + num3 / 5f, 0f, 1f));
+					startColor = Vector3.Lerp(startColor, OffShoreColor, Mathf.Clamp(num3 / 50f, 0f, 1f));
+					num2 = 0.5f;
 				}
-				startColor += (num3 - 0.5f) * 0.65f * startColor;
+				startColor += (num2 - 0.5f) * 0.65f * startColor;
 				startColor = (startColor - Half) * 0.94f + Half;
 				startColor *= 1.05f;
-				CS_0024_003C_003E8__locals0.output[i + 500, y + 500] = new Color(startColor.x, startColor.y, startColor.z);
+				output[i + 500, y + 500] = new Color(startColor.x, startColor.y, startColor.z);
 			}
 		});
-		background = CS_0024_003C_003E8__locals0.output[0, 0];
+		background = output[0, 0];
 		return EncodeToFile(imageWidth, imageHeight, array, lossy);
+		float GetHeight(float x, float y)
+		{
+			return terrainHeightMap.GetHeight(x, y);
+		}
+		Vector3 GetNormal(float x, float y)
+		{
+			return terrainHeightMap.GetNormal(x, y);
+		}
+		float GetSplat(float x, float y, int mask)
+		{
+			return terrainSplatMap.GetSplat(x, y, mask);
+		}
 	}
 
 	private static byte[] EncodeToFile(int width, int height, Color[] pixels, bool lossy)

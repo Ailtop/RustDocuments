@@ -8,8 +8,7 @@ public class PrefabPoolCollection
 	public void Push(GameObject instance)
 	{
 		Poolable component = instance.GetComponent<Poolable>();
-		PrefabPool value;
-		if (!storage.TryGetValue(component.prefabID, out value))
+		if (!storage.TryGetValue(component.prefabID, out var value))
 		{
 			value = new PrefabPool();
 			storage.Add(component.prefabID, value);
@@ -19,8 +18,7 @@ public class PrefabPoolCollection
 
 	public GameObject Pop(uint id, Vector3 pos = default(Vector3), Quaternion rot = default(Quaternion))
 	{
-		PrefabPool value;
-		if (storage.TryGetValue(id, out value))
+		if (storage.TryGetValue(id, out var value))
 		{
 			return value.Pop(pos, rot);
 		}

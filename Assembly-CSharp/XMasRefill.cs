@@ -115,8 +115,7 @@ public class XMasRefill : BaseEntity
 			float height = TerrainMeta.HeightMap.GetHeight(pos);
 			pos.y = Mathf.Max(pos.y, height);
 		}
-		RaycastHit hitOut;
-		if (!TransformUtil.GetGroundInfo(pos, out hitOut, 80f, num))
+		if (!TransformUtil.GetGroundInfo(pos, out var hitOut, 80f, num))
 		{
 			return false;
 		}

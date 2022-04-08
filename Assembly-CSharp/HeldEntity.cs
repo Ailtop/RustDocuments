@@ -157,14 +157,14 @@ public class HeldEntity : BaseEntity
 		Assert.IsTrue(player.isServer, "Player should be serverside!");
 		TransformEx.Identity(base.gameObject);
 		SetParent(player, handBone);
-		SetHeld(false);
+		SetHeld(bHeld: false);
 	}
 
 	public virtual void ClearOwnerPlayer()
 	{
 		Assert.IsTrue(base.isServer, "Should be server!");
 		SetParent(null);
-		SetHeld(false);
+		SetHeld(bHeld: false);
 	}
 
 	public virtual void SetVisibleWhileHolstered(bool visible)
@@ -223,7 +223,7 @@ public class HeldEntity : BaseEntity
 		}
 		currentVisState = heldEntityVisState.Hand;
 		base.limitNetworking = false;
-		SetFlag(Flags.Disabled, false);
+		SetFlag(Flags.Disabled, b: false);
 		SetParent(GetOwnerPlayer(), GetBone(handBone));
 		return true;
 	}
@@ -236,7 +236,7 @@ public class HeldEntity : BaseEntity
 		}
 		currentVisState = heldEntityVisState.GenericVis;
 		base.limitNetworking = false;
-		SetFlag(Flags.Disabled, false);
+		SetFlag(Flags.Disabled, b: false);
 		return true;
 	}
 
@@ -248,9 +248,9 @@ public class HeldEntity : BaseEntity
 		}
 		currentVisState = heldEntityVisState.Holster;
 		base.limitNetworking = false;
-		SetFlag(Flags.Disabled, false);
+		SetFlag(Flags.Disabled, b: false);
 		SetParent(GetOwnerPlayer(), GetBone(holsterInfo.holsterBone));
-		SetLightsOn(false);
+		SetLightsOn(isOn: false);
 		return true;
 	}
 
@@ -263,7 +263,7 @@ public class HeldEntity : BaseEntity
 		currentVisState = heldEntityVisState.Invis;
 		SetParent(GetOwnerPlayer(), GetBone(handBone));
 		base.limitNetworking = true;
-		SetFlag(Flags.Disabled, true);
+		SetFlag(Flags.Disabled, b: true);
 		return true;
 	}
 

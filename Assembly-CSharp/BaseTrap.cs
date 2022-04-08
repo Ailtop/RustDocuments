@@ -8,7 +8,7 @@ public class BaseTrap : DecayEntity
 
 	public virtual void Arm()
 	{
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		SendNetworkUpdate();
 	}
 

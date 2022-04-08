@@ -27,10 +27,8 @@ public struct ViewModelDrawEvent : IEquatable<ViewModelDrawEvent>
 
 	public override bool Equals(object obj)
 	{
-		object obj2;
-		if ((obj2 = obj) is ViewModelDrawEvent)
+		if (obj is ViewModelDrawEvent other)
 		{
-			ViewModelDrawEvent other = (ViewModelDrawEvent)obj2;
 			return Equals(other);
 		}
 		return false;

@@ -48,7 +48,7 @@ public class TerrainAlphaMap : TerrainMap<byte>
 
 	public void GenerateTextures()
 	{
-		AlphaTexture = new Texture2D(res, res, TextureFormat.Alpha8, false, true);
+		AlphaTexture = new Texture2D(res, res, TextureFormat.Alpha8, mipChain: false, linear: true);
 		AlphaTexture.name = "AlphaTexture";
 		AlphaTexture.wrapMode = TextureWrapMode.Clamp;
 		Color32[] col = new Color32[res * res];
@@ -65,9 +65,9 @@ public class TerrainAlphaMap : TerrainMap<byte>
 
 	public void ApplyTextures()
 	{
-		AlphaTexture.Apply(true, false);
-		AlphaTexture.Compress(false);
-		AlphaTexture.Apply(false, true);
+		AlphaTexture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+		AlphaTexture.Compress(highQuality: false);
+		AlphaTexture.Apply(updateMipmaps: false, makeNoLongerReadable: true);
 	}
 
 	public float GetAlpha(Vector3 worldPos)

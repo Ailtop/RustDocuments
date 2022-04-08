@@ -84,14 +84,12 @@ public static class Auth_CentralizedBans
 
 	private static bool CheckIfPlayerBanned(ulong steamId, Connection connection, UnityWebRequest request)
 	{
-		_003C_003Ec__DisplayClass2_0 _003C_003Ec__DisplayClass2_ = default(_003C_003Ec__DisplayClass2_0);
-		_003C_003Ec__DisplayClass2_.connection = connection;
 		if (request.isNetworkError)
 		{
 			Debug.LogError("Failed to check centralized bans due to a network error (" + request.error + ")");
 			if (ConVar.Server.bansServerFailureMode == 1)
 			{
-				_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("Centralized Ban Error: Network Error", ref _003C_003Ec__DisplayClass2_);
+				Reject("Centralized Ban Error: Network Error");
 				return true;
 			}
 			return false;
@@ -105,7 +103,7 @@ public static class Auth_CentralizedBans
 			Debug.LogError($"Failed to check centralized bans due to a server error ({request.responseCode}: {request.error})");
 			if (ConVar.Server.bansServerFailureMode == 1)
 			{
-				_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("Centralized Ban Error: Server Error", ref _003C_003Ec__DisplayClass2_);
+				Reject("Centralized Ban Error: Server Error");
 				return true;
 			}
 			return false;
@@ -125,14 +123,14 @@ public static class Auth_CentralizedBans
 				Debug.LogError($"Failed to check centralized bans due to SteamID mismatch (expected {steamId}, got {payloadData.steamId})");
 				if (ConVar.Server.bansServerFailureMode == 1)
 				{
-					_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("Centralized Ban Error: SteamID Mismatch", ref _003C_003Ec__DisplayClass2_);
+					Reject("Centralized Ban Error: SteamID Mismatch");
 					return true;
 				}
 				return false;
 			}
 			string text = payloadData.reason ?? "no reason given";
 			string text2 = ((payloadData.expiryDate > 0) ? (" for " + (payloadData.expiryDate - Epoch.Current).FormatSecondsLong()) : "");
-			_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("You are banned from this server" + text2 + " (" + text + ")", ref _003C_003Ec__DisplayClass2_);
+			Reject("You are banned from this server" + text2 + " (" + text + ")");
 			return true;
 		}
 		catch (Exception exception)
@@ -141,10 +139,15 @@ public static class Auth_CentralizedBans
 			Debug.LogException(exception);
 			if (ConVar.Server.bansServerFailureMode == 1)
 			{
-				_003CCheckIfPlayerBanned_003Eg__Reject_007C2_0("Centralized Ban Error: Malformed Response", ref _003C_003Ec__DisplayClass2_);
+				Reject("Centralized Ban Error: Malformed Response");
 				return true;
 			}
 			return false;
+		}
+		void Reject(string reason)
+		{
+			ConnectionAuth.Reject(connection, reason);
+			PlatformService.Instance.EndPlayerSession(connection.userid);
 		}
 	}
 }

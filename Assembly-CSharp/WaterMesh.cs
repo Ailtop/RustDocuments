@@ -36,7 +36,7 @@ public class WaterMesh
 		this.borderRingCount = borderRingCount;
 		this.borderRingSpacingFalloff = borderRingSpacingFalloff;
 		borderMesh = CreateSortedBorderPatch(patchResolution, borderRingCount, patchSizeInWorld);
-		centerPatch = CreateSortedCenterPatch(patchResolution, patchSizeInWorld, false);
+		centerPatch = CreateSortedCenterPatch(patchResolution, patchSizeInWorld, borderOnly: false);
 		resolution = patchResolution;
 		borderVerticesLocal = new Vector3[borderMesh.vertexCount];
 		borderVerticesWorld = new Vector3[borderMesh.vertexCount];

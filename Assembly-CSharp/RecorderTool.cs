@@ -116,8 +116,7 @@ public class RecorderTool : ThrownWeapon, ICassettePlayer
 		{
 			ent.OwnerID = GetOwnerPlayer().userID;
 		}
-		DeployedRecorder deployedRecorder;
-		if (cachedCassette != null && (object)(deployedRecorder = ent as DeployedRecorder) != null)
+		if (cachedCassette != null && ent is DeployedRecorder deployedRecorder)
 		{
 			GetItem().contents.itemList[0].SetParent(deployedRecorder.inventory);
 		}
@@ -128,7 +127,7 @@ public class RecorderTool : ThrownWeapon, ICassettePlayer
 		base.OnHeldChanged();
 		if (IsDisabled())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 		}
 	}
 }

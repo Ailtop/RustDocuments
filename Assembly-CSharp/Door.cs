@@ -305,7 +305,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 			decayResetTimeLast = float.NegativeInfinity;
 			if (isSecurityDoor && NavMeshLink != null)
 			{
-				SetNavMeshLinkEnabled(false);
+				SetNavMeshLinkEnabled(wantsOn: false);
 			}
 			woundedCloses.Clear();
 			woundedOpens.Clear();
@@ -422,7 +422,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 
 	public void CloseRequest()
 	{
-		SetOpen(false);
+		SetOpen(open: false);
 	}
 
 	public void SetOpen(bool open, bool suppressBlockageChecks = false)
@@ -441,7 +441,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 
 	public void SetLocked(bool locked)
 	{
-		SetFlag(Flags.Locked, false);
+		SetFlag(Flags.Locked, b: false);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -461,13 +461,13 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		{
 			if (wantsOn)
 			{
-				NavMeshLink.gameObject.SetActive(true);
+				NavMeshLink.gameObject.SetActive(value: true);
 				NavMeshLink.enabled = true;
 			}
 			else
 			{
 				NavMeshLink.enabled = false;
-				NavMeshLink.gameObject.SetActive(false);
+				NavMeshLink.gameObject.SetActive(value: false);
 			}
 		}
 	}
@@ -476,7 +476,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_OpenDoor(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract(true) || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
+		if (!rpc.player.CanInteract(usableWhileCrawling: true) || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
 		{
 			return;
 		}
@@ -509,11 +509,11 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 				decayResetTimeLast = UnityEngine.Time.realtimeSinceStartup;
 			}
 		}
-		SetFlag(Flags.Open, true);
+		SetFlag(Flags.Open, b: true);
 		SendNetworkUpdateImmediate();
 		if (isSecurityDoor && NavMeshLink != null)
 		{
-			SetNavMeshLinkEnabled(true);
+			SetNavMeshLinkEnabled(wantsOn: true);
 		}
 		if (checkPhysBoxesOnOpen)
 		{
@@ -535,7 +535,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	{
 		if (HasVehiclePushBoxes)
 		{
-			ToggleVehiclePushBoxes(false);
+			ToggleVehiclePushBoxes(state: false);
 			CancelInvoke(DisableVehiclePhysBox);
 		}
 	}
@@ -544,7 +544,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_CloseDoor(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract(true) || !canHandOpen || !IsOpen() || IsBusy() || IsLocked())
+		if (!rpc.player.CanInteract(usableWhileCrawling: true) || !canHandOpen || !IsOpen() || IsBusy() || IsLocked())
 		{
 			return;
 		}
@@ -559,11 +559,11 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		BaseLock baseLock = GetSlot(Slot.Lock) as BaseLock;
 		if (!(baseLock != null) || baseLock.OnTryToClose(rpc.player))
 		{
-			SetFlag(Flags.Open, false);
+			SetFlag(Flags.Open, b: false);
 			SendNetworkUpdateImmediate();
 			if (isSecurityDoor && NavMeshLink != null)
 			{
-				SetNavMeshLinkEnabled(false);
+				SetNavMeshLinkEnabled(wantsOn: false);
 			}
 			StartCheckingForBlockages();
 			Interface.CallHook("OnDoorClosed", this, rpc.player);
@@ -574,7 +574,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_KnockDoor(RPCMessage rpc)
 	{
-		if (!rpc.player.CanInteract(true) || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)
+		if (!rpc.player.CanInteract(usableWhileCrawling: true) || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)
 		{
 			return;
 		}
@@ -597,7 +597,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 	[RPC_Server.MaxDistance(3f)]
 	private void RPC_ToggleHatch(RPCMessage rpc)
 	{
-		if (rpc.player.CanInteract(true) && hasHatch)
+		if (rpc.player.CanInteract(usableWhileCrawling: true) && hasHatch)
 		{
 			BaseLock baseLock = GetSlot(Slot.Lock) as BaseLock;
 			if (!baseLock || baseLock.OnTryToOpen(rpc.player))
@@ -609,12 +609,12 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 
 	private void EnableVehiclePhysBoxes()
 	{
-		ToggleVehiclePushBoxes(true);
+		ToggleVehiclePushBoxes(state: true);
 	}
 
 	private void DisableVehiclePhysBox()
 	{
-		ToggleVehiclePushBoxes(false);
+		ToggleVehiclePushBoxes(state: false);
 	}
 
 	private void ToggleVehiclePushBoxes(bool state)
@@ -720,14 +720,12 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		bool flag = false;
 		foreach (BaseEntity entityContent in trigger.entityContents)
 		{
-			BaseMountable baseMountable;
-			if ((object)(baseMountable = entityContent as BaseMountable) != null && baseMountable.BlocksDoors)
+			if (entityContent is BaseMountable baseMountable && baseMountable.BlocksDoors)
 			{
 				flag = true;
 				break;
 			}
-			BaseVehicleModule baseVehicleModule;
-			if ((object)(baseVehicleModule = entityContent as BaseVehicleModule) != null && baseVehicleModule.Vehicle != null && baseVehicleModule.Vehicle.BlocksDoors)
+			if (entityContent is BaseVehicleModule baseVehicleModule && baseVehicleModule.Vehicle != null && baseVehicleModule.Vehicle.BlocksDoors)
 			{
 				flag = true;
 				break;
@@ -736,7 +734,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		if (flag)
 		{
 			bool flag2 = HasFlag(Flags.Open);
-			SetOpen(!flag2, true);
+			SetOpen(!flag2, suppressBlockageChecks: true);
 			ReverseDoorAnimation(flag2);
 			StopCheckingForBlockages();
 			ClientRPC(null, "OnDoorInterrupted", flag2 ? 1 : 0);

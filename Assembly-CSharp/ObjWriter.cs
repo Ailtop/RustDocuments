@@ -42,9 +42,7 @@ public static class ObjWriter
 
 	public static void Write(Mesh mesh, string path)
 	{
-		using (StreamWriter streamWriter = new StreamWriter(path))
-		{
-			streamWriter.Write(MeshToString(mesh));
-		}
+		using StreamWriter streamWriter = new StreamWriter(path);
+		streamWriter.Write(MeshToString(mesh));
 	}
 }

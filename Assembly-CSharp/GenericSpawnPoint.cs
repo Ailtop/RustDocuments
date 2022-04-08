@@ -51,12 +51,12 @@ public class GenericSpawnPoint : BaseSpawnPoint
 			Effect.server.Run(spawnEffect.resourcePath, instance.GetComponent<BaseEntity>(), 0u, Vector3.zero, Vector3.up);
 		}
 		OnObjectSpawnedEvent.Invoke();
-		base.gameObject.SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 
 	public override void ObjectRetired(SpawnPointInstance instance)
 	{
 		OnObjectRetiredEvent.Invoke();
-		base.gameObject.SetActive(true);
+		base.gameObject.SetActive(value: true);
 	}
 }

@@ -109,7 +109,7 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 	{
 		base.SetFuse(fuseLength);
 		explodeTime = UnityEngine.Time.realtimeSinceStartup + fuseLength;
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		SendNetworkUpdate();
 		CancelInvoke(base.KillMessage);
 	}
@@ -159,11 +159,11 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 			SetParent(null);
 		}
 		base.transform.SetPositionAndRotation(position, rotation);
-		SetFlag(Flags.On, false);
-		SetCollisionEnabled(true);
+		SetFlag(Flags.On, b: false);
+		SetCollisionEnabled(wantsCollision: true);
 		if (flag)
 		{
-			SetMotionEnabled(true);
+			SetMotionEnabled(wantsMotion: true);
 		}
 		Effect.server.Run("assets/bundled/prefabs/fx/impacts/blunt/concrete/concrete1.prefab", this, 0u, Vector3.zero, Vector3.zero);
 		SendNetworkUpdate();
@@ -181,7 +181,7 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 	public void Ignite(Vector3 fromPos)
 	{
 		SetFuse(GetRandomTimerTime());
-		ReceiveCollisionMessages(true);
+		ReceiveCollisionMessages(b: true);
 		if (waterCausesExplosion)
 		{
 			InvokeRepeating(base.WaterCheck, 0f, 0.5f);

@@ -1,9 +1,8 @@
 using System;
 
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+[Serializable]
+public sealed class VignetteModeParameter : ParameterOverride<VignetteMode>
 {
-	[Serializable]
-	public sealed class VignetteModeParameter : ParameterOverride<VignetteMode>
-	{
-	}
 }

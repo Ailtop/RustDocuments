@@ -34,7 +34,7 @@ public class FluidSwitch : ElectricSwitch
 			{
 				lastPassthroughEnergy = -1;
 				SetFlag(Flag_PumpPowered, pumpEnabled);
-				SendChangedToRoot(true);
+				SendChangedToRoot(forceUpdate: true);
 			}
 		}
 	}
@@ -47,7 +47,7 @@ public class FluidSwitch : ElectricSwitch
 
 	private void DelayedSendChanged()
 	{
-		SendChangedToRoot(true);
+		SendChangedToRoot(forceUpdate: true);
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)

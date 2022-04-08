@@ -1,8 +1,7 @@
 using UnityEngine;
 
-namespace VLB
+namespace VLB;
+
+public sealed class HighlightNullAttribute : PropertyAttribute
 {
-	public sealed class HighlightNullAttribute : PropertyAttribute
-	{
-	}
 }

@@ -77,8 +77,7 @@ public class ScrapTransportHelicopter : MiniCopter
 			{
 				num++;
 			}
-			BaseVehicleSeat baseVehicleSeat;
-			if ((object)(baseVehicleSeat = child as BaseVehicleSeat) != null && baseVehicleSeat.GetMounted() != null && baseVehicleSeat.GetMounted() != GetDriver())
+			if (child is BaseVehicleSeat baseVehicleSeat && baseVehicleSeat.GetMounted() != null && baseVehicleSeat.GetMounted() != GetDriver())
 			{
 				num++;
 			}

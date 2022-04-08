@@ -119,8 +119,7 @@ public class InstantCameraTool : HeldEntity
 			Debug.LogError("Sub-entity was not found");
 			return;
 		}
-		PhotoEntity photoEntity;
-		if ((object)(photoEntity = baseNetworkable as PhotoEntity) == null)
+		if (!(baseNetworkable is PhotoEntity photoEntity))
 		{
 			item2.Remove();
 			Debug.LogError("Sub-entity is not a photo");

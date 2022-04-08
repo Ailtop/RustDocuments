@@ -112,7 +112,7 @@ public class BaseGameMode : BaseEntity
 		GameModeTeam[] array = teams;
 		for (int i = 0; i < array.Length; i++)
 		{
-			GameModeTeam gameModeTeam = array[i];
+			_ = array[i];
 			GameMode.TeamInfo teamInfo = new GameMode.TeamInfo();
 			teamInfo.score = 0;
 			teamInfo.ShouldPool = false;
@@ -182,7 +182,7 @@ public class BaseGameMode : BaseEntity
 			string[] array = scoreColumns;
 			for (int i = 0; i < array.Length; i++)
 			{
-				string text = array[i];
+				_ = array[i];
 				playerScore.scores.Add(0);
 			}
 			gameModeScores.playerScores.Add(playerScore);
@@ -494,12 +494,12 @@ public class BaseGameMode : BaseEntity
 
 	public static void CreateGameMode(string overrideMode = "")
 	{
-		BaseGameMode activeGameMode = GetActiveGameMode(true);
+		BaseGameMode activeGameMode = GetActiveGameMode(serverside: true);
 		if ((bool)activeGameMode)
 		{
 			activeGameMode.ShutdownGame();
 			activeGameMode.Kill();
-			SetActiveGameMode(null, true);
+			SetActiveGameMode(null, serverside: true);
 		}
 		string text = Server.gamemode;
 		Debug.Log("Gamemode Convar :" + text);
@@ -639,9 +639,9 @@ public class BaseGameMode : BaseEntity
 	protected virtual void OnMatchBegin()
 	{
 		matchStartTime = UnityEngine.Time.realtimeSinceStartup;
-		SetFlag(Flags.Reserved3, false);
-		SetFlag(Flags.Reserved1, false);
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved3, b: false);
+		SetFlag(Flags.Reserved1, b: false);
+		SetFlag(Flags.Reserved2, b: false);
 	}
 
 	public virtual void ResetMatch()
@@ -651,8 +651,8 @@ public class BaseGameMode : BaseEntity
 			return;
 		}
 		isResetting = true;
-		SetFlag(Flags.Reserved1, true, false, false);
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved1, b: true, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved2, b: false);
 		ResetTeamScores();
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
@@ -719,13 +719,13 @@ public class BaseGameMode : BaseEntity
 				OnMatchEnd();
 				return;
 			}
-			SetFlag(Flags.Reserved3, true);
-			SetFlag(Flags.Reserved2, false);
-			SetFlag(Flags.Reserved1, false);
+			SetFlag(Flags.Reserved3, b: true);
+			SetFlag(Flags.Reserved2, b: false);
+			SetFlag(Flags.Reserved1, b: false);
 		}
 		else if (IsWaitingForPlayers() && num2 >= minPlayersToStart)
 		{
-			SetFlag(Flags.Reserved3, false);
+			SetFlag(Flags.Reserved3, b: false);
 			CancelInvoke(ResetMatch);
 			ResetMatch();
 		}
@@ -735,7 +735,7 @@ public class BaseGameMode : BaseEntity
 	{
 		matchEndTime = UnityEngine.Time.time;
 		Debug.Log("Match over!");
-		SetFlag(Flags.Reserved2, true);
+		SetFlag(Flags.Reserved2, b: true);
 		Invoke(ResetMatch, timeBetweenMatches);
 	}
 
@@ -827,7 +827,7 @@ public class BaseGameMode : BaseEntity
 			{
 				ModifyPlayerGameScore(instigator, "kills", 1);
 			}
-			CheckGameConditions(true);
+			CheckGameConditions(force: true);
 		}
 	}
 

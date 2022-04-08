@@ -156,14 +156,14 @@ public class DieselEngine : StorageContainer
 
 	public void EngineOff()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		BroadcastEntityMessage("DieselEngineOff");
 		Interface.CallHook("OnDieselEngineToggled", this);
 	}
 
 	public void EngineOn()
 	{
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		BroadcastEntityMessage("DieselEngineOn");
 		Interface.CallHook("OnDieselEngineToggled", this);
 	}

@@ -32,7 +32,7 @@ public class GrowableGenes
 			for (int i = 0; i < 6; i++)
 			{
 				CalculateSlotWeights(growable.Properties.Genes, i);
-				Genes[i].Set(PickWeightedGeneType(), true);
+				Genes[i].Set(PickWeightedGeneType(), firstSet: true);
 			}
 		}
 	}
@@ -143,7 +143,7 @@ public class GrowableGenes
 
 	public void DebugPrint()
 	{
-		Debug.Log(GetDisplayString(false));
+		Debug.Log(GetDisplayString(previousGenes: false));
 	}
 
 	private string GetDisplayString(bool previousGenes)

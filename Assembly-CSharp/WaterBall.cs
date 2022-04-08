@@ -53,13 +53,9 @@ public class WaterBall : BaseEntity
 			List<ISplashable> obj3 = Pool.GetList<ISplashable>();
 			foreach (BaseEntity item in obj2)
 			{
-				if (!item.isClient)
+				if (!item.isClient && item is ISplashable splashable && !obj3.Contains(splashable) && splashable.WantsSplash(liquidDef, amount))
 				{
-					ISplashable splashable = item as ISplashable;
-					if (splashable != null && !obj3.Contains(splashable) && splashable.WantsSplash(liquidDef, amount))
-					{
-						obj3.Add(splashable);
-					}
+					obj3.Add(splashable);
 				}
 			}
 			if (obj3.Count == 0)

@@ -164,16 +164,16 @@ public class WildlifeTrap : StorageContainer
 			}
 			else
 			{
-				SetFlag(Flags.Reserved1, true);
+				SetFlag(Flags.Reserved1, b: true);
 			}
-			SetTrapActive(false);
-			Hurt(StartMaxHealth() * 0.1f, DamageType.Decay, null, false);
+			SetTrapActive(trapOn: false);
+			Hurt(StartMaxHealth() * 0.1f, DamageType.Decay, null, useProtection: false);
 		}
 	}
 
 	public void ClearTrap()
 	{
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 	}
 
 	public bool HasBait()

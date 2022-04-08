@@ -78,9 +78,9 @@ public class StrobeLight : BaseCombatEntity
 
 	public void ServerEnableStrobing(bool wantsOn)
 	{
-		SetFlag(Flags.Reserved6, false);
-		SetFlag(Flags.Reserved7, false);
-		SetFlag(Flags.Reserved8, false);
+		SetFlag(Flags.Reserved6, b: false);
+		SetFlag(Flags.Reserved7, b: false);
+		SetFlag(Flags.Reserved8, b: false);
 		SetFlag(Flags.On, wantsOn);
 		SendNetworkUpdateImmediate();
 		UpdateSpeedFlags();
@@ -97,7 +97,7 @@ public class StrobeLight : BaseCombatEntity
 	public void SelfDamage()
 	{
 		float num = burnRate / lifeTimeSeconds;
-		Hurt(num * MaxHealth(), DamageType.Decay, this, false);
+		Hurt(num * MaxHealth(), DamageType.Decay, this, useProtection: false);
 	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)

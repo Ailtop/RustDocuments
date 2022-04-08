@@ -98,7 +98,7 @@ public class FreeableLootContainer : LootContainer
 			GetRB().isKinematic = false;
 			buoyancy.enabled = true;
 			buoyancy.buoyancyScale = 1f;
-			SetFlag(Flags.Reserved8, false);
+			SetFlag(Flags.Reserved8, b: false);
 			if (freedEffect.isValid)
 			{
 				Effect.server.Run(freedEffect.resourcePath, base.transform.position, Vector3.up);

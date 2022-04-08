@@ -34,12 +34,12 @@ public class GenerateRoadMeshes : ProceduralComponent
 				obj.transform.position = item.Position;
 				obj.layer = 16;
 				GameObjectEx.SetHierarchyGroup(obj, road.Name);
-				obj.SetActive(false);
+				obj.SetActive(value: false);
 				MeshCollider meshCollider = obj.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RoadPhysicMaterial;
 				meshCollider.sharedMesh = item.Meshes[0];
 				obj.AddComponent<AddToHeightMap>();
-				obj.SetActive(true);
+				obj.SetActive(value: true);
 			}
 		}
 	}

@@ -49,7 +49,7 @@ public class Socket_Base : PrefabAttribute
 		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
 		position = base.transform.position;
 		rotation = base.transform.rotation;
-		socketMods = GetComponentsInChildren<SocketMod>(true);
+		socketMods = GetComponentsInChildren<SocketMod>(includeInactive: true);
 		SocketMod[] array = socketMods;
 		for (int i = 0; i < array.Length; i++)
 		{

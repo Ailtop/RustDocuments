@@ -54,8 +54,8 @@ public class NPCNavigator : BaseNavigator
 			{
 				vector = currentNavMeshLinkEndPos - base.BaseEntity.ServerPosition;
 			}
-			float sqrMagnitude = vector.sqrMagnitude;
-			float num = 0.001f;
+			_ = vector.sqrMagnitude;
+			_ = 0.001f;
 		}
 		else if ((base.Agent.destination - base.BaseEntity.ServerPosition).sqrMagnitude > 1f)
 		{

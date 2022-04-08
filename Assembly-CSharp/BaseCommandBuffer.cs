@@ -8,14 +8,12 @@ public class BaseCommandBuffer : MonoBehaviour
 
 	protected CommandBuffer GetCommandBuffer(string name, Camera camera, CameraEvent cameraEvent)
 	{
-		Dictionary<int, CommandBuffer> value;
-		if (!cameras.TryGetValue(camera, out value))
+		if (!cameras.TryGetValue(camera, out var value))
 		{
 			value = new Dictionary<int, CommandBuffer>();
 			cameras.Add(camera, value);
 		}
-		CommandBuffer value2;
-		if (value.TryGetValue((int)cameraEvent, out value2))
+		if (value.TryGetValue((int)cameraEvent, out var value2))
 		{
 			value2.Clear();
 		}
@@ -44,9 +42,7 @@ public class BaseCommandBuffer : MonoBehaviour
 
 	protected void CleanupCommandBuffer(Camera camera, CameraEvent cameraEvent)
 	{
-		Dictionary<int, CommandBuffer> value;
-		CommandBuffer value2;
-		if (cameras.TryGetValue(camera, out value) && value.TryGetValue((int)cameraEvent, out value2))
+		if (cameras.TryGetValue(camera, out var value) && value.TryGetValue((int)cameraEvent, out var value2))
 		{
 			camera.RemoveCommandBuffer(cameraEvent, value2);
 		}

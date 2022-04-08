@@ -72,8 +72,7 @@ public static class ServerUsers
 
 	public static User Get(ulong uid)
 	{
-		User value;
-		if (!users.TryGetValue(uid, out value))
+		if (!users.TryGetValue(uid, out var value))
 		{
 			return null;
 		}

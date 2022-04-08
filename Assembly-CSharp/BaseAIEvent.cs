@@ -23,25 +23,14 @@ public class BaseAIEvent
 	public ExecuteRate Rate { get; protected set; } = ExecuteRate.Normal;
 
 
-	public float ExecutionRate
+	public float ExecutionRate => Rate switch
 	{
-		get
-		{
-			switch (Rate)
-			{
-			case ExecuteRate.Slow:
-				return 1f;
-			case ExecuteRate.Normal:
-				return 0.5f;
-			case ExecuteRate.Fast:
-				return 0.25f;
-			case ExecuteRate.VeryFast:
-				return 0.1f;
-			default:
-				return 0.5f;
-			}
-		}
-	}
+		ExecuteRate.Slow => 1f, 
+		ExecuteRate.Normal => 0.5f, 
+		ExecuteRate.Fast => 0.25f, 
+		ExecuteRate.VeryFast => 0.1f, 
+		_ => 0.5f, 
+	};
 
 	public bool ShouldExecute { get; protected set; }
 

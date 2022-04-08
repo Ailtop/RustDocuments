@@ -61,7 +61,7 @@ public class GameModeCapturePoint : BaseEntity
 
 	public void AssignPoints()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (activeGameMode == null || !activeGameMode.IsMatchActive())
 		{
 			return;
@@ -73,9 +73,9 @@ public class GameModeCapturePoint : BaseEntity
 				activeGameMode.ModifyTeamScore(captureTeam, scorePerSecond);
 			}
 		}
-		else if (capturedPlayer.IsValid(true))
+		else if (capturedPlayer.IsValid(serverside: true))
 		{
-			activeGameMode.ModifyPlayerGameScore(capturedPlayer.Get(true).GetComponent<BasePlayer>(), "score", scorePerSecond);
+			activeGameMode.ModifyPlayerGameScore(capturedPlayer.Get(serverside: true).GetComponent<BasePlayer>(), "score", scorePerSecond);
 		}
 	}
 
@@ -100,14 +100,14 @@ public class GameModeCapturePoint : BaseEntity
 			return;
 		}
 		float num = captureFraction;
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (activeGameMode == null)
 		{
 			return;
 		}
 		if (captureTrigger.entityContents == null)
 		{
-			SetFlag(Flags.Busy, false, false, false);
+			SetFlag(Flags.Busy, b: false, recursive: false, networkupdate: false);
 		}
 		else
 		{
@@ -176,7 +176,7 @@ public class GameModeCapturePoint : BaseEntity
 			}
 			else
 			{
-				if (!capturingPlayer.IsValid(true) && !capturedPlayer.IsValid(true))
+				if (!capturingPlayer.IsValid(serverside: true) && !capturedPlayer.IsValid(serverside: true))
 				{
 					captureFraction = 0f;
 				}
@@ -193,11 +193,11 @@ public class GameModeCapturePoint : BaseEntity
 						{
 							continue;
 						}
-						if (!capturedPlayer.IsValid(true) && captureFraction == 0f)
+						if (!capturedPlayer.IsValid(serverside: true) && captureFraction == 0f)
 						{
 							capturingPlayer.Set(component2);
 						}
-						if (captureFraction > 0f && component2 != capturedPlayer.Get(true) && component2 != capturingPlayer.Get(true))
+						if (captureFraction > 0f && component2 != capturedPlayer.Get(serverside: true) && component2 != capturingPlayer.Get(serverside: true))
 						{
 							captureFraction = Mathf.Clamp01(captureFraction - Time.deltaTime / timeToCapture);
 							if (captureFraction == 0f)
@@ -205,7 +205,7 @@ public class GameModeCapturePoint : BaseEntity
 								capturedPlayer.Set(null);
 							}
 						}
-						else if (!capturedPlayer.Get(true) && captureFraction < 1f && capturingPlayer.Get(true) == component2)
+						else if (!capturedPlayer.Get(serverside: true) && captureFraction < 1f && capturingPlayer.Get(serverside: true) == component2)
 						{
 							DoProgressEffect();
 							captureFraction = Mathf.Clamp01(captureFraction + Time.deltaTime / timeToCapture);

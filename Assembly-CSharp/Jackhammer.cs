@@ -64,7 +64,7 @@ public class Jackhammer : BaseMelee
 	{
 		if (!bHeld)
 		{
-			SetEngineStatus(false);
+			SetEngineStatus(on: false);
 		}
 		base.SetHeld(bHeld);
 	}

@@ -102,7 +102,7 @@ public class RFBroadcaster : IOEntity, IRFObject
 			}
 			else if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) == null)
 			{
-				RFManager.ChangeFrequency(frequency, num, this, false, IsPowered());
+				RFManager.ChangeFrequency(frequency, num, this, isListener: false, IsPowered());
 				frequency = num;
 				MarkDirty();
 				SendNetworkUpdate();
@@ -123,7 +123,7 @@ public class RFBroadcaster : IOEntity, IRFObject
 		{
 			CancelInvoke(StopBroadcasting);
 			RFManager.AddBroadcaster(frequency, this);
-			SetFlag(Flags.Reserved3, true);
+			SetFlag(Flags.Reserved3, b: true);
 			nextStopTime = UnityEngine.Time.time + 1f;
 		}
 		else
@@ -134,7 +134,7 @@ public class RFBroadcaster : IOEntity, IRFObject
 
 	public void StopBroadcasting()
 	{
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved3, b: false);
 		RFManager.RemoveBroadcaster(frequency, this);
 	}
 

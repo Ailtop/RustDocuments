@@ -20,15 +20,15 @@ public class MonumentMarker : MonoBehaviour
 		if (info.mapIcon != null)
 		{
 			image.sprite = info.mapIcon;
-			text.SetActive(false);
-			imageBackground.SetActive(true);
+			text.SetActive(active: false);
+			imageBackground.SetActive(active: true);
 		}
 		else
 		{
-			text.SetActive(true);
-			imageBackground.SetActive(false);
+			text.SetActive(active: true);
+			imageBackground.SetActive(active: false);
 		}
-		SetNightMode(false);
+		SetNightMode(nightMode: false);
 	}
 
 	public void SetNightMode(bool nightMode)

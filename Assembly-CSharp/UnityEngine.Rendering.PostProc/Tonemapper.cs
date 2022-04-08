@@ -1,10 +1,9 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public enum Tonemapper
 {
-	public enum Tonemapper
-	{
-		None = 0,
-		Neutral = 1,
-		ACES = 2,
-		Custom = 3
-	}
+	None = 0,
+	Neutral = 1,
+	ACES = 2,
+	Custom = 3
 }

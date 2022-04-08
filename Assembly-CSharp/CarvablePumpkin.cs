@@ -337,7 +337,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		}
 		if (!flag3)
 		{
-			SetFlag(Flags.Locked, false);
+			SetFlag(Flags.Locked, b: false);
 		}
 	}
 
@@ -347,7 +347,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
 		{
-			SetFlag(Flags.Locked, true);
+			SetFlag(Flags.Locked, b: true);
 			SendNetworkUpdate();
 			base.OwnerID = msg.player.userID;
 		}
@@ -359,7 +359,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))
 		{
-			SetFlag(Flags.Locked, false);
+			SetFlag(Flags.Locked, b: false);
 			SendNetworkUpdate();
 		}
 	}
@@ -405,8 +405,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 				break;
 			}
 		}
-		ItemModSign component;
-		if (flag && createdItem.info.TryGetComponent<ItemModSign>(out component))
+		if (flag && createdItem.info.TryGetComponent<ItemModSign>(out var component))
 		{
 			component.OnSignPickedUp(this, createdItem);
 		}
@@ -415,8 +414,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
 		base.OnDeployed(parent, deployedBy, fromItem);
-		ItemModSign component;
-		if (fromItem.info.TryGetComponent<ItemModSign>(out component))
+		if (fromItem.info.TryGetComponent<ItemModSign>(out var _))
 		{
 			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
 			if (associatedEntity != null)

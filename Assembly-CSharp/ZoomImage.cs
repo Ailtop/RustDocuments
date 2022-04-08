@@ -29,8 +29,7 @@ public class ZoomImage : MonoBehaviour, IScrollHandler, IEventSystemHandler
 
 	public void OnScroll(PointerEventData eventData)
 	{
-		Vector2 localPoint;
-		RectTransformUtility.ScreenPointToLocalPointInRectangle(_thisTransform, Input.mousePosition, null, out localPoint);
+		RectTransformUtility.ScreenPointToLocalPointInRectangle(_thisTransform, Input.mousePosition, null, out var localPoint);
 		float y = eventData.scrollDelta.y;
 		if (y > 0f && _scale.x < _maximumScale)
 		{

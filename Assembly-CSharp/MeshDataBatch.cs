@@ -82,7 +82,7 @@ public class MeshDataBatch : MeshBatch
 			meshBatch = AssetPool.Get<UnityEngine.Mesh>();
 		}
 		meshData.Apply(meshBatch);
-		meshBatch.UploadMeshData(false);
+		meshBatch.UploadMeshData(markNoLongerReadable: false);
 	}
 
 	protected override void ToggleMesh(bool state)

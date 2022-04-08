@@ -75,7 +75,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 				bool flag = false;
 				if (informationZone != null)
 				{
-					AIMovePoint bestMovePointNear = informationZone.GetBestMovePointNear(baseEntity.transform.position, entity.transform.position, 0f, brain.Navigator.BestMovementPointMaxDistance, true, entity, true);
+					AIMovePoint bestMovePointNear = informationZone.GetBestMovePointNear(baseEntity.transform.position, entity.transform.position, 0f, brain.Navigator.BestMovementPointMaxDistance, checkLOS: true, entity, returnClosest: true);
 					if ((bool)bestMovePointNear)
 					{
 						bestMovePointNear.SetUsedBy(entity, 5f);
@@ -126,7 +126,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 		public override void StateLeave()
 		{
 			base.StateLeave();
-			GetEntity().SetDucked(false);
+			GetEntity().SetDucked(flag: false);
 			brain.Navigator.ClearFacingDirectionOverride();
 		}
 
@@ -140,13 +140,13 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 				if (Random.Range(0, 3) == 1)
 				{
 					nextActionTime = Time.time + Random.Range(1f, 2f);
-					entity.SetDucked(true);
+					entity.SetDucked(flag: true);
 					brain.Navigator.Stop();
 				}
 				else
 				{
 					nextActionTime = Time.time + Random.Range(2f, 3f);
-					entity.SetDucked(false);
+					entity.SetDucked(flag: false);
 					brain.Navigator.SetDestination(brain.PathFinder.GetRandomPositionAround(combatStartPosition, 1f), BaseNavigator.NavigationSpeed.Normal);
 				}
 			}
@@ -208,7 +208,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 		{
 			base.StateEnter();
 			HumanNPC entity = GetEntity();
-			entity.SetDucked(true);
+			entity.SetDucked(flag: true);
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
 			if (aIPoint != null)
 			{
@@ -233,7 +233,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 		{
 			base.StateLeave();
 			HumanNPC entity = GetEntity();
-			entity.SetDucked(false);
+			entity.SetDucked(flag: false);
 			brain.Navigator.ClearFacingDirectionOverride();
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
 			if (aIPoint != null)
@@ -525,10 +525,10 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			case AIState.Patrol:
 			case AIState.FollowPath:
 			case AIState.Cooldown:
-				GetEntity().SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, true);
+				GetEntity().SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, b: true);
 				break;
 			default:
-				GetEntity().SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, false);
+				GetEntity().SetPlayerFlag(BasePlayer.PlayerFlags.Relaxed, b: false);
 				break;
 			}
 		}

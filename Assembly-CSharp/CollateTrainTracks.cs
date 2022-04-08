@@ -14,39 +14,77 @@ public class CollateTrainTracks : ProceduralComponent
 	{
 		TrainTrackSpline[] array = Object.FindObjectsOfType<TrainTrackSpline>();
 		TrainTrackSpline[] array2 = array;
-		_003C_003Ec__DisplayClass5_0 _003C_003Ec__DisplayClass5_ = default(_003C_003Ec__DisplayClass5_0);
-		_003C_003Ec__DisplayClass5_1 _003C_003Ec__DisplayClass5_2 = default(_003C_003Ec__DisplayClass5_1);
-		_003C_003Ec__DisplayClass5_2 _003C_003Ec__DisplayClass5_3 = default(_003C_003Ec__DisplayClass5_2);
-		_003C_003Ec__DisplayClass5_3 _003C_003Ec__DisplayClass5_4 = default(_003C_003Ec__DisplayClass5_3);
-		for (int i = 0; i < array2.Length; i++)
+		foreach (TrainTrackSpline ourSpline in array2)
 		{
-			_003C_003Ec__DisplayClass5_.ourSpline = array2[i];
-			_003C_003Ec__DisplayClass5_2.ourStartPos = _003C_003Ec__DisplayClass5_.ourSpline.GetStartPointWorld();
-			_003C_003Ec__DisplayClass5_2.ourEndPos = _003C_003Ec__DisplayClass5_.ourSpline.GetEndPointWorld();
-			_003C_003Ec__DisplayClass5_2.ourStartTangent = _003C_003Ec__DisplayClass5_.ourSpline.GetStartTangentWorld();
-			_003C_003Ec__DisplayClass5_2.ourEndTangent = _003C_003Ec__DisplayClass5_.ourSpline.GetEndTangentWorld();
-			if (_003CProcess_003Eg__NodesConnect_007C5_0(_003C_003Ec__DisplayClass5_2.ourStartPos, _003C_003Ec__DisplayClass5_2.ourEndPos, _003C_003Ec__DisplayClass5_2.ourStartTangent, _003C_003Ec__DisplayClass5_2.ourEndTangent))
+			Vector3 ourStartPos = ourSpline.GetStartPointWorld();
+			Vector3 ourEndPos = ourSpline.GetEndPointWorld();
+			Vector3 ourStartTangent = ourSpline.GetStartTangentWorld();
+			Vector3 ourEndTangent = ourSpline.GetEndTangentWorld();
+			if (NodesConnect(ourStartPos, ourEndPos, ourStartTangent, ourEndTangent))
 			{
-				_003C_003Ec__DisplayClass5_.ourSpline.AddTrackConnection(_003C_003Ec__DisplayClass5_.ourSpline, TrainTrackSpline.TrackPosition.Next, TrainTrackSpline.TrackOrientation.Same);
-				_003C_003Ec__DisplayClass5_.ourSpline.AddTrackConnection(_003C_003Ec__DisplayClass5_.ourSpline, TrainTrackSpline.TrackPosition.Prev, TrainTrackSpline.TrackOrientation.Same);
+				ourSpline.AddTrackConnection(ourSpline, TrainTrackSpline.TrackPosition.Next, TrainTrackSpline.TrackOrientation.Same);
+				ourSpline.AddTrackConnection(ourSpline, TrainTrackSpline.TrackPosition.Prev, TrainTrackSpline.TrackOrientation.Same);
 				continue;
 			}
 			TrainTrackSpline[] array3 = array;
-			for (int j = 0; j < array3.Length; j++)
+			foreach (TrainTrackSpline otherSpline in array3)
 			{
-				_003C_003Ec__DisplayClass5_3.otherSpline = array3[j];
-				if (!(_003C_003Ec__DisplayClass5_.ourSpline == _003C_003Ec__DisplayClass5_3.otherSpline))
+				Vector3 theirStartPos;
+				Vector3 theirEndPos;
+				Vector3 theirStartTangent;
+				Vector3 theirEndTangent;
+				if (!(ourSpline == otherSpline))
 				{
-					_003C_003Ec__DisplayClass5_4.theirStartPos = _003C_003Ec__DisplayClass5_3.otherSpline.GetStartPointWorld();
-					_003C_003Ec__DisplayClass5_4.theirEndPos = _003C_003Ec__DisplayClass5_3.otherSpline.GetEndPointWorld();
-					_003C_003Ec__DisplayClass5_4.theirStartTangent = _003C_003Ec__DisplayClass5_3.otherSpline.GetStartTangentWorld();
-					_003C_003Ec__DisplayClass5_4.theirEndTangent = _003C_003Ec__DisplayClass5_3.otherSpline.GetEndTangentWorld();
-					if (!_003CProcess_003Eg__CompareNodes_007C5_1(false, true, ref _003C_003Ec__DisplayClass5_, ref _003C_003Ec__DisplayClass5_2, ref _003C_003Ec__DisplayClass5_3, ref _003C_003Ec__DisplayClass5_4) && !_003CProcess_003Eg__CompareNodes_007C5_1(false, false, ref _003C_003Ec__DisplayClass5_, ref _003C_003Ec__DisplayClass5_2, ref _003C_003Ec__DisplayClass5_3, ref _003C_003Ec__DisplayClass5_4) && !_003CProcess_003Eg__CompareNodes_007C5_1(true, true, ref _003C_003Ec__DisplayClass5_, ref _003C_003Ec__DisplayClass5_2, ref _003C_003Ec__DisplayClass5_3, ref _003C_003Ec__DisplayClass5_4))
+					theirStartPos = otherSpline.GetStartPointWorld();
+					theirEndPos = otherSpline.GetEndPointWorld();
+					theirStartTangent = otherSpline.GetStartTangentWorld();
+					theirEndTangent = otherSpline.GetEndTangentWorld();
+					if (!CompareNodes(ourStart: false, theirStart: true) && !CompareNodes(ourStart: false, theirStart: false) && !CompareNodes(ourStart: true, theirStart: true))
 					{
-						_003CProcess_003Eg__CompareNodes_007C5_1(true, false, ref _003C_003Ec__DisplayClass5_, ref _003C_003Ec__DisplayClass5_2, ref _003C_003Ec__DisplayClass5_3, ref _003C_003Ec__DisplayClass5_4);
+						CompareNodes(ourStart: true, theirStart: false);
 					}
 				}
+				bool CompareNodes(bool ourStart, bool theirStart)
+				{
+					Vector3 ourPos2 = (ourStart ? ourStartPos : ourEndPos);
+					Vector3 ourTangent2 = (ourStart ? ourStartTangent : ourEndTangent);
+					Vector3 theirPos2 = (theirStart ? theirStartPos : theirEndPos);
+					Vector3 theirTangent2 = (theirStart ? theirStartTangent : theirEndTangent);
+					if (ourStart == theirStart)
+					{
+						theirTangent2 *= -1f;
+					}
+					if (NodesConnect(ourPos2, theirPos2, ourTangent2, theirTangent2))
+					{
+						if (ourStart)
+						{
+							ourSpline.AddTrackConnection(otherSpline, TrainTrackSpline.TrackPosition.Prev, theirStart ? TrainTrackSpline.TrackOrientation.Reverse : TrainTrackSpline.TrackOrientation.Same);
+						}
+						else
+						{
+							ourSpline.AddTrackConnection(otherSpline, TrainTrackSpline.TrackPosition.Next, (!theirStart) ? TrainTrackSpline.TrackOrientation.Reverse : TrainTrackSpline.TrackOrientation.Same);
+						}
+						if (theirStart)
+						{
+							otherSpline.AddTrackConnection(ourSpline, TrainTrackSpline.TrackPosition.Prev, ourStart ? TrainTrackSpline.TrackOrientation.Reverse : TrainTrackSpline.TrackOrientation.Same);
+						}
+						else
+						{
+							otherSpline.AddTrackConnection(ourSpline, TrainTrackSpline.TrackPosition.Next, (!ourStart) ? TrainTrackSpline.TrackOrientation.Reverse : TrainTrackSpline.TrackOrientation.Same);
+						}
+						return true;
+					}
+					return false;
+				}
 			}
+		}
+		static bool NodesConnect(Vector3 ourPos, Vector3 theirPos, Vector3 ourTangent, Vector3 theirTangent)
+		{
+			if (Vector3.SqrMagnitude(ourPos - theirPos) < 0.0100000007f)
+			{
+				return Vector3.Angle(ourTangent, theirTangent) < 10f;
+			}
+			return false;
 		}
 	}
 }

@@ -20,8 +20,7 @@ public static class TransformUtil
 		startPos.y += 0.25f;
 		range += 0.25f;
 		hitOut = default(RaycastHit);
-		RaycastHit hitInfo;
-		if (Physics.Raycast(new Ray(startPos, Vector3.down), out hitInfo, range, mask))
+		if (Physics.Raycast(new Ray(startPos, Vector3.down), out var hitInfo, range, mask))
 		{
 			if (ignoreTransform != null && (hitInfo.collider.transform == ignoreTransform || hitInfo.collider.transform.IsChildOf(ignoreTransform)))
 			{
@@ -79,8 +78,7 @@ public static class TransformUtil
 	{
 		startPos.y += 0.25f;
 		range += 0.25f;
-		RaycastHit hitInfo;
-		if (Physics.Raycast(new Ray(startPos, Vector3.down), out hitInfo, range, mask) && hitInfo.collider is TerrainCollider)
+		if (Physics.Raycast(new Ray(startPos, Vector3.down), out var hitInfo, range, mask) && hitInfo.collider is TerrainCollider)
 		{
 			pos = hitInfo.point;
 			normal = hitInfo.normal;

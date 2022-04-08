@@ -143,7 +143,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		BasePlayer player = rpc.player;
 		if ((bool)player && player.CanInteract() && CanLoot() && containers != null && Interface.CallHook("CanLootEntity", player, this) == null && player.inventory.loot.StartLootingEntity(this))
 		{
-			SetFlag(Flags.Open, true);
+			SetFlag(Flags.Open, b: true);
 			ItemContainer[] array = containers;
 			foreach (ItemContainer container in array)
 			{
@@ -159,7 +159,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	{
 		Interface.CallHook("OnLootEntityEnd", player, this);
 		ResetRemovalTime();
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 		SendNetworkUpdate();
 	}
 

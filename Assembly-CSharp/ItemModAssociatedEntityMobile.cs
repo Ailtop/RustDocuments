@@ -8,11 +8,11 @@ public class ItemModAssociatedEntityMobile : ItemModAssociatedEntity<MobileInven
 		MobileInventoryEntity associatedEntity = ItemModAssociatedEntity<MobileInventoryEntity>.GetAssociatedEntity(item);
 		if (command == "silenton")
 		{
-			associatedEntity.SetSilentMode(true);
+			associatedEntity.SetSilentMode(wantsSilent: true);
 		}
 		else if (command == "silentoff")
 		{
-			associatedEntity.SetSilentMode(false);
+			associatedEntity.SetSilentMode(wantsSilent: false);
 		}
 	}
 }

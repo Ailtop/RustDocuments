@@ -108,7 +108,7 @@ public class GameModeSoftcore : GameModeVanilla
 	{
 		if (victim != null && !victim.IsNpc)
 		{
-			SetInventoryLocked(victim, false);
+			SetInventoryLocked(victim, wantsLocked: false);
 			int num = 0;
 			if (ReclaimManager.instance == null)
 			{
@@ -165,12 +165,12 @@ public class GameModeSoftcore : GameModeVanilla
 	public override void OnPlayerWounded(BasePlayer instigator, BasePlayer victim, HitInfo info)
 	{
 		base.OnPlayerWounded(instigator, victim, info);
-		SetInventoryLocked(victim, true);
+		SetInventoryLocked(victim, wantsLocked: true);
 	}
 
 	public override void OnPlayerRevived(BasePlayer instigator, BasePlayer victim)
 	{
-		SetInventoryLocked(victim, false);
+		SetInventoryLocked(victim, wantsLocked: false);
 		base.OnPlayerRevived(instigator, victim);
 	}
 

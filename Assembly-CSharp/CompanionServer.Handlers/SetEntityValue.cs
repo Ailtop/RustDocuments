@@ -1,21 +1,19 @@
 using ProtoBuf;
 
-namespace CompanionServer.Handlers
+namespace CompanionServer.Handlers;
+
+public class SetEntityValue : BaseEntityHandler<AppSetEntityValue>
 {
-	public class SetEntityValue : BaseEntityHandler<AppSetEntityValue>
+	public override void Execute()
 	{
-		public override void Execute()
+		if (base.Entity is SmartSwitch smartSwitch)
 		{
-			SmartSwitch smartSwitch;
-			if ((object)(smartSwitch = base.Entity as SmartSwitch) != null)
-			{
-				smartSwitch.Value = base.Proto.value;
-				SendSuccess();
-			}
-			else
-			{
-				SendError("wrong_type");
-			}
+			smartSwitch.Value = base.Proto.value;
+			SendSuccess();
+		}
+		else
+		{
+			SendError("wrong_type");
 		}
 	}
 }

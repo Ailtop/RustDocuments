@@ -653,7 +653,7 @@ public class BradleyAPC : BaseCombatEntity
 			if (UnityEngine.Time.time > nextCoaxTime && flag && num <= 40f)
 			{
 				numCoaxBursted++;
-				FireGun(GetAimPoint(mainGunTarget), 3f, true);
+				FireGun(GetAimPoint(mainGunTarget), 3f, isCoax: true);
 				nextCoaxTime = UnityEngine.Time.time + coaxFireRate;
 				if (numCoaxBursted >= coaxBurstLength)
 				{
@@ -671,7 +671,7 @@ public class BradleyAPC : BaseCombatEntity
 			BaseEntity entity = targetList[1].entity;
 			if (entity != null && UnityEngine.Time.time > nextTopTurretTime && VisibilityTest(entity))
 			{
-				FireGun(GetAimPoint(targetList[1].entity), 3f, false);
+				FireGun(GetAimPoint(targetList[1].entity), 3f, isCoax: false);
 				nextTopTurretTime = UnityEngine.Time.time + topTurretFireRate;
 			}
 		}
@@ -935,9 +935,7 @@ public class BradleyAPC : BaseCombatEntity
 		}
 		else
 		{
-			Stack<BasePathNode> path;
-			float pathCost;
-			if (!AStarPath.FindPath(basePathNode, closestToPoint, out path, out pathCost))
+			if (!AStarPath.FindPath(basePathNode, closestToPoint, out var path, out var _))
 			{
 				return;
 			}
@@ -1004,8 +1002,7 @@ public class BradleyAPC : BaseCombatEntity
 			foreach (BasePathNode item2 in nearNodes)
 			{
 				Stack<BasePathNode> path = new Stack<BasePathNode>();
-				float pathCost;
-				if (targetInfo.entity.IsVisible(item2.transform.position + new Vector3(0f, y, 0f)) && AStarPath.FindPath(start, item2, out path, out pathCost) && pathCost < num)
+				if (targetInfo.entity.IsVisible(item2.transform.position + new Vector3(0f, y, 0f)) && AStarPath.FindPath(start, item2, out path, out var pathCost) && pathCost < num)
 				{
 					stack = path;
 					num = pathCost;
@@ -1016,8 +1013,7 @@ public class BradleyAPC : BaseCombatEntity
 			{
 				Stack<BasePathNode> path2 = new Stack<BasePathNode>();
 				BasePathNode basePathNode2 = nearNodes[UnityEngine.Random.Range(0, nearNodes.Count)];
-				float pathCost2;
-				if (AStarPath.FindPath(start, basePathNode2, out path2, out pathCost2) && pathCost2 < num)
+				if (AStarPath.FindPath(start, basePathNode2, out path2, out var pathCost2) && pathCost2 < num)
 				{
 					stack = path2;
 					basePathNode = basePathNode2;
@@ -1145,7 +1141,7 @@ public class BradleyAPC : BaseCombatEntity
 			float num4 = Mathf.InverseLerp(0.5f, 0.8f, value);
 			num2 = 15f - 14f * ((1f - num4) * (1f - num3));
 		}
-		float num8 = 20f;
+		_ = 20f;
 		if (patrolPath != null)
 		{
 			float num5 = num2;
@@ -1176,15 +1172,15 @@ public class BradleyAPC : BaseCombatEntity
 		float torqueAmount = Mathf.Lerp(moveForceMax, turnForce, t);
 		float num7 = Mathf.InverseLerp(5f, 1.5f, velocity.magnitude * Mathf.Abs(Vector3.Dot(velocity.normalized, base.transform.forward)));
 		ScaleSidewaysFriction(1f - num7);
-		SetMotorTorque(leftThrottle, false, torqueAmount);
-		SetMotorTorque(rightThrottle, true, torqueAmount);
+		SetMotorTorque(leftThrottle, rightSide: false, torqueAmount);
+		SetMotorTorque(rightThrottle, rightSide: true, torqueAmount);
 		impactDamager.damageEnabled = myRigidBody.velocity.magnitude > 2f;
 	}
 
 	public void ApplyBrakes(float amount)
 	{
-		ApplyBrakeTorque(amount, true);
-		ApplyBrakeTorque(amount, false);
+		ApplyBrakeTorque(amount, rightSide: true);
+		ApplyBrakeTorque(amount, rightSide: false);
 	}
 
 	public float GetMotorTorque(bool rightSide)
@@ -1226,8 +1222,7 @@ public class BradleyAPC : BaseCombatEntity
 		WheelCollider[] array = (rightSide ? rightWheels : leftWheels);
 		for (int i = 0; i < array.Length; i++)
 		{
-			WheelHit hit;
-			if (array[i].GetGroundHit(out hit))
+			if (array[i].GetGroundHit(out var _))
 			{
 				num3++;
 			}
@@ -1240,8 +1235,7 @@ public class BradleyAPC : BaseCombatEntity
 		array = (rightSide ? rightWheels : leftWheels);
 		foreach (WheelCollider wheelCollider in array)
 		{
-			WheelHit hit2;
-			if (wheelCollider.GetGroundHit(out hit2))
+			if (wheelCollider.GetGroundHit(out var _))
 			{
 				wheelCollider.motorTorque = num * num4;
 			}
@@ -1275,7 +1269,7 @@ public class BradleyAPC : BaseCombatEntity
 			return;
 		}
 		CreateExplosionMarker(10f);
-		Effect.server.Run(explosionEffect.resourcePath, mainTurretEyePos.transform.position, Vector3.up, null, true);
+		Effect.server.Run(explosionEffect.resourcePath, mainTurretEyePos.transform.position, Vector3.up, null, broadcast: true);
 		Vector3 zero = Vector3.zero;
 		GameObject gibSource = servergibs.Get().GetComponent<ServerGib>()._gibSource;
 		List<ServerGib> list = ServerGib.CreateGibs(servergibs.resourcePath, base.gameObject, gibSource, zero, 3f);
@@ -1295,7 +1289,7 @@ public class BradleyAPC : BaseCombatEntity
 			baseEntity.SetVelocity(zero + onUnitSphere * UnityEngine.Random.Range(min, max));
 			foreach (ServerGib item in list)
 			{
-				UnityEngine.Physics.IgnoreCollision(component, item.GetCollider(), true);
+				UnityEngine.Physics.IgnoreCollision(component, item.GetCollider(), ignore: true);
 			}
 		}
 		for (int j = 0; j < maxCratesToSpawn; j++)
@@ -1332,7 +1326,7 @@ public class BradleyAPC : BaseCombatEntity
 			baseEntity2.SendMessage("SetLockingEnt", fireBall.gameObject, SendMessageOptions.DontRequireReceiver);
 			foreach (ServerGib item2 in list)
 			{
-				UnityEngine.Physics.IgnoreCollision(component2, item2.GetCollider(), true);
+				UnityEngine.Physics.IgnoreCollision(component2, item2.GetCollider(), ignore: true);
 			}
 		}
 		base.OnKilled(info);

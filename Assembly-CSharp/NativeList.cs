@@ -1,9 +1,8 @@
 using System;
-using System.Runtime.CompilerServices;
 using Facepunch;
 using Unity.Collections;
 
-public class NativeList<[System.Runtime.CompilerServices.IsUnmanaged] T> : Pool.IPooled where T : struct
+public class NativeList<T> : Pool.IPooled where T : unmanaged
 {
 	private NativeArray<T> _array;
 

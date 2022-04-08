@@ -1,9 +1,8 @@
-namespace Smaa
+namespace Smaa;
+
+public enum EdgeDetectionMethod
 {
-	public enum EdgeDetectionMethod
-	{
-		Luma = 1,
-		Color = 2,
-		Depth = 3
-	}
+	Luma = 1,
+	Color = 2,
+	Depth = 3
 }

@@ -64,7 +64,7 @@ public class RHIB : MotorRowboat
 	{
 		if (!(GetParentEntity() == null))
 		{
-			SetParent(null, true, true);
+			SetParent(null, worldPositionStays: true, sendImmediate: true);
 			rigidBody.isKinematic = false;
 		}
 	}
@@ -111,7 +111,7 @@ public class RHIB : MotorRowboat
 
 	public void AddFuel(int amount)
 	{
-		StorageContainer storageContainer = fuelSystem.fuelStorageInstance.Get(true);
+		StorageContainer storageContainer = fuelSystem.fuelStorageInstance.Get(serverside: true);
 		if ((bool)storageContainer)
 		{
 			storageContainer.GetComponent<StorageContainer>().inventory.AddItem(ItemManager.FindItemDefinition("lowgradefuel"), amount, 0uL);

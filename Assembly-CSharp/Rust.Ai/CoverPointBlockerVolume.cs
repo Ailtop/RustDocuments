@@ -1,9 +1,8 @@
 using UnityEngine;
 
-namespace Rust.Ai
+namespace Rust.Ai;
+
+[RequireComponent(typeof(Collider))]
+public class CoverPointBlockerVolume : MonoBehaviour
 {
-	[RequireComponent(typeof(Collider))]
-	public class CoverPointBlockerVolume : MonoBehaviour
-	{
-	}
 }

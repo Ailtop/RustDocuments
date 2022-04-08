@@ -1,9 +1,8 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+[AttributeUsage(AttributeTargets.Method)]
+public class AfterDecode : Attribute
 {
-	[AttributeUsage(AttributeTargets.Method)]
-	public class AfterDecode : Attribute
-	{
-	}
 }

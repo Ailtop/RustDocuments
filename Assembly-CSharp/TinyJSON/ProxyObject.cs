@@ -2,68 +2,66 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+public sealed class ProxyObject : Variant, IEnumerable<KeyValuePair<string, Variant>>, IEnumerable
 {
-	public sealed class ProxyObject : Variant, IEnumerable<KeyValuePair<string, Variant>>, IEnumerable
+	public const string TypeHintKey = "@type";
+
+	private readonly Dictionary<string, Variant> dict;
+
+	public string TypeHint
 	{
-		public const string TypeHintKey = "@type";
-
-		private readonly Dictionary<string, Variant> dict;
-
-		public string TypeHint
+		get
 		{
-			get
+			if (TryGetValue("@type", out var item))
 			{
-				Variant item;
-				if (TryGetValue("@type", out item))
-				{
-					return item.ToString(CultureInfo.InvariantCulture);
-				}
-				return null;
+				return item.ToString(CultureInfo.InvariantCulture);
 			}
+			return null;
 		}
+	}
 
-		public override Variant this[string key]
+	public override Variant this[string key]
+	{
+		get
 		{
-			get
-			{
-				return dict[key];
-			}
-			set
-			{
-				dict[key] = value;
-			}
+			return dict[key];
 		}
-
-		public int Count => dict.Count;
-
-		public Dictionary<string, Variant>.KeyCollection Keys => dict.Keys;
-
-		public Dictionary<string, Variant>.ValueCollection Values => dict.Values;
-
-		public ProxyObject()
+		set
 		{
-			dict = new Dictionary<string, Variant>();
+			dict[key] = value;
 		}
+	}
 
-		IEnumerator<KeyValuePair<string, Variant>> IEnumerable<KeyValuePair<string, Variant>>.GetEnumerator()
-		{
-			return dict.GetEnumerator();
-		}
+	public int Count => dict.Count;
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return dict.GetEnumerator();
-		}
+	public Dictionary<string, Variant>.KeyCollection Keys => dict.Keys;
 
-		public void Add(string key, Variant item)
-		{
-			dict.Add(key, item);
-		}
+	public Dictionary<string, Variant>.ValueCollection Values => dict.Values;
 
-		public bool TryGetValue(string key, out Variant item)
-		{
-			return dict.TryGetValue(key, out item);
-		}
+	public ProxyObject()
+	{
+		dict = new Dictionary<string, Variant>();
+	}
+
+	IEnumerator<KeyValuePair<string, Variant>> IEnumerable<KeyValuePair<string, Variant>>.GetEnumerator()
+	{
+		return dict.GetEnumerator();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return dict.GetEnumerator();
+	}
+
+	public void Add(string key, Variant item)
+	{
+		dict.Add(key, item);
+	}
+
+	public bool TryGetValue(string key, out Variant item)
+	{
+		return dict.TryGetValue(key, out item);
 	}
 }

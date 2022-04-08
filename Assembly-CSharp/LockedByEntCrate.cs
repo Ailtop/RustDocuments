@@ -7,12 +7,12 @@ public class LockedByEntCrate : LootContainer
 	public void SetLockingEnt(GameObject ent)
 	{
 		CancelInvoke(Think);
-		SetLocked(false);
+		SetLocked(isLocked: false);
 		lockingEnt = ent;
 		if (lockingEnt != null)
 		{
 			InvokeRepeating(Think, Random.Range(0f, 1f), 1f);
-			SetLocked(true);
+			SetLocked(isLocked: true);
 		}
 	}
 

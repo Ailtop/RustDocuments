@@ -430,7 +430,7 @@ public class WireTool : HeldEntity
 			iOEntity2.MarkDirtyForceUpdateOutputs();
 			iOEntity2.SendNetworkUpdate();
 			iOEntity.SendNetworkUpdate();
-			iOEntity2.SendChangedToRoot(true);
+			iOEntity2.SendChangedToRoot(forceUpdate: true);
 		}
 	}
 
@@ -483,7 +483,7 @@ public class WireTool : HeldEntity
 		iOEntity.SendNetworkUpdate();
 		if (flag && iOEntity2 != null)
 		{
-			iOEntity2.SendChangedToRoot(true);
+			iOEntity2.SendChangedToRoot(forceUpdate: true);
 		}
 		else if (!flag)
 		{
@@ -492,7 +492,7 @@ public class WireTool : HeldEntity
 			{
 				if (iOSlot2.mainPowerSlot && (bool)iOSlot2.connectedTo.Get())
 				{
-					iOSlot2.connectedTo.Get().SendChangedToRoot(true);
+					iOSlot2.connectedTo.Get().SendChangedToRoot(forceUpdate: true);
 				}
 			}
 		}

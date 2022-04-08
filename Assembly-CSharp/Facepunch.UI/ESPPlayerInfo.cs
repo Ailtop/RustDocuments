@@ -1,30 +1,29 @@
 using TMPro;
 using UnityEngine;
 
-namespace Facepunch.UI
+namespace Facepunch.UI;
+
+public class ESPPlayerInfo : MonoBehaviour
 {
-	public class ESPPlayerInfo : MonoBehaviour
-	{
-		public Vector3 WorldOffset;
+	public Vector3 WorldOffset;
 
-		public TextMeshProUGUI Text;
+	public TextMeshProUGUI Text;
 
-		public TextMeshProUGUI Image;
+	public TextMeshProUGUI Image;
 
-		public CanvasGroup group;
+	public CanvasGroup group;
 
-		public Gradient gradientNormal;
+	public Gradient gradientNormal;
 
-		public Gradient gradientTeam;
+	public Gradient gradientTeam;
 
-		public Color TeamColor;
+	public Color TeamColor;
 
-		public Color AllyColor = Color.blue;
+	public Color AllyColor = Color.blue;
 
-		public Color EnemyColor;
+	public Color EnemyColor;
 
-		public QueryVis visCheck;
+	public QueryVis visCheck;
 
-		public BasePlayer Entity { get; set; }
-	}
+	public BasePlayer Entity { get; set; }
 }

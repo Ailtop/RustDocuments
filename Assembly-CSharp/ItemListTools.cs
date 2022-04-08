@@ -55,14 +55,14 @@ public class ItemListTools : MonoBehaviour
 				GameManager.Destroy(child.gameObject);
 			}
 		}
-		categoryButton.SetActive(true);
+		categoryButton.SetActive(value: true);
 		foreach (IGrouping<ItemCategory, ItemDefinition> item in from x in ItemManager.GetItemDefinitions()
 			group x by x.category into x
 			orderby x.First().category
 			select x)
 		{
 			GameObject gameObject = Object.Instantiate(categoryButton);
-			gameObject.transform.SetParent(categoryButton.transform.parent, false);
+			gameObject.transform.SetParent(categoryButton.transform.parent, worldPositionStays: false);
 			gameObject.GetComponentInChildren<TextMeshProUGUI>().text = item.First().category.ToString();
 			Button btn = gameObject.GetComponentInChildren<Button>();
 			ItemDefinition[] itemArray = item.ToArray();
@@ -83,7 +83,7 @@ public class ItemListTools : MonoBehaviour
 				SwitchItemCategory(itemArray);
 			}
 		}
-		categoryButton.SetActive(false);
+		categoryButton.SetActive(value: false);
 	}
 
 	private void SwitchItemCategory(ItemDefinition[] defs)
@@ -107,7 +107,7 @@ public class ItemListTools : MonoBehaviour
 				GameManager.Destroy(child.gameObject);
 			}
 		}
-		itemButton.SetActive(true);
+		itemButton.SetActive(value: true);
 		bool flag = !string.IsNullOrEmpty(searchText);
 		string value = (flag ? searchText.ToLower() : null);
 		IOrderedEnumerable<ItemDefinition> obj = (flag ? allItems : currentItems);
@@ -117,7 +117,7 @@ public class ItemListTools : MonoBehaviour
 			if (!item.hidden && (!flag || item.displayName.translated.ToLower().Contains(value)))
 			{
 				GameObject obj2 = Object.Instantiate(itemButton);
-				obj2.transform.SetParent(itemButton.transform.parent, false);
+				obj2.transform.SetParent(itemButton.transform.parent, worldPositionStays: false);
 				obj2.GetComponentInChildren<TextMeshProUGUI>().text = item.displayName.translated;
 				obj2.GetComponentInChildren<ItemButtonTools>().itemDef = item;
 				obj2.GetComponentInChildren<ItemButtonTools>().image.sprite = item.iconSprite;
@@ -128,6 +128,6 @@ public class ItemListTools : MonoBehaviour
 				}
 			}
 		}
-		itemButton.SetActive(false);
+		itemButton.SetActive(value: false);
 	}
 }

@@ -252,8 +252,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		Vector3 vector = base.transform.position - Vector3.up * 6f;
 		float num = Vector3.Distance(position, vector);
 		Vector3 normalized = (position - vector).normalized;
-		RaycastHit hitInfo;
-		if (GamePhysics.Trace(new Ray(vector + normalized * 5f, normalized), 0f, out hitInfo, num * 1.1f, 1218652417) && GameObjectEx.ToBaseEntity(hitInfo.collider.gameObject) == ply)
+		if (GamePhysics.Trace(new Ray(vector + normalized * 5f, normalized), 0f, out var hitInfo, num * 1.1f, 1218652417) && GameObjectEx.ToBaseEntity(hitInfo.collider.gameObject) == ply)
 		{
 			return true;
 		}
@@ -378,8 +377,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			float num2 = Mathf.Min(100f, b);
 			int mask = LayerMask.GetMask("Terrain", "World", "Construction");
 			Vector3 b2 = Vector3.zero;
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.SphereCast(ray, num, out hitInfo, num2 - num * 0.5f, mask))
+			if (UnityEngine.Physics.SphereCast(ray, num, out var hitInfo, num2 - num * 0.5f, mask))
 			{
 				float num3 = 1f - hitInfo.distance / num2;
 				float num4 = terrainPushForce * num3;
@@ -387,8 +385,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			}
 			Ray ray2 = new Ray(vector, _lastMoveDir);
 			float num5 = Mathf.Min(10f, b);
-			RaycastHit hitInfo2;
-			if (UnityEngine.Physics.SphereCast(ray2, num, out hitInfo2, num5 - num * 0.5f, mask))
+			if (UnityEngine.Physics.SphereCast(ray2, num, out var hitInfo2, num5 - num * 0.5f, mask))
 			{
 				float num6 = 1f - hitInfo2.distance / num5;
 				float num7 = obstaclePushForce * num6;
@@ -516,8 +513,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		Vector3 normalized = (targetPos - position).normalized;
 		position += normalized * 2f;
 		Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(aimCone, normalized);
-		RaycastHit hitInfo;
-		if (GamePhysics.Trace(new Ray(position, modifiedAimConeDirection), 0f, out hitInfo, 300f, 1219701521))
+		if (GamePhysics.Trace(new Ray(position, modifiedAimConeDirection), 0f, out var hitInfo, 300f, 1219701521))
 		{
 			targetPos = hitInfo.point;
 			if ((bool)hitInfo.collider)
@@ -625,13 +621,12 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		float x = Mathf.Sin((float)Math.PI * 2f * num) * 10f;
 		float z = Mathf.Cos((float)Math.PI * 2f * num) * 10f;
 		Vector3 vector = new Vector3(x, 0f, z);
-		SetAimTarget(base.transform.position + vector, true);
+		SetAimTarget(base.transform.position + vector, isDoorSide: true);
 		Ray ray = new Ray(base.transform.position, GetLastMoveDir());
 		int mask = LayerMask.GetMask("Terrain", "World", "Construction", "Water");
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.SphereCast(ray, 3f, out hitInfo, 5f, mask) || UnityEngine.Time.realtimeSinceStartup > deathTimeout)
+		if (UnityEngine.Physics.SphereCast(ray, 3f, out var _, 5f, mask) || UnityEngine.Time.realtimeSinceStartup > deathTimeout)
 		{
-			helicopterBase.Hurt(helicopterBase.health * 2f, DamageType.Generic, null, false);
+			helicopterBase.Hurt(helicopterBase.health * 2f, DamageType.Generic, null, useProtection: false);
 		}
 	}
 
@@ -641,9 +636,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		_currentState = aiState.DEATH;
 		Vector3 randomOffset = GetRandomOffset(base.transform.position, 20f, 60f);
 		int num = 1236478737;
-		Vector3 pos;
-		Vector3 normal;
-		TransformUtil.GetGroundInfo(randomOffset - Vector3.up * 2f, out pos, out normal, 500f, num);
+		TransformUtil.GetGroundInfo(randomOffset - Vector3.up * 2f, out var pos, out var _, 500f, num);
 		SetTargetDestination(pos);
 		targetThrottleSpeed = 0.5f;
 		deathTimeout = UnityEngine.Time.realtimeSinceStartup + 10f;
@@ -795,8 +788,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 				vector = monumentInfo.transform.position;
 				_visitedMonuments.Add(monumentInfo);
 				vector.y = TerrainMeta.HeightMap.GetHeight(vector) + 200f;
-				RaycastHit hitOut;
-				if (TransformUtil.GetGroundInfo(vector, out hitOut, 300f, 1235288065))
+				if (TransformUtil.GetGroundInfo(vector, out var hitOut, 300f, 1235288065))
 				{
 					vector.y = hitOut.point.y;
 				}
@@ -897,9 +889,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			lastStrafeTime = UnityEngine.Time.realtimeSinceStartup;
 			_currentState = aiState.STRAFE;
 			int mask = LayerMask.GetMask("Terrain", "World", "Construction", "Water");
-			Vector3 pos;
-			Vector3 normal;
-			if (TransformUtil.GetGroundInfo(strafePos, out pos, out normal, 100f, mask, base.transform))
+			if (TransformUtil.GetGroundInfo(strafePos, out var pos, out var _, 100f, mask, base.transform))
 			{
 				strafe_target_position = pos;
 			}
@@ -986,12 +976,11 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			vector2 = AimConeUtil.GetModifiedAimConeDirection(num, vector2);
 		}
 		float maxDistance = 1f;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(vector, vector2, out hitInfo, maxDistance, 1236478737))
+		if (UnityEngine.Physics.Raycast(vector, vector2, out var hitInfo, maxDistance, 1236478737))
 		{
 			maxDistance = hitInfo.distance - 0.1f;
 		}
-		Effect.server.Run(helicopterBase.rocket_fire_effect.resourcePath, helicopterBase, StringPool.Get(flag ? "rocket_tube_left" : "rocket_tube_right"), Vector3.zero, Vector3.forward, null, true);
+		Effect.server.Run(helicopterBase.rocket_fire_effect.resourcePath, helicopterBase, StringPool.Get(flag ? "rocket_tube_left" : "rocket_tube_right"), Vector3.zero, Vector3.forward, null, broadcast: true);
 		BaseEntity baseEntity = GameManager.server.CreateEntity(useNapalm ? rocketProjectile_Napalm.resourcePath : rocketProjectile.resourcePath, vector);
 		if (!(baseEntity == null))
 		{
@@ -1086,8 +1075,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		Ray ray = new Ray(origin + new Vector3(0f, num, 0f), Vector3.down);
 		float num2 = 5f;
 		int mask = LayerMask.GetMask("Terrain", "World", "Construction", "Water");
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.SphereCast(ray, num2, out hitInfo, num * 2f - num2, mask))
+		if (UnityEngine.Physics.SphereCast(ray, num2, out var hitInfo, num * 2f - num2, mask))
 		{
 			origin = hitInfo.point;
 		}

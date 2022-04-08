@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("culling")]
+public class Culling : ConsoleSystem
 {
-	[Factory("culling")]
-	public class Culling : ConsoleSystem
-	{
-	}
 }

@@ -38,17 +38,17 @@ public class DoorManipulator : IOEntity
 
 	public virtual void SetupInitialDoorConnection()
 	{
-		if (targetDoor == null && !entityRef.IsValid(true))
+		if (targetDoor == null && !entityRef.IsValid(serverside: true))
 		{
 			SetTargetDoor(FindDoor(PairWithLockedDoors()));
 		}
-		if (targetDoor != null && !entityRef.IsValid(true))
+		if (targetDoor != null && !entityRef.IsValid(serverside: true))
 		{
 			entityRef.Set(targetDoor);
 		}
-		if (entityRef.IsValid(true) && targetDoor == null)
+		if (entityRef.IsValid(serverside: true) && targetDoor == null)
 		{
-			SetTargetDoor(entityRef.Get(true).GetComponent<Door>());
+			SetTargetDoor(entityRef.Get(serverside: true).GetComponent<Door>());
 		}
 	}
 
@@ -115,12 +115,12 @@ public class DoorManipulator : IOEntity
 			{
 				if (!targetDoor.IsOpen())
 				{
-					targetDoor.SetOpen(true);
+					targetDoor.SetOpen(open: true);
 				}
 			}
 			else if (targetDoor.IsOpen())
 			{
-				targetDoor.SetOpen(false);
+				targetDoor.SetOpen(open: false);
 			}
 		}
 		else if (powerAction == DoorEffect.Close)
@@ -129,12 +129,12 @@ public class DoorManipulator : IOEntity
 			{
 				if (targetDoor.IsOpen())
 				{
-					targetDoor.SetOpen(false);
+					targetDoor.SetOpen(open: false);
 				}
 			}
 			else if (!targetDoor.IsOpen())
 			{
-				targetDoor.SetOpen(true);
+				targetDoor.SetOpen(open: true);
 			}
 		}
 		else if (powerAction == DoorEffect.Toggle)

@@ -12,8 +12,7 @@ public class HumanPathFinder : BasePathFinder
 	public override AIMovePoint GetBestRoamPoint(Vector3 anchorPos, Vector3 currentPos, Vector3 currentDirection, float anchorClampDistance, float lookupMaxRange = 20f)
 	{
 		AIInformationZone aIInformationZone = null;
-		HumanNPC humanNPC;
-		if ((object)(humanNPC = npc as HumanNPC) != null)
+		if (npc is HumanNPC humanNPC)
 		{
 			aIInformationZone = ((!(humanNPC.VirtualInfoZone != null)) ? humanNPC.GetInformationZone(currentPos) : humanNPC.VirtualInfoZone);
 		}

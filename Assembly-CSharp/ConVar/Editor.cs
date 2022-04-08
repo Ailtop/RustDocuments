@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("editor")]
+public class Editor : ConsoleSystem
 {
-	[Factory("editor")]
-	public class Editor : ConsoleSystem
-	{
-	}
 }

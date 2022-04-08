@@ -113,8 +113,7 @@ public struct EntityRef<T> where T : BaseEntity
 		{
 			return null;
 		}
-		T result;
-		if ((result = baseEntity as T) == null)
+		if (!(baseEntity is T result))
 		{
 			Set(null);
 			return null;

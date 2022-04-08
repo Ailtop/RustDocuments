@@ -14,8 +14,8 @@ public class ExplosionDemoReactivator : MonoBehaviour
 		Transform[] componentsInChildren = GetComponentsInChildren<Transform>();
 		foreach (Transform obj in componentsInChildren)
 		{
-			obj.gameObject.SetActive(false);
-			obj.gameObject.SetActive(true);
+			obj.gameObject.SetActive(value: false);
+			obj.gameObject.SetActive(value: true);
 		}
 	}
 }

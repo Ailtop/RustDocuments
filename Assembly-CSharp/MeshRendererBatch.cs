@@ -88,7 +88,7 @@ public class MeshRendererBatch : MeshBatch
 		}
 		meshLookup.Apply();
 		meshData.Apply(meshBatch);
-		meshBatch.UploadMeshData(false);
+		meshBatch.UploadMeshData(markNoLongerReadable: false);
 	}
 
 	protected override void ToggleMesh(bool state)

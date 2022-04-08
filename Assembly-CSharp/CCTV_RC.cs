@@ -85,7 +85,7 @@ public class CCTV_RC : PoweredRemoteControlEntity
 		{
 			pitchAmount = pitch.localEulerAngles.x;
 			yawAmount = yaw.localEulerAngles.y;
-			UpdateRCAccess(true);
+			UpdateRCAccess(isOnline: true);
 		}
 	}
 

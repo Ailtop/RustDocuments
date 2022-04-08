@@ -19,9 +19,7 @@ public class PlayerModelHairCap : MonoBehaviour
 			{
 				continue;
 			}
-			float typeNum;
-			float dyeNum;
-			PlayerModelHair.GetRandomVariation(hairNum, i, index, out typeNum, out dyeNum);
+			PlayerModelHair.GetRandomVariation(hairNum, i, index, out var typeNum, out var dyeNum);
 			HairType hairType = (HairType)i;
 			HairSetCollection.HairSetEntry hairSetEntry = skinSet.HairCollection.Get(hairType, typeNum);
 			if (!(hairSetEntry.HairSet == null))

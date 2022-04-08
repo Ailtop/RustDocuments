@@ -1,9 +1,8 @@
-namespace Rust.Ai
+namespace Rust.Ai;
+
+public enum SensationType
 {
-	public enum SensationType
-	{
-		Gunshot = 0,
-		ThrownWeapon = 1,
-		Explosion = 2
-	}
+	Gunshot = 0,
+	ThrownWeapon = 1,
+	Explosion = 2
 }

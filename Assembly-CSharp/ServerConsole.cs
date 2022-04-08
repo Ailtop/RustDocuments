@@ -133,7 +133,7 @@ public class ServerConsole : SingletonComponent<ServerConsole>
 				string text2 = currentGameTime.ToString("[H:mm]");
 				string text3 = " " + text2 + " [" + currentPlayerCount + "/" + maxPlayerCount + "] " + ConVar.Server.hostname + " [" + ConVar.Server.level + "]";
 				string obj = (Performance.current.frameRate + "fps " + Performance.current.memoryCollections + "gc " + text) ?? "";
-				string text4 = Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesReceived_LastSecond).FormatBytes(true) + "/s in, " + Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond).FormatBytes(true) + "/s out";
+				string text4 = Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesReceived_LastSecond).FormatBytes(shortFormat: true) + "/s in, " + Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond).FormatBytes(shortFormat: true) + "/s out";
 				string text5 = obj.PadLeft(input.lineWidth - 1);
 				text5 = text3 + ((text3.Length < text5.Length) ? text5.Substring(text3.Length) : "");
 				string text6 = " " + currentEntityCount.ToString("n0") + " ents, " + currentSleeperCount.ToString("n0") + " slprs";

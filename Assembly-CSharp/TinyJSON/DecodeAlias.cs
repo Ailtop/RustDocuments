@@ -1,20 +1,19 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
+public class DecodeAlias : Attribute
 {
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
-	public class DecodeAlias : Attribute
+	public string[] Names { get; private set; }
+
+	public DecodeAlias(params string[] names)
 	{
-		public string[] Names { get; private set; }
+		Names = names;
+	}
 
-		public DecodeAlias(params string[] names)
-		{
-			Names = names;
-		}
-
-		public bool Contains(string name)
-		{
-			return Array.IndexOf(Names, name) > -1;
-		}
+	public bool Contains(string name)
+	{
+		return Array.IndexOf(Names, name) > -1;
 	}
 }

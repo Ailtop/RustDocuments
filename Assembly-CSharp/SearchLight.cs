@@ -111,7 +111,7 @@ public class SearchLight : IOEntity
 			if (player != null)
 			{
 				mountedPlayer = player;
-				SetFlag(Flags.Reserved5, true);
+				SetFlag(Flags.Reserved5, b: true);
 			}
 		}
 	}
@@ -122,7 +122,7 @@ public class SearchLight : IOEntity
 		{
 			mountedPlayer = null;
 		}
-		SetFlag(Flags.Reserved5, false);
+		SetFlag(Flags.Reserved5, b: false);
 	}
 
 	public void MountedUpdate()
@@ -172,7 +172,7 @@ public class SearchLight : IOEntity
 
 	public override void OnKilled(HitInfo info)
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		base.OnKilled(info);
 	}
 

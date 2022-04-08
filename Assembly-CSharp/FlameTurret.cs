@@ -133,7 +133,7 @@ public class FlameTurret : StorageContainer
 		{
 			if (info.damageTypes.IsMeleeType())
 			{
-				SetTriggered(true);
+				SetTriggered(triggered: true);
 			}
 			base.OnAttacked(info);
 		}
@@ -156,11 +156,11 @@ public class FlameTurret : StorageContainer
 		lastServerThink = Time.realtimeSinceStartup;
 		if (IsTriggered() && (Time.realtimeSinceStartup - triggeredTime > triggeredDuration || !HasFuel()))
 		{
-			SetTriggered(false);
+			SetTriggered(triggered: false);
 		}
 		if (!IsTriggered() && HasFuel() && CheckTrigger())
 		{
-			SetTriggered(true);
+			SetTriggered(triggered: true);
 			Effect.server.Run(triggeredEffect.resourcePath, base.transform.position, Vector3.up);
 		}
 		if (num != IsTriggered())
@@ -230,7 +230,7 @@ public class FlameTurret : StorageContainer
 	public override void OnKilled(HitInfo info)
 	{
 		float num = (float)GetFuelAmount() / 500f;
-		DamageUtil.RadiusDamage(this, LookupPrefab(), GetEyePosition(), 2f, 6f, damagePerSec, 133120, true);
+		DamageUtil.RadiusDamage(this, LookupPrefab(), GetEyePosition(), 2f, 6f, damagePerSec, 133120, useLineOfSight: true);
 		Effect.server.Run(explosionEffect.resourcePath, base.transform.position, Vector3.up);
 		int num2 = Mathf.CeilToInt(Mathf.Clamp(num * 8f, 1f, 8f));
 		for (int i = 0; i < num2; i++)
@@ -295,8 +295,8 @@ public class FlameTurret : StorageContainer
 		}
 		float amount = damagePerSec[0].amount;
 		damagePerSec[0].amount = amount * delta;
-		DamageUtil.RadiusDamage(this, LookupPrefab(), hitInfo.point - ray.direction * 0.1f, flameRadius * 0.5f, flameRadius, damagePerSec, 2230272, true);
-		DamageUtil.RadiusDamage(this, LookupPrefab(), base.transform.position + new Vector3(0f, 1.25f, 0f), 0.25f, 0.25f, damagePerSec, 133120, false);
+		DamageUtil.RadiusDamage(this, LookupPrefab(), hitInfo.point - ray.direction * 0.1f, flameRadius * 0.5f, flameRadius, damagePerSec, 2230272, useLineOfSight: true);
+		DamageUtil.RadiusDamage(this, LookupPrefab(), base.transform.position + new Vector3(0f, 1.25f, 0f), 0.25f, 0.25f, damagePerSec, 133120, useLineOfSight: false);
 		damagePerSec[0].amount = amount;
 		if (Time.realtimeSinceStartup >= nextFireballTime)
 		{

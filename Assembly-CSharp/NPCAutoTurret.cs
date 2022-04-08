@@ -17,7 +17,7 @@ public class NPCAutoTurret : AutoTurret
 	{
 		base.ServerInit();
 		SetOnline();
-		SetPeacekeepermode(true);
+		SetPeacekeepermode(isOn: true);
 	}
 
 	public virtual bool HasAmmo()

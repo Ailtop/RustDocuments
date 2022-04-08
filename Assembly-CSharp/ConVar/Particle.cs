@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("particle")]
+public class Particle : ConsoleSystem
 {
-	[Factory("particle")]
-	public class Particle : ConsoleSystem
-	{
-	}
 }

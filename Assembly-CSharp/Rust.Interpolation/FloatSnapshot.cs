@@ -1,27 +1,26 @@
 using UnityEngine;
 
-namespace Rust.Interpolation
+namespace Rust.Interpolation;
+
+public struct FloatSnapshot : Interpolator<FloatSnapshot>.ISnapshot
 {
-	public struct FloatSnapshot : Interpolator<FloatSnapshot>.ISnapshot
+	public float value;
+
+	public float Time { get; set; }
+
+	public FloatSnapshot(float time, float value)
 	{
-		public float value;
+		Time = time;
+		this.value = value;
+	}
 
-		public float Time { get; set; }
+	public void MatchValuesTo(FloatSnapshot entry)
+	{
+		value = entry.value;
+	}
 
-		public FloatSnapshot(float time, float value)
-		{
-			Time = time;
-			this.value = value;
-		}
-
-		public void MatchValuesTo(FloatSnapshot entry)
-		{
-			value = entry.value;
-		}
-
-		public void Lerp(FloatSnapshot prev, FloatSnapshot next, float delta)
-		{
-			value = Mathf.Lerp(prev.value, next.value, delta);
-		}
+	public void Lerp(FloatSnapshot prev, FloatSnapshot next, float delta)
+	{
+		value = Mathf.Lerp(prev.value, next.value, delta);
 	}
 }

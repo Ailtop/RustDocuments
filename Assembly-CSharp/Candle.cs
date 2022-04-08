@@ -86,14 +86,14 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 	public void Burn()
 	{
 		float num = burnRate / lifeTimeSeconds;
-		Hurt(num * MaxHealth(), DamageType.Decay, this, false);
+		Hurt(num * MaxHealth(), DamageType.Decay, this, useProtection: false);
 	}
 
 	public override void OnAttacked(HitInfo info)
 	{
 		if (base.isServer && info.damageTypes.Get(DamageType.Heat) > 0f && !IsOn())
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			UpdateInvokes();
 		}
 		base.OnAttacked(info);
@@ -112,7 +112,7 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 	{
 		if (amount > 1)
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			UpdateInvokes();
 			amount--;
 		}
@@ -121,7 +121,7 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 
 	public void Ignite(Vector3 fromPos)
 	{
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		UpdateInvokes();
 	}
 

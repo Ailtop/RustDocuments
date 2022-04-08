@@ -211,7 +211,7 @@ public class LiquidWeapon : BaseLiquidVessel
 		{
 			CancelInvoke("FireTick");
 			InvokeRepeating("FireTick", 0f, FireRate);
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			StartCooldown(FireRate);
 			if (base.isServer)
 			{
@@ -230,7 +230,7 @@ public class LiquidWeapon : BaseLiquidVessel
 		{
 			pressure = MaxPressure;
 		}
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		if (base.isServer)
 		{
 			SendNetworkUpdateImmediate();
@@ -319,8 +319,7 @@ public class LiquidWeapon : BaseLiquidVessel
 		}
 		Ray ray = ownerPlayer.eyes.BodyRay();
 		Debug.DrawLine(ray.origin, ray.origin + ray.direction * currentRange, Color.blue, 1f);
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(ray, out hitInfo, currentRange, 1218652417))
+		if (UnityEngine.Physics.Raycast(ray, out var hitInfo, currentRange, 1218652417))
 		{
 			DoSplash(ownerPlayer, hitInfo.point, ray.direction, num);
 		}
@@ -336,7 +335,7 @@ public class LiquidWeapon : BaseLiquidVessel
 			if (slot != null && slot.amount > 0 && !(slot.info == null))
 			{
 				WaterBall.DoSplash(position, SplashRadius, slot.info, amount);
-				DamageUtil.RadiusDamage(attacker, LookupPrefab(), position, MinDmgRadius, MaxDmgRadius, Damage, 131072, true);
+				DamageUtil.RadiusDamage(attacker, LookupPrefab(), position, MinDmgRadius, MaxDmgRadius, Damage, 131072, useLineOfSight: true);
 			}
 		}
 	}

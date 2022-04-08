@@ -39,8 +39,7 @@ public class ItemModGiveOxygen : ItemMod, IAirSupply
 		ItemMod[] array = siblingMods;
 		for (int i = 0; i < array.Length; i++)
 		{
-			ItemModCycle itemModCycle;
-			if ((object)(itemModCycle = array[i] as ItemModCycle) != null)
+			if (array[i] is ItemModCycle itemModCycle)
 			{
 				cycleTime = itemModCycle.timeBetweenCycles;
 			}

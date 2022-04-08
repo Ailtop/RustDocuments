@@ -7,7 +7,7 @@ public class MLRSAmmoIcon : MonoBehaviour
 
 	protected void Awake()
 	{
-		SetState(false);
+		SetState(filled: false);
 	}
 
 	public void SetState(bool filled)

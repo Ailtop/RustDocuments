@@ -25,8 +25,7 @@ public class Marketplace : BaseEntity
 			return 0u;
 		}
 		BaseEntity baseEntity = GameManager.server.CreateEntity(deliveryDronePrefab?.resourcePath, droneLaunchPoint.position, droneLaunchPoint.rotation);
-		DeliveryDrone deliveryDrone;
-		if ((object)(deliveryDrone = baseEntity as DeliveryDrone) == null)
+		if (!(baseEntity is DeliveryDrone deliveryDrone))
 		{
 			baseEntity.Kill();
 			return 0u;
@@ -39,8 +38,7 @@ public class Marketplace : BaseEntity
 
 	public void ReturnDrone(DeliveryDrone deliveryDrone)
 	{
-		MarketTerminal entity;
-		if (deliveryDrone.sourceTerminal.TryGet(true, out entity))
+		if (deliveryDrone.sourceTerminal.TryGet(serverside: true, out var entity))
 		{
 			entity.CompleteOrder(deliveryDrone.targetVendingMachine.uid);
 		}
@@ -66,8 +64,7 @@ public class Marketplace : BaseEntity
 		{
 			for (int i = terminalPoints.Length; i < terminalEntities.Length; i++)
 			{
-				MarketTerminal entity;
-				if (terminalEntities[i].TryGet(true, out entity))
+				if (terminalEntities[i].TryGet(serverside: true, out var entity))
 				{
 					entity.Kill();
 				}
@@ -77,14 +74,12 @@ public class Marketplace : BaseEntity
 		for (int j = 0; j < terminalPoints.Length; j++)
 		{
 			Transform transform = terminalPoints[j];
-			MarketTerminal entity2;
-			if (!terminalEntities[j].TryGet(true, out entity2))
+			if (!terminalEntities[j].TryGet(serverside: true, out var _))
 			{
 				BaseEntity baseEntity = GameManager.server.CreateEntity(terminalPrefab?.resourcePath, transform.position, transform.rotation);
-				baseEntity.SetParent(this, true);
+				baseEntity.SetParent(this, worldPositionStays: true);
 				baseEntity.Spawn();
-				MarketTerminal marketTerminal;
-				if ((object)(marketTerminal = baseEntity as MarketTerminal) == null)
+				if (!(baseEntity is MarketTerminal marketTerminal))
 				{
 					Debug.LogError("Marketplace.terminalPrefab did not spawn a MarketTerminal (it spawned " + baseEntity.GetType().FullName + ")");
 					baseEntity.Kill();

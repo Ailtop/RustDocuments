@@ -25,7 +25,7 @@ public class TerrainBiomeMap : TerrainMap<byte>
 					{
 						Color32 color = pixels[num];
 						byte[] array = dst;
-						int re = res;
+						_ = res;
 						array[(0 + i) * res + num2] = color.r;
 						dst[(res + i) * res + num2] = color.g;
 						dst[(2 * res + i) * res + num2] = color.b;
@@ -50,7 +50,7 @@ public class TerrainBiomeMap : TerrainMap<byte>
 
 	public void GenerateTextures()
 	{
-		BiomeTexture = new Texture2D(res, res, TextureFormat.RGBA32, true, true);
+		BiomeTexture = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: true, linear: true);
 		BiomeTexture.name = "BiomeTexture";
 		BiomeTexture.wrapMode = TextureWrapMode.Clamp;
 		Color32[] col = new Color32[res * res];
@@ -59,7 +59,7 @@ public class TerrainBiomeMap : TerrainMap<byte>
 			for (int i = 0; i < res; i++)
 			{
 				byte[] array = src;
-				int re = res;
+				_ = res;
 				byte r = array[(0 + z) * res + i];
 				byte g = src[(res + z) * res + i];
 				byte b = src[(2 * res + z) * res + i];
@@ -72,9 +72,9 @@ public class TerrainBiomeMap : TerrainMap<byte>
 
 	public void ApplyTextures()
 	{
-		BiomeTexture.Apply(true, false);
-		BiomeTexture.Compress(false);
-		BiomeTexture.Apply(false, true);
+		BiomeTexture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+		BiomeTexture.Compress(highQuality: false);
+		BiomeTexture.Apply(updateMipmaps: false, makeNoLongerReadable: true);
 	}
 
 	public float GetBiomeMax(Vector3 worldPos, int mask = -1)
@@ -249,7 +249,7 @@ public class TerrainBiomeMap : TerrainMap<byte>
 			if (num2 == 0f && opacity == 1f)
 			{
 				byte[] array = dst;
-				int re = res;
+				_ = res;
 				array[(0 + z) * res + x] = BitUtility.Float2Byte(v.x);
 				dst[(res + z) * res + x] = BitUtility.Float2Byte(v.y);
 				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(v.z);
@@ -258,10 +258,10 @@ public class TerrainBiomeMap : TerrainMap<byte>
 			else
 			{
 				byte[] array2 = dst;
-				int re2 = res;
+				_ = res;
 				int num3 = (0 + z) * res + x;
 				byte[] array3 = src;
-				int re3 = res;
+				_ = res;
 				array2[num3] = BitUtility.Float2Byte(BitUtility.Byte2Float(array3[(0 + z) * res + x]) * num2 + v.x * opacity);
 				dst[(res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(res + z) * res + x]) * num2 + v.y * opacity);
 				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(2 * res + z) * res + x]) * num2 + v.z * opacity);

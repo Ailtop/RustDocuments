@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("effects")]
+public class Effects : ConsoleSystem
 {
-	[Factory("effects")]
-	public class Effects : ConsoleSystem
-	{
-	}
 }

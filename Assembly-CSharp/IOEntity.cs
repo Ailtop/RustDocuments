@@ -29,21 +29,21 @@ public class IOEntity : DecayEntity
 
 		public void Init()
 		{
-			if (ioEnt != null && !entityRef.IsValid(true))
+			if (ioEnt != null && !entityRef.IsValid(serverside: true))
 			{
 				entityRef.Set(ioEnt);
 			}
-			if (entityRef.IsValid(true))
+			if (entityRef.IsValid(serverside: true))
 			{
-				ioEnt = entityRef.Get(true).GetComponent<IOEntity>();
+				ioEnt = entityRef.Get(serverside: true).GetComponent<IOEntity>();
 			}
 		}
 
 		public void InitClient()
 		{
-			if (entityRef.IsValid(false) && ioEnt == null)
+			if (entityRef.IsValid(serverside: false) && ioEnt == null)
 			{
-				ioEnt = entityRef.Get(false).GetComponent<IOEntity>();
+				ioEnt = entityRef.Get(serverside: false).GetComponent<IOEntity>();
 			}
 		}
 
@@ -256,7 +256,7 @@ public class IOEntity : DecayEntity
 					worldHandlePosition = iOEntity.transform.TransformPoint(iOEntity.outputs[0].handlePosition);
 					return iOEntity;
 				}
-				iOEntity = iOEntity.FindGravitySource(ref worldHandlePosition, depth - 1, false);
+				iOEntity = iOEntity.FindGravitySource(ref worldHandlePosition, depth - 1, ignoreSelf: false);
 				if (iOEntity != null)
 				{
 					worldHandlePosition = iOEntity.transform.TransformPoint(iOEntity.outputs[0].handlePosition);
@@ -548,7 +548,7 @@ public class IOEntity : DecayEntity
 
 	public void Shutdown()
 	{
-		SendChangedToRoot(true);
+		SendChangedToRoot(forceUpdate: true);
 		ClearConnections();
 	}
 
@@ -611,7 +611,7 @@ public class IOEntity : DecayEntity
 
 	public virtual void UpdateHasPower(int inputAmount, int inputSlot)
 	{
-		SetFlag(Flags.Reserved8, inputAmount >= ConsumptionAmount() && inputAmount > 0, false, false);
+		SetFlag(Flags.Reserved8, inputAmount >= ConsumptionAmount() && inputAmount > 0, recursive: false, networkupdate: false);
 	}
 
 	public void TouchInternal()

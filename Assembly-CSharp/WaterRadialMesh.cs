@@ -45,7 +45,7 @@ public class WaterRadialMesh
 		mesh.vertices = vertices;
 		mesh.SetIndices(indices, MeshTopology.Quads, 0);
 		mesh.RecalculateBounds();
-		mesh.UploadMeshData(true);
+		mesh.UploadMeshData(markNoLongerReadable: true);
 		return mesh;
 	}
 

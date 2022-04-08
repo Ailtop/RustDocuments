@@ -220,8 +220,8 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public float ApplyCollisionsToTrackSpeed(float trackSpeed, float deltaTime)
 	{
-		trackSpeed = ApplyCollisions(trackSpeed, true, frontCollisionTrigger, ref staticCollidingAtFront, deltaTime);
-		trackSpeed = ApplyCollisions(trackSpeed, false, rearCollisionTrigger, ref staticCollidingAtRear, deltaTime);
+		trackSpeed = ApplyCollisions(trackSpeed, atOurFront: true, frontCollisionTrigger, ref staticCollidingAtFront, deltaTime);
+		trackSpeed = ApplyCollisions(trackSpeed, atOurFront: false, rearCollisionTrigger, ref staticCollidingAtRear, deltaTime);
 		Rigidbody rigidbody = null;
 		foreach (KeyValuePair<Rigidbody, float> prevTrackSpeed in prevTrackSpeeds)
 		{
@@ -252,7 +252,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 			}
 			foreach (Rigidbody otherRigidbodyContent in trigger.otherRigidbodyContents)
 			{
-				trackSpeed = HandleRigidbodyCollision(atOurFront, trackSpeed, otherRigidbodyContent, otherRigidbodyContent.mass, deltaTime, true);
+				trackSpeed = HandleRigidbodyCollision(atOurFront, trackSpeed, otherRigidbodyContent, otherRigidbodyContent.mass, deltaTime, calcSecondaryForces: true);
 				num += Vector3.Magnitude(otherRigidbodyContent.velocity - rigidBody.velocity) * otherRigidbodyContent.mass;
 			}
 		}
@@ -306,7 +306,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		else
 		{
 			float totalPushingMass = theirTrain.GetTotalPushingMass(pushDirection);
-			trackSpeed = ((!(totalPushingMass < 0f)) ? HandleRigidbodyCollision(front, trackSpeed, theirTrain.rigidBody, totalPushingMass, deltaTime, false) : HandleStaticCollisions(true, front, trackSpeed, ref wasStaticColliding));
+			trackSpeed = ((!(totalPushingMass < 0f)) ? HandleRigidbodyCollision(front, trackSpeed, theirTrain.rigidBody, totalPushingMass, deltaTime, calcSecondaryForces: false) : HandleStaticCollisions(staticColliding: true, front, trackSpeed, ref wasStaticColliding));
 			float num2 = theirTrain.GetTotalPushingForces(pushDirection);
 			if (!front)
 			{
@@ -352,7 +352,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 			return 0f;
 		}
 		float num = ((!(forceMagnitude > derailCollisionForce)) ? (Mathf.Pow(forceMagnitude, 1.4f) / collisionDamageDivide) : float.MaxValue);
-		Hurt(num, DamageType.Collision, this, false);
+		Hurt(num, DamageType.Collision, this, useProtection: false);
 		return num;
 	}
 
@@ -429,9 +429,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	{
 		base.Spawn();
 		initialSpawnTime = UnityEngine.Time.time;
-		TrainTrackSpline splineResult;
-		float distResult;
-		if (TrainTrackSpline.TryFindTrackNearby(GetFrontWheelPos(), 2f, out splineResult, out distResult) && splineResult.HasClearTrackSpaceNear(this))
+		if (TrainTrackSpline.TryFindTrackNearby(GetFrontWheelPos(), 2f, out var splineResult, out var distResult) && splineResult.HasClearTrackSpaceNear(this))
 		{
 			FrontWheelSplineDist = distResult;
 			Vector3 tangent;
@@ -618,9 +616,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		TrackSpeed = ApplyCollisionsToTrackSpeed(TrackSpeed, deltaTime);
 		float distMoved = TrackSpeed * deltaTime;
 		TrainTrackSpline preferredAltTrack = ((RearTrackSection != FrontTrackSection) ? RearTrackSection : null);
-		TrainTrackSpline onSpline;
-		bool atEndOfLine;
-		FrontWheelSplineDist = FrontTrackSection.GetSplineDistAfterMove(FrontWheelSplineDist, base.transform.forward, distMoved, curTrackSelection, out onSpline, out atEndOfLine, preferredAltTrack);
+		FrontWheelSplineDist = FrontTrackSection.GetSplineDistAfterMove(FrontWheelSplineDist, base.transform.forward, distMoved, curTrackSelection, out var onSpline, out var _, preferredAltTrack);
 		Vector3 tangent;
 		Vector3 positionAndTangent = onSpline.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out tangent);
 		SetTheRestFromFrontWheelData(ref onSpline, positionAndTangent, tangent);
@@ -637,8 +633,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		Vector3 positionAndTangent = onSpline.GetPositionAndTangent(splineDistAfterMove, base.transform.forward, out tangent);
 		if (atEndOfLine)
 		{
-			bool atEndOfLine2;
-			FrontWheelSplineDist = onSpline.GetSplineDistAfterMove(splineDistAfterMove, base.transform.forward, distFrontToBackWheel, curTrackSelection, out frontTS, out atEndOfLine2, onSpline);
+			FrontWheelSplineDist = onSpline.GetSplineDistAfterMove(splineDistAfterMove, base.transform.forward, distFrontToBackWheel, curTrackSelection, out frontTS, out var _, onSpline);
 			targetFrontWheelPos = frontTS.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out targetFrontWheelTangent);
 		}
 		RearTrackSection = onSpline;

@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("lerp")]
+public class Lerp : ConsoleSystem
 {
-	[Factory("lerp")]
-	public class Lerp : ConsoleSystem
-	{
-	}
 }

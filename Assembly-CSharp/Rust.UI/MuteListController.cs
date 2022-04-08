@@ -1,13 +1,12 @@
 using UnityEngine;
 
-namespace Rust.UI
+namespace Rust.UI;
+
+public class MuteListController : UIDialog
 {
-	public class MuteListController : UIDialog
-	{
-		public RectTransform ListParent;
+	public RectTransform ListParent;
 
-		public GameObjectRef UserWidget;
+	public GameObjectRef UserWidget;
 
-		public SteamFriendsList SearchList;
-	}
+	public SteamFriendsList SearchList;
 }

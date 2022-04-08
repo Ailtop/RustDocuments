@@ -12,7 +12,7 @@ public static class CameraUtil
 	public static void ExtractPlanes(Camera camera, ref Plane[] planes)
 	{
 		Matrix4x4 worldToCameraMatrix = camera.worldToCameraMatrix;
-		ExtractPlanes(GL.GetGPUProjectionMatrix(camera.projectionMatrix, false) * worldToCameraMatrix, ref planes);
+		ExtractPlanes(GL.GetGPUProjectionMatrix(camera.projectionMatrix, renderIntoTexture: false) * worldToCameraMatrix, ref planes);
 	}
 
 	public static void ExtractPlanes(Matrix4x4 viewProjMatrix, ref Plane[] planes)

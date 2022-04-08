@@ -53,7 +53,7 @@ public class TerrainWaterMap : TerrainMap<short>
 				heights[z * res + i] = BitUtility.EncodeShort(src[z * res + i]);
 			}
 		});
-		WaterTexture = new Texture2D(res, res, TextureFormat.RGBA32, true, true);
+		WaterTexture = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: true, linear: true);
 		WaterTexture.name = "WaterTexture";
 		WaterTexture.wrapMode = TextureWrapMode.Clamp;
 		WaterTexture.SetPixels32(heights);
@@ -61,7 +61,7 @@ public class TerrainWaterMap : TerrainMap<short>
 
 	public void ApplyTextures()
 	{
-		WaterTexture.Apply(true, true);
+		WaterTexture.Apply(updateMipmaps: true, makeNoLongerReadable: true);
 	}
 
 	public float GetHeight(Vector3 worldPos)

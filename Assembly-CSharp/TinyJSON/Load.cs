@@ -1,9 +1,8 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+[Obsolete("Use the AfterDecode attribute instead.")]
+public sealed class Load : AfterDecode
 {
-	[Obsolete("Use the AfterDecode attribute instead.")]
-	public sealed class Load : AfterDecode
-	{
-	}
 }

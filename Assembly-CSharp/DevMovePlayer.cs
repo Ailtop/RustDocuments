@@ -82,13 +82,12 @@ public class DevMovePlayer : BaseMonoBehaviour
 			Vector3 position = base.transform.position;
 			float range = 1f;
 			LayerMask mask = 1537286401;
-			RaycastHit hitOut;
-			if (TransformUtil.GetGroundInfo(base.transform.position + normalized * speed * Time.deltaTime, out hitOut, range, mask, player.transform))
+			if (TransformUtil.GetGroundInfo(base.transform.position + normalized * speed * Time.deltaTime, out var hitOut, range, mask, player.transform))
 			{
 				position = hitOut.point;
 			}
 			base.transform.position = position;
-			Vector3 normalized2 = (new Vector3(destination.x, 0f, destination.z) - new Vector3(player.transform.position.x, 0f, player.transform.position.z)).normalized;
+			_ = (new Vector3(destination.x, 0f, destination.z) - new Vector3(player.transform.position.x, 0f, player.transform.position.z)).normalized;
 			player.SendNetworkUpdate();
 		}
 	}

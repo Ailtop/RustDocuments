@@ -1,11 +1,10 @@
 using UnityEngine;
 
-namespace Rust.UI.ServerAdmin
-{
-	public class ServerAdminServerInfo : MonoBehaviour
-	{
-		public RustText InfoName;
+namespace Rust.UI.ServerAdmin;
 
-		public RustText InfoValue;
-	}
+public class ServerAdminServerInfo : MonoBehaviour
+{
+	public RustText InfoName;
+
+	public RustText InfoValue;
 }

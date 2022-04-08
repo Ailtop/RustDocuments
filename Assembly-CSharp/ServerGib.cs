@@ -23,7 +23,7 @@ public class ServerGib : BaseCombatEntity
 	public static List<ServerGib> CreateGibs(string entityToCreatePath, GameObject creator, GameObject gibSource, Vector3 inheritVelocity, float spreadVelocity)
 	{
 		List<ServerGib> list = new List<ServerGib>();
-		MeshRenderer[] componentsInChildren = gibSource.GetComponentsInChildren<MeshRenderer>(true);
+		MeshRenderer[] componentsInChildren = gibSource.GetComponentsInChildren<MeshRenderer>(includeInactive: true);
 		foreach (MeshRenderer meshRenderer in componentsInChildren)
 		{
 			MeshFilter component = meshRenderer.GetComponent<MeshFilter>();
@@ -53,7 +53,7 @@ public class ServerGib : BaseCombatEntity
 			{
 				if (!(item == item2))
 				{
-					Physics.IgnoreCollision(item2.GetCollider(), item.GetCollider(), true);
+					Physics.IgnoreCollision(item2.GetCollider(), item.GetCollider(), ignore: true);
 				}
 			}
 		}

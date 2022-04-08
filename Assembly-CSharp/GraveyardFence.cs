@@ -29,7 +29,7 @@ public class GraveyardFence : SimpleBuildingBlock
 		BoxCollider[] array = pillars;
 		foreach (BoxCollider boxCollider in array)
 		{
-			boxCollider.gameObject.SetActive(true);
+			boxCollider.gameObject.SetActive(value: true);
 			Collider[] array2 = Physics.OverlapBox(boxCollider.transform.TransformPoint(boxCollider.center), boxCollider.size * 0.5f, boxCollider.transform.rotation, 2097152);
 			foreach (Collider collider in array2)
 			{
@@ -38,7 +38,7 @@ public class GraveyardFence : SimpleBuildingBlock
 					BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider.gameObject);
 					if (!(baseEntity == null) && !EqualNetID(baseEntity) && collider != boxCollider)
 					{
-						boxCollider.gameObject.SetActive(false);
+						boxCollider.gameObject.SetActive(value: false);
 					}
 				}
 			}

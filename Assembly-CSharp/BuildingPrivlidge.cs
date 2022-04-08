@@ -413,7 +413,7 @@ public class BuildingPrivlidge : StorageContainer
 		for (int i = 0; i < itemAmounts.Count; i++)
 		{
 			ItemAmount itemAmount = itemAmounts[i];
-			if ((float)base.inventory.GetAmount(itemAmount.itemid, true) < itemAmount.amount)
+			if ((float)base.inventory.GetAmount(itemAmount.itemid, onlyUsableAmounts: true) < itemAmount.amount)
 			{
 				if (IsDebugging())
 				{
@@ -450,7 +450,7 @@ public class BuildingPrivlidge : StorageContainer
 		{
 			return;
 		}
-		float num = Mathf.Min(GetProtectedMinutes(true) * 60f, deltaTime);
+		float num = Mathf.Min(GetProtectedMinutes(force: true) * 60f, deltaTime);
 		if (!(num > 0f))
 		{
 			return;
@@ -564,7 +564,7 @@ public class BuildingPrivlidge : StorageContainer
 
 	public void UpdateMaxAuthCapacity()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if ((bool)activeGameMode && activeGameMode.limitTeamAuths)
 		{
 			SetFlag(Flags.Reserved5, authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize());

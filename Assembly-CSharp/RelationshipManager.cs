@@ -70,8 +70,7 @@ public class RelationshipManager : BaseEntity
 
 		public bool Forget(ulong player)
 		{
-			PlayerRelationshipInfo value;
-			if (relations.TryGetValue(player, out value))
+			if (relations.TryGetValue(player, out var value))
 			{
 				relations.Remove(player);
 				if (value.mugshotCrc != 0)
@@ -86,8 +85,7 @@ public class RelationshipManager : BaseEntity
 		public PlayerRelationshipInfo GetRelations(ulong player)
 		{
 			BasePlayer basePlayer = FindByID(player);
-			PlayerRelationshipInfo value;
-			if (relations.TryGetValue(player, out value))
+			if (relations.TryGetValue(player, out var value))
 			{
 				if (basePlayer != null)
 				{
@@ -593,7 +591,7 @@ public class RelationshipManager : BaseEntity
 			Debug.Log("Please append the word 'confirm' at the end of the console command to execute");
 			return;
 		}
-		ulong userID = basePlayer.userID;
+		_ = basePlayer.userID;
 		ServerInstance.relationships.Clear();
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
@@ -808,7 +806,7 @@ public class RelationshipManager : BaseEntity
 			{
 				_dirtyRelationshipPlayers.Add(player);
 			}
-			ulong userID = player.userID;
+			_ = player.userID;
 		}
 	}
 
@@ -840,8 +838,7 @@ public class RelationshipManager : BaseEntity
 
 	public int GetNumberRelationships(ulong player)
 	{
-		PlayerRelationships value;
-		if (relationships.TryGetValue(player, out value))
+		if (relationships.TryGetValue(player, out var value))
 		{
 			return value.relations.Count;
 		}
@@ -850,8 +847,7 @@ public class RelationshipManager : BaseEntity
 
 	public bool HasRelations(ulong player, ulong otherPlayer)
 	{
-		PlayerRelationships value;
-		if (relationships.TryGetValue(player, out value) && value.relations.ContainsKey(otherPlayer))
+		if (relationships.TryGetValue(player, out var value) && value.relations.ContainsKey(otherPlayer))
 		{
 			return true;
 		}
@@ -860,8 +856,7 @@ public class RelationshipManager : BaseEntity
 
 	public PlayerRelationships GetRelationships(ulong player)
 	{
-		PlayerRelationships value;
-		if (relationships.TryGetValue(player, out value))
+		if (relationships.TryGetValue(player, out var value))
 		{
 			return value;
 		}
@@ -904,11 +899,11 @@ public class RelationshipManager : BaseEntity
 		BasePlayer basePlayer = FindByID(num);
 		if (basePlayer == null)
 		{
-			ForceRelationshipByID(player, num, relationshipType, 0, true);
+			ForceRelationshipByID(player, num, relationshipType, 0, sendImmediate: true);
 		}
 		else
 		{
-			SetRelationship(player, basePlayer, relationshipType, 1, true);
+			SetRelationship(player, basePlayer, relationshipType, 1, sendImmediate: true);
 		}
 	}
 
@@ -931,9 +926,7 @@ public class RelationshipManager : BaseEntity
 		ulong num = msg.read.UInt64();
 		uint num2 = msg.read.UInt32();
 		byte[] array = msg.read.BytesWithSize(65536u);
-		PlayerRelationships value;
-		PlayerRelationshipInfo value2;
-		if (array != null && ImageProcessing.IsValidJPG(array, 256, 512) && relationships.TryGetValue(userID, out value) && value.relations.TryGetValue(num, out value2))
+		if (array != null && ImageProcessing.IsValidJPG(array, 256, 512) && relationships.TryGetValue(userID, out var value) && value.relations.TryGetValue(num, out var value2))
 		{
 			uint steamIdHash = GetSteamIdHash(userID, num);
 			uint num3 = FileStorage.server.Store(array, FileStorage.Type.jpg, net.ID, steamIdHash);
@@ -966,7 +959,7 @@ public class RelationshipManager : BaseEntity
 
 	public int GetMaxTeamSize()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if ((bool)activeGameMode)
 		{
 			return activeGameMode.GetMaxRelationshipTeamSize();
@@ -1034,7 +1027,7 @@ public class RelationshipManager : BaseEntity
 		info.msg.relationshipManager.relationships = Facepunch.Pool.GetList<ProtoBuf.RelationshipManager.PlayerRelationships>();
 		foreach (ulong key in relationships.Keys)
 		{
-			PlayerRelationships playerRelationship = relationships[key];
+			_ = relationships[key];
 			ProtoBuf.RelationshipManager.PlayerRelationships relationshipSaveByID = GetRelationshipSaveByID(key);
 			info.msg.relationshipManager.relationships.Add(relationshipSaveByID);
 		}
@@ -1084,8 +1077,7 @@ public class RelationshipManager : BaseEntity
 
 	public PlayerTeam FindPlayersTeam(ulong userID)
 	{
-		PlayerTeam value;
-		if (playerToTeam.TryGetValue(userID, out value))
+		if (playerToTeam.TryGetValue(userID, out var value))
 		{
 			return value;
 		}
@@ -1194,8 +1186,7 @@ public class RelationshipManager : BaseEntity
 
 	public static BasePlayer GetLookingAtPlayer(BasePlayer source)
 	{
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(source.eyes.position, source.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
+		if (UnityEngine.Physics.Raycast(source.eyes.position, source.eyes.HeadForward(), out var hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
 			if ((bool)entity)
@@ -1210,8 +1201,7 @@ public class RelationshipManager : BaseEntity
 	public static void sleeptoggle(ConsoleSystem.Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		RaycastHit hitInfo;
-		if (basePlayer == null || !UnityEngine.Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
+		if (basePlayer == null || !UnityEngine.Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out var hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			return;
 		}
@@ -1258,8 +1248,7 @@ public class RelationshipManager : BaseEntity
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		PlayerTeam playerTeam = ServerInstance.FindTeam(basePlayer.currentTeam);
-		RaycastHit hitInfo;
-		if (playerTeam == null || playerTeam.GetLeader() == null || playerTeam.GetLeader() != basePlayer || !UnityEngine.Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
+		if (playerTeam == null || playerTeam.GetLeader() == null || playerTeam.GetLeader() != basePlayer || !UnityEngine.Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out var hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			return;
 		}
@@ -1296,8 +1285,7 @@ public class RelationshipManager : BaseEntity
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		PlayerTeam playerTeam = ServerInstance.FindTeam(basePlayer.currentTeam);
-		RaycastHit hitInfo;
-		if (playerTeam == null || playerTeam.GetLeader() == null || playerTeam.GetLeader() != basePlayer || !UnityEngine.Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
+		if (playerTeam == null || playerTeam.GetLeader() == null || playerTeam.GetLeader() != basePlayer || !UnityEngine.Physics.Raycast(basePlayer.eyes.position, basePlayer.eyes.HeadForward(), out var hitInfo, 5f, 1218652417, QueryTriggerInteraction.Ignore))
 		{
 			return;
 		}

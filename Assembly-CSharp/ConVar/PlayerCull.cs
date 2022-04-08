@@ -1,6 +1,5 @@
-namespace ConVar
+namespace ConVar;
+
+public class PlayerCull : ConsoleSystem
 {
-	public class PlayerCull : ConsoleSystem
-	{
-	}
 }

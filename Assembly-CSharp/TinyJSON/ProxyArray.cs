@@ -1,81 +1,78 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+public sealed class ProxyArray : Variant, IEnumerable<Variant>, IEnumerable
 {
-	public sealed class ProxyArray : Variant, IEnumerable<Variant>, IEnumerable
+	private readonly List<Variant> list;
+
+	public override Variant this[int index]
 	{
-		private readonly List<Variant> list;
-
-		public override Variant this[int index]
+		get
 		{
-			get
-			{
-				return list[index];
-			}
-			set
-			{
-				list[index] = value;
-			}
+			return list[index];
 		}
-
-		public int Count => list.Count;
-
-		public ProxyArray()
+		set
 		{
-			list = new List<Variant>();
+			list[index] = value;
 		}
+	}
 
-		IEnumerator<Variant> IEnumerable<Variant>.GetEnumerator()
+	public int Count => list.Count;
+
+	public ProxyArray()
+	{
+		list = new List<Variant>();
+	}
+
+	IEnumerator<Variant> IEnumerable<Variant>.GetEnumerator()
+	{
+		return list.GetEnumerator();
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return list.GetEnumerator();
+	}
+
+	public void Add(Variant item)
+	{
+		list.Add(item);
+	}
+
+	internal bool CanBeMultiRankArray(int[] rankLengths)
+	{
+		return CanBeMultiRankArray(0, rankLengths);
+	}
+
+	private bool CanBeMultiRankArray(int rank, int[] rankLengths)
+	{
+		int num = (rankLengths[rank] = list.Count);
+		if (rank == rankLengths.Length - 1)
 		{
-			return list.GetEnumerator();
+			return true;
 		}
-
-		IEnumerator IEnumerable.GetEnumerator()
+		if (!(list[0] is ProxyArray proxyArray))
 		{
-			return list.GetEnumerator();
+			return false;
 		}
-
-		public void Add(Variant item)
+		int count = proxyArray.Count;
+		for (int i = 1; i < num; i++)
 		{
-			list.Add(item);
-		}
-
-		internal bool CanBeMultiRankArray(int[] rankLengths)
-		{
-			return CanBeMultiRankArray(0, rankLengths);
-		}
-
-		private bool CanBeMultiRankArray(int rank, int[] rankLengths)
-		{
-			int num = (rankLengths[rank] = list.Count);
-			if (rank == rankLengths.Length - 1)
-			{
-				return true;
-			}
-			ProxyArray proxyArray = list[0] as ProxyArray;
-			if (proxyArray == null)
+			if (!(list[i] is ProxyArray proxyArray2))
 			{
 				return false;
 			}
-			int count = proxyArray.Count;
-			for (int i = 1; i < num; i++)
+			if (proxyArray2.Count != count)
 			{
-				ProxyArray proxyArray2 = list[i] as ProxyArray;
-				if (proxyArray2 == null)
-				{
-					return false;
-				}
-				if (proxyArray2.Count != count)
-				{
-					return false;
-				}
-				if (!proxyArray2.CanBeMultiRankArray(rank + 1, rankLengths))
-				{
-					return false;
-				}
+				return false;
 			}
-			return true;
+			if (!proxyArray2.CanBeMultiRankArray(rank + 1, rankLengths))
+			{
+				return false;
+			}
 		}
+		return true;
 	}
 }

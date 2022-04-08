@@ -1,54 +1,53 @@
 using UnityEngine;
 
-namespace ConVar
+namespace ConVar;
+
+[Factory("time")]
+public class Time : ConsoleSystem
 {
-	[Factory("time")]
-	public class Time : ConsoleSystem
+	[ServerVar]
+	[Help("Pause time while loading")]
+	public static bool pausewhileloading = true;
+
+	[ServerVar]
+	[Help("Fixed delta time in seconds")]
+	public static float fixeddelta
 	{
-		[ServerVar]
-		[Help("Pause time while loading")]
-		public static bool pausewhileloading = true;
-
-		[ServerVar]
-		[Help("Fixed delta time in seconds")]
-		public static float fixeddelta
+		get
 		{
-			get
-			{
-				return UnityEngine.Time.fixedDeltaTime;
-			}
-			set
-			{
-				UnityEngine.Time.fixedDeltaTime = value;
-			}
+			return UnityEngine.Time.fixedDeltaTime;
 		}
-
-		[ServerVar]
-		[Help("The minimum amount of times to tick per frame")]
-		public static float maxdelta
+		set
 		{
-			get
-			{
-				return UnityEngine.Time.maximumDeltaTime;
-			}
-			set
-			{
-				UnityEngine.Time.maximumDeltaTime = value;
-			}
+			UnityEngine.Time.fixedDeltaTime = value;
 		}
+	}
 
-		[ServerVar]
-		[Help("The time scale")]
-		public static float timescale
+	[ServerVar]
+	[Help("The minimum amount of times to tick per frame")]
+	public static float maxdelta
+	{
+		get
 		{
-			get
-			{
-				return UnityEngine.Time.timeScale;
-			}
-			set
-			{
-				UnityEngine.Time.timeScale = value;
-			}
+			return UnityEngine.Time.maximumDeltaTime;
+		}
+		set
+		{
+			UnityEngine.Time.maximumDeltaTime = value;
+		}
+	}
+
+	[ServerVar]
+	[Help("The time scale")]
+	public static float timescale
+	{
+		get
+		{
+			return UnityEngine.Time.timeScale;
+		}
+		set
+		{
+			UnityEngine.Time.timeScale = value;
 		}
 	}
 }

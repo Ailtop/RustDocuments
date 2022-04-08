@@ -51,9 +51,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		TrainTrackSpline splineResult;
-		float distResult;
-		if (TrainTrackSpline.TryFindTrackNearby(base.transform.position, 3f, out splineResult, out distResult))
+		if (TrainTrackSpline.TryFindTrackNearby(base.transform.position, 3f, out var splineResult, out var distResult))
 		{
 			track = splineResult;
 			FrontWheelSplineDist = distResult;
@@ -92,12 +90,12 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 			hitTrain.ReduceSpeedBy(velReduction);
 			if (vehicle.cinematictrains)
 			{
-				hitTrain.Hurt(9999f, DamageType.Collision, this, false);
+				hitTrain.Hurt(9999f, DamageType.Collision, this, useProtection: false);
 			}
 			else
 			{
 				float amount = Mathf.Abs(hitTrain.TrackSpeed) * trainDamagePerMPS;
-				hitTrain.Hurt(amount, DamageType.Collision, this, false);
+				hitTrain.Hurt(amount, DamageType.Collision, this, useProtection: false);
 			}
 		}
 		ClearHitTrain();

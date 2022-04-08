@@ -20,8 +20,7 @@ public static class FloodedSpawnHandler
 		for (int i = 0; i < 10; i++)
 		{
 			Vector3 vector = FindSpawnPoint(searchHeight);
-			RaycastHit hitInfo;
-			if ((int)placementCheckMask != 0 && Physics.Raycast(vector + Vector3.up * placementCheckHeight, Vector3.down, out hitInfo, placementCheckHeight, placementCheckMask))
+			if ((int)placementCheckMask != 0 && Physics.Raycast(vector + Vector3.up * placementCheckHeight, Vector3.down, out var hitInfo, placementCheckHeight, placementCheckMask))
 			{
 				if (((1 << hitInfo.transform.gameObject.layer) & (int)placementMask) == 0)
 				{

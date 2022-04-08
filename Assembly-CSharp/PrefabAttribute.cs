@@ -15,8 +15,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 
 		internal List<PrefabAttribute> Find(Type t)
 		{
-			List<PrefabAttribute> value;
-			if (attributes.TryGetValue(t, out value))
+			if (attributes.TryGetValue(t, out var value))
 			{
 				return value;
 			}
@@ -31,8 +30,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 			{
 				cache = new Dictionary<Type, object>();
 			}
-			object value;
-			if (cache.TryGetValue(typeof(T), out value))
+			if (cache.TryGetValue(typeof(T), out var value))
 			{
 				return (T[])value;
 			}
@@ -66,8 +64,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 
 		public AttributeCollection Find(uint prefabID, bool warmup = true)
 		{
-			AttributeCollection value;
-			if (prefabs.TryGetValue(prefabID, out value))
+			if (prefabs.TryGetValue(prefabID, out var value))
 			{
 				return value;
 			}
@@ -81,7 +78,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 				}
 				else if (clientside)
 				{
-					bool serverside2 = serverside;
+					_ = serverside;
 				}
 			}
 			return value;
@@ -104,7 +101,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 
 		public void Add(uint prefabID, PrefabAttribute attribute)
 		{
-			Find(prefabID, false).Add(attribute);
+			Find(prefabID, warmup: false).Add(attribute);
 		}
 
 		public void Invalidate(uint prefabID)
@@ -152,7 +149,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 	[NonSerialized]
 	public bool isServer;
 
-	public static Library server = new Library(false, true);
+	public static Library server = new Library(clientside: false, serverside: true);
 
 	public bool isClient => !isServer;
 
@@ -204,8 +201,7 @@ public abstract class PrefabAttribute : MonoBehaviour, IPrefabPreProcess
 
 	public override bool Equals(object o)
 	{
-		PrefabAttribute y;
-		if ((object)(y = o as PrefabAttribute) != null)
+		if (o is PrefabAttribute y)
 		{
 			return ComparePrefabAttribute(this, y);
 		}

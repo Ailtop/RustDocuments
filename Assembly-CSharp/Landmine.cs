@@ -101,7 +101,7 @@ public class Landmine : BaseTrap
 
 	public override void ServerInit()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		Invoke(Arm, 1.5f);
 		base.ServerInit();
 	}
@@ -129,7 +129,7 @@ public class Landmine : BaseTrap
 		{
 			triggerPlayerID = ply.userID;
 		}
-		SetFlag(Flags.Open, true);
+		SetFlag(Flags.Open, b: true);
 		SendNetworkUpdate();
 	}
 
@@ -149,8 +149,8 @@ public class Landmine : BaseTrap
 	public virtual void Explode()
 	{
 		base.health = float.PositiveInfinity;
-		Effect.server.Run(explosionEffect.resourcePath, PivotPoint(), base.transform.up, null, true);
-		DamageUtil.RadiusDamage(this, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 2263296, true);
+		Effect.server.Run(explosionEffect.resourcePath, PivotPoint(), base.transform.up, null, broadcast: true);
+		DamageUtil.RadiusDamage(this, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 2263296, useLineOfSight: true);
 		if (!base.IsDestroyed)
 		{
 			Kill();
@@ -177,7 +177,7 @@ public class Landmine : BaseTrap
 
 	public override void Arm()
 	{
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		SendNetworkUpdate();
 	}
 
@@ -187,7 +187,7 @@ public class Landmine : BaseTrap
 	{
 		if (rpc.player.net.ID != triggerPlayerID && Armed() && Interface.CallHook("OnTrapDisarm", this, rpc.player) == null)
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			if (UnityEngine.Random.Range(0, 100) < 15)
 			{
 				Invoke(TryExplode, 0.05f);

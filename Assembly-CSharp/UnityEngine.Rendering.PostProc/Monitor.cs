@@ -1,51 +1,50 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public abstract class Monitor
 {
-	public abstract class Monitor
+	internal bool requested;
+
+	public RenderTexture output { get; protected set; }
+
+	public bool IsRequestedAndSupported(PostProcessRenderContext context)
 	{
-		internal bool requested;
-
-		public RenderTexture output { get; protected set; }
-
-		public bool IsRequestedAndSupported(PostProcessRenderContext context)
+		if (requested && SystemInfo.supportsComputeShaders && !RuntimeUtilities.isAndroidOpenGL)
 		{
-			if (requested && SystemInfo.supportsComputeShaders && !RuntimeUtilities.isAndroidOpenGL)
-			{
-				return ShaderResourcesAvailable(context);
-			}
-			return false;
+			return ShaderResourcesAvailable(context);
 		}
+		return false;
+	}
 
-		internal abstract bool ShaderResourcesAvailable(PostProcessRenderContext context);
+	internal abstract bool ShaderResourcesAvailable(PostProcessRenderContext context);
 
-		internal virtual bool NeedsHalfRes()
-		{
-			return false;
-		}
+	internal virtual bool NeedsHalfRes()
+	{
+		return false;
+	}
 
-		protected void CheckOutput(int width, int height)
-		{
-			if (output == null || !output.IsCreated() || output.width != width || output.height != height)
-			{
-				RuntimeUtilities.Destroy(output);
-				output = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32)
-				{
-					anisoLevel = 0,
-					filterMode = FilterMode.Bilinear,
-					wrapMode = TextureWrapMode.Clamp,
-					useMipMap = false
-				};
-			}
-		}
-
-		internal virtual void OnEnable()
-		{
-		}
-
-		internal virtual void OnDisable()
+	protected void CheckOutput(int width, int height)
+	{
+		if (output == null || !output.IsCreated() || output.width != width || output.height != height)
 		{
 			RuntimeUtilities.Destroy(output);
+			output = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32)
+			{
+				anisoLevel = 0,
+				filterMode = FilterMode.Bilinear,
+				wrapMode = TextureWrapMode.Clamp,
+				useMipMap = false
+			};
 		}
-
-		internal abstract void Render(PostProcessRenderContext context);
 	}
+
+	internal virtual void OnEnable()
+	{
+	}
+
+	internal virtual void OnDisable()
+	{
+		RuntimeUtilities.Destroy(output);
+	}
+
+	internal abstract void Render(PostProcessRenderContext context);
 }

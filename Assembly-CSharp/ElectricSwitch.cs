@@ -68,7 +68,7 @@ public class ElectricSwitch : IOEntity
 
 	public override void ResetIOState()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
@@ -84,11 +84,11 @@ public class ElectricSwitch : IOEntity
 	{
 		if (inputSlot == 1 && inputAmount > 0)
 		{
-			SetSwitch(true);
+			SetSwitch(wantsOn: true);
 		}
 		if (inputSlot == 2 && inputAmount > 0)
 		{
-			SetSwitch(false);
+			SetSwitch(wantsOn: false);
 		}
 		base.IOStateChanged(inputAmount, inputSlot);
 	}
@@ -96,7 +96,7 @@ public class ElectricSwitch : IOEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 
 	public virtual void SetSwitch(bool wantsOn)
@@ -104,7 +104,7 @@ public class ElectricSwitch : IOEntity
 		if (wantsOn != IsOn())
 		{
 			SetFlag(Flags.On, wantsOn);
-			SetFlag(Flags.Busy, true);
+			SetFlag(Flags.Busy, b: true);
 			Invoke(Unbusy, 0.5f);
 			SendNetworkUpdateImmediate();
 			MarkDirty();
@@ -124,6 +124,6 @@ public class ElectricSwitch : IOEntity
 
 	public void Unbusy()
 	{
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 }

@@ -16,7 +16,7 @@ public class BaseDetector : IOEntity
 
 	public virtual void OnObjects()
 	{
-		SetFlag(Flags.Reserved1, true);
+		SetFlag(Flags.Reserved1, b: true);
 		if (ShouldTrigger())
 		{
 			OnDetectorTriggered();
@@ -26,7 +26,7 @@ public class BaseDetector : IOEntity
 
 	public virtual void OnEmpty()
 	{
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 		if (ShouldTrigger())
 		{
 			OnDetectorReleased();

@@ -68,8 +68,7 @@ public class RHIBAIController : FacepunchBehaviour
 					{
 						direction = (vector4 - vector2).normalized;
 					}
-					RaycastHit hitInfo;
-					if (Physics.Raycast(vector2, direction, out hitInfo, maxDistance, 1218511105))
+					if (Physics.Raycast(vector2, direction, out var _, maxDistance, 1218511105))
 					{
 						flag2 = false;
 					}
@@ -93,8 +92,7 @@ public class RHIBAIController : FacepunchBehaviour
 
 	public float GetWaterDepth(Vector3 pos)
 	{
-		RaycastHit hitInfo;
-		if (!Physics.Raycast(pos, Vector3.down, out hitInfo, 100f, 8388608))
+		if (!Physics.Raycast(pos, Vector3.down, out var hitInfo, 100f, 8388608))
 		{
 			return 100f;
 		}

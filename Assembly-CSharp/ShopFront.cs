@@ -168,11 +168,11 @@ public class ShopFront : StorageContainer
 
 	public void ResetTrade()
 	{
-		SetFlag(Flags.Reserved1, false);
-		SetFlag(Flags.Reserved2, false);
-		SetFlag(Flags.Reserved3, false);
-		vendorInventory.SetLocked(false);
-		customerInventory.SetLocked(false);
+		SetFlag(Flags.Reserved1, b: false);
+		SetFlag(Flags.Reserved2, b: false);
+		SetFlag(Flags.Reserved3, b: false);
+		vendorInventory.SetLocked(isLocked: false);
+		customerInventory.SetLocked(isLocked: false);
 		CancelInvoke(CompleteTrade);
 	}
 
@@ -211,17 +211,17 @@ public class ShopFront : StorageContainer
 		{
 			if (IsPlayerVendor(msg.player))
 			{
-				SetFlag(Flags.Reserved1, true);
-				vendorInventory.SetLocked(true);
+				SetFlag(Flags.Reserved1, b: true);
+				vendorInventory.SetLocked(isLocked: true);
 			}
 			else if (IsPlayerCustomer(msg.player))
 			{
-				SetFlag(Flags.Reserved2, true);
-				customerInventory.SetLocked(true);
+				SetFlag(Flags.Reserved2, b: true);
+				customerInventory.SetLocked(isLocked: true);
 			}
 			if (HasFlag(Flags.Reserved1) && HasFlag(Flags.Reserved2))
 			{
-				SetFlag(Flags.Reserved3, true);
+				SetFlag(Flags.Reserved3, b: true);
 				Invoke(CompleteTrade, 2f);
 			}
 		}
@@ -233,8 +233,8 @@ public class ShopFront : StorageContainer
 	{
 		if (IsTradingPlayer(msg.player) && Interface.CallHook("OnShopCancelClick", this, msg.player) == null)
 		{
-			bool flag = (bool)vendorPlayer;
-			bool flag2 = (bool)customerPlayer;
+			_ = (bool)vendorPlayer;
+			_ = (bool)customerPlayer;
 			ResetTrade();
 		}
 	}

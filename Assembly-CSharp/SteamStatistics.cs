@@ -75,8 +75,7 @@ public class SteamStatistics
 		}
 		using (TimeWarning.New("PlayerStats.Get"))
 		{
-			int value;
-			if (intStats.TryGetValue(name, out value))
+			if (intStats.TryGetValue(name, out var value))
 			{
 				return value;
 			}

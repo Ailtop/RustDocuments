@@ -128,7 +128,7 @@ public class BaseBoat : BaseVehicle
 			steering = 0f;
 		}
 		base.VehicleFixedUpdate();
-		bool flag = WaterLevel.Test(thrustPoint.position, true, this);
+		bool flag = WaterLevel.Test(thrustPoint.position, waves: true, this);
 		if (gasPedal != 0f && flag && buoyancy.submergedFraction > 0.3f)
 		{
 			Vector3 force = (base.transform.forward + base.transform.right * steering * steeringScale).normalized * gasPedal * engineThrust;
@@ -151,7 +151,7 @@ public class BaseBoat : BaseVehicle
 			if (!float.IsPositiveInfinity(num))
 			{
 				float num3 = decayTickRate / 60f / num;
-				entity.Hurt(entity.MaxHealth() * num3, DamageType.Decay, entity, false);
+				entity.Hurt(entity.MaxHealth() * num3, DamageType.Decay, entity, useProtection: false);
 			}
 		}
 	}
@@ -174,8 +174,7 @@ public class BaseBoat : BaseVehicle
 	{
 		if (!UnityEngine.Application.isPlaying || TerrainMeta.WaterMap == null)
 		{
-			RaycastHit hitInfo;
-			if (!UnityEngine.Physics.Raycast(pos, Vector3.down, out hitInfo, 100f, 8388608))
+			if (!UnityEngine.Physics.Raycast(pos, Vector3.down, out var hitInfo, 100f, 8388608))
 			{
 				return 100f;
 			}
@@ -236,8 +235,7 @@ public class BaseBoat : BaseVehicle
 					{
 						direction = (vector3 - vector2).normalized;
 					}
-					RaycastHit hitInfo;
-					if (UnityEngine.Physics.SphereCast(origin, 3f, direction, out hitInfo, minDistanceFromShore, 1218511105))
+					if (UnityEngine.Physics.SphereCast(origin, 3f, direction, out var _, minDistanceFromShore, 1218511105))
 					{
 						flag2 = false;
 						break;

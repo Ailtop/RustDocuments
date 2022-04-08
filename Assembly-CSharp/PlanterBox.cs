@@ -226,8 +226,7 @@ public class PlanterBox : StorageContainer, ISplashable
 		}
 		foreach (BaseEntity child in children)
 		{
-			GrowableEntity growableEntity;
-			if (!(child == null) && !(child == ignoreEntity) && (object)(growableEntity = child as GrowableEntity) != null)
+			if (!(child == null) && !(child == ignoreEntity) && child is GrowableEntity growableEntity)
 			{
 				growableEntity.QueueForQualityUpdate();
 			}
@@ -247,7 +246,7 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	public float GetSunExposure()
 	{
-		return sunExposure?.Get(false) ?? 0f;
+		return sunExposure?.Get(force: false) ?? 0f;
 	}
 
 	private float CalculateSunExposure()
@@ -257,7 +256,7 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	public float GetArtificialLightExposure()
 	{
-		return artificialLightExposure?.Get(false) ?? 0f;
+		return artificialLightExposure?.Get(force: false) ?? 0f;
 	}
 
 	private float CalculateArtificialLightExposure()
@@ -267,7 +266,7 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	public float GetPlantTemperature()
 	{
-		return (plantTemperature?.Get(false) ?? 0f) + (plantArtificalTemperature?.Get(false) ?? 0f);
+		return (plantTemperature?.Get(force: false) ?? 0f) + (plantArtificalTemperature?.Get(force: false) ?? 0f);
 	}
 
 	private float CalculatePlantTemperature()
@@ -277,7 +276,7 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	private void CalculateRainFactor()
 	{
-		if (sunExposure.Get(false) > 0f)
+		if (sunExposure.Get(force: false) > 0f)
 		{
 			float rain = Climate.GetRain(base.transform.position);
 			if (rain > 0f)
@@ -304,8 +303,7 @@ public class PlanterBox : StorageContainer, ISplashable
 		List<uint> obj = Facepunch.Pool.GetList<uint>();
 		foreach (BaseEntity child in children)
 		{
-			GrowableEntity growableEntity;
-			if ((object)(growableEntity = child as GrowableEntity) != null && !obj.Contains(growableEntity.prefabID))
+			if (child is GrowableEntity growableEntity && !obj.Contains(growableEntity.prefabID))
 			{
 				obj.Add(growableEntity.prefabID);
 			}

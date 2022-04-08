@@ -1,16 +1,15 @@
 using Network;
 
-namespace UnityEngine
+namespace UnityEngine;
+
+public static class NetworkPacketEx
 {
-	public static class NetworkPacketEx
+	public static BasePlayer Player(this Message v)
 	{
-		public static BasePlayer Player(this Message v)
+		if (v.connection == null)
 		{
-			if (v.connection == null)
-			{
-				return null;
-			}
-			return v.connection.player as BasePlayer;
+			return null;
 		}
+		return v.connection.player as BasePlayer;
 	}
 }

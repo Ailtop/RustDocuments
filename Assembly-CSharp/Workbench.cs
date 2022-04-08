@@ -236,8 +236,8 @@ public class Workbench : StorageContainer
 			{
 				Effect.server.Run(experimentStartEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
 			}
-			SetFlag(Flags.On, true);
-			base.inventory.SetLocked(true);
+			SetFlag(Flags.On, b: true);
+			base.inventory.SetLocked(isLocked: true);
 			CancelInvoke(ExperimentComplete);
 			Invoke(ExperimentComplete, 5f);
 			SendNetworkUpdate();
@@ -299,9 +299,9 @@ public class Workbench : StorageContainer
 				Effect.server.Run(experimentSuccessEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
 			}
 		}
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		pendingBlueprint = null;
-		base.inventory.SetLocked(false);
+		base.inventory.SetLocked(isLocked: false);
 		SendNetworkUpdate();
 		Interface.CallHook("OnExperimentEnded", this);
 	}
@@ -309,10 +309,10 @@ public class Workbench : StorageContainer
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		if (base.inventory != null)
 		{
-			base.inventory.SetLocked(false);
+			base.inventory.SetLocked(isLocked: false);
 		}
 	}
 

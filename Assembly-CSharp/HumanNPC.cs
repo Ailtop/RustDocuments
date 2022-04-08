@@ -293,7 +293,7 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 				nPCPlayerCorpse.transform.position = nPCPlayerCorpse.transform.position + Vector3.down * NavAgent.baseOffset;
 				nPCPlayerCorpse.SetLootableIn(2f);
 				nPCPlayerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
-				nPCPlayerCorpse.SetFlag(Flags.Reserved2, true);
+				nPCPlayerCorpse.SetFlag(Flags.Reserved2, b: true);
 				nPCPlayerCorpse.TakeFrom(inventory.containerMain, inventory.containerWear, inventory.containerBelt);
 				nPCPlayerCorpse.playerName = OverrideCorpseName();
 				nPCPlayerCorpse.playerSteamID = userID;

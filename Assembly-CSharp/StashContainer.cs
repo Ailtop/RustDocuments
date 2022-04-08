@@ -156,7 +156,7 @@ public class StashContainer : StorageContainer
 	public void DisableNetworking()
 	{
 		base.limitNetworking = true;
-		SetFlag(Flags.Disabled, true);
+		SetFlag(Flags.Disabled, b: true);
 	}
 
 	public void Decay()
@@ -167,7 +167,7 @@ public class StashContainer : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		SetHidden(false);
+		SetHidden(isHidden: false);
 	}
 
 	public void ToggleHidden()
@@ -181,7 +181,7 @@ public class StashContainer : StorageContainer
 	{
 		if (Interface.CallHook("CanHideStash", rpc.player, this) == null)
 		{
-			SetHidden(true);
+			SetHidden(isHidden: true);
 			Interface.CallHook("OnStashHidden", this, rpc.player);
 		}
 	}
@@ -195,7 +195,7 @@ public class StashContainer : StorageContainer
 			BasePlayer player = rpc.player;
 			if (PlayerInRange(player) && Interface.CallHook("CanSeeStash", rpc.player, this) == null)
 			{
-				SetHidden(false);
+				SetHidden(isHidden: false);
 				Interface.CallHook("OnStashExposed", this, rpc.player);
 			}
 		}

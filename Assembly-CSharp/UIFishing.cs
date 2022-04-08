@@ -11,6 +11,6 @@ public class UIFishing : SingletonComponent<UIFishing>
 
 	private void Start()
 	{
-		base.gameObject.SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

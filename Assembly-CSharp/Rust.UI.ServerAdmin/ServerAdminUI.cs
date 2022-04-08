@@ -1,27 +1,26 @@
 using UnityEngine;
 
-namespace Rust.UI.ServerAdmin
+namespace Rust.UI.ServerAdmin;
+
+public class ServerAdminUI : SingletonComponent<ServerAdminUI>
 {
-	public class ServerAdminUI : SingletonComponent<ServerAdminUI>
-	{
-		public GameObjectRef PlayerEntry;
+	public GameObjectRef PlayerEntry;
 
-		public RectTransform PlayerInfoParent;
+	public RectTransform PlayerInfoParent;
 
-		public RustText PlayerCount;
+	public RustText PlayerCount;
 
-		public RustInput PlayerNameFilter;
+	public RustInput PlayerNameFilter;
 
-		public GameObjectRef ServerInfoEntry;
+	public GameObjectRef ServerInfoEntry;
 
-		public RectTransform ServerInfoParent;
+	public RectTransform ServerInfoParent;
 
-		public GameObjectRef ConvarInfoEntry;
+	public GameObjectRef ConvarInfoEntry;
 
-		public GameObjectRef ConvarInfoLongEntry;
+	public GameObjectRef ConvarInfoLongEntry;
 
-		public RectTransform ConvarInfoParent;
+	public RectTransform ConvarInfoParent;
 
-		public ServerAdminPlayerInfo PlayerInfo;
-	}
+	public ServerAdminPlayerInfo PlayerInfo;
 }

@@ -59,7 +59,7 @@ public class LargeShredder : BaseEntity
 			currentlyShredding = ent;
 			ent.transform.rotation = rotation;
 			isShredding = true;
-			SetShredding(true);
+			SetShredding(isShredding: true);
 			shredStartTime = Time.realtimeSinceStartup;
 		}
 	}
@@ -175,7 +175,7 @@ public class LargeShredder : BaseEntity
 				currentlyShredding.Kill();
 				currentlyShredding = null;
 				isShredding = false;
-				SetShredding(false);
+				SetShredding(isShredding: false);
 			}
 		}
 	}

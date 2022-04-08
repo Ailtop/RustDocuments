@@ -110,9 +110,7 @@ public class Drone : RemoteControlEntity
 		}
 		Vector2 vector = v.XZ2D();
 		Vector2 vector2 = position.XZ2D();
-		Vector3 direction;
-		float magnitude;
-		(vector - vector2).XZ3D().ToDirectionAndMagnitude(out direction, out magnitude);
+		(vector - vector2).XZ3D().ToDirectionAndMagnitude(out var direction, out var magnitude);
 		currentInput.Reset();
 		lastInputTime = Time.time;
 		if (position.y - height > 1f)
@@ -146,12 +144,9 @@ public class Drone : RemoteControlEntity
 		}
 		double currentTimestamp = TimeEx.currentTimestamp;
 		bool num2 = lastCollision > 0.0 && currentTimestamp - lastCollision < (double)collisionDisableTime;
-		RaycastHit hitInfo;
-		isGrounded = enableGrounding && body.SweepTest(-base.transform.up, out hitInfo, groundTraceDist);
+		isGrounded = enableGrounding && body.SweepTest(-base.transform.up, out var _, groundTraceDist);
 		Vector3 vector = base.transform.TransformDirection(currentInput.movement);
-		Vector3 direction;
-		float magnitude;
-		body.velocity.WithY(0f).ToDirectionAndMagnitude(out direction, out magnitude);
+		body.velocity.WithY(0f).ToDirectionAndMagnitude(out var direction, out var magnitude);
 		float num3 = Mathf.Clamp01(magnitude / leanMaxVelocity);
 		Vector3 vector2 = (Mathf.Approximately(vector.sqrMagnitude, 0f) ? ((0f - num3) * direction) : vector);
 		Vector3 normalized = (Vector3.up + vector2 * leanWeight * num3).normalized;

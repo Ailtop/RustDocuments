@@ -65,8 +65,8 @@ public class PressButton : IOEntity
 	public override void ResetIOState()
 	{
 		base.ResetIOState();
-		SetFlag(Flags.On, false);
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.On, b: false);
+		SetFlag(Flags.Reserved3, b: false);
 		CancelInvoke(Unpress);
 		CancelInvoke(UnpowerTime);
 	}
@@ -86,14 +86,14 @@ public class PressButton : IOEntity
 
 	public void UnpowerTime()
 	{
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved3, b: false);
 		MarkDirty();
 	}
 
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	[RPC_Server]
@@ -102,9 +102,9 @@ public class PressButton : IOEntity
 	{
 		if (!IsOn() && Interface.CallHook("OnButtonPress", this, msg.player) == null)
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			Invoke(UnpowerTime, pressPowerTime);
-			SetFlag(Flags.Reserved3, true);
+			SetFlag(Flags.Reserved3, b: true);
 			SendNetworkUpdateImmediate();
 			MarkDirty();
 			Invoke(Unpress, pressDuration);
@@ -113,7 +113,7 @@ public class PressButton : IOEntity
 
 	public void Unpress()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		MarkDirty();
 	}
 

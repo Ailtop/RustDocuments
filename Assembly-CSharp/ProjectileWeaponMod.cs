@@ -61,7 +61,7 @@ public class ProjectileWeaponMod : BaseEntity
 
 	public override void ServerInit()
 	{
-		SetFlag(Flags.Disabled, true);
+		SetFlag(Flags.Disabled, b: true);
 		base.ServerInit();
 	}
 

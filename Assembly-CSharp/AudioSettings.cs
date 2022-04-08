@@ -11,8 +11,7 @@ public class AudioSettings : MonoBehaviour
 		if (!(mixer == null))
 		{
 			mixer.SetFloat("MasterVol", LinearToDecibel(Audio.master));
-			float value;
-			mixer.GetFloat("MusicVol", out value);
+			mixer.GetFloat("MusicVol", out var value);
 			if (!LevelManager.isLoaded || !MainCamera.isValid)
 			{
 				mixer.SetFloat("MusicVol", Mathf.Lerp(value, LinearToDecibel(Audio.musicvolumemenu), UnityEngine.Time.deltaTime));

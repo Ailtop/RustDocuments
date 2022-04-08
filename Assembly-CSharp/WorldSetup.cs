@@ -100,7 +100,7 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 			GameObject gameObject = Object.Instantiate(prefab);
 			if (gameObject != null)
 			{
-				gameObject.SetActive(true);
+				gameObject.SetActive(value: true);
 			}
 		}
 	}
@@ -115,7 +115,7 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 		{
 			Debug.Log("Generating procedural map of size " + World.Size + " with seed " + World.Seed);
 		}
-		ProceduralComponent[] components = GetComponentsInChildren<ProceduralComponent>(true);
+		ProceduralComponent[] components = GetComponentsInChildren<ProceduralComponent>(includeInactive: true);
 		Timing downloadTimer = Timing.Start("Downloading World");
 		if (World.Procedural && !World.CanLoadFromDisk() && World.CanLoadFromUrl())
 		{

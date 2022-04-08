@@ -176,8 +176,7 @@ public static class StringFormatCache
 	public static string Get(string format, string value1)
 	{
 		Key1 key = new Key1(format, value1);
-		string value2;
-		if (!dict1.TryGetValue(key, out value2))
+		if (!dict1.TryGetValue(key, out var value2))
 		{
 			value2 = string.Format(format, value1);
 			dict1.Add(key, value2);
@@ -188,8 +187,7 @@ public static class StringFormatCache
 	public static string Get(string format, string value1, string value2)
 	{
 		Key2 key = new Key2(format, value1, value2);
-		string value3;
-		if (!dict2.TryGetValue(key, out value3))
+		if (!dict2.TryGetValue(key, out var value3))
 		{
 			value3 = string.Format(format, value1, value2);
 			dict2.Add(key, value3);
@@ -200,8 +198,7 @@ public static class StringFormatCache
 	public static string Get(string format, string value1, string value2, string value3)
 	{
 		Key3 key = new Key3(format, value1, value2, value3);
-		string value4;
-		if (!dict3.TryGetValue(key, out value4))
+		if (!dict3.TryGetValue(key, out var value4))
 		{
 			value4 = string.Format(format, value1, value2, value3);
 			dict3.Add(key, value4);
@@ -212,8 +209,7 @@ public static class StringFormatCache
 	public static string Get(string format, string value1, string value2, string value3, string value4)
 	{
 		Key4 key = new Key4(format, value1, value2, value3, value4);
-		string value5;
-		if (!dict4.TryGetValue(key, out value5))
+		if (!dict4.TryGetValue(key, out var value5))
 		{
 			value5 = string.Format(format, value1, value2, value3, value4);
 			dict4.Add(key, value5);

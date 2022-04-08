@@ -1,118 +1,117 @@
 using System;
 using System.Collections.Generic;
 
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public sealed class PostProcessProfile : ScriptableObject
 {
-	public sealed class PostProcessProfile : ScriptableObject
+	[Tooltip("A list of all settings currently stored in this profile.")]
+	public List<PostProcessEffectSettings> settings = new List<PostProcessEffectSettings>();
+
+	[NonSerialized]
+	public bool isDirty = true;
+
+	private void OnEnable()
 	{
-		[Tooltip("A list of all settings currently stored in this profile.")]
-		public List<PostProcessEffectSettings> settings = new List<PostProcessEffectSettings>();
+		settings.RemoveAll((PostProcessEffectSettings x) => x == null);
+	}
 
-		[NonSerialized]
-		public bool isDirty = true;
+	public T AddSettings<T>() where T : PostProcessEffectSettings
+	{
+		return (T)AddSettings(typeof(T));
+	}
 
-		private void OnEnable()
+	public PostProcessEffectSettings AddSettings(Type type)
+	{
+		if (HasSettings(type))
 		{
-			settings.RemoveAll((PostProcessEffectSettings x) => x == null);
+			throw new InvalidOperationException("Effect already exists in the stack");
 		}
+		PostProcessEffectSettings postProcessEffectSettings = (PostProcessEffectSettings)ScriptableObject.CreateInstance(type);
+		postProcessEffectSettings.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+		postProcessEffectSettings.name = type.Name;
+		postProcessEffectSettings.enabled.value = true;
+		settings.Add(postProcessEffectSettings);
+		isDirty = true;
+		return postProcessEffectSettings;
+	}
 
-		public T AddSettings<T>() where T : PostProcessEffectSettings
+	public PostProcessEffectSettings AddSettings(PostProcessEffectSettings effect)
+	{
+		if (HasSettings(settings.GetType()))
 		{
-			return (T)AddSettings(typeof(T));
+			throw new InvalidOperationException("Effect already exists in the stack");
 		}
+		settings.Add(effect);
+		isDirty = true;
+		return effect;
+	}
 
-		public PostProcessEffectSettings AddSettings(Type type)
+	public void RemoveSettings<T>() where T : PostProcessEffectSettings
+	{
+		RemoveSettings(typeof(T));
+	}
+
+	public void RemoveSettings(Type type)
+	{
+		int num = -1;
+		for (int i = 0; i < settings.Count; i++)
 		{
-			if (HasSettings(type))
+			if (settings[i].GetType() == type)
 			{
-				throw new InvalidOperationException("Effect already exists in the stack");
+				num = i;
+				break;
 			}
-			PostProcessEffectSettings postProcessEffectSettings = (PostProcessEffectSettings)ScriptableObject.CreateInstance(type);
-			postProcessEffectSettings.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-			postProcessEffectSettings.name = type.Name;
-			postProcessEffectSettings.enabled.value = true;
-			settings.Add(postProcessEffectSettings);
-			isDirty = true;
-			return postProcessEffectSettings;
 		}
-
-		public PostProcessEffectSettings AddSettings(PostProcessEffectSettings effect)
+		if (num < 0)
 		{
-			if (HasSettings(settings.GetType()))
+			throw new InvalidOperationException("Effect doesn't exist in the profile");
+		}
+		settings.RemoveAt(num);
+		isDirty = true;
+	}
+
+	public bool HasSettings<T>() where T : PostProcessEffectSettings
+	{
+		return HasSettings(typeof(T));
+	}
+
+	public bool HasSettings(Type type)
+	{
+		foreach (PostProcessEffectSettings setting in settings)
+		{
+			if (setting.GetType() == type)
 			{
-				throw new InvalidOperationException("Effect already exists in the stack");
+				return true;
 			}
-			settings.Add(effect);
-			isDirty = true;
-			return effect;
 		}
+		return false;
+	}
 
-		public void RemoveSettings<T>() where T : PostProcessEffectSettings
+	public T GetSetting<T>() where T : PostProcessEffectSettings
+	{
+		foreach (PostProcessEffectSettings setting in settings)
 		{
-			RemoveSettings(typeof(T));
-		}
-
-		public void RemoveSettings(Type type)
-		{
-			int num = -1;
-			for (int i = 0; i < settings.Count; i++)
+			if (setting is T)
 			{
-				if (settings[i].GetType() == type)
-				{
-					num = i;
-					break;
-				}
+				return setting as T;
 			}
-			if (num < 0)
-			{
-				throw new InvalidOperationException("Effect doesn't exist in the profile");
-			}
-			settings.RemoveAt(num);
-			isDirty = true;
 		}
+		return null;
+	}
 
-		public bool HasSettings<T>() where T : PostProcessEffectSettings
+	public bool TryGetSettings<T>(out T outSetting) where T : PostProcessEffectSettings
+	{
+		Type typeFromHandle = typeof(T);
+		outSetting = null;
+		foreach (PostProcessEffectSettings setting in settings)
 		{
-			return HasSettings(typeof(T));
-		}
-
-		public bool HasSettings(Type type)
-		{
-			foreach (PostProcessEffectSettings setting in settings)
+			if (setting.GetType() == typeFromHandle)
 			{
-				if (setting.GetType() == type)
-				{
-					return true;
-				}
+				outSetting = (T)setting;
+				return true;
 			}
-			return false;
 		}
-
-		public T GetSetting<T>() where T : PostProcessEffectSettings
-		{
-			foreach (PostProcessEffectSettings setting in settings)
-			{
-				if (setting is T)
-				{
-					return setting as T;
-				}
-			}
-			return null;
-		}
-
-		public bool TryGetSettings<T>(out T outSetting) where T : PostProcessEffectSettings
-		{
-			Type typeFromHandle = typeof(T);
-			outSetting = null;
-			foreach (PostProcessEffectSettings setting in settings)
-			{
-				if (setting.GetType() == typeFromHandle)
-				{
-					outSetting = (T)setting;
-					return true;
-				}
-			}
-			return false;
-		}
+		return false;
 	}
 }

@@ -77,10 +77,10 @@ public class Elevator : IOEntity, IFlagNotify
 		Elevator elevatorInDirection = GetElevatorInDirection(Direction.Down);
 		if (elevatorInDirection != null)
 		{
-			elevatorInDirection.SetFlag(Flags.Reserved1, false);
+			elevatorInDirection.SetFlag(Flags.Reserved1, b: false);
 			Floor = elevatorInDirection.Floor + 1;
 		}
-		SetFlag(Flags.Reserved1, true);
+		SetFlag(Flags.Reserved1, b: true);
 	}
 
 	public virtual void CallElevator()
@@ -89,8 +89,7 @@ public class Elevator : IOEntity, IFlagNotify
 		{
 			if (elevatorEnt.IsTop && Interface.CallHook("OnElevatorCall", this, elevatorEnt) == null)
 			{
-				float timeToTravel;
-				elevatorEnt.RequestMoveLiftTo(Floor, out timeToTravel);
+				elevatorEnt.RequestMoveLiftTo(Floor, out var _);
 			}
 		}, (ConstructionSocket socket) => socket.socketType == ConstructionSocket.Type.Elevator);
 	}
@@ -119,8 +118,7 @@ public class Elevator : IOEntity, IFlagNotify
 			}
 			break;
 		}
-		float timeToTravel;
-		RequestMoveLiftTo(num, out timeToTravel);
+		RequestMoveLiftTo(num, out var _);
 	}
 
 	public bool RequestMoveLiftTo(int targetFloor, out float timeToTravel)
@@ -160,16 +158,16 @@ public class Elevator : IOEntity, IFlagNotify
 		Vector3 vector = base.transform.InverseTransformPoint(worldSpaceFloorPosition);
 		timeToTravel = TimeToTravelDistance(Mathf.Abs(liftEntity.transform.localPosition.y - vector.y));
 		LeanTween.moveLocalY(liftEntity.gameObject, vector.y, timeToTravel);
-		SetFlag(Flags.Busy, true);
+		SetFlag(Flags.Busy, b: true);
 		if (targetFloor < Floor)
 		{
-			liftEntity.ToggleHurtTrigger(true);
+			liftEntity.ToggleHurtTrigger(state: true);
 		}
 		Invoke(ClearBusy, timeToTravel);
 		if (ioEntity != null)
 		{
-			ioEntity.SetFlag(Flags.Busy, true);
-			ioEntity.SendChangedToRoot(true);
+			ioEntity.SetFlag(Flags.Busy, b: true);
+			ioEntity.SendChangedToRoot(forceUpdate: true);
 		}
 		return true;
 	}
@@ -197,15 +195,15 @@ public class Elevator : IOEntity, IFlagNotify
 
 	public virtual void ClearBusy()
 	{
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 		if (liftEntity != null)
 		{
-			liftEntity.ToggleHurtTrigger(false);
+			liftEntity.ToggleHurtTrigger(state: false);
 		}
 		if (ioEntity != null)
 		{
-			ioEntity.SetFlag(Flags.Busy, false);
-			ioEntity.SendChangedToRoot(true);
+			ioEntity.SetFlag(Flags.Busy, b: false);
+			ioEntity.SendChangedToRoot(forceUpdate: true);
 		}
 	}
 
@@ -224,8 +222,7 @@ public class Elevator : IOEntity, IFlagNotify
 		if (entityLink != null && !entityLink.IsEmpty())
 		{
 			BaseEntity owner = entityLink.connections[0].owner;
-			Elevator elevator;
-			if (owner != null && owner.isServer && (object)(elevator = owner as Elevator) != null && elevator != this)
+			if (owner != null && owner.isServer && owner is Elevator elevator && elevator != this)
 			{
 				return elevator;
 			}
@@ -244,7 +241,7 @@ public class Elevator : IOEntity, IFlagNotify
 			if (liftEntity == null)
 			{
 				liftEntity = GameManager.server.CreateEntity(LiftEntityPrefab.resourcePath, GetWorldSpaceFloorPosition(Floor), LiftRoot.rotation) as ElevatorLift;
-				liftEntity.SetParent(this, true);
+				liftEntity.SetParent(this, worldPositionStays: true);
 				liftEntity.Spawn();
 			}
 			if (ioEntity == null)
@@ -254,7 +251,7 @@ public class Elevator : IOEntity, IFlagNotify
 			if (ioEntity == null && IoEntityPrefab.isValid)
 			{
 				ioEntity = GameManager.server.CreateEntity(IoEntityPrefab.resourcePath, IoEntitySpawnPoint.position, IoEntitySpawnPoint.rotation) as IOEntity;
-				ioEntity.SetParent(this, true);
+				ioEntity.SetParent(this, worldPositionStays: true);
 				ioEntity.Spawn();
 			}
 		}
@@ -275,8 +272,7 @@ public class Elevator : IOEntity, IFlagNotify
 	{
 		foreach (BaseEntity child in children)
 		{
-			IOEntity iOEntity;
-			if ((object)(iOEntity = child as IOEntity) != null)
+			if (child is IOEntity iOEntity)
 			{
 				ioEntity = iOEntity;
 				break;
@@ -322,7 +318,7 @@ public class Elevator : IOEntity, IFlagNotify
 		Elevator elevatorInDirection = GetElevatorInDirection(Direction.Down);
 		if (elevatorInDirection != null)
 		{
-			elevatorInDirection.SetFlag(Flags.Reserved1, true);
+			elevatorInDirection.SetFlag(Flags.Reserved1, b: true);
 		}
 		Elevator elevatorInDirection2 = GetElevatorInDirection(Direction.Up);
 		if (elevatorInDirection2 != null)
@@ -334,11 +330,11 @@ public class Elevator : IOEntity, IFlagNotify
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 		UpdateChildEntities(IsTop);
 		if (ioEntity != null)
 		{
-			ioEntity.SetFlag(Flags.Busy, false);
+			ioEntity.SetFlag(Flags.Busy, b: false);
 		}
 	}
 
@@ -398,8 +394,7 @@ public class Elevator : IOEntity, IFlagNotify
 	{
 		foreach (BaseEntity child in children)
 		{
-			ElevatorLift elevatorLift;
-			if ((object)(elevatorLift = child as ElevatorLift) != null)
+			if (child is ElevatorLift elevatorLift)
 			{
 				liftEntity = elevatorLift;
 				break;

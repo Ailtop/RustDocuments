@@ -1,30 +1,29 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Rust.Modular
+namespace Rust.Modular;
+
+public class EnableDisableEvent : MonoBehaviour
 {
-	public class EnableDisableEvent : MonoBehaviour
+	[SerializeField]
+	private UnityEvent enableEvent;
+
+	[SerializeField]
+	private UnityEvent disableEvent;
+
+	protected void OnEnable()
 	{
-		[SerializeField]
-		private UnityEvent enableEvent;
-
-		[SerializeField]
-		private UnityEvent disableEvent;
-
-		protected void OnEnable()
+		if (enableEvent != null)
 		{
-			if (enableEvent != null)
-			{
-				enableEvent.Invoke();
-			}
+			enableEvent.Invoke();
 		}
+	}
 
-		protected void OnDisable()
+	protected void OnDisable()
+	{
+		if (disableEvent != null)
 		{
-			if (disableEvent != null)
-			{
-				disableEvent.Invoke();
-			}
+			disableEvent.Invoke();
 		}
 	}
 }

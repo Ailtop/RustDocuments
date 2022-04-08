@@ -66,8 +66,8 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 			}
 			else if (Interface.CallHook("OnEngineStart", ((VehicleEngineController<>)(object)this).owner, player) == null)
 			{
-				owner.SetFlag(engineStartingFlag, true);
-				owner.SetFlag(BaseEntity.Flags.On, false);
+				owner.SetFlag(engineStartingFlag, b: true);
+				owner.SetFlag(BaseEntity.Flags.On, b: false);
 				owner.Invoke(FinishStartingEngine, engineStartupTime);
 				Interface.CallHook("OnEngineStarted", ((VehicleEngineController<>)(object)this).owner, player);
 			}
@@ -78,8 +78,8 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 	{
 		if (isServer && !owner.IsDead() && !IsOn)
 		{
-			owner.SetFlag(BaseEntity.Flags.On, true);
-			owner.SetFlag(engineStartingFlag, false);
+			owner.SetFlag(BaseEntity.Flags.On, b: true);
+			owner.SetFlag(engineStartingFlag, b: false);
 			Interface.CallHook("OnEngineStartFinished", ((VehicleEngineController<>)(object)this).owner);
 		}
 	}
@@ -89,8 +89,8 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 		if (isServer && !IsOff && Interface.CallHook("OnEngineStop", ((VehicleEngineController<>)(object)this).owner) == null)
 		{
 			CancelEngineStart();
-			owner.SetFlag(BaseEntity.Flags.On, false);
-			owner.SetFlag(engineStartingFlag, false);
+			owner.SetFlag(BaseEntity.Flags.On, b: false);
+			owner.SetFlag(engineStartingFlag, b: false);
 			Interface.CallHook("OnEngineStopped", ((VehicleEngineController<>)(object)this).owner);
 		}
 	}
@@ -129,7 +129,7 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 	{
 		if (waterloggedPoint != null)
 		{
-			return WaterLevel.Test(waterloggedPoint.position, true, owner);
+			return WaterLevel.Test(waterloggedPoint.position, waves: true, owner);
 		}
 		return false;
 	}

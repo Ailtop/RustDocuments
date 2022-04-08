@@ -1,8 +1,7 @@
 using UnityEngine;
 
-namespace Rust.UI
+namespace Rust.UI;
+
+public class SteamInventoryIcon : MonoBehaviour
 {
-	public class SteamInventoryIcon : MonoBehaviour
-	{
-	}
 }

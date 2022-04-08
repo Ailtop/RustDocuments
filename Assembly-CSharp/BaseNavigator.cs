@@ -281,8 +281,7 @@ public class BaseNavigator : BaseMonoBehaviour
 	private void DelayedForceToGround()
 	{
 		int layerMask = 10551296;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(base.transform.position + Vector3.up * 0.5f, Vector3.down, out hitInfo, 1000f, layerMask))
+		if (UnityEngine.Physics.Raycast(base.transform.position + Vector3.up * 0.5f, Vector3.down, out var hitInfo, 1000f, layerMask))
 		{
 			BaseEntity.ServerPosition = hitInfo.point;
 		}
@@ -296,8 +295,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		}
 		bool flag = true;
 		float maxRange = (IsSwimming() ? 30f : 6f);
-		Vector3 position;
-		if (GetNearestNavmeshPosition(base.transform.position + Vector3.one * 2f, out position, maxRange))
+		if (GetNearestNavmeshPosition(base.transform.position + Vector3.one * 2f, out var position, maxRange))
 		{
 			flag = Warp(position);
 		}
@@ -329,8 +327,7 @@ public class BaseNavigator : BaseMonoBehaviour
 	{
 		position = base.transform.position;
 		bool result = true;
-		NavMeshHit hit;
-		if (NavMesh.SamplePosition(target, out hit, maxRange, defaultAreaMask))
+		if (NavMesh.SamplePosition(target, out var hit, maxRange, defaultAreaMask))
 		{
 			position = hit.position;
 		}
@@ -390,8 +387,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			return false;
 		}
-		float pathCost;
-		if (AStarPath.FindPath(closestToPoint, newTargetNode, out currentAStarPath, out pathCost))
+		if (AStarPath.FindPath(closestToPoint, newTargetNode, out currentAStarPath, out var _))
 		{
 			currentSpeedFraction = speedFraction;
 			targetNode = newTargetNode;
@@ -459,8 +455,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			Vector3 navMeshPos;
 			NavigationType navigationType3 = DetermineNavigationType(base.transform.position, out navMeshPos);
-			Vector3 navMeshPos2;
-			navigationType2 = DetermineNavigationType(pos, out navMeshPos2);
+			navigationType2 = DetermineNavigationType(pos, out var _);
 			if (navigationType2 == NavigationType.NavMesh && navigationType3 == NavigationType.NavMesh && (CurrentNavigationType == NavigationType.None || CurrentNavigationType == NavigationType.Base))
 			{
 				Warp(navMeshPos);
@@ -517,8 +512,7 @@ public class BaseNavigator : BaseMonoBehaviour
 			}
 			if (navmeshSampleDistance > 0f && AI.setdestinationsamplenavmesh)
 			{
-				NavMeshHit hit;
-				if (!NavMesh.SamplePosition(pos, out hit, navmeshSampleDistance, defaultAreaMask))
+				if (!NavMesh.SamplePosition(pos, out var hit, navmeshSampleDistance, defaultAreaMask))
 				{
 					return false;
 				}
@@ -556,8 +550,7 @@ public class BaseNavigator : BaseMonoBehaviour
 	{
 		navMeshPos = location;
 		int layerMask = 2097152;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(location + Vector3.up * navTypeHeightOffset, Vector3.down, out hitInfo, navTypeDistance, layerMask))
+		if (UnityEngine.Physics.Raycast(location + Vector3.up * navTypeHeightOffset, Vector3.down, out var _, navTypeDistance, layerMask))
 		{
 			return NavigationType.Base;
 		}
@@ -583,19 +576,14 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public float GetSpeedFraction(NavigationSpeed speed)
 	{
-		switch (speed)
+		return speed switch
 		{
-		case NavigationSpeed.Fast:
-			return FastSpeedFraction;
-		case NavigationSpeed.Normal:
-			return NormalSpeedFraction;
-		case NavigationSpeed.Slow:
-			return SlowSpeedFraction;
-		case NavigationSpeed.Slowest:
-			return SlowestSpeedFraction;
-		default:
-			return 1f;
-		}
+			NavigationSpeed.Fast => FastSpeedFraction, 
+			NavigationSpeed.Normal => NormalSpeedFraction, 
+			NavigationSpeed.Slow => SlowSpeedFraction, 
+			NavigationSpeed.Slowest => SlowestSpeedFraction, 
+			_ => 1f, 
+		};
 	}
 
 	public void SetCurrentNavigationType(NavigationType navType)
@@ -616,7 +604,7 @@ public class BaseNavigator : BaseMonoBehaviour
 			stuckTimer = 0f;
 			break;
 		case NavigationType.NavMesh:
-			SetNavMeshEnabled(true);
+			SetNavMeshEnabled(flag: true);
 			break;
 		}
 	}
@@ -659,7 +647,7 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	private void StopNavMesh()
 	{
-		SetNavMeshEnabled(false);
+		SetNavMeshEnabled(flag: false);
 	}
 
 	private void StopAStar()
@@ -824,8 +812,7 @@ public class BaseNavigator : BaseMonoBehaviour
 			Vector3 vector3 = BaseEntity.ServerPosition + Vector3.up * maxStepUpDistance;
 			Vector3 direction = Vector3Ex.Direction(vector2 + Vector3.up * maxStepUpDistance, BaseEntity.ServerPosition + Vector3.up * maxStepUpDistance);
 			float maxDistance = Vector3.Distance(vector3, vector2 + Vector3.up * maxStepUpDistance) + 0.25f;
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.Raycast(vector3, direction, out hitInfo, maxDistance, layerMask))
+			if (UnityEngine.Physics.Raycast(vector3, direction, out var hitInfo, maxDistance, layerMask))
 			{
 				return;
 			}
@@ -921,11 +908,11 @@ public class BaseNavigator : BaseMonoBehaviour
 			currentNavMeshLinkEndPos = currentOffMeshLinkData.endPos;
 		}
 		traversingNavMeshLink = true;
-		Agent.ActivateCurrentOffMeshLink(false);
+		Agent.ActivateCurrentOffMeshLink(activated: false);
 		Agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 		if (!(currentNavMeshLinkName == "OpenDoorLink") && !(currentNavMeshLinkName == "JumpRockLink"))
 		{
-			bool flag = currentNavMeshLinkName == "JumpFoundationLink";
+			_ = currentNavMeshLinkName == "JumpFoundationLink";
 		}
 		return true;
 	}
@@ -965,7 +952,7 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	private void CompleteNavMeshLink()
 	{
-		Agent.ActivateCurrentOffMeshLink(true);
+		Agent.ActivateCurrentOffMeshLink(activated: true);
 		Agent.CompleteOffMeshLink();
 		Agent.isStopped = false;
 		Agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;

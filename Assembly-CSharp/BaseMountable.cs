@@ -403,7 +403,7 @@ public class BaseMountable : BaseCombatEntity
 			player.OverrideViewAngles(transform.rotation.eulerAngles);
 			_mounted.eyes.NetworkUpdate(transform.rotation);
 			player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
-			SetFlag(Flags.Busy, true);
+			SetFlag(Flags.Busy, b: true);
 			OnPlayerMounted();
 			Interface.CallHook("OnEntityMounted", this, player);
 		}
@@ -441,7 +441,7 @@ public class BaseMountable : BaseCombatEntity
 			}
 			_mounted.DismountObject();
 			_mounted = null;
-			SetFlag(Flags.Busy, false);
+			SetFlag(Flags.Busy, b: false);
 			if (baseVehicle != null)
 			{
 				baseVehicle.PlayerDismounted(player, this);
@@ -461,8 +461,8 @@ public class BaseMountable : BaseCombatEntity
 			BasePlayer mounted = _mounted;
 			_mounted = null;
 			Debug.LogWarning("Killing player due to invalid dismount point :" + player.displayName + " / " + player.userID + " on obj : " + base.gameObject.name);
-			mounted.Hurt(1000f, DamageType.Suicide, mounted, false);
-			SetFlag(Flags.Busy, false);
+			mounted.Hurt(1000f, DamageType.Suicide, mounted, useProtection: false);
+			SetFlag(Flags.Busy, b: false);
 			if (baseVehicle != null)
 			{
 				baseVehicle.PlayerDismounted(player, this);
@@ -478,9 +478,9 @@ public class BaseMountable : BaseCombatEntity
 			_mounted.transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
 			_mounted.MovePosition(res);
 			_mounted.SendNetworkUpdateImmediate();
-			_mounted.SendModelState(true);
+			_mounted.SendModelState(force: true);
 			_mounted = null;
-			SetFlag(Flags.Busy, false);
+			SetFlag(Flags.Busy, b: false);
 			if (baseVehicle != null)
 			{
 				baseVehicle.PlayerDismounted(player, this);
@@ -518,8 +518,7 @@ public class BaseMountable : BaseCombatEntity
 				{
 					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
 				}
-				RaycastHit hitInfo;
-				if (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out hitInfo, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C66_0(hitInfo))
+				if (!UnityEngine.Physics.Linecast(visualCheckOrigin, vector, out var hitInfo, 1486946561) || HitOurself(hitInfo))
 				{
 					if (debugDismounts)
 					{
@@ -527,7 +526,7 @@ public class BaseMountable : BaseCombatEntity
 					}
 					Ray ray = new Ray(visualCheckOrigin, Vector3Ex.Direction(vector, visualCheckOrigin));
 					float maxDistance = Vector3.Distance(visualCheckOrigin, vector);
-					if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || _003CValidDismountPosition_003Eg__HitOurself_007C66_0(hitInfo))
+					if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || HitOurself(hitInfo))
 					{
 						if (debugDismounts)
 						{
@@ -551,6 +550,15 @@ public class BaseMountable : BaseCombatEntity
 			}
 		}
 		return false;
+		bool HitOurself(RaycastHit hit)
+		{
+			BaseEntity entity = RaycastHitEx.GetEntity(hit);
+			if (!(entity == this))
+			{
+				return EqualNetID(entity);
+			}
+			return true;
+		}
 	}
 
 	public virtual bool HasValidDismountPosition(BasePlayer player)
@@ -669,8 +677,7 @@ public class BaseMountable : BaseCombatEntity
 		}
 		if (obj.Count > 0)
 		{
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.Raycast(firingPos, firingDir, out hitInfo, launchOffset, 1236478737))
+			if (UnityEngine.Physics.Raycast(firingPos, firingDir, out var hitInfo, launchOffset, 1236478737))
 			{
 				launchOffset = hitInfo.distance - 0.1f;
 			}
@@ -718,8 +725,7 @@ public class BaseMountable : BaseCombatEntity
 		}
 		if (Vector3.Distance(player.transform.position, mountAnchor.position) <= maxMountDistance)
 		{
-			RaycastHit hitInfo;
-			if (!UnityEngine.Physics.SphereCast(player.eyes.HeadRay(), 0.25f, out hitInfo, 2f, 1218652417))
+			if (!UnityEngine.Physics.SphereCast(player.eyes.HeadRay(), 0.25f, out var hitInfo, 2f, 1218652417))
 			{
 				return false;
 			}
@@ -730,8 +736,7 @@ public class BaseMountable : BaseCombatEntity
 				{
 					return true;
 				}
-				BasePlayer basePlayer;
-				if ((object)(basePlayer = entity as BasePlayer) != null)
+				if (entity is BasePlayer basePlayer)
 				{
 					BaseMountable mounted = basePlayer.GetMounted();
 					if (mounted == this)

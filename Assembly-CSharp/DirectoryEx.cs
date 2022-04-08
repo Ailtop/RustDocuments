@@ -45,7 +45,7 @@ public static class DirectoryEx
 					int num2 = ((num != 0) ? (1 << num - 1) : 0);
 					if (totalHours >= (double)num2)
 					{
-						directoryInfo2.Delete(true);
+						directoryInfo2.Delete(recursive: true);
 						MoveToSafe(directoryInfo, directoryInfo2.FullName);
 					}
 				}
@@ -80,7 +80,7 @@ public static class DirectoryEx
 			foreach (FileInfo fileInfo in files)
 			{
 				FileInfo fileInfo2 = new FileInfo(Path.Combine(target.FullName, fileInfo.Name));
-				fileInfo.CopyTo(fileInfo2.FullName, true);
+				fileInfo.CopyTo(fileInfo2.FullName, overwrite: true);
 				fileInfo2.CreationTime = fileInfo.CreationTime;
 				fileInfo2.LastAccessTime = fileInfo.LastAccessTime;
 				fileInfo2.LastWriteTime = fileInfo.LastWriteTime;

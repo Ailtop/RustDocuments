@@ -99,7 +99,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 	{
 		if (inventory == null)
 		{
-			CreateInventory(true);
+			CreateInventory(giveUID: true);
 			OnInventoryFirstCreated(inventory);
 		}
 		base.ServerInit();
@@ -108,7 +108,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 	public override void PreServerLoad()
 	{
 		base.PreServerLoad();
-		CreateInventory(false);
+		CreateInventory(giveUID: false);
 	}
 
 	public override void PostServerLoad()
@@ -118,7 +118,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 		{
 			inventory.GiveUID();
 		}
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 	}
 
 	public void CreateInventory(bool giveUID)
@@ -212,7 +212,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 		}
 		if (player.inventory.loot.StartLootingEntity(this, doPositionChecks))
 		{
-			SetFlag(Flags.Open, true);
+			SetFlag(Flags.Open, b: true);
 			player.inventory.loot.AddContainer(inventory);
 			player.inventory.loot.SendImmediate();
 			player.ClientRPCPlayer(null, player, "RPC_OpenLootPanel", lootPanelName);
@@ -225,7 +225,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 	public virtual void PlayerStoppedLooting(BasePlayer player)
 	{
 		Interface.CallHook("OnLootEntityEnd", player, this);
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 		SendNetworkUpdate();
 	}
 

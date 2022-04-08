@@ -73,7 +73,7 @@ public class PagerEntity : BaseEntity, IRFObject
 
 	public override void SwitchParent(BaseEntity ent)
 	{
-		SetParent(ent, false, true);
+		SetParent(ent, worldPositionStays: false, sendImmediate: true);
 	}
 
 	public override void ServerInit()
@@ -118,12 +118,12 @@ public class PagerEntity : BaseEntity, IRFObject
 
 	public void SetOff()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public void ChangeFrequency(int newFreq)
 	{
-		RFManager.ChangeFrequency(frequency, newFreq, this, true);
+		RFManager.ChangeFrequency(frequency, newFreq, this, isListener: true);
 		frequency = newFreq;
 	}
 
@@ -137,7 +137,7 @@ public class PagerEntity : BaseEntity, IRFObject
 			int num = msg.read.Int32();
 			if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) == null)
 			{
-				RFManager.ChangeFrequency(frequency, num, this, true);
+				RFManager.ChangeFrequency(frequency, num, this, isListener: true);
 				frequency = num;
 				SendNetworkUpdateImmediate();
 				Interface.CallHook("OnRfFrequencyChanged", this, num, msg.player);
@@ -154,7 +154,7 @@ public class PagerEntity : BaseEntity, IRFObject
 
 	internal override void OnParentRemoved()
 	{
-		SetParent(null, false, true);
+		SetParent(null, worldPositionStays: false, sendImmediate: true);
 	}
 
 	public void OnParentDestroying()

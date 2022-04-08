@@ -1,32 +1,31 @@
-namespace ConVar
-{
-	[Factory("file")]
-	public class FileConVar : ConsoleSystem
-	{
-		[ClientVar]
-		public static bool debug
-		{
-			get
-			{
-				return FileSystem.LogDebug;
-			}
-			set
-			{
-				FileSystem.LogDebug = value;
-			}
-		}
+namespace ConVar;
 
-		[ClientVar]
-		public static bool time
+[Factory("file")]
+public class FileConVar : ConsoleSystem
+{
+	[ClientVar]
+	public static bool debug
+	{
+		get
 		{
-			get
-			{
-				return FileSystem.LogTime;
-			}
-			set
-			{
-				FileSystem.LogTime = value;
-			}
+			return FileSystem.LogDebug;
+		}
+		set
+		{
+			FileSystem.LogDebug = value;
+		}
+	}
+
+	[ClientVar]
+	public static bool time
+	{
+		get
+		{
+			return FileSystem.LogTime;
+		}
+		set
+		{
+			FileSystem.LogTime = value;
 		}
 	}
 }

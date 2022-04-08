@@ -283,7 +283,7 @@ public class FlameThrower : AttackEntity
 	{
 		if (!IsOnFire())
 		{
-			SetFlameState(true);
+			SetFlameState(wantsOn: true);
 			Invoke(StopFlameState, 0.2f);
 			base.ServerUse();
 		}
@@ -322,7 +322,7 @@ public class FlameThrower : AttackEntity
 
 	public void StopFlameState()
 	{
-		SetFlameState(false);
+		SetFlameState(wantsOn: false);
 	}
 
 	[RPC_Server]
@@ -381,7 +381,7 @@ public class FlameThrower : AttackEntity
 
 	public override void OnHeldChanged()
 	{
-		SetFlameState(false);
+		SetFlameState(wantsOn: false);
 		base.OnHeldChanged();
 	}
 
@@ -407,7 +407,7 @@ public class FlameThrower : AttackEntity
 		float num3 = (ownerPlayer.IsNpc ? npcDamageScale : 1f);
 		float amount = damagePerSec[0].amount;
 		damagePerSec[0].amount = amount * num * num3;
-		DamageUtil.RadiusDamage(ownerPlayer, LookupPrefab(), hitInfo.point - ray.direction * 0.1f, flameRadius * 0.5f, flameRadius, damagePerSec, 2279681, true);
+		DamageUtil.RadiusDamage(ownerPlayer, LookupPrefab(), hitInfo.point - ray.direction * 0.1f, flameRadius * 0.5f, flameRadius, damagePerSec, 2279681, useLineOfSight: true);
 		damagePerSec[0].amount = amount;
 		if (num2 && UnityEngine.Time.realtimeSinceStartup >= nextFlameTime && hitInfo.distance > 1.1f)
 		{
@@ -423,7 +423,7 @@ public class FlameThrower : AttackEntity
 		}
 		if (ammo == 0)
 		{
-			SetFlameState(false);
+			SetFlameState(wantsOn: false);
 		}
 		GetOwnerItem()?.LoseCondition(num);
 	}

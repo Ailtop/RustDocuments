@@ -88,11 +88,11 @@ public class MiningQuarry : BaseResourceExtractor
 	{
 		if (isOn && FuelCheck())
 		{
-			SetOn(true);
+			SetOn(isOn: true);
 		}
 		else
 		{
-			SetOn(false);
+			SetOn(isOn: false);
 		}
 	}
 
@@ -143,7 +143,7 @@ public class MiningQuarry : BaseResourceExtractor
 			{
 				_linkedDeposit.Add(ItemManager.FindItemDefinition("hq.metal.ore"), 1f, 1000, 30f, ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM);
 			}
-			_linkedDeposit.Add(ItemManager.FindItemDefinition("crude.oil"), 1f, 1000, 10f, ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM, true);
+			_linkedDeposit.Add(ItemManager.FindItemDefinition("crude.oil"), 1f, 1000, 10f, ResourceDepositManager.ResourceDeposit.surveySpawnType.ITEM, liquid: true);
 		}
 	}
 
@@ -186,13 +186,13 @@ public class MiningQuarry : BaseResourceExtractor
 				else if (!item.MoveToContainer(hopperPrefab.instance.GetComponent<StorageContainer>().inventory))
 				{
 					item.Remove();
-					SetOn(false);
+					SetOn(isOn: false);
 				}
 			}
 		}
 		if (!FuelCheck())
 		{
-			SetOn(false);
+			SetOn(isOn: false);
 		}
 	}
 

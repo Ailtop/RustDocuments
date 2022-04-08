@@ -439,7 +439,7 @@ public class VendingMachine : StorageContainer
 		if (base.isServer)
 		{
 			InstallDefaultSellOrders();
-			SetFlag(Flags.Reserved2, false);
+			SetFlag(Flags.Reserved2, b: false);
 			base.inventory.onItemAddedRemoved = OnItemAddedOrRemoved;
 			RefreshSellOrderStockLevel();
 			ItemContainer itemContainer = base.inventory;
@@ -529,7 +529,7 @@ public class VendingMachine : StorageContainer
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved2, b: false);
 		RefreshSellOrderStockLevel();
 		UpdateMapMarker();
 	}
@@ -572,7 +572,7 @@ public class VendingMachine : StorageContainer
 		vend_Player = buyer;
 		vend_sellOrderID = sellOrderId;
 		vend_numberOfTransactions = numberOfTransactions;
-		SetFlag(Flags.Reserved2, true);
+		SetFlag(Flags.Reserved2, b: true);
 		if (HasVendingSounds())
 		{
 			ClientRPC(null, "CLIENT_StartVendingSounds", sellOrderId);
@@ -585,7 +585,7 @@ public class VendingMachine : StorageContainer
 		vend_Player = null;
 		vend_sellOrderID = -1;
 		vend_numberOfTransactions = -1;
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved2, b: false);
 		ClientRPC(null, "CLIENT_CancelVendingSounds");
 	}
 

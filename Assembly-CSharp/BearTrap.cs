@@ -93,7 +93,7 @@ public class BearTrap : BaseTrap
 
 	public void Fire()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		SendNetworkUpdate();
 	}
 

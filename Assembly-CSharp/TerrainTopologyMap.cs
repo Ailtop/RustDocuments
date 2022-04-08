@@ -41,7 +41,7 @@ public class TerrainTopologyMap : TerrainMap<int>
 
 	public void GenerateTextures()
 	{
-		TopologyTexture = new Texture2D(res, res, TextureFormat.RGBA32, false, true);
+		TopologyTexture = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: false, linear: true);
 		TopologyTexture.name = "TopologyTexture";
 		TopologyTexture.wrapMode = TextureWrapMode.Clamp;
 		Color32[] col = new Color32[res * res];
@@ -57,7 +57,7 @@ public class TerrainTopologyMap : TerrainMap<int>
 
 	public void ApplyTextures()
 	{
-		TopologyTexture.Apply(false, true);
+		TopologyTexture.Apply(updateMipmaps: false, makeNoLongerReadable: true);
 	}
 
 	public bool GetTopology(Vector3 worldPos, int mask)

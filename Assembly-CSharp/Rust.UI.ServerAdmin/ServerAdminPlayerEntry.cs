@@ -1,13 +1,12 @@
 using UnityEngine;
 
-namespace Rust.UI.ServerAdmin
+namespace Rust.UI.ServerAdmin;
+
+public class ServerAdminPlayerEntry : MonoBehaviour
 {
-	public class ServerAdminPlayerEntry : MonoBehaviour
-	{
-		public RustText PlayerName;
+	public RustText PlayerName;
 
-		public RustText Ping;
+	public RustText Ping;
 
-		public RustButton Button;
-	}
+	public RustButton Button;
 }

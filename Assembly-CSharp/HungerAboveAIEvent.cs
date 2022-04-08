@@ -27,8 +27,7 @@ public class HungerAboveAIEvent : BaseAIEvent
 
 	public override void Execute(AIMemory memory, AIBrainSenses senses, StateStatus stateStatus)
 	{
-		IAIHungerAbove iAIHungerAbove = base.Owner as IAIHungerAbove;
-		if (iAIHungerAbove == null)
+		if (!(base.Owner is IAIHungerAbove iAIHungerAbove))
 		{
 			base.Result = false;
 			return;

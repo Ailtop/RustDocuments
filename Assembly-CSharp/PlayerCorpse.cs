@@ -43,7 +43,7 @@ public class PlayerCorpse : LootableCorpse
 	{
 		if (!IsBuoyant())
 		{
-			SetFlag(Flags.Reserved6, isSubmerged, false, false);
+			SetFlag(Flags.Reserved6, isSubmerged, recursive: false, networkupdate: false);
 			SendNetworkUpdate_Flags();
 		}
 	}

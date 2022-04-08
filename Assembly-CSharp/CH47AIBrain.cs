@@ -57,8 +57,8 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 
 		public override void StateEnter()
 		{
-			brain.GetEntity().SetDropDoorOpen(true);
-			brain.GetEntity().EnableFacingOverride(false);
+			brain.GetEntity().SetDropDoorOpen(open: true);
+			brain.GetEntity().EnableFacingOverride(enabled: false);
 			CH47DropZone closest = CH47DropZone.GetClosest(brain.GetEntity().transform.position);
 			if (closest == null)
 			{
@@ -82,7 +82,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 
 		public override void StateLeave()
 		{
-			brain.GetEntity().SetDropDoorOpen(false);
+			brain.GetEntity().SetDropDoorOpen(open: false);
 			nextDropTime = Time.time + 60f;
 			base.StateLeave();
 		}
@@ -124,7 +124,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 
 		public override void StateEnter()
 		{
-			brain.GetEntity().EnableFacingOverride(false);
+			brain.GetEntity().EnableFacingOverride(enabled: false);
 			Transform transform = brain.GetEntity().transform;
 			Rigidbody rigidBody = brain.GetEntity().rigidBody;
 			Vector3 rhs = ((rigidBody.velocity.magnitude < 0.1f) ? transform.forward : rigidBody.velocity.normalized);
@@ -227,7 +227,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 		{
 			base.StateThink(delta);
 			Vector3 position = brain.GetEntity().transform.position;
-			Vector3 forward = brain.GetEntity().transform.forward;
+			_ = brain.GetEntity().transform.forward;
 			CH47LandingZone closest = CH47LandingZone.GetClosest(brain.GetEntity().landingTarget);
 			if (!closest)
 			{
@@ -267,8 +267,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 			if (num < 100f && num > 15f)
 			{
 				Vector3 vector = Vector3Ex.Direction2D(closest.transform.position, position);
-				RaycastHit hitInfo;
-				if (Physics.SphereCast(position, 15f, vector, out hitInfo, num, 1218511105))
+				if (Physics.SphereCast(position, 15f, vector, out var hitInfo, num, 1218511105))
 				{
 					Vector3 vector2 = Vector3.Cross(vector, Vector3.up);
 					moveTarget = hitInfo.point + vector2 * 50f;
@@ -306,8 +305,8 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 
 		public override void StateLeave()
 		{
-			brain.GetEntity().EnableFacingOverride(false);
-			brain.GetEntity().SetAltitudeProtection(true);
+			brain.GetEntity().EnableFacingOverride(enabled: false);
+			brain.GetEntity().SetAltitudeProtection(on: true);
 			brain.GetEntity().SetMinHoverHeight(30f);
 			landedForSeconds = 0f;
 			base.StateLeave();
@@ -338,20 +337,16 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 				float num = 1f - Mathf.InverseLerp(120f, 180f, base.TimeInState);
 				return 5f * num;
 			}
-			if (brain.CurrentState != null && brain.CurrentState.StateType == AIState.Patrol)
+			if (brain.CurrentState != null && brain.CurrentState.StateType == AIState.Patrol && brain.CurrentState is PatrolState patrolState && patrolState.AtPatrolDestination())
 			{
-				PatrolState patrolState = brain.CurrentState as PatrolState;
-				if (patrolState != null && patrolState.AtPatrolDestination())
-				{
-					return 5f;
-				}
+				return 5f;
 			}
 			return 0f;
 		}
 
 		public override void StateEnter()
 		{
-			brain.GetEntity().EnableFacingOverride(true);
+			brain.GetEntity().EnableFacingOverride(enabled: true);
 			brain.GetEntity().InitiateAnger();
 			base.StateEnter();
 		}
@@ -375,7 +370,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 
 		public override void StateLeave()
 		{
-			brain.GetEntity().EnableFacingOverride(false);
+			brain.GetEntity().EnableFacingOverride(enabled: false);
 			brain.GetEntity().CancelAnger();
 			base.StateLeave();
 		}

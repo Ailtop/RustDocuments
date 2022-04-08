@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("mesh")]
+public class Mesh : ConsoleSystem
 {
-	[Factory("mesh")]
-	public class Mesh : ConsoleSystem
-	{
-	}
 }

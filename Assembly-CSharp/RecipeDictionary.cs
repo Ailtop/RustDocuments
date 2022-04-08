@@ -6,8 +6,7 @@ public static class RecipeDictionary
 
 	public static void CacheRecipes(RecipeList recipeList)
 	{
-		Dictionary<int, List<Recipe>> value;
-		if (recipeList == null || recipeListsDict.TryGetValue(recipeList.FilenameStringId, out value))
+		if (recipeList == null || recipeListsDict.TryGetValue(recipeList.FilenameStringId, out var _))
 		{
 			return;
 		}
@@ -95,8 +94,7 @@ public static class RecipeDictionary
 		{
 			return null;
 		}
-		Dictionary<int, List<Recipe>> value;
-		if (!recipeListsDict.TryGetValue(recipeList.FilenameStringId, out value))
+		if (!recipeListsDict.TryGetValue(recipeList.FilenameStringId, out var value))
 		{
 			CacheRecipes(recipeList);
 		}
@@ -104,8 +102,7 @@ public static class RecipeDictionary
 		{
 			return null;
 		}
-		List<Recipe> value2;
-		if (!value.TryGetValue(firstIngredient.info.itemid, out value2))
+		if (!value.TryGetValue(firstIngredient.info.itemid, out var value2))
 		{
 			return null;
 		}

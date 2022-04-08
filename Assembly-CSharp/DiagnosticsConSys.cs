@@ -258,7 +258,7 @@ public class DiagnosticsConSys : ConsoleSystem
 		array = rootObjects;
 		foreach (Transform tx2 in array)
 		{
-			DumpGameObjectRecursive(stringBuilder, tx2, 0, true);
+			DumpGameObjectRecursive(stringBuilder, tx2, 0, includeComponents: true);
 			stringBuilder.AppendLine();
 		}
 		WriteTextToFile(targetFolder + "GameObject.Hierarchy.Components.txt", stringBuilder.ToString());

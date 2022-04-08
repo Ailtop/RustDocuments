@@ -121,15 +121,14 @@ public class CH47FlightTest : MonoBehaviour
 		{
 			Transform obj = GroundPoints[i];
 			Transform transform = GroundEffects[i];
-			RaycastHit hitInfo;
-			if (Physics.Raycast(obj.transform.position, Vector3.down, out hitInfo, 50f, 8388608))
+			if (Physics.Raycast(obj.transform.position, Vector3.down, out var hitInfo, 50f, 8388608))
 			{
-				transform.gameObject.SetActive(true);
+				transform.gameObject.SetActive(value: true);
 				transform.transform.position = hitInfo.point + new Vector3(0f, 1f, 0f);
 			}
 			else
 			{
-				transform.gameObject.SetActive(false);
+				transform.gameObject.SetActive(value: false);
 			}
 		}
 	}

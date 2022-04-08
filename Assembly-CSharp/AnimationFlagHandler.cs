@@ -6,11 +6,11 @@ public class AnimationFlagHandler : MonoBehaviour
 
 	public void SetBoolTrue(string name)
 	{
-		animator.SetBool(name, true);
+		animator.SetBool(name, value: true);
 	}
 
 	public void SetBoolFalse(string name)
 	{
-		animator.SetBool(name, false);
+		animator.SetBool(name, value: false);
 	}
 }

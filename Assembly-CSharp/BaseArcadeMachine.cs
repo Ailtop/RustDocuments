@@ -236,14 +236,14 @@ public class BaseArcadeMachine : BaseVehicle
 	{
 		base.PlayerMounted(player, seat);
 		ClientRPCPlayer(null, player, "BeginHosting");
-		SetFlag(Flags.Reserved7, true, true);
+		SetFlag(Flags.Reserved7, b: true, recursive: true);
 	}
 
 	public override void PlayerDismounted(BasePlayer player, BaseMountable seat)
 	{
 		base.PlayerDismounted(player, seat);
 		ClientRPCPlayer(null, player, "EndHosting");
-		SetFlag(Flags.Reserved7, false, true);
+		SetFlag(Flags.Reserved7, b: false, recursive: true);
 		if (!AnyMounted())
 		{
 			NearbyClientMessage("NoHost");

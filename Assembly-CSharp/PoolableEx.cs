@@ -26,11 +26,11 @@ public static class PoolableEx
 	{
 		if (gameObject.activeSelf)
 		{
-			gameObject.GetComponent<Poolable>().SetBehaviourEnabled(true);
+			gameObject.GetComponent<Poolable>().SetBehaviourEnabled(state: true);
 		}
 		else
 		{
-			gameObject.SetActive(true);
+			gameObject.SetActive(value: true);
 		}
 	}
 }

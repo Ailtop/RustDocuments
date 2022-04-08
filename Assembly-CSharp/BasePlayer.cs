@@ -1951,7 +1951,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		BasePlayer player = msg.player;
 		UnityEngine.Vector3 vector = msg.read.Vector3();
-		if (vector.IsNaNOrInfinity() || !player || !player.metabolism.CanConsume() || UnityEngine.Vector3.Distance(player.transform.position, vector) > 5f || !WaterLevel.Test(vector, true, this) || (isMounted && !GetMounted().canDrinkWhileMounted))
+		if (vector.IsNaNOrInfinity() || !player || !player.metabolism.CanConsume() || UnityEngine.Vector3.Distance(player.transform.position, vector) > 5f || !WaterLevel.Test(vector, waves: true, this) || (isMounted && !GetMounted().canDrinkWhileMounted))
 		{
 			return;
 		}
@@ -1984,7 +1984,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			return;
 		}
 		UnityEngine.Vector3 end = vector2 - (vector2 - player.eyes.position).normalized * 0.25f;
-		if (!GamePhysics.CheckCapsule(player.eyes.position, end, 0.25f, 1218519041) && !AntiHack.TestNoClipping(player, vector2 + player.NoClipOffset(), vector2 + player.NoClipOffset(), player.NoClipRadius(ConVar.AntiHack.noclip_margin), ConVar.AntiHack.noclip_backtracking, true))
+		if (!GamePhysics.CheckCapsule(player.eyes.position, end, 0.25f, 1218519041) && !AntiHack.TestNoClipping(player, vector2 + player.NoClipOffset(), vector2 + player.NoClipOffset(), player.NoClipRadius(ConVar.AntiHack.noclip_margin), ConVar.AntiHack.noclip_backtracking, sphereCast: true))
 		{
 			player.EnsureDismounted();
 			player.transform.position = vector2;
@@ -2269,13 +2269,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public int CountWaveTargets(UnityEngine.Vector3 position, float distance, float minimumDot, UnityEngine.Vector3 forward, HashSet<uint> workingList, int maxCount)
 	{
-		_003C_003Ec__DisplayClass83_0 _003C_003Ec__DisplayClass83_ = default(_003C_003Ec__DisplayClass83_0);
-		_003C_003Ec__DisplayClass83_._003C_003E4__this = this;
-		_003C_003Ec__DisplayClass83_.position = position;
-		_003C_003Ec__DisplayClass83_.forward = forward;
-		_003C_003Ec__DisplayClass83_.minimumDot = minimumDot;
-		_003C_003Ec__DisplayClass83_.workingList = workingList;
-		_003C_003Ec__DisplayClass83_.sqrDistance = distance * distance;
+		float sqrDistance = distance * distance;
 		Group group = net.group;
 		if (group == null)
 		{
@@ -2291,9 +2285,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				continue;
 			}
 			BasePlayer basePlayer = connection.player as BasePlayer;
-			if (_003CCountWaveTargets_003Eg__CheckPlayer_007C83_0(basePlayer, ref _003C_003Ec__DisplayClass83_))
+			if (CheckPlayer(basePlayer))
 			{
-				_003C_003Ec__DisplayClass83_.workingList.Add(basePlayer.net.ID);
+				workingList.Add(basePlayer.net.ID);
 				num++;
 				if (num >= maxCount)
 				{
@@ -2302,6 +2296,30 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 		}
 		return num;
+		bool CheckPlayer(BasePlayer player)
+		{
+			if (player == null)
+			{
+				return false;
+			}
+			if (player == this)
+			{
+				return false;
+			}
+			if (player.SqrDistance(position) > sqrDistance)
+			{
+				return false;
+			}
+			if (UnityEngine.Vector3.Dot((player.transform.position - position).normalized, forward) < minimumDot)
+			{
+				return false;
+			}
+			if (workingList.Contains(player.net.ID))
+			{
+				return false;
+			}
+			return true;
+		}
 	}
 
 	private bool IsGestureBlocked()
@@ -2339,63 +2357,61 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		int num = 0;
 		int num2 = 0;
-		using (PlayerTeam playerTeam2 = Facepunch.Pool.Get<PlayerTeam>())
+		using PlayerTeam playerTeam2 = Facepunch.Pool.Get<PlayerTeam>();
+		playerTeam2.teamLeader = playerTeam.teamLeader;
+		playerTeam2.teamID = playerTeam.teamID;
+		playerTeam2.teamName = playerTeam.teamName;
+		playerTeam2.members = Facepunch.Pool.GetList<PlayerTeam.TeamMember>();
+		playerTeam2.teamLifetime = playerTeam.teamLifetime;
+		foreach (ulong member in playerTeam.members)
 		{
-			playerTeam2.teamLeader = playerTeam.teamLeader;
-			playerTeam2.teamID = playerTeam.teamID;
-			playerTeam2.teamName = playerTeam.teamName;
-			playerTeam2.members = Facepunch.Pool.GetList<PlayerTeam.TeamMember>();
-			playerTeam2.teamLifetime = playerTeam.teamLifetime;
-			foreach (ulong member in playerTeam.members)
+			BasePlayer basePlayer = RelationshipManager.FindByID(member);
+			PlayerTeam.TeamMember teamMember = Facepunch.Pool.Get<PlayerTeam.TeamMember>();
+			teamMember.displayName = ((basePlayer != null) ? basePlayer.displayName : (SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(member) ?? "DEAD"));
+			teamMember.healthFraction = ((basePlayer != null && basePlayer.IsAlive()) ? basePlayer.healthFraction : 0f);
+			teamMember.position = ((basePlayer != null) ? basePlayer.transform.position : UnityEngine.Vector3.zero);
+			teamMember.online = basePlayer != null && !basePlayer.IsSleeping();
+			teamMember.wounded = basePlayer != null && basePlayer.IsWounded();
+			if ((!sentInstrumentTeamAchievement || !sentSummerTeamAchievement) && basePlayer != null)
 			{
-				BasePlayer basePlayer = RelationshipManager.FindByID(member);
-				PlayerTeam.TeamMember teamMember = Facepunch.Pool.Get<PlayerTeam.TeamMember>();
-				teamMember.displayName = ((basePlayer != null) ? basePlayer.displayName : (SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(member) ?? "DEAD"));
-				teamMember.healthFraction = ((basePlayer != null && basePlayer.IsAlive()) ? basePlayer.healthFraction : 0f);
-				teamMember.position = ((basePlayer != null) ? basePlayer.transform.position : UnityEngine.Vector3.zero);
-				teamMember.online = basePlayer != null && !basePlayer.IsSleeping();
-				teamMember.wounded = basePlayer != null && basePlayer.IsWounded();
-				if ((!sentInstrumentTeamAchievement || !sentSummerTeamAchievement) && basePlayer != null)
+				if ((bool)basePlayer.GetHeldEntity() && basePlayer.GetHeldEntity().IsInstrument())
 				{
-					if ((bool)basePlayer.GetHeldEntity() && basePlayer.GetHeldEntity().IsInstrument())
+					num++;
+				}
+				if (basePlayer.isMounted)
+				{
+					if (basePlayer.GetMounted().IsInstrument())
 					{
 						num++;
 					}
-					if (basePlayer.isMounted)
+					if (basePlayer.GetMounted().IsSummerDlcVehicle)
 					{
-						if (basePlayer.GetMounted().IsInstrument())
-						{
-							num++;
-						}
-						if (basePlayer.GetMounted().IsSummerDlcVehicle)
-						{
-							num2++;
-						}
-					}
-					if (num >= 4 && !sentInstrumentTeamAchievement)
-					{
-						GiveAchievement("TEAM_INSTRUMENTS");
-						sentInstrumentTeamAchievement = true;
-					}
-					if (num2 >= 4)
-					{
-						GiveAchievement("SUMMER_INFLATABLE");
-						sentSummerTeamAchievement = true;
+						num2++;
 					}
 				}
-				teamMember.userID = member;
-				playerTeam2.members.Add(teamMember);
+				if (num >= 4 && !sentInstrumentTeamAchievement)
+				{
+					GiveAchievement("TEAM_INSTRUMENTS");
+					sentInstrumentTeamAchievement = true;
+				}
+				if (num2 >= 4)
+				{
+					GiveAchievement("SUMMER_INFLATABLE");
+					sentSummerTeamAchievement = true;
+				}
 			}
-			teamLeaderBuffer = FindByID(playerTeam.teamLeader);
-			if (teamLeaderBuffer != null)
-			{
-				playerTeam2.mapNote = teamLeaderBuffer.ServerCurrentMapNote;
-			}
-			if (Interface.CallHook("OnTeamUpdated", currentTeam, playerTeam2, this) == null)
-			{
-				ClientRPCPlayerAndSpectators(null, this, "CLIENT_ReceiveTeamInfo", playerTeam2);
-				playerTeam2.mapNote = null;
-			}
+			teamMember.userID = member;
+			playerTeam2.members.Add(teamMember);
+		}
+		teamLeaderBuffer = FindByID(playerTeam.teamLeader);
+		if (teamLeaderBuffer != null)
+		{
+			playerTeam2.mapNote = teamLeaderBuffer.ServerCurrentMapNote;
+		}
+		if (Interface.CallHook("OnTeamUpdated", currentTeam, playerTeam2, this) == null)
+		{
+			ClientRPCPlayerAndSpectators(null, this, "CLIENT_ReceiveTeamInfo", playerTeam2);
+			playerTeam2.mapNote = null;
 		}
 	}
 
@@ -2557,20 +2573,18 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public void SendMarkersToClient()
 	{
-		using (MapNoteList mapNoteList = Facepunch.Pool.Get<MapNoteList>())
+		using MapNoteList mapNoteList = Facepunch.Pool.Get<MapNoteList>();
+		mapNoteList.notes = Facepunch.Pool.GetList<MapNote>();
+		if (ServerCurrentDeathNote != null)
 		{
-			mapNoteList.notes = Facepunch.Pool.GetList<MapNote>();
-			if (ServerCurrentDeathNote != null)
-			{
-				mapNoteList.notes.Add(ServerCurrentDeathNote);
-			}
-			if (ServerCurrentMapNote != null)
-			{
-				mapNoteList.notes.Add(ServerCurrentMapNote);
-			}
-			ClientRPCPlayer(null, this, "Client_ReceiveMarkers", mapNoteList);
-			mapNoteList.notes.Clear();
+			mapNoteList.notes.Add(ServerCurrentDeathNote);
 		}
+		if (ServerCurrentMapNote != null)
+		{
+			mapNoteList.notes.Add(ServerCurrentMapNote);
+		}
+		ClientRPCPlayer(null, this, "Client_ReceiveMarkers", mapNoteList);
+		mapNoteList.notes.Clear();
 	}
 
 	public bool HasAttemptedMission(uint missionID)
@@ -3105,8 +3119,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public void SendClientPetLink()
 	{
-		BasePet value;
-		if (PetEntity == null && BasePet.ActivePetByOwnerID.TryGetValue(userID, out value) && value.Brain != null)
+		if (PetEntity == null && BasePet.ActivePetByOwnerID.TryGetValue(userID, out var value) && value.Brain != null)
 		{
 			value.Brain.SetOwningPlayer(this);
 		}
@@ -3129,13 +3142,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	[RPC_Server]
 	private void IssuePetCommand(RPCMessage msg)
 	{
-		ParsePetCommand(msg, false);
+		ParsePetCommand(msg, raycast: false);
 	}
 
 	[RPC_Server]
 	private void IssuePetCommandRaycast(RPCMessage msg)
 	{
-		ParsePetCommand(msg, true);
+		ParsePetCommand(msg, raycast: true);
 	}
 
 	private void ParsePetCommand(RPCMessage msg, bool raycast)
@@ -3362,7 +3375,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		PlayerAttack playerAttack = playerProjectileAttack.playerAttack;
 		HitInfo hitInfo = new HitInfo();
-		hitInfo.LoadFromAttack(playerAttack.attack, true);
+		hitInfo.LoadFromAttack(playerAttack.attack, serverSide: true);
 		hitInfo.Initiator = this;
 		hitInfo.ProjectileID = playerAttack.projectileID;
 		hitInfo.ProjectileDistance = playerProjectileAttack.hitDistance;
@@ -3376,8 +3389,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			stats.combat.Log(hitInfo, "projectile_nan");
 			return;
 		}
-		FiredProjectile value;
-		if (!firedProjectiles.TryGetValue(playerAttack.projectileID, out value))
+		if (!firedProjectiles.TryGetValue(playerAttack.projectileID, out var value))
 		{
 			AntiHack.Log(this, AntiHackType.ProjectileHack, "Missing ID (" + playerAttack.projectileID + ")");
 			playerProjectileAttack.ResetToPool();
@@ -3468,7 +3480,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					stats.combat.Log(hitInfo, "water_entity");
 					flag9 = false;
 				}
-				if (!WaterLevel.Test(hitInfo.HitPositionWorld - 0.5f * UnityEngine.Vector3.up, false, this))
+				if (!WaterLevel.Test(hitInfo.HitPositionWorld - 0.5f * UnityEngine.Vector3.up, waves: false, this))
 				{
 					string text5 = hitInfo.ProjectilePrefab.name;
 					string text6 = (flag6 ? hitEntity.ShortPrefabName : "world");
@@ -3587,9 +3599,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 			if (value.protection >= 4)
 			{
-				UnityEngine.Vector3 prevPosition;
-				UnityEngine.Vector3 prevVelocity;
-				SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out prevPosition, out prevVelocity);
+				SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out var prevPosition, out var prevVelocity);
 				UnityEngine.Vector3 vector3 = prevVelocity * (1f / 32f);
 				Line line = new Line(prevPosition - vector3, position + vector3);
 				float num21 = line.Distance(hitInfo.PointStart);
@@ -3754,8 +3764,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			playerProjectileUpdate = null;
 			return;
 		}
-		FiredProjectile value;
-		if (!firedProjectiles.TryGetValue(playerProjectileUpdate.projectileID, out value))
+		if (!firedProjectiles.TryGetValue(playerProjectileUpdate.projectileID, out var value))
 		{
 			AntiHack.Log(this, AntiHackType.ProjectileHack, "Missing ID (" + playerProjectileUpdate.projectileID + ")");
 			playerProjectileUpdate.ResetToPool();
@@ -3847,9 +3856,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 			if (value.protection >= 4)
 			{
-				UnityEngine.Vector3 prevPosition;
-				UnityEngine.Vector3 prevVelocity;
-				SimulateProjectile(ref position, ref velocity, ref partialTime, num2 - travelTime, gravity, drag, out prevPosition, out prevVelocity);
+				SimulateProjectile(ref position, ref velocity, ref partialTime, num2 - travelTime, gravity, drag, out var prevPosition, out var prevVelocity);
 				UnityEngine.Vector3 vector2 = prevVelocity * (1f / 32f);
 				num += new Line(prevPosition - vector2, position + vector2).Distance(playerProjectileUpdate.curPosition);
 				if (num > ConVar.AntiHack.projectile_trajectory)
@@ -4012,7 +4019,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			BaseProjectile baseProjectile2 = attackEnt as BaseProjectile;
 			if ((bool)baseProjectile2)
 			{
-				num2 *= baseProjectile2.GetProjectileVelocityScale(true);
+				num2 *= baseProjectile2.GetProjectileVelocityScale(getMax: true);
 			}
 			num2 *= num;
 			if (magnitude > num2)
@@ -4238,9 +4245,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			{
 				previousLifeStory.ShouldPool = false;
 			}
-			SetPlayerFlag(PlayerFlags.Sleeping, false);
+			SetPlayerFlag(PlayerFlags.Sleeping, b: false);
 			StartSleeping();
-			SetPlayerFlag(PlayerFlags.Connected, false);
+			SetPlayerFlag(PlayerFlags.Connected, b: false);
 			if (lifeStory == null && IsAlive())
 			{
 				LifeStoryStart();
@@ -4357,7 +4364,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			{
 				currentTimeCategory |= 32;
 			}
-			BaseMountable baseMountable2;
 			if (isMounted)
 			{
 				BaseMountable baseMountable = GetMounted();
@@ -4374,7 +4380,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					currentTimeCategory |= 64;
 				}
 			}
-			else if (HasParent() && (object)(baseMountable2 = GetParentEntity() as BaseMountable) != null)
+			else if (HasParent() && GetParentEntity() is BaseMountable baseMountable2)
 			{
 				if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Boating)
 				{
@@ -4555,7 +4561,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		else
 		{
-			SetParent(null, true, true);
+			SetParent(null, worldPositionStays: true, sendImmediate: true);
 		}
 	}
 
@@ -4703,7 +4709,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			AntiHack.AddViolation(this, AntiHackType.InsideTerrain, ConVar.AntiHack.terrain_penalty);
 			if (ConVar.AntiHack.terrain_kill)
 			{
-				Hurt(1000f, DamageType.Suicide, this, false);
+				Hurt(1000f, DamageType.Suicide, this, useProtection: false);
 				return;
 			}
 		}
@@ -4726,7 +4732,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	private void ServerUpdateBots(float deltaTime)
 	{
-		RefreshColliderSize(false);
+		RefreshColliderSize(forced: false);
 	}
 
 	private void ConnectedPlayerUpdate(float deltaTime)
@@ -4794,13 +4800,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			stats.Add("time", num3, Stats.Server);
 			secondsConnected = num2;
 		}
-		RefreshColliderSize(false);
+		RefreshColliderSize(forced: false);
 		SendModelState();
 	}
 
 	private void EnterGame()
 	{
-		SetPlayerFlag(PlayerFlags.ReceivingSnapshot, false);
+		SetPlayerFlag(PlayerFlags.ReceivingSnapshot, b: false);
 		ClientRPCPlayer(null, this, "FinishLoading");
 		Invoke(DelayedTeamUpdate, 1f);
 		LoadMissions(State.missions);
@@ -4844,7 +4850,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		using (TimeWarning.New("PlayerInit", 10))
 		{
 			CancelInvoke(base.KillMessage);
-			SetPlayerFlag(PlayerFlags.Connected, true);
+			SetPlayerFlag(PlayerFlags.Connected, b: true);
 			activePlayerList.Add(this);
 			bots.Remove(this);
 			userID = c.userid;
@@ -4858,7 +4864,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			eyeHistory.Clear();
 			lastTickTime = 0f;
 			lastInputTime = 0f;
-			SetPlayerFlag(PlayerFlags.ReceivingSnapshot, true);
+			SetPlayerFlag(PlayerFlags.ReceivingSnapshot, b: true);
 			stats.Init();
 			InvokeRandomized(StatSave, UnityEngine.Random.Range(5f, 10f), 30f, UnityEngine.Random.Range(0f, 6f));
 			previousLifeStory = SingletonComponent<ServerMgr>.Instance.persistance.GetLastLifeStory(userID);
@@ -4872,9 +4878,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			net.StartSubscriber();
 			SendAsSnapshot(net.connection);
 			ClientRPCPlayer(null, this, "StartLoading");
-			if ((bool)BaseGameMode.GetActiveGameMode(true))
+			if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
 			{
-				BaseGameMode.GetActiveGameMode(true).OnPlayerConnected(this);
+				BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerConnected(this);
 			}
 			if (net != null)
 			{
@@ -4926,26 +4932,24 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public void SendRespawnOptions()
 	{
-		using (RespawnInformation respawnInformation = Facepunch.Pool.Get<RespawnInformation>())
+		using RespawnInformation respawnInformation = Facepunch.Pool.Get<RespawnInformation>();
+		respawnInformation.spawnOptions = Facepunch.Pool.Get<List<RespawnInformation.SpawnOptions>>();
+		SleepingBag[] array = SleepingBag.FindForPlayer(userID, ignoreTimers: true);
+		foreach (SleepingBag sleepingBag in array)
 		{
-			respawnInformation.spawnOptions = Facepunch.Pool.Get<List<RespawnInformation.SpawnOptions>>();
-			SleepingBag[] array = SleepingBag.FindForPlayer(userID, true);
-			foreach (SleepingBag sleepingBag in array)
-			{
-				RespawnInformation.SpawnOptions spawnOptions = Facepunch.Pool.Get<RespawnInformation.SpawnOptions>();
-				spawnOptions.id = sleepingBag.net.ID;
-				spawnOptions.name = sleepingBag.niceName;
-				spawnOptions.worldPosition = sleepingBag.transform.position;
-				spawnOptions.type = sleepingBag.RespawnType;
-				spawnOptions.unlockSeconds = sleepingBag.GetUnlockSeconds(userID);
-				spawnOptions.occupied = sleepingBag.IsOccupied();
-				respawnInformation.spawnOptions.Add(spawnOptions);
-			}
-			respawnInformation.previousLife = previousLifeStory;
-			respawnInformation.fadeIn = previousLifeStory != null && previousLifeStory.timeDied > Epoch.Current - 5;
-			Interface.CallHook("OnRespawnInformationGiven", this, respawnInformation);
-			ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
+			RespawnInformation.SpawnOptions spawnOptions = Facepunch.Pool.Get<RespawnInformation.SpawnOptions>();
+			spawnOptions.id = sleepingBag.net.ID;
+			spawnOptions.name = sleepingBag.niceName;
+			spawnOptions.worldPosition = sleepingBag.transform.position;
+			spawnOptions.type = sleepingBag.RespawnType;
+			spawnOptions.unlockSeconds = sleepingBag.GetUnlockSeconds(userID);
+			spawnOptions.occupied = sleepingBag.IsOccupied();
+			respawnInformation.spawnOptions.Add(spawnOptions);
 		}
+		respawnInformation.previousLife = previousLifeStory;
+		respawnInformation.fadeIn = previousLifeStory != null && previousLifeStory.timeDied > Epoch.Current - 5;
+		Interface.CallHook("OnRespawnInformationGiven", this, respawnInformation);
+		ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
 	}
 
 	[RPC_Server]
@@ -4975,34 +4979,34 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			{
 				EnsureDismounted();
 			}
-			SetPlayerFlag(PlayerFlags.Sleeping, true);
+			SetPlayerFlag(PlayerFlags.Sleeping, b: true);
 			sleepStartTime = UnityEngine.Time.time;
 			sleepingPlayerList.Add(this);
 			bots.Remove(this);
 			CancelInvoke(InventoryUpdate);
 			CancelInvoke(TeamUpdate);
 			inventory.loot.Clear();
-			inventory.crafting.CancelAll(true);
+			inventory.crafting.CancelAll(returnItems: true);
 			inventory.containerMain.OnChanged();
 			inventory.containerBelt.OnChanged();
 			inventory.containerWear.OnChanged();
 			TurnOffAllLights();
 			EnablePlayerCollider();
 			RemovePlayerRigidbody();
-			SetServerFall(true);
+			SetServerFall(wantsOn: true);
 		}
 	}
 
 	private void TurnOffAllLights()
 	{
-		LightToggle(false);
+		LightToggle(mask: false);
 		HeldEntity heldEntity = GetHeldEntity();
 		if (heldEntity != null)
 		{
 			TorchWeapon component = heldEntity.GetComponent<TorchWeapon>();
 			if (component != null)
 			{
-				component.SetIsOn(false);
+				component.SetIsOn(isOn: false);
 			}
 		}
 	}
@@ -5017,7 +5021,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	private void DelayedServerFall()
 	{
-		SetServerFall(true);
+		SetServerFall(wantsOn: true);
 	}
 
 	public void SetServerFall(bool wantsOn)
@@ -5026,7 +5030,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			if (!IsInvoking(ServerFall))
 			{
-				SetPlayerFlag(PlayerFlags.ServerFall, true);
+				SetPlayerFlag(PlayerFlags.ServerFall, b: true);
 				lastFallTime = UnityEngine.Time.time - fallTickRate;
 				InvokeRandomized(ServerFall, 0f, fallTickRate, fallTickRate * 0.1f);
 				fallVelocity = estimatedVelocity.y;
@@ -5035,7 +5039,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		else
 		{
 			CancelInvoke(ServerFall);
-			SetPlayerFlag(PlayerFlags.ServerFall, false);
+			SetPlayerFlag(PlayerFlags.ServerFall, b: false);
 		}
 	}
 
@@ -5043,13 +5047,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		if (IsDead() || HasParent() || (!IsIncapacitated() && !IsSleeping()))
 		{
-			SetServerFall(false);
+			SetServerFall(wantsOn: false);
 			return;
 		}
 		float num = UnityEngine.Time.time - lastFallTime;
 		lastFallTime = UnityEngine.Time.time;
 		float radius = GetRadius();
-		float num2 = GetHeight(true) * 0.5f;
+		float num2 = GetHeight(ducked: true) * 0.5f;
 		float num3 = 2.5f;
 		float num4 = 0.5f;
 		fallVelocity += UnityEngine.Physics.gravity.y * num3 * num4 * num;
@@ -5057,10 +5061,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		UnityEngine.Vector3 origin = base.transform.position + UnityEngine.Vector3.up * (radius + num2);
 		UnityEngine.Vector3 position = base.transform.position;
 		UnityEngine.Vector3 position2 = base.transform.position;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.SphereCast(origin, radius, UnityEngine.Vector3.down, out hitInfo, num5 + num2, 1537286401, QueryTriggerInteraction.Ignore))
+		if (UnityEngine.Physics.SphereCast(origin, radius, UnityEngine.Vector3.down, out var hitInfo, num5 + num2, 1537286401, QueryTriggerInteraction.Ignore))
 		{
-			SetServerFall(false);
+			SetServerFall(wantsOn: false);
 			if (hitInfo.distance > num2)
 			{
 				position2 += UnityEngine.Vector3.down * (hitInfo.distance - num2);
@@ -5071,7 +5074,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		else if (UnityEngine.Physics.Raycast(origin, UnityEngine.Vector3.down, out hitInfo, num5 + radius + num2, 1537286401, QueryTriggerInteraction.Ignore))
 		{
-			SetServerFall(false);
+			SetServerFall(wantsOn: false);
 			if (hitInfo.distance > num2 - radius)
 			{
 				position2 += UnityEngine.Vector3.down * (hitInfo.distance - num2 - radius);
@@ -5084,9 +5087,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			position2 += UnityEngine.Vector3.down * num5;
 			UpdateEstimatedVelocity(position, position2, num);
-			if (WaterLevel.Test(position2, true, this) || AntiHack.TestInsideTerrain(position2))
+			if (WaterLevel.Test(position2, waves: true, this) || AntiHack.TestInsideTerrain(position2))
 			{
-				SetServerFall(false);
+				SetServerFall(wantsOn: false);
 			}
 		}
 		MovePosition(position2);
@@ -5103,7 +5106,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			return;
 		}
-		SetPlayerFlag(PlayerFlags.Sleeping, false);
+		SetPlayerFlag(PlayerFlags.Sleeping, b: false);
 		sleepStartTime = -1f;
 		sleepingPlayerList.Remove(this);
 		if (userID < 10000000 && !bots.Contains(this))
@@ -5118,10 +5121,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		EnablePlayerCollider();
 		AddPlayerRigidbody();
-		SetServerFall(false);
+		SetServerFall(wantsOn: false);
 		if (HasParent())
 		{
-			SetParent(null, true);
+			SetParent(null, worldPositionStays: true);
 			ForceUpdateTriggers();
 		}
 		inventory.containerMain.OnChanged();
@@ -5161,19 +5164,19 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			Invoke(base.KillMessage, 0f);
 		}
 		activePlayerList.Remove(this);
-		SetPlayerFlag(PlayerFlags.Connected, false);
+		SetPlayerFlag(PlayerFlags.Connected, b: false);
 		StopDemoRecording();
 		if (net != null)
 		{
 			net.OnDisconnected();
 		}
 		ResetAntiHack();
-		RefreshColliderSize(true);
+		RefreshColliderSize(forced: true);
 		clientTickRate = 20;
 		clientTickInterval = 0.05f;
-		if ((bool)BaseGameMode.GetActiveGameMode(true))
+		if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
 		{
-			BaseGameMode.GetActiveGameMode(true).OnPlayerDisconnected(this);
+			BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerDisconnected(this);
 		}
 		BaseMission.PlayerDisconnected(this);
 	}
@@ -5303,8 +5306,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public override void OnKilled(HitInfo info)
 	{
-		SetPlayerFlag(PlayerFlags.Unused2, false);
-		SetPlayerFlag(PlayerFlags.Unused1, false);
+		SetPlayerFlag(PlayerFlags.Unused2, b: false);
+		SetPlayerFlag(PlayerFlags.Unused1, b: false);
 		EnsureDismounted();
 		EndSleeping();
 		EndLooting();
@@ -5315,10 +5318,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			RelationshipManager.ServerInstance.SetSeen(this, info.InitiatorPlayer);
 			RelationshipManager.ServerInstance.SetRelationship(this, info.InitiatorPlayer, RelationshipManager.RelationshipType.Enemy);
 		}
-		if ((bool)BaseGameMode.GetActiveGameMode(true))
+		if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
 		{
 			BasePlayer instigator = info?.InitiatorPlayer;
-			BaseGameMode.GetActiveGameMode(true).OnPlayerDeath(instigator, this, info);
+			BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerDeath(instigator, this, info);
 		}
 		BaseMission.PlayerKilled(this);
 		DisablePlayerCollider();
@@ -5335,7 +5338,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 		}
 		StopWounded();
-		inventory.crafting.CancelAll(true);
+		inventory.crafting.CancelAll(returnItems: true);
 		if (EACServer.playerTracker != null && net.connection != null)
 		{
 			BasePlayer basePlayer = ((info != null && info.Initiator != null) ? info.Initiator.ToPlayer() : null);
@@ -5368,8 +5371,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					component.AddForce((info.attackNormal + UnityEngine.Vector3.up * 0.5f).normalized * 1f, ForceMode.VelocityChange);
 				}
 			}
-			PlayerCorpse playerCorpse;
-			if ((object)(playerCorpse = baseCorpse as PlayerCorpse) != null && playerCorpse.containers != null)
+			if (baseCorpse is PlayerCorpse playerCorpse && playerCorpse.containers != null)
 			{
 				foreach (BasePlayer item in obj)
 				{
@@ -5495,17 +5497,17 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public void RespawnAt(UnityEngine.Vector3 position, UnityEngine.Quaternion rotation)
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (!activeGameMode || activeGameMode.CanPlayerRespawn(this))
 		{
-			SetPlayerFlag(PlayerFlags.Wounded, false);
-			SetPlayerFlag(PlayerFlags.Incapacitated, false);
-			SetPlayerFlag(PlayerFlags.Unused2, false);
-			SetPlayerFlag(PlayerFlags.Unused1, false);
-			SetPlayerFlag(PlayerFlags.ReceivingSnapshot, true);
-			SetPlayerFlag(PlayerFlags.DisplaySash, false);
+			SetPlayerFlag(PlayerFlags.Wounded, b: false);
+			SetPlayerFlag(PlayerFlags.Incapacitated, b: false);
+			SetPlayerFlag(PlayerFlags.Unused2, b: false);
+			SetPlayerFlag(PlayerFlags.Unused1, b: false);
+			SetPlayerFlag(PlayerFlags.ReceivingSnapshot, b: true);
+			SetPlayerFlag(PlayerFlags.DisplaySash, b: false);
 			ServerPerformance.spawns++;
-			SetParent(null, true);
+			SetParent(null, worldPositionStays: true);
 			base.transform.SetPositionAndRotation(position, rotation);
 			tickInterpolator.Reset(position);
 			tickHistory.Reset(position);
@@ -5530,7 +5532,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			ClientRPCPlayer(null, this, "StartLoading");
 			if ((bool)activeGameMode)
 			{
-				BaseGameMode.GetActiveGameMode(true).OnPlayerRespawn(this);
+				BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerRespawn(this);
 			}
 			if (net != null)
 			{
@@ -6221,7 +6223,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		if (!IsSpectating() && Interface.CallHook("OnPlayerSpectate", this, spectateFilter) == null)
 		{
-			SetPlayerFlag(PlayerFlags.Spectating, true);
+			SetPlayerFlag(PlayerFlags.Spectating, b: true);
 			UnityEngine.TransformEx.SetLayerRecursive(base.gameObject, 10);
 			CancelInvoke(InventoryUpdate);
 			ChatMessage("Becoming Spectator");
@@ -6234,7 +6236,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		if (IsSpectating() && Interface.CallHook("OnPlayerSpectateEnd", this, spectateFilter) == null)
 		{
 			SetParent(null);
-			SetPlayerFlag(PlayerFlags.Spectating, false);
+			SetPlayerFlag(PlayerFlags.Spectating, b: false);
 			UnityEngine.TransformEx.SetLayerRecursive(base.gameObject, 17);
 		}
 	}
@@ -6305,8 +6307,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		foreach (BaseEntity child in children)
 		{
-			BasePlayer player2;
-			if ((object)(player2 = child as BasePlayer) != null)
+			if (child is BasePlayer player2)
 			{
 				ClientRPCPlayer(sourceConnection, player2, funcName);
 			}
@@ -6326,8 +6327,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		foreach (BaseEntity child in children)
 		{
-			BasePlayer player2;
-			if ((object)(player2 = child as BasePlayer) != null)
+			if (child is BasePlayer player2)
 			{
 				ClientRPCPlayer(sourceConnection, player2, funcName, arg1);
 			}
@@ -6347,8 +6347,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		foreach (BaseEntity child in children)
 		{
-			BasePlayer player2;
-			if ((object)(player2 = child as BasePlayer) != null)
+			if (child is BasePlayer player2)
 			{
 				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2);
 			}
@@ -6438,7 +6437,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			PlayerTick playerTick = null;
 			using (TimeWarning.New("PlayerTick.Deserialize"))
 			{
-				playerTick = PlayerTick.Deserialize(stream, lastReceivedTick, true);
+				playerTick = PlayerTick.Deserialize(stream, lastReceivedTick, isDelta: true);
 			}
 			using (TimeWarning.New("RecordPacket"))
 			{
@@ -6614,7 +6613,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			HeldEntity heldEntity = activeItem.GetHeldEntity() as HeldEntity;
 			if (heldEntity != null)
 			{
-				heldEntity.SetHeld(false);
+				heldEntity.SetHeld(bHeld: false);
 			}
 		}
 		svActiveItemID = itemID;
@@ -6625,7 +6624,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			HeldEntity heldEntity2 = activeItem2.GetHeldEntity() as HeldEntity;
 			if (heldEntity2 != null)
 			{
-				heldEntity2.SetHeld(true);
+				heldEntity2.SetHeld(bHeld: true);
 			}
 			NotifyGesturesNewItemEquipped();
 		}
@@ -6923,25 +6922,17 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			return !info.isHeadshot;
 		}
-		switch (info.damageTypes.GetMajorityDamageType())
+		return info.damageTypes.GetMajorityDamageType() switch
 		{
-		case DamageType.Suicide:
-			return false;
-		case DamageType.Fall:
-			return true;
-		case DamageType.Bite:
-			return true;
-		case DamageType.Bleeding:
-			return true;
-		case DamageType.Hunger:
-			return true;
-		case DamageType.Thirst:
-			return true;
-		case DamageType.Poison:
-			return true;
-		default:
-			return false;
-		}
+			DamageType.Suicide => false, 
+			DamageType.Fall => true, 
+			DamageType.Bite => true, 
+			DamageType.Bleeding => true, 
+			DamageType.Hunger => true, 
+			DamageType.Thirst => true, 
+			DamageType.Poison => true, 
+			_ => false, 
+		};
 	}
 
 	public void BecomeWounded(HitInfo info = null)
@@ -7058,8 +7049,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		base.health = UnityEngine.Random.Range(2f, 6f);
 		metabolism.bleeding.value = 0f;
 		healingWhileCrawling = 0f;
-		SetPlayerFlag(PlayerFlags.Incapacitated, true);
-		SetServerFall(true);
+		SetPlayerFlag(PlayerFlags.Incapacitated, b: true);
+		SetServerFall(wantsOn: true);
 		BasePlayer basePlayer = info?.InitiatorPlayer;
 		if (EACServer.playerTracker != null && net.connection != null && basePlayer != null && basePlayer.net.connection != null)
 		{
@@ -7077,7 +7068,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	public void WoundedStartSharedCode(HitInfo info)
 	{
 		stats.Add("wounded", 1, (Stats)5);
-		SetPlayerFlag(PlayerFlags.Wounded, true);
+		SetPlayerFlag(PlayerFlags.Wounded, b: true);
 		if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
 		{
 			BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerWounded(info.InitiatorPlayer, this, info);
@@ -7100,8 +7091,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				base.health = UnityEngine.Random.Range(2f, 6f) + healingWhileCrawling;
 			}
 			healingWhileCrawling = 0f;
-			SetPlayerFlag(PlayerFlags.Wounded, false);
-			SetPlayerFlag(PlayerFlags.Incapacitated, false);
+			SetPlayerFlag(PlayerFlags.Wounded, b: false);
+			SetPlayerFlag(PlayerFlags.Incapacitated, b: false);
 			if ((bool)BaseGameMode.GetActiveGameMode(base.isServer))
 			{
 				BaseGameMode.GetActiveGameMode(base.isServer).OnPlayerRevived(null, this);
@@ -7162,7 +7153,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public bool CanInteract()
 	{
-		return CanInteract(false);
+		return CanInteract(usableWhileCrawling: false);
 	}
 
 	public bool CanInteract(bool usableWhileCrawling)
@@ -7430,7 +7421,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public UnityEngine.Vector3 NoClipOffset()
 	{
-		return new UnityEngine.Vector3(0f, GetHeight(true) - GetRadius(), 0f);
+		return new UnityEngine.Vector3(0f, GetHeight(ducked: true) - GetRadius(), 0f);
 	}
 
 	public float NoClipRadius(float margin)
@@ -7549,8 +7540,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						foreach (BaseEntity child in initiatorPlayer.children)
 						{
-							BasePlayer basePlayer;
-							if ((object)(basePlayer = child as BasePlayer) != null)
+							if (child is BasePlayer basePlayer)
 							{
 								basePlayer.ClientRPCPlayer(null, basePlayer, "SpectatedPlayerHeadshot");
 							}
@@ -7592,7 +7582,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		if (!playerCollider.enabled && Interface.CallHook("OnPlayerColliderEnable", this, playerCollider) == null)
 		{
-			RefreshColliderSize(true);
+			RefreshColliderSize(forced: true);
 			playerCollider.enabled = true;
 		}
 	}
@@ -7971,8 +7961,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	public float GetOxygenTime(out ItemModGiveOxygen.AirSupplyType airSupplyType)
 	{
 		BaseVehicle mountedVehicle = GetMountedVehicle();
-		IAirSupply airSupply;
-		if (BaseEntityEx.IsValid(mountedVehicle) && (airSupply = mountedVehicle as IAirSupply) != null)
+		if (BaseEntityEx.IsValid(mountedVehicle) && mountedVehicle is IAirSupply airSupply)
 		{
 			float airTimeRemaining = airSupply.GetAirTimeRemaining();
 			if (airTimeRemaining > 0f)
@@ -8051,8 +8040,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			return false;
 		}
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.SphereCast(base.transform.position + UnityEngine.Vector3.up * (0.25f + GetRadius()), GetRadius() * 0.95f, UnityEngine.Vector3.down, out hitInfo, 4f, layerMask))
+		if (UnityEngine.Physics.SphereCast(base.transform.position + UnityEngine.Vector3.up * (0.25f + GetRadius()), GetRadius() * 0.95f, UnityEngine.Vector3.down, out var hitInfo, 4f, layerMask))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
 			if (entity != null)

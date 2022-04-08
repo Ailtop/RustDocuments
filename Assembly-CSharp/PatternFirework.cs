@@ -147,17 +147,13 @@ public class PatternFirework : MortarFirework
 
 	public float GetShellFuseLength()
 	{
-		switch (ShellFuseLength)
+		return ShellFuseLength switch
 		{
-		case FuseLength.Short:
-			return ShellFuseLengthShort;
-		case FuseLength.Medium:
-			return ShellFuseLengthMed;
-		case FuseLength.Long:
-			return ShellFuseLengthLong;
-		default:
-			return ShellFuseLengthMed;
-		}
+			FuseLength.Short => ShellFuseLengthShort, 
+			FuseLength.Medium => ShellFuseLengthMed, 
+			FuseLength.Long => ShellFuseLengthLong, 
+			_ => ShellFuseLengthMed, 
+		};
 	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)

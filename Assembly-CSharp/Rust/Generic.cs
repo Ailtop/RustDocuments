@@ -1,21 +1,20 @@
 using UnityEngine.SceneManagement;
 
-namespace Rust
-{
-	public static class Generic
-	{
-		private static Scene _batchingScene;
+namespace Rust;
 
-		public static Scene BatchingScene
+public static class Generic
+{
+	private static Scene _batchingScene;
+
+	public static Scene BatchingScene
+	{
+		get
 		{
-			get
+			if (!_batchingScene.IsValid())
 			{
-				if (!_batchingScene.IsValid())
-				{
-					_batchingScene = SceneManager.CreateScene("Batching");
-				}
-				return _batchingScene;
+				_batchingScene = SceneManager.CreateScene("Batching");
 			}
+			return _batchingScene;
 		}
 	}
 }

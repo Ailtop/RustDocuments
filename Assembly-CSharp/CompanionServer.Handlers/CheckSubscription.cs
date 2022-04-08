@@ -1,21 +1,19 @@
 using ProtoBuf;
 
-namespace CompanionServer.Handlers
+namespace CompanionServer.Handlers;
+
+public class CheckSubscription : BaseEntityHandler<AppEmpty>
 {
-	public class CheckSubscription : BaseEntityHandler<AppEmpty>
+	public override void Execute()
 	{
-		public override void Execute()
+		if (base.Entity is ISubscribable subscribable)
 		{
-			ISubscribable subscribable;
-			if ((subscribable = base.Entity as ISubscribable) != null)
-			{
-				bool value = subscribable.HasSubscription(base.UserId);
-				SendFlag(value);
-			}
-			else
-			{
-				SendError("wrong_type");
-			}
+			bool value = subscribable.HasSubscription(base.UserId);
+			SendFlag(value);
+		}
+		else
+		{
+			SendError("wrong_type");
 		}
 	}
 }

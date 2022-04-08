@@ -188,7 +188,7 @@ public class Explosion_Bloom : MonoBehaviour
 
 	private void OnEnable()
 	{
-		if (!IsSupported(shader, true, false, this))
+		if (!IsSupported(shader, needDepth: true, needHdr: false, this))
 		{
 			base.enabled = false;
 		}

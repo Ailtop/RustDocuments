@@ -139,7 +139,7 @@ public class MicrophoneStand : BaseMountable
 		int num = 128;
 		List<ConnectedSpeaker> obj = Facepunch.Pool.GetList<ConnectedSpeaker>();
 		GamePhysics.OverlapSphere(base.transform.position, num, obj, 256);
-		IOEntity iOEntity = ioEntity.Get(true);
+		IOEntity iOEntity = ioEntity.Get(serverside: true);
 		List<MicrophoneStand> obj2 = Facepunch.Pool.GetList<MicrophoneStand>();
 		int num2 = 0;
 		foreach (ConnectedSpeaker item in obj)

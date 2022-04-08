@@ -77,7 +77,7 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 		{
 			if (AllowNullParenting)
 			{
-				associatedEntity.SetParent(null, false, true);
+				associatedEntity.SetParent(null, worldPositionStays: false, sendImmediate: true);
 			}
 			if (OwnedByParentPlayer)
 			{
@@ -86,9 +86,8 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 		}
 		else if (entityForParenting.isServer && entityForParenting.IsFullySpawned())
 		{
-			associatedEntity.SetParent(entityForParenting, false, true);
-			BasePlayer basePlayer;
-			if (OwnedByParentPlayer && (object)(basePlayer = entityForParenting as BasePlayer) != null)
+			associatedEntity.SetParent(entityForParenting, worldPositionStays: false, sendImmediate: true);
+			if (OwnedByParentPlayer && entityForParenting is BasePlayer basePlayer)
 			{
 				associatedEntity.OwnerID = basePlayer.userID;
 			}

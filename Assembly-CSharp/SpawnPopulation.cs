@@ -57,7 +57,7 @@ public class SpawnPopulation : BaseScriptableObject
 		{
 			if (!string.IsNullOrEmpty(ResourceFolder))
 			{
-				Prefabs = Prefab.Load<Spawnable>("assets/bundled/prefabs/autospawn/" + ResourceFolder, GameManager.server, PrefabAttribute.server, false);
+				Prefabs = Prefab.Load<Spawnable>("assets/bundled/prefabs/autospawn/" + ResourceFolder, GameManager.server, PrefabAttribute.server, useProbabilities: false);
 			}
 			if (ResourceList != null && ResourceList.Length != 0)
 			{

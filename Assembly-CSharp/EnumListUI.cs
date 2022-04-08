@@ -20,7 +20,7 @@ public class EnumListUI : MonoBehaviour
 
 	public void Show(List<object> values, Action<object> clicked)
 	{
-		base.gameObject.SetActive(true);
+		base.gameObject.SetActive(value: true);
 		clickedAction = clicked;
 		foreach (Transform item in Container)
 		{
@@ -29,7 +29,7 @@ public class EnumListUI : MonoBehaviour
 		foreach (object value in values)
 		{
 			Transform obj = UnityEngine.Object.Instantiate(PrefabItem);
-			obj.SetParent(Container, false);
+			obj.SetParent(Container, worldPositionStays: false);
 			obj.GetComponent<EnumListItemUI>().Init(value, value.ToString(), this);
 		}
 	}
@@ -42,6 +42,6 @@ public class EnumListUI : MonoBehaviour
 
 	public void Hide()
 	{
-		base.gameObject.SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

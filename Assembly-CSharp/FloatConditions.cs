@@ -20,19 +20,14 @@ public class FloatConditions
 
 		public bool Test(float val)
 		{
-			switch (type)
+			return type switch
 			{
-			case Types.Equal:
-				return val == value;
-			case Types.NotEqual:
-				return val != value;
-			case Types.Higher:
-				return val > value;
-			case Types.Lower:
-				return val < value;
-			default:
-				return false;
-			}
+				Types.Equal => val == value, 
+				Types.NotEqual => val != value, 
+				Types.Higher => val > value, 
+				Types.Lower => val < value, 
+				_ => false, 
+			};
 		}
 	}
 

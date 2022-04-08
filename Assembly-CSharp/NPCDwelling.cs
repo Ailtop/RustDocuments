@@ -17,7 +17,7 @@ public class NPCDwelling : BaseEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		UpdateInformationZone(false);
+		UpdateInformationZone(remove: false);
 		if (npcSpawner != null && Random.Range(0f, 1f) <= NPCSpawnChance)
 		{
 			npcSpawner.SpawnInitial();
@@ -38,15 +38,15 @@ public class NPCDwelling : BaseEntity
 		base.DestroyShared();
 		if (base.isServer)
 		{
-			UpdateInformationZone(true);
+			UpdateInformationZone(remove: true);
 		}
 	}
 
 	public bool ValidateAIPoint(Vector3 pos)
 	{
-		base.gameObject.SetActive(false);
+		base.gameObject.SetActive(value: false);
 		bool result = !GamePhysics.CheckSphere(pos + Vector3.up * 0.6f, 0.5f, 65537);
-		base.gameObject.SetActive(true);
+		base.gameObject.SetActive(value: true);
 		return result;
 	}
 

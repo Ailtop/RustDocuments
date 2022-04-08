@@ -101,8 +101,7 @@ public class PaddlingPool : LiquidContainer, ISplashable
 		{
 			foreach (BaseEntity entityContent in waterVolume.entityContents)
 			{
-				IPoolVehicle poolVehicle;
-				if ((poolVehicle = entityContent as IPoolVehicle) != null)
+				if (entityContent is IPoolVehicle poolVehicle)
 				{
 					poolVehicle.WakeUp();
 				}
@@ -128,8 +127,7 @@ public class PaddlingPool : LiquidContainer, ISplashable
 		{
 			foreach (BaseEntity entityContent in waterVolume.entityContents)
 			{
-				IPoolVehicle item;
-				if ((item = entityContent as IPoolVehicle) != null)
+				if (entityContent is IPoolVehicle item)
 				{
 					obj.Add(item);
 				}

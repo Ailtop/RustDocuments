@@ -1,23 +1,22 @@
 using UnityEngine.SceneManagement;
 
-namespace Rust
+namespace Rust;
+
+public static class Server
 {
-	public static class Server
+	public const float UseDistance = 3f;
+
+	private static Scene _entityScene;
+
+	public static Scene EntityScene
 	{
-		public const float UseDistance = 3f;
-
-		private static Scene _entityScene;
-
-		public static Scene EntityScene
+		get
 		{
-			get
+			if (!_entityScene.IsValid())
 			{
-				if (!_entityScene.IsValid())
-				{
-					_entityScene = SceneManager.CreateScene("Server Entities");
-				}
-				return _entityScene;
+				_entityScene = SceneManager.CreateScene("Server Entities");
 			}
+			return _entityScene;
 		}
 	}
 }

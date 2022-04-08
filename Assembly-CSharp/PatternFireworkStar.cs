@@ -12,11 +12,11 @@ public class PatternFireworkStar : MonoBehaviour, IClientComponent
 	{
 		if (Pixel != null)
 		{
-			Pixel.SetActive(true);
+			Pixel.SetActive(value: true);
 		}
 		if (Explosion != null)
 		{
-			Explosion.SetActive(false);
+			Explosion.SetActive(value: false);
 		}
 		if (ParticleSystems == null)
 		{
@@ -37,11 +37,11 @@ public class PatternFireworkStar : MonoBehaviour, IClientComponent
 	{
 		if (Pixel != null)
 		{
-			Pixel.SetActive(false);
+			Pixel.SetActive(value: false);
 		}
 		if (Explosion != null)
 		{
-			Explosion.SetActive(true);
+			Explosion.SetActive(value: true);
 		}
 	}
 }

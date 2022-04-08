@@ -74,12 +74,12 @@ public class TabToggle : MonoBehaviour
 		{
 			LeanTween.alphaCanvas(component, 0f, 0.1f).setOnComplete((Action)delegate
 			{
-				go.SetActive(false);
+				go.SetActive(value: false);
 			});
 		}
 		else
 		{
-			go.SetActive(false);
+			go.SetActive(value: false);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class TabToggle : MonoBehaviour
 				component.alpha = 0f;
 				LeanTween.alphaCanvas(component, 1f, 0.1f);
 			}
-			go.SetActive(true);
+			go.SetActive(value: true);
 		}
 	}
 }

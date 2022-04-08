@@ -33,7 +33,7 @@ public class IOEntityMovementChecker : FacepunchBehaviour
 			prevPos = base.transform.position;
 			if (ioEntity.HasConnections())
 			{
-				ioEntity.SendChangedToRoot(true);
+				ioEntity.SendChangedToRoot(forceUpdate: true);
 				ioEntity.ClearConnections();
 			}
 		}

@@ -1,9 +1,8 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+public sealed class Include : Attribute
 {
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-	public sealed class Include : Attribute
-	{
-	}
 }

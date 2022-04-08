@@ -21,7 +21,7 @@ public class TerrainCollision : TerrainExtension
 		}
 		foreach (Collider key in ignoredColliders.Keys)
 		{
-			Physics.IgnoreCollision(key, terrainCollider, false);
+			Physics.IgnoreCollision(key, terrainCollider, ignore: false);
 		}
 		ignoredColliders.Clear();
 	}
@@ -30,7 +30,7 @@ public class TerrainCollision : TerrainExtension
 	{
 		if ((bool)terrainCollider && (bool)collider)
 		{
-			Physics.IgnoreCollision(collider, terrainCollider, false);
+			Physics.IgnoreCollision(collider, terrainCollider, ignore: false);
 			ignoredColliders.Remove(collider);
 		}
 	}
@@ -69,7 +69,7 @@ public class TerrainCollision : TerrainExtension
 			if (ignore)
 			{
 				List<Collider> val = new List<Collider> { trigger };
-				Physics.IgnoreCollision(collider, terrainCollider, true);
+				Physics.IgnoreCollision(collider, terrainCollider, ignore: true);
 				ignoredColliders.Add(collider, val);
 			}
 			return;
@@ -105,7 +105,7 @@ public class TerrainCollision : TerrainExtension
 			}
 			else if (value.Count == 0)
 			{
-				Physics.IgnoreCollision(key, terrainCollider, false);
+				Physics.IgnoreCollision(key, terrainCollider, ignore: false);
 				ignoredColliders.RemoveAt(i--);
 			}
 		}

@@ -22,7 +22,7 @@ public class SupplySignal : TimedExplosive
 			Interface.CallHook("OnCargoPlaneSignaled", baseEntity, this);
 		}
 		Invoke(FinishUp, 210f);
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		SendNetworkUpdateImmediate();
 	}
 

@@ -143,7 +143,7 @@ public class Mailbox : StorageContainer
 		base.PlayerStoppedLooting(player);
 		if (PlayerIsOwner(player))
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 		}
 	}
 
@@ -171,7 +171,7 @@ public class Mailbox : StorageContainer
 				Effect.server.Run(mailDropSound.resourcePath, GetDropPosition());
 				if (fromPlayer != null && !PlayerIsOwner(fromPlayer))
 				{
-					SetFlag(Flags.On, true);
+					SetFlag(Flags.On, b: true);
 				}
 			}
 		}

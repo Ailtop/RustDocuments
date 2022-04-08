@@ -70,6 +70,6 @@ public class GameSetup : MonoBehaviour
 		ConVar.GC.unload();
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
-		yield return StartCoroutine(Bootstrap.StartServer(loadSave, loadSaveFile, true));
+		yield return StartCoroutine(Bootstrap.StartServer(loadSave, loadSaveFile, allowOutOfDateSaves: true));
 	}
 }

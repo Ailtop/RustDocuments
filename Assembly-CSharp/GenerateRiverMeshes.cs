@@ -26,14 +26,14 @@ public class GenerateRiverMeshes : ProceduralComponent
 				obj.tag = "River";
 				obj.layer = 4;
 				GameObjectEx.SetHierarchyGroup(obj, river.Name);
-				obj.SetActive(false);
+				obj.SetActive(value: false);
 				MeshCollider meshCollider = obj.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RiverPhysicMaterial;
 				meshCollider.sharedMesh = item.Meshes[0];
 				obj.AddComponent<RiverInfo>();
 				obj.AddComponent<WaterBody>().FishingType = WaterBody.FishingTag.River;
 				obj.AddComponent<AddToWaterMap>();
-				obj.SetActive(true);
+				obj.SetActive(value: true);
 			}
 		}
 	}

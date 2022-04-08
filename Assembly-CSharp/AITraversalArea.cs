@@ -88,7 +88,7 @@ public class AITraversalArea : TriggerBase
 	{
 		Vector3 position = GetClosestEntry(pos).position;
 		Vector3 position2 = GetFarthestEntry(pos).position;
-		BaseEntity[] array2 = new BaseEntity[1];
+		_ = new BaseEntity[1];
 		AITraversalWaitPoint result = null;
 		float num = 0f;
 		AITraversalWaitPoint[] array = waitPoints;

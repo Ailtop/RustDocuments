@@ -12,24 +12,22 @@ public class WorldNetworking
 	public static void OnMessageReceived(Message message)
 	{
 		WorldSerialization serialization = World.Serialization;
-		using (WorldMessage worldMessage = WorldMessage.Deserialize(message.read))
+		using WorldMessage worldMessage = WorldMessage.Deserialize(message.read);
+		switch (worldMessage.status)
 		{
-			switch (worldMessage.status)
-			{
-			case WorldMessage.MessageType.Request:
-				SendWorldData(message.connection);
-				return;
-			}
-			if (worldMessage.prefabs != null)
-			{
-				serialization.world.prefabs.AddRange(worldMessage.prefabs);
-				worldMessage.prefabs.Clear();
-			}
-			if (worldMessage.paths != null)
-			{
-				serialization.world.paths.AddRange(worldMessage.paths);
-				worldMessage.paths.Clear();
-			}
+		case WorldMessage.MessageType.Request:
+			SendWorldData(message.connection);
+			return;
+		}
+		if (worldMessage.prefabs != null)
+		{
+			serialization.world.prefabs.AddRange(worldMessage.prefabs);
+			worldMessage.prefabs.Clear();
+		}
+		if (worldMessage.paths != null)
+		{
+			serialization.world.paths.AddRange(worldMessage.paths);
+			worldMessage.paths.Clear();
 		}
 	}
 

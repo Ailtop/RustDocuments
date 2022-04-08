@@ -30,7 +30,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 						if (this.num > 0)
 						{
 							byte[] array = dst;
-							int re = res;
+							_ = res;
 							array[(0 + i) * res + num2] = color.r;
 						}
 						if (this.num > 1)
@@ -99,7 +99,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 
 	public void GenerateTextures()
 	{
-		SplatTexture0 = new Texture2D(res, res, TextureFormat.RGBA32, false, true);
+		SplatTexture0 = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: false, linear: true);
 		SplatTexture0.name = "SplatTexture0";
 		SplatTexture0.wrapMode = TextureWrapMode.Clamp;
 		Color32[] cols = new Color32[res * res];
@@ -115,7 +115,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 				else
 				{
 					byte[] array = src;
-					int re = res;
+					_ = res;
 					num = array[(0 + z) * res + j];
 				}
 				byte r2 = (byte)num;
@@ -126,7 +126,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 			}
 		});
 		SplatTexture0.SetPixels32(cols);
-		SplatTexture1 = new Texture2D(res, res, TextureFormat.RGBA32, false, true);
+		SplatTexture1 = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: false, linear: true);
 		SplatTexture1.name = "SplatTexture1";
 		SplatTexture1.wrapMode = TextureWrapMode.Clamp;
 		Color32[] cols2 = new Color32[res * res];
@@ -146,8 +146,8 @@ public class TerrainSplatMap : TerrainMap<byte>
 
 	public void ApplyTextures()
 	{
-		SplatTexture0.Apply(true, true);
-		SplatTexture1.Apply(true, true);
+		SplatTexture0.Apply(updateMipmaps: true, makeNoLongerReadable: true);
+		SplatTexture1.Apply(updateMipmaps: true, makeNoLongerReadable: true);
 	}
 
 	public float GetSplatMax(Vector3 worldPos, int mask = -1)
@@ -329,7 +329,7 @@ public class TerrainSplatMap : TerrainMap<byte>
 			if (num2 == 0f && opacity == 1f)
 			{
 				byte[] array = dst;
-				int re = res;
+				_ = res;
 				array[(0 + z) * res + x] = BitUtility.Float2Byte(v1.x);
 				dst[(res + z) * res + x] = BitUtility.Float2Byte(v1.y);
 				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(v1.z);
@@ -342,10 +342,10 @@ public class TerrainSplatMap : TerrainMap<byte>
 			else
 			{
 				byte[] array2 = dst;
-				int re2 = res;
+				_ = res;
 				int num3 = (0 + z) * res + x;
 				byte[] array3 = src;
-				int re3 = res;
+				_ = res;
 				array2[num3] = BitUtility.Float2Byte(BitUtility.Byte2Float(array3[(0 + z) * res + x]) * num2 + v1.x * opacity);
 				dst[(res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(res + z) * res + x]) * num2 + v1.y * opacity);
 				dst[(2 * res + z) * res + x] = BitUtility.Float2Byte(BitUtility.Byte2Float(src[(2 * res + z) * res + x]) * num2 + v1.z * opacity);

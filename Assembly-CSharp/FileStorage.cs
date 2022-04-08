@@ -31,7 +31,7 @@ public class FileStorage : IDisposable
 
 	private MruDictionary<uint, CacheData> _cache = new MruDictionary<uint, CacheData>(1000);
 
-	public static FileStorage server = new FileStorage("sv.files." + 223, true);
+	public static FileStorage server = new FileStorage("sv.files." + 223, server: true);
 
 	protected FileStorage(string name, bool server)
 	{
@@ -39,7 +39,7 @@ public class FileStorage : IDisposable
 		{
 			string path = Server.rootFolder + "/" + name + ".db";
 			db = new Database();
-			db.Open(path, true);
+			db.Open(path, fastMode: true);
 			if (!db.TableExists("data"))
 			{
 				db.Execute("CREATE TABLE data ( crc INTEGER PRIMARY KEY, data BLOB, updated INTEGER, entid INTEGER, filetype INTEGER, part INTEGER )");
@@ -97,8 +97,7 @@ public class FileStorage : IDisposable
 	{
 		using (TimeWarning.New("FileStorage.Get"))
 		{
-			CacheData value;
-			if (_cache.TryGetValue(crc, out value))
+			if (_cache.TryGetValue(crc, out var value))
 			{
 				Assert.IsTrue(value.data != null, "FileStorage cache contains a null texture");
 				return value.data;

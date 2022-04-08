@@ -151,13 +151,11 @@ public class VehicleModuleCamper : VehicleModuleSeating
 		int num = 0;
 		foreach (BaseEntity child in children)
 		{
-			SleepingBagCamper sleepingBagCamper2;
-			IItemContainerEntity itemContainerEntity;
-			if ((object)(sleepingBagCamper2 = child as SleepingBagCamper) != null)
+			if (child is SleepingBagCamper sleepingBagCamper2)
 			{
-				sleepingBagCamper2.SetSeat(GetSeatAtIndex(num++), true);
+				sleepingBagCamper2.SetSeat(GetSeatAtIndex(num++), sendNetworkUpdate: true);
 			}
-			else if ((itemContainerEntity = child as IItemContainerEntity) != null)
+			else if (child is IItemContainerEntity itemContainerEntity)
 			{
 				ItemContainer inventory = itemContainerEntity.inventory;
 				inventory.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(inventory.onItemAddedRemoved, new Action<Item, bool>(OnItemAddedRemoved));
@@ -217,8 +215,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 	{
 		foreach (BaseEntity child in children)
 		{
-			IItemContainerEntity itemContainerEntity;
-			if ((itemContainerEntity = child as IItemContainerEntity) != null && !ObjectEx.IsUnityNull(itemContainerEntity) && !itemContainerEntity.inventory.IsEmpty())
+			if (child is IItemContainerEntity itemContainerEntity && !ObjectEx.IsUnityNull(itemContainerEntity) && !itemContainerEntity.inventory.IsEmpty())
 			{
 				return false;
 			}
@@ -247,7 +244,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 		}
 		if (activeBbq.IsValid(base.isServer) && seatConfig != null)
 		{
-			BaseOven baseOven = activeBbq.Get(true);
+			BaseOven baseOven = activeBbq.Get(serverside: true);
 			baseOven.transform.position = seatConfig.StovePosition.position;
 			baseOven.transform.rotation = seatConfig.StovePosition.rotation;
 			baseOven.SendNetworkUpdate();
@@ -267,8 +264,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 		CamperSeatConfig result = null;
 		foreach (ConditionalObject item in list)
 		{
-			CamperSeatConfig component;
-			if (item.gameObject.activeSelf && item.gameObject.TryGetComponent<CamperSeatConfig>(out component))
+			if (item.gameObject.activeSelf && item.gameObject.TryGetComponent<CamperSeatConfig>(out var component))
 			{
 				result = component;
 			}
@@ -372,8 +368,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 		int num = 0;
 		foreach (BaseEntity child in children)
 		{
-			SleepingBagCamper sleepingBagCamper;
-			if ((object)(sleepingBagCamper = child as SleepingBagCamper) != null)
+			if (child is SleepingBagCamper sleepingBagCamper)
 			{
 				stringBuilder.AppendLine($"Bag {num++}:");
 				stringBuilder.AppendLine(sleepingBagCamper.Admin_Who());

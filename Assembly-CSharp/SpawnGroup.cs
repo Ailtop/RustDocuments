@@ -201,7 +201,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 			{
 				continue;
 			}
-			BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot, false);
+			BaseEntity baseEntity = GameManager.server.CreateEntity(prefab.resourcePath, pos, rot, startActive: false);
 			if ((bool)baseEntity)
 			{
 				if (baseEntity.enableSaving && !(spawnPoint is SpaceCheckingSpawnPoint))

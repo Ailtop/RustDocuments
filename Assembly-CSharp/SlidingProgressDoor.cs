@@ -22,7 +22,7 @@ public class SlidingProgressDoor : ProgressDoor
 		InvokeRepeating(ServerUpdate, 0f, 0.1f);
 		if (vehiclePhysBox != null)
 		{
-			vehiclePhysBox.gameObject.SetActive(false);
+			vehiclePhysBox.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class SlidingProgressDoor : ProgressDoor
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		ProtoBuf.SphereEntity sphereEntity = info.msg.sphereEntity;
+		_ = info.msg.sphereEntity;
 	}
 
 	public override void Save(SaveInfo info)

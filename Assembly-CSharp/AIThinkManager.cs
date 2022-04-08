@@ -44,7 +44,7 @@ public class AIThinkManager : BaseMonoBehaviour, IServerComponent
 	{
 		if (queueType != 0)
 		{
-			int num = 2;
+			_ = 2;
 		}
 		switch (queueType)
 		{

@@ -1,19 +1,18 @@
 using System;
 using UnityEngine;
 
-namespace Painting
+namespace Painting;
+
+[Serializable]
+public class Brush
 {
-	[Serializable]
-	public class Brush
-	{
-		public float spacing;
+	public float spacing;
 
-		public Vector2 brushSize;
+	public Vector2 brushSize;
 
-		public Texture2D texture;
+	public Texture2D texture;
 
-		public Color color;
+	public Color color;
 
-		public bool erase;
-	}
+	public bool erase;
 }

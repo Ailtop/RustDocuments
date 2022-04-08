@@ -53,7 +53,7 @@ public class CeilingLight : IOEntity
 					obj2.Add(planter);
 					planter.ForceLightUpdate();
 				}
-				item.CalculateQualities(false, true);
+				item.CalculateQualities(firstTime: false, forceArtificialLightUpdates: true);
 				item.SendNetworkUpdate();
 			}
 		}

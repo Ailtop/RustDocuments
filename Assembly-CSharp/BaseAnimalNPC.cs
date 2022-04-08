@@ -82,8 +82,7 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 		{
 			return false;
 		}
-		float dist;
-		if (!IsTargetInRange(entity, out dist))
+		if (!IsTargetInRange(entity, out var _))
 		{
 			return false;
 		}

@@ -3,98 +3,95 @@ using System.Linq;
 using System.Net;
 using ConVar;
 
-namespace CompanionServer
+namespace CompanionServer;
+
+public class ConnectionLimiter
 {
-	public class ConnectionLimiter
+	private readonly object _sync;
+
+	private readonly Dictionary<IPAddress, int> _addressCounts;
+
+	private int _overallCount;
+
+	public ConnectionLimiter()
 	{
-		private readonly object _sync;
+		_sync = new object();
+		_addressCounts = new Dictionary<IPAddress, int>();
+		_overallCount = 0;
+	}
 
-		private readonly Dictionary<IPAddress, int> _addressCounts;
-
-		private int _overallCount;
-
-		public ConnectionLimiter()
+	public bool TryAdd(IPAddress address)
+	{
+		if (address == null)
 		{
-			_sync = new object();
-			_addressCounts = new Dictionary<IPAddress, int>();
-			_overallCount = 0;
+			return false;
 		}
-
-		public bool TryAdd(IPAddress address)
+		lock (_sync)
 		{
-			if (address == null)
+			if (_overallCount >= App.maxconnections)
 			{
 				return false;
 			}
-			lock (_sync)
+			if (_addressCounts.TryGetValue(address, out var value))
 			{
-				if (_overallCount >= App.maxconnections)
+				if (value >= App.maxconnectionsperip)
 				{
 					return false;
 				}
-				int value;
-				if (_addressCounts.TryGetValue(address, out value))
+				_addressCounts[address] = value + 1;
+			}
+			else
+			{
+				_addressCounts.Add(address, 1);
+			}
+			_overallCount++;
+			return true;
+		}
+	}
+
+	public void Remove(IPAddress address)
+	{
+		if (address == null)
+		{
+			return;
+		}
+		lock (_sync)
+		{
+			if (_addressCounts.TryGetValue(address, out var value))
+			{
+				if (value <= 1)
 				{
-					if (value >= App.maxconnectionsperip)
-					{
-						return false;
-					}
-					_addressCounts[address] = value + 1;
+					_addressCounts.Remove(address);
 				}
 				else
 				{
-					_addressCounts.Add(address, 1);
+					_addressCounts[address] = value - 1;
 				}
-				_overallCount++;
-				return true;
+				_overallCount--;
 			}
 		}
+	}
 
-		public void Remove(IPAddress address)
+	public void Clear()
+	{
+		lock (_sync)
 		{
-			if (address == null)
-			{
-				return;
-			}
-			lock (_sync)
-			{
-				int value;
-				if (_addressCounts.TryGetValue(address, out value))
-				{
-					if (value <= 1)
-					{
-						_addressCounts.Remove(address);
-					}
-					else
-					{
-						_addressCounts[address] = value - 1;
-					}
-					_overallCount--;
-				}
-			}
+			_addressCounts.Clear();
+			_overallCount = 0;
 		}
+	}
 
-		public void Clear()
+	public override string ToString()
+	{
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("IP", "connections");
+		lock (_sync)
 		{
-			lock (_sync)
+			foreach (KeyValuePair<IPAddress, int> item in _addressCounts.OrderByDescending((KeyValuePair<IPAddress, int> t) => t.Value))
 			{
-				_addressCounts.Clear();
-				_overallCount = 0;
+				textTable.AddRow(item.Key.ToString(), item.Value.ToString());
 			}
-		}
-
-		public override string ToString()
-		{
-			TextTable textTable = new TextTable();
-			textTable.AddColumns("IP", "connections");
-			lock (_sync)
-			{
-				foreach (KeyValuePair<IPAddress, int> item in _addressCounts.OrderByDescending((KeyValuePair<IPAddress, int> t) => t.Value))
-				{
-					textTable.AddRow(item.Key.ToString(), item.Value.ToString());
-				}
-				return $"{textTable}\n{_overallCount} total";
-			}
+			return $"{textTable}\n{_overallCount} total";
 		}
 	}
 }

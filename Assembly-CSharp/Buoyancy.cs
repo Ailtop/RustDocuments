@@ -225,7 +225,7 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 		Matrix4x4 localToWorldMatrix = base.transform.localToWorldMatrix;
 		for (int i = 0; i < pointData.Length; i++)
 		{
-			BuoyancyPoint buoyancyPoint2 = points[i];
+			_ = points[i];
 			Vector3 position = localToWorldMatrix.MultiplyPoint3x4(pointData[i].rootToPoint);
 			pointData[i].position = position;
 			float x3 = (position.x - x) * x2;

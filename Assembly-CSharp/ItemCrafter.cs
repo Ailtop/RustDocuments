@@ -188,7 +188,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 					takenItem.UseItem(num);
 					num -= num2;
 				}
-				int num3 = 0;
+				_ = 0;
 			}
 		}
 		Facepunch.Rust.Analytics.Server.Crafting(task.blueprint.targetItem.shortname, task.skinID);
@@ -263,7 +263,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			return false;
 		}
-		return CancelTask(itemCraftTask.taskUID, true);
+		return CancelTask(itemCraftTask.taskUID, ReturnItems: true);
 	}
 
 	public void CancelAll(bool returnItems)
@@ -279,7 +279,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		int num = 0;
 		foreach (ItemContainer container in containers)
 		{
-			num += container.GetAmount(item, true);
+			num += container.GetAmount(item, onlyUsableAmounts: true);
 		}
 		return num >= iAmount;
 	}

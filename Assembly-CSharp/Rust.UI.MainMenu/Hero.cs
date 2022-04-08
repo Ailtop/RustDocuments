@@ -1,24 +1,23 @@
 using UnityEngine;
 
-namespace Rust.UI.MainMenu
+namespace Rust.UI.MainMenu;
+
+public class Hero : SingletonComponent<Hero>
 {
-	public class Hero : SingletonComponent<Hero>
-	{
-		public CanvasGroup CanvasGroup;
+	public CanvasGroup CanvasGroup;
 
-		public Video VideoPlayer;
+	public Video VideoPlayer;
 
-		public RustText TitleText;
+	public RustText TitleText;
 
-		public RustText ButtonText;
+	public RustText ButtonText;
 
-		public HttpImage TitleImage;
+	public HttpImage TitleImage;
 
-		[Header("Item Store Links")]
-		public RustButton ItemStoreButton;
+	[Header("Item Store Links")]
+	public RustButton ItemStoreButton;
 
-		public RustButton LimitedTabButton;
+	public RustButton LimitedTabButton;
 
-		public RustButton GeneralTabButton;
-	}
+	public RustButton GeneralTabButton;
 }

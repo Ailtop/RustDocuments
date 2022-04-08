@@ -236,7 +236,7 @@ public class ComputerStation : BaseMountable
 
 	public void StopControl(BasePlayer ply)
 	{
-		BaseEntity baseEntity = currentlyControllingEnt.Get(true);
+		BaseEntity baseEntity = currentlyControllingEnt.Get(serverside: true);
 		if ((bool)baseEntity)
 		{
 			if (Interface.CallHook("OnBookmarkControlEnd", this, ply, baseEntity) != null)
@@ -316,7 +316,7 @@ public class ComputerStation : BaseMountable
 		IRemoteControllable component = baseNetworkable.GetComponent<IRemoteControllable>();
 		if (component.CanControl() && !(component.GetIdentifier() != text) && Interface.CallHook("OnBookmarkControl", this, player, text, component) == null)
 		{
-			BaseEntity baseEntity = currentlyControllingEnt.Get(true);
+			BaseEntity baseEntity = currentlyControllingEnt.Get(serverside: true);
 			if ((bool)baseEntity)
 			{
 				IRemoteControllable component2 = baseEntity.GetComponent<IRemoteControllable>();
@@ -343,9 +343,8 @@ public class ComputerStation : BaseMountable
 		{
 			return;
 		}
-		BaseEntity baseEntity = currentlyControllingEnt.Get(true);
-		CCTV_RC cCTV_RC;
-		if (!(baseEntity != null) || (object)(cCTV_RC = baseEntity as CCTV_RC) == null)
+		BaseEntity baseEntity = currentlyControllingEnt.Get(serverside: true);
+		if (!(baseEntity != null) || !(baseEntity is CCTV_RC cCTV_RC))
 		{
 			return;
 		}
@@ -562,22 +561,22 @@ public class ComputerStation : BaseMountable
 		{
 			SendControlBookmarks(mounted);
 		}
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 	}
 
 	public override void OnPlayerDismounted(BasePlayer player)
 	{
 		base.OnPlayerDismounted(player);
 		StopControl(player);
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
 		base.PlayerServerInput(inputState, player);
-		if (currentlyControllingEnt.IsValid(true) && Interface.CallHook("OnBookmarkInput", this, player, inputState) == null)
+		if (currentlyControllingEnt.IsValid(serverside: true) && Interface.CallHook("OnBookmarkInput", this, player, inputState) == null)
 		{
-			currentlyControllingEnt.Get(true).GetComponent<IRemoteControllable>().UserInput(inputState, player);
+			currentlyControllingEnt.Get(serverside: true).GetComponent<IRemoteControllable>().UserInput(inputState, player);
 		}
 	}
 
@@ -619,8 +618,7 @@ public class ComputerStation : BaseMountable
 				if (array2.Length >= 2)
 				{
 					string text = array2[0];
-					uint result;
-					uint.TryParse(array2[1], out result);
+					uint.TryParse(array2[1], out var result);
 					if (IsValidIdentifier(text))
 					{
 						controlBookmarks.Add(text, result);

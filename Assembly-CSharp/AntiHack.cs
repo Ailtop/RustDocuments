@@ -201,7 +201,7 @@ public static class AntiHack
 				while (ticks.MoveNext(b))
 				{
 					vector2 = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
-					if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, true))
+					if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true))
 					{
 						return true;
 					}
@@ -210,12 +210,12 @@ public static class AntiHack
 			}
 			else if (ConVar.AntiHack.noclip_protection >= 2)
 			{
-				if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, true))
+				if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true))
 				{
 					return true;
 				}
 			}
-			else if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, false))
+			else if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false))
 			{
 				return true;
 			}
@@ -325,7 +325,7 @@ public static class AntiHack
 				while (ticks.MoveNext(b))
 				{
 					newPos = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
-					if (TestFlying(ply, oldPos, newPos, true))
+					if (TestFlying(ply, oldPos, newPos, verifyGrounded: true))
 					{
 						return true;
 					}
@@ -334,12 +334,12 @@ public static class AntiHack
 			}
 			else if (ConVar.AntiHack.flyhack_protection >= 2)
 			{
-				if (TestFlying(ply, oldPos, newPos, true))
+				if (TestFlying(ply, oldPos, newPos, verifyGrounded: true))
 				{
 					return true;
 				}
 			}
-			else if (TestFlying(ply, oldPos, newPos, false))
+			else if (TestFlying(ply, oldPos, newPos, verifyGrounded: false))
 			{
 				return true;
 			}
@@ -355,11 +355,11 @@ public static class AntiHack
 		{
 			float flyhack_extrusion = ConVar.AntiHack.flyhack_extrusion;
 			Vector3 vector = (oldPos + newPos) * 0.5f;
-			if (!ply.OnLadder() && !WaterLevel.Test(vector - new Vector3(0f, flyhack_extrusion, 0f), true, ply) && (EnvironmentManager.Get(vector) & EnvironmentType.Elevator) == 0)
+			if (!ply.OnLadder() && !WaterLevel.Test(vector - new Vector3(0f, flyhack_extrusion, 0f), waves: true, ply) && (EnvironmentManager.Get(vector) & EnvironmentType.Elevator) == 0)
 			{
 				float flyhack_margin = ConVar.AntiHack.flyhack_margin;
 				float radius = ply.GetRadius();
-				float height = ply.GetHeight(false);
+				float height = ply.GetHeight(ducked: false);
 				Vector3 vector2 = vector + new Vector3(0f, radius - flyhack_extrusion, 0f);
 				Vector3 vector3 = vector + new Vector3(0f, height - radius, 0f);
 				float radius2 = radius - flyhack_margin;

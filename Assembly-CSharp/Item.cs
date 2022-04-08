@@ -271,7 +271,7 @@ public class Item
 			BaseEntity baseEntity = GetHeldEntity();
 			if (baseEntity != null)
 			{
-				baseEntity.SetFlag(BaseEntity.Flags.Broken, false);
+				baseEntity.SetFlag(BaseEntity.Flags.Broken, b: false);
 			}
 			if (ConVar.Global.developer > 0)
 			{
@@ -305,7 +305,7 @@ public class Item
 		BaseEntity baseEntity = GetHeldEntity();
 		if (baseEntity != null)
 		{
-			baseEntity.SetFlag(BaseEntity.Flags.Broken, true);
+			baseEntity.SetFlag(BaseEntity.Flags.Broken, b: true);
 		}
 		BasePlayer ownerPlayer = GetOwnerPlayer();
 		if ((bool)ownerPlayer)
@@ -315,8 +315,7 @@ public class Item
 				Effect.server.Run("assets/bundled/prefabs/fx/item_break.prefab", ownerPlayer, 0u, Vector3.zero, Vector3.zero);
 				ownerPlayer.ChatMessage("Your active item was broken!");
 			}
-			ItemModWearable component;
-			if (info.TryGetComponent<ItemModWearable>(out component) && ownerPlayer.inventory.containerWear.itemList.Contains(this))
+			if (info.TryGetComponent<ItemModWearable>(out var component) && ownerPlayer.inventory.containerWear.itemList.Contains(this))
 			{
 				if (component.breakEffect.isValid)
 				{
@@ -487,8 +486,7 @@ public class Item
 		}
 		if (BaseEntityEx.IsValid(worldEntity))
 		{
-			WorldItem worldItem;
-			if ((object)(worldItem = worldEntity as WorldItem) != null)
+			if (worldEntity is WorldItem worldItem)
 			{
 				worldItem.RemoveItem();
 			}
@@ -629,7 +627,7 @@ public class Item
 						if (num2 > 0)
 						{
 							Item item = slot.SplitItem(num2);
-							if (item != null && !item.MoveToContainer(newcontainer, -1, false) && (itemContainer == null || !item.MoveToContainer(itemContainer)))
+							if (item != null && !item.MoveToContainer(newcontainer, -1, allowStack: false) && (itemContainer == null || !item.MoveToContainer(itemContainer)))
 							{
 								item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
 							}
@@ -700,7 +698,7 @@ public class Item
 			if (newcontainer.maxStackSize > 0 && newcontainer.maxStackSize < amount)
 			{
 				Item item3 = SplitItem(newcontainer.maxStackSize);
-				if (item3 != null && !item3.MoveToContainer(newcontainer, iTargetPos, false) && (itemContainer == null || !item3.MoveToContainer(itemContainer)))
+				if (item3 != null && !item3.MoveToContainer(newcontainer, iTargetPos, allowStack: false) && (itemContainer == null || !item3.MoveToContainer(itemContainer)))
 				{
 					item3.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
 				}
@@ -1088,8 +1086,7 @@ public class Item
 
 	public bool HasAmmo(AmmoTypes ammoType)
 	{
-		ItemModProjectile component;
-		if (info.TryGetComponent<ItemModProjectile>(out component) && component.IsAmmo(ammoType))
+		if (info.TryGetComponent<ItemModProjectile>(out var component) && component.IsAmmo(ammoType))
 		{
 			return true;
 		}
@@ -1102,8 +1099,7 @@ public class Item
 
 	public void FindAmmo(List<Item> list, AmmoTypes ammoType)
 	{
-		ItemModProjectile component;
-		if (info.TryGetComponent<ItemModProjectile>(out component) && component.IsAmmo(ammoType))
+		if (info.TryGetComponent<ItemModProjectile>(out var component) && component.IsAmmo(ammoType))
 		{
 			list.Add(this);
 		}
@@ -1116,8 +1112,7 @@ public class Item
 	public int GetAmmoAmount(AmmoTypes ammoType)
 	{
 		int num = 0;
-		ItemModProjectile component;
-		if (info.TryGetComponent<ItemModProjectile>(out component) && component.IsAmmo(ammoType))
+		if (info.TryGetComponent<ItemModProjectile>(out var component) && component.IsAmmo(ammoType))
 		{
 			num += amount;
 		}

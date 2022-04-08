@@ -9,8 +9,7 @@ public class AttackTickAIEvent : BaseAIEvent
 	public override void Execute(AIMemory memory, AIBrainSenses senses, StateStatus stateStatus)
 	{
 		base.Result = base.Inverted;
-		IAIAttack iAIAttack = base.Owner as IAIAttack;
-		if (iAIAttack != null)
+		if (base.Owner is IAIAttack iAIAttack)
 		{
 			BaseEntity baseEntity = memory.Entity.Get(base.InputEntityMemorySlot);
 			iAIAttack.AttackTick(deltaTime, baseEntity, senses.Memory.IsLOS(baseEntity));

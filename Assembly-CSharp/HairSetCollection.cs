@@ -26,21 +26,15 @@ public class HairSetCollection : ScriptableObject
 
 	public HairSetEntry[] GetListByType(HairType hairType)
 	{
-		switch (hairType)
+		return hairType switch
 		{
-		case HairType.Head:
-			return Head;
-		case HairType.Eyebrow:
-			return Eyebrow;
-		case HairType.Facial:
-			return Facial;
-		case HairType.Armpit:
-			return Armpit;
-		case HairType.Pubic:
-			return Pubic;
-		default:
-			return null;
-		}
+			HairType.Head => Head, 
+			HairType.Eyebrow => Eyebrow, 
+			HairType.Facial => Facial, 
+			HairType.Armpit => Armpit, 
+			HairType.Pubic => Pubic, 
+			_ => null, 
+		};
 	}
 
 	public int GetIndex(HairSetEntry[] list, float typeNum)

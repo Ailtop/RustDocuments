@@ -97,14 +97,14 @@ public class OcclusionCulling : MonoBehaviour
 		{
 			if (count > capacity || (culling.usePixelShaderFallback && resultTexture != null && !resultTexture.IsCreated()))
 			{
-				Dispose(false);
+				Dispose(data: false);
 				int num = capacity;
 				int num2 = count / granularity * granularity + granularity;
 				if (culling.usePixelShaderFallback)
 				{
 					width = Mathf.CeilToInt(Mathf.Sqrt(num2));
 					height = Mathf.CeilToInt((float)num2 / (float)width);
-					inputTexture = new Texture2D(width, height, TextureFormat.RGBAFloat, false, true);
+					inputTexture = new Texture2D(width, height, TextureFormat.RGBAFloat, mipChain: false, linear: true);
 					inputTexture.name = "_Input";
 					inputTexture.filterMode = FilterMode.Point;
 					inputTexture.wrapMode = TextureWrapMode.Clamp;
@@ -114,7 +114,7 @@ public class OcclusionCulling : MonoBehaviour
 					resultTexture.wrapMode = TextureWrapMode.Clamp;
 					resultTexture.useMipMap = false;
 					resultTexture.Create();
-					resultReadTexture = new Texture2D(width, height, TextureFormat.ARGB32, false, true);
+					resultReadTexture = new Texture2D(width, height, TextureFormat.ARGB32, mipChain: false, linear: true);
 					resultReadTexture.name = "_ResultRead";
 					resultReadTexture.filterMode = FilterMode.Point;
 					resultReadTexture.wrapMode = TextureWrapMode.Clamp;
@@ -1039,7 +1039,7 @@ public class OcclusionCulling : MonoBehaviour
 		hiZLevelCount = (int)(Mathf.Log(num, 2f) + 1f);
 		hiZLevels = new RenderTexture[hiZLevelCount];
 		depthTexture = CreateDepthTexture("DepthTex", width, height);
-		hiZTexture = CreateDepthTexture("HiZMapTex", width, height, true);
+		hiZTexture = CreateDepthTexture("HiZMapTex", width, height, mips: true);
 		for (int i = 0; i < hiZLevelCount; i++)
 		{
 			hiZLevels[i] = CreateDepthTextureMip("HiZMap" + i, width, height, i);
@@ -1136,7 +1136,7 @@ public class OcclusionCulling : MonoBehaviour
 		Gizmos.color = Color.red;
 		Gizmos.matrix = Matrix4x4.identity;
 		Matrix4x4 worldToCameraMatrix = component.worldToCameraMatrix;
-		Matrix4x4 matrix4x = GL.GetGPUProjectionMatrix(component.projectionMatrix, false) * worldToCameraMatrix;
+		Matrix4x4 matrix4x = GL.GetGPUProjectionMatrix(component.projectionMatrix, renderIntoTexture: false) * worldToCameraMatrix;
 		Vector4[] planes = new Vector4[6];
 		ExtractFrustum(matrix4x, ref planes);
 		for (int i = 0; i < planes.Length; i++)
@@ -1324,7 +1324,7 @@ public class OcclusionCulling : MonoBehaviour
 			hideFlags = HideFlags.HideAndDontSave
 		};
 		InitializeHiZMap();
-		UpdateCameraMatrices(true);
+		UpdateCameraMatrices(starting: true);
 	}
 
 	private bool SupportsNativePath()
@@ -1566,7 +1566,7 @@ public class OcclusionCulling : MonoBehaviour
 		}
 		Matrix4x4 proj = Matrix4x4.Perspective(camera.fieldOfView, camera.aspect, camera.nearClipPlane, camera.farClipPlane);
 		viewMatrix = camera.worldToCameraMatrix;
-		projMatrix = GL.GetGPUProjectionMatrix(proj, false);
+		projMatrix = GL.GetGPUProjectionMatrix(proj, renderIntoTexture: false);
 		viewProjMatrix = projMatrix * viewMatrix;
 		invViewProjMatrix = Matrix4x4.Inverse(viewProjMatrix);
 		if (starting)
@@ -1650,12 +1650,12 @@ public class OcclusionCulling : MonoBehaviour
 		}
 		if (staticOccludees.Count > 0)
 		{
-			UpdateBuffers(staticOccludees, staticStates, staticSet, staticChanged, true);
+			UpdateBuffers(staticOccludees, staticStates, staticSet, staticChanged, isStatic: true);
 			staticSet.Dispatch(staticOccludees.Count);
 		}
 		if (dynamicOccludees.Count > 0)
 		{
-			UpdateBuffers(dynamicOccludees, dynamicStates, dynamicSet, dynamicChanged, false);
+			UpdateBuffers(dynamicOccludees, dynamicStates, dynamicSet, dynamicChanged, isStatic: false);
 			dynamicSet.Dispatch(dynamicOccludees.Count);
 		}
 		UpdateGridBuffers();

@@ -103,11 +103,9 @@ public class WorldItem : BaseEntity
 		{
 			return;
 		}
-		using (UpdateItem updateItem = Facepunch.Pool.Get<UpdateItem>())
-		{
-			updateItem.item = item.Save(false, false);
-			ClientRPC(null, "UpdateItem", updateItem);
-		}
+		using UpdateItem updateItem = Facepunch.Pool.Get<UpdateItem>();
+		updateItem.item = item.Save(bIncludeContainer: false, bIncludeOwners: false);
+		ClientRPC(null, "UpdateItem", updateItem);
 	}
 
 	[RPC_Server]
@@ -131,7 +129,7 @@ public class WorldItem : BaseEntity
 		{
 			bool forDisk = info.forDisk;
 			info.msg.worldItem = Facepunch.Pool.Get<ProtoBuf.WorldItem>();
-			info.msg.worldItem.item = item.Save(forDisk, false);
+			info.msg.worldItem.item = item.Save(forDisk, bIncludeOwners: false);
 		}
 	}
 

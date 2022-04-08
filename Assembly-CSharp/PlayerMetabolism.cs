@@ -111,7 +111,7 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		}
 		if (oxygen.value < 0.5f)
 		{
-			owner.Hurt(Mathf.InverseLerp(0.5f, 0f, oxygen.value) * delta * 20f, DamageType.Drowned, null, false);
+			owner.Hurt(Mathf.InverseLerp(0.5f, 0f, oxygen.value) * delta * 20f, DamageType.Drowned, null, useProtection: false);
 		}
 		if (bleeding.value > 0f)
 		{
@@ -286,10 +286,8 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 			return;
 		}
 		isDirty = false;
-		using (ProtoBuf.PlayerMetabolism arg = Save())
-		{
-			base.baseEntity.ClientRPCPlayerAndSpectators(null, base.baseEntity, "UpdateMetabolism", arg);
-		}
+		using ProtoBuf.PlayerMetabolism arg = Save();
+		base.baseEntity.ClientRPCPlayerAndSpectators(null, base.baseEntity, "UpdateMetabolism", arg);
 	}
 
 	public bool CanConsume()
@@ -350,18 +348,13 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 
 	public override MetabolismAttribute FindAttribute(MetabolismAttribute.Type type)
 	{
-		switch (type)
+		return type switch
 		{
-		case MetabolismAttribute.Type.Poison:
-			return poison;
-		case MetabolismAttribute.Type.Bleeding:
-			return bleeding;
-		case MetabolismAttribute.Type.Radiation:
-			return radiation_poison;
-		case MetabolismAttribute.Type.HealthOverTime:
-			return pending_health;
-		default:
-			return base.FindAttribute(type);
-		}
+			MetabolismAttribute.Type.Poison => poison, 
+			MetabolismAttribute.Type.Bleeding => bleeding, 
+			MetabolismAttribute.Type.Radiation => radiation_poison, 
+			MetabolismAttribute.Type.HealthOverTime => pending_health, 
+			_ => base.FindAttribute(type), 
+		};
 	}
 }

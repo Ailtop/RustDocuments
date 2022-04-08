@@ -30,9 +30,9 @@ public class UIParticle : BaseMonoBehaviour
 	public static void Add(UIParticle particleSource, RectTransform spawnPosition, RectTransform particleCanvas)
 	{
 		GameObject obj = Object.Instantiate(particleSource.gameObject);
-		obj.transform.SetParent(spawnPosition, false);
+		obj.transform.SetParent(spawnPosition, worldPositionStays: false);
 		obj.transform.localPosition = new Vector3(Random.Range(0f, spawnPosition.rect.width) - spawnPosition.rect.width * spawnPosition.pivot.x, Random.Range(0f, spawnPosition.rect.height) - spawnPosition.rect.height * spawnPosition.pivot.y, 0f);
-		obj.transform.SetParent(particleCanvas, true);
+		obj.transform.SetParent(particleCanvas, worldPositionStays: true);
 		obj.transform.localScale = Vector3.one;
 		obj.transform.localRotation = Quaternion.identity;
 	}

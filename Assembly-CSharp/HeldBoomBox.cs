@@ -143,7 +143,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 	{
 		if (GetOwnerPlayer() != null && GetOwnerPlayer().IsSleeping())
 		{
-			BoxController.ServerTogglePlay(false);
+			BoxController.ServerTogglePlay(play: false);
 		}
 		else
 		{
@@ -156,7 +156,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 		base.OnHeldChanged();
 		if (IsDisabled())
 		{
-			BoxController.ServerTogglePlay(false);
+			BoxController.ServerTogglePlay(play: false);
 		}
 	}
 

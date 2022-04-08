@@ -56,10 +56,8 @@ public class PlayerModifiers : BaseModifiers<BasePlayer>
 		{
 			return;
 		}
-		SetDirty(false);
-		using (ProtoBuf.PlayerModifiers arg = Save())
-		{
-			base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateModifiers", arg);
-		}
+		SetDirty(flag: false);
+		using ProtoBuf.PlayerModifiers arg = Save();
+		base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateModifiers", arg);
 	}
 }

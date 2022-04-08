@@ -1,26 +1,25 @@
 using TMPro;
 using UnityEngine;
 
-namespace Rust.UI
+namespace Rust.UI;
+
+public class SteamInventoryCrateOpen : MonoBehaviour
 {
-	public class SteamInventoryCrateOpen : MonoBehaviour
-	{
-		public TextMeshProUGUI Name;
+	public TextMeshProUGUI Name;
 
-		public TextMeshProUGUI Requirements;
+	public TextMeshProUGUI Requirements;
 
-		public TextMeshProUGUI Label;
+	public TextMeshProUGUI Label;
 
-		public HttpImage IconImage;
+	public HttpImage IconImage;
 
-		public GameObject ErrorPanel;
+	public GameObject ErrorPanel;
 
-		public TextMeshProUGUI ErrorText;
+	public TextMeshProUGUI ErrorText;
 
-		public GameObject CraftButton;
+	public GameObject CraftButton;
 
-		public GameObject ProgressPanel;
+	public GameObject ProgressPanel;
 
-		public SteamInventoryNewItem NewItemModal;
-	}
+	public SteamInventoryNewItem NewItemModal;
 }

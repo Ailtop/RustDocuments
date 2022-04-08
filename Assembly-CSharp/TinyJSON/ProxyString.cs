@@ -1,19 +1,18 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+public sealed class ProxyString : Variant
 {
-	public sealed class ProxyString : Variant
+	private readonly string value;
+
+	public ProxyString(string value)
 	{
-		private readonly string value;
+		this.value = value;
+	}
 
-		public ProxyString(string value)
-		{
-			this.value = value;
-		}
-
-		public override string ToString(IFormatProvider provider)
-		{
-			return value;
-		}
+	public override string ToString(IFormatProvider provider)
+	{
+		return value;
 	}
 }

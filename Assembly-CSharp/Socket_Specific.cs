@@ -15,7 +15,7 @@ public class Socket_Specific : Socket_Base
 		Gizmos.DrawLine(Vector3.zero, Vector3.right * 0.1f);
 		Gizmos.color = Color.green;
 		Gizmos.DrawLine(Vector3.zero, Vector3.up * 0.1f);
-		Gizmos.DrawIcon(base.transform.position, "light_circle_green.png", false);
+		Gizmos.DrawIcon(base.transform.position, "light_circle_green.png", allowScaling: false);
 	}
 
 	public override bool TestTarget(Construction.Target target)

@@ -39,18 +39,18 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 	{
 		if (!IsExhausted() && !IsLit())
 		{
-			SetFlag(Flags.OnFire, true);
-			EnableGlobalBroadcast(true);
+			SetFlag(Flags.OnFire, b: true);
+			EnableGlobalBroadcast(wants: true);
 			Invoke(Begin, fuseLength);
 			pickup.enabled = false;
-			EnableSaving(false);
+			EnableSaving(wants: false);
 		}
 	}
 
 	public virtual void Begin()
 	{
-		SetFlag(Flags.OnFire, false);
-		SetFlag(Flags.On, true, false, false);
+		SetFlag(Flags.OnFire, b: false);
+		SetFlag(Flags.On, b: true, recursive: false, networkupdate: false);
 		SendNetworkUpdate_Flags();
 		Interface.CallHook("OnFireworkStarted", this);
 		Invoke(OnExhausted, activityLength);
@@ -58,10 +58,10 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 
 	public virtual void OnExhausted()
 	{
-		SetFlag(Flags.Reserved8, true, false, false);
-		SetFlag(Flags.OnFire, false, false, false);
-		SetFlag(Flags.On, false, false, false);
-		EnableGlobalBroadcast(false);
+		SetFlag(Flags.Reserved8, b: true, recursive: false, networkupdate: false);
+		SetFlag(Flags.OnFire, b: false, recursive: false, networkupdate: false);
+		SetFlag(Flags.On, b: false, recursive: false, networkupdate: false);
+		EnableGlobalBroadcast(wants: false);
 		SendNetworkUpdate_Flags();
 		Interface.CallHook("OnFireworkExhausted", this);
 		Invoke(Cleanup, corpseDuration);
@@ -103,12 +103,12 @@ public class BaseFirework : BaseCombatEntity, IIgniteable
 		{
 			if (NumActiveFireworks() >= maxActiveFireworks)
 			{
-				SetFlag(Flags.OnFire, true);
+				SetFlag(Flags.OnFire, b: true);
 				Invoke(StaggeredTryLightFuse, 0.35f);
 				return;
 			}
 			_activeFireworks.Add(this);
-			SetFlag(Flags.OnFire, false, false, false);
+			SetFlag(Flags.OnFire, b: false, recursive: false, networkupdate: false);
 		}
 		Invoke(TryLightFuse, UnityEngine.Random.Range(0.1f, 0.3f));
 	}

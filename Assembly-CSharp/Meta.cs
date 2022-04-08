@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Facepunch;
-using UnityEngine;
 
 [Factory("meta")]
 public class Meta : ConsoleSystem
@@ -49,7 +47,7 @@ public class Meta : ConsoleSystem
 	public static void if_false(Arg args)
 	{
 		string @string = args.GetString(0);
-		bool @bool = args.GetBool(1, true);
+		bool @bool = args.GetBool(1, def: true);
 		if (!@bool)
 		{
 			ConsoleSystem.Run(Option.Client, @string, @bool);
@@ -60,9 +58,8 @@ public class Meta : ConsoleSystem
 	public static void reset_cycle(Arg args)
 	{
 		string name = args.GetString(0);
-		List<KeyCode> keys;
-		KeyCombos.TryParse(ref name, out keys);
-		Facepunch.Input.Button button = Facepunch.Input.GetButton(name);
+		KeyCombos.TryParse(ref name, out var _);
+		Input.Button button = Input.GetButton(name);
 		if (button == null)
 		{
 			args.ReplyWith("Button not found");

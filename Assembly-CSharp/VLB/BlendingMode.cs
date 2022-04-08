@@ -1,9 +1,8 @@
-namespace VLB
+namespace VLB;
+
+public enum BlendingMode
 {
-	public enum BlendingMode
-	{
-		Additive = 0,
-		SoftAdditive = 1,
-		TraditionalTransparency = 2
-	}
+	Additive = 0,
+	SoftAdditive = 1,
+	TraditionalTransparency = 2
 }

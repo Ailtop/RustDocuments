@@ -335,7 +335,7 @@ public class FrankensteinTable : StorageContainer
 		if (!(owner == null) && CanStartCreating(owner))
 		{
 			waking = true;
-			base.inventory.SetLocked(true);
+			base.inventory.SetLocked(isLocked: true);
 			SendNetworkUpdateImmediate();
 			StartCoroutine(DelayWakeFrankenstein(owner));
 			ClientRPC(null, "CL_WakeFrankenstein");
@@ -348,19 +348,19 @@ public class FrankensteinTable : StorageContainer
 		yield return new WaitForSeconds(TableDownDuration);
 		if (owner != null && owner.PetEntity != null)
 		{
-			base.inventory.SetLocked(false);
+			base.inventory.SetLocked(isLocked: false);
 			SendNetworkUpdateImmediate();
 			waking = false;
 			yield break;
 		}
 		ItemsToUse = GetValidItems(base.inventory);
-		BaseEntity baseEntity = GameManager.server.CreateEntity(FrankensteinPrefab.resourcePath, SpawnLocation.position, SpawnLocation.rotation, false);
+		BaseEntity baseEntity = GameManager.server.CreateEntity(FrankensteinPrefab.resourcePath, SpawnLocation.position, SpawnLocation.rotation, startActive: false);
 		baseEntity.enableSaving = false;
 		PoolableEx.AwakeFromInstantiate(baseEntity.gameObject);
 		baseEntity.Spawn();
 		EquipFrankenstein(baseEntity as FrankensteinPet);
 		ConsumeInventory();
-		base.inventory.SetLocked(false);
+		base.inventory.SetLocked(isLocked: false);
 		SendNetworkUpdateImmediate();
 		StartCoroutine(WaitForFrankensteinBrainInit(baseEntity as BasePet, owner));
 		waking = false;

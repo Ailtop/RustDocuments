@@ -122,21 +122,18 @@ public class AudioVisualisationEntity : IOEntity
 			{
 				return null;
 			}
-			IAudioConnectionSource component;
-			if (iOEntity != null && iOEntity.TryGetComponent<IAudioConnectionSource>(out component))
+			if (iOEntity != null && iOEntity.TryGetComponent<IAudioConnectionSource>(out var _))
 			{
 				return iOEntity;
 			}
-			AudioVisualisationEntity component2;
-			if (iOEntity != null && iOEntity.TryGetComponent<AudioVisualisationEntity>(out component2) && component2.connectedTo.IsSet)
+			if (iOEntity != null && iOEntity.TryGetComponent<AudioVisualisationEntity>(out var component2) && component2.connectedTo.IsSet)
 			{
 				return component2.connectedTo.Get(base.isServer) as IOEntity;
 			}
 			if (iOEntity != null)
 			{
 				iOEntity = GetAudioSource(iOEntity, depth - 1);
-				IAudioConnectionSource component3;
-				if (iOEntity != null && iOEntity.TryGetComponent<IAudioConnectionSource>(out component3))
+				if (iOEntity != null && iOEntity.TryGetComponent<IAudioConnectionSource>(out var _))
 				{
 					return iOEntity;
 				}

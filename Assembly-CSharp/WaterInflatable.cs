@@ -268,8 +268,7 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 
 	public override void OnCollision(Collision collision, BaseEntity hitEntity)
 	{
-		BaseVehicle baseVehicle;
-		if ((object)(baseVehicle = hitEntity as BaseVehicle) != null && (baseVehicle.HasDriver() || baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
+		if (hitEntity is BaseVehicle baseVehicle && (baseVehicle.HasDriver() || baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
 		{
 			Kill(DestroyMode.Gib);
 		}
@@ -306,8 +305,7 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 		}
 		foreach (BaseEntity entityContent in trigger.entityContents)
 		{
-			BaseVehicle baseVehicle;
-			if ((object)(baseVehicle = entityContent as BaseVehicle) != null && (baseVehicle.HasDriver() || baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
+			if (entityContent is BaseVehicle baseVehicle && (baseVehicle.HasDriver() || baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
 			{
 				Kill(DestroyMode.Gib);
 				break;

@@ -86,8 +86,7 @@ public class Cassette : BaseEntity
 		int num = 0;
 		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
 		{
-			Cassette cassette;
-			if ((object)(cassette = serverEntity as Cassette) != null && cassette.ClearSavedAudio())
+			if (serverEntity is Cassette cassette && cassette.ClearSavedAudio())
 			{
 				num++;
 			}
@@ -102,8 +101,7 @@ public class Cassette : BaseEntity
 		int num = 0;
 		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
 		{
-			Cassette cassette;
-			if ((object)(cassette = serverEntity as Cassette) != null && cassette.CreatorSteamId == uInt)
+			if (serverEntity is Cassette cassette && cassette.CreatorSteamId == uInt)
 			{
 				cassette.ClearSavedAudio();
 				num++;
@@ -119,15 +117,14 @@ public class Cassette : BaseEntity
 		{
 			return;
 		}
-		uint audioId = AudioId;
+		_ = AudioId;
 		AudioId = info.msg.cassette.audioId;
 		CreatorSteamId = info.msg.cassette.creatorSteamId;
 		preloadedAudioId = info.msg.cassette.preloadAudioId;
 		if (base.isServer && info.msg.cassette.holder != 0)
 		{
 			BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(info.msg.cassette.holder);
-			ICassettePlayer cassettePlayer;
-			if (baseNetworkable != null && (cassettePlayer = baseNetworkable as ICassettePlayer) != null)
+			if (baseNetworkable != null && baseNetworkable is ICassettePlayer cassettePlayer)
 			{
 				currentCassettePlayer = cassettePlayer;
 			}
@@ -170,8 +167,7 @@ public class Cassette : BaseEntity
 		base.OnParentChanging(oldParent, newParent);
 		currentCassettePlayer?.OnCassetteRemoved(this);
 		currentCassettePlayer = null;
-		ICassettePlayer cassettePlayer;
-		if (newParent != null && (cassettePlayer = newParent as ICassettePlayer) != null)
+		if (newParent != null && newParent is ICassettePlayer cassettePlayer)
 		{
 			Invoke(DelayedCassetteInserted, 0.1f);
 			currentCassettePlayer = cassettePlayer;
@@ -201,8 +197,7 @@ public class Cassette : BaseEntity
 		{
 			return;
 		}
-		HeldEntity heldEntity;
-		if (GetParentEntity() != null && (object)(heldEntity = GetParentEntity() as HeldEntity) != null && heldEntity.GetOwnerPlayer() != msg.player)
+		if (GetParentEntity() != null && GetParentEntity() is HeldEntity heldEntity && heldEntity.GetOwnerPlayer() != msg.player)
 		{
 			Debug.Log("Player mismatch!");
 			return;

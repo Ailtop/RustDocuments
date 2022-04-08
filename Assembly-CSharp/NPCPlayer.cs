@@ -56,7 +56,7 @@ public class NPCPlayer : BasePlayer
 		set
 		{
 			_isDormant = value;
-			bool isDormant = _isDormant;
+			_ = _isDormant;
 		}
 	}
 

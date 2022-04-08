@@ -47,18 +47,18 @@ public class Stocking : LootContainer
 		else if (IsEmpty() && Interface.CallHook("OnXmasStockingFill", this) == null)
 		{
 			base.SpawnLoot();
-			SetFlag(Flags.On, true);
-			Hurt(MaxHealth() * 0.1f, DamageType.Generic, null, false);
+			SetFlag(Flags.On, b: true);
+			Hurt(MaxHealth() * 0.1f, DamageType.Generic, null, useProtection: false);
 		}
 	}
 
 	public override void PlayerStoppedLooting(BasePlayer player)
 	{
 		base.PlayerStoppedLooting(player);
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		if (IsEmpty() && base.healthFraction <= 0.1f)
 		{
-			Hurt(base.health, DamageType.Generic, this, false);
+			Hurt(base.health, DamageType.Generic, this, useProtection: false);
 		}
 	}
 }

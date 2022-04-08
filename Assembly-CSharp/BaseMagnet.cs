@@ -90,7 +90,7 @@ public class BaseMagnet : MonoBehaviour
 	{
 		if ((bool)fixedJoint.connectedBody)
 		{
-			SetCollisionsEnabled(fixedJoint.connectedBody.gameObject, true);
+			SetCollisionsEnabled(fixedJoint.connectedBody.gameObject, wants: true);
 			Rigidbody connectedBody = fixedJoint.connectedBody;
 			fixedJoint.connectedBody = null;
 			connectedBody.WakeUp();
@@ -126,12 +126,12 @@ public class BaseMagnet : MonoBehaviour
 			}
 			if (new OBB(entityContent.transform.position, entityContent.transform.rotation, entityContent.bounds).Contains(attachDepthPoint.position))
 			{
-				entityContent.GetComponent<MagnetLiftable>().SetMagnetized(true, this, associatedPlayer);
+				entityContent.GetComponent<MagnetLiftable>().SetMagnetized(wantsOn: true, this, associatedPlayer);
 				if (fixedJoint.connectedBody == null)
 				{
 					Effect.server.Run(attachEffect.resourcePath, attachDepthPoint.position, -attachDepthPoint.up);
 					fixedJoint.connectedBody = component;
-					SetCollisionsEnabled(component.gameObject, false);
+					SetCollisionsEnabled(component.gameObject, wants: false);
 					continue;
 				}
 			}

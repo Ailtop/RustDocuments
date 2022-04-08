@@ -336,7 +336,7 @@ public class TerrainMeta : MonoBehaviour
 			Shader.SetGlobalTexture("Terrain_Control0", SplatMap.SplatTexture0);
 			Shader.SetGlobalTexture("Terrain_Control1", SplatMap.SplatTexture1);
 		}
-		bool flag = (bool)WaterMap;
+		_ = (bool)WaterMap;
 		if ((bool)DistanceMap)
 		{
 			Shader.SetGlobalTexture("Terrain_Distance", DistanceMap.DistanceTexture);

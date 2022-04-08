@@ -24,19 +24,19 @@ public class ElectricalCombiner : IOEntity
 
 	public override void UpdateHasPower(int inputAmount, int inputSlot)
 	{
-		SetFlag(Flags.Reserved8, input1Amount > 0 || input2Amount > 0, false, false);
+		SetFlag(Flags.Reserved8, input1Amount > 0 || input2Amount > 0, recursive: false, networkupdate: false);
 	}
 
 	public override void UpdateFromInput(int inputAmount, int slot)
 	{
-		if (inputAmount > 0 && IsConnectedTo(this, slot, IOEntity.backtracking * 2, true))
+		if (inputAmount > 0 && IsConnectedTo(this, slot, IOEntity.backtracking * 2, defaultReturn: true))
 		{
 			inputAmount = 0;
-			SetFlag(Flags.Reserved7, true);
+			SetFlag(Flags.Reserved7, b: true);
 		}
 		else
 		{
-			SetFlag(Flags.Reserved7, false);
+			SetFlag(Flags.Reserved7, b: false);
 		}
 		switch (slot)
 		{
@@ -52,10 +52,10 @@ public class ElectricalCombiner : IOEntity
 		}
 		int num = input1Amount + input2Amount + input3Amount;
 		bool b = num > 0;
-		SetFlag(Flags.Reserved1, input1Amount > 0, false, false);
-		SetFlag(Flags.Reserved2, input2Amount > 0, false, false);
-		SetFlag(Flags.Reserved3, b, false, false);
-		SetFlag(Flags.Reserved4, input1Amount > 0 || input2Amount > 0 || input3Amount > 0, false, false);
+		SetFlag(Flags.Reserved1, input1Amount > 0, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved2, input2Amount > 0, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved3, b, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved4, input1Amount > 0 || input2Amount > 0 || input3Amount > 0, recursive: false, networkupdate: false);
 		SetFlag(Flags.On, num > 0);
 		base.UpdateFromInput(num, slot);
 	}

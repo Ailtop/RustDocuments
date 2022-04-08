@@ -94,7 +94,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			{
 				return;
 			}
-			TerrainHeightMap heightMap = TerrainMeta.HeightMap;
+			_ = TerrainMeta.HeightMap;
 			List<Prefab<MonumentInfo>> list = new List<Prefab<MonumentInfo>>();
 			string[] array2 = array;
 			for (int i = 0; i < array2.Length; i++)
@@ -192,7 +192,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 						Vector3 tangent = path.GetTangent(num5);
 						int num6 = 0;
 						Vector3 zero = Vector3.zero;
-						TerrainPathConnect[] componentsInChildren = prefab3.Object.GetComponentsInChildren<TerrainPathConnect>(true);
+						TerrainPathConnect[] componentsInChildren = prefab3.Object.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
 						foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 						{
 							if (terrainPathConnect.Type == InfrastructureType.Road)

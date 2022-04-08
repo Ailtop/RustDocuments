@@ -25,7 +25,7 @@ public class ReclaimBackpack : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
+		base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
 		Invoke(RemoveMe, ReclaimManager.reclaim_expire_minutes * 60f);
 		InvokeRandomized(CheckEmpty, 1f, 30f, 3f);
 	}

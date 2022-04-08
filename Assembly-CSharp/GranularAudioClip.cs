@@ -141,7 +141,7 @@ public class GranularAudioClip : MonoBehaviour
 		int bufferLength = 1;
 		int numBuffers = 1;
 		UnityEngine.AudioSettings.GetDSPBufferSize(out bufferLength, out numBuffers);
-		granularClip = AudioClip.Create(sourceClip.name + " (granular)", bufferLength, sourceClip.channels, sampleRate, true, OnAudioRead);
+		granularClip = AudioClip.Create(sourceClip.name + " (granular)", bufferLength, sourceClip.channels, sampleRate, stream: true, OnAudioRead);
 		sourceChannels = sourceClip.channels;
 	}
 

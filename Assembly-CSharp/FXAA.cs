@@ -18,7 +18,7 @@ public class FXAA : FXAAPostEffectsBase, IImageEffect
 	private void Start()
 	{
 		CreateMaterials();
-		CheckSupport(false);
+		CheckSupport(needDepth: false);
 	}
 
 	public bool IsActive()

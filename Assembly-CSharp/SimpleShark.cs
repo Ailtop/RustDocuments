@@ -264,8 +264,7 @@ public class SimpleShark : BaseCombatEntity
 			float radius2 = 1f;
 			Vector3 pointOnCircle = BasePathFinder.GetPointOnCircle(center, radius2, num);
 			Vector3 vector = Vector3Ex.Direction(pointOnCircle, center);
-			RaycastHit hitInfo;
-			pointOnCircle = ((!Physics.SphereCast(center, obstacleDetectionRadius, vector, out hitInfo, radius + staggerOffset, layerMask)) ? (center + vector * radius) : (center + vector * (hitInfo.distance - 6f)));
+			pointOnCircle = ((!Physics.SphereCast(center, obstacleDetectionRadius, vector, out var hitInfo, radius + staggerOffset, layerMask)) ? (center + vector * radius) : (center + vector * (hitInfo.distance - 6f)));
 			if (staggerOffset != 0f)
 			{
 				pointOnCircle += vector * Random.Range(0f - staggerOffset, staggerOffset);
@@ -290,8 +289,7 @@ public class SimpleShark : BaseCombatEntity
 			float radius2 = radius * 2f;
 			Vector3 vector = BasePathFinder.GetPointOnCircle(center, radius2, num);
 			Vector3 vector2 = Vector3Ex.Direction(center, vector);
-			RaycastHit hitInfo;
-			if (Physics.SphereCast(vector, obstacleDetectionRadius, vector2, out hitInfo, radius + staggerOffset, layerMask))
+			if (Physics.SphereCast(vector, obstacleDetectionRadius, vector2, out var hitInfo, radius + staggerOffset, layerMask))
 			{
 				vector = hitInfo.point - vector2 * 6f;
 			}
@@ -420,7 +418,7 @@ public class SimpleShark : BaseCombatEntity
 				return false;
 			}
 		}
-		else if (!WaterLevel.Test(newTarget.CenterPoint(), true, newTarget))
+		else if (!WaterLevel.Test(newTarget.CenterPoint(), waves: true, newTarget))
 		{
 			return false;
 		}
@@ -587,19 +585,16 @@ public class SimpleShark : BaseCombatEntity
 		Vector3 forward = base.transform.forward;
 		Vector3 position = base.transform.position;
 		int layerMask = 1503764737;
-		RaycastHit hitInfo;
-		if (Physics.SphereCast(position, obstacleDetectionRadius, forward, out hitInfo, obstacleDetectionRange, layerMask))
+		if (Physics.SphereCast(position, obstacleDetectionRadius, forward, out var hitInfo, obstacleDetectionRange, layerMask))
 		{
 			Vector3 point = hitInfo.point;
 			Vector3 vector = Vector3.zero;
 			Vector3 vector2 = Vector3.zero;
-			RaycastHit hitInfo2;
-			if (Physics.SphereCast(position + Vector3.down * 0.25f + base.transform.right * 0.25f, obstacleDetectionRadius, forward, out hitInfo2, obstacleDetectionRange, layerMask))
+			if (Physics.SphereCast(position + Vector3.down * 0.25f + base.transform.right * 0.25f, obstacleDetectionRadius, forward, out var hitInfo2, obstacleDetectionRange, layerMask))
 			{
 				vector = hitInfo2.point;
 			}
-			RaycastHit hitInfo3;
-			if (Physics.SphereCast(position + Vector3.down * 0.25f - base.transform.right * 0.25f, obstacleDetectionRadius, forward, out hitInfo3, obstacleDetectionRange, layerMask))
+			if (Physics.SphereCast(position + Vector3.down * 0.25f - base.transform.right * 0.25f, obstacleDetectionRadius, forward, out var hitInfo3, obstacleDetectionRange, layerMask))
 			{
 				vector2 = hitInfo3.point;
 			}
@@ -628,7 +623,7 @@ public class SimpleShark : BaseCombatEntity
 
 	private void UpdateDirection(float delta)
 	{
-		Vector3 forward = base.transform.forward;
+		_ = base.transform.forward;
 		Vector3 vector = Vector3Ex.Direction(WaterClamp(destination), base.transform.position);
 		if (obstacleAvoidanceScale != 0f)
 		{

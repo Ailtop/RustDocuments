@@ -32,8 +32,7 @@ public static class MeshCache
 
 	public static Data Get(Mesh mesh)
 	{
-		Data value;
-		if (!dictionary.TryGetValue(mesh, out value))
+		if (!dictionary.TryGetValue(mesh, out var value))
 		{
 			value = new Data();
 			value.mesh = mesh;

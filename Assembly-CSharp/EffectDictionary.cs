@@ -13,21 +13,15 @@ public class EffectDictionary
 
 	public static string GetParticle(DamageType damageType, string materialName)
 	{
-		switch (damageType)
+		return damageType switch
 		{
-		case DamageType.Bullet:
-			return GetParticle("bullet", materialName);
-		case DamageType.Arrow:
-			return GetParticle("bullet", materialName);
-		case DamageType.Blunt:
-			return GetParticle("blunt", materialName);
-		case DamageType.Slash:
-			return GetParticle("slash", materialName);
-		case DamageType.Stab:
-			return GetParticle("stab", materialName);
-		default:
-			return GetParticle("blunt", materialName);
-		}
+			DamageType.Bullet => GetParticle("bullet", materialName), 
+			DamageType.Arrow => GetParticle("bullet", materialName), 
+			DamageType.Blunt => GetParticle("blunt", materialName), 
+			DamageType.Slash => GetParticle("slash", materialName), 
+			DamageType.Stab => GetParticle("stab", materialName), 
+			_ => GetParticle("blunt", materialName), 
+		};
 	}
 
 	public static string GetDecal(string impactType, string materialName)
@@ -37,21 +31,15 @@ public class EffectDictionary
 
 	public static string GetDecal(DamageType damageType, string materialName)
 	{
-		switch (damageType)
+		return damageType switch
 		{
-		case DamageType.Bullet:
-			return GetDecal("bullet", materialName);
-		case DamageType.Arrow:
-			return GetDecal("bullet", materialName);
-		case DamageType.Blunt:
-			return GetDecal("blunt", materialName);
-		case DamageType.Slash:
-			return GetDecal("slash", materialName);
-		case DamageType.Stab:
-			return GetDecal("stab", materialName);
-		default:
-			return GetDecal("blunt", materialName);
-		}
+			DamageType.Bullet => GetDecal("bullet", materialName), 
+			DamageType.Arrow => GetDecal("bullet", materialName), 
+			DamageType.Blunt => GetDecal("blunt", materialName), 
+			DamageType.Slash => GetDecal("slash", materialName), 
+			DamageType.Stab => GetDecal("stab", materialName), 
+			_ => GetDecal("blunt", materialName), 
+		};
 	}
 
 	public static string GetDisplacement(string impactType, string materialName)
@@ -66,8 +54,7 @@ public class EffectDictionary
 			effectDictionary = GameManifest.LoadEffectDictionary();
 		}
 		string format = "assets/bundled/prefabs/fx/{0}/{1}/{2}";
-		string[] value;
-		if (!effectDictionary.TryGetValue(StringFormatCache.Get(format, category, effect, material), out value) && !effectDictionary.TryGetValue(StringFormatCache.Get(format, category, effect, "generic"), out value))
+		if (!effectDictionary.TryGetValue(StringFormatCache.Get(format, category, effect, material), out var value) && !effectDictionary.TryGetValue(StringFormatCache.Get(format, category, effect, "generic"), out value))
 		{
 			return string.Empty;
 		}

@@ -181,7 +181,7 @@ public class FuelGenerator : ContainerIOEntity
 	{
 		if (!IsOn() && UseFuel(1f))
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			UpdateCurrentEnergy();
 			MarkDirty();
 			InvokeRepeating(FuelConsumption, fuelTickRate, fuelTickRate);
@@ -200,7 +200,7 @@ public class FuelGenerator : ContainerIOEntity
 	{
 		if (IsOn())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			UpdateCurrentEnergy();
 			MarkDirty();
 			CancelInvoke(FuelConsumption);

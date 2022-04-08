@@ -35,25 +35,14 @@ public class BaseOven : StorageContainer, ISplashable
 
 	private const float UpdateRate = 0.5f;
 
-	public float cookingTemperature
+	public float cookingTemperature => temperature switch
 	{
-		get
-		{
-			switch (temperature)
-			{
-			case TemperatureType.Fractioning:
-				return 1500f;
-			case TemperatureType.Cooking:
-				return 200f;
-			case TemperatureType.Smelting:
-				return 1000f;
-			case TemperatureType.Warming:
-				return 50f;
-			default:
-				return 15f;
-			}
-		}
-	}
+		TemperatureType.Fractioning => 1500f, 
+		TemperatureType.Cooking => 200f, 
+		TemperatureType.Smelting => 1000f, 
+		TemperatureType.Warming => 50f, 
+		_ => 15f, 
+	};
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -126,7 +115,7 @@ public class BaseOven : StorageContainer, ISplashable
 		base.OnItemAddedOrRemoved(item, bAdded);
 		if (item != null && item.HasFlag(Item.Flag.OnFire))
 		{
-			item.SetFlag(Item.Flag.OnFire, false);
+			item.SetFlag(Item.Flag.OnFire, b: false);
 			item.MarkDirty();
 		}
 	}
@@ -179,7 +168,7 @@ public class BaseOven : StorageContainer, ISplashable
 		item.fuel -= 0.5f * (cookingTemperature / 200f);
 		if (!item.HasFlag(Item.Flag.OnFire))
 		{
-			item.SetFlag(Item.Flag.OnFire, true);
+			item.SetFlag(Item.Flag.OnFire, b: true);
 			item.MarkDirty();
 		}
 		if (item.fuel <= 0f)
@@ -254,7 +243,7 @@ public class BaseOven : StorageContainer, ISplashable
 			base.inventory.temperature = cookingTemperature;
 			UpdateAttachmentTemperature();
 			InvokeRepeating(Cook, 0.5f, 0.5f);
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 		}
 	}
 
@@ -268,13 +257,13 @@ public class BaseOven : StorageContainer, ISplashable
 			{
 				if (item.HasFlag(Item.Flag.OnFire))
 				{
-					item.SetFlag(Item.Flag.OnFire, false);
+					item.SetFlag(Item.Flag.OnFire, b: false);
 					item.MarkDirty();
 				}
 			}
 		}
 		CancelInvoke(Cook);
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public bool WantsSplash(ItemDefinition splashType, int amount)

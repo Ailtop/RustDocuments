@@ -24,7 +24,7 @@ public class WaterCollision : MonoBehaviour
 		{
 			foreach (Collider key in ignoredColliders.Keys)
 			{
-				Physics.IgnoreCollision(key, enumerator.Current, false);
+				Physics.IgnoreCollision(key, enumerator.Current, ignore: false);
 			}
 		}
 		ignoredColliders.Clear();
@@ -37,7 +37,7 @@ public class WaterCollision : MonoBehaviour
 			HashSet<Collider>.Enumerator enumerator = waterColliders.GetEnumerator();
 			while (enumerator.MoveNext())
 			{
-				Physics.IgnoreCollision(collider, enumerator.Current, false);
+				Physics.IgnoreCollision(collider, enumerator.Current, ignore: false);
 			}
 			ignoredColliders.Remove(collider);
 		}
@@ -90,7 +90,7 @@ public class WaterCollision : MonoBehaviour
 				HashSet<Collider>.Enumerator enumerator = waterColliders.GetEnumerator();
 				while (enumerator.MoveNext())
 				{
-					Physics.IgnoreCollision(collider, enumerator.Current, true);
+					Physics.IgnoreCollision(collider, enumerator.Current, ignore: true);
 				}
 				ignoredColliders.Add(collider, val);
 			}
@@ -126,7 +126,7 @@ public class WaterCollision : MonoBehaviour
 				HashSet<Collider>.Enumerator enumerator = waterColliders.GetEnumerator();
 				while (enumerator.MoveNext())
 				{
-					Physics.IgnoreCollision(key, enumerator.Current, false);
+					Physics.IgnoreCollision(key, enumerator.Current, ignore: false);
 				}
 				ignoredColliders.RemoveAt(i--);
 			}

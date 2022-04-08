@@ -86,12 +86,12 @@ public class Poolable : MonoBehaviour, IClientComponent, IPrefabPostProcess
 	public void Initialize(uint id)
 	{
 		prefabID = id;
-		behaviours = base.gameObject.GetComponentsInChildren(typeof(Behaviour), true).OfType<Behaviour>().ToArray();
-		rigidbodies = base.gameObject.GetComponentsInChildren<Rigidbody>(true);
-		colliders = base.gameObject.GetComponentsInChildren<Collider>(true);
-		lodgroups = base.gameObject.GetComponentsInChildren<LODGroup>(true);
-		renderers = base.gameObject.GetComponentsInChildren<Renderer>(true);
-		particles = base.gameObject.GetComponentsInChildren<ParticleSystem>(true);
+		behaviours = base.gameObject.GetComponentsInChildren(typeof(Behaviour), includeInactive: true).OfType<Behaviour>().ToArray();
+		rigidbodies = base.gameObject.GetComponentsInChildren<Rigidbody>(includeInactive: true);
+		colliders = base.gameObject.GetComponentsInChildren<Collider>(includeInactive: true);
+		lodgroups = base.gameObject.GetComponentsInChildren<LODGroup>(includeInactive: true);
+		renderers = base.gameObject.GetComponentsInChildren<Renderer>(includeInactive: true);
+		particles = base.gameObject.GetComponentsInChildren<ParticleSystem>(includeInactive: true);
 		if (behaviours.Length == 0)
 		{
 			behaviours = Array.Empty<Behaviour>();
@@ -127,21 +127,21 @@ public class Poolable : MonoBehaviour, IClientComponent, IPrefabPostProcess
 	{
 		if (base.transform.parent != null)
 		{
-			base.transform.SetParent(null, false);
+			base.transform.SetParent(null, worldPositionStays: false);
 		}
 		if (Pool.mode <= 1)
 		{
 			if (base.gameObject.activeSelf)
 			{
-				base.gameObject.SetActive(false);
+				base.gameObject.SetActive(value: false);
 			}
 			return;
 		}
-		SetBehaviourEnabled(false);
-		SetComponentEnabled(false);
+		SetBehaviourEnabled(state: false);
+		SetComponentEnabled(state: false);
 		if (!base.gameObject.activeSelf)
 		{
-			base.gameObject.SetActive(true);
+			base.gameObject.SetActive(value: true);
 		}
 	}
 
@@ -149,7 +149,7 @@ public class Poolable : MonoBehaviour, IClientComponent, IPrefabPostProcess
 	{
 		if (Pool.mode > 1)
 		{
-			SetComponentEnabled(true);
+			SetComponentEnabled(state: true);
 		}
 	}
 

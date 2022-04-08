@@ -98,7 +98,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 	{
 		if (!(ent.GetParentEntity() == GameObjectEx.ToBaseEntity(base.gameObject)))
 		{
-			ent.SetParent(GameObjectEx.ToBaseEntity(base.gameObject), true, true);
+			ent.SetParent(GameObjectEx.ToBaseEntity(base.gameObject), worldPositionStays: true, sendImmediate: true);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 	{
 		if (!(ent.GetParentEntity() != GameObjectEx.ToBaseEntity(base.gameObject)))
 		{
-			ent.SetParent(null, true, true);
+			ent.SetParent(null, worldPositionStays: true, sendImmediate: true);
 			BasePlayer basePlayer = ent.ToPlayer();
 			if (basePlayer != null)
 			{
@@ -114,9 +114,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 				basePlayer.PauseSpeedHackDetection(5f);
 				basePlayer.PauseVehicleNoClipDetection(5f);
 			}
-			BasePlayer basePlayer2;
-			Vector3 res;
-			if (associatedMountable != null && doClippingCheck && IsClipping(ent) && (object)(basePlayer2 = ent as BasePlayer) != null && associatedMountable.GetDismountPosition(basePlayer2, out res))
+			if (associatedMountable != null && doClippingCheck && IsClipping(ent) && ent is BasePlayer basePlayer2 && associatedMountable.GetDismountPosition(basePlayer2, out var res))
 			{
 				basePlayer2.MovePosition(res);
 				basePlayer2.SendNetworkUpdateImmediate();

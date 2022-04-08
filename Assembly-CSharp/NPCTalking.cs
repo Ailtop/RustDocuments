@@ -386,7 +386,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				ForceEndConversation(player);
 				if (Interface.CallHook("OnVendingShopOpen", vendingMachine, player) == null)
 				{
-					vendingMachine.PlayerOpenLoot(player, "vendingmachine.customer", false);
+					vendingMachine.PlayerOpenLoot(player, "vendingmachine.customer", doPositionChecks: false);
 					Interface.CallHook("OnVendingShopOpened", vendingMachine, player);
 				}
 				return;

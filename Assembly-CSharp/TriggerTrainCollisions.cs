@@ -103,7 +103,7 @@ public class TriggerTrainCollisions : TriggerBase
 			TrainCar componentInParent = obj.GetComponentInParent<TrainCar>();
 			if (componentInParent != null)
 			{
-				if (!_003COnObjectRemoved_003Eg__HasAnotherColliderFor_007C17_0(componentInParent))
+				if (!HasAnotherColliderFor<TrainCar>(componentInParent))
 				{
 					trainContents.Remove(componentInParent);
 				}
@@ -111,12 +111,23 @@ public class TriggerTrainCollisions : TriggerBase
 			else
 			{
 				Rigidbody componentInParent2 = obj.GetComponentInParent<Rigidbody>();
-				if (!_003COnObjectRemoved_003Eg__HasAnotherColliderFor_007C17_0(componentInParent2))
+				if (!HasAnotherColliderFor<Rigidbody>(componentInParent2))
 				{
 					otherRigidbodyContents.Remove(componentInParent2);
 				}
 			}
 		}
 		base.OnObjectRemoved(obj);
+		bool HasAnotherColliderFor<T>(T component) where T : Component
+		{
+			foreach (Collider colliderContent in colliderContents)
+			{
+				if (colliderContent != null && (UnityEngine.Object)colliderContent.GetComponentInParent<T>() == (UnityEngine.Object)component)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

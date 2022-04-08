@@ -10,7 +10,7 @@ public class NPCDoorTriggerBox : MonoBehaviour
 	public void Setup(Door d)
 	{
 		door = d;
-		base.transform.SetParent(door.transform, false);
+		base.transform.SetParent(door.transform, worldPositionStays: false);
 		base.gameObject.layer = 18;
 		BoxCollider boxCollider = base.gameObject.AddComponent<BoxCollider>();
 		boxCollider.isTrigger = true;
@@ -33,7 +33,7 @@ public class NPCDoorTriggerBox : MonoBehaviour
 			BasePlayer component = other.gameObject.GetComponent<BasePlayer>();
 			if (component != null && component.IsNpc && !door.isSecurityDoor)
 			{
-				door.SetOpen(true);
+				door.SetOpen(open: true);
 			}
 		}
 	}

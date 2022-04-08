@@ -308,7 +308,7 @@ public class CodeLock : BaseLock
 		{
 			if (!hasCode && !flag)
 			{
-				SetFlag(Flags.Locked, true);
+				SetFlag(Flags.Locked, b: true);
 			}
 			if (!flag)
 			{
@@ -338,7 +338,7 @@ public class CodeLock : BaseLock
 			if (whitelistPlayers.Contains(rpc.player.userID))
 			{
 				DoEffect(effectUnlocked.resourcePath);
-				SetFlag(Flags.Locked, false);
+				SetFlag(Flags.Locked, b: false);
 				SendNetworkUpdate();
 			}
 			else
@@ -355,14 +355,14 @@ public class CodeLock : BaseLock
 		if (rpc.player.CanInteract() && !IsLocked() && code.Length == 4 && Interface.CallHook("CanLock", rpc.player, this) == null && whitelistPlayers.Contains(rpc.player.userID))
 		{
 			DoEffect(effectLocked.resourcePath);
-			SetFlag(Flags.Locked, true);
+			SetFlag(Flags.Locked, b: true);
 			SendNetworkUpdate();
 		}
 	}
 
 	public void ClearCodeEntryBlocked()
 	{
-		SetFlag(Flags.Reserved11, false);
+		SetFlag(Flags.Reserved11, b: false);
 		wrongCodes = 0;
 	}
 
@@ -389,7 +389,7 @@ public class CodeLock : BaseLock
 			}
 			DoEffect(effectDenied.resourcePath);
 			DoEffect(effectShock.resourcePath);
-			rpc.player.Hurt((float)(wrongCodes + 1) * 5f, DamageType.ElectricShock, this, false);
+			rpc.player.Hurt((float)(wrongCodes + 1) * 5f, DamageType.ElectricShock, this, useProtection: false);
 			wrongCodes++;
 			if (wrongCodes > 5)
 			{
@@ -397,7 +397,7 @@ public class CodeLock : BaseLock
 			}
 			if ((float)wrongCodes >= maxFailedAttempts)
 			{
-				SetFlag(Flags.Reserved11, true);
+				SetFlag(Flags.Reserved11, b: true);
 				Invoke(ClearCodeEntryBlocked, lockoutCooldown);
 			}
 			lastWrongTime = UnityEngine.Time.realtimeSinceStartup;
@@ -423,6 +423,6 @@ public class CodeLock : BaseLock
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.Reserved11, false);
+		SetFlag(Flags.Reserved11, b: false);
 	}
 }

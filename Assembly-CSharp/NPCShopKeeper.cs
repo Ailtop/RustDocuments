@@ -45,11 +45,11 @@ public class NPCShopKeeper : NPCPlayer
 		Invoke(DelayedSleepEnd, 3f);
 		SetAimDirection(base.transform.rotation * Vector3.forward);
 		InvokeRandomized(Greeting, Random.Range(5f, 10f), 5f, Random.Range(0f, 2f));
-		if (invisibleVendingMachineRef.IsValid(true) && machine == null)
+		if (invisibleVendingMachineRef.IsValid(serverside: true) && machine == null)
 		{
 			machine = GetVendingMachine();
 		}
-		else if (machine != null && !invisibleVendingMachineRef.IsValid(true))
+		else if (machine != null && !invisibleVendingMachineRef.IsValid(serverside: true))
 		{
 			invisibleVendingMachineRef.Set(machine);
 		}
@@ -99,7 +99,7 @@ public class NPCShopKeeper : NPCPlayer
 	{
 		List<BasePlayer> obj = Pool.GetList<BasePlayer>();
 		Vis.Entities(base.transform.position, 10f, obj, 131072);
-		Vector3 position = base.transform.position;
+		_ = base.transform.position;
 		BasePlayer basePlayer = null;
 		foreach (BasePlayer item in obj)
 		{

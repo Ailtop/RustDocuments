@@ -57,7 +57,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		lastBounceTime = Time.time;
 		base.ServerInit();
 		SetFuse(GetRandomTimerTime());
-		ReceiveCollisionMessages(true);
+		ReceiveCollisionMessages(b: true);
 		if (waterCausesExplosion)
 		{
 			InvokeRepeating(WaterCheck, 0f, 0.5f);
@@ -114,17 +114,17 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		}
 		if (flag)
 		{
-			Effect.server.Run(underwaterExplosionEffect.resourcePath, explosionFxPos, explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
+			Effect.server.Run(underwaterExplosionEffect.resourcePath, explosionFxPos, explosionUsesForward ? base.transform.forward : Vector3.up, null, broadcast: true);
 		}
 		else if (explosionEffect.isValid)
 		{
-			Effect.server.Run(explosionEffect.resourcePath, explosionFxPos, explosionUsesForward ? base.transform.forward : Vector3.up, null, true);
+			Effect.server.Run(explosionEffect.resourcePath, explosionFxPos, explosionUsesForward ? base.transform.forward : Vector3.up, null, broadcast: true);
 		}
 		if (damageTypes.Count > 0)
 		{
 			if (onlyDamageParent)
 			{
-				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 166144, true);
+				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 166144, useLineOfSight: true);
 				BaseEntity baseEntity = GetParentEntity();
 				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
 				while (baseCombatEntity == null && baseEntity != null && baseEntity.HasParent())
@@ -159,7 +159,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 			}
 			else
 			{
-				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 1076005121, true);
+				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 1076005121, useLineOfSight: true);
 				if (creatorEntity != null && damageTypes != null)
 				{
 					float num2 = 0f;
@@ -225,7 +225,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		{
 			if (bounceEffect.isValid)
 			{
-				Effect.server.Run(bounceEffect.resourcePath, base.transform.position, Vector3.up, null, true);
+				Effect.server.Run(bounceEffect.resourcePath, base.transform.position, Vector3.up, null, broadcast: true);
 			}
 			lastBounceTime = Time.time;
 		}
@@ -271,7 +271,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		{
 			return false;
 		}
-		return parentEntity.IsValid(true);
+		return parentEntity.IsValid(serverside: true);
 	}
 
 	public void DoStick(Vector3 position, Vector3 normal, BaseEntity ent, Collider collider)
@@ -287,27 +287,27 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 				return;
 			}
 			position = ent.transform.position;
-			ent = ent.parentEntity.Get(true);
+			ent = ent.parentEntity.Get(serverside: true);
 		}
-		SetMotionEnabled(false);
-		SetCollisionEnabled(false);
+		SetMotionEnabled(wantsMotion: false);
+		SetCollisionEnabled(wantsCollision: false);
 		if (!HasChild(ent))
 		{
 			base.transform.position = position;
 			base.transform.rotation = Quaternion.LookRotation(normal, base.transform.up);
 			if (collider != null)
 			{
-				SetParent(ent, ent.FindBoneID(collider.transform), true);
+				SetParent(ent, ent.FindBoneID(collider.transform), worldPositionStays: true);
 			}
 			else
 			{
-				SetParent(ent, StringPool.closest, true);
+				SetParent(ent, StringPool.closest, worldPositionStays: true);
 			}
 			if (stickEffect.isValid)
 			{
-				Effect.server.Run(stickEffect.resourcePath, base.transform.position, Vector3.up, null, true);
+				Effect.server.Run(stickEffect.resourcePath, base.transform.position, Vector3.up, null, broadcast: true);
 			}
-			ReceiveCollisionMessages(false);
+			ReceiveCollisionMessages(b: false);
 		}
 	}
 
@@ -315,10 +315,10 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 	{
 		if ((bool)GetParentEntity())
 		{
-			SetParent(null, true, true);
-			SetMotionEnabled(true);
-			SetCollisionEnabled(true);
-			ReceiveCollisionMessages(true);
+			SetParent(null, worldPositionStays: true, sendImmediate: true);
+			SetMotionEnabled(wantsMotion: true);
+			SetCollisionEnabled(wantsCollision: true);
+			ReceiveCollisionMessages(b: true);
 		}
 	}
 

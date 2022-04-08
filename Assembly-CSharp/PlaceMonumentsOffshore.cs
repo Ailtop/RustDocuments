@@ -69,7 +69,7 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 			float min2 = position.x + size.x + (float)MinDistanceFromTerrain;
 			float max2 = position.x + size.x + (float)MaxDistanceFromTerrain;
 			float num = position.z - (float)MaxDistanceFromTerrain;
-			int minDistanceFromTerrain = MinDistanceFromTerrain;
+			_ = MinDistanceFromTerrain;
 			float min3 = position.z + size.z + (float)MinDistanceFromTerrain;
 			float max3 = position.z + size.z + (float)MaxDistanceFromTerrain;
 			int num2 = 0;

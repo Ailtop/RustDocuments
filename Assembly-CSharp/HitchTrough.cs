@@ -49,7 +49,7 @@ public class HitchTrough : StorageContainer
 
 	public bool ValidHitchPosition(Vector3 pos)
 	{
-		if (GetClosest(pos, false, 1f) != null)
+		if (GetClosest(pos, includeOccupied: false, 1f) != null)
 		{
 			return true;
 		}

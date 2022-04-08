@@ -240,7 +240,7 @@ public class KeyLock : BaseLock
 	{
 		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && HasLockPermission(rpc.player))
 		{
-			SetFlag(Flags.Locked, false);
+			SetFlag(Flags.Locked, b: false);
 			SendNetworkUpdate();
 		}
 	}
@@ -292,7 +292,7 @@ public class KeyLock : BaseLock
 
 	public void LockLock(BasePlayer player)
 	{
-		SetFlag(Flags.Locked, true);
+		SetFlag(Flags.Locked, b: true);
 		if (BaseEntityEx.IsValid(player))
 		{
 			player.GiveAchievement("LOCK_LOCK");

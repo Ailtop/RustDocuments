@@ -1,8 +1,7 @@
-namespace VLB
+namespace VLB;
+
+public enum PlaneAlignment
 {
-	public enum PlaneAlignment
-	{
-		Surface = 0,
-		Beam = 1
-	}
+	Surface = 0,
+	Beam = 1
 }

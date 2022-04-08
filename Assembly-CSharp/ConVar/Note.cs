@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("note")]
+public class Note : ConsoleSystem
 {
-	[Factory("note")]
-	public class Note : ConsoleSystem
-	{
-	}
 }

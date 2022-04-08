@@ -12,7 +12,7 @@ public class RealmedNavMeshObstacle : BasePrefab
 		{
 			return;
 		}
-		base.PreProcess(process, rootObj, name, serverside, clientside, false);
+		base.PreProcess(process, rootObj, name, serverside, clientside, bundling: false);
 		if (base.isServer && (bool)Obstacle)
 		{
 			if (AiManager.nav_disable)

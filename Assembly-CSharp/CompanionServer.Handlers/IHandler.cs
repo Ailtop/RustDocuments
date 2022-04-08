@@ -1,16 +1,15 @@
 using Facepunch;
 using ProtoBuf;
 
-namespace CompanionServer.Handlers
+namespace CompanionServer.Handlers;
+
+public interface IHandler : Pool.IPooled
 {
-	public interface IHandler : Pool.IPooled
-	{
-		AppRequest Request { get; }
+	AppRequest Request { get; }
 
-		ValidationResult Validate();
+	ValidationResult Validate();
 
-		void Execute();
+	void Execute();
 
-		void SendError(string code);
-	}
+	void SendError(string code);
 }

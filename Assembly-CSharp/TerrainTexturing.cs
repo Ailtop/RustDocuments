@@ -120,9 +120,9 @@ public class TerrainTexturing : TerrainExtension
 		}
 		ref int size = ref shoreMapSize;
 		byte threshold = 127;
-		DistanceField.Generate(ref size, ref threshold, ref image, ref distances);
+		DistanceField.Generate(in size, in threshold, in image, ref distances);
 		DistanceField.ApplyGaussianBlur(shoreMapSize, distances, 0);
-		DistanceField.GenerateVectors(ref shoreMapSize, ref distances, ref vectors);
+		DistanceField.GenerateVectors(in shoreMapSize, in distances, ref vectors);
 		results.Dispose();
 		commands.Dispose();
 	}

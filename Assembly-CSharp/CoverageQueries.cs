@@ -59,10 +59,10 @@ public class CoverageQueries : MonoBehaviour
 		{
 			if (count > inputData.Length || (resultTexture != null && !resultTexture.IsCreated()))
 			{
-				Dispose(false);
+				Dispose(data: false);
 				width = Mathf.CeilToInt(Mathf.Sqrt(count));
 				height = Mathf.CeilToInt((float)count / (float)width);
-				inputTexture = new Texture2D(width, height, TextureFormat.RGBAFloat, false, true);
+				inputTexture = new Texture2D(width, height, TextureFormat.RGBAFloat, mipChain: false, linear: true);
 				inputTexture.name = "_Input";
 				inputTexture.filterMode = FilterMode.Point;
 				inputTexture.wrapMode = TextureWrapMode.Clamp;

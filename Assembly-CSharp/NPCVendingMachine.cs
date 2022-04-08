@@ -98,7 +98,7 @@ public class NPCVendingMachine : VendingMachine
 			{
 				continue;
 			}
-			int num = Mathf.FloorToInt(base.inventory.GetAmount(entry.sellItem.itemid, false) / entry.sellItemAmount);
+			int num = Mathf.FloorToInt(base.inventory.GetAmount(entry.sellItem.itemid, onlyUsableAmounts: false) / entry.sellItemAmount);
 			int num2 = Mathf.Min(10 - num, entry.refillAmount) * entry.sellItemAmount;
 			if (num2 > 0)
 			{

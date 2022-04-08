@@ -36,11 +36,11 @@ public class VehicleVendor : NPCTalking
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		if (spawnerRef.IsValid(true) && vehicleSpawner == null)
+		if (spawnerRef.IsValid(serverside: true) && vehicleSpawner == null)
 		{
 			vehicleSpawner = GetVehicleSpawner();
 		}
-		else if (vehicleSpawner != null && !spawnerRef.IsValid(true))
+		else if (vehicleSpawner != null && !spawnerRef.IsValid(serverside: true))
 		{
 			spawnerRef.Set(vehicleSpawner);
 		}

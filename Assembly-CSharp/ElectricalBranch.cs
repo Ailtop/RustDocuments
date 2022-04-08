@@ -94,15 +94,12 @@ public class ElectricalBranch : IOEntity
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
 	{
-		switch (outputSlot)
+		return outputSlot switch
 		{
-		case 0:
-			return Mathf.Clamp(GetCurrentEnergy() - branchAmount, 0, GetCurrentEnergy());
-		case 1:
-			return Mathf.Min(GetCurrentEnergy(), branchAmount);
-		default:
-			return 0;
-		}
+			0 => Mathf.Clamp(GetCurrentEnergy() - branchAmount, 0, GetCurrentEnergy()), 
+			1 => Mathf.Min(GetCurrentEnergy(), branchAmount), 
+			_ => 0, 
+		};
 	}
 
 	public override void Save(SaveInfo info)

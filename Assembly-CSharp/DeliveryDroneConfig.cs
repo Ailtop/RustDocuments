@@ -23,8 +23,7 @@ public class DeliveryDroneConfig : BaseScriptableObject
 			Vector3 vector = Vector3.forward * (num * (float)i);
 			Vector3 vector2 = vendingMachine.transform.TransformPoint(vendingMachineOffset + vector);
 			Vector3 vector3 = vector2 + Vector3.up * testHeight;
-			RaycastHit hitInfo;
-			if (!Physics.BoxCast(vector3, halfExtents, Vector3.down, out hitInfo, vendingMachine.transform.rotation, testHeight, layerMask))
+			if (!Physics.BoxCast(vector3, halfExtents, Vector3.down, out var hitInfo, vendingMachine.transform.rotation, testHeight, layerMask))
 			{
 				waitPosition = vector2;
 				descendPosition = vector3.WithY(currentY);

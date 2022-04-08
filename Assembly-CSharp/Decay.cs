@@ -16,33 +16,23 @@ public abstract class Decay : PrefabAttribute, IServerComponent
 			{
 				return ConVar.Decay.delay_override;
 			}
-			switch (grade)
+			return grade switch
 			{
-			default:
-				return ConVar.Decay.delay_twig * 3600f;
-			case BuildingGrade.Enum.Wood:
-				return ConVar.Decay.delay_wood * 3600f;
-			case BuildingGrade.Enum.Stone:
-				return ConVar.Decay.delay_stone * 3600f;
-			case BuildingGrade.Enum.Metal:
-				return ConVar.Decay.delay_metal * 3600f;
-			case BuildingGrade.Enum.TopTier:
-				return ConVar.Decay.delay_toptier * 3600f;
-			}
+				BuildingGrade.Enum.Wood => ConVar.Decay.delay_wood * 3600f, 
+				BuildingGrade.Enum.Stone => ConVar.Decay.delay_stone * 3600f, 
+				BuildingGrade.Enum.Metal => ConVar.Decay.delay_metal * 3600f, 
+				BuildingGrade.Enum.TopTier => ConVar.Decay.delay_toptier * 3600f, 
+				_ => ConVar.Decay.delay_twig * 3600f, 
+			};
 		}
-		switch (grade)
+		return grade switch
 		{
-		default:
-			return 3600f;
-		case BuildingGrade.Enum.Wood:
-			return 64800f;
-		case BuildingGrade.Enum.Stone:
-			return 64800f;
-		case BuildingGrade.Enum.Metal:
-			return 64800f;
-		case BuildingGrade.Enum.TopTier:
-			return 86400f;
-		}
+			BuildingGrade.Enum.Wood => 64800f, 
+			BuildingGrade.Enum.Stone => 64800f, 
+			BuildingGrade.Enum.Metal => 64800f, 
+			BuildingGrade.Enum.TopTier => 86400f, 
+			_ => 3600f, 
+		};
 	}
 
 	protected float GetDecayDuration(BuildingGrade.Enum grade)
@@ -53,33 +43,23 @@ public abstract class Decay : PrefabAttribute, IServerComponent
 			{
 				return ConVar.Decay.duration_override;
 			}
-			switch (grade)
+			return grade switch
 			{
-			default:
-				return ConVar.Decay.duration_twig * 3600f;
-			case BuildingGrade.Enum.Wood:
-				return ConVar.Decay.duration_wood * 3600f;
-			case BuildingGrade.Enum.Stone:
-				return ConVar.Decay.duration_stone * 3600f;
-			case BuildingGrade.Enum.Metal:
-				return ConVar.Decay.duration_metal * 3600f;
-			case BuildingGrade.Enum.TopTier:
-				return ConVar.Decay.duration_toptier * 3600f;
-			}
+				BuildingGrade.Enum.Wood => ConVar.Decay.duration_wood * 3600f, 
+				BuildingGrade.Enum.Stone => ConVar.Decay.duration_stone * 3600f, 
+				BuildingGrade.Enum.Metal => ConVar.Decay.duration_metal * 3600f, 
+				BuildingGrade.Enum.TopTier => ConVar.Decay.duration_toptier * 3600f, 
+				_ => ConVar.Decay.duration_twig * 3600f, 
+			};
 		}
-		switch (grade)
+		return grade switch
 		{
-		default:
-			return 3600f;
-		case BuildingGrade.Enum.Wood:
-			return 86400f;
-		case BuildingGrade.Enum.Stone:
-			return 172800f;
-		case BuildingGrade.Enum.Metal:
-			return 259200f;
-		case BuildingGrade.Enum.TopTier:
-			return 432000f;
-		}
+			BuildingGrade.Enum.Wood => 86400f, 
+			BuildingGrade.Enum.Stone => 172800f, 
+			BuildingGrade.Enum.Metal => 259200f, 
+			BuildingGrade.Enum.TopTier => 432000f, 
+			_ => 3600f, 
+		};
 	}
 
 	public static void BuildingDecayTouch(BuildingBlock buildingBlock)

@@ -1,6 +1,5 @@
-namespace UnityEngine
+namespace UnityEngine;
+
+public static class ObjectEffectsEx
 {
-	public static class ObjectEffectsEx
-	{
-	}
 }

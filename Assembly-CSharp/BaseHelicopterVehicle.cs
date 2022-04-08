@@ -257,7 +257,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 	{
 		float num = explosionForceMultiplier;
 		explosionForceMultiplier = 0f;
-		Hurt(pendingImpactDamage * MaxHealth(), DamageType.Explosion, this, false);
+		Hurt(pendingImpactDamage * MaxHealth(), DamageType.Explosion, this, useProtection: false);
 		pendingImpactDamage = 0f;
 		explosionForceMultiplier = num;
 	}
@@ -317,7 +317,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 		}
 		if (explosionEffect.isValid)
 		{
-			Effect.server.Run(explosionEffect.resourcePath, base.transform.position, Vector3.up, null, true);
+			Effect.server.Run(explosionEffect.resourcePath, base.transform.position, Vector3.up, null, broadcast: true);
 		}
 		Vector3 vector = rigidBody.velocity * 0.25f;
 		List<ServerGib> list = null;
@@ -359,7 +359,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 				}
 				foreach (ServerGib item in list)
 				{
-					Physics.IgnoreCollision(component, item.GetCollider(), true);
+					Physics.IgnoreCollision(component, item.GetCollider(), ignore: true);
 				}
 			}
 		}

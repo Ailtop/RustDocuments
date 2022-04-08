@@ -46,7 +46,7 @@ public class Model : MonoBehaviour, IPrefabPreProcess
 	private Transform FindBoneInternal(string name)
 	{
 		BuildBoneDictionary();
-		return boneDict.FindBone(name, false);
+		return boneDict.FindBone(name, defaultToRoot: false);
 	}
 
 	public Transform FindBone(string name)
@@ -115,7 +115,7 @@ public class Model : MonoBehaviour, IPrefabPreProcess
 			{
 				rootBone = base.transform;
 			}
-			boneTransforms = rootBone.GetComponentsInChildren<Transform>(true);
+			boneTransforms = rootBone.GetComponentsInChildren<Transform>(includeInactive: true);
 			boneNames = new string[boneTransforms.Length];
 			for (int i = 0; i < boneTransforms.Length; i++)
 			{

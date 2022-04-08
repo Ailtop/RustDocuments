@@ -97,7 +97,7 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		if (IsStatic() && rcIdentifier.Contains(text))
 		{
 			int length = rcIdentifier.IndexOf(text);
-			int length2 = text.Length;
+			_ = text.Length;
 			string text2 = rcIdentifier.Substring(0, length);
 			text2 += net.ID;
 			UpdateIdentifier(text2);
@@ -199,7 +199,7 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 
 	public void UpdateIdentifier(string newID, bool clientSend = false)
 	{
-		string rcIdentifier2 = rcIdentifier;
+		_ = rcIdentifier;
 		if (base.isServer)
 		{
 			if (!RemoteControlEntity.IDInUse(newID))

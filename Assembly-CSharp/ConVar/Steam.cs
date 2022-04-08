@@ -1,6 +1,5 @@
-namespace ConVar
+namespace ConVar;
+
+public class Steam
 {
-	public class Steam
-	{
-	}
 }

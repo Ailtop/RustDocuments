@@ -13,7 +13,7 @@ public class DummySwitch : IOEntity
 
 	public override void ResetIOState()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
@@ -37,7 +37,7 @@ public class DummySwitch : IOEntity
 
 	public void SetOff()
 	{
-		SetOn(false);
+		SetOn(wantsOn: false);
 	}
 
 	public override void OnEntityMessage(BaseEntity from, string msg)
@@ -46,13 +46,13 @@ public class DummySwitch : IOEntity
 		{
 			if (IsOn())
 			{
-				SetOn(false);
+				SetOn(wantsOn: false);
 			}
-			SetOn(true);
+			SetOn(wantsOn: true);
 		}
 		else if (msg == listenStringOff && listenStringOff != "" && IsOn())
 		{
-			SetOn(false);
+			SetOn(wantsOn: false);
 		}
 	}
 }

@@ -564,8 +564,8 @@ public class ModularCarGarage : ContainerIOEntity
 		base.ServerInit();
 		magnetSnap = new MagnetSnap(vehicleLiftPos);
 		RefreshOnOffState();
-		SetOccupantState(false, false, false, OccupantLock.CannotHaveLock, 0, true);
-		RefreshLiftState(true);
+		SetOccupantState(hasOccupant: false, editableOccupant: false, driveableOccupant: false, OccupantLock.CannotHaveLock, 0, forced: true);
+		RefreshLiftState(forced: true);
 	}
 
 	public override void Save(SaveInfo info)
@@ -648,7 +648,7 @@ public class ModularCarGarage : ContainerIOEntity
 			}
 			else
 			{
-				SetOccupantState(false, false, false, OccupantLock.CannotHaveLock, 0);
+				SetOccupantState(hasOccupant: false, editableOccupant: false, driveableOccupant: false, OccupantLock.CannotHaveLock, 0);
 			}
 		}
 	}
@@ -674,8 +674,7 @@ public class ModularCarGarage : ContainerIOEntity
 				attachedRigidbody.WakeUp();
 			}
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item);
-			BaseRidableAnimal baseRidableAnimal;
-			if (baseEntity != null && (object)(baseRidableAnimal = baseEntity as BaseRidableAnimal) != null && baseRidableAnimal.isServer)
+			if (baseEntity != null && baseEntity is BaseRidableAnimal baseRidableAnimal && baseRidableAnimal.isServer)
 			{
 				baseRidableAnimal.UpdateDropToGroundForDuration(2f);
 			}
@@ -734,7 +733,7 @@ public class ModularCarGarage : ContainerIOEntity
 		{
 			CancelInvoke(FinishDestroyingChassis);
 		}
-		SetFlag(Flags.Reserved6, false);
+		SetFlag(Flags.Reserved6, b: false);
 	}
 
 	[RPC_Server]
@@ -749,7 +748,7 @@ public class ModularCarGarage : ContainerIOEntity
 			Item vehicleItem = carOccupant.GetVehicleItem(num);
 			if (vehicleItem != null)
 			{
-				RepairBench.RepairAnItem(vehicleItem, player, this, 0f, false);
+				RepairBench.RepairAnItem(vehicleItem, player, this, 0f, mustKnowBlueprint: false);
 			}
 			else
 			{
@@ -786,12 +785,9 @@ public class ModularCarGarage : ContainerIOEntity
 			return;
 		}
 		bool flag = player.inventory.loot.RemoveContainerAt(3);
-		BaseVehicleModule result;
-		if (TryGetModuleForItem(vehicleItem, out result))
+		if (TryGetModuleForItem(vehicleItem, out var result))
 		{
-			VehicleModuleStorage vehicleModuleStorage;
-			VehicleModuleCamper vehicleModuleCamper;
-			if ((object)(vehicleModuleStorage = result as VehicleModuleStorage) != null)
+			if (result is VehicleModuleStorage vehicleModuleStorage)
 			{
 				IItemContainerEntity container = vehicleModuleStorage.GetContainer();
 				if (!ObjectEx.IsUnityNull(container))
@@ -800,7 +796,7 @@ public class ModularCarGarage : ContainerIOEntity
 					flag = true;
 				}
 			}
-			else if ((object)(vehicleModuleCamper = result as VehicleModuleCamper) != null)
+			else if (result is VehicleModuleCamper vehicleModuleCamper)
 			{
 				IItemContainerEntity container2 = vehicleModuleCamper.GetContainer();
 				if (!ObjectEx.IsUnityNull(container2))
@@ -845,11 +841,11 @@ public class ModularCarGarage : ContainerIOEntity
 		if (!(player == null))
 		{
 			ItemAmount itemAmount = lockResourceCost;
-			if ((float)player.inventory.GetAmount(itemAmount.itemDef.itemid) >= itemAmount.amount && carOccupant.carLock.CanCraftAKey(player, true))
+			if ((float)player.inventory.GetAmount(itemAmount.itemDef.itemid) >= itemAmount.amount && carOccupant.carLock.CanCraftAKey(player, free: true))
 			{
 				player.inventory.Take(null, itemAmount.itemDef.itemid, Mathf.CeilToInt(itemAmount.amount));
 				carOccupant.carLock.AddALock();
-				carOccupant.carLock.TryCraftAKey(player, true);
+				carOccupant.carLock.TryCraftAKey(player, free: true);
 			}
 		}
 	}
@@ -875,7 +871,7 @@ public class ModularCarGarage : ContainerIOEntity
 			BasePlayer player = msg.player;
 			if (!(player == null))
 			{
-				carOccupant.carLock.TryCraftAKey(player, false);
+				carOccupant.carLock.TryCraftAKey(player, free: false);
 			}
 		}
 	}
@@ -889,7 +885,7 @@ public class ModularCarGarage : ContainerIOEntity
 		if (!carOccupant.HasAnyModules)
 		{
 			Invoke(FinishDestroyingChassis, 10f);
-			SetFlag(Flags.Reserved6, true);
+			SetFlag(Flags.Reserved6, b: true);
 		}
 	}
 
@@ -907,7 +903,7 @@ public class ModularCarGarage : ContainerIOEntity
 		if (HasOccupant && !carOccupant.HasAnyModules)
 		{
 			carOccupant.Kill(DestroyMode.Gib);
-			SetFlag(Flags.Reserved6, false);
+			SetFlag(Flags.Reserved6, b: false);
 		}
 	}
 
@@ -973,7 +969,7 @@ public class ModularCarGarage : ContainerIOEntity
 	{
 		if (vehicleLiftState != desiredLiftState || forced)
 		{
-			VehicleLiftState vehicleLiftState2 = vehicleLiftState;
+			_ = vehicleLiftState;
 			vehicleLiftState = desiredLiftState;
 			if (base.isServer)
 			{

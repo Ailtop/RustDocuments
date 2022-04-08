@@ -25,7 +25,7 @@ public class flamethrowerFire : MonoBehaviour
 	public void PilotLightOn()
 	{
 		pilotLightFX.enableEmission = true;
-		SetFlameStatus(false);
+		SetFlameStatus(status: false);
 	}
 
 	public void SetFlameStatus(bool status)
@@ -40,13 +40,13 @@ public class flamethrowerFire : MonoBehaviour
 	public void ShutOff()
 	{
 		pilotLightFX.enableEmission = false;
-		SetFlameStatus(false);
+		SetFlameStatus(status: false);
 	}
 
 	public void FlameOn()
 	{
 		pilotLightFX.enableEmission = false;
-		SetFlameStatus(true);
+		SetFlameStatus(status: true);
 	}
 
 	private void Start()

@@ -13,8 +13,7 @@ public class GrowableHeatSource : EntityComponent<BaseEntity>, IServerComponent
 		{
 			return 0f;
 		}
-		IOEntity iOEntity;
-		if (base.baseEntity.IsOn() || ((object)(iOEntity = base.baseEntity as IOEntity) != null && iOEntity.IsPowered()))
+		if (base.baseEntity.IsOn() || (base.baseEntity is IOEntity iOEntity && iOEntity.IsPowered()))
 		{
 			return Mathx.RemapValClamped(Vector3.Distance(forPosition, base.transform.position), 0f, Server.artificialTemperatureGrowableRange, 0f, heatAmount);
 		}
@@ -36,7 +35,7 @@ public class GrowableHeatSource : EntityComponent<BaseEntity>, IServerComponent
 					obj2.Add(planter);
 					planter.ForceTemperatureUpdate();
 				}
-				item.CalculateQualities(false, false, true);
+				item.CalculateQualities(firstTime: false, forceArtificialLightUpdates: false, forceArtificialTemperatureUpdates: true);
 				item.SendNetworkUpdate();
 			}
 		}

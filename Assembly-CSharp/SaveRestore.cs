@@ -69,72 +69,70 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			Dictionary<BaseEntity, ProtoBuf.Entity> dictionary = new Dictionary<BaseEntity, ProtoBuf.Entity>();
 			using (FileStream fileStream = File.OpenRead(strFilename))
 			{
-				using (BinaryReader binaryReader = new BinaryReader(fileStream))
+				using BinaryReader binaryReader = new BinaryReader(fileStream);
+				SaveCreatedTime = File.GetCreationTime(strFilename);
+				if (binaryReader.ReadSByte() != 83 || binaryReader.ReadSByte() != 65 || binaryReader.ReadSByte() != 86 || binaryReader.ReadSByte() != 82)
 				{
-					SaveCreatedTime = File.GetCreationTime(strFilename);
-					if (binaryReader.ReadSByte() != 83 || binaryReader.ReadSByte() != 65 || binaryReader.ReadSByte() != 86 || binaryReader.ReadSByte() != 82)
+					UnityEngine.Debug.LogWarning("Invalid save (missing header)");
+					return false;
+				}
+				if (binaryReader.PeekChar() == 68)
+				{
+					binaryReader.ReadChar();
+					SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
+				}
+				if (binaryReader.ReadUInt32() != 223)
+				{
+					if (allowOutOfDateSaves)
 					{
-						UnityEngine.Debug.LogWarning("Invalid save (missing header)");
-						return false;
+						UnityEngine.Debug.LogWarning("This save is from an older (possibly incompatible) version!");
 					}
-					if (binaryReader.PeekChar() == 68)
+					else
 					{
-						binaryReader.ReadChar();
-						SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
+						UnityEngine.Debug.LogWarning("This save is from an older version. It might not load properly.");
 					}
-					if (binaryReader.ReadUInt32() != 223)
+				}
+				ClearMapEntities();
+				Assert.IsTrue(BaseEntity.saveList.Count == 0, "BaseEntity.saveList isn't empty!");
+				Network.Net.sv.Reset();
+				Rust.Application.isLoadingSave = true;
+				HashSet<uint> hashSet = new HashSet<uint>();
+				while (fileStream.Position < fileStream.Length)
+				{
+					RCon.Update();
+					uint num = binaryReader.ReadUInt32();
+					long position = fileStream.Position;
+					ProtoBuf.Entity entData = null;
+					try
 					{
-						if (allowOutOfDateSaves)
-						{
-							UnityEngine.Debug.LogWarning("This save is from an older (possibly incompatible) version!");
-						}
-						else
-						{
-							UnityEngine.Debug.LogWarning("This save is from an older version. It might not load properly.");
-						}
+						entData = ProtoBuf.Entity.DeserializeLength(fileStream, (int)num);
 					}
-					ClearMapEntities();
-					Assert.IsTrue(BaseEntity.saveList.Count == 0, "BaseEntity.saveList isn't empty!");
-					Network.Net.sv.Reset();
-					Rust.Application.isLoadingSave = true;
-					HashSet<uint> hashSet = new HashSet<uint>();
-					while (fileStream.Position < fileStream.Length)
+					catch (Exception exception)
 					{
-						RCon.Update();
-						uint num = binaryReader.ReadUInt32();
-						long position = fileStream.Position;
-						ProtoBuf.Entity entData = null;
-						try
-						{
-							entData = ProtoBuf.Entity.DeserializeLength(fileStream, (int)num);
-						}
-						catch (Exception exception)
-						{
-							UnityEngine.Debug.LogWarning("Skipping entity since it could not be deserialized - stream position: " + position + " size: " + num);
-							UnityEngine.Debug.LogException(exception);
-							fileStream.Position = position + num;
-							continue;
-						}
-						if (entData.basePlayer != null && dictionary.Any((KeyValuePair<BaseEntity, ProtoBuf.Entity> x) => x.Value.basePlayer != null && x.Value.basePlayer.userid == entData.basePlayer.userid))
-						{
-							UnityEngine.Debug.LogWarning("Skipping entity " + entData.baseNetworkable.uid + " - it's a player " + entData.basePlayer.userid + " who is in the save multiple times");
-							continue;
-						}
-						if (entData.baseNetworkable.uid != 0 && hashSet.Contains(entData.baseNetworkable.uid))
-						{
-							UnityEngine.Debug.LogWarning("Skipping entity " + entData.baseNetworkable.uid + " " + StringPool.Get(entData.baseNetworkable.prefabID) + " - uid is used multiple times");
-							continue;
-						}
-						if (entData.baseNetworkable.uid != 0)
-						{
-							hashSet.Add(entData.baseNetworkable.uid);
-						}
-						BaseEntity baseEntity = GameManager.server.CreateEntity(StringPool.Get(entData.baseNetworkable.prefabID), entData.baseEntity.pos, Quaternion.Euler(entData.baseEntity.rot));
-						if ((bool)baseEntity)
-						{
-							baseEntity.InitLoad(entData.baseNetworkable.uid);
-							dictionary.Add(baseEntity, entData);
-						}
+						UnityEngine.Debug.LogWarning("Skipping entity since it could not be deserialized - stream position: " + position + " size: " + num);
+						UnityEngine.Debug.LogException(exception);
+						fileStream.Position = position + num;
+						continue;
+					}
+					if (entData.basePlayer != null && dictionary.Any((KeyValuePair<BaseEntity, ProtoBuf.Entity> x) => x.Value.basePlayer != null && x.Value.basePlayer.userid == entData.basePlayer.userid))
+					{
+						UnityEngine.Debug.LogWarning("Skipping entity " + entData.baseNetworkable.uid + " - it's a player " + entData.basePlayer.userid + " who is in the save multiple times");
+						continue;
+					}
+					if (entData.baseNetworkable.uid != 0 && hashSet.Contains(entData.baseNetworkable.uid))
+					{
+						UnityEngine.Debug.LogWarning("Skipping entity " + entData.baseNetworkable.uid + " " + StringPool.Get(entData.baseNetworkable.prefabID) + " - uid is used multiple times");
+						continue;
+					}
+					if (entData.baseNetworkable.uid != 0)
+					{
+						hashSet.Add(entData.baseNetworkable.uid);
+					}
+					BaseEntity baseEntity = GameManager.server.CreateEntity(StringPool.Get(entData.baseNetworkable.prefabID), entData.baseEntity.pos, Quaternion.Euler(entData.baseEntity.rot));
+					if ((bool)baseEntity)
+					{
+						baseEntity.InitLoad(entData.baseNetworkable.uid);
+						dictionary.Add(baseEntity, entData);
 					}
 				}
 			}
@@ -294,7 +292,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		for (int i = 0; i < array.Length; i++)
 		{
 			RCon.Update();
-			array[i].UpdateSkin(true);
+			array[i].UpdateSkin(force: true);
 			if (stopwatch.Elapsed.TotalMilliseconds > 2000.0)
 			{
 				stopwatch.Reset();
@@ -414,11 +412,9 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				}
 				try
 				{
-					using (FileStream destination = File.OpenWrite(text))
-					{
-						SaveBuffer.Position = 0L;
-						SaveBuffer.CopyTo(destination);
-					}
+					using FileStream destination = File.OpenWrite(text);
+					SaveBuffer.Position = 0L;
+					SaveBuffer.CopyTo(destination);
 				}
 				catch (Exception ex)
 				{
@@ -429,7 +425,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 					}
 					yield break;
 				}
-				File.Copy(text, strFilename, true);
+				File.Copy(text, strFilename, overwrite: true);
 				File.Delete(text);
 			}
 			catch (Exception ex2)
@@ -444,24 +440,22 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 
 	private static void ShiftSaveBackups(string fileName)
 	{
-		_003C_003Ec__DisplayClass10_0 _003C_003Ec__DisplayClass10_ = default(_003C_003Ec__DisplayClass10_0);
-		_003C_003Ec__DisplayClass10_.fileName = fileName;
 		int num = Mathf.Max(ConVar.Server.saveBackupCount, 2);
-		if (!File.Exists(_003C_003Ec__DisplayClass10_.fileName))
+		if (!File.Exists(fileName))
 		{
 			return;
 		}
 		try
 		{
 			int num2 = 0;
-			for (int i = 1; i <= num && File.Exists(_003C_003Ec__DisplayClass10_.fileName + "." + i); i++)
+			for (int j = 1; j <= num && File.Exists(fileName + "." + j); j++)
 			{
 				num2++;
 			}
-			string text = _003CShiftSaveBackups_003Eg__GetBackupName_007C10_0(num2 + 1, ref _003C_003Ec__DisplayClass10_);
+			string text = GetBackupName(num2 + 1);
 			for (int num3 = num2; num3 > 0; num3--)
 			{
-				string text2 = _003CShiftSaveBackups_003Eg__GetBackupName_007C10_0(num3, ref _003C_003Ec__DisplayClass10_);
+				string text2 = GetBackupName(num3);
 				if (num3 == num)
 				{
 					File.Delete(text2);
@@ -476,13 +470,17 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				}
 				text = text2;
 			}
-			File.Copy(_003C_003Ec__DisplayClass10_.fileName, text, true);
+			File.Copy(fileName, text, overwrite: true);
 		}
 		catch (Exception ex)
 		{
 			UnityEngine.Debug.LogError("Error while backing up old saves: " + ex.Message);
 			UnityEngine.Debug.LogException(ex);
 			throw;
+		}
+		string GetBackupName(int i)
+		{
+			return $"{fileName}.{i}";
 		}
 	}
 
@@ -521,7 +519,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		{
 			return false;
 		}
-		IEnumerator enumerator = SingletonComponent<SaveRestore>.Instance.DoAutomatedSave(true);
+		IEnumerator enumerator = SingletonComponent<SaveRestore>.Instance.DoAutomatedSave(AndWait: true);
 		while (enumerator.MoveNext())
 		{
 		}

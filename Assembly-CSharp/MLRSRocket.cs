@@ -23,7 +23,7 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 	{
 		base.ServerInit();
 		CreateMapMarker();
-		Effect.server.Run(launchBlastFXPrefab.resourcePath, PivotPoint(), base.transform.up, null, true);
+		Effect.server.Run(launchBlastFXPrefab.resourcePath, PivotPoint(), base.transform.up, null, broadcast: true);
 	}
 
 	public override void ProjectileImpact(RaycastHit info, Vector3 rayOrigin)
@@ -31,7 +31,7 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 		Explode(rayOrigin);
 		if (Physics.Raycast(info.point + Vector3.up, Vector3.down, 4f, 1218511121, QueryTriggerInteraction.Ignore))
 		{
-			Effect.server.Run(explosionGroundFXPrefab.resourcePath, info.point, Vector3.up, null, true);
+			Effect.server.Run(explosionGroundFXPrefab.resourcePath, info.point, Vector3.up, null, broadcast: true);
 		}
 	}
 
@@ -45,7 +45,7 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 		BaseEntity baseEntity2 = GameManager.server.CreateEntity(mapMarkerPrefab?.resourcePath, base.transform.position, Quaternion.identity);
 		baseEntity2.OwnerID = base.OwnerID;
 		baseEntity2.Spawn();
-		baseEntity2.SetParent(this, true);
+		baseEntity2.SetParent(this, worldPositionStays: true);
 		mapMarkerInstanceRef.Set(baseEntity2);
 	}
 

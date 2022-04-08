@@ -166,8 +166,7 @@ public class MarketTerminal : StorageContainer
 		{
 			return;
 		}
-		Marketplace entity;
-		if (!_marketplace.TryGet(true, out entity))
+		if (!_marketplace.TryGet(serverside: true, out var entity))
 		{
 			Debug.LogError("Marketplace is not set", this);
 			return;
@@ -184,7 +183,7 @@ public class MarketTerminal : StorageContainer
 		pendingOrder.droneId = num;
 		pendingOrders.Add(pendingOrder);
 		CheckForExpiredOrders();
-		UpdateHasItems(false);
+		UpdateHasItems(sendNetworkUpdate: false);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -201,7 +200,7 @@ public class MarketTerminal : StorageContainer
 			pendingOrders[num].Dispose();
 			pendingOrders.RemoveAt(num);
 			CheckForExpiredOrders();
-			UpdateHasItems(false);
+			UpdateHasItems(sendNetworkUpdate: false);
 			SendNetworkUpdateImmediate();
 		}
 	}
@@ -217,8 +216,7 @@ public class MarketTerminal : StorageContainer
 				ProtoBuf.MarketTerminal.PendingOrder pendingOrder = pendingOrders[i];
 				if ((float)pendingOrder.timeUntilExpiry <= 0f)
 				{
-					DeliveryDrone entity;
-					if (new EntityRef<DeliveryDrone>(pendingOrder.droneId).TryGet(true, out entity))
+					if (new EntityRef<DeliveryDrone>(pendingOrder.droneId).TryGet(serverside: true, out var entity))
 					{
 						Debug.LogError("Delivery timed out waiting for drone (too slow speed?)", this);
 						entity.Kill();
@@ -238,7 +236,7 @@ public class MarketTerminal : StorageContainer
 			}
 			if (flag)
 			{
-				UpdateHasItems(false);
+				UpdateHasItems(sendNetworkUpdate: false);
 				SendNetworkUpdate();
 			}
 			if (num.HasValue)
@@ -296,17 +294,15 @@ public class MarketTerminal : StorageContainer
 		{
 			return;
 		}
-		if (!_marketplace.IsValid(true))
+		if (!_marketplace.IsValid(serverside: true))
 		{
 			Debug.LogError("Marketplace is not set", this);
 			return;
 		}
-		using (EntityIdList entityIdList = Facepunch.Pool.Get<EntityIdList>())
-		{
-			entityIdList.entityIds = Facepunch.Pool.GetList<uint>();
-			GetDeliveryEligibleVendingMachines(entityIdList.entityIds);
-			ClientRPCPlayer(null, msg.player, "Client_OpenMarket", entityIdList);
-		}
+		using EntityIdList entityIdList = Facepunch.Pool.Get<EntityIdList>();
+		entityIdList.entityIds = Facepunch.Pool.GetList<uint>();
+		GetDeliveryEligibleVendingMachines(entityIdList.entityIds);
+		ClientRPCPlayer(null, msg.player, "Client_OpenMarket", entityIdList);
 	}
 
 	[RPC_Server]
@@ -318,7 +314,7 @@ public class MarketTerminal : StorageContainer
 		{
 			return;
 		}
-		if (!_marketplace.IsValid(true))
+		if (!_marketplace.IsValid(serverside: true))
 		{
 			Debug.LogError("Marketplace is not set", this);
 			return;
@@ -350,7 +346,7 @@ public class MarketTerminal : StorageContainer
 			{
 				Debug.LogError($"Took an incorrect number of items for the delivery fee (took {num5}, should have taken {num4})");
 			}
-			ClientRPCPlayer(null, msg.player, "Client_ShowItemNotice", deliveryFeeCurrency.itemid, -num4, false);
+			ClientRPCPlayer(null, msg.player, "Client_ShowItemNotice", deliveryFeeCurrency.itemid, -num4, arg3: false);
 			if (!vendingMachine.DoTransaction(msg.player, num2, num3, base.inventory, _onCurrencyRemovedCached, _onItemPurchasedCached))
 			{
 				Item item = ItemManager.CreateByItemID(deliveryFeeCurrency.itemid, num4, 0uL);
@@ -377,8 +373,8 @@ public class MarketTerminal : StorageContainer
 		{
 			bool flag = base.inventory.itemList.Count > 0;
 			bool flag2 = pendingOrders != null && pendingOrders.Count != 0;
-			SetFlag(Flags.Reserved1, flag && !flag2, false, sendNetworkUpdate);
-			SetFlag(Flags.Reserved2, base.inventory.IsFull(), false, sendNetworkUpdate);
+			SetFlag(Flags.Reserved1, flag && !flag2, recursive: false, sendNetworkUpdate);
+			SetFlag(Flags.Reserved2, base.inventory.IsFull(), recursive: false, sendNetworkUpdate);
 			if (!flag && !flag2)
 			{
 				ClearRestriction();
@@ -390,7 +386,7 @@ public class MarketTerminal : StorageContainer
 	{
 		if (player != null && currencyItem != null)
 		{
-			ClientRPCPlayer(null, player, "Client_ShowItemNotice", currencyItem.info.itemid, -currencyItem.amount, false);
+			ClientRPCPlayer(null, player, "Client_ShowItemNotice", currencyItem.info.itemid, -currencyItem.amount, arg3: false);
 		}
 	}
 
@@ -398,7 +394,7 @@ public class MarketTerminal : StorageContainer
 	{
 		if (player != null && purchasedItem != null)
 		{
-			ClientRPCPlayer(null, player, "Client_ShowItemNotice", purchasedItem.info.itemid, purchasedItem.amount, true);
+			ClientRPCPlayer(null, player, "Client_ShowItemNotice", purchasedItem.info.itemid, purchasedItem.amount, arg3: true);
 		}
 	}
 
@@ -485,11 +481,10 @@ public class MarketTerminal : StorageContainer
 		_deliveryEligible.Clear();
 		foreach (MapMarker serverMapMarker in MapMarker.serverMapMarkers)
 		{
-			VendingMachineMapMarker vendingMachineMapMarker;
-			if ((object)(vendingMachineMapMarker = serverMapMarker as VendingMachineMapMarker) != null && !(vendingMachineMapMarker.server_vendingMachine == null))
+			if (serverMapMarker is VendingMachineMapMarker vendingMachineMapMarker && !(vendingMachineMapMarker.server_vendingMachine == null))
 			{
 				VendingMachine server_vendingMachine = vendingMachineMapMarker.server_vendingMachine;
-				if (!(server_vendingMachine == null) && (_003CGetDeliveryEligibleVendingMachines_003Eg__IsEligible_007C24_0(server_vendingMachine, config.vendingMachineOffset, 1) || _003CGetDeliveryEligibleVendingMachines_003Eg__IsEligible_007C24_0(server_vendingMachine, config.vendingMachineOffset + Vector3.forward * config.maxDistanceFromVendingMachine, 2)))
+				if (!(server_vendingMachine == null) && (IsEligible(server_vendingMachine, config.vendingMachineOffset, 1) || IsEligible(server_vendingMachine, config.vendingMachineOffset + Vector3.forward * config.maxDistanceFromVendingMachine, 2)))
 				{
 					_deliveryEligible.Add(server_vendingMachine.net.ID);
 				}
@@ -502,6 +497,22 @@ public class MarketTerminal : StorageContainer
 		foreach (uint item2 in _deliveryEligible)
 		{
 			vendingMachineIds.Add(item2);
+		}
+		bool IsEligible(VendingMachine vendingMachine, Vector3 offset, int n)
+		{
+			if (vendingMachine is NPCVendingMachine)
+			{
+				return true;
+			}
+			if (!vendingMachine.IsBroadcasting())
+			{
+				return false;
+			}
+			if (!config.IsVendingMachineAccessible(vendingMachine, offset, out var _))
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 

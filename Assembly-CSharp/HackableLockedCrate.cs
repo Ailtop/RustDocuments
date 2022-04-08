@@ -164,8 +164,8 @@ public class HackableLockedCrate : LootContainer
 		}
 		if (!Rust.Application.isLoadingSave)
 		{
-			SetFlag(Flags.Reserved1, false);
-			SetFlag(Flags.Reserved2, false);
+			SetFlag(Flags.Reserved1, b: false);
+			SetFlag(Flags.Reserved2, b: false);
 			if (wasDropped)
 			{
 				InvokeRepeating(LandCheck, 0f, 0.015f);
@@ -194,7 +194,7 @@ public class HackableLockedCrate : LootContainer
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 	}
 
 	[RPC_Server]
@@ -211,7 +211,7 @@ public class HackableLockedCrate : LootContainer
 	{
 		Interface.CallHook("OnCrateHack", this);
 		BroadcastEntityMessage("HackingStarted", 20f, 256);
-		SetFlag(Flags.Reserved1, true);
+		SetFlag(Flags.Reserved1, b: true);
 		InvokeRepeating(HackProgress, 1f, 1f);
 		ClientRPC(null, "UpdateHackProgress", 0, (int)requiredHackSeconds);
 		RefreshDecay();
@@ -224,7 +224,7 @@ public class HackableLockedCrate : LootContainer
 		{
 			Interface.CallHook("OnCrateHackEnd", this);
 			RefreshDecay();
-			SetFlag(Flags.Reserved2, true);
+			SetFlag(Flags.Reserved2, b: true);
 			isLootable = true;
 			CancelInvoke(HackProgress);
 		}

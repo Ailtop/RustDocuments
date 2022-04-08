@@ -102,7 +102,7 @@ public class GenerateDungeonBase : ProceduralComponent
 		}
 		foreach (DungeonBaseInfo item in TerrainMeta.Path ? TerrainMeta.Path.DungeonBaseEntrances : null)
 		{
-			TerrainPathConnect[] componentsInChildren = item.GetComponentsInChildren<TerrainPathConnect>(true);
+			TerrainPathConnect[] componentsInChildren = item.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
 			foreach (TerrainPathConnect obj in componentsInChildren)
 			{
 				if (obj.Type != ConnectionType)
@@ -123,7 +123,7 @@ public class GenerateDungeonBase : ProceduralComponent
 					{
 						List<DungeonSegment> list2 = new List<DungeonSegment>();
 						list2.Add(segmentStart);
-						PlaceSegments(ref seed2, int.MaxValue, 4, 3, true, false, list2, array2);
+						PlaceSegments(ref seed2, int.MaxValue, 4, 3, attachToFemale: true, attachToMale: false, list2, array2);
 						if (list2.Count > list.Count)
 						{
 							list = list2;
@@ -133,13 +133,13 @@ public class GenerateDungeonBase : ProceduralComponent
 				if (list.Count > 5)
 				{
 					list = list.OrderByDescending((DungeonSegment x) => (x.position - segmentStart.position).SqrMagnitude2D()).ToList();
-					PlaceSegments(ref seed2, 1, 5, 3, true, false, list, array);
+					PlaceSegments(ref seed2, 1, 5, 3, attachToFemale: true, attachToMale: false, list, array);
 				}
 				if (list.Count > 25)
 				{
 					DungeonSegment segmentEnd = list[list.Count - 1];
 					list = list.OrderByDescending((DungeonSegment x) => Mathf.Min((x.position - segmentStart.position).SqrMagnitude2D(), (x.position - segmentEnd.position).SqrMagnitude2D())).ToList();
-					PlaceSegments(ref seed2, 1, 6, 3, true, false, list, array);
+					PlaceSegments(ref seed2, 1, 6, 3, attachToFemale: true, attachToMale: false, list, array);
 				}
 				bool flag = true;
 				while (flag)
@@ -155,7 +155,7 @@ public class GenerateDungeonBase : ProceduralComponent
 						}
 					}
 				}
-				PlaceSegments(ref seed2, int.MaxValue, int.MaxValue, 4, true, true, list, array3);
+				PlaceSegments(ref seed2, int.MaxValue, int.MaxValue, 4, attachToFemale: true, attachToMale: true, list, array3);
 				PlaceTransitions(ref seed2, list, array4);
 				segmentsTotal.AddRange(list);
 			}
@@ -175,17 +175,13 @@ public class GenerateDungeonBase : ProceduralComponent
 
 	private Quaternion[] GetRotationList(DungeonBaseSocketType type)
 	{
-		switch (type)
+		return type switch
 		{
-		case DungeonBaseSocketType.Horizontal:
-			return horizontalRotations;
-		case DungeonBaseSocketType.Vertical:
-			return verticalRotations;
-		case DungeonBaseSocketType.Pillar:
-			return pillarRotations;
-		default:
-			return null;
-		}
+			DungeonBaseSocketType.Horizontal => horizontalRotations, 
+			DungeonBaseSocketType.Vertical => verticalRotations, 
+			DungeonBaseSocketType.Pillar => pillarRotations, 
+			_ => null, 
+		};
 	}
 
 	private int GetSocketFloor(DungeonBaseSocketType type)

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager
 {
-	public static GameManager server = new GameManager(false, true);
+	public static GameManager server = new GameManager(clientside: false, serverside: true);
 
 	public PrefabPreProcess preProcessed;
 
@@ -108,7 +108,7 @@ public class GameManager
 		GameObject gameObject = Instantiate(strPrefab, parent.position, parent.rotation);
 		if ((bool)gameObject)
 		{
-			gameObject.transform.SetParent(parent, false);
+			gameObject.transform.SetParent(parent, worldPositionStays: false);
 			TransformEx.Identity(gameObject);
 			if (active)
 			{

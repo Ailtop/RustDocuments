@@ -65,7 +65,7 @@ public class ReclaimTerminal : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
+		base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
 	}
 
 	[RPC_Server]

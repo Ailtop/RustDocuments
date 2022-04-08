@@ -101,7 +101,7 @@ public class JunkPile : BaseEntity
 		{
 			array[i].Clear();
 		}
-		SetFlag(Flags.Reserved8, true, true);
+		SetFlag(Flags.Reserved8, b: true, recursive: true);
 		ClientRPC(null, "CLIENT_StartSink");
 		base.transform.position -= new Vector3(0f, 5f, 0f);
 		isSinking = true;

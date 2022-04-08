@@ -20,8 +20,7 @@ public class AddToHeightMap : ProceduralObject
 				float normX = TerrainMeta.HeightMap.Coordinate(j);
 				Vector3 origin = new Vector3(TerrainMeta.DenormalizeX(normX), bounds.max.y, TerrainMeta.DenormalizeZ(normZ));
 				Ray ray = new Ray(origin, Vector3.down);
-				RaycastHit hitInfo;
-				if (component.Raycast(ray, out hitInfo, bounds.size.y))
+				if (component.Raycast(ray, out var hitInfo, bounds.size.y))
 				{
 					float num5 = TerrainMeta.NormalizeY(hitInfo.point.y);
 					float height = TerrainMeta.HeightMap.GetHeight01(j, i);

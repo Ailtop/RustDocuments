@@ -31,13 +31,11 @@ public class FishLookup : PrefabAttribute
 		List<ItemDefinition> obj2 = Pool.GetList<ItemDefinition>();
 		foreach (ItemDefinition item in ItemManager.itemList)
 		{
-			ItemModFishable component;
-			if (item.TryGetComponent<ItemModFishable>(out component))
+			if (item.TryGetComponent<ItemModFishable>(out var component))
 			{
 				obj.Add(component);
 			}
-			ItemModCompostable component2;
-			if (item.TryGetComponent<ItemModCompostable>(out component2) && component2.BaitValue > 0f)
+			if (item.TryGetComponent<ItemModCompostable>(out var component2) && component2.BaitValue > 0f)
 			{
 				obj2.Add(item);
 			}
@@ -54,7 +52,7 @@ public class FishLookup : PrefabAttribute
 		ItemModCompostable component;
 		float num = (lure.TryGetComponent<ItemModCompostable>(out component) ? component.BaitValue : 0f);
 		WaterBody.FishingTag fishingTag = ((bodyType != null) ? bodyType.FishingType : WaterBody.FishingTag.Ocean);
-		float num2 = WaterLevel.GetOverallWaterDepth(worldPos, true, null, true);
+		float num2 = WaterLevel.GetOverallWaterDepth(worldPos, waves: true, null, noEarlyExit: true);
 		if (worldPos.y < -10f)
 		{
 			num2 = 10f;

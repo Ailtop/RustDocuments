@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using ConVar;
@@ -42,22 +41,19 @@ public static class EACServer
 
 	public static EasyAntiCheat.Server.Hydra.Client GetClient(Connection connection)
 	{
-		EasyAntiCheat.Server.Hydra.Client value;
-		connection2client.TryGetValue(connection, out value);
+		connection2client.TryGetValue(connection, out var value);
 		return value;
 	}
 
 	public static Connection GetConnection(EasyAntiCheat.Server.Hydra.Client client)
 	{
-		Connection value;
-		client2connection.TryGetValue(client, out value);
+		client2connection.TryGetValue(client, out var value);
 		return value;
 	}
 
 	public static bool IsAuthenticated(Connection connection)
 	{
-		ClientStatus value;
-		connection2status.TryGetValue(connection, out value);
+		connection2status.TryGetValue(connection, out var value);
 		return value == ClientStatus.ClientAuthenticatedRemote;
 	}
 
@@ -111,8 +107,7 @@ public static class EACServer
 					connection.authStatus = "eac";
 					Network.Net.sv.Kick(connection, "EAC: " + text);
 					Interface.CallHook("OnPlayerKicked", connection, text);
-					DateTime? timeBanExpires;
-					if (clientStatus.IsBanned(out timeBanExpires))
+					if (clientStatus.IsBanned(out var timeBanExpires))
 					{
 						connection.authStatus = "eacbanned";
 						object[] args = new object[3]
@@ -136,7 +131,7 @@ public static class EACServer
 				else if (clientStatus.Status == ClientStatus.ClientAuthenticatedLocal)
 				{
 					OnAuthenticatedLocal(connection);
-					easyAntiCheat.SetClientNetworkState(client, false);
+					easyAntiCheat.SetClientNetworkState(client, networkActive: false);
 				}
 				else if (clientStatus.Status == ClientStatus.ClientAuthenticatedRemote)
 				{
@@ -169,7 +164,7 @@ public static class EACServer
 			client2connection.Clear();
 			connection2client.Clear();
 			connection2status.Clear();
-			Log.SetOut(new StreamWriter(ConVar.Server.rootFolder + "/Log.EAC.txt", false)
+			Log.SetOut(new StreamWriter(ConVar.Server.rootFolder + "/Log.EAC.txt", append: false)
 			{
 				AutoFlush = true
 			});
@@ -259,7 +254,7 @@ public static class EACServer
 		if (easyAntiCheat != null)
 		{
 			EasyAntiCheat.Server.Hydra.Client client = GetClient(connection);
-			easyAntiCheat.SetClientNetworkState(client, false);
+			easyAntiCheat.SetClientNetworkState(client, networkActive: false);
 		}
 	}
 
@@ -268,7 +263,7 @@ public static class EACServer
 		if (easyAntiCheat != null)
 		{
 			EasyAntiCheat.Server.Hydra.Client client = GetClient(connection);
-			easyAntiCheat.SetClientNetworkState(client, true);
+			easyAntiCheat.SetClientNetworkState(client, networkActive: true);
 		}
 	}
 
@@ -280,9 +275,7 @@ public static class EACServer
 			return;
 		}
 		EasyAntiCheat.Server.Hydra.Client client = GetClient(message.connection);
-		byte[] buffer;
-		int size;
-		if (message.read.TemporaryBytesWithSize(out buffer, out size))
+		if (message.read.TemporaryBytesWithSize(out var buffer, out var size))
 		{
 			easyAntiCheat.PushNetworkMessage(client, buffer, size);
 		}

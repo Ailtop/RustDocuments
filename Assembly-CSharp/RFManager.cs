@@ -74,7 +74,7 @@ public class RFManager
 			{
 				listenList.Remove(obj);
 			}
-			obj.RFSignalUpdate(false);
+			obj.RFSignalUpdate(on: false);
 			Interface.CallHook("OnRfListenerRemoved", obj, frequency);
 		}
 	}

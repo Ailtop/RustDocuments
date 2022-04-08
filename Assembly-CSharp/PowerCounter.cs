@@ -157,7 +157,7 @@ public class PowerCounter : IOEntity
 		bool flag = msg.read.Bit();
 		if (Interface.CallHook("OnCounterModeToggle", this, msg.player, flag) == null && msg.player.CanBuild())
 		{
-			SetFlag(Flags.Reserved2, flag, false, false);
+			SetFlag(Flags.Reserved2, flag, recursive: false, networkupdate: false);
 			MarkDirty();
 			SendNetworkUpdate();
 		}

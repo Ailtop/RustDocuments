@@ -102,16 +102,12 @@ public abstract class BaseMetabolism<T> : EntityComponent<T> where T : BaseComba
 
 	public virtual MetabolismAttribute FindAttribute(MetabolismAttribute.Type type)
 	{
-		switch (type)
+		return type switch
 		{
-		case MetabolismAttribute.Type.Calories:
-			return calories;
-		case MetabolismAttribute.Type.Hydration:
-			return hydration;
-		case MetabolismAttribute.Type.Heartrate:
-			return heartrate;
-		default:
-			return null;
-		}
+			MetabolismAttribute.Type.Calories => calories, 
+			MetabolismAttribute.Type.Hydration => hydration, 
+			MetabolismAttribute.Type.Heartrate => heartrate, 
+			_ => null, 
+		};
 	}
 }

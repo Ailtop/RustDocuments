@@ -236,7 +236,7 @@ public class ItemDefinition : MonoBehaviour
 			Debug.LogError("Item Definition Initializing twice: " + base.name);
 		}
 		skins = ItemSkinDirectory.ForItem(this);
-		itemMods = GetComponentsInChildren<ItemMod>(true);
+		itemMods = GetComponentsInChildren<ItemMod>(includeInactive: true);
 		ItemMod[] array = itemMods;
 		for (int i = 0; i < array.Length; i++)
 		{

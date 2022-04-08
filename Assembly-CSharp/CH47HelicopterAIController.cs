@@ -162,7 +162,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 		HumanNPC component = GameManager.server.CreateEntity(scientistPrefab.resourcePath, spawnPos, identity).GetComponent<HumanNPC>();
 		component.Spawn();
 		AttemptMount(component);
-		component.Brain.SetEnabled(false);
+		component.Brain.SetEnabled(flag: false);
 	}
 
 	public void SpawnScientists()
@@ -257,7 +257,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 				ScientistNPC scientistNPC = mounted as ScientistNPC;
 				if (scientistNPC != null)
 				{
-					scientistNPC.Brain.SetEnabled(true);
+					scientistNPC.Brain.SetEnabled(flag: true);
 				}
 			}
 		}
@@ -277,7 +277,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 				ScientistNPC scientistNPC = mounted as ScientistNPC;
 				if (scientistNPC != null)
 				{
-					scientistNPC.Brain.SetEnabled(false);
+					scientistNPC.Brain.SetEnabled(flag: false);
 				}
 			}
 		}
@@ -331,7 +331,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 				BasePlayer mounted = mountPoint.mountable.GetMounted();
 				if ((bool)mounted)
 				{
-					mounted.Hurt(10000f, DamageType.Explosion, this, false);
+					mounted.Hurt(10000f, DamageType.Explosion, this, useProtection: false);
 				}
 			}
 		}
@@ -374,9 +374,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 		{
 			Vector3 rhs = ((rigidBody.velocity.magnitude < 0.1f) ? base.transform.forward : rigidBody.velocity.normalized);
 			Vector3 normalized = (Vector3.Cross(Vector3.Cross(base.transform.up, rhs), Vector3.up) + Vector3.down * 0.3f).normalized;
-			RaycastHit hitInfo;
-			RaycastHit hitInfo2;
-			if (Physics.SphereCast(base.transform.position - normalized * 20f, 20f, normalized, out hitInfo, 75f, 1218511105) && Physics.SphereCast(hitInfo.point + Vector3.up * 200f, 20f, Vector3.down, out hitInfo2, 200f, 1218511105))
+			if (Physics.SphereCast(base.transform.position - normalized * 20f, 20f, normalized, out var hitInfo, 75f, 1218511105) && Physics.SphereCast(hitInfo.point + Vector3.up * 200f, 20f, Vector3.down, out var hitInfo2, 200f, 1218511105))
 			{
 				num2 = hitInfo2.point.y + hoverHeight;
 			}

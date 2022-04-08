@@ -1,8 +1,7 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public enum VignetteMode
 {
-	public enum VignetteMode
-	{
-		Classic = 0,
-		Masked = 1
-	}
+	Classic = 0,
+	Masked = 1
 }

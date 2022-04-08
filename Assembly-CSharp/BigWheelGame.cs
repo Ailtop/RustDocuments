@@ -47,7 +47,7 @@ public class BigWheelGame : SpinnerWheel
 		{
 			velocity += UnityEngine.Random.Range(7f, 10f);
 			spinNumber++;
-			SetTerminalsLocked(true);
+			SetTerminalsLocked(isLocked: true);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class BigWheelGame : SpinnerWheel
 			}
 		}
 		ItemManager.DoRemoves();
-		SetTerminalsLocked(false);
+		SetTerminalsLocked(isLocked: false);
 	}
 
 	public HitNumber GetCurrentHitType()

@@ -77,11 +77,11 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		SteamNetworking.SetDebugFunction();
 		if (Facepunch.CommandLine.HasSwitch("-swnet"))
 		{
-			NetworkInitSteamworks(false);
+			NetworkInitSteamworks(enableSteamDatagramRelay: false);
 		}
 		else if (Facepunch.CommandLine.HasSwitch("-sdrnet"))
 		{
-			NetworkInitSteamworks(true);
+			NetworkInitSteamworks(enableSteamDatagramRelay: true);
 		}
 		else
 		{
@@ -252,7 +252,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return StartCoroutine(FileSystem_Warmup.Run(2f, WriteToLog, "Asset Warmup ({0}/{1})"));
-		yield return StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", false));
+		yield return StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", allowOutOfDateSaves: false));
 		if (!Object.FindObjectOfType<Performance>())
 		{
 			Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/performance.prefab"));
@@ -354,7 +354,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 	public void ThrowError(string error)
 	{
 		Debug.Log("ThrowError: " + error);
-		errorPanel.SetActive(true);
+		errorPanel.SetActive(value: true);
 		errorText.text = error;
 		isErrored = true;
 	}

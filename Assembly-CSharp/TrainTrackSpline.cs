@@ -89,7 +89,7 @@ public class TrainTrackSpline : WorldSpline
 		{
 			if (HasPrevTrack)
 			{
-				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, false, facingForward, preferredAltTrack);
+				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, nextTrack: false, facingForward, preferredAltTrack);
 				float distMoved2 = (facingForward ? num : (0f - num));
 				if (trackSelection2.orientation == TrackOrientation.Same)
 				{
@@ -109,7 +109,7 @@ public class TrainTrackSpline : WorldSpline
 		{
 			if (HasNextTrack)
 			{
-				ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, true, facingForward, preferredAltTrack);
+				ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, nextTrack: true, facingForward, preferredAltTrack);
 				float distMoved3 = (facingForward ? (num - data.Length) : (0f - (num - data.Length)));
 				if (trackSelection3.orientation == TrackOrientation.Same)
 				{
@@ -295,7 +295,7 @@ public class TrainTrackSpline : WorldSpline
 		{
 			if (HasPrevTrack)
 			{
-				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, false, movingForward, preferredAltTrack);
+				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, nextTrack: false, movingForward, preferredAltTrack);
 				if (trackSelection2.orientation == TrackOrientation.Same)
 				{
 					askerSplineDist = trackSelection2.track.GetLength();
@@ -312,7 +312,7 @@ public class TrainTrackSpline : WorldSpline
 		}
 		else if (num2 > data.Length && HasNextTrack)
 		{
-			ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, true, movingForward, preferredAltTrack);
+			ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, nextTrack: true, movingForward, preferredAltTrack);
 			if (trackSelection3.orientation == TrackOrientation.Same)
 			{
 				askerSplineDist = 0f;
@@ -440,7 +440,7 @@ public class TrainTrackSpline : WorldSpline
 			float num = float.MaxValue;
 			foreach (Collider item in obj)
 			{
-				item.GetComponentsInParent(false, obj2);
+				item.GetComponentsInParent(includeInactive: false, obj2);
 				if (obj2.Count <= 0)
 				{
 					continue;

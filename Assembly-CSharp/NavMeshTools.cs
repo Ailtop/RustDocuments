@@ -25,7 +25,7 @@ public static class NavMeshTools
 			{
 				for (float z = 0f - bounds.extents.z; z < bounds.extents.z - (float)(cellSize / 2); z += (float)cellSize)
 				{
-					AsyncTerrainNavMeshBake terrainSource = new AsyncTerrainNavMeshBake(new Vector3(x, 0f, z), cellSize, cellSize, false, true);
+					AsyncTerrainNavMeshBake terrainSource = new AsyncTerrainNavMeshBake(new Vector3(x, 0f, z), cellSize, cellSize, normal: false, alpha: true);
 					yield return terrainSource;
 					sources.Add(terrainSource.CreateNavMeshBuildSource(area));
 				}

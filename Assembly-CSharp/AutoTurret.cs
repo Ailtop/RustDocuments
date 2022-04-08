@@ -540,7 +540,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public void SetOnline()
 	{
-		SetIsOnline(true);
+		SetIsOnline(online: true);
 	}
 
 	public void SetIsOnline(bool online)
@@ -610,7 +610,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			CancelInvoke(SetOnline);
 			booting = false;
 			Effect.server.Run(offlineSound.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
-			SetIsOnline(false);
+			SetIsOnline(online: false);
 		}
 	}
 
@@ -689,10 +689,10 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		if (authorizedPlayers.Count >= 200)
 		{
-			SetFlag(Flags.Reserved4, true);
+			SetFlag(Flags.Reserved4, b: true);
 			return;
 		}
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		bool b = activeGameMode != null && activeGameMode.limitTeamAuths && authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize();
 		SetFlag(Flags.Reserved4, b);
 	}
@@ -782,7 +782,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		if (IsAuthed(rpc.player))
 		{
-			SetPeacekeepermode(true);
+			SetPeacekeepermode(isOn: true);
 		}
 	}
 
@@ -792,7 +792,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		if (IsAuthed(rpc.player))
 		{
-			SetPeacekeepermode(false);
+			SetPeacekeepermode(isOn: false);
 		}
 	}
 
@@ -1212,13 +1212,13 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		{
 			if ((bool)GetAttachedWeapon())
 			{
-				GetAttachedWeapon().SetGenericVisible(false);
-				GetAttachedWeapon().SetLightsOn(false);
+				GetAttachedWeapon().SetGenericVisible(wantsVis: false);
+				GetAttachedWeapon().SetLightsOn(isOn: false);
 			}
 			AttachedWeapon = null;
 			return;
 		}
-		heldEntity.SetLightsOn(true);
+		heldEntity.SetLightsOn(isOn: true);
 		Transform transform = heldEntity.transform;
 		Transform muzzleTransform = heldEntity.MuzzleTransform;
 		heldEntity.SetParent(null);
@@ -1226,7 +1226,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		transform.localRotation = Quaternion.identity;
 		Quaternion quaternion = transform.rotation * Quaternion.Inverse(muzzleTransform.rotation);
 		heldEntity.limitNetworking = false;
-		heldEntity.SetFlag(Flags.Disabled, false);
+		heldEntity.SetFlag(Flags.Disabled, b: false);
 		heldEntity.SetParent(this, StringPool.Get(socketTransform.name));
 		transform.localPosition = Vector3.zero;
 		transform.localRotation = Quaternion.identity;
@@ -1235,7 +1235,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		transform.localPosition = Vector3.left * vector.x;
 		float num = Vector3.Distance(muzzleTransform.position, transform.position);
 		transform.localPosition += Vector3.forward * num * attachedWeaponZOffsetScale;
-		heldEntity.SetGenericVisible(true);
+		heldEntity.SetGenericVisible(wantsVis: true);
 		AttachedWeapon = heldEntity;
 		totalAmmoDirty = true;
 		Reload();
@@ -1247,8 +1247,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		BaseProjectile attachedWeapon = GetAttachedWeapon();
 		if (attachedWeapon != null)
 		{
-			attachedWeapon.SetGenericVisible(false);
-			attachedWeapon.SetLightsOn(false);
+			attachedWeapon.SetGenericVisible(wantsVis: false);
+			attachedWeapon.SetLightsOn(isOn: false);
 		}
 		AttachedWeapon = null;
 		base.OnKilled(info);
@@ -1258,7 +1258,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		base.PlayerStoppedLooting(player);
 		UpdateTotalAmmo();
-		EnsureReloaded(false);
+		EnsureReloaded(onlyReloadIfEmpty: false);
 		UpdateTotalAmmo();
 		nextShotTime = UnityEngine.Time.time;
 	}
@@ -1340,8 +1340,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public virtual bool IsEntityHostile(BaseCombatEntity ent)
 	{
-		BasePet basePet;
-		if ((object)(basePet = ent as BasePet) != null && basePet.Brain.OwningPlayer != null)
+		if (ent is BasePet basePet && basePet.Brain.OwningPlayer != null)
 		{
 			if (!basePet.Brain.OwningPlayer.IsHostile())
 			{
@@ -1362,8 +1361,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		{
 			return false;
 		}
-		BasePet basePet;
-		if ((object)(basePet = targ as BasePet) != null && basePet.Brain.OwningPlayer != null && IsAuthed(basePet.Brain.OwningPlayer))
+		if (targ is BasePet basePet && basePet.Brain.OwningPlayer != null && IsAuthed(basePet.Brain.OwningPlayer))
 		{
 			return false;
 		}

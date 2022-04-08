@@ -154,7 +154,7 @@ public class CargoShip : BaseEntity
 			baseEntity.enableSaving = false;
 			baseEntity.SendMessage("SetWasDropped", SendMessageOptions.DontRequireReceiver);
 			baseEntity.Spawn();
-			baseEntity.SetParent(this, true);
+			baseEntity.SetParent(this, worldPositionStays: true);
 			Rigidbody component = baseEntity.GetComponent<Rigidbody>();
 			if (component != null)
 			{
@@ -192,7 +192,7 @@ public class CargoShip : BaseEntity
 		if ((bool)baseEntity)
 		{
 			baseEntity.enableSaving = false;
-			baseEntity.SetParent(this, true);
+			baseEntity.SetParent(this, worldPositionStays: true);
 			baseEntity.Spawn();
 			baseEntity.GetComponent<Rigidbody>().isKinematic = true;
 			RHIB component = baseEntity.GetComponent<RHIB>();
@@ -205,22 +205,22 @@ public class CargoShip : BaseEntity
 		if ((bool)microphoneStand)
 		{
 			microphoneStand.enableSaving = false;
-			microphoneStand.SetParent(this, true);
+			microphoneStand.SetParent(this, worldPositionStays: true);
 			microphoneStand.Spawn();
 			microphoneStand.SpawnChildEntity();
-			IOEntity iOEntity = microphoneStand.ioEntity.Get(true);
+			IOEntity iOEntity = microphoneStand.ioEntity.Get(serverside: true);
 			Transform[] array = speakerPoints;
 			foreach (Transform transform in array)
 			{
 				IOEntity iOEntity2 = GameManager.server.CreateEntity(speakerPrefab.resourcePath, transform.position, transform.rotation) as IOEntity;
 				iOEntity2.enableSaving = false;
-				iOEntity2.SetParent(this, true);
+				iOEntity2.SetParent(this, worldPositionStays: true);
 				iOEntity2.Spawn();
 				iOEntity.outputs[0].connectedTo.Set(iOEntity2);
 				iOEntity2.inputs[0].connectedTo.Set(iOEntity);
 				iOEntity = iOEntity2;
 			}
-			microphoneStand.ioEntity.Get(true).MarkDirtyForceUpdateOutputs();
+			microphoneStand.ioEntity.Get(serverside: true).MarkDirtyForceUpdateOutputs();
 		}
 	}
 
@@ -290,8 +290,8 @@ public class CargoShip : BaseEntity
 		{
 			egressing = true;
 			CancelInvoke(PlayHorn);
-			radiation.SetActive(true);
-			SetFlag(Flags.Reserved8, true);
+			radiation.SetActive(value: true);
+			SetFlag(Flags.Reserved8, b: true);
 			InvokeRepeating(UpdateRadiation, 10f, 1f);
 			Invoke(DelayedDestroy, 60f * egress_duration_minutes);
 		}

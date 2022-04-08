@@ -43,17 +43,13 @@ public class TokenisedPhrase : Translate.Phrase
 
 	public static string TranslateMouseButton(string mouseButton)
 	{
-		switch (mouseButton)
+		return mouseButton switch
 		{
-		case "mouse0":
-			return "Left Mouse";
-		case "mouse1":
-			return "Right Mouse";
-		case "mouse2":
-			return "Center Mouse";
-		default:
-			return mouseButton;
-		}
+			"mouse0" => "Left Mouse", 
+			"mouse1" => "Right Mouse", 
+			"mouse2" => "Center Mouse", 
+			_ => mouseButton, 
+		};
 	}
 
 	private static string GetButtonWithBind(string s)

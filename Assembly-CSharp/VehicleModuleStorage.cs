@@ -169,8 +169,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
 		if (BaseEntityEx.IsValid(baseEntity))
 		{
-			BaseCombatEntity baseCombatEntity;
-			if ((object)(baseCombatEntity = baseEntity as BaseCombatEntity) != null)
+			if (baseEntity is BaseCombatEntity baseCombatEntity)
 			{
 				baseCombatEntity.Die();
 			}

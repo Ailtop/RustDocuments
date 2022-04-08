@@ -27,19 +27,14 @@ public class AnimalFootIK : MonoBehaviour
 
 	public AvatarIKGoal GoalFromIndex(int index)
 	{
-		switch (index)
+		return index switch
 		{
-		case 0:
-			return AvatarIKGoal.LeftHand;
-		case 1:
-			return AvatarIKGoal.RightHand;
-		case 2:
-			return AvatarIKGoal.LeftFoot;
-		case 3:
-			return AvatarIKGoal.RightFoot;
-		default:
-			return AvatarIKGoal.LeftHand;
-		}
+			0 => AvatarIKGoal.LeftHand, 
+			1 => AvatarIKGoal.RightHand, 
+			2 => AvatarIKGoal.LeftFoot, 
+			3 => AvatarIKGoal.RightFoot, 
+			_ => AvatarIKGoal.LeftHand, 
+		};
 	}
 
 	private void OnAnimatorIK(int layerIndex)
@@ -49,13 +44,12 @@ public class AnimalFootIK : MonoBehaviour
 		{
 			Transform transform = Feet[i];
 			AvatarIKGoal goal = GoalFromIndex(i);
-			Vector3 up = Vector3.up;
+			_ = Vector3.up;
 			Vector3 position = transform.transform.position;
 			float iKPositionWeight = animator.GetIKPositionWeight(goal);
-			RaycastHit hit;
-			if (GroundSample(transform.transform.position - Vector3.down * actualFootOffset, out hit))
+			if (GroundSample(transform.transform.position - Vector3.down * actualFootOffset, out var hit))
 			{
-				Vector3 normal = hit.normal;
+				_ = hit.normal;
 				position = hit.point;
 				float value = Vector3.Distance(transform.transform.position - Vector3.down * actualFootOffset, position);
 				iKPositionWeight = 1f - Mathf.InverseLerp(minWeightDistance, maxWeightDistance, value);

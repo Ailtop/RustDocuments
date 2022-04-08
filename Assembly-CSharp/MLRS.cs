@@ -414,8 +414,7 @@ public class MLRS : BaseMountable
 		{
 			if (!((float)timeSinceBroken >= brokenDownMinutes * 60f))
 			{
-				Item item;
-				SetFlag(Flags.Reserved8, TryGetAimingModule(out item));
+				SetFlag(Flags.Reserved8, TryGetAimingModule(out var _));
 				return;
 			}
 			SetRepaired();
@@ -431,10 +430,7 @@ public class MLRS : BaseMountable
 		}
 		if (!IsFiringRockets)
 		{
-			float hRot;
-			float vRot;
-			float g;
-			HitPosToRotation(trueTargetHitPos, out hRot, out vRot, out g);
+			HitPosToRotation(trueTargetHitPos, out var hRot, out var vRot, out var g);
 			float num = g / (0f - UnityEngine.Physics.gravity.y);
 			IsRealigning = Mathf.Abs(Mathf.DeltaAngle(VRotation, vRot)) > 0.001f || Mathf.Abs(Mathf.DeltaAngle(HRotation, hRot)) > 0.001f || !Mathf.Approximately(CurGravityMultiplier, num);
 			if (IsRealigning)
@@ -483,8 +479,7 @@ public class MLRS : BaseMountable
 		projectile.pos += vector2;
 		float y2 = projectile.forward.y + num * dt;
 		projectile.forward.y = y2;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Linecast(pos, projectile.pos, out hitInfo, 1084293393, QueryTriggerInteraction.Ignore))
+		if (UnityEngine.Physics.Linecast(pos, projectile.pos, out var hitInfo, 1084293393, QueryTriggerInteraction.Ignore))
 		{
 			projectile.pos = hitInfo.point;
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
@@ -515,7 +510,7 @@ public class MLRS : BaseMountable
 
 	public void SetRepaired()
 	{
-		SetFlag(Flags.Broken, false);
+		SetFlag(Flags.Broken, b: false);
 	}
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
@@ -592,7 +587,7 @@ public class MLRS : BaseMountable
 		UpdateStorageState();
 		if (CanFire && !(_mounted == null) && Interface.CallHook("OnMlrsFire", this, owner) == null)
 		{
-			SetFlag(Flags.Reserved6, true);
+			SetFlag(Flags.Reserved6, b: true);
 			radiusModIndex = 0;
 			nextRocketIndex = Mathf.Min(RocketAmmoCount - 1, rocketTubes.Length - 1);
 			rocketOwnerRef.Set(owner);
@@ -605,13 +600,12 @@ public class MLRS : BaseMountable
 	{
 		CancelInvoke(FireNextRocket);
 		rocketOwnerRef.Set(null);
-		Item item;
-		if (TryGetAimingModule(out item))
+		if (TryGetAimingModule(out var item))
 		{
 			item.LoseCondition(1f);
 		}
-		SetFlag(Flags.Reserved6, false, false, false);
-		SetFlag(Flags.Broken, true, false, false);
+		SetFlag(Flags.Reserved6, b: false, recursive: false, networkupdate: false);
+		SetFlag(Flags.Broken, b: true, recursive: false, networkupdate: false);
 		SendNetworkUpdate_Flags();
 		timeSinceBroken = 0f;
 		Interface.CallHook("OnMlrsFiringEnded", this);
@@ -637,8 +631,7 @@ public class MLRS : BaseMountable
 		Vector3 targetPos = TrueHitPos + new Vector3(vector.x, 0f, vector.y);
 		float g;
 		Vector3 aimToTarget = GetAimToTarget(targetPos, out g);
-		ServerProjectile projectile;
-		if (BaseMountable.TryFireProjectile(rocketContainer, AmmoTypes.MLRS_ROCKET, firingPos, aimToTarget, _mounted, 0f, 0f, out projectile))
+		if (BaseMountable.TryFireProjectile(rocketContainer, AmmoTypes.MLRS_ROCKET, firingPos, aimToTarget, _mounted, 0f, 0f, out var projectile))
 		{
 			projectile.gravityModifier = g / (0f - UnityEngine.Physics.gravity.y);
 			Interface.CallHook("OnMlrsRocketFired", this, projectile);
@@ -702,7 +695,7 @@ public class MLRS : BaseMountable
 			IItemContainerEntity rocketContainer = GetRocketContainer();
 			if (!ObjectEx.IsUnityNull(rocketContainer))
 			{
-				rocketContainer.PlayerOpenLoot(player, "", false);
+				rocketContainer.PlayerOpenLoot(player, "", doPositionChecks: false);
 			}
 			else
 			{
@@ -748,10 +741,7 @@ public class MLRS : BaseMountable
 		{
 			SetUserTargetHitPos(info.msg.mlrs.targetPos);
 			TrueHitPos = info.msg.mlrs.curHitPos;
-			float hRot;
-			float vRot;
-			float g;
-			HitPosToRotation(TrueHitPos, out hRot, out vRot, out g);
+			HitPosToRotation(TrueHitPos, out var hRot, out var vRot, out var g);
 			CurGravityMultiplier = g / (0f - UnityEngine.Physics.gravity.y);
 			if (base.isServer)
 			{

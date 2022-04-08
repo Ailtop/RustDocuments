@@ -81,7 +81,7 @@ public class SmartSwitch : AppIOEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 
 	public override int ConsumptionAmount()
@@ -95,7 +95,7 @@ public class SmartSwitch : AppIOEntity
 
 	public override void ResetIOState()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
@@ -111,11 +111,11 @@ public class SmartSwitch : AppIOEntity
 	{
 		if (inputSlot == 1 && inputAmount > 0)
 		{
-			SetSwitch(true);
+			SetSwitch(wantsOn: true);
 		}
 		if (inputSlot == 2 && inputAmount > 0)
 		{
-			SetSwitch(false);
+			SetSwitch(wantsOn: false);
 		}
 		base.IOStateChanged(inputAmount, inputSlot);
 	}
@@ -125,7 +125,7 @@ public class SmartSwitch : AppIOEntity
 		if (wantsOn != IsOn())
 		{
 			SetFlag(Flags.On, wantsOn);
-			SetFlag(Flags.Busy, true);
+			SetFlag(Flags.Busy, b: true);
 			Invoke(Unbusy, 0.5f);
 			SendNetworkUpdateImmediate();
 			MarkDirty();
@@ -146,7 +146,7 @@ public class SmartSwitch : AppIOEntity
 
 	public void Unbusy()
 	{
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 
 	private static bool PlayerCanToggle(BasePlayer player)

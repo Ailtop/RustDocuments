@@ -25,7 +25,7 @@ public class BuildingBlock : StabilityEntity
 		{
 			if (ShouldAdd(entity))
 			{
-				entity.UpdateSkin(true);
+				entity.UpdateSkin(force: true);
 			}
 		}
 
@@ -292,13 +292,13 @@ public class BuildingBlock : StabilityEntity
 
 	public void StopBeingDemolishable()
 	{
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved2, b: false);
 		SendNetworkUpdate();
 	}
 
 	public void StartBeingDemolishable()
 	{
-		SetFlag(Flags.Reserved2, true);
+		SetFlag(Flags.Reserved2, b: true);
 		Invoke(StopBeingDemolishable, 600f);
 	}
 
@@ -504,7 +504,7 @@ public class BuildingBlock : StabilityEntity
 				{
 					if (Rust.Application.isLoading)
 					{
-						buildingBlock.UpdateSkin(true);
+						buildingBlock.UpdateSkin(force: true);
 					}
 					else
 					{
@@ -559,7 +559,7 @@ public class BuildingBlock : StabilityEntity
 		{
 			if (currentSkin == null)
 			{
-				UpdatePlaceholder(false);
+				UpdatePlaceholder(state: false);
 			}
 			else
 			{
@@ -586,7 +586,7 @@ public class BuildingBlock : StabilityEntity
 		{
 			if (flag)
 			{
-				RefreshNeighbours(true);
+				RefreshNeighbours(linkToNeighbours: true);
 			}
 			if (flag2)
 			{
@@ -678,8 +678,8 @@ public class BuildingBlock : StabilityEntity
 			base.transform.localRotation *= Quaternion.Euler(blockDefinition.rotationAmount);
 			RefreshEntityLinks();
 			UpdateSurroundingEntities();
-			UpdateSkin(true);
-			RefreshNeighbours(false);
+			UpdateSkin(force: true);
+			RefreshNeighbours(linkToNeighbours: false);
 			SendNetworkUpdateImmediate();
 			ClientRPC(null, "RefreshSkin");
 		}
@@ -687,7 +687,7 @@ public class BuildingBlock : StabilityEntity
 
 	public void StopBeingRotatable()
 	{
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 		SendNetworkUpdate();
 	}
 
@@ -695,7 +695,7 @@ public class BuildingBlock : StabilityEntity
 	{
 		if (blockDefinition.grades != null && blockDefinition.canRotateAfterPlacement)
 		{
-			SetFlag(Flags.Reserved1, true);
+			SetFlag(Flags.Reserved1, b: true);
 			Invoke(StopBeingRotatable, 600f);
 		}
 	}
@@ -718,8 +718,8 @@ public class BuildingBlock : StabilityEntity
 		}
 		if (info.fromDisk)
 		{
-			SetFlag(Flags.Reserved2, false);
-			SetFlag(Flags.Reserved1, false);
+			SetFlag(Flags.Reserved2, b: false);
+			SetFlag(Flags.Reserved1, b: false);
 			UpdateSkin();
 		}
 	}
@@ -792,7 +792,7 @@ public class BuildingBlock : StabilityEntity
 		grade = BuildingGrade.Enum.Twigs;
 		lastGrade = BuildingGrade.Enum.None;
 		DestroySkin();
-		UpdatePlaceholder(true);
+		UpdatePlaceholder(state: true);
 	}
 
 	public override void InitShared()
@@ -813,7 +813,7 @@ public class BuildingBlock : StabilityEntity
 	{
 		if (base.isServer)
 		{
-			RefreshNeighbours(false);
+			RefreshNeighbours(linkToNeighbours: false);
 		}
 		base.DestroyShared();
 	}

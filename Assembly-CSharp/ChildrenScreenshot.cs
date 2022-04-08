@@ -31,7 +31,7 @@ public class ChildrenScreenshot : MonoBehaviour
 		camera.clearFlags = CameraClearFlags.Color;
 		camera.backgroundColor = new Color(0f, 0f, 0f, 0f);
 		camera.renderingPath = RenderingPath.DeferredShading;
-		Texture2D texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.ARGB32, false);
+		Texture2D texture2D = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.ARGB32, mipChain: false);
 		foreach (Transform item in base.transform.Cast<Transform>())
 		{
 			PositionCamera(camera, item.gameObject);
@@ -42,7 +42,7 @@ public class ChildrenScreenshot : MonoBehaviour
 			string recursiveName = TransformEx.GetRecursiveName(item);
 			recursiveName = recursiveName.Replace('/', '.');
 			RenderTexture.active = renderTexture;
-			texture2D.ReadPixels(new Rect(0f, 0f, renderTexture.width, renderTexture.height), 0, 0, false);
+			texture2D.ReadPixels(new Rect(0f, 0f, renderTexture.width, renderTexture.height), 0, 0, recalculateMipMaps: false);
 			RenderTexture.active = null;
 			byte[] bytes = texture2D.EncodeToPNG();
 			string path = string.Format(folder, recursiveName, item.name);
@@ -53,9 +53,9 @@ public class ChildrenScreenshot : MonoBehaviour
 			}
 			File.WriteAllBytes(path, bytes);
 		}
-		UnityEngine.Object.DestroyImmediate(texture2D, true);
-		UnityEngine.Object.DestroyImmediate(renderTexture, true);
-		UnityEngine.Object.DestroyImmediate(gameObject, true);
+		UnityEngine.Object.DestroyImmediate(texture2D, allowDestroyingAssets: true);
+		UnityEngine.Object.DestroyImmediate(renderTexture, allowDestroyingAssets: true);
+		UnityEngine.Object.DestroyImmediate(gameObject, allowDestroyingAssets: true);
 	}
 
 	public void PositionCamera(Camera cam, GameObject obj)

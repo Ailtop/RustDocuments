@@ -353,8 +353,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 			engineController.TickFuel(fuelPerSecond);
 		}
 		engineController.CheckEngineState();
-		RaycastHit hitInfo;
-		if (!carPhysics.IsGrounded() && UnityEngine.Physics.Raycast(base.transform.position, Vector3.down, out hitInfo, 10f, 1218511105, QueryTriggerInteraction.Ignore))
+		if (!carPhysics.IsGrounded() && UnityEngine.Physics.Raycast(base.transform.position, Vector3.down, out var hitInfo, 10f, 1218511105, QueryTriggerInteraction.Ignore))
 		{
 			Vector3 normal = hitInfo.normal;
 			Vector3 right = base.transform.right;
@@ -541,7 +540,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 			if (!float.IsPositiveInfinity(num))
 			{
 				float num2 = 1f / num;
-				Hurt(MaxHealth() * num2, DamageType.Decay, this, false);
+				Hurt(MaxHealth() * num2, DamageType.Decay, this, useProtection: false);
 			}
 		}
 	}

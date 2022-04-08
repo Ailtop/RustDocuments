@@ -6,13 +6,12 @@ public class ConstructionSocket_Elevator : ConstructionSocket
 
 	protected override bool CanConnectToEntity(Construction.Target target)
 	{
-		Elevator elevator;
-		if ((object)(elevator = target.entity as Elevator) != null && elevator.Floor >= MaxFloor)
+		if (target.entity is Elevator elevator && elevator.Floor >= MaxFloor)
 		{
 			return false;
 		}
 		Vector3 vector = target.GetWorldPosition();
-		Quaternion quaternion = target.GetWorldRotation(true);
+		Quaternion quaternion = target.GetWorldRotation(female: true);
 		if (GamePhysics.CheckOBB(new OBB(vector, new Vector3(2f, 0.5f, 2f), quaternion), 2097152))
 		{
 			return false;

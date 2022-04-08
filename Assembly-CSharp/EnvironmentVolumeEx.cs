@@ -7,7 +7,7 @@ public static class EnvironmentVolumeEx
 	public static bool CheckEnvironmentVolumes(this Transform transform, Vector3 pos, Quaternion rot, Vector3 scale, EnvironmentType type)
 	{
 		List<EnvironmentVolume> obj = Pool.GetList<EnvironmentVolume>();
-		transform.GetComponentsInChildren(true, obj);
+		transform.GetComponentsInChildren(includeInactive: true, obj);
 		for (int i = 0; i < obj.Count; i++)
 		{
 			EnvironmentVolume environmentVolume = obj[i];
@@ -35,7 +35,7 @@ public static class EnvironmentVolumeEx
 			return true;
 		}
 		List<EnvironmentVolume> obj = Pool.GetList<EnvironmentVolume>();
-		transform.GetComponentsInChildren(true, obj);
+		transform.GetComponentsInChildren(includeInactive: true, obj);
 		if (obj.Count == 0)
 		{
 			Pool.FreeList(ref obj);
@@ -85,7 +85,7 @@ public static class EnvironmentVolumeEx
 			return true;
 		}
 		List<EnvironmentVolume> obj = Pool.GetList<EnvironmentVolume>();
-		transform.GetComponentsInChildren(true, obj);
+		transform.GetComponentsInChildren(includeInactive: true, obj);
 		if (obj.Count == 0)
 		{
 			Pool.FreeList(ref obj);

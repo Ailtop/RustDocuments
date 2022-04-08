@@ -227,8 +227,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 		}
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			ModularCarSeat modularCarSeat;
-			if ((object)(modularCarSeat = mountPoint.mountable as ModularCarSeat) != null)
+			if (mountPoint.mountable is ModularCarSeat modularCarSeat)
 			{
 				modularCarSeat.associatedSeatingModule = this;
 			}
@@ -303,7 +302,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 		base.OnPlayerDismountedVehicle(player);
 		if (HasFlag(Flags.Reserved8) && player == hornPlayer)
 		{
-			SetFlag(Flags.Reserved8, false);
+			SetFlag(Flags.Reserved8, b: false);
 		}
 	}
 
@@ -333,8 +332,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 		bool flag = true;
 		foreach (BaseVehicleModule attachedModuleEntity in Car.AttachedModuleEntities)
 		{
-			VehicleModuleEngine vehicleModuleEngine;
-			if ((object)(vehicleModuleEngine = attachedModuleEntity as VehicleModuleEngine) != null && !vehicleModuleEngine.AtPeakPerformance)
+			if (attachedModuleEntity is VehicleModuleEngine vehicleModuleEngine && !vehicleModuleEngine.AtPeakPerformance)
 			{
 				flag = false;
 				break;

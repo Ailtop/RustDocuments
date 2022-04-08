@@ -94,7 +94,7 @@ public class CardReader : IOEntity
 
 	public void CancelAccess()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		MarkDirty();
 	}
 
@@ -113,7 +113,7 @@ public class CardReader : IOEntity
 
 	public void GrantCard()
 	{
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		MarkDirty();
 		Effect.server.Run(accessGrantedEffect.resourcePath, audioPosition.position, Vector3.up);
 	}

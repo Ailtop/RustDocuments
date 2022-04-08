@@ -352,7 +352,7 @@ public sealed class ItemContainer
 		MarkDirty();
 		if (onItemAddedRemoved != null)
 		{
-			onItemAddedRemoved(item, true);
+			onItemAddedRemoved(item, arg2: true);
 		}
 		Interface.CallHook("OnItemAddedToContainer", this, item);
 		return true;
@@ -420,7 +420,7 @@ public sealed class ItemContainer
 		MarkDirty();
 		if (onItemAddedRemoved != null)
 		{
-			onItemAddedRemoved(item, false);
+			onItemAddedRemoved(item, arg2: false);
 		}
 		Interface.CallHook("OnItemRemovedFromContainer", this, item);
 		return true;
@@ -556,7 +556,7 @@ public sealed class ItemContainer
 			Item item = itemList[k];
 			if (item.IsValid())
 			{
-				itemContainer.contents.Add(item.Save(true));
+				itemContainer.contents.Add(item.Save(bIncludeContainer: true));
 			}
 		}
 		return itemContainer;

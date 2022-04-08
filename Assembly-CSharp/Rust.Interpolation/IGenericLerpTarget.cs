@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 
-namespace Rust.Interpolation
+namespace Rust.Interpolation;
+
+public interface IGenericLerpTarget<T> : ILerpInfo where T : Interpolator<T>.ISnapshot, new()
 {
-	public interface IGenericLerpTarget<T> : ILerpInfo where T : Interpolator<T>.ISnapshot, new()
-	{
-		void SetFrom(T snapshot);
+	void SetFrom(T snapshot);
 
-		T GetCurrentState();
+	T GetCurrentState();
 
-		void DebugInterpolationState(Interpolator<T>.Segment segment, List<T> entries);
-	}
+	void DebugInterpolationState(Interpolator<T>.Segment segment, List<T> entries);
 }

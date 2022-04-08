@@ -21,7 +21,7 @@ public class BoneDictionary
 	public BoneDictionary(Transform rootBone)
 	{
 		this.transform = rootBone;
-		transforms = rootBone.GetComponentsInChildren<Transform>(true);
+		transforms = rootBone.GetComponentsInChildren<Transform>(includeInactive: true);
 		names = new string[transforms.Length];
 		for (int i = 0; i < transforms.Length; i++)
 		{
@@ -94,8 +94,7 @@ public class BoneDictionary
 
 	public uint FindBoneID(Transform transform)
 	{
-		uint value;
-		if (!transformDict.TryGetValue(transform, out value))
+		if (!transformDict.TryGetValue(transform, out var value))
 		{
 			return StringPool.closest;
 		}

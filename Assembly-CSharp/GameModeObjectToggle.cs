@@ -8,7 +8,7 @@ public class GameModeObjectToggle : BaseMonoBehaviour
 
 	public void Awake()
 	{
-		SetToggle(false);
+		SetToggle(wantsOn: false);
 		BaseGameMode.GameModeChanged += OnGameModeChanged;
 	}
 

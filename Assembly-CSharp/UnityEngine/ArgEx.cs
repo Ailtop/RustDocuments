@@ -1,54 +1,52 @@
-namespace UnityEngine
+namespace UnityEngine;
+
+public static class ArgEx
 {
-	public static class ArgEx
+	public static BasePlayer Player(this ConsoleSystem.Arg arg)
 	{
-		public static BasePlayer Player(this ConsoleSystem.Arg arg)
+		if (arg == null || arg.Connection == null)
 		{
-			if (arg == null || arg.Connection == null)
-			{
-				return null;
-			}
-			return arg.Connection.player as BasePlayer;
+			return null;
 		}
+		return arg.Connection.player as BasePlayer;
+	}
 
-		public static BasePlayer GetPlayer(this ConsoleSystem.Arg arg, int iArgNum)
+	public static BasePlayer GetPlayer(this ConsoleSystem.Arg arg, int iArgNum)
+	{
+		string @string = arg.GetString(iArgNum);
+		if (@string == null)
 		{
-			string @string = arg.GetString(iArgNum);
-			if (@string == null)
-			{
-				return null;
-			}
-			return BasePlayer.Find(@string);
+			return null;
 		}
+		return BasePlayer.Find(@string);
+	}
 
-		public static BasePlayer GetSleeper(this ConsoleSystem.Arg arg, int iArgNum)
+	public static BasePlayer GetSleeper(this ConsoleSystem.Arg arg, int iArgNum)
+	{
+		string @string = arg.GetString(iArgNum);
+		if (@string == null)
 		{
-			string @string = arg.GetString(iArgNum);
-			if (@string == null)
-			{
-				return null;
-			}
-			return BasePlayer.FindSleeping(@string);
+			return null;
 		}
+		return BasePlayer.FindSleeping(@string);
+	}
 
-		public static BasePlayer GetPlayerOrSleeper(this ConsoleSystem.Arg arg, int iArgNum)
+	public static BasePlayer GetPlayerOrSleeper(this ConsoleSystem.Arg arg, int iArgNum)
+	{
+		string @string = arg.GetString(iArgNum);
+		if (@string == null)
 		{
-			string @string = arg.GetString(iArgNum);
-			if (@string == null)
-			{
-				return null;
-			}
-			return BasePlayer.FindAwakeOrSleeping(@string);
+			return null;
 		}
+		return BasePlayer.FindAwakeOrSleeping(@string);
+	}
 
-		public static BasePlayer GetPlayerOrSleeperOrBot(this ConsoleSystem.Arg arg, int iArgNum)
+	public static BasePlayer GetPlayerOrSleeperOrBot(this ConsoleSystem.Arg arg, int iArgNum)
+	{
+		if (arg.TryGetUInt(iArgNum, out var value))
 		{
-			uint value;
-			if (arg.TryGetUInt(iArgNum, out value))
-			{
-				return BasePlayer.FindBot(value);
-			}
-			return GetPlayerOrSleeper(arg, iArgNum);
+			return BasePlayer.FindBot(value);
 		}
+		return GetPlayerOrSleeper(arg, iArgNum);
 	}
 }

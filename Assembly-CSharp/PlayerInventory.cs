@@ -125,13 +125,13 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 	protected void Initialize()
 	{
 		containerMain = new ItemContainer();
-		containerMain.SetFlag(ItemContainer.Flag.IsPlayer, true);
+		containerMain.SetFlag(ItemContainer.Flag.IsPlayer, b: true);
 		containerBelt = new ItemContainer();
-		containerBelt.SetFlag(ItemContainer.Flag.IsPlayer, true);
-		containerBelt.SetFlag(ItemContainer.Flag.Belt, true);
+		containerBelt.SetFlag(ItemContainer.Flag.IsPlayer, b: true);
+		containerBelt.SetFlag(ItemContainer.Flag.Belt, b: true);
 		containerWear = new ItemContainer();
-		containerWear.SetFlag(ItemContainer.Flag.IsPlayer, true);
-		containerWear.SetFlag(ItemContainer.Flag.Clothing, true);
+		containerWear.SetFlag(ItemContainer.Flag.IsPlayer, b: true);
+		containerWear.SetFlag(ItemContainer.Flag.Clothing, b: true);
 		crafting = GetComponent<ItemCrafter>();
 		crafting.AddContainer(containerMain);
 		crafting.AddContainer(containerBelt);
@@ -206,7 +206,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			BasePlayer basePlayer = base.baseEntity;
 			if (!basePlayer.HasPlayerFlag(BasePlayer.PlayerFlags.DisplaySash) && basePlayer.IsHostileItem(item))
 			{
-				base.baseEntity.SetPlayerFlag(BasePlayer.PlayerFlags.DisplaySash, true);
+				base.baseEntity.SetPlayerFlag(BasePlayer.PlayerFlags.DisplaySash, b: true);
 			}
 			if (bAdded)
 			{
@@ -242,22 +242,22 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			{
 				if (flag3 && !item2.IsDeployed() && item2.holsterInfo.slot == HeldEntity.HolsterInfo.HolsterSlot.BACK)
 				{
-					item2.SetVisibleWhileHolstered(true);
+					item2.SetVisibleWhileHolstered(visible: true);
 					flag3 = false;
 				}
 				else if (flag2 && !item2.IsDeployed() && item2.holsterInfo.slot == HeldEntity.HolsterInfo.HolsterSlot.RIGHT_THIGH)
 				{
-					item2.SetVisibleWhileHolstered(true);
+					item2.SetVisibleWhileHolstered(visible: true);
 					flag2 = false;
 				}
 				else if (flag && !item2.IsDeployed() && item2.holsterInfo.slot == HeldEntity.HolsterInfo.HolsterSlot.LEFT_THIGH)
 				{
-					item2.SetVisibleWhileHolstered(true);
+					item2.SetVisibleWhileHolstered(visible: true);
 					flag = false;
 				}
 				else
 				{
-					item2.SetVisibleWhileHolstered(false);
+					item2.SetVisibleWhileHolstered(visible: false);
 				}
 			}
 		}
@@ -274,14 +274,13 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	private bool CanMoveItemsFrom(BaseEntity entity, Item item)
 	{
-		ICanMoveFrom canMoveFrom;
-		if ((canMoveFrom = entity as ICanMoveFrom) != null && !canMoveFrom.CanMoveFrom(base.baseEntity, item))
+		if (entity is ICanMoveFrom canMoveFrom && !canMoveFrom.CanMoveFrom(base.baseEntity, item))
 		{
 			return false;
 		}
-		if ((bool)BaseGameMode.GetActiveGameMode(true))
+		if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
 		{
-			return BaseGameMode.GetActiveGameMode(true).CanMoveItemsFrom(this, entity, item);
+			return BaseGameMode.GetActiveGameMode(serverside: true).CanMoveItemsFrom(this, entity, item);
 		}
 		return true;
 	}
@@ -505,9 +504,9 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			crafting.ServerUpdate(delta);
 		}
 		float currentTemperature = base.baseEntity.currentTemperature;
-		UpdateContainer(delta, Type.Main, containerMain, false, currentTemperature);
-		UpdateContainer(delta, Type.Belt, containerBelt, true, currentTemperature);
-		UpdateContainer(delta, Type.Wear, containerWear, true, currentTemperature);
+		UpdateContainer(delta, Type.Main, containerMain, bSendInventoryToEveryone: false, currentTemperature);
+		UpdateContainer(delta, Type.Belt, containerBelt, bSendInventoryToEveryone: true, currentTemperature);
+		UpdateContainer(delta, Type.Wear, containerWear, bSendInventoryToEveryone: true, currentTemperature);
 	}
 
 	public void UpdateContainer(float delta, Type type, ItemContainer container, bool bSendInventoryToEveryone, float temperature)
@@ -532,32 +531,30 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		using (TimeWarning.New("PlayerInventory.SendSnapshot"))
 		{
 			SendUpdatedInventory(Type.Main, containerMain);
-			SendUpdatedInventory(Type.Belt, containerBelt, true);
-			SendUpdatedInventory(Type.Wear, containerWear, true);
+			SendUpdatedInventory(Type.Belt, containerBelt, bSendInventoryToEveryone: true);
+			SendUpdatedInventory(Type.Wear, containerWear, bSendInventoryToEveryone: true);
 		}
 	}
 
 	public void SendUpdatedInventory(Type type, ItemContainer container, bool bSendInventoryToEveryone = false)
 	{
-		using (UpdateItemContainer updateItemContainer = Facepunch.Pool.Get<UpdateItemContainer>())
+		using UpdateItemContainer updateItemContainer = Facepunch.Pool.Get<UpdateItemContainer>();
+		updateItemContainer.type = (int)type;
+		if (container != null)
 		{
-			updateItemContainer.type = (int)type;
-			if (container != null)
+			container.dirty = false;
+			updateItemContainer.container = Facepunch.Pool.Get<List<ProtoBuf.ItemContainer>>();
+			updateItemContainer.container.Add(container.Save());
+		}
+		if (Interface.CallHook("OnInventoryNetworkUpdate", this, container, updateItemContainer, type, bSendInventoryToEveryone) == null)
+		{
+			if (bSendInventoryToEveryone)
 			{
-				container.dirty = false;
-				updateItemContainer.container = Facepunch.Pool.Get<List<ProtoBuf.ItemContainer>>();
-				updateItemContainer.container.Add(container.Save());
+				base.baseEntity.ClientRPC(null, "UpdatedItemContainer", updateItemContainer);
 			}
-			if (Interface.CallHook("OnInventoryNetworkUpdate", this, container, updateItemContainer, type, bSendInventoryToEveryone) == null)
+			else
 			{
-				if (bSendInventoryToEveryone)
-				{
-					base.baseEntity.ClientRPC(null, "UpdatedItemContainer", updateItemContainer);
-				}
-				else
-				{
-					base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdatedItemContainer", updateItemContainer);
-				}
+				base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdatedItemContainer", updateItemContainer);
 			}
 		}
 	}
@@ -801,10 +798,10 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			return;
 		}
 		Strip();
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (activeGameMode != null && activeGameMode.HasLoadouts())
 		{
-			BaseGameMode.GetActiveGameMode(true).LoadoutPlayer(base.baseEntity);
+			BaseGameMode.GetActiveGameMode(serverside: true).LoadoutPlayer(base.baseEntity);
 			return;
 		}
 		ulong num = 0uL;
@@ -826,8 +823,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 					for (int i = 0; i < skins.Length; i++)
 					{
 						ItemSkinDirectory.Skin skin = skins[i];
-						ItemSkin itemSkin;
-						if (skin.id == infoInt && skin.invItem != null && (object)(itemSkin = skin.invItem as ItemSkin) != null && itemSkin.Redirect != null)
+						if (skin.id == infoInt && skin.invItem != null && skin.invItem is ItemSkin itemSkin && itemSkin.Redirect != null)
 						{
 							GiveItem(ItemManager.CreateByName(itemSkin.Redirect.shortname, 1, 0uL), containerBelt);
 							flag = true;
@@ -925,15 +921,15 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		int num = 0;
 		if (containerMain != null)
 		{
-			num += containerMain.GetAmount(itemid, true);
+			num += containerMain.GetAmount(itemid, onlyUsableAmounts: true);
 		}
 		if (containerBelt != null)
 		{
-			num += containerBelt.GetAmount(itemid, true);
+			num += containerBelt.GetAmount(itemid, onlyUsableAmounts: true);
 		}
 		if (containerWear != null)
 		{
-			num += containerWear.GetAmount(itemid, true);
+			num += containerWear.GetAmount(itemid, onlyUsableAmounts: true);
 		}
 		return num;
 	}

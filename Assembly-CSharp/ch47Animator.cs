@@ -36,8 +36,8 @@ public class ch47Animator : MonoBehaviour
 
 	private void Start()
 	{
-		EnableBlurredRotorBlades(false);
-		animator.SetBool("rotorblade_stop", false);
+		EnableBlurredRotorBlades(enabled: false);
+		animator.SetBool("rotorblade_stop", value: false);
 	}
 
 	public void SetDropDoorOpen(bool isOpen)
@@ -55,19 +55,19 @@ public class ch47Animator : MonoBehaviour
 		animator.SetBool("reardoor_extension", rearDoorExtensionOpen);
 		if (rotorBladeSpeed >= blurSpeedThreshold && !blurredRotorBladesEnabled)
 		{
-			EnableBlurredRotorBlades(true);
+			EnableBlurredRotorBlades(enabled: true);
 		}
 		else if (rotorBladeSpeed < blurSpeedThreshold && blurredRotorBladesEnabled)
 		{
-			EnableBlurredRotorBlades(false);
+			EnableBlurredRotorBlades(enabled: false);
 		}
 		if (rotorBladeSpeed <= 0f)
 		{
-			animator.SetBool("rotorblade_stop", true);
+			animator.SetBool("rotorblade_stop", value: true);
 		}
 		else
 		{
-			animator.SetBool("rotorblade_stop", false);
+			animator.SetBool("rotorblade_stop", value: false);
 		}
 	}
 

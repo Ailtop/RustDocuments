@@ -15,21 +15,15 @@ public class HitNumber : MonoBehaviour
 
 	public int ColorToMultiplier(HitType type)
 	{
-		switch (type)
+		return type switch
 		{
-		case HitType.Yellow:
-			return 1;
-		case HitType.Green:
-			return 3;
-		case HitType.Blue:
-			return 5;
-		case HitType.Purple:
-			return 10;
-		case HitType.Red:
-			return 20;
-		default:
-			return 0;
-		}
+			HitType.Yellow => 1, 
+			HitType.Green => 3, 
+			HitType.Blue => 5, 
+			HitType.Purple => 10, 
+			HitType.Red => 20, 
+			_ => 0, 
+		};
 	}
 
 	public void OnDrawGizmos()

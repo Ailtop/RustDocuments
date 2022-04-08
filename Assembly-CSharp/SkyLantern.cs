@@ -46,7 +46,7 @@ public class SkyLantern : StorageContainer, IIgniteable
 		TransformEx.RemoveComponent<DestroyOnGroundMissing>(base.gameObject.transform);
 		base.gameObject.layer = 14;
 		travelVec = Vector3Ex.Direction2D(base.transform.position, fromPos);
-		SetFlag(Flags.On, true);
+		SetFlag(Flags.On, b: true);
 		UpdateIdealAltitude();
 	}
 
@@ -101,7 +101,7 @@ public class SkyLantern : StorageContainer, IIgniteable
 			hoverHeight = 0f;
 			travelVec = Vector3.zero;
 			UpdateIdealAltitude();
-			SetFlag(Flags.Broken, true);
+			SetFlag(Flags.Broken, b: true);
 		}
 	}
 
@@ -123,8 +123,7 @@ public class SkyLantern : StorageContainer, IIgniteable
 			Vector3 vector = base.transform.position + zero * Time.fixedDeltaTime;
 			Vector3 direction = Vector3Ex.Direction(vector, base.transform.position);
 			float maxDistance = Vector3.Distance(vector, base.transform.position);
-			RaycastHit hitInfo;
-			if (!Physics.SphereCast(collisionCheckPoint.position, collisionRadius, direction, out hitInfo, maxDistance, 1218519297))
+			if (!Physics.SphereCast(collisionCheckPoint.position, collisionRadius, direction, out var _, maxDistance, 1218519297))
 			{
 				base.transform.position = vector;
 				base.transform.Rotate(Vector3.up, rotationSpeed * randOffset * Time.deltaTime, Space.Self);

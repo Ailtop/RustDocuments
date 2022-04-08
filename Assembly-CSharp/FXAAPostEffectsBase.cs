@@ -64,7 +64,7 @@ public class FXAAPostEffectsBase : MonoBehaviour
 
 	private bool CheckSupport()
 	{
-		return CheckSupport(false);
+		return CheckSupport(needDepth: false);
 	}
 
 	private bool CheckResources()

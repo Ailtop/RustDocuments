@@ -25,14 +25,14 @@ public class ServerBrowserTagList : MonoBehaviour
 		ServerBrowserTag[] allTags = _allTags;
 		foreach (ServerBrowserTag serverBrowserTag in allTags)
 		{
-			if (num < 3 && serverBrowserTag.Test(ref server))
+			if (num < 3 && serverBrowserTag.Test(in server))
 			{
-				serverBrowserTag.SetActive(true);
+				serverBrowserTag.SetActive(active: true);
 				num++;
 			}
 			else
 			{
-				serverBrowserTag.SetActive(false);
+				serverBrowserTag.SetActive(active: false);
 			}
 		}
 		return num > 0;

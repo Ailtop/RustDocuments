@@ -28,7 +28,7 @@ public class PowerLineWireSpan : MonoBehaviour
 				obj.transform.position = Vector3.Lerp(vector, vector2, 0.5f);
 				obj.transform.LookAt(vector2);
 				obj.transform.localScale = new Vector3(1f, 1f, Vector3.Distance(vector, vector2));
-				obj.SetActive(true);
+				obj.SetActive(value: true);
 			}
 		}
 	}

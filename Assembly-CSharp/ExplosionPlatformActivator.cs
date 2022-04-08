@@ -25,7 +25,7 @@ public class ExplosionPlatformActivator : MonoBehaviour
 	private void Init()
 	{
 		canUpdate = true;
-		Effect.SetActive(true);
+		Effect.SetActive(value: true);
 	}
 
 	private void Update()
@@ -36,8 +36,8 @@ public class ExplosionPlatformActivator : MonoBehaviour
 			if (currentTime > currentRepeatTime)
 			{
 				currentTime = 0f;
-				Effect.SetActive(false);
-				Effect.SetActive(true);
+				Effect.SetActive(value: false);
+				Effect.SetActive(value: true);
 			}
 		}
 	}

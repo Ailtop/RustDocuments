@@ -42,7 +42,7 @@ public class CardTable : BaseVehicle
 
 		public CardTablePlayerStorage GetStorage()
 		{
-			BaseEntity baseEntity = storageInstance.Get(true);
+			BaseEntity baseEntity = storageInstance.Get(serverside: true);
 			if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
 			{
 				return baseEntity as CardTablePlayerStorage;
@@ -348,7 +348,7 @@ public class CardTable : BaseVehicle
 
 	public StorageContainer GetPot()
 	{
-		BaseEntity baseEntity = PotInstance.Get(true);
+		BaseEntity baseEntity = PotInstance.Get(serverside: true);
 		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
@@ -373,8 +373,7 @@ public class CardTable : BaseVehicle
 		int num = 0;
 		foreach (BaseEntity child in children)
 		{
-			CardTablePlayerStorage ent;
-			if ((object)(ent = child as CardTablePlayerStorage) != null)
+			if (child is CardTablePlayerStorage ent)
 			{
 				playerStoragePoints[num].storageInstance.Set(ent);
 				num++;
@@ -453,7 +452,7 @@ public class CardTable : BaseVehicle
 		CardTablePlayerStorage playerStorage = GetPlayerStorage(player.userID);
 		if (playerStorage != null)
 		{
-			playerStorage.inventory.GetSlot(0)?.MoveToContainer(player.inventory.containerMain, -1, true, true);
+			playerStorage.inventory.GetSlot(0)?.MoveToContainer(player.inventory.containerMain, -1, allowStack: true, ignoreStackLimit: true);
 		}
 	}
 
@@ -528,10 +527,9 @@ public class CardTable : BaseVehicle
 		BaseEntity baseEntity = GameManager.server.CreateEntity("assets/prefabs/player/player.prefab", base.transform.position, Quaternion.identity);
 		baseEntity.Spawn();
 		BasePlayer basePlayer = (BasePlayer)baseEntity;
-		AttemptMount(basePlayer, false);
+		AttemptMount(basePlayer, doMountChecks: false);
 		GameController.JoinTable(basePlayer);
-		CardPlayerData cardPlayer;
-		if (GameController.TryGetCardPlayerData(basePlayer, out cardPlayer))
+		if (GameController.TryGetCardPlayerData(basePlayer, out var cardPlayer))
 		{
 			int scrapAmount = cardPlayer.GetScrapAmount();
 			if (scrapAmount < 400)
@@ -596,7 +594,7 @@ public class CardTable : BaseVehicle
 	[RPC_Server.IsVisible(3f)]
 	private void RPC_PlayerInput(RPCMessage msg)
 	{
-		GameController.ReceivedInputFromPlayer(msg.player, msg.read.Int32(), true, msg.read.Int32());
+		GameController.ReceivedInputFromPlayer(msg.player, msg.read.Int32(), countAsAction: true, msg.read.Int32());
 	}
 
 	public override void DestroyShared()

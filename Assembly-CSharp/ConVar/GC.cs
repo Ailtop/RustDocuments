@@ -2,94 +2,93 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Scripting;
 
-namespace ConVar
+namespace ConVar;
+
+[Factory("gc")]
+public class GC : ConsoleSystem
 {
-	[Factory("gc")]
-	public class GC : ConsoleSystem
+	[ClientVar]
+	public static bool buffer_enabled = true;
+
+	[ClientVar]
+	public static int debuglevel = 1;
+
+	private static int m_buffer = 256;
+
+	[ClientVar]
+	public static int buffer
 	{
-		[ClientVar]
-		public static bool buffer_enabled = true;
-
-		[ClientVar]
-		public static int debuglevel = 1;
-
-		private static int m_buffer = 256;
-
-		[ClientVar]
-		public static int buffer
+		get
 		{
-			get
-			{
-				return m_buffer;
-			}
-			set
-			{
-				m_buffer = Mathf.Clamp(value, 64, 4096);
-			}
+			return m_buffer;
 		}
-
-		[ServerVar]
-		[ClientVar]
-		public static bool incremental_enabled
+		set
 		{
-			get
-			{
-				return GarbageCollector.isIncremental;
-			}
-			set
-			{
-				Debug.LogWarning("Cannot set gc.incremental as it is read only");
-			}
+			m_buffer = Mathf.Clamp(value, 64, 4096);
 		}
+	}
 
-		[ServerVar]
-		[ClientVar]
-		public static int incremental_milliseconds
+	[ServerVar]
+	[ClientVar]
+	public static bool incremental_enabled
+	{
+		get
 		{
-			get
-			{
-				return (int)(GarbageCollector.incrementalTimeSliceNanoseconds / 1000000uL);
-			}
-			set
-			{
-				GarbageCollector.incrementalTimeSliceNanoseconds = 1000000uL * (ulong)Mathf.Max(value, 0);
-			}
+			return GarbageCollector.isIncremental;
 		}
+		set
+		{
+			Debug.LogWarning("Cannot set gc.incremental as it is read only");
+		}
+	}
 
-		[ServerVar]
-		[ClientVar]
-		public static bool enabled
+	[ServerVar]
+	[ClientVar]
+	public static int incremental_milliseconds
+	{
+		get
 		{
-			get
-			{
-				return Rust.GC.Enabled;
-			}
-			set
-			{
-				Debug.LogWarning("Cannot set gc.enabled as it is read only");
-			}
+			return (int)(GarbageCollector.incrementalTimeSliceNanoseconds / 1000000uL);
 		}
+		set
+		{
+			GarbageCollector.incrementalTimeSliceNanoseconds = 1000000uL * (ulong)Mathf.Max(value, 0);
+		}
+	}
 
-		[ServerVar]
-		[ClientVar]
-		public static void collect()
+	[ServerVar]
+	[ClientVar]
+	public static bool enabled
+	{
+		get
 		{
-			Rust.GC.Collect();
+			return Rust.GC.Enabled;
 		}
+		set
+		{
+			Debug.LogWarning("Cannot set gc.enabled as it is read only");
+		}
+	}
 
-		[ServerVar]
-		[ClientVar]
-		public static void unload()
-		{
-			Resources.UnloadUnusedAssets();
-		}
+	[ServerVar]
+	[ClientVar]
+	public static void collect()
+	{
+		Rust.GC.Collect();
+	}
 
-		[ServerVar]
-		[ClientVar]
-		public static void alloc(Arg args)
-		{
-			byte[] array = new byte[args.GetInt(0, 1048576)];
-			args.ReplyWith("Allocated " + array.Length + " bytes");
-		}
+	[ServerVar]
+	[ClientVar]
+	public static void unload()
+	{
+		Resources.UnloadUnusedAssets();
+	}
+
+	[ServerVar]
+	[ClientVar]
+	public static void alloc(Arg args)
+	{
+		byte[] array = new byte[args.GetInt(0, 1048576)];
+		args.ReplyWith("Allocated " + array.Length + " bytes");
 	}
 }

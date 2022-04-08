@@ -177,8 +177,7 @@ public class sedanAnimation : MonoBehaviour
 	private float GetShockHeightDelta(WheelCollider wheel)
 	{
 		int mask = LayerMask.GetMask("Terrain", "World", "Construction");
-		RaycastHit hitInfo;
-		Physics.Linecast(wheel.transform.position, wheel.transform.position - Vector3.up * 10f, out hitInfo, mask);
+		Physics.Linecast(wheel.transform.position, wheel.transform.position - Vector3.up * 10f, out var hitInfo, mask);
 		return Mathx.RemapValClamped(hitInfo.distance, traceDistanceNeutralPoint - shockDistance, traceDistanceNeutralPoint + shockDistance, shockDistance * 0.75f, -0.75f * shockDistance);
 	}
 }

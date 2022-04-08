@@ -1,9 +1,8 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("tree")]
+public class Tree : ConsoleSystem
 {
-	[Factory("tree")]
-	public class Tree : ConsoleSystem
-	{
-		[ServerVar]
-		public static bool global_broadcast;
-	}
+	[ServerVar]
+	public static bool global_broadcast;
 }

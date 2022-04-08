@@ -12,8 +12,8 @@ public class RANDSwitch : ElectricalBlocker
 	public override void UpdateBlocked()
 	{
 		bool num = IsOn();
-		SetFlag(Flags.On, rand, false, false);
-		SetFlag(Flags.Reserved8, rand, false, false);
+		SetFlag(Flags.On, rand, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved8, rand, recursive: false, networkupdate: false);
 		UpdateHasPower(input1Amount + input2Amount, 1);
 		if (num != IsOn())
 		{

@@ -124,7 +124,7 @@ public class PuzzleReset : FacepunchBehaviour
 			BasePlayer basePlayer = BasePlayer.sleepingPlayerList[num];
 			if (!(basePlayer == null) && basePlayer.IsSleeping() && Vector3.Distance(basePlayer.transform.position, playerDetectionOrigin.position) <= playerDetectionRadius)
 			{
-				basePlayer.Hurt(1000f, DamageType.Suicide, basePlayer, false);
+				basePlayer.Hurt(1000f, DamageType.Suicide, basePlayer, useProtection: false);
 			}
 		}
 	}

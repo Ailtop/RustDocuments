@@ -164,7 +164,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 			inventory.ServerInitialize(null, Mathf.Min(num, maxItemCount));
 			inventory.GiveUID();
 			inventory.entityOwner = this;
-			inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
+			inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
 			array = source;
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -190,7 +190,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 			BasePlayer player = rpc.player;
 			if ((bool)player && player.CanInteract() && Interface.CallHook("CanLootEntity", player, this) == null && player.inventory.loot.StartLootingEntity(this))
 			{
-				SetFlag(Flags.Open, true);
+				SetFlag(Flags.Open, b: true);
 				player.inventory.loot.AddContainer(inventory);
 				player.inventory.loot.SendImmediate();
 				player.ClientRPCPlayer(null, player, "RPC_OpenLootPanel", lootPanelName);
@@ -208,7 +208,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 			return;
 		}
 		ResetRemovalTime();
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 		SendNetworkUpdate();
 	}
 
@@ -218,7 +218,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 		inventory = new ItemContainer();
 		inventory.entityOwner = this;
 		inventory.ServerInitialize(null, 0);
-		inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
+		inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
 	}
 
 	public override void Save(SaveInfo info)

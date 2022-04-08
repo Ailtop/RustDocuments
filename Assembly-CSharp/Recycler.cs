@@ -312,7 +312,7 @@ public class Recycler : StorageContainer
 		{
 			InvokeRepeating(RecycleThink, 5f, 5f);
 			Effect.server.Run(startSound.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			SendNetworkUpdateImmediate();
 		}
 	}
@@ -323,7 +323,7 @@ public class Recycler : StorageContainer
 		if (IsOn())
 		{
 			Effect.server.Run(stopSound.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			SendNetworkUpdateImmediate();
 		}
 	}

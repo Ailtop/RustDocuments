@@ -11,6 +11,6 @@ public class NoticeArea : SingletonComponent<NoticeArea>
 	protected override void Awake()
 	{
 		base.Awake();
-		notices = GetComponentsInChildren<IVitalNotice>(true);
+		notices = GetComponentsInChildren<IVitalNotice>(includeInactive: true);
 	}
 }

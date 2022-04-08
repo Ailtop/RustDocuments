@@ -34,8 +34,7 @@ public static class AIDesigns
 
 	private static ProtoBuf.AIDesign GetByName(string designName)
 	{
-		ProtoBuf.AIDesign value;
-		designs.TryGetValue(designName, out value);
+		designs.TryGetValue(designName, out var value);
 		if (value != null)
 		{
 			return value;
@@ -47,16 +46,14 @@ public static class AIDesigns
 		}
 		try
 		{
-			using (FileStream stream = File.Open(text, FileMode.Open))
+			using FileStream stream = File.Open(text, FileMode.Open);
+			value = ProtoBuf.AIDesign.Deserialize(stream);
+			if (value == null)
 			{
-				value = ProtoBuf.AIDesign.Deserialize(stream);
-				if (value == null)
-				{
-					return null;
-				}
-				designs.Add(designName, value);
-				return value;
+				return null;
 			}
+			designs.Add(designName, value);
+			return value;
 		}
 		catch (Exception)
 		{

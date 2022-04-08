@@ -31,7 +31,7 @@ public class DungeonBaseLink : MonoBehaviour
 			if (sockets == null)
 			{
 				sockets = new List<DungeonBaseSocket>();
-				GetComponentsInChildren(true, sockets);
+				GetComponentsInChildren(includeInactive: true, sockets);
 			}
 			return sockets;
 		}
@@ -44,7 +44,7 @@ public class DungeonBaseLink : MonoBehaviour
 			if (volumes == null)
 			{
 				volumes = new List<DungeonVolume>();
-				GetComponentsInChildren(true, volumes);
+				GetComponentsInChildren(includeInactive: true, volumes);
 			}
 			return volumes;
 		}

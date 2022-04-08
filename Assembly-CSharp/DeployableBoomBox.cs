@@ -132,7 +132,7 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 			base.UpdateHasPower(inputAmount, inputSlot);
 			if (!IsPowered() && IsOn())
 			{
-				BoxController.ServerTogglePlay(false);
+				BoxController.ServerTogglePlay(play: false);
 			}
 		}
 		else if (IsPowered() && !IsConnectedToAnySlot(this, inputSlot, IOEntity.backtracking))
@@ -148,7 +148,7 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 		BoxController.HurtCallback = HurtCallback;
 		if (IsStatic)
 		{
-			SetFlag(Flags.Reserved8, true);
+			SetFlag(Flags.Reserved8, b: true);
 		}
 	}
 
@@ -230,7 +230,7 @@ public class DeployableBoomBox : ContainerIOEntity, ICassettePlayer, IAudioConne
 		base.Load(info);
 		if (base.isServer && IsStatic)
 		{
-			SetFlag(Flags.Reserved8, true);
+			SetFlag(Flags.Reserved8, b: true);
 		}
 	}
 }

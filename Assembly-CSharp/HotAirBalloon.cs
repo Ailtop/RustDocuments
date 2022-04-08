@@ -190,7 +190,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public bool WaterLogged()
 	{
-		return WaterLevel.Test(engineHeight.position, true, this);
+		return WaterLevel.Test(engineHeight.position, waves: true, this);
 	}
 
 	protected override void OnChildAdded(BaseEntity child)
@@ -239,7 +239,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	[RPC_Server]
@@ -284,7 +284,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			float num = 1f / outsidedecayminutes;
 			if (IsOutside())
 			{
-				Hurt(MaxHealth() * num, DamageType.Decay, this, false);
+				Hurt(MaxHealth() * num, DamageType.Decay, this, useProtection: false);
 			}
 		}
 	}
@@ -312,7 +312,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public void ScheduleOff()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public void UpdateIsGrounded()
@@ -334,7 +334,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		}
 		if (!fuelSystem.HasFuel() || WaterLogged())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 		}
 		if (IsOn())
 		{
@@ -372,7 +372,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			SetFlag(Flags.Reserved1, inflationLevel > 0.3f);
 			SetFlag(Flags.Reserved2, inflationLevel >= 1f);
 			SendNetworkUpdate();
-			float inflationLevel2 = inflationLevel;
+			_ = inflationLevel;
 		}
 		bool flag2 = !myRigidbody.IsSleeping() || inflationLevel > 0f;
 		array = balloonColliders;
@@ -403,13 +403,12 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			myRigidbody.AddForceAtPosition(Vector3.up * (0f - UnityEngine.Physics.gravity.y) * myRigidbody.mass * 0.5f * inflationLevel, buoyancyPoint.position, ForceMode.Force);
 			myRigidbody.AddForceAtPosition(Vector3.up * liftAmount * currentBuoyancy * num2, buoyancyPoint.position, ForceMode.Force);
 			Vector3 windAtPos = GetWindAtPos(buoyancyPoint.position);
-			float magnitude = windAtPos.magnitude;
+			_ = windAtPos.magnitude;
 			float num3 = 1f;
 			float num4 = Mathf.Max(TerrainMeta.HeightMap.GetHeight(buoyancyPoint.position), TerrainMeta.WaterMap.GetHeight(buoyancyPoint.position));
 			float num5 = Mathf.InverseLerp(num4 + 20f, num4 + 60f, buoyancyPoint.position.y);
 			float num6 = 1f;
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.SphereCast(new Ray(base.transform.position + Vector3.up * 2f, Vector3.down), 1.5f, out hitInfo, 5f, 1218511105))
+			if (UnityEngine.Physics.SphereCast(new Ray(base.transform.position + Vector3.up * 2f, Vector3.down), 1.5f, out var hitInfo, 5f, 1218511105))
 			{
 				num6 = Mathf.Clamp01(hitInfo.distance / 5f);
 			}

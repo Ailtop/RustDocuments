@@ -119,9 +119,9 @@ public class CustomDoorManipulator : DoorManipulator
 
 	public override void SetupInitialDoorConnection()
 	{
-		if (entityRef.IsValid(true) && targetDoor == null)
+		if (entityRef.IsValid(serverside: true) && targetDoor == null)
 		{
-			SetTargetDoor(entityRef.Get(true).GetComponent<Door>());
+			SetTargetDoor(entityRef.Get(serverside: true).GetComponent<Door>());
 		}
 	}
 

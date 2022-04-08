@@ -28,7 +28,7 @@ public class HorseSpawner : VehicleSpawner
 			BaseVehicle baseVehicle = SpawnVehicle(objectsToSpawn[0].prefabToSpawn.resourcePath, null);
 			if (spawnForSale)
 			{
-				baseVehicle.SetFlag(Flags.Reserved2, true);
+				baseVehicle.SetFlag(Flags.Reserved2, b: true);
 			}
 		}
 	}

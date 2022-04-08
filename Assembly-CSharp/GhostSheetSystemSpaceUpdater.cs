@@ -23,17 +23,17 @@ public class GhostSheetSystemSpaceUpdater : MonoBehaviour, IClientComponent
 		BaseMountable mounted = player.GetMounted();
 		if (mounted != null)
 		{
-			SetSimulateSpace(mounted.transform, false);
+			SetSimulateSpace(mounted.transform, collisionEnabled: false);
 			return;
 		}
 		BaseEntity parentEntity = player.GetParentEntity();
 		if (parentEntity != null)
 		{
-			SetSimulateSpace(parentEntity.transform, true);
+			SetSimulateSpace(parentEntity.transform, collisionEnabled: true);
 		}
 		else
 		{
-			SetSimulateSpace(null, true);
+			SetSimulateSpace(null, collisionEnabled: true);
 		}
 	}
 

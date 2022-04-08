@@ -232,8 +232,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 				return false;
 			}
 			nextInterval = Random.Range(3f, 6f);
-			Vector3 result;
-			if (!brain.PathFinder.GetBestFleePosition(brain.Navigator, brain.Senses, fleeFromEntity, brain.Events.Memory.Position.Get(4), 50f, 100f, out result))
+			if (!brain.PathFinder.GetBestFleePosition(brain.Navigator, brain.Senses, fleeFromEntity, brain.Events.Memory.Position.Get(4), 50f, 100f, out var result))
 			{
 				return false;
 			}

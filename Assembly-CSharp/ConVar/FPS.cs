@@ -1,43 +1,42 @@
 using UnityEngine;
 
-namespace ConVar
+namespace ConVar;
+
+[Factory("fps")]
+public class FPS : ConsoleSystem
 {
-	[Factory("fps")]
-	public class FPS : ConsoleSystem
+	private static int m_graph;
+
+	[ClientVar(Saved = true)]
+	[ServerVar(Saved = true)]
+	public static int limit
 	{
-		private static int m_graph;
-
-		[ClientVar(Saved = true)]
-		[ServerVar(Saved = true)]
-		public static int limit
+		get
 		{
-			get
-			{
-				return Application.targetFrameRate;
-			}
-			set
-			{
-				Application.targetFrameRate = value;
-			}
+			return Application.targetFrameRate;
 		}
-
-		[ClientVar]
-		public static int graph
+		set
 		{
-			get
+			Application.targetFrameRate = value;
+		}
+	}
+
+	[ClientVar]
+	public static int graph
+	{
+		get
+		{
+			return m_graph;
+		}
+		set
+		{
+			m_graph = value;
+			if ((bool)MainCamera.mainCamera)
 			{
-				return m_graph;
-			}
-			set
-			{
-				m_graph = value;
-				if ((bool)MainCamera.mainCamera)
+				FPSGraph component = MainCamera.mainCamera.GetComponent<FPSGraph>();
+				if ((bool)component)
 				{
-					FPSGraph component = MainCamera.mainCamera.GetComponent<FPSGraph>();
-					if ((bool)component)
-					{
-						component.Refresh();
-					}
+					component.Refresh();
 				}
 			}
 		}

@@ -181,8 +181,7 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 		TreeMarkerData treeMarkerData = PrefabAttribute.server.Find<TreeMarkerData>(prefabID);
 		if (treeMarkerData != null)
 		{
-			Vector3 normal;
-			Vector3 nearbyPoint = treeMarkerData.GetNearbyPoint(base.transform.InverseTransformPoint(vector), ref lastHitMarkerIndex, out normal);
+			Vector3 nearbyPoint = treeMarkerData.GetNearbyPoint(base.transform.InverseTransformPoint(vector), ref lastHitMarkerIndex, out var normal);
 			nearbyPoint = base.transform.TransformPoint(nearbyPoint);
 			Quaternion rot = QuaternionEx.LookRotationNormal(base.transform.TransformDirection(normal));
 			xMarker = GameManager.server.CreateEntity("assets/content/nature/treesprefabs/trees/effects/tree_marking_nospherecast.prefab", nearbyPoint, rot);

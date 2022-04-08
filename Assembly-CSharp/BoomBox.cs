@@ -65,16 +65,14 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		int num = 0;
 		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
 		{
-			DeployableBoomBox deployableBoomBox;
-			HeldBoomBox heldBoomBox;
-			if ((object)(deployableBoomBox = serverEntity as DeployableBoomBox) != null)
+			if (serverEntity is DeployableBoomBox deployableBoomBox)
 			{
 				if (deployableBoomBox.ClearRadioByUserId(uInt))
 				{
 					num++;
 				}
 			}
-			else if ((object)(heldBoomBox = serverEntity as HeldBoomBox) != null && heldBoomBox.ClearRadioByUserId(uInt))
+			else if (serverEntity is HeldBoomBox heldBoomBox && heldBoomBox.ClearRadioByUserId(uInt))
 			{
 				num++;
 			}
@@ -178,7 +176,7 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 			base.baseEntity.ClientRPC(null, "OnRadioIPChanged", CurrentRadioIp);
 			if (IsOn())
 			{
-				ServerTogglePlay(false);
+				ServerTogglePlay(play: false);
 			}
 		}
 	}
@@ -201,7 +199,7 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 			AssignedRadioBy = 0uL;
 			if (HasFlag(BaseEntity.Flags.On))
 			{
-				ServerTogglePlay(false);
+				ServerTogglePlay(play: false);
 			}
 			return true;
 		}
@@ -236,10 +234,9 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		if (!(base.baseEntity == null))
 		{
 			SetFlag(BaseEntity.Flags.On, play);
-			IOEntity iOEntity;
-			if ((object)(iOEntity = base.baseEntity as IOEntity) != null)
+			if (base.baseEntity is IOEntity iOEntity)
 			{
-				iOEntity.SendChangedToRoot(true);
+				iOEntity.SendChangedToRoot(forceUpdate: true);
 				iOEntity.MarkDirtyForceUpdateOutputs();
 			}
 			if (play && !IsInvoking(DeductCondition) && ConditionLossRate > 0f)
@@ -258,9 +255,9 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		if (!(base.baseEntity == null))
 		{
 			base.baseEntity.ClientRPC(null, "Client_OnCassetteInserted", c.net.ID);
-			ServerTogglePlay(false);
+			ServerTogglePlay(play: false);
 			base.baseEntity.SendNetworkUpdate();
-			SetFlag(BaseEntity.Flags.Reserved1, true);
+			SetFlag(BaseEntity.Flags.Reserved1, state: true);
 		}
 	}
 
@@ -269,8 +266,8 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		if (!(base.baseEntity == null))
 		{
 			base.baseEntity.ClientRPC(null, "Client_OnCassetteRemoved");
-			ServerTogglePlay(false);
-			SetFlag(BaseEntity.Flags.Reserved1, false);
+			ServerTogglePlay(play: false);
+			SetFlag(BaseEntity.Flags.Reserved1, state: false);
 		}
 	}
 

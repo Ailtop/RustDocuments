@@ -120,7 +120,7 @@ public class WheelSwitch : IOEntity
 	{
 		if (!IsBeingRotated())
 		{
-			SetFlag(BeingRotated, true);
+			SetFlag(BeingRotated, b: true);
 			rotatorPlayer = msg.player;
 			InvokeRepeating(RotateProgress, 0f, progressTickRate);
 		}
@@ -129,7 +129,7 @@ public class WheelSwitch : IOEntity
 	public void CancelPlayerRotation()
 	{
 		CancelInvoke(RotateProgress);
-		SetFlag(BeingRotated, false);
+		SetFlag(BeingRotated, b: false);
 		IOSlot[] array = outputs;
 		foreach (IOSlot iOSlot in array)
 		{
@@ -176,7 +176,7 @@ public class WheelSwitch : IOEntity
 
 	public void StoppedRotatingCheck()
 	{
-		SetFlag(Flags.Reserved4, false);
+		SetFlag(Flags.Reserved4, b: false);
 	}
 
 	[RPC_Server]

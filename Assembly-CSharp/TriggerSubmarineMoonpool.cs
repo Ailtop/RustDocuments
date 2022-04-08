@@ -14,8 +14,7 @@ public class TriggerSubmarineMoonpool : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		BaseSubmarine baseSubmarine;
-		if (baseEntity.isServer && (object)(baseSubmarine = baseEntity as BaseSubmarine) != null)
+		if (baseEntity.isServer && baseEntity is BaseSubmarine baseSubmarine)
 		{
 			return baseSubmarine.gameObject;
 		}
@@ -25,8 +24,7 @@ public class TriggerSubmarineMoonpool : TriggerBase, IServerComponent
 	internal override void OnEntityEnter(BaseEntity ent)
 	{
 		base.OnEntityEnter(ent);
-		BaseSubmarine baseSubmarine;
-		if ((object)(baseSubmarine = ent as BaseSubmarine) != null)
+		if (ent is BaseSubmarine baseSubmarine)
 		{
 			baseSubmarine.OnSurfacedInMoonpool();
 		}

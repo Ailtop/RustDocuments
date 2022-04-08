@@ -15,8 +15,7 @@ public class TriggerPlayerTimer : TriggerBase
 		if (obj != null)
 		{
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
-			BasePlayer basePlayer;
-			if ((object)(basePlayer = baseEntity as BasePlayer) != null && baseEntity.isServer && !basePlayer.isMounted)
+			if (baseEntity is BasePlayer basePlayer && baseEntity.isServer && !basePlayer.isMounted)
 			{
 				return baseEntity.gameObject;
 			}
@@ -41,8 +40,7 @@ public class TriggerPlayerTimer : TriggerBase
 		bool flag = false;
 		foreach (BaseEntity entityContent in entityContents)
 		{
-			BasePlayer basePlayer;
-			if ((object)(basePlayer = entityContent as BasePlayer) != null && !basePlayer.isMounted)
+			if (entityContent is BasePlayer basePlayer && !basePlayer.isMounted)
 			{
 				flag = true;
 			}

@@ -283,8 +283,7 @@ public class ThrownWeapon : AttackEntity
 		{
 			return;
 		}
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.SphereCast(new Ray(vector, normalized), 0.05f, out hitInfo, 1.5f, 1236478737))
+		if (UnityEngine.Physics.SphereCast(new Ray(vector, normalized), 0.05f, out var hitInfo, 1.5f, 1236478737))
 		{
 			Vector3 point = hitInfo.point;
 			Vector3 normal = hitInfo.normal;

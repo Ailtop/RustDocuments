@@ -38,7 +38,7 @@ public class BiomeVisuals : MonoBehaviour
 		ApplyChoice(selection, Arctic, shouldDestroy);
 		if (selection != null)
 		{
-			selection.SetActive(true);
+			selection.SetActive(value: true);
 		}
 		GameManager.Destroy(this);
 	}
@@ -53,7 +53,7 @@ public class BiomeVisuals : MonoBehaviour
 			}
 			else
 			{
-				target.SetActive(false);
+				target.SetActive(value: false);
 			}
 		}
 	}

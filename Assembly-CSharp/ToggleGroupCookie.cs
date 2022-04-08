@@ -18,7 +18,7 @@ public class ToggleGroupCookie : MonoBehaviour
 				Toggle component = transform.GetComponent<Toggle>();
 				if ((bool)component)
 				{
-					Toggle[] componentsInChildren = GetComponentsInChildren<Toggle>(true);
+					Toggle[] componentsInChildren = GetComponentsInChildren<Toggle>(includeInactive: true);
 					for (int i = 0; i < componentsInChildren.Length; i++)
 					{
 						componentsInChildren[i].isOn = false;
@@ -43,7 +43,7 @@ public class ToggleGroupCookie : MonoBehaviour
 	{
 		if (!Rust.Application.isQuitting)
 		{
-			Toggle[] componentsInChildren = GetComponentsInChildren<Toggle>(true);
+			Toggle[] componentsInChildren = GetComponentsInChildren<Toggle>(includeInactive: true);
 			for (int i = 0; i < componentsInChildren.Length; i++)
 			{
 				componentsInChildren[i].onValueChanged.RemoveListener(OnToggleChanged);
@@ -53,7 +53,7 @@ public class ToggleGroupCookie : MonoBehaviour
 
 	private void SetupListeners()
 	{
-		Toggle[] componentsInChildren = GetComponentsInChildren<Toggle>(true);
+		Toggle[] componentsInChildren = GetComponentsInChildren<Toggle>(includeInactive: true);
 		for (int i = 0; i < componentsInChildren.Length; i++)
 		{
 			componentsInChildren[i].onValueChanged.AddListener(OnToggleChanged);

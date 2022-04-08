@@ -74,8 +74,7 @@ public class RagdollEditor : SingletonComponent<RagdollEditor>
 
 	private void StartGrab()
 	{
-		RaycastHit hitInfo;
-		if (Physics.Raycast(base.transform.position, base.transform.forward, out hitInfo, 100f))
+		if (Physics.Raycast(base.transform.position, base.transform.forward, out var hitInfo, 100f))
 		{
 			grabbedRigid = hitInfo.collider.GetComponent<Rigidbody>();
 			if (!(grabbedRigid == null))

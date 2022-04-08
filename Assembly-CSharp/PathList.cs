@@ -171,8 +171,7 @@ public class PathList
 			int index2 = Mathf.Min(i + 1, positions.Count - 1);
 			Vector3 position = positions[i];
 			Quaternion rotation = Quaternion.LookRotation((positions[index2] - positions[index]).XZ3D());
-			Prefab spawned;
-			SpawnObject(ref seed, prefabs, position, rotation, obj, out spawned, filter);
+			SpawnObject(ref seed, prefabs, position, rotation, obj, out var spawned, filter);
 			if (spawned != null)
 			{
 				obj.Add(spawned);
@@ -620,7 +619,7 @@ public class PathList
 	public void AdjustTerrainHeight()
 	{
 		TerrainHeightMap heightmap = TerrainMeta.HeightMap;
-		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
+		_ = TerrainMeta.TopologyMap;
 		float num = 1f;
 		float randomScale = RandomScale;
 		float outerPadding = OuterPadding;
@@ -868,8 +867,8 @@ public class PathList
 		float randomScale = RandomScale;
 		float meshOffset = MeshOffset;
 		float num5 = Width * 0.5f;
-		int num13 = array[0].vertices.Length;
-		int num14 = array[0].triangles.Length;
+		_ = array[0].vertices.Length;
+		_ = array[0].triangles.Length;
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		for (int k = 0; k < num2; k += num3)
 		{

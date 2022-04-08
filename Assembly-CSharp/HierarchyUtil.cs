@@ -8,8 +8,7 @@ public static class HierarchyUtil
 
 	public static GameObject GetRoot(string strName, bool groupActive = true, bool persistant = false)
 	{
-		GameObject value;
-		if (rootDict.TryGetValue(strName, out value))
+		if (rootDict.TryGetValue(strName, out var value))
 		{
 			if (value != null)
 			{

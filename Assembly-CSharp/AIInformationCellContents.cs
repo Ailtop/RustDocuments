@@ -12,7 +12,7 @@ public class AIInformationCellContents<T> where T : AIPoint
 	public void Init(Bounds cellBounds, GameObject root)
 	{
 		Clear();
-		T[] componentsInChildren = root.GetComponentsInChildren<T>(true);
+		T[] componentsInChildren = root.GetComponentsInChildren<T>(includeInactive: true);
 		foreach (T val in componentsInChildren)
 		{
 			if (cellBounds.Contains(val.gameObject.transform.position))

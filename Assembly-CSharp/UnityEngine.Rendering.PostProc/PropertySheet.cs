@@ -1,36 +1,35 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public sealed class PropertySheet
 {
-	public sealed class PropertySheet
+	public MaterialPropertyBlock properties { get; private set; }
+
+	internal Material material { get; private set; }
+
+	internal PropertySheet(Material material)
 	{
-		public MaterialPropertyBlock properties { get; private set; }
+		this.material = material;
+		properties = new MaterialPropertyBlock();
+	}
 
-		internal Material material { get; private set; }
+	public void ClearKeywords()
+	{
+		material.shaderKeywords = null;
+	}
 
-		internal PropertySheet(Material material)
-		{
-			this.material = material;
-			properties = new MaterialPropertyBlock();
-		}
+	public void EnableKeyword(string keyword)
+	{
+		material.EnableKeyword(keyword);
+	}
 
-		public void ClearKeywords()
-		{
-			material.shaderKeywords = null;
-		}
+	public void DisableKeyword(string keyword)
+	{
+		material.DisableKeyword(keyword);
+	}
 
-		public void EnableKeyword(string keyword)
-		{
-			material.EnableKeyword(keyword);
-		}
-
-		public void DisableKeyword(string keyword)
-		{
-			material.DisableKeyword(keyword);
-		}
-
-		internal void Release()
-		{
-			RuntimeUtilities.Destroy(material);
-			material = null;
-		}
+	internal void Release()
+	{
+		RuntimeUtilities.Destroy(material);
+		material = null;
 	}
 }

@@ -21,7 +21,7 @@ public class CH47ReinforcementListener : BaseEntity
 		CH47HelicopterAIController component = GameManager.server.CreateEntity(heliPrefab.resourcePath).GetComponent<CH47HelicopterAIController>();
 		if ((bool)component)
 		{
-			Vector3 size = TerrainMeta.Size;
+			_ = TerrainMeta.Size;
 			CH47LandingZone closest = CH47LandingZone.GetClosest(base.transform.position);
 			Vector3 zero = Vector3.zero;
 			zero.y = closest.transform.position.y;

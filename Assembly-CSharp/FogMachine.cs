@@ -39,7 +39,7 @@ public class FogMachine : StorageContainer
 	{
 		if (!IsEmitting() && !IsOn() && HasFuel() && msg.player.CanBuild())
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			InvokeRepeating(StartFogging, 0f, fogLength - 1f);
 		}
 	}
@@ -51,7 +51,7 @@ public class FogMachine : StorageContainer
 		if (IsOn() && msg.player.CanBuild())
 		{
 			CancelInvoke(StartFogging);
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class FogMachine : StorageContainer
 			SetFlag(Flags.Reserved7, flag);
 			if (flag)
 			{
-				SetFlag(Flags.On, false);
+				SetFlag(Flags.On, b: false);
 			}
 			UpdateMotionMode();
 		}
@@ -85,7 +85,7 @@ public class FogMachine : StorageContainer
 
 	public void CheckTrigger()
 	{
-		if (!IsEmitting() && BasePlayer.AnyPlayersVisibleToEntity(base.transform.position + base.transform.forward * 3f, 3f, this, base.transform.position + Vector3.up * 0.1f, true))
+		if (!IsEmitting() && BasePlayer.AnyPlayersVisibleToEntity(base.transform.position + base.transform.forward * 3f, 3f, this, base.transform.position + Vector3.up * 0.1f, ignorePlayersWithPriv: true))
 		{
 			StartFogging();
 		}
@@ -96,10 +96,10 @@ public class FogMachine : StorageContainer
 		if (!UseFuel(1f))
 		{
 			CancelInvoke(StartFogging);
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			return;
 		}
-		SetFlag(Flags.Reserved6, true);
+		SetFlag(Flags.Reserved6, b: true);
 		Invoke(EnableFogField, 1f);
 		Invoke(DisableNozzle, nozzleBlastDuration);
 		Invoke(FinishFogging, fogLength);
@@ -107,24 +107,24 @@ public class FogMachine : StorageContainer
 
 	public virtual void EnableFogField()
 	{
-		SetFlag(Flags.Reserved8, true);
+		SetFlag(Flags.Reserved8, b: true);
 	}
 
 	public void DisableNozzle()
 	{
-		SetFlag(Flags.Reserved6, false);
+		SetFlag(Flags.Reserved6, b: false);
 	}
 
 	public virtual void FinishFogging()
 	{
-		SetFlag(Flags.Reserved8, false);
+		SetFlag(Flags.Reserved8, b: false);
 	}
 
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SetFlag(Flags.Reserved8, false);
-		SetFlag(Flags.Reserved6, false);
+		SetFlag(Flags.Reserved8, b: false);
+		SetFlag(Flags.Reserved6, b: false);
 		SetFlag(Flags.Reserved5, HasFuel());
 		if (IsOn())
 		{

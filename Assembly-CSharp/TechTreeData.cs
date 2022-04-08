@@ -53,8 +53,7 @@ public class TechTreeData : ScriptableObject
 			{
 				_idToNode = nodes.ToDictionary((NodeInstance n) => n.id, (NodeInstance n) => n);
 			}
-			NodeInstance value;
-			_idToNode.TryGetValue(id, out value);
+			_idToNode.TryGetValue(id, out var value);
 			return value;
 		}
 		_idToNode = null;

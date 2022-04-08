@@ -66,9 +66,7 @@ public class Sprinkler : IOEntity
 				{
 					foreach (BaseEntity item in obj)
 					{
-						ISplashable splashable;
-						IOEntity entity;
-						if (!item.isClient && (splashable = item as ISplashable) != null && !cachedSplashables.Contains(splashable) && splashable.WantsSplash(currentFuelType, num) && item.IsVisible(position) && ((object)(entity = item as IOEntity) == null || !IsConnectedTo(entity, IOEntity.backtracking)))
+						if (!item.isClient && item is ISplashable splashable && !cachedSplashables.Contains(splashable) && splashable.WantsSplash(currentFuelType, num) && item.IsVisible(position) && (!(item is IOEntity entity) || !IsConnectedTo(entity, IOEntity.backtracking)))
 						{
 							cachedSplashables.Add(splashable);
 						}
@@ -116,7 +114,7 @@ public class Sprinkler : IOEntity
 	{
 		if (!IsOn())
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			forceUpdateSplashables = true;
 			if (!IsInvoking(DoSplash))
 			{
@@ -129,7 +127,7 @@ public class Sprinkler : IOEntity
 	{
 		if (IsOn())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			if (IsInvoking(DoSplash))
 			{
 				CancelInvoke(DoSplash);
@@ -151,7 +149,7 @@ public class Sprinkler : IOEntity
 		base.Load(info);
 		if (info.fromDisk)
 		{
-			SetFlag(Flags.On, false, false, false);
+			SetFlag(Flags.On, b: false, recursive: false, networkupdate: false);
 		}
 	}
 }

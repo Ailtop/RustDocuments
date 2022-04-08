@@ -4,7 +4,7 @@ public static class AssetStorage
 {
 	public static void Save<T>(ref T asset, string path) where T : Object
 	{
-		bool flag = (bool)(Object)asset;
+		_ = (bool)(Object)asset;
 	}
 
 	public static void Save(ref Texture2D asset)
@@ -13,7 +13,7 @@ public static class AssetStorage
 
 	public static void Save(ref Texture2D asset, string path, bool linear, bool compress)
 	{
-		bool flag = (bool)asset;
+		_ = (bool)asset;
 	}
 
 	public static void Load<T>(ref T asset, string path) where T : Object

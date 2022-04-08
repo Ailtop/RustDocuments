@@ -364,174 +364,172 @@ public class BaseMelee : AttackEntity
 		}
 		using (TimeWarning.New("PlayerAttack", 50))
 		{
-			using (PlayerAttack playerAttack = ProtoBuf.PlayerAttack.Deserialize(msg.read))
+			using PlayerAttack playerAttack = ProtoBuf.PlayerAttack.Deserialize(msg.read);
+			if (playerAttack == null)
 			{
-				if (playerAttack == null)
+				return;
+			}
+			HitInfo hitInfo = Facepunch.Pool.Get<HitInfo>();
+			hitInfo.LoadFromAttack(playerAttack.attack, serverSide: true);
+			hitInfo.Initiator = player;
+			hitInfo.Weapon = this;
+			hitInfo.WeaponPrefab = this;
+			hitInfo.Predicted = msg.connection;
+			hitInfo.damageProperties = damageProperties;
+			if (Interface.CallHook("OnMeleeAttack", player, hitInfo) != null)
+			{
+				return;
+			}
+			if (hitInfo.IsNaNOrInfinity())
+			{
+				string shortPrefabName = base.ShortPrefabName;
+				AntiHack.Log(player, AntiHackType.MeleeHack, "Contains NaN (" + shortPrefabName + ")");
+				player.stats.combat.Log(hitInfo, "melee_nan");
+				return;
+			}
+			BaseEntity hitEntity = hitInfo.HitEntity;
+			BasePlayer basePlayer = hitInfo.HitEntity as BasePlayer;
+			bool flag = basePlayer != null;
+			bool flag2 = flag && basePlayer.IsSleeping();
+			bool flag3 = flag && basePlayer.IsWounded();
+			bool flag4 = flag && basePlayer.isMounted;
+			bool flag5 = flag && basePlayer.HasParent();
+			bool flag6 = hitEntity != null;
+			bool flag7 = flag6 && hitEntity.IsNpc;
+			if (ConVar.AntiHack.melee_protection > 0)
+			{
+				bool flag8 = true;
+				float num = 1f + ConVar.AntiHack.melee_forgiveness;
+				float melee_clientframes = ConVar.AntiHack.melee_clientframes;
+				float melee_serverframes = ConVar.AntiHack.melee_serverframes;
+				float num2 = melee_clientframes / 60f;
+				float num3 = melee_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
+				float num4 = (player.desyncTimeClamped + num2 + num3) * num;
+				int layerMask = (ConVar.AntiHack.melee_terraincheck ? 10551296 : 2162688);
+				if (flag && hitInfo.boneArea == (HitArea)(-1))
 				{
-					return;
+					string shortPrefabName2 = base.ShortPrefabName;
+					string shortPrefabName3 = basePlayer.ShortPrefabName;
+					AntiHack.Log(player, AntiHackType.MeleeHack, "Bone is invalid  (" + shortPrefabName2 + " on " + shortPrefabName3 + " bone " + hitInfo.HitBone + ")");
+					player.stats.combat.Log(hitInfo, "melee_bone");
+					flag8 = false;
 				}
-				HitInfo hitInfo = Facepunch.Pool.Get<HitInfo>();
-				hitInfo.LoadFromAttack(playerAttack.attack, true);
-				hitInfo.Initiator = player;
-				hitInfo.Weapon = this;
-				hitInfo.WeaponPrefab = this;
-				hitInfo.Predicted = msg.connection;
-				hitInfo.damageProperties = damageProperties;
-				if (Interface.CallHook("OnMeleeAttack", player, hitInfo) != null)
+				if (ConVar.AntiHack.melee_protection >= 2)
 				{
-					return;
-				}
-				if (hitInfo.IsNaNOrInfinity())
-				{
-					string shortPrefabName = base.ShortPrefabName;
-					AntiHack.Log(player, AntiHackType.MeleeHack, "Contains NaN (" + shortPrefabName + ")");
-					player.stats.combat.Log(hitInfo, "melee_nan");
-					return;
-				}
-				BaseEntity hitEntity = hitInfo.HitEntity;
-				BasePlayer basePlayer = hitInfo.HitEntity as BasePlayer;
-				bool flag = basePlayer != null;
-				bool flag2 = flag && basePlayer.IsSleeping();
-				bool flag3 = flag && basePlayer.IsWounded();
-				bool flag4 = flag && basePlayer.isMounted;
-				bool flag5 = flag && basePlayer.HasParent();
-				bool flag6 = hitEntity != null;
-				bool flag7 = flag6 && hitEntity.IsNpc;
-				if (ConVar.AntiHack.melee_protection > 0)
-				{
-					bool flag8 = true;
-					float num = 1f + ConVar.AntiHack.melee_forgiveness;
-					float melee_clientframes = ConVar.AntiHack.melee_clientframes;
-					float melee_serverframes = ConVar.AntiHack.melee_serverframes;
-					float num2 = melee_clientframes / 60f;
-					float num3 = melee_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
-					float num4 = (player.desyncTimeClamped + num2 + num3) * num;
-					int layerMask = (ConVar.AntiHack.melee_terraincheck ? 10551296 : 2162688);
-					if (flag && hitInfo.boneArea == (HitArea)(-1))
+					if (flag6)
 					{
-						string shortPrefabName2 = base.ShortPrefabName;
-						string shortPrefabName3 = basePlayer.ShortPrefabName;
-						AntiHack.Log(player, AntiHackType.MeleeHack, "Bone is invalid  (" + shortPrefabName2 + " on " + shortPrefabName3 + " bone " + hitInfo.HitBone + ")");
-						player.stats.combat.Log(hitInfo, "melee_bone");
-						flag8 = false;
-					}
-					if (ConVar.AntiHack.melee_protection >= 2)
-					{
-						if (flag6)
+						float num5 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
+						float num6 = hitEntity.BoundsPadding() + num4 * num5;
+						float num7 = hitEntity.Distance(hitInfo.HitPositionWorld);
+						if (num7 > num6)
 						{
-							float num5 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
-							float num6 = hitEntity.BoundsPadding() + num4 * num5;
-							float num7 = hitEntity.Distance(hitInfo.HitPositionWorld);
-							if (num7 > num6)
-							{
-								string shortPrefabName4 = base.ShortPrefabName;
-								string shortPrefabName5 = hitEntity.ShortPrefabName;
-								AntiHack.Log(player, AntiHackType.MeleeHack, "Entity too far away (" + shortPrefabName4 + " on " + shortPrefabName5 + " with " + num7 + "m > " + num6 + "m in " + num4 + "s)");
-								player.stats.combat.Log(hitInfo, "melee_target");
-								flag8 = false;
-							}
-						}
-						if (ConVar.AntiHack.melee_protection >= 4 && flag8 && flag && !flag7 && !flag2 && !flag3 && !flag4 && !flag5)
-						{
-							float magnitude = basePlayer.GetParentVelocity().magnitude;
-							float num8 = basePlayer.BoundsPadding() + num4 * magnitude + ConVar.AntiHack.tickhistoryforgiveness;
-							float num9 = basePlayer.tickHistory.Distance(basePlayer, hitInfo.HitPositionWorld);
-							if (num9 > num8)
-							{
-								string shortPrefabName6 = base.ShortPrefabName;
-								string shortPrefabName7 = basePlayer.ShortPrefabName;
-								AntiHack.Log(player, AntiHackType.ProjectileHack, "Player too far away (" + shortPrefabName6 + " on " + shortPrefabName7 + " with " + num9 + "m > " + num8 + "m in " + num4 + "s)");
-								player.stats.combat.Log(hitInfo, "player_distance");
-								flag8 = false;
-							}
+							string shortPrefabName4 = base.ShortPrefabName;
+							string shortPrefabName5 = hitEntity.ShortPrefabName;
+							AntiHack.Log(player, AntiHackType.MeleeHack, "Entity too far away (" + shortPrefabName4 + " on " + shortPrefabName5 + " with " + num7 + "m > " + num6 + "m in " + num4 + "s)");
+							player.stats.combat.Log(hitInfo, "melee_target");
+							flag8 = false;
 						}
 					}
-					if (ConVar.AntiHack.melee_protection >= 1)
+					if (ConVar.AntiHack.melee_protection >= 4 && flag8 && flag && !flag7 && !flag2 && !flag3 && !flag4 && !flag5)
 					{
-						if (ConVar.AntiHack.melee_protection >= 4)
+						float magnitude = basePlayer.GetParentVelocity().magnitude;
+						float num8 = basePlayer.BoundsPadding() + num4 * magnitude + ConVar.AntiHack.tickhistoryforgiveness;
+						float num9 = basePlayer.tickHistory.Distance(basePlayer, hitInfo.HitPositionWorld);
+						if (num9 > num8)
 						{
-							float magnitude2 = player.GetParentVelocity().magnitude;
-							float num10 = player.BoundsPadding() + num4 * magnitude2 + num * maxDistance;
-							float num11 = player.tickHistory.Distance(player, hitInfo.HitPositionWorld);
-							if (num11 > num10)
-							{
-								string shortPrefabName8 = base.ShortPrefabName;
-								string text = (flag6 ? hitEntity.ShortPrefabName : "world");
-								AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName8 + " on " + text + " with " + num11 + "m > " + num10 + "m in " + num4 + "s)");
-								player.stats.combat.Log(hitInfo, "melee_initiator");
-								flag8 = false;
-							}
+							string shortPrefabName6 = base.ShortPrefabName;
+							string shortPrefabName7 = basePlayer.ShortPrefabName;
+							AntiHack.Log(player, AntiHackType.ProjectileHack, "Player too far away (" + shortPrefabName6 + " on " + shortPrefabName7 + " with " + num9 + "m > " + num8 + "m in " + num4 + "s)");
+							player.stats.combat.Log(hitInfo, "player_distance");
+							flag8 = false;
+						}
+					}
+				}
+				if (ConVar.AntiHack.melee_protection >= 1)
+				{
+					if (ConVar.AntiHack.melee_protection >= 4)
+					{
+						float magnitude2 = player.GetParentVelocity().magnitude;
+						float num10 = player.BoundsPadding() + num4 * magnitude2 + num * maxDistance;
+						float num11 = player.tickHistory.Distance(player, hitInfo.HitPositionWorld);
+						if (num11 > num10)
+						{
+							string shortPrefabName8 = base.ShortPrefabName;
+							string text = (flag6 ? hitEntity.ShortPrefabName : "world");
+							AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName8 + " on " + text + " with " + num11 + "m > " + num10 + "m in " + num4 + "s)");
+							player.stats.combat.Log(hitInfo, "melee_initiator");
+							flag8 = false;
+						}
+					}
+					else
+					{
+						float num12 = player.MaxVelocity() + player.GetParentVelocity().magnitude;
+						float num13 = player.BoundsPadding() + num4 * num12 + num * maxDistance;
+						float num14 = player.Distance(hitInfo.HitPositionWorld);
+						if (num14 > num13)
+						{
+							string shortPrefabName9 = base.ShortPrefabName;
+							string text2 = (flag6 ? hitEntity.ShortPrefabName : "world");
+							AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName9 + " on " + text2 + " with " + num14 + "m > " + num13 + "m in " + num4 + "s)");
+							player.stats.combat.Log(hitInfo, "melee_initiator");
+							flag8 = false;
+						}
+					}
+				}
+				if (ConVar.AntiHack.melee_protection >= 3)
+				{
+					if (flag6)
+					{
+						Vector3 pointStart = hitInfo.PointStart;
+						Vector3 vector = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
+						Vector3 center = player.eyes.center;
+						Vector3 position = player.eyes.position;
+						Vector3 vector2 = pointStart;
+						Vector3 vector3 = hitInfo.PositionOnRay(vector);
+						Vector3 vector4 = vector;
+						bool num15 = GamePhysics.LineOfSight(center, position, vector2, vector3, vector4, layerMask);
+						if (!num15)
+						{
+							player.stats.Add("hit_" + hitEntity.Categorize() + "_indirect_los", 1, Stats.Server);
 						}
 						else
 						{
-							float num12 = player.MaxVelocity() + player.GetParentVelocity().magnitude;
-							float num13 = player.BoundsPadding() + num4 * num12 + num * maxDistance;
-							float num14 = player.Distance(hitInfo.HitPositionWorld);
-							if (num14 > num13)
-							{
-								string shortPrefabName9 = base.ShortPrefabName;
-								string text2 = (flag6 ? hitEntity.ShortPrefabName : "world");
-								AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName9 + " on " + text2 + " with " + num14 + "m > " + num13 + "m in " + num4 + "s)");
-								player.stats.combat.Log(hitInfo, "melee_initiator");
-								flag8 = false;
-							}
+							player.stats.Add("hit_" + hitEntity.Categorize() + "_direct_los", 1, Stats.Server);
+						}
+						if (!num15)
+						{
+							string shortPrefabName10 = base.ShortPrefabName;
+							string shortPrefabName11 = hitEntity.ShortPrefabName;
+							AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName10, " on ", shortPrefabName11, ") ", center, " ", position, " ", vector2, " ", vector3, " ", vector4));
+							player.stats.combat.Log(hitInfo, "melee_los");
+							flag8 = false;
 						}
 					}
-					if (ConVar.AntiHack.melee_protection >= 3)
+					if (flag8 && flag && !flag7)
 					{
-						if (flag6)
+						Vector3 vector5 = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
+						Vector3 position2 = basePlayer.eyes.position;
+						Vector3 vector6 = basePlayer.CenterPoint();
+						if ((!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(position2, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)) && (!GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(vector6, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)))
 						{
-							Vector3 pointStart = hitInfo.PointStart;
-							Vector3 vector = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
-							Vector3 center = player.eyes.center;
-							Vector3 position = player.eyes.position;
-							Vector3 vector2 = pointStart;
-							Vector3 vector3 = hitInfo.PositionOnRay(vector);
-							Vector3 vector4 = vector;
-							bool num15 = GamePhysics.LineOfSight(center, position, vector2, vector3, vector4, layerMask);
-							if (!num15)
-							{
-								player.stats.Add("hit_" + hitEntity.Categorize() + "_indirect_los", 1, Stats.Server);
-							}
-							else
-							{
-								player.stats.Add("hit_" + hitEntity.Categorize() + "_direct_los", 1, Stats.Server);
-							}
-							if (!num15)
-							{
-								string shortPrefabName10 = base.ShortPrefabName;
-								string shortPrefabName11 = hitEntity.ShortPrefabName;
-								AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName10, " on ", shortPrefabName11, ") ", center, " ", position, " ", vector2, " ", vector3, " ", vector4));
-								player.stats.combat.Log(hitInfo, "melee_los");
-								flag8 = false;
-							}
+							string shortPrefabName12 = base.ShortPrefabName;
+							string shortPrefabName13 = basePlayer.ShortPrefabName;
+							AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName12, " on ", shortPrefabName13, ") ", vector5, " ", position2, " or ", vector5, " ", vector6));
+							player.stats.combat.Log(hitInfo, "melee_los");
+							flag8 = false;
 						}
-						if (flag8 && flag && !flag7)
-						{
-							Vector3 vector5 = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
-							Vector3 position2 = basePlayer.eyes.position;
-							Vector3 vector6 = basePlayer.CenterPoint();
-							if ((!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(position2, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)) && (!GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(vector6, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)))
-							{
-								string shortPrefabName12 = base.ShortPrefabName;
-								string shortPrefabName13 = basePlayer.ShortPrefabName;
-								AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName12, " on ", shortPrefabName13, ") ", vector5, " ", position2, " or ", vector5, " ", vector6));
-								player.stats.combat.Log(hitInfo, "melee_los");
-								flag8 = false;
-							}
-						}
-					}
-					if (!flag8)
-					{
-						AntiHack.AddViolation(player, AntiHackType.MeleeHack, ConVar.AntiHack.melee_penalty);
-						return;
 					}
 				}
-				player.metabolism.UseHeart(heartStress * 0.2f);
-				using (TimeWarning.New("DoAttackShared", 50))
+				if (!flag8)
 				{
-					DoAttackShared(hitInfo);
+					AntiHack.AddViolation(player, AntiHackType.MeleeHack, ConVar.AntiHack.melee_penalty);
+					return;
 				}
+			}
+			player.metabolism.UseHeart(heartStress * 0.2f);
+			using (TimeWarning.New("DoAttackShared", 50))
+			{
+				DoAttackShared(hitInfo);
 			}
 		}
 	}

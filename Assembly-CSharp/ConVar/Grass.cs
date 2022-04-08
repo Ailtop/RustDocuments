@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("grass")]
+public class Grass : ConsoleSystem
 {
-	[Factory("grass")]
-	public class Grass : ConsoleSystem
-	{
-	}
 }

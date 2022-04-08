@@ -45,7 +45,7 @@ public class ItemModEntity : ItemMod
 		{
 			baseEntity = item.parentItem.GetHeldEntity();
 		}
-		ourEntity.SetFlag(BaseEntity.Flags.Disabled, false);
+		ourEntity.SetFlag(BaseEntity.Flags.Disabled, b: false);
 		ourEntity.limitNetworking = false;
 		ourEntity.SetParent(baseEntity, defaultBone);
 		return true;
@@ -75,7 +75,7 @@ public class ItemModEntity : ItemMod
 		{
 			heldEntity.SetParent(null);
 			heldEntity.limitNetworking = true;
-			heldEntity.SetFlag(BaseEntity.Flags.Disabled, true);
+			heldEntity.SetFlag(BaseEntity.Flags.Disabled, b: true);
 		}
 	}
 

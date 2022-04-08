@@ -20,20 +20,14 @@ public class Gib : ListComponent<Gib>
 
 	public static string GetEffect(PhysicMaterial physicMaterial)
 	{
-		switch (AssetNameCache.GetNameLower(physicMaterial))
+		return AssetNameCache.GetNameLower(physicMaterial) switch
 		{
-		case "wood":
-			return "assets/bundled/prefabs/fx/building/wood_gib.prefab";
-		case "concrete":
-			return "assets/bundled/prefabs/fx/building/stone_gib.prefab";
-		case "metal":
-			return "assets/bundled/prefabs/fx/building/metal_sheet_gib.prefab";
-		case "rock":
-			return "assets/bundled/prefabs/fx/building/stone_gib.prefab";
-		case "flesh":
-			return "assets/bundled/prefabs/fx/building/wood_gib.prefab";
-		default:
-			return "assets/bundled/prefabs/fx/building/wood_gib.prefab";
-		}
+			"wood" => "assets/bundled/prefabs/fx/building/wood_gib.prefab", 
+			"concrete" => "assets/bundled/prefabs/fx/building/stone_gib.prefab", 
+			"metal" => "assets/bundled/prefabs/fx/building/metal_sheet_gib.prefab", 
+			"rock" => "assets/bundled/prefabs/fx/building/stone_gib.prefab", 
+			"flesh" => "assets/bundled/prefabs/fx/building/wood_gib.prefab", 
+			_ => "assets/bundled/prefabs/fx/building/wood_gib.prefab", 
+		};
 	}
 }

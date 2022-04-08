@@ -35,8 +35,7 @@ public class AddToWaterMap : ProceduralObject
 					float normX = TerrainMeta.WaterMap.Coordinate(l);
 					Vector3 origin = new Vector3(TerrainMeta.DenormalizeX(normX), bounds.max.y + 1f, TerrainMeta.DenormalizeZ(normZ));
 					Ray ray = new Ray(origin, Vector3.down);
-					RaycastHit hitInfo;
-					if (component.Raycast(ray, out hitInfo, bounds.size.y + 1f + 1f))
+					if (component.Raycast(ray, out var hitInfo, bounds.size.y + 1f + 1f))
 					{
 						float num6 = TerrainMeta.NormalizeY(hitInfo.point.y);
 						float height2 = TerrainMeta.WaterMap.GetHeight01(l, k);

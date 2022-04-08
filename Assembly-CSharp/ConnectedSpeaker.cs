@@ -65,8 +65,7 @@ public class ConnectedSpeaker : IOEntity
 			{
 				return null;
 			}
-			IAudioConnectionSource result;
-			if (iOEntity != null && (result = iOEntity as IAudioConnectionSource) != null)
+			if (iOEntity != null && iOEntity is IAudioConnectionSource result)
 			{
 				return result;
 			}

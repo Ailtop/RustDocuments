@@ -184,7 +184,7 @@ public class VertexColorStream : MonoBehaviour
 
 	public void unlink()
 	{
-		init(paintedMesh, false);
+		init(paintedMesh, destroyOld: false);
 	}
 
 	public void rebuild()
@@ -217,7 +217,7 @@ public class VertexColorStream : MonoBehaviour
 			paintedMesh.uv3 = _uv3;
 			paintedMesh.colors = _colors;
 			paintedMesh.uv4 = _uv4;
-			init(paintedMesh, true);
+			init(paintedMesh, destroyOld: true);
 		}
 		else
 		{
@@ -237,7 +237,7 @@ public class VertexColorStream : MonoBehaviour
 			paintedMesh.uv3 = meshHold._uv3;
 			paintedMesh.colors = meshHold._colors;
 			paintedMesh.uv4 = meshHold._uv4;
-			init(paintedMesh, true);
+			init(paintedMesh, destroyOld: true);
 		}
 	}
 

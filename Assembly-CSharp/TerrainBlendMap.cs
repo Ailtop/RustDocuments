@@ -46,7 +46,7 @@ public class TerrainBlendMap : TerrainMap<byte>
 
 	public void GenerateTextures()
 	{
-		BlendTexture = new Texture2D(res, res, TextureFormat.Alpha8, true, true);
+		BlendTexture = new Texture2D(res, res, TextureFormat.Alpha8, mipChain: true, linear: true);
 		BlendTexture.name = "BlendTexture";
 		BlendTexture.wrapMode = TextureWrapMode.Clamp;
 		Color32[] col = new Color32[res * res];
@@ -63,9 +63,9 @@ public class TerrainBlendMap : TerrainMap<byte>
 
 	public void ApplyTextures()
 	{
-		BlendTexture.Apply(true, false);
-		BlendTexture.Compress(false);
-		BlendTexture.Apply(false, true);
+		BlendTexture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+		BlendTexture.Compress(highQuality: false);
+		BlendTexture.Apply(updateMipmaps: false, makeNoLongerReadable: true);
 	}
 
 	public float GetAlpha(Vector3 worldPos)

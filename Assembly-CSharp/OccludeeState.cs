@@ -85,7 +85,7 @@ public class OccludeeState : OcclusionCulling.SmartListValue
 		states.array[slot].isVisible = 1;
 		if (onVisibilityChanged != null)
 		{
-			onVisibilityChanged(true);
+			onVisibilityChanged(visible: true);
 		}
 	}
 }

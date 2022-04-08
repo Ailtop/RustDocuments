@@ -128,7 +128,7 @@ public class PieMenu : UIBehaviour
 		canvasGroup.blocksRaycasts = false;
 		IsOpen = false;
 		isClosing = true;
-		GameObjectEx.SetChildComponentsEnabled<TMP_Text>(base.gameObject, false);
+		GameObjectEx.SetChildComponentsEnabled<TMP_Text>(base.gameObject, enabled: false);
 	}
 
 	public void Clear()
@@ -149,7 +149,7 @@ public class PieMenu : UIBehaviour
 		isClosing = false;
 		SetDefaultOption();
 		Rebuild();
-		UpdateInteraction(false);
+		UpdateInteraction(allowLerp: false);
 		PlayOpenSound();
 		LeanTween.cancel(base.gameObject);
 		LeanTween.cancel(scaleTarget);
@@ -157,7 +157,7 @@ public class PieMenu : UIBehaviour
 		LeanTween.alphaCanvas(GetComponent<CanvasGroup>(), 1f, 0.1f).setEase(LeanTweenType.easeOutCirc);
 		scaleTarget.transform.localScale = Vector3.one * 1.5f;
 		LeanTween.scale(scaleTarget, Vector3.one, 0.1f).setEase(LeanTweenType.easeOutBounce);
-		GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, true);
+		GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, enabled: true);
 	}
 
 	protected override void OnEnable()
@@ -208,7 +208,7 @@ public class PieMenu : UIBehaviour
 			LeanTween.cancel(scaleTarget);
 			LeanTween.alphaCanvas(GetComponent<CanvasGroup>(), 0f, 0.2f).setEase(LeanTweenType.easeOutCirc);
 			LeanTween.scale(scaleTarget, Vector3.one * (success ? 1.5f : 0.5f), 0.2f).setEase(LeanTweenType.easeOutCirc);
-			GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, false);
+			GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, enabled: false);
 			IsOpen = false;
 		}
 	}
@@ -238,7 +238,7 @@ public class PieMenu : UIBehaviour
 		{
 			if (UnityEngine.Application.isPlaying)
 			{
-				GameManager.DestroyImmediate(optionsCanvas.transform.GetChild(0).gameObject, true);
+				GameManager.DestroyImmediate(optionsCanvas.transform.GetChild(0).gameObject, allowDestroyingAssets: true);
 			}
 			else
 			{
@@ -275,7 +275,7 @@ public class PieMenu : UIBehaviour
 				float num8 = (options[j].wantsMerge ? 0.8f : 1f);
 				float num9 = (options[j].wantsMerge ? num5 : num6);
 				GameObject gameObject = Facepunch.Instantiate.GameObject(pieOptionPrefab);
-				gameObject.transform.SetParent(optionsCanvas.transform, false);
+				gameObject.transform.SetParent(optionsCanvas.transform, worldPositionStays: false);
 				options[j].option = gameObject.GetComponent<PieOption>();
 				options[j].option.UpdateOption(num7, num9, sliceGaps, options[j].name, outerSize, innerSize, num8 * iconSize, options[j].sprite);
 				num7 += num9;

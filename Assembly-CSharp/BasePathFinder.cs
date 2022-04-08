@@ -56,8 +56,7 @@ public class BasePathFinder
 		for (float num4 = 0f; num4 < 360f; num4 += 90f)
 		{
 			Vector3 pointOnCircle = GetPointOnCircle(navigator.transform.position, radius, num4 + num3);
-			Vector3 position;
-			if (navigator.GetNearestNavmeshPosition(pointOnCircle, out position, 10f) && navigator.IsAcceptableWaterDepth(position))
+			if (navigator.GetNearestNavmeshPosition(pointOnCircle, out var position, 10f) && navigator.IsAcceptableWaterDepth(position))
 			{
 				topologySamples[num] = position;
 				num++;
@@ -124,8 +123,7 @@ public class BasePathFinder
 		result = navigator.transform.position;
 		Vector3 vector = Quaternion.Euler(0f, offsetDegrees, 0f) * dirFromThreat;
 		Vector3 target = navigator.transform.position + vector * UnityEngine.Random.Range(minRange, maxRange);
-		Vector3 position;
-		if (!navigator.GetNearestNavmeshPosition(target, out position, 20f))
+		if (!navigator.GetNearestNavmeshPosition(target, out var position, 20f))
 		{
 			return false;
 		}

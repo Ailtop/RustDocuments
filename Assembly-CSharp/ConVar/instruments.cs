@@ -1,8 +1,7 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("instruments")]
+public class instruments : ConsoleSystem
 {
-	[Factory("instruments")]
-	public class instruments : ConsoleSystem
-	{
-		public const string InstrumentsFolder = "instruments";
-	}
+	public const string InstrumentsFolder = "instruments";
 }

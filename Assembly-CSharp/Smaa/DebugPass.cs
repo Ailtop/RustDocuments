@@ -1,9 +1,8 @@
-namespace Smaa
+namespace Smaa;
+
+public enum DebugPass
 {
-	public enum DebugPass
-	{
-		Off = 0,
-		Edges = 1,
-		Weights = 2
-	}
+	Off = 0,
+	Edges = 1,
+	Weights = 2
 }

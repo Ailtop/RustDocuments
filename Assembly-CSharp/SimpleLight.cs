@@ -3,7 +3,7 @@ public class SimpleLight : IOEntity
 	public override void ResetIOState()
 	{
 		base.ResetIOState();
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public override void IOStateChanged(int inputAmount, int inputSlot)

@@ -15,15 +15,15 @@ public class TimedUnlootableCrate : LootContainer
 
 	public void SetUnlootableFor(float duration)
 	{
-		SetFlag(Flags.OnFire, true);
-		SetFlag(Flags.Locked, true);
+		SetFlag(Flags.OnFire, b: true);
+		SetFlag(Flags.Locked, b: true);
 		unlootableDuration = duration;
 		Invoke(MakeLootable, duration);
 	}
 
 	public void MakeLootable()
 	{
-		SetFlag(Flags.OnFire, false);
-		SetFlag(Flags.Locked, false);
+		SetFlag(Flags.OnFire, b: false);
+		SetFlag(Flags.Locked, b: false);
 	}
 }

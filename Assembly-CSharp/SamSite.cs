@@ -264,7 +264,7 @@ public class SamSite : ContainerIOEntity
 	{
 		lifestate = LifeState.Alive;
 		base.health = startHealth;
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 	}
 
 	public override void Die(HitInfo info = null)
@@ -277,7 +277,7 @@ public class SamSite : ContainerIOEntity
 			Invoke(SelfHeal, staticrepairseconds);
 			lifestate = LifeState.Dead;
 			base.health = 0f;
-			SetFlag(Flags.Reserved1, true);
+			SetFlag(Flags.Reserved1, b: true);
 		}
 		else
 		{
@@ -376,9 +376,9 @@ public class SamSite : ContainerIOEntity
 		{
 			if (!IsInDefenderMode())
 			{
-				_003CTargetScan_003Eg__AddTargetSet_007C55_0(obj, 32768, targetTypeVehicle.scanRadius);
+				AddTargetSet(obj, 32768, targetTypeVehicle.scanRadius);
 			}
-			_003CTargetScan_003Eg__AddTargetSet_007C55_0(obj, 1048576, targetTypeMissile.scanRadius);
+			AddTargetSet(obj, 1048576, targetTypeMissile.scanRadius);
 		}
 		ISamSiteTarget samSiteTarget = null;
 		foreach (ISamSiteTarget item in obj)
@@ -406,6 +406,13 @@ public class SamSite : ContainerIOEntity
 		else
 		{
 			InvokeRandomized(WeaponTick, 0f, 0.5f, 0.2f);
+		}
+		void AddTargetSet(List<ISamSiteTarget> allTargets, int layerMask, float scanRadius)
+		{
+			List<ISamSiteTarget> obj2 = Facepunch.Pool.GetList<ISamSiteTarget>();
+			Vis.Entities(eyePoint.transform.position, scanRadius, obj2, layerMask, QueryTriggerInteraction.Ignore);
+			allTargets.AddRange(obj2);
+			Facepunch.Pool.FreeList(ref obj2);
 		}
 	}
 

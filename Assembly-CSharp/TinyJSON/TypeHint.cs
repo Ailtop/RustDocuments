@@ -1,9 +1,8 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+public class TypeHint : Attribute
 {
-	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
-	public class TypeHint : Attribute
-	{
-	}
 }

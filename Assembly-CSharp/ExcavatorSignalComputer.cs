@@ -99,8 +99,8 @@ public class ExcavatorSignalComputer : BaseCombatEntity
 
 	public override void PostServerLoad()
 	{
-		SetFlag(Flags.Reserved8, false);
-		SetFlag(Flags.Reserved7, false);
+		SetFlag(Flags.Reserved8, b: false);
+		SetFlag(Flags.Reserved7, b: false);
 	}
 
 	public void ChargeThink()
@@ -125,11 +125,11 @@ public class ExcavatorSignalComputer : BaseCombatEntity
 		base.OnEntityMessage(from, msg);
 		if (msg == "DieselEngineOn")
 		{
-			SetFlag(Flags.Reserved8, true);
+			SetFlag(Flags.Reserved8, b: true);
 		}
 		else if (msg == "DieselEngineOff")
 		{
-			SetFlag(Flags.Reserved8, false);
+			SetFlag(Flags.Reserved8, b: false);
 		}
 	}
 
@@ -150,7 +150,7 @@ public class ExcavatorSignalComputer : BaseCombatEntity
 			}
 			Interface.CallHook("OnExcavatorSuppliesRequested", this, rpc.player, baseEntity);
 			chargePower -= chargeNeededForSupplies;
-			SetFlag(Flags.Reserved7, false);
+			SetFlag(Flags.Reserved7, b: false);
 			SendNetworkUpdate();
 		}
 	}

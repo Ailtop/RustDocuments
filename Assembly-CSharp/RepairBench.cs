@@ -197,8 +197,7 @@ public class RepairBench : StorageContainer
 			int amount = slot.amount;
 			int contents = 0;
 			ItemDefinition ammoType = null;
-			BaseProjectile baseProjectile;
-			if (slot.GetHeldEntity() != null && (object)(baseProjectile = slot.GetHeldEntity() as BaseProjectile) != null && baseProjectile.primaryMagazine != null)
+			if (slot.GetHeldEntity() != null && slot.GetHeldEntity() is BaseProjectile baseProjectile && baseProjectile.primaryMagazine != null)
 			{
 				contents = baseProjectile.primaryMagazine.contents;
 				ammoType = baseProjectile.primaryMagazine.ammoType;
@@ -218,12 +217,11 @@ public class RepairBench : StorageContainer
 			slot.Remove();
 			ItemManager.DoRemoves();
 			Item item = ItemManager.Create(template, 1, 0uL);
-			item.MoveToContainer(base.inventory, 0, false);
+			item.MoveToContainer(base.inventory, 0, allowStack: false);
 			item.maxCondition = maxCondition;
 			item.condition = condition;
 			item.amount = amount;
-			BaseProjectile baseProjectile2;
-			if (item.GetHeldEntity() != null && (object)(baseProjectile2 = item.GetHeldEntity() as BaseProjectile) != null && baseProjectile2.primaryMagazine != null)
+			if (item.GetHeldEntity() != null && item.GetHeldEntity() is BaseProjectile baseProjectile2 && baseProjectile2.primaryMagazine != null)
 			{
 				baseProjectile2.primaryMagazine.contents = contents;
 				baseProjectile2.primaryMagazine.ammoType = ammoType;
@@ -271,7 +269,7 @@ public class RepairBench : StorageContainer
 	{
 		Item slot = base.inventory.GetSlot(0);
 		BasePlayer player = msg.player;
-		RepairAnItem(slot, player, this, maxConditionLostOnRepair, true);
+		RepairAnItem(slot, player, this, maxConditionLostOnRepair, mustKnowBlueprint: true);
 	}
 
 	public static void RepairAnItem(Item itemToRepair, BasePlayer player, BaseEntity repairBenchEntity, float maxConditionLostOnRepair, bool mustKnowBlueprint)

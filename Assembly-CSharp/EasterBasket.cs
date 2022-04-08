@@ -132,8 +132,7 @@ public class EasterBasket : AttackEntity
 				vector2 = AimConeUtil.GetModifiedAimConeDirection(num2, vector2);
 			}
 			float num3 = 1f;
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.Raycast(vector, vector2, out hitInfo, num3, 1236478737))
+			if (UnityEngine.Physics.Raycast(vector, vector2, out var hitInfo, num3, 1236478737))
 			{
 				num3 = hitInfo.distance - 0.1f;
 			}

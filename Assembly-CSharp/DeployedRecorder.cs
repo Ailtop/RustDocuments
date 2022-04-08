@@ -87,7 +87,7 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 	public void OnCassetteRemoved(Cassette c)
 	{
 		ClientRPC(null, "Client_OnCassetteRemoved");
-		ServerTogglePlay(false);
+		ServerTogglePlay(play: false);
 	}
 
 	public override bool ItemFilter(Item item, int targetSlot)
@@ -148,23 +148,23 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 				return;
 			}
 			position = ent.transform.position;
-			ent = ent.parentEntity.Get(true);
+			ent = ent.parentEntity.Get(serverside: true);
 		}
-		SetMotionEnabled(false);
-		SetCollisionEnabled(false);
+		SetMotionEnabled(wantsMotion: false);
+		SetCollisionEnabled(wantsCollision: false);
 		if (!(ent != null) || !HasChild(ent))
 		{
 			base.transform.position = position;
 			base.transform.rotation = Quaternion.LookRotation(normal, base.transform.up);
 			if (hitCollider != null && ent != null)
 			{
-				SetParent(ent, ent.FindBoneID(hitCollider.transform), true);
+				SetParent(ent, ent.FindBoneID(hitCollider.transform), worldPositionStays: true);
 			}
 			else
 			{
-				SetParent(ent, StringPool.closest, true);
+				SetParent(ent, StringPool.closest, worldPositionStays: true);
 			}
-			ReceiveCollisionMessages(false);
+			ReceiveCollisionMessages(b: false);
 		}
 	}
 
@@ -172,10 +172,10 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 	{
 		if ((bool)GetParentEntity())
 		{
-			SetParent(null, true, true);
-			SetMotionEnabled(true);
-			SetCollisionEnabled(true);
-			ReceiveCollisionMessages(true);
+			SetParent(null, worldPositionStays: true, sendImmediate: true);
+			SetMotionEnabled(wantsMotion: true);
+			SetCollisionEnabled(wantsCollision: true);
+			ReceiveCollisionMessages(b: true);
 		}
 	}
 

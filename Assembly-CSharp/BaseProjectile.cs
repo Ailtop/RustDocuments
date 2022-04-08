@@ -148,7 +148,7 @@ public class BaseProjectile : AttackEntity
 			}
 			foreach (Item item in list)
 			{
-				int amount = item.amount;
+				_ = item.amount;
 				int num2 = Mathf.Min(num, item.amount);
 				item.UseItem(num2);
 				contents += num2;
@@ -493,7 +493,7 @@ public class BaseProjectile : AttackEntity
 
 	protected void StartReloadCooldown(float cooldown)
 	{
-		nextReloadTime = CalculateCooldownTime(nextReloadTime, cooldown, false);
+		nextReloadTime = CalculateCooldownTime(nextReloadTime, cooldown, catchup: false);
 		startReloadTime = nextReloadTime - cooldown;
 	}
 
@@ -697,7 +697,7 @@ public class BaseProjectile : AttackEntity
 			}
 			Facepunch.Pool.FreeList(ref obj);
 			UnityEngine.Vector3 vector2 = ((flag && ownerPlayer.isMounted) ? (modifiedAimConeDirection * 6f) : UnityEngine.Vector3.zero);
-			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + vector2, modifiedAimConeDirection * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), true);
+			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + vector2, modifiedAimConeDirection * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), forceClientsideEffects: true);
 		}
 	}
 

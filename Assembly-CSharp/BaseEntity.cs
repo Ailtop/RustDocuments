@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using ConVar;
 using Facepunch;
 using Facepunch.Extend;
@@ -133,8 +132,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Reserved11 = 0x80000
 	}
 
-	[IsReadOnly]
-	private struct ServerFileRequest : IEquatable<ServerFileRequest>
+	private readonly struct ServerFileRequest : IEquatable<ServerFileRequest>
 	{
 		public readonly FileStorage.Type Type;
 
@@ -166,10 +164,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public override bool Equals(object obj)
 		{
-			object obj2;
-			if ((obj2 = obj) is ServerFileRequest)
+			if (obj is ServerFileRequest other)
 			{
-				ServerFileRequest other = (ServerFileRequest)obj2;
 				return Equals(other);
 			}
 			return false;
@@ -591,8 +587,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			bool hasFilter = !string.IsNullOrEmpty(strFilter);
 			return (from x in BaseNetworkable.serverEntities.Where(delegate(BaseNetworkable x)
 				{
-					BaseEntity baseEntity;
-					if ((object)(baseEntity = x as BaseEntity) != null)
+					if (x is BaseEntity baseEntity)
 					{
 						if (baseEntity.OwnerID != ownedBy)
 						{
@@ -613,10 +608,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			bool hasFilter = !string.IsNullOrEmpty(strFilter);
 			return (from x in BaseNetworkable.serverEntities.Where(delegate(BaseNetworkable x)
 				{
-					BuildingPrivlidge buildingPrivlidge;
-					AutoTurret autoTurret;
-					CodeLock codeLock;
-					if ((object)(buildingPrivlidge = x as BuildingPrivlidge) != null)
+					if (x is BuildingPrivlidge buildingPrivlidge)
 					{
 						if (!buildingPrivlidge.IsAuthed(authId))
 						{
@@ -627,7 +619,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 							return true;
 						}
 					}
-					else if ((object)(autoTurret = x as AutoTurret) != null)
+					else if (x is AutoTurret autoTurret)
 					{
 						if (!autoTurret.IsAuthed(authId))
 						{
@@ -638,7 +630,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 							return true;
 						}
 					}
-					else if ((object)(codeLock = x as CodeLock) != null)
+					else if (x is CodeLock codeLock)
 					{
 						if (!codeLock.whitelistPlayers.Contains(authId))
 						{
@@ -795,8 +787,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			Vector3 networkPosition = GetNetworkPosition();
 			foreach (TriggerBase trigger in triggers)
 			{
-				TriggerWetness triggerWetness;
-				if ((object)(triggerWetness = trigger as TriggerWetness) != null)
+				if (trigger is TriggerWetness triggerWetness)
 				{
 					num += triggerWetness.WorkoutWetness(networkPosition);
 				}
@@ -845,7 +836,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public float Weight { get; protected set; }
 
-	public EntityComponentBase[] Components => _components ?? (_components = GetComponentsInChildren<EntityComponentBase>(true));
+	public EntityComponentBase[] Components => _components ?? (_components = GetComponentsInChildren<EntityComponentBase>(includeInactive: true));
 
 	public virtual bool IsNpc => false;
 
@@ -1016,7 +1007,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			for (int i = 0; i < children.Count; i++)
 			{
-				children[i].SetFlag(f, b, true);
+				children[i].SetFlag(f, b, recursive: true);
 			}
 		}
 	}
@@ -1979,13 +1970,13 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		if (GameManager.server.preProcessed.NeedsProcessing(base.gameObject))
 		{
-			GameManager.server.preProcessed.ProcessObject(null, base.gameObject, false);
+			GameManager.server.preProcessed.ProcessObject(null, base.gameObject, resetLocalTransform: false);
 		}
 		BaseEntity baseEntity = ((base.transform.parent != null) ? base.transform.parent.GetComponentInParent<BaseEntity>() : null);
 		Spawn();
 		if (baseEntity != null)
 		{
-			SetParent(baseEntity, true);
+			SetParent(baseEntity, worldPositionStays: true);
 		}
 	}
 
@@ -1995,11 +1986,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			if (GameManager.server.preProcessed.NeedsProcessing(base.gameObject))
 			{
-				GameManager.server.preProcessed.ProcessObject(null, base.gameObject, false);
+				GameManager.server.preProcessed.ProcessObject(null, base.gameObject, resetLocalTransform: false);
 			}
 			base.transform.parent = null;
 			SceneManager.MoveGameObjectToScene(base.gameObject, Rust.Server.EntityScene);
-			base.gameObject.SetActive(true);
+			base.gameObject.SetActive(value: true);
 			Spawn();
 		}
 	}
@@ -2021,7 +2012,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				array[i].OnParentRemoved();
 			}
 		}
-		SetParent(null, true);
+		SetParent(null, worldPositionStays: true);
 		Query.Server.Remove(this);
 		base.DoServerDestroy();
 	}
@@ -2392,7 +2383,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		if (!base.IsDestroyed)
 		{
-			ForceUpdateTriggers(false, true, false);
+			ForceUpdateTriggers(enter: false, exit: true, invoke: false);
 		}
 	}
 
@@ -2631,13 +2622,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			return false;
 		}
-		RaycastHit hit;
-		if (!WorldSpaceBounds().Trace(ray, out hit, maxDistance))
+		if (!WorldSpaceBounds().Trace(ray, out var hit, maxDistance))
 		{
 			return false;
 		}
-		RaycastHit hitInfo;
-		if (GamePhysics.Trace(ray, 0f, out hitInfo, maxDistance, layerMask))
+		if (GamePhysics.Trace(ray, 0f, out var hitInfo, maxDistance, layerMask))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
 			if (entity == this)
@@ -2735,8 +2724,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		do
 		{
 			flag = false;
-			RaycastHit hitInfo;
-			if (!UnityEngine.Physics.Raycast(position, Vector3.up, out hitInfo, 100f, 161546513))
+			if (!UnityEngine.Physics.Raycast(position, Vector3.up, out var hitInfo, 100f, 161546513))
 			{
 				continue;
 			}
@@ -2785,8 +2773,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		for (int i = 0; i < triggers.Count; i++)
 		{
-			WaterVolume waterVolume;
-			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(pos, out info))
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(pos, out info))
 			{
 				return true;
 			}
@@ -2804,8 +2791,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		WaterLevel.WaterInfo info = default(WaterLevel.WaterInfo);
 		for (int i = 0; i < triggers.Count; i++)
 		{
-			WaterVolume waterVolume;
-			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(pos, out info))
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(pos, out info))
 			{
 				return true;
 			}
@@ -2822,8 +2808,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		for (int i = 0; i < triggers.Count; i++)
 		{
-			WaterVolume waterVolume;
-			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(bounds, out info))
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(bounds, out info))
 			{
 				return true;
 			}
@@ -2841,8 +2826,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		for (int i = 0; i < triggers.Count; i++)
 		{
-			WaterVolume waterVolume;
-			if ((object)(waterVolume = triggers[i] as WaterVolume) != null && waterVolume.Test(start, end, radius, out info))
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(start, end, radius, out info))
 			{
 				return true;
 			}

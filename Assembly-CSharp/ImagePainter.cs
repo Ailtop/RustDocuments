@@ -40,8 +40,7 @@ public class ImagePainter : MonoBehaviour, IPointerDownHandler, IEventSystemHand
 	{
 		if (eventData.button != PointerEventData.InputButton.Right)
 		{
-			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out var localPoint);
 			DrawAt(localPoint, eventData.button);
 			pointerState[(int)eventData.button].isDown = true;
 		}
@@ -63,8 +62,7 @@ public class ImagePainter : MonoBehaviour, IPointerDownHandler, IEventSystemHand
 		}
 		else
 		{
-			Vector2 localPoint;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out localPoint);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out var localPoint);
 			DrawAt(localPoint, eventData.button);
 		}
 	}

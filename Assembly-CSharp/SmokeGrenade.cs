@@ -37,8 +37,8 @@ public class SmokeGrenade : TimedExplosive
 		else if (!IsOn())
 		{
 			Invoke(FinishUp, smokeDuration);
-			SetFlag(Flags.On, true);
-			SetFlag(Flags.Open, true);
+			SetFlag(Flags.On, b: true);
+			SetFlag(Flags.Open, b: true);
 			InvalidateNetworkCache();
 			SendNetworkUpdateImmediate();
 			activeGrenades.Add(this);

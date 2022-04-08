@@ -187,9 +187,9 @@ public class ExcavatorArm : BaseEntity
 	{
 		if (IsPowered())
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			InvokeRepeating(ProduceResources, resourceProductionTickRate, resourceProductionTickRate);
-			ExcavatorServerEffects.SetMining(true);
+			ExcavatorServerEffects.SetMining(isMining: true);
 			Facepunch.Rust.Analytics.Server.ExcavatorStarted();
 			excavatorStartTime = GetNetworkTime();
 			Interface.CallHook("OnExcavatorMiningToggled", this);
@@ -198,13 +198,13 @@ public class ExcavatorArm : BaseEntity
 
 	public void StopMining()
 	{
-		ExcavatorServerEffects.SetMining(false);
+		ExcavatorServerEffects.SetMining(isMining: false);
 		CancelInvoke(ProduceResources);
 		if (HasFlag(Flags.On))
 		{
 			Facepunch.Rust.Analytics.Server.ExcavatorStopped(GetNetworkTime() - excavatorStartTime);
 		}
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		Interface.CallHook("OnExcavatorMiningToggled", this);
 	}
 
@@ -242,11 +242,11 @@ public class ExcavatorArm : BaseEntity
 		base.OnEntityMessage(from, msg);
 		if (msg == "DieselEngineOn")
 		{
-			SetFlag(Flags.Reserved8, true);
+			SetFlag(Flags.Reserved8, b: true);
 		}
 		else if (msg == "DieselEngineOff")
 		{
-			SetFlag(Flags.Reserved8, false);
+			SetFlag(Flags.Reserved8, b: false);
 			StopMining();
 		}
 	}

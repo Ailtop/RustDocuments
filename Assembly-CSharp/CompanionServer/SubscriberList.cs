@@ -2,84 +2,79 @@ using System;
 using System.Collections.Generic;
 using Facepunch;
 
-namespace CompanionServer
+namespace CompanionServer;
+
+public class SubscriberList<TKey, TTarget, TMessage> where TKey : IEquatable<TKey> where TTarget : class
 {
-	public class SubscriberList<TKey, TTarget, TMessage> where TKey : IEquatable<TKey> where TTarget : class
+	private readonly object _syncRoot;
+
+	private readonly Dictionary<TKey, HashSet<TTarget>> _subscriptions;
+
+	private readonly IBroadcastSender<TTarget, TMessage> _sender;
+
+	public SubscriberList(IBroadcastSender<TTarget, TMessage> sender)
 	{
-		private readonly object _syncRoot;
+		_syncRoot = new object();
+		_subscriptions = new Dictionary<TKey, HashSet<TTarget>>();
+		_sender = sender;
+	}
 
-		private readonly Dictionary<TKey, HashSet<TTarget>> _subscriptions;
-
-		private readonly IBroadcastSender<TTarget, TMessage> _sender;
-
-		public SubscriberList(IBroadcastSender<TTarget, TMessage> sender)
+	public void Add(TKey key, TTarget value)
+	{
+		lock (_syncRoot)
 		{
-			_syncRoot = new object();
-			_subscriptions = new Dictionary<TKey, HashSet<TTarget>>();
-			_sender = sender;
-		}
-
-		public void Add(TKey key, TTarget value)
-		{
-			lock (_syncRoot)
+			if (_subscriptions.TryGetValue(key, out var value2))
 			{
-				HashSet<TTarget> value2;
-				if (_subscriptions.TryGetValue(key, out value2))
-				{
-					value2.Add(value);
-					return;
-				}
-				value2 = new HashSet<TTarget> { value };
-				_subscriptions.Add(key, value2);
+				value2.Add(value);
+				return;
 			}
+			value2 = new HashSet<TTarget> { value };
+			_subscriptions.Add(key, value2);
 		}
+	}
 
-		public void Remove(TKey key, TTarget value)
+	public void Remove(TKey key, TTarget value)
+	{
+		lock (_syncRoot)
 		{
-			lock (_syncRoot)
+			if (_subscriptions.TryGetValue(key, out var value2))
 			{
-				HashSet<TTarget> value2;
-				if (_subscriptions.TryGetValue(key, out value2))
+				value2.Remove(value);
+				if (value2.Count == 0)
 				{
-					value2.Remove(value);
-					if (value2.Count == 0)
-					{
-						_subscriptions.Remove(key);
-					}
+					_subscriptions.Remove(key);
 				}
 			}
 		}
+	}
 
-		public void Clear(TKey key)
+	public void Clear(TKey key)
+	{
+		lock (_syncRoot)
 		{
-			lock (_syncRoot)
+			if (_subscriptions.TryGetValue(key, out var value))
 			{
-				HashSet<TTarget> value;
-				if (_subscriptions.TryGetValue(key, out value))
-				{
-					value.Clear();
-				}
+				value.Clear();
 			}
 		}
+	}
 
-		public void Send(TKey key, TMessage message)
+	public void Send(TKey key, TMessage message)
+	{
+		List<TTarget> obj;
+		lock (_syncRoot)
 		{
-			List<TTarget> obj;
-			lock (_syncRoot)
+			if (!_subscriptions.TryGetValue(key, out var value))
 			{
-				HashSet<TTarget> value;
-				if (!_subscriptions.TryGetValue(key, out value))
-				{
-					return;
-				}
-				obj = Pool.GetList<TTarget>();
-				foreach (TTarget item in value)
-				{
-					obj.Add(item);
-				}
+				return;
 			}
-			_sender.BroadcastTo(obj, message);
-			Pool.FreeList(ref obj);
+			obj = Pool.GetList<TTarget>();
+			foreach (TTarget item in value)
+			{
+				obj.Add(item);
+			}
 		}
+		_sender.BroadcastTo(obj, message);
+		Pool.FreeList(ref obj);
 	}
 }

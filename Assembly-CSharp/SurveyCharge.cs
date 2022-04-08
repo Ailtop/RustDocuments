@@ -12,7 +12,7 @@ public class SurveyCharge : TimedExplosive
 	public override void Explode()
 	{
 		base.Explode();
-		if (WaterLevel.Test(base.transform.position, true, this))
+		if (WaterLevel.Test(base.transform.position, waves: true, this))
 		{
 			return;
 		}
@@ -22,13 +22,12 @@ public class SurveyCharge : TimedExplosive
 			return;
 		}
 		orCreate.lastSurveyTime = Time.realtimeSinceStartup;
-		RaycastHit hitOut;
-		if (!TransformUtil.GetGroundInfo(base.transform.position, out hitOut, 0.3f, 8388608))
+		if (!TransformUtil.GetGroundInfo(base.transform.position, out var hitOut, 0.3f, 8388608))
 		{
 			return;
 		}
 		Vector3 point = hitOut.point;
-		Vector3 normal = hitOut.normal;
+		_ = hitOut.normal;
 		List<SurveyCrater> obj = Pool.GetList<SurveyCrater>();
 		Vis.Entities(base.transform.position, 10f, obj, 1);
 		bool num = obj.Count > 0;

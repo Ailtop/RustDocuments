@@ -346,7 +346,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			if (zone.isDirty)
 			{
 				flag = true;
-				bool isDirty2 = zone.isDirty;
+				_ = zone.isDirty;
 				zone.isDirty = !zone.ProcessDistancesAttempt();
 				break;
 			}
@@ -370,7 +370,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 	{
 		lastNavmeshBuildTime = UnityEngine.Time.realtimeSinceStartup;
 		buildTimeTest = UnityEngine.Time.realtimeSinceStartup + 15f;
-		MarkDirty(true);
+		MarkDirty(completeRefresh: true);
 	}
 
 	public Vector3 ClosestPointTo(Vector3 target)
@@ -392,13 +392,13 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		{
 			AddCoverPoint(point);
 		}
-		AIMovePoint[] componentsInChildren2 = base.transform.GetComponentsInChildren<AIMovePoint>(true);
+		AIMovePoint[] componentsInChildren2 = base.transform.GetComponentsInChildren<AIMovePoint>(includeInactive: true);
 		foreach (AIMovePoint point2 in componentsInChildren2)
 		{
 			AddMovePoint(point2);
 		}
 		RefreshPointArrays();
-		NavMeshLink[] componentsInChildren3 = base.transform.GetComponentsInChildren<NavMeshLink>(true);
+		NavMeshLink[] componentsInChildren3 = base.transform.GetComponentsInChildren<NavMeshLink>(includeInactive: true);
 		navMeshLinks.AddRange(componentsInChildren3);
 		AIMovePointPath[] componentsInChildren4 = base.transform.GetComponentsInChildren<AIMovePointPath>();
 		paths.AddRange(componentsInChildren4);
@@ -443,7 +443,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			{
 				if (!(aIMovePoint == null))
 				{
-					RemoveMovePoint(aIMovePoint, false);
+					RemoveMovePoint(aIMovePoint, markDirty: false);
 				}
 			}
 		}
@@ -453,7 +453,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 			{
 				if (!(aICoverPoint == null))
 				{
-					RemoveCoverPoint(aICoverPoint, false);
+					RemoveCoverPoint(aICoverPoint, markDirty: false);
 				}
 			}
 		}
@@ -614,7 +614,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 	{
 		AICoverPoint aICoverPoint = null;
 		float num = 0f;
-		AIMovePoint closestRaw = GetClosestRaw(currentPosition, true);
+		AIMovePoint closestRaw = GetClosestRaw(currentPosition, onlyIncludeWithCover: true);
 		int pointCount;
 		AICoverPoint[] coverPointsInRange = GetCoverPointsInRange(currentPosition, maxRange, out pointCount);
 		if (coverPointsInRange == null || pointCount <= 0)

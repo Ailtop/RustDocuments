@@ -128,8 +128,7 @@ public class FishingBobber : BaseCombatEntity
 			return false;
 		}
 		Vector3 position = base.transform.position;
-		RaycastHit hitInfo;
-		if (GamePhysics.Trace(new Ray(position, (pos - position).normalized), 0.1f, out hitInfo, checkLength, 1218511105))
+		if (GamePhysics.Trace(new Ray(position, (pos - position).normalized), 0.1f, out var _, checkLength, 1218511105))
 		{
 			return false;
 		}

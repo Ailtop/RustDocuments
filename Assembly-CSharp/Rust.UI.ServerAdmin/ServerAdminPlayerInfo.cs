@@ -1,27 +1,26 @@
 using UnityEngine;
 
-namespace Rust.UI.ServerAdmin
+namespace Rust.UI.ServerAdmin;
+
+public class ServerAdminPlayerInfo : MonoBehaviour
 {
-	public class ServerAdminPlayerInfo : MonoBehaviour
-	{
-		public RustText PlayerName;
+	public RustText PlayerName;
 
-		public RustText SteamID;
+	public RustText SteamID;
 
-		public RustText OwnerSteamID;
+	public RustText OwnerSteamID;
 
-		public RustText Ping;
+	public RustText Ping;
 
-		public RustText Address;
+	public RustText Address;
 
-		public RustText ConnectedTime;
+	public RustText ConnectedTime;
 
-		public RustText ViolationLevel;
+	public RustText ViolationLevel;
 
-		public RustText Health;
+	public RustText Health;
 
-		public RustInput KickReasonInput;
+	public RustInput KickReasonInput;
 
-		public RustInput BanReasonInput;
-	}
+	public RustInput BanReasonInput;
 }

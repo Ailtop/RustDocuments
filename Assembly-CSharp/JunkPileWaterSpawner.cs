@@ -7,7 +7,7 @@ public class JunkPileWaterSpawner : SpawnGroup
 		base.PostSpawnProcess(entity, spawnPoint);
 		if (attachToParent != null)
 		{
-			entity.SetParent(attachToParent, true);
+			entity.SetParent(attachToParent, worldPositionStays: true);
 		}
 	}
 }

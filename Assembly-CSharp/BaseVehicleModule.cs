@@ -188,7 +188,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 				Vehicle.ModuleReachedZeroHealth();
 			}
 		}
-		RefreshConditionals(true);
+		RefreshConditionals(canGib: true);
 	}
 
 	public bool CanBeMovedNow()
@@ -317,7 +317,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 			}
 			SendNetworkUpdate();
 		}
-		RefreshConditionals(false);
+		RefreshConditionals(canGib: false);
 	}
 
 	public virtual void ModuleRemoved()
@@ -337,7 +337,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 
 	public void OtherVehicleModulesChanged()
 	{
-		RefreshConditionals(false);
+		RefreshConditionals(canGib: false);
 	}
 
 	public virtual void OnEngineStateChanged(VehicleEngineController<GroundVehicle>.EngineState oldState, VehicleEngineController<GroundVehicle>.EngineState newState)
@@ -427,8 +427,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		{
 			bool flag2 = false;
 			bool flag3 = false;
-			BaseVehicleModule result;
-			if (TryGetAdjacentModuleInFront(out result))
+			if (TryGetAdjacentModuleInFront(out var result))
 			{
 				flag2 = InSameVisualGroupAs(result, conditional.adjacentMatch);
 			}
@@ -488,7 +487,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 				}
 			}
 		}
-		bool activeInHierarchy = conditional.gameObject.activeInHierarchy;
+		_ = conditional.gameObject.activeInHierarchy;
 		conditional.SetActive(flag);
 	}
 
@@ -564,7 +563,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 
 	public bool PlayerIsLookingAtUsable(string lookingAtColldierName, string usableColliderName)
 	{
-		return string.Compare(lookingAtColldierName, usableColliderName, true) == 0;
+		return string.Compare(lookingAtColldierName, usableColliderName, ignoreCase: true) == 0;
 	}
 
 	public override void Load(LoadInfo info)

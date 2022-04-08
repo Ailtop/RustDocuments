@@ -2,14 +2,11 @@ public static class HitAreaUtil
 {
 	public static string Format(HitArea area)
 	{
-		switch (area)
+		return area switch
 		{
-		case (HitArea)0:
-			return "None";
-		case (HitArea)(-1):
-			return "Generic";
-		default:
-			return area.ToString();
-		}
+			(HitArea)0 => "None", 
+			(HitArea)(-1) => "Generic", 
+			_ => area.ToString(), 
+		};
 	}
 }

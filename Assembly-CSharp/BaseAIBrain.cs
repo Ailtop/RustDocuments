@@ -227,8 +227,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 				return false;
 			}
 			nextInterval = UnityEngine.Random.Range(3f, 6f);
-			Vector3 result;
-			if (!brain.PathFinder.GetBestFleePosition(brain.Navigator, brain.Senses, fleeFromEntity, brain.Events.Memory.Position.Get(4), 50f, 100f, out result))
+			if (!brain.PathFinder.GetBestFleePosition(brain.Navigator, brain.Senses, fleeFromEntity, brain.Events.Memory.Position.Get(4), 50f, 100f, out var result))
 			{
 				return false;
 			}
@@ -264,7 +263,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 			base.StateEnter();
 			status = StateStatus.Error;
-			brain.Navigator.SetBrakingEnabled(false);
+			brain.Navigator.SetBrakingEnabled(flag: false);
 			path = brain.Navigator.Path;
 			T entity = GetEntity();
 			if (path == null)
@@ -294,7 +293,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 			base.StateLeave();
 			brain.Navigator.ClearFacingDirectionOverride();
-			brain.Navigator.SetBrakingEnabled(true);
+			brain.Navigator.SetBrakingEnabled(flag: true);
 		}
 
 		public override StateStatus StateThink(float delta)
@@ -544,8 +543,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 			base.StateEnter();
 			status = StateStatus.Error;
-			IAISleep iAISleep;
-			if ((iAISleep = GetEntity() as IAISleep) != null)
+			if (GetEntity() is IAISleep iAISleep)
 			{
 				iAISleep.StartSleeping();
 				status = StateStatus.Running;
@@ -555,8 +553,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		public override void StateLeave()
 		{
 			base.StateLeave();
-			IAISleep iAISleep;
-			if ((iAISleep = GetEntity() as IAISleep) != null)
+			if (GetEntity() is IAISleep iAISleep)
 			{
 				iAISleep.StopSleeping();
 			}
@@ -878,8 +875,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		if (ray.HasValue)
 		{
 			int layerMask = 10551296;
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.Raycast(ray.Value, out hitInfo, 75f, layerMask))
+			if (UnityEngine.Physics.Raycast(ray.Value, out var hitInfo, 75f, layerMask))
 			{
 				Events.Memory.Position.Set(hitInfo.point, 6);
 			}
@@ -985,7 +981,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			return;
 		}
 		T entity = GetEntity();
-		BaseEntity[] array = BaseEntity.Util.FindTargets(entity.ShortPrefabName, false);
+		BaseEntity[] array = BaseEntity.Util.FindTargets(entity.ShortPrefabName, onlyPlayers: false);
 		if (array == null || array.Length == 0)
 		{
 			return;
@@ -1005,8 +1001,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			EntityComponentBase[] array3 = components;
 			for (int j = 0; j < array3.Length; j++)
 			{
-				IAIDesign iAIDesign;
-				if ((iAIDesign = array3[j] as IAIDesign) != null)
+				if (array3[j] is IAIDesign iAIDesign)
 				{
 					iAIDesign.LoadAIDesign(aIDesign, null);
 					break;
@@ -1223,7 +1218,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			}
 			loadedDesignIndex = 0;
 			LoadAIDesign(AIDesigns.GetByNameOrInstance(Designs[loadedDesignIndex].Filename, InstanceSpecificDesign), null, loadedDesignIndex);
-			AIInformationZone forPoint = AIInformationZone.GetForPoint(base.transform.position, false);
+			AIInformationZone forPoint = AIInformationZone.GetForPoint(base.transform.position, fallBackToNearest: false);
 			if (forPoint != null)
 			{
 				forPoint.RegisterSleepableEntity(this);

@@ -1,14 +1,13 @@
 using UnityEngine;
 
-namespace Rust.Modular
+namespace Rust.Modular;
+
+public class ItemModVehicleChassis : ItemMod, VehicleModuleInformationPanel.IVehicleModuleInfo
 {
-	public class ItemModVehicleChassis : ItemMod, VehicleModuleInformationPanel.IVehicleModuleInfo
-	{
-		public GameObjectRef entityPrefab;
+	public GameObjectRef entityPrefab;
 
-		[Range(1f, 6f)]
-		public int socketsTaken = 1;
+	[Range(1f, 6f)]
+	public int socketsTaken = 1;
 
-		public int SocketsTaken => socketsTaken;
-	}
+	public int SocketsTaken => socketsTaken;
 }

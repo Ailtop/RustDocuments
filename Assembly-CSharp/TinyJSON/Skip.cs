@@ -1,9 +1,8 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+[Obsolete("Use the Exclude attribute instead.")]
+public sealed class Skip : Exclude
 {
-	[Obsolete("Use the Exclude attribute instead.")]
-	public sealed class Skip : Exclude
-	{
-	}
 }

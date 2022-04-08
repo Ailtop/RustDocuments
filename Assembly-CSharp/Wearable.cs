@@ -153,7 +153,7 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 
 	public virtual void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
-		LODGroup[] componentsInChildren = GetComponentsInChildren<LODGroup>(true);
+		LODGroup[] componentsInChildren = GetComponentsInChildren<LODGroup>(includeInactive: true);
 		foreach (LODGroup lODGroup in componentsInChildren)
 		{
 			lODGroup.SetLODs(emptyLOD);
@@ -166,12 +166,12 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		playerModelHairCap = GetComponent<PlayerModelHairCap>();
 		playerModelHair = GetComponent<PlayerModelHair>();
 		wearableReplacementByRace = GetComponent<WearableReplacementByRace>();
-		GetComponentsInChildren(true, renderers);
-		GetComponentsInChildren(true, playerModelSkins);
-		GetComponentsInChildren(true, boneRetargets);
-		GetComponentsInChildren(true, skinnedRenderers);
-		GetComponentsInChildren(true, skeletonSkins);
-		GetComponentsInChildren(true, componentInfos);
+		GetComponentsInChildren(includeInactive: true, renderers);
+		GetComponentsInChildren(includeInactive: true, playerModelSkins);
+		GetComponentsInChildren(includeInactive: true, boneRetargets);
+		GetComponentsInChildren(includeInactive: true, skinnedRenderers);
+		GetComponentsInChildren(includeInactive: true, skeletonSkins);
+		GetComponentsInChildren(includeInactive: true, componentInfos);
 		RenderersLod0 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("0")).ToArray();
 		RenderersLod1 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("1")).ToArray();
 		RenderersLod2 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("2")).ToArray();

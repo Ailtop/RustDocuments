@@ -74,7 +74,7 @@ public class ItemBasedFlowRestrictor : IOEntity
 
 	public override void ResetIOState()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		if (inventory != null)
 		{
 			inventory.GetSlot(0)?.Drop(debugOrigin.transform.position + base.transform.forward * 0.5f, GetInheritedDropVelocity() + base.transform.forward * 2f);
@@ -136,7 +136,7 @@ public class ItemBasedFlowRestrictor : IOEntity
 	{
 		if (inventory == null)
 		{
-			CreateInventory(true);
+			CreateInventory(giveUID: true);
 			OnInventoryFirstCreated(inventory);
 		}
 		InvokeRandomized(TickPassthroughItem, 1f, 1f, 0.015f);
@@ -146,7 +146,7 @@ public class ItemBasedFlowRestrictor : IOEntity
 	public override void PreServerLoad()
 	{
 		base.PreServerLoad();
-		CreateInventory(false);
+		CreateInventory(giveUID: false);
 	}
 
 	public void CreateInventory(bool giveUID)
@@ -217,7 +217,7 @@ public class ItemBasedFlowRestrictor : IOEntity
 			BasePlayer player = rpc.player;
 			if ((bool)player && player.CanInteract() && player.inventory.loot.StartLootingEntity(this))
 			{
-				SetFlag(Flags.Open, true);
+				SetFlag(Flags.Open, b: true);
 				player.inventory.loot.AddContainer(inventory);
 				player.inventory.loot.SendImmediate();
 				player.ClientRPCPlayer(null, player, "RPC_OpenLootPanel", lootPanelName);

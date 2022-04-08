@@ -95,7 +95,7 @@ public class EngineSwitch : BaseEntity
 		MiningQuarry miningQuarry = GetParentEntity() as MiningQuarry;
 		if ((bool)miningQuarry)
 		{
-			miningQuarry.EngineSwitch(false);
+			miningQuarry.EngineSwitch(isOn: false);
 			Interface.CallHook("OnQuarryToggled", miningQuarry, msg.player);
 		}
 	}
@@ -107,7 +107,7 @@ public class EngineSwitch : BaseEntity
 		MiningQuarry miningQuarry = GetParentEntity() as MiningQuarry;
 		if ((bool)miningQuarry)
 		{
-			miningQuarry.EngineSwitch(true);
+			miningQuarry.EngineSwitch(isOn: true);
 			Interface.CallHook("OnQuarryToggled", miningQuarry, msg.player);
 		}
 	}

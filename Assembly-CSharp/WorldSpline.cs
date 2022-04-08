@@ -21,8 +21,7 @@ public class WorldSpline : MonoBehaviour
 
 	public WorldSplineData GetData()
 	{
-		WorldSplineData data;
-		if (WorldSplineSharedData.TryGetDataFor(this, out data))
+		if (WorldSplineSharedData.TryGetDataFor(this, out var data))
 		{
 			return data;
 		}

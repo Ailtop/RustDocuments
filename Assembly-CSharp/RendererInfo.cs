@@ -18,8 +18,7 @@ public class RendererInfo : ComponentInfo<Renderer>
 		{
 			component.sharedMaterial = material;
 		}
-		SkinnedMeshRenderer skinnedMeshRenderer;
-		if ((object)(skinnedMeshRenderer = component as SkinnedMeshRenderer) != null)
+		if (component is SkinnedMeshRenderer skinnedMeshRenderer)
 		{
 			skinnedMeshRenderer.sharedMesh = mesh;
 		}
@@ -33,8 +32,7 @@ public class RendererInfo : ComponentInfo<Renderer>
 	{
 		shadows = component.shadowCastingMode;
 		material = component.sharedMaterial;
-		SkinnedMeshRenderer skinnedMeshRenderer;
-		if ((object)(skinnedMeshRenderer = component as SkinnedMeshRenderer) != null)
+		if (component is SkinnedMeshRenderer skinnedMeshRenderer)
 		{
 			mesh = skinnedMeshRenderer.sharedMesh;
 		}

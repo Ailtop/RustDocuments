@@ -83,8 +83,7 @@ public static class WaterLevel
 			{
 				return result;
 			}
-			RaycastHit hitInfo;
-			if (flag2 && Physics.Raycast(pos, Vector3.up, out hitInfo, 5f, 16, QueryTriggerInteraction.Collide))
+			if (flag2 && Physics.Raycast(pos, Vector3.up, out var hitInfo, 5f, 16, QueryTriggerInteraction.Collide))
 			{
 				waterHeight = Mathf.Min(waterHeight, hitInfo.point.y);
 			}

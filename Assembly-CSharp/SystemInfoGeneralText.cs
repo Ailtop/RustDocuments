@@ -63,7 +63,7 @@ public class SystemInfoGeneralText : MonoBehaviour
 			stringBuilder.Append(GC.CollectionCount(0));
 			stringBuilder.AppendLine();
 			stringBuilder.Append("\tMemory:   ");
-			stringBuilder.Append(MB(GC.GetTotalMemory(false)));
+			stringBuilder.Append(MB(GC.GetTotalMemory(forceFullCollection: false)));
 			stringBuilder.Append(" MB");
 			stringBuilder.AppendLine();
 			stringBuilder.AppendLine();

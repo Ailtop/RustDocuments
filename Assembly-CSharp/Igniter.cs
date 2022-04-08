@@ -46,7 +46,6 @@ public class Igniter : IOEntity
 			{
 				continue;
 			}
-			IIgniteable igniteable;
 			if (item.isServer && item is BaseOven)
 			{
 				(item as BaseOven).StartCooking();
@@ -55,13 +54,13 @@ public class Igniter : IOEntity
 					num++;
 				}
 			}
-			else if (item.isServer && (igniteable = item as IIgniteable) != null && igniteable.CanIgnite())
+			else if (item.isServer && item is IIgniteable igniteable && igniteable.CanIgnite())
 			{
 				igniteable.Ignite(base.transform.position);
 				num++;
 			}
 		}
 		Pool.FreeList(ref obj);
-		Hurt(SelfDamagePerIgnite, DamageType.ElectricShock, this, false);
+		Hurt(SelfDamagePerIgnite, DamageType.ElectricShock, this, useProtection: false);
 	}
 }

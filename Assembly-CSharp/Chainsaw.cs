@@ -227,7 +227,7 @@ public class Chainsaw : BaseMelee
 			if (ownerPlayer != null && ownerPlayer.IsNpc)
 			{
 				DoReload(default(RPCMessage));
-				SetEngineStatus(true);
+				SetEngineStatus(status: true);
 				SendNetworkUpdateImmediate();
 			}
 		}
@@ -236,7 +236,7 @@ public class Chainsaw : BaseMelee
 	public override void ServerUse()
 	{
 		base.ServerUse();
-		SetAttackStatus(true);
+		SetAttackStatus(status: true);
 		Invoke(DelayedStopAttack, attackSpacing + 0.5f);
 	}
 
@@ -247,7 +247,7 @@ public class Chainsaw : BaseMelee
 
 	private void DelayedStopAttack()
 	{
-		SetAttackStatus(false);
+		SetAttackStatus(status: false);
 	}
 
 	protected override bool VerifyClientAttack(BasePlayer player)
@@ -268,7 +268,7 @@ public class Chainsaw : BaseMelee
 	{
 		if (!bHeld)
 		{
-			SetEngineStatus(false);
+			SetEngineStatus(status: false);
 		}
 		base.SetHeld(bHeld);
 	}
@@ -298,7 +298,7 @@ public class Chainsaw : BaseMelee
 		}
 		if ((float)ammo <= 0f)
 		{
-			SetEngineStatus(false);
+			SetEngineStatus(status: false);
 		}
 		SendNetworkUpdate();
 	}
@@ -336,7 +336,7 @@ public class Chainsaw : BaseMelee
 		SetFlag(Flags.On, status);
 		if (!status)
 		{
-			SetAttackStatus(false);
+			SetAttackStatus(status: false);
 		}
 		CancelInvoke(EngineTick);
 		if (status)
@@ -384,7 +384,7 @@ public class Chainsaw : BaseMelee
 			if (num || failedAttempts >= 3)
 			{
 				failedAttempts = 0;
-				SetEngineStatus(true);
+				SetEngineStatus(status: true);
 				SendNetworkUpdateImmediate();
 			}
 		}
@@ -394,7 +394,7 @@ public class Chainsaw : BaseMelee
 	[RPC_Server.IsActiveItem]
 	public void Server_StopEngine(RPCMessage msg)
 	{
-		SetEngineStatus(false);
+		SetEngineStatus(status: false);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -431,28 +431,28 @@ public class Chainsaw : BaseMelee
 
 	public void DisableHitEffects()
 	{
-		SetFlag(Flags.Reserved6, false);
-		SetFlag(Flags.Reserved7, false);
-		SetFlag(Flags.Reserved8, false);
+		SetFlag(Flags.Reserved6, b: false);
+		SetFlag(Flags.Reserved7, b: false);
+		SetFlag(Flags.Reserved8, b: false);
 		SendNetworkUpdateImmediate();
 	}
 
 	public void EnableHitEffect(uint hitMaterial)
 	{
-		SetFlag(Flags.Reserved6, false);
-		SetFlag(Flags.Reserved7, false);
-		SetFlag(Flags.Reserved8, false);
+		SetFlag(Flags.Reserved6, b: false);
+		SetFlag(Flags.Reserved7, b: false);
+		SetFlag(Flags.Reserved8, b: false);
 		if (hitMaterial == StringPool.Get("Flesh"))
 		{
-			SetFlag(Flags.Reserved8, true);
+			SetFlag(Flags.Reserved8, b: true);
 		}
 		else if (hitMaterial == StringPool.Get("Wood"))
 		{
-			SetFlag(Flags.Reserved7, true);
+			SetFlag(Flags.Reserved7, b: true);
 		}
 		else
 		{
-			SetFlag(Flags.Reserved6, true);
+			SetFlag(Flags.Reserved6, b: true);
 		}
 		SendNetworkUpdateImmediate();
 		CancelInvoke(DisableHitEffects);

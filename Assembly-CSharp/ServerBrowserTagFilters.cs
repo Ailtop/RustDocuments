@@ -31,7 +31,7 @@ public class ServerBrowserTagFilters : MonoBehaviour
 	{
 		if (OptionsParent != null)
 		{
-			OptionsParent.SetActive(true);
+			OptionsParent.SetActive(active: true);
 		}
 		_previousState = GetCurrentSelections();
 	}
@@ -40,7 +40,7 @@ public class ServerBrowserTagFilters : MonoBehaviour
 	{
 		if (OptionsParent != null)
 		{
-			OptionsParent.SetActive(false);
+			OptionsParent.SetActive(active: false);
 		}
 		if (_previousState != null)
 		{

@@ -17,17 +17,13 @@ public class PreloadedCassetteContent : ScriptableObject
 
 	public SoundDefinition GetSoundContent(int index, PreloadType type)
 	{
-		switch (type)
+		return type switch
 		{
-		case PreloadType.Short:
-			return GetDefinition(index, ShortTapeContent);
-		case PreloadType.Medium:
-			return GetDefinition(index, MediumTapeContent);
-		case PreloadType.Long:
-			return GetDefinition(index, LongTapeContent);
-		default:
-			return null;
-		}
+			PreloadType.Short => GetDefinition(index, ShortTapeContent), 
+			PreloadType.Medium => GetDefinition(index, MediumTapeContent), 
+			PreloadType.Long => GetDefinition(index, LongTapeContent), 
+			_ => null, 
+		};
 	}
 
 	private SoundDefinition GetDefinition(int index, SoundDefinition[] array)

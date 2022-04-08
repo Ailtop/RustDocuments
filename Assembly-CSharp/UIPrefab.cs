@@ -13,7 +13,7 @@ public class UIPrefab : MonoBehaviour
 		{
 			createdGameObject = Facepunch.Instantiate.GameObject(prefabSource);
 			createdGameObject.name = prefabSource.name;
-			createdGameObject.transform.SetParent(base.transform, false);
+			createdGameObject.transform.SetParent(base.transform, worldPositionStays: false);
 			TransformEx.Identity(createdGameObject);
 		}
 	}

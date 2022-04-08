@@ -36,7 +36,7 @@ public class TerrainDistanceMap : TerrainMap<byte>
 
 	public void GenerateTextures()
 	{
-		DistanceTexture = new Texture2D(res, res, TextureFormat.RGBA32, true, true);
+		DistanceTexture = new Texture2D(res, res, TextureFormat.RGBA32, mipChain: true, linear: true);
 		DistanceTexture.name = "DistanceTexture";
 		DistanceTexture.wrapMode = TextureWrapMode.Clamp;
 		Color32[] cols = new Color32[res * res];
@@ -52,7 +52,7 @@ public class TerrainDistanceMap : TerrainMap<byte>
 
 	public void ApplyTextures()
 	{
-		DistanceTexture.Apply(true, true);
+		DistanceTexture.Apply(updateMipmaps: true, makeNoLongerReadable: true);
 	}
 
 	public Vector2i GetDistance(Vector3 worldPos)
@@ -73,7 +73,7 @@ public class TerrainDistanceMap : TerrainMap<byte>
 	public Vector2i GetDistance(int x, int z)
 	{
 		byte[] array = src;
-		int re = res;
+		_ = res;
 		byte b = array[(0 + z) * res + x];
 		byte b2 = src[(res + z) * res + x];
 		byte b3 = src[(2 * res + z) * res + x];
@@ -88,7 +88,7 @@ public class TerrainDistanceMap : TerrainMap<byte>
 	public void SetDistance(int x, int z, Vector2i v)
 	{
 		byte[] array = dst;
-		int re = res;
+		_ = res;
 		array[(0 + z) * res + x] = (byte)Mathf.Clamp(v.x, 0, 255);
 		dst[(res + z) * res + x] = (byte)Mathf.Clamp(-v.x, 0, 255);
 		dst[(2 * res + z) * res + x] = (byte)Mathf.Clamp(v.y, 0, 255);

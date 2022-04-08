@@ -134,8 +134,7 @@ public class GameManifest : ScriptableObject
 			return string.Empty;
 		}
 		Load();
-		string value;
-		if (guidToPath.TryGetValue(guid, out value))
+		if (guidToPath.TryGetValue(guid, out var value))
 		{
 			return value;
 		}
@@ -164,13 +163,11 @@ public class GameManifest : ScriptableObject
 
 	public static void Invalidate(string path)
 	{
-		string value;
-		UnityEngine.Object value2;
-		if (pathToGuid.TryGetValue(path, out value) && guidToObject.TryGetValue(value, out value2))
+		if (pathToGuid.TryGetValue(path, out var value) && guidToObject.TryGetValue(value, out var value2))
 		{
 			if (value2 != null)
 			{
-				UnityEngine.Object.DestroyImmediate(value2, true);
+				UnityEngine.Object.DestroyImmediate(value2, allowDestroyingAssets: true);
 			}
 			guidToObject.Remove(value);
 		}

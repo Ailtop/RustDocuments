@@ -168,7 +168,7 @@ public class PlaceMonuments : ProceduralComponent
 							continue;
 						}
 						bool flag = false;
-						TerrainPathConnect[] componentsInChildren = prefab.Object.GetComponentsInChildren<TerrainPathConnect>(true);
+						TerrainPathConnect[] componentsInChildren = prefab.Object.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
 						foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 						{
 							if (terrainPathConnect.Type == InfrastructureType.Boat)

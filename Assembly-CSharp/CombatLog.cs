@@ -221,8 +221,7 @@ public class CombatLog
 
 	public static Queue<Event> Get(ulong id)
 	{
-		Queue<Event> value;
-		if (players.TryGetValue(id, out value))
+		if (players.TryGetValue(id, out var value))
 		{
 			return value;
 		}

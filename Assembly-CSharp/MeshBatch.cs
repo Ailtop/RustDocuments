@@ -52,13 +52,13 @@ public abstract class MeshBatch : MonoBehaviour
 
 	public void Display()
 	{
-		ToggleMesh(true);
+		ToggleMesh(state: true);
 		BatchedCount = Count;
 	}
 
 	public void Invalidate()
 	{
-		ToggleMesh(false);
+		ToggleMesh(state: false);
 		BatchedCount = 0;
 	}
 

@@ -1,17 +1,16 @@
 using ProtoBuf;
 
-namespace CompanionServer
+namespace CompanionServer;
+
+public interface IConnection
 {
-	public interface IConnection
-	{
-		void Send(AppResponse response);
+	void Send(AppResponse response);
 
-		void Subscribe(PlayerTarget target);
+	void Subscribe(PlayerTarget target);
 
-		void Unsubscribe(PlayerTarget target);
+	void Unsubscribe(PlayerTarget target);
 
-		void Subscribe(EntityTarget target);
+	void Subscribe(EntityTarget target);
 
-		void Unsubscribe(EntityTarget target);
-	}
+	void Unsubscribe(EntityTarget target);
 }

@@ -2,23 +2,22 @@ using Facepunch.Extend;
 using TMPro;
 using UnityEngine;
 
-namespace Rust.UI
+namespace Rust.UI;
+
+public class SteamInventoryItem : MonoBehaviour
 {
-	public class SteamInventoryItem : MonoBehaviour
+	public IPlayerItem Item;
+
+	public HttpImage Image;
+
+	public bool Setup(IPlayerItem item)
 	{
-		public IPlayerItem Item;
-
-		public HttpImage Image;
-
-		public bool Setup(IPlayerItem item)
+		Item = item;
+		if (item.GetDefinition() == null)
 		{
-			Item = item;
-			if (item.GetDefinition() == null)
-			{
-				return false;
-			}
-			base.transform.FindChildRecursive("ItemName").GetComponent<TextMeshProUGUI>().text = item.GetDefinition().Name;
-			return Image.Load(item.GetDefinition().IconUrl);
+			return false;
 		}
+		base.transform.FindChildRecursive("ItemName").GetComponent<TextMeshProUGUI>().text = item.GetDefinition().Name;
+		return Image.Load(item.GetDefinition().IconUrl);
 	}
 }

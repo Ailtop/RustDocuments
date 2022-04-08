@@ -64,7 +64,7 @@ public abstract class BaseModifiers<T> : EntityComponent<T> where T : BaseCombat
 		{
 			totalValues[modifier.Type] += modifier.Value;
 		}
-		SetDirty(true);
+		SetDirty(flag: true);
 	}
 
 	private bool CanAdd(Modifier modifier)
@@ -124,7 +124,7 @@ public abstract class BaseModifiers<T> : EntityComponent<T> where T : BaseCombat
 		{
 			All.Remove(modifier);
 			totalValues[modifier.Type] -= modifier.Value;
-			SetDirty(true);
+			SetDirty(flag: true);
 		}
 	}
 
@@ -132,13 +132,12 @@ public abstract class BaseModifiers<T> : EntityComponent<T> where T : BaseCombat
 	{
 		All.Clear();
 		totalValues.Clear();
-		SetDirty(true);
+		SetDirty(flag: true);
 	}
 
 	public float GetValue(Modifier.ModifierType type, float defaultValue = 0f)
 	{
-		float value;
-		if (totalValues.TryGetValue(type, out value))
+		if (totalValues.TryGetValue(type, out var value))
 		{
 			return value;
 		}
@@ -147,8 +146,7 @@ public abstract class BaseModifiers<T> : EntityComponent<T> where T : BaseCombat
 
 	public float GetVariableValue(Modifier.ModifierType type, float defaultValue)
 	{
-		float value;
-		if (modifierVariables.TryGetValue(type, out value))
+		if (modifierVariables.TryGetValue(type, out var value))
 		{
 			return value;
 		}
@@ -157,8 +155,7 @@ public abstract class BaseModifiers<T> : EntityComponent<T> where T : BaseCombat
 
 	public void SetVariableValue(Modifier.ModifierType type, float value)
 	{
-		float value2;
-		if (modifierVariables.TryGetValue(type, out value2))
+		if (modifierVariables.TryGetValue(type, out var _))
 		{
 			modifierVariables[type] = value;
 		}

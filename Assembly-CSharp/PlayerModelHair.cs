@@ -37,7 +37,7 @@ public class PlayerModelHair : MonoBehaviour
 			return;
 		}
 		List<SkinnedMeshRenderer> obj = Pool.GetList<SkinnedMeshRenderer>();
-		base.gameObject.GetComponentsInChildren(true, obj);
+		base.gameObject.GetComponentsInChildren(includeInactive: true, obj);
 		materials = new Dictionary<Renderer, RendererMaterials>();
 		materials.Clear();
 		foreach (SkinnedMeshRenderer item in obj)
@@ -81,9 +81,7 @@ public class PlayerModelHair : MonoBehaviour
 			return;
 		}
 		int typeIndex = (int)type;
-		float typeNum;
-		float dyeNum;
-		GetRandomVariation(hairNum, typeIndex, index, out typeNum, out dyeNum);
+		GetRandomVariation(hairNum, typeIndex, index, out var typeNum, out var dyeNum);
 		Setup(type, skinSet.HairCollection, index, typeNum, dyeNum, block);
 	}
 

@@ -1,15 +1,14 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+internal interface IAmbientOcclusionMethod
 {
-	internal interface IAmbientOcclusionMethod
-	{
-		DepthTextureMode GetCameraFlags();
+	DepthTextureMode GetCameraFlags();
 
-		void RenderAfterOpaque(PostProcessRenderContext context);
+	void RenderAfterOpaque(PostProcessRenderContext context);
 
-		void RenderAmbientOnly(PostProcessRenderContext context);
+	void RenderAmbientOnly(PostProcessRenderContext context);
 
-		void CompositeAmbientOnly(PostProcessRenderContext context);
+	void CompositeAmbientOnly(PostProcessRenderContext context);
 
-		void Release();
-	}
+	void Release();
 }

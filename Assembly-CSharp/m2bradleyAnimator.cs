@@ -161,8 +161,7 @@ public class m2bradleyAnimator : MonoBehaviour
 		{
 			ray.origin = ShockTraceLineBegin[i].position;
 			ray.direction = base.transform.up * -1f;
-			RaycastHit hitInfo;
-			num3 = ((!Physics.SphereCast(ray, 0.15f, out hitInfo, maxDistance, mask)) ? 0.26f : (hitInfo.distance - num2));
+			num3 = ((!Physics.SphereCast(ray, 0.15f, out var hitInfo, maxDistance, mask)) ? 0.26f : (hitInfo.distance - num2));
 			vecShocksOffsetPosition[i].y = Mathf.Lerp(vecShocksOffsetPosition[i].y, Mathf.Clamp(num3 * -1f, -0.26f, 0f), Time.deltaTime * 5f);
 			ShocksBones[i].localPosition = vecShocksOffsetPosition[i];
 		}
@@ -174,10 +173,8 @@ public class m2bradleyAnimator : MonoBehaviour
 		{
 			return;
 		}
-		Vector3 normalized = (targetTurret.position - turret.position).normalized;
-		float pitch;
-		float yaw;
-		CalculateYawPitchOffset(turret, turret.position, targetTurret.position, out yaw, out pitch);
+		_ = (targetTurret.position - turret.position).normalized;
+		CalculateYawPitchOffset(turret, turret.position, targetTurret.position, out var yaw, out var pitch);
 		yaw = NormalizeYaw(yaw);
 		float num = Time.deltaTime * turretTurnSpeed;
 		if (yaw < -0.5f)
@@ -236,10 +233,8 @@ public class m2bradleyAnimator : MonoBehaviour
 	{
 		if (targetSpotLight != null)
 		{
-			Vector3 normalized = (targetSpotLight.position - spotLightYaw.position).normalized;
-			float pitch;
-			float yaw;
-			CalculateYawPitchOffset(spotLightYaw, spotLightYaw.position, targetSpotLight.position, out yaw, out pitch);
+			_ = (targetSpotLight.position - spotLightYaw.position).normalized;
+			CalculateYawPitchOffset(spotLightYaw, spotLightYaw.position, targetSpotLight.position, out var yaw, out var pitch);
 			yaw = NormalizeYaw(yaw);
 			float num = Time.deltaTime * spotLightTurnSpeed;
 			if (yaw < -0.5f)
@@ -272,10 +267,8 @@ public class m2bradleyAnimator : MonoBehaviour
 		{
 			if (!(targetSideguns[i] == null))
 			{
-				Vector3 normalized = (targetSideguns[i].position - sideguns[i].position).normalized;
-				float yaw;
-				float pitch;
-				CalculateYawPitchOffset(sideguns[i], sideguns[i].position, targetSideguns[i].position, out yaw, out pitch);
+				_ = (targetSideguns[i].position - sideguns[i].position).normalized;
+				CalculateYawPitchOffset(sideguns[i], sideguns[i].position, targetSideguns[i].position, out var yaw, out var pitch);
 				yaw = NormalizeYaw(yaw);
 				float num = Time.deltaTime * sidegunsTurnSpeed;
 				if (yaw < -0.5f)

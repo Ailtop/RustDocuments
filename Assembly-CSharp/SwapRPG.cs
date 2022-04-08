@@ -21,9 +21,9 @@ public class SwapRPG : MonoBehaviour
 		GameObject[] array = rpgModels;
 		for (int i = 0; i < array.Length; i++)
 		{
-			array[i].SetActive(false);
+			array[i].SetActive(value: false);
 		}
-		rpgModels[iType].SetActive(true);
+		rpgModels[iType].SetActive(value: true);
 	}
 
 	public void UpdateAmmoType(ItemDefinition ammoType)

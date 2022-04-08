@@ -37,10 +37,10 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
 		Rect value2 = new Rect(0f, 0f, context.width, 1f);
 		Rect value3 = new Rect(0f, 0f, 1f, context.height);
 		Rect value4 = new Rect(context.width - 1, 0f, 1f, context.height);
-		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, false, value);
-		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, false, value2);
-		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, false, value3);
-		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, false, value4);
+		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, clear: false, value);
+		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, clear: false, value2);
+		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, clear: false, value3);
+		RuntimeUtilities.BlitFullscreenTriangle(context.command, BuiltinRenderTextureType.None, buffer1, propertySheet, 0, clear: false, value4);
 	}
 
 	private int GetSkyMask(PostProcessRenderContext context, ResolutionType resolution, Vector3 lightPos, int blurIterations, float blurRadius, float maxRadius)

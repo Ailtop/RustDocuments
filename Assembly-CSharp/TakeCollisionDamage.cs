@@ -46,9 +46,9 @@ public class TakeCollisionDamage : FacepunchBehaviour
 		if (num2 > 0f)
 		{
 			pendingDamage = Mathf.Max(pendingDamage, Mathf.Lerp(minDamage, maxDamage, num2));
-			if (pendingDamage > entity.Health())
+			if (pendingDamage > entity.Health() && GameObjectEx.ToBaseEntity(collision.gameObject) is ICanRestoreVelocity canRestoreVelocity)
 			{
-				(GameObjectEx.ToBaseEntity(collision.gameObject) as ICanRestoreVelocity)?.RestoreVelocity(collision.relativeVelocity * velocityRestorePercent);
+				canRestoreVelocity.RestoreVelocity(collision.relativeVelocity * velocityRestorePercent);
 			}
 			Invoke(DoDamage, 0f);
 		}
@@ -63,7 +63,7 @@ public class TakeCollisionDamage : FacepunchBehaviour
 	{
 		if (!(entity == null) && !entity.IsDead() && !entity.IsDestroyed && pendingDamage > 0f)
 		{
-			entity.Hurt(pendingDamage, DamageType.Collision, null, false);
+			entity.Hurt(pendingDamage, DamageType.Collision, null, useProtection: false);
 			pendingDamage = 0f;
 		}
 	}

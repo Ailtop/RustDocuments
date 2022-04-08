@@ -202,8 +202,7 @@ public class ItemManager
 	public static ItemDefinition FindItemDefinition(int itemID)
 	{
 		Initialize();
-		ItemDefinition value;
-		if (itemDictionary.TryGetValue(itemID, out value))
+		if (itemDictionary.TryGetValue(itemID, out var value))
 		{
 			return value;
 		}
@@ -213,8 +212,7 @@ public class ItemManager
 	public static ItemDefinition FindItemDefinition(string shortName)
 	{
 		Initialize();
-		ItemDefinition value;
-		if (itemDictionaryByName.TryGetValue(shortName, out value))
+		if (itemDictionaryByName.TryGetValue(shortName, out var value))
 		{
 			return value;
 		}

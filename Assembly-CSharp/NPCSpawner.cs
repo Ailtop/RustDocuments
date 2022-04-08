@@ -76,8 +76,7 @@ public class NPCSpawner : SpawnGroup
 	{
 		base.PostSpawnProcess(entity, spawnPoint);
 		BaseNavigator component = entity.GetComponent<BaseNavigator>();
-		HumanNPC humanNPC;
-		if (AdditionalLOSBlockingLayer != 0 && entity != null && (object)(humanNPC = entity as HumanNPC) != null)
+		if (AdditionalLOSBlockingLayer != 0 && entity != null && entity is HumanNPC humanNPC)
 		{
 			humanNPC.AdditionalLosBlockingLayer = AdditionalLOSBlockingLayer;
 		}

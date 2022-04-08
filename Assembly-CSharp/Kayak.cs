@@ -216,7 +216,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 				updateValue = CalculateDesiredDrag
 			};
 		}
-		rigidBody.drag = fixedDragUpdate.Get(false);
+		rigidBody.drag = fixedDragUpdate.Get(force: false);
 	}
 
 	public float CalculateDesiredDrag()

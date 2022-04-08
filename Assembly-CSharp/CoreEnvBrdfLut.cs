@@ -38,7 +38,7 @@ public class CoreEnvBrdfLut
 		int num2 = 32;
 		float num3 = 1f / (float)num;
 		float num4 = 1f / (float)num2;
-		Texture2D texture2D = new Texture2D(num, num2, textureFormat, false, true);
+		Texture2D texture2D = new Texture2D(num, num2, textureFormat, mipChain: false, linear: true);
 		texture2D.name = "_EnvBrdfLut";
 		texture2D.wrapMode = TextureWrapMode.Clamp;
 		texture2D.filterMode = FilterMode.Bilinear;
@@ -86,7 +86,7 @@ public class CoreEnvBrdfLut
 			}
 		}
 		texture2D.SetPixels(array);
-		texture2D.Apply(false, !asset);
+		texture2D.Apply(updateMipmaps: false, !asset);
 		return texture2D;
 	}
 

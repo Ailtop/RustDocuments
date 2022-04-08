@@ -1,6 +1,4 @@
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,7 +23,7 @@ public class ServerBrowserTag : MonoBehaviour
 		Refresh();
 	}
 
-	public bool Test([In][IsReadOnly] ref ServerInfo serverInfo)
+	public bool Test(in ServerInfo serverInfo)
 	{
 		if (serverHasAnyOf != null && serverHasAnyOf.Length != 0)
 		{

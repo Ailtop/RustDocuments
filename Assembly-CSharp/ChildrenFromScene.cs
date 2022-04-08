@@ -19,7 +19,7 @@ public class ChildrenFromScene : MonoBehaviour
 		GameObject[] rootGameObjects = sceneByName.GetRootGameObjects();
 		foreach (GameObject gameObject in rootGameObjects)
 		{
-			gameObject.transform.SetParent(base.transform, false);
+			gameObject.transform.SetParent(base.transform, worldPositionStays: false);
 			TransformEx.Identity(gameObject);
 			RectTransform rectTransform = gameObject.transform as RectTransform;
 			if ((bool)rectTransform)
@@ -30,14 +30,14 @@ public class ChildrenFromScene : MonoBehaviour
 				rectTransform.anchorMax = Vector2.one;
 				rectTransform.sizeDelta = Vector2.one;
 			}
-			SingletonComponent[] componentsInChildren = gameObject.GetComponentsInChildren<SingletonComponent>(true);
+			SingletonComponent[] componentsInChildren = gameObject.GetComponentsInChildren<SingletonComponent>(includeInactive: true);
 			for (int j = 0; j < componentsInChildren.Length; j++)
 			{
 				componentsInChildren[j].SingletonSetup();
 			}
 			if (StartChildrenDisabled)
 			{
-				gameObject.SetActive(false);
+				gameObject.SetActive(value: false);
 			}
 		}
 		SceneManager.UnloadSceneAsync(sceneByName);

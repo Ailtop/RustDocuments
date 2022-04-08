@@ -138,7 +138,7 @@ public class ModularCarLock
 	{
 		if (!owner.HasDriver() && !CentralLockingIsOn)
 		{
-			owner.SetFlag(BaseEntity.Flags.Reserved2, true);
+			owner.SetFlag(BaseEntity.Flags.Reserved2, b: true);
 		}
 	}
 

@@ -151,26 +151,24 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 		{
 			return;
 		}
-		using (PlayerUpdateLoot playerUpdateLoot = Pool.Get<PlayerUpdateLoot>())
+		using PlayerUpdateLoot playerUpdateLoot = Pool.Get<PlayerUpdateLoot>();
+		if ((bool)entitySource && entitySource.net != null)
 		{
-			if ((bool)entitySource && entitySource.net != null)
-			{
-				playerUpdateLoot.entityID = entitySource.net.ID;
-			}
-			if (itemSource != null)
-			{
-				playerUpdateLoot.itemID = itemSource.uid;
-			}
-			if (containers.Count > 0)
-			{
-				playerUpdateLoot.containers = Pool.Get<List<ProtoBuf.ItemContainer>>();
-				foreach (ItemContainer container in containers)
-				{
-					playerUpdateLoot.containers.Add(container.Save());
-				}
-			}
-			base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateLoot", playerUpdateLoot);
+			playerUpdateLoot.entityID = entitySource.net.ID;
 		}
+		if (itemSource != null)
+		{
+			playerUpdateLoot.itemID = itemSource.uid;
+		}
+		if (containers.Count > 0)
+		{
+			playerUpdateLoot.containers = Pool.Get<List<ProtoBuf.ItemContainer>>();
+			foreach (ItemContainer container in containers)
+			{
+				playerUpdateLoot.containers.Add(container.Save());
+			}
+		}
+		base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateLoot", playerUpdateLoot);
 	}
 
 	public bool StartLootingEntity(BaseEntity targetEntity, bool doPositionChecks = true)

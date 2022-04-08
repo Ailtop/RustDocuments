@@ -45,7 +45,7 @@ public class VisualStorageContainer : LootContainer
 			DroppedItem component = slot.Drop(displayNodes[i].transform.position + new Vector3(0f, 0.25f, 0f), Vector3.zero, displayNodes[i].transform.rotation).GetComponent<DroppedItem>();
 			if ((bool)component)
 			{
-				ReceiveCollisionMessages(false);
+				ReceiveCollisionMessages(b: false);
 				CancelInvoke(component.IdleDestroy);
 				Rigidbody componentInChildren = component.GetComponentInChildren<Rigidbody>();
 				if ((bool)componentInChildren)
@@ -99,7 +99,7 @@ public class VisualStorageContainer : LootContainer
 	public void ItemUpdateComplete()
 	{
 		ClearRigidBodies();
-		SetItemsVisible(true);
+		SetItemsVisible(vis: true);
 	}
 
 	public void UpdateVisibleItems(ProtoBuf.ItemContainer msg)
@@ -134,10 +134,10 @@ public class VisualStorageContainer : LootContainer
 				displayModels[content.slot].displayModel = gameObject;
 				displayModels[content.slot].slot = content.slot;
 				displayModels[content.slot].def = itemDefinition;
-				gameObject.SetActive(true);
+				gameObject.SetActive(value: true);
 			}
 		}
-		SetItemsVisible(false);
+		SetItemsVisible(vis: false);
 		CancelInvoke(ItemUpdateComplete);
 		Invoke(ItemUpdateComplete, 1f);
 	}

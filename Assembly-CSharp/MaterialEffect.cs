@@ -70,8 +70,7 @@ public class MaterialEffect : ScriptableObject
 
 	public void SpawnOnRay(Ray ray, int mask, float length = 0.5f, Vector3 forward = default(Vector3), float speed = 0f)
 	{
-		RaycastHit hitInfo;
-		if (!GamePhysics.Trace(ray, 0f, out hitInfo, length, mask))
+		if (!GamePhysics.Trace(ray, 0f, out var hitInfo, length, mask))
 		{
 			Effect.client.Run(DefaultEffect.resourcePath, ray.origin, ray.direction * -1f, forward);
 			if (DefaultSoundDefinition != null)

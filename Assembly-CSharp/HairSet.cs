@@ -27,16 +27,16 @@ public class HairSet : ScriptableObject
 	public void Process(PlayerModelHair playerModelHair, HairDyeCollection dyeCollection, HairDye dye, MaterialPropertyBlock block)
 	{
 		List<SkinnedMeshRenderer> obj = Pool.GetList<SkinnedMeshRenderer>();
-		playerModelHair.gameObject.GetComponentsInChildren(true, obj);
+		playerModelHair.gameObject.GetComponentsInChildren(includeInactive: true, obj);
 		foreach (SkinnedMeshRenderer item in obj)
 		{
 			if (!(item.sharedMesh == null) && !(item.sharedMaterial == null))
 			{
 				string materialName = item.sharedMesh.name;
-				string name2 = item.sharedMaterial.name;
+				_ = item.sharedMaterial.name;
 				if (!item.gameObject.activeSelf)
 				{
-					item.gameObject.SetActive(true);
+					item.gameObject.SetActive(value: true);
 				}
 				for (int i = 0; i < MeshReplacements.Length; i++)
 				{

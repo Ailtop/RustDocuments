@@ -363,11 +363,11 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		basePlayer.Spawn();
 		basePlayer.limitNetworking = false;
 		basePlayer.PlayerInit(connection);
-		if ((bool)BaseGameMode.GetActiveGameMode(true))
+		if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
 		{
-			BaseGameMode.GetActiveGameMode(true).OnNewPlayer(basePlayer);
+			BaseGameMode.GetActiveGameMode(serverside: true).OnNewPlayer(basePlayer);
 		}
-		else if (UnityEngine.Application.isEditor || (SleepingBag.FindForPlayer(basePlayer.userID, true).Length == 0 && !basePlayer.hasPreviousLife))
+		else if (UnityEngine.Application.isEditor || (SleepingBag.FindForPlayer(basePlayer.userID, ignoreTimers: true).Length == 0 && !basePlayer.hasPreviousLife))
 		{
 			basePlayer.Respawn();
 		}
@@ -1115,7 +1115,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private static BaseGameMode Gamemode()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (!(activeGameMode != null))
 		{
 			return null;
@@ -1244,7 +1244,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	internal void SpawnMapEntities()
 	{
-		new PrefabPreProcess(false, true);
+		new PrefabPreProcess(clientside: false, serverside: true);
 		BaseEntity[] array = UnityEngine.Object.FindObjectsOfType<BaseEntity>();
 		BaseEntity[] array2 = array;
 		for (int i = 0; i < array2.Length; i++)
@@ -1304,8 +1304,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				spawnPoint2.rot = MainCamera.rotation;
 			}
 		}
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(new Ray(spawnPoint2.pos, Vector3.down), out hitInfo, 32f, 1537286401))
+		if (UnityEngine.Physics.Raycast(new Ray(spawnPoint2.pos, Vector3.down), out var hitInfo, 32f, 1537286401))
 		{
 			spawnPoint2.pos = hitInfo.point;
 		}

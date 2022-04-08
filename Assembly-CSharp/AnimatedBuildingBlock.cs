@@ -14,20 +14,20 @@ public class AnimatedBuildingBlock : StabilityEntity
 		base.ServerInit();
 		if (!Rust.Application.isLoadingSave)
 		{
-			UpdateAnimationParameters(true);
+			UpdateAnimationParameters(init: true);
 		}
 	}
 
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		UpdateAnimationParameters(true);
+		UpdateAnimationParameters(init: true);
 	}
 
 	public override void OnFlagsChanged(Flags old, Flags next)
 	{
 		base.OnFlagsChanged(old, next);
-		UpdateAnimationParameters(false);
+		UpdateAnimationParameters(init: false);
 	}
 
 	protected void UpdateAnimationParameters(bool init)
@@ -58,7 +58,7 @@ public class AnimatedBuildingBlock : StabilityEntity
 				model.animator.fireEvents = base.isClient;
 				if (base.isServer)
 				{
-					SetFlag(Flags.Busy, true);
+					SetFlag(Flags.Busy, b: true);
 				}
 			}
 		}
@@ -88,7 +88,7 @@ public class AnimatedBuildingBlock : StabilityEntity
 		model.animator.enabled = false;
 		if (base.isServer)
 		{
-			SetFlag(Flags.Busy, false);
+			SetFlag(Flags.Busy, b: false);
 		}
 		OnAnimatorDisabled();
 	}

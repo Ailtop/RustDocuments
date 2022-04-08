@@ -60,7 +60,7 @@ public class TimerSwitch : IOEntity
 	public override void ResetIOState()
 	{
 		base.ResetIOState();
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		if (IsInvoking(AdvanceTime))
 		{
 			EndTimer();
@@ -89,7 +89,7 @@ public class TimerSwitch : IOEntity
 	{
 		if (inputSlot == 0)
 		{
-			SetFlag(Flags.Reserved8, inputAmount > 0, false, false);
+			SetFlag(Flags.Reserved8, inputAmount > 0, recursive: false, networkupdate: false);
 		}
 	}
 
@@ -105,7 +105,7 @@ public class TimerSwitch : IOEntity
 			}
 			else if (timePassed != -1f)
 			{
-				SetFlag(Flags.On, false, false, false);
+				SetFlag(Flags.On, b: false, recursive: false, networkupdate: false);
 				SwitchPressed();
 			}
 			break;
@@ -129,7 +129,7 @@ public class TimerSwitch : IOEntity
 	{
 		if (!IsOn() && IsPowered())
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			MarkDirty();
 			InvokeRepeating(AdvanceTime, 0f, 0.1f);
 			SendNetworkUpdateImmediate();
@@ -157,7 +157,7 @@ public class TimerSwitch : IOEntity
 	{
 		CancelInvoke(AdvanceTime);
 		timePassed = -1f;
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 		SendNetworkUpdateImmediate();
 		MarkDirty();
 	}
@@ -174,7 +174,7 @@ public class TimerSwitch : IOEntity
 		{
 			if (IsOn())
 			{
-				SetFlag(Flags.On, false);
+				SetFlag(Flags.On, b: false);
 			}
 		}
 		else

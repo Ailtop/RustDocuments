@@ -53,7 +53,7 @@ public class WaterVisibilityTrigger : EnvironmentVolumeTrigger
 	{
 		if (togglePhysics && WaterSystem.Collision != null)
 		{
-			WaterSystem.Collision.SetIgnore(other, base.volume.trigger, false);
+			WaterSystem.Collision.SetIgnore(other, base.volume.trigger, ignore: false);
 		}
 	}
 

@@ -87,17 +87,13 @@ public class ResearchTable : StorageContainer
 
 	public int RarityMultiplier(Rarity rarity)
 	{
-		switch (rarity)
+		return rarity switch
 		{
-		case Rarity.Common:
-			return 20;
-		case Rarity.Uncommon:
-			return 15;
-		case Rarity.Rare:
-			return 10;
-		default:
-			return 5;
-		}
+			Rarity.Common => 20, 
+			Rarity.Uncommon => 15, 
+			Rarity.Rare => 10, 
+			_ => 5, 
+		};
 	}
 
 	public int GetBlueprintStacksize(Item sourceItem)
@@ -211,7 +207,7 @@ public class ResearchTable : StorageContainer
 		{
 			Invoke(ResearchAttemptFinished, researchFinishedTime - UnityEngine.Time.realtimeSinceStartup);
 		}
-		base.inventory.SetLocked(false);
+		base.inventory.SetLocked(isLocked: false);
 	}
 
 	public override bool PlayerOpenLoot(BasePlayer player, string panelToOpen = "", bool doPositionChecks = true)
@@ -242,8 +238,8 @@ public class ResearchTable : StorageContainer
 			targetItem.CollectedForCrafting(player);
 			researchFinishedTime = UnityEngine.Time.realtimeSinceStartup + researchDuration;
 			Invoke(ResearchAttemptFinished, researchDuration);
-			base.inventory.SetLocked(true);
-			SetFlag(Flags.On, true);
+			base.inventory.SetLocked(isLocked: true);
+			SetFlag(Flags.On, b: true);
 			SendNetworkUpdate();
 			player.inventory.loot.SendImmediate();
 			if (researchStartEffect.isValid)
@@ -306,8 +302,8 @@ public class ResearchTable : StorageContainer
 
 	public void EndResearch()
 	{
-		base.inventory.SetLocked(false);
-		SetFlag(Flags.On, false);
+		base.inventory.SetLocked(isLocked: false);
+		SetFlag(Flags.On, b: false);
 		researchFinishedTime = 0f;
 		SendNetworkUpdate();
 		if (user != null)

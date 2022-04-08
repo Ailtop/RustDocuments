@@ -74,7 +74,7 @@ public class LootContainer : StorageContainer
 		}
 		if (BlockPlayerItemInput && !Rust.Application.isLoadingSave && base.inventory != null)
 		{
-			base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
+			base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
 		}
 		SetFlag(Flags.Reserved6, PlayerInventory.IsBirthday());
 	}
@@ -84,7 +84,7 @@ public class LootContainer : StorageContainer
 		base.PostServerLoad();
 		if (BlockPlayerItemInput && base.inventory != null)
 		{
-			base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, true);
+			base.inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
 		}
 	}
 
@@ -109,19 +109,14 @@ public class LootContainer : StorageContainer
 
 	public int ScoreForRarity(Rarity rarity)
 	{
-		switch (rarity)
+		return rarity switch
 		{
-		case Rarity.Common:
-			return 1;
-		case Rarity.Uncommon:
-			return 2;
-		case Rarity.Rare:
-			return 3;
-		case Rarity.VeryRare:
-			return 4;
-		default:
-			return 5000;
-		}
+			Rarity.Common => 1, 
+			Rarity.Uncommon => 2, 
+			Rarity.Rare => 3, 
+			Rarity.VeryRare => 4, 
+			_ => 5000, 
+		};
 	}
 
 	public virtual void PopulateLoot()

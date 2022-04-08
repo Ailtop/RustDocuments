@@ -1,6 +1,5 @@
-namespace UnityEngine
+namespace UnityEngine;
+
+public static class NetworkNetworkable
 {
-	public static class NetworkNetworkable
-	{
-	}
 }

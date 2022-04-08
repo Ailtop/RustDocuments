@@ -1,13 +1,12 @@
 using System;
 
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+[Serializable]
+public sealed class FloatParameter : ParameterOverride<float>
 {
-	[Serializable]
-	public sealed class FloatParameter : ParameterOverride<float>
+	public override void Interp(float from, float to, float t)
 	{
-		public override void Interp(float from, float to, float t)
-		{
-			value = from + (to - from) * t;
-		}
+		value = from + (to - from) * t;
 	}
 }

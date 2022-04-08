@@ -15,7 +15,7 @@ public class ConditionalModel : PrefabAttribute
 	protected override void AttributeSetup(GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
 		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
-		conditions = GetComponentsInChildren<ModelConditionTest>(true);
+		conditions = GetComponentsInChildren<ModelConditionTest>(includeInactive: true);
 	}
 
 	public bool RunTests(BaseEntity parent)
@@ -36,7 +36,7 @@ public class ConditionalModel : PrefabAttribute
 		{
 			return null;
 		}
-		GameObject gameObject = gameManager.CreatePrefab(prefab.resourcePath, parent.transform, false);
+		GameObject gameObject = gameManager.CreatePrefab(prefab.resourcePath, parent.transform, active: false);
 		if ((bool)gameObject)
 		{
 			gameObject.transform.localPosition = worldPosition;

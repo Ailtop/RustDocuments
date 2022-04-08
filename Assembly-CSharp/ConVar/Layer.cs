@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("layer")]
+public class Layer : ConsoleSystem
 {
-	[Factory("layer")]
-	public class Layer : ConsoleSystem
-	{
-	}
 }

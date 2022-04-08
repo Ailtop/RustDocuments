@@ -17,11 +17,11 @@ public class LightListener : BaseEntity
 		base.OnEntityMessage(from, msg);
 		if (msg == onMessage)
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 		}
 		else if (msg == offMessage)
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 		}
 	}
 }

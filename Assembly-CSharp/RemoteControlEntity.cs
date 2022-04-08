@@ -104,7 +104,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 
 	public void UpdateIdentifier(string newID, bool clientSend = false)
 	{
-		string rcIdentifier2 = rcIdentifier;
+		_ = rcIdentifier;
 		if (base.isServer)
 		{
 			if (!IDInUse(newID))

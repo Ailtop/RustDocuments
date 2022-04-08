@@ -36,11 +36,11 @@ public class UIGene : MonoBehaviour
 
 	public void Hide()
 	{
-		Child.gameObject.SetActive(false);
+		Child.gameObject.SetActive(value: false);
 	}
 
 	public void Show()
 	{
-		Child.gameObject.SetActive(true);
+		Child.gameObject.SetActive(value: true);
 	}
 }

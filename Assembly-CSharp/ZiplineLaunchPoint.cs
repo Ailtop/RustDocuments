@@ -179,14 +179,14 @@ public class ZiplineLaunchPoint : BaseEntity
 			{
 				ziplineMountable.Kill();
 			}
-			SetFlag(Flags.Busy, true);
+			SetFlag(Flags.Busy, b: true);
 			Invoke(ClearBusy, 2f);
 		}
 	}
 
 	private void ClearBusy()
 	{
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 
 	public override void Save(SaveInfo info)
@@ -246,10 +246,33 @@ public class ZiplineLaunchPoint : BaseEntity
 
 	private void UpdateBuildingBlocks()
 	{
-		BuildingBlock.gameObject.SetActive(false);
+		BuildingBlock.gameObject.SetActive(value: false);
 		if (ziplineTargets.Count > 0)
 		{
-			_003CUpdateBuildingBlocks_003Eg__SetUpBuildingBlock_007C20_0(BuildingBlock, linePoints);
+			SetUpBuildingBlock(BuildingBlock, linePoints);
+		}
+		static void SetUpBuildingBlock(BoxCollider c, List<Vector3> linePoints)
+		{
+			Vector3 vector = linePoints[0];
+			Vector3 vector2 = linePoints[linePoints.Count - 1];
+			Vector3 vector3 = Vector3.zero;
+			Quaternion rotation = Quaternion.LookRotation((vector - vector2).normalized, Vector3.up);
+			Vector3 position = Vector3.Lerp(vector, vector2, 0.5f);
+			c.transform.position = position;
+			c.transform.rotation = rotation;
+			foreach (Vector3 linePoint in linePoints)
+			{
+				Vector3 vector4 = c.transform.InverseTransformPoint(linePoint);
+				if (vector4.y < vector3.y)
+				{
+					vector3 = vector4;
+				}
+			}
+			float num = Mathf.Abs(vector3.y) + 2f;
+			float z = Vector3.Distance(vector, vector2);
+			c.size = new Vector3(0.5f, num, z);
+			c.center = new Vector3(0f, 0f - num * 0.5f, 0f);
+			c.gameObject.SetActive(value: true);
 		}
 	}
 

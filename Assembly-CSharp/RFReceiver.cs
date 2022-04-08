@@ -68,7 +68,7 @@ public class RFReceiver : IOEntity, IRFObject
 
 	public override void ResetIOState()
 	{
-		SetFlag(Flags.On, false);
+		SetFlag(Flags.On, b: false);
 	}
 
 	public override int GetPassthroughAmount(int outputSlot = 0)
@@ -121,7 +121,7 @@ public class RFReceiver : IOEntity, IRFObject
 			int num = msg.read.Int32();
 			if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) == null)
 			{
-				RFManager.ChangeFrequency(frequency, num, this, true);
+				RFManager.ChangeFrequency(frequency, num, this, isListener: true);
 				frequency = num;
 				MarkDirty();
 				SendNetworkUpdate();

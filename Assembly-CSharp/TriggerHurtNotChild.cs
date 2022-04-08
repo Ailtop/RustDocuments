@@ -137,8 +137,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 		IHurtTriggerUser hurtTriggerUser = SourceEntity as IHurtTriggerUser;
 		foreach (BaseEntity item in obj)
 		{
-			float value;
-			if (BaseEntityEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
+			if (BaseEntityEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out var value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
 			{
 				float num = DamagePerSecond * 1f / DamageTickRate;
 				if (UseSourceEntityDamageMultiplier && hurtTriggerUser != null)

@@ -1,10 +1,9 @@
-namespace CompanionServer
+namespace CompanionServer;
+
+public enum NotificationChannel
 {
-	public enum NotificationChannel
-	{
-		Pairing = 1001,
-		PlayerLoggedIn = 1002,
-		PlayerDied = 1003,
-		SmartAlarm = 1004
-	}
+	Pairing = 1001,
+	PlayerLoggedIn = 1002,
+	PlayerDied = 1003,
+	SmartAlarm = 1004
 }

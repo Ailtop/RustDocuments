@@ -20,6 +20,6 @@ public class UIRecordingInfo : SingletonComponent<UIRecordingInfo>
 
 	private void Start()
 	{
-		base.gameObject.SetActive(false);
+		base.gameObject.SetActive(value: false);
 	}
 }

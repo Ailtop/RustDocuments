@@ -10,7 +10,7 @@ public class GameModeSpawnGroup : SpawnGroup
 
 	public bool ShouldSpawn()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (activeGameMode == null)
 		{
 			return false;

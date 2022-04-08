@@ -109,7 +109,7 @@ public class ReactiveTarget : IOEntity
 			if (knockdownHealth <= 0f)
 			{
 				Effect.server.Run(knockdownEffect.resourcePath, this, StringPool.Get("target_collider_bullseye"), Vector3.zero, Vector3.zero);
-				SetFlag(Flags.On, false);
+				SetFlag(Flags.On, b: false);
 				QueueReset();
 				SendPowerBurst();
 				SendNetworkUpdate();
@@ -118,7 +118,7 @@ public class ReactiveTarget : IOEntity
 			{
 				ClientRPC(null, "HitEffect", info.Initiator.net.ID);
 			}
-			Hurt(1f, DamageType.Suicide, info.Initiator, false);
+			Hurt(1f, DamageType.Suicide, info.Initiator, useProtection: false);
 		}
 	}
 
@@ -157,7 +157,7 @@ public class ReactiveTarget : IOEntity
 		if (IsKnockedDown() && CanToggle())
 		{
 			CancelInvoke(ResetTarget);
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			knockdownHealth = 100f;
 			SendPowerBurst();
 			Interface.CallHook("OnReactiveTargetReset", this);
@@ -168,7 +168,7 @@ public class ReactiveTarget : IOEntity
 	{
 		if (!IsKnockedDown() && CanToggle())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			SendPowerBurst();
 		}
 	}

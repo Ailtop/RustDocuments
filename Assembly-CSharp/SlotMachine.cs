@@ -259,7 +259,7 @@ public class SlotMachine : BaseMountable
 			StorageInstance.uid = info.msg.slotMachine.storageID;
 			if (info.fromDisk && base.isServer)
 			{
-				SetFlag(Flags.Reserved2, false);
+				SetFlag(Flags.Reserved2, b: false);
 			}
 		}
 	}
@@ -323,7 +323,7 @@ public class SlotMachine : BaseMountable
 			}
 		}
 		component.UpdateAmount(amount);
-		SetFlag(Flags.Reserved2, true);
+		SetFlag(Flags.Reserved2, b: true);
 		SpinResultPrevious1 = SpinResult1;
 		SpinResultPrevious2 = SpinResult2;
 		SpinResultPrevious3 = SpinResult3;
@@ -340,7 +340,7 @@ public class SlotMachine : BaseMountable
 		BasePlayer player = rpc.player;
 		if (!(player == null) && StorageInstance.IsValid(base.isServer))
 		{
-			StorageInstance.Get(base.isServer).GetComponent<StorageContainer>().PlayerOpenLoot(player, "", false);
+			StorageInstance.Get(base.isServer).GetComponent<StorageContainer>().PlayerOpenLoot(player, "", doPositionChecks: false);
 		}
 	}
 
@@ -349,14 +349,11 @@ public class SlotMachine : BaseMountable
 		bool flag = false;
 		if (PayoutSettings != null && BaseEntityEx.IsValid(CurrentSpinPlayer) && CurrentSpinPlayer == _mounted)
 		{
-			SlotMachinePayoutSettings.PayoutInfo info;
-			int bonus;
-			if (CalculatePayout(out info, out bonus))
+			if (CalculatePayout(out var info, out var bonus))
 			{
 				int num = ((int)info.Item.amount + bonus) * CurrentMultiplier;
-				BaseEntity baseEntity = StorageInstance.Get(true);
-				SlotMachineStorage slotMachineStorage;
-				if (baseEntity != null && (object)(slotMachineStorage = baseEntity as SlotMachineStorage) != null)
+				BaseEntity baseEntity = StorageInstance.Get(serverside: true);
+				if (baseEntity != null && baseEntity is SlotMachineStorage slotMachineStorage)
 				{
 					Item slot = slotMachineStorage.inventory.GetSlot(1);
 					if (slot != null)
@@ -391,7 +388,7 @@ public class SlotMachine : BaseMountable
 		}
 		if (!flag)
 		{
-			SetFlag(Flags.Reserved2, false);
+			SetFlag(Flags.Reserved2, b: false);
 		}
 		else
 		{
@@ -402,7 +399,7 @@ public class SlotMachine : BaseMountable
 
 	private void DelayedSpinningReset()
 	{
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved2, b: false);
 	}
 
 	private void CalculateSpinResults()
@@ -442,9 +439,8 @@ public class SlotMachine : BaseMountable
 	public override void OnPlayerDismounted(BasePlayer player)
 	{
 		base.OnPlayerDismounted(player);
-		BaseEntity baseEntity = StorageInstance.Get(true);
-		SlotMachineStorage slotMachineStorage;
-		if (baseEntity != null && (object)(slotMachineStorage = baseEntity as SlotMachineStorage) != null)
+		BaseEntity baseEntity = StorageInstance.Get(serverside: true);
+		if (baseEntity != null && baseEntity is SlotMachineStorage slotMachineStorage)
 		{
 			slotMachineStorage.inventory.GetSlot(1)?.MoveToContainer(player.inventory.containerMain);
 		}

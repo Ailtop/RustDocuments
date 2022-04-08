@@ -25,8 +25,7 @@ public abstract class BaseSpawnPoint : MonoBehaviour, IServerComponent
 			float height = TerrainMeta.HeightMap.GetHeight(pos);
 			pos.y = Mathf.Max(pos.y, height);
 		}
-		RaycastHit hitOut;
-		if (TransformUtil.GetGroundInfo(pos, out hitOut, 20f, 1235288065))
+		if (TransformUtil.GetGroundInfo(pos, out var hitOut, 20f, 1235288065))
 		{
 			pos = hitOut.point;
 			rot = Quaternion.LookRotation(rot * Vector3.forward, hitOut.normal);

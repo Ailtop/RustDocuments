@@ -1,9 +1,8 @@
-namespace VLB
+namespace VLB;
+
+public enum AttenuationEquation
 {
-	public enum AttenuationEquation
-	{
-		Linear = 0,
-		Quadratic = 1,
-		Blend = 2
-	}
+	Linear = 0,
+	Quadratic = 1,
+	Blend = 2
 }

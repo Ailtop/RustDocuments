@@ -36,7 +36,7 @@ public class TypeThroughButton : Button, IUpdateSelectedHandler, IEventSystemHan
 		{
 			typingTarget.text += " ";
 		}
-		typingTarget.MoveTextEnd(false);
+		typingTarget.MoveTextEnd(shift: false);
 		typingTarget.ProcessEvent(e);
 		yield return null;
 		typingTarget.caretPosition = typingTarget.text.Length;

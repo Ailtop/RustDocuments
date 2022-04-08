@@ -136,16 +136,16 @@ public class NVGEffect : PostEffectsBase, IImageEffect
 
 	public override bool CheckResources()
 	{
-		CheckSupport(false);
+		CheckSupport(needDepth: false);
 		material = CheckShaderAndCreateMaterial(Shader, material);
 		if (rgbChannelTex1 == null || rgbChannelTex2 == null)
 		{
-			rgbChannelTex1 = new Texture2D(256, 4, TextureFormat.ARGB32, false, true)
+			rgbChannelTex1 = new Texture2D(256, 4, TextureFormat.ARGB32, mipChain: false, linear: true)
 			{
 				hideFlags = HideFlags.DontSave,
 				wrapMode = TextureWrapMode.Clamp
 			};
-			rgbChannelTex2 = new Texture2D(256, 4, TextureFormat.ARGB32, false, true)
+			rgbChannelTex2 = new Texture2D(256, 4, TextureFormat.ARGB32, mipChain: false, linear: true)
 			{
 				hideFlags = HideFlags.DontSave,
 				wrapMode = TextureWrapMode.Clamp

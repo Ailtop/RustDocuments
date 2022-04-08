@@ -91,7 +91,7 @@ public class ElevatorLift : BaseCombatEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		ToggleHurtTrigger(false);
+		ToggleHurtTrigger(state: false);
 	}
 
 	public void ToggleHurtTrigger(bool state)
@@ -114,7 +114,7 @@ public class ElevatorLift : BaseCombatEntity
 		bool flag = msg.read.Bit();
 		if (Interface.CallHook("OnElevatorButtonPress", this, msg.player, direction, flag) == null)
 		{
-			SetFlag((direction == Elevator.Direction.Up) ? Flags.Reserved1 : Flags.Reserved2, true);
+			SetFlag((direction == Elevator.Direction.Up) ? Flags.Reserved1 : Flags.Reserved2, b: true);
 			owner.Server_RaiseLowerElevator(direction, flag);
 			Invoke(ClearDirection, 0.7f);
 			if (liftButtonPressedEffect.isValid)
@@ -126,14 +126,13 @@ public class ElevatorLift : BaseCombatEntity
 
 	private void ClearDirection()
 	{
-		SetFlag(Flags.Reserved1, false);
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved1, b: false);
+		SetFlag(Flags.Reserved2, b: false);
 	}
 
 	public override void Hurt(HitInfo info)
 	{
-		BaseCombatEntity baseCombatEntity;
-		if (HasParent() && (object)(baseCombatEntity = GetParentEntity() as BaseCombatEntity) != null)
+		if (HasParent() && GetParentEntity() is BaseCombatEntity baseCombatEntity)
 		{
 			baseCombatEntity.Hurt(info);
 		}

@@ -134,7 +134,7 @@ public class OreResourceEntity : StagedResourceEntity
 		{
 			return null;
 		}
-		Vector2 normalized2 = Random.insideUnitCircle.normalized;
+		_ = Random.insideUnitCircle.normalized;
 		Vector3 zero = Vector3.zero;
 		MeshCollider stageComponent = GetStageComponent<MeshCollider>();
 		Vector3 vector = base.transform.InverseTransformPoint(stageComponent.bounds.center);
@@ -158,8 +158,7 @@ public class OreResourceEntity : StagedResourceEntity
 		}
 		bonusesSpawned++;
 		Vector3 normalized = (stageComponent.bounds.center - zero).normalized;
-		RaycastHit hitInfo;
-		if (stageComponent.Raycast(new Ray(zero, normalized), out hitInfo, 10f))
+		if (stageComponent.Raycast(new Ray(zero, normalized), out var hitInfo, 10f))
 		{
 			OreHotSpot obj = GameManager.server.CreateEntity(bonusPrefab.resourcePath, hitInfo.point - normalized * 0.025f, Quaternion.LookRotation(hitInfo.normal, Vector3.up)) as OreHotSpot;
 			obj.Spawn();

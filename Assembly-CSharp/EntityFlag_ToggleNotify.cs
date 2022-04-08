@@ -5,13 +5,11 @@ public class EntityFlag_ToggleNotify : EntityFlag_Toggle
 	protected override void OnStateToggled(bool state)
 	{
 		base.OnStateToggled(state);
-		IFlagNotify flagNotify;
-		if (!UseEntityParent && base.baseEntity != null && (flagNotify = base.baseEntity as IFlagNotify) != null)
+		if (!UseEntityParent && base.baseEntity != null && base.baseEntity is IFlagNotify flagNotify)
 		{
 			flagNotify.OnFlagToggled(state);
 		}
-		IFlagNotify flagNotify2;
-		if (UseEntityParent && base.baseEntity != null && base.baseEntity.GetParentEntity() != null && (flagNotify2 = base.baseEntity.GetParentEntity() as IFlagNotify) != null)
+		if (UseEntityParent && base.baseEntity != null && base.baseEntity.GetParentEntity() != null && base.baseEntity.GetParentEntity() is IFlagNotify flagNotify2)
 		{
 			flagNotify2.OnFlagToggled(state);
 		}

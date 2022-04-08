@@ -22,7 +22,7 @@ public class ItemStoreItemInfoModal : MonoBehaviour
 		Name.text = item.Name;
 		Description.text = item.Description.BBCodeToUnity();
 		Price.text = item.LocalPriceFormatted;
-		base.gameObject.SetActive(true);
+		base.gameObject.SetActive(value: true);
 		GetComponent<CanvasGroup>().alpha = 0f;
 		LeanTween.alphaCanvas(GetComponent<CanvasGroup>(), 1f, 0.1f);
 	}
@@ -31,7 +31,7 @@ public class ItemStoreItemInfoModal : MonoBehaviour
 	{
 		LeanTween.alphaCanvas(GetComponent<CanvasGroup>(), 0f, 0.2f).setOnComplete((Action)delegate
 		{
-			base.gameObject.SetActive(false);
+			base.gameObject.SetActive(value: false);
 		});
 	}
 }

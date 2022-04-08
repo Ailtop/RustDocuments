@@ -10,7 +10,7 @@ public class NPCBarricadeTriggerBox : MonoBehaviour
 	public void Setup(Barricade t)
 	{
 		target = t;
-		base.transform.SetParent(target.transform, false);
+		base.transform.SetParent(target.transform, worldPositionStays: false);
 		base.gameObject.layer = 18;
 		BoxCollider boxCollider = base.gameObject.AddComponent<BoxCollider>();
 		boxCollider.isTrigger = true;

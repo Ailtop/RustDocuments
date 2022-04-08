@@ -471,7 +471,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	{
 		if (next.HasFlag(Flags.On) && !old.HasFlag(Flags.On))
 		{
-			SetFlag(Flags.Reserved5, true);
+			SetFlag(Flags.Reserved5, b: true);
 		}
 	}
 
@@ -561,7 +561,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 					BasePlayer mounted = mountPoint.mountable.GetMounted();
 					if (mounted != null)
 					{
-						mounted.Hurt(10000f, DamageType.Explosion, this, false);
+						mounted.Hurt(10000f, DamageType.Explosion, this, useProtection: false);
 					}
 				}
 			}
@@ -645,7 +645,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		if (UnityEngine.Time.time >= nextCollisionDamageTime && maxDamageThisTick > 0f)
 		{
 			nextCollisionDamageTime = UnityEngine.Time.time + 0.33f;
-			Hurt(maxDamageThisTick, DamageType.Collision, this, false);
+			Hurt(maxDamageThisTick, DamageType.Collision, this, useProtection: false);
 			maxDamageThisTick = 0f;
 		}
 		StorageContainer torpedoContainer = GetTorpedoContainer();
@@ -661,8 +661,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			if (IsInWater && (float)timeSinceTorpedoFired >= maxFireRate)
 			{
 				float minSpeed = GetSpeed() + 2f;
-				ServerProjectile projectile;
-				if (BaseMountable.TryFireProjectile(torpedoContainer, AmmoTypes.TORPEDO, torpedoFiringPoint.position, torpedoFiringPoint.forward, driver, 1f, minSpeed, out projectile))
+				if (BaseMountable.TryFireProjectile(torpedoContainer, AmmoTypes.TORPEDO, torpedoFiringPoint.position, torpedoFiringPoint.forward, driver, 1f, minSpeed, out var _))
 				{
 					timeSinceTorpedoFired = 0f;
 					flag = false;
@@ -683,7 +682,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		prevPrimaryFireInput = primaryFireInput;
 		if ((float)timeSinceLastUsed > 300f && LightsAreOn)
 		{
-			SetFlag(Flags.Reserved5, false);
+			SetFlag(Flags.Reserved5, b: false);
 		}
 		for (int i = 0; i < parentTriggers.Length; i++)
 		{
@@ -1030,12 +1029,11 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	private float GetWaterSurfaceY()
 	{
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(base.transform.position - Vector3.up * 1.5f, Vector3.up, out hitInfo, 5f, waterLayerMask, QueryTriggerInteraction.Collide))
+		if (UnityEngine.Physics.Raycast(base.transform.position - Vector3.up * 1.5f, Vector3.up, out var hitInfo, 5f, waterLayerMask, QueryTriggerInteraction.Collide))
 		{
 			return hitInfo.point.y;
 		}
-		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(base.transform.position, true, this);
+		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(base.transform.position, waves: true, this);
 		if (!waterInfo.isValid)
 		{
 			return base.transform.position.y - 1f;

@@ -1,9 +1,8 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("voice")]
+public class Voice : ConsoleSystem
 {
-	[Factory("voice")]
-	public class Voice : ConsoleSystem
-	{
-		[ClientVar(Saved = true)]
-		public static bool loopback;
-	}
+	[ClientVar(Saved = true)]
+	public static bool loopback;
 }

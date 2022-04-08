@@ -1,6 +1,5 @@
-namespace UnityEngine
+namespace UnityEngine;
+
+public class DDraw : MonoBehaviour
 {
-	public class DDraw : MonoBehaviour
-	{
-	}
 }

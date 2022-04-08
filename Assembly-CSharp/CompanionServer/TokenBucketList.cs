@@ -1,57 +1,54 @@
 using System.Collections.Generic;
 using Facepunch;
 
-namespace CompanionServer
+namespace CompanionServer;
+
+public class TokenBucketList<TKey> : ITokenBucketSettings
 {
-	public class TokenBucketList<TKey> : ITokenBucketSettings
+	private readonly Dictionary<TKey, TokenBucket> _buckets;
+
+	public double MaxTokens { get; }
+
+	public double TokensPerSec { get; }
+
+	public TokenBucketList(double maxTokens, double tokensPerSec)
 	{
-		private readonly Dictionary<TKey, TokenBucket> _buckets;
+		_buckets = new Dictionary<TKey, TokenBucket>();
+		MaxTokens = maxTokens;
+		TokensPerSec = tokensPerSec;
+	}
 
-		public double MaxTokens { get; }
-
-		public double TokensPerSec { get; }
-
-		public TokenBucketList(double maxTokens, double tokensPerSec)
+	public TokenBucket Get(TKey key)
+	{
+		if (_buckets.TryGetValue(key, out var value))
 		{
-			_buckets = new Dictionary<TKey, TokenBucket>();
-			MaxTokens = maxTokens;
-			TokensPerSec = tokensPerSec;
+			return value;
 		}
+		TokenBucket tokenBucket = Pool.Get<TokenBucket>();
+		tokenBucket.Settings = this;
+		tokenBucket.Reset();
+		_buckets.Add(key, tokenBucket);
+		return tokenBucket;
+	}
 
-		public TokenBucket Get(TKey key)
+	public void Cleanup()
+	{
+		List<TKey> obj = Pool.GetList<TKey>();
+		foreach (KeyValuePair<TKey, TokenBucket> bucket in _buckets)
 		{
-			TokenBucket value;
-			if (_buckets.TryGetValue(key, out value))
+			if (bucket.Value.IsFull)
 			{
-				return value;
+				obj.Add(bucket.Key);
 			}
-			TokenBucket tokenBucket = Pool.Get<TokenBucket>();
-			tokenBucket.Settings = this;
-			tokenBucket.Reset();
-			_buckets.Add(key, tokenBucket);
-			return tokenBucket;
 		}
-
-		public void Cleanup()
+		foreach (TKey item in obj)
 		{
-			List<TKey> obj = Pool.GetList<TKey>();
-			foreach (KeyValuePair<TKey, TokenBucket> bucket in _buckets)
+			if (_buckets.TryGetValue(item, out var value))
 			{
-				if (bucket.Value.IsFull)
-				{
-					obj.Add(bucket.Key);
-				}
+				Pool.Free(ref value);
+				_buckets.Remove(item);
 			}
-			foreach (TKey item in obj)
-			{
-				TokenBucket value;
-				if (_buckets.TryGetValue(item, out value))
-				{
-					Pool.Free(ref value);
-					_buckets.Remove(item);
-				}
-			}
-			Pool.FreeList(ref obj);
 		}
+		Pool.FreeList(ref obj);
 	}
 }

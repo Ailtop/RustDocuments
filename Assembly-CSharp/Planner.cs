@@ -67,10 +67,8 @@ public class Planner : HeldEntity
 		{
 			return;
 		}
-		using (CreateBuilding msg2 = CreateBuilding.Deserialize(msg.read))
-		{
-			DoBuild(msg2);
-		}
+		using CreateBuilding msg2 = CreateBuilding.Deserialize(msg.read);
+		DoBuild(msg2);
 	}
 
 	public Socket_Base FindSocket(string name, uint prefabIDToFind)
@@ -239,7 +237,7 @@ public class Planner : HeldEntity
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
 			if (deployable.setSocketParent && target.entity != null && target.entity.SupportsChildDeployables() && (bool)baseEntity)
 			{
-				baseEntity.SetParent(target.entity, true);
+				baseEntity.SetParent(target.entity, worldPositionStays: true);
 			}
 			if (deployable.wantsInstanceData && GetOwnerItem().instanceData != null)
 			{
@@ -281,7 +279,7 @@ public class Planner : HeldEntity
 		{
 			return null;
 		}
-		BaseEntity baseEntity = component.CreateConstruction(placement, true);
+		BaseEntity baseEntity = component.CreateConstruction(placement, bNeedsValidPlacement: true);
 		if (!baseEntity)
 		{
 			return null;

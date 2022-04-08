@@ -58,7 +58,7 @@ public class SleepingBagButton : MonoBehaviour, IPointerEnterHandler, IEventSyst
 	{
 		if (DeleteButton != null)
 		{
-			DeleteButton.SetActive(false);
+			DeleteButton.SetActive(value: false);
 		}
 	}
 
@@ -133,7 +133,7 @@ public class SleepingBagButton : MonoBehaviour, IPointerEnterHandler, IEventSyst
 	{
 		if (DeleteButton != null)
 		{
-			DeleteButton.SetActive(true);
+			DeleteButton.SetActive(value: true);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class SleepingBagButton : MonoBehaviour, IPointerEnterHandler, IEventSyst
 	{
 		if (DeleteButton != null)
 		{
-			DeleteButton.SetActive(false);
+			DeleteButton.SetActive(value: false);
 		}
 	}
 }

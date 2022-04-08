@@ -17,7 +17,7 @@ public class ANDSwitch : IOEntity
 
 	public override void UpdateHasPower(int inputAmount, int inputSlot)
 	{
-		SetFlag(Flags.Reserved8, input1Amount > 0 || input2Amount > 0, false, false);
+		SetFlag(Flags.Reserved8, input1Amount > 0 || input2Amount > 0, recursive: false, networkupdate: false);
 	}
 
 	public override void UpdateFromInput(int inputAmount, int slot)
@@ -33,10 +33,10 @@ public class ANDSwitch : IOEntity
 		}
 		int num = ((input1Amount > 0 && input2Amount > 0) ? (input1Amount + input2Amount) : 0);
 		bool b = num > 0;
-		SetFlag(Flags.Reserved1, input1Amount > 0, false, false);
-		SetFlag(Flags.Reserved2, input2Amount > 0, false, false);
-		SetFlag(Flags.Reserved3, b, false, false);
-		SetFlag(Flags.Reserved4, input1Amount > 0 && input2Amount > 0, false, false);
+		SetFlag(Flags.Reserved1, input1Amount > 0, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved2, input2Amount > 0, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved3, b, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved4, input1Amount > 0 && input2Amount > 0, recursive: false, networkupdate: false);
 		SetFlag(Flags.On, num > 0);
 		base.UpdateFromInput(inputAmount, slot);
 	}

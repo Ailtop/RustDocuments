@@ -1,28 +1,27 @@
 using System;
 
-namespace TinyJSON
+namespace TinyJSON;
+
+public sealed class ProxyBoolean : Variant
 {
-	public sealed class ProxyBoolean : Variant
+	private readonly bool value;
+
+	public ProxyBoolean(bool value)
 	{
-		private readonly bool value;
+		this.value = value;
+	}
 
-		public ProxyBoolean(bool value)
-		{
-			this.value = value;
-		}
+	public override bool ToBoolean(IFormatProvider provider)
+	{
+		return value;
+	}
 
-		public override bool ToBoolean(IFormatProvider provider)
+	public override string ToString(IFormatProvider provider)
+	{
+		if (!value)
 		{
-			return value;
+			return "false";
 		}
-
-		public override string ToString(IFormatProvider provider)
-		{
-			if (!value)
-			{
-				return "false";
-			}
-			return "true";
-		}
+		return "true";
 	}
 }

@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("client")]
+public class Client : ConsoleSystem
 {
-	[Factory("client")]
-	public class Client : ConsoleSystem
-	{
-	}
 }

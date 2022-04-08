@@ -25,7 +25,7 @@ public abstract class UIRoot : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		graphicRaycasters = GetComponentsInChildren<GraphicRaycaster>(true);
+		graphicRaycasters = GetComponentsInChildren<GraphicRaycaster>(includeInactive: true);
 	}
 
 	protected void Update()

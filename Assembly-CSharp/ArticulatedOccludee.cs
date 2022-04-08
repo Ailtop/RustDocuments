@@ -79,7 +79,7 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 		{
 			UnregisterFromCulling();
 		}
-		int num = OcclusionCulling.RegisterOccludee(sphere.position, sphere.radius, visible, 0.25f, false, base.gameObject.layer, OnVisibilityChanged);
+		int num = OcclusionCulling.RegisterOccludee(sphere.position, sphere.radius, visible, 0.25f, isStatic: false, base.gameObject.layer, OnVisibilityChanged);
 		if (num >= 0)
 		{
 			localOccludee = new OccludeeSphere(num, localOccludee.sphere);

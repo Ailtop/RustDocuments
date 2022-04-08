@@ -131,7 +131,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 		}
 		if (LightsAreOn && !AnyMounted())
 		{
-			SetFlag(Flags.Reserved5, false);
+			SetFlag(Flags.Reserved5, b: false);
 		}
 		if (!(Time.time >= nextCollisionDamageTime))
 		{
@@ -177,8 +177,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 		if (num > 0f)
 		{
 			float num2 = Mathf.Lerp(1f, 200f, num) * collisionDamageMultiplier;
-			float value;
-			if (damageSinceLastTick.TryGetValue(hitEntity, out value))
+			if (damageSinceLastTick.TryGetValue(hitEntity, out var value))
 			{
 				if (value < num2)
 				{
@@ -195,7 +194,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 
 	protected virtual void DoCollisionDamage(BaseEntity hitEntity, float damage)
 	{
-		Hurt(damage, DamageType.Collision, this, false);
+		Hurt(damage, DamageType.Collision, this, useProtection: false);
 	}
 
 	private void ProcessCollision(Collision collision)

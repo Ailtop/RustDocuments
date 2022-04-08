@@ -10,15 +10,11 @@ public class InAttackRangeAIEvent : BaseAIEvent
 	{
 		BaseEntity baseEntity = memory.Entity.Get(base.InputEntityMemorySlot);
 		base.Result = false;
-		if (!(baseEntity == null))
+		if (!(baseEntity == null) && base.Owner is IAIAttack iAIAttack)
 		{
-			IAIAttack iAIAttack = base.Owner as IAIAttack;
-			if (iAIAttack != null)
-			{
-				float dist;
-				bool flag = iAIAttack.IsTargetInRange(baseEntity, out dist);
-				base.Result = (base.Inverted ? (!flag) : flag);
-			}
+			float dist;
+			bool flag = iAIAttack.IsTargetInRange(baseEntity, out dist);
+			base.Result = (base.Inverted ? (!flag) : flag);
 		}
 	}
 }

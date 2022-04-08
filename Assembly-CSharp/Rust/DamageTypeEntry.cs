@@ -1,12 +1,11 @@
 using System;
 
-namespace Rust
-{
-	[Serializable]
-	public class DamageTypeEntry
-	{
-		public DamageType type;
+namespace Rust;
 
-		public float amount;
-	}
+[Serializable]
+public class DamageTypeEntry
+{
+	public DamageType type;
+
+	public float amount;
 }

@@ -76,8 +76,8 @@ public class WaterWell : LiquidContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		SetFlag(Flags.Reserved2, false);
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved2, b: false);
+		SetFlag(Flags.Reserved3, b: false);
 	}
 
 	[RPC_Server]
@@ -87,7 +87,7 @@ public class WaterWell : LiquidContainer
 		BasePlayer player = msg.player;
 		if (!(player == null) && !player.IsDead() && !player.IsSleeping() && !(player.metabolism.calories.value < caloriesPerPump) && !HasFlag(Flags.Reserved2))
 		{
-			SetFlag(Flags.Reserved2, true);
+			SetFlag(Flags.Reserved2, b: true);
 			player.metabolism.calories.value -= caloriesPerPump;
 			player.metabolism.SendChangesToClient();
 			currentPressure = Mathf.Clamp01(currentPressure + pressurePerPump);
@@ -103,7 +103,7 @@ public class WaterWell : LiquidContainer
 
 	public void StopPump()
 	{
-		SetFlag(Flags.Reserved2, false);
+		SetFlag(Flags.Reserved2, b: false);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -116,7 +116,7 @@ public class WaterWell : LiquidContainer
 	public void Produce()
 	{
 		base.inventory.AddItem(defaultLiquid, waterPerPump, 0uL);
-		SetFlag(Flags.Reserved3, true);
+		SetFlag(Flags.Reserved3, b: true);
 		ScheduleTapOff();
 		SendNetworkUpdateImmediate();
 	}
@@ -129,7 +129,7 @@ public class WaterWell : LiquidContainer
 
 	private void TapOff()
 	{
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved3, b: false);
 	}
 
 	public void ReducePressure()

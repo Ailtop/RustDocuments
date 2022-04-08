@@ -177,7 +177,7 @@ public class AIInformationGrid : MonoBehaviour
 			AIInformationCell[] cells = Cells;
 			for (int i = 0; i < cells.Length; i++)
 			{
-				cells[i]?.DebugDraw(Color.white, false);
+				cells[i]?.DebugDraw(Color.white, points: false);
 			}
 		}
 	}

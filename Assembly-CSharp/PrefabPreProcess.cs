@@ -81,8 +81,7 @@ public class PrefabPreProcess : IPrefabProcessor
 
 	public GameObject Find(string strPrefab)
 	{
-		GameObject value;
-		if (prefabList.TryGetValue(strPrefab, out value))
+		if (prefabList.TryGetValue(strPrefab, out var value))
 		{
 			if (value == null)
 			{
@@ -232,13 +231,12 @@ public class PrefabPreProcess : IPrefabProcessor
 
 	public void Invalidate(string name)
 	{
-		GameObject value;
-		if (prefabList.TryGetValue(name, out value))
+		if (prefabList.TryGetValue(name, out var value))
 		{
 			prefabList.Remove(name);
 			if (value != null)
 			{
-				UnityEngine.Object.DestroyImmediate(value, true);
+				UnityEngine.Object.DestroyImmediate(value, allowDestroyingAssets: true);
 			}
 		}
 	}
@@ -247,18 +245,18 @@ public class PrefabPreProcess : IPrefabProcessor
 	{
 		if (isClientside && isServerside)
 		{
-			return HierarchyUtil.GetRoot("PrefabPreProcess - Generic", false, true);
+			return HierarchyUtil.GetRoot("PrefabPreProcess - Generic", groupActive: false, persistant: true);
 		}
 		if (isServerside)
 		{
-			return HierarchyUtil.GetRoot("PrefabPreProcess - Server", false, true);
+			return HierarchyUtil.GetRoot("PrefabPreProcess - Server", groupActive: false, persistant: true);
 		}
-		return HierarchyUtil.GetRoot("PrefabPreProcess - Client", false, true);
+		return HierarchyUtil.GetRoot("PrefabPreProcess - Client", groupActive: false, persistant: true);
 	}
 
 	public void AddPrefab(string name, GameObject go)
 	{
-		go.SetActive(false);
+		go.SetActive(value: false);
 		prefabList.Add(name, go);
 	}
 
@@ -276,7 +274,7 @@ public class PrefabPreProcess : IPrefabProcessor
 				{
 					NominateForDeletion(item.gameObject);
 				}
-				UnityEngine.Object.DestroyImmediate(item, true);
+				UnityEngine.Object.DestroyImmediate(item, allowDestroyingAssets: true);
 			}
 		}
 	}
@@ -389,7 +387,7 @@ public class PrefabPreProcess : IPrefabProcessor
 	{
 		foreach (Component destroy in destroyList)
 		{
-			UnityEngine.Object.DestroyImmediate(destroy, true);
+			UnityEngine.Object.DestroyImmediate(destroy, allowDestroyingAssets: true);
 		}
 		destroyList.Clear();
 		foreach (GameObject cleanup in cleanupList)
@@ -401,12 +399,12 @@ public class PrefabPreProcess : IPrefabProcessor
 
 	public void DoCleanup(GameObject go)
 	{
-		if (!(go == null) && go.GetComponentsInChildren<Component>(true).Length <= 1)
+		if (!(go == null) && go.GetComponentsInChildren<Component>(includeInactive: true).Length <= 1)
 		{
 			Transform parent = go.transform.parent;
 			if (!(parent == null) && !parent.name.StartsWith("PrefabPreProcess - "))
 			{
-				UnityEngine.Object.DestroyImmediate(go, true);
+				UnityEngine.Object.DestroyImmediate(go, allowDestroyingAssets: true);
 			}
 		}
 	}

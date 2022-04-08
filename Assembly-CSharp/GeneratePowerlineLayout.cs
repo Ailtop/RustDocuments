@@ -57,7 +57,7 @@ public class GeneratePowerlineLayout : ProceduralComponent
 		}
 		foreach (MonumentInfo item in monuments)
 		{
-			TerrainPathConnect[] componentsInChildren = item.GetComponentsInChildren<TerrainPathConnect>(true);
+			TerrainPathConnect[] componentsInChildren = item.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
 				if (terrainPathConnect.Type == InfrastructureType.Power)

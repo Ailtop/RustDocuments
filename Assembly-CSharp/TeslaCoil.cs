@@ -48,16 +48,16 @@ public class TeslaCoil : IOEntity
 			}
 			float time = Mathf.Min(dischargeTickRate - num, dischargeTickRate);
 			InvokeRepeating(Discharge, time, dischargeTickRate);
-			SetFlag(Flags.Reserved1, inputAmount < powerForHeavyShorting, false, false);
-			SetFlag(Flags.Reserved2, inputAmount >= powerForHeavyShorting, false, false);
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.Reserved1, inputAmount < powerForHeavyShorting, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved2, inputAmount >= powerForHeavyShorting, recursive: false, networkupdate: false);
+			SetFlag(Flags.On, b: true);
 		}
 		else
 		{
 			CancelInvoke(Discharge);
-			SetFlag(Flags.Reserved1, false, false, false);
-			SetFlag(Flags.Reserved2, false, false, false);
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.Reserved1, b: false, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved2, b: false, recursive: false, networkupdate: false);
+			SetFlag(Flags.On, b: false);
 		}
 	}
 
@@ -82,7 +82,7 @@ public class TeslaCoil : IOEntity
 			}
 		}
 		float amount = dischargeTickRate / maxDischargeSelfDamageSeconds * MaxHealth();
-		Hurt(amount, DamageType.ElectricShock, this, false);
+		Hurt(amount, DamageType.ElectricShock, this, useProtection: false);
 		if (!CanDischarge())
 		{
 			MarkDirty();

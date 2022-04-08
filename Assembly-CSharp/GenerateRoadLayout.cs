@@ -122,7 +122,7 @@ public class GenerateRoadLayout : ProceduralComponent
 			{
 				continue;
 			}
-			TerrainPathConnect[] componentsInChildren = monument.GetComponentsInChildren<TerrainPathConnect>(true);
+			TerrainPathConnect[] componentsInChildren = monument.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
 				if (terrainPathConnect.Type == RoadType)

@@ -305,7 +305,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	{
 		if (!serverside)
 		{
-			postNetworkUpdateComponents = GetComponentsInChildren<IOnPostNetworkUpdate>(true).Cast<Component>().ToList();
+			postNetworkUpdateComponents = GetComponentsInChildren<IOnPostNetworkUpdate>(includeInactive: true).Cast<Component>().ToList();
 		}
 	}
 
@@ -402,7 +402,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		UpdateNetworkGroup();
 		isSpawned = true;
 		Interface.CallHook("OnEntitySpawned", this);
-		SendNetworkUpdateImmediate(true);
+		SendNetworkUpdateImmediate(justCreated: true);
 		if (Rust.Application.isLoading && !Rust.Application.isLoadingSave)
 		{
 			OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
@@ -485,7 +485,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			serverEntities.UnregisterID(this);
 			Network.Net.sv.DestroyNetworkable(ref net);
 			StopAllCoroutines();
-			base.gameObject.SetActive(false);
+			base.gameObject.SetActive(value: false);
 		}
 	}
 
@@ -611,10 +611,10 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 				Network.Net.sv.write.EntityID(net.ID);
 				NetWrite write = Network.Net.sv.write;
 				Vector3 obj = GetNetworkPosition();
-				write.Vector3(ref obj);
+				write.Vector3(in obj);
 				NetWrite write2 = Network.Net.sv.write;
 				obj = GetNetworkRotation().eulerAngles;
-				write2.Vector3(ref obj);
+				write2.Vector3(in obj);
 				Network.Net.sv.write.Float(GetNetworkTime());
 				uint uid = parentEntity.uid;
 				if (uid != 0)

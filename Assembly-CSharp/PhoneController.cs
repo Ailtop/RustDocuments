@@ -77,8 +77,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		get
 		{
-			Telephone telephone;
-			if ((object)(telephone = base.baseEntity as Telephone) == null)
+			if (!(base.baseEntity is Telephone telephone))
 			{
 				return 0u;
 			}
@@ -136,8 +135,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		get
 		{
-			Telephone telephone;
-			if (!(base.baseEntity != null) || (object)(telephone = base.baseEntity as Telephone) == null)
+			if (!(base.baseEntity != null) || !(base.baseEntity is Telephone telephone))
 			{
 				return null;
 			}
@@ -161,7 +159,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 	public void PostServerLoad()
 	{
 		currentPlayer = null;
-		base.baseEntity.SetFlag(BaseEntity.Flags.Busy, false);
+		base.baseEntity.SetFlag(BaseEntity.Flags.Busy, b: false);
 		TelephoneManager.RegisterTelephone(this);
 	}
 
@@ -182,7 +180,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 			currentPlayer.SetActiveTelephone(null);
 			currentPlayer = null;
 		}
-		base.baseEntity.SetFlag(BaseEntity.Flags.Busy, false);
+		base.baseEntity.SetFlag(BaseEntity.Flags.Busy, b: false);
 	}
 
 	public void SetCurrentUser(BaseEntity.RPCMessage msg)
@@ -375,8 +373,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		serverState = state;
 		base.baseEntity.ClientRPC(null, "SetClientState", (int)serverState, (activeCallTo != null) ? activeCallTo.PhoneNumber : 0);
-		MobilePhone mobilePhone;
-		if ((object)(mobilePhone = base.baseEntity as MobilePhone) != null)
+		if (base.baseEntity is MobilePhone mobilePhone)
 		{
 			mobilePhone.ToggleRinging(state == Telephone.CallState.Ringing);
 		}
@@ -386,17 +383,15 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		if (state == Telephone.CallState.Idle && currentPlayer == null)
 		{
-			base.baseEntity.SetFlag(BaseEntity.Flags.Busy, false);
+			base.baseEntity.SetFlag(BaseEntity.Flags.Busy, b: false);
 		}
 		serverState = state;
 		base.baseEntity.ClientRPC(null, "SetClientState", (int)serverState, (activeCallTo != null) ? activeCallTo.PhoneNumber : 0);
-		Telephone telephone;
-		if ((object)(telephone = base.baseEntity as Telephone) != null)
+		if (base.baseEntity is Telephone telephone)
 		{
 			telephone.MarkDirtyForceUpdateOutputs();
 		}
-		MobilePhone mobilePhone;
-		if ((object)(mobilePhone = base.baseEntity as MobilePhone) != null)
+		if (base.baseEntity is MobilePhone mobilePhone)
 		{
 			mobilePhone.ToggleRinging(state == Telephone.CallState.Ringing);
 		}
@@ -408,7 +403,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 		{
 			if (IsMobile && activeCallTo != null && !activeCallTo.RequirePower)
 			{
-				bool flag = currentPlayer != null;
+				_ = currentPlayer != null;
 			}
 			SetPhoneStateWithPlayer(Telephone.CallState.InProcess);
 			Invoke(TimeOutCall, TelephoneManager.MaxCallLength);
@@ -502,11 +497,9 @@ public class PhoneController : EntityComponent<BaseEntity>
 			return;
 		}
 		int page = msg.read.Int32();
-		using (PhoneDirectory phoneDirectory = Pool.Get<PhoneDirectory>())
-		{
-			TelephoneManager.GetPhoneDirectory(PhoneNumber, page, 12, phoneDirectory);
-			base.baseEntity.ClientRPC(null, "ReceivePhoneDirectory", phoneDirectory);
-		}
+		using PhoneDirectory phoneDirectory = Pool.Get<PhoneDirectory>();
+		TelephoneManager.GetPhoneDirectory(PhoneNumber, page, 12, phoneDirectory);
+		base.baseEntity.ClientRPC(null, "ReceivePhoneDirectory", phoneDirectory);
 	}
 
 	public void Server_AddSavedNumber(BaseEntity.RPCMessage msg)
@@ -609,7 +602,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 	{
 		if (newParent != null && newParent is BasePlayer)
 		{
-			TelephoneManager.RegisterTelephone(this, true);
+			TelephoneManager.RegisterTelephone(this, checkPhoneNumber: true);
 		}
 		else
 		{
@@ -700,8 +693,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	private bool IsPowered()
 	{
-		IOEntity iOEntity;
-		if (base.baseEntity != null && (object)(iOEntity = base.baseEntity as IOEntity) != null)
+		if (base.baseEntity != null && base.baseEntity is IOEntity iOEntity)
 		{
 			return iOEntity.IsPowered();
 		}

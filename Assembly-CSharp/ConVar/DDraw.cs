@@ -1,6 +1,5 @@
-namespace ConVar
+namespace ConVar;
+
+public class DDraw
 {
-	public class DDraw
-	{
-	}
 }

@@ -102,9 +102,9 @@ public class CollectableEasterEgg : BaseEntity
 	public override void ServerInit()
 	{
 		int num = UnityEngine.Random.Range(0, 3);
-		SetFlag(Flags.Reserved1, num == 0, false, false);
-		SetFlag(Flags.Reserved2, num == 1, false, false);
-		SetFlag(Flags.Reserved3, num == 2, false, false);
+		SetFlag(Flags.Reserved1, num == 0, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved2, num == 1, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved3, num == 2, recursive: false, networkupdate: false);
 		base.ServerInit();
 	}
 

@@ -1,15 +1,14 @@
 using UnityEngine;
 
-namespace Rust.UI.ServerAdmin
+namespace Rust.UI.ServerAdmin;
+
+public class ServerAdminConvarInfo : MonoBehaviour
 {
-	public class ServerAdminConvarInfo : MonoBehaviour
-	{
-		public RustText InfoName;
+	public RustText InfoName;
 
-		public RustText InfoValue;
+	public RustText InfoValue;
 
-		public RustInput VariableInput;
+	public RustInput VariableInput;
 
-		public Tooltip TooltipComponent;
-	}
+	public Tooltip TooltipComponent;
 }

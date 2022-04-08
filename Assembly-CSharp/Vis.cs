@@ -65,13 +65,9 @@ public static class Vis
 		for (int i = 0; i < colCount; i++)
 		{
 			Collider collider = colBuffer[i];
-			if (!(collider == null) && collider.enabled)
+			if (!(collider == null) && collider.enabled && GameObjectEx.ToBaseEntity(collider) is T item)
 			{
-				T val = GameObjectEx.ToBaseEntity(collider) as T;
-				if (val != null)
-				{
-					list.Add(val);
-				}
+				list.Add(item);
 			}
 		}
 	}

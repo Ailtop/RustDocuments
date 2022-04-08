@@ -220,13 +220,13 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 		myRigidbody.centerOfMass = COM.localPosition;
 		carPhysics = new CarPhysics<MagnetCrane>(this, base.transform, rigidBody, carSettings);
 		serverTerrainHandler = new VehicleTerrainHandler(this);
-		Magnet.SetMagnetEnabled(false, null);
+		Magnet.SetMagnetEnabled(wantsOn: false, null);
 		spawnOrigin = base.transform.position;
 		lastDrivenTime = UnityEngine.Time.realtimeSinceStartup;
 		GameObject[] onTriggers = OnTriggers;
 		for (int i = 0; i < onTriggers.Length; i++)
 		{
-			onTriggers[i].SetActive(false);
+			onTriggers[i].SetActive(value: false);
 		}
 	}
 
@@ -407,7 +407,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 					{
 						GetDriver().ShowToast(1, ReturnMessage);
 					}
-					Hurt(MaxHealth() * 0.15f, DamageType.Generic, this, false);
+					Hurt(MaxHealth() * 0.15f, DamageType.Generic, this, useProtection: false);
 					lastDamagePos = base.transform.position;
 					nextSelfHealTime = realtimeSinceStartup + 3600f;
 					Effect.server.Run(selfDamageEffect.resourcePath, base.transform.position + Vector3.up * 2f, Vector3.up);
@@ -424,22 +424,22 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 			handbrakeOn = true;
 			throttleInput = 0f;
 			steerInput = 0f;
-			SetFlag(Flags.Reserved10, false);
-			Magnet.SetMagnetEnabled(false, null);
+			SetFlag(Flags.Reserved10, b: false);
+			Magnet.SetMagnetEnabled(wantsOn: false, null);
 		}
 		else
 		{
 			lastDrivenTime = realtimeSinceStartup;
 			if (Magnet.IsMagnetOn() && Magnet.HasConnectedObject() && GamePhysics.CheckOBB(Magnet.GetConnectedOBB(0.75f), 1084293121, QueryTriggerInteraction.Ignore))
 			{
-				Magnet.SetMagnetEnabled(false, null);
+				Magnet.SetMagnetEnabled(wantsOn: false, null);
 				nextToggleTime = realtimeSinceStartup + 2f;
 				Effect.server.Run(selfDamageEffect.resourcePath, Magnet.transform.position, Vector3.up);
 			}
 		}
-		extensionMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C35_0(extensionInput, extensionMove, 3f, UnityEngine.Time.fixedDeltaTime);
-		yawMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C35_0(yawInput, yawMove, 3f, UnityEngine.Time.fixedDeltaTime);
-		raiseArmMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C35_0(raiseArmInput, raiseArmMove, 3f, UnityEngine.Time.fixedDeltaTime);
+		extensionMove = UpdateMoveInput(extensionInput, extensionMove, 3f, UnityEngine.Time.fixedDeltaTime);
+		yawMove = UpdateMoveInput(yawInput, yawMove, 3f, UnityEngine.Time.fixedDeltaTime);
+		raiseArmMove = UpdateMoveInput(raiseArmInput, raiseArmMove, 3f, UnityEngine.Time.fixedDeltaTime);
 		bool flag2 = extensionInput != 0f || raiseArmInput != 0f || yawInput != 0f;
 		SetFlag(Flags.Reserved7, flag2);
 		magnetDamage.damageEnabled = IsOn() && flag2;
@@ -456,6 +456,14 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 		UpdateAnimator(UnityEngine.Time.fixedDeltaTime);
 		Magnet.MagnetThink(UnityEngine.Time.fixedDeltaTime);
 		SetFlag(Flags.Reserved10, throttleInput != 0f || steerInput != 0f);
+		static float UpdateMoveInput(float input, float move, float slowRate, float dt)
+		{
+			if (input != 0f)
+			{
+				return input;
+			}
+			return Mathf.MoveTowards(move, 0f, dt * slowRate);
+		}
 	}
 
 	public override void Save(SaveInfo info)
@@ -510,8 +518,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 				Capsule capsule = new Capsule(driverCollision.transform.position, driverCollision.radius, driverCollision.height);
 				float num = Vector3.Distance(info.PointStart, info.PointEnd);
 				Ray ray = new Ray(info.PointStart, Vector3Ex.Direction(info.PointEnd, info.PointStart));
-				RaycastHit hit;
-				if (capsule.Trace(ray, out hit, 0.05f, num * 1.2f))
+				if (capsule.Trace(ray, out var _, 0.05f, num * 1.2f))
 				{
 					driver.Hurt(info.damageTypes.Total() * 0.15f, DamageType.Bullet, info.Initiator);
 				}
@@ -524,7 +531,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 	{
 		if (HasDriver())
 		{
-			GetDriver().Hurt(10000f, DamageType.Blunt, info.Initiator, false);
+			GetDriver().Hurt(10000f, DamageType.Blunt, info.Initiator, useProtection: false);
 		}
 		if (explosionEffect.isValid)
 		{

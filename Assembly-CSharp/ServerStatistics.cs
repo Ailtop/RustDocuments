@@ -8,8 +8,7 @@ public class ServerStatistics
 
 		public int Get(string name)
 		{
-			int value;
-			dict.TryGetValue(name, out value);
+			dict.TryGetValue(name, out var value);
 			return value;
 		}
 
@@ -56,8 +55,7 @@ public class ServerStatistics
 
 	public static Storage Get(ulong id)
 	{
-		Storage value;
-		if (players.TryGetValue(id, out value))
+		if (players.TryGetValue(id, out var value))
 		{
 			return value;
 		}

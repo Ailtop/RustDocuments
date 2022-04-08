@@ -366,8 +366,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 	public override void PlayerDismounted(BasePlayer player, BaseMountable seat)
 	{
 		base.PlayerDismounted(player, seat);
-		DriverSeatInputs val;
-		if (driverSeatInputs.TryGetValue(seat, out val))
+		if (driverSeatInputs.TryGetValue(seat, out var _))
 		{
 			driverSeatInputs.Remove(seat);
 		}
@@ -680,10 +679,9 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		{
 			return;
 		}
-		BaseVehicleModule baseVehicleModule;
-		if ((object)(baseVehicleModule = hitEntity as BaseVehicleModule) != null)
+		if (hitEntity is BaseVehicleModule baseVehicleModule)
 		{
-			baseVehicleModule.Hurt(damage, DamageType.Collision, this, false);
+			baseVehicleModule.Hurt(damage, DamageType.Collision, this, useProtection: false);
 		}
 		else
 		{
@@ -697,12 +695,12 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 				{
 					foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
 					{
-						attachedModuleEntity.AcceptPropagatedDamage(amount, DamageType.Collision, this, false);
+						attachedModuleEntity.AcceptPropagatedDamage(amount, DamageType.Collision, this, useProtection: false);
 					}
 					return;
 				}
 			}
-			Hurt(damage, DamageType.Collision, this, false);
+			Hurt(damage, DamageType.Collision, this, useProtection: false);
 		}
 	}
 
@@ -750,8 +748,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		base.ScaleDamageForPlayer(player, info);
 		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
 		{
-			VehicleModuleSeating vehicleModuleSeating;
-			if (attachedModuleEntity.HasSeating && (object)(vehicleModuleSeating = attachedModuleEntity as VehicleModuleSeating) != null && vehicleModuleSeating.IsOnThisModule(player))
+			if (attachedModuleEntity.HasSeating && attachedModuleEntity is VehicleModuleSeating vehicleModuleSeating && vehicleModuleSeating.IsOnThisModule(player))
 			{
 				attachedModuleEntity.ScaleDamageForPlayer(player, info);
 			}

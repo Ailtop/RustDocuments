@@ -233,7 +233,7 @@ public class ZiplineMountable : BaseMountable
 		if (num >= 1f)
 		{
 			isAnimatingIn = false;
-			SetFlag(Flags.Reserved2, true);
+			SetFlag(Flags.Reserved2, b: true);
 			mountTime = 0f;
 			CancelInvoke(MovePlayerToPosition);
 		}

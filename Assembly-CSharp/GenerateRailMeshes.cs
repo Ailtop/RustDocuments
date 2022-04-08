@@ -28,12 +28,12 @@ public class GenerateRailMeshes : ProceduralComponent
 				obj.transform.position = item.Position;
 				obj.layer = 16;
 				GameObjectEx.SetHierarchyGroup(obj, rail.Name);
-				obj.SetActive(false);
+				obj.SetActive(value: false);
 				MeshCollider meshCollider = obj.AddComponent<MeshCollider>();
 				meshCollider.sharedMaterial = RailPhysicMaterial;
 				meshCollider.sharedMesh = item.Meshes[0];
 				obj.AddComponent<AddToHeightMap>();
-				obj.SetActive(true);
+				obj.SetActive(value: true);
 			}
 			AddTrackSpline(rail);
 		}

@@ -26,7 +26,7 @@ public class RandomStaticObject : MonoBehaviour
 			GameObject gameObject = Candidates[j];
 			if (j == num)
 			{
-				gameObject.SetActive(true);
+				gameObject.SetActive(value: true);
 			}
 			else
 			{

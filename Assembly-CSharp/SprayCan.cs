@@ -110,36 +110,32 @@ public class SprayCan : HeldEntity
 	[RPC_Server.IsActiveItem]
 	private void ChangeItemSkin(RPCMessage msg)
 	{
-		_003C_003Ec__DisplayClass14_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass14_0();
-		CS_0024_003C_003E8__locals0._003C_003E4__this = this;
 		if (IsBusy())
 		{
 			return;
 		}
 		uint uid = msg.read.UInt32();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
-		CS_0024_003C_003E8__locals0.targetSkin = msg.read.Int32();
+		int targetSkin = msg.read.Int32();
 		if (msg.player == null || !msg.player.CanBuild())
 		{
 			return;
 		}
 		bool flag = false;
-		if (CS_0024_003C_003E8__locals0.targetSkin != 0 && !flag && !msg.player.blueprints.CheckSkinOwnership(CS_0024_003C_003E8__locals0.targetSkin, msg.player.userID))
+		if (targetSkin != 0 && !flag && !msg.player.blueprints.CheckSkinOwnership(targetSkin, msg.player.userID))
 		{
-			CS_0024_003C_003E8__locals0._003CChangeItemSkin_003Eg__SprayFailResponse_007C2(SprayFailReason.SkinNotOwned);
+			SprayFailResponse(SprayFailReason.SkinNotOwned);
 			return;
 		}
-		BaseEntity baseEntity;
-		if (baseNetworkable != null && (object)(baseEntity = baseNetworkable as BaseEntity) != null)
+		if (baseNetworkable != null && baseNetworkable is BaseEntity baseEntity2)
 		{
-			Vector3 position = baseEntity.WorldSpaceBounds().ClosestPoint(msg.player.eyes.position);
+			Vector3 position = baseEntity2.WorldSpaceBounds().ClosestPoint(msg.player.eyes.position);
 			if (!msg.player.IsVisible(position, 3f))
 			{
-				CS_0024_003C_003E8__locals0._003CChangeItemSkin_003Eg__SprayFailResponse_007C2(SprayFailReason.LineOfSight);
+				SprayFailResponse(SprayFailReason.LineOfSight);
 				return;
 			}
-			Door door;
-			if ((object)(door = baseNetworkable as Door) != null)
+			if (baseNetworkable is Door door)
 			{
 				if (!door.GetPlayerLockPermission(msg.player))
 				{
@@ -152,70 +148,65 @@ public class SprayCan : HeldEntity
 					return;
 				}
 			}
-			ItemDefinition def;
-			if (!GetItemDefinitionForEntity(baseEntity, out def))
+			if (!GetItemDefinitionForEntity(baseEntity2, out var def))
 			{
-				CS_0024_003C_003E8__locals0._003CChangeItemSkin_003Eg__SprayFailResponse_007C2(SprayFailReason.InvalidItem);
+				SprayFailResponse(SprayFailReason.InvalidItem);
 				return;
 			}
 			ItemDefinition itemDefinition = null;
-			ulong num = ItemDefinition.FindSkin(def.itemid, CS_0024_003C_003E8__locals0.targetSkin);
-			ItemSkinDirectory.Skin skin = def.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => x.id == CS_0024_003C_003E8__locals0.targetSkin);
-			if (Interface.CallHook("OnEntityReskin", baseEntity, skin, msg.player) != null)
+			ulong num = ItemDefinition.FindSkin(def.itemid, targetSkin);
+			ItemSkinDirectory.Skin skin = def.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => x.id == targetSkin);
+			if (Interface.CallHook("OnEntityReskin", baseEntity2, skin, msg.player) != null)
 			{
 				return;
 			}
-			ItemSkin itemSkin;
-			if (skin.invItem != null && (object)(itemSkin = skin.invItem as ItemSkin) != null)
+			if (skin.invItem != null && skin.invItem is ItemSkin itemSkin)
 			{
 				if (itemSkin.Redirect != null)
 				{
 					itemDefinition = itemSkin.Redirect;
 				}
-				else if (GetItemDefinitionForEntity(baseEntity, out def, false) && def.isRedirectOf != null)
+				else if (GetItemDefinitionForEntity(baseEntity2, out def, useRedirect: false) && def.isRedirectOf != null)
 				{
 					itemDefinition = def.isRedirectOf;
 				}
 			}
-			else if (def.isRedirectOf != null || (GetItemDefinitionForEntity(baseEntity, out def, false) && def.isRedirectOf != null))
+			else if (def.isRedirectOf != null || (GetItemDefinitionForEntity(baseEntity2, out def, useRedirect: false) && def.isRedirectOf != null))
 			{
 				itemDefinition = def.isRedirectOf;
 			}
 			if (itemDefinition == null)
 			{
-				baseEntity.skinID = num;
-				baseEntity.SendNetworkUpdate();
-				Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, CS_0024_003C_003E8__locals0.targetSkin);
+				baseEntity2.skinID = num;
+				baseEntity2.SendNetworkUpdate();
+				Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, targetSkin);
 			}
 			else
 			{
-				SprayFailReason reason;
-				if (!CanEntityBeRespawned(baseEntity, out reason))
+				if (!CanEntityBeRespawned(baseEntity2, out var reason2))
 				{
-					CS_0024_003C_003E8__locals0._003CChangeItemSkin_003Eg__SprayFailResponse_007C2(reason);
+					SprayFailResponse(reason2);
 					return;
 				}
-				string resourcePath;
-				if (!GetEntityPrefabPath(itemDefinition, out resourcePath))
+				if (!GetEntityPrefabPath(itemDefinition, out var resourcePath))
 				{
 					Debug.LogWarning("Cannot find resource path of redirect entity to spawn! " + itemDefinition.gameObject.name);
-					CS_0024_003C_003E8__locals0._003CChangeItemSkin_003Eg__SprayFailResponse_007C2(SprayFailReason.InvalidItem);
+					SprayFailResponse(SprayFailReason.InvalidItem);
 					return;
 				}
-				Vector3 position2 = baseEntity.transform.position;
-				Quaternion rotation = baseEntity.transform.rotation;
-				BaseEntity entity = baseEntity.GetParentEntity();
-				float health = baseEntity.Health();
-				EntityRef[] slots = baseEntity.GetSlots();
-				BaseCombatEntity baseCombatEntity;
-				float lastAttackedTime = (((object)(baseCombatEntity = baseEntity as BaseCombatEntity) != null) ? baseCombatEntity.lastAttackedTime : 0f);
-				bool flag2 = baseEntity is Door;
-				Dictionary<ContainerSet, List<Item>> dictionary = new Dictionary<ContainerSet, List<Item>>();
-				_003CChangeItemSkin_003Eg__SaveEntityStorage_007C14_0(baseEntity, dictionary, 0);
+				Vector3 position2 = baseEntity2.transform.position;
+				Quaternion rotation = baseEntity2.transform.rotation;
+				BaseEntity entity = baseEntity2.GetParentEntity();
+				float health = baseEntity2.Health();
+				EntityRef[] slots = baseEntity2.GetSlots();
+				float lastAttackedTime = ((baseEntity2 is BaseCombatEntity baseCombatEntity) ? baseCombatEntity.lastAttackedTime : 0f);
+				bool flag2 = baseEntity2 is Door;
+				Dictionary<ContainerSet, List<Item>> dictionary2 = new Dictionary<ContainerSet, List<Item>>();
+				SaveEntityStorage(baseEntity2, dictionary2, 0);
 				List<ChildPreserveInfo> obj = Facepunch.Pool.GetList<ChildPreserveInfo>();
 				if (flag2)
 				{
-					foreach (BaseEntity child in baseEntity.children)
+					foreach (BaseEntity child in baseEntity2.children)
 					{
 						obj.Add(new ChildPreserveInfo
 						{
@@ -227,51 +218,48 @@ public class SprayCan : HeldEntity
 					}
 					foreach (ChildPreserveInfo item in obj)
 					{
-						item.TargetEntity.SetParent(null, true);
+						item.TargetEntity.SetParent(null, worldPositionStays: true);
 					}
 				}
 				else
 				{
-					for (int i = 0; i < baseEntity.children.Count; i++)
+					for (int i = 0; i < baseEntity2.children.Count; i++)
 					{
-						_003CChangeItemSkin_003Eg__SaveEntityStorage_007C14_0(baseEntity.children[i], dictionary, -1);
+						SaveEntityStorage(baseEntity2.children[i], dictionary2, -1);
 					}
 				}
-				baseEntity.Kill();
-				baseEntity = GameManager.server.CreateEntity(resourcePath, position2, rotation);
-				baseEntity.SetParent(entity);
-				ItemDefinition def2;
-				if (GetItemDefinitionForEntity(baseEntity, out def2, false) && def2.isRedirectOf != null)
+				baseEntity2.Kill();
+				baseEntity2 = GameManager.server.CreateEntity(resourcePath, position2, rotation);
+				baseEntity2.SetParent(entity);
+				if (GetItemDefinitionForEntity(baseEntity2, out var def2, useRedirect: false) && def2.isRedirectOf != null)
 				{
-					baseEntity.skinID = 0uL;
+					baseEntity2.skinID = 0uL;
 				}
 				else
 				{
-					baseEntity.skinID = num;
+					baseEntity2.skinID = num;
 				}
-				DecayEntity decayEntity;
-				if ((object)(decayEntity = baseEntity as DecayEntity) != null)
+				if (baseEntity2 is DecayEntity decayEntity)
 				{
 					decayEntity.AttachToBuilding(null);
 				}
-				baseEntity.Spawn();
-				BaseCombatEntity baseCombatEntity2;
-				if ((object)(baseCombatEntity2 = baseEntity as BaseCombatEntity) != null)
+				baseEntity2.Spawn();
+				if (baseEntity2 is BaseCombatEntity baseCombatEntity2)
 				{
 					baseCombatEntity2.SetHealth(health);
 					baseCombatEntity2.lastAttackedTime = lastAttackedTime;
 				}
-				if (dictionary.Count > 0)
+				if (dictionary2.Count > 0)
 				{
-					_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C14_1(baseEntity, 0, dictionary);
+					RestoreEntityStorage(baseEntity2, 0, dictionary2);
 					if (!flag2)
 					{
-						for (int j = 0; j < baseEntity.children.Count; j++)
+						for (int j = 0; j < baseEntity2.children.Count; j++)
 						{
-							_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C14_1(baseEntity.children[j], -1, dictionary);
+							RestoreEntityStorage(baseEntity2.children[j], -1, dictionary2);
 						}
 					}
-					foreach (KeyValuePair<ContainerSet, List<Item>> item2 in dictionary)
+					foreach (KeyValuePair<ContainerSet, List<Item>> item2 in dictionary2)
 					{
 						foreach (Item item3 in item2.Value)
 						{
@@ -279,46 +267,91 @@ public class SprayCan : HeldEntity
 							item3.Remove();
 						}
 					}
-					Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, CS_0024_003C_003E8__locals0.targetSkin);
+					Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, targetSkin);
 				}
 				if (flag2)
 				{
 					foreach (ChildPreserveInfo item4 in obj)
 					{
-						item4.TargetEntity.SetParent(baseEntity, item4.TargetBone, true);
+						item4.TargetEntity.SetParent(baseEntity2, item4.TargetBone, worldPositionStays: true);
 						item4.TargetEntity.transform.localPosition = item4.LocalPosition;
 						item4.TargetEntity.transform.localRotation = item4.LocalRotation;
 						item4.TargetEntity.SendNetworkUpdate();
 					}
-					baseEntity.SetSlots(slots);
+					baseEntity2.SetSlots(slots);
 				}
 				Facepunch.Pool.FreeList(ref obj);
 			}
-			Interface.CallHook("OnEntityReskinned", baseEntity, skin, msg.player);
-			ClientRPC(null, "Client_ReskinResult", 1, baseEntity.net.ID);
+			Interface.CallHook("OnEntityReskinned", baseEntity2, skin, msg.player);
+			ClientRPC(null, "Client_ReskinResult", 1, baseEntity2.net.ID);
 		}
 		LoseCondition(ConditionLossPerReskin);
-		SetFlag(Flags.Busy, true);
+		SetFlag(Flags.Busy, b: true);
 		Invoke(ClearBusy, SprayCooldown);
+		static void RestoreEntityStorage(BaseEntity baseEntity, int index, Dictionary<ContainerSet, List<Item>> copy)
+		{
+			if (baseEntity is IItemContainerEntity itemContainerEntity)
+			{
+				ContainerSet containerSet = default(ContainerSet);
+				containerSet.ContainerIndex = index;
+				containerSet.PrefabId = ((index != 0) ? baseEntity.prefabID : 0u);
+				ContainerSet key = containerSet;
+				if (copy.ContainsKey(key))
+				{
+					foreach (Item item5 in copy[key])
+					{
+						item5.MoveToContainer(itemContainerEntity.inventory);
+					}
+					copy.Remove(key);
+				}
+			}
+		}
+		static void SaveEntityStorage(BaseEntity baseEntity, Dictionary<ContainerSet, List<Item>> dictionary, int index)
+		{
+			if (baseEntity is IItemContainerEntity itemContainerEntity2)
+			{
+				ContainerSet containerSet2 = default(ContainerSet);
+				containerSet2.ContainerIndex = index;
+				containerSet2.PrefabId = ((index != 0) ? baseEntity.prefabID : 0u);
+				ContainerSet key2 = containerSet2;
+				if (!dictionary.ContainsKey(key2))
+				{
+					dictionary.Add(key2, new List<Item>());
+					foreach (Item item6 in itemContainerEntity2.inventory.itemList)
+					{
+						dictionary[key2].Add(item6);
+					}
+					{
+						foreach (Item item7 in dictionary[key2])
+						{
+							item7.RemoveFromContainer();
+						}
+						return;
+					}
+				}
+				Debug.Log("Multiple containers with the same prefab id being added during vehicle reskin");
+			}
+		}
+		void SprayFailResponse(SprayFailReason reason)
+		{
+			ClientRPC(null, "Client_ReskinResult", 0, (int)reason);
+		}
 	}
 
 	private bool GetEntityPrefabPath(ItemDefinition def, out string resourcePath)
 	{
 		resourcePath = string.Empty;
-		ItemModDeployable component;
-		if (def.TryGetComponent<ItemModDeployable>(out component))
+		if (def.TryGetComponent<ItemModDeployable>(out var component))
 		{
 			resourcePath = component.entityPrefab.resourcePath;
 			return true;
 		}
-		ItemModEntity component2;
-		if (def.TryGetComponent<ItemModEntity>(out component2))
+		if (def.TryGetComponent<ItemModEntity>(out var component2))
 		{
 			resourcePath = component2.entityPrefab.resourcePath;
 			return true;
 		}
-		ItemModEntityReference component3;
-		if (def.TryGetComponent<ItemModEntityReference>(out component3))
+		if (def.TryGetComponent<ItemModEntityReference>(out var component3))
 		{
 			resourcePath = component3.entityPrefab.resourcePath;
 			return true;
@@ -333,25 +366,22 @@ public class SprayCan : HeldEntity
 
 	public void ClearBusy()
 	{
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 	}
 
 	private bool CanEntityBeRespawned(BaseEntity targetEntity, out SprayFailReason reason)
 	{
-		BaseMountable baseMountable;
-		if ((object)(baseMountable = targetEntity as BaseMountable) != null && baseMountable.IsMounted())
+		if (targetEntity is BaseMountable baseMountable && baseMountable.IsMounted())
 		{
 			reason = SprayFailReason.MountedBlocked;
 			return false;
 		}
-		BaseVehicle baseVehicle;
-		if (targetEntity.isServer && (object)(baseVehicle = targetEntity as BaseVehicle) != null && (baseVehicle.HasDriver() || baseVehicle.AnyMounted()))
+		if (targetEntity.isServer && targetEntity is BaseVehicle baseVehicle && (baseVehicle.HasDriver() || baseVehicle.AnyMounted()))
 		{
 			reason = SprayFailReason.MountedBlocked;
 			return false;
 		}
-		IOEntity iOEntity;
-		if ((object)(iOEntity = targetEntity as IOEntity) != null && (iOEntity.GetConnectedInputCount() != 0 || iOEntity.GetConnectedOutputCount() != 0))
+		if (targetEntity is IOEntity iOEntity && (iOEntity.GetConnectedInputCount() != 0 || iOEntity.GetConnectedOutputCount() != 0))
 		{
 			reason = SprayFailReason.IOConnection;
 			return false;
@@ -363,8 +393,7 @@ public class SprayCan : HeldEntity
 	public static bool GetItemDefinitionForEntity(BaseEntity be, out ItemDefinition def, bool useRedirect = true)
 	{
 		def = null;
-		BaseCombatEntity baseCombatEntity;
-		if ((object)(baseCombatEntity = be as BaseCombatEntity) != null)
+		if (be is BaseCombatEntity baseCombatEntity)
 		{
 			if (baseCombatEntity.pickup.enabled && baseCombatEntity.pickup.itemTarget != null)
 			{

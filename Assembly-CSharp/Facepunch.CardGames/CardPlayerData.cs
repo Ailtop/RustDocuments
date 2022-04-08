@@ -3,228 +3,227 @@ using System.Collections.Generic;
 using ProtoBuf;
 using UnityEngine;
 
-namespace Facepunch.CardGames
+namespace Facepunch.CardGames;
+
+public class CardPlayerData : IDisposable
 {
-	public class CardPlayerData : IDisposable
+	public enum CardPlayerState
 	{
-		public enum CardPlayerState
+		None = 0,
+		WantsToPlay = 1,
+		InGame = 2,
+		InCurrentRound = 3
+	}
+
+	public List<PlayingCard> Cards;
+
+	public readonly int mountIndex;
+
+	private readonly bool isServer;
+
+	public int availableInputs;
+
+	public int betThisRound;
+
+	public int betThisTurn;
+
+	public int finalScore;
+
+	public float lastActionTime;
+
+	public int remainingToPayOut;
+
+	private Func<int, StorageContainer> getStorage;
+
+	public readonly int scrapItemID;
+
+	public ulong UserID { get; set; }
+
+	public CardPlayerState State { get; set; }
+
+	public bool HasUser => State >= CardPlayerState.WantsToPlay;
+
+	public bool HasUserInGame => State >= CardPlayerState.InGame;
+
+	public bool HasUserInCurrentRound => State == CardPlayerState.InCurrentRound;
+
+	public bool HasAvailableInputs => availableInputs > 0;
+
+	private bool IsClient => !isServer;
+
+	public bool LeftRoundEarly { get; set; }
+
+	public bool SendCardDetails { get; set; }
+
+	public bool hasActedThisTurn { get; set; }
+
+	public CardPlayerData(int mountIndex, bool isServer)
+	{
+		this.isServer = isServer;
+		this.mountIndex = mountIndex;
+		Cards = Pool.GetList<PlayingCard>();
+	}
+
+	public CardPlayerData(int scrapItemID, Func<int, StorageContainer> getStorage, int mountIndex, bool isServer)
+		: this(mountIndex, isServer)
+	{
+		this.scrapItemID = scrapItemID;
+		this.getStorage = getStorage;
+	}
+
+	public void Dispose()
+	{
+		Pool.FreeList(ref Cards);
+	}
+
+	public int GetScrapAmount()
+	{
+		if (!HasUser)
 		{
-			None = 0,
-			WantsToPlay = 1,
-			InGame = 2,
-			InCurrentRound = 3
-		}
-
-		public List<PlayingCard> Cards;
-
-		public readonly int mountIndex;
-
-		private readonly bool isServer;
-
-		public int availableInputs;
-
-		public int betThisRound;
-
-		public int betThisTurn;
-
-		public int finalScore;
-
-		public float lastActionTime;
-
-		public int remainingToPayOut;
-
-		private Func<int, StorageContainer> getStorage;
-
-		public readonly int scrapItemID;
-
-		public ulong UserID { get; set; }
-
-		public CardPlayerState State { get; set; }
-
-		public bool HasUser => State >= CardPlayerState.WantsToPlay;
-
-		public bool HasUserInGame => State >= CardPlayerState.InGame;
-
-		public bool HasUserInCurrentRound => State == CardPlayerState.InCurrentRound;
-
-		public bool HasAvailableInputs => availableInputs > 0;
-
-		private bool IsClient => !isServer;
-
-		public bool LeftRoundEarly { get; set; }
-
-		public bool SendCardDetails { get; set; }
-
-		public bool hasActedThisTurn { get; set; }
-
-		public CardPlayerData(int mountIndex, bool isServer)
-		{
-			this.isServer = isServer;
-			this.mountIndex = mountIndex;
-			Cards = Pool.GetList<PlayingCard>();
-		}
-
-		public CardPlayerData(int scrapItemID, Func<int, StorageContainer> getStorage, int mountIndex, bool isServer)
-			: this(mountIndex, isServer)
-		{
-			this.scrapItemID = scrapItemID;
-			this.getStorage = getStorage;
-		}
-
-		public void Dispose()
-		{
-			Pool.FreeList(ref Cards);
-		}
-
-		public int GetScrapAmount()
-		{
-			if (!HasUser)
-			{
-				return 0;
-			}
-			if (isServer)
-			{
-				StorageContainer storage = GetStorage();
-				if (storage != null)
-				{
-					return storage.inventory.GetAmount(scrapItemID, true);
-				}
-				Debug.LogError(GetType().Name + ": Couldn't get player storage.");
-			}
 			return 0;
 		}
-
-		public void SetHasActedThisTurn(bool hasActed)
+		if (isServer)
 		{
-			hasActedThisTurn = hasActed;
-			if (!hasActed)
+			StorageContainer storage = GetStorage();
+			if (storage != null)
 			{
-				betThisTurn = 0;
+				return storage.inventory.GetAmount(scrapItemID, onlyUsableAmounts: true);
 			}
+			Debug.LogError(GetType().Name + ": Couldn't get player storage.");
 		}
+		return 0;
+	}
 
-		public bool HasBeenIdleFor(int seconds)
+	public void SetHasActedThisTurn(bool hasActed)
+	{
+		hasActedThisTurn = hasActed;
+		if (!hasActed)
 		{
-			if (HasUserInGame)
-			{
-				return Time.unscaledTime > lastActionTime + (float)seconds;
-			}
-			return false;
+			betThisTurn = 0;
 		}
+	}
 
-		public StorageContainer GetStorage()
+	public bool HasBeenIdleFor(int seconds)
+	{
+		if (HasUserInGame)
 		{
-			return getStorage(mountIndex);
+			return Time.unscaledTime > lastActionTime + (float)seconds;
 		}
+		return false;
+	}
 
-		public void AddUser(ulong userID)
-		{
-			ClearAllData();
-			UserID = userID;
-			State = CardPlayerState.WantsToPlay;
-			lastActionTime = Time.unscaledTime;
-		}
+	public StorageContainer GetStorage()
+	{
+		return getStorage(mountIndex);
+	}
 
-		public void ClearAllData()
+	public void AddUser(ulong userID)
+	{
+		ClearAllData();
+		UserID = userID;
+		State = CardPlayerState.WantsToPlay;
+		lastActionTime = Time.unscaledTime;
+	}
+
+	public void ClearAllData()
+	{
+		UserID = 0uL;
+		Cards.Clear();
+		availableInputs = 0;
+		betThisRound = 0;
+		betThisTurn = 0;
+		finalScore = 0;
+		LeftRoundEarly = false;
+		hasActedThisTurn = false;
+		SendCardDetails = false;
+		State = CardPlayerState.None;
+	}
+
+	public void JoinRound()
+	{
+		if (HasUser)
 		{
-			UserID = 0uL;
+			State = CardPlayerState.InCurrentRound;
 			Cards.Clear();
-			availableInputs = 0;
 			betThisRound = 0;
 			betThisTurn = 0;
 			finalScore = 0;
 			LeftRoundEarly = false;
 			hasActedThisTurn = false;
 			SendCardDetails = false;
-			State = CardPlayerState.None;
 		}
+	}
 
-		public void JoinRound()
+	public void LeaveCurrentRound(bool clearBets, bool leftRoundEarly)
+	{
+		if (HasUserInCurrentRound)
 		{
-			if (HasUser)
+			availableInputs = 0;
+			finalScore = 0;
+			hasActedThisTurn = false;
+			if (clearBets)
 			{
-				State = CardPlayerState.InCurrentRound;
-				Cards.Clear();
 				betThisRound = 0;
 				betThisTurn = 0;
-				finalScore = 0;
-				LeftRoundEarly = false;
-				hasActedThisTurn = false;
-				SendCardDetails = false;
 			}
+			State = CardPlayerState.InGame;
+			LeftRoundEarly = leftRoundEarly;
 		}
+	}
 
-		public void LeaveCurrentRound(bool clearBets, bool leftRoundEarly)
+	public void LeaveGame()
+	{
+		if (HasUserInGame)
 		{
-			if (HasUserInCurrentRound)
+			Cards.Clear();
+			availableInputs = 0;
+			finalScore = 0;
+			SendCardDetails = false;
+			LeftRoundEarly = false;
+			State = CardPlayerState.WantsToPlay;
+		}
+	}
+
+	public void EnableSendingCards()
+	{
+		SendCardDetails = true;
+	}
+
+	public string HandToString()
+	{
+		return HandToString(Cards);
+	}
+
+	public static string HandToString(List<PlayingCard> cards)
+	{
+		string text = string.Empty;
+		foreach (PlayingCard card in cards)
+		{
+			text = text + "23456789TJQKA"[(int)card.Rank] + "♠♥♦♣"[(int)card.Suit] + " ";
+		}
+		return text;
+	}
+
+	public void Save(List<ProtoBuf.CardTable.CardPlayer> playersMsg)
+	{
+		ProtoBuf.CardTable.CardPlayer cardPlayer = Pool.Get<ProtoBuf.CardTable.CardPlayer>();
+		cardPlayer.userid = UserID;
+		cardPlayer.cards = Pool.GetList<int>();
+		if (SendCardDetails)
+		{
+			foreach (PlayingCard card in Cards)
 			{
-				availableInputs = 0;
-				finalScore = 0;
-				hasActedThisTurn = false;
-				if (clearBets)
-				{
-					betThisRound = 0;
-					betThisTurn = 0;
-				}
-				State = CardPlayerState.InGame;
-				LeftRoundEarly = leftRoundEarly;
+				cardPlayer.cards.Add(card.GetIndex());
 			}
 		}
-
-		public void LeaveGame()
-		{
-			if (HasUserInGame)
-			{
-				Cards.Clear();
-				availableInputs = 0;
-				finalScore = 0;
-				SendCardDetails = false;
-				LeftRoundEarly = false;
-				State = CardPlayerState.WantsToPlay;
-			}
-		}
-
-		public void EnableSendingCards()
-		{
-			SendCardDetails = true;
-		}
-
-		public string HandToString()
-		{
-			return HandToString(Cards);
-		}
-
-		public static string HandToString(List<PlayingCard> cards)
-		{
-			string text = string.Empty;
-			foreach (PlayingCard card in cards)
-			{
-				text = text + "23456789TJQKA"[(int)card.Rank] + "♠♥♦♣"[(int)card.Suit] + " ";
-			}
-			return text;
-		}
-
-		public void Save(List<ProtoBuf.CardTable.CardPlayer> playersMsg)
-		{
-			ProtoBuf.CardTable.CardPlayer cardPlayer = Pool.Get<ProtoBuf.CardTable.CardPlayer>();
-			cardPlayer.userid = UserID;
-			cardPlayer.cards = Pool.GetList<int>();
-			if (SendCardDetails)
-			{
-				foreach (PlayingCard card in Cards)
-				{
-					cardPlayer.cards.Add(card.GetIndex());
-				}
-			}
-			cardPlayer.scrap = GetScrapAmount();
-			cardPlayer.state = (int)State;
-			cardPlayer.availableInputs = availableInputs;
-			cardPlayer.betThisRound = betThisRound;
-			cardPlayer.betThisTurn = betThisTurn;
-			cardPlayer.trueCardCount = Cards.Count;
-			cardPlayer.leftRoundEarly = LeftRoundEarly;
-			cardPlayer.sendCardDetails = SendCardDetails;
-			playersMsg.Add(cardPlayer);
-		}
+		cardPlayer.scrap = GetScrapAmount();
+		cardPlayer.state = (int)State;
+		cardPlayer.availableInputs = availableInputs;
+		cardPlayer.betThisRound = betThisRound;
+		cardPlayer.betThisTurn = betThisTurn;
+		cardPlayer.trueCardCount = Cards.Count;
+		cardPlayer.leftRoundEarly = LeftRoundEarly;
+		cardPlayer.sendCardDetails = SendCardDetails;
+		playersMsg.Add(cardPlayer);
 	}
 }

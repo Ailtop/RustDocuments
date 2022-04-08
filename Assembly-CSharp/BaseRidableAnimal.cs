@@ -342,7 +342,7 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 		if (inventory == null)
 		{
-			CreateInventory(true);
+			CreateInventory(giveUID: true);
 			OnInventoryFirstCreated(inventory);
 		}
 	}
@@ -454,17 +454,13 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public float GetBreathingDelay()
 	{
-		switch (currentRunState)
+		return currentRunState switch
 		{
-		default:
-			return -1f;
-		case RunState.walk:
-			return 8f;
-		case RunState.run:
-			return 5f;
-		case RunState.sprint:
-			return 2.5f;
-		}
+			RunState.walk => 8f, 
+			RunState.run => 5f, 
+			RunState.sprint => 2.5f, 
+			_ => -1f, 
+		};
 	}
 
 	public bool IsLeading()
@@ -516,8 +512,8 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public void DelayedDropToGround()
 	{
-		DropToGround(base.transform.position, true);
-		UpdateGroundNormal(true);
+		DropToGround(base.transform.position, force: true);
+		UpdateGroundNormal(force: true);
 	}
 
 	public override void Load(LoadInfo info)
@@ -549,9 +545,9 @@ public class BaseRidableAnimal : BaseVehicle
 			if (item != null)
 			{
 				item.UseItem();
-				SetFlag(Flags.Reserved2, false);
+				SetFlag(Flags.Reserved2, b: false);
 				Facepunch.Rust.Analytics.Server.VehiclePurchased(base.ShortPrefabName);
-				AttemptMount(player, false);
+				AttemptMount(player, doMountChecks: false);
 				Interface.CallHook("OnRidableAnimalClaimed", this, player);
 			}
 		}
@@ -577,13 +573,13 @@ public class BaseRidableAnimal : BaseVehicle
 	public override void PlayerMounted(BasePlayer player, BaseMountable seat)
 	{
 		base.PlayerMounted(player, seat);
-		SetFlag(Flags.On, true, true);
+		SetFlag(Flags.On, b: true, recursive: true);
 	}
 
 	public override void PlayerDismounted(BasePlayer player, BaseMountable seat)
 	{
 		base.PlayerDismounted(player, seat);
-		SetFlag(Flags.On, false, true);
+		SetFlag(Flags.On, b: false, recursive: true);
 	}
 
 	public void SetDecayActive(bool isActive)
@@ -641,7 +637,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			float num = 1f / decayminutes;
 			float num2 = ((!IsOutside()) ? 1f : 0.5f);
-			Hurt(MaxHealth() * num * num2, DamageType.Decay, this, false);
+			Hurt(MaxHealth() * num * num2, DamageType.Decay, this, useProtection: false);
 		}
 	}
 
@@ -878,7 +874,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			currentRunState = newState;
 			timeInMoveState = 0f;
-			SetFlag(Flags.Reserved8, currentRunState == RunState.sprint, false, false);
+			SetFlag(Flags.Reserved8, currentRunState == RunState.sprint, recursive: false, networkupdate: false);
 			MarkObstacleDistanceDirty();
 		}
 	}
@@ -899,17 +895,13 @@ public class BaseRidableAnimal : BaseVehicle
 	public float MoveStateToVelocity(RunState stateToCheck)
 	{
 		float num = 0f;
-		switch (stateToCheck)
+		return stateToCheck switch
 		{
-		default:
-			return 0f;
-		case RunState.walk:
-			return GetWalkSpeed();
-		case RunState.run:
-			return GetTrotSpeed();
-		case RunState.sprint:
-			return GetRunSpeed();
-		}
+			RunState.walk => GetWalkSpeed(), 
+			RunState.run => GetTrotSpeed(), 
+			RunState.sprint => GetRunSpeed(), 
+			_ => 0f, 
+		};
 	}
 
 	public float GetDesiredVelocity()
@@ -990,7 +982,7 @@ public class BaseRidableAnimal : BaseVehicle
 		float value = UnityEngine.Time.time - lastInputTime;
 		lastInputTime = UnityEngine.Time.time;
 		value = Mathf.Clamp(value, 0f, 1f);
-		Vector3 zero = Vector3.zero;
+		_ = Vector3.zero;
 		timeInMoveState += value;
 		if (inputState == null)
 		{
@@ -1110,9 +1102,7 @@ public class BaseRidableAnimal : BaseVehicle
 			Transform[] array = groundSampleOffsets;
 			for (int i = 0; i < array.Length; i++)
 			{
-				Vector3 pos;
-				Vector3 normal;
-				if (TransformUtil.GetGroundInfo(array[i].position + Vector3.up * 2f, out pos, out normal, 4f, 278986753))
+				if (TransformUtil.GetGroundInfo(array[i].position + Vector3.up * 2f, out var _, out var normal, 4f, 278986753))
 				{
 					targetUp += normal;
 				}
@@ -1147,7 +1137,7 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public float ObstacleDistanceCheck(float speed = 10f)
 	{
-		Vector3 position = base.transform.position;
+		_ = base.transform.position;
 		int num = Mathf.Max(2, Mathf.Min((int)speed, 10));
 		float num2 = 0.5f;
 		int num3 = Mathf.CeilToInt((float)num / num2);
@@ -1167,8 +1157,7 @@ public class BaseRidableAnimal : BaseVehicle
 			Vector3 origin = vector3 + Vector3.up * (maxStepHeight + obstacleDetectionRadius);
 			Vector3 vector4 = vector3 + vector * num5;
 			float num7 = maxStepDownHeight + obstacleDetectionRadius;
-			RaycastHit hitInfo;
-			if (UnityEngine.Physics.SphereCast(origin, obstacleDetectionRadius, vector, out hitInfo, num5, 1486954753))
+			if (UnityEngine.Physics.SphereCast(origin, obstacleDetectionRadius, vector, out var hitInfo, num5, 1486954753))
 			{
 				num6 = hitInfo.distance;
 				pos = hitInfo.point;
@@ -1182,7 +1171,7 @@ public class BaseRidableAnimal : BaseVehicle
 					return num4;
 				}
 				num6 = Vector3.Distance(vector3, pos);
-				if (WaterLevel.Test(pos + Vector3.one * maxWaterDepth, true, this))
+				if (WaterLevel.Test(pos + Vector3.one * maxWaterDepth, waves: true, this))
 				{
 					normal = -base.transform.forward;
 					return num4;
@@ -1202,9 +1191,7 @@ public class BaseRidableAnimal : BaseVehicle
 					{
 						Vector3 vector6 = vector4 + normalOffsets[j].x * base.transform.right;
 						float num12 = maxStepHeight * 2.5f;
-						Vector3 pos2;
-						Vector3 normal2;
-						if (TransformUtil.GetGroundInfo(vector6 + Vector3.up * num12 + normalOffsets[j].z * base.transform.forward, out pos2, out normal2, num7 + num12, 278986753))
+						if (TransformUtil.GetGroundInfo(vector6 + Vector3.up * num12 + normalOffsets[j].z * base.transform.forward, out var pos2, out var normal2, num7 + num12, 278986753))
 						{
 							num11++;
 							vector5 += normal2;
@@ -1332,7 +1319,7 @@ public class BaseRidableAnimal : BaseVehicle
 		num11 = (num11 + 1f) / 2f;
 		if (desiredRotation != 0f)
 		{
-			Vector3 position2 = animalFront.transform.position;
+			_ = animalFront.transform.position;
 			Quaternion rotation = base.transform.rotation;
 			base.transform.Rotate(Vector3.up, desiredRotation * delta * turnSpeed * num11);
 			if (!IsLeading() && Vis.AnyColliders(animalFront.transform.position, obstacleDetectionRadius * 0.25f, 1503731969))
@@ -1350,7 +1337,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			return;
 		}
-		Vector3 vector3 = base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up;
+		_ = base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up;
 		RaycastHit hitInfo;
 		bool flag2 = UnityEngine.Physics.SphereCast(animalFront.transform.position, obstacleDetectionRadius, normalized, out hitInfo, num12, 1503731969);
 		bool flag3 = UnityEngine.Physics.SphereCast(base.transform.position + base.transform.InverseTransformPoint(animalFront.transform.position).y * base.transform.up, obstacleDetectionRadius, normalized, out hitInfo, num12, 1503731969);
@@ -1374,9 +1361,7 @@ public class BaseRidableAnimal : BaseVehicle
 	public bool DropToGround(Vector3 targetPos, bool force = false)
 	{
 		float range = (force ? 10000f : (maxStepHeight + maxStepDownHeight));
-		Vector3 pos;
-		Vector3 normal;
-		if (TransformUtil.GetGroundInfo(targetPos, out pos, out normal, range, 278986753))
+		if (TransformUtil.GetGroundInfo(targetPos, out var pos, out var _, range, 278986753))
 		{
 			if (UnityEngine.Physics.CheckSphere(pos + Vector3.up * 1f, 0.2f, 278986753))
 			{
@@ -1407,7 +1392,7 @@ public class BaseRidableAnimal : BaseVehicle
 	public override void PreServerLoad()
 	{
 		base.PreServerLoad();
-		CreateInventory(false);
+		CreateInventory(giveUID: false);
 	}
 
 	public override void ServerInit()
@@ -1415,7 +1400,7 @@ public class BaseRidableAnimal : BaseVehicle
 		ContainerServerInit();
 		base.ServerInit();
 		InvokeRepeating(DoNetworkUpdate, UnityEngine.Random.Range(0f, 0.2f), 0.333f);
-		SetDecayActive(true);
+		SetDecayActive(isActive: true);
 		if (debugMovement)
 		{
 			InvokeRandomized(DoDebugMovement, 0f, 0.1f, 0.1f);
@@ -1481,7 +1466,7 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 		if (base.isServer)
 		{
-			float runSpeed2 = runSpeed;
+			_ = runSpeed;
 			float num = Mathf.InverseLerp(maxStaminaSeconds * 0.5f, maxStaminaSeconds, currentMaxStaminaSeconds) * staminaCoreSpeedBonus;
 			float num2 = (onIdealTerrain ? roadSpeedBonus : 0f);
 			return runSpeed + num + num2;

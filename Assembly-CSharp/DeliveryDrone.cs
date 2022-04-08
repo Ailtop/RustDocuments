@@ -89,75 +89,69 @@ public class DeliveryDrone : Drone
 
 	public void Think()
 	{
-		_003C_003Ec__DisplayClass24_0 _003C_003Ec__DisplayClass24_ = default(_003C_003Ec__DisplayClass24_0);
-		_003C_003Ec__DisplayClass24_._003C_003E4__this = this;
 		if ((float)_sinceLastStateChange > stateTimeout)
 		{
 			Debug.LogError("Delivery drone hasn't change state in too long, killing", this);
 			ForceRemove();
 			return;
 		}
-		MarketTerminal entity;
-		if (!sourceMarketplace.TryGet(true, out _003C_003Ec__DisplayClass24_.marketplace) || !sourceTerminal.TryGet(true, out entity))
+		if (!sourceMarketplace.TryGet(serverside: true, out var marketplace) || !sourceTerminal.TryGet(serverside: true, out var _))
 		{
 			Debug.LogError("Delivery drone's marketplace or terminal was destroyed, killing", this);
 			ForceRemove();
 			return;
 		}
-		VendingMachine entity2;
-		if (!targetVendingMachine.TryGet(true, out entity2) && _state <= State.AscendBeforeReturn)
+		if (!targetVendingMachine.TryGet(serverside: true, out var entity2) && _state <= State.AscendBeforeReturn)
 		{
-			_003CThink_003Eg__SetState_007C24_7(State.ReturnToTerminal, ref _003C_003Ec__DisplayClass24_);
+			SetState(State.ReturnToTerminal);
 		}
-		_003C_003Ec__DisplayClass24_.currentPosition = base.transform.position;
-		float num = _003CThink_003Eg__GetMinimumHeight_007C24_1(Vector3.zero, ref _003C_003Ec__DisplayClass24_);
+		Vector3 currentPosition = base.transform.position;
+		float num = GetMinimumHeight(Vector3.zero);
 		if (_goToY.HasValue)
 		{
-			if (!_003CThink_003Eg__IsAtGoToY_007C24_6(ref _003C_003Ec__DisplayClass24_))
+			if (!IsAtGoToY())
 			{
-				targetPosition = _003C_003Ec__DisplayClass24_.currentPosition.WithY(_goToY.Value);
+				targetPosition = currentPosition.WithY(_goToY.Value);
 				return;
 			}
 			_goToY = null;
 			_sinceLastObstacleBlock = 0f;
-			_minimumYLock = _003C_003Ec__DisplayClass24_.currentPosition.y;
+			_minimumYLock = currentPosition.y;
 		}
 		Vector3 waitPosition;
 		switch (_state)
 		{
 		case State.Takeoff:
-			_003CThink_003Eg__SetGoalPosition_007C24_3(_003C_003Ec__DisplayClass24_.marketplace.droneLaunchPoint.position + Vector3.up * 15f, ref _003C_003Ec__DisplayClass24_);
-			if (_003CThink_003Eg__IsAtGoalPosition_007C24_4(ref _003C_003Ec__DisplayClass24_))
+			SetGoalPosition(marketplace.droneLaunchPoint.position + Vector3.up * 15f);
+			if (IsAtGoalPosition())
 			{
-				_003CThink_003Eg__SetState_007C24_7(State.FlyToVendingMachine, ref _003C_003Ec__DisplayClass24_);
+				SetState(State.FlyToVendingMachine);
 			}
 			break;
 		case State.FlyToVendingMachine:
 		{
-			bool isBlocked;
-			float num2 = _003CThink_003Eg__CalculatePreferredY_007C24_0(out isBlocked, ref _003C_003Ec__DisplayClass24_);
-			if (isBlocked && _003C_003Ec__DisplayClass24_.currentPosition.y < num2)
+			bool isBlocked2;
+			float num2 = CalculatePreferredY(out isBlocked2);
+			if (isBlocked2 && currentPosition.y < num2)
 			{
-				_003CThink_003Eg__SetGoToY_007C24_5(num2 + marginAbovePreferredHeight, ref _003C_003Ec__DisplayClass24_);
+				SetGoToY(num2 + marginAbovePreferredHeight);
 				return;
 			}
-			Vector3 descendPosition;
-			config.FindDescentPoints(entity2, num2 + marginAbovePreferredHeight, out waitPosition, out descendPosition);
-			_003CThink_003Eg__SetGoalPosition_007C24_3(descendPosition, ref _003C_003Ec__DisplayClass24_);
-			if (_003CThink_003Eg__IsAtGoalPosition_007C24_4(ref _003C_003Ec__DisplayClass24_))
+			config.FindDescentPoints(entity2, num2 + marginAbovePreferredHeight, out waitPosition, out var descendPosition);
+			SetGoalPosition(descendPosition);
+			if (IsAtGoalPosition())
 			{
-				_003CThink_003Eg__SetState_007C24_7(State.DescendToVendingMachine, ref _003C_003Ec__DisplayClass24_);
+				SetState(State.DescendToVendingMachine);
 			}
 			break;
 		}
 		case State.DescendToVendingMachine:
 		{
-			Vector3 waitPosition2;
-			config.FindDescentPoints(entity2, _003C_003Ec__DisplayClass24_.currentPosition.y, out waitPosition2, out waitPosition);
-			_003CThink_003Eg__SetGoalPosition_007C24_3(waitPosition2, ref _003C_003Ec__DisplayClass24_);
-			if (_003CThink_003Eg__IsAtGoalPosition_007C24_4(ref _003C_003Ec__DisplayClass24_))
+			config.FindDescentPoints(entity2, currentPosition.y, out var waitPosition2, out waitPosition);
+			SetGoalPosition(waitPosition2);
+			if (IsAtGoalPosition())
 			{
-				_003CThink_003Eg__SetState_007C24_7(State.PickUpItems, ref _003C_003Ec__DisplayClass24_);
+				SetState(State.PickUpItems);
 			}
 			break;
 		}
@@ -165,31 +159,30 @@ public class DeliveryDrone : Drone
 			_pickUpTicks++;
 			if (_pickUpTicks >= pickUpDelayInTicks)
 			{
-				_003CThink_003Eg__SetState_007C24_7(State.AscendBeforeReturn, ref _003C_003Ec__DisplayClass24_);
+				SetState(State.AscendBeforeReturn);
 			}
 			break;
 		case State.AscendBeforeReturn:
 		{
-			Vector3 descendPosition2;
-			config.FindDescentPoints(entity2, num + preferredCruiseHeight, out waitPosition, out descendPosition2);
-			_003CThink_003Eg__SetGoalPosition_007C24_3(descendPosition2, ref _003C_003Ec__DisplayClass24_);
-			if (_003CThink_003Eg__IsAtGoalPosition_007C24_4(ref _003C_003Ec__DisplayClass24_))
+			config.FindDescentPoints(entity2, num + preferredCruiseHeight, out waitPosition, out var descendPosition2);
+			SetGoalPosition(descendPosition2);
+			if (IsAtGoalPosition())
 			{
-				_003CThink_003Eg__SetState_007C24_7(State.ReturnToTerminal, ref _003C_003Ec__DisplayClass24_);
+				SetState(State.ReturnToTerminal);
 			}
 			break;
 		}
 		case State.ReturnToTerminal:
 		{
-			bool isBlocked2;
-			float num3 = _003CThink_003Eg__CalculatePreferredY_007C24_0(out isBlocked2, ref _003C_003Ec__DisplayClass24_);
-			if (isBlocked2 && _003C_003Ec__DisplayClass24_.currentPosition.y < num3)
+			bool isBlocked3;
+			float num3 = CalculatePreferredY(out isBlocked3);
+			if (isBlocked3 && currentPosition.y < num3)
 			{
-				_003CThink_003Eg__SetGoToY_007C24_5(num3 + marginAbovePreferredHeight, ref _003C_003Ec__DisplayClass24_);
+				SetGoToY(num3 + marginAbovePreferredHeight);
 				return;
 			}
-			Vector3 vector = _003CThink_003Eg__LandingPosition_007C24_2(ref _003C_003Ec__DisplayClass24_);
-			if (Vector3Ex.Distance2D(_003C_003Ec__DisplayClass24_.currentPosition, vector) < 30f)
+			Vector3 vector = LandingPosition();
+			if (Vector3Ex.Distance2D(currentPosition, vector) < 30f)
 			{
 				vector.y = Mathf.Max(vector.y, num3 + marginAbovePreferredHeight);
 			}
@@ -197,19 +190,19 @@ public class DeliveryDrone : Drone
 			{
 				vector.y = num3 + marginAbovePreferredHeight;
 			}
-			_003CThink_003Eg__SetGoalPosition_007C24_3(vector, ref _003C_003Ec__DisplayClass24_);
-			if (_003CThink_003Eg__IsAtGoalPosition_007C24_4(ref _003C_003Ec__DisplayClass24_))
+			SetGoalPosition(vector);
+			if (IsAtGoalPosition())
 			{
-				_003CThink_003Eg__SetState_007C24_7(State.Landing, ref _003C_003Ec__DisplayClass24_);
+				SetState(State.Landing);
 			}
 			break;
 		}
 		case State.Landing:
-			_003CThink_003Eg__SetGoalPosition_007C24_3(_003CThink_003Eg__LandingPosition_007C24_2(ref _003C_003Ec__DisplayClass24_), ref _003C_003Ec__DisplayClass24_);
-			if (_003CThink_003Eg__IsAtGoalPosition_007C24_4(ref _003C_003Ec__DisplayClass24_))
+			SetGoalPosition(LandingPosition());
+			if (IsAtGoalPosition())
 			{
-				_003C_003Ec__DisplayClass24_.marketplace.ReturnDrone(this);
-				_003CThink_003Eg__SetState_007C24_7(State.Invalid, ref _003C_003Ec__DisplayClass24_);
+				marketplace.ReturnDrone(this);
+				SetState(State.Invalid);
 			}
 			break;
 		default:
@@ -227,12 +220,90 @@ public class DeliveryDrone : Drone
 				targetPosition = targetPosition.Value.WithY(_minimumYLock.Value);
 			}
 		}
+		float CalculatePreferredY(out bool isBlocked)
+		{
+			body.velocity.WithY(0f).ToDirectionAndMagnitude(out var direction, out var magnitude);
+			if (magnitude < 0.5f)
+			{
+				float num4 = GetMinimumHeight(Vector3.zero) + preferredCruiseHeight;
+				Vector3 origin = currentPosition.WithY(num4 + 1000f);
+				currentPosition.WithY(num4);
+				isBlocked = Physics.Raycast(origin, Vector3.down, out var hitInfo, 1000f, config.layerMask);
+				if (!isBlocked)
+				{
+					return num4;
+				}
+				return num4 + (1000f - hitInfo.distance) + preferredHeightAboveObstacle;
+			}
+			float num5 = magnitude * 2f;
+			float minimumHeight = GetMinimumHeight(Vector3.zero);
+			float minimumHeight2 = GetMinimumHeight(new Vector3(0f, 0f, num5 / 2f));
+			float num6 = Mathf.Max(b: GetMinimumHeight(new Vector3(0f, 0f, num5)), a: Mathf.Max(minimumHeight, minimumHeight2)) + preferredCruiseHeight;
+			Quaternion quaternion = Quaternion.FromToRotation(Vector3.forward, direction);
+			Vector3 halfExtents = config.halfExtents.WithZ(num5 / 2f);
+			Vector3 vector2 = (currentPosition.WithY(num6) + quaternion * new Vector3(0f, 0f, halfExtents.z / 2f)).WithY(num6 + 1000f);
+			isBlocked = Physics.BoxCast(vector2, halfExtents, Vector3.down, out var hitInfo2, quaternion, 1000f, config.layerMask);
+			if (isBlocked)
+			{
+				Ray ray = new Ray(vector2, Vector3.down);
+				Vector3 b = RayEx.ClosestPoint(ray, hitInfo2.point);
+				float num7 = Vector3.Distance(ray.origin, b);
+				return num6 + (1000f - num7) + preferredHeightAboveObstacle;
+			}
+			return num6;
+		}
+		float GetMinimumHeight(Vector3 offset)
+		{
+			Vector3 vector3 = base.transform.TransformPoint(offset);
+			float height = TerrainMeta.HeightMap.GetHeight(vector3);
+			float height2 = WaterSystem.GetHeight(vector3);
+			return Mathf.Max(height, height2);
+		}
+		bool IsAtGoalPosition()
+		{
+			if (_stateGoalPosition.HasValue)
+			{
+				return Vector3.Distance(_stateGoalPosition.Value, currentPosition) < targetPositionTolerance;
+			}
+			return false;
+		}
+		bool IsAtGoToY()
+		{
+			if (_goToY.HasValue)
+			{
+				return Mathf.Abs(_goToY.Value - currentPosition.y) < targetPositionTolerance;
+			}
+			return false;
+		}
+		Vector3 LandingPosition()
+		{
+			return marketplace.droneLaunchPoint.position;
+		}
+		void SetGoalPosition(Vector3 position)
+		{
+			_goToY = null;
+			_stateGoalPosition = position;
+			targetPosition = position;
+		}
+		void SetGoToY(float y)
+		{
+			_goToY = y;
+			targetPosition = currentPosition.WithY(y);
+		}
+		void SetState(State newState)
+		{
+			_state = newState;
+			_sinceLastStateChange = 0f;
+			_pickUpTicks = 0;
+			_stateGoalPosition = null;
+			_goToY = null;
+			SetFlag(Flags.Reserved1, _state >= State.AscendBeforeReturn);
+		}
 	}
 
 	public void ForceRemove()
 	{
-		Marketplace entity;
-		if (sourceMarketplace.TryGet(true, out entity))
+		if (sourceMarketplace.TryGet(serverside: true, out var entity))
 		{
 			entity.ReturnDrone(this);
 		}

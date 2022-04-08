@@ -1,7 +1,6 @@
-namespace VLB
+namespace VLB;
+
+public static class Version
 {
-	public static class Version
-	{
-		public const int Current = 1510;
-	}
+	public const int Current = 1510;
 }

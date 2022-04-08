@@ -455,8 +455,7 @@ public class Climate : SingletonComponent<Climate>
 		{
 			presetLookup = new Dictionary<WeatherPresetType, WeatherPreset[]>();
 		}
-		WeatherPreset[] value;
-		if (!presetLookup.TryGetValue(type, out value))
+		if (!presetLookup.TryGetValue(type, out var value))
 		{
 			presetLookup.Add(type, value = CacheWeatherPresets(type));
 		}

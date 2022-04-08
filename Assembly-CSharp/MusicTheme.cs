@@ -162,7 +162,7 @@ public class MusicTheme : ScriptableObject
 				AudioClip audioClip = positionedClip.musicClip.audioClip;
 				if (!audioClipDict.ContainsKey(audioClip))
 				{
-					audioClipDict.Add(audioClip, true);
+					audioClipDict.Add(audioClip, value: true);
 				}
 				if (positionedClip.startingBar < 8 && !firstAudioClips.Contains(audioClip))
 				{

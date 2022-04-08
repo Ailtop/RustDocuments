@@ -1,8 +1,7 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public enum AmbientOcclusionMode
 {
-	public enum AmbientOcclusionMode
-	{
-		ScalableAmbientObscurance = 0,
-		MultiScaleVolumetricObscurance = 1
-	}
+	ScalableAmbientObscurance = 0,
+	MultiScaleVolumetricObscurance = 1
 }

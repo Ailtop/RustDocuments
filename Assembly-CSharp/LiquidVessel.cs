@@ -96,12 +96,10 @@ public class LiquidVessel : HeldEntity
 		{
 			return;
 		}
-		using (List<Item>.Enumerator enumerator = item.contents.itemList.GetEnumerator())
+		using List<Item>.Enumerator enumerator = item.contents.itemList.GetEnumerator();
+		if (enumerator.MoveNext())
 		{
-			if (enumerator.MoveNext())
-			{
-				enumerator.Current.UseItem(50);
-			}
+			enumerator.Current.UseItem(50);
 		}
 	}
 

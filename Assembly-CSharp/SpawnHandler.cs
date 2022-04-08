@@ -345,9 +345,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 			f = Mathx.Min(numToTry, numToFill, f);
 			for (int i = 0; i < f; i++)
 			{
-				Vector3 spawnPos;
-				Quaternion spawnRot;
-				if (distribution.Sample(out spawnPos, out spawnRot, node, population.AlignToNormal, population.ClusterDithering) && population.Filter.GetFactor(spawnPos) > 0f && (float)distribution.GetCount(spawnPos) < num)
+				if (distribution.Sample(out var spawnPos, out var spawnRot, node, population.AlignToNormal, population.ClusterDithering) && population.Filter.GetFactor(spawnPos) > 0f && (float)distribution.GetCount(spawnPos) < num)
 				{
 					Spawn(population, spawnPos, spawnRot);
 					numToFill--;
@@ -396,7 +394,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		{
 			Debug.Log("[Spawn] Spawning " + randomPrefab.Name);
 		}
-		BaseEntity baseEntity = randomPrefab.SpawnEntity(pos, rot, false);
+		BaseEntity baseEntity = randomPrefab.SpawnEntity(pos, rot, active: false);
 		if (baseEntity == null)
 		{
 			Debug.LogWarning("[Spawn] Couldn't create prefab as entity - " + randomPrefab.Name);
@@ -531,8 +529,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 	{
 		if (spawnable.Population != null)
 		{
-			SpawnDistribution value;
-			if (!population2distribution.TryGetValue(spawnable.Population, out value))
+			if (!population2distribution.TryGetValue(spawnable.Population, out var value))
 			{
 				Debug.LogWarning("[SpawnHandler] trying to add instance to invalid population: " + spawnable.Population);
 			}
@@ -547,8 +544,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 	{
 		if (spawnable.Population != null)
 		{
-			SpawnDistribution value;
-			if (!population2distribution.TryGetValue(spawnable.Population, out value))
+			if (!population2distribution.TryGetValue(spawnable.Population, out var value))
 			{
 				Debug.LogWarning("[SpawnHandler] trying to remove instance from invalid population: " + spawnable.Population);
 			}

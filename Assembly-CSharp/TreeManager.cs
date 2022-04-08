@@ -100,11 +100,9 @@ public class TreeManager : BaseEntity
 		{
 			return;
 		}
-		using (ProtoBuf.Tree tree = Facepunch.Pool.Get<ProtoBuf.Tree>())
-		{
-			ExtractTreeNetworkData(billboardEntity, tree);
-			server.ClientRPC(null, "CLIENT_TreeSpawned", tree);
-		}
+		using ProtoBuf.Tree tree = Facepunch.Pool.Get<ProtoBuf.Tree>();
+		ExtractTreeNetworkData(billboardEntity, tree);
+		server.ClientRPC(null, "CLIENT_TreeSpawned", tree);
 	}
 
 	private static void ExtractTreeNetworkData(BaseEntity billboardEntity, ProtoBuf.Tree tree)

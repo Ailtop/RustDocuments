@@ -124,9 +124,8 @@ public class GenerateDungeonGrid : ProceduralComponent
 		List<DungeonGridInfo> list = (TerrainMeta.Path ? TerrainMeta.Path.DungeonGridEntrances : null);
 		WorldSpaceGrid<Prefab<DungeonGridCell>> worldSpaceGrid = new WorldSpaceGrid<Prefab<DungeonGridCell>>(TerrainMeta.Size.x * 2f, CellSize);
 		int[,] array5 = new int[worldSpaceGrid.CellCount, worldSpaceGrid.CellCount];
-		_003C_003Ec__DisplayClass17_0 _003C_003Ec__DisplayClass17_ = default(_003C_003Ec__DisplayClass17_0);
-		_003C_003Ec__DisplayClass17_.hashmap = new DungeonGridConnectionHash[worldSpaceGrid.CellCount, worldSpaceGrid.CellCount];
-		_003C_003Ec__DisplayClass17_.pathFinder = new PathFinder(array5, false);
+		DungeonGridConnectionHash[,] hashmap = new DungeonGridConnectionHash[worldSpaceGrid.CellCount, worldSpaceGrid.CellCount];
+		PathFinder pathFinder = new PathFinder(array5, diagonals: false);
 		int cellCount = worldSpaceGrid.CellCount;
 		int num = 0;
 		int num2 = worldSpaceGrid.CellCount - 1;
@@ -140,21 +139,17 @@ public class GenerateDungeonGrid : ProceduralComponent
 		List<PathSegment> list2 = new List<PathSegment>();
 		List<PathLink> list3 = new List<PathLink>();
 		List<PathNode> list4 = new List<PathNode>();
-		_003C_003Ec__DisplayClass17_.unconnectedNodeList = new List<PathNode>();
-		_003C_003Ec__DisplayClass17_.secondaryNodeList = new List<PathNode>();
+		List<PathNode> unconnectedNodeList = new List<PathNode>();
+		List<PathNode> secondaryNodeList = new List<PathNode>();
 		List<PathFinder.Point> list5 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list6 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list7 = new List<PathFinder.Point>();
-		_003C_003Ec__DisplayClass17_1 _003C_003Ec__DisplayClass17_2 = default(_003C_003Ec__DisplayClass17_1);
-		_003C_003Ec__DisplayClass17_3 _003C_003Ec__DisplayClass17_3 = default(_003C_003Ec__DisplayClass17_3);
-		foreach (DungeonGridInfo item in list)
+		foreach (DungeonGridInfo item2 in list)
 		{
-			_003C_003Ec__DisplayClass17_2.entrance = item;
-			TerrainPathConnect[] componentsInChildren = _003C_003Ec__DisplayClass17_2.entrance.GetComponentsInChildren<TerrainPathConnect>(true);
+			DungeonGridInfo entrance = item2;
+			TerrainPathConnect[] componentsInChildren = entrance.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
 			foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
 			{
-				_003C_003Ec__DisplayClass17_2 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass17_2();
-				CS_0024_003C_003E8__locals0._003C_003E4__this = this;
 				if (terrainPathConnect.Type != ConnectionType)
 				{
 					continue;
@@ -164,8 +159,8 @@ public class GenerateDungeonGrid : ProceduralComponent
 				{
 					continue;
 				}
-				CS_0024_003C_003E8__locals0.stationNode = _003C_003Ec__DisplayClass17_.pathFinder.FindClosestWalkable(new PathFinder.Point(cellPos.x, cellPos.y), 1);
-				if (CS_0024_003C_003E8__locals0.stationNode == null)
+				PathFinder.Node stationNode = pathFinder.FindClosestWalkable(new PathFinder.Point(cellPos.x, cellPos.y), 1);
+				if (stationNode == null)
 				{
 					continue;
 				}
@@ -184,9 +179,9 @@ public class GenerateDungeonGrid : ProceduralComponent
 						continue;
 					}
 					DungeonVolume componentInChildren = prefab6.Object.GetComponentInChildren<DungeonVolume>();
-					DungeonVolume componentInChildren2 = _003C_003Ec__DisplayClass17_2.entrance.GetComponentInChildren<DungeonVolume>();
+					DungeonVolume componentInChildren2 = entrance.GetComponentInChildren<DungeonVolume>();
 					OBB bounds = componentInChildren.GetBounds(worldSpaceGrid.GridToWorldCoords(cellPos), Quaternion.identity);
-					OBB bounds2 = componentInChildren2.GetBounds(_003C_003Ec__DisplayClass17_2.entrance.transform.position, Quaternion.identity);
+					OBB bounds2 = componentInChildren2.GetBounds(entrance.transform.position, Quaternion.identity);
 					if (!bounds.Intersects2D(bounds2))
 					{
 						DungeonGridLink componentInChildren3 = prefab6.Object.GetComponentInChildren<DungeonGridLink>();
@@ -199,33 +194,34 @@ public class GenerateDungeonGrid : ProceduralComponent
 						}
 					}
 				}
+				bool isStartPoint;
 				if (prefab5 != null)
 				{
 					worldSpaceGrid[cellPos.x, cellPos.y] = prefab5;
 					array5[cellPos.x, cellPos.y] = int.MaxValue;
-					_003C_003Ec__DisplayClass17_3.isStartPoint = _003C_003Ec__DisplayClass17_.secondaryNodeList.Count == 0;
-					_003C_003Ec__DisplayClass17_.secondaryNodeList.RemoveAll((PathNode x) => x.node.point == CS_0024_003C_003E8__locals0.stationNode.point);
-					_003C_003Ec__DisplayClass17_.unconnectedNodeList.RemoveAll((PathNode x) => x.node.point == CS_0024_003C_003E8__locals0.stationNode.point);
+					isStartPoint = secondaryNodeList.Count == 0;
+					secondaryNodeList.RemoveAll((PathNode x) => x.node.point == stationNode.point);
+					unconnectedNodeList.RemoveAll((PathNode x) => x.node.point == stationNode.point);
 					if (prefab5.Component.West != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x - 1, cellPos.y, ref _003C_003Ec__DisplayClass17_, ref _003C_003Ec__DisplayClass17_2, ref _003C_003Ec__DisplayClass17_3);
+						AddNode(cellPos.x - 1, cellPos.y);
 					}
 					if (prefab5.Component.East != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x + 1, cellPos.y, ref _003C_003Ec__DisplayClass17_, ref _003C_003Ec__DisplayClass17_2, ref _003C_003Ec__DisplayClass17_3);
+						AddNode(cellPos.x + 1, cellPos.y);
 					}
 					if (prefab5.Component.South != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x, cellPos.y - 1, ref _003C_003Ec__DisplayClass17_, ref _003C_003Ec__DisplayClass17_2, ref _003C_003Ec__DisplayClass17_3);
+						AddNode(cellPos.x, cellPos.y - 1);
 					}
 					if (prefab5.Component.North != 0)
 					{
-						CS_0024_003C_003E8__locals0._003CProcess_003Eg__AddNode_007C1(cellPos.x, cellPos.y + 1, ref _003C_003Ec__DisplayClass17_, ref _003C_003Ec__DisplayClass17_2, ref _003C_003Ec__DisplayClass17_3);
+						AddNode(cellPos.x, cellPos.y + 1);
 					}
 					PathLink pathLink = new PathLink();
-					DungeonGridLink componentInChildren4 = _003C_003Ec__DisplayClass17_2.entrance.gameObject.GetComponentInChildren<DungeonGridLink>();
-					Vector3 position = _003C_003Ec__DisplayClass17_2.entrance.transform.position;
-					Vector3 eulerAngles = _003C_003Ec__DisplayClass17_2.entrance.transform.rotation.eulerAngles;
+					DungeonGridLink componentInChildren4 = entrance.gameObject.GetComponentInChildren<DungeonGridLink>();
+					Vector3 position = entrance.transform.position;
+					Vector3 eulerAngles = entrance.transform.rotation.eulerAngles;
 					DungeonGridLink componentInChildren5 = prefab5.Object.GetComponentInChildren<DungeonGridLink>();
 					Vector3 position2 = worldSpaceGrid.GridToWorldCoords(new Vector2i(cellPos.x, cellPos.y));
 					Vector3 zero = Vector3.zero;
@@ -245,34 +241,78 @@ public class GenerateDungeonGrid : ProceduralComponent
 					pathLink.upwards.segments = new List<PathLinkSegment>();
 					list3.Add(pathLink);
 				}
+				void AddNode(int x, int y)
+				{
+					PathFinder.Node node8 = pathFinder.FindClosestWalkable(new PathFinder.Point(x, y), 1);
+					if (node8 != null)
+					{
+						PathNode item = new PathNode
+						{
+							monument = (TerrainMeta.Path ? TerrainMeta.Path.FindClosest(TerrainMeta.Path.Monuments, entrance.transform.position) : entrance.transform.GetComponentInParent<MonumentInfo>()),
+							node = node8
+						};
+						if (isStartPoint)
+						{
+							secondaryNodeList.Add(item);
+						}
+						else
+						{
+							unconnectedNodeList.Add(item);
+						}
+						DungeonGridConnectionHash dungeonGridConnectionHash4 = hashmap[node8.point.x, node8.point.y];
+						DungeonGridConnectionHash dungeonGridConnectionHash5 = hashmap[stationNode.point.x, stationNode.point.y];
+						if (node8.point.x > stationNode.point.x)
+						{
+							dungeonGridConnectionHash4.West = true;
+							dungeonGridConnectionHash5.East = true;
+						}
+						if (node8.point.x < stationNode.point.x)
+						{
+							dungeonGridConnectionHash4.East = true;
+							dungeonGridConnectionHash5.West = true;
+						}
+						if (node8.point.y > stationNode.point.y)
+						{
+							dungeonGridConnectionHash4.South = true;
+							dungeonGridConnectionHash5.North = true;
+						}
+						if (node8.point.y < stationNode.point.y)
+						{
+							dungeonGridConnectionHash4.North = true;
+							dungeonGridConnectionHash5.South = true;
+						}
+						hashmap[node8.point.x, node8.point.y] = dungeonGridConnectionHash4;
+						hashmap[stationNode.point.x, stationNode.point.y] = dungeonGridConnectionHash5;
+					}
+				}
 			}
 		}
-		while (_003C_003Ec__DisplayClass17_.unconnectedNodeList.Count != 0 || _003C_003Ec__DisplayClass17_.secondaryNodeList.Count != 0)
+		while (unconnectedNodeList.Count != 0 || secondaryNodeList.Count != 0)
 		{
-			if (_003C_003Ec__DisplayClass17_.unconnectedNodeList.Count == 0)
+			if (unconnectedNodeList.Count == 0)
 			{
-				PathNode node3 = _003C_003Ec__DisplayClass17_.secondaryNodeList[0];
-				_003C_003Ec__DisplayClass17_.unconnectedNodeList.AddRange(_003C_003Ec__DisplayClass17_.secondaryNodeList.Where((PathNode x) => x.monument == node3.monument));
-				_003C_003Ec__DisplayClass17_.secondaryNodeList.RemoveAll((PathNode x) => x.monument == node3.monument);
+				PathNode node3 = secondaryNodeList[0];
+				unconnectedNodeList.AddRange(secondaryNodeList.Where((PathNode x) => x.monument == node3.monument));
+				secondaryNodeList.RemoveAll((PathNode x) => x.monument == node3.monument);
 				Vector2i vector2i = worldSpaceGrid.WorldToGridCoords(node3.monument.transform.position);
-				_003C_003Ec__DisplayClass17_.pathFinder.PushPoint = new PathFinder.Point(vector2i.x, vector2i.y);
-				_003C_003Ec__DisplayClass17_.pathFinder.PushRadius = 2;
-				_003C_003Ec__DisplayClass17_.pathFinder.PushDistance = 2;
-				_003C_003Ec__DisplayClass17_.pathFinder.PushMultiplier = 4;
+				pathFinder.PushPoint = new PathFinder.Point(vector2i.x, vector2i.y);
+				pathFinder.PushRadius = 2;
+				pathFinder.PushDistance = 2;
+				pathFinder.PushMultiplier = 4;
 			}
 			list7.Clear();
-			list7.AddRange(_003C_003Ec__DisplayClass17_.unconnectedNodeList.Select((PathNode x) => x.node.point));
+			list7.AddRange(unconnectedNodeList.Select((PathNode x) => x.node.point));
 			list6.Clear();
 			list6.AddRange(list4.Select((PathNode x) => x.node.point));
-			list6.AddRange(_003C_003Ec__DisplayClass17_.secondaryNodeList.Select((PathNode x) => x.node.point));
+			list6.AddRange(secondaryNodeList.Select((PathNode x) => x.node.point));
 			list6.AddRange(list5);
-			PathFinder.Node node4 = _003C_003Ec__DisplayClass17_.pathFinder.FindPathUndirected(list6, list7, 100000);
+			PathFinder.Node node4 = pathFinder.FindPathUndirected(list6, list7, 100000);
 			if (node4 == null)
 			{
-				PathNode node2 = _003C_003Ec__DisplayClass17_.unconnectedNodeList[0];
-				_003C_003Ec__DisplayClass17_.secondaryNodeList.AddRange(_003C_003Ec__DisplayClass17_.unconnectedNodeList.Where((PathNode x) => x.monument == node2.monument));
-				_003C_003Ec__DisplayClass17_.unconnectedNodeList.RemoveAll((PathNode x) => x.monument == node2.monument);
-				_003C_003Ec__DisplayClass17_.secondaryNodeList.Remove(node2);
+				PathNode node2 = unconnectedNodeList[0];
+				secondaryNodeList.AddRange(unconnectedNodeList.Where((PathNode x) => x.monument == node2.monument));
+				unconnectedNodeList.RemoveAll((PathNode x) => x.monument == node2.monument);
+				secondaryNodeList.Remove(node2);
 				list4.Add(node2);
 				continue;
 			}
@@ -289,15 +329,15 @@ public class GenerateDungeonGrid : ProceduralComponent
 				}
 			}
 			list2.Add(segment);
-			PathNode node = _003C_003Ec__DisplayClass17_.unconnectedNodeList.Find((PathNode x) => x.node.point == segment.start.point || x.node.point == segment.end.point);
-			_003C_003Ec__DisplayClass17_.secondaryNodeList.AddRange(_003C_003Ec__DisplayClass17_.unconnectedNodeList.Where((PathNode x) => x.monument == node.monument));
-			_003C_003Ec__DisplayClass17_.unconnectedNodeList.RemoveAll((PathNode x) => x.monument == node.monument);
-			_003C_003Ec__DisplayClass17_.secondaryNodeList.Remove(node);
+			PathNode node = unconnectedNodeList.Find((PathNode x) => x.node.point == segment.start.point || x.node.point == segment.end.point);
+			secondaryNodeList.AddRange(unconnectedNodeList.Where((PathNode x) => x.monument == node.monument));
+			unconnectedNodeList.RemoveAll((PathNode x) => x.monument == node.monument);
+			secondaryNodeList.Remove(node);
 			list4.Add(node);
-			PathNode pathNode = _003C_003Ec__DisplayClass17_.secondaryNodeList.Find((PathNode x) => x.node.point == segment.start.point || x.node.point == segment.end.point);
+			PathNode pathNode = secondaryNodeList.Find((PathNode x) => x.node.point == segment.start.point || x.node.point == segment.end.point);
 			if (pathNode != null)
 			{
-				_003C_003Ec__DisplayClass17_.secondaryNodeList.Remove(pathNode);
+				secondaryNodeList.Remove(pathNode);
 				list4.Add(pathNode);
 			}
 			for (PathFinder.Node node6 = node4; node6 != null; node6 = node6.next)
@@ -308,13 +348,13 @@ public class GenerateDungeonGrid : ProceduralComponent
 				}
 			}
 		}
-		foreach (PathSegment item2 in list2)
+		foreach (PathSegment item3 in list2)
 		{
-			PathFinder.Node node7 = item2.start;
+			PathFinder.Node node7 = item3.start;
 			while (node7 != null && node7.next != null)
 			{
-				DungeonGridConnectionHash dungeonGridConnectionHash = _003C_003Ec__DisplayClass17_.hashmap[node7.point.x, node7.point.y];
-				DungeonGridConnectionHash dungeonGridConnectionHash2 = _003C_003Ec__DisplayClass17_.hashmap[node7.next.point.x, node7.next.point.y];
+				DungeonGridConnectionHash dungeonGridConnectionHash = hashmap[node7.point.x, node7.point.y];
+				DungeonGridConnectionHash dungeonGridConnectionHash2 = hashmap[node7.next.point.x, node7.next.point.y];
 				if (node7.point.x > node7.next.point.x)
 				{
 					dungeonGridConnectionHash.West = true;
@@ -335,8 +375,8 @@ public class GenerateDungeonGrid : ProceduralComponent
 					dungeonGridConnectionHash.North = true;
 					dungeonGridConnectionHash2.South = true;
 				}
-				_003C_003Ec__DisplayClass17_.hashmap[node7.point.x, node7.point.y] = dungeonGridConnectionHash;
-				_003C_003Ec__DisplayClass17_.hashmap[node7.next.point.x, node7.next.point.y] = dungeonGridConnectionHash2;
+				hashmap[node7.point.x, node7.point.y] = dungeonGridConnectionHash;
+				hashmap[node7.next.point.x, node7.next.point.y] = dungeonGridConnectionHash2;
 				node7 = node7.next;
 			}
 		}
@@ -348,7 +388,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 				{
 					continue;
 				}
-				DungeonGridConnectionHash dungeonGridConnectionHash3 = _003C_003Ec__DisplayClass17_.hashmap[m, n];
+				DungeonGridConnectionHash dungeonGridConnectionHash3 = hashmap[m, n];
 				if (dungeonGridConnectionHash3.Value == 0)
 				{
 					continue;
@@ -411,9 +451,9 @@ public class GenerateDungeonGrid : ProceduralComponent
 			}
 		}
 		while (zero2 != zero3);
-		foreach (PathLink item3 in list3)
+		foreach (PathLink item4 in list3)
 		{
-			item3.upwards.origin.position += zero2;
+			item4.upwards.origin.position += zero2;
 		}
 		for (int num8 = 0; num8 < worldSpaceGrid.CellCount; num8++)
 		{
@@ -469,10 +509,10 @@ public class GenerateDungeonGrid : ProceduralComponent
 				}
 			}
 		}
-		foreach (PathLink item4 in list3)
+		foreach (PathLink item5 in list3)
 		{
-			Vector3 vector8 = item4.upwards.origin.position + item4.upwards.origin.rotation * Vector3.Scale(item4.upwards.origin.upSocket.localPosition, item4.upwards.origin.scale);
-			Vector3 vector9 = item4.downwards.origin.position + item4.downwards.origin.rotation * Vector3.Scale(item4.downwards.origin.downSocket.localPosition, item4.downwards.origin.scale) - vector8;
+			Vector3 vector8 = item5.upwards.origin.position + item5.upwards.origin.rotation * Vector3.Scale(item5.upwards.origin.upSocket.localPosition, item5.upwards.origin.scale);
+			Vector3 vector9 = item5.downwards.origin.position + item5.downwards.origin.rotation * Vector3.Scale(item5.downwards.origin.downSocket.localPosition, item5.downwards.origin.scale) - vector8;
 			Vector3[] array7 = new Vector3[2]
 			{
 				new Vector3(0f, 1f, 0f),
@@ -492,7 +532,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 					int num14 = int.MinValue;
 					Vector3 position3 = Vector3.zero;
 					Quaternion rotation = Quaternion.identity;
-					PathLinkSegment prevSegment = item4.downwards.prevSegment;
+					PathLinkSegment prevSegment = item5.downwards.prevSegment;
 					Vector3 vector11 = prevSegment.position + prevSegment.rotation * Vector3.Scale(prevSegment.scale, prevSegment.downSocket.localPosition);
 					Quaternion quaternion = prevSegment.rotation * prevSegment.downSocket.localRotation;
 					Prefab<DungeonGridLink>[] array8 = array4;
@@ -526,7 +566,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 						}
 						Quaternion quaternion2 = quaternion * Quaternion.Inverse(component.UpSocket.localRotation);
 						Quaternion quaternion3 = quaternion2 * component.DownSocket.localRotation;
-						PathLinkSegment prevSegment2 = item4.upwards.prevSegment;
+						PathLinkSegment prevSegment2 = item5.upwards.prevSegment;
 						Quaternion quaternion4 = prevSegment2.rotation * prevSegment2.upSocket.localRotation;
 						if (component.Rotation > 0)
 						{
@@ -592,7 +632,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 						pathLinkSegment.scale = Vector3.one;
 						pathLinkSegment.prefab = prefab19;
 						pathLinkSegment.link = prefab19.Component;
-						item4.downwards.segments.Add(pathLinkSegment);
+						item5.downwards.segments.Add(pathLinkSegment);
 						vector9 += vector10;
 					}
 					else
@@ -606,7 +646,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 						int num17 = int.MinValue;
 						Vector3 position4 = Vector3.zero;
 						Quaternion rotation2 = Quaternion.identity;
-						PathLinkSegment prevSegment3 = item4.upwards.prevSegment;
+						PathLinkSegment prevSegment3 = item5.upwards.prevSegment;
 						Vector3 vector17 = prevSegment3.position + prevSegment3.rotation * Vector3.Scale(prevSegment3.scale, prevSegment3.upSocket.localPosition);
 						Quaternion quaternion6 = prevSegment3.rotation * prevSegment3.upSocket.localRotation;
 						array8 = array4;
@@ -640,7 +680,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 							}
 							Quaternion quaternion7 = quaternion6 * Quaternion.Inverse(component2.DownSocket.localRotation);
 							Quaternion quaternion8 = quaternion7 * component2.UpSocket.localRotation;
-							PathLinkSegment prevSegment4 = item4.downwards.prevSegment;
+							PathLinkSegment prevSegment4 = item5.downwards.prevSegment;
 							Quaternion quaternion9 = prevSegment4.rotation * prevSegment4.downSocket.localRotation;
 							if (component2.Rotation > 0)
 							{
@@ -706,7 +746,7 @@ public class GenerateDungeonGrid : ProceduralComponent
 							pathLinkSegment2.scale = Vector3.one;
 							pathLinkSegment2.prefab = prefab21;
 							pathLinkSegment2.link = prefab21.Component;
-							item4.upwards.segments.Add(pathLinkSegment2);
+							item5.upwards.segments.Add(pathLinkSegment2);
 							vector9 -= vector16;
 						}
 						else
@@ -721,13 +761,13 @@ public class GenerateDungeonGrid : ProceduralComponent
 				}
 			}
 		}
-		foreach (PathLink item5 in list3)
+		foreach (PathLink item6 in list3)
 		{
-			foreach (PathLinkSegment segment2 in item5.downwards.segments)
+			foreach (PathLinkSegment segment2 in item6.downwards.segments)
 			{
 				World.AddPrefab("Dungeon", segment2.prefab, segment2.position, segment2.rotation, segment2.scale);
 			}
-			foreach (PathLinkSegment segment3 in item5.upwards.segments)
+			foreach (PathLinkSegment segment3 in item6.upwards.segments)
 			{
 				World.AddPrefab("Dungeon", segment3.prefab, segment3.position, segment3.rotation, segment3.scale);
 			}

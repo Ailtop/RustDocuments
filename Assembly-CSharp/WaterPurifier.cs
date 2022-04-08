@@ -37,14 +37,14 @@ public class WaterPurifier : LiquidContainer
 		base.ServerInit();
 		if (!Rust.Application.isLoadingSave)
 		{
-			SpawnStorageEnt(false);
+			SpawnStorageEnt(load: false);
 		}
 	}
 
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		SpawnStorageEnt(true);
+		SpawnStorageEnt(load: true);
 	}
 
 	protected virtual void SpawnStorageEnt(bool load)
@@ -56,8 +56,7 @@ public class WaterPurifier : LiquidContainer
 			{
 				foreach (BaseEntity child in baseEntity.children)
 				{
-					LiquidContainer liquidContainer;
-					if (child != this && (object)(liquidContainer = child as LiquidContainer) != null)
+					if (child != this && child is LiquidContainer liquidContainer)
 					{
 						waterStorage = liquidContainer;
 						break;
@@ -98,7 +97,7 @@ public class WaterPurifier : LiquidContainer
 	{
 		if (!GetParentEntity() || !GetParentEntity().IsOn() || !HasDirtyWater())
 		{
-			SetFlag(Flags.Reserved1, false);
+			SetFlag(Flags.Reserved1, b: false);
 			CancelInvoke(CheckCoolDown);
 		}
 	}
@@ -121,7 +120,7 @@ public class WaterPurifier : LiquidContainer
 			if (!IsBoiling() && flag)
 			{
 				InvokeRepeating(CheckCoolDown, 2f, 2f);
-				SetFlag(Flags.Reserved1, true);
+				SetFlag(Flags.Reserved1, b: true);
 			}
 			if (IsBoiling() && flag)
 			{
@@ -191,7 +190,7 @@ public class WaterPurifier : LiquidContainer
 		base.Load(info);
 		if (info.fromDisk)
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 		}
 	}
 }

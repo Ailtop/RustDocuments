@@ -242,8 +242,7 @@ public class BaseFishingRod : HeldEntity
 			FailedCast(FailReason.NoLure);
 			return;
 		}
-		FailReason reason;
-		if (!EvaluateFishingPosition(ref pos, ownerPlayer, out reason, out surfaceBody))
+		if (!EvaluateFishingPosition(ref pos, ownerPlayer, out var reason, out surfaceBody))
 		{
 			FailedCast(reason);
 			return;
@@ -268,12 +267,11 @@ public class BaseFishingRod : HeldEntity
 			ownerPlayer.SignalBroadcast(Signal.Attack);
 			catchTime = (ImmediateHook ? 0f : UnityEngine.Random.Range(10f, 20f));
 			catchTime = (float)catchTime * fishableModifier.CatchWaitTimeMultiplier;
-			ItemModCompostable component2;
-			float val = (lureUsed.TryGetComponent<ItemModCompostable>(out component2) ? component2.BaitValue : 0f);
+			float val = (lureUsed.TryGetComponent<ItemModCompostable>(out var component2) ? component2.BaitValue : 0f);
 			val = Mathx.RemapValClamped(val, 0f, 20f, 1f, 10f);
 			catchTime = Mathf.Clamp((float)catchTime - val, 3f, 20f);
 			playerStartPosition = ownerPlayer.transform.position;
-			SetFlag(Flags.Busy, true);
+			SetFlag(Flags.Busy, b: true);
 			CurrentState = CatchState.Waiting;
 			InvokeRepeating(CatchProcess, 0f, 0f);
 			inQueue = false;
@@ -299,7 +297,7 @@ public class BaseFishingRod : HeldEntity
 	private void CatchProcessBudgeted()
 	{
 		inQueue = false;
-		FishingBobber fishingBobber = currentBobber.Get(true);
+		FishingBobber fishingBobber = currentBobber.Get(serverside: true);
 		BasePlayer ownerPlayer = GetOwnerPlayer();
 		if (ownerPlayer == null || ownerPlayer.IsSleeping() || ownerPlayer.IsWounded() || ownerPlayer.IsDead() || fishingBobber == null)
 		{
@@ -339,7 +337,7 @@ public class BaseFishingRod : HeldEntity
 			{
 				ClientRPC(null, "Client_HookedSomething");
 				CurrentState = CatchState.Catching;
-				fishingBobber.SetFlag(Flags.Reserved1, true);
+				fishingBobber.SetFlag(Flags.Reserved1, b: true);
 				nextFishStateChange = 0f;
 				fishCatchDuration = 0f;
 				strainTimer = 0f;
@@ -512,12 +510,12 @@ public class BaseFishingRod : HeldEntity
 		{
 			GetItem().LoseCondition((reason == FailReason.Success) ? ConditionLossOnSuccess : ConditionLossOnFail);
 		}
-		SetFlag(Flags.Busy, false);
+		SetFlag(Flags.Busy, b: false);
 		UpdateFlags();
 		CancelInvoke(CatchProcess);
 		CurrentState = CatchState.None;
-		SetFlag(Flags.Reserved1, false);
-		FishingBobber fishingBobber = currentBobber.Get(true);
+		SetFlag(Flags.Reserved1, b: false);
+		FishingBobber fishingBobber = currentBobber.Get(serverside: true);
 		if (fishingBobber != null)
 		{
 			fishingBobber.Kill();
@@ -594,8 +592,7 @@ public class BaseFishingRod : HeldEntity
 					continue;
 				}
 				flag = true;
-				RaycastHit hitInfo;
-				if (GamePhysics.Trace(new Ray(pos + Vector3.up, -Vector3.up), 0f, out hitInfo, 1.5f, 16, QueryTriggerInteraction.Collide))
+				if (GamePhysics.Trace(new Ray(pos + Vector3.up, -Vector3.up), 0f, out var hitInfo, 1.5f, 16, QueryTriggerInteraction.Collide))
 				{
 					pos.y = hitInfo.point.y;
 				}
@@ -644,12 +641,12 @@ public class BaseFishingRod : HeldEntity
 			reason = FailReason.Obstructed;
 			return false;
 		}
-		if (WaterLevel.GetOverallWaterDepth(Vector3.Lerp(pos, ply.transform.position.WithY(pos.y), 0.95f), true, null, true) < 0.1f && ply.eyes.position.y > 0f)
+		if (WaterLevel.GetOverallWaterDepth(Vector3.Lerp(pos, ply.transform.position.WithY(pos.y), 0.95f), waves: true, null, noEarlyExit: true) < 0.1f && ply.eyes.position.y > 0f)
 		{
 			reason = FailReason.TooShallow;
 			return false;
 		}
-		if (WaterLevel.GetOverallWaterDepth(pos, true, null, true) < 0.3f && ply.eyes.position.y > 0f)
+		if (WaterLevel.GetOverallWaterDepth(pos, waves: true, null, noEarlyExit: true) < 0.3f && ply.eyes.position.y > 0f)
 		{
 			reason = FailReason.TooShallow;
 			return false;

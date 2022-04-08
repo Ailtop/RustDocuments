@@ -21,7 +21,7 @@ public class DroppedItem : WorldItem
 		{
 			Invoke(IdleDestroy, GetDespawnDuration());
 		}
-		ReceiveCollisionMessages(true);
+		ReceiveCollisionMessages(b: true);
 	}
 
 	public virtual float GetDespawnDuration()
@@ -100,8 +100,7 @@ public class DroppedItem : WorldItem
 		Vector3 position = base.transform.position;
 		Quaternion rotation = base.transform.rotation;
 		SetParent(null);
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(position + Vector3.up * 2f, Vector3.down, out hitInfo, 2f, 27328512) && position.y < hitInfo.point.y)
+		if (UnityEngine.Physics.Raycast(position + Vector3.up * 2f, Vector3.down, out var hitInfo, 2f, 27328512) && position.y < hitInfo.point.y)
 		{
 			position += Vector3.up * 1.5f;
 		}
@@ -122,7 +121,7 @@ public class DroppedItem : WorldItem
 		base.PostInitShared();
 		GameObject gameObject = null;
 		gameObject = ((item == null || !item.info.worldModelPrefab.isValid) ? Object.Instantiate(itemModel) : item.info.worldModelPrefab.Instantiate());
-		gameObject.transform.SetParent(base.transform, false);
+		gameObject.transform.SetParent(base.transform, worldPositionStays: false);
 		gameObject.transform.localPosition = Vector3.zero;
 		gameObject.transform.localRotation = Quaternion.identity;
 		TransformEx.SetLayerRecursive(gameObject, base.gameObject.layer);
@@ -144,7 +143,7 @@ public class DroppedItem : WorldItem
 			rigidbody.angularDrag = angularDrag;
 			rigidbody.interpolation = RigidbodyInterpolation.None;
 			ConVar.Physics.ApplyDropped(rigidbody);
-			Renderer[] componentsInChildren = gameObject.GetComponentsInChildren<Renderer>(true);
+			Renderer[] componentsInChildren = gameObject.GetComponentsInChildren<Renderer>(includeInactive: true);
 			for (int i = 0; i < componentsInChildren.Length; i++)
 			{
 				componentsInChildren[i].enabled = false;
@@ -162,7 +161,7 @@ public class DroppedItem : WorldItem
 				}
 			}
 		}
-		gameObject.SetActive(true);
+		gameObject.SetActive(value: true);
 	}
 
 	public override bool ShouldInheritNetworkGroup()

@@ -1,21 +1,20 @@
 using UnityEngine;
 
-namespace Rust.Ai
+namespace Rust.Ai;
+
+public struct Sensation
 {
-	public struct Sensation
-	{
-		public SensationType Type;
+	public SensationType Type;
 
-		public Vector3 Position;
+	public Vector3 Position;
 
-		public float Radius;
+	public float Radius;
 
-		public float DamagePotential;
+	public float DamagePotential;
 
-		public BaseEntity Initiator;
+	public BaseEntity Initiator;
 
-		public BasePlayer InitiatorPlayer;
+	public BasePlayer InitiatorPlayer;
 
-		public BaseEntity UsedEntity;
-	}
+	public BaseEntity UsedEntity;
 }

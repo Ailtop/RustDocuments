@@ -34,9 +34,9 @@ public class IceFence : GraveyardFence
 		GameObject[] array = styles;
 		for (int i = 0; i < array.Length; i++)
 		{
-			array[i].gameObject.SetActive(false);
+			array[i].gameObject.SetActive(value: false);
 		}
-		styles[style].gameObject.SetActive(true);
+		styles[style].gameObject.SetActive(value: true);
 	}
 
 	public override void UpdatePillars()

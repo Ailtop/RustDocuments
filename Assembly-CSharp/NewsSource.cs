@@ -191,7 +191,7 @@ public class NewsSource : MonoBehaviour
 			string text = currentParagraph.ToString();
 			currentParagraph.Clear();
 			RustText rustText = UnityEngine.Object.Instantiate(paragraphTemplate, container);
-			rustText.SetActive(true);
+			rustText.SetActive(active: true);
 			rustText.SetText(text);
 		}
 	}
@@ -200,7 +200,7 @@ public class NewsSource : MonoBehaviour
 	{
 		AppendParagraph(currentParagraph);
 		HttpImage httpImage = UnityEngine.Object.Instantiate(imageTemplate, container);
-		httpImage.SetActive(true);
+		httpImage.SetActive(active: true);
 		httpImage.Load(url);
 	}
 
@@ -208,7 +208,7 @@ public class NewsSource : MonoBehaviour
 	{
 		AppendParagraph(currentParagraph);
 		HttpImage httpImage = UnityEngine.Object.Instantiate(youtubeTemplate, container);
-		httpImage.SetActive(true);
+		httpImage.SetActive(active: true);
 		httpImage.Load("https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg");
 		RustButton component = httpImage.GetComponent<RustButton>();
 		if (component != null)

@@ -15,8 +15,8 @@ public class ObjectFlasher : BaseMonoBehaviour
 	public void Awake()
 	{
 		InvokeRepeating(Toggle, Random.Range(0f, randomOffset) + timeOffset, toggleLength);
-		disabledObj.SetActive(false);
-		enabledObj.SetActive(true);
+		disabledObj.SetActive(value: false);
+		enabledObj.SetActive(value: true);
 	}
 
 	public void Toggle()

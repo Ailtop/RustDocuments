@@ -134,7 +134,7 @@ public class Detonator : HeldEntity, IRFObject
 	{
 		if (!bHeld)
 		{
-			InternalSetPressed(false);
+			InternalSetPressed(pressed: false);
 		}
 		base.SetHeld(bHeld);
 	}
@@ -158,7 +158,7 @@ public class Detonator : HeldEntity, IRFObject
 			{
 				return;
 			}
-			RFManager.ChangeFrequency(frequency, num, this, false, IsOn());
+			RFManager.ChangeFrequency(frequency, num, this, isListener: false, IsOn());
 			frequency = num;
 			SendNetworkUpdate();
 			Item item = GetItem();

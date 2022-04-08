@@ -1,31 +1,30 @@
 using UnityEngine;
 
-namespace Sonar
+namespace Sonar;
+
+public class SubmarineSonar : FacepunchBehaviour
 {
-	public class SubmarineSonar : FacepunchBehaviour
-	{
-		[SerializeField]
-		private float range = 100f;
+	[SerializeField]
+	private float range = 100f;
 
-		[SerializeField]
-		private ParticleSystem sonarPS;
+	[SerializeField]
+	private ParticleSystem sonarPS;
 
-		[SerializeField]
-		private ParticleSystem blipPS;
+	[SerializeField]
+	private ParticleSystem blipPS;
 
-		[SerializeField]
-		private SonarObject us;
+	[SerializeField]
+	private SonarObject us;
 
-		[SerializeField]
-		private Color greenBlip;
+	[SerializeField]
+	private Color greenBlip;
 
-		[SerializeField]
-		private Color redBlip;
+	[SerializeField]
+	private Color redBlip;
 
-		[SerializeField]
-		private Color whiteBlip;
+	[SerializeField]
+	private Color whiteBlip;
 
-		[SerializeField]
-		private SubmarineAudio submarineAudio;
-	}
+	[SerializeField]
+	private SubmarineAudio submarineAudio;
 }

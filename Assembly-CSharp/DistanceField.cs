@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class DistanceField
@@ -17,7 +15,7 @@ public class DistanceField
 		1f / 32f
 	};
 
-	public static void Generate([In][IsReadOnly] ref int size, [In][IsReadOnly] ref byte threshold, [In][IsReadOnly] ref byte[] image, ref float[] distanceField)
+	public static void Generate(in int size, in byte threshold, in byte[] image, ref float[] distanceField)
 	{
 		int num = size + 2;
 		int[] array = new int[num * num];
@@ -179,7 +177,7 @@ public class DistanceField
 		return data[y * size + x];
 	}
 
-	public static void GenerateVectors([In][IsReadOnly] ref int size, [In][IsReadOnly] ref float[] distanceField, ref Vector3[] vectorField)
+	public static void GenerateVectors(in int size, in float[] distanceField, ref Vector3[] vectorField)
 	{
 		for (int i = 1; i < size - 1; i++)
 		{

@@ -82,7 +82,7 @@ public class v_chainsaw : MonoBehaviour
 		smokeEffect.enableEmission = bEngineOn;
 		if (bHitMetal)
 		{
-			chainsawAnimator.SetBool("attackHit", true);
+			chainsawAnimator.SetBool("attackHit", value: true);
 			ParticleSystem[] array = hitMetalFX;
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -102,7 +102,7 @@ public class v_chainsaw : MonoBehaviour
 		}
 		else if (bHitWood)
 		{
-			chainsawAnimator.SetBool("attackHit", true);
+			chainsawAnimator.SetBool("attackHit", value: true);
 			ParticleSystem[] array = hitMetalFX;
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -122,7 +122,7 @@ public class v_chainsaw : MonoBehaviour
 		}
 		else if (bHitFlesh)
 		{
-			chainsawAnimator.SetBool("attackHit", true);
+			chainsawAnimator.SetBool("attackHit", value: true);
 			ParticleSystem[] array = hitMetalFX;
 			for (int i = 0; i < array.Length; i++)
 			{
@@ -142,7 +142,7 @@ public class v_chainsaw : MonoBehaviour
 		}
 		else
 		{
-			chainsawAnimator.SetBool("attackHit", false);
+			chainsawAnimator.SetBool("attackHit", value: false);
 			ParticleSystem[] array = hitMetalFX;
 			for (int i = 0; i < array.Length; i++)
 			{

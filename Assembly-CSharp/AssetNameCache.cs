@@ -15,8 +15,7 @@ public static class AssetNameCache
 		{
 			return string.Empty;
 		}
-		string value;
-		if (!mixed.TryGetValue(obj, out value))
+		if (!mixed.TryGetValue(obj, out var value))
 		{
 			value = obj.name;
 			mixed.Add(obj, value);
@@ -30,8 +29,7 @@ public static class AssetNameCache
 		{
 			return string.Empty;
 		}
-		string value;
-		if (!lower.TryGetValue(obj, out value))
+		if (!lower.TryGetValue(obj, out var value))
 		{
 			value = obj.name.ToLower();
 			lower.Add(obj, value);
@@ -45,8 +43,7 @@ public static class AssetNameCache
 		{
 			return string.Empty;
 		}
-		string value;
-		if (!upper.TryGetValue(obj, out value))
+		if (!upper.TryGetValue(obj, out var value))
 		{
 			value = obj.name.ToUpper();
 			upper.Add(obj, value);

@@ -58,7 +58,7 @@ public class SleepingBagCamper : SleepingBag
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		SetFlag(Flags.Reserved3, true);
+		SetFlag(Flags.Reserved3, b: true);
 	}
 
 	protected override void PostPlayerSpawn(BasePlayer p)

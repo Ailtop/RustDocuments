@@ -12,12 +12,12 @@ public class SnowMachine : FogMachine
 	public override void EnableFogField()
 	{
 		base.EnableFogField();
-		tempTrigger.gameObject.SetActive(true);
+		tempTrigger.gameObject.SetActive(value: true);
 	}
 
 	public override void FinishFogging()
 	{
 		base.FinishFogging();
-		tempTrigger.gameObject.SetActive(false);
+		tempTrigger.gameObject.SetActive(value: false);
 	}
 }

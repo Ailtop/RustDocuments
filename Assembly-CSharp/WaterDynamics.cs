@@ -220,7 +220,7 @@ public class WaterDynamics : MonoBehaviour
 
 		private Texture2D CreateDynamicTexture(int size)
 		{
-			return new Texture2D(size, size, TextureFormat.ARGB32, false, true)
+			return new Texture2D(size, size, TextureFormat.ARGB32, mipChain: false, linear: true)
 			{
 				filterMode = FilterMode.Bilinear,
 				wrapMode = TextureWrapMode.Clamp
@@ -241,10 +241,7 @@ public class WaterDynamics : MonoBehaviour
 		{
 			for (int i = 0; i < clearTileList.Count; i++)
 			{
-				int x;
-				int y;
-				int offset;
-				desc.TileOffsetToXYOffset(clearTileList[i], out x, out y, out offset);
+				desc.TileOffsetToXYOffset(clearTileList[i], out var x, out var y, out var offset);
 				int num = Mathf.Min(x + desc.tileSize, desc.size) - x;
 				int num2 = Mathf.Min(y + desc.tileSize, desc.size) - y;
 				if (owner.useNativePath)

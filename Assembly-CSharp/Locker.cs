@@ -97,12 +97,12 @@ public class Locker : StorageContainer
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 	}
 
 	public void ClearEquipping()
 	{
-		SetFlag(Flags.Reserved1, false);
+		SetFlag(Flags.Reserved1, b: false);
 	}
 
 	public override bool ItemFilter(Item item, int targetSlot)
@@ -189,7 +189,7 @@ public class Locker : StorageContainer
 		if (flag)
 		{
 			Effect.server.Run(equipSound.resourcePath, player, StringPool.Get("spine3"), Vector3.zero, Vector3.zero);
-			SetFlag(Flags.Reserved1, true);
+			SetFlag(Flags.Reserved1, b: true);
 			Invoke(ClearEquipping, 1.5f);
 		}
 	}

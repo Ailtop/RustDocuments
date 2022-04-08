@@ -1,43 +1,42 @@
 using System;
 using UnityEngine;
 
-namespace Rust.Ai
+namespace Rust.Ai;
+
+[DefaultExecutionOrder(-102)]
+public class AiManagedAgent : FacepunchBehaviour, IServerComponent
 {
-	[DefaultExecutionOrder(-102)]
-	public class AiManagedAgent : FacepunchBehaviour, IServerComponent
+	[Tooltip("TODO: Replace with actual agent type id on the NavMeshAgent when we upgrade to 5.6.1 or above.")]
+	public int AgentTypeIndex;
+
+	[NonSerialized]
+	[ReadOnly]
+	public Vector2i NavmeshGridCoord;
+
+	private bool isRegistered;
+
+	private void OnEnable()
 	{
-		[Tooltip("TODO: Replace with actual agent type id on the NavMeshAgent when we upgrade to 5.6.1 or above.")]
-		public int AgentTypeIndex;
-
-		[NonSerialized]
-		[ReadOnly]
-		public Vector2i NavmeshGridCoord;
-
-		private bool isRegistered;
-
-		private void OnEnable()
+		isRegistered = false;
+		if (SingletonComponent<AiManager>.Instance == null || !SingletonComponent<AiManager>.Instance.enabled || AiManager.nav_disable)
 		{
-			isRegistered = false;
-			if (SingletonComponent<AiManager>.Instance == null || !SingletonComponent<AiManager>.Instance.enabled || AiManager.nav_disable)
-			{
-				base.enabled = false;
-			}
+			base.enabled = false;
 		}
+	}
 
-		private void DelayedRegistration()
+	private void DelayedRegistration()
+	{
+		if (!isRegistered)
 		{
-			if (!isRegistered)
-			{
-				isRegistered = true;
-			}
+			isRegistered = true;
 		}
+	}
 
-		private void OnDisable()
+	private void OnDisable()
+	{
+		if (!Application.isQuitting && !(SingletonComponent<AiManager>.Instance == null) && SingletonComponent<AiManager>.Instance.enabled)
 		{
-			if (!Application.isQuitting && !(SingletonComponent<AiManager>.Instance == null) && SingletonComponent<AiManager>.Instance.enabled)
-			{
-				bool isRegistered2 = isRegistered;
-			}
+			_ = isRegistered;
 		}
 	}
 }

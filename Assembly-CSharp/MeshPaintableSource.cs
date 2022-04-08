@@ -46,7 +46,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 	{
 		if (texture == null)
 		{
-			texture = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, false);
+			texture = new Texture2D(texWidth, texHeight, TextureFormat.ARGB32, mipChain: false);
 			texture.name = "MeshPaintableSource_" + base.gameObject.name;
 			texture.wrapMode = TextureWrapMode.Clamp;
 			texture.Clear(Color.clear);
@@ -59,9 +59,9 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		{
 			block.Clear();
 		}
-		UpdateMaterials(block, null, false, isSelected);
+		UpdateMaterials(block, null, forEditing: false, isSelected);
 		List<Renderer> obj = Pool.GetList<Renderer>();
-		(applyToAllRenderers ? base.transform.root : base.transform).GetComponentsInChildren(true, obj);
+		(applyToAllRenderers ? base.transform.root : base.transform).GetComponentsInChildren(includeInactive: true, obj);
 		foreach (Renderer item in obj)
 		{
 			item.SetPropertyBlock(block);
@@ -103,7 +103,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		Init();
 		Color32[] pixels = input.GetPixels32();
 		texture.SetPixels32(pixels);
-		texture.Apply(true, false);
+		texture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
 		return pixels;
 	}
 
@@ -113,7 +113,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		if (data != null)
 		{
 			texture.LoadImage(data);
-			texture.Apply(true, false);
+			texture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
 		}
 	}
 
@@ -122,7 +122,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		if (!(texture == null))
 		{
 			texture.Clear(new Color(0f, 0f, 0f, 0f));
-			texture.Apply(true, false);
+			texture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
 		}
 	}
 }

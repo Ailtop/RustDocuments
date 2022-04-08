@@ -331,9 +331,9 @@ public class RidableHorse : BaseRidableAnimal
 
 	public void EquipmentUpdate()
 	{
-		SetFlag(Flags.Reserved4, false, false, false);
-		SetFlag(Flags.Reserved5, false, false, false);
-		SetFlag(Flags.Reserved6, false, false, false);
+		SetFlag(Flags.Reserved4, b: false, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved5, b: false, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved6, b: false, recursive: false, networkupdate: false);
 		riderProtection.Clear();
 		baseProtection.Clear();
 		equipmentSpeedMod = 0f;
@@ -348,10 +348,10 @@ public class RidableHorse : BaseRidableAnimal
 			ItemModAnimalEquipment component = slot.info.GetComponent<ItemModAnimalEquipment>();
 			if ((bool)component)
 			{
-				SetFlag(component.WearableFlag, true, false, false);
+				SetFlag(component.WearableFlag, b: true, recursive: false, networkupdate: false);
 				if (component.hideHair)
 				{
-					SetFlag(Flags.Reserved4, true);
+					SetFlag(Flags.Reserved4, b: true);
 				}
 				if ((bool)component.riderProtection)
 				{

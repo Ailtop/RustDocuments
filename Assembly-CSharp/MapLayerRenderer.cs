@@ -17,10 +17,8 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 
 	private void RenderTrainLayer()
 	{
-		using (CommandBuffer cb = BuildCommandBufferTrainTunnels())
-		{
-			RenderImpl(cb);
-		}
+		using CommandBuffer cb = BuildCommandBufferTrainTunnels();
+		RenderImpl(cb);
 	}
 
 	private CommandBuffer BuildCommandBufferTrainTunnels()
@@ -38,8 +36,7 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 			MeshRenderer[] mapRenderers = dungeonGridCell.MapRenderers;
 			foreach (MeshRenderer meshRenderer in mapRenderers)
 			{
-				MeshFilter component;
-				if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out component))
+				if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out var component))
 				{
 					Mesh sharedMesh = component.sharedMesh;
 					int subMeshCount = sharedMesh.subMeshCount;
@@ -56,10 +53,8 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 
 	private void RenderUnderwaterLabs(int floor)
 	{
-		using (CommandBuffer cb = BuildCommandBufferUnderwaterLabs(floor))
-		{
-			RenderImpl(cb);
-		}
+		using CommandBuffer cb = BuildCommandBufferUnderwaterLabs(floor);
+		RenderImpl(cb);
 	}
 
 	public int GetUnderwaterLabFloorCount()
@@ -94,8 +89,7 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 				MeshRenderer[] mapRenderers = link.MapRenderers;
 				foreach (MeshRenderer meshRenderer in mapRenderers)
 				{
-					MeshFilter component;
-					if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out component))
+					if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out var component))
 					{
 						Mesh sharedMesh = component.sharedMesh;
 						int subMeshCount = sharedMesh.subMeshCount;

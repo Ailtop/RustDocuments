@@ -97,7 +97,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			{
 				return GetPlanter().GetPlantTemperature();
 			}
-			return Climate.GetTemperature(base.transform.position) + (artificialTemperatureExposure?.Get(false) ?? 0f);
+			return Climate.GetTemperature(base.transform.position) + (artificialTemperatureExposure?.Get(force: false) ?? 0f);
 		}
 	}
 
@@ -378,8 +378,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	public static float SunRaycast(Vector3 checkPosition)
 	{
 		Vector3 normalized = (TOD_Sky.Instance.Components.Sun.transform.position - checkPosition).normalized;
-		RaycastHit hitInfo;
-		if (!UnityEngine.Physics.Raycast(checkPosition, normalized, out hitInfo, 100f, 10551297))
+		if (!UnityEngine.Physics.Raycast(checkPosition, normalized, out var _, 100f, 10551297))
 		{
 			return 1f;
 		}
@@ -431,7 +430,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		if (firstCheck)
 		{
 			Vector3 position = base.transform.position;
-			if (WaterLevel.Test(position, true, this))
+			if (WaterLevel.Test(position, waves: true, this))
 			{
 				underWater = true;
 				GroundQuality = 0f;
@@ -457,27 +456,18 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public float GetGroundTypeValue(Vector3 pos)
 	{
-		switch (TerrainMeta.SplatMap.GetSplatMaxType(pos))
+		return TerrainMeta.SplatMap.GetSplatMaxType(pos) switch
 		{
-		case 16:
-			return 0.3f;
-		case 2:
-			return 0f;
-		case 8:
-			return 0f;
-		case 64:
-			return 0f;
-		case 1:
-			return 0.3f;
-		case 32:
-			return 0.2f;
-		case 4:
-			return 0f;
-		case 128:
-			return 0f;
-		default:
-			return 0.5f;
-		}
+			16 => 0.3f, 
+			2 => 0f, 
+			8 => 0f, 
+			64 => 0f, 
+			1 => 0.3f, 
+			32 => 0.2f, 
+			4 => 0f, 
+			128 => 0f, 
+			_ => 0.5f, 
+		};
 	}
 
 	public void CalculateTemperatureQuality()
@@ -561,7 +551,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		Genes.GenerateRandom(this);
 		if (!Rust.Application.isLoadingSave)
 		{
-			CalculateQualities(true);
+			CalculateQualities(firstTime: true);
 		}
 	}
 
@@ -586,13 +576,13 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			planter.FertilizeGrowables();
 		}
-		CalculateQualities(true);
+		CalculateQualities(firstTime: true);
 	}
 
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		CalculateQualities(true);
+		CalculateQualities(firstTime: true);
 	}
 
 	public void ResetSeason()
@@ -605,7 +595,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	{
 		if (!IsDead())
 		{
-			CalculateQualities(false);
+			CalculateQualities(firstTime: false);
 			float overallQuality = CalculateOverallQuality();
 			float actualStageAgeIncrease = UpdateAge(overallQuality);
 			UpdateHealthAndYield(overallQuality, actualStageAgeIncrease);
@@ -700,11 +690,11 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 		if (seasons >= Properties.MaxSeasons)
 		{
-			ChangeState(PlantProperties.State.Dying, true);
+			ChangeState(PlantProperties.State.Dying, resetAge: true);
 		}
 		else
 		{
-			ChangeState(currentStage.nextState, true);
+			ChangeState(currentStage.nextState, resetAge: true);
 		}
 		return State;
 	}
@@ -726,7 +716,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		if (!Fertilized)
 		{
 			Fertilized = true;
-			CalculateQualities(false);
+			CalculateQualities(firstTime: false);
 			SendNetworkUpdate();
 		}
 	}
@@ -784,12 +774,12 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			}
 			else
 			{
-				ChangeState(PlantProperties.State.Dying, true);
+				ChangeState(PlantProperties.State.Dying, resetAge: true);
 			}
 		}
 		else
 		{
-			ChangeState(PlantProperties.State.Mature, true);
+			ChangeState(PlantProperties.State.Mature, resetAge: true);
 		}
 	}
 
@@ -881,7 +871,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			if (item.isServer)
 			{
-				item.ChangeState(item.currentStage.nextState, false);
+				item.ChangeState(item.currentStage.nextState, resetAge: false);
 			}
 		}
 		Facepunch.Pool.FreeList(ref obj);
@@ -958,7 +948,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			Fertilized = info.msg.growableEntity.fertilized;
 			yieldPool = info.msg.growableEntity.yieldPool;
 			Genes.Load(info);
-			ChangeState((PlantProperties.State)info.msg.growableEntity.state, false, true);
+			ChangeState((PlantProperties.State)info.msg.growableEntity.state, resetAge: false, loading: true);
 		}
 		else
 		{
@@ -1002,8 +992,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
 		base.OnDeployed(parent, deployedBy, fromItem);
-		PlanterBox planterBox;
-		if (parent != null && (object)(planterBox = parent as PlanterBox) != null)
+		if (parent != null && parent is PlanterBox planterBox)
 		{
 			planterBox.OnPlantInserted(this, deployedBy);
 		}

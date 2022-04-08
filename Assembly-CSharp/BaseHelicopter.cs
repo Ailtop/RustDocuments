@@ -44,7 +44,7 @@ public class BaseHelicopter : BaseCombatEntity
 			if (!isDestroyed)
 			{
 				health -= amount;
-				Effect.server.Run(damagedParticles.resourcePath, body, StringPool.Get(bonenames[UnityEngine.Random.Range(0, bonenames.Length)]), Vector3.zero, Vector3.up, null, true);
+				Effect.server.Run(damagedParticles.resourcePath, body, StringPool.Get(bonenames[UnityEngine.Random.Range(0, bonenames.Length)]), Vector3.zero, Vector3.up, null, broadcast: true);
 				if (health <= 0f)
 				{
 					health = 0f;
@@ -61,8 +61,8 @@ public class BaseHelicopter : BaseCombatEntity
 		public void WeakspotDestroyed()
 		{
 			isDestroyed = true;
-			Effect.server.Run(destroyedParticles.resourcePath, body, StringPool.Get(bonenames[UnityEngine.Random.Range(0, bonenames.Length)]), Vector3.zero, Vector3.up, null, true);
-			body.Hurt(body.MaxHealth() * healthFractionOnDestroyed, DamageType.Generic, null, false);
+			Effect.server.Run(destroyedParticles.resourcePath, body, StringPool.Get(bonenames[UnityEngine.Random.Range(0, bonenames.Length)]), Vector3.zero, Vector3.up, null, broadcast: true);
+			body.Hurt(body.MaxHealth() * healthFractionOnDestroyed, DamageType.Generic, null, useProtection: false);
 		}
 	}
 
@@ -308,7 +308,7 @@ public class BaseHelicopter : BaseCombatEntity
 			return;
 		}
 		CreateExplosionMarker(10f);
-		Effect.server.Run(explosionEffect.resourcePath, base.transform.position, Vector3.up, null, true);
+		Effect.server.Run(explosionEffect.resourcePath, base.transform.position, Vector3.up, null, broadcast: true);
 		Vector3 vector = myAI.GetLastMoveDir() * myAI.GetMoveSpeed() * 0.75f;
 		GameObject gibSource = servergibs.Get().GetComponent<ServerGib>()._gibSource;
 		List<ServerGib> list = ServerGib.CreateGibs(servergibs.resourcePath, base.gameObject, gibSource, vector, 3f);
@@ -328,7 +328,7 @@ public class BaseHelicopter : BaseCombatEntity
 			baseEntity.SetVelocity(vector + onUnitSphere * UnityEngine.Random.Range(min, max));
 			foreach (ServerGib item in list)
 			{
-				Physics.IgnoreCollision(component, item.GetCollider(), true);
+				Physics.IgnoreCollision(component, item.GetCollider(), ignore: true);
 			}
 		}
 		for (int j = 0; j < maxCratesToSpawn; j++)
@@ -363,7 +363,7 @@ public class BaseHelicopter : BaseCombatEntity
 			baseEntity2.SendMessage("SetLockingEnt", fireBall.gameObject, SendMessageOptions.DontRequireReceiver);
 			foreach (ServerGib item2 in list)
 			{
-				Physics.IgnoreCollision(component2, item2.GetCollider(), true);
+				Physics.IgnoreCollision(component2, item2.GetCollider(), ignore: true);
 			}
 		}
 		base.OnKilled(info);

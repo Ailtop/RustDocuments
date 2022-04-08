@@ -112,12 +112,12 @@ public class TorchWeapon : BaseMelee
 	{
 		if (isOn)
 		{
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			InvokeRepeating(UseFuel, 1f, 1f);
 		}
 		else
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			CancelInvoke(UseFuel);
 		}
 	}
@@ -128,7 +128,7 @@ public class TorchWeapon : BaseMelee
 	{
 		if (msg.player.CanInteract())
 		{
-			SetIsOn(true);
+			SetIsOn(isOn: true);
 		}
 	}
 
@@ -138,7 +138,7 @@ public class TorchWeapon : BaseMelee
 	{
 		if (msg.player.CanInteract())
 		{
-			SetIsOn(false);
+			SetIsOn(isOn: false);
 		}
 	}
 
@@ -151,7 +151,7 @@ public class TorchWeapon : BaseMelee
 	{
 		if (IsDisabled())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			CancelInvoke(UseFuel);
 		}
 	}

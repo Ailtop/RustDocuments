@@ -74,8 +74,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		}
 		float num2 = currentVelocity.magnitude * Time.fixedDeltaTime;
 		Vector3 position = base.transform.position;
-		RaycastHit hitInfo;
-		if (GamePhysics.Trace(new Ray(position, currentVelocity.normalized), radius, out hitInfo, num2 + scanRange, mask, QueryTriggerInteraction.Ignore))
+		if (GamePhysics.Trace(new Ray(position, currentVelocity.normalized), radius, out var hitInfo, num2 + scanRange, mask, QueryTriggerInteraction.Ignore))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
 			if (IsAValidHit(entity))

@@ -1,14 +1,13 @@
-namespace Generated.AnimatorController
-{
-	public static class PlayerMenuAnimation
-	{
-		public enum Layers
-		{
-			Movement = 0
-		}
+namespace Generated.AnimatorController;
 
-		public static class Groups
-		{
-		}
+public static class PlayerMenuAnimation
+{
+	public enum Layers
+	{
+		Movement = 0
+	}
+
+	public static class Groups
+	{
 	}
 }

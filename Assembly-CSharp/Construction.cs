@@ -231,7 +231,7 @@ public class Construction : PrefabAttribute
 	private bool TestPlacingThroughRock(ref Placement placement, Target target)
 	{
 		OBB oBB = new OBB(placement.position, Vector3.one, placement.rotation, bounds);
-		Vector3 center = target.player.GetCenter(true);
+		Vector3 center = target.player.GetCenter(ducked: true);
 		Vector3 origin = target.ray.origin;
 		if (Physics.Linecast(center, origin, 65536, QueryTriggerInteraction.Ignore))
 		{
@@ -249,8 +249,7 @@ public class Construction : PrefabAttribute
 	private static bool TestPlacingThroughWall(ref Placement placement, Transform transform, Construction common, Target target)
 	{
 		Vector3 vector = placement.position - target.ray.origin;
-		RaycastHit hitInfo;
-		if (!Physics.Raycast(target.ray.origin, vector.normalized, out hitInfo, vector.magnitude, 2097152))
+		if (!Physics.Raycast(target.ray.origin, vector.normalized, out var hitInfo, vector.magnitude, 2097152))
 		{
 			return true;
 		}
@@ -311,7 +310,7 @@ public class Construction : PrefabAttribute
 
 	public BaseEntity CreateConstruction(Target target, bool bNeedsValidPlacement = false)
 	{
-		GameObject gameObject = GameManager.server.CreatePrefab(fullName, Vector3.zero, Quaternion.identity, false);
+		GameObject gameObject = GameManager.server.CreatePrefab(fullName, Vector3.zero, Quaternion.identity, active: false);
 		bool flag = UpdatePlacement(gameObject.transform, this, ref target);
 		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
 		if (bNeedsValidPlacement && !flag)
@@ -366,9 +365,9 @@ public class Construction : PrefabAttribute
 		bounds = rootObj.GetComponent<BaseEntity>().bounds;
 		deployable = GetComponent<Deployable>();
 		placeholder = GetComponentInChildren<ConstructionPlaceholder>();
-		allSockets = GetComponentsInChildren<Socket_Base>(true);
-		allProximities = GetComponentsInChildren<BuildingProximity>(true);
-		socketHandle = GetComponentsInChildren<SocketHandle>(true).FirstOrDefault();
+		allSockets = GetComponentsInChildren<Socket_Base>(includeInactive: true);
+		allProximities = GetComponentsInChildren<BuildingProximity>(includeInactive: true);
+		socketHandle = GetComponentsInChildren<SocketHandle>(includeInactive: true).FirstOrDefault();
 		ConstructionGrade[] components = rootObj.GetComponents<ConstructionGrade>();
 		grades = new ConstructionGrade[5];
 		ConstructionGrade[] array = components;

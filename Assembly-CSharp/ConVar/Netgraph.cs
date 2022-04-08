@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("netgraph")]
+public class Netgraph : ConsoleSystem
 {
-	[Factory("netgraph")]
-	public class Netgraph : ConsoleSystem
-	{
-	}
 }

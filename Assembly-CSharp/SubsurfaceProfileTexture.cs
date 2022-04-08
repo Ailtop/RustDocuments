@@ -109,7 +109,7 @@ public class SubsurfaceProfileTexture
 			int num = 32;
 			int num2 = Mathf.Max(entries.Count, 64);
 			ReleaseTexture();
-			texture = new Texture2D(num, num2, TextureFormat.RGBAHalf, false, true);
+			texture = new Texture2D(num, num2, TextureFormat.RGBAHalf, mipChain: false, linear: true);
 			texture.name = "SubsurfaceProfiles";
 			texture.wrapMode = TextureWrapMode.Clamp;
 			texture.filterMode = FilterMode.Bilinear;
@@ -138,7 +138,7 @@ public class SubsurfaceProfileTexture
 				}
 			}
 			texture.SetPixels(pixels, 0);
-			texture.Apply(false, false);
+			texture.Apply(updateMipmaps: false, makeNoLongerReadable: false);
 			return texture;
 		}
 		return null;

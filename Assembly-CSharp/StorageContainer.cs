@@ -200,7 +200,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 	{
 		if (inventory == null)
 		{
-			CreateInventory(true);
+			CreateInventory(giveUID: true);
 			OnInventoryFirstCreated(inventory);
 		}
 		base.ServerInit();
@@ -243,7 +243,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 	public override void PreServerLoad()
 	{
 		base.PreServerLoad();
-		CreateInventory(false);
+		CreateInventory(giveUID: false);
 	}
 
 	protected virtual void OnInventoryDirty()
@@ -258,7 +258,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 		{
 			inventory.GiveUID();
 		}
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 	}
 
 	internal override void DoServerDestroy()
@@ -354,7 +354,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 		}
 		if (player.inventory.loot.StartLootingEntity(this, doPositionChecks))
 		{
-			SetFlag(Flags.Open, true);
+			SetFlag(Flags.Open, b: true);
 			AddContainers(player.inventory.loot);
 			player.inventory.loot.SendImmediate();
 			player.ClientRPCPlayer(null, player, "RPC_OpenLootPanel", panelToOpen);
@@ -367,7 +367,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 	public virtual void PlayerStoppedLooting(BasePlayer player)
 	{
 		Interface.CallHook("OnLootEntityEnd", player, this);
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 		SendNetworkUpdate();
 	}
 
@@ -417,7 +417,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, LootPanel.IHa
 		else
 		{
 			string prefab = (containerEntity.DropFloats ? "assets/prefabs/misc/item drop/item_drop_buoyant.prefab" : "assets/prefabs/misc/item drop/item_drop.prefab");
-			bool flag = itemContainer.Drop(prefab, containerEntity.GetDropPosition(), containerEntity.Transform.rotation) != null;
+			_ = itemContainer.Drop(prefab, containerEntity.GetDropPosition(), containerEntity.Transform.rotation) != null;
 		}
 	}
 

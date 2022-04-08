@@ -56,8 +56,7 @@ public class PlacementTest : MonoBehaviour
 		if (testTransform != null && visualTest != null)
 		{
 			Vector3 position2 = base.transform.position;
-			RaycastHit hitInfo;
-			if (myMeshCollider.Raycast(new Ray(testTransform.position, (base.transform.position - testTransform.position).normalized), out hitInfo, 5f))
+			if (myMeshCollider.Raycast(new Ray(testTransform.position, (base.transform.position - testTransform.position).normalized), out var hitInfo, 5f))
 			{
 				position2 = hitInfo.point;
 			}

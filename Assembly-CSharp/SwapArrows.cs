@@ -24,7 +24,7 @@ public class SwapArrows : MonoBehaviour, IClientComponent
 		HideAllArrowHeads();
 		if (iType < arrowModels.Length)
 		{
-			arrowModels[iType].SetActive(true);
+			arrowModels[iType].SetActive(value: true);
 		}
 	}
 
@@ -33,7 +33,7 @@ public class SwapArrows : MonoBehaviour, IClientComponent
 		GameObject[] array = arrowModels;
 		for (int i = 0; i < array.Length; i++)
 		{
-			array[i].SetActive(false);
+			array[i].SetActive(value: false);
 		}
 	}
 

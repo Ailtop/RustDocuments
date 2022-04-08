@@ -24,7 +24,7 @@ public class TriggerWakeAIZ : TriggerBase, IServerComponent
 			}
 			aiz = parent.GetComponentInChildren<AIInformationZone>();
 		}
-		SetZonesSleeping(true);
+		SetZonesSleeping(flag: true);
 	}
 
 	private void Awake()
@@ -95,7 +95,7 @@ public class TriggerWakeAIZ : TriggerBase, IServerComponent
 		if (!(aiz == null) || (zones != null && zones.Count != 0))
 		{
 			CancelInvoke(SleepAI);
-			SetZonesSleeping(false);
+			SetZonesSleeping(flag: false);
 		}
 	}
 
@@ -116,6 +116,6 @@ public class TriggerWakeAIZ : TriggerBase, IServerComponent
 
 	private void SleepAI()
 	{
-		SetZonesSleeping(true);
+		SetZonesSleeping(flag: true);
 	}
 }

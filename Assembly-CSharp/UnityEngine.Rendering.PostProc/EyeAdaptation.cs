@@ -1,8 +1,7 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public enum EyeAdaptation
 {
-	public enum EyeAdaptation
-	{
-		Progressive = 0,
-		Fixed = 1
-	}
+	Progressive = 0,
+	Fixed = 1
 }

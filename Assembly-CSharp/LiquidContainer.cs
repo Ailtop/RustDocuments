@@ -174,7 +174,7 @@ public class LiquidContainer : ContainerIOEntity
 			}
 			foreach (IOEntity item2 in obj)
 			{
-				item2.SendChangedToRoot(true);
+				item2.SendChangedToRoot(forceUpdate: true);
 			}
 			Facepunch.Pool.FreeList(ref obj);
 		}
@@ -301,7 +301,7 @@ public class LiquidContainer : ContainerIOEntity
 	{
 		if (!HasFlag(Flags.Reserved5))
 		{
-			SetFlag(Flags.Reserved5, true);
+			SetFlag(Flags.Reserved5, b: true);
 			Invoke(ShutTap, duration);
 			SendNetworkUpdateImmediate();
 		}
@@ -309,7 +309,7 @@ public class LiquidContainer : ContainerIOEntity
 
 	public virtual void ShutTap()
 	{
-		SetFlag(Flags.Reserved5, false);
+		SetFlag(Flags.Reserved5, b: false);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -431,13 +431,12 @@ public class LiquidContainer : ContainerIOEntity
 			return;
 		}
 		Vector3 worldHandlePosition = Vector3.zero;
-		IOEntity iOEntity = connected.FindGravitySource(ref worldHandlePosition, IOEntity.backtracking, true);
+		IOEntity iOEntity = connected.FindGravitySource(ref worldHandlePosition, IOEntity.backtracking, ignoreSelf: true);
 		if ((iOEntity != null && !connected.AllowLiquidPassthrough(iOEntity, worldHandlePosition)) || connected == this || ConsiderConnectedTo(connected))
 		{
 			return;
 		}
-		ContainerIOEntity containerIOEntity;
-		if ((object)(containerIOEntity = connected as ContainerIOEntity) != null && !pushTargets.Contains(containerIOEntity) && containerIOEntity.inventory.CanAcceptItem(ourFuel, 0) == ItemContainer.CanAcceptResult.CanAccept)
+		if (connected is ContainerIOEntity containerIOEntity && !pushTargets.Contains(containerIOEntity) && containerIOEntity.inventory.CanAcceptItem(ourFuel, 0) == ItemContainer.CanAcceptResult.CanAccept)
 		{
 			pushTargets.Add(containerIOEntity);
 			return;

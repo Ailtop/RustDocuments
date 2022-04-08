@@ -93,8 +93,7 @@ public class BaseLauncher : BaseProjectile
 			vector = AimConeUtil.GetModifiedAimConeDirection(num, vector);
 		}
 		float num2 = 1f;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(position, vector, out hitInfo, num2, 1236478737))
+		if (UnityEngine.Physics.Raycast(position, vector, out var hitInfo, num2, 1236478737))
 		{
 			num2 = hitInfo.distance - 0.1f;
 		}
@@ -180,8 +179,7 @@ public class BaseLauncher : BaseProjectile
 			vector2 = AimConeUtil.GetModifiedAimConeDirection(num2, vector2);
 		}
 		float num3 = 1f;
-		RaycastHit hitInfo;
-		if (UnityEngine.Physics.Raycast(vector, vector2, out hitInfo, num3, 1236478737))
+		if (UnityEngine.Physics.Raycast(vector, vector2, out var hitInfo, num3, 1236478737))
 		{
 			num3 = hitInfo.distance - 0.1f;
 		}

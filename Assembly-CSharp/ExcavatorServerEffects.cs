@@ -9,7 +9,7 @@ public class ExcavatorServerEffects : MonoBehaviour
 	public void Awake()
 	{
 		instance = this;
-		SetMining(false, true);
+		SetMining(isMining: false, force: true);
 	}
 
 	public void OnDestroy()

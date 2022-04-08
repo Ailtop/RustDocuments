@@ -78,7 +78,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
 		base.OnDeployed(parent, deployedBy, fromItem);
-		SetFlag(Flags.Reserved1, true);
+		SetFlag(Flags.Reserved1, b: true);
 		UpdateGroundedFlag();
 		UpdatePhysicsMaterial();
 	}
@@ -155,7 +155,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		{
 			initialForceScale = 0f;
 			InvokeRepeating(ApplyInitialForce, 0f, 0.1f);
-			SetFlag(Flags.Reserved1, false);
+			SetFlag(Flags.Reserved1, b: false);
 		}
 		if (!IsInvoking(UpdatePhysicsMaterial))
 		{
@@ -235,14 +235,12 @@ public class Sled : BaseVehicle, INotifyTrigger
 		{
 			if (!(entityContent is Sled))
 			{
-				BaseVehicleModule baseVehicleModule;
-				if ((object)(baseVehicleModule = entityContent as BaseVehicleModule) != null && baseVehicleModule.Vehicle != null && (baseVehicleModule.Vehicle.IsOn() || !baseVehicleModule.Vehicle.IsStationary()))
+				if (entityContent is BaseVehicleModule baseVehicleModule && baseVehicleModule.Vehicle != null && (baseVehicleModule.Vehicle.IsOn() || !baseVehicleModule.Vehicle.IsStationary()))
 				{
 					Kill(DestroyMode.Gib);
 					break;
 				}
-				BaseVehicle baseVehicle;
-				if ((object)(baseVehicle = entityContent as BaseVehicle) != null && baseVehicle.HasDriver() && (baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
+				if (entityContent is BaseVehicle baseVehicle && baseVehicle.HasDriver() && (baseVehicle.IsMoving() || baseVehicle.HasFlag(Flags.On)))
 				{
 					Kill(DestroyMode.Gib);
 					break;

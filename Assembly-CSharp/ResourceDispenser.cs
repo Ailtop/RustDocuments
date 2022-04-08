@@ -71,17 +71,13 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 
 		public GatherPropertyEntry GetFromIndex(GatherType index)
 		{
-			switch (index)
+			return index switch
 			{
-			case GatherType.Tree:
-				return Tree;
-			case GatherType.Ore:
-				return Ore;
-			case GatherType.Flesh:
-				return Flesh;
-			default:
-				return null;
-			}
+				GatherType.Tree => Tree, 
+				GatherType.Ore => Ore, 
+				GatherType.Flesh => Flesh, 
+				_ => null, 
+			};
 		}
 	}
 

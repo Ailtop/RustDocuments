@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using ConVar;
 using Facepunch;
 using Network;
@@ -39,8 +38,7 @@ public class BaseVehicle : BaseMountable
 		public BaseMountable mountable;
 	}
 
-	[IsReadOnly]
-	public struct Enumerable : IEnumerable<MountPointInfo>, IEnumerable
+	public readonly struct Enumerable : IEnumerable<MountPointInfo>, IEnumerable
 	{
 		private readonly BaseVehicle _vehicle;
 
@@ -577,7 +575,7 @@ public class BaseVehicle : BaseMountable
 			foreach (ProtoBuf.BaseVehicle.MountPoint mountPoint in pendingLoad.mountPoints)
 			{
 				EntityRef<BaseMountable> entityRef = new EntityRef<BaseMountable>(mountPoint.mountableId);
-				if (!entityRef.IsValid(true))
+				if (!entityRef.IsValid(serverside: true))
 				{
 					Debug.LogError($"Loaded a mountpoint which doesn't exist: {mountPoint.index}", this);
 					continue;
@@ -585,7 +583,7 @@ public class BaseVehicle : BaseMountable
 				if (mountPoint.index < 0 || mountPoint.index >= mountPoints.Count)
 				{
 					Debug.LogError($"Loaded a mountpoint which has no info: {mountPoint.index}", this);
-					entityRef.Get(true).Kill();
+					entityRef.Get(serverside: true).Kill();
 					continue;
 				}
 				MountPointInfo mountPointInfo = mountPoints[mountPoint.index];
@@ -594,10 +592,10 @@ public class BaseVehicle : BaseMountable
 					Debug.LogError($"Loading a mountpoint after one was already set: {mountPoint.index}", this);
 					mountPointInfo.mountable.Kill();
 				}
-				mountPointInfo.mountable = entityRef.Get(true);
+				mountPointInfo.mountable = entityRef.Get(serverside: true);
 				if (!mountPointInfo.mountable.enableSaving)
 				{
-					mountPointInfo.mountable.EnableSaving(true);
+					mountPointInfo.mountable.EnableSaving(wants: true);
 				}
 			}
 		}
@@ -828,7 +826,7 @@ public class BaseVehicle : BaseMountable
 					num = 0;
 				}
 				MountPointInfo mountPoint = GetMountPoint(num);
-				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable, true) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
+				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable, fullBodyCheck: true) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
 				{
 					baseMountable = mountPoint.mountable;
 					break;
@@ -837,7 +835,7 @@ public class BaseVehicle : BaseMountable
 		}
 		if (baseMountable != null && baseMountable != mountable)
 		{
-			mountable.DismountPlayer(player, true);
+			mountable.DismountPlayer(player, lite: true);
 			baseMountable.MountPlayer(player);
 			player.MarkSwapSeat();
 		}
@@ -874,7 +872,7 @@ public class BaseVehicle : BaseMountable
 		if (owner != null)
 		{
 			creatorEntity = owner;
-			SetFlag(Flags.Locked, true);
+			SetFlag(Flags.Locked, b: true);
 			safeAreaRadius = newSafeAreaRadius;
 			safeAreaOrigin = newSafeAreaOrigin;
 			spawnTime = UnityEngine.Time.realtimeSinceStartup;
@@ -884,7 +882,7 @@ public class BaseVehicle : BaseMountable
 	public void ClearOwnerEntry()
 	{
 		creatorEntity = null;
-		SetFlag(Flags.Locked, false);
+		SetFlag(Flags.Locked, b: false);
 		safeAreaRadius = -1f;
 		safeAreaOrigin = Vector3.zero;
 	}
@@ -943,7 +941,7 @@ public class BaseVehicle : BaseMountable
 			{
 				continue;
 			}
-			if (IsSeatClipping(allMountPoint.mountable, true))
+			if (IsSeatClipping(allMountPoint.mountable, fullBodyCheck: true))
 			{
 				if (UnityEngine.Application.isEditor)
 				{
@@ -1116,11 +1114,11 @@ public class BaseVehicle : BaseMountable
 		{
 			if (!baseMountable.enableSaving)
 			{
-				baseMountable.EnableSaving(true);
+				baseMountable.EnableSaving(wants: true);
 			}
 			if (mountToSpawn.bone != "")
 			{
-				baseMountable.SetParent(this, mountToSpawn.bone, true, true);
+				baseMountable.SetParent(this, mountToSpawn.bone, worldPositionStays: true, sendImmediate: true);
 			}
 			else
 			{
@@ -1228,7 +1226,7 @@ public class BaseVehicle : BaseMountable
 		{
 			if (enumerator.MoveNext())
 			{
-				MountPointInfo current = enumerator.Current;
+				_ = enumerator.Current;
 				return true;
 			}
 		}
@@ -1276,8 +1274,7 @@ public class BaseVehicle : BaseMountable
 	protected override void OnChildAdded(BaseEntity child)
 	{
 		base.OnChildAdded(child);
-		BaseVehicle baseVehicle;
-		if ((object)(baseVehicle = child as BaseVehicle) != null && !baseVehicle.IsVehicleRoot() && !childVehicles.Contains(baseVehicle))
+		if (child is BaseVehicle baseVehicle && !baseVehicle.IsVehicleRoot() && !childVehicles.Contains(baseVehicle))
 		{
 			childVehicles.Add(baseVehicle);
 		}
@@ -1286,8 +1283,7 @@ public class BaseVehicle : BaseMountable
 	protected override void OnChildRemoved(BaseEntity child)
 	{
 		base.OnChildRemoved(child);
-		BaseVehicle baseVehicle;
-		if ((object)(baseVehicle = child as BaseVehicle) != null && !baseVehicle.IsVehicleRoot())
+		if (child is BaseVehicle baseVehicle && !baseVehicle.IsVehicleRoot())
 		{
 			childVehicles.Remove(baseVehicle);
 		}

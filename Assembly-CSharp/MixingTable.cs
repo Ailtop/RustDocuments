@@ -148,8 +148,7 @@ public class MixingTable : StorageContainer
 		}
 		MixStartingPlayer = player;
 		List<Item> orderedContainerItems = GetOrderedContainerItems(base.inventory);
-		int quantity;
-		currentRecipe = RecipeDictionary.GetMatchingRecipeAndQuantity(Recipes, orderedContainerItems, out quantity);
+		currentRecipe = RecipeDictionary.GetMatchingRecipeAndQuantity(Recipes, orderedContainerItems, out var quantity);
 		currentQuantity = quantity;
 		if (!(currentRecipe == null) && (!currentRecipe.RequiresBlueprint || !(currentRecipe.ProducedItem != null) || player.blueprints.HasUnlocked(currentRecipe.ProducedItem)))
 		{
@@ -166,7 +165,7 @@ public class MixingTable : StorageContainer
 				return;
 			}
 			InvokeRepeating(TickMix, 1f, 1f);
-			SetFlag(Flags.On, true);
+			SetFlag(Flags.On, b: true);
 			SendNetworkUpdateImmediate();
 		}
 	}
@@ -184,7 +183,7 @@ public class MixingTable : StorageContainer
 		CancelInvoke(TickMix);
 		if (IsOn())
 		{
-			SetFlag(Flags.On, false);
+			SetFlag(Flags.On, b: false);
 			SendNetworkUpdateImmediate();
 		}
 	}

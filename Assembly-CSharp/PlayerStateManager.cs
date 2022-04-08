@@ -20,8 +20,7 @@ public class PlayerStateManager
 	{
 		using (TimeWarning.New("PlayerStateManager.Get"))
 		{
-			PlayerState value;
-			if (_cache.TryGetValue(playerId, out value))
+			if (_cache.TryGetValue(playerId, out var value))
 			{
 				return value;
 			}
@@ -49,8 +48,7 @@ public class PlayerStateManager
 
 	public void Save(ulong playerId)
 	{
-		PlayerState value;
-		if (_cache.TryGetValue(playerId, out value))
+		if (_cache.TryGetValue(playerId, out var value))
 		{
 			SaveState(playerId, value);
 		}

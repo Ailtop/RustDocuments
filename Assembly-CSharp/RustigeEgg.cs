@@ -122,10 +122,10 @@ public class RustigeEgg : BaseCombatEntity
 			{
 				CancelInvoke(CloseEgg);
 			}
-			SetFlag(Flags.Open, flag, false, false);
+			SetFlag(Flags.Open, flag, recursive: false, networkupdate: false);
 			if (IsSpinning() && flag)
 			{
-				SetFlag(Flags.Reserved1, false, false, false);
+				SetFlag(Flags.Reserved1, b: false, recursive: false, networkupdate: false);
 			}
 			SendNetworkUpdateImmediate();
 		}
@@ -133,6 +133,6 @@ public class RustigeEgg : BaseCombatEntity
 
 	public void CloseEgg()
 	{
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 	}
 }

@@ -233,7 +233,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 			{
 				_notificationBody = text2;
 			}
-			SetFlag(Flags.Reserved6, true);
+			SetFlag(Flags.Reserved6, b: true);
 		}
 	}
 }

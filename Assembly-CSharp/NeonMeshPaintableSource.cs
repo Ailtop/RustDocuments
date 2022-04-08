@@ -42,20 +42,40 @@ public class NeonMeshPaintableSource : MeshPaintableSource
 
 	public override Color32[] UpdateFrom(Texture2D input)
 	{
-		_003C_003Ec__DisplayClass8_0 _003C_003Ec__DisplayClass8_ = default(_003C_003Ec__DisplayClass8_0);
-		_003C_003Ec__DisplayClass8_._003C_003E4__this = this;
 		Init();
-		_003C_003Ec__DisplayClass8_.pixels = input.GetPixels32();
-		texture.SetPixels32(_003C_003Ec__DisplayClass8_.pixels);
-		texture.Apply(true, false);
-		_003C_003Ec__DisplayClass8_.width = input.width;
+		Color32[] pixels = input.GetPixels32();
+		texture.SetPixels32(pixels);
+		texture.Apply(updateMipmaps: true, makeNoLongerReadable: false);
+		int width = input.width;
 		int height = input.height;
-		int num = _003C_003Ec__DisplayClass8_.width / 2;
+		int num = width / 2;
 		int num2 = height / 2;
-		topLeft = _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(0, num2, num, num2, ref _003C_003Ec__DisplayClass8_);
-		topRight = _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(num, num2, num, num2, ref _003C_003Ec__DisplayClass8_);
-		bottomLeft = _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(0, 0, num, num2, ref _003C_003Ec__DisplayClass8_);
-		bottomRight = _003CUpdateFrom_003Eg__GetColorForRegion_007C8_0(num, 0, num, num2, ref _003C_003Ec__DisplayClass8_);
-		return _003C_003Ec__DisplayClass8_.pixels;
+		topLeft = GetColorForRegion(0, num2, num, num2);
+		topRight = GetColorForRegion(num, num2, num, num2);
+		bottomLeft = GetColorForRegion(0, 0, num, num2);
+		bottomRight = GetColorForRegion(num, 0, num, num2);
+		return pixels;
+		Color GetColorForRegion(int x, int y, int regionWidth, int regionHeight)
+		{
+			float num3 = 0f;
+			float num4 = 0f;
+			float num5 = 0f;
+			int num6 = y + regionHeight;
+			for (int i = y; i < num6; i++)
+			{
+				int num7 = i * width + x;
+				int num8 = num7 + regionWidth;
+				for (int j = num7; j < num8; j++)
+				{
+					Color32 color = pixels[j];
+					float num9 = (float)(int)color.a / 255f;
+					num3 += (float)(int)color.r * num9;
+					num4 += (float)(int)color.g * num9;
+					num5 += (float)(int)color.b * num9;
+				}
+			}
+			int num10 = regionWidth * regionHeight * 255;
+			return new Color(lightingCurve.Evaluate(num3 / (float)num10), lightingCurve.Evaluate(num4 / (float)num10), lightingCurve.Evaluate(num5 / (float)num10), 1f);
+		}
 	}
 }

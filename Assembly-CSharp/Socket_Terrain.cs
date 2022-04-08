@@ -19,7 +19,7 @@ public class Socket_Terrain : Socket_Base
 		Gizmos.DrawCube(Vector3.zero, new Vector3(0.1f, 0.1f, placementHeight));
 		Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
 		Gizmos.DrawWireCube(Vector3.zero, new Vector3(0.1f, 0.1f, placementHeight));
-		Gizmos.DrawIcon(base.transform.position, "light_circle_green.png", false);
+		Gizmos.DrawIcon(base.transform.position, "light_circle_green.png", allowScaling: false);
 	}
 
 	public override bool TestTarget(Construction.Target target)

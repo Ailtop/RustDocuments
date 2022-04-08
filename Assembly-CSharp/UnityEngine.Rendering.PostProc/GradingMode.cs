@@ -1,9 +1,8 @@
-namespace UnityEngine.Rendering.PostProcessing
+namespace UnityEngine.Rendering.PostProcessing;
+
+public enum GradingMode
 {
-	public enum GradingMode
-	{
-		LowDefinitionRange = 0,
-		HighDefinitionRange = 1,
-		External = 2
-	}
+	LowDefinitionRange = 0,
+	HighDefinitionRange = 1,
+	External = 2
 }

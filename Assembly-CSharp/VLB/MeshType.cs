@@ -1,8 +1,7 @@
-namespace VLB
+namespace VLB;
+
+public enum MeshType
 {
-	public enum MeshType
-	{
-		Shared = 0,
-		Custom = 1
-	}
+	Shared = 0,
+	Custom = 1
 }

@@ -1,7 +1,6 @@
-namespace ConVar
+namespace ConVar;
+
+[Factory("decor")]
+public class Decor : ConsoleSystem
 {
-	[Factory("decor")]
-	public class Decor : ConsoleSystem
-	{
-	}
 }

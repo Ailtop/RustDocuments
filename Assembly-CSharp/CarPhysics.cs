@@ -139,12 +139,11 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 
 	public CarPhysics(TCar car, Transform transform, Rigidbody rBody, CarSettings vehicleSettings)
 	{
-		_003C_003Ec__DisplayClass47_0 _003C_003Ec__DisplayClass47_ = default(_003C_003Ec__DisplayClass47_0);
-		_003C_003Ec__DisplayClass47_.transform = transform;
+		Transform transform2 = transform;
 		base._002Ector();
-		_003C_003Ec__DisplayClass47_._003C_003E4__this = this;
+		CarPhysics<TCar> carPhysics = this;
 		this.car = car;
-		this.transform = _003C_003Ec__DisplayClass47_.transform;
+		this.transform = transform2;
 		this.rBody = rBody;
 		this.vehicleSettings = vehicleSettings;
 		timeSinceWaterCheck = default(TimeSince);
@@ -154,11 +153,25 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		wheelData = new ServerWheelData[wheels.Length];
 		for (int i = 0; i < wheelData.Length; i++)
 		{
-			wheelData[i] = _003C_002Ector_003Eg__AddWheel_007C47_0(wheels[i], ref _003C_003Ec__DisplayClass47_);
+			wheelData[i] = AddWheel(wheels[i]);
 		}
 		midWheelPos = car.GetWheelsMidPos();
 		wheelData[0].wheel.wheelCollider.ConfigureVehicleSubsteps(1000f, 1, 1);
 		lastMovingTime = Time.realtimeSinceStartup;
+		ServerWheelData AddWheel(CarWheel wheel)
+		{
+			ServerWheelData serverWheelData = new ServerWheelData();
+			serverWheelData.wheelCollider = wheel.wheelCollider;
+			serverWheelData.wheelColliderTransform = wheel.wheelCollider.transform;
+			serverWheelData.forceDistance = GetWheelForceDistance(wheel.wheelCollider);
+			serverWheelData.wheel = wheel;
+			serverWheelData.wheelCollider.sidewaysFriction = zeroFriction;
+			serverWheelData.wheelCollider.forwardFriction = zeroFriction;
+			Vector3 vector = transform2.InverseTransformPoint(wheel.wheelCollider.transform.position);
+			serverWheelData.isFrontWheel = vector.z > 0f;
+			serverWheelData.isLeftWheel = vector.x < 0f;
+			return serverWheelData;
+		}
 	}
 
 	public void FixedUpdate(float dt, float speed)
@@ -228,8 +241,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				{
 					float a = car.WaterFactor();
 					float b = 0f;
-					TriggerVehicleDrag result;
-					if (car.FindTrigger<TriggerVehicleDrag>(out result))
+					if (car.FindTrigger<TriggerVehicleDrag>(out var result))
 					{
 						b = result.vehicleDrag;
 					}
@@ -364,8 +376,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 	{
 		wd.isGrounded = wd.wheelCollider.GetGroundHit(out wd.hit);
 		wd.origin = wd.wheelColliderTransform.TransformPoint(wd.wheelCollider.center);
-		RaycastHit hitInfo;
-		if (wd.isGrounded && GamePhysics.Trace(new Ray(wd.origin, -wd.wheelColliderTransform.up), 0f, out hitInfo, wd.wheelCollider.suspensionDistance + wd.wheelCollider.radius, 1235321089, QueryTriggerInteraction.Ignore))
+		if (wd.isGrounded && GamePhysics.Trace(new Ray(wd.origin, -wd.wheelColliderTransform.up), 0f, out var hitInfo, wd.wheelCollider.suspensionDistance + wd.wheelCollider.radius, 1235321089, QueryTriggerInteraction.Ignore))
 		{
 			wd.hit.point = hitInfo.point;
 			wd.hit.normal = hitInfo.normal;
@@ -498,44 +509,35 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		{
 			wd.tyreSlip.x = wd.localVelocity.x;
 			wd.tyreSlip.y = wd.localVelocity.y - wd.angularVelocity * wd.wheelCollider.radius;
-			float num7;
-			switch (car.OnSurface)
+			VehicleTerrainHandler.Surface onSurface = car.OnSurface;
+			float num7 = wd.wheel.tyreFriction * wd.downforce * onSurface switch
 			{
-			case VehicleTerrainHandler.Surface.Road:
-				num7 = 1f;
-				break;
-			case VehicleTerrainHandler.Surface.Ice:
-				num7 = 0.25f;
-				break;
-			case VehicleTerrainHandler.Surface.Frictionless:
-				num7 = 0f;
-				break;
-			default:
-				num7 = 0.75f;
-				break;
-			}
-			float num8 = wd.wheel.tyreFriction * wd.downforce * num7;
-			float num9 = 0f;
+				VehicleTerrainHandler.Surface.Road => 1f, 
+				VehicleTerrainHandler.Surface.Ice => 0.25f, 
+				VehicleTerrainHandler.Surface.Frictionless => 0f, 
+				_ => 0.75f, 
+			};
+			float num8 = 0f;
 			if (!wd.isBraking)
 			{
-				num9 = Mathf.Min(Mathf.Abs(num6 * wd.tyreSlip.x) / num8, num2);
-				if (num6 != 0f && num9 < 0.1f)
+				num8 = Mathf.Min(Mathf.Abs(num6 * wd.tyreSlip.x) / num7, num2);
+				if (num6 != 0f && num8 < 0.1f)
 				{
-					num9 = 0.1f;
+					num8 = 0.1f;
 				}
 			}
-			if (Mathf.Abs(wd.tyreSlip.y) < num9)
+			if (Mathf.Abs(wd.tyreSlip.y) < num8)
 			{
-				wd.tyreSlip.y = num9 * Mathf.Sign(wd.tyreSlip.y);
+				wd.tyreSlip.y = num8 * Mathf.Sign(wd.tyreSlip.y);
 			}
-			Vector2 vector = (0f - num8) * wd.tyreSlip.normalized;
+			Vector2 vector = (0f - num7) * wd.tyreSlip.normalized;
 			vector.x = Mathf.Abs(vector.x) * 1.5f;
 			vector.y = Mathf.Abs(vector.y);
 			wd.tyreForce.x = Mathf.Clamp(wd.localRigForce.x, 0f - vector.x, vector.x);
 			if (wd.isBraking)
 			{
-				float num10 = Mathf.Min(vector.y, num6);
-				wd.tyreForce.y = Mathf.Clamp(wd.localRigForce.y, 0f - num10, num10);
+				float num9 = Mathf.Min(vector.y, num6);
+				wd.tyreForce.y = Mathf.Clamp(wd.localRigForce.y, 0f - num9, num9);
 			}
 			else
 			{
@@ -549,30 +551,30 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		}
 		if (wd.isGrounded)
 		{
-			float num11;
+			float num10;
 			if (wd.isBraking)
 			{
-				num11 = 0f;
+				num10 = 0f;
 			}
 			else
 			{
 				float driveForceToMaxSlip = vehicleSettings.driveForceToMaxSlip;
-				num11 = Mathf.Clamp01((Mathf.Abs(num6) - Mathf.Abs(wd.tyreForce.y)) / driveForceToMaxSlip) * num2 * Mathf.Sign(num6);
+				num10 = Mathf.Clamp01((Mathf.Abs(num6) - Mathf.Abs(wd.tyreForce.y)) / driveForceToMaxSlip) * num2 * Mathf.Sign(num6);
 			}
-			wd.angularVelocity = (wd.localVelocity.y + num11) / wd.wheelCollider.radius;
+			wd.angularVelocity = (wd.localVelocity.y + num10) / wd.wheelCollider.radius;
 			return;
 		}
-		float num12 = 50f;
-		float num13 = 10f;
+		float num11 = 50f;
+		float num12 = 10f;
 		if (num > 0f)
 		{
-			wd.angularVelocity += num12 * num;
+			wd.angularVelocity += num11 * num;
 		}
 		else
 		{
-			wd.angularVelocity -= num13;
+			wd.angularVelocity -= num12;
 		}
-		wd.angularVelocity -= num12 * brakeInput;
+		wd.angularVelocity -= num11 * brakeInput;
 		wd.angularVelocity = Mathf.Clamp(wd.angularVelocity, 0f, maxSpeed / wd.wheelCollider.radius);
 	}
 

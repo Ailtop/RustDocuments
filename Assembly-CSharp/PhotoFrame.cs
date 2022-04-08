@@ -212,7 +212,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
 		{
-			SetFlag(Flags.Locked, true);
+			SetFlag(Flags.Locked, b: true);
 			SendNetworkUpdate();
 			base.OwnerID = msg.player.userID;
 			Interface.CallHook("OnSignLocked", this, msg.player);
@@ -225,7 +225,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))
 		{
-			SetFlag(Flags.Locked, false);
+			SetFlag(Flags.Locked, b: false);
 			SendNetworkUpdate();
 		}
 	}
@@ -288,8 +288,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 	public override void OnPickedUpPreItemMove(Item createdItem, BasePlayer player)
 	{
 		base.OnPickedUpPreItemMove(createdItem, player);
-		ItemModSign component;
-		if (_overlayTextureCrc != 0 && createdItem.info.TryGetComponent<ItemModSign>(out component))
+		if (_overlayTextureCrc != 0 && createdItem.info.TryGetComponent<ItemModSign>(out var component))
 		{
 			component.OnSignPickedUp(this, createdItem);
 		}
@@ -298,8 +297,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
 	{
 		base.OnDeployed(parent, deployedBy, fromItem);
-		ItemModSign component;
-		if (fromItem.info.TryGetComponent<ItemModSign>(out component))
+		if (fromItem.info.TryGetComponent<ItemModSign>(out var _))
 		{
 			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
 			if (associatedEntity != null)

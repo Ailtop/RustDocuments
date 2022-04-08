@@ -70,7 +70,7 @@ public class Performance : SingletonComponent<Performance>
 			current.frameRateAverage = AverageFrameRate();
 			current.frameTimeAverage = AverageFrameTime();
 			current.memoryUsageSystem = SystemInfoEx.systemMemoryUsed;
-			current.memoryAllocations = GC.GetTotalMemory(false) / 1048576;
+			current.memoryAllocations = GC.GetTotalMemory(forceFullCollection: false) / 1048576;
 			current.memoryCollections = GC.CollectionCount(0);
 			current.loadBalancerTasks = LoadBalancer.Count();
 			current.invokeHandlerTasks = InvokeHandler.Count();

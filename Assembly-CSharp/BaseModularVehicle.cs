@@ -114,7 +114,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 		prevEditable = IsEditableNow;
 		if (Inventory == null)
 		{
-			Inventory = new ModularVehicleInventory(this, AssociatedItemDef, true);
+			Inventory = new ModularVehicleInventory(this, AssociatedItemDef, giveUID: true);
 		}
 	}
 
@@ -124,7 +124,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 		base.PreServerLoad();
 		if (Inventory == null)
 		{
-			Inventory = new ModularVehicleInventory(this, AssociatedItemDef, false);
+			Inventory = new ModularVehicleInventory(this, AssociatedItemDef, giveUID: false);
 		}
 	}
 
@@ -135,7 +135,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 		{
 			Inventory.GiveUIDs();
 		}
-		SetFlag(Flags.Open, false);
+		SetFlag(Flags.Open, b: false);
 	}
 
 	public override void DoServerDestroy()
@@ -237,8 +237,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 
 	public bool TryAddModule(Item moduleItem, int socketIndex)
 	{
-		string failureReason;
-		if (!ModuleCanBeAdded(moduleItem, socketIndex, out failureReason))
+		if (!ModuleCanBeAdded(moduleItem, socketIndex, out var failureReason))
 		{
 			Debug.LogError(GetType().Name + ": Can't add module: " + failureReason);
 			return false;
@@ -368,7 +367,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 		HasInited = true;
 		foreach (BaseVehicleModule attachedModuleEntity in AttachedModuleEntities)
 		{
-			attachedModuleEntity.RefreshConditionals(false);
+			attachedModuleEntity.RefreshConditionals(canGib: false);
 		}
 	}
 
@@ -459,7 +458,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		ModularVehicle modularVehicle = info.msg.modularVehicle;
+		_ = info.msg.modularVehicle;
 	}
 
 	public override bool CanPushNow(BasePlayer pusher)
@@ -493,8 +492,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 	public override void OnChildRemoved(BaseEntity childEntity)
 	{
 		base.OnChildRemoved(childEntity);
-		BaseVehicleModule removedModule;
-		if ((object)(removedModule = childEntity as BaseVehicleModule) != null)
+		if (childEntity is BaseVehicleModule removedModule)
 		{
 			ModuleEntityRemoved(removedModule);
 		}

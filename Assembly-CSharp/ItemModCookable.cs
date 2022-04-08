@@ -37,7 +37,7 @@ public class ItemModCookable : ItemMod
 			{
 				if (setCookingFlag && item.HasFlag(Item.Flag.Cooking))
 				{
-					item.SetFlag(Item.Flag.Cooking, false);
+					item.SetFlag(Item.Flag.Cooking, b: false);
 					item.MarkDirty();
 				}
 			}
@@ -45,7 +45,7 @@ public class ItemModCookable : ItemMod
 			{
 				if (setCookingFlag && !item.HasFlag(Item.Flag.Cooking))
 				{
-					item.SetFlag(Item.Flag.Cooking, true);
+					item.SetFlag(Item.Flag.Cooking, b: true);
 					item.MarkDirty();
 				}
 				cooktimeLeft -= delta;

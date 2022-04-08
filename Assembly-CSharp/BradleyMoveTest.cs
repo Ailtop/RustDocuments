@@ -96,14 +96,14 @@ public class BradleyMoveTest : MonoBehaviour
 		AdjustFriction();
 		float t = Mathf.InverseLerp(3f, 1f, velocity.magnitude * Mathf.Abs(Vector3.Dot(velocity.normalized, base.transform.forward)));
 		float torqueAmount = Mathf.Lerp(moveForceMax, turnForce, t);
-		SetMotorTorque(num5, false, torqueAmount);
-		SetMotorTorque(num6, true, torqueAmount);
+		SetMotorTorque(num5, rightSide: false, torqueAmount);
+		SetMotorTorque(num6, rightSide: true, torqueAmount);
 	}
 
 	public void ApplyBrakes(float amount)
 	{
-		ApplyBrakeTorque(amount, true);
-		ApplyBrakeTorque(amount, false);
+		ApplyBrakeTorque(amount, rightSide: true);
+		ApplyBrakeTorque(amount, rightSide: false);
 	}
 
 	public float GetMotorTorque(bool rightSide)

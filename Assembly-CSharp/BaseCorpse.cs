@@ -60,7 +60,7 @@ public class BaseCorpse : BaseCombatEntity
 
 	public virtual float GetRemovalTime()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(true);
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (activeGameMode != null)
 		{
 			return activeGameMode.CorpseRemovalTime(this);
@@ -174,7 +174,7 @@ public class BaseCorpse : BaseCombatEntity
 		{
 			parentEnt = BaseNetworkable.serverEntities.Find(corpse.parentID) as BaseEntity;
 		}
-		bool isClient2 = base.isClient;
+		_ = base.isClient;
 	}
 
 	public override void OnAttacked(HitInfo info)

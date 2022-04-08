@@ -28,8 +28,7 @@ public class TirednessAboveAIEvent : BaseAIEvent
 	public override void Execute(AIMemory memory, AIBrainSenses senses, StateStatus stateStatus)
 	{
 		base.Result = base.Inverted;
-		IAITirednessAbove iAITirednessAbove = base.Owner as IAITirednessAbove;
-		if (iAITirednessAbove != null)
+		if (base.Owner is IAITirednessAbove iAITirednessAbove)
 		{
 			bool flag = iAITirednessAbove.IsTirednessAbove(Value);
 			if (base.Inverted)

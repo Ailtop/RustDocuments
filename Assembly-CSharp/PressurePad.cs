@@ -25,18 +25,18 @@ public class PressurePad : BaseDetector
 	{
 		base.OnDetectorTriggered();
 		Invoke(UnpowerTime, pressPowerTime);
-		SetFlag(Flags.Reserved3, true);
+		SetFlag(Flags.Reserved3, b: true);
 	}
 
 	public override void OnDetectorReleased()
 	{
 		base.OnDetectorReleased();
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved3, b: false);
 	}
 
 	public void UnpowerTime()
 	{
-		SetFlag(Flags.Reserved3, false);
+		SetFlag(Flags.Reserved3, b: false);
 		MarkDirty();
 	}
 

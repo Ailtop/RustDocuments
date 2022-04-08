@@ -17,7 +17,7 @@ public class ElectricalBlocker : IOEntity
 	public override void UpdateHasPower(int inputAmount, int inputSlot)
 	{
 		base.UpdateHasPower(inputAmount, inputSlot);
-		SetFlag(Flags.Reserved8, input1Amount > 0 || input2Amount > 0, false, false);
+		SetFlag(Flags.Reserved8, input1Amount > 0 || input2Amount > 0, recursive: false, networkupdate: false);
 	}
 
 	public override void IOStateChanged(int inputAmount, int inputSlot)
@@ -28,8 +28,8 @@ public class ElectricalBlocker : IOEntity
 	public virtual void UpdateBlocked()
 	{
 		bool num = IsOn();
-		SetFlag(Flags.On, input1Amount > 0, false, false);
-		SetFlag(Flags.Reserved8, IsOn(), false, false);
+		SetFlag(Flags.On, input1Amount > 0, recursive: false, networkupdate: false);
+		SetFlag(Flags.Reserved8, IsOn(), recursive: false, networkupdate: false);
 		UpdateHasPower(input1Amount + input2Amount, 1);
 		if (num != IsOn())
 		{

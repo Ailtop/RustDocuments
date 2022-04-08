@@ -654,8 +654,7 @@ public class BaseNpc : BaseCombatEntity
 			velocity = baseEntity.transform.InverseTransformDirection(velocity);
 		}
 		Vector3 targetPosition = ent.ServerPosition + velocity * UnityEngine.Time.fixedDeltaTime;
-		NavMeshHit hit;
-		NavMesh.Raycast(ent.ServerPosition, targetPosition, out hit, -1);
+		NavMesh.Raycast(ent.ServerPosition, targetPosition, out var hit, -1);
 		if (!hit.position.IsNaNOrInfinity())
 		{
 			return hit.position;
@@ -753,8 +752,8 @@ public class BaseNpc : BaseCombatEntity
 			float num2 = 1f / 15f;
 			Stamina.Add(0.1f * num2);
 		}
-		float secondsSinceAttacked = base.SecondsSinceAttacked;
-		float num3 = 60f;
+		_ = base.SecondsSinceAttacked;
+		_ = 60f;
 	}
 
 	public virtual bool WantsToEat(BaseEntity best)
@@ -955,7 +954,7 @@ public class BaseNpc : BaseCombatEntity
 			_currentNavMeshLinkOrientation = Quaternion.LookRotation(currentOffMeshLinkData.endPos + Vector3.up * (currentOffMeshLinkData.startPos.y - currentOffMeshLinkData.endPos.y) - currentOffMeshLinkData.startPos);
 		}
 		_traversingNavMeshLink = true;
-		NavAgent.ActivateCurrentOffMeshLink(false);
+		NavAgent.ActivateCurrentOffMeshLink(activated: false);
 		NavAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 		float num = Mathf.Max(NavAgent.speed, 2.8f);
 		float magnitude = (_currentNavMeshLink.startPos - _currentNavMeshLink.endPos).magnitude;
@@ -963,7 +962,7 @@ public class BaseNpc : BaseCombatEntity
 		_currentNavMeshLinkTraversalTimeDelta = 0f;
 		if (!(_currentNavMeshLinkName == "OpenDoorLink") && !(_currentNavMeshLinkName == "JumpRockLink"))
 		{
-			bool flag = _currentNavMeshLinkName == "JumpFoundationLink";
+			_ = _currentNavMeshLinkName == "JumpFoundationLink";
 		}
 		return true;
 	}
@@ -1007,7 +1006,7 @@ public class BaseNpc : BaseCombatEntity
 
 	private void CompleteNavMeshLink()
 	{
-		NavAgent.ActivateCurrentOffMeshLink(true);
+		NavAgent.ActivateCurrentOffMeshLink(activated: true);
 		NavAgent.CompleteOffMeshLink();
 		NavAgent.isStopped = false;
 		NavAgent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
@@ -1390,7 +1389,7 @@ public class BaseNpc : BaseCombatEntity
 			if (newValue > 0)
 			{
 				CurrentBehaviour = Behaviour.Sleep;
-				SetFact(Facts.CanTargetEnemies, 0, false);
+				SetFact(Facts.CanTargetEnemies, 0, triggerCallback: false);
 				SetFact(Facts.CanTargetFood, 0);
 			}
 			else
@@ -1591,15 +1590,12 @@ public class BaseNpc : BaseCombatEntity
 
 	public float ToSpeed(SpeedEnum speed)
 	{
-		switch (speed)
+		return speed switch
 		{
-		case SpeedEnum.StandStill:
-			return 0f;
-		case SpeedEnum.Walk:
-			return 0.18f * Stats.Speed;
-		default:
-			return Stats.Speed;
-		}
+			SpeedEnum.StandStill => 0f, 
+			SpeedEnum.Walk => 0.18f * Stats.Speed, 
+			_ => Stats.Speed, 
+		};
 	}
 
 	public byte GetPathStatus()
@@ -1875,8 +1871,7 @@ public class BaseNpc : BaseCombatEntity
 		{
 			if (!GetNavAgent.isOnNavMesh)
 			{
-				NavMeshHit hit;
-				if (NavMesh.SamplePosition(ServerPosition, out hit, GetNavAgent.height * maxDistanceMultiplier, GetNavAgent.areaMask))
+				if (NavMesh.SamplePosition(ServerPosition, out var hit, GetNavAgent.height * maxDistanceMultiplier, GetNavAgent.areaMask))
 				{
 					ServerPosition = hit.position;
 					GetNavAgent.Warp(ServerPosition);

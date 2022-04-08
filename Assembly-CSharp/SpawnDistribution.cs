@@ -67,8 +67,7 @@ public class SpawnDistribution
 			{
 				continue;
 			}
-			RaycastHit hitInfo;
-			if ((int)placementCheckMask != 0 && Physics.Raycast(vector + Vector3.up * placementCheckHeight, Vector3.down, out hitInfo, placementCheckHeight, placementCheckMask))
+			if ((int)placementCheckMask != 0 && Physics.Raycast(vector + Vector3.up * placementCheckHeight, Vector3.down, out var hitInfo, placementCheckHeight, placementCheckMask))
 			{
 				if (((1 << hitInfo.transform.gameObject.layer) & (int)placementMask) == 0)
 				{
@@ -120,8 +119,7 @@ public class SpawnDistribution
 		BaseEntity component = spawnable.GetComponent<BaseEntity>();
 		if ((bool)component)
 		{
-			int value;
-			if (dict.TryGetValue(component.prefabID, out value))
+			if (dict.TryGetValue(component.prefabID, out var value))
 			{
 				dict[component.prefabID] = value + delta;
 				return;
@@ -133,8 +131,7 @@ public class SpawnDistribution
 
 	public int GetCount(uint prefabID)
 	{
-		int value;
-		dict.TryGetValue(prefabID, out value);
+		dict.TryGetValue(prefabID, out var value);
 		return value;
 	}
 
