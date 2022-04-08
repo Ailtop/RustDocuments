@@ -69,7 +69,6 @@ public class ExcavatorArm : BaseEntity
 	{
 		using (TimeWarning.New("ExcavatorArm.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 2059417170 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -90,7 +89,7 @@ public class ExcavatorArm : BaseEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -126,7 +125,7 @@ public class ExcavatorArm : BaseEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -191,7 +190,7 @@ public class ExcavatorArm : BaseEntity
 			SetFlag(Flags.On, true);
 			InvokeRepeating(ProduceResources, resourceProductionTickRate, resourceProductionTickRate);
 			ExcavatorServerEffects.SetMining(true);
-			Facepunch.Rust.Analytics.ExcavatorStarted();
+			Facepunch.Rust.Analytics.Server.ExcavatorStarted();
 			excavatorStartTime = GetNetworkTime();
 			Interface.CallHook("OnExcavatorMiningToggled", this);
 		}
@@ -203,7 +202,7 @@ public class ExcavatorArm : BaseEntity
 		CancelInvoke(ProduceResources);
 		if (HasFlag(Flags.On))
 		{
-			Facepunch.Rust.Analytics.ExcavatorStopped(GetNetworkTime() - excavatorStartTime);
+			Facepunch.Rust.Analytics.Server.ExcavatorStopped(GetNetworkTime() - excavatorStartTime);
 		}
 		SetFlag(Flags.On, false);
 		Interface.CallHook("OnExcavatorMiningToggled", this);

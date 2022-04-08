@@ -268,7 +268,7 @@ public class GenerateRoadLayout : ProceduralComponent
 		{
 			item2.Path.Smoothen(4);
 			item2.Path.RecalculateTangents();
-			item2.AdjustPlacementMap(item2.Width * 2f);
+			item2.AdjustPlacementMap(20f);
 		}
 		TerrainMeta.Path.Roads.AddRange(list);
 	}

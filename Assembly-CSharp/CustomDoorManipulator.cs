@@ -11,7 +11,6 @@ public class CustomDoorManipulator : DoorManipulator
 	{
 		using (TimeWarning.New("CustomDoorManipulator.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1224330484 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -32,7 +31,7 @@ public class CustomDoorManipulator : DoorManipulator
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -68,7 +67,7 @@ public class CustomDoorManipulator : DoorManipulator
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;

@@ -23,7 +23,6 @@ public class ThrownWeapon : AttackEntity
 	{
 		using (TimeWarning.New("ThrownWeapon.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1513023343 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -44,7 +43,7 @@ public class ThrownWeapon : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -80,7 +79,7 @@ public class ThrownWeapon : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -146,7 +145,6 @@ public class ThrownWeapon : AttackEntity
 		StartAttackCooldown(repeatDelay);
 		UseItemAmount(1);
 		TimedExplosive timedExplosive = baseEntity as TimedExplosive;
-		Sensation sensation;
 		if (timedExplosive != null)
 		{
 			float num3 = 0f;
@@ -154,7 +152,7 @@ public class ThrownWeapon : AttackEntity
 			{
 				num3 += damageType.amount;
 			}
-			sensation = default(Sensation);
+			Sensation sensation = default(Sensation);
 			sensation.Type = SensationType.ThrownWeapon;
 			sensation.Position = ownerPlayer.transform.position;
 			sensation.Radius = 50f;
@@ -166,7 +164,7 @@ public class ThrownWeapon : AttackEntity
 		}
 		else
 		{
-			sensation = default(Sensation);
+			Sensation sensation = default(Sensation);
 			sensation.Type = SensationType.ThrownWeapon;
 			sensation.Position = ownerPlayer.transform.position;
 			sensation.Radius = 50f;
@@ -231,7 +229,6 @@ public class ThrownWeapon : AttackEntity
 			return;
 		}
 		TimedExplosive timedExplosive = baseEntity as TimedExplosive;
-		Sensation sensation;
 		if (timedExplosive != null)
 		{
 			float num2 = 0f;
@@ -239,7 +236,7 @@ public class ThrownWeapon : AttackEntity
 			{
 				num2 += damageType.amount;
 			}
-			sensation = default(Sensation);
+			Sensation sensation = default(Sensation);
 			sensation.Type = SensationType.ThrownWeapon;
 			sensation.Position = player.transform.position;
 			sensation.Radius = 50f;
@@ -251,7 +248,7 @@ public class ThrownWeapon : AttackEntity
 		}
 		else
 		{
-			sensation = default(Sensation);
+			Sensation sensation = default(Sensation);
 			sensation.Type = SensationType.ThrownWeapon;
 			sensation.Position = player.transform.position;
 			sensation.Radius = 50f;

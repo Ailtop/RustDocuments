@@ -10,7 +10,7 @@ using Rust.UI;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
+public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 {
 	public enum EngineSpeeds
 	{
@@ -89,19 +89,10 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public float maxFuelPerSec = 0.15f;
 
 	[SerializeField]
-	public GameObject detailedCabinColliderObj;
-
-	[SerializeField]
 	public TriggerParent platformParentTrigger;
 
 	[SerializeField]
 	public ProtectionProperties driverProtection;
-
-	[SerializeField]
-	public float wheelRadius = 0.615f;
-
-	[SerializeField]
-	public Transform[] wheelVisuals;
 
 	[SerializeField]
 	public VehicleLight[] lights;
@@ -246,7 +237,7 @@ public class TrainEngine : BaseTrain, IEngineControllerUser, IEntity
 	public override void OnKilled(HitInfo info)
 	{
 		base.OnKilled(info);
-		if (base.IsDestroyed)
+		if (base.IsDestroyed && fxFinalExplosion != null)
 		{
 			Effect.server.Run(fxFinalExplosion.resourcePath, engineWorldCol.transform.position + engineWorldCol.center, Vector3.up, null, true);
 		}

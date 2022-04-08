@@ -99,13 +99,14 @@ public class WorldItem : BaseEntity
 	private void SendItemUpdate()
 	{
 		_isInvokingSendItemUpdate = false;
-		if (item != null)
+		if (item == null)
 		{
-			using (UpdateItem updateItem = Facepunch.Pool.Get<UpdateItem>())
-			{
-				updateItem.item = item.Save(false, false);
-				ClientRPC(null, "UpdateItem", updateItem);
-			}
+			return;
+		}
+		using (UpdateItem updateItem = Facepunch.Pool.Get<UpdateItem>())
+		{
+			updateItem.item = item.Save(false, false);
+			ClientRPC(null, "UpdateItem", updateItem);
 		}
 	}
 

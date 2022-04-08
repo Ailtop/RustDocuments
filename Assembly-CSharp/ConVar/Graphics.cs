@@ -67,8 +67,7 @@ namespace ConVar
 		[ClientVar(Saved = true, ClientAdmin = true)]
 		public static bool dof_debug = false;
 
-		[ClientVar(ClientAdmin = true)]
-		public static int dof_focus_target = 0;
+		public static BaseEntity dof_focus_target_entity = null;
 
 		[ClientVar(Saved = true, Help = "Whether to scale vm models with fov")]
 		public static bool vm_fov_scale = true;
@@ -288,6 +287,11 @@ namespace ConVar
 		{
 			distance = ((QualitySettings.shadowCascades == 1) ? Mathf.Clamp(distance, 40f, 40f) : ((QualitySettings.shadowCascades != 2) ? Mathf.Clamp(distance, 40f, 800f) : Mathf.Clamp(distance, 40f, 180f)));
 			return distance;
+		}
+
+		[ClientVar(ClientAdmin = true)]
+		public static void dof_focus_target(Arg arg)
+		{
 		}
 
 		[ClientVar]

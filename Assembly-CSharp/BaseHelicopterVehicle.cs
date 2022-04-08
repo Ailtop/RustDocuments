@@ -141,7 +141,7 @@ public class BaseHelicopterVehicle : BaseVehicle
 	public virtual void SetDefaultInputState()
 	{
 		currentInputState.Reset();
-		if (IsMounted())
+		if (HasDriver())
 		{
 			float num = Vector3.Dot(Vector3.up, base.transform.right);
 			float num2 = Vector3.Dot(Vector3.up, base.transform.forward);

@@ -15,7 +15,7 @@ public enum ItemCategory
 	Common = 12,
 	Component = 13,
 	Search = 14,
-	Favourite = 0xF,
-	Electrical = 0x10,
+	Favourite = 15,
+	Electrical = 16,
 	Fun = 17
 }

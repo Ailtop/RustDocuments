@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -96,6 +97,10 @@ public class AdventCalendar : BaseCombatEntity
 
 	public void AwardGift(BasePlayer player)
 	{
+		if (Interface.CallHook("OnAdventGiftAward", this, player) != null)
+		{
+			return;
+		}
 		DateTime now = DateTime.Now;
 		int num = now.Day - startDay;
 		if (now.Month == startMonth && num >= 0 && num < days.Length)
@@ -116,11 +121,17 @@ public class AdventCalendar : BaseCombatEntity
 				ItemAmount itemAmount = dayReward.rewards[i];
 				player.GiveItem(ItemManager.CreateByItemID(itemAmount.itemid, Mathf.CeilToInt(itemAmount.amount), 0uL), GiveItemReason.PickedUp);
 			}
+			Interface.CallHook("OnAdventGiftAwarded", this, player);
 		}
 	}
 
 	public bool WasAwardedTodaysGift(BasePlayer player)
 	{
+		object obj = Interface.CallHook("CanBeAwardedAdventGift", this, player);
+		if (obj is bool)
+		{
+			return !(bool)obj;
+		}
 		if (!playerRewardHistory.ContainsKey(player.userID))
 		{
 			return false;

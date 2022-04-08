@@ -17,18 +17,20 @@ public class WorldSplineSharedData : ScriptableObject
 		instance = Resources.Load<WorldSplineSharedData>("WorldSpline Prefab Shared Data");
 	}
 
-	public static WorldSplineData GetDataFor(WorldSpline worldSpline)
+	public static bool TryGetDataFor(WorldSpline worldSpline, out WorldSplineData data)
 	{
 		if (instance == null)
 		{
 			Debug.LogError("No instance of WorldSplineSharedData found.");
-			return null;
+			data = null;
+			return false;
 		}
 		if (worldSpline.dataIndex < 0 || worldSpline.dataIndex >= instance.dataList.Count)
 		{
-			Debug.LogError($"Data index out of range ({worldSpline.dataIndex}/{instance.dataList.Count}) for world spline: {worldSpline.name}", worldSpline.gameObject);
-			return null;
+			data = null;
+			return false;
 		}
-		return instance.dataList[worldSpline.dataIndex];
+		data = instance.dataList[worldSpline.dataIndex];
+		return true;
 	}
 }

@@ -35,6 +35,10 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 
 	public ServerBrowserTagList serverTags;
 
+	public RawImage backgroundImage;
+
+	public Texture2D defaultBackground;
+
 	public static bool isOpen
 	{
 		get

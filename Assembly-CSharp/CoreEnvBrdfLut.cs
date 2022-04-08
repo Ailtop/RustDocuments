@@ -43,7 +43,7 @@ public class CoreEnvBrdfLut
 		texture2D.wrapMode = TextureWrapMode.Clamp;
 		texture2D.filterMode = FilterMode.Bilinear;
 		Color[] array = new Color[num * num2];
-		float num5 = 0.0078125f;
+		float num5 = 1f / 128f;
 		for (int i = 0; i < num2; i++)
 		{
 			float num6 = ((float)i + 0.5f) * num4;

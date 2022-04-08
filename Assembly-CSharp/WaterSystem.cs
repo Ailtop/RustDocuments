@@ -140,6 +140,26 @@ public class WaterSystem : MonoBehaviour
 
 	private static NativePathState nativePathState = NativePathState.Initializing;
 
+	private static Vector3[] currentShoreMap;
+
+	private static GCHandle currentShoreMapHandle;
+
+	private static short[] currentWaterMap;
+
+	private static GCHandle currentWaterMapHandle;
+
+	private static short[] currentHeightMap;
+
+	private static GCHandle currentHeightMapHandle;
+
+	private static Vector4[] currentOpenWaves;
+
+	private static GCHandle currentOpenWavesHandle;
+
+	private static Vector4[] currentShoreWaves;
+
+	private static GCHandle currentShoreWavesHandle;
+
 	public WaterGerstner.PrecomputedWave[] PrecomputedWaves => precomputedWaves;
 
 	public WaterGerstner.PrecomputedShoreWaves PrecomputedShoreWaves => precomputedShoreWaves;
@@ -266,6 +286,11 @@ public class WaterSystem : MonoBehaviour
 			packedParams.y = ((instance != null) ? 1f : 0f);
 			packedParams.z = ((TerrainTexturing.Instance != null) ? 1f : 0f);
 			packedParams.w = 0f;
+			PinObject(shoreMap, ref currentShoreMap, ref currentShoreMapHandle);
+			PinObject(src, ref currentWaterMap, ref currentWaterMapHandle);
+			PinObject(src2, ref currentHeightMap, ref currentHeightMapHandle);
+			PinObject(openWaves, ref currentOpenWaves, ref currentOpenWavesHandle);
+			PinObject(shoreWaves, ref currentShoreWaves, ref currentShoreWavesHandle);
 			SetBaseConstants_Native(shoreMapSize, ref shoreMap[0], waterHeightMapSize, ref src[0], packedParams);
 			SetTerrainConstants_Native(terrainHeightMapSize, ref src2[0], TerrainMeta.Position, TerrainMeta.Size);
 			SetGerstnerConstants_Native(globalParams0, globalParams1, ref openWaves[0], ref shoreWaves[0]);
@@ -274,6 +299,19 @@ public class WaterSystem : MonoBehaviour
 		catch (EntryPointNotFoundException)
 		{
 			nativePathState = NativePathState.Failed;
+		}
+	}
+
+	private static void PinObject<T>(T value, ref T currentValue, ref GCHandle currentValueHandle) where T : class
+	{
+		if (value != null && value != currentValue)
+		{
+			if (currentValueHandle.IsAllocated)
+			{
+				currentValueHandle.Free();
+			}
+			currentValue = value;
+			currentValueHandle = GCHandle.Alloc(value, GCHandleType.Pinned);
 		}
 	}
 

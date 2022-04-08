@@ -691,16 +691,18 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 			{
 				return;
 			}
-			if (!base.HasAnyModules)
+			if (base.HasAnyModules)
 			{
-				Hurt(damage, DamageType.Collision, this, false);
-				return;
+				float amount = damage / (float)base.NumAttachedModules;
+				{
+					foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
+					{
+						attachedModuleEntity.AcceptPropagatedDamage(amount, DamageType.Collision, this, false);
+					}
+					return;
+				}
 			}
-			float amount = damage / (float)base.NumAttachedModules;
-			foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
-			{
-				attachedModuleEntity.AcceptPropagatedDamage(amount, DamageType.Collision, this, false);
-			}
+			Hurt(damage, DamageType.Collision, this, false);
 		}
 	}
 
@@ -927,6 +929,27 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
 		{
 			attachedModuleEntity.OnEngineStateChanged(lastSetEngineState, base.CurEngineState);
+		}
+		if (base.isServer && Rust.GameInfo.HasAchievements)
+		{
+			int num = 0;
+			foreach (MountPointInfo allMountPoint in base.allMountPoints)
+			{
+				if (allMountPoint.mountable.GetMounted() != null)
+				{
+					num++;
+				}
+			}
+			if (num >= 5)
+			{
+				foreach (MountPointInfo allMountPoint2 in base.allMountPoints)
+				{
+					if (allMountPoint2.mountable.GetMounted() != null)
+					{
+						allMountPoint2.mountable.GetMounted().GiveAchievement("BATTLE_BUS");
+					}
+				}
+			}
 		}
 		lastSetEngineState = base.CurEngineState;
 		return true;

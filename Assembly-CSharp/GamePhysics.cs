@@ -92,6 +92,13 @@ public static class GamePhysics
 		BufferToList(UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, colBuffer, layerMask, triggerInteraction), list);
 	}
 
+	public static void CapsuleSweep(Vector3 position0, Vector3 position1, float radius, Vector3 direction, float distance, List<RaycastHit> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
+	{
+		layerMask = HandleTerrainCollision(position1, layerMask);
+		layerMask = HandleTerrainCollision(position1, layerMask);
+		HitBufferToList(UnityEngine.Physics.CapsuleCastNonAlloc(position0, position1, radius, direction, hitBuffer, distance, layerMask, triggerInteraction), list);
+	}
+
 	public static void OverlapCapsule(Vector3 point0, Vector3 point1, float radius, List<Collider> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
 	{
 		layerMask = HandleTerrainCollision(point0, layerMask);
@@ -211,6 +218,18 @@ public static class GamePhysics
 				list.Add(component);
 			}
 			colBuffer[i] = null;
+		}
+	}
+
+	private static void HitBufferToList(int count, List<RaycastHit> list)
+	{
+		if (count >= hitBuffer.Length)
+		{
+			Debug.LogWarning("Physics query is exceeding collider buffer length.");
+		}
+		for (int i = 0; i < count; i++)
+		{
+			list.Add(hitBuffer[i]);
 		}
 	}
 

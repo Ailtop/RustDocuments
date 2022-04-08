@@ -17,14 +17,15 @@ public class PlayerBelt
 	public void DropActive(Vector3 position, Vector3 velocity)
 	{
 		Item activeItem = player.GetActiveItem();
-		if (activeItem != null && Interface.CallHook("OnPlayerDropActiveItem", player, activeItem) == null)
+		if (activeItem == null || Interface.CallHook("OnPlayerDropActiveItem", player, activeItem) != null)
 		{
-			using (TimeWarning.New("PlayerBelt.DropActive"))
-			{
-				activeItem.Drop(position, velocity);
-				player.svActiveItemID = 0u;
-				player.SendNetworkUpdate();
-			}
+			return;
+		}
+		using (TimeWarning.New("PlayerBelt.DropActive"))
+		{
+			activeItem.Drop(position, velocity);
+			player.svActiveItemID = 0u;
+			player.SendNetworkUpdate();
 		}
 	}
 

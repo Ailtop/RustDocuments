@@ -28,7 +28,7 @@ public class SlotMachine : BaseMountable
 		TechScrap = 12,
 		Frags = 13,
 		Cloth = 14,
-		LuckySeven = 0xF
+		LuckySeven = 15
 	}
 
 	[ServerVar]
@@ -108,7 +108,6 @@ public class SlotMachine : BaseMountable
 	{
 		using (TimeWarning.New("SlotMachine.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1251063754 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -129,7 +128,7 @@ public class SlotMachine : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -165,7 +164,7 @@ public class SlotMachine : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -205,7 +204,7 @@ public class SlotMachine : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -371,7 +370,7 @@ public class SlotMachine : BaseMountable
 					}
 				}
 				CurrentSpinPlayer.ChatMessage($"You received {num}x {info.Item.itemDef.displayName.english} for slots payout!");
-				Analytics.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, num);
+				Analytics.Server.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, num);
 				if (info.OverrideWinEffect != null && info.OverrideWinEffect.isValid)
 				{
 					Effect.server.Run(info.OverrideWinEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
@@ -387,7 +386,7 @@ public class SlotMachine : BaseMountable
 			}
 			else
 			{
-				Analytics.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, 0);
+				Analytics.Server.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, 0);
 			}
 		}
 		if (!flag)

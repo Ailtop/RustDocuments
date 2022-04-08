@@ -246,14 +246,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				try
 				{
 					EACServer.OnMessageReceived(packet);
+					break;
 				}
 				catch (Exception e3)
 				{
 					Log(e3);
 					Network.Net.sv.Kick(packet.connection, "Invalid Packet: EAC");
+					break;
 				}
 			}
-			break;
 		case Message.Type.World:
 			if (!World.Transfer || !packet.connection.connected)
 			{
@@ -269,14 +270,15 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				try
 				{
 					WorldNetworking.OnMessageReceived(packet);
+					break;
 				}
 				catch (Exception e6)
 				{
 					Log(e6);
 					Network.Net.sv.Kick(packet.connection, "Invalid Packet: World");
+					break;
 				}
 			}
-			break;
 		case Message.Type.VoiceData:
 			if (!packet.connection.connected)
 			{
@@ -499,14 +501,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2330)
+		else if (packet.connection.protocol > 2332)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2330));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2332));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2330)
+		else if (packet.connection.protocol < 2332)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2330));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2332));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -1153,7 +1155,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2330}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2332}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
 				string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();

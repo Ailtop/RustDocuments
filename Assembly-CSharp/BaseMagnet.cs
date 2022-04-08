@@ -22,6 +22,8 @@ public class BaseMagnet : MonoBehaviour
 
 	public GameObject colliderSource;
 
+	private BasePlayer associatedPlayer;
+
 	public bool HasConnectedObject()
 	{
 		if (fixedJoint.connectedBody != null)
@@ -59,10 +61,11 @@ public class BaseMagnet : MonoBehaviour
 		}
 	}
 
-	public virtual void SetMagnetEnabled(bool wantsOn)
+	public virtual void SetMagnetEnabled(bool wantsOn, BasePlayer forPlayer)
 	{
 		if (isMagnetOn != wantsOn)
 		{
+			associatedPlayer = forPlayer;
 			isMagnetOn = wantsOn;
 			if (isMagnetOn)
 			{
@@ -123,7 +126,7 @@ public class BaseMagnet : MonoBehaviour
 			}
 			if (new OBB(entityContent.transform.position, entityContent.transform.rotation, entityContent.bounds).Contains(attachDepthPoint.position))
 			{
-				entityContent.GetComponent<MagnetLiftable>().SetMagnetized(true, this);
+				entityContent.GetComponent<MagnetLiftable>().SetMagnetized(true, this, associatedPlayer);
 				if (fixedJoint.connectedBody == null)
 				{
 					Effect.server.Run(attachEffect.resourcePath, attachDepthPoint.position, -attachDepthPoint.up);

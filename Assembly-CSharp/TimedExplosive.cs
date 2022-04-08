@@ -122,7 +122,6 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		}
 		if (damageTypes.Count > 0)
 		{
-			Sensation sensation;
 			if (onlyDamageParent)
 			{
 				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 166144, true);
@@ -148,7 +147,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 					{
 						num += damageType.amount;
 					}
-					sensation = default(Sensation);
+					Sensation sensation = default(Sensation);
 					sensation.Type = SensationType.Explosion;
 					sensation.Position = creatorEntity.transform.position;
 					sensation.Radius = explosionRadius * 17f;
@@ -168,7 +167,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 					{
 						num2 += damageType2.amount;
 					}
-					sensation = default(Sensation);
+					Sensation sensation = default(Sensation);
 					sensation.Type = SensationType.Explosion;
 					sensation.Position = creatorEntity.transform.position;
 					sensation.Radius = explosionRadius * 17f;

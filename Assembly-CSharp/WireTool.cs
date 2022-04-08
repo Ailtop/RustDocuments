@@ -85,7 +85,6 @@ public class WireTool : HeldEntity
 	{
 		using (TimeWarning.New("WireTool.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 678101026 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -110,7 +109,7 @@ public class WireTool : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -150,7 +149,7 @@ public class WireTool : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -190,7 +189,7 @@ public class WireTool : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -219,7 +218,7 @@ public class WireTool : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -259,7 +258,7 @@ public class WireTool : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -390,9 +389,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -500,9 +499,9 @@ public class WireTool : HeldEntity
 		iOEntity2.SendNetworkUpdate();
 	}
 
+	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
-	[RPC_Server.FromOwner]
 	public void AddLine(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -532,7 +531,7 @@ public class WireTool : HeldEntity
 		{
 			BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
 			IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
-			if (!(iOEntity2 == null) && ValidateLine(list, iOEntity, iOEntity2) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
+			if (!(iOEntity2 == null) && ValidateLine(list, iOEntity, iOEntity2, player) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
 			{
 				iOEntity2.outputs[num3].linePoints = list.ToArray();
 				iOEntity2.outputs[num3].wireColour = wireColour;
@@ -559,7 +558,7 @@ public class WireTool : HeldEntity
 		return wireColour;
 	}
 
-	private bool ValidateLine(List<Vector3> lineList, IOEntity inputEntity, IOEntity outputEntity)
+	private bool ValidateLine(List<Vector3> lineList, IOEntity inputEntity, IOEntity outputEntity, BasePlayer byPlayer)
 	{
 		if (lineList.Count < 2)
 		{
@@ -589,10 +588,20 @@ public class WireTool : HeldEntity
 		{
 			return false;
 		}
-		point = inputEntity.transform.InverseTransformPoint(outputEntity.transform.TransformPoint(lineList[0]));
+		Vector3 position = outputEntity.transform.TransformPoint(lineList[0]);
+		point = inputEntity.transform.InverseTransformPoint(position);
 		Bounds bounds2 = inputEntity.bounds;
 		bounds2.Expand(0.5f);
 		if (!bounds2.Contains(point))
+		{
+			return false;
+		}
+		if (byPlayer == null)
+		{
+			return false;
+		}
+		Vector3 position2 = outputEntity.transform.TransformPoint(lineList[lineList.Count - 1]);
+		if (byPlayer.Distance(position2) > 5f && byPlayer.Distance(position) > 5f)
 		{
 			return false;
 		}

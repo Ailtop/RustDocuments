@@ -283,7 +283,6 @@ public class BaseProjectile : AttackEntity
 	{
 		using (TimeWarning.New("BaseProjectile.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 3168282921u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -308,7 +307,7 @@ public class BaseProjectile : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -344,7 +343,7 @@ public class BaseProjectile : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -380,7 +379,7 @@ public class BaseProjectile : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -416,7 +415,7 @@ public class BaseProjectile : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -452,7 +451,7 @@ public class BaseProjectile : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1146,20 +1145,21 @@ public class BaseProjectile : AttackEntity
 		sensation.InitiatorPlayer = player;
 		sensation.Initiator = player;
 		Sense.Stimulate(sensation);
-		if (EACServer.playerTracker != null)
+		if (EACServer.playerTracker == null)
 		{
-			using (TimeWarning.New("LogPlayerShooting"))
-			{
-				UnityEngine.Vector3 networkPosition = player.GetNetworkPosition();
-				UnityEngine.Quaternion networkRotation = player.GetNetworkRotation();
-				int weaponID = GetItem()?.info.itemid ?? 0;
-				EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(player.net.connection);
-				PlayerUseWeapon eventParams = default(PlayerUseWeapon);
-				eventParams.Position = new EasyAntiCheat.Server.Cerberus.Vector3(networkPosition.x, networkPosition.y, networkPosition.z);
-				eventParams.ViewRotation = new EasyAntiCheat.Server.Cerberus.Quaternion(networkRotation.w, networkRotation.x, networkRotation.y, networkRotation.z);
-				eventParams.WeaponID = weaponID;
-				EACServer.playerTracker.LogPlayerUseWeapon(client, eventParams);
-			}
+			return;
+		}
+		using (TimeWarning.New("LogPlayerShooting"))
+		{
+			UnityEngine.Vector3 networkPosition = player.GetNetworkPosition();
+			UnityEngine.Quaternion networkRotation = player.GetNetworkRotation();
+			int weaponID = GetItem()?.info.itemid ?? 0;
+			EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(player.net.connection);
+			PlayerUseWeapon eventParams = default(PlayerUseWeapon);
+			eventParams.Position = new EasyAntiCheat.Server.Cerberus.Vector3(networkPosition.x, networkPosition.y, networkPosition.z);
+			eventParams.ViewRotation = new EasyAntiCheat.Server.Cerberus.Quaternion(networkRotation.w, networkRotation.x, networkRotation.y, networkRotation.z);
+			eventParams.WeaponID = weaponID;
+			EACServer.playerTracker.LogPlayerUseWeapon(client, eventParams);
 		}
 	}
 

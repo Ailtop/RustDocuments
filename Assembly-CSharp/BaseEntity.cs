@@ -111,10 +111,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	[Flags]
 	public enum Flags
 	{
-		Placeholder = 0x1,
-		On = 0x2,
-		OnFire = 0x4,
-		Open = 0x8,
+		Placeholder = 1,
+		On = 2,
+		OnFire = 4,
+		Open = 8,
 		Locked = 0x10,
 		Debugging = 0x20,
 		Disabled = 0x40,
@@ -516,8 +516,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Gesture = 12,
 		PhysImpact = 13,
 		Eat = 14,
-		Startled = 0xF,
-		Admire = 0x10
+		Startled = 15,
+		Admire = 16
 	}
 
 	public enum Slot
@@ -536,11 +536,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	[Flags]
 	public enum TraitFlag
 	{
-		None = 0x0,
-		Alive = 0x1,
-		Animal = 0x2,
-		Human = 0x4,
-		Interesting = 0x8,
+		None = 0,
+		Alive = 1,
+		Animal = 2,
+		Human = 4,
+		Interesting = 8,
 		Food = 0x10,
 		Meat = 0x20,
 		Water = 0x20
@@ -657,7 +657,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		public static ScientistNPC[] FindScientists()
 		{
 			return (from x in BaseNetworkable.serverEntities
-				where (x is ScientistNPC) ? true : false
+				where x is ScientistNPC
 				select x as ScientistNPC).ToArray();
 		}
 	}
@@ -855,7 +855,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		using (TimeWarning.New("BaseEntity.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1552640099 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -876,7 +875,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -905,7 +904,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1399,14 +1398,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		string funcName = StringPool.Get(msg.read.UInt32());
 		uint num2 = ((msg.read.Unread > 0) ? msg.read.UInt32() : 0u);
 		byte[] array = FileStorage.server.Get(num, type, net.ID, num2);
-		if (array != null)
-		{
-			ClientRPCEx(new SendInfo(msg.connection)
-			{
-				channel = 2,
-				method = SendMethod.Reliable
-			}, null, funcName, num, (uint)array.Length, array, num2, (byte)type);
-		}
+		SendInfo sendInfo = new SendInfo(msg.connection);
+		sendInfo.channel = 2;
+		sendInfo.method = SendMethod.Reliable;
+		SendInfo sendInfo2 = sendInfo;
+		ClientRPCEx(sendInfo2, null, funcName, num, (array != null) ? ((uint)array.Length) : 0u, array ?? Array.Empty<byte>(), num2, (byte)type);
 	}
 
 	public void SetParent(BaseEntity entity, bool worldPositionStays = false, bool sendImmediate = false)

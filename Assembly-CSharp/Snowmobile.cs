@@ -260,7 +260,6 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 	{
 		using (TimeWarning.New("Snowmobile.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1851540757 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -274,7 +273,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -310,7 +309,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -671,5 +670,18 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 			return !IsOn();
 		}
 		return true;
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (base.isServer && Rust.GameInfo.HasAchievements && !old.HasFlag(Flags.On) && next.HasFlag(Flags.On))
+		{
+			BasePlayer driver = GetDriver();
+			if (driver != null && driver.FindTrigger<TriggerSnowmobileAchievement>() != null)
+			{
+				driver.GiveAchievement("DRIVE_SNOWMOBILE");
+			}
+		}
 	}
 }

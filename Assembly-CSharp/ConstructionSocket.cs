@@ -19,8 +19,8 @@ public class ConstructionSocket : Socket_Base
 		Shutters = 12,
 		WallFrame = 13,
 		FloorFrame = 14,
-		WindowDressing = 0xF,
-		DoorDressing = 0x10,
+		WindowDressing = 15,
+		DoorDressing = 16,
 		Elevator = 17,
 		DoubleDoorDressing = 18
 	}

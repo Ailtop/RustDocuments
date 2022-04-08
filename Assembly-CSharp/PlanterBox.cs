@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using ProtoBuf;
+using Rust;
 using UnityEngine;
 
 public class PlanterBox : StorageContainer, ISplashable
@@ -12,9 +14,9 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	public MeshRenderer soilRenderer;
 
-	private static readonly float MinimumSaturationTriggerLevel = Server.optimalPlanterQualitySaturation - 0.2f;
+	private static readonly float MinimumSaturationTriggerLevel = ConVar.Server.optimalPlanterQualitySaturation - 0.2f;
 
-	private static readonly float MaximumSaturationTriggerLevel = Server.optimalPlanterQualitySaturation + 0.1f;
+	private static readonly float MaximumSaturationTriggerLevel = ConVar.Server.optimalPlanterQualitySaturation + 0.1f;
 
 	private TimeCachedValue<float> sunExposure;
 
@@ -32,7 +34,7 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	public int availableWaterCapacity => soilSaturationMax - soilSaturation;
 
-	public int idealSaturation => Mathf.FloorToInt((float)soilSaturationMax * Server.optimalPlanterQualitySaturation);
+	public int idealSaturation => Mathf.FloorToInt((float)soilSaturationMax * ConVar.Server.optimalPlanterQualitySaturation);
 
 	public bool BelowMinimumSaturationTriggerLevel => soilSaturationFraction < MinimumSaturationTriggerLevel;
 
@@ -291,5 +293,27 @@ public class PlanterBox : StorageContainer, ISplashable
 	private float CalculateArtificialTemperature()
 	{
 		return GrowableEntity.CalculateArtificialTemperature(base.transform);
+	}
+
+	public void OnPlantInserted(GrowableEntity entity, BasePlayer byPlayer)
+	{
+		if (!Rust.GameInfo.HasAchievements)
+		{
+			return;
+		}
+		List<uint> obj = Facepunch.Pool.GetList<uint>();
+		foreach (BaseEntity child in children)
+		{
+			GrowableEntity growableEntity;
+			if ((object)(growableEntity = child as GrowableEntity) != null && !obj.Contains(growableEntity.prefabID))
+			{
+				obj.Add(growableEntity.prefabID);
+			}
+		}
+		if (obj.Count == 9)
+		{
+			byPlayer.GiveAchievement("HONEST_WORK");
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 }

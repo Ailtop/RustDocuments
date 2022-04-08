@@ -96,6 +96,9 @@
     <Reference Include="CurvedTextMeshPro">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\CurvedTextMeshPro.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Unity.Mathematics.dll</HintPath>
+    </Reference>
     <Reference Include="Facepunch.Skeleton">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Skeleton.dll</HintPath>
     </Reference>
@@ -166,14 +169,14 @@
     <Reference Include="Facepunch.SteamNetworking">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.SteamNetworking.dll</HintPath>
     </Reference>
+    <Reference Include="GA">
+      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\GA.dll</HintPath>
+    </Reference>
     <Reference Include="Facepunch.Raknet">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Raknet.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
-    </Reference>
-    <Reference Include="GA">
-      <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\GA.dll</HintPath>
     </Reference>
     <Reference Include="Oxide.Core">
       <HintPath>..\..\..\..\..\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Oxide.Core.dll</HintPath>

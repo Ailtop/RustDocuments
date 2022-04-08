@@ -17,9 +17,9 @@ public class BaseNpc : BaseCombatEntity
 	[Flags]
 	public enum AiFlags
 	{
-		Sitting = 0x2,
-		Chasing = 0x4,
-		Sleeping = 0x8
+		Sitting = 2,
+		Chasing = 4,
+		Sleeping = 8
 	}
 
 	public enum Facts
@@ -39,8 +39,8 @@ public class BaseNpc : BaseCombatEntity
 		FoodRange = 12,
 		AttackedLately = 13,
 		LoudNoiseNearby = 14,
-		CanTargetFood = 0xF,
-		IsMoving = 0x10,
+		CanTargetFood = 15,
+		IsMoving = 16,
 		IsFleeing = 17,
 		IsEating = 18,
 		IsAfraid = 19,
@@ -690,14 +690,15 @@ public class BaseNpc : BaseCombatEntity
 		{
 			TickNavigation();
 		}
-		if (!AiManager.ai_dormant || GetNavAgent.enabled || CurrentBehaviour == Behaviour.Sleep || NewAI)
+		if (AiManager.ai_dormant && !GetNavAgent.enabled && CurrentBehaviour != Behaviour.Sleep && !NewAI)
 		{
-			using (TimeWarning.New("TickMetabolism"))
-			{
-				TickSleep();
-				TickMetabolism();
-				TickSpeed();
-			}
+			return;
+		}
+		using (TimeWarning.New("TickMetabolism"))
+		{
+			TickSleep();
+			TickMetabolism();
+			TickSpeed();
 		}
 	}
 
@@ -749,7 +750,7 @@ public class BaseNpc : BaseCombatEntity
 		Energy.Add(num * 0.1f * -1f);
 		if (Stamina.TimeSinceUsed > 5f)
 		{
-			float num2 = 71f / (339f * (float)Math.PI);
+			float num2 = 1f / 15f;
 			Stamina.Add(0.1f * num2);
 		}
 		float secondsSinceAttacked = base.SecondsSinceAttacked;

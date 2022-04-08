@@ -881,17 +881,18 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			return;
 		}
 		IsDestroyed = true;
-		if (!Rust.Application.isQuitting)
+		if (Rust.Application.isQuitting)
 		{
-			DestroyShared();
-			if (isServer)
-			{
-				DoServerDestroy();
-			}
-			using (TimeWarning.New("Registry.Entity.Unregister"))
-			{
-				Rust.Registry.Entity.Unregister(base.gameObject);
-			}
+			return;
+		}
+		DestroyShared();
+		if (isServer)
+		{
+			DoServerDestroy();
+		}
+		using (TimeWarning.New("Registry.Entity.Unregister"))
+		{
+			Rust.Registry.Entity.Unregister(base.gameObject);
 		}
 	}
 

@@ -8,13 +8,13 @@ public class DistanceField
 
 	private static readonly float[] GaussWeights = new float[7]
 	{
-		0.03125f,
+		1f / 32f,
 		7f / 64f,
 		7f / 32f,
 		9f / 32f,
 		7f / 32f,
 		7f / 64f,
-		0.03125f
+		1f / 32f
 	};
 
 	public static void Generate([In][IsReadOnly] ref int size, [In][IsReadOnly] ref byte threshold, [In][IsReadOnly] ref byte[] image, ref float[] distanceField)

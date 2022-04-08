@@ -1,4 +1,3 @@
-using System;
 using ConVar;
 using Facepunch;
 using Network;
@@ -116,7 +115,7 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		}
 		if (bleeding.value > 0f)
 		{
-			float num = delta * 0.333333343f;
+			float num = delta * (1f / 3f);
 			owner.Hurt(num, DamageType.Bleeding);
 			bleeding.Subtract(num);
 		}
@@ -184,9 +183,9 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		{
 			float num11 = heartrate.Fraction() * 0.375f;
 			calories.MoveTowards(0f, delta * num11);
-			float num12 = 0.008333334f;
-			num12 += Mathf.InverseLerp(40f, 60f, temperature.value) * 0.0833333358f;
-			num12 += heartrate.value * (71f / (339f * (float)Math.PI));
+			float num12 = 1f / 120f;
+			num12 += Mathf.InverseLerp(40f, 60f, temperature.value) * (1f / 12f);
+			num12 += heartrate.value * (1f / 15f);
 			hydration.MoveTowards(0f, delta * num12);
 		}
 		bool b = hydration.Fraction() <= 0f || radiation_poison.value >= 100f;
@@ -282,13 +281,14 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 
 	public void SendChangesToClient()
 	{
-		if (HasChanged())
+		if (!HasChanged())
 		{
-			isDirty = false;
-			using (ProtoBuf.PlayerMetabolism arg = Save())
-			{
-				base.baseEntity.ClientRPCPlayerAndSpectators(null, base.baseEntity, "UpdateMetabolism", arg);
-			}
+			return;
+		}
+		isDirty = false;
+		using (ProtoBuf.PlayerMetabolism arg = Save())
+		{
+			base.baseEntity.ClientRPCPlayerAndSpectators(null, base.baseEntity, "UpdateMetabolism", arg);
 		}
 	}
 

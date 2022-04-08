@@ -142,7 +142,6 @@ public static class EACServer
 				{
 					OnAuthenticatedRemote(connection);
 				}
-				return;
 			}
 		}
 	}

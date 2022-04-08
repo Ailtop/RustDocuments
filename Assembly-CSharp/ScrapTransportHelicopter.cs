@@ -1,3 +1,4 @@
+using Rust;
 using UnityEngine;
 
 public class ScrapTransportHelicopter : MiniCopter
@@ -40,6 +41,10 @@ public class ScrapTransportHelicopter : MiniCopter
 	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public new static float population;
 
+	public const string PASSENGER_ACHIEVEMENT = "RUST_AIR";
+
+	public const int PASSENGER_ACHIEVEMENT_REQ_COUNT = 5;
+
 	public override void OnHealthChanged(float oldvalue, float newvalue)
 	{
 		if (base.isServer)
@@ -56,6 +61,32 @@ public class ScrapTransportHelicopter : MiniCopter
 	public override void OnAttacked(HitInfo info)
 	{
 		base.OnAttacked(info);
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (!Rust.GameInfo.HasAchievements || !base.isServer || old.HasFlag(Flags.On) || !next.HasFlag(Flags.On) || !(GetDriver() != null))
+		{
+			return;
+		}
+		int num = 0;
+		foreach (BaseEntity child in children)
+		{
+			if (child.ToPlayer() != null)
+			{
+				num++;
+			}
+			BaseVehicleSeat baseVehicleSeat;
+			if ((object)(baseVehicleSeat = child as BaseVehicleSeat) != null && baseVehicleSeat.GetMounted() != null && baseVehicleSeat.GetMounted() != GetDriver())
+			{
+				num++;
+			}
+		}
+		if (num >= 5)
+		{
+			GetDriver().GiveAchievement("RUST_AIR");
+		}
 	}
 
 	protected override bool CanPushNow(BasePlayer pusher)

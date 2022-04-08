@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Facepunch;
+using Facepunch.Rust;
 using Oxide.Core;
+using Rust;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Rust/Missions/BaseMission")]
@@ -340,6 +342,8 @@ public class BaseMission : BaseScriptableObject
 
 	public static List<Vector3> blockedPoints = new List<Vector3>();
 
+	public const string MISSION_COMPLETE_STAT = "missions_completed";
+
 	public GameObjectRef acceptEffect;
 
 	public GameObjectRef failedEffect;
@@ -537,9 +541,14 @@ public class BaseMission : BaseScriptableObject
 				}
 			}
 		}
+		Facepunch.Rust.Analytics.Server.MissionComplete(this);
 		instance.status = MissionStatus.Completed;
 		assignee.SetActiveMission(-1);
 		assignee.MissionDirty();
+		if (Rust.GameInfo.HasAchievements)
+		{
+			assignee.stats.Add("missions_completed", 1, Stats.All);
+		}
 	}
 
 	public virtual void MissionSuccess(MissionInstance instance, BasePlayer assignee)

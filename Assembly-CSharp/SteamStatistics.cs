@@ -62,4 +62,25 @@ public class SteamStatistics
 			}
 		}
 	}
+
+	public int Get(string name)
+	{
+		if (!PlatformService.Instance.IsValid)
+		{
+			return 0;
+		}
+		if (refresh == null || !refresh.IsCompleted)
+		{
+			return 0;
+		}
+		using (TimeWarning.New("PlayerStats.Get"))
+		{
+			int value;
+			if (intStats.TryGetValue(name, out value))
+			{
+				return value;
+			}
+			return (int)PlatformService.Instance.GetPlayerStatInt(player.userID, name, 0L);
+		}
+	}
 }

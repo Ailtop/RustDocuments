@@ -13,7 +13,7 @@ public class UIBlackoutOverlay : MonoBehaviour
 		NVG = 5,
 		FULLWHITE = 6,
 		SUNGLASSES = 7,
-		NONE = 0x40
+		NONE = 64
 	}
 
 	public CanvasGroup group;

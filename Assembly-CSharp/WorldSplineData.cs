@@ -1,24 +1,70 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
 public class WorldSplineData
 {
+	[Serializable]
+	public class LUTEntry
+	{
+		[Serializable]
+		public struct LUTPoint
+		{
+			public float distance;
+
+			public Vector3 pos;
+
+			public LUTPoint(float distance, Vector3 pos)
+			{
+				this.distance = distance;
+				this.pos = pos;
+			}
+		}
+
+		public List<LUTPoint> points = new List<LUTPoint>();
+	}
+
 	public Vector3[] inputPoints;
 
 	public Vector3[] inputTangents;
 
 	public float inputLUTInterval;
 
-	public List<float> LUTDistanceKeys;
-
-	public List<Vector3> LUTPosValues;
+	public List<LUTEntry> LUTValues;
 
 	public float Length;
 
 	[SerializeField]
 	private int maxPointsIndex;
+
+	public WorldSplineData(WorldSpline worldSpline)
+	{
+		worldSpline.CheckValidity();
+		LUTValues = new List<LUTEntry>();
+		inputPoints = new Vector3[worldSpline.points.Length];
+		worldSpline.points.CopyTo(inputPoints, 0);
+		inputTangents = new Vector3[worldSpline.tangents.Length];
+		worldSpline.tangents.CopyTo(inputTangents, 0);
+		inputLUTInterval = worldSpline.lutInterval;
+		maxPointsIndex = inputPoints.Length - 1;
+		CreateLookupTable(worldSpline);
+	}
+
+	public bool IsSameAs(WorldSpline worldSpline)
+	{
+		if (inputPoints.SequenceEqual(worldSpline.points) && inputTangents.SequenceEqual(worldSpline.tangents))
+		{
+			return inputLUTInterval == worldSpline.lutInterval;
+		}
+		return false;
+	}
+
+	public bool IsDifferentTo(WorldSpline worldSpline)
+	{
+		return !IsSameAs(worldSpline);
+	}
 
 	public Vector3 GetStartPoint()
 	{
@@ -42,27 +88,86 @@ public class WorldSplineData
 
 	public Vector3 GetPointCubicHermite(float distance)
 	{
-		if (distance < 0f)
+		Vector3 tangent;
+		return GetPointAndTangentCubicHermite(distance, out tangent);
+	}
+
+	public Vector3 GetPointAndTangentCubicHermite(float distance, out Vector3 tangent)
+	{
+		if (distance <= 0f)
 		{
+			tangent = GetStartTangent();
 			return GetStartPoint();
 		}
-		if (distance > Length)
+		if (distance >= Length)
 		{
+			tangent = GetEndTangent();
 			return GetEndPoint();
 		}
-		Vector3 a = GetStartPoint();
-		float a2 = 0f;
-		for (int i = 0; i < LUTDistanceKeys.Count; i++)
+		int num = Mathf.FloorToInt(distance);
+		if (LUTValues.Count > num)
 		{
-			float num = LUTDistanceKeys[i];
-			if (num > distance)
+			int num2 = -1;
+			while (num2 < 0 && (float)num > 0f)
 			{
-				float t = Mathf.InverseLerp(a2, num, distance);
-				return Vector3.Lerp(a, LUTPosValues[i], t);
+				LUTEntry lUTEntry = LUTValues[num];
+				for (int i = 0; i < lUTEntry.points.Count && !(lUTEntry.points[i].distance > distance); i++)
+				{
+					num2 = i;
+				}
+				if (num2 < 0)
+				{
+					num--;
+				}
 			}
-			a2 = num;
-			a = LUTPosValues[i];
+			float a;
+			Vector3 vector;
+			if (num2 < 0)
+			{
+				a = 0f;
+				vector = GetStartPoint();
+			}
+			else
+			{
+				LUTEntry.LUTPoint lUTPoint = LUTValues[num].points[num2];
+				a = lUTPoint.distance;
+				vector = lUTPoint.pos;
+			}
+			num2 = -1;
+			while (num2 < 0 && num < LUTValues.Count)
+			{
+				LUTEntry lUTEntry2 = LUTValues[num];
+				for (int j = 0; j < lUTEntry2.points.Count; j++)
+				{
+					if (lUTEntry2.points[j].distance >= distance)
+					{
+						num2 = j;
+						break;
+					}
+				}
+				if (num2 < 0)
+				{
+					num++;
+				}
+			}
+			float b;
+			Vector3 vector2;
+			if (num2 < 0)
+			{
+				b = Length;
+				vector2 = GetEndPoint();
+			}
+			else
+			{
+				LUTEntry.LUTPoint lUTPoint2 = LUTValues[num].points[num2];
+				b = lUTPoint2.distance;
+				vector2 = lUTPoint2.pos;
+			}
+			float t = Mathf.InverseLerp(a, b, distance);
+			tangent = (vector2 - vector).normalized;
+			return Vector3.Lerp(vector, vector2, t);
 		}
+		tangent = GetEndTangent();
 		return GetEndPoint();
 	}
 
@@ -112,10 +217,14 @@ public class WorldSplineData
 
 	private void AddEntry(float distance, Vector3 pos)
 	{
-		if (!LUTDistanceKeys.Contains(distance))
+		int num = Mathf.FloorToInt(distance);
+		if (LUTValues.Count < num + 1)
 		{
-			LUTDistanceKeys.Add(distance);
-			LUTPosValues.Add(pos);
+			for (int i = LUTValues.Count; i < num + 1; i++)
+			{
+				LUTValues.Add(new LUTEntry());
+			}
 		}
+		LUTValues[num].points.Add(new LUTEntry.LUTPoint(distance, pos));
 	}
 }

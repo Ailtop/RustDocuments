@@ -93,9 +93,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 						queueInternal.Remove(item2);
 					}
 					Facepunch.Pool.FreeList(ref obj);
-					return;
 				}
-				queueInternal.RemoveWhere((BaseNetworkable x) => x == null || x.net?.group == null || !x.net.group.isGlobal);
+				else
+				{
+					queueInternal.RemoveWhere((BaseNetworkable x) => x == null || x.net?.group == null || !x.net.group.isGlobal);
+				}
 			}
 		}
 	}
@@ -103,10 +105,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	[Flags]
 	public enum PlayerFlags
 	{
-		Unused1 = 0x1,
-		Unused2 = 0x2,
-		IsAdmin = 0x4,
-		ReceivingSnapshot = 0x8,
+		Unused1 = 1,
+		Unused2 = 2,
+		IsAdmin = 4,
+		ReceivingSnapshot = 8,
 		Sleeping = 0x10,
 		Spectating = 0x20,
 		Wounded = 0x40,
@@ -292,6 +294,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	public TimeSince blockHeldInputTimer;
 
 	public GestureConfig currentGesture;
+
+	private HashSet<uint> recentWaveTargets = new HashSet<uint>();
+
+	public const string WAVED_PLAYERS_STAT = "waved_at_players";
 
 	public ulong currentTeam;
 
@@ -1033,7 +1039,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		using (TimeWarning.New("BasePlayer.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 935768323 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -1054,7 +1059,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1090,7 +1095,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1119,7 +1124,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1148,7 +1153,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1184,7 +1189,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1220,7 +1225,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1256,7 +1261,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1292,7 +1297,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1328,7 +1333,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1364,7 +1369,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1404,7 +1409,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1440,7 +1445,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1476,7 +1481,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1512,7 +1517,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1541,7 +1546,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1577,7 +1582,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1648,7 +1653,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1684,7 +1689,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1720,7 +1725,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1760,7 +1765,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1789,7 +1794,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1818,7 +1823,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -2223,6 +2228,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				triggerDanceAchievement.NotifyDanceStarted();
 			}
 		}
+		else if (toPlay.actionType == GestureConfig.GestureActionType.ShowNameTag && Rust.GameInfo.HasAchievements)
+		{
+			int val = CountWaveTargets(base.transform.position, 4f, 0.6f, eyes.HeadForward(), recentWaveTargets, 5);
+			stats.Add("waved_at_players", val);
+		}
 	}
 
 	private void TimeoutGestureServer()
@@ -2255,6 +2265,43 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			Server_CancelGesture();
 		}
+	}
+
+	public int CountWaveTargets(UnityEngine.Vector3 position, float distance, float minimumDot, UnityEngine.Vector3 forward, HashSet<uint> workingList, int maxCount)
+	{
+		_003C_003Ec__DisplayClass83_0 _003C_003Ec__DisplayClass83_ = default(_003C_003Ec__DisplayClass83_0);
+		_003C_003Ec__DisplayClass83_._003C_003E4__this = this;
+		_003C_003Ec__DisplayClass83_.position = position;
+		_003C_003Ec__DisplayClass83_.forward = forward;
+		_003C_003Ec__DisplayClass83_.minimumDot = minimumDot;
+		_003C_003Ec__DisplayClass83_.workingList = workingList;
+		_003C_003Ec__DisplayClass83_.sqrDistance = distance * distance;
+		Group group = net.group;
+		if (group == null)
+		{
+			return 0;
+		}
+		List<Network.Connection> subscribers = group.subscribers;
+		int num = 0;
+		for (int i = 0; i < subscribers.Count; i++)
+		{
+			Network.Connection connection = subscribers[i];
+			if (!connection.active)
+			{
+				continue;
+			}
+			BasePlayer basePlayer = connection.player as BasePlayer;
+			if (_003CCountWaveTargets_003Eg__CheckPlayer_007C83_0(basePlayer, ref _003C_003Ec__DisplayClass83_))
+			{
+				_003C_003Ec__DisplayClass83_.workingList.Add(basePlayer.net.ID);
+				num++;
+				if (num >= maxCount)
+				{
+					break;
+				}
+			}
+		}
+		return num;
 	}
 
 	private bool IsGestureBlocked()
@@ -2754,7 +2801,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 222;
+		missions.protocol = 223;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2854,7 +2901,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (222 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (223 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -3543,7 +3590,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				UnityEngine.Vector3 prevPosition;
 				UnityEngine.Vector3 prevVelocity;
 				SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out prevPosition, out prevVelocity);
-				UnityEngine.Vector3 vector3 = prevVelocity * 0.03125f;
+				UnityEngine.Vector3 vector3 = prevVelocity * (1f / 32f);
 				Line line = new Line(prevPosition - vector3, position + vector3);
 				float num21 = line.Distance(hitInfo.PointStart);
 				float num22 = line.Distance(hitInfo.HitPositionWorld);
@@ -3803,7 +3850,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				UnityEngine.Vector3 prevPosition;
 				UnityEngine.Vector3 prevVelocity;
 				SimulateProjectile(ref position, ref velocity, ref partialTime, num2 - travelTime, gravity, drag, out prevPosition, out prevVelocity);
-				UnityEngine.Vector3 vector2 = prevVelocity * 0.03125f;
+				UnityEngine.Vector3 vector2 = prevVelocity * (1f / 32f);
 				num += new Line(prevPosition - vector2, position + vector2).Distance(playerProjectileUpdate.curPosition);
 				if (num > ConVar.AntiHack.projectile_trajectory)
 				{
@@ -3844,7 +3891,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	private void SimulateProjectile(ref UnityEngine.Vector3 position, ref UnityEngine.Vector3 velocity, ref float partialTime, float travelTime, UnityEngine.Vector3 gravity, float drag, out UnityEngine.Vector3 prevPosition, out UnityEngine.Vector3 prevVelocity)
 	{
-		float num = 0.03125f;
+		float num = 1f / 32f;
 		prevPosition = position;
 		prevVelocity = velocity;
 		if (partialTime > Mathf.Epsilon)
@@ -4607,6 +4654,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			modifiers.ServerInit(this);
 		}
+		if (recentWaveTargets != null)
+		{
+			recentWaveTargets.Clear();
+		}
 	}
 
 	internal override void DoServerDestroy()
@@ -5077,13 +5128,14 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		inventory.containerBelt.OnChanged();
 		inventory.containerWear.OnChanged();
 		Interface.CallHook("OnPlayerSleepEnded", this);
-		if (EACServer.playerTracker != null && net.connection != null)
+		if (EACServer.playerTracker == null || net.connection == null)
 		{
-			using (TimeWarning.New("playerTracker.LogPlayerSpawn"))
-			{
-				EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(net.connection);
-				EACServer.playerTracker.LogPlayerSpawn(client, 0, 0);
-			}
+			return;
+		}
+		using (TimeWarning.New("playerTracker.LogPlayerSpawn"))
+		{
+			EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(net.connection);
+			EACServer.playerTracker.LogPlayerSpawn(client, 0, 0);
 		}
 	}
 
@@ -5356,53 +5408,56 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 					text2 = "You died: suicide by " + lastDamage;
 					if (lastDamage == DamageType.Suicide)
 					{
-						Facepunch.Rust.Analytics.Death("suicide");
+						Facepunch.Rust.Analytics.Server.Death("suicide", ServerPosition);
 						stats.Add("death_suicide", 1, Stats.All);
 					}
 					else
 					{
-						Facepunch.Rust.Analytics.Death("selfinflicted");
+						Facepunch.Rust.Analytics.Server.Death("selfinflicted", ServerPosition);
 						stats.Add("death_selfinflicted", 1);
-					}
-				}
-				else if (info.Initiator is BasePlayer)
-				{
-					BasePlayer basePlayer2 = info.Initiator.ToPlayer();
-					text = ToString() + " was killed by " + basePlayer2.ToString();
-					text2 = "You died: killed by " + basePlayer2.displayName + " (" + basePlayer2.userID + ")";
-					basePlayer2.stats.Add("kill_player", 1, Stats.All);
-					basePlayer2.LifeStoryKill(this);
-					if (info.WeaponPrefab != null)
-					{
-						Facepunch.Rust.Analytics.Death(info.WeaponPrefab.ShortPrefabName);
-					}
-					else
-					{
-						Facepunch.Rust.Analytics.Death("player");
-					}
-					if (lastDamage == DamageType.Fun_Water)
-					{
-						basePlayer2.GiveAchievement("SUMMER_LIQUIDATOR");
-						LiquidWeapon liquidWeapon = basePlayer2.GetHeldEntity() as LiquidWeapon;
-						if (liquidWeapon != null && liquidWeapon.RequiresPumping && liquidWeapon.PressureFraction <= liquidWeapon.MinimumPressureFraction)
-						{
-							basePlayer2.GiveAchievement("SUMMER_NO_PRESSURE");
-						}
 					}
 				}
 				else
 				{
-					text = ToString() + " was killed by " + info.Initiator.ShortPrefabName + " (" + info.Initiator.Categorize() + ")";
-					text2 = "You died: killed by " + info.Initiator.Categorize();
-					stats.Add("death_" + info.Initiator.Categorize(), 1);
-					Facepunch.Rust.Analytics.Death(info.Initiator.Categorize());
+					if (info.Initiator is BasePlayer)
+					{
+						BasePlayer basePlayer2 = info.Initiator.ToPlayer();
+						text = ToString() + " was killed by " + basePlayer2.ToString();
+						text2 = "You died: killed by " + basePlayer2.displayName + " (" + basePlayer2.userID + ")";
+						basePlayer2.stats.Add("kill_player", 1, Stats.All);
+						basePlayer2.LifeStoryKill(this);
+						OnKilledByPlayer(basePlayer2);
+						if (lastDamage == DamageType.Fun_Water)
+						{
+							basePlayer2.GiveAchievement("SUMMER_LIQUIDATOR");
+							LiquidWeapon liquidWeapon = basePlayer2.GetHeldEntity() as LiquidWeapon;
+							if (liquidWeapon != null && liquidWeapon.RequiresPumping && liquidWeapon.PressureFraction <= liquidWeapon.MinimumPressureFraction)
+							{
+								basePlayer2.GiveAchievement("SUMMER_NO_PRESSURE");
+							}
+						}
+						else if (Rust.GameInfo.HasAchievements && lastDamage == DamageType.Explosion && info.WeaponPrefab != null && info.WeaponPrefab.ShortPrefabName.Contains("mlrs") && basePlayer2 != null)
+						{
+							basePlayer2.stats.Add("mlrs_kills", 1, Stats.All);
+						}
+					}
+					else
+					{
+						text = ToString() + " was killed by " + info.Initiator.ShortPrefabName + " (" + info.Initiator.Categorize() + ")";
+						text2 = "You died: killed by " + info.Initiator.Categorize();
+						stats.Add("death_" + info.Initiator.Categorize(), 1);
+					}
+					if (!IsNpc)
+					{
+						Facepunch.Rust.Analytics.Server.Death(info.Initiator, info.WeaponPrefab, ServerPosition);
+					}
 				}
 			}
 			else if (lastDamage == DamageType.Fall)
 			{
 				text = ToString() + " was killed by fall!";
 				text2 = "You died: killed by fall!";
-				Facepunch.Rust.Analytics.Death("fall");
+				Facepunch.Rust.Analytics.Server.Death("fall", ServerPosition);
 			}
 			else
 			{
@@ -6078,6 +6133,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		return true;
 	}
 
+	protected virtual void OnKilledByPlayer(BasePlayer p)
+	{
+	}
+
 	private void Tick_Spectator()
 	{
 		int num = 0;
@@ -6135,25 +6194,26 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			return;
 		}
 		BaseEntity baseEntity = array[SpectateOffset % array.Length];
-		if (baseEntity != null)
+		if (!(baseEntity != null))
 		{
-			if (baseEntity is BasePlayer)
-			{
-				ChatMessage("Spectating: " + (baseEntity as BasePlayer).displayName);
-			}
-			else
-			{
-				ChatMessage("Spectating: " + baseEntity.ToString());
-			}
-			using (TimeWarning.New("SendEntitySnapshot"))
-			{
-				SendEntitySnapshot(baseEntity);
-			}
-			UnityEngine.TransformEx.Identity(base.gameObject);
-			using (TimeWarning.New("SetParent"))
-			{
-				SetParent(baseEntity);
-			}
+			return;
+		}
+		if (baseEntity is BasePlayer)
+		{
+			ChatMessage("Spectating: " + (baseEntity as BasePlayer).displayName);
+		}
+		else
+		{
+			ChatMessage("Spectating: " + baseEntity.ToString());
+		}
+		using (TimeWarning.New("SendEntitySnapshot"))
+		{
+			SendEntitySnapshot(baseEntity);
+		}
+		UnityEngine.TransformEx.Identity(base.gameObject);
+		using (TimeWarning.New("SetParent"))
+		{
+			SetParent(baseEntity);
 		}
 	}
 
@@ -6497,35 +6557,33 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			using (TimeWarning.New("Tick_Spectator"))
 			{
 				Tick_Spectator();
+				return;
 			}
 		}
-		else
+		if (IsDead())
 		{
-			if (IsDead())
+			return;
+		}
+		if (IsSleeping())
+		{
+			if (serverInput.WasJustPressed(BUTTON.FIRE_PRIMARY) || serverInput.WasJustPressed(BUTTON.FIRE_SECONDARY) || serverInput.WasJustPressed(BUTTON.JUMP) || serverInput.WasJustPressed(BUTTON.DUCK))
 			{
-				return;
+				EndSleeping();
+				SendNetworkUpdateImmediate();
 			}
-			if (IsSleeping())
+			UpdateActiveItem(0u);
+			return;
+		}
+		UpdateActiveItem(msg.activeItem);
+		UpdateModelStateFromTick(msg);
+		if (!IsIncapacitated())
+		{
+			if (isMounted)
 			{
-				if (serverInput.WasJustPressed(BUTTON.FIRE_PRIMARY) || serverInput.WasJustPressed(BUTTON.FIRE_SECONDARY) || serverInput.WasJustPressed(BUTTON.JUMP) || serverInput.WasJustPressed(BUTTON.DUCK))
-				{
-					EndSleeping();
-					SendNetworkUpdateImmediate();
-				}
-				UpdateActiveItem(0u);
-				return;
+				GetMounted().PlayerServerInput(serverInput, this);
 			}
-			UpdateActiveItem(msg.activeItem);
-			UpdateModelStateFromTick(msg);
-			if (!IsIncapacitated())
-			{
-				if (isMounted)
-				{
-					GetMounted().PlayerServerInput(serverInput, this);
-				}
-				UpdatePositionFromTick(msg, wasPlayerStalled);
-				UpdateRotationFromTick(msg);
-			}
+			UpdatePositionFromTick(msg, wasPlayerStalled);
+			UpdateRotationFromTick(msg);
 		}
 	}
 
@@ -6918,14 +6976,15 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		RecoverFromWounded();
 		CancelInvoke(WoundingTick);
-		if (EACServer.playerTracker != null && net.connection != null && source != null && source.net.connection != null)
+		if (EACServer.playerTracker == null || net.connection == null || !(source != null) || source.net.connection == null)
 		{
-			using (TimeWarning.New("playerTracker.LogPlayerRevive"))
-			{
-				EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(net.connection);
-				EasyAntiCheat.Server.Hydra.Client client2 = EACServer.GetClient(source.net.connection);
-				EACServer.playerTracker.LogPlayerRevive(client, client2);
-			}
+			return;
+		}
+		using (TimeWarning.New("playerTracker.LogPlayerRevive"))
+		{
+			EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(net.connection);
+			EasyAntiCheat.Server.Hydra.Client client2 = EACServer.GetClient(source.net.connection);
+			EACServer.playerTracker.LogPlayerRevive(client, client2);
 		}
 	}
 
@@ -7463,7 +7522,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				EffectNetwork.Send(effect, net.connection);
 			}
 			string text = StringPool.Get(info.HitBone);
-			bool flag = ((UnityEngine.Vector3.Dot((info.PointEnd - info.PointStart).normalized, eyes.BodyForward()) > 0.4f) ? true : false);
+			bool flag = UnityEngine.Vector3.Dot((info.PointEnd - info.PointStart).normalized, eyes.BodyForward()) > 0.4f;
 			BasePlayer initiatorPlayer = info.InitiatorPlayer;
 			if ((bool)initiatorPlayer && !info.damageTypes.IsMeleeType())
 			{
@@ -7817,7 +7876,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		baseProtection.Clear();
 		baseProtection.Add(inventory.containerWear.itemList);
-		float num = 355f / (678f * (float)Math.PI);
+		float num = 1f / 6f;
 		for (int i = 0; i < baseProtection.amounts.Length; i++)
 		{
 			switch (i)

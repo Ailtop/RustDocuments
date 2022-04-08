@@ -138,7 +138,6 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	{
 		using (TimeWarning.New("GrowableEntity.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 598660365 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -163,7 +162,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -199,7 +198,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -235,7 +234,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -997,6 +996,16 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		if (resetAge)
 		{
 			stageAge = 0f;
+		}
+	}
+
+	public override void OnDeployed(BaseEntity parent, BasePlayer deployedBy, Item fromItem)
+	{
+		base.OnDeployed(parent, deployedBy, fromItem);
+		PlanterBox planterBox;
+		if (parent != null && (object)(planterBox = parent as PlanterBox) != null)
+		{
+			planterBox.OnPlantInserted(this, deployedBy);
 		}
 	}
 }

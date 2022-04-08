@@ -104,7 +104,6 @@ public class StrobeLight : BaseCombatEntity
 	{
 		using (TimeWarning.New("StrobeLight.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1433326740 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -125,7 +124,7 @@ public class StrobeLight : BaseCombatEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -161,7 +160,7 @@ public class StrobeLight : BaseCombatEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;

@@ -7,7 +7,7 @@ public class CH47PathFinder : BasePathFinder
 
 	public override Vector3 GetRandomPatrolPoint()
 	{
-		Vector3 vector = Vector3.zero;
+		Vector3 zero = Vector3.zero;
 		MonumentInfo monumentInfo = null;
 		if (TerrainMeta.Path != null && TerrainMeta.Path.Monuments != null && TerrainMeta.Path.Monuments.Count > 0)
 		{
@@ -49,27 +49,27 @@ public class CH47PathFinder : BasePathFinder
 		if (monumentInfo != null)
 		{
 			visitedPatrolPoints.Add(monumentInfo.transform.position);
-			vector = monumentInfo.transform.position;
+			zero = monumentInfo.transform.position;
 		}
 		else
 		{
 			float x = TerrainMeta.Size.x;
 			float y = 30f;
-			vector = Vector3Ex.Range(-1f, 1f);
-			vector.y = 0f;
-			vector.Normalize();
-			vector *= x * Random.Range(0f, 0.75f);
-			vector.y = y;
+			zero = Vector3Ex.Range(-1f, 1f);
+			zero.y = 0f;
+			zero.Normalize();
+			zero *= x * Random.Range(0f, 0.75f);
+			zero.y = y;
 		}
-		float num3 = Mathf.Max(TerrainMeta.WaterMap.GetHeight(vector), TerrainMeta.HeightMap.GetHeight(vector));
+		float num3 = Mathf.Max(TerrainMeta.WaterMap.GetHeight(zero), TerrainMeta.HeightMap.GetHeight(zero));
 		float num4 = num3;
 		RaycastHit hitInfo;
-		if (Physics.SphereCast(vector + new Vector3(0f, 200f, 0f), 20f, Vector3.down, out hitInfo, 300f, 1218511105))
+		if (Physics.SphereCast(zero + new Vector3(0f, 200f, 0f), 20f, Vector3.down, out hitInfo, 300f, 1218511105))
 		{
 			num4 = Mathf.Max(hitInfo.point.y, num3);
 		}
-		vector.y = num4 + 30f;
-		return vector;
+		zero.y = num4 + 30f;
+		return zero;
 	}
 
 	private MonumentInfo GetRandomValidMonumentInfo()

@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Network;
+using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -131,7 +132,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 			if (rpc == 2791546333u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DestroyLock "));
 				}
@@ -306,16 +307,6 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 		}
 	}
 
-	protected bool ModuleHasMountPoint(MountPointInfo mountPointInfo)
-	{
-		ModularCarSeat modularCarSeat = mountPointInfo.mountable as ModularCarSeat;
-		if (modularCarSeat != null)
-		{
-			return modularCarSeat.associatedSeatingModule == this;
-		}
-		return false;
-	}
-
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	public void RPC_DestroyLock(RPCMessage msg)
@@ -330,5 +321,35 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 	protected virtual Vector3 ModifySeatPositionLocalSpace(int index, Vector3 desiredPos)
 	{
 		return desiredPos;
+	}
+
+	public override void OnEngineStateChanged(VehicleEngineController<GroundVehicle>.EngineState oldState, VehicleEngineController<GroundVehicle>.EngineState newState)
+	{
+		base.OnEngineStateChanged(oldState, newState);
+		if (!Rust.GameInfo.HasAchievements || base.isClient || newState != VehicleEngineController<GroundVehicle>.EngineState.On || mountPoints == null)
+		{
+			return;
+		}
+		bool flag = true;
+		foreach (BaseVehicleModule attachedModuleEntity in Car.AttachedModuleEntities)
+		{
+			VehicleModuleEngine vehicleModuleEngine;
+			if ((object)(vehicleModuleEngine = attachedModuleEntity as VehicleModuleEngine) != null && !vehicleModuleEngine.AtPeakPerformance)
+			{
+				flag = false;
+				break;
+			}
+		}
+		if (!flag)
+		{
+			return;
+		}
+		foreach (MountPointInfo mountPoint in mountPoints)
+		{
+			if (mountPoint.mountable.GetMounted() != null)
+			{
+				mountPoint.mountable.GetMounted().GiveAchievement("BUCKLE_UP");
+			}
+		}
 	}
 }

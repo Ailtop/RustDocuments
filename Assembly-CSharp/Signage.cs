@@ -57,7 +57,6 @@ public class Signage : IOEntity, ILOD, ISignage
 	{
 		using (TimeWarning.New("Signage.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1455609404 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -78,7 +77,7 @@ public class Signage : IOEntity, ILOD, ISignage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -114,7 +113,7 @@ public class Signage : IOEntity, ILOD, ISignage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -154,7 +153,7 @@ public class Signage : IOEntity, ILOD, ISignage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -189,9 +188,9 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 	}
 
-	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(5f)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))

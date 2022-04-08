@@ -1,3 +1,4 @@
+using Facepunch.Rust;
 using Oxide.Core;
 using Rust;
 using UnityEngine;
@@ -97,6 +98,7 @@ public class ItemModConsume : ItemMod
 		{
 			player.SignalBroadcast(BaseEntity.Signal.Gesture, eatGesture);
 		}
+		Facepunch.Rust.Analytics.Server.Consume(base.gameObject.name);
 		if (consumable.conditionFractionToLose > 0f)
 		{
 			item.LoseCondition(consumable.conditionFractionToLose * item.maxCondition);

@@ -7,7 +7,7 @@ namespace VLB
 	{
 		public enum FloatPackingPrecision
 		{
-			High = 0x40,
+			High = 64,
 			Low = 8,
 			Undef = 0
 		}

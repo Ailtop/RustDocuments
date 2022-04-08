@@ -106,16 +106,13 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 		{
 			return;
 		}
-		foreach (MountPointInfo mountPoint in base.Vehicle.mountPoints)
+		foreach (MountPointInfo mountPoint in mountPoints)
 		{
-			if (ModuleHasMountPoint(mountPoint))
+			BaseMountable mountable = mountPoint.mountable;
+			BasePlayer mounted = mountable.GetMounted();
+			if (mounted != null && mountable.HasValidDismountPosition(mounted))
 			{
-				BaseMountable mountable = mountPoint.mountable;
-				BasePlayer mounted = mountable.GetMounted();
-				if (mounted != null && mountable.HasValidDismountPosition(mounted))
-				{
-					mountable.AttemptDismount(mounted);
-				}
+				mountable.AttemptDismount(mounted);
 			}
 		}
 	}

@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using ProtoBuf;
 using UnityEngine;
@@ -83,6 +84,8 @@ public class HeldEntity : BaseEntity
 	public bool genericVisible;
 
 	private heldEntityVisState currentVisState;
+
+	private TimeSince lastHeldEvent;
 
 	public uint ownerItemUID;
 
@@ -275,6 +278,11 @@ public class HeldEntity : BaseEntity
 		base.limitNetworking = !bHeld;
 		SetFlag(Flags.Disabled, !bHeld);
 		SendNetworkUpdate();
+		if (bHeld && (float)lastHeldEvent > 1f && Analytics.Server.Enabled && !GetOwnerPlayer().IsNpc)
+		{
+			Analytics.Server.HeldItemDeployed(GetItem().info);
+			lastHeldEvent = 0f;
+		}
 		OnHeldChanged();
 	}
 

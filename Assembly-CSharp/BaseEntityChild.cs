@@ -14,12 +14,13 @@ public class BaseEntityChild : MonoBehaviour
 
 	public void OnDestroy()
 	{
-		if (!Rust.Application.isQuitting)
+		if (Rust.Application.isQuitting)
 		{
-			using (TimeWarning.New("Registry.Entity.Unregister"))
-			{
-				Entity.Unregister(base.gameObject);
-			}
+			return;
+		}
+		using (TimeWarning.New("Registry.Entity.Unregister"))
+		{
+			Entity.Unregister(base.gameObject);
 		}
 	}
 }

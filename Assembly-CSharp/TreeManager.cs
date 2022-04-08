@@ -96,13 +96,14 @@ public class TreeManager : BaseEntity
 	public static void OnTreeSpawned(BaseEntity billboardEntity)
 	{
 		entities.Add(billboardEntity);
-		if (!Rust.Application.isLoading && !Rust.Application.isQuitting)
+		if (Rust.Application.isLoading || Rust.Application.isQuitting)
 		{
-			using (ProtoBuf.Tree tree = Facepunch.Pool.Get<ProtoBuf.Tree>())
-			{
-				ExtractTreeNetworkData(billboardEntity, tree);
-				server.ClientRPC(null, "CLIENT_TreeSpawned", tree);
-			}
+			return;
+		}
+		using (ProtoBuf.Tree tree = Facepunch.Pool.Get<ProtoBuf.Tree>())
+		{
+			ExtractTreeNetworkData(billboardEntity, tree);
+			server.ClientRPC(null, "CLIENT_TreeSpawned", tree);
 		}
 	}
 

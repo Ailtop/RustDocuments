@@ -60,7 +60,7 @@ public class OccludeeState : OcclusionCulling.SmartListValue
 			waitFrame = (uint)(Time.frameCount + 1),
 			isVisible = (byte)(isVisible ? 1 : 0),
 			active = 1,
-			callback = (byte)((onVisibilityChanged != null) ? 1 : 0)
+			callback = ((onVisibilityChanged != null) ? ((byte)1) : ((byte)0))
 		};
 		this.slot = slot;
 		this.isStatic = isStatic;

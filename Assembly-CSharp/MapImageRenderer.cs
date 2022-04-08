@@ -31,7 +31,7 @@ public static class MapImageRenderer
 		}
 	}
 
-	private static readonly Vector3 StartColor = new Vector3(73f / 255f, 23f / 85f, 0.247058839f);
+	private static readonly Vector3 StartColor = new Vector3(0.286274523f, 23f / 85f, 0.247058839f);
 
 	private static readonly Vector4 WaterColor = new Vector4(0.16941601f, 0.317557573f, 0.362000018f, 1f);
 
@@ -39,17 +39,17 @@ public static class MapImageRenderer
 
 	private static readonly Vector4 DirtColor = new Vector4(0.6f, 0.479594618f, 0.33f, 1f);
 
-	private static readonly Vector4 SandColor = new Vector4(0.7f, 0.65968585f, 504f / 955f, 1f);
+	private static readonly Vector4 SandColor = new Vector4(0.7f, 0.65968585f, 0.5277487f, 1f);
 
 	private static readonly Vector4 GrassColor = new Vector4(0.354863644f, 0.37f, 0.2035f, 1f);
 
 	private static readonly Vector4 ForestColor = new Vector4(0.248437509f, 0.3f, 9f / 128f, 1f);
 
-	private static readonly Vector4 RockColor = new Vector4(0.4f, 254f / 645f, 0.375193775f, 1f);
+	private static readonly Vector4 RockColor = new Vector4(0.4f, 0.393798441f, 0.375193775f, 1f);
 
 	private static readonly Vector4 SnowColor = new Vector4(0.862745166f, 0.9294118f, 0.941176534f, 1f);
 
-	private static readonly Vector4 PebbleColor = new Vector4(7f / 51f, 71f / 255f, 0.2761563f, 1f);
+	private static readonly Vector4 PebbleColor = new Vector4(7f / 51f, 0.2784314f, 0.2761563f, 1f);
 
 	private static readonly Vector4 OffShoreColor = new Vector4(0.04090196f, 0.220600322f, 14f / 51f, 1f);
 

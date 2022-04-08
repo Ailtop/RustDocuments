@@ -41,7 +41,6 @@ public class ComputerStation : BaseMountable
 	{
 		using (TimeWarning.New("ComputerStation.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 481778085 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -55,7 +54,7 @@ public class ComputerStation : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -84,7 +83,7 @@ public class ComputerStation : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -113,7 +112,7 @@ public class ComputerStation : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -142,7 +141,7 @@ public class ComputerStation : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -254,6 +253,7 @@ public class ComputerStation : BaseMountable
 		SendNetworkUpdate();
 		SendControlBookmarks(ply);
 		CancelInvoke(ControlCheck);
+		CancelInvoke(CheckCCTVAchievement);
 		Interface.CallHook("OnBookmarkControlEnded", this, ply, baseEntity);
 	}
 
@@ -328,8 +328,46 @@ public class ComputerStation : BaseMountable
 			SendNetworkUpdateImmediate();
 			SendControlBookmarks(player);
 			component.InitializeControl(player);
+			if (Rust.GameInfo.HasAchievements && component.GetEnt() is CCTV_RC)
+			{
+				InvokeRepeating(CheckCCTVAchievement, 1f, 3f);
+			}
 			InvokeRepeating(ControlCheck, 0f, 0f);
 			Interface.CallHook("OnBookmarkControlStarted", this, player, text, component);
+		}
+	}
+
+	private void CheckCCTVAchievement()
+	{
+		if (!(_mounted != null))
+		{
+			return;
+		}
+		BaseEntity baseEntity = currentlyControllingEnt.Get(true);
+		CCTV_RC cCTV_RC;
+		if (!(baseEntity != null) || (object)(cCTV_RC = baseEntity as CCTV_RC) == null)
+		{
+			return;
+		}
+		foreach (Connection subscriber in _mounted.net.secondaryGroup.subscribers)
+		{
+			if (!subscriber.active)
+			{
+				continue;
+			}
+			BasePlayer basePlayer = subscriber.player as BasePlayer;
+			if (!(basePlayer == null))
+			{
+				Vector3 vector = basePlayer.CenterPoint();
+				float num = Vector3.Dot((vector - cCTV_RC.pitch.position).normalized, cCTV_RC.pitch.forward);
+				Vector3 vector2 = cCTV_RC.pitch.InverseTransformPoint(vector);
+				if (num > 0.6f && vector2.magnitude < 10f)
+				{
+					_mounted.GiveAchievement("BIG_BROTHER");
+					CancelInvoke(CheckCCTVAchievement);
+					break;
+				}
+			}
 		}
 	}
 

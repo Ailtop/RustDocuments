@@ -96,7 +96,6 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	{
 		using (TimeWarning.New("HotAirBalloon.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 578721460 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -117,7 +116,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -146,7 +145,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -421,6 +420,28 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			myRigidbody.AddForceAtPosition(vector * 0.1f, buoyancyPoint.position, ForceMode.Force);
 			myRigidbody.AddForce(vector * 0.9f, ForceMode.Force);
 		}
+	}
+
+	public override Vector3 GetLocalVelocityServer()
+	{
+		if (myRigidbody == null)
+		{
+			return Vector3.zero;
+		}
+		return myRigidbody.velocity;
+	}
+
+	public override Quaternion GetAngularVelocityServer()
+	{
+		if (myRigidbody == null)
+		{
+			return Quaternion.identity;
+		}
+		if (myRigidbody.angularVelocity.sqrMagnitude < 0.1f)
+		{
+			return Quaternion.identity;
+		}
+		return Quaternion.LookRotation(myRigidbody.angularVelocity, base.transform.up);
 	}
 
 	public Vector3 GetWindAtPos(Vector3 pos)

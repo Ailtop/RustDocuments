@@ -223,8 +223,8 @@ public class ArticulatedOccludee : BaseMonoBehaviour
 			else
 			{
 				float t = Mathf.Clamp01((Mathf.Sqrt(sqrMagnitude) - 20f) * 0.001f);
-				float num3 = Mathf.Lerp(71f / (339f * (float)Math.PI), 2f, t);
-				num2 = UnityEngine.Random.Range(num3, num3 + 71f / (339f * (float)Math.PI));
+				float num3 = Mathf.Lerp(1f / 15f, 2f, t);
+				num2 = UnityEngine.Random.Range(num3, num3 + 1f / 15f);
 			}
 			UpdateVisibility(num2);
 			ApplyVisibility(isVisible);

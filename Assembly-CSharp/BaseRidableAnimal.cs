@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -220,7 +221,6 @@ public class BaseRidableAnimal : BaseVehicle
 	{
 		using (TimeWarning.New("BaseRidableAnimal.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 2333451803u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -241,7 +241,7 @@ public class BaseRidableAnimal : BaseVehicle
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -277,7 +277,7 @@ public class BaseRidableAnimal : BaseVehicle
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -313,7 +313,7 @@ public class BaseRidableAnimal : BaseVehicle
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -550,6 +550,7 @@ public class BaseRidableAnimal : BaseVehicle
 			{
 				item.UseItem();
 				SetFlag(Flags.Reserved2, false);
+				Facepunch.Rust.Analytics.Server.VehiclePurchased(base.ShortPrefabName);
 				AttemptMount(player, false);
 				Interface.CallHook("OnRidableAnimalClaimed", this, player);
 			}

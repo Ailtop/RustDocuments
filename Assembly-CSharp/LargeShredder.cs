@@ -1,3 +1,4 @@
+using Rust;
 using UnityEngine;
 
 public class LargeShredder : BaseEntity
@@ -33,6 +34,8 @@ public class LargeShredder : BaseEntity
 	public Transform resourceSpawnPoint;
 
 	private Quaternion entryRotation;
+
+	public const string SHRED_STAT = "cars_shredded";
 
 	public bool isShredding;
 
@@ -71,6 +74,11 @@ public class LargeShredder : BaseEntity
 		if (component == null)
 		{
 			return;
+		}
+		if (component.associatedPlayer != null && Rust.GameInfo.HasAchievements)
+		{
+			component.associatedPlayer.stats.Add("cars_shredded", 1);
+			component.associatedPlayer.stats.Save();
 		}
 		ItemAmount[] shredResources = component.shredResources;
 		foreach (ItemAmount itemAmount in shredResources)

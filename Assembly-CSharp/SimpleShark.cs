@@ -196,6 +196,8 @@ public class SimpleShark : BaseCombatEntity
 
 	public GameObjectRef corpsePrefab;
 
+	private const string SPEARGUN_KILL_STAT = "shark_speargun_kills";
+
 	[ServerVar]
 	public static float forceSurfaceAmount = 0f;
 
@@ -246,6 +248,8 @@ public class SimpleShark : BaseCombatEntity
 
 	private float timeSinceLastObstacleCheck;
 
+	public override bool IsNpc => true;
+
 	private void GenerateIdlePoints(Vector3 center, float radius, float heightOffset, float staggerOffset = 0f)
 	{
 		patrolPath.Clear();
@@ -258,17 +262,17 @@ public class SimpleShark : BaseCombatEntity
 		{
 			num += 360f / (float)num2;
 			float radius2 = 1f;
-			Vector3 vector = BasePathFinder.GetPointOnCircle(center, radius2, num);
-			Vector3 vector2 = Vector3Ex.Direction(vector, center);
+			Vector3 pointOnCircle = BasePathFinder.GetPointOnCircle(center, radius2, num);
+			Vector3 vector = Vector3Ex.Direction(pointOnCircle, center);
 			RaycastHit hitInfo;
-			vector = ((!Physics.SphereCast(center, obstacleDetectionRadius, vector2, out hitInfo, radius + staggerOffset, layerMask)) ? (center + vector2 * radius) : (center + vector2 * (hitInfo.distance - 6f)));
+			pointOnCircle = ((!Physics.SphereCast(center, obstacleDetectionRadius, vector, out hitInfo, radius + staggerOffset, layerMask)) ? (center + vector * radius) : (center + vector * (hitInfo.distance - 6f)));
 			if (staggerOffset != 0f)
 			{
-				vector += vector2 * Random.Range(0f - staggerOffset, staggerOffset);
+				pointOnCircle += vector * Random.Range(0f - staggerOffset, staggerOffset);
 			}
-			vector.y += Random.Range(0f - heightOffset, heightOffset);
-			vector.y = Mathf.Clamp(vector.y, height2 + 3f, height - 3f);
-			patrolPath.Add(vector);
+			pointOnCircle.y += Random.Range(0f - heightOffset, heightOffset);
+			pointOnCircle.y = Mathf.Clamp(pointOnCircle.y, height2 + 3f, height - 3f);
+			patrolPath.Add(pointOnCircle);
 		}
 	}
 
@@ -433,6 +437,10 @@ public class SimpleShark : BaseCombatEntity
 	{
 		if (base.isServer)
 		{
+			if (Rust.GameInfo.HasAchievements && hitInfo != null && hitInfo.InitiatorPlayer != null && !hitInfo.InitiatorPlayer.IsNpc && hitInfo.Weapon.ShortPrefabName.Contains("speargun"))
+			{
+				hitInfo.InitiatorPlayer.stats.Add("shark_speargun_kills", 1, Stats.All);
+			}
 			BaseCorpse baseCorpse = DropCorpse(corpsePrefab.resourcePath);
 			if ((bool)baseCorpse)
 			{
@@ -509,6 +517,11 @@ public class SimpleShark : BaseCombatEntity
 	public BasePlayer GetTarget()
 	{
 		return target;
+	}
+
+	public override string Categorize()
+	{
+		return "Shark";
 	}
 
 	public bool CanAttack()

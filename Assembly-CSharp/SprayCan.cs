@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -184,6 +185,7 @@ public class SprayCan : HeldEntity
 			{
 				baseEntity.skinID = num;
 				baseEntity.SendNetworkUpdate();
+				Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, CS_0024_003C_003E8__locals0.targetSkin);
 			}
 			else
 			{
@@ -232,7 +234,7 @@ public class SprayCan : HeldEntity
 				{
 					for (int i = 0; i < baseEntity.children.Count; i++)
 					{
-						_003CChangeItemSkin_003Eg__SaveEntityStorage_007C14_0(baseEntity.children[i], dictionary, i + 1);
+						_003CChangeItemSkin_003Eg__SaveEntityStorage_007C14_0(baseEntity.children[i], dictionary, -1);
 					}
 				}
 				baseEntity.Kill();
@@ -266,7 +268,7 @@ public class SprayCan : HeldEntity
 					{
 						for (int j = 0; j < baseEntity.children.Count; j++)
 						{
-							_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C14_1(baseEntity.children[j], j + 1, dictionary);
+							_003CChangeItemSkin_003Eg__RestoreEntityStorage_007C14_1(baseEntity.children[j], -1, dictionary);
 						}
 					}
 					foreach (KeyValuePair<ContainerSet, List<Item>> item2 in dictionary)
@@ -277,6 +279,7 @@ public class SprayCan : HeldEntity
 							item3.Remove();
 						}
 					}
+					Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, CS_0024_003C_003E8__locals0.targetSkin);
 				}
 				if (flag2)
 				{

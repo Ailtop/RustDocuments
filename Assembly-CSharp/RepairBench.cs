@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -23,7 +24,6 @@ public class RepairBench : StorageContainer
 	{
 		using (TimeWarning.New("RepairBench.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1942825351 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -44,7 +44,7 @@ public class RepairBench : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -80,7 +80,7 @@ public class RepairBench : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -240,10 +240,12 @@ public class RepairBench : StorageContainer
 			{
 				ApplySkinToItem(item, Skin);
 			}
+			Facepunch.Rust.Analytics.Server.SkinUsed(item.info.shortname, num);
 		}
 		else
 		{
 			ApplySkinToItem(slot, Skin);
+			Facepunch.Rust.Analytics.Server.SkinUsed(slot.info.shortname, num);
 		}
 		if (skinchangeEffect.isValid)
 		{

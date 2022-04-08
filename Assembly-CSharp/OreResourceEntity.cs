@@ -1,3 +1,4 @@
+using Facepunch.Rust;
 using Network;
 using UnityEngine;
 
@@ -55,6 +56,7 @@ public class OreResourceEntity : StagedResourceEntity
 	public override void OnKilled(HitInfo info)
 	{
 		CleanupBonus();
+		Analytics.Server.OreKilled(this, info);
 		base.OnKilled(info);
 	}
 

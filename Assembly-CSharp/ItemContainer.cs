@@ -14,10 +14,10 @@ public sealed class ItemContainer
 	[Flags]
 	public enum Flag
 	{
-		IsPlayer = 0x1,
-		Clothing = 0x2,
-		Belt = 0x4,
-		SingleType = 0x8,
+		IsPlayer = 1,
+		Clothing = 2,
+		Belt = 4,
+		SingleType = 8,
 		IsLocked = 0x10,
 		ShowSlotsOnIcon = 0x20,
 		NoBrokenItems = 0x40,
@@ -28,8 +28,8 @@ public sealed class ItemContainer
 	[Flags]
 	public enum ContentsType
 	{
-		Generic = 0x1,
-		Liquid = 0x2
+		Generic = 1,
+		Liquid = 2
 	}
 
 	public enum CanAcceptResult
@@ -496,6 +496,22 @@ public sealed class ItemContainer
 			if (itemList[i].info == itemDefinition)
 			{
 				return itemList[i];
+			}
+		}
+		return null;
+	}
+
+	public Item FindBySubEntityID(uint subEntityID)
+	{
+		if (subEntityID == 0)
+		{
+			return null;
+		}
+		foreach (Item item in itemList)
+		{
+			if (item.instanceData != null && item.instanceData.subEntity == subEntityID)
+			{
+				return item;
 			}
 		}
 		return null;

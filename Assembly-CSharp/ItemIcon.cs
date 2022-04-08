@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class ItemIcon : BaseMonoBehaviour, IPointerClickHandler, IEventSystemHandler, IPointerEnterHandler, IPointerExitHandler, IDraggable, IInventoryChanged, IItemAmountChanged, IItemIconChanged
 {
-	public static Color defaultBackgroundColor = new Color(247f / 255f, 47f / 51f, 0.882352948f, 3f / 85f);
+	public static Color defaultBackgroundColor = new Color(0.968627453f, 47f / 51f, 0.882352948f, 3f / 85f);
 
-	public static Color selectedBackgroundColor = new Color(31f / 255f, 107f / 255f, 32f / 51f, 40f / 51f);
+	public static Color selectedBackgroundColor = new Color(0.121568628f, 0.419607848f, 32f / 51f, 40f / 51f);
 
 	public ItemContainerSource containerSource;
 

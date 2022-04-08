@@ -46,7 +46,6 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 	{
 		using (TimeWarning.New("PlayerInventory.OnRpcMessage"))
 		{
-			BaseEntity.RPCMessage rPCMessage;
 			if (rpc == 3482449460u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -67,7 +66,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(BaseEntity.RPCMessage);
+							BaseEntity.RPCMessage rPCMessage = default(BaseEntity.RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -103,7 +102,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(BaseEntity.RPCMessage);
+							BaseEntity.RPCMessage rPCMessage = default(BaseEntity.RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -627,6 +626,35 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		if (containerWear != null)
 		{
 			Item item3 = containerWear.FindItemByItemID(id);
+			if (item3 != null && item3.IsValid())
+			{
+				return item3;
+			}
+		}
+		return null;
+	}
+
+	public Item FindBySubEntityID(uint subEntityID)
+	{
+		if (containerMain != null)
+		{
+			Item item = containerMain.FindBySubEntityID(subEntityID);
+			if (item != null && item.IsValid())
+			{
+				return item;
+			}
+		}
+		if (containerBelt != null)
+		{
+			Item item2 = containerBelt.FindBySubEntityID(subEntityID);
+			if (item2 != null && item2.IsValid())
+			{
+				return item2;
+			}
+		}
+		if (containerWear != null)
+		{
+			Item item3 = containerWear.FindBySubEntityID(subEntityID);
 			if (item3 != null && item3.IsValid())
 			{
 				return item3;

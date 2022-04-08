@@ -69,7 +69,7 @@ public class GenerateRiverLayout : ProceduralComponent
 					vector.y = Mathf.Lerp(vector.y, num5, 0.15f);
 					int topology = topologyMap.GetTopology(vector, radius);
 					int topology2 = topologyMap.GetTopology(vector);
-					int num6 = 2694148;
+					int num6 = 3742724;
 					int num7 = 128;
 					if ((topology & num6) != 0)
 					{

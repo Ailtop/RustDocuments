@@ -121,6 +121,10 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 
 	public float SteerAngle { get; private set; }
 
+	public float TankThrottleLeft { get; private set; }
+
+	public float TankThrottleRight { get; private set; }
+
 	private bool InSlowSpeedExitMode
 	{
 		get
@@ -135,12 +139,12 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 
 	public CarPhysics(TCar car, Transform transform, Rigidbody rBody, CarSettings vehicleSettings)
 	{
-		_003C_003Ec__DisplayClass39_0 _003C_003Ec__DisplayClass39_ = default(_003C_003Ec__DisplayClass39_0);
-		_003C_003Ec__DisplayClass39_.transform = transform;
+		_003C_003Ec__DisplayClass47_0 _003C_003Ec__DisplayClass47_ = default(_003C_003Ec__DisplayClass47_0);
+		_003C_003Ec__DisplayClass47_.transform = transform;
 		base._002Ector();
-		_003C_003Ec__DisplayClass39_._003C_003E4__this = this;
+		_003C_003Ec__DisplayClass47_._003C_003E4__this = this;
 		this.car = car;
-		this.transform = _003C_003Ec__DisplayClass39_.transform;
+		this.transform = _003C_003Ec__DisplayClass47_.transform;
 		this.rBody = rBody;
 		this.vehicleSettings = vehicleSettings;
 		timeSinceWaterCheck = default(TimeSince);
@@ -150,7 +154,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		wheelData = new ServerWheelData[wheels.Length];
 		for (int i = 0; i < wheelData.Length; i++)
 		{
-			wheelData[i] = _003C_002Ector_003Eg__AddWheel_007C39_0(wheels[i], ref _003C_003Ec__DisplayClass39_);
+			wheelData[i] = _003C_002Ector_003Eg__AddWheel_007C47_0(wheels[i], ref _003C_003Ec__DisplayClass47_);
 		}
 		midWheelPos = car.GetWheelsMidPos();
 		wheelData[0].wheel.wheelCollider.ConfigureVehicleSubsteps(1000f, 1, 1);
@@ -218,7 +222,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				maxDriveForce *= num3;
 				if (car.IsOn())
 				{
-					ComputeSteerAngle(steerInput, dt, speed);
+					ComputeSteerAngle(num2, steerInput, dt, speed);
 				}
 				if ((float)timeSinceWaterCheck > 0.25f)
 				{
@@ -308,11 +312,12 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		prevLocalCOM = rBody.centerOfMass;
 	}
 
-	private void ComputeSteerAngle(float steerInput, float dt, float speed)
+	private void ComputeSteerAngle(float throttleInput, float steerInput, float dt, float speed)
 	{
 		if (vehicleSettings.tankSteering)
 		{
 			SteerAngle = 0f;
+			ComputeTankSteeringThrottle(throttleInput, steerInput, speed);
 			return;
 		}
 		float num = vehicleSettings.maxSteerAngle * steerInput;
@@ -457,34 +462,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		float absSpeed = Mathf.Abs(speed);
 		if (vehicleSettings.tankSteering && brakeInput == 0f)
 		{
-			float tankSteerInvert = GetTankSteerInvert(throttleInput, speed);
-			if (wd.isLeftWheel)
-			{
-				if (throttleInput == 0f)
-				{
-					throttleInput = 0f - steerInput;
-				}
-				else if (steerInput > 0f)
-				{
-					throttleInput = Mathf.Lerp(throttleInput, -1f * tankSteerInvert, steerInput);
-				}
-				else if (steerInput < 0f)
-				{
-					throttleInput = Mathf.Lerp(throttleInput, 1f * tankSteerInvert, 0f - steerInput);
-				}
-			}
-			else if (throttleInput == 0f)
-			{
-				throttleInput = steerInput;
-			}
-			else if (steerInput > 0f)
-			{
-				throttleInput = Mathf.Lerp(throttleInput, 1f * tankSteerInvert, steerInput);
-			}
-			else if (steerInput < 0f)
-			{
-				throttleInput = Mathf.Lerp(throttleInput, -1f * tankSteerInvert, 0f - steerInput);
-			}
+			throttleInput = ((!wd.isLeftWheel) ? TankThrottleRight : TankThrottleLeft);
 		}
 		float num = (wd.wheel.powerWheel ? throttleInput : 0f);
 		wd.hasThrottleInput = num != 0f;
@@ -596,6 +574,28 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		}
 		wd.angularVelocity -= num12 * brakeInput;
 		wd.angularVelocity = Mathf.Clamp(wd.angularVelocity, 0f, maxSpeed / wd.wheelCollider.radius);
+	}
+
+	private void ComputeTankSteeringThrottle(float throttleInput, float steerInput, float speed)
+	{
+		TankThrottleLeft = throttleInput;
+		TankThrottleRight = throttleInput;
+		float tankSteerInvert = GetTankSteerInvert(throttleInput, speed);
+		if (throttleInput == 0f)
+		{
+			TankThrottleLeft = 0f - steerInput;
+			TankThrottleRight = steerInput;
+		}
+		else if (steerInput > 0f)
+		{
+			TankThrottleLeft = Mathf.Lerp(throttleInput, -1f * tankSteerInvert, steerInput);
+			TankThrottleRight = Mathf.Lerp(throttleInput, 1f * tankSteerInvert, steerInput);
+		}
+		else if (steerInput < 0f)
+		{
+			TankThrottleLeft = Mathf.Lerp(throttleInput, 1f * tankSteerInvert, 0f - steerInput);
+			TankThrottleRight = Mathf.Lerp(throttleInput, -1f * tankSteerInvert, 0f - steerInput);
+		}
 	}
 
 	private float ComputeDriveForce(float speed, float absSpeed, float demandedForce, float maxForce, float maxForwardSpeed, float driveForceMultiplier)

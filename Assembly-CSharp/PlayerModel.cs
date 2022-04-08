@@ -20,8 +20,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 		SitMinicopter_Passenger = 12,
 		ArcadeLeft = 13,
 		ArcadeRight = 14,
-		SitSummer_Ring = 0xF,
-		SitSummer_BoogieBoard = 0x10,
+		SitSummer_Ring = 15,
+		SitSummer_BoogieBoard = 16,
 		SitCarPassenger = 17,
 		SitSummer_Chair = 18,
 		SitRaft_NoPaddle = 19,
@@ -32,7 +32,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 		Sit_Snowmobile_Shooting = 24,
 		Sit_RetroSnowmobile_Shooting = 25,
 		Driving_Snowmobile = 26,
-		Standing = 0x80
+		ZiplineHold = 27,
+		Standing = 128
 	}
 
 	public Transform[] Shoulders;
@@ -86,6 +87,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 	protected static int vehicle_aim_speed = Animator.StringToHash("vehicleAimYawSpeed");
 
 	protected static int onPhone = Animator.StringToHash("onPhone");
+
+	protected static int usePoseTransition = Animator.StringToHash("usePoseTransition");
 
 	protected static int leftFootIK = Animator.StringToHash("leftFootIK");
 

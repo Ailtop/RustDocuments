@@ -63,12 +63,13 @@ public class Planner : HeldEntity
 	[RPC_Server.IsActiveItem]
 	private void DoPlace(RPCMessage msg)
 	{
-		if (msg.player.CanInteract())
+		if (!msg.player.CanInteract())
 		{
-			using (CreateBuilding msg2 = CreateBuilding.Deserialize(msg.read))
-			{
-				DoBuild(msg2);
-			}
+			return;
+		}
+		using (CreateBuilding msg2 = CreateBuilding.Deserialize(msg.read))
+		{
+			DoBuild(msg2);
 		}
 	}
 

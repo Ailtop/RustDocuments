@@ -105,28 +105,28 @@ public class PathInterpolator
 		initialized = false;
 	}
 
-	public void Smoothen(int iterations)
+	public void Smoothen(int iterations, Func<Vector3, bool> filter = null)
 	{
-		Smoothen(iterations, Vector3.one);
+		Smoothen(iterations, Vector3.one, filter);
 	}
 
-	public void Smoothen(int iterations, Vector3 multipliers)
+	public void Smoothen(int iterations, Vector3 multipliers, Func<Vector3, bool> filter = null)
 	{
 		for (int i = 0; i < iterations; i++)
 		{
 			for (int j = MinIndex + ((!Circular) ? 1 : 0); j <= MaxIndex - 1; j += 2)
 			{
-				SmoothenIndex(j, multipliers);
+				SmoothenIndex(j, multipliers, filter);
 			}
 			for (int k = MinIndex + (Circular ? 1 : 2); k <= MaxIndex - 1; k += 2)
 			{
-				SmoothenIndex(k, multipliers);
+				SmoothenIndex(k, multipliers, filter);
 			}
 		}
 		initialized = false;
 	}
 
-	private void SmoothenIndex(int i, Vector3 multipliers)
+	private void SmoothenIndex(int i, Vector3 multipliers, Func<Vector3, bool> filter = null)
 	{
 		int num = i - 1;
 		int num2 = i + 1;
@@ -137,17 +137,20 @@ public class PathInterpolator
 		Vector3 vector = Points[num];
 		Vector3 vector2 = Points[i];
 		Vector3 vector3 = Points[num2];
-		Vector3 vector4 = (vector + vector2 + vector2 + vector3) * 0.25f;
-		if (multipliers != Vector3.one)
+		if (filter == null || filter(vector2))
 		{
-			vector4.x = Mathf.LerpUnclamped(vector2.x, vector4.x, multipliers.x);
-			vector4.y = Mathf.LerpUnclamped(vector2.y, vector4.y, multipliers.y);
-			vector4.z = Mathf.LerpUnclamped(vector2.z, vector4.z, multipliers.z);
-		}
-		Points[i] = vector4;
-		if (i == 0)
-		{
-			Points[Points.Length - 1] = Points[0];
+			Vector3 vector4 = (vector + vector2 + vector2 + vector3) * 0.25f;
+			if (multipliers != Vector3.one)
+			{
+				vector4.x = Mathf.LerpUnclamped(vector2.x, vector4.x, multipliers.x);
+				vector4.y = Mathf.LerpUnclamped(vector2.y, vector4.y, multipliers.y);
+				vector4.z = Mathf.LerpUnclamped(vector2.z, vector4.z, multipliers.z);
+			}
+			Points[i] = vector4;
+			if (i == 0)
+			{
+				Points[Points.Length - 1] = Points[0];
+			}
 		}
 	}
 

@@ -80,6 +80,7 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 		{
 			owner.SetFlag(BaseEntity.Flags.On, true);
 			owner.SetFlag(engineStartingFlag, false);
+			Interface.CallHook("OnEngineStartFinished", ((VehicleEngineController<>)(object)this).owner);
 		}
 	}
 

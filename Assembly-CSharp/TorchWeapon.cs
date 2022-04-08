@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 public class TorchWeapon : BaseMelee
 {
 	[NonSerialized]
-	public float fuelTickAmount = 0.0833333358f;
+	public float fuelTickAmount = 1f / 12f;
 
 	[Header("TorchWeapon")]
 	public AnimatorOverrideController LitHoldAnimationOverride;
@@ -18,7 +18,6 @@ public class TorchWeapon : BaseMelee
 	{
 		using (TimeWarning.New("TorchWeapon.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 2235491565u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -39,7 +38,7 @@ public class TorchWeapon : BaseMelee
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -75,7 +74,7 @@ public class TorchWeapon : BaseMelee
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;

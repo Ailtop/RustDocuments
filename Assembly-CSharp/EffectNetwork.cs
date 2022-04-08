@@ -40,11 +40,11 @@ public static class EffectNetwork
 					return;
 				}
 				group = baseEntity.net.group;
-				goto IL_0113;
 			}
-			group = Net.sv.visibility.GetGroup(effect.worldPos);
-			goto IL_0113;
-			IL_0113:
+			else
+			{
+				group = Net.sv.visibility.GetGroup(effect.worldPos);
+			}
 			if (group != null)
 			{
 				Net.sv.write.Start();

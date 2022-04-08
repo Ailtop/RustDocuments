@@ -20,10 +20,10 @@ public class HairDye
 	[Flags]
 	public enum CopyPropertyMask
 	{
-		DyeColor = 0x1,
-		RootColor = 0x2,
-		TipColor = 0x4,
-		Brightness = 0x8,
+		DyeColor = 1,
+		RootColor = 2,
+		TipColor = 4,
+		Brightness = 8,
 		DyeRoughness = 0x10,
 		DyeScatter = 0x20,
 		Specular = 0x40,

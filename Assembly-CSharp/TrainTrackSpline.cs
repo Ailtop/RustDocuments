@@ -128,26 +128,48 @@ public class TrainTrackSpline : WorldSpline
 		return num;
 	}
 
-	public float GetDistance(Vector3 position, float maxError, DistanceType distanceType)
+	public float GetDistance(Vector3 position, float maxError, out float minSplineDist)
 	{
 		WorldSplineData data = GetData();
-		float num = float.MaxValue;
-		float num2 = 0f;
-		float result = 0f;
-		for (; num2 < data.Length + maxError; num2 += maxError)
+		float num = maxError * maxError;
+		Vector3 vector = base.transform.InverseTransformPoint(position);
+		float num2 = float.MaxValue;
+		minSplineDist = 0f;
+		int num3 = 0;
+		int num4 = data.LUTValues.Count;
+		if (data.Length > 40f)
 		{
-			float num3 = Vector3.SqrMagnitude(GetPointCubicHermiteWorld(num2, data) - position);
-			if (num3 < num)
+			for (int i = 0; (float)i < data.Length + 10f; i += 10)
 			{
-				num = num3;
-				result = num2;
+				float num5 = Vector3.SqrMagnitude(data.GetPointCubicHermite(i) - vector);
+				if (num5 < num2)
+				{
+					num2 = num5;
+					minSplineDist = i;
+				}
+			}
+			num3 = Mathf.FloorToInt(Mathf.Max(0f, minSplineDist - 10f + 1f));
+			num4 = Mathf.CeilToInt(Mathf.Min(data.LUTValues.Count, minSplineDist + 10f - 1f));
+		}
+		for (int j = num3; j < num4; j++)
+		{
+			WorldSplineData.LUTEntry lUTEntry = data.LUTValues[j];
+			for (int k = 0; k < lUTEntry.points.Count; k++)
+			{
+				WorldSplineData.LUTEntry.LUTPoint lUTPoint = lUTEntry.points[k];
+				float num6 = Vector3.SqrMagnitude(lUTPoint.pos - vector);
+				if (num6 < num2)
+				{
+					num2 = num6;
+					minSplineDist = lUTPoint.distance;
+					if (num6 < num)
+					{
+						break;
+					}
+				}
 			}
 		}
-		if (distanceType == DistanceType.SplineDistance)
-		{
-			return result;
-		}
-		return Mathf.Sqrt(num);
+		return Mathf.Sqrt(num2);
 	}
 
 	public float GetLength()
@@ -160,12 +182,18 @@ public class TrainTrackSpline : WorldSpline
 		return GetPointCubicHermiteWorld(distance);
 	}
 
-	public void AddTrack(TrainTrackSpline track, TrackPosition p, TrackOrientation o)
+	public Vector3 GetPositionAndTangent(float distance, Vector3 askerForward, out Vector3 tangent)
 	{
-		if (track == this)
+		Vector3 pointAndTangentCubicHermiteWorld = GetPointAndTangentCubicHermiteWorld(distance, out tangent);
+		if (Vector3.Dot(askerForward, tangent) < 0f)
 		{
-			return;
+			tangent = -tangent;
 		}
+		return pointAndTangentCubicHermiteWorld;
+	}
+
+	public void AddTrackConnection(TrainTrackSpline track, TrackPosition p, TrackOrientation o)
+	{
 		List<ConnectedTrackInfo> list = ((p == TrackPosition.Next) ? nextTracks : prevTracks);
 		for (int i = 0; i < list.Count; i++)
 		{
@@ -230,7 +258,7 @@ public class TrainTrackSpline : WorldSpline
 		return Vector3.Dot(askerForward, tangentWorld) >= 0f;
 	}
 
-	public bool HasValidHazardWithin(BaseTrain asker, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, TrainTrackSpline preferredAltTrack = null)
+	public bool HasValidHazardWithin(TrainCar asker, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, TrainTrackSpline preferredAltTrack = null)
 	{
 		Vector3 askerForward = ((asker.TrackSpeed >= 0f) ? asker.transform.forward : (-asker.transform.forward));
 		bool movingForward = IsForward(askerForward, askerSplineDist);
@@ -419,17 +447,15 @@ public class TrainTrackSpline : WorldSpline
 				}
 				foreach (TrainTrackSpline item2 in obj2)
 				{
-					float distance = item2.GetDistance(pos, 1f, DistanceType.WorldDistance);
+					float minSplineDist;
+					float distance = item2.GetDistance(pos, 1f, out minSplineDist);
 					if (distance < num)
 					{
 						num = distance;
+						distResult = minSplineDist;
 						splineResult = item2;
 					}
 				}
-			}
-			if (splineResult != null)
-			{
-				distResult = splineResult.GetDistance(pos, 0.25f, DistanceType.SplineDistance);
 			}
 			Pool.FreeList(ref obj2);
 		}

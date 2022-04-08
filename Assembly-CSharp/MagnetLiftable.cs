@@ -6,7 +6,10 @@ public class MagnetLiftable : EntityComponent<BaseEntity>
 
 	public Vector3 shredDirection = Vector3.forward;
 
-	public virtual void SetMagnetized(bool wantsOn, BaseMagnet magnetSource)
+	public BasePlayer associatedPlayer { get; private set; }
+
+	public virtual void SetMagnetized(bool wantsOn, BaseMagnet magnetSource, BasePlayer player)
 	{
+		associatedPlayer = player;
 	}
 }

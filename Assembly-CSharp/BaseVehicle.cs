@@ -376,7 +376,7 @@ public class BaseVehicle : BaseMountable
 
 	public bool AnyMounted()
 	{
-		return (float)NumMounted() > 0f;
+		return IsMounted();
 	}
 
 	public override void VehicleFixedUpdate()
@@ -607,6 +607,7 @@ public class BaseVehicle : BaseMountable
 		{
 			SpawnMountPoint(mountPoints[i], model);
 		}
+		UpdateFullFlag();
 	}
 
 	public override void Spawn()
@@ -636,7 +637,7 @@ public class BaseVehicle : BaseMountable
 	{
 		if (!HasMountPoints())
 		{
-			if (!IsMounted())
+			if (!base.IsMounted())
 			{
 				return 0;
 			}
@@ -747,8 +748,9 @@ public class BaseVehicle : BaseMountable
 					}
 				}
 			}
+			return;
 		}
-		else if (_mounted != null)
+		if (_mounted != null)
 		{
 			drivers.Add(_mounted);
 		}
@@ -1014,6 +1016,11 @@ public class BaseVehicle : BaseMountable
 	{
 		bool b = NumMounted() == MaxMounted();
 		SetFlag(Flags.Reserved11, b);
+		BaseVehicle baseVehicle = VehicleParent();
+		if (baseVehicle != null)
+		{
+			baseVehicle.UpdateFullFlag();
+		}
 	}
 
 	public void ClearRecentDriver()
@@ -1232,7 +1239,7 @@ public class BaseVehicle : BaseMountable
 	{
 		if (base.isServer)
 		{
-			return HasDriver();
+			return (float)NumMounted() > 0f;
 		}
 		throw new NotImplementedException("Please don't call BaseVehicle IsMounted on the client.");
 	}

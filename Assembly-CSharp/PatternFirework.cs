@@ -164,7 +164,6 @@ public class PatternFirework : MortarFirework
 	{
 		using (TimeWarning.New("PatternFirework.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 3850129568u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -189,7 +188,7 @@ public class PatternFirework : MortarFirework
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -229,7 +228,7 @@ public class PatternFirework : MortarFirework
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -269,7 +268,7 @@ public class PatternFirework : MortarFirework
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;

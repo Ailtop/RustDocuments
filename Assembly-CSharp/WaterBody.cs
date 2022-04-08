@@ -7,10 +7,10 @@ public class WaterBody : MonoBehaviour
 	[Flags]
 	public enum FishingTag
 	{
-		MoonPool = 0x1,
-		River = 0x2,
-		Ocean = 0x4,
-		Swamp = 0x8
+		MoonPool = 1,
+		River = 2,
+		Ocean = 4,
+		Swamp = 8
 	}
 
 	public WaterBodyType Type = WaterBodyType.Lake;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ConVar;
 using Network;
 using Network.Visibility;
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -165,6 +166,10 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 
 	private void GetVisibleFrom(Group group, List<Group> groups, int radius)
 	{
+		if (Interface.CallHook("OnNetworkSubscriptionsGather", this, group, groups, radius) != null)
+		{
+			return;
+		}
 		groups.Add(Network.Net.sv.visibility.Get(0u));
 		uint iD = group.ID;
 		if (iD < startID)

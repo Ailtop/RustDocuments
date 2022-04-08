@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class PathList
@@ -96,10 +97,7 @@ public class PathList
 			Meshes = new Mesh[meshData.Length];
 			for (int i = 0; i < Meshes.Length; i++)
 			{
-				MeshData obj = meshData[i];
-				Mesh mesh = (Meshes[i] = new Mesh());
-				obj.Apply(mesh);
-				mesh.RecalculateTangents();
+				meshData[i].Apply(Meshes[i] = new Mesh());
 			}
 		}
 	}
@@ -140,6 +138,8 @@ public class PathList
 
 	public int Splat;
 
+	public int AdjustTerrainHeightCalls;
+
 	public PathFinder.Node ProcgenStartNode;
 
 	public PathFinder.Node ProcgenEndNode;
@@ -160,17 +160,25 @@ public class PathList
 
 	private void SpawnObjectsNeighborAligned(ref uint seed, Prefab[] prefabs, List<Vector3> positions, SpawnFilter filter = null)
 	{
-		if (positions.Count >= 2)
+		if (positions.Count < 2)
 		{
-			for (int i = 0; i < positions.Count; i++)
+			return;
+		}
+		List<Prefab> obj = Pool.GetList<Prefab>();
+		for (int i = 0; i < positions.Count; i++)
+		{
+			int index = Mathf.Max(i - 1, 0);
+			int index2 = Mathf.Min(i + 1, positions.Count - 1);
+			Vector3 position = positions[i];
+			Quaternion rotation = Quaternion.LookRotation((positions[index2] - positions[index]).XZ3D());
+			Prefab spawned;
+			SpawnObject(ref seed, prefabs, position, rotation, obj, out spawned, filter);
+			if (spawned != null)
 			{
-				int index = Mathf.Max(i - 1, 0);
-				int index2 = Mathf.Min(i + 1, positions.Count - 1);
-				Vector3 position = positions[i];
-				Quaternion rotation = Quaternion.LookRotation((positions[index2] - positions[index]).XZ3D());
-				SpawnObject(ref seed, prefabs, position, rotation, filter);
+				obj.Add(spawned);
 			}
 		}
+		Pool.FreeList(ref obj);
 	}
 
 	private bool SpawnObject(ref uint seed, Prefab[] prefabs, Vector3 position, Quaternion rotation, SpawnFilter filter = null)
@@ -185,6 +193,24 @@ public class PathList
 			return false;
 		}
 		World.AddPrefab(Name, random, pos, rot, scale);
+		return true;
+	}
+
+	private bool SpawnObject(ref uint seed, Prefab[] prefabs, Vector3 position, Quaternion rotation, List<Prefab> previousSpawns, out Prefab spawned, SpawnFilter filter = null)
+	{
+		spawned = null;
+		Prefab replacement = ArrayEx.GetRandom(prefabs, ref seed);
+		replacement.ApplySequenceReplacement(previousSpawns, ref replacement, prefabs);
+		Vector3 pos = position;
+		Quaternion rot = rotation;
+		Vector3 scale = replacement.Object.transform.localScale;
+		replacement.ApplyDecorComponents(ref pos, ref rot, ref scale);
+		if (!replacement.ApplyTerrainAnchors(ref pos, rot, scale, filter))
+		{
+			return false;
+		}
+		World.AddPrefab(Name, replacement, pos, rot, scale);
+		spawned = replacement;
 		return true;
 	}
 
@@ -594,12 +620,12 @@ public class PathList
 	public void AdjustTerrainHeight()
 	{
 		TerrainHeightMap heightmap = TerrainMeta.HeightMap;
-		TerrainTopologyMap topomap = TerrainMeta.TopologyMap;
+		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
 		float num = 1f;
 		float randomScale = RandomScale;
 		float outerPadding = OuterPadding;
 		float innerPadding = InnerPadding;
-		float outerFade = OuterFade;
+		float outerFade = ((AdjustTerrainHeightCalls == 0) ? OuterFade : (OuterFade / 3f));
 		float innerFade = InnerFade;
 		float offset = TerrainOffset * TerrainMeta.OneOverSize.y;
 		float num2 = Width * 0.5f;
@@ -638,37 +664,32 @@ public class PathList
 			float yn = TerrainMeta.NormalizeY((vector5.y + vector2.y) * 0.5f);
 			heightmap.ForEach(vector3, vector4, vector6, vector7, delegate(int x, int z)
 			{
-				float num5 = heightmap.Coordinate(x);
-				float num6 = heightmap.Coordinate(z);
-				if ((topomap.GetTopology(num5, num6) & Topology) == 0)
+				Vector3 vector9 = TerrainMeta.Denormalize(new Vector3(heightmap.Coordinate(x), z: heightmap.Coordinate(z), y: yn));
+				Vector3 vector10 = prev_line.ClosestPoint2D(vector9);
+				Vector3 vector11 = cur_line.ClosestPoint2D(vector9);
+				Vector3 vector12 = next_line.ClosestPoint2D(vector9);
+				float num5 = (vector9 - vector10).Magnitude2D();
+				float num6 = (vector9 - vector11).Magnitude2D();
+				float num7 = (vector9 - vector12).Magnitude2D();
+				float value = num6;
+				Vector3 vector13 = vector11;
+				if (!(num6 <= num5) || !(num6 <= num7))
 				{
-					Vector3 vector9 = TerrainMeta.Denormalize(new Vector3(num5, yn, num6));
-					Vector3 vector10 = prev_line.ClosestPoint2D(vector9);
-					Vector3 vector11 = cur_line.ClosestPoint2D(vector9);
-					Vector3 vector12 = next_line.ClosestPoint2D(vector9);
-					float num7 = (vector9 - vector10).Magnitude2D();
-					float num8 = (vector9 - vector11).Magnitude2D();
-					float num9 = (vector9 - vector12).Magnitude2D();
-					float value = num8;
-					Vector3 vector13 = vector11;
-					if (!(num8 <= num7) || !(num8 <= num9))
+					if (num5 <= num7)
 					{
-						if (num7 <= num9)
-						{
-							value = num7;
-							vector13 = vector10;
-						}
-						else
-						{
-							value = num9;
-							vector13 = vector12;
-						}
+						value = num5;
+						vector13 = vector10;
 					}
-					float num10 = Mathf.InverseLerp(radius + outerPadding + outerFade, radius + outerPadding, value);
-					float t = Mathf.InverseLerp(radius - innerPadding, radius - innerPadding - innerFade, value);
-					float num11 = TerrainMeta.NormalizeY(vector13.y);
-					heightmap.SetHeight(x, z, num11 + Mathf.SmoothStep(0f, offset, t), opacity * num10);
+					else
+					{
+						value = num7;
+						vector13 = vector12;
+					}
 				}
+				float num8 = Mathf.InverseLerp(radius + outerPadding + outerFade, radius + outerPadding, value);
+				float t = Mathf.InverseLerp(radius - innerPadding, radius - innerPadding - innerFade, value);
+				float num9 = TerrainMeta.NormalizeY(vector13.y);
+				heightmap.SetHeight(x, z, num9 + Mathf.SmoothStep(0f, offset, t), opacity * num8);
 			});
 			vector2 = vector5;
 			vector3 = vector6;
@@ -678,6 +699,7 @@ public class PathList
 			v = tangent;
 			cur_line = next_line;
 		}
+		AdjustTerrainHeightCalls++;
 	}
 
 	public void AdjustTerrainTexture()
@@ -866,24 +888,25 @@ public class PathList
 						Vector2 item = data.uv[n];
 						Vector3 vector2 = data.vertices[n];
 						Vector3 vector3 = data.normals[n];
+						Vector4 vector4 = data.tangents[n];
 						float t = (vector2.x - min.x) / size.x;
 						float num7 = vector2.y - min.y;
 						float num8 = (vector2.z - min.z) / size.z;
 						float num9 = num6 + num8 * num4;
-						Vector3 vector4 = (Spline ? Path.GetPointCubicHermite(num9) : Path.GetPoint(num9));
+						Vector3 vector5 = (Spline ? Path.GetPointCubicHermite(num9) : Path.GetPoint(num9));
 						Vector3 tangent = Path.GetTangent(num9);
 						Vector3 normalized = tangent.XZ3D().normalized;
-						Vector3 vector5 = rot90 * normalized;
-						Vector3 vector6 = Vector3.Cross(tangent, vector5);
-						Quaternion quaternion = Quaternion.FromToRotation(Vector3.up, vector6);
-						float num10 = Mathf.Lerp(num5, num5 * randomScale, Noise.Billow(vector4.x, vector4.z, 2, 0.005f));
-						Vector3 vector7 = vector4 - vector5 * num10;
-						Vector3 vector8 = vector4 + vector5 * num10;
-						vector7.y = heightMap.GetHeight(vector7);
+						Vector3 vector6 = rot90 * normalized;
+						Vector3 vector7 = Vector3.Cross(tangent, vector6);
+						Quaternion quaternion = Quaternion.LookRotation(normalized, vector7);
+						float num10 = Mathf.Lerp(num5, num5 * randomScale, Noise.Billow(vector5.x, vector5.z, 2, 0.005f));
+						Vector3 vector8 = vector5 - vector6 * num10;
+						Vector3 vector9 = vector5 + vector6 * num10;
 						vector8.y = heightMap.GetHeight(vector8);
-						vector7 += vector6 * meshOffset;
-						vector8 += vector6 * meshOffset;
-						vector2 = Vector3.Lerp(vector7, vector8, t);
+						vector9.y = heightMap.GetHeight(vector9);
+						vector8 += vector7 * meshOffset;
+						vector9 += vector7 * meshOffset;
+						vector2 = Vector3.Lerp(vector8, vector9, t);
 						if (!Path.Circular && (num9 < 0.1f || num9 > Path.Length - 0.1f))
 						{
 							vector2.y = heightMap.GetHeight(vector2);
@@ -894,12 +917,14 @@ public class PathList
 						}
 						vector2 -= vector;
 						vector3 = quaternion * vector3;
+						vector4 = quaternion * vector4;
 						if (normalSmoothing > 0f)
 						{
 							vector3 = Vector3.Slerp(vector3, Vector3.up, normalSmoothing);
 						}
 						meshData.vertices.Add(vector2);
 						meshData.normals.Add(vector3);
+						meshData.tangents.Add(vector4);
 						meshData.uv.Add(item);
 					}
 					for (int num11 = 0; num11 < data.triangles.Length; num11++)

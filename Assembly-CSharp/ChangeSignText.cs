@@ -10,4 +10,8 @@ public class ChangeSignText : UIDialog
 	public GameObject currentFrameSection;
 
 	public GameObject[] frameOptions;
+
+	public Camera cameraPreview;
+
+	public Camera camera3D;
 }

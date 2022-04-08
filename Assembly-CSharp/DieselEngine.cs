@@ -5,6 +5,7 @@ using Facepunch;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
+using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,6 +23,8 @@ public class DieselEngine : StorageContainer
 
 	private const float rumbleMaxDistSq = 100f;
 
+	private const string EXCAVATOR_ACTIVATED_STAT = "excavator_activated";
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("DieselEngine.OnRpcMessage"))
@@ -29,7 +32,7 @@ public class DieselEngine : StorageContainer
 			if (rpc == 578721460 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - EngineSwitch "));
 				}
@@ -101,6 +104,10 @@ public class DieselEngine : StorageContainer
 			if (GetFuelAmount() > 0)
 			{
 				EngineOn();
+				if (Rust.GameInfo.HasAchievements && msg.player != null)
+				{
+					msg.player.stats.Add("excavator_activated", 1, Stats.All);
+				}
 			}
 		}
 		else

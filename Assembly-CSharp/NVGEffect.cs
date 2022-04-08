@@ -42,17 +42,41 @@ public class NVGEffect : PostEffectsBase, IImageEffect
 		public FilterMode filterMode;
 	}
 
-	public ColorCorrectionParams ColorCorrection1;
+	public ColorCorrectionParams ColorCorrection1 = new ColorCorrectionParams
+	{
+		saturation = 1f,
+		redChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
+		greenChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
+		blueChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f))
+	};
 
-	public ColorCorrectionParams ColorCorrection2;
+	public ColorCorrectionParams ColorCorrection2 = new ColorCorrectionParams
+	{
+		saturation = 1f,
+		redChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
+		greenChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
+		blueChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f))
+	};
 
-	public NoiseAndGrainParams NoiseAndGrain;
+	public NoiseAndGrainParams NoiseAndGrain = new NoiseAndGrainParams
+	{
+		intensityMultiplier = 1.5f,
+		generalIntensity = 1f,
+		blackIntensity = 1f,
+		whiteIntensity = 1f,
+		midGrey = 0.182f,
+		monochrome = true,
+		intensities = new Vector3(1f, 1f, 1f),
+		tiling = new Vector3(60f, 70f, 80f),
+		monochromeTiling = 55f,
+		filterMode = FilterMode.Point
+	};
 
 	private Texture2D rgbChannelTex1;
 
 	private Texture2D rgbChannelTex2;
 
-	private bool updateTexturesOnStartup;
+	private bool updateTexturesOnStartup = true;
 
 	public Texture2D NoiseTexture;
 
@@ -210,40 +234,5 @@ public class NVGEffect : PostEffectsBase, IImageEffect
 		}
 		GL.End();
 		GL.PopMatrix();
-	}
-
-	public NVGEffect()
-	{
-		ColorCorrectionParams colorCorrectionParams = new ColorCorrectionParams
-		{
-			saturation = 1f,
-			redChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
-			greenChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
-			blueChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f))
-		};
-		ColorCorrection1 = colorCorrectionParams;
-		colorCorrectionParams = new ColorCorrectionParams
-		{
-			saturation = 1f,
-			redChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
-			greenChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f)),
-			blueChannel = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 1f))
-		};
-		ColorCorrection2 = colorCorrectionParams;
-		NoiseAndGrain = new NoiseAndGrainParams
-		{
-			intensityMultiplier = 1.5f,
-			generalIntensity = 1f,
-			blackIntensity = 1f,
-			whiteIntensity = 1f,
-			midGrey = 0.182f,
-			monochrome = true,
-			intensities = new Vector3(1f, 1f, 1f),
-			tiling = new Vector3(60f, 70f, 80f),
-			monochromeTiling = 55f,
-			filterMode = FilterMode.Point
-		};
-		updateTexturesOnStartup = true;
-		base._002Ector();
 	}
 }

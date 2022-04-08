@@ -6,7 +6,7 @@ public struct FixedSByteNorm4
 
 	private const float MaxFrac = 128f;
 
-	private const float RcpMaxFrac = 0.0078125f;
+	private const float RcpMaxFrac = 1f / 128f;
 
 	public sbyte x;
 
@@ -26,6 +26,6 @@ public struct FixedSByteNorm4
 
 	public static explicit operator Vector4(FixedSByteNorm4 vec)
 	{
-		return new Vector4((float)vec.x * 0.0078125f, (float)vec.y * 0.0078125f, (float)vec.z * 0.0078125f, (float)vec.w * 0.0078125f);
+		return new Vector4((float)vec.x * (1f / 128f), (float)vec.y * (1f / 128f), (float)vec.z * (1f / 128f), (float)vec.w * (1f / 128f));
 	}
 }

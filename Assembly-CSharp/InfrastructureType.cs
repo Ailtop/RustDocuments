@@ -5,5 +5,6 @@ public enum InfrastructureType
 	Trail = 2,
 	Tunnel = 3,
 	UnderwaterLab = 4,
-	Boat = 5
+	Boat = 5,
+	Rail = 6
 }

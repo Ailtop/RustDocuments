@@ -7,6 +7,7 @@ using ConVar;
 using Facepunch;
 using Facepunch.Network;
 using Facepunch.Network.Raknet;
+using Facepunch.Rust;
 using Facepunch.Utility;
 using Network;
 using Oxide.Core;
@@ -97,6 +98,13 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 	public static void Init_Systems()
 	{
 		Rust.Global.Init();
+		if (Rust.GameInfo.IsOfficialServer && ConVar.Server.stats)
+		{
+			GA.Logging = false;
+			GA.Build = BuildInfo.Current.Scm.ChangeId;
+			GA.Initialize("218faecaf1ad400a4e15c53392ebeebc", "0c9803ce52c38671278899538b9c54c8d4e19849");
+			Facepunch.Rust.Analytics.Server.Enabled = true;
+		}
 		Facepunch.Application.Initialize(new Integration());
 		Facepunch.Performance.GetMemoryUsage = () => SystemInfoEx.systemMemoryUsed;
 	}

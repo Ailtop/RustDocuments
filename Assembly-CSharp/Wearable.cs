@@ -9,41 +9,41 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[Flags]
 	public enum RemoveSkin
 	{
-		Torso = 0x1,
-		Feet = 0x2,
-		Hands = 0x4,
-		Legs = 0x8,
+		Torso = 1,
+		Feet = 2,
+		Hands = 4,
+		Legs = 8,
 		Head = 0x10
 	}
 
 	[Flags]
 	public enum RemoveHair
 	{
-		Head = 0x1,
-		Eyebrow = 0x2,
-		Facial = 0x4,
-		Armpit = 0x8,
+		Head = 1,
+		Eyebrow = 2,
+		Facial = 4,
+		Armpit = 8,
 		Pubic = 0x10
 	}
 
 	[Flags]
 	public enum DeformHair
 	{
-		None = 0x0,
-		BaseballCap = 0x1,
-		BoonieHat = 0x2,
-		CandleHat = 0x3,
-		MinersHat = 0x4,
-		WoodHelmet = 0x5
+		None = 0,
+		BaseballCap = 1,
+		BoonieHat = 2,
+		CandleHat = 3,
+		MinersHat = 4,
+		WoodHelmet = 5
 	}
 
 	[Flags]
 	public enum OccupationSlots
 	{
-		HeadTop = 0x1,
-		Face = 0x2,
-		HeadBack = 0x4,
-		TorsoFront = 0x8,
+		HeadTop = 1,
+		Face = 2,
+		HeadBack = 4,
+		TorsoFront = 8,
 		TorsoBack = 0x10,
 		LeftShoulder = 0x20,
 		RightShoulder = 0x40,

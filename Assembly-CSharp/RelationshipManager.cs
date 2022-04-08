@@ -58,10 +58,6 @@ public class RelationshipManager : BaseEntity
 			notes = "";
 			lastMugshotTime = 0f;
 		}
-
-		public void OnServerFileReceived(FileStorage.Type type, uint numId, uint crc, byte[] data)
-		{
-		}
 	}
 
 	public class PlayerRelationships : Facepunch.Pool.IPooled
@@ -345,7 +341,6 @@ public class RelationshipManager : BaseEntity
 	{
 		using (TimeWarning.New("RelationshipManager.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1684577101 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -366,7 +361,7 @@ public class RelationshipManager : BaseEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -402,7 +397,7 @@ public class RelationshipManager : BaseEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -438,7 +433,7 @@ public class RelationshipManager : BaseEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -474,7 +469,7 @@ public class RelationshipManager : BaseEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;

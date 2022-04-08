@@ -218,6 +218,7 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 			TerrainMeta.Path.Roads.AddRange(World.GetPaths("Road"));
 			TerrainMeta.Path.Rivers.AddRange(World.GetPaths("River"));
 			TerrainMeta.Path.Powerlines.AddRange(World.GetPaths("Powerline"));
+			TerrainMeta.Path.Rails.AddRange(World.GetPaths("Rail"));
 		}
 		spawnTimer.End();
 		Timing procgenTimer = Timing.Start("Processing World");
@@ -254,6 +255,7 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 			World.AddPaths(TerrainMeta.Path.Roads);
 			World.AddPaths(TerrainMeta.Path.Rivers);
 			World.AddPaths(TerrainMeta.Path.Powerlines);
+			World.AddPaths(TerrainMeta.Path.Rails);
 			World.Serialization.Save(World.MapFolderName + "/" + World.MapFileName);
 		}
 		saveTimer.End();

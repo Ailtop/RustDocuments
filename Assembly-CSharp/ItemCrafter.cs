@@ -191,7 +191,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 				int num3 = 0;
 			}
 		}
-		Facepunch.Rust.Analytics.Crafting(task.blueprint.targetItem.shortname, task.skinID);
+		Facepunch.Rust.Analytics.Server.Crafting(task.blueprint.targetItem.shortname, task.skinID);
 		task.owner.Command("note.craft_done", task.taskUID, 1, task.amount);
 		Interface.CallHook("OnItemCraftFinished", task, item);
 		if (task.instanceData != null)

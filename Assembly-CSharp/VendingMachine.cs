@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -58,7 +59,6 @@ public class VendingMachine : StorageContainer
 	{
 		using (TimeWarning.New("VendingMachine.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 3011053703u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -83,7 +83,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -119,7 +119,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -155,7 +155,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -191,7 +191,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -227,7 +227,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -263,7 +263,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -299,7 +299,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -335,7 +335,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -371,7 +371,7 @@ public class VendingMachine : StorageContainer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -727,6 +727,7 @@ public class VendingMachine : StorageContainer
 				{
 					return (bool)obj3;
 				}
+				RecordSaleAnalytics(item2);
 				if (targetContainer == null)
 				{
 					GiveSoldItem(item2, buyer);
@@ -746,6 +747,11 @@ public class VendingMachine : StorageContainer
 		UpdateEmptyFlag();
 		transactionActive = false;
 		return true;
+	}
+
+	protected virtual void RecordSaleAnalytics(Item itemSold)
+	{
+		Facepunch.Rust.Analytics.Server.VendingMachineTransaction(null, itemSold.info, itemSold.amount);
 	}
 
 	public virtual void TakeCurrencyItem(Item takenCurrencyItem)
@@ -836,11 +842,11 @@ public class VendingMachine : StorageContainer
 	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenShop(RPCMessage msg)
 	{
-		if (OccupiedCheck(msg.player))
+		if (OccupiedCheck(msg.player) && Interface.CallHook("OnVendingShopOpen", this, msg.player) == null)
 		{
 			SendSellOrders(msg.player);
 			PlayerOpenLoot(msg.player, customerPanel);
-			Interface.CallHook("OnOpenVendingShop", this, msg.player);
+			Interface.CallHook("OnVendingShopOpened", this, msg.player);
 		}
 	}
 

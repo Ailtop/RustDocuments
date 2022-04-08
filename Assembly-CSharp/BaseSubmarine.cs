@@ -45,6 +45,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	private float highDrag;
 
+	private bool wasOnSurface;
+
 	[Header("Submarine Main")]
 	[SerializeField]
 	private Transform centreOfMassTransform;
@@ -327,7 +329,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	{
 		using (TimeWarning.New("BaseSubmarine.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1851540757 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -341,7 +342,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -377,7 +378,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -413,7 +414,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -580,6 +581,10 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 		Velocity = GetLocalVelocity();
 		UpdateWaterInfo();
+		if (IsSurfaced && !wasOnSurface && base.transform.position.y > Env.oceanlevel - 1f)
+		{
+			wasOnSurface = true;
+		}
 		buoyancy.ArtificialHeight = waterSurfaceY;
 		rigidBody.drag = (HasDriver() ? normalDrag : highDrag);
 		float num = 2f;
@@ -878,6 +883,19 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			if (itemContainer != null)
 			{
 				itemContainer.PlayerOpenLoot(player);
+			}
+		}
+	}
+
+	public void OnSurfacedInMoonpool()
+	{
+		if (wasOnSurface && Rust.GameInfo.HasAchievements)
+		{
+			wasOnSurface = false;
+			BasePlayer driver = GetDriver();
+			if (driver != null)
+			{
+				driver.GiveAchievement("SUBMARINE_MOONPOOL");
 			}
 		}
 	}

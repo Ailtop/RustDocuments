@@ -5,6 +5,8 @@ public class TerrainPath : TerrainExtension
 {
 	public List<PathList> Roads = new List<PathList>();
 
+	internal List<PathList> Rails = new List<PathList>();
+
 	public List<PathList> Rivers = new List<PathList>();
 
 	public List<PathList> Powerlines = new List<PathList>();
@@ -40,6 +42,11 @@ public class TerrainPath : TerrainExtension
 			road.ProcgenStartNode = null;
 			road.ProcgenEndNode = null;
 		}
+		foreach (PathList rail in Rails)
+		{
+			rail.ProcgenStartNode = null;
+			rail.ProcgenEndNode = null;
+		}
 		foreach (PathList river in Rivers)
 		{
 			river.ProcgenStartNode = null;
@@ -55,6 +62,7 @@ public class TerrainPath : TerrainExtension
 	public void Clear()
 	{
 		Roads.Clear();
+		Rails.Clear();
 		Rivers.Clear();
 		Powerlines.Clear();
 	}
@@ -79,6 +87,7 @@ public class TerrainPath : TerrainExtension
 	{
 		float radius = 5f;
 		int num = (int)((float)World.Size / 7.5f);
+		TerrainPlacementMap placementMap = TerrainMeta.PlacementMap;
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
 		int[,] array = new int[num, num];
@@ -91,13 +100,13 @@ public class TerrainPath : TerrainExtension
 				float slope = heightMap.GetSlope(normX, normZ);
 				int topology = topologyMap.GetTopology(normX, normZ, radius);
 				int num2 = 2295174;
-				int num3 = 55296;
+				int num3 = 1628160;
 				int num4 = 512;
 				if ((topology & num2) != 0)
 				{
 					array[j, i] = int.MaxValue;
 				}
-				else if ((topology & num3) != 0)
+				else if ((topology & num3) != 0 || placementMap.GetBlocked(normX, normZ, radius))
 				{
 					array[j, i] = 2500;
 				}
@@ -118,6 +127,7 @@ public class TerrainPath : TerrainExtension
 	{
 		float radius = 5f;
 		int num = (int)((float)World.Size / 7.5f);
+		TerrainPlacementMap placementMap = TerrainMeta.PlacementMap;
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
 		int[,] array = new int[num, num];
@@ -136,13 +146,52 @@ public class TerrainPath : TerrainExtension
 				{
 					array[j, i] = int.MaxValue;
 				}
-				else if ((topology & num4) != 0)
+				else if ((topology & num4) != 0 || placementMap.GetBlocked(normX, normZ, radius))
 				{
-					array[j, i] = 2500;
+					array[j, i] = 5000;
 				}
 				else
 				{
 					array[j, i] = 1 + (int)(slope * slope * 10f) + num2;
+				}
+			}
+		}
+		return array;
+	}
+
+	public static int[,] CreateRailCostmap(ref uint seed)
+	{
+		float radius = 5f;
+		int num = (int)((float)World.Size / 7.5f);
+		TerrainPlacementMap placementMap = TerrainMeta.PlacementMap;
+		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
+		TerrainTopologyMap topologyMap = TerrainMeta.TopologyMap;
+		int[,] array = new int[num, num];
+		for (int i = 0; i < num; i++)
+		{
+			float normZ = ((float)i + 0.5f) / (float)num;
+			for (int j = 0; j < num; j++)
+			{
+				float normX = ((float)j + 0.5f) / (float)num;
+				float slope = heightMap.GetSlope(normX, normZ);
+				int topology = topologyMap.GetTopology(normX, normZ, radius);
+				int num2 = 2295686;
+				int num3 = 49152;
+				if (slope > 20f || (topology & num2) != 0)
+				{
+					array[j, i] = int.MaxValue;
+				}
+				else if ((topology & num3) != 0 || placementMap.GetBlocked(normX, normZ, radius))
+				{
+					array[j, i] = 5000;
+				}
+				else if (slope > 10f)
+				{
+					array[j, i] = 1500;
+				}
+				else
+				{
+					array[j, i] = 1000;
 				}
 			}
 		}
@@ -231,5 +280,21 @@ public class TerrainPath : TerrainExtension
 				GameObjectEx.SetHierarchyGroup(powerLineWire.gameObject, name);
 			}
 		}
+	}
+
+	public MonumentInfo FindMonumentWithBoundsOverlap(Vector3 position)
+	{
+		if (TerrainMeta.Path.Monuments == null)
+		{
+			return null;
+		}
+		foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+		{
+			if (monument != null && monument.IsInBounds(position))
+			{
+				return monument;
+			}
+		}
+		return null;
 	}
 }

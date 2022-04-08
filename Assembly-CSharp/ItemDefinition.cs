@@ -40,8 +40,8 @@ public class ItemDefinition : MonoBehaviour
 	[Flags]
 	public enum Flag
 	{
-		NoDropping = 0x1,
-		NotStraightToBelt = 0x2
+		NoDropping = 1,
+		NotStraightToBelt = 2
 	}
 
 	public enum AmountType

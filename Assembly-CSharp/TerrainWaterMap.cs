@@ -203,17 +203,17 @@ public class TerrainWaterMap : TerrainMap<short>
 
 	public float GetSlope01(Vector3 worldPos)
 	{
-		return GetSlope(worldPos) * 0.0111111114f;
+		return GetSlope(worldPos) * (1f / 90f);
 	}
 
 	public float GetSlope01(float normX, float normZ)
 	{
-		return GetSlope(normX, normZ) * 0.0111111114f;
+		return GetSlope(normX, normZ) * (1f / 90f);
 	}
 
 	public float GetSlope01(int x, int z)
 	{
-		return GetSlope(x, z) * 0.0111111114f;
+		return GetSlope(x, z) * (1f / 90f);
 	}
 
 	public float GetDepth(Vector3 worldPos)

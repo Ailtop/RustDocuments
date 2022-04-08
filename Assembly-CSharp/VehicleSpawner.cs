@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Facepunch;
+using Facepunch.Rust;
 using UnityEngine;
 
 public class VehicleSpawner : BaseEntity
@@ -24,6 +25,8 @@ public class VehicleSpawner : BaseEntity
 	public Transform spawnOffset;
 
 	public float safeRadius = 10f;
+
+	protected virtual bool LogAnalytics => true;
 
 	public virtual int GetOccupyLayer()
 	{
@@ -84,6 +87,10 @@ public class VehicleSpawner : BaseEntity
 			component.SetupOwner(newOwner, spawnOffset.transform.position, safeRadius);
 		}
 		VehicleSpawnPoint.AddStartingFuel(component);
+		if (LogAnalytics)
+		{
+			Analytics.Server.VehiclePurchased(component.ShortPrefabName);
+		}
 		return component;
 	}
 

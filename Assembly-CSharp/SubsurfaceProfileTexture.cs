@@ -132,7 +132,7 @@ public class SubsurfaceProfileTexture
 				int num3 = num * (num2 - j - 1);
 				for (int k = 0; k < 29; k++)
 				{
-					Color color = array[k] * new Color(1f, 1f, 1f, 0.333333343f);
+					Color color = array[k] * new Color(1f, 1f, 1f, 1f / 3f);
 					color.a *= data.ScatterRadius / 1024f;
 					pixels[num3 + k] = color;
 				}

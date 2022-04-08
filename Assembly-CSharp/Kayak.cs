@@ -1,4 +1,5 @@
 using Network;
+using Rust;
 using UnityEngine;
 
 public class Kayak : BaseBoat, IPoolVehicle
@@ -48,6 +49,10 @@ public class Kayak : BaseBoat, IPoolVehicle
 
 	private const float DECAY_TICK_TIME = 60f;
 
+	private Vector3 lastTravelPos;
+
+	private float distanceRemainder;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("Kayak.OnRpcMessage"))
@@ -61,6 +66,37 @@ public class Kayak : BaseBoat, IPoolVehicle
 		base.ServerInit();
 		timeSinceLastUsed = 0f;
 		InvokeRandomized(BoatDecay, Random.Range(30f, 60f), 60f, 6f);
+	}
+
+	public override void OnPlayerMounted()
+	{
+		base.OnPlayerMounted();
+		if (IsInvoking(TravelDistanceUpdate) || !Rust.GameInfo.HasAchievements)
+		{
+			return;
+		}
+		int num = 0;
+		foreach (MountPointInfo allMountPoint in base.allMountPoints)
+		{
+			if (allMountPoint.mountable != null && allMountPoint.mountable.IsMounted())
+			{
+				num++;
+			}
+		}
+		if (num == 2)
+		{
+			lastTravelPos = base.transform.position.WithY(0f);
+			InvokeRandomized(TravelDistanceUpdate, 5f, 5f, 3f);
+		}
+	}
+
+	public override void OnPlayerDismounted(BasePlayer player)
+	{
+		base.OnPlayerDismounted(player);
+		if (IsInvoking(TravelDistanceUpdate))
+		{
+			CancelInvoke(TravelDistanceUpdate);
+		}
 	}
 
 	public override void DriverInput(InputState inputState, BasePlayer player)
@@ -110,6 +146,25 @@ public class Kayak : BaseBoat, IPoolVehicle
 				rigidBody.velocity = Vector3.Lerp(velocity, vector * velocity.magnitude, 0.4f);
 			}
 		}
+	}
+
+	private void TravelDistanceUpdate()
+	{
+		Vector3 b = base.transform.position.WithY(0f);
+		if (Rust.GameInfo.HasAchievements)
+		{
+			float num = Vector3.Distance(lastTravelPos, b) + distanceRemainder;
+			float num2 = Mathf.Max(Mathf.Floor(num), 0f);
+			distanceRemainder = num - num2;
+			foreach (MountPointInfo allMountPoint in base.allMountPoints)
+			{
+				if (allMountPoint.mountable != null && allMountPoint.mountable.IsMounted() && (int)num2 > 0)
+				{
+					allMountPoint.mountable.GetMounted().stats.Add("kayak_distance_travelled", (int)num2);
+				}
+			}
+		}
+		lastTravelPos = b;
 	}
 
 	public override bool EngineOn()

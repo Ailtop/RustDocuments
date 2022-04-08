@@ -32,7 +32,6 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 	{
 		using (TimeWarning.New("PhotoFrame.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1455609404 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -53,7 +52,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -89,7 +88,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -129,7 +128,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -189,9 +188,9 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 		return CanUpdateSign(player);
 	}
 
-	[RPC_Server.CallsPerSecond(3uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server.CallsPerSecond(3uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (!(msg.player == null) && CanUpdateSign(msg.player))

@@ -6,10 +6,10 @@ public class ColliderInfo : MonoBehaviour
 	[Flags]
 	public enum Flags
 	{
-		Usable = 0x1,
-		Shootable = 0x2,
-		Melee = 0x4,
-		Opaque = 0x8,
+		Usable = 1,
+		Shootable = 2,
+		Melee = 4,
+		Opaque = 8,
 		Airflow = 0x10
 	}
 

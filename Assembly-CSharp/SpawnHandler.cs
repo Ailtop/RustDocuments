@@ -35,7 +35,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 
 	public SpawnDistribution[] SpawnDistributions;
 
-	internal SpawnDistribution CharDistribution;
+	public SpawnDistribution CharDistribution;
 
 	public List<ISpawnGroup> SpawnGroups = new List<ISpawnGroup>();
 

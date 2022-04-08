@@ -5,7 +5,7 @@ public class ItemModContainerRestriction : ItemMod
 	[Flags]
 	public enum SlotFlags
 	{
-		Map = 0x1
+		Map = 1
 	}
 
 	[InspectorFlags]

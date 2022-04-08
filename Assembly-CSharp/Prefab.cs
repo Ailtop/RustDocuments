@@ -127,6 +127,15 @@ public class Prefab : IComparable<Prefab>
 		return EnvironmentVolumeEx.CheckEnvironmentVolumesOutsideTerrain(Object.transform, pos, rot, scale, type, padding);
 	}
 
+	public void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements)
+	{
+		PathSequence pathSequence = Attribute.Find<PathSequence>(ID);
+		if (pathSequence != null)
+		{
+			pathSequence.ApplySequenceReplacement(sequence, ref replacement, possibleReplacements);
+		}
+	}
+
 	public GameObject Spawn(Transform transform, bool active = true)
 	{
 		return Manager.CreatePrefab(Name, transform, active);

@@ -3,9 +3,9 @@ using System;
 [Flags]
 public enum HairCapMask
 {
-	Head = 0x1,
-	Eyebrow = 0x2,
-	Facial = 0x4,
-	Armpit = 0x8,
+	Head = 1,
+	Eyebrow = 2,
+	Facial = 4,
+	Armpit = 8,
 	Pubic = 0x10
 }

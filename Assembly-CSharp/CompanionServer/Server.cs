@@ -117,20 +117,17 @@ namespace CompanionServer
 			{
 				string serverId;
 				string serverToken;
-				if (!TryLoadServerRegistration(out serverId, out serverToken))
+				if (TryLoadServerRegistration(out serverId, out serverToken))
 				{
-					goto IL_0185;
+					StringContent content = new StringContent(serverToken, Encoding.UTF8, "text/plain");
+					HttpResponseMessage httpResponseMessage = await Http.PostAsync("https://companion-rust.facepunch.com/api/server/refresh", content);
+					if (httpResponseMessage.IsSuccessStatusCode)
+					{
+						SetServerRegistration(await httpResponseMessage.Content.ReadAsStringAsync());
+						return;
+					}
+					UnityEngine.Debug.LogWarning("Failed to refresh server ID - registering a new one");
 				}
-				StringContent content = new StringContent(serverToken, Encoding.UTF8, "text/plain");
-				HttpResponseMessage httpResponseMessage = await Http.PostAsync("https://companion-rust.facepunch.com/api/server/refresh", content);
-				if (httpResponseMessage.IsSuccessStatusCode)
-				{
-					SetServerRegistration(await httpResponseMessage.Content.ReadAsStringAsync());
-					return;
-				}
-				UnityEngine.Debug.LogWarning("Failed to refresh server ID - registering a new one");
-				goto IL_0185;
-				IL_0185:
 				SetServerRegistration(await Http.GetStringAsync("https://companion-rust.facepunch.com/api/server/register"));
 			}
 			catch (Exception arg)
@@ -175,16 +172,17 @@ namespace CompanionServer
 			}
 			SetServerId(registerResponse?.ServerId);
 			Token = registerResponse?.ServerToken;
-			if (registerResponse != null)
+			if (registerResponse == null)
 			{
-				try
-				{
-					File.WriteAllText(GetServerIdPath(), responseJson);
-				}
-				catch (Exception arg2)
-				{
-					UnityEngine.Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
-				}
+				return;
+			}
+			try
+			{
+				File.WriteAllText(GetServerIdPath(), responseJson);
+			}
+			catch (Exception arg2)
+			{
+				UnityEngine.Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
 			}
 		}
 

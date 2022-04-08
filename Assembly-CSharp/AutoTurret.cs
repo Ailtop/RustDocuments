@@ -164,7 +164,6 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	{
 		using (TimeWarning.New("AutoTurret.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1092560690 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -185,7 +184,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -221,7 +220,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -257,7 +256,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -293,7 +292,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -329,7 +328,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -365,7 +364,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -401,7 +400,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -988,7 +987,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		if (!HasTarget())
 		{
-			aimDir = Vector3.Lerp(aimDir, targetAimDir, UnityEngine.Time.deltaTime * 2f);
+			aimDir = Lerp(aimDir, targetAimDir, 2f);
 		}
 	}
 
@@ -1662,6 +1661,11 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	private static Quaternion Lerp(Quaternion from, Quaternion to, float speed)
 	{
 		return Quaternion.Lerp(to, from, Mathf.Pow(2f, (0f - speed) * UnityEngine.Time.deltaTime));
+	}
+
+	private static Vector3 Lerp(Vector3 from, Vector3 to, float speed)
+	{
+		return Vector3.Lerp(to, from, Mathf.Pow(2f, (0f - speed) * UnityEngine.Time.deltaTime));
 	}
 
 	public bool IsAuthed(ulong id)

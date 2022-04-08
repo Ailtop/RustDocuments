@@ -297,7 +297,7 @@ public class Construction : PrefabAttribute
 		int topology3 = topologyMap.GetTopology(point2, radius);
 		int topology4 = topologyMap.GetTopology(point3, radius);
 		int topology5 = topologyMap.GetTopology(point4, radius);
-		if (((topology | topology2 | topology3 | topology4 | topology5) & 0x800) == 0)
+		if (((topology | topology2 | topology3 | topology4 | topology5) & 0x80800) == 0)
 		{
 			return true;
 		}

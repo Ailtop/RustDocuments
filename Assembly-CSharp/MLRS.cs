@@ -37,6 +37,8 @@ public class MLRS : BaseMountable
 		}
 	}
 
+	public const string MLRS_PLAYER_KILL_STAT = "mlrs_kills";
+
 	private float leftRightInput;
 
 	private float upDownInput;
@@ -57,7 +59,7 @@ public class MLRS : BaseMountable
 	{
 		0.1f,
 		0.2f,
-		0.333333343f,
+		1f / 3f,
 		2f / 3f
 	};
 
@@ -241,7 +243,6 @@ public class MLRS : BaseMountable
 	{
 		using (TimeWarning.New("MLRS.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 455279877 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -262,7 +263,7 @@ public class MLRS : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -298,7 +299,7 @@ public class MLRS : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -334,7 +335,7 @@ public class MLRS : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -370,7 +371,7 @@ public class MLRS : BaseMountable
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -409,20 +410,18 @@ public class MLRS : BaseMountable
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		Item item;
 		if (IsBroken())
 		{
 			if (!((float)timeSinceBroken >= brokenDownMinutes * 60f))
 			{
+				Item item;
 				SetFlag(Flags.Reserved8, TryGetAimingModule(out item));
 				return;
 			}
 			SetRepaired();
 		}
-		bool b = TryGetAimingModule(out item);
-		SetFlag(Flags.Reserved8, b);
 		int rocketAmmoCount = RocketAmmoCount;
-		RocketAmmoCount = GetRocketContainer().inventory.GetAmmoAmount(AmmoTypes.MLRS_ROCKET);
+		UpdateStorageState();
 		if (CanBeUsed && IsMounted())
 		{
 			Vector3 userTargetHitPos = UserTargetHitPos;
@@ -489,12 +488,20 @@ public class MLRS : BaseMountable
 		{
 			projectile.pos = hitInfo.point;
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
-			bool num3 = entity != null && entity.EqualNetID(this);
-			if (num3)
+			int num3;
+			if (entity != null)
 			{
-				projectile.pos += projectile.forward * 1f;
+				num3 = (entity.EqualNetID(this) ? 1 : 0);
+				if (num3 != 0)
+				{
+					projectile.pos += projectile.forward * 1f;
+				}
 			}
-			return !num3;
+			else
+			{
+				num3 = 0;
+			}
+			return num3 == 0;
 		}
 		return false;
 	}
@@ -582,12 +589,13 @@ public class MLRS : BaseMountable
 
 	public void Fire(BasePlayer owner)
 	{
-		if (CanFire && !IsFiringRockets && !(_mounted == null) && Interface.CallHook("OnMlrsFire", this, owner) == null)
+		UpdateStorageState();
+		if (CanFire && !(_mounted == null) && Interface.CallHook("OnMlrsFire", this, owner) == null)
 		{
-			nextRocketIndex = Mathf.Min(RocketAmmoCount - 1, rocketTubes.Length - 1);
-			rocketOwnerRef.Set(owner);
 			SetFlag(Flags.Reserved6, true);
 			radiusModIndex = 0;
+			nextRocketIndex = Mathf.Min(RocketAmmoCount - 1, rocketTubes.Length - 1);
+			rocketOwnerRef.Set(owner);
 			InvokeRepeating(FireNextRocket, 0f, 0.5f);
 			Interface.CallHook("OnMlrsFired", this, owner);
 		}
@@ -611,7 +619,8 @@ public class MLRS : BaseMountable
 
 	public void FireNextRocket()
 	{
-		if (nextRocketIndex < 0)
+		RocketAmmoCount = GetRocketContainer().inventory.GetAmmoAmount(AmmoTypes.MLRS_ROCKET);
+		if (nextRocketIndex < 0 || nextRocketIndex >= RocketAmmoCount || IsBroken())
 		{
 			EndFiring();
 			return;
@@ -639,6 +648,14 @@ public class MLRS : BaseMountable
 		{
 			EndFiring();
 		}
+	}
+
+	private void UpdateStorageState()
+	{
+		Item item;
+		bool b = TryGetAimingModule(out item);
+		SetFlag(Flags.Reserved8, b);
+		RocketAmmoCount = GetRocketContainer().inventory.GetAmmoAmount(AmmoTypes.MLRS_ROCKET);
 	}
 
 	public bool TryGetAimingModule(out Item item)
@@ -844,8 +861,7 @@ public class MLRS : BaseMountable
 		vector.Normalize();
 		vector.y = 0f;
 		Vector3 axis = Vector3.Cross(vector, Vector3.up);
-		vector = Quaternion.AngleAxis(num5, axis) * vector;
-		return vector;
+		return Quaternion.AngleAxis(num5, axis) * vector;
 	}
 
 	public static float ProjectileDistToSpeed(float x, float y, float angle, float g, float fallbackV)

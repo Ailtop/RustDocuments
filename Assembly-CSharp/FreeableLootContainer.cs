@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -106,6 +107,7 @@ public class FreeableLootContainer : LootContainer
 			if ((bool)player)
 			{
 				player.ProcessMissionEvent(BaseMission.MissionEventType.FREE_CRATE, "", 1f);
+				Analytics.Server.FreeUnderwaterCrate();
 			}
 		}
 	}

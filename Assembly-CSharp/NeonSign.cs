@@ -56,7 +56,6 @@ public class NeonSign : Signage
 	{
 		using (TimeWarning.New("NeonSign.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 2433901419u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -81,7 +80,7 @@ public class NeonSign : Signage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -121,7 +120,7 @@ public class NeonSign : Signage
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -257,9 +256,9 @@ public class NeonSign : Signage
 		SendNetworkUpdate();
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server]
 	public void UpdateNeonColors(RPCMessage msg)
 	{
 		if (CanUpdateSign(msg.player))

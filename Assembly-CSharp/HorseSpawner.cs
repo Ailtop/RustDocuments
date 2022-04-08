@@ -8,6 +8,8 @@ public class HorseSpawner : VehicleSpawner
 
 	public bool spawnForSale = true;
 
+	protected override bool LogAnalytics => false;
+
 	public override void ServerInit()
 	{
 		base.ServerInit();

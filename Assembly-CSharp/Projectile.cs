@@ -25,7 +25,7 @@ public class Projectile : BaseMonoBehaviour
 		};
 	}
 
-	public const float moveDeltaTime = 0.03125f;
+	public const float moveDeltaTime = 1f / 32f;
 
 	public const float lifeTime = 8f;
 

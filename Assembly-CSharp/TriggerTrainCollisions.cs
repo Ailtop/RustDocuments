@@ -14,13 +14,13 @@ public class TriggerTrainCollisions : TriggerBase
 
 	public ColliderLocation location;
 
-	public BaseTrain owner;
+	public TrainCar owner;
 
 	[NonSerialized]
 	public HashSet<GameObject> staticContents = new HashSet<GameObject>();
 
 	[NonSerialized]
-	public HashSet<BaseTrain> trainContents = new HashSet<BaseTrain>();
+	public HashSet<TrainCar> trainContents = new HashSet<TrainCar>();
 
 	[NonSerialized]
 	public HashSet<Rigidbody> otherRigidbodyContents = new HashSet<Rigidbody>();
@@ -58,7 +58,7 @@ public class TriggerTrainCollisions : TriggerBase
 			Rigidbody componentInParent = obj.GetComponentInParent<Rigidbody>();
 			if (componentInParent != null)
 			{
-				BaseTrain componentInParent2 = obj.GetComponentInParent<BaseTrain>();
+				TrainCar componentInParent2 = obj.GetComponentInParent<TrainCar>();
 				if (componentInParent2 != null)
 				{
 					trainContents.Add(componentInParent2);
@@ -100,7 +100,7 @@ public class TriggerTrainCollisions : TriggerBase
 		}
 		if (!staticContents.Remove(obj))
 		{
-			BaseTrain componentInParent = obj.GetComponentInParent<BaseTrain>();
+			TrainCar componentInParent = obj.GetComponentInParent<TrainCar>();
 			if (componentInParent != null)
 			{
 				if (!_003COnObjectRemoved_003Eg__HasAnotherColliderFor_007C17_0(componentInParent))

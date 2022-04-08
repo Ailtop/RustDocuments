@@ -11,6 +11,8 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 
 	protected virtual bool ShouldAutoCreateEntity => true;
 
+	protected virtual bool OwnedByParentPlayer => false;
+
 	public override void OnItemCreated(Item item)
 	{
 		base.OnItemCreated(item);
@@ -65,24 +67,30 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 
 	public void UpdateParent(Item item)
 	{
+		T associatedEntity = GetAssociatedEntity(item);
+		if ((Object)associatedEntity == (Object)null)
+		{
+			return;
+		}
 		BaseEntity entityForParenting = GetEntityForParenting(item);
 		if (entityForParenting == null)
 		{
 			if (AllowNullParenting)
 			{
-				T associatedEntity = GetAssociatedEntity(item);
-				if ((Object)associatedEntity != (Object)null)
-				{
-					associatedEntity.SetParent(null, false, true);
-				}
+				associatedEntity.SetParent(null, false, true);
+			}
+			if (OwnedByParentPlayer)
+			{
+				associatedEntity.OwnerID = 0uL;
 			}
 		}
 		else if (entityForParenting.isServer && entityForParenting.IsFullySpawned())
 		{
-			T associatedEntity2 = GetAssociatedEntity(item);
-			if ((bool)(Object)associatedEntity2)
+			associatedEntity.SetParent(entityForParenting, false, true);
+			BasePlayer basePlayer;
+			if (OwnedByParentPlayer && (object)(basePlayer = entityForParenting as BasePlayer) != null)
 			{
-				associatedEntity2.SetParent(entityForParenting, false, true);
+				associatedEntity.OwnerID = basePlayer.userID;
 			}
 		}
 	}

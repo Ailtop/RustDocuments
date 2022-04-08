@@ -32,8 +32,13 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 
 	public Renderer[] extraRenderers;
 
+	public bool paint3D;
+
 	[NonSerialized]
 	public bool isSelected;
+
+	[NonSerialized]
+	public Renderer legRenderer;
 
 	private static MaterialPropertyBlock block;
 
@@ -71,6 +76,10 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 					renderer.SetPropertyBlock(block);
 				}
 			}
+		}
+		if (legRenderer != null)
+		{
+			legRenderer.SetPropertyBlock(block);
 		}
 		Pool.FreeList(ref obj);
 	}

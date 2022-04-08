@@ -239,14 +239,22 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 			bool altitudeProtection = num > 15f && position.y < closest.transform.position.y + 10f;
 			brain.GetEntity().EnableFacingOverride(enabled);
 			brain.GetEntity().SetAltitudeProtection(altitudeProtection);
-			bool num2 = Mathf.Abs(closest.transform.position.y - position.y) < 3f && num <= 5f && magnitude < 1f;
-			if (num2)
+			int num2;
+			if (Mathf.Abs(closest.transform.position.y - position.y) < 3f && num <= 5f)
 			{
-				landedForSeconds += delta;
-				if (lastLandtime == 0f)
+				num2 = ((magnitude < 1f) ? 1 : 0);
+				if (num2 != 0)
 				{
-					lastLandtime = Time.time;
+					landedForSeconds += delta;
+					if (lastLandtime == 0f)
+					{
+						lastLandtime = Time.time;
+					}
 				}
+			}
+			else
+			{
+				num2 = 0;
 			}
 			float num3 = 1f - Mathf.InverseLerp(0f, 7f, num);
 			landingHeight -= 4f * num3 * Time.deltaTime;
@@ -267,7 +275,7 @@ public class CH47AIBrain : BaseAIBrain<CH47HelicopterAIController>
 				}
 			}
 			brain.GetEntity().SetMoveTarget(moveTarget);
-			if (num2)
+			if (num2 != 0)
 			{
 				if (landedForSeconds > 1f && Time.time > nextDismountTime)
 				{

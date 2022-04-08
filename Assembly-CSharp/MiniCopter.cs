@@ -214,7 +214,7 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		{
 			return;
 		}
-		if (IsMounted())
+		if (HasDriver())
 		{
 			float num = Vector3.Dot(Vector3.up, base.transform.right);
 			float num2 = Vector3.Dot(Vector3.up, base.transform.forward);

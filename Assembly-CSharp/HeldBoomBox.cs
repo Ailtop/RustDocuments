@@ -17,7 +17,6 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 	{
 		using (TimeWarning.New("HeldBoomBox.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1918716764 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -42,7 +41,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -78,7 +77,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -111,9 +110,9 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 		BoxController.ServerTogglePlay(msg);
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(2uL)]
-	[RPC_Server.IsActiveItem]
 	private void Server_UpdateRadioIP(RPCMessage msg)
 	{
 		BoxController.Server_UpdateRadioIP(msg);

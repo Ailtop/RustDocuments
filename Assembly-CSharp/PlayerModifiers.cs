@@ -52,13 +52,14 @@ public class PlayerModifiers : BaseModifiers<BasePlayer>
 
 	public void SendChangesToClient()
 	{
-		if (dirty)
+		if (!dirty)
 		{
-			SetDirty(false);
-			using (ProtoBuf.PlayerModifiers arg = Save())
-			{
-				base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateModifiers", arg);
-			}
+			return;
+		}
+		SetDirty(false);
+		using (ProtoBuf.PlayerModifiers arg = Save())
+		{
+			base.baseEntity.ClientRPCPlayer(null, base.baseEntity, "UpdateModifiers", arg);
 		}
 	}
 }

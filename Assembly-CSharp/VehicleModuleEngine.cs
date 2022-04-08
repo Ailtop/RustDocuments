@@ -66,6 +66,8 @@ public class VehicleModuleEngine : VehicleModuleStorage
 
 	public bool AtLowPerformance => OverallPerformanceFraction <= 0.5f;
 
+	public bool AtPeakPerformance => Mathf.Approximately(OverallPerformanceFraction, 1f);
+
 	public int KW => engine.engineKW;
 
 	public EngineAudioSet AudioSet => engine.audioSet;

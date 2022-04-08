@@ -58,7 +58,7 @@ public class Climate : SingletonComponent<Climate>
 			float num = Mathf.Abs(sky.SunriseTime - sky.Cycle.Hour);
 			float num2 = Mathf.Abs(sky.SunsetTime - sky.Cycle.Hour);
 			float num3 = (180f - sky.SunZenith) / 180f;
-			float num4 = 0.111111112f;
+			float num4 = 1f / 9f;
 			if (num < num2)
 			{
 				if (num3 < 0.5f)

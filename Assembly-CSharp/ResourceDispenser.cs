@@ -187,6 +187,8 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		hitInfo.gatherScale = 0f;
 		hitInfo.PointStart = info.PointStart;
 		hitInfo.PointEnd = info.PointEnd;
+		hitInfo.WeaponPrefab = info.WeaponPrefab;
+		hitInfo.Weapon = info.Weapon;
 		base.baseEntity.OnAttacked(hitInfo);
 	}
 

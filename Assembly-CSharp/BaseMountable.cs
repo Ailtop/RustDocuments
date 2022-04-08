@@ -110,7 +110,6 @@ public class BaseMountable : BaseCombatEntity
 	{
 		using (TimeWarning.New("BaseMountable.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 1735799362 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -124,7 +123,7 @@ public class BaseMountable : BaseCombatEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -160,7 +159,7 @@ public class BaseMountable : BaseCombatEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -325,7 +324,20 @@ public class BaseMountable : BaseCombatEntity
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (DirectlyMountable() && Interface.CallHook("OnPlayerWantsMount", player, this) == null)
+		if (!player || !player.CanInteract())
+		{
+			return;
+		}
+		if (!DirectlyMountable())
+		{
+			BaseVehicle baseVehicle = VehicleParent();
+			if (baseVehicle != null)
+			{
+				baseVehicle.RPC_WantsMount(msg);
+				return;
+			}
+		}
+		if (Interface.CallHook("OnPlayerWantsMount", player, this) == null)
 		{
 			AttemptMount(player);
 		}
@@ -488,7 +500,7 @@ public class BaseMountable : BaseCombatEntity
 		}
 	}
 
-	public bool ValidDismountPosition(Vector3 disPos, Vector3 visualCheckOrigin)
+	public virtual bool ValidDismountPosition(Vector3 disPos, Vector3 visualCheckOrigin)
 	{
 		bool debugDismounts = Debugging.DebugDismounts;
 		if (debugDismounts)

@@ -85,16 +85,16 @@ public class SantaSleigh : BaseEntity
 
 	public Vector3 RandomDropPosition()
 	{
-		Vector3 vector = Vector3.zero;
+		Vector3 zero = Vector3.zero;
 		float num = 100f;
 		float x = TerrainMeta.Size.x;
 		do
 		{
-			vector = Vector3Ex.Range(0f - x / 3f, x / 3f);
+			zero = Vector3Ex.Range(0f - x / 3f, x / 3f);
 		}
-		while (filter.GetFactor(vector) == 0f && (num -= 1f) > 0f);
-		vector.y = 0f;
-		return vector;
+		while (filter.GetFactor(zero) == 0f && (num -= 1f) > 0f);
+		zero.y = 0f;
+		return zero;
 	}
 
 	public void UpdateDropPosition(Vector3 newDropPosition)

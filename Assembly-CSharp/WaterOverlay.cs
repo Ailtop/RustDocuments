@@ -25,65 +25,53 @@ public class WaterOverlay : MonoBehaviour, IClientComponent
 
 		public bool godRays;
 
-		public static EffectParams DefaultAdmin;
-
-		public static EffectParams DefaultGoggles;
-
-		public static EffectParams DefaultSubmarine;
-
-		public static EffectParams DefaultUnderwaterLab;
-
-		static EffectParams()
+		public static EffectParams DefaultAdmin = new EffectParams
 		{
-			EffectParams effectParams = new EffectParams
-			{
-				scatterCoefficient = 0.025f,
-				blur = false,
-				blurDistance = 10f,
-				blurSize = 2f,
-				wiggle = false,
-				wiggleSpeed = 0f,
-				chromaticAberration = true,
-				godRays = false
-			};
-			DefaultAdmin = effectParams;
-			effectParams = new EffectParams
-			{
-				scatterCoefficient = 0.05f,
-				blur = true,
-				blurDistance = 10f,
-				blurSize = 2f,
-				wiggle = true,
-				wiggleSpeed = 2f,
-				chromaticAberration = true,
-				godRays = true
-			};
-			DefaultGoggles = effectParams;
-			effectParams = new EffectParams
-			{
-				scatterCoefficient = 0.025f,
-				blur = false,
-				blurDistance = 10f,
-				blurSize = 2f,
-				wiggle = false,
-				wiggleSpeed = 0f,
-				chromaticAberration = false,
-				godRays = false
-			};
-			DefaultSubmarine = effectParams;
-			effectParams = new EffectParams
-			{
-				scatterCoefficient = 0.005f,
-				blur = false,
-				blurDistance = 10f,
-				blurSize = 2f,
-				wiggle = false,
-				wiggleSpeed = 0f,
-				chromaticAberration = true,
-				godRays = false
-			};
-			DefaultUnderwaterLab = effectParams;
-		}
+			scatterCoefficient = 0.025f,
+			blur = false,
+			blurDistance = 10f,
+			blurSize = 2f,
+			wiggle = false,
+			wiggleSpeed = 0f,
+			chromaticAberration = true,
+			godRays = false
+		};
+
+		public static EffectParams DefaultGoggles = new EffectParams
+		{
+			scatterCoefficient = 0.05f,
+			blur = true,
+			blurDistance = 10f,
+			blurSize = 2f,
+			wiggle = true,
+			wiggleSpeed = 2f,
+			chromaticAberration = true,
+			godRays = true
+		};
+
+		public static EffectParams DefaultSubmarine = new EffectParams
+		{
+			scatterCoefficient = 0.025f,
+			blur = false,
+			blurDistance = 10f,
+			blurSize = 2f,
+			wiggle = false,
+			wiggleSpeed = 0f,
+			chromaticAberration = false,
+			godRays = false
+		};
+
+		public static EffectParams DefaultUnderwaterLab = new EffectParams
+		{
+			scatterCoefficient = 0.005f,
+			blur = false,
+			blurDistance = 10f,
+			blurSize = 2f,
+			wiggle = false,
+			wiggleSpeed = 0f,
+			chromaticAberration = true,
+			godRays = false
+		};
 	}
 
 	public PostProcessVolume postProcessVolume;

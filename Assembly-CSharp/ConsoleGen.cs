@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[807]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[814]
 	{
 		new ConsoleSystem.Command
 		{
@@ -9379,16 +9379,119 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "steamconnectiontimeout",
+			Parent = "global",
+			FullName = "global.steamconnectiontimeout",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamconnectiontimeout.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamconnectiontimeout = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "steamnetdebug",
 			Parent = "global",
 			FullName = "global.steamnetdebug",
 			ServerAdmin = true,
-			Description = "Turns on varying levels of debug output for the Steam Networking. This will affect performance. (0 = off, 8 = max)",
+			Description = "Turns on varying levels of debug output for the Steam Networking. This will affect performance. (0 = off, 1 = bug, 2 = error, 3 = important, 4 = warning, 5 = message, 6 = verbose, 7 = debug, 8 = everything)",
 			Variable = true,
 			GetOveride = () => SteamNetworking.steamnetdebug.ToString(),
 			SetOveride = delegate(string str)
 			{
-				SteamNetworking.steamnetdebug = str.ToFloat();
+				SteamNetworking.steamnetdebug = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamnetdebug_ackrtt",
+			Parent = "global",
+			FullName = "global.steamnetdebug_ackrtt",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamnetdebug_ackrtt.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamnetdebug_ackrtt = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamnetdebug_message",
+			Parent = "global",
+			FullName = "global.steamnetdebug_message",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamnetdebug_message.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamnetdebug_message = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamnetdebug_p2prendezvous",
+			Parent = "global",
+			FullName = "global.steamnetdebug_p2prendezvous",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamnetdebug_p2prendezvous.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamnetdebug_p2prendezvous = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamnetdebug_packetdecode",
+			Parent = "global",
+			FullName = "global.steamnetdebug_packetdecode",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamnetdebug_packetdecode.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamnetdebug_packetdecode = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamnetdebug_packetgaps",
+			Parent = "global",
+			FullName = "global.steamnetdebug_packetgaps",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamnetdebug_packetgaps.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamnetdebug_packetgaps = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamnetdebug_sdrrelaypings",
+			Parent = "global",
+			FullName = "global.steamnetdebug_sdrrelaypings",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => SteamNetworking.steamnetdebug_sdrrelaypings.ToString(),
+			SetOveride = delegate(string str)
+			{
+				SteamNetworking.steamnetdebug_sdrrelaypings = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "steamrelayinit",
+			Parent = "global",
+			FullName = "global.steamrelayinit",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate
+			{
+				SteamNetworking.steamrelayinit();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9403,19 +9506,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				SteamNetworking.steamsendbuffer = str.ToInt();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "steamsendverify",
-			Parent = "global",
-			FullName = "global.steamsendverify",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => SteamNetworking.steamsendverify.ToString(),
-			SetOveride = delegate(string str)
-			{
-				SteamNetworking.steamsendverify = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command

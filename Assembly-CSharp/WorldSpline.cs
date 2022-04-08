@@ -17,9 +17,27 @@ public class WorldSpline : MonoBehaviour
 
 	private static List<Vector3> visualSplineList = new List<Vector3>();
 
+	private WorldSplineData privateData;
+
 	public WorldSplineData GetData()
 	{
-		return WorldSplineSharedData.GetDataFor(this);
+		WorldSplineData data;
+		if (WorldSplineSharedData.TryGetDataFor(this, out data))
+		{
+			return data;
+		}
+		if (Application.isPlaying && privateData == null)
+		{
+			privateData = new WorldSplineData(this);
+		}
+		return privateData;
+	}
+
+	public void SetAll(Vector3[] points, Vector3[] tangents, float lutInterval)
+	{
+		this.points = points;
+		this.tangents = tangents;
+		this.lutInterval = lutInterval;
 	}
 
 	public void CheckValidity()
@@ -141,12 +159,26 @@ public class WorldSpline : MonoBehaviour
 
 	public Vector3 GetPointCubicHermiteWorld(float distance)
 	{
-		return GetPointCubicHermiteWorld(distance, GetData());
+		return base.transform.TransformPoint(GetData().GetPointCubicHermite(distance));
 	}
 
 	public Vector3 GetPointCubicHermiteWorld(float distance, WorldSplineData data)
 	{
 		return base.transform.TransformPoint(data.GetPointCubicHermite(distance));
+	}
+
+	public Vector3 GetPointAndTangentCubicHermiteWorld(float distance, out Vector3 tangent)
+	{
+		Vector3 pointAndTangentCubicHermite = GetData().GetPointAndTangentCubicHermite(distance, out tangent);
+		tangent = base.transform.TransformDirection(tangent);
+		return base.transform.TransformPoint(pointAndTangentCubicHermite);
+	}
+
+	public Vector3 GetPointAndTangentCubicHermiteWorld(float distance, WorldSplineData data, out Vector3 tangent)
+	{
+		Vector3 pointAndTangentCubicHermite = data.GetPointAndTangentCubicHermite(distance, out tangent);
+		tangent = base.transform.TransformDirection(tangent);
+		return base.transform.TransformPoint(pointAndTangentCubicHermite);
 	}
 
 	public Vector3[] GetPointsWorld()

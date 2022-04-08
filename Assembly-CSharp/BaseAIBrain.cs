@@ -753,7 +753,6 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 	{
 		using (TimeWarning.New("BaseAIBrain<T>.OnRpcMessage"))
 		{
-			BaseEntity.RPCMessage rPCMessage;
 			if (rpc == 66191493 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -767,7 +766,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(BaseEntity.RPCMessage);
+							BaseEntity.RPCMessage rPCMessage = default(BaseEntity.RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -796,7 +795,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(BaseEntity.RPCMessage);
+							BaseEntity.RPCMessage rPCMessage = default(BaseEntity.RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -825,7 +824,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(BaseEntity.RPCMessage);
+							BaseEntity.RPCMessage rPCMessage = default(BaseEntity.RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -1106,12 +1105,13 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					ProtoBuf.AIDesign.Serialize(stream2, aIDesign);
 				}
 				AIDesigns.RefreshCache(filename, aIDesign);
+				break;
 			}
 			catch (Exception)
 			{
 				Debug.LogWarning("Error trying to save default AI Design: " + text);
+				break;
 			}
-			break;
 		case AIDesignScope.EntityServerWide:
 			filename += "_custom";
 			text += filename;
@@ -1122,12 +1122,13 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					ProtoBuf.AIDesign.Serialize(stream, aIDesign);
 				}
 				AIDesigns.RefreshCache(filename, aIDesign);
+				break;
 			}
 			catch (Exception)
 			{
 				Debug.LogWarning("Error trying to save server-wide AI Design: " + text);
+				break;
 			}
-			break;
 		case AIDesignScope.EntityInstance:
 			break;
 		}

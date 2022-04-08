@@ -49,7 +49,6 @@ public class BaseLiquidVessel : AttackEntity
 	{
 		using (TimeWarning.New("BaseLiquidVessel.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 4013436649u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -70,7 +69,7 @@ public class BaseLiquidVessel : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -99,7 +98,7 @@ public class BaseLiquidVessel : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -128,7 +127,7 @@ public class BaseLiquidVessel : AttackEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;

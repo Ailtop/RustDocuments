@@ -10,17 +10,15 @@ using UnityEngine.Assertions;
 
 public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 {
-	public float nextInputTime;
-
 	public float steerInput;
 
 	public float throttleInput;
 
 	private float brakeInput;
 
-	public float extensionInput;
-
 	public float yawInput;
+
+	public float extensionInput;
 
 	public float raiseArmInput;
 
@@ -54,7 +52,13 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 
 	public VehicleTerrainHandler serverTerrainHandler;
 
-	private Vector3 inertiaTensor = new Vector3(25000f, 11000f, 19000f);
+	private Vector3 customInertiaTensor = new Vector3(25000f, 11000f, 19000f);
+
+	public float extensionArmState;
+
+	public float raiseArmState;
+
+	public float yawState = 1f;
 
 	[Header("Magnet Crane")]
 	public Animator animator;
@@ -105,6 +109,12 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 	private Transform rightHandTarget;
 
 	[SerializeField]
+	private Transform leftFootTarget;
+
+	[SerializeField]
+	private Transform rightFootTarget;
+
+	[SerializeField]
 	public float idleFuelPerSec;
 
 	[SerializeField]
@@ -131,19 +141,24 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 	[SerializeField]
 	private ParticleSystem exhaustOuter;
 
+	[SerializeField]
+	private EmissionToggle lightToggle;
+
 	public static readonly Translate.Phrase ReturnMessage = new Translate.Phrase("junkyardcrane.return", "Return to the Junkyard. Excessive damage will occur.");
-
-	public float extensionArmState;
-
-	public float raiseArmState;
-
-	public float yawState = 5f;
-
-	private float testPreviousYaw = 5f;
 
 	private const Flags Flag_ArmMovement = Flags.Reserved7;
 
 	private const Flags Flag_BaseMovementInput = Flags.Reserved10;
+
+	private static int leftTreadParam = Animator.StringToHash("left tread movement");
+
+	private static int rightTreadParam = Animator.StringToHash("right tread movement");
+
+	private static int yawParam = Animator.StringToHash("Yaw");
+
+	private static int arm1Param = Animator.StringToHash("Arm_01");
+
+	private static int arm2Param = Animator.StringToHash("Arm_02");
 
 	public VehicleTerrainHandler.Surface OnSurface
 	{
@@ -205,7 +220,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 		myRigidbody.centerOfMass = COM.localPosition;
 		carPhysics = new CarPhysics<MagnetCrane>(this, base.transform, rigidBody, carSettings);
 		serverTerrainHandler = new VehicleTerrainHandler(this);
-		Magnet.SetMagnetEnabled(false);
+		Magnet.SetMagnetEnabled(false, null);
 		spawnOrigin = base.transform.position;
 		lastDrivenTime = UnityEngine.Time.realtimeSinceStartup;
 		GameObject[] onTriggers = OnTriggers;
@@ -239,7 +254,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 			bool num = inputState.IsDown(BUTTON.SPRINT);
 			if (inputState.IsDown(BUTTON.RELOAD) && UnityEngine.Time.realtimeSinceStartup > nextToggleTime)
 			{
-				Magnet.SetMagnetEnabled(!Magnet.IsMagnetOn());
+				Magnet.SetMagnetEnabled(!Magnet.IsMagnetOn(), player);
 				nextToggleTime = UnityEngine.Time.realtimeSinceStartup + 0.5f;
 			}
 			if (num)
@@ -278,35 +293,40 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 					steerInput = 1f;
 				}
 			}
-			else if (UnityEngine.Time.realtimeSinceStartup >= nextInputTime)
+			else
 			{
-				if (inputState.IsDown(BUTTON.RIGHT))
-				{
-					yawInput = -1f;
-				}
 				if (inputState.IsDown(BUTTON.LEFT))
 				{
 					yawInput = 1f;
+				}
+				else if (inputState.IsDown(BUTTON.RIGHT))
+				{
+					yawInput = -1f;
+				}
+				else if (inputState.IsDown(BUTTON.DUCK))
+				{
+					float @float = animator.GetFloat(yawParam);
+					if (@float > 0.01f && @float < 0.99f)
+					{
+						yawInput = ((@float <= 0.5f) ? (-1f) : 1f);
+					}
 				}
 				if (inputState.IsDown(BUTTON.FORWARD))
 				{
 					raiseArmInput = 1f;
 				}
-				if (inputState.IsDown(BUTTON.BACKWARD))
+				else if (inputState.IsDown(BUTTON.BACKWARD))
 				{
 					raiseArmInput = -1f;
 				}
 			}
-			if (UnityEngine.Time.realtimeSinceStartup >= nextInputTime)
+			if (inputState.IsDown(BUTTON.FIRE_PRIMARY))
 			{
-				if (inputState.IsDown(BUTTON.FIRE_PRIMARY))
-				{
-					extensionInput = 1f;
-				}
-				if (inputState.IsDown(BUTTON.FIRE_SECONDARY))
-				{
-					extensionInput = -1f;
-				}
+				extensionInput = 1f;
+			}
+			if (inputState.IsDown(BUTTON.FIRE_SECONDARY))
+			{
+				extensionInput = -1f;
 			}
 		}
 		handbrakeOn = throttleInput == 0f && steerInput == 0f;
@@ -339,7 +359,8 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		rigidBody.inertiaTensor = inertiaTensor;
+		rigidBody.ResetInertiaTensor();
+		rigidBody.inertiaTensor = Vector3.Lerp(rigidBody.inertiaTensor, customInertiaTensor, 0.5f);
 		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
 		float num = Mathf.Clamp(realtimeSinceStartup - lastFixedUpdateTime, 0f, 0.5f);
 		lastFixedUpdateTime = realtimeSinceStartup;
@@ -404,30 +425,35 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 			throttleInput = 0f;
 			steerInput = 0f;
 			SetFlag(Flags.Reserved10, false);
-			Magnet.SetMagnetEnabled(false);
+			Magnet.SetMagnetEnabled(false, null);
 		}
 		else
 		{
 			lastDrivenTime = realtimeSinceStartup;
 			if (Magnet.IsMagnetOn() && Magnet.HasConnectedObject() && GamePhysics.CheckOBB(Magnet.GetConnectedOBB(0.75f), 1084293121, QueryTriggerInteraction.Ignore))
 			{
-				Magnet.SetMagnetEnabled(false);
+				Magnet.SetMagnetEnabled(false, null);
 				nextToggleTime = realtimeSinceStartup + 2f;
 				Effect.server.Run(selfDamageEffect.resourcePath, Magnet.transform.position, Vector3.up);
 			}
 		}
-		extensionMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C33_0(extensionInput, extensionMove, 3f, UnityEngine.Time.fixedDeltaTime);
-		yawMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C33_0(yawInput, yawMove, 3f, UnityEngine.Time.fixedDeltaTime);
-		raiseArmMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C33_0(raiseArmInput, raiseArmMove, 3f, UnityEngine.Time.fixedDeltaTime);
+		extensionMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C35_0(extensionInput, extensionMove, 3f, UnityEngine.Time.fixedDeltaTime);
+		yawMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C35_0(yawInput, yawMove, 3f, UnityEngine.Time.fixedDeltaTime);
+		raiseArmMove = _003CVehicleFixedUpdate_003Eg__UpdateMoveInput_007C35_0(raiseArmInput, raiseArmMove, 3f, UnityEngine.Time.fixedDeltaTime);
 		bool flag2 = extensionInput != 0f || raiseArmInput != 0f || yawInput != 0f;
 		SetFlag(Flags.Reserved7, flag2);
 		magnetDamage.damageEnabled = IsOn() && flag2;
 		extensionArmState += extensionInput * arm1Speed * num;
 		raiseArmState += raiseArmInput * arm2Speed * num;
 		yawState += yawInput * turnYawSpeed * num;
+		yawState %= 1f;
+		if (yawState < 0f)
+		{
+			yawState += 1f;
+		}
 		extensionArmState = Mathf.Clamp(extensionArmState, -1f, 1f);
 		raiseArmState = Mathf.Clamp(raiseArmState, -1f, 1f);
-		UpdateAnimator(UnityEngine.Time.fixedDeltaTime, false);
+		UpdateAnimator(UnityEngine.Time.fixedDeltaTime);
 		Magnet.MagnetThink(UnityEngine.Time.fixedDeltaTime);
 		SetFlag(Flags.Reserved10, throttleInput != 0f || steerInput != 0f);
 	}
@@ -439,6 +465,11 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 		info.msg.crane.arm1 = extensionArmState;
 		info.msg.crane.arm2 = raiseArmState;
 		info.msg.crane.yaw = yawState;
+		info.msg.crane.time = GetNetworkTime();
+		byte num = (byte)((carPhysics.TankThrottleLeft + 1f) * 7f);
+		byte b = (byte)((carPhysics.TankThrottleRight + 1f) * 7f);
+		byte treadInput = (byte)(num + (b << 4));
+		info.msg.crane.treadInput = treadInput;
 	}
 
 	public void UpdateParams()
@@ -448,29 +479,24 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 
 	public void LateUpdate()
 	{
-		if (base.isClient)
+		if (!base.isClient)
 		{
-			return;
-		}
-		if (HasDriver() && DidCollide())
-		{
-			if (UnityEngine.Time.realtimeSinceStartup > nextInputTime)
+			if (HasDriver() && IsColliding())
 			{
-				nextInputTime = UnityEngine.Time.realtimeSinceStartup + 0.5f;
 				extensionArmState = lastExtensionArmState;
 				raiseArmState = lastRaiseArmState;
 				yawState = lastYawState;
 				extensionInput = 0f - extensionInput;
 				yawInput = 0f - yawInput;
 				raiseArmInput = 0f - raiseArmInput;
+				UpdateAnimator(UnityEngine.Time.deltaTime);
 			}
-			UpdateAnimator(UnityEngine.Time.deltaTime, false);
-		}
-		else
-		{
-			lastExtensionArmState = extensionArmState;
-			lastRaiseArmState = raiseArmState;
-			lastYawState = yawState;
+			else
+			{
+				lastExtensionArmState = extensionArmState;
+				lastRaiseArmState = raiseArmState;
+				lastYawState = yawState;
+			}
 		}
 	}
 
@@ -507,7 +533,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 		base.OnKilled(info);
 	}
 
-	public bool DidCollide()
+	public bool IsColliding()
 	{
 		Transform[] array = collisionTestingPoints;
 		foreach (Transform transform in array)
@@ -547,6 +573,13 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 		return 0f;
 	}
 
+	public void UpdateAnimator(float dt)
+	{
+		animator.SetFloat("Arm_01", extensionArmState);
+		animator.SetFloat("Arm_02", raiseArmState);
+		animator.SetFloat("Yaw", yawState);
+	}
+
 	[RPC_Server]
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
@@ -582,31 +615,12 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.crane != null)
+		if (info.msg.crane != null && base.isServer)
 		{
 			yawState = info.msg.crane.yaw;
 			extensionArmState = info.msg.crane.arm1;
 			raiseArmState = info.msg.crane.arm2;
 		}
-	}
-
-	public void UpdateAnimator(float dt, bool shouldLerp = true)
-	{
-		float @float = animator.GetFloat("Arm_01");
-		float float2 = animator.GetFloat("Arm_02");
-		animator.SetFloat("Arm_01", shouldLerp ? Mathf.Lerp(@float, extensionArmState, dt * 6f) : extensionArmState);
-		animator.SetFloat("Arm_02", shouldLerp ? Mathf.Lerp(float2, raiseArmState, dt * 6f) : raiseArmState);
-		float num = Mathf.Lerp(testPreviousYaw, yawState, dt * 6f);
-		if (num % 1f < 0f)
-		{
-			num += 1f;
-		}
-		if (yawState % 1f < 0f)
-		{
-			yawState += 1f;
-		}
-		animator.SetFloat("Yaw", (shouldLerp ? num : yawState) % 1f);
-		testPreviousYaw = num;
 	}
 
 	public override float GetMaxForwardSpeed()

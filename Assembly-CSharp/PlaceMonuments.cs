@@ -64,7 +64,7 @@ public class PlaceMonuments : ProceduralComponent
 
 	public const int GroupCandidates = 10;
 
-	public const int IndividualCandidates = 100;
+	public const int IndividualCandidates = 10;
 
 	public const int Attempts = 10000;
 
@@ -241,7 +241,7 @@ public class PlaceMonuments : ProceduralComponent
 							item = spawnInfo;
 						}
 						num5++;
-						if (num5 >= 100 || DistanceDifferentType == DistanceMode.Any)
+						if (num5 >= 10 || DistanceDifferentType == DistanceMode.Any)
 						{
 							break;
 						}

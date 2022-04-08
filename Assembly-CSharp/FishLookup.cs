@@ -13,6 +13,10 @@ public class FishLookup : PrefabAttribute
 
 	private static TimeSince lastShuffle;
 
+	public const int ALL_FISH_COUNT = 9;
+
+	public const string ALL_FISH_ACHIEVEMENT_NAME = "PRO_ANGLER";
+
 	public static void LoadFish()
 	{
 		if (AvailableFish != null)
@@ -72,6 +76,24 @@ public class FishLookup : PrefabAttribute
 		}
 		fishable = FallbackFish;
 		return FallbackFish.GetComponent<ItemDefinition>();
+	}
+
+	public void CheckCatchAllAchievement(BasePlayer player)
+	{
+		LoadFish();
+		int num = 0;
+		ItemModFishable[] availableFish = AvailableFish;
+		foreach (ItemModFishable itemModFishable in availableFish)
+		{
+			if (!string.IsNullOrEmpty(itemModFishable.SteamStatName) && player.stats.steam.Get(itemModFishable.SteamStatName) > 0)
+			{
+				num++;
+			}
+		}
+		if (num == 9)
+		{
+			player.GiveAchievement("PRO_ANGLER");
+		}
 	}
 
 	protected override Type GetIndexedType()

@@ -40,6 +40,11 @@ public class GunTrap : StorageContainer
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	public override string Categorize()
+	{
+		return "GunTrap";
+	}
+
 	public bool UseAmmo()
 	{
 		foreach (Item item in base.inventory.itemList)

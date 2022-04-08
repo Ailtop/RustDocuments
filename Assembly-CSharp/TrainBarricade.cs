@@ -18,7 +18,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 	[SerializeField]
 	private GameObjectRef barricadeDamageEffect;
 
-	private BaseTrain hitTrain;
+	private TrainCar hitTrain;
 
 	private TriggerTrainCollisions hitTrainTrigger;
 
@@ -28,7 +28,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 
 	public float FrontWheelSplineDist { get; private set; }
 
-	public bool CustomCollision(BaseTrain train, TriggerTrainCollisions trainTrigger)
+	public bool CustomCollision(TrainCar train, TriggerTrainCollisions trainTrigger)
 	{
 		bool result = false;
 		if (base.isServer)
@@ -70,7 +70,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 		base.DoServerDestroy();
 	}
 
-	private void SetHitTrain(BaseTrain train, TriggerTrainCollisions trainTrigger)
+	private void SetHitTrain(TrainCar train, TriggerTrainCollisions trainTrigger)
 	{
 		hitTrain = train;
 		hitTrainTrigger = trainTrigger;

@@ -265,11 +265,11 @@ public class OcclusionCulling : MonoBehaviour
 	[Flags]
 	public enum DebugMask
 	{
-		Off = 0x0,
-		Dynamic = 0x1,
-		Static = 0x2,
-		Grid = 0x4,
-		All = 0x7
+		Off = 0,
+		Dynamic = 1,
+		Static = 2,
+		Grid = 4,
+		All = 7
 	}
 
 	[Serializable]

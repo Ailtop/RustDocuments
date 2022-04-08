@@ -497,14 +497,15 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public void Server_RequestPhoneDirectory(BaseEntity.RPCMessage msg)
 	{
-		if (!(msg.player != currentPlayer))
+		if (msg.player != currentPlayer)
 		{
-			int page = msg.read.Int32();
-			using (PhoneDirectory phoneDirectory = Pool.Get<PhoneDirectory>())
-			{
-				TelephoneManager.GetPhoneDirectory(PhoneNumber, page, 12, phoneDirectory);
-				base.baseEntity.ClientRPC(null, "ReceivePhoneDirectory", phoneDirectory);
-			}
+			return;
+		}
+		int page = msg.read.Int32();
+		using (PhoneDirectory phoneDirectory = Pool.Get<PhoneDirectory>())
+		{
+			TelephoneManager.GetPhoneDirectory(PhoneNumber, page, 12, phoneDirectory);
+			base.baseEntity.ClientRPC(null, "ReceivePhoneDirectory", phoneDirectory);
 		}
 	}
 

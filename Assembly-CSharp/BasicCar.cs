@@ -117,8 +117,8 @@ public class BasicCar : BaseVehicle
 		ConvertInputToThrottle();
 		DoSteering();
 		ApplyForceAtWheels();
-		SetFlag(Flags.Reserved1, IsMounted());
-		SetFlag(Flags.Reserved2, IsMounted() && lightsOn);
+		SetFlag(Flags.Reserved1, HasDriver());
+		SetFlag(Flags.Reserved2, HasDriver() && lightsOn);
 	}
 
 	public void DoSteering()

@@ -25,4 +25,8 @@ public class MainMenuSystem : SingletonComponent<MainMenuSystem>
 	public GameObject SuicideButton;
 
 	public GameObject EndDemoButton;
+
+	public GameObject ReflexModeOption;
+
+	public GameObject ReflexLatencyMarkerOption;
 }

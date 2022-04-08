@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
+using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -43,9 +45,9 @@ public class BaseFishingRod : HeldEntity
 	[Flags]
 	public enum FishState
 	{
-		PullingLeft = 0x1,
-		PullingRight = 0x2,
-		PullingBack = 0x4
+		PullingLeft = 1,
+		PullingRight = 2,
+		PullingBack = 4
 	}
 
 	public enum FailReason
@@ -152,11 +154,10 @@ public class BaseFishingRod : HeldEntity
 	{
 		using (TimeWarning.New("BaseFishingRod.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 4237324865u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_Cancel "));
 				}
@@ -173,7 +174,7 @@ public class BaseFishingRod : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -192,7 +193,7 @@ public class BaseFishingRod : HeldEntity
 			if (rpc == 4238539495u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestCast "));
 				}
@@ -209,7 +210,7 @@ public class BaseFishingRod : HeldEntity
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -473,7 +474,13 @@ public class BaseFishingRod : HeldEntity
 				{
 					item.name = RandomUsernames.Get(UnityEngine.Random.Range(0, 1000));
 				}
+				if (Rust.GameInfo.HasAchievements && !string.IsNullOrEmpty(fishableModifier.SteamStatName))
+				{
+					ownerPlayer.stats.Add(fishableModifier.SteamStatName, 1);
+					fishLookup.CheckCatchAllAchievement(ownerPlayer);
+				}
 			}
+			Facepunch.Rust.Analytics.Server.FishCaught(currentFishTarget);
 			ClientRPC(null, "Client_OnCaughtFish", currentFishTarget.itemid);
 			ownerPlayer.SignalBroadcast(Signal.Alt_Attack);
 			Invoke(ResetLine, 6f);

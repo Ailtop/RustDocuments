@@ -16,11 +16,11 @@ public class Item
 	[Flags]
 	public enum Flag
 	{
-		None = 0x0,
-		Placeholder = 0x1,
-		IsOn = 0x2,
-		OnFire = 0x4,
-		IsLocked = 0x8,
+		None = 0,
+		Placeholder = 1,
+		IsOn = 2,
+		OnFire = 4,
+		IsLocked = 8,
 		Cooking = 0x10
 	}
 

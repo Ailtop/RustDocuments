@@ -36,7 +36,6 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	{
 		using (TimeWarning.New("NPCTalking.OnRpcMessage"))
 		{
-			RPCMessage rPCMessage;
 			if (rpc == 4224060672u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -61,7 +60,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -101,7 +100,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -141,7 +140,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -181,7 +180,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 					{
 						using (TimeWarning.New("Call"))
 						{
-							rPCMessage = default(RPCMessage);
+							RPCMessage rPCMessage = default(RPCMessage);
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
@@ -313,9 +312,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		Interface.CallHook("OnNpcConversationEnded", this, msg.player);
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void ConversationAction(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -336,9 +335,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	public void Server_ResponsePressed(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -385,8 +384,11 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 			if (vendingMachine != null && Vector3.Distance(player.transform.position, base.transform.position) < 5f)
 			{
 				ForceEndConversation(player);
-				vendingMachine.PlayerOpenLoot(player, "vendingmachine.customer", false);
-				Interface.CallHook("OnOpenVendingShop", vendingMachine, player);
+				if (Interface.CallHook("OnVendingShopOpen", vendingMachine, player) == null)
+				{
+					vendingMachine.PlayerOpenLoot(player, "vendingmachine.customer", false);
+					Interface.CallHook("OnVendingShopOpened", vendingMachine, player);
+				}
 				return;
 			}
 		}

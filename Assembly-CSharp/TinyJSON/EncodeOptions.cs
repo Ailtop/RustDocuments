@@ -5,12 +5,12 @@ namespace TinyJSON
 	[Flags]
 	public enum EncodeOptions
 	{
-		None = 0x0,
-		PrettyPrint = 0x1,
-		NoTypeHints = 0x2,
-		IncludePublicProperties = 0x4,
-		EnforceHierarchyOrder = 0x8,
+		None = 0,
+		PrettyPrint = 1,
+		NoTypeHints = 2,
+		IncludePublicProperties = 4,
+		EnforceHierarchyOrder = 8,
 		[Obsolete("Use EncodeOptions.EnforceHierarchyOrder instead.")]
-		EnforceHeirarchyOrder = 0x8
+		EnforceHeirarchyOrder = 8
 	}
 }
