@@ -19,8 +19,6 @@ public class GenerateRiverLayout : ProceduralComponent
 
 	public const float TerrainOffset = -1.5f;
 
-	private const int Smoothen = 4;
-
 	public override void Process(uint seed)
 	{
 		if (World.Networked)
@@ -83,6 +81,7 @@ public class GenerateRiverLayout : ProceduralComponent
 						{
 							int num8 = TerrainMeta.Path.Rivers.Count + list.Count;
 							PathList pathList = new PathList("River " + num8, list2.ToArray());
+							pathList.Spline = true;
 							pathList.Width = 36f;
 							pathList.InnerPadding = 1f;
 							pathList.OuterPadding = 1f;
@@ -181,7 +180,10 @@ public class GenerateRiverLayout : ProceduralComponent
 		}
 		foreach (PathList item in list)
 		{
-			item.Path.Smoothen(4);
+			item.Path.Smoothen(4, new Vector3(1f, 0f, 1f));
+			item.Path.Smoothen(8, new Vector3(0f, 1f, 0f));
+			item.Path.RecalculateLength();
+			item.Path.Resample(7.5f);
 			item.Path.RecalculateTangents();
 		}
 		TerrainMeta.Path.Rivers.AddRange(list);

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[814]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[822]
 	{
 		new ConsoleSystem.Command
 		{
@@ -1636,6 +1636,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.npc_junkpile_g_spawn_chance = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "npc_junkpilespawn_chance",
+			Parent = "ai",
+			FullName = "ai.npc_junkpilespawn_chance",
+			ServerAdmin = true,
+			Description = "defines the chance for scientists to spawn at NPC junkpiles. (Default: 0.1)",
+			Variable = true,
+			GetOveride = () => AI.npc_junkpilespawn_chance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AI.npc_junkpilespawn_chance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7931,6 +7945,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "statbackup",
+			Parent = "server",
+			FullName = "server.statbackup",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.statBackup.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.statBackup = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "stats",
 			Parent = "server",
 			FullName = "server.stats",
@@ -8556,6 +8583,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "stop_all_trains",
+			Parent = "vehicle",
+			FullName = "vehicle.stop_all_trains",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				vehicle.stop_all_trains(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "swapseats",
 			Parent = "vehicle",
 			FullName = "vehicle.swapseats",
@@ -8564,6 +8603,20 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				vehicle.swapseats(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "trainskeeprunning",
+			Parent = "vehicle",
+			FullName = "vehicle.trainskeeprunning",
+			ServerAdmin = true,
+			Description = "Determines whether trains stop automatically when there's no-one on them. Default: false",
+			Variable = true,
+			GetOveride = () => vehicle.trainskeeprunning.ToString(),
+			SetOveride = delegate(string str)
+			{
+				vehicle.trainskeeprunning = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -10776,6 +10829,49 @@ public class ConsoleGen
 		new ConsoleSystem.Command
 		{
 			Name = "population",
+			Parent = "traincar",
+			FullName = "traincar.population",
+			ServerAdmin = true,
+			Description = "Population active on the server",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => TrainCar.population.ToString(),
+			SetOveride = delegate(string str)
+			{
+				TrainCar.population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wagons_per_engine",
+			Parent = "traincar",
+			FullName = "traincar.wagons_per_engine",
+			ServerAdmin = true,
+			Description = "Ratio of wagons to train engines that spawn",
+			Variable = true,
+			GetOveride = () => TrainCar.wagons_per_engine.ToString(),
+			SetOveride = delegate(string str)
+			{
+				TrainCar.wagons_per_engine = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "max_couple_speed",
+			Parent = "traincouplingcontroller",
+			FullName = "traincouplingcontroller.max_couple_speed",
+			ServerAdmin = true,
+			Description = "Maximum difference in velocity for train cars to couple",
+			Variable = true,
+			GetOveride = () => TrainCouplingController.max_couple_speed.ToString(),
+			SetOveride = delegate(string str)
+			{
+				TrainCouplingController.max_couple_speed = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "population",
 			Parent = "wolf",
 			FullName = "wolf.population",
 			ServerAdmin = true,
@@ -10786,6 +10882,18 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Wolf.Population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "report",
+			Parent = "ziplinelaunchpoint",
+			FullName = "ziplinelaunchpoint.report",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ZiplineLaunchPoint.report(arg);
 			}
 		},
 		new ConsoleSystem.Command

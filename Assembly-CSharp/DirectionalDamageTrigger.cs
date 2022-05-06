@@ -57,7 +57,7 @@ public class DirectionalDamageTrigger : TriggerBase
 		BaseEntity[] array = entityContents.ToArray();
 		foreach (BaseEntity baseEntity in array)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (BaseNetworkableEx.IsValid(baseEntity))
 			{
 				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
 				if (!(baseCombatEntity == null))

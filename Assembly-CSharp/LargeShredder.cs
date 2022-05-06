@@ -78,7 +78,7 @@ public class LargeShredder : BaseEntity
 		if (component.associatedPlayer != null && Rust.GameInfo.HasAchievements)
 		{
 			component.associatedPlayer.stats.Add("cars_shredded", 1);
-			component.associatedPlayer.stats.Save();
+			component.associatedPlayer.stats.Save(forceSteamSave: true);
 		}
 		ItemAmount[] shredResources = component.shredResources;
 		foreach (ItemAmount itemAmount in shredResources)

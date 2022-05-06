@@ -104,6 +104,14 @@ public class BaseRidableAnimal : BaseVehicle
 
 	private float dungProduction;
 
+	protected float prevStamina;
+
+	protected float prevMaxStamina;
+
+	protected int prevRunState;
+
+	protected float prevMaxSpeed;
+
 	[Header("Stamina")]
 	public float staminaSeconds = 10f;
 
@@ -1384,9 +1392,17 @@ public class BaseRidableAnimal : BaseVehicle
 		return false;
 	}
 
-	public void DoNetworkUpdate()
+	public virtual void DoNetworkUpdate()
 	{
-		SendNetworkUpdate();
+		bool num = false || prevStamina != staminaSeconds || prevMaxStamina != currentMaxStaminaSeconds || prevRunState != (int)currentRunState || prevMaxSpeed != GetRunSpeed();
+		prevStamina = staminaSeconds;
+		prevMaxStamina = currentMaxStaminaSeconds;
+		prevRunState = (int)currentRunState;
+		prevMaxSpeed = GetRunSpeed();
+		if (num)
+		{
+			SendNetworkUpdate();
+		}
 	}
 
 	public override void PreServerLoad()

@@ -71,11 +71,11 @@ public class WorldSpline : MonoBehaviour
 	{
 		if (showGizmos)
 		{
-			DrawSplineGizmo(this, base.transform, Color.magenta);
+			DrawSplineGizmo(this, Color.magenta);
 		}
 	}
 
-	protected static void DrawSplineGizmo(WorldSpline ws, Transform tr, Color splineColour)
+	protected static void DrawSplineGizmo(WorldSpline ws, Color splineColour)
 	{
 		if (ws == null)
 		{
@@ -103,7 +103,7 @@ public class WorldSpline : MonoBehaviour
 		Vector3[] visualSpline = GetVisualSpline(ws, data, 1f);
 		for (int j = 0; j < visualSpline.Length - 1; j++)
 		{
-			Gizmos.color = Color.Lerp(Color.white, Color.magenta, (float)j / (float)(visualSpline.Length - 1));
+			Gizmos.color = Color.Lerp(Color.white, splineColour, (float)j / (float)(visualSpline.Length - 1));
 			Gizmos.DrawLine(visualSpline[j], visualSpline[j + 1]);
 			Gizmos.DrawLine(visualSpline[j], visualSpline[j] + Vector3.up * 0.25f);
 		}
@@ -154,6 +154,16 @@ public class WorldSpline : MonoBehaviour
 	public Vector3 GetTangentWorld(float distance, WorldSplineData data)
 	{
 		return Vector3.Scale(base.transform.rotation * data.GetTangent(distance), base.transform.localScale);
+	}
+
+	public Vector3 GetTangentCubicHermiteWorld(float distance)
+	{
+		return Vector3.Scale(base.transform.rotation * GetData().GetTangentCubicHermite(distance), base.transform.localScale);
+	}
+
+	public Vector3 GetTangentCubicHermiteWorld(float distance, WorldSplineData data)
+	{
+		return Vector3.Scale(base.transform.rotation * data.GetTangentCubicHermite(distance), base.transform.localScale);
 	}
 
 	public Vector3 GetPointCubicHermiteWorld(float distance)

@@ -38,7 +38,7 @@ public class Effect : EffectData
 
 		public static void DoAdditiveImpactEffect(HitInfo info, string effectName)
 		{
-			if (BaseEntityEx.IsValid(info.HitEntity))
+			if (BaseNetworkableEx.IsValid(info.HitEntity))
 			{
 				Run(effectName, info.HitEntity, info.HitBone, info.HitPositionLocal + info.HitNormalLocal * 0.1f, info.HitNormalLocal);
 			}
@@ -61,7 +61,7 @@ public class Effect : EffectData
 			{
 				return;
 			}
-			if (BaseEntityEx.IsValid(info.HitEntity))
+			if (BaseNetworkableEx.IsValid(info.HitEntity))
 			{
 				GameObjectRef impactEffect = info.HitEntity.GetImpactEffect(info);
 				if (impactEffect.isValid)
@@ -86,7 +86,7 @@ public class Effect : EffectData
 				if (baseMelee != null)
 				{
 					string strikeEffectPath = baseMelee.GetStrikeEffectPath(materialName);
-					if (BaseEntityEx.IsValid(info.HitEntity))
+					if (BaseNetworkableEx.IsValid(info.HitEntity))
 					{
 						Run(strikeEffectPath, info.HitEntity, info.HitBone, info.HitPositionLocal, info.HitNormalLocal);
 					}
@@ -147,7 +147,7 @@ public class Effect : EffectData
 
 		public static void DoAdditiveImpactEffect(HitInfo info, string effectName)
 		{
-			if (BaseEntityEx.IsValid(info.HitEntity))
+			if (BaseNetworkableEx.IsValid(info.HitEntity))
 			{
 				Run(effectName, info.HitEntity, info.HitBone, info.HitPositionLocal, info.HitNormalLocal, info.Predicted);
 			}
@@ -170,7 +170,7 @@ public class Effect : EffectData
 			}
 			string strName = EffectDictionary.GetParticle(info.damageTypes.GetMajorityDamageType(), materialName);
 			string decal = EffectDictionary.GetDecal(info.damageTypes.GetMajorityDamageType(), materialName);
-			if (BaseEntityEx.IsValid(info.HitEntity))
+			if (BaseNetworkableEx.IsValid(info.HitEntity))
 			{
 				GameObjectRef impactEffect = info.HitEntity.GetImpactEffect(info);
 				if (impactEffect.isValid)
@@ -191,7 +191,7 @@ public class Effect : EffectData
 				if (baseMelee != null)
 				{
 					string strikeEffectPath = baseMelee.GetStrikeEffectPath(materialName);
-					if (BaseEntityEx.IsValid(info.HitEntity))
+					if (BaseNetworkableEx.IsValid(info.HitEntity))
 					{
 						Run(strikeEffectPath, info.HitEntity, info.HitBone, info.HitPositionLocal, info.HitNormalLocal, info.Predicted);
 					}
@@ -255,11 +255,11 @@ public class Effect : EffectData
 		normal = normLocal;
 		gameObject = null;
 		Up = Vector3.zero;
-		if (ent != null && !BaseEntityEx.IsValid(ent))
+		if (ent != null && !BaseNetworkableEx.IsValid(ent))
 		{
 			Debug.LogWarning("Effect.Init - invalid entity");
 		}
-		entity = (BaseEntityEx.IsValid(ent) ? ent.net.ID : 0u);
+		entity = (BaseNetworkableEx.IsValid(ent) ? ent.net.ID : 0u);
 		source = sourceConnection?.userid ?? 0;
 		bone = boneID;
 	}

@@ -1,9 +1,14 @@
 using System.Collections.Generic;
-using Rust.Interpolation;
 using UnityEngine;
 
-public interface IPosLerpTarget : ILerpInfo
+public interface ILerpTarget
 {
+	float GetExtrapolationTime();
+
+	float GetInterpolationDelay();
+
+	float GetInterpolationSmoothing();
+
 	float GetInterpolationInertia();
 
 	Vector3 GetNetworkPosition();
@@ -14,7 +19,7 @@ public interface IPosLerpTarget : ILerpInfo
 
 	void SetNetworkRotation(Quaternion rot);
 
-	void DrawInterpolationState(Interpolator<TransformSnapshot>.Segment segment, List<TransformSnapshot> entries);
+	void DrawInterpolationState(TransformInterpolator.Segment segment, List<TransformInterpolator.Entry> entries);
 
 	void LerpIdleDisable();
 }

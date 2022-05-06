@@ -4,6 +4,8 @@ public class GenerateRailMeshes : ProceduralComponent
 {
 	public const float NormalSmoothing = 0f;
 
+	public const bool SnapToTerrain = false;
+
 	public Mesh RailMesh;
 
 	public Mesh[] RailMeshes;
@@ -22,7 +24,7 @@ public class GenerateRailMeshes : ProceduralComponent
 		}
 		foreach (PathList rail in TerrainMeta.Path.Rails)
 		{
-			foreach (PathList.MeshObject item in rail.CreateMesh(RailMeshes, 0f))
+			foreach (PathList.MeshObject item in rail.CreateMesh(RailMeshes, 0f, snapToTerrain: false))
 			{
 				GameObject obj = new GameObject("Rail Mesh");
 				obj.transform.position = item.Position;
@@ -41,12 +43,26 @@ public class GenerateRailMeshes : ProceduralComponent
 
 	private void AddTrackSpline(PathList rail)
 	{
+		bool flag = rail.Path.GetStartPoint() == rail.Path.GetEndPoint();
 		TrainTrackSpline trainTrackSpline = HierarchyUtil.GetRoot(rail.Name).AddComponent<TrainTrackSpline>();
-		Vector3[] points = rail.Path.Points;
-		for (int i = 0; i < points.Length; i++)
+		trainTrackSpline.aboveGroundSpawn = !flag;
+		trainTrackSpline.forceAsSecondary = !flag;
+		trainTrackSpline.useNewTangentCalc = true;
+		if (trainTrackSpline.aboveGroundSpawn)
 		{
-			points[i].y += 0.41f;
+			TrainTrackSpline.SidingSplines.Add(trainTrackSpline);
 		}
-		trainTrackSpline.SetAll(points, rail.Path.Tangents, 0.25f);
+		Vector3[] array = new Vector3[rail.Path.Points.Length];
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i] = rail.Path.Points[i];
+			array[i].y += 0.41f;
+		}
+		Vector3[] array2 = new Vector3[rail.Path.Tangents.Length];
+		for (int j = 0; j < array.Length; j++)
+		{
+			array2[j] = rail.Path.Tangents[j];
+		}
+		trainTrackSpline.SetAll(array, array2, 0.25f);
 	}
 }

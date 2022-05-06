@@ -25,7 +25,7 @@ public class StabilityEntity : DecayEntity
 			{
 				return false;
 			}
-			if (!BaseEntityEx.IsValid(entity))
+			if (!BaseNetworkableEx.IsValid(entity))
 			{
 				return false;
 			}

@@ -263,7 +263,7 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual bool PlayerIsMounted(BasePlayer player)
 	{
-		if (BaseEntityEx.IsValid(player))
+		if (BaseNetworkableEx.IsValid(player))
 		{
 			return player.GetMounted() == this;
 		}
@@ -633,6 +633,18 @@ public class BaseMountable : BaseCombatEntity
 				baseMountable.VehicleFixedUpdate();
 			}
 		}
+		for (int num2 = FixedUpdateMountables.Count - 1; num2 >= 0; num2--)
+		{
+			BaseMountable baseMountable2 = FixedUpdateMountables[num2];
+			if (baseMountable2 == null)
+			{
+				FixedUpdateMountables.RemoveAt(num2);
+			}
+			else if (baseMountable2.isSpawned)
+			{
+				baseMountable2.PostVehicleFixedUpdate();
+			}
+		}
 	}
 
 	public virtual void VehicleFixedUpdate()
@@ -643,6 +655,10 @@ public class BaseMountable : BaseCombatEntity
 			_mounted.ServerRotation = mountAnchor.transform.rotation;
 			_mounted.MovePosition(mountAnchor.transform.position);
 		}
+	}
+
+	public virtual void PostVehicleFixedUpdate()
+	{
 	}
 
 	public virtual void PlayerServerInput(InputState inputState, BasePlayer player)
@@ -695,7 +711,7 @@ public class BaseMountable : BaseCombatEntity
 				}
 			}
 			projectile.InitializeVelocity(vector);
-			if (BaseEntityEx.IsValid(driver))
+			if (BaseNetworkableEx.IsValid(driver))
 			{
 				baseEntity.creatorEntity = driver;
 				baseEntity.OwnerID = driver.userID;

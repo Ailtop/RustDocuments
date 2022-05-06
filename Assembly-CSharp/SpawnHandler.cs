@@ -345,10 +345,17 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 			f = Mathx.Min(numToTry, numToFill, f);
 			for (int i = 0; i < f; i++)
 			{
-				if (distribution.Sample(out var spawnPos, out var spawnRot, node, population.AlignToNormal, population.ClusterDithering) && population.Filter.GetFactor(spawnPos) > 0f && (float)distribution.GetCount(spawnPos) < num)
+				if (distribution.Sample(out var spawnPos, out var spawnRot, node, population.AlignToNormal, population.ClusterDithering) && population.Filter.GetFactor(spawnPos) > 0f)
 				{
-					Spawn(population, spawnPos, spawnRot);
-					numToFill--;
+					if (!population.OverrideSpawnPosition(ref spawnPos, ref spawnRot))
+					{
+						continue;
+					}
+					if ((float)distribution.GetCount(spawnPos) < num)
+					{
+						Spawn(population, spawnPos, spawnRot);
+						numToFill--;
+					}
 				}
 				numToTry--;
 			}
@@ -482,7 +489,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		foreach (Spawnable item in array.Take(num))
 		{
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (BaseNetworkableEx.IsValid(baseEntity))
 			{
 				baseEntity.Kill();
 			}

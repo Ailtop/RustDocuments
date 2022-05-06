@@ -484,7 +484,7 @@ public class Item
 		{
 			contents.OnRemovedFromWorld();
 		}
-		if (BaseEntityEx.IsValid(worldEntity))
+		if (BaseNetworkableEx.IsValid(worldEntity))
 		{
 			if (worldEntity is WorldItem worldItem)
 			{
@@ -828,7 +828,7 @@ public class Item
 			RemoveFromContainer();
 		}
 		BaseEntity baseEntity = GetHeldEntity();
-		if (BaseEntityEx.IsValid(baseEntity))
+		if (BaseNetworkableEx.IsValid(baseEntity))
 		{
 			Debug.LogWarning("Item's Held Entity not removed!" + info.displayName.english + " -> " + baseEntity, baseEntity);
 		}
@@ -978,7 +978,7 @@ public class Item
 
 	public void SetWorldEntity(BaseEntity ent)
 	{
-		if (!BaseEntityEx.IsValid(ent))
+		if (!BaseNetworkableEx.IsValid(ent))
 		{
 			worldEnt.Set(null);
 			MarkDirty();
@@ -1011,7 +1011,7 @@ public class Item
 
 	public void SetHeldEntity(BaseEntity ent)
 	{
-		if (!BaseEntityEx.IsValid(ent))
+		if (!BaseNetworkableEx.IsValid(ent))
 		{
 			this.heldEntity.Set(null);
 			MarkDirty();
@@ -1024,7 +1024,7 @@ public class Item
 			}
 			this.heldEntity.Set(ent);
 			MarkDirty();
-			if (BaseEntityEx.IsValid(ent))
+			if (BaseNetworkableEx.IsValid(ent))
 			{
 				HeldEntity heldEntity = ent as HeldEntity;
 				if (heldEntity != null)

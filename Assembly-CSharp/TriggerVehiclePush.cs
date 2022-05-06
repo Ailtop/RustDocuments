@@ -54,7 +54,7 @@ public class TriggerVehiclePush : TriggerBase, IServerComponent
 		Vector3 position = base.transform.position;
 		foreach (BaseEntity entityContent in entityContents)
 		{
-			if (!BaseEntityEx.IsValid(entityContent) || entityContent.EqualNetID(thisEntity))
+			if (!BaseNetworkableEx.IsValid(entityContent) || entityContent.EqualNetID(thisEntity))
 			{
 				continue;
 			}

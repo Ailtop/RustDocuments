@@ -106,7 +106,7 @@ public class Hierarchy : ConsoleSystem
 		foreach (Transform item in enumerable)
 		{
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (BaseNetworkableEx.IsValid(baseEntity))
 			{
 				if (baseEntity.isServer)
 				{

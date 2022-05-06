@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace UnityEngine.Rendering.PostProcessing;
 
 [ExecuteAlways]
@@ -11,6 +8,8 @@ public sealed class PostProcessVolume : MonoBehaviour
 
 	[Tooltip("Check this box to mark this volume as global. This volume's Profile will be applied to the whole Scene.")]
 	public bool isGlobal;
+
+	public Bounds bounds;
 
 	[Min(0f)]
 	[Tooltip("The distance (from the attached Collider) to start blending from. A value of 0 means there will be no blending and the Volume overrides will be applied immediatly upon entry to the attached Collider.")]
@@ -26,8 +25,6 @@ public sealed class PostProcessVolume : MonoBehaviour
 	private int m_PreviousLayer;
 
 	private float m_PreviousPriority;
-
-	private List<Collider> m_TempColliders;
 
 	private PostProcessProfile m_InternalProfile;
 
@@ -76,7 +73,6 @@ public sealed class PostProcessVolume : MonoBehaviour
 	{
 		PostProcessManager.instance.Register(this);
 		m_PreviousLayer = base.gameObject.layer;
-		m_TempColliders = new List<Collider>();
 	}
 
 	private void OnDisable()
@@ -101,45 +97,14 @@ public sealed class PostProcessVolume : MonoBehaviour
 
 	private void OnDrawGizmos()
 	{
-		List<Collider> tempColliders = m_TempColliders;
-		GetComponents(tempColliders);
-		if (isGlobal || tempColliders == null)
+		if (!isGlobal)
 		{
-			return;
+			Vector3 lossyScale = base.transform.lossyScale;
+			Vector3 vector = new Vector3(1f / lossyScale.x, 1f / lossyScale.y, 1f / lossyScale.z);
+			Gizmos.matrix = Matrix4x4.TRS(base.transform.position, base.transform.rotation, lossyScale);
+			Gizmos.DrawCube(bounds.center, bounds.size);
+			Gizmos.DrawWireCube(bounds.center, bounds.size + vector * blendDistance * 4f);
+			Gizmos.matrix = Matrix4x4.identity;
 		}
-		Vector3 lossyScale = base.transform.lossyScale;
-		Vector3 vector = new Vector3(1f / lossyScale.x, 1f / lossyScale.y, 1f / lossyScale.z);
-		Gizmos.matrix = Matrix4x4.TRS(base.transform.position, base.transform.rotation, lossyScale);
-		foreach (Collider item in tempColliders)
-		{
-			if (!item.enabled)
-			{
-				continue;
-			}
-			Type type = item.GetType();
-			if (type == typeof(BoxCollider))
-			{
-				BoxCollider boxCollider = (BoxCollider)item;
-				Gizmos.DrawCube(boxCollider.center, boxCollider.size);
-				Gizmos.DrawWireCube(boxCollider.center, boxCollider.size + vector * blendDistance * 4f);
-			}
-			else if (type == typeof(SphereCollider))
-			{
-				SphereCollider sphereCollider = (SphereCollider)item;
-				Gizmos.DrawSphere(sphereCollider.center, sphereCollider.radius);
-				Gizmos.DrawWireSphere(sphereCollider.center, sphereCollider.radius + vector.x * blendDistance * 2f);
-			}
-			else if (type == typeof(MeshCollider))
-			{
-				MeshCollider meshCollider = (MeshCollider)item;
-				if (!meshCollider.convex)
-				{
-					meshCollider.convex = true;
-				}
-				Gizmos.DrawMesh(meshCollider.sharedMesh);
-				Gizmos.DrawWireMesh(meshCollider.sharedMesh, Vector3.zero, Quaternion.identity, Vector3.one + vector * blendDistance * 4f);
-			}
-		}
-		tempColliders.Clear();
 	}
 }

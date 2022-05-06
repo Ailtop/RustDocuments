@@ -79,7 +79,7 @@ public abstract class AppIOEntity : IOEntity
 
 	protected void BroadcastValueChange()
 	{
-		if (BaseEntityEx.IsValid(this))
+		if (BaseNetworkableEx.IsValid(this))
 		{
 			EntityTarget target = GetTarget();
 			AppBroadcast appBroadcast = Facepunch.Pool.Get<AppBroadcast>();
@@ -111,9 +111,9 @@ public abstract class AppIOEntity : IOEntity
 		return new EntityTarget(net.ID);
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server]
 	public async void PairWithApp(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

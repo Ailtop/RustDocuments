@@ -4,6 +4,8 @@ public class GenerateRoadMeshes : ProceduralComponent
 {
 	public const float NormalSmoothing = 0f;
 
+	public const bool SnapToTerrain = true;
+
 	public Mesh RoadMesh;
 
 	public Mesh[] RoadMeshes;
@@ -28,7 +30,7 @@ public class GenerateRoadMeshes : ProceduralComponent
 			{
 				continue;
 			}
-			foreach (PathList.MeshObject item in road.CreateMesh(RoadMeshes, 0f))
+			foreach (PathList.MeshObject item in road.CreateMesh(RoadMeshes, 0f, snapToTerrain: true))
 			{
 				GameObject obj = new GameObject("Road Mesh");
 				obj.transform.position = item.Position;

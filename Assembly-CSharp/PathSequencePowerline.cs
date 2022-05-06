@@ -12,21 +12,28 @@ public class PathSequencePowerline : PathSequence
 
 	private const int RegularPowerlineSpacing = 2;
 
-	public override void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements)
+	public override void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements, int pathLength, int pathIndex)
 	{
-		if (sequence.Count == 0)
-		{
-			return;
-		}
 		bool flag = false;
-		int indexCountToRule = GetIndexCountToRule(sequence, SequenceRule.PowerlinePlatform);
 		if (Rule == SequenceRule.Powerline)
 		{
-			flag = indexCountToRule >= 2;
+			if (pathLength >= 3)
+			{
+				flag = sequence.Count == 0 || pathIndex == pathLength - 1;
+				if (!flag)
+				{
+					flag = GetIndexCountToRule(sequence, SequenceRule.PowerlinePlatform) >= 2;
+				}
+			}
 		}
 		else if (Rule == SequenceRule.PowerlinePlatform)
 		{
-			flag = indexCountToRule < 2 && indexCountToRule != sequence.Count;
+			flag = pathLength < 3;
+			if (!flag)
+			{
+				int indexCountToRule = GetIndexCountToRule(sequence, SequenceRule.PowerlinePlatform);
+				flag = indexCountToRule < 2 && indexCountToRule != sequence.Count && pathIndex < pathLength - 1;
+			}
 		}
 		if (flag)
 		{

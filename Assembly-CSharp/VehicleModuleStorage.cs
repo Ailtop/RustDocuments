@@ -71,7 +71,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	public IItemContainerEntity GetContainer()
 	{
 		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as IItemContainerEntity;
 		}
@@ -167,7 +167,7 @@ public class VehicleModuleStorage : VehicleModuleSeating
 			return;
 		}
 		BaseEntity baseEntity = storageUnitInstance.Get(base.isServer);
-		if (BaseEntityEx.IsValid(baseEntity))
+		if (BaseNetworkableEx.IsValid(baseEntity))
 		{
 			if (baseEntity is BaseCombatEntity baseCombatEntity)
 			{

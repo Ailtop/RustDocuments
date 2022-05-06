@@ -1,6 +1,5 @@
 #define UNITY_ASSERTIONS
 using System;
-using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -9,6 +8,7 @@ using Rust;
 using Rust.UI;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 {
@@ -37,17 +37,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public static readonly EngineSpeeds MinThrottle = EngineSpeeds.Rev_Hi;
 
-	public float decayDuration = 1200f;
-
-	public float decayTickSpacing = 60f;
-
-	public float lastDecayTick;
-
-	public float decayingFor;
-
 	public EngineDamageOverTime engineDamage;
-
-	public Vector3 spawnOrigin;
 
 	public Vector3 engineLocalOffset;
 
@@ -89,9 +79,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public float maxFuelPerSec = 0.15f;
 
 	[SerializeField]
-	public TriggerParent platformParentTrigger;
-
-	[SerializeField]
 	public ProtectionProperties driverProtection;
 
 	[SerializeField]
@@ -107,13 +94,10 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public ParticleSystemContainer fxHeavyDamage;
 
 	[SerializeField]
-	private ParticleSystemContainer fxEngineTrouble;
+	public ParticleSystemContainer fxEngineTrouble;
 
 	[SerializeField]
 	public BoxCollider engineWorldCol;
-
-	[SerializeField]
-	public GameObjectRef fxFinalExplosion;
 
 	[SerializeField]
 	public float engineDamageToSlow = 150f;
@@ -128,6 +112,13 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public float engineSlowedMaxVel = 4f;
 
 	[SerializeField]
+	private ParticleSystemContainer[] sparks;
+
+	[FormerlySerializedAs("brakeSparkLights")]
+	[SerializeField]
+	private Light[] sparkLights;
+
+	[SerializeField]
 	private TrainEngineAudio trainAudio;
 
 	public const Flags Flag_HazardAhead = Flags.Reserved6;
@@ -137,6 +128,8 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public const Flags Flag_EngineSlowed = Flags.Reserved10;
 
 	public VehicleEngineController<TrainEngine> engineController;
+
+	public override bool IsEngine => true;
 
 	public bool LightsAreOn => HasFlag(Flags.Reserved5);
 
@@ -187,8 +180,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		InvokeRandomized(DecayTick, UnityEngine.Random.Range(20f, 40f), decayTickSpacing, decayTickSpacing * 0.1f);
-		spawnOrigin = base.transform.position;
 		engineDamage = new EngineDamageOverTime(engineDamageToSlow, engineDamageTimeframe, OnEngineTookHeavyDamage);
 		engineLocalOffset = base.transform.InverseTransformPoint(engineWorldCol.transform.position + engineWorldCol.transform.rotation * engineWorldCol.center);
 	}
@@ -232,15 +223,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public override EntityFuelSystem GetFuelSystem()
 	{
 		return engineController.FuelSystem;
-	}
-
-	public override void OnKilled(HitInfo info)
-	{
-		base.OnKilled(info);
-		if (base.IsDestroyed && fxFinalExplosion != null)
-		{
-			Effect.server.Run(fxFinalExplosion.resourcePath, engineWorldCol.transform.position + engineWorldCol.center, Vector3.up, null, broadcast: true);
-		}
 	}
 
 	public override void LightToggle(BasePlayer player)
@@ -316,7 +298,11 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		{
 			return false;
 		}
-		return AnyPlayersOnTrain();
+		if (!completeTrain.AnyPlayersOnTrain())
+		{
+			return vehicle.trainskeeprunning;
+		}
+		return true;
 	}
 
 	public void OnEngineStartFailed()
@@ -331,25 +317,27 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		}
 	}
 
-	public override float GetEngineForces()
+	public override float GetForces()
 	{
+		float num = base.GetForces();
 		if (IsDead() || base.IsDestroyed)
 		{
-			return 0f;
+			return num;
 		}
-		float num = (engineController.IsOn ? GetThrottleFraction() : 0f);
-		float value = maxSpeed * num;
+		float num2 = (engineController.IsOn ? GetThrottleFraction() : 0f);
+		float value = maxSpeed * num2;
 		float curTopSpeed = GetCurTopSpeed();
 		value = Mathf.Clamp(value, 0f - curTopSpeed, curTopSpeed);
-		if (num > 0f && base.TrackSpeed < value)
+		float trackSpeed = GetTrackSpeed();
+		if (num2 > 0f && trackSpeed < value)
 		{
-			return GetCurEngineForce();
+			num += GetCurEngineForce();
 		}
-		if (num < 0f && base.TrackSpeed > value)
+		else if (num2 < 0f && trackSpeed > value)
 		{
-			return 0f - GetCurEngineForce();
+			num -= GetCurEngineForce();
 		}
-		return 0f;
+		return num;
 	}
 
 	public override void Hurt(HitInfo info)
@@ -359,6 +347,16 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 			engineDamage.TakeDamage(info.damageTypes.Total());
 		}
 		base.Hurt(info);
+	}
+
+	public void StopEngine()
+	{
+		engineController.StopEngine();
+	}
+
+	protected override Vector3 GetExplosionPos()
+	{
+		return engineWorldCol.transform.position + engineWorldCol.center;
 	}
 
 	public void IncreaseThrottle()
@@ -382,8 +380,9 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		SetThrottle(EngineSpeeds.Zero);
 	}
 
-	public void ServerFlagsChanged(Flags old, Flags next)
+	protected override void ServerFlagsChanged(Flags old, Flags next)
 	{
+		base.ServerFlagsChanged(old, next);
 		if (next.HasFlag(Flags.On) && !old.HasFlag(Flags.On))
 		{
 			SetFlag(Flags.Reserved5, b: true);
@@ -396,48 +395,13 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		}
 	}
 
-	public bool AnyPlayersOnTrain()
-	{
-		if (AnyMounted())
-		{
-			return true;
-		}
-		if (platformParentTrigger.HasAnyEntityContents)
-		{
-			foreach (BaseEntity entityContent in platformParentTrigger.entityContents)
-			{
-				if (entityContent.ToPlayer() != null)
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public bool AnyPlayersNearby(float maxDist)
-	{
-		List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-		Vis.Entities(base.transform.position, maxDist, obj, 131072);
-		bool result = false;
-		foreach (BasePlayer item in obj)
-		{
-			if (!item.IsSleeping() && item.IsAlive())
-			{
-				result = true;
-				break;
-			}
-		}
-		Facepunch.Pool.FreeList(ref obj);
-		return result;
-	}
-
 	public void CheckForHazards()
 	{
-		if (base.TrackSpeed > 4.5f || base.TrackSpeed < -4.5f)
+		float trackSpeed = GetTrackSpeed();
+		if (trackSpeed > 4.5f || trackSpeed < -4.5f)
 		{
-			float maxHazardDist = Mathf.Lerp(40f, 325f, Mathf.Abs(base.TrackSpeed) * 0.05f);
-			SetFlag(Flags.Reserved6, base.FrontTrackSection.HasValidHazardWithin(this, base.FrontWheelSplineDist, 20f, maxHazardDist, curTrackSelection, base.RearTrackSection));
+			float maxHazardDist = Mathf.Lerp(40f, 325f, Mathf.Abs(trackSpeed) * 0.05f);
+			SetFlag(Flags.Reserved6, base.FrontTrackSection.HasValidHazardWithin(this, base.FrontWheelSplineDist, 20f, maxHazardDist, localTrackSelection, trackSpeed, base.RearTrackSection));
 		}
 		else
 		{
@@ -471,28 +435,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		return engineForce * GetEnginePowerMultiplier(0.75f);
 	}
 
-	public void DecayTick()
-	{
-		bool flag = HasDriver() || AnyPlayersOnTrain();
-		bool num = base.IsAtAStation && Vector3.Distance(spawnOrigin, base.transform.position) < 50f;
-		if (flag)
-		{
-			decayingFor = 0f;
-		}
-		bool num2 = !num && !flag && !AnyPlayersNearby(30f);
-		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
-		float num3 = realtimeSinceStartup - lastDecayTick;
-		lastDecayTick = realtimeSinceStartup;
-		if (num2)
-		{
-			decayingFor += num3;
-			if (decayingFor >= decayDuration)
-			{
-				ActualDeath();
-			}
-		}
-	}
-
 	[RPC_Server]
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
@@ -521,15 +463,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		{
 			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.trainEngine.fuelStorageID;
 			SetThrottle((EngineSpeeds)info.msg.trainEngine.throttleSetting);
-		}
-	}
-
-	public override void OnFlagsChanged(Flags old, Flags next)
-	{
-		base.OnFlagsChanged(old, next);
-		if (old != next && base.isServer)
-		{
-			ServerFlagsChanged(old, next);
 		}
 	}
 

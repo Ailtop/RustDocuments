@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using ConVar;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Facepunch.Rust;
@@ -16,7 +20,15 @@ public static class Analytics
 
 		public static bool Enabled;
 
+		private static Dictionary<string, float> bufferData;
+
 		private static TimeSince lastHeldItemEvent;
+
+		private static TimeSince lastAnalyticsSave;
+
+		private static DateTime backupDate;
+
+		private static bool WriteToFile => ConVar.Server.statBackup;
 
 		private static bool CanSendAnalytics
 		{
@@ -29,6 +41,8 @@ public static class Analytics
 				return false;
 			}
 		}
+
+		private static DateTime currentDate => DateTime.Now;
 
 		internal static void Death(BaseEntity initiator, BaseEntity weaponPrefab, Vector3 worldPosition)
 		{
@@ -66,19 +80,19 @@ public static class Analytics
 			{
 				return;
 			}
-			MonumentInfo monumentInfo = TerrainMeta.Path.FindMonumentWithBoundsOverlap(worldPosition);
-			if (monumentInfo != null && !string.IsNullOrEmpty(monumentInfo.displayPhrase.token))
+			string monumentStringFromPosition = GetMonumentStringFromPosition(worldPosition);
+			if (!string.IsNullOrEmpty(monumentStringFromPosition))
 			{
 				switch (deathType)
 				{
 				case DeathType.Player:
-					GA.DesignEvent("player:" + monumentInfo.displayPhrase.token + "death:" + v);
+					DesignEvent("player:" + monumentStringFromPosition + "death:" + v);
 					break;
 				case DeathType.NPC:
-					GA.DesignEvent("player:" + monumentInfo.displayPhrase.token + "death:npc:" + v);
+					DesignEvent("player:" + monumentStringFromPosition + "death:npc:" + v);
 					break;
 				case DeathType.AutoTurret:
-					GA.DesignEvent("player:" + monumentInfo.displayPhrase.token + "death:autoturret:" + v);
+					DesignEvent("player:" + monumentStringFromPosition + "death:autoturret:" + v);
 					break;
 				}
 			}
@@ -87,23 +101,37 @@ public static class Analytics
 				switch (deathType)
 				{
 				case DeathType.Player:
-					GA.DesignEvent("player:death:" + v);
+					DesignEvent("player:death:" + v);
 					break;
 				case DeathType.NPC:
-					GA.DesignEvent("player:death:npc:" + v);
+					DesignEvent("player:death:npc:" + v);
 					break;
 				case DeathType.AutoTurret:
-					GA.DesignEvent("player:death:autoturret:" + v);
+					DesignEvent("player:death:autoturret:" + v);
 					break;
 				}
 			}
+		}
+
+		private static string GetMonumentStringFromPosition(Vector3 worldPosition)
+		{
+			MonumentInfo monumentInfo = TerrainMeta.Path.FindMonumentWithBoundsOverlap(worldPosition);
+			if (monumentInfo != null && !string.IsNullOrEmpty(monumentInfo.displayPhrase.token))
+			{
+				return monumentInfo.displayPhrase.token;
+			}
+			if (SingletonComponent<EnvironmentManager>.Instance != null && (EnvironmentManager.Get(worldPosition) & EnvironmentType.TrainTunnels) == EnvironmentType.TrainTunnels)
+			{
+				return "train_tunnel_display_name";
+			}
+			return string.Empty;
 		}
 
 		public static void Crafting(string targetItemShortname, int skinId)
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("player:craft:" + targetItemShortname);
+				DesignEvent("player:craft:" + targetItemShortname);
 				SkinUsed(targetItemShortname, skinId);
 			}
 		}
@@ -112,7 +140,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics && skinId != 0)
 			{
-				GA.DesignEvent($"skinUsed:{itemShortName}:{skinId}");
+				DesignEvent($"skinUsed:{itemShortName}:{skinId}");
 			}
 		}
 
@@ -120,7 +148,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("monuments:excavatorstarted");
+				DesignEvent("monuments:excavatorstarted");
 			}
 		}
 
@@ -128,7 +156,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("monuments:excavatorstopped", activeDuration);
+				DesignEvent("monuments:excavatorstopped", activeDuration);
 			}
 		}
 
@@ -136,8 +164,8 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("slots:scrapSpent", scrapSpent);
-				GA.DesignEvent("slots:scrapReceived", scrapReceived);
+				DesignEvent("slots:scrapSpent", scrapSpent);
+				DesignEvent("slots:scrapReceived", scrapReceived);
 			}
 		}
 
@@ -145,7 +173,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("vehiclePurchased:" + vehicleType);
+				DesignEvent("vehiclePurchased:" + vehicleType);
 			}
 		}
 
@@ -153,7 +181,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics && !(fish == null))
 			{
-				GA.DesignEvent("fishCaught:" + fish.shortname);
+				DesignEvent("fishCaught:" + fish.shortname);
 			}
 		}
 
@@ -163,11 +191,11 @@ public static class Analytics
 			{
 				if (npcVendingOrder == null)
 				{
-					GA.DesignEvent("vendingPurchase:player:" + purchased.shortname, amount);
+					DesignEvent("vendingPurchase:player:" + purchased.shortname, amount);
 				}
 				else
 				{
-					GA.DesignEvent("vendingPurchase:static:" + purchased.shortname, amount);
+					DesignEvent("vendingPurchase:static:" + purchased.shortname, amount);
 				}
 			}
 		}
@@ -176,7 +204,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics && !string.IsNullOrEmpty(consumedItem))
 			{
-				GA.DesignEvent("player:consume:" + consumedItem);
+				DesignEvent("player:consume:" + consumedItem);
 			}
 		}
 
@@ -186,11 +214,11 @@ public static class Analytics
 			{
 				if (withWeapon != null)
 				{
-					GA.DesignEvent("treekilled:" + withWeapon.ShortPrefabName);
+					DesignEvent("treekilled:" + withWeapon.ShortPrefabName);
 				}
 				else
 				{
-					GA.DesignEvent("treekilled");
+					DesignEvent("treekilled");
 				}
 			}
 		}
@@ -201,11 +229,11 @@ public static class Analytics
 			{
 				if (info.WeaponPrefab != null)
 				{
-					GA.DesignEvent("orekilled:" + component.containedItems[0].itemDef.shortname + ":" + info.WeaponPrefab.ShortPrefabName);
+					DesignEvent("orekilled:" + component.containedItems[0].itemDef.shortname + ":" + info.WeaponPrefab.ShortPrefabName);
 				}
 				else
 				{
-					GA.DesignEvent($"orekilled:{component.containedItems[0]}");
+					DesignEvent($"orekilled:{component.containedItems[0]}");
 				}
 			}
 		}
@@ -214,7 +242,15 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("missionComplete:" + mission.shortname);
+				DesignEvent("missionComplete:" + mission.shortname);
+			}
+		}
+
+		public static void MissionFailed(BaseMission mission, BaseMission.MissionFailReason reason)
+		{
+			if (CanSendAnalytics)
+			{
+				DesignEvent($"missionFailed:{mission.shortname}:{reason}");
 			}
 		}
 
@@ -222,7 +258,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("loot:freeUnderWaterCrate");
+				DesignEvent("loot:freeUnderWaterCrate");
 			}
 		}
 
@@ -231,7 +267,7 @@ public static class Analytics
 			if (CanSendAnalytics && !((float)lastHeldItemEvent < 0.1f))
 			{
 				lastHeldItemEvent = 0f;
-				GA.DesignEvent("heldItemDeployed:" + def.shortname);
+				DesignEvent("heldItemDeployed:" + def.shortname);
 			}
 		}
 
@@ -239,7 +275,112 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				GA.DesignEvent("usedZipline");
+				DesignEvent("usedZipline");
+			}
+		}
+
+		public static void Trigger(string message)
+		{
+			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
+			{
+				DesignEvent(message);
+			}
+		}
+
+		private static void DesignEvent(string message)
+		{
+			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
+			{
+				GA.DesignEvent(message);
+				LocalBackup(message, 1f);
+			}
+		}
+
+		private static void DesignEvent(string message, float value)
+		{
+			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
+			{
+				GA.DesignEvent(message, value);
+				LocalBackup(message, value);
+			}
+		}
+
+		private static void DesignEvent(string message, int value)
+		{
+			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
+			{
+				GA.DesignEvent(message, value);
+				LocalBackup(message, value);
+			}
+		}
+
+		private static string GetBackupPath(DateTime date)
+		{
+			return string.Format("{0}/{1}_{2}_{3}_analytics_backup.txt", ConVar.Server.GetServerFolder("analytics"), date.Day, date.Month, date.Year);
+		}
+
+		private static void LocalBackup(string message, float value)
+		{
+			if (!WriteToFile)
+			{
+				return;
+			}
+			if (bufferData != null && backupDate.Date != currentDate.Date)
+			{
+				SaveBufferIntoDateFile(backupDate);
+				bufferData.Clear();
+				backupDate = currentDate;
+			}
+			if (bufferData == null)
+			{
+				if (bufferData == null)
+				{
+					bufferData = new Dictionary<string, float>();
+				}
+				lastAnalyticsSave = 0f;
+				backupDate = currentDate;
+			}
+			if (bufferData.ContainsKey(message))
+			{
+				bufferData[message] += value;
+			}
+			else
+			{
+				bufferData.Add(message, value);
+			}
+			if ((float)lastAnalyticsSave > 120f)
+			{
+				lastAnalyticsSave = 0f;
+				SaveBufferIntoDateFile(currentDate);
+				bufferData.Clear();
+			}
+			static void MergeBuffers(Dictionary<string, float> target, Dictionary<string, float> destination)
+			{
+				foreach (KeyValuePair<string, float> item in target)
+				{
+					if (destination.ContainsKey(item.Key))
+					{
+						destination[item.Key] += item.Value;
+					}
+					else
+					{
+						destination.Add(item.Key, item.Value);
+					}
+				}
+			}
+			static void SaveBufferIntoDateFile(DateTime date)
+			{
+				string backupPath = GetBackupPath(date);
+				if (File.Exists(backupPath))
+				{
+					Dictionary<string, float> dictionary = (Dictionary<string, float>)JsonConvert.DeserializeObject(File.ReadAllText(backupPath), typeof(Dictionary<string, float>));
+					if (dictionary != null)
+					{
+						MergeBuffers(dictionary, bufferData);
+					}
+				}
+				string contents = JsonConvert.SerializeObject(bufferData);
+				File.WriteAllText(GetBackupPath(date), contents);
 			}
 		}
 	}

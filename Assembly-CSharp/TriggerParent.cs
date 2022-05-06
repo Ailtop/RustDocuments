@@ -71,7 +71,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 	protected virtual bool ShouldParent(BaseEntity ent)
 	{
 		BaseEntity parentEntity = ent.GetParentEntity();
-		if (!overrideOtherTriggers && BaseEntityEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
+		if (!overrideOtherTriggers && BaseNetworkableEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
 		{
 			return false;
 		}
@@ -130,13 +130,13 @@ public class TriggerParent : TriggerBase, IServerComponent
 			return;
 		}
 		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(base.gameObject);
-		if (!BaseEntityEx.IsValid(baseEntity) || baseEntity.IsDestroyed)
+		if (!BaseNetworkableEx.IsValid(baseEntity) || baseEntity.IsDestroyed)
 		{
 			return;
 		}
 		foreach (BaseEntity entityContent in entityContents)
 		{
-			if (BaseEntityEx.IsValid(entityContent) && !entityContent.IsDestroyed)
+			if (BaseNetworkableEx.IsValid(entityContent) && !entityContent.IsDestroyed)
 			{
 				if (ShouldParent(entityContent))
 				{

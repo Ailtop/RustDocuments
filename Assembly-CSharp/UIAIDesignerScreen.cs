@@ -26,4 +26,6 @@ public class UIAIDesignerScreen : SingletonComponent<UIAIDesignerScreen>, IUIScr
 	public NeedsCursor needsCursor;
 
 	protected CanvasGroup canvasGroup;
+
+	public GameObject RootPanel;
 }

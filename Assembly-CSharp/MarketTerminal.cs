@@ -323,7 +323,7 @@ public class MarketTerminal : StorageContainer
 		int num2 = msg.read.Int32();
 		int num3 = msg.read.Int32();
 		VendingMachine vendingMachine = BaseNetworkable.serverEntities.Find(num) as VendingMachine;
-		if (vendingMachine == null || !BaseEntityEx.IsValid(vendingMachine) || num2 < 0 || num2 >= vendingMachine.sellOrders.sellOrders.Count || num3 <= 0 || base.inventory.IsFull())
+		if (vendingMachine == null || !BaseNetworkableEx.IsValid(vendingMachine) || num2 < 0 || num2 >= vendingMachine.sellOrders.sellOrders.Count || num3 <= 0 || base.inventory.IsFull())
 		{
 			return;
 		}

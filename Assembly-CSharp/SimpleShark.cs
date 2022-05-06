@@ -435,9 +435,10 @@ public class SimpleShark : BaseCombatEntity
 	{
 		if (base.isServer)
 		{
-			if (Rust.GameInfo.HasAchievements && hitInfo != null && hitInfo.InitiatorPlayer != null && !hitInfo.InitiatorPlayer.IsNpc && hitInfo.Weapon.ShortPrefabName.Contains("speargun"))
+			if (Rust.GameInfo.HasAchievements && hitInfo != null && hitInfo.InitiatorPlayer != null && !hitInfo.InitiatorPlayer.IsNpc && hitInfo.Weapon != null && hitInfo.Weapon.ShortPrefabName.Contains("speargun"))
 			{
 				hitInfo.InitiatorPlayer.stats.Add("shark_speargun_kills", 1, Stats.All);
+				hitInfo.InitiatorPlayer.stats.Save(forceSteamSave: true);
 			}
 			BaseCorpse baseCorpse = DropCorpse(corpsePrefab.resourcePath);
 			if ((bool)baseCorpse)

@@ -43,7 +43,7 @@ public class CardTable : BaseVehicle
 		public CardTablePlayerStorage GetStorage()
 		{
 			BaseEntity baseEntity = storageInstance.Get(serverside: true);
-			if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+			if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 			{
 				return baseEntity as CardTablePlayerStorage;
 			}
@@ -349,7 +349,7 @@ public class CardTable : BaseVehicle
 	public StorageContainer GetPot()
 	{
 		BaseEntity baseEntity = PotInstance.Get(serverside: true);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
 		}

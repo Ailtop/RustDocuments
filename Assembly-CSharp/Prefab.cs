@@ -127,12 +127,12 @@ public class Prefab : IComparable<Prefab>
 		return EnvironmentVolumeEx.CheckEnvironmentVolumesOutsideTerrain(Object.transform, pos, rot, scale, type, padding);
 	}
 
-	public void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements)
+	public void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements, int pathLength, int pathIndex)
 	{
 		PathSequence pathSequence = Attribute.Find<PathSequence>(ID);
 		if (pathSequence != null)
 		{
-			pathSequence.ApplySequenceReplacement(sequence, ref replacement, possibleReplacements);
+			pathSequence.ApplySequenceReplacement(sequence, ref replacement, possibleReplacements, pathLength, pathIndex);
 		}
 	}
 

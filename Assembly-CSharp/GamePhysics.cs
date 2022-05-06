@@ -233,10 +233,10 @@ public static class GamePhysics
 		}
 	}
 
-	public static bool Trace(Ray ray, float radius, out RaycastHit hitInfo, float maxDistance = float.PositiveInfinity, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
+	public static bool Trace(Ray ray, float radius, out RaycastHit hitInfo, float maxDistance = float.PositiveInfinity, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, BaseEntity ignoreEntity = null)
 	{
 		List<RaycastHit> obj = Facepunch.Pool.GetList<RaycastHit>();
-		TraceAllUnordered(ray, radius, obj, maxDistance, layerMask, triggerInteraction);
+		TraceAllUnordered(ray, radius, obj, maxDistance, layerMask, triggerInteraction, ignoreEntity);
 		if (obj.Count == 0)
 		{
 			hitInfo = default(RaycastHit);
@@ -249,13 +249,13 @@ public static class GamePhysics
 		return true;
 	}
 
-	public static void TraceAll(Ray ray, float radius, List<RaycastHit> hits, float maxDistance = float.PositiveInfinity, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
+	public static void TraceAll(Ray ray, float radius, List<RaycastHit> hits, float maxDistance = float.PositiveInfinity, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, BaseEntity ignoreEntity = null)
 	{
-		TraceAllUnordered(ray, radius, hits, maxDistance, layerMask, triggerInteraction);
+		TraceAllUnordered(ray, radius, hits, maxDistance, layerMask, triggerInteraction, ignoreEntity);
 		Sort(hits);
 	}
 
-	public static void TraceAllUnordered(Ray ray, float radius, List<RaycastHit> hits, float maxDistance = float.PositiveInfinity, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
+	public static void TraceAllUnordered(Ray ray, float radius, List<RaycastHit> hits, float maxDistance = float.PositiveInfinity, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, BaseEntity ignoreEntity = null)
 	{
 		int num = 0;
 		num = ((radius != 0f) ? UnityEngine.Physics.SphereCastNonAlloc(ray, radius, hitBuffer, maxDistance, layerMask, triggerInteraction) : UnityEngine.Physics.RaycastNonAlloc(ray, hitBuffer, maxDistance, layerMask, triggerInteraction));
@@ -270,76 +270,44 @@ public static class GamePhysics
 		for (int i = 0; i < num; i++)
 		{
 			RaycastHit raycastHit = hitBuffer[i];
-			if (Verify(raycastHit))
+			if (Verify(raycastHit, ignoreEntity))
 			{
 				hits.Add(raycastHit);
 			}
 		}
 	}
 
-	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding0, float padding1)
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding0, float padding1, BaseEntity ignoreEntity = null)
 	{
-		return LineOfSightInternal(p0, p1, layerMask, radius, padding0, padding1);
+		return LineOfSightInternal(p0, p1, layerMask, radius, padding0, padding1, ignoreEntity);
 	}
 
-	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding = 0f)
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding, BaseEntity ignoreEntity = null)
 	{
-		return LineOfSightInternal(p0, p1, layerMask, radius, padding, padding);
+		return LineOfSightInternal(p0, p1, layerMask, radius, padding, padding, ignoreEntity);
 	}
 
-	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, Vector3 p2, int layerMask, float radius, float padding = 0f)
+	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, int layerMask, float radius, BaseEntity ignoreEntity = null)
 	{
-		if (LineOfSightInternal(p0, p1, layerMask, radius, padding, 0f))
-		{
-			return LineOfSightInternal(p1, p2, layerMask, radius, 0f, padding);
-		}
-		return false;
+		return LineOfSightInternal(p0, p1, layerMask, radius, 0f, 0f, ignoreEntity);
 	}
 
-	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, int layerMask, float radius, float padding = 0f)
+	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding0, float padding1, BaseEntity ignoreEntity = null)
 	{
-		if (LineOfSightInternal(p0, p1, layerMask, radius, padding, 0f) && LineOfSightInternal(p1, p2, layerMask, radius, 0f, 0f))
-		{
-			return LineOfSightInternal(p2, p3, layerMask, radius, 0f, padding);
-		}
-		return false;
+		return LineOfSightRadius(p0, p1, layerMask, 0f, padding0, padding1, ignoreEntity);
 	}
 
-	public static bool LineOfSightRadius(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, int layerMask, float radius, float padding = 0f)
+	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding, BaseEntity ignoreEntity = null)
 	{
-		if (LineOfSightInternal(p0, p1, layerMask, radius, padding, 0f) && LineOfSightInternal(p1, p2, layerMask, radius, 0f, 0f) && LineOfSightInternal(p2, p3, layerMask, radius, 0f, 0f))
-		{
-			return LineOfSightInternal(p3, p4, layerMask, radius, 0f, padding);
-		}
-		return false;
+		return LineOfSightRadius(p0, p1, layerMask, 0f, padding, padding, ignoreEntity);
 	}
 
-	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding0, float padding1)
+	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, BaseEntity ignoreEntity = null)
 	{
-		return LineOfSightRadius(p0, p1, layerMask, 0f, padding0, padding1);
+		return LineOfSightRadius(p0, p1, layerMask, 0f, 0f, 0f, ignoreEntity);
 	}
 
-	public static bool LineOfSight(Vector3 p0, Vector3 p1, int layerMask, float padding = 0f)
-	{
-		return LineOfSightRadius(p0, p1, layerMask, 0f, padding);
-	}
-
-	public static bool LineOfSight(Vector3 p0, Vector3 p1, Vector3 p2, int layerMask, float padding = 0f)
-	{
-		return LineOfSightRadius(p0, p1, p2, layerMask, 0f, padding);
-	}
-
-	public static bool LineOfSight(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, int layerMask, float padding = 0f)
-	{
-		return LineOfSightRadius(p0, p1, p2, p3, layerMask, 0f, padding);
-	}
-
-	public static bool LineOfSight(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, int layerMask, float padding = 0f)
-	{
-		return LineOfSightRadius(p0, p1, p2, p3, p4, layerMask, 0f, padding);
-	}
-
-	private static bool LineOfSightInternal(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding0, float padding1)
+	private static bool LineOfSightInternal(Vector3 p0, Vector3 p1, int layerMask, float radius, float padding0, float padding1, BaseEntity ignoreEntity = null)
 	{
 		if (!ValidBounds.Test(p0))
 		{
@@ -360,12 +328,12 @@ public static class GamePhysics
 		float maxDistance = magnitude - padding0 - padding1;
 		bool flag;
 		RaycastHit hitInfo;
-		if (((uint)layerMask & 0x800000u) != 0)
+		if (!BaseNetworkableEx.IsRealNull(ignoreEntity) || ((uint)layerMask & 0x800000u) != 0)
 		{
-			flag = Trace(ray, 0f, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+			flag = Trace(ray, 0f, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore, ignoreEntity);
 			if (radius > 0f && !flag)
 			{
-				flag = Trace(ray, radius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore);
+				flag = Trace(ray, radius, out hitInfo, maxDistance, layerMask, QueryTriggerInteraction.Ignore, ignoreEntity);
 			}
 		}
 		else
@@ -392,18 +360,31 @@ public static class GamePhysics
 		return false;
 	}
 
-	public static bool Verify(RaycastHit hitInfo)
+	public static bool Verify(RaycastHit hitInfo, BaseEntity ignoreEntity = null)
 	{
-		return Verify(hitInfo.collider, hitInfo.point);
+		return Verify(hitInfo.collider, hitInfo.point, ignoreEntity);
 	}
 
-	public static bool Verify(Collider collider, Vector3 point)
+	public static bool Verify(Collider collider, Vector3 point, BaseEntity ignoreEntity = null)
 	{
 		if (collider is TerrainCollider && (bool)TerrainMeta.Collision && TerrainMeta.Collision.GetIgnore(point))
 		{
 			return false;
 		}
+		if (!BaseNetworkableEx.IsRealNull(ignoreEntity) && CompareEntity(GameObjectEx.ToBaseEntity(collider), ignoreEntity))
+		{
+			return false;
+		}
 		return collider.enabled;
+	}
+
+	private static bool CompareEntity(BaseEntity a, BaseEntity b)
+	{
+		if (a == b)
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public static int HandleTerrainCollision(Vector3 position, int layerMask)

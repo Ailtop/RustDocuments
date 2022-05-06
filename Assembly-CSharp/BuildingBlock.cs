@@ -31,7 +31,7 @@ public class BuildingBlock : StabilityEntity
 
 		protected override bool ShouldAdd(BuildingBlock entity)
 		{
-			return BaseEntityEx.IsValid(entity);
+			return BaseNetworkableEx.IsValid(entity);
 		}
 	}
 

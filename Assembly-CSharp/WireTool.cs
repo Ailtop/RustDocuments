@@ -373,9 +373,9 @@ public class WireTool : HeldEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -499,9 +499,9 @@ public class WireTool : HeldEntity
 		iOEntity2.SendNetworkUpdate();
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void AddLine(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

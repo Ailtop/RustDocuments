@@ -121,7 +121,7 @@ public class HeldEntity : BaseEntity
 	public BasePlayer GetOwnerPlayer()
 	{
 		BaseEntity baseEntity = GetParentEntity();
-		if (!BaseEntityEx.IsValid(baseEntity))
+		if (!BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return null;
 		}

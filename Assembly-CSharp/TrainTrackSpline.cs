@@ -57,7 +57,14 @@ public class TrainTrackSpline : WorldSpline
 	[Tooltip("Is this track spline part of a train station?")]
 	public bool isStation;
 
+	[Tooltip("Can above-ground trains spawn here?")]
+	public bool aboveGroundSpawn;
+
+	public bool useNewTangentCalc;
+
 	public bool forceAsSecondary;
+
+	public static List<TrainTrackSpline> SidingSplines = new List<TrainTrackSpline>();
 
 	public List<ConnectedTrackInfo> nextTracks = new List<ConnectedTrackInfo>();
 
@@ -72,6 +79,16 @@ public class TrainTrackSpline : WorldSpline
 	public bool HasNextTrack => nextTracks.Count > 0;
 
 	public bool HasPrevTrack => prevTracks.Count > 0;
+
+	public void SetAll(Vector3[] points, Vector3[] tangents, TrainTrackSpline sourceSpline)
+	{
+		base.points = points;
+		base.tangents = tangents;
+		lutInterval = sourceSpline.lutInterval;
+		isStation = sourceSpline.isStation;
+		aboveGroundSpawn = sourceSpline.aboveGroundSpawn;
+		useNewTangentCalc = sourceSpline.useNewTangentCalc;
+	}
 
 	public float GetSplineDistAfterMove(float prevSplineDist, Vector3 askerForward, float distMoved, TrackSelection trackSelection, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltTrack = null)
 	{
@@ -202,7 +219,11 @@ public class TrainTrackSpline : WorldSpline
 				return;
 			}
 		}
-		float num = Vector3.SignedAngle(GetOverallVector(), track.GetOverallVector(o), Vector3.up);
+		Vector3 position = ((p == TrackPosition.Next) ? points[points.Length - 2] : points[0]);
+		Vector3 position2 = ((p == TrackPosition.Next) ? points[points.Length - 1] : points[1]);
+		Vector3 from = base.transform.TransformPoint(position2) - base.transform.TransformPoint(position);
+		Vector3 initialVector = GetInitialVector(track, p, o);
+		float num = Vector3.SignedAngle(from, initialVector, Vector3.up);
 		int j;
 		for (j = 0; j < list.Count && !(list[j].angle > num); j++)
 		{
@@ -254,13 +275,13 @@ public class TrainTrackSpline : WorldSpline
 	public bool IsForward(Vector3 askerForward, float askerSplineDist)
 	{
 		WorldSplineData data = GetData();
-		Vector3 tangentWorld = GetTangentWorld(askerSplineDist, data);
-		return Vector3.Dot(askerForward, tangentWorld) >= 0f;
+		Vector3 rhs = ((!useNewTangentCalc) ? GetTangentWorld(askerSplineDist, data) : GetTangentCubicHermiteWorld(askerSplineDist, data));
+		return Vector3.Dot(askerForward, rhs) >= 0f;
 	}
 
-	public bool HasValidHazardWithin(TrainCar asker, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, TrainTrackSpline preferredAltTrack = null)
+	public bool HasValidHazardWithin(TrainCar asker, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, float trackSpeed, TrainTrackSpline preferredAltTrack = null)
 	{
-		Vector3 askerForward = ((asker.TrackSpeed >= 0f) ? asker.transform.forward : (-asker.transform.forward));
+		Vector3 askerForward = ((trackSpeed >= 0f) ? asker.transform.forward : (-asker.transform.forward));
 		bool movingForward = IsForward(askerForward, askerSplineDist);
 		return HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist, maxHazardDist, trackSelection, movingForward, preferredAltTrack);
 	}
@@ -370,25 +391,89 @@ public class TrainTrackSpline : WorldSpline
 		return true;
 	}
 
-	public Vector3 GetOverallVector(TrackOrientation o = TrackOrientation.Same)
+	public bool HasConnectedTrack(TrainTrackSpline tts)
 	{
-		if (o == TrackOrientation.Reverse)
+		foreach (ConnectedTrackInfo nextTrack in nextTracks)
 		{
-			return GetStartPointWorld() - GetEndPointWorld();
+			if (nextTrack.track == tts)
+			{
+				return true;
+			}
 		}
-		return GetEndPointWorld() - GetStartPointWorld();
+		foreach (ConnectedTrackInfo prevTrack in prevTracks)
+		{
+			if (prevTrack.track == tts)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Vector3 GetInitialVector(TrainTrackSpline track, TrackPosition p, TrackOrientation o)
+	{
+		Vector3 position;
+		Vector3 position2;
+		if (p == TrackPosition.Next)
+		{
+			if (o == TrackOrientation.Reverse)
+			{
+				position = track.points[track.points.Length - 1];
+				position2 = track.points[track.points.Length - 2];
+			}
+			else
+			{
+				position = track.points[0];
+				position2 = track.points[1];
+			}
+		}
+		else if (o == TrackOrientation.Reverse)
+		{
+			position = track.points[1];
+			position2 = track.points[0];
+		}
+		else
+		{
+			position = track.points[track.points.Length - 2];
+			position2 = track.points[track.points.Length - 1];
+		}
+		return track.transform.TransformPoint(position2) - track.transform.TransformPoint(position);
 	}
 
 	protected override void OnDrawGizmosSelected()
 	{
 		base.OnDrawGizmosSelected();
-		foreach (ConnectedTrackInfo nextTrack in nextTracks)
+		for (int i = 0; i < nextTracks.Count; i++)
 		{
-			WorldSpline.DrawSplineGizmo(nextTrack.track, nextTrack.track.transform, Color.white);
+			Color splineColour = Color.white;
+			if (straightestNextIndex != i && nextTracks.Count > 1)
+			{
+				if (i == 0)
+				{
+					splineColour = Color.green;
+				}
+				else if (i == nextTracks.Count - 1)
+				{
+					splineColour = Color.yellow;
+				}
+			}
+			WorldSpline.DrawSplineGizmo(nextTracks[i].track, splineColour);
 		}
-		foreach (ConnectedTrackInfo prevTrack in prevTracks)
+		for (int j = 0; j < prevTracks.Count; j++)
 		{
-			WorldSpline.DrawSplineGizmo(prevTrack.track, prevTrack.track.transform, Color.white);
+			Color splineColour2 = Color.white;
+			if (straightestPrevIndex != j && prevTracks.Count > 1)
+			{
+				if (j == 0)
+				{
+					splineColour2 = Color.green;
+				}
+				else if (j == nextTracks.Count - 1)
+				{
+					splineColour2 = Color.yellow;
+				}
+			}
+			WorldSpline.DrawSplineGizmo(prevTracks[j].track, splineColour2);
 		}
 	}
 

@@ -114,6 +114,9 @@ public class Server : ConsoleSystem
 	[ServerVar]
 	public static int ipQueriesPerMin = 30;
 
+	[ServerVar]
+	public static bool statBackup = false;
+
 	[ServerVar(Saved = true, ShowInAdminUI = true)]
 	public static string headerimage = "";
 
@@ -704,6 +707,8 @@ public class Server : ConsoleSystem
 			basePlayer.SendNetworkUpdateImmediate();
 			basePlayer.SendGlobalSnapshot();
 			basePlayer.SendFullSnapshot();
+			basePlayer.SendEntityUpdate();
+			TreeManager.SendSnapshot(basePlayer);
 			ServerMgr.SendReplicatedVars(basePlayer.net.connection);
 		}
 	}

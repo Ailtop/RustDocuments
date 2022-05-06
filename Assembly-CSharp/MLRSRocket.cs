@@ -38,7 +38,7 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 	private void CreateMapMarker()
 	{
 		BaseEntity baseEntity = mapMarkerInstanceRef.Get(base.isServer);
-		if (BaseEntityEx.IsValid(baseEntity))
+		if (BaseNetworkableEx.IsValid(baseEntity))
 		{
 			baseEntity.Kill();
 		}

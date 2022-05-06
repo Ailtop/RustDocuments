@@ -396,16 +396,24 @@ public class BaseMelee : AttackEntity
 			bool flag5 = flag && basePlayer.HasParent();
 			bool flag6 = hitEntity != null;
 			bool flag7 = flag6 && hitEntity.IsNpc;
+			bool flag8;
+			int layerMask;
+			Vector3 center;
+			Vector3 position;
+			Vector3 vector;
+			Vector3 vector2;
+			Vector3 vector3;
+			int num15;
 			if (ConVar.AntiHack.melee_protection > 0)
 			{
-				bool flag8 = true;
+				flag8 = true;
 				float num = 1f + ConVar.AntiHack.melee_forgiveness;
 				float melee_clientframes = ConVar.AntiHack.melee_clientframes;
 				float melee_serverframes = ConVar.AntiHack.melee_serverframes;
 				float num2 = melee_clientframes / 60f;
 				float num3 = melee_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
 				float num4 = (player.desyncTimeClamped + num2 + num3) * num;
-				int layerMask = (ConVar.AntiHack.melee_terraincheck ? 10551296 : 2162688);
+				layerMask = (ConVar.AntiHack.melee_terraincheck ? 10551296 : 2162688);
 				if (flag && hitInfo.boneArea == (HitArea)(-1))
 				{
 					string shortPrefabName2 = base.ShortPrefabName;
@@ -481,56 +489,79 @@ public class BaseMelee : AttackEntity
 					if (flag6)
 					{
 						Vector3 pointStart = hitInfo.PointStart;
-						Vector3 vector = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
-						Vector3 center = player.eyes.center;
-						Vector3 position = player.eyes.position;
-						Vector3 vector2 = pointStart;
-						Vector3 vector3 = hitInfo.PositionOnRay(vector);
-						Vector3 vector4 = vector;
-						bool num15 = GamePhysics.LineOfSight(center, position, vector2, vector3, vector4, layerMask);
-						if (!num15)
+						Vector3 hitPositionWorld = hitInfo.HitPositionWorld;
+						center = player.eyes.center;
+						position = player.eyes.position;
+						vector = pointStart;
+						vector2 = hitInfo.PositionOnRay(hitPositionWorld) + hitInfo.HitNormalWorld.normalized * 0.001f;
+						vector3 = hitPositionWorld;
+						if (GamePhysics.LineOfSight(center, position, layerMask) && GamePhysics.LineOfSight(position, vector, layerMask) && GamePhysics.LineOfSight(vector, vector2, layerMask))
 						{
-							player.stats.Add("hit_" + hitEntity.Categorize() + "_indirect_los", 1, Stats.Server);
+							num15 = (GamePhysics.LineOfSight(vector2, vector3, layerMask, hitEntity) ? 1 : 0);
+							if (num15 != 0)
+							{
+								player.stats.Add("hit_" + hitEntity.Categorize() + "_direct_los", 1, Stats.Server);
+								goto IL_0709;
+							}
 						}
 						else
 						{
-							player.stats.Add("hit_" + hitEntity.Categorize() + "_direct_los", 1, Stats.Server);
+							num15 = 0;
 						}
-						if (!num15)
-						{
-							string shortPrefabName10 = base.ShortPrefabName;
-							string shortPrefabName11 = hitEntity.ShortPrefabName;
-							AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName10, " on ", shortPrefabName11, ") ", center, " ", position, " ", vector2, " ", vector3, " ", vector4));
-							player.stats.combat.Log(hitInfo, "melee_los");
-							flag8 = false;
-						}
+						player.stats.Add("hit_" + hitEntity.Categorize() + "_indirect_los", 1, Stats.Server);
+						goto IL_0709;
 					}
-					if (flag8 && flag && !flag7)
-					{
-						Vector3 vector5 = hitInfo.HitPositionWorld + hitInfo.HitNormalWorld.normalized * 0.001f;
-						Vector3 position2 = basePlayer.eyes.position;
-						Vector3 vector6 = basePlayer.CenterPoint();
-						if ((!GamePhysics.LineOfSight(vector5, position2, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(position2, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)) && (!GamePhysics.LineOfSight(vector5, vector6, layerMask, 0f, ConVar.AntiHack.melee_losforgiveness) || !GamePhysics.LineOfSight(vector6, vector5, layerMask, ConVar.AntiHack.melee_losforgiveness, 0f)))
-						{
-							string shortPrefabName12 = base.ShortPrefabName;
-							string shortPrefabName13 = basePlayer.ShortPrefabName;
-							AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName12, " on ", shortPrefabName13, ") ", vector5, " ", position2, " or ", vector5, " ", vector6));
-							player.stats.combat.Log(hitInfo, "melee_los");
-							flag8 = false;
-						}
-					}
+					goto IL_07c4;
 				}
-				if (!flag8)
-				{
-					AntiHack.AddViolation(player, AntiHackType.MeleeHack, ConVar.AntiHack.melee_penalty);
-					return;
-				}
+				goto IL_0902;
 			}
+			goto IL_0914;
+			IL_0902:
+			if (!flag8)
+			{
+				AntiHack.AddViolation(player, AntiHackType.MeleeHack, ConVar.AntiHack.melee_penalty);
+				return;
+			}
+			goto IL_0914;
+			IL_0709:
+			if (num15 == 0)
+			{
+				string shortPrefabName10 = base.ShortPrefabName;
+				string shortPrefabName11 = hitEntity.ShortPrefabName;
+				AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName10, " on ", shortPrefabName11, ") ", center, " ", position, " ", vector, " ", vector2, " ", vector3));
+				player.stats.combat.Log(hitInfo, "melee_los");
+				flag8 = false;
+			}
+			goto IL_07c4;
+			IL_0914:
 			player.metabolism.UseHeart(heartStress * 0.2f);
 			using (TimeWarning.New("DoAttackShared", 50))
 			{
 				DoAttackShared(hitInfo);
+				return;
 			}
+			IL_07c4:
+			if (flag8 && flag && !flag7)
+			{
+				Vector3 hitPositionWorld2 = hitInfo.HitPositionWorld;
+				Vector3 position2 = basePlayer.eyes.position;
+				Vector3 vector4 = basePlayer.CenterPoint();
+				float melee_losforgiveness = ConVar.AntiHack.melee_losforgiveness;
+				bool flag9 = GamePhysics.LineOfSight(hitPositionWorld2, position2, layerMask, 0f, melee_losforgiveness) && GamePhysics.LineOfSight(position2, hitPositionWorld2, layerMask, melee_losforgiveness, 0f);
+				if (!flag9)
+				{
+					flag9 = GamePhysics.LineOfSight(hitPositionWorld2, vector4, layerMask, 0f, melee_losforgiveness) && GamePhysics.LineOfSight(vector4, hitPositionWorld2, layerMask, melee_losforgiveness, 0f);
+				}
+				if (!flag9)
+				{
+					string shortPrefabName12 = base.ShortPrefabName;
+					string shortPrefabName13 = basePlayer.ShortPrefabName;
+					AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName12, " on ", shortPrefabName13, ") ", hitPositionWorld2, " ", position2, " or ", hitPositionWorld2, " ", vector4));
+					player.stats.combat.Log(hitInfo, "melee_los");
+					flag8 = false;
+				}
+			}
+			goto IL_0902;
 		}
 	}
 

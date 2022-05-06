@@ -8,7 +8,7 @@ public class CardTablePlayerStorage : StorageContainer
 	public CardTable GetCardTable()
 	{
 		BaseEntity baseEntity = cardTableRef.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as CardTable;
 		}

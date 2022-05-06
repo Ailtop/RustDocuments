@@ -293,7 +293,7 @@ public class KeyLock : BaseLock
 	public void LockLock(BasePlayer player)
 	{
 		SetFlag(Flags.Locked, b: true);
-		if (BaseEntityEx.IsValid(player))
+		if (BaseNetworkableEx.IsValid(player))
 		{
 			player.GiveAchievement("LOCK_LOCK");
 		}

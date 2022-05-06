@@ -21,7 +21,7 @@ public class ItemModDeployable : MonoBehaviour
 
 	internal void OnDeployed(BaseEntity ent, BasePlayer player)
 	{
-		if (BaseEntityEx.IsValid(player) && !string.IsNullOrEmpty(UnlockAchievement))
+		if (BaseNetworkableEx.IsValid(player) && !string.IsNullOrEmpty(UnlockAchievement))
 		{
 			player.GiveAchievement(UnlockAchievement);
 		}

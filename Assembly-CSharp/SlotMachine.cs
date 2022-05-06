@@ -347,7 +347,7 @@ public class SlotMachine : BaseMountable
 	private void CheckPayout()
 	{
 		bool flag = false;
-		if (PayoutSettings != null && BaseEntityEx.IsValid(CurrentSpinPlayer) && CurrentSpinPlayer == _mounted)
+		if (PayoutSettings != null && BaseNetworkableEx.IsValid(CurrentSpinPlayer) && CurrentSpinPlayer == _mounted)
 		{
 			if (CalculatePayout(out var info, out var bonus))
 			{

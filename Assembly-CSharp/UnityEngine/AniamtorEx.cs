@@ -19,4 +19,12 @@ public static class AniamtorEx
 		}
 		animator.SetFloat(id, value, dampTime, deltaTime);
 	}
+
+	public static void SetBoolChecked(this Animator animator, int id, bool value)
+	{
+		if (animator.GetBool(id) != value)
+		{
+			animator.SetBool(id, value);
+		}
+	}
 }

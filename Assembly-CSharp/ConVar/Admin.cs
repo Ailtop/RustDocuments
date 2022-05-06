@@ -98,7 +98,7 @@ public class Admin : ConsoleSystem
 		if (@string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2332 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2336 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -115,7 +115,7 @@ public class Admin : ConsoleSystem
 		{
 			try
 			{
-				if (!BaseEntityEx.IsValid(activePlayer))
+				if (!BaseNetworkableEx.IsValid(activePlayer))
 				{
 					continue;
 				}
@@ -185,7 +185,7 @@ public class Admin : ConsoleSystem
 			{
 				try
 				{
-					if (BaseEntityEx.IsValid(activePlayer))
+					if (BaseNetworkableEx.IsValid(activePlayer))
 					{
 						string text = activePlayer.displayName.QuoteSafe();
 						if (@string.Length <= 0 || text.Contains(@string, CompareOptions.IgnoreCase))

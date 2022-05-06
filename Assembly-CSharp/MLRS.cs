@@ -802,7 +802,7 @@ public class MLRS : BaseMountable
 	public StorageContainer GetRocketContainer()
 	{
 		BaseEntity baseEntity = rocketStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
 		}
@@ -812,7 +812,7 @@ public class MLRS : BaseMountable
 	public StorageContainer GetDashboardContainer()
 	{
 		BaseEntity baseEntity = dashboardStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
 		}

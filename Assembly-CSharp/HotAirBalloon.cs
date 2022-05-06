@@ -322,8 +322,24 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			List<Collider> obj = Facepunch.Pool.GetList<Collider>();
 			GamePhysics.OverlapSphere(groundSample.transform.position, 1.25f, obj, 1218511105);
 			grounded = obj.Count > 0;
+			CheckGlobal(flags);
 			Facepunch.Pool.FreeList(ref obj);
 		}
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (base.isServer)
+		{
+			CheckGlobal(next);
+		}
+	}
+
+	private void CheckGlobal(Flags flags)
+	{
+		bool wants = flags.HasFlag(Flags.On) || flags.HasFlag(Flags.Reserved2) || flags.HasFlag(Flags.Reserved1) || !grounded;
+		EnableGlobalBroadcast(wants);
 	}
 
 	protected void FixedUpdate()

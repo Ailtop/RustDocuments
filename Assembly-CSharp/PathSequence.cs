@@ -8,7 +8,7 @@ public class PathSequence : PrefabAttribute
 		return typeof(PathSequence);
 	}
 
-	public virtual void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements)
+	public virtual void ApplySequenceReplacement(List<Prefab> sequence, ref Prefab replacement, Prefab[] possibleReplacements, int pathLength, int pathIndex)
 	{
 	}
 }

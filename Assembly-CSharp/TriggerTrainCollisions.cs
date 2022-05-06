@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TriggerTrainCollisions : TriggerBase
 {
-	public enum ColliderLocation
+	public enum Location
 	{
 		Front = 0,
 		Rear = 1
@@ -12,7 +12,7 @@ public class TriggerTrainCollisions : TriggerBase
 
 	public Collider triggerCollider;
 
-	public ColliderLocation location;
+	public Location location;
 
 	public TrainCar owner;
 
@@ -62,6 +62,10 @@ public class TriggerTrainCollisions : TriggerBase
 				if (componentInParent2 != null)
 				{
 					trainContents.Add(componentInParent2);
+					if (owner.coupling != null)
+					{
+						owner.coupling.Touched(componentInParent2, location);
+					}
 				}
 				else
 				{

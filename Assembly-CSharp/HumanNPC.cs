@@ -338,7 +338,7 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	{
 		base.AttackerInfo(info);
 		info.inflictorName = inventory.containerBelt.GetSlot(0).info.shortname;
-		info.attackerName = "scientist";
+		info.attackerName = base.ShortPrefabName;
 	}
 
 	public bool IsThreat(BaseEntity entity)

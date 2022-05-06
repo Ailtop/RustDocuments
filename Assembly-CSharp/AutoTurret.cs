@@ -32,7 +32,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return BaseNetworkableEx.IsValid(entity);
 			}
 			return false;
 		}

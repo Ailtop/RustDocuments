@@ -1,25 +1,35 @@
+using System.Linq;
 using UnityEngine;
 
 public class GenerateRiverTerrain : ProceduralComponent
 {
-	private const int Smoothen = 8;
+	public const int SmoothenLoops = 1;
+
+	public const int SmoothenIterations = 8;
+
+	public const int SmoothenY = 8;
+
+	public const int SmoothenXZ = 4;
 
 	public override void Process(uint seed)
 	{
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
-		foreach (PathList river in TerrainMeta.Path.Rivers)
+		for (int i = 0; i < 1; i++)
 		{
-			if (!World.Networked)
+			foreach (PathList item in TerrainMeta.Path.Rivers.AsEnumerable().Reverse())
 			{
-				PathInterpolator path = river.Path;
-				river.TrimTopology(16384);
-				path.Smoothen(8, Vector3.up);
-				path.RecalculateTangents();
-				river.ResetTrims();
+				if (!World.Networked)
+				{
+					PathInterpolator path = item.Path;
+					path.Smoothen(8, Vector3.up);
+					path.RecalculateTangents();
+				}
+				heightMap.Push();
+				float intensity = 1f;
+				float fade = 1f / (1f + (float)i / 3f);
+				item.AdjustTerrainHeight(intensity, fade);
+				heightMap.Pop();
 			}
-			heightMap.Push();
-			river.AdjustTerrainHeight();
-			heightMap.Pop();
 		}
 	}
 }

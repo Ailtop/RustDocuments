@@ -240,7 +240,10 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			if (flag)
 			{
-				Agent.isStopped = false;
+				if (Agent.isOnNavMesh)
+				{
+					Agent.isStopped = false;
+				}
 			}
 			else if (Agent.isOnNavMesh)
 			{
@@ -519,6 +522,14 @@ public class BaseNavigator : BaseMonoBehaviour
 				pos = hit.position;
 			}
 			SetCurrentNavigationType(NavigationType.NavMesh);
+			if (!Agent.isOnNavMesh)
+			{
+				return false;
+			}
+			if (!Agent.isActiveAndEnabled)
+			{
+				return false;
+			}
 			Destination = pos;
 			bool flag;
 			if (AI.usecalculatepath)

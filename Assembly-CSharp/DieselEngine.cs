@@ -107,6 +107,7 @@ public class DieselEngine : StorageContainer
 				if (Rust.GameInfo.HasAchievements && msg.player != null)
 				{
 					msg.player.stats.Add("excavator_activated", 1, Stats.All);
+					msg.player.stats.Save(forceSteamSave: true);
 				}
 			}
 		}

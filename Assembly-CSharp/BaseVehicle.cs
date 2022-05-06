@@ -187,6 +187,8 @@ public class BaseVehicle : BaseMountable
 
 	private bool prevSleeping;
 
+	private float nextCollisionFXTime;
+
 	private ProtoBuf.BaseVehicle pendingLoad;
 
 	public Queue<BasePlayer> recentDrivers = new Queue<BasePlayer>();
@@ -203,6 +205,8 @@ public class BaseVehicle : BaseMountable
 	public bool mountChaining = true;
 
 	public ClippingCheckMode clippingChecks;
+
+	public GameObjectRef collisionEffect;
 
 	public bool shouldShowHudHealth;
 
@@ -1010,6 +1014,19 @@ public class BaseVehicle : BaseMountable
 		UpdateFullFlag();
 	}
 
+	public void TryShowCollisionFX(Vector3 effectPosition)
+	{
+		if (!(UnityEngine.Time.time < nextCollisionFXTime))
+		{
+			nextCollisionFXTime = UnityEngine.Time.time + 0.25f;
+			if (collisionEffect.isValid)
+			{
+				effectPosition += (base.transform.position - effectPosition) * 0.25f;
+				Effect.server.Run(collisionEffect.resourcePath, effectPosition, base.transform.up);
+			}
+		}
+	}
+
 	private void UpdateFullFlag()
 	{
 		bool b = NumMounted() == MaxMounted();
@@ -1204,7 +1221,7 @@ public class BaseVehicle : BaseMountable
 
 	public override bool PlayerIsMounted(BasePlayer player)
 	{
-		if (BaseEntityEx.IsValid(player))
+		if (BaseNetworkableEx.IsValid(player))
 		{
 			return player.GetMountedVehicle() == this;
 		}

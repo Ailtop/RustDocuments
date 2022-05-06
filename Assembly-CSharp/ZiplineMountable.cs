@@ -25,7 +25,7 @@ public class ZiplineMountable : BaseMountable
 
 	private List<Vector3> linePoints;
 
-	private const Flags PushForward = Flags.Reserved1;
+	public const Flags PushForward = Flags.Reserved1;
 
 	public AnimationCurve MountPositionCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
@@ -33,29 +33,29 @@ public class ZiplineMountable : BaseMountable
 
 	public float MountEaseInTime = 0.5f;
 
-	private const Flags ShowHandle = Flags.Reserved2;
+	public const Flags ShowHandle = Flags.Reserved2;
 
-	private float additiveValue;
+	public float additiveValue;
 
-	private float currentTravelDistance;
+	public float currentTravelDistance;
 
-	private TimeSince mountTime;
+	public TimeSince mountTime;
 
-	private List<Collider> ignoreColliders = new List<Collider>();
+	public List<Collider> ignoreColliders = new List<Collider>();
 
-	private Vector3 startPosition = Vector3.zero;
+	public Vector3 startPosition = Vector3.zero;
 
-	private Vector3 endPosition = Vector3.zero;
+	public Vector3 endPosition = Vector3.zero;
 
-	private Quaternion startRotation = Quaternion.identity;
+	public Quaternion startRotation = Quaternion.identity;
 
-	private Quaternion endRotation = Quaternion.identity;
+	public Quaternion endRotation = Quaternion.identity;
 
-	private float elapsedMoveTime;
+	public float elapsedMoveTime;
 
-	private bool isAnimatingIn;
+	public bool isAnimatingIn;
 
-	private Vector3 ProcessBezierMovement(float distanceToTravel)
+	public Vector3 ProcessBezierMovement(float distanceToTravel)
 	{
 		if (linePoints == null)
 		{
@@ -75,12 +75,12 @@ public class ZiplineMountable : BaseMountable
 		return linePoints[linePoints.Count - 1];
 	}
 
-	private Vector3 GetLineEndPoint()
+	public Vector3 GetLineEndPoint()
 	{
 		return linePoints?[linePoints.Count - 1] ?? Vector3.zero;
 	}
 
-	private Vector3 GetNextLinePoint(Transform forTransform)
+	public Vector3 GetNextLinePoint(Transform forTransform)
 	{
 		Vector3 position = forTransform.position;
 		Vector3 forward = forTransform.forward;
@@ -111,7 +111,7 @@ public class ZiplineMountable : BaseMountable
 		return MoveSpeed + ForwardAdditive;
 	}
 
-	public void SetDestination(List<Vector3> targetLinePoints, Vector3 startPos, Quaternion startRot)
+	public void SetDestination(List<Vector3> targetLinePoints, Vector3 lineStartPos, Quaternion lineStartRot)
 	{
 		linePoints = targetLinePoints;
 		currentTravelDistance = 0f;
@@ -119,8 +119,8 @@ public class ZiplineMountable : BaseMountable
 		GamePhysics.OverlapSphere(base.transform.position, 6f, ignoreColliders, 1218511105);
 		startPosition = base.transform.position;
 		startRotation = base.transform.rotation;
-		endPosition = startPos;
-		endRotation = startRot;
+		endPosition = lineStartPos;
+		endRotation = lineStartRot;
 		elapsedMoveTime = 0f;
 		isAnimatingIn = true;
 		InvokeRepeating(MovePlayerToPosition, 0f, 0f);
@@ -182,7 +182,7 @@ public class ZiplineMountable : BaseMountable
 		}
 	}
 
-	private void EndZipline()
+	public void EndZipline()
 	{
 		DismountAllPlayers();
 	}
@@ -222,7 +222,7 @@ public class ZiplineMountable : BaseMountable
 		}
 	}
 
-	private void MovePlayerToPosition()
+	public void MovePlayerToPosition()
 	{
 		elapsedMoveTime += UnityEngine.Time.deltaTime;
 		float num = Mathf.Clamp(elapsedMoveTime / MountEaseInTime, 0f, 1f);

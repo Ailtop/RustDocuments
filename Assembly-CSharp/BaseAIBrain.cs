@@ -330,6 +330,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					}
 				}
 			}
+			else if (currentTargetPoint != null)
+			{
+				brain.Navigator.SetDestination(currentTargetPoint.transform.position, BaseNavigator.NavigationSpeed.Slow, 1f);
+			}
 			return StateStatus.Running;
 		}
 	}

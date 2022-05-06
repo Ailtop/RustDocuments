@@ -162,7 +162,7 @@ public class BaseMission : BaseScriptableObject
 				mission.Think(this, assignee, delta);
 				if (mission.timeLimitSeconds > 0f && timePassed >= mission.timeLimitSeconds)
 				{
-					mission.MissionFailed(this, assignee);
+					mission.MissionFailed(this, assignee, MissionFailReason.TimeOut);
 				}
 			}
 		}
@@ -329,6 +329,14 @@ public class BaseMission : BaseScriptableObject
 		public bool cleanupOnMissionSuccess;
 	}
 
+	public enum MissionFailReason
+	{
+		TimeOut = 0,
+		Disconnect = 1,
+		ResetPlayerState = 2,
+		Abandon = 3
+	}
+
 	[ServerVar]
 	public static bool missionsenabled = true;
 
@@ -397,7 +405,7 @@ public class BaseMission : BaseScriptableObject
 			BaseMission mission = missionInstance.GetMission();
 			if (mission.missionEntities.Length != 0)
 			{
-				mission.MissionFailed(missionInstance, player);
+				mission.MissionFailed(missionInstance, player, MissionFailReason.Disconnect);
 			}
 		}
 	}
@@ -548,6 +556,7 @@ public class BaseMission : BaseScriptableObject
 		if (Rust.GameInfo.HasAchievements)
 		{
 			assignee.stats.Add("missions_completed", 1, Stats.All);
+			assignee.stats.Save(forceSteamSave: true);
 		}
 	}
 
@@ -559,13 +568,14 @@ public class BaseMission : BaseScriptableObject
 		Interface.CallHook("OnMissionSucceeded", this, instance, assignee);
 	}
 
-	public virtual void MissionFailed(MissionInstance instance, BasePlayer assignee)
+	public virtual void MissionFailed(MissionInstance instance, BasePlayer assignee, MissionFailReason failReason)
 	{
 		assignee.ChatMessage("You have failed the mission : " + missionName.english);
 		DoMissionEffect(failedEffect.resourcePath, assignee);
+		Facepunch.Rust.Analytics.Server.MissionFailed(this, failReason);
 		instance.status = MissionStatus.Failed;
 		MissionEnded(instance, assignee);
-		Interface.CallHook("OnMissionFailed", this, instance, assignee);
+		Interface.CallHook("OnMissionFailed", this, instance, assignee, failReason);
 	}
 
 	public virtual void MissionEnded(MissionInstance instance, BasePlayer assignee)

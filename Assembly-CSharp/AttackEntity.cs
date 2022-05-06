@@ -258,7 +258,7 @@ public class AttackEntity : HeldEntity
 				Vector3 center = player.eyes.center;
 				Vector3 position = player.eyes.position;
 				Vector3 vector = eyePos;
-				if (!GamePhysics.LineOfSightRadius(center, position, vector, layerMask, ConVar.AntiHack.eye_losradius))
+				if (!GamePhysics.LineOfSightRadius(center, position, layerMask, ConVar.AntiHack.eye_losradius) || !GamePhysics.LineOfSightRadius(position, vector, layerMask, ConVar.AntiHack.eye_losradius))
 				{
 					string shortPrefabName4 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName4, " on attack) ", center, " ", position, " ", vector));

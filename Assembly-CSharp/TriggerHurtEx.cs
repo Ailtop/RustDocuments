@@ -164,7 +164,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent, IHurtTrigger
 		for (int i = 0; i < array.Length; i++)
 		{
 			KeyValuePair<BaseEntity, EntityTriggerInfo> keyValuePair = array[i];
-			if (BaseEntityEx.IsValid(keyValuePair.Key))
+			if (BaseNetworkableEx.IsValid(keyValuePair.Key))
 			{
 				Vector3 position = keyValuePair.Key.transform.position;
 				float magnitude = (position - keyValuePair.Value.lastPosition).magnitude;
@@ -184,7 +184,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent, IHurtTrigger
 		{
 			foreach (BaseEntity entityAdd in entityAddList)
 			{
-				if (BaseEntityEx.IsValid(entityAdd))
+				if (BaseNetworkableEx.IsValid(entityAdd))
 				{
 					DoDamage(entityAdd, hurtTypeOnEnter, damageOnEnter, effectOnEnter);
 					if (entityInfo == null)
@@ -208,7 +208,7 @@ public class TriggerHurtEx : TriggerBase, IServerComponent, IHurtTrigger
 		}
 		foreach (BaseEntity entityLeave in entityLeaveList)
 		{
-			if (!BaseEntityEx.IsValid(entityLeave))
+			if (!BaseNetworkableEx.IsValid(entityLeave))
 			{
 				continue;
 			}

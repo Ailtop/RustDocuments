@@ -113,9 +113,7 @@ public class TreeManager : BaseEntity
 		tree.scale = billboardEntity.transform.lossyScale.y;
 	}
 
-	[RPC_Server]
-	[RPC_Server.CallsPerSecond(0uL)]
-	private void SERVER_RequestTrees(RPCMessage msg)
+	public static void SendSnapshot(BasePlayer player)
 	{
 		BufferList<BaseEntity> values = entities.Values;
 		TreeList treeList = null;
@@ -132,16 +130,23 @@ public class TreeManager : BaseEntity
 			treeList.trees.Add(tree);
 			if (treeList.trees.Count >= 100)
 			{
-				ClientRPCPlayer(null, msg.player, "CLIENT_ReceiveTrees", treeList);
+				server.ClientRPCPlayer(null, player, "CLIENT_ReceiveTrees", treeList);
 				treeList.Dispose();
 				treeList = null;
 			}
 		}
 		if (treeList != null)
 		{
-			ClientRPCPlayer(null, msg.player, "CLIENT_ReceiveTrees", treeList);
+			server.ClientRPCPlayer(null, player, "CLIENT_ReceiveTrees", treeList);
 			treeList.Dispose();
 			treeList = null;
 		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(0uL)]
+	private void SERVER_RequestTrees(RPCMessage msg)
+	{
+		SendSnapshot(msg.player);
 	}
 }

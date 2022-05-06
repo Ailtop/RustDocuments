@@ -927,24 +927,13 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		{
 			attachedModuleEntity.OnEngineStateChanged(lastSetEngineState, base.CurEngineState);
 		}
-		if (base.isServer && Rust.GameInfo.HasAchievements)
+		if (base.isServer && Rust.GameInfo.HasAchievements && NumMounted() >= 5)
 		{
-			int num = 0;
 			foreach (MountPointInfo allMountPoint in base.allMountPoints)
 			{
-				if (allMountPoint.mountable.GetMounted() != null)
+				if (allMountPoint.mountable != null && allMountPoint.mountable.GetMounted() != null)
 				{
-					num++;
-				}
-			}
-			if (num >= 5)
-			{
-				foreach (MountPointInfo allMountPoint2 in base.allMountPoints)
-				{
-					if (allMountPoint2.mountable.GetMounted() != null)
-					{
-						allMountPoint2.mountable.GetMounted().GiveAchievement("BATTLE_BUS");
-					}
+					allMountPoint.mountable.GetMounted().GiveAchievement("BATTLE_BUS");
 				}
 			}
 		}

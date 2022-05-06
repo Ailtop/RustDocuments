@@ -214,7 +214,7 @@ public class Planner : HeldEntity
 					p += target.normal.normalized * deployShell.LineOfSightPadding();
 				}
 			}
-			if (!GamePhysics.LineOfSightRadius(center, position, origin, p, layerMask, num3, padding))
+			if (!GamePhysics.LineOfSightRadius(center, position, layerMask, num3) || !GamePhysics.LineOfSightRadius(position, origin, layerMask, num3) || !GamePhysics.LineOfSightRadius(origin, p, layerMask, num3, 0f, padding))
 			{
 				ownerPlayer.ChatMessage("Line of sight blocked.");
 				return;
@@ -317,7 +317,7 @@ public class Planner : HeldEntity
 		}
 		if (Interface.CallHook("OnConstructionPlace", baseEntity, component, placement, ownerPlayer) != null)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (BaseNetworkableEx.IsValid(baseEntity))
 			{
 				baseEntity.KillMessage();
 			}

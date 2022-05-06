@@ -41,8 +41,6 @@ public class GenerateRailRing : ProceduralComponent
 
 	public const float TerrainOffset = -0.125f;
 
-	private const int Smoothen = 32;
-
 	private const int MaxDepth = 250000;
 
 	public int MinWorldSize;
@@ -64,7 +62,7 @@ public class GenerateRailRing : ProceduralComponent
 			PathFinder pathFinder = new PathFinder(array);
 			int length = array.GetLength(0);
 			int num = length / 4;
-			int num2 = 4;
+			int num2 = 1;
 			int stepcount = num / num2;
 			int num3 = length / 2;
 			int pos_x = num;
@@ -100,7 +98,7 @@ public class GenerateRailRing : ProceduralComponent
 				RingNode prev = list[(i - 1 + list.Count) % list.Count];
 				ringNode.next = next;
 				ringNode.prev = prev;
-				while (!pathFinder.IsWalkable(ringNode.position))
+				while (!pathFinder.IsWalkableWithNeighbours(ringNode.position))
 				{
 					if (ringNode.attempts <= 0)
 					{
@@ -155,7 +153,7 @@ public class GenerateRailRing : ProceduralComponent
 					ringNode2.position += ringNode2.direction;
 					ringNode2.attempts--;
 				}
-				while (!pathFinder.IsWalkable(ringNode2.position));
+				while (!pathFinder.IsWalkableWithNeighbours(ringNode2.position));
 				ringNode2.path = pathFinder.FindPath(ringNode2.position, ringNode2.next.position, 250000);
 				ringNode2.prev.path = pathFinder.FindPath(ringNode2.prev.position, ringNode2.position, 250000);
 				flag = false;
@@ -263,6 +261,7 @@ public class GenerateRailRing : ProceduralComponent
 			{
 				int count = TerrainMeta.Path.Rails.Count;
 				PathList pathList = new PathList("Rail " + count, list2.ToArray());
+				pathList.Spline = true;
 				pathList.Width = 4f;
 				pathList.InnerPadding = 1f;
 				pathList.OuterPadding = 1f;
@@ -277,7 +276,10 @@ public class GenerateRailRing : ProceduralComponent
 				pathList.End = false;
 				pathList.ProcgenStartNode = node10;
 				pathList.ProcgenEndNode = node11;
-				pathList.Path.Smoothen(32);
+				pathList.Path.Smoothen(32, new Vector3(1f, 0f, 1f));
+				pathList.Path.Smoothen(64, new Vector3(0f, 1f, 0f));
+				pathList.Path.RecalculateLength();
+				pathList.Path.Resample(7.5f);
 				pathList.Path.RecalculateTangents();
 				pathList.AdjustPlacementMap(20f);
 				TerrainMeta.Path.Rails.Add(pathList);

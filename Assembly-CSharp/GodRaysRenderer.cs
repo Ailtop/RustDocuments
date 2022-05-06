@@ -111,25 +111,28 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
 	{
 		Camera camera = context.camera;
 		TOD_Sky instance = TOD_Sky.Instance;
-		Vector3 lightPos = camera.WorldToViewportPoint(instance.Components.LightTransform.position);
-		CommandBuffer command = context.command;
-		PropertySheet propertySheet = context.propertySheets.Get(GodRayShader);
-		int skyMask = GetSkyMask(context, base.settings.Resolution.value, lightPos, base.settings.BlurIterations.value, base.settings.BlurRadius.value, base.settings.MaxRadius.value);
-		Color value = Color.black;
-		if ((double)lightPos.z >= 0.0)
+		if (!(instance == null))
 		{
-			value = ((!instance.IsDay) ? (base.settings.Intensity.value * instance.MoonVisibility * instance.MoonRayColor) : (base.settings.Intensity.value * instance.SunVisibility * instance.SunRayColor));
+			Vector3 lightPos = camera.WorldToViewportPoint(instance.Components.LightTransform.position);
+			CommandBuffer command = context.command;
+			PropertySheet propertySheet = context.propertySheets.Get(GodRayShader);
+			int skyMask = GetSkyMask(context, base.settings.Resolution.value, lightPos, base.settings.BlurIterations.value, base.settings.BlurRadius.value, base.settings.MaxRadius.value);
+			Color value = Color.black;
+			if ((double)lightPos.z >= 0.0)
+			{
+				value = ((!instance.IsDay) ? (base.settings.Intensity.value * instance.MoonVisibility * instance.MoonRayColor) : (base.settings.Intensity.value * instance.SunVisibility * instance.SunRayColor));
+			}
+			propertySheet.properties.SetColor("_LightColor", value);
+			command.SetGlobalTexture("_SkyMask", skyMask);
+			if (base.settings.BlendMode.value == BlendModeType.Screen)
+			{
+				RuntimeUtilities.BlitFullscreenTriangle(context.command, context.source, context.destination, propertySheet, 0);
+			}
+			else
+			{
+				RuntimeUtilities.BlitFullscreenTriangle(context.command, context.source, context.destination, propertySheet, 1);
+			}
+			command.ReleaseTemporaryRT(skyMask);
 		}
-		propertySheet.properties.SetColor("_LightColor", value);
-		command.SetGlobalTexture("_SkyMask", skyMask);
-		if (base.settings.BlendMode.value == BlendModeType.Screen)
-		{
-			RuntimeUtilities.BlitFullscreenTriangle(context.command, context.source, context.destination, propertySheet, 0);
-		}
-		else
-		{
-			RuntimeUtilities.BlitFullscreenTriangle(context.command, context.source, context.destination, propertySheet, 1);
-		}
-		command.ReleaseTemporaryRT(skyMask);
 	}
 }

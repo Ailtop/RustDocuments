@@ -388,7 +388,7 @@ public class TexasHoldEmController : CardGameController
 				if (basePlayer != null)
 				{
 					basePlayer.stats.Add("won_hand_texas_holdem", 1);
-					basePlayer.stats.Save();
+					basePlayer.stats.Save(forceSteamSave: true);
 				}
 			}
 		}

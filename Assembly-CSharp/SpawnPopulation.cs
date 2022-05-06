@@ -135,4 +135,9 @@ public class SpawnPopulation : BaseScriptableObject
 		}
 		return 2f * TargetDensity * Spawn.max_density * 1E-06f;
 	}
+
+	public virtual bool OverrideSpawnPosition(ref Vector3 newPos, ref Quaternion newRot)
+	{
+		return true;
+	}
 }

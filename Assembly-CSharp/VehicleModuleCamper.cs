@@ -345,17 +345,17 @@ public class VehicleModuleCamper : VehicleModuleSeating
 	public IItemContainerEntity GetContainer()
 	{
 		Locker locker = activeLocker.Get(base.isServer);
-		if (locker != null && BaseEntityEx.IsValid(locker) && !locker.inventory.IsEmpty())
+		if (locker != null && BaseNetworkableEx.IsValid(locker) && !locker.inventory.IsEmpty())
 		{
 			return locker;
 		}
 		BaseOven baseOven = activeBbq.Get(base.isServer);
-		if (baseOven != null && BaseEntityEx.IsValid(baseOven) && !baseOven.inventory.IsEmpty())
+		if (baseOven != null && BaseNetworkableEx.IsValid(baseOven) && !baseOven.inventory.IsEmpty())
 		{
 			return baseOven;
 		}
 		StorageContainer storageContainer = activeStorage.Get(base.isServer);
-		if (storageContainer != null && BaseEntityEx.IsValid(storageContainer) && !storageContainer.inventory.IsEmpty())
+		if (storageContainer != null && BaseNetworkableEx.IsValid(storageContainer) && !storageContainer.inventory.IsEmpty())
 		{
 			return storageContainer;
 		}

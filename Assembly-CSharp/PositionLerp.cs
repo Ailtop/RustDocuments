@@ -1,5 +1,4 @@
 using System;
-using Rust.Interpolation;
 using UnityEngine;
 
 public class PositionLerp : IDisposable
@@ -22,9 +21,9 @@ public class PositionLerp : IDisposable
 
 	private Action idleDisable;
 
-	private Interpolator<TransformSnapshot> interpolator = new Interpolator<TransformSnapshot>(32);
+	private TransformInterpolator interpolator = new TransformInterpolator();
 
-	private IPosLerpTarget target;
+	private ILerpTarget target;
 
 	private float timeOffset0 = float.MaxValue;
 
@@ -77,7 +76,7 @@ public class PositionLerp : IDisposable
 		InstanceList.Remove(this);
 	}
 
-	public void Initialize(IPosLerpTarget target)
+	public void Initialize(ILerpTarget target)
 	{
 		this.target = target;
 		Enabled = true;
@@ -113,7 +112,12 @@ public class PositionLerp : IDisposable
 		{
 			lastClientTime = lerpTime;
 			lastServerTime = serverTime;
-			interpolator.Add(new TransformSnapshot(lerpTime, position, rotation));
+			interpolator.Add(new TransformInterpolator.Entry
+			{
+				time = lerpTime,
+				pos = position,
+				rot = rotation
+			});
 		}
 		interpolator.Cull(lerpTime - num);
 	}
@@ -133,14 +137,19 @@ public class PositionLerp : IDisposable
 
 	public void SnapTo(Vector3 position, Quaternion rotation)
 	{
-		interpolator.last = new TransformSnapshot(LerpTime, position, rotation);
+		interpolator.last = new TransformInterpolator.Entry
+		{
+			pos = position,
+			rot = rotation,
+			time = LerpTime
+		};
 		Wipe();
 	}
 
 	public void SnapToEnd()
 	{
 		float interpolationDelay = target.GetInterpolationDelay();
-		Interpolator<TransformSnapshot>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, 0f, 0f);
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolationDelay, 0f, 0f);
 		target.SetNetworkPosition(segment.tick.pos);
 		target.SetNetworkRotation(segment.tick.rot);
 		Wipe();
@@ -175,8 +184,8 @@ public class PositionLerp : IDisposable
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolation = target.GetInterpolationDelay() * num;
 		float num2 = target.GetInterpolationSmoothing() * num;
-		Interpolator<TransformSnapshot>.Segment segment = interpolator.Query(LerpTime, interpolation, extrapolationTime, num2);
-		if (segment.next.Time >= interpolator.last.Time)
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolation, extrapolationTime, num2);
+		if (segment.next.time >= interpolator.last.time)
 		{
 			extrapolatedTime = Mathf.Min(extrapolatedTime + Time.deltaTime, extrapolationTime);
 		}
@@ -211,7 +220,7 @@ public class PositionLerp : IDisposable
 		Quaternion rotation = matrix.rotation;
 		for (int i = 0; i < interpolator.list.Count; i++)
 		{
-			TransformSnapshot value = interpolator.list[i];
+			TransformInterpolator.Entry value = interpolator.list[i];
 			value.pos = matrix.MultiplyPoint3x4(value.pos);
 			value.rot = rotation * value.rot;
 			interpolator.list[i] = value;
@@ -229,14 +238,14 @@ public class PositionLerp : IDisposable
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolationDelay = target.GetInterpolationDelay();
 		float interpolationSmoothing = target.GetInterpolationSmoothing();
-		Interpolator<TransformSnapshot>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
-		TransformSnapshot next = segment.next;
-		TransformSnapshot prev = segment.prev;
-		if (next.Time == prev.Time)
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
+		TransformInterpolator.Entry next = segment.next;
+		TransformInterpolator.Entry prev = segment.prev;
+		if (next.time == prev.time)
 		{
 			return Quaternion.identity;
 		}
-		return Quaternion.Euler((prev.rot.eulerAngles - next.rot.eulerAngles) / (prev.Time - next.Time));
+		return Quaternion.Euler((prev.rot.eulerAngles - next.rot.eulerAngles) / (prev.time - next.time));
 	}
 
 	public Vector3 GetEstimatedVelocity()
@@ -248,14 +257,14 @@ public class PositionLerp : IDisposable
 		float extrapolationTime = target.GetExtrapolationTime();
 		float interpolationDelay = target.GetInterpolationDelay();
 		float interpolationSmoothing = target.GetInterpolationSmoothing();
-		Interpolator<TransformSnapshot>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
-		TransformSnapshot next = segment.next;
-		TransformSnapshot prev = segment.prev;
-		if (next.Time == prev.Time)
+		TransformInterpolator.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
+		TransformInterpolator.Entry next = segment.next;
+		TransformInterpolator.Entry prev = segment.prev;
+		if (next.time == prev.time)
 		{
 			return Vector3.zero;
 		}
-		return (prev.pos - next.pos) / (prev.Time - next.Time);
+		return (prev.pos - next.pos) / (prev.time - next.time);
 	}
 
 	public void Dispose()

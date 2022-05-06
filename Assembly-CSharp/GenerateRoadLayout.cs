@@ -44,8 +44,6 @@ public class GenerateRoadLayout : ProceduralComponent
 
 	public const float TerrainOffset = -0.125f;
 
-	private const int Smoothen = 4;
-
 	private const int MaxDepth = 100000;
 
 	private PathList CreateSegment(int number, Vector3[] points)
@@ -53,6 +51,7 @@ public class GenerateRoadLayout : ProceduralComponent
 		PathList pathList = new PathList("Road " + number, points);
 		if (RoadType == InfrastructureType.Road)
 		{
+			pathList.Spline = true;
 			pathList.Width = 10f;
 			pathList.InnerPadding = 1f;
 			pathList.OuterPadding = 1f;
@@ -67,6 +66,7 @@ public class GenerateRoadLayout : ProceduralComponent
 		else
 		{
 			float num = 0.4f;
+			pathList.Spline = true;
 			pathList.Width = 4f;
 			pathList.InnerPadding = 1f * num;
 			pathList.OuterPadding = 1f;
@@ -266,7 +266,10 @@ public class GenerateRoadLayout : ProceduralComponent
 		}
 		foreach (PathList item2 in list)
 		{
-			item2.Path.Smoothen(4);
+			item2.Path.Smoothen(4, new Vector3(1f, 0f, 1f));
+			item2.Path.Smoothen(16, new Vector3(0f, 1f, 0f));
+			item2.Path.RecalculateLength();
+			item2.Path.Resample(7.5f);
 			item2.Path.RecalculateTangents();
 			item2.AdjustPlacementMap(20f);
 		}

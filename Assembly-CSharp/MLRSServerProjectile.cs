@@ -10,7 +10,7 @@ public class MLRSServerProjectile : ServerProjectile
 		{
 			return false;
 		}
-		if (BaseEntityEx.IsValid(hitEnt))
+		if (BaseNetworkableEx.IsValid(hitEnt))
 		{
 			return !(hitEnt is MLRS);
 		}

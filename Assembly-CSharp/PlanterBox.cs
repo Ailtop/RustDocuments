@@ -1,10 +1,13 @@
+#define UNITY_ASSERTIONS
 using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Network;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class PlanterBox : StorageContainer, ISplashable
 {
@@ -26,6 +29,8 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	private TimeCachedValue<float> plantArtificalTemperature;
 
+	private TimeSince lastSplashNetworkUpdate;
+
 	private TimeSince lastRainCheck;
 
 	public float soilSaturationFraction => (float)soilSaturation / (float)soilSaturationMax;
@@ -39,6 +44,50 @@ public class PlanterBox : StorageContainer, ISplashable
 	public bool BelowMinimumSaturationTriggerLevel => soilSaturationFraction < MinimumSaturationTriggerLevel;
 
 	public bool AboveMaximumSaturationTriggerLevel => soilSaturationFraction > MaximumSaturationTriggerLevel;
+
+	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
+	{
+		using (TimeWarning.New("PlanterBox.OnRpcMessage"))
+		{
+			if (rpc == 2965786167u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestSaturationUpdate "));
+				}
+				using (TimeWarning.New("RPC_RequestSaturationUpdate"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(2965786167u, "RPC_RequestSaturationUpdate", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							RPC_RequestSaturationUpdate(msg2);
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in RPC_RequestSaturationUpdate");
+					}
+				}
+				return true;
+			}
+		}
+		return base.OnRpcMessage(player, rpc, msg);
+	}
 
 	public override void ServerInit()
 	{
@@ -208,13 +257,21 @@ public class PlanterBox : StorageContainer, ISplashable
 		{
 			soilSaturation = 0;
 			RefreshGrowables();
-			SendNetworkUpdate();
+			if ((float)lastSplashNetworkUpdate > 60f)
+			{
+				SendNetworkUpdate();
+				lastSplashNetworkUpdate = 0f;
+			}
 			return amount;
 		}
 		int num = Mathf.Min(availableWaterCapacity, amount);
 		soilSaturation += num;
 		RefreshGrowables();
-		SendNetworkUpdate();
+		if ((float)lastSplashNetworkUpdate > 60f)
+		{
+			SendNetworkUpdate();
+			lastSplashNetworkUpdate = 0f;
+		}
 		return num;
 	}
 
@@ -313,5 +370,15 @@ public class PlanterBox : StorageContainer, ISplashable
 			byPlayer.GiveAchievement("HONEST_WORK");
 		}
 		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	private void RPC_RequestSaturationUpdate(RPCMessage msg)
+	{
+		if (msg.player != null)
+		{
+			ClientRPCPlayer(null, msg.player, "RPC_ReceiveSaturationUpdate", soilSaturation);
+		}
 	}
 }

@@ -161,6 +161,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 				if (allMountPoint.mountable != null && allMountPoint.mountable.IsMounted() && (int)num2 > 0)
 				{
 					allMountPoint.mountable.GetMounted().stats.Add("kayak_distance_travelled", (int)num2);
+					allMountPoint.mountable.GetMounted().stats.Save(forceSteamSave: true);
 				}
 			}
 		}

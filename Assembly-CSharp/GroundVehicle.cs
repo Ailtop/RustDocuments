@@ -10,9 +10,6 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 	protected GroundVehicleAudio gvAudio;
 
 	[SerializeField]
-	public GameObjectRef collisionEffect;
-
-	[SerializeField]
 	private GameObjectRef fuelStoragePrefab;
 
 	[SerializeField]
@@ -35,8 +32,6 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 	private Dictionary<BaseEntity, float> damageSinceLastTick = new Dictionary<BaseEntity, float>();
 
 	private float nextCollisionDamageTime;
-
-	private float nextCollisionFXTime;
 
 	private float dragMod;
 
@@ -218,21 +213,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 			float forceMagnitude = collision.impulse.magnitude / Time.fixedDeltaTime;
 			if (QueueCollisionDamage(baseEntity, forceMagnitude) > 0f)
 			{
-				ShowCollisionFX(collision);
-			}
-		}
-	}
-
-	private void ShowCollisionFX(Collision collision)
-	{
-		if (!(Time.time < nextCollisionFXTime))
-		{
-			nextCollisionFXTime = Time.time + 0.25f;
-			if (collisionEffect.isValid)
-			{
-				Vector3 point = collision.GetContact(0).point;
-				point += (base.transform.position - point) * 0.25f;
-				Effect.server.Run(collisionEffect.resourcePath, point, base.transform.up);
+				TryShowCollisionFX(collision.GetContact(0).point);
 			}
 		}
 	}

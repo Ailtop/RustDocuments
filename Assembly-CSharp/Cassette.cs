@@ -156,7 +156,7 @@ public class Cassette : BaseEntity
 		info.msg.cassette.audioId = AudioId;
 		info.msg.cassette.creatorSteamId = CreatorSteamId;
 		info.msg.cassette.preloadAudioId = preloadedAudioId;
-		if (!ObjectEx.IsUnityNull(currentCassettePlayer) && BaseEntityEx.IsValid(currentCassettePlayer.ToBaseEntity))
+		if (!ObjectEx.IsUnityNull(currentCassettePlayer) && BaseNetworkableEx.IsValid(currentCassettePlayer.ToBaseEntity))
 		{
 			info.msg.cassette.holder = currentCassettePlayer.ToBaseEntity.net.ID;
 		}

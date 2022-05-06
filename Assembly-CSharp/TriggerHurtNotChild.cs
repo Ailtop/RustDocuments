@@ -38,7 +38,11 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 
 	public bool ignoreAllVehicleMounted;
 
+	public float activationDelay;
+
 	private Dictionary<BaseEntity, float> entryTimes;
+
+	private TimeSince timeSinceAcivation;
 
 	public override GameObject InterestedInObject(GameObject obj)
 	{
@@ -95,6 +99,11 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 		CancelInvoke(OnTick);
 	}
 
+	protected void OnEnable()
+	{
+		timeSinceAcivation = 0f;
+	}
+
 	public new void OnDisable()
 	{
 		CancelInvoke(OnTick);
@@ -103,6 +112,10 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 
 	private bool IsInterested(BaseEntity ent)
 	{
+		if ((float)timeSinceAcivation < activationDelay)
+		{
+			return false;
+		}
 		BasePlayer basePlayer = ent.ToPlayer();
 		if (basePlayer != null)
 		{
@@ -137,7 +150,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 		IHurtTriggerUser hurtTriggerUser = SourceEntity as IHurtTriggerUser;
 		foreach (BaseEntity item in obj)
 		{
-			if (BaseEntityEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out var value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
+			if (BaseNetworkableEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out var value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
 			{
 				float num = DamagePerSecond * 1f / DamageTickRate;
 				if (UseSourceEntityDamageMultiplier && hurtTriggerUser != null)

@@ -41,8 +41,6 @@ public class GenerateRoadRing : ProceduralComponent
 
 	public const float TerrainOffset = -0.125f;
 
-	private const int Smoothen = 4;
-
 	private const int MaxDepth = 250000;
 
 	public int MinWorldSize;
@@ -57,7 +55,7 @@ public class GenerateRoadRing : ProceduralComponent
 		PathFinder pathFinder = new PathFinder(array);
 		int length = array.GetLength(0);
 		int num = length / 4;
-		int num2 = 4;
+		int num2 = 1;
 		int stepcount = num / num2;
 		int num3 = length / 2;
 		int pos_x = num;
@@ -256,6 +254,7 @@ public class GenerateRoadRing : ProceduralComponent
 		{
 			int count = TerrainMeta.Path.Roads.Count;
 			PathList pathList = new PathList("Road " + count, list2.ToArray());
+			pathList.Spline = true;
 			pathList.Width = 12f;
 			pathList.InnerPadding = 1f;
 			pathList.OuterPadding = 1f;
@@ -270,7 +269,10 @@ public class GenerateRoadRing : ProceduralComponent
 			pathList.End = false;
 			pathList.ProcgenStartNode = node10;
 			pathList.ProcgenEndNode = node11;
-			pathList.Path.Smoothen(4);
+			pathList.Path.Smoothen(4, new Vector3(1f, 0f, 1f));
+			pathList.Path.Smoothen(16, new Vector3(0f, 1f, 0f));
+			pathList.Path.RecalculateLength();
+			pathList.Path.Resample(7.5f);
 			pathList.Path.RecalculateTangents();
 			pathList.AdjustPlacementMap(24f);
 			TerrainMeta.Path.Roads.Add(pathList);

@@ -12,6 +12,9 @@ public class vehicle : ConsoleSystem
 	[ServerVar(Help = "If true, trains always explode when destroyed, and hitting a barrier always destroys the train immediately. Default: false")]
 	public static bool cinematictrains = false;
 
+	[ServerVar(Help = "Determines whether trains stop automatically when there's no-one on them. Default: false")]
+	public static bool trainskeeprunning = false;
+
 	[ServerVar(Help = "Determines whether modular cars turn into wrecks when destroyed, or just immediately gib. Default: true")]
 	public static bool carwrecks = true;
 
@@ -77,5 +80,16 @@ public class vehicle : ConsoleSystem
 			}
 		}
 		arg.ReplyWith($"Fixed up {num} vehicles.");
+	}
+
+	[ServerVar]
+	public static void stop_all_trains(Arg arg)
+	{
+		TrainEngine[] array = Object.FindObjectsOfType<TrainEngine>();
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].StopEngine();
+		}
+		arg.ReplyWith("All trains stopped.");
 	}
 }

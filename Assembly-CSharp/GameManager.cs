@@ -177,7 +177,7 @@ public class GameManager
 
 	public static void Destroy(Component component, float delay = 0f)
 	{
-		if (BaseEntityEx.IsValid(component as BaseEntity))
+		if (BaseNetworkableEx.IsValid(component as BaseEntity))
 		{
 			Debug.LogError("Trying to destroy an entity without killing it first: " + component.name);
 		}
@@ -188,7 +188,7 @@ public class GameManager
 	{
 		if ((bool)instance)
 		{
-			if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
+			if (BaseNetworkableEx.IsValid(instance.GetComponent<BaseEntity>()))
 			{
 				Debug.LogError("Trying to destroy an entity without killing it first: " + instance.name);
 			}
@@ -198,7 +198,7 @@ public class GameManager
 
 	public static void DestroyImmediate(Component component, bool allowDestroyingAssets = false)
 	{
-		if (BaseEntityEx.IsValid(component as BaseEntity))
+		if (BaseNetworkableEx.IsValid(component as BaseEntity))
 		{
 			Debug.LogError("Trying to destroy an entity without killing it first: " + component.name);
 		}
@@ -207,7 +207,7 @@ public class GameManager
 
 	public static void DestroyImmediate(GameObject instance, bool allowDestroyingAssets = false)
 	{
-		if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
+		if (BaseNetworkableEx.IsValid(instance.GetComponent<BaseEntity>()))
 		{
 			Debug.LogError("Trying to destroy an entity without killing it first: " + instance.name);
 		}
@@ -222,7 +222,7 @@ public class GameManager
 		}
 		using (TimeWarning.New("GameManager.Retire"))
 		{
-			if (BaseEntityEx.IsValid(instance.GetComponent<BaseEntity>()))
+			if (BaseNetworkableEx.IsValid(instance.GetComponent<BaseEntity>()))
 			{
 				Debug.LogError("Trying to retire an entity without killing it first: " + instance.name);
 			}

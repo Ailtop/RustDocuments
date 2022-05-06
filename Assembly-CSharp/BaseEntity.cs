@@ -1388,12 +1388,21 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		FileStorage.Type type = (FileStorage.Type)msg.read.UInt8();
 		string funcName = StringPool.Get(msg.read.UInt32());
 		uint num2 = ((msg.read.Unread > 0) ? msg.read.UInt32() : 0u);
+		bool flag = msg.read.Unread > 0 && msg.read.Bit();
 		byte[] array = FileStorage.server.Get(num, type, net.ID, num2);
+		if (array == null)
+		{
+			if (!flag)
+			{
+				return;
+			}
+			array = Array.Empty<byte>();
+		}
 		SendInfo sendInfo = new SendInfo(msg.connection);
 		sendInfo.channel = 2;
 		sendInfo.method = SendMethod.Reliable;
 		SendInfo sendInfo2 = sendInfo;
-		ClientRPCEx(sendInfo2, null, funcName, num, (array != null) ? ((uint)array.Length) : 0u, array ?? Array.Empty<byte>(), num2, (byte)type);
+		ClientRPCEx(sendInfo2, null, funcName, num, (uint)array.Length, array, num2, (byte)type);
 	}
 
 	public void SetParent(BaseEntity entity, bool worldPositionStays = false, bool sendImmediate = false)
@@ -1444,7 +1453,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		if (base.limitNetworking && baseEntity != null && baseEntity != entity)
 		{
 			BasePlayer basePlayer = baseEntity as BasePlayer;
-			if (BaseEntityEx.IsValid(basePlayer))
+			if (BaseNetworkableEx.IsValid(basePlayer))
 			{
 				DestroyOnClient(basePlayer.net.connection);
 			}
@@ -1604,7 +1613,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		Assert.IsTrue(base.isServer, "Should be server!");
 		BasePlayer basePlayer = NetworkPacketEx.Player(message);
-		if (!BaseEntityEx.IsValid(basePlayer))
+		if (!BaseNetworkableEx.IsValid(basePlayer))
 		{
 			if (ConVar.Global.developer > 0)
 			{
@@ -2069,7 +2078,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			else if (ShouldInheritNetworkGroup() && parentEntity.IsSet())
 			{
 				BaseEntity baseEntity = GetParentEntity();
-				if (!BaseEntityEx.IsValid(baseEntity))
+				if (!BaseNetworkableEx.IsValid(baseEntity))
 				{
 					Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + parentEntity.uid);
 					Invoke(UpdateNetworkGroup, 2f);

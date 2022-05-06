@@ -437,7 +437,7 @@ public class IOEntity : DecayEntity
 		while (_processQueue.Count > 0 && UnityEngine.Time.realtimeSinceStartup < realtimeSinceStartup + num && !_processQueue.Peek().HasBlockedUpdatedOutputsThisFrame)
 		{
 			IOEntity iOEntity = _processQueue.Dequeue();
-			if (BaseEntityEx.IsValid(iOEntity))
+			if (BaseNetworkableEx.IsValid(iOEntity))
 			{
 				iOEntity.UpdateOutputs();
 			}

@@ -315,7 +315,7 @@ public class Construction : PrefabAttribute
 		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
 		if (bNeedsValidPlacement && !flag)
 		{
-			if (BaseEntityEx.IsValid(baseEntity))
+			if (BaseNetworkableEx.IsValid(baseEntity))
 			{
 				baseEntity.Kill();
 			}

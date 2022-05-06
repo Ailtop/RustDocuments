@@ -480,7 +480,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		if (vehicle.vehiclesdroploot)
 		{
 			StorageContainer storageContainer = itemStorageInstance.Get(base.isServer);
-			if (storageContainer != null && BaseEntityEx.IsValid(storageContainer))
+			if (storageContainer != null && BaseNetworkableEx.IsValid(storageContainer))
 			{
 				storageContainer.DropItems();
 			}
@@ -779,7 +779,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public StorageContainer GetTorpedoContainer()
 	{
 		BaseEntity baseEntity = torpedoStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
 		}
@@ -789,7 +789,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	public StorageContainer GetItemContainer()
 	{
 		BaseEntity baseEntity = itemStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
 		}

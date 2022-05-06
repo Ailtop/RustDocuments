@@ -9,6 +9,8 @@ public class JunkPile : BaseEntity
 
 	public SpawnGroup[] spawngroups;
 
+	public NPCSpawner NPCSpawn;
+
 	private const float lifetimeMinutes = 30f;
 
 	protected bool isSinking;
@@ -49,6 +51,10 @@ public class JunkPile : BaseEntity
 				return false;
 			}
 		}
+		if (NPCSpawn != null && NPCSpawn.currentPopulation > 0)
+		{
+			return false;
+		}
 		return true;
 	}
 
@@ -68,7 +74,7 @@ public class JunkPile : BaseEntity
 		bool result = false;
 		foreach (BasePlayer item in obj)
 		{
-			if (!item.IsSleeping() && item.IsAlive())
+			if (!item.IsSleeping() && item.IsAlive() && !(item is HumanNPC))
 			{
 				result = true;
 				break;
@@ -88,6 +94,7 @@ public class JunkPile : BaseEntity
 		if (PlayersNearby())
 		{
 			Invoke(TimeOut, 30f);
+			return;
 		}
 		SpawnGroupsEmpty();
 		SinkAndDestroy();
@@ -102,6 +109,10 @@ public class JunkPile : BaseEntity
 			array[i].Clear();
 		}
 		SetFlag(Flags.Reserved8, b: true, recursive: true);
+		if (NPCSpawn != null)
+		{
+			NPCSpawn.Clear();
+		}
 		ClientRPC(null, "CLIENT_StartSink");
 		base.transform.position -= new Vector3(0f, 5f, 0f);
 		isSinking = true;

@@ -20,8 +20,6 @@ public sealed class PostProcessManager
 
 	private readonly List<PostProcessEffectSettings> m_BaseSettings;
 
-	private readonly List<Collider> m_TempColliders;
-
 	public readonly Dictionary<Type, PostProcessAttribute> settingsTypes;
 
 	public static PostProcessManager instance
@@ -42,7 +40,6 @@ public sealed class PostProcessManager
 		m_Volumes = new List<PostProcessVolume>();
 		m_SortNeeded = new Dictionary<int, bool>();
 		m_BaseSettings = new List<PostProcessEffectSettings>();
-		m_TempColliders = new List<Collider>(5);
 		settingsTypes = new Dictionary<Type, PostProcessAttribute>();
 		ReloadBaseTypes();
 	}
@@ -87,33 +84,11 @@ public sealed class PostProcessManager
 			{
 				results.Add(item);
 			}
-			else
+			else if (!flag)
 			{
-				if (flag)
-				{
-					continue;
-				}
-				List<Collider> tempColliders = m_TempColliders;
-				item.GetComponents(tempColliders);
-				if (tempColliders.Count == 0)
-				{
-					continue;
-				}
-				float num = float.PositiveInfinity;
-				foreach (Collider item2 in tempColliders)
-				{
-					if (item2.enabled)
-					{
-						float sqrMagnitude = ((item2.ClosestPoint(vector) - vector) / 2f).sqrMagnitude;
-						if (sqrMagnitude < num)
-						{
-							num = sqrMagnitude;
-						}
-					}
-				}
-				tempColliders.Clear();
-				float num2 = item.blendDistance * item.blendDistance;
-				if (num <= num2)
+				float sqrMagnitude = ((new OBB(item.transform, item.bounds).ClosestPoint(vector) - vector) / 2f).sqrMagnitude;
+				float num = item.blendDistance * item.blendDistance;
+				if (sqrMagnitude <= num)
 				{
 					results.Add(item);
 				}
@@ -262,34 +237,16 @@ public sealed class PostProcessManager
 				{
 					continue;
 				}
-				List<Collider> tempColliders = m_TempColliders;
-				item.GetComponents(tempColliders);
-				if (tempColliders.Count == 0)
+				float sqrMagnitude = ((new OBB(item.transform, item.bounds).ClosestPoint(vector) - vector) / 2f).sqrMagnitude;
+				float num = item.blendDistance * item.blendDistance;
+				if (!(sqrMagnitude > num))
 				{
-					continue;
-				}
-				float num = float.PositiveInfinity;
-				foreach (Collider item2 in tempColliders)
-				{
-					if (item2.enabled)
+					float num2 = 1f;
+					if (num > 0f)
 					{
-						float sqrMagnitude = ((item2.ClosestPoint(vector) - vector) / 2f).sqrMagnitude;
-						if (sqrMagnitude < num)
-						{
-							num = sqrMagnitude;
-						}
+						num2 = 1f - sqrMagnitude / num;
 					}
-				}
-				tempColliders.Clear();
-				float num2 = item.blendDistance * item.blendDistance;
-				if (!(num > num2))
-				{
-					float num3 = 1f;
-					if (num2 > 0f)
-					{
-						num3 = 1f - num / num2;
-					}
-					postProcessLayer.OverrideSettings(settings, num3 * Mathf.Clamp01(item.weight));
+					postProcessLayer.OverrideSettings(settings, num2 * Mathf.Clamp01(item.weight));
 				}
 			}
 		}

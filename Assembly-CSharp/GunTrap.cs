@@ -134,7 +134,7 @@ public class GunTrap : StorageContainer
 			foreach (BaseEntity item in entityContents)
 			{
 				BasePlayer component = item.GetComponent<BasePlayer>();
-				if (component.IsSleeping() || !component.IsAlive() || component.IsBuildingAuthed())
+				if (component.IsSleeping() || !component.IsAlive())
 				{
 					continue;
 				}
@@ -143,6 +143,10 @@ public class GunTrap : StorageContainer
 				{
 					Pool.FreeList(ref obj);
 					return (bool)obj2;
+				}
+				if (component.IsBuildingAuthed())
+				{
+					continue;
 				}
 				obj.Clear();
 				GamePhysics.TraceAll(new Ray(component.eyes.position, (GetEyePosition() - component.eyes.position).normalized), 0f, obj, 9f, 1218519297);

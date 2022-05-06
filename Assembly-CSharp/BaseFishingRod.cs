@@ -27,7 +27,7 @@ public class BaseFishingRod : HeldEntity
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return BaseNetworkableEx.IsValid(entity);
 			}
 			return false;
 		}
@@ -475,6 +475,7 @@ public class BaseFishingRod : HeldEntity
 				if (Rust.GameInfo.HasAchievements && !string.IsNullOrEmpty(fishableModifier.SteamStatName))
 				{
 					ownerPlayer.stats.Add(fishableModifier.SteamStatName, 1);
+					ownerPlayer.stats.Save(forceSteamSave: true);
 					fishLookup.CheckCatchAllAchievement(ownerPlayer);
 				}
 			}

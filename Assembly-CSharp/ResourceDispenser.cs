@@ -152,7 +152,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			}
 			baseMelee.SendPunch(new Vector3(UnityEngine.Random.Range(0.5f, 1f), UnityEngine.Random.Range(-0.25f, -0.5f), 0f) * -30f * (gatherInfoFromIndex.conditionLost / 6f), 0.05f);
 			baseMelee.LoseCondition(gatherInfoFromIndex.conditionLost);
-			if (!BaseEntityEx.IsValid(baseMelee) || baseMelee.IsBroken())
+			if (!BaseNetworkableEx.IsValid(baseMelee) || baseMelee.IsBroken())
 			{
 				return;
 			}
@@ -219,7 +219,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 
 	private void GiveResources(BaseEntity entity, float gatherDamage, float destroyFraction, AttackEntity attackWeapon)
 	{
-		if (!BaseEntityEx.IsValid(entity) || gatherDamage <= 0f)
+		if (!BaseNetworkableEx.IsValid(entity) || gatherDamage <= 0f)
 		{
 			return;
 		}
@@ -252,7 +252,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			Debug.Assert(attackWeapon.GetItem() != null, string.Concat("Attack Weapon ", attackWeapon, " has no Item"));
 			Debug.Assert(attackWeapon.ownerItemUID != 0, string.Concat("Attack Weapon ", attackWeapon, " ownerItemUID is 0"));
 			Debug.Assert(attackWeapon.GetParentEntity() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is null"));
-			Debug.Assert(BaseEntityEx.IsValid(attackWeapon.GetParentEntity()), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
+			Debug.Assert(BaseNetworkableEx.IsValid(attackWeapon.GetParentEntity()), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
 			Debug.Assert(attackWeapon.GetParentEntity().ToPlayer() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not a player"));
 			Debug.Assert(!attackWeapon.GetParentEntity().ToPlayer().IsDead(), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
 			BasePlayer ownerPlayer = attackWeapon.GetOwnerPlayer();

@@ -21,7 +21,7 @@ public class FlameTurret : StorageContainer
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return BaseNetworkableEx.IsValid(entity);
 			}
 			return false;
 		}

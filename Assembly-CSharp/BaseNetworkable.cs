@@ -765,7 +765,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public bool EqualNetID(BaseNetworkable other)
 	{
-		if (other != null && other.net != null && net != null)
+		if (!BaseNetworkableEx.IsRealNull(other) && other.net != null && net != null)
 		{
 			return other.net.ID == net.ID;
 		}

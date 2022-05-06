@@ -16,7 +16,7 @@ public class ZiplineLaunchPoint : BaseEntity
 
 	public Collider MountCollider;
 
-	public BoxCollider BuildingBlock;
+	public BoxCollider[] BuildingBlocks;
 
 	public GameObjectRef MountableRef;
 
@@ -24,9 +24,11 @@ public class ZiplineLaunchPoint : BaseEntity
 
 	public bool RegenLine;
 
-	private List<Vector3> ziplineTargets = new List<Vector3>();
+	public List<Vector3> ziplineTargets = new List<Vector3>();
 
 	private List<Vector3> linePoints;
+
+	public GameObjectRef ArrivalPointRef;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -91,14 +93,19 @@ public class ZiplineLaunchPoint : BaseEntity
 		if (ziplineTargets.Count == 0)
 		{
 			Kill();
+			return;
 		}
-		else
+		if (Vector3.Distance(linePoints[0], linePoints[linePoints.Count - 1]) > 100f && ArrivalPointRef != null && ArrivalPointRef.isValid)
 		{
-			SendNetworkUpdate();
+			ZiplineArrivalPoint obj = base.gameManager.CreateEntity(ArrivalPointRef.resourcePath, linePoints[linePoints.Count - 1]) as ZiplineArrivalPoint;
+			obj.SetPositions(linePoints);
+			obj.Spawn();
 		}
+		UpdateBuildingBlocks();
+		SendNetworkUpdate();
 	}
 
-	private void FindZiplineTarget(ref List<Vector3> foundPositions)
+	public void FindZiplineTarget(ref List<Vector3> foundPositions)
 	{
 		foundPositions.Clear();
 		Vector3 position = LineDeparturePoint.position;
@@ -106,7 +113,7 @@ public class ZiplineLaunchPoint : BaseEntity
 		GamePhysics.OverlapSphere(position + base.transform.forward * 200f, 200f, list, 1218511105);
 		ZiplineTarget ziplineTarget = null;
 		float num = float.MaxValue;
-		float num2 = 0f;
+		float num2 = 3f;
 		foreach (ZiplineTarget item in list)
 		{
 			if (item.IsChainPoint)
@@ -116,7 +123,7 @@ public class ZiplineLaunchPoint : BaseEntity
 			Vector3 position2 = item.transform.position;
 			float num3 = Vector3.Dot((position2.WithY(position.y) - position).normalized, base.transform.forward);
 			float num4 = Vector3.Distance(position, position2);
-			if (!(num3 > 0.2f) || !item.IsValidPosition(position) || !(position.y > position2.y + num2) || !(num4 > 10f) || !(num4 < num))
+			if (!(num3 > 0.2f) || !item.IsValidPosition(position) || !(position.y + num2 > position2.y) || !(num4 > 10f) || !(num4 < num))
 			{
 				continue;
 			}
@@ -130,24 +137,49 @@ public class ZiplineLaunchPoint : BaseEntity
 			}
 			foreach (ZiplineTarget item2 in list)
 			{
-				if (item2.IsChainPoint && item2.IsValidPosition(position) && !item2.IsValidPosition(position2))
+				if (!item2.IsChainPoint || !item2.IsValidChainPoint(position, position2))
 				{
-					bool num5 = CheckLineOfSight(position, item2.transform.position);
-					bool flag = CheckLineOfSight(item2.transform.position, position2);
-					if (num5 && flag)
+					continue;
+				}
+				bool flag = CheckLineOfSight(position, item2.transform.position);
+				bool flag2 = CheckLineOfSight(item2.transform.position, position2);
+				if (flag && flag2)
+				{
+					num = num4;
+					ziplineTarget = item;
+					foundPositions.Clear();
+					foundPositions.Add(item2.transform.position);
+					foundPositions.Add(ziplineTarget.transform.position);
+				}
+				else
+				{
+					if (!flag)
 					{
-						num = num4;
-						ziplineTarget = item;
-						foundPositions.Clear();
-						foundPositions.Add(item2.transform.position);
-						foundPositions.Add(ziplineTarget.transform.position);
+						continue;
+					}
+					foreach (ZiplineTarget item3 in list)
+					{
+						if (!(item3 == item2) && item3.IsValidChainPoint(item2.Target.position, item.Target.position))
+						{
+							bool num5 = CheckLineOfSight(item2.transform.position, item3.transform.position);
+							bool flag3 = CheckLineOfSight(item3.transform.position, item.transform.position);
+							if (num5 && flag3)
+							{
+								num = num4;
+								ziplineTarget = item;
+								foundPositions.Clear();
+								foundPositions.Add(item2.transform.position);
+								foundPositions.Add(item3.transform.position);
+								foundPositions.Add(ziplineTarget.transform.position);
+							}
+						}
 					}
 				}
 			}
 		}
 	}
 
-	private bool CheckLineOfSight(Vector3 from, Vector3 to)
+	public bool CheckLineOfSight(Vector3 from, Vector3 to)
 	{
 		Vector3 vector = CalculateLineMidPoint(from, to) - Vector3.up * 0.5f;
 		if (GamePhysics.LineOfSightRadius(from, to, 1218511105, 0.5f, 2f) && GamePhysics.LineOfSightRadius(from, vector, 1218511105, 0.5f, 2f))
@@ -160,19 +192,20 @@ public class ZiplineLaunchPoint : BaseEntity
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(2uL)]
-	private void MountPlayer(RPCMessage msg)
+	public void MountPlayer(RPCMessage msg)
 	{
 		if (IsBusy() || msg.player == null || msg.player.Distance(LineDeparturePoint.position) > 3f || !IsPlayerFacingValidDirection(msg.player) || ziplineTargets.Count == 0)
 		{
 			return;
 		}
 		Vector3 position = LineDeparturePoint.position;
-		Quaternion startRot = Quaternion.LookRotation((ziplineTargets[0].WithY(position.y) - position).normalized);
-		ZiplineMountable ziplineMountable = base.gameManager.CreateEntity(MountableRef.resourcePath, msg.player.transform.position + Vector3.up * 2f, msg.player.eyes.rotation) as ZiplineMountable;
+		Quaternion lineStartRot = Quaternion.LookRotation((ziplineTargets[0].WithY(position.y) - position).normalized);
+		Quaternion rot = Quaternion.LookRotation((position - msg.player.transform.position.WithY(position.y)).normalized);
+		ZiplineMountable ziplineMountable = base.gameManager.CreateEntity(MountableRef.resourcePath, msg.player.transform.position + Vector3.up * 2.1f, rot) as ZiplineMountable;
 		if (ziplineMountable != null)
 		{
 			CalculateZiplinePoints(ziplineTargets, ref linePoints);
-			ziplineMountable.SetDestination(linePoints, position, startRot);
+			ziplineMountable.SetDestination(linePoints, position, lineStartRot);
 			ziplineMountable.Spawn();
 			ziplineMountable.MountPlayer(msg.player);
 			if (msg.player.GetMounted() != ziplineMountable)
@@ -184,7 +217,7 @@ public class ZiplineLaunchPoint : BaseEntity
 		}
 	}
 
-	private void ClearBusy()
+	public void ClearBusy()
 	{
 		SetFlag(Flags.Busy, b: false);
 	}
@@ -201,6 +234,28 @@ public class ZiplineLaunchPoint : BaseEntity
 		{
 			info.msg.zipline.destinationPoints.Add(new VectorData(ziplineTarget.x, ziplineTarget.y, ziplineTarget.z));
 		}
+	}
+
+	[ServerVar(ServerAdmin = true)]
+	public static void report(ConsoleSystem.Arg arg)
+	{
+		float num = 0f;
+		int num2 = 0;
+		int num3 = 0;
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			if (serverEntity is ZiplineLaunchPoint ziplineLaunchPoint)
+			{
+				float lineLength = ziplineLaunchPoint.GetLineLength();
+				num2++;
+				num += lineLength;
+			}
+			else if (serverEntity is ZiplineArrivalPoint)
+			{
+				num3++;
+			}
+		}
+		arg.ReplyWith($"{num2} ziplines, total distance: {num:F2}, avg length: {num / (float)num2:F2}, arrival points: {num3}");
 	}
 
 	public override void Load(LoadInfo info)
@@ -237,47 +292,90 @@ public class ZiplineLaunchPoint : BaseEntity
 		}
 	}
 
-	private Vector3 CalculateLineMidPoint(Vector3 start, Vector3 endPoint)
+	public Vector3 CalculateLineMidPoint(Vector3 start, Vector3 endPoint)
 	{
 		Vector3 result = Vector3.Lerp(start, endPoint, 0.5f);
 		result.y -= LineSlackAmount;
 		return result;
 	}
 
-	private void UpdateBuildingBlocks()
+	public void UpdateBuildingBlocks()
 	{
-		BuildingBlock.gameObject.SetActive(value: false);
-		if (ziplineTargets.Count > 0)
+		BoxCollider[] buildingBlocks = BuildingBlocks;
+		for (int i = 0; i < buildingBlocks.Length; i++)
 		{
-			SetUpBuildingBlock(BuildingBlock, linePoints);
+			buildingBlocks[i].gameObject.SetActive(value: false);
 		}
-		static void SetUpBuildingBlock(BoxCollider c, List<Vector3> linePoints)
+		int num = 0;
+		if (ziplineTargets.Count <= 0)
 		{
-			Vector3 vector = linePoints[0];
-			Vector3 vector2 = linePoints[linePoints.Count - 1];
-			Vector3 vector3 = Vector3.zero;
-			Quaternion rotation = Quaternion.LookRotation((vector - vector2).normalized, Vector3.up);
-			Vector3 position = Vector3.Lerp(vector, vector2, 0.5f);
+			return;
+		}
+		Vector3 vector = Vector3.zero;
+		int startIndex2 = 0;
+		for (int j = 0; j < linePoints.Count; j++)
+		{
+			if (j == 0)
+			{
+				continue;
+			}
+			Vector3 vector2 = linePoints[j];
+			Vector3 normalized = (vector2 - linePoints[j - 1].WithY(vector2.y)).normalized;
+			if (vector != Vector3.zero && Vector3.Dot(normalized, vector) < 0.9f)
+			{
+				if (num < BuildingBlocks.Length)
+				{
+					SetUpBuildingBlock(BuildingBlocks[num++], startIndex2, j - 1);
+				}
+				startIndex2 = j - 1;
+			}
+			vector = normalized;
+		}
+		if (num < BuildingBlocks.Length)
+		{
+			SetUpBuildingBlock(BuildingBlocks[num], startIndex2, linePoints.Count - 1);
+		}
+		void SetUpBuildingBlock(BoxCollider c, int startIndex, int endIndex)
+		{
+			Vector3 vector3 = linePoints[startIndex];
+			Vector3 vector4 = linePoints[endIndex];
+			Vector3 vector5 = Vector3.zero;
+			Quaternion rotation = Quaternion.LookRotation((vector3 - vector4).normalized, Vector3.up);
+			Vector3 position = Vector3.Lerp(vector3, vector4, 0.5f);
 			c.transform.position = position;
 			c.transform.rotation = rotation;
-			foreach (Vector3 linePoint in linePoints)
+			for (int k = startIndex; k < endIndex; k++)
 			{
-				Vector3 vector4 = c.transform.InverseTransformPoint(linePoint);
-				if (vector4.y < vector3.y)
+				Vector3 vector6 = c.transform.InverseTransformPoint(linePoints[k]);
+				if (vector6.y < vector5.y)
 				{
-					vector3 = vector4;
+					vector5 = vector6;
 				}
 			}
-			float num = Mathf.Abs(vector3.y) + 2f;
-			float z = Vector3.Distance(vector, vector2);
-			c.size = new Vector3(0.5f, num, z);
-			c.center = new Vector3(0f, 0f - num * 0.5f, 0f);
+			float num2 = Mathf.Abs(vector5.y) + 2f;
+			float z = Vector3.Distance(vector3, vector4);
+			c.size = new Vector3(0.5f, num2, z);
+			c.center = new Vector3(0f, 0f - num2 * 0.5f, 0f);
 			c.gameObject.SetActive(value: true);
 		}
 	}
 
-	private bool IsPlayerFacingValidDirection(BasePlayer ply)
+	public bool IsPlayerFacingValidDirection(BasePlayer ply)
 	{
 		return Vector3.Dot(ply.eyes.HeadForward(), base.transform.forward) > 0.2f;
+	}
+
+	public float GetLineLength()
+	{
+		if (linePoints == null)
+		{
+			return 0f;
+		}
+		float num = 0f;
+		for (int i = 0; i < linePoints.Count - 1; i++)
+		{
+			num += Vector3.Distance(linePoints[i], linePoints[i + 1]);
+		}
+		return num;
 	}
 }

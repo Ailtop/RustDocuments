@@ -138,8 +138,6 @@ public class PathList
 
 	public int Splat;
 
-	public int AdjustTerrainHeightCalls;
-
 	public PathFinder.Node ProcgenStartNode;
 
 	public PathFinder.Node ProcgenEndNode;
@@ -171,7 +169,7 @@ public class PathList
 			int index2 = Mathf.Min(i + 1, positions.Count - 1);
 			Vector3 position = positions[i];
 			Quaternion rotation = Quaternion.LookRotation((positions[index2] - positions[index]).XZ3D());
-			SpawnObject(ref seed, prefabs, position, rotation, obj, out var spawned, filter);
+			SpawnObject(ref seed, prefabs, position, rotation, obj, out var spawned, positions.Count, i, filter);
 			if (spawned != null)
 			{
 				obj.Add(spawned);
@@ -195,11 +193,11 @@ public class PathList
 		return true;
 	}
 
-	private bool SpawnObject(ref uint seed, Prefab[] prefabs, Vector3 position, Quaternion rotation, List<Prefab> previousSpawns, out Prefab spawned, SpawnFilter filter = null)
+	private bool SpawnObject(ref uint seed, Prefab[] prefabs, Vector3 position, Quaternion rotation, List<Prefab> previousSpawns, out Prefab spawned, int pathLength, int index, SpawnFilter filter = null)
 	{
 		spawned = null;
 		Prefab replacement = ArrayEx.GetRandom(prefabs, ref seed);
-		replacement.ApplySequenceReplacement(previousSpawns, ref replacement, prefabs);
+		replacement.ApplySequenceReplacement(previousSpawns, ref replacement, prefabs, pathLength, index);
 		Vector3 pos = position;
 		Quaternion rot = rotation;
 		Vector3 scale = replacement.Object.transform.localScale;
@@ -616,7 +614,7 @@ public class PathList
 		Path.MaxIndex = Path.DefaultMaxIndex;
 	}
 
-	public void AdjustTerrainHeight()
+	public void AdjustTerrainHeight(float intensity = 1f, float fade = 1f)
 	{
 		TerrainHeightMap heightmap = TerrainMeta.HeightMap;
 		_ = TerrainMeta.TopologyMap;
@@ -624,7 +622,7 @@ public class PathList
 		float randomScale = RandomScale;
 		float outerPadding = OuterPadding;
 		float innerPadding = InnerPadding;
-		float outerFade = ((AdjustTerrainHeightCalls == 0) ? OuterFade : (OuterFade / 3f));
+		float outerFade = OuterFade * fade;
 		float innerFade = InnerFade;
 		float offset = TerrainOffset * TerrainMeta.OneOverSize.y;
 		float num2 = Width * 0.5f;
@@ -688,7 +686,7 @@ public class PathList
 				float num8 = Mathf.InverseLerp(radius + outerPadding + outerFade, radius + outerPadding, value);
 				float t = Mathf.InverseLerp(radius - innerPadding, radius - innerPadding - innerFade, value);
 				float num9 = TerrainMeta.NormalizeY(vector13.y);
-				heightmap.SetHeight(x, z, num9 + Mathf.SmoothStep(0f, offset, t), opacity * num8);
+				heightmap.SetHeight(x, z, num9 + Mathf.SmoothStep(0f, offset, t), intensity * opacity * num8);
 			});
 			vector2 = vector5;
 			vector3 = vector6;
@@ -698,7 +696,6 @@ public class PathList
 			v = tangent;
 			cur_line = next_line;
 		}
-		AdjustTerrainHeightCalls++;
 	}
 
 	public void AdjustTerrainTexture()
@@ -842,7 +839,7 @@ public class PathList
 		}
 	}
 
-	public List<MeshObject> CreateMesh(Mesh[] meshes, float normalSmoothing)
+	public List<MeshObject> CreateMesh(Mesh[] meshes, float normalSmoothing, bool snapToTerrain)
 	{
 		MeshCache.Data[] array = new MeshCache.Data[meshes.Length];
 		MeshData[] array2 = new MeshData[meshes.Length];
@@ -901,8 +898,11 @@ public class PathList
 						float num10 = Mathf.Lerp(num5, num5 * randomScale, Noise.Billow(vector5.x, vector5.z, 2, 0.005f));
 						Vector3 vector8 = vector5 - vector6 * num10;
 						Vector3 vector9 = vector5 + vector6 * num10;
-						vector8.y = heightMap.GetHeight(vector8);
-						vector9.y = heightMap.GetHeight(vector9);
+						if (snapToTerrain)
+						{
+							vector8.y = heightMap.GetHeight(vector8);
+							vector9.y = heightMap.GetHeight(vector9);
+						}
 						vector8 += vector7 * meshOffset;
 						vector9 += vector7 * meshOffset;
 						vector2 = Vector3.Lerp(vector8, vector9, t);

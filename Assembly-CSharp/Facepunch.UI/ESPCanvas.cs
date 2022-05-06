@@ -15,4 +15,16 @@ public class ESPCanvas : MonoBehaviour
 
 	[Tooltip("Entities this far away won't be overlayed")]
 	public float MaxDistance = 64f;
+
+	[ClientVar(ClientAdmin = true)]
+	public static float OverrideMaxDisplayDistance;
+
+	[ClientVar(ClientAdmin = true)]
+	public static bool DisableOcclusionChecks;
+
+	[ClientVar(ClientAdmin = true)]
+	public static bool ShowHealth;
+
+	[ClientVar(ClientAdmin = true)]
+	public static bool ColourCodeTeams;
 }

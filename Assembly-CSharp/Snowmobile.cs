@@ -499,7 +499,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 		if (vehicle.vehiclesdroploot)
 		{
 			StorageContainer storageContainer = itemStorageInstance.Get(base.isServer);
-			if (storageContainer != null && BaseEntityEx.IsValid(storageContainer))
+			if (storageContainer != null && BaseNetworkableEx.IsValid(storageContainer))
 			{
 				storageContainer.DropItems();
 			}
@@ -548,7 +548,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 	public StorageContainer GetItemContainer()
 	{
 		BaseEntity baseEntity = itemStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseEntityEx.IsValid(baseEntity))
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
 			return baseEntity as StorageContainer;
 		}

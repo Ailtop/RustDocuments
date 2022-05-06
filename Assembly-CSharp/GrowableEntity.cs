@@ -19,7 +19,6 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			if (ShouldAdd(entity))
 			{
 				entity.CalculateQualities_Water();
-				entity.SendNetworkUpdate();
 			}
 		}
 
@@ -27,7 +26,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			if (base.ShouldAdd(entity))
 			{
-				return BaseEntityEx.IsValid(entity);
+				return BaseNetworkableEx.IsValid(entity);
 			}
 			return false;
 		}
@@ -214,6 +213,42 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 				}
 				return true;
 			}
+			if (rpc == 232075937 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestQualityUpdate "));
+				}
+				using (TimeWarning.New("RPC_RequestQualityUpdate"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(232075937u, "RPC_RequestQualityUpdate", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							RPC_RequestQualityUpdate(msg4);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in RPC_RequestQualityUpdate");
+					}
+				}
+				return true;
+			}
 			if (rpc == 2222960834u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -238,13 +273,13 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg4 = rPCMessage;
-							RPC_TakeClone(msg4);
+							RPCMessage msg5 = rPCMessage;
+							RPC_TakeClone(msg5);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception4)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in RPC_TakeClone");
 					}
 				}
@@ -875,6 +910,23 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 			}
 		}
 		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	private void RPC_RequestQualityUpdate(RPCMessage msg)
+	{
+		if (msg.player != null)
+		{
+			ProtoBuf.GrowableEntity growableEntity = Facepunch.Pool.Get<ProtoBuf.GrowableEntity>();
+			growableEntity.lightModifier = LightQuality;
+			growableEntity.groundModifier = GroundQuality;
+			growableEntity.waterModifier = WaterQuality;
+			growableEntity.happiness = OverallQuality;
+			growableEntity.temperatureModifier = TemperatureQuality;
+			growableEntity.waterConsumption = WaterConsumption;
+			ClientRPCPlayer(null, msg.player, "RPC_ReceiveQualityUpdate", growableEntity);
+		}
 	}
 
 	public void ReceiveInstanceData(ProtoBuf.Item.InstanceData data)

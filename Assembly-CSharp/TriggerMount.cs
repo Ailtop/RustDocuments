@@ -72,7 +72,7 @@ public class TriggerMount : TriggerBase, IServerComponent
 		foreach (KeyValuePair<BaseEntity, EntryInfo> item in entryInfo)
 		{
 			BaseEntity key = item.Key;
-			if (!BaseEntityEx.IsValid(key))
+			if (!BaseNetworkableEx.IsValid(key))
 			{
 				continue;
 			}

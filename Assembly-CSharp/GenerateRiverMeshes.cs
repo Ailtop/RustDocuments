@@ -4,6 +4,8 @@ public class GenerateRiverMeshes : ProceduralComponent
 {
 	public const float NormalSmoothing = 0.1f;
 
+	public const bool SnapToTerrain = true;
+
 	public Mesh RiverMesh;
 
 	public Mesh[] RiverMeshes;
@@ -19,7 +21,7 @@ public class GenerateRiverMeshes : ProceduralComponent
 		RiverMeshes = new Mesh[1] { RiverMesh };
 		foreach (PathList river in TerrainMeta.Path.Rivers)
 		{
-			foreach (PathList.MeshObject item in river.CreateMesh(RiverMeshes, 0.1f))
+			foreach (PathList.MeshObject item in river.CreateMesh(RiverMeshes, 0.1f, snapToTerrain: true))
 			{
 				GameObject obj = new GameObject("River Mesh");
 				obj.transform.position = item.Position;

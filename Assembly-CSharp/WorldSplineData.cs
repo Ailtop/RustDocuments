@@ -86,10 +86,34 @@ public class WorldSplineData
 		return inputTangents[maxPointsIndex];
 	}
 
+	public virtual Vector3 GetTangent(float distance)
+	{
+		float num = distance / Length * (float)(inputTangents.Length - 1);
+		int num2 = (int)num;
+		if (num <= 0f)
+		{
+			return GetStartTangent();
+		}
+		if (num >= (float)maxPointsIndex)
+		{
+			return GetEndTangent();
+		}
+		Vector3 a = inputTangents[num2];
+		Vector3 b = inputTangents[num2 + 1];
+		float t = num - (float)num2;
+		return Vector3.Slerp(a, b, t);
+	}
+
 	public Vector3 GetPointCubicHermite(float distance)
 	{
 		Vector3 tangent;
 		return GetPointAndTangentCubicHermite(distance, out tangent);
+	}
+
+	public Vector3 GetTangentCubicHermite(float distance)
+	{
+		GetPointAndTangentCubicHermite(distance, out var tangent);
+		return tangent;
 	}
 
 	public Vector3 GetPointAndTangentCubicHermite(float distance, out Vector3 tangent)
@@ -139,7 +163,7 @@ public class WorldSplineData
 				LUTEntry lUTEntry2 = LUTValues[num];
 				for (int j = 0; j < lUTEntry2.points.Count; j++)
 				{
-					if (lUTEntry2.points[j].distance >= distance)
+					if (lUTEntry2.points[j].distance > distance)
 					{
 						num2 = j;
 						break;
@@ -169,24 +193,6 @@ public class WorldSplineData
 		}
 		tangent = GetEndTangent();
 		return GetEndPoint();
-	}
-
-	public virtual Vector3 GetTangent(float distance)
-	{
-		float num = distance / Length * (float)(inputTangents.Length - 1);
-		int num2 = (int)num;
-		if (num <= 0f)
-		{
-			return GetStartTangent();
-		}
-		if (num >= (float)maxPointsIndex)
-		{
-			return GetEndTangent();
-		}
-		Vector3 a = inputTangents[num2];
-		Vector3 b = inputTangents[num2 + 1];
-		float t = num - (float)num2;
-		return Vector3.Slerp(a, b, t);
 	}
 
 	public void SetDefaultTangents(WorldSpline worldSpline)

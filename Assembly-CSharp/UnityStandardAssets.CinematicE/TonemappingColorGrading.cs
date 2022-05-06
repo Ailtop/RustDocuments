@@ -232,9 +232,9 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Brightens or darkens all colors.")]
 		public float value;
 
+		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		[Space]
 		[Range(0f, 2f)]
-		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		public float contrast;
 
 		[Range(0.01f, 5f)]

@@ -15,9 +15,9 @@ public static class TelephoneManager
 	[ServerVar]
 	public static int MaxCallLength = 120;
 
-	private static Dictionary<int, PhoneController> allTelephones = new Dictionary<int, PhoneController>();
+	public static Dictionary<int, PhoneController> allTelephones = new Dictionary<int, PhoneController>();
 
-	private static int maxAssignedPhoneNumber = 99990000;
+	public static int maxAssignedPhoneNumber = 99990000;
 
 	public static int GetUnusedTelephoneNumber()
 	{

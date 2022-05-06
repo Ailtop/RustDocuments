@@ -77,7 +77,7 @@ public class PathInterpolator
 		initialized = true;
 	}
 
-	protected virtual void RecalculateLength()
+	public void RecalculateLength()
 	{
 		float num = 0f;
 		for (int i = 0; i < Points.Length - 1; i++)
@@ -92,25 +92,28 @@ public class PathInterpolator
 
 	public void Resample(float distance)
 	{
-		if (!initialized)
+		int num = Mathf.RoundToInt(Length / distance);
+		if (num >= 2)
 		{
-			throw new Exception("Tangents have not been calculated yet or are outdated.");
+			Vector3[] array = new Vector3[num];
+			distance = Length / (float)(num - 1);
+			for (int i = 0; i < num; i++)
+			{
+				array[i] = GetPoint((float)i * distance);
+			}
+			Points = array;
+			MinIndex = DefaultMinIndex;
+			MaxIndex = DefaultMaxIndex;
+			initialized = false;
 		}
-		Vector3[] array = new Vector3[Mathf.RoundToInt(Length / distance)];
-		for (int i = 0; i < array.Length; i++)
-		{
-			array[i] = GetPointCubicHermite((float)i * distance);
-		}
-		Points = array;
-		initialized = false;
 	}
 
-	public void Smoothen(int iterations, Func<Vector3, bool> filter = null)
+	public void Smoothen(int iterations, Func<int, float> filter = null)
 	{
 		Smoothen(iterations, Vector3.one, filter);
 	}
 
-	public void Smoothen(int iterations, Vector3 multipliers, Func<Vector3, bool> filter = null)
+	public void Smoothen(int iterations, Vector3 multipliers, Func<int, float> filter = null)
 	{
 		for (int i = 0; i < iterations; i++)
 		{
@@ -126,7 +129,7 @@ public class PathInterpolator
 		initialized = false;
 	}
 
-	private void SmoothenIndex(int i, Vector3 multipliers, Func<Vector3, bool> filter = null)
+	private void SmoothenIndex(int i, Vector3 multipliers, Func<int, float> filter = null)
 	{
 		int num = i - 1;
 		int num2 = i + 1;
@@ -137,20 +140,21 @@ public class PathInterpolator
 		Vector3 vector = Points[num];
 		Vector3 vector2 = Points[i];
 		Vector3 vector3 = Points[num2];
-		if (filter == null || filter(vector2))
+		Vector3 vector4 = (vector + vector2 + vector2 + vector3) * 0.25f;
+		if (filter != null)
 		{
-			Vector3 vector4 = (vector + vector2 + vector2 + vector3) * 0.25f;
-			if (multipliers != Vector3.one)
-			{
-				vector4.x = Mathf.LerpUnclamped(vector2.x, vector4.x, multipliers.x);
-				vector4.y = Mathf.LerpUnclamped(vector2.y, vector4.y, multipliers.y);
-				vector4.z = Mathf.LerpUnclamped(vector2.z, vector4.z, multipliers.z);
-			}
-			Points[i] = vector4;
-			if (i == 0)
-			{
-				Points[Points.Length - 1] = Points[0];
-			}
+			multipliers *= filter(i);
+		}
+		if (multipliers != Vector3.one)
+		{
+			vector4.x = Mathf.LerpUnclamped(vector2.x, vector4.x, multipliers.x);
+			vector4.y = Mathf.LerpUnclamped(vector2.y, vector4.y, multipliers.y);
+			vector4.z = Mathf.LerpUnclamped(vector2.z, vector4.z, multipliers.z);
+		}
+		Points[i] = vector4;
+		if (i == 0)
+		{
+			Points[Points.Length - 1] = Points[0];
 		}
 	}
 
@@ -184,6 +188,10 @@ public class PathInterpolator
 
 	public Vector3 GetPoint(float distance)
 	{
+		if (Length == 0f)
+		{
+			return GetStartPoint();
+		}
 		float num = distance / Length * (float)(Points.Length - 1);
 		int num2 = (int)num;
 		if (num <= (float)MinIndex)
@@ -205,6 +213,10 @@ public class PathInterpolator
 		if (!initialized)
 		{
 			throw new Exception("Tangents have not been calculated yet or are outdated.");
+		}
+		if (Length == 0f)
+		{
+			return GetStartPoint();
 		}
 		float num = distance / Length * (float)(Tangents.Length - 1);
 		int num2 = (int)num;

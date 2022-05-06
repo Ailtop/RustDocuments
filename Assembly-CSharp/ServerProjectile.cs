@@ -92,7 +92,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 
 	protected virtual bool IsAValidHit(BaseEntity hitEnt)
 	{
-		if (BaseEntityEx.IsValid(hitEnt) && BaseEntityEx.IsValid(base.baseEntity.creatorEntity))
+		if (BaseNetworkableEx.IsValid(hitEnt) && BaseNetworkableEx.IsValid(base.baseEntity.creatorEntity))
 		{
 			return hitEnt.net.ID != base.baseEntity.creatorEntity.net.ID;
 		}

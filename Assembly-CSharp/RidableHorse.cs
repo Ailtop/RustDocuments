@@ -33,6 +33,10 @@ public class RidableHorse : BaseRidableAnimal
 
 	public int numStorageSlots;
 
+	private int prevBreed;
+
+	private int prevSlots;
+
 	private static Material[] breedAssignmentArray = new Material[2];
 
 	private float distanceRecordingSpacing = 5f;
@@ -379,6 +383,21 @@ public class RidableHorse : BaseRidableAnimal
 		}
 		inventory.capacity = GetStorageStartIndex() + numStorageSlots;
 		SendNetworkUpdate();
+	}
+
+	public override void DoNetworkUpdate()
+	{
+		bool num = false || prevStamina != staminaSeconds || prevMaxStamina != currentMaxStaminaSeconds || prevBreed != currentBreed || prevSlots != numStorageSlots || prevRunState != (int)currentRunState || prevMaxSpeed != GetRunSpeed();
+		prevStamina = staminaSeconds;
+		prevMaxStamina = currentMaxStaminaSeconds;
+		prevRunState = (int)currentRunState;
+		prevMaxSpeed = GetRunSpeed();
+		prevBreed = currentBreed;
+		prevSlots = numStorageSlots;
+		if (num)
+		{
+			SendNetworkUpdate();
+		}
 	}
 
 	public override void Load(LoadInfo info)

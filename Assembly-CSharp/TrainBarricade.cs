@@ -33,7 +33,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 		bool result = false;
 		if (base.isServer)
 		{
-			float num = Mathf.Abs(train.TrackSpeed);
+			float num = Mathf.Abs(train.GetTrackSpeed());
 			SetHitTrain(train, trainTrigger);
 			if (num < minVelToDestroy && !vehicle.cinematictrains)
 			{
@@ -87,14 +87,14 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 		}
 		if (hitTrain != null)
 		{
-			hitTrain.ReduceSpeedBy(velReduction);
+			hitTrain.completeTrain.ReduceSpeedBy(velReduction);
 			if (vehicle.cinematictrains)
 			{
 				hitTrain.Hurt(9999f, DamageType.Collision, this, useProtection: false);
 			}
 			else
 			{
-				float amount = Mathf.Abs(hitTrain.TrackSpeed) * trainDamagePerMPS;
+				float amount = Mathf.Abs(hitTrain.GetTrackSpeed()) * trainDamagePerMPS;
 				hitTrain.Hurt(amount, DamageType.Collision, this, useProtection: false);
 			}
 		}
@@ -120,8 +120,8 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 		}
 		if (flag)
 		{
-			float num = hitTrainTrigger.owner.GetEngineForces();
-			if (hitTrainTrigger.location == TriggerTrainCollisions.ColliderLocation.Rear)
+			float num = hitTrainTrigger.owner.completeTrain.TotalForces;
+			if (hitTrainTrigger.location == TriggerTrainCollisions.Location.Rear)
 			{
 				num *= -1f;
 			}
@@ -129,7 +129,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 			Hurt(0.002f * num);
 			if (IsDead())
 			{
-				hitTrain.FreeStaticCollision();
+				hitTrain.completeTrain.FreeStaticCollision();
 			}
 		}
 		else
