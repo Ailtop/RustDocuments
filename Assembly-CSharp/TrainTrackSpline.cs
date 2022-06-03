@@ -62,7 +62,7 @@ public class TrainTrackSpline : WorldSpline
 
 	public bool useNewTangentCalc;
 
-	public bool forceAsSecondary;
+	public int hierarchy;
 
 	public static List<TrainTrackSpline> SidingSplines = new List<TrainTrackSpline>();
 
@@ -90,13 +90,13 @@ public class TrainTrackSpline : WorldSpline
 		useNewTangentCalc = sourceSpline.useNewTangentCalc;
 	}
 
-	public float GetSplineDistAfterMove(float prevSplineDist, Vector3 askerForward, float distMoved, TrackSelection trackSelection, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltTrack = null)
+	public float GetSplineDistAfterMove(float prevSplineDist, Vector3 askerForward, float distMoved, TrackSelection trackSelection, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltA, TrainTrackSpline preferredAltB)
 	{
 		bool facingForward = IsForward(askerForward, prevSplineDist);
-		return GetSplineDistAfterMove(prevSplineDist, distMoved, trackSelection, facingForward, out onSpline, out atEndOfLine, preferredAltTrack);
+		return GetSplineDistAfterMove(prevSplineDist, distMoved, trackSelection, facingForward, out onSpline, out atEndOfLine, preferredAltA, preferredAltB);
 	}
 
-	public float GetSplineDistAfterMove(float prevSplineDist, float distMoved, TrackSelection trackSelection, bool facingForward, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltTrack = null)
+	public float GetSplineDistAfterMove(float prevSplineDist, float distMoved, TrackSelection trackSelection, bool facingForward, out TrainTrackSpline onSpline, out bool atEndOfLine, TrainTrackSpline preferredAltA, TrainTrackSpline preferredAltB)
 	{
 		WorldSplineData data = GetData();
 		float num = (facingForward ? (prevSplineDist + distMoved) : (prevSplineDist - distMoved));
@@ -106,7 +106,7 @@ public class TrainTrackSpline : WorldSpline
 		{
 			if (HasPrevTrack)
 			{
-				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, nextTrack: false, facingForward, preferredAltTrack);
+				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, nextTrack: false, facingForward, preferredAltA, preferredAltB);
 				float distMoved2 = (facingForward ? num : (0f - num));
 				if (trackSelection2.orientation == TrackOrientation.Same)
 				{
@@ -117,7 +117,7 @@ public class TrainTrackSpline : WorldSpline
 					prevSplineDist = 0f;
 					facingForward = !facingForward;
 				}
-				return trackSelection2.track.GetSplineDistAfterMove(prevSplineDist, distMoved2, trackSelection, facingForward, out onSpline, out atEndOfLine);
+				return trackSelection2.track.GetSplineDistAfterMove(prevSplineDist, distMoved2, trackSelection, facingForward, out onSpline, out atEndOfLine, preferredAltA, preferredAltB);
 			}
 			atEndOfLine = true;
 			num = 0f;
@@ -126,7 +126,7 @@ public class TrainTrackSpline : WorldSpline
 		{
 			if (HasNextTrack)
 			{
-				ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, nextTrack: true, facingForward, preferredAltTrack);
+				ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, nextTrack: true, facingForward, preferredAltA, preferredAltB);
 				float distMoved3 = (facingForward ? (num - data.Length) : (0f - (num - data.Length)));
 				if (trackSelection3.orientation == TrackOrientation.Same)
 				{
@@ -137,7 +137,7 @@ public class TrainTrackSpline : WorldSpline
 					prevSplineDist = trackSelection3.track.GetLength();
 					facingForward = !facingForward;
 				}
-				return trackSelection3.track.GetSplineDistAfterMove(prevSplineDist, distMoved3, trackSelection, facingForward, out onSpline, out atEndOfLine);
+				return trackSelection3.track.GetSplineDistAfterMove(prevSplineDist, distMoved3, trackSelection, facingForward, out onSpline, out atEndOfLine, preferredAltA, preferredAltB);
 			}
 			atEndOfLine = true;
 			num = data.Length;
@@ -229,21 +229,26 @@ public class TrainTrackSpline : WorldSpline
 		{
 		}
 		list.Insert(j, new ConnectedTrackInfo(track, o, num));
-		float num2 = float.MaxValue;
-		int num3 = 0;
+		int num2 = int.MaxValue;
 		for (int k = 0; k < list.Count; k++)
 		{
-			ConnectedTrackInfo connectedTrackInfo = list[k];
-			if (connectedTrackInfo.track.forceAsSecondary)
+			num2 = Mathf.Min(num2, list[k].track.hierarchy);
+		}
+		float num3 = float.MaxValue;
+		int num4 = 0;
+		for (int l = 0; l < list.Count; l++)
+		{
+			ConnectedTrackInfo connectedTrackInfo = list[l];
+			if (connectedTrackInfo.track.hierarchy > num2)
 			{
 				continue;
 			}
-			float num4 = Mathf.Abs(connectedTrackInfo.angle);
-			if (num4 < num2)
+			float num5 = Mathf.Abs(connectedTrackInfo.angle);
+			if (num5 < num3)
 			{
-				num2 = num4;
-				num3 = k;
-				if (num2 == 0f)
+				num3 = num5;
+				num4 = l;
+				if (num3 == 0f)
 				{
 					break;
 				}
@@ -251,11 +256,11 @@ public class TrainTrackSpline : WorldSpline
 		}
 		if (p == TrackPosition.Next)
 		{
-			straightestNextIndex = num3;
+			straightestNextIndex = num4;
 		}
 		else
 		{
-			straightestPrevIndex = num3;
+			straightestPrevIndex = num4;
 		}
 	}
 
@@ -279,14 +284,14 @@ public class TrainTrackSpline : WorldSpline
 		return Vector3.Dot(askerForward, rhs) >= 0f;
 	}
 
-	public bool HasValidHazardWithin(TrainCar asker, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, float trackSpeed, TrainTrackSpline preferredAltTrack = null)
+	public bool HasValidHazardWithin(TrainCar asker, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, float trackSpeed, TrainTrackSpline preferredAltA, TrainTrackSpline preferredAltB)
 	{
 		Vector3 askerForward = ((trackSpeed >= 0f) ? asker.transform.forward : (-asker.transform.forward));
 		bool movingForward = IsForward(askerForward, askerSplineDist);
-		return HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist, maxHazardDist, trackSelection, movingForward, preferredAltTrack);
+		return HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist, maxHazardDist, trackSelection, movingForward, preferredAltA, preferredAltB);
 	}
 
-	public bool HasValidHazardWithin(ITrainTrackUser asker, Vector3 askerForward, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, bool movingForward, TrainTrackSpline preferredAltTrack = null)
+	public bool HasValidHazardWithin(ITrainTrackUser asker, Vector3 askerForward, float askerSplineDist, float minHazardDist, float maxHazardDist, TrackSelection trackSelection, bool movingForward, TrainTrackSpline preferredAltA, TrainTrackSpline preferredAltB)
 	{
 		WorldSplineData data = GetData();
 		foreach (ITrainTrackUser trackUser in trackUsers)
@@ -316,7 +321,7 @@ public class TrainTrackSpline : WorldSpline
 		{
 			if (HasPrevTrack)
 			{
-				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, nextTrack: false, movingForward, preferredAltTrack);
+				ConnectedTrackInfo trackSelection2 = GetTrackSelection(prevTracks, straightestPrevIndex, trackSelection, nextTrack: false, movingForward, preferredAltA, preferredAltB);
 				if (trackSelection2.orientation == TrackOrientation.Same)
 				{
 					askerSplineDist = trackSelection2.track.GetLength();
@@ -328,12 +333,12 @@ public class TrainTrackSpline : WorldSpline
 				}
 				float minHazardDist2 = Mathf.Max(0f - num, 0f);
 				float maxHazardDist2 = 0f - num2;
-				return trackSelection2.track.HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist2, maxHazardDist2, trackSelection, movingForward, preferredAltTrack);
+				return trackSelection2.track.HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist2, maxHazardDist2, trackSelection, movingForward, preferredAltA, preferredAltB);
 			}
 		}
 		else if (num2 > data.Length && HasNextTrack)
 		{
-			ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, nextTrack: true, movingForward, preferredAltTrack);
+			ConnectedTrackInfo trackSelection3 = GetTrackSelection(nextTracks, straightestNextIndex, trackSelection, nextTrack: true, movingForward, preferredAltA, preferredAltB);
 			if (trackSelection3.orientation == TrackOrientation.Same)
 			{
 				askerSplineDist = 0f;
@@ -345,7 +350,7 @@ public class TrainTrackSpline : WorldSpline
 			}
 			float minHazardDist3 = Mathf.Max(num - data.Length, 0f);
 			float maxHazardDist3 = num2 - data.Length;
-			return trackSelection3.track.HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist3, maxHazardDist3, trackSelection, movingForward, preferredAltTrack);
+			return trackSelection3.track.HasValidHazardWithin(asker, askerForward, askerSplineDist, minHazardDist3, maxHazardDist3, trackSelection, movingForward, preferredAltA, preferredAltB);
 		}
 		return false;
 	}
@@ -477,20 +482,17 @@ public class TrainTrackSpline : WorldSpline
 		}
 	}
 
-	public ConnectedTrackInfo GetTrackSelection(List<ConnectedTrackInfo> trackOptions, int straightestIndex, TrackSelection trackSelection, bool nextTrack, bool trainForward, TrainTrackSpline preferredAltTrack)
+	public ConnectedTrackInfo GetTrackSelection(List<ConnectedTrackInfo> trackOptions, int straightestIndex, TrackSelection trackSelection, bool nextTrack, bool trainForward, TrainTrackSpline preferredAltA, TrainTrackSpline preferredAltB)
 	{
 		if (trackOptions.Count == 1)
 		{
 			return trackOptions[0];
 		}
-		if (preferredAltTrack != null)
+		foreach (ConnectedTrackInfo trackOption in trackOptions)
 		{
-			foreach (ConnectedTrackInfo trackOption in trackOptions)
+			if (trackOption.track == preferredAltA || trackOption.track == preferredAltB)
 			{
-				if (trackOption.track == preferredAltTrack)
-				{
-					return trackOption;
-				}
+				return trackOption;
 			}
 		}
 		bool flag = nextTrack ^ trainForward;

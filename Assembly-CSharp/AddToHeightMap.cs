@@ -4,7 +4,7 @@ public class AddToHeightMap : ProceduralObject
 {
 	public bool DestroyGameObject;
 
-	public override void Process()
+	public void Apply()
 	{
 		Collider component = GetComponent<Collider>();
 		Bounds bounds = component.bounds;
@@ -31,6 +31,11 @@ public class AddToHeightMap : ProceduralObject
 				}
 			}
 		}
+	}
+
+	public override void Process()
+	{
+		Apply();
 		if (DestroyGameObject)
 		{
 			GameManager.Destroy(base.gameObject);

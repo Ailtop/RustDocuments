@@ -221,10 +221,14 @@ public class RepairBench : StorageContainer
 			item.maxCondition = maxCondition;
 			item.condition = condition;
 			item.amount = amount;
-			if (item.GetHeldEntity() != null && item.GetHeldEntity() is BaseProjectile baseProjectile2 && baseProjectile2.primaryMagazine != null)
+			if (item.GetHeldEntity() != null && item.GetHeldEntity() is BaseProjectile baseProjectile2)
 			{
-				baseProjectile2.primaryMagazine.contents = contents;
-				baseProjectile2.primaryMagazine.ammoType = ammoType;
+				if (baseProjectile2.primaryMagazine != null)
+				{
+					baseProjectile2.primaryMagazine.contents = contents;
+					baseProjectile2.primaryMagazine.ammoType = ammoType;
+				}
+				baseProjectile2.ForceModsChanged();
 			}
 			if (obj.Count > 0 && item.contents != null)
 			{

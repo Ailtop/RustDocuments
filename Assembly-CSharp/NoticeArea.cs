@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class NoticeArea : SingletonComponent<NoticeArea>
 {
 	public GameObjectRef itemPickupPrefab;
@@ -5,6 +7,10 @@ public class NoticeArea : SingletonComponent<NoticeArea>
 	public GameObjectRef itemPickupCondensedText;
 
 	public GameObjectRef itemDroppedPrefab;
+
+	public AnimationCurve pickupSizeCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+
+	public AnimationCurve pickupAlphaCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
 	private IVitalNotice[] notices;
 

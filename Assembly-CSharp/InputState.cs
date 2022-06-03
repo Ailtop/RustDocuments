@@ -104,6 +104,7 @@ public class InputState
 	{
 		current.buttons = 0;
 		previous.buttons = 0;
+		current.mouseDelta = Vector3.zero;
 		SwallowedButtons = 0;
 	}
 }

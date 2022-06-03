@@ -125,5 +125,8 @@ public class TrainEngineAudio : MonoBehaviour
 	private SoundDefinition changeThrottleDef;
 
 	[SerializeField]
+	private SoundDefinition changeCouplingDef;
+
+	[SerializeField]
 	private SoundPlayer brakeSound;
 }

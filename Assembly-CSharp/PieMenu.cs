@@ -13,6 +13,19 @@ public class PieMenu : UIBehaviour
 	[Serializable]
 	public class MenuOption
 	{
+		public struct ColorMode
+		{
+			public enum PieMenuSpriteColorOption
+			{
+				CustomColor = 0,
+				SpriteColor = 1
+			}
+
+			public PieMenuSpriteColorOption Mode;
+
+			public Color CustomColor;
+		}
+
 		public string name;
 
 		public string desc;
@@ -25,7 +38,7 @@ public class PieMenu : UIBehaviour
 
 		public int order;
 
-		public Color? overrideColor;
+		public ColorMode? overrideColorMode;
 
 		[NonSerialized]
 		public Action<BasePlayer> action;
@@ -109,6 +122,8 @@ public class PieMenu : UIBehaviour
 	private CanvasGroup canvasGroup;
 
 	public bool IsOpen;
+
+	public Material IconMaterial;
 
 	internal MenuOption selectedOption;
 
@@ -278,6 +293,7 @@ public class PieMenu : UIBehaviour
 				gameObject.transform.SetParent(optionsCanvas.transform, worldPositionStays: false);
 				options[j].option = gameObject.GetComponent<PieOption>();
 				options[j].option.UpdateOption(num7, num9, sliceGaps, options[j].name, outerSize, innerSize, num8 * iconSize, options[j].sprite);
+				options[j].option.imageIcon.material = ((options[j].overrideColorMode.HasValue && options[j].overrideColorMode.Value.Mode == MenuOption.ColorMode.PieMenuSpriteColorOption.SpriteColor) ? null : IconMaterial);
 				num7 += num9;
 			}
 		}
@@ -312,12 +328,22 @@ public class PieMenu : UIBehaviour
 					pieSelection.startRadius = options[i].option.background.startRadius;
 					pieSelection.endRadius = options[i].option.background.endRadius;
 				}
-				if (options[i].overrideColor.HasValue)
+				middleImage.material = IconMaterial;
+				if (options[i].overrideColorMode.HasValue)
 				{
-					Color value = options[i].overrideColor.Value;
-					pieSelection.color = options[i].overrideColor.Value;
-					value.a = middleImageColor.a;
-					middleImage.color = value;
+					if (options[i].overrideColorMode.Value.Mode == MenuOption.ColorMode.PieMenuSpriteColorOption.CustomColor)
+					{
+						Color customColor = options[i].overrideColorMode.Value.CustomColor;
+						pieSelection.color = customColor;
+						customColor.a = middleImageColor.a;
+						middleImage.color = customColor;
+					}
+					else if (options[i].overrideColorMode.Value.Mode == MenuOption.ColorMode.PieMenuSpriteColorOption.SpriteColor)
+					{
+						pieSelection.color = pieSelectionColor;
+						middleImage.color = Color.white;
+						middleImage.material = null;
+					}
 				}
 				else
 				{
@@ -355,13 +381,25 @@ public class PieMenu : UIBehaviour
 					}
 				}
 			}
-			else if (options[i].overrideColor.HasValue)
-			{
-				options[i].option.imageIcon.color = options[i].overrideColor.Value;
-			}
 			else
 			{
-				options[i].option.imageIcon.color = colorIconActive;
+				options[i].option.imageIcon.material = IconMaterial;
+				if (options[i].overrideColorMode.HasValue)
+				{
+					if (options[i].overrideColorMode.Value.Mode == MenuOption.ColorMode.PieMenuSpriteColorOption.CustomColor)
+					{
+						options[i].option.imageIcon.color = options[i].overrideColorMode.Value.CustomColor;
+					}
+					else if (options[i].overrideColorMode.Value.Mode == MenuOption.ColorMode.PieMenuSpriteColorOption.SpriteColor)
+					{
+						options[i].option.imageIcon.color = Color.white;
+						options[i].option.imageIcon.material = null;
+					}
+				}
+				else
+				{
+					options[i].option.imageIcon.color = colorIconActive;
+				}
 			}
 			if (options[i].disabled)
 			{

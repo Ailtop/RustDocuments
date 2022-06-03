@@ -1,3 +1,4 @@
+using Rust;
 using UnityEngine;
 
 public class TriggerParent : TriggerBase, IServerComponent
@@ -12,12 +13,17 @@ public class TriggerParent : TriggerBase, IServerComponent
 	[Tooltip("Needed if the player might dismount inside the trigger and the trigger might be moving. Being mounting inside the trigger lets them dismount in local trigger-space, which means client and server will sync up.Otherwise the client/server delay can have them dismounting into invalid space.")]
 	public bool parentMountedPlayers;
 
+	[Tooltip("Sleepers don't have all the checks (e.g. clipping) that awake players get. If that might be a problem,sleeper parenting can be disabled. You'll need an associatedMountable though so that the sleeper can be dismounted.")]
+	public bool parentSleepers = true;
+
 	public bool ParentNPCPlayers;
 
 	[Tooltip("If the player is already parented to something else, they'll switch over to another parent only if this is true")]
 	public bool overrideOtherTriggers;
 
 	public const int CLIP_CHECK_MASK = 1218511105;
+
+	private BasePlayer killPlayerTemp;
 
 	public override GameObject InterestedInObject(GameObject obj)
 	{
@@ -62,18 +68,25 @@ public class TriggerParent : TriggerBase, IServerComponent
 			CancelInvoke(OnTick);
 		}
 		BasePlayer basePlayer = ent.ToPlayer();
-		if (!(basePlayer != null) || !basePlayer.IsSleeping())
+		if (!parentSleepers || !(basePlayer != null) || !basePlayer.IsSleeping())
 		{
 			Unparent(ent);
 		}
 	}
 
-	protected virtual bool ShouldParent(BaseEntity ent)
+	public virtual bool ShouldParent(BaseEntity ent, bool bypassOtherTriggerCheck = false)
 	{
-		BaseEntity parentEntity = ent.GetParentEntity();
-		if (!overrideOtherTriggers && BaseNetworkableEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
+		if (!ent.canTriggerParent)
 		{
 			return false;
+		}
+		if (!bypassOtherTriggerCheck)
+		{
+			BaseEntity parentEntity = ent.GetParentEntity();
+			if (!overrideOtherTriggers && BaseNetworkableEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
+			{
+				return false;
+			}
 		}
 		if (ent.FindTrigger<TriggerParentExclusion>() != null)
 		{
@@ -83,12 +96,19 @@ public class TriggerParent : TriggerBase, IServerComponent
 		{
 			return false;
 		}
-		if (!parentMountedPlayers)
+		if (!parentMountedPlayers || !parentSleepers)
 		{
 			BasePlayer basePlayer = ent.ToPlayer();
-			if (basePlayer != null && basePlayer.isMounted)
+			if (basePlayer != null)
 			{
-				return false;
+				if (!parentMountedPlayers && basePlayer.isMounted)
+				{
+					return false;
+				}
+				if (!parentSleepers && basePlayer.IsSleeping())
+				{
+					return false;
+				}
 			}
 		}
 		return true;
@@ -104,23 +124,51 @@ public class TriggerParent : TriggerBase, IServerComponent
 
 	protected void Unparent(BaseEntity ent)
 	{
-		if (!(ent.GetParentEntity() != GameObjectEx.ToBaseEntity(base.gameObject)))
+		if (ent.GetParentEntity() != GameObjectEx.ToBaseEntity(base.gameObject))
 		{
-			ent.SetParent(null, worldPositionStays: true, sendImmediate: true);
-			BasePlayer basePlayer = ent.ToPlayer();
-			if (basePlayer != null)
+			return;
+		}
+		if (BaseNetworkableEx.IsValid(ent) && !ent.IsDestroyed)
+		{
+			TriggerParent triggerParent = ent.FindSuitableParent();
+			if (triggerParent != null && BaseNetworkableEx.IsValid(GameObjectEx.ToBaseEntity(triggerParent.gameObject)))
 			{
-				basePlayer.PauseFlyHackDetection(5f);
-				basePlayer.PauseSpeedHackDetection(5f);
-				basePlayer.PauseVehicleNoClipDetection(5f);
-			}
-			if (associatedMountable != null && doClippingCheck && IsClipping(ent) && ent is BasePlayer basePlayer2 && associatedMountable.GetDismountPosition(basePlayer2, out var res))
-			{
-				basePlayer2.MovePosition(res);
-				basePlayer2.SendNetworkUpdateImmediate();
-				basePlayer2.ClientRPCPlayer(null, basePlayer2, "ForcePositionTo", res);
+				triggerParent.Parent(ent);
+				return;
 			}
 		}
+		ent.SetParent(null, worldPositionStays: true, sendImmediate: true);
+		BasePlayer basePlayer = ent.ToPlayer();
+		if (!(basePlayer != null))
+		{
+			return;
+		}
+		basePlayer.PauseFlyHackDetection(5f);
+		basePlayer.PauseSpeedHackDetection(5f);
+		basePlayer.PauseVehicleNoClipDetection(5f);
+		if (associatedMountable != null && ((doClippingCheck && IsClipping(ent)) || basePlayer.IsSleeping()))
+		{
+			if (associatedMountable.GetDismountPosition(basePlayer, out var res))
+			{
+				basePlayer.MovePosition(res);
+				basePlayer.SendNetworkUpdateImmediate();
+				basePlayer.ClientRPCPlayer(null, basePlayer, "ForcePositionTo", res);
+			}
+			else
+			{
+				killPlayerTemp = basePlayer;
+				Invoke(KillPlayerDelayed, 0f);
+			}
+		}
+	}
+
+	private void KillPlayerDelayed()
+	{
+		if (BaseNetworkableEx.IsValid(killPlayerTemp) && !killPlayerTemp.IsDead())
+		{
+			killPlayerTemp.Hurt(1000f, DamageType.Suicide, killPlayerTemp, useProtection: false);
+		}
+		killPlayerTemp = null;
 	}
 
 	private void OnTick()

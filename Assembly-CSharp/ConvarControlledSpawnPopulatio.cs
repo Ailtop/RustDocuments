@@ -27,11 +27,24 @@ public class ConvarControlledSpawnPopulation : SpawnPopulation
 }
 public class ConvarControlledSpawnPopulationRailRing : ConvarControlledSpawnPopulation
 {
-	public bool IsWagon;
+	public enum TrainCarType
+	{
+		WorkCart = 0,
+		WorkCartWithCover = 1,
+		Wagon = 2
+	}
 
-	private const float MIN_MARGIN = 40f;
+	public TrainCarType trainCarType;
 
-	public override float TargetDensity => base.TargetDensity * (IsWagon ? ((float)TrainCar.wagons_per_engine) : 1f);
+	private const float MIN_MARGIN = 60f;
+
+	public override float TargetDensity => trainCarType switch
+	{
+		TrainCarType.WorkCart => base.TargetDensity * (1f - TrainCar.variant_ratio), 
+		TrainCarType.WorkCartWithCover => base.TargetDensity * TrainCar.variant_ratio, 
+		TrainCarType.Wagon => base.TargetDensity * (float)TrainCar.wagons_per_engine * 1.1f, 
+		_ => base.TargetDensity, 
+	};
 
 	public override bool OverrideSpawnPosition(ref Vector3 newPos, ref Quaternion newRot)
 	{
@@ -48,11 +61,11 @@ public class ConvarControlledSpawnPopulationRailRing : ConvarControlledSpawnPopu
 			{
 				TrainTrackSpline trainTrackSpline = TrainTrackSpline.SidingSplines[index];
 				float length = trainTrackSpline.GetLength();
-				if (length < 45f)
+				if (length < 65f)
 				{
 					return false;
 				}
-				float distance = Random.Range(40f, length - 40f);
+				float distance = Random.Range(60f, length - 60f);
 				newPos = trainTrackSpline.GetPointAndTangentCubicHermiteWorld(distance, out var tangent) + Vector3.up * 0.5f;
 				newRot = Quaternion.LookRotation(tangent);
 				return true;

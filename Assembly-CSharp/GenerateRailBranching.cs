@@ -38,7 +38,8 @@ public class GenerateRailBranching : ProceduralComponent
 			MeshOffset = 0f,
 			TerrainOffset = -0.125f,
 			Topology = 524288,
-			Splat = 128
+			Splat = 128,
+			Hierarchy = 1
 		};
 	}
 

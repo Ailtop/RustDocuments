@@ -893,7 +893,7 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			nextIdealTerrainCheckTime = UnityEngine.Time.time + UnityEngine.Random.Range(1f, 2f);
 			onIdealTerrain = false;
-			if (TerrainMeta.TopologyMap != null && ((uint)TerrainMeta.TopologyMap.GetTopology(base.transform.position) & 0x800u) != 0)
+			if (TerrainMeta.TopologyMap != null && ((uint)TerrainMeta.TopologyMap.GetTopology(base.transform.position) & 0x80800u) != 0)
 			{
 				onIdealTerrain = true;
 			}

@@ -1,3 +1,6 @@
+using Rust.AI;
+using UnityEngine;
+
 namespace ConVar;
 
 [Factory("ai")]
@@ -252,6 +255,46 @@ public class AI : ConsoleSystem
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].Kill();
+		}
+	}
+
+	[ServerVar]
+	public static void killanimals(Arg args)
+	{
+		BaseAnimalNPC[] array = BaseEntity.Util.FindAnimals();
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Kill();
+		}
+	}
+
+	[ServerVar(Help = "Add a player (or command user if no player is specified) to the AIs ignore list.")]
+	public static void addignoreplayer(Arg args)
+	{
+		BasePlayer basePlayer = null;
+		basePlayer = (args.HasArgs() ? ArgEx.GetPlayerOrSleeper(args, 0) : ArgEx.Player(args));
+		if (basePlayer == null || basePlayer.net == null || basePlayer.net.connection == null)
+		{
+			args.ReplyWith("Player not found.");
+		}
+		else
+		{
+			SimpleAIMemory.AddIgnorePlayer(basePlayer);
+		}
+	}
+
+	[ServerVar(Help = "Remove a player (or command user if no player is specified) from the AIs ignore list.")]
+	public static void removeignoreplayer(Arg args)
+	{
+		BasePlayer basePlayer = null;
+		basePlayer = (args.HasArgs() ? ArgEx.GetPlayerOrSleeper(args, 0) : ArgEx.Player(args));
+		if (basePlayer == null || basePlayer.net == null || basePlayer.net.connection == null)
+		{
+			args.ReplyWith("Player not found.");
+		}
+		else
+		{
+			SimpleAIMemory.RemoveIgnorePlayer(basePlayer);
 		}
 	}
 

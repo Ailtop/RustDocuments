@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Rust.Interpolation;
 
-public class Interpolator<T> where T : Interpolator<T>.ISnapshot, new()
+public class Interpolator<T> where T : ISnapshot<T>, new()
 {
 	public struct Segment
 	{
@@ -12,15 +12,6 @@ public class Interpolator<T> where T : Interpolator<T>.ISnapshot, new()
 		public T prev;
 
 		public T next;
-	}
-
-	public interface ISnapshot
-	{
-		float Time { get; set; }
-
-		void MatchValuesTo(T entry);
-
-		void Lerp(T prev, T next, float delta);
 	}
 
 	public List<T> list;
@@ -55,7 +46,7 @@ public class Interpolator<T> where T : Interpolator<T>.ISnapshot, new()
 		list.Clear();
 	}
 
-	public Segment Query(float time, float interpolation, float extrapolation, float smoothing)
+	public Segment Query(float time, float interpolation, float extrapolation, float smoothing, ref T t)
 	{
 		Segment result = default(Segment);
 		if (list.Count == 0)
@@ -91,49 +82,46 @@ public class Interpolator<T> where T : Interpolator<T>.ISnapshot, new()
 				val2 = item;
 			}
 		}
-		T prev3 = new T();
+		T @new = t.GetNew();
 		if (val.Time - prev.Time <= Mathf.Epsilon)
 		{
-			prev3.Time = num3;
-			prev3.MatchValuesTo(val);
+			@new.Time = num3;
+			@new.MatchValuesTo(val);
 		}
 		else
 		{
-			float delta = (num3 - prev.Time) / (val.Time - prev.Time);
-			prev3.Time = num3;
-			prev3.Lerp(prev, val, delta);
+			@new.Time = num3;
+			@new.Lerp(prev, val, (num3 - prev.Time) / (val.Time - prev.Time));
 		}
-		result.prev = prev3;
-		T val3 = new T();
+		result.prev = @new;
+		T new2 = t.GetNew();
 		if (val2.Time - prev2.Time <= Mathf.Epsilon)
 		{
-			val3.Time = num2;
-			val3.MatchValuesTo(val2);
+			new2.Time = num2;
+			new2.MatchValuesTo(val2);
 		}
 		else
 		{
-			float delta2 = (num2 - prev2.Time) / (val2.Time - prev2.Time);
-			val3.Time = num2;
-			val3.Lerp(prev2, val2, delta2);
+			new2.Time = num2;
+			new2.Lerp(prev2, val2, (num2 - prev2.Time) / (val2.Time - prev2.Time));
 		}
-		result.next = val3;
-		if (val3.Time - prev3.Time <= Mathf.Epsilon)
+		result.next = new2;
+		if (new2.Time - @new.Time <= Mathf.Epsilon)
 		{
-			result.prev = val3;
-			result.tick = val3;
+			result.prev = new2;
+			result.tick = new2;
 			return result;
 		}
-		if (num - val3.Time > extrapolation)
+		if (num - new2.Time > extrapolation)
 		{
-			result.prev = val3;
-			result.tick = val3;
+			result.prev = new2;
+			result.tick = new2;
 			return result;
 		}
-		T tick = new T();
-		float delta3 = Mathf.Min(num - prev3.Time, val3.Time + extrapolation - prev3.Time) / (val3.Time - prev3.Time);
-		tick.Time = num;
-		tick.Lerp(prev3, val3, delta3);
-		result.tick = tick;
+		T new3 = t.GetNew();
+		new3.Time = num;
+		new3.Lerp(@new, new2, Mathf.Min(num - @new.Time, new2.Time + extrapolation - @new.Time) / (new2.Time - @new.Time));
+		result.tick = new3;
 		return result;
 	}
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Rust.Interpolation;
 
-public interface IGenericLerpTarget<T> : ILerpInfo where T : Interpolator<T>.ISnapshot, new()
+public interface IGenericLerpTarget<T> : ILerpInfo where T : ISnapshot<T>, new()
 {
 	void SetFrom(T snapshot);
 

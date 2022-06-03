@@ -164,7 +164,7 @@ public class BaseLiquidVessel : AttackEntity
 		{
 			DoThrow(base.transform.position, Vector3.zero);
 			Item item = GetItem();
-			if (item != null)
+			if (item != null && item.contents != null)
 			{
 				item.contents.SetLocked(IsDisabled());
 				SendNetworkUpdateImmediate();

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[822]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[833]
 	{
 		new ConsoleSystem.Command
 		{
@@ -1169,6 +1169,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "addignoreplayer",
+			Parent = "ai",
+			FullName = "ai.addignoreplayer",
+			ServerAdmin = true,
+			Description = "Add a player (or command user if no player is specified) to the AIs ignore list.",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.addignoreplayer(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "allowdesigning",
 			Parent = "ai",
 			FullName = "ai.allowdesigning",
@@ -1248,6 +1261,18 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.ignoreplayers = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "killanimals",
+			Parent = "ai",
+			FullName = "ai.killanimals",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.killanimals(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1970,6 +1995,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.ocean_patrol_path_iterations = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "removeignoreplayer",
+			Parent = "ai",
+			FullName = "ai.removeignoreplayer",
+			ServerAdmin = true,
+			Description = "Remove a player (or command user if no player is specified) from the AIs ignore list.",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.removeignoreplayer(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3403,6 +3441,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "historysize",
+			Parent = "chat",
+			FullName = "chat.historysize",
+			ServerAdmin = true,
+			Description = "Number of messages to keep in memory for chat history",
+			Variable = true,
+			GetOveride = () => Chat.historysize.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Chat.historysize = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "say",
 			Parent = "chat",
 			FullName = "chat.say",
@@ -4695,6 +4747,42 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "clearallsprays",
+			Parent = "global",
+			FullName = "global.clearallsprays",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate
+			{
+				Global.ClearAllSprays();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearallspraysbyplayer",
+			Parent = "global",
+			FullName = "global.clearallspraysbyplayer",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.ClearAllSpraysByPlayer(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearspraysinradius",
+			Parent = "global",
+			FullName = "global.clearspraysinradius",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.ClearSpraysInRadius(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "colliders",
 			Parent = "global",
 			FullName = "global.colliders",
@@ -4764,6 +4852,22 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Global.kill(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxspraysperplayer",
+			Parent = "global",
+			FullName = "global.maxspraysperplayer",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "If a player sprays more than this, the oldest spray will be destroyed. 0 will disable",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Global.MaxSpraysPerPlayer.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.MaxSpraysPerPlayer = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -4952,32 +5056,34 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "sprayinauthduration",
+			Name = "sprayduration",
 			Parent = "global",
-			FullName = "global.sprayinauthduration",
+			FullName = "global.sprayduration",
 			ServerAdmin = true,
 			Saved = true,
-			Description = "How long sprays will last when sprayed inside a players TC auth",
+			Description = "Base time (in seconds) that sprays last",
+			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Global.SprayInAuthDuration.ToString(),
+			GetOveride = () => Global.SprayDuration.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Global.SprayInAuthDuration = str.ToFloat();
+				Global.SprayDuration = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "spraynoauthduration",
+			Name = "sprayoutofauthmultiplier",
 			Parent = "global",
-			FullName = "global.spraynoauthduration",
+			FullName = "global.sprayoutofauthmultiplier",
 			ServerAdmin = true,
 			Saved = true,
-			Description = "How long sprays will last when sprayed outside a players TC auth",
+			Description = "Multiplier applied to SprayDuration if a spray isn't in the sprayers auth (cannot go above 1f)",
+			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Global.SprayNoAuthDuration.ToString(),
+			GetOveride = () => Global.SprayOutOfAuthMultiplier.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Global.SprayNoAuthDuration = str.ToFloat();
+				Global.SprayOutOfAuthMultiplier = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6170,6 +6276,22 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Player.wakeupall(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "woundforever",
+			Parent = "player",
+			FullName = "player.woundforever",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Whether the crawling state expires",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Player.woundforever.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Player.woundforever = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -10167,6 +10289,23 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "version",
+			Parent = "recoilproperties",
+			FullName = "recoilproperties.version",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => RecoilProperties.version.ToString(),
+			SetOveride = delegate(string str)
+			{
+				RecoilProperties.version = str.ToInt();
+			},
+			Default = "1"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "acceptinvite",
 			Parent = "relationshipmanager",
 			FullName = "relationshipmanager.acceptinvite",
@@ -10839,6 +10978,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				TrainCar.population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "variant_ratio",
+			Parent = "traincar",
+			FullName = "traincar.variant_ratio",
+			ServerAdmin = true,
+			Description = "Ratio of Work Carts with additional cover to standard Work Carts. 1.0 = All covered, 0.0 = all standard.",
+			Variable = true,
+			GetOveride = () => TrainCar.variant_ratio.ToString(),
+			SetOveride = delegate(string str)
+			{
+				TrainCar.variant_ratio = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

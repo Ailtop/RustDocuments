@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
@@ -17,6 +18,9 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	[ServerVar(Help = "Ratio of wagons to train engines that spawn")]
 	public static int wagons_per_engine = 2;
+
+	[ServerVar(Help = "Ratio of Work Carts with additional cover to standard Work Carts. 1.0 = All covered, 0.0 = all standard.")]
+	public static float variant_ratio = 0.5f;
 
 	protected bool trainDebug;
 
@@ -97,6 +101,8 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	[SerializeField]
 	public TriggerParent platformParentTrigger;
 
+	public GameObjectRef collisionEffect;
+
 	public Transform frontCoupling;
 
 	public Transform frontCouplingPivot;
@@ -114,14 +120,17 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	[SerializeField]
 	private TrainCarAudio trainCarAudio;
 
+	[FormerlySerializedAs("frontCoupleFx")]
 	[SerializeField]
-	private ParticleSystem frontCoupleFx;
+	private ParticleSystem frontCouplingChangedFx;
 
+	[FormerlySerializedAs("rearCoupleFx")]
 	[SerializeField]
-	private ParticleSystem rearCoupleFx;
+	private ParticleSystem rearCouplingChangedFx;
 
+	[FormerlySerializedAs("fxCoupling")]
 	[SerializeField]
-	private ParticleSystem fxCoupling;
+	private ParticleSystem newCouplingFX;
 
 	[SerializeField]
 	[ReadOnly]
@@ -139,6 +148,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public TrainCouplingController coupling;
 
+	[NonSerialized]
 	public TrainTrackSpline.TrackSelection localTrackSelection;
 
 	public Vector3 Position => base.transform.position;
@@ -146,6 +156,8 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	public float FrontWheelSplineDist { get; set; }
 
 	public virtual bool IsEngine => false;
+
+	protected virtual bool networkUpdateOnCompleteTrainChange => false;
 
 	public TrainTrackSpline FrontTrackSection
 	{
@@ -243,9 +255,9 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	{
 		base.ServerInit();
 		spawnOrigin = base.transform.position;
-		completeTrain = new CompleteTrain(this);
 		distFrontToBackWheel = Vector3.Distance(GetFrontWheelPos(), GetRearWheelPos());
 		rigidBody.centerOfMass = centreOfMassTransform.localPosition;
+		UpdateCompleteTrain();
 		InvokeRandomized(UpdateClients, 0f, 0.15f, 0.02f);
 		InvokeRandomized(DecayTick, UnityEngine.Random.Range(20f, 40f), decayTickSpacing, decayTickSpacing * 0.1f);
 	}
@@ -266,12 +278,12 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	{
 		base.Spawn();
 		initialSpawnTime = UnityEngine.Time.time;
-		if (TrainTrackSpline.TryFindTrackNearby(GetFrontWheelPos(), 2f, out var splineResult, out var distResult) && splineResult.HasClearTrackSpaceNear(this))
+		if (TrainTrackSpline.TryFindTrackNearby(GetFrontWheelPos(), 2f, out var splineResult, out var distResult) && (Rust.Application.isLoadingSave || splineResult.HasClearTrackSpaceNear(this)))
 		{
 			FrontWheelSplineDist = distResult;
 			Vector3 tangent;
 			Vector3 positionAndTangent = splineResult.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out tangent);
-			SetTheRestFromFrontWheelData(ref splineResult, positionAndTangent, tangent, localTrackSelection);
+			SetTheRestFromFrontWheelData(ref splineResult, positionAndTangent, tangent, localTrackSelection, null);
 			FrontTrackSection = splineResult;
 		}
 		else
@@ -301,31 +313,37 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public virtual void ServerFlagsChanged(Flags old, Flags next)
 	{
-		if (next.HasFlag(Flags.Reserved2) != old.HasFlag(Flags.Reserved2) || next.HasFlag(Flags.Reserved3) != old.HasFlag(Flags.Reserved3))
+		if (isSpawned && (next.HasFlag(Flags.Reserved2) != old.HasFlag(Flags.Reserved2) || next.HasFlag(Flags.Reserved3) != old.HasFlag(Flags.Reserved3)))
 		{
-			List<TrainCar> all = coupling.GetAll();
-			if (!completeTrain.Matches(all))
-			{
-				SetNewCompleteTrain(new CompleteTrain(all));
-			}
+			UpdateCompleteTrain();
+		}
+	}
+
+	private void UpdateCompleteTrain()
+	{
+		List<TrainCar> result = Facepunch.Pool.GetList<TrainCar>();
+		coupling.GetAll(ref result);
+		if (completeTrain == null || !completeTrain.Matches(result))
+		{
+			SetNewCompleteTrain(new CompleteTrain(result));
+		}
+		else
+		{
+			Facepunch.Pool.FreeList(ref result);
 		}
 	}
 
 	public void SetNewCompleteTrain(CompleteTrain ct)
 	{
-		if (completeTrain == ct)
+		if (completeTrain != ct)
 		{
-			return;
-		}
-		if (completeTrain != null)
-		{
-			if (completeTrain.ContainsOnly(this))
+			RemoveFromCompleteTrain();
+			completeTrain = ct;
+			if (networkUpdateOnCompleteTrainChange)
 			{
-				completeTrain.Dispose();
+				SendNetworkUpdate();
 			}
-			completeTrain.RemoveTrainCar(this);
 		}
-		completeTrain = ct;
 	}
 
 	public override void Hurt(HitInfo info)
@@ -396,7 +414,24 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 		coupling.Uncouple(front: true);
 		coupling.Uncouple(front: false);
+		RemoveFromCompleteTrain();
 		base.DoServerDestroy();
+	}
+
+	private void RemoveFromCompleteTrain()
+	{
+		if (completeTrain != null)
+		{
+			if (completeTrain.ContainsOnly(this))
+			{
+				completeTrain.Dispose();
+				completeTrain = null;
+			}
+			else
+			{
+				completeTrain.RemoveTrainCar(this);
+			}
+		}
 	}
 
 	public override bool MountEligable(BasePlayer player)
@@ -415,6 +450,10 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public float GetTrackSpeed()
 	{
+		if (completeTrain == null)
+		{
+			return 0f;
+		}
 		return completeTrain.GetTrackSpeedFor(this);
 	}
 
@@ -429,7 +468,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		{
 			return true;
 		}
-		if (platformParentTrigger.HasAnyEntityContents)
+		if (platformParentTrigger != null && platformParentTrigger.HasAnyEntityContents)
 		{
 			foreach (BaseEntity entityContent in platformParentTrigger.entityContents)
 			{
@@ -445,16 +484,22 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		completeTrain.UpdateTick(UnityEngine.Time.fixedDeltaTime);
-		float trackSpeed = GetTrackSpeed();
-		hurtTriggerFront.gameObject.SetActive(!coupling.IsFrontCoupled && trackSpeed > hurtTriggerMinSpeed);
-		hurtTriggerRear.gameObject.SetActive(!coupling.IsRearCoupled && trackSpeed < 0f - hurtTriggerMinSpeed);
+		if (completeTrain != null)
+		{
+			completeTrain.UpdateTick(UnityEngine.Time.fixedDeltaTime);
+			float trackSpeed = GetTrackSpeed();
+			hurtTriggerFront.gameObject.SetActive(!coupling.IsFrontCoupled && trackSpeed > hurtTriggerMinSpeed);
+			hurtTriggerRear.gameObject.SetActive(!coupling.IsRearCoupled && trackSpeed < 0f - hurtTriggerMinSpeed);
+		}
 	}
 
 	public override void PostVehicleFixedUpdate()
 	{
 		base.PostVehicleFixedUpdate();
-		completeTrain.ResetUpdateTick();
+		if (completeTrain != null)
+		{
+			completeTrain.ResetUpdateTick();
+		}
 	}
 
 	public Vector3 GetFrontOfTrainPos()
@@ -481,10 +526,10 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public void MoveFrontWheelsAlongTrackSpline(TrainTrackSpline trackSpline, float prevSplineDist, float distToMove, TrainTrackSpline preferredAltTrack, TrainTrackSpline.TrackSelection trackSelection)
 	{
-		FrontWheelSplineDist = trackSpline.GetSplineDistAfterMove(prevSplineDist, base.transform.forward, distToMove, trackSelection, out var onSpline, out var _, preferredAltTrack);
+		FrontWheelSplineDist = trackSpline.GetSplineDistAfterMove(prevSplineDist, base.transform.forward, distToMove, trackSelection, out var onSpline, out var _, preferredAltTrack, null);
 		Vector3 tangent;
 		Vector3 positionAndTangent = onSpline.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out tangent);
-		SetTheRestFromFrontWheelData(ref onSpline, positionAndTangent, tangent, trackSelection);
+		SetTheRestFromFrontWheelData(ref onSpline, positionAndTangent, tangent, trackSelection, trackSpline);
 		FrontTrackSection = onSpline;
 	}
 
@@ -498,16 +543,16 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		return base.transform.position + base.transform.rotation * rearBogieLocalOffset;
 	}
 
-	public void SetTheRestFromFrontWheelData(ref TrainTrackSpline frontTS, Vector3 targetFrontWheelPos, Vector3 targetFrontWheelTangent, TrainTrackSpline.TrackSelection trackSelection)
+	public void SetTheRestFromFrontWheelData(ref TrainTrackSpline frontTS, Vector3 targetFrontWheelPos, Vector3 targetFrontWheelTangent, TrainTrackSpline.TrackSelection trackSelection, TrainTrackSpline additionalAlt)
 	{
 		TrainTrackSpline onSpline;
 		bool atEndOfLine;
-		float splineDistAfterMove = frontTS.GetSplineDistAfterMove(FrontWheelSplineDist, base.transform.forward, 0f - distFrontToBackWheel, trackSelection, out onSpline, out atEndOfLine, RearTrackSection);
+		float splineDistAfterMove = frontTS.GetSplineDistAfterMove(FrontWheelSplineDist, base.transform.forward, 0f - distFrontToBackWheel, trackSelection, out onSpline, out atEndOfLine, RearTrackSection, additionalAlt);
 		Vector3 tangent;
 		Vector3 positionAndTangent = onSpline.GetPositionAndTangent(splineDistAfterMove, base.transform.forward, out tangent);
 		if (atEndOfLine)
 		{
-			FrontWheelSplineDist = onSpline.GetSplineDistAfterMove(splineDistAfterMove, base.transform.forward, distFrontToBackWheel, trackSelection, out frontTS, out var _, onSpline);
+			FrontWheelSplineDist = onSpline.GetSplineDistAfterMove(splineDistAfterMove, base.transform.forward, distFrontToBackWheel, trackSelection, out frontTS, out var _, onSpline, additionalAlt);
 			targetFrontWheelPos = frontTS.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out targetFrontWheelTangent);
 		}
 		RearTrackSection = onSpline;
@@ -559,6 +604,10 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public void DecayTick()
 	{
+		if (completeTrain == null)
+		{
+			return;
+		}
 		bool flag = HasDriver() || completeTrain.AnyPlayersOnTrain();
 		if (flag)
 		{
@@ -599,7 +648,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	public void RPC_WantsUncouple(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && !(Vector3.SqrMagnitude(base.transform.position - player.transform.position) > 200f))
+		if (!(player == null) && !(Vector3.SqrMagnitude(base.transform.position - player.transform.position) > 200f) && Interface.CallHook("OnTrainCarUncouple", this, msg.player) == null)
 		{
 			bool front = msg.read.Bit();
 			coupling.Uncouple(front);

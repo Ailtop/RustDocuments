@@ -652,6 +652,13 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				where x is ScientistNPC
 				select x as ScientistNPC).ToArray();
 		}
+
+		public static BaseAnimalNPC[] FindAnimals()
+		{
+			return (from x in BaseNetworkable.serverEntities
+				where x is BaseAnimalNPC
+				select x as BaseAnimalNPC).ToArray();
+		}
 	}
 
 	public enum GiveItemReason
@@ -2452,6 +2459,22 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			Invoke(ForceUpdateTriggersAction, UnityEngine.Time.time - UnityEngine.Time.fixedTime + UnityEngine.Time.fixedDeltaTime * 1.5f);
 		}
+	}
+
+	public TriggerParent FindSuitableParent()
+	{
+		if (triggers == null)
+		{
+			return null;
+		}
+		foreach (TriggerBase trigger in triggers)
+		{
+			if (trigger is TriggerParent triggerParent && triggerParent.ShouldParent(this, bypassOtherTriggerCheck: true))
+			{
+				return triggerParent;
+			}
+		}
+		return null;
 	}
 
 	public virtual BasePlayer ToPlayer()

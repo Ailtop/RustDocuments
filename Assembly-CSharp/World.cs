@@ -58,7 +58,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 224 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 225 + ".map";
 		}
 	}
 
@@ -70,9 +70,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 224 + ".sav";
+				return Name + "." + 225 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 224 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 225 + ".sav";
 		}
 	}
 
@@ -91,7 +91,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 224 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 225 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -128,7 +128,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 224 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 225 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -216,6 +216,7 @@ public static class World
 			terrainOffset = src.TerrainOffset,
 			splat = src.Splat,
 			topology = src.Topology,
+			hierarchy = src.Hierarchy,
 			nodes = VectorArrayToList(src.Path.Points)
 		};
 	}
@@ -236,6 +237,7 @@ public static class World
 		pathList.TerrainOffset = src.terrainOffset;
 		pathList.Splat = src.splat;
 		pathList.Topology = src.topology;
+		pathList.Hierarchy = src.hierarchy;
 		pathList.Path.RecalculateTangents();
 		return pathList;
 	}

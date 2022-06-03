@@ -321,9 +321,9 @@ public class BaseArcadeMachine : BaseVehicle
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(7uL)]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
 	public void BroadcastEntityMessage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

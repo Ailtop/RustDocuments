@@ -8,11 +8,16 @@ using UnityEngine.AI;
 
 public static class NavMeshTools
 {
-	public static IEnumerator CollectSourcesAsync(Bounds bounds, int mask, NavMeshCollectGeometry geometry, int area, bool useBakedTerrainMesh, int cellSize, List<NavMeshBuildSource> sources, Action<List<NavMeshBuildSource>> append, Action callback)
+	public static IEnumerator CollectSourcesAsync(Bounds bounds, int mask, NavMeshCollectGeometry geometry, int area, bool useBakedTerrainMesh, int cellSize, List<NavMeshBuildSource> sources, Action<List<NavMeshBuildSource>> append, Action callback, Transform customNavMeshDataRoot)
 	{
 		while (!AI.move && !AiManager.nav_wait)
 		{
 			yield return CoroutineEx.waitForSeconds(1f);
+		}
+		if (customNavMeshDataRoot != null)
+		{
+			customNavMeshDataRoot.gameObject.SetActive(value: true);
+			yield return new WaitForEndOfFrame();
 		}
 		float time = UnityEngine.Time.realtimeSinceStartup;
 		Debug.Log("Starting Navmesh Source Collecting");
@@ -33,6 +38,10 @@ public static class NavMeshTools
 		}
 		append?.Invoke(sources);
 		Debug.Log($"Navmesh Source Collecting took {UnityEngine.Time.realtimeSinceStartup - time:0.00} seconds");
+		if (customNavMeshDataRoot != null)
+		{
+			customNavMeshDataRoot.gameObject.SetActive(value: false);
+		}
 		callback?.Invoke();
 	}
 

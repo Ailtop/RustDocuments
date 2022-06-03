@@ -729,7 +729,7 @@ public class Server : ConsoleSystem
 		textTable.AddColumns("SteamID", "DisplayName", "POS", "ROT");
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, activePlayer.transform.position.ToString(), activePlayer.transform.rotation.eulerAngles.ToString());
+			textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, activePlayer.transform.position.ToString(), activePlayer.eyes.BodyForward().ToString());
 		}
 		arg.ReplyWith(textTable.ToString());
 	}

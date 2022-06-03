@@ -215,9 +215,9 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 		public float tint;
 
-		[Tooltip("Shift the hue of all colors.")]
 		[Space]
 		[Range(-0.5f, 0.5f)]
+		[Tooltip("Shift the hue of all colors.")]
 		public float hue;
 
 		[Range(0f, 2f)]
@@ -232,9 +232,9 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Brightens or darkens all colors.")]
 		public float value;
 
-		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		[Space]
 		[Range(0f, 2f)]
+		[Tooltip("Expands or shrinks the overall range of tonal values.")]
 		public float contrast;
 
 		[Range(0.01f, 5f)]

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CopyLODValues : MonoBehaviour
+public class CopyLODValues : MonoBehaviour, IEditorComponent
 {
 	[SerializeField]
 	private LODGroup source;
@@ -37,13 +37,11 @@ public class CopyLODValues : MonoBehaviour
 			}
 		}
 		LOD[] lODs2 = destination.GetLODs();
-		for (int j = 0; j < lODs2.Length; j++)
+		for (int j = 0; j < lODs2.Length && j < lODs.Length; j++)
 		{
-			if (j < lODs.Length)
-			{
-				lODs2[j].screenRelativeTransitionHeight = lODs[j].screenRelativeTransitionHeight;
-				Debug.Log($"Set destination LOD {j} to {lODs2[j].screenRelativeTransitionHeight}");
-			}
+			int num2 = ((j == lODs2.Length - 1) ? (lODs.Length - 1) : j);
+			lODs2[j].screenRelativeTransitionHeight = lODs[num2].screenRelativeTransitionHeight;
+			Debug.Log($"Set destination LOD {j} to {lODs2[j].screenRelativeTransitionHeight}");
 		}
 		destination.SetLODs(lODs2);
 	}

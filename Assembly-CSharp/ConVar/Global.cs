@@ -35,11 +35,14 @@ public class Global : ConsoleSystem
 	[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 	public static bool specnet = false;
 
-	[ServerVar(Saved = true, Help = "How long sprays will last when sprayed inside a players TC auth")]
-	public static float SprayInAuthDuration = 30f;
+	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "Multiplier applied to SprayDuration if a spray isn't in the sprayers auth (cannot go above 1f)")]
+	public static float SprayOutOfAuthMultiplier = 0.5f;
 
-	[ServerVar(Saved = true, Help = "How long sprays will last when sprayed outside a players TC auth")]
-	public static float SprayNoAuthDuration = 30f;
+	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "Base time (in seconds) that sprays last")]
+	public static float SprayDuration = 10800f;
+
+	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "If a player sprays more than this, the oldest spray will be destroyed. 0 will disable")]
+	public static int MaxSpraysPerPlayer = 25;
 
 	[ServerVar]
 	[ClientVar]
@@ -602,5 +605,72 @@ public class Global : ConsoleSystem
 			}
 		}
 		arg.ReplyWith(textTable.ToString());
+	}
+
+	[ServerVar]
+	public static void ClearAllSprays()
+	{
+		List<SprayCanSpray> obj = Facepunch.Pool.GetList<SprayCanSpray>();
+		foreach (SprayCanSpray allSpray in SprayCanSpray.AllSprays)
+		{
+			obj.Add(allSpray);
+		}
+		foreach (SprayCanSpray item in obj)
+		{
+			item.Kill();
+		}
+		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	[ServerVar]
+	public static void ClearAllSpraysByPlayer(Arg arg)
+	{
+		if (!arg.HasArgs())
+		{
+			return;
+		}
+		ulong uLong = arg.GetULong(0, 0uL);
+		List<SprayCanSpray> obj = Facepunch.Pool.GetList<SprayCanSpray>();
+		foreach (SprayCanSpray allSpray in SprayCanSpray.AllSprays)
+		{
+			if (allSpray.sprayedByPlayer == uLong)
+			{
+				obj.Add(allSpray);
+			}
+		}
+		foreach (SprayCanSpray item in obj)
+		{
+			item.Kill();
+		}
+		int count = obj.Count;
+		Facepunch.Pool.FreeList(ref obj);
+		arg.ReplyWith($"Deleted {count} sprays by {uLong}");
+	}
+
+	[ServerVar]
+	public static void ClearSpraysInRadius(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (basePlayer == null)
+		{
+			return;
+		}
+		float @float = arg.GetFloat(0, 16f);
+		Vector3 position = basePlayer.transform.position;
+		List<SprayCanSpray> obj = Facepunch.Pool.GetList<SprayCanSpray>();
+		foreach (SprayCanSpray allSpray in SprayCanSpray.AllSprays)
+		{
+			if (allSpray.Distance(position) <= @float)
+			{
+				obj.Add(allSpray);
+			}
+		}
+		foreach (SprayCanSpray item in obj)
+		{
+			item.Kill();
+		}
+		int count = obj.Count;
+		Facepunch.Pool.FreeList(ref obj);
+		arg.ReplyWith($"Deleted {count} sprays within {@float} of {basePlayer.displayName}");
 	}
 }

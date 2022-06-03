@@ -18,6 +18,8 @@ public class ZiplineLaunchPoint : BaseEntity
 
 	public BoxCollider[] BuildingBlocks;
 
+	public BoxCollider[] PointBuildingBlocks;
+
 	public GameObjectRef MountableRef;
 
 	public float LineSlackAmount = 2f;
@@ -306,6 +308,11 @@ public class ZiplineLaunchPoint : BaseEntity
 		{
 			buildingBlocks[i].gameObject.SetActive(value: false);
 		}
+		buildingBlocks = PointBuildingBlocks;
+		for (int i = 0; i < buildingBlocks.Length; i++)
+		{
+			buildingBlocks[i].gameObject.SetActive(value: false);
+		}
 		int num = 0;
 		if (ziplineTargets.Count <= 0)
 		{
@@ -315,17 +322,17 @@ public class ZiplineLaunchPoint : BaseEntity
 		int startIndex2 = 0;
 		for (int j = 0; j < linePoints.Count; j++)
 		{
-			if (j == 0)
+			if (j == 0 || (base.isClient && j == 1))
 			{
 				continue;
 			}
 			Vector3 vector2 = linePoints[j];
 			Vector3 normalized = (vector2 - linePoints[j - 1].WithY(vector2.y)).normalized;
-			if (vector != Vector3.zero && Vector3.Dot(normalized, vector) < 0.9f)
+			if (vector != Vector3.zero && Vector3.Dot(normalized, vector) < 0.98f)
 			{
 				if (num < BuildingBlocks.Length)
 				{
-					SetUpBuildingBlock(BuildingBlocks[num++], startIndex2, j - 1);
+					SetUpBuildingBlock(BuildingBlocks[num], PointBuildingBlocks[num++], startIndex2, j - 1);
 				}
 				startIndex2 = j - 1;
 			}
@@ -333,20 +340,20 @@ public class ZiplineLaunchPoint : BaseEntity
 		}
 		if (num < BuildingBlocks.Length)
 		{
-			SetUpBuildingBlock(BuildingBlocks[num], startIndex2, linePoints.Count - 1);
+			SetUpBuildingBlock(BuildingBlocks[num], PointBuildingBlocks[num], startIndex2, linePoints.Count - 1);
 		}
-		void SetUpBuildingBlock(BoxCollider c, int startIndex, int endIndex)
+		void SetUpBuildingBlock(BoxCollider longCollider, BoxCollider pointCollider, int startIndex, int endIndex)
 		{
 			Vector3 vector3 = linePoints[startIndex];
 			Vector3 vector4 = linePoints[endIndex];
 			Vector3 vector5 = Vector3.zero;
 			Quaternion rotation = Quaternion.LookRotation((vector3 - vector4).normalized, Vector3.up);
 			Vector3 position = Vector3.Lerp(vector3, vector4, 0.5f);
-			c.transform.position = position;
-			c.transform.rotation = rotation;
+			longCollider.transform.position = position;
+			longCollider.transform.rotation = rotation;
 			for (int k = startIndex; k < endIndex; k++)
 			{
-				Vector3 vector6 = c.transform.InverseTransformPoint(linePoints[k]);
+				Vector3 vector6 = longCollider.transform.InverseTransformPoint(linePoints[k]);
 				if (vector6.y < vector5.y)
 				{
 					vector5 = vector6;
@@ -354,9 +361,11 @@ public class ZiplineLaunchPoint : BaseEntity
 			}
 			float num2 = Mathf.Abs(vector5.y) + 2f;
 			float z = Vector3.Distance(vector3, vector4);
-			c.size = new Vector3(0.5f, num2, z);
-			c.center = new Vector3(0f, 0f - num2 * 0.5f, 0f);
-			c.gameObject.SetActive(value: true);
+			longCollider.size = new Vector3(0.5f, num2, z);
+			longCollider.center = new Vector3(0f, 0f - num2 * 0.5f, 0f);
+			longCollider.gameObject.SetActive(value: true);
+			pointCollider.transform.position = linePoints[endIndex];
+			pointCollider.gameObject.SetActive(value: true);
 		}
 	}
 

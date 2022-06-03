@@ -6,61 +6,70 @@ using UnityEngine;
 
 public class CompleteTrain : IDisposable
 {
-	private enum StaticCollisionState
+	public enum StaticCollisionState
 	{
 		Free = 0,
 		StaticColliding = 1,
 		StayingStill = 2
 	}
 
-	private float trackSpeed;
+	public float trackSpeed;
 
-	private List<TrainCar> trainCars;
+	public List<TrainCar> trainCars;
 
-	private TriggerTrainCollisions frontCollisionTrigger;
+	public TriggerTrainCollisions frontCollisionTrigger;
 
-	private TriggerTrainCollisions rearCollisionTrigger;
+	public TriggerTrainCollisions rearCollisionTrigger;
 
-	private bool ranUpdateTick;
+	public bool ranUpdateTick;
 
-	private bool disposed;
+	public bool disposed;
 
-	private const float IMPACT_ENERGY_FRACTION = 0.75f;
+	public const float IMPACT_ENERGY_FRACTION = 0.75f;
 
-	private const float MIN_COLLISION_FORCE = 70000f;
+	public const float MIN_COLLISION_FORCE = 70000f;
 
-	private float lastMovingTime = float.MinValue;
+	public float lastMovingTime = float.MinValue;
 
-	private const float SLEEP_SPEED = 0.1f;
+	public const float SLEEP_SPEED = 0.1f;
 
-	private const float SLEEP_DELAY = 10f;
+	public const float SLEEP_DELAY = 10f;
 
-	private TimeSince timeSinceLastChange;
+	public TimeSince timeSinceLastChange;
 
-	private StaticCollisionState staticCollidingAtFront;
+	public StaticCollisionState staticCollidingAtFront;
 
 	private HashSet<GameObject> monitoredStaticContentF = new HashSet<GameObject>();
 
-	private StaticCollisionState staticCollidingAtRear;
+	public StaticCollisionState staticCollidingAtRear;
 
 	private HashSet<GameObject> monitoredStaticContentR = new HashSet<GameObject>();
 
-	private Dictionary<Rigidbody, float> prevTrackSpeeds = new Dictionary<Rigidbody, float>();
+	public Dictionary<Rigidbody, float> prevTrackSpeeds = new Dictionary<Rigidbody, float>();
 
-	public TrainCar PrimaryTrainCar { get; private set; }
+	public TrainCar PrimaryTrainCar { get; set; }
 
 	public bool TrainIsReversing => PrimaryTrainCar != trainCars[0];
 
-	public float TotalForces { get; private set; }
+	public float TotalForces { get; set; }
 
-	public float TotalMass { get; private set; }
+	public float TotalMass { get; set; }
+
+	public int NumTrainCars => trainCars.Count;
 
 	public CompleteTrain(TrainCar trainCar)
-		: this(new List<TrainCar>(1) { trainCar })
 	{
+		List<TrainCar> list = Facepunch.Pool.GetList<TrainCar>();
+		list.Add(trainCar);
+		Init(list);
 	}
 
 	public CompleteTrain(List<TrainCar> allTrainCars)
+	{
+		Init(allTrainCars);
+	}
+
+	private void Init(List<TrainCar> allTrainCars)
 	{
 		trainCars = allTrainCars;
 		timeSinceLastChange = 0f;
@@ -83,6 +92,26 @@ public class CompleteTrain : IDisposable
 		}
 		num = (trackSpeed = num / (float)trainCars.Count);
 		ParamsTick();
+	}
+
+	~CompleteTrain()
+	{
+		Cleanup();
+	}
+
+	public void Dispose()
+	{
+		Cleanup();
+		System.GC.SuppressFinalize(this);
+	}
+
+	private void Cleanup()
+	{
+		if (!disposed)
+		{
+			disposed = true;
+			Facepunch.Pool.FreeList(ref trainCars);
+		}
 	}
 
 	public void RemoveTrainCar(TrainCar trainCar)
@@ -125,11 +154,6 @@ public class CompleteTrain : IDisposable
 				SleepAll();
 			}
 		}
-	}
-
-	public void Dispose()
-	{
-		disposed = true;
 	}
 
 	public bool IncludesAnEngine()
@@ -412,10 +436,22 @@ public class CompleteTrain : IDisposable
 		TrainTrackSpline.TrackSelection result = TrainTrackSpline.TrackSelection.Default;
 		foreach (TrainCar trainCar in trainCars)
 		{
-			if (trainCar.localTrackSelection != 0)
+			if (trainCar.localTrackSelection == TrainTrackSpline.TrackSelection.Default)
 			{
-				return trainCar.localTrackSelection;
+				continue;
 			}
+			if (IsCoupledBackwards(trainCar) != IsCoupledBackwards(PrimaryTrainCar))
+			{
+				if (trainCar.localTrackSelection == TrainTrackSpline.TrackSelection.Left)
+				{
+					return TrainTrackSpline.TrackSelection.Right;
+				}
+				if (trainCar.localTrackSelection == TrainTrackSpline.TrackSelection.Right)
+				{
+					return TrainTrackSpline.TrackSelection.Left;
+				}
+			}
+			return trainCar.localTrackSelection;
 		}
 		return result;
 	}
@@ -474,7 +510,8 @@ public class CompleteTrain : IDisposable
 		{
 			foreach (Collider colliderContent in trigger.colliderContents)
 			{
-				trigger.owner.TryShowCollisionFX(colliderContent.ClosestPointOnBounds(trigger.owner.transform.position));
+				Vector3 contactPoint = colliderContent.ClosestPointOnBounds(trigger.owner.transform.position);
+				trigger.owner.TryShowCollisionFX(contactPoint, trigger.owner.collisionEffect);
 			}
 			return trackSpeed;
 		}
@@ -591,7 +628,7 @@ public class CompleteTrain : IDisposable
 				num3 -= Mathf.Clamp((num5 - num4) * ourTotalMass, 0f, 1000000f);
 				prevTrackSpeeds[theirRB] = num;
 			}
-			else
+			else if (num != 0f)
 			{
 				prevTrackSpeeds.Add(theirRB, num);
 			}

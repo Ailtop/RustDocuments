@@ -177,6 +177,9 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	[NonSerialized]
 	public readonly List<BaseEntity> children = new List<BaseEntity>();
 
+	[NonSerialized]
+	public bool canTriggerParent = true;
+
 	public int creationFrame;
 
 	public bool isSpawned;

@@ -1,5 +1,3 @@
-namespace Rust.Interpolation;
-
 public interface ILerpInfo
 {
 	float GetExtrapolationTime();

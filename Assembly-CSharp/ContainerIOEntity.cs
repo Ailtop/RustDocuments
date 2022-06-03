@@ -32,6 +32,10 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasL
 
 	public bool onlyOneUser;
 
+	public SoundDefinition openSound;
+
+	public SoundDefinition closeSound;
+
 	public Translate.Phrase LootPanelTitle => panelTitle;
 
 	public ItemContainer inventory { get; private set; }

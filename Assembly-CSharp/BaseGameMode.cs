@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Network;
 using ProtoBuf;
+using Rust;
 using UnityEngine;
 
 public class BaseGameMode : BaseEntity
@@ -43,8 +45,6 @@ public class BaseGameMode : BaseEntity
 
 	public int numScoreForVictory = 10;
 
-	public GameObjectRef startingWeapon;
-
 	public string gamemodeTitle;
 
 	public SoundDefinition[] warmupMusics;
@@ -64,9 +64,31 @@ public class BaseGameMode : BaseEntity
 
 	public string[] gameModeTags;
 
+	public BasePlayer.CameraMode deathCameraMode = BasePlayer.CameraMode.Eyes;
+
 	public bool permanent = true;
 
 	public bool limitTeamAuths;
+
+	public bool allowSleeping = true;
+
+	public bool allowWounding = true;
+
+	public bool allowBleeding = true;
+
+	public bool allowTemperature = true;
+
+	public bool quickRespawn;
+
+	public float respawnDelayOverride = 5f;
+
+	public float startHealthOverride;
+
+	public float autoHealDelay;
+
+	public float autoHealDuration = 1f;
+
+	public bool hasKillFeed;
 
 	public static BaseGameMode svActiveGameMode = null;
 
@@ -80,11 +102,28 @@ public class BaseGameMode : BaseEntity
 
 	public PlayerInventoryProperties[] loadouts;
 
+	[Tooltip("Use steamID to always pick the same loadout per player")]
+	public bool useStaticLoadoutPerPlayer;
+
+	public bool topUpMagazines;
+
+	public bool sendKillNotifications;
+
 	public GameModeTeam[] teams;
+
+	public float corpseRemovalTimeOverride;
 
 	private static bool isResetting = false;
 
 	public static event Action<BaseGameMode> GameModeChanged;
+
+	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
+	{
+		using (TimeWarning.New("BaseGameMode.OnRpcMessage"))
+		{
+		}
+		return base.OnRpcMessage(player, rpc, msg);
+	}
 
 	public GameMode GetGameScores()
 	{
@@ -473,9 +512,22 @@ public class BaseGameMode : BaseEntity
 		return false;
 	}
 
+	public bool AllowsSleeping()
+	{
+		return allowSleeping;
+	}
+
 	public bool HasLoadouts()
 	{
-		return loadouts.Length != 0;
+		if (loadouts.Length == 0)
+		{
+			if (IsTeamGame())
+			{
+				return teams[0].teamloadouts.Length != 0;
+			}
+			return false;
+		}
+		return true;
 	}
 
 	public int GetNumTeams()
@@ -501,7 +553,7 @@ public class BaseGameMode : BaseEntity
 			activeGameMode.Kill();
 			SetActiveGameMode(null, serverside: true);
 		}
-		string text = Server.gamemode;
+		string text = ConVar.Server.gamemode;
 		Debug.Log("Gamemode Convar :" + text);
 		if (!string.IsNullOrEmpty(overrideMode))
 		{
@@ -572,7 +624,7 @@ public class BaseGameMode : BaseEntity
 
 	public virtual float CorpseRemovalTime(BaseCorpse corpse)
 	{
-		return Server.corpsedespawn;
+		return ConVar.Server.corpsedespawn;
 	}
 
 	public virtual bool InWarmup()
@@ -657,6 +709,7 @@ public class BaseGameMode : BaseEntity
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
 			ResetPlayerScores(activePlayer);
+			activePlayer.Hurt(100000f, DamageType.Suicide, null, useProtection: false);
 			activePlayer.Respawn();
 		}
 		GameModeSpawnGroup[] array = gameModeSpawnGroups;
@@ -707,6 +760,10 @@ public class BaseGameMode : BaseEntity
 		int num2 = 0;
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
+			if (autoHealDelay > 0f && activePlayer.healthFraction < 1f && activePlayer.IsAlive() && !activePlayer.IsWounded() && activePlayer.SecondsSinceAttacked >= autoHealDelay)
+			{
+				activePlayer.Heal(activePlayer.MaxHealth() * delta / autoHealDuration);
+			}
 			if (activePlayer.IsConnected)
 			{
 				num2++;
@@ -742,6 +799,21 @@ public class BaseGameMode : BaseEntity
 	public virtual void OnNewPlayer(BasePlayer player)
 	{
 		player.Respawn();
+		if (!AllowsSleeping())
+		{
+			player.EndSleeping();
+			player.SendNetworkUpdateImmediate();
+		}
+		PostPlayerRespawn(player);
+	}
+
+	public void PostPlayerRespawn(BasePlayer player)
+	{
+		if (startHealthOverride > 0f)
+		{
+			player.SetMaxHealth(startHealthOverride);
+			player.health = startHealthOverride;
+		}
 	}
 
 	public virtual void OnPlayerConnected(BasePlayer player)
@@ -814,21 +886,58 @@ public class BaseGameMode : BaseEntity
 	{
 	}
 
+	public virtual void OnPlayerHurt(BasePlayer instigator, BasePlayer victim, HitInfo deathInfo = null)
+	{
+		if (!allowBleeding && victim.metabolism.bleeding.value != 0f)
+		{
+			victim.metabolism.bleeding.value = 0f;
+			victim.metabolism.SendChangesToClient();
+		}
+	}
+
 	public virtual void OnPlayerDeath(BasePlayer instigator, BasePlayer victim, HitInfo deathInfo = null)
 	{
-		if (IsMatchActive())
+		if (!IsMatchActive())
 		{
-			if (victim != null && victim.IsConnected && !victim.IsNpc)
-			{
-				ModifyPlayerGameScore(victim, "deaths", 1);
-			}
-			bool flag = IsTeamGame() && instigator != null && victim != null && instigator.gamemodeteam == victim.gamemodeteam;
-			if (instigator != null && victim != instigator && !flag && !instigator.IsNpc)
-			{
-				ModifyPlayerGameScore(instigator, "kills", 1);
-			}
-			CheckGameConditions(force: true);
+			return;
 		}
+		if (victim != null && victim.IsConnected && !victim.IsNpc)
+		{
+			ModifyPlayerGameScore(victim, "deaths", 1);
+		}
+		bool flag = IsTeamGame() && instigator != null && victim != null && instigator.gamemodeteam == victim.gamemodeteam;
+		if (instigator != null && victim != instigator && !flag && !instigator.IsNpc)
+		{
+			ModifyPlayerGameScore(instigator, "kills", 1);
+		}
+		if (instigator != null && instigator.IsConnected && !instigator.IsNpc && instigator != victim)
+		{
+			ClientRPCPlayer(null, instigator, "RPC_ScoreSplash", victim.displayName, 100, arg3: true);
+		}
+		if (hasKillFeed && instigator != null && victim != null && deathInfo.Weapon != null && deathInfo.Weapon.GetItem() != null)
+		{
+			string text = Vector3.Distance(instigator.transform.position, victim.transform.position).ToString("N0") + "m";
+			string text2 = " with a " + deathInfo.Weapon.GetItem().info.displayName.translated + " from " + text;
+			string msg = "You Killed " + victim.displayName + text2;
+			string msg2 = instigator.displayName + " Killed You" + text2;
+			string msg3 = instigator.displayName + " Killed" + victim.displayName + text2;
+			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+			{
+				if (activePlayer == instigator)
+				{
+					activePlayer.ChatMessage(msg);
+				}
+				else if (activePlayer == victim)
+				{
+					activePlayer.ChatMessage(msg2);
+				}
+				else if (BasePlayer.activePlayerList.Count <= 5)
+				{
+					activePlayer.ChatMessage(msg3);
+				}
+			}
+		}
+		CheckGameConditions(force: true);
 	}
 
 	public virtual bool CanPlayerRespawn(BasePlayer player)
@@ -842,6 +951,13 @@ public class BaseGameMode : BaseEntity
 
 	public virtual void OnPlayerRespawn(BasePlayer player)
 	{
+		if (!AllowsSleeping())
+		{
+			player.EndSleeping();
+			player.MarkRespawn(respawnDelayOverride);
+			SendNetworkUpdateImmediate();
+		}
+		PostPlayerRespawn(player);
 	}
 
 	public virtual void CheckGameConditions(bool force = false)
@@ -878,7 +994,11 @@ public class BaseGameMode : BaseEntity
 	public virtual void LoadoutPlayer(BasePlayer player)
 	{
 		PlayerInventoryProperties playerInventoryProperties;
-		if (IsTeamGame())
+		if (!IsTeamGame())
+		{
+			playerInventoryProperties = ((!useStaticLoadoutPerPlayer) ? loadouts[UnityEngine.Random.Range(0, loadouts.Length)] : loadouts[SeedRandom.Range((uint)player.userID, 0, loadouts.Length)]);
+		}
+		else
 		{
 			if (player.gamemodeteam == -1)
 			{
@@ -886,10 +1006,6 @@ public class BaseGameMode : BaseEntity
 				AutoAssignTeam(player);
 			}
 			playerInventoryProperties = teams[player.gamemodeteam].teamloadouts[SeedRandom.Range((uint)player.userID, 0, teams[player.gamemodeteam].teamloadouts.Length)];
-		}
-		else
-		{
-			playerInventoryProperties = loadouts[SeedRandom.Range((uint)player.userID, 0, loadouts.Length)];
 		}
 		if ((bool)playerInventoryProperties)
 		{
@@ -899,11 +1015,31 @@ public class BaseGameMode : BaseEntity
 		{
 			player.inventory.GiveItem(ItemManager.CreateByName("hazmatsuit", 1, 0uL), player.inventory.containerWear);
 		}
+		if (!topUpMagazines)
+		{
+			return;
+		}
+		foreach (Item item in player.inventory.containerBelt.itemList)
+		{
+			BaseEntity heldEntity = item.GetHeldEntity();
+			if (heldEntity != null)
+			{
+				BaseProjectile component = heldEntity.GetComponent<BaseProjectile>();
+				if (component != null)
+				{
+					component.TopUpAmmo();
+				}
+			}
+		}
 	}
 
 	public virtual void InstallSpawnpoints()
 	{
 		allspawns = GameObject.FindGameObjectsWithTag("spawnpoint");
+		if (allspawns != null)
+		{
+			Debug.Log("Installed : " + allspawns.Length + "spawn points.");
+		}
 	}
 
 	public virtual BasePlayer.SpawnPoint GetPlayerSpawn(BasePlayer forPlayer)
@@ -925,17 +1061,17 @@ public class BaseGameMode : BaseEntity
 					BasePlayer basePlayer = BasePlayer.activePlayerList[j];
 					if (!(basePlayer == null) && basePlayer.IsAlive() && !(basePlayer == forPlayer))
 					{
-						float num4 = Vector3.Distance(basePlayer.transform.position, gameObject.transform.position);
-						num3 -= 100f * (1f - Mathf.InverseLerp(2f, 6f, num4));
+						float value = Vector3.Distance(basePlayer.transform.position, gameObject.transform.position);
+						num3 -= 100f * (1f - Mathf.InverseLerp(8f, 16f, value));
 						if (!IsTeamGame() || basePlayer.gamemodeteam != forPlayer.gamemodeteam)
 						{
-							num3 += num4;
+							num3 += 100f * Mathf.InverseLerp(16f, 32f, value);
 						}
 					}
 				}
-				float value = Vector3.Distance((forPlayer.ServerCurrentDeathNote == null) ? allspawns[UnityEngine.Random.Range(0, allspawns.Length)].transform.position : forPlayer.ServerCurrentDeathNote.worldPosition, gameObject.transform.position);
-				float num5 = Mathf.InverseLerp(8f, 12f, value);
-				num3 *= num5;
+				float value2 = Vector3.Distance((forPlayer.ServerCurrentDeathNote == null) ? allspawns[UnityEngine.Random.Range(0, allspawns.Length)].transform.position : forPlayer.ServerCurrentDeathNote.worldPosition, gameObject.transform.position);
+				float num4 = Mathf.InverseLerp(8f, 25f, value2);
+				num3 *= num4;
 				if (num3 > num)
 				{
 					num2 = i;

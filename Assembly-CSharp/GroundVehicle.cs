@@ -16,6 +16,9 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 	public Transform waterloggedPoint;
 
 	[SerializeField]
+	private GameObjectRef collisionEffect;
+
+	[SerializeField]
 	public float engineStartupTime = 0.5f;
 
 	[SerializeField]
@@ -213,7 +216,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 			float forceMagnitude = collision.impulse.magnitude / Time.fixedDeltaTime;
 			if (QueueCollisionDamage(baseEntity, forceMagnitude) > 0f)
 			{
-				TryShowCollisionFX(collision.GetContact(0).point);
+				TryShowCollisionFX(collision, collisionEffect);
 			}
 		}
 	}

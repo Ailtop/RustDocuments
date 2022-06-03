@@ -174,6 +174,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 					HitPositionLocal = item.transform.InverseTransformPoint(vector),
 					HitNormalWorld = Vector3.up,
 					HitMaterial = ((item is BaseCombatEntity) ? StringPool.Get("Flesh") : 0u),
+					WeaponPrefab = ((SourceEntity != null) ? SourceEntity.gameManager.FindPrefab(SourceEntity.prefabID).GetComponent<BaseEntity>() : null),
 					Initiator = hurtTriggerUser?.GetPlayerDamageInitiator()
 				};
 				hitInfo.damageTypes = new DamageTypeList();

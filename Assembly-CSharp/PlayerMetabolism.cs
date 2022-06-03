@@ -142,6 +142,7 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		{
 			return;
 		}
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		float currentTemperature = owner.currentTemperature;
 		float fTarget = owner.currentComfort;
 		float currentCraftLevel = owner.currentCraftLevel;
@@ -149,15 +150,22 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench2, currentCraftLevel == 2f);
 		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench3, currentCraftLevel == 3f);
 		owner.SetPlayerFlag(BasePlayer.PlayerFlags.SafeZone, owner.InSafeZone());
-		float num = currentTemperature;
-		num -= DeltaWet() * 34f;
-		float num2 = Mathf.Clamp(owner.baseProtection.amounts[18] * 1.5f, -1f, 1f);
-		float num3 = Mathf.InverseLerp(20f, -50f, currentTemperature);
-		float num4 = Mathf.InverseLerp(20f, 30f, currentTemperature);
-		num += num3 * 70f * num2;
-		num += num4 * 10f * Mathf.Abs(num2);
-		num += heartrate.value * 5f;
-		temperature.MoveTowards(num, delta * 5f);
+		if (activeGameMode == null || activeGameMode.allowTemperature)
+		{
+			float num = currentTemperature;
+			num -= DeltaWet() * 34f;
+			float num2 = Mathf.Clamp(owner.baseProtection.amounts[18] * 1.5f, -1f, 1f);
+			float num3 = Mathf.InverseLerp(20f, -50f, currentTemperature);
+			float num4 = Mathf.InverseLerp(20f, 30f, currentTemperature);
+			num += num3 * 70f * num2;
+			num += num4 * 10f * Mathf.Abs(num2);
+			num += heartrate.value * 5f;
+			temperature.MoveTowards(num, delta * 5f);
+		}
+		else
+		{
+			temperature.value = 25f;
+		}
 		if (temperature.value >= 40f)
 		{
 			fTarget = 0f;

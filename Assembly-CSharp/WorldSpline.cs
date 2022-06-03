@@ -179,14 +179,14 @@ public class WorldSpline : MonoBehaviour
 	public Vector3 GetPointAndTangentCubicHermiteWorld(float distance, out Vector3 tangent)
 	{
 		Vector3 pointAndTangentCubicHermite = GetData().GetPointAndTangentCubicHermite(distance, out tangent);
-		tangent = base.transform.TransformDirection(tangent);
+		tangent = base.transform.TransformVector(tangent);
 		return base.transform.TransformPoint(pointAndTangentCubicHermite);
 	}
 
 	public Vector3 GetPointAndTangentCubicHermiteWorld(float distance, WorldSplineData data, out Vector3 tangent)
 	{
 		Vector3 pointAndTangentCubicHermite = data.GetPointAndTangentCubicHermite(distance, out tangent);
-		tangent = base.transform.TransformDirection(tangent);
+		tangent = base.transform.TransformVector(tangent);
 		return base.transform.TransformPoint(pointAndTangentCubicHermite);
 	}
 

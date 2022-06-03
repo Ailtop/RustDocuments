@@ -5,7 +5,7 @@ public class TerrainPath : TerrainExtension
 {
 	public List<PathList> Roads = new List<PathList>();
 
-	internal List<PathList> Rails = new List<PathList>();
+	public List<PathList> Rails = new List<PathList>();
 
 	public List<PathList> Rivers = new List<PathList>();
 

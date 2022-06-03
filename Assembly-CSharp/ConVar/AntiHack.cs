@@ -277,7 +277,7 @@ public class AntiHack : ConsoleSystem
 
 	[ServerVar]
 	[Help("distance at which to start testing eye noclipping")]
-	public static float eye_noclip_cutoff = 0.01f;
+	public static float eye_noclip_cutoff = 0.06f;
 
 	[ServerVar]
 	[Help("collider margin when checking for noclipping")]
@@ -289,7 +289,7 @@ public class AntiHack : ConsoleSystem
 
 	[ServerVar]
 	[Help("line of sight sphere cast radius, 0 == raycast")]
-	public static float eye_losradius = 0.2f;
+	public static float eye_losradius = 0.18f;
 
 	[ServerVar]
 	[Help("violation penalty to hand out when eye history mismatch is detected")]

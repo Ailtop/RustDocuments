@@ -148,38 +148,28 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				DungeonGridInfo dungeonEntrance = component.DungeonEntrance;
 				foreach (PathList road in TerrainMeta.Path.Roads)
 				{
+					bool flag = false;
 					switch (RoadType)
 					{
 					case RoadMode.SideRoadOrRingRoad:
-						if (road.IsExtraNarrow)
-						{
-							continue;
-						}
+						flag = road.Hierarchy == 0 || road.Hierarchy == 1;
 						break;
 					case RoadMode.SideRoad:
-						if (road.IsExtraNarrow || road.IsExtraWide)
-						{
-							continue;
-						}
+						flag = road.Hierarchy == 1;
 						break;
 					case RoadMode.RingRoad:
-						if (!road.IsExtraWide)
-						{
-							continue;
-						}
+						flag = road.Hierarchy == 0;
 						break;
 					case RoadMode.SideRoadOrDesireTrail:
-						if (road.IsExtraWide)
-						{
-							continue;
-						}
+						flag = road.Hierarchy == 1 || road.Hierarchy == 2;
 						break;
 					case RoadMode.DesireTrail:
-						if (!road.IsExtraNarrow)
-						{
-							continue;
-						}
+						flag = road.Hierarchy == 2;
 						break;
+					}
+					if (!flag)
+					{
+						continue;
 					}
 					PathInterpolator path = road.Path;
 					float num = 5f;

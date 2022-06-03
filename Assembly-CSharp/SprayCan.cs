@@ -40,6 +40,12 @@ public class SprayCan : HeldEntity
 		public Quaternion LocalRotation;
 	}
 
+	public const float MaxFreeSprayDistanceFromStart = 10f;
+
+	public const float MaxFreeSprayStartingDistance = 3f;
+
+	private SprayCanSpray_Freehand paintingLine;
+
 	public SoundDefinition SpraySound;
 
 	public GameObjectRef SkinSelectPanel;
@@ -56,16 +62,60 @@ public class SprayCan : HeldEntity
 
 	public float[] SprayWidths = new float[3] { 0.1f, 0.2f, 0.3f };
 
-	public ParticleSystem FreehandWorldSpray;
-
-	public ParticleSystem OneShotWorldSpray;
+	public ParticleSystem worldSpaceSprayFx;
 
 	public GameObjectRef ReskinEffect;
+
+	public ItemDefinition SprayDecalItem;
+
+	public GameObjectRef SprayDecalEntityRef;
+
+	public SteamInventoryItem FreeSprayUnlockItem;
+
+	public ParticleSystem.MinMaxGradient DecalSprayGradient;
+
+	public const string ENEMY_BASE_STAT = "sprayed_enemy_base";
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("SprayCan.OnRpcMessage"))
 		{
+			if (rpc == 3490735573u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BeginFreehandSpray "));
+				}
+				using (TimeWarning.New("BeginFreehandSpray"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsActiveItem.Test(3490735573u, "BeginFreehandSpray", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							BeginFreehandSpray(msg2);
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in BeginFreehandSpray");
+					}
+				}
+				return true;
+			}
 			if (rpc == 151738090 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -90,20 +140,116 @@ public class SprayCan : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg2 = rPCMessage;
-							ChangeItemSkin(msg2);
+							RPCMessage msg3 = rPCMessage;
+							ChangeItemSkin(msg3);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception exception2)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in ChangeItemSkin");
+					}
+				}
+				return true;
+			}
+			if (rpc == 396000799 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - CreateSpray "));
+				}
+				using (TimeWarning.New("CreateSpray"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsActiveItem.Test(396000799u, "CreateSpray", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							CreateSpray(msg4);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in CreateSpray");
 					}
 				}
 				return true;
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsActiveItem]
+	private void BeginFreehandSpray(RPCMessage msg)
+	{
+		if (!IsBusy() && CanSprayFreehand(msg.player))
+		{
+			Vector3 vector = msg.read.Vector3();
+			Vector3 atNormal = msg.read.Vector3();
+			int num = msg.read.Int32();
+			int num2 = msg.read.Int32();
+			if (num >= 0 && num < SprayColours.Length && num2 >= 0 && num2 < SprayWidths.Length && !(Vector3.Distance(vector, GetOwnerPlayer().transform.position) > 3f))
+			{
+				SprayCanSpray_Freehand sprayCanSpray_Freehand = GameManager.server.CreateEntity(LinePrefab.resourcePath, vector, Quaternion.identity) as SprayCanSpray_Freehand;
+				sprayCanSpray_Freehand.AddInitialPoint(atNormal);
+				sprayCanSpray_Freehand.SetColour(SprayColours[num]);
+				sprayCanSpray_Freehand.SetWidth(SprayWidths[num2]);
+				sprayCanSpray_Freehand.EnableChanges(msg.player);
+				sprayCanSpray_Freehand.Spawn();
+				paintingLine = sprayCanSpray_Freehand;
+				ClientRPC(null, "Client_ChangeSprayColour", num);
+				SetFlag(Flags.Busy, b: true);
+				CheckAchievementPosition(vector);
+			}
+		}
+	}
+
+	public void ClearPaintingLine()
+	{
+		paintingLine = null;
+		LoseCondition(ConditionLossPerSpray);
+	}
+
+	public bool CanSprayFreehand(BasePlayer player)
+	{
+		if (FreeSprayUnlockItem != null)
+		{
+			if (!player.blueprints.steamInventory.HasItem(FreeSprayUnlockItem.id))
+			{
+				return FreeSprayUnlockItem.HasUnlocked(player.userID);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private bool IsSprayBlockedByTrigger(Vector3 pos)
+	{
+		BasePlayer ownerPlayer = GetOwnerPlayer();
+		if (ownerPlayer == null)
+		{
+			return true;
+		}
+		TriggerNoSpray triggerNoSpray = ownerPlayer.FindTrigger<TriggerNoSpray>();
+		if (triggerNoSpray == null)
+		{
+			return false;
+		}
+		return !triggerNoSpray.IsPositionValid(pos);
 	}
 
 	[RPC_Server]
@@ -286,6 +432,7 @@ public class SprayCan : HeldEntity
 			ClientRPC(null, "Client_ReskinResult", 1, baseEntity2.net.ID);
 		}
 		LoseCondition(ConditionLossPerReskin);
+		ClientRPC(null, "Client_ChangeSprayColour", -1);
 		SetFlag(Flags.Busy, b: true);
 		Invoke(ClearBusy, SprayCooldown);
 		static void RestoreEntityStorage(BaseEntity baseEntity, int index, Dictionary<ContainerSet, List<Item>> copy)
@@ -359,6 +506,45 @@ public class SprayCan : HeldEntity
 		return false;
 	}
 
+	[RPC_Server]
+	[RPC_Server.IsActiveItem]
+	private void CreateSpray(RPCMessage msg)
+	{
+		if (IsBusy())
+		{
+			return;
+		}
+		ClientRPC(null, "Client_ChangeSprayColour", -1);
+		SetFlag(Flags.Busy, b: true);
+		Invoke(ClearBusy, SprayCooldown);
+		Vector3 vector = msg.read.Vector3();
+		Vector3 vector2 = msg.read.Vector3();
+		Vector3 point = msg.read.Vector3();
+		int num = msg.read.Int32();
+		if (!(Vector3.Distance(vector, base.transform.position) > 4.5f))
+		{
+			Quaternion rot = Quaternion.LookRotation((new Plane(vector2, vector).ClosestPointOnPlane(point) - vector).normalized, vector2);
+			rot *= Quaternion.Euler(0f, 0f, 90f);
+			bool flag = false;
+			if (num != 0 && !flag && !msg.player.blueprints.CheckSkinOwnership(num, msg.player.userID))
+			{
+				Debug.Log($"SprayCan.ChangeItemSkin player does not have item :{num}:");
+				return;
+			}
+			ulong num2 = ItemDefinition.FindSkin(SprayDecalItem.itemid, num);
+			BaseEntity baseEntity = GameManager.server.CreateEntity(SprayDecalEntityRef.resourcePath, vector, rot);
+			baseEntity.skinID = num2;
+			baseEntity.OnDeployed(null, GetOwnerPlayer(), GetItem());
+			baseEntity.Spawn();
+			CheckAchievementPosition(vector);
+			LoseCondition(ConditionLossPerSpray);
+		}
+	}
+
+	private void CheckAchievementPosition(Vector3 pos)
+	{
+	}
+
 	private void LoseCondition(float amount)
 	{
 		GetOwnerItem()?.LoseCondition(amount);
@@ -367,6 +553,19 @@ public class SprayCan : HeldEntity
 	public void ClearBusy()
 	{
 		SetFlag(Flags.Busy, b: false);
+	}
+
+	public override void OnHeldChanged()
+	{
+		if (IsDisabled())
+		{
+			ClearBusy();
+			if (paintingLine != null)
+			{
+				paintingLine.Kill();
+			}
+			paintingLine = null;
+		}
 	}
 
 	private bool CanEntityBeRespawned(BaseEntity targetEntity, out SprayFailReason reason)

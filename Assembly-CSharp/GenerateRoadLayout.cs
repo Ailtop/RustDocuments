@@ -62,6 +62,7 @@ public class GenerateRoadLayout : ProceduralComponent
 			pathList.TerrainOffset = -0.125f;
 			pathList.Topology = 2048;
 			pathList.Splat = 128;
+			pathList.Hierarchy = 1;
 		}
 		else
 		{
@@ -77,6 +78,7 @@ public class GenerateRoadLayout : ProceduralComponent
 			pathList.TerrainOffset = -0.125f;
 			pathList.Topology = 2048;
 			pathList.Splat = 1;
+			pathList.Hierarchy = 2;
 		}
 		return pathList;
 	}

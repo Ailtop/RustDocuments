@@ -26,7 +26,7 @@ public class GenerateRoadMeshes : ProceduralComponent
 		}
 		foreach (PathList road in TerrainMeta.Path.Roads)
 		{
-			if (road.IsExtraNarrow)
+			if (road.Hierarchy >= 2)
 			{
 				continue;
 			}

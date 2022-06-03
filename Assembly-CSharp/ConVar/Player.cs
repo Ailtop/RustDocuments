@@ -15,6 +15,9 @@ public class Player : ConsoleSystem
 	[ServerVar]
 	public static int tickrate_sv = 16;
 
+	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "Whether the crawling state expires")]
+	public static bool woundforever = false;
+
 	[ServerUserVar]
 	[ClientVar(AllowRunFromServer = true)]
 	public static void cinematic_play(Arg arg)

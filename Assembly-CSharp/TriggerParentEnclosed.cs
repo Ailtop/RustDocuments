@@ -23,9 +23,9 @@ public class TriggerParentEnclosed : TriggerParent
 		boxCollider = GetComponent<BoxCollider>();
 	}
 
-	protected override bool ShouldParent(BaseEntity ent)
+	public override bool ShouldParent(BaseEntity ent, bool bypassOtherTriggerCheck = false)
 	{
-		if (!base.ShouldParent(ent))
+		if (!base.ShouldParent(ent, bypassOtherTriggerCheck))
 		{
 			return false;
 		}

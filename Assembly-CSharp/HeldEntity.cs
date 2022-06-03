@@ -89,6 +89,8 @@ public class HeldEntity : BaseEntity
 
 	public uint ownerItemUID;
 
+	private Item cachedItem;
+
 	public bool hostile => hostileScore > 0f;
 
 	public virtual bool IsUsableByTurret => false;
@@ -342,6 +344,16 @@ public class HeldEntity : BaseEntity
 	{
 		ownerItemUID = item.uid;
 		InitOwnerPlayer();
+	}
+
+	public Item GetCachedItem()
+	{
+		return cachedItem;
+	}
+
+	public void OnItemChanged(Item item)
+	{
+		cachedItem = item;
 	}
 
 	public override void PostServerLoad()

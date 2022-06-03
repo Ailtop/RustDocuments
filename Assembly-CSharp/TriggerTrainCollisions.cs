@@ -55,6 +55,21 @@ public class TriggerTrainCollisions : TriggerBase
 		base.OnObjectAdded(obj, col);
 		if (obj != null)
 		{
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(obj);
+			if (baseEntity != null)
+			{
+				Vector3 vector = baseEntity.transform.position + baseEntity.transform.rotation * Vector3.Scale(obj.transform.lossyScale, baseEntity.bounds.center);
+				Vector3 center = triggerCollider.bounds.center;
+				Vector3 rhs = vector - center;
+				bool flag = Vector3.Dot(owner.transform.forward, rhs) > 0f;
+				if ((location == Location.Front && !flag) || (location == Location.Rear && flag))
+				{
+					return;
+				}
+			}
+		}
+		if (obj != null)
+		{
 			Rigidbody componentInParent = obj.GetComponentInParent<Rigidbody>();
 			if (componentInParent != null)
 			{

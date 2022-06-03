@@ -21,6 +21,8 @@ public class PlayerInventoryProperties : ScriptableObject
 
 	public List<ItemAmountSkinned> wear;
 
+	public PlayerInventoryProperties giveBase;
+
 	public void GiveToPlayer(BasePlayer player)
 	{
 		if (player == null)
@@ -28,6 +30,10 @@ public class PlayerInventoryProperties : ScriptableObject
 			return;
 		}
 		player.inventory.Strip();
+		if (giveBase != null)
+		{
+			giveBase.GiveToPlayer(player);
+		}
 		foreach (ItemAmountSkinned item in belt)
 		{
 			player.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, item.skinOverride), player.inventory.containerBelt);

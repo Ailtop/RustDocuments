@@ -23,8 +23,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public float targetClimbSpeed;
 
-	private float nextCollisionFXTime;
-
 	public float maxDamageThisTick;
 
 	private float nextCollisionDamageTime;
@@ -809,7 +807,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			}
 			if (num > 0f)
 			{
-				ShowCollisionFX(collision);
+				GameObjectRef effectGO = ((curSubDepthY > 2f) ? underWatercollisionEffect : aboveWatercollisionEffect);
+				TryShowCollisionFX(collision, effectGO);
 			}
 		}
 	}
@@ -823,21 +822,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			byte arg = (byte)(num + (b << 4));
 			int arg2 = Mathf.CeilToInt(GetFuelAmount());
 			ClientRPC(null, "SubmarineUpdate", RudderInput, arg, arg2, Oxygen);
-		}
-	}
-
-	private void ShowCollisionFX(Collision collision)
-	{
-		if (!(UnityEngine.Time.time < nextCollisionFXTime))
-		{
-			nextCollisionFXTime = UnityEngine.Time.time + 0.25f;
-			GameObjectRef gameObjectRef = ((curSubDepthY > 2f) ? underWatercollisionEffect : aboveWatercollisionEffect);
-			if (gameObjectRef.isValid)
-			{
-				Vector3 point = collision.GetContact(0).point;
-				point += (base.transform.position - point) * 0.25f;
-				Effect.server.Run(gameObjectRef.resourcePath, point, base.transform.up);
-			}
 		}
 	}
 

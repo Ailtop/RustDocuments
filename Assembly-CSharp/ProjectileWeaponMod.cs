@@ -57,6 +57,9 @@ public class ProjectileWeaponMod : BaseEntity
 
 	public float zoomAmountDisplayOnly;
 
+	[Header("Magazine")]
+	public Modifier magazineCapacity;
+
 	public bool needsOnForEffects;
 
 	public override void ServerInit()

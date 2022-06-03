@@ -30,6 +30,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		ThirdPerson = 1,
 		Eyes = 2,
 		FirstPersonWithArms = 3,
+		DeathCamClassic = 4,
 		Last = 3
 	}
 
@@ -2245,9 +2246,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		currentGesture = null;
 	}
 
+	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.CallsPerSecond(10uL)]
 	public void Server_CancelGesture()
 	{
 		currentGesture = null;
@@ -2820,7 +2821,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 224;
+		missions.protocol = 225;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2920,7 +2921,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (224 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (225 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -4630,9 +4631,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		return UnityEngine.Time.realtimeSinceStartup > nextRespawnTime;
 	}
 
-	public void MarkRespawn()
+	public void MarkRespawn(float nextSpawnDelay = 5f)
 	{
-		nextRespawnTime = UnityEngine.Time.realtimeSinceStartup + 5f;
+		nextRespawnTime = UnityEngine.Time.realtimeSinceStartup + nextSpawnDelay;
 	}
 
 	public Item GetActiveItem()
@@ -4985,9 +4986,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -5688,6 +5689,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 		}
 		base.Hurt(info);
+		if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
+		{
+			BasePlayer instigator = info?.InitiatorPlayer;
+			BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerHurt(instigator, this, info);
+		}
 		if (EACServer.playerTracker != null && info.Initiator != null && info.Initiator is BasePlayer)
 		{
 			BasePlayer basePlayer = info.Initiator.ToPlayer();
@@ -5720,9 +5726,18 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			}
 		}
 		metabolism.SendChangesToClient();
-		if (info.PointStart != UnityEngine.Vector3.zero && info.damageTypes.Total() >= 0f)
+		if (info.PointStart != UnityEngine.Vector3.zero && (info.damageTypes.Total() >= 0f || IsGod()))
 		{
-			ClientRPCPlayerAndSpectators(null, this, "DirectionalDamage", info.PointStart, (int)info.damageTypes.GetMajorityDamageType());
+			int arg = (int)info.damageTypes.GetMajorityDamageType();
+			if (info.Weapon != null && info.damageTypes.Has(DamageType.Bullet))
+			{
+				BaseProjectile component = info.Weapon.GetComponent<BaseProjectile>();
+				if (component != null && component.IsSilenced())
+				{
+					arg = 12;
+				}
+			}
+			ClientRPCPlayerAndSpectators(null, this, "DirectionalDamage", info.PointStart, arg, Mathf.CeilToInt(info.damageTypes.Total()));
 		}
 		cachedNonSuicideHitInfo = info;
 	}
@@ -6398,6 +6413,26 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
+	public void ClientRPCPlayerAndSpectators<T1, T2, T3>(Network.Connection sourceConnection, BasePlayer player, string funcName, T1 arg1, T2 arg2, T3 arg3)
+	{
+		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCPlayer(sourceConnection, player, funcName, arg1, arg2, arg3);
+		if (!IsBeingSpectated || children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			if (child is BasePlayer player2)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2, arg3);
+			}
+		}
+	}
+
 	public override float GetThreatLevel()
 	{
 		EnsureUpdated();
@@ -6948,6 +6983,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		{
 			return false;
 		}
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		if ((bool)activeGameMode && !activeGameMode.allowWounding)
+		{
+			return false;
+		}
 		if (triggers != null)
 		{
 			for (int i = 0; i < triggers.Count; i++)
@@ -7036,7 +7076,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			{
 				return;
 			}
-			if (TimeSinceWoundedStarted >= woundedDuration)
+			if (!Player.woundforever && TimeSinceWoundedStarted >= woundedDuration)
 			{
 				float num = (IsIncapacitated() ? ConVar.Server.incapacitatedrecoverchance : ConVar.Server.woundedrecoverchance);
 				float num2 = Mathf.Lerp(t: (metabolism.hydration.Fraction() + metabolism.calories.Fraction()) / 2f, a: 0f, b: ConVar.Server.woundedmaxfoodandwaterbonus);

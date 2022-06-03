@@ -138,6 +138,8 @@ public class PathList
 
 	public int Splat;
 
+	public int Hierarchy;
+
 	public PathFinder.Node ProcgenStartNode;
 
 	public PathFinder.Node ProcgenEndNode;
@@ -145,10 +147,6 @@ public class PathList
 	public const float StepSize = 1f;
 
 	private static float[] placements = new float[3] { 0f, -1f, 1f };
-
-	public bool IsExtraWide => Width > 10f;
-
-	public bool IsExtraNarrow => Width < 5f;
 
 	public PathList(string name, Vector3[] points)
 	{

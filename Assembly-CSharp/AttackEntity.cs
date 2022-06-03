@@ -270,10 +270,21 @@ public class AttackEntity : HeldEntity
 			{
 				Vector3 position2 = player.eyes.position;
 				Vector3 vector2 = eyePos;
-				if (Vector3.Distance(position2, vector2) > ConVar.AntiHack.eye_noclip_cutoff && AntiHack.TestNoClipping(player, position2, vector2, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2))
+				float num11 = Vector3.Distance(position2, vector2);
+				if (num11 > ConVar.AntiHack.eye_noclip_cutoff)
 				{
-					string shortPrefabName5 = base.ShortPrefabName;
-					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
+					if (AntiHack.TestNoClipping(player, position2, vector2, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2))
+					{
+						string shortPrefabName5 = base.ShortPrefabName;
+						AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
+						player.stats.combat.Log(this, "eye_noclip");
+						flag = false;
+					}
+				}
+				else if (num11 > 0.01f && AntiHack.TestNoClipping(player, position2, vector2, 0.01f, ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2))
+				{
+					string shortPrefabName6 = base.ShortPrefabName;
+					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName6, " on attack) ", position2, " ", vector2));
 					player.stats.combat.Log(this, "eye_noclip");
 					flag = false;
 				}

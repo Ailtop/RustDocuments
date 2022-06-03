@@ -206,8 +206,6 @@ public class BaseVehicle : BaseMountable
 
 	public ClippingCheckMode clippingChecks;
 
-	public GameObjectRef collisionEffect;
-
 	public bool shouldShowHudHealth;
 
 	public bool ignoreDamageFromOutside;
@@ -429,7 +427,7 @@ public class BaseVehicle : BaseMountable
 		{
 			return Quaternion.identity;
 		}
-		if (rigidBody.angularVelocity.sqrMagnitude < 0.1f)
+		if (rigidBody.angularVelocity.sqrMagnitude < 0.025f)
 		{
 			return Quaternion.identity;
 		}
@@ -1014,15 +1012,20 @@ public class BaseVehicle : BaseMountable
 		UpdateFullFlag();
 	}
 
-	public void TryShowCollisionFX(Vector3 effectPosition)
+	public void TryShowCollisionFX(Collision collision, GameObjectRef effectGO)
+	{
+		TryShowCollisionFX(collision.GetContact(0).point, effectGO);
+	}
+
+	public void TryShowCollisionFX(Vector3 contactPoint, GameObjectRef effectGO)
 	{
 		if (!(UnityEngine.Time.time < nextCollisionFXTime))
 		{
 			nextCollisionFXTime = UnityEngine.Time.time + 0.25f;
-			if (collisionEffect.isValid)
+			if (effectGO.isValid)
 			{
-				effectPosition += (base.transform.position - effectPosition) * 0.25f;
-				Effect.server.Run(collisionEffect.resourcePath, effectPosition, base.transform.up);
+				contactPoint += (base.transform.position - contactPoint) * 0.25f;
+				Effect.server.Run(effectGO.resourcePath, contactPoint, base.transform.up);
 			}
 		}
 	}
@@ -1286,6 +1289,11 @@ public class BaseVehicle : BaseMountable
 	public override bool DirectlyMountable()
 	{
 		return IsVehicleRoot();
+	}
+
+	public override BaseVehicle VehicleParent()
+	{
+		return null;
 	}
 
 	protected override void OnChildAdded(BaseEntity child)

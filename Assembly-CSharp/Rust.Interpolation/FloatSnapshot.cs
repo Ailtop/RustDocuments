@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Rust.Interpolation;
 
-public struct FloatSnapshot : Interpolator<FloatSnapshot>.ISnapshot
+public struct FloatSnapshot : ISnapshot<FloatSnapshot>
 {
 	public float value;
 
@@ -22,5 +22,10 @@ public struct FloatSnapshot : Interpolator<FloatSnapshot>.ISnapshot
 	public void Lerp(FloatSnapshot prev, FloatSnapshot next, float delta)
 	{
 		value = Mathf.Lerp(prev.value, next.value, delta);
+	}
+
+	public FloatSnapshot GetNew()
+	{
+		return default(FloatSnapshot);
 	}
 }

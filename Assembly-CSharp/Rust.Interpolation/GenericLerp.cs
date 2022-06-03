@@ -3,13 +3,15 @@ using UnityEngine;
 
 namespace Rust.Interpolation;
 
-public class GenericLerp<T> : IDisposable where T : Interpolator<T>.ISnapshot, new()
+public class GenericLerp<T> : IDisposable where T : ISnapshot<T>, new()
 {
 	private Interpolator<T> interpolator;
 
 	private IGenericLerpTarget<T> target;
 
-	private static float TimeOffset;
+	private static T snapshotPrototype = new T();
+
+	private static float TimeOffset = 0f;
 
 	private float timeOffset0 = float.MaxValue;
 
@@ -40,7 +42,7 @@ public class GenericLerp<T> : IDisposable where T : Interpolator<T>.ISnapshot, n
 			float extrapolationTime = target.GetExtrapolationTime();
 			float interpolationDelay = target.GetInterpolationDelay();
 			float interpolationSmoothing = target.GetInterpolationSmoothing();
-			Interpolator<T>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing);
+			Interpolator<T>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, extrapolationTime, interpolationSmoothing, ref snapshotPrototype);
 			if (segment.next.Time >= interpolator.last.Time)
 			{
 				extrapolatedTime = Mathf.Min(extrapolatedTime + Time.deltaTime, extrapolationTime);
@@ -97,7 +99,7 @@ public class GenericLerp<T> : IDisposable where T : Interpolator<T>.ISnapshot, n
 	public void SnapToEnd()
 	{
 		float interpolationDelay = target.GetInterpolationDelay();
-		Interpolator<T>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, 0f, 0f);
+		Interpolator<T>.Segment segment = interpolator.Query(LerpTime, interpolationDelay, 0f, 0f, ref snapshotPrototype);
 		target.SetFrom(segment.tick);
 		Wipe();
 	}

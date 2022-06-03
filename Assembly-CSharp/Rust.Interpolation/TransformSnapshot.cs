@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Rust.Interpolation;
 
-public struct TransformSnapshot : Interpolator<TransformSnapshot>.ISnapshot
+public struct TransformSnapshot : ISnapshot<TransformSnapshot>
 {
 	public Vector3 pos;
 
@@ -27,5 +27,10 @@ public struct TransformSnapshot : Interpolator<TransformSnapshot>.ISnapshot
 	{
 		pos = Vector3.LerpUnclamped(prev.pos, next.pos, delta);
 		rot = Quaternion.SlerpUnclamped(prev.rot, next.rot, delta);
+	}
+
+	public TransformSnapshot GetNew()
+	{
+		return default(TransformSnapshot);
 	}
 }

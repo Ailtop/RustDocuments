@@ -549,9 +549,9 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	private void ToggleDefenderMode(RPCMessage msg)
 	{
 		if (staticRespawn)
@@ -562,7 +562,7 @@ public class SamSite : ContainerIOEntity
 		if (!(player == null) && player.CanBuild())
 		{
 			bool flag = msg.read.Bit();
-			if (flag != IsInDefenderMode())
+			if (flag != IsInDefenderMode() && Interface.CallHook("OnSamSiteModeToggle", this, player, flag) == null)
 			{
 				SetFlag(Flag_DefenderMode, flag);
 			}

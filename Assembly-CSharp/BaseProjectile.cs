@@ -255,9 +255,21 @@ public class BaseProjectile : AttackEntity
 
 	private float lastReloadTime = -10f;
 
+	private bool modsChangedInitialized;
+
 	private float stancePenalty;
 
 	private float aimconePenalty;
+
+	private uint cachedModHash;
+
+	private float sightAimConeScale = 1f;
+
+	private float sightAimConeOffset;
+
+	private float hipAimConeScale = 1f;
+
+	private float hipAimConeOffset;
 
 	protected bool reloadStarted;
 
@@ -266,6 +278,18 @@ public class BaseProjectile : AttackEntity
 	private int fractionalInsertCounter;
 
 	private static readonly Effect reusableInstance = new Effect();
+
+	public RecoilProperties recoilProperties
+	{
+		get
+		{
+			if (!(recoil == null))
+			{
+				return recoil.GetRecoil();
+			}
+			return null;
+		}
+	}
 
 	public bool isSemiAuto => !automatic;
 
@@ -534,7 +558,7 @@ public class BaseProjectile : AttackEntity
 
 	public virtual RecoilProperties GetRecoil()
 	{
-		return recoil;
+		return recoilProperties;
 	}
 
 	public virtual void DidAttackServerside()
@@ -714,6 +738,87 @@ public class BaseProjectile : AttackEntity
 	{
 		base.ServerInit();
 		primaryMagazine.ServerInit();
+		Invoke(DelayedModSetup, 0.1f);
+	}
+
+	public void DelayedModSetup()
+	{
+		if (!modsChangedInitialized)
+		{
+			Item item = GetCachedItem();
+			if (item != null && item.contents != null)
+			{
+				ItemContainer contents = item.contents;
+				contents.onItemAddedRemoved = (Action<Item, bool>)Delegate.Combine(contents.onItemAddedRemoved, new Action<Item, bool>(ModsChanged));
+				modsChangedInitialized = true;
+			}
+		}
+	}
+
+	public override void DestroyShared()
+	{
+		if (base.isServer)
+		{
+			Item item = GetCachedItem();
+			if (item != null && item.contents != null)
+			{
+				ItemContainer contents = item.contents;
+				contents.onItemAddedRemoved = (Action<Item, bool>)Delegate.Remove(contents.onItemAddedRemoved, new Action<Item, bool>(ModsChanged));
+				modsChangedInitialized = false;
+			}
+		}
+		base.DestroyShared();
+	}
+
+	public void ModsChanged(Item item, bool added)
+	{
+		Invoke(DelayedModsChanged, 0.1f);
+	}
+
+	public void ForceModsChanged()
+	{
+		Invoke(DelayedModSetup, 0f);
+		Invoke(DelayedModsChanged, 0.2f);
+	}
+
+	public void DelayedModsChanged()
+	{
+		int num = Mathf.CeilToInt(ProjectileWeaponMod.Mult(this, (ProjectileWeaponMod x) => x.magazineCapacity, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f) * (float)primaryMagazine.definition.builtInSize);
+		if (num == primaryMagazine.capacity)
+		{
+			return;
+		}
+		if (primaryMagazine.contents > 0 && primaryMagazine.contents > num)
+		{
+			_ = primaryMagazine.ammoType;
+			int contents = primaryMagazine.contents;
+			BasePlayer ownerPlayer = GetOwnerPlayer();
+			ItemContainer itemContainer = null;
+			if (ownerPlayer != null)
+			{
+				itemContainer = ownerPlayer.inventory.containerMain;
+			}
+			else if (GetCachedItem() != null)
+			{
+				itemContainer = GetCachedItem().parent;
+			}
+			primaryMagazine.contents = 0;
+			if (itemContainer != null)
+			{
+				Item item = ItemManager.Create(primaryMagazine.ammoType, contents, 0uL);
+				if (!item.MoveToContainer(itemContainer))
+				{
+					UnityEngine.Vector3 vPos = base.transform.position;
+					if (itemContainer.entityOwner != null)
+					{
+						vPos = itemContainer.entityOwner.transform.position + UnityEngine.Vector3.up * 0.25f;
+					}
+					item.Drop(vPos, UnityEngine.Vector3.up * 5f);
+				}
+			}
+		}
+		primaryMagazine.capacity = num;
+		SendNetworkUpdate();
 	}
 
 	public override void ServerCommand(Item item, string command, BasePlayer player)
@@ -786,15 +891,32 @@ public class BaseProjectile : AttackEntity
 
 	public virtual float GetAimCone()
 	{
-		float num = ProjectileWeaponMod.Mult(this, (ProjectileWeaponMod x) => x.sightAimCone, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f);
-		float num2 = ProjectileWeaponMod.Sum(this, (ProjectileWeaponMod x) => x.sightAimCone, (ProjectileWeaponMod.Modifier y) => y.offset, 0f);
-		float num3 = ProjectileWeaponMod.Mult(this, (ProjectileWeaponMod x) => x.hipAimCone, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f);
-		float num4 = ProjectileWeaponMod.Sum(this, (ProjectileWeaponMod x) => x.hipAimCone, (ProjectileWeaponMod.Modifier y) => y.offset, 0f);
+		uint num = 0u;
+		foreach (BaseEntity child in children)
+		{
+			num += child.net.ID;
+			num += (uint)child.flags;
+		}
+		uint num2 = CRC.Compute32(0u, num);
+		if (num2 != cachedModHash)
+		{
+			sightAimConeScale = ProjectileWeaponMod.Mult(this, (ProjectileWeaponMod x) => x.sightAimCone, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f);
+			sightAimConeOffset = ProjectileWeaponMod.Sum(this, (ProjectileWeaponMod x) => x.sightAimCone, (ProjectileWeaponMod.Modifier y) => y.offset, 0f);
+			hipAimConeScale = ProjectileWeaponMod.Mult(this, (ProjectileWeaponMod x) => x.hipAimCone, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f);
+			hipAimConeOffset = ProjectileWeaponMod.Sum(this, (ProjectileWeaponMod x) => x.hipAimCone, (ProjectileWeaponMod.Modifier y) => y.offset, 0f);
+			cachedModHash = num2;
+		}
+		float num3 = aimCone;
+		if (recoilProperties != null && recoilProperties.overrideAimconeWithCurve)
+		{
+			num3 += recoilProperties.aimconeCurve.Evaluate((float)numShotsFired / (float)primaryMagazine.capacity % 1f) * recoilProperties.aimconeCurveScale;
+			aimconePenalty = 0f;
+		}
 		if (aiming || base.isServer)
 		{
-			return (aimCone + aimconePenalty + stancePenalty * stancePenaltyScale) * num + num2;
+			return (num3 + aimconePenalty + stancePenalty * stancePenaltyScale) * sightAimConeScale + sightAimConeOffset;
 		}
-		return (aimCone + aimconePenalty + stancePenalty * stancePenaltyScale) * num + num2 + hipAimCone * num3 + num4;
+		return (num3 + aimconePenalty + stancePenalty * stancePenaltyScale) * sightAimConeScale + sightAimConeOffset + hipAimCone * hipAimConeScale + hipAimConeOffset;
 	}
 
 	public float ScaleRepeatDelay(float delay)

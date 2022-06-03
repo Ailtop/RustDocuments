@@ -131,6 +131,8 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public override bool IsEngine => true;
 
+	protected override bool networkUpdateOnCompleteTrainChange => true;
+
 	public bool LightsAreOn => HasFlag(Flags.Reserved5);
 
 	public bool CloseToHazard => HasFlag(Flags.Reserved6);
@@ -218,6 +220,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		info.msg.trainEngine.throttleSetting = (int)CurThrottleSetting;
 		info.msg.trainEngine.fuelStorageID = GetFuelSystem().fuelStorageInstance.uid;
 		info.msg.trainEngine.fuelAmount = GetFuelAmount();
+		info.msg.trainEngine.numConnectedCars = completeTrain.NumTrainCars;
 	}
 
 	public override EntityFuelSystem GetFuelSystem()
@@ -401,7 +404,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		if (trackSpeed > 4.5f || trackSpeed < -4.5f)
 		{
 			float maxHazardDist = Mathf.Lerp(40f, 325f, Mathf.Abs(trackSpeed) * 0.05f);
-			SetFlag(Flags.Reserved6, base.FrontTrackSection.HasValidHazardWithin(this, base.FrontWheelSplineDist, 20f, maxHazardDist, localTrackSelection, trackSpeed, base.RearTrackSection));
+			SetFlag(Flags.Reserved6, base.FrontTrackSection.HasValidHazardWithin(this, base.FrontWheelSplineDist, 20f, maxHazardDist, localTrackSelection, trackSpeed, base.RearTrackSection, null));
 		}
 		else
 		{
@@ -476,7 +479,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		{
 			return false;
 		}
-		if (!PlayerIsInParentTrigger(player))
+		if (platformParentTrigger != null && !PlayerIsInParentTrigger(player))
 		{
 			return false;
 		}
@@ -546,7 +549,11 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public bool CanMount(BasePlayer player)
 	{
-		return PlayerIsInParentTrigger(player);
+		if (platformParentTrigger != null)
+		{
+			return PlayerIsInParentTrigger(player);
+		}
+		return true;
 	}
 
 	public bool PlayerIsInParentTrigger(BasePlayer player)

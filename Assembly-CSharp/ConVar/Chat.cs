@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using CircularBuffer;
 using CompanionServer;
 using Facepunch;
 using Facepunch.Math;
@@ -45,7 +46,10 @@ public class Chat : ConsoleSystem
 	[ClientVar]
 	public static bool enabled = true;
 
-	public static List<ChatEntry> History = new List<ChatEntry>();
+	[ServerVar(Help = "Number of messages to keep in memory for chat history")]
+	public static int historysize = 1000;
+
+	public static CircularBuffer<ChatEntry> History = new CircularBuffer<ChatEntry>(historysize);
 
 	[ServerVar]
 	public static bool serverlog = true;
@@ -56,16 +60,14 @@ public class Chat : ConsoleSystem
 		{
 			string text = username.EscapeRichText();
 			ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=" + color + ">" + text + "</color> " + message);
-			ChatEntry chatEntry = default(ChatEntry);
-			chatEntry.Channel = ChatChannel.Server;
-			chatEntry.Message = message;
-			chatEntry.UserId = userid.ToString();
-			chatEntry.Username = username;
-			chatEntry.Color = color;
-			chatEntry.Time = Epoch.Current;
-			ChatEntry chatEntry2 = chatEntry;
-			History.Add(chatEntry2);
-			RCon.Broadcast(RCon.LogType.Chat, chatEntry2);
+			ChatEntry ce = default(ChatEntry);
+			ce.Channel = ChatChannel.Server;
+			ce.Message = message;
+			ce.UserId = userid.ToString();
+			ce.Username = username;
+			ce.Color = color;
+			ce.Time = Epoch.Current;
+			Record(ce);
 		}
 	}
 
@@ -192,16 +194,14 @@ public class Chat : ConsoleSystem
 			text3 = "#fa5";
 		}
 		string text4 = username.EscapeRichText();
-		ChatEntry chatEntry = default(ChatEntry);
-		chatEntry.Channel = targetChannel;
-		chatEntry.Message = text;
-		chatEntry.UserId = ((player != null) ? player.UserIDString : userId.ToString());
-		chatEntry.Username = username;
-		chatEntry.Color = text3;
-		chatEntry.Time = Epoch.Current;
-		ChatEntry chatEntry2 = chatEntry;
-		History.Add(chatEntry2);
-		RCon.Broadcast(RCon.LogType.Chat, chatEntry2);
+		ChatEntry ce = default(ChatEntry);
+		ce.Channel = targetChannel;
+		ce.Message = text;
+		ce.UserId = ((player != null) ? player.UserIDString : userId.ToString());
+		ce.Username = username;
+		ce.Color = text3;
+		ce.Time = Epoch.Current;
+		Record(ce);
 		switch (targetChannel)
 		{
 		case ChatChannel.Cards:
@@ -272,7 +272,7 @@ public class Chat : ConsoleSystem
 	public static IEnumerable<ChatEntry> tail(Arg arg)
 	{
 		int @int = arg.GetInt(0, 200);
-		int num = History.Count - @int;
+		int num = History.Size - @int;
 		if (num < 0)
 		{
 			num = 0;
@@ -290,5 +290,21 @@ public class Chat : ConsoleSystem
 			return Enumerable.Empty<ChatEntry>();
 		}
 		return History.Where((ChatEntry x) => x.Message.Length < 4096 && x.Message.Contains(search, CompareOptions.IgnoreCase));
+	}
+
+	public static void Record(ChatEntry ce)
+	{
+		int num = Mathf.Max(historysize, 10);
+		if (History.Capacity != num)
+		{
+			CircularBuffer<ChatEntry> circularBuffer = new CircularBuffer<ChatEntry>(num);
+			foreach (ChatEntry item in History)
+			{
+				circularBuffer.PushBack(item);
+			}
+			History = circularBuffer;
+		}
+		History.PushBack(ce);
+		RCon.Broadcast(RCon.LogType.Chat, ce);
 	}
 }

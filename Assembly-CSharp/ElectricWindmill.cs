@@ -18,7 +18,7 @@ public class ElectricWindmill : IOEntity
 
 	public float targetSpeed;
 
-	private float serverWindSpeed;
+	public float serverWindSpeed;
 
 	public override int MaximalPowerOutput()
 	{
@@ -88,7 +88,7 @@ public class ElectricWindmill : IOEntity
 
 	public void WindUpdate()
 	{
-		if (Interface.CallHook("OnWindUpdate", this) == null)
+		if (Interface.CallHook("OnWindmillUpdate", this) == null)
 		{
 			serverWindSpeed = GetWindSpeedScale();
 			if (!AmIVisible())
@@ -103,7 +103,7 @@ public class ElectricWindmill : IOEntity
 				MarkDirty();
 			}
 			SendNetworkUpdate();
-			Interface.CallHook("OnWindUpdated", this);
+			Interface.CallHook("OnWindmillUpdated", this);
 		}
 	}
 

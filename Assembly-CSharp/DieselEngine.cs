@@ -95,7 +95,7 @@ public class DieselEngine : StorageContainer
 	[RPC_Server.IsVisible(6f)]
 	public void EngineSwitch(RPCMessage msg)
 	{
-		if (Interface.CallHook("OnDieselEngineToggle", msg.player, this) != null)
+		if (Interface.CallHook("OnDieselEngineToggle", this, msg.player) != null)
 		{
 			return;
 		}

@@ -1,3 +1,4 @@
+using Oxide.Core;
 using UnityEngine;
 
 public class TrainCoupling
@@ -71,6 +72,11 @@ public class TrainCoupling
 		if (IsCoupled)
 		{
 			return false;
+		}
+		object obj = Interface.CallHook("CanTrainCarCouple", owner, theirCoupling.owner);
+		if (obj is bool)
+		{
+			return (bool)obj;
 		}
 		if (reflect && !theirCoupling.TryCouple(this, reflect: false))
 		{

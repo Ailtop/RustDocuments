@@ -112,9 +112,6 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 	public SpawnSettings spawnSettings;
 
 	[SerializeField]
-	public Transform fuelStoragePoint;
-
-	[SerializeField]
 	[HideInInspector]
 	public MeshRenderer[] damageShowingRenderers;
 

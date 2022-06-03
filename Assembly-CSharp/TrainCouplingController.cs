@@ -97,24 +97,23 @@ public class TrainCouplingController
 		}
 	}
 
-	public List<TrainCar> GetAll()
+	public void GetAll(ref List<TrainCar> result)
 	{
-		List<TrainCar> list = new List<TrainCar>(1) { owner };
+		result.Add(owner);
 		TrainCoupling coupledTo = rearCoupling.CoupledTo;
-		while (coupledTo != null && coupledTo.IsCoupled && !list.Contains(coupledTo.owner))
+		while (coupledTo != null && coupledTo.IsCoupled && !result.Contains(coupledTo.owner))
 		{
-			list.Insert(0, coupledTo.owner);
+			result.Insert(0, coupledTo.owner);
 			coupledTo = coupledTo.GetOppositeCoupling();
 			coupledTo = coupledTo.CoupledTo;
 		}
 		TrainCoupling coupledTo2 = frontCoupling.CoupledTo;
-		while (coupledTo2 != null && coupledTo2.IsCoupled && !list.Contains(coupledTo2.owner))
+		while (coupledTo2 != null && coupledTo2.IsCoupled && !result.Contains(coupledTo2.owner))
 		{
-			list.Add(coupledTo2.owner);
+			result.Add(coupledTo2.owner);
 			coupledTo2 = coupledTo2.GetOppositeCoupling();
 			coupledTo2 = coupledTo2.CoupledTo;
 		}
-		return list;
 	}
 
 	public void OnPreCouplingChange()

@@ -104,7 +104,7 @@ public class DynamicNavMesh : SingletonComponent<DynamicNavMesh>, IServerCompone
 		HasBuildOperationStarted = false;
 		Bounds.size = TerrainMeta.Size;
 		NavMesh.pathfindingIterationsPerFrame = AiManager.pathfindingIterationsPerFrame;
-		IEnumerator enumerator = NavMeshTools.CollectSourcesAsync(Bounds, LayerMask, NavMeshCollectGeometry, defaultArea, use_baked_terrain_mesh, AsyncTerrainNavMeshBakeCellSize, sources, AppendModifierVolumes, UpdateNavMeshAsync);
+		IEnumerator enumerator = NavMeshTools.CollectSourcesAsync(Bounds, LayerMask, NavMeshCollectGeometry, defaultArea, use_baked_terrain_mesh, AsyncTerrainNavMeshBakeCellSize, sources, AppendModifierVolumes, UpdateNavMeshAsync, null);
 		if (AiManager.nav_wait)
 		{
 			yield return enumerator;

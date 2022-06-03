@@ -18,6 +18,8 @@ public class SimpleAIMemory
 		public float Danger;
 	}
 
+	public static HashSet<BasePlayer> PlayerIgnoreList = new HashSet<BasePlayer>();
+
 	public List<SeenInfo> All = new List<SeenInfo>();
 
 	public List<BaseEntity> Players = new List<BaseEntity>();
@@ -37,6 +39,11 @@ public class SimpleAIMemory
 			return;
 		}
 		IAISenses iAISenses = owner as IAISenses;
+		BasePlayer basePlayer = ent as BasePlayer;
+		if (basePlayer != null && PlayerIgnoreList.Contains(basePlayer))
+		{
+			return;
+		}
 		bool flag = false;
 		if (iAISenses != null && iAISenses.IsThreat(ent))
 		{
@@ -57,7 +64,6 @@ public class SimpleAIMemory
 				return;
 			}
 		}
-		BasePlayer basePlayer = ent as BasePlayer;
 		if (basePlayer != null)
 		{
 			if (ConVar.AI.ignoreplayers && !basePlayer.IsNpc)
@@ -137,5 +143,18 @@ public class SimpleAIMemory
 			All.RemoveAt(i);
 			i--;
 		}
+	}
+
+	public static void AddIgnorePlayer(BasePlayer player)
+	{
+		if (!PlayerIgnoreList.Contains(player))
+		{
+			PlayerIgnoreList.Add(player);
+		}
+	}
+
+	public static void RemoveIgnorePlayer(BasePlayer player)
+	{
+		PlayerIgnoreList.Remove(player);
 	}
 }

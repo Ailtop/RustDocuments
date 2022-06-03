@@ -188,17 +188,19 @@ public class CargoShip : BaseEntity
 
 	public void SpawnSubEntities()
 	{
-		BaseEntity baseEntity = GameManager.server.CreateEntity(escapeBoatPrefab.resourcePath, escapeBoatPoint.position, escapeBoatPoint.rotation);
-		if ((bool)baseEntity)
+		if (!Rust.Application.isLoadingSave)
 		{
-			baseEntity.enableSaving = false;
-			baseEntity.SetParent(this, worldPositionStays: true);
-			baseEntity.Spawn();
-			baseEntity.GetComponent<Rigidbody>().isKinematic = true;
-			RHIB component = baseEntity.GetComponent<RHIB>();
-			if ((bool)component)
+			BaseEntity baseEntity = GameManager.server.CreateEntity(escapeBoatPrefab.resourcePath, escapeBoatPoint.position, escapeBoatPoint.rotation);
+			if ((bool)baseEntity)
 			{
-				component.AddFuel(50);
+				baseEntity.SetParent(this, worldPositionStays: true);
+				baseEntity.Spawn();
+				RHIB component = baseEntity.GetComponent<RHIB>();
+				component.rigidBody.isKinematic = true;
+				if ((bool)component)
+				{
+					component.AddFuel(50);
+				}
 			}
 		}
 		MicrophoneStand microphoneStand = GameManager.server.CreateEntity(microphonePrefab.resourcePath, microphonePoint.position, microphonePoint.rotation) as MicrophoneStand;
@@ -221,6 +223,20 @@ public class CargoShip : BaseEntity
 				iOEntity = iOEntity2;
 			}
 			microphoneStand.ioEntity.Get(serverside: true).MarkDirtyForceUpdateOutputs();
+		}
+	}
+
+	protected override void OnChildAdded(BaseEntity child)
+	{
+		base.OnChildAdded(child);
+		if (base.isServer && Rust.Application.isLoadingSave && child is RHIB rHIB)
+		{
+			Vector3 localPosition = rHIB.transform.localPosition;
+			Vector3 b = base.transform.InverseTransformPoint(escapeBoatPoint.transform.position);
+			if (Vector3.Distance(localPosition, b) < 1f)
+			{
+				rHIB.rigidBody.isKinematic = true;
+			}
 		}
 	}
 

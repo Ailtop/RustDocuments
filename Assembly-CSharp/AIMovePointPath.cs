@@ -127,4 +127,11 @@ public class AIMovePointPath : MonoBehaviour
 			point.DrawLookAtPoints();
 		}
 	}
+
+	[ContextMenu("Add Child Points")]
+	public void AddChildPoints()
+	{
+		Points = new List<AIMovePoint>();
+		Points.AddRange(GetComponentsInChildren<AIMovePoint>());
+	}
 }
