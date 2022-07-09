@@ -88,6 +88,11 @@ public class ScrapTransportHelicopter : MiniCopter
 		}
 	}
 
+	public override int StartingFuelUnits()
+	{
+		return 100;
+	}
+
 	protected override bool CanPushNow(BasePlayer pusher)
 	{
 		return false;

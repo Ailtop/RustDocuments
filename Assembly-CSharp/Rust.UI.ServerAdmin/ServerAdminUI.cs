@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Rust.UI.ServerAdmin;
 
@@ -23,4 +24,20 @@ public class ServerAdminUI : SingletonComponent<ServerAdminUI>
 	public RectTransform ConvarInfoParent;
 
 	public ServerAdminPlayerInfo PlayerInfo;
+
+	public RustInput UgcNameFilter;
+
+	public GameObjectRef ImageEntry;
+
+	public GameObjectRef PatternEntry;
+
+	public GameObjectRef SoundEntry;
+
+	public RectTransform UgcParent;
+
+	public GameObject ExpandedUgcRoot;
+
+	public RawImage ExpandedImage;
+
+	public RectTransform ExpandedImageBacking;
 }

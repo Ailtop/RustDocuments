@@ -193,7 +193,7 @@ public class ResearchTable : StorageContainer
 	public Item GetScrapItem()
 	{
 		Item slot = base.inventory.GetSlot(1);
-		if (slot.info != researchResource)
+		if (slot == null || slot.info != researchResource)
 		{
 			return null;
 		}
@@ -203,9 +203,9 @@ public class ResearchTable : StorageContainer
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		if (HasFlag(Flags.On) && researchFinishedTime != 0f)
+		if (HasFlag(Flags.On))
 		{
-			Invoke(ResearchAttemptFinished, researchFinishedTime - UnityEngine.Time.realtimeSinceStartup);
+			Invoke(ResearchAttemptFinished, researchDuration);
 		}
 		base.inventory.SetLocked(isLocked: false);
 	}
@@ -264,7 +264,7 @@ public class ResearchTable : StorageContainer
 			}
 			if (scrapItem.amount >= num)
 			{
-				if (scrapItem.amount <= num)
+				if (scrapItem.amount == num)
 				{
 					base.inventory.Remove(scrapItem);
 					scrapItem.RemoveFromContainer();

@@ -46,6 +46,8 @@ public class SprayCan : HeldEntity
 
 	private SprayCanSpray_Freehand paintingLine;
 
+	public const Flags IsFreeSpraying = Flags.Reserved1;
+
 	public SoundDefinition SpraySound;
 
 	public GameObjectRef SkinSelectPanel;
@@ -73,6 +75,8 @@ public class SprayCan : HeldEntity
 	public SteamInventoryItem FreeSprayUnlockItem;
 
 	public ParticleSystem.MinMaxGradient DecalSprayGradient;
+
+	public SoundDefinition SprayLoopDef;
 
 	public const string ENEMY_BASE_STAT = "sprayed_enemy_base";
 
@@ -213,15 +217,24 @@ public class SprayCan : HeldEntity
 				paintingLine = sprayCanSpray_Freehand;
 				ClientRPC(null, "Client_ChangeSprayColour", num);
 				SetFlag(Flags.Busy, b: true);
+				SetFlag(Flags.Reserved1, b: true);
 				CheckAchievementPosition(vector);
 			}
 		}
 	}
 
-	public void ClearPaintingLine()
+	public void ClearPaintingLine(bool allowNewSprayImmediately)
 	{
 		paintingLine = null;
 		LoseCondition(ConditionLossPerSpray);
+		if (allowNewSprayImmediately)
+		{
+			ClearBusy();
+		}
+		else
+		{
+			Invoke(ClearBusy, 0.1f);
+		}
 	}
 
 	public bool CanSprayFreehand(BasePlayer player)
@@ -523,21 +536,23 @@ public class SprayCan : HeldEntity
 		int num = msg.read.Int32();
 		if (!(Vector3.Distance(vector, base.transform.position) > 4.5f))
 		{
-			Quaternion rot = Quaternion.LookRotation((new Plane(vector2, vector).ClosestPointOnPlane(point) - vector).normalized, vector2);
-			rot *= Quaternion.Euler(0f, 0f, 90f);
+			Quaternion quaternion = Quaternion.LookRotation((new Plane(vector2, vector).ClosestPointOnPlane(point) - vector).normalized, vector2);
+			quaternion *= Quaternion.Euler(0f, 0f, 90f);
 			bool flag = false;
 			if (num != 0 && !flag && !msg.player.blueprints.CheckSkinOwnership(num, msg.player.userID))
 			{
 				Debug.Log($"SprayCan.ChangeItemSkin player does not have item :{num}:");
-				return;
 			}
-			ulong num2 = ItemDefinition.FindSkin(SprayDecalItem.itemid, num);
-			BaseEntity baseEntity = GameManager.server.CreateEntity(SprayDecalEntityRef.resourcePath, vector, rot);
-			baseEntity.skinID = num2;
-			baseEntity.OnDeployed(null, GetOwnerPlayer(), GetItem());
-			baseEntity.Spawn();
-			CheckAchievementPosition(vector);
-			LoseCondition(ConditionLossPerSpray);
+			else if (Interface.CallHook("OnSprayCreate", this, vector, quaternion) == null)
+			{
+				ulong num2 = ItemDefinition.FindSkin(SprayDecalItem.itemid, num);
+				BaseEntity baseEntity = GameManager.server.CreateEntity(SprayDecalEntityRef.resourcePath, vector, quaternion);
+				baseEntity.skinID = num2;
+				baseEntity.OnDeployed(null, GetOwnerPlayer(), GetItem());
+				baseEntity.Spawn();
+				CheckAchievementPosition(vector);
+				LoseCondition(ConditionLossPerSpray);
+			}
 		}
 	}
 
@@ -553,6 +568,7 @@ public class SprayCan : HeldEntity
 	public void ClearBusy()
 	{
 		SetFlag(Flags.Busy, b: false);
+		SetFlag(Flags.Reserved1, b: false);
 	}
 
 	public override void OnHeldChanged()

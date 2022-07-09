@@ -783,6 +783,10 @@ public class BaseProjectile : AttackEntity
 
 	public void DelayedModsChanged()
 	{
+		if (Interface.CallHook("OnWeaponModChange", this, GetOwnerPlayer()) != null)
+		{
+			return;
+		}
 		int num = Mathf.CeilToInt(ProjectileWeaponMod.Mult(this, (ProjectileWeaponMod x) => x.magazineCapacity, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f) * (float)primaryMagazine.definition.builtInSize);
 		if (num == primaryMagazine.capacity)
 		{
@@ -872,6 +876,13 @@ public class BaseProjectile : AttackEntity
 	public override void SetLightsOn(bool isOn)
 	{
 		base.SetLightsOn(isOn);
+		UpdateAttachmentsState();
+	}
+
+	public void UpdateAttachmentsState()
+	{
+		_ = flags;
+		bool b = ShouldLightsBeOn();
 		if (children == null)
 		{
 			return;
@@ -880,7 +891,26 @@ public class BaseProjectile : AttackEntity
 			where x != null && x.isLight
 			select x)
 		{
-			item.SetFlag(Flags.On, isOn);
+			item.SetFlag(Flags.On, b);
+		}
+	}
+
+	private bool ShouldLightsBeOn()
+	{
+		if (LightsOn())
+		{
+			return IsDeployed();
+		}
+		return false;
+	}
+
+	protected override void OnChildRemoved(BaseEntity child)
+	{
+		base.OnChildRemoved(child);
+		if (child is ProjectileWeaponMod projectileWeaponMod && projectileWeaponMod.isLight)
+		{
+			child.SetFlag(Flags.On, b: false);
+			SetLightsOn(isOn: false);
 		}
 	}
 
@@ -974,7 +1004,7 @@ public class BaseProjectile : AttackEntity
 	protected virtual void ReloadMagazine(int desiredAmount = -1)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
-		if ((bool)ownerPlayer && Interface.CallHook("OnReloadMagazine", ownerPlayer, this, desiredAmount) == null)
+		if ((bool)ownerPlayer && Interface.CallHook("OnMagazineReload", this, desiredAmount, ownerPlayer) == null)
 		{
 			primaryMagazine.Reload(ownerPlayer, desiredAmount);
 			SendNetworkUpdateImmediate();
@@ -1003,7 +1033,7 @@ public class BaseProjectile : AttackEntity
 			return;
 		}
 		ItemModProjectile component = itemDefinition.GetComponent<ItemModProjectile>();
-		if ((bool)component && component.IsAmmo(primaryMagazine.definition.ammoTypes) && Interface.CallHook("OnSwitchAmmo", ownerPlayer, this) == null)
+		if ((bool)component && component.IsAmmo(primaryMagazine.definition.ammoTypes) && Interface.CallHook("OnAmmoSwitch", this, ownerPlayer) == null)
 		{
 			if (primaryMagazine.contents > 0)
 			{
@@ -1023,6 +1053,7 @@ public class BaseProjectile : AttackEntity
 		reloadStarted = false;
 		reloadFinished = false;
 		fractionalInsertCounter = 0;
+		UpdateAttachmentsState();
 	}
 
 	[RPC_Server]
@@ -1036,7 +1067,7 @@ public class BaseProjectile : AttackEntity
 			reloadStarted = false;
 			reloadFinished = false;
 		}
-		else if (Interface.CallHook("OnReloadWeapon", player, this) == null)
+		else if (Interface.CallHook("OnWeaponReload", this, player) == null)
 		{
 			reloadFinished = false;
 			reloadStarted = true;

@@ -28,6 +28,14 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 	[Serializable]
 	public class SpawnSettings
 	{
+		public enum AdminBonus
+		{
+			None = 0,
+			T1PlusFuel = 1,
+			T2PlusFuel = 2,
+			T3PlusFuel = 3
+		}
+
 		[Tooltip("Must be true to use any of these settings.")]
 		public bool useSpawnSettings;
 
@@ -39,6 +47,8 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 		[Tooltip("Max health  % at spawn for any modules that spawn with this chassis.")]
 		public float maxStartHealthPercent = 0.5f;
+
+		public AdminBonus adminBonus;
 	}
 
 	public static HashSet<ModularCar> allCarsList = new HashSet<ModularCar>();
@@ -728,6 +738,23 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 			}
 		}
 		Interface.CallHook("OnVehicleModulesAssigned", this, modularCarPresetConfig.socketItemDefs);
+		Invoke(HandleAdminBonus, 0f);
+	}
+
+	private void HandleAdminBonus()
+	{
+		switch (spawnSettings.adminBonus)
+		{
+		case SpawnSettings.AdminBonus.T1PlusFuel:
+			AdminFixUp(1);
+			break;
+		case SpawnSettings.AdminBonus.T2PlusFuel:
+			AdminFixUp(2);
+			break;
+		case SpawnSettings.AdminBonus.T3PlusFuel:
+			AdminFixUp(3);
+			break;
+		}
 	}
 
 	[RPC_Server]

@@ -556,6 +556,7 @@ public class ComputerStation : BaseMountable
 
 	public override void OnPlayerMounted()
 	{
+		base.OnPlayerMounted();
 		BasePlayer mounted = _mounted;
 		if ((bool)mounted)
 		{

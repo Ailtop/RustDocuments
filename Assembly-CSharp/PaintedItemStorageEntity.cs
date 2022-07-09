@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using ConVar;
 using Facepunch;
@@ -10,9 +11,37 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver
+public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver, IUGCBrowserEntity
 {
 	public uint _currentImageCrc;
+
+	private ulong lastEditedBy;
+
+	public uint[] GetContentCRCs
+	{
+		get
+		{
+			if (_currentImageCrc == 0)
+			{
+				return Array.Empty<uint>();
+			}
+			return new uint[1] { _currentImageCrc };
+		}
+	}
+
+	public UGCType ContentType => UGCType.ImageJpg;
+
+	public List<ulong> EditingHistory
+	{
+		get
+		{
+			if (lastEditedBy == 0)
+			{
+				return new List<ulong>();
+			}
+			return new List<ulong> { lastEditedBy };
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -64,6 +93,10 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver
 		if (info.msg.paintedItem != null)
 		{
 			_currentImageCrc = info.msg.paintedItem.imageCrc;
+			if (base.isServer)
+			{
+				lastEditedBy = info.msg.paintedItem.editedBy;
+			}
 		}
 	}
 
@@ -72,6 +105,7 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver
 		base.Save(info);
 		info.msg.paintedItem = Facepunch.Pool.Get<PaintedItem>();
 		info.msg.paintedItem.imageCrc = _currentImageCrc;
+		info.msg.paintedItem.editedBy = lastEditedBy;
 	}
 
 	[RPC_Server]
@@ -119,6 +153,7 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver
 			{
 				item.LoseCondition(0.25f);
 			}
+			lastEditedBy = msg.player.userID;
 		}
 		Interface.CallHook("OnItemPainted", this, item, msg.player, array);
 		SendNetworkUpdate();
@@ -131,6 +166,12 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver
 		{
 			FileStorage.server.RemoveAllByEntity(net.ID);
 		}
+	}
+
+	public void ClearContent()
+	{
+		_currentImageCrc = 0u;
+		SendNetworkUpdate();
 	}
 
 	[Conditional("PAINTED_ITEM_DEBUG")]

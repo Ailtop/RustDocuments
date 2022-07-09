@@ -109,9 +109,11 @@ public static class Util
 
 	public static Dictionary<string, string> GetPlayerPairingData(BasePlayer player)
 	{
+		bool locked;
+		int orGenerateAppToken = SingletonComponent<ServerMgr>.Instance.persistance.GetOrGenerateAppToken(player.userID, out locked);
 		Dictionary<string, string> serverPairingData = GetServerPairingData();
 		serverPairingData.Add("playerId", player.UserIDString);
-		serverPairingData.Add("playerToken", player.appToken.ToString("G", CultureInfo.InvariantCulture));
+		serverPairingData.Add("playerToken", orGenerateAppToken.ToString("G", CultureInfo.InvariantCulture));
 		return serverPairingData;
 	}
 

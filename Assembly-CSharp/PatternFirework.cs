@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -8,7 +9,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PatternFirework : MortarFirework
+public class PatternFirework : MortarFirework, IUGCBrowserEntity
 {
 	public enum FuseLength
 	{
@@ -36,6 +37,32 @@ public class PatternFirework : MortarFirework
 
 	[NonSerialized]
 	public FuseLength ShellFuseLength;
+
+	public uint[] GetContentCRCs
+	{
+		get
+		{
+			if (Design == null || Design.stars.Count <= 0)
+			{
+				return Array.Empty<uint>();
+			}
+			return new uint[1] { 1u };
+		}
+	}
+
+	public UGCType ContentType => UGCType.PatternBoomer;
+
+	public List<ulong> EditingHistory
+	{
+		get
+		{
+			if (Design == null)
+			{
+				return new List<ulong>();
+			}
+			return new List<ulong> { Design.editedBy };
+		}
+	}
 
 	public override void DestroyShared()
 	{
@@ -88,6 +115,7 @@ public class PatternFirework : MortarFirework
 				star.position = new Vector2(Mathf.Clamp(star.position.x, -1f, 1f), Mathf.Clamp(star.position.y, -1f, 1f));
 				star.color = new Color(Mathf.Clamp01(star.color.r), Mathf.Clamp01(star.color.g), Mathf.Clamp01(star.color.b), 1f);
 			}
+			design.editedBy = rpc.player.userID;
 		}
 		Design?.Dispose();
 		Design = design;
@@ -132,6 +160,13 @@ public class PatternFirework : MortarFirework
 		info.msg.patternFirework = Facepunch.Pool.Get<ProtoBuf.PatternFirework>();
 		info.msg.patternFirework.design = Design?.Copy();
 		info.msg.patternFirework.shellFuseLength = (int)ShellFuseLength;
+	}
+
+	public void ClearContent()
+	{
+		Design?.Dispose();
+		Design = null;
+		SendNetworkUpdateImmediate();
 	}
 
 	public override void Load(LoadInfo info)

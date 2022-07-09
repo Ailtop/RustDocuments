@@ -26,12 +26,7 @@ public class DroppedItem : WorldItem
 
 	public virtual float GetDespawnDuration()
 	{
-		if (item != null && item.info.quickDespawn)
-		{
-			return 30f;
-		}
-		int num = ((item == null) ? 1 : item.despawnMultiplier);
-		return Server.itemdespawn * (float)num;
+		return item?.GetDespawnDuration() ?? Server.itemdespawn;
 	}
 
 	public void IdleDestroy()

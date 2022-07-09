@@ -133,6 +133,11 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		return engineController.FuelSystem;
 	}
 
+	public override int StartingFuelUnits()
+	{
+		return 100;
+	}
+
 	protected override void OnChildAdded(BaseEntity child)
 	{
 		base.OnChildAdded(child);

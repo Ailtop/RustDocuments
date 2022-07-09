@@ -995,7 +995,6 @@ public class BaseVehicle : BaseMountable
 
 	public virtual void PlayerMounted(BasePlayer player, BaseMountable seat)
 	{
-		UpdateFullFlag();
 	}
 
 	public virtual void PrePlayerDismount(BasePlayer player, BaseMountable seat)
@@ -1009,7 +1008,6 @@ public class BaseVehicle : BaseMountable
 		{
 			Invoke(clearRecentDriverAction, 3f);
 		}
-		UpdateFullFlag();
 	}
 
 	public void TryShowCollisionFX(Collision collision, GameObjectRef effectGO)
@@ -1030,7 +1028,7 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	private void UpdateFullFlag()
+	public void UpdateFullFlag()
 	{
 		bool b = NumMounted() == MaxMounted();
 		SetFlag(Flags.Reserved11, b);

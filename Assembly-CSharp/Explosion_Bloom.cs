@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-[ImageEffectAllowedInSceneView]
-[AddComponentMenu("KriptoFX/Explosion_Bloom")]
 [ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
+[AddComponentMenu("KriptoFX/Explosion_Bloom")]
+[ImageEffectAllowedInSceneView]
 public class Explosion_Bloom : MonoBehaviour
 {
 	[Serializable]

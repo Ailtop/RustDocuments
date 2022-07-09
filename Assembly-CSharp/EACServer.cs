@@ -110,14 +110,8 @@ public static class EACServer
 					if (clientStatus.IsBanned(out var timeBanExpires))
 					{
 						connection.authStatus = "eacbanned";
-						object[] args = new object[3]
-						{
-							2,
-							0,
-							"<color=#fff>SERVER</color> Kicking " + connection.username + " (banned by anticheat)"
-						};
+						ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Kicking " + connection.username + " (banned by anticheat)");
 						Interface.CallHook("OnPlayerBanned", connection, text);
-						ConsoleNetwork.BroadcastToAllClients("chat.add", args);
 						if (!timeBanExpires.HasValue)
 						{
 							Entity.DeleteBy(connection.userid);

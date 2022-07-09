@@ -1,14 +1,42 @@
+using System;
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
 using Rust;
 
-public class PhotoEntity : ImageStorageEntity
+public class PhotoEntity : ImageStorageEntity, IUGCBrowserEntity
 {
 	public ulong PhotographerSteamId { get; private set; }
 
 	public uint ImageCrc { get; private set; }
 
 	protected override uint CrcToLoad => ImageCrc;
+
+	public uint[] GetContentCRCs
+	{
+		get
+		{
+			if (ImageCrc == 0)
+			{
+				return Array.Empty<uint>();
+			}
+			return new uint[1] { ImageCrc };
+		}
+	}
+
+	public UGCType ContentType => UGCType.ImageJpg;
+
+	public List<ulong> EditingHistory
+	{
+		get
+		{
+			if (PhotographerSteamId == 0)
+			{
+				return new List<ulong>();
+			}
+			return new List<ulong> { PhotographerSteamId };
+		}
+	}
 
 	public override void Load(LoadInfo info)
 	{
@@ -41,5 +69,11 @@ public class PhotoEntity : ImageStorageEntity
 		{
 			FileStorage.server.RemoveAllByEntity(net.ID);
 		}
+	}
+
+	public void ClearContent()
+	{
+		ImageCrc = 0u;
+		SendNetworkUpdate();
 	}
 }

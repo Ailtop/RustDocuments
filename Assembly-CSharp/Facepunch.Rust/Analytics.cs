@@ -242,7 +242,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				DesignEvent("missionComplete:" + mission.shortname);
+				DesignEvent("missionComplete:" + mission.shortname, canBackup: true);
 			}
 		}
 
@@ -250,7 +250,7 @@ public static class Analytics
 		{
 			if (CanSendAnalytics)
 			{
-				DesignEvent($"missionFailed:{mission.shortname}:{reason}");
+				DesignEvent($"missionFailed:{mission.shortname}:{reason}", canBackup: true);
 			}
 		}
 
@@ -287,30 +287,39 @@ public static class Analytics
 			}
 		}
 
-		private static void DesignEvent(string message)
+		private static void DesignEvent(string message, bool canBackup = false)
 		{
 			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
 			{
 				GA.DesignEvent(message);
-				LocalBackup(message, 1f);
+				if (canBackup)
+				{
+					LocalBackup(message, 1f);
+				}
 			}
 		}
 
-		private static void DesignEvent(string message, float value)
+		private static void DesignEvent(string message, float value, bool canBackup = false)
 		{
 			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
 			{
 				GA.DesignEvent(message, value);
-				LocalBackup(message, value);
+				if (canBackup)
+				{
+					LocalBackup(message, value);
+				}
 			}
 		}
 
-		private static void DesignEvent(string message, int value)
+		private static void DesignEvent(string message, int value, bool canBackup = false)
 		{
 			if (CanSendAnalytics && !string.IsNullOrEmpty(message))
 			{
 				GA.DesignEvent(message, value);
-				LocalBackup(message, value);
+				if (canBackup)
+				{
+					LocalBackup(message, value);
+				}
 			}
 		}
 

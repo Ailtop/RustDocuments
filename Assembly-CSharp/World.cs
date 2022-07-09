@@ -58,7 +58,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 225 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 226 + ".map";
 		}
 	}
 
@@ -70,13 +70,26 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 225 + ".sav";
+				return Name + "." + 226 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 225 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 226 + ".sav";
 		}
 	}
 
 	public static string SaveFolderName => Server.rootFolder;
+
+	public static string GetServerBrowserMapName()
+	{
+		if (!CanLoadFromUrl())
+		{
+			return Name;
+		}
+		if (Name.StartsWith("proceduralmap."))
+		{
+			return "Procedural Map";
+		}
+		return "Custom Map";
+	}
 
 	public static bool CanLoadFromUrl()
 	{
@@ -91,7 +104,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 225 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 226 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -128,7 +141,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 225 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 226 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -293,17 +306,38 @@ public static class World
 
 	public static IEnumerator Spawn(float deltaTime, Action<string> statusFunction = null)
 	{
+		Dictionary<string, List<PrefabData>> assetGroups = (from p in Serialization.world.prefabs
+			group p by StringPool.Get(p.id)).ToDictionary((IGrouping<string, PrefabData> g) => g.Key, (IGrouping<string, PrefabData> g) => g.ToList(), StringComparer.InvariantCultureIgnoreCase);
+		int totalCount = Serialization.world.prefabs.Count;
+		int spawnedCount = 0;
+		int resultIndex = 0;
 		Stopwatch sw = Stopwatch.StartNew();
-		for (int i = 0; i < Serialization.world.prefabs.Count; i++)
+		AssetPreloadResult load = FileSystem.PreloadAssets(assetGroups.Keys, Global.preloadConcurrency, 10);
+		while (load != null && (load.MoveNext() || assetGroups.Count > 0))
 		{
-			if (sw.Elapsed.TotalSeconds > (double)deltaTime || i == 0 || i == Serialization.world.prefabs.Count - 1)
+			while (resultIndex < load.Results.Count && sw.Elapsed.TotalSeconds < (double)deltaTime)
 			{
-				Status(statusFunction, "Spawning World ({0}/{1})", i + 1, Serialization.world.prefabs.Count);
-				yield return CoroutineEx.waitForEndOfFrame;
-				sw.Reset();
-				sw.Start();
+				string item = load.Results[resultIndex].AssetPath;
+				if (!assetGroups.TryGetValue(item, out var value))
+				{
+					resultIndex++;
+					continue;
+				}
+				if (value.Count == 0)
+				{
+					assetGroups.Remove(item);
+					resultIndex++;
+					continue;
+				}
+				int index = value.Count - 1;
+				PrefabData prefab = value[index];
+				value.RemoveAt(index);
+				Spawn(prefab);
+				spawnedCount++;
 			}
-			Spawn(Serialization.world.prefabs[i]);
+			Status(statusFunction, "Spawning World ({0}/{1})", spawnedCount, totalCount);
+			yield return CoroutineEx.waitForEndOfFrame;
+			sw.Restart();
 		}
 	}
 

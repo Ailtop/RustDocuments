@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Rust.UI;
 
@@ -19,4 +20,18 @@ public class ReportBug : UIDialog
 	public RustIcon ProgressIcon;
 
 	public RustText ProgressText;
+
+	public RawImage ScreenshotImage;
+
+	public GameObject ScreenshotRoot;
+
+	public UIBackgroundBlur BlurController;
+
+	public RustButton SubmitButton;
+
+	public GameObject SubmitErrorRoot;
+
+	public RustText CooldownText;
+
+	public RustText ContentMissingText;
 }

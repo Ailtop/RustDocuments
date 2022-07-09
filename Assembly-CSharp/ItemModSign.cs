@@ -4,12 +4,12 @@ public class ItemModSign : ItemModAssociatedEntity<SignContent>
 
 	protected override bool ShouldAutoCreateEntity => false;
 
-	public void OnSignPickedUp(ISignage s, Item toItem)
+	public void OnSignPickedUp(ISignage s, IUGCBrowserEntity ugc, Item toItem)
 	{
 		SignContent signContent = CreateAssociatedEntity(toItem);
 		if (signContent != null)
 		{
-			signContent.CopyInfoFromSign(s);
+			signContent.CopyInfoFromSign(s, ugc);
 		}
 	}
 }

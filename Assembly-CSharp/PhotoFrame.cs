@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -8,7 +9,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
+public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGCBrowserEntity
 {
 	public GameObjectRef SignEditorDialog;
 
@@ -20,6 +21,8 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 
 	public uint _overlayTextureCrc;
 
+	private List<ulong> editHistory = new List<ulong>();
+
 	public Vector2i TextureSize => new Vector2i(PaintableSource.texWidth, PaintableSource.texHeight);
 
 	public int TextureCount => 1;
@@ -27,6 +30,12 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 	public uint NetworkID => net.ID;
 
 	public FileStorage.Type FileType => FileStorage.Type.png;
+
+	public UGCType ContentType => UGCType.ImagePng;
+
+	public List<ulong> EditingHistory => editHistory;
+
+	public uint[] GetContentCRCs => new uint[1] { _overlayTextureCrc };
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -200,6 +209,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 			{
 				FileStorage.server.RemoveAllByEntity(net.ID);
 				_overlayTextureCrc = FileStorage.server.Store(array, FileStorage.Type.png, net.ID);
+				LogEdit(msg.player);
 				SendNetworkUpdate();
 				Interface.CallHook("OnSignUpdated", this, msg.player);
 			}
@@ -258,6 +268,29 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 			_photoEntity.uid = info.msg.photoFrame.photoEntityId;
 			_overlayTextureCrc = info.msg.photoFrame.overlayImageCrc;
 		}
+		if (!base.isServer || info.msg.photoFrame == null)
+		{
+			return;
+		}
+		if (info.msg.photoFrame.editHistory != null)
+		{
+			if (editHistory == null)
+			{
+				editHistory = Facepunch.Pool.GetList<ulong>();
+			}
+			editHistory.Clear();
+			{
+				foreach (ulong item in info.msg.photoFrame.editHistory)
+				{
+					editHistory.Add(item);
+				}
+				return;
+			}
+		}
+		if (editHistory != null)
+		{
+			Facepunch.Pool.FreeList(ref editHistory);
+		}
 	}
 
 	public uint[] GetTextureCRCs()
@@ -271,6 +304,15 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 		info.msg.photoFrame = Facepunch.Pool.Get<ProtoBuf.PhotoFrame>();
 		info.msg.photoFrame.photoEntityId = _photoEntity.uid;
 		info.msg.photoFrame.overlayImageCrc = _overlayTextureCrc;
+		if (editHistory.Count <= 0)
+		{
+			return;
+		}
+		info.msg.photoFrame.editHistory = Facepunch.Pool.GetList<ulong>();
+		foreach (ulong item in editHistory)
+		{
+			info.msg.photoFrame.editHistory.Add(item);
+		}
 	}
 
 	public override void OnItemAddedOrRemoved(Item item, bool added)
@@ -290,7 +332,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 		base.OnPickedUpPreItemMove(createdItem, player);
 		if (_overlayTextureCrc != 0 && createdItem.info.TryGetComponent<ItemModSign>(out var component))
 		{
-			component.OnSignPickedUp(this, createdItem);
+			component.OnSignPickedUp(this, this, createdItem);
 		}
 	}
 
@@ -302,7 +344,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
 			if (associatedEntity != null)
 			{
-				associatedEntity.CopyInfoToSign(this);
+				associatedEntity.CopyInfoToSign(this, this);
 			}
 		}
 	}
@@ -314,6 +356,26 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage
 			_overlayTextureCrc = crcs[0];
 			SendNetworkUpdate();
 		}
+	}
+
+	private void LogEdit(BasePlayer byPlayer)
+	{
+		if (!editHistory.Contains(byPlayer.userID))
+		{
+			editHistory.Insert(0, byPlayer.userID);
+			int num = 0;
+			while (editHistory.Count > 5 && num < 10)
+			{
+				editHistory.RemoveAt(5);
+				num++;
+			}
+		}
+	}
+
+	public void ClearContent()
+	{
+		_overlayTextureCrc = 0u;
+		SendNetworkUpdate();
 	}
 
 	public override bool CanPickup(BasePlayer player)

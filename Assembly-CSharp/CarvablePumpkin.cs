@@ -10,7 +10,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class CarvablePumpkin : BaseOven, ILOD, ISignage
+public class CarvablePumpkin : BaseOven, ILOD, ISignage, IUGCBrowserEntity
 {
 	private const float TextureRequestTimeout = 15f;
 
@@ -20,6 +20,8 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 
 	[NonSerialized]
 	public uint[] textureIDs;
+
+	private List<ulong> editHistory = new List<ulong>();
 
 	public Vector2i TextureSize
 	{
@@ -50,6 +52,12 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 	public FileStorage.Type FileType => FileStorage.Type.png;
 
 	public uint NetworkID => net.ID;
+
+	public UGCType ContentType => UGCType.ImagePng;
+
+	public List<ulong> EditingHistory => editHistory;
+
+	public uint[] GetContentCRCs => textureIDs;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -227,6 +235,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 			}
 			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
 		}
+		LogEdit(msg.player);
 		SendNetworkUpdate();
 		Interface.CallHook("OnSignUpdated", this, msg.player);
 	}
@@ -339,6 +348,29 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		{
 			SetFlag(Flags.Locked, b: false);
 		}
+		if (info.msg.sign == null)
+		{
+			return;
+		}
+		if (info.msg.sign.editHistory != null)
+		{
+			if (editHistory == null)
+			{
+				editHistory = Facepunch.Pool.GetList<ulong>();
+			}
+			editHistory.Clear();
+			{
+				foreach (ulong item in info.msg.sign.editHistory)
+				{
+					editHistory.Add(item);
+				}
+				return;
+			}
+		}
+		if (editHistory != null)
+		{
+			Facepunch.Pool.FreeList(ref editHistory);
+		}
 	}
 
 	[RPC_Server]
@@ -377,6 +409,15 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		info.msg.sign = Facepunch.Pool.Get<Sign>();
 		info.msg.sign.imageid = 0u;
 		info.msg.sign.imageIds = list;
+		if (editHistory.Count <= 0)
+		{
+			return;
+		}
+		info.msg.sign.editHistory = Facepunch.Pool.GetList<ulong>();
+		foreach (ulong item2 in editHistory)
+		{
+			info.msg.sign.editHistory.Add(item2);
+		}
 	}
 
 	public override void OnKilled(HitInfo info)
@@ -407,7 +448,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		}
 		if (flag && createdItem.info.TryGetComponent<ItemModSign>(out var component))
 		{
-			component.OnSignPickedUp(this, createdItem);
+			component.OnSignPickedUp(this, this, createdItem);
 		}
 	}
 
@@ -419,7 +460,7 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
 			if (associatedEntity != null)
 			{
-				associatedEntity.CopyInfoToSign(this);
+				associatedEntity.CopyInfoToSign(this, this);
 			}
 		}
 	}
@@ -434,6 +475,25 @@ public class CarvablePumpkin : BaseOven, ILOD, ISignage
 		textureIDs = new uint[crcs.Length];
 		crcs.CopyTo(textureIDs, 0);
 		SendNetworkUpdate();
+	}
+
+	private void LogEdit(BasePlayer byPlayer)
+	{
+		if (!editHistory.Contains(byPlayer.userID))
+		{
+			editHistory.Insert(0, byPlayer.userID);
+			int num = 0;
+			while (editHistory.Count > 5 && num < 10)
+			{
+				editHistory.RemoveAt(5);
+				num++;
+			}
+		}
+	}
+
+	public void ClearContent()
+	{
+		SetTextureCRCs(Array.Empty<uint>());
 	}
 
 	public override string Categorize()

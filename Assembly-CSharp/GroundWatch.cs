@@ -11,6 +11,9 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 
 	public float radius = 0.1f;
 
+	[Header("Whitelist")]
+	public BaseEntity[] whitelist;
+
 	private int fails;
 
 	private void OnDrawGizmosSelected()
@@ -112,15 +115,33 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 		foreach (Collider item in obj)
 		{
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item.gameObject);
-			if (!baseEntity || (!(baseEntity == component) && !baseEntity.IsDestroyed && !baseEntity.isClient))
+			if ((bool)baseEntity && (baseEntity == component || baseEntity.IsDestroyed || baseEntity.isClient))
 			{
-				DecayEntity decayEntity = component as DecayEntity;
-				DecayEntity decayEntity2 = baseEntity as DecayEntity;
-				if (!decayEntity || decayEntity.buildingID == 0 || !decayEntity2 || decayEntity2.buildingID == 0 || decayEntity.buildingID == decayEntity2.buildingID)
+				continue;
+			}
+			if (whitelist != null && whitelist.Length != 0)
+			{
+				bool flag = false;
+				BaseEntity[] array = whitelist;
+				foreach (BaseEntity baseEntity2 in array)
 				{
-					Facepunch.Pool.FreeList(ref obj);
-					return true;
+					if (baseEntity.prefabID == baseEntity2.prefabID)
+					{
+						flag = true;
+						break;
+					}
 				}
+				if (!flag)
+				{
+					continue;
+				}
+			}
+			DecayEntity decayEntity = component as DecayEntity;
+			DecayEntity decayEntity2 = baseEntity as DecayEntity;
+			if (!decayEntity || decayEntity.buildingID == 0 || !decayEntity2 || decayEntity2.buildingID == 0 || decayEntity.buildingID == decayEntity2.buildingID)
+			{
+				Facepunch.Pool.FreeList(ref obj);
+				return true;
 			}
 		}
 		if (ConVar.Physics.groundwatchdebug)

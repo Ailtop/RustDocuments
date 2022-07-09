@@ -20,7 +20,7 @@ public class UserPersistance : IDisposable
 
 	private static Dictionary<ulong, string> nameCache;
 
-	private static MruDictionary<ulong, int> tokenCache;
+	private static MruDictionary<ulong, (int Token, bool Locked)> tokenCache;
 
 	public UserPersistance(string strFolder)
 	{
@@ -48,16 +48,20 @@ public class UserPersistance : IDisposable
 		tokens.Open(strFolder + "/player.tokens.db");
 		if (!tokens.TableExists("data"))
 		{
-			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT )");
+			tokens.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, token INT, locked BOOLEAN DEFAULT 0 )");
+		}
+		if (!tokens.ColumnExists("data", "locked"))
+		{
+			tokens.Execute("ALTER TABLE data ADD COLUMN locked BOOLEAN DEFAULT 0");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 225 + ".db");
+		playerState.Open(strFolder + "/player.states." + 226 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");
 		}
 		nameCache = new Dictionary<ulong, string>();
-		tokenCache = new MruDictionary<ulong, int>(500);
+		tokenCache = new MruDictionary<ulong, (int, bool)>(500);
 	}
 
 	public virtual void Dispose()
@@ -208,29 +212,50 @@ public class UserPersistance : IDisposable
 		}
 	}
 
-	public int GetOrGenerateAppToken(ulong playerID)
+	public int GetOrGenerateAppToken(ulong playerID, out bool locked)
 	{
 		if (tokens == null)
 		{
+			locked = false;
 			return 0;
 		}
 		using (TimeWarning.New("GetOrGenerateAppToken"))
 		{
 			if (tokenCache.TryGetValue(playerID, out var value))
 			{
-				return value;
+				locked = value.Item2;
+				return value.Item1;
 			}
 			int num = tokens.QueryInt("SELECT token FROM data WHERE userid = ?", playerID);
 			if (num != 0)
 			{
-				tokenCache.Add(playerID, num);
+				bool flag = tokens.QueryInt("SELECT locked FROM data WHERE userid = ?", playerID) != 0;
+				tokenCache.Add(playerID, (num, flag));
+				locked = flag;
 				return num;
 			}
 			int num2 = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 			tokens.Execute("INSERT INTO data ( userid, token ) VALUES ( ?, ? )", playerID, num2);
-			tokenCache.Add(playerID, num2);
+			tokenCache.Add(playerID, (num2, false));
+			locked = false;
 			return num2;
 		}
+	}
+
+	public bool SetAppTokenLocked(ulong playerID, bool locked)
+	{
+		if (tokens == null)
+		{
+			return false;
+		}
+		GetOrGenerateAppToken(playerID, out var locked2);
+		if (locked2 == locked)
+		{
+			return false;
+		}
+		tokens.Execute("UPDATE data SET locked = ? WHERE userid = ?", locked ? 1 : 0, playerID);
+		tokenCache.Remove(playerID);
+		return true;
 	}
 
 	public byte[] GetPlayerState(ulong playerID)

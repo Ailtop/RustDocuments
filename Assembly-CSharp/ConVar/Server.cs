@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using EasyAntiCheat.Server.Scout;
+using Facepunch.Extend;
 using Network;
 using UnityEngine;
 
@@ -86,6 +87,9 @@ public class Server : ConsoleSystem
 
 	[ServerVar]
 	public static float itemdespawn = 300f;
+
+	[ServerVar]
+	public static float itemdespawn_quick = 30f;
 
 	[ServerVar]
 	public static float corpsedespawn = 300f;
@@ -299,6 +303,15 @@ public class Server : ConsoleSystem
 
 	[ServerVar(Help = "Timeout (in seconds) for centralized banning web server requests")]
 	public static int bansServerTimeout = 5;
+
+	[ServerVar(Help = "HTTP API endpoint for receiving F7 reports", Saved = true)]
+	public static string reportsServerEndpoint = "";
+
+	[ServerVar(Help = "If set, this key will be included with any reports sent via reportsServerEndpoint (for validation)", Saved = true)]
+	public static string reportsServerEndpointKey = "";
+
+	[ServerVar(Help = "Should F7 reports from players be printed to console", Saved = true)]
+	public static bool printReportsToConsole = false;
 
 	[ServerVar(Saved = true)]
 	public static bool showHolsteredItems = true;
@@ -730,6 +743,18 @@ public class Server : ConsoleSystem
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
 			textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, activePlayer.transform.position.ToString(), activePlayer.eyes.BodyForward().ToString());
+		}
+		arg.ReplyWith(textTable.ToString());
+	}
+
+	[ServerVar(Help = "Prints all the vending machines on the server")]
+	public static void listvendingmachines(Arg arg)
+	{
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("EntityId", "Position", "Name");
+		foreach (VendingMachine item in BaseNetworkable.serverEntities.OfType<VendingMachine>())
+		{
+			textTable.AddRow(item.net.ID.ToString(), item.transform.position.ToString(), item.shopName.QuoteSafe());
 		}
 		arg.ReplyWith(textTable.ToString());
 	}

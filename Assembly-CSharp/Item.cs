@@ -471,6 +471,15 @@ public class Item
 		}
 	}
 
+	public float GetDespawnDuration()
+	{
+		if (info.quickDespawn)
+		{
+			return ConVar.Server.itemdespawn_quick;
+		}
+		return ConVar.Server.itemdespawn * (float)despawnMultiplier;
+	}
+
 	public void RemoveFromWorld()
 	{
 		BaseEntity worldEntity = GetWorldEntity();
@@ -550,6 +559,25 @@ public class Item
 		{
 			itemMods[i].OnAttacked(this, hitInfo);
 		}
+	}
+
+	public BaseEntity GetEntityOwner()
+	{
+		ItemContainer itemContainer = parent;
+		for (int i = 0; i < 10; i++)
+		{
+			if (itemContainer.entityOwner != null)
+			{
+				return itemContainer.entityOwner;
+			}
+			ItemContainer itemContainer2 = itemContainer.parent?.parent;
+			if (itemContainer2 == null || itemContainer2 == itemContainer)
+			{
+				return null;
+			}
+			itemContainer = itemContainer2;
+		}
+		return null;
 	}
 
 	public bool IsChildContainer(ItemContainer c)

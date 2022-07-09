@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -7,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class Cassette : BaseEntity
+public class Cassette : BaseEntity, IUGCBrowserEntity
 {
 	public float MaxCassetteLength = 15f;
 
@@ -35,6 +36,22 @@ public class Cassette : BaseEntity
 	public uint AudioId { get; private set; }
 
 	public SoundDefinition PreloadedAudio => PreloadContent.GetSoundContent(preloadedAudioId, PreloadType);
+
+	public uint[] GetContentCRCs
+	{
+		get
+		{
+			if (AudioId == 0)
+			{
+				return Array.Empty<uint>();
+			}
+			return new uint[1] { AudioId };
+		}
+	}
+
+	public UGCType ContentType => UGCType.AudioOgg;
+
+	public List<ulong> EditingHistory => new List<ulong> { CreatorSteamId };
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -229,6 +246,12 @@ public class Cassette : BaseEntity
 	{
 		base.DoServerDestroy();
 		ClearSavedAudio();
+	}
+
+	public void ClearContent()
+	{
+		AudioId = 0u;
+		SendNetworkUpdate();
 	}
 
 	public static bool IsOggValid(byte[] data, Cassette c)

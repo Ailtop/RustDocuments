@@ -85,7 +85,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 
 	public bool HasInited { get; private set; }
 
-	public static ItemDefinition AssociatedItemDef => ((BaseCombatEntity)/*Error: ldarg 0 (out-of-bounds)*/).repair.itemTarget;
+	public ItemDefinition AssociatedItemDef => repair.itemTarget;
 
 	public bool IsEditableNow
 	{
@@ -105,7 +105,6 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 
 	public override void ServerInit()
 	{
-		//IL_003c: Incompatible stack heights: 0 vs 1
 		base.ServerInit();
 		if (!disablePhysics)
 		{
@@ -120,7 +119,6 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 
 	public override void PreServerLoad()
 	{
-		//IL_001c: Incompatible stack heights: 0 vs 1
 		base.PreServerLoad();
 		if (Inventory == null)
 		{
@@ -539,28 +537,35 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 			Debug.LogError($"{GetType().Name}: Unable to add module {addedModule.name} to socket ({index}). Destroying it.", base.gameObject);
 			addedModule.Kill();
 			AttachedModuleEntities.Remove(addedModule);
+			return;
 		}
-		else
+		RefreshModulesExcept(addedModule);
+		if (base.isServer)
 		{
-			RefreshModulesExcept(addedModule);
+			UpdateFullFlag();
 		}
 	}
 
 	public virtual void ModuleEntityRemoved(BaseVehicleModule removedModule)
 	{
-		if (!base.IsDestroyed)
+		if (base.IsDestroyed)
 		{
-			if (moduleAddActions.ContainsKey(removedModule))
+			return;
+		}
+		if (moduleAddActions.ContainsKey(removedModule))
+		{
+			removedModule.CancelInvoke(moduleAddActions[removedModule]);
+			moduleAddActions.Remove(removedModule);
+		}
+		if (AttachedModuleEntities.Contains(removedModule))
+		{
+			RemoveMass(removedModule.Mass, removedModule.CentreOfMass, removedModule.transform.position);
+			AttachedModuleEntities.Remove(removedModule);
+			removedModule.ModuleRemoved();
+			RefreshModulesExcept(removedModule);
+			if (base.isServer)
 			{
-				removedModule.CancelInvoke(moduleAddActions[removedModule]);
-				moduleAddActions.Remove(removedModule);
-			}
-			if (AttachedModuleEntities.Contains(removedModule))
-			{
-				RemoveMass(removedModule.Mass, removedModule.CentreOfMass, removedModule.transform.position);
-				AttachedModuleEntities.Remove(removedModule);
-				removedModule.ModuleRemoved();
-				RefreshModulesExcept(removedModule);
+				UpdateFullFlag();
 			}
 		}
 	}

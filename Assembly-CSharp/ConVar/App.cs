@@ -78,6 +78,32 @@ public class App : ConsoleSystem
 		arg.ReplyWith(strValue);
 	}
 
+	[ServerVar]
+	public static void appban(Arg arg)
+	{
+		ulong uLong = arg.GetULong(0, 0uL);
+		if (uLong == 0L)
+		{
+			arg.ReplyWith("Usage: app.appban <steamID64>");
+			return;
+		}
+		string strValue = (SingletonComponent<ServerMgr>.Instance.persistance.SetAppTokenLocked(uLong, locked: true) ? $"Banned {uLong} from using the companion app" : $"{uLong} is already banned from using the companion app");
+		arg.ReplyWith(strValue);
+	}
+
+	[ServerVar]
+	public static void appunban(Arg arg)
+	{
+		ulong uLong = arg.GetULong(0, 0uL);
+		if (uLong == 0L)
+		{
+			arg.ReplyWith("Usage: app.appunban <steamID64>");
+			return;
+		}
+		string strValue = (SingletonComponent<ServerMgr>.Instance.persistance.SetAppTokenLocked(uLong, locked: false) ? $"Unbanned {uLong}, they can use the companion app again" : $"{uLong} is not banned from using the companion app");
+		arg.ReplyWith(strValue);
+	}
+
 	public static IPAddress GetListenIP()
 	{
 		if (!string.IsNullOrWhiteSpace(listenip))

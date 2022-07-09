@@ -104,6 +104,8 @@ public class WaterSystem : MonoBehaviour
 
 	public bool ProgressTime = true;
 
+	public GameObject FallbackPlane;
+
 	public SimulationSettings Simulation = new SimulationSettings();
 
 	public RenderingSettings Rendering = new RenderingSettings();

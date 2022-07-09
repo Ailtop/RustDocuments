@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[833]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[850]
 	{
 		new ConsoleSystem.Command
 		{
@@ -658,6 +658,42 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "adminui_deleteugccontent",
+			Parent = "global",
+			FullName = "global.adminui_deleteugccontent",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_DeleteUGCContent(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_fullrefresh",
+			Parent = "global",
+			FullName = "global.adminui_fullrefresh",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_FullRefresh(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_requestfireworkpattern",
+			Parent = "global",
+			FullName = "global.adminui_requestfireworkpattern",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_RequestFireworkPattern(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "adminui_requestplayerlist",
 			Parent = "global",
 			FullName = "global.adminui_requestplayerlist",
@@ -690,6 +726,30 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.AdminUI_RequestServerInfo(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_requestugccontent",
+			Parent = "global",
+			FullName = "global.adminui_requestugccontent",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_RequestUGCContent(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "adminui_requestugclist",
+			Parent = "global",
+			FullName = "global.adminui_requestugclist",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.AdminUI_RequestUGCList(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3180,6 +3240,30 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "appban",
+			Parent = "app",
+			FullName = "app.appban",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				App.appban(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "appunban",
+			Parent = "app",
+			FullName = "app.appunban",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				App.appunban(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "connections",
 			Parent = "app",
 			FullName = "app.connections",
@@ -4723,6 +4807,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "asyncwarmup",
+			Parent = "global",
+			FullName = "global.asyncwarmup",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Global.asyncWarmup.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.asyncWarmup = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "breakclothing",
 			Parent = "global",
 			FullName = "global.breakclothing",
@@ -4820,6 +4917,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "forceunloadbundles",
+			Parent = "global",
+			FullName = "global.forceunloadbundles",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Global.forceUnloadBundles.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.forceUnloadBundles = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "free",
 			Parent = "global",
 			FullName = "global.free",
@@ -4907,6 +5017,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Global.perf = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "preloadconcurrency",
+			Parent = "global",
+			FullName = "global.preloadconcurrency",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Global.preloadConcurrency.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.preloadConcurrency = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -5269,6 +5392,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "warmupconcurrency",
+			Parent = "global",
+			FullName = "global.warmupconcurrency",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Global.warmupConcurrency.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.warmupConcurrency = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "enabled",
 			Parent = "halloween",
 			FullName = "halloween.enabled",
@@ -5376,6 +5512,30 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Halloween.scarecrows_throw_beancans = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "load",
+			Parent = "harmony",
+			FullName = "harmony.load",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Harmony.Load(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "unload",
+			Parent = "harmony",
+			FullName = "harmony.unload",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Harmony.Unload(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7194,6 +7354,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "itemdespawn_quick",
+			Parent = "server",
+			FullName = "server.itemdespawn_quick",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.itemdespawn_quick.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.itemdespawn_quick = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "level",
 			Parent = "server",
 			FullName = "server.level",
@@ -7229,6 +7402,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.levelurl = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "listvendingmachines",
+			Parent = "server",
+			FullName = "server.listvendingmachines",
+			ServerAdmin = true,
+			Description = "Prints all the vending machines on the server",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Server.listvendingmachines(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7721,6 +7907,21 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "printreportstoconsole",
+			Parent = "server",
+			FullName = "server.printreportstoconsole",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Should F7 reports from players be printed to console",
+			Variable = true,
+			GetOveride = () => Server.printReportsToConsole.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.printReportsToConsole = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "printrot",
 			Parent = "server",
 			FullName = "server.printrot",
@@ -7797,6 +7998,36 @@ public class ConsoleGen
 			{
 				string rval3 = Server.readcfg(arg);
 				arg.ReplyWithObject(rval3);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "reportsserverendpoint",
+			Parent = "server",
+			FullName = "server.reportsserverendpoint",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "HTTP API endpoint for receiving F7 reports",
+			Variable = true,
+			GetOveride = () => Server.reportsServerEndpoint.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.reportsServerEndpoint = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "reportsserverendpointkey",
+			Parent = "server",
+			FullName = "server.reportsserverendpointkey",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "If set, this key will be included with any reports sent via reportsServerEndpoint (for validation)",
+			Variable = true,
+			GetOveride = () => Server.reportsServerEndpointKey.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.reportsServerEndpointKey = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -10286,23 +10517,6 @@ public class ConsoleGen
 			{
 				ReclaimManager.reclaim_expire_minutes = str.ToFloat();
 			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "version",
-			Parent = "recoilproperties",
-			FullName = "recoilproperties.version",
-			ServerAdmin = true,
-			ClientAdmin = true,
-			Client = true,
-			Replicated = true,
-			Variable = true,
-			GetOveride = () => RecoilProperties.version.ToString(),
-			SetOveride = delegate(string str)
-			{
-				RecoilProperties.version = str.ToInt();
-			},
-			Default = "1"
 		},
 		new ConsoleSystem.Command
 		{

@@ -501,14 +501,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2345)
+		else if (packet.connection.protocol > 2348)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2345));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2348));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2345)
+		else if (packet.connection.protocol < 2348)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2345));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2348));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -1144,7 +1144,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			SteamServer.ServerName = ConVar.Server.hostname;
 			SteamServer.MaxPlayers = ConVar.Server.maxplayers;
 			SteamServer.Passworded = false;
-			SteamServer.MapName = World.Name;
+			SteamServer.MapName = World.GetServerBrowserMapName();
 			string text = "stok";
 			if (Restarting)
 			{
@@ -1155,7 +1155,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2345}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2348}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
 				string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();

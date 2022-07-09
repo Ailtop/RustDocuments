@@ -16,7 +16,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 	public Transform waterloggedPoint;
 
 	[SerializeField]
-	private GameObjectRef collisionEffect;
+	public GameObjectRef collisionEffect;
 
 	[SerializeField]
 	public float engineStartupTime = 0.5f;

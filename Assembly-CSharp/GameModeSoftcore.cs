@@ -28,14 +28,19 @@ public class GameModeSoftcore : GameModeVanilla
 		SingletonComponent<ServerMgr>.Instance.CreateImportantEntity<ReclaimManager>(reclaimManagerPrefab.resourcePath);
 	}
 
-	public void AddFractionOfContainer(ItemContainer from, ref List<Item> to, float fraction = 1f)
+	public void AddFractionOfContainer(ItemContainer from, ref List<Item> to, float fraction = 1f, bool takeLastItem = false)
 	{
 		if (from.itemList.Count == 0)
 		{
 			return;
 		}
 		fraction = Mathf.Clamp01(fraction);
-		float num = Mathf.Ceil((float)from.itemList.Count * fraction);
+		int count = from.itemList.Count;
+		float num = Mathf.Ceil((float)count * fraction);
+		if (count == 1 && num == 1f && !takeLastItem)
+		{
+			return;
+		}
 		List<int> obj = Facepunch.Pool.GetList<int>();
 		for (int i = 0; i < from.capacity; i++)
 		{
@@ -109,7 +114,7 @@ public class GameModeSoftcore : GameModeVanilla
 		if (victim != null && !victim.IsNpc)
 		{
 			SetInventoryLocked(victim, wantsLocked: false);
-			int num = 0;
+			int newID = 0;
 			if (ReclaimManager.instance == null)
 			{
 				Debug.LogError("No reclaim manage for softcore");
@@ -120,14 +125,20 @@ public class GameModeSoftcore : GameModeVanilla
 			AddFractionOfContainer(victim.inventory.containerBelt, ref to, reclaim_fraction_belt);
 			AddFractionOfContainer(victim.inventory.containerWear, ref to, reclaim_fraction_wear);
 			AddFractionOfContainer(victim.inventory.containerMain, ref to, reclaim_fraction_main);
-			num = ReclaimManager.instance.AddPlayerReclaim(victim.userID, to, (instigator == null) ? 0 : instigator.userID, (instigator == null) ? "" : instigator.displayName);
+			if (to.Count > 0)
+			{
+				newID = ReclaimManager.instance.AddPlayerReclaim(victim.userID, to, (instigator == null) ? 0 : instigator.userID, (instigator == null) ? "" : instigator.displayName);
+			}
 			ReturnItemsTo(ref source, victim.inventory.containerBelt);
+			if (to.Count > 0)
+			{
+				Vector3 pos = victim.transform.position + Vector3.up * 0.25f;
+				Quaternion rot = Quaternion.Euler(0f, victim.transform.eulerAngles.y, 0f);
+				ReclaimBackpack component = GameManager.server.CreateEntity(reclaimBackpackPrefab.resourcePath, pos, rot).GetComponent<ReclaimBackpack>();
+				component.InitForPlayer(victim.userID, newID);
+				component.Spawn();
+			}
 			Facepunch.Pool.FreeList(ref to);
-			Vector3 pos = victim.transform.position + Vector3.up * 0.25f;
-			Quaternion rot = Quaternion.Euler(0f, victim.transform.eulerAngles.y, 0f);
-			ReclaimBackpack component = GameManager.server.CreateEntity(reclaimBackpackPrefab.resourcePath, pos, rot).GetComponent<ReclaimBackpack>();
-			component.InitForPlayer(victim.userID, num);
-			component.Spawn();
 		}
 		base.OnPlayerDeath(instigator, victim, deathInfo);
 	}

@@ -30,7 +30,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		get
 		{
-			return _playerName;
+			return NameHelper.Get(playerSteamID, _playerName);
 		}
 		set
 		{
@@ -128,15 +128,16 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel
 
 	public float CalculateRemovalTime()
 	{
-		int num = 1;
+		float num = ConVar.Server.itemdespawn_quick;
 		if (inventory != null)
 		{
 			foreach (Item item in inventory.itemList)
 			{
-				num = Mathf.Max(num, item.despawnMultiplier);
+				num = Mathf.Max(num, item.GetDespawnDuration());
 			}
+			return num;
 		}
-		return (float)num * ConVar.Server.itemdespawn;
+		return num;
 	}
 
 	internal override void DoServerDestroy()

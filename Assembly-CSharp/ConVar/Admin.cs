@@ -17,6 +17,12 @@ namespace ConVar;
 [Factory("global")]
 public class Admin : ConsoleSystem
 {
+	private enum ChangeGradeMode
+	{
+		Upgrade = 0,
+		Downgrade = 1
+	}
+
 	[Preserve]
 	public struct PlayerInfo
 	{
@@ -87,6 +93,22 @@ public class Admin : ConsoleSystem
 		public string Help;
 	}
 
+	[Preserve]
+	public struct ServerUGCInfo
+	{
+		public uint entityId;
+
+		public uint[] crcs;
+
+		public UGCType contentType;
+
+		public uint entityPrefabID;
+
+		public string shortPrefabName;
+
+		public ulong[] playerIds;
+	}
+
 	[ReplicatedVar(Help = "Controls whether the in-game admin UI is displayed to admins")]
 	public static bool allowAdminUI = true;
 
@@ -98,7 +120,7 @@ public class Admin : ConsoleSystem
 		if (@string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2345 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2348 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -342,6 +364,12 @@ public class Admin : ConsoleSystem
 			return;
 		}
 		ServerUsers.Set(uInt, ServerUsers.UserGroup.Moderator, @string, string2, -1L);
+		BasePlayer basePlayer = BasePlayer.FindByID(uInt);
+		if (basePlayer != null)
+		{
+			basePlayer.SetPlayerFlag(BasePlayer.PlayerFlags.IsAdmin, b: true);
+			basePlayer.SendNetworkUpdate();
+		}
 		arg.ReplyWith("Added moderator " + @string + ", steamid " + uInt);
 	}
 
@@ -356,6 +384,11 @@ public class Admin : ConsoleSystem
 			arg.ReplyWith("This doesn't appear to be a 64bit steamid: " + uInt);
 			return;
 		}
+		if (arg.Connection != null && arg.Connection.authLevel < 2)
+		{
+			arg.ReplyWith("Moderators cannot run ownerid");
+			return;
+		}
 		ServerUsers.User user = ServerUsers.Get(uInt);
 		if (user != null && user.group == ServerUsers.UserGroup.Owner)
 		{
@@ -363,6 +396,12 @@ public class Admin : ConsoleSystem
 			return;
 		}
 		ServerUsers.Set(uInt, ServerUsers.UserGroup.Owner, @string, string2, -1L);
+		BasePlayer basePlayer = BasePlayer.FindByID(uInt);
+		if (basePlayer != null)
+		{
+			basePlayer.SetPlayerFlag(BasePlayer.PlayerFlags.IsAdmin, b: true);
+			basePlayer.SendNetworkUpdate();
+		}
 		arg.ReplyWith("Added owner " + @string + ", steamid " + uInt);
 	}
 
@@ -382,6 +421,12 @@ public class Admin : ConsoleSystem
 			return;
 		}
 		ServerUsers.Remove(uInt);
+		BasePlayer basePlayer = BasePlayer.FindByID(uInt);
+		if (basePlayer != null)
+		{
+			basePlayer.SetPlayerFlag(BasePlayer.PlayerFlags.IsAdmin, b: false);
+			basePlayer.SendNetworkUpdate();
+		}
 		arg.ReplyWith("Removed Moderator: " + uInt);
 	}
 
@@ -401,6 +446,12 @@ public class Admin : ConsoleSystem
 			return;
 		}
 		ServerUsers.Remove(uInt);
+		BasePlayer basePlayer = BasePlayer.FindByID(uInt);
+		if (basePlayer != null)
+		{
+			basePlayer.SetPlayerFlag(BasePlayer.PlayerFlags.IsAdmin, b: false);
+			basePlayer.SendNetworkUpdate();
+		}
 		arg.ReplyWith("Removed Owner: " + uInt);
 	}
 
@@ -773,41 +824,58 @@ public class Admin : ConsoleSystem
 	public static void entid(Arg arg)
 	{
 		BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(arg.GetUInt(1)) as BaseEntity;
-		if (!(baseEntity == null) && !(baseEntity is BasePlayer))
+		if (baseEntity == null || baseEntity is BasePlayer)
 		{
-			string @string = arg.GetString(0);
-			if (ArgEx.Player(arg) != null)
-			{
-				Debug.Log("[ENTCMD] " + ArgEx.Player(arg).displayName + "/" + ArgEx.Player(arg).userID + " used *" + @string + "* on ent: " + baseEntity.name);
-			}
-			switch (@string)
-			{
-			case "kill":
-				baseEntity.AdminKill();
-				break;
-			case "lock":
-				baseEntity.SetFlag(BaseEntity.Flags.Locked, b: true);
-				break;
-			case "unlock":
-				baseEntity.SetFlag(BaseEntity.Flags.Locked, b: false);
-				break;
-			case "debug":
-				baseEntity.SetFlag(BaseEntity.Flags.Debugging, b: true);
-				break;
-			case "undebug":
-				baseEntity.SetFlag(BaseEntity.Flags.Debugging, b: false);
-				break;
-			case "who":
-				arg.ReplyWith(baseEntity.Admin_Who());
-				break;
-			case "auth":
-				arg.ReplyWith(AuthList(baseEntity));
-				break;
-			default:
-				arg.ReplyWith("Unknown command");
-				break;
-			}
+			return;
 		}
+		string @string = arg.GetString(0);
+		if (ArgEx.Player(arg) != null)
+		{
+			Debug.Log("[ENTCMD] " + ArgEx.Player(arg).displayName + "/" + ArgEx.Player(arg).userID + " used *" + @string + "* on ent: " + baseEntity.name);
+		}
+		switch (@string)
+		{
+		case "kill":
+			baseEntity.AdminKill();
+			return;
+		case "lock":
+			baseEntity.SetFlag(BaseEntity.Flags.Locked, b: true);
+			return;
+		case "unlock":
+			baseEntity.SetFlag(BaseEntity.Flags.Locked, b: false);
+			return;
+		case "debug":
+			baseEntity.SetFlag(BaseEntity.Flags.Debugging, b: true);
+			return;
+		case "undebug":
+			baseEntity.SetFlag(BaseEntity.Flags.Debugging, b: false);
+			return;
+		case "who":
+			arg.ReplyWith(baseEntity.Admin_Who());
+			return;
+		case "auth":
+			arg.ReplyWith(AuthList(baseEntity));
+			return;
+		case "upgrade":
+			arg.ReplyWith(ChangeGrade(baseEntity, arg.GetInt(2, 1), 0, BuildingGrade.Enum.None, arg.GetFloat(3)));
+			return;
+		case "downgrade":
+			arg.ReplyWith(ChangeGrade(baseEntity, 0, arg.GetInt(2, 1), BuildingGrade.Enum.None, arg.GetFloat(3)));
+			return;
+		case "setgrade":
+			arg.ReplyWith(ChangeGrade(baseEntity, 0, 0, (BuildingGrade.Enum)arg.GetInt(2), arg.GetFloat(3)));
+			return;
+		case "repair":
+			RunInRadius(arg.GetFloat(2), baseEntity, delegate(BaseCombatEntity entity)
+			{
+				if (entity.repair.enabled)
+				{
+					entity.SetHealth(entity.MaxHealth());
+				}
+			});
+			break;
+		}
+		arg.ReplyWith("Unknown command");
 	}
 
 	private static string AuthList(BaseEntity ent)
@@ -889,6 +957,60 @@ public class Admin : ConsoleSystem
 		return text;
 	}
 
+	public static string ChangeGrade(BaseEntity entity, int increaseBy = 0, int decreaseBy = 0, BuildingGrade.Enum targetGrade = BuildingGrade.Enum.None, float radius = 0f)
+	{
+		if (entity as BuildingBlock == null)
+		{
+			return $"'{entity}' is not a building block";
+		}
+		RunInRadius(radius, entity, delegate(BuildingBlock block)
+		{
+			BuildingGrade.Enum grade = block.grade;
+			if (targetGrade > BuildingGrade.Enum.None && targetGrade < BuildingGrade.Enum.Count)
+			{
+				grade = targetGrade;
+			}
+			else
+			{
+				grade = (BuildingGrade.Enum)Mathf.Min((int)(grade + increaseBy), 4);
+				grade = (BuildingGrade.Enum)Mathf.Max((int)(grade - decreaseBy), 0);
+			}
+			if (grade != block.grade)
+			{
+				block.ChangeGrade(grade);
+			}
+		});
+		int count = Facepunch.Pool.GetList<BuildingBlock>().Count;
+		return $"Upgraded/downgraded '{count}' building block(s)";
+	}
+
+	private static bool RunInRadius<T>(float radius, BaseEntity initial, Action<T> callback, Func<T, bool> filter = null) where T : BaseEntity
+	{
+		List<T> list = Facepunch.Pool.GetList<T>();
+		radius = Mathf.Clamp(radius, 0f, 200f);
+		if (radius > 0f)
+		{
+			global::Vis.Entities(initial.transform.position, radius, list, 2097152);
+		}
+		else if (initial is T item)
+		{
+			list.Add(item);
+		}
+		foreach (T item2 in list)
+		{
+			try
+			{
+				callback(item2);
+			}
+			catch (Exception arg)
+			{
+				Debug.LogError($"Exception while running callback in radius: {arg}");
+				return false;
+			}
+		}
+		return true;
+	}
+
 	[ServerVar(Help = "Get a list of players")]
 	public static PlayerInfo[] playerlist()
 	{
@@ -943,6 +1065,15 @@ public class Admin : ConsoleSystem
 	}
 
 	[ServerVar]
+	public static void AdminUI_FullRefresh(Arg arg)
+	{
+		AdminUI_RequestPlayerList(arg);
+		AdminUI_RequestServerInfo(arg);
+		AdminUI_RequestServerConvars(arg);
+		AdminUI_RequestUGCList(arg);
+	}
+
+	[ServerVar]
 	public static void AdminUI_RequestPlayerList(Arg arg)
 	{
 		if (allowAdminUI)
@@ -983,5 +1114,119 @@ public class Admin : ConsoleSystem
 		}
 		ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceiveCommands", JsonConvert.SerializeObject(obj));
 		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	[ServerVar]
+	public static void AdminUI_RequestUGCList(Arg arg)
+	{
+		if (!allowAdminUI)
+		{
+			return;
+		}
+		List<ServerUGCInfo> obj = Facepunch.Pool.GetList<ServerUGCInfo>();
+		uint[] array = null;
+		ulong[] array2 = null;
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			array = null;
+			array2 = null;
+			UGCType uGCType = UGCType.ImageJpg;
+			if (serverEntity.TryGetComponent<IUGCBrowserEntity>(out var component))
+			{
+				array = component.GetContentCRCs;
+				array2 = component.EditingHistory.ToArray();
+				uGCType = component.ContentType;
+			}
+			if (array == null || array.Length == 0)
+			{
+				continue;
+			}
+			bool flag = false;
+			uint[] array3 = array;
+			for (int i = 0; i < array3.Length; i++)
+			{
+				if (array3[i] != 0)
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (uGCType == UGCType.PatternBoomer)
+			{
+				flag = true;
+			}
+			if (flag)
+			{
+				obj.Add(new ServerUGCInfo
+				{
+					entityId = serverEntity.net.ID,
+					crcs = array,
+					contentType = uGCType,
+					entityPrefabID = serverEntity.prefabID,
+					shortPrefabName = serverEntity.ShortPrefabName,
+					playerIds = array2
+				});
+			}
+		}
+		ConsoleNetwork.SendClientCommand(arg.Connection, "AdminUI_ReceiveUGCList", JsonConvert.SerializeObject(obj));
+		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	[ServerVar]
+	public static void AdminUI_RequestUGCContent(Arg arg)
+	{
+		if (allowAdminUI && !(ArgEx.Player(arg) == null))
+		{
+			uint uInt = arg.GetUInt(0);
+			uint uInt2 = arg.GetUInt(1);
+			FileStorage.Type @int = (FileStorage.Type)arg.GetInt(2);
+			uint uInt3 = arg.GetUInt(3);
+			byte[] array = FileStorage.server.Get(uInt, @int, uInt2, uInt3);
+			if (array != null)
+			{
+				SendInfo sendInfo = new SendInfo(arg.Connection);
+				sendInfo.channel = 2;
+				sendInfo.method = SendMethod.Reliable;
+				SendInfo sendInfo2 = sendInfo;
+				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedUGC", uInt, (uint)array.Length, array, uInt3, (byte)@int);
+			}
+		}
+	}
+
+	[ServerVar]
+	public static void AdminUI_DeleteUGCContent(Arg arg)
+	{
+		if (!allowAdminUI)
+		{
+			return;
+		}
+		uint uInt = arg.GetUInt(0);
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+		if (baseNetworkable != null)
+		{
+			FileStorage.server.RemoveAllByEntity(uInt);
+			if (baseNetworkable.TryGetComponent<IUGCBrowserEntity>(out var component))
+			{
+				component.ClearContent();
+			}
+		}
+	}
+
+	[ServerVar]
+	public static void AdminUI_RequestFireworkPattern(Arg arg)
+	{
+		if (allowAdminUI)
+		{
+			uint uInt = arg.GetUInt(0);
+			BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+			if (baseNetworkable != null && baseNetworkable is PatternFirework patternFirework)
+			{
+				SendInfo sendInfo = new SendInfo(arg.Connection);
+				sendInfo.channel = 2;
+				sendInfo.method = SendMethod.Reliable;
+				SendInfo sendInfo2 = sendInfo;
+				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedPatternFirework", uInt, patternFirework.Design.ToProtoBytes());
+			}
+		}
 	}
 }

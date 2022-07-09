@@ -21,4 +21,6 @@ public class SelectedContact : SingletonComponent<SelectedContact>
 	public Translate.Phrase nowPhrase;
 
 	public Translate.Phrase agoSuffix;
+
+	public RustButton chatMute;
 }

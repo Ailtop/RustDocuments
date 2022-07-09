@@ -14,11 +14,11 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 
 	public List<AlignedLineDrawer.LinePoint> LinePoints = new List<AlignedLineDrawer.LinePoint>();
 
-	private Color colour = Color.white;
+	public Color colour = Color.white;
 
-	private float width;
+	public float width;
 
-	private EntityRef<BasePlayer> editingPlayer;
+	public EntityRef<BasePlayer> editingPlayer;
 
 	public GroundWatch groundWatch;
 
@@ -171,7 +171,7 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 		Invoke(TimeoutEditing, 30f);
 	}
 
-	private void TimeoutEditing()
+	public void TimeoutEditing()
 	{
 		if (editingPlayer.IsSet)
 		{
@@ -189,18 +189,10 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 		{
 			return;
 		}
-		bool flag = msg.read.Int32() == 1;
+		bool allowNewSprayImmediately = msg.read.Int32() == 1;
 		if (basePlayer != null && basePlayer.GetHeldEntity() != null && basePlayer.GetHeldEntity() is SprayCan sprayCan)
 		{
-			sprayCan.ClearPaintingLine();
-			if (flag)
-			{
-				sprayCan.ClearBusy();
-			}
-			else
-			{
-				sprayCan.Invoke(sprayCan.ClearBusy, 0.1f);
-			}
+			sprayCan.ClearPaintingLine(allowNewSprayImmediately);
 		}
 		editingPlayer.Set(null);
 		SprayList obj = SprayList.Deserialize(msg.read);
@@ -280,7 +272,7 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 		}
 	}
 
-	private void CopyPoints(List<AlignedLineDrawer.LinePoint> from, List<LinePoint> to)
+	public void CopyPoints(List<AlignedLineDrawer.LinePoint> from, List<LinePoint> to)
 	{
 		to.Clear();
 		foreach (AlignedLineDrawer.LinePoint item in from)
@@ -292,7 +284,7 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 		}
 	}
 
-	private void CopyPoints(List<AlignedLineDrawer.LinePoint> from, List<Vector3> to)
+	public void CopyPoints(List<AlignedLineDrawer.LinePoint> from, List<Vector3> to)
 	{
 		to.Clear();
 		foreach (AlignedLineDrawer.LinePoint item in from)
@@ -302,7 +294,7 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 		}
 	}
 
-	private void CopyPoints(List<LinePoint> from, List<AlignedLineDrawer.LinePoint> to)
+	public void CopyPoints(List<LinePoint> from, List<AlignedLineDrawer.LinePoint> to)
 	{
 		to.Clear();
 		foreach (LinePoint item in from)

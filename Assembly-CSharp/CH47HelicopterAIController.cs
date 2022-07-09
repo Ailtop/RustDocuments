@@ -297,7 +297,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 
 	public override void OnAttacked(HitInfo info)
 	{
-		if (Interface.CallHook("OnHelicopterAttacked", this, info) == null)
+		if (Interface.CallHook("OnHelicopterAttack", this, info) == null)
 		{
 			base.OnAttacked(info);
 			InitiateAnger();

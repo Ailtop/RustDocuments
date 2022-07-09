@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -123,7 +124,7 @@ public class Locker : StorageContainer
 	public void RPC_Equip(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
-		if (num < 0 || num >= 3 || IsEquipping())
+		if (num < 0 || num >= 3 || Interface.CallHook("OnLockerSwap", this, num, msg.player) != null || IsEquipping())
 		{
 			return;
 		}

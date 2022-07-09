@@ -195,4 +195,13 @@ public class Drone : RemoteControlEntity
 	{
 		return Time.fixedTime;
 	}
+
+	public override Vector3 GetLocalVelocityServer()
+	{
+		if (body == null)
+		{
+			return Vector3.zero;
+		}
+		return body.velocity;
+	}
 }

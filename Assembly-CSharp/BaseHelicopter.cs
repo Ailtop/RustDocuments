@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
@@ -202,6 +203,10 @@ public class BaseHelicopter : BaseCombatEntity
 
 	public override void Hurt(HitInfo info)
 	{
+		if (Interface.CallHook("OnHelicopterAttacked", this, info) != null)
+		{
+			return;
+		}
 		bool flag = false;
 		if (info.damageTypes.Total() >= base.health)
 		{

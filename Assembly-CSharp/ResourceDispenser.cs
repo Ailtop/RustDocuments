@@ -286,31 +286,32 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		}
 		float num = Mathf.Min(gatherDamage, base.baseEntity.Health()) / base.baseEntity.MaxHealth();
 		float num2 = itemAmt.startAmount / startingItemCounts;
-		float num3 = Mathf.Clamp(itemAmt.startAmount * num / num2, 0f, itemAmt.amount);
-		float num4 = num3 * destroyFraction * 2f;
-		if (itemAmt.amount <= num3 + num4)
+		float f = Mathf.Clamp(itemAmt.startAmount * num / num2, 0f, itemAmt.amount);
+		f = Mathf.Round(f);
+		float num3 = f * destroyFraction * 2f;
+		if (itemAmt.amount <= f + num3)
 		{
-			float num5 = (num3 + num4) / itemAmt.amount;
-			num3 /= num5;
-			num4 /= num5;
+			float num4 = (f + num3) / itemAmt.amount;
+			f /= num4;
+			num3 /= num4;
 		}
+		itemAmt.amount -= Mathf.Floor(f);
 		itemAmt.amount -= Mathf.Floor(num3);
-		itemAmt.amount -= Mathf.Floor(num4);
-		if (num3 < 1f)
+		if (f < 1f)
 		{
-			num3 = ((UnityEngine.Random.Range(0f, 1f) <= num3) ? 1f : 0f);
+			f = ((UnityEngine.Random.Range(0f, 1f) <= f) ? 1f : 0f);
 			itemAmt.amount = 0f;
 		}
 		if (itemAmt.amount < 0f)
 		{
 			itemAmt.amount = 0f;
 		}
-		if (num3 >= 1f)
+		if (f >= 1f)
 		{
-			int num6 = CalculateGatherBonus(entity, itemAmt, num3);
-			int iAmount = Mathf.FloorToInt(num3) + num6;
+			int num5 = CalculateGatherBonus(entity, itemAmt, f);
+			int iAmount = Mathf.FloorToInt(f) + num5;
 			Item item = ItemManager.CreateByItemID(itemAmt.itemid, iAmount, 0uL);
-			if (item != null && Interface.CallHook("OnDispenserGather", this, entity, item) == null)
+			if (Interface.CallHook("OnDispenserGather", this, entity, item) == null && item != null)
 			{
 				OverrideOwnership(item, attackWeapon);
 				entity.GiveItem(item, BaseEntity.GiveItemReason.ResourceHarvested);

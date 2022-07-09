@@ -3,6 +3,7 @@ using System;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using UnityEngine;
@@ -15,6 +16,9 @@ public class SprayCanSpray : DecayEntity, ISplashable
 	public ulong sprayedByPlayer;
 
 	public static ListHashSet<SprayCanSpray> AllSprays = new ListHashSet<SprayCanSpray>();
+
+	[NonSerialized]
+	public int splashThreshold;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -107,7 +111,7 @@ public class SprayCanSpray : DecayEntity, ISplashable
 		}
 	}
 
-	private void ApplyOutOfAuthConditionPenalty()
+	public void ApplyOutOfAuthConditionPenalty()
 	{
 		if (!IsFullySpawned())
 		{
@@ -137,7 +141,7 @@ public class SprayCanSpray : DecayEntity, ISplashable
 		}
 	}
 
-	private void RainCheck()
+	public void RainCheck()
 	{
 		if (Climate.GetRain(base.transform.position) > 0f && IsOutside())
 		{
@@ -147,7 +151,7 @@ public class SprayCanSpray : DecayEntity, ISplashable
 
 	public bool WantsSplash(ItemDefinition splashType, int amount)
 	{
-		return amount > 0;
+		return amount > splashThreshold;
 	}
 
 	public int DoSplash(ItemDefinition splashType, int amount)
@@ -163,13 +167,13 @@ public class SprayCanSpray : DecayEntity, ISplashable
 	private void Server_RequestWaterClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && Menu_WaterClear_ShowIf(player))
+		if (!(player == null) && Menu_WaterClear_ShowIf(player) && Interface.CallHook("OnSprayRemove", this, player) == null)
 		{
 			Kill();
 		}
 	}
 
-	private bool Menu_WaterClear_ShowIf(BasePlayer player)
+	public bool Menu_WaterClear_ShowIf(BasePlayer player)
 	{
 		if (player.GetHeldEntity() != null && player.GetHeldEntity() is BaseLiquidVessel baseLiquidVessel)
 		{

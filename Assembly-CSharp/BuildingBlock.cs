@@ -417,15 +417,26 @@ public class BuildingBlock : StabilityEntity
 			if (!(constructionGrade == null) && CanChangeToGrade(@enum, msg.player) && CanAffordUpgrade(@enum, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum) == null && !(base.SecondsSinceAttacked < 30f))
 			{
 				PayForUpgrade(constructionGrade, msg.player);
-				SetGrade(@enum);
-				SetHealthToMax();
-				StartBeingRotatable();
-				SendNetworkUpdate();
-				UpdateSkin();
-				ResetUpkeepTime();
-				UpdateSurroundingEntities();
-				BuildingManager.server.GetBuilding(buildingID)?.Dirty();
-				Effect.server.Run("assets/bundled/prefabs/fx/build/promote_" + @enum.ToString().ToLower() + ".prefab", this, 0u, Vector3.zero, Vector3.zero);
+				ChangeGrade(@enum, playEffect: true);
+			}
+		}
+	}
+
+	public void ChangeGrade(BuildingGrade.Enum targetGrade, bool playEffect = false)
+	{
+		if (grade != targetGrade)
+		{
+			SetGrade(targetGrade);
+			SetHealthToMax();
+			StartBeingRotatable();
+			SendNetworkUpdate();
+			UpdateSkin();
+			ResetUpkeepTime();
+			UpdateSurroundingEntities();
+			BuildingManager.server.GetBuilding(buildingID)?.Dirty();
+			if (playEffect)
+			{
+				Effect.server.Run("assets/bundled/prefabs/fx/build/promote_" + targetGrade.ToString().ToLower() + ".prefab", this, 0u, Vector3.zero, Vector3.zero);
 			}
 		}
 	}

@@ -25,6 +25,25 @@ public class Global : ConsoleSystem
 	[ClientVar]
 	public static int maxthreads = 8;
 
+	private const int DefaultWarmupConcurrency = 256;
+
+	[ServerVar]
+	[ClientVar]
+	public static int warmupConcurrency = 256;
+
+	[ServerVar]
+	[ClientVar]
+	public static int preloadConcurrency = 256;
+
+	[ServerVar]
+	[ClientVar]
+	public static bool forceUnloadBundles = false;
+
+	private const bool DefaultAsyncWarmupEnabled = true;
+
+	[ServerVar]
+	public static bool asyncWarmup = true;
+
 	[ServerVar(Saved = true)]
 	[ClientVar(Saved = true)]
 	public static int perf = 0;
@@ -42,7 +61,7 @@ public class Global : ConsoleSystem
 	public static float SprayDuration = 10800f;
 
 	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "If a player sprays more than this, the oldest spray will be destroyed. 0 will disable")]
-	public static int MaxSpraysPerPlayer = 25;
+	public static int MaxSpraysPerPlayer = 40;
 
 	[ServerVar]
 	[ClientVar]

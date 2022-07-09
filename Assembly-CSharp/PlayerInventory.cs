@@ -296,7 +296,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		uint id = msg.read.UInt32();
 		string text = msg.read.String();
 		Item item = FindItemUID(id);
-		if (item == null || Interface.CallHook("OnItemAction", item, text, msg.player) != null || item.IsLocked() || !CanMoveItemsFrom(item.parent.entityOwner, item))
+		if (item == null || Interface.CallHook("OnItemAction", item, text, msg.player) != null || item.IsLocked() || !CanMoveItemsFrom(item.GetEntityOwner(), item))
 		{
 			return;
 		}
@@ -345,7 +345,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			{
 				return;
 			}
-			if (!CanMoveItemsFrom(item.parent.entityOwner, item))
+			if (!CanMoveItemsFrom(item.GetEntityOwner(), item))
 			{
 				msg.player.ChatMessage("Cannot move item!");
 				return;
@@ -662,6 +662,11 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	public List<Item> FindItemIDs(int id)
 	{
+		object obj = Interface.CallHook("OnInventoryItemsFind", this, id);
+		if (obj is List<Item>)
+		{
+			return (List<Item>)obj;
+		}
 		List<Item> list = new List<Item>();
 		if (containerMain != null)
 		{
@@ -882,6 +887,11 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	public int Take(List<Item> collect, int itemid, int amount)
 	{
+		object obj = Interface.CallHook("OnInventoryItemsTake", this, collect, itemid, amount);
+		if (obj is int)
+		{
+			return (int)obj;
+		}
 		int num = 0;
 		if (containerMain != null)
 		{
@@ -917,6 +927,11 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		if (itemid == 0)
 		{
 			return 0;
+		}
+		object obj = Interface.CallHook("OnInventoryItemsCount", this, itemid);
+		if (obj is int)
+		{
+			return (int)obj;
 		}
 		int num = 0;
 		if (containerMain != null)
@@ -972,13 +987,16 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	public void FindAmmo(List<Item> list, AmmoTypes ammoType)
 	{
-		if (containerMain != null)
+		if (Interface.CallHook("OnInventoryAmmoFind", this, list, ammoType) == null)
 		{
-			containerMain.FindAmmo(list, ammoType);
-		}
-		if (containerBelt != null)
-		{
-			containerBelt.FindAmmo(list, ammoType);
+			if (containerMain != null)
+			{
+				containerMain.FindAmmo(list, ammoType);
+			}
+			if (containerBelt != null)
+			{
+				containerBelt.FindAmmo(list, ammoType);
+			}
 		}
 	}
 

@@ -116,12 +116,19 @@ public class CompleteTrain : IDisposable
 
 	public void RemoveTrainCar(TrainCar trainCar)
 	{
-		trainCars.Remove(trainCar);
-		timeSinceLastChange = 0f;
+		if (!disposed)
+		{
+			trainCars.Remove(trainCar);
+			timeSinceLastChange = 0f;
+		}
 	}
 
 	public float GetTrackSpeedFor(TrainCar trainCar)
 	{
+		if (disposed)
+		{
+			return 0f;
+		}
 		if (trainCars.IndexOf(trainCar) < 0)
 		{
 			Debug.LogError(GetType().Name + ": Train car not found in the trainCars list.");
@@ -141,10 +148,14 @@ public class CompleteTrain : IDisposable
 			return;
 		}
 		ranUpdateTick = true;
-		if (!IsAllAsleep() || HasAnyEnginesOn() || HasAnyCollisions())
+		if (IsAllAsleep() && !HasAnyEnginesOn() && !HasAnyCollisions())
 		{
-			ParamsTick();
-			MovementTick(dt);
+			return;
+		}
+		ParamsTick();
+		MovementTick(dt);
+		if (!disposed)
+		{
 			if (Mathf.Abs(trackSpeed) > 0.1f)
 			{
 				lastMovingTime = UnityEngine.Time.time;
@@ -158,6 +169,10 @@ public class CompleteTrain : IDisposable
 
 	public bool IncludesAnEngine()
 	{
+		if (disposed)
+		{
+			return false;
+		}
 		foreach (TrainCar trainCar in trainCars)
 		{
 			if (trainCar.IsEngine)
@@ -179,6 +194,10 @@ public class CompleteTrain : IDisposable
 
 	private bool HasAnyEnginesOn()
 	{
+		if (disposed)
+		{
+			return false;
+		}
 		foreach (TrainCar trainCar in trainCars)
 		{
 			if (trainCar.IsEngine && trainCar.IsOn())
@@ -191,6 +210,10 @@ public class CompleteTrain : IDisposable
 
 	private bool IsAllAsleep()
 	{
+		if (disposed)
+		{
+			return true;
+		}
 		foreach (TrainCar trainCar in trainCars)
 		{
 			if (!trainCar.rigidBody.IsSleeping())
@@ -203,6 +226,10 @@ public class CompleteTrain : IDisposable
 
 	private void SleepAll()
 	{
+		if (disposed)
+		{
+			return;
+		}
 		foreach (TrainCar trainCar in trainCars)
 		{
 			trainCar.rigidBody.Sleep();
@@ -211,6 +238,10 @@ public class CompleteTrain : IDisposable
 
 	public bool ContainsOnly(TrainCar trainCar)
 	{
+		if (disposed)
+		{
+			return false;
+		}
 		if (trainCars.Count == 1)
 		{
 			return trainCars[0] == trainCar;
@@ -369,6 +400,10 @@ public class CompleteTrain : IDisposable
 
 	public bool Matches(List<TrainCar> listToCompare)
 	{
+		if (disposed)
+		{
+			return false;
+		}
 		if (listToCompare.Count != trainCars.Count)
 		{
 			return false;
@@ -397,6 +432,10 @@ public class CompleteTrain : IDisposable
 
 	public bool AnyPlayersOnTrain()
 	{
+		if (disposed)
+		{
+			return false;
+		}
 		foreach (TrainCar trainCar in trainCars)
 		{
 			if (trainCar.AnyPlayersOnTrainCar())
@@ -409,12 +448,16 @@ public class CompleteTrain : IDisposable
 
 	private bool IsCoupledBackwards(TrainCar trainCar)
 	{
+		if (disposed)
+		{
+			return false;
+		}
 		return IsCoupledBackwards(trainCars.IndexOf(trainCar));
 	}
 
 	private bool IsCoupledBackwards(int trainCarIndex)
 	{
-		if (trainCars.Count == 1 || trainCarIndex < 0 || trainCarIndex > trainCars.Count - 1)
+		if (disposed || trainCars.Count == 1 || trainCarIndex < 0 || trainCarIndex > trainCars.Count - 1)
 		{
 			return false;
 		}
@@ -467,9 +510,17 @@ public class CompleteTrain : IDisposable
 		TrainCar owner = frontCollisionTrigger.owner;
 		Vector3 forwardVector = (IsCoupledBackwards(owner) ? (-owner.transform.forward) : owner.transform.forward);
 		trackSpeed = ApplyCollisions(trackSpeed, owner, forwardVector, atOurFront: true, frontCollisionTrigger, totalMass, ref staticCollidingAtFront, deltaTime);
+		if (disposed)
+		{
+			return trackSpeed;
+		}
 		owner = rearCollisionTrigger.owner;
 		forwardVector = (IsCoupledBackwards(owner) ? (-owner.transform.forward) : owner.transform.forward);
 		trackSpeed = ApplyCollisions(trackSpeed, owner, forwardVector, atOurFront: false, rearCollisionTrigger, totalMass, ref staticCollidingAtRear, deltaTime);
+		if (disposed)
+		{
+			return trackSpeed;
+		}
 		Rigidbody rigidbody = null;
 		foreach (KeyValuePair<Rigidbody, float> prevTrackSpeed in prevTrackSpeeds)
 		{

@@ -198,7 +198,7 @@ public class TriggerParent : TriggerBase, IServerComponent
 		}
 	}
 
-	private bool IsClipping(BaseEntity ent)
+	protected virtual bool IsClipping(BaseEntity ent)
 	{
 		return GamePhysics.CheckOBB(ent.WorldSpaceBounds(), 1218511105, QueryTriggerInteraction.Ignore);
 	}

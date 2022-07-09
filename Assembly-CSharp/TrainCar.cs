@@ -288,7 +288,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 		else
 		{
-			Kill();
+			Invoke(base.KillMessage, 0f);
 		}
 	}
 

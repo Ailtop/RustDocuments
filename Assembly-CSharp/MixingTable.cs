@@ -147,10 +147,11 @@ public class MixingTable : StorageContainer
 			return;
 		}
 		MixStartingPlayer = player;
-		List<Item> orderedContainerItems = GetOrderedContainerItems(base.inventory);
+		bool itemsAreContiguous;
+		List<Item> orderedContainerItems = GetOrderedContainerItems(base.inventory, out itemsAreContiguous);
 		currentRecipe = RecipeDictionary.GetMatchingRecipeAndQuantity(Recipes, orderedContainerItems, out var quantity);
 		currentQuantity = quantity;
-		if (!(currentRecipe == null) && (!currentRecipe.RequiresBlueprint || !(currentRecipe.ProducedItem != null) || player.blueprints.HasUnlocked(currentRecipe.ProducedItem)))
+		if (!(currentRecipe == null) && itemsAreContiguous && (!currentRecipe.RequiresBlueprint || !(currentRecipe.ProducedItem != null) || player.blueprints.HasUnlocked(currentRecipe.ProducedItem)))
 		{
 			if (base.isServer)
 			{
@@ -246,7 +247,7 @@ public class MixingTable : StorageContainer
 			Item slot = base.inventory.GetSlot(i);
 			if (slot == null)
 			{
-				continue;
+				break;
 			}
 			int num = slot.amount - currentRecipe.Ingredients[i].Count * currentQuantity;
 			if (num > 0)
@@ -326,8 +327,9 @@ public class MixingTable : StorageContainer
 		}
 	}
 
-	public List<Item> GetOrderedContainerItems(ItemContainer container)
+	public List<Item> GetOrderedContainerItems(ItemContainer container, out bool itemsAreContiguous)
 	{
+		itemsAreContiguous = true;
 		if (container == null)
 		{
 			return null;
@@ -341,12 +343,19 @@ public class MixingTable : StorageContainer
 			return null;
 		}
 		inventoryItems.Clear();
+		bool flag = false;
 		for (int i = 0; i < container.capacity; i++)
 		{
 			Item item = container.GetSlot(i);
+			if (item != null && flag)
+			{
+				itemsAreContiguous = false;
+				break;
+			}
 			if (item == null)
 			{
-				break;
+				flag = true;
+				continue;
 			}
 			if (GetItemWaterAmount(item) > 0)
 			{

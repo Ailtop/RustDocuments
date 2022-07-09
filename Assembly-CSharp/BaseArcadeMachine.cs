@@ -340,9 +340,9 @@ public class BaseArcadeMachine : BaseVehicle
 		}
 	}
 
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(30uL)]
-	[RPC_Server.IsVisible(3f)]
 	public void GetSnapshotFromClient(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

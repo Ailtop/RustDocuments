@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using ConVar;
 using Facepunch;
 using Network;
@@ -10,7 +11,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class Signage : IOEntity, ILOD, ISignage
+public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 {
 	private const float TextureRequestTimeout = 15f;
 
@@ -22,6 +23,8 @@ public class Signage : IOEntity, ILOD, ISignage
 	public uint[] textureIDs;
 
 	public ItemDefinition RequiredHeldEntity;
+
+	private List<ulong> editHistory = new List<ulong>();
 
 	public Vector2i TextureSize
 	{
@@ -52,6 +55,12 @@ public class Signage : IOEntity, ILOD, ISignage
 	public uint NetworkID => net.ID;
 
 	public FileStorage.Type FileType => FileStorage.Type.png;
+
+	public UGCType ContentType => UGCType.ImagePng;
+
+	public List<ulong> EditingHistory => editHistory;
+
+	public uint[] GetContentCRCs => GetTextureCRCs();
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -229,6 +238,7 @@ public class Signage : IOEntity, ILOD, ISignage
 			}
 			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
 		}
+		LogEdit(msg.player);
 		SendNetworkUpdate();
 		Interface.CallHook("OnSignUpdated", this, msg.player, num);
 	}
@@ -348,6 +358,29 @@ public class Signage : IOEntity, ILOD, ISignage
 		{
 			SetFlag(Flags.Locked, b: false);
 		}
+		if (info.msg.sign == null)
+		{
+			return;
+		}
+		if (info.msg.sign.editHistory != null)
+		{
+			if (editHistory == null)
+			{
+				editHistory = Facepunch.Pool.GetList<ulong>();
+			}
+			editHistory.Clear();
+			{
+				foreach (ulong item in info.msg.sign.editHistory)
+				{
+					editHistory.Add(item);
+				}
+				return;
+			}
+		}
+		if (editHistory != null)
+		{
+			Facepunch.Pool.FreeList(ref editHistory);
+		}
 	}
 
 	private bool HeldEntityCheck(BasePlayer player)
@@ -401,6 +434,15 @@ public class Signage : IOEntity, ILOD, ISignage
 		info.msg.sign = Facepunch.Pool.Get<Sign>();
 		info.msg.sign.imageid = 0u;
 		info.msg.sign.imageIds = list;
+		if (editHistory == null || editHistory.Count <= 0)
+		{
+			return;
+		}
+		info.msg.sign.editHistory = Facepunch.Pool.GetList<ulong>();
+		foreach (ulong item2 in editHistory)
+		{
+			info.msg.sign.editHistory.Add(item2);
+		}
 	}
 
 	public override void OnKilled(HitInfo info)
@@ -431,7 +473,7 @@ public class Signage : IOEntity, ILOD, ISignage
 		}
 		if (flag && createdItem.info.TryGetComponent<ItemModSign>(out var component))
 		{
-			component.OnSignPickedUp(this, createdItem);
+			component.OnSignPickedUp(this, this, createdItem);
 		}
 	}
 
@@ -443,7 +485,7 @@ public class Signage : IOEntity, ILOD, ISignage
 			SignContent associatedEntity = ItemModAssociatedEntity<SignContent>.GetAssociatedEntity(fromItem);
 			if (associatedEntity != null)
 			{
-				associatedEntity.CopyInfoToSign(this);
+				associatedEntity.CopyInfoToSign(this, this);
 			}
 		}
 	}
@@ -458,6 +500,40 @@ public class Signage : IOEntity, ILOD, ISignage
 		textureIDs = new uint[crcs.Length];
 		crcs.CopyTo(textureIDs, 0);
 		SendNetworkUpdate();
+	}
+
+	private void LogEdit(BasePlayer byPlayer)
+	{
+		if (!editHistory.Contains(byPlayer.userID))
+		{
+			editHistory.Insert(0, byPlayer.userID);
+			int num = 0;
+			while (editHistory.Count > 5 && num < 10)
+			{
+				editHistory.RemoveAt(5);
+				num++;
+			}
+		}
+	}
+
+	public void ClearContent()
+	{
+		SetTextureCRCs(Array.Empty<uint>());
+	}
+
+	public override string Admin_Who()
+	{
+		if (editHistory == null || editHistory.Count == 0)
+		{
+			return base.Admin_Who();
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendLine(base.Admin_Who());
+		for (int i = 0; i < editHistory.Count; i++)
+		{
+			stringBuilder.AppendLine($"Edit {0}: {editHistory[i]}");
+		}
+		return stringBuilder.ToString();
 	}
 
 	public override int ConsumptionAmount()

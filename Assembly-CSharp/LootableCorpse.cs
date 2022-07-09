@@ -25,7 +25,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	{
 		get
 		{
-			return _playerName;
+			return NameHelper.Get(playerSteamID, _playerName);
 		}
 		set
 		{

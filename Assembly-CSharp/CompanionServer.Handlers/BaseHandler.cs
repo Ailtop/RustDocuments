@@ -47,10 +47,15 @@ public abstract class BaseHandler<T> : IHandler, Pool.IPooled where T : class
 
 	public virtual ValidationResult Validate()
 	{
-		int orGenerateAppToken = SingletonComponent<ServerMgr>.Instance.persistance.GetOrGenerateAppToken(Request.playerId);
+		bool locked;
+		int orGenerateAppToken = SingletonComponent<ServerMgr>.Instance.persistance.GetOrGenerateAppToken(Request.playerId, out locked);
 		if (Request.playerId == 0L || Request.playerToken != orGenerateAppToken)
 		{
 			return ValidationResult.NotFound;
+		}
+		if (locked)
+		{
+			return ValidationResult.Banned;
 		}
 		if ((ServerUsers.Get(Request.playerId)?.group ?? ServerUsers.UserGroup.None) == ServerUsers.UserGroup.Banned)
 		{

@@ -549,9 +549,9 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	private void ToggleDefenderMode(RPCMessage msg)
 	{
 		if (staticRespawn)

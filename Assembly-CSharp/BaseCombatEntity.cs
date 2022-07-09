@@ -786,14 +786,14 @@ public class BaseCombatEntity : BaseEntity
 	{
 		using (TimeWarning.New("DoHitNotify"))
 		{
-			if (sendsHitNotification && !(info.Initiator == null) && info.Initiator is BasePlayer && !info.isHeadshot && !(this == info.Initiator) && UnityEngine.Time.frameCount != lastNotifyFrame)
+			if (sendsHitNotification && !(info.Initiator == null) && info.Initiator is BasePlayer && !(this == info.Initiator) && (!info.isHeadshot || !(info.HitEntity is BasePlayer)) && UnityEngine.Time.frameCount != lastNotifyFrame)
 			{
 				lastNotifyFrame = UnityEngine.Time.frameCount;
 				bool flag = info.Weapon is BaseMelee;
 				if (base.isServer && (!flag || sendsMeleeHitNotification))
 				{
 					bool arg = info.Initiator.net.connection == info.Predicted;
-					ClientRPCPlayer(null, info.Initiator as BasePlayer, "HitNotify", arg);
+					ClientRPCPlayerAndSpectators(null, info.Initiator as BasePlayer, "HitNotify", arg);
 				}
 			}
 		}

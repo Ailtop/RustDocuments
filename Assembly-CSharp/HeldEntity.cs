@@ -252,7 +252,6 @@ public class HeldEntity : BaseEntity
 		base.limitNetworking = false;
 		SetFlag(Flags.Disabled, b: false);
 		SetParent(GetOwnerPlayer(), GetBone(holsterInfo.holsterBone));
-		SetLightsOn(isOn: false);
 		return true;
 	}
 

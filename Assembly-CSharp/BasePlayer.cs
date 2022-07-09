@@ -12,6 +12,7 @@ using EasyAntiCheat.Server.Hydra;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
+using Facepunch.Models;
 using Facepunch.Rust;
 using Network;
 using Network.Visibility;
@@ -445,8 +446,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	public float cachedCraftLevel;
 
 	public float nextCheckTime;
-
-	private int? cachedAppToken;
 
 	public PersistantPlayer cachedPersistantPlayer;
 
@@ -898,20 +897,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 	}
 
-	public int appToken
-	{
-		get
-		{
-			if (cachedAppToken.HasValue)
-			{
-				return cachedAppToken.Value;
-			}
-			int orGenerateAppToken = SingletonComponent<ServerMgr>.Instance.persistance.GetOrGenerateAppToken(userID);
-			cachedAppToken = orGenerateAppToken;
-			return orGenerateAppToken;
-		}
-	}
-
 	public PersistantPlayer PersistantPlayerInfo
 	{
 		get
@@ -1022,7 +1007,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 	{
 		get
 		{
-			return _displayName;
+			return NameHelper.Get(userID, _displayName);
 		}
 		set
 		{
@@ -1174,6 +1159,42 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 				}
 				return true;
 			}
+			if (rpc == 3441821928u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnFeedbackReport "));
+				}
+				using (TimeWarning.New("OnFeedbackReport"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(3441821928u, "OnFeedbackReport", this, player, 1uL))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg6 = rPCMessage;
+							OnFeedbackReport(msg6);
+						}
+					}
+					catch (Exception exception5)
+					{
+						Debug.LogException(exception5);
+						player.Kick("RPC Error in OnFeedbackReport");
+					}
+				}
+				return true;
+			}
 			if (rpc == 1998170713 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -1198,13 +1219,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg6 = rPCMessage;
-							OnPlayerLanded(msg6);
+							RPCMessage msg7 = rPCMessage;
+							OnPlayerLanded(msg7);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception exception6)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in OnPlayerLanded");
 					}
 				}
@@ -1234,13 +1255,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg7 = rPCMessage;
-							OnPlayerReported(msg7);
+							RPCMessage msg8 = rPCMessage;
+							OnPlayerReported(msg8);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception exception7)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(exception7);
 						player.Kick("RPC Error in OnPlayerReported");
 					}
 				}
@@ -1270,13 +1291,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg8 = rPCMessage;
-							OnProjectileAttack(msg8);
+							RPCMessage msg9 = rPCMessage;
+							OnProjectileAttack(msg9);
 						}
 					}
-					catch (Exception exception7)
+					catch (Exception exception8)
 					{
-						Debug.LogException(exception7);
+						Debug.LogException(exception8);
 						player.Kick("RPC Error in OnProjectileAttack");
 					}
 				}
@@ -1306,13 +1327,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg9 = rPCMessage;
-							OnProjectileRicochet(msg9);
+							RPCMessage msg10 = rPCMessage;
+							OnProjectileRicochet(msg10);
 						}
 					}
-					catch (Exception exception8)
+					catch (Exception exception9)
 					{
-						Debug.LogException(exception8);
+						Debug.LogException(exception9);
 						player.Kick("RPC Error in OnProjectileRicochet");
 					}
 				}
@@ -1342,13 +1363,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg10 = rPCMessage;
-							OnProjectileUpdate(msg10);
+							RPCMessage msg11 = rPCMessage;
+							OnProjectileUpdate(msg11);
 						}
 					}
-					catch (Exception exception9)
+					catch (Exception exception10)
 					{
-						Debug.LogException(exception9);
+						Debug.LogException(exception10);
 						player.Kick("RPC Error in OnProjectileUpdate");
 					}
 				}
@@ -1378,13 +1399,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg11 = rPCMessage;
-							PerformanceReport(msg11);
+							RPCMessage msg12 = rPCMessage;
+							PerformanceReport(msg12);
 						}
 					}
-					catch (Exception exception10)
+					catch (Exception exception11)
 					{
-						Debug.LogException(exception10);
+						Debug.LogException(exception11);
 						player.Kick("RPC Error in PerformanceReport");
 					}
 				}
@@ -1418,13 +1439,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg12 = rPCMessage;
-							RequestRespawnInformation(msg12);
+							RPCMessage msg13 = rPCMessage;
+							RequestRespawnInformation(msg13);
 						}
 					}
-					catch (Exception exception11)
+					catch (Exception exception12)
 					{
-						Debug.LogException(exception11);
+						Debug.LogException(exception12);
 						player.Kick("RPC Error in RequestRespawnInformation");
 					}
 				}
@@ -1454,13 +1475,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg13 = rPCMessage;
-							RPC_Assist(msg13);
+							RPCMessage msg14 = rPCMessage;
+							RPC_Assist(msg14);
 						}
 					}
-					catch (Exception exception12)
+					catch (Exception exception13)
 					{
-						Debug.LogException(exception12);
+						Debug.LogException(exception13);
 						player.Kick("RPC Error in RPC_Assist");
 					}
 				}
@@ -1490,13 +1511,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg14 = rPCMessage;
-							RPC_KeepAlive(msg14);
+							RPCMessage msg15 = rPCMessage;
+							RPC_KeepAlive(msg15);
 						}
 					}
-					catch (Exception exception13)
+					catch (Exception exception14)
 					{
-						Debug.LogException(exception13);
+						Debug.LogException(exception14);
 						player.Kick("RPC Error in RPC_KeepAlive");
 					}
 				}
@@ -1526,13 +1547,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg15 = rPCMessage;
-							RPC_LootPlayer(msg15);
+							RPCMessage msg16 = rPCMessage;
+							RPC_LootPlayer(msg16);
 						}
 					}
-					catch (Exception exception14)
+					catch (Exception exception15)
 					{
-						Debug.LogException(exception14);
+						Debug.LogException(exception15);
 						player.Kick("RPC Error in RPC_LootPlayer");
 					}
 				}
@@ -1555,13 +1576,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg16 = rPCMessage;
-							RPC_StartClimb(msg16);
+							RPCMessage msg17 = rPCMessage;
+							RPC_StartClimb(msg17);
 						}
 					}
-					catch (Exception exception15)
+					catch (Exception exception16)
 					{
-						Debug.LogException(exception15);
+						Debug.LogException(exception16);
 						player.Kick("RPC Error in RPC_StartClimb");
 					}
 				}
@@ -1591,13 +1612,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg17 = rPCMessage;
-							Server_AddMarker(msg17);
+							RPCMessage msg18 = rPCMessage;
+							Server_AddMarker(msg18);
 						}
 					}
-					catch (Exception exception16)
+					catch (Exception exception17)
 					{
-						Debug.LogException(exception16);
+						Debug.LogException(exception17);
 						player.Kick("RPC Error in Server_AddMarker");
 					}
 				}
@@ -1630,9 +1651,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							Server_CancelGesture();
 						}
 					}
-					catch (Exception exception17)
+					catch (Exception exception18)
 					{
-						Debug.LogException(exception17);
+						Debug.LogException(exception18);
 						player.Kick("RPC Error in Server_CancelGesture");
 					}
 				}
@@ -1662,13 +1683,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg18 = rPCMessage;
-							Server_ClearMapMarkers(msg18);
+							RPCMessage msg19 = rPCMessage;
+							Server_ClearMapMarkers(msg19);
 						}
 					}
-					catch (Exception exception18)
+					catch (Exception exception19)
 					{
-						Debug.LogException(exception18);
+						Debug.LogException(exception19);
 						player.Kick("RPC Error in Server_ClearMapMarkers");
 					}
 				}
@@ -1698,13 +1719,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg19 = rPCMessage;
-							Server_RemovePointOfInterest(msg19);
+							RPCMessage msg20 = rPCMessage;
+							Server_RemovePointOfInterest(msg20);
 						}
 					}
-					catch (Exception exception19)
+					catch (Exception exception20)
 					{
-						Debug.LogException(exception19);
+						Debug.LogException(exception20);
 						player.Kick("RPC Error in Server_RemovePointOfInterest");
 					}
 				}
@@ -1734,13 +1755,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg20 = rPCMessage;
-							Server_RequestMarkers(msg20);
+							RPCMessage msg21 = rPCMessage;
+							Server_RequestMarkers(msg21);
 						}
 					}
-					catch (Exception exception20)
+					catch (Exception exception21)
 					{
-						Debug.LogException(exception20);
+						Debug.LogException(exception21);
 						player.Kick("RPC Error in Server_RequestMarkers");
 					}
 				}
@@ -1774,13 +1795,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg21 = rPCMessage;
-							Server_StartGesture(msg21);
+							RPCMessage msg22 = rPCMessage;
+							Server_StartGesture(msg22);
 						}
 					}
-					catch (Exception exception21)
+					catch (Exception exception22)
 					{
-						Debug.LogException(exception21);
+						Debug.LogException(exception22);
 						player.Kick("RPC Error in Server_StartGesture");
 					}
 				}
@@ -1803,13 +1824,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg22 = rPCMessage;
-							ServerRPC_UnderwearChange(msg22);
+							RPCMessage msg23 = rPCMessage;
+							ServerRPC_UnderwearChange(msg23);
 						}
 					}
-					catch (Exception exception22)
+					catch (Exception exception23)
 					{
-						Debug.LogException(exception22);
+						Debug.LogException(exception23);
 						player.Kick("RPC Error in ServerRPC_UnderwearChange");
 					}
 				}
@@ -1832,13 +1853,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg23 = rPCMessage;
-							SV_Drink(msg23);
+							RPCMessage msg24 = rPCMessage;
+							SV_Drink(msg24);
 						}
 					}
-					catch (Exception exception23)
+					catch (Exception exception24)
 					{
-						Debug.LogException(exception23);
+						Debug.LogException(exception24);
 						player.Kick("RPC Error in SV_Drink");
 					}
 				}
@@ -2246,9 +2267,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		currentGesture = null;
 	}
 
-	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(10uL)]
 	public void Server_CancelGesture()
 	{
 		currentGesture = null;
@@ -2821,7 +2842,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 225;
+		missions.protocol = 226;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -2921,7 +2942,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (225 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (226 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save clearing");
 				loadedMissions.activeMission = -1;
@@ -3972,7 +3993,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		}
 		UnityEngine.Vector3 projectileVelocity = info.ProjectileVelocity;
 		Item item = ((recycleItem != null) ? recycleItem : ItemManager.Create(itemDef, 1, 0uL));
-		if (Interface.CallHook("OnCreateWorldProjectile", info, item) != null)
+		if (Interface.CallHook("OnWorldProjectileCreate", info, item) != null)
 		{
 			return;
 		}
@@ -4986,9 +5007,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -6123,6 +6144,41 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 		Interface.CallHook("OnPlayerReported", this, text5, text4, text, text2, text3);
 	}
 
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
+	public void OnFeedbackReport(RPCMessage msg)
+	{
+		if (ConVar.Server.printReportsToConsole || !string.IsNullOrEmpty(ConVar.Server.reportsServerEndpoint))
+		{
+			string text = msg.read.String();
+			string text2 = msg.read.StringMultiLine();
+			ReportType reportType = (ReportType)Mathf.Clamp(msg.read.Int32(), 0, 5);
+			if (ConVar.Server.printReportsToConsole)
+			{
+				DebugEx.Log($"[FeedbackReport] {this} reported {reportType} - \"{text}\" \"{text2}\"");
+				RCon.Broadcast(RCon.LogType.Report, new
+				{
+					PlayerId = UserIDString,
+					PlayerName = displayName,
+					Subject = text,
+					Message = text2,
+					Type = reportType
+				});
+			}
+			if (!string.IsNullOrEmpty(ConVar.Server.reportsServerEndpoint))
+			{
+				string image = msg.read.StringMultiLine(60000);
+				Facepunch.Models.Feedback feedback = default(Facepunch.Models.Feedback);
+				feedback.Type = reportType;
+				feedback.Message = text2;
+				feedback.Subject = text;
+				Facepunch.Models.Feedback feedback2 = feedback;
+				feedback2.AppInfo.Image = image;
+				Facepunch.Feedback.ServerReport(ConVar.Server.reportsServerEndpoint, userID, ConVar.Server.reportsServerEndpointKey, feedback2);
+			}
+		}
+	}
+
 	public void StartDemoRecording()
 	{
 		if (net != null && net.connection != null && !net.connection.IsRecording)
@@ -6349,86 +6405,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			if (child2 is BasePlayer)
 			{
 				IsBeingSpectated = true;
-			}
-		}
-	}
-
-	public void ClientRPCPlayerAndSpectators(Network.Connection sourceConnection, BasePlayer player, string funcName)
-	{
-		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
-		{
-			return;
-		}
-		ClientRPCEx(new SendInfo(player.net.connection), sourceConnection, funcName);
-		if (!IsBeingSpectated || children == null)
-		{
-			return;
-		}
-		foreach (BaseEntity child in children)
-		{
-			if (child is BasePlayer player2)
-			{
-				ClientRPCPlayer(sourceConnection, player2, funcName);
-			}
-		}
-	}
-
-	public void ClientRPCPlayerAndSpectators<T1>(Network.Connection sourceConnection, BasePlayer player, string funcName, T1 arg1)
-	{
-		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
-		{
-			return;
-		}
-		ClientRPCEx(new SendInfo(player.net.connection), sourceConnection, funcName, arg1);
-		if (!IsBeingSpectated || children == null)
-		{
-			return;
-		}
-		foreach (BaseEntity child in children)
-		{
-			if (child is BasePlayer player2)
-			{
-				ClientRPCPlayer(sourceConnection, player2, funcName, arg1);
-			}
-		}
-	}
-
-	public void ClientRPCPlayerAndSpectators<T1, T2>(Network.Connection sourceConnection, BasePlayer player, string funcName, T1 arg1, T2 arg2)
-	{
-		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
-		{
-			return;
-		}
-		ClientRPCPlayer(sourceConnection, player, funcName, arg1, arg2);
-		if (!IsBeingSpectated || children == null)
-		{
-			return;
-		}
-		foreach (BaseEntity child in children)
-		{
-			if (child is BasePlayer player2)
-			{
-				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2);
-			}
-		}
-	}
-
-	public void ClientRPCPlayerAndSpectators<T1, T2, T3>(Network.Connection sourceConnection, BasePlayer player, string funcName, T1 arg1, T2 arg2, T3 arg3)
-	{
-		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
-		{
-			return;
-		}
-		ClientRPCPlayer(sourceConnection, player, funcName, arg1, arg2, arg3);
-		if (!IsBeingSpectated || children == null)
-		{
-			return;
-		}
-		foreach (BaseEntity child in children)
-		{
-			if (child is BasePlayer player2)
-			{
-				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2, arg3);
 			}
 		}
 	}
@@ -7591,10 +7567,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel
 			CheckDeathCondition(info);
 			if (net != null && net.connection != null)
 			{
-				Effect effect = new Effect();
-				effect.Init(Effect.Type.Generic, base.transform.position, base.transform.forward);
-				effect.pooledString = "assets/bundled/prefabs/fx/takedamage_hit.prefab";
-				EffectNetwork.Send(effect, net.connection);
+				ClientRPCPlayer(null, this, "TakeDamageHit");
 			}
 			string text = StringPool.Get(info.HitBone);
 			bool flag = UnityEngine.Vector3.Dot((info.PointEnd - info.PointStart).normalized, eyes.BodyForward()) > 0.4f;

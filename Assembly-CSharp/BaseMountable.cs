@@ -26,6 +26,8 @@ public class BaseMountable : BaseCombatEntity
 		UpperBody = 1
 	}
 
+	public static Translate.Phrase dismountPhrase = new Translate.Phrase("dismount", "Dismount");
+
 	[Header("View")]
 	[FormerlySerializedAs("eyeOverride")]
 	public Transform eyePositionOverride;
@@ -411,10 +413,26 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual void OnPlayerMounted()
 	{
+		UpdateFullFlag();
 	}
 
 	public virtual void OnPlayerDismounted(BasePlayer player)
 	{
+		UpdateFullFlag();
+	}
+
+	private void UpdateFullFlag()
+	{
+		if (this is BaseVehicle baseVehicle)
+		{
+			baseVehicle.UpdateFullFlag();
+			return;
+		}
+		BaseVehicle baseVehicle2 = VehicleParent();
+		if (baseVehicle2 != null)
+		{
+			baseVehicle2.UpdateFullFlag();
+		}
 	}
 
 	public virtual void DismountAllPlayers()

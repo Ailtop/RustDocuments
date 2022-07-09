@@ -1801,6 +1801,86 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
+	public void ClientRPCPlayerAndSpectators(Connection sourceConnection, BasePlayer player, string funcName)
+	{
+		if (!Network.Net.sv.IsConnected() || player.net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCEx(new SendInfo(player.net.connection), sourceConnection, funcName);
+		if (!player.IsBeingSpectated || player.children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in player.children)
+		{
+			if (child is BasePlayer player2)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName);
+			}
+		}
+	}
+
+	public void ClientRPCPlayerAndSpectators<T1>(Connection sourceConnection, BasePlayer player, string funcName, T1 arg1)
+	{
+		if (!Network.Net.sv.IsConnected() || player.net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCEx(new SendInfo(player.net.connection), sourceConnection, funcName, arg1);
+		if (!player.IsBeingSpectated || player.children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in player.children)
+		{
+			if (child is BasePlayer player2)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName, arg1);
+			}
+		}
+	}
+
+	public void ClientRPCPlayerAndSpectators<T1, T2>(Connection sourceConnection, BasePlayer player, string funcName, T1 arg1, T2 arg2)
+	{
+		if (!Network.Net.sv.IsConnected() || player.net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCPlayer(sourceConnection, player, funcName, arg1, arg2);
+		if (!player.IsBeingSpectated || player.children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			if (child is BasePlayer player2)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2);
+			}
+		}
+	}
+
+	public void ClientRPCPlayerAndSpectators<T1, T2, T3>(Connection sourceConnection, BasePlayer player, string funcName, T1 arg1, T2 arg2, T3 arg3)
+	{
+		if (!Network.Net.sv.IsConnected() || player.net == null || player.net.connection == null)
+		{
+			return;
+		}
+		ClientRPCPlayer(sourceConnection, player, funcName, arg1, arg2, arg3);
+		if (!player.IsBeingSpectated || player.children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in player.children)
+		{
+			if (child is BasePlayer player2)
+			{
+				ClientRPCPlayer(sourceConnection, player2, funcName, arg1, arg2, arg3);
+			}
+		}
+	}
+
 	private bool ClientRPCStart(Connection sourceConnection, string funcName)
 	{
 		if (Network.Net.sv.write.Start())

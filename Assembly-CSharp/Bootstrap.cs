@@ -229,6 +229,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 	private IEnumerator DedicatedServerStartup()
 	{
 		Rust.Application.isLoading = true;
+		UnityEngine.Application.backgroundLoadingPriority = UnityEngine.ThreadPriority.High;
 		WriteToLog("Skinnable Warmup");
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
@@ -251,7 +252,15 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		LevelManager.LoadLevel(ConVar.Server.level);
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
-		yield return StartCoroutine(FileSystem_Warmup.Run(2f, WriteToLog, "Asset Warmup ({0}/{1})"));
+		string[] assetList = FileSystem_Warmup.GetAssetList();
+		if (ConVar.Global.asyncWarmup)
+		{
+			yield return StartCoroutine(FileSystem_Warmup.RunAsync(assetList, WriteToLog, "Asset Warmup ({0}/{1})"));
+		}
+		else
+		{
+			yield return StartCoroutine(FileSystem_Warmup.Run(assetList, WriteToLog, "Asset Warmup ({0}/{1})"));
+		}
 		yield return StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", allowOutOfDateSaves: false));
 		if (!Object.FindObjectOfType<Performance>())
 		{
@@ -380,6 +389,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		if (!(lastWrittenValue == str))
 		{
 			DebugEx.Log(str);
+			lastWrittenValue = str;
 		}
 	}
 }

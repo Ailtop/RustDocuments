@@ -39,6 +39,19 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 
 	public Texture2D defaultBackground;
 
+	public GameObject pingWarning;
+
+	public RustText pingWarningText;
+
+	[Tooltip("Ping must be at least this many ms higher than the server browser ping")]
+	public int minPingDiffToShowWarning = 50;
+
+	[Tooltip("Ping must be this many times higher than the server browser ping")]
+	public float pingDiffFactorToShowWarning = 2f;
+
+	[Tooltip("Number of ping samples required before showing the warning")]
+	public int requiredPingSampleCount = 10;
+
 	public static bool isOpen
 	{
 		get

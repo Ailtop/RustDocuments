@@ -44,14 +44,11 @@ public class RecoilProperties : ScriptableObject
 	[Tooltip("Randomly select how much to scale final aimcone by per shot, you can use this to weigh a fraction of shots closer to the center")]
 	public AnimationCurve aimconeProbabilityCurve = new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(0.5f, 0f), new Keyframe(1f, 1f));
 
-	[ReplicatedVar(Default = "1")]
-	public static int version = 1;
-
 	public RecoilProperties newRecoilOverride;
 
 	public RecoilProperties GetRecoil()
 	{
-		if (!(newRecoilOverride != null) || version != 1)
+		if (!(newRecoilOverride != null))
 		{
 			return this;
 		}
