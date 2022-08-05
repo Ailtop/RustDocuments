@@ -43,6 +43,8 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver, IUGCBro
 		}
 	}
 
+	public BaseNetworkable UgcEntity => this;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("PaintedItemStorageEntity.OnRpcMessage"))

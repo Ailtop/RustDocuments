@@ -89,7 +89,7 @@ public class Spawn : ConsoleSystem
 		textTable.AddRow("Population Rate", SpawnHandler.PlayerLerp(min_rate, max_rate).ToString());
 		textTable.AddRow("Population Density", SpawnHandler.PlayerLerp(min_density, max_density).ToString());
 		textTable.AddRow("Group Rate", SpawnHandler.PlayerScale(player_scale).ToString());
-		args.ReplyWith(textTable.ToString());
+		args.ReplyWith(args.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar]

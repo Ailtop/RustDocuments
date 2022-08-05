@@ -63,6 +63,7 @@ public class CollateTrainTracks : ProceduralComponent
 							}
 							ourSpline.SetAll(array6, array7, ourSpline);
 							trainTrackSpline2.SetAll(array4, array5, ourSpline);
+							nodeIndex--;
 							return true;
 						}
 						return false;

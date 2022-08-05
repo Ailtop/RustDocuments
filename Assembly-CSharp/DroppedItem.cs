@@ -81,6 +81,7 @@ public class DroppedItem : WorldItem
 				Invoke(IdleDestroy, GetDespawnDuration());
 			}
 			Effect.server.Run("assets/bundled/prefabs/fx/notice/stack.world.fx.prefab", this, 0u, Vector3.zero, Vector3.zero);
+			Interface.CallHook("OnDroppedItemCombined", this);
 		}
 	}
 

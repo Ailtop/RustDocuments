@@ -92,7 +92,10 @@ public class TriggerTrainCollisions : TriggerBase
 				ITrainCollidable componentInParent3 = obj.GetComponentInParent<ITrainCollidable>();
 				if (componentInParent3 == null)
 				{
-					staticContents.Add(obj);
+					if (!obj.CompareTag("Railway"))
+					{
+						staticContents.Add(obj);
+					}
 				}
 				else if (!componentInParent3.EqualNetID(owner) && !componentInParent3.CustomCollision(owner, this))
 				{

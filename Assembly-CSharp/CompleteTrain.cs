@@ -6,6 +6,13 @@ using UnityEngine;
 
 public class CompleteTrain : IDisposable
 {
+	private enum ShuntState
+	{
+		None = 0,
+		Forwards = 1,
+		Backwards = 2
+	}
+
 	public enum StaticCollisionState
 	{
 		Free = 0,
@@ -13,7 +20,11 @@ public class CompleteTrain : IDisposable
 		StayingStill = 2
 	}
 
+	private Vector3 unloaderPos;
+
 	public float trackSpeed;
+
+	private float prevTrackSpeed;
 
 	public List<TrainCar> trainCars;
 
@@ -37,6 +48,28 @@ public class CompleteTrain : IDisposable
 
 	public TimeSince timeSinceLastChange;
 
+	private bool isShunting;
+
+	private TimeSince timeSinceShuntStart;
+
+	private const float MAX_SHUNT_TIME = 20f;
+
+	private const float SHUNT_SPEED = 4f;
+
+	private const float SHUNT_SPEED_CHANGE_RATE = 10f;
+
+	private Action<CoalingTower.ActionAttemptStatus> shuntEndCallback;
+
+	private float shuntDistance;
+
+	private Vector3 shuntDirection;
+
+	private Vector2 shuntStartPos2D = Vector2.zero;
+
+	private Vector2 shuntTargetPos2D = Vector2.zero;
+
+	private TrainCar shuntTarget;
+
 	public StaticCollisionState staticCollidingAtFront;
 
 	private HashSet<GameObject> monitoredStaticContentF = new HashSet<GameObject>();
@@ -56,6 +89,11 @@ public class CompleteTrain : IDisposable
 	public float TotalMass { get; set; }
 
 	public int NumTrainCars => trainCars.Count;
+
+	public int LinedUpToUnload { get; private set; } = -1;
+
+
+	public bool IsLinedUpToUnload => LinedUpToUnload >= 0;
 
 	public CompleteTrain(TrainCar trainCar)
 	{
@@ -84,13 +122,15 @@ public class CompleteTrain : IDisposable
 				if (trainCar.completeTrain != null)
 				{
 					bool num2 = IsCoupledBackwards(i);
+					bool preChangeCoupledBackwards = trainCar.coupling.PreChangeCoupledBackwards;
 					float preChangeTrackSpeed = trainCar.coupling.PreChangeTrackSpeed;
-					num = ((!num2) ? (num + preChangeTrackSpeed) : (num - preChangeTrackSpeed));
+					num = ((num2 == preChangeCoupledBackwards) ? (num + preChangeTrackSpeed) : (num - preChangeTrackSpeed));
 				}
 				trainCar.SetNewCompleteTrain(this);
 			}
 		}
 		num = (trackSpeed = num / (float)trainCars.Count);
+		prevTrackSpeed = trackSpeed;
 		ParamsTick();
 	}
 
@@ -109,6 +149,7 @@ public class CompleteTrain : IDisposable
 	{
 		if (!disposed)
 		{
+			EndShunting(CoalingTower.ActionAttemptStatus.GenericError);
 			disposed = true;
 			Facepunch.Pool.FreeList(ref trainCars);
 		}
@@ -116,10 +157,23 @@ public class CompleteTrain : IDisposable
 
 	public void RemoveTrainCar(TrainCar trainCar)
 	{
-		if (!disposed)
+		if (disposed)
 		{
-			trainCars.Remove(trainCar);
-			timeSinceLastChange = 0f;
+			return;
+		}
+		if (trainCars.Count <= 1)
+		{
+			Debug.LogWarning(GetType().Name + ": Can't remove car from CompleteTrain of length one.");
+			return;
+		}
+		int num = IndexOf(trainCar);
+		bool flag = ((num != 0) ? IsCoupledBackwards(0) : IsCoupledBackwards(1));
+		trainCars.RemoveAt(num);
+		timeSinceLastChange = 0f;
+		LinedUpToUnload = -1;
+		if (IsCoupledBackwards(0) != flag)
+		{
+			trackSpeed *= -1f;
 		}
 	}
 
@@ -141,6 +195,20 @@ public class CompleteTrain : IDisposable
 		return trackSpeed;
 	}
 
+	public float GetPrevTrackSpeedFor(TrainCar trainCar)
+	{
+		if (trainCars.IndexOf(trainCar) < 0)
+		{
+			Debug.LogError(GetType().Name + ": Train car not found in the trainCars list.");
+			return 0f;
+		}
+		if (IsCoupledBackwards(trainCar))
+		{
+			return 0f - prevTrackSpeed;
+		}
+		return prevTrackSpeed;
+	}
+
 	public void UpdateTick(float dt)
 	{
 		if (ranUpdateTick || disposed)
@@ -148,12 +216,14 @@ public class CompleteTrain : IDisposable
 			return;
 		}
 		ranUpdateTick = true;
-		if (IsAllAsleep() && !HasAnyEnginesOn() && !HasAnyCollisions())
+		if (IsAllAsleep() && !HasAnyEnginesOn() && !HasAnyCollisions() && !isShunting)
 		{
+			trackSpeed = 0f;
 			return;
 		}
 		ParamsTick();
 		MovementTick(dt);
+		LinedUpToUnload = CheckLinedUpToUnload(out unloaderPos);
 		if (!disposed)
 		{
 			if (Mathf.Abs(trackSpeed) > 0.1f)
@@ -162,6 +232,7 @@ public class CompleteTrain : IDisposable
 			}
 			if (!HasAnyEnginesOn() && !HasAnyCollisions() && UnityEngine.Time.time > lastMovingTime + 10f)
 			{
+				trackSpeed = 0f;
 				SleepAll();
 			}
 		}
@@ -175,7 +246,7 @@ public class CompleteTrain : IDisposable
 		}
 		foreach (TrainCar trainCar in trainCars)
 		{
-			if (trainCar.IsEngine)
+			if (trainCar.CarType == TrainCar.TrainCarType.Engine)
 			{
 				return true;
 			}
@@ -200,7 +271,7 @@ public class CompleteTrain : IDisposable
 		}
 		foreach (TrainCar trainCar in trainCars)
 		{
-			if (trainCar.IsEngine && trainCar.IsOn())
+			if (trainCar.CarType == TrainCar.TrainCarType.Engine && trainCar.IsOn())
 			{
 				return true;
 			}
@@ -236,6 +307,51 @@ public class CompleteTrain : IDisposable
 		}
 	}
 
+	public bool TryShuntCarTo(Vector3 shuntDirection, float shuntDistance, TrainCar shuntTarget, Action<CoalingTower.ActionAttemptStatus> shuntEndCallback, out CoalingTower.ActionAttemptStatus status)
+	{
+		if (disposed)
+		{
+			status = CoalingTower.ActionAttemptStatus.NoTrainCar;
+			return false;
+		}
+		if (isShunting)
+		{
+			status = CoalingTower.ActionAttemptStatus.AlreadyShunting;
+			return false;
+		}
+		if (Mathf.Abs(trackSpeed) > 0.1f)
+		{
+			status = CoalingTower.ActionAttemptStatus.TrainIsMoving;
+			return false;
+		}
+		if (HasThrottleInput())
+		{
+			status = CoalingTower.ActionAttemptStatus.TrainHasThrottle;
+			return false;
+		}
+		this.shuntDirection = shuntDirection;
+		this.shuntDistance = shuntDistance;
+		this.shuntTarget = shuntTarget;
+		timeSinceShuntStart = 0f;
+		shuntStartPos2D.x = shuntTarget.transform.position.x;
+		shuntStartPos2D.y = shuntTarget.transform.position.z;
+		isShunting = true;
+		this.shuntEndCallback = shuntEndCallback;
+		status = CoalingTower.ActionAttemptStatus.NoError;
+		return true;
+	}
+
+	private void EndShunting(CoalingTower.ActionAttemptStatus status)
+	{
+		isShunting = false;
+		if (shuntEndCallback != null)
+		{
+			shuntEndCallback(status);
+			shuntEndCallback = null;
+		}
+		shuntTarget = null;
+	}
+
 	public bool ContainsOnly(TrainCar trainCar)
 	{
 		if (disposed)
@@ -246,6 +362,36 @@ public class CompleteTrain : IDisposable
 		{
 			return trainCars[0] == trainCar;
 		}
+		return false;
+	}
+
+	public int IndexOf(TrainCar trainCar)
+	{
+		if (disposed)
+		{
+			return -1;
+		}
+		return trainCars.IndexOf(trainCar);
+	}
+
+	public bool TryGetAdjacentTrainCar(TrainCar trainCar, bool next, Vector3 forwardDir, out TrainCar result)
+	{
+		int num = trainCars.IndexOf(trainCar);
+		Vector3 lhs = ((!IsCoupledBackwards(num)) ? trainCar.transform.forward : (-trainCar.transform.forward));
+		if (Vector3.Dot(lhs, forwardDir) < 0f)
+		{
+			next = !next;
+		}
+		if (num >= 0)
+		{
+			num = ((!next) ? (num - 1) : (num + 1));
+			if (num >= 0 && num < trainCars.Count)
+			{
+				result = trainCars[num];
+				return true;
+			}
+		}
+		result = null;
 		return false;
 	}
 
@@ -264,11 +410,13 @@ public class CompleteTrain : IDisposable
 				num = i;
 			}
 		}
+		bool flag = false;
 		for (int j = 0; j < trainCars.Count; j++)
 		{
 			TrainCar trainCar2 = trainCars[j];
 			float forces = trainCar2.GetForces();
 			TotalForces += (IsCoupledBackwards(trainCar2) ? (0f - forces) : forces);
+			flag |= trainCar2.HasThrottleInput();
 			if (j == num)
 			{
 				TotalMass += trainCar2.rigidBody.mass;
@@ -277,6 +425,10 @@ public class CompleteTrain : IDisposable
 			{
 				TotalMass += trainCar2.rigidBody.mass * 0.4f;
 			}
+		}
+		if (isShunting && flag)
+		{
+			EndShunting(CoalingTower.ActionAttemptStatus.TrainHasThrottle);
 		}
 		if (trainCars.Count == 1)
 		{
@@ -292,11 +444,64 @@ public class CompleteTrain : IDisposable
 
 	private void MovementTick(float dt)
 	{
-		trackSpeed += TotalForces * dt / TotalMass;
-		float drag = trainCars[0].rigidBody.drag;
+		prevTrackSpeed = trackSpeed;
+		if (!isShunting)
+		{
+			trackSpeed += TotalForces * dt / TotalMass;
+		}
+		else
+		{
+			bool flag = Vector3.Dot(shuntDirection, PrimaryTrainCar.transform.forward) >= 0f;
+			if (IsCoupledBackwards(PrimaryTrainCar))
+			{
+				flag = !flag;
+			}
+			if (shuntTarget == null || shuntTarget.IsDead() || shuntTarget.IsDestroyed)
+			{
+				EndShunting(CoalingTower.ActionAttemptStatus.NoTrainCar);
+			}
+			else
+			{
+				float num = 4f;
+				shuntTargetPos2D.x = shuntTarget.transform.position.x;
+				shuntTargetPos2D.y = shuntTarget.transform.position.z;
+				float num2 = shuntDistance - Vector3.Distance(shuntStartPos2D, shuntTargetPos2D);
+				if (num2 < 2f)
+				{
+					float t = Mathf.InverseLerp(0f, 2f, num2);
+					num *= Mathf.Lerp(0.1f, 1f, t);
+				}
+				trackSpeed = Mathf.MoveTowards(trackSpeed, flag ? num : (0f - num), dt * 10f);
+				if ((float)timeSinceShuntStart > 20f || num2 <= 0f)
+				{
+					EndShunting(CoalingTower.ActionAttemptStatus.NoError);
+					trackSpeed = 0f;
+				}
+			}
+		}
+		float num3 = trainCars[0].rigidBody.drag;
+		if (IsLinedUpToUnload)
+		{
+			float num4 = Mathf.Abs(trackSpeed);
+			if (num4 > 1f)
+			{
+				TrainCarUnloadable trainCarUnloadable = trainCars[LinedUpToUnload] as TrainCarUnloadable;
+				if (trainCarUnloadable != null)
+				{
+					float value = trainCarUnloadable.MinDistToUnloadingArea(unloaderPos);
+					float num5 = Mathf.InverseLerp(2f, 0f, value);
+					if (num4 < 2f)
+					{
+						float num6 = (num4 - 1f) / 1f;
+						num5 *= num6;
+					}
+					num3 = Mathf.Lerp(num3, 3.5f, num5);
+				}
+			}
+		}
 		if (trackSpeed > 0f)
 		{
-			trackSpeed -= drag * 4f * dt;
+			trackSpeed -= num3 * 4f * dt;
 			if (trackSpeed < 0f)
 			{
 				trackSpeed = 0f;
@@ -304,13 +509,18 @@ public class CompleteTrain : IDisposable
 		}
 		else if (trackSpeed < 0f)
 		{
-			trackSpeed += drag * 4f * dt;
+			trackSpeed += num3 * 4f * dt;
 			if (trackSpeed > 0f)
 			{
 				trackSpeed = 0f;
 			}
 		}
+		float num7 = trackSpeed;
 		trackSpeed = ApplyCollisionsToTrackSpeed(trackSpeed, TotalMass, dt);
+		if (isShunting && trackSpeed != num7)
+		{
+			EndShunting(CoalingTower.ActionAttemptStatus.GenericError);
+		}
 		if (disposed)
 		{
 			return;
@@ -353,9 +563,9 @@ public class CompleteTrain : IDisposable
 			}
 			return;
 		}
-		for (int num = trainCars.Count - 2; num >= 0; num--)
+		for (int num8 = trainCars.Count - 2; num8 >= 0; num8--)
 		{
-			MoveOtherTrainCar(trainCars[num], trainCars[num + 1]);
+			MoveOtherTrainCar(trainCars[num8], trainCars[num8 + 1]);
 		}
 	}
 
@@ -420,6 +630,7 @@ public class CompleteTrain : IDisposable
 
 	public void ReduceSpeedBy(float velChange)
 	{
+		prevTrackSpeed = trackSpeed;
 		if (trackSpeed > 0f)
 		{
 			trackSpeed = Mathf.Max(0f, trackSpeed - velChange);
@@ -446,7 +657,30 @@ public class CompleteTrain : IDisposable
 		return false;
 	}
 
-	private bool IsCoupledBackwards(TrainCar trainCar)
+	private int CheckLinedUpToUnload(out Vector3 unloaderPos)
+	{
+		if (disposed)
+		{
+			unloaderPos = Vector3.zero;
+			return -1;
+		}
+		for (int i = 0; i < trainCars.Count; i++)
+		{
+			TrainCar trainCar = trainCars[i];
+			if (CoalingTower.IsUnderAnUnloader(trainCar, out var isLinedUp, out unloaderPos))
+			{
+				trainCar.SetFlag(BaseEntity.Flags.Reserved4, isLinedUp);
+				if (isLinedUp)
+				{
+					return i;
+				}
+			}
+		}
+		unloaderPos = Vector3.zero;
+		return -1;
+	}
+
+	public bool IsCoupledBackwards(TrainCar trainCar)
 	{
 		if (disposed)
 		{
@@ -472,6 +706,18 @@ public class CompleteTrain : IDisposable
 			return coupledTo.owner != trainCars[trainCarIndex - 1];
 		}
 		return true;
+	}
+
+	private bool HasThrottleInput()
+	{
+		for (int i = 0; i < trainCars.Count; i++)
+		{
+			if (trainCars[i].HasThrottleInput())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private TrainTrackSpline.TrackSelection GetTrackSelection()
@@ -541,20 +787,20 @@ public class CompleteTrain : IDisposable
 	{
 		Vector3 vector = forwardVector * trackSpeed;
 		bool hasAnyStaticContents = trigger.HasAnyStaticContents;
-		float num = (hasAnyStaticContents ? (vector.magnitude * ourTotalMass) : 0f);
+		float num = (hasAnyStaticContents ? (vector.magnitude * Mathf.Clamp(ourTotalMass, 1f, 13000f)) : 0f);
 		trackSpeed = HandleStaticCollisions(hasAnyStaticContents, atOurFront, trackSpeed, ref wasStaticColliding, trigger);
 		if (!hasAnyStaticContents)
 		{
 			foreach (TrainCar trainContent in trigger.trainContents)
 			{
-				Vector3 vector2 = trainContent.transform.forward * trainContent.GetTrackSpeed();
+				Vector3 vector2 = trainContent.transform.forward * trainContent.GetPrevTrackSpeed();
 				trackSpeed = HandleTrainCollision(atOurFront, forwardVector, trackSpeed, ourTrainCar.transform, trainContent, deltaTime, ref wasStaticColliding);
-				num += Vector3.Magnitude(vector2 - vector) * trainContent.rigidBody.mass;
+				num += Vector3.Magnitude(vector2 - vector) * Mathf.Clamp(trainContent.rigidBody.mass, 1f, 13000f);
 			}
 			foreach (Rigidbody otherRigidbodyContent in trigger.otherRigidbodyContents)
 			{
 				trackSpeed = HandleRigidbodyCollision(atOurFront, trackSpeed, forwardVector, ourTotalMass, otherRigidbodyContent, otherRigidbodyContent.mass, deltaTime, calcSecondaryForces: true);
-				num += Vector3.Magnitude(otherRigidbodyContent.velocity - vector) * otherRigidbodyContent.mass;
+				num += Vector3.Magnitude(otherRigidbodyContent.velocity - vector) * Mathf.Clamp(otherRigidbodyContent.mass, 1f, 13000f);
 			}
 		}
 		if (num >= 70000f && (float)timeSinceLastChange > 1f && trigger.owner.ApplyCollisionDamage(num) > 5f)
@@ -685,7 +931,7 @@ public class CompleteTrain : IDisposable
 			}
 		}
 		float value = num3 / ourTotalMass * deltaTime;
-		value = Mathf.Clamp(value, 0f - Mathf.Abs(num) - 6f, Mathf.Abs(num) + 6f);
+		value = Mathf.Clamp(value, 0f - Mathf.Abs(num - trackSpeed) - 1f, Mathf.Abs(num - trackSpeed) + 1f);
 		trackSpeed -= value;
 		return trackSpeed;
 	}

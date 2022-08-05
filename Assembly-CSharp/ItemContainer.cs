@@ -289,7 +289,7 @@ public sealed class ItemContainer
 
 	public int GetMaxTransferAmount(ItemDefinition def)
 	{
-		int num = maxStackSize;
+		int num = ContainerMaxStackSize();
 		foreach (Item item in itemList)
 		{
 			if (item.info == def)
@@ -633,6 +633,15 @@ public sealed class ItemContainer
 		return playerOwner;
 	}
 
+	public int ContainerMaxStackSize()
+	{
+		if (maxStackSize <= 0)
+		{
+			return int.MaxValue;
+		}
+		return maxStackSize;
+	}
+
 	public int Take(List<Item> collect, int itemid, int iAmount)
 	{
 		int num = 0;
@@ -722,11 +731,21 @@ public sealed class ItemContainer
 		return num;
 	}
 
-	public void AddItem(ItemDefinition itemToCreate, int p, ulong skin = 0uL)
+	public int TotalItemAmount()
+	{
+		int num = 0;
+		for (int i = 0; i < itemList.Count; i++)
+		{
+			num += itemList[i].amount;
+		}
+		return num;
+	}
+
+	public void AddItem(ItemDefinition itemToCreate, int amount, ulong skin = 0uL, bool respectMaxStack = false)
 	{
 		for (int i = 0; i < itemList.Count; i++)
 		{
-			if (p == 0)
+			if (amount == 0)
 			{
 				return;
 			}
@@ -740,20 +759,31 @@ public sealed class ItemContainer
 				continue;
 			}
 			MarkDirty();
-			itemList[i].amount += p;
-			p -= p;
+			itemList[i].amount += amount;
+			amount -= amount;
 			if (itemList[i].amount > num)
 			{
-				p = itemList[i].amount - num;
-				if (p > 0)
+				amount = itemList[i].amount - num;
+				if (amount > 0)
 				{
-					itemList[i].amount -= p;
+					itemList[i].amount -= amount;
 				}
 			}
 		}
-		if (p != 0)
+		if (amount == 0)
 		{
-			Item item = ItemManager.Create(itemToCreate, p, skin);
+			return;
+		}
+		int num2 = (respectMaxStack ? Mathf.Min(itemToCreate.stackable, ContainerMaxStackSize()) : int.MaxValue);
+		if (num2 <= 0)
+		{
+			return;
+		}
+		while (amount > 0)
+		{
+			int num3 = Mathf.Min(amount, num2);
+			Item item = ItemManager.Create(itemToCreate, num3, skin);
+			amount -= num3;
 			if (!item.MoveToContainer(this))
 			{
 				item.Remove();

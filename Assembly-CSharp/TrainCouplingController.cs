@@ -34,6 +34,8 @@ public class TrainCouplingController
 
 	public float PreChangeTrackSpeed { get; private set; }
 
+	public bool PreChangeCoupledBackwards { get; private set; }
+
 	public TrainCouplingController(TrainCar owner)
 	{
 		this.owner = owner;
@@ -118,6 +120,11 @@ public class TrainCouplingController
 
 	public void OnPreCouplingChange()
 	{
+		PreChangeCoupledBackwards = owner.IsCoupledBackwards();
 		PreChangeTrackSpeed = owner.GetTrackSpeed();
+		if (PreChangeCoupledBackwards)
+		{
+			PreChangeTrackSpeed = 0f - PreChangeTrackSpeed;
+		}
 	}
 }

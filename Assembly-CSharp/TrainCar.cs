@@ -13,14 +13,11 @@ using UnityEngine.Serialization;
 
 public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, TrainTrackSpline.ITrainTrackUser, ITrainCollidable, IPrefabPreProcess
 {
-	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
-	public static float population = 0.6f;
-
-	[ServerVar(Help = "Ratio of wagons to train engines that spawn")]
-	public static int wagons_per_engine = 2;
-
-	[ServerVar(Help = "Ratio of Work Carts with additional cover to standard Work Carts. 1.0 = All covered, 0.0 = all standard.")]
-	public static float variant_ratio = 0.5f;
+	public enum TrainCarType
+	{
+		Wagon = 0,
+		Engine = 1
+	}
 
 	protected bool trainDebug;
 
@@ -40,13 +37,11 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public float initialSpawnTime;
 
-	public float decayDuration = 1200f;
+	public float decayingFor;
 
 	public float decayTickSpacing = 60f;
 
 	public float lastDecayTick;
-
-	public float decayingFor;
 
 	[Header("Train Car")]
 	[SerializeField]
@@ -122,15 +117,15 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	[FormerlySerializedAs("frontCoupleFx")]
 	[SerializeField]
-	private ParticleSystem frontCouplingChangedFx;
+	public ParticleSystem frontCouplingChangedFx;
 
 	[FormerlySerializedAs("rearCoupleFx")]
 	[SerializeField]
-	private ParticleSystem rearCouplingChangedFx;
+	public ParticleSystem rearCouplingChangedFx;
 
 	[FormerlySerializedAs("fxCoupling")]
 	[SerializeField]
-	private ParticleSystem newCouplingFX;
+	public ParticleSystem newCouplingFX;
 
 	[SerializeField]
 	[ReadOnly]
@@ -139,6 +134,15 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	[SerializeField]
 	[ReadOnly]
 	public Vector3 rearBogieLocalOffset;
+
+	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
+	public static float population = 2.4f;
+
+	[ServerVar(Help = "Ratio of wagons to train engines that spawn")]
+	public static int wagons_per_engine = 2;
+
+	[ServerVar(Help = "How long before a train car despawns")]
+	public static float decayminutes = 30f;
 
 	[ReadOnly]
 	public float DistFrontWheelToFrontCoupling;
@@ -151,13 +155,13 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	[NonSerialized]
 	public TrainTrackSpline.TrackSelection localTrackSelection;
 
+	public const Flags Flag_LinedUpToUnload = Flags.Reserved4;
+
 	public Vector3 Position => base.transform.position;
 
 	public float FrontWheelSplineDist { get; set; }
 
-	public virtual bool IsEngine => false;
-
-	protected virtual bool networkUpdateOnCompleteTrainChange => false;
+	public virtual bool networkUpdateOnCompleteTrainChange => false;
 
 	public TrainTrackSpline FrontTrackSection
 	{
@@ -196,7 +200,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 	}
 
-	protected bool IsOnAboveGroundSpawnRail
+	public bool IsOnAboveGroundSpawnRail
 	{
 		get
 		{
@@ -213,6 +217,10 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	public TriggerTrainCollisions FrontCollisionTrigger => frontCollisionTrigger;
 
 	public TriggerTrainCollisions RearCollisionTrigger => rearCollisionTrigger;
+
+	public virtual TrainCarType CarType => TrainCarType.Wagon;
+
+	public bool LinedUpToUnload => HasFlag(Flags.Reserved4);
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -258,6 +266,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		distFrontToBackWheel = Vector3.Distance(GetFrontWheelPos(), GetRearWheelPos());
 		rigidBody.centerOfMass = centreOfMassTransform.localPosition;
 		UpdateCompleteTrain();
+		lastDecayTick = UnityEngine.Time.time;
 		InvokeRandomized(UpdateClients, 0f, 0.15f, 0.02f);
 		InvokeRandomized(DecayTick, UnityEngine.Random.Range(20f, 40f), decayTickSpacing, decayTickSpacing * 0.1f);
 	}
@@ -278,13 +287,17 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	{
 		base.Spawn();
 		initialSpawnTime = UnityEngine.Time.time;
-		if (TrainTrackSpline.TryFindTrackNearby(GetFrontWheelPos(), 2f, out var splineResult, out var distResult) && (Rust.Application.isLoadingSave || splineResult.HasClearTrackSpaceNear(this)))
+		if (TrainTrackSpline.TryFindTrackNear(GetFrontWheelPos(), 15f, out var splineResult, out var distResult))
 		{
 			FrontWheelSplineDist = distResult;
 			Vector3 tangent;
 			Vector3 positionAndTangent = splineResult.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out tangent);
-			SetTheRestFromFrontWheelData(ref splineResult, positionAndTangent, tangent, localTrackSelection, null);
+			SetTheRestFromFrontWheelData(ref splineResult, positionAndTangent, tangent, localTrackSelection, null, instantMove: true);
 			FrontTrackSection = splineResult;
+			if (!Rust.Application.isLoadingSave && !SpaceIsClear())
+			{
+				Invoke(base.KillMessage, 0f);
+			}
 		}
 		else
 		{
@@ -319,7 +332,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 	}
 
-	private void UpdateCompleteTrain()
+	public void UpdateCompleteTrain()
 	{
 		List<TrainCar> result = Facepunch.Pool.GetList<TrainCar>();
 		coupling.GetAll(ref result);
@@ -356,9 +369,9 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public override void OnKilled(HitInfo info)
 	{
-		float num = info.damageTypes.Get(DamageType.AntiVehicle);
-		float num2 = info.damageTypes.Get(DamageType.Explosion);
-		float num3 = info.damageTypes.Total();
+		float num = info?.damageTypes.Get(DamageType.AntiVehicle) ?? 0f;
+		float num2 = info?.damageTypes.Get(DamageType.Explosion) ?? 0f;
+		float num3 = info?.damageTypes.Total() ?? 0f;
 		if ((num + num2) / num3 > 0.5f || vehicle.cinematictrains || corpseSeconds == 0f)
 		{
 			if (HasDriver())
@@ -379,7 +392,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 
 	public virtual Vector3 GetExplosionPos()
 	{
-		return base.transform.position + base.transform.rotation * bounds.center;
+		return GetCentreOfTrainPos();
 	}
 
 	public void ActualDeath()
@@ -418,7 +431,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		base.DoServerDestroy();
 	}
 
-	private void RemoveFromCompleteTrain()
+	public void RemoveFromCompleteTrain()
 	{
 		if (completeTrain != null)
 		{
@@ -455,6 +468,24 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 			return 0f;
 		}
 		return completeTrain.GetTrackSpeedFor(this);
+	}
+
+	public bool IsCoupledBackwards()
+	{
+		if (completeTrain == null)
+		{
+			return false;
+		}
+		return completeTrain.IsCoupledBackwards(this);
+	}
+
+	public float GetPrevTrackSpeed()
+	{
+		if (completeTrain == null)
+		{
+			return 0f;
+		}
+		return completeTrain.GetPrevTrackSpeedFor(this);
 	}
 
 	public override Vector3 GetLocalVelocityServer()
@@ -502,6 +533,11 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 	}
 
+	public Vector3 GetCentreOfTrainPos()
+	{
+		return base.transform.position + base.transform.rotation * bounds.center;
+	}
+
 	public Vector3 GetFrontOfTrainPos()
 	{
 		return base.transform.position + base.transform.rotation * (bounds.center + Vector3.forward * bounds.extents.z);
@@ -524,12 +560,32 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		MoveFrontWheelsAlongTrackSpline(theirTrackSpline, prevSplineDist, distanceOffset, FrontTrackSection, TrainTrackSpline.TrackSelection.Default);
 	}
 
+	public bool TryGetNextTrainCar(Vector3 forwardDir, out TrainCar result)
+	{
+		return TryGetTrainCar(next: true, forwardDir, out result);
+	}
+
+	public bool TryGetPrevTrainCar(Vector3 forwardDir, out TrainCar result)
+	{
+		return TryGetTrainCar(next: false, forwardDir, out result);
+	}
+
+	public bool TryGetTrainCar(bool next, Vector3 forwardDir, out TrainCar result)
+	{
+		result = null;
+		if (completeTrain == null)
+		{
+			return false;
+		}
+		return completeTrain.TryGetAdjacentTrainCar(this, next, forwardDir, out result);
+	}
+
 	public void MoveFrontWheelsAlongTrackSpline(TrainTrackSpline trackSpline, float prevSplineDist, float distToMove, TrainTrackSpline preferredAltTrack, TrainTrackSpline.TrackSelection trackSelection)
 	{
 		FrontWheelSplineDist = trackSpline.GetSplineDistAfterMove(prevSplineDist, base.transform.forward, distToMove, trackSelection, out var onSpline, out var _, preferredAltTrack, null);
 		Vector3 tangent;
 		Vector3 positionAndTangent = onSpline.GetPositionAndTangent(FrontWheelSplineDist, base.transform.forward, out tangent);
-		SetTheRestFromFrontWheelData(ref onSpline, positionAndTangent, tangent, trackSelection, trackSpline);
+		SetTheRestFromFrontWheelData(ref onSpline, positionAndTangent, tangent, trackSelection, trackSpline, instantMove: false);
 		FrontTrackSection = onSpline;
 	}
 
@@ -543,7 +599,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		return base.transform.position + base.transform.rotation * rearBogieLocalOffset;
 	}
 
-	public void SetTheRestFromFrontWheelData(ref TrainTrackSpline frontTS, Vector3 targetFrontWheelPos, Vector3 targetFrontWheelTangent, TrainTrackSpline.TrackSelection trackSelection, TrainTrackSpline additionalAlt)
+	public void SetTheRestFromFrontWheelData(ref TrainTrackSpline frontTS, Vector3 targetFrontWheelPos, Vector3 targetFrontWheelTangent, TrainTrackSpline.TrackSelection trackSelection, TrainTrackSpline additionalAlt, bool instantMove)
 	{
 		TrainTrackSpline onSpline;
 		bool atEndOfLine;
@@ -558,14 +614,29 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		RearTrackSection = onSpline;
 		Vector3 normalized = (targetFrontWheelPos - positionAndTangent).normalized;
 		Vector3 vector = targetFrontWheelPos - Quaternion.LookRotation(normalized) * frontBogieLocalOffset;
-		rigidBody.MovePosition(vector);
-		if (normalized.magnitude == 0f)
+		if (instantMove)
 		{
-			rigidBody.MoveRotation(Quaternion.identity);
+			base.transform.position = vector;
+			if (normalized.magnitude == 0f)
+			{
+				base.transform.rotation = Quaternion.identity;
+			}
+			else
+			{
+				base.transform.rotation = Quaternion.LookRotation(normalized);
+			}
 		}
 		else
 		{
-			rigidBody.MoveRotation(Quaternion.LookRotation(normalized));
+			rigidBody.MovePosition(vector);
+			if (normalized.magnitude == 0f)
+			{
+				rigidBody.MoveRotation(Quaternion.identity);
+			}
+			else
+			{
+				rigidBody.MoveRotation(Quaternion.LookRotation(normalized));
+			}
 		}
 		frontBogieYRot = Vector3.SignedAngle(base.transform.forward, targetFrontWheelTangent, base.transform.up);
 		rearBogieYRot = Vector3.SignedAngle(base.transform.forward, tangent, base.transform.up);
@@ -577,19 +648,29 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 	}
 
-	public virtual float GetForces()
+	public float GetForces()
 	{
 		float num = base.transform.localEulerAngles.x;
 		if (num > 180f)
 		{
 			num -= 360f;
 		}
-		return 0f + num / 90f * (0f - UnityEngine.Physics.gravity.y) * RealisticMass;
+		return 0f + num / 90f * (0f - UnityEngine.Physics.gravity.y) * RealisticMass + GetThrottleForce();
+	}
+
+	protected virtual float GetThrottleForce()
+	{
+		return 0f;
+	}
+
+	public virtual bool HasThrottleInput()
+	{
+		return false;
 	}
 
 	public float ApplyCollisionDamage(float forceMagnitude)
 	{
-		float num = ((!(forceMagnitude > derailCollisionForce)) ? (Mathf.Pow(forceMagnitude, 1.4f) / collisionDamageDivide) : float.MaxValue);
+		float num = ((!(forceMagnitude > derailCollisionForce)) ? (Mathf.Pow(forceMagnitude, 1.3f) / collisionDamageDivide) : float.MaxValue);
 		Hurt(num, DamageType.Collision, this, useProtection: false);
 		return num;
 	}
@@ -613,18 +694,37 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		{
 			decayingFor = 0f;
 		}
-		bool num = (!IsAtAStation || !(Vector3.Distance(spawnOrigin, base.transform.position) < 50f)) && !IsOnAboveGroundSpawnRail && !flag && !AnyPlayersNearby(30f);
-		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
-		float num2 = realtimeSinceStartup - lastDecayTick;
-		lastDecayTick = realtimeSinceStartup;
-		if (num)
+		float num = GetDecayMinutes(flag) * 60f;
+		float time = UnityEngine.Time.time;
+		float num2 = time - lastDecayTick;
+		lastDecayTick = time;
+		if (num != float.PositiveInfinity)
 		{
 			decayingFor += num2;
-			if (decayingFor >= decayDuration && (IsEngine || !completeTrain.IncludesAnEngine()))
+			if (decayingFor >= num && CanDieFromDecayNow())
 			{
 				ActualDeath();
 			}
 		}
+	}
+
+	protected virtual float GetDecayMinutes(bool hasPassengers)
+	{
+		bool flag = IsAtAStation && Vector3.Distance(spawnOrigin, base.transform.position) < 50f;
+		if (hasPassengers || AnyPlayersNearby(30f) || flag || IsOnAboveGroundSpawnRail)
+		{
+			return float.PositiveInfinity;
+		}
+		return decayminutes;
+	}
+
+	protected virtual bool CanDieFromDecayNow()
+	{
+		if (CarType != TrainCarType.Engine)
+		{
+			return !completeTrain.IncludesAnEngine();
+		}
+		return true;
 	}
 
 	public bool AnyPlayersNearby(float maxDist)
@@ -642,6 +742,32 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 		Facepunch.Pool.FreeList(ref obj);
 		return result;
+	}
+
+	public bool SpaceIsClear()
+	{
+		List<Collider> obj = Facepunch.Pool.GetList<Collider>();
+		GamePhysics.OverlapOBB(WorldSpaceBounds(), obj, 32768);
+		foreach (Collider item in obj)
+		{
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item);
+			if (!(baseEntity != this))
+			{
+				continue;
+			}
+			if (baseEntity != null)
+			{
+				BaseEntity baseEntity2 = baseEntity.parentEntity.Get(base.isServer);
+				if (BaseNetworkableEx.IsValid(baseEntity2))
+				{
+					_ = baseEntity2 != this;
+				}
+				return false;
+			}
+			return false;
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		return true;
 	}
 
 	[RPC_Server]

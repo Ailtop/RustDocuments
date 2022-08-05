@@ -66,7 +66,7 @@ public class vehicle : ConsoleSystem
 		BaseVehicle[] array2 = array;
 		foreach (BaseVehicle baseVehicle in array2)
 		{
-			if (baseVehicle.isServer && Vector3.Distance(baseVehicle.transform.position, basePlayer.transform.position) <= 5f && baseVehicle.AdminFixUp(@int))
+			if (baseVehicle.isServer && Vector3.Distance(baseVehicle.transform.position, basePlayer.transform.position) <= 10f && baseVehicle.AdminFixUp(@int))
 			{
 				num++;
 			}
@@ -74,7 +74,7 @@ public class vehicle : ConsoleSystem
 		MLRS[] array3 = Object.FindObjectsOfType<MLRS>();
 		foreach (MLRS mLRS in array3)
 		{
-			if (mLRS.isServer && Vector3.Distance(mLRS.transform.position, basePlayer.transform.position) <= 5f && mLRS.AdminFixUp())
+			if (mLRS.isServer && Vector3.Distance(mLRS.transform.position, basePlayer.transform.position) <= 10f && mLRS.AdminFixUp())
 			{
 				num++;
 			}

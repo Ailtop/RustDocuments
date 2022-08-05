@@ -62,9 +62,9 @@ public class PlaceMonuments : ProceduralComponent
 	[Tooltip("Distance to monuments of a different type")]
 	public DistanceMode DistanceDifferentType;
 
-	public const int GroupCandidates = 10;
+	public const int GroupCandidates = 8;
 
-	public const int IndividualCandidates = 10;
+	public const int IndividualCandidates = 8;
 
 	public const int Attempts = 10000;
 
@@ -111,7 +111,7 @@ public class PlaceMonuments : ProceduralComponent
 			List<SpawnInfo> a = new List<SpawnInfo>();
 			int num2 = 0;
 			List<SpawnInfo> b = new List<SpawnInfo>();
-			for (int j = 0; j < 10; j++)
+			for (int j = 0; j < 8; j++)
 			{
 				num = 0;
 				a.Clear();
@@ -147,7 +147,35 @@ public class PlaceMonuments : ProceduralComponent
 						Vector3 scale = prefab.Object.transform.localScale;
 						Vector3 vector = pos;
 						prefab.ApplyDecorComponents(ref pos, ref rot, ref scale);
-						if (!prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !component.CheckPlacement(pos, rot, scale))
+						DistanceInfo distanceInfo = GetDistanceInfo(a, prefab, pos, rot, scale, vector);
+						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < (float)dungeonEntrance.CellSize))
+						{
+							continue;
+						}
+						int num8 = num4;
+						if (distanceInfo.minDistanceSameType != float.MaxValue)
+						{
+							if (DistanceSameType == DistanceMode.Min)
+							{
+								num8 -= Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+							}
+							else if (DistanceSameType == DistanceMode.Max)
+							{
+								num8 += Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+							}
+						}
+						if (distanceInfo.minDistanceDifferentType != float.MaxValue)
+						{
+							if (DistanceDifferentType == DistanceMode.Min)
+							{
+								num8 -= Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+							}
+							else if (DistanceDifferentType == DistanceMode.Max)
+							{
+								num8 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
+							}
+						}
+						if (num8 <= num6 || !prefab.ApplyTerrainAnchors(ref pos, rot, scale, Filter) || !component.CheckPlacement(pos, rot, scale))
 						{
 							continue;
 						}
@@ -162,8 +190,7 @@ public class PlaceMonuments : ProceduralComponent
 							}
 							vector = vector3;
 						}
-						DistanceInfo distanceInfo = GetDistanceInfo(a, prefab, pos, rot, scale, vector);
-						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < (float)dungeonEntrance.CellSize) || !prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
+						if (!prefab.ApplyTerrainChecks(pos, rot, scale, Filter) || !prefab.ApplyTerrainFilters(pos, rot, scale) || !prefab.ApplyWaterChecks(pos, rot, scale) || prefab.CheckEnvironmentVolumes(pos, rot, scale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
 						{
 							continue;
 						}
@@ -198,52 +225,25 @@ public class PlaceMonuments : ProceduralComponent
 								}
 							}
 						}
-						if (flag)
+						if (!flag)
 						{
-							continue;
-						}
-						SpawnInfo spawnInfo = default(SpawnInfo);
-						spawnInfo.prefab = prefab;
-						spawnInfo.position = pos;
-						spawnInfo.rotation = rot;
-						spawnInfo.scale = scale;
-						if ((bool)dungeonEntrance)
-						{
-							spawnInfo.dungeonEntrance = true;
-							spawnInfo.dungeonEntrancePos = vector;
-						}
-						int num8 = num4;
-						if (distanceInfo.minDistanceSameType != float.MaxValue)
-						{
-							if (DistanceSameType == DistanceMode.Min)
+							SpawnInfo spawnInfo = default(SpawnInfo);
+							spawnInfo.prefab = prefab;
+							spawnInfo.position = pos;
+							spawnInfo.rotation = rot;
+							spawnInfo.scale = scale;
+							if ((bool)dungeonEntrance)
 							{
-								num8 -= Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
+								spawnInfo.dungeonEntrance = true;
+								spawnInfo.dungeonEntrancePos = vector;
 							}
-							else if (DistanceSameType == DistanceMode.Max)
-							{
-								num8 += Mathf.RoundToInt(distanceInfo.minDistanceSameType * distanceInfo.minDistanceSameType * 2f);
-							}
-						}
-						if (distanceInfo.minDistanceDifferentType != float.MaxValue)
-						{
-							if (DistanceDifferentType == DistanceMode.Min)
-							{
-								num8 -= Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
-							}
-							else if (DistanceDifferentType == DistanceMode.Max)
-							{
-								num8 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
-							}
-						}
-						if (num8 > num6)
-						{
 							num6 = num8;
 							item = spawnInfo;
-						}
-						num5++;
-						if (num5 >= 10 || DistanceDifferentType == DistanceMode.Any)
-						{
-							break;
+							num5++;
+							if (num5 >= 8 || DistanceDifferentType == DistanceMode.Any)
+							{
+								break;
+							}
 						}
 					}
 					if (num6 > 0)

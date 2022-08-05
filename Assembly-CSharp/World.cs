@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using ConVar;
 using Oxide.Core;
@@ -40,6 +41,7 @@ public static class World
 
 	public static string Name
 	{
+		[MethodImpl(MethodImplOptions.NoInlining)]
 		get
 		{
 			if (CanLoadFromUrl())
@@ -52,32 +54,49 @@ public static class World
 
 	public static string MapFileName
 	{
+		[MethodImpl(MethodImplOptions.NoInlining)]
 		get
 		{
 			if (CanLoadFromUrl())
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 226 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 227 + ".map";
 		}
 	}
 
-	public static string MapFolderName => Server.rootFolder;
+	public static string MapFolderName
+	{
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		get
+		{
+			return Server.rootFolder;
+		}
+	}
 
 	public static string SaveFileName
 	{
+		[MethodImpl(MethodImplOptions.NoInlining)]
 		get
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 226 + ".sav";
+				return Name + "." + 227 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 226 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 227 + ".sav";
 		}
 	}
 
-	public static string SaveFolderName => Server.rootFolder;
+	public static string SaveFolderName
+	{
+		[MethodImpl(MethodImplOptions.NoInlining)]
+		get
+		{
+			return Server.rootFolder;
+		}
+	}
 
+	[MethodImpl(MethodImplOptions.NoInlining)]
 	public static string GetServerBrowserMapName()
 	{
 		if (!CanLoadFromUrl())
@@ -91,11 +110,13 @@ public static class World
 		return "Custom Map";
 	}
 
+	[MethodImpl(MethodImplOptions.NoInlining)]
 	public static bool CanLoadFromUrl()
 	{
 		return !string.IsNullOrEmpty(Url);
 	}
 
+	[MethodImpl(MethodImplOptions.NoInlining)]
 	public static bool CanLoadFromDisk()
 	{
 		return File.Exists(MapFolderName + "/" + MapFileName);
@@ -104,7 +125,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 226 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 227 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -141,7 +162,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 226 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 227 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -304,7 +325,7 @@ public static class World
 		Serialization.AddPath(PathListToPathData(path));
 	}
 
-	public static IEnumerator Spawn(float deltaTime, Action<string> statusFunction = null)
+	public static IEnumerator SpawnAsync(float deltaTime, Action<string> statusFunction = null)
 	{
 		Dictionary<string, List<PrefabData>> assetGroups = (from p in Serialization.world.prefabs
 			group p by StringPool.Get(p.id)).ToDictionary((IGrouping<string, PrefabData> g) => g.Key, (IGrouping<string, PrefabData> g) => g.ToList(), StringComparer.InvariantCultureIgnoreCase);
@@ -338,6 +359,22 @@ public static class World
 			Status(statusFunction, "Spawning World ({0}/{1})", spawnedCount, totalCount);
 			yield return CoroutineEx.waitForEndOfFrame;
 			sw.Restart();
+		}
+	}
+
+	public static IEnumerator Spawn(float deltaTime, Action<string> statusFunction = null)
+	{
+		Stopwatch sw = Stopwatch.StartNew();
+		for (int i = 0; i < Serialization.world.prefabs.Count; i++)
+		{
+			if (sw.Elapsed.TotalSeconds > (double)deltaTime || i == 0 || i == Serialization.world.prefabs.Count - 1)
+			{
+				Status(statusFunction, "Spawning World ({0}/{1})", i + 1, Serialization.world.prefabs.Count);
+				yield return CoroutineEx.waitForEndOfFrame;
+				sw.Reset();
+				sw.Start();
+			}
+			Spawn(Serialization.world.prefabs[i]);
 		}
 	}
 

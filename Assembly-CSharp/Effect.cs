@@ -177,6 +177,15 @@ public class Effect : EffectData
 				{
 					strName = impactEffect.resourcePath;
 				}
+				Bounds bounds = info.HitEntity.bounds;
+				float num = info.HitEntity.BoundsPadding();
+				bounds.extents += new Vector3(num, num, num);
+				if (!bounds.Contains(info.HitPositionLocal))
+				{
+					float num2 = Mathf.Sqrt(bounds.SqrDistance(info.HitPositionLocal));
+					AntiHack.Log(info.InitiatorPlayer, AntiHackType.EffectHack, $"Tried to run an impact effect outside of entity '{info.HitEntity.ShortPrefabName}' bounds by {num2}m");
+					return;
+				}
 				Run(strName, info.HitEntity, info.HitBone, info.HitPositionLocal, info.HitNormalLocal, info.Predicted);
 				Run(decal, info.HitEntity, info.HitBone, info.HitPositionLocal, info.HitNormalLocal, info.Predicted);
 			}

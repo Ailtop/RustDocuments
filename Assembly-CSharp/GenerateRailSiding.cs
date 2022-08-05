@@ -11,7 +11,7 @@ public class GenerateRailSiding : ProceduralComponent
 
 	public const float InnerFade = 1f;
 
-	public const float OuterFade = 16f;
+	public const float OuterFade = 32f;
 
 	public const float RandomScale = 1f;
 
@@ -34,7 +34,7 @@ public class GenerateRailSiding : ProceduralComponent
 			InnerPadding = 1f,
 			OuterPadding = 1f,
 			InnerFade = 1f,
-			OuterFade = 16f,
+			OuterFade = 32f,
 			RandomScale = 1f,
 			MeshOffset = 0f,
 			TerrainOffset = -0.125f,
@@ -56,8 +56,7 @@ public class GenerateRailSiding : ProceduralComponent
 		int max = Mathf.RoundToInt(53.3333321f);
 		int min2 = Mathf.RoundToInt(13.333333f);
 		int max2 = Mathf.RoundToInt(20f);
-		int num = 8;
-		float num2 = 16f * 16f;
+		float num = 16f * 16f;
 		List<PathList> list = new List<PathList>();
 		int[,] array = TerrainPath.CreateRailCostmap(ref seed);
 		new PathFinder(array);
@@ -79,7 +78,7 @@ public class GenerateRailSiding : ProceduralComponent
 					Vector3[] points2 = rail2.Path.Points;
 					foreach (Vector3 vector2 in points2)
 					{
-						if ((vector - vector2).sqrMagnitude < num2)
+						if ((vector - vector2).sqrMagnitude < num)
 						{
 							hashSet.Add(vector);
 							break;
@@ -93,39 +92,39 @@ public class GenerateRailSiding : ProceduralComponent
 			PathInterpolator path = rail3.Path;
 			Vector3[] points3 = path.Points;
 			Vector3[] tangents = path.Tangents;
-			int num3 = path.MinIndex + 1 + num * 2;
-			int num4 = path.MaxIndex - 1 - num * 2;
-			for (int k = num3; k <= num4; k++)
+			int num2 = path.MinIndex + 1 + 16;
+			int num3 = path.MaxIndex - 1 - 16;
+			for (int k = num2; k <= num3; k++)
 			{
 				list2.Clear();
 				list3.Clear();
-				int num5 = SeedRandom.Range(ref seed, min2, max2);
-				int num6 = SeedRandom.Range(ref seed, min, max);
-				int num7 = k;
-				int num8 = k + num5;
-				if (num8 >= num4)
+				int num4 = SeedRandom.Range(ref seed, min2, max2);
+				int num5 = SeedRandom.Range(ref seed, min, max);
+				int num6 = k;
+				int num7 = k + num4;
+				if (num7 >= num3)
 				{
 					continue;
 				}
-				Vector3 from = tangents[num7];
-				Vector3 to = tangents[num8];
+				Vector3 from = tangents[num6];
+				Vector3 to = tangents[num7];
 				if (Vector3.Angle(from, to) > 30f)
 				{
 					continue;
 				}
-				Vector3 to2 = tangents[num7];
-				Vector3 to3 = tangents[num8];
-				Vector3 from2 = Vector3.Normalize(points3[num7 + num] - points3[num7]);
-				Vector3 from3 = Vector3.Normalize(points3[num8] - points3[num8 - num]);
-				float num9 = Vector3.SignedAngle(from2, to2, Vector3.up);
+				Vector3 to2 = tangents[num6];
+				Vector3 to3 = tangents[num7];
+				Vector3 from2 = Vector3.Normalize(points3[num6 + 8] - points3[num6]);
+				Vector3 from3 = Vector3.Normalize(points3[num7] - points3[num7 - 8]);
+				float num8 = Vector3.SignedAngle(from2, to2, Vector3.up);
 				float f = 0f - Vector3.SignedAngle(from3, to3, Vector3.up);
-				if (Mathf.Sign(num9) != Mathf.Sign(f) || Mathf.Abs(num9) > 60f || Mathf.Abs(f) > 60f)
+				if (Mathf.Sign(num8) != Mathf.Sign(f) || Mathf.Abs(num8) > 60f || Mathf.Abs(f) > 60f)
 				{
 					continue;
 				}
-				float num10 = 4f;
-				Quaternion quaternion = ((num9 > 0f) ? rotRight : rotLeft);
-				for (int l = num7 - num; l <= num8 + num; l++)
+				float num9 = 5f;
+				Quaternion quaternion = ((num8 > 0f) ? rotRight : rotLeft);
+				for (int l = num6 - 8; l <= num7 + 8; l++)
 				{
 					Vector3 item = points3[l];
 					if (hashSet.Contains(item))
@@ -136,21 +135,21 @@ public class GenerateRailSiding : ProceduralComponent
 					}
 					Vector3 vector3 = tangents[l];
 					Vector3 vector4 = quaternion * vector3;
-					if (l < num7 + num)
+					if (l < num6 + 8)
 					{
-						float t = Mathf.InverseLerp(num7 - num, num7, l);
-						float num11 = Mathf.SmoothStep(0f, 1f, t) * num10;
-						item += vector4 * num11;
+						float t = Mathf.InverseLerp(num6 - 8, num6, l);
+						float num10 = Mathf.SmoothStep(0f, 1f, t) * num9;
+						item += vector4 * num10;
 					}
-					else if (l > num8 - num)
+					else if (l > num7 - 8)
 					{
-						float t2 = Mathf.InverseLerp(num8 + num, num8, l);
-						float num12 = Mathf.SmoothStep(0f, 1f, t2) * num10;
-						item += vector4 * num12;
+						float t2 = Mathf.InverseLerp(num7 + 8, num7, l);
+						float num11 = Mathf.SmoothStep(0f, 1f, t2) * num9;
+						item += vector4 * num11;
 					}
 					else
 					{
-						item += vector4 * num10;
+						item += vector4 * num9;
 					}
 					list2.Add(item);
 					list3.Add(vector3);
@@ -162,9 +161,9 @@ public class GenerateRailSiding : ProceduralComponent
 					pathList.Start = false;
 					pathList.End = false;
 					list.Add(pathList);
-					k += num5;
+					k += num4;
 				}
-				k += num6;
+				k += num5;
 			}
 		}
 		foreach (PathList item2 in list)

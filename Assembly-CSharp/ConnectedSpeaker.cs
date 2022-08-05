@@ -37,7 +37,7 @@ public class ConnectedSpeaker : IOEntity
 		}
 		else if (connectedTo.IsSet)
 		{
-			ClientRPC(null, "Client_StopPlayingAudio");
+			ClientRPC(null, "Client_StopPlayingAudio", connectedTo.uid);
 			connectedTo.Set(null);
 		}
 	}

@@ -15,6 +15,7 @@ public class World : ConsoleSystem
 	public static bool streaming = true;
 
 	[ClientVar]
+	[ServerVar]
 	public static void monuments(Arg arg)
 	{
 		if (!TerrainMeta.Path)

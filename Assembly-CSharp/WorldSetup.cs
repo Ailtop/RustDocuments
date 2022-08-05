@@ -206,10 +206,13 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 			TerrainMeta.TopologyMap.FromByteArray(World.GetMap("topology"));
 			TerrainMeta.AlphaMap.FromByteArray(World.GetMap("alpha"));
 			TerrainMeta.WaterMap.FromByteArray(World.GetMap("water"));
-			IEnumerator worldSpawn = World.Spawn(0.2f, delegate(string str)
+			IEnumerator worldSpawn = ((ConVar.Global.preloadConcurrency > 1) ? World.SpawnAsync(0.2f, delegate(string str)
 			{
 				LoadingScreen.Update(str);
-			});
+			}) : World.Spawn(0.2f, delegate(string str)
+			{
+				LoadingScreen.Update(str);
+			}));
 			while (worldSpawn.MoveNext())
 			{
 				yield return worldSpawn.Current;

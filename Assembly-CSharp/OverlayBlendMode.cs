@@ -4,5 +4,6 @@ public enum OverlayBlendMode
 	ScreenBlend = 1,
 	Multiply = 2,
 	Overlay = 3,
-	AlphaBlend = 4
+	AlphaBlend = 4,
+	AdditiveNonLit = 5
 }

@@ -17,4 +17,10 @@ public class LightGroupAtTime : FacepunchBehaviour
 	};
 
 	public Transform SearchRoot;
+
+	[Header("Power Settings")]
+	public bool requiresPower;
+
+	[Tooltip("Can NOT be entity, use new blank gameobject!")]
+	public Transform powerOverrideTransform;
 }

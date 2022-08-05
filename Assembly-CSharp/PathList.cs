@@ -837,7 +837,7 @@ public class PathList
 		}
 	}
 
-	public List<MeshObject> CreateMesh(Mesh[] meshes, float normalSmoothing, bool snapToTerrain)
+	public List<MeshObject> CreateMesh(Mesh[] meshes, float normalSmoothing, bool snapToTerrain, bool snapStartToTerrain, bool snapEndToTerrain)
 	{
 		MeshCache.Data[] array = new MeshCache.Data[meshes.Length];
 		MeshData[] array2 = new MeshData[meshes.Length];
@@ -851,7 +851,7 @@ public class PathList
 		{
 			array3[j].AllocMinimal();
 		}
-		Bounds bounds = meshes[0].bounds;
+		Bounds bounds = meshes[meshes.Length - 1].bounds;
 		Vector3 min = bounds.min;
 		Vector3 size = bounds.size;
 		float num = Width / bounds.size.x;
@@ -904,7 +904,7 @@ public class PathList
 						vector8 += vector7 * meshOffset;
 						vector9 += vector7 * meshOffset;
 						vector2 = Vector3.Lerp(vector8, vector9, t);
-						if (!Path.Circular && (num9 < 0.1f || num9 > Path.Length - 0.1f))
+						if ((snapStartToTerrain && num9 < 0.1f) || (snapEndToTerrain && num9 > Path.Length - 0.1f))
 						{
 							vector2.y = heightMap.GetHeight(vector2);
 						}

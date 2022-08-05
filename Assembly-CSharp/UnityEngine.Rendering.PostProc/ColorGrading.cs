@@ -35,17 +35,17 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Toe Length")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects how much of the dynamic range is in the toe. With a small value, the toe will be very short and quickly transition into the linear section, with a larger value, the toe will be longer.")]
+	[DisplayName("Toe Length")]
 	public FloatParameter toneCurveToeLength = new FloatParameter
 	{
 		value = 0.5f
 	};
 
-	[DisplayName("Shoulder Strength")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects the transition between the mid section and the shoulder of the curve. A value of 0 means no shoulder, a value of 1 means a very hard transition.")]
+	[DisplayName("Shoulder Strength")]
 	public FloatParameter toneCurveShoulderStrength = new FloatParameter
 	{
 		value = 0f
@@ -67,9 +67,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Gamma")]
 	[Min(0.001f)]
 	[Tooltip("Applies a gamma function to the curve.")]
+	[DisplayName("Gamma")]
 	public FloatParameter toneCurveGamma = new FloatParameter
 	{
 		value = 1f
@@ -107,25 +107,25 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[ColorUsage(false, true)]
 	[Tooltip("Tint the render by multiplying a color.")]
 	[DisplayName("Color Filter")]
+	[ColorUsage(false, true)]
 	public ColorParameter colorFilter = new ColorParameter
 	{
 		value = Color.white
 	};
 
+	[DisplayName("Hue Shift")]
 	[Range(-180f, 180f)]
 	[Tooltip("Shift the hue of all colors.")]
-	[DisplayName("Hue Shift")]
 	public FloatParameter hueShift = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Tooltip("Pushes the intensity of all colors.")]
 	[DisplayName("Saturation")]
 	[Range(-100f, 100f)]
+	[Tooltip("Pushes the intensity of all colors.")]
 	public FloatParameter saturation = new FloatParameter
 	{
 		value = 0f
@@ -146,9 +146,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[DisplayName("Contrast")]
 	[Range(-100f, 100f)]
 	[Tooltip("Expands or shrinks the overall range of tonal values.")]
-	[DisplayName("Contrast")]
 	public FloatParameter contrast = new FloatParameter
 	{
 		value = 0f
@@ -170,17 +170,17 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	[DisplayName("Blue")]
 	[Range(-200f, 200f)]
-	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	public FloatParameter mixerRedOutBlueIn = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[DisplayName("Red")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the red channel in the overall mix.")]
+	[DisplayName("Red")]
 	public FloatParameter mixerGreenOutRedIn = new FloatParameter
 	{
 		value = 0f
@@ -210,9 +210,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Green")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the green channel in the overall mix.")]
+	[DisplayName("Green")]
 	public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 	{
 		value = 0f
@@ -242,9 +242,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = new Vector4(1f, 1f, 1f, 0f)
 	};
 
+	[DisplayName("Gain")]
 	[Tooltip("Controls the lightest portions of the render.")]
 	[Trackball(TrackballAttribute.Mode.Gain)]
-	[DisplayName("Gain")]
 	public Vector4Parameter gain = new Vector4Parameter
 	{
 		value = new Vector4(1f, 1f, 1f, 0f)

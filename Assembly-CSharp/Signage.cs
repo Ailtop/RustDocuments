@@ -60,6 +60,8 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 
 	public List<ulong> EditingHistory => editHistory;
 
+	public BaseNetworkable UgcEntity => this;
+
 	public uint[] GetContentCRCs => GetTextureCRCs();
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
@@ -531,7 +533,7 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 		stringBuilder.AppendLine(base.Admin_Who());
 		for (int i = 0; i < editHistory.Count; i++)
 		{
-			stringBuilder.AppendLine($"Edit {0}: {editHistory[i]}");
+			stringBuilder.AppendLine($"Edit {i}: {editHistory[i]}");
 		}
 		return stringBuilder.ToString();
 	}

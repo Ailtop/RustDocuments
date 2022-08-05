@@ -1987,7 +1987,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		if (!base.transform.hasChanged)
 		{
-			if (ticksSinceStopped >= 3)
+			if (ticksSinceStopped >= 6)
 			{
 				return;
 			}
@@ -3105,7 +3105,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual bool SupportsChildDeployables()
 	{
-		return true;
+		return false;
 	}
 
 	public void BroadcastEntityMessage(string msg, float radius = 20f, int layerMask = 1218652417)

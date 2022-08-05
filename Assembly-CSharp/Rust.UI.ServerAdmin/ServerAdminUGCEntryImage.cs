@@ -13,5 +13,5 @@ public class ServerAdminUGCEntryImage : ServerAdminUGCEntry
 
 	public RustText ImageIndex;
 
-	public ServerAdminPlayerId[] historyIds = new ServerAdminPlayerId[0];
+	public Vector2 OriginalImageSize;
 }

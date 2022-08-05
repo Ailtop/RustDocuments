@@ -1,3 +1,4 @@
+using Facepunch;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,7 +34,7 @@ public class ServerAdminUI : SingletonComponent<ServerAdminUI>
 
 	public GameObjectRef SoundEntry;
 
-	public RectTransform UgcParent;
+	public VirtualScroll UgcVirtualScroll;
 
 	public GameObject ExpandedUgcRoot;
 

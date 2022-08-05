@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class Sled : BaseVehicle, INotifyTrigger
 {
-	private const Flags BrakeOn = Flags.Reserved1;
+	public const Flags BrakeOn = Flags.Reserved1;
 
-	private const Flags OnSnow = Flags.Reserved2;
+	public const Flags OnSnow = Flags.Reserved2;
 
-	private const Flags IsGrounded = Flags.Reserved3;
+	public const Flags IsGrounded = Flags.Reserved3;
 
-	private const Flags OnSand = Flags.Reserved4;
+	public const Flags OnSand = Flags.Reserved4;
 
 	public PhysicMaterial BrakeMaterial;
 
@@ -54,15 +54,15 @@ public class Sled : BaseVehicle, INotifyTrigger
 
 	public AnimationCurve movementLoopPitchCurve;
 
-	private VehicleTerrainHandler terrainHandler;
+	public VehicleTerrainHandler terrainHandler;
 
-	private PhysicMaterial cachedMaterial;
+	public PhysicMaterial cachedMaterial;
 
-	private float initialForceScale;
+	public float initialForceScale;
 
-	private TimeSince leftIce;
+	public TimeSince leftIce;
 
-	private TimeSince lastNudge;
+	public TimeSince lastNudge;
 
 	public override bool BlocksDoors => false;
 
@@ -101,7 +101,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		}
 	}
 
-	private void UpdatePhysicsMaterial()
+	public void UpdatePhysicsMaterial()
 	{
 		cachedMaterial = GetPhysicMaterial();
 		Collider[] physicsMaterialTargets = PhysicsMaterialTargets;
@@ -117,7 +117,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		SetFlag(Flags.Reserved4, terrainHandler.OnSurface == VehicleTerrainHandler.Surface.Sand);
 	}
 
-	private void UpdateGroundedFlag()
+	public void UpdateGroundedFlag()
 	{
 		if (!AnyMounted() && rigidBody.IsSleeping())
 		{
@@ -126,7 +126,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		SetFlag(Flags.Reserved3, terrainHandler.IsGrounded);
 	}
 
-	private PhysicMaterial GetPhysicMaterial()
+	public PhysicMaterial GetPhysicMaterial()
 	{
 		if (HasFlag(Flags.Reserved1) || !AnyMounted())
 		{
@@ -171,7 +171,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		}
 	}
 
-	private void ApplyInitialForce()
+	public void ApplyInitialForce()
 	{
 		Vector3 forward = base.transform.forward;
 		Vector3 vector = ((Vector3.Dot(forward, -Vector3.up) > Vector3.Dot(-forward, -Vector3.up)) ? forward : (-forward));
@@ -212,7 +212,7 @@ public class Sled : BaseVehicle, INotifyTrigger
 		}
 	}
 
-	private void DecayOverTime()
+	public void DecayOverTime()
 	{
 		if (!AnyMounted())
 		{

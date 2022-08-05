@@ -44,7 +44,6 @@ public class WaterBall : BaseEntity
 			return (bool)obj;
 		}
 		List<BaseEntity> obj2 = Pool.GetList<BaseEntity>();
-		Interface.CallHook("OnWaterBallSplash", position, radius, liquidDef, amount);
 		Vis.Entities(position, radius, obj2, 1219701523);
 		int num = 0;
 		int num2 = amount;

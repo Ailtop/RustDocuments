@@ -68,14 +68,20 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 			fails++;
 			if (fails >= ConVar.Physics.groundwatchfails)
 			{
-				base.transform.root.BroadcastMessage("OnGroundMissing", SendMessageOptions.DontRequireReceiver);
-				return;
+				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(base.gameObject);
+				if ((bool)baseEntity)
+				{
+					baseEntity.transform.BroadcastMessage("OnGroundMissing", SendMessageOptions.DontRequireReceiver);
+				}
 			}
-			if (ConVar.Physics.groundwatchdebug)
+			else
 			{
-				Debug.Log("GroundWatch retry: " + fails);
+				if (ConVar.Physics.groundwatchdebug)
+				{
+					Debug.Log("GroundWatch retry: " + fails);
+				}
+				Invoke(OnPhysicsNeighbourChanged, ConVar.Physics.groundwatchdelay);
 			}
-			Invoke(OnPhysicsNeighbourChanged, ConVar.Physics.groundwatchdelay);
 		}
 		else
 		{

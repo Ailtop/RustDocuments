@@ -530,6 +530,10 @@ public class BaseMountable : BaseCombatEntity
 		if (!UnityEngine.Physics.CheckCapsule(start, end, 0.5f, 1537286401))
 		{
 			Vector3 vector = disPos + base.transform.up * 0.5f;
+			if (debugDismounts)
+			{
+				Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} capsule check is OK.");
+			}
 			if (IsVisible(vector))
 			{
 				if (debugDismounts)

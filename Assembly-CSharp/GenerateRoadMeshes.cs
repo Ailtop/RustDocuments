@@ -30,7 +30,7 @@ public class GenerateRoadMeshes : ProceduralComponent
 			{
 				continue;
 			}
-			foreach (PathList.MeshObject item in road.CreateMesh(RoadMeshes, 0f, snapToTerrain: true))
+			foreach (PathList.MeshObject item in road.CreateMesh(RoadMeshes, 0f, snapToTerrain: true, !road.Path.Circular, !road.Path.Circular))
 			{
 				GameObject obj = new GameObject("Road Mesh");
 				obj.transform.position = item.Position;

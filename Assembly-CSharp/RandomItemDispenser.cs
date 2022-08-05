@@ -1,4 +1,5 @@
 using System;
+using Oxide.Core;
 using UnityEngine;
 
 public class RandomItemDispenser : PrefabAttribute, IServerComponent
@@ -38,6 +39,10 @@ public class RandomItemDispenser : PrefabAttribute, IServerComponent
 
 	private bool TryAward(RandomItemChance itemChance, BasePlayer forPlayer, Vector3 distributorPosition)
 	{
+		if (Interface.CallHook("OnRandomItemAward", this, itemChance, forPlayer, distributorPosition) != null)
+		{
+			return false;
+		}
 		float num = UnityEngine.Random.Range(0f, 1f);
 		if (itemChance.Chance >= num)
 		{

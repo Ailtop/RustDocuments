@@ -33,7 +33,7 @@ public class GenerateRailRing : ProceduralComponent
 
 	public const float InnerFade = 1f;
 
-	public const float OuterFade = 16f;
+	public const float OuterFade = 32f;
 
 	public const float RandomScale = 1f;
 
@@ -266,7 +266,7 @@ public class GenerateRailRing : ProceduralComponent
 				pathList.InnerPadding = 1f;
 				pathList.OuterPadding = 1f;
 				pathList.InnerFade = 1f;
-				pathList.OuterFade = 16f;
+				pathList.OuterFade = 32f;
 				pathList.RandomScale = 1f;
 				pathList.MeshOffset = 0f;
 				pathList.TerrainOffset = -0.125f;

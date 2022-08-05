@@ -38,6 +38,8 @@ public class PhotoEntity : ImageStorageEntity, IUGCBrowserEntity
 		}
 	}
 
+	public BaseNetworkable UgcEntity => this;
+
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);

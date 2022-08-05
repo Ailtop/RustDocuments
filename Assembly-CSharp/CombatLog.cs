@@ -136,13 +136,13 @@ public class CombatLog
 		}
 	}
 
-	public string Get(int count, uint filterByAttacker = 0u)
+	public string Get(int count, uint filterByAttacker = 0u, bool json = false)
 	{
 		if (storage == null)
 		{
 			return string.Empty;
 		}
-		if (storage.Count == 0)
+		if (storage.Count == 0 && !json)
 		{
 			return "Combat log empty.";
 		}
@@ -210,11 +210,19 @@ public class CombatLog
 				}
 			}
 		}
-		string text12 = textTable.ToString();
-		if (num2 > 0)
+		string text12;
+		if (json)
 		{
-			text12 = text12 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
-			text12 = text12 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
+			text12 = textTable.ToJson();
+		}
+		else
+		{
+			text12 = textTable.ToString();
+			if (num2 > 0)
+			{
+				text12 = text12 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
+				text12 = text12 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
+			}
 		}
 		return text12;
 	}

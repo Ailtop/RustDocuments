@@ -20,6 +20,8 @@ public class SignContent : ImageStorageEntity, IUGCBrowserEntity
 
 	public List<ulong> EditingHistory => editHistory;
 
+	public BaseNetworkable UgcEntity => this;
+
 	public void CopyInfoFromSign(ISignage s, IUGCBrowserEntity b)
 	{
 		uint[] textureCRCs = s.GetTextureCRCs();

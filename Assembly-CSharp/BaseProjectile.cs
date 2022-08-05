@@ -1189,9 +1189,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

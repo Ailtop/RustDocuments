@@ -27,6 +27,8 @@ public class VirtualScroll : MonoBehaviour
 
 	public ScrollRect ScrollRect;
 
+	public RectTransform OverrideContentRoot;
+
 	private IDataSource dataSource;
 
 	private Dictionary<int, GameObject> ActivePool = new Dictionary<int, GameObject>();
@@ -89,7 +91,7 @@ public class VirtualScroll : MonoBehaviour
 			return;
 		}
 		int itemCount = dataSource.GetItemCount();
-		RectTransform obj = ScrollRect.viewport.GetChild(0) as RectTransform;
+		RectTransform obj = ((OverrideContentRoot != null) ? OverrideContentRoot : (ScrollRect.viewport.GetChild(0) as RectTransform));
 		obj.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, BlockHeight * itemCount - ItemSpacing + Padding.top + Padding.bottom);
 		int num = Mathf.Max(2, Mathf.CeilToInt(ScrollRect.viewport.rect.height / (float)BlockHeight));
 		int num2 = Mathf.FloorToInt((obj.anchoredPosition.y - (float)Padding.top) / (float)BlockHeight);
@@ -147,7 +149,7 @@ public class VirtualScroll : MonoBehaviour
 		if (InactivePool.Count == 0)
 		{
 			GameObject gameObject = Object.Instantiate(SourceObject);
-			gameObject.transform.SetParent(ScrollRect.viewport.GetChild(0), worldPositionStays: false);
+			gameObject.transform.SetParent((OverrideContentRoot != null) ? OverrideContentRoot : ScrollRect.viewport.GetChild(0), worldPositionStays: false);
 			gameObject.transform.localScale = Vector3.one;
 			gameObject.SetActive(value: false);
 			InactivePool.Push(gameObject);

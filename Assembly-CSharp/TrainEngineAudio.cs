@@ -27,6 +27,9 @@ public class TrainEngineAudio : MonoBehaviour
 	[SerializeField]
 	private Transform cockpitSoundPosition;
 
+	[SerializeField]
+	private Transform hornSoundPosition;
+
 	[Header("Engine")]
 	[SerializeField]
 	private SoundDefinition engineStartSound;
@@ -67,6 +70,13 @@ public class TrainEngineAudio : MonoBehaviour
 
 	[SerializeField]
 	private float reflectionRayOffset = 0.5f;
+
+	[Header("Horn")]
+	[SerializeField]
+	private SoundDefinition hornLoop;
+
+	[SerializeField]
+	private SoundDefinition hornStart;
 
 	[Header("Other")]
 	[SerializeField]
@@ -126,6 +136,12 @@ public class TrainEngineAudio : MonoBehaviour
 
 	[SerializeField]
 	private SoundDefinition changeCouplingDef;
+
+	[SerializeField]
+	private SoundDefinition unloadableStartDef;
+
+	[SerializeField]
+	private SoundDefinition unloadableEndDef;
 
 	[SerializeField]
 	private SoundPlayer brakeSound;

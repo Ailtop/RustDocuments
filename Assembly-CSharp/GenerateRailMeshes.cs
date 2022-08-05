@@ -24,10 +24,11 @@ public class GenerateRailMeshes : ProceduralComponent
 		}
 		foreach (PathList rail in TerrainMeta.Path.Rails)
 		{
-			foreach (PathList.MeshObject item in rail.CreateMesh(RailMeshes, 0f, snapToTerrain: false))
+			foreach (PathList.MeshObject item in rail.CreateMesh(RailMeshes, 0f, snapToTerrain: false, !rail.Path.Circular && !rail.Start, !rail.Path.Circular && !rail.End))
 			{
 				GameObject obj = new GameObject("Rail Mesh");
 				obj.transform.position = item.Position;
+				obj.tag = "Railway";
 				obj.layer = 16;
 				GameObjectEx.SetHierarchyGroup(obj, rail.Name);
 				obj.SetActive(value: false);

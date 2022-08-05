@@ -27,24 +27,7 @@ public class ConvarControlledSpawnPopulation : SpawnPopulation
 }
 public class ConvarControlledSpawnPopulationRailRing : ConvarControlledSpawnPopulation
 {
-	public enum TrainCarType
-	{
-		WorkCart = 0,
-		WorkCartWithCover = 1,
-		Wagon = 2
-	}
-
-	public TrainCarType trainCarType;
-
 	private const float MIN_MARGIN = 60f;
-
-	public override float TargetDensity => trainCarType switch
-	{
-		TrainCarType.WorkCart => base.TargetDensity * (1f - TrainCar.variant_ratio), 
-		TrainCarType.WorkCartWithCover => base.TargetDensity * TrainCar.variant_ratio, 
-		TrainCarType.Wagon => base.TargetDensity * (float)TrainCar.wagons_per_engine * 1.1f, 
-		_ => base.TargetDensity, 
-	};
 
 	public override bool OverrideSpawnPosition(ref Vector3 newPos, ref Quaternion newRot)
 	{
@@ -72,5 +55,23 @@ public class ConvarControlledSpawnPopulationRailRing : ConvarControlledSpawnPopu
 			}
 		}
 		return false;
+	}
+
+	protected override int GetPrefabWeight(Prefab<Spawnable> prefab)
+	{
+		int num = ((!prefab.Parameters) ? 1 : prefab.Parameters.Count);
+		TrainCar component = prefab.Object.GetComponent<TrainCar>();
+		if (component != null)
+		{
+			if (component.CarType == TrainCar.TrainCarType.Wagon)
+			{
+				num *= TrainCar.wagons_per_engine;
+			}
+		}
+		else
+		{
+			Debug.LogError(GetType().Name + ": No TrainCar script on train prefab " + prefab.Object.name);
+		}
+		return num;
 	}
 }

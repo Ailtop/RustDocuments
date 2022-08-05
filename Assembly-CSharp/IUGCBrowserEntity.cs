@@ -8,5 +8,7 @@ public interface IUGCBrowserEntity
 
 	List<ulong> EditingHistory { get; }
 
+	BaseNetworkable UgcEntity { get; }
+
 	void ClearContent();
 }

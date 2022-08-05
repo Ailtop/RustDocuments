@@ -381,4 +381,9 @@ public class PlanterBox : StorageContainer, ISplashable
 			ClientRPCPlayer(null, msg.player, "RPC_ReceiveSaturationUpdate", soilSaturation);
 		}
 	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
+	}
 }

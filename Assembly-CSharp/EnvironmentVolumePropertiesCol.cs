@@ -5,6 +5,14 @@ using UnityEngine;
 public class EnvironmentVolumePropertiesCollection : ScriptableObject
 {
 	[Serializable]
+	public class EnvironmentMultiplier
+	{
+		public EnvironmentType Type;
+
+		public float Multiplier;
+	}
+
+	[Serializable]
 	public class OceanParameters
 	{
 		public AnimationCurve TransitionCurve = AnimationCurve.Linear(0f, 0f, 40f, 1f);
@@ -45,20 +53,15 @@ public class EnvironmentVolumePropertiesCollection : ScriptableObject
 
 	public float TransitionSpeed = 1f;
 
-	public EnvironmentVolumeProperties[] Properties;
+	[Horizontal(1, 0)]
+	public EnvironmentMultiplier[] ReflectionMultipliers;
+
+	public float DefaultReflectionMultiplier = 1f;
+
+	[Horizontal(1, 0)]
+	public EnvironmentMultiplier[] AmbientMultipliers;
+
+	public float DefaultAmbientMultiplier = 1f;
 
 	public OceanParameters OceanOverrides;
-
-	public EnvironmentVolumeProperties FindQuality(int quality)
-	{
-		EnvironmentVolumeProperties[] properties = Properties;
-		foreach (EnvironmentVolumeProperties environmentVolumeProperties in properties)
-		{
-			if (environmentVolumeProperties.ReflectionQuality == quality)
-			{
-				return environmentVolumeProperties;
-			}
-		}
-		return null;
-	}
 }

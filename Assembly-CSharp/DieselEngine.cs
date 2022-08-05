@@ -99,6 +99,12 @@ public class DieselEngine : StorageContainer
 		{
 			return;
 		}
+		DateTime expireDate = default(DateTime);
+		expireDate._002Ector(2022, 12, 31);
+		if (Interface.CallDeprecatedHook("OnDieselEngineToggle", "OnDieselEngineToggle(DieselEngine engine, BasePlayer player)", expireDate, msg.player, this) != null)
+		{
+			return;
+		}
 		if (msg.read.Bit())
 		{
 			if (GetFuelAmount() > 0)

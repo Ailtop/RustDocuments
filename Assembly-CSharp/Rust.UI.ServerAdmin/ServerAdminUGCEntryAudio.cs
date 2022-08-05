@@ -11,6 +11,4 @@ public class ServerAdminUGCEntryAudio : ServerAdminUGCEntry
 	public RustSlider ProgressSlider;
 
 	public RustIcon PlayIcon;
-
-	public ServerAdminPlayerId EditedBy;
 }

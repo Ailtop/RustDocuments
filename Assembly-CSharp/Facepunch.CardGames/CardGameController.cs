@@ -359,7 +359,10 @@ public abstract class CardGameController : IDisposable
 			{
 				foreach (Item item in obj)
 				{
-					item.MoveToContainer(pot.inventory, -1, allowStack: true, ignoreStackLimit: true);
+					if (!item.MoveToContainer(pot.inventory, -1, allowStack: true, ignoreStackLimit: true))
+					{
+						item.MoveToContainer(storage.inventory);
+					}
 				}
 			}
 			Pool.FreeList(ref obj);
@@ -391,7 +394,10 @@ public abstract class CardGameController : IDisposable
 			{
 				foreach (Item item in obj)
 				{
-					item.MoveToContainer(storage.inventory, -1, allowStack: true, ignoreStackLimit: true);
+					if (!item.MoveToContainer(storage.inventory, -1, allowStack: true, ignoreStackLimit: true))
+					{
+						item.MoveToContainer(pot.inventory);
+					}
 				}
 			}
 			Pool.FreeList(ref obj);
@@ -421,7 +427,10 @@ public abstract class CardGameController : IDisposable
 			{
 				foreach (Item item in obj)
 				{
-					item.MoveToContainer(basePlayer.inventory.containerMain, -1, allowStack: true, ignoreStackLimit: true);
+					if (!item.MoveToContainer(basePlayer.inventory.containerMain, -1, allowStack: true, ignoreStackLimit: true))
+					{
+						item.MoveToContainer(storage.inventory);
+					}
 				}
 			}
 			Pool.FreeList(ref obj);

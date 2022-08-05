@@ -12,15 +12,15 @@ public class UserPersistance : IDisposable
 
 	public static Facepunch.Sqlite.Database deaths;
 
-	private static Facepunch.Sqlite.Database identities;
+	public static Facepunch.Sqlite.Database identities;
 
-	private static Facepunch.Sqlite.Database tokens;
+	public static Facepunch.Sqlite.Database tokens;
 
-	private static Facepunch.Sqlite.Database playerState;
+	public static Facepunch.Sqlite.Database playerState;
 
-	private static Dictionary<ulong, string> nameCache;
+	public static Dictionary<ulong, string> nameCache;
 
-	private static MruDictionary<ulong, (int Token, bool Locked)> tokenCache;
+	public static MruDictionary<ulong, (int Token, bool Locked)> tokenCache;
 
 	public UserPersistance(string strFolder)
 	{
@@ -55,7 +55,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("ALTER TABLE data ADD COLUMN locked BOOLEAN DEFAULT 0");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 226 + ".db");
+		playerState.Open(strFolder + "/player.states." + 227 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

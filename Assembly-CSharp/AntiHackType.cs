@@ -10,5 +10,6 @@ public enum AntiHackType
 	AttackHack = 7,
 	ReloadHack = 8,
 	CooldownHack = 9,
-	InsideTerrain = 10
+	InsideTerrain = 10,
+	EffectHack = 11
 }

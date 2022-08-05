@@ -503,13 +503,23 @@ public class VendingMachine : StorageContainer
 			sellOrder.inStock = inStock;
 			float itemCondition = 0f;
 			float itemConditionMax = 0f;
-			if (obj.Count > 0 && obj[0].hasCondition)
+			int instanceData = 0;
+			if (obj.Count > 0)
 			{
-				itemCondition = obj[0].condition;
-				itemConditionMax = obj[0].maxCondition;
+				if (obj[0].hasCondition)
+				{
+					itemCondition = obj[0].condition;
+					itemConditionMax = obj[0].maxCondition;
+				}
+				if (obj[0].info != null && obj[0].info.amountType == ItemDefinition.AmountType.Genetics && obj[0].instanceData != null)
+				{
+					instanceData = obj[0].instanceData.dataInt;
+					sellOrder.inStock = obj[0].amount;
+				}
 			}
 			sellOrder.itemCondition = itemCondition;
 			sellOrder.itemConditionMax = itemConditionMax;
+			sellOrder.instanceData = instanceData;
 			Facepunch.Pool.FreeList(ref obj);
 		}
 	}

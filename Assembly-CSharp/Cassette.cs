@@ -53,6 +53,8 @@ public class Cassette : BaseEntity, IUGCBrowserEntity
 
 	public List<ulong> EditingHistory => new List<ulong> { CreatorSteamId };
 
+	public BaseNetworkable UgcEntity => this;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("Cassette.OnRpcMessage"))

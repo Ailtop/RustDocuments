@@ -417,6 +417,11 @@ public class CargoShip : BaseEntity
 		return true;
 	}
 
+	public override bool SupportsChildDeployables()
+	{
+		return true;
+	}
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("CargoShip.OnRpcMessage"))

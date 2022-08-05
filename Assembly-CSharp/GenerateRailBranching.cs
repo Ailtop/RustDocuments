@@ -12,7 +12,7 @@ public class GenerateRailBranching : ProceduralComponent
 
 	public const float InnerFade = 1f;
 
-	public const float OuterFade = 16f;
+	public const float OuterFade = 32f;
 
 	public const float RandomScale = 1f;
 
@@ -33,7 +33,7 @@ public class GenerateRailBranching : ProceduralComponent
 			InnerPadding = 1f,
 			OuterPadding = 1f,
 			InnerFade = 1f,
-			OuterFade = 16f,
+			OuterFade = 32f,
 			RandomScale = 1f,
 			MeshOffset = 0f,
 			TerrainOffset = -0.125f,
@@ -55,7 +55,7 @@ public class GenerateRailBranching : ProceduralComponent
 		int max = Mathf.RoundToInt(53.3333321f);
 		int min2 = Mathf.RoundToInt(40f);
 		int max2 = Mathf.RoundToInt(120f);
-		int transitionSteps = 8;
+		float num = 120f * 120f;
 		List<PathList> list = new List<PathList>();
 		int[,] array = TerrainPath.CreateRailCostmap(ref seed);
 		PathFinder pathFinder = new PathFinder(array);
@@ -63,37 +63,65 @@ public class GenerateRailBranching : ProceduralComponent
 		List<Vector3> list2 = new List<Vector3>();
 		List<Vector3> list3 = new List<Vector3>();
 		List<Vector3> list4 = new List<Vector3>();
+		HashSet<Vector3> hashSet = new HashSet<Vector3>();
 		foreach (PathList rail2 in TerrainMeta.Path.Rails)
 		{
-			PathInterpolator path = rail2.Path;
-			Vector3[] points = path.Points;
+			foreach (PathList rail3 in TerrainMeta.Path.Rails)
+			{
+				if (rail2 == rail3)
+				{
+					continue;
+				}
+				Vector3[] points = rail2.Path.Points;
+				foreach (Vector3 vector in points)
+				{
+					Vector3[] points2 = rail3.Path.Points;
+					foreach (Vector3 vector2 in points2)
+					{
+						if ((vector - vector2).sqrMagnitude < num)
+						{
+							hashSet.Add(vector);
+							break;
+						}
+					}
+				}
+			}
+		}
+		foreach (PathList rail4 in TerrainMeta.Path.Rails)
+		{
+			PathInterpolator path = rail4.Path;
+			Vector3[] points3 = path.Points;
 			Vector3[] tangents = path.Tangents;
-			int num = path.MinIndex + 1 + transitionSteps;
-			int num2 = path.MaxIndex - 1 - transitionSteps;
-			for (int j = num; j <= num2; j++)
+			int num2 = path.MinIndex + 1 + 8;
+			int num3 = path.MaxIndex - 1 - 8;
+			for (int l = num2; l <= num3; l++)
 			{
 				list2.Clear();
 				list3.Clear();
 				list4.Clear();
-				int num3 = SeedRandom.Range(ref seed, min2, max2);
-				int num4 = SeedRandom.Range(ref seed, min, max);
-				int num5 = j;
-				int num6 = j + num3;
-				if (num6 >= num2)
+				int num4 = SeedRandom.Range(ref seed, min2, max2);
+				int num5 = SeedRandom.Range(ref seed, min, max);
+				int num6 = l;
+				int num7 = l + num4;
+				if (num7 >= num3)
 				{
 					continue;
 				}
-				Vector3 from = tangents[num5];
-				Vector3 to = tangents[num6];
+				Vector3 from = tangents[num6];
+				Vector3 to = tangents[num7];
 				if (Vector3.Angle(from, to) > 30f)
 				{
 					continue;
 				}
-				Vector3 worldPos = points[num5];
-				PathFinder.Point pathFinderPoint = GetPathFinderPoint(worldPos, length);
-				Vector3 worldPos2 = points[num6];
-				PathFinder.Point pathFinderPoint2 = GetPathFinderPoint(worldPos2, length);
-				j += num4;
+				Vector3 vector3 = points3[num6];
+				Vector3 vector4 = points3[num7];
+				if (hashSet.Contains(vector3) || hashSet.Contains(vector4))
+				{
+					continue;
+				}
+				PathFinder.Point pathFinderPoint = GetPathFinderPoint(vector3, length);
+				PathFinder.Point pathFinderPoint2 = GetPathFinderPoint(vector4, length);
+				l += num5;
 				PathFinder.Node node = pathFinder.FindPath(pathFinderPoint, pathFinderPoint2, 250000);
 				if (node == null)
 				{
@@ -120,12 +148,12 @@ public class GenerateRailBranching : ProceduralComponent
 				}
 				node = node2;
 				node3.next = null;
-				for (int k = 0; k < transitionSteps; k++)
+				for (int m = 0; m < 8; m++)
 				{
-					int num7 = num5 + (k + 1 - transitionSteps);
-					int num8 = num6 + k;
-					list2.Add(points[num7]);
-					list3.Add(points[num8]);
+					int num8 = num6 + (m + 1 - 8);
+					int num9 = num7 + m;
+					list2.Add(points3[num8]);
+					list3.Add(points3[num9]);
 				}
 				list4.AddRange(list2);
 				for (PathFinder.Node node5 = node2; node5 != null; node5 = node5.next)
@@ -138,36 +166,36 @@ public class GenerateRailBranching : ProceduralComponent
 					list4.Add(new Vector3(x, y, z));
 				}
 				list4.AddRange(list3);
-				int num9 = transitionSteps;
-				int num10 = list4.Count - 1 - transitionSteps;
-				Vector3 vector = Vector3.Normalize(list4[num9 + transitionSteps] - list4[num9]);
-				Vector3 vector2 = Vector3.Normalize(list4[num10] - list4[num10 - transitionSteps]);
-				Vector3 from2 = Vector3.Normalize(points[num5 + transitionSteps] - points[num5]);
-				Vector3 from3 = Vector3.Normalize(points[num6] - points[num6 - transitionSteps]);
-				float num11 = Vector3.SignedAngle(from2, vector, Vector3.up);
-				float num12 = 0f - Vector3.SignedAngle(from3, vector2, Vector3.up);
-				if (Mathf.Sign(num11) != Mathf.Sign(num12) || Mathf.Abs(num11) > 60f || Mathf.Abs(num12) > 60f)
+				int num10 = 8;
+				int num11 = list4.Count - 1 - 8;
+				Vector3 to2 = Vector3.Normalize(list4[num10 + 16] - list4[num10]);
+				Vector3 to3 = Vector3.Normalize(list4[num11] - list4[num11 - 16]);
+				Vector3 vector5 = Vector3.Normalize(points3[num6 + 16] - points3[num6]);
+				Vector3 vector6 = Vector3.Normalize(points3[num7] - points3[(num7 - 16 + points3.Length) % points3.Length]);
+				float num12 = Vector3.SignedAngle(vector5, to2, Vector3.up);
+				float num13 = 0f - Vector3.SignedAngle(vector6, to3, Vector3.up);
+				if (Mathf.Sign(num12) != Mathf.Sign(num13) || Mathf.Abs(num12) > 60f || Mathf.Abs(num13) > 60f)
 				{
 					continue;
 				}
-				Vector3 vector3 = rot90 * vector;
-				Vector3 vector4 = rot90 * vector2;
-				if (num11 < 0f)
-				{
-					vector3 = -vector3;
-				}
+				Vector3 vector7 = rot90 * vector5;
+				Vector3 vector8 = rot90 * vector6;
 				if (num12 < 0f)
 				{
-					vector4 = -vector4;
+					vector7 = -vector7;
 				}
-				for (int l = 0; l < transitionSteps * 2; l++)
+				if (num13 < 0f)
 				{
-					int index = l;
-					int index2 = list4.Count - l - 1;
-					float t = Mathf.InverseLerp(0f, transitionSteps, l);
-					float num13 = Mathf.SmoothStep(0f, 2f, t) * 4f;
-					list4[index] += vector3 * num13;
-					list4[index2] += vector4 * num13;
+					vector8 = -vector8;
+				}
+				for (int n = 0; n < 16; n++)
+				{
+					int index = n;
+					int index2 = list4.Count - n - 1;
+					float t = Mathf.InverseLerp(0f, 8f, n);
+					float num14 = Mathf.SmoothStep(0f, 2f, t) * 4f;
+					list4[index] += vector7 * num14;
+					list4[index2] += vector8 * num14;
 				}
 				bool flag = false;
 				bool flag2 = false;
@@ -200,7 +228,7 @@ public class GenerateRailBranching : ProceduralComponent
 						pathList.ProcgenEndNode = node3;
 						list.Add(pathList);
 					}
-					j += num3;
+					l += num4;
 				}
 			}
 		}
@@ -208,8 +236,8 @@ public class GenerateRailBranching : ProceduralComponent
 		{
 			Func<int, float> filter = delegate(int i)
 			{
-				float a = Mathf.InverseLerp(0f, transitionSteps, i);
-				float b = Mathf.InverseLerp(rail.Path.DefaultMaxIndex, rail.Path.DefaultMaxIndex - transitionSteps, i);
+				float a = Mathf.InverseLerp(0f, 8f, i);
+				float b = Mathf.InverseLerp(rail.Path.DefaultMaxIndex, rail.Path.DefaultMaxIndex - 8, i);
 				return Mathf.SmoothStep(0f, 1f, Mathf.Min(a, b));
 			};
 			rail.Path.Smoothen(32, new Vector3(1f, 0f, 1f), filter);

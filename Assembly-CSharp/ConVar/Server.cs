@@ -488,7 +488,11 @@ public class Server : ConsoleSystem
 			string text2 = item2.Item2.ToString();
 			textTable.AddRow(text, text2);
 		}
-		return textTable.ToString();
+		if (!arg.HasArg("--json"))
+		{
+			return textTable.ToString();
+		}
+		return textTable.ToJson();
 	}
 
 	[ServerVar]
@@ -647,7 +651,7 @@ public class Server : ConsoleSystem
 		{
 			return "invalid player";
 		}
-		return basePlayer.stats.combat.Get(combatlogsize);
+		return basePlayer.stats.combat.Get(combatlogsize, 0u, arg.HasArg("--json"));
 	}
 
 	[ServerAllVar(Help = "Get the player combat log, only showing outgoing damage")]
@@ -662,7 +666,7 @@ public class Server : ConsoleSystem
 		{
 			return "invalid player";
 		}
-		return basePlayer.stats.combat.Get(combatlogsize, basePlayer.net.ID);
+		return basePlayer.stats.combat.Get(combatlogsize, basePlayer.net.ID, arg.HasArg("--json"));
 	}
 
 	[ServerVar(Help = "Print the current player position.")]
@@ -744,7 +748,7 @@ public class Server : ConsoleSystem
 		{
 			textTable.AddRow(activePlayer.userID.ToString(), activePlayer.displayName, activePlayer.transform.position.ToString(), activePlayer.eyes.BodyForward().ToString());
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar(Help = "Prints all the vending machines on the server")]
@@ -756,6 +760,18 @@ public class Server : ConsoleSystem
 		{
 			textTable.AddRow(item.net.ID.ToString(), item.transform.position.ToString(), item.shopName.QuoteSafe());
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
+	}
+
+	[ServerVar(Help = "Prints all the Tool Cupboards on the server")]
+	public static void listtoolcupboards(Arg arg)
+	{
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("EntityId", "Position", "Authed");
+		foreach (BuildingPrivlidge item in BaseNetworkable.serverEntities.OfType<BuildingPrivlidge>())
+		{
+			textTable.AddRow(item.net.ID.ToString(), item.transform.position.ToString(), item.authorizedPlayers.Count.ToString());
+		}
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 }

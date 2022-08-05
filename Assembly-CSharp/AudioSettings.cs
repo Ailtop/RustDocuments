@@ -20,11 +20,13 @@ public class AudioSettings : MonoBehaviour
 			{
 				mixer.SetFloat("MusicVol", Mathf.Lerp(value, LinearToDecibel(Audio.musicvolume), UnityEngine.Time.deltaTime));
 			}
-			mixer.SetFloat("WorldVol", LinearToDecibel(Audio.game));
-			mixer.SetFloat("VoiceVol", LinearToDecibel(Audio.voices));
-			mixer.SetFloat("InstrumentVol", LinearToDecibel(Audio.instruments));
-			float value2 = LinearToDecibel(Audio.voiceProps) - 28.7f;
-			mixer.SetFloat("VoicePropsVol", value2);
+			float num = 1f - ((SingletonComponent<MixerSnapshotManager>.Instance == null) ? 0f : SingletonComponent<MixerSnapshotManager>.Instance.deafness);
+			mixer.SetFloat("WorldVol", LinearToDecibel(Audio.game * num));
+			mixer.SetFloat("WorldVolFlashbang", LinearToDecibel(Audio.game));
+			mixer.SetFloat("VoiceVol", LinearToDecibel(Audio.voices * num));
+			mixer.SetFloat("InstrumentVol", LinearToDecibel(Audio.instruments * num));
+			float num2 = LinearToDecibel(Audio.voiceProps * num) - 28.7f;
+			mixer.SetFloat("VoicePropsVol", num2 * num);
 		}
 	}
 

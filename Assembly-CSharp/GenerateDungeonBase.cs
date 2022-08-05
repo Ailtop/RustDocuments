@@ -37,9 +37,9 @@ public class GenerateDungeonBase : ProceduralComponent
 
 	private const int MaxCount = int.MaxValue;
 
-	private const int MaxDepth = 4;
+	private const int MaxDepth = 3;
 
-	private const int MaxFloor = 3;
+	private const int MaxFloor = 2;
 
 	private List<DungeonSegment> segmentsTotal = new List<DungeonSegment>();
 
@@ -123,7 +123,7 @@ public class GenerateDungeonBase : ProceduralComponent
 					{
 						List<DungeonSegment> list2 = new List<DungeonSegment>();
 						list2.Add(segmentStart);
-						PlaceSegments(ref seed2, int.MaxValue, 4, 3, attachToFemale: true, attachToMale: false, list2, array2);
+						PlaceSegments(ref seed2, int.MaxValue, 3, 2, attachToFemale: true, attachToMale: false, list2, array2);
 						if (list2.Count > list.Count)
 						{
 							list = list2;
@@ -133,13 +133,13 @@ public class GenerateDungeonBase : ProceduralComponent
 				if (list.Count > 5)
 				{
 					list = list.OrderByDescending((DungeonSegment x) => (x.position - segmentStart.position).SqrMagnitude2D()).ToList();
-					PlaceSegments(ref seed2, 1, 5, 3, attachToFemale: true, attachToMale: false, list, array);
+					PlaceSegments(ref seed2, 1, 4, 2, attachToFemale: true, attachToMale: false, list, array);
 				}
 				if (list.Count > 25)
 				{
 					DungeonSegment segmentEnd = list[list.Count - 1];
 					list = list.OrderByDescending((DungeonSegment x) => Mathf.Min((x.position - segmentStart.position).SqrMagnitude2D(), (x.position - segmentEnd.position).SqrMagnitude2D())).ToList();
-					PlaceSegments(ref seed2, 1, 6, 3, attachToFemale: true, attachToMale: false, list, array);
+					PlaceSegments(ref seed2, 1, 5, 2, attachToFemale: true, attachToMale: false, list, array);
 				}
 				bool flag = true;
 				while (flag)
@@ -155,7 +155,7 @@ public class GenerateDungeonBase : ProceduralComponent
 						}
 					}
 				}
-				PlaceSegments(ref seed2, int.MaxValue, int.MaxValue, 4, attachToFemale: true, attachToMale: true, list, array3);
+				PlaceSegments(ref seed2, int.MaxValue, int.MaxValue, 3, attachToFemale: true, attachToMale: true, list, array3);
 				PlaceTransitions(ref seed2, list, array4);
 				segmentsTotal.AddRange(list);
 			}

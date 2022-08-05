@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Collections.Generic;
 using ConVar;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -11,9 +11,9 @@ public class SpawnPopulation : BaseScriptableObject
 
 	public GameObjectRef[] ResourceList;
 
+	[Header("Spawn Info")]
 	[FormerlySerializedAs("TargetDensity")]
 	[Tooltip("Usually per square km")]
-	[Header("Spawn Info")]
 	[SerializeField]
 	public float _targetDensity = 1f;
 
@@ -61,7 +61,21 @@ public class SpawnPopulation : BaseScriptableObject
 			}
 			if (ResourceList != null && ResourceList.Length != 0)
 			{
-				Prefabs = Prefab.Load<Spawnable>(ResourceList.Select((GameObjectRef x) => x.resourcePath).ToArray(), GameManager.server, PrefabAttribute.server);
+				List<string> list = new List<string>();
+				GameObjectRef[] resourceList = ResourceList;
+				foreach (GameObjectRef gameObjectRef in resourceList)
+				{
+					string resourcePath = gameObjectRef.resourcePath;
+					if (string.IsNullOrEmpty(resourcePath))
+					{
+						Debug.LogWarning(base.name + " resource list contains invalid resource path for GUID " + gameObjectRef.guid, this);
+					}
+					else
+					{
+						list.Add(resourcePath);
+					}
+				}
+				Prefabs = Prefab.Load<Spawnable>(list.ToArray(), GameManager.server, PrefabAttribute.server);
 			}
 			if (Prefabs == null || Prefabs.Length == 0)
 			{
@@ -78,20 +92,29 @@ public class SpawnPopulation : BaseScriptableObject
 		for (int i = 0; i < Prefabs.Length; i++)
 		{
 			Prefab<Spawnable> prefab = Prefabs[i];
-			int num2 = ((!prefab.Parameters) ? 1 : prefab.Parameters.Count);
-			num += num2;
+			int prefabWeight = GetPrefabWeight(prefab);
+			num += prefabWeight;
 		}
-		int num3 = Mathf.CeilToInt((float)targetCount / (float)num);
+		int num2 = Mathf.CeilToInt((float)targetCount / (float)num);
 		sumToSpawn = 0;
 		for (int j = 0; j < Prefabs.Length; j++)
 		{
 			Prefab<Spawnable> prefab2 = Prefabs[j];
-			int num4 = ((!prefab2.Parameters) ? 1 : prefab2.Parameters.Count);
+			int prefabWeight2 = GetPrefabWeight(prefab2);
 			int count = distribution.GetCount(prefab2.ID);
-			int num5 = Mathf.Max(num4 * num3 - count, 0);
-			numToSpawn[j] = num5;
-			sumToSpawn += num5;
+			int num3 = Mathf.Max(prefabWeight2 * num2 - count, 0);
+			numToSpawn[j] = num3;
+			sumToSpawn += num3;
 		}
+	}
+
+	protected virtual int GetPrefabWeight(Prefab<Spawnable> prefab)
+	{
+		if (!prefab.Parameters)
+		{
+			return 1;
+		}
+		return prefab.Parameters.Count;
 	}
 
 	public Prefab<Spawnable> GetRandomPrefab()

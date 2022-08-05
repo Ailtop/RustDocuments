@@ -37,6 +37,8 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 
 	public uint[] GetContentCRCs => new uint[1] { _overlayTextureCrc };
 
+	public BaseNetworkable UgcEntity => this;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("PhotoFrame.OnRpcMessage"))

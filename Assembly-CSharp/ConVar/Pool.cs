@@ -51,7 +51,7 @@ public class Pool : ConsoleSystem
 			Facepunch.Pool.ICollection value = item.Value;
 			textTable.AddRow(text, value.ItemsInStack.FormatNumberShort(), value.ItemsInUse.FormatNumberShort(), value.ItemsTaken.FormatNumberShort(), value.ItemsCreated.FormatNumberShort(), value.ItemsSpilled.FormatNumberShort());
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar]
@@ -79,7 +79,7 @@ public class Pool : ConsoleSystem
 				textTable.AddRow(text, Path.GetFileNameWithoutExtension(text2), text3);
 			}
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar]
@@ -106,7 +106,7 @@ public class Pool : ConsoleSystem
 				textTable.AddRow(text, text2, text3);
 			}
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar]

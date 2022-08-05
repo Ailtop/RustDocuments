@@ -64,6 +64,8 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 		}
 	}
 
+	public BaseNetworkable UgcEntity => this;
+
 	public override void DestroyShared()
 	{
 		base.DestroyShared();
@@ -123,9 +125,9 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 		SendNetworkUpdateImmediate();
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	private void SetShellFuseLength(RPCMessage rpc)
 	{
 		if (PlayerCanModify(rpc.player))

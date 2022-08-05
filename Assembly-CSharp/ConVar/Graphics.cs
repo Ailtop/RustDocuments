@@ -7,13 +7,13 @@ namespace ConVar;
 [Factory("graphics")]
 public class Graphics : ConsoleSystem
 {
-	private const float MinShadowDistance = 40f;
+	private const float MinShadowDistance = 100f;
 
-	private const float MaxShadowDistance2Split = 180f;
+	private const float MaxShadowDistance2Split = 600f;
 
-	private const float MaxShadowDistance4Split = 800f;
+	private const float MaxShadowDistance4Split = 1000f;
 
-	private static float _shadowdistance = 800f;
+	private static float _shadowdistance = 1000f;
 
 	[ClientVar(Saved = true)]
 	public static int shadowmode = 2;
@@ -285,7 +285,7 @@ public class Graphics : ConsoleSystem
 
 	public static float EnforceShadowDistanceBounds(float distance)
 	{
-		distance = ((QualitySettings.shadowCascades == 1) ? Mathf.Clamp(distance, 40f, 40f) : ((QualitySettings.shadowCascades != 2) ? Mathf.Clamp(distance, 40f, 800f) : Mathf.Clamp(distance, 40f, 180f)));
+		distance = ((QualitySettings.shadowCascades == 1) ? Mathf.Clamp(distance, 100f, 100f) : ((QualitySettings.shadowCascades != 2) ? Mathf.Clamp(distance, 100f, 1000f) : Mathf.Clamp(distance, 100f, 600f)));
 		return distance;
 	}
 

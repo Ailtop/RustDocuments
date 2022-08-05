@@ -15,6 +15,8 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 
 	public float explosionRadius = 10f;
 
+	public bool explodeOnContact;
+
 	public bool canStick;
 
 	public bool onlyDamageParent;
@@ -178,7 +180,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 				}
 			}
 		}
-		if (!base.IsDestroyed)
+		if (!base.IsDestroyed && !HasFlag(Flags.Broken))
 		{
 			Kill(DestroyMode.Gib);
 		}
@@ -206,7 +208,16 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 				DoCollisionStick(collision, hitEntity);
 			}
 		}
-		DoBounceEffect();
+		if (explodeOnContact && !IsBusy())
+		{
+			SetMotionEnabled(wantsMotion: false);
+			SetFlag(Flags.Busy, b: true, recursive: false, networkupdate: false);
+			Invoke(Explode, 0.015f);
+		}
+		else
+		{
+			DoBounceEffect();
+		}
 	}
 
 	public virtual bool CanStickTo(BaseEntity entity)

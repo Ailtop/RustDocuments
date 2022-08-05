@@ -464,9 +464,4 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		float num = pos.y * 6f;
 		return new Vector3(Mathf.Sin(num * ((float)Math.PI / 180f)), 0f, Mathf.Cos(num * ((float)Math.PI / 180f))).normalized * 1f;
 	}
-
-	public override bool SupportsChildDeployables()
-	{
-		return false;
-	}
 }

@@ -21,7 +21,7 @@ public class GenerateRiverMeshes : ProceduralComponent
 		RiverMeshes = new Mesh[1] { RiverMesh };
 		foreach (PathList river in TerrainMeta.Path.Rivers)
 		{
-			foreach (PathList.MeshObject item in river.CreateMesh(RiverMeshes, 0.1f, snapToTerrain: true))
+			foreach (PathList.MeshObject item in river.CreateMesh(RiverMeshes, 0.1f, snapToTerrain: true, !river.Path.Circular, !river.Path.Circular))
 			{
 				GameObject obj = new GameObject("River Mesh");
 				obj.transform.position = item.Position;

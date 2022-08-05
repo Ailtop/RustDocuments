@@ -51,7 +51,7 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		if (TrainTrackSpline.TryFindTrackNearby(base.transform.position, 3f, out var splineResult, out var distResult))
+		if (TrainTrackSpline.TryFindTrackNear(base.transform.position, 3f, out var splineResult, out var distResult))
 		{
 			track = splineResult;
 			FrontWheelSplineDist = distResult;

@@ -1269,11 +1269,6 @@ public class BaseVehicle : BaseMountable
 		return false;
 	}
 
-	public override bool SupportsChildDeployables()
-	{
-		return false;
-	}
-
 	public bool IsFlipped()
 	{
 		return Vector3.Dot(Vector3.up, base.transform.up) <= 0f;
@@ -1297,7 +1292,7 @@ public class BaseVehicle : BaseMountable
 	protected override void OnChildAdded(BaseEntity child)
 	{
 		base.OnChildAdded(child);
-		if (child is BaseVehicle baseVehicle && !baseVehicle.IsVehicleRoot() && !childVehicles.Contains(baseVehicle))
+		if (!IsDead() && !base.IsDestroyed && child is BaseVehicle baseVehicle && !baseVehicle.IsVehicleRoot() && !childVehicles.Contains(baseVehicle))
 		{
 			childVehicles.Add(baseVehicle);
 		}

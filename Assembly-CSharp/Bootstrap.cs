@@ -253,14 +253,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
 		string[] assetList = FileSystem_Warmup.GetAssetList();
-		if (ConVar.Global.asyncWarmup)
-		{
-			yield return StartCoroutine(FileSystem_Warmup.RunAsync(assetList, WriteToLog, "Asset Warmup ({0}/{1})"));
-		}
-		else
-		{
-			yield return StartCoroutine(FileSystem_Warmup.Run(assetList, WriteToLog, "Asset Warmup ({0}/{1})"));
-		}
+		yield return StartCoroutine(FileSystem_Warmup.Run(assetList, WriteToLog, "Asset Warmup ({0}/{1})"));
 		yield return StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", allowOutOfDateSaves: false));
 		if (!Object.FindObjectOfType<Performance>())
 		{

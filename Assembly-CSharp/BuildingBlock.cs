@@ -39,7 +39,7 @@ public class BuildingBlock : StabilityEntity
 
 	public int modelState;
 
-	private int lastModelState;
+	public int lastModelState;
 
 	public BuildingGrade.Enum grade;
 
@@ -256,7 +256,7 @@ public class BuildingBlock : StabilityEntity
 		return false;
 	}
 
-	private bool IsDemolishable()
+	public bool IsDemolishable()
 	{
 		if (!ConVar.Server.pve && !HasFlag(Flags.Reserved2))
 		{
@@ -265,7 +265,7 @@ public class BuildingBlock : StabilityEntity
 		return true;
 	}
 
-	private bool HasDemolishPrivilege(BasePlayer player)
+	public bool HasDemolishPrivilege(BasePlayer player)
 	{
 		return player.IsBuildingAuthed(base.transform.position, base.transform.rotation, bounds);
 	}
@@ -336,7 +336,7 @@ public class BuildingBlock : StabilityEntity
 		return false;
 	}
 
-	private bool HasUpgradePrivilege(BuildingGrade.Enum iGrade, BasePlayer player)
+	public bool HasUpgradePrivilege(BuildingGrade.Enum iGrade, BasePlayer player)
 	{
 		if (iGrade == grade)
 		{
@@ -357,7 +357,7 @@ public class BuildingBlock : StabilityEntity
 		return !player.IsBuildingBlocked(base.transform.position, base.transform.rotation, bounds);
 	}
 
-	private bool IsUpgradeBlocked()
+	public bool IsUpgradeBlocked()
 	{
 		if (!blockDefinition.checkVolumeOnUpgrade)
 		{
@@ -396,7 +396,7 @@ public class BuildingBlock : StabilityEntity
 		UpdateGrade();
 	}
 
-	private void UpdateGrade()
+	public void UpdateGrade()
 	{
 		baseProtection = currentGrade.gradeBase.damageProtecton;
 	}
@@ -459,7 +459,7 @@ public class BuildingBlock : StabilityEntity
 		}
 	}
 
-	private bool NeedsSkinChange()
+	public bool NeedsSkinChange()
 	{
 		if (!(currentSkin == null) && !forceSkinRefresh && lastGrade == grade)
 		{
@@ -648,7 +648,7 @@ public class BuildingBlock : StabilityEntity
 		return false;
 	}
 
-	private bool IsRotatable()
+	public bool IsRotatable()
 	{
 		if (blockDefinition.grades == null)
 		{
@@ -665,7 +665,7 @@ public class BuildingBlock : StabilityEntity
 		return true;
 	}
 
-	private bool IsRotationBlocked()
+	public bool IsRotationBlocked()
 	{
 		if (!blockDefinition.checkVolumeOnRotate)
 		{
@@ -675,7 +675,7 @@ public class BuildingBlock : StabilityEntity
 		return DeployVolume.Check(base.transform.position, base.transform.rotation, volumes, ~(1 << base.gameObject.layer));
 	}
 
-	private bool HasRotationPrivilege(BasePlayer player)
+	public bool HasRotationPrivilege(BasePlayer player)
 	{
 		return !player.IsBuildingBlocked(base.transform.position, base.transform.rotation, bounds);
 	}
@@ -853,5 +853,10 @@ public class BuildingBlock : StabilityEntity
 			}
 		}
 		return false;
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
 	}
 }

@@ -200,7 +200,6 @@ public class Recycler : StorageContainer
 		bool flag = false;
 		float num = recycleEfficiency;
 		int num2 = 0;
-		int num4 = default(int);
 		while (true)
 		{
 			if (num2 < 6)
@@ -221,83 +220,83 @@ public class Recycler : StorageContainer
 				}
 				if (slot.hasCondition)
 				{
-					float num3 = num;
-					float value = slot.conditionNormalized * slot.maxConditionNormalized;
-					if (Interface.CallHook("OnItemRecycleAmount", slot, num4, this) is int)
-					{
-					}
-					num = Mathf.Clamp01(num3 * Mathf.Clamp(value, 0.1f, 1f));
+					num = Mathf.Clamp01(num * Mathf.Clamp(slot.conditionNormalized * slot.maxConditionNormalized, 0.1f, 1f));
 				}
-				num4 = 1;
+				int num3 = 1;
 				if (slot.amount > 1)
 				{
-					num4 = Mathf.CeilToInt(Mathf.Min(slot.amount, (float)slot.info.stackable * 0.1f));
+					num3 = Mathf.CeilToInt(Mathf.Min(slot.amount, (float)slot.info.stackable * 0.1f));
+				}
+				object obj = Interface.CallHook("OnItemRecycleAmount", slot, num3, this);
+				if (obj is int)
+				{
+					num3 = (int)obj;
 				}
 				if (slot.info.Blueprint.scrapFromRecycle > 0)
 				{
-					int num6 = slot.info.Blueprint.scrapFromRecycle * num4;
+					int num4 = slot.info.Blueprint.scrapFromRecycle * num3;
 					if (slot.info.stackable == 1 && slot.hasCondition)
 					{
-						num6 = Mathf.CeilToInt((float)num6 * slot.conditionNormalized);
+						num4 = Mathf.CeilToInt((float)num4 * slot.conditionNormalized);
 					}
-					if (num6 >= 1)
+					if (num4 >= 1)
 					{
-						Item newItem = ItemManager.CreateByName("scrap", num6, 0uL);
+						Item newItem = ItemManager.CreateByName("scrap", num4, 0uL);
 						MoveItemToOutput(newItem);
 					}
 				}
 				if (!string.IsNullOrEmpty(slot.info.Blueprint.RecycleStat))
 				{
-					List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
-					Vis.Entities(base.transform.position, 3f, obj, 131072);
-					foreach (BasePlayer item in obj)
+					List<BasePlayer> obj2 = Facepunch.Pool.GetList<BasePlayer>();
+					Vis.Entities(base.transform.position, 3f, obj2, 131072);
+					foreach (BasePlayer item in obj2)
 					{
 						if (item.IsAlive() && !item.IsSleeping() && item.inventory.loot.entitySource == this)
 						{
-							item.stats.Add(slot.info.Blueprint.RecycleStat, num4, (Stats)5);
+							item.stats.Add(slot.info.Blueprint.RecycleStat, num3, (Stats)5);
 							item.stats.Save();
 						}
 					}
-					Facepunch.Pool.FreeList(ref obj);
+					Facepunch.Pool.FreeList(ref obj2);
 				}
-				slot.UseItem(num4);
+				slot.UseItem(num3);
 				foreach (ItemAmount ingredient in slot.info.Blueprint.ingredients)
 				{
 					if (ingredient.itemDef.shortname == "scrap")
 					{
 						continue;
 					}
-					float num7 = ingredient.amount / (float)slot.info.Blueprint.amountToCreate;
-					int num8 = 0;
-					if (num7 <= 1f)
+					float num5 = ingredient.amount / (float)slot.info.Blueprint.amountToCreate;
+					int num6 = 0;
+					if (num5 <= 1f)
 					{
-						for (int i = 0; i < num4; i++)
+						for (int i = 0; i < num3; i++)
 						{
-							if (UnityEngine.Random.Range(0f, 1f) <= num7 * num)
+							if (UnityEngine.Random.Range(0f, 1f) <= num5 * num)
 							{
-								num8++;
+								num6++;
 							}
 						}
 					}
 					else
 					{
-						num8 = Mathf.CeilToInt(Mathf.Clamp(num7 * num * UnityEngine.Random.Range(1f, 1f), 0f, ingredient.amount)) * num4;
+						num6 = Mathf.CeilToInt(Mathf.Clamp(num5 * num * UnityEngine.Random.Range(1f, 1f), 0f, ingredient.amount)) * num3;
 					}
-					if (num8 <= 0)
+					if (num6 <= 0)
 					{
 						continue;
 					}
-					int num9 = Mathf.CeilToInt((float)num8 / (float)ingredient.itemDef.stackable);
-					for (int j = 0; j < num9; j++)
+					int num7 = Mathf.CeilToInt((float)num6 / (float)ingredient.itemDef.stackable);
+					for (int j = 0; j < num7; j++)
 					{
-						int num10 = ((num8 > ingredient.itemDef.stackable) ? ingredient.itemDef.stackable : num8);
-						Item newItem2 = ItemManager.Create(ingredient.itemDef, num10, 0uL);
+						int num8 = ((num6 > ingredient.itemDef.stackable) ? ingredient.itemDef.stackable : num6);
+						Item newItem2 = ItemManager.Create(ingredient.itemDef, num8, 0uL);
 						if (!MoveItemToOutput(newItem2))
 						{
 							flag = true;
 						}
-						num8 -= num10;
-						if (num8 <= 0)
+						num6 -= num8;
+						if (num6 <= 0)
 						{
 							break;
 						}

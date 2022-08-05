@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{0FA86EF6-2DEA-4C06-ACB2-94CBDB43D64F}</ProjectGuid>
+    <ProjectGuid>{68E4E32A-3413-49C4-B130-3BF08ADC3F8A}</ProjectGuid>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -518,7 +518,10 @@
     <Compile Include="ChristmasTree.cs" />
     <Compile Include="CinematicEntity.cs" />
     <Compile Include="Client.cs" />
+    <Compile Include="ClientFrametimeReport.cs" />
+    <Compile Include="ClientFrametimeRequest.cs" />
     <Compile Include="ClientIOLine.cs" />
+    <Compile Include="ClientPerformanceReport.cs" />
     <Compile Include="Climate.cs" />
     <Compile Include="ClimateBlendTexture.cs" />
     <Compile Include="ClimateOverlay.cs" />
@@ -526,6 +529,7 @@
     <Compile Include="ClothingMovementProperties.cs" />
     <Compile Include="ClothLOD.cs" />
     <Compile Include="ClothWindModify.cs" />
+    <Compile Include="CoalingTower.cs" />
     <Compile Include="CodeLock.cs" />
     <Compile Include="ColdBreath.cs" />
     <Compile Include="ColdOverlay.cs" />
@@ -922,7 +926,6 @@
     <Compile Include="EnvironmentFish.cs" />
     <Compile Include="EnvironmentFishManager.cs" />
     <Compile Include="EnvironmentManager.cs" />
-    <Compile Include="EnvironmentMultiplier.cs" />
     <Compile Include="EnvironmentType.cs" />
     <Compile Include="EnvironmentVolume.cs" />
     <Compile Include="EnvironmentVolumeEx.cs" />
@@ -1006,6 +1009,10 @@
     <Compile Include="flamethrowerFire.cs" />
     <Compile Include="flamethrowerState.cs" />
     <Compile Include="FlameTurret.cs" />
+    <Compile Include="Flashbang.cs" />
+    <Compile Include="FlashbangEffect.cs" />
+    <Compile Include="FlashbangEffectRenderer.cs" />
+    <Compile Include="FlashbangOverlay.cs" />
     <Compile Include="FlasherLight.cs" />
     <Compile Include="FlashlightBeam.cs" />
     <Compile Include="FlintStrikeWeapon.cs" />
@@ -1076,6 +1083,7 @@
     <Compile Include="GeneratePowerlineLayout.cs" />
     <Compile Include="GeneratePowerlineTopology.cs" />
     <Compile Include="GenerateRailBranching.cs" />
+    <Compile Include="GenerateRailLayout.cs" />
     <Compile Include="GenerateRailMeshes.cs" />
     <Compile Include="GenerateRailRing.cs" />
     <Compile Include="GenerateRailSiding.cs" />
@@ -1202,6 +1210,7 @@
     <Compile Include="IClothingChanged.cs" />
     <Compile Include="IconSkin.cs" />
     <Compile Include="IconSkinPicker.cs" />
+    <Compile Include="IContainerSounds.cs" />
     <Compile Include="IConversationProvider.cs" />
     <Compile Include="IdentifierConfig.cs" />
     <Compile Include="IDraggable.cs" />
@@ -1244,6 +1253,7 @@
     <Compile Include="InfoBar.cs" />
     <Compile Include="InfrastructureType.cs" />
     <Compile Include="IngameMenuBackground.cs" />
+    <Compile Include="INotifyEntityTrigger.cs" />
     <Compile Include="INotifyLOD.cs" />
     <Compile Include="INotifyTrigger.cs" />
     <Compile Include="InputState.cs" />
@@ -1473,6 +1483,7 @@
     <Compile Include="LocalPositionAnimation.cs" />
     <Compile Include="LockedByEntCrate.cs" />
     <Compile Include="Locker.cs" />
+    <Compile Include="LocomotiveExtraVisuals.cs" />
     <Compile Include="LODComponent.cs" />
     <Compile Include="LODComponentParticleSystem.cs" />
     <Compile Include="LODDistanceMode.cs" />
@@ -1642,6 +1653,7 @@
     <Compile Include="ModularCarPresetConfig.cs" />
     <Compile Include="ModularCarSeat.cs" />
     <Compile Include="ModularVehicleShopFront.cs" />
+    <Compile Include="MolotovCocktail.cs" />
     <Compile Include="Monument.cs" />
     <Compile Include="MonumentBenchmarkScene.cs" />
     <Compile Include="MonumentInfo.cs" />
@@ -1689,6 +1701,7 @@
     <Compile Include="Network.Channel\Server.cs" />
     <Compile Include="NetworkCryptography.cs" />
     <Compile Include="NetworkCryptographyServer.cs" />
+    <Compile Include="NetworkedProperty.cs" />
     <Compile Include="NetworkInfoGeneralText.cs" />
     <Compile Include="NetworkSleep.cs" />
     <Compile Include="NetworkVisibilityGrid.cs" />
@@ -1748,6 +1761,7 @@
     <Compile Include="OnSendNetworkUpdateEx.cs" />
     <Compile Include="OpenSteamURL.cs" />
     <Compile Include="OpenURL.cs" />
+    <Compile Include="OreHopper.cs" />
     <Compile Include="OreHotSpot.cs" />
     <Compile Include="OreResourceEntity.cs" />
     <Compile Include="ORSwitch.cs" />
@@ -1789,6 +1803,7 @@
     <Compile Include="PatternFirework.cs" />
     <Compile Include="PatternFireworkShell.cs" />
     <Compile Include="PatternFireworkStar.cs" />
+    <Compile Include="PercentFullStorageContainer.cs" />
     <Compile Include="Performance.cs" />
     <Compile Include="PerformanceText.cs" />
     <Compile Include="PerformedAttackAIEvent.cs" />
@@ -1819,6 +1834,7 @@
     <Compile Include="PlaceMonument.cs" />
     <Compile Include="PlaceMonuments.cs" />
     <Compile Include="PlaceMonumentsOffshore.cs" />
+    <Compile Include="PlaceMonumentsRailside.cs" />
     <Compile Include="PlaceMonumentsRoadside.cs" />
     <Compile Include="PlacePowerlineObjects.cs" />
     <Compile Include="PlaceRiverObjects.cs" />
@@ -2063,6 +2079,7 @@
     <Compile Include="Rust.UI.ServerAdmin\ServerAdminUGCEntryAudio.cs" />
     <Compile Include="Rust.UI.ServerAdmin\ServerAdminUGCEntryImage.cs" />
     <Compile Include="Rust.UI.ServerAdmin\ServerAdminUGCEntryPattern.cs" />
+    <Compile Include="Rust.UI.ServerAdmin\ServerAdminUGCEntryStub.cs" />
     <Compile Include="Rust.UI.ServerAdmin\ServerAdminUI.cs" />
     <Compile Include="Rust.UI.Utility\ForceWeather.cs" />
     <Compile Include="Rust.UI\MuteListController.cs" />
@@ -2470,11 +2487,14 @@
     <Compile Include="TrainBarricade.cs" />
     <Compile Include="TrainCar.cs" />
     <Compile Include="TrainCarAudio.cs" />
+    <Compile Include="TrainCarFuelHatches.cs" />
+    <Compile Include="TrainCarUnloadable.cs" />
     <Compile Include="TrainCoupling.cs" />
     <Compile Include="TrainCouplingController.cs" />
     <Compile Include="TrainEngine.cs" />
     <Compile Include="TrainEngineAudio.cs" />
     <Compile Include="TrainTrackSpline.cs" />
+    <Compile Include="TrainWagonLootData.cs" />
     <Compile Include="TransformUtil.cs" />
     <Compile Include="TrappableWildlife.cs" />
     <Compile Include="TreadAnimator.cs" />
@@ -2504,6 +2524,7 @@
     <Compile Include="TriggerMovement.cs" />
     <Compile Include="TriggerNoSpray.cs" />
     <Compile Include="TriggerNotify.cs" />
+    <Compile Include="TriggerNotifyEntity.cs" />
     <Compile Include="TriggerParent.cs" />
     <Compile Include="TriggerParentElevator.cs" />
     <Compile Include="TriggerParentEnclosed.cs" />
@@ -2530,6 +2551,7 @@
     <Compile Include="TweakUIMultiSelect.cs" />
     <Compile Include="TweakUISlider.cs" />
     <Compile Include="TweakUIToggle.cs" />
+    <Compile Include="TwitchTrophy.cs" />
     <Compile Include="TypeThroughButton.cs" />
     <Compile Include="UGCType.cs" />
     <Compile Include="UIAIDesignerScreen.cs" />
@@ -2590,10 +2612,12 @@
     <Compile Include="UISleepingScreen.cs" />
     <Compile Include="UISound.cs" />
     <Compile Include="UISoundPlayer.cs" />
+    <Compile Include="UITwitchTrophy.cs" />
     <Compile Include="UIUnderlay.cs" />
     <Compile Include="UIVoiceIcon.cs" />
     <Compile Include="UIWounded.cs" />
     <Compile Include="UI_LocalVoice.cs" />
+    <Compile Include="UndergroundLODSwitcher.cs" />
     <Compile Include="UnderwaterDweller.cs" />
     <Compile Include="UnderwaterEffect.cs" />
     <Compile Include="UnderwaterPathFinder.cs" />
@@ -2777,6 +2801,7 @@
     <Compile Include="ViewmodelClothing.cs" />
     <Compile Include="ViewModelDrawEvent.cs" />
     <Compile Include="ViewmodelEditor.cs" />
+    <Compile Include="ViewmodelIgniteToggle.cs" />
     <Compile Include="ViewmodelIk.cs" />
     <Compile Include="ViewmodelItem.cs" />
     <Compile Include="ViewmodelLower.cs" />
@@ -2858,6 +2883,7 @@
     <Compile Include="WearableHairCap.cs" />
     <Compile Include="WearableHolsterOffset.cs" />
     <Compile Include="WearableReplacementByRace.cs" />
+    <Compile Include="WearableShadowLod.cs" />
     <Compile Include="WeatherEffect.cs" />
     <Compile Include="WeatherEffectSting.cs" />
     <Compile Include="WeatherPreset.cs" />

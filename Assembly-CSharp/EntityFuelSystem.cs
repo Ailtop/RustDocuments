@@ -56,7 +56,7 @@ public class EntityFuelSystem
 	public StorageContainer GetFuelContainer()
 	{
 		StorageContainer storageContainer = fuelStorageInstance.Get(isServer);
-		if (storageContainer != null && BaseNetworkableEx.IsValid(storageContainer))
+		if (BaseNetworkableEx.IsValid(storageContainer))
 		{
 			return storageContainer;
 		}

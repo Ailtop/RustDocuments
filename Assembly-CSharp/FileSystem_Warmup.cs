@@ -8,12 +8,14 @@ using UnityEngine;
 
 public class FileSystem_Warmup : MonoBehaviour
 {
+	public static bool ranInBackground = false;
+
 	private static bool run = true;
 
-	public static string[] ExcludeFilter = new string[13]
+	public static string[] ExcludeFilter = new string[11]
 	{
 		"/bundled/prefabs/autospawn/monument", "/bundled/prefabs/autospawn/mountain", "/bundled/prefabs/autospawn/canyon", "/bundled/prefabs/autospawn/decor", "/bundled/prefabs/navmesh", "/content/ui/", "/prefabs/ui/", "/prefabs/world/", "/prefabs/system/", "/standard assets/",
-		"/third party/", "assets/scenes/prefabs/", "assets/content/structures/"
+		"/third party/"
 	};
 
 	public static void Run()
@@ -29,7 +31,16 @@ public class FileSystem_Warmup : MonoBehaviour
 		}
 	}
 
-	public static IEnumerator RunAsync(string[] assetList, Action<string> statusFunction = null, string format = null, int priority = 0)
+	public static IEnumerator Run(string[] assetList, Action<string> statusFunction = null, string format = null, int priority = 0)
+	{
+		if (Global.warmupConcurrency <= 1)
+		{
+			return RunImpl(assetList, statusFunction, format);
+		}
+		return RunAsyncImpl(assetList, statusFunction, format, priority);
+	}
+
+	private static IEnumerator RunAsyncImpl(string[] assetList, Action<string> statusFunction, string format, int priority)
 	{
 		if (Global.skipassetwarmup || !run)
 		{
@@ -60,27 +71,23 @@ public class FileSystem_Warmup : MonoBehaviour
 		run = false;
 	}
 
-	public static IEnumerator Run(string[] assetList, Action<string> statusFunction = null, string format = null)
+	private static IEnumerator RunImpl(string[] assetList, Action<string> statusFunction = null, string format = null)
 	{
 		if (Global.skipassetwarmup || !run)
 		{
 			yield break;
 		}
-		Stopwatch statusSw = Stopwatch.StartNew();
 		Stopwatch sw = Stopwatch.StartNew();
 		for (int i = 0; i < assetList.Length; i++)
 		{
-			PrefabWarmup(assetList[i]);
-			if (i == 0 || i == assetList.Length - 1 || statusSw.Elapsed.TotalSeconds > 1.0)
+			if (sw.Elapsed.TotalSeconds > (double)CalculateFrameBudget() || i == 0 || i == assetList.Length - 1)
 			{
-				statusFunction?.Invoke(string.Format(format ?? "{0}/{1}", i + 1, assetList.Length));
-				statusSw.Restart();
-			}
-			if (sw.Elapsed.TotalSeconds >= (double)CalculateFrameBudget())
-			{
+				statusFunction?.Invoke(string.Format((format != null) ? format : "{0}/{1}", i + 1, assetList.Length));
 				yield return CoroutineEx.waitForEndOfFrame;
-				sw.Restart();
+				sw.Reset();
+				sw.Start();
 			}
+			PrefabWarmup(assetList[i]);
 		}
 		run = false;
 	}
@@ -104,8 +111,15 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	public static string[] GetAssetList(bool? poolFilter = null)
 	{
+		if (!poolFilter.HasValue)
+		{
+			return (from x in GameManifest.Current.prefabProperties
+				select x.name into x
+				where !ShouldIgnore(x)
+				select x).ToArray();
+		}
 		return (from x in GameManifest.Current.prefabProperties
-			where !ShouldIgnore(x.name) && (!poolFilter.HasValue || x.pool == poolFilter)
+			where !ShouldIgnore(x.name) && x.pool == poolFilter
 			select x.name).Distinct(StringComparer.InvariantCultureIgnoreCase).ToArray();
 	}
 

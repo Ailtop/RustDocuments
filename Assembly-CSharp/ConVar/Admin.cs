@@ -81,6 +81,10 @@ public class Admin : ConsoleSystem
 		public bool Restarting;
 
 		public string SaveCreatedTime;
+
+		public int Version;
+
+		public string Protocol;
 	}
 
 	[Preserve]
@@ -107,6 +111,16 @@ public class Admin : ConsoleSystem
 		public string shortPrefabName;
 
 		public ulong[] playerIds;
+
+		public ServerUGCInfo(IUGCBrowserEntity fromEntity)
+		{
+			entityId = fromEntity.UgcEntity.net.ID;
+			crcs = fromEntity.GetContentCRCs;
+			contentType = fromEntity.ContentType;
+			entityPrefabID = fromEntity.UgcEntity.prefabID;
+			shortPrefabName = fromEntity.UgcEntity.ShortPrefabName;
+			playerIds = fromEntity.EditingHistory.ToArray();
+		}
 	}
 
 	[ReplicatedVar(Help = "Controls whether the in-game admin UI is displayed to admins")]
@@ -116,11 +130,16 @@ public class Admin : ConsoleSystem
 	public static void status(Arg arg)
 	{
 		string @string = arg.GetString(0);
+		if (@string == "--json")
+		{
+			@string = arg.GetString(1);
+		}
+		bool flag = arg.HasArg("--json");
 		string text = string.Empty;
-		if (@string.Length == 0)
+		if (!flag && @string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2348 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2352 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -168,7 +187,14 @@ public class Admin : ConsoleSystem
 				textTable.AddRow(activePlayer.UserIDString, ex.Message.QuoteSafe());
 			}
 		}
-		arg.ReplyWith(text + textTable.ToString());
+		if (flag)
+		{
+			arg.ReplyWith(textTable.ToJson());
+		}
+		else
+		{
+			arg.ReplyWith(text + textTable.ToString());
+		}
 	}
 
 	[ServerVar(Help = "Print out stats of currently connected clients")]
@@ -232,7 +258,7 @@ public class Admin : ConsoleSystem
 			}
 			action(uInt, arg2);
 		}
-		arg.ReplyWith(table.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? table.ToJson() : table.ToString());
 	}
 
 	[ServerVar]
@@ -567,7 +593,7 @@ public class Admin : ConsoleSystem
 			string text5 = activePlayer.GetQueuedUpdateCount(BasePlayer.NetworkQueue.UpdateDistance).ToString();
 			textTable.AddRow(userIDString, text2, text3, string.Empty, text4, string.Empty, text5);
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar(Help = "Sends a message in chat")]
@@ -660,6 +686,34 @@ public class Admin : ConsoleSystem
 		arg.ReplyWith(text);
 	}
 
+	[ServerVar(Help = "Show user info for players on server in range of the supplied player (eg. Jim 50)")]
+	public static void usersinrangeofplayer(Arg arg)
+	{
+		BasePlayer targetPlayer = ArgEx.GetPlayerOrSleeper(arg, 0);
+		if (targetPlayer == null)
+		{
+			return;
+		}
+		float range = arg.GetFloat(1);
+		string text = "<slot:userid:\"name\">\n";
+		int num = 0;
+		List<BasePlayer> obj = Facepunch.Pool.GetList<BasePlayer>();
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			obj.Add(activePlayer);
+		}
+		obj.RemoveAll((BasePlayer p) => p.Distance2D(targetPlayer) > range);
+		obj.Sort((BasePlayer player, BasePlayer basePlayer) => (!(player.Distance2D(targetPlayer) < basePlayer.Distance2D(targetPlayer))) ? 1 : (-1));
+		foreach (BasePlayer item in obj)
+		{
+			text += $"{item.userID}:{item.displayName}:{item.Distance2D(targetPlayer)}m\n";
+			num++;
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		text += $"{num} users within {range}m of {targetPlayer.displayName}\n";
+		arg.ReplyWith(text);
+	}
+
 	[ServerVar(Help = "List of banned users (sourceds compat)")]
 	public static void banlist(Arg arg)
 	{
@@ -722,9 +776,26 @@ public class Admin : ConsoleSystem
 	[ServerVar]
 	public static void clientperf(Arg arg)
 	{
+		string @string = arg.GetString(0, "legacy");
+		int @int = arg.GetInt(1, UnityEngine.Random.Range(int.MinValue, int.MaxValue));
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			activePlayer.ClientRPCPlayer(null, activePlayer, "GetPerformanceReport");
+			activePlayer.ClientRPCPlayer(null, activePlayer, "GetPerformanceReport", @string, @int);
+		}
+	}
+
+	[ServerVar]
+	public static void clientperf_frametime(Arg arg)
+	{
+		ClientFrametimeRequest value = new ClientFrametimeRequest
+		{
+			request_id = arg.GetInt(0, UnityEngine.Random.Range(int.MinValue, int.MaxValue)),
+			start_frame = arg.GetInt(1),
+			max_frames = arg.GetInt(2, 1000)
+		};
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			activePlayer.ClientRPCPlayer(null, activePlayer, "GetPerformanceReport_Frametime", JsonConvert.SerializeObject(value));
 		}
 	}
 
@@ -817,7 +888,11 @@ public class Admin : ConsoleSystem
 			bool flag = Network.Net.sv.connections.FirstOrDefault((Connection c) => c.connected && c.userid == memberId) != null;
 			textTable.AddRow(memberId.ToString(), GetPlayerName(memberId), flag ? "x" : "", (memberId == playerTeam.teamLeader) ? "x" : "");
 		}
-		return textTable.ToString();
+		if (!arg.HasArg("--json"))
+		{
+			return textTable.ToString();
+		}
+		return textTable.ToJson();
 	}
 
 	[ServerVar]
@@ -1055,6 +1130,8 @@ public class Admin : ConsoleSystem
 		result.NetworkOut = (int)((Network.Net.sv != null) ? Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond) : 0);
 		result.Restarting = SingletonComponent<ServerMgr>.Instance.Restarting;
 		result.SaveCreatedTime = SaveRestore.SaveCreatedTime.ToString();
+		result.Version = 2352;
+		result.Protocol = Protocol.printable;
 		return result;
 	}
 
@@ -1227,6 +1304,55 @@ public class Admin : ConsoleSystem
 				SendInfo sendInfo2 = sendInfo;
 				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedPatternFirework", uInt, patternFirework.Design.ToProtoBytes());
 			}
+		}
+	}
+
+	[ServerVar]
+	public static void clearugcentity(Arg arg)
+	{
+		uint uInt = arg.GetUInt(0);
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+		if (baseNetworkable != null && baseNetworkable.TryGetComponent<IUGCBrowserEntity>(out var component))
+		{
+			component.ClearContent();
+			arg.ReplyWith($"Cleared content on {baseNetworkable.ShortPrefabName}/{uInt}");
+		}
+		else
+		{
+			arg.ReplyWith($"Could not find UGC entity with id {uInt}");
+		}
+	}
+
+	[ServerVar]
+	public static void clearugcentitiesinrange(Arg arg)
+	{
+		Vector3 vector = arg.GetVector3(0);
+		float @float = arg.GetFloat(1);
+		int num = 0;
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			if (serverEntity.TryGetComponent<IUGCBrowserEntity>(out var component) && Vector3.Distance(serverEntity.transform.position, vector) <= @float)
+			{
+				component.ClearContent();
+				num++;
+			}
+		}
+		arg.ReplyWith($"Cleared {num} UGC entities within {@float}m of {vector}");
+	}
+
+	[ServerVar]
+	public static void getugcinfo(Arg arg)
+	{
+		uint uInt = arg.GetUInt(0);
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+		if (baseNetworkable != null && baseNetworkable.TryGetComponent<IUGCBrowserEntity>(out var component))
+		{
+			ServerUGCInfo serverUGCInfo = new ServerUGCInfo(component);
+			arg.ReplyWith(JsonConvert.SerializeObject(serverUGCInfo));
+		}
+		else
+		{
+			arg.ReplyWith($"Invalid entity id: {uInt}");
 		}
 	}
 }

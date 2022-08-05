@@ -74,11 +74,12 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 
 	public void DoPickup(BasePlayer reciever)
 	{
-		if (itemList == null)
+		if (itemList == null || Interface.CallHook("OnCollectiblePickup", this, reciever) != null)
 		{
 			return;
 		}
 		ItemAmount[] array = itemList;
+		DateTime expireDate = default(DateTime);
 		foreach (ItemAmount itemAmount in array)
 		{
 			Item item = ItemManager.Create(itemAmount.itemDef, (int)itemAmount.amount, 0uL);
@@ -88,7 +89,8 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 			}
 			if ((bool)reciever)
 			{
-				if (Interface.CallHook("OnCollectiblePickup", item, reciever, this) == null)
+				expireDate._002Ector(2022, 12, 31);
+				if (Interface.CallDeprecatedHook("OnCollectiblePickup", "OnCollectiblePickup(CollectibleEntity collectible, BasePlayer player)", expireDate, item, reciever, this) == null)
 				{
 					reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
 				}

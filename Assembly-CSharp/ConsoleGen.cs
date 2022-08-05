@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[850]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[858]
 	{
 		new ConsoleSystem.Command
 		{
@@ -865,6 +865,30 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "clearugcentitiesinrange",
+			Parent = "global",
+			FullName = "global.clearugcentitiesinrange",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.clearugcentitiesinrange(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearugcentity",
+			Parent = "global",
+			FullName = "global.clearugcentity",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.clearugcentity(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "clientperf",
 			Parent = "global",
 			FullName = "global.clientperf",
@@ -877,6 +901,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "clientperf_frametime",
+			Parent = "global",
+			FullName = "global.clientperf_frametime",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.clientperf_frametime(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "entid",
 			Parent = "global",
 			FullName = "global.entid",
@@ -885,6 +921,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.entid(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "getugcinfo",
+			Parent = "global",
+			FullName = "global.getugcinfo",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.getugcinfo(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1212,6 +1260,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.usersinrange(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "usersinrangeofplayer",
+			Parent = "global",
+			FullName = "global.usersinrangeofplayer",
+			ServerAdmin = true,
+			Description = "Show user info for players on server in range of the supplied player (eg. Jim 50)",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.usersinrangeofplayer(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7406,6 +7467,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "listtoolcupboards",
+			Parent = "server",
+			FullName = "server.listtoolcupboards",
+			ServerAdmin = true,
+			Description = "Prints all the Tool Cupboards on the server",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Server.listtoolcupboards(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "listvendingmachines",
 			Parent = "server",
 			FullName = "server.listvendingmachines",
@@ -9604,6 +9678,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "monuments",
+			Parent = "world",
+			FullName = "world.monuments",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.World.monuments(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "renderlabs",
 			Parent = "world",
 			FullName = "world.renderlabs",
@@ -11181,6 +11267,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "decayminutes",
+			Parent = "traincar",
+			FullName = "traincar.decayminutes",
+			ServerAdmin = true,
+			Description = "How long before a train car despawns",
+			Variable = true,
+			GetOveride = () => TrainCar.decayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				TrainCar.decayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "population",
 			Parent = "traincar",
 			FullName = "traincar.population",
@@ -11196,20 +11296,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "variant_ratio",
-			Parent = "traincar",
-			FullName = "traincar.variant_ratio",
-			ServerAdmin = true,
-			Description = "Ratio of Work Carts with additional cover to standard Work Carts. 1.0 = All covered, 0.0 = all standard.",
-			Variable = true,
-			GetOveride = () => TrainCar.variant_ratio.ToString(),
-			SetOveride = delegate(string str)
-			{
-				TrainCar.variant_ratio = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "wagons_per_engine",
 			Parent = "traincar",
 			FullName = "traincar.wagons_per_engine",
@@ -11220,6 +11306,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				TrainCar.wagons_per_engine = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "decayminutesafterunload",
+			Parent = "traincarunloadable",
+			FullName = "traincarunloadable.decayminutesafterunload",
+			ServerAdmin = true,
+			Description = "How long before an unloadable train car despawns afer being unloaded",
+			Variable = true,
+			GetOveride = () => TrainCarUnloadable.decayminutesafterunload.ToString(),
+			SetOveride = delegate(string str)
+			{
+				TrainCarUnloadable.decayminutesafterunload = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

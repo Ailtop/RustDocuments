@@ -105,6 +105,9 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	public WearableReplacementByRace wearableReplacementByRace;
 
 	[HideInInspector]
+	public WearableShadowLod wearableShadowLod;
+
+	[HideInInspector]
 	public List<Renderer> renderers = new List<Renderer>();
 
 	[HideInInspector]
@@ -166,6 +169,7 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		playerModelHairCap = GetComponent<PlayerModelHairCap>();
 		playerModelHair = GetComponent<PlayerModelHair>();
 		wearableReplacementByRace = GetComponent<WearableReplacementByRace>();
+		wearableShadowLod = GetComponent<WearableShadowLod>();
 		GetComponentsInChildren(includeInactive: true, renderers);
 		GetComponentsInChildren(includeInactive: true, playerModelSkins);
 		GetComponentsInChildren(includeInactive: true, boneRetargets);

@@ -33,6 +33,7 @@ public class PlayerModel : ListComponent<PlayerModel>
 		Sit_RetroSnowmobile_Shooting = 25,
 		Driving_Snowmobile = 26,
 		ZiplineHold = 27,
+		Sit_Locomotive = 28,
 		Standing = 128
 	}
 

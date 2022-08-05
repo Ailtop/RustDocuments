@@ -25,24 +25,27 @@ public class Global : ConsoleSystem
 	[ClientVar]
 	public static int maxthreads = 8;
 
-	private const int DefaultWarmupConcurrency = 256;
+	private const int DefaultWarmupConcurrency = 1;
+
+	private const int DefaultPreloadConcurrency = 1;
 
 	[ServerVar]
 	[ClientVar]
-	public static int warmupConcurrency = 256;
+	public static int warmupConcurrency = 1;
 
 	[ServerVar]
 	[ClientVar]
-	public static int preloadConcurrency = 256;
+	public static int preloadConcurrency = 1;
 
 	[ServerVar]
 	[ClientVar]
-	public static bool forceUnloadBundles = false;
+	public static bool forceUnloadBundles = true;
 
-	private const bool DefaultAsyncWarmupEnabled = true;
+	private const bool DefaultAsyncWarmupEnabled = false;
 
 	[ServerVar]
-	public static bool asyncWarmup = true;
+	[ClientVar]
+	public static bool asyncWarmup = false;
 
 	[ServerVar(Saved = true)]
 	[ClientVar(Saved = true)]
@@ -623,7 +626,7 @@ public class Global : ConsoleSystem
 				textTable.AddRow("sv", item.ID.ToString());
 			}
 		}
-		arg.ReplyWith(textTable.ToString());
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
 	[ServerVar]

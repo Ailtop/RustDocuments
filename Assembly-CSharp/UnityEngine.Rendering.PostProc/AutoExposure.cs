@@ -6,9 +6,9 @@ namespace UnityEngine.Rendering.PostProcessing;
 [PostProcess(typeof(AutoExposureRenderer), "Unity/Auto Exposure", true)]
 public sealed class AutoExposure : PostProcessEffectSettings
 {
+	[MinMax(1f, 99f)]
 	[DisplayName("Filtering (%)")]
 	[Tooltip("Filters the bright and dark parts of the histogram when computing the average luminance. This is to avoid very dark pixels and very bright pixels from contributing to the auto exposure. Unit is in percent.")]
-	[MinMax(1f, 99f)]
 	public Vector2Parameter filtering = new Vector2Parameter
 	{
 		value = new Vector2(50f, 95f)
@@ -30,9 +30,9 @@ public sealed class AutoExposure : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Min(0f)]
 	[DisplayName("Exposure Compensation")]
 	[Tooltip("Use this to scale the global exposure of the scene.")]
-	[Min(0f)]
 	public FloatParameter keyValue = new FloatParameter
 	{
 		value = 1f

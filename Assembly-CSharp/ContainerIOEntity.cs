@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasLootPanel
+public class ContainerIOEntity : IOEntity, IItemContainerEntity, LootPanel.IHasLootPanel, IContainerSounds
 {
 	public ItemDefinition onlyAllowedItem;
 

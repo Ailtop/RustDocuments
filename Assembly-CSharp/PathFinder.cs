@@ -443,4 +443,11 @@ public class PathFinder
 		}
 		return num;
 	}
+
+	public float Distance(Point a, Point b)
+	{
+		int num = a.x - b.x;
+		int num2 = a.y - b.y;
+		return Mathf.Sqrt(num * num + num2 * num2);
+	}
 }

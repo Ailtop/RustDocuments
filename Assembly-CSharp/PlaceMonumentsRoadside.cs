@@ -74,9 +74,9 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 
 	public RoadMode RoadType;
 
-	public const int GroupCandidates = 10;
+	public const int GroupCandidates = 8;
 
-	public const int IndividualCandidates = 100;
+	public const int IndividualCandidates = 8;
 
 	public static Quaternion rot90 = Quaternion.Euler(0f, 90f, 0f);
 
@@ -145,7 +145,23 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 				{
 					continue;
 				}
-				DungeonGridInfo dungeonEntrance = component.DungeonEntrance;
+				int num = 0;
+				Vector3 zero = Vector3.zero;
+				TerrainPathConnect[] componentsInChildren = prefab3.Object.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
+				foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
+				{
+					if (terrainPathConnect.Type == InfrastructureType.Road)
+					{
+						zero += terrainPathConnect.transform.position;
+						num++;
+					}
+				}
+				Vector3 vector = -zero.XZ3D().normalized;
+				Vector3 forward = rot90 * vector;
+				if (num > 1)
+				{
+					zero /= (float)num;
+				}
 				foreach (PathList road in TerrainMeta.Path.Roads)
 				{
 					bool flag = false;
@@ -172,63 +188,28 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 						continue;
 					}
 					PathInterpolator path = road.Path;
-					float num = 5f;
 					float num2 = 5f;
-					float num3 = path.StartOffset + num2;
-					float num4 = path.Length - path.EndOffset - num2;
-					for (float num5 = num3; num5 <= num4; num5 += num)
+					float num3 = 5f;
+					float num4 = path.StartOffset + num3;
+					float num5 = path.Length - path.EndOffset - num3;
+					for (float num6 = num4; num6 <= num5; num6 += num2)
 					{
-						Vector3 vector = (road.Spline ? path.GetPointCubicHermite(num5) : path.GetPoint(num5));
-						Vector3 tangent = path.GetTangent(num5);
-						int num6 = 0;
-						Vector3 zero = Vector3.zero;
-						TerrainPathConnect[] componentsInChildren = prefab3.Object.GetComponentsInChildren<TerrainPathConnect>(includeInactive: true);
-						foreach (TerrainPathConnect terrainPathConnect in componentsInChildren)
-						{
-							if (terrainPathConnect.Type == InfrastructureType.Road)
-							{
-								zero += terrainPathConnect.transform.position;
-								num6++;
-							}
-						}
-						if (num6 > 1)
-						{
-							zero /= (float)num6;
-						}
+						Vector3 vector2 = (road.Spline ? path.GetPointCubicHermite(num6) : path.GetPoint(num6));
+						Vector3 tangent = path.GetTangent(num6);
 						for (int m = -1; m <= 1; m += 2)
 						{
 							Quaternion quaternion = Quaternion.LookRotation(m * tangent.XZ3D());
-							Vector3 pos = vector;
+							Vector3 position = vector2;
 							Quaternion quaternion2 = quaternion;
 							Vector3 localScale = prefab3.Object.transform.localScale;
-							if (zero != Vector3.zero)
-							{
-								quaternion2 *= Quaternion.LookRotation(rot90 * -zero.XZ3D());
-								pos -= quaternion2 * zero;
-							}
-							if (!prefab3.ApplyTerrainAnchors(ref pos, quaternion2, localScale, Filter) || !component.CheckPlacement(pos, quaternion2, localScale))
-							{
-								continue;
-							}
-							if ((bool)dungeonEntrance)
-							{
-								Vector3 vector2 = pos + quaternion2 * Vector3.Scale(localScale, dungeonEntrance.transform.position);
-								Vector3 vector3 = dungeonEntrance.SnapPosition(vector2);
-								pos += vector3 - vector2;
-								if (!dungeonEntrance.IsValidSpawnPosition(vector3))
-								{
-									continue;
-								}
-							}
-							if (prefab3.ApplyTerrainChecks(pos, quaternion2, localScale, Filter) && prefab3.ApplyTerrainFilters(pos, quaternion2, localScale) && prefab3.ApplyWaterChecks(pos, quaternion2, localScale) && !prefab3.CheckEnvironmentVolumes(pos, quaternion2, localScale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
-							{
-								SpawnInfo item = default(SpawnInfo);
-								item.prefab = prefab3;
-								item.position = pos;
-								item.rotation = quaternion2;
-								item.scale = localScale;
-								spawnInfoGroup3.candidates.Add(item);
-							}
+							quaternion2 *= Quaternion.LookRotation(forward);
+							position -= quaternion2 * zero;
+							SpawnInfo item = default(SpawnInfo);
+							item.prefab = prefab3;
+							item.position = position;
+							item.rotation = quaternion2;
+							item.scale = localScale;
+							spawnInfoGroup3.candidates.Add(item);
 						}
 					}
 				}
@@ -238,7 +219,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			List<SpawnInfo> a = new List<SpawnInfo>();
 			int num8 = 0;
 			List<SpawnInfo> b = new List<SpawnInfo>();
-			for (int n = 0; n < 10; n++)
+			for (int n = 0; n < 8; n++)
 			{
 				num7 = 0;
 				a.Clear();
@@ -252,6 +233,7 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 					{
 						continue;
 					}
+					DungeonGridInfo dungeonEntrance = component2.DungeonEntrance;
 					int num9 = (int)((!prefab4.Parameters) ? PrefabPriority.Low : (prefab4.Parameters.Priority + 1));
 					int num10 = 100000 * num9 * num9 * num9 * num9;
 					int num11 = 0;
@@ -289,15 +271,29 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 								num14 += Mathf.RoundToInt(distanceInfo.minDistanceDifferentType * distanceInfo.minDistanceDifferentType);
 							}
 						}
-						if (num14 > num12)
+						if (num14 <= num12 || !prefab4.ApplyTerrainAnchors(ref spawnInfo.position, spawnInfo.rotation, spawnInfo.scale, Filter) || !component2.CheckPlacement(spawnInfo.position, spawnInfo.rotation, spawnInfo.scale))
+						{
+							continue;
+						}
+						if ((bool)dungeonEntrance)
+						{
+							Vector3 vector3 = spawnInfo.position + spawnInfo.rotation * Vector3.Scale(spawnInfo.scale, dungeonEntrance.transform.position);
+							Vector3 vector4 = dungeonEntrance.SnapPosition(vector3);
+							spawnInfo.position += vector4 - vector3;
+							if (!dungeonEntrance.IsValidSpawnPosition(vector4))
+							{
+								continue;
+							}
+						}
+						if (prefab4.ApplyTerrainChecks(spawnInfo.position, spawnInfo.rotation, spawnInfo.scale, Filter) && prefab4.ApplyTerrainFilters(spawnInfo.position, spawnInfo.rotation, spawnInfo.scale) && prefab4.ApplyWaterChecks(spawnInfo.position, spawnInfo.rotation, spawnInfo.scale) && !prefab4.CheckEnvironmentVolumes(spawnInfo.position, spawnInfo.rotation, spawnInfo.scale, EnvironmentType.Underground | EnvironmentType.TrainTunnels))
 						{
 							num12 = num14;
 							item2 = spawnInfo;
-						}
-						num11++;
-						if (num11 >= 100 || DistanceDifferentType == DistanceMode.Any)
-						{
-							break;
+							num11++;
+							if (num11 >= 8 || DistanceDifferentType == DistanceMode.Any)
+							{
+								break;
+							}
 						}
 					}
 					if (num12 > 0)
