@@ -168,7 +168,6 @@ public class GenerateRailSiding : ProceduralComponent
 		}
 		foreach (PathList item2 in list)
 		{
-			item2.Path.RecalculateLength();
 			item2.Path.Resample(7.5f);
 			item2.Path.RecalculateTangents();
 			item2.AdjustPlacementMap(20f);

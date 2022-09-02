@@ -39,7 +39,5 @@ public class LifeInfographic : MonoBehaviour
 
 	public DamageSetting[] DamageDisplays;
 
-	public BaseEntity[] NpcDeathInfo;
-
 	public bool ShowDebugData;
 }

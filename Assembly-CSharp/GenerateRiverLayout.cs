@@ -182,7 +182,6 @@ public class GenerateRiverLayout : ProceduralComponent
 		{
 			item.Path.Smoothen(4, new Vector3(1f, 0f, 1f));
 			item.Path.Smoothen(8, new Vector3(0f, 1f, 0f));
-			item.Path.RecalculateLength();
 			item.Path.Resample(7.5f);
 			item.Path.RecalculateTangents();
 		}

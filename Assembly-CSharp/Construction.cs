@@ -119,6 +119,9 @@ public class Construction : PrefabAttribute
 	public bool isBuildingPrivilege;
 
 	[NonSerialized]
+	public bool isSleepingBag;
+
+	[NonSerialized]
 	public ConstructionGrade[] grades;
 
 	[NonSerialized]
@@ -362,6 +365,7 @@ public class Construction : PrefabAttribute
 	{
 		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
 		isBuildingPrivilege = rootObj.GetComponent<BuildingPrivlidge>();
+		isSleepingBag = rootObj.GetComponent<SleepingBag>();
 		bounds = rootObj.GetComponent<BaseEntity>().bounds;
 		deployable = GetComponent<Deployable>();
 		placeholder = GetComponentInChildren<ConstructionPlaceholder>();

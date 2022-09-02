@@ -80,6 +80,23 @@ public class ResearchTable : StorageContainer
 		researchFinishedTime = 0f;
 	}
 
+	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	{
+		if (item.info.shortname == "scrap")
+		{
+			Item slot = container.GetSlot(1);
+			if (slot == null)
+			{
+				return 1;
+			}
+			if (slot.amount < item.info.stackable)
+			{
+				return 1;
+			}
+		}
+		return base.GetIdealSlot(player, container, item);
+	}
+
 	public bool IsResearching()
 	{
 		return HasFlag(Flags.On);

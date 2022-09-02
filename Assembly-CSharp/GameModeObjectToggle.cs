@@ -1,14 +1,19 @@
+using System.Linq;
 using UnityEngine;
 
 public class GameModeObjectToggle : BaseMonoBehaviour
 {
 	public string[] gameModeTags;
 
+	public string[] tagsToDisable;
+
 	public GameObject[] toToggle;
+
+	public bool defaultState;
 
 	public void Awake()
 	{
-		SetToggle(wantsOn: false);
+		SetToggle(defaultState);
 		BaseGameMode.GameModeChanged += OnGameModeChanged;
 	}
 
@@ -26,9 +31,12 @@ public class GameModeObjectToggle : BaseMonoBehaviour
 	public void SetToggle(bool wantsOn)
 	{
 		GameObject[] array = toToggle;
-		for (int i = 0; i < array.Length; i++)
+		foreach (GameObject gameObject in array)
 		{
-			array[i].SetActive(wantsOn);
+			if (gameObject != null)
+			{
+				gameObject.SetActive(wantsOn);
+			}
 		}
 	}
 
@@ -36,16 +44,16 @@ public class GameModeObjectToggle : BaseMonoBehaviour
 	{
 		if (newGameMode == null)
 		{
+			return defaultState;
+		}
+		if (tagsToDisable.Length != 0 && (newGameMode.HasAnyGameModeTag(tagsToDisable) || tagsToDisable.Contains("*")))
+		{
 			return false;
 		}
-		if (gameModeTags.Length == 0)
+		if (gameModeTags.Length != 0 && (newGameMode.HasAnyGameModeTag(gameModeTags) || gameModeTags.Contains("*")))
 		{
 			return true;
 		}
-		if (newGameMode.HasAnyGameModeTag(gameModeTags))
-		{
-			return true;
-		}
-		return false;
+		return defaultState;
 	}
 }

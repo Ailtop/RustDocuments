@@ -203,7 +203,12 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 			{
 				lastMovingTime = Time.time;
 			}
-			if (vehicleSettings.canSleep && !hasDriver && Time.time > lastMovingTime + 10f)
+			bool flag = vehicleSettings.canSleep && !hasDriver && Time.time > lastMovingTime + 10f;
+			if (flag && BaseNetworkableEx.IsValid(car.GetParentEntity() as BaseVehicle))
+			{
+				flag = false;
+			}
+			if (flag)
 			{
 				for (int i = 0; i < wheelData.Length; i++)
 				{
@@ -254,12 +259,12 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 				}
 				int num4 = 0;
 				float num5 = 0f;
-				bool flag = !hasDriver && rBody.velocity.magnitude < 2.5f && (float)car.timeSinceLastPush > 2f;
+				bool flag2 = !hasDriver && rBody.velocity.magnitude < 2.5f && (float)car.timeSinceLastPush > 2f;
 				for (int j = 0; j < wheelData.Length; j++)
 				{
 					ServerWheelData serverWheelData = wheelData[j];
 					serverWheelData.wheelCollider.motorTorque = 1E-05f;
-					if (flag && car.OnSurface != VehicleTerrainHandler.Surface.Frictionless)
+					if (flag2 && car.OnSurface != VehicleTerrainHandler.Surface.Frictionless)
 					{
 						serverWheelData.wheelCollider.brakeTorque = 10000f;
 					}

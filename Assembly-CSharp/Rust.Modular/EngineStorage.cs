@@ -105,6 +105,11 @@ public class EngineStorage : StorageContainer
 		return -1;
 	}
 
+	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	{
+		return GetValidSlot(item);
+	}
+
 	public override void OnInventoryFirstCreated(ItemContainer container)
 	{
 		RefreshLoadoutData();

@@ -13,4 +13,10 @@ public class ChatEntry : MonoBehaviour
 	public float lifeStarted;
 
 	public ulong steamid;
+
+	public Translate.Phrase LocalPhrase = new Translate.Phrase("local", "local");
+
+	public Translate.Phrase CardsPhrase = new Translate.Phrase("cards", "cards");
+
+	public Translate.Phrase TeamPhrase = new Translate.Phrase("team", "team");
 }

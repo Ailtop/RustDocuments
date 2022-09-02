@@ -27,25 +27,25 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = Tonemapper.None
 	};
 
-	[DisplayName("Toe Strength")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects the transition between the toe and the mid section of the curve. A value of 0 means no toe, a value of 1 means a very hard transition.")]
+	[DisplayName("Toe Strength")]
 	public FloatParameter toneCurveToeStrength = new FloatParameter
 	{
 		value = 0f
 	};
 
+	[DisplayName("Toe Length")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects how much of the dynamic range is in the toe. With a small value, the toe will be very short and quickly transition into the linear section, with a larger value, the toe will be longer.")]
-	[DisplayName("Toe Length")]
 	public FloatParameter toneCurveToeLength = new FloatParameter
 	{
 		value = 0.5f
 	};
 
+	[DisplayName("Shoulder Strength")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects the transition between the mid section and the shoulder of the curve. A value of 0 means no shoulder, a value of 1 means a very hard transition.")]
-	[DisplayName("Shoulder Strength")]
 	public FloatParameter toneCurveShoulderStrength = new FloatParameter
 	{
 		value = 0f
@@ -59,9 +59,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0.5f
 	};
 
+	[Tooltip("Affects how much overshoot to add to the shoulder.")]
 	[DisplayName("Shoulder Angle")]
 	[Range(0f, 1f)]
-	[Tooltip("Affects how much overshoot to add to the shoulder.")]
 	public FloatParameter toneCurveShoulderAngle = new FloatParameter
 	{
 		value = 0f
@@ -83,9 +83,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		defaultState = TextureParameterDefault.Lut2D
 	};
 
-	[DisplayName("Contribution")]
 	[Range(0f, 1f)]
 	[Tooltip("How much of the lookup texture will contribute to the color grading effect.")]
+	[DisplayName("Contribution")]
 	public FloatParameter ldrLutContribution = new FloatParameter
 	{
 		value = 1f
@@ -107,17 +107,17 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[Tooltip("Tint the render by multiplying a color.")]
 	[DisplayName("Color Filter")]
 	[ColorUsage(false, true)]
+	[Tooltip("Tint the render by multiplying a color.")]
 	public ColorParameter colorFilter = new ColorParameter
 	{
 		value = Color.white
 	};
 
+	[Tooltip("Shift the hue of all colors.")]
 	[DisplayName("Hue Shift")]
 	[Range(-180f, 180f)]
-	[Tooltip("Shift the hue of all colors.")]
 	public FloatParameter hueShift = new FloatParameter
 	{
 		value = 0f
@@ -170,17 +170,17 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	[DisplayName("Blue")]
-	[Range(-200f, 200f)]
 	public FloatParameter mixerRedOutBlueIn = new FloatParameter
 	{
 		value = 0f
 	};
 
+	[DisplayName("Red")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the red channel in the overall mix.")]
-	[DisplayName("Red")]
 	public FloatParameter mixerGreenOutRedIn = new FloatParameter
 	{
 		value = 0f
@@ -210,9 +210,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[DisplayName("Green")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the green channel in the overall mix.")]
-	[DisplayName("Green")]
 	public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 	{
 		value = 0f
@@ -226,9 +226,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 100f
 	};
 
-	[Trackball(TrackballAttribute.Mode.Lift)]
 	[DisplayName("Lift")]
 	[Tooltip("Controls the darkest portions of the render.")]
+	[Trackball(TrackballAttribute.Mode.Lift)]
 	public Vector4Parameter lift = new Vector4Parameter
 	{
 		value = new Vector4(1f, 1f, 1f, 0f)

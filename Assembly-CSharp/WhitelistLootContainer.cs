@@ -63,7 +63,7 @@ public class WhitelistLootContainer : LootContainer
 		ulong userID = player.userID;
 		if (!whitelist.Contains(userID))
 		{
-			player.ShowToast(1, CantLootToast);
+			player.ShowToast(GameTip.Styles.Red_Normal, CantLootToast);
 			return false;
 		}
 		return base.PlayerOpenLoot(player, panelToOpen, doPositionChecks);

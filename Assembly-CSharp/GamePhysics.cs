@@ -32,6 +32,21 @@ public static class GamePhysics
 		return UnityEngine.Physics.CheckBox(obb.position, obb.extents, obb.rotation, layerMask, triggerInteraction);
 	}
 
+	public static bool CheckOBBAndEntity(OBB obb, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, BaseEntity ignoreEntity = null)
+	{
+		layerMask = HandleTerrainCollision(obb.position, layerMask);
+		int num = UnityEngine.Physics.OverlapBoxNonAlloc(obb.position, obb.extents, colBuffer, obb.rotation, layerMask, triggerInteraction);
+		for (int i = 0; i < num; i++)
+		{
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(colBuffer[i]);
+			if (!(baseEntity != null) || !(ignoreEntity != null) || (baseEntity.isServer == ignoreEntity.isServer && !(baseEntity == ignoreEntity)))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static bool CheckBounds(Bounds bounds, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
 	{
 		layerMask = HandleTerrainCollision(bounds.center, layerMask);

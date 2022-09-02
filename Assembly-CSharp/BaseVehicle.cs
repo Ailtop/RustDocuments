@@ -446,6 +446,11 @@ public class BaseVehicle : BaseMountable
 
 	public static bool InSafeZone(List<TriggerBase> triggers, Vector3 position)
 	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		if (activeGameMode != null && !activeGameMode.safeZone)
+		{
+			return false;
+		}
 		float num = 0f;
 		if (triggers != null)
 		{

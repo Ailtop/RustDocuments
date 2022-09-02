@@ -146,16 +146,6 @@ public class WorldSpline : MonoBehaviour
 		return Vector3.Scale(base.transform.rotation * tangents[tangents.Length - 1], base.transform.localScale);
 	}
 
-	public Vector3 GetTangentWorld(float distance)
-	{
-		return GetTangentWorld(distance, GetData());
-	}
-
-	public Vector3 GetTangentWorld(float distance, WorldSplineData data)
-	{
-		return Vector3.Scale(base.transform.rotation * data.GetTangent(distance), base.transform.localScale);
-	}
-
 	public Vector3 GetTangentCubicHermiteWorld(float distance)
 	{
 		return Vector3.Scale(base.transform.rotation * GetData().GetTangentCubicHermite(distance), base.transform.localScale);

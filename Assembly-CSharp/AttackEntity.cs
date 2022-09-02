@@ -144,50 +144,50 @@ public class AttackEntity : HeldEntity
 		if (ownerPlayer == null)
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Owner not found (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "owner_missing");
+			player.stats.combat.LogInvalid(player, this, "owner_missing");
 			return false;
 		}
 		if (ownerPlayer != player)
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Player mismatch (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "player_mismatch");
+			player.stats.combat.LogInvalid(player, this, "player_mismatch");
 			return false;
 		}
 		if (player.IsDead())
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Player dead (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "player_dead");
+			player.stats.combat.LogInvalid(player, this, "player_dead");
 			return false;
 		}
 		if (player.IsWounded())
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Player down (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "player_down");
+			player.stats.combat.LogInvalid(player, this, "player_down");
 			return false;
 		}
 		if (player.IsSleeping())
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Player sleeping (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "player_sleeping");
+			player.stats.combat.LogInvalid(player, this, "player_sleeping");
 			return false;
 		}
 		if (player.desyncTimeRaw > ConVar.AntiHack.maxdesync)
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Player stalled (" + base.ShortPrefabName + " with " + player.desyncTimeRaw + "s)");
-			player.stats.combat.Log(this, "player_stalled");
+			player.stats.combat.LogInvalid(player, this, "player_stalled");
 			return false;
 		}
 		Item ownerItem = GetOwnerItem();
 		if (ownerItem == null)
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Item not found (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "item_missing");
+			player.stats.combat.LogInvalid(player, this, "item_missing");
 			return false;
 		}
 		if (ownerItem.isBroken)
 		{
 			AntiHack.Log(player, AntiHackType.AttackHack, "Item broken (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "item_broken");
+			player.stats.combat.LogInvalid(player, this, "item_broken");
 			return false;
 		}
 		return true;
@@ -202,7 +202,7 @@ public class AttackEntity : HeldEntity
 		if (HasAttackCooldown())
 		{
 			AntiHack.Log(player, AntiHackType.CooldownHack, "T-" + GetAttackCooldown() + "s (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "attack_cooldown");
+			player.stats.combat.LogInvalid(player, this, "attack_cooldown");
 			return false;
 		}
 		return true;
@@ -215,7 +215,7 @@ public class AttackEntity : HeldEntity
 		{
 			string shortPrefabName = base.ShortPrefabName;
 			AntiHack.Log(player, AntiHackType.EyeHack, "Contains NaN (" + shortPrefabName + ")");
-			player.stats.combat.Log(this, "eye_nan");
+			player.stats.combat.LogInvalid(player, this, "eye_nan");
 			flag = false;
 		}
 		if (ConVar.AntiHack.eye_protection > 0)
@@ -236,7 +236,7 @@ public class AttackEntity : HeldEntity
 				{
 					string shortPrefabName2 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, "Distance (" + shortPrefabName2 + " on attack with " + num7 + "m > " + num6 + "m)");
-					player.stats.combat.Log(this, "eye_distance");
+					player.stats.combat.LogInvalid(player, this, "eye_distance");
 					flag = false;
 				}
 			}
@@ -249,7 +249,7 @@ public class AttackEntity : HeldEntity
 				{
 					string shortPrefabName3 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, "Altitude (" + shortPrefabName3 + " on attack with " + num10 + "m > " + num9 + "m)");
-					player.stats.combat.Log(this, "eye_altitude");
+					player.stats.combat.LogInvalid(player, this, "eye_altitude");
 					flag = false;
 				}
 			}
@@ -262,7 +262,7 @@ public class AttackEntity : HeldEntity
 				{
 					string shortPrefabName4 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName4, " on attack) ", center, " ", position, " ", vector));
-					player.stats.combat.Log(this, "eye_los");
+					player.stats.combat.LogInvalid(player, this, "eye_los");
 					flag = false;
 				}
 			}
@@ -277,7 +277,7 @@ public class AttackEntity : HeldEntity
 					{
 						string shortPrefabName5 = base.ShortPrefabName;
 						AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
-						player.stats.combat.Log(this, "eye_noclip");
+						player.stats.combat.LogInvalid(player, this, "eye_noclip");
 						flag = false;
 					}
 				}
@@ -285,7 +285,7 @@ public class AttackEntity : HeldEntity
 				{
 					string shortPrefabName6 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName6, " on attack) ", position2, " ", vector2));
-					player.stats.combat.Log(this, "eye_noclip");
+					player.stats.combat.LogInvalid(player, this, "eye_noclip");
 					flag = false;
 				}
 			}

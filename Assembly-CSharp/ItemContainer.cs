@@ -166,6 +166,15 @@ public sealed class ItemContainer
 		return HasFlag(Flag.NoItemInput);
 	}
 
+	public float GetTemperature(int slot)
+	{
+		if (entityOwner is BaseOven baseOven)
+		{
+			return baseOven.GetTemperature(slot);
+		}
+		return temperature;
+	}
+
 	public void ServerInitialize(Item parentItem, int iMaxCapacity)
 	{
 		parent = parentItem;
@@ -241,6 +250,29 @@ public sealed class ItemContainer
 		}
 		droppedItemContainer.Spawn();
 		return droppedItemContainer;
+	}
+
+	public BaseEntity GetEntityOwner()
+	{
+		ItemContainer itemContainer = this;
+		for (int i = 0; i < 10; i++)
+		{
+			if (itemContainer.entityOwner != null)
+			{
+				return itemContainer.entityOwner;
+			}
+			if (itemContainer.playerOwner != null)
+			{
+				return itemContainer.playerOwner;
+			}
+			ItemContainer itemContainer2 = itemContainer.parent?.parent;
+			if (itemContainer2 == null || itemContainer2 == itemContainer)
+			{
+				return null;
+			}
+			itemContainer = itemContainer2;
+		}
+		return null;
 	}
 
 	public void OnChanged()

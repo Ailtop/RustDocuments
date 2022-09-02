@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface IItemContainerEntity
+public interface IItemContainerEntity : IIdealSlotEntity
 {
 	ItemContainer inventory { get; }
 

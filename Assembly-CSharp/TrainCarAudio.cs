@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class TrainCarAudio : MonoBehaviour
 {
+	[Header("Train Car Audio")]
 	[SerializeField]
 	private TrainCar trainCar;
 

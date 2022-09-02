@@ -191,7 +191,7 @@ public class GenerateRailLayout : ProceduralComponent
 				Vector3[] points2 = pathList.Path.Points;
 				Vector3 vector4 = pathList.Path.Tangents[num2];
 				int num4 = ((Vector3.Angle(vector4, normalized) < Vector3.Angle(-vector4, normalized)) ? 1 : (-1));
-				Vector3 to = Vector3.Normalize(list6[list6.Count - 1] - list6[list6.Count - 1 - 16]);
+				Vector3 to = Vector3.Normalize(list6[list6.Count - 1] - list6[Mathf.Max(0, list6.Count - 1 - 16)]);
 				Vector3 vector5 = Vector3.Normalize(points2[(num2 + num4 * 8 * 2 + points2.Length) % points2.Length] - points2[num2]);
 				float num5 = 0f - Vector3.SignedAngle(vector5, to, Vector3.up);
 				Vector3 vector6 = rot90 * vector5;
@@ -230,7 +230,6 @@ public class GenerateRailLayout : ProceduralComponent
 			};
 			rail.Path.Smoothen(32, new Vector3(1f, 0f, 1f), filter);
 			rail.Path.Smoothen(64, new Vector3(0f, 1f, 0f), filter);
-			rail.Path.RecalculateLength();
 			rail.Path.Resample(7.5f);
 			rail.Path.RecalculateTangents();
 			rail.AdjustPlacementMap(20f);

@@ -212,7 +212,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		}
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			if (activePlayer.HasPlayerFlag(BasePlayer.PlayerFlags.SafeZone) || Vector3Ex.Distance2D(base.transform.position, activePlayer.transform.position) > 150f)
+			if (activePlayer.InSafeZone() || Vector3Ex.Distance2D(base.transform.position, activePlayer.transform.position) > 150f)
 			{
 				continue;
 			}

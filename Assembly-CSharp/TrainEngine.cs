@@ -99,6 +99,9 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	public bool lootablesAreOnPlatform;
 
 	[SerializeField]
+	private bool mustMountFromPlatform = true;
+
+	[SerializeField]
 	private VehicleLight[] onLights;
 
 	[SerializeField]
@@ -614,7 +617,11 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public bool CanMount(BasePlayer player)
 	{
-		return PlayerIsOnPlatform(player);
+		if (mustMountFromPlatform)
+		{
+			return PlayerIsOnPlatform(player);
+		}
+		return true;
 	}
 
 	public bool PlayerIsOnPlatform(BasePlayer player)

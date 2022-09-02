@@ -73,6 +73,14 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 	public Quaternion prevRotation;
 
+	private Bounds collisionCheckBounds;
+
+	private Vector3 lastGoodPos;
+
+	private Quaternion lastGoodRot;
+
+	private bool lastPosWasBad;
+
 	public float deathDamageCounter;
 
 	private const float DAMAGE_TO_GIB = 600f;
@@ -117,6 +125,9 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 	[SerializeField]
 	public ProtectionProperties mortalProtection;
+
+	[SerializeField]
+	private BoxCollider mainChassisCollider;
 
 	[SerializeField]
 	public SpawnSettings spawnSettings;
@@ -243,6 +254,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		}
 		lastEngineOnTime = UnityEngine.Time.realtimeSinceStartup;
 		allCarsList.Add(this);
+		collisionCheckBounds = new Bounds(mainChassisCollider.center, new Vector3(mainChassisCollider.size.x - 0.5f, 0.05f, mainChassisCollider.size.z - 0.5f));
 		InvokeRandomized(UpdateClients, 0f, 0.15f, 0.02f);
 		InvokeRandomized(DecayTick, UnityEngine.Random.Range(30f, 60f), 60f, 6f);
 	}
@@ -296,6 +308,32 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		hurtTriggerFront.gameObject.SetActive(speed > hurtTriggerMinSpeed);
 		hurtTriggerRear.gameObject.SetActive(speed < 0f - hurtTriggerMinSpeed);
 		serverTerrainHandler.FixedUpdate();
+		float num = Mathf.Abs(speed);
+		if (lastPosWasBad || num > 15f)
+		{
+			if (GamePhysics.CheckOBB(new OBB(mainChassisCollider.transform, collisionCheckBounds), 1218511105, QueryTriggerInteraction.Ignore))
+			{
+				rigidBody.position = lastGoodPos;
+				rigidBody.rotation = lastGoodRot;
+				base.transform.position = lastGoodPos;
+				base.transform.rotation = lastGoodRot;
+				rigidBody.velocity = Vector3.zero;
+				rigidBody.angularVelocity = Vector3.zero;
+				lastPosWasBad = true;
+			}
+			else
+			{
+				lastGoodPos = rigidBody.position;
+				lastGoodRot = rigidBody.rotation;
+				lastPosWasBad = false;
+			}
+		}
+		else
+		{
+			lastGoodPos = rigidBody.position;
+			lastGoodRot = rigidBody.rotation;
+			lastPosWasBad = false;
+		}
 		SetFlag(Flags.Reserved7, rigidBody.position == prevPosition && rigidBody.rotation == prevRotation);
 		prevPosition = rigidBody.position;
 		prevRotation = rigidBody.rotation;

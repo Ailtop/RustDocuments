@@ -22,6 +22,8 @@ public abstract class DeployVolume : PrefabAttribute
 	[FormerlySerializedAs("entities")]
 	public BaseEntity[] entityList;
 
+	public static Collider LastDeployHit { get; private set; }
+
 	protected override Type GetIndexedType()
 	{
 		return typeof(DeployVolume);
@@ -93,8 +95,10 @@ public abstract class DeployVolume : PrefabAttribute
 
 	private static bool CheckFlags(List<Collider> list, DeployVolume volume)
 	{
+		LastDeployHit = null;
 		for (int i = 0; i < list.Count; i++)
 		{
+			LastDeployHit = list[i];
 			GameObject gameObject = list[i].gameObject;
 			if (gameObject.CompareTag("DeployVolumeIgnore"))
 			{

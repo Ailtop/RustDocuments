@@ -77,9 +77,6 @@ public class Server : ConsoleSystem
 	public static bool stats = false;
 
 	[ServerVar]
-	public static bool globalchat = true;
-
-	[ServerVar]
 	public static bool stability = true;
 
 	[ServerVar(ShowInAdminUI = true)]
@@ -217,8 +214,11 @@ public class Server : ConsoleSystem
 	[ServerVar(Saved = true)]
 	public static float rewounddelay = 60f;
 
-	[ServerVar(Saved = true)]
+	[ServerVar(Saved = true, Help = "Can players be wounded after recieving fatal damage")]
 	public static bool woundingenabled = true;
+
+	[ServerVar(Saved = true, Help = "Do players go into the crawling wounded state")]
+	public static bool crawlingenabled = true;
 
 	[ServerVar(Help = "Base chance of recovery after crawling wounded state", Saved = true)]
 	public static float woundedrecoverchance = 0.2f;
@@ -651,7 +651,7 @@ public class Server : ConsoleSystem
 		{
 			return "invalid player";
 		}
-		return basePlayer.stats.combat.Get(combatlogsize, 0u, arg.HasArg("--json"));
+		return basePlayer.stats.combat.Get(combatlogsize, 0u, arg.HasArg("--json"), arg.IsAdmin);
 	}
 
 	[ServerAllVar(Help = "Get the player combat log, only showing outgoing damage")]
@@ -666,7 +666,7 @@ public class Server : ConsoleSystem
 		{
 			return "invalid player";
 		}
-		return basePlayer.stats.combat.Get(combatlogsize, basePlayer.net.ID, arg.HasArg("--json"));
+		return basePlayer.stats.combat.Get(combatlogsize, basePlayer.net.ID, arg.HasArg("--json"), arg.IsAdmin);
 	}
 
 	[ServerVar(Help = "Print the current player position.")]

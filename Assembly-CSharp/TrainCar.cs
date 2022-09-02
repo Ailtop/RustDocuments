@@ -16,7 +16,8 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	public enum TrainCarType
 	{
 		Wagon = 0,
-		Engine = 1
+		Engine = 1,
+		Other = 2
 	}
 
 	protected bool trainDebug;
@@ -136,7 +137,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 	public Vector3 rearBogieLocalOffset;
 
 	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
-	public static float population = 2.4f;
+	public static float population = 2.3f;
 
 	[ServerVar(Help = "Ratio of wagons to train engines that spawn")]
 	public static int wagons_per_engine = 2;
@@ -675,6 +676,40 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		return num;
 	}
 
+	public bool SpaceIsClear()
+	{
+		List<Collider> obj = Facepunch.Pool.GetList<Collider>();
+		GamePhysics.OverlapOBB(WorldSpaceBounds(), obj, 32768);
+		foreach (Collider item in obj)
+		{
+			if (!ColliderIsPartOfTrain(item))
+			{
+				return false;
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		return true;
+	}
+
+	public bool ColliderIsPartOfTrain(Collider collider)
+	{
+		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider);
+		if (baseEntity == null)
+		{
+			return false;
+		}
+		if (baseEntity == this)
+		{
+			return true;
+		}
+		BaseEntity baseEntity2 = baseEntity.parentEntity.Get(base.isServer);
+		if (BaseNetworkableEx.IsValid(baseEntity2))
+		{
+			return baseEntity2 == this;
+		}
+		return false;
+	}
+
 	public void UpdateClients()
 	{
 		if (IsMoving())
@@ -708,7 +743,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 	}
 
-	protected virtual float GetDecayMinutes(bool hasPassengers)
+	public virtual float GetDecayMinutes(bool hasPassengers)
 	{
 		bool flag = IsAtAStation && Vector3.Distance(spawnOrigin, base.transform.position) < 50f;
 		if (hasPassengers || AnyPlayersNearby(30f) || flag || IsOnAboveGroundSpawnRail)
@@ -718,7 +753,7 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		return decayminutes;
 	}
 
-	protected virtual bool CanDieFromDecayNow()
+	public virtual bool CanDieFromDecayNow()
 	{
 		if (CarType != TrainCarType.Engine)
 		{
@@ -742,32 +777,6 @@ public class TrainCar : BaseVehicle, TriggerHurtNotChild.IHurtTriggerUser, Train
 		}
 		Facepunch.Pool.FreeList(ref obj);
 		return result;
-	}
-
-	public bool SpaceIsClear()
-	{
-		List<Collider> obj = Facepunch.Pool.GetList<Collider>();
-		GamePhysics.OverlapOBB(WorldSpaceBounds(), obj, 32768);
-		foreach (Collider item in obj)
-		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item);
-			if (!(baseEntity != this))
-			{
-				continue;
-			}
-			if (baseEntity != null)
-			{
-				BaseEntity baseEntity2 = baseEntity.parentEntity.Get(base.isServer);
-				if (BaseNetworkableEx.IsValid(baseEntity2))
-				{
-					_ = baseEntity2 != this;
-				}
-				return false;
-			}
-			return false;
-		}
-		Facepunch.Pool.FreeList(ref obj);
-		return true;
 	}
 
 	[RPC_Server]

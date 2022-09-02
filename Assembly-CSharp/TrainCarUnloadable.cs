@@ -194,6 +194,7 @@ public class TrainCarUnloadable : TrainCar
 			if (base.isClient)
 			{
 				orePlaneVisuals.localScale = _oreScale;
+				orePlaneVisuals.gameObject.SetActive(percent > 0f);
 			}
 			if (base.isServer)
 			{

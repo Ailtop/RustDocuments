@@ -20,6 +20,8 @@ public class SprayCanSpray : DecayEntity, ISplashable
 	[NonSerialized]
 	public int splashThreshold;
 
+	public override bool BypassInsideDecayMultiplier => true;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("SprayCanSpray.OnRpcMessage"))

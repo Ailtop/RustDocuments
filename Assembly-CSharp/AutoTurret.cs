@@ -1533,6 +1533,32 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		AddSelfAuthorize(deployedBy);
 	}
 
+	public override uint GetIdealContainer(BasePlayer player, Item item)
+	{
+		return 0u;
+	}
+
+	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	{
+		bool num = item.info.category == ItemCategory.Weapon;
+		bool flag = item.info.category == ItemCategory.Ammunition;
+		if (num)
+		{
+			return 0;
+		}
+		if (flag)
+		{
+			for (int i = 1; i < container.capacity; i++)
+			{
+				if (!container.SlotTaken(item, i))
+				{
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
 	public bool IsOnline()
 	{
 		return IsOn();

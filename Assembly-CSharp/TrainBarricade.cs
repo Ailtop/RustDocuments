@@ -28,6 +28,8 @@ public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpli
 
 	public float FrontWheelSplineDist { get; private set; }
 
+	public TrainCar.TrainCarType CarType => TrainCar.TrainCarType.Other;
+
 	public bool CustomCollision(TrainCar train, TriggerTrainCollisions trainTrigger)
 	{
 		bool result = false;

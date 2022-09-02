@@ -270,7 +270,6 @@ public class GenerateRoadLayout : ProceduralComponent
 		{
 			item2.Path.Smoothen(4, new Vector3(1f, 0f, 1f));
 			item2.Path.Smoothen(16, new Vector3(0f, 1f, 0f));
-			item2.Path.RecalculateLength();
 			item2.Path.Resample(7.5f);
 			item2.Path.RecalculateTangents();
 			item2.AdjustPlacementMap(20f);

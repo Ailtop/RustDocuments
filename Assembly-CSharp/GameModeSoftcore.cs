@@ -146,7 +146,7 @@ public class GameModeSoftcore : GameModeVanilla
 	public override void OnPlayerRespawn(BasePlayer player)
 	{
 		base.OnPlayerRespawn(player);
-		player.ShowToast(2, ReclaimToast);
+		player.ShowToast(GameTip.Styles.Blue_Long, ReclaimToast);
 	}
 
 	public override SleepingBag[] FindSleepingBagsForPlayer(ulong playerID, bool ignoreTimers)

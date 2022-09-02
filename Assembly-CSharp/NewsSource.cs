@@ -1,15 +1,42 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
+using Facepunch.Models;
 using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class NewsSource : MonoBehaviour
 {
+	private struct ParagraphBuilder
+	{
+		public StringBuilder StringBuilder;
+
+		public List<string> Links;
+
+		public static ParagraphBuilder New()
+		{
+			ParagraphBuilder result = default(ParagraphBuilder);
+			result.StringBuilder = new StringBuilder();
+			result.Links = new List<string>();
+			return result;
+		}
+
+		public void AppendLine()
+		{
+			StringBuilder.AppendLine();
+		}
+
+		public void Append(string text)
+		{
+			StringBuilder.Append(text);
+		}
+	}
+
 	private static readonly Regex BbcodeParse = new Regex("([^\\[]*)(?:\\[(\\w+)(?:=([^\\]]+))?\\](.*?)\\[\\/\\2\\])?", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
 
 	public RustText title;
@@ -56,20 +83,30 @@ public class NewsSource : MonoBehaviour
 		button.onClick.RemoveAllListeners();
 		button.onClick.AddListener(delegate
 		{
-			Debug.Log("Opening URL: " + story.url);
-			UnityEngine.Application.OpenURL(story.url);
+			string text2 = GetBlogPost()?.Url ?? story.url;
+			Debug.Log("Opening URL: " + text2);
+			UnityEngine.Application.OpenURL(text2);
 		});
-		string firstImage = null;
-		StringBuilder currentParagraph = new StringBuilder();
-		ParseBbcode(currentParagraph, story.text, ref firstImage);
-		AppendParagraph(currentParagraph);
+		string firstImage = GetBlogPost()?.HeaderImage;
+		ParagraphBuilder currentParagraph = ParagraphBuilder.New();
+		ParseBbcode(ref currentParagraph, story.text, ref firstImage);
+		AppendParagraph(ref currentParagraph);
 		if (firstImage != null)
 		{
 			coverImage.Load(firstImage);
 		}
+		RustText[] componentsInChildren = container.GetComponentsInChildren<RustText>();
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			componentsInChildren[i].DoAutoSize();
+		}
+		Facepunch.Models.Manifest.NewsInfo.BlogInfo GetBlogPost()
+		{
+			return ((IReadOnlyCollection<Facepunch.Models.Manifest.NewsInfo.BlogInfo>)(object)Facepunch.Application.Manifest?.News?.Blogs)?.FindWith((Facepunch.Models.Manifest.NewsInfo.BlogInfo b) => b.Title, story.name, StringComparer.InvariantCultureIgnoreCase);
+		}
 	}
 
-	private void ParseBbcode(StringBuilder currentParagraph, string bbcode, ref string firstImage, int depth = 0)
+	private void ParseBbcode(ref ParagraphBuilder currentParagraph, string bbcode, ref string firstImage, int depth = 0)
 	{
 		foreach (Match item in BbcodeParse.Matches(bbcode))
 		{
@@ -84,54 +121,62 @@ public class NewsSource : MonoBehaviour
 				if (depth == 0)
 				{
 					string[] array2 = value3.Split(';');
-					AppendYouTube(currentParagraph, array2[0]);
+					AppendYouTube(ref currentParagraph, array2[0]);
 				}
 				break;
 			case "h1":
 			case "h2":
 				currentParagraph.Append("<size=200%>");
-				currentParagraph.Append(value4);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</size>");
 				break;
 			case "h3":
 				currentParagraph.Append("<size=175%>");
-				currentParagraph.Append(value4);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</size>");
 				break;
 			case "h4":
 				currentParagraph.Append("<size=150%>");
-				currentParagraph.Append(value4);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</size>");
 				break;
 			case "b":
 				currentParagraph.Append("<b>");
-				ParseBbcode(currentParagraph, value4, ref firstImage, depth + 1);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</b>");
 				break;
 			case "u":
 				currentParagraph.Append("<u>");
-				ParseBbcode(currentParagraph, value4, ref firstImage, depth + 1);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</u>");
 				break;
 			case "i":
 				currentParagraph.Append("<i>");
-				ParseBbcode(currentParagraph, value4, ref firstImage, depth + 1);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</i>");
 				break;
 			case "strike":
 				currentParagraph.Append("<s>");
-				ParseBbcode(currentParagraph, value4, ref firstImage, depth + 1);
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
 				currentParagraph.Append("</s>");
 				break;
 			case "noparse":
 				currentParagraph.Append(value4);
 				break;
 			case "url":
-				currentParagraph.Append(value4);
-				currentParagraph.Append(" (");
-				currentParagraph.Append(value3);
-				currentParagraph.Append(")");
+			{
+				if (value4.Contains("[img]", StringComparison.InvariantCultureIgnoreCase))
+				{
+					ParseBbcode(ref currentParagraph, value4, ref firstImage, depth);
+					break;
+				}
+				int count = currentParagraph.Links.Count;
+				currentParagraph.Links.Add(value3);
+				currentParagraph.Append($"<link={count}><u>");
+				ParseBbcode(ref currentParagraph, value4, ref firstImage, depth + 1);
+				currentParagraph.Append("</u></link>");
 				break;
+			}
 			case "list":
 			{
 				currentParagraph.AppendLine();
@@ -157,7 +202,7 @@ public class NewsSource : MonoBehaviour
 				{
 					if (!string.IsNullOrWhiteSpace(text2))
 					{
-						currentParagraph.AppendFormat("\t{0} ", num++);
+						currentParagraph.Append($"\t{num++} ");
 						currentParagraph.Append(text2.Trim());
 						currentParagraph.AppendLine();
 					}
@@ -172,7 +217,7 @@ public class NewsSource : MonoBehaviour
 					{
 						firstImage = text;
 					}
-					AppendImage(currentParagraph, text);
+					AppendImage(ref currentParagraph, text);
 				}
 				break;
 			}
@@ -184,29 +229,33 @@ public class NewsSource : MonoBehaviour
 		return listContent?.Split(BulletSeparators, StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>();
 	}
 
-	private void AppendParagraph(StringBuilder currentParagraph)
+	private void AppendParagraph(ref ParagraphBuilder currentParagraph)
 	{
-		if (currentParagraph.Length != 0)
+		if (currentParagraph.StringBuilder.Length > 0)
 		{
-			string text = currentParagraph.ToString();
-			currentParagraph.Clear();
+			string text = currentParagraph.StringBuilder.ToString();
 			RustText rustText = UnityEngine.Object.Instantiate(paragraphTemplate, container);
 			rustText.SetActive(active: true);
 			rustText.SetText(text);
+			if (rustText.TryGetComponent<NewsParagraph>(out var component))
+			{
+				component.Links = currentParagraph.Links;
+			}
 		}
+		currentParagraph = ParagraphBuilder.New();
 	}
 
-	private void AppendImage(StringBuilder currentParagraph, string url)
+	private void AppendImage(ref ParagraphBuilder currentParagraph, string url)
 	{
-		AppendParagraph(currentParagraph);
+		AppendParagraph(ref currentParagraph);
 		HttpImage httpImage = UnityEngine.Object.Instantiate(imageTemplate, container);
 		httpImage.SetActive(active: true);
 		httpImage.Load(url);
 	}
 
-	private void AppendYouTube(StringBuilder currentParagraph, string videoId)
+	private void AppendYouTube(ref ParagraphBuilder currentParagraph, string videoId)
 	{
-		AppendParagraph(currentParagraph);
+		AppendParagraph(ref currentParagraph);
 		HttpImage httpImage = UnityEngine.Object.Instantiate(youtubeTemplate, container);
 		httpImage.SetActive(active: true);
 		httpImage.Load("https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg");

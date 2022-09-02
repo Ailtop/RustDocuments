@@ -14,9 +14,9 @@ public sealed class AutoExposure : PostProcessEffectSettings
 		value = new Vector2(50f, 95f)
 	};
 
+	[Tooltip("Minimum average luminance to consider for auto exposure. Unit is EV.")]
 	[Range(-9f, 9f)]
 	[DisplayName("Minimum (EV)")]
-	[Tooltip("Minimum average luminance to consider for auto exposure. Unit is EV.")]
 	public FloatParameter minLuminance = new FloatParameter
 	{
 		value = 0f

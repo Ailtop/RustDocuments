@@ -79,25 +79,19 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 			return;
 		}
 		ItemAmount[] array = itemList;
-		DateTime expireDate = default(DateTime);
 		foreach (ItemAmount itemAmount in array)
 		{
 			Item item = ItemManager.Create(itemAmount.itemDef, (int)itemAmount.amount, 0uL);
-			if (item == null)
+			if (item != null)
 			{
-				continue;
-			}
-			if ((bool)reciever)
-			{
-				expireDate._002Ector(2022, 12, 31);
-				if (Interface.CallDeprecatedHook("OnCollectiblePickup", "OnCollectiblePickup(CollectibleEntity collectible, BasePlayer player)", expireDate, item, reciever, this) == null)
+				if ((bool)reciever)
 				{
 					reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
 				}
-			}
-			else
-			{
-				item.Drop(base.transform.position + Vector3.up * 0.5f, Vector3.up);
+				else
+				{
+					item.Drop(base.transform.position + Vector3.up * 0.5f, Vector3.up);
+				}
 			}
 		}
 		itemList = null;

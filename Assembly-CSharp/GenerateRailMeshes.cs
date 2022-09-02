@@ -47,7 +47,6 @@ public class GenerateRailMeshes : ProceduralComponent
 		TrainTrackSpline trainTrackSpline = HierarchyUtil.GetRoot(rail.Name).AddComponent<TrainTrackSpline>();
 		trainTrackSpline.aboveGroundSpawn = rail.Hierarchy == 2;
 		trainTrackSpline.hierarchy = rail.Hierarchy;
-		trainTrackSpline.useNewTangentCalc = true;
 		if (trainTrackSpline.aboveGroundSpawn)
 		{
 			TrainTrackSpline.SidingSplines.Add(trainTrackSpline);

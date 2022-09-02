@@ -1,4 +1,4 @@
-public class ScarecrowBrain : BaseAIBrain<ScarecrowNPC>
+public class ScarecrowBrain : BaseAIBrain
 {
 	public override void AddStates()
 	{
@@ -14,7 +14,7 @@ public class ScarecrowBrain : BaseAIBrain<ScarecrowNPC>
 		base.ThinkMode = AIThinkMode.Interval;
 		thinkRate = 0.25f;
 		base.PathFinder = new HumanPathFinder();
-		((HumanPathFinder)base.PathFinder).Init(GetEntity());
+		((HumanPathFinder)base.PathFinder).Init(GetBaseEntity());
 	}
 
 	public override void OnDestroy()

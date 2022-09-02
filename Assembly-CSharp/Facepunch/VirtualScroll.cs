@@ -56,9 +56,9 @@ public class VirtualScroll : MonoBehaviour
 		Rebuild();
 	}
 
-	public void SetDataSource(IDataSource source)
+	public void SetDataSource(IDataSource source, bool forceRebuild = false)
 	{
-		if (dataSource != source)
+		if (dataSource != source || forceRebuild)
 		{
 			dataSource = source;
 			FullRebuild();

@@ -1,4 +1,5 @@
 using ConVar;
+using UnityEngine;
 
 public class SprayDecay : Decay
 {
@@ -14,6 +15,6 @@ public class SprayDecay : Decay
 
 	public override float GetDecayDuration(BaseEntity entity)
 	{
-		return Global.SprayDuration;
+		return Mathf.Max(Global.SprayDuration, 1f);
 	}
 }

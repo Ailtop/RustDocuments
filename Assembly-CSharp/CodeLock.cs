@@ -393,7 +393,7 @@ public class CodeLock : BaseLock
 			wrongCodes++;
 			if (wrongCodes > 5)
 			{
-				rpc.player.ShowToast(1, blockwarning);
+				rpc.player.ShowToast(GameTip.Styles.Red_Normal, blockwarning);
 			}
 			if ((float)wrongCodes >= maxFailedAttempts)
 			{

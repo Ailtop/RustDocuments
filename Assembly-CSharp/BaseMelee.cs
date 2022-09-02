@@ -148,9 +148,9 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity();
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -167,28 +167,28 @@ public class BaseMelee : AttackEntity
 			if (!canThrowAsProjectile)
 			{
 				AntiHack.Log(player, AntiHackType.ProjectileHack, "Not throwable (" + base.ShortPrefabName + ")");
-				player.stats.combat.Log(this, "not_throwable");
+				player.stats.combat.LogInvalid(player, this, "not_throwable");
 				return;
 			}
 			Item item = GetItem();
 			if (item == null)
 			{
 				AntiHack.Log(player, AntiHackType.ProjectileHack, "Item not found (" + base.ShortPrefabName + ")");
-				player.stats.combat.Log(this, "item_missing");
+				player.stats.combat.LogInvalid(player, this, "item_missing");
 				return;
 			}
 			ItemModProjectile component = item.info.GetComponent<ItemModProjectile>();
 			if (component == null)
 			{
 				AntiHack.Log(player, AntiHackType.ProjectileHack, "Item mod not found (" + base.ShortPrefabName + ")");
-				player.stats.combat.Log(this, "mod_missing");
+				player.stats.combat.LogInvalid(player, this, "mod_missing");
 				return;
 			}
 			ProjectileShoot projectileShoot = ProjectileShoot.Deserialize(msg.read);
 			if (projectileShoot.projectiles.Count != 1)
 			{
 				AntiHack.Log(player, AntiHackType.ProjectileHack, "Projectile count mismatch (" + base.ShortPrefabName + ")");
-				player.stats.combat.Log(this, "count_mismatch");
+				player.stats.combat.LogInvalid(player, this, "count_mismatch");
 				return;
 			}
 			player.CleanupExpiredProjectiles();
@@ -197,7 +197,7 @@ public class BaseMelee : AttackEntity
 				if (player.HasFiredProjectile(projectile.projectileID))
 				{
 					AntiHack.Log(player, AntiHackType.ProjectileHack, "Duplicate ID (" + projectile.projectileID + ")");
-					player.stats.combat.Log(this, "duplicate_id");
+					player.stats.combat.LogInvalid(player, this, "duplicate_id");
 				}
 				else if (ValidateEyePos(player, projectile.startPos))
 				{
@@ -384,7 +384,7 @@ public class BaseMelee : AttackEntity
 			{
 				string shortPrefabName = base.ShortPrefabName;
 				AntiHack.Log(player, AntiHackType.MeleeHack, "Contains NaN (" + shortPrefabName + ")");
-				player.stats.combat.Log(hitInfo, "melee_nan");
+				player.stats.combat.LogInvalid(hitInfo, "melee_nan");
 				return;
 			}
 			BaseEntity hitEntity = hitInfo.HitEntity;
@@ -419,7 +419,7 @@ public class BaseMelee : AttackEntity
 					string shortPrefabName2 = base.ShortPrefabName;
 					string shortPrefabName3 = basePlayer.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.MeleeHack, "Bone is invalid  (" + shortPrefabName2 + " on " + shortPrefabName3 + " bone " + hitInfo.HitBone + ")");
-					player.stats.combat.Log(hitInfo, "melee_bone");
+					player.stats.combat.LogInvalid(hitInfo, "melee_bone");
 					flag8 = false;
 				}
 				if (ConVar.AntiHack.melee_protection >= 2)
@@ -434,7 +434,7 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName4 = base.ShortPrefabName;
 							string shortPrefabName5 = hitEntity.ShortPrefabName;
 							AntiHack.Log(player, AntiHackType.MeleeHack, "Entity too far away (" + shortPrefabName4 + " on " + shortPrefabName5 + " with " + num7 + "m > " + num6 + "m in " + num4 + "s)");
-							player.stats.combat.Log(hitInfo, "melee_target");
+							player.stats.combat.LogInvalid(hitInfo, "melee_target");
 							flag8 = false;
 						}
 					}
@@ -448,7 +448,7 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName6 = base.ShortPrefabName;
 							string shortPrefabName7 = basePlayer.ShortPrefabName;
 							AntiHack.Log(player, AntiHackType.ProjectileHack, "Player too far away (" + shortPrefabName6 + " on " + shortPrefabName7 + " with " + num9 + "m > " + num8 + "m in " + num4 + "s)");
-							player.stats.combat.Log(hitInfo, "player_distance");
+							player.stats.combat.LogInvalid(hitInfo, "player_distance");
 							flag8 = false;
 						}
 					}
@@ -465,7 +465,7 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName8 = base.ShortPrefabName;
 							string text = (flag6 ? hitEntity.ShortPrefabName : "world");
 							AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName8 + " on " + text + " with " + num11 + "m > " + num10 + "m in " + num4 + "s)");
-							player.stats.combat.Log(hitInfo, "melee_initiator");
+							player.stats.combat.LogInvalid(hitInfo, "melee_initiator");
 							flag8 = false;
 						}
 					}
@@ -479,7 +479,7 @@ public class BaseMelee : AttackEntity
 							string shortPrefabName9 = base.ShortPrefabName;
 							string text2 = (flag6 ? hitEntity.ShortPrefabName : "world");
 							AntiHack.Log(player, AntiHackType.MeleeHack, "Initiator too far away (" + shortPrefabName9 + " on " + text2 + " with " + num14 + "m > " + num13 + "m in " + num4 + "s)");
-							player.stats.combat.Log(hitInfo, "melee_initiator");
+							player.stats.combat.LogInvalid(hitInfo, "melee_initiator");
 							flag8 = false;
 						}
 					}
@@ -529,7 +529,7 @@ public class BaseMelee : AttackEntity
 				string shortPrefabName10 = base.ShortPrefabName;
 				string shortPrefabName11 = hitEntity.ShortPrefabName;
 				AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName10, " on ", shortPrefabName11, ") ", center, " ", position, " ", vector, " ", vector2, " ", vector3));
-				player.stats.combat.Log(hitInfo, "melee_los");
+				player.stats.combat.LogInvalid(hitInfo, "melee_los");
 				flag8 = false;
 			}
 			goto IL_07c4;
@@ -557,7 +557,7 @@ public class BaseMelee : AttackEntity
 					string shortPrefabName12 = base.ShortPrefabName;
 					string shortPrefabName13 = basePlayer.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.MeleeHack, string.Concat("Line of sight (", shortPrefabName12, " on ", shortPrefabName13, ") ", hitPositionWorld2, " ", position2, " or ", hitPositionWorld2, " ", vector4));
-					player.stats.combat.Log(hitInfo, "melee_los");
+					player.stats.combat.LogInvalid(hitInfo, "melee_los");
 					flag8 = false;
 				}
 			}

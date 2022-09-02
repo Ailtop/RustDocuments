@@ -5,12 +5,12 @@ public class BaseAnimalNPC : BaseNpc, IAIAttack, IAITirednessAbove, IAISleep, IA
 {
 	public string deathStatName = "";
 
-	public BaseAIBrain<BaseAnimalNPC> brain;
+	public AnimalBrain brain;
 
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		brain = GetComponent<BaseAIBrain<BaseAnimalNPC>>();
+		brain = GetComponent<AnimalBrain>();
 		if (!base.isClient)
 		{
 			AIThinkManager.AddAnimal(this);

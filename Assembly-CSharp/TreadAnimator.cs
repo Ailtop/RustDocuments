@@ -12,8 +12,6 @@ public class TreadAnimator : MonoBehaviour, IClientComponent
 
 	public float wheelBoneDistMax = 0.26f;
 
-	public Renderer treadRenderer;
-
 	public Material leftTread;
 
 	public Material rightTread;

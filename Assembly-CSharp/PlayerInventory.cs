@@ -348,7 +348,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			{
 				return;
 			}
-			if (!CanMoveItemsFrom(item.GetEntityOwner(), item))
+			BaseEntity entityOwner = item.GetEntityOwner();
+			if (!CanMoveItemsFrom(entityOwner, item))
 			{
 				msg.player.ChatMessage("Cannot move item!");
 				return;
@@ -364,11 +365,40 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			}
 			if (num2 == 0)
 			{
-				if (!GiveItem(item))
+				BaseEntity baseEntity = entityOwner;
+				if (loot.containers.Count > 0)
 				{
-					msg.player.ChatMessage("GiveItem failed!");
+					baseEntity = ((entityOwner == base.baseEntity) ? loot.entitySource : base.baseEntity);
 				}
-				return;
+				if (baseEntity is IIdealSlotEntity idealSlotEntity)
+				{
+					num2 = idealSlotEntity.GetIdealContainer(base.baseEntity, item);
+				}
+				ItemContainer parent = item.parent;
+				if (parent != null && parent.IsLocked())
+				{
+					msg.player.ChatMessage("Container is locked!");
+					return;
+				}
+				if (num2 == 0)
+				{
+					if (baseEntity == loot.entitySource)
+					{
+						foreach (ItemContainer container in loot.containers)
+						{
+							if (!container.PlayerItemInputBlocked() && !container.IsLocked() && item.MoveToContainer(container, -1, allowStack: true, ignoreStackLimit: false, base.baseEntity))
+							{
+								break;
+							}
+						}
+						return;
+					}
+					if (!GiveItem(item))
+					{
+						msg.player.ChatMessage("GiveItem failed!");
+					}
+					return;
+				}
 			}
 			ItemContainer itemContainer = FindContainer(num2);
 			if (itemContainer == null)
@@ -376,8 +406,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				msg.player.ChatMessage("Invalid container (" + num2 + ")");
 				return;
 			}
-			ItemContainer parent = item.parent;
-			if ((parent != null && parent.IsLocked()) || itemContainer.IsLocked())
+			if (itemContainer.IsLocked())
 			{
 				msg.player.ChatMessage("Container is locked!");
 				return;
@@ -397,7 +426,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 						split_Amount = Mathf.Min(num4, itemContainer.maxStackSize);
 					}
 					Item item2 = item.SplitItem(split_Amount);
-					if (!item2.MoveToContainer(itemContainer, num3))
+					if (!item2.MoveToContainer(itemContainer, num3, allowStack: true, ignoreStackLimit: false, base.baseEntity))
 					{
 						item.amount += item2.amount;
 						item2.Remove();
@@ -407,7 +436,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 					return;
 				}
 			}
-			if (item.MoveToContainer(itemContainer, num3))
+			if (item.MoveToContainer(itemContainer, num3, allowStack: true, ignoreStackLimit: false, base.baseEntity))
 			{
 				ItemManager.DoRemoves();
 				ServerUpdate(0f);

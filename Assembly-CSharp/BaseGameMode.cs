@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using CompanionServer;
 using ConVar;
 using Facepunch;
 using Network;
@@ -7,8 +9,27 @@ using ProtoBuf;
 using Rust;
 using UnityEngine;
 
+[Serializable]
 public class BaseGameMode : BaseEntity
 {
+	public struct CanAssignBedResult
+	{
+		public bool Result;
+
+		public int Count;
+
+		public int Max;
+	}
+
+	public struct CanBuildResult
+	{
+		public bool Result;
+
+		public Translate.Phrase Phrase;
+
+		public string[] Arguments;
+	}
+
 	[Serializable]
 	public class GameModeTeam
 	{
@@ -21,11 +42,49 @@ public class BaseGameMode : BaseEntity
 
 	public string[] scoreColumns;
 
+	[Header("Vanilla")]
+	public bool globalChat = true;
+
+	public bool localChat;
+
+	public bool teamSystem = true;
+
+	public bool safeZone = true;
+
+	public bool ingameMap = true;
+
+	public bool compass = true;
+
+	public bool contactSystem = true;
+
+	public bool crawling = true;
+
+	public bool rustPlus = true;
+
+	public bool wipeBpsOnProtocol;
+
+	public int maximumSleepingBags = -1;
+
+	public bool returnValidCombatlog = true;
+
+	public bool missionSystem = true;
+
+	public bool mlrs = true;
+
 	public const Flags Flag_Warmup = Flags.Reserved1;
 
 	public const Flags Flag_GameOver = Flags.Reserved2;
 
 	public const Flags Flag_WaitingForPlayers = Flags.Reserved3;
+
+	[Header("Changelog")]
+	public Translate.Phrase[] addedFeatures;
+
+	public Translate.Phrase[] removedFeatures;
+
+	public Translate.Phrase[] changedFeatures;
+
+	public List<string> convars = new List<string>();
 
 	public string shortname = "vanilla";
 
@@ -62,7 +121,7 @@ public class BaseGameMode : BaseEntity
 	[NonSerialized]
 	private float matchEndTime;
 
-	public string[] gameModeTags;
+	public List<string> gameModeTags;
 
 	public BasePlayer.CameraMode deathCameraMode = BasePlayer.CameraMode.Eyes;
 
@@ -485,9 +544,172 @@ public class BaseGameMode : BaseEntity
 		}
 	}
 
+	public int GetMaxBeds(BasePlayer player)
+	{
+		return maximumSleepingBags;
+	}
+
+	protected virtual void SetupTags()
+	{
+		gameModeTags.Add("missions-" + (missionSystem ? "enabled" : "disabled"));
+		gameModeTags.Add("mlrs-" + (mlrs ? "enabled" : "disabled"));
+		gameModeTags.Add("map-" + (ingameMap ? "enabled" : "disabled"));
+	}
+
+	public virtual float? EvaluateSleepingBagReset(SleepingBag bag, Vector3 position, SleepingBag.SleepingBagResetReason reason)
+	{
+		return null;
+	}
+
+	public virtual CanBuildResult? CanBuildEntity(BasePlayer player, Construction construction)
+	{
+		if (GameManager.server.FindPrefab(construction.prefabID)?.GetComponent<BaseEntity>() is SleepingBag)
+		{
+			CanAssignBedResult? canAssignBedResult = CanAssignBed(player, null, player.userID);
+			if (canAssignBedResult.HasValue)
+			{
+				CanBuildResult value;
+				if (canAssignBedResult.Value.Result)
+				{
+					value = default(CanBuildResult);
+					value.Result = true;
+					value.Phrase = SleepingBag.bagLimitPhrase;
+					value.Arguments = new string[2]
+					{
+						canAssignBedResult.Value.Count.ToString(),
+						canAssignBedResult.Value.Max.ToString()
+					};
+					return value;
+				}
+				value = default(CanBuildResult);
+				value.Result = false;
+				value.Phrase = SleepingBag.bagLimitReachedPhrase;
+				return value;
+			}
+		}
+		return null;
+	}
+
+	public virtual CanAssignBedResult? CanAssignBed(BasePlayer player, SleepingBag newBag, ulong targetPlayer, int countOffset = 1, int maxOffset = 0, SleepingBag ignore = null)
+	{
+		int num = GetMaxBeds(player) + maxOffset;
+		if (num < 0)
+		{
+			return null;
+		}
+		int num2 = countOffset;
+		CanAssignBedResult value;
+		foreach (SleepingBag sleepingBag in SleepingBag.sleepingBags)
+		{
+			if (sleepingBag != ignore && sleepingBag.deployerUserID == targetPlayer)
+			{
+				num2++;
+				if (num2 > num)
+				{
+					value = default(CanAssignBedResult);
+					value.Count = num2;
+					value.Max = num;
+					value.Result = false;
+					return value;
+				}
+			}
+		}
+		value = default(CanAssignBedResult);
+		value.Count = num2;
+		value.Max = num;
+		value.Result = true;
+		return value;
+	}
+
+	private void DeleteEntities()
+	{
+		if (!SingletonComponent<ServerMgr>.Instance.runFrameUpdate)
+		{
+			Invoke(DeleteEntities, 5f);
+		}
+		MonumentInfo[] array = TerrainMeta.Path.Monuments.Where((MonumentInfo x) => x.IsSafeZone).ToArray();
+		foreach (MonumentInfo monumentInfo in array)
+		{
+			List<BaseEntity> list = new List<BaseEntity>();
+			Vis.Entities(new OBB(monumentInfo.transform, monumentInfo.Bounds), list);
+			foreach (BaseEntity item in list)
+			{
+				if (!safeZone && (item is HumanNPC || item is NPCAutoTurret || item is Marketplace))
+				{
+					item.Kill();
+				}
+			}
+			if (!safeZone)
+			{
+				NPCSpawner[] componentsInChildren = monumentInfo.GetComponentsInChildren<NPCSpawner>();
+				for (int j = 0; j < componentsInChildren.Length; j++)
+				{
+					componentsInChildren[j].isSpawnerActive = false;
+				}
+			}
+			if (mlrs)
+			{
+				continue;
+			}
+			IndividualSpawner[] componentsInChildren2 = monumentInfo.GetComponentsInChildren<IndividualSpawner>();
+			foreach (IndividualSpawner individualSpawner in componentsInChildren2)
+			{
+				if (individualSpawner.entityPrefab.isValid && individualSpawner.entityPrefab.GetEntity() is MLRS)
+				{
+					individualSpawner.isSpawnerActive = false;
+				}
+			}
+		}
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			if (!mlrs && serverEntity is MLRS)
+			{
+				serverEntity.Kill();
+			}
+			if (!missionSystem && serverEntity is NPCMissionProvider)
+			{
+				serverEntity.Kill();
+			}
+		}
+	}
+
+	protected void OnCreated_Vanilla()
+	{
+		if (rustPlus != CompanionServer.Server.IsEnabled)
+		{
+			if (rustPlus)
+			{
+				CompanionServer.Server.Initialize();
+			}
+			else
+			{
+				CompanionServer.Server.Shutdown();
+			}
+		}
+		if (!teamSystem)
+		{
+			RelationshipManager.maxTeamSize = 0;
+		}
+		ConVar.Server.crawlingenabled = crawling;
+		DeleteEntities();
+		if (wipeBpsOnProtocol)
+		{
+			SingletonComponent<ServerMgr>.Instance.persistance.Dispose();
+			SingletonComponent<ServerMgr>.Instance.persistance = new UserPersistance(ConVar.Server.rootFolder);
+			BasePlayer[] array = UnityEngine.Object.FindObjectsOfType<BasePlayer>();
+			for (int i = 0; i < array.Length; i++)
+			{
+				array[i].InvalidateCachedPeristantPlayer();
+			}
+		}
+		RelationshipManager.contacts = contactSystem;
+		Chat.globalchat = globalChat;
+		Chat.localchat = localChat;
+	}
+
 	public bool HasAnyGameModeTag(string[] tags)
 	{
-		for (int i = 0; i < gameModeTags.Length; i++)
+		for (int i = 0; i < gameModeTags.Count; i++)
 		{
 			for (int j = 0; j < tags.Length; j++)
 			{
@@ -502,7 +724,7 @@ public class BaseGameMode : BaseEntity
 
 	public bool HasGameModeTag(string tag)
 	{
-		for (int i = 0; i < gameModeTags.Length; i++)
+		for (int i = 0; i < gameModeTags.Count; i++)
 		{
 			if (gameModeTags[i] == tag)
 			{
@@ -659,6 +881,7 @@ public class BaseGameMode : BaseEntity
 			Debug.LogError("Already an active game mode! was : " + GetActiveGameMode(base.isServer).name);
 			UnityEngine.Object.Destroy(GetActiveGameMode(base.isServer).gameObject);
 		}
+		SetupTags();
 		SetActiveGameMode(this, base.isServer);
 		OnCreated();
 	}
@@ -674,8 +897,13 @@ public class BaseGameMode : BaseEntity
 
 	protected virtual void OnCreated()
 	{
+		OnCreated_Vanilla();
 		if (base.isServer)
 		{
+			foreach (string convar in convars)
+			{
+				ConsoleSystem.Run(ConsoleSystem.Option.Server, convar);
+			}
 			gameModeSpawnGroups = UnityEngine.Object.FindObjectsOfType<GameModeSpawnGroup>();
 			UnassignAllPlayers();
 			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)

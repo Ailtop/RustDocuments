@@ -18,6 +18,7 @@ public class OreHopper : PercentFullStorageContainer
 	{
 		_oreScale.y = Mathf.Clamp01(percentFull);
 		oreOutputMesh.localScale = _oreScale;
+		oreOutputMesh.gameObject.SetActive(percentFull > 0f);
 		visualPercentFull = percentFull;
 	}
 

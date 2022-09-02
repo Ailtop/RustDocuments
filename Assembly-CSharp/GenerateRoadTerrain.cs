@@ -39,7 +39,7 @@ public class GenerateRoadTerrain : ProceduralComponent
 				path.RecalculateTangents();
 				heightMap.Push();
 				float intensity = 1f;
-				float fade = 1f / (1f + (float)j / 3f);
+				float fade = Mathf.InverseLerp(2f, 0f, j);
 				item.AdjustTerrainHeight(intensity, fade);
 				heightMap.Pop();
 			}
@@ -47,7 +47,7 @@ public class GenerateRoadTerrain : ProceduralComponent
 			{
 				heightMap.Push();
 				float intensity2 = 1f;
-				float num = 1f / (1f + (float)j / 3f);
+				float num = Mathf.InverseLerp(2f, 0f, j);
 				item2.AdjustTerrainHeight(intensity2, num / 4f);
 				heightMap.Pop();
 			}

@@ -304,6 +304,10 @@ public class AntiHack : ConsoleSystem
 	public static float build_losradius = 0.01f;
 
 	[ServerVar]
+	[Help("line of sight sphere cast radius, 0 == raycast")]
+	public static float build_losradius_sleepingbag = 0.3f;
+
+	[ServerVar]
 	[Help("whether or not to include terrain in the build LOS checks")]
 	public static bool build_terraincheck = true;
 

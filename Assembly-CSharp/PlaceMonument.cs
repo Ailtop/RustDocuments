@@ -21,6 +21,10 @@ public class PlaceMonument : ProceduralComponent
 
 	public override void Process(uint seed)
 	{
+		if (!Monument.isValid)
+		{
+			return;
+		}
 		TerrainHeightMap heightMap = TerrainMeta.HeightMap;
 		Vector3 position = TerrainMeta.Position;
 		Vector3 size = TerrainMeta.Size;

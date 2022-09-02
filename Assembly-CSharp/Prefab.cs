@@ -42,7 +42,7 @@ public class Prefab : IComparable<Prefab>
 	{
 		ID = StringPool.Get(name);
 		Name = name;
-		Folder = Path.GetDirectoryName(name);
+		Folder = (string.IsNullOrWhiteSpace(name) ? "" : Path.GetDirectoryName(name));
 		Object = prefab;
 		Manager = manager;
 		Attribute = attribute;
@@ -106,6 +106,17 @@ public class Prefab : IComparable<Prefab>
 		return WaterCheckEx.ApplyWaterChecks(Object.transform, anchors, pos, rot, scale);
 	}
 
+	public bool ApplyBoundsChecks(Vector3 pos, Quaternion rot, Vector3 scale, LayerMask rejectOnLayer)
+	{
+		BoundsCheck[] bounds = Attribute.FindAll<BoundsCheck>(ID);
+		BaseEntity component = Object.GetComponent<BaseEntity>();
+		if (component != null)
+		{
+			return BoundsCheckEx.ApplyBoundsChecks(component, bounds, pos, rot, scale, rejectOnLayer);
+		}
+		return true;
+	}
+
 	public void ApplyDecorComponents(ref Vector3 pos, ref Quaternion rot, ref Vector3 scale)
 	{
 		DecorComponent[] components = Attribute.FindAll<DecorComponent>(ID);
@@ -167,6 +178,11 @@ public class Prefab : IComparable<Prefab>
 			attribute = DefaultAttribute;
 		}
 		string text = StringPool.Get(id);
+		if (string.IsNullOrWhiteSpace(text))
+		{
+			Debug.LogWarning($"Could not find path for prefab ID {id}");
+			return null;
+		}
 		GameObject gameObject = manager.FindPrefab(text);
 		T component = gameObject.GetComponent<T>();
 		return new Prefab<T>(text, gameObject, component, manager, attribute);
@@ -183,6 +199,11 @@ public class Prefab : IComparable<Prefab>
 			attribute = DefaultAttribute;
 		}
 		string text = StringPool.Get(id);
+		if (string.IsNullOrWhiteSpace(text))
+		{
+			Debug.LogWarning($"Could not find path for prefab ID {id}");
+			return null;
+		}
 		GameObject prefab = manager.FindPrefab(text);
 		return new Prefab(text, prefab, manager, attribute);
 	}

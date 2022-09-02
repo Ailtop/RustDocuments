@@ -194,4 +194,20 @@ public class Locker : StorageContainer
 			Invoke(ClearEquipping, 1.5f);
 		}
 	}
+
+	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	{
+		if (item.info.category == ItemCategory.Attire)
+		{
+			return -1;
+		}
+		for (int i = 0; i < inventorySlots; i++)
+		{
+			if (GetRowType(i) == RowType.Belt && !container.SlotTaken(item, i))
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
 }

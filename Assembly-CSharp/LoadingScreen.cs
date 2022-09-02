@@ -35,6 +35,16 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 
 	public ServerBrowserTagList serverTags;
 
+	public RectTransform demoInfo;
+
+	public RustText demoName;
+
+	public RustText demoLength;
+
+	public RustText demoDate;
+
+	public RustText demoMap;
+
 	public RawImage backgroundImage;
 
 	public Texture2D defaultBackground;

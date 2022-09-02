@@ -44,9 +44,9 @@ public sealed class LensDistortion : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Tooltip("Global screen scaling.")]
 	[Space]
 	[Range(0.01f, 5f)]
-	[Tooltip("Global screen scaling.")]
 	public FloatParameter scale = new FloatParameter
 	{
 		value = 1f

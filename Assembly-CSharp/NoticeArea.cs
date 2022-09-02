@@ -12,6 +12,10 @@ public class NoticeArea : SingletonComponent<NoticeArea>
 
 	public AnimationCurve pickupAlphaCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
 
+	public AnimationCurve reuseAlphaCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+
+	public AnimationCurve reuseSizeCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+
 	private IVitalNotice[] notices;
 
 	protected override void Awake()

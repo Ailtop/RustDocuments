@@ -10,7 +10,7 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener where T : BaseEntity
+public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener
 {
 	public class BaseAttackState : BasicAIState
 	{
@@ -22,10 +22,10 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			base.AgrresiveState = true;
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
-			attack = GetEntity() as IAIAttack;
+			base.StateEnter(brain, entity);
+			attack = entity as IAIAttack;
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
@@ -39,9 +39,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			brain.Navigator.ClearFacingDirectionOverride();
 			brain.Navigator.Stop();
 			StopAttacking();
@@ -52,9 +52,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			attack.StopAttacking();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (attack == null)
 			{
@@ -110,9 +110,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			base.AgrresiveState = true;
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
@@ -120,9 +120,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
@@ -131,9 +131,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity == null)
 			{
@@ -179,20 +179,20 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
 				stopFleeDistance = UnityEngine.Random.Range(80f, 100f) + Mathf.Clamp(Vector3Ex.Distance2D(brain.Navigator.transform.position, baseEntity.transform.position), 0f, 50f);
 			}
-			FleeFrom(brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot), GetEntity());
+			FleeFrom(brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot), entity);
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
@@ -201,9 +201,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity == null)
 			{
@@ -213,7 +213,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			{
 				return StateStatus.Finished;
 			}
-			if ((brain.Navigator.UpdateIntervalElapsed(nextInterval) || !brain.Navigator.Moving) && !FleeFrom(baseEntity, GetEntity()))
+			if ((brain.Navigator.UpdateIntervalElapsed(nextInterval) || !brain.Navigator.Moving) && !FleeFrom(baseEntity, entity))
 			{
 				return StateStatus.Error;
 			}
@@ -259,13 +259,12 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Error;
 			brain.Navigator.SetBrakingEnabled(flag: false);
 			path = brain.Navigator.Path;
-			T entity = GetEntity();
 			if (path == null)
 			{
 				AIInformationZone forPoint = AIInformationZone.GetForPoint(entity.ServerPosition);
@@ -289,16 +288,16 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			brain.Navigator.ClearFacingDirectionOverride();
 			brain.Navigator.SetBrakingEnabled(flag: true);
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			if (status == StateStatus.Error)
 			{
 				return status;
@@ -310,7 +309,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 					Transform randomLookAtPoint = currentTargetPoint.GetRandomLookAtPoint();
 					if (randomLookAtPoint != null)
 					{
-						brain.Navigator.SetFacingDirectionOverride(Vector3Ex.Direction2D(randomLookAtPoint.transform.position, GetEntity().ServerPosition));
+						brain.Navigator.SetFacingDirectionOverride(Vector3Ex.Direction2D(randomLookAtPoint.transform.position, entity.ServerPosition));
 					}
 				}
 				if (currentTargetPoint.WaitTime > 0f)
@@ -353,9 +352,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			brain.Navigator.Stop();
 		}
 	}
@@ -367,9 +366,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
@@ -378,9 +377,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity == null)
 			{
@@ -408,9 +407,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			Vector3 pos = brain.Events.Memory.Position.Get(4);
 			status = StateStatus.Running;
 			if (!brain.Navigator.SetDestination(pos, BaseNavigator.NavigationSpeed.Normal))
@@ -419,9 +418,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
@@ -430,9 +429,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			if (status == StateStatus.Error)
 			{
 				return status;
@@ -469,9 +468,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			return 0f;
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			nextRoamPositionTime = -1f;
 			lastDestinationTime = UnityEngine.Time.time;
 		}
@@ -502,14 +501,13 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			{
 				return brain.Events.Memory.Position.Get(4);
 			}
-			return GetEntity().transform.position;
+			return brain.GetBaseEntity().transform.position;
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			bool flag = UnityEngine.Time.time - lastDestinationTime > 25f;
-			T entity = GetEntity();
 			if ((Vector3.Distance(GetDestination(), entity.transform.position) < 2f || flag) && nextRoamPositionTime == -1f)
 			{
 				nextRoamPositionTime = UnityEngine.Time.time + UnityEngine.Random.Range(5f, 10f);
@@ -543,36 +541,36 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Error;
-			if (GetEntity() is IAISleep iAISleep)
+			if (entity is IAISleep iAISleep)
 			{
 				iAISleep.StartSleeping();
 				status = StateStatus.Running;
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
-			if (GetEntity() is IAISleep iAISleep)
+			base.StateLeave(brain, entity);
+			if (entity is IAISleep iAISleep)
 			{
 				iAISleep.StopSleeping();
 			}
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			return status;
 		}
 	}
 
 	public class BasicAIState
 	{
-		public BaseAIBrain<T> brain;
+		public BaseAIBrain brain;
 
 		protected float _lastStateExitTime;
 
@@ -582,18 +580,18 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 		public bool AgrresiveState { get; protected set; }
 
-		public virtual void StateEnter()
+		public virtual void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
 			TimeInState = 0f;
 		}
 
-		public virtual StateStatus StateThink(float delta)
+		public virtual StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
 			TimeInState += delta;
 			return StateStatus.Running;
 		}
 
-		public virtual void StateLeave()
+		public virtual void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
 			TimeInState = 0f;
 			_lastStateExitTime = UnityEngine.Time.time;
@@ -645,11 +643,6 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 		public virtual void DrawGizmos()
 		{
-		}
-
-		public T GetEntity()
-		{
-			return brain.GetEntity();
 		}
 	}
 
@@ -752,7 +745,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
-		using (TimeWarning.New("BaseAIBrain<T>.OnRpcMessage"))
+		using (TimeWarning.New("BaseAIBrain.OnRpcMessage"))
 		{
 			if (rpc == 66191493 && player != null)
 			{
@@ -852,9 +845,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 	public void SetPetOwner(BasePlayer player)
 	{
-		T val = (T)(player.PetEntity = GetEntity());
-		GetEntity().OwnerID = player.userID;
-		BasePet.ActivePetByOwnerID[player.userID] = val as BasePet;
+		BaseEntity baseEntity = (player.PetEntity = GetBaseEntity());
+		baseEntity.OwnerID = player.userID;
+		BasePet.ActivePetByOwnerID[player.userID] = baseEntity as BasePet;
 	}
 
 	public bool IsOwnedBy(BasePlayer player)
@@ -907,7 +900,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			return SwitchToState(stateContainerByID.State, param);
 		}
 		case PetCommandType.Destroy:
-			GetEntity().Kill();
+			GetBaseEntity().Kill();
 			return true;
 		default:
 			return false;
@@ -964,7 +957,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 	{
 		if (UseAIDesign && !(msg.player == null) && AIDesign != null && PlayerCanDesignAI(msg.player))
 		{
-			msg.player.designingAIEntity = GetEntity();
+			msg.player.designingAIEntity = GetBaseEntity();
 			msg.player.ClientRPCPlayer(null, msg.player, "StartDesigningAI", AIDesign.ToProto(currentStateContainerID));
 			DesigningPlayer = msg.player;
 			SetOwningPlayer(msg.player);
@@ -984,20 +977,20 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		{
 			return;
 		}
-		T entity = GetEntity();
-		BaseEntity[] array = BaseEntity.Util.FindTargets(entity.ShortPrefabName, onlyPlayers: false);
+		BaseEntity baseEntity = GetBaseEntity();
+		BaseEntity[] array = BaseEntity.Util.FindTargets(baseEntity.ShortPrefabName, onlyPlayers: false);
 		if (array == null || array.Length == 0)
 		{
 			return;
 		}
 		BaseEntity[] array2 = array;
-		foreach (BaseEntity baseEntity in array2)
+		foreach (BaseEntity baseEntity2 in array2)
 		{
-			if (baseEntity == null || baseEntity == entity)
+			if (baseEntity2 == null || baseEntity2 == baseEntity)
 			{
 				continue;
 			}
-			EntityComponentBase[] components = baseEntity.Components;
+			EntityComponentBase[] components = baseEntity2.Components;
 			if (components == null)
 			{
 				continue;
@@ -1054,7 +1047,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 	{
 		if (design == null)
 		{
-			Debug.LogError(GetEntity().gameObject.name + " failed to load AI design!");
+			Debug.LogError(GetBaseEntity().gameObject.name + " failed to load AI design!");
 			return false;
 		}
 		if (player != null)
@@ -1179,11 +1172,6 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		return states.Keys.ToList();
 	}
 
-	public T GetEntity()
-	{
-		return base.baseEntity;
-	}
-
 	public void Start()
 	{
 		AddStates();
@@ -1197,8 +1185,8 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 
 	public virtual void InitializeAI()
 	{
-		T entity = GetEntity();
-		entity.HasBrain = true;
+		BaseEntity baseEntity = GetBaseEntity();
+		baseEntity.HasBrain = true;
 		Navigator = GetComponent<BaseNavigator>();
 		if (UseAIDesign)
 		{
@@ -1209,7 +1197,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 				Events = new AIEvents();
 			}
 			bool senseFriendlies = MaxGroupSize > 0;
-			Senses.Init(entity, MemoryDuration, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes, RefreshKnownLOS);
+			Senses.Init(baseEntity, MemoryDuration, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes, RefreshKnownLOS);
 			if (DefaultDesignSO == null && Designs.Count == 0)
 			{
 				Debug.LogWarning("Brain on " + base.gameObject.name + " is trying to load a null AI design!");
@@ -1228,17 +1216,22 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 				forPoint.RegisterSleepableEntity(this);
 			}
 		}
-		BaseEntity.Query.Server.AddBrain(entity);
+		BaseEntity.Query.Server.AddBrain(baseEntity);
 		StartMovementTick();
+	}
+
+	public BaseEntity GetBrainBaseEntity()
+	{
+		return GetBaseEntity();
 	}
 
 	public virtual void OnDestroy()
 	{
 		if (!Rust.Application.isQuitting)
 		{
-			BaseEntity.Query.Server.RemoveBrain(GetEntity());
+			BaseEntity.Query.Server.RemoveBrain(GetBaseEntity());
 			AIInformationZone aIInformationZone = null;
-			HumanNPC humanNPC = GetEntity() as HumanNPC;
+			HumanNPC humanNPC = GetBaseEntity() as HumanNPC;
 			if (humanNPC != null)
 			{
 				aIInformationZone = humanNPC.VirtualInfoZone;
@@ -1275,7 +1268,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 				DoMovementTick();
 				return;
 			}
-			BasePet basePet = GetEntity() as BasePet;
+			BasePet basePet = GetBaseEntity() as BasePet;
 			if (basePet != null && !basePet.inQueue)
 			{
 				BasePet._movementProcessQueue.Enqueue(basePet);
@@ -1324,7 +1317,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		return false;
 	}
 
-	public bool SwitchToState(BasicAIState newState, int stateContainerID = -1)
+	private bool SwitchToState(BasicAIState newState, int stateContainerID = -1)
 	{
 		if (newState == null || !newState.CanEnter())
 		{
@@ -1340,11 +1333,11 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 			{
 				return false;
 			}
-			CurrentState.StateLeave();
+			CurrentState.StateLeave(this, GetBaseEntity());
 		}
 		AddEvents(stateContainerID);
 		CurrentState = newState;
-		CurrentState.StateEnter();
+		CurrentState.StateEnter(this, GetBaseEntity());
 		currentStateContainerID = stateContainerID;
 		return true;
 	}
@@ -1381,7 +1374,7 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		if (CurrentState != null)
 		{
 			UpdateAgressionTimer(delta);
-			StateStatus stateStatus = CurrentState.StateThink(delta);
+			StateStatus stateStatus = CurrentState.StateThink(delta, this, GetBaseEntity());
 			if (Events != null)
 			{
 				Events.Tick(delta, stateStatus);
@@ -1512,9 +1505,9 @@ public class BaseAIBrain<T> : EntityComponent<T>, IPet, IAISleepable, IAIDesign,
 		IsGrouped = true;
 		IsGroupLeader = true;
 		GroupLeader = this;
-		T entity = GetEntity();
-		Events.Memory.Entity.Set(entity, 6);
-		member.JoinGroup(this, entity);
+		BaseEntity baseEntity = GetBaseEntity();
+		Events.Memory.Entity.Set(baseEntity, 6);
+		member.JoinGroup(this, baseEntity);
 		return true;
 	}
 

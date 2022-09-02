@@ -39,6 +39,8 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public bool preventDuplicates;
 
+	public bool isSpawnerActive = true;
+
 	public BoxCollider setFreeIfMovedBeyond;
 
 	public bool fillOnSpawn;
@@ -100,7 +102,10 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public void Fill()
 	{
-		Spawn(maxPopulation);
+		if (isSpawnerActive)
+		{
+			Spawn(maxPopulation);
+		}
 	}
 
 	public void Clear()
@@ -136,7 +141,7 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public virtual void SpawnInitial()
 	{
-		if (wantsInitialSpawn)
+		if (wantsInitialSpawn && isSpawnerActive)
 		{
 			if (fillOnSpawn)
 			{
@@ -181,7 +186,10 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public void Spawn()
 	{
-		Spawn(UnityEngine.Random.Range(numToSpawnPerTickMin, numToSpawnPerTickMax + 1));
+		if (isSpawnerActive)
+		{
+			Spawn(UnityEngine.Random.Range(numToSpawnPerTickMin, numToSpawnPerTickMax + 1));
+		}
 	}
 
 	protected virtual void Spawn(int numToSpawn)

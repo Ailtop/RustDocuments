@@ -20,6 +20,8 @@ public class ZiplineLaunchPoint : BaseEntity
 
 	public BoxCollider[] PointBuildingBlocks;
 
+	public SpawnableBoundsBlocker[] SpawnableBoundsBlockers;
+
 	public GameObjectRef MountableRef;
 
 	public float LineSlackAmount = 2f;
@@ -313,6 +315,11 @@ public class ZiplineLaunchPoint : BaseEntity
 		{
 			buildingBlocks[i].gameObject.SetActive(value: false);
 		}
+		SpawnableBoundsBlocker[] spawnableBoundsBlockers = SpawnableBoundsBlockers;
+		for (int i = 0; i < spawnableBoundsBlockers.Length; i++)
+		{
+			spawnableBoundsBlockers[i].gameObject.SetActive(value: false);
+		}
 		int num = 0;
 		if (ziplineTargets.Count <= 0)
 		{
@@ -332,7 +339,7 @@ public class ZiplineLaunchPoint : BaseEntity
 			{
 				if (num < BuildingBlocks.Length)
 				{
-					SetUpBuildingBlock(BuildingBlocks[num], PointBuildingBlocks[num++], startIndex2, j - 1);
+					SetUpBuildingBlock(BuildingBlocks[num], PointBuildingBlocks[num], SpawnableBoundsBlockers[num++], startIndex2, j - 1);
 				}
 				startIndex2 = j - 1;
 			}
@@ -340,9 +347,9 @@ public class ZiplineLaunchPoint : BaseEntity
 		}
 		if (num < BuildingBlocks.Length)
 		{
-			SetUpBuildingBlock(BuildingBlocks[num], PointBuildingBlocks[num], startIndex2, linePoints.Count - 1);
+			SetUpBuildingBlock(BuildingBlocks[num], PointBuildingBlocks[num], SpawnableBoundsBlockers[num], startIndex2, linePoints.Count - 1);
 		}
-		void SetUpBuildingBlock(BoxCollider longCollider, BoxCollider pointCollider, int startIndex, int endIndex)
+		void SetUpBuildingBlock(BoxCollider longCollider, BoxCollider pointCollider, SpawnableBoundsBlocker spawnBlocker, int startIndex, int endIndex)
 		{
 			Vector3 vector3 = linePoints[startIndex];
 			Vector3 vector4 = linePoints[endIndex];
@@ -361,11 +368,16 @@ public class ZiplineLaunchPoint : BaseEntity
 			}
 			float num2 = Mathf.Abs(vector5.y) + 2f;
 			float z = Vector3.Distance(vector3, vector4);
-			longCollider.size = new Vector3(0.5f, num2, z);
-			longCollider.center = new Vector3(0f, 0f - num2 * 0.5f, 0f);
+			Vector3 vector9 = (longCollider.size = (spawnBlocker.BoxCollider.size = new Vector3(0.5f, num2, z)));
+			vector9 = (longCollider.center = (spawnBlocker.BoxCollider.center = new Vector3(0f, 0f - num2 * 0.5f, 0f)));
 			longCollider.gameObject.SetActive(value: true);
 			pointCollider.transform.position = linePoints[endIndex];
 			pointCollider.gameObject.SetActive(value: true);
+			spawnBlocker.gameObject.SetActive(value: true);
+			if (base.isServer)
+			{
+				spawnBlocker.ClearTrees();
+			}
 		}
 	}
 

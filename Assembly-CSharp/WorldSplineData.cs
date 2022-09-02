@@ -86,24 +86,6 @@ public class WorldSplineData
 		return inputTangents[maxPointsIndex];
 	}
 
-	public virtual Vector3 GetTangent(float distance)
-	{
-		float num = distance / Length * (float)(inputTangents.Length - 1);
-		int num2 = (int)num;
-		if (num <= 0f)
-		{
-			return GetStartTangent();
-		}
-		if (num >= (float)maxPointsIndex)
-		{
-			return GetEndTangent();
-		}
-		Vector3 a = inputTangents[num2];
-		Vector3 b = inputTangents[num2 + 1];
-		float t = num - (float)num2;
-		return Vector3.Slerp(a, b, t);
-	}
-
 	public Vector3 GetPointCubicHermite(float distance)
 	{
 		Vector3 tangent;
@@ -200,6 +182,31 @@ public class WorldSplineData
 		PathInterpolator pathInterpolator = new PathInterpolator(worldSpline.points, worldSpline.tangents);
 		pathInterpolator.RecalculateTangents();
 		worldSpline.tangents = pathInterpolator.Tangents;
+	}
+
+	public bool DetectSplineProblems(WorldSpline worldSpline)
+	{
+		bool result = false;
+		Vector3 to = GetTangentCubicHermite(0f);
+		for (float num = 0.05f; num <= Length; num += 0.05f)
+		{
+			Vector3 tangentCubicHermite = GetTangentCubicHermite(num);
+			float num2 = Vector3.Angle(tangentCubicHermite, to);
+			if (num2 > 5f)
+			{
+				if (worldSpline != null)
+				{
+					Vector3 tangent;
+					Vector3 pointAndTangentCubicHermiteWorld = worldSpline.GetPointAndTangentCubicHermiteWorld(num, out tangent);
+					Debug.DrawRay(pointAndTangentCubicHermiteWorld, tangent, Color.red, 30f);
+					Debug.DrawRay(pointAndTangentCubicHermiteWorld, Vector3.up, Color.red, 30f);
+				}
+				Debug.Log($"Spline may have a too-sharp bend at {num / Length:P0}. Angle change: " + num2);
+				result = true;
+			}
+			to = tangentCubicHermite;
+		}
+		return result;
 	}
 
 	private void CreateLookupTable(WorldSpline worldSpline)

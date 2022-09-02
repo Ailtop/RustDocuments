@@ -10,6 +10,8 @@ public class FileSystem_Warmup : MonoBehaviour
 {
 	public static bool ranInBackground = false;
 
+	public static Coroutine warmupTask;
+
 	private static bool run = true;
 
 	public static string[] ExcludeFilter = new string[11]

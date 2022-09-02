@@ -1,3 +1,4 @@
+using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,8 @@ public class LootPanel : MonoBehaviour
 	}
 
 	public Text Title;
+
+	public RustText TitleText;
 
 	public bool hideInvalidIcons;
 

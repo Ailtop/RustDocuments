@@ -104,7 +104,7 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 					for (int j = 0; j < socketMods.Length; j++)
 					{
 						SocketMod_AreaCheck socketMod_AreaCheck = socketMods[j] as SocketMod_AreaCheck;
-						if ((bool)socketMod_AreaCheck && socketMod_AreaCheck.wantsInside && !socketMod_AreaCheck.DoCheck(component.transform.position, component.transform.rotation))
+						if ((bool)socketMod_AreaCheck && socketMod_AreaCheck.wantsInside && !socketMod_AreaCheck.DoCheck(component.transform.position, component.transform.rotation, component))
 						{
 							if (ConVar.Physics.groundwatchdebug)
 							{

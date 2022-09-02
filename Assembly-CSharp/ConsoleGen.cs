@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[858]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[864]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2312,6 +2312,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "build_losradius_sleepingbag",
+			Parent = "antihack",
+			FullName = "antihack.build_losradius_sleepingbag",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.build_losradius_sleepingbag.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.build_losradius_sleepingbag = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "build_terraincheck",
 			Parent = "antihack",
 			FullName = "antihack.build_terraincheck",
@@ -3586,6 +3599,23 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "globalchat",
+			Parent = "chat",
+			FullName = "chat.globalchat",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Chat.globalchat.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Chat.globalchat = str.ToBool();
+			},
+			Default = "True"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "historysize",
 			Parent = "chat",
 			FullName = "chat.historysize",
@@ -3596,6 +3626,48 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Chat.historysize = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "localchat",
+			Parent = "chat",
+			FullName = "chat.localchat",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Chat.localchat.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Chat.localchat = str.ToBool();
+			},
+			Default = "False"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "localchatrange",
+			Parent = "chat",
+			FullName = "chat.localchatrange",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Chat.localChatRange.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Chat.localChatRange = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "localsay",
+			Parent = "chat",
+			FullName = "chat.localsay",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Chat.localsay(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4925,6 +4997,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Global.ClearAllSpraysByPlayer(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearspraysatpositioninradius",
+			Parent = "global",
+			FullName = "global.clearspraysatpositioninradius",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.ClearSpraysAtPositionInRadius(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7059,6 +7143,21 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "crawlingenabled",
+			Parent = "server",
+			FullName = "server.crawlingenabled",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Do players go into the crawling wounded state",
+			Variable = true,
+			GetOveride = () => Server.crawlingenabled.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.crawlingenabled = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "crawlingmaximumhealth",
 			Parent = "server",
 			FullName = "server.crawlingmaximumhealth",
@@ -7262,19 +7361,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.gamemode = str;
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "globalchat",
-			Parent = "server",
-			FullName = "server.globalchat",
-			ServerAdmin = true,
-			Variable = true,
-			GetOveride = () => Server.globalchat.ToString(),
-			SetOveride = delegate(string str)
-			{
-				Server.globalchat = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8541,6 +8627,7 @@ public class ConsoleGen
 			FullName = "server.woundingenabled",
 			ServerAdmin = true,
 			Saved = true,
+			Description = "Can players be wounded after recieving fatal damage",
 			Variable = true,
 			GetOveride = () => Server.woundingenabled.ToString(),
 			SetOveride = delegate(string str)
@@ -10634,12 +10721,16 @@ public class ConsoleGen
 			Parent = "relationshipmanager",
 			FullName = "relationshipmanager.contacts",
 			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
 			Variable = true,
 			GetOveride = () => RelationshipManager.contacts.ToString(),
 			SetOveride = delegate(string str)
 			{
 				RelationshipManager.contacts = str.ToBool();
-			}
+			},
+			Default = "True"
 		},
 		new ConsoleSystem.Command
 		{

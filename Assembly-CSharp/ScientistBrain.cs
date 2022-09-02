@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class ScientistBrain : BaseAIBrain<HumanNPC>
+public class ScientistBrain : BaseAIBrain
 {
 	public class ChaseState : BasicAIState
 	{
@@ -14,15 +14,15 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			base.AgrresiveState = true;
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Error;
 			if (brain.PathFinder != null)
 			{
@@ -37,9 +37,9 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			brain.Navigator.ClearFacingDirectionOverride();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			if (status == StateStatus.Error)
 			{
 				return status;
@@ -49,7 +49,6 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			{
 				return StateStatus.Error;
 			}
-			HumanNPC entity = GetEntity();
 			float num = Vector3.Distance(baseEntity.transform.position, entity.transform.position);
 			if (brain.Senses.Memory.IsLOS(baseEntity) || num <= 10f || base.TimeInState <= 5f)
 			{
@@ -70,8 +69,8 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			if (Time.time > nextPositionUpdateTime)
 			{
 				nextPositionUpdateTime = Time.time + Random.Range(0.5f, 1f);
-				Vector3 pos = GetEntity().transform.position;
-				AIInformationZone informationZone = entity.GetInformationZone(baseEntity.transform.position);
+				Vector3 pos = entity.transform.position;
+				AIInformationZone informationZone = (entity as HumanNPC).GetInformationZone(baseEntity.transform.position);
 				bool flag = false;
 				if (informationZone != null)
 				{
@@ -116,37 +115,37 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			base.AgrresiveState = true;
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
-			combatStartPosition = GetEntity().transform.position;
+			base.StateEnter(brain, entity);
+			combatStartPosition = entity.transform.position;
 			FaceTarget();
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
-			GetEntity().SetDucked(flag: false);
+			base.StateLeave(brain, entity);
+			(entity as HumanNPC).SetDucked(flag: false);
 			brain.Navigator.ClearFacingDirectionOverride();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
+			HumanNPC humanNPC = entity as HumanNPC;
 			FaceTarget();
 			if (Time.time > nextActionTime)
 			{
-				HumanNPC entity = GetEntity();
 				if (Random.Range(0, 3) == 1)
 				{
 					nextActionTime = Time.time + Random.Range(1f, 2f);
-					entity.SetDucked(flag: true);
+					humanNPC.SetDucked(flag: true);
 					brain.Navigator.Stop();
 				}
 				else
 				{
 					nextActionTime = Time.time + Random.Range(2f, 3f);
-					entity.SetDucked(flag: false);
+					humanNPC.SetDucked(flag: false);
 					brain.Navigator.SetDestination(brain.PathFinder.GetRandomPositionAround(combatStartPosition, 1f), BaseNavigator.NavigationSpeed.Normal);
 				}
 			}
@@ -175,15 +174,15 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			base.AgrresiveState = true;
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			brain.Navigator.ClearFacingDirectionOverride();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
@@ -204,36 +203,35 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
-			HumanNPC entity = GetEntity();
-			entity.SetDucked(flag: true);
+			base.StateEnter(brain, entity);
+			HumanNPC humanNPC = entity as HumanNPC;
+			humanNPC.SetDucked(flag: true);
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
 			if (aIPoint != null)
 			{
 				aIPoint.SetUsedBy(entity);
 			}
-			if (!(entity.healthFraction <= brain.HealBelowHealthFraction) || !(Random.Range(0f, 1f) <= brain.HealChance))
+			if (!(humanNPC.healthFraction <= brain.HealBelowHealthFraction) || !(Random.Range(0f, 1f) <= brain.HealChance))
 			{
 				return;
 			}
-			Item item = entity.FindHealingItem();
+			Item item = humanNPC.FindHealingItem();
 			if (item != null)
 			{
 				BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 				if (baseEntity == null || (!brain.Senses.Memory.IsLOS(baseEntity) && Vector3.Distance(entity.transform.position, baseEntity.transform.position) >= 5f))
 				{
-					entity.UseHealingItem(item);
+					humanNPC.UseHealingItem(item);
 				}
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
-			HumanNPC entity = GetEntity();
-			entity.SetDucked(flag: false);
+			base.StateLeave(brain, entity);
+			(entity as HumanNPC).SetDucked(flag: false);
 			brain.Navigator.ClearFacingDirectionOverride();
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
 			if (aIPoint != null)
@@ -242,15 +240,15 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			}
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
-			HumanNPC entity = GetEntity();
+			base.StateThink(delta, brain, entity);
+			HumanNPC humanNPC = entity as HumanNPC;
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
-			float num = entity.AmmoFractionRemaining();
+			float num = humanNPC.AmmoFractionRemaining();
 			if (num == 0f || (baseEntity != null && !brain.Senses.Memory.IsLOS(baseEntity) && num < 0.25f))
 			{
-				entity.AttemptReload();
+				humanNPC.AttemptReload();
 			}
 			if (baseEntity != null)
 			{
@@ -264,16 +262,15 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 	{
 		private StateStatus status = StateStatus.Error;
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Error;
-			HumanNPC entity = GetEntity();
 			if (brain.PathFinder == null)
 			{
 				return;
 			}
-			AIInformationZone informationZone = entity.GetInformationZone(entity.transform.position);
+			AIInformationZone informationZone = (entity as HumanNPC).GetInformationZone(entity.transform.position);
 			if (!(informationZone == null))
 			{
 				AICoverPoint bestCoverPoint = informationZone.GetBestCoverPoint(entity.transform.position, entity.transform.position, 25f, 50f, entity);
@@ -289,9 +286,9 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			}
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			if (status == StateStatus.Error)
 			{
 				return status;
@@ -318,30 +315,29 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 
 		private AIMovePoint roamPoint;
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
-			ClearRoamPointUsage();
+			ClearRoamPointUsage(entity);
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Error;
-			ClearRoamPointUsage();
-			HumanNPC entity = GetEntity();
+			ClearRoamPointUsage(entity);
 			if (brain.PathFinder == null)
 			{
 				return;
 			}
 			status = StateStatus.Error;
-			roamPoint = brain.PathFinder.GetBestRoamPoint(GetRoamAnchorPosition(), entity.transform.position, entity.eyes.BodyForward(), brain.Navigator.MaxRoamDistanceFromHome, brain.Navigator.BestRoamPointMaxDistance);
+			roamPoint = brain.PathFinder.GetBestRoamPoint(GetRoamAnchorPosition(), entity.transform.position, (entity as HumanNPC).eyes.BodyForward(), brain.Navigator.MaxRoamDistanceFromHome, brain.Navigator.BestRoamPointMaxDistance);
 			if (roamPoint != null)
 			{
 				if (brain.Navigator.SetDestination(roamPoint.transform.position, BaseNavigator.NavigationSpeed.Slow))
 				{
-					roamPoint.SetUsedBy(GetEntity());
+					roamPoint.SetUsedBy(entity);
 					status = StateStatus.Running;
 				}
 				else
@@ -351,11 +347,11 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			}
 		}
 
-		private void ClearRoamPointUsage()
+		private void ClearRoamPointUsage(BaseEntity entity)
 		{
 			if (roamPoint != null)
 			{
-				roamPoint.ClearIfUsedBy(GetEntity());
+				roamPoint.ClearIfUsedBy(entity);
 				roamPoint = null;
 			}
 		}
@@ -365,7 +361,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
 			if (status == StateStatus.Error)
 			{
@@ -390,40 +386,39 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Running;
-			if (!StartMovingToCover())
+			if (!StartMovingToCover(entity as HumanNPC))
 			{
 				status = StateStatus.Error;
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			brain.Navigator.ClearFacingDirectionOverride();
-			ClearCoverPointUsage();
+			ClearCoverPointUsage(entity);
 		}
 
-		private void ClearCoverPointUsage()
+		private void ClearCoverPointUsage(BaseEntity entity)
 		{
 			AIPoint aIPoint = brain.Events.Memory.AIPoint.Get(4);
 			if (aIPoint != null)
 			{
-				aIPoint.ClearIfUsedBy(GetEntity());
+				aIPoint.ClearIfUsedBy(entity);
 			}
 		}
 
-		private bool StartMovingToCover()
+		private bool StartMovingToCover(HumanNPC entity)
 		{
 			coverFromEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (coverFromEntity == null)
 			{
 				return false;
 			}
-			HumanNPC entity = GetEntity();
 			Vector3 hideFromPosition = (coverFromEntity ? coverFromEntity.transform.position : (entity.transform.position + entity.LastAttackedDir * 30f));
 			AIInformationZone informationZone = entity.GetInformationZone(entity.transform.position);
 			if (informationZone == null)
@@ -453,9 +448,9 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 			base.DrawGizmos();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			FaceCoverFromEntity();
 			if (status == StateStatus.Error)
 			{
@@ -503,7 +498,7 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 		base.ThinkMode = AIThinkMode.Interval;
 		thinkRate = 0.25f;
 		base.PathFinder = new HumanPathFinder();
-		((HumanPathFinder)base.PathFinder).Init(GetEntity());
+		((HumanPathFinder)base.PathFinder).Init(GetBaseEntity());
 		Count++;
 	}
 
@@ -511,6 +506,11 @@ public class ScientistBrain : BaseAIBrain<HumanNPC>
 	{
 		base.OnDestroy();
 		Count--;
+	}
+
+	public HumanNPC GetEntity()
+	{
+		return GetBaseEntity() as HumanNPC;
 	}
 
 	protected override void OnStateChanged()

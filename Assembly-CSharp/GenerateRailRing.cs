@@ -278,7 +278,6 @@ public class GenerateRailRing : ProceduralComponent
 				pathList.ProcgenEndNode = node11;
 				pathList.Path.Smoothen(32, new Vector3(1f, 0f, 1f));
 				pathList.Path.Smoothen(64, new Vector3(0f, 1f, 0f));
-				pathList.Path.RecalculateLength();
 				pathList.Path.Resample(7.5f);
 				pathList.Path.RecalculateTangents();
 				pathList.AdjustPlacementMap(20f);

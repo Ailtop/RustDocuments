@@ -16,5 +16,7 @@ public class UIInventory : SingletonComponent<UIInventory>
 
 	public Transform InventoryIconContainer;
 
+	public ChangelogPanel ChangelogPanel;
+
 	public ContactsPanel contactsPanel;
 }

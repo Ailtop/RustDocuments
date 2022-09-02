@@ -256,8 +256,8 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		{
 			base.baseEntity.ClientRPC(null, "Client_OnCassetteInserted", c.net.ID);
 			ServerTogglePlay(play: false);
-			base.baseEntity.SendNetworkUpdate();
 			SetFlag(BaseEntity.Flags.Reserved1, state: true);
+			base.baseEntity.SendNetworkUpdate();
 		}
 	}
 

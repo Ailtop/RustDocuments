@@ -610,7 +610,7 @@ public class VendingMachine : StorageContainer
 			int num2 = rpc.read.Int32();
 			if (IsVending())
 			{
-				rpc.player.ShowToast(1, WaitForVendingMessage);
+				rpc.player.ShowToast(GameTip.Styles.Red_Normal, WaitForVendingMessage);
 			}
 			else if (Interface.CallHook("OnBuyVendingItem", this, rpc.player, num, num2) == null)
 			{

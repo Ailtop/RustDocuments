@@ -11,9 +11,9 @@ public class SpawnPopulation : BaseScriptableObject
 
 	public GameObjectRef[] ResourceList;
 
+	[Tooltip("Usually per square km")]
 	[Header("Spawn Info")]
 	[FormerlySerializedAs("TargetDensity")]
-	[Tooltip("Usually per square km")]
 	[SerializeField]
 	public float _targetDensity = 1f;
 
@@ -117,7 +117,7 @@ public class SpawnPopulation : BaseScriptableObject
 		return prefab.Parameters.Count;
 	}
 
-	public Prefab<Spawnable> GetRandomPrefab()
+	public bool TryTakeRandomPrefab(out Prefab<Spawnable> result)
 	{
 		int num = Random.Range(0, sumToSpawn);
 		for (int i = 0; i < Prefabs.Length; i++)
@@ -126,10 +126,28 @@ public class SpawnPopulation : BaseScriptableObject
 			{
 				numToSpawn[i]--;
 				sumToSpawn--;
-				return Prefabs[i];
+				result = Prefabs[i];
+				return true;
 			}
 		}
-		return null;
+		result = null;
+		return false;
+	}
+
+	public void ReturnPrefab(Prefab<Spawnable> prefab)
+	{
+		if (prefab == null)
+		{
+			return;
+		}
+		for (int i = 0; i < Prefabs.Length; i++)
+		{
+			if (Prefabs[i] == prefab)
+			{
+				numToSpawn[i]++;
+				sumToSpawn++;
+			}
+		}
 	}
 
 	public float GetCurrentSpawnRate()
@@ -159,8 +177,12 @@ public class SpawnPopulation : BaseScriptableObject
 		return 2f * TargetDensity * Spawn.max_density * 1E-06f;
 	}
 
-	public virtual bool OverrideSpawnPosition(ref Vector3 newPos, ref Quaternion newRot)
+	public virtual bool GetSpawnPosOverride(Prefab<Spawnable> prefab, ref Vector3 newPos, ref Quaternion newRot)
 	{
 		return true;
+	}
+
+	public virtual void OnPostFill(SpawnHandler spawnHandler)
+	{
 	}
 }

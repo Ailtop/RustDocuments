@@ -54,7 +54,12 @@ public static class Server
 
 	public static void Initialize()
 	{
-		if (App.port >= 0)
+		if (App.port < 0)
+		{
+			return;
+		}
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		if (!(activeGameMode != null) || activeGameMode.rustPlus)
 		{
 			Map.PopulateCache();
 			if (App.port == 0)
@@ -75,6 +80,7 @@ public static class Server
 
 	public static void Shutdown()
 	{
+		SetServerId(null);
 		Listener?.Dispose();
 		Listener = null;
 	}

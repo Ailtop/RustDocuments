@@ -11,6 +11,7 @@ public class SystemInfoGeneralText : MonoBehaviour
 	{
 		get
 		{
+			BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: false);
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append("System");
 			stringBuilder.AppendLine();
@@ -72,7 +73,14 @@ public class SystemInfoGeneralText : MonoBehaviour
 				stringBuilder.Append("World");
 				stringBuilder.AppendLine();
 				stringBuilder.Append("\tSeed:        ");
-				stringBuilder.Append(World.Seed);
+				if (activeGameMode != null && !activeGameMode.ingameMap)
+				{
+					stringBuilder.Append("?");
+				}
+				else
+				{
+					stringBuilder.Append(World.Seed);
+				}
 				stringBuilder.AppendLine();
 				stringBuilder.Append("\tSize:        ");
 				stringBuilder.Append(KM2(World.Size));

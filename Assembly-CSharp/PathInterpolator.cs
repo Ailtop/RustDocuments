@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PathInterpolator
@@ -92,16 +93,51 @@ public class PathInterpolator
 
 	public void Resample(float distance)
 	{
-		int num = Mathf.RoundToInt(Length / distance);
-		if (num >= 2)
+		float num = 0f;
+		for (int i = 0; i < Points.Length - 1; i++)
 		{
-			Vector3[] array = new Vector3[num];
-			distance = Length / (float)(num - 1);
-			for (int i = 0; i < num; i++)
+			Vector3 vector = Points[i];
+			Vector3 vector2 = Points[i + 1];
+			num += (vector2 - vector).magnitude;
+		}
+		int num2 = Mathf.RoundToInt(num / distance);
+		if (num2 < 2)
+		{
+			return;
+		}
+		distance = num / (float)(num2 - 1);
+		List<Vector3> list = new List<Vector3>(num2);
+		float num3 = 0f;
+		for (int j = 0; j < Points.Length - 1; j++)
+		{
+			int num4 = j;
+			int num5 = j + 1;
+			Vector3 vector3 = Points[num4];
+			Vector3 vector4 = Points[num5];
+			float num6 = (vector4 - vector3).magnitude;
+			if (num4 == 0)
 			{
-				array[i] = GetPoint((float)i * distance);
+				list.Add(vector3);
 			}
-			Points = array;
+			while (num3 + num6 > distance)
+			{
+				float num7 = distance - num3;
+				float t = num7 / num6;
+				Vector3 vector5 = Vector3.Lerp(vector3, vector4, t);
+				list.Add(vector5);
+				vector3 = vector5;
+				num3 = 0f;
+				num6 -= num7;
+			}
+			num3 += num6;
+			if (num5 == Points.Length - 1 && num3 > distance * 0.5f)
+			{
+				list.Add(vector4);
+			}
+		}
+		if (list.Count >= 2)
+		{
+			Points = list.ToArray();
 			MinIndex = DefaultMinIndex;
 			MaxIndex = DefaultMaxIndex;
 			initialized = false;

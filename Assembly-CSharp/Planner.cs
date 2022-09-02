@@ -111,6 +111,18 @@ public class Planner : HeldEntity
 			AntiHack.NoteAdminHack(ownerPlayer);
 			return;
 		}
+		BaseGameMode.CanBuildResult? canBuildResult = BaseGameMode.GetActiveGameMode(serverside: true)?.CanBuildEntity(ownerPlayer, construction);
+		if (canBuildResult.HasValue)
+		{
+			if (canBuildResult.Value.Phrase != null)
+			{
+				ownerPlayer.ShowToast((!canBuildResult.Value.Result) ? GameTip.Styles.Red_Normal : GameTip.Styles.Blue_Long, canBuildResult.Value.Phrase, canBuildResult.Value.Arguments);
+			}
+			if (!canBuildResult.Value.Result)
+			{
+				return;
+			}
+		}
 		Construction.Target target = default(Construction.Target);
 		if (msg.entity != 0)
 		{
@@ -199,9 +211,21 @@ public class Planner : HeldEntity
 			Vector3 p = ((target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position);
 			int num = 2097152;
 			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
-			float num3 = ((target.socket != null) ? 0f : ConVar.AntiHack.build_losradius);
-			float padding = ((target.socket != null) ? 0.5f : (ConVar.AntiHack.build_losradius + 0.01f));
-			int layerMask = ((target.socket != null) ? num : num2);
+			float num3 = ConVar.AntiHack.build_losradius;
+			float padding = ConVar.AntiHack.build_losradius + 0.01f;
+			int layerMask = num2;
+			if (target.socket != null)
+			{
+				num3 = 0f;
+				padding = 0.5f;
+				layerMask = num;
+			}
+			if (component.isSleepingBag)
+			{
+				num3 = ConVar.AntiHack.build_losradius_sleepingbag;
+				padding = ConVar.AntiHack.build_losradius_sleepingbag + 0.01f;
+				layerMask = num2;
+			}
 			if (num3 > 0f)
 			{
 				p += target.normal.normalized * num3;

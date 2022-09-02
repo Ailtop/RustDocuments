@@ -275,6 +275,9 @@ public class RelationshipManager : BaseEntity
 		}
 	}
 
+	[ReplicatedVar]
+	public static bool contacts = true;
+
 	private const int MugshotResolution = 256;
 
 	private const int MugshotMaxFileSize = 65536;
@@ -288,9 +291,6 @@ public class RelationshipManager : BaseEntity
 	private const int seenReputationSeconds = 60;
 
 	private int startingReputation;
-
-	[ServerVar]
-	public static bool contacts = true;
 
 	[ServerVar]
 	public static int forgetafterminutes = 960;

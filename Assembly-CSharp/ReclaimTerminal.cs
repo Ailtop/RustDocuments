@@ -127,7 +127,7 @@ public class ReclaimTerminal : StorageContainer
 			if (base.inventory.itemList.Count > 0)
 			{
 				ReclaimManager.instance.AddPlayerReclaim(player.userID, base.inventory.itemList, 0uL);
-				player.ShowToast(2, DespawnToast);
+				player.ShowToast(GameTip.Styles.Blue_Long, DespawnToast);
 			}
 			base.PlayerStoppedLooting(player);
 		}

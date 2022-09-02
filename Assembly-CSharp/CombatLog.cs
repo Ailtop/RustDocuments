@@ -40,6 +40,8 @@ public class CombatLog
 		public float proj_travel;
 
 		public float proj_mismatch;
+
+		public int desync;
 	}
 
 	private const string selfname = "you";
@@ -69,60 +71,56 @@ public class CombatLog
 	{
 	}
 
-	public void Log(AttackEntity weapon, string description = null)
+	public void LogInvalid(BasePlayer player, AttackEntity weapon, string description)
 	{
-		Log(weapon, null, description);
+		Log(player, weapon, null, description);
 	}
 
-	public void Log(AttackEntity weapon, Projectile projectile, string description = null)
+	public void LogInvalid(HitInfo info, string description)
+	{
+		Log(info.Initiator, info.Weapon, info.HitEntity as BaseCombatEntity, description, info.ProjectilePrefab, info.ProjectileID, -1f, info);
+	}
+
+	public void LogAttack(HitInfo info, string description, float oldHealth = -1f)
+	{
+		Log(info.Initiator, info.Weapon, info.HitEntity as BaseCombatEntity, description, info.ProjectilePrefab, info.ProjectileID, oldHealth, info);
+	}
+
+	public void Log(BaseEntity attacker, AttackEntity weapon, BaseCombatEntity hitEntity, string description, Projectile projectilePrefab = null, int projectileId = -1, float healthOld = -1f, HitInfo hitInfo = null)
 	{
 		Event val = default(Event);
+		float distance = 0f;
+		if (hitInfo != null)
+		{
+			distance = (hitInfo.IsProjectile() ? hitInfo.ProjectileDistance : Vector3.Distance(hitInfo.PointStart, hitInfo.HitPositionWorld));
+		}
+		float health_new = hitEntity?.Health() ?? 0f;
 		val.time = UnityEngine.Time.realtimeSinceStartup;
-		val.attacker_id = (((bool)player && player.net != null) ? player.net.ID : 0u);
-		val.target_id = 0u;
-		val.attacker = "you";
-		val.target = "N/A";
-		val.weapon = (weapon ? weapon.name : "N/A");
-		val.ammo = (projectile ? projectile.name : "N/A");
-		val.bone = "N/A";
-		val.area = (HitArea)0;
-		val.distance = 0f;
-		val.health_old = 0f;
-		val.health_new = 0f;
-		val.info = ((description != null) ? description : string.Empty);
-		Log(val);
-	}
-
-	public void Log(HitInfo info, string description = null)
-	{
-		float num = (info.HitEntity ? info.HitEntity.Health() : 0f);
-		Log(info, num, num, description);
-	}
-
-	public void Log(HitInfo info, float health_old, float health_new, string description = null)
-	{
-		Event val = default(Event);
-		val.time = UnityEngine.Time.realtimeSinceStartup;
-		val.attacker_id = (((bool)info.Initiator && info.Initiator.net != null) ? info.Initiator.net.ID : 0u);
-		val.target_id = (((bool)info.HitEntity && info.HitEntity.net != null) ? info.HitEntity.net.ID : 0u);
-		val.attacker = ((player == info.Initiator) ? "you" : (info.Initiator ? info.Initiator.ShortPrefabName : "N/A"));
-		val.target = ((player == info.HitEntity) ? "you" : (info.HitEntity ? info.HitEntity.ShortPrefabName : "N/A"));
-		val.weapon = (info.WeaponPrefab ? info.WeaponPrefab.name : "N/A");
-		val.ammo = (info.ProjectilePrefab ? info.ProjectilePrefab.name : "N/A");
-		val.bone = info.boneName;
-		val.area = info.boneArea;
-		val.distance = (info.IsProjectile() ? info.ProjectileDistance : Vector3.Distance(info.PointStart, info.HitPositionWorld));
-		val.health_old = health_old;
+		val.attacker_id = attacker?.net?.ID ?? 0;
+		val.target_id = ((hitEntity?.net != null) ? hitEntity.net.ID : 0u);
+		val.attacker = ((player == attacker) ? "you" : (attacker?.ShortPrefabName ?? "N/A"));
+		val.target = ((player == hitEntity) ? "you" : (hitEntity?.ShortPrefabName ?? "N/A"));
+		val.weapon = weapon?.name ?? "N/A";
+		val.ammo = projectilePrefab?.name ?? "N/A";
+		val.bone = hitInfo?.boneName ?? "N/A";
+		val.area = hitInfo?.boneArea ?? ((HitArea)0);
+		val.distance = distance;
+		val.health_old = ((healthOld == -1f) ? 0f : healthOld);
 		val.health_new = health_new;
-		val.info = ((description != null) ? description : string.Empty);
-		val.proj_hits = info.ProjectileHits;
-		val.proj_integrity = info.ProjectileIntegrity;
-		val.proj_travel = info.ProjectileTravelTime;
-		val.proj_mismatch = info.ProjectileTrajectoryMismatch;
+		val.info = description ?? string.Empty;
+		val.proj_hits = hitInfo?.ProjectileHits ?? 0;
+		val.proj_integrity = hitInfo?.ProjectileIntegrity ?? 0f;
+		val.proj_travel = hitInfo?.ProjectileTravelTime ?? 0f;
+		val.proj_mismatch = hitInfo?.ProjectileTrajectoryMismatch ?? 0f;
+		BasePlayer basePlayer = attacker as BasePlayer;
+		if (basePlayer != null && projectilePrefab != null && basePlayer.firedProjectiles.TryGetValue(projectileId, out var value))
+		{
+			val.desync = (int)(value.desyncLifeTime * 1000f);
+		}
 		Log(val);
 	}
 
-	public void Log(Event val)
+	private void Log(Event val)
 	{
 		LastActive = UnityEngine.Time.realtimeSinceStartup;
 		if (storage != null)
@@ -136,7 +134,7 @@ public class CombatLog
 		}
 	}
 
-	public string Get(int count, uint filterByAttacker = 0u, bool json = false)
+	public string Get(int count, uint filterByAttacker = 0u, bool json = false, bool isAdmin = false)
 	{
 		if (storage == null)
 		{
@@ -163,16 +161,18 @@ public class CombatLog
 		textTable.AddColumn("integrity");
 		textTable.AddColumn("travel");
 		textTable.AddColumn("mismatch");
+		textTable.AddColumn("desync");
 		int num = storage.Count - count;
 		int combatlogdelay = Server.combatlogdelay;
 		int num2 = 0;
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		foreach (Event item in storage)
 		{
 			if (num > 0)
 			{
 				num--;
 			}
-			else if (filterByAttacker == 0 || item.attacker_id == filterByAttacker)
+			else if ((filterByAttacker == 0 || item.attacker_id == filterByAttacker) && (!(activeGameMode != null) || activeGameMode.returnValidCombatlog || isAdmin || item.proj_hits <= 0))
 			{
 				float num3 = UnityEngine.Time.realtimeSinceStartup - item.time;
 				if (num3 >= (float)combatlogdelay)
@@ -202,7 +202,9 @@ public class CombatLog
 					string text10 = distance.ToString("0.00s");
 					distance = item.proj_mismatch;
 					string text11 = distance.ToString("0.00m");
-					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info, text8, text9, text10, text11);
+					proj_hits = item.desync;
+					string text12 = proj_hits.ToString();
+					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info, text8, text9, text10, text11, text12);
 				}
 				else
 				{
@@ -210,21 +212,21 @@ public class CombatLog
 				}
 			}
 		}
-		string text12;
+		string text13;
 		if (json)
 		{
-			text12 = textTable.ToJson();
+			text13 = textTable.ToJson();
 		}
 		else
 		{
-			text12 = textTable.ToString();
+			text13 = textTable.ToString();
 			if (num2 > 0)
 			{
-				text12 = text12 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
-				text12 = text12 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
+				text13 = text13 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
+				text13 = text13 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
 			}
 		}
-		return text12;
+		return text13;
 	}
 
 	public static Queue<Event> Get(ulong id)

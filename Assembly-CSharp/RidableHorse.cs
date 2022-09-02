@@ -421,7 +421,7 @@ public class RidableHorse : BaseRidableAnimal
 	public static void setHorseBreed(ConsoleSystem.Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		if (basePlayer == null || !basePlayer.IsDeveloper)
+		if (basePlayer == null)
 		{
 			return;
 		}

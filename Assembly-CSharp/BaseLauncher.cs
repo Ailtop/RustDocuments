@@ -128,7 +128,7 @@ public class BaseLauncher : BaseProjectile
 		if (reloadFinished && HasReloadCooldown())
 		{
 			AntiHack.Log(player, AntiHackType.ProjectileHack, "Reloading (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "reload_cooldown");
+			player.stats.combat.LogInvalid(player, this, "reload_cooldown");
 			return;
 		}
 		reloadStarted = false;
@@ -136,7 +136,7 @@ public class BaseLauncher : BaseProjectile
 		if (primaryMagazine.contents <= 0)
 		{
 			AntiHack.Log(player, AntiHackType.ProjectileHack, "Magazine empty (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "magazine_empty");
+			player.stats.combat.LogInvalid(player, this, "magazine_empty");
 			return;
 		}
 		primaryMagazine.contents--;
@@ -170,7 +170,7 @@ public class BaseLauncher : BaseProjectile
 		if (!component)
 		{
 			AntiHack.Log(player, AntiHackType.ProjectileHack, "Item mod not found (" + base.ShortPrefabName + ")");
-			player.stats.combat.Log(this, "mod_missing");
+			player.stats.combat.LogInvalid(player, this, "mod_missing");
 			return;
 		}
 		float num2 = GetAimCone() + component.projectileSpread;

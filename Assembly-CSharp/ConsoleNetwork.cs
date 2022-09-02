@@ -50,7 +50,8 @@ public static class ConsoleNetwork
 			Interface.CallHook("OnSendCommand", cn, strCommand, args);
 			Network.Net.sv.write.Start();
 			Network.Net.sv.write.PacketID(Message.Type.ConsoleCommand);
-			Network.Net.sv.write.String(ConsoleSystem.BuildCommand(strCommand, args));
+			string val = ConsoleSystem.BuildCommand(strCommand, args);
+			Network.Net.sv.write.String(val);
 			Network.Net.sv.write.Send(new SendInfo(cn));
 		}
 	}

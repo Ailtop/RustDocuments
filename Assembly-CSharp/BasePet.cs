@@ -31,7 +31,7 @@ public class BasePet : NPCPlayer, IThinker
 
 	public static Queue<BasePet> _movementProcessQueue = new Queue<BasePet>();
 
-	public BaseAIBrain<BasePet> Brain { get; protected set; }
+	public PetBrain Brain { get; protected set; }
 
 	public override float StartHealth()
 	{
@@ -79,7 +79,7 @@ public class BasePet : NPCPlayer, IThinker
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		Brain = GetComponent<BaseAIBrain<BasePet>>();
+		Brain = GetComponent<PetBrain>();
 		if (!base.isClient)
 		{
 			AIThinkManager.AddPet(this);

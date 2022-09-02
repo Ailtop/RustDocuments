@@ -132,7 +132,57 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Reserved11 = 0x80000
 	}
 
-	private readonly struct ServerFileRequest : IEquatable<ServerFileRequest>
+	private readonly struct QueuedFileRequest : IEquatable<QueuedFileRequest>
+	{
+		public readonly BaseEntity Entity;
+
+		public readonly FileStorage.Type Type;
+
+		public readonly uint Part;
+
+		public readonly uint Crc;
+
+		public readonly uint ResponseFunction;
+
+		public readonly bool? RespondIfNotFound;
+
+		public QueuedFileRequest(BaseEntity entity, FileStorage.Type type, uint part, uint crc, uint responseFunction, bool? respondIfNotFound)
+		{
+			Entity = entity;
+			Type = type;
+			Part = part;
+			Crc = crc;
+			ResponseFunction = responseFunction;
+			RespondIfNotFound = respondIfNotFound;
+		}
+
+		public bool Equals(QueuedFileRequest other)
+		{
+			if (object.Equals(Entity, other.Entity) && Type == other.Type && Part == other.Part && Crc == other.Crc && ResponseFunction == other.ResponseFunction)
+			{
+				return RespondIfNotFound == other.RespondIfNotFound;
+			}
+			return false;
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj is QueuedFileRequest other)
+			{
+				return Equals(other);
+			}
+			return false;
+		}
+
+		public override int GetHashCode()
+		{
+			uint num = ((((((((uint)(((Entity != null) ? Entity.GetHashCode() : 0) * 397) ^ (uint)Type) * 397) ^ Part) * 397) ^ Crc) * 397) ^ ResponseFunction) * 397;
+			bool? respondIfNotFound = RespondIfNotFound;
+			return (int)num ^ respondIfNotFound.GetHashCode();
+		}
+	}
+
+	private readonly struct PendingFileRequest : IEquatable<PendingFileRequest>
 	{
 		public readonly FileStorage.Type Type;
 
@@ -144,7 +194,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public readonly float Time;
 
-		public ServerFileRequest(FileStorage.Type type, uint numId, uint crc, IServerFileReceiver receiver)
+		public PendingFileRequest(FileStorage.Type type, uint numId, uint crc, IServerFileReceiver receiver)
 		{
 			Type = type;
 			NumId = numId;
@@ -153,7 +203,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			Time = UnityEngine.Time.realtimeSinceStartup;
 		}
 
-		public bool Equals(ServerFileRequest other)
+		public bool Equals(PendingFileRequest other)
 		{
 			if (Type == other.Type && NumId == other.NumId && Crc == other.Crc)
 			{
@@ -164,7 +214,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public override bool Equals(object obj)
 		{
-			if (obj is ServerFileRequest other)
+			if (obj is PendingFileRequest other)
 			{
 				return Equals(other);
 			}
@@ -174,16 +224,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		public override int GetHashCode()
 		{
 			return (int)(((((uint)((int)Type * 397) ^ NumId) * 397) ^ Crc) * 397) ^ ((Receiver != null) ? Receiver.GetHashCode() : 0);
-		}
-
-		public static bool operator ==(ServerFileRequest left, ServerFileRequest right)
-		{
-			return left.Equals(right);
-		}
-
-		public static bool operator !=(ServerFileRequest left, ServerFileRequest right)
-		{
-			return !left.Equals(right);
 		}
 	}
 
@@ -1567,11 +1607,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Rigidbody component = GetComponent<Rigidbody>();
 		if ((bool)component)
 		{
-			if (oldParent != null)
+			if (oldParent != null && oldParent.GetComponent<Rigidbody>() == null)
 			{
 				component.velocity += oldParent.GetWorldVelocity();
 			}
-			if (newParent != null)
+			if (newParent != null && newParent.GetComponent<Rigidbody>() == null)
 			{
 				component.velocity -= newParent.GetWorldVelocity();
 			}

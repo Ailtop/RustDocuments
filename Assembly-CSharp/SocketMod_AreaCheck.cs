@@ -20,16 +20,16 @@ public class SocketMod_AreaCheck : SocketMod
 		Gizmos.DrawCube(bounds.center, bounds.size);
 	}
 
-	public static bool IsInArea(Vector3 position, Quaternion rotation, Bounds bounds, LayerMask layerMask)
+	public static bool IsInArea(Vector3 position, Quaternion rotation, Bounds bounds, LayerMask layerMask, BaseEntity entity = null)
 	{
-		return GamePhysics.CheckOBB(new OBB(position, rotation, bounds), layerMask.value);
+		return GamePhysics.CheckOBBAndEntity(new OBB(position, rotation, bounds), layerMask.value, QueryTriggerInteraction.UseGlobal, entity);
 	}
 
-	public bool DoCheck(Vector3 position, Quaternion rotation)
+	public bool DoCheck(Vector3 position, Quaternion rotation, BaseEntity entity = null)
 	{
 		Vector3 position2 = position + rotation * worldPosition;
 		Quaternion rotation2 = rotation * worldRotation;
-		return IsInArea(position2, rotation2, bounds, layerMask) == wantsInside;
+		return IsInArea(position2, rotation2, bounds, layerMask, entity) == wantsInside;
 	}
 
 	public override bool DoCheck(Construction.Placement place)

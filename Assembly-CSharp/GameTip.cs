@@ -5,6 +5,13 @@ using UnityEngine.UI;
 
 public class GameTip : SingletonComponent<GameTip>
 {
+	public enum Styles
+	{
+		Blue_Normal = 0,
+		Red_Normal = 1,
+		Blue_Long = 2
+	}
+
 	[Serializable]
 	public struct Theme
 	{

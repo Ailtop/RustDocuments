@@ -405,7 +405,7 @@ public class MagnetCrane : GroundVehicle, CarPhysics<MagnetCrane>.ICar
 				{
 					if (GetDriver() != null)
 					{
-						GetDriver().ShowToast(1, ReturnMessage);
+						GetDriver().ShowToast(GameTip.Styles.Red_Normal, ReturnMessage);
 					}
 					Hurt(MaxHealth() * 0.15f, DamageType.Generic, this, useProtection: false);
 					lastDamagePos = base.transform.position;

@@ -242,7 +242,6 @@ public class GenerateRailBranching : ProceduralComponent
 			};
 			rail.Path.Smoothen(32, new Vector3(1f, 0f, 1f), filter);
 			rail.Path.Smoothen(64, new Vector3(0f, 1f, 0f), filter);
-			rail.Path.RecalculateLength();
 			rail.Path.Resample(7.5f);
 			rail.Path.RecalculateTangents();
 			rail.AdjustPlacementMap(20f);

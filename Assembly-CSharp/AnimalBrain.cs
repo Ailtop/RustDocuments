@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
+public class AnimalBrain : BaseAIBrain
 {
 	public class AttackState : BasicAIState
 	{
@@ -12,10 +12,10 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			base.AgrresiveState = true;
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
-			attack = GetEntity();
+			base.StateEnter(brain, entity);
+			attack = entity as IAIAttack;
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			BasePlayer basePlayer = baseEntity as BasePlayer;
 			if (basePlayer != null && basePlayer.IsDead())
@@ -25,7 +25,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			else if (baseEntity != null && baseEntity.Health() > 0f)
 			{
 				BaseCombatEntity target = baseEntity as BaseCombatEntity;
-				Vector3 aimDirection = GetAimDirection(GetEntity(), target);
+				Vector3 aimDirection = GetAimDirection(entity as BaseCombatEntity, target);
 				brain.Navigator.SetFacingDirectionOverride(aimDirection);
 				if (attack.CanAttack(baseEntity))
 				{
@@ -35,9 +35,9 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			brain.Navigator.ClearFacingDirectionOverride();
 			brain.Navigator.Stop();
 			StopAttacking();
@@ -48,9 +48,9 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			attack.StopAttacking();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (attack == null)
 			{
@@ -88,7 +88,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 				return StateStatus.Error;
 			}
 			BaseCombatEntity target = baseEntity as BaseCombatEntity;
-			Vector3 aimDirection = GetAimDirection(GetEntity(), target);
+			Vector3 aimDirection = GetAimDirection(entity as BaseCombatEntity, target);
 			brain.Navigator.SetFacingDirectionOverride(aimDirection);
 			if (attack.CanAttack(baseEntity))
 			{
@@ -130,10 +130,10 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			base.AgrresiveState = true;
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
-			attack = GetEntity();
+			base.StateEnter(brain, entity);
+			attack = entity as IAIAttack;
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
@@ -141,9 +141,9 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			}
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
@@ -152,9 +152,9 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity == null)
 			{
@@ -184,20 +184,20 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 		{
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity != null)
 			{
 				stopFleeDistance = Random.Range(80f, 100f) + Mathf.Clamp(Vector3Ex.Distance2D(brain.Navigator.transform.position, baseEntity.transform.position), 0f, 50f);
 			}
-			FleeFrom(brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot), GetEntity());
+			FleeFrom(brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot), entity);
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
@@ -206,9 +206,9 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			BaseEntity baseEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
 			if (baseEntity == null)
 			{
@@ -218,7 +218,7 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			{
 				return StateStatus.Finished;
 			}
-			if ((brain.Navigator.UpdateIntervalElapsed(nextInterval) || !brain.Navigator.Moving) && !FleeFrom(baseEntity, GetEntity()))
+			if ((brain.Navigator.UpdateIntervalElapsed(nextInterval) || !brain.Navigator.Moving) && !FleeFrom(baseEntity, entity))
 			{
 				return StateStatus.Error;
 			}
@@ -255,35 +255,35 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 
 		private int turnChance = 33;
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
-			FaceNewDirection();
+			base.StateEnter(brain, entity);
+			FaceNewDirection(entity);
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			brain.Navigator.ClearFacingDirectionOverride();
 		}
 
-		private void FaceNewDirection()
+		private void FaceNewDirection(BaseEntity entity)
 		{
 			if (Random.Range(0, 100) <= turnChance)
 			{
-				Vector3 position = GetEntity().transform.position;
+				Vector3 position = entity.transform.position;
 				Vector3 normalized = (BasePathFinder.GetPointOnCircle(position, 1f, Random.Range(0f, 594f)) - position).normalized;
 				brain.Navigator.SetFacingDirectionOverride(normalized);
 			}
 			nextTurnTime = Time.realtimeSinceStartup + Random.Range(minTurnTime, maxTurnTime);
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			if (Time.realtimeSinceStartup >= nextTurnTime)
 			{
-				FaceNewDirection();
+				FaceNewDirection(entity);
 			}
 			return StateStatus.Running;
 		}
@@ -302,15 +302,15 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 		{
 		}
 
-		public override void StateLeave()
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateLeave();
+			base.StateLeave(brain, entity);
 			Stop();
 		}
 
-		public override void StateEnter()
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateEnter();
+			base.StateEnter(brain, entity);
 			status = StateStatus.Error;
 			if (brain.PathFinder == null)
 			{
@@ -345,9 +345,9 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 			brain.Navigator.Stop();
 		}
 
-		public override StateStatus StateThink(float delta)
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
 		{
-			base.StateThink(delta);
+			base.StateThink(delta, brain, entity);
 			if (status == StateStatus.Error)
 			{
 				return status;
@@ -388,5 +388,10 @@ public class AnimalBrain : BaseAIBrain<BaseAnimalNPC>
 	{
 		base.OnDestroy();
 		Count--;
+	}
+
+	public BaseAnimalNPC GetEntity()
+	{
+		return GetBaseEntity() as BaseAnimalNPC;
 	}
 }

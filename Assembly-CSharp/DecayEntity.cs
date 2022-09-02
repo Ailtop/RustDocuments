@@ -28,6 +28,8 @@ public class DecayEntity : BaseCombatEntity
 
 	public float decayVariance = 1f;
 
+	public virtual bool BypassInsideDecayMultiplier => false;
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
@@ -273,7 +275,7 @@ public class DecayEntity : BaseCombatEntity
 			float num4 = 1f;
 			if (ConVar.Decay.upkeep)
 			{
-				if (!IsOutside())
+				if (!BypassInsideDecayMultiplier && !IsOutside())
 				{
 					num4 *= ConVar.Decay.upkeep_inside_decay_scale;
 				}

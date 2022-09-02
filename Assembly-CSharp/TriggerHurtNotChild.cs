@@ -44,6 +44,8 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 
 	private TimeSince timeSinceAcivation;
 
+	private IHurtTriggerUser hurtTiggerUser;
+
 	public override GameObject InterestedInObject(GameObject obj)
 	{
 		obj = base.InterestedInObject(obj);
@@ -102,6 +104,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 	protected void OnEnable()
 	{
 		timeSinceAcivation = 0f;
+		hurtTiggerUser = SourceEntity as IHurtTriggerUser;
 	}
 
 	public new void OnDisable()
@@ -147,15 +150,14 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 		}
 		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
 		obj.AddRange(entityContents);
-		IHurtTriggerUser hurtTriggerUser = SourceEntity as IHurtTriggerUser;
 		foreach (BaseEntity item in obj)
 		{
 			if (BaseNetworkableEx.IsValid(item) && IsInterested(item) && (!(DamageDelay > 0f) || entryTimes == null || !entryTimes.TryGetValue(item, out var value) || !(value + DamageDelay > Time.time)) && (!RequireUpAxis || !(Vector3.Dot(item.transform.up, base.transform.up) < 0f)))
 			{
 				float num = DamagePerSecond * 1f / DamageTickRate;
-				if (UseSourceEntityDamageMultiplier && hurtTriggerUser != null)
+				if (UseSourceEntityDamageMultiplier && hurtTiggerUser != null)
 				{
-					num *= hurtTriggerUser.GetPlayerDamageMultiplier();
+					num *= hurtTiggerUser.GetPlayerDamageMultiplier();
 				}
 				if (item.IsNpc)
 				{
@@ -175,12 +177,15 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 					HitNormalWorld = Vector3.up,
 					HitMaterial = ((item is BaseCombatEntity) ? StringPool.Get("Flesh") : 0u),
 					WeaponPrefab = ((SourceEntity != null) ? SourceEntity.gameManager.FindPrefab(SourceEntity.prefabID).GetComponent<BaseEntity>() : null),
-					Initiator = hurtTriggerUser?.GetPlayerDamageInitiator()
+					Initiator = ((hurtTiggerUser != null) ? hurtTiggerUser.GetPlayerDamageInitiator() : null)
 				};
 				hitInfo.damageTypes = new DamageTypeList();
 				hitInfo.damageTypes.Set(damageType, num);
 				item.OnAttacked(hitInfo);
-				hurtTriggerUser?.OnHurtTriggerOccupant(item, damageType, num);
+				if (hurtTiggerUser != null)
+				{
+					hurtTiggerUser.OnHurtTriggerOccupant(item, damageType, num);
+				}
 				if (triggerHitImpacts)
 				{
 					Effect.server.ImpactEffect(hitInfo);

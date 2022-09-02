@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class BaseFishNPC : BaseNpc, IAIAttack, IAISenses, IThinker
 {
-	protected BaseAIBrain<BaseFishNPC> brain;
+	protected FishBrain brain;
 
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		brain = GetComponent<BaseAIBrain<BaseFishNPC>>();
+		brain = GetComponent<FishBrain>();
 		if (!base.isClient)
 		{
 			AIThinkManager.AddAnimal(this);

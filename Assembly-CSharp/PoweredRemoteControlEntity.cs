@@ -199,6 +199,10 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 
 	public void UpdateIdentifier(string newID, bool clientSend = false)
 	{
+		if (Interface.CallHook("OnRemoteIdentifierUpdate", this, newID) != null)
+		{
+			return;
+		}
 		_ = rcIdentifier;
 		if (base.isServer)
 		{

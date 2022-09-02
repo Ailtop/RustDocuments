@@ -27,13 +27,21 @@ public class ItemModCookable : ItemMod
 		}
 	}
 
+	public bool CanBeCookedByAtTemperature(float temperature)
+	{
+		if (temperature > (float)lowTemp)
+		{
+			return temperature < (float)highTemp;
+		}
+		return false;
+	}
+
 	public override void OnItemCreated(Item itemcreated)
 	{
 		float cooktimeLeft = cookTime;
 		itemcreated.onCycle += delegate(Item item, float delta)
 		{
-			float temperature = item.temperature;
-			if (temperature < (float)lowTemp || temperature > (float)highTemp || cooktimeLeft < 0f)
+			if (!CanBeCookedByAtTemperature(item.temperature) || cooktimeLeft < 0f)
 			{
 				if (setCookingFlag && item.HasFlag(Item.Flag.Cooking))
 				{
@@ -51,11 +59,14 @@ public class ItemModCookable : ItemMod
 				cooktimeLeft -= delta;
 				if (!(cooktimeLeft > 0f))
 				{
-					int position = item.position;
-					if (item.amount > 1)
+					BaseOven baseOven = item.GetEntityOwner() as BaseOven;
+					int a = ((baseOven == null) ? 1 : baseOven.GetSmeltingSpeed());
+					a = Mathf.Min(a, item.amount);
+					int iTargetPos = item.position + 1;
+					if (item.amount > a)
 					{
 						cooktimeLeft = cookTime;
-						item.amount--;
+						item.amount -= a;
 						item.MarkDirty();
 					}
 					else
@@ -64,17 +75,13 @@ public class ItemModCookable : ItemMod
 					}
 					if (becomeOnCooked != null)
 					{
-						Item item2 = ItemManager.Create(becomeOnCooked, amountOfBecome, 0uL);
-						if (item2 != null && !item2.MoveToContainer(item.parent, position) && !item2.MoveToContainer(item.parent))
+						Item item2 = ItemManager.Create(becomeOnCooked, amountOfBecome * a, 0uL);
+						if (item2 != null && !item2.MoveToContainer(item.parent, iTargetPos) && !item2.MoveToContainer(item.parent))
 						{
 							item2.Drop(item.parent.dropPosition, item.parent.dropVelocity);
-							if ((bool)item.parent.entityOwner)
+							if ((bool)item.parent.entityOwner && baseOven != null)
 							{
-								BaseOven component = item.parent.entityOwner.GetComponent<BaseOven>();
-								if (component != null)
-								{
-									component.OvenFull();
-								}
+								baseOven.OvenFull();
 							}
 						}
 					}

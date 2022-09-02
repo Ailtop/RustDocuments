@@ -506,11 +506,11 @@ public class BaseCombatEntity : BaseEntity
 			{
 				if (IsDead())
 				{
-					initiatorPlayer.stats.combat.Log(info, num, health, "killed");
+					initiatorPlayer.stats.combat.LogAttack(info, "killed", num);
 				}
 				else
 				{
-					initiatorPlayer.stats.combat.Log(info, num, health);
+					initiatorPlayer.stats.combat.LogAttack(info, "", num);
 				}
 			}
 		}

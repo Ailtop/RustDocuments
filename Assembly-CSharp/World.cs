@@ -61,7 +61,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 227 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 228 + ".map";
 		}
 	}
 
@@ -81,9 +81,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 227 + ".sav";
+				return Name + "." + 228 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 227 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 228 + ".sav";
 		}
 	}
 
@@ -125,7 +125,7 @@ public static class World
 	public static void CleanupOldFiles()
 	{
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 227 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 228 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -162,7 +162,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 227 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 228 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -327,9 +327,24 @@ public static class World
 
 	public static IEnumerator SpawnAsync(float deltaTime, Action<string> statusFunction = null)
 	{
-		Dictionary<string, List<PrefabData>> assetGroups = (from p in Serialization.world.prefabs
-			group p by StringPool.Get(p.id)).ToDictionary((IGrouping<string, PrefabData> g) => g.Key, (IGrouping<string, PrefabData> g) => g.ToList(), StringComparer.InvariantCultureIgnoreCase);
-		int totalCount = Serialization.world.prefabs.Count;
+		int totalCount = 0;
+		Dictionary<string, List<PrefabData>> assetGroups = new Dictionary<string, List<PrefabData>>(StringComparer.InvariantCultureIgnoreCase);
+		foreach (PrefabData prefab2 in Serialization.world.prefabs)
+		{
+			string text = StringPool.Get(prefab2.id);
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				UnityEngine.Debug.LogWarning($"Could not find path for prefab ID {prefab2.id}, skipping spawn");
+				continue;
+			}
+			if (!assetGroups.TryGetValue(text, out var value))
+			{
+				value = new List<PrefabData>();
+				assetGroups.Add(text, value);
+			}
+			value.Add(prefab2);
+			totalCount++;
+		}
 		int spawnedCount = 0;
 		int resultIndex = 0;
 		Stopwatch sw = Stopwatch.StartNew();
@@ -339,20 +354,20 @@ public static class World
 			while (resultIndex < load.Results.Count && sw.Elapsed.TotalSeconds < (double)deltaTime)
 			{
 				string item = load.Results[resultIndex].AssetPath;
-				if (!assetGroups.TryGetValue(item, out var value))
+				if (!assetGroups.TryGetValue(item, out var value2))
 				{
 					resultIndex++;
 					continue;
 				}
-				if (value.Count == 0)
+				if (value2.Count == 0)
 				{
 					assetGroups.Remove(item);
 					resultIndex++;
 					continue;
 				}
-				int index = value.Count - 1;
-				PrefabData prefab = value[index];
-				value.RemoveAt(index);
+				int index = value2.Count - 1;
+				PrefabData prefab = value2[index];
+				value2.RemoveAt(index);
 				Spawn(prefab);
 				spawnedCount++;
 			}
@@ -433,7 +448,7 @@ public static class World
 
 	private static void Spawn(string category, Prefab prefab, Vector3 position, Quaternion rotation, Vector3 scale)
 	{
-		if ((bool)prefab.Object)
+		if (prefab != null && (bool)prefab.Object)
 		{
 			if (!Cached)
 			{

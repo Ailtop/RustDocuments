@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{68E4E32A-3413-49C4-B130-3BF08ADC3F8A}</ProjectGuid>
+    <ProjectGuid>{7DADF6FF-1D65-4107-8F5C-9824B498AF33}</ProjectGuid>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -30,181 +30,181 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Network">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Network.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Network.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.UnityEngine">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.UnityEngine.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Unity">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Unity.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Console">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Console.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="Rust.Global">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Global.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Global.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Data">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Data.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Data.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VehiclesModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Localization">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Localization.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Facepunch.System">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.System.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.World">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.World.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.World.dll</HintPath>
     </Reference>
     <Reference Include="EasyAntiCheat.Server">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\EasyAntiCheat.Server.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\EasyAntiCheat.Server.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.UI">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.UI.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.UI.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Platform.Common">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Platform.Common.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Platform.Common.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.BurstCloth">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.BurstCloth.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.BurstCloth.dll</HintPath>
     </Reference>
     <Reference Include="EZhex1991.EZSoftBone">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\EZhex1991.EZSoftBone.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\EZhex1991.EZSoftBone.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="CurvedTextMeshPro">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\CurvedTextMeshPro.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\CurvedTextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Mathematics">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Unity.Mathematics.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Unity.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Skeleton">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Skeleton.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Skeleton.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Input">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Input.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.FileSystem">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.FileSystem.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.FileSystem.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ClothModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainPhysicsModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.WindModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.WindModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.WindModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Steamworks.Win64">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Steamworks.Win64.dll</HintPath>
     </Reference>
     <Reference Include="Ionic.Zip.Reduced">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Ionic.Zip.Reduced.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Sqlite">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Sqlite.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Workshop">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Workshop.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Workshop.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.VideoModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="EasyRoads3Dv3">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\EasyRoads3Dv3.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\EasyRoads3Dv3.dll</HintPath>
     </Reference>
     <Reference Include="Fleck">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Fleck.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Fleck.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\System.Memory.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http" />
     <Reference Include="Facepunch.Rcon">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Rcon.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Rcon.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Platform">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Platform.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Platform.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.SteamNetworking">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.SteamNetworking.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.SteamNetworking.dll</HintPath>
     </Reference>
     <Reference Include="GA">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\GA.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\GA.dll</HintPath>
     </Reference>
     <Reference Include="Facepunch.Raknet">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Facepunch.Raknet.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Facepunch.Raknet.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
     <Reference Include="Rust.Harmony">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Rust.Harmony.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Rust.Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Oxide.Core">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Oxide.Core.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Oxide.Core.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>E:\Game\Rust\rustserver\RustDedicated_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>E:\Game\Rust\rustserver-test\RustDedicated_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -320,6 +320,7 @@
     <Compile Include="Auth_EAC.cs" />
     <Compile Include="Auth_Steam.cs" />
     <Compile Include="AutoTurret.cs" />
+    <Compile Include="AvatarSwitcher.cs" />
     <Compile Include="AverageVelocity.cs" />
     <Compile Include="BanditGuard.cs" />
     <Compile Include="Barricade.cs" />
@@ -431,6 +432,8 @@
     <Compile Include="BoomBox.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="BossFormController.cs" />
+    <Compile Include="BoundsCheck.cs" />
+    <Compile Include="BoundsCheckEx.cs" />
     <Compile Include="BoundsEx.cs" />
     <Compile Include="BowWeapon.cs" />
     <Compile Include="BoxStorage.cs" />
@@ -504,6 +507,8 @@
     <Compile Include="Chainsaw.cs" />
     <Compile Include="ChanceAIEvent.cs" />
     <Compile Include="ChanceEventUI.cs" />
+    <Compile Include="ChangelogButton.cs" />
+    <Compile Include="ChangelogPanel.cs" />
     <Compile Include="ChangeSignText.cs" />
     <Compile Include="ChatEntry.cs" />
     <Compile Include="Chicken.cs" />
@@ -1057,6 +1062,7 @@
     <Compile Include="GameManager.cs" />
     <Compile Include="GameManifest.cs" />
     <Compile Include="GameModeCapturePoint.cs" />
+    <Compile Include="GameModeHardcore.cs" />
     <Compile Include="GameModeManifest.cs" />
     <Compile Include="GameModeObjectToggle.cs" />
     <Compile Include="GameModeSoftcore.cs" />
@@ -1221,6 +1227,7 @@
     <Compile Include="Igniter.cs" />
     <Compile Include="IgnoreCollision.cs" />
     <Compile Include="IHurtTrigger.cs" />
+    <Compile Include="IIdealSlotEntity.cs" />
     <Compile Include="IIgniteable.cs" />
     <Compile Include="IImageReceiver.cs" />
     <Compile Include="IInstanceDataReceiver.cs" />
@@ -1271,6 +1278,7 @@
     <Compile Include="InstrumentTool.cs" />
     <Compile Include="InstrumentToolGuitar.cs" />
     <Compile Include="InstrumentViewmodel.cs" />
+    <Compile Include="InventoryUI.cs" />
     <Compile Include="InvisibleVendingMachine.cs" />
     <Compile Include="IOEntity.cs" />
     <Compile Include="IOEntityInformationPanel.cs" />
@@ -1498,8 +1506,10 @@
     <Compile Include="LookAtPlanter.cs" />
     <Compile Include="LookatTooltip.cs" />
     <Compile Include="LootableCorpse.cs" />
+    <Compile Include="LootAllButton.cs" />
     <Compile Include="LootContainer.cs" />
     <Compile Include="LootDistanceOverride.cs" />
+    <Compile Include="LootGrid.cs" />
     <Compile Include="LootPanel.cs" />
     <Compile Include="LootPanelBigWheelTerminal.cs" />
     <Compile Include="LootPanelCardTableTerminal.cs" />
@@ -1706,6 +1716,7 @@
     <Compile Include="NetworkSleep.cs" />
     <Compile Include="NetworkVisibilityGrid.cs" />
     <Compile Include="NetworkWriteEx.cs" />
+    <Compile Include="NewsParagraph.cs" />
     <Compile Include="NewsSource.cs" />
     <Compile Include="NewYearGong.cs" />
     <Compile Include="NGSS_Directional.cs" />
@@ -1767,6 +1778,11 @@
     <Compile Include="ORSwitch.cs" />
     <Compile Include="OutlineManager.cs" />
     <Compile Include="OutlineObject.cs" />
+    <Compile Include="OvenItemIcon.cs" />
+    <Compile Include="OvenLineRow.cs" />
+    <Compile Include="OvenLootPanel.cs" />
+    <Compile Include="OvenSlotType.cs" />
+    <Compile Include="OvenStatus.cs" />
     <Compile Include="OverlayBlendMode.cs" />
     <Compile Include="OverlayBlendModeParameter.cs" />
     <Compile Include="OverlayMeshPaintableSource.cs" />
@@ -1909,6 +1925,7 @@
     <Compile Include="PressButton.cs" />
     <Compile Include="PressButton_TrainTunnel.cs" />
     <Compile Include="PressurePad.cs" />
+    <Compile Include="PreventBuildingMonumentTag.cs" />
     <Compile Include="ProceduralComponent.cs" />
     <Compile Include="ProceduralLift.cs" />
     <Compile Include="ProceduralLiftCabin.cs" />
@@ -2267,6 +2284,7 @@
     <Compile Include="SoundVoiceLimiter.cs" />
     <Compile Include="SpaceCheckingSpawnPoint.cs" />
     <Compile Include="Spawnable.cs" />
+    <Compile Include="SpawnableBoundsBlocker.cs" />
     <Compile Include="SpawnDistribution.cs" />
     <Compile Include="SpawnFilter.cs" />
     <Compile Include="SpawnGroup.cs" />
@@ -2289,6 +2307,7 @@
     <Compile Include="SprayDecay.cs" />
     <Compile Include="Sprinkler.cs" />
     <Compile Include="SpriteArcadeEntity.cs" />
+    <Compile Include="SquareBorder.cs" />
     <Compile Include="sRGB.cs" />
     <Compile Include="StabilityEntity.cs" />
     <Compile Include="StabilitySocket.cs" />

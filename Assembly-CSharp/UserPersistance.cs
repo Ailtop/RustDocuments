@@ -25,7 +25,13 @@ public class UserPersistance : IDisposable
 	public UserPersistance(string strFolder)
 	{
 		blueprints = new Facepunch.Sqlite.Database();
-		blueprints.Open(strFolder + "/player.blueprints." + 5 + ".db");
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		string text = strFolder + "/player.blueprints.";
+		if (activeGameMode != null && activeGameMode.wipeBpsOnProtocol)
+		{
+			text = text + 228 + ".";
+		}
+		blueprints.Open(text + 5 + ".db");
 		if (!blueprints.TableExists("data"))
 		{
 			blueprints.Execute("CREATE TABLE data ( userid TEXT PRIMARY KEY, info BLOB, updated INTEGER )");
@@ -55,7 +61,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("ALTER TABLE data ADD COLUMN locked BOOLEAN DEFAULT 0");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 227 + ".db");
+		playerState.Open(strFolder + "/player.states." + 228 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

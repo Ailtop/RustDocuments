@@ -47,6 +47,9 @@ public class Global : ConsoleSystem
 	[ClientVar]
 	public static bool asyncWarmup = false;
 
+	[ClientVar(Saved = true, Help = "Experimental faster loading, requires game restart (0 = off, 1 = partial, 2 = full)")]
+	public static int asyncLoadingPreset = 0;
+
 	[ServerVar(Saved = true)]
 	[ClientVar(Saved = true)]
 	public static int perf = 0;
@@ -77,6 +80,44 @@ public class Global : ConsoleSystem
 		set
 		{
 			_developer = value;
+		}
+	}
+
+	public static void ApplyAsyncLoadingPreset()
+	{
+		if (asyncLoadingPreset != 0)
+		{
+			UnityEngine.Debug.Log($"Applying async loading preset number {asyncLoadingPreset}");
+		}
+		switch (asyncLoadingPreset)
+		{
+		case 1:
+			if (warmupConcurrency <= 1)
+			{
+				warmupConcurrency = 256;
+			}
+			if (preloadConcurrency <= 1)
+			{
+				preloadConcurrency = 256;
+			}
+			asyncWarmup = false;
+			break;
+		case 2:
+			if (warmupConcurrency <= 1)
+			{
+				warmupConcurrency = 256;
+			}
+			if (preloadConcurrency <= 1)
+			{
+				preloadConcurrency = 256;
+			}
+			asyncWarmup = true;
+			break;
+		default:
+			UnityEngine.Debug.LogWarning($"There is no asyncLoading preset number {asyncLoadingPreset}");
+			break;
+		case 0:
+			break;
 		}
 	}
 
@@ -673,16 +714,20 @@ public class Global : ConsoleSystem
 	public static void ClearSpraysInRadius(Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		if (basePlayer == null)
+		if (!(basePlayer == null))
 		{
-			return;
+			float @float = arg.GetFloat(0, 16f);
+			int num = ClearSpraysInRadius(basePlayer.transform.position, @float);
+			arg.ReplyWith($"Deleted {num} sprays within {@float} of {basePlayer.displayName}");
 		}
-		float @float = arg.GetFloat(0, 16f);
-		Vector3 position = basePlayer.transform.position;
+	}
+
+	private static int ClearSpraysInRadius(Vector3 position, float radius)
+	{
 		List<SprayCanSpray> obj = Facepunch.Pool.GetList<SprayCanSpray>();
 		foreach (SprayCanSpray allSpray in SprayCanSpray.AllSprays)
 		{
-			if (allSpray.Distance(position) <= @float)
+			if (allSpray.Distance(position) <= radius)
 			{
 				obj.Add(allSpray);
 			}
@@ -693,6 +738,18 @@ public class Global : ConsoleSystem
 		}
 		int count = obj.Count;
 		Facepunch.Pool.FreeList(ref obj);
-		arg.ReplyWith($"Deleted {count} sprays within {@float} of {basePlayer.displayName}");
+		return count;
+	}
+
+	[ServerVar]
+	public static void ClearSpraysAtPositionInRadius(Arg arg)
+	{
+		Vector3 vector = arg.GetVector3(0);
+		float @float = arg.GetFloat(1);
+		if (@float != 0f)
+		{
+			int num = ClearSpraysInRadius(vector, @float);
+			arg.ReplyWith($"Deleted {num} sprays within {@float} of {vector}");
+		}
 	}
 }
