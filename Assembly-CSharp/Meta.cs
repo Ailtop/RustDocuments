@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Facepunch;
 
 [Factory("meta")]
@@ -72,6 +73,43 @@ public class Meta : ConsoleSystem
 		{
 			button.CycleIndex = 0;
 		}
+	}
+
+	[ClientVar(Help = "exec [command_1] ... - runs all of the commands passed as arguments (also, if the last argument is true/false then that will flow into each command's arguments)")]
+	public static void exec(Arg args)
+	{
+		List<string> obj = Pool.GetList<string>();
+		for (int i = 0; i < 32; i++)
+		{
+			string @string = args.GetString(i);
+			if (string.IsNullOrWhiteSpace(@string))
+			{
+				break;
+			}
+			obj.Add(@string);
+		}
+		if (obj.Count > 0)
+		{
+			string text = null;
+			string text2 = obj[obj.Count - 1];
+			if (bool.TryParse(text2, out var _))
+			{
+				text = text2;
+				obj.RemoveAt(obj.Count - 1);
+			}
+			foreach (string item in obj)
+			{
+				if (text != null)
+				{
+					ConsoleSystem.Run(Option.Client, item, text);
+				}
+				else
+				{
+					ConsoleSystem.Run(Option.Client, item);
+				}
+			}
+		}
+		Pool.FreeList(ref obj);
 	}
 
 	private static Command Find(string name)

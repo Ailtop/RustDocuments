@@ -1110,7 +1110,7 @@ public class BaseRidableAnimal : BaseVehicle
 			Transform[] array = groundSampleOffsets;
 			for (int i = 0; i < array.Length; i++)
 			{
-				if (TransformUtil.GetGroundInfo(array[i].position + Vector3.up * 2f, out var _, out var normal, 4f, 278986753))
+				if (TransformUtil.GetGroundInfo(array[i].position + Vector3.up * 2f, out var _, out var normal, 4f, 295763969))
 				{
 					targetUp += normal;
 				}
@@ -1174,7 +1174,7 @@ public class BaseRidableAnimal : BaseVehicle
 			}
 			if (!flag)
 			{
-				if (!TransformUtil.GetGroundInfo(vector4 + Vector3.up * 2f, out pos, out normal, 2f + num7, 278986753))
+				if (!TransformUtil.GetGroundInfo(vector4 + Vector3.up * 2f, out pos, out normal, 2f + num7, 295763969))
 				{
 					return num4;
 				}
@@ -1199,7 +1199,7 @@ public class BaseRidableAnimal : BaseVehicle
 					{
 						Vector3 vector6 = vector4 + normalOffsets[j].x * base.transform.right;
 						float num12 = maxStepHeight * 2.5f;
-						if (TransformUtil.GetGroundInfo(vector6 + Vector3.up * num12 + normalOffsets[j].z * base.transform.forward, out var pos2, out var normal2, num7 + num12, 278986753))
+						if (TransformUtil.GetGroundInfo(vector6 + Vector3.up * num12 + normalOffsets[j].z * base.transform.forward, out var pos2, out var normal2, num7 + num12, 295763969))
 						{
 							num11++;
 							vector5 += normal2;
@@ -1369,9 +1369,9 @@ public class BaseRidableAnimal : BaseVehicle
 	public bool DropToGround(Vector3 targetPos, bool force = false)
 	{
 		float range = (force ? 10000f : (maxStepHeight + maxStepDownHeight));
-		if (TransformUtil.GetGroundInfo(targetPos, out var pos, out var _, range, 278986753))
+		if (TransformUtil.GetGroundInfo(targetPos, out var pos, out var _, range, 295763969))
 		{
-			if (UnityEngine.Physics.CheckSphere(pos + Vector3.up * 1f, 0.2f, 278986753))
+			if (UnityEngine.Physics.CheckSphere(pos + Vector3.up * 1f, 0.2f, 295763969))
 			{
 				return false;
 			}

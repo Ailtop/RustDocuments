@@ -128,6 +128,10 @@ public class ConnectionQueue
 		{
 			return true;
 		}
+		if (user != null && user.group == ServerUsers.UserGroup.SkipQueue)
+		{
+			return true;
+		}
 		return false;
 	}
 

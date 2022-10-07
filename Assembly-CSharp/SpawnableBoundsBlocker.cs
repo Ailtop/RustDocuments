@@ -8,12 +8,13 @@ public class SpawnableBoundsBlocker : MonoBehaviour
 
 	public BoxCollider BoxCollider;
 
+	[Button("Clear Trees")]
 	public void ClearTrees()
 	{
 		List<TreeEntity> obj = Pool.GetList<TreeEntity>();
 		if (BoxCollider != null)
 		{
-			GamePhysics.OverlapOBB(new OBB(base.transform.TransformPoint(BoxCollider.center), BoxCollider.size, base.transform.rotation), obj, 262144, QueryTriggerInteraction.Collide);
+			GamePhysics.OverlapOBB(new OBB(base.transform.TransformPoint(BoxCollider.center), BoxCollider.size + Vector3.one, base.transform.rotation), obj, 1073741824, QueryTriggerInteraction.Collide);
 		}
 		foreach (TreeEntity item in obj)
 		{

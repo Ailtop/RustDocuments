@@ -1,51 +1,104 @@
+using System;
 using System.Collections.Generic;
-using System.IO;
 using ConVar;
-using EasyAntiCheat.Server;
-using EasyAntiCheat.Server.Cerberus;
-using EasyAntiCheat.Server.Hydra;
-using EasyAntiCheat.Server.Scout;
+using Epic.OnlineServices;
+using Epic.OnlineServices.AntiCheatCommon;
+using Epic.OnlineServices.AntiCheatServer;
+using Epic.OnlineServices.Reports;
 using Network;
 using Oxide.Core;
 using UnityEngine;
 
 public static class EACServer
 {
-	public static ICerberus<EasyAntiCheat.Server.Hydra.Client> playerTracker;
+	public static AntiCheatServerInterface Interface = null;
 
-	public static Scout eacScout;
+	public static ReportsInterface Reports = null;
 
-	private static Dictionary<EasyAntiCheat.Server.Hydra.Client, Connection> client2connection = new Dictionary<EasyAntiCheat.Server.Hydra.Client, Connection>();
+	private static Dictionary<IntPtr, Connection> client2connection = new Dictionary<IntPtr, Connection>();
 
-	private static Dictionary<Connection, EasyAntiCheat.Server.Hydra.Client> connection2client = new Dictionary<Connection, EasyAntiCheat.Server.Hydra.Client>();
+	private static Dictionary<Connection, IntPtr> connection2client = new Dictionary<Connection, IntPtr>();
 
-	private static Dictionary<Connection, ClientStatus> connection2status = new Dictionary<Connection, ClientStatus>();
+	private static Dictionary<Connection, AntiCheatCommonClientAuthStatus> connection2status = new Dictionary<Connection, AntiCheatCommonClientAuthStatus>();
 
-	private static EasyAntiCheatServer<EasyAntiCheat.Server.Hydra.Client> easyAntiCheat = null;
+	private static uint clientHandleCounter = 0u;
 
-	public static void Encrypt(Connection connection, MemoryStream src, int srcOffset, MemoryStream dst, int dstOffset)
+	public static bool CanSendAnalytics
 	{
-		if (easyAntiCheat != null)
+		get
 		{
-			easyAntiCheat.NetProtect.ProtectMessage(GetClient(connection), src, srcOffset, dst, dstOffset);
+			if (ConVar.Server.official)
+			{
+				return Interface != null;
+			}
+			return false;
 		}
 	}
 
-	public static void Decrypt(Connection connection, MemoryStream src, int srcOffset, MemoryStream dst, int dstOffset)
+	private static IntPtr GenerateCompatibilityClient()
 	{
-		if (easyAntiCheat != null)
+		return (IntPtr)(++clientHandleCounter);
+	}
+
+	public static void Encrypt(Connection connection, ArraySegment<byte> src, ref ArraySegment<byte> dst)
+	{
+		if (Interface != null)
 		{
-			easyAntiCheat.NetProtect.UnprotectMessage(GetClient(connection), src, srcOffset, dst, dstOffset);
+			ProtectMessageOptions protectMessageOptions = default(ProtectMessageOptions);
+			protectMessageOptions.ClientHandle = GetClient(connection);
+			protectMessageOptions.Data = src;
+			protectMessageOptions.OutBufferSizeBytes = (uint)dst.Count;
+			ProtectMessageOptions options = protectMessageOptions;
+			dst = new ArraySegment<byte>(dst.Array, dst.Offset, 0);
+			uint outBytesWritten;
+			Result result = Interface.ProtectMessage(ref options, dst, out outBytesWritten);
+			switch (result)
+			{
+			case Result.Success:
+				dst = new ArraySegment<byte>(dst.Array, dst.Offset, (int)outBytesWritten);
+				break;
+			default:
+				Debug.LogWarning("[EAC] ProtectMessage failed: " + result);
+				break;
+			case Result.InvalidUser:
+				break;
+			}
 		}
 	}
 
-	public static EasyAntiCheat.Server.Hydra.Client GetClient(Connection connection)
+	public static void Decrypt(Connection connection, ArraySegment<byte> src, ref ArraySegment<byte> dst)
+	{
+		if (Interface != null)
+		{
+			UnprotectMessageOptions unprotectMessageOptions = default(UnprotectMessageOptions);
+			unprotectMessageOptions.ClientHandle = GetClient(connection);
+			unprotectMessageOptions.Data = src;
+			unprotectMessageOptions.OutBufferSizeBytes = (uint)dst.Count;
+			UnprotectMessageOptions options = unprotectMessageOptions;
+			dst = new ArraySegment<byte>(dst.Array, dst.Offset, 0);
+			uint outBytesWritten;
+			Result result = Interface.UnprotectMessage(ref options, dst, out outBytesWritten);
+			switch (result)
+			{
+			case Result.Success:
+				dst = new ArraySegment<byte>(dst.Array, dst.Offset, (int)outBytesWritten);
+				break;
+			default:
+				Debug.LogWarning("[EAC] UnprotectMessage failed: " + result);
+				break;
+			case Result.InvalidUser:
+				break;
+			}
+		}
+	}
+
+	public static IntPtr GetClient(Connection connection)
 	{
 		connection2client.TryGetValue(connection, out var value);
 		return value;
 	}
 
-	public static Connection GetConnection(EasyAntiCheat.Server.Hydra.Client client)
+	public static Connection GetConnection(IntPtr client)
 	{
 		client2connection.TryGetValue(client, out var value);
 		return value;
@@ -54,7 +107,7 @@ public static class EACServer
 	public static bool IsAuthenticated(Connection connection)
 	{
 		connection2status.TryGetValue(connection, out var value);
-		return value == ClientStatus.ClientAuthenticatedRemote;
+		return value == AntiCheatCommonClientAuthStatus.RemoteAuthComplete;
 	}
 
 	private static void OnAuthenticatedLocal(Connection connection)
@@ -63,181 +116,215 @@ public static class EACServer
 		{
 			connection.authStatus = "ok";
 		}
-		connection2status[connection] = ClientStatus.ClientAuthenticatedLocal;
+		connection2status[connection] = AntiCheatCommonClientAuthStatus.LocalAuthComplete;
 	}
 
 	private static void OnAuthenticatedRemote(Connection connection)
 	{
-		connection2status[connection] = ClientStatus.ClientAuthenticatedRemote;
+		connection2status[connection] = AntiCheatCommonClientAuthStatus.RemoteAuthComplete;
 	}
 
-	public static bool ShouldIgnore(Connection connection)
-	{
-		if (connection.authLevel >= 3)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	private static void HandleClientUpdate(ClientStatusUpdate<EasyAntiCheat.Server.Hydra.Client> clientStatus)
+	private static void OnClientAuthStatusChanged(ref OnClientAuthStatusChangedCallbackInfo data)
 	{
 		using (TimeWarning.New("AntiCheatKickPlayer", 10))
 		{
-			EasyAntiCheat.Server.Hydra.Client client = clientStatus.Client;
-			Connection connection = GetConnection(client);
+			IntPtr clientHandle = data.ClientHandle;
+			Connection connection = GetConnection(clientHandle);
 			if (connection == null)
 			{
-				Debug.LogError("EAC status update for invalid client: " + client.ClientID);
+				Debug.LogError("[EAC] Status update for invalid client: " + clientHandle);
 			}
-			else
+			else if (data.ClientAuthStatus == AntiCheatCommonClientAuthStatus.LocalAuthComplete)
 			{
-				if (ShouldIgnore(connection))
-				{
-					return;
-				}
-				if (clientStatus.RequiresKick)
-				{
-					string text = clientStatus.Message;
-					if (string.IsNullOrEmpty(text))
-					{
-						text = clientStatus.Status.ToString();
-					}
-					Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({text})");
-					connection.authStatus = "eac";
-					Network.Net.sv.Kick(connection, "EAC: " + text);
-					Interface.CallHook("OnPlayerKicked", connection, text);
-					if (clientStatus.IsBanned(out var timeBanExpires))
-					{
-						connection.authStatus = "eacbanned";
-						ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Kicking " + connection.username + " (banned by anticheat)");
-						Interface.CallHook("OnPlayerBanned", connection, text);
-						if (!timeBanExpires.HasValue)
-						{
-							Entity.DeleteBy(connection.userid);
-						}
-					}
-					easyAntiCheat.UnregisterClient(client);
-					client2connection.Remove(client);
-					connection2client.Remove(connection);
-					connection2status.Remove(connection);
-				}
-				else if (clientStatus.Status == ClientStatus.ClientAuthenticatedLocal)
-				{
-					OnAuthenticatedLocal(connection);
-					easyAntiCheat.SetClientNetworkState(client, networkActive: false);
-				}
-				else if (clientStatus.Status == ClientStatus.ClientAuthenticatedRemote)
-				{
-					OnAuthenticatedRemote(connection);
-				}
+				OnAuthenticatedLocal(connection);
+				SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
+				setClientNetworkStateOptions.ClientHandle = clientHandle;
+				setClientNetworkStateOptions.IsNetworkActive = false;
+				SetClientNetworkStateOptions options = setClientNetworkStateOptions;
+				Interface.SetClientNetworkState(ref options);
+			}
+			else if (data.ClientAuthStatus == AntiCheatCommonClientAuthStatus.RemoteAuthComplete)
+			{
+				OnAuthenticatedRemote(connection);
 			}
 		}
 	}
 
-	private static void SendToClient(EasyAntiCheat.Server.Hydra.Client client, byte[] message, int messageLength)
+	private static void OnClientActionRequired(ref OnClientActionRequiredCallbackInfo data)
 	{
-		Connection connection = GetConnection(client);
+		using (TimeWarning.New("OnClientActionRequired", 10))
+		{
+			IntPtr clientHandle = data.ClientHandle;
+			Connection connection = GetConnection(clientHandle);
+			if (connection == null)
+			{
+				Debug.LogError("[EAC] Status update for invalid client: " + clientHandle);
+				return;
+			}
+			AntiCheatCommonClientAction clientAction = data.ClientAction;
+			if (clientAction != AntiCheatCommonClientAction.RemovePlayer)
+			{
+				return;
+			}
+			Utf8String actionReasonDetailsString = data.ActionReasonDetailsString;
+			Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({actionReasonDetailsString})");
+			connection.authStatus = "eac";
+			Network.Net.sv.Kick(connection, "EAC: " + actionReasonDetailsString);
+			Oxide.Core.Interface.CallHook("OnPlayerKicked", connection, actionReasonDetailsString.ToString());
+			if (data.ActionReasonCode == AntiCheatCommonClientActionReason.PermanentBanned || data.ActionReasonCode == AntiCheatCommonClientActionReason.TemporaryBanned)
+			{
+				connection.authStatus = "eacbanned";
+				ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Kicking " + connection.username + " (banned by anticheat)");
+				Oxide.Core.Interface.CallHook("OnPlayerBanned", connection, actionReasonDetailsString.ToString());
+				if (data.ActionReasonCode == AntiCheatCommonClientActionReason.PermanentBanned)
+				{
+					Entity.DeleteBy(connection.userid);
+				}
+			}
+			UnregisterClientOptions unregisterClientOptions = default(UnregisterClientOptions);
+			unregisterClientOptions.ClientHandle = clientHandle;
+			UnregisterClientOptions options = unregisterClientOptions;
+			Interface.UnregisterClient(ref options);
+			client2connection.Remove(clientHandle);
+			connection2client.Remove(connection);
+			connection2status.Remove(connection);
+		}
+	}
+
+	private static void SendToClient(ref OnMessageToClientCallbackInfo data)
+	{
+		IntPtr clientHandle = data.ClientHandle;
+		Connection connection = GetConnection(clientHandle);
 		if (connection == null)
 		{
-			Debug.LogError("EAC network packet for invalid client: " + client.ClientID);
+			Debug.LogError("[EAC] Network packet for invalid client: " + clientHandle);
 		}
 		else if (Network.Net.sv.write.Start())
 		{
 			Network.Net.sv.write.PacketID(Message.Type.EAC);
-			Network.Net.sv.write.UInt32((uint)messageLength);
-			Network.Net.sv.write.Write(message, 0, messageLength);
+			Network.Net.sv.write.UInt32((uint)data.MessageData.Count);
+			Network.Net.sv.write.Write(data.MessageData.Array, data.MessageData.Offset, data.MessageData.Count);
 			Network.Net.sv.write.Send(new SendInfo(connection));
 		}
 	}
 
 	public static void DoStartup()
 	{
-		if (ConVar.Server.secure)
+		if (ConVar.Server.secure && !Application.isEditor)
 		{
 			client2connection.Clear();
 			connection2client.Clear();
 			connection2status.Clear();
-			Log.SetOut(new StreamWriter(ConVar.Server.rootFolder + "/Log.EAC.txt", append: false)
-			{
-				AutoFlush = true
-			});
-			Log.Prefix = "";
-			Log.Level = LogLevel.Info;
-			easyAntiCheat = new EasyAntiCheatServer<EasyAntiCheat.Server.Hydra.Client>(HandleClientUpdate, 20, ConVar.Server.hostname);
-			playerTracker = easyAntiCheat.Cerberus;
-			playerTracker.LogGameRoundStart(World.Name, string.Empty, 0);
-			eacScout = new Scout();
+			EOS.Initialize(isServer: true, ConVar.Server.anticheatid, ConVar.Server.anticheatkey, ConVar.Server.rootFolder + "/Log.EAC.txt");
+			Interface = EOS.Interface.GetAntiCheatServerInterface();
+			AddNotifyClientActionRequiredOptions options = default(AddNotifyClientActionRequiredOptions);
+			Interface.AddNotifyClientActionRequired(ref options, null, OnClientActionRequired);
+			AddNotifyClientAuthStatusChangedOptions options2 = default(AddNotifyClientAuthStatusChangedOptions);
+			Interface.AddNotifyClientAuthStatusChanged(ref options2, null, OnClientAuthStatusChanged);
+			AddNotifyMessageToClientOptions options3 = default(AddNotifyMessageToClientOptions);
+			Interface.AddNotifyMessageToClient(ref options3, null, SendToClient);
+			BeginSessionOptions beginSessionOptions = default(BeginSessionOptions);
+			beginSessionOptions.LocalUserId = null;
+			beginSessionOptions.EnableGameplayData = CanSendAnalytics;
+			beginSessionOptions.RegisterTimeoutSeconds = 20u;
+			beginSessionOptions.ServerName = ConVar.Server.hostname;
+			BeginSessionOptions options4 = beginSessionOptions;
+			Interface.BeginSession(ref options4);
+			LogGameRoundStartOptions logGameRoundStartOptions = default(LogGameRoundStartOptions);
+			logGameRoundStartOptions.LevelName = World.Name;
+			LogGameRoundStartOptions options5 = logGameRoundStartOptions;
+			Interface.LogGameRoundStart(ref options5);
+		}
+		else
+		{
+			client2connection.Clear();
+			connection2client.Clear();
+			connection2status.Clear();
 		}
 	}
 
 	public static void DoUpdate()
 	{
-		if (easyAntiCheat == null)
+		if (ConVar.Server.secure && !Application.isEditor)
 		{
-			return;
-		}
-		easyAntiCheat.HandleClientUpdates();
-		if (Network.Net.sv != null && Network.Net.sv.IsConnected())
-		{
-			EasyAntiCheat.Server.Hydra.Client client;
-			byte[] messageBuffer;
-			int messageLength;
-			while (easyAntiCheat.PopNetworkMessage(out client, out messageBuffer, out messageLength))
-			{
-				SendToClient(client, messageBuffer, messageLength);
-			}
+			EOS.Tick();
 		}
 	}
 
 	public static void DoShutdown()
 	{
-		client2connection.Clear();
-		connection2client.Clear();
-		connection2status.Clear();
-		if (eacScout != null)
+		if (ConVar.Server.secure && !Application.isEditor)
 		{
-			Debug.Log("EasyAntiCheat Scout Shutting Down");
-			eacScout.Dispose();
-			eacScout = null;
+			client2connection.Clear();
+			connection2client.Clear();
+			connection2status.Clear();
+			if (Interface != null)
+			{
+				Debug.Log("EasyAntiCheat Server Shutting Down");
+				EndSessionOptions options = default(EndSessionOptions);
+				Interface.EndSession(ref options);
+				Interface = null;
+			}
+			EOS.Shutdown();
 		}
-		if (easyAntiCheat != null)
+		else
 		{
-			Debug.Log("EasyAntiCheat Server Shutting Down");
-			easyAntiCheat.Dispose();
-			easyAntiCheat = null;
+			client2connection.Clear();
+			connection2client.Clear();
+			connection2status.Clear();
 		}
 	}
 
 	public static void OnLeaveGame(Connection connection)
 	{
-		if (easyAntiCheat != null)
+		if (ConVar.Server.secure && !Application.isEditor)
 		{
-			EasyAntiCheat.Server.Hydra.Client client = GetClient(connection);
-			easyAntiCheat.UnregisterClient(client);
-			client2connection.Remove(client);
-			connection2client.Remove(connection);
+			if (Interface != null)
+			{
+				IntPtr client = GetClient(connection);
+				UnregisterClientOptions unregisterClientOptions = default(UnregisterClientOptions);
+				unregisterClientOptions.ClientHandle = client;
+				UnregisterClientOptions options = unregisterClientOptions;
+				Interface.UnregisterClient(ref options);
+				client2connection.Remove(client);
+				connection2client.Remove(connection);
+				connection2status.Remove(connection);
+			}
+		}
+		else
+		{
 			connection2status.Remove(connection);
 		}
 	}
 
 	public static void OnJoinGame(Connection connection)
 	{
-		if (easyAntiCheat != null)
+		if (ConVar.Server.secure && !Application.isEditor)
 		{
-			EasyAntiCheat.Server.Hydra.Client client = easyAntiCheat.GenerateCompatibilityClient();
-			easyAntiCheat.RegisterClient(client, connection.userid.ToString(), connection.ipaddress, connection.ownerid.ToString(), connection.username, (connection.authLevel != 0) ? PlayerRegisterFlags.PlayerRegisterFlagAdmin : PlayerRegisterFlags.PlayerRegisterFlagNone);
-			client2connection.Add(client, connection);
-			connection2client.Add(connection, client);
-			connection2status.Add(connection, ClientStatus.Reserved);
-			if (ShouldIgnore(connection))
+			if (Interface != null)
 			{
-				OnAuthenticatedLocal(connection);
-				OnAuthenticatedRemote(connection);
+				IntPtr intPtr = GenerateCompatibilityClient();
+				RegisterClientOptions registerClientOptions = default(RegisterClientOptions);
+				registerClientOptions.ClientHandle = intPtr;
+				registerClientOptions.AccountId = connection.userid.ToString();
+				registerClientOptions.IpAddress = connection.IPAddressWithoutPort();
+				registerClientOptions.ClientType = ((connection.authLevel >= 3 && connection.os == "editor") ? AntiCheatCommonClientType.UnprotectedClient : AntiCheatCommonClientType.ProtectedClient);
+				registerClientOptions.ClientPlatform = ((connection.os == "windows") ? AntiCheatCommonClientPlatform.Windows : ((connection.os == "linux") ? AntiCheatCommonClientPlatform.Linux : ((connection.os == "mac") ? AntiCheatCommonClientPlatform.Mac : AntiCheatCommonClientPlatform.Unknown)));
+				RegisterClientOptions options = registerClientOptions;
+				Interface.RegisterClient(ref options);
+				SetClientDetailsOptions setClientDetailsOptions = default(SetClientDetailsOptions);
+				setClientDetailsOptions.ClientHandle = intPtr;
+				setClientDetailsOptions.ClientFlags = ((connection.authLevel != 0) ? AntiCheatCommonClientFlags.Admin : AntiCheatCommonClientFlags.None);
+				SetClientDetailsOptions options2 = setClientDetailsOptions;
+				Interface.SetClientDetails(ref options2);
+				client2connection.Add(intPtr, connection);
+				connection2client.Add(connection, intPtr);
+				connection2status.Add(connection, AntiCheatCommonClientAuthStatus.Invalid);
 			}
 		}
 		else
 		{
+			connection2status.Add(connection, AntiCheatCommonClientAuthStatus.Invalid);
 			OnAuthenticatedLocal(connection);
 			OnAuthenticatedRemote(connection);
 		}
@@ -245,19 +332,27 @@ public static class EACServer
 
 	public static void OnStartLoading(Connection connection)
 	{
-		if (easyAntiCheat != null)
+		if (Interface != null)
 		{
-			EasyAntiCheat.Server.Hydra.Client client = GetClient(connection);
-			easyAntiCheat.SetClientNetworkState(client, networkActive: false);
+			IntPtr client = GetClient(connection);
+			SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
+			setClientNetworkStateOptions.ClientHandle = client;
+			setClientNetworkStateOptions.IsNetworkActive = false;
+			SetClientNetworkStateOptions options = setClientNetworkStateOptions;
+			Interface.SetClientNetworkState(ref options);
 		}
 	}
 
 	public static void OnFinishLoading(Connection connection)
 	{
-		if (easyAntiCheat != null)
+		if (Interface != null)
 		{
-			EasyAntiCheat.Server.Hydra.Client client = GetClient(connection);
-			easyAntiCheat.SetClientNetworkState(client, networkActive: true);
+			IntPtr client = GetClient(connection);
+			SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
+			setClientNetworkStateOptions.ClientHandle = client;
+			setClientNetworkStateOptions.IsNetworkActive = true;
+			SetClientNetworkStateOptions options = setClientNetworkStateOptions;
+			Interface.SetClientNetworkState(ref options);
 		}
 	}
 
@@ -268,10 +363,14 @@ public static class EACServer
 			Debug.LogError("EAC network packet from invalid connection: " + message.connection.userid);
 			return;
 		}
-		EasyAntiCheat.Server.Hydra.Client client = GetClient(message.connection);
+		IntPtr client = GetClient(message.connection);
 		if (message.read.TemporaryBytesWithSize(out var buffer, out var size))
 		{
-			easyAntiCheat.PushNetworkMessage(client, buffer, size);
+			ReceiveMessageFromClientOptions receiveMessageFromClientOptions = default(ReceiveMessageFromClientOptions);
+			receiveMessageFromClientOptions.ClientHandle = client;
+			receiveMessageFromClientOptions.Data = new ArraySegment<byte>(buffer, 0, size);
+			ReceiveMessageFromClientOptions options = receiveMessageFromClientOptions;
+			Interface.ReceiveMessageFromClient(ref options);
 		}
 	}
 }

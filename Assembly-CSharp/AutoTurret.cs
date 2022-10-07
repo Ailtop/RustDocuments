@@ -1067,7 +1067,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 				{
 					if (item.info == attachedWeapon.primaryMagazine.ammoType)
 					{
-						num += item.info.stackable - item.amount;
+						num += item.MaxStackable() - item.amount;
 					}
 				}
 				flag = num >= attachedWeapon.primaryMagazine.contents;
@@ -1538,7 +1538,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return 0u;
 	}
 
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
 		bool num = item.info.category == ItemCategory.Weapon;
 		bool flag = item.info.category == ItemCategory.Ammunition;
@@ -1548,9 +1548,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 		if (flag)
 		{
-			for (int i = 1; i < container.capacity; i++)
+			for (int i = 1; i < base.inventory.capacity; i++)
 			{
-				if (!container.SlotTaken(item, i))
+				if (!base.inventory.SlotTaken(item, i))
 				{
 					return i;
 				}

@@ -155,7 +155,7 @@ public class Recycler : StorageContainer
 					num = i;
 					break;
 				}
-				int num2 = Mathf.Min(slot.info.stackable - slot.amount, newItem.amount);
+				int num2 = Mathf.Min(slot.MaxStackable() - slot.amount, newItem.amount);
 				newItem.UseItem(num2);
 				slot.amount += num2;
 				slot.MarkDirty();
@@ -225,7 +225,7 @@ public class Recycler : StorageContainer
 				int num3 = 1;
 				if (slot.amount > 1)
 				{
-					num3 = Mathf.CeilToInt(Mathf.Min(slot.amount, (float)slot.info.stackable * 0.1f));
+					num3 = Mathf.CeilToInt(Mathf.Min(slot.amount, (float)slot.MaxStackable() * 0.1f));
 				}
 				object obj = Interface.CallHook("OnItemRecycleAmount", slot, num3, this);
 				if (obj is int)
@@ -235,7 +235,7 @@ public class Recycler : StorageContainer
 				if (slot.info.Blueprint.scrapFromRecycle > 0)
 				{
 					int num4 = slot.info.Blueprint.scrapFromRecycle * num3;
-					if (slot.info.stackable == 1 && slot.hasCondition)
+					if (slot.MaxStackable() == 1 && slot.hasCondition)
 					{
 						num4 = Mathf.CeilToInt((float)num4 * slot.conditionNormalized);
 					}

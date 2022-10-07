@@ -391,9 +391,9 @@ public class IOEntity : DecayEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(6f)]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

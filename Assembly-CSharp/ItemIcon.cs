@@ -48,6 +48,8 @@ public class ItemIcon : BaseMonoBehaviour, IPointerClickHandler, IEventSystemHan
 
 	public Image backgroundUnderlayImage;
 
+	public Image progressPanel;
+
 	public Sprite emptySlotBackgroundSprite;
 
 	public CanvasGroup conditionObject;

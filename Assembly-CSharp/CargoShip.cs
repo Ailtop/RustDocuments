@@ -196,7 +196,7 @@ public class CargoShip : BaseEntity
 				baseEntity.SetParent(this, worldPositionStays: true);
 				baseEntity.Spawn();
 				RHIB component = baseEntity.GetComponent<RHIB>();
-				component.rigidBody.isKinematic = true;
+				component.SetToKinematic();
 				if ((bool)component)
 				{
 					component.AddFuel(50);
@@ -235,7 +235,7 @@ public class CargoShip : BaseEntity
 			Vector3 b = base.transform.InverseTransformPoint(escapeBoatPoint.transform.position);
 			if (Vector3.Distance(localPosition, b) < 1f)
 			{
-				rHIB.rigidBody.isKinematic = true;
+				rHIB.SetToKinematic();
 			}
 		}
 	}

@@ -215,7 +215,7 @@ public class TechTreeData : ScriptableObject
 			{
 				if (!(item.itemDef == null) && !HasPlayerUnlocked(player, item))
 				{
-					num2 += ResearchTable.ScrapForResearch(item.itemDef);
+					num2 += ResearchTable.ScrapForResearch(item.itemDef, ResearchTable.ResearchType.TechTree);
 				}
 			}
 			if (num2 < num)

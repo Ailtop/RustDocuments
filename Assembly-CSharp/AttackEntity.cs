@@ -1,4 +1,5 @@
 using ConVar;
+using Oxide.Core;
 using UnityEngine;
 
 public class AttackEntity : HeldEntity
@@ -50,7 +51,7 @@ public class AttackEntity : HeldEntity
 
 	public float NextAttackTime => nextAttackTime;
 
-	public virtual Vector3 GetInheritedVelocity(BasePlayer player)
+	public virtual Vector3 GetInheritedVelocity(BasePlayer player, Vector3 direction)
 	{
 		return Vector3.zero;
 	}
@@ -210,6 +211,11 @@ public class AttackEntity : HeldEntity
 
 	protected bool ValidateEyePos(BasePlayer player, Vector3 eyePos)
 	{
+		object obj = Interface.CallHook("OnEyePosValidate", this, player, eyePos);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		bool flag = true;
 		if (eyePos.IsNaNOrInfinity())
 		{

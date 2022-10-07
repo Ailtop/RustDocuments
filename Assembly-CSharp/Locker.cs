@@ -195,7 +195,7 @@ public class Locker : StorageContainer
 		}
 	}
 
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
 		if (item.info.category == ItemCategory.Attire)
 		{
@@ -203,7 +203,7 @@ public class Locker : StorageContainer
 		}
 		for (int i = 0; i < inventorySlots; i++)
 		{
-			if (GetRowType(i) == RowType.Belt && !container.SlotTaken(item, i))
+			if (GetRowType(i) == RowType.Belt && !base.inventory.SlotTaken(item, i))
 			{
 				return i;
 			}

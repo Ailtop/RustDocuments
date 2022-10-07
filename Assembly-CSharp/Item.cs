@@ -56,6 +56,8 @@ public class Item
 
 	public string text;
 
+	public float cookTimeLeft;
+
 	public Flag flags;
 
 	public ItemContainer contents;
@@ -586,7 +588,7 @@ public class Item
 		return false;
 	}
 
-	public bool CanMoveTo(ItemContainer newcontainer, int iTargetPos = -1, bool allowStack = true)
+	public bool CanMoveTo(ItemContainer newcontainer, int iTargetPos = -1)
 	{
 		if (IsChildContainer(newcontainer))
 		{
@@ -611,25 +613,31 @@ public class Item
 	{
 		using (TimeWarning.New("MoveToContainer"))
 		{
+			bool flag = iTargetPos == -1;
 			ItemContainer itemContainer = parent;
-			bool flag = default(bool);
+			IItemContainerEntity itemContainerEntity = default(IItemContainerEntity);
+			Item slot = default(Item);
 			if (iTargetPos == -1)
 			{
 				if (allowStack && info.stackable > 1)
 				{
-					foreach (Item item3 in from x in newcontainer.FindItemsByItemID(info.itemid)
-						orderby x.amount
+					foreach (Item item2 in from x in newcontainer.FindItemsByItemID(info.itemid)
+						orderby x.position
 						select x)
 					{
-						if (item3.CanStack(this) && item3.amount < item3.MaxStackable())
+						if (item2.CanStack(this) && (ignoreStackLimit || item2.amount < item2.MaxStackable()))
 						{
-							iTargetPos = item3.position;
+							iTargetPos = item2.position;
 						}
 					}
 				}
-				if (iTargetPos == -1 && newcontainer.GetEntityOwner() is IItemContainerEntity itemContainerEntity)
+				if (iTargetPos == -1)
 				{
-					iTargetPos = itemContainerEntity.GetIdealSlot(sourcePlayer, newcontainer, this);
+					itemContainerEntity = newcontainer.GetEntityOwner() as IItemContainerEntity;
+					if (itemContainerEntity != null)
+					{
+						iTargetPos = itemContainerEntity.GetIdealSlot(sourcePlayer, this);
+					}
 				}
 				if (iTargetPos == -1)
 				{
@@ -637,30 +645,33 @@ public class Item
 					{
 						return false;
 					}
-					flag = newcontainer.HasFlag(ItemContainer.Flag.Clothing) && info.isWearable;
+					bool flag2 = newcontainer.HasFlag(ItemContainer.Flag.Clothing) && info.isWearable;
 					ItemModWearable itemModWearable = info.ItemModWearable;
 					for (int i = 0; i < newcontainer.capacity; i++)
 					{
-						Item slot = newcontainer.GetSlot(i);
-						if (slot == null)
+						slot = newcontainer.GetSlot(i);
+						if (slot == null && CanMoveTo(newcontainer, i))
 						{
 							iTargetPos = i;
 							break;
 						}
-						if (flag && slot != null && !slot.info.ItemModWearable.CanExistWith(itemModWearable))
+						if (flag2 && slot != null && !slot.info.ItemModWearable.CanExistWith(itemModWearable))
 						{
 							iTargetPos = i;
 							break;
 						}
 					}
-					_ = -1;
-				}
-				if (iTargetPos == -1)
-				{
-					return false;
+					if (flag2 && iTargetPos == -1)
+					{
+						iTargetPos = newcontainer.capacity - 1;
+					}
 				}
 			}
-			if (!CanMoveTo(newcontainer, iTargetPos, allowStack))
+			if (iTargetPos == -1)
+			{
+				return false;
+			}
+			if (!CanMoveTo(newcontainer, iTargetPos))
 			{
 				return false;
 			}
@@ -684,31 +695,24 @@ public class Item
 						{
 							return false;
 						}
-						slot2.amount += amount;
+						int num2 = Mathf.Min(num - slot2.amount, amount);
+						slot2.amount += num2;
+						amount -= num2;
 						slot2.MarkDirty();
-						RemoveFromWorld();
-						RemoveFromContainer();
-						Remove();
-						int num2 = slot2.amount - num;
-						if (num2 > 0)
+						MarkDirty();
+						if (amount <= 0)
 						{
-							Item item = slot2.SplitItem(num2);
-							if (item != null && !item.MoveToContainer(newcontainer, -1, allowStack, ignoreStackLimit, sourcePlayer) && (itemContainer == null || !item.MoveToContainer(itemContainer, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer)))
-							{
-								BasePlayer basePlayer = newcontainer.GetEntityOwner() as BasePlayer;
-								if (basePlayer != null)
-								{
-									basePlayer.GiveItem(item);
-								}
-								else
-								{
-									item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
-								}
-							}
-							slot2.amount = num;
+							RemoveFromWorld();
+							RemoveFromContainer();
+							Remove();
+							return true;
 						}
-						bool result = true;
-						Interface.CallHook("OnItemStacked", slot2, this, newcontainer);
+						if (flag)
+						{
+							return MoveToContainer(newcontainer, -1, allowStack, ignoreStackLimit, sourcePlayer);
+						}
+						bool result = false;
+						Interface.CallHook("OnItemStacked", slot, this, newcontainer);
 						return result;
 					}
 				}
@@ -739,13 +743,13 @@ public class Item
 			}
 			if (newcontainer.maxStackSize > 0 && newcontainer.maxStackSize < amount)
 			{
-				Item item2 = SplitItem(newcontainer.maxStackSize);
-				if (item2 != null && !item2.MoveToContainer(newcontainer, iTargetPos, allowStack: false, ignoreStackLimit: false, sourcePlayer) && (itemContainer == null || !item2.MoveToContainer(itemContainer, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer)))
+				Item item = SplitItem(newcontainer.maxStackSize);
+				if (item != null && !item.MoveToContainer(newcontainer, iTargetPos, allowStack: false, ignoreStackLimit: false, sourcePlayer) && (itemContainer == null || !item.MoveToContainer(itemContainer, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer)))
 				{
-					item2.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
+					item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
 				}
 				bool result = true;
-				Interface.CallHook("OnItemStacked", flag, this, newcontainer);
+				Interface.CallHook("OnItemStacked", itemContainerEntity, this, newcontainer);
 				return result;
 			}
 			if (!newcontainer.CanAccept(this))
@@ -959,11 +963,11 @@ public class Item
 		{
 			return false;
 		}
-		if (info.stackable <= 1)
+		if (MaxStackable() <= 1)
 		{
 			return false;
 		}
-		if (item.info.stackable <= 1)
+		if (item.MaxStackable() <= 1)
 		{
 			return false;
 		}
@@ -1217,6 +1221,7 @@ public class Item
 		item.skinid = skin;
 		item.name = name;
 		item.text = text;
+		item.cooktime = cookTimeLeft;
 		if (hasCondition)
 		{
 			item.conditionData = Facepunch.Pool.Get<ProtoBuf.Item.ConditionData>();
@@ -1239,6 +1244,7 @@ public class Item
 		uid = load.UID;
 		name = load.name;
 		text = load.text;
+		cookTimeLeft = load.cooktime;
 		amount = load.amount;
 		position = load.slot;
 		busyTime = load.locktime;

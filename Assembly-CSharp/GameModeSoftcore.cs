@@ -58,7 +58,7 @@ public class GameModeSoftcore : GameModeVanilla
 		{
 			int index = Random.Range(0, obj.Count);
 			Item item = from.GetSlot(obj[index]);
-			if (item.info.stackable > 1)
+			if (item.MaxStackable() > 1)
 			{
 				foreach (Item item2 in from.itemList)
 				{

@@ -28,6 +28,8 @@ public class ItemDefinition : MonoBehaviour
 		[Tooltip("If true, never lose max condition when repaired")]
 		public bool maintainMaxCondition;
 
+		public bool ovenCondition;
+
 		public WorldSpawnCondition foundCondition;
 	}
 
@@ -94,8 +96,6 @@ public class ItemDefinition : MonoBehaviour
 	public bool spawnAsBlueprint;
 
 	[Header("Sounds")]
-	public SoundDefinition inventorySelectSound;
-
 	public SoundDefinition inventoryGrabSound;
 
 	public SoundDefinition inventoryDropSound;

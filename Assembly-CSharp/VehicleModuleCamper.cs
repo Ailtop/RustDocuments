@@ -379,6 +379,10 @@ public class VehicleModuleCamper : VehicleModuleSeating
 
 	public override bool CanBeLooted(BasePlayer player)
 	{
+		if (base.IsOnAVehicle && base.Vehicle.IsDead())
+		{
+			return base.CanBeLooted(player);
+		}
 		if (base.CanBeLooted(player))
 		{
 			return IsOnThisModule(player);

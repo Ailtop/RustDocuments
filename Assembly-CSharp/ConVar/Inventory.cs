@@ -105,6 +105,9 @@ public class Inventory : ConsoleSystem
 
 	private const string LoadoutDirectory = "loadouts";
 
+	[ServerVar(Help = "Disables all attire limitations, so NPC clothing and invalid overlaps can be equipped")]
+	public static bool disableAttireLimitations;
+
 	[ServerUserVar]
 	public static void lighttoggle(Arg arg)
 	{
@@ -409,24 +412,50 @@ public class Inventory : ConsoleSystem
 	public static void deployLoadout(Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		if ((basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic) && !(basePlayer == null))
+		if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
 		{
 			string @string = arg.GetString(0);
-			BasePlayer playerOrSleeperOrBot = ArgEx.GetPlayerOrSleeperOrBot(arg, 1);
-			SavedLoadout so;
-			if (playerOrSleeperOrBot == null)
+			BasePlayer basePlayer2 = ArgEx.GetPlayerOrSleeperOrBot(arg, 1);
+			if (basePlayer2 == null)
 			{
-				arg.ReplyWith("Could not find player " + arg.GetString(1));
+				basePlayer2 = basePlayer;
+			}
+			SavedLoadout so;
+			if (basePlayer2 == null)
+			{
+				arg.ReplyWith("Could not find player " + arg.GetString(1) + " and no local player available");
 			}
 			else if (LoadLoadout(@string, out so))
 			{
-				so.LoadItemsOnTo(playerOrSleeperOrBot);
-				arg.ReplyWith("Deployed loadout " + @string + " to " + playerOrSleeperOrBot.displayName);
+				so.LoadItemsOnTo(basePlayer2);
+				arg.ReplyWith("Deployed loadout " + @string + " to " + basePlayer2.displayName);
 			}
 			else
 			{
 				arg.ReplyWith("Could not find loadout " + @string);
 			}
+		}
+	}
+
+	[ServerVar(Help = "Clears the inventory of a target player. eg. inventory.clearInventory jim")]
+	public static void clearInventory(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
+		{
+			BasePlayer basePlayer2 = ArgEx.GetPlayerOrSleeperOrBot(arg, 0);
+			if (basePlayer2 == null)
+			{
+				basePlayer2 = basePlayer;
+			}
+			if (basePlayer2 == null)
+			{
+				arg.ReplyWith("Could not find player " + arg.GetString(1) + " and no local player available");
+				return;
+			}
+			basePlayer2.inventory.containerBelt.Clear();
+			basePlayer2.inventory.containerWear.Clear();
+			basePlayer2.inventory.containerMain.Clear();
 		}
 	}
 

@@ -432,13 +432,21 @@ public class MotorRowboat : BaseBoat
 			SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), recursive: false, networkupdate: false);
-			SetFlag(Flags.Reserved7, GetLocalVelocity().sqrMagnitude < 0.5f && !AnyMounted(), recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved8, base.RecentlyPushed, recursive: false, networkupdate: false);
 			if (num != flags)
 			{
 				Invoke(base.SendNetworkUpdate_Flags, 0f);
 			}
 		}
+	}
+
+	protected override bool DetermineIfStationary()
+	{
+		if (GetLocalVelocity().sqrMagnitude < 0.5f)
+		{
+			return !AnyMounted();
+		}
+		return false;
 	}
 
 	public override void SeatClippedWorld(BaseMountable mountable)

@@ -12,6 +12,13 @@ using UnityEngine;
 [Serializable]
 public class BaseGameMode : BaseEntity
 {
+	public struct ResearchCostResult
+	{
+		public float? Scale;
+
+		public int? Amount;
+	}
+
 	public struct CanAssignBedResult
 	{
 		public bool Result;
@@ -554,6 +561,11 @@ public class BaseGameMode : BaseEntity
 		gameModeTags.Add("missions-" + (missionSystem ? "enabled" : "disabled"));
 		gameModeTags.Add("mlrs-" + (mlrs ? "enabled" : "disabled"));
 		gameModeTags.Add("map-" + (ingameMap ? "enabled" : "disabled"));
+	}
+
+	public virtual ResearchCostResult GetScrapCostForResearch(ItemDefinition item, ResearchTable.ResearchType researchType)
+	{
+		return default(ResearchCostResult);
 	}
 
 	public virtual float? EvaluateSleepingBagReset(SleepingBag bag, Vector3 position, SleepingBag.SleepingBagResetReason reason)

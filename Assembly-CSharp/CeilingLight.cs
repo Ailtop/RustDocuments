@@ -41,7 +41,7 @@ public class CeilingLight : IOEntity
 	public void RefreshGrowables()
 	{
 		List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
-		Vis.Entities(base.transform.position + new Vector3(0f, 0f - ConVar.Server.ceilingLightHeightOffset, 0f), ConVar.Server.ceilingLightGrowableRange, obj, 512);
+		Vis.Entities(base.transform.position + new Vector3(0f, 0f - ConVar.Server.ceilingLightHeightOffset, 0f), ConVar.Server.ceilingLightGrowableRange, obj, 67108864);
 		List<PlanterBox> obj2 = Facepunch.Pool.GetList<PlanterBox>();
 		foreach (GrowableEntity item in obj)
 		{

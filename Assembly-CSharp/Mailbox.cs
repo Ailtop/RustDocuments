@@ -218,7 +218,7 @@ public class Mailbox : StorageContainer
 		return false;
 	}
 
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
 		if (player == null || PlayerIsOwner(player))
 		{

@@ -84,15 +84,6 @@ public class VehicleModuleStorage : VehicleModuleSeating
 		storageUnitInstance.uid = info.msg.simpleUID.uid;
 	}
 
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		if (!base.IsOnAVehicle)
-		{
-			return false;
-		}
-		return base.Vehicle.CanBeLooted(player);
-	}
-
 	public override void Spawn()
 	{
 		base.Spawn();

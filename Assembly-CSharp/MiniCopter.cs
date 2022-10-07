@@ -460,6 +460,16 @@ public class MiniCopter : BaseHelicopterVehicle, IEngineControllerUser, IEntity,
 		return false;
 	}
 
+	public override float InheritedVelocityScale()
+	{
+		return 1f;
+	}
+
+	public override bool InheritedVelocityDirection()
+	{
+		return false;
+	}
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("MiniCopter.OnRpcMessage"))

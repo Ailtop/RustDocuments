@@ -52,17 +52,25 @@ public class TrainCouplingController
 		return true;
 	}
 
-	public void Touched(TrainCar them, TriggerTrainCollisions.Location ourLocation)
+	public bool TryCouple(TrainCar them, TriggerTrainCollisions.Location ourLocation)
 	{
 		TrainCoupling trainCoupling = ((ourLocation == TriggerTrainCollisions.Location.Front) ? frontCoupling : rearCoupling);
-		if (!trainCoupling.isValid || (float)trainCoupling.timeSinceCouplingBlock < 1.5f)
+		if (!trainCoupling.isValid)
 		{
-			return;
+			return false;
+		}
+		if (trainCoupling.IsCoupled)
+		{
+			return false;
+		}
+		if ((float)trainCoupling.timeSinceCouplingBlock < 1.5f)
+		{
+			return false;
 		}
 		float num = Vector3.Angle(owner.transform.forward, them.transform.forward);
 		if (num > 25f && num < 155f)
 		{
-			return;
+			return false;
 		}
 		bool num2 = num < 90f;
 		TrainCoupling trainCoupling2 = ((!num2) ? ((ourLocation == TriggerTrainCollisions.Location.Front) ? them.coupling.frontCoupling : them.coupling.rearCoupling) : ((ourLocation == TriggerTrainCollisions.Location.Front) ? them.coupling.rearCoupling : them.coupling.frontCoupling));
@@ -75,16 +83,23 @@ public class TrainCouplingController
 		{
 			trainCoupling.timeSinceCouplingBlock = 0f;
 			trainCoupling2.timeSinceCouplingBlock = 0f;
+			return false;
 		}
-		else if (trainCoupling2.isValid && !(Vector3.SqrMagnitude(trainCoupling.couplingPoint.position - trainCoupling2.couplingPoint.position) > 0.5f))
+		if (!trainCoupling2.isValid)
 		{
-			TrainTrackSpline frontTrackSection = owner.FrontTrackSection;
-			TrainTrackSpline frontTrackSection2 = them.FrontTrackSection;
-			if (!(frontTrackSection2 != frontTrackSection) || frontTrackSection.HasConnectedTrack(frontTrackSection2))
-			{
-				trainCoupling.TryCouple(trainCoupling2, reflect: true);
-			}
+			return false;
 		}
+		if (Vector3.SqrMagnitude(trainCoupling.couplingPoint.position - trainCoupling2.couplingPoint.position) > 0.5f)
+		{
+			return false;
+		}
+		TrainTrackSpline frontTrackSection = owner.FrontTrackSection;
+		TrainTrackSpline frontTrackSection2 = them.FrontTrackSection;
+		if (frontTrackSection2 != frontTrackSection && !frontTrackSection.HasConnectedTrack(frontTrackSection2))
+		{
+			return false;
+		}
+		return trainCoupling.TryCouple(trainCoupling2, reflect: true);
 	}
 
 	public void Uncouple(bool front)

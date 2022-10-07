@@ -458,7 +458,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 		}
 	}
 
-	public virtual int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public virtual int GetIdealSlot(BasePlayer player, Item item)
 	{
 		return -1;
 	}

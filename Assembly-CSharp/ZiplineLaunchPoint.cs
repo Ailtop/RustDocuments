@@ -368,7 +368,7 @@ public class ZiplineLaunchPoint : BaseEntity
 			}
 			float num2 = Mathf.Abs(vector5.y) + 2f;
 			float z = Vector3.Distance(vector3, vector4);
-			Vector3 vector9 = (longCollider.size = (spawnBlocker.BoxCollider.size = new Vector3(0.5f, num2, z)));
+			Vector3 vector9 = (longCollider.size = (spawnBlocker.BoxCollider.size = new Vector3(0.5f, num2, z) + Vector3.one));
 			vector9 = (longCollider.center = (spawnBlocker.BoxCollider.center = new Vector3(0f, 0f - num2 * 0.5f, 0f)));
 			longCollider.gameObject.SetActive(value: true);
 			pointCollider.transform.position = linePoints[endIndex];

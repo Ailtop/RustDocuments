@@ -250,7 +250,7 @@ public class Chat : ConsoleSystem
 		}
 		case ChatChannel.Global:
 			ConsoleNetwork.BroadcastToAllClients("chat.add2", 0, userId, text, text4, text3, 1f);
-			break;
+			return true;
 		case ChatChannel.Local:
 		{
 			if (!(player != null))

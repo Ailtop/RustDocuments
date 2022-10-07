@@ -11,10 +11,10 @@ public class SpawnPopulation : BaseScriptableObject
 
 	public GameObjectRef[] ResourceList;
 
-	[Tooltip("Usually per square km")]
 	[Header("Spawn Info")]
-	[FormerlySerializedAs("TargetDensity")]
+	[Tooltip("Usually per square km")]
 	[SerializeField]
+	[FormerlySerializedAs("TargetDensity")]
 	public float _targetDensity = 1f;
 
 	public float SpawnRate = 1f;
@@ -42,6 +42,8 @@ public class SpawnPopulation : BaseScriptableObject
 	public SpawnFilter Filter = new SpawnFilter();
 
 	public float FilterCutoff;
+
+	public float FilterRadius;
 
 	public Prefab<Spawnable>[] Prefabs;
 

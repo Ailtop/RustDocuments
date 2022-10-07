@@ -169,6 +169,7 @@ public class RidableHorse : BaseRidableAnimal
 		riderProtection = ScriptableObject.CreateInstance<ProtectionProperties>();
 		baseProtection = ScriptableObject.CreateInstance<ProtectionProperties>();
 		baseProtection.Add(baseHorseProtection, 1f);
+		EquipmentUpdate();
 	}
 
 	public override void PlayerMounted(BasePlayer player, BaseMountable seat)
@@ -297,16 +298,12 @@ public class RidableHorse : BaseRidableAnimal
 	public override bool CanAnimalAcceptItem(Item item, int targetSlot)
 	{
 		ItemModAnimalEquipment component = item.info.GetComponent<ItemModAnimalEquipment>();
-		if (targetSlot == -1 && !component)
+		if (targetSlot >= 0 && targetSlot < numEquipmentSlots && !component)
 		{
-			return true;
+			return false;
 		}
 		if (targetSlot < numEquipmentSlots)
 		{
-			if (component == null)
-			{
-				return false;
-			}
 			if (component.slot == ItemModAnimalEquipment.SlotType.Basic)
 			{
 				return true;

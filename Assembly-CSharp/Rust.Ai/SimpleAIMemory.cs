@@ -157,4 +157,20 @@ public class SimpleAIMemory
 	{
 		PlayerIgnoreList.Remove(player);
 	}
+
+	public static void ClearIgnoredPlayers()
+	{
+		PlayerIgnoreList.Clear();
+	}
+
+	public static string GetIgnoredPlayers()
+	{
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("Name", "Steam ID");
+		foreach (BasePlayer playerIgnore in PlayerIgnoreList)
+		{
+			textTable.AddRow(playerIgnore.displayName, playerIgnore.userID.ToString());
+		}
+		return textTable.ToString();
+	}
 }

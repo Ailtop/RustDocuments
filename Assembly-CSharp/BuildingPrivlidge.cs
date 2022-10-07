@@ -679,19 +679,19 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
 		if (item != null && item.info != null && allowedConstructionItems.Contains(item.info))
 		{
 			for (int i = 24; i <= 27; i++)
 			{
-				if (container.GetSlot(i) == null)
+				if (base.inventory.GetSlot(i) == null)
 				{
 					return i;
 				}
 			}
 		}
-		return base.GetIdealSlot(player, container, item);
+		return base.GetIdealSlot(player, item);
 	}
 
 	public override bool HasSlot(Slot slot)

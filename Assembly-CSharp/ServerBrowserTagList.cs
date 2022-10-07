@@ -1,15 +1,16 @@
-using Facepunch;
 using UnityEngine;
 
 public class ServerBrowserTagList : MonoBehaviour
 {
-	private ServerBrowserTag[] _allTags;
+	public int maxTagsToShow = 3;
+
+	private ServerBrowserTagGroup[] _groups;
 
 	private void Initialize()
 	{
-		if (_allTags == null)
+		if (_groups == null)
 		{
-			_allTags = GetComponentsInChildren<ServerBrowserTag>();
+			_groups = GetComponentsInChildren<ServerBrowserTagGroup>(includeInactive: true);
 		}
 	}
 
@@ -18,23 +19,15 @@ public class ServerBrowserTagList : MonoBehaviour
 		Initialize();
 	}
 
-	public bool Refresh(ServerInfo server)
+	public bool Refresh(in ServerInfo server)
 	{
 		Initialize();
-		int num = 0;
-		ServerBrowserTag[] allTags = _allTags;
-		foreach (ServerBrowserTag serverBrowserTag in allTags)
+		int tagsEnabled = 0;
+		ServerBrowserTagGroup[] groups = _groups;
+		for (int i = 0; i < groups.Length; i++)
 		{
-			if (num < 3 && serverBrowserTag.Test(in server))
-			{
-				serverBrowserTag.SetActive(active: true);
-				num++;
-			}
-			else
-			{
-				serverBrowserTag.SetActive(active: false);
-			}
+			groups[i].Refresh(in server, ref tagsEnabled, maxTagsToShow);
 		}
-		return num > 0;
+		return tagsEnabled > 0;
 	}
 }

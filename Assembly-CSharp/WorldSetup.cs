@@ -177,9 +177,9 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 			{
 				if (World.Cached)
 				{
-					int heightmapResolution = Mathf.RoundToInt(Mathf.Sqrt(World.GetMap("height").Length / 2));
-					int alphamapResolution = Mathf.RoundToInt(Mathf.Sqrt(World.GetMap("splat").Length / 8));
-					terrain = component2.CreateTerrain(heightmapResolution, alphamapResolution);
+					int cachedHeightMapResolution = World.GetCachedHeightMapResolution();
+					int cachedSplatMapResolution = World.GetCachedSplatMapResolution();
+					terrain = component2.CreateTerrain(cachedHeightMapResolution, cachedSplatMapResolution);
 				}
 				else
 				{

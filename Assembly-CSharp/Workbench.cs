@@ -167,7 +167,7 @@ public class Workbench : StorageContainer
 			}
 			else if (byID.itemDef != null && Interface.CallHook("OnTechTreeNodeUnlock", this, byID, player) == null)
 			{
-				int num2 = ResearchTable.ScrapForResearch(byID.itemDef);
+				int num2 = ResearchTable.ScrapForResearch(byID.itemDef, ResearchTable.ResearchType.TechTree);
 				int itemid = ItemManager.FindItemDefinition("scrap").itemid;
 				if (player.inventory.GetAmount(itemid) >= num2)
 				{

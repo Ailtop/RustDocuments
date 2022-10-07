@@ -2632,17 +2632,26 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return 0f;
 	}
 
-	public virtual Vector3 GetInheritedProjectileVelocity()
+	public virtual bool InheritedVelocityDirection()
+	{
+		return true;
+	}
+
+	public virtual Vector3 GetInheritedProjectileVelocity(Vector3 direction)
 	{
 		BaseEntity baseEntity = parentEntity.Get(base.isServer);
-		if (!(baseEntity != null))
+		if (baseEntity == null)
 		{
 			return Vector3.zero;
 		}
-		return GetParentVelocity() * baseEntity.InheritedVelocityScale();
+		if (baseEntity.InheritedVelocityDirection())
+		{
+			return GetParentVelocity() * baseEntity.InheritedVelocityScale();
+		}
+		return Mathf.Max(Vector3.Dot(GetParentVelocity() * baseEntity.InheritedVelocityScale(), direction), 0f) * direction;
 	}
 
-	public virtual Vector3 GetInheritedThrowVelocity()
+	public virtual Vector3 GetInheritedThrowVelocity(Vector3 direction)
 	{
 		return GetParentVelocity();
 	}

@@ -94,14 +94,14 @@ public class CombatLog
 		{
 			distance = (hitInfo.IsProjectile() ? hitInfo.ProjectileDistance : Vector3.Distance(hitInfo.PointStart, hitInfo.HitPositionWorld));
 		}
-		float health_new = hitEntity?.Health() ?? 0f;
+		float health_new = ((hitEntity != null) ? hitEntity.Health() : 0f);
 		val.time = UnityEngine.Time.realtimeSinceStartup;
-		val.attacker_id = attacker?.net?.ID ?? 0;
-		val.target_id = ((hitEntity?.net != null) ? hitEntity.net.ID : 0u);
+		val.attacker_id = ((attacker != null && attacker.net != null) ? attacker.net.ID : 0u);
+		val.target_id = ((hitEntity != null && hitEntity.net != null) ? hitEntity.net.ID : 0u);
 		val.attacker = ((player == attacker) ? "you" : (attacker?.ShortPrefabName ?? "N/A"));
 		val.target = ((player == hitEntity) ? "you" : (hitEntity?.ShortPrefabName ?? "N/A"));
-		val.weapon = weapon?.name ?? "N/A";
-		val.ammo = projectilePrefab?.name ?? "N/A";
+		val.weapon = ((weapon != null) ? weapon.name : "N/A");
+		val.ammo = ((!(projectilePrefab != null)) ? "N/A" : projectilePrefab?.name);
 		val.bone = hitInfo?.boneName ?? "N/A";
 		val.area = hitInfo?.boneArea ?? ((HitArea)0);
 		val.distance = distance;

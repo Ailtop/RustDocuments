@@ -298,6 +298,18 @@ public class AI : ConsoleSystem
 		}
 	}
 
+	[ServerVar(Help = "Remove all players from the AIs ignore list.")]
+	public static void clearignoredplayers(Arg args)
+	{
+		SimpleAIMemory.ClearIgnoredPlayers();
+	}
+
+	[ServerVar(Help = "Print a lost of all the players in the AI ignore list.")]
+	public static void printignoredplayers(Arg args)
+	{
+		args.ReplyWith(SimpleAIMemory.GetIgnoredPlayers());
+	}
+
 	public static float TickDelta()
 	{
 		return 1f / tickrate;

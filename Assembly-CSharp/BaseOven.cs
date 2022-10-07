@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConVar;
+using Facepunch;
 using Network;
 using Oxide.Core;
+using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -66,7 +68,7 @@ public class BaseOven : StorageContainer, ISplashable
 
 	public int outputSlots = 1;
 
-	public int _activeCookingSlot;
+	public int _activeCookingSlot = -1;
 
 	public int _inputSlotIndex;
 
@@ -132,6 +134,7 @@ public class BaseOven : StorageContainer, ISplashable
 		base.PreInitShared();
 		_inputSlotIndex = fuelSlots;
 		_outputSlotIndex = _inputSlotIndex + inputSlots;
+		_activeCookingSlot = _inputSlotIndex;
 	}
 
 	public override void ServerInit()
@@ -146,6 +149,16 @@ public class BaseOven : StorageContainer, ISplashable
 		if (IsOn())
 		{
 			StartCooking();
+		}
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		if (!info.forDisk)
+		{
+			info.msg.baseOven = Facepunch.Pool.Get<ProtoBuf.BaseOven>();
+			info.msg.baseOven.cookSpeed = GetSmeltingSpeed();
 		}
 	}
 
@@ -165,10 +178,18 @@ public class BaseOven : StorageContainer, ISplashable
 	public override void OnItemAddedOrRemoved(Item item, bool bAdded)
 	{
 		base.OnItemAddedOrRemoved(item, bAdded);
-		if (item != null && item.HasFlag(Item.Flag.OnFire))
+		if (item != null)
 		{
-			item.SetFlag(Item.Flag.OnFire, b: false);
-			item.MarkDirty();
+			ItemModCookable component = item.info.GetComponent<ItemModCookable>();
+			if (component != null)
+			{
+				item.cookTimeLeft = component.cookTime;
+			}
+			if (item.HasFlag(Item.Flag.OnFire))
+			{
+				item.SetFlag(Item.Flag.OnFire, b: false);
+				item.MarkDirty();
+			}
 		}
 	}
 
@@ -232,7 +253,7 @@ public class BaseOven : StorageContainer, ISplashable
 		return new MinMax(_outputSlotIndex, _outputSlotIndex + outputSlots - 1);
 	}
 
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
 		MinMax? allowedSlots = GetAllowedSlots(item);
 		if (!allowedSlots.HasValue)
@@ -241,13 +262,13 @@ public class BaseOven : StorageContainer, ISplashable
 		}
 		for (int i = allowedSlots.Value.Min; i <= allowedSlots.Value.Max; i++)
 		{
-			Item slot = container.GetSlot(i);
+			Item slot = base.inventory.GetSlot(i);
 			if (slot == null || (slot.CanStack(item) && slot.amount < slot.MaxStackable()))
 			{
 				return i;
 			}
 		}
-		return base.GetIdealSlot(player, container, item);
+		return base.GetIdealSlot(player, item);
 	}
 
 	public void OvenFull()
@@ -265,11 +286,6 @@ public class BaseOven : StorageContainer, ISplashable
 		return 1;
 	}
 
-	public int GetSmeltingSpeed()
-	{
-		return smeltSpeed;
-	}
-
 	public void Cook()
 	{
 		Item item = FindBurnable();
@@ -282,8 +298,15 @@ public class BaseOven : StorageContainer, ISplashable
 			StopCooking();
 			return;
 		}
-		_activeCookingSlot = FindActiveCookingSlot();
-		base.inventory.OnCycle(0.5f);
+		foreach (Item item2 in base.inventory.itemList)
+		{
+			if (item2.position >= _inputSlotIndex && item2.position < _inputSlotIndex + inputSlots && !item2.HasFlag(Item.Flag.Cooking))
+			{
+				item2.SetFlag(Item.Flag.Cooking, b: true);
+				item2.MarkDirty();
+			}
+		}
+		IncreaseCookTime(0.5f * GetSmeltingSpeed());
 		BaseEntity slot = GetSlot(Slot.FireMod);
 		if ((bool)slot)
 		{
@@ -352,24 +375,12 @@ public class BaseOven : StorageContainer, ISplashable
 		}
 	}
 
-	public int FindActiveCookingSlot()
-	{
-		int num = _inputSlotIndex + inputSlots;
-		for (int i = _inputSlotIndex; i <= num; i++)
-		{
-			if (base.inventory.GetSlot(i) != null)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
 	public float GetTemperature(int slot)
 	{
-		if (slot != _activeCookingSlot)
+		object obj = Interface.CallHook("OnOvenTemperature", this, slot);
+		if (obj is float)
 		{
-			return 15f;
+			return (float)obj;
 		}
 		if (!HasFlag(Flags.On))
 		{
@@ -412,6 +423,11 @@ public class BaseOven : StorageContainer, ISplashable
 					item.SetFlag(Item.Flag.OnFire, b: false);
 					item.MarkDirty();
 				}
+				else if (item.HasFlag(Item.Flag.Cooking))
+				{
+					item.SetFlag(Item.Flag.Cooking, b: false);
+					item.MarkDirty();
+				}
 			}
 		}
 		CancelInvoke(Cook);
@@ -452,6 +468,33 @@ public class BaseOven : StorageContainer, ISplashable
 			}
 		}
 		return null;
+	}
+
+	private void IncreaseCookTime(float amount)
+	{
+		List<Item> obj = Facepunch.Pool.GetList<Item>();
+		foreach (Item item in base.inventory.itemList)
+		{
+			if (item.HasFlag(Item.Flag.Cooking))
+			{
+				obj.Add(item);
+			}
+		}
+		float delta = amount / (float)obj.Count;
+		foreach (Item item2 in obj)
+		{
+			item2.OnCycle(delta);
+		}
+		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	public float GetSmeltingSpeed()
+	{
+		if (base.isServer)
+		{
+			return smeltSpeed;
+		}
+		throw new Exception("No way it should be able to get here?");
 	}
 
 	public bool IsBurnableItem(Item item)

@@ -345,7 +345,14 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 			f = Mathx.Min(numToTry, numToFill, f);
 			for (int i = 0; i < f; i++)
 			{
-				if (distribution.Sample(out var spawnPos, out var spawnRot, node, population.AlignToNormal, population.ClusterDithering) && population.Filter.GetFactor(spawnPos) > 0f && population.TryTakeRandomPrefab(out var result))
+				Vector3 spawnPos;
+				Quaternion spawnRot;
+				bool flag = distribution.Sample(out spawnPos, out spawnRot, node, population.AlignToNormal, population.ClusterDithering) && population.Filter.GetFactor(spawnPos) > 0f;
+				if (flag && population.FilterRadius > 0f)
+				{
+					flag = population.Filter.GetFactor(spawnPos + Vector3.forward * population.FilterRadius) > 0f && population.Filter.GetFactor(spawnPos - Vector3.forward * population.FilterRadius) > 0f && population.Filter.GetFactor(spawnPos + Vector3.right * population.FilterRadius) > 0f && population.Filter.GetFactor(spawnPos - Vector3.right * population.FilterRadius) > 0f;
+				}
+				if (flag && population.TryTakeRandomPrefab(out var result))
 				{
 					if (population.GetSpawnPosOverride(result, ref spawnPos, ref spawnRot) && (float)distribution.GetCount(spawnPos) < num)
 					{

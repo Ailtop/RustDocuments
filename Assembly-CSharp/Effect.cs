@@ -1,4 +1,5 @@
 using Network;
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 
@@ -159,7 +160,7 @@ public class Effect : EffectData
 
 		public static void ImpactEffect(HitInfo info)
 		{
-			if (((bool)info.InitiatorPlayer && info.InitiatorPlayer.limitNetworking) || !info.DoHitEffects)
+			if (Interface.CallHook("OnImpactEffectCreate", info) != null || ((bool)info.InitiatorPlayer && info.InitiatorPlayer.limitNetworking) || !info.DoHitEffects)
 			{
 				return;
 			}

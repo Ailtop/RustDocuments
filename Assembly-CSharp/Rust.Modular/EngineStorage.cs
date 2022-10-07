@@ -86,6 +86,11 @@ public class EngineStorage : StorageContainer
 		return false;
 	}
 
+	public override int GetIdealSlot(BasePlayer player, Item item)
+	{
+		return GetValidSlot(item);
+	}
+
 	public int GetValidSlot(Item item)
 	{
 		ItemModEngineItem component = item.info.GetComponent<ItemModEngineItem>();
@@ -93,21 +98,15 @@ public class EngineStorage : StorageContainer
 		{
 			return -1;
 		}
-		ItemContainer rootContainer = item.GetRootContainer();
-		_ = component.engineItemType;
+		EngineItemTypes engineItemType = component.engineItemType;
 		for (int i = 0; i < inventorySlots; i++)
 		{
-			if (component.engineItemType == slotTypes[i] && !rootContainer.SlotTaken(item, i))
+			if (engineItemType == slotTypes[i] && !base.inventory.SlotTaken(item, i))
 			{
 				return i;
 			}
 		}
 		return -1;
-	}
-
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
-	{
-		return GetValidSlot(item);
 	}
 
 	public override void OnInventoryFirstCreated(ItemContainer container)

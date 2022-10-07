@@ -78,6 +78,10 @@ public class SprayCan : HeldEntity
 
 	public SoundDefinition SprayLoopDef;
 
+	public static Translate.Phrase FreeSprayNamePhrase = new Translate.Phrase("freespray_radial", "Free Spray");
+
+	public static Translate.Phrase FreeSprayDescPhrase = new Translate.Phrase("freespray_radial_desc", "Spray shapes freely with various colors");
+
 	public const string ENEMY_BASE_STAT = "sprayed_enemy_base";
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)

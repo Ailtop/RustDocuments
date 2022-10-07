@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using ConVar;
 using Facepunch;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ProtoBuf;
 using UnityEngine;
 
@@ -82,37 +81,32 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 
 	public static void LoadStations()
 	{
-		if (ValidStations != null)
-		{
-			return;
-		}
-		string stationData = GetStationData();
-		if (!string.IsNullOrEmpty(stationData))
-		{
-			try
-			{
-				ValidStations = JsonConvert.DeserializeObject<Dictionary<string, string>>(stationData);
-			}
-			catch (Exception arg)
-			{
-				Debug.Log($"Unable to deserialize global station list: {arg}");
-			}
-		}
 		if (ValidStations == null)
 		{
-			ValidStations = new Dictionary<string, string>();
+			ValidStations = GetStationData() ?? new Dictionary<string, string>();
+			ParseServerUrlList();
 		}
-		ParseServerUrlList();
 	}
 
-	public static string GetStationData()
+	public static Dictionary<string, string> GetStationData()
 	{
-		string path = UnityEngine.Application.streamingAssetsPath + "/RadioList.txt";
-		if (File.Exists(path))
+		if ((Facepunch.Application.Manifest?.Metadata)?["RadioStations"] is JArray jArray && jArray.Count > 0)
 		{
-			return File.ReadAllText(path);
+			string[] array = new string[2];
+			Dictionary<string, string> dictionary = new Dictionary<string, string>();
+			{
+				foreach (string item in jArray.Values<string>())
+				{
+					array = item.Split(',');
+					if (!dictionary.ContainsKey(array[0]))
+					{
+						dictionary.Add(array[0], array[1]);
+					}
+				}
+				return dictionary;
+			}
 		}
-		return string.Empty;
+		return null;
 	}
 
 	public static bool IsStationValid(string url)

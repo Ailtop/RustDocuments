@@ -5,7 +5,7 @@ public class AntiHack : ConsoleSystem
 {
 	[ServerVar]
 	[Help("report violations to the anti cheat backend")]
-	public static bool reporting = true;
+	public static bool reporting = false;
 
 	[ServerVar]
 	[Help("are admins allowed to use their admin cheat")]

@@ -393,12 +393,12 @@ public class ShopFront : StorageContainer
 		ClientRPC(null, "CLIENT_ReceivePlayers", (!(vendorPlayer == null)) ? vendorPlayer.net.ID : 0u, (!(customerPlayer == null)) ? customerPlayer.net.ID : 0u);
 	}
 
-	public override int GetIdealSlot(BasePlayer player, ItemContainer container, Item item)
+	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
 		if (player == customerPlayer)
 		{
 			return 1;
 		}
-		return base.GetIdealSlot(player, container, item);
+		return base.GetIdealSlot(player, item);
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
@@ -139,7 +140,7 @@ public class Admin : ConsoleSystem
 		if (!flag && @string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2356 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2359 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -566,6 +567,56 @@ public class Admin : ConsoleSystem
 		{
 			SingletonComponent<ServerMgr>.Instance.connectionQueue.SkipQueue(uInt);
 		}
+	}
+
+	[ServerVar(Help = "Adds skip queue permissions to a SteamID")]
+	public static void skipqueueid(Arg arg)
+	{
+		ulong uInt = arg.GetUInt64(0, 0uL);
+		string @string = arg.GetString(1, "unnamed");
+		string string2 = arg.GetString(2, "no reason");
+		if (uInt < 70000000000000000L)
+		{
+			arg.ReplyWith("This doesn't appear to be a 64bit steamid: " + uInt);
+			return;
+		}
+		ServerUsers.User user = ServerUsers.Get(uInt);
+		if (user != null && (user.group == ServerUsers.UserGroup.Owner || user.group == ServerUsers.UserGroup.Moderator || user.group == ServerUsers.UserGroup.SkipQueue))
+		{
+			arg.ReplyWith($"User {uInt} will already skip the queue ({user.group})");
+			return;
+		}
+		if (user != null && user.group == ServerUsers.UserGroup.Banned)
+		{
+			arg.ReplyWith($"User {uInt} is banned");
+			return;
+		}
+		ServerUsers.Set(uInt, ServerUsers.UserGroup.SkipQueue, @string, string2, -1L);
+		arg.ReplyWith($"Added skip queue permission for {@string} ({uInt})");
+	}
+
+	[ServerVar(Help = "Removes skip queue permission from a SteamID")]
+	public static void removeskipqueue(Arg arg)
+	{
+		ulong uInt = arg.GetUInt64(0, 0uL);
+		if (uInt < 70000000000000000L)
+		{
+			arg.ReplyWith("This doesn't appear to be a 64bit steamid: " + uInt);
+			return;
+		}
+		ServerUsers.User user = ServerUsers.Get(uInt);
+		if (user != null && (user.group == ServerUsers.UserGroup.Owner || user.group == ServerUsers.UserGroup.Moderator))
+		{
+			arg.ReplyWith($"User is a {user.group}, cannot remove skip queue permission with this command");
+			return;
+		}
+		if (user == null || user.group != ServerUsers.UserGroup.SkipQueue)
+		{
+			arg.ReplyWith("User does not have skip queue permission");
+			return;
+		}
+		ServerUsers.Remove(uInt);
+		arg.ReplyWith("Removed skip queue permission: " + uInt);
 	}
 
 	[ServerVar(Help = "Print out currently connected clients etc")]
@@ -1130,7 +1181,7 @@ public class Admin : ConsoleSystem
 		result.NetworkOut = (int)((Network.Net.sv != null) ? Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond) : 0);
 		result.Restarting = SingletonComponent<ServerMgr>.Instance.Restarting;
 		result.SaveCreatedTime = SaveRestore.SaveCreatedTime.ToString();
-		result.Version = 2356;
+		result.Version = 2359;
 		result.Protocol = Protocol.printable;
 		return result;
 	}
@@ -1353,6 +1404,114 @@ public class Admin : ConsoleSystem
 		else
 		{
 			arg.ReplyWith($"Invalid entity id: {uInt}");
+		}
+	}
+
+	[ServerVar(Help = "Returns all entities that the provided player is authed to (TC's, locks, etc), supports --json")]
+	public static void authcount(Arg arg)
+	{
+		BasePlayer player = ArgEx.GetPlayer(arg, 0);
+		if (player == null)
+		{
+			arg.ReplyWith("Please provide a valid player, unable to find '" + arg.GetString(0) + "'");
+			return;
+		}
+		string text = arg.GetString(1);
+		if (text == "--json")
+		{
+			text = string.Empty;
+		}
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		FindEntityAssociationsForPlayer(player, useOwnerId: false, useAuth: true, text, obj);
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("Prefab name", "Position", "ID");
+		foreach (BaseEntity item in obj)
+		{
+			textTable.AddRow(item.ShortPrefabName, item.transform.position.ToString(), item.net.ID.ToString());
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		if (arg.HasArg("--json"))
+		{
+			arg.ReplyWith(textTable.ToJson());
+			return;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendLine("Found entities " + player.displayName + " is authed to");
+		stringBuilder.AppendLine(textTable.ToString());
+		arg.ReplyWith(stringBuilder.ToString());
+	}
+
+	[ServerVar(Help = "Returns all entities that the provided player has placed, supports --json")]
+	public static void entcount(Arg arg)
+	{
+		BasePlayer player = ArgEx.GetPlayer(arg, 0);
+		if (player == null)
+		{
+			arg.ReplyWith("Please provide a valid player, unable to find '" + arg.GetString(0) + "'");
+			return;
+		}
+		string text = arg.GetString(1);
+		if (text == "--json")
+		{
+			text = string.Empty;
+		}
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		FindEntityAssociationsForPlayer(player, useOwnerId: true, useAuth: false, text, obj);
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("Prefab name", "Position", "ID");
+		foreach (BaseEntity item in obj)
+		{
+			textTable.AddRow(item.ShortPrefabName, item.transform.position.ToString(), item.net.ID.ToString());
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		if (arg.HasArg("--json"))
+		{
+			arg.ReplyWith(textTable.ToJson());
+			return;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.AppendLine("Found entities associated with " + player.displayName);
+		stringBuilder.AppendLine(textTable.ToString());
+		arg.ReplyWith(stringBuilder.ToString());
+	}
+
+	private static void FindEntityAssociationsForPlayer(BasePlayer ply, bool useOwnerId, bool useAuth, string filter, List<BaseEntity> results)
+	{
+		results.Clear();
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			if (!(serverEntity is BaseEntity baseEntity))
+			{
+				continue;
+			}
+			bool flag = false;
+			if (useOwnerId && baseEntity.OwnerID == ply.userID)
+			{
+				flag = true;
+			}
+			if (useAuth)
+			{
+				if (!flag && baseEntity is BuildingPrivlidge buildingPrivlidge && buildingPrivlidge.IsAuthed(ply.userID))
+				{
+					flag = true;
+				}
+				if (!flag && baseEntity is KeyLock keyLock && keyLock.HasLockPermission(ply))
+				{
+					flag = true;
+				}
+				else if (baseEntity is CodeLock codeLock && codeLock.whitelistPlayers.Contains(ply.userID))
+				{
+					flag = true;
+				}
+			}
+			if (flag && !string.IsNullOrEmpty(filter) && !serverEntity.ShortPrefabName.Contains(filter, CompareOptions.IgnoreCase))
+			{
+				flag = false;
+			}
+			if (flag)
+			{
+				results.Add(baseEntity);
+			}
 		}
 	}
 }

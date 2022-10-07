@@ -143,14 +143,14 @@ public class BaseMelee : AttackEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public override Vector3 GetInheritedVelocity(BasePlayer player)
+	public override Vector3 GetInheritedVelocity(BasePlayer player, Vector3 direction)
 	{
-		return player.GetInheritedThrowVelocity();
+		return player.GetInheritedThrowVelocity(direction);
 	}
 
+	[RPC_Server.FromOwner]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server]
-	[RPC_Server.FromOwner]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -17,7 +17,8 @@ public static class ServerUsers
 		None = 0,
 		Owner = 1,
 		Moderator = 2,
-		Banned = 3
+		Banned = 3,
+		SkipQueue = 4
 	}
 
 	public class User
@@ -177,6 +178,16 @@ public static class ServerUsers
 			stringBuilder.Append(Facepunch.Extend.StringExtensions.QuoteSafe(item4.username));
 			stringBuilder.Append(' ');
 			stringBuilder.Append(Facepunch.Extend.StringExtensions.QuoteSafe(item4.notes));
+			stringBuilder.Append("\r\n");
+		}
+		foreach (User item5 in GetAll(UserGroup.SkipQueue))
+		{
+			stringBuilder.Append("skipqueueid ");
+			stringBuilder.Append(item5.steamid);
+			stringBuilder.Append(' ');
+			stringBuilder.Append(Facepunch.Extend.StringExtensions.QuoteSafe(item5.username));
+			stringBuilder.Append(' ');
+			stringBuilder.Append(Facepunch.Extend.StringExtensions.QuoteSafe(item5.notes));
 			stringBuilder.Append("\r\n");
 		}
 		File.WriteAllText(serverFolder + "/users.cfg", stringBuilder.ToString());

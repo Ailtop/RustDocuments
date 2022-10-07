@@ -27,9 +27,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = Tonemapper.None
 	};
 
+	[DisplayName("Toe Strength")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects the transition between the toe and the mid section of the curve. A value of 0 means no toe, a value of 1 means a very hard transition.")]
-	[DisplayName("Toe Strength")]
 	public FloatParameter toneCurveToeStrength = new FloatParameter
 	{
 		value = 0f
@@ -43,33 +43,33 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0.5f
 	};
 
-	[DisplayName("Shoulder Strength")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects the transition between the mid section and the shoulder of the curve. A value of 0 means no shoulder, a value of 1 means a very hard transition.")]
+	[DisplayName("Shoulder Strength")]
 	public FloatParameter toneCurveShoulderStrength = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[DisplayName("Shoulder Length")]
 	[Min(0f)]
 	[Tooltip("Affects how many F-stops (EV) to add to the dynamic range of the curve.")]
+	[DisplayName("Shoulder Length")]
 	public FloatParameter toneCurveShoulderLength = new FloatParameter
 	{
 		value = 0.5f
 	};
 
-	[Tooltip("Affects how much overshoot to add to the shoulder.")]
 	[DisplayName("Shoulder Angle")]
 	[Range(0f, 1f)]
+	[Tooltip("Affects how much overshoot to add to the shoulder.")]
 	public FloatParameter toneCurveShoulderAngle = new FloatParameter
 	{
 		value = 0f
 	};
 
+	[DisplayName("Gamma")]
 	[Min(0.001f)]
 	[Tooltip("Applies a gamma function to the curve.")]
-	[DisplayName("Gamma")]
 	public FloatParameter toneCurveGamma = new FloatParameter
 	{
 		value = 1f
@@ -83,9 +83,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		defaultState = TextureParameterDefault.Lut2D
 	};
 
+	[DisplayName("Contribution")]
 	[Range(0f, 1f)]
 	[Tooltip("How much of the lookup texture will contribute to the color grading effect.")]
-	[DisplayName("Contribution")]
 	public FloatParameter ldrLutContribution = new FloatParameter
 	{
 		value = 1f
@@ -99,9 +99,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 	[DisplayName("Tint")]
 	[Range(-100f, 100f)]
-	[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 	public FloatParameter tint = new FloatParameter
 	{
 		value = 0f
@@ -115,9 +115,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = Color.white
 	};
 
-	[Tooltip("Shift the hue of all colors.")]
 	[DisplayName("Hue Shift")]
 	[Range(-180f, 180f)]
+	[Tooltip("Shift the hue of all colors.")]
 	public FloatParameter hueShift = new FloatParameter
 	{
 		value = 0f
@@ -146,9 +146,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Tooltip("Expands or shrinks the overall range of tonal values.")]
 	[DisplayName("Contrast")]
 	[Range(-100f, 100f)]
-	[Tooltip("Expands or shrinks the overall range of tonal values.")]
 	public FloatParameter contrast = new FloatParameter
 	{
 		value = 0f
@@ -170,9 +170,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[DisplayName("Blue")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the blue channel in the overall mix.")]
-	[DisplayName("Blue")]
 	public FloatParameter mixerRedOutBlueIn = new FloatParameter
 	{
 		value = 0f
@@ -186,9 +186,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[Tooltip("Modify influence of the green channel in the overall mix.")]
 	[DisplayName("Green")]
 	[Range(-200f, 200f)]
-	[Tooltip("Modify influence of the green channel in the overall mix.")]
 	public FloatParameter mixerGreenOutGreenIn = new FloatParameter
 	{
 		value = 100f
@@ -242,9 +242,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = new Vector4(1f, 1f, 1f, 0f)
 	};
 
-	[DisplayName("Gain")]
 	[Tooltip("Controls the lightest portions of the render.")]
 	[Trackball(TrackballAttribute.Mode.Gain)]
+	[DisplayName("Gain")]
 	public Vector4Parameter gain = new Vector4Parameter
 	{
 		value = new Vector4(1f, 1f, 1f, 0f)

@@ -37,7 +37,7 @@ public class DroppedItem : WorldItem
 
 	public override void OnCollision(Collision collision, BaseEntity hitEntity)
 	{
-		if (item != null)
+		if (item != null && item.MaxStackable() > 1)
 		{
 			DroppedItem droppedItem = hitEntity as DroppedItem;
 			if (!(droppedItem == null) && droppedItem.item != null && !(droppedItem.item.info != item.info))
@@ -49,7 +49,7 @@ public class DroppedItem : WorldItem
 
 	public void OnDroppedOn(DroppedItem di)
 	{
-		if (item == null || di.item == null || Interface.CallHook("CanCombineDroppedItem", this, di) != null || item.info.stackable <= 1 || di.item.info != item.info || (di.item.IsBlueprint() && di.item.blueprintTarget != item.blueprintTarget) || (di.item.hasCondition && di.item.condition != di.item.maxCondition) || (item.hasCondition && item.condition != item.maxCondition))
+		if (item == null || di.item == null || Interface.CallHook("CanCombineDroppedItem", this, di) != null || di.item.info != item.info || (di.item.IsBlueprint() && di.item.blueprintTarget != item.blueprintTarget) || (di.item.hasCondition && di.item.condition != di.item.maxCondition) || (item.hasCondition && item.condition != item.maxCondition))
 		{
 			return;
 		}
@@ -70,7 +70,7 @@ public class DroppedItem : WorldItem
 			}
 		}
 		int num3 = di.item.amount + item.amount;
-		if (num3 <= item.info.stackable && num3 != 0)
+		if (num3 <= item.MaxStackable() && num3 != 0)
 		{
 			di.DestroyItem();
 			di.Kill();
@@ -80,8 +80,8 @@ public class DroppedItem : WorldItem
 			{
 				Invoke(IdleDestroy, GetDespawnDuration());
 			}
-			Effect.server.Run("assets/bundled/prefabs/fx/notice/stack.world.fx.prefab", this, 0u, Vector3.zero, Vector3.zero);
 			Interface.CallHook("OnDroppedItemCombined", this);
+			Effect.server.Run("assets/bundled/prefabs/fx/notice/stack.world.fx.prefab", this, 0u, Vector3.zero, Vector3.zero);
 		}
 	}
 

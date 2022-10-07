@@ -389,9 +389,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

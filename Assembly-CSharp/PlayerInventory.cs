@@ -331,7 +331,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	[BaseEntity.RPC_Server]
 	[BaseEntity.RPC_Server.FromOwner]
-	private void MoveItem(BaseEntity.RPCMessage msg)
+	public void MoveItem(BaseEntity.RPCMessage msg)
 	{
 		uint num = msg.read.UInt32();
 		uint num2 = msg.read.UInt32();
@@ -496,7 +496,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		{
 			return (bool)obj;
 		}
-		if (component.npcOnly)
+		if (component.npcOnly && !Inventory.disableAttireLimitations)
 		{
 			BasePlayer basePlayer = base.baseEntity;
 			if (basePlayer != null && !basePlayer.IsNpc)
@@ -512,7 +512,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				continue;
 			}
 			ItemModWearable component2 = item2.info.GetComponent<ItemModWearable>();
-			if (!(component2 == null) && !component.CanExistWith(component2))
+			if (!(component2 == null) && !Inventory.disableAttireLimitations && !component.CanExistWith(component2))
 			{
 				bool flag = false;
 				if (item.parent == containerBelt)
@@ -780,7 +780,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	protected void GetIdealPickupContainer(Item item, ref ItemContainer container, ref int position)
 	{
-		if (item.info.stackable > 1)
+		if (item.MaxStackable() > 1)
 		{
 			if (containerBelt != null && containerBelt.FindItemByItemID(item.info.itemid) != null)
 			{

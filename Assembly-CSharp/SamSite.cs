@@ -515,7 +515,7 @@ public class SamSite : ContainerIOEntity
 			ServerProjectile component = baseEntity.GetComponent<ServerProjectile>();
 			if ((bool)component)
 			{
-				component.InitializeVelocity(GetInheritedProjectileVelocity() + direction * component.speed * speedMultiplier);
+				component.InitializeVelocity(GetInheritedProjectileVelocity(direction) + direction * component.speed * speedMultiplier);
 			}
 			baseEntity.Spawn();
 		}

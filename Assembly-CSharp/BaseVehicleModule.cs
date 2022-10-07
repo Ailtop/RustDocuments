@@ -259,6 +259,15 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		}
 	}
 
+	public override bool AdminFixUp(int tier)
+	{
+		if (IsOnAVehicle && Vehicle.IsDead())
+		{
+			return false;
+		}
+		return base.AdminFixUp(tier);
+	}
+
 	public virtual void OnPlayerDismountedVehicle(BasePlayer player)
 	{
 	}
@@ -338,6 +347,15 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 	public void OtherVehicleModulesChanged()
 	{
 		RefreshConditionals(canGib: false);
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (!IsOnAVehicle)
+		{
+			return false;
+		}
+		return Vehicle.CanBeLooted(player);
 	}
 
 	public virtual void OnEngineStateChanged(VehicleEngineController<GroundVehicle>.EngineState oldState, VehicleEngineController<GroundVehicle>.EngineState newState)

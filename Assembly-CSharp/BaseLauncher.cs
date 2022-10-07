@@ -190,7 +190,7 @@ public class BaseLauncher : BaseProjectile
 			ServerProjectile component2 = baseEntity.GetComponent<ServerProjectile>();
 			if ((bool)component2)
 			{
-				component2.InitializeVelocity(GetInheritedVelocity(player) + vector2 * component2.speed);
+				component2.InitializeVelocity(GetInheritedVelocity(player, vector2) + vector2 * component2.speed);
 			}
 			baseEntity.Spawn();
 			StartAttackCooldown(ScaleRepeatDelay(repeatDelay));

@@ -8,10 +8,10 @@ using UnityEngine.Scripting;
 namespace UnityEngine.Rendering.PostProcessing;
 
 [ExecuteAlways]
-[DisallowMultipleComponent]
-[ImageEffectAllowedInSceneView]
 [AddComponentMenu("Rendering/Post-process Layer", 1000)]
 [RequireComponent(typeof(Camera))]
+[DisallowMultipleComponent]
+[ImageEffectAllowedInSceneView]
 public class PostProcessLayer : MonoBehaviour
 {
 	private enum ScalingMode

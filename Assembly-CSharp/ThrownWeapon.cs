@@ -101,9 +101,9 @@ public class ThrownWeapon : AttackEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public override Vector3 GetInheritedVelocity(BasePlayer player)
+	public override Vector3 GetInheritedVelocity(BasePlayer player, Vector3 direction)
 	{
-		return player.GetInheritedThrowVelocity();
+		return player.GetInheritedThrowVelocity(direction);
 	}
 
 	public void ServerThrow(Vector3 targetPosition)
@@ -215,7 +215,7 @@ public class ThrownWeapon : AttackEntity
 		}
 		baseEntity.creatorEntity = msg.player;
 		baseEntity.skinID = skinID;
-		baseEntity.SetVelocity(GetInheritedVelocity(msg.player) + normalized * maxThrowVelocity * num + msg.player.estimatedVelocity * 0.5f);
+		baseEntity.SetVelocity(GetInheritedVelocity(msg.player, normalized) + normalized * maxThrowVelocity * num + msg.player.estimatedVelocity * 0.5f);
 		if (tumbleVelocity > 0f)
 		{
 			baseEntity.SetAngularVelocity(new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)) * tumbleVelocity);

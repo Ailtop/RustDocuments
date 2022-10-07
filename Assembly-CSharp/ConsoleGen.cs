@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[864]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[875]
 	{
 		new ConsoleSystem.Command
 		{
@@ -772,6 +772,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "authcount",
+			Parent = "global",
+			FullName = "global.authcount",
+			ServerAdmin = true,
+			Description = "Returns all entities that the provided player is authed to (TC's, locks, etc), supports --json",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.authcount(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "ban",
 			Parent = "global",
 			FullName = "global.ban",
@@ -909,6 +922,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.clientperf_frametime(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "entcount",
+			Parent = "global",
+			FullName = "global.entcount",
+			ServerAdmin = true,
+			Description = "Returns all entities that the provided player has placed, supports --json",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.entcount(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1110,6 +1136,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "removeskipqueue",
+			Parent = "global",
+			FullName = "global.removeskipqueue",
+			ServerAdmin = true,
+			Description = "Removes skip queue permission from a SteamID",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.removeskipqueue(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "say",
 			Parent = "global",
 			FullName = "global.say",
@@ -1145,6 +1184,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.skipqueue(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "skipqueueid",
+			Parent = "global",
+			FullName = "global.skipqueueid",
+			ServerAdmin = true,
+			Description = "Adds skip queue permissions to a SteamID",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.skipqueueid(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1343,6 +1395,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				AI.brainstats(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clearignoredplayers",
+			Parent = "ai",
+			FullName = "ai.clearignoredplayers",
+			ServerAdmin = true,
+			Description = "Remove all players from the AIs ignore list.",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.clearignoredplayers(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2116,6 +2181,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				AI.ocean_patrol_path_iterations = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printignoredplayers",
+			Parent = "ai",
+			FullName = "ai.printignoredplayers",
+			ServerAdmin = true,
+			Description = "Print a lost of all the players in the AI ignore list.",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				AI.printignoredplayers(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5721,6 +5799,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "clearinventory",
+			Parent = "inventory",
+			FullName = "inventory.clearinventory",
+			ServerAdmin = true,
+			Description = "Clears the inventory of a target player. eg. inventory.clearInventory jim",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Inventory.clearInventory(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "copyto",
 			Parent = "inventory",
 			FullName = "inventory.copyto",
@@ -5768,6 +5859,20 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Inventory.deployLoadoutInRange(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "disableattirelimitations",
+			Parent = "inventory",
+			FullName = "inventory.disableattirelimitations",
+			ServerAdmin = true,
+			Description = "Disables all attire limitations, so NPC clothing and invalid overlaps can be equipped",
+			Variable = true,
+			GetOveride = () => Inventory.disableAttireLimitations.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Inventory.disableAttireLimitations = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6785,6 +6890,45 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Sentry.targetall = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "anticheatid",
+			Parent = "server",
+			FullName = "server.anticheatid",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.anticheatid.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.anticheatid = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "anticheatkey",
+			Parent = "server",
+			FullName = "server.anticheatkey",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.anticheatkey.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.anticheatkey = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "anticheatlog",
+			Parent = "server",
+			FullName = "server.anticheatlog",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.anticheatlog.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.anticheatlog = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command

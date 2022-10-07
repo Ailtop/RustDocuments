@@ -1,102 +1,98 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Facepunch;
-using Rust.UI;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class ServerBrowserTagFilters : MonoBehaviour
 {
-	public RustButton Button;
-
-	public RectTransform OptionsParent;
-
 	public UnityEvent TagFiltersChanged = new UnityEvent();
 
-	private ServerBrowserTag[] _allTags;
+	private ServerBrowserTagGroup[] _groups;
 
 	private List<bool> _previousState;
 
 	public void Start()
 	{
-		_allTags = ((OptionsParent != null) ? OptionsParent.GetComponentsInChildren<ServerBrowserTag>() : Array.Empty<ServerBrowserTag>());
-		if (Button != null && Button.Text != null)
-		{
-			Button.Text.SetPhraseArguments(0);
-		}
-	}
-
-	public void Open()
-	{
-		if (OptionsParent != null)
-		{
-			OptionsParent.SetActive(active: true);
-		}
-		_previousState = GetCurrentSelections();
-	}
-
-	public void Close()
-	{
-		if (OptionsParent != null)
-		{
-			OptionsParent.SetActive(active: false);
-		}
-		if (_previousState != null)
-		{
-			List<bool> currentSelections = GetCurrentSelections();
-			if (!currentSelections.SequenceEqual(_previousState))
-			{
-				TagFiltersChanged?.Invoke();
-			}
-			if (Button != null && Button.Text != null)
-			{
-				Button.Text.SetPhraseArguments(currentSelections.Count((bool b) => b));
-			}
-			_previousState = null;
-		}
-		else
+		_groups = base.gameObject.GetComponentsInChildren<ServerBrowserTagGroup>();
+		UnityAction call = delegate
 		{
 			TagFiltersChanged?.Invoke();
+		};
+		ServerBrowserTagGroup[] groups = _groups;
+		for (int i = 0; i < groups.Length; i++)
+		{
+			ServerBrowserTag[] tags = groups[i].tags;
+			foreach (ServerBrowserTag obj in tags)
+			{
+				obj.button.OnPressed.AddListener(call);
+				obj.button.OnReleased.AddListener(call);
+			}
 		}
 	}
 
-	public void GetTags(out HashSet<string> searchTags, out HashSet<string> excludeTags)
+	public void DeselectAll()
 	{
-		searchTags = new HashSet<string>();
-		excludeTags = new HashSet<string>();
-		ServerBrowserTag[] allTags = _allTags;
-		foreach (ServerBrowserTag serverBrowserTag in allTags)
+		if (_groups == null)
 		{
-			if (serverBrowserTag.IsActive)
+			return;
+		}
+		ServerBrowserTagGroup[] groups = _groups;
+		foreach (ServerBrowserTagGroup serverBrowserTagGroup in groups)
+		{
+			if (serverBrowserTagGroup.tags != null)
 			{
-				string[] serverHasAnyOf = serverBrowserTag.serverHasAnyOf;
-				foreach (string item in serverHasAnyOf)
+				ServerBrowserTag[] tags = serverBrowserTagGroup.tags;
+				for (int j = 0; j < tags.Length; j++)
 				{
-					searchTags.Add(item);
+					tags[j].button.SetToggleFalse();
 				}
 			}
 		}
-		allTags = _allTags;
-		foreach (ServerBrowserTag serverBrowserTag2 in allTags)
+	}
+
+	public void GetTags(out List<HashSet<string>> searchTagGroups, out HashSet<string> excludeTags)
+	{
+		searchTagGroups = new List<HashSet<string>>();
+		excludeTags = new HashSet<string>();
+		ServerBrowserTagGroup[] groups = _groups;
+		foreach (ServerBrowserTagGroup serverBrowserTagGroup in groups)
 		{
-			if (!serverBrowserTag2.IsActive)
+			if (!serverBrowserTagGroup.AnyActive())
 			{
 				continue;
 			}
-			string[] serverHasAnyOf = serverBrowserTag2.serverHasNoneOf;
-			foreach (string item2 in serverHasAnyOf)
+			ServerBrowserTag[] tags;
+			if (serverBrowserTagGroup.isExclusive)
 			{
-				if (!searchTags.Contains(item2))
+				HashSet<string> hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				tags = serverBrowserTagGroup.tags;
+				foreach (ServerBrowserTag serverBrowserTag in tags)
 				{
-					excludeTags.Add(item2);
+					if (serverBrowserTag.IsActive)
+					{
+						hashSet.Add(serverBrowserTag.serverTag);
+					}
+					else if (serverBrowserTagGroup.isExclusive)
+					{
+						excludeTags.Add(serverBrowserTag.serverTag);
+					}
+				}
+				if (hashSet.Count > 0)
+				{
+					searchTagGroups.Add(hashSet);
+				}
+				continue;
+			}
+			tags = serverBrowserTagGroup.tags;
+			foreach (ServerBrowserTag serverBrowserTag2 in tags)
+			{
+				if (serverBrowserTag2.IsActive)
+				{
+					HashSet<string> hashSet2 = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+					hashSet2.Add(serverBrowserTag2.serverTag);
+					searchTagGroups.Add(hashSet2);
 				}
 			}
 		}
-	}
-
-	private List<bool> GetCurrentSelections()
-	{
-		return _allTags.Select((ServerBrowserTag t) => t.IsActive).ToList();
 	}
 }

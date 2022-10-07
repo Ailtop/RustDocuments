@@ -105,5 +105,11 @@ public class TrainEngineAudio : TrainCarAudio
 	private SoundDefinition unloadableEndDef;
 
 	[SerializeField]
+	private GameObject bellObject;
+
+	[SerializeField]
+	private SoundDefinition bellRingDef;
+
+	[SerializeField]
 	private SoundPlayer brakeSound;
 }

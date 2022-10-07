@@ -7,7 +7,7 @@ public class ServerBrowserItem : MonoBehaviour
 {
 	public TextMeshProUGUI serverName;
 
-	public RustText mapName;
+	public RustFlexText mapName;
 
 	public TextMeshProUGUI playerCount;
 

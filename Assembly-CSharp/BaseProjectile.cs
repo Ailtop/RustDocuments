@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConVar;
-using EasyAntiCheat.Server.Cerberus;
-using EasyAntiCheat.Server.Hydra;
+using Epic.OnlineServices.AntiCheatCommon;
 using Facepunch;
 using Network;
 using Oxide.Core;
@@ -495,9 +494,9 @@ public class BaseProjectile : AttackEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public override UnityEngine.Vector3 GetInheritedVelocity(BasePlayer player)
+	public override Vector3 GetInheritedVelocity(BasePlayer player, Vector3 direction)
 	{
-		return player.GetInheritedProjectileVelocity();
+		return player.GetInheritedProjectileVelocity(direction);
 	}
 
 	public virtual float GetDamageScale(bool getMax = false)
@@ -551,7 +550,7 @@ public class BaseProjectile : AttackEntity
 			if ((bool)ownerPlayer)
 			{
 				Gizmos.color = Color.cyan;
-				Gizmos.DrawLine(MuzzlePoint.position, MuzzlePoint.position + ownerPlayer.eyes.rotation * UnityEngine.Vector3.forward * 10f);
+				Gizmos.DrawLine(MuzzlePoint.position, MuzzlePoint.position + ownerPlayer.eyes.rotation * Vector3.forward * 10f);
 			}
 		}
 	}
@@ -596,7 +595,7 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	public override UnityEngine.Vector3 ModifyAIAim(UnityEngine.Vector3 eulerInput, float swayModifier = 1f)
+	public override Vector3 ModifyAIAim(Vector3 eulerInput, float swayModifier = 1f)
 	{
 		float num = UnityEngine.Time.time * (aimSwaySpeed * 1f + aiAimSwayOffset);
 		float num2 = Mathf.Sin(UnityEngine.Time.time * 2f);
@@ -652,8 +651,8 @@ public class BaseProjectile : AttackEntity
 			}
 		}
 		StartAttackCooldownRaw(repeatDelay);
-		UnityEngine.Vector3 vector = (flag ? ownerPlayer.eyes.position : MuzzlePoint.transform.position);
-		UnityEngine.Vector3 inputVec = MuzzlePoint.transform.forward;
+		Vector3 vector = (flag ? ownerPlayer.eyes.position : MuzzlePoint.transform.position);
+		Vector3 inputVec = MuzzlePoint.transform.forward;
 		if (originOverride != null)
 		{
 			vector = originOverride.position;
@@ -669,7 +668,7 @@ public class BaseProjectile : AttackEntity
 		}
 		for (int i = 0; i < component.numProjectiles; i++)
 		{
-			UnityEngine.Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + GetAimCone() + GetAIAimcone() * 1f, inputVec);
+			Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(component.projectileSpread + GetAimCone() + GetAIAimcone() * 1f, inputVec);
 			List<RaycastHit> obj = Facepunch.Pool.GetList<RaycastHit>();
 			GamePhysics.TraceAll(new Ray(vector, modifiedAimConeDirection), 0f, obj, 300f, 1219701505);
 			for (int j = 0; j < obj.Count; j++)
@@ -720,7 +719,7 @@ public class BaseProjectile : AttackEntity
 				}
 			}
 			Facepunch.Pool.FreeList(ref obj);
-			UnityEngine.Vector3 vector2 = ((flag && ownerPlayer.isMounted) ? (modifiedAimConeDirection * 6f) : UnityEngine.Vector3.zero);
+			Vector3 vector2 = ((flag && ownerPlayer.isMounted) ? (modifiedAimConeDirection * 6f) : Vector3.zero);
 			CreateProjectileEffectClientside(component.projectileObject.resourcePath, vector + vector2, modifiedAimConeDirection * component.projectileVelocity, UnityEngine.Random.Range(1, 100), null, IsSilenced(), forceClientsideEffects: true);
 		}
 	}
@@ -812,12 +811,12 @@ public class BaseProjectile : AttackEntity
 				Item item = ItemManager.Create(primaryMagazine.ammoType, contents, 0uL);
 				if (!item.MoveToContainer(itemContainer))
 				{
-					UnityEngine.Vector3 vPos = base.transform.position;
+					Vector3 vPos = base.transform.position;
 					if (itemContainer.entityOwner != null)
 					{
-						vPos = itemContainer.entityOwner.transform.position + UnityEngine.Vector3.up * 0.25f;
+						vPos = itemContainer.entityOwner.transform.position + Vector3.up * 0.25f;
 					}
-					item.Drop(vPos, UnityEngine.Vector3.up * 5f);
+					item.Drop(vPos, Vector3.up * 5f);
 				}
 			}
 		}
@@ -1189,9 +1188,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1298,25 +1297,39 @@ public class BaseProjectile : AttackEntity
 		sensation.InitiatorPlayer = player;
 		sensation.Initiator = player;
 		Sense.Stimulate(sensation);
-		if (EACServer.playerTracker == null)
+		if (!EACServer.CanSendAnalytics || player.net.connection == null)
 		{
 			return;
 		}
-		using (TimeWarning.New("LogPlayerShooting"))
+		using (TimeWarning.New("EAC.LogPlayerShooting"))
 		{
-			UnityEngine.Vector3 networkPosition = player.GetNetworkPosition();
-			UnityEngine.Quaternion networkRotation = player.GetNetworkRotation();
-			int weaponID = GetItem()?.info.itemid ?? 0;
-			EasyAntiCheat.Server.Hydra.Client client = EACServer.GetClient(player.net.connection);
-			PlayerUseWeapon eventParams = default(PlayerUseWeapon);
-			eventParams.Position = new EasyAntiCheat.Server.Cerberus.Vector3(networkPosition.x, networkPosition.y, networkPosition.z);
-			eventParams.ViewRotation = new EasyAntiCheat.Server.Cerberus.Quaternion(networkRotation.w, networkRotation.x, networkRotation.y, networkRotation.z);
-			eventParams.WeaponID = weaponID;
-			EACServer.playerTracker.LogPlayerUseWeapon(client, eventParams);
+			Vector3 networkPosition = player.GetNetworkPosition();
+			Quaternion networkRotation = player.GetNetworkRotation();
+			Item item = GetItem();
+			string text = ((item != null) ? item.info.shortname : "unknown");
+			LogPlayerUseWeaponOptions options = default(LogPlayerUseWeaponOptions);
+			LogPlayerUseWeaponData value = default(LogPlayerUseWeaponData);
+			value.PlayerHandle = EACServer.GetClient(player.net.connection);
+			value.PlayerPosition = new Vec3f
+			{
+				x = networkPosition.x,
+				y = networkPosition.y,
+				z = networkPosition.z
+			};
+			value.PlayerViewRotation = new Quat
+			{
+				w = networkRotation.w,
+				x = networkRotation.x,
+				y = networkRotation.y,
+				z = networkRotation.z
+			};
+			value.WeaponName = text;
+			options.UseWeaponData = value;
+			EACServer.Interface.LogPlayerUseWeapon(ref options);
 		}
 	}
 
-	public void CreateProjectileEffectClientside(string prefabName, UnityEngine.Vector3 pos, UnityEngine.Vector3 velocity, int seed, Connection sourceConnection, bool silenced = false, bool forceClientsideEffects = false)
+	public void CreateProjectileEffectClientside(string prefabName, Vector3 pos, Vector3 velocity, int seed, Connection sourceConnection, bool silenced = false, bool forceClientsideEffects = false)
 	{
 		if (Interface.CallHook("OnClientProjectileEffectCreate", sourceConnection, this, prefabName) == null)
 		{
