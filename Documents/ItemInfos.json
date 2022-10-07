@@ -30,6 +30,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -69,6 +70,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -108,6 +110,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -147,6 +150,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -186,6 +190,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -225,6 +230,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -264,6 +270,7 @@
       "max": 1000.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -303,6 +310,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -342,6 +350,7 @@
       "max": 1.0,
       "repairable": false,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -381,6 +390,7 @@
       "max": 1.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -420,6 +430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -459,6 +470,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -498,6 +510,7 @@
       "max": 750.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -537,6 +550,7 @@
       "max": 750.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -576,6 +590,7 @@
       "max": 900.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -615,6 +630,7 @@
       "max": 750.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -654,6 +670,7 @@
       "max": 750.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -693,6 +710,7 @@
       "max": 1000.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -732,6 +750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -771,6 +790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -810,6 +830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -849,6 +870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -888,6 +910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -927,6 +950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -966,6 +990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1005,6 +1030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1044,6 +1070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1083,6 +1110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1122,6 +1150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1161,6 +1190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1200,6 +1230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1239,6 +1270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1278,6 +1310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1317,6 +1350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1356,6 +1390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1395,6 +1430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1434,6 +1470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1473,6 +1510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1512,6 +1550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1551,6 +1590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1590,6 +1630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1629,6 +1670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1668,6 +1710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1707,6 +1750,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1746,6 +1790,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1785,6 +1830,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1824,6 +1870,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1863,6 +1910,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1902,6 +1950,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1941,6 +1990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -1980,6 +2030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2019,6 +2070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2058,6 +2110,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2097,6 +2150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2136,6 +2190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2175,6 +2230,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2214,6 +2270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2253,6 +2310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2292,6 +2350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2331,6 +2390,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2370,6 +2430,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2409,6 +2470,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2448,6 +2510,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2487,6 +2550,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2526,6 +2590,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2565,6 +2630,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2604,6 +2670,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2643,6 +2710,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2682,6 +2750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2721,6 +2790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2760,6 +2830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2799,6 +2870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2838,6 +2910,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2877,6 +2950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2916,6 +2990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2955,6 +3030,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -2994,6 +3070,7 @@
       "max": 600.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3033,6 +3110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3072,6 +3150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3111,6 +3190,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3150,6 +3230,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3189,6 +3270,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3228,6 +3310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3267,6 +3350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3306,6 +3390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3345,6 +3430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3384,6 +3470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3423,6 +3510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3462,6 +3550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3501,6 +3590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3540,6 +3630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3579,6 +3670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3618,6 +3710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3657,6 +3750,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3696,6 +3790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3735,6 +3830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3774,6 +3870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3813,6 +3910,7 @@
       "max": 200.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3852,6 +3950,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3891,6 +3990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3930,6 +4030,7 @@
       "max": 1000.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -3969,6 +4070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4008,6 +4110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4047,6 +4150,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4086,6 +4190,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4125,6 +4230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4164,6 +4270,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4203,6 +4310,7 @@
       "max": 1000.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4242,6 +4350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4281,6 +4390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4320,6 +4430,7 @@
       "max": 75.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4359,6 +4470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4398,6 +4510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4437,6 +4550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4476,6 +4590,7 @@
       "max": 320.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4515,6 +4630,7 @@
       "max": 900.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4554,6 +4670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4593,6 +4710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4632,6 +4750,7 @@
       "max": 1000.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4671,6 +4790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4710,6 +4830,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4749,6 +4870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4788,6 +4910,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4827,6 +4950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4866,6 +4990,7 @@
       "max": 250.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4905,6 +5030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4944,6 +5070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -4983,6 +5110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5022,6 +5150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5061,6 +5190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5100,6 +5230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5139,6 +5270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5178,6 +5310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5217,6 +5350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5256,6 +5390,7 @@
       "max": 450.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5295,12 +5430,53 @@
       "max": 450.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
       }
     },
     "isRedirectOf": null,
+    "steamDlcName": null
+  },
+  {
+    "shortname": "hazmatsuit.lumberjack",
+    "itemid": 861513346,
+    "itemName": "Hazmat_Suit.lumberjack.item",
+    "worldModelPrefab": "assets/prefabs/clothes/suit.hazmat/lumberjack/lumberjack_hazmat_wm.prefab",
+    "displayName": "Lumberjack Suit",
+    "displayDescription": "A Lumberjack Suit",
+    "Traits": "Interesting",
+    "rarity": "Rare",
+    "occupySlots": "None",
+    "amountType": "Count",
+    "category": "Attire",
+    "selectionPanel": "None",
+    "flags": 0,
+    "itemType": "Generic",
+    "maxDraggable": 0,
+    "stackable": 65000,
+    "craftingStackable": 65000,
+    "quickDespawn": false,
+    "hidden": false,
+    "isHoldable": false,
+    "isWearable": true,
+    "HasSkins": false,
+    "CraftableWithSkin": false,
+    "isUsable": false,
+    "spawnAsBlueprint": false,
+    "condition": {
+      "enabled": true,
+      "max": 450.0,
+      "repairable": true,
+      "maintainMaxCondition": false,
+      "ovenCondition": false,
+      "foundCondition": {
+        "fractionMin": 1.0,
+        "fractionMax": 1.0
+      }
+    },
+    "isRedirectOf": "hazmatsuit",
     "steamDlcName": null
   },
   {
@@ -5334,6 +5510,7 @@
       "max": 450.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5373,6 +5550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5412,6 +5590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5451,6 +5630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5490,6 +5670,7 @@
       "max": 450.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5529,6 +5710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5568,6 +5750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5607,6 +5790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5646,6 +5830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5685,6 +5870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5724,6 +5910,7 @@
       "max": 360.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5763,6 +5950,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5802,6 +5990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5841,6 +6030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -5880,6 +6070,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -5919,6 +6110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -5958,6 +6150,7 @@
       "max": 140.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -5997,6 +6190,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6036,6 +6230,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6075,6 +6270,7 @@
       "max": 140.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6114,6 +6310,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6153,6 +6350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6192,6 +6390,7 @@
       "max": 140.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6231,6 +6430,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6270,6 +6470,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6309,6 +6510,7 @@
       "max": 140.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6348,6 +6550,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6387,6 +6590,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6426,6 +6630,7 @@
       "max": 140.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -6465,6 +6670,7 @@
       "max": 200.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6504,6 +6710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6543,6 +6750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6582,6 +6790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6621,6 +6830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6660,6 +6870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6699,6 +6910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6738,6 +6950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6777,6 +6990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6816,6 +7030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6855,6 +7070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6894,6 +7110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6933,6 +7150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -6972,6 +7190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7011,6 +7230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7050,6 +7270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7089,6 +7310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7128,6 +7350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7167,6 +7390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7206,6 +7430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7245,6 +7470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7284,6 +7510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7323,6 +7550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7362,6 +7590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7401,6 +7630,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7440,6 +7670,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7479,6 +7710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7518,6 +7750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7557,6 +7790,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7596,6 +7830,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7635,6 +7870,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7674,6 +7910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7713,6 +7950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7752,6 +7990,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7791,6 +8030,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7830,6 +8070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7869,6 +8110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7908,6 +8150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7947,6 +8190,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -7986,6 +8230,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8025,6 +8270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8064,6 +8310,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8103,6 +8350,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8142,6 +8390,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8181,6 +8430,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8220,6 +8470,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8259,6 +8510,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8298,6 +8550,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8337,6 +8590,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8376,6 +8630,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8415,6 +8670,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8454,6 +8710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8493,6 +8750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8532,6 +8790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8571,6 +8830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8610,6 +8870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8649,6 +8910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8688,6 +8950,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8727,6 +8990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8766,6 +9030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8805,6 +9070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8844,6 +9110,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8858,7 +9125,7 @@
     "itemName": "box.wooden.large.item",
     "worldModelPrefab": "",
     "displayName": "Large Wood Box",
-    "displayDescription": "Keep your things in this wooden storage box. Stores up to 30 items.",
+    "displayDescription": "Keep your things in this wooden storage box. Stores up to 48 items.",
     "Traits": "Interesting",
     "rarity": "None",
     "occupySlots": 0,
@@ -8883,6 +9150,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8922,6 +9190,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -8961,6 +9230,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9000,6 +9270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9039,6 +9310,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9078,6 +9350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9117,6 +9390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9156,6 +9430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9195,6 +9470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9234,6 +9510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9273,6 +9550,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9312,6 +9590,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9351,6 +9630,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9390,6 +9670,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9429,6 +9710,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9468,6 +9750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9507,6 +9790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9546,6 +9830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9585,6 +9870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9624,6 +9910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9663,6 +9950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9702,6 +9990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9741,6 +10030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9780,6 +10070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9819,6 +10110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9858,6 +10150,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9897,6 +10190,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9936,6 +10230,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -9975,6 +10270,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10014,6 +10310,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10053,6 +10350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10092,6 +10390,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10131,6 +10430,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10170,6 +10470,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10209,6 +10510,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10248,6 +10550,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10287,6 +10590,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10326,6 +10630,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10365,6 +10670,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10404,6 +10710,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10443,6 +10750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10482,6 +10790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10521,6 +10830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10560,6 +10870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10599,6 +10910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10638,6 +10950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10677,6 +10990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10716,6 +11030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10755,6 +11070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10794,6 +11110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10833,6 +11150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10872,6 +11190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10911,6 +11230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10950,6 +11270,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -10989,6 +11310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11028,6 +11350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11067,6 +11390,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11097,7 +11421,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -11106,6 +11430,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11145,6 +11470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11184,6 +11510,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11223,6 +11550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11262,6 +11590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11301,6 +11630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11340,6 +11670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11379,6 +11710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11418,6 +11750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11457,6 +11790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11496,6 +11830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11535,6 +11870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11574,6 +11910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11613,6 +11950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11652,6 +11990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11691,6 +12030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11730,6 +12070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11769,6 +12110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11808,6 +12150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11847,6 +12190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11886,6 +12230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11925,6 +12270,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -11964,6 +12310,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12003,6 +12350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12042,6 +12390,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12081,6 +12430,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12120,6 +12470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12159,6 +12510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12189,7 +12541,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -12198,6 +12550,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12237,6 +12590,7 @@
       "max": 1.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12276,6 +12630,7 @@
       "max": 1.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12315,6 +12670,7 @@
       "max": 1.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12354,6 +12710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12393,6 +12750,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12423,7 +12781,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -12432,6 +12790,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12471,6 +12830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12510,6 +12870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12540,7 +12901,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -12549,6 +12910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12588,6 +12950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12602,7 +12965,7 @@
     "itemName": "box_wooden.item",
     "worldModelPrefab": "",
     "displayName": "Wood Storage Box",
-    "displayDescription": "Keep your things in this wooden storage box. Stores up to 12 items.",
+    "displayDescription": "Keep your things in this wooden storage box. Stores up to 18 items.",
     "Traits": "Interesting",
     "rarity": "None",
     "occupySlots": 0,
@@ -12618,7 +12981,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -12627,6 +12990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12666,6 +13030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12705,6 +13070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12744,6 +13110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12783,6 +13150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12822,6 +13190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12861,6 +13230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12900,6 +13270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12939,6 +13310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -12978,6 +13350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13017,6 +13390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13026,9 +13400,9 @@
     "steamDlcName": null
   },
   {
-    "shortname": "chocholate",
-    "itemid": 363467698,
-    "itemName": "chocholate.item",
+    "shortname": "chocolate",
+    "itemid": -965336208,
+    "itemName": "chocolate.item",
     "worldModelPrefab": "assets/prefabs/food/chocholate/chocolate.worldmodel.prefab",
     "displayName": "Chocolate Bar",
     "displayDescription": "Chocolate Bar found as loot. Eating it provides a small boost to health, hunger, and thirst.",
@@ -13056,6 +13430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13095,6 +13470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13134,6 +13510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13173,6 +13550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13212,6 +13590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13251,6 +13630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13290,6 +13670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13329,6 +13710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13368,6 +13750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13407,6 +13790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13446,6 +13830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13485,6 +13870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13524,6 +13910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13563,6 +13950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13602,6 +13990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13641,6 +14030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13680,6 +14070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13719,6 +14110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13758,6 +14150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13797,6 +14190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13836,6 +14230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13875,6 +14270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13914,6 +14310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13953,6 +14350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -13992,6 +14390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14031,6 +14430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14070,6 +14470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14109,6 +14510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14148,6 +14550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14187,6 +14590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14226,6 +14630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14265,6 +14670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14304,6 +14710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14343,6 +14750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14382,6 +14790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14421,6 +14830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14460,6 +14870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14499,6 +14910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14538,6 +14950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14577,6 +14990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14616,6 +15030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14655,6 +15070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14694,6 +15110,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14733,6 +15150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14772,6 +15190,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14811,6 +15230,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14841,7 +15261,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -14850,6 +15270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14889,6 +15310,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14928,6 +15350,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -14967,6 +15390,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15006,6 +15430,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15045,6 +15470,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15084,6 +15510,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15123,6 +15550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15162,6 +15590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15201,6 +15630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15240,6 +15670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15279,6 +15710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15318,6 +15750,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15357,6 +15790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15396,6 +15830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15435,6 +15870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15474,6 +15910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15513,6 +15950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15552,6 +15990,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15591,6 +16030,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15630,6 +16070,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15669,6 +16110,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15708,6 +16150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15747,6 +16190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15786,6 +16230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15825,6 +16270,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15864,6 +16310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15903,6 +16350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15942,6 +16390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -15981,6 +16430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16020,6 +16470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16059,6 +16510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16098,6 +16550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16137,6 +16590,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16176,6 +16630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16215,6 +16670,7 @@
       "max": 25.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16254,6 +16710,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16293,6 +16750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16332,6 +16790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16371,6 +16830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16410,6 +16870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16449,6 +16910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16488,6 +16950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16527,6 +16990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16566,6 +17030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16605,6 +17070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16644,6 +17110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16683,6 +17150,7 @@
       "max": 180.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16722,6 +17190,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16761,6 +17230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16800,6 +17270,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16839,6 +17310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16878,6 +17350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16917,6 +17390,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16956,6 +17430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -16995,6 +17470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17034,6 +17510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17073,6 +17550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17112,6 +17590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17151,6 +17630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17190,6 +17670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17229,6 +17710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17268,6 +17750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17307,6 +17790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17346,6 +17830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17385,6 +17870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17424,6 +17910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17463,6 +17950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17502,6 +17990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17541,6 +18030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17580,6 +18070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17619,6 +18110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17658,6 +18150,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17697,6 +18190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17736,6 +18230,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17775,6 +18270,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17814,6 +18310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17853,6 +18350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17892,6 +18390,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17931,6 +18430,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -17970,6 +18470,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18009,6 +18510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18048,6 +18550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18087,6 +18590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18126,6 +18630,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18165,6 +18670,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18204,6 +18710,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18243,6 +18750,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18282,6 +18790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18321,6 +18830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18360,6 +18870,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18399,6 +18910,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18438,6 +18950,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18477,6 +18990,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18516,6 +19030,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18555,6 +19070,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18594,6 +19110,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18633,6 +19150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18672,6 +19190,7 @@
       "max": 30.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18711,6 +19230,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18750,6 +19270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18789,6 +19310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18828,6 +19350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18867,6 +19390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18906,6 +19430,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18945,6 +19470,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -18984,6 +19510,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19023,6 +19550,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19062,6 +19590,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19101,6 +19630,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19140,6 +19670,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19179,6 +19710,7 @@
       "max": 50.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19218,6 +19750,7 @@
       "max": 50.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19257,6 +19790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19296,6 +19830,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19335,6 +19870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19374,6 +19910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19413,6 +19950,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19452,6 +19990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19491,6 +20030,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19530,6 +20070,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19569,6 +20110,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19608,6 +20150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19647,6 +20190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19686,6 +20230,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19725,6 +20270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19764,6 +20310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19803,6 +20350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19842,6 +20390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19881,6 +20430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19920,6 +20470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19959,6 +20510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -19998,6 +20550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20037,6 +20590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20076,6 +20630,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20115,6 +20670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20154,6 +20710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20193,6 +20750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20232,6 +20790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20271,6 +20830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20310,6 +20870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20349,6 +20910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20388,6 +20950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20427,6 +20990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20466,6 +21030,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20505,6 +21070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20544,6 +21110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20583,6 +21150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20622,6 +21190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20661,6 +21230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20700,6 +21270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20739,6 +21310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20778,6 +21350,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20817,6 +21390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20856,6 +21430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20895,6 +21470,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20934,6 +21510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -20973,6 +21550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21012,6 +21590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21051,6 +21630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21090,6 +21670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21129,6 +21710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21168,6 +21750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21207,6 +21790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21246,6 +21830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21285,6 +21870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21324,6 +21910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21363,6 +21950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21402,6 +21990,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21441,6 +22030,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21480,6 +22070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21519,6 +22110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21558,6 +22150,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21597,6 +22190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21636,6 +22230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21675,6 +22270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21714,6 +22310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21753,6 +22350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21792,6 +22390,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21831,6 +22430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21870,6 +22470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21909,6 +22510,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21948,6 +22550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -21987,6 +22590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22026,6 +22630,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22065,6 +22670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22104,6 +22710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22143,6 +22750,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22182,6 +22790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22221,6 +22830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22260,6 +22870,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22299,6 +22910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22338,6 +22950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22377,6 +22990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22416,6 +23030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22455,6 +23070,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22494,6 +23110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22533,6 +23150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22572,6 +23190,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22611,6 +23230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22650,6 +23270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22689,6 +23310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22728,6 +23350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22767,6 +23390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22806,6 +23430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22845,6 +23470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22884,6 +23510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22923,6 +23550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -22962,6 +23590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23001,6 +23630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23040,6 +23670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23079,6 +23710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23118,6 +23750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23157,6 +23790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23196,6 +23830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23235,6 +23870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23274,6 +23910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23313,6 +23950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23352,6 +23990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23391,6 +24030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23430,6 +24070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23466,9 +24107,10 @@
     "spawnAsBlueprint": false,
     "condition": {
       "enabled": false,
-      "max": 0.0,
+      "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23508,6 +24150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23547,6 +24190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23586,6 +24230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23625,6 +24270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23664,6 +24310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23703,6 +24350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23742,6 +24390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23781,6 +24430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23820,6 +24470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23859,6 +24510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23898,6 +24550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23937,6 +24590,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -23976,6 +24630,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24015,6 +24670,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24054,6 +24710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24093,6 +24750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24132,6 +24790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24171,6 +24830,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24210,6 +24870,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24249,6 +24910,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24288,6 +24950,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24327,6 +24990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24366,6 +25030,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24405,6 +25070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24444,6 +25110,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24483,6 +25150,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24522,6 +25190,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24561,6 +25230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24600,6 +25270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24639,6 +25310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24678,6 +25350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24717,6 +25390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24756,6 +25430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24795,6 +25470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24834,6 +25510,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24873,6 +25550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24912,6 +25590,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24951,6 +25630,7 @@
       "max": 50.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -24990,6 +25670,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25029,6 +25710,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25068,6 +25750,7 @@
       "max": 50.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25107,6 +25790,7 @@
       "max": 50.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25146,6 +25830,7 @@
       "max": 4.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25176,7 +25861,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -25185,6 +25870,7 @@
       "max": 300.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25224,6 +25910,7 @@
       "max": 4.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25263,6 +25950,7 @@
       "max": 4.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25302,6 +25990,7 @@
       "max": 2.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25341,6 +26030,167 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
+      "foundCondition": {
+        "fractionMin": 1.0,
+        "fractionMax": 1.0
+      }
+    },
+    "isRedirectOf": null,
+    "steamDlcName": null
+  },
+  {
+    "shortname": "concretehatchet",
+    "itemid": 1176355476,
+    "itemName": "concrete_hatchet.item",
+    "worldModelPrefab": "assets/prefabs/tools/lumberjack_tools/concrete_hatchet.worldmodel.prefab",
+    "displayName": "Concrete Hatchet",
+    "displayDescription": "A salvaged piece of concrete and rebar which can be used to harvest wood",
+    "Traits": "Interesting",
+    "rarity": "None",
+    "occupySlots": 0,
+    "amountType": "Count",
+    "category": "Tool",
+    "selectionPanel": "None",
+    "flags": 0,
+    "itemType": "Generic",
+    "maxDraggable": 0,
+    "stackable": 65000,
+    "craftingStackable": 65000,
+    "quickDespawn": false,
+    "hidden": false,
+    "isHoldable": true,
+    "isWearable": false,
+    "HasSkins": false,
+    "CraftableWithSkin": false,
+    "isUsable": true,
+    "spawnAsBlueprint": false,
+    "condition": {
+      "enabled": true,
+      "max": 100.0,
+      "repairable": true,
+      "maintainMaxCondition": false,
+      "ovenCondition": false,
+      "foundCondition": {
+        "fractionMin": 1.0,
+        "fractionMax": 1.0
+      }
+    },
+    "isRedirectOf": null,
+    "steamDlcName": null
+  },
+  {
+    "shortname": "concretepickaxe",
+    "itemid": -1360171080,
+    "itemName": "concrete_pickaxe.item",
+    "worldModelPrefab": "assets/prefabs/tools/lumberjack_tools/concrete_pickaxe.worldmodel.prefab",
+    "displayName": "Concrete Pickaxe",
+    "displayDescription": "A salvaged piece of concrete and rebar with a sharp edge. Can be used to harvest Stone, Metal ore and Sulfur ore.",
+    "Traits": "Interesting",
+    "rarity": "None",
+    "occupySlots": 0,
+    "amountType": "Count",
+    "category": "Tool",
+    "selectionPanel": "None",
+    "flags": 0,
+    "itemType": "Generic",
+    "maxDraggable": 0,
+    "stackable": 65000,
+    "craftingStackable": 65000,
+    "quickDespawn": false,
+    "hidden": false,
+    "isHoldable": true,
+    "isWearable": false,
+    "HasSkins": false,
+    "CraftableWithSkin": false,
+    "isUsable": true,
+    "spawnAsBlueprint": false,
+    "condition": {
+      "enabled": true,
+      "max": 100.0,
+      "repairable": true,
+      "maintainMaxCondition": false,
+      "ovenCondition": false,
+      "foundCondition": {
+        "fractionMin": 1.0,
+        "fractionMax": 1.0
+      }
+    },
+    "isRedirectOf": null,
+    "steamDlcName": null
+  },
+  {
+    "shortname": "lumberjack.hatchet",
+    "itemid": -399173933,
+    "itemName": "lumberjack_axe.item",
+    "worldModelPrefab": "assets/prefabs/tools/lumberjack_tools/lumberjack_axe.worldmodel.prefab",
+    "displayName": "Prototype Hatchet",
+    "displayDescription": "A prototype field hatchet, useful for gathering wood",
+    "Traits": "Interesting",
+    "rarity": "Uncommon",
+    "occupySlots": 0,
+    "amountType": "Count",
+    "category": "Tool",
+    "selectionPanel": "None",
+    "flags": 0,
+    "itemType": "Generic",
+    "maxDraggable": 0,
+    "stackable": 65000,
+    "craftingStackable": 65000,
+    "quickDespawn": false,
+    "hidden": false,
+    "isHoldable": true,
+    "isWearable": false,
+    "HasSkins": false,
+    "CraftableWithSkin": false,
+    "isUsable": true,
+    "spawnAsBlueprint": false,
+    "condition": {
+      "enabled": true,
+      "max": 400.0,
+      "repairable": true,
+      "maintainMaxCondition": false,
+      "ovenCondition": false,
+      "foundCondition": {
+        "fractionMin": 1.0,
+        "fractionMax": 1.0
+      }
+    },
+    "isRedirectOf": null,
+    "steamDlcName": null
+  },
+  {
+    "shortname": "lumberjack.pickaxe",
+    "itemid": 236677901,
+    "itemName": "lumberjack_pick.item",
+    "worldModelPrefab": "assets/prefabs/tools/lumberjack_tools/lumberjack_pick.worldmodel.prefab",
+    "displayName": "Prototype Pickaxe",
+    "displayDescription": "A prototype field pickaxe. Useful for gathering ore from rocks.",
+    "Traits": "Interesting",
+    "rarity": "Uncommon",
+    "occupySlots": 0,
+    "amountType": "Count",
+    "category": "Tool",
+    "selectionPanel": "None",
+    "flags": 0,
+    "itemType": "Generic",
+    "maxDraggable": 0,
+    "stackable": 65000,
+    "craftingStackable": 65000,
+    "quickDespawn": false,
+    "hidden": false,
+    "isHoldable": true,
+    "isWearable": false,
+    "HasSkins": false,
+    "CraftableWithSkin": false,
+    "isUsable": true,
+    "spawnAsBlueprint": false,
+    "condition": {
+      "enabled": true,
+      "max": 400.0,
+      "repairable": true,
+      "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25380,6 +26230,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25419,6 +26270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25458,6 +26310,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25497,6 +26350,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25536,6 +26390,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25550,7 +26405,7 @@
     "itemName": "spraycan.item",
     "worldModelPrefab": "assets/prefabs/tools/spraycan/spraycan.worldmodel.prefab",
     "displayName": "Spray Can",
-    "displayDescription": "Use the Spray Can to leave Tags or reskin your items. Press [attack] to spray and [attack2] to reskin items. Insert spray attachments to spray in the world.",
+    "displayDescription": "Use the Spray Can to leave Tags or reskin your items. Press [attack] to spray and [attack2] to reskin items.",
     "Traits": "Interesting",
     "rarity": "Common",
     "occupySlots": 0,
@@ -25575,6 +26430,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25614,6 +26470,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25653,6 +26510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25692,6 +26550,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25731,6 +26590,7 @@
       "max": 4.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -25770,6 +26630,7 @@
       "max": 200.0,
       "repairable": false,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -25809,6 +26670,7 @@
       "max": 250.0,
       "repairable": false,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -25848,6 +26710,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -25887,6 +26750,7 @@
       "max": 300.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -25926,6 +26790,7 @@
       "max": 360.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -25965,6 +26830,7 @@
       "max": 700.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26004,6 +26870,7 @@
       "max": 425.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26043,6 +26910,7 @@
       "max": 300.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26082,6 +26950,7 @@
       "max": 250.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26121,6 +26990,7 @@
       "max": 675.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26160,6 +27030,7 @@
       "max": 275.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26199,6 +27070,7 @@
       "max": 275.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26238,6 +27110,7 @@
       "max": 295.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26277,6 +27150,7 @@
       "max": 525.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26316,6 +27190,7 @@
       "max": 325.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26355,6 +27230,7 @@
       "max": 325.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26394,6 +27270,7 @@
       "max": 525.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26433,6 +27310,7 @@
       "max": 300.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -26472,6 +27350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26511,6 +27390,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26550,6 +27430,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26589,6 +27470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26628,6 +27510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26667,6 +27550,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26706,6 +27590,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26745,6 +27630,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26784,6 +27670,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26823,6 +27710,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26862,6 +27750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26901,6 +27790,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26940,6 +27830,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -26979,6 +27870,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27018,6 +27910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27057,6 +27950,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27096,6 +27990,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27135,6 +28030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27174,6 +28070,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27213,6 +28110,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27252,6 +28150,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27291,6 +28190,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27330,6 +28230,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27369,6 +28270,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27408,6 +28310,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27447,6 +28350,7 @@
       "max": 300.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27486,6 +28390,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -27525,6 +28430,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -27564,6 +28470,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27603,6 +28510,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27642,6 +28550,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.01,
         "fractionMax": 0.05
@@ -27672,7 +28581,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -27681,6 +28590,7 @@
       "max": 80.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27711,7 +28621,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -27720,6 +28630,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27750,7 +28661,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -27759,6 +28670,7 @@
       "max": 50.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27798,6 +28710,7 @@
       "max": 10.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27837,6 +28750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27876,6 +28790,7 @@
       "max": 250.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27915,6 +28830,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -27945,7 +28861,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -27954,6 +28870,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.2,
         "fractionMax": 0.5
@@ -27984,7 +28901,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -27993,6 +28910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.1
@@ -28023,7 +28941,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28032,6 +28950,7 @@
       "max": 50.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28062,7 +28981,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28071,6 +28990,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28110,6 +29030,7 @@
       "max": 300.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.0,
         "fractionMax": 0.02
@@ -28149,6 +29070,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28188,6 +29110,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28227,6 +29150,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28266,6 +29190,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28305,6 +29230,7 @@
       "max": 400.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28344,6 +29270,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28374,7 +29301,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28383,6 +29310,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28413,7 +29341,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28422,6 +29350,7 @@
       "max": 400.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28461,6 +29390,7 @@
       "max": 350.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -28491,7 +29421,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28500,6 +29430,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28530,7 +29461,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28539,6 +29470,7 @@
       "max": 60.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.01,
         "fractionMax": 0.05
@@ -28569,7 +29501,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28578,6 +29510,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.5,
         "fractionMax": 1.0
@@ -28608,7 +29541,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28617,6 +29550,7 @@
       "max": 500.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -28647,7 +29581,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28656,6 +29590,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -28695,6 +29630,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.2,
         "fractionMax": 0.3
@@ -28734,6 +29670,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28773,6 +29710,7 @@
       "max": 200.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28812,6 +29750,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28842,7 +29781,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28851,6 +29790,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -28890,6 +29830,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -28929,6 +29870,7 @@
       "max": 300.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -28959,7 +29901,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -28968,6 +29910,7 @@
       "max": 400.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29007,6 +29950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.25,
         "fractionMax": 0.75
@@ -29037,7 +29981,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29046,6 +29990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.1
@@ -29085,6 +30030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -29124,6 +30070,7 @@
       "max": 100.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29154,7 +30101,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29163,6 +30110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29202,6 +30150,7 @@
       "max": 500.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29241,6 +30190,7 @@
       "max": 500.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29271,7 +30221,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29280,6 +30230,7 @@
       "max": 500.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29310,7 +30261,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29319,6 +30270,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29358,6 +30310,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.01,
         "fractionMax": 0.03
@@ -29397,6 +30350,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -29427,7 +30381,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29436,6 +30390,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -29466,7 +30421,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29475,6 +30430,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.1
@@ -29514,6 +30470,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.01,
         "fractionMax": 0.03
@@ -29553,6 +30510,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.2,
         "fractionMax": 0.5
@@ -29583,7 +30541,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29592,6 +30550,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29622,7 +30581,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29631,6 +30590,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29670,6 +30630,7 @@
       "max": 80.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29700,7 +30661,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29709,6 +30670,7 @@
       "max": 250.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29739,7 +30701,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29748,6 +30710,7 @@
       "max": 350.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29778,7 +30741,7 @@
     "hidden": false,
     "isHoldable": true,
     "isWearable": false,
-    "HasSkins": true,
+    "HasSkins": false,
     "CraftableWithSkin": false,
     "isUsable": true,
     "spawnAsBlueprint": false,
@@ -29787,6 +30750,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 0.1,
         "fractionMax": 0.2
@@ -29826,6 +30790,7 @@
       "max": 0.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29865,6 +30830,7 @@
       "max": 50.0,
       "repairable": false,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29904,6 +30870,7 @@
       "max": 150.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29943,6 +30910,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -29982,6 +30950,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -30021,6 +30990,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -30060,6 +31030,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -30099,6 +31070,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -30138,6 +31110,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0
@@ -30177,6 +31150,7 @@
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
+      "ovenCondition": false,
       "foundCondition": {
         "fractionMin": 1.0,
         "fractionMax": 1.0

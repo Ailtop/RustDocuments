@@ -373,6 +373,9 @@
   "hazmatsuit": [
     "ItemModWearable"
   ],
+  "hazmatsuit.lumberjack": [
+    "ItemModWearable"
+  ],
   "hazmatsuit.nomadsuit": [
     "ItemModWearable"
   ],
@@ -858,16 +861,24 @@
     "ItemModAssociatedEntity`1"
   ],
   "sign.wooden.huge": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModSign",
+    "ItemModAssociatedEntity`1"
   ],
   "sign.wooden.large": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModSign",
+    "ItemModAssociatedEntity`1"
   ],
   "sign.wooden.medium": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModSign",
+    "ItemModAssociatedEntity`1"
   ],
   "sign.wooden.small": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModSign",
+    "ItemModAssociatedEntity`1"
   ],
   "guntrap": [
     "ItemModEntity"
@@ -969,7 +980,7 @@
     "ItemModConsume",
     "ItemModMenuOption"
   ],
-  "chocholate": [
+  "chocolate": [
     "ItemModConsume",
     "ItemModMenuOption"
   ],
@@ -2046,6 +2057,18 @@
   "largemedkit": [
     "ItemModConsume",
     "ItemModMenuOption"
+  ],
+  "concretehatchet": [
+    "ItemModEntity"
+  ],
+  "concretepickaxe": [
+    "ItemModEntity"
+  ],
+  "lumberjack.hatchet": [
+    "ItemModEntity"
+  ],
+  "lumberjack.pickaxe": [
+    "ItemModEntity"
   ],
   "map": [
     "ItemModEntity",

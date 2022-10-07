@@ -8004,6 +8004,36 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/modding/cubes/cube_glowing_cool.prefab",
+    "guid": "c1b0dce92f5702749bb0e952f533f886",
+    "hash": 2811850945,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/cube_glowing_green.prefab",
+    "guid": "5762d8acc22489349aab3da01b689a77",
+    "hash": 419528325,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/cube_glowing_red.prefab",
+    "guid": "21785f2e76ee20849a02d154f184b934",
+    "hash": 1532402506,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/cube_glowing_warm.prefab",
+    "guid": "85d0b188a6699e24d8cf9fb3e16a654f",
+    "hash": 280628015,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/cube_glowing_white.prefab",
+    "guid": "e69ca05a9f1957f48b623106e30cd337",
+    "hash": 64297614,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/modding/cubes/dock_gounds_concrete_cube.prefab",
     "guid": "38cf22c8713db5f4d9363b9c3f66dedf",
     "hash": 1161443549,
@@ -8187,6 +8217,36 @@
     "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_dev_05.prefab",
     "guid": "ace4bda6fa58efb4caa3477d41483b5c",
     "hash": 3297176165,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_dev_06.prefab",
+    "guid": "5c5cf4beb25933d45b79c62a46b5a926",
+    "hash": 748921282,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_dev_07.prefab",
+    "guid": "a1e16edf2b65c3648b6806bd9ddfef7f",
+    "hash": 3000377299,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_dev_08.prefab",
+    "guid": "4c56b71809a949f4dbedde0cb1762be5",
+    "hash": 2131825849,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_dev_09.prefab",
+    "guid": "8b5543a021f085845a38e1581e8e4f6a",
+    "hash": 1568138236,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_dev_10.prefab",
+    "guid": "64a0a81f1af367d4dba5f30c5eeb9063",
+    "hash": 3299532326,
     "pool": false
   },
   {
@@ -11403,6 +11463,12 @@
     "name": "assets/content/effects/water/bullet_trails_underwater_01.prefab",
     "guid": "1545df97021e49d47847175c931a14fd",
     "hash": 1337665276,
+    "pool": false
+  },
+  {
+    "name": "assets/content/effects/weather/dust/vfx_dust_cinematic_volume.prefab",
+    "guid": "08233c066f650fe4b817afd70ca84ad5",
+    "hash": 3491773388,
     "pool": false
   },
   {
@@ -17481,12 +17547,6 @@
     "name": "assets/content/props/mixing_table_decor/mixingtable.decor.prefab",
     "guid": "aa4ee524a215aa9438a58cac36373335",
     "hash": 4251918121,
-    "pool": false
-  },
-  {
-    "name": "assets/content/props/new_campfire/new_campfire.prefab",
-    "guid": "71a75b782ba663b4887e3fe120d66260",
-    "hash": 417355778,
     "pool": false
   },
   {
@@ -23712,6 +23772,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/structures/office_interiors/effects/vent-door-close.prefab",
+    "guid": "769939fe89ed146f3a0e039b5c9c6c6e",
+    "hash": 2298604228,
+    "pool": true
+  },
+  {
+    "name": "assets/content/structures/office_interiors/effects/vent-door-open.prefab",
+    "guid": "53cbf96730f3a4b4db3ba52a3d617ce9",
+    "hash": 3914949716,
+    "pool": true
+  },
+  {
     "name": "assets/content/structures/office_interiors/office_a_floor_0.prefab",
     "guid": "77c5cbd67b972124085b198b6b0703ca",
     "hash": 1181221201,
@@ -26433,6 +26505,12 @@
     "name": "assets/content/structures/train_tracks/crane_track_150x900_end.prefab",
     "guid": "64a99128d3ab43147811d043c8358e12",
     "hash": 1648377328,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/train_tracks/train_barrier_end.prefab",
+    "guid": "1d222c3c37bd83844973beb2d12f472a",
+    "hash": 3454182030,
     "pool": false
   },
   {
@@ -31098,6 +31176,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/ui/menuui/ui.serverbrowser.checkbox.prefab",
+    "guid": "18d3f7cb582856f4e9559e4b7bf19acb",
+    "hash": 1780421713,
+    "pool": false
+  },
+  {
+    "name": "assets/content/ui/menuui/ui.serverbrowser.filtering.prefab",
+    "guid": "0a10a11ddde2eb140ae5e7db825d2e3e",
+    "hash": 2555232890,
+    "pool": false
+  },
+  {
     "name": "assets/content/ui/menuui/ui.serverbrowser.list.prefab",
     "guid": "26c3ef451020b074289e8b662eb53161",
     "hash": 2468234189,
@@ -31105,14 +31195,26 @@
   },
   {
     "name": "assets/content/ui/menuui/ui.serverbrowser.tag.prefab",
-    "guid": "a09ef0582fbf11e4ba1b759ff3393c59",
+    "guid": "42698de35c8b7324ea96f2d92e18bd4e",
     "hash": 227433652,
     "pool": false
   },
   {
+    "name": "assets/content/ui/menuui/ui.serverbrowser.taglist.filtering.prefab",
+    "guid": "00d8764cf32fa734caf7d210b4bf80ac",
+    "hash": 1021214762,
+    "pool": false
+  },
+  {
     "name": "assets/content/ui/menuui/ui.serverbrowser.taglist.prefab",
-    "guid": "b5c65ea9d0989ef4d8185a0dade0a9f5",
+    "guid": "c589652f0749a6e4493571c8a5ec1f22",
     "hash": 1314604604,
+    "pool": false
+  },
+  {
+    "name": "assets/content/ui/menuui/ui.serverbrowser.taglist.summary.prefab",
+    "guid": "94a8396f3f6e6f047a2efb2053676f9e",
+    "hash": 3718019489,
     "pool": false
   },
   {
@@ -33358,6 +33460,12 @@
     "guid": "72d67844c3dd5d741b6a4e27184522b6",
     "hash": 3016281271,
     "pool": true
+  },
+  {
+    "name": "assets/media/timelines/playblast/playblast_timeline.prefab",
+    "guid": "d7e4487cffa8d38438f41a85085affca",
+    "hash": 940120915,
+    "pool": false
   },
   {
     "name": "assets/plugins/facepunch.unity/fpapi/resources/facepunch.performance.prefab",
@@ -38238,6 +38346,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/clothes/suit.hazmat/lumberjack/hazmat_suit.lumberjack.item.prefab",
+    "guid": "df0f1221e246b654f9beccf26ee4c22d",
+    "hash": 1210631191,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/clothes/suit.hazmat/lumberjack/lumberjack_hazmat.prefab",
+    "guid": "34bda1d14839ce04594d2831ff457bb5",
+    "hash": 1427282987,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/clothes/suit.hazmat/lumberjack/lumberjack_hazmat_vm.prefab",
+    "guid": "22a9c8ddc5542884495fb6c68e5b5f4d",
+    "hash": 2320986442,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/clothes/suit.hazmat/lumberjack/lumberjack_hazmat_wm.prefab",
+    "guid": "f97a1dcfaadc3684db13d5da637a6e62",
+    "hash": 2573428348,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/clothes/suit.hazmat/nomad/hazmat_suit.nomadsuit.item.prefab",
     "guid": "db2d0531915a7e8419f115c768795604",
     "hash": 2200021467,
@@ -39138,6 +39270,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/deployable/campfire/campfire.model.prefab",
+    "guid": "1d2159bf4675f2e42a8501705556fd97",
+    "hash": 1380131554,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/deployable/campfire/campfire.prefab",
     "guid": "b04a8d83cee7bfa489cef0605c6d1f5a",
     "hash": 4160694184,
@@ -39148,6 +39286,12 @@
     "guid": "a5cffe686f993410a98146f3e239c38f",
     "hash": 1554352183,
     "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/campfire/effects2/campfire burning.prefab",
+    "guid": "aab41eec88f8ac347841ed5f20da0a2b",
+    "hash": 2362014226,
+    "pool": false
   },
   {
     "name": "assets/prefabs/deployable/card table/_cardtable_base.prefab",
@@ -42138,6 +42282,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/engine/world setup empty.prefab",
+    "guid": "fdfdd88c3ae8146439a94a8fdbd5912a",
+    "hash": 3711876460,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/engine/world setup.prefab",
     "guid": "9b0f9282e5f87324cbea0eb81c842ea8",
     "hash": 1622922681,
@@ -42312,9 +42462,9 @@
     "pool": false
   },
   {
-    "name": "assets/prefabs/food/chocholate/chocholate.item.prefab",
+    "name": "assets/prefabs/food/chocholate/chocolate.item.prefab",
     "guid": "cb8b648a754d11942a28abe81f93bd51",
-    "hash": 3086801933,
+    "hash": 3039919184,
     "pool": false
   },
   {
@@ -51423,6 +51573,234 @@
     "name": "assets/prefabs/tools/large medkit/largemedkit.worldmodel.prefab",
     "guid": "64174b12b20c24c4da7982adfaec12d6",
     "hash": 3544605451,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_hatchet.entity.prefab",
+    "guid": "cc6ff9b3a358f4c42b14d78ab08bf2c9",
+    "hash": 1777756171,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_hatchet.item.prefab",
+    "guid": "e10ce5464dffe804fb85b1e0c2976ce4",
+    "hash": 4137438663,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_hatchet.projectile.prefab",
+    "guid": "2eabfbd5d7f935a4dbab89e2839bd4ef",
+    "hash": 401287261,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_hatchet.viewmodel.prefab",
+    "guid": "335b827e326841844b4fd579391da18b",
+    "hash": 3511282078,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_hatchet.worldmodel.prefab",
+    "guid": "0dad1793069d44d43ad74c3b65ed9dca",
+    "hash": 3785833103,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_pickaxe.entity.prefab",
+    "guid": "f9ed8a227328f9748b1f7b09b1e88d31",
+    "hash": 1480417083,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_pickaxe.item.prefab",
+    "guid": "31ad1b82c1496674887b3a5e1c5d3b27",
+    "hash": 3035378059,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_pickaxe.projectile.prefab",
+    "guid": "5fa1a89c1044faf4981f28fdc718d508",
+    "hash": 2260704082,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_pickaxe.viewmodel.prefab",
+    "guid": "a4d820936178a9b4d99b08cd79e9a4a4",
+    "hash": 3445519908,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/concrete_pickaxe.worldmodel.prefab",
+    "guid": "827990c6c02228949bcffdf2a10f6f0d",
+    "hash": 2098484187,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/attack_shake.prefab",
+    "guid": "65b1106592f8c094bbad0615fd9665e3",
+    "hash": 324927562,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/deploy.prefab",
+    "guid": "05c91da16f9c8ed4aa68e95fd4936e30",
+    "hash": 2969425084,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/lumberjack-axe-strike.prefab",
+    "guid": "fe0735f1752ce6347ac93c7d9459d6ce",
+    "hash": 2561808823,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/lumberjack-axe-strike-muted.prefab",
+    "guid": "cff1ba9ecd9900140be36ba30bf3f37f",
+    "hash": 2922129354,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/lumberjack-pick-strike.prefab",
+    "guid": "65a11d385e8db41a195f277dc86eadd3",
+    "hash": 3320708503,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/lumberjack-pick-strike-muted.prefab",
+    "guid": "2768c8cac61ca41cc917c76fded691d2",
+    "hash": 4045586077,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/strike_screenshake.prefab",
+    "guid": "dce1aa5c1e3d0d74188f121cb8fd7165",
+    "hash": 2232262632,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/swing.prefab",
+    "guid": "6a53bb6a1defc6249a6b4db7cb442ae4",
+    "hash": 3562758160,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_metal/effects/throw.prefab",
+    "guid": "edb192badc0f9ff4dab49351d62a67b2",
+    "hash": 1939905869,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/attack_shake.prefab",
+    "guid": "08d61fa636896c64fb5c846bcc509054",
+    "hash": 3569073615,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/concrete-axe-strike.prefab",
+    "guid": "ae35f2f9f7ba7f8439674ac47e685186",
+    "hash": 886991073,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/concrete-axe-strike-muted.prefab",
+    "guid": "073e26c54215cb248a44139cf4992aa8",
+    "hash": 2951215008,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/concrete-pick-strike.prefab",
+    "guid": "2768fc827271e41769b016fa453ee7c2",
+    "hash": 3264267536,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/concrete-pick-strike-muted.prefab",
+    "guid": "ce8279cbca3a445b3971a90a414c98be",
+    "hash": 1951581249,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/deploy.prefab",
+    "guid": "37e8fbb1b81bcef41856ed17f09ad951",
+    "hash": 617217128,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/strike_screenshake.prefab",
+    "guid": "1dd1ecbbe66168b4c937534d8497ddb4",
+    "hash": 2981727381,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/swing.prefab",
+    "guid": "f21f2e5ecdf2bde48a2d37e86489e666",
+    "hash": 1920433543,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/effects_stone/effects/throw.prefab",
+    "guid": "011f47132a433c043bd4dd64bba31fe6",
+    "hash": 3777399288,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_axe.entity.prefab",
+    "guid": "2e8c1cb1f7f07284bbedbfa528fe9c9e",
+    "hash": 4035646930,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_axe.item.prefab",
+    "guid": "a3c3c0fb26b814b4b9613796bb7300a9",
+    "hash": 3483562423,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_axe.projectile.prefab",
+    "guid": "7e597f0a392f82a48a755763f34cbd6a",
+    "hash": 623030135,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_axe.viewmodel.prefab",
+    "guid": "5aabb9ae0f8b2764cbd21cf9f2e3d328",
+    "hash": 1984242702,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_axe.worldmodel.prefab",
+    "guid": "fdc51147643b2184594b73a8eeed1f5d",
+    "hash": 3817758839,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_pick.entity.prefab",
+    "guid": "9ed0bcd302252b948bc7bbc39cf7b651",
+    "hash": 1725165540,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_pick.item.prefab",
+    "guid": "3dc3e4b1baadf864b94a0778867b2429",
+    "hash": 2024386235,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_pick.projectile.prefab",
+    "guid": "01101a8bfefc6154194ed4299123c10a",
+    "hash": 3896353015,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_pick.viewmodel.prefab",
+    "guid": "59396a539af81c849b06b5e2b21d5a71",
+    "hash": 2274625834,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/lumberjack_tools/lumberjack_pick.worldmodel.prefab",
+    "guid": "fdb65a701e91aba49a18b89fb577ca50",
+    "hash": 903351533,
     "pool": false
   },
   {

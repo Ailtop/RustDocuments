@@ -7848,6 +7848,34 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "concrete_hatchet.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "concrete_pickaxe.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lumberjack_axe.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lumberjack_pick.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "cargomarker": [
     "MapMarkerCH47",
     "MapMarker",
