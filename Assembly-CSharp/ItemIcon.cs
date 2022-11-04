@@ -58,11 +58,15 @@ public class ItemIcon : BaseMonoBehaviour, IPointerClickHandler, IEventSystemHan
 
 	public Image maxConditionFill;
 
+	public GameObject lightEnabled;
+
 	public bool allowSelection = true;
 
 	public bool allowDropping = true;
 
 	public bool allowMove = true;
+
+	public bool showCountDropShadow;
 
 	[NonSerialized]
 	public Item item;

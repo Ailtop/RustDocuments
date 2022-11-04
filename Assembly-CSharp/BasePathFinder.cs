@@ -82,6 +82,41 @@ public class BasePathFinder
 		return chosenPosition;
 	}
 
+	public virtual Vector3 GetBestRoamPositionFromAnchor(BaseNavigator navigator, Vector3 anchorPos, Vector3 fallbackPos, float minRange, float maxRange)
+	{
+		float radius = UnityEngine.Random.Range(minRange, maxRange);
+		int num = 0;
+		int num2 = 0;
+		float num3 = UnityEngine.Random.Range(0f, 90f);
+		for (float num4 = 0f; num4 < 360f; num4 += 90f)
+		{
+			Vector3 pointOnCircle = GetPointOnCircle(anchorPos, radius, num4 + num3);
+			if (navigator.GetNearestNavmeshPosition(pointOnCircle, out var position, 10f) && navigator.IsAcceptableWaterDepth(position))
+			{
+				topologySamples[num] = position;
+				num++;
+				if (navigator.IsPositionABiomePreference(position) && navigator.IsPositionATopologyPreference(position))
+				{
+					preferedTopologySamples[num2] = position;
+					num2++;
+				}
+			}
+		}
+		if (UnityEngine.Random.Range(0f, 1f) <= 0.9f && num2 > 0)
+		{
+			chosenPosition = preferedTopologySamples[UnityEngine.Random.Range(0, num2)];
+		}
+		else if (num > 0)
+		{
+			chosenPosition = topologySamples[UnityEngine.Random.Range(0, num)];
+		}
+		else
+		{
+			chosenPosition = fallbackPos;
+		}
+		return chosenPosition;
+	}
+
 	public virtual bool GetBestFleePosition(BaseNavigator navigator, AIBrainSenses senses, BaseEntity fleeFrom, Vector3 fallbackPos, float minRange, float maxRange, out Vector3 result)
 	{
 		if (fleeFrom == null)

@@ -1,4 +1,6 @@
+using ConVar;
 using Oxide.Core;
+using ProtoBuf;
 using Rust;
 using UnityEngine;
 
@@ -13,9 +15,28 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	[Header("Loot")]
 	public LootContainer.LootSpawnSlot[] LootSpawnSlots;
 
-	public float nextAttackTime;
+	public static float NextBeanCanAllowedTime;
+
+	public bool RoamAroundHomePoint;
 
 	public ScarecrowBrain Brain { get; set; }
+
+	public override BaseNpc.AiStatistics.FamilyEnum Family => BaseNpc.AiStatistics.FamilyEnum.Murderer;
+
+	public override float StartHealth()
+	{
+		return startHealth;
+	}
+
+	public override float StartMaxHealth()
+	{
+		return startHealth;
+	}
+
+	public override float MaxHealth()
+	{
+		return startHealth;
+	}
 
 	public override void ServerInit()
 	{
@@ -44,6 +65,21 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 		if (Brain.ShouldServerThink())
 		{
 			Brain.DoThink();
+		}
+	}
+
+	public override string Categorize()
+	{
+		return "Scarecrow";
+	}
+
+	public override void EquipWeapon(bool skipDeployDelay = false)
+	{
+		base.EquipWeapon(skipDeployDelay);
+		HeldEntity heldEntity = GetHeldEntity();
+		if (heldEntity != null && heldEntity is Chainsaw chainsaw)
+		{
+			chainsaw.ServerNPCStart();
 		}
 	}
 
@@ -137,7 +173,12 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 
 	public bool IsOnCooldown()
 	{
-		return Time.realtimeSinceStartup < nextAttackTime;
+		AttackEntity attackEntity = GetAttackEntity();
+		if ((bool)attackEntity)
+		{
+			return attackEntity.HasAttackCooldown();
+		}
+		return true;
 	}
 
 	public bool StartAttacking(BaseEntity target)
@@ -160,9 +201,11 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 			{
 				ServerRotation = Quaternion.LookRotation(vector.normalized);
 			}
-			target.Hurt(BaseAttackDamge, AttackDamageType, this);
-			SignalBroadcast(Signal.Attack);
-			nextAttackTime = Time.realtimeSinceStartup + CooldownDuration();
+			AttackEntity attackEntity = GetAttackEntity();
+			if ((bool)attackEntity)
+			{
+				attackEntity.ServerUse();
+			}
 		}
 	}
 
@@ -193,7 +236,7 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	{
 		using (TimeWarning.New("Create corpse"))
 		{
-			NPCPlayerCorpse nPCPlayerCorpse = DropCorpse("assets/rust.ai/agents/NPCPlayer/pet/frankensteinpet_corpse.prefab") as NPCPlayerCorpse;
+			NPCPlayerCorpse nPCPlayerCorpse = DropCorpse("assets/prefabs/npc/murderer/murderer_corpse.prefab") as NPCPlayerCorpse;
 			if ((bool)nPCPlayerCorpse)
 			{
 				nPCPlayerCorpse.transform.position = nPCPlayerCorpse.transform.position + Vector3.down * NavAgent.baseOffset;
@@ -237,5 +280,28 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	protected virtual string OverrideCorpseName()
 	{
 		return "Scarecrow";
+	}
+
+	public override void Hurt(HitInfo info)
+	{
+		if (!info.isHeadshot)
+		{
+			if ((info.InitiatorPlayer != null && !info.InitiatorPlayer.IsNpc) || (info.InitiatorPlayer == null && info.Initiator != null && info.Initiator.IsNpc))
+			{
+				info.damageTypes.ScaleAll(Halloween.scarecrow_body_dmg_modifier);
+			}
+			else
+			{
+				info.damageTypes.ScaleAll(2f);
+			}
+		}
+		base.Hurt(info);
+	}
+
+	public override void AttackerInfo(PlayerLifeStory.DeathInfo info)
+	{
+		base.AttackerInfo(info);
+		info.inflictorName = inventory.containerBelt.GetSlot(0).info.shortname;
+		info.attackerName = base.ShortPrefabName;
 	}
 }

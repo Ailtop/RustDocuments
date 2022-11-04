@@ -6,6 +6,7 @@ using ConVar;
 using Facepunch;
 using Facepunch.Extend;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using Rust;
 using Rust.UI;
@@ -305,9 +306,9 @@ public class MarketTerminal : StorageContainer
 		ClientRPCPlayer(null, msg.player, "Client_OpenMarket", entityIdList);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void Server_Purchase(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))
@@ -500,6 +501,11 @@ public class MarketTerminal : StorageContainer
 		}
 		bool IsEligible(VendingMachine vendingMachine, Vector3 offset, int n)
 		{
+			object obj = Interface.CallHook("CanAccessVendingMachine", config, vendingMachine);
+			if (obj is bool)
+			{
+				return (bool)obj;
+			}
 			if (vendingMachine is NPCVendingMachine)
 			{
 				return true;

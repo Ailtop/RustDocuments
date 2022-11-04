@@ -522,6 +522,11 @@ public class Item
 		}
 	}
 
+	public bool DoItemSlotsConflict(Item other)
+	{
+		return (info.occupySlots & other.info.occupySlots) != 0;
+	}
+
 	public void SetParent(ItemContainer target)
 	{
 		if (target == parent)
@@ -650,12 +655,21 @@ public class Item
 					for (int i = 0; i < newcontainer.capacity; i++)
 					{
 						slot = newcontainer.GetSlot(i);
-						if (slot == null && CanMoveTo(newcontainer, i))
+						if (slot == null)
+						{
+							if (CanMoveTo(newcontainer, i))
+							{
+								iTargetPos = i;
+								break;
+							}
+							continue;
+						}
+						if (flag2 && slot != null && !slot.info.ItemModWearable.CanExistWith(itemModWearable))
 						{
 							iTargetPos = i;
 							break;
 						}
-						if (flag2 && slot != null && !slot.info.ItemModWearable.CanExistWith(itemModWearable))
+						if (newcontainer.availableSlots != null && newcontainer.availableSlots.Count > 0 && DoItemSlotsConflict(slot))
 						{
 							iTargetPos = i;
 							break;
@@ -711,22 +725,25 @@ public class Item
 						{
 							return MoveToContainer(newcontainer, -1, allowStack, ignoreStackLimit, sourcePlayer);
 						}
-						bool result = false;
 						Interface.CallHook("OnItemStacked", slot, this, newcontainer);
-						return result;
+						return false;
 					}
 				}
 				if (parent != null)
 				{
-					ItemContainer newcontainer2 = parent;
+					ItemContainer itemContainer2 = parent;
 					int iTargetPos2 = position;
-					if (!slot2.CanMoveTo(newcontainer2, iTargetPos2))
+					if (!slot2.CanMoveTo(itemContainer2, iTargetPos2))
 					{
 						return false;
 					}
+					BaseEntity entityOwner = GetEntityOwner();
+					BaseEntity entityOwner2 = slot2.GetEntityOwner();
 					RemoveFromContainer();
 					slot2.RemoveFromContainer();
-					slot2.MoveToContainer(newcontainer2, iTargetPos2, allowStack: true, ignoreStackLimit: false, sourcePlayer);
+					RemoveConflictingSlots(newcontainer, entityOwner, sourcePlayer);
+					slot2.RemoveConflictingSlots(itemContainer2, entityOwner2, sourcePlayer);
+					slot2.MoveToContainer(itemContainer2, iTargetPos2, allowStack: true, ignoreStackLimit: false, sourcePlayer);
 					return MoveToContainer(newcontainer, iTargetPos, allowStack: true, ignoreStackLimit: false, sourcePlayer);
 				}
 				return false;
@@ -756,12 +773,40 @@ public class Item
 			{
 				return false;
 			}
+			BaseEntity entityOwner3 = GetEntityOwner();
 			RemoveFromContainer();
 			RemoveFromWorld();
+			RemoveConflictingSlots(newcontainer, entityOwner3, sourcePlayer);
 			position = iTargetPos;
 			SetParent(newcontainer);
 			return true;
 		}
+	}
+
+	private void RemoveConflictingSlots(ItemContainer container, BaseEntity entityOwner, BasePlayer sourcePlayer)
+	{
+		if (!isServer || container.availableSlots == null || container.availableSlots.Count <= 0)
+		{
+			return;
+		}
+		List<Item> obj = Facepunch.Pool.GetList<Item>();
+		obj.AddRange(container.itemList);
+		foreach (Item item in obj)
+		{
+			if (item.DoItemSlotsConflict(this))
+			{
+				item.RemoveFromContainer();
+				if (entityOwner is BasePlayer basePlayer)
+				{
+					basePlayer.GiveItem(item);
+				}
+				else if (entityOwner is IItemContainerEntity itemContainerEntity)
+				{
+					item.MoveToContainer(itemContainerEntity.inventory, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer);
+				}
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public BaseEntity CreateWorldObject(Vector3 pos, Quaternion rotation = default(Quaternion), BaseEntity parentEnt = null, uint parentBone = 0u)

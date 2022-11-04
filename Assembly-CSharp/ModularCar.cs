@@ -960,6 +960,10 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		{
 			return false;
 		}
+		if (PlayerIsMounted(player))
+		{
+			return true;
+		}
 		if (!PlayerCanUseThis(player, ModularCarLock.LockType.General))
 		{
 			return false;

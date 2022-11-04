@@ -309,6 +309,41 @@ public class ScientistBrain : BaseAIBrain
 	{
 	}
 
+	public class MoveToVector3State : BasicAIState
+	{
+		public MoveToVector3State()
+			: base(AIState.MoveToVector3)
+		{
+		}
+
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateLeave(brain, entity);
+			Stop();
+		}
+
+		private void Stop()
+		{
+			brain.Navigator.Stop();
+			brain.Navigator.ClearFacingDirectionOverride();
+		}
+
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateThink(delta, brain, entity);
+			Vector3 pos = brain.Events.Memory.Position.Get(7);
+			if (!brain.Navigator.SetDestination(pos, BaseNavigator.NavigationSpeed.Fast, 0.5f))
+			{
+				return StateStatus.Error;
+			}
+			if (!brain.Navigator.Moving)
+			{
+				return StateStatus.Finished;
+			}
+			return StateStatus.Running;
+		}
+	}
+
 	public class RoamState : BaseRoamState
 	{
 		private StateStatus status = StateStatus.Error;
@@ -490,6 +525,7 @@ public class ScientistBrain : BaseAIBrain
 		AddState(new BaseNavigateHomeState());
 		AddState(new CombatStationaryState());
 		AddState(new BaseMoveTorwardsState());
+		AddState(new MoveToVector3State());
 	}
 
 	public override void InitializeAI()

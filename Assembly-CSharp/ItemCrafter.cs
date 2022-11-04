@@ -167,6 +167,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		ulong skin = ItemDefinition.FindSkin(task.blueprint.targetItem.itemid, task.skinID);
 		Item item = ItemManager.CreateByItemID(task.blueprint.targetItem.itemid, 1, skin);
 		item.amount = task.blueprint.amountToCreate;
+		int amount = item.amount;
 		if (item.hasCondition && task.conditionScale != 1f)
 		{
 			item.maxCondition *= task.conditionScale;
@@ -204,11 +205,11 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 		if (task.owner.inventory.GiveItem(item))
 		{
-			task.owner.Command("note.inv", item.info.itemid, item.amount);
+			task.owner.Command("note.inv", item.info.itemid, amount);
 			return;
 		}
 		ItemContainer itemContainer = containers.First();
-		task.owner.Command("note.inv", item.info.itemid, item.amount);
+		task.owner.Command("note.inv", item.info.itemid, amount);
 		task.owner.Command("note.inv", item.info.itemid, -item.amount);
 		item.Drop(itemContainer.dropPosition, itemContainer.dropVelocity);
 	}

@@ -58,6 +58,21 @@ public abstract class TerrainMap : TerrainExtension
 		}
 	}
 
+	public void ForEach(float normX, float normZ, float normRadius, Action<int, int> action)
+	{
+		int num = Index(normX - normRadius);
+		int num2 = Index(normX + normRadius);
+		int num3 = Index(normZ - normRadius);
+		int num4 = Index(normZ + normRadius);
+		for (int i = num3; i <= num4; i++)
+		{
+			for (int j = num; j <= num2; j++)
+			{
+				action(j, i);
+			}
+		}
+	}
+
 	public void ForEachParallel(Vector3 v0, Vector3 v1, Vector3 v2, Action<int, int> action)
 	{
 		Vector2i v3 = new Vector2i(Index(TerrainMeta.NormalizeX(v0.x)), Index(TerrainMeta.NormalizeZ(v0.z)));

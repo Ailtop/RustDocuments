@@ -251,7 +251,7 @@ public class AI : ConsoleSystem
 	[ServerVar]
 	public static void killscientists(Arg args)
 	{
-		ScientistNPC[] array = BaseEntity.Util.FindScientists();
+		ScientistNPC[] array = BaseEntity.Util.FindAll<ScientistNPC>();
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].Kill();
@@ -261,7 +261,7 @@ public class AI : ConsoleSystem
 	[ServerVar]
 	public static void killanimals(Arg args)
 	{
-		BaseAnimalNPC[] array = BaseEntity.Util.FindAnimals();
+		BaseAnimalNPC[] array = BaseEntity.Util.FindAll<BaseAnimalNPC>();
 		for (int i = 0; i < array.Length; i++)
 		{
 			array[i].Kill();

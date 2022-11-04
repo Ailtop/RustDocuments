@@ -1,7 +1,7 @@
 using Rust;
 using UnityEngine;
 
-public class ScrapTransportHelicopter : MiniCopter
+public class ScrapTransportHelicopter : MiniCopter, TriggerHurtNotChild.IHurtTriggerUser
 {
 	public Transform searchlightEye;
 
@@ -91,6 +91,15 @@ public class ScrapTransportHelicopter : MiniCopter
 	public override int StartingFuelUnits()
 	{
 		return 100;
+	}
+
+	public float GetPlayerDamageMultiplier()
+	{
+		return 1f;
+	}
+
+	public void OnHurtTriggerOccupant(BaseEntity hurtEntity, DamageType damageType, float damageTotal)
+	{
 	}
 
 	protected override bool CanPushNow(BasePlayer pusher)

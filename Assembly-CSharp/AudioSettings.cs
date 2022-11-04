@@ -27,6 +27,7 @@ public class AudioSettings : MonoBehaviour
 			mixer.SetFloat("InstrumentVol", LinearToDecibel(Audio.instruments * num));
 			float num2 = LinearToDecibel(Audio.voiceProps * num) - 28.7f;
 			mixer.SetFloat("VoicePropsVol", num2 * num);
+			mixer.SetFloat("SeasonalEventsVol", LinearToDecibel(Audio.eventAudio * num));
 		}
 	}
 

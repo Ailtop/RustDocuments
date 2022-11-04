@@ -152,10 +152,13 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 		int num = 0;
 		foreach (IOEntity connected in connectedList)
 		{
-			num += connected.DesiredPower();
-			if (num >= maxOutput)
+			if (connected.ShouldDrainBattery(this))
 			{
-				return maxOutput;
+				num += connected.DesiredPower();
+				if (num >= maxOutput)
+				{
+					return maxOutput;
+				}
 			}
 		}
 		return num;

@@ -31,24 +31,6 @@ public static class ColliderEx
 		return false;
 	}
 
-	public static Vector3 GetLocalCentre(this Collider col)
-	{
-		if (col is SphereCollider sphereCollider)
-		{
-			return sphereCollider.center;
-		}
-		if (col is BoxCollider boxCollider)
-		{
-			return boxCollider.center;
-		}
-		if (col is CapsuleCollider capsuleCollider)
-		{
-			return capsuleCollider.center;
-		}
-		_ = col is MeshCollider;
-		return Vector3.zero;
-	}
-
 	public static float GetRadius(this Collider col, Vector3 transformScale)
 	{
 		float result = 1f;

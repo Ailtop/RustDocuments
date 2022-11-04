@@ -115,9 +115,9 @@ public class ScientistNPC : HumanNPC, IAIMounted
 		}
 	}
 
-	public override void EquipWeapon()
+	public override void EquipWeapon(bool skipDeployDelay = false)
 	{
-		base.EquipWeapon();
+		base.EquipWeapon(skipDeployDelay);
 		HeldEntity heldEntity = GetHeldEntity();
 		if (!(heldEntity != null))
 		{

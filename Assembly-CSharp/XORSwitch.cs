@@ -20,7 +20,8 @@ public class XORSwitch : IOEntity
 		{
 			return 0;
 		}
-		return Mathf.Max(input1Amount, input2Amount);
+		int num = Mathf.Max(input1Amount, input2Amount);
+		return Mathf.Max(0, num - ConsumptionAmount());
 	}
 
 	public override void UpdateHasPower(int inputAmount, int inputSlot)

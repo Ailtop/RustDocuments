@@ -476,6 +476,19 @@ public class SleepingBag : DecayEntity
 		}
 		deployerUserID = num;
 		SendNetworkUpdate();
+		CheckForOnlineAndDead();
+	}
+
+	private void CheckForOnlineAndDead()
+	{
+		if (deployerUserID != 0L)
+		{
+			BasePlayer basePlayer = BasePlayer.FindByID(deployerUserID);
+			if (basePlayer != null && basePlayer.IsConnected && basePlayer.IsDead())
+			{
+				basePlayer.SendRespawnOptions();
+			}
+		}
 	}
 
 	[RPC_Server]

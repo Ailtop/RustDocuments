@@ -69,9 +69,9 @@ public sealed class Bloom : PostProcessEffectSettings
 		value = null
 	};
 
+	[Min(0f)]
 	[Tooltip("The intensity of the lens dirtiness.")]
 	[DisplayName("Intensity")]
-	[Min(0f)]
 	public FloatParameter dirtIntensity = new FloatParameter
 	{
 		value = 0f

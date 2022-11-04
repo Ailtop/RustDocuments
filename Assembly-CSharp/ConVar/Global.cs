@@ -111,7 +111,7 @@ public class Global : ConsoleSystem
 			{
 				preloadConcurrency = 256;
 			}
-			asyncWarmup = true;
+			asyncWarmup = false;
 			break;
 		default:
 			UnityEngine.Debug.LogWarning($"There is no asyncLoading preset number {asyncLoadingPreset}");

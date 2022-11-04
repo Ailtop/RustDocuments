@@ -62,6 +62,11 @@ public class ProjectileWeaponMod : BaseEntity
 
 	public bool needsOnForEffects;
 
+	[Header("Burst")]
+	public int burstCount = -1;
+
+	public float timeBetweenBursts;
+
 	public override void ServerInit()
 	{
 		SetFlag(Flags.Disabled, b: true);

@@ -148,9 +148,9 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity(direction);
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.IsActiveItem]
-	[RPC_Server]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -570,7 +570,7 @@ public class BaseMelee : AttackEntity
 		return true;
 	}
 
-	public string GetStrikeEffectPath(string materialName)
+	public virtual string GetStrikeEffectPath(string materialName)
 	{
 		for (int i = 0; i < materialStrikeFX.Count; i++)
 		{

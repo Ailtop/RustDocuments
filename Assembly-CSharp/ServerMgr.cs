@@ -8,6 +8,7 @@ using CompanionServer;
 using ConVar;
 using Facepunch;
 using Facepunch.Math;
+using Facepunch.Network;
 using Ionic.Crc;
 using Network;
 using Network.Visibility;
@@ -501,14 +502,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2359)
+		else if (packet.connection.protocol > 2362)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2359));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2362));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2359)
+		else if (packet.connection.protocol < 2362)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2359));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2362));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -1044,6 +1045,36 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 	}
 
+	private void LateUpdate()
+	{
+		if (!runFrameUpdate)
+		{
+			return;
+		}
+		using (TimeWarning.New("ServerMgr.LateUpdate", 500))
+		{
+			if (!Facepunch.Network.SteamNetworking.steamnagleflush)
+			{
+				return;
+			}
+			try
+			{
+				using (TimeWarning.New("Connection.Flush"))
+				{
+					for (int i = 0; i < Network.Net.sv.connections.Count; i++)
+					{
+						Network.Net.sv.Flush(Network.Net.sv.connections[i]);
+					}
+				}
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogWarning("Server Exception: Connection.Flush");
+				UnityEngine.Debug.LogException(exception, this);
+			}
+		}
+	}
+
 	private void FixedUpdate()
 	{
 		using (TimeWarning.New("ServerMgr.FixedUpdate"))
@@ -1153,7 +1184,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2359}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2362}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
 				string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();

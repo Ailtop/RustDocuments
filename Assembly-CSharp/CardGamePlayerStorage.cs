@@ -1,16 +1,16 @@
 using Facepunch;
 using ProtoBuf;
 
-public class CardTablePlayerStorage : StorageContainer
+public class CardGamePlayerStorage : StorageContainer
 {
 	private EntityRef cardTableRef;
 
-	public CardTable GetCardTable()
+	public BaseCardGameEntity GetCardGameEntity()
 	{
 		BaseEntity baseEntity = cardTableRef.Get(base.isServer);
 		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
 		{
-			return baseEntity as CardTable;
+			return baseEntity as BaseCardGameEntity;
 		}
 		return null;
 	}
@@ -24,18 +24,13 @@ public class CardTablePlayerStorage : StorageContainer
 		}
 	}
 
-	public void SetCardTable(CardTable cardTable)
-	{
-		cardTableRef.Set(cardTable);
-	}
-
 	protected override void OnInventoryDirty()
 	{
 		base.OnInventoryDirty();
-		CardTable cardTable = GetCardTable();
-		if (cardTable != null)
+		BaseCardGameEntity cardGameEntity = GetCardGameEntity();
+		if (cardGameEntity != null)
 		{
-			cardTable.PlayerStorageChanged();
+			cardGameEntity.PlayerStorageChanged();
 		}
 	}
 
@@ -44,5 +39,10 @@ public class CardTablePlayerStorage : StorageContainer
 		base.Save(info);
 		info.msg.simpleUID = Pool.Get<SimpleUID>();
 		info.msg.simpleUID.uid = cardTableRef.uid;
+	}
+
+	public void SetCardTable(BaseCardGameEntity cardGameEntity)
+	{
+		cardTableRef.Set(cardGameEntity);
 	}
 }

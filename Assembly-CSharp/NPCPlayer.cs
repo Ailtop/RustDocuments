@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using ConVar;
 using Oxide.Core;
 using UnityEngine;
 using UnityEngine.AI;
@@ -44,6 +46,8 @@ public class NPCPlayer : BasePlayer
 	private float lastMovementTickTime;
 
 	public Vector3 lastPos;
+
+	private float lastThrowTime;
 
 	public override bool IsNpc => true;
 
@@ -111,7 +115,7 @@ public class NPCPlayer : BasePlayer
 		if (!IsLoadBalanced())
 		{
 			InvokeRepeating(ServerThink_Internal, 0f, 0.1f);
-			lastThinkTime = Time.time;
+			lastThinkTime = UnityEngine.Time.time;
 		}
 		Invoke(EquipTest, 0.25f);
 		finalDestination = base.transform.position;
@@ -220,7 +224,7 @@ public class NPCPlayer : BasePlayer
 				baseProjectile.ServerReload();
 				return false;
 			}
-			if (baseProjectile.NextAttackTime > Time.time)
+			if (baseProjectile.NextAttackTime > UnityEngine.Time.time)
 			{
 				return false;
 			}
@@ -231,24 +235,24 @@ public class NPCPlayer : BasePlayer
 			{
 				return true;
 			}
-			if (Time.time < nextTriggerTime)
+			if (UnityEngine.Time.time < nextTriggerTime)
 			{
 				return true;
 			}
 			InvokeRepeating(TriggerDown, 0f, 0.01f);
 			if (targetDist <= shortRange)
 			{
-				triggerEndTime = Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax * attackLengthMaxShortRangeScale);
+				triggerEndTime = UnityEngine.Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax * attackLengthMaxShortRangeScale);
 			}
 			else
 			{
-				triggerEndTime = Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax);
+				triggerEndTime = UnityEngine.Time.time + UnityEngine.Random.Range(attackEntity.attackLengthMin, attackEntity.attackLengthMax);
 			}
 			TriggerDown();
 			return true;
 		}
 		attackEntity.ServerUse(damageScale);
-		lastGunShotTime = Time.time;
+		lastGunShotTime = UnityEngine.Time.time;
 		return true;
 	}
 
@@ -259,9 +263,9 @@ public class NPCPlayer : BasePlayer
 
 	public void CancelBurst(float delay = 0.2f)
 	{
-		if (triggerEndTime > Time.time + delay)
+		if (triggerEndTime > UnityEngine.Time.time + delay)
 		{
-			triggerEndTime = Time.time + delay;
+			triggerEndTime = UnityEngine.Time.time + delay;
 		}
 	}
 
@@ -288,15 +292,15 @@ public class NPCPlayer : BasePlayer
 		{
 			attackEntity.ServerUse(damageScale);
 		}
-		lastGunShotTime = Time.time;
-		if (Time.time > triggerEndTime)
+		lastGunShotTime = UnityEngine.Time.time;
+		if (UnityEngine.Time.time > triggerEndTime)
 		{
 			CancelInvoke(TriggerDown);
-			nextTriggerTime = Time.time + ((attackEntity != null) ? attackEntity.attackSpacing : 1f);
+			nextTriggerTime = UnityEngine.Time.time + ((attackEntity != null) ? attackEntity.attackSpacing : 1f);
 		}
 	}
 
-	public virtual void EquipWeapon()
+	public virtual void EquipWeapon(bool skipDeployDelay = false)
 	{
 		if (inventory == null || inventory.containerBelt == null)
 		{
@@ -309,26 +313,31 @@ public class NPCPlayer : BasePlayer
 		}
 		UpdateActiveItem(inventory.containerBelt.GetSlot(0).uid);
 		BaseEntity heldEntity = slot.GetHeldEntity();
-		if (heldEntity != null)
+		if (!(heldEntity != null))
 		{
-			AttackEntity component = heldEntity.GetComponent<AttackEntity>();
-			if (component != null)
+			return;
+		}
+		AttackEntity component = heldEntity.GetComponent<AttackEntity>();
+		if (component != null)
+		{
+			if (skipDeployDelay)
 			{
-				component.TopUpAmmo();
+				component.ResetAttackCooldown();
 			}
+			component.TopUpAmmo();
 		}
 	}
 
 	public void EquipTest()
 	{
-		EquipWeapon();
+		EquipWeapon(skipDeployDelay: true);
 	}
 
 	internal void ServerThink_Internal()
 	{
-		float delta = Time.time - lastThinkTime;
+		float delta = UnityEngine.Time.time - lastThinkTime;
 		ServerThink(delta);
-		lastThinkTime = Time.time;
+		lastThinkTime = UnityEngine.Time.time;
 	}
 
 	public virtual void ServerThink(float delta)
@@ -351,16 +360,16 @@ public class NPCPlayer : BasePlayer
 
 	public void TickMovement()
 	{
-		float delta = Time.realtimeSinceStartup - lastMovementTickTime;
-		lastMovementTickTime = Time.realtimeSinceStartup;
+		float delta = UnityEngine.Time.realtimeSinceStartup - lastMovementTickTime;
+		lastMovementTickTime = UnityEngine.Time.realtimeSinceStartup;
 		MovementUpdate(delta);
 	}
 
 	public override float GetNetworkTime()
 	{
-		if (Time.realtimeSinceStartup - lastPositionUpdateTime > PositionTickRate * 2f)
+		if (UnityEngine.Time.realtimeSinceStartup - lastPositionUpdateTime > PositionTickRate * 2f)
 		{
-			return Time.time;
+			return UnityEngine.Time.time;
 		}
 		return lastPositionUpdateTime;
 	}
@@ -410,7 +419,7 @@ public class NPCPlayer : BasePlayer
 
 	protected virtual void UpdatePositionAndRotation(Vector3 moveToPosition)
 	{
-		lastPositionUpdateTime = Time.time;
+		lastPositionUpdateTime = UnityEngine.Time.time;
 		ServerPosition = moveToPosition;
 		SetAimDirection(GetAimDirection());
 	}
@@ -422,7 +431,7 @@ public class NPCPlayer : BasePlayer
 
 	public virtual float DesiredMoveSpeed()
 	{
-		float running = Mathf.Sin(Time.time + randomOffset);
+		float running = Mathf.Sin(UnityEngine.Time.time + randomOffset);
 		return GetSpeed(running, 0f, 0f);
 	}
 
@@ -453,7 +462,95 @@ public class NPCPlayer : BasePlayer
 			eyes.rotation = Quaternion.LookRotation(newAim, Vector3.up);
 			viewAngles = eyes.rotation.eulerAngles;
 			ServerRotation = eyes.rotation;
-			lastPositionUpdateTime = Time.time;
+			lastPositionUpdateTime = UnityEngine.Time.time;
 		}
+	}
+
+	public bool TryUseThrownWeapon(BaseEntity target, float attackRate)
+	{
+		if (HasThrownItemCooldown())
+		{
+			return false;
+		}
+		Item item = FindThrownWeapon();
+		if (item == null)
+		{
+			lastThrowTime = UnityEngine.Time.time;
+			return false;
+		}
+		return TryUseThrownWeapon(item, target, attackRate);
+	}
+
+	public bool TryUseThrownWeapon(Item item, BaseEntity target, float attackRate)
+	{
+		if (HasThrownItemCooldown())
+		{
+			return false;
+		}
+		float num = Vector3.Distance(target.transform.position, base.transform.position);
+		if (num <= 2f || num >= 20f)
+		{
+			return false;
+		}
+		Vector3 position = target.transform.position;
+		if (!IsVisible(CenterPoint(), position))
+		{
+			return false;
+		}
+		if (UseThrownWeapon(item, target))
+		{
+			if (this is ScarecrowNPC)
+			{
+				ScarecrowNPC.NextBeanCanAllowedTime = UnityEngine.Time.time + Halloween.scarecrow_throw_beancan_global_delay;
+			}
+			lastThrowTime = UnityEngine.Time.time;
+			return true;
+		}
+		return false;
+	}
+
+	public bool HasThrownItemCooldown()
+	{
+		return UnityEngine.Time.time - lastThrowTime < 10f;
+	}
+
+	protected bool UseThrownWeapon(Item item, BaseEntity target)
+	{
+		UpdateActiveItem(item.uid);
+		ThrownWeapon thrownWeapon = GetActiveItem().GetHeldEntity() as ThrownWeapon;
+		if (thrownWeapon == null)
+		{
+			return false;
+		}
+		StartCoroutine(DoThrow(thrownWeapon, target));
+		return true;
+	}
+
+	private IEnumerator DoThrow(ThrownWeapon thrownWeapon, BaseEntity target)
+	{
+		modelState.aiming = true;
+		yield return new WaitForSeconds(1.5f);
+		SetAimDirection(Vector3Ex.Direction(target.transform.position, base.transform.position));
+		thrownWeapon.ResetAttackCooldown();
+		thrownWeapon.ServerThrow(target.transform.position);
+		modelState.aiming = false;
+		Invoke(EquipTest, 0.5f);
+	}
+
+	public Item FindThrownWeapon()
+	{
+		if (inventory == null || inventory.containerBelt == null)
+		{
+			return null;
+		}
+		for (int i = 0; i < inventory.containerBelt.capacity; i++)
+		{
+			Item slot = inventory.containerBelt.GetSlot(i);
+			if (slot != null && slot.GetHeldEntity() as ThrownWeapon != null)
+			{
+				return slot;
+			}
+		}
+		return null;
 	}
 }

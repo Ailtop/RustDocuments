@@ -98,7 +98,7 @@ public class AttackEntity : HeldEntity
 		nextAttackTime = CalculateCooldownTime(nextAttackTime, cooldown, catchup: true);
 	}
 
-	protected void ResetAttackCooldown()
+	public void ResetAttackCooldown()
 	{
 		nextAttackTime = float.NegativeInfinity;
 	}

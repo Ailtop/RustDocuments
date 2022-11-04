@@ -24,15 +24,25 @@ public class MissionEntity : BaseMonoBehaviour, IOnParentDestroying
 
 	public virtual void MissionStarted(BasePlayer assignee, BaseMission.MissionInstance instance)
 	{
+		IMissionEntityListener[] componentsInChildren = GetComponentsInChildren<IMissionEntityListener>();
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			componentsInChildren[i].MissionStarted(assignee, instance);
+		}
 	}
 
 	public virtual void MissionEnded(BasePlayer assignee, BaseMission.MissionInstance instance)
 	{
+		IMissionEntityListener[] componentsInChildren = GetComponentsInChildren<IMissionEntityListener>();
+		for (int i = 0; i < componentsInChildren.Length; i++)
+		{
+			componentsInChildren[i].MissionEnded(assignee, instance);
+		}
 		if (instance.createdEntities.Contains(this))
 		{
 			instance.createdEntities.Remove(this);
 		}
-		if ((cleanupOnMissionSuccess && instance.status == BaseMission.MissionStatus.Completed) || (cleanupOnMissionFailed && instance.status == BaseMission.MissionStatus.Failed))
+		if ((cleanupOnMissionSuccess && (instance.status == BaseMission.MissionStatus.Completed || instance.status == BaseMission.MissionStatus.Accomplished)) || (cleanupOnMissionFailed && instance.status == BaseMission.MissionStatus.Failed))
 		{
 			BaseEntity entity = GetEntity();
 			if ((bool)entity)

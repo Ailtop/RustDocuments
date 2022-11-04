@@ -68,6 +68,10 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	public static AIInformationZone Merge(List<AIInformationZone> zones, GameObject newRoot)
 	{
+		if (zones == null)
+		{
+			return null;
+		}
 		AIInformationZone aIInformationZone = newRoot.AddComponent<AIInformationZone>();
 		aIInformationZone.UseCalculatedCoverDistances = false;
 		foreach (AIInformationZone zone in zones)
@@ -385,7 +389,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 		Gizmos.DrawCube(bounds.center, bounds.size);
 	}
 
-	private void AddInitialPoints()
+	public void AddInitialPoints()
 	{
 		AICoverPoint[] componentsInChildren = base.transform.GetComponentsInChildren<AICoverPoint>();
 		foreach (AICoverPoint point in componentsInChildren)

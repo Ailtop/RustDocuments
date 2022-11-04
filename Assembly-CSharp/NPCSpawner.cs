@@ -22,6 +22,8 @@ public class NPCSpawner : SpawnGroup
 
 	public float SenseRange = 30f;
 
+	public bool CheckLOS = true;
+
 	public float TargetLostRange = 50f;
 
 	public float AttackRangeMultiplier = 1f;
@@ -123,6 +125,7 @@ public class NPCSpawner : SpawnGroup
 			brain.TargetLostRange *= TargetLostRange;
 			brain.AttackRangeMultiplier = AttackRangeMultiplier;
 			brain.ListenRange = ListenRange;
+			brain.CheckLOS = CheckLOS;
 			if (CanUseHealingItemsChance > 0f)
 			{
 				brain.CanUseHealingItems = Random.Range(0f, 1f) <= CanUseHealingItemsChance;

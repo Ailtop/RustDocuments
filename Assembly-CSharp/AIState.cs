@@ -24,5 +24,6 @@ public enum AIState
 	NavigateHome = 21,
 	CombatStationary = 22,
 	Cooldown = 23,
-	MoveToPoint = 24
+	MoveToPoint = 24,
+	MoveToVector3 = 25
 }

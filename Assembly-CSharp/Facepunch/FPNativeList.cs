@@ -1,8 +1,9 @@
-using System;
-using Facepunch;
 using Unity.Collections;
+using UnityEngine;
 
-public class NativeList<T> : Pool.IPooled where T : unmanaged
+namespace Facepunch;
+
+public class FPNativeList<T> : Pool.IPooled where T : unmanaged
 {
 	private NativeArray<T> _array;
 
@@ -53,7 +54,7 @@ public class NativeList<T> : Pool.IPooled where T : unmanaged
 	{
 		if (!_array.IsCreated || _array.Length < requiredCapacity)
 		{
-			int length = Math.Max(_array.Length * 2, requiredCapacity);
+			int length = Mathf.Max(_array.Length * 2, requiredCapacity);
 			NativeArray<T> array = new NativeArray<T>(length, Allocator.Persistent);
 			if (_array.IsCreated)
 			{

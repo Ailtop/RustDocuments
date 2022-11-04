@@ -200,7 +200,7 @@ public class Inventory : ConsoleSystem
 				arg.ReplyWith("Invalid Item!");
 				return;
 			}
-			item.amount = arg.GetInt(1, 1);
+			int num = (item.amount = arg.GetInt(1, 1));
 			item.OnVirginSpawn();
 			if (!activePlayer.inventory.GiveItem(item))
 			{
@@ -208,7 +208,7 @@ public class Inventory : ConsoleSystem
 				arg.ReplyWith("Couldn't give item (inventory full?)");
 				continue;
 			}
-			activePlayer.Command("note.inv", item.info.itemid, item.amount);
+			activePlayer.Command("note.inv", item.info.itemid, num);
 			Debug.Log(" [ServerVar] giving " + activePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
 		}
 		if (item != null)
@@ -237,7 +237,7 @@ public class Inventory : ConsoleSystem
 			arg.ReplyWith("Invalid Item!");
 			return;
 		}
-		item.amount = arg.GetInt(2, 1);
+		int num = (item.amount = arg.GetInt(2, 1));
 		item.OnVirginSpawn();
 		if (!basePlayer.inventory.GiveItem(item))
 		{
@@ -245,9 +245,9 @@ public class Inventory : ConsoleSystem
 			arg.ReplyWith("Couldn't give item (inventory full?)");
 			return;
 		}
-		basePlayer.Command("note.inv", item.info.itemid, item.amount);
-		Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
-		Chat.Broadcast(text + " gave " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
+		basePlayer.Command("note.inv", item.info.itemid, num);
+		Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + num + " x " + item.info.displayName.english);
+		Chat.Broadcast(text + " gave " + basePlayer.displayName + " " + num + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
 	}
 
 	[ServerVar]
@@ -264,7 +264,7 @@ public class Inventory : ConsoleSystem
 			arg.ReplyWith("Invalid Item!");
 			return;
 		}
-		item.amount = arg.GetInt(1, 1);
+		int num = (item.amount = arg.GetInt(1, 1));
 		item.OnVirginSpawn();
 		if (!basePlayer.inventory.GiveItem(item))
 		{
@@ -272,15 +272,15 @@ public class Inventory : ConsoleSystem
 			arg.ReplyWith("Couldn't give item (inventory full?)");
 			return;
 		}
-		basePlayer.Command("note.inv", item.info.itemid, item.amount);
-		Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
+		basePlayer.Command("note.inv", item.info.itemid, num);
+		Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + num + " x " + item.info.displayName.english);
 		if (basePlayer.IsDeveloper)
 		{
-			basePlayer.ChatMessage("you silently gave yourself " + item.amount + " x " + item.info.displayName.english);
+			basePlayer.ChatMessage("you silently gave yourself " + num + " x " + item.info.displayName.english);
 		}
 		else
 		{
-			Chat.Broadcast(basePlayer.displayName + " gave themselves " + item.amount + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
+			Chat.Broadcast(basePlayer.displayName + " gave themselves " + num + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
 		}
 	}
 
@@ -298,7 +298,7 @@ public class Inventory : ConsoleSystem
 			arg.ReplyWith("Invalid Item!");
 			return;
 		}
-		item.amount = arg.GetInt(1, 1);
+		int num = (item.amount = arg.GetInt(1, 1));
 		item.OnVirginSpawn();
 		if (!basePlayer.inventory.GiveItem(item, basePlayer.inventory.containerBelt))
 		{
@@ -306,7 +306,7 @@ public class Inventory : ConsoleSystem
 			arg.ReplyWith("Couldn't give item (inventory full?)");
 			return;
 		}
-		basePlayer.Command("note.inv", item.info.itemid, item.amount);
+		basePlayer.Command("note.inv", item.info.itemid, num);
 		Debug.Log(" [ServerVar] giving " + basePlayer.displayName + " " + item.amount + " x " + item.info.displayName.english);
 		if (basePlayer.IsDeveloper)
 		{

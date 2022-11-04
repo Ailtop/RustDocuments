@@ -37,6 +37,8 @@ public class CardPlayerData : IDisposable
 
 	public readonly int scrapItemID;
 
+	private Action<CardPlayerData> turnTimerCallback;
+
 	public ulong UserID { get; set; }
 
 	public CardPlayerState State { get; set; }
@@ -55,7 +57,7 @@ public class CardPlayerData : IDisposable
 
 	public bool SendCardDetails { get; set; }
 
-	public bool hasActedThisTurn { get; set; }
+	public bool hasCompletedTurn { get; private set; }
 
 	public CardPlayerData(int mountIndex, bool isServer)
 	{
@@ -71,17 +73,17 @@ public class CardPlayerData : IDisposable
 		this.getStorage = getStorage;
 	}
 
-	public void Dispose()
+	public virtual void Dispose()
 	{
 		Pool.FreeList(ref Cards);
+		if (isServer)
+		{
+			CancelTurnTimer();
+		}
 	}
 
 	public int GetScrapAmount()
 	{
-		if (!HasUser)
-		{
-			return 0;
-		}
 		if (isServer)
 		{
 			StorageContainer storage = GetStorage();
@@ -94,9 +96,24 @@ public class CardPlayerData : IDisposable
 		return 0;
 	}
 
-	public void SetHasActedThisTurn(bool hasActed)
+	public virtual int GetTotalBetThisRound()
 	{
-		hasActedThisTurn = hasActed;
+		return betThisRound;
+	}
+
+	public virtual List<PlayingCard> GetMainCards()
+	{
+		return Cards;
+	}
+
+	public virtual List<PlayingCard> GetSecondaryCards()
+	{
+		return null;
+	}
+
+	public void SetHasCompletedTurn(bool hasActed)
+	{
+		hasCompletedTurn = hasActed;
 		if (!hasActed)
 		{
 			betThisTurn = 0;
@@ -128,15 +145,9 @@ public class CardPlayerData : IDisposable
 	public void ClearAllData()
 	{
 		UserID = 0uL;
-		Cards.Clear();
 		availableInputs = 0;
-		betThisRound = 0;
-		betThisTurn = 0;
-		finalScore = 0;
-		LeftRoundEarly = false;
-		hasActedThisTurn = false;
-		SendCardDetails = false;
 		State = CardPlayerState.None;
+		ClearPerRoundData();
 	}
 
 	public void JoinRound()
@@ -144,23 +155,28 @@ public class CardPlayerData : IDisposable
 		if (HasUser)
 		{
 			State = CardPlayerState.InCurrentRound;
-			Cards.Clear();
-			betThisRound = 0;
-			betThisTurn = 0;
-			finalScore = 0;
-			LeftRoundEarly = false;
-			hasActedThisTurn = false;
-			SendCardDetails = false;
+			ClearPerRoundData();
 		}
 	}
 
-	public void LeaveCurrentRound(bool clearBets, bool leftRoundEarly)
+	protected virtual void ClearPerRoundData()
+	{
+		Cards.Clear();
+		betThisRound = 0;
+		betThisTurn = 0;
+		finalScore = 0;
+		LeftRoundEarly = false;
+		hasCompletedTurn = false;
+		SendCardDetails = false;
+	}
+
+	public virtual void LeaveCurrentRound(bool clearBets, bool leftRoundEarly)
 	{
 		if (HasUserInCurrentRound)
 		{
 			availableInputs = 0;
 			finalScore = 0;
-			hasActedThisTurn = false;
+			hasCompletedTurn = false;
 			if (clearBets)
 			{
 				betThisRound = 0;
@@ -168,10 +184,11 @@ public class CardPlayerData : IDisposable
 			}
 			State = CardPlayerState.InGame;
 			LeftRoundEarly = leftRoundEarly;
+			CancelTurnTimer();
 		}
 	}
 
-	public void LeaveGame()
+	public virtual void LeaveGame()
 	{
 		if (HasUserInGame)
 		{
@@ -204,26 +221,41 @@ public class CardPlayerData : IDisposable
 		return text;
 	}
 
-	public void Save(List<ProtoBuf.CardTable.CardPlayer> playersMsg)
+	public virtual void Save(CardGame syncData)
 	{
-		ProtoBuf.CardTable.CardPlayer cardPlayer = Pool.Get<ProtoBuf.CardTable.CardPlayer>();
+		CardGame.CardPlayer cardPlayer = Pool.Get<CardGame.CardPlayer>();
 		cardPlayer.userid = UserID;
 		cardPlayer.cards = Pool.GetList<int>();
-		if (SendCardDetails)
+		foreach (PlayingCard card in Cards)
 		{
-			foreach (PlayingCard card in Cards)
-			{
-				cardPlayer.cards.Add(card.GetIndex());
-			}
+			cardPlayer.cards.Add(SendCardDetails ? card.GetIndex() : (-1));
 		}
 		cardPlayer.scrap = GetScrapAmount();
 		cardPlayer.state = (int)State;
 		cardPlayer.availableInputs = availableInputs;
 		cardPlayer.betThisRound = betThisRound;
 		cardPlayer.betThisTurn = betThisTurn;
-		cardPlayer.trueCardCount = Cards.Count;
 		cardPlayer.leftRoundEarly = LeftRoundEarly;
 		cardPlayer.sendCardDetails = SendCardDetails;
-		playersMsg.Add(cardPlayer);
+		syncData.players.Add(cardPlayer);
+	}
+
+	public void StartTurnTimer(Action<CardPlayerData> callback, float maxTurnTime)
+	{
+		turnTimerCallback = callback;
+		SingletonComponent<InvokeHandler>.Instance.Invoke(TimeoutTurn, maxTurnTime);
+	}
+
+	public void CancelTurnTimer()
+	{
+		SingletonComponent<InvokeHandler>.Instance.CancelInvoke(TimeoutTurn);
+	}
+
+	public void TimeoutTurn()
+	{
+		if (turnTimerCallback != null)
+		{
+			turnTimerCallback(this);
+		}
 	}
 }

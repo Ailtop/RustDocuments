@@ -82,9 +82,9 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 		return aimConeScale;
 	}
 
-	public override void EquipWeapon()
+	public override void EquipWeapon(bool skipDeployDelay = false)
 	{
-		base.EquipWeapon();
+		base.EquipWeapon(skipDeployDelay);
 	}
 
 	public override void DismountObject()
@@ -299,10 +299,13 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 				nPCPlayerCorpse.playerSteamID = userID;
 				nPCPlayerCorpse.Spawn();
 				nPCPlayerCorpse.TakeChildren(this);
-				ItemContainer[] containers = nPCPlayerCorpse.containers;
-				for (int i = 0; i < containers.Length; i++)
+				for (int i = 0; i < nPCPlayerCorpse.containers.Length; i++)
 				{
-					containers[i].Clear();
+					ItemContainer itemContainer = nPCPlayerCorpse.containers[i];
+					if (i != 1)
+					{
+						itemContainer.Clear();
+					}
 				}
 				if (LootSpawnSlots.Length != 0)
 				{
@@ -312,10 +315,10 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 						return (BaseCorpse)obj;
 					}
 					LootContainer.LootSpawnSlot[] lootSpawnSlots = LootSpawnSlots;
-					for (int i = 0; i < lootSpawnSlots.Length; i++)
+					for (int j = 0; j < lootSpawnSlots.Length; j++)
 					{
-						LootContainer.LootSpawnSlot lootSpawnSlot = lootSpawnSlots[i];
-						for (int j = 0; j < lootSpawnSlot.numberToSpawn; j++)
+						LootContainer.LootSpawnSlot lootSpawnSlot = lootSpawnSlots[j];
+						for (int k = 0; k < lootSpawnSlot.numberToSpawn; k++)
 						{
 							if (UnityEngine.Random.Range(0f, 1f) <= lootSpawnSlot.probability)
 							{
@@ -353,6 +356,10 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 			return true;
 		}
 		if (entity is BasePet)
+		{
+			return true;
+		}
+		if (entity is ScarecrowNPC)
 		{
 			return true;
 		}
@@ -472,7 +479,7 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 			heldItem.ServerUse();
 			Heal(MaxHealth());
 			yield return new WaitForSeconds(2f);
-			EquipTest();
+			EquipWeapon();
 		}
 	}
 

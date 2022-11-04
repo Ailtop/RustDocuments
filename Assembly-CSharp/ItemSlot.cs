@@ -8,5 +8,6 @@ public enum ItemSlot
 	Silencer = 4,
 	Scope = 8,
 	UnderBarrel = 0x10,
-	Magazine = 0x20
+	Magazine = 0x20,
+	Internal = 0x40
 }

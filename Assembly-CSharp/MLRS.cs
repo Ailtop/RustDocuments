@@ -783,14 +783,14 @@ public class MLRS : BaseMountable
 			trueTargetHitPos = UserTargetHitPos;
 			foreach (TriggerSafeZone allSafeZone in TriggerSafeZone.allSafeZones)
 			{
-				Vector3 vector2 = allSafeZone.transform.position + ColliderEx.GetLocalCentre(allSafeZone.triggerCollider);
-				vector2.y = 0f;
+				Vector3 center = allSafeZone.triggerCollider.bounds.center;
+				center.y = 0f;
 				float num = ColliderEx.GetRadius(allSafeZone.triggerCollider, allSafeZone.transform.localScale) + targetAreaRadius;
 				trueTargetHitPos.y = 0f;
-				if (Vector3.Distance(vector2, trueTargetHitPos) < num)
+				if (Vector3.Distance(center, trueTargetHitPos) < num)
 				{
-					Vector3 vector3 = trueTargetHitPos - vector2;
-					trueTargetHitPos = vector2 + vector3.normalized * num;
+					Vector3 vector2 = trueTargetHitPos - center;
+					trueTargetHitPos = center + vector2.normalized * num;
 					trueTargetHitPos.y = GetSurfaceHeight(trueTargetHitPos);
 					break;
 				}

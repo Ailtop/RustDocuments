@@ -914,7 +914,10 @@ public class CompleteTrain : IDisposable
 			{
 				num2 *= -1f;
 			}
-			trackSpeed += num2 / TotalMass * deltaTime;
+			if ((front && num2 <= 0f) || (!front && num2 >= 0f))
+			{
+				trackSpeed += num2 / TotalMass * deltaTime;
+			}
 			Facepunch.Pool.FreeList(ref prevTrains);
 		}
 		return trackSpeed;
@@ -944,7 +947,7 @@ public class CompleteTrain : IDisposable
 			}
 		}
 		float value = num3 / ourTotalMass * deltaTime;
-		value = Mathf.Clamp(value, 0f - Mathf.Abs(num - trackSpeed) - 1f, Mathf.Abs(num - trackSpeed) + 1f);
+		value = Mathf.Clamp(value, 0f - Mathf.Abs(num - trackSpeed) - 0.5f, Mathf.Abs(num - trackSpeed) + 0.5f);
 		trackSpeed -= value;
 		return trackSpeed;
 	}

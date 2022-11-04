@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using Rust;
 using Rust.Ai;
 using UnityEngine;
@@ -121,8 +120,7 @@ public class DynamicNavMesh : SingletonComponent<DynamicNavMesh>, IServerCompone
 		int lastPct = 0;
 		while (!HasBuildOperationStarted)
 		{
-			Thread.Sleep(250);
-			yield return null;
+			yield return CoroutineEx.waitForSecondsRealtime(0.25f);
 		}
 		while (BuildingOperation != null)
 		{
@@ -132,9 +130,8 @@ public class DynamicNavMesh : SingletonComponent<DynamicNavMesh>, IServerCompone
 				UnityEngine.Debug.LogFormat("{0}%", num);
 				lastPct = num;
 			}
-			Thread.Sleep(250);
+			yield return CoroutineEx.waitForSecondsRealtime(0.25f);
 			FinishBuildingNavmesh();
-			yield return null;
 		}
 	}
 

@@ -8,42 +8,36 @@ public class TexasHoldEmUI : MonoBehaviour
 	[SerializeField]
 	private Image[] holeCardImages;
 
+	[SerializeField]
+	private Image[] holeCardBackings;
+
 	[FormerlySerializedAs("flopCardImages")]
 	[SerializeField]
 	private Image[] communityCardImages;
 
 	[SerializeField]
+	private Image[] communityCardBackings;
+
+	[SerializeField]
 	private RustText potText;
 
 	[SerializeField]
-	private TexasHoldEmPlayerWidget[] playerWidgets;
-
-	[SerializeField]
-	private GameObject raiseRoot;
-
-	[SerializeField]
-	private Translate.Phrase phraseNotEnoughBuyIn;
-
-	[SerializeField]
-	private Translate.Phrase phraseTooMuchBuyIn;
-
-	[SerializeField]
-	private Translate.Phrase phraseYouWinTheRound;
-
-	[SerializeField]
-	private Translate.Phrase phraseRoundWinner;
-
-	[SerializeField]
-	private Translate.Phrase phraseRoundWinners;
-
-	[SerializeField]
-	private Translate.Phrase phraseScrapWon;
-
-	[SerializeField]
-	private Translate.Phrase phraseScrapReturned;
+	private CardGamePlayerWidget[] playerWidgets;
 
 	[SerializeField]
 	private Translate.Phrase phraseWinningHand;
+
+	[SerializeField]
+	private Translate.Phrase foldPhrase;
+
+	[SerializeField]
+	private Translate.Phrase raisePhrase;
+
+	[SerializeField]
+	private Translate.Phrase checkPhrase;
+
+	[SerializeField]
+	private Translate.Phrase callPhrase;
 
 	[SerializeField]
 	private Translate.Phrase phraseRoyalFlush;
@@ -74,4 +68,19 @@ public class TexasHoldEmUI : MonoBehaviour
 
 	[SerializeField]
 	private Translate.Phrase phraseHighCard;
+
+	[SerializeField]
+	private Translate.Phrase phraseRaiseAmount;
+
+	[SerializeField]
+	private Sprite dealerChip;
+
+	[SerializeField]
+	private Sprite smallBlindChip;
+
+	[SerializeField]
+	private Sprite bigBlindChip;
+
+	[SerializeField]
+	private Sprite noIcon;
 }

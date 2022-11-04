@@ -279,6 +279,22 @@ public static class Analytics
 			}
 		}
 
+		public static void ReportCandiesCollectedByPlayer(int count)
+		{
+			if (Enabled)
+			{
+				DesignEvent("halloween:candiesCollected", count);
+			}
+		}
+
+		public static void ReportPlayersParticipatedInHalloweenEvent(int count)
+		{
+			if (Enabled)
+			{
+				DesignEvent("halloween:playersParticipated", count);
+			}
+		}
+
 		public static void Trigger(string message)
 		{
 			if (CanSendAnalytics && !string.IsNullOrEmpty(message))

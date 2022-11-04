@@ -4,16 +4,28 @@ namespace Facepunch.CardGames;
 
 public class PlayingCard
 {
+	public readonly bool IsUnknownCard;
+
 	public readonly Suit Suit;
 
 	public readonly Rank Rank;
 
 	public static PlayingCard[] cards = GenerateAllCards();
 
+	public static PlayingCard unknownCard = new PlayingCard();
+
 	private PlayingCard(Suit suit, Rank rank)
 	{
+		IsUnknownCard = false;
 		Suit = suit;
 		Rank = rank;
+	}
+
+	private PlayingCard()
+	{
+		IsUnknownCard = true;
+		Suit = Suit.Spades;
+		Rank = Rank.Two;
 	}
 
 	public static PlayingCard GetCard(Suit suit, Rank rank)
@@ -28,11 +40,19 @@ public class PlayingCard
 
 	public static PlayingCard GetCard(int index)
 	{
+		if (index == -1)
+		{
+			return unknownCard;
+		}
 		return cards[index];
 	}
 
 	public int GetIndex()
 	{
+		if (IsUnknownCard)
+		{
+			return -1;
+		}
 		return GetIndex(Suit, Rank);
 	}
 
@@ -41,12 +61,12 @@ public class PlayingCard
 		return (int)((int)suit * 13 + rank);
 	}
 
-	public int GetEvaluationValue()
+	public int GetPokerEvaluationValue()
 	{
-		return Arrays.primes[(int)Rank] | ((int)Rank << 8) | GetSuitCode() | (1 << (int)(16 + Rank));
+		return Arrays.primes[(int)Rank] | ((int)Rank << 8) | GetPokerSuitCode() | (1 << (int)(16 + Rank));
 	}
 
-	private int GetSuitCode()
+	private int GetPokerSuitCode()
 	{
 		return Suit switch
 		{

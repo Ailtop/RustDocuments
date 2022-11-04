@@ -1,5 +1,4 @@
 using System;
-using Oxide.Core;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Rust/Delivery Drone Config")]
@@ -41,11 +40,6 @@ public class DeliveryDroneConfig : BaseScriptableObject
 
 	public bool IsVendingMachineAccessible(VendingMachine vendingMachine, Vector3 offset, out RaycastHit hitInfo)
 	{
-		object obj = Interface.CallHook("CanAccessVendingMachine", this, vendingMachine);
-		if (obj is bool)
-		{
-			return (bool)obj;
-		}
 		Vector3 vector = vendingMachine.transform.TransformPoint(offset);
 		if (Physics.BoxCast(vector + Vector3.up * testHeight, halfExtents, Vector3.down, out hitInfo, vendingMachine.transform.rotation, testHeight, layerMask))
 		{

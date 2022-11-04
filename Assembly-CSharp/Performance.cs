@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Facepunch;
+using Rust;
 using Rust.Workshop;
 using UnityEngine;
 
@@ -33,6 +34,8 @@ public class Performance : SingletonComponent<Performance>
 		public int ping;
 
 		public bool gcTriggered;
+
+		public PerformanceSamplePoint performanceSample;
 	}
 
 	private struct LagSpike
@@ -99,8 +102,8 @@ public class Performance : SingletonComponent<Performance>
 			current.frameRateAverage = AverageFrameRate();
 			current.frameTimeAverage = AverageFrameTime();
 			current.memoryUsageSystem = SystemInfoEx.systemMemoryUsed;
-			current.memoryAllocations = GC.GetTotalMemory(forceFullCollection: false) / 1048576;
-			current.memoryCollections = GC.CollectionCount(0);
+			current.memoryAllocations = Rust.GC.GetTotalMemory();
+			current.memoryCollections = Rust.GC.CollectionCount();
 			current.loadBalancerTasks = LoadBalancer.Count();
 			current.invokeHandlerTasks = InvokeHandler.Count();
 			current.workshopSkinsQueued = Rust.Workshop.WorkshopSkin.QueuedCount;

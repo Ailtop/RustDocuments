@@ -11,6 +11,14 @@ public class WorldPositionGenerator : ScriptableObject
 
 	public bool aboveWater;
 
+	public float MaxSlopeRadius;
+
+	public float MaxSlopeDegrees = 90f;
+
+	public float CheckSphereRadius;
+
+	public LayerMask CheckSphereMask;
+
 	private Vector3 _origin;
 
 	private Vector3 _area;
@@ -56,9 +64,35 @@ public class WorldPositionGenerator : ScriptableObject
 			Pool.FreeList(ref blockedRects);
 			return false;
 		}
-		ByteQuadtree.Element random = candidates.GetRandom();
-		Rect rect = GetElementRect(random);
-		Vector3 vector = (rect.min + rect.size * new Vector2(Random.value, Random.value)).XZ3D();
+		Vector3 vector;
+		if (CheckSphereRadius <= float.Epsilon)
+		{
+			ByteQuadtree.Element random = candidates.GetRandom();
+			Rect rect = GetElementRect(random);
+			vector = (rect.min + rect.size * new Vector2(Random.value, Random.value)).XZ3D();
+		}
+		else
+		{
+			Vector3 vector2;
+			while (true)
+			{
+				if (candidates.Count == 0)
+				{
+					position = Vector3.zero;
+					return false;
+				}
+				int index = Random.Range(0, candidates.Count);
+				ByteQuadtree.Element element3 = candidates[index];
+				vector2 = GetElementRect(element3).center.XZ3D();
+				vector2.y = TerrainMeta.HeightMap.GetHeight(vector2);
+				if (!Physics.CheckSphere(vector2, CheckSphereRadius, CheckSphereMask.value))
+				{
+					break;
+				}
+				candidates.RemoveAt(index);
+			}
+			vector = vector2;
+		}
 		position = vector.WithY(aboveWater ? TerrainMeta.WaterMap.GetHeight(vector) : TerrainMeta.HeightMap.GetHeight(vector));
 		Pool.FreeList(ref candidates);
 		Pool.FreeList(ref blockedRects);
@@ -88,8 +122,8 @@ public class WorldPositionGenerator : ScriptableObject
 		{
 			int num2 = 1 << element.Depth;
 			float num3 = 1f / (float)num2;
-			Vector2 vector2 = element.Coords * num3;
-			return new Rect(_origin.x + vector2.x * _area.x, _origin.z + vector2.y * _area.z, _area.x * num3, _area.z * num3);
+			Vector2 vector3 = element.Coords * num3;
+			return new Rect(_origin.x + vector3.x * _area.x, _origin.z + vector3.y * _area.z, _area.x * num3, _area.z * num3);
 		}
 	}
 
@@ -104,6 +138,16 @@ public class WorldPositionGenerator : ScriptableObject
 				float normX = ((float)i + 0.5f) / (float)res;
 				float normZ = ((float)z + 0.5f) / (float)res;
 				float factor = Filter.GetFactor(normX, normZ);
+				if (factor > 0f && MaxSlopeRadius > 0f)
+				{
+					TerrainMeta.HeightMap.ForEach(normX, normZ, MaxSlopeRadius / (float)res, delegate(int slopeX, int slopeZ)
+					{
+						if (TerrainMeta.HeightMap.GetSlope(slopeX, slopeZ) > MaxSlopeDegrees)
+						{
+							factor = 0f;
+						}
+					});
+				}
 				map[z * res + i] = (byte)((factor >= FilterCutoff) ? (255f * factor) : 0f);
 			}
 		});

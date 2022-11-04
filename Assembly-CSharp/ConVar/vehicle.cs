@@ -92,4 +92,57 @@ public class vehicle : ConsoleSystem
 		}
 		arg.ReplyWith("All trains stopped.");
 	}
+
+	[ServerVar]
+	public static void killcars(Arg args)
+	{
+		ModularCar[] array = BaseEntity.Util.FindAll<ModularCar>();
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Kill();
+		}
+	}
+
+	[ServerVar]
+	public static void killminis(Arg args)
+	{
+		MiniCopter[] array = BaseEntity.Util.FindAll<MiniCopter>();
+		foreach (MiniCopter miniCopter in array)
+		{
+			if (miniCopter.name.ToLower().Contains("minicopter"))
+			{
+				miniCopter.Kill();
+			}
+		}
+	}
+
+	[ServerVar]
+	public static void killscraphelis(Arg args)
+	{
+		ScrapTransportHelicopter[] array = BaseEntity.Util.FindAll<ScrapTransportHelicopter>();
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Kill();
+		}
+	}
+
+	[ServerVar]
+	public static void killtrains(Arg args)
+	{
+		TrainCar[] array = BaseEntity.Util.FindAll<TrainCar>();
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Kill();
+		}
+	}
+
+	[ServerVar]
+	public static void killboats(Arg args)
+	{
+		BaseBoat[] array = BaseEntity.Util.FindAll<BaseBoat>();
+		for (int i = 0; i < array.Length; i++)
+		{
+			array[i].Kill();
+		}
+	}
 }

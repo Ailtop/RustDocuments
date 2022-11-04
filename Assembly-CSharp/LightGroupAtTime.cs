@@ -23,4 +23,6 @@ public class LightGroupAtTime : FacepunchBehaviour
 
 	[Tooltip("Can NOT be entity, use new blank gameobject!")]
 	public Transform powerOverrideTransform;
+
+	public LayerMask checkLayers = 1235288065;
 }

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ImpostorBatch
 {
-	public NativeList<Vector4> Positions;
+	public FPNativeList<Vector4> Positions;
 
-	private NativeList<uint> args;
+	private FPNativeList<uint> args;
 
 	private Queue<int> recycle = new Queue<int>(32);
 
@@ -34,8 +34,8 @@ public class ImpostorBatch
 	{
 		Mesh = mesh;
 		Material = material;
-		Positions = Pool.Get<NativeList<Vector4>>();
-		args = Pool.Get<NativeList<uint>>();
+		Positions = Pool.Get<FPNativeList<Vector4>>();
+		args = Pool.Get<FPNativeList<uint>>();
 		args.Resize(5);
 		ArgsBuffer = SafeRelease(ArgsBuffer);
 		ArgsBuffer = new ComputeBuffer(1, args.Count * 4, ComputeBufferType.DrawIndirect);

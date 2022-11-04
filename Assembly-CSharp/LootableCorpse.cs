@@ -89,6 +89,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	internal override void DoServerDestroy()
 	{
 		base.DoServerDestroy();
+		PreDropItems();
 		DropItems();
 		if (containers != null)
 		{
@@ -136,23 +137,32 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		return true;
 	}
 
+	protected virtual bool CanLootContainer(ItemContainer c, int index)
+	{
+		return true;
+	}
+
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	private void RPC_LootCorpse(RPCMessage rpc)
 	{
 		BasePlayer player = rpc.player;
-		if ((bool)player && player.CanInteract() && CanLoot() && containers != null && Interface.CallHook("CanLootEntity", player, this) == null && player.inventory.loot.StartLootingEntity(this))
+		if (!player || !player.CanInteract() || !CanLoot() || containers == null || Interface.CallHook("CanLootEntity", player, this) != null || !player.inventory.loot.StartLootingEntity(this))
 		{
-			SetFlag(Flags.Open, b: true);
-			ItemContainer[] array = containers;
-			foreach (ItemContainer container in array)
-			{
-				player.inventory.loot.AddContainer(container);
-			}
-			player.inventory.loot.SendImmediate();
-			ClientRPCPlayer(null, player, "RPC_ClientLootCorpse");
-			SendNetworkUpdate();
+			return;
 		}
+		SetFlag(Flags.Open, b: true);
+		for (int i = 0; i < containers.Length; i++)
+		{
+			ItemContainer itemContainer = containers[i];
+			if (CanLootContainer(itemContainer, i))
+			{
+				player.inventory.loot.AddContainer(itemContainer);
+			}
+		}
+		player.inventory.loot.SendImmediate();
+		ClientRPCPlayer(null, player, "RPC_ClientLootCorpse");
+		SendNetworkUpdate();
 	}
 
 	public void PlayerStoppedLooting(BasePlayer player)
@@ -161,6 +171,10 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		ResetRemovalTime();
 		SetFlag(Flags.Open, b: false);
 		SendNetworkUpdate();
+	}
+
+	protected virtual void PreDropItems()
+	{
 	}
 
 	public void DropItems()

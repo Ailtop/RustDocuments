@@ -26,6 +26,9 @@ public class Audio : ConsoleSystem
 	[ClientVar(Help = "Volume", Saved = true)]
 	public static float voiceProps = 1f;
 
+	[ClientVar(Help = "Volume", Saved = true)]
+	public static float eventAudio = 1f;
+
 	[ClientVar(Help = "Ambience System")]
 	public static bool ambience = true;
 

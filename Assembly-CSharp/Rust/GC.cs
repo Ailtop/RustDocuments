@@ -11,4 +11,14 @@ public class GC : MonoBehaviour, IClientComponent
 	{
 		System.GC.Collect();
 	}
+
+	public static long GetTotalMemory()
+	{
+		return System.GC.GetTotalMemory(forceFullCollection: false) / 1048576;
+	}
+
+	public static int CollectionCount()
+	{
+		return System.GC.CollectionCount(0);
+	}
 }

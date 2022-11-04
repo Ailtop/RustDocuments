@@ -5,6 +5,8 @@ using UnityEngine;
 public class BurstClothHitBoxCollision : BurstCloth, IClientComponent, IPrefabPreProcess
 {
 	[Header("Rust Wearable BurstCloth")]
+	public bool UseLocalGravity = true;
+
 	public float GravityStrength = 0.8f;
 
 	public float DefaultLength = 1f;
@@ -15,7 +17,12 @@ public class BurstClothHitBoxCollision : BurstCloth, IClientComponent, IPrefabPr
 
 	public float CorpseLengthMultiplier = 0.2f;
 
+	public Transform UpAxis;
+
 	[Header("Collision")]
+	public Transform ColliderRoot;
+
+	[Tooltip("Keywords in bone names which should be ignored for collision")]
 	public string[] IgnoreKeywords;
 
 	protected override void GatherColliders(List<CapsuleParams> colliders)

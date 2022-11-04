@@ -90,9 +90,14 @@ public class PuzzleReset : FacepunchBehaviour
 
 	private bool PlayersWithinDistance()
 	{
+		return AnyPlayersWithinDistance(playerDetectionOrigin, playerDetectionRadius);
+	}
+
+	public static bool AnyPlayersWithinDistance(Transform origin, float radius)
+	{
 		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
 		{
-			if (!activePlayer.IsSleeping() && activePlayer.IsAlive() && Vector3.Distance(activePlayer.transform.position, playerDetectionOrigin.position) < playerDetectionRadius)
+			if (!activePlayer.IsSleeping() && activePlayer.IsAlive() && Vector3.Distance(activePlayer.transform.position, origin.position) < radius)
 			{
 				return true;
 			}

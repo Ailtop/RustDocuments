@@ -841,40 +841,8 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			BaseGameMode.GetActiveGameMode(serverside: true).LoadoutPlayer(base.baseEntity);
 			return;
 		}
-		ulong num = 0uL;
-		int infoInt = base.baseEntity.GetInfoInt("client.rockskin", 0);
-		bool flag = false;
-		if (infoInt > 0 && base.baseEntity.blueprints.steamInventory.HasItem(infoInt))
-		{
-			ItemDefinition itemDefinition = ItemManager.FindItemDefinition("rock");
-			if (itemDefinition != null && ItemDefinition.FindSkin(itemDefinition.itemid, infoInt) != 0L)
-			{
-				IPlayerItemDefinition itemDefinition2 = PlatformService.Instance.GetItemDefinition(infoInt);
-				if (itemDefinition2 != null)
-				{
-					num = itemDefinition2.WorkshopDownload;
-				}
-				if (num == 0L && itemDefinition.skins != null)
-				{
-					ItemSkinDirectory.Skin[] skins = itemDefinition.skins;
-					for (int i = 0; i < skins.Length; i++)
-					{
-						ItemSkinDirectory.Skin skin = skins[i];
-						if (skin.id == infoInt && skin.invItem != null && skin.invItem is ItemSkin itemSkin && itemSkin.Redirect != null)
-						{
-							GiveItem(ItemManager.CreateByName(itemSkin.Redirect.shortname, 1, 0uL), containerBelt);
-							flag = true;
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (!flag)
-		{
-			GiveItem(ItemManager.CreateByName("rock", 1, num), containerBelt);
-		}
-		GiveItem(ItemManager.CreateByName("torch", 1, 0uL), containerBelt);
+		GiveDefaultItemWithSkin("client.rockskin", "rock");
+		GiveDefaultItemWithSkin("client.torchskin", "torch");
 		if (IsBirthday())
 		{
 			GiveItem(ItemManager.CreateByName("cakefiveyear", 1, 0uL), containerBelt);
@@ -887,6 +855,43 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			GiveItem(ItemManager.CreateByName("snowball", 1, 0uL), containerBelt);
 		}
 		Interface.CallHook("OnDefaultItemsReceived", this);
+		void GiveDefaultItemWithSkin(string convarSkinName, string itemShortName)
+		{
+			ulong num = 0uL;
+			int infoInt = base.baseEntity.GetInfoInt(convarSkinName, 0);
+			bool flag = false;
+			bool flag2 = false;
+			if (infoInt > 0 && (base.baseEntity.blueprints.steamInventory.HasItem(infoInt) || flag2))
+			{
+				ItemDefinition itemDefinition = ItemManager.FindItemDefinition(itemShortName);
+				if (itemDefinition != null && ItemDefinition.FindSkin(itemDefinition.itemid, infoInt) != 0L)
+				{
+					IPlayerItemDefinition itemDefinition2 = PlatformService.Instance.GetItemDefinition(infoInt);
+					if (itemDefinition2 != null)
+					{
+						num = itemDefinition2.WorkshopDownload;
+					}
+					if (num == 0L && itemDefinition.skins != null)
+					{
+						ItemSkinDirectory.Skin[] skins = itemDefinition.skins;
+						for (int i = 0; i < skins.Length; i++)
+						{
+							ItemSkinDirectory.Skin skin = skins[i];
+							if (skin.id == infoInt && skin.invItem != null && skin.invItem is ItemSkin itemSkin && itemSkin.Redirect != null)
+							{
+								GiveItem(ItemManager.CreateByName(itemSkin.Redirect.shortname, 1, 0uL), containerBelt);
+								flag = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if (!flag)
+			{
+				GiveItem(ItemManager.CreateByName(itemShortName, 1, num), containerBelt);
+			}
+		}
 	}
 
 	public ProtoBuf.PlayerInventory Save(bool bForDisk)

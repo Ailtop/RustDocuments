@@ -22,14 +22,11 @@ public class TexasHoldEmController : CardGameController
 		RevealHand = 0x40
 	}
 
-	public enum Playability
+	public enum PokerRoundResult
 	{
-		OK = 0,
-		NoPlayer = 1,
-		NotEnoughBuyIn = 2,
-		TooMuchBuyIn = 3,
-		RanOutOfScrap = 4,
-		Idle = 5
+		Loss = 0,
+		PrimaryWinner = 1,
+		SecondaryWinner = 2
 	}
 
 	public List<PlayingCard> communityCards = new List<PlayingCard>();
@@ -40,21 +37,17 @@ public class TexasHoldEmController : CardGameController
 
 	public const string WON_HAND_STAT = "won_hand_texas_holdem";
 
-	public const int RAISE_INCREMENTS = 5;
-
 	private int dealerIndex;
 
-	private int activePlayerIndex;
+	private StackOfCards deck = new StackOfCards(1);
 
-	private DeckOfCards deck = new DeckOfCards();
-
-	private bool isWaitingBetweenTurns;
+	public override int MinPlayers => 2;
 
 	public override int MinBuyIn => 100;
 
 	public override int MaxBuyIn => 1000;
 
-	public override int MinPlayers => 2;
+	public override int MinToPlay => 10;
 
 	public PokerInputOption LastAction { get; private set; }
 
@@ -64,81 +57,39 @@ public class TexasHoldEmController : CardGameController
 
 	public int BiggestRaiseThisTurn { get; private set; }
 
-	public TexasHoldEmController(CardTable owner)
+	public TexasHoldEmController(BaseCardGameEntity owner)
 		: base(owner)
 	{
-	}
-
-	public Playability GetPlayabilityStatus(CardPlayerData cpd)
-	{
-		if (!cpd.HasUser)
-		{
-			return Playability.NoPlayer;
-		}
-		int scrapAmount = cpd.GetScrapAmount();
-		if (cpd.HasUserInGame)
-		{
-			if (scrapAmount <= 0)
-			{
-				return Playability.RanOutOfScrap;
-			}
-		}
-		else
-		{
-			if (scrapAmount < MinBuyIn)
-			{
-				return Playability.NotEnoughBuyIn;
-			}
-			if (scrapAmount > MaxBuyIn)
-			{
-				return Playability.TooMuchBuyIn;
-			}
-		}
-		return Playability.OK;
 	}
 
 	public int GetCurrentBet()
 	{
 		int num = 0;
-		CardPlayerData[] array = playerData;
-		foreach (CardPlayerData cardPlayerData in array)
+		foreach (CardPlayerData item in PlayersInRound())
 		{
-			if (cardPlayerData.HasUserInCurrentRound)
-			{
-				num = Mathf.Max(num, cardPlayerData.betThisTurn);
-			}
+			num = Mathf.Max(num, item.betThisTurn);
 		}
 		return num;
 	}
 
-	public override bool IsAllowedToPlay(CardPlayerData cpd)
-	{
-		return GetPlayabilityStatus(cpd) == Playability.OK;
-	}
-
-	public bool TryGetActivePlayer(out CardPlayerData activePlayer)
-	{
-		return ToCardPlayerData(activePlayerIndex, includeFolded: false, out activePlayer);
-	}
-
 	public bool TryGetDealer(out CardPlayerData dealer)
 	{
-		return ToCardPlayerData(dealerIndex, includeFolded: true, out dealer);
+		return ToCardPlayerData(dealerIndex, includeOutOfRound: true, out dealer);
 	}
 
 	public bool TryGetSmallBlind(out CardPlayerData smallBlind)
 	{
 		int relIndex = ((NumPlayersInGame() < 3) ? dealerIndex : (dealerIndex + 1));
-		return ToCardPlayerData(relIndex, includeFolded: true, out smallBlind);
+		return ToCardPlayerData(relIndex, includeOutOfRound: true, out smallBlind);
 	}
 
 	public bool TryGetBigBlind(out CardPlayerData bigBlind)
 	{
 		int relIndex = ((NumPlayersInGame() < 3) ? (dealerIndex + 1) : (dealerIndex + 2));
-		return ToCardPlayerData(relIndex, includeFolded: true, out bigBlind);
+		return ToCardPlayerData(relIndex, includeOutOfRound: true, out bigBlind);
 	}
 
-	public int GetFirstPlayerRelIndex(bool startOfRound)
+	protected override int GetFirstPlayerRelIndex(bool startOfRound)
 	{
 		int num = NumPlayersInGame();
 		if (startOfRound && num == 2)
@@ -148,26 +99,13 @@ public class TexasHoldEmController : CardGameController
 		return (dealerIndex + 1) % num;
 	}
 
-	private bool ToCardPlayerData(int relIndex, bool includeFolded, out CardPlayerData result)
-	{
-		if (!base.HasRoundInProgress)
-		{
-			Debug.LogWarning(GetType().Name + ": Tried to call ToCardPlayerData while no round was in progress. Returning null.");
-			result = null;
-			return false;
-		}
-		int num = (includeFolded ? NumPlayersInGame() : NumPlayersInCurrentRound());
-		int index = RelToAbsIndex(relIndex % num, includeFolded);
-		return TryGetCardPlayerData(index, out result);
-	}
-
 	public static ushort EvaluatePokerHand(List<PlayingCard> cards)
 	{
 		ushort result = 0;
 		int[] array = new int[cards.Count];
 		for (int i = 0; i < array.Length; i++)
 		{
-			array[i] = cards[i].GetEvaluationValue();
+			array[i] = cards[i].GetPokerEvaluationValue();
 		}
 		if (cards.Count == 5)
 		{
@@ -194,13 +132,33 @@ public class TexasHoldEmController : CardGameController
 		return communityCards;
 	}
 
-	public override void Save(ProtoBuf.CardTable syncData)
+	public void InputsToList(int availableInputs, List<PokerInputOption> result)
+	{
+		PokerInputOption[] array = (PokerInputOption[])Enum.GetValues(typeof(PokerInputOption));
+		foreach (PokerInputOption pokerInputOption in array)
+		{
+			if (pokerInputOption != 0 && ((uint)availableInputs & (uint)pokerInputOption) == (uint)pokerInputOption)
+			{
+				result.Add(pokerInputOption);
+			}
+		}
+	}
+
+	protected override CardPlayerData GetNewCardPlayerData(int mountIndex)
+	{
+		if (base.IsServer)
+		{
+			return new CardPlayerData(base.ScrapItemID, base.Owner.GetPlayerStorage, mountIndex, base.IsServer);
+		}
+		return new CardPlayerData(mountIndex, base.IsServer);
+	}
+
+	public override void Save(CardGame syncData)
 	{
 		base.Save(syncData);
-		syncData.texasHoldEm = Pool.Get<ProtoBuf.CardTable.TexasHoldEm>();
+		syncData.texasHoldEm = Pool.Get<CardGame.TexasHoldEm>();
 		syncData.texasHoldEm.dealerIndex = dealerIndex;
 		syncData.texasHoldEm.communityCards = Pool.GetList<int>();
-		syncData.texasHoldEm.activePlayerIndex = activePlayerIndex;
 		syncData.texasHoldEm.biggestRaiseThisTurn = BiggestRaiseThisTurn;
 		syncData.lastActionId = (int)LastAction;
 		syncData.lastActionTarget = LastActionTarget;
@@ -215,7 +173,7 @@ public class TexasHoldEmController : CardGameController
 	protected override void SubStartRound()
 	{
 		communityCards.Clear();
-		deck = new DeckOfCards();
+		deck = new StackOfCards(1);
 		BiggestRaiseThisTurn = 0;
 		ClearLastAction();
 		IncrementDealer();
@@ -246,11 +204,10 @@ public class TexasHoldEmController : CardGameController
 
 	protected override void SubEndRound()
 	{
-		CancelNextTurnInvoke();
 		int num = 0;
 		List<CardPlayerData> obj = Pool.GetList<CardPlayerData>();
-		CardPlayerData[] array = playerData;
-		foreach (CardPlayerData cardPlayerData in array)
+		CardPlayerData[] playerData = base.PlayerData;
+		foreach (CardPlayerData cardPlayerData in playerData)
 		{
 			if (cardPlayerData.betThisRound > 0)
 			{
@@ -263,14 +220,13 @@ public class TexasHoldEmController : CardGameController
 		}
 		if (obj.Count == 0)
 		{
+			base.Owner.GetPot().inventory.Clear();
 			return;
 		}
-		ClearWinnerInfo();
 		bool flag = num > 1;
-		SingletonComponent<InvokeHandler>.Instance.CancelInvoke(TimeoutTurn);
 		int num2 = GetScrapInPot();
-		array = playerData;
-		foreach (CardPlayerData cardPlayerData2 in array)
+		playerData = base.PlayerData;
+		foreach (CardPlayerData cardPlayerData2 in playerData)
 		{
 			if (cardPlayerData2.HasUserInGame)
 			{
@@ -278,8 +234,8 @@ public class TexasHoldEmController : CardGameController
 			}
 		}
 		bool flag2 = true;
-		array = playerData;
-		foreach (CardPlayerData obj2 in array)
+		playerData = base.PlayerData;
+		foreach (CardPlayerData obj2 in playerData)
 		{
 			obj2.remainingToPayOut = obj2.betThisRound;
 		}
@@ -287,8 +243,8 @@ public class TexasHoldEmController : CardGameController
 		{
 			int num3 = int.MaxValue;
 			int num4 = 0;
-			array = playerData;
-			foreach (CardPlayerData cardPlayerData3 in array)
+			playerData = base.PlayerData;
+			foreach (CardPlayerData cardPlayerData3 in playerData)
 			{
 				if (cardPlayerData3.betThisRound > 0)
 				{
@@ -305,37 +261,38 @@ public class TexasHoldEmController : CardGameController
 				item.betThisRound -= num3;
 			}
 			int num6 = int.MaxValue;
-			foreach (CardPlayerData item2 in obj)
+			foreach (CardPlayerData item2 in PlayersInRound())
 			{
-				if (item2.HasUserInCurrentRound && item2.finalScore < num6)
+				if (item2.finalScore < num6)
 				{
 					num6 = item2.finalScore;
 				}
 			}
 			if (flag2)
 			{
-				base.winnerInfo.winningScore = num6;
+				base.resultInfo.winningScore = num6;
 			}
 			int num7 = 0;
-			foreach (CardPlayerData item3 in obj)
+			foreach (CardPlayerData item3 in PlayersInRound())
 			{
-				if (item3.HasUserInCurrentRound && item3.finalScore == num6)
+				if (item3.finalScore == num6)
 				{
 					num7++;
 				}
 			}
 			int num8 = Mathf.CeilToInt((float)(num5 + num2) / (float)num7);
 			num2 = 0;
-			foreach (CardPlayerData item4 in obj)
+			foreach (CardPlayerData item4 in PlayersInRound())
 			{
-				if (item4.HasUserInCurrentRound && item4.finalScore == num6)
+				if (item4.finalScore == num6)
 				{
 					if (flag)
 					{
 						item4.EnableSendingCards();
 					}
-					PayOut(item4, num8);
-					AddWinner(item4, num8, flag2);
+					PayOutFromPot(item4, num8);
+					PokerRoundResult resultCode = (flag2 ? PokerRoundResult.PrimaryWinner : PokerRoundResult.SecondaryWinner);
+					AddRoundResult(item4, num8, (int)resultCode);
 				}
 			}
 			for (int num9 = obj.Count - 1; num9 >= 0; num9--)
@@ -351,45 +308,31 @@ public class TexasHoldEmController : CardGameController
 		{
 			int num10 = obj[0].betThisRound + num2;
 			num2 = 0;
-			PayOut(obj[0], num10);
-			bool primaryWinner2 = base.winnerInfo.winners.Count == 0;
-			AddWinner(obj[0], num10, primaryWinner2);
+			PayOutFromPot(obj[0], num10);
+			PokerRoundResult resultCode2 = ((base.resultInfo.results.Count == 0) ? PokerRoundResult.PrimaryWinner : PokerRoundResult.SecondaryWinner);
+			AddRoundResult(obj[0], num10, (int)resultCode2);
 		}
-		base.Owner.ClientRPC(null, "OnWinnersDeclared", base.winnerInfo);
+		base.Owner.ClientRPC(null, "OnResultsDeclared", base.resultInfo);
 		StorageContainer pot = base.Owner.GetPot();
-		if (pot != null)
+		int amount = pot.inventory.GetAmount(base.ScrapItemID, onlyUsableAmounts: true);
+		if (amount > 0)
 		{
-			int amount = pot.inventory.GetAmount(base.ScrapItemID, onlyUsableAmounts: true);
-			if (amount > 0)
-			{
-				Debug.LogError($"{GetType().Name}: Something went wrong in the winner calculation. Pot still has {amount} scrap left over after payouts. Expected 0. Clearing it.");
-				pot.inventory.Clear();
-			}
+			Debug.LogError($"{GetType().Name}: Something went wrong in the winner calculation. Pot still has {amount} scrap left over after payouts. Expected 0. Clearing it.");
+			pot.inventory.Clear();
 		}
 		Pool.FreeList(ref obj);
-		void AddWinner(CardPlayerData pData, int winnings, bool primaryWinner)
+	}
+
+	protected override void AddRoundResult(CardPlayerData pData, int winnings, int winState)
+	{
+		base.AddRoundResult(pData, winnings, winState);
+		if (global::Rust.GameInfo.HasAchievements)
 		{
-			foreach (ProtoBuf.CardTable.WinnerBreakdown.Winner winner2 in base.winnerInfo.winners)
+			BasePlayer basePlayer = base.Owner.IDToPlayer(pData.UserID);
+			if (basePlayer != null)
 			{
-				if (winner2.ID == pData.UserID)
-				{
-					winner2.winnings += winnings;
-					return;
-				}
-			}
-			ProtoBuf.CardTable.WinnerBreakdown.Winner winner = Pool.Get<ProtoBuf.CardTable.WinnerBreakdown.Winner>();
-			winner.ID = pData.UserID;
-			winner.winnings = winnings;
-			winner.primaryWinner = primaryWinner;
-			base.winnerInfo.winners.Add(winner);
-			if (global::Rust.GameInfo.HasAchievements)
-			{
-				BasePlayer basePlayer = base.Owner.IDToPlayer(pData.UserID);
-				if (basePlayer != null)
-				{
-					basePlayer.stats.Add("won_hand_texas_holdem", 1);
-					basePlayer.stats.Save(forceSteamSave: true);
-				}
+				basePlayer.stats.Add("won_hand_texas_holdem", 1);
+				basePlayer.stats.Save(forceSteamSave: true);
 			}
 		}
 	}
@@ -415,19 +358,15 @@ public class TexasHoldEmController : CardGameController
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			CardPlayerData[] array = playerData;
-			foreach (CardPlayerData cardPlayerData in array)
+			foreach (CardPlayerData item in PlayersInRound())
 			{
-				if (cardPlayerData.HasUserInCurrentRound)
+				if (deck.TryTakeCard(out var card))
 				{
-					if (deck.TryTakeCard(out var card))
-					{
-						cardPlayerData.Cards.Add(card);
-					}
-					else
-					{
-						Debug.LogError(GetType().Name + ": No more cards in the deck to deal!");
-					}
+					item.Cards.Add(card);
+				}
+				else
+				{
+					Debug.LogError(GetType().Name + ": No more cards in the deck to deal!");
 				}
 			}
 		}
@@ -471,9 +410,9 @@ public class TexasHoldEmController : CardGameController
 		LastActionValue = 0;
 	}
 
-	protected override void TimeoutTurn()
+	protected override void OnTurnTimeout(CardPlayerData pData)
 	{
-		if (TryGetActivePlayer(out var activePlayer))
+		if (TryGetActivePlayer(out var activePlayer) && activePlayer == pData)
 		{
 			ReceivedInputFromPlayer(activePlayer, 1, countAsAction: true, 0, playerInitiated: false);
 		}
@@ -516,7 +455,7 @@ public class TexasHoldEmController : CardGameController
 			case 2:
 			{
 				int currentBet = GetCurrentBet();
-				int num = (LastActionValue = AddToPot(playerData, currentBet - playerData.betThisTurn));
+				int num = (LastActionValue = TryAddBet(playerData, currentBet - playerData.betThisTurn));
 				break;
 			}
 			case 16:
@@ -528,7 +467,7 @@ public class TexasHoldEmController : CardGameController
 				{
 					value = currentBet + biggestRaiseThisTurn - playerData.betThisTurn;
 				}
-				int num = AddToPot(playerData, value);
+				int num = TryAddBet(playerData, value);
 				BiggestRaiseThisTurn = Mathf.Max(BiggestRaiseThisTurn, num - currentBet);
 				LastActionValue = num;
 				break;
@@ -536,7 +475,7 @@ public class TexasHoldEmController : CardGameController
 			case 4:
 			{
 				int currentBet = GetCurrentBet();
-				int num = AddAllToPot(playerData);
+				int num = GoAllIn(playerData);
 				BiggestRaiseThisTurn = Mathf.Max(BiggestRaiseThisTurn, num - currentBet);
 				LastActionValue = num;
 				break;
@@ -547,7 +486,7 @@ public class TexasHoldEmController : CardGameController
 			}
 			if (countAsAction && input != 0)
 			{
-				playerData.SetHasActedThisTurn(hasActed: true);
+				playerData.SetHasCompletedTurn(hasActed: true);
 			}
 			LastActionTarget = playerData.UserID;
 			LastAction = (PokerInputOption)input;
@@ -568,81 +507,31 @@ public class TexasHoldEmController : CardGameController
 			{
 				startIndex = (activePlayerIndex + 1) % NumPlayersInCurrentRound();
 			}
-			if (ShouldEndTurn())
+			CardPlayerData newActivePlayer;
+			if (ShouldEndCycle())
 			{
-				EndTurn();
-				return;
+				EndCycle();
 			}
-			MoveToNextPlayerWithInputs(startIndex);
-			StartTurnTimer(MaxTurnTime);
-			base.Owner.SendNetworkUpdate();
-		}
-	}
-
-	private bool ShouldEndTurn()
-	{
-		CardPlayerData[] array = playerData;
-		foreach (CardPlayerData cardPlayerData in array)
-		{
-			if (cardPlayerData.HasUserInCurrentRound && cardPlayerData.GetScrapAmount() > 0 && (cardPlayerData.betThisTurn != GetCurrentBet() || !cardPlayerData.hasActedThisTurn))
+			else if (TryMoveToNextPlayerWithInputs(startIndex, out newActivePlayer))
 			{
-				return false;
+				StartTurnTimer(newActivePlayer, MaxTurnTime);
+				base.Owner.SendNetworkUpdate();
+			}
+			else
+			{
+				EndCycle();
 			}
 		}
-		return true;
 	}
 
-	private void EndTurn()
+	protected override void StartNextCycle()
 	{
-		CardPlayerData[] array = playerData;
-		for (int i = 0; i < array.Length; i++)
-		{
-			array[i].SetHasActedThisTurn(hasActed: false);
-		}
-		BiggestRaiseThisTurn = 0;
-		if (DealCommunityCards())
-		{
-			QueueNextTurnInvoke();
-			return;
-		}
-		array = playerData;
-		foreach (CardPlayerData cardPlayerData in array)
-		{
-			if (cardPlayerData.HasUserInCurrentRound)
-			{
-				List<PlayingCard> obj = Pool.GetList<PlayingCard>();
-				obj.AddRange(cardPlayerData.Cards);
-				obj.AddRange(communityCards);
-				ushort finalScore = EvaluatePokerHand(obj);
-				Pool.FreeList(ref obj);
-				cardPlayerData.finalScore = finalScore;
-			}
-		}
-		EndRound();
-	}
-
-	private void QueueNextTurnInvoke()
-	{
-		SingletonComponent<InvokeHandler>.Instance.CancelInvoke(StartNextTurn);
-		SingletonComponent<InvokeHandler>.Instance.Invoke(StartNextTurn, 1f);
-		isWaitingBetweenTurns = true;
-		base.Owner.SendNetworkUpdate();
-	}
-
-	private void CancelNextTurnInvoke()
-	{
-		SingletonComponent<InvokeHandler>.Instance.CancelInvoke(StartNextTurn);
-		isWaitingBetweenTurns = false;
-	}
-
-	private void StartNextTurn()
-	{
-		isWaitingBetweenTurns = false;
+		base.StartNextCycle();
 		int num = GetFirstPlayerRelIndex(startOfRound: false);
 		int num2 = NumPlayersInGame();
 		int num3 = 0;
 		CardPlayerData result;
-		while (!ToCardPlayerData(num, includeFolded: true, out result) || !result.HasUserInCurrentRound)
+		while (!ToCardPlayerData(num, includeOutOfRound: true, out result) || !result.HasUserInCurrentRound)
 		{
 			num = ++num % num2;
 			num3++;
@@ -656,28 +545,74 @@ public class TexasHoldEmController : CardGameController
 		int num4 = GameToRoundIndex(num);
 		if (num4 < 0 || num4 > NumPlayersInCurrentRound())
 		{
-			Debug.LogError($"EndTurn NewActiveIndex is out of range: {num4}. Clamping it to between 0 and {NumPlayersInCurrentRound()}.");
+			Debug.LogError($"StartNextCycle NewActiveIndex is out of range: {num4}. Clamping it to between 0 and {NumPlayersInCurrentRound()}.");
 			num4 = Mathf.Clamp(num4, 0, NumPlayersInCurrentRound());
 		}
 		int startIndex = num4;
-		int num5 = 0;
-		CardPlayerData[] array = playerData;
-		foreach (CardPlayerData cardPlayerData in array)
+		CardPlayerData newActivePlayer;
+		if (ShouldEndCycle())
 		{
-			if (cardPlayerData.HasUserInCurrentRound && cardPlayerData.GetScrapAmount() > 0)
+			EndCycle();
+		}
+		else if (TryMoveToNextPlayerWithInputs(startIndex, out newActivePlayer))
+		{
+			StartTurnTimer(newActivePlayer, MaxTurnTime);
+			UpdateAllAvailableInputs();
+			base.Owner.SendNetworkUpdate();
+		}
+		else
+		{
+			EndCycle();
+		}
+	}
+
+	protected override bool ShouldEndCycle()
+	{
+		int num = 0;
+		foreach (CardPlayerData item in PlayersInRound())
+		{
+			if (item.GetScrapAmount() > 0)
 			{
-				num5++;
+				num++;
 			}
 		}
-		if (num5 == 1 || ShouldEndTurn())
+		if (num == 1)
 		{
-			EndTurn();
+			return true;
+		}
+		foreach (CardPlayerData item2 in PlayersInRound())
+		{
+			if (item2.GetScrapAmount() > 0 && (item2.betThisTurn != GetCurrentBet() || !item2.hasCompletedTurn))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	protected override void EndCycle()
+	{
+		CardPlayerData[] playerData = base.PlayerData;
+		for (int i = 0; i < playerData.Length; i++)
+		{
+			playerData[i].SetHasCompletedTurn(hasActed: false);
+		}
+		BiggestRaiseThisTurn = 0;
+		if (DealCommunityCards())
+		{
+			QueueNextCycleInvoke();
 			return;
 		}
-		MoveToNextPlayerWithInputs(startIndex);
-		StartTurnTimer(MaxTurnTime);
-		UpdateAllAvailableInputs();
-		base.Owner.SendNetworkUpdate();
+		foreach (CardPlayerData item in PlayersInRound())
+		{
+			List<PlayingCard> obj = Pool.GetList<PlayingCard>();
+			obj.AddRange(item.Cards);
+			obj.AddRange(communityCards);
+			ushort finalScore = EvaluatePokerHand(obj);
+			Pool.FreeList(ref obj);
+			item.finalScore = finalScore;
+		}
+		EndRound();
 	}
 
 	protected override int GetAvailableInputsForPlayer(CardPlayerData playerData)
@@ -721,53 +656,8 @@ public class TexasHoldEmController : CardGameController
 		return (int)pokerInputOption;
 	}
 
-	public override void OnTableDestroyed()
+	protected override void HandlePlayerLeavingDuringTheirTurn(CardPlayerData pData)
 	{
-		base.OnTableDestroyed();
-		if (!base.HasGameInProgress)
-		{
-			return;
-		}
-		int maxAmount = GetScrapInPot() / NumPlayersInGame();
-		CardPlayerData[] array = playerData;
-		foreach (CardPlayerData cardPlayerData in array)
-		{
-			if (cardPlayerData.HasUserInGame)
-			{
-				PayOut(cardPlayerData, maxAmount);
-			}
-			if (cardPlayerData.HasUser)
-			{
-				RemoveScrapFromStorage(cardPlayerData);
-			}
-		}
-	}
-
-	protected override void SubOnPlayerLeaving(CardPlayerData playerData)
-	{
-		if (base.HasRoundInProgress && TryGetActivePlayer(out var activePlayer))
-		{
-			if (playerData == activePlayer)
-			{
-				ReceivedInputFromPlayer(activePlayer, 1, countAsAction: true, 0, playerInitiated: false);
-			}
-			else if (playerData.HasUserInCurrentRound && playerData.mountIndex < activePlayer.mountIndex && activePlayerIndex > 0)
-			{
-				activePlayerIndex--;
-			}
-		}
-	}
-
-	private void MoveToNextPlayerWithInputs(int startIndex)
-	{
-		activePlayerIndex = startIndex;
-		TryGetActivePlayer(out var activePlayer);
-		int num = 0;
-		while (GetAvailableInputsForPlayer(activePlayer) == 0 && num < NumPlayersInCurrentRound())
-		{
-			activePlayerIndex = (activePlayerIndex + 1) % NumPlayersInCurrentRound();
-			TryGetActivePlayer(out activePlayer);
-			num++;
-		}
+		ReceivedInputFromPlayer(pData, 1, countAsAction: true, 0, playerInitiated: false);
 	}
 }

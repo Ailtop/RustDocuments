@@ -87,6 +87,8 @@ public class SlotMachine : BaseMountable
 
 	public Material PayoutIconMaterial;
 
+	public bool UseTimeOfDayAdjustedSprite = true;
+
 	public MeshRenderer[] PulseRenderers;
 
 	public float PulseSpeed = 5f;
@@ -281,6 +283,16 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
+	internal override void DoServerDestroy()
+	{
+		SlotMachineStorage slotMachineStorage = StorageInstance.Get(base.isServer) as SlotMachineStorage;
+		if (BaseNetworkableEx.IsValid(slotMachineStorage))
+		{
+			slotMachineStorage.DropItems();
+		}
+		base.DoServerDestroy();
+	}
+
 	private int GetBettingAmount()
 	{
 		SlotMachineStorage component = StorageInstance.Get(base.isServer).GetComponent<SlotMachineStorage>();
@@ -385,6 +397,10 @@ public class SlotMachine : BaseMountable
 			{
 				Analytics.Server.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, 0);
 			}
+		}
+		else
+		{
+			Debug.LogError($"Failed to process spin results: PayoutSettings != null {PayoutSettings != null} CurrentSpinPlayer.IsValid {BaseNetworkableEx.IsValid(CurrentSpinPlayer)} CurrentSpinPlayer == mounted {CurrentSpinPlayer == _mounted}");
 		}
 		if (!flag)
 		{

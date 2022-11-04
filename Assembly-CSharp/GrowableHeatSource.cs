@@ -23,7 +23,7 @@ public class GrowableHeatSource : EntityComponent<BaseEntity>, IServerComponent
 	public void ForceUpdateGrowablesInRange()
 	{
 		List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
-		Vis.Entities(base.transform.position, Server.artificialTemperatureGrowableRange, obj, 67108864);
+		Vis.Entities(base.transform.position, Server.artificialTemperatureGrowableRange, obj, 512);
 		List<PlanterBox> obj2 = Facepunch.Pool.GetList<PlanterBox>();
 		foreach (GrowableEntity item in obj)
 		{

@@ -4,7 +4,7 @@ using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardTableUI : UIDialog
+public class CardGameUI : UIDialog
 {
 	[Serializable]
 	public class PlayingCardImage
@@ -41,14 +41,14 @@ public class CardTableUI : UIDialog
 	{
 		int DynamicBetAmount { get; }
 
-		void UpdateInGameUI(CardTableUI ui, CardGameController game);
+		void UpdateInGameUI(CardGameUI ui, CardGameController game);
 
-		string GetSecondaryInfo(CardTableUI ui, CardGameController game, out InfoTextUI.Attitude attitude);
+		string GetSecondaryInfo(CardGameUI ui, CardGameController game, out InfoTextUI.Attitude attitude);
 
-		void UpdateInGameUI_NoPlayer(CardTableUI ui);
+		void UpdateInGameUI_NoPlayer(CardGameUI ui);
 	}
 
-	[Header("Card Table")]
+	[Header("Card Game")]
 	[SerializeField]
 	private InfoTextUI primaryInfo;
 
@@ -60,9 +60,6 @@ public class CardTableUI : UIDialog
 
 	[SerializeField]
 	private GameObject playingUI;
-
-	[SerializeField]
-	private GameObject availableInputsUI;
 
 	[SerializeField]
 	private PlayingCardImage[] cardImages;
@@ -83,19 +80,43 @@ public class CardTableUI : UIDialog
 	private Translate.Phrase phraseNotEnoughPlayers;
 
 	[SerializeField]
-	private Translate.Phrase phraseYourTurn;
-
-	[SerializeField]
 	private Translate.Phrase phrasePlayerLeftGame;
 
 	[SerializeField]
-	private Color colourNeutralUI;
+	private Translate.Phrase phraseNotEnoughBuyIn;
 
 	[SerializeField]
-	private Color colourGoodUI;
+	private Translate.Phrase phraseTooMuchBuyIn;
 
-	[SerializeField]
-	private Color colourBadUI;
+	public Translate.Phrase phraseYourTurn;
+
+	public Translate.Phrase phraseYouWinTheRound;
+
+	public Translate.Phrase phraseRoundWinner;
+
+	public Translate.Phrase phraseRoundWinners;
+
+	public Translate.Phrase phraseScrapWon;
+
+	public Translate.Phrase phraseScrapReturned;
+
+	public Translate.Phrase phraseChangeBetAmount;
+
+	public Translate.Phrase phraseBet;
+
+	public Translate.Phrase phraseBetAdd;
+
+	public Translate.Phrase phraseAllIn;
+
+	public GameObject amountChangeRoot;
+
+	public RustText amountChangeText;
+
+	public Color colourNeutralUI;
+
+	public Color colourGoodUI;
+
+	public Color colourBadUI;
 
 	[SerializeField]
 	private CanvasGroup timerCanvas;
@@ -130,4 +151,7 @@ public class CardTableUI : UIDialog
 
 	[SerializeField]
 	private TexasHoldEmUI texasHoldEmUI;
+
+	[SerializeField]
+	private BlackjackUI blackjackUI;
 }

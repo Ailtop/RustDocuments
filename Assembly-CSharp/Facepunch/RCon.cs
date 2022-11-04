@@ -35,7 +35,8 @@ public class RCon
 		Error = 1,
 		Warning = 2,
 		Chat = 3,
-		Report = 4
+		Report = 4,
+		ClientPerf = 5
 	}
 
 	public struct Response
@@ -361,7 +362,7 @@ public class RCon
 
 	internal static RConListener listener = null;
 
-	internal static Listener listenerNew = null;
+	public static Listener listenerNew = null;
 
 	private static Queue<Command> Commands = new Queue<Command>();
 
@@ -453,9 +454,18 @@ public class RCon
 	{
 		if (listenerNew != null)
 		{
+			string message = JsonConvert.SerializeObject(obj, Formatting.Indented);
+			Broadcast(type, message);
+		}
+	}
+
+	public static void Broadcast(LogType type, string message)
+	{
+		if (listenerNew != null && !string.IsNullOrWhiteSpace(message))
+		{
 			Response response = default(Response);
 			response.Identifier = -1;
-			response.Message = JsonConvert.SerializeObject(obj, Formatting.Indented);
+			response.Message = message;
 			response.Type = type;
 			if (responseConnection < 0)
 			{

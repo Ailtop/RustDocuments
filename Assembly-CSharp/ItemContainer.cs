@@ -32,6 +32,13 @@ public sealed class ItemContainer
 		Liquid = 2
 	}
 
+	public enum LimitStack
+	{
+		None = 0,
+		Existing = 1,
+		All = 2
+	}
+
 	public enum CanAcceptResult
 	{
 		CanAccept = 0,
@@ -773,7 +780,7 @@ public sealed class ItemContainer
 		return num;
 	}
 
-	public void AddItem(ItemDefinition itemToCreate, int amount, ulong skin = 0uL, bool respectMaxStack = false)
+	public void AddItem(ItemDefinition itemToCreate, int amount, ulong skin = 0uL, LimitStack limitStack = LimitStack.Existing)
 	{
 		for (int i = 0; i < itemList.Count; i++)
 		{
@@ -786,14 +793,14 @@ public sealed class ItemContainer
 				continue;
 			}
 			int num = itemList[i].MaxStackable();
-			if (num <= itemList[i].amount)
+			if (num <= itemList[i].amount && limitStack != 0)
 			{
 				continue;
 			}
 			MarkDirty();
 			itemList[i].amount += amount;
 			amount -= amount;
-			if (itemList[i].amount > num)
+			if (itemList[i].amount > num && limitStack != 0)
 			{
 				amount = itemList[i].amount - num;
 				if (amount > 0)
@@ -806,7 +813,7 @@ public sealed class ItemContainer
 		{
 			return;
 		}
-		int num2 = (respectMaxStack ? Mathf.Min(itemToCreate.stackable, ContainerMaxStackSize()) : int.MaxValue);
+		int num2 = ((limitStack == LimitStack.All) ? Mathf.Min(itemToCreate.stackable, ContainerMaxStackSize()) : int.MaxValue);
 		if (num2 <= 0)
 		{
 			return;
@@ -881,6 +888,26 @@ public sealed class ItemContainer
 		{
 			return CanAcceptResult.CannotAccept;
 		}
+		if (isServer && availableSlots != null && availableSlots.Count > 0)
+		{
+			if (item.info.occupySlots == (ItemSlot)0 || item.info.occupySlots == ItemSlot.None)
+			{
+				return CanAcceptResult.CannotAccept;
+			}
+			if (item.isBroken)
+			{
+				return CanAcceptResult.CannotAccept;
+			}
+			int num = 0;
+			foreach (ItemSlot availableSlot in availableSlots)
+			{
+				num |= (int)availableSlot;
+			}
+			if (((uint)num & (uint)item.info.occupySlots) != (uint)item.info.occupySlots)
+			{
+				return CanAcceptResult.CannotAcceptRightNow;
+			}
+		}
 		if ((allowedContents & item.info.itemType) != item.info.itemType)
 		{
 			return CanAcceptResult.CannotAccept;
@@ -899,35 +926,6 @@ public sealed class ItemContainer
 			if (!flag)
 			{
 				return CanAcceptResult.CannotAccept;
-			}
-		}
-		if (availableSlots != null && availableSlots.Count > 0)
-		{
-			if (item.info.occupySlots == (ItemSlot)0 || item.info.occupySlots == ItemSlot.None)
-			{
-				return CanAcceptResult.CannotAccept;
-			}
-			int[] array = new int[32];
-			foreach (ItemSlot availableSlot in availableSlots)
-			{
-				array[(int)Mathf.Log((float)availableSlot, 2f)]++;
-			}
-			foreach (Item item2 in itemList)
-			{
-				for (int j = 0; j < 32; j++)
-				{
-					if (((uint)item2.info.occupySlots & (uint)(1 << j)) != 0)
-					{
-						array[j]--;
-					}
-				}
-			}
-			for (int k = 0; k < 32; k++)
-			{
-				if (((uint)item.info.occupySlots & (uint)(1 << k)) != 0 && array[k] <= 0)
-				{
-					return CanAcceptResult.CannotAcceptRightNow;
-				}
 			}
 		}
 		object obj = Interface.CallHook("CanAcceptItem", this, item, targetPos);

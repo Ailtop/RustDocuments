@@ -62,6 +62,8 @@ public class LoadingScreen : SingletonComponent<LoadingScreen>
 	[Tooltip("Number of ping samples required before showing the warning")]
 	public int requiredPingSampleCount = 10;
 
+	public GameObject blackout;
+
 	public static bool isOpen
 	{
 		get

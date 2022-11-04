@@ -686,18 +686,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				select x as BaseEntity).ToArray();
 		}
 
-		public static ScientistNPC[] FindScientists()
+		public static T[] FindAll<T>() where T : BaseEntity
 		{
 			return (from x in BaseNetworkable.serverEntities
-				where x is ScientistNPC
-				select x as ScientistNPC).ToArray();
-		}
-
-		public static BaseAnimalNPC[] FindAnimals()
-		{
-			return (from x in BaseNetworkable.serverEntities
-				where x is BaseAnimalNPC
-				select x as BaseAnimalNPC).ToArray();
+				where x is T
+				select x as T).ToArray();
 		}
 	}
 

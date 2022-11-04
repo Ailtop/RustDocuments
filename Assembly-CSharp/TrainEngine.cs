@@ -624,11 +624,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		return true;
 	}
 
-	public bool PlayerIsOnPlatform(BasePlayer player)
-	{
-		return player.GetParentEntity() == this;
-	}
-
 	void IEngineControllerUser.Invoke(Action action, float time)
 	{
 		Invoke(action, time);

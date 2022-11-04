@@ -11,9 +11,9 @@ public class Vis : ConsoleSystem
 	[Help("Turns on debug display of damages")]
 	public static bool damage;
 
+	[Help("Turns on debug display of attacks")]
 	[ServerVar]
 	[ClientVar]
-	[Help("Turns on debug display of attacks")]
 	public static bool attack;
 
 	[ServerVar]

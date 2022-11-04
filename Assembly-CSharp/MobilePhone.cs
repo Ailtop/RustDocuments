@@ -633,9 +633,9 @@ public class MobilePhone : HeldEntity
 		Controller.DestroyShared();
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void UpdatePhoneName(RPCMessage msg)
 	{
 		Controller.UpdatePhoneName(msg);
@@ -695,9 +695,9 @@ public class MobilePhone : HeldEntity
 		Controller.ServerStopVoicemail(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void ServerDeleteVoicemail(RPCMessage msg)
 	{
 		Controller.ServerDeleteVoicemail(msg);

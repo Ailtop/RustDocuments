@@ -549,6 +549,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		{
 			SetFlag(Flags.On, online);
 			booting = false;
+			GetAttachedWeapon()?.SetLightsOn(online);
 			SendNetworkUpdate();
 			if (IsOffline())
 			{
@@ -1340,6 +1341,10 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public virtual bool IsEntityHostile(BaseCombatEntity ent)
 	{
+		if (ent is ScarecrowNPC)
+		{
+			return true;
+		}
 		if (ent is BasePet basePet && basePet.Brain.OwningPlayer != null)
 		{
 			if (!basePet.Brain.OwningPlayer.IsHostile())

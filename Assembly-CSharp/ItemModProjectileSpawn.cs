@@ -26,14 +26,15 @@ public class ItemModProjectileSpawn : ItemModProjectile
 			if ((bool)baseEntity)
 			{
 				Vector3 hitPositionWorld = info.HitPositionWorld;
-				Vector3 normalized = info.HitNormalWorld.normalized;
-				Vector3 normalized2 = info.ProjectileVelocity.normalized;
-				baseEntity.transform.position = hitPositionWorld - normalized2 * 0.1f;
-				baseEntity.transform.rotation = Quaternion.LookRotation(-normalized2);
+				Vector3 pointStart = info.PointStart;
+				Vector3 normalized = (hitPositionWorld - pointStart).normalized;
+				Vector3 normalized2 = info.HitNormalWorld.normalized;
+				baseEntity.transform.position = hitPositionWorld - normalized * 0.1f;
+				baseEntity.transform.rotation = Quaternion.LookRotation(-normalized);
 				baseEntity.Spawn();
 				if (spreadAngle > 0f)
 				{
-					Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(spreadAngle, normalized);
+					Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(spreadAngle, normalized2);
 					baseEntity.SetVelocity(modifiedAimConeDirection * Random.Range(1f, 3f));
 				}
 			}

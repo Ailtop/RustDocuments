@@ -58,6 +58,8 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool allowHeadLook;
 
+	public bool ignoreVehicleParent;
+
 	[FormerlySerializedAs("modifyPlayerCollider")]
 	public bool modifiesPlayerCollider;
 
@@ -274,6 +276,10 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual BaseVehicle VehicleParent()
 	{
+		if (ignoreVehicleParent)
+		{
+			return null;
+		}
 		return GetParentEntity() as BaseVehicle;
 	}
 

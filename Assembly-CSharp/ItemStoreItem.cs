@@ -1,3 +1,4 @@
+using System;
 using Rust.UI;
 using TMPro;
 using UnityEngine;
@@ -20,13 +21,13 @@ public class ItemStoreItem : MonoBehaviour
 	{
 		this.item = item;
 		Icon.Load(item.IconUrl);
-		Name.text = item.Name;
+		Name.SetText(item.Name);
 		Price.text = item.LocalPriceFormatted;
 		InCartTag.SetActive(inCart);
 		if (!string.IsNullOrWhiteSpace(item.ItemShortName))
 		{
 			ItemDefinition itemDefinition = ItemManager.FindItemDefinition(item.ItemShortName);
-			if (itemDefinition != null)
+			if (itemDefinition != null && !string.Equals(itemDefinition.displayName.english, item.Name, StringComparison.InvariantCultureIgnoreCase))
 			{
 				ItemName.SetPhrase(itemDefinition.displayName);
 			}

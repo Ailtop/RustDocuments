@@ -5,6 +5,8 @@ namespace ConVar;
 [Factory("fps")]
 public class FPS : ConsoleSystem
 {
+	private static int _limit = 240;
+
 	private static int m_graph;
 
 	[ClientVar(Saved = true)]
@@ -13,11 +15,16 @@ public class FPS : ConsoleSystem
 	{
 		get
 		{
-			return Application.targetFrameRate;
+			if (_limit == -1)
+			{
+				_limit = Application.targetFrameRate;
+			}
+			return _limit;
 		}
 		set
 		{
-			Application.targetFrameRate = value;
+			_limit = value;
+			Application.targetFrameRate = _limit;
 		}
 	}
 

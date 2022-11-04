@@ -1,5 +1,5 @@
-using System;
 using System.Text;
+using Rust;
 using TMPro;
 using UnityEngine;
 
@@ -61,10 +61,10 @@ public class SystemInfoGeneralText : MonoBehaviour
 			stringBuilder.Append("Mono");
 			stringBuilder.AppendLine();
 			stringBuilder.Append("\tCollects: ");
-			stringBuilder.Append(GC.CollectionCount(0));
+			stringBuilder.Append(GC.CollectionCount());
 			stringBuilder.AppendLine();
 			stringBuilder.Append("\tMemory:   ");
-			stringBuilder.Append(MB(GC.GetTotalMemory(forceFullCollection: false)));
+			stringBuilder.Append(GC.GetTotalMemory());
 			stringBuilder.Append(" MB");
 			stringBuilder.AppendLine();
 			stringBuilder.AppendLine();

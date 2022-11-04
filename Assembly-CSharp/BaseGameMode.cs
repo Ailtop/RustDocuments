@@ -146,6 +146,8 @@ public class BaseGameMode : BaseEntity
 
 	public bool quickRespawn;
 
+	public bool quickDeploy;
+
 	public float respawnDelayOverride = 5f;
 
 	public float startHealthOverride;

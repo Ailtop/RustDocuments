@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
-[RequireComponent(typeof(Camera))]
-[AddComponentMenu("KriptoFX/Explosion_Bloom")]
 [ImageEffectAllowedInSceneView]
+[AddComponentMenu("KriptoFX/Explosion_Bloom")]
+[RequireComponent(typeof(Camera))]
+[ExecuteInEditMode]
 public class Explosion_Bloom : MonoBehaviour
 {
 	[Serializable]
@@ -19,9 +19,9 @@ public class Explosion_Bloom : MonoBehaviour
 		[Tooltip("Makes transition between under/over-threshold gradual.")]
 		public float softKnee;
 
-		[Tooltip("Changes extent of veiling effects in a screen resolution-independent fashion.")]
 		[SerializeField]
 		[Range(1f, 7f)]
+		[Tooltip("Changes extent of veiling effects in a screen resolution-independent fashion.")]
 		public float radius;
 
 		[SerializeField]

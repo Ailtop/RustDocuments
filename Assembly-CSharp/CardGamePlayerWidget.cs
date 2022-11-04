@@ -2,8 +2,11 @@ using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TexasHoldEmPlayerWidget : MonoBehaviour
+public class CardGamePlayerWidget : MonoBehaviour
 {
+	[SerializeField]
+	private GameObjectRef cardImageSmallPrefab;
+
 	[SerializeField]
 	private RawImage avatar;
 
@@ -14,7 +17,7 @@ public class TexasHoldEmPlayerWidget : MonoBehaviour
 	private RustText scrapTotal;
 
 	[SerializeField]
-	private RustText betTotal;
+	private RustText betText;
 
 	[SerializeField]
 	private Image background;
@@ -38,13 +41,7 @@ public class TexasHoldEmPlayerWidget : MonoBehaviour
 	private RustText actionText;
 
 	[SerializeField]
-	private Sprite dealerChip;
-
-	[SerializeField]
-	private Sprite smallBlindChip;
-
-	[SerializeField]
-	private Sprite bigBlindChip;
+	private Sprite noIcon;
 
 	[SerializeField]
 	private Sprite canSeeIcon;
@@ -53,29 +50,17 @@ public class TexasHoldEmPlayerWidget : MonoBehaviour
 	private Sprite cannotSeeIcon;
 
 	[SerializeField]
-	private Sprite noChip;
+	private Image cornerIcon;
 
 	[SerializeField]
-	private Image chip;
+	private Transform cardDisplayParent;
 
 	[SerializeField]
-	private Image[] cardsDisplay;
+	private GridLayoutGroup cardDisplayGridLayout;
 
 	[SerializeField]
-	private Translate.Phrase allInPhrase;
+	private GameObject circle;
 
 	[SerializeField]
-	private Translate.Phrase foldPhrase;
-
-	[SerializeField]
-	private Translate.Phrase raisePhrase;
-
-	[SerializeField]
-	private Translate.Phrase betPhrase;
-
-	[SerializeField]
-	private Translate.Phrase checkPhrase;
-
-	[SerializeField]
-	private Translate.Phrase callPhrase;
+	private RustText circleText;
 }
