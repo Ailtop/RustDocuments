@@ -1,4 +1,42 @@
 {
+  "assets/bundled/prefabs/autospawn/monument/railside/trainyard_1.prefab": {
+    "DisplayName": "Train Yard",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": true,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 4,
+    "Tier": 2,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 200.0,
+        "y": 200.0,
+        "z": 200.0
+      },
+      "extents": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      },
+      "min": {
+        "x": -100.0,
+        "y": -100.0,
+        "z": -100.0
+      },
+      "max": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      }
+    }
+  },
   "assets/bundled/prefabs/autospawn/monument/harbor/harbor_2.prefab": {
     "DisplayName": "Harbor",
     "shouldDisplayOnMap": true,
@@ -265,6 +303,44 @@
       }
     }
   },
+  "assets/bundled/prefabs/autospawn/monument/xlarge/launch_site_1.prefab": {
+    "DisplayName": "Launch Site",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 3500,
+    "HasNavmesh": true,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 3,
+    "Tier": 4,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 400.0,
+        "y": 200.0,
+        "z": 200.0
+      },
+      "extents": {
+        "x": 200.0,
+        "y": 100.0,
+        "z": 100.0
+      },
+      "min": {
+        "x": -200.0,
+        "y": -100.0,
+        "z": -100.0
+      },
+      "max": {
+        "x": 200.0,
+        "y": 100.0,
+        "z": 100.0
+      }
+    }
+  },
   "assets/bundled/prefabs/autospawn/monument/medium/compound.prefab": {
     "DisplayName": "Outpost",
     "shouldDisplayOnMap": true,
@@ -300,6 +376,82 @@
         "x": 100.0,
         "y": 100.0,
         "z": 100.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/medium/bandit_town.prefab": {
+    "DisplayName": "Bandit Camp\n",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": true,
+    "IsSafeZone": true,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 3,
+    "Tier": 2,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 200.0,
+        "y": 200.0,
+        "z": 200.0
+      },
+      "extents": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      },
+      "min": {
+        "x": -100.0,
+        "y": -100.0,
+        "z": -100.0
+      },
+      "max": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/large/excavator_1.prefab": {
+    "DisplayName": "Giant Excavator Pit",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 3500,
+    "HasNavmesh": true,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 4,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 300.0,
+        "y": 100.0,
+        "z": 300.0
+      },
+      "extents": {
+        "x": 150.0,
+        "y": 50.0,
+        "z": 150.0
+      },
+      "min": {
+        "x": -150.0,
+        "y": -50.0,
+        "z": -150.0
+      },
+      "max": {
+        "x": 150.0,
+        "y": 50.0,
+        "z": 150.0
       }
     }
   },
@@ -417,16 +569,16 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/monument/large/powerplant_1.prefab": {
-    "DisplayName": "Power Plant",
+  "assets/bundled/prefabs/autospawn/monument/large/airfield_1.prefab": {
+    "DisplayName": "Airfield",
     "shouldDisplayOnMap": true,
     "MinWorldSize": 0,
-    "HasNavmesh": false,
+    "HasNavmesh": true,
     "IsSafeZone": false,
     "WantsDungeonLink": true,
     "HasDungeonLink": true,
-    "Type": 4,
-    "Tier": 4,
+    "Type": 1,
+    "Tier": 2,
     "Bounds": {
       "center": {
         "x": 0.0,
@@ -434,24 +586,24 @@
         "z": 0.0
       },
       "size": {
-        "x": 200.0,
+        "x": 400.0,
         "y": 200.0,
-        "z": 200.0
+        "z": 300.0
       },
       "extents": {
-        "x": 100.0,
+        "x": 200.0,
         "y": 100.0,
-        "z": 100.0
+        "z": 150.0
       },
       "min": {
-        "x": -100.0,
+        "x": -200.0,
         "y": -100.0,
-        "z": -100.0
+        "z": -150.0
       },
       "max": {
-        "x": 100.0,
+        "x": 200.0,
         "y": 100.0,
-        "z": 100.0
+        "z": 150.0
       }
     }
   },
@@ -490,6 +642,44 @@
         "x": 100.0,
         "y": 100.0,
         "z": 100.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/medium/radtown_small_3.prefab": {
+    "DisplayName": "Sewer Branch",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 4,
+    "Tier": 2,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 150.0,
+        "y": 150.0,
+        "z": 150.0
+      },
+      "extents": {
+        "x": 75.0,
+        "y": 75.0,
+        "z": 75.0
+      },
+      "min": {
+        "x": -75.0,
+        "y": -75.0,
+        "z": -75.0
+      },
+      "max": {
+        "x": 75.0,
+        "y": 75.0,
+        "z": 75.0
       }
     }
   },
@@ -645,7 +835,45 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/monument/tiny/water_well_b.prefab": {
+  "assets/bundled/prefabs/autospawn/monument/small/satellite_dish.prefab": {
+    "DisplayName": "Satellite Dish",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 4,
+    "Tier": 2,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 150.0,
+        "y": 150.0,
+        "z": 150.0
+      },
+      "extents": {
+        "x": 75.0,
+        "y": 75.0,
+        "z": 75.0
+      },
+      "min": {
+        "x": -75.0,
+        "y": -75.0,
+        "z": -75.0
+      },
+      "max": {
+        "x": 75.0,
+        "y": 75.0,
+        "z": 75.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/tiny/water_well_c.prefab": {
     "DisplayName": "Water Well",
     "shouldDisplayOnMap": false,
     "MinWorldSize": 0,
@@ -683,7 +911,7 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/monument/tiny/water_well_a.prefab": {
+  "assets/bundled/prefabs/autospawn/monument/tiny/water_well_b.prefab": {
     "DisplayName": "Water Well",
     "shouldDisplayOnMap": false,
     "MinWorldSize": 0,
@@ -873,6 +1101,44 @@
       }
     }
   },
+  "assets/bundled/prefabs/autospawn/monument/ice_lakes/ice_lake_3.prefab": {
+    "DisplayName": "Ice Lake",
+    "shouldDisplayOnMap": false,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 9,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "extents": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "min": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "max": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    }
+  },
   "assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_d.prefab": {
     "DisplayName": "Train Tunnel",
     "shouldDisplayOnMap": false,
@@ -911,8 +1177,122 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/monument/roadside/supermarket_1.prefab": {
-    "DisplayName": "Abandoned Supermarket",
+  "assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_b.prefab": {
+    "DisplayName": "Train Tunnel",
+    "shouldDisplayOnMap": false,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 7,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
+      },
+      "extents": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      },
+      "min": {
+        "x": -25.0,
+        "y": -25.0,
+        "z": -25.0
+      },
+      "max": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_a.prefab": {
+    "DisplayName": "Train Tunnel",
+    "shouldDisplayOnMap": false,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 7,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
+      },
+      "extents": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      },
+      "min": {
+        "x": -25.0,
+        "y": -25.0,
+        "z": -25.0
+      },
+      "max": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_c.prefab": {
+    "DisplayName": "Train Tunnel",
+    "shouldDisplayOnMap": false,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 7,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
+      },
+      "extents": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      },
+      "min": {
+        "x": -25.0,
+        "y": -25.0,
+        "z": -25.0
+      },
+      "max": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/roadside/warehouse.prefab": {
+    "DisplayName": "Mining Outpost",
     "shouldDisplayOnMap": true,
     "MinWorldSize": 0,
     "HasNavmesh": false,
@@ -928,24 +1308,24 @@
         "z": 0.0
       },
       "size": {
-        "x": 100.0,
-        "y": 100.0,
-        "z": 100.0
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
       },
       "extents": {
-        "x": 50.0,
-        "y": 50.0,
-        "z": 50.0
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
       },
       "min": {
-        "x": -50.0,
-        "y": -50.0,
-        "z": -50.0
+        "x": -25.0,
+        "y": -25.0,
+        "z": -25.0
       },
       "max": {
-        "x": 50.0,
-        "y": 50.0,
-        "z": 50.0
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
       }
     }
   },
@@ -987,7 +1367,45 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/power substations/small/power_sub_small_2.prefab": {
+  "assets/bundled/prefabs/autospawn/monument/roadside/supermarket_1.prefab": {
+    "DisplayName": "Abandoned Supermarket",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 7,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      },
+      "extents": {
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
+      },
+      "min": {
+        "x": -50.0,
+        "y": -50.0,
+        "z": -50.0
+      },
+      "max": {
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/power substations/small/power_sub_small_1.prefab": {
     "DisplayName": "Substation",
     "shouldDisplayOnMap": false,
     "MinWorldSize": 0,
@@ -1025,7 +1443,7 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/power substations/small/power_sub_small_1.prefab": {
+  "assets/bundled/prefabs/autospawn/power substations/small/power_sub_small_2.prefab": {
     "DisplayName": "Substation",
     "shouldDisplayOnMap": false,
     "MinWorldSize": 0,
@@ -1330,82 +1748,6 @@
     }
   },
   "assets/bundled/prefabs/autospawn/monument/underwater_lab/underwater_lab_d.prefab": {
-    "DisplayName": "Underwater Lab",
-    "shouldDisplayOnMap": true,
-    "MinWorldSize": 0,
-    "HasNavmesh": false,
-    "IsSafeZone": false,
-    "WantsDungeonLink": true,
-    "HasDungeonLink": false,
-    "Type": 2,
-    "Tier": -1,
-    "Bounds": {
-      "center": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-      },
-      "size": {
-        "x": 64.0,
-        "y": 64.0,
-        "z": 64.0
-      },
-      "extents": {
-        "x": 32.0,
-        "y": 32.0,
-        "z": 32.0
-      },
-      "min": {
-        "x": -32.0,
-        "y": -32.0,
-        "z": -32.0
-      },
-      "max": {
-        "x": 32.0,
-        "y": 32.0,
-        "z": 32.0
-      }
-    }
-  },
-  "assets/bundled/prefabs/autospawn/monument/underwater_lab/underwater_lab_b.prefab": {
-    "DisplayName": "Underwater Lab",
-    "shouldDisplayOnMap": true,
-    "MinWorldSize": 0,
-    "HasNavmesh": false,
-    "IsSafeZone": false,
-    "WantsDungeonLink": true,
-    "HasDungeonLink": false,
-    "Type": 2,
-    "Tier": -1,
-    "Bounds": {
-      "center": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-      },
-      "size": {
-        "x": 64.0,
-        "y": 64.0,
-        "z": 64.0
-      },
-      "extents": {
-        "x": 32.0,
-        "y": 32.0,
-        "z": 32.0
-      },
-      "min": {
-        "x": -32.0,
-        "y": -32.0,
-        "z": -32.0
-      },
-      "max": {
-        "x": 32.0,
-        "y": 32.0,
-        "z": 32.0
-      }
-    }
-  },
-  "assets/bundled/prefabs/autospawn/monument/underwater_lab/underwater_lab_a.prefab": {
     "DisplayName": "Underwater Lab",
     "shouldDisplayOnMap": true,
     "MinWorldSize": 0,

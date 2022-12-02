@@ -3316,12 +3316,23 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "slotmachine.caboose_static": [
+    "SlotMachine",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "traincaboose.entity": [
     "Spawnable",
     "TrainCar",
     "BaseVehicle",
     "BaseMountable",
     "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "traincaboose.static": [
     "BaseEntity",
     "BaseNetworkable"
   ],
@@ -3974,7 +3985,19 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "debris.stone.external.wall": [
+    "DebrisEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "debris.wall": [
+    "DebrisEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "debris.wood.external.wall": [
     "DebrisEntity",
     "BaseCombatEntity",
     "BaseEntity",

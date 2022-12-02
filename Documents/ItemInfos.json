@@ -9586,7 +9586,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9626,7 +9626,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9666,7 +9666,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9706,7 +9706,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9866,7 +9866,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9906,7 +9906,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9946,7 +9946,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -9986,7 +9986,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10026,7 +10026,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10045,7 +10045,7 @@
     "itemName": "doorcontroller.item",
     "worldModelPrefab": "",
     "displayName": "Door Controller",
-    "displayDescription": "A Door Controller. Will manipulate the state of the closest door when it recieves power",
+    "displayDescription": "A Door Controller. Will manipulate the state of the closest door when it receives power",
     "Traits": "Interesting",
     "rarity": "Uncommon",
     "occupySlots": 0,
@@ -10106,7 +10106,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10146,7 +10146,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10186,7 +10186,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10226,7 +10226,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10266,7 +10266,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10306,7 +10306,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10346,7 +10346,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10386,7 +10386,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10426,7 +10426,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10466,7 +10466,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10506,7 +10506,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10546,7 +10546,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10586,7 +10586,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10626,7 +10626,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10826,7 +10826,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10866,7 +10866,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10906,7 +10906,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -10986,7 +10986,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -11026,7 +11026,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -11066,7 +11066,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -11146,7 +11146,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": true,
@@ -11306,7 +11306,7 @@
     "isUsable": true,
     "spawnAsBlueprint": false,
     "condition": {
-      "enabled": true,
+      "enabled": false,
       "max": 100.0,
       "repairable": true,
       "maintainMaxCondition": false,
@@ -15558,46 +15558,6 @@
     },
     "isRedirectOf": null,
     "steamDlcName": "Instrument Pack"
-  },
-  {
-    "shortname": "car.key",
-    "itemid": 946662961,
-    "itemName": "car_key.item",
-    "worldModelPrefab": "",
-    "displayName": "Car Key",
-    "displayDescription": "A key to a car, created at a vehicle lift. Keep this item safe; if lost you'll be unable to drive the car again!",
-    "Traits": "Interesting",
-    "rarity": "None",
-    "occupySlots": 0,
-    "amountType": "Count",
-    "category": "Misc",
-    "selectionPanel": "None",
-    "flags": 0,
-    "itemType": "Generic",
-    "maxDraggable": 0,
-    "stackable": 65000,
-    "craftingStackable": 65000,
-    "quickDespawn": false,
-    "hidden": false,
-    "isHoldable": false,
-    "isWearable": false,
-    "HasSkins": false,
-    "CraftableWithSkin": false,
-    "isUsable": false,
-    "spawnAsBlueprint": false,
-    "condition": {
-      "enabled": false,
-      "max": 0.0,
-      "repairable": false,
-      "maintainMaxCondition": false,
-      "ovenCondition": false,
-      "foundCondition": {
-        "fractionMin": 1.0,
-        "fractionMax": 1.0
-      }
-    },
-    "isRedirectOf": null,
-    "steamDlcName": null
   },
   {
     "shortname": "door.key",
@@ -23927,7 +23887,7 @@
     "displayName": "High Quality Metal Ore",
     "displayDescription": "A rock containing High Quality Metal. Can be smelted in a furnace.",
     "Traits": "Interesting",
-    "rarity": "None",
+    "rarity": "Rare",
     "occupySlots": 0,
     "amountType": "Count",
     "category": "Resources",
@@ -24127,7 +24087,7 @@
     "displayName": "Metal Ore",
     "displayDescription": "A naturally occurring rock containing metal and metal compounds. You can extract this metal using a furnace.",
     "Traits": "Interesting",
-    "rarity": "None",
+    "rarity": "Uncommon",
     "occupySlots": 0,
     "amountType": "Count",
     "category": "Resources",
@@ -29247,7 +29207,7 @@
     "displayName": "Baseball Bat",
     "displayDescription": "",
     "Traits": "Interesting",
-    "rarity": "Uncommon",
+    "rarity": "None",
     "occupySlots": 0,
     "amountType": "Count",
     "category": "Weapon",
@@ -30807,7 +30767,7 @@
     "displayName": "Stone Spear",
     "displayDescription": "A stone-tipped wooden Spear. Slightly longer range.",
     "Traits": "Interesting",
-    "rarity": "Uncommon",
+    "rarity": "None",
     "occupySlots": 0,
     "amountType": "Count",
     "category": "Weapon",

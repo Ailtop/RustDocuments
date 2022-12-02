@@ -9834,6 +9834,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/system/debug/aimhelper.prefab",
+    "guid": "dca6f1d4a7e347f44b7af5863e2ee16f",
+    "hash": 3487030212,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/system/debug/debug_camera.prefab",
     "guid": "2b256cf25afc1e34f958b22c173a3908",
     "hash": 215884535,
@@ -32304,6 +32310,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/vehicles/modularcar/models/components/carcodelocks.prefab",
+    "guid": "514826000e9383d44958661d0f9836f7",
+    "hash": 678766296,
+    "pool": false
+  },
+  {
     "name": "assets/content/vehicles/modularcar/models/components/centrallocking.prefab",
     "guid": "c946001c5f091d94cbf23bbfeb99300a",
     "hash": 3891128153,
@@ -33054,6 +33066,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/vehicles/trains/caboose/caboose dressing static.prefab",
+    "guid": "dd5f784e73963af4991c92313110ca0e",
+    "hash": 373728361,
+    "pool": false
+  },
+  {
     "name": "assets/content/vehicles/trains/caboose/caboose dressing.prefab",
     "guid": "19192c4badbf71443ae4e93a3661ac5e",
     "hash": 4064822081,
@@ -33090,6 +33108,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/vehicles/trains/caboose/cardtable.caboose_static.prefab",
+    "guid": "f1a4703ada655d74cab55a219e0d35b6",
+    "hash": 858712032,
+    "pool": false
+  },
+  {
     "name": "assets/content/vehicles/trains/caboose/carpets.prefab",
     "guid": "e867675a28d59344a84c548f6be07e58",
     "hash": 3345782123,
@@ -33102,9 +33126,21 @@
     "pool": false
   },
   {
+    "name": "assets/content/vehicles/trains/caboose/rustedbogies.prefab",
+    "guid": "203e076ad8e96834dabf910bae82f5c8",
+    "hash": 270850533,
+    "pool": false
+  },
+  {
     "name": "assets/content/vehicles/trains/caboose/slotmachine.caboose.prefab",
     "guid": "5e954299ebdbd314d96e88bc819f018f",
     "hash": 1863405911,
+    "pool": false
+  },
+  {
+    "name": "assets/content/vehicles/trains/caboose/slotmachine.caboose_static.prefab",
+    "guid": "2e58ee00d8fe1a64dadfe2456304aa84",
+    "hash": 3666013697,
     "pool": false
   },
   {
@@ -33123,6 +33159,12 @@
     "name": "assets/content/vehicles/trains/caboose/traincaboose.entity.prefab",
     "guid": "6a2271c6ab709f6499f6737305732e05",
     "hash": 1965024162,
+    "pool": false
+  },
+  {
+    "name": "assets/content/vehicles/trains/caboose/traincaboose.static.prefab",
+    "guid": "421a3730d3e04b44aae121700d7ee3f5",
+    "hash": 2633527920,
     "pool": false
   },
   {
@@ -39270,9 +39312,21 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/debris/debris.stone.external.wall.prefab",
+    "guid": "89828b4bf3e908b4090b31292b2d30d0",
+    "hash": 3573484548,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/debris/debris.wall.prefab",
     "guid": "796413a57ca6b4c8f85faf6a6732e002",
     "hash": 1424066995,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/debris/debris.wood.external.wall.prefab",
+    "guid": "708b866f5e465094d9077f5065c4e14d",
+    "hash": 2304619954,
     "pool": false
   },
   {
@@ -40590,6 +40644,18 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/deployable/modular car lift/effects/modular-car-lift-addremovelock.prefab",
+    "guid": "8c51f810bbff4bc4b856e66fd6ed5f24",
+    "hash": 597670884,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/modular car lift/effects/modular-car-lift-changelockcode.prefab",
+    "guid": "ab9e360c7d19a924f989254f66478551",
+    "hash": 3880494059,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/deployable/modular car lift/effects/modular-car-lift-deploy.prefab",
     "guid": "2e8fa7b46aa5047e1a4482ebabf45178",
     "hash": 2623494141,
@@ -40599,6 +40665,12 @@
     "name": "assets/prefabs/deployable/modular car lift/effects/modular-car-lift-destroy.prefab",
     "guid": "eccddbbd620174e2b976c96bceacbc92",
     "hash": 1218570581,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/modular car lift/effects/modular-car-lift-repair.prefab",
+    "guid": "e2ef485f2ead82d4b8f50316111abb81",
+    "hash": 3989019690,
     "pool": true
   },
   {
@@ -43941,12 +44013,6 @@
     "name": "assets/prefabs/io/kinetic/wheelswitch_wheel_only.prefab",
     "guid": "bd4d38832b3651149a4243985886181d",
     "hash": 3508954061,
-    "pool": false
-  },
-  {
-    "name": "assets/prefabs/locks/carlock/car_key.item.prefab",
-    "guid": "03c96dc83bcd62a44b1d7e5aea79b362",
-    "hash": 4115123548,
     "pool": false
   },
   {
@@ -50742,6 +50808,12 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/plants/hemp/hemp.skin.4.5.ripe.prefab",
+    "guid": "95d097b6126372248af3529fd0935b23",
+    "hash": 2731346217,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/plants/hemp/hemp.skin.4.fruiting.prefab",
     "guid": "bf63ecb21419d4628a5ffaee2f49e220",
     "hash": 3557507480,
@@ -51822,15 +51894,45 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/tools/hose/clientioline_hose_aqua.prefab",
+    "guid": "a8b639fda65710044a596f3f86561ac6",
+    "hash": 2308272443,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/tools/hose/clientioline_hose_blue.prefab",
     "guid": "25244f62c56916a45bccfcfe203f1910",
     "hash": 2777427997,
     "pool": true
   },
   {
+    "name": "assets/prefabs/tools/hose/clientioline_hose_orange.prefab",
+    "guid": "eae66f03799e9af44ac9ea0d391cd0d5",
+    "hash": 2265267507,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/hose/clientioline_hose_pink.prefab",
+    "guid": "49a01a9c12fe4ce409dcdacc6896d3bc",
+    "hash": 719558509,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/hose/clientioline_hose_purple.prefab",
+    "guid": "b2161874030f4694ba6c1041974c53e2",
+    "hash": 2393749809,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/tools/hose/clientioline_hose_red.prefab",
     "guid": "008dd1be9a8d9e14dafee58bd32103aa",
     "hash": 2014255810,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/hose/clientioline_hose_white.prefab",
+    "guid": "1b1d542bc40ae7b47ad7aaa7fba6844d",
+    "hash": 57637754,
     "pool": true
   },
   {
@@ -52740,6 +52842,12 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/tools/wire/clientioline_aqua.prefab",
+    "guid": "c676698d7164ab34c80c3dccaf6b433f",
+    "hash": 4032704935,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/tools/wire/clientioline_blue.prefab",
     "guid": "640991a47ce50104d91e21cb9a2e83c3",
     "hash": 4158420726,
@@ -52752,9 +52860,33 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/tools/wire/clientioline_orange.prefab",
+    "guid": "e50c511e32e936447a24584ab1a31842",
+    "hash": 276454529,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/wire/clientioline_pink.prefab",
+    "guid": "69933170725a60146b4cefe174469320",
+    "hash": 696581506,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/wire/clientioline_purple.prefab",
+    "guid": "0b46f989d2728ab46a5d17b032f8d609",
+    "hash": 3872088705,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/tools/wire/clientioline_red.prefab",
     "guid": "45d212666c130e34197e89cf6397d9a2",
     "hash": 2417157099,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/wire/clientioline_white.prefab",
+    "guid": "1fec99dad3b7820469fb844758160603",
+    "hash": 1852823064,
     "pool": true
   },
   {
@@ -57198,6 +57330,12 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/weapons/molotov cocktail/effects/molotovexplodeunderwater.prefab",
+    "guid": "84bed9e814d125c48aa518f8ed7ff5e8",
+    "hash": 815882363,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/weapons/molotov cocktail/effects/pfx_omni_ground_flame.prefab",
     "guid": "253aa8a4a15cb484892e4c6a8461708c",
     "hash": 2451035599,
@@ -61419,6 +61557,24 @@
     "name": "assets/scenes/test/material_zoo/neutral_dungeon_lighting.prefab",
     "guid": "24f4fe2fc41b1e64b8551118d6cfc6af",
     "hash": 2728166956,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/test/modelviewer/canvas.prefab",
+    "guid": "7d21272de6fd83549ad26f079c45afa5",
+    "hash": 2775741925,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/test/modelviewer/lighting.prefab",
+    "guid": "226ddc31e5ebaa94e9d97e6ace341473",
+    "hash": 704793563,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/test/modelviewer/modelviewercamera.prefab",
+    "guid": "b821fbc35603231429426885f8be0cb6",
+    "hash": 4154640459,
     "pool": false
   },
   {

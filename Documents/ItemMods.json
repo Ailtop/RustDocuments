@@ -1215,7 +1215,6 @@
   "xylophone": [
     "ItemModEntity"
   ],
-  "car.key": [],
   "door.key": [
     "ItemModBurnable"
   ],
@@ -2162,6 +2161,7 @@
   ],
   "fun.boomboxportable": [
     "ItemModEntity",
+    "ItemModCassetteContainer",
     "ItemModContainer"
   ],
   "cassette": [
