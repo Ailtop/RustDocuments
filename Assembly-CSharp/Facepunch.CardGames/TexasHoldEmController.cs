@@ -375,7 +375,7 @@ public class TexasHoldEmController : CardGameController
 
 	private bool DealCommunityCards()
 	{
-		if (!base.HasRoundInProgress)
+		if (!base.HasActiveRound)
 		{
 			return false;
 		}
@@ -424,7 +424,7 @@ public class TexasHoldEmController : CardGameController
 		{
 			return;
 		}
-		if (!base.HasRoundInProgress)
+		if (!base.HasActiveRound)
 		{
 			if (input == 64)
 			{
@@ -492,7 +492,7 @@ public class TexasHoldEmController : CardGameController
 			LastAction = (PokerInputOption)input;
 			if (flag && NumPlayersInCurrentRound() == 1)
 			{
-				EndRound();
+				EndRoundWithDelay();
 				return;
 			}
 			int startIndex = activePlayerIndex;
@@ -538,7 +538,7 @@ public class TexasHoldEmController : CardGameController
 			if (num3 > num2)
 			{
 				Debug.LogError(GetType().Name + ": This should never happen. Ended turn with no players in game?.");
-				EndRound();
+				EndRoundWithDelay();
 				return;
 			}
 		}
@@ -612,7 +612,7 @@ public class TexasHoldEmController : CardGameController
 			Pool.FreeList(ref obj);
 			item.finalScore = finalScore;
 		}
-		EndRound();
+		EndRoundWithDelay();
 	}
 
 	protected override int GetAvailableInputsForPlayer(CardPlayerData playerData)
@@ -622,7 +622,7 @@ public class TexasHoldEmController : CardGameController
 		{
 			return (int)pokerInputOption;
 		}
-		if (!base.HasRoundInProgress)
+		if (!base.HasActiveRound)
 		{
 			if (!playerData.LeftRoundEarly && playerData.Cards.Count > 0 && !playerData.SendCardDetails)
 			{

@@ -75,9 +75,13 @@ public class PressButton : IOEntity
 	{
 		if (IsOn())
 		{
-			if (HasFlag(Flags.Reserved3) && (sourceItem != null || smallBurst))
+			if (sourceItem != null || smallBurst)
 			{
-				return pressPowerAmount;
+				if (HasFlag(Flags.Reserved3))
+				{
+					return Mathf.Max(pressPowerAmount, base.GetPassthroughAmount());
+				}
+				return 0;
 			}
 			return base.GetPassthroughAmount();
 		}

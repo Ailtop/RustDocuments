@@ -670,6 +670,10 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAID
 
 	public bool IgnoreNonVisionSneakers = true;
 
+	public float IgnoreSneakersMaxDistance = 4f;
+
+	public float IgnoreNonVisionMaxDistance = 15f;
+
 	public float ListenRange;
 
 	public EntityType SenseTypes;
@@ -1197,7 +1201,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAID
 				Events = new AIEvents();
 			}
 			bool senseFriendlies = MaxGroupSize > 0;
-			Senses.Init(baseEntity, MemoryDuration, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes, RefreshKnownLOS);
+			Senses.Init(baseEntity, this, MemoryDuration, SenseRange, TargetLostRange, VisionCone, CheckVisionCone, CheckLOS, IgnoreNonVisionSneakers, ListenRange, HostileTargetsOnly, senseFriendlies, IgnoreSafeZonePlayers, SenseTypes, RefreshKnownLOS);
 			if (DefaultDesignSO == null && Designs.Count == 0)
 			{
 				Debug.LogWarning("Brain on " + base.gameObject.name + " is trying to load a null AI design!");

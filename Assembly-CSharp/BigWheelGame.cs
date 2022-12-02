@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Oxide.Core;
 using UnityEngine;
 
@@ -59,10 +60,16 @@ public class BigWheelGame : SpinnerWheel
 		}
 	}
 
+	public void RemoveTerminal(BigWheelBettingTerminal terminal)
+	{
+		terminals.Remove(terminal);
+	}
+
 	public void InitBettingTerminals()
 	{
 		terminals.Clear();
 		Vis.Entities(base.transform.position, 30f, terminals, 256);
+		terminals = terminals.Distinct().ToList();
 	}
 
 	public override void Update_Server()

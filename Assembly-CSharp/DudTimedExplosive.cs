@@ -24,6 +24,10 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 	[NonSerialized]
 	private float explodeTime;
 
+	public bool becomeDudInWater;
+
+	protected override bool AlwaysRunWaterCheck => becomeDudInWater;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("DudTimedExplosive.OnRpcMessage"))
@@ -71,6 +75,31 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 	private bool IsWickBurning()
 	{
 		return HasFlag(Flags.On);
+	}
+
+	public override void WaterCheck()
+	{
+		if (becomeDudInWater && WaterFactor() >= 0.5f)
+		{
+			if (creatorEntity != null && creatorEntity.IsNpc)
+			{
+				base.Explode();
+				return;
+			}
+			BecomeDud();
+			if (IsInvoking(WaterCheck))
+			{
+				CancelInvoke(WaterCheck);
+			}
+			if (IsInvoking(Explode))
+			{
+				CancelInvoke(Explode);
+			}
+		}
+		else
+		{
+			base.WaterCheck();
+		}
 	}
 
 	public override float GetRandomTimerTime()
@@ -184,7 +213,7 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 		ReceiveCollisionMessages(b: true);
 		if (waterCausesExplosion)
 		{
-			InvokeRepeating(base.WaterCheck, 0f, 0.5f);
+			InvokeRepeating(WaterCheck, 0f, 0.5f);
 		}
 	}
 

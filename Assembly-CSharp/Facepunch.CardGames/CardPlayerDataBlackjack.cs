@@ -112,5 +112,9 @@ public class CardPlayerDataBlackjack : CardPlayerData
 		SplitCards.Clear();
 		SplitCards.AddRange(obj);
 		Pool.FreeList(ref obj);
+		int num = betThisRound;
+		int num2 = splitBetThisRound;
+		splitBetThisRound = num;
+		betThisRound = num2;
 	}
 }

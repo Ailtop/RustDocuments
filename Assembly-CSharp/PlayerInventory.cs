@@ -299,7 +299,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		uint id = msg.read.UInt32();
 		string text = msg.read.String();
 		Item item = FindItemUID(id);
-		if (item == null || Interface.CallHook("OnItemAction", item, text, msg.player) != null || item.IsLocked() || !CanMoveItemsFrom(item.GetEntityOwner(), item))
+		if (item == null || Interface.CallHook("OnItemAction", item, text, msg.player) != null || item.IsLocked() || (item.parent != null && item.parent.IsLocked()) || !CanMoveItemsFrom(item.GetEntityOwner(), item))
 		{
 			return;
 		}

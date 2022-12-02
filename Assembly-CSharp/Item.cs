@@ -150,11 +150,16 @@ public class Item
 	{
 		get
 		{
+			Rarity rarity = info.despawnRarity;
+			if (rarity == Rarity.None)
+			{
+				rarity = info.rarity;
+			}
 			if (!(info != null))
 			{
 				return 1;
 			}
-			return Mathf.Clamp((int)(info.rarity - 1) * 4, 1, 100);
+			return Mathf.Clamp((int)(rarity - 1) * 4, 1, 100);
 		}
 	}
 
@@ -621,7 +626,6 @@ public class Item
 			bool flag = iTargetPos == -1;
 			ItemContainer itemContainer = parent;
 			IItemContainerEntity itemContainerEntity = default(IItemContainerEntity);
-			Item slot = default(Item);
 			if (iTargetPos == -1)
 			{
 				if (allowStack && info.stackable > 1)
@@ -638,10 +642,14 @@ public class Item
 				}
 				if (iTargetPos == -1)
 				{
-					itemContainerEntity = newcontainer.GetEntityOwner() as IItemContainerEntity;
+					itemContainerEntity = newcontainer.GetEntityOwner(returnHeldEntity: true) as IItemContainerEntity;
 					if (itemContainerEntity != null)
 					{
 						iTargetPos = itemContainerEntity.GetIdealSlot(sourcePlayer, this);
+						if (iTargetPos == int.MinValue)
+						{
+							return false;
+						}
 					}
 				}
 				if (iTargetPos == -1)
@@ -654,7 +662,7 @@ public class Item
 					ItemModWearable itemModWearable = info.ItemModWearable;
 					for (int i = 0; i < newcontainer.capacity; i++)
 					{
-						slot = newcontainer.GetSlot(i);
+						Item slot = newcontainer.GetSlot(i);
 						if (slot == null)
 						{
 							if (CanMoveTo(newcontainer, i))
@@ -714,6 +722,7 @@ public class Item
 						amount -= num2;
 						slot2.MarkDirty();
 						MarkDirty();
+						Interface.CallHook("OnItemStacked", slot2, this, newcontainer);
 						if (amount <= 0)
 						{
 							RemoveFromWorld();
@@ -725,7 +734,6 @@ public class Item
 						{
 							return MoveToContainer(newcontainer, -1, allowStack, ignoreStackLimit, sourcePlayer);
 						}
-						Interface.CallHook("OnItemStacked", slot, this, newcontainer);
 						return false;
 					}
 				}
@@ -765,9 +773,8 @@ public class Item
 				{
 					item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
 				}
-				bool result = true;
 				Interface.CallHook("OnItemStacked", itemContainerEntity, this, newcontainer);
-				return result;
+				return true;
 			}
 			if (!newcontainer.CanAccept(this))
 			{

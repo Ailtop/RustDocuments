@@ -56,7 +56,7 @@ public class BasePathFinder
 		for (float num4 = 0f; num4 < 360f; num4 += 90f)
 		{
 			Vector3 pointOnCircle = GetPointOnCircle(navigator.transform.position, radius, num4 + num3);
-			if (navigator.GetNearestNavmeshPosition(pointOnCircle, out var position, 10f) && navigator.IsAcceptableWaterDepth(position))
+			if (navigator.GetNearestNavmeshPosition(pointOnCircle, out var position, 10f) && navigator.IsPositionABiomeRequirement(position) && navigator.IsAcceptableWaterDepth(position) && !navigator.IsPositionPreventTopology(position))
 			{
 				topologySamples[num] = position;
 				num++;
@@ -67,7 +67,7 @@ public class BasePathFinder
 				}
 			}
 		}
-		if (UnityEngine.Random.Range(0f, 1f) <= 0.9f && num2 > 0)
+		if (num2 > 0)
 		{
 			chosenPosition = preferedTopologySamples[UnityEngine.Random.Range(0, num2)];
 		}

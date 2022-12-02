@@ -29,6 +29,10 @@ public class PuzzleReset : FacepunchBehaviour
 	[HideInInspector]
 	public Vector3[] resetPositions;
 
+	public bool broadcastResetMessage;
+
+	public Translate.Phrase resetPhrase;
+
 	private AIInformationZone zone;
 
 	private float resetTimeElapsed;
@@ -179,6 +183,17 @@ public class PuzzleReset : FacepunchBehaviour
 			if (gameObject != null)
 			{
 				gameObject.SendMessage("OnPuzzleReset", SendMessageOptions.DontRequireReceiver);
+			}
+		}
+		if (!broadcastResetMessage)
+		{
+			return;
+		}
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			if (!activePlayer.IsNpc && activePlayer.IsConnected)
+			{
+				activePlayer.ShowToast(GameTip.Styles.Server_Event, resetPhrase);
 			}
 		}
 	}

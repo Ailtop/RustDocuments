@@ -137,6 +137,46 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	{
 		using (TimeWarning.New("GrowableEntity.OnRpcMessage"))
 		{
+			if (rpc == 759768385 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_EatFruit "));
+				}
+				using (TimeWarning.New("RPC_EatFruit"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(759768385u, "RPC_EatFruit", this, player, 3f))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(759768385u, "RPC_EatFruit", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg2 = rPCMessage;
+							RPC_EatFruit(msg2);
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in RPC_EatFruit");
+					}
+				}
+				return true;
+			}
 			if (rpc == 598660365 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -165,14 +205,54 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg2 = rPCMessage;
-							RPC_PickFruit(msg2);
+							RPCMessage msg3 = rPCMessage;
+							RPC_PickFruit(msg3);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception exception2)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in RPC_PickFruit");
+					}
+				}
+				return true;
+			}
+			if (rpc == 3465633431u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PickFruitAll "));
+				}
+				using (TimeWarning.New("RPC_PickFruitAll"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(3465633431u, "RPC_PickFruitAll", this, player, 3f))
+						{
+							return true;
+						}
+						if (!RPC_Server.MaxDistance.Test(3465633431u, "RPC_PickFruitAll", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							RPC_PickFruitAll(msg4);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in RPC_PickFruitAll");
 					}
 				}
 				return true;
@@ -201,14 +281,50 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg3 = rPCMessage;
-							RPC_RemoveDying(msg3);
+							RPCMessage msg5 = rPCMessage;
+							RPC_RemoveDying(msg5);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception exception4)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in RPC_RemoveDying");
+					}
+				}
+				return true;
+			}
+			if (rpc == 1771718099 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RemoveDyingAll "));
+				}
+				using (TimeWarning.New("RPC_RemoveDyingAll"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(1771718099u, "RPC_RemoveDyingAll", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg6 = rPCMessage;
+							RPC_RemoveDyingAll(msg6);
+						}
+					}
+					catch (Exception exception5)
+					{
+						Debug.LogException(exception5);
+						player.Kick("RPC Error in RPC_RemoveDyingAll");
 					}
 				}
 				return true;
@@ -237,13 +353,13 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg4 = rPCMessage;
-							RPC_RequestQualityUpdate(msg4);
+							RPCMessage msg7 = rPCMessage;
+							RPC_RequestQualityUpdate(msg7);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception6)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in RPC_RequestQualityUpdate");
 					}
 				}
@@ -273,14 +389,50 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg5 = rPCMessage;
-							RPC_TakeClone(msg5);
+							RPCMessage msg8 = rPCMessage;
+							RPC_TakeClone(msg8);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception7)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(exception7);
 						player.Kick("RPC Error in RPC_TakeClone");
+					}
+				}
+				return true;
+			}
+			if (rpc == 95639240 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TakeCloneAll "));
+				}
+				using (TimeWarning.New("RPC_TakeCloneAll"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(95639240u, "RPC_TakeCloneAll", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg9 = rPCMessage;
+							RPC_TakeCloneAll(msg9);
+						}
+					}
+					catch (Exception exception8)
+					{
+						Debug.LogException(exception8);
+						player.Kick("RPC Error in RPC_TakeCloneAll");
 					}
 				}
 				return true;
@@ -577,6 +729,15 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		return Mathf.Lerp(minB, maxB, t);
 	}
 
+	public bool IsFood()
+	{
+		if (Properties.pickupItem.category == ItemCategory.Food)
+		{
+			return Properties.pickupItem.GetComponent<ItemModConsume>() != null;
+		}
+		return false;
+	}
+
 	public override void ServerInit()
 	{
 		base.ServerInit();
@@ -763,6 +924,29 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		TakeClones(msg.player);
 	}
 
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	public void RPC_TakeCloneAll(RPCMessage msg)
+	{
+		if (GetParentEntity() != null)
+		{
+			List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
+			foreach (BaseEntity child in GetParentEntity().children)
+			{
+				if (child != this && child is GrowableEntity item)
+				{
+					obj.Add(item);
+				}
+			}
+			foreach (GrowableEntity item2 in obj)
+			{
+				item2.TakeClones(msg.player);
+			}
+			Facepunch.Pool.FreeList(ref obj);
+		}
+		TakeClones(msg.player);
+	}
+
 	public void TakeClones(BasePlayer player)
 	{
 		if (player == null || !CanClone() || Interface.CallHook("CanTakeCutting", player, this) != null)
@@ -783,14 +967,14 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	public void PickFruit(BasePlayer player)
+	public void PickFruit(BasePlayer player, bool eat = false)
 	{
-		if (!CanPick() || Interface.CallHook("OnGrowableGather", this, player) != null)
+		if (!CanPick() || Interface.CallHook("OnGrowableGather", this, player, eat) != null)
 		{
 			return;
 		}
 		harvests++;
-		GiveFruit(player, CurrentPickAmount);
+		GiveFruit(player, CurrentPickAmount, eat);
 		RandomItemDispenser randomItemDispenser = PrefabAttribute.server.Find<RandomItemDispenser>(prefabID);
 		if (randomItemDispenser != null)
 		{
@@ -818,7 +1002,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	public void GiveFruit(BasePlayer player, int amount)
+	public void GiveFruit(BasePlayer player, int amount, bool eat)
 	{
 		if (amount <= 0)
 		{
@@ -829,21 +1013,30 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			for (int i = 0; i < amount; i++)
 			{
-				GiveFruit(player, 1, flag);
+				GiveFruit(player, 1, flag, eat);
 			}
 		}
 		else
 		{
-			GiveFruit(player, amount, flag);
+			GiveFruit(player, amount, flag, eat);
 		}
 	}
 
-	public void GiveFruit(BasePlayer player, int amount, bool applyCondition)
+	public void GiveFruit(BasePlayer player, int amount, bool applyCondition, bool eat)
 	{
 		Item item = ItemManager.Create(Properties.pickupItem, amount, 0uL);
 		if (applyCondition)
 		{
 			item.conditionNormalized = Properties.fruitVisualScaleCurve.Evaluate(StageProgressFraction);
+		}
+		if (eat && player != null && IsFood())
+		{
+			ItemModConsume component = item.info.GetComponent<ItemModConsume>();
+			if (component != null)
+			{
+				component.DoAction(item, player);
+				return;
+			}
 		}
 		if (player != null)
 		{
@@ -866,8 +1059,63 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
+	public void RPC_EatFruit(RPCMessage msg)
+	{
+		PickFruit(msg.player, eat: true);
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
+	public void RPC_PickFruitAll(RPCMessage msg)
+	{
+		if (GetParentEntity() != null)
+		{
+			List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
+			foreach (BaseEntity child in GetParentEntity().children)
+			{
+				if (child != this && child is GrowableEntity item)
+				{
+					obj.Add(item);
+				}
+			}
+			foreach (GrowableEntity item2 in obj)
+			{
+				item2.PickFruit(msg.player);
+			}
+			Facepunch.Pool.FreeList(ref obj);
+		}
+		PickFruit(msg.player);
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_RemoveDying(RPCMessage msg)
 	{
+		RemoveDying(msg.player);
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	public void RPC_RemoveDyingAll(RPCMessage msg)
+	{
+		if (GetParentEntity() != null)
+		{
+			List<GrowableEntity> obj = Facepunch.Pool.GetList<GrowableEntity>();
+			foreach (BaseEntity child in GetParentEntity().children)
+			{
+				if (child != this && child is GrowableEntity item)
+				{
+					obj.Add(item);
+				}
+			}
+			foreach (GrowableEntity item2 in obj)
+			{
+				item2.RemoveDying(msg.player);
+			}
+			Facepunch.Pool.FreeList(ref obj);
+		}
 		RemoveDying(msg.player);
 	}
 

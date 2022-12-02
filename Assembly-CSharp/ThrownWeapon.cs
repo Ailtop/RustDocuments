@@ -21,6 +21,8 @@ public class ThrownWeapon : AttackEntity
 
 	public bool canStick = true;
 
+	public bool canThrowUnderwater = true;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("ThrownWeapon.OnRpcMessage"))
@@ -113,7 +115,7 @@ public class ThrownWeapon : AttackEntity
 			return;
 		}
 		BasePlayer ownerPlayer = GetOwnerPlayer();
-		if (ownerPlayer == null)
+		if (ownerPlayer == null || (!canThrowUnderwater && ownerPlayer.IsHeadUnderwater()))
 		{
 			return;
 		}
@@ -208,6 +210,10 @@ public class ThrownWeapon : AttackEntity
 		{
 			return;
 		}
+		if (!canThrowUnderwater && msg.player.IsHeadUnderwater())
+		{
+			return;
+		}
 		BaseEntity baseEntity = GameManager.server.CreateEntity(prefabToThrow.resourcePath, vector, Quaternion.LookRotation((overrideAngle == Vector3.zero) ? (-normalized) : overrideAngle));
 		if (baseEntity == null)
 		{
@@ -266,7 +272,7 @@ public class ThrownWeapon : AttackEntity
 	[RPC_Server.IsActiveItem]
 	private void DoDrop(RPCMessage msg)
 	{
-		if (!HasItemAmount() || HasAttackCooldown())
+		if (!HasItemAmount() || HasAttackCooldown() || (!canThrowUnderwater && msg.player.IsHeadUnderwater()))
 		{
 			return;
 		}

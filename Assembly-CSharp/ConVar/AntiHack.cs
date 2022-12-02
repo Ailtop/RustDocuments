@@ -220,6 +220,14 @@ public class AntiHack : ConsoleSystem
 	public static float projectile_losforgiveness = 0.2f;
 
 	[ServerVar]
+	[Help("how often a projectile is allowed to penetrate something before its damage is ignored")]
+	public static int projectile_damagedepth = 2;
+
+	[ServerVar]
+	[Help("how often a projectile is allowed to penetrate something before its impact spawn is ignored")]
+	public static int projectile_impactspawndepth = 1;
+
+	[ServerVar]
 	[Help("whether or not to include terrain in the projectile LOS checks")]
 	public static bool projectile_terraincheck = true;
 

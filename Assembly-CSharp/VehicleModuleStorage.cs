@@ -64,6 +64,42 @@ public class VehicleModuleStorage : VehicleModuleSeating
 				}
 				return true;
 			}
+			if (rpc == 425471188 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TryOpenWithKeycode "));
+				}
+				using (TimeWarning.New("RPC_TryOpenWithKeycode"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(425471188u, "RPC_TryOpenWithKeycode", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg3 = rPCMessage;
+							RPC_TryOpenWithKeycode(msg3);
+						}
+					}
+					catch (Exception exception2)
+					{
+						Debug.LogException(exception2);
+						player.Kick("RPC Error in RPC_TryOpenWithKeycode");
+					}
+				}
+				return true;
+			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
 	}
@@ -175,19 +211,25 @@ public class VehicleModuleStorage : VehicleModuleSeating
 	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open(RPCMessage msg)
 	{
-		BasePlayer player = msg.player;
-		if (!(player == null) && CanBeLooted(player))
+		TryOpen(msg.player);
+	}
+
+	private bool TryOpen(BasePlayer player)
+	{
+		if (!BaseNetworkableEx.IsValid(player) || !CanBeLooted(player))
 		{
-			IItemContainerEntity container = GetContainer();
-			if (!ObjectEx.IsUnityNull(container))
-			{
-				container.PlayerOpenLoot(player);
-			}
-			else
-			{
-				Debug.LogError(GetType().Name + ": No container component found.");
-			}
+			return false;
 		}
+		IItemContainerEntity container = GetContainer();
+		if (!ObjectEx.IsUnityNull(container))
+		{
+			container.PlayerOpenLoot(player);
+		}
+		else
+		{
+			Debug.LogError(GetType().Name + ": No container component found.");
+		}
+		return true;
 	}
 
 	protected override bool CanBeMovedNowOnVehicle()
@@ -198,5 +240,28 @@ public class VehicleModuleStorage : VehicleModuleSeating
 			return false;
 		}
 		return true;
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	public void RPC_TryOpenWithKeycode(RPCMessage msg)
+	{
+		if (!base.IsOnACar)
+		{
+			return;
+		}
+		BasePlayer player = msg.player;
+		if (!(player == null))
+		{
+			string codeEntered = msg.read.String();
+			if (base.Car.CarLock.TryOpenWithCode(player, codeEntered))
+			{
+				TryOpen(player);
+			}
+			else
+			{
+				base.Car.ClientRPC(null, "CodeEntryFailed");
+			}
+		}
 	}
 }

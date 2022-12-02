@@ -116,6 +116,12 @@ public class BaseNavigator : BaseMonoBehaviour
 	[InspectorFlags]
 	public TerrainTopology.Enum topologyPreference = (TerrainTopology.Enum)96;
 
+	[InspectorFlags]
+	public TerrainTopology.Enum topologyPrevent;
+
+	[InspectorFlags]
+	public TerrainBiome.Enum biomeRequirement;
+
 	public float stuckTimer;
 
 	public Vector3 stuckCheckPosition;
@@ -206,6 +212,16 @@ public class BaseNavigator : BaseMonoBehaviour
 	public int TopologyPreference()
 	{
 		return (int)topologyPreference;
+	}
+
+	public int TopologyPrevent()
+	{
+		return (int)topologyPrevent;
+	}
+
+	public int BiomeRequirement()
+	{
+		return (int)biomeRequirement;
 	}
 
 	public virtual void Init(BaseCombatEntity entity, NavMeshAgent agent)
@@ -974,7 +990,20 @@ public class BaseNavigator : BaseMonoBehaviour
 		if (TerrainMeta.TopologyMap != null)
 		{
 			int topology = TerrainMeta.TopologyMap.GetTopology(position);
-			if ((TopologyPreference() & topology) > 0)
+			if ((TopologyPreference() & topology) != 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool IsPositionPreventTopology(Vector3 position)
+	{
+		if (TerrainMeta.TopologyMap != null)
+		{
+			int topology = TerrainMeta.TopologyMap.GetTopology(position);
+			if ((TopologyPrevent() & topology) != 0)
 			{
 				return true;
 			}
@@ -991,7 +1020,24 @@ public class BaseNavigator : BaseMonoBehaviour
 		if (TerrainMeta.BiomeMap != null)
 		{
 			int num = (int)biomePreference;
-			if ((TerrainMeta.BiomeMap.GetBiomeMaxType(position) & num) > 0)
+			if ((TerrainMeta.BiomeMap.GetBiomeMaxType(position) & num) != 0)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool IsPositionABiomeRequirement(Vector3 position)
+	{
+		if (biomeRequirement == (TerrainBiome.Enum)0)
+		{
+			return true;
+		}
+		if (TerrainMeta.BiomeMap != null)
+		{
+			int biomeMaxType = TerrainMeta.BiomeMap.GetBiomeMaxType(position);
+			if ((BiomeRequirement() & biomeMaxType) != 0)
 			{
 				return true;
 			}

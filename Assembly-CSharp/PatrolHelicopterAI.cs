@@ -763,6 +763,10 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			{
 				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 				{
+					if (monument.IsSafeZone)
+					{
+						continue;
+					}
 					bool flag = false;
 					foreach (MonumentInfo visitedMonument in _visitedMonuments)
 					{
@@ -781,7 +785,14 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 			if (monumentInfo == null)
 			{
 				_visitedMonuments.Clear();
-				monumentInfo = TerrainMeta.Path.Monuments[UnityEngine.Random.Range(0, TerrainMeta.Path.Monuments.Count)];
+				for (int i = 0; i < 5; i++)
+				{
+					monumentInfo = TerrainMeta.Path.Monuments[UnityEngine.Random.Range(0, TerrainMeta.Path.Monuments.Count)];
+					if (!monumentInfo.IsSafeZone)
+					{
+						break;
+					}
+				}
 			}
 			if ((bool)monumentInfo)
 			{
@@ -810,7 +821,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public void State_Patrol_Think(float timePassed)
 	{
-		float num = Vector3.Distance(base.transform.position, destination);
+		float num = Vector3Ex.Distance2D(base.transform.position, destination);
 		if (num <= 25f)
 		{
 			targetThrottleSpeed = GetThrottleForDistance(num);

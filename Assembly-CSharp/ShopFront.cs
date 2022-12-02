@@ -27,6 +27,8 @@ public class ShopFront : StorageContainer
 
 	public ItemContainer customerInventory;
 
+	private bool swappingItems;
+
 	private float AngleDotProduct => 1f - maxUseAngle / 90f;
 
 	public ItemContainer vendorInventory => base.inventory;
@@ -184,18 +186,26 @@ public class ShopFront : StorageContainer
 			{
 				return;
 			}
-			for (int num = vendorInventory.capacity - 1; num >= 0; num--)
+			try
 			{
-				Item slot = vendorInventory.GetSlot(num);
-				Item slot2 = customerInventory.GetSlot(num);
-				if ((bool)customerPlayer && slot != null)
+				swappingItems = true;
+				for (int num = vendorInventory.capacity - 1; num >= 0; num--)
 				{
-					customerPlayer.GiveItem(slot);
+					Item slot = vendorInventory.GetSlot(num);
+					Item slot2 = customerInventory.GetSlot(num);
+					if ((bool)customerPlayer && slot != null)
+					{
+						customerPlayer.GiveItem(slot);
+					}
+					if ((bool)vendorPlayer && slot2 != null)
+					{
+						vendorPlayer.GiveItem(slot2);
+					}
 				}
-				if ((bool)vendorPlayer && slot2 != null)
-				{
-					vendorPlayer.GiveItem(slot2);
-				}
+			}
+			finally
+			{
+				swappingItems = false;
 			}
 			Effect.server.Run(transactionCompleteEffect.resourcePath, this, 0u, new Vector3(0f, 1f, 0f), Vector3.zero);
 		}
@@ -274,7 +284,7 @@ public class ShopFront : StorageContainer
 
 	private bool CanAcceptVendorItem(Item item, int targetSlot)
 	{
-		if ((vendorPlayer != null && item.GetOwnerPlayer() == vendorPlayer) || vendorInventory.itemList.Contains(item) || item.parent == null)
+		if (swappingItems || (vendorPlayer != null && item.GetOwnerPlayer() == vendorPlayer) || vendorInventory.itemList.Contains(item))
 		{
 			return true;
 		}
@@ -283,7 +293,7 @@ public class ShopFront : StorageContainer
 
 	private bool CanAcceptCustomerItem(Item item, int targetSlot)
 	{
-		if ((customerPlayer != null && item.GetOwnerPlayer() == customerPlayer) || customerInventory.itemList.Contains(item) || item.parent == null)
+		if (swappingItems || (customerPlayer != null && item.GetOwnerPlayer() == customerPlayer) || customerInventory.itemList.Contains(item))
 		{
 			return true;
 		}
@@ -391,14 +401,5 @@ public class ShopFront : StorageContainer
 	public void UpdatePlayers()
 	{
 		ClientRPC(null, "CLIENT_ReceivePlayers", (!(vendorPlayer == null)) ? vendorPlayer.net.ID : 0u, (!(customerPlayer == null)) ? customerPlayer.net.ID : 0u);
-	}
-
-	public override int GetIdealSlot(BasePlayer player, Item item)
-	{
-		if (player == customerPlayer)
-		{
-			return 1;
-		}
-		return base.GetIdealSlot(player, item);
 	}
 }

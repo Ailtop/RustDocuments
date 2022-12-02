@@ -161,6 +161,11 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
+	public static class BaseProjectileFlags
+	{
+		public const Flags BurstToggle = Flags.Reserved6;
+	}
+
 	[Header("NPC Info")]
 	public float NoiseRadius = 100f;
 
@@ -242,7 +247,22 @@ public class BaseProjectile : AttackEntity
 	[NonSerialized]
 	public bool aiming;
 
+	[Header("Burst Information")]
 	public bool isBurstWeapon;
+
+	public bool canChangeFireModes = true;
+
+	public bool defaultOn = true;
+
+	public float internalBurstRecoilScale = 0.8f;
+
+	public float internalBurstFireRateScale = 0.8f;
+
+	public float internalBurstAimConeScale = 0.8f;
+
+	public Translate.Phrase Toast_BurstDisabled = new Translate.Phrase("burst_disabled", "Burst Disabled");
+
+	public Translate.Phrase Toast_BurstEnabled = new Translate.Phrase("burst enabled", "Burst Enabled");
 
 	public float resetDuration = 0.3f;
 
@@ -488,6 +508,46 @@ public class BaseProjectile : AttackEntity
 					{
 						Debug.LogException(exception5);
 						player.Kick("RPC Error in SwitchAmmoTo");
+					}
+				}
+				return true;
+			}
+			if (rpc == 3327286961u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ToggleFireMode "));
+				}
+				using (TimeWarning.New("ToggleFireMode"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(3327286961u, "ToggleFireMode", this, player, 2uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.IsActiveItem.Test(3327286961u, "ToggleFireMode", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg7 = rPCMessage;
+							ToggleFireMode(msg7);
+						}
+					}
+					catch (Exception exception6)
+					{
+						Debug.LogException(exception6);
+						player.Kick("RPC Error in ToggleFireMode");
 					}
 				}
 				return true;
@@ -942,6 +1002,7 @@ public class BaseProjectile : AttackEntity
 			cachedModHash = num2;
 		}
 		float num3 = aimCone;
+		num3 *= (UsingInternalBurstMode() ? internalBurstAimConeScale : 1f);
 		if (recoilProperties != null && recoilProperties.overrideAimconeWithCurve && primaryMagazine.capacity > 0)
 		{
 			num3 += recoilProperties.aimconeCurve.Evaluate((float)numShotsFired / (float)primaryMagazine.capacity % 1f) * recoilProperties.aimconeCurveScale;
@@ -958,7 +1019,8 @@ public class BaseProjectile : AttackEntity
 	{
 		float num = ProjectileWeaponMod.Average(this, (ProjectileWeaponMod x) => x.repeatDelay, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f);
 		float num2 = ProjectileWeaponMod.Sum(this, (ProjectileWeaponMod x) => x.repeatDelay, (ProjectileWeaponMod.Modifier y) => y.offset, 0f);
-		return delay * num + num2;
+		float num3 = (UsingInternalBurstMode() ? internalBurstFireRateScale : 1f);
+		return delay * num * num3 + num2;
 	}
 
 	public Projectile.Modifier GetProjectileModifier()
@@ -969,6 +1031,54 @@ public class BaseProjectile : AttackEntity
 		result.distanceOffset = ProjectileWeaponMod.Sum(this, (ProjectileWeaponMod x) => x.projectileDistance, (ProjectileWeaponMod.Modifier y) => y.offset, 0f);
 		result.distanceScale = ProjectileWeaponMod.Average(this, (ProjectileWeaponMod x) => x.projectileDistance, (ProjectileWeaponMod.Modifier y) => y.scalar, 1f) * GetDistanceScale();
 		return result;
+	}
+
+	public bool UsingBurstMode()
+	{
+		if (IsBurstDisabled())
+		{
+			return false;
+		}
+		if (!isBurstWeapon)
+		{
+			if (children != null)
+			{
+				return (from ProjectileWeaponMod x in children
+					where x != null && x.burstCount > 0
+					select x).FirstOrDefault() != null;
+			}
+			return false;
+		}
+		return true;
+	}
+
+	public bool UsingInternalBurstMode()
+	{
+		if (IsBurstDisabled())
+		{
+			return false;
+		}
+		return isBurstWeapon;
+	}
+
+	public bool IsBurstEligable()
+	{
+		if (!isBurstWeapon)
+		{
+			if (children != null)
+			{
+				return (from ProjectileWeaponMod x in children
+					where x != null && x.burstCount > 0
+					select x).FirstOrDefault() != null;
+			}
+			return false;
+		}
+		return true;
+	}
+
+	public float TimeBetweenBursts()
+	{
+		return repeatDelay * 3f;
 	}
 
 	public float GetReloadDuration()
@@ -1004,6 +1114,28 @@ public class BaseProjectile : AttackEntity
 		}
 		Facepunch.Pool.FreeList(ref obj);
 		return num;
+	}
+
+	public bool IsBurstDisabled()
+	{
+		return HasFlag(Flags.Reserved6) == defaultOn;
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server.CallsPerSecond(2uL)]
+	private void ToggleFireMode(RPCMessage msg)
+	{
+		if (canChangeFireModes && IsBurstEligable())
+		{
+			SetFlag(Flags.Reserved6, !HasFlag(Flags.Reserved6));
+			SendNetworkUpdate_Flags();
+			BasePlayer ownerPlayer = GetOwnerPlayer();
+			if (!ownerPlayer.IsNpc && ownerPlayer.IsConnected)
+			{
+				ownerPlayer.ShowToast(GameTip.Styles.Blue_Short, IsBurstDisabled() ? Toast_BurstDisabled : Toast_BurstEnabled);
+			}
+		}
 	}
 
 	protected virtual void ReloadMagazine(int desiredAmount = -1)
@@ -1194,9 +1326,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

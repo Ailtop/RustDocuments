@@ -103,6 +103,13 @@ public class IOEntity : DecayEntity
 		}
 	}
 
+	private struct FrameTiming
+	{
+		public string PrefabName;
+
+		public float Time;
+	}
+
 	[Header("IOEntity")]
 	public Transform debugOrigin;
 
@@ -121,6 +128,12 @@ public class IOEntity : DecayEntity
 	[ServerVar]
 	public static int backtracking = 8;
 
+	[ServerVar(Help = "Print out what is taking so long in the IO frame budget")]
+	public static bool debugBudget = false;
+
+	[ServerVar(Help = "Ignore frames with a lower ms than this while debugBudget is active")]
+	public static float debugBudgetThreshold = 2f;
+
 	public const Flags Flag_ShortCircuit = Flags.Reserved7;
 
 	public const Flags Flag_HasPower = Flags.Reserved8;
@@ -132,6 +145,8 @@ public class IOEntity : DecayEntity
 	public IOType ioType;
 
 	public static Queue<IOEntity> _processQueue = new Queue<IOEntity>();
+
+	private static List<FrameTiming> timings = new List<FrameTiming>();
 
 	public int cachedOutputsUsed;
 
@@ -439,14 +454,48 @@ public class IOEntity : DecayEntity
 	{
 		float realtimeSinceStartup = UnityEngine.Time.realtimeSinceStartup;
 		float num = framebudgetms / 1000f;
+		if (debugBudget)
+		{
+			timings.Clear();
+		}
 		while (_processQueue.Count > 0 && UnityEngine.Time.realtimeSinceStartup < realtimeSinceStartup + num && !_processQueue.Peek().HasBlockedUpdatedOutputsThisFrame)
 		{
+			float realtimeSinceStartup2 = UnityEngine.Time.realtimeSinceStartup;
 			IOEntity iOEntity = _processQueue.Dequeue();
 			if (BaseNetworkableEx.IsValid(iOEntity))
 			{
 				iOEntity.UpdateOutputs();
 			}
+			if (debugBudget)
+			{
+				timings.Add(new FrameTiming
+				{
+					PrefabName = iOEntity.ShortPrefabName,
+					Time = (UnityEngine.Time.realtimeSinceStartup - realtimeSinceStartup2) * 1000f
+				});
+			}
 		}
+		if (!debugBudget)
+		{
+			return;
+		}
+		float num2 = UnityEngine.Time.realtimeSinceStartup - realtimeSinceStartup;
+		float num3 = debugBudgetThreshold / 1000f;
+		if (!(num2 > num3))
+		{
+			return;
+		}
+		TextTable textTable = new TextTable();
+		textTable.AddColumns("Prefab Name", "Time (in ms)");
+		foreach (FrameTiming timing in timings)
+		{
+			string[] obj = new string[2] { timing.PrefabName, null };
+			float time = timing.Time;
+			obj[1] = time.ToString();
+			textTable.AddRow(obj);
+		}
+		textTable.AddRow("Total time", (num2 * 1000f).ToString());
+		Debug.Log(textTable.ToString());
 	}
 
 	public virtual void ResetIOState()

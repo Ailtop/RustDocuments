@@ -30,9 +30,9 @@ public sealed class AutoExposure : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[Tooltip("Use this to scale the global exposure of the scene.")]
 	[Min(0f)]
 	[DisplayName("Exposure Compensation")]
+	[Tooltip("Use this to scale the global exposure of the scene.")]
 	public FloatParameter keyValue = new FloatParameter
 	{
 		value = 1f

@@ -17,7 +17,13 @@ public class WireTool : HeldEntity
 		Red = 1,
 		Green = 2,
 		Blue = 3,
-		Yellow = 4
+		Yellow = 4,
+		Pink = 5,
+		Purple = 6,
+		Orange = 7,
+		White = 8,
+		LightBlue = 9,
+		Count = 10
 	}
 
 	public struct PendingPlug_t
@@ -47,6 +53,8 @@ public class WireTool : HeldEntity
 
 	public IOEntity.IOType wireType;
 
+	public float RadialMenuHoldTime = 0.25f;
+
 	public static Translate.Phrase Default = new Translate.Phrase("wiretoolcolour.default", "Default");
 
 	public static Translate.Phrase DefaultDesc = new Translate.Phrase("wiretoolcolour.default.desc", "Default connection color");
@@ -66,6 +74,26 @@ public class WireTool : HeldEntity
 	public static Translate.Phrase Yellow = new Translate.Phrase("wiretoolcolour.yellow", "Yellow");
 
 	public static Translate.Phrase YellowDesc = new Translate.Phrase("wiretoolcolour.yellow.desc", "Yellow connection color");
+
+	public static Translate.Phrase LightBlue = new Translate.Phrase("wiretoolcolour.light_blue", "Light Blue");
+
+	public static Translate.Phrase LightBlueDesc = new Translate.Phrase("wiretoolcolour.light_blue.desc", "Light Blue connection color");
+
+	public static Translate.Phrase Orange = new Translate.Phrase("wiretoolcolour.orange", "Orange");
+
+	public static Translate.Phrase OrangeDesc = new Translate.Phrase("wiretoolcolour.orange.desc", "Orange connection color");
+
+	public static Translate.Phrase Purple = new Translate.Phrase("wiretoolcolour.purple", "Purple");
+
+	public static Translate.Phrase PurpleDesc = new Translate.Phrase("wiretoolcolour.purple.desc", "Purple connection color");
+
+	public static Translate.Phrase White = new Translate.Phrase("wiretoolcolour.white", "White");
+
+	public static Translate.Phrase WhiteDesc = new Translate.Phrase("wiretoolcolour.white.desc", "White connection color");
+
+	public static Translate.Phrase Pink = new Translate.Phrase("wiretoolcolour.pink", "Pink");
+
+	public static Translate.Phrase PinkDesc = new Translate.Phrase("wiretoolcolour.pink.desc", "Pink connection color");
 
 	public PendingPlug_t pending;
 
@@ -165,6 +193,46 @@ public class WireTool : HeldEntity
 				}
 				return true;
 			}
+			if (rpc == 121409151 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestChangeColor "));
+				}
+				using (TimeWarning.New("RequestChangeColor"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.FromOwner.Test(121409151u, "RequestChangeColor", this, player))
+						{
+							return true;
+						}
+						if (!RPC_Server.IsActiveItem.Test(121409151u, "RequestChangeColor", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							RequestChangeColor(msg4);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in RequestChangeColor");
+					}
+				}
+				return true;
+			}
 			if (rpc == 2469840259u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -193,13 +261,13 @@ public class WireTool : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg4 = rPCMessage;
-							RequestClear(msg4);
+							RPCMessage msg5 = rPCMessage;
+							RequestClear(msg5);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception4)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in RequestClear");
 					}
 				}
@@ -226,9 +294,9 @@ public class WireTool : HeldEntity
 							SetPlugged(plugged);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception5)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in SetPlugged");
 					}
 				}
@@ -262,13 +330,13 @@ public class WireTool : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg5 = rPCMessage;
-							TryClear(msg5);
+							RPCMessage msg6 = rPCMessage;
+							TryClear(msg6);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception exception6)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(exception6);
 						player.Kick("RPC Error in TryClear");
 					}
 				}
@@ -373,9 +441,9 @@ public class WireTool : HeldEntity
 		return false;
 	}
 
+	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
-	[RPC_Server.FromOwner]
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -389,9 +457,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -502,6 +570,39 @@ public class WireTool : HeldEntity
 	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	public void RequestChangeColor(RPCMessage msg)
+	{
+		if (!CanPlayerUseWires(msg.player))
+		{
+			return;
+		}
+		uint uid = msg.read.UInt32();
+		int index = msg.read.Int32();
+		bool flag = msg.read.Bit();
+		WireColour wireColour = IntToColour(msg.read.Int32());
+		IOEntity iOEntity = BaseNetworkable.serverEntities.Find(uid) as IOEntity;
+		if (iOEntity == null)
+		{
+			return;
+		}
+		IOEntity.IOSlot iOSlot = (flag ? iOEntity.inputs.ElementAtOrDefault(index) : iOEntity.outputs.ElementAtOrDefault(index));
+		if (iOSlot != null)
+		{
+			IOEntity iOEntity2 = iOSlot.connectedTo.Get();
+			if (!(iOEntity2 == null))
+			{
+				IOEntity.IOSlot obj = (flag ? iOEntity2.outputs : iOEntity2.inputs)[iOSlot.connectedToSlot];
+				iOSlot.wireColour = wireColour;
+				iOEntity.SendNetworkUpdate();
+				obj.wireColour = wireColour;
+				iOEntity2.SendNetworkUpdate();
+			}
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void AddLine(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -546,9 +647,9 @@ public class WireTool : HeldEntity
 		{
 			i = 0;
 		}
-		if (i > 4)
+		if (i >= 10)
 		{
-			i = 4;
+			i = 9;
 		}
 		WireColour wireColour = (WireColour)i;
 		if (wireType == IOEntity.IOType.Fluidic && wireColour == WireColour.Green)

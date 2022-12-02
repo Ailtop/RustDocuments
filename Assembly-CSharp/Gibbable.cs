@@ -68,6 +68,8 @@ public class Gibbable : PrefabAttribute, IClientComponent
 	[Tooltip("If enabled, gibs will spawn even though we've hit a gib limit")]
 	public bool important;
 
+	public bool useContinuousCollision;
+
 	public float explodeScale;
 
 	public float scaleOverride = 1f;

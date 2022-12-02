@@ -31,7 +31,7 @@ public class ModularCarSeat : MouseSteerableSeat
 			ModularCar modularCar = associatedSeatingModule.Vehicle as ModularCar;
 			if (modularCar != null)
 			{
-				return modularCar.PlayerCanUseThis(player, ModularCarLock.LockType.Door);
+				return modularCar.PlayerCanUseThis(player, ModularCarCodeLock.LockType.Door);
 			}
 		}
 		return true;

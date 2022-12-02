@@ -32,6 +32,12 @@ public class BlackjackUI : MonoBehaviour
 	private RustText dealerValueText;
 
 	[SerializeField]
+	private GameObject yourValueObj;
+
+	[SerializeField]
+	private RustText yourValueText;
+
+	[SerializeField]
 	private Translate.Phrase phrasePlaceYourBet;
 
 	[SerializeField]

@@ -1,4 +1,5 @@
 #define UNITY_ASSERTIONS
+using System;
 using System.Collections.Generic;
 using ConVar;
 using Network;
@@ -10,6 +11,14 @@ using UnityEngine.Serialization;
 
 public class NetworkVisibilityGrid : MonoBehaviour, Provider
 {
+	public const int overworldLayer = 0;
+
+	public const int cavesLayer = 1;
+
+	public const int tunnelsLayer = 2;
+
+	public const int dynamicDungeonsFirstLayer = 10;
+
 	public int startID = 1024;
 
 	public int gridSize = 100;
@@ -23,11 +32,35 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 
 	public float switchTolerance = 20f;
 
+	public float cavesThreshold = -5f;
+
+	public float tunnelsThreshold = -50f;
+
+	public float dynamicDungeonsThreshold = 1000f;
+
+	public float dynamicDungeonsInterval = 100f;
+
+	private float halfGridSize;
+
+	private float cellSize;
+
+	private float halfCellSize;
+
+	private int numIDsPerLayer;
+
 	private void Awake()
 	{
 		Debug.Assert(Network.Net.sv != null, "Network.Net.sv is NULL when creating Visibility Grid");
 		Debug.Assert(Network.Net.sv.visibility == null, "Network.Net.sv.visibility is being set multiple times");
 		Network.Net.sv.visibility = new Manager(this);
+	}
+
+	private void OnEnable()
+	{
+		halfGridSize = (float)gridSize / 2f;
+		cellSize = (float)gridSize / (float)cellCount;
+		halfCellSize = cellSize / 2f;
+		numIDsPerLayer = cellCount * cellCount;
 	}
 
 	private void OnDisable()
@@ -42,37 +75,52 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 	private void OnDrawGizmosSelected()
 	{
 		Gizmos.color = Color.blue;
-		float num = CellSize();
-		float num2 = (float)gridSize / 2f;
 		Vector3 position = base.transform.position;
 		for (int i = 0; i <= cellCount; i++)
 		{
-			float num3 = 0f - num2 + (float)i * num - num / 2f;
-			Gizmos.DrawLine(new Vector3(num2, position.y, num3), new Vector3(0f - num2, position.y, num3));
-			Gizmos.DrawLine(new Vector3(num3, position.y, num2), new Vector3(num3, position.y, 0f - num2));
+			float num = 0f - halfGridSize + (float)i * cellSize - halfCellSize;
+			Gizmos.DrawLine(new Vector3(halfGridSize, position.y, num), new Vector3(0f - halfGridSize, position.y, num));
+			Gizmos.DrawLine(new Vector3(num, position.y, halfGridSize), new Vector3(num, position.y, 0f - halfGridSize));
 		}
 	}
 
-	private int PositionToGrid(float f)
+	private int PositionToGrid(float value)
 	{
-		f += (float)gridSize / 2f;
-		return Mathf.RoundToInt(f / CellSize());
+		return Mathf.RoundToInt((value + halfGridSize) / cellSize);
 	}
 
-	private float GridToPosition(int i)
+	private float GridToPosition(int value)
 	{
-		return (float)i * CellSize() - (float)gridSize / 2f;
+		return (float)value * cellSize - halfGridSize;
 	}
 
-	public uint CoordToID(int x, int y)
+	private int PositionToLayer(float y)
 	{
-		return (uint)(x * cellCount + y + startID);
+		if (y < tunnelsThreshold)
+		{
+			return 2;
+		}
+		if (y < cavesThreshold)
+		{
+			return 1;
+		}
+		if (y >= dynamicDungeonsThreshold)
+		{
+			return 10 + Mathf.FloorToInt((y - dynamicDungeonsThreshold) / dynamicDungeonsInterval);
+		}
+		return 0;
 	}
 
-	public uint GetID(Vector3 vPos)
+	private uint CoordToID(int x, int y, int layer)
+	{
+		return (uint)(layer * numIDsPerLayer + (x * cellCount + y) + startID);
+	}
+
+	private uint GetID(Vector3 vPos)
 	{
 		int num = PositionToGrid(vPos.x);
 		int num2 = PositionToGrid(vPos.z);
+		int num3 = PositionToLayer(vPos.y);
 		if (num < 0)
 		{
 			return 0u;
@@ -89,35 +137,60 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		{
 			return 0u;
 		}
-		uint num3 = CoordToID(num, num2);
-		if (num3 < startID)
+		uint num4 = CoordToID(num, num2, num3);
+		if (num4 < startID)
 		{
-			Debug.LogError("NetworkVisibilityGrid.GetID - group is below range " + num + " " + num2 + " " + num3 + " " + cellCount);
+			Debug.LogError($"NetworkVisibilityGrid.GetID - group is below range {num} {num2} {num3} {num4} {cellCount}");
 		}
-		if (num3 > startID + cellCount * cellCount)
+		return num4;
+	}
+
+	private (int x, int y, int layer) DeconstructGroupId(int groupId)
+	{
+		groupId -= startID;
+		int result;
+		int item = Math.DivRem(groupId, numIDsPerLayer, out result);
+		int result2;
+		return (Math.DivRem(result, cellCount, out result2), result2, item);
+	}
+
+	private Bounds GetBounds(uint uid)
+	{
+		(int x, int y, int layer) tuple = DeconstructGroupId((int)uid);
+		int item = tuple.x;
+		int item2 = tuple.y;
+		int item3 = tuple.layer;
+		Vector3 min = new Vector3(GridToPosition(item) - halfCellSize, 0f, GridToPosition(item2) - halfCellSize);
+		Vector3 max = new Vector3(min.x + cellSize, 0f, min.z + cellSize);
+		if (item3 == 0)
 		{
-			Debug.LogError("NetworkVisibilityGrid.GetID - group is higher than range " + num + " " + num2 + " " + num3 + " " + cellCount);
+			min.y = cavesThreshold;
+			max.y = dynamicDungeonsThreshold;
 		}
-		return num3;
-	}
-
-	public Vector3 GetPosition(uint uid)
-	{
-		uid -= (uint)startID;
-		int i = (int)((long)uid / (long)cellCount);
-		int i2 = (int)((long)uid % (long)cellCount);
-		return new Vector3(GridToPosition(i), 0f, GridToPosition(i2));
-	}
-
-	public Bounds GetBounds(uint uid)
-	{
-		float num = CellSize();
-		return new Bounds(GetPosition(uid), new Vector3(num, 1048576f, num));
-	}
-
-	public float CellSize()
-	{
-		return (float)gridSize / (float)cellCount;
+		else if (item3 == 1)
+		{
+			min.y = tunnelsThreshold;
+			max.y = cavesThreshold - float.Epsilon;
+		}
+		else if (item3 == 2)
+		{
+			min.y = -10000f;
+			max.y = tunnelsThreshold - float.Epsilon;
+		}
+		else if (item3 >= 10)
+		{
+			int num = item3 - 10;
+			min.y = dynamicDungeonsThreshold + (float)num * dynamicDungeonsInterval + float.Epsilon;
+			max.y = min.y + dynamicDungeonsInterval;
+		}
+		else
+		{
+			Debug.LogError($"Cannot get bounds for unknown layer {item3}!", this);
+		}
+		Bounds result = default(Bounds);
+		result.min = min;
+		result.max = max;
+		return result;
 	}
 
 	public void OnGroupAdded(Group group)
@@ -170,37 +243,53 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		{
 			return;
 		}
-		groups.Add(Network.Net.sv.visibility.Get(0u));
-		uint iD = group.ID;
+		List<Group> groups2 = groups;
+		groups2.Add(Network.Net.sv.visibility.Get(0u));
+		int iD = (int)group.ID;
 		if (iD < startID)
 		{
 			return;
 		}
-		iD -= (uint)startID;
-		int num = (int)((long)iD / (long)cellCount);
-		int num2 = (int)((long)iD % (long)cellCount);
-		groups.Add(Network.Net.sv.visibility.Get(CoordToID(num, num2)));
+		var (num, num2, groupLayer2) = DeconstructGroupId(iD);
+		AddLayers(num, num2, groupLayer2);
 		for (int i = 1; i <= radius; i++)
 		{
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2)));
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2)));
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num, num2 - i)));
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num, num2 + i)));
+			AddLayers(num - i, num2, groupLayer2);
+			AddLayers(num + i, num2, groupLayer2);
+			AddLayers(num, num2 - i, groupLayer2);
+			AddLayers(num, num2 + i, groupLayer2);
 			for (int j = 1; j < i; j++)
 			{
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 - j)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 + j)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 - j)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 + j)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - j, num2 - i)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + j, num2 - i)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - j, num2 + i)));
-				groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + j, num2 + i)));
+				AddLayers(num - i, num2 - j, groupLayer2);
+				AddLayers(num - i, num2 + j, groupLayer2);
+				AddLayers(num + i, num2 - j, groupLayer2);
+				AddLayers(num + i, num2 + j, groupLayer2);
+				AddLayers(num - j, num2 - i, groupLayer2);
+				AddLayers(num + j, num2 - i, groupLayer2);
+				AddLayers(num - j, num2 + i, groupLayer2);
+				AddLayers(num + j, num2 + i, groupLayer2);
 			}
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 - i)));
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num - i, num2 + i)));
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 - i)));
-			groups.Add(Network.Net.sv.visibility.Get(CoordToID(num + i, num2 + i)));
+			AddLayers(num - i, num2 - i, groupLayer2);
+			AddLayers(num - i, num2 + i, groupLayer2);
+			AddLayers(num + i, num2 - i, groupLayer2);
+			AddLayers(num + i, num2 + i, groupLayer2);
+		}
+		void Add(int groupX, int groupY, int groupLayer)
+		{
+			groups2.Add(Network.Net.sv.visibility.Get(CoordToID(groupX, groupY, groupLayer)));
+		}
+		void AddLayers(int groupX, int groupY, int groupLayer)
+		{
+			Add(groupX, groupY, groupLayer);
+			if (groupLayer == 0)
+			{
+				Add(groupX, groupY, 1);
+			}
+			if (groupLayer == 1)
+			{
+				Add(groupX, groupY, 2);
+				Add(groupX, groupY, 0);
+			}
 		}
 	}
 }

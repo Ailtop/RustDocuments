@@ -89,6 +89,8 @@ public class Construction : PrefabAttribute
 
 	public Vector3 applyStartingRotation = Vector3.zero;
 
+	public Transform deployOffset;
+
 	[Range(0f, 10f)]
 	public float healthMultiplier = 1f;
 
@@ -204,7 +206,6 @@ public class Construction : PrefabAttribute
 			{
 				transform.position = placement.position;
 				transform.rotation = placement.rotation;
-				lastPlacementError = "Too close to another building";
 				continue;
 			}
 			if (common.isBuildingPrivilege && !target.player.CanPlaceBuildingPrivilege(placement.position, placement.rotation, common.bounds))
@@ -251,7 +252,12 @@ public class Construction : PrefabAttribute
 
 	private static bool TestPlacingThroughWall(ref Placement placement, Transform transform, Construction common, Target target)
 	{
-		Vector3 vector = placement.position - target.ray.origin;
+		Vector3 position = placement.position;
+		if (common.deployOffset != null)
+		{
+			position += placement.rotation * common.deployOffset.localPosition;
+		}
+		Vector3 vector = position - target.ray.origin;
 		if (!Physics.Raycast(target.ray.origin, vector.normalized, out var hitInfo, vector.magnitude, 2097152))
 		{
 			return true;

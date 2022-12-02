@@ -112,22 +112,22 @@ public class GenerateDungeonBase : ProceduralComponent
 				uint seed2 = seed++;
 				List<DungeonSegment> list = new List<DungeonSegment>();
 				DungeonSegment segmentStart = new DungeonSegment();
+				int num = 0;
 				segmentStart.position = item.transform.position;
 				segmentStart.rotation = item.transform.rotation;
 				segmentStart.link = item.GetComponentInChildren<DungeonBaseLink>();
 				segmentStart.cost = 0;
 				segmentStart.floor = 0;
-				for (int j = 0; j < 5; j++)
+				for (int j = 0; j < 25; j++)
 				{
-					if (list.Count <= 25)
+					List<DungeonSegment> list2 = new List<DungeonSegment>();
+					list2.Add(segmentStart);
+					PlaceSegments(ref seed2, int.MaxValue, 3, 2, attachToFemale: true, attachToMale: false, list2, array2);
+					int num2 = list2.Count((DungeonSegment x) => x.link.MaxCountLocal != -1);
+					if (num2 > num || (num2 == num && list2.Count > list.Count))
 					{
-						List<DungeonSegment> list2 = new List<DungeonSegment>();
-						list2.Add(segmentStart);
-						PlaceSegments(ref seed2, int.MaxValue, 3, 2, attachToFemale: true, attachToMale: false, list2, array2);
-						if (list2.Count > list.Count)
-						{
-							list = list2;
-						}
+						list = list2;
+						num = num2;
 					}
 				}
 				if (list.Count > 5)

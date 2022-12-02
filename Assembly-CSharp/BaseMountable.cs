@@ -331,21 +331,26 @@ public class BaseMountable : BaseCombatEntity
 	[RPC_Server.IsVisible(3f)]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
-		BasePlayer player = msg.player;
-		if (!player || !player.CanInteract())
+		WantsMount(msg.player);
+	}
+
+	public void WantsMount(BasePlayer player)
+	{
+		if (!BaseNetworkableEx.IsValid(player) || !player.CanInteract())
 		{
 			return;
 		}
+		BaseVehicle baseVehicle = default(BaseVehicle);
 		if (!DirectlyMountable())
 		{
-			BaseVehicle baseVehicle = VehicleParent();
+			baseVehicle = VehicleParent();
 			if (baseVehicle != null)
 			{
-				baseVehicle.RPC_WantsMount(msg);
+				baseVehicle.WantsMount(player);
 				return;
 			}
 		}
-		if (Interface.CallHook("OnPlayerWantsMount", player, this) == null)
+		if (Interface.CallHook("OnPlayerWantsMount", baseVehicle, this) == null)
 		{
 			AttemptMount(player);
 		}

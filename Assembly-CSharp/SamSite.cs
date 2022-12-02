@@ -545,7 +545,7 @@ public class SamSite : ContainerIOEntity
 			}
 			return result;
 		default:
-			return 0;
+			return GetCurrentEnergy();
 		}
 	}
 

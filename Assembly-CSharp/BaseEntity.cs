@@ -2200,9 +2200,12 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				BaseEntity baseEntity = GetParentEntity();
 				if (!BaseNetworkableEx.IsValid(baseEntity))
 				{
-					Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + parentEntity.uid);
-					Invoke(UpdateNetworkGroup, 2f);
-					isCallingUpdateNetworkGroup = true;
+					if (!Rust.Application.isLoadingSave)
+					{
+						Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + parentEntity.uid);
+						Invoke(UpdateNetworkGroup, 2f);
+						isCallingUpdateNetworkGroup = true;
+					}
 				}
 				else if (baseEntity != null)
 				{

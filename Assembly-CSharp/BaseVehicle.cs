@@ -208,6 +208,8 @@ public class BaseVehicle : BaseMountable
 
 	public ClippingCheckMode clippingChecks;
 
+	public bool checkVehicleClipping;
+
 	public bool shouldShowHudHealth;
 
 	public bool ignoreDamageFromOutside;
@@ -384,15 +386,9 @@ public class BaseVehicle : BaseMountable
 	public override void VehicleFixedUpdate()
 	{
 		base.VehicleFixedUpdate();
-		if (clippingChecks != 0 && AnyMounted())
+		if (clippingChecks != 0 && AnyMounted() && UnityEngine.Physics.OverlapBox(base.transform.TransformPoint(bounds.center), bounds.extents, base.transform.rotation, GetClipCheckMask()).Length != 0)
 		{
-			Vector3 center = base.transform.TransformPoint(bounds.center);
-			int num = (IsFlipped() ? 1218511105 : 1210122497);
-			if (UnityEngine.Physics.OverlapBox(center, bounds.extents, base.transform.rotation, num).Length != 0)
-			{
-				bool fullBodyCheck = clippingChecks != ClippingCheckMode.AlwaysHeadOnly;
-				CheckSeatsForClipping(fullBodyCheck, num);
-			}
+			CheckSeatsForClipping();
 		}
 		if (rigidBody != null)
 		{
@@ -412,6 +408,16 @@ public class BaseVehicle : BaseMountable
 		{
 			ClearOwnerEntry();
 		}
+	}
+
+	private int GetClipCheckMask()
+	{
+		int num = (IsFlipped() ? 1218511105 : 1210122497);
+		if (checkVehicleClipping)
+		{
+			num |= 0x2000;
+		}
+		return num;
 	}
 
 	protected virtual bool DetermineIfStationary()
@@ -495,7 +501,7 @@ public class BaseVehicle : BaseMountable
 		return GamePhysics.LineOfSight(eyePos, p, mask);
 	}
 
-	public virtual bool IsSeatClipping(BaseMountable mountable, bool fullBodyCheck, int mask = 1218511105)
+	public virtual bool IsSeatClipping(BaseMountable mountable)
 	{
 		if (!doClippingAndVisChecks)
 		{
@@ -505,6 +511,7 @@ public class BaseVehicle : BaseMountable
 		{
 			return false;
 		}
+		int clipCheckMask = GetClipCheckMask();
 		Vector3 position = mountable.eyePositionOverride.transform.position;
 		Vector3 position2 = mountable.transform.position;
 		Vector3 vector = position - position2;
@@ -514,20 +521,20 @@ public class BaseVehicle : BaseMountable
 			num = Mathf.Min(num, mountable.customPlayerCollider.radius);
 		}
 		Vector3 vector2 = position - vector * (num - 0.15f);
-		if (fullBodyCheck)
+		if (clippingChecks == ClippingCheckMode.AlwaysHeadOnly)
 		{
-			Vector3 end = position2 + vector * (num + 0.05f);
-			return GamePhysics.CheckCapsule(vector2, end, num, mask, QueryTriggerInteraction.Ignore);
+			return GamePhysics.CheckSphere(vector2, num, clipCheckMask, QueryTriggerInteraction.Ignore);
 		}
-		return GamePhysics.CheckSphere(vector2, num, mask, QueryTriggerInteraction.Ignore);
+		Vector3 end = position2 + vector * (num + 0.05f);
+		return GamePhysics.CheckCapsule(vector2, end, num, clipCheckMask, QueryTriggerInteraction.Ignore);
 	}
 
-	public virtual void CheckSeatsForClipping(bool fullBodyCheck, int mask)
+	public virtual void CheckSeatsForClipping()
 	{
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
 			BaseMountable mountable = mountPoint.mountable;
-			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable, fullBodyCheck, mask))
+			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable))
 			{
 				SeatClippedWorld(mountable);
 			}
@@ -848,7 +855,7 @@ public class BaseVehicle : BaseMountable
 					num = 0;
 				}
 				MountPointInfo mountPoint = GetMountPoint(num);
-				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable, fullBodyCheck: true) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
+				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
 				{
 					baseMountable = mountPoint.mountable;
 					break;
@@ -963,7 +970,7 @@ public class BaseVehicle : BaseMountable
 			{
 				continue;
 			}
-			if (IsSeatClipping(allMountPoint.mountable, fullBodyCheck: true))
+			if (IsSeatClipping(allMountPoint.mountable))
 			{
 				if (UnityEngine.Application.isEditor)
 				{

@@ -5,6 +5,8 @@ public class FlameExplosive : TimedExplosive
 {
 	public GameObjectRef createOnExplode;
 
+	public bool blockCreateUnderwater;
+
 	public float numToCreate = 10f;
 
 	public float minVelocity = 2f;
@@ -30,6 +32,12 @@ public class FlameExplosive : TimedExplosive
 		{
 			return;
 		}
+		Vector3 position = base.transform.position;
+		if (blockCreateUnderwater && WaterLevel.Test(position))
+		{
+			base.Explode();
+			return;
+		}
 		Collider component = GetComponent<Collider>();
 		if ((bool)component)
 		{
@@ -37,7 +45,6 @@ public class FlameExplosive : TimedExplosive
 		}
 		for (int i = 0; (float)i < numToCreate; i++)
 		{
-			Vector3 position = base.transform.position;
 			BaseEntity baseEntity = GameManager.server.CreateEntity(createOnExplode.resourcePath, position);
 			if ((bool)baseEntity)
 			{
@@ -46,7 +53,7 @@ public class FlameExplosive : TimedExplosive
 				baseEntity.transform.SetPositionAndRotation(position, Quaternion.LookRotation(modifiedAimConeDirection));
 				baseEntity.creatorEntity = ((creatorEntity == null) ? baseEntity : creatorEntity);
 				baseEntity.Spawn();
-				Interface.CallHook("OnFlameExplosion", this, i);
+				Interface.CallHook("OnFlameExplosion", this, component);
 				Vector3 vector = modifiedAimConeDirection.normalized * UnityEngine.Random.Range(minVelocity, maxVelocity) * velocityCurve.Evaluate(num * UnityEngine.Random.Range(1f, 1.1f));
 				FireBall component2 = baseEntity.GetComponent<FireBall>();
 				if (component2 != null)

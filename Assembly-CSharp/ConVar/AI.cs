@@ -118,7 +118,7 @@ public class AI : ConsoleSystem
 	public static float npc_alertness_zero_detection_mod = 0.5f;
 
 	[ServerVar(Help = "defines the chance for scientists to spawn at NPC junkpiles. (Default: 0.1)")]
-	public static float npc_junkpilespawn_chance = 0.1f;
+	public static float npc_junkpilespawn_chance = 0.07f;
 
 	[ServerVar(Help = "npc_junkpile_a_spawn_chance define the chance for scientists to spawn at junkpile a. (Default: 0.1)")]
 	public static float npc_junkpile_a_spawn_chance = 0.1f;

@@ -47,6 +47,8 @@ public class ExcavatorArm : BaseEntity
 
 	public ItemAmount[] pendingResources;
 
+	public Translate.Phrase excavatorPhrase;
+
 	public float movedAmount;
 
 	public float currentTurnThrottle;
@@ -54,6 +56,8 @@ public class ExcavatorArm : BaseEntity
 	public float lastMoveYaw;
 
 	private float excavatorStartTime;
+
+	private float nextNotificationTime;
 
 	public int resourceMiningIndex;
 
@@ -185,15 +189,27 @@ public class ExcavatorArm : BaseEntity
 
 	public void BeginMining()
 	{
-		if (IsPowered())
+		if (!IsPowered())
 		{
-			SetFlag(Flags.On, b: true);
-			InvokeRepeating(ProduceResources, resourceProductionTickRate, resourceProductionTickRate);
-			ExcavatorServerEffects.SetMining(isMining: true);
-			Facepunch.Rust.Analytics.Server.ExcavatorStarted();
-			excavatorStartTime = GetNetworkTime();
-			Interface.CallHook("OnExcavatorMiningToggled", this);
+			return;
 		}
+		SetFlag(Flags.On, b: true);
+		InvokeRepeating(ProduceResources, resourceProductionTickRate, resourceProductionTickRate);
+		if (UnityEngine.Time.time > nextNotificationTime)
+		{
+			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+			{
+				if (!activePlayer.IsNpc && activePlayer.IsConnected)
+				{
+					activePlayer.ShowToast(GameTip.Styles.Server_Event, excavatorPhrase);
+				}
+			}
+			nextNotificationTime = UnityEngine.Time.time + 60f;
+		}
+		ExcavatorServerEffects.SetMining(isMining: true);
+		Facepunch.Rust.Analytics.Server.ExcavatorStarted();
+		excavatorStartTime = GetNetworkTime();
+		Interface.CallHook("OnExcavatorMiningToggled", this);
 	}
 
 	public void StopMining()

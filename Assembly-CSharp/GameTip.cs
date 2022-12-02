@@ -9,7 +9,9 @@ public class GameTip : SingletonComponent<GameTip>
 	{
 		Blue_Normal = 0,
 		Red_Normal = 1,
-		Blue_Long = 2
+		Blue_Long = 2,
+		Blue_Short = 3,
+		Server_Event = 4
 	}
 
 	[Serializable]

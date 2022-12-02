@@ -26,8 +26,8 @@ public class ItemModProjectileSpawn : ItemModProjectile
 			if ((bool)baseEntity)
 			{
 				Vector3 hitPositionWorld = info.HitPositionWorld;
-				Vector3 pointStart = info.PointStart;
-				Vector3 normalized = (hitPositionWorld - pointStart).normalized;
+				_ = info.PointStart;
+				Vector3 normalized = info.ProjectileVelocity.normalized;
 				Vector3 normalized2 = info.HitNormalWorld.normalized;
 				baseEntity.transform.position = hitPositionWorld - normalized * 0.1f;
 				baseEntity.transform.rotation = Quaternion.LookRotation(-normalized);

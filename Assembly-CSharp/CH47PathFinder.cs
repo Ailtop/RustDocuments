@@ -21,7 +21,7 @@ public class CH47PathFinder : BasePathFinder
 					num2 -= count;
 				}
 				MonumentInfo monumentInfo2 = TerrainMeta.Path.Monuments[num2];
-				if (monumentInfo2.Type == MonumentType.Cave || monumentInfo2.Type == MonumentType.WaterWell || monumentInfo2.Tier == MonumentTier.Tier0 || (monumentInfo2.Tier & MonumentTier.Tier0) > (MonumentTier)0)
+				if (monumentInfo2.Type == MonumentType.Cave || monumentInfo2.Type == MonumentType.WaterWell || monumentInfo2.Tier == MonumentTier.Tier0 || monumentInfo2.IsSafeZone || (monumentInfo2.Tier & MonumentTier.Tier0) > (MonumentTier)0)
 				{
 					continue;
 				}
@@ -83,7 +83,7 @@ public class CH47PathFinder : BasePathFinder
 				num2 -= count;
 			}
 			MonumentInfo monumentInfo = TerrainMeta.Path.Monuments[num2];
-			if (monumentInfo.Type != 0 && monumentInfo.Type != MonumentType.WaterWell && monumentInfo.Tier != MonumentTier.Tier0)
+			if (monumentInfo.Type != 0 && monumentInfo.Type != MonumentType.WaterWell && monumentInfo.Tier != MonumentTier.Tier0 && !monumentInfo.IsSafeZone)
 			{
 				return monumentInfo;
 			}

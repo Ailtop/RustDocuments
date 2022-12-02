@@ -50,4 +50,23 @@ public class BigWheelBettingTerminal : StorageContainer
 		}
 		return base.PlayerOpenLoot(player, panelToOpen);
 	}
+
+	public bool TrySetBigWheel(BigWheelGame newWheel)
+	{
+		if (base.isClient)
+		{
+			return false;
+		}
+		if (bigWheel != null && bigWheel != newWheel)
+		{
+			float num = Vector3.SqrMagnitude(bigWheel.transform.position - base.transform.position);
+			if (Vector3.SqrMagnitude(newWheel.transform.position - base.transform.position) >= num)
+			{
+				return false;
+			}
+			bigWheel.RemoveTerminal(this);
+		}
+		bigWheel = newWheel;
+		return true;
+	}
 }

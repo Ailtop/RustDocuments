@@ -93,6 +93,8 @@ public class ItemDefinition : MonoBehaviour
 	[Tooltip("How rare this item is and how much it costs to research")]
 	public Rarity rarity;
 
+	public Rarity despawnRarity;
+
 	public bool spawnAsBlueprint;
 
 	[Header("Sounds")]

@@ -140,7 +140,7 @@ public class Admin : ConsoleSystem
 		if (!flag && @string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2362 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2365 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -1013,11 +1013,15 @@ public class Admin : ConsoleSystem
 			{
 				if (!(ent is AutoTurret autoTurret))
 				{
-					if (ent is CodeLock codeLock)
+					if (!(ent is CodeLock codeLock))
 					{
-						return CodeLockAuthList(codeLock);
+						if (ent is BaseVehicleModule vehicleModule)
+						{
+							return CodeLockAuthList(vehicleModule);
+						}
+						goto IL_0055;
 					}
-					goto IL_0042;
+					return CodeLockAuthList(codeLock);
 				}
 				authorizedPlayers = autoTurret.authorizedPlayers;
 			}
@@ -1038,8 +1042,8 @@ public class Admin : ConsoleSystem
 			}
 			return textTable.ToString();
 		}
-		goto IL_0042;
-		IL_0042:
+		goto IL_0055;
+		IL_0055:
 		return "Entity has no auth list";
 	}
 
@@ -1060,6 +1064,27 @@ public class Admin : ConsoleSystem
 		foreach (ulong guestPlayer in codeLock.guestPlayers)
 		{
 			textTable.AddRow(guestPlayer.ToString(), GetPlayerName(guestPlayer), "x");
+		}
+		return textTable.ToString();
+	}
+
+	private static string CodeLockAuthList(BaseVehicleModule vehicleModule)
+	{
+		if (!vehicleModule.IsOnAVehicle)
+		{
+			return "Nobody is authed to this entity";
+		}
+		ModularCar modularCar = vehicleModule.Vehicle as ModularCar;
+		if (modularCar == null || !modularCar.IsLockable || modularCar.CarLock.WhitelistPlayers.Count == 0)
+		{
+			return "Nobody is authed to this entity";
+		}
+		TextTable textTable = new TextTable();
+		textTable.AddColumn("steamID");
+		textTable.AddColumn("username");
+		foreach (ulong whitelistPlayer in modularCar.CarLock.WhitelistPlayers)
+		{
+			textTable.AddRow(whitelistPlayer.ToString(), GetPlayerName(whitelistPlayer));
 		}
 		return textTable.ToString();
 	}
@@ -1181,7 +1206,7 @@ public class Admin : ConsoleSystem
 		result.NetworkOut = (int)((Network.Net.sv != null) ? Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond) : 0);
 		result.Restarting = SingletonComponent<ServerMgr>.Instance.Restarting;
 		result.SaveCreatedTime = SaveRestore.SaveCreatedTime.ToString();
-		result.Version = 2362;
+		result.Version = 2365;
 		result.Protocol = Protocol.printable;
 		return result;
 	}
@@ -1500,6 +1525,10 @@ public class Admin : ConsoleSystem
 					flag = true;
 				}
 				else if (baseEntity is CodeLock codeLock && codeLock.whitelistPlayers.Contains(ply.userID))
+				{
+					flag = true;
+				}
+				if (!flag && baseEntity is ModularCar modularCar && modularCar.IsLockable && modularCar.CarLock.HasLockPermission(ply))
 				{
 					flag = true;
 				}

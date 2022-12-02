@@ -334,6 +334,8 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		BaseGameMode.CreateGameMode();
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
+		MissionManifest.Get();
+		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		serverMgr.OpenConnection();
 		CompanionServer.Server.Initialize();
 		using (BenchmarkTimer.New("Boombox.LoadStations"))

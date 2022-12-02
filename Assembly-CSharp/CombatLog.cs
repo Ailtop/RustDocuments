@@ -42,6 +42,8 @@ public class CombatLog
 		public float proj_mismatch;
 
 		public int desync;
+
+		public bool attacker_dead;
 	}
 
 	private const string selfname = "you";
@@ -93,6 +95,10 @@ public class CombatLog
 		if (hitInfo != null)
 		{
 			distance = (hitInfo.IsProjectile() ? hitInfo.ProjectileDistance : Vector3.Distance(hitInfo.PointStart, hitInfo.HitPositionWorld));
+			if (hitInfo.Initiator is BasePlayer basePlayer && hitInfo.HitEntity != hitInfo.Initiator)
+			{
+				val.attacker_dead = basePlayer.IsDead();
+			}
 		}
 		float health_new = ((hitEntity != null) ? hitEntity.Health() : 0f);
 		val.time = UnityEngine.Time.realtimeSinceStartup;
@@ -112,8 +118,8 @@ public class CombatLog
 		val.proj_integrity = hitInfo?.ProjectileIntegrity ?? 0f;
 		val.proj_travel = hitInfo?.ProjectileTravelTime ?? 0f;
 		val.proj_mismatch = hitInfo?.ProjectileTrajectoryMismatch ?? 0f;
-		BasePlayer basePlayer = attacker as BasePlayer;
-		if (basePlayer != null && projectilePrefab != null && basePlayer.firedProjectiles.TryGetValue(projectileId, out var value))
+		BasePlayer basePlayer2 = attacker as BasePlayer;
+		if (basePlayer2 != null && projectilePrefab != null && basePlayer2.firedProjectiles.TryGetValue(projectileId, out var value))
 		{
 			val.desync = (int)(value.desyncLifeTime * 1000f);
 		}
@@ -134,7 +140,7 @@ public class CombatLog
 		}
 	}
 
-	public string Get(int count, uint filterByAttacker = 0u, bool json = false, bool isAdmin = false)
+	public string Get(int count, uint filterByAttacker = 0u, bool json = false, bool isAdmin = false, ulong requestingUser = 0uL)
 	{
 		if (storage == null)
 		{
@@ -172,8 +178,12 @@ public class CombatLog
 			{
 				num--;
 			}
-			else if ((filterByAttacker == 0 || item.attacker_id == filterByAttacker) && (!(activeGameMode != null) || activeGameMode.returnValidCombatlog || isAdmin || item.proj_hits <= 0))
+			else
 			{
+				if ((filterByAttacker != 0 && item.attacker_id != filterByAttacker) || (activeGameMode != null && !activeGameMode.returnValidCombatlog && !isAdmin && item.proj_hits > 0))
+				{
+					continue;
+				}
 				float num3 = UnityEngine.Time.realtimeSinceStartup - item.time;
 				if (num3 >= (float)combatlogdelay)
 				{
@@ -193,18 +203,22 @@ public class CombatLog
 					string text6 = distance.ToString("0.0");
 					distance = item.health_new;
 					string text7 = distance.ToString("0.0");
-					string info = item.info;
+					string text8 = item.info;
+					if (!player.IsDestroyed && player.userID == requestingUser && item.attacker_dead)
+					{
+						text8 = "you died first (" + text8 + ")";
+					}
 					int proj_hits = item.proj_hits;
-					string text8 = proj_hits.ToString();
+					string text9 = proj_hits.ToString();
 					distance = item.proj_integrity;
-					string text9 = distance.ToString("0.00");
+					string text10 = distance.ToString("0.00");
 					distance = item.proj_travel;
-					string text10 = distance.ToString("0.00s");
+					string text11 = distance.ToString("0.00s");
 					distance = item.proj_mismatch;
-					string text11 = distance.ToString("0.00m");
+					string text12 = distance.ToString("0.00m");
 					proj_hits = item.desync;
-					string text12 = proj_hits.ToString();
-					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, info, text8, text9, text10, text11, text12);
+					string text13 = proj_hits.ToString();
+					textTable.AddRow(text, attacker, text2, target, text3, weapon, ammo, text4, text5, text6, text7, text8, text9, text10, text11, text12, text13);
 				}
 				else
 				{
@@ -212,21 +226,21 @@ public class CombatLog
 				}
 			}
 		}
-		string text13;
+		string text14;
 		if (json)
 		{
-			text13 = textTable.ToJson();
+			text14 = textTable.ToJson();
 		}
 		else
 		{
-			text13 = textTable.ToString();
+			text14 = textTable.ToString();
 			if (num2 > 0)
 			{
-				text13 = text13 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
-				text13 = text13 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
+				text14 = text14 + "+ " + num2 + " " + ((num2 > 1) ? "events" : "event");
+				text14 = text14 + " in the last " + combatlogdelay + " " + ((combatlogdelay > 1) ? "seconds" : "second");
 			}
 		}
-		return text13;
+		return text14;
 	}
 
 	public static Queue<Event> Get(ulong id)

@@ -50,6 +50,8 @@ public class BlackjackController : CardGameController
 
 	public const float INSURANCE_PAYOUT_RATIO = 2f;
 
+	private const float DEALER_MOVE_TIME = 1f;
+
 	private const int NUM_DECKS = 6;
 
 	private StackOfCards cardStack = new StackOfCards(6);
@@ -61,6 +63,8 @@ public class BlackjackController : CardGameController
 	public override int MaxBuyIn => int.MaxValue;
 
 	public override int MinToPlay => MinBuyIn;
+
+	public override int EndRoundDelay => 1;
 
 	public override int TimeBetweenRounds => 4;
 
@@ -74,7 +78,7 @@ public class BlackjackController : CardGameController
 	{
 		get
 		{
-			if (!base.HasRoundInProgress)
+			if (!base.HasRoundInProgressOrEnding)
 			{
 				return false;
 			}
@@ -306,7 +310,7 @@ public class BlackjackController : CardGameController
 		for (int i = 0; i < dealerCards.Count; i++)
 		{
 			PlayingCard playingCard = dealerCards[i];
-			if (base.HasRoundInProgress && i == 0)
+			if (base.HasActiveRound && i == 0)
 			{
 				syncData.blackjack.dealerCards.Add(-1);
 			}
@@ -370,14 +374,17 @@ public class BlackjackController : CardGameController
 		{
 			return (int)blackjackInputOption;
 		}
-		if (!base.HasRoundInProgress)
+		if (!base.HasActiveRound)
 		{
 			return (int)blackjackInputOption;
 		}
 		if (AllBetsPlaced)
 		{
 			blackjackInputOption |= BlackjackInputOption.Stand;
-			blackjackInputOption |= BlackjackInputOption.Hit;
+			if (!Has21(cardPlayerDataBlackjack.Cards))
+			{
+				blackjackInputOption |= BlackjackInputOption.Hit;
+			}
 			if (CanSplit(cardPlayerDataBlackjack))
 			{
 				blackjackInputOption |= BlackjackInputOption.Split;
@@ -430,7 +437,7 @@ public class BlackjackController : CardGameController
 			int insurancePayout = 0;
 			if (dealerHasBlackjack && item.insuranceBetThisRound > 0)
 			{
-				int num3 = Mathf.FloorToInt((float)item.insuranceBetThisRound * 2f);
+				int num3 = Mathf.FloorToInt((float)item.insuranceBetThisRound * 3f);
 				num += num3;
 				insurancePayout = num3;
 			}
@@ -521,7 +528,7 @@ public class BlackjackController : CardGameController
 		}
 		BlackjackInputOption selectedMove = (BlackjackInputOption)input;
 		CardPlayerDataBlackjack pdBlackjack = (CardPlayerDataBlackjack)pData;
-		if (!base.HasRoundInProgress)
+		if (!base.HasActiveRound)
 		{
 			LastActionTarget = pData.UserID;
 			LastAction = selectedMove;
@@ -692,14 +699,36 @@ public class BlackjackController : CardGameController
 
 	protected override void OnTurnTimeout(CardPlayerData pData)
 	{
-		if (pData.HasUserInCurrentRound && !pData.hasCompletedTurn)
+		if (!pData.HasUserInCurrentRound || pData.hasCompletedTurn)
 		{
-			HandlePlayerLeavingDuringTheirTurn(pData);
+			return;
 		}
-		pData.ClearAllData();
-		if (base.HasRoundInProgress && NumPlayersInCurrentRound() < MinPlayers)
+		BlackjackInputOption blackjackInputOption = BlackjackInputOption.Abandon;
+		int value = 0;
+		if (AllBetsPlaced)
 		{
-			EndRound();
+			if ((pData.availableInputs & 4) == 4)
+			{
+				blackjackInputOption = BlackjackInputOption.Stand;
+				ReceivedInputFromPlayer(pData, 4, countAsAction: true, 0, playerInitiated: false);
+			}
+		}
+		else if ((pData.availableInputs & 1) == 1 && pData.GetScrapAmount() >= MinBuyIn)
+		{
+			blackjackInputOption = BlackjackInputOption.SubmitBet;
+			value = MinBuyIn;
+		}
+		if (blackjackInputOption != BlackjackInputOption.Abandon)
+		{
+			ReceivedInputFromPlayer(pData, (int)blackjackInputOption, countAsAction: true, value, playerInitiated: false);
+			return;
+		}
+		blackjackInputOption = BlackjackInputOption.Abandon;
+		ReceivedInputFromPlayer(pData, (int)blackjackInputOption, countAsAction: true, 0, playerInitiated: false);
+		pData.ClearAllData();
+		if (base.HasActiveRound && NumPlayersInCurrentRound() < MinPlayers)
+		{
+			BeginRoundEnd();
 		}
 		if (pData.HasUserInGame)
 		{
@@ -778,21 +807,38 @@ public class BlackjackController : CardGameController
 				break;
 			}
 		}
-		if (NumPlayersInCurrentRound() > 0 && (!flag || !flag2))
-		{
-			for (int cardsValue = GetCardsValue(dealerCards, CardsValueMode.High); cardsValue < 17; cardsValue = GetCardsValue(dealerCards, CardsValueMode.High))
-			{
-				cardStack.TryTakeCard(out var card);
-				dealerCards.Add(card);
-			}
-		}
 		ServerPlaySound(CardGameSounds.SoundType.Draw);
-		EndRound();
+		if (NumPlayersInCurrentRound() > 0 && !flag && !flag2)
+		{
+			base.Owner.Invoke(DealerPlayInvoke, 1f);
+			BeginRoundEnd();
+		}
+		else
+		{
+			EndRoundWithDelay();
+		}
+	}
+
+	private void DealerPlayInvoke()
+	{
+		int cardsValue = GetCardsValue(dealerCards, CardsValueMode.High);
+		if (GetCardsValue(dealerCards, CardsValueMode.Low) < 17 && (cardsValue < 17 || cardsValue > 21))
+		{
+			cardStack.TryTakeCard(out var card);
+			dealerCards.Add(card);
+			ServerPlaySound(CardGameSounds.SoundType.Draw);
+			base.Owner.Invoke(DealerPlayInvoke, 1f);
+			base.Owner.SendNetworkUpdate();
+		}
+		else
+		{
+			EndRoundWithDelay();
+		}
 	}
 
 	private void DealInitialCards()
 	{
-		if (!base.HasRoundInProgress)
+		if (!base.HasActiveRound)
 		{
 			return;
 		}

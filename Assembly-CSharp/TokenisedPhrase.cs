@@ -24,7 +24,7 @@ public class TokenisedPhrase : Translate.Phrase
 		str = str.Replace("[+altlook]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+altlook")).ToUpper()));
 		str = str.Replace("[+reload]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+reload")).ToUpper()));
 		str = str.Replace("[+voice]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+voice")).ToUpper()));
-		str = str.Replace("[+lockBreakHealthPercent]", $"{0.15f:0%}");
+		str = str.Replace("[+lockBreakHealthPercent]", $"{0.2f:0%}");
 		str = str.Replace("[+gestures]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+gestures")).ToUpper()));
 		str = str.Replace("[+left]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+left")).ToUpper()));
 		str = str.Replace("[+right]", string.Format("[{0}]", TranslateMouseButton(Facepunch.Input.GetButtonWithBind("+right")).ToUpper()));
@@ -33,6 +33,7 @@ public class TokenisedPhrase : Translate.Phrase
 		str = str.Replace("[+sprint]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+sprint")).ToUpper());
 		str = str.Replace("[+duck]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+duck")).ToUpper());
 		str = str.Replace("[+pets]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+pets")).ToUpper());
+		str = str.Replace("[lighttoggle]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("lighttoggle")).ToUpper());
 		return str;
 	}
 

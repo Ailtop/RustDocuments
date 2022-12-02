@@ -197,17 +197,48 @@ public class Locker : StorageContainer
 
 	public override int GetIdealSlot(BasePlayer player, Item item)
 	{
-		if (item.info.category == ItemCategory.Attire)
-		{
-			return -1;
-		}
 		for (int i = 0; i < inventorySlots; i++)
 		{
-			if (GetRowType(i) == RowType.Belt && !base.inventory.SlotTaken(item, i))
+			RowType rowType = GetRowType(i);
+			if (item.info.category == ItemCategory.Attire)
+			{
+				if (rowType != 0)
+				{
+					continue;
+				}
+			}
+			else if (rowType != RowType.Belt)
+			{
+				continue;
+			}
+			if (!base.inventory.SlotTaken(item, i) && (rowType != 0 || !DoesWearableConflictWithRow(item, i)))
 			{
 				return i;
 			}
 		}
-		return -1;
+		return int.MinValue;
+	}
+
+	private bool DoesWearableConflictWithRow(Item item, int pos)
+	{
+		int num = pos / 13 * 13;
+		ItemModWearable itemModWearable = item.info.ItemModWearable;
+		if (itemModWearable == null)
+		{
+			return false;
+		}
+		for (int i = num; i < num + 7; i++)
+		{
+			Item slot = base.inventory.GetSlot(i);
+			if (slot != null)
+			{
+				ItemModWearable itemModWearable2 = slot.info.ItemModWearable;
+				if (!(itemModWearable2 == null) && !itemModWearable2.CanExistWith(itemModWearable))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

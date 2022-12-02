@@ -234,13 +234,13 @@ public class Chat : ConsoleSystem
 			{
 				return false;
 			}
-			CardTable cardTable = player.GetMountedVehicle() as CardTable;
-			if (cardTable == null || !cardTable.GameController.PlayerIsInGame(player))
+			BaseCardGameEntity baseCardGameEntity = player.GetMountedVehicle() as BaseCardGameEntity;
+			if (baseCardGameEntity == null || !baseCardGameEntity.GameController.IsAtTable(player))
 			{
 				return false;
 			}
 			List<Network.Connection> obj2 = Facepunch.Pool.GetList<Network.Connection>();
-			cardTable.GameController.GetConnectionsInGame(obj2);
+			baseCardGameEntity.GameController.GetConnectionsInGame(obj2);
 			if (obj2.Count > 0)
 			{
 				ConsoleNetwork.SendClientCommand(obj2, "chat.add2", 3, userId, text, text4, text3, 1f);

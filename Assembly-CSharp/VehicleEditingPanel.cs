@@ -1,4 +1,5 @@
 using System;
+using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -111,25 +112,25 @@ public class VehicleEditingPanel : LootPanel
 	private Translate.Phrase phraseAddLock;
 
 	[SerializeField]
-	private Translate.Phrase phraseAddKey;
-
-	[SerializeField]
 	private Translate.Phrase phraseAddLockButton;
 
 	[SerializeField]
-	private Translate.Phrase phraseCraftKeyButton;
+	private Translate.Phrase phraseChangeLockCodeButton;
 
 	[SerializeField]
 	private Text carLockInfoText;
 
 	[SerializeField]
-	private Text carLockButtonText;
+	private RustText carLockButtonText;
 
 	[SerializeField]
 	private Button actionLockButton;
 
 	[SerializeField]
 	private Button removeLockButton;
+
+	[SerializeField]
+	private GameObjectRef keyEnterDialog;
 
 	[SerializeField]
 	private Translate.Phrase phraseEmptyStorage;

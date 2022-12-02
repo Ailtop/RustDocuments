@@ -8,6 +8,8 @@ public class KeyCodeEntry : UIDialog
 
 	public Action<string> onCodeEntered;
 
+	public Action onClosed;
+
 	public Text typeDisplay;
 
 	public Translate.Phrase masterCodePhrase;

@@ -50,6 +50,23 @@ public class Debugging : ConsoleSystem
 		RenderInfo.GenerateReport();
 	}
 
+	[ServerVar]
+	public static void enable_player_movement(Arg arg)
+	{
+		if (arg.IsAdmin)
+		{
+			bool @bool = arg.GetBool(0, def: true);
+			BasePlayer basePlayer = ArgEx.Player(arg);
+			if (basePlayer == null)
+			{
+				arg.ReplyWith("Must be called from client with player model");
+				return;
+			}
+			basePlayer.ClientRPCPlayer(null, basePlayer, "TogglePlayerMovement", @bool);
+			arg.ReplyWith((@bool ? "enabled" : "disabled") + " player movement");
+		}
+	}
+
 	[ClientVar]
 	[ServerVar]
 	public static void stall(Arg arg)

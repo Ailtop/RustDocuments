@@ -50,6 +50,15 @@ public class Entity : ConsoleSystem
 		}
 	}
 
+	private struct EntitySpawnRequest
+	{
+		public string PrefabName;
+
+		public string Error;
+
+		public bool Valid => string.IsNullOrEmpty(Error);
+	}
+
 	private static TextTable GetEntityTable(Func<EntityInfo, bool> filter)
 	{
 		TextTable textTable = new TextTable();
@@ -182,35 +191,53 @@ public class Entity : ConsoleSystem
 		}
 	}
 
-	[ServerVar(Name = "spawn")]
-	public static string svspawn(string name, Vector3 pos, Vector3 dir)
+	private static EntitySpawnRequest GetSpawnEntityFromName(string name)
 	{
-		BasePlayer arg = ArgEx.Player(ConsoleSystem.CurrentArgs);
+		EntitySpawnRequest result;
 		if (string.IsNullOrEmpty(name))
 		{
-			return "No entity name provided";
+			result = default(EntitySpawnRequest);
+			result.Error = "No entity name provided";
+			return result;
 		}
 		string[] array = (from x in GameManifest.Current.entities
 			where Path.GetFileNameWithoutExtension(x).Contains(name, CompareOptions.IgnoreCase)
 			select x.ToLower()).ToArray();
 		if (array.Length == 0)
 		{
-			return "Entity type not found";
+			result = default(EntitySpawnRequest);
+			result.Error = "Entity type not found";
+			return result;
 		}
 		if (array.Length > 1)
 		{
 			string text = array.FirstOrDefault((string x) => string.Compare(Path.GetFileNameWithoutExtension(x), name, StringComparison.OrdinalIgnoreCase) == 0);
 			if (text == null)
 			{
-				Debug.Log($"{arg} failed to spawn \"{name}\"");
-				return "Unknown entity - could be:\n\n" + string.Join("\n", array.Select(Path.GetFileNameWithoutExtension).ToArray());
+				result = default(EntitySpawnRequest);
+				result.Error = "Unknown entity - could be:\n\n" + string.Join("\n", array.Select(Path.GetFileNameWithoutExtension).ToArray());
+				return result;
 			}
 			array[0] = text;
 		}
-		BaseEntity baseEntity = GameManager.server.CreateEntity(array[0], pos, Quaternion.LookRotation(dir, Vector3.up));
+		result = default(EntitySpawnRequest);
+		result.PrefabName = array[0];
+		return result;
+	}
+
+	[ServerVar(Name = "spawn")]
+	public static string svspawn(string name, Vector3 pos, Vector3 dir)
+	{
+		BasePlayer arg = ArgEx.Player(ConsoleSystem.CurrentArgs);
+		EntitySpawnRequest spawnEntityFromName = GetSpawnEntityFromName(name);
+		if (!spawnEntityFromName.Valid)
+		{
+			return spawnEntityFromName.Error;
+		}
+		BaseEntity baseEntity = GameManager.server.CreateEntity(spawnEntityFromName.PrefabName, pos, Quaternion.LookRotation(dir, Vector3.up));
 		if (baseEntity == null)
 		{
-			Debug.Log($"{arg} failed to spawn \"{array[0]}\" (tried to spawn \"{name}\")");
+			Debug.Log($"{arg} failed to spawn \"{spawnEntityFromName.PrefabName}\" (tried to spawn \"{name}\")");
 			return "Couldn't spawn " + name;
 		}
 		BasePlayer basePlayer = baseEntity as BasePlayer;
@@ -258,6 +285,36 @@ public class Entity : ConsoleSystem
 		BaseEntity arg2 = item.CreateWorldObject(pos);
 		Debug.Log($"{arg} spawned \"{arg2}\" at {pos} (via spawnitem)");
 		return string.Concat("spawned ", item, " at ", pos);
+	}
+
+	[ServerVar(Name = "spawngrid")]
+	public static string svspawngrid(string name, int width = 5, int height = 5, int spacing = 5)
+	{
+		BasePlayer basePlayer = ArgEx.Player(ConsoleSystem.CurrentArgs);
+		EntitySpawnRequest spawnEntityFromName = GetSpawnEntityFromName(name);
+		if (!spawnEntityFromName.Valid)
+		{
+			return spawnEntityFromName.Error;
+		}
+		Quaternion rotation = basePlayer.transform.rotation;
+		rotation.eulerAngles = new Vector3(0f, rotation.eulerAngles.y, 0f);
+		Matrix4x4 matrix4x = Matrix4x4.TRS(basePlayer.transform.position, basePlayer.transform.rotation, Vector3.one);
+		for (int i = 0; i < width; i++)
+		{
+			for (int j = 0; j < height; j++)
+			{
+				Vector3 pos = matrix4x.MultiplyPoint(new Vector3(i * spacing, 0f, j * spacing));
+				BaseEntity baseEntity = GameManager.server.CreateEntity(spawnEntityFromName.PrefabName, pos, rotation);
+				if (baseEntity == null)
+				{
+					Debug.Log($"{basePlayer} failed to spawn \"{spawnEntityFromName.PrefabName}\" (tried to spawn \"{name}\")");
+					return "Couldn't spawn " + name;
+				}
+				baseEntity.Spawn();
+			}
+		}
+		Debug.Log($"{basePlayer} spawned ({width * height}) " + spawnEntityFromName.PrefabName);
+		return $"spawned ({width * height}) " + spawnEntityFromName.PrefabName;
 	}
 
 	[ServerVar]

@@ -2,7 +2,7 @@ using Rust.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BlackjackScreenCardUI : MonoBehaviour
+public class BlackjackScreenCardUI : FacepunchBehaviour
 {
 	[SerializeField]
 	private Canvas baseCanvas;

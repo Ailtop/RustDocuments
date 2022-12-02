@@ -134,6 +134,10 @@ public class BaseBoat : BaseVehicle
 			Vector3 force = (base.transform.forward + base.transform.right * steering * steeringScale).normalized * gasPedal * engineThrust;
 			rigidBody.AddForceAtPosition(force, thrustPoint.position, ForceMode.Force);
 		}
+		if (AnyMounted() && IsFlipped())
+		{
+			DismountAllPlayers();
+		}
 	}
 
 	public static void WaterVehicleDecay(BaseCombatEntity entity, float decayTickRate, float timeSinceLastUsed, float outsideDecayMinutes, float deepWaterDecayMinutes)

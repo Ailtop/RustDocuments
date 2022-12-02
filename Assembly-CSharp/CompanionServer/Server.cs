@@ -58,6 +58,11 @@ public static class Server
 		{
 			return;
 		}
+		if (IsEnabled)
+		{
+			UnityEngine.Debug.LogWarning("Rust+ is already started up! Skipping second startup");
+			return;
+		}
 		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (!(activeGameMode != null) || activeGameMode.rustPlus)
 		{

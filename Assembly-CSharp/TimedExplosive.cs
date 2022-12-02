@@ -41,6 +41,8 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 
 	private CollisionDetectionMode? initialCollisionDetectionMode;
 
+	protected virtual bool AlwaysRunWaterCheck => false;
+
 	public void SetDamageScale(float scale)
 	{
 		foreach (DamageTypeEntry damageType in damageTypes)
@@ -60,13 +62,13 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		base.ServerInit();
 		SetFuse(GetRandomTimerTime());
 		ReceiveCollisionMessages(b: true);
-		if (waterCausesExplosion)
+		if (waterCausesExplosion || AlwaysRunWaterCheck)
 		{
 			InvokeRepeating(WaterCheck, 0f, 0.5f);
 		}
 	}
 
-	public void WaterCheck()
+	public virtual void WaterCheck()
 	{
 		if (waterCausesExplosion && WaterFactor() >= 0.5f)
 		{

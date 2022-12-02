@@ -210,23 +210,16 @@ public class CodeLock : BaseLock
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.codeLock == null)
+		if (info.msg.codeLock != null)
 		{
-			return;
-		}
-		hasCode = info.msg.codeLock.hasCode;
-		hasGuestCode = info.msg.codeLock.hasGuestCode;
-		if (info.msg.codeLock.pv != null)
-		{
-			code = info.msg.codeLock.pv.code;
-			whitelistPlayers = info.msg.codeLock.pv.users;
-			guestCode = info.msg.codeLock.pv.guestCode;
-			guestPlayers = info.msg.codeLock.pv.guestUsers;
-			if (guestCode == null || guestCode.Length != 4)
+			hasCode = info.msg.codeLock.hasCode;
+			hasGuestCode = info.msg.codeLock.hasGuestCode;
+			if (info.msg.codeLock.pv != null)
 			{
-				hasGuestCode = false;
-				guestCode = string.Empty;
-				guestPlayers.Clear();
+				code = info.msg.codeLock.pv.code;
+				whitelistPlayers = info.msg.codeLock.pv.users;
+				guestCode = info.msg.codeLock.pv.guestCode;
+				guestPlayers = info.msg.codeLock.pv.guestUsers;
 			}
 		}
 	}

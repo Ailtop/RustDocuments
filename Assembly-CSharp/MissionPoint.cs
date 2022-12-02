@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Facepunch;
+using Rust;
 using UnityEngine;
 
 public class MissionPoint : MonoBehaviour
@@ -73,11 +74,26 @@ public class MissionPoint : MonoBehaviour
 
 	public void Awake()
 	{
+		all.Add(this);
+	}
+
+	private void Start()
+	{
 		if (dropToGround)
 		{
-			TransformEx.DropToGround(base.transform);
+			SingletonComponent<InvokeHandler>.Instance.Invoke(DropToGround, 0.5f);
 		}
-		all.Add(this);
+	}
+
+	private void DropToGround()
+	{
+		if (Rust.Application.isLoading)
+		{
+			SingletonComponent<InvokeHandler>.Instance.Invoke(DropToGround, 0.5f);
+			return;
+		}
+		_ = base.transform.position;
+		TransformEx.DropToGround(base.transform);
 	}
 
 	public void OnDisable()

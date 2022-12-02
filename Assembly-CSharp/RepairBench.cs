@@ -116,27 +116,42 @@ public class RepairBench : StorageContainer
 		{
 			allIngredients.Add(new ItemAmount(ingredient.itemDef, ingredient.amount));
 		}
-		foreach (ItemAmount ingredient2 in bp.ingredients)
+		StripComponentRepairCost(allIngredients);
+	}
+
+	public static void StripComponentRepairCost(List<ItemAmount> allIngredients)
+	{
+		if (allIngredients == null)
 		{
-			if (ingredient2.itemDef.category != ItemCategory.Component || !(ingredient2.itemDef.Blueprint != null))
+			return;
+		}
+		for (int i = 0; i < allIngredients.Count; i++)
+		{
+			ItemAmount itemAmount = allIngredients[i];
+			if (itemAmount.itemDef.category != ItemCategory.Component)
 			{
 				continue;
 			}
-			bool flag = false;
-			ItemAmount itemAmount = ingredient2.itemDef.Blueprint.ingredients[0];
-			foreach (ItemAmount allIngredient in allIngredients)
+			if (itemAmount.itemDef.Blueprint != null)
 			{
-				if (allIngredient.itemDef == itemAmount.itemDef)
+				bool flag = false;
+				ItemAmount itemAmount2 = itemAmount.itemDef.Blueprint.ingredients[0];
+				foreach (ItemAmount allIngredient in allIngredients)
 				{
-					allIngredient.amount += itemAmount.amount * ingredient2.amount;
-					flag = true;
-					break;
+					if (allIngredient.itemDef == itemAmount2.itemDef)
+					{
+						allIngredient.amount += itemAmount2.amount * itemAmount.amount;
+						flag = true;
+						break;
+					}
+				}
+				if (!flag)
+				{
+					allIngredients.Add(new ItemAmount(itemAmount2.itemDef, itemAmount2.amount * itemAmount.amount));
 				}
 			}
-			if (!flag)
-			{
-				allIngredients.Add(new ItemAmount(itemAmount.itemDef, itemAmount.amount * ingredient2.amount));
-			}
+			allIngredients.RemoveAt(i);
+			i--;
 		}
 	}
 
@@ -274,6 +289,11 @@ public class RepairBench : StorageContainer
 		Item slot = base.inventory.GetSlot(0);
 		BasePlayer player = msg.player;
 		RepairAnItem(slot, player, this, maxConditionLostOnRepair, mustKnowBlueprint: true);
+	}
+
+	public override int GetIdealSlot(BasePlayer player, Item item)
+	{
+		return 0;
 	}
 
 	public static void RepairAnItem(Item itemToRepair, BasePlayer player, BaseEntity repairBenchEntity, float maxConditionLostOnRepair, bool mustKnowBlueprint)

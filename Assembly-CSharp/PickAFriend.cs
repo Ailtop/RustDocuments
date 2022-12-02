@@ -10,6 +10,8 @@ public class PickAFriend : UIDialog
 
 	public bool AutoSelectInputField;
 
+	public bool AllowMultiple;
+
 	public Action<ulong, string> onSelected;
 
 	public Translate.Phrase sleepingBagHeaderPhrase = new Translate.Phrase("assign_to_friend", "Assign To a Friend");

@@ -86,7 +86,8 @@ public class StabilityEntity : DecayEntity
 			for (int i = 0; i < link.connections.Count; i++)
 			{
 				StabilityEntity stabilityEntity2 = link.connections[i].owner as StabilityEntity;
-				if (!(stabilityEntity2 == null) && !(stabilityEntity2 == parent) && !(stabilityEntity2 == ignoreEntity) && !stabilityEntity2.isClient && !stabilityEntity2.IsDestroyed && (stabilityEntity == null || stabilityEntity2.cachedDistanceFromGround < stabilityEntity.cachedDistanceFromGround))
+				Socket_Base socket = link.connections[i].socket;
+				if (!(stabilityEntity2 == null) && !(stabilityEntity2 == parent) && !(stabilityEntity2 == ignoreEntity) && !stabilityEntity2.isClient && !stabilityEntity2.IsDestroyed && (!(socket is ConstructionSocket constructionSocket) || !constructionSocket.femaleNoStability) && (stabilityEntity == null || stabilityEntity2.cachedDistanceFromGround < stabilityEntity.cachedDistanceFromGround))
 				{
 					stabilityEntity = stabilityEntity2;
 				}

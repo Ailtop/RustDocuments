@@ -359,7 +359,7 @@ public class SlotMachine : BaseMountable
 	private void CheckPayout()
 	{
 		bool flag = false;
-		if (PayoutSettings != null && BaseNetworkableEx.IsValid(CurrentSpinPlayer) && CurrentSpinPlayer == _mounted)
+		if (PayoutSettings != null)
 		{
 			if (CalculatePayout(out var info, out var bonus))
 			{
@@ -378,7 +378,10 @@ public class SlotMachine : BaseMountable
 						ItemManager.Create(info.Item.itemDef, num, 0uL).MoveToContainer(slotMachineStorage.inventory, 1);
 					}
 				}
-				CurrentSpinPlayer.ChatMessage($"You received {num}x {info.Item.itemDef.displayName.english} for slots payout!");
+				if (BaseNetworkableEx.IsValid(CurrentSpinPlayer) && CurrentSpinPlayer == _mounted)
+				{
+					CurrentSpinPlayer.ChatMessage($"You received {num}x {info.Item.itemDef.displayName.english} for slots payout!");
+				}
 				Analytics.Server.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, num);
 				if (info.OverrideWinEffect != null && info.OverrideWinEffect.isValid)
 				{

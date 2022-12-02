@@ -56,15 +56,51 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 				}
 				return true;
 			}
+			if (rpc == 3528769075u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - PickupEat "));
+				}
+				using (TimeWarning.New("PickupEat"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(3528769075u, "PickupEat", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg3 = rPCMessage;
+							PickupEat(msg3);
+						}
+					}
+					catch (Exception exception2)
+					{
+						Debug.LogException(exception2);
+						player.Kick("RPC Error in PickupEat");
+					}
+				}
+				return true;
+			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public bool IsFood()
+	public bool IsFood(bool checkConsumeMod = false)
 	{
 		for (int i = 0; i < itemList.Length; i++)
 		{
-			if (itemList[i].itemDef.category == ItemCategory.Food)
+			if (itemList[i].itemDef.category == ItemCategory.Food && (!checkConsumeMod || itemList[i].itemDef.GetComponent<ItemModConsume>() != null))
 			{
 				return true;
 			}
@@ -72,9 +108,9 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		return false;
 	}
 
-	public void DoPickup(BasePlayer reciever)
+	public void DoPickup(BasePlayer reciever, bool eat = false)
 	{
-		if (itemList == null || Interface.CallHook("OnCollectiblePickup", this, reciever) != null)
+		if (itemList == null || Interface.CallHook("OnCollectiblePickup", this, reciever, eat) != null)
 		{
 			return;
 		}
@@ -82,16 +118,26 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		foreach (ItemAmount itemAmount in array)
 		{
 			Item item = ItemManager.Create(itemAmount.itemDef, (int)itemAmount.amount, 0uL);
-			if (item != null)
+			if (item == null)
 			{
-				if ((bool)reciever)
+				continue;
+			}
+			if (eat && item.info.category == ItemCategory.Food && reciever != null)
+			{
+				ItemModConsume component = item.info.GetComponent<ItemModConsume>();
+				if (component != null)
 				{
-					reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
+					component.DoAction(item, reciever);
+					continue;
 				}
-				else
-				{
-					item.Drop(base.transform.position + Vector3.up * 0.5f, Vector3.up);
-				}
+			}
+			if ((bool)reciever)
+			{
+				reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
+			}
+			else
+			{
+				item.Drop(base.transform.position + Vector3.up * 0.5f, Vector3.up);
 			}
 		}
 		itemList = null;
@@ -114,6 +160,16 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		if (msg.player.CanInteract())
 		{
 			DoPickup(msg.player);
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	public void PickupEat(RPCMessage msg)
+	{
+		if (msg.player.CanInteract())
+		{
+			DoPickup(msg.player, eat: true);
 		}
 	}
 

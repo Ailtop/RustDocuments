@@ -269,10 +269,6 @@ public class LiquidContainer : ContainerIOEntity
 		if (!(UnityEngine.Time.realtimeSinceStartup - lastOutputDrainUpdate < 0.2f))
 		{
 			lastOutputDrainUpdate = UnityEngine.Time.realtimeSinceStartup;
-			if (HasLiquidItem() && autofillOutputs)
-			{
-				UpdatePushLiquidTargets();
-			}
 			ClearDrains();
 			Invoke(updateDrainAmountAction, 0.1f);
 		}

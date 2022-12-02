@@ -112,8 +112,8 @@ public abstract class AppIOEntity : IOEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.IsVisible(3f)]
 	public async void PairWithApp(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -13,7 +13,8 @@ public abstract class CardGameController : IDisposable
 	{
 		NotPlaying = 0,
 		InGameBetweenRounds = 1,
-		InGameRound = 2
+		InGameRound = 2,
+		InGameRoundEnding = 3
 	}
 
 	public enum Playability
@@ -26,7 +27,7 @@ public abstract class CardGameController : IDisposable
 		Idle = 5
 	}
 
-	public const int IDLE_KICK_SECONDS = 600;
+	public const int IDLE_KICK_SECONDS = 240;
 
 	public CardGame.CardList localPlayerCards;
 
@@ -40,7 +41,19 @@ public abstract class CardGameController : IDisposable
 
 	public bool HasGameInProgress => State >= CardGameState.InGameBetweenRounds;
 
-	public bool HasRoundInProgress => State == CardGameState.InGameRound;
+	public bool HasRoundInProgressOrEnding
+	{
+		get
+		{
+			if (State != CardGameState.InGameRound)
+			{
+				return State == CardGameState.InGameRoundEnding;
+			}
+			return true;
+		}
+	}
+
+	public bool HasActiveRound => State == CardGameState.InGameRound;
 
 	public CardPlayerData[] PlayerData { get; private set; }
 
@@ -53,6 +66,8 @@ public abstract class CardGameController : IDisposable
 	public abstract int MinToPlay { get; }
 
 	public virtual float MaxTurnTime => 30f;
+
+	public virtual int EndRoundDelay => 0;
 
 	public virtual int TimeBetweenRounds => 8;
 
@@ -155,7 +170,7 @@ public abstract class CardGameController : IDisposable
 
 	protected bool ToCardPlayerData(int relIndex, bool includeOutOfRound, out CardPlayerData result)
 	{
-		if (!HasRoundInProgress)
+		if (!HasRoundInProgressOrEnding)
 		{
 			Debug.LogWarning(GetType().Name + ": Tried to call ToCardPlayerData while no round was in progress. Returning null.");
 			result = null;
@@ -168,7 +183,7 @@ public abstract class CardGameController : IDisposable
 
 	public int RelToAbsIndex(int relIndex, bool includeFolded)
 	{
-		if (!HasRoundInProgress)
+		if (!HasRoundInProgressOrEnding)
 		{
 			Debug.LogError(GetType().Name + ": Called RelToAbsIndex outside of a round. No-one is playing. Returning -1.");
 			return -1;
@@ -191,7 +206,7 @@ public abstract class CardGameController : IDisposable
 
 	public int GameToRoundIndex(int gameRelIndex)
 	{
-		if (!HasRoundInProgress)
+		if (!HasRoundInProgressOrEnding)
 		{
 			Debug.LogError(GetType().Name + ": Called GameToRoundIndex outside of a round. No-one is playing. Returning 0.");
 			return 0;
@@ -444,7 +459,7 @@ public abstract class CardGameController : IDisposable
 
 	public void LeaveTable(CardPlayerData pData)
 	{
-		if (HasRoundInProgress && TryGetActivePlayer(out var activePlayer))
+		if (HasActiveRound && TryGetActivePlayer(out var activePlayer))
 		{
 			if (pData == activePlayer)
 			{
@@ -456,9 +471,9 @@ public abstract class CardGameController : IDisposable
 			}
 		}
 		pData.ClearAllData();
-		if (HasRoundInProgress && NumPlayersInCurrentRound() < MinPlayers)
+		if (HasActiveRound && NumPlayersInCurrentRound() < MinPlayers)
 		{
-			EndRound();
+			EndRoundWithDelay();
 		}
 		if (pData.HasUserInGame)
 		{
@@ -597,7 +612,7 @@ public abstract class CardGameController : IDisposable
 
 	public bool TryStartNewRound()
 	{
-		if (HasRoundInProgress)
+		if (HasRoundInProgressOrEnding)
 		{
 			return false;
 		}
@@ -609,7 +624,7 @@ public abstract class CardGameController : IDisposable
 			{
 				cardPlayerData.lastActionTime = Time.unscaledTime;
 			}
-			else if (cardPlayerData.HasBeenIdleFor(600) && BasePlayer.TryFindByID(cardPlayerData.UserID, out basePlayer))
+			else if (cardPlayerData.HasBeenIdleFor(240) && BasePlayer.TryFindByID(cardPlayerData.UserID, out basePlayer))
 			{
 				basePlayer.GetMounted().DismountPlayer(basePlayer);
 			}
@@ -635,6 +650,21 @@ public abstract class CardGameController : IDisposable
 		SubStartRound();
 		Owner.SendNetworkUpdate();
 		return true;
+	}
+
+	protected void BeginRoundEnd()
+	{
+		State = CardGameState.InGameRoundEnding;
+		CancelNextCycleInvoke();
+		Owner.SendNetworkUpdate();
+	}
+
+	protected void EndRoundWithDelay()
+	{
+		State = CardGameState.InGameRoundEnding;
+		CancelNextCycleInvoke();
+		Owner.SendNetworkUpdate();
+		Owner.Invoke(EndRound, EndRoundDelay);
 	}
 
 	public void EndRound()
@@ -713,7 +743,7 @@ public abstract class CardGameController : IDisposable
 				pData.lastActionTime = Time.unscaledTime;
 			}
 			SubReceivedInputFromPlayer(pData, input, value, countAsAction);
-			if (HasRoundInProgress)
+			if (HasActiveRound)
 			{
 				UpdateAllAvailableInputs();
 				Owner.SendNetworkUpdate();

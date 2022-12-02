@@ -2336,9 +2336,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		currentGesture = null;
 	}
 
-	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(10uL)]
 	public void Server_CancelGesture()
 	{
 		currentGesture = null;
@@ -2911,7 +2911,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 230;
+		missions.protocol = 231;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -3011,7 +3011,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (230 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (231 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save. Clearing");
 				loadedMissions.activeMission = -1;
@@ -3544,13 +3544,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		bool flag7 = flag6 && hitEntity.IsNpc;
 		bool flag8 = hitInfo.HitMaterial == Projectile.WaterMaterialID();
 		bool flag9;
-		float num13;
-		float num14;
 		Vector3 position2;
 		Vector3 pointStart;
 		Vector3 hitPositionWorld;
-		Vector3 vector;
-		int num22;
+		Vector3 vector2;
+		int num27;
 		if (value.protection > 0)
 		{
 			flag9 = true;
@@ -3567,8 +3565,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			float num10 = projectile_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
 			float num11 = (desyncTimeClamped + num8 + num9 + num10) * num2;
 			float num12 = ((value.protection >= 6) ? ((desyncTimeClamped + num9 + num10) * num2) : num11);
-			num13 = (num5 - desyncTimeClamped - num9 - num10) * num3;
-			num14 = Vector3.Distance(value.initialPosition, hitInfo.HitPositionWorld);
+			float num13 = (num5 - desyncTimeClamped - num9 - num10) * num3;
+			float num14 = Vector3.Distance(value.initialPosition, hitInfo.HitPositionWorld);
 			if (flag && hitInfo.boneArea == (HitArea)(-1))
 			{
 				string text = hitInfo.ProjectilePrefab.name;
@@ -3657,128 +3655,89 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 					flag9 = false;
 				}
 			}
+			if (value.protection >= 4)
+			{
+				SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out var prevPosition, out var prevVelocity);
+				Vector3 vector = prevVelocity * (1f / 32f);
+				Line line = new Line(prevPosition - vector, position + vector);
+				float num22 = line.Distance(hitInfo.PointStart);
+				float num23 = line.Distance(hitInfo.HitPositionWorld);
+				if (num22 > ConVar.AntiHack.projectile_trajectory)
+				{
+					string text15 = value.projectilePrefab.name;
+					string text16 = (flag6 ? hitEntity.ShortPrefabName : "world");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + text15 + " on " + text16 + " with " + num22 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					stats.combat.LogInvalid(hitInfo, "trajectory_start");
+					flag9 = false;
+				}
+				if (num23 > ConVar.AntiHack.projectile_trajectory)
+				{
+					string text17 = value.projectilePrefab.name;
+					string text18 = (flag6 ? hitEntity.ShortPrefabName : "world");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + text17 + " on " + text18 + " with " + num23 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					stats.combat.LogInvalid(hitInfo, "trajectory_end");
+					flag9 = false;
+				}
+				hitInfo.ProjectileVelocity = velocity;
+				if (playerProjectileAttack.hitVelocity != Vector3.zero && velocity != Vector3.zero)
+				{
+					float num24 = Vector3.Angle(playerProjectileAttack.hitVelocity, velocity);
+					float num25 = playerProjectileAttack.hitVelocity.magnitude / velocity.magnitude;
+					if (num24 > ConVar.AntiHack.projectile_anglechange)
+					{
+						string text19 = value.projectilePrefab.name;
+						string text20 = (flag6 ? hitEntity.ShortPrefabName : "world");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + text19 + " on " + text20 + " with " + num24 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
+						stats.combat.LogInvalid(hitInfo, "angle_change");
+						flag9 = false;
+					}
+					if (num25 > ConVar.AntiHack.projectile_velocitychange)
+					{
+						string text21 = value.projectilePrefab.name;
+						string text22 = (flag6 ? hitEntity.ShortPrefabName : "world");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + text21 + " on " + text22 + " with " + num25 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
+						stats.combat.LogInvalid(hitInfo, "velocity_change");
+						flag9 = false;
+					}
+				}
+				float magnitude3 = velocity.magnitude;
+				float num26 = num13 * magnitude3;
+				if (num14 < num26)
+				{
+					string text23 = hitInfo.ProjectilePrefab.name;
+					string text24 = (flag6 ? hitEntity.ShortPrefabName : "world");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too slow (" + text23 + " on " + text24 + " with " + num14 + "m < " + num26 + "m in " + num13 + "s)");
+					stats.combat.LogInvalid(hitInfo, "projectile_minspeed");
+					flag9 = false;
+				}
+			}
 			if (value.protection >= 3)
 			{
 				position2 = value.position;
 				pointStart = hitInfo.PointStart;
 				hitPositionWorld = hitInfo.HitPositionWorld;
-				vector = hitInfo.PositionOnRay(hitPositionWorld);
-				if (!flag8 && !flag6)
+				if (!flag8)
 				{
-					hitPositionWorld += hitInfo.HitNormalWorld.normalized * 0.001f;
+					hitPositionWorld -= hitInfo.ProjectileVelocity.normalized * 0.001f;
 				}
-				if (GamePhysics.LineOfSight(position2, pointStart, layerMask, value.lastEntityHit) && GamePhysics.LineOfSight(pointStart, vector, layerMask, value.lastEntityHit))
+				vector2 = hitInfo.PositionOnRay(hitPositionWorld);
+				if (GamePhysics.LineOfSight(position2, pointStart, layerMask, value.lastEntityHit) && GamePhysics.LineOfSight(pointStart, vector2, layerMask, value.lastEntityHit))
 				{
-					num22 = (GamePhysics.LineOfSight(vector, hitPositionWorld, layerMask, hitEntity) ? 1 : 0);
-					if (num22 != 0)
+					num27 = (GamePhysics.LineOfSight(vector2, hitPositionWorld, layerMask, value.lastEntityHit) ? 1 : 0);
+					if (num27 != 0)
 					{
 						stats.Add("hit_" + (flag6 ? hitEntity.Categorize() : "world") + "_direct_los", 1, Stats.Server);
-						goto IL_0b2a;
+						goto IL_0f2e;
 					}
 				}
 				else
 				{
-					num22 = 0;
+					num27 = 0;
 				}
 				stats.Add("hit_" + (flag6 ? hitEntity.Categorize() : "world") + "_indirect_los", 1, Stats.Server);
-				goto IL_0b2a;
+				goto IL_0f2e;
 			}
-			goto IL_0d2f;
-		}
-		goto IL_114c;
-		IL_0b2a:
-		if (num22 == 0)
-		{
-			string text15 = hitInfo.ProjectilePrefab.name;
-			string text16 = (flag6 ? hitEntity.ShortPrefabName : "world");
-			AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text15, " on ", text16, ") ", position2, " ", pointStart, " ", vector, " ", hitPositionWorld));
-			stats.combat.LogInvalid(hitInfo, "projectile_los");
-			flag9 = false;
-		}
-		if (flag9 && flag && !flag7)
-		{
-			Vector3 hitPositionWorld2 = hitInfo.HitPositionWorld;
-			Vector3 position3 = basePlayer.eyes.position;
-			Vector3 vector2 = basePlayer.CenterPoint();
-			float projectile_losforgiveness = ConVar.AntiHack.projectile_losforgiveness;
-			bool flag10 = GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(position3, hitPositionWorld2, layerMask, projectile_losforgiveness, 0f);
-			if (!flag10)
-			{
-				flag10 = GamePhysics.LineOfSight(hitPositionWorld2, vector2, layerMask, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(vector2, hitPositionWorld2, layerMask, projectile_losforgiveness, 0f);
-			}
-			if (!flag10)
-			{
-				string text17 = hitInfo.ProjectilePrefab.name;
-				string text18 = (flag6 ? hitEntity.ShortPrefabName : "world");
-				AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text17, " on ", text18, ") ", hitPositionWorld2, " ", position3, " or ", hitPositionWorld2, " ", vector2));
-				stats.combat.LogInvalid(hitInfo, "projectile_los");
-				flag9 = false;
-			}
-		}
-		goto IL_0d2f;
-		IL_0d2f:
-		if (value.protection >= 4)
-		{
-			SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out var prevPosition, out var prevVelocity);
-			Vector3 vector3 = prevVelocity * (1f / 32f);
-			Line line = new Line(prevPosition - vector3, position + vector3);
-			float num23 = line.Distance(hitInfo.PointStart);
-			float num24 = line.Distance(hitInfo.HitPositionWorld);
-			if (num23 > ConVar.AntiHack.projectile_trajectory)
-			{
-				string text19 = value.projectilePrefab.name;
-				string text20 = (flag6 ? hitEntity.ShortPrefabName : "world");
-				AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + text19 + " on " + text20 + " with " + num23 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
-				stats.combat.LogInvalid(hitInfo, "trajectory_start");
-				flag9 = false;
-			}
-			if (num24 > ConVar.AntiHack.projectile_trajectory)
-			{
-				string text21 = value.projectilePrefab.name;
-				string text22 = (flag6 ? hitEntity.ShortPrefabName : "world");
-				AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + text21 + " on " + text22 + " with " + num24 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
-				stats.combat.LogInvalid(hitInfo, "trajectory_end");
-				flag9 = false;
-			}
-			hitInfo.ProjectileVelocity = velocity;
-			if (playerProjectileAttack.hitVelocity != Vector3.zero && velocity != Vector3.zero)
-			{
-				float num25 = Vector3.Angle(playerProjectileAttack.hitVelocity, velocity);
-				float num26 = playerProjectileAttack.hitVelocity.magnitude / velocity.magnitude;
-				if (num25 > ConVar.AntiHack.projectile_anglechange)
-				{
-					string text23 = value.projectilePrefab.name;
-					string text24 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + text23 + " on " + text24 + " with " + num25 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
-					stats.combat.LogInvalid(hitInfo, "angle_change");
-					flag9 = false;
-				}
-				if (num26 > ConVar.AntiHack.projectile_velocitychange)
-				{
-					string text25 = value.projectilePrefab.name;
-					string text26 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + text25 + " on " + text26 + " with " + num26 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
-					stats.combat.LogInvalid(hitInfo, "velocity_change");
-					flag9 = false;
-				}
-			}
-			float magnitude3 = velocity.magnitude;
-			float num27 = num13 * magnitude3;
-			if (num14 < num27)
-			{
-				string text27 = hitInfo.ProjectilePrefab.name;
-				string text28 = (flag6 ? hitEntity.ShortPrefabName : "world");
-				AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too slow (" + text27 + " on " + text28 + " with " + num14 + "m < " + num27 + "m in " + num13 + "s)");
-				stats.combat.LogInvalid(hitInfo, "projectile_minspeed");
-				flag9 = false;
-			}
-		}
-		if (!flag9)
-		{
-			AntiHack.AddViolation(this, AntiHackType.ProjectileHack, ConVar.AntiHack.projectile_penalty);
-			playerProjectileAttack.ResetToPool();
-			playerProjectileAttack = null;
-			return;
+			goto IL_1133;
 		}
 		goto IL_114c;
 		IL_114c:
@@ -3816,7 +3775,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 		if (value.integrity <= 0f)
 		{
-			if (value.hits <= 1)
+			if (value.hits <= ConVar.AntiHack.projectile_impactspawndepth)
 			{
 				value.itemMod.ServerProjectileHit(hitInfo);
 			}
@@ -3828,7 +3787,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		firedProjectiles[playerAttack.projectileID] = value;
 		if (flag6)
 		{
-			if (value.hits <= 2)
+			if (value.hits <= ConVar.AntiHack.projectile_damagedepth)
 			{
 				hitEntity.OnAttacked(hitInfo);
 			}
@@ -3841,6 +3800,46 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Effect.server.ImpactEffect(hitInfo);
 		playerProjectileAttack.ResetToPool();
 		playerProjectileAttack = null;
+		return;
+		IL_0f2e:
+		if (num27 == 0)
+		{
+			string text25 = hitInfo.ProjectilePrefab.name;
+			string text26 = (flag6 ? hitEntity.ShortPrefabName : "world");
+			AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text25, " on ", text26, ") ", position2, " ", pointStart, " ", vector2, " ", hitPositionWorld));
+			stats.combat.LogInvalid(hitInfo, "projectile_los");
+			flag9 = false;
+		}
+		if (flag9 && flag && !flag7)
+		{
+			Vector3 hitPositionWorld2 = hitInfo.HitPositionWorld;
+			Vector3 position3 = basePlayer.eyes.position;
+			Vector3 vector3 = basePlayer.CenterPoint();
+			float projectile_losforgiveness = ConVar.AntiHack.projectile_losforgiveness;
+			bool flag10 = GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(position3, hitPositionWorld2, layerMask, projectile_losforgiveness, 0f);
+			if (!flag10)
+			{
+				flag10 = GamePhysics.LineOfSight(hitPositionWorld2, vector3, layerMask, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(vector3, hitPositionWorld2, layerMask, projectile_losforgiveness, 0f);
+			}
+			if (!flag10)
+			{
+				string text27 = hitInfo.ProjectilePrefab.name;
+				string text28 = (flag6 ? hitEntity.ShortPrefabName : "world");
+				AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text27, " on ", text28, ") ", hitPositionWorld2, " ", position3, " or ", hitPositionWorld2, " ", vector3));
+				stats.combat.LogInvalid(hitInfo, "projectile_los");
+				flag9 = false;
+			}
+		}
+		goto IL_1133;
+		IL_1133:
+		if (!flag9)
+		{
+			AntiHack.AddViolation(this, AntiHackType.ProjectileHack, ConVar.AntiHack.projectile_penalty);
+			playerProjectileAttack.ResetToPool();
+			playerProjectileAttack = null;
+			return;
+		}
+		goto IL_114c;
 	}
 
 	[RPC_Server]

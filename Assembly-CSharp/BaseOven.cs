@@ -190,6 +190,11 @@ public class BaseOven : StorageContainer, ISplashable
 				item.SetFlag(Item.Flag.OnFire, b: false);
 				item.MarkDirty();
 			}
+			if (item.HasFlag(Item.Flag.Cooking))
+			{
+				item.SetFlag(Item.Flag.Cooking, b: false);
+				item.MarkDirty();
+			}
 		}
 	}
 

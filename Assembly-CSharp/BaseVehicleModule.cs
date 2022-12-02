@@ -243,6 +243,10 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		VehicleModuleButtonComponent[] array2 = buttonComponents;
 		foreach (VehicleModuleButtonComponent vehicleModuleButtonComponent in array2)
 		{
+			if (vehicleModuleButtonComponent == null)
+			{
+				break;
+			}
 			if (PlayerIsLookingAtUsable(lookingAtColldierName, vehicleModuleButtonComponent.interactionColliderName))
 			{
 				vehicleModuleButtonComponent.ServerUse(player, this);
@@ -356,6 +360,15 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 			return false;
 		}
 		return Vehicle.CanBeLooted(player);
+	}
+
+	public bool KeycodeEntryBlocked(BasePlayer player)
+	{
+		if (IsOnAVehicle && Vehicle is ModularCar modularCar)
+		{
+			return modularCar.KeycodeEntryBlocked(player);
+		}
+		return false;
 	}
 
 	public virtual void OnEngineStateChanged(VehicleEngineController<GroundVehicle>.EngineState oldState, VehicleEngineController<GroundVehicle>.EngineState newState)
@@ -576,7 +589,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		{
 			return false;
 		}
-		return Vehicle.PlayerCanUseThis(player, ModularCarLock.LockType.General);
+		return Vehicle.PlayerCanUseThis(player, ModularCarCodeLock.LockType.General);
 	}
 
 	public bool PlayerIsLookingAtUsable(string lookingAtColldierName, string usableColliderName)
@@ -587,10 +600,6 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (base.isClient && info.msg.vehicleModule != null && FirstSocketIndex < 0 && info.msg.vehicleModule.socketIndex >= 0)
-		{
-			FirstSocketIndex = info.msg.vehicleModule.socketIndex;
-		}
 	}
 
 	public override bool IsVehicleRoot()

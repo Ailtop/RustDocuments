@@ -41,13 +41,13 @@ public class CardGamePlayerWidget : MonoBehaviour
 	private RustText actionText;
 
 	[SerializeField]
-	private Sprite noIcon;
-
-	[SerializeField]
 	private Sprite canSeeIcon;
 
 	[SerializeField]
 	private Sprite cannotSeeIcon;
+
+	[SerializeField]
+	private Sprite blankSprite;
 
 	[SerializeField]
 	private Image cornerIcon;

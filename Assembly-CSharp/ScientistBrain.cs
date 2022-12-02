@@ -450,10 +450,6 @@ public class ScientistBrain : BaseAIBrain
 		private bool StartMovingToCover(HumanNPC entity)
 		{
 			coverFromEntity = brain.Events.Memory.Entity.Get(brain.Events.CurrentInputMemorySlot);
-			if (coverFromEntity == null)
-			{
-				return false;
-			}
 			Vector3 hideFromPosition = (coverFromEntity ? coverFromEntity.transform.position : (entity.transform.position + entity.LastAttackedDir * 30f));
 			AIInformationZone informationZone = entity.GetInformationZone(entity.transform.position);
 			if (informationZone == null)

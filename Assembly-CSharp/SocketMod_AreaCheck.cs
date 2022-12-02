@@ -16,7 +16,7 @@ public class SocketMod_AreaCheck : SocketMod
 		{
 			flag = !flag;
 		}
-		Gizmos.color = (flag ? Color.green : Color.red);
+		Gizmos.color = (flag ? Color.green.WithAlpha(0.5f) : Color.red.WithAlpha(0.5f));
 		Gizmos.DrawCube(bounds.center, bounds.size);
 	}
 

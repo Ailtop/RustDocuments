@@ -27,7 +27,7 @@ public static class EACServer
 	{
 		get
 		{
-			if (ConVar.Server.official)
+			if (ConVar.Server.official && ConVar.Server.stats)
 			{
 				return Interface != null;
 			}
