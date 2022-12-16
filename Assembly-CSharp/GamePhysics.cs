@@ -386,7 +386,7 @@ public static class GamePhysics
 		{
 			return false;
 		}
-		if (!BaseNetworkableEx.IsRealNull(ignoreEntity) && CompareEntity(GameObjectEx.ToBaseEntity(collider), ignoreEntity))
+		if (CompareEntity(GameObjectEx.ToBaseEntity(collider), ignoreEntity))
 		{
 			return false;
 		}
@@ -395,6 +395,10 @@ public static class GamePhysics
 
 	private static bool CompareEntity(BaseEntity a, BaseEntity b)
 	{
+		if (BaseNetworkableEx.IsRealNull(a) || BaseNetworkableEx.IsRealNull(b))
+		{
+			return false;
+		}
 		if (a == b)
 		{
 			return true;

@@ -13,8 +13,6 @@ public class ProceduralDynamicDungeon : BaseEntity
 
 	public bool[] grid;
 
-	public List<ProceduralDungeonCell> cellPrefabs = new List<ProceduralDungeonCell>();
-
 	public List<GameObjectRef> cellPrefabReferences = new List<GameObjectRef>();
 
 	public List<ProceduralDungeonCell> spawnedCells = new List<ProceduralDungeonCell>();
@@ -33,22 +31,41 @@ public class ProceduralDynamicDungeon : BaseEntity
 
 	public uint baseseed;
 
-	public static List<ProceduralDynamicDungeon> dungeons = new List<ProceduralDynamicDungeon>();
+	public Vector3 mapOffset = Vector3.zero;
+
+	public static readonly List<ProceduralDynamicDungeon> dungeons = new List<ProceduralDynamicDungeon>();
 
 	public ProceduralDungeonCell entranceHack;
 
-	public static void AddDungeon(ProceduralDynamicDungeon newDungeon)
+	public override void InitShared()
 	{
-		dungeons.Add(newDungeon);
+		base.InitShared();
+		dungeons.Add(this);
 	}
 
-	public static void RemoveDungeon(ProceduralDynamicDungeon dungeon)
+	public override void OnFlagsChanged(Flags old, Flags next)
 	{
-		_ = dungeon.transform.position;
-		if (dungeons.Contains(dungeon))
+		base.OnFlagsChanged(old, next);
+		foreach (ProceduralDungeonCell spawnedCell in spawnedCells)
 		{
-			dungeons.Remove(dungeon);
+			EntityFlag_Toggle[] componentsInChildren = spawnedCell.GetComponentsInChildren<EntityFlag_Toggle>();
+			for (int i = 0; i < componentsInChildren.Length; i++)
+			{
+				componentsInChildren[i].DoUpdate(this);
+			}
 		}
+	}
+
+	public BaseEntity GetExitPortal(bool serverSide)
+	{
+		return exitPortal.Get(serverSide);
+	}
+
+	public override void DestroyShared()
+	{
+		dungeons.Remove(this);
+		RetireAllCells();
+		base.DestroyShared();
 	}
 
 	public bool ContainsAnyPlayers()
@@ -97,7 +114,6 @@ public class ProceduralDynamicDungeon : BaseEntity
 	internal override void DoServerDestroy()
 	{
 		KillPlayers();
-		RemoveDungeon(this);
 		if (exitPortal.IsValid(serverside: true))
 		{
 			exitPortal.Get(serverside: true).Kill();
@@ -113,7 +129,6 @@ public class ProceduralDynamicDungeon : BaseEntity
 			Debug.Log("Spawning dungeon with seed :" + (int)seed);
 		}
 		base.ServerInit();
-		AddDungeon(this);
 		if (!Rust.Application.isLoadingSave)
 		{
 			DoGeneration();
@@ -126,12 +141,21 @@ public class ProceduralDynamicDungeon : BaseEntity
 	public void DoGeneration()
 	{
 		GenerateGrid();
+		CreateAIZ();
 		if (base.isServer)
 		{
 			Debug.Log("Server DoGeneration,calling routine update nav mesh");
 			StartCoroutine(UpdateNavMesh());
 		}
 		Invoke(InitSpawnGroups, 1f);
+	}
+
+	private void CreateAIZ()
+	{
+		AIInformationZone aIInformationZone = base.gameObject.AddComponent<AIInformationZone>();
+		aIInformationZone.UseCalculatedCoverDistances = false;
+		aIInformationZone.bounds.extents = new Vector3((float)gridResolution * gridSpacing * 0.75f, 10f, (float)gridResolution * gridSpacing * 0.75f);
+		aIInformationZone.Init();
 	}
 
 	public override void PostServerLoad()
@@ -150,12 +174,13 @@ public class ProceduralDynamicDungeon : BaseEntity
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
-		if (info.msg.ioEntity == null)
+		if (info.msg.proceduralDungeon == null)
 		{
-			info.msg.ioEntity = Pool.Get<ProtoBuf.IOEntity>();
+			info.msg.proceduralDungeon = Pool.Get<ProceduralDungeon>();
 		}
-		info.msg.ioEntity.genericEntRef1 = baseseed;
-		info.msg.ioEntity.genericEntRef2 = exitPortal.uid;
+		info.msg.proceduralDungeon.seed = baseseed;
+		info.msg.proceduralDungeon.exitPortalID = exitPortal.uid;
+		info.msg.proceduralDungeon.mapOffset = mapOffset;
 	}
 
 	public BasePortal GetExitPortal()
@@ -190,25 +215,15 @@ public class ProceduralDynamicDungeon : BaseEntity
 		}
 	}
 
-	public override void DestroyShared()
-	{
-		RetireAllCells();
-		base.DestroyShared();
-	}
-
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.ioEntity != null)
+		if (info.msg.proceduralDungeon != null)
 		{
-			baseseed = (seed = info.msg.ioEntity.genericEntRef1);
-			exitPortal.uid = info.msg.ioEntity.genericEntRef2;
+			baseseed = (seed = info.msg.proceduralDungeon.seed);
+			exitPortal.uid = info.msg.proceduralDungeon.exitPortalID;
+			mapOffset = info.msg.proceduralDungeon.mapOffset;
 		}
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
 	}
 
 	[ContextMenu("Test Grid")]

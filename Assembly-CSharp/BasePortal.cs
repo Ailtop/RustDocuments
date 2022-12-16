@@ -32,6 +32,8 @@ public class BasePortal : BaseCombatEntity
 
 	public GameObjectRef transitionSoundEffect;
 
+	public string useTagString = "";
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BasePortal.OnRpcMessage"))

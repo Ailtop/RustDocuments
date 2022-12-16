@@ -65,4 +65,6 @@ public class MapView : FacepunchBehaviour
 	public RustImageButton TrainButton;
 
 	public RustImageButton[] UnderwaterButtons;
+
+	public RustImageButton DungeonButton;
 }

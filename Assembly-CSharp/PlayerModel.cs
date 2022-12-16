@@ -34,6 +34,7 @@ public class PlayerModel : ListComponent<PlayerModel>
 		Driving_Snowmobile = 26,
 		ZiplineHold = 27,
 		Sit_Locomotive = 28,
+		Sit_Throne = 29,
 		Standing = 128
 	}
 

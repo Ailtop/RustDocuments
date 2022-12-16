@@ -9,5 +9,6 @@ public enum MapLayer
 	Underwater5 = 5,
 	Underwater6 = 6,
 	Underwater7 = 7,
-	Underwater8 = 8
+	Underwater8 = 8,
+	Dungeons = 10
 }

@@ -42,52 +42,58 @@ public static class EACServer
 
 	public static void Encrypt(Connection connection, ArraySegment<byte> src, ref ArraySegment<byte> dst)
 	{
-		if (Interface != null)
+		uint count = (uint)dst.Count;
+		dst = new ArraySegment<byte>(dst.Array, dst.Offset, 0);
+		if (!(Interface != null))
+		{
+			return;
+		}
+		IntPtr client = GetClient(connection);
+		if (client != IntPtr.Zero)
 		{
 			ProtectMessageOptions protectMessageOptions = default(ProtectMessageOptions);
-			protectMessageOptions.ClientHandle = GetClient(connection);
+			protectMessageOptions.ClientHandle = client;
 			protectMessageOptions.Data = src;
-			protectMessageOptions.OutBufferSizeBytes = (uint)dst.Count;
+			protectMessageOptions.OutBufferSizeBytes = count;
 			ProtectMessageOptions options = protectMessageOptions;
-			dst = new ArraySegment<byte>(dst.Array, dst.Offset, 0);
 			uint outBytesWritten;
 			Result result = Interface.ProtectMessage(ref options, dst, out outBytesWritten);
-			switch (result)
+			if (result == Result.Success)
 			{
-			case Result.Success:
 				dst = new ArraySegment<byte>(dst.Array, dst.Offset, (int)outBytesWritten);
-				break;
-			default:
+			}
+			else
+			{
 				Debug.LogWarning("[EAC] ProtectMessage failed: " + result);
-				break;
-			case Result.InvalidUser:
-				break;
 			}
 		}
 	}
 
 	public static void Decrypt(Connection connection, ArraySegment<byte> src, ref ArraySegment<byte> dst)
 	{
-		if (Interface != null)
+		uint count = (uint)dst.Count;
+		dst = new ArraySegment<byte>(dst.Array, dst.Offset, 0);
+		if (!(Interface != null))
+		{
+			return;
+		}
+		IntPtr client = GetClient(connection);
+		if (client != IntPtr.Zero)
 		{
 			UnprotectMessageOptions unprotectMessageOptions = default(UnprotectMessageOptions);
-			unprotectMessageOptions.ClientHandle = GetClient(connection);
+			unprotectMessageOptions.ClientHandle = client;
 			unprotectMessageOptions.Data = src;
-			unprotectMessageOptions.OutBufferSizeBytes = (uint)dst.Count;
+			unprotectMessageOptions.OutBufferSizeBytes = count;
 			UnprotectMessageOptions options = unprotectMessageOptions;
-			dst = new ArraySegment<byte>(dst.Array, dst.Offset, 0);
 			uint outBytesWritten;
 			Result result = Interface.UnprotectMessage(ref options, dst, out outBytesWritten);
-			switch (result)
+			if (result == Result.Success)
 			{
-			case Result.Success:
 				dst = new ArraySegment<byte>(dst.Array, dst.Offset, (int)outBytesWritten);
-				break;
-			default:
+			}
+			else
+			{
 				Debug.LogWarning("[EAC] UnprotectMessage failed: " + result);
-				break;
-			case Result.InvalidUser:
-				break;
 			}
 		}
 	}
@@ -282,11 +288,14 @@ public static class EACServer
 			if (Interface != null)
 			{
 				IntPtr client = GetClient(connection);
-				UnregisterClientOptions unregisterClientOptions = default(UnregisterClientOptions);
-				unregisterClientOptions.ClientHandle = client;
-				UnregisterClientOptions options = unregisterClientOptions;
-				Interface.UnregisterClient(ref options);
-				client2connection.Remove((uint)(int)client);
+				if (client != IntPtr.Zero)
+				{
+					UnregisterClientOptions unregisterClientOptions = default(UnregisterClientOptions);
+					unregisterClientOptions.ClientHandle = client;
+					UnregisterClientOptions options = unregisterClientOptions;
+					Interface.UnregisterClient(ref options);
+					client2connection.Remove((uint)(int)client);
+				}
 				connection2client.Remove(connection);
 				connection2status.Remove(connection);
 			}
@@ -304,6 +313,11 @@ public static class EACServer
 			if (Interface != null)
 			{
 				IntPtr intPtr = GenerateCompatibilityClient();
+				if (intPtr == IntPtr.Zero)
+				{
+					Debug.LogError("[EAC] GenerateCompatibilityClient returned invalid client: " + intPtr);
+					return;
+				}
 				RegisterClientOptions registerClientOptions = default(RegisterClientOptions);
 				registerClientOptions.ClientHandle = intPtr;
 				registerClientOptions.AccountId = connection.userid.ToString();
@@ -335,11 +349,14 @@ public static class EACServer
 		if (Interface != null)
 		{
 			IntPtr client = GetClient(connection);
-			SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
-			setClientNetworkStateOptions.ClientHandle = client;
-			setClientNetworkStateOptions.IsNetworkActive = false;
-			SetClientNetworkStateOptions options = setClientNetworkStateOptions;
-			Interface.SetClientNetworkState(ref options);
+			if (client != IntPtr.Zero)
+			{
+				SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
+				setClientNetworkStateOptions.ClientHandle = client;
+				setClientNetworkStateOptions.IsNetworkActive = false;
+				SetClientNetworkStateOptions options = setClientNetworkStateOptions;
+				Interface.SetClientNetworkState(ref options);
+			}
 		}
 	}
 
@@ -348,23 +365,27 @@ public static class EACServer
 		if (Interface != null)
 		{
 			IntPtr client = GetClient(connection);
-			SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
-			setClientNetworkStateOptions.ClientHandle = client;
-			setClientNetworkStateOptions.IsNetworkActive = true;
-			SetClientNetworkStateOptions options = setClientNetworkStateOptions;
-			Interface.SetClientNetworkState(ref options);
+			if (client != IntPtr.Zero)
+			{
+				SetClientNetworkStateOptions setClientNetworkStateOptions = default(SetClientNetworkStateOptions);
+				setClientNetworkStateOptions.ClientHandle = client;
+				setClientNetworkStateOptions.IsNetworkActive = true;
+				SetClientNetworkStateOptions options = setClientNetworkStateOptions;
+				Interface.SetClientNetworkState(ref options);
+			}
 		}
 	}
 
 	public static void OnMessageReceived(Message message)
 	{
-		if (!connection2client.ContainsKey(message.connection))
+		IntPtr client = GetClient(message.connection);
+		byte[] buffer;
+		int size;
+		if (client == IntPtr.Zero)
 		{
 			Debug.LogError("EAC network packet from invalid connection: " + message.connection.userid);
-			return;
 		}
-		IntPtr client = GetClient(message.connection);
-		if (message.read.TemporaryBytesWithSize(out var buffer, out var size))
+		else if (message.read.TemporaryBytesWithSize(out buffer, out size))
 		{
 			ReceiveMessageFromClientOptions receiveMessageFromClientOptions = default(ReceiveMessageFromClientOptions);
 			receiveMessageFromClientOptions.ClientHandle = client;

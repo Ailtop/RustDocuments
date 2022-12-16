@@ -21,6 +21,8 @@ public static class AntiHack
 
 	private static Dictionary<ulong, int> bans = new Dictionary<ulong, int>();
 
+	private static RaycastHit buildRayHit;
+
 	public static void ResetTimer(BasePlayer ply)
 	{
 		ply.lastViolationTime = UnityEngine.Time.realtimeSinceStartup;
@@ -194,6 +196,7 @@ public static class AntiHack
 			Vector3 vector3 = ply.NoClipOffset();
 			float radius = ply.NoClipRadius(ConVar.AntiHack.noclip_margin);
 			float noclip_backtracking = ConVar.AntiHack.noclip_backtracking;
+			bool vehicleLayer = ply.vehiclePauseTime <= 0f;
 			if (ConVar.AntiHack.noclip_protection >= 3)
 			{
 				float b = Mathf.Max(ConVar.AntiHack.noclip_stepsize, 0.1f);
@@ -202,7 +205,7 @@ public static class AntiHack
 				while (ticks.MoveNext(b))
 				{
 					vector2 = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
-					if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true))
+					if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
 					{
 						return true;
 					}
@@ -211,12 +214,12 @@ public static class AntiHack
 			}
 			else if (ConVar.AntiHack.noclip_protection >= 2)
 			{
-				if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true))
+				if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
 				{
 					return true;
 				}
 			}
-			else if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false))
+			else if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false, vehicleLayer))
 			{
 				return true;
 			}
@@ -224,21 +227,22 @@ public static class AntiHack
 		}
 	}
 
-	public static bool TestNoClipping(BasePlayer ply, Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast)
+	public static bool TestNoClipping(BasePlayer ply, Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast, bool vehicleLayer = false, BaseEntity ignoreEntity = null)
 	{
 		int num = 429990145;
-		if (ply.vehiclePauseTime > 0f)
+		if (!vehicleLayer)
 		{
 			num &= -8193;
 		}
 		Vector3 normalized = (newPos - oldPos).normalized;
 		Vector3 vector = oldPos - normalized * backtracking;
 		float magnitude = (newPos - vector).magnitude;
+		Ray ray = new Ray(vector, normalized);
 		RaycastHit hitInfo = default(RaycastHit);
-		bool flag = UnityEngine.Physics.Raycast(new Ray(vector, normalized), out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore);
+		bool flag = ((ignoreEntity == null) ? UnityEngine.Physics.Raycast(ray, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, 0f, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore, ignoreEntity));
 		if (!flag && sphereCast)
 		{
-			flag = UnityEngine.Physics.SphereCast(new Ray(vector, normalized), radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore);
+			flag = ((ignoreEntity == null) ? UnityEngine.Physics.SphereCast(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore, ignoreEntity));
 		}
 		if (flag)
 		{
@@ -427,6 +431,34 @@ public static class AntiHack
 			ply.flyhackDistanceHorizontal = 0f;
 		}
 		return false;
+	}
+
+	public static bool TestIsBuildingInsideSomething(Construction.Target target, Vector3 deployPos)
+	{
+		if (ConVar.AntiHack.build_inside_check <= 0)
+		{
+			return false;
+		}
+		bool queriesHitBackfaces = UnityEngine.Physics.queriesHitBackfaces;
+		UnityEngine.Physics.queriesHitBackfaces = true;
+		if (IsInside(deployPos) && IsInside(target.ray.origin))
+		{
+			LogToConsole(target.player, AntiHackType.InsideTerrain, "Tried to build while clipped inside " + buildRayHit.collider.name);
+			if (ConVar.AntiHack.build_inside_check > 1)
+			{
+				return true;
+			}
+		}
+		UnityEngine.Physics.queriesHitBackfaces = queriesHitBackfaces;
+		return false;
+		static bool IsInside(Vector3 pos)
+		{
+			if (UnityEngine.Physics.Raycast(pos, Vector3.up, out buildRayHit, 50f, 65537))
+			{
+				return Vector3.Dot(Vector3.up, buildRayHit.normal) > 0f;
+			}
+			return false;
+		}
 	}
 
 	public static void NoteAdminHack(BasePlayer ply)

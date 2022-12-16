@@ -203,12 +203,18 @@ public class Planner : HeldEntity
 				return;
 			}
 		}
+		Vector3 vector = ((target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position);
+		if (AntiHack.TestIsBuildingInsideSomething(target, vector))
+		{
+			ownerPlayer.ChatMessage("Can't deploy inside objects");
+			return;
+		}
 		if (ConVar.AntiHack.eye_protection >= 2)
 		{
 			Vector3 center = ownerPlayer.eyes.center;
 			Vector3 position = ownerPlayer.eyes.position;
 			Vector3 origin = target.ray.origin;
-			Vector3 p = ((target.entity != null && target.socket != null) ? target.GetWorldPosition() : target.position);
+			Vector3 p = vector;
 			int num = 2097152;
 			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
 			float num3 = ConVar.AntiHack.build_losradius;
@@ -250,11 +256,11 @@ public class Planner : HeldEntity
 		{
 			ownerPlayer.ChatMessage("Can't place: " + Construction.lastPlacementError);
 		}
+		Interface.CallHook("OnEntityBuilt", this, gameObject);
 		if (!(gameObject != null))
 		{
 			return;
 		}
-		Interface.CallHook("OnEntityBuilt", this, gameObject);
 		Deployable deployable = GetDeployable();
 		if (deployable != null)
 		{

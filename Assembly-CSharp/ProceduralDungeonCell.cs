@@ -18,6 +18,8 @@ public class ProceduralDungeonCell : BaseMonoBehaviour
 
 	public SpawnGroup[] spawnGroups;
 
+	public MeshRenderer[] mapRenderers;
+
 	public void Awake()
 	{
 		spawnGroups = GetComponentsInChildren<SpawnGroup>();

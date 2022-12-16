@@ -321,6 +321,12 @@ public class Server : ConsoleSystem
 	[ServerVar(Help = "Should F7 reports from players be printed to console", Saved = true)]
 	public static bool printReportsToConsole = false;
 
+	[ServerVar(Help = "If a player presses the respawn button, respawn at their death location (for trailer filming)")]
+	public static bool respawnAtDeathPosition = false;
+
+	[ServerVar(Help = "When a player respawns give them the loadout assigned to client.RespawnLoadout (created with inventory.saveloadout)")]
+	public static bool respawnWithLoadout = false;
+
 	[ServerVar(Saved = true)]
 	public static bool showHolsteredItems = true;
 

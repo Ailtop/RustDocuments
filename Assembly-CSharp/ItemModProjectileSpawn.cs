@@ -1,3 +1,4 @@
+using ConVar;
 using UnityEngine;
 
 public class ItemModProjectileSpawn : ItemModProjectile
@@ -22,15 +23,22 @@ public class ItemModProjectileSpawn : ItemModProjectile
 			{
 				continue;
 			}
+			Vector3 hitPositionWorld = info.HitPositionWorld;
+			Vector3 pointStart = info.PointStart;
+			Vector3 normalized = info.ProjectileVelocity.normalized;
+			Vector3 normalized2 = info.HitNormalWorld.normalized;
+			Vector3 vector = hitPositionWorld - normalized * 0.1f;
+			Quaternion rotation = Quaternion.LookRotation(-normalized);
+			int layerMask = (ConVar.AntiHack.projectile_terraincheck ? 10551296 : 2162688);
+			if (!GamePhysics.LineOfSight(pointStart, vector, layerMask))
+			{
+				continue;
+			}
 			BaseEntity baseEntity = GameManager.server.CreateEntity(createOnImpact.resourcePath);
 			if ((bool)baseEntity)
 			{
-				Vector3 hitPositionWorld = info.HitPositionWorld;
-				_ = info.PointStart;
-				Vector3 normalized = info.ProjectileVelocity.normalized;
-				Vector3 normalized2 = info.HitNormalWorld.normalized;
-				baseEntity.transform.position = hitPositionWorld - normalized * 0.1f;
-				baseEntity.transform.rotation = Quaternion.LookRotation(-normalized);
+				baseEntity.transform.position = vector;
+				baseEntity.transform.rotation = rotation;
 				baseEntity.Spawn();
 				if (spreadAngle > 0f)
 				{

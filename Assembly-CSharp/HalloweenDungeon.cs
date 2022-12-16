@@ -10,9 +10,10 @@ public class HalloweenDungeon : BasePortal
 	public EntityRef<ProceduralDynamicDungeon> dungeonInstance;
 
 	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
-	public static float population;
+	public static float population = 0f;
 
-	public float lifetime = 600f;
+	[ServerVar(Help = "How long each active dungeon should last before dying", ShowInAdminUI = true)]
+	public static float lifetime = 600f;
 
 	private float secondsUsed;
 
@@ -23,6 +24,11 @@ public class HalloweenDungeon : BasePortal
 	public Translate.Phrase collapsePhrase;
 
 	public Translate.Phrase mountPhrase;
+
+	public virtual float GetLifetime()
+	{
+		return lifetime;
+	}
 
 	public override void Load(LoadInfo info)
 	{
@@ -37,7 +43,7 @@ public class HalloweenDungeon : BasePortal
 
 	public float GetLifeFraction()
 	{
-		return Mathf.Clamp01(secondsUsed / lifetime);
+		return Mathf.Clamp01(secondsUsed / GetLifetime());
 	}
 
 	public void Update()
@@ -137,24 +143,22 @@ public class HalloweenDungeon : BasePortal
 
 	public static Vector3 GetDungeonSpawnPoint()
 	{
-		float num = 200f;
-		float num2 = 200f;
-		float num3 = Mathf.Floor(TerrainMeta.Size.x / 200f);
-		float num4 = 1000f;
+		float num = Mathf.Floor(TerrainMeta.Size.x / 200f);
+		float num2 = 1000f;
 		Vector3 zero = Vector3.zero;
-		zero.x = 0f - Mathf.Min(TerrainMeta.Size.x, 4000f) + num;
-		zero.y = 1000f;
-		zero.z = 0f - Mathf.Min(TerrainMeta.Size.z, 4000f) + num;
+		zero.x = 0f - Mathf.Min(TerrainMeta.Size.x * 0.5f, 4000f) + 200f;
+		zero.y = 1025f;
+		zero.z = 0f - Mathf.Min(TerrainMeta.Size.z * 0.5f, 4000f) + 200f;
 		_ = Vector3.zero;
-		for (int i = 0; (float)i < num4; i++)
+		for (int i = 0; (float)i < num2; i++)
 		{
-			for (int j = 0; (float)j < num3; j++)
+			for (int j = 0; (float)j < num; j++)
 			{
-				Vector3 vector = zero + new Vector3((float)j * num, (float)i * num2, 0f);
+				Vector3 vector = zero + new Vector3((float)j * 200f, (float)i * 100f, 0f);
 				bool flag = false;
 				foreach (ProceduralDynamicDungeon dungeon in ProceduralDynamicDungeon.dungeons)
 				{
-					if (Vector3.Distance(dungeon.transform.position, vector) < 10f)
+					if (dungeon != null && dungeon.isServer && Vector3.Distance(dungeon.transform.position, vector) < 10f)
 					{
 						flag = true;
 						break;
@@ -193,8 +197,9 @@ public class HalloweenDungeon : BasePortal
 			return;
 		}
 		BaseEntity baseEntity = GameManager.server.CreateEntity(dungeonPrefab.resourcePath, dungeonSpawnPoint, Quaternion.identity);
-		baseEntity.Spawn();
 		ProceduralDynamicDungeon component = baseEntity.GetComponent<ProceduralDynamicDungeon>();
+		component.mapOffset = base.transform.position - dungeonSpawnPoint;
+		baseEntity.Spawn();
 		dungeonInstance.Set(component);
 		BasePortal basePortal = (targetPortal = component.GetExitPortal());
 		basePortal.targetPortal = this;

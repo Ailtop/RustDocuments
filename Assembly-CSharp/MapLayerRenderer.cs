@@ -5,6 +5,8 @@ using UnityEngine.Rendering;
 
 public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 {
+	private uint? _currentlyRenderedDungeon;
+
 	private int? _underwaterLabFloorCount;
 
 	public Camera renderCamera;
@@ -14,6 +16,75 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 	public Material renderMaterial;
 
 	private MapLayer? _currentlyRenderedLayer;
+
+	private void RenderDungeonsLayer()
+	{
+		ProceduralDynamicDungeon proceduralDynamicDungeon = FindDungeon(MainCamera.isValid ? MainCamera.position : Vector3.zero);
+		if (_currentlyRenderedLayer == MapLayer.Dungeons && _currentlyRenderedDungeon == proceduralDynamicDungeon?.net?.ID)
+		{
+			return;
+		}
+		_currentlyRenderedLayer = MapLayer.Dungeons;
+		_currentlyRenderedDungeon = proceduralDynamicDungeon?.net?.ID;
+		using CommandBuffer cb = BuildCommandBufferDungeons(proceduralDynamicDungeon);
+		RenderImpl(cb);
+	}
+
+	private CommandBuffer BuildCommandBufferDungeons(ProceduralDynamicDungeon closest)
+	{
+		CommandBuffer commandBuffer = new CommandBuffer
+		{
+			name = "DungeonsLayer Render"
+		};
+		if (closest != null && closest.spawnedCells != null)
+		{
+			Matrix4x4 matrix4x = Matrix4x4.Translate(closest.mapOffset);
+			{
+				foreach (ProceduralDungeonCell spawnedCell in closest.spawnedCells)
+				{
+					if (spawnedCell == null || spawnedCell.mapRenderers == null || spawnedCell.mapRenderers.Length == 0)
+					{
+						continue;
+					}
+					MeshRenderer[] mapRenderers = spawnedCell.mapRenderers;
+					foreach (MeshRenderer meshRenderer in mapRenderers)
+					{
+						if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out var component))
+						{
+							Mesh sharedMesh = component.sharedMesh;
+							int subMeshCount = sharedMesh.subMeshCount;
+							Matrix4x4 matrix = matrix4x * meshRenderer.transform.localToWorldMatrix;
+							for (int j = 0; j < subMeshCount; j++)
+							{
+								commandBuffer.DrawMesh(sharedMesh, matrix, renderMaterial, j);
+							}
+						}
+					}
+				}
+				return commandBuffer;
+			}
+		}
+		return commandBuffer;
+	}
+
+	public static ProceduralDynamicDungeon FindDungeon(Vector3 position, float maxDist = 200f)
+	{
+		ProceduralDynamicDungeon result = null;
+		float num = 100000f;
+		foreach (ProceduralDynamicDungeon dungeon in ProceduralDynamicDungeon.dungeons)
+		{
+			if (!(dungeon == null) && dungeon.isClient)
+			{
+				float num2 = Vector3.Distance(position, dungeon.transform.position);
+				if (!(num2 > maxDist) && !(num2 > num))
+				{
+					result = dungeon;
+					num = num2;
+				}
+			}
+		}
+		return result;
+	}
 
 	private void RenderTrainLayer()
 	{
@@ -107,20 +178,32 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 
 	public void Render(MapLayer layer)
 	{
-		if (layer == _currentlyRenderedLayer)
+		if (layer < MapLayer.TrainTunnels)
 		{
 			return;
 		}
-		_currentlyRenderedLayer = layer;
-		if (layer >= MapLayer.TrainTunnels)
+		if (layer == MapLayer.Dungeons)
 		{
-			if (layer == MapLayer.TrainTunnels)
+			RenderDungeonsLayer();
+		}
+		else if (layer != _currentlyRenderedLayer)
+		{
+			_currentlyRenderedLayer = layer;
+			switch (layer)
 			{
+			case MapLayer.TrainTunnels:
 				RenderTrainLayer();
-			}
-			else
-			{
+				break;
+			case MapLayer.Underwater1:
+			case MapLayer.Underwater2:
+			case MapLayer.Underwater3:
+			case MapLayer.Underwater4:
+			case MapLayer.Underwater5:
+			case MapLayer.Underwater6:
+			case MapLayer.Underwater7:
+			case MapLayer.Underwater8:
 				RenderUnderwaterLabs((int)(layer - 1));
+				break;
 			}
 		}
 	}

@@ -441,9 +441,9 @@ public class WireTool : HeldEntity
 		return false;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -567,9 +567,9 @@ public class WireTool : HeldEntity
 		iOEntity2.SendNetworkUpdate();
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
 	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	public void RequestChangeColor(RPCMessage msg)
 	{
 		if (!CanPlayerUseWires(msg.player))

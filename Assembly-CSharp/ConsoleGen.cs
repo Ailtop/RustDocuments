@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[893]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[902]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2387,6 +2387,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.admincheat = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "build_inside_check",
+			Parent = "antihack",
+			FullName = "antihack.build_inside_check",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.build_inside_check.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.build_inside_check = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -5120,6 +5133,22 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "cinematicgingerbreadcorpses",
+			Parent = "global",
+			FullName = "global.cinematicgingerbreadcorpses",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Description = "When enabled a player wearing a gingerbread suit will gib like the gingerbread NPC's",
+			Variable = true,
+			GetOveride = () => Global.cinematicGingerbreadCorpses.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.cinematicGingerbreadCorpses = str.ToBool();
+			},
+			Default = "False"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "clearallsprays",
 			Parent = "global",
 			FullName = "global.clearallsprays",
@@ -5189,6 +5218,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Global.developer = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "disablebagdropping",
+			Parent = "global",
+			FullName = "global.disablebagdropping",
+			ServerAdmin = true,
+			Description = "Disables the backpacks that appear after a corpse times out",
+			Variable = true,
+			GetOveride = () => Global.disableBagDropping.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Global.disableBagDropping = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8414,6 +8457,20 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "respawnatdeathposition",
+			Parent = "server",
+			FullName = "server.respawnatdeathposition",
+			ServerAdmin = true,
+			Description = "If a player presses the respawn button, respawn at their death location (for trailer filming)",
+			Variable = true,
+			GetOveride = () => Server.respawnAtDeathPosition.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.respawnAtDeathPosition = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "respawnresetrange",
 			Parent = "server",
 			FullName = "server.respawnresetrange",
@@ -8423,6 +8480,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.respawnresetrange = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "respawnwithloadout",
+			Parent = "server",
+			FullName = "server.respawnwithloadout",
+			ServerAdmin = true,
+			Description = "When a player respawns give them the loadout assigned to client.RespawnLoadout (created with inventory.saveloadout)",
+			Variable = true,
+			GetOveride = () => Server.respawnWithLoadout.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.respawnWithLoadout = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -10612,6 +10683,21 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "lifetime",
+			Parent = "halloweendungeon",
+			FullName = "halloweendungeon.lifetime",
+			ServerAdmin = true,
+			Description = "How long each active dungeon should last before dying",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => HalloweenDungeon.lifetime.ToString(),
+			SetOveride = delegate(string str)
+			{
+				HalloweenDungeon.lifetime = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "population",
 			Parent = "halloweendungeon",
 			FullName = "halloweendungeon.population",
@@ -11820,6 +11906,51 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Wolf.Population = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "playerdetectrange",
+			Parent = "xmasdungeon",
+			FullName = "xmasdungeon.playerdetectrange",
+			ServerAdmin = true,
+			Description = "How far we detect players from our inside/outside",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => XmasDungeon.playerdetectrange.ToString(),
+			SetOveride = delegate(string str)
+			{
+				XmasDungeon.playerdetectrange = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "xmaslifetime",
+			Parent = "xmasdungeon",
+			FullName = "xmasdungeon.xmaslifetime",
+			ServerAdmin = true,
+			Description = "How long each active dungeon should last before dying",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => XmasDungeon.xmaslifetime.ToString(),
+			SetOveride = delegate(string str)
+			{
+				XmasDungeon.xmaslifetime = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "xmaspopulation",
+			Parent = "xmasdungeon",
+			FullName = "xmasdungeon.xmaspopulation",
+			ServerAdmin = true,
+			Description = "Population active on the server",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => XmasDungeon.xmaspopulation.ToString(),
+			SetOveride = delegate(string str)
+			{
+				XmasDungeon.xmaspopulation = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

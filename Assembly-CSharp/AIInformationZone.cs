@@ -44,6 +44,8 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	private int pathFails;
 
+	private bool initd;
+
 	private static bool lastFrameAnyDirty = false;
 
 	private static float rebuildStartTime = 0f;
@@ -124,13 +126,22 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	public void Start()
 	{
-		AddInitialPoints();
-		areaBox = new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
-		zones.Add(this);
-		grid = GetComponent<AIInformationGrid>();
-		if (grid != null)
+		Init();
+	}
+
+	public void Init()
+	{
+		if (!initd)
 		{
-			grid.Init();
+			initd = true;
+			AddInitialPoints();
+			areaBox = new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
+			zones.Add(this);
+			grid = GetComponent<AIInformationGrid>();
+			if (grid != null)
+			{
+				grid.Init();
+			}
 		}
 	}
 

@@ -73,6 +73,10 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public float TurnSpeed = 10f;
 
+	public NavigationSpeed MoveTowardsSpeed = NavigationSpeed.Normal;
+
+	public bool FaceMoveTowardsTarget;
+
 	[Header("Speed Fractions")]
 	public float SlowestSpeedFraction = 0.16f;
 

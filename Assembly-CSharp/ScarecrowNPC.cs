@@ -1,21 +1,18 @@
 using ConVar;
 using Oxide.Core;
 using ProtoBuf;
-using Rust;
 using UnityEngine;
 
 public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 {
 	public float BaseAttackRate = 2f;
 
-	public float BaseAttackDamge = 10f;
-
-	public DamageType AttackDamageType = DamageType.Slash;
-
 	[Header("Loot")]
 	public LootContainer.LootSpawnSlot[] LootSpawnSlots;
 
 	public static float NextBeanCanAllowedTime;
+
+	public bool BlockClothingOnCorpse;
 
 	public bool RoamAroundHomePoint;
 
@@ -236,7 +233,8 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 	{
 		using (TimeWarning.New("Create corpse"))
 		{
-			NPCPlayerCorpse nPCPlayerCorpse = DropCorpse("assets/prefabs/npc/murderer/murderer_corpse.prefab") as NPCPlayerCorpse;
+			string text = "assets/prefabs/npc/murderer/murderer_corpse.prefab";
+			NPCPlayerCorpse nPCPlayerCorpse = DropCorpse(text) as NPCPlayerCorpse;
 			if ((bool)nPCPlayerCorpse)
 			{
 				nPCPlayerCorpse.transform.position = nPCPlayerCorpse.transform.position + Vector3.down * NavAgent.baseOffset;
@@ -244,7 +242,7 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 				nPCPlayerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
 				nPCPlayerCorpse.SetFlag(Flags.Reserved2, b: true);
 				nPCPlayerCorpse.TakeFrom(inventory.containerMain, inventory.containerWear, inventory.containerBelt);
-				nPCPlayerCorpse.playerName = OverrideCorpseName();
+				nPCPlayerCorpse.playerName = "Scarecrow";
 				nPCPlayerCorpse.playerSteamID = userID;
 				nPCPlayerCorpse.Spawn();
 				ItemContainer[] containers = nPCPlayerCorpse.containers;
@@ -254,7 +252,7 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 				}
 				if (LootSpawnSlots.Length != 0)
 				{
-					object obj = Interface.CallHook("OnCorpsePopulate", this, nPCPlayerCorpse);
+					object obj = Interface.CallHook("OnCorpsePopulate", this, text);
 					if (obj is BaseCorpse)
 					{
 						return (BaseCorpse)obj;
@@ -275,11 +273,6 @@ public class ScarecrowNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 			}
 			return nPCPlayerCorpse;
 		}
-	}
-
-	protected virtual string OverrideCorpseName()
-	{
-		return "Scarecrow";
 	}
 
 	public override void Hurt(HitInfo info)

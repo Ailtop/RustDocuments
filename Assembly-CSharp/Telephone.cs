@@ -677,9 +677,9 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.DestroyShared();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	public void UpdatePhoneName(RPCMessage msg)
 	{
 		Controller.UpdatePhoneName(msg);
@@ -701,9 +701,9 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.Server_AddSavedNumber(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	public void Server_RemoveSavedNumber(RPCMessage msg)
 	{
 		Controller.Server_RemoveSavedNumber(msg);

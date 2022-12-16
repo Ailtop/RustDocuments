@@ -60,6 +60,12 @@ public class Global : ConsoleSystem
 	[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
 	public static bool specnet = false;
 
+	[ClientVar]
+	[ServerVar(ClientAdmin = true, ServerAdmin = true, Help = "When enabled a player wearing a gingerbread suit will gib like the gingerbread NPC's")]
+	public static bool cinematicGingerbreadCorpses = false;
+
+	private static uint _gingerbreadMaterialID = 0u;
+
 	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "Multiplier applied to SprayDuration if a spray isn't in the sprayers auth (cannot go above 1f)")]
 	public static float SprayOutOfAuthMultiplier = 0.5f;
 
@@ -68,6 +74,9 @@ public class Global : ConsoleSystem
 
 	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "If a player sprays more than this, the oldest spray will be destroyed. 0 will disable")]
 	public static int MaxSpraysPerPlayer = 40;
+
+	[ServerVar(Help = "Disables the backpacks that appear after a corpse times out")]
+	public static bool disableBagDropping = false;
 
 	[ServerVar]
 	[ClientVar]
@@ -668,6 +677,15 @@ public class Global : ConsoleSystem
 			}
 		}
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
+	}
+
+	public static uint GingerbreadMaterialID()
+	{
+		if (_gingerbreadMaterialID == 0)
+		{
+			_gingerbreadMaterialID = StringPool.Get("Gingerbread");
+		}
+		return _gingerbreadMaterialID;
 	}
 
 	[ServerVar]

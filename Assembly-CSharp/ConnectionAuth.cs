@@ -60,7 +60,7 @@ public class ConnectionAuth : MonoBehaviour
 			Reject(connection, "Invalid SteamID");
 			return;
 		}
-		if (connection.protocol != 2365)
+		if (connection.protocol != 2366)
 		{
 			if (!DeveloperList.Contains(connection.userid))
 			{

@@ -21,6 +21,12 @@ public class BaseVehicle : BaseMountable
 		AlwaysHeadOnly = 2
 	}
 
+	public enum DismountStyle
+	{
+		Closest = 0,
+		Ordered = 1
+	}
+
 	[Serializable]
 	public class MountPointInfo
 	{
@@ -209,6 +215,8 @@ public class BaseVehicle : BaseMountable
 	public ClippingCheckMode clippingChecks;
 
 	public bool checkVehicleClipping;
+
+	public DismountStyle dismountStyle;
 
 	public bool shouldShowHudHealth;
 
@@ -1134,13 +1142,16 @@ public class BaseVehicle : BaseMountable
 			return baseVehicle.GetDismountPosition(player, out res);
 		}
 		List<Vector3> obj = Facepunch.Pool.GetList<Vector3>();
-		Vector3 visualCheckOrigin = player.TriggerPoint();
 		Transform[] array = dismountPositions;
 		foreach (Transform transform in array)
 		{
-			if (ValidDismountPosition(transform.transform.position, visualCheckOrigin))
+			if (ValidDismountPosition(player, transform.transform.position))
 			{
 				obj.Add(transform.transform.position);
+				if (dismountStyle == DismountStyle.Ordered)
+				{
+					break;
+				}
 			}
 		}
 		if (obj.Count == 0)

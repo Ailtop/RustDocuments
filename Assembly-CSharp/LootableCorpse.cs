@@ -179,7 +179,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 
 	public void DropItems()
 	{
-		if (containers != null)
+		if (!Global.disableBagDropping && containers != null)
 		{
 			DroppedItemContainer droppedItemContainer = ItemContainer.Drop("assets/prefabs/misc/item drop/item_drop_backpack.prefab", base.transform.position, Quaternion.identity, containers);
 			if (droppedItemContainer != null)
