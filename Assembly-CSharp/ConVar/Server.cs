@@ -94,6 +94,9 @@ public class Server : ConsoleSystem
 	public static float itemdespawn = 300f;
 
 	[ServerVar]
+	public static float itemdespawn_container_scale = 2f;
+
+	[ServerVar]
 	public static float itemdespawn_quick = 30f;
 
 	[ServerVar]

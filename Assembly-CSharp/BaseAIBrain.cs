@@ -11,7 +11,7 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAIDesign, IAIGroupable, IAIEventListener
+public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, global::IAIDesign, IAIGroupable, IAIEventListener
 {
 	public class BaseAttackState : BasicAIState
 	{
@@ -948,7 +948,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAID
 		disabled = !flag;
 	}
 
-	bool IAIDesign.CanPlayerDesignAI(BasePlayer player)
+	bool global::IAIDesign.CanPlayerDesignAI(BasePlayer player)
 	{
 		return PlayerCanDesignAI(player);
 	}
@@ -1024,7 +1024,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAID
 			EntityComponentBase[] array3 = components;
 			for (int j = 0; j < array3.Length; j++)
 			{
-				if (array3[j] is IAIDesign iAIDesign)
+				if (array3[j] is global::IAIDesign iAIDesign)
 				{
 					iAIDesign.LoadAIDesign(aIDesign, null);
 					break;
@@ -1033,12 +1033,12 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAID
 		}
 	}
 
-	void IAIDesign.StopDesigning()
+	void global::IAIDesign.StopDesigning()
 	{
 		ClearDesigningPlayer();
 	}
 
-	void IAIDesign.LoadAIDesign(ProtoBuf.AIDesign design, BasePlayer player)
+	void global::IAIDesign.LoadAIDesign(ProtoBuf.AIDesign design, BasePlayer player)
 	{
 		LoadAIDesign(design, player, loadedDesignIndex);
 	}
@@ -1277,7 +1277,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, IAID
 	private void StartMovementTick()
 	{
 		CancelInvoke(TickMovement);
-		InvokeRandomized(TickMovement, 1f, 0.1f, 0.0100000007f);
+		InvokeRandomized(TickMovement, 1f, 0.1f, 0.010000001f);
 	}
 
 	private void StopMovementTick()

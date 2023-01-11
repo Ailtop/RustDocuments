@@ -455,7 +455,8 @@ public class Item
 	public void Initialize(ItemDefinition template)
 	{
 		uid = Network.Net.sv.TakeUID();
-		float num2 = (condition = (maxCondition = info.condition.max));
+		float num = (maxCondition = info.condition.max);
+		condition = num;
 		OnItemCreated();
 	}
 
@@ -741,6 +742,8 @@ public class Item
 				{
 					ItemContainer itemContainer2 = parent;
 					int iTargetPos2 = position;
+					ItemContainer itemContainer3 = slot2.parent;
+					int num3 = slot2.position;
 					if (!slot2.CanMoveTo(itemContainer2, iTargetPos2))
 					{
 						return false;
@@ -751,8 +754,17 @@ public class Item
 					slot2.RemoveFromContainer();
 					RemoveConflictingSlots(newcontainer, entityOwner, sourcePlayer);
 					slot2.RemoveConflictingSlots(itemContainer2, entityOwner2, sourcePlayer);
-					slot2.MoveToContainer(itemContainer2, iTargetPos2, allowStack: true, ignoreStackLimit: false, sourcePlayer);
-					return MoveToContainer(newcontainer, iTargetPos, allowStack: true, ignoreStackLimit: false, sourcePlayer);
+					if (!slot2.MoveToContainer(itemContainer2, iTargetPos2, allowStack: true, ignoreStackLimit: false, sourcePlayer) || !MoveToContainer(newcontainer, iTargetPos, allowStack: true, ignoreStackLimit: false, sourcePlayer))
+					{
+						RemoveFromContainer();
+						slot2.RemoveFromContainer();
+						SetParent(itemContainer2);
+						position = iTargetPos2;
+						slot2.SetParent(itemContainer3);
+						slot2.position = num3;
+						return true;
+					}
+					return true;
 				}
 				return false;
 			}

@@ -69,7 +69,8 @@ public class NPCPlayerNavigator : BaseNavigator
 			}
 			else if (facingDirectionEntity != null)
 			{
-				Vector3 vector = (facingDirectionOverride = GetAimDirection(NPCPlayerEntity, facingDirectionEntity));
+				Vector3 aimDirection = GetAimDirection(NPCPlayerEntity, facingDirectionEntity);
+				facingDirectionOverride = aimDirection;
 				NPCPlayerEntity.SetAimDirection(facingDirectionOverride);
 			}
 		}

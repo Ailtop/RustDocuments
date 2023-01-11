@@ -80,7 +80,7 @@ public class Deployer : HeldEntity
 	public bool IsPlacementAngleAcceptable(Vector3 pos, Quaternion rot)
 	{
 		Vector3 lhs = rot * Vector3.up;
-		if (Mathf.Acos(Vector3.Dot(lhs, Vector3.up)) <= 0.610865235f)
+		if (Mathf.Acos(Vector3.Dot(lhs, Vector3.up)) <= 0.61086524f)
 		{
 			return true;
 		}

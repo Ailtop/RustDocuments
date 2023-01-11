@@ -19,7 +19,8 @@ public class Debugging : ConsoleSystem
 	[ServerVar]
 	public static bool checkparentingtriggers = true;
 
-	[ServerVar(Saved = false, Help = "Shows some debug info for dismount attempts.")]
+	[ServerVar]
+	[ClientVar(Saved = false, Help = "Shows some debug info for dismount attempts.")]
 	public static bool DebugDismounts = false;
 
 	[ServerVar(Help = "Do not damage any items")]

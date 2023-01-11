@@ -87,7 +87,7 @@ public class GodRaysRenderer : PostProcessEffectRenderer<GodRays>
 		{
 			DrawBorder(context, num);
 		}
-		float num3 = blurRadius * 0.00130208337f;
+		float num3 = blurRadius * 0.0013020834f;
 		propertySheet.properties.SetVector("_BlurRadius4", new Vector4(num3, num3, 0f, 0f));
 		propertySheet.properties.SetVector("_LightPosition", new Vector4(lightPos.x, lightPos.y, lightPos.z, maxRadius));
 		for (int i = 0; i < blurIterations; i++)

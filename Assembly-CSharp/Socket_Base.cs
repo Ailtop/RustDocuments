@@ -29,6 +29,8 @@ public class Socket_Base : PrefabAttribute
 	[NonSerialized]
 	public Quaternion rotation;
 
+	private Type cachedType;
+
 	public Vector3 selectSize = new Vector3(2f, 0.1f, 2f);
 
 	public Vector3 selectCenter = new Vector3(0f, 0f, 1f);
@@ -40,6 +42,11 @@ public class Socket_Base : PrefabAttribute
 	public SocketMod[] socketMods;
 
 	public OccupiedSocketCheck[] checkOccupiedSockets;
+
+	public Socket_Base()
+	{
+		cachedType = GetType();
+	}
 
 	public Vector3 GetSelectPivot(Vector3 position, Quaternion rotation)
 	{
@@ -88,7 +95,7 @@ public class Socket_Base : PrefabAttribute
 		{
 			return false;
 		}
-		return socket.GetType() == GetType();
+		return socket.cachedType == cachedType;
 	}
 
 	public virtual bool CanConnect(Vector3 position, Quaternion rotation, Socket_Base socket, Vector3 socketPosition, Quaternion socketRotation)

@@ -588,14 +588,14 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 		else
 		{
-			switch (TerrainMeta.BiomeMap.GetBiomeMaxType(base.transform.position))
+			switch ((TerrainBiome.Enum)TerrainMeta.BiomeMap.GetBiomeMaxType(base.transform.position))
 			{
-			case 8:
+			case TerrainBiome.Enum.Arctic:
 				WaterQuality = 0.1f;
 				break;
-			case 1:
-			case 2:
-			case 4:
+			case TerrainBiome.Enum.Arid:
+			case TerrainBiome.Enum.Temperate:
+			case TerrainBiome.Enum.Tundra:
 				WaterQuality = 0.3f;
 				break;
 			default:
@@ -643,16 +643,16 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 
 	public float GetGroundTypeValue(Vector3 pos)
 	{
-		return TerrainMeta.SplatMap.GetSplatMaxType(pos) switch
+		return (TerrainSplat.Enum)TerrainMeta.SplatMap.GetSplatMaxType(pos) switch
 		{
-			16 => 0.3f, 
-			2 => 0f, 
-			8 => 0f, 
-			64 => 0f, 
-			1 => 0.3f, 
-			32 => 0.2f, 
-			4 => 0f, 
-			128 => 0f, 
+			TerrainSplat.Enum.Grass => 0.3f, 
+			TerrainSplat.Enum.Snow => 0f, 
+			TerrainSplat.Enum.Rock => 0f, 
+			TerrainSplat.Enum.Stones => 0f, 
+			TerrainSplat.Enum.Dirt => 0.3f, 
+			TerrainSplat.Enum.Forest => 0.2f, 
+			TerrainSplat.Enum.Sand => 0f, 
+			TerrainSplat.Enum.Gravel => 0f, 
 			_ => 0.5f, 
 		};
 	}
@@ -1049,9 +1049,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);

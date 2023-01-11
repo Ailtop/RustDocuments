@@ -31,6 +31,7 @@ public class DroppedItem : WorldItem
 
 	public void IdleDestroy()
 	{
+		Interface.CallHook("OnItemDespawn", item);
 		DestroyItem();
 		Kill();
 	}

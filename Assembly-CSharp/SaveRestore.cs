@@ -18,6 +18,117 @@ using UnityEngine.Assertions;
 
 public class SaveRestore : SingletonComponent<SaveRestore>
 {
+	[CompilerGenerated]
+	private sealed class _003CDoAutomatedSave_003Ed__13 : IEnumerator<object>, IEnumerator, IDisposable
+	{
+		private int _003C_003E1__state;
+
+		private object _003C_003E2__current;
+
+		public bool AndWait;
+
+		public SaveRestore _003C_003E4__this;
+
+		private string _003Cfolder_003E5__2;
+
+		object IEnumerator<object>.Current
+		{
+			[DebuggerHidden]
+			get
+			{
+				return _003C_003E2__current;
+			}
+		}
+
+		object IEnumerator.Current
+		{
+			[DebuggerHidden]
+			get
+			{
+				return _003C_003E2__current;
+			}
+		}
+
+		[DebuggerHidden]
+		public _003CDoAutomatedSave_003Ed__13(int _003C_003E1__state)
+		{
+			this._003C_003E1__state = _003C_003E1__state;
+		}
+
+		[DebuggerHidden]
+		void IDisposable.Dispose()
+		{
+		}
+
+		private bool MoveNext()
+		{
+			int num = _003C_003E1__state;
+			SaveRestore saveRestore = _003C_003E4__this;
+			switch (num)
+			{
+			default:
+				return false;
+			case 0:
+				_003C_003E1__state = -1;
+				IsSaving = true;
+				_003Cfolder_003E5__2 = ConVar.Server.rootFolder;
+				if (!AndWait)
+				{
+					_003C_003E2__current = CoroutineEx.waitForEndOfFrame;
+					_003C_003E1__state = 1;
+					return true;
+				}
+				goto IL_0061;
+			case 1:
+				_003C_003E1__state = -1;
+				goto IL_0061;
+			case 2:
+				_003C_003E1__state = -1;
+				goto IL_00d0;
+			case 3:
+				{
+					_003C_003E1__state = -1;
+					break;
+				}
+				IL_0061:
+				if (AndWait)
+				{
+					IEnumerator enumerator = Save(_003Cfolder_003E5__2 + "/" + World.SaveFileName, AndWait);
+					while (enumerator.MoveNext())
+					{
+					}
+					goto IL_00d0;
+				}
+				_003C_003E2__current = saveRestore.StartCoroutine(Save(_003Cfolder_003E5__2 + "/" + World.SaveFileName, AndWait));
+				_003C_003E1__state = 2;
+				return true;
+				IL_00d0:
+				if (!AndWait)
+				{
+					_003C_003E2__current = CoroutineEx.waitForEndOfFrame;
+					_003C_003E1__state = 3;
+					return true;
+				}
+				break;
+			}
+			UnityEngine.Debug.Log("Saving complete");
+			IsSaving = false;
+			return false;
+		}
+
+		bool IEnumerator.MoveNext()
+		{
+			//ILSpy generated this explicit interface implementation from .override directive in MoveNext
+			return this.MoveNext();
+		}
+
+		[DebuggerHidden]
+		void IEnumerator.Reset()
+		{
+			throw new NotSupportedException();
+		}
+	}
+
 	public static bool IsSaving = false;
 
 	public static DateTime SaveCreatedTime;
@@ -81,7 +192,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 					binaryReader.ReadChar();
 					SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 				}
-				if (binaryReader.ReadUInt32() != 231)
+				if (binaryReader.ReadUInt32() != 232)
 				{
 					if (allowOutOfDateSaves)
 					{
@@ -357,7 +468,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			writer.Write((sbyte)82);
 			writer.Write((sbyte)68);
 			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(231u);
+			writer.Write(232u);
 			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 			saveInfo.forDisk = true;
 			if (!AndWait)

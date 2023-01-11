@@ -90,6 +90,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public bool LongUseOnly;
 
+		public bool PrioritizeIfNotWhitelisted;
+
+		public bool PrioritizeIfUnlocked;
+
 		public Menu()
 		{
 		}
@@ -129,7 +133,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Reserved8 = 0x10000,
 		Reserved9 = 0x20000,
 		Reserved10 = 0x40000,
-		Reserved11 = 0x80000
+		Reserved11 = 0x80000,
+		InUse = 0x100000
 	}
 
 	private readonly struct QueuedFileRequest : IEquatable<QueuedFileRequest>

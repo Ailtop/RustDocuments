@@ -164,7 +164,8 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		{
 			if (msg.player != null)
 			{
-				ulong num = (AssignedRadioBy = msg.player.userID);
+				ulong userID = msg.player.userID;
+				AssignedRadioBy = userID;
 			}
 			CurrentRadioIp = text;
 			base.baseEntity.ClientRPC(null, "OnRadioIPChanged", CurrentRadioIp);

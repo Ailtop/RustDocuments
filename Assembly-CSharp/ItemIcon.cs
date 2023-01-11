@@ -7,7 +7,7 @@ public class ItemIcon : BaseMonoBehaviour, IPointerClickHandler, IEventSystemHan
 {
 	private Color backgroundColor;
 
-	public Color selectedBackgroundColor = new Color(0.121568628f, 0.419607848f, 32f / 51f, 40f / 51f);
+	public Color selectedBackgroundColor = new Color(0.12156863f, 0.41960785f, 32f / 51f, 40f / 51f);
 
 	public float unoccupiedAlpha = 1f;
 

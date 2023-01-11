@@ -242,12 +242,13 @@ public class NeonSign : Signage
 		info.msg.neonSign.animationSpeed = animationSpeed;
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void SetAnimationSpeed(RPCMessage msg)
 	{
-		float num = (animationSpeed = Mathf.Clamp(msg.read.Float(), 0.5f, 5f));
+		float num = Mathf.Clamp(msg.read.Float(), 0.5f, 5f);
+		animationSpeed = num;
 		if (isAnimating)
 		{
 			CancelInvoke(animationLoopAction);

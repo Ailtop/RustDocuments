@@ -53,7 +53,7 @@ public class GenerateRailSiding : ProceduralComponent
 			return;
 		}
 		int min = Mathf.RoundToInt(40f);
-		int max = Mathf.RoundToInt(53.3333321f);
+		int max = Mathf.RoundToInt(53.333332f);
 		int min2 = Mathf.RoundToInt(13.333333f);
 		int max2 = Mathf.RoundToInt(20f);
 		float num = 16f * 16f;

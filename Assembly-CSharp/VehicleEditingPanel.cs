@@ -88,6 +88,9 @@ public class VehicleEditingPanel : LootPanel
 	private Translate.Phrase phraseBadOccupant;
 
 	[SerializeField]
+	private Translate.Phrase phrasePlayerObstructing;
+
+	[SerializeField]
 	private Translate.Phrase phraseNotDriveable;
 
 	[SerializeField]

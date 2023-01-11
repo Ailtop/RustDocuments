@@ -52,7 +52,7 @@ public class GenerateRailBranching : ProceduralComponent
 			return;
 		}
 		int min = Mathf.RoundToInt(40f);
-		int max = Mathf.RoundToInt(53.3333321f);
+		int max = Mathf.RoundToInt(53.333332f);
 		int min2 = Mathf.RoundToInt(40f);
 		int max2 = Mathf.RoundToInt(120f);
 		float num = 120f * 120f;

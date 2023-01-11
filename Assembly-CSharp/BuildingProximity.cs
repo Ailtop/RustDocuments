@@ -125,7 +125,7 @@ public class BuildingProximity : PrefabAttribute
 				}
 			}
 		}
-		if (!result.hit)
+		if (construction1.isServer)
 		{
 			for (int k = 0; k < construction1.allSockets.Length; k++)
 			{

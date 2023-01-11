@@ -96,6 +96,10 @@ public class AntiHack : ConsoleSystem
 	public static float noclip_margin = 0.09f;
 
 	[ServerVar]
+	[Help("collider margin when checking for noclipping on dismount")]
+	public static float noclip_margin_dismount = 0.22f;
+
+	[ServerVar]
 	[Help("collider backtracking when checking for noclipping")]
 	public static float noclip_backtracking = 0.01f;
 
@@ -321,7 +325,7 @@ public class AntiHack : ConsoleSystem
 
 	[ServerVar]
 	[Help("whether or not to check for building being done on the wrong side of something (e.g. inside rocks). 0 = Disabled, 1 = Info only, 2 = Enabled")]
-	public static int build_inside_check = 0;
+	public static int build_inside_check = 1;
 
 	[ServerVar]
 	[Help("0 == silent, 1 == print max violation, 2 == print nonzero violation, 3 == print any violation except noclip, 4 == print any violation")]

@@ -590,7 +590,7 @@ public class SprayCan : HeldEntity
 
 	private bool CanEntityBeRespawned(BaseEntity targetEntity, out SprayFailReason reason)
 	{
-		if (targetEntity is BaseMountable baseMountable && baseMountable.IsMounted())
+		if (targetEntity is BaseMountable baseMountable && baseMountable.AnyMounted())
 		{
 			reason = SprayFailReason.MountedBlocked;
 			return false;

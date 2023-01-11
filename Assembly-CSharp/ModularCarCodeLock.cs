@@ -192,6 +192,11 @@ public class ModularCarCodeLock
 
 	public bool TryOpenWithCode(BasePlayer player, string codeEntered)
 	{
+		object obj = Interface.CallHook("CanUnlock", player, this, codeEntered);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (CodeEntryBlocked(player))
 		{
 			return false;

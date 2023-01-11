@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Facepunch;
 using ProtoBuf;
 using Rust;
@@ -24,6 +25,10 @@ public class HalloweenDungeon : BasePortal
 	public Translate.Phrase collapsePhrase;
 
 	public Translate.Phrase mountPhrase;
+
+	private bool anyplayers_cached;
+
+	private float nextPlayerCheckTime = float.NegativeInfinity;
 
 	public virtual float GetLifetime()
 	{
@@ -59,18 +64,66 @@ public class HalloweenDungeon : BasePortal
 			if (dungeonInstance.IsValid(serverside: true))
 			{
 				ProceduralDynamicDungeon proceduralDynamicDungeon = dungeonInstance.Get(serverside: true);
-				float value = radiationCurve.Evaluate(lifeFraction) * 100f;
+				float value = radiationCurve.Evaluate(lifeFraction) * 80f;
 				proceduralDynamicDungeon.exitRadiation.RadiationAmountOverride = Mathf.Clamp(value, 0f, float.PositiveInfinity);
 			}
 			if (lifeFraction >= 1f)
 			{
-				Kill();
+				KillIfNoPlayers();
 			}
 			else if (timeAlive > 3600f && secondsUsed == 0f)
 			{
+				ClearAllEntitiesInRadius(80f);
 				Kill();
 			}
 		}
+	}
+
+	public void KillIfNoPlayers()
+	{
+		if (!AnyPlayersInside())
+		{
+			ClearAllEntitiesInRadius(80f);
+			Kill();
+		}
+	}
+
+	public bool AnyPlayersInside()
+	{
+		ProceduralDynamicDungeon proceduralDynamicDungeon = dungeonInstance.Get(serverside: true);
+		if (proceduralDynamicDungeon == null)
+		{
+			anyplayers_cached = false;
+		}
+		else if (Time.time > nextPlayerCheckTime)
+		{
+			nextPlayerCheckTime = Time.time + 10f;
+			anyplayers_cached = BaseNetworkable.HasCloseConnections(proceduralDynamicDungeon.transform.position, 80f);
+		}
+		return anyplayers_cached;
+	}
+
+	private void ClearAllEntitiesInRadius(float radius)
+	{
+		ProceduralDynamicDungeon proceduralDynamicDungeon = dungeonInstance.Get(serverside: true);
+		if (proceduralDynamicDungeon == null)
+		{
+			return;
+		}
+		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
+		Vis.Entities(proceduralDynamicDungeon.transform.position, radius, obj);
+		foreach (BaseEntity item in obj)
+		{
+			if (BaseNetworkableEx.IsValid(item) && !item.IsDestroyed)
+			{
+				if (item is LootableCorpse lootableCorpse)
+				{
+					lootableCorpse.blockBagDrop = true;
+				}
+				item.Kill();
+			}
+		}
+		Pool.FreeList(ref obj);
 	}
 
 	public override void Save(SaveInfo info)

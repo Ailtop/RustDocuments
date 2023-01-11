@@ -9,7 +9,7 @@ public class IOEntityMovementChecker : FacepunchBehaviour
 
 	private const float MAX_MOVE = 0.05f;
 
-	private const float MAX_MOVE_SQR = 0.00250000018f;
+	private const float MAX_MOVE_SQR = 0.0025000002f;
 
 	protected void Awake()
 	{
@@ -28,7 +28,7 @@ public class IOEntityMovementChecker : FacepunchBehaviour
 
 	private void CheckPosition()
 	{
-		if (!ioEntity.isClient && Vector3.SqrMagnitude(base.transform.position - prevPos) > 0.00250000018f)
+		if (!ioEntity.isClient && Vector3.SqrMagnitude(base.transform.position - prevPos) > 0.0025000002f)
 		{
 			prevPos = base.transform.position;
 			if (ioEntity.HasConnections())

@@ -421,7 +421,7 @@ public class MLRS : BaseMountable
 		}
 		int rocketAmmoCount = RocketAmmoCount;
 		UpdateStorageState();
-		if (CanBeUsed && IsMounted())
+		if (CanBeUsed && AnyMounted())
 		{
 			Vector3 userTargetHitPos = UserTargetHitPos;
 			userTargetHitPos += Vector3.forward * upDownInput * 75f * UnityEngine.Time.fixedDeltaTime;

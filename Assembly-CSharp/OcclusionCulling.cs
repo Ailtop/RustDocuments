@@ -496,7 +496,8 @@ public class OcclusionCulling : MonoBehaviour
 			if (array.Length < min)
 			{
 				int num = ((array.Length == 0) ? 16 : (array.Length * 2));
-				num = (Capacity = ((num < min) ? min : num));
+				num = ((num < min) ? min : num);
+				Capacity = num;
 			}
 		}
 	}
@@ -629,7 +630,8 @@ public class OcclusionCulling : MonoBehaviour
 			if (list.Length < min)
 			{
 				int num = ((list.Length == 0) ? 16 : (list.Length * 2));
-				num = (Capacity = ((num < min) ? min : num));
+				num = ((num < min) ? min : num);
+				Capacity = num;
 			}
 		}
 	}

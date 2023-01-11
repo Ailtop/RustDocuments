@@ -281,7 +281,7 @@ public class CH47AIBrain : BaseAIBrain
 				{
 					foreach (BaseVehicle.MountPointInfo mountPoint in cH47HelicopterAIController.mountPoints)
 					{
-						if ((bool)mountPoint.mountable && mountPoint.mountable.IsMounted())
+						if ((bool)mountPoint.mountable && mountPoint.mountable.AnyMounted())
 						{
 							nextDismountTime = Time.time + 0.5f;
 							mountPoint.mountable.DismountAllPlayers();

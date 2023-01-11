@@ -93,6 +93,9 @@ public class ModularCarGarage : ContainerIOEntity
 	[SerializeField]
 	private GameObjectRef repairEffect;
 
+	[SerializeField]
+	private TriggerBase playerTrigger;
+
 	public ChassisBuildOption[] chassisBuildOptions;
 
 	public ItemAmount lockResourceCost;
@@ -103,11 +106,13 @@ public class ModularCarGarage : ContainerIOEntity
 
 	public Vector3 downPos;
 
-	public const Flags DestroyingChassis = Flags.Reserved6;
+	public const Flags Flag_DestroyingChassis = Flags.Reserved6;
 
 	public const float TimeToDestroyChassis = 10f;
 
-	public const Flags EnteringKeycode = Flags.Reserved7;
+	public const Flags Flag_EnteringKeycode = Flags.Reserved7;
+
+	public const Flags Flag_PlayerObstructing = Flags.Reserved8;
 
 	public ModularCar carOccupant
 	{
@@ -150,6 +155,8 @@ public class ModularCarGarage : ContainerIOEntity
 	public bool IsDestroyingChassis => HasFlag(Flags.Reserved6);
 
 	private bool IsEnteringKeycode => HasFlag(Flags.Reserved7);
+
+	public bool PlayerObstructingLift => HasFlag(Flags.Reserved8);
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -601,6 +608,14 @@ public class ModularCarGarage : ContainerIOEntity
 		{
 			return;
 		}
+		if (playerTrigger != null)
+		{
+			bool hasAnyContents = playerTrigger.HasAnyContents;
+			if (PlayerObstructingLift != hasAnyContents)
+			{
+				SetFlag(Flags.Reserved8, hasAnyContents);
+			}
+		}
 		UpdateCarOccupant();
 		if (HasOccupant && carOccupant.CouldBeEdited() && carOccupant.GetSpeed() <= 1f)
 		{
@@ -729,7 +744,7 @@ public class ModularCarGarage : ContainerIOEntity
 		{
 			if (HasOccupant)
 			{
-				bool editableOccupant = Vector3.SqrMagnitude(carOccupant.transform.position - vehicleLiftPos.position) < 1f && carOccupant.CouldBeEdited();
+				bool editableOccupant = Vector3.SqrMagnitude(carOccupant.transform.position - vehicleLiftPos.position) < 1f && carOccupant.CouldBeEdited() && !PlayerObstructingLift;
 				bool driveableOccupant = carOccupant.IsComplete();
 				SetOccupantState(occupantLockState: carOccupant.CarLock.CanHaveALock() ? ((!carOccupant.CarLock.HasALock) ? OccupantLock.NoLock : OccupantLock.HasLock) : OccupantLock.CannotHaveLock, hasOccupant: HasOccupant, editableOccupant: editableOccupant, driveableOccupant: driveableOccupant);
 			}
@@ -845,9 +860,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenEditing(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -943,11 +958,15 @@ public class ModularCarGarage : ContainerIOEntity
 			return;
 		}
 		BasePlayer player = msg.player;
-		if (!(player == null))
+		if (player == null)
 		{
-			string code = msg.read.String();
+			return;
+		}
+		string text = msg.read.String();
+		if (Interface.CallHook("OnVehicleLockRequest", this, player, text) == null)
+		{
 			ItemAmount itemAmount = lockResourceCost;
-			if ((float)player.inventory.GetAmount(itemAmount.itemDef.itemid) >= itemAmount.amount && carOccupant.CarLock.TryAddALock(code, player.userID))
+			if ((float)player.inventory.GetAmount(itemAmount.itemDef.itemid) >= itemAmount.amount && carOccupant.CarLock.TryAddALock(text, player.userID))
 			{
 				player.inventory.Take(null, itemAmount.itemDef.itemid, Mathf.CeilToInt(itemAmount.amount));
 				Effect.server.Run(addRemoveLockEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
@@ -955,9 +974,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_RequestRemoveLock(RPCMessage msg)
 	{
 		if (HasOccupant && carOccupant.CarLock.HasALock)
@@ -967,9 +986,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_RequestNewCode(RPCMessage msg)
 	{
 		if (!HasOccupant || !carOccupant.CarLock.HasALock)
@@ -987,10 +1006,10 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_StartDestroyingChassis(RPCMessage msg)
 	{
 		if (!carOccupant.HasAnyModules)
@@ -1000,10 +1019,10 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_StopDestroyingChassis(RPCMessage msg)
 	{
 		StopChassisDestroy();

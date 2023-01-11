@@ -520,7 +520,7 @@ public class SpawnHandler : SingletonComponent<SpawnHandler>
 		float num2 = population.GetCurrentSpawnDensity();
 		if (!population.ScaleWithLargeMaps)
 		{
-			num = Mathf.Min(num, 1.6E+07f);
+			num = Mathf.Min(num, 16000000f);
 		}
 		if (population.ScaleWithSpawnFilter)
 		{

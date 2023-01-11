@@ -36,7 +36,8 @@ public class JiggleBone : BaseMonoBehaviour
 
 	private void Awake()
 	{
-		Vector3 vector = (dynamicPos = base.transform.position + base.transform.TransformDirection(new Vector3(boneAxis.x * targetDistance, boneAxis.y * targetDistance, boneAxis.z * targetDistance)));
+		Vector3 vector = base.transform.position + base.transform.TransformDirection(new Vector3(boneAxis.x * targetDistance, boneAxis.y * targetDistance, boneAxis.z * targetDistance));
+		dynamicPos = vector;
 	}
 
 	private void LateUpdate()

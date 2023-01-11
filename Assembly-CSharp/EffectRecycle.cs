@@ -1,6 +1,6 @@
 using UnityEngine.Serialization;
 
-public class EffectRecycle : BaseMonoBehaviour, IClientComponent, IRagdollInhert, IEffectRecycle
+public class EffectRecycle : BaseMonoBehaviour, IClientComponent, global::IRagdollInhert, IEffectRecycle
 {
 	public enum PlayMode
 	{

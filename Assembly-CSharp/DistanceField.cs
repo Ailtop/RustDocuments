@@ -74,7 +74,7 @@ public class DistanceField
 				int num17 = num16 - 1;
 				int num18 = num16 + 1;
 				float num19 = array3[num14];
-				if (array3[num17] + 1.41421354f < num19)
+				if (array3[num17] + 1.4142135f < num19)
 				{
 					num19 = (array3[num14] = Vector2Ex.Length(num13 - (array[num14] = array[num17]), num11 - (array2[num14] = array2[num17])));
 				}
@@ -82,7 +82,7 @@ public class DistanceField
 				{
 					num19 = (array3[num14] = Vector2Ex.Length(num13 - (array[num14] = array[num16]), num11 - (array2[num14] = array2[num16])));
 				}
-				if (array3[num18] + 1.41421354f < num19)
+				if (array3[num18] + 1.4142135f < num19)
 				{
 					num19 = (array3[num14] = Vector2Ex.Length(num13 - (array[num14] = array[num18]), num11 - (array2[num14] = array2[num18])));
 				}
@@ -113,7 +113,7 @@ public class DistanceField
 				{
 					num28 = (array3[num23] = Vector2Ex.Length(num22 - (array[num23] = array[num24]), num20 - (array2[num23] = array2[num24])));
 				}
-				if (array3[num26] + 1.41421354f < num28)
+				if (array3[num26] + 1.4142135f < num28)
 				{
 					num28 = (array3[num23] = Vector2Ex.Length(num22 - (array[num23] = array[num26]), num20 - (array2[num23] = array2[num26])));
 				}

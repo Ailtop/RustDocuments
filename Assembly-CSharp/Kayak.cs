@@ -78,7 +78,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 		int num = 0;
 		foreach (MountPointInfo allMountPoint in base.allMountPoints)
 		{
-			if (allMountPoint.mountable != null && allMountPoint.mountable.IsMounted())
+			if (allMountPoint.mountable != null && allMountPoint.mountable.AnyMounted())
 			{
 				num++;
 			}
@@ -158,7 +158,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 			distanceRemainder = num - num2;
 			foreach (MountPointInfo allMountPoint in base.allMountPoints)
 			{
-				if (allMountPoint.mountable != null && allMountPoint.mountable.IsMounted() && (int)num2 > 0)
+				if (allMountPoint.mountable != null && allMountPoint.mountable.AnyMounted() && (int)num2 > 0)
 				{
 					allMountPoint.mountable.GetMounted().stats.Add("kayak_distance_travelled", (int)num2);
 					allMountPoint.mountable.GetMounted().stats.Save(forceSteamSave: true);

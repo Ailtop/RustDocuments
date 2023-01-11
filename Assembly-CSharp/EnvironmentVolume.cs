@@ -16,6 +16,22 @@ public class EnvironmentVolume : MonoBehaviour
 		UpdateTrigger();
 	}
 
+	protected void OnEnable()
+	{
+		if ((bool)trigger && !trigger.enabled)
+		{
+			trigger.enabled = true;
+		}
+	}
+
+	protected void OnDisable()
+	{
+		if ((bool)trigger && trigger.enabled)
+		{
+			trigger.enabled = false;
+		}
+	}
+
 	public void UpdateTrigger()
 	{
 		if (!trigger)

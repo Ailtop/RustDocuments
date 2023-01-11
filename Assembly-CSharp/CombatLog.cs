@@ -97,7 +97,7 @@ public class CombatLog
 			distance = (hitInfo.IsProjectile() ? hitInfo.ProjectileDistance : Vector3.Distance(hitInfo.PointStart, hitInfo.HitPositionWorld));
 			if (hitInfo.Initiator is BasePlayer basePlayer && hitInfo.HitEntity != hitInfo.Initiator)
 			{
-				val.attacker_dead = basePlayer.IsDead();
+				val.attacker_dead = basePlayer.IsDead() || basePlayer.IsWounded();
 			}
 		}
 		float health_new = ((hitEntity != null) ? hitEntity.Health() : 0f);

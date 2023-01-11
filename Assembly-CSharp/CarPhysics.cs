@@ -238,10 +238,7 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 					num3 = Mathf.Lerp(1f, 2.75f, t);
 				}
 				maxDriveForce *= num3;
-				if (car.IsOn())
-				{
-					ComputeSteerAngle(num2, steerInput, dt, speed);
-				}
+				ComputeSteerAngle(num2, steerInput, dt, speed);
 				if ((float)timeSinceWaterCheck > 0.25f)
 				{
 					float a = car.WaterFactor();
@@ -514,35 +511,35 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		{
 			wd.tyreSlip.x = wd.localVelocity.x;
 			wd.tyreSlip.y = wd.localVelocity.y - wd.angularVelocity * wd.wheelCollider.radius;
-			VehicleTerrainHandler.Surface onSurface = car.OnSurface;
-			float num7 = wd.wheel.tyreFriction * wd.downforce * onSurface switch
+			float num7 = car.OnSurface switch
 			{
 				VehicleTerrainHandler.Surface.Road => 1f, 
 				VehicleTerrainHandler.Surface.Ice => 0.25f, 
 				VehicleTerrainHandler.Surface.Frictionless => 0f, 
 				_ => 0.75f, 
 			};
-			float num8 = 0f;
+			float num8 = wd.wheel.tyreFriction * wd.downforce * num7;
+			float num9 = 0f;
 			if (!wd.isBraking)
 			{
-				num8 = Mathf.Min(Mathf.Abs(num6 * wd.tyreSlip.x) / num7, num2);
-				if (num6 != 0f && num8 < 0.1f)
+				num9 = Mathf.Min(Mathf.Abs(num6 * wd.tyreSlip.x) / num8, num2);
+				if (num6 != 0f && num9 < 0.1f)
 				{
-					num8 = 0.1f;
+					num9 = 0.1f;
 				}
 			}
-			if (Mathf.Abs(wd.tyreSlip.y) < num8)
+			if (Mathf.Abs(wd.tyreSlip.y) < num9)
 			{
-				wd.tyreSlip.y = num8 * Mathf.Sign(wd.tyreSlip.y);
+				wd.tyreSlip.y = num9 * Mathf.Sign(wd.tyreSlip.y);
 			}
-			Vector2 vector = (0f - num7) * wd.tyreSlip.normalized;
+			Vector2 vector = (0f - num8) * wd.tyreSlip.normalized;
 			vector.x = Mathf.Abs(vector.x) * 1.5f;
 			vector.y = Mathf.Abs(vector.y);
 			wd.tyreForce.x = Mathf.Clamp(wd.localRigForce.x, 0f - vector.x, vector.x);
 			if (wd.isBraking)
 			{
-				float num9 = Mathf.Min(vector.y, num6);
-				wd.tyreForce.y = Mathf.Clamp(wd.localRigForce.y, 0f - num9, num9);
+				float num10 = Mathf.Min(vector.y, num6);
+				wd.tyreForce.y = Mathf.Clamp(wd.localRigForce.y, 0f - num10, num10);
 			}
 			else
 			{
@@ -556,30 +553,30 @@ public class CarPhysics<TCar> where TCar : BaseVehicle, CarPhysics<TCar>.ICar
 		}
 		if (wd.isGrounded)
 		{
-			float num10;
+			float num11;
 			if (wd.isBraking)
 			{
-				num10 = 0f;
+				num11 = 0f;
 			}
 			else
 			{
 				float driveForceToMaxSlip = vehicleSettings.driveForceToMaxSlip;
-				num10 = Mathf.Clamp01((Mathf.Abs(num6) - Mathf.Abs(wd.tyreForce.y)) / driveForceToMaxSlip) * num2 * Mathf.Sign(num6);
+				num11 = Mathf.Clamp01((Mathf.Abs(num6) - Mathf.Abs(wd.tyreForce.y)) / driveForceToMaxSlip) * num2 * Mathf.Sign(num6);
 			}
-			wd.angularVelocity = (wd.localVelocity.y + num10) / wd.wheelCollider.radius;
+			wd.angularVelocity = (wd.localVelocity.y + num11) / wd.wheelCollider.radius;
 			return;
 		}
-		float num11 = 50f;
-		float num12 = 10f;
+		float num12 = 50f;
+		float num13 = 10f;
 		if (num > 0f)
 		{
-			wd.angularVelocity += num11 * num;
+			wd.angularVelocity += num12 * num;
 		}
 		else
 		{
-			wd.angularVelocity -= num12;
+			wd.angularVelocity -= num13;
 		}
-		wd.angularVelocity -= num11 * brakeInput;
+		wd.angularVelocity -= num12 * brakeInput;
 		wd.angularVelocity = Mathf.Clamp(wd.angularVelocity, 0f, maxSpeed / wd.wheelCollider.radius);
 	}
 

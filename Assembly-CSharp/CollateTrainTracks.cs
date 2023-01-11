@@ -4,7 +4,7 @@ public class CollateTrainTracks : ProceduralComponent
 {
 	private const float MAX_NODE_DIST = 0.1f;
 
-	private const float MAX_NODE_DIST_SQR = 0.0100000007f;
+	private const float MAX_NODE_DIST_SQR = 0.010000001f;
 
 	private const float MAX_NODE_ANGLE = 10f;
 
@@ -139,7 +139,7 @@ public class CollateTrainTracks : ProceduralComponent
 		}
 		static bool NodesConnect(Vector3 ourPos, Vector3 theirPos, Vector3 ourTangent, Vector3 theirTangent)
 		{
-			if (Vector3.SqrMagnitude(ourPos - theirPos) < 0.0100000007f)
+			if (Vector3.SqrMagnitude(ourPos - theirPos) < 0.010000001f)
 			{
 				return Vector3.Angle(ourTangent, theirTangent) < 10f;
 			}

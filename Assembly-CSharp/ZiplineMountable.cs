@@ -82,7 +82,7 @@ public class ZiplineMountable : BaseMountable
 		if (applyDismountOffset && linePoints != null)
 		{
 			Vector3 normalized = (linePoints[linePoints.Count - 2] - linePoints[linePoints.Count - 1]).normalized;
-			return linePoints[linePoints.Count - 1] + normalized * 0.5f;
+			return linePoints[linePoints.Count - 1] + normalized * 1.5f;
 		}
 		return linePoints?[linePoints.Count - 1] ?? Vector3.zero;
 	}
@@ -165,12 +165,15 @@ public class ZiplineMountable : BaseMountable
 		Facepunch.Pool.FreeList(ref obj);
 		if (Vector3.Distance(vector, GetLineEndPoint()) < 0.1f)
 		{
-			base.transform.position = GetLineEndPoint();
-			return;
+			base.transform.position = GetLineEndPoint(applyDismountOffset: true);
+			hasEnded = true;
 		}
-		Vector3 normalized = (vector - base.transform.position.WithY(vector.y)).normalized;
-		base.transform.position = Vector3.Lerp(base.transform.position, vector, UnityEngine.Time.deltaTime * 12f);
-		base.transform.forward = normalized;
+		else
+		{
+			Vector3 normalized = (vector - base.transform.position.WithY(vector.y)).normalized;
+			base.transform.position = Vector3.Lerp(base.transform.position, vector, UnityEngine.Time.deltaTime * 12f);
+			base.transform.forward = normalized;
+		}
 	}
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
@@ -178,16 +181,15 @@ public class ZiplineMountable : BaseMountable
 		base.PlayerServerInput(inputState, player);
 		if (linePoints != null)
 		{
+			if (hasEnded)
+			{
+				EndZipline();
+				return;
+			}
 			Vector3 position = base.transform.position;
 			float num = ((GetNextLinePoint(base.transform).y < position.y + 0.1f && inputState.IsDown(BUTTON.FORWARD)) ? 1f : 0f);
 			additiveValue = Mathf.MoveTowards(additiveValue, num, (float)Server.tickrate * ((num > 0f) ? 4f : 2f));
 			SetFlag(Flags.Reserved1, additiveValue > 0.5f);
-			if (Vector3.Distance(position, GetLineEndPoint()) < 0.1f)
-			{
-				base.transform.position = GetLineEndPoint(applyDismountOffset: true);
-				hasEnded = true;
-				EndZipline();
-			}
 		}
 	}
 

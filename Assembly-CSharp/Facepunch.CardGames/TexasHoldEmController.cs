@@ -455,7 +455,8 @@ public class TexasHoldEmController : CardGameController
 			case 2:
 			{
 				int currentBet = GetCurrentBet();
-				int num = (LastActionValue = TryAddBet(playerData, currentBet - playerData.betThisTurn));
+				int num = TryAddBet(playerData, currentBet - playerData.betThisTurn);
+				LastActionValue = num;
 				break;
 			}
 			case 16:

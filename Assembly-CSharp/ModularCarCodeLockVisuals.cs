@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public class ModularCarCodeLockVisuals : VehicleModuleButtonComponent
+public class ModularCarCodeLockVisuals : MonoBehaviour
 {
 	[SerializeField]
 	private GameObject lockedVisuals;
@@ -22,7 +22,6 @@ public class ModularCarCodeLockVisuals : VehicleModuleButtonComponent
 	[SerializeField]
 	private float xOffset = 0.91f;
 
-	public override void ServerUse(BasePlayer player, BaseVehicleModule parentModule)
-	{
-	}
+	[SerializeField]
+	private ParticleSystemContainer keycodeDestroyableFX;
 }

@@ -20,6 +20,8 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 	[NonSerialized]
 	public string _playerName;
 
+	public bool ItemBasedDespawn;
+
 	public bool onlyOwnerLoot;
 
 	public SoundDefinition openSound;
@@ -132,6 +134,10 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 
 	public float CalculateRemovalTime()
 	{
+		if (!ItemBasedDespawn)
+		{
+			return ConVar.Server.itemdespawn * 16f * ConVar.Server.itemdespawn_container_scale;
+		}
 		float num = ConVar.Server.itemdespawn_quick;
 		if (inventory != null)
 		{

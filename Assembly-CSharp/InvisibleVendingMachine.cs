@@ -96,6 +96,7 @@ public class InvisibleVendingMachine : NPCVendingMachine
 				}
 			}
 		}
-		NPCVendingOrder nPCVendingOrder = (vendingOrders = vmoManifest.GetFromIndex(info.msg.vendingMachine.vmoIndex));
+		NPCVendingOrder fromIndex = vmoManifest.GetFromIndex(info.msg.vendingMachine.vmoIndex);
+		vendingOrders = fromIndex;
 	}
 }

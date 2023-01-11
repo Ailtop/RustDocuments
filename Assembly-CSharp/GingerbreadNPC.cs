@@ -1,8 +1,9 @@
 using ConVar;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 
-public class GingerbreadNPC : HumanNPC, IClientBrainStateListener
+public class GingerbreadNPC : HumanNPC, global::IClientBrainStateListener
 {
 	public GameObjectRef OverrideCorpseMale;
 
@@ -28,10 +29,10 @@ public class GingerbreadNPC : HumanNPC, IClientBrainStateListener
 			return "assets/prefabs/npc/murderer/murderer_corpse.prefab";
 			static float GetFloatBasedOnUserID(ulong steamid, ulong seed)
 			{
-				Random.State state = Random.state;
-				Random.InitState((int)(seed + steamid));
-				float result = Random.Range(0f, 1f);
-				Random.state = state;
+				UnityEngine.Random.State state = UnityEngine.Random.state;
+				UnityEngine.Random.InitState((int)(seed + steamid));
+				float result = UnityEngine.Random.Range(0f, 1f);
+				UnityEngine.Random.state = state;
 				return result;
 			}
 		}
@@ -76,13 +77,18 @@ public class GingerbreadNPC : HumanNPC, IClientBrainStateListener
 				}
 				if (LootSpawnSlots.Length != 0)
 				{
+					object obj = Interface.CallHook("OnCorpsePopulate", this, nPCPlayerCorpse);
+					if (obj is BaseCorpse)
+					{
+						return (BaseCorpse)obj;
+					}
 					LootContainer.LootSpawnSlot[] lootSpawnSlots = LootSpawnSlots;
 					for (int i = 0; i < lootSpawnSlots.Length; i++)
 					{
 						LootContainer.LootSpawnSlot lootSpawnSlot = lootSpawnSlots[i];
 						for (int j = 0; j < lootSpawnSlot.numberToSpawn; j++)
 						{
-							if (Random.Range(0f, 1f) <= lootSpawnSlot.probability)
+							if (UnityEngine.Random.Range(0f, 1f) <= lootSpawnSlot.probability)
 							{
 								lootSpawnSlot.definition.SpawnIntoContainer(nPCPlayerCorpse.containers[0]);
 							}

@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[902]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[904]
 	{
 		new ConsoleSystem.Command
 		{
@@ -2950,6 +2950,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "noclip_margin_dismount",
+			Parent = "antihack",
+			FullName = "antihack.noclip_margin_dismount",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.noclip_margin_dismount.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.noclip_margin_dismount = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "noclip_maxsteps",
 			Parent = "antihack",
 			FullName = "antihack.noclip_maxsteps",
@@ -4047,7 +4060,6 @@ public class ConsoleGen
 			Parent = "debug",
 			FullName = "debug.debugdismounts",
 			ServerAdmin = true,
-			Description = "Shows some debug info for dismount attempts.",
 			Variable = true,
 			GetOveride = () => Debugging.DebugDismounts.ToString(),
 			SetOveride = delegate(string str)
@@ -7749,6 +7761,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.itemdespawn = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "itemdespawn_container_scale",
+			Parent = "server",
+			FullName = "server.itemdespawn_container_scale",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.itemdespawn_container_scale.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.itemdespawn_container_scale = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

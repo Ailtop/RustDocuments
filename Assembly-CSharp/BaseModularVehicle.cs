@@ -544,7 +544,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 		RefreshModulesExcept(addedModule);
 		if (base.isServer)
 		{
-			UpdateFullFlag();
+			UpdateMountFlags();
 		}
 	}
 
@@ -567,7 +567,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 			RefreshModulesExcept(removedModule);
 			if (base.isServer)
 			{
-				UpdateFullFlag();
+				UpdateMountFlags();
 			}
 		}
 	}

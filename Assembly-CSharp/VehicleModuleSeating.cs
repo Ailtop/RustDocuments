@@ -66,6 +66,9 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 	private ProtectionProperties passengerProtection;
 
 	[SerializeField]
+	private ModularCarCodeLockVisuals codeLockVisuals;
+
+	[SerializeField]
 	private Seating seating;
 
 	[SerializeField]
@@ -117,7 +120,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 
 	public override bool HasSeating => mountPoints.Count > 0;
 
-	protected ModularCar Car { get; private set; }
+	public ModularCar Car { get; private set; }
 
 	protected bool IsOnACar => Car != null;
 

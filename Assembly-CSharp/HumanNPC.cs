@@ -256,7 +256,8 @@ public class HumanNPC : NPCPlayer, IAISenses, IAIAttack, IThinker
 			BaseEntity baseEntity = GetParentEntity();
 			if ((bool)baseEntity)
 			{
-				Vector3 forward = new Vector3(y: baseEntity.transform.InverseTransformDirection(newAim).y, x: newAim.x, z: newAim.z);
+				Vector3 vector = baseEntity.transform.InverseTransformDirection(newAim);
+				Vector3 forward = new Vector3(newAim.x, vector.y, newAim.z);
 				eyes.rotation = Quaternion.Lerp(eyes.rotation, Quaternion.LookRotation(forward, baseEntity.transform.up), num * 25f);
 				viewAngles = eyes.bodyRotation.eulerAngles;
 				ServerRotation = eyes.bodyRotation;

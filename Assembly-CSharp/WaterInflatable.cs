@@ -136,7 +136,7 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 		{
 			rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
 		}
-		if (!IsMounted() || !(headSpaceCheckPosition != null))
+		if (!AnyMounted() || !(headSpaceCheckPosition != null))
 		{
 			return;
 		}

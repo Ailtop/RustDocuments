@@ -317,7 +317,8 @@ public class SlotMachine : BaseMountable
 		{
 			return;
 		}
-		BasePlayer basePlayer = (CurrentSpinPlayer = rpc.player);
+		BasePlayer player = rpc.player;
+		CurrentSpinPlayer = player;
 		Item slot = component.inventory.GetSlot(0);
 		int amount = 0;
 		if (slot != null)
@@ -465,9 +466,9 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	private void Server_RequestMultiplierChange(RPCMessage msg)
 	{
 		if (!(msg.player != _mounted))

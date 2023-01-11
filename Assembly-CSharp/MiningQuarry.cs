@@ -103,13 +103,14 @@ public class MiningQuarry : BaseResourceExtractor
 	public override void ServerInit()
 	{
 		base.ServerInit();
-		if (!isStatic)
+		if (isStatic)
 		{
-			ResourceDepositManager.ResourceDeposit resourceDeposit = (_linkedDeposit = ResourceDepositManager.GetOrCreate(base.transform.position));
+			UpdateStaticDeposit();
 		}
 		else
 		{
-			UpdateStaticDeposit();
+			ResourceDepositManager.ResourceDeposit orCreate = ResourceDepositManager.GetOrCreate(base.transform.position);
+			_linkedDeposit = orCreate;
 		}
 		SpawnChildEntities();
 		engineSwitchPrefab.instance.SetFlag(Flags.On, HasFlag(Flags.On));

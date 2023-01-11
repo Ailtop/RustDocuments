@@ -60,6 +60,8 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool ignoreVehicleParent;
 
+	public bool legacyDismount;
+
 	[FormerlySerializedAs("modifyPlayerCollider")]
 	public bool modifiesPlayerCollider;
 
@@ -90,13 +92,13 @@ public class BaseMountable : BaseCombatEntity
 
 	public float SideLeanAmount = 0.2f;
 
-	public BasePlayer _mounted;
-
-	public static ListHashSet<BaseMountable> FixedUpdateMountables = new ListHashSet<BaseMountable>();
-
 	public const float playerHeight = 1.8f;
 
 	public const float playerRadius = 0.5f;
+
+	public BasePlayer _mounted;
+
+	public static ListHashSet<BaseMountable> FixedUpdateMountables = new ListHashSet<BaseMountable>();
 
 	public override float PositionTickRate
 	{
@@ -227,9 +229,14 @@ public class BaseMountable : BaseCombatEntity
 		return yawClamp;
 	}
 
-	public virtual bool IsMounted()
+	public virtual bool AnyMounted()
 	{
 		return IsBusy();
+	}
+
+	public bool IsMounted()
+	{
+		return AnyMounted();
 	}
 
 	public virtual Vector3 EyePositionForPlayer(BasePlayer player, Quaternion lookRot)
@@ -283,10 +290,101 @@ public class BaseMountable : BaseCombatEntity
 		return GetParentEntity() as BaseVehicle;
 	}
 
-	public override void PostServerLoad()
+	public virtual bool HasValidDismountPosition(BasePlayer player)
 	{
-		base.PostServerLoad();
-		SetFlag(Flags.Busy, _mounted != null);
+		BaseVehicle baseVehicle = VehicleParent();
+		if (baseVehicle != null)
+		{
+			return baseVehicle.HasValidDismountPosition(player);
+		}
+		Transform[] array = dismountPositions;
+		foreach (Transform transform in array)
+		{
+			if (ValidDismountPosition(player, transform.transform.position))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public virtual bool ValidDismountPosition(BasePlayer player, Vector3 disPos)
+	{
+		bool debugDismounts = Debugging.DebugDismounts;
+		Vector3 dismountCheckStart = GetDismountCheckStart(player);
+		if (debugDismounts)
+		{
+			Debug.Log($"ValidDismountPosition debug: Checking dismount point {disPos} from {dismountCheckStart}.");
+		}
+		Vector3 start = disPos + new Vector3(0f, 0.5f, 0f);
+		Vector3 end = disPos + new Vector3(0f, 1.3f, 0f);
+		if (!UnityEngine.Physics.CheckCapsule(start, end, 0.5f, 1537286401))
+		{
+			Vector3 vector = disPos + base.transform.up * 0.5f;
+			if (debugDismounts)
+			{
+				Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} capsule check is OK.");
+			}
+			if (IsVisible(vector))
+			{
+				Vector3 vector2 = disPos + player.NoClipOffset();
+				if (debugDismounts)
+				{
+					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
+				}
+				if (legacyDismount)
+				{
+					if (!UnityEngine.Physics.Linecast(dismountCheckStart, vector, out var hitInfo, 1486946561) || HitOurself(hitInfo))
+					{
+						if (debugDismounts)
+						{
+							Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} linecast is OK.");
+						}
+						Ray ray = new Ray(dismountCheckStart, Vector3Ex.Direction(vector, dismountCheckStart));
+						float maxDistance = Vector3.Distance(dismountCheckStart, vector);
+						if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || HitOurself(hitInfo))
+						{
+							if (debugDismounts)
+							{
+								if (debugDismounts)
+								{
+									Debug.Log($"<color=green>ValidDismountPosition debug: Dismount point {disPos} is valid</color>.");
+								}
+								Debug.DrawLine(dismountCheckStart, disPos, Color.green, 10f);
+							}
+							return true;
+						}
+					}
+				}
+				else if (!AntiHack.TestNoClipping(player, dismountCheckStart, vector2, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, this))
+				{
+					if (debugDismounts)
+					{
+						Debug.Log($"<color=green>ValidDismountPosition debug: Dismount point {disPos} is valid</color>.");
+						Debug.DrawLine(dismountCheckStart, vector2, Color.green, 10f);
+					}
+					return true;
+				}
+			}
+		}
+		if (debugDismounts)
+		{
+			Debug.DrawLine(dismountCheckStart, disPos, Color.red, 10f);
+			if (debugDismounts)
+			{
+				Debug.Log($"<color=red>ValidDismountPosition debug: Dismount point {disPos} is invalid</color>.");
+			}
+		}
+		return false;
+		bool HitOurself(RaycastHit hit)
+		{
+			BaseEntity entity = RaycastHitEx.GetEntity(hit);
+			if (!(entity == this))
+			{
+				return EqualNetID(entity);
+			}
+			return true;
+		}
 	}
 
 	public BasePlayer GetMounted()
@@ -316,7 +414,7 @@ public class BaseMountable : BaseCombatEntity
 	{
 		if (base.CanPickup(player))
 		{
-			return !IsMounted();
+			return !AnyMounted();
 		}
 		return false;
 	}
@@ -416,7 +514,6 @@ public class BaseMountable : BaseCombatEntity
 			player.OverrideViewAngles(transform.rotation.eulerAngles);
 			_mounted.eyes.NetworkUpdate(transform.rotation);
 			player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
-			SetFlag(Flags.Busy, b: true);
 			OnPlayerMounted();
 			Interface.CallHook("OnEntityMounted", this, player);
 		}
@@ -424,25 +521,21 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual void OnPlayerMounted()
 	{
-		UpdateFullFlag();
+		UpdateMountFlags();
 	}
 
 	public virtual void OnPlayerDismounted(BasePlayer player)
 	{
-		UpdateFullFlag();
+		UpdateMountFlags();
 	}
 
-	private void UpdateFullFlag()
+	public virtual void UpdateMountFlags()
 	{
-		if (this is BaseVehicle baseVehicle)
+		SetFlag(Flags.Busy, _mounted != null);
+		BaseVehicle baseVehicle = VehicleParent();
+		if (baseVehicle != null)
 		{
-			baseVehicle.UpdateFullFlag();
-			return;
-		}
-		BaseVehicle baseVehicle2 = VehicleParent();
-		if (baseVehicle2 != null)
-		{
-			baseVehicle2.UpdateFullFlag();
+			baseVehicle.UpdateMountFlags();
 		}
 	}
 
@@ -470,11 +563,11 @@ public class BaseMountable : BaseCombatEntity
 			}
 			_mounted.DismountObject();
 			_mounted = null;
-			SetFlag(Flags.Busy, b: false);
 			if (baseVehicle != null)
 			{
 				baseVehicle.PlayerDismounted(player, this);
 			}
+			OnPlayerDismounted(player);
 			Interface.CallHook("OnEntityDismounted", this, player);
 		}
 		else if (!GetDismountPosition(player, out res) || Distance(res) > 10f)
@@ -491,11 +584,11 @@ public class BaseMountable : BaseCombatEntity
 			_mounted = null;
 			Debug.LogWarning("Killing player due to invalid dismount point :" + player.displayName + " / " + player.userID + " on obj : " + base.gameObject.name);
 			mounted.Hurt(1000f, DamageType.Suicide, mounted, useProtection: false);
-			SetFlag(Flags.Busy, b: false);
 			if (baseVehicle != null)
 			{
 				baseVehicle.PlayerDismounted(player, this);
 			}
+			OnPlayerDismounted(player);
 		}
 		else
 		{
@@ -509,7 +602,6 @@ public class BaseMountable : BaseCombatEntity
 			_mounted.SendNetworkUpdateImmediate();
 			_mounted.SendModelState(force: true);
 			_mounted = null;
-			SetFlag(Flags.Busy, b: false);
 			if (baseVehicle != null)
 			{
 				baseVehicle.PlayerDismounted(player, this);
@@ -524,73 +616,9 @@ public class BaseMountable : BaseCombatEntity
 			{
 				player.ClientRPCPlayer(null, player, "ForcePositionTo", res);
 			}
-			Interface.CallHook("OnEntityDismounted", this, player);
 			OnPlayerDismounted(player);
+			Interface.CallHook("OnEntityDismounted", this, player);
 		}
-	}
-
-	public virtual bool ValidDismountPosition(BasePlayer player, Vector3 disPos)
-	{
-		bool debugDismounts = Debugging.DebugDismounts;
-		Vector3 dismountCheckStart = GetDismountCheckStart(player);
-		if (debugDismounts)
-		{
-			Debug.Log($"ValidDismountPosition debug: Checking dismount point {disPos} from {dismountCheckStart}.");
-		}
-		Vector3 start = disPos + new Vector3(0f, 0.5f, 0f);
-		Vector3 end = disPos + new Vector3(0f, 1.3f, 0f);
-		if (!UnityEngine.Physics.CheckCapsule(start, end, 0.5f, 1537286401))
-		{
-			Vector3 position = disPos + base.transform.up * 0.5f;
-			if (debugDismounts)
-			{
-				Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} capsule check is OK.");
-			}
-			if (IsVisible(position))
-			{
-				Vector3 vector = disPos + player.NoClipOffset();
-				if (debugDismounts)
-				{
-					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
-				}
-				if (!AntiHack.TestNoClipping(player, dismountCheckStart, vector, player.NoClipRadius(ConVar.AntiHack.noclip_margin), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, this))
-				{
-					if (debugDismounts)
-					{
-						Debug.Log($"<color=green>ValidDismountPosition debug: Dismount point {disPos} is valid</color>.");
-						Debug.DrawLine(dismountCheckStart, vector, Color.green, 10f);
-					}
-					return true;
-				}
-			}
-		}
-		if (debugDismounts)
-		{
-			Debug.DrawLine(dismountCheckStart, disPos, Color.red, 10f);
-			if (debugDismounts)
-			{
-				Debug.Log($"<color=red>ValidDismountPosition debug: Dismount point {disPos} is invalid</color>.");
-			}
-		}
-		return false;
-	}
-
-	public virtual bool HasValidDismountPosition(BasePlayer player)
-	{
-		BaseVehicle baseVehicle = VehicleParent();
-		if (baseVehicle != null)
-		{
-			return baseVehicle.HasValidDismountPosition(player);
-		}
-		Transform[] array = dismountPositions;
-		foreach (Transform transform in array)
-		{
-			if (ValidDismountPosition(player, transform.transform.position))
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public virtual bool GetDismountPosition(BasePlayer player, out Vector3 res)
@@ -755,6 +783,10 @@ public class BaseMountable : BaseCombatEntity
 		{
 			result += -vector * 0.26f;
 			result += vector2 * 0.25f;
+		}
+		else if (mountPose == PlayerModel.MountPoses.SitGeneric)
+		{
+			result += -vector * 0.26f;
 		}
 		return result;
 	}

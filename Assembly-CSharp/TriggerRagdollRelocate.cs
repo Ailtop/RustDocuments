@@ -31,6 +31,7 @@ public class TriggerRagdollRelocate : TriggerBase
 	{
 		Vector3 position = targetLocation.InverseTransformPoint(t.position);
 		position.y = 0f;
-		position = (t.position = targetLocation.TransformPoint(position));
+		position = targetLocation.TransformPoint(position);
+		t.position = position;
 	}
 }

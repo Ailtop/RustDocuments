@@ -256,11 +256,11 @@ public class Planner : HeldEntity
 		{
 			ownerPlayer.ChatMessage("Can't place: " + Construction.lastPlacementError);
 		}
-		Interface.CallHook("OnEntityBuilt", this, gameObject);
 		if (!(gameObject != null))
 		{
 			return;
 		}
+		Interface.CallHook("OnEntityBuilt", this, gameObject);
 		Deployable deployable = GetDeployable();
 		if (deployable != null)
 		{

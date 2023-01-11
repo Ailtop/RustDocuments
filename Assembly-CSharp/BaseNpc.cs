@@ -621,7 +621,7 @@ public class BaseNpc : BaseCombatEntity
 		{
 			IsStopped = false;
 		}
-		if ((Destination - position).sqrMagnitude > 0.0100000007f)
+		if ((Destination - position).sqrMagnitude > 0.010000001f)
 		{
 			Destination = position;
 		}
@@ -737,7 +737,7 @@ public class BaseNpc : BaseCombatEntity
 
 	protected virtual void TickMetabolism()
 	{
-		float num = 0.000166666665f;
+		float num = 0.00016666666f;
 		if (CurrentBehaviour == Behaviour.Sleep)
 		{
 			num *= 0.01f;
@@ -814,12 +814,12 @@ public class BaseNpc : BaseCombatEntity
 		if (CurrentBehaviour == Behaviour.Sleep)
 		{
 			IsSleeping = true;
-			Sleep += 0.000333333359f;
+			Sleep += 0.00033333336f;
 		}
 		else
 		{
 			IsSleeping = false;
-			Sleep -= 2.77777781E-05f;
+			Sleep -= 2.7777778E-05f;
 		}
 		Sleep = Mathf.Clamp01(Sleep);
 	}
@@ -899,7 +899,7 @@ public class BaseNpc : BaseCombatEntity
 		{
 			position += vector.normalized * AttackOffset.z;
 		}
-		if ((NavAgent.destination - position).sqrMagnitude > 0.0100000007f)
+		if ((NavAgent.destination - position).sqrMagnitude > 0.010000001f)
 		{
 			NavAgent.SetDestination(position);
 		}
@@ -1418,13 +1418,13 @@ public class BaseNpc : BaseCombatEntity
 			}
 			break;
 		case Facts.Speed:
-			switch (newValue)
+			switch ((SpeedEnum)newValue)
 			{
-			case 0:
+			case SpeedEnum.StandStill:
 				StopMoving();
 				CurrentBehaviour = Behaviour.Idle;
 				break;
-			case 1:
+			case SpeedEnum.Walk:
 				IsStopped = false;
 				CurrentBehaviour = Behaviour.Wander;
 				break;
@@ -1775,7 +1775,7 @@ public class BaseNpc : BaseCombatEntity
 		IsStuck = false;
 		AgencyUpdateRequired = false;
 		IsOnOffmeshLinkAndReachedNewCoord = false;
-		InvokeRandomized(TickAi, 0.1f, 0.1f, 0.00500000035f);
+		InvokeRandomized(TickAi, 0.1f, 0.1f, 0.0050000004f);
 		Sleep = UnityEngine.Random.Range(0.5f, 1f);
 		Stamina.Level = UnityEngine.Random.Range(0.1f, 1f);
 		Energy.Level = UnityEngine.Random.Range(0.5f, 1f);

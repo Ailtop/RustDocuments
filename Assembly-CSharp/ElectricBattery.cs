@@ -167,7 +167,8 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 	public override void OnCircuitChanged(bool forceUpdate)
 	{
 		base.OnCircuitChanged(forceUpdate);
-		int num = (activeDrain = GetDrain());
+		int drain = GetDrain();
+		activeDrain = drain;
 	}
 
 	public void CheckDischarge()
@@ -178,7 +179,8 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 			return;
 		}
 		IOEntity iOEntity = outputs[0].connectedTo.Get();
-		int num = (activeDrain = GetDrain());
+		int drain = GetDrain();
+		activeDrain = drain;
 		if ((bool)iOEntity)
 		{
 			SetDischarging(iOEntity.WantsPower());

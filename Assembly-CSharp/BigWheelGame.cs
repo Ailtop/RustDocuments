@@ -160,6 +160,7 @@ public class BigWheelGame : SpinnerWheel
 	[ContextMenu("LoadHitNumbers")]
 	public void LoadHitNumbers()
 	{
-		HitNumber[] array = (hitNumbers = GetComponentsInChildren<HitNumber>());
+		HitNumber[] componentsInChildren = GetComponentsInChildren<HitNumber>();
+		hitNumbers = componentsInChildren;
 	}
 }

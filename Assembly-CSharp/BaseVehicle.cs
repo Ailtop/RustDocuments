@@ -246,6 +246,8 @@ public class BaseVehicle : BaseMountable
 
 	public const Flags Flag_SeatsFull = Flags.Reserved11;
 
+	protected const Flags Flag_AnyMounted = Flags.InUse;
+
 	private readonly List<BaseVehicle> childVehicles = new List<BaseVehicle>(0);
 
 	public virtual bool AlwaysAllowBradleyTargeting => false;
@@ -384,11 +386,6 @@ public class BaseVehicle : BaseMountable
 	public override float GetNetworkTime()
 	{
 		return UnityEngine.Time.fixedTime;
-	}
-
-	public bool AnyMounted()
-	{
-		return IsMounted();
 	}
 
 	public override void VehicleFixedUpdate()
@@ -542,7 +539,7 @@ public class BaseVehicle : BaseMountable
 		foreach (MountPointInfo mountPoint in mountPoints)
 		{
 			BaseMountable mountable = mountPoint.mountable;
-			if (!(mountable == null) && mountable.IsMounted() && IsSeatClipping(mountable))
+			if (!(mountable == null) && mountable.AnyMounted() && IsSeatClipping(mountable))
 			{
 				SeatClippedWorld(mountable);
 			}
@@ -642,7 +639,7 @@ public class BaseVehicle : BaseMountable
 		{
 			SpawnMountPoint(mountPoints[i], model);
 		}
-		UpdateFullFlag();
+		UpdateMountFlags();
 	}
 
 	public override void Spawn()
@@ -672,7 +669,7 @@ public class BaseVehicle : BaseMountable
 	{
 		if (!HasMountPoints())
 		{
-			if (!base.IsMounted())
+			if (!AnyMounted())
 			{
 				return 0;
 			}
@@ -712,14 +709,14 @@ public class BaseVehicle : BaseMountable
 		{
 			foreach (MountPointInfo allMountPoint in allMountPoints)
 			{
-				if (allMountPoint != null && allMountPoint.mountable != null && allMountPoint.isDriver && allMountPoint.mountable.IsMounted())
+				if (allMountPoint != null && allMountPoint.mountable != null && allMountPoint.isDriver && allMountPoint.mountable.AnyMounted())
 				{
 					return true;
 				}
 			}
 			return false;
 		}
-		return base.IsMounted();
+		return base.AnyMounted();
 	}
 
 	public bool IsDriver(BasePlayer player)
@@ -863,7 +860,7 @@ public class BaseVehicle : BaseMountable
 					num = 0;
 				}
 				MountPointInfo mountPoint = GetMountPoint(num);
-				if (mountPoint?.mountable != null && !mountPoint.mountable.IsMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
+				if (mountPoint?.mountable != null && !mountPoint.mountable.AnyMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
 				{
 					baseMountable = mountPoint.mountable;
 					break;
@@ -969,7 +966,7 @@ public class BaseVehicle : BaseMountable
 		float num = float.PositiveInfinity;
 		foreach (MountPointInfo allMountPoint in allMountPoints)
 		{
-			if (allMountPoint.mountable.IsMounted())
+			if (allMountPoint.mountable.AnyMounted())
 			{
 				continue;
 			}
@@ -1082,14 +1079,15 @@ public class BaseVehicle : BaseMountable
 		}
 	}
 
-	public void UpdateFullFlag()
+	public override void UpdateMountFlags()
 	{
-		bool b = NumMounted() == MaxMounted();
-		SetFlag(Flags.Reserved11, b);
+		int num = NumMounted();
+		SetFlag(Flags.InUse, num > 0);
+		SetFlag(Flags.Reserved11, num == MaxMounted());
 		BaseVehicle baseVehicle = VehicleParent();
 		if (baseVehicle != null)
 		{
-			baseVehicle.UpdateFullFlag();
+			baseVehicle.UpdateMountFlags();
 		}
 	}
 
@@ -1277,6 +1275,11 @@ public class BaseVehicle : BaseMountable
 		return !HasFlag(Flags.Reserved7);
 	}
 
+	public override bool AnyMounted()
+	{
+		return HasFlag(Flags.InUse);
+	}
+
 	public override bool PlayerIsMounted(BasePlayer player)
 	{
 		if (BaseNetworkableEx.IsValid(player))
@@ -1306,15 +1309,6 @@ public class BaseVehicle : BaseMountable
 			}
 		}
 		return false;
-	}
-
-	public override bool IsMounted()
-	{
-		if (base.isServer)
-		{
-			return (float)NumMounted() > 0f;
-		}
-		throw new NotImplementedException("Please don't call BaseVehicle IsMounted on the client.");
 	}
 
 	public override bool CanBeLooted(BasePlayer player)

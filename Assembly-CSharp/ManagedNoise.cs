@@ -60,9 +60,9 @@ public static class ManagedNoise
 
 	private const double sqrt2 = 1.4142135623730951;
 
-	private const double rsqrt2 = 0.70710678118654757;
+	private const double rsqrt2 = 0.7071067811865476;
 
-	private const double squaresToTriangles = 0.21132486540518711;
+	private const double squaresToTriangles = 0.2113248654051871;
 
 	private const double trianglesToSquares = 0.36602540378443865;
 
@@ -76,9 +76,9 @@ public static class ManagedNoise
 
 	private const int gradientsMask1D = 1;
 
-	private static double[] gradients2Dx = new double[8] { 1.0, -1.0, 0.0, 0.0, 0.70710678118654757, -0.70710678118654757, 0.70710678118654757, -0.70710678118654757 };
+	private static double[] gradients2Dx = new double[8] { 1.0, -1.0, 0.0, 0.0, 0.7071067811865476, -0.7071067811865476, 0.7071067811865476, -0.7071067811865476 };
 
-	private static double[] gradients2Dy = new double[8] { 0.0, 0.0, 1.0, -1.0, 0.70710678118654757, 0.70710678118654757, -0.70710678118654757, -0.70710678118654757 };
+	private static double[] gradients2Dy = new double[8] { 0.0, 0.0, 1.0, -1.0, 0.7071067811865476, 0.7071067811865476, -0.7071067811865476, -0.7071067811865476 };
 
 	private const int gradientsMask2D = 7;
 
@@ -157,7 +157,7 @@ public static class ManagedNoise
 		int num6 = Floor(num4);
 		int num7 = num5;
 		int num8 = num6;
-		double num9 = (double)(num7 + num8) * 0.21132486540518711;
+		double num9 = (double)(num7 + num8) * 0.2113248654051871;
 		double num10 = x - (double)num7 + num9;
 		double num11 = y - (double)num8 + num9;
 		double num12 = 0.5 - num10 * num10 - num11 * num11;
@@ -173,7 +173,7 @@ public static class ManagedNoise
 		}
 		int num19 = num5 + 1;
 		int num20 = num6 + 1;
-		double num21 = (double)(num19 + num20) * 0.21132486540518711;
+		double num21 = (double)(num19 + num20) * 0.2113248654051871;
 		double num22 = x - (double)num19 + num21;
 		double num23 = y - (double)num20 + num21;
 		double num24 = 0.5 - num22 * num22 - num23 * num23;
@@ -191,7 +191,7 @@ public static class ManagedNoise
 		{
 			int num31 = num5 + 1;
 			int num32 = num6;
-			double num33 = (double)(num31 + num32) * 0.21132486540518711;
+			double num33 = (double)(num31 + num32) * 0.2113248654051871;
 			double num34 = x - (double)num31 + num33;
 			double num35 = y - (double)num32 + num33;
 			double num36 = 0.5 - num34 * num34 - num35 * num35;
@@ -210,7 +210,7 @@ public static class ManagedNoise
 		{
 			int num43 = num5;
 			int num44 = num6 + 1;
-			double num45 = (double)(num43 + num44) * 0.21132486540518711;
+			double num45 = (double)(num43 + num44) * 0.2113248654051871;
 			double num46 = x - (double)num43 + num45;
 			double num47 = y - (double)num44 + num45;
 			double num48 = 0.5 - num46 * num46 - num47 * num47;
@@ -240,7 +240,7 @@ public static class ManagedNoise
 		int num6 = Floor(num4);
 		int num7 = num5;
 		int num8 = num6;
-		double num9 = (double)(num7 + num8) * 0.21132486540518711;
+		double num9 = (double)(num7 + num8) * 0.2113248654051871;
 		double num10 = x - (double)num7 + num9;
 		double num11 = y - (double)num8 + num9;
 		double num12 = 0.5 - num10 * num10 - num11 * num11;
@@ -259,7 +259,7 @@ public static class ManagedNoise
 		}
 		int num20 = num5 + 1;
 		int num21 = num6 + 1;
-		double num22 = (double)(num20 + num21) * 0.21132486540518711;
+		double num22 = (double)(num20 + num21) * 0.2113248654051871;
 		double num23 = x - (double)num20 + num22;
 		double num24 = y - (double)num21 + num22;
 		double num25 = 0.5 - num23 * num23 - num24 * num24;
@@ -280,7 +280,7 @@ public static class ManagedNoise
 		{
 			int num33 = num5 + 1;
 			int num34 = num6;
-			double num35 = (double)(num33 + num34) * 0.21132486540518711;
+			double num35 = (double)(num33 + num34) * 0.2113248654051871;
 			double num36 = x - (double)num33 + num35;
 			double num37 = y - (double)num34 + num35;
 			double num38 = 0.5 - num36 * num36 - num37 * num37;
@@ -302,7 +302,7 @@ public static class ManagedNoise
 		{
 			int num46 = num5;
 			int num47 = num6 + 1;
-			double num48 = (double)(num46 + num47) * 0.21132486540518711;
+			double num48 = (double)(num46 + num47) * 0.2113248654051871;
 			double num49 = x - (double)num46 + num48;
 			double num50 = y - (double)num47 + num48;
 			double num51 = 0.5 - num49 * num49 - num50 * num50;

@@ -163,7 +163,8 @@ public static class MeshGenerator
 			}
 			mesh.triangles = array6;
 		}
-		Bounds bounds2 = (mesh.bounds = new Bounds(new Vector3(0f, 0f, lengthZ * 0.5f), new Vector3(Mathf.Max(radiusStart, radiusEnd) * 2f, Mathf.Max(radiusStart, radiusEnd) * 2f, lengthZ)));
+		Bounds bounds = new Bounds(new Vector3(0f, 0f, lengthZ * 0.5f), new Vector3(Mathf.Max(radiusStart, radiusEnd) * 2f, Mathf.Max(radiusStart, radiusEnd) * 2f, lengthZ));
+		mesh.bounds = bounds;
 		Debug.Assert(mesh.vertexCount == GetVertexCount(numSides, numSegments, flag));
 		Debug.Assert(mesh.triangles.Length == GetIndicesCount(numSides, numSegments, flag));
 		return mesh;

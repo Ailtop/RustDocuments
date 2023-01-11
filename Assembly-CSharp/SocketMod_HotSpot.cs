@@ -13,6 +13,7 @@ public class SocketMod_HotSpot : SocketMod
 
 	public override void ModifyPlacement(Construction.Placement place)
 	{
-		place.position += place.rotation * worldPosition;
+		Vector3 position = place.position + place.rotation * worldPosition;
+		place.position = position;
 	}
 }

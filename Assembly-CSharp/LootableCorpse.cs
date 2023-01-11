@@ -37,6 +37,8 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 
 	public Translate.Phrase LootPanelName => "N/A";
 
+	public bool blockBagDrop { get; set; }
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("LootableCorpse.OnRpcMessage"))
@@ -89,8 +91,12 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	internal override void DoServerDestroy()
 	{
 		base.DoServerDestroy();
-		PreDropItems();
-		DropItems();
+		if (!blockBagDrop)
+		{
+			PreDropItems();
+			DropItems();
+		}
+		blockBagDrop = false;
 		if (containers != null)
 		{
 			ItemContainer[] array = containers;

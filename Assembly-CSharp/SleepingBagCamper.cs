@@ -93,7 +93,7 @@ public class SleepingBagCamper : SleepingBag
 
 	public override bool IsOccupied()
 	{
-		if (!AssociatedSeat.IsValid(base.isServer) || !AssociatedSeat.Get(base.isServer).IsMounted())
+		if (!AssociatedSeat.IsValid(base.isServer) || !AssociatedSeat.Get(base.isServer).AnyMounted())
 		{
 			return WaterLevel.Test(base.transform.position);
 		}

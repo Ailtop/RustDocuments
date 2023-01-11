@@ -269,12 +269,21 @@ public class CodeLock : BaseLock
 		return false;
 	}
 
+	public override bool CanUseNetworkCache(Connection connection)
+	{
+		return false;
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
 		info.msg.codeLock = Facepunch.Pool.Get<ProtoBuf.CodeLock>();
 		info.msg.codeLock.hasGuestCode = guestCode.Length > 0;
 		info.msg.codeLock.hasCode = code.Length > 0;
+		if (!info.forDisk && info.forConnection != null)
+		{
+			info.msg.codeLock.hasAuth = whitelistPlayers.Contains(info.forConnection.userid) || guestPlayers.Contains(info.forConnection.userid);
+		}
 		if (info.forDisk)
 		{
 			info.msg.codeLock.pv = Facepunch.Pool.Get<ProtoBuf.CodeLock.Private>();

@@ -48,7 +48,8 @@ public class VTP : MonoBehaviour
 				num = num3;
 			}
 		}
-		Color color2 = (colors[num2] = VertexColorLerp(colors[num2], color, strength));
+		Color color2 = VertexColorLerp(colors[num2], color, strength);
+		colors[num2] = color2;
 		transform.GetComponent<MeshFilter>().sharedMesh.colors = colors;
 	}
 
@@ -61,7 +62,8 @@ public class VTP : MonoBehaviour
 		for (int i = 0; i < 3; i++)
 		{
 			num = triangles[triangleIndex * 3 + i];
-			Color color2 = (colors[num] = VertexColorLerp(colors[num], color, strength));
+			Color color2 = VertexColorLerp(colors[num], color, strength);
+			colors[num] = color2;
 		}
 		transform.GetComponent<MeshFilter>().sharedMesh.colors = colors;
 	}

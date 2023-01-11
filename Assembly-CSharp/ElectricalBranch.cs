@@ -66,7 +66,8 @@ public class ElectricalBranch : IOEntity
 		{
 			nextChangeTime = UnityEngine.Time.time + 1f;
 			int value = msg.read.Int32();
-			value = (branchAmount = Mathf.Clamp(value, 2, 10000000));
+			value = Mathf.Clamp(value, 2, 10000000);
+			branchAmount = value;
 			MarkDirtyForceUpdateOutputs();
 			SendNetworkUpdate();
 		}

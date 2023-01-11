@@ -143,7 +143,8 @@ public class Inventory : ConsoleSystem
 			return;
 		}
 		int num = (item.amount = arg.GetInt(1, 1));
-		float num2 = (item.conditionNormalized = arg.GetFloat(2, 1f));
+		float @float = arg.GetFloat(2, 1f);
+		item.conditionNormalized = @float;
 		item.OnVirginSpawn();
 		if (!basePlayer.inventory.GiveItem(item))
 		{

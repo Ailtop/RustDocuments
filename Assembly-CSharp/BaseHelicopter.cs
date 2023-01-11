@@ -317,23 +317,26 @@ public class BaseHelicopter : BaseCombatEntity
 		Vector3 vector = myAI.GetLastMoveDir() * myAI.GetMoveSpeed() * 0.75f;
 		GameObject gibSource = servergibs.Get().GetComponent<ServerGib>()._gibSource;
 		List<ServerGib> list = ServerGib.CreateGibs(servergibs.resourcePath, base.gameObject, gibSource, vector, 3f);
-		for (int i = 0; i < 12 - maxCratesToSpawn; i++)
+		if (info.damageTypes.GetMajorityDamageType() != DamageType.Decay)
 		{
-			BaseEntity baseEntity = GameManager.server.CreateEntity(this.fireBall.resourcePath, base.transform.position, base.transform.rotation);
-			if (!baseEntity)
+			for (int i = 0; i < 12 - maxCratesToSpawn; i++)
 			{
-				continue;
-			}
-			float min = 3f;
-			float max = 10f;
-			Vector3 onUnitSphere = UnityEngine.Random.onUnitSphere;
-			baseEntity.transform.position = base.transform.position + new Vector3(0f, 1.5f, 0f) + onUnitSphere * UnityEngine.Random.Range(-4f, 4f);
-			Collider component = baseEntity.GetComponent<Collider>();
-			baseEntity.Spawn();
-			baseEntity.SetVelocity(vector + onUnitSphere * UnityEngine.Random.Range(min, max));
-			foreach (ServerGib item in list)
-			{
-				Physics.IgnoreCollision(component, item.GetCollider(), ignore: true);
+				BaseEntity baseEntity = GameManager.server.CreateEntity(this.fireBall.resourcePath, base.transform.position, base.transform.rotation);
+				if (!baseEntity)
+				{
+					continue;
+				}
+				float min = 3f;
+				float max = 10f;
+				Vector3 onUnitSphere = UnityEngine.Random.onUnitSphere;
+				baseEntity.transform.position = base.transform.position + new Vector3(0f, 1.5f, 0f) + onUnitSphere * UnityEngine.Random.Range(-4f, 4f);
+				Collider component = baseEntity.GetComponent<Collider>();
+				baseEntity.Spawn();
+				baseEntity.SetVelocity(vector + onUnitSphere * UnityEngine.Random.Range(min, max));
+				foreach (ServerGib item in list)
+				{
+					Physics.IgnoreCollision(component, item.GetCollider(), ignore: true);
+				}
 			}
 		}
 		for (int j = 0; j < maxCratesToSpawn; j++)

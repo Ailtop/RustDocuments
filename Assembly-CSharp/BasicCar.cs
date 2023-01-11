@@ -172,7 +172,7 @@ public class BasicCar : BaseVehicle
 				}
 			}
 		}
-		SetFlag(Flags.Reserved3, num2 >= 100f && IsMounted());
+		SetFlag(Flags.Reserved3, num2 >= 100f && AnyMounted());
 	}
 
 	public void NoDriverInput()

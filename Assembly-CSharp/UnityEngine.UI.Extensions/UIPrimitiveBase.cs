@@ -34,7 +34,7 @@ public class UIPrimitiveBase : MaskableGraphic, ILayoutElement, ICanvasRaycastFi
 		}
 		set
 		{
-			if (SetPropertyUtility.SetClass(ref m_Sprite, value))
+			if (UnityEngine.UI.Extensions.SetPropertyUtility.SetClass(ref m_Sprite, value))
 			{
 				GeneratedUVs();
 			}
@@ -50,7 +50,7 @@ public class UIPrimitiveBase : MaskableGraphic, ILayoutElement, ICanvasRaycastFi
 		}
 		set
 		{
-			if (SetPropertyUtility.SetClass(ref m_OverrideSprite, value))
+			if (UnityEngine.UI.Extensions.SetPropertyUtility.SetClass(ref m_OverrideSprite, value))
 			{
 				GeneratedUVs();
 			}
