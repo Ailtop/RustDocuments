@@ -29,7 +29,7 @@ public class UserPersistance : IDisposable
 		string text = strFolder + "/player.blueprints.";
 		if (activeGameMode != null && activeGameMode.wipeBpsOnProtocol)
 		{
-			text = text + 232 + ".";
+			text = text + 233 + ".";
 		}
 		blueprints.Open(text + 5 + ".db");
 		if (!blueprints.TableExists("data"))
@@ -61,7 +61,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("ALTER TABLE data ADD COLUMN locked BOOLEAN DEFAULT 0");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 232 + ".db");
+		playerState.Open(strFolder + "/player.states." + 233 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");

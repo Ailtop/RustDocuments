@@ -55,6 +55,8 @@ public class VendingMachine : StorageContainer
 
 	private VendingMachineMapMarker myMarker;
 
+	private bool industrialItemIncoming;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("VendingMachine.OnRpcMessage"))
@@ -599,9 +601,9 @@ public class VendingMachine : StorageContainer
 		ClientRPC(null, "CLIENT_CancelVendingSounds");
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))
@@ -874,6 +876,16 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
+	public void OnIndustrialItemTransferBegins()
+	{
+		industrialItemIncoming = true;
+	}
+
+	public void OnIndustrialItemTransferEnds()
+	{
+		industrialItemIncoming = false;
+	}
+
 	public bool CanAcceptItem(Item item, int targetSlot)
 	{
 		object obj = Interface.CallHook("CanVendingAcceptItem", this, item, targetSlot);
@@ -882,7 +894,7 @@ public class VendingMachine : StorageContainer
 			return (bool)obj;
 		}
 		BasePlayer ownerPlayer = item.GetOwnerPlayer();
-		if (transactionActive)
+		if (transactionActive || industrialItemIncoming)
 		{
 			return true;
 		}
@@ -1051,7 +1063,7 @@ public class VendingMachine : StorageContainer
 
 	protected virtual bool CanRotate()
 	{
-		return true;
+		return !HasAttachedStorageAdaptor();
 	}
 
 	public bool IsBroadcasting()
@@ -1091,5 +1103,10 @@ public class VendingMachine : StorageContainer
 			return OccupiedCheck(player);
 		}
 		return false;
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
 	}
 }

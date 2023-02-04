@@ -13,7 +13,7 @@ public static class ArgEx
 
 	public static BasePlayer GetPlayer(this ConsoleSystem.Arg arg, int iArgNum)
 	{
-		string @string = arg.GetString(iArgNum);
+		string @string = arg.GetString(iArgNum, null);
 		if (@string == null)
 		{
 			return null;

@@ -33,7 +33,7 @@ public class DepthOfFieldEffect : PostProcessEffectSettings
 
 	public DOFBlurSampleCountParameter blurSampleCount = new DOFBlurSampleCountParameter
 	{
-		value = DOFBlurSampleCount.High
+		value = DOFBlurSampleCount.Low
 	};
 
 	public Transform focalTransform;

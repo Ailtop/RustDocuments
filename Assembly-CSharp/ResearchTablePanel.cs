@@ -20,6 +20,8 @@ public class ResearchTablePanel : LootPanel
 
 	public GameObject itemDescAlreadyResearched;
 
+	public GameObject itemDescDefaultBlueprint;
+
 	public Text successChanceText;
 
 	public ItemIcon scrapIcon;

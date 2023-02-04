@@ -153,6 +153,11 @@ public class ResearchTable : StorageContainer
 		{
 			result = 500;
 		}
+		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint(item.info);
+		if (itemBlueprint != null && itemBlueprint.defaultBlueprint)
+		{
+			return ConVar.Server.defaultBlueprintResearchCost;
+		}
 		return result;
 	}
 
@@ -199,7 +204,11 @@ public class ResearchTable : StorageContainer
 	public bool IsItemResearchable(Item item)
 	{
 		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint((item.info.isRedirectOf != null) ? item.info.isRedirectOf : item.info);
-		if (itemBlueprint == null || !itemBlueprint.isResearchable || itemBlueprint.defaultBlueprint)
+		if (itemBlueprint != null && itemBlueprint.defaultBlueprint)
+		{
+			return true;
+		}
+		if (itemBlueprint == null || !itemBlueprint.isResearchable)
 		{
 			return false;
 		}

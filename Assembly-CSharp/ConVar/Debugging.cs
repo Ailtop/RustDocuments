@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Facepunch;
@@ -100,7 +102,7 @@ public class Debugging : ConsoleSystem
 	{
 		if (!(ArgEx.Player(arg) == null))
 		{
-			PuzzleReset[] array = Object.FindObjectsOfType<PuzzleReset>();
+			PuzzleReset[] array = UnityEngine.Object.FindObjectsOfType<PuzzleReset>();
 			Debug.Log("iterating...");
 			PuzzleReset[] array2 = array;
 			foreach (PuzzleReset puzzleReset in array2)
@@ -260,5 +262,89 @@ public class Debugging : ConsoleSystem
 	public static void ResetSleepingBagTimers(Arg arg)
 	{
 		SleepingBag.ResetTimersForPlayer(ArgEx.Player(arg));
+	}
+
+	[ServerVar(Help = "Spawn lots of IO entities to lag the server")]
+	public static void bench_io(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (basePlayer == null || !basePlayer.IsAdmin)
+		{
+			return;
+		}
+		int @int = arg.GetInt(0, 50);
+		string name = arg.GetString(1, "water_catcher_small");
+		List<IOEntity> list = new List<IOEntity>();
+		WaterCatcher waterCatcher = null;
+		Vector3 position = ArgEx.Player(arg).transform.position;
+		string[] array = (from x in GameManifest.Current.entities
+			where Path.GetFileNameWithoutExtension(x).Contains(name, CompareOptions.IgnoreCase)
+			select x.ToLower()).ToArray();
+		if (array.Length == 0)
+		{
+			arg.ReplyWith("Couldn't find io prefab \"" + array[0] + "\"");
+			return;
+		}
+		if (array.Length > 1)
+		{
+			string text = array.FirstOrDefault((string x) => string.Compare(Path.GetFileNameWithoutExtension(x), name, StringComparison.OrdinalIgnoreCase) == 0);
+			if (text == null)
+			{
+				Debug.Log($"{arg} failed to find io entity \"{name}\"");
+				arg.ReplyWith("Unknown entity - could be:\n\n" + string.Join("\n", array.Select(Path.GetFileNameWithoutExtension).ToArray()));
+				return;
+			}
+			array[0] = text;
+		}
+		for (int i = 0; i < @int; i++)
+		{
+			Vector3 pos = position + new Vector3(i * 5, 0f, 0f);
+			Quaternion identity = Quaternion.identity;
+			BaseEntity baseEntity = GameManager.server.CreateEntity(array[0], pos, identity);
+			if (!baseEntity)
+			{
+				continue;
+			}
+			baseEntity.Spawn();
+			WaterCatcher component = baseEntity.GetComponent<WaterCatcher>();
+			if ((bool)component)
+			{
+				list.Add(component);
+				if (waterCatcher != null)
+				{
+					Connect(waterCatcher, component);
+				}
+				if (i == @int - 1)
+				{
+					Connect(component, list.First());
+				}
+				waterCatcher = component;
+			}
+		}
+		static void Connect(IOEntity InputIOEnt, IOEntity OutputIOEnt)
+		{
+			int num = 0;
+			int num2 = 0;
+			WireTool.WireColour wireColour = WireTool.WireColour.Default;
+			IOEntity.IOSlot iOSlot = InputIOEnt.inputs[num];
+			IOEntity.IOSlot obj = OutputIOEnt.outputs[num2];
+			iOSlot.connectedTo.Set(OutputIOEnt);
+			iOSlot.connectedToSlot = num2;
+			iOSlot.wireColour = wireColour;
+			iOSlot.connectedTo.Init();
+			obj.connectedTo.Set(InputIOEnt);
+			obj.connectedToSlot = num;
+			obj.wireColour = wireColour;
+			obj.connectedTo.Init();
+			obj.linePoints = new Vector3[2]
+			{
+				Vector3.zero,
+				OutputIOEnt.transform.InverseTransformPoint(InputIOEnt.transform.TransformPoint(iOSlot.handlePosition))
+			};
+			OutputIOEnt.MarkDirtyForceUpdateOutputs();
+			OutputIOEnt.SendNetworkUpdate();
+			InputIOEnt.SendNetworkUpdate();
+			OutputIOEnt.SendChangedToRoot(forceUpdate: true);
+		}
 	}
 }

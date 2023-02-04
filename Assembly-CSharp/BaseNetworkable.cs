@@ -470,13 +470,11 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		if (net != null && net.group != null && Network.Net.sv.IsConnected())
 		{
 			LogEntry(LogEntryType.Network, 2, "Term {0}", mode);
-			if (Network.Net.sv.write.Start())
-			{
-				Network.Net.sv.write.PacketID(Message.Type.EntityDestroy);
-				Network.Net.sv.write.EntityID(net.ID);
-				Network.Net.sv.write.UInt8((byte)mode);
-				Network.Net.sv.write.Send(new SendInfo(net.group.subscribers));
-			}
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.EntityDestroy);
+			netWrite.EntityID(net.ID);
+			netWrite.UInt8((byte)mode);
+			netWrite.Send(new SendInfo(net.group.subscribers));
 		}
 	}
 
@@ -518,30 +516,30 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			if (net.group == null)
 			{
 				Debug.LogWarning(ToString() + " changed its network group to null");
+				return;
 			}
-			else if (Network.Net.sv.write.Start())
-			{
-				Network.Net.sv.write.PacketID(Message.Type.GroupChange);
-				Network.Net.sv.write.EntityID(net.ID);
-				Network.Net.sv.write.GroupID(net.group.ID);
-				Network.Net.sv.write.Send(new SendInfo(net.group.subscribers));
-			}
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.GroupChange);
+			netWrite.EntityID(net.ID);
+			netWrite.GroupID(net.group.ID);
+			netWrite.Send(new SendInfo(net.group.subscribers));
 		}
 	}
 
 	public void SendAsSnapshot(Connection connection, bool justCreated = false)
 	{
-		if (Interface.CallHook("OnEntitySnapshot", this, connection) == null && Network.Net.sv.write.Start())
+		if (Interface.CallHook("OnEntitySnapshot", this, connection) == null)
 		{
+			NetWrite netWrite = Network.Net.sv.StartWrite();
 			connection.validate.entityUpdates++;
 			SaveInfo saveInfo = default(SaveInfo);
 			saveInfo.forConnection = connection;
 			saveInfo.forDisk = false;
 			SaveInfo saveInfo2 = saveInfo;
-			Network.Net.sv.write.PacketID(Message.Type.Entities);
-			Network.Net.sv.write.UInt32(connection.validate.entityUpdates);
-			ToStreamForNetwork(Network.Net.sv.write, saveInfo2);
-			Network.Net.sv.write.Send(new SendInfo(connection));
+			netWrite.PacketID(Message.Type.Entities);
+			netWrite.UInt32(connection.validate.entityUpdates);
+			ToStreamForNetwork(netWrite, saveInfo2);
+			netWrite.Send(new SendInfo(connection));
 		}
 	}
 
@@ -608,27 +606,26 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		{
 			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Position");
 			List<Connection> subscribers = GetSubscribers();
-			if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
+			if (subscribers != null && subscribers.Count > 0)
 			{
-				Network.Net.sv.write.PacketID(Message.Type.EntityPosition);
-				Network.Net.sv.write.EntityID(net.ID);
-				NetWrite write = Network.Net.sv.write;
+				NetWrite netWrite = Network.Net.sv.StartWrite();
+				netWrite.PacketID(Message.Type.EntityPosition);
+				netWrite.EntityID(net.ID);
 				Vector3 obj = GetNetworkPosition();
-				write.Vector3(in obj);
-				NetWrite write2 = Network.Net.sv.write;
+				netWrite.Vector3(in obj);
 				obj = GetNetworkRotation().eulerAngles;
-				write2.Vector3(in obj);
-				Network.Net.sv.write.Float(GetNetworkTime());
+				netWrite.Vector3(in obj);
+				netWrite.Float(GetNetworkTime());
 				uint uid = parentEntity.uid;
 				if (uid != 0)
 				{
-					Network.Net.sv.write.EntityID(uid);
+					netWrite.EntityID(uid);
 				}
 				SendInfo sendInfo = new SendInfo(subscribers);
 				sendInfo.method = SendMethod.ReliableUnordered;
 				sendInfo.priority = Priority.Immediate;
 				SendInfo info = sendInfo;
-				Network.Net.sv.write.Send(info);
+				netWrite.Send(info);
 			}
 		}
 	}
@@ -858,13 +855,11 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		if (Network.Net.sv.IsConnected())
 		{
 			LogEntry(LogEntryType.Network, 2, "LeaveVisibility");
-			if (Network.Net.sv.write.Start())
-			{
-				Network.Net.sv.write.PacketID(Message.Type.EntityDestroy);
-				Network.Net.sv.write.EntityID(net.ID);
-				Network.Net.sv.write.UInt8(0);
-				Network.Net.sv.write.Send(new SendInfo(connections));
-			}
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.EntityDestroy);
+			netWrite.EntityID(net.ID);
+			netWrite.UInt8(0);
+			netWrite.Send(new SendInfo(connections));
 		}
 	}
 

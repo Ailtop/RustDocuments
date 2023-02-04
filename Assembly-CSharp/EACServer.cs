@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using ConVar;
 using Epic.OnlineServices;
 using Epic.OnlineServices.AntiCheatCommon;
@@ -15,11 +15,11 @@ public static class EACServer
 
 	public static ReportsInterface Reports = null;
 
-	private static Dictionary<uint, Connection> client2connection = new Dictionary<uint, Connection>();
+	private static ConcurrentDictionary<uint, Connection> client2connection = new ConcurrentDictionary<uint, Connection>();
 
-	private static Dictionary<Connection, uint> connection2client = new Dictionary<Connection, uint>();
+	private static ConcurrentDictionary<Connection, uint> connection2client = new ConcurrentDictionary<Connection, uint>();
 
-	private static Dictionary<Connection, AntiCheatCommonClientAuthStatus> connection2status = new Dictionary<Connection, AntiCheatCommonClientAuthStatus>();
+	private static ConcurrentDictionary<Connection, AntiCheatCommonClientAuthStatus> connection2status = new ConcurrentDictionary<Connection, AntiCheatCommonClientAuthStatus>();
 
 	private static uint clientHandleCounter = 0u;
 
@@ -191,9 +191,9 @@ public static class EACServer
 			unregisterClientOptions.ClientHandle = clientHandle;
 			UnregisterClientOptions options = unregisterClientOptions;
 			Interface.UnregisterClient(ref options);
-			client2connection.Remove((uint)(int)clientHandle);
-			connection2client.Remove(connection);
-			connection2status.Remove(connection);
+			client2connection.TryRemove((uint)(int)clientHandle, out var _);
+			connection2client.TryRemove(connection, out var _);
+			connection2status.TryRemove(connection, out var _);
 		}
 	}
 
@@ -204,14 +204,13 @@ public static class EACServer
 		if (connection == null)
 		{
 			Debug.LogError("[EAC] Network packet for invalid client: " + clientHandle);
+			return;
 		}
-		else if (Network.Net.sv.write.Start())
-		{
-			Network.Net.sv.write.PacketID(Message.Type.EAC);
-			Network.Net.sv.write.UInt32((uint)data.MessageData.Count);
-			Network.Net.sv.write.Write(data.MessageData.Array, data.MessageData.Offset, data.MessageData.Count);
-			Network.Net.sv.write.Send(new SendInfo(connection));
-		}
+		NetWrite netWrite = Network.Net.sv.StartWrite();
+		netWrite.PacketID(Message.Type.EAC);
+		netWrite.UInt32((uint)data.MessageData.Count);
+		netWrite.Write(data.MessageData.Array, data.MessageData.Offset, data.MessageData.Count);
+		netWrite.Send(new SendInfo(connection));
 	}
 
 	public static void DoStartup()
@@ -283,6 +282,7 @@ public static class EACServer
 
 	public static void OnLeaveGame(Connection connection)
 	{
+		AntiCheatCommonClientAuthStatus value3;
 		if (ConVar.Server.secure && !Application.isEditor)
 		{
 			if (Interface != null)
@@ -294,15 +294,15 @@ public static class EACServer
 					unregisterClientOptions.ClientHandle = client;
 					UnregisterClientOptions options = unregisterClientOptions;
 					Interface.UnregisterClient(ref options);
-					client2connection.Remove((uint)(int)client);
+					client2connection.TryRemove((uint)(int)client, out var _);
 				}
-				connection2client.Remove(connection);
-				connection2status.Remove(connection);
+				connection2client.TryRemove(connection, out var _);
+				connection2status.TryRemove(connection, out value3);
 			}
 		}
 		else
 		{
-			connection2status.Remove(connection);
+			connection2status.TryRemove(connection, out value3);
 		}
 	}
 
@@ -331,14 +331,14 @@ public static class EACServer
 				setClientDetailsOptions.ClientFlags = ((connection.authLevel != 0) ? AntiCheatCommonClientFlags.Admin : AntiCheatCommonClientFlags.None);
 				SetClientDetailsOptions options2 = setClientDetailsOptions;
 				Interface.SetClientDetails(ref options2);
-				client2connection.Add((uint)(int)intPtr, connection);
-				connection2client.Add(connection, (uint)(int)intPtr);
-				connection2status.Add(connection, AntiCheatCommonClientAuthStatus.Invalid);
+				client2connection.TryAdd((uint)(int)intPtr, connection);
+				connection2client.TryAdd(connection, (uint)(int)intPtr);
+				connection2status.TryAdd(connection, AntiCheatCommonClientAuthStatus.Invalid);
 			}
 		}
 		else
 		{
-			connection2status.Add(connection, AntiCheatCommonClientAuthStatus.Invalid);
+			connection2status.TryAdd(connection, AntiCheatCommonClientAuthStatus.Invalid);
 			OnAuthenticatedLocal(connection);
 			OnAuthenticatedRemote(connection);
 		}

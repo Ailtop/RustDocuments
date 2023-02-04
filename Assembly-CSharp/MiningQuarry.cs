@@ -114,6 +114,16 @@ public class MiningQuarry : BaseResourceExtractor
 		}
 		SpawnChildEntities();
 		engineSwitchPrefab.instance.SetFlag(Flags.On, HasFlag(Flags.On));
+		if (base.isServer)
+		{
+			ItemContainer inventory = fuelStoragePrefab.instance.GetComponent<StorageContainer>().inventory;
+			inventory.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(inventory.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
+		}
+	}
+
+	public bool CanAcceptItem(Item item, int targetSlot)
+	{
+		return item.info.shortname == "diesel_barrel";
 	}
 
 	public void UpdateStaticDeposit()

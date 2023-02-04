@@ -306,9 +306,9 @@ public class MarketTerminal : StorageContainer
 		ClientRPCPlayer(null, msg.player, "Client_OpenMarket", entityIdList);
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(10uL)]
-	[RPC_Server]
 	public void Server_Purchase(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))

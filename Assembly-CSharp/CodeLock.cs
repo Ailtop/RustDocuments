@@ -335,18 +335,11 @@ public class CodeLock : BaseLock
 	[RPC_Server.MaxDistance(3f)]
 	private void TryUnlock(RPCMessage rpc)
 	{
-		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && !IsCodeEntryBlocked())
+		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && !IsCodeEntryBlocked() && whitelistPlayers.Contains(rpc.player.userID))
 		{
-			if (whitelistPlayers.Contains(rpc.player.userID))
-			{
-				DoEffect(effectUnlocked.resourcePath);
-				SetFlag(Flags.Locked, b: false);
-				SendNetworkUpdate();
-			}
-			else
-			{
-				ClientRPCPlayer(null, rpc.player, "EnterUnlockCode");
-			}
+			DoEffect(effectUnlocked.resourcePath);
+			SetFlag(Flags.Locked, b: false);
+			SendNetworkUpdate();
 		}
 	}
 

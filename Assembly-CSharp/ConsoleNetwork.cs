@@ -36,10 +36,10 @@ public static class ConsoleNetwork
 	{
 		if (Network.Net.sv.IsConnected())
 		{
-			Network.Net.sv.write.Start();
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleMessage);
-			Network.Net.sv.write.String(strCommand);
-			Network.Net.sv.write.Send(new SendInfo(cn));
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.ConsoleMessage);
+			netWrite.String(strCommand);
+			netWrite.Send(new SendInfo(cn));
 		}
 	}
 
@@ -48,11 +48,11 @@ public static class ConsoleNetwork
 		if (Network.Net.sv.IsConnected())
 		{
 			Interface.CallHook("OnSendCommand", cn, strCommand, args);
-			Network.Net.sv.write.Start();
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleCommand);
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.ConsoleCommand);
 			string val = ConsoleSystem.BuildCommand(strCommand, args);
-			Network.Net.sv.write.String(val);
-			Network.Net.sv.write.Send(new SendInfo(cn));
+			netWrite.String(val);
+			netWrite.Send(new SendInfo(cn));
 		}
 	}
 
@@ -61,10 +61,10 @@ public static class ConsoleNetwork
 		if (Network.Net.sv.IsConnected())
 		{
 			Interface.CallHook("OnSendCommand", cn, strCommand, args);
-			Network.Net.sv.write.Start();
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleCommand);
-			Network.Net.sv.write.String(ConsoleSystem.BuildCommand(strCommand, args));
-			Network.Net.sv.write.Send(new SendInfo(cn));
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.ConsoleCommand);
+			netWrite.String(ConsoleSystem.BuildCommand(strCommand, args));
+			netWrite.Send(new SendInfo(cn));
 		}
 	}
 
@@ -73,10 +73,10 @@ public static class ConsoleNetwork
 		if (Network.Net.sv.IsConnected())
 		{
 			Interface.CallHook("OnBroadcastCommand", strCommand, args);
-			Network.Net.sv.write.Start();
-			Network.Net.sv.write.PacketID(Message.Type.ConsoleCommand);
-			Network.Net.sv.write.String(ConsoleSystem.BuildCommand(strCommand, args));
-			Network.Net.sv.write.Send(new SendInfo(Network.Net.sv.connections));
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.ConsoleCommand);
+			netWrite.String(ConsoleSystem.BuildCommand(strCommand, args));
+			netWrite.Send(new SendInfo(Network.Net.sv.connections));
 		}
 	}
 }

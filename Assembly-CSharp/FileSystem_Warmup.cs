@@ -22,7 +22,7 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	public static void Run()
 	{
-		if (!Global.skipassetwarmup && run)
+		if (!Global.skipAssetWarmup_crashes && run)
 		{
 			string[] assetList = GetAssetList();
 			for (int i = 0; i < assetList.Length; i++)
@@ -44,7 +44,7 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	private static IEnumerator RunAsyncImpl(string[] assetList, Action<string> statusFunction, string format, int priority)
 	{
-		if (Global.skipassetwarmup || !run)
+		if (Global.skipAssetWarmup_crashes || !run)
 		{
 			yield break;
 		}
@@ -75,7 +75,7 @@ public class FileSystem_Warmup : MonoBehaviour
 
 	private static IEnumerator RunImpl(string[] assetList, Action<string> statusFunction = null, string format = null)
 	{
-		if (Global.skipassetwarmup || !run)
+		if (Global.skipAssetWarmup_crashes || !run)
 		{
 			yield break;
 		}

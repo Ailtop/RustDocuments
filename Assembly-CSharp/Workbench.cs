@@ -27,6 +27,8 @@ public class Workbench : StorageContainer
 
 	public TechTreeData techTree;
 
+	public bool supportsIndustrialCrafter;
+
 	public static ItemDefinition blueprintBaseDef;
 
 	private ItemDefinition pendingBlueprint;
@@ -134,6 +136,15 @@ public class Workbench : StorageContainer
 	public bool IsWorking()
 	{
 		return HasFlag(Flags.On);
+	}
+
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (children.Count == 0)
+		{
+			return base.CanPickup(player);
+		}
+		return false;
 	}
 
 	[RPC_Server]
@@ -329,5 +340,10 @@ public class Workbench : StorageContainer
 			return true;
 		}
 		return false;
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
 	}
 }

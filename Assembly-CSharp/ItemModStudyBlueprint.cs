@@ -40,6 +40,10 @@ public class ItemModStudyBlueprint : ItemMod
 				}
 			}
 		}
+		if (blueprint != null && blueprint.defaultBlueprint)
+		{
+			flag2 = true;
+		}
 		if (flag2 || Interface.CallHook("OnPlayerStudyBlueprint", player, item) != null)
 		{
 			return;

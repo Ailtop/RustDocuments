@@ -516,7 +516,7 @@ public class MotorRowboat : BaseBoat
 
 	public override bool HasValidDismountPosition(BasePlayer player)
 	{
-		if (rigidBody.velocity.magnitude <= 4f)
+		if (GetWorldVelocity().magnitude <= 4f)
 		{
 			Transform[] array = stationaryDismounts;
 			foreach (Transform transform in array)

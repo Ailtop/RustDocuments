@@ -67,6 +67,9 @@ public class Graphics : ConsoleSystem
 	[ClientVar(Saved = true, ClientAdmin = true)]
 	public static bool dof_debug = false;
 
+	[ClientVar(Saved = true, Help = "Goes from 0 - 3, higher = more dof samples but slower perf")]
+	public static int dof_kernel_count = 0;
+
 	public static BaseEntity dof_focus_target_entity = null;
 
 	[ClientVar(Saved = true, Help = "Whether to scale vm models with fov")]

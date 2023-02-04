@@ -72,13 +72,11 @@ public class ConnectionQueue
 		{
 			string empty = string.Empty;
 			empty = ((position <= 0) ? string.Format("YOU'RE NEXT - {1:N0} PLAYERS BEHIND YOU", position, queue.Count - position - 1) : $"{position:N0} PLAYERS AHEAD OF YOU, {queue.Count - position - 1:N0} PLAYERS BEHIND");
-			if (Net.sv.write.Start())
-			{
-				Net.sv.write.PacketID(Message.Type.Message);
-				Net.sv.write.String("QUEUE");
-				Net.sv.write.String(empty);
-				Net.sv.write.Send(new SendInfo(c));
-			}
+			NetWrite netWrite = Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.Message);
+			netWrite.String("QUEUE");
+			netWrite.String(empty);
+			netWrite.Send(new SendInfo(c));
 		}
 	}
 

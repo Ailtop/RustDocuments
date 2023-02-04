@@ -42,6 +42,8 @@ public class LiquidContainer : ContainerIOEntity
 
 	private Action deductFuelAction;
 
+	private TimeUntil waterTransferStartTime;
+
 	private float lastOutputDrainUpdate;
 
 	public override bool IsGravitySource => true;
@@ -182,6 +184,10 @@ public class LiquidContainer : ContainerIOEntity
 		{
 			Invoke(updatePushLiquidTargetsAction, 0.1f);
 		}
+		if (added)
+		{
+			waterTransferStartTime = 10f;
+		}
 	}
 
 	private void ClearDrains()
@@ -221,7 +227,7 @@ public class LiquidContainer : ContainerIOEntity
 			{
 				if (iOSlot.connectedTo.Get() != null)
 				{
-					CalculateDrain(iOSlot.connectedTo.Get(), base.transform.TransformPoint(iOSlot.handlePosition), IOEntity.backtracking, ref amount, this, liquidItem?.info);
+					CalculateDrain(iOSlot.connectedTo.Get(), base.transform.TransformPoint(iOSlot.handlePosition), IOEntity.backtracking * 2, ref amount, this, liquidItem?.info);
 				}
 			}
 		}
@@ -382,6 +388,10 @@ public class LiquidContainer : ContainerIOEntity
 
 	private void PushLiquidThroughOutputs()
 	{
+		if ((float)waterTransferStartTime > 0f)
+		{
+			return;
+		}
 		if (!HasLiquidItem())
 		{
 			CancelInvoke(pushLiquidAction);
@@ -394,6 +404,14 @@ public class LiquidContainer : ContainerIOEntity
 			if (num == 0 && liquidItem.amount > 0)
 			{
 				num = liquidItem.amount;
+			}
+			if (ConVar.Server.waterContainersLeaveWaterBehind && num == liquidItem.amount)
+			{
+				num--;
+			}
+			if (num == 0)
+			{
+				return;
 			}
 			foreach (ContainerIOEntity pushTarget in pushTargets)
 			{
@@ -427,7 +445,7 @@ public class LiquidContainer : ContainerIOEntity
 			return;
 		}
 		Vector3 worldHandlePosition = Vector3.zero;
-		IOEntity iOEntity = connected.FindGravitySource(ref worldHandlePosition, IOEntity.backtracking, ignoreSelf: true);
+		IOEntity iOEntity = connected.FindGravitySource(ref worldHandlePosition, IOEntity.backtracking * 2, ignoreSelf: true);
 		if ((iOEntity != null && !connected.AllowLiquidPassthrough(iOEntity, worldHandlePosition)) || connected == this || ConsiderConnectedTo(connected))
 		{
 			return;

@@ -316,6 +316,11 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 		}
 	}
 
+	public override BaseVehicle VehicleParent()
+	{
+		return GetParentEntity() as BaseVehicle;
+	}
+
 	public virtual void ModuleAdded(BaseModularVehicle vehicle, int firstSocketIndex)
 	{
 		Vehicle = vehicle;

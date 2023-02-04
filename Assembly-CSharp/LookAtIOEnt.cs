@@ -48,6 +48,14 @@ public class LookAtIOEnt : MonoBehaviour
 
 	public GameObject GravityWarning;
 
+	public GameObject DistanceWarning;
+
+	public GameObject LineOfSightWarning;
+
+	public GameObject TooManyInputsWarning;
+
+	public GameObject TooManyOutputsWarning;
+
 	public CanvasGroup group;
 
 	public HandleSet[] handleSets;
@@ -71,4 +79,6 @@ public class LookAtIOEnt : MonoBehaviour
 	public Texture ElectricSprite;
 
 	public Texture FluidSprite;
+
+	public Texture IndustrialSprite;
 }

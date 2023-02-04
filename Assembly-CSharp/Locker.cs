@@ -241,4 +241,31 @@ public class Locker : StorageContainer
 		}
 		return false;
 	}
+
+	public Vector2i GetIndustrialSlotRange(Vector3 localPosition)
+	{
+		if (localPosition.x < -0.3f)
+		{
+			return new Vector2i(26, 38);
+		}
+		if (localPosition.x > 0.3f)
+		{
+			return new Vector2i(0, 12);
+		}
+		return new Vector2i(13, 25);
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
+	}
+
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (base.CanPickup(player))
+		{
+			return !HasAttachedStorageAdaptor();
+		}
+		return false;
+	}
 }

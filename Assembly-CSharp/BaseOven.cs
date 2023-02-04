@@ -10,7 +10,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseOven : StorageContainer, ISplashable
+public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 {
 	public enum TemperatureType
 	{
@@ -19,6 +19,14 @@ public class BaseOven : StorageContainer, ISplashable
 		Cooking = 2,
 		Smelting = 3,
 		Fractioning = 4
+	}
+
+	public enum IndustrialSlotMode
+	{
+		Furnace = 0,
+		LargeFurnace = 1,
+		OilRefinery = 2,
+		ElectricFurnace = 3
 	}
 
 	public struct MinMax
@@ -68,6 +76,8 @@ public class BaseOven : StorageContainer, ISplashable
 
 	public int outputSlots = 1;
 
+	public IndustrialSlotMode IndustrialMode;
+
 	public int _activeCookingSlot = -1;
 
 	public int _inputSlotIndex;
@@ -75,6 +85,12 @@ public class BaseOven : StorageContainer, ISplashable
 	public int _outputSlotIndex;
 
 	public const float UpdateRate = 0.5f;
+
+	protected virtual bool CanRunWithNoFuel => false;
+
+	public ItemContainer Container => base.inventory;
+
+	public BaseEntity IndustrialEntity => this;
 
 	public float cookingTemperature => temperature switch
 	{
@@ -298,7 +314,7 @@ public class BaseOven : StorageContainer, ISplashable
 		{
 			return;
 		}
-		if (item == null)
+		if (item == null && !CanRunWithNoFuel)
 		{
 			StopCooking();
 			return;
@@ -317,16 +333,19 @@ public class BaseOven : StorageContainer, ISplashable
 		{
 			slot.SendMessage("Cook", 0.5f, SendMessageOptions.DontRequireReceiver);
 		}
-		ItemModBurnable component = item.info.GetComponent<ItemModBurnable>();
-		item.fuel -= 0.5f * (cookingTemperature / 200f);
-		if (!item.HasFlag(Item.Flag.OnFire))
+		if (item != null)
 		{
-			item.SetFlag(Item.Flag.OnFire, b: true);
-			item.MarkDirty();
-		}
-		if (item.fuel <= 0f)
-		{
-			ConsumeFuel(item, component);
+			ItemModBurnable component = item.info.GetComponent<ItemModBurnable>();
+			item.fuel -= 0.5f * (cookingTemperature / 200f);
+			if (!item.HasFlag(Item.Flag.OnFire))
+			{
+				item.SetFlag(Item.Flag.OnFire, b: true);
+				item.MarkDirty();
+			}
+			if (item.fuel <= 0f)
+			{
+				ConsumeFuel(item, component);
+			}
 		}
 		OnCooked();
 		Interface.CallHook("OnOvenCooked", this, item, slot);
@@ -405,7 +424,7 @@ public class BaseOven : StorageContainer, ISplashable
 
 	public virtual void StartCooking()
 	{
-		if (Interface.CallHook("OnOvenStart", this) == null && FindBurnable() != null)
+		if (Interface.CallHook("OnOvenStart", this) == null && (FindBurnable() != null || CanRunWithNoFuel))
 		{
 			base.inventory.temperature = cookingTemperature;
 			UpdateAttachmentTemperature();
@@ -491,6 +510,48 @@ public class BaseOven : StorageContainer, ISplashable
 			item2.OnCycle(delta);
 		}
 		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	public Vector2i InputSlotRange(int slotIndex)
+	{
+		if (IndustrialMode == IndustrialSlotMode.LargeFurnace)
+		{
+			return new Vector2i(0, 7);
+		}
+		if (IndustrialMode == IndustrialSlotMode.OilRefinery)
+		{
+			return new Vector2i(0, 1);
+		}
+		if (IndustrialMode == IndustrialSlotMode.ElectricFurnace)
+		{
+			return new Vector2i(0, 1);
+		}
+		return new Vector2i(0, 2);
+	}
+
+	public Vector2i OutputSlotRange(int slotIndex)
+	{
+		if (IndustrialMode == IndustrialSlotMode.LargeFurnace)
+		{
+			return new Vector2i(7, 16);
+		}
+		if (IndustrialMode == IndustrialSlotMode.OilRefinery)
+		{
+			return new Vector2i(2, 4);
+		}
+		if (IndustrialMode == IndustrialSlotMode.ElectricFurnace)
+		{
+			return new Vector2i(2, 4);
+		}
+		return new Vector2i(3, 5);
+	}
+
+	public void OnStorageItemTransferBegin()
+	{
+	}
+
+	public void OnStorageItemTransferEnd()
+	{
 	}
 
 	public float GetSmeltingSpeed()
@@ -583,5 +644,24 @@ public class BaseOven : StorageContainer, ISplashable
 			return true;
 		}
 		return base.HasSlot(slot);
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
+	}
+
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (base.CanPickup(player))
+		{
+			return CanPickupOven();
+		}
+		return false;
+	}
+
+	protected virtual bool CanPickupOven()
+	{
+		return children.Count == 0;
 	}
 }

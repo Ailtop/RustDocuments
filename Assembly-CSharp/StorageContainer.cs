@@ -493,4 +493,20 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 		}
 		return true;
 	}
+
+	protected bool HasAttachedStorageAdaptor()
+	{
+		if (children == null)
+		{
+			return false;
+		}
+		foreach (BaseEntity child in children)
+		{
+			if (child is IndustrialStorageAdaptor)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

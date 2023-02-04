@@ -90,9 +90,9 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	private void ServerSetFireworkDesign(RPCMessage rpc)
 	{
 		if (!PlayerCanModify(rpc.player))

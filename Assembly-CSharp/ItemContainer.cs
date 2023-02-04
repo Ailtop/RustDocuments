@@ -788,6 +788,34 @@ public sealed class ItemContainer
 		return num;
 	}
 
+	public int GetTotalItemAmount(ItemDefinition def, int slotStartInclusive, int slotEndInclusive)
+	{
+		int num = 0;
+		for (int i = slotStartInclusive; i <= slotEndInclusive; i++)
+		{
+			Item slot = GetSlot(i);
+			if (slot != null && slot.info == def)
+			{
+				num += slot.amount;
+			}
+		}
+		return num;
+	}
+
+	public int GetTotalCategoryAmount(ItemCategory category, int slotStartInclusive, int slotEndInclusive)
+	{
+		int num = 0;
+		for (int i = slotStartInclusive; i <= slotEndInclusive; i++)
+		{
+			Item slot = GetSlot(i);
+			if (slot != null && slot.info.category == category)
+			{
+				num += slot.amount;
+			}
+		}
+		return num;
+	}
+
 	public void AddItem(ItemDefinition itemToCreate, int amount, ulong skin = 0uL, LimitStack limitStack = LimitStack.Existing)
 	{
 		for (int i = 0; i < itemList.Count; i++)

@@ -238,7 +238,7 @@ public static class AntiHack
 		Vector3 vector = oldPos - normalized * backtracking;
 		float magnitude = (newPos - vector).magnitude;
 		Ray ray = new Ray(vector, normalized);
-		RaycastHit hitInfo = default(RaycastHit);
+		RaycastHit hitInfo;
 		bool flag = ((ignoreEntity == null) ? UnityEngine.Physics.Raycast(ray, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, 0f, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore, ignoreEntity));
 		if (!flag && sphereCast)
 		{

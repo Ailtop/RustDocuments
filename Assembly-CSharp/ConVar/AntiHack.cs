@@ -325,7 +325,7 @@ public class AntiHack : ConsoleSystem
 
 	[ServerVar]
 	[Help("whether or not to check for building being done on the wrong side of something (e.g. inside rocks). 0 = Disabled, 1 = Info only, 2 = Enabled")]
-	public static int build_inside_check = 1;
+	public static int build_inside_check = 2;
 
 	[ServerVar]
 	[Help("0 == silent, 1 == print max violation, 2 == print nonzero violation, 3 == print any violation except noclip, 4 == print any violation")]

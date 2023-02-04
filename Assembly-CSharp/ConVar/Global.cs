@@ -18,8 +18,8 @@ public class Global : ConsoleSystem
 	private static int _developer;
 
 	[ServerVar]
-	[ClientVar]
-	public static bool skipassetwarmup = false;
+	[ClientVar(Help = "WARNING: This causes random crashes!")]
+	public static bool skipAssetWarmup_crashes = false;
 
 	[ServerVar]
 	[ClientVar]
@@ -368,6 +368,25 @@ public class Global : ConsoleSystem
 			{
 				basePlayer.StartSpectating();
 				basePlayer.UpdateSpectateTarget(@string);
+			}
+		}
+	}
+
+	[ServerVar]
+	public static void spectateid(Arg args)
+	{
+		BasePlayer basePlayer = ArgEx.Player(args);
+		if ((bool)basePlayer)
+		{
+			if (!basePlayer.IsDead())
+			{
+				basePlayer.DieInstantly();
+			}
+			uint uInt = args.GetUInt(0);
+			if (basePlayer.IsDead())
+			{
+				basePlayer.StartSpectating();
+				basePlayer.UpdateSpectateTarget(uInt);
 			}
 		}
 	}
@@ -769,5 +788,23 @@ public class Global : ConsoleSystem
 			int num = ClearSpraysInRadius(vector, @float);
 			arg.ReplyWith($"Deleted {num} sprays within {@float} of {vector}");
 		}
+	}
+
+	[ServerVar]
+	public static void ClearDroppedItems()
+	{
+		List<DroppedItem> obj = Facepunch.Pool.GetList<DroppedItem>();
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			if (serverEntity is DroppedItem item)
+			{
+				obj.Add(item);
+			}
+		}
+		foreach (DroppedItem item2 in obj)
+		{
+			item2.Kill();
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 }

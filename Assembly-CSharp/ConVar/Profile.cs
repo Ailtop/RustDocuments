@@ -24,4 +24,10 @@ public class Profile : ConsoleSystem
 	public static void stop(Arg arg)
 	{
 	}
+
+	[ServerVar]
+	[ClientVar]
+	public static void flush_analytics(Arg arg)
+	{
+	}
 }

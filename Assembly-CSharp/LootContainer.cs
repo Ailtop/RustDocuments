@@ -51,6 +51,8 @@ public class LootContainer : StorageContainer
 
 	public spawnType SpawnType;
 
+	public bool FirstLooted;
+
 	private static ItemDefinition scrapDef;
 
 	public bool shouldRefreshContents
@@ -63,6 +65,12 @@ public class LootContainer : StorageContainer
 			}
 			return false;
 		}
+	}
+
+	public override void ResetState()
+	{
+		FirstLooted = false;
+		base.ResetState();
 	}
 
 	public override void ServerInit()
@@ -213,6 +221,15 @@ public class LootContainer : StorageContainer
 				Interface.CallHook("OnBonusItemDropped", item, basePlayer);
 			}
 		}
+	}
+
+	public override bool OnStartBeingLooted(BasePlayer baseEntity)
+	{
+		if (!FirstLooted)
+		{
+			FirstLooted = true;
+		}
+		return base.OnStartBeingLooted(baseEntity);
 	}
 
 	public override void PlayerStoppedLooting(BasePlayer player)

@@ -140,7 +140,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		}
 		float num = 0f;
 		float num2 = 0f;
-		BaseMelee baseMelee = ((info.Weapon == null) ? null : info.Weapon.GetComponent<BaseMelee>());
+		BaseMelee baseMelee = ((info.Weapon == null) ? null : (info.Weapon as BaseMelee));
 		if (baseMelee != null)
 		{
 			GatherPropertyEntry gatherInfoFromIndex = baseMelee.GetGatherInfoFromIndex(gatherType);
@@ -164,7 +164,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			num2 = 0.5f;
 		}
 		float num3 = fractionRemaining;
-		GiveResources(info.Initiator, num, num2, info.Weapon);
+		GiveResources(info.InitiatorPlayer, num, num2, info.Weapon);
 		UpdateFraction();
 		float num4 = 0f;
 		if (fractionRemaining <= 0f)
@@ -172,7 +172,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			num4 = base.baseEntity.MaxHealth();
 			if (info.DidGather && num2 < maxDestroyFractionForFinishBonus)
 			{
-				AssignFinishBonus(info.InitiatorPlayer, 1f - num2);
+				AssignFinishBonus(info.InitiatorPlayer, 1f - num2, info.Weapon);
 			}
 		}
 		else
@@ -188,7 +188,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		base.baseEntity.OnAttacked(hitInfo);
 	}
 
-	public void AssignFinishBonus(BasePlayer player, float fraction)
+	public void AssignFinishBonus(BasePlayer player, float fraction, AttackEntity weapon)
 	{
 		SendMessage("FinishBonusAssigned", SendMessageOptions.DontRequireReceiver);
 		if (fraction <= 0f || finishBonus == null)
@@ -217,7 +217,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		DoGather(info);
 	}
 
-	private void GiveResources(BaseEntity entity, float gatherDamage, float destroyFraction, AttackEntity attackWeapon)
+	private void GiveResources(BasePlayer entity, float gatherDamage, float destroyFraction, AttackEntity attackWeapon)
 	{
 		if (!BaseNetworkableEx.IsValid(entity) || gatherDamage <= 0f)
 		{
@@ -246,8 +246,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		}
 		GiveResourceFromItem(entity, itemAmount, gatherDamage, destroyFraction, attackWeapon);
 		UpdateVars();
-		BasePlayer basePlayer = entity.ToPlayer();
-		if ((bool)basePlayer)
+		if ((bool)entity)
 		{
 			Debug.Assert(attackWeapon.GetItem() != null, string.Concat("Attack Weapon ", attackWeapon, " has no Item"));
 			Debug.Assert(attackWeapon.ownerItemUID != 0, string.Concat("Attack Weapon ", attackWeapon, " ownerItemUID is 0"));
@@ -257,7 +256,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			Debug.Assert(!attackWeapon.GetParentEntity().ToPlayer().IsDead(), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
 			BasePlayer ownerPlayer = attackWeapon.GetOwnerPlayer();
 			Debug.Assert(ownerPlayer != null, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is null"));
-			Debug.Assert(ownerPlayer == basePlayer, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is not player"));
+			Debug.Assert(ownerPlayer == entity, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is not player"));
 			if (ownerPlayer != null)
 			{
 				Debug.Assert(ownerPlayer.inventory != null, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer inventory is null"));
@@ -278,7 +277,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		UpdateVars();
 	}
 
-	private void GiveResourceFromItem(BaseEntity entity, ItemAmount itemAmt, float gatherDamage, float destroyFraction, AttackEntity attackWeapon)
+	private void GiveResourceFromItem(BasePlayer entity, ItemAmount itemAmt, float gatherDamage, float destroyFraction, AttackEntity attackWeapon)
 	{
 		if (itemAmt.amount == 0f)
 		{

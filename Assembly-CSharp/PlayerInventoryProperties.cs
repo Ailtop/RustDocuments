@@ -9,6 +9,8 @@ public class PlayerInventoryProperties : ScriptableObject
 	public class ItemAmountSkinned : ItemAmount
 	{
 		public ulong skinOverride;
+
+		public bool blueprint;
 	}
 
 	public string niceName;
@@ -34,17 +36,31 @@ public class PlayerInventoryProperties : ScriptableObject
 		{
 			giveBase.GiveToPlayer(player);
 		}
-		foreach (ItemAmountSkinned item in belt)
+		foreach (ItemAmountSkinned item2 in belt)
 		{
-			player.inventory.GiveItem(ItemManager.Create(item.itemDef, (int)item.amount, item.skinOverride), player.inventory.containerBelt);
+			CreateItem(item2, player.inventory.containerBelt);
 		}
-		foreach (ItemAmountSkinned item2 in main)
+		foreach (ItemAmountSkinned item3 in main)
 		{
-			player.inventory.GiveItem(ItemManager.Create(item2.itemDef, (int)item2.amount, item2.skinOverride), player.inventory.containerMain);
+			CreateItem(item3, player.inventory.containerMain);
 		}
-		foreach (ItemAmountSkinned item3 in wear)
+		foreach (ItemAmountSkinned item4 in wear)
 		{
-			player.inventory.GiveItem(ItemManager.Create(item3.itemDef, (int)item3.amount, item3.skinOverride), player.inventory.containerWear);
+			CreateItem(item4, player.inventory.containerWear);
+		}
+		void CreateItem(ItemAmountSkinned toCreate, ItemContainer destination)
+		{
+			Item item = null;
+			if (toCreate.blueprint)
+			{
+				item = ItemManager.Create(ItemManager.blueprintBaseDef, 1, 0uL);
+				item.blueprintTarget = ((toCreate.itemDef.isRedirectOf != null) ? toCreate.itemDef.isRedirectOf.itemid : toCreate.itemDef.itemid);
+			}
+			else
+			{
+				item = ItemManager.Create(toCreate.itemDef, (int)toCreate.amount, toCreate.skinOverride);
+			}
+			player.inventory.GiveItem(item, destination);
 		}
 	}
 }

@@ -958,7 +958,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			Item item = ItemManager.Create(Properties.CloneItem, num, 0uL);
 			GrowableGeneEncoding.EncodeGenesToItem(this, item);
-			player.GiveItem(item, GiveItemReason.PickedUp);
+			player.GiveItem(item, GiveItemReason.ResourceHarvested);
 			if (Properties.pickEffect.isValid)
 			{
 				Effect.server.Run(Properties.pickEffect.resourcePath, base.transform.position, Vector3.up);
@@ -1041,7 +1041,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		if (player != null)
 		{
 			Interface.CallHook("OnGrowableGathered", this, item, player);
-			player.GiveItem(item, GiveItemReason.PickedUp);
+			player.GiveItem(item, GiveItemReason.ResourceHarvested);
 		}
 		else
 		{
@@ -1049,9 +1049,9 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_PickFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player);

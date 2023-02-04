@@ -74,6 +74,10 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		Facepunch.Pool.ResizeBuffer<EntityLink>(65536);
 		Facepunch.Pool.FillBuffer<Networkable>();
 		Facepunch.Pool.FillBuffer<EntityLink>();
+		if (Facepunch.CommandLine.HasSwitch("-networkthread"))
+		{
+			BaseNetwork.Multithreading = true;
+		}
 		SteamNetworking.SetDebugFunction();
 		if (Facepunch.CommandLine.HasSwitch("-swnet"))
 		{
@@ -82,6 +86,10 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		else if (Facepunch.CommandLine.HasSwitch("-sdrnet"))
 		{
 			NetworkInitSteamworks(enableSteamDatagramRelay: true);
+		}
+		else if (Facepunch.CommandLine.HasSwitch("-raknet"))
+		{
+			NetworkInitRaknet();
 		}
 		else
 		{

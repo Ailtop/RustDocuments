@@ -57,6 +57,8 @@ public class BuildingBlock : StabilityEntity
 
 	public bool CullBushes;
 
+	public bool CheckForPipesOnModelChange;
+
 	[NonSerialized]
 	public Construction blockDefinition;
 
@@ -591,6 +593,10 @@ public class BuildingBlock : StabilityEntity
 		if (flag || flag2 || forceSkinRefresh)
 		{
 			currentSkin.Refresh(this);
+			if (base.isServer && flag2)
+			{
+				CheckForPipes();
+			}
 			forceSkinRefresh = false;
 		}
 		if (base.isServer)
@@ -609,6 +615,24 @@ public class BuildingBlock : StabilityEntity
 	public override bool ShouldBlockProjectiles()
 	{
 		return grade != BuildingGrade.Enum.Twigs;
+	}
+
+	public void CheckForPipes()
+	{
+		if (!CheckForPipesOnModelChange || !ConVar.Server.enforcePipeChecksOnBuildingBlockChanges || Rust.Application.isLoading)
+		{
+			return;
+		}
+		List<ColliderInfo_Pipe> obj = Facepunch.Pool.GetList<ColliderInfo_Pipe>();
+		Vis.Components(new OBB(base.transform, bounds), obj, 536870912);
+		foreach (ColliderInfo_Pipe item in obj)
+		{
+			if (!(item == null) && item.gameObject.activeInHierarchy && item.HasFlag(ColliderInfo.Flags.OnlyBlockBuildingBlock) && item.ParentEntity != null && item.ParentEntity.isServer)
+			{
+				WireTool.AttemptClearSlot(item.ParentEntity, null, item.OutputSlotIndex, isInput: false);
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	private void OnHammered()

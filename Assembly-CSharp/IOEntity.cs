@@ -17,7 +17,8 @@ public class IOEntity : DecayEntity
 		Electric = 0,
 		Fluidic = 1,
 		Kinetic = 2,
-		Generic = 3
+		Generic = 3,
+		Industrial = 4
 	}
 
 	[Serializable]
@@ -85,9 +86,13 @@ public class IOEntity : DecayEntity
 
 		public float[] slackLevels;
 
+		public Vector3 worldSpaceLineEndRotation;
+
 		public ClientIOLine line;
 
 		public Vector3 handlePosition;
+
+		public Vector3 handleDirection;
 
 		public bool rootConnectionsOnly;
 
@@ -108,6 +113,13 @@ public class IOEntity : DecayEntity
 		public string PrefabName;
 
 		public float Time;
+	}
+
+	public struct ContainerInputOutput
+	{
+		public IIndustrialStorage Storage;
+
+		public int SlotIndex;
 	}
 
 	[Header("IOEntity")]
@@ -161,6 +173,10 @@ public class IOEntity : DecayEntity
 	public int lastUpdateBlockedFrame;
 
 	public bool ensureOutputsUpdated;
+
+	public const int MaxContainerSourceCount = 16;
+
+	private List<BoxCollider> spawnedColliders = new List<BoxCollider>();
 
 	public virtual bool IsGravitySource => false;
 
@@ -233,6 +249,7 @@ public class IOEntity : DecayEntity
 			lastUpdateTime = 0f;
 			ensureOutputsUpdated = false;
 		}
+		ClearIndustrialPreventBuilding();
 	}
 
 	public string GetDisplayName()
@@ -689,7 +706,7 @@ public class IOEntity : DecayEntity
 		{
 			return;
 		}
-		if (inputs[inputSlot].type != ioType)
+		if (inputs[inputSlot].type != ioType || inputs[inputSlot].type == IOType.Industrial)
 		{
 			IOStateChanged(inputAmount, inputSlot);
 			return;
@@ -875,6 +892,7 @@ public class IOEntity : DecayEntity
 			iOConnection2.type = (int)iOSlot2.type;
 			iOConnection2.inUse = iOConnection2.connectedID != 0;
 			iOConnection2.colour = (int)iOSlot2.wireColour;
+			iOConnection2.worldSpaceRotation = iOSlot2.worldSpaceLineEndRotation;
 			if (iOSlot2.linePoints != null)
 			{
 				iOConnection2.linePointList = Facepunch.Pool.GetList<ProtoBuf.IOEntity.IOConnection.LineVec>();
@@ -906,6 +924,57 @@ public class IOEntity : DecayEntity
 			}
 		}
 		return inputAmount;
+	}
+
+	public void FindContainerSource(List<ContainerInputOutput> found, int depth, bool input, Func<IIndustrialStorage, int, bool> validFilter)
+	{
+		if (depth <= 0 || found.Count >= 16)
+		{
+			return;
+		}
+		int num = 0;
+		IOSlot[] array = (input ? inputs : outputs);
+		foreach (IOSlot iOSlot in array)
+		{
+			num++;
+			if (iOSlot.type != IOType.Industrial)
+			{
+				break;
+			}
+			IOEntity iOEntity = iOSlot.connectedTo.Get(base.isServer);
+			if (!(iOEntity != null))
+			{
+				continue;
+			}
+			if (iOEntity is IIndustrialStorage industrialStorage && (validFilter == null || validFilter(industrialStorage, iOSlot.connectedToSlot)))
+			{
+				num = iOSlot.connectedToSlot;
+				if (GetExistingCount(industrialStorage) < 2)
+				{
+					found.Add(new ContainerInputOutput
+					{
+						SlotIndex = num,
+						Storage = industrialStorage
+					});
+				}
+			}
+			if ((!(iOEntity is IIndustrialStorage) || iOEntity is IndustrialStorageAdaptor) && !(iOEntity is IndustrialConveyor) && iOEntity != null)
+			{
+				iOEntity.FindContainerSource(found, depth - 1, input, validFilter);
+			}
+		}
+		int GetExistingCount(IIndustrialStorage storage)
+		{
+			int num2 = 0;
+			foreach (ContainerInputOutput item in found)
+			{
+				if (item.Storage == storage)
+				{
+					num2++;
+				}
+			}
+			return num2;
+		}
 	}
 
 	public virtual bool AllowLiquidPassthrough(IOEntity fromSource, Vector3 sourceWorldPosition, bool forPlacement = false)
@@ -964,67 +1033,68 @@ public class IOEntity : DecayEntity
 				inputs[i].wireColour = (WireTool.WireColour)iOConnection.colour;
 			}
 		}
-		if (info.msg.ioEntity.outputs == null)
+		if (info.msg.ioEntity.outputs != null)
 		{
-			return;
-		}
-		if (!info.fromDisk && base.isClient)
-		{
-			IOSlot[] array = outputs;
-			for (int j = 0; j < array.Length; j++)
+			if (!info.fromDisk && base.isClient)
 			{
-				array[j].Clear();
-			}
-		}
-		int count2 = info.msg.ioEntity.outputs.Count;
-		IOSlot[] array2 = null;
-		if (outputs.Length != count2 && count2 > 0)
-		{
-			array2 = outputs;
-			outputs = new IOSlot[count2];
-			for (int k = 0; k < array2.Length; k++)
-			{
-				if (k < count2)
+				IOSlot[] array = outputs;
+				for (int j = 0; j < array.Length; j++)
 				{
-					outputs[k] = array2[k];
+					array[j].Clear();
+				}
+			}
+			int count2 = info.msg.ioEntity.outputs.Count;
+			IOSlot[] array2 = null;
+			if (outputs.Length != count2 && count2 > 0)
+			{
+				array2 = outputs;
+				outputs = new IOSlot[count2];
+				for (int k = 0; k < array2.Length; k++)
+				{
+					if (k < count2)
+					{
+						outputs[k] = array2[k];
+					}
+				}
+			}
+			for (int l = 0; l < count2; l++)
+			{
+				if (outputs[l] == null)
+				{
+					outputs[l] = new IOSlot();
+				}
+				ProtoBuf.IOEntity.IOConnection iOConnection2 = info.msg.ioEntity.outputs[l];
+				outputs[l].connectedTo = new IORef();
+				outputs[l].connectedTo.entityRef.uid = iOConnection2.connectedID;
+				if (base.isClient)
+				{
+					outputs[l].connectedTo.InitClient();
+				}
+				outputs[l].connectedToSlot = iOConnection2.connectedToSlot;
+				outputs[l].niceName = iOConnection2.niceName;
+				outputs[l].type = (IOType)iOConnection2.type;
+				outputs[l].wireColour = (WireTool.WireColour)iOConnection2.colour;
+				outputs[l].worldSpaceLineEndRotation = iOConnection2.worldSpaceRotation;
+				if (info.fromDisk || base.isClient)
+				{
+					List<ProtoBuf.IOEntity.IOConnection.LineVec> linePointList = iOConnection2.linePointList;
+					if (outputs[l].linePoints == null || outputs[l].linePoints.Length != linePointList.Count)
+					{
+						outputs[l].linePoints = new Vector3[linePointList.Count];
+					}
+					if (outputs[l].slackLevels == null || outputs[l].slackLevels.Length != linePointList.Count)
+					{
+						outputs[l].slackLevels = new float[linePointList.Count];
+					}
+					for (int m = 0; m < linePointList.Count; m++)
+					{
+						outputs[l].linePoints[m] = linePointList[m].vec;
+						outputs[l].slackLevels[m] = linePointList[m].vec.w;
+					}
 				}
 			}
 		}
-		for (int l = 0; l < count2; l++)
-		{
-			if (outputs[l] == null)
-			{
-				outputs[l] = new IOSlot();
-			}
-			ProtoBuf.IOEntity.IOConnection iOConnection2 = info.msg.ioEntity.outputs[l];
-			outputs[l].connectedTo = new IORef();
-			outputs[l].connectedTo.entityRef.uid = iOConnection2.connectedID;
-			if (base.isClient)
-			{
-				outputs[l].connectedTo.InitClient();
-			}
-			outputs[l].connectedToSlot = iOConnection2.connectedToSlot;
-			outputs[l].niceName = iOConnection2.niceName;
-			outputs[l].type = (IOType)iOConnection2.type;
-			outputs[l].wireColour = (WireTool.WireColour)iOConnection2.colour;
-			if (info.fromDisk || base.isClient)
-			{
-				List<ProtoBuf.IOEntity.IOConnection.LineVec> linePointList = iOConnection2.linePointList;
-				if (outputs[l].linePoints == null || outputs[l].linePoints.Length != linePointList.Count)
-				{
-					outputs[l].linePoints = new Vector3[linePointList.Count];
-				}
-				if (outputs[l].slackLevels == null || outputs[l].slackLevels.Length != linePointList.Count)
-				{
-					outputs[l].slackLevels = new float[linePointList.Count];
-				}
-				for (int m = 0; m < linePointList.Count; m++)
-				{
-					outputs[l].linePoints[m] = linePointList[m].vec;
-					outputs[l].slackLevels[m] = linePointList[m].vec.w;
-				}
-			}
-		}
+		RefreshIndustrialPreventBuilding();
 	}
 
 	public int GetConnectedInputCount()
@@ -1062,5 +1132,55 @@ public class IOEntity : DecayEntity
 			return GetConnectedOutputCount() > 0;
 		}
 		return true;
+	}
+
+	public override void DestroyShared()
+	{
+		base.DestroyShared();
+		ClearIndustrialPreventBuilding();
+	}
+
+	public void RefreshIndustrialPreventBuilding()
+	{
+		ClearIndustrialPreventBuilding();
+		Matrix4x4 localToWorldMatrix = base.transform.localToWorldMatrix;
+		for (int i = 0; i < outputs.Length; i++)
+		{
+			IOSlot iOSlot = outputs[i];
+			if (iOSlot.type != IOType.Industrial || iOSlot.linePoints == null || iOSlot.linePoints.Length <= 1)
+			{
+				continue;
+			}
+			Vector3 vector = localToWorldMatrix.MultiplyPoint3x4(iOSlot.linePoints[0]);
+			for (int j = 1; j < iOSlot.linePoints.Length; j++)
+			{
+				Vector3 vector2 = localToWorldMatrix.MultiplyPoint3x4(iOSlot.linePoints[j]);
+				Vector3 pos = Vector3.Lerp(vector2, vector, 0.5f);
+				float z = Vector3.Distance(vector2, vector);
+				Quaternion rot = Quaternion.LookRotation((vector2 - vector).normalized);
+				GameObject obj = base.gameManager.CreatePrefab("assets/prefabs/misc/ioentitypreventbuilding.prefab", pos, rot);
+				obj.transform.SetParent(base.transform);
+				if (obj.TryGetComponent<BoxCollider>(out var component))
+				{
+					component.size = new Vector3(0.1f, 0.1f, z);
+					spawnedColliders.Add(component);
+				}
+				if (obj.TryGetComponent<ColliderInfo_Pipe>(out var component2))
+				{
+					component2.OutputSlotIndex = i;
+					component2.ParentEntity = this;
+				}
+				vector = vector2;
+			}
+		}
+	}
+
+	private void ClearIndustrialPreventBuilding()
+	{
+		foreach (BoxCollider spawnedCollider in spawnedColliders)
+		{
+			base.gameManager.Retire(spawnedCollider.gameObject);
+		}
+		spawnedColliders.Clear();
 	}
 }

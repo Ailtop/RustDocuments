@@ -3,12 +3,13 @@ using ConVar;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Network;
+using Facepunch.Rust;
 using Rust.Ai;
 using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[904]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[922]
 	{
 		new ConsoleSystem.Command
 		{
@@ -3991,6 +3992,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "bench_io",
+			Parent = "debug",
+			FullName = "debug.bench_io",
+			ServerAdmin = true,
+			Description = "Spawn lots of IO entities to lag the server",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.bench_io(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "breakheld",
 			Parent = "debug",
 			FullName = "debug.breakheld",
@@ -5185,6 +5199,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "cleardroppeditems",
+			Parent = "global",
+			FullName = "global.cleardroppeditems",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate
+			{
+				Global.ClearDroppedItems();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "clearspraysatpositioninradius",
 			Parent = "global",
 			FullName = "global.clearspraysatpositioninradius",
@@ -5485,15 +5511,15 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "skipassetwarmup",
+			Name = "skipassetwarmup_crashes",
 			Parent = "global",
-			FullName = "global.skipassetwarmup",
+			FullName = "global.skipassetwarmup_crashes",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Global.skipassetwarmup.ToString(),
+			GetOveride = () => Global.skipAssetWarmup_crashes.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Global.skipassetwarmup = str.ToBool();
+				Global.skipAssetWarmup_crashes = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -5518,6 +5544,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Global.spectate(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "spectateid",
+			Parent = "global",
+			FullName = "global.spectateid",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.spectateid(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6065,6 +6103,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Inventory.givearm(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "givebp",
+			Parent = "inventory",
+			FullName = "inventory.givebp",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Inventory.giveBp(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6962,6 +7012,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "flush_analytics",
+			Parent = "profile",
+			FullName = "profile.flush_analytics",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.Profile.flush_analytics(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "start",
 			Parent = "profile",
 			FullName = "profile.start",
@@ -7381,6 +7443,22 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "conveyormovefrequency",
+			Parent = "server",
+			FullName = "server.conveyormovefrequency",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Server.conveyorMoveFrequency.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.conveyorMoveFrequency = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "corpsedespawn",
 			Parent = "server",
 			FullName = "server.corpsedespawn",
@@ -7476,6 +7554,26 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "defaultblueprintresearchcost",
+			Parent = "server",
+			FullName = "server.defaultblueprintresearchcost",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Saved = true,
+			Description = "How much scrap is required to research default blueprints",
+			Replicated = true,
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Server.defaultBlueprintResearchCost.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.defaultBlueprintResearchCost = str.ToInt();
+			},
+			Default = "10"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "description",
 			Parent = "server",
 			FullName = "server.description",
@@ -7512,6 +7610,22 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.encryption = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "enforcepipechecksonbuildingblockchanges",
+			Parent = "server",
+			FullName = "server.enforcepipechecksonbuildingblockchanges",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Whether to check for illegal industrial pipes when changing building block states (roof bunkers)",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Server.enforcePipeChecksOnBuildingBlockChanges.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.enforcePipeChecksOnBuildingBlockChanges = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7726,6 +7840,22 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "industrialcrafterfrequency",
+			Parent = "server",
+			FullName = "server.industrialcrafterfrequency",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Server.industrialCrafterFrequency.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.industrialCrafterFrequency = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "ip",
 			Parent = "server",
 			FullName = "server.ip",
@@ -7884,6 +8014,35 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "maxdecryptqueue",
+			Parent = "server",
+			FullName = "server.maxdecryptqueue",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.maxdecryptqueue.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.maxdecryptqueue = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxitemstacksmovedpertickindustrial",
+			Parent = "server",
+			FullName = "server.maxitemstacksmovedpertickindustrial",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How many stacks a single conveyor can move in a single tick",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Server.maxItemStacksMovedPerTickIndustrial.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.maxItemStacksMovedPerTickIndustrial = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxpacketsize",
 			Parent = "server",
 			FullName = "server.maxpacketsize",
@@ -8015,6 +8174,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "maxreadqueue",
+			Parent = "server",
+			FullName = "server.maxreadqueue",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.maxreadqueue.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.maxreadqueue = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxreceivetime",
 			Parent = "server",
 			FullName = "server.maxreceivetime",
@@ -8037,6 +8209,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.maxunack = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxwritequeue",
+			Parent = "server",
+			FullName = "server.maxwritequeue",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Server.maxwritequeue.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.maxwritequeue = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8893,6 +9078,21 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Server.useMinimumPlantCondition = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "watercontainersleavewaterbehind",
+			Parent = "server",
+			FullName = "server.watercontainersleavewaterbehind",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "When transferring water, should containers keep 1 water behind. Enabling this should help performance if water IO is causing performance loss",
+			Variable = true,
+			GetOveride = () => Server.waterContainersLeaveWaterBehind.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Server.waterContainersLeaveWaterBehind = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -10585,6 +10785,58 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				RCon.Web = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "analytics_header",
+			Parent = "analytics",
+			FullName = "analytics.analytics_header",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Analytics.AnalyticsHeader.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Analytics.AnalyticsHeader = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "analytics_secret",
+			Parent = "analytics",
+			FullName = "analytics.analytics_secret",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Analytics.AnalyticsSecret.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Analytics.AnalyticsSecret = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "client_analytics_url",
+			Parent = "analytics",
+			FullName = "analytics.client_analytics_url",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Analytics.ClientAnalyticsUrl.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Analytics.ClientAnalyticsUrl = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "server_analytics_url",
+			Parent = "analytics",
+			FullName = "analytics.server_analytics_url",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Analytics.ServerAnalyticsUrl.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Analytics.ServerAnalyticsUrl = str;
 			}
 		},
 		new ConsoleSystem.Command

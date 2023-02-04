@@ -320,48 +320,24 @@ public class BaseMountable : BaseCombatEntity
 		Vector3 end = disPos + new Vector3(0f, 1.3f, 0f);
 		if (!UnityEngine.Physics.CheckCapsule(start, end, 0.5f, 1537286401))
 		{
-			Vector3 vector = disPos + base.transform.up * 0.5f;
+			Vector3 position = disPos + base.transform.up * 0.5f;
 			if (debugDismounts)
 			{
 				Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} capsule check is OK.");
 			}
-			if (IsVisible(vector))
+			if (IsVisible(position))
 			{
-				Vector3 vector2 = disPos + player.NoClipOffset();
+				Vector3 vector = disPos + player.NoClipOffset();
 				if (debugDismounts)
 				{
 					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
 				}
-				if (legacyDismount)
-				{
-					if (!UnityEngine.Physics.Linecast(dismountCheckStart, vector, out var hitInfo, 1486946561) || HitOurself(hitInfo))
-					{
-						if (debugDismounts)
-						{
-							Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} linecast is OK.");
-						}
-						Ray ray = new Ray(dismountCheckStart, Vector3Ex.Direction(vector, dismountCheckStart));
-						float maxDistance = Vector3.Distance(dismountCheckStart, vector);
-						if (!UnityEngine.Physics.SphereCast(ray, 0.5f, out hitInfo, maxDistance, 1486946561) || HitOurself(hitInfo))
-						{
-							if (debugDismounts)
-							{
-								if (debugDismounts)
-								{
-									Debug.Log($"<color=green>ValidDismountPosition debug: Dismount point {disPos} is valid</color>.");
-								}
-								Debug.DrawLine(dismountCheckStart, disPos, Color.green, 10f);
-							}
-							return true;
-						}
-					}
-				}
-				else if (!AntiHack.TestNoClipping(player, dismountCheckStart, vector2, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, this))
+				if (!AntiHack.TestNoClipping(player, dismountCheckStart, vector, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, legacyDismount ? null : this))
 				{
 					if (debugDismounts)
 					{
 						Debug.Log($"<color=green>ValidDismountPosition debug: Dismount point {disPos} is valid</color>.");
-						Debug.DrawLine(dismountCheckStart, vector2, Color.green, 10f);
+						Debug.DrawLine(dismountCheckStart, vector, Color.green, 10f);
 					}
 					return true;
 				}
@@ -376,15 +352,6 @@ public class BaseMountable : BaseCombatEntity
 			}
 		}
 		return false;
-		bool HitOurself(RaycastHit hit)
-		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hit);
-			if (!(entity == this))
-			{
-				return EqualNetID(entity);
-			}
-			return true;
-		}
 	}
 
 	public BasePlayer GetMounted()

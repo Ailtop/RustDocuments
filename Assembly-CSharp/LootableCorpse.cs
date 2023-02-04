@@ -21,6 +21,9 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	[NonSerialized]
 	public ItemContainer[] containers;
 
+	[NonSerialized]
+	private bool firstLooted;
+
 	public virtual string playerName
 	{
 		get
@@ -83,6 +86,12 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	public override void ResetState()
+	{
+		firstLooted = false;
+		base.ResetState();
+	}
+
 	public override void ServerInit()
 	{
 		base.ServerInit();
@@ -141,6 +150,17 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	public virtual bool CanLoot()
 	{
 		return true;
+	}
+
+	public override bool OnStartBeingLooted(BasePlayer baseEntity)
+	{
+		if (!firstLooted)
+		{
+			_ = playerSteamID;
+			_ = 10000000;
+			firstLooted = true;
+		}
+		return base.OnStartBeingLooted(baseEntity);
 	}
 
 	protected virtual bool CanLootContainer(ItemContainer c, int index)

@@ -68,6 +68,16 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			}
 		}
 
+		public class Priority : Attribute
+		{
+			public string functionName;
+
+			public Priority(string priorityFunc)
+			{
+				functionName = priorityFunc;
+			}
+		}
+
 		public class UsableWhileWounded : Attribute
 		{
 		}
@@ -1130,13 +1140,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			if (Interface.CallHook("OnEntityFlagsNetworkUpdate", this) == null)
 			{
 				List<Connection> subscribers = GetSubscribers();
-				if (subscribers != null && subscribers.Count > 0 && Network.Net.sv.write.Start())
+				if (subscribers != null && subscribers.Count > 0)
 				{
-					Network.Net.sv.write.PacketID(Message.Type.EntityFlags);
-					Network.Net.sv.write.EntityID(net.ID);
-					Network.Net.sv.write.Int32((int)flags);
+					NetWrite netWrite = Network.Net.sv.StartWrite();
+					netWrite.PacketID(Message.Type.EntityFlags);
+					netWrite.EntityID(net.ID);
+					netWrite.Int32((int)flags);
 					SendInfo info = new SendInfo(subscribers);
-					Network.Net.sv.write.Send(info);
+					netWrite.Send(info);
 				}
 				OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this);
 			}
@@ -1559,12 +1570,13 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				child.DestroyOnClient(connection);
 			}
 		}
-		if (Network.Net.sv.IsConnected() && Network.Net.sv.write.Start())
+		if (Network.Net.sv.IsConnected())
 		{
-			Network.Net.sv.write.PacketID(Message.Type.EntityDestroy);
-			Network.Net.sv.write.EntityID(net.ID);
-			Network.Net.sv.write.UInt8(0);
-			Network.Net.sv.write.Send(new SendInfo(connection));
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.EntityDestroy);
+			netWrite.EntityID(net.ID);
+			netWrite.UInt8(0);
+			netWrite.Send(new SendInfo(connection));
 			LogEntry(LogEntryType.Network, 2, "EntityDestroy");
 		}
 	}
@@ -1778,64 +1790,70 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public void ClientRPCEx<T1, T2, T3, T4, T5>(SendInfo sendInfo, Connection sourceConnection, string funcName, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
 	{
-		if (Network.Net.sv.IsConnected() && net != null && ClientRPCStart(sourceConnection, funcName))
+		if (Network.Net.sv.IsConnected() && net != null)
 		{
-			ClientRPCWrite(arg1);
-			ClientRPCWrite(arg2);
-			ClientRPCWrite(arg3);
-			ClientRPCWrite(arg4);
-			ClientRPCWrite(arg5);
-			ClientRPCSend(sendInfo);
+			NetWrite write = ClientRPCStart(sourceConnection, funcName);
+			ClientRPCWrite(write, arg1);
+			ClientRPCWrite(write, arg2);
+			ClientRPCWrite(write, arg3);
+			ClientRPCWrite(write, arg4);
+			ClientRPCWrite(write, arg5);
+			ClientRPCSend(write, sendInfo);
 		}
 	}
 
 	public void ClientRPCEx<T1, T2, T3, T4>(SendInfo sendInfo, Connection sourceConnection, string funcName, T1 arg1, T2 arg2, T3 arg3, T4 arg4)
 	{
-		if (Network.Net.sv.IsConnected() && net != null && ClientRPCStart(sourceConnection, funcName))
+		if (Network.Net.sv.IsConnected() && net != null)
 		{
-			ClientRPCWrite(arg1);
-			ClientRPCWrite(arg2);
-			ClientRPCWrite(arg3);
-			ClientRPCWrite(arg4);
-			ClientRPCSend(sendInfo);
+			NetWrite write = ClientRPCStart(sourceConnection, funcName);
+			ClientRPCWrite(write, arg1);
+			ClientRPCWrite(write, arg2);
+			ClientRPCWrite(write, arg3);
+			ClientRPCWrite(write, arg4);
+			ClientRPCSend(write, sendInfo);
 		}
 	}
 
 	public void ClientRPCEx<T1, T2, T3>(SendInfo sendInfo, Connection sourceConnection, string funcName, T1 arg1, T2 arg2, T3 arg3)
 	{
-		if (Network.Net.sv.IsConnected() && net != null && ClientRPCStart(sourceConnection, funcName))
+		if (Network.Net.sv.IsConnected() && net != null)
 		{
-			ClientRPCWrite(arg1);
-			ClientRPCWrite(arg2);
-			ClientRPCWrite(arg3);
-			ClientRPCSend(sendInfo);
+			NetWrite write = ClientRPCStart(sourceConnection, funcName);
+			ClientRPCWrite(write, arg1);
+			ClientRPCWrite(write, arg2);
+			ClientRPCWrite(write, arg3);
+			ClientRPCSend(write, sendInfo);
 		}
 	}
 
 	public void ClientRPCEx<T1, T2>(SendInfo sendInfo, Connection sourceConnection, string funcName, T1 arg1, T2 arg2)
 	{
-		if (Network.Net.sv.IsConnected() && net != null && ClientRPCStart(sourceConnection, funcName))
+		if (Network.Net.sv.IsConnected() && net != null)
 		{
-			ClientRPCWrite(arg1);
-			ClientRPCWrite(arg2);
-			ClientRPCSend(sendInfo);
+			NetWrite write = ClientRPCStart(sourceConnection, funcName);
+			ClientRPCWrite(write, arg1);
+			ClientRPCWrite(write, arg2);
+			ClientRPCSend(write, sendInfo);
 		}
 	}
 
 	public void ClientRPCEx<T1>(SendInfo sendInfo, Connection sourceConnection, string funcName, T1 arg1)
 	{
-		if (Network.Net.sv.IsConnected() && net != null && ClientRPCStart(sourceConnection, funcName))
+		if (Network.Net.sv.IsConnected() && net != null)
 		{
-			ClientRPCWrite(arg1);
-			ClientRPCSend(sendInfo);
+			NetWrite write = ClientRPCStart(sourceConnection, funcName);
+			ClientRPCWrite(write, arg1);
+			ClientRPCSend(write, sendInfo);
 		}
 	}
 
 	public void ClientRPCEx(SendInfo sendInfo, Connection sourceConnection, string funcName)
 	{
-		if (Network.Net.sv.IsConnected() && net != null && ClientRPCStart(sourceConnection, funcName))
+		if (Network.Net.sv.IsConnected() && net != null)
 		{
-			ClientRPCSend(sendInfo);
+			NetWrite write = ClientRPCStart(sourceConnection, funcName);
+			ClientRPCSend(write, sendInfo);
 		}
 	}
 
@@ -1919,27 +1937,24 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	private bool ClientRPCStart(Connection sourceConnection, string funcName)
+	private NetWrite ClientRPCStart(Connection sourceConnection, string funcName)
 	{
-		if (Network.Net.sv.write.Start())
-		{
-			Network.Net.sv.write.PacketID(Message.Type.RPCMessage);
-			Network.Net.sv.write.UInt32(net.ID);
-			Network.Net.sv.write.UInt32(StringPool.Get(funcName));
-			Network.Net.sv.write.UInt64(sourceConnection?.userid ?? 0);
-			return true;
-		}
-		return false;
+		NetWrite netWrite = Network.Net.sv.StartWrite();
+		netWrite.PacketID(Message.Type.RPCMessage);
+		netWrite.UInt32(net.ID);
+		netWrite.UInt32(StringPool.Get(funcName));
+		netWrite.UInt64(sourceConnection?.userid ?? 0);
+		return netWrite;
 	}
 
-	private void ClientRPCWrite<T>(T arg)
+	private void ClientRPCWrite<T>(NetWrite write, T arg)
 	{
-		NetworkWriteEx.WriteObject(Network.Net.sv.write, arg);
+		NetworkWriteEx.WriteObject(write, arg);
 	}
 
-	private void ClientRPCSend(SendInfo sendInfo)
+	private void ClientRPCSend(NetWrite write, SendInfo sendInfo)
 	{
-		Network.Net.sv.write.Send(sendInfo);
+		write.Send(sendInfo);
 	}
 
 	public virtual float RadiationProtection()

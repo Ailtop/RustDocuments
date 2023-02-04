@@ -22,11 +22,19 @@ public abstract class DeployVolume : PrefabAttribute
 	[FormerlySerializedAs("entities")]
 	public BaseEntity[] entityList;
 
+	public bool IsBuildingBlock { get; set; }
+
 	public static Collider LastDeployHit { get; private set; }
 
 	protected override Type GetIndexedType()
 	{
 		return typeof(DeployVolume);
+	}
+
+	public override void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		base.PreProcess(preProcess, rootObj, name, serverside, clientside, bundling);
+		IsBuildingBlock = rootObj.GetComponent<BuildingBlock>() != null;
 	}
 
 	protected abstract bool Check(Vector3 position, Quaternion rotation, int mask = -1);
@@ -105,7 +113,7 @@ public abstract class DeployVolume : PrefabAttribute
 				continue;
 			}
 			ColliderInfo component = gameObject.GetComponent<ColliderInfo>();
-			if (!(component == null) && volume.ignore != 0 && component.HasFlag(volume.ignore))
+			if ((component != null && component.HasFlag(ColliderInfo.Flags.OnlyBlockBuildingBlock) && !volume.IsBuildingBlock) || (!(component == null) && volume.ignore != 0 && component.HasFlag(volume.ignore)))
 			{
 				continue;
 			}

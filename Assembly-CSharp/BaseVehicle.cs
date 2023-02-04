@@ -525,13 +525,41 @@ public class BaseVehicle : BaseMountable
 		{
 			num = Mathf.Min(num, mountable.customPlayerCollider.radius);
 		}
-		Vector3 vector2 = position - vector * (num - 0.15f);
-		if (clippingChecks == ClippingCheckMode.AlwaysHeadOnly)
+		Vector3 vector2 = position - vector * (num - 0.2f);
+		bool result = false;
+		if (checkVehicleClipping)
 		{
-			return GamePhysics.CheckSphere(vector2, num, clipCheckMask, QueryTriggerInteraction.Ignore);
+			List<Collider> obj = Facepunch.Pool.GetList<Collider>();
+			if (clippingChecks == ClippingCheckMode.AlwaysHeadOnly)
+			{
+				GamePhysics.OverlapSphere(vector2, num, obj, clipCheckMask);
+			}
+			else
+			{
+				Vector3 point = position2 + vector * (num + 0.05f);
+				GamePhysics.OverlapCapsule(vector2, point, num, obj, clipCheckMask);
+			}
+			foreach (Collider item in obj)
+			{
+				BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item);
+				if (baseEntity != this && !EqualNetID(baseEntity))
+				{
+					result = true;
+					break;
+				}
+			}
+			Facepunch.Pool.FreeList(ref obj);
 		}
-		Vector3 end = position2 + vector * (num + 0.05f);
-		return GamePhysics.CheckCapsule(vector2, end, num, clipCheckMask, QueryTriggerInteraction.Ignore);
+		else if (clippingChecks == ClippingCheckMode.AlwaysHeadOnly)
+		{
+			result = GamePhysics.CheckSphere(vector2, num, clipCheckMask, QueryTriggerInteraction.Ignore);
+		}
+		else
+		{
+			Vector3 end = position2 + vector * (num + 0.05f);
+			result = GamePhysics.CheckCapsule(vector2, end, num, clipCheckMask, QueryTriggerInteraction.Ignore);
+		}
+		return result;
 	}
 
 	public virtual void CheckSeatsForClipping()
@@ -1007,6 +1035,11 @@ public class BaseVehicle : BaseMountable
 			{
 				return false;
 			}
+		}
+		BaseVehicle baseVehicle = VehicleParent();
+		if (baseVehicle != null)
+		{
+			return baseVehicle.MountEligable(player);
 		}
 		return true;
 	}

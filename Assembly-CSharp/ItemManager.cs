@@ -128,6 +128,16 @@ public class ItemManager
 		return CreateByItemID(itemDefinition.itemid, iAmount, skin);
 	}
 
+	public static ItemDefinition FindDefinitionByPartialName(string strName, int iAmount = 1, ulong skin = 0uL)
+	{
+		ItemDefinition itemDefinition = itemList.Find((ItemDefinition x) => x.shortname == strName);
+		if (itemDefinition == null)
+		{
+			itemDefinition = itemList.Find((ItemDefinition x) => x.shortname.Contains(strName, CompareOptions.IgnoreCase));
+		}
+		return itemDefinition;
+	}
+
 	public static Item CreateByItemID(int itemID, int iAmount = 1, ulong skin = 0uL)
 	{
 		ItemDefinition itemDefinition = FindItemDefinition(itemID);

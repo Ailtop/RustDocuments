@@ -2214,17 +2214,18 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 		using (TimeWarning.New("SendEntitySnapshot"))
 		{
-			if (!(ent == null) && ent.net != null && ent.ShouldNetworkTo(this) && Network.Net.sv.write.Start())
+			if (!(ent == null) && ent.net != null && ent.ShouldNetworkTo(this))
 			{
+				NetWrite netWrite = Network.Net.sv.StartWrite();
 				net.connection.validate.entityUpdates++;
 				SaveInfo saveInfo = default(SaveInfo);
 				saveInfo.forConnection = net.connection;
 				saveInfo.forDisk = false;
 				SaveInfo saveInfo2 = saveInfo;
-				Network.Net.sv.write.PacketID(Message.Type.Entities);
-				Network.Net.sv.write.UInt32(net.connection.validate.entityUpdates);
-				ent.ToStreamForNetwork(Network.Net.sv.write, saveInfo2);
-				Network.Net.sv.write.Send(new SendInfo(net.connection));
+				netWrite.PacketID(Message.Type.Entities);
+				netWrite.UInt32(net.connection.validate.entityUpdates);
+				ent.ToStreamForNetwork(netWrite, saveInfo2);
+				netWrite.Send(new SendInfo(net.connection));
 			}
 		}
 	}
@@ -2285,9 +2286,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!InGesture && !IsGestureBlocked())
@@ -2911,7 +2912,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 232;
+		missions.protocol = 233;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -3011,7 +3012,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (232 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (233 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save. Clearing");
 				loadedMissions.activeMission = -1;
@@ -6587,26 +6588,43 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			return;
 		}
 		BaseEntity baseEntity = array[SpectateOffset % array.Length];
-		if (!(baseEntity != null))
+		if (baseEntity != null)
 		{
-			return;
+			SpectatePlayer(baseEntity);
 		}
-		if (baseEntity is BasePlayer)
+	}
+
+	public void UpdateSpectateTarget(ulong id)
+	{
+		foreach (BasePlayer activePlayer in activePlayerList)
 		{
-			ChatMessage("Spectating: " + (baseEntity as BasePlayer).displayName);
+			if (activePlayer != null && activePlayer.userID == id)
+			{
+				spectateFilter = string.Empty;
+				SpectatePlayer(activePlayer);
+				break;
+			}
+		}
+	}
+
+	private void SpectatePlayer(BaseEntity target)
+	{
+		if (target is BasePlayer)
+		{
+			ChatMessage("Spectating: " + (target as BasePlayer).displayName);
 		}
 		else
 		{
-			ChatMessage("Spectating: " + baseEntity.ToString());
+			ChatMessage("Spectating: " + target.ToString());
 		}
 		using (TimeWarning.New("SendEntitySnapshot"))
 		{
-			SendEntitySnapshot(baseEntity);
+			SendEntitySnapshot(target);
 		}
 		UnityEngine.TransformEx.Identity(base.gameObject);
 		using (TimeWarning.New("SetParent"))
 		{
-			SetParent(baseEntity);
+			SetParent(target);
 		}
 	}
 
@@ -6791,16 +6809,14 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	{
 		if (Interface.CallHook("OnPlayerVoice", this, data) == null)
 		{
-			if (Network.Net.sv.write.Start())
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.VoiceData);
+			netWrite.UInt32(net.ID);
+			netWrite.BytesWithSize(data);
+			netWrite.Send(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.transform.position, 100f))
 			{
-				Network.Net.sv.write.PacketID(Message.Type.VoiceData);
-				Network.Net.sv.write.UInt32(net.ID);
-				Network.Net.sv.write.BytesWithSize(data);
-				Network.Net.sv.write.Send(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.transform.position, 100f))
-				{
-					priority = Priority.Immediate
-				});
-			}
+				priority = Priority.Immediate
+			});
 			if (activeTelephone != null)
 			{
 				activeTelephone.OnReceivedVoiceFromUser(data);

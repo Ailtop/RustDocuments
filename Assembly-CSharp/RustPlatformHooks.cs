@@ -25,17 +25,11 @@ public class RustPlatformHooks : IPlatformHooks
 			{
 				address = IPAddress.Parse(ConVar.Server.ip);
 			}
-			bool flag = ConVar.Server.queryport > 0 && ConVar.Server.queryport != ConVar.Server.port;
-			if (!flag && !Network.Net.sv.AllowPassthroughMessages)
+			if (ConVar.Server.queryport <= 0 || ConVar.Server.queryport == ConVar.Server.port)
 			{
 				ConVar.Server.queryport = Math.Max(ConVar.Server.port, RCon.Port) + 1;
-				flag = true;
 			}
-			if (flag && (ConVar.Server.queryport <= 0 || ConVar.Server.queryport == ConVar.Server.port))
-			{
-				throw new Exception("Query port isn't set up properly");
-			}
-			return new ServerParameters("rust", "Rust", 2367.ToString(), ConVar.Server.secure, CommandLine.HasSwitch("-sdrnet"), address, (ushort)Network.Net.sv.port, (ushort)(flag ? ((ushort)ConVar.Server.queryport) : 0));
+			return new ServerParameters("rust", "Rust", 2370.ToString(), ConVar.Server.secure, CommandLine.HasSwitch("-sdrnet"), address, (ushort)Network.Net.sv.port, (ushort)ConVar.Server.queryport);
 		}
 	}
 

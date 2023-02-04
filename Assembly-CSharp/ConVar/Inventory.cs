@@ -167,25 +167,33 @@ public class Inventory : ConsoleSystem
 	[ServerVar]
 	public static void resetbp(Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.Player(arg);
-		if ((bool)basePlayer)
+		BasePlayer basePlayer = ArgEx.GetPlayer(arg, 0);
+		if (basePlayer == null)
 		{
-			basePlayer.blueprints.Reset();
+			if (arg.HasArgs())
+			{
+				arg.ReplyWith("Can't find player");
+				return;
+			}
+			basePlayer = ArgEx.Player(arg);
 		}
+		basePlayer.blueprints.Reset();
 	}
 
 	[ServerVar]
 	public static void unlockall(Arg arg)
 	{
-		BasePlayer basePlayer = ArgEx.GetPlayer(arg, 0) ?? ArgEx.Player(arg);
-		if (!basePlayer)
+		BasePlayer basePlayer = ArgEx.GetPlayer(arg, 0);
+		if (basePlayer == null)
 		{
-			arg.ReplyWith("Can't find player");
+			if (arg.HasArgs())
+			{
+				arg.ReplyWith("Can't find player");
+				return;
+			}
+			basePlayer = ArgEx.Player(arg);
 		}
-		else
-		{
-			basePlayer.blueprints.UnlockAll();
-		}
+		basePlayer.blueprints.UnlockAll();
 	}
 
 	[ServerVar]
@@ -616,5 +624,45 @@ public class Inventory : ConsoleSystem
 			}
 		}
 		return -1;
+	}
+
+	[ServerVar]
+	public static void giveBp(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (!basePlayer)
+		{
+			return;
+		}
+		ItemDefinition itemDefinition = ItemManager.FindDefinitionByPartialName(arg.GetString(0), 1, 0uL);
+		if (itemDefinition == null)
+		{
+			arg.ReplyWith("Could not find item: " + arg.GetString(0));
+			return;
+		}
+		if (itemDefinition.Blueprint == null)
+		{
+			arg.ReplyWith(itemDefinition.shortname + " has no blueprint!");
+			return;
+		}
+		Item item = ItemManager.Create(ItemManager.blueprintBaseDef, 1, 0uL);
+		item.blueprintTarget = itemDefinition.itemid;
+		item.OnVirginSpawn();
+		if (!basePlayer.inventory.GiveItem(item))
+		{
+			item.Remove();
+			arg.ReplyWith("Couldn't give item (inventory full?)");
+			return;
+		}
+		basePlayer.Command("note.inv", item.info.itemid, 1);
+		Debug.Log("giving " + basePlayer.displayName + " 1 x " + item.blueprintTargetDef.shortname + " blueprint");
+		if (basePlayer.IsDeveloper)
+		{
+			basePlayer.ChatMessage("you silently gave yourself 1 x " + item.blueprintTargetDef.shortname + " blueprint");
+		}
+		else
+		{
+			Chat.Broadcast(basePlayer.displayName + " gave themselves 1 x " + item.blueprintTargetDef.shortname + " blueprint", "SERVER", "#eee", 0uL);
+		}
 	}
 }

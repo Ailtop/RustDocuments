@@ -330,6 +330,24 @@ public class Server : ConsoleSystem
 	[ServerVar(Help = "When a player respawns give them the loadout assigned to client.RespawnLoadout (created with inventory.saveloadout)")]
 	public static bool respawnWithLoadout = false;
 
+	[ServerVar(Help = "When transferring water, should containers keep 1 water behind. Enabling this should help performance if water IO is causing performance loss", Saved = true)]
+	public static bool waterContainersLeaveWaterBehind = false;
+
+	[ServerVar(Help = "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement", Saved = true, ShowInAdminUI = true)]
+	public static float conveyorMoveFrequency = 5f;
+
+	[ServerVar(Help = "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting", Saved = true, ShowInAdminUI = true)]
+	public static float industrialCrafterFrequency = 5f;
+
+	[ReplicatedVar(Help = "How much scrap is required to research default blueprints", Saved = true, ShowInAdminUI = true)]
+	public static int defaultBlueprintResearchCost = 10;
+
+	[ServerVar(Help = "Whether to check for illegal industrial pipes when changing building block states (roof bunkers)", Saved = true, ShowInAdminUI = true)]
+	public static bool enforcePipeChecksOnBuildingBlockChanges = true;
+
+	[ServerVar(Help = "How many stacks a single conveyor can move in a single tick", Saved = true, ShowInAdminUI = true)]
+	public static int maxItemStacksMovedPerTickIndustrial = 12;
+
 	[ServerVar(Saved = true)]
 	public static bool showHolsteredItems = true;
 
@@ -396,6 +414,45 @@ public class Server : ConsoleSystem
 		set
 		{
 			Network.Server.MaxReceiveTime = Mathf.Clamp(value, 1f, 1000f);
+		}
+	}
+
+	[ServerVar]
+	public static int maxreadqueue
+	{
+		get
+		{
+			return Network.Server.MaxReadQueue;
+		}
+		set
+		{
+			Network.Server.MaxReadQueue = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxwritequeue
+	{
+		get
+		{
+			return Network.Server.MaxWriteQueue;
+		}
+		set
+		{
+			Network.Server.MaxWriteQueue = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxdecryptqueue
+	{
+		get
+		{
+			return Network.Server.MaxDecryptQueue;
+		}
+		set
+		{
+			Network.Server.MaxDecryptQueue = Mathf.Max(value, 1);
 		}
 	}
 

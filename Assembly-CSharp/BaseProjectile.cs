@@ -247,6 +247,9 @@ public class BaseProjectile : AttackEntity
 	[NonSerialized]
 	public bool aiming;
 
+	[Header("ViewModel")]
+	public bool useEmptyAmmoState;
+
 	[Header("Burst Information")]
 	public bool isBurstWeapon;
 
@@ -1121,9 +1124,9 @@ public class BaseProjectile : AttackEntity
 		return HasFlag(Flags.Reserved6) == defaultOn;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.CallsPerSecond(2uL)]
+	[RPC_Server]
 	private void ToggleFireMode(RPCMessage msg)
 	{
 		if (canChangeFireModes && IsBurstEligable())

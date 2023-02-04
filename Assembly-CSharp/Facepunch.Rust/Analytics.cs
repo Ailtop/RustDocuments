@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using ConVar;
+using Network;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -9,6 +14,100 @@ namespace Facepunch.Rust;
 
 public static class Analytics
 {
+	public class AzureWebInterface
+	{
+		public static readonly AzureWebInterface client = new AzureWebInterface(isClient: true);
+
+		public static readonly AzureWebInterface server = new AzureWebInterface(isClient: false);
+
+		public bool IsClient;
+
+		public int MaxRetries = 1;
+
+		public int FlushSize = 1000;
+
+		public TimeSpan FlushDelay = TimeSpan.FromSeconds(30.0);
+
+		private DateTime nextFlush;
+
+		private ConcurrentQueue<List<EventRecord>> listPool = new ConcurrentQueue<List<EventRecord>>();
+
+		private List<EventRecord> pending = new List<EventRecord>();
+
+		private HttpClient HttpClient = new HttpClient();
+
+		public AzureWebInterface(bool isClient)
+		{
+			IsClient = isClient;
+		}
+
+		public void EnqueueEvent(EventRecord point)
+		{
+			DateTime utcNow = DateTime.UtcNow;
+			pending.Add(point);
+			if (pending.Count <= FlushSize && !(utcNow > nextFlush))
+			{
+				return;
+			}
+			nextFlush = utcNow.Add(FlushDelay);
+			List<EventRecord> toUpload = pending;
+			Task.Run(async delegate
+			{
+				await UploadAsync(toUpload);
+			});
+			List<EventRecord> result;
+			while (listPool.TryDequeue(out result))
+			{
+				foreach (EventRecord item in result)
+				{
+					EventRecord obj = item;
+					Pool.Free(ref obj);
+				}
+				Pool.FreeList(ref result);
+			}
+			pending = Pool.GetList<EventRecord>();
+		}
+
+		private async Task UploadAsync(List<EventRecord> records)
+		{
+			string payload;
+			try
+			{
+				payload = JsonConvert.SerializeObject(records);
+			}
+			catch (Exception exception)
+			{
+				Debug.LogException(exception);
+				listPool.Enqueue(records);
+				return;
+			}
+			for (int attempt = 0; attempt < MaxRetries; attempt++)
+			{
+				try
+				{
+					using StringContent content = new StringContent(payload, Encoding.UTF8, "application/json");
+					content.Headers.Add(AnalyticsHeader, AnalyticsSecret);
+					if (!IsClient)
+					{
+						content.Headers.Add("X-SERVER-IP", global::Network.Net.sv.ip);
+						content.Headers.Add("X-SERVER-PORT", global::Network.Net.sv.port.ToString());
+					}
+					(await HttpClient.PostAsync(IsClient ? ClientAnalyticsUrl : ServerAnalyticsUrl, content)).EnsureSuccessStatusCode();
+				}
+				catch (Exception ex)
+				{
+					if (!(ex is HttpRequestException))
+					{
+						Debug.LogException(ex);
+					}
+					continue;
+				}
+				break;
+			}
+			listPool.Enqueue(records);
+		}
+	}
+
 	public static class Server
 	{
 		public enum DeathType
@@ -409,4 +508,20 @@ public static class Analytics
 			}
 		}
 	}
+
+	[ServerVar(Name = "client_analytics_url")]
+	public static string ClientAnalyticsUrl { get; set; } = "https://functions-rust-api.azurewebsites.net/api/public/analytics/rust/client";
+
+
+	[ServerVar(Name = "server_analytics_url")]
+	public static string ServerAnalyticsUrl { get; set; } = "https://functions-rust-api.azurewebsites.net/api/public/analytics/rust/server";
+
+
+	[ServerVar(Name = "analytics_header")]
+	public static string AnalyticsHeader { get; set; } = "X-API-KEY";
+
+
+	[ServerVar(Name = "analytics_secret")]
+	public static string AnalyticsSecret { get; set; } = "";
+
 }

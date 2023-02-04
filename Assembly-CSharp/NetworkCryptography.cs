@@ -1,7 +1,7 @@
 using System;
 using Network;
 
-public abstract class NetworkCryptography : INetworkCryptocraphy
+public abstract class NetworkCryptography : INetworkCryptography
 {
 	private byte[] buffer = new byte[8388608];
 
@@ -55,24 +55,6 @@ public abstract class NetworkCryptography : INetworkCryptocraphy
 		ArraySegment<byte> dst = new ArraySegment<byte>(data.Array, data.Offset, data.Array.Length - data.Offset);
 		DecryptionHandler(connection, src, ref dst);
 		data = dst;
-	}
-
-	public bool IsEnabledIncoming(Connection connection)
-	{
-		if (connection != null && connection.encryptionLevel != 0)
-		{
-			return connection.decryptIncoming;
-		}
-		return false;
-	}
-
-	public bool IsEnabledOutgoing(Connection connection)
-	{
-		if (connection != null && connection.encryptionLevel != 0)
-		{
-			return connection.encryptOutgoing;
-		}
-		return false;
 	}
 
 	protected abstract void EncryptionHandler(Connection connection, ArraySegment<byte> src, ref ArraySegment<byte> dst);

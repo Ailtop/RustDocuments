@@ -662,7 +662,7 @@ public class BuildingPrivlidge : StorageContainer
 	public void RPC_Rotate(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (player.CanBuild() && (bool)player.GetHeldEntity() && player.GetHeldEntity().GetComponent<Hammer>() != null && (GetSlot(Slot.Lock) == null || !GetSlot(Slot.Lock).IsLocked()))
+		if (player.CanBuild() && (bool)player.GetHeldEntity() && player.GetHeldEntity().GetComponent<Hammer>() != null && (GetSlot(Slot.Lock) == null || !GetSlot(Slot.Lock).IsLocked()) && !HasAttachedStorageAdaptor())
 		{
 			base.transform.rotation = Quaternion.LookRotation(-base.transform.forward, base.transform.up);
 			SendNetworkUpdate();
@@ -701,5 +701,10 @@ public class BuildingPrivlidge : StorageContainer
 			return true;
 		}
 		return base.HasSlot(slot);
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
 	}
 }

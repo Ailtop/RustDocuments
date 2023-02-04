@@ -81,8 +81,9 @@ public class DepthOfFieldEffectRenderer : PostProcessEffectRenderer<DepthOfField
 		}
 		command.GetTemporaryRT(nameID, width >> 1, height >> 1, 0, FilterMode.Bilinear, sourceFormat);
 		command.GetTemporaryRT(nameID2, width >> 1, height >> 1, 0, FilterMode.Bilinear, sourceFormat);
-		int pass = (((DOFBlurSampleCount)blurSampleCount == DOFBlurSampleCount.High || (DOFBlurSampleCount)blurSampleCount == DOFBlurSampleCount.Medium) ? 4 : 2);
+		int pass = 2;
 		propertySheet.properties.SetVector("_Offsets", new Vector4(0f, internalBlurWidth, 0.025f, internalBlurWidth));
+		propertySheet.properties.SetInt("_BlurCountMode", (int)blurSampleCount.value);
 		RuntimeUtilities.BlitFullscreenTriangle(command, context.source, context.destination, propertySheet, pass);
 		command.ReleaseTemporaryRT(nameID);
 		command.ReleaseTemporaryRT(nameID2);
