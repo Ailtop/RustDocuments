@@ -10320,6 +10320,12 @@
     "pool": true
   },
   {
+    "name": "assets/bundled/prefabs/ui/lootpanels/lootpanel.industrialcrafter.prefab",
+    "guid": "270576ff3583f6f4abc8e90d7b646fd0",
+    "hash": 850134855,
+    "pool": true
+  },
+  {
     "name": "assets/bundled/prefabs/ui/lootpanels/lootpanel.lantern.prefab",
     "guid": "a7b4dbc443b5d6b41ba8b45a7a7c0a91",
     "hash": 3331590796,
@@ -41262,6 +41268,30 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/deployable/playerioents/electricfurnace/effects/electric-furnace-deploy.prefab",
+    "guid": "f1c95a79995f241c08c9df7dd590fc38",
+    "hash": 884069569,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/electricfurnace/electricfurnace.deployed.prefab",
+    "guid": "3e8c03662f463b242a740a586073daa9",
+    "hash": 3808299817,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/electricfurnace/electricfurnace.io.prefab",
+    "guid": "153791fb6fdbd984684fa341e1ab4c36",
+    "hash": 2678691787,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/electricfurnace/electricfurnace.item.prefab",
+    "guid": "cbc667e4e7c2d964ca53d80a573a2358",
+    "hash": 428423743,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/deployable/playerioents/electricheater/electric_heater.prefab",
     "guid": "a53a66fff4d641f48933c930d2c6e1fb",
     "hash": 3720950550,
@@ -41487,6 +41517,102 @@
     "name": "assets/prefabs/deployable/playerioents/igniter/igniter.item.prefab",
     "guid": "b2d4537045292cb47bef3639239c8934",
     "hash": 522918425,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialadaptors/effects/event lights.prefab",
+    "guid": "f5e129e53168f5e4c878a65f172b6243",
+    "hash": 125794897,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialadaptors/storageadaptor.deployed.prefab",
+    "guid": "c47b2ada4ec8f8f468706fee0099493d",
+    "hash": 1077498142,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialadaptors/storageadaptor.item.prefab",
+    "guid": "cf5409ed335c7b24eaa1f22c4d2d2550",
+    "hash": 2345488323,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialcombiner/industrialcombiner.deployed.prefab",
+    "guid": "aba131ebdb93b1243af455f40f4f83f0",
+    "hash": 2557715962,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialcombiner/industrialcombiner.item.prefab",
+    "guid": "4c0e50d394e4dff4e88aa6e6d4f1e7e5",
+    "hash": 4255206595,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/effects/event lights.prefab",
+    "guid": "b79314bfab5b0b248a414d0b42c9dc28",
+    "hash": 3274327446,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/effects/industrial-conveyor-deploy.prefab",
+    "guid": "bb0b3c787e3924615919b3a3a1b9de94",
+    "hash": 2972826437,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/industrialconveyor.deployed.prefab",
+    "guid": "a729d29bb3fff6d4faca45fede59a7e9",
+    "hash": 3459531520,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/industrialconveyor.item.prefab",
+    "guid": "63850c14851aad844a68d30288f4ca6c",
+    "hash": 986892188,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/ui.dialog.conveyorfilter.itemicon.prefab",
+    "guid": "bf98480a80a2a5a45b15610ac8ae8c0b",
+    "hash": 3502379026,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/ui.dialog.conveyorfilter.prefab",
+    "guid": "daac8f8de862b0a4fa97033d8ec2c191",
+    "hash": 2196990570,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialcrafter/effects/industrial-crafter-deploy.prefab",
+    "guid": "8e4dc76ee7b084fb598d527922d1331d",
+    "hash": 3163039755,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialcrafter/industrialcrafter.deployed.prefab",
+    "guid": "56f05d1c38018a744b4fd82584061f6b",
+    "hash": 273687723,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialcrafter/industrialcrafter.item.prefab",
+    "guid": "6d654643fa15f4b4cb47d35a8ace4da7",
+    "hash": 144571951,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialsplitter/industrialsplitter.deployed.prefab",
+    "guid": "b5490a26834ba6a449be259aed2cc2c3",
+    "hash": 4142483135,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/playerioents/industrialsplitter/industrialsplitter.item.prefab",
+    "guid": "f6f05e4ca340d4743862c1fb2db5ee98",
+    "hash": 4143518665,
     "pool": false
   },
   {
@@ -46480,6 +46606,12 @@
     "guid": "22dacc7553c9d3845b2aa2055f1e3898",
     "hash": 1911550872,
     "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/ioentitypreventbuilding.prefab",
+    "guid": "60260b2ffbfcc8341bcd883195f07bfb",
+    "hash": 2932091640,
+    "pool": true
   },
   {
     "name": "assets/prefabs/misc/item drop/item_drop.prefab",
@@ -53622,6 +53754,72 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/tools/pipe/clientiopipe_blue.prefab",
+    "guid": "4a0df76abfd697349a33ec721273f020",
+    "hash": 828712278,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/clientiopipe_green.prefab",
+    "guid": "5dd4e8995f4434e40b62b1c79854c3b8",
+    "hash": 3021955285,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/clientiopipe_grey.prefab",
+    "guid": "0e1c99a9bb2640f4a9921792bf2bdb9c",
+    "hash": 1586921307,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/clientiopipe_red.prefab",
+    "guid": "8d02edceb7c21a34d824689c3e0734b6",
+    "hash": 1528432187,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/clientiopipe_yellow.prefab",
+    "guid": "d2b3d46a5d4bfa94182fd8ded33009ef",
+    "hash": 3684514234,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/effects/plugeffect.prefab",
+    "guid": "9a6371c6999484b63a2326c9db9160e7",
+    "hash": 4016526150,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/pipe.viewmodel.prefab",
+    "guid": "538c912ce9b89e84988eb939bce7dc3e",
+    "hash": 1582012136,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/pipe.worldmodel.prefab",
+    "guid": "9a2e59a619634824883d057aa31e86b8",
+    "hash": 3889156124,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/piperenderer.prefab",
+    "guid": "ea8c52fa2831b74418f9306482dc0b8a",
+    "hash": 3397771554,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/pipetool.entity.prefab",
+    "guid": "b269b631d9f2f864b84b83945688da91",
+    "hash": 3896504765,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/pipe/pipetool.item.prefab",
+    "guid": "f63a6508883374043a6e3ed896d0f321",
+    "hash": 3840627643,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/tools/planner/building_planner.item.prefab",
     "guid": "c68be0197980f27428566cc0d2ae88c9",
     "hash": 3935042626,
@@ -56625,6 +56823,24 @@
     "name": "assets/prefabs/weapons/glockskin/effects/reload_start.prefab",
     "guid": "69fcd514adb3243ed93a98871959f1a3",
     "hash": 1342617539,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/weapons/glockskin/effects/slide_close.prefab",
+    "guid": "5467553f77cb1e342b93b31192f6791d",
+    "hash": 3696348388,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/weapons/glockskin/effects/slide_open.prefab",
+    "guid": "a5c3761f22c0cae4cbc7e1c9c701e91c",
+    "hash": 3358237131,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/weapons/glockskin/effects/slide_shut.prefab",
+    "guid": "3ebeaf2bf596285489595ecba68be8cb",
+    "hash": 4146624794,
     "pool": true
   },
   {

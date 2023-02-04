@@ -3351,6 +3351,15 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "cardtable.caboose_static": [
+    "CardTable",
+    "BaseCardGameEntity",
+    "BaseVehicle",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "slotmachine.caboose": [
     "SlotMachine",
     "BaseMountable",
@@ -3506,6 +3515,7 @@
   ],
   "trainwagonunloadableloot.entity": [
     "Spawnable",
+    "TrainCarUnloadableLoot",
     "TrainCarUnloadable",
     "TrainCar",
     "BaseVehicle",
@@ -4842,6 +4852,23 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "electricfurnace.deployed": [
+    "ElectricOven",
+    "BaseOven",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "electricfurnace.io": [
+    "ElectricFurnaceIO",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "electrical.heater": [
     "ElectricalHeater",
     "IOEntity",
@@ -4983,6 +5010,49 @@
   ],
   "igniter.deployed": [
     "Igniter",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "storageadaptor.deployed": [
+    "IndustrialStorageAdaptor",
+    "IndustrialEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "industrialcombiner.deployed": [
+    "ElectricalCombiner",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "industrialconveyor.deployed": [
+    "IndustrialConveyor",
+    "IndustrialEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "industrialcrafter.deployed": [
+    "IndustrialCrafter",
+    "IndustrialEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "industrialsplitter.deployed": [
+    "Splitter",
     "IOEntity",
     "DecayEntity",
     "BaseCombatEntity",
@@ -8239,6 +8309,12 @@
   ],
   "pager.entity": [
     "PagerEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "pipetool.entity": [
+    "WireTool",
+    "HeldEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],

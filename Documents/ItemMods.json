@@ -693,6 +693,10 @@
   "electric.doorcontroller": [
     "ItemModEntity"
   ],
+  "electric.furnace": [
+    "ItemModEntity",
+    "ItemModChildIO"
+  ],
   "electric.heater": [
     "ItemModEntity"
   ],
@@ -745,6 +749,21 @@
     "ItemModEntity"
   ],
   "electric.igniter": [
+    "ItemModEntity"
+  ],
+  "storageadaptor": [
+    "ItemModEntity"
+  ],
+  "industrial.combiner": [
+    "ItemModEntity"
+  ],
+  "industrial.conveyor": [
+    "ItemModEntity"
+  ],
+  "industrial.crafter": [
+    "ItemModEntity"
+  ],
+  "industrial.splitter": [
     "ItemModEntity"
   ],
   "electric.flasherlight": [
@@ -2097,6 +2116,9 @@
   "rf_pager": [
     "ItemModRFListener",
     "ItemModAssociatedEntity`1"
+  ],
+  "pipetool": [
+    "ItemModEntity"
   ],
   "building.planner": [
     "ItemModEntity"

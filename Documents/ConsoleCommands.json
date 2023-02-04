@@ -2151,7 +2151,7 @@
     "Name": "build_inside_check",
     "Parent": "antihack",
     "FullName": "antihack.build_inside_check",
-    "GetOveride": "1",
+    "GetOveride": "2",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -3624,6 +3624,18 @@
     "Saved": false
   },
   {
+    "Name": "bench_io",
+    "Parent": "debug",
+    "FullName": "debug.bench_io",
+    "GetOveride": "",
+    "Description": "Spawn lots of IO entities to lag the server",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
     "Name": "breakheld",
     "Parent": "debug",
     "FullName": "debug.breakheld",
@@ -3688,7 +3700,7 @@
     "Parent": "debug",
     "FullName": "debug.debugdismounts",
     "GetOveride": "False",
-    "Description": "Shows some debug info for dismount attempts.",
+    "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
@@ -4467,7 +4479,7 @@
     "Name": "day",
     "Parent": "env",
     "FullName": "env.day",
-    "GetOveride": "13",
+    "GetOveride": "20",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -4479,7 +4491,7 @@
     "Name": "month",
     "Parent": "env",
     "FullName": "env.month",
-    "GetOveride": "6",
+    "GetOveride": "5",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -4515,7 +4527,7 @@
     "Name": "time",
     "Parent": "env",
     "FullName": "env.time",
-    "GetOveride": "9.231213",
+    "GetOveride": "9.095621",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -4707,6 +4719,18 @@
     "Name": "clearallspraysbyplayer",
     "Parent": "global",
     "FullName": "global.clearallspraysbyplayer",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "cleardroppeditems",
+    "Parent": "global",
+    "FullName": "global.cleardroppeditems",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": true,
@@ -5004,9 +5028,9 @@
     "Saved": false
   },
   {
-    "Name": "skipassetwarmup",
+    "Name": "skipassetwarmup_crashes",
     "Parent": "global",
-    "FullName": "global.skipassetwarmup",
+    "FullName": "global.skipassetwarmup_crashes",
     "GetOveride": "False",
     "Description": "",
     "ServerAdmin": true,
@@ -5031,6 +5055,18 @@
     "Name": "spectate",
     "Parent": "global",
     "FullName": "global.spectate",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "spectateid",
+    "Parent": "global",
+    "FullName": "global.spectateid",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": true,
@@ -5547,6 +5583,18 @@
     "Name": "givearm",
     "Parent": "inventory",
     "FullName": "inventory.givearm",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "givebp",
+    "Parent": "inventory",
+    "FullName": "inventory.givebp",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": true,
@@ -6408,6 +6456,18 @@
     "Saved": false
   },
   {
+    "Name": "flush_analytics",
+    "Parent": "profile",
+    "FullName": "profile.flush_analytics",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
     "Name": "start",
     "Parent": "profile",
     "FullName": "profile.start",
@@ -6780,6 +6840,18 @@
     "Saved": false
   },
   {
+    "Name": "conveyormovefrequency",
+    "Parent": "server",
+    "FullName": "server.conveyormovefrequency",
+    "GetOveride": "5",
+    "Description": "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
     "Name": "corpsedespawn",
     "Parent": "server",
     "FullName": "server.corpsedespawn",
@@ -6864,6 +6936,18 @@
     "Saved": false
   },
   {
+    "Name": "defaultblueprintresearchcost",
+    "Parent": "server",
+    "FullName": "server.defaultblueprintresearchcost",
+    "GetOveride": "10",
+    "Description": "How much scrap is required to research default blueprints",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
     "Name": "description",
     "Parent": "server",
     "FullName": "server.description",
@@ -6898,6 +6982,18 @@
     "AllowRunFromServer": false,
     "Variable": true,
     "Saved": false
+  },
+  {
+    "Name": "enforcepipechecksonbuildingblockchanges",
+    "Parent": "server",
+    "FullName": "server.enforcepipechecksonbuildingblockchanges",
+    "GetOveride": "True",
+    "Description": "Whether to check for illegal industrial pipes when changing building block states (roof bunkers)",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
   },
   {
     "Name": "entitybatchsize",
@@ -7080,6 +7176,18 @@
     "Saved": true
   },
   {
+    "Name": "industrialcrafterfrequency",
+    "Parent": "server",
+    "FullName": "server.industrialcrafterfrequency",
+    "GetOveride": "5",
+    "Description": "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
     "Name": "ip",
     "Parent": "server",
     "FullName": "server.ip",
@@ -7224,6 +7332,30 @@
     "Saved": false
   },
   {
+    "Name": "maxdecryptqueue",
+    "Parent": "server",
+    "FullName": "server.maxdecryptqueue",
+    "GetOveride": "1000",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "maxitemstacksmovedpertickindustrial",
+    "Parent": "server",
+    "FullName": "server.maxitemstacksmovedpertickindustrial",
+    "GetOveride": "12",
+    "Description": "How many stacks a single conveyor can move in a single tick",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
     "Name": "maxpacketsize",
     "Parent": "server",
     "FullName": "server.maxpacketsize",
@@ -7344,6 +7476,18 @@
     "Saved": false
   },
   {
+    "Name": "maxreadqueue",
+    "Parent": "server",
+    "FullName": "server.maxreadqueue",
+    "GetOveride": "1000",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
     "Name": "maxreceivetime",
     "Parent": "server",
     "FullName": "server.maxreceivetime",
@@ -7360,6 +7504,18 @@
     "Parent": "server",
     "FullName": "server.maxunack",
     "GetOveride": "4",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "maxwritequeue",
+    "Parent": "server",
+    "FullName": "server.maxwritequeue",
+    "GetOveride": "1000",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -7443,7 +7599,7 @@
     "Name": "netcachesize",
     "Parent": "server",
     "FullName": "server.netcachesize",
-    "GetOveride": "185743",
+    "GetOveride": "0",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -7695,7 +7851,7 @@
     "Name": "queryport",
     "Parent": "server",
     "FullName": "server.queryport",
-    "GetOveride": "0",
+    "GetOveride": "28017",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -7863,7 +8019,7 @@
     "Name": "savecachesize",
     "Parent": "server",
     "FullName": "server.savecachesize",
-    "GetOveride": "2837636",
+    "GetOveride": "2669975",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -8122,6 +8278,18 @@
     "AllowRunFromServer": false,
     "Variable": true,
     "Saved": false
+  },
+  {
+    "Name": "watercontainersleavewaterbehind",
+    "Parent": "server",
+    "FullName": "server.watercontainersleavewaterbehind",
+    "GetOveride": "False",
+    "Description": "When transferring water, should containers keep 1 water behind. Enabling this should help performance if water IO is causing performance loss",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
   },
   {
     "Name": "worldsize",
@@ -9593,6 +9761,54 @@
     "FullName": "rcon.web",
     "GetOveride": "True",
     "Description": "If set to true, use websocket rcon. If set to false use legacy, source engine rcon.",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "analytics_header",
+    "Parent": "analytics",
+    "FullName": "analytics.analytics_header",
+    "GetOveride": "X-API-KEY",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "analytics_secret",
+    "Parent": "analytics",
+    "FullName": "analytics.analytics_secret",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "client_analytics_url",
+    "Parent": "analytics",
+    "FullName": "analytics.client_analytics_url",
+    "GetOveride": "https://functions-rust-api.azurewebsites.net/api/public/analytics/rust/client",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "server_analytics_url",
+    "Parent": "analytics",
+    "FullName": "analytics.server_analytics_url",
+    "GetOveride": "https://functions-rust-api.azurewebsites.net/api/public/analytics/rust/server",
+    "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
