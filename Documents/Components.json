@@ -5162,6 +5162,15 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "ptz_cctv_deployed": [
+    "CCTV_RC",
+    "PoweredRemoteControlEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "hopperoutput": [
     "ResourceExtractorFuelStorage",
     "StorageContainer",
@@ -8126,6 +8135,7 @@
     "BaseNetworkable"
   ],
   "explosive.timed.deployed": [
+    "RFTimedExplosive",
     "TimedExplosive",
     "BaseEntity",
     "BaseNetworkable"

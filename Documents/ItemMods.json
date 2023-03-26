@@ -799,6 +799,9 @@
   "waterpump": [
     "ItemModEntity"
   ],
+  "ptz.cctv.camera": [
+    "ItemModEntity"
+  ],
   "mining.quarry": [
     "ItemModEntity"
   ],
@@ -2049,7 +2052,8 @@
     "ItemModEntity"
   ],
   "explosive.timed": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModSetFrequency"
   ],
   "tool.camera": [
     "ItemModEntity"

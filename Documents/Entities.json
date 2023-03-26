@@ -782,6 +782,7 @@
   "assets/prefabs/deployable/playerioents/timers/timer.prefab",
   "assets/prefabs/deployable/playerioents/tunnel/cabletunnel.prefab",
   "assets/prefabs/deployable/playerioents/waterpump/water.pump.deployed.prefab",
+  "assets/prefabs/deployable/ptz security camera/ptz_cctv_deployed.prefab",
   "assets/prefabs/deployable/quarry/engineswitch.prefab",
   "assets/prefabs/deployable/quarry/fuelstorage.prefab",
   "assets/prefabs/deployable/quarry/hopperoutput.prefab",

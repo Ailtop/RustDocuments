@@ -11856,6 +11856,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/nature/caves/cave_entrance_c.prefab",
+    "guid": "6d504158e1e74f64b8253e28985ee4f8",
+    "hash": 3076731954,
+    "pool": false
+  },
+  {
     "name": "assets/content/nature/caves/cave_gravel_a.prefab",
     "guid": "3a42a5fef6c9d9b488e462c7d18e68a8",
     "hash": 247668311,
@@ -40086,6 +40092,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/deployable/computerstation/effects/computer-station-deploy.prefab",
+    "guid": "ba55a0414998c41659cdc1f8e7efccda",
+    "hash": 2588143692,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/deployable/computerstation/rcbookmarkentry.prefab",
     "guid": "3cae072fa4a894d4aab3cc0639537a5f",
     "hash": 1902047281,
@@ -40173,6 +40185,30 @@
     "name": "assets/prefabs/deployable/drone/drone.prefab",
     "guid": "257673f7b24081a40906cf4a407ca883",
     "hash": 2478500425,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/drone/effects/drone-deploy.prefab",
+    "guid": "2f8c6b2fced9b42ec95adfc93c2299b7",
+    "hash": 3632735569,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/drone/effects/drone-destroy.prefab",
+    "guid": "38b2ab7a9225b4574a4de7da268a3aa0",
+    "hash": 4031825608,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/drone/effects/drone-impact.prefab",
+    "guid": "2fcd0f3b84d7444819121f05913aa042",
+    "hash": 2584769199,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/drone/effects/pfx battery fire.prefab",
+    "guid": "1b0c8b5970cc29b499ff19eb381f6670",
+    "hash": 2798845467,
     "pool": false
   },
   {
@@ -41574,6 +41610,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/deployable/playerioents/industrialconveyor/ui.dialog.conveyorfilter.bufferinprocess.prefab",
+    "guid": "01b7a41eeefe3ca459fe19b754128611",
+    "hash": 718263765,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/deployable/playerioents/industrialconveyor/ui.dialog.conveyorfilter.itemicon.prefab",
     "guid": "bf98480a80a2a5a45b15610ac8ae8c0b",
     "hash": 3502379026,
@@ -41770,6 +41812,30 @@
     "guid": "c2be2528e91024656b29743efe81ac87",
     "hash": 1721420222,
     "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/ptz security camera/effects/ptz-camera-deploy.prefab",
+    "guid": "1bade5ef90abf42f3bc6e0f895916ded",
+    "hash": 94965251,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/deployable/ptz security camera/ptz_cctv_camera.item.prefab",
+    "guid": "948f70c9cb245ce40bf484165dcf9b37",
+    "hash": 144269483,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/ptz security camera/ptz_cctv_deployed.prefab",
+    "guid": "df9e8b006973c334e9d27944124ab528",
+    "hash": 2576173574,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/ptz security camera/ptzsecuritycamera.prefab",
+    "guid": "9bb254b5bcc11e5488c3307ce7a78d42",
+    "hash": 4274316069,
+    "pool": false
   },
   {
     "name": "assets/prefabs/deployable/quarry/effects/mining-quarry-deploy.prefab",
