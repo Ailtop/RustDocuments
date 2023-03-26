@@ -11,17 +11,41 @@ using UnityEngine.Assertions;
 
 public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 {
-	public string rcIdentifier = "NONE";
+	public string rcIdentifier = "";
 
 	public Transform viewEyes;
 
 	public GameObjectRef IDPanelPrefab;
+
+	public RemoteControllableControls rcControls;
 
 	public bool isStatic;
 
 	public bool appendEntityIDToIdentifier;
 
 	public virtual bool RequiresMouse => false;
+
+	public virtual float MaxRange => 10000f;
+
+	public RemoteControllableControls RequiredControls => rcControls;
+
+	public virtual bool CanAcceptInput => false;
+
+	public int ViewerCount { get; private set; }
+
+	public CameraViewerId? ControllingViewerId { get; private set; }
+
+	public bool IsBeingControlled
+	{
+		get
+		{
+			if (ViewerCount > 0)
+			{
+				return ControllingViewerId.HasValue;
+			}
+			return false;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -104,14 +128,43 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		}
 	}
 
+	public virtual bool InitializeControl(CameraViewerId viewerID)
+	{
+		ViewerCount++;
+		if (CanAcceptInput && !ControllingViewerId.HasValue)
+		{
+			ControllingViewerId = viewerID;
+			return true;
+		}
+		return !CanAcceptInput;
+	}
+
+	public virtual void StopControl(CameraViewerId viewerID)
+	{
+		ViewerCount--;
+		if (ControllingViewerId == viewerID)
+		{
+			ControllingViewerId = null;
+		}
+	}
+
+	public virtual void UserInput(InputState inputState, CameraViewerId viewerID)
+	{
+	}
+
 	public Transform GetEyes()
 	{
 		return viewEyes;
 	}
 
-	public virtual bool CanControl()
+	public virtual float GetFovScale()
 	{
-		object obj = Interface.CallHook("OnEntityControl", this);
+		return 1f;
+	}
+
+	public virtual bool CanControl(ulong playerID)
+	{
+		object obj = Interface.CallHook("OnEntityControl", this, playerID);
 		if (obj is bool)
 		{
 			return (bool)obj;
@@ -123,26 +176,9 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		return true;
 	}
 
-	public virtual void UserInput(InputState inputState, BasePlayer player)
-	{
-	}
-
 	public BaseEntity GetEnt()
 	{
 		return this;
-	}
-
-	public bool Occupied()
-	{
-		return false;
-	}
-
-	public virtual void InitializeControl(BasePlayer controller)
-	{
-	}
-
-	public virtual void StopControl()
-	{
 	}
 
 	public virtual void RCSetup()
@@ -166,12 +202,12 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 			return;
 		}
 		BasePlayer player = msg.player;
-		if (!player.CanBuild() || !player.IsBuildingAuthed())
+		if (!CanChangeID(player))
 		{
 			return;
 		}
 		string text = msg.read.String();
-		if (ComputerStation.IsValidIdentifier(text))
+		if (string.IsNullOrEmpty(text) || ComputerStation.IsValidIdentifier(text))
 		{
 			string text2 = msg.read.String();
 			if (ComputerStation.IsValidIdentifier(text2) && text == GetIdentifier())
@@ -181,11 +217,23 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		}
 	}
 
+	public override bool CanUseNetworkCache(Connection connection)
+	{
+		if (IsStatic())
+		{
+			return base.CanUseNetworkCache(connection);
+		}
+		return false;
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
-		info.msg.rcEntity = Facepunch.Pool.Get<RCEntity>();
-		info.msg.rcEntity.identifier = GetIdentifier();
+		if (info.forDisk || IsStatic() || CanChangeID(info.forConnection?.player as BasePlayer))
+		{
+			info.msg.rcEntity = Facepunch.Pool.Get<RCEntity>();
+			info.msg.rcEntity.identifier = GetIdentifier();
+		}
 	}
 
 	public override void Load(LoadInfo info)
@@ -210,10 +258,6 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 			{
 				rcIdentifier = newID;
 			}
-			else
-			{
-				Debug.Log("ID In use!" + newID);
-			}
 			if (!Rust.Application.isLoadingSave)
 			{
 				SendNetworkUpdate();
@@ -236,5 +280,14 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 	{
 		RCShutdown();
 		base.DestroyShared();
+	}
+
+	protected bool CanChangeID(BasePlayer player)
+	{
+		if (player != null && player.CanBuild())
+		{
+			return player.IsBuildingAuthed();
+		}
+		return false;
 	}
 }

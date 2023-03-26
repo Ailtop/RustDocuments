@@ -332,7 +332,7 @@ public class BaseMountable : BaseCombatEntity
 				{
 					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
 				}
-				if (!AntiHack.TestNoClipping(player, dismountCheckStart, vector, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, legacyDismount ? null : this))
+				if (!AntiHack.TestNoClipping(dismountCheckStart, vector, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, legacyDismount ? null : this))
 				{
 					if (debugDismounts)
 					{

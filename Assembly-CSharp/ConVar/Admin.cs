@@ -124,6 +124,20 @@ public class Admin : ConsoleSystem
 		}
 	}
 
+	private struct EntityAssociation
+	{
+		public BaseEntity TargetEntity;
+
+		public EntityAssociationType AssociationType;
+	}
+
+	private enum EntityAssociationType
+	{
+		Owner = 0,
+		Auth = 1,
+		LockGuest = 2
+	}
+
 	[ReplicatedVar(Help = "Controls whether the in-game admin UI is displayed to admins")]
 	public static bool allowAdminUI = true;
 
@@ -140,7 +154,7 @@ public class Admin : ConsoleSystem
 		if (!flag && @string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2370 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2377 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -1206,7 +1220,7 @@ public class Admin : ConsoleSystem
 		result.NetworkOut = (int)((Network.Net.sv != null) ? Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond) : 0);
 		result.Restarting = SingletonComponent<ServerMgr>.Instance.Restarting;
 		result.SaveCreatedTime = SaveRestore.SaveCreatedTime.ToString();
-		result.Version = 2370;
+		result.Version = 2377;
 		result.Protocol = Protocol.printable;
 		return result;
 	}
@@ -1446,13 +1460,13 @@ public class Admin : ConsoleSystem
 		{
 			text = string.Empty;
 		}
-		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		List<EntityAssociation> obj = Facepunch.Pool.GetList<EntityAssociation>();
 		FindEntityAssociationsForPlayer(playerOrSleeper, useOwnerId: false, useAuth: true, text, obj);
 		TextTable textTable = new TextTable();
-		textTable.AddColumns("Prefab name", "Position", "ID");
-		foreach (BaseEntity item in obj)
+		textTable.AddColumns("Prefab name", "Position", "ID", "Type");
+		foreach (EntityAssociation item in obj)
 		{
-			textTable.AddRow(item.ShortPrefabName, item.transform.position.ToString(), item.net.ID.ToString());
+			textTable.AddRow(item.TargetEntity.ShortPrefabName, item.TargetEntity.transform.position.ToString(), item.TargetEntity.net.ID.ToString(), item.AssociationType.ToString());
 		}
 		Facepunch.Pool.FreeList(ref obj);
 		if (arg.HasArg("--json"))
@@ -1480,13 +1494,13 @@ public class Admin : ConsoleSystem
 		{
 			text = string.Empty;
 		}
-		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		List<EntityAssociation> obj = Facepunch.Pool.GetList<EntityAssociation>();
 		FindEntityAssociationsForPlayer(playerOrSleeper, useOwnerId: true, useAuth: false, text, obj);
 		TextTable textTable = new TextTable();
 		textTable.AddColumns("Prefab name", "Position", "ID");
-		foreach (BaseEntity item in obj)
+		foreach (EntityAssociation item in obj)
 		{
-			textTable.AddRow(item.ShortPrefabName, item.transform.position.ToString(), item.net.ID.ToString());
+			textTable.AddRow(item.TargetEntity.ShortPrefabName, item.TargetEntity.transform.position.ToString(), item.TargetEntity.net.ID.ToString());
 		}
 		Facepunch.Pool.FreeList(ref obj);
 		if (arg.HasArg("--json"))
@@ -1500,11 +1514,12 @@ public class Admin : ConsoleSystem
 		arg.ReplyWith(stringBuilder.ToString());
 	}
 
-	private static void FindEntityAssociationsForPlayer(BasePlayer ply, bool useOwnerId, bool useAuth, string filter, List<BaseEntity> results)
+	private static void FindEntityAssociationsForPlayer(BasePlayer ply, bool useOwnerId, bool useAuth, string filter, List<EntityAssociation> results)
 	{
 		results.Clear();
 		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
 		{
+			EntityAssociationType entityAssociationType = EntityAssociationType.Owner;
 			if (!(serverEntity is BaseEntity baseEntity))
 			{
 				continue;
@@ -1514,7 +1529,7 @@ public class Admin : ConsoleSystem
 			{
 				flag = true;
 			}
-			if (useAuth)
+			if (useAuth && !flag)
 			{
 				if (!flag && baseEntity is BuildingPrivlidge buildingPrivlidge && buildingPrivlidge.IsAuthed(ply.userID))
 				{
@@ -1524,13 +1539,25 @@ public class Admin : ConsoleSystem
 				{
 					flag = true;
 				}
-				else if (baseEntity is CodeLock codeLock && codeLock.whitelistPlayers.Contains(ply.userID))
+				else if (baseEntity is CodeLock codeLock)
 				{
-					flag = true;
+					if (codeLock.whitelistPlayers.Contains(ply.userID))
+					{
+						flag = true;
+					}
+					else if (codeLock.guestPlayers.Contains(ply.userID))
+					{
+						flag = true;
+						entityAssociationType = EntityAssociationType.LockGuest;
+					}
 				}
 				if (!flag && baseEntity is ModularCar modularCar && modularCar.IsLockable && modularCar.CarLock.HasLockPermission(ply))
 				{
 					flag = true;
+				}
+				if (flag && entityAssociationType == EntityAssociationType.Owner)
+				{
+					entityAssociationType = EntityAssociationType.Auth;
 				}
 			}
 			if (flag && !string.IsNullOrEmpty(filter) && !serverEntity.ShortPrefabName.Contains(filter, CompareOptions.IgnoreCase))
@@ -1539,7 +1566,11 @@ public class Admin : ConsoleSystem
 			}
 			if (flag)
 			{
-				results.Add(baseEntity);
+				results.Add(new EntityAssociation
+				{
+					TargetEntity = baseEntity,
+					AssociationType = entityAssociationType
+				});
 			}
 		}
 	}

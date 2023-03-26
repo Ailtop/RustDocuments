@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConVar;
-using Epic.OnlineServices.AntiCheatCommon;
 using Facepunch;
 using Network;
 using Oxide.Core;
@@ -1124,9 +1123,9 @@ public class BaseProjectile : AttackEntity
 		return HasFlag(Flags.Reserved6) == defaultOn;
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	[RPC_Server.CallsPerSecond(2uL)]
-	[RPC_Server]
 	private void ToggleFireMode(RPCMessage msg)
 	{
 		if (canChangeFireModes && IsBurstEligable())
@@ -1173,7 +1172,7 @@ public class BaseProjectile : AttackEntity
 			return;
 		}
 		ItemModProjectile component = itemDefinition.GetComponent<ItemModProjectile>();
-		if ((bool)component && component.IsAmmo(primaryMagazine.definition.ammoTypes) && Interface.CallHook("OnAmmoSwitch", this, ownerPlayer) == null)
+		if ((bool)component && component.IsAmmo(primaryMagazine.definition.ammoTypes) && Interface.CallHook("OnAmmoSwitch", this, ownerPlayer, itemDefinition) == null)
 		{
 			if (primaryMagazine.contents > 0)
 			{
@@ -1438,36 +1437,7 @@ public class BaseProjectile : AttackEntity
 		sensation.InitiatorPlayer = player;
 		sensation.Initiator = player;
 		Sense.Stimulate(sensation);
-		if (!EACServer.CanSendAnalytics || player.net.connection == null)
-		{
-			return;
-		}
-		using (TimeWarning.New("EAC.LogPlayerShooting"))
-		{
-			Vector3 networkPosition = player.GetNetworkPosition();
-			Quaternion networkRotation = player.GetNetworkRotation();
-			Item item = GetItem();
-			string text = ((item != null) ? item.info.shortname : "unknown");
-			LogPlayerUseWeaponOptions options = default(LogPlayerUseWeaponOptions);
-			LogPlayerUseWeaponData value = default(LogPlayerUseWeaponData);
-			value.PlayerHandle = EACServer.GetClient(player.net.connection);
-			value.PlayerPosition = new Vec3f
-			{
-				x = networkPosition.x,
-				y = networkPosition.y,
-				z = networkPosition.z
-			};
-			value.PlayerViewRotation = new Quat
-			{
-				w = networkRotation.w,
-				x = networkRotation.x,
-				y = networkRotation.y,
-				z = networkRotation.z
-			};
-			value.WeaponName = text;
-			options.UseWeaponData = value;
-			EACServer.Interface.LogPlayerUseWeapon(ref options);
-		}
+		EACServer.LogPlayerUseWeapon(player, this);
 	}
 
 	public void CreateProjectileEffectClientside(string prefabName, Vector3 pos, Vector3 velocity, int seed, Connection sourceConnection, bool silenced = false, bool forceClientsideEffects = false)

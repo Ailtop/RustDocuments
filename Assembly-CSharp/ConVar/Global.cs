@@ -382,11 +382,11 @@ public class Global : ConsoleSystem
 			{
 				basePlayer.DieInstantly();
 			}
-			uint uInt = args.GetUInt(0);
+			ulong uLong = args.GetULong(0, 0uL);
 			if (basePlayer.IsDead())
 			{
 				basePlayer.StartSpectating();
-				basePlayer.UpdateSpectateTarget(uInt);
+				basePlayer.UpdateSpectateTarget(uLong);
 			}
 		}
 	}

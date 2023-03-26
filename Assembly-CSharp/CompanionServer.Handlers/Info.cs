@@ -1,3 +1,4 @@
+using CompanionServer.Cameras;
 using ConVar;
 using Facepunch;
 using Facepunch.Math;
@@ -22,6 +23,7 @@ public class Info : BaseHandler<AppEmpty>
 		appInfo.queuedPlayers = (uint)SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued;
 		appInfo.seed = World.Seed;
 		appInfo.salt = World.Salt;
+		appInfo.camerasEnabled = CameraRenderer.enabled;
 		AppResponse appResponse = Facepunch.Pool.Get<AppResponse>();
 		appResponse.info = appInfo;
 		Send(appResponse);

@@ -6,45 +6,92 @@ public class IndustrialStorageAdaptor : IndustrialEntity, IIndustrialStorage
 
 	public GameObject RedLight;
 
-	public ItemContainer Container => (GetParentEntity() as StorageContainer)?.inventory;
+	private ItemContainer cachedContainer;
+
+	private BaseEntity _cachedParent;
+
+	public ItemContainer Container
+	{
+		get
+		{
+			if (cachedContainer == null)
+			{
+				cachedContainer = (cachedParent as StorageContainer)?.inventory;
+			}
+			return cachedContainer;
+		}
+	}
+
+	private BaseEntity cachedParent
+	{
+		get
+		{
+			if (_cachedParent == null)
+			{
+				_cachedParent = GetParentEntity();
+			}
+			return _cachedParent;
+		}
+	}
 
 	public BaseEntity IndustrialEntity => this;
 
+	public override void ServerInit()
+	{
+		base.ServerInit();
+		_cachedParent = null;
+		cachedContainer = null;
+	}
+
 	public Vector2i InputSlotRange(int slotIndex)
 	{
-		if (GetParentEntity() is IIndustrialStorage industrialStorage)
+		if (cachedParent != null)
 		{
-			return industrialStorage.InputSlotRange(slotIndex);
+			if (cachedParent is IIndustrialStorage industrialStorage)
+			{
+				return industrialStorage.InputSlotRange(slotIndex);
+			}
+			if (cachedParent is Locker locker)
+			{
+				Vector3 localPosition = base.transform.localPosition;
+				return locker.GetIndustrialSlotRange(localPosition);
+			}
 		}
-		if (GetParentEntity() is Locker locker)
+		if (Container != null)
 		{
-			Vector3 localPosition = base.transform.localPosition;
-			return locker.GetIndustrialSlotRange(localPosition);
+			return new Vector2i(0, Container.capacity - 1);
 		}
-		return new Vector2i(0, Container.capacity - 1);
+		return new Vector2i(0, 0);
 	}
 
 	public Vector2i OutputSlotRange(int slotIndex)
 	{
-		if (GetParentEntity() is DropBox)
+		if (cachedParent != null)
 		{
-			return new Vector2i(0, Container.capacity - 2);
+			if (cachedParent is DropBox && Container != null)
+			{
+				return new Vector2i(0, Container.capacity - 2);
+			}
+			if (cachedParent is IIndustrialStorage industrialStorage)
+			{
+				return industrialStorage.OutputSlotRange(slotIndex);
+			}
+			if (cachedParent is Locker locker)
+			{
+				Vector3 localPosition = base.transform.localPosition;
+				return locker.GetIndustrialSlotRange(localPosition);
+			}
 		}
-		if (GetParentEntity() is IIndustrialStorage industrialStorage)
+		if (Container != null)
 		{
-			return industrialStorage.OutputSlotRange(slotIndex);
+			return new Vector2i(0, Container.capacity - 1);
 		}
-		if (GetParentEntity() is Locker locker)
-		{
-			Vector3 localPosition = base.transform.localPosition;
-			return locker.GetIndustrialSlotRange(localPosition);
-		}
-		return new Vector2i(0, Container.capacity - 1);
+		return new Vector2i(0, 0);
 	}
 
 	public void OnStorageItemTransferBegin()
 	{
-		if (GetParentEntity() is VendingMachine vendingMachine)
+		if (cachedParent != null && cachedParent is VendingMachine vendingMachine)
 		{
 			vendingMachine.OnIndustrialItemTransferBegins();
 		}
@@ -52,7 +99,7 @@ public class IndustrialStorageAdaptor : IndustrialEntity, IIndustrialStorage
 
 	public void OnStorageItemTransferEnd()
 	{
-		if (GetParentEntity() is VendingMachine vendingMachine)
+		if (cachedParent != null && cachedParent is VendingMachine vendingMachine)
 		{
 			vendingMachine.OnIndustrialItemTransferEnds();
 		}

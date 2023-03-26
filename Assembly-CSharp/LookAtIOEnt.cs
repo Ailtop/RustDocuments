@@ -56,6 +56,8 @@ public class LookAtIOEnt : MonoBehaviour
 
 	public GameObject TooManyOutputsWarning;
 
+	public GameObject BuildPrivilegeWarning;
+
 	public CanvasGroup group;
 
 	public HandleSet[] handleSets;

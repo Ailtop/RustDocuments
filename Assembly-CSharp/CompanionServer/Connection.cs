@@ -18,30 +18,56 @@ public class Connection : IConnection
 
 	private readonly IWebSocketConnection _connection;
 
-	private readonly HashSet<PlayerTarget> _subscribedPlayers;
+	private PlayerTarget? _subscribedPlayer;
 
 	private readonly HashSet<EntityTarget> _subscribedEntities;
 
+	private IRemoteControllable _currentCamera;
+
+	private ulong _cameraViewerSteamId;
+
+	private bool _isControllingCamera;
+
+	public long ConnectionId { get; private set; }
+
 	public IPAddress Address => _connection.ConnectionInfo.ClientIpAddress;
 
-	public Connection(Listener listener, IWebSocketConnection connection)
+	public IRemoteControllable CurrentCamera => _currentCamera;
+
+	public bool IsControllingCamera => _isControllingCamera;
+
+	public ulong ControllingSteamId => _cameraViewerSteamId;
+
+	public InputState InputState { get; set; }
+
+	public Connection(long connectionId, Listener listener, IWebSocketConnection connection)
 	{
+		ConnectionId = connectionId;
 		_listener = listener;
 		_connection = connection;
-		_subscribedPlayers = new HashSet<PlayerTarget>();
 		_subscribedEntities = new HashSet<EntityTarget>();
 	}
 
 	public void OnClose()
 	{
-		foreach (PlayerTarget subscribedPlayer in _subscribedPlayers)
+		if (_subscribedPlayer.HasValue)
 		{
-			_listener.PlayerSubscribers.Remove(subscribedPlayer, this);
+			_listener.PlayerSubscribers.Remove(_subscribedPlayer.Value, this);
+			_subscribedPlayer = null;
 		}
 		foreach (EntityTarget subscribedEntity in _subscribedEntities)
 		{
 			_listener.EntitySubscribers.Remove(subscribedEntity, this);
 		}
+		_subscribedEntities.Clear();
+		_currentCamera?.StopControl(new CameraViewerId(_cameraViewerSteamId, ConnectionId));
+		if (TryGetCameraTarget(_currentCamera, out var target))
+		{
+			_listener.CameraSubscribers.Remove(target, this);
+		}
+		_currentCamera = null;
+		_cameraViewerSteamId = 0uL;
+		_isControllingCamera = false;
 	}
 
 	public void OnMessage(Span<byte> data)
@@ -78,17 +104,16 @@ public class Connection : IConnection
 
 	public void Subscribe(PlayerTarget target)
 	{
-		if (_subscribedPlayers.Add(target))
+		if (!(_subscribedPlayer == target))
 		{
+			EndViewing();
+			if (_subscribedPlayer.HasValue)
+			{
+				_listener.PlayerSubscribers.Remove(_subscribedPlayer.Value, this);
+				_subscribedPlayer = null;
+			}
 			_listener.PlayerSubscribers.Add(target, this);
-		}
-	}
-
-	public void Unsubscribe(PlayerTarget target)
-	{
-		if (_subscribedPlayers.Remove(target))
-		{
-			_listener.PlayerSubscribers.Remove(target, this);
+			_subscribedPlayer = target;
 		}
 	}
 
@@ -100,12 +125,59 @@ public class Connection : IConnection
 		}
 	}
 
-	public void Unsubscribe(EntityTarget target)
+	public bool BeginViewing(IRemoteControllable camera)
 	{
-		if (_subscribedEntities.Remove(target))
+		if (!_subscribedPlayer.HasValue)
 		{
-			_listener.EntitySubscribers.Remove(target, this);
+			return false;
 		}
+		if (!TryGetCameraTarget(camera, out var target))
+		{
+			if (_currentCamera == camera)
+			{
+				_currentCamera?.StopControl(new CameraViewerId(_cameraViewerSteamId, ConnectionId));
+				_currentCamera = null;
+				_isControllingCamera = false;
+				_cameraViewerSteamId = 0uL;
+			}
+			return false;
+		}
+		if (_currentCamera == camera)
+		{
+			_listener.CameraSubscribers.Add(target, this);
+			return true;
+		}
+		if (TryGetCameraTarget(_currentCamera, out var target2))
+		{
+			_listener.CameraSubscribers.Remove(target2, this);
+			_currentCamera.StopControl(new CameraViewerId(_cameraViewerSteamId, ConnectionId));
+			_currentCamera = null;
+			_isControllingCamera = false;
+			_cameraViewerSteamId = 0uL;
+		}
+		ulong steamId = _subscribedPlayer.Value.SteamId;
+		if (!camera.CanControl(steamId))
+		{
+			return false;
+		}
+		_listener.CameraSubscribers.Add(target, this);
+		_currentCamera = camera;
+		_isControllingCamera = _currentCamera.InitializeControl(new CameraViewerId(steamId, ConnectionId));
+		_cameraViewerSteamId = steamId;
+		InputState?.Clear();
+		return true;
+	}
+
+	public void EndViewing()
+	{
+		if (TryGetCameraTarget(_currentCamera, out var target))
+		{
+			_listener.CameraSubscribers.Remove(target, this);
+		}
+		_currentCamera?.StopControl(new CameraViewerId(_cameraViewerSteamId, ConnectionId));
+		_currentCamera = null;
+		_isControllingCamera = false;
+		_cameraViewerSteamId = 0uL;
 	}
 
 	public void SendRaw(MemoryBuffer data)
@@ -118,5 +190,17 @@ public class Connection : IConnection
 		{
 			Debug.LogError($"Failed to send message to app client {_connection.ConnectionInfo.ClientIpAddress}: {arg}");
 		}
+	}
+
+	private static bool TryGetCameraTarget(IRemoteControllable camera, out CameraTarget target)
+	{
+		BaseEntity baseEntity = camera?.GetEnt();
+		if (ObjectEx.IsUnityNull(camera) || baseEntity == null || !BaseNetworkableEx.IsValid(baseEntity))
+		{
+			target = default(CameraTarget);
+			return false;
+		}
+		target = new CameraTarget(baseEntity.net.ID);
+		return true;
 	}
 }

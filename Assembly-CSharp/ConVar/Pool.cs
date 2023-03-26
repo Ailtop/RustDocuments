@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using Facepunch;
 using Facepunch.Extend;
+using Network;
 using UnityEngine;
 
 namespace ConVar;
@@ -50,6 +52,28 @@ public class Pool : ConsoleSystem
 			string text = item.Key.ToString().Replace("System.Collections.Generic.", "");
 			Facepunch.Pool.ICollection value = item.Value;
 			textTable.AddRow(text, value.ItemsInStack.FormatNumberShort(), value.ItemsInUse.FormatNumberShort(), value.ItemsTaken.FormatNumberShort(), value.ItemsCreated.FormatNumberShort(), value.ItemsSpilled.FormatNumberShort());
+		}
+		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
+	}
+
+	[ServerVar]
+	[ClientVar]
+	public static void print_arraypool(Arg arg)
+	{
+		ArrayPool<byte> arrayPool = BaseNetwork.ArrayPool;
+		ConcurrentQueue<byte[]>[] buffer = arrayPool.GetBuffer();
+		TextTable textTable = new TextTable();
+		textTable.AddColumn("index");
+		textTable.AddColumn("size");
+		textTable.AddColumn("bytes");
+		textTable.AddColumn("count");
+		textTable.AddColumn("memory");
+		for (int i = 0; i < buffer.Length; i++)
+		{
+			int num = arrayPool.IndexToSize(i);
+			int count = buffer[i].Count;
+			int input = num * count;
+			textTable.AddRow(i.ToString(), num.ToString(), num.FormatBytes(), count.ToString(), input.FormatBytes());
 		}
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
@@ -113,21 +137,22 @@ public class Pool : ConsoleSystem
 	[ClientVar]
 	public static void clear_memory(Arg arg)
 	{
-		Facepunch.Pool.Clear();
+		Facepunch.Pool.Clear(arg.GetString(0, string.Empty));
 	}
 
 	[ServerVar]
 	[ClientVar]
 	public static void clear_prefabs(Arg arg)
 	{
-		GameManager.server.pool.Clear();
+		string @string = arg.GetString(0, string.Empty);
+		GameManager.server.pool.Clear(@string);
 	}
 
 	[ServerVar]
 	[ClientVar]
 	public static void clear_assets(Arg arg)
 	{
-		AssetPool.Clear();
+		AssetPool.Clear(arg.GetString(0, string.Empty));
 	}
 
 	[ServerVar]
@@ -153,5 +178,14 @@ public class Pool : ConsoleSystem
 			}
 		}
 		File.WriteAllText("prefabs.csv", stringBuilder.ToString());
+	}
+
+	[ServerVar]
+	[ClientVar]
+	public static void fill_prefabs(Arg arg)
+	{
+		string @string = arg.GetString(0, string.Empty);
+		int @int = arg.GetInt(1);
+		PrefabPoolWarmup.Run(@string, @int);
 	}
 }

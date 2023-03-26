@@ -703,9 +703,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public static T[] FindAll<T>() where T : BaseEntity
 		{
-			return (from x in BaseNetworkable.serverEntities
-				where x is T
-				select x as T).ToArray();
+			return BaseNetworkable.serverEntities.OfType<T>().ToArray();
 		}
 	}
 
@@ -1965,6 +1963,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public virtual float RadiationExposureFraction()
 	{
 		return 1f;
+	}
+
+	public virtual void SetCreatorEntity(BaseEntity newCreatorEntity)
+	{
+		creatorEntity = newCreatorEntity;
 	}
 
 	public virtual Vector3 GetLocalVelocityServer()

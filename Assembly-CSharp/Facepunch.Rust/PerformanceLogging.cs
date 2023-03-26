@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using ConVar;
+using Epic.OnlineServices.Version;
 using Steamworks;
 using UnityEngine;
 
@@ -169,14 +170,15 @@ public class PerformanceLogging
 			["system_memory"] = SystemInfo.systemMemorySize.ToString(),
 			["os"] = SystemInfo.operatingSystem
 		};
-		Dictionary<string, string> data2 = new Dictionary<string, string>
+		Dictionary<string, string> dictionary = new Dictionary<string, string>
 		{
 			["unity"] = UnityEngine.Application.unityVersion ?? "editor",
 			["changeset"] = BuildInfo.Current.Scm.ChangeId ?? "editor",
 			["branch"] = BuildInfo.Current.Scm.Branch ?? "editor",
-			["network_version"] = 2370.ToString()
+			["network_version"] = 2377.ToString()
 		};
-		record.AddObject("hardware", data).AddObject("application", data2);
+		dictionary["eos_sdk"] = VersionInterface.GetVersion()?.ToString() ?? "disabled";
+		record.AddObject("hardware", data).AddObject("application", dictionary);
 		List<TimeSpan> frametimes = Frametimes;
 		List<int> ping = PingHistory;
 		Task.Run(async delegate

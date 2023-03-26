@@ -6,7 +6,7 @@ namespace CompanionServer.Handlers;
 
 public class SendTeamChat : BaseHandler<AppSendMessage>
 {
-	protected override int TokenCost => 2;
+	protected override double TokenCost => 2.0;
 
 	public override void Execute()
 	{

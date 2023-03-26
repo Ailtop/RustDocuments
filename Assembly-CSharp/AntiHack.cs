@@ -1,17 +1,80 @@
 using System.Collections.Generic;
 using ConVar;
-using Epic.OnlineServices;
 using Epic.OnlineServices.Reports;
+using Facepunch;
 using Oxide.Core;
 using UnityEngine;
 
 public static class AntiHack
 {
+	private class GroupedLog : Facepunch.Pool.IPooled
+	{
+		public float firstLogTime;
+
+		public string playerName;
+
+		public AntiHackType antiHackType;
+
+		public string message;
+
+		public Vector3 averagePos;
+
+		public int num;
+
+		public GroupedLog()
+		{
+		}
+
+		public GroupedLog(string playerName, AntiHackType antiHackType, string message, Vector3 pos)
+		{
+			SetInitial(playerName, antiHackType, message, pos);
+		}
+
+		public void EnterPool()
+		{
+			firstLogTime = 0f;
+			playerName = string.Empty;
+			antiHackType = AntiHackType.None;
+			averagePos = Vector3.zero;
+			num = 0;
+		}
+
+		public void LeavePool()
+		{
+		}
+
+		public void SetInitial(string playerName, AntiHackType antiHackType, string message, Vector3 pos)
+		{
+			firstLogTime = UnityEngine.Time.unscaledTime;
+			this.playerName = playerName;
+			this.antiHackType = antiHackType;
+			this.message = message;
+			averagePos = pos;
+			num = 1;
+		}
+
+		public bool TryGroup(string playerName, AntiHackType antiHackType, string message, Vector3 pos, float maxDistance)
+		{
+			if (antiHackType != this.antiHackType || playerName != this.playerName || message != this.message)
+			{
+				return false;
+			}
+			if (Vector3.SqrMagnitude(averagePos - pos) > maxDistance * maxDistance)
+			{
+				return false;
+			}
+			Vector3 vector = averagePos * num;
+			averagePos = (vector + pos) / (num + 1);
+			num++;
+			return true;
+		}
+	}
+
 	private const int movement_mask = 429990145;
 
-	private const int grounded_mask = 1503731969;
-
 	private const int vehicle_mask = 8192;
+
+	private const int grounded_mask = 1503731969;
 
 	private const int player_mask = 131072;
 
@@ -21,7 +84,51 @@ public static class AntiHack
 
 	private static Dictionary<ulong, int> bans = new Dictionary<ulong, int>();
 
-	private static RaycastHit buildRayHit;
+	private const float LOG_GROUP_SECONDS = 60f;
+
+	private static Queue<GroupedLog> groupedLogs = new Queue<GroupedLog>();
+
+	public static RaycastHit isInsideRayHit;
+
+	public static bool TestNoClipping(Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast, bool vehicleLayer = false, BaseEntity ignoreEntity = null)
+	{
+		int num = 429990145;
+		if (!vehicleLayer)
+		{
+			num &= -8193;
+		}
+		Vector3 normalized = (newPos - oldPos).normalized;
+		Vector3 vector = oldPos - normalized * backtracking;
+		float magnitude = (newPos - vector).magnitude;
+		Ray ray = new Ray(vector, normalized);
+		RaycastHit hitInfo;
+		bool flag = ((ignoreEntity == null) ? UnityEngine.Physics.Raycast(ray, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, 0f, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore, ignoreEntity));
+		if (!flag && sphereCast)
+		{
+			flag = ((ignoreEntity == null) ? UnityEngine.Physics.SphereCast(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore, ignoreEntity));
+		}
+		if (flag)
+		{
+			return GamePhysics.Verify(hitInfo);
+		}
+		return false;
+	}
+
+	public static void Cycle()
+	{
+		float num = UnityEngine.Time.unscaledTime - 60f;
+		if (groupedLogs.Count > 0)
+		{
+			GroupedLog groupedLog = groupedLogs.Peek();
+			while (groupedLog.firstLogTime <= num)
+			{
+				GroupedLog obj = groupedLogs.Dequeue();
+				LogToConsole(obj.playerName, obj.antiHackType, $"{obj.message} (x{obj.num})", obj.averagePos);
+				Facepunch.Pool.Free(ref obj);
+				groupedLog = groupedLogs.Peek();
+			}
+		}
+	}
 
 	public static void ResetTimer(BasePlayer ply)
 	{
@@ -137,42 +244,55 @@ public static class AntiHack
 
 	public static bool IsInsideTerrain(BasePlayer ply)
 	{
-		using (TimeWarning.New("AntiHack.IsInsideTerrain"))
-		{
-			return TestInsideTerrain(ply.transform.position);
-		}
+		return TestInsideTerrain(ply.transform.position);
 	}
 
 	public static bool TestInsideTerrain(Vector3 pos)
 	{
-		if (!TerrainMeta.Terrain)
+		using (TimeWarning.New("AntiHack.TestInsideTerrain"))
 		{
-			return false;
+			if (!TerrainMeta.Terrain)
+			{
+				return false;
+			}
+			if (!TerrainMeta.HeightMap)
+			{
+				return false;
+			}
+			if (!TerrainMeta.Collision)
+			{
+				return false;
+			}
+			float terrain_padding = ConVar.AntiHack.terrain_padding;
+			float height = TerrainMeta.HeightMap.GetHeight(pos);
+			if (pos.y > height - terrain_padding)
+			{
+				return false;
+			}
+			float num = TerrainMeta.Position.y + TerrainMeta.Terrain.SampleHeight(pos);
+			if (pos.y > num - terrain_padding)
+			{
+				return false;
+			}
+			if (TerrainMeta.Collision.GetIgnore(pos))
+			{
+				return false;
+			}
+			return true;
 		}
-		if (!TerrainMeta.HeightMap)
+	}
+
+	public static bool IsInsideMesh(Vector3 pos)
+	{
+		bool queriesHitBackfaces = UnityEngine.Physics.queriesHitBackfaces;
+		UnityEngine.Physics.queriesHitBackfaces = true;
+		if (UnityEngine.Physics.Raycast(pos, Vector3.up, out isInsideRayHit, 50f, 65537))
 		{
-			return false;
+			UnityEngine.Physics.queriesHitBackfaces = queriesHitBackfaces;
+			return Vector3.Dot(Vector3.up, isInsideRayHit.normal) > 0f;
 		}
-		if (!TerrainMeta.Collision)
-		{
-			return false;
-		}
-		float terrain_padding = ConVar.AntiHack.terrain_padding;
-		float height = TerrainMeta.HeightMap.GetHeight(pos);
-		if (pos.y > height - terrain_padding)
-		{
-			return false;
-		}
-		float num = TerrainMeta.Position.y + TerrainMeta.Terrain.SampleHeight(pos);
-		if (pos.y > num - terrain_padding)
-		{
-			return false;
-		}
-		if (TerrainMeta.Collision.GetIgnore(pos))
-		{
-			return false;
-		}
-		return true;
+		UnityEngine.Physics.queriesHitBackfaces = queriesHitBackfaces;
+		return false;
 	}
 
 	public static bool IsNoClipping(BasePlayer ply, TickInterpolator ticks, float deltaTime)
@@ -205,7 +325,7 @@ public static class AntiHack
 				while (ticks.MoveNext(b))
 				{
 					vector2 = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
-					if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
+					if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
 					{
 						return true;
 					}
@@ -214,41 +334,17 @@ public static class AntiHack
 			}
 			else if (ConVar.AntiHack.noclip_protection >= 2)
 			{
-				if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
+				if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
 				{
 					return true;
 				}
 			}
-			else if (TestNoClipping(ply, vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false, vehicleLayer))
+			else if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false, vehicleLayer))
 			{
 				return true;
 			}
 			return false;
 		}
-	}
-
-	public static bool TestNoClipping(BasePlayer ply, Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast, bool vehicleLayer = false, BaseEntity ignoreEntity = null)
-	{
-		int num = 429990145;
-		if (!vehicleLayer)
-		{
-			num &= -8193;
-		}
-		Vector3 normalized = (newPos - oldPos).normalized;
-		Vector3 vector = oldPos - normalized * backtracking;
-		float magnitude = (newPos - vector).magnitude;
-		Ray ray = new Ray(vector, normalized);
-		RaycastHit hitInfo;
-		bool flag = ((ignoreEntity == null) ? UnityEngine.Physics.Raycast(ray, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, 0f, out hitInfo, magnitude + radius, num, QueryTriggerInteraction.Ignore, ignoreEntity));
-		if (!flag && sphereCast)
-		{
-			flag = ((ignoreEntity == null) ? UnityEngine.Physics.SphereCast(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore, ignoreEntity));
-		}
-		if (flag)
-		{
-			return GamePhysics.Verify(hitInfo);
-		}
-		return false;
 	}
 
 	public static bool IsSpeeding(BasePlayer ply, TickInterpolator ticks, float deltaTime)
@@ -439,26 +535,15 @@ public static class AntiHack
 		{
 			return false;
 		}
-		bool queriesHitBackfaces = UnityEngine.Physics.queriesHitBackfaces;
-		UnityEngine.Physics.queriesHitBackfaces = true;
-		if (IsInside(deployPos) && IsInside(target.ray.origin))
+		if (IsInsideMesh(deployPos) && IsInsideMesh(target.ray.origin))
 		{
-			LogToConsole(target.player, AntiHackType.InsideTerrain, "Tried to build while clipped inside " + buildRayHit.collider.name);
+			LogToConsoleBatched(target.player, AntiHackType.InsideGeometry, "Tried to build while clipped inside " + isInsideRayHit.collider.name, 25f);
 			if (ConVar.AntiHack.build_inside_check > 1)
 			{
 				return true;
 			}
 		}
-		UnityEngine.Physics.queriesHitBackfaces = queriesHitBackfaces;
 		return false;
-		static bool IsInside(Vector3 pos)
-		{
-			if (UnityEngine.Physics.Raycast(pos, Vector3.up, out buildRayHit, 50f, 65537))
-			{
-				return Vector3.Dot(Vector3.up, buildRayHit.normal) > 0f;
-			}
-			return false;
-		}
 	}
 
 	public static void NoteAdminHack(BasePlayer ply)
@@ -503,21 +588,37 @@ public static class AntiHack
 		LogToEAC(ply, type, message);
 	}
 
+	public static void LogToConsoleBatched(BasePlayer ply, AntiHackType type, string message, float maxDistance)
+	{
+		string playerName = ply.ToString();
+		Vector3 position = ply.transform.position;
+		foreach (GroupedLog groupedLog2 in groupedLogs)
+		{
+			if (groupedLog2.TryGroup(playerName, type, message, position, maxDistance))
+			{
+				return;
+			}
+		}
+		GroupedLog groupedLog = Facepunch.Pool.Get<GroupedLog>();
+		groupedLog.SetInitial(playerName, type, message, position);
+		groupedLogs.Enqueue(groupedLog);
+	}
+
 	private static void LogToConsole(BasePlayer ply, AntiHackType type, string message)
 	{
 		Debug.LogWarning(string.Concat(ply, " ", type, ": ", message, " at ", ply.transform.position));
 	}
 
+	private static void LogToConsole(string plyName, AntiHackType type, string message, Vector3 pos)
+	{
+		Debug.LogWarning(string.Concat(plyName, " ", type, ": ", message, " at ", pos));
+	}
+
 	private static void LogToEAC(BasePlayer ply, AntiHackType type, string message)
 	{
-		if (ConVar.AntiHack.reporting && EACServer.Reports != null)
+		if (ConVar.AntiHack.reporting)
 		{
-			SendPlayerBehaviorReportOptions sendPlayerBehaviorReportOptions = default(SendPlayerBehaviorReportOptions);
-			sendPlayerBehaviorReportOptions.ReportedUserId = ProductUserId.FromString(ply.UserIDString);
-			sendPlayerBehaviorReportOptions.Category = PlayerReportsCategory.Exploiting;
-			sendPlayerBehaviorReportOptions.Message = string.Concat(type, ": ", message);
-			SendPlayerBehaviorReportOptions options = sendPlayerBehaviorReportOptions;
-			EACServer.Reports.SendPlayerBehaviorReport(ref options, null, null);
+			EACServer.SendPlayerBehaviorReport(PlayerReportsCategory.Exploiting, ply.UserIDString, string.Concat(type, ": ", message));
 		}
 	}
 

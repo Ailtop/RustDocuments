@@ -3,6 +3,14 @@ namespace ConVar;
 [Factory("antihack")]
 public class AntiHack : ConsoleSystem
 {
+	[ReplicatedVar]
+	[Help("collider margin when checking for noclipping on dismount")]
+	public static float noclip_margin_dismount = 0.22f;
+
+	[ReplicatedVar]
+	[Help("collider backtracking when checking for noclipping")]
+	public static float noclip_backtracking = 0.01f;
+
 	[ServerVar]
 	[Help("report violations to the anti cheat backend")]
 	public static bool reporting = false;
@@ -80,6 +88,10 @@ public class AntiHack : ConsoleSystem
 	public static bool terrain_kill = true;
 
 	[ServerVar]
+	[Help("whether or not to check for player inside geometry like rocks as well as base terrain")]
+	public static bool terrain_check_geometry = false;
+
+	[ServerVar]
 	[Help("0 == disabled, 1 == ray, 2 == sphere, 3 == curve")]
 	public static int noclip_protection = 3;
 
@@ -94,14 +106,6 @@ public class AntiHack : ConsoleSystem
 	[ServerVar]
 	[Help("collider margin when checking for noclipping")]
 	public static float noclip_margin = 0.09f;
-
-	[ServerVar]
-	[Help("collider margin when checking for noclipping on dismount")]
-	public static float noclip_margin_dismount = 0.22f;
-
-	[ServerVar]
-	[Help("collider backtracking when checking for noclipping")]
-	public static float noclip_backtracking = 0.01f;
 
 	[ServerVar]
 	[Help("movement curve step size, lower value = less false positives")]

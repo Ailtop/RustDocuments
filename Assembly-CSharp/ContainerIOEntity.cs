@@ -46,6 +46,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 
 	public bool DropFloats => dropFloats;
 
+	public float DestroyLootPercent => 0f;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("ContainerIOEntity.OnRpcMessage"))

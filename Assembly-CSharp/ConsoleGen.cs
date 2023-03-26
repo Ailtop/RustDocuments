@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using CompanionServer;
+using CompanionServer.Cameras;
 using ConVar;
 using Facepunch;
 using Facepunch.Extend;
@@ -9,7 +11,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[922]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[955]
 	{
 		new ConsoleSystem.Command
 		{
@@ -673,6 +675,200 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "pool_stats",
+			Parent = "camerarenderermanager",
+			FullName = "camerarenderermanager.pool_stats",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				CameraRendererManager.pool_stats(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "completionframebudgetms",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.completionframebudgetms",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.completionFrameBudgetMs.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.completionFrameBudgetMs = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "enabled",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.enabled",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.enabled.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.enabled = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "entitymaxage",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.entitymaxage",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.entityMaxAge.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.entityMaxAge = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "entitymaxdistance",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.entitymaxdistance",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.entityMaxDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.entityMaxDistance = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "farplane",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.farplane",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.farPlane.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.farPlane = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "height",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.height",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.height.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.height = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "layermask",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.layermask",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.layerMask.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.layerMask = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxraysperframe",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.maxraysperframe",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.maxRaysPerFrame.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.maxRaysPerFrame = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxrendersperframe",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.maxrendersperframe",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.maxRendersPerFrame.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.maxRendersPerFrame = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "nearplane",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.nearplane",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.nearPlane.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.nearPlane = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "renderinterval",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.renderinterval",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.renderInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.renderInterval = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "samplesperrender",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.samplesperrender",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.samplesPerRender.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.samplesPerRender = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "verticalfov",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.verticalfov",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.verticalFov.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.verticalFov = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "width",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.width",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.width.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.width = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "adminui_deleteugccontent",
 			Parent = "global",
 			FullName = "global.adminui_deleteugccontent",
@@ -860,8 +1056,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				ServerUsers.User[] rval25 = Admin.Bans();
-				arg.ReplyWithObject(rval25);
+				ServerUsers.User[] rval28 = Admin.Bans();
+				arg.ReplyWithObject(rval28);
 			}
 		},
 		new ConsoleSystem.Command
@@ -874,8 +1070,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				BuildInfo rval24 = Admin.BuildInfo();
-				arg.ReplyWithObject(rval24);
+				BuildInfo rval27 = Admin.BuildInfo();
+				arg.ReplyWithObject(rval27);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1096,8 +1292,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Admin.PlayerInfo[] rval23 = Admin.playerlist();
-				arg.ReplyWithObject(rval23);
+				Admin.PlayerInfo[] rval26 = Admin.playerlist();
+				arg.ReplyWithObject(rval26);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1275,8 +1471,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval22 = Admin.teaminfo(arg);
-				arg.ReplyWithObject(rval22);
+				string rval25 = Admin.teaminfo(arg);
+				arg.ReplyWithObject(rval25);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2929,12 +3125,16 @@ public class ConsoleGen
 			Parent = "antihack",
 			FullName = "antihack.noclip_backtracking",
 			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
 			Variable = true,
 			GetOveride = () => ConVar.AntiHack.noclip_backtracking.ToString(),
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.noclip_backtracking = str.ToFloat();
-			}
+			},
+			Default = "0.01"
 		},
 		new ConsoleSystem.Command
 		{
@@ -2955,12 +3155,16 @@ public class ConsoleGen
 			Parent = "antihack",
 			FullName = "antihack.noclip_margin_dismount",
 			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
 			Variable = true,
 			GetOveride = () => ConVar.AntiHack.noclip_margin_dismount.ToString(),
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.noclip_margin_dismount = str.ToFloat();
-			}
+			},
+			Default = "0.22"
 		},
 		new ConsoleSystem.Command
 		{
@@ -3341,6 +3545,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "terrain_check_geometry",
+			Parent = "antihack",
+			FullName = "antihack.terrain_check_geometry",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.terrain_check_geometry.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.terrain_check_geometry = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "terrain_kill",
 			Parent = "antihack",
 			FullName = "antihack.terrain_kill",
@@ -3612,6 +3829,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "regeneratetoken",
+			Parent = "app",
+			FullName = "app.regeneratetoken",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				App.regeneratetoken(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "resetlimiter",
 			Parent = "app",
 			FullName = "app.resetlimiter",
@@ -3836,8 +4065,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval21 = Chat.search(arg);
-				arg.ReplyWithObject(rval21);
+				IEnumerable<Chat.ChatEntry> rval24 = Chat.search(arg);
+				arg.ReplyWithObject(rval24);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3862,8 +4091,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval20 = Chat.tail(arg);
-				arg.ReplyWithObject(rval20);
+				IEnumerable<Chat.ChatEntry> rval23 = Chat.tail(arg);
+				arg.ReplyWithObject(rval23);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3887,8 +4116,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval19 = Console.search(arg);
-				arg.ReplyWithObject(rval19);
+				IEnumerable<Output.Entry> rval22 = Console.search(arg);
+				arg.ReplyWithObject(rval22);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3900,8 +4129,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval18 = Console.tail(arg);
-				arg.ReplyWithObject(rval18);
+				IEnumerable<Output.Entry> rval21 = Console.tail(arg);
+				arg.ReplyWithObject(rval21);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4654,8 +4883,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval17 = Demo.record(arg);
-				arg.ReplyWithObject(rval17);
+				string rval20 = Demo.record(arg);
+				arg.ReplyWithObject(rval20);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4722,8 +4951,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval16 = Demo.stop(arg);
-				arg.ReplyWithObject(rval16);
+				string rval19 = Demo.stop(arg);
+				arg.ReplyWithObject(rval19);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4882,8 +5111,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval15 = Entity.svspawn(arg.GetString(0), arg.GetVector3(1, Vector3.zero), arg.GetVector3(2, Vector3.zero));
-				arg.ReplyWithObject(rval15);
+				string rval18 = Entity.svspawn(arg.GetString(0), arg.GetVector3(1, Vector3.zero), arg.GetVector3(2, Vector3.zero));
+				arg.ReplyWithObject(rval18);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4895,8 +5124,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval14 = Entity.svspawngrid(arg.GetString(0), arg.GetInt(1, 5), arg.GetInt(2, 5), arg.GetInt(3, 5));
-				arg.ReplyWithObject(rval14);
+				string rval17 = Entity.svspawngrid(arg.GetString(0), arg.GetInt(1, 5), arg.GetInt(2, 5), arg.GetInt(3, 5));
+				arg.ReplyWithObject(rval17);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4908,8 +5137,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval13 = Entity.svspawnitem(arg.GetString(0), arg.GetVector3(1, Vector3.zero));
-				arg.ReplyWithObject(rval13);
+				string rval16 = Entity.svspawnitem(arg.GetString(0), arg.GetVector3(1, Vector3.zero));
+				arg.ReplyWithObject(rval16);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6224,8 +6453,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				object rval12 = ConVar.Manifest.PrintManifest();
-				arg.ReplyWithObject(rval12);
+				object rval15 = ConVar.Manifest.PrintManifest();
+				arg.ReplyWithObject(rval15);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6237,8 +6466,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				object rval11 = ConVar.Manifest.PrintManifestRaw();
-				arg.ReplyWithObject(rval11);
+				object rval14 = ConVar.Manifest.PrintManifestRaw();
+				arg.ReplyWithObject(rval14);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6950,6 +7179,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "fill_prefabs",
+			Parent = "pool",
+			FullName = "pool.fill_prefabs",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.Pool.fill_prefabs(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "mode",
 			Parent = "pool",
 			FullName = "pool.mode",
@@ -6972,6 +7213,18 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Pool.prewarm = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "print_arraypool",
+			Parent = "pool",
+			FullName = "pool.print_arraypool",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.Pool.print_arraypool(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7081,10 +7334,10 @@ public class ConsoleGen
 			FullName = "server.anticheatid",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.anticheatid.ToString(),
+			GetOveride = () => ConVar.Server.anticheatid.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.anticheatid = str;
+				ConVar.Server.anticheatid = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7094,10 +7347,10 @@ public class ConsoleGen
 			FullName = "server.anticheatkey",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.anticheatkey.ToString(),
+			GetOveride = () => ConVar.Server.anticheatkey.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.anticheatkey = str;
+				ConVar.Server.anticheatkey = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7107,10 +7360,10 @@ public class ConsoleGen
 			FullName = "server.anticheatlog",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.anticheatlog.ToString(),
+			GetOveride = () => ConVar.Server.anticheatlog.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.anticheatlog = str.ToInt();
+				ConVar.Server.anticheatlog = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7121,10 +7374,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.arrowarmor.ToString(),
+			GetOveride = () => ConVar.Server.arrowarmor.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.arrowarmor = str.ToFloat();
+				ConVar.Server.arrowarmor = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7135,10 +7388,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.arrowdamage.ToString(),
+			GetOveride = () => ConVar.Server.arrowdamage.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.arrowdamage = str.ToFloat();
+				ConVar.Server.arrowdamage = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7149,10 +7402,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.artificialTemperatureGrowableRange.ToString(),
+			GetOveride = () => ConVar.Server.artificialTemperatureGrowableRange.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.artificialTemperatureGrowableRange = str.ToFloat();
+				ConVar.Server.artificialTemperatureGrowableRange = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7162,10 +7415,10 @@ public class ConsoleGen
 			FullName = "server.authtimeout",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.authtimeout.ToString(),
+			GetOveride = () => ConVar.Server.authtimeout.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.authtimeout = str.ToInt();
+				ConVar.Server.authtimeout = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7178,7 +7431,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate
 			{
-				Server.backup();
+				ConVar.Server.backup();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7189,10 +7442,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "HTTP API endpoint for centralized banning (see wiki)",
 			Variable = true,
-			GetOveride = () => Server.bansServerEndpoint.ToString(),
+			GetOveride = () => ConVar.Server.bansServerEndpoint.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bansServerEndpoint = str;
+				ConVar.Server.bansServerEndpoint = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7203,10 +7456,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "Failure mode for centralized banning, set to 1 to reject players from joining if it's down (see wiki)",
 			Variable = true,
-			GetOveride = () => Server.bansServerFailureMode.ToString(),
+			GetOveride = () => ConVar.Server.bansServerFailureMode.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bansServerFailureMode = str.ToInt();
+				ConVar.Server.bansServerFailureMode = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7217,10 +7470,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "Timeout (in seconds) for centralized banning web server requests",
 			Variable = true,
-			GetOveride = () => Server.bansServerTimeout.ToString(),
+			GetOveride = () => ConVar.Server.bansServerTimeout.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bansServerTimeout = str.ToInt();
+				ConVar.Server.bansServerTimeout = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7231,10 +7484,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.bleedingarmor.ToString(),
+			GetOveride = () => ConVar.Server.bleedingarmor.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bleedingarmor = str.ToFloat();
+				ConVar.Server.bleedingarmor = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7245,10 +7498,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.bleedingdamage.ToString(),
+			GetOveride = () => ConVar.Server.bleedingdamage.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bleedingdamage = str.ToFloat();
+				ConVar.Server.bleedingdamage = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7258,10 +7511,10 @@ public class ConsoleGen
 			FullName = "server.branch",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.branch.ToString(),
+			GetOveride = () => ConVar.Server.branch.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.branch = str;
+				ConVar.Server.branch = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7272,10 +7525,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.bulletarmor.ToString(),
+			GetOveride = () => ConVar.Server.bulletarmor.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bulletarmor = str.ToFloat();
+				ConVar.Server.bulletarmor = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7286,10 +7539,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.bulletdamage.ToString(),
+			GetOveride = () => ConVar.Server.bulletdamage.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.bulletdamage = str.ToFloat();
+				ConVar.Server.bulletdamage = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7300,10 +7553,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.ceilingLightGrowableRange.ToString(),
+			GetOveride = () => ConVar.Server.ceilingLightGrowableRange.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.ceilingLightGrowableRange = str.ToFloat();
+				ConVar.Server.ceilingLightGrowableRange = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7314,10 +7567,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.ceilingLightHeightOffset.ToString(),
+			GetOveride = () => ConVar.Server.ceilingLightHeightOffset.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.ceilingLightHeightOffset = str.ToFloat();
+				ConVar.Server.ceilingLightHeightOffset = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7328,10 +7581,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "Censors the Steam player list to make player tracking more difficult",
 			Variable = true,
-			GetOveride = () => Server.censorplayerlist.ToString(),
+			GetOveride = () => ConVar.Server.censorplayerlist.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.censorplayerlist = str.ToBool();
+				ConVar.Server.censorplayerlist = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7343,7 +7596,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.cheatreport(arg);
+				ConVar.Server.cheatreport(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7353,10 +7606,10 @@ public class ConsoleGen
 			FullName = "server.cinematic",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.cinematic.ToString(),
+			GetOveride = () => ConVar.Server.cinematic.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.cinematic = str.ToBool();
+				ConVar.Server.cinematic = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7370,8 +7623,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval10 = Server.combatlog(arg);
-				arg.ReplyWithObject(rval10);
+				string rval13 = ConVar.Server.combatlog(arg);
+				arg.ReplyWithObject(rval13);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7385,8 +7638,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval9 = Server.combatlog_outgoing(arg);
-				arg.ReplyWithObject(rval9);
+				string rval12 = ConVar.Server.combatlog_outgoing(arg);
+				arg.ReplyWithObject(rval12);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7396,10 +7649,10 @@ public class ConsoleGen
 			FullName = "server.combatlogdelay",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.combatlogdelay.ToString(),
+			GetOveride = () => ConVar.Server.combatlogdelay.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.combatlogdelay = str.ToInt();
+				ConVar.Server.combatlogdelay = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7409,10 +7662,10 @@ public class ConsoleGen
 			FullName = "server.combatlogsize",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.combatlogsize.ToString(),
+			GetOveride = () => ConVar.Server.combatlogsize.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.combatlogsize = str.ToInt();
+				ConVar.Server.combatlogsize = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7422,10 +7675,10 @@ public class ConsoleGen
 			FullName = "server.composterupdateinterval",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.composterUpdateInterval.ToString(),
+			GetOveride = () => ConVar.Server.composterUpdateInterval.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.composterUpdateInterval = str.ToFloat();
+				ConVar.Server.composterUpdateInterval = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7435,10 +7688,10 @@ public class ConsoleGen
 			FullName = "server.compression",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.compression.ToString(),
+			GetOveride = () => ConVar.Server.compression.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.compression = str.ToBool();
+				ConVar.Server.compression = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7451,10 +7704,10 @@ public class ConsoleGen
 			Description = "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement",
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.conveyorMoveFrequency.ToString(),
+			GetOveride = () => ConVar.Server.conveyorMoveFrequency.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.conveyorMoveFrequency = str.ToFloat();
+				ConVar.Server.conveyorMoveFrequency = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7464,10 +7717,10 @@ public class ConsoleGen
 			FullName = "server.corpsedespawn",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.corpsedespawn.ToString(),
+			GetOveride = () => ConVar.Server.corpsedespawn.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.corpsedespawn = str.ToFloat();
+				ConVar.Server.corpsedespawn = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7477,10 +7730,10 @@ public class ConsoleGen
 			FullName = "server.corpses",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.corpses.ToString(),
+			GetOveride = () => ConVar.Server.corpses.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.corpses = str.ToBool();
+				ConVar.Server.corpses = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7492,10 +7745,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "Do players go into the crawling wounded state",
 			Variable = true,
-			GetOveride = () => Server.crawlingenabled.ToString(),
+			GetOveride = () => ConVar.Server.crawlingenabled.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.crawlingenabled = str.ToBool();
+				ConVar.Server.crawlingenabled = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7506,10 +7759,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "Maximum initial health given when a player dies and moves to crawling wounded state",
 			Variable = true,
-			GetOveride = () => Server.crawlingmaximumhealth.ToString(),
+			GetOveride = () => ConVar.Server.crawlingmaximumhealth.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.crawlingmaximumhealth = str.ToInt();
+				ConVar.Server.crawlingmaximumhealth = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7520,10 +7773,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "Minimum initial health given when a player dies and moves to crawling wounded state",
 			Variable = true,
-			GetOveride = () => Server.crawlingminimumhealth.ToString(),
+			GetOveride = () => ConVar.Server.crawlingminimumhealth.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.crawlingminimumhealth = str.ToInt();
+				ConVar.Server.crawlingminimumhealth = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7533,10 +7786,10 @@ public class ConsoleGen
 			FullName = "server.cycletime",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.cycletime.ToString(),
+			GetOveride = () => ConVar.Server.cycletime.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.cycletime = str.ToFloat();
+				ConVar.Server.cycletime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7546,10 +7799,10 @@ public class ConsoleGen
 			FullName = "server.debrisdespawn",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.debrisdespawn.ToString(),
+			GetOveride = () => ConVar.Server.debrisdespawn.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.debrisdespawn = str.ToFloat();
+				ConVar.Server.debrisdespawn = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7565,10 +7818,10 @@ public class ConsoleGen
 			Replicated = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.defaultBlueprintResearchCost.ToString(),
+			GetOveride = () => ConVar.Server.defaultBlueprintResearchCost.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.defaultBlueprintResearchCost = str.ToInt();
+				ConVar.Server.defaultBlueprintResearchCost = str.ToInt();
 			},
 			Default = "10"
 		},
@@ -7580,10 +7833,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.description.ToString(),
+			GetOveride = () => ConVar.Server.description.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.description = str;
+				ConVar.Server.description = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7593,10 +7846,10 @@ public class ConsoleGen
 			FullName = "server.dropitems",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.dropitems.ToString(),
+			GetOveride = () => ConVar.Server.dropitems.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.dropitems = str.ToBool();
+				ConVar.Server.dropitems = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7606,10 +7859,10 @@ public class ConsoleGen
 			FullName = "server.encryption",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.encryption.ToString(),
+			GetOveride = () => ConVar.Server.encryption.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.encryption = str.ToInt();
+				ConVar.Server.encryption = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7622,10 +7875,10 @@ public class ConsoleGen
 			Description = "Whether to check for illegal industrial pipes when changing building block states (roof bunkers)",
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.enforcePipeChecksOnBuildingBlockChanges.ToString(),
+			GetOveride = () => ConVar.Server.enforcePipeChecksOnBuildingBlockChanges.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.enforcePipeChecksOnBuildingBlockChanges = str.ToBool();
+				ConVar.Server.enforcePipeChecksOnBuildingBlockChanges = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7635,10 +7888,10 @@ public class ConsoleGen
 			FullName = "server.entitybatchsize",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.entitybatchsize.ToString(),
+			GetOveride = () => ConVar.Server.entitybatchsize.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.entitybatchsize = str.ToInt();
+				ConVar.Server.entitybatchsize = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7648,10 +7901,10 @@ public class ConsoleGen
 			FullName = "server.entitybatchtime",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.entitybatchtime.ToString(),
+			GetOveride = () => ConVar.Server.entitybatchtime.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.entitybatchtime = str.ToFloat();
+				ConVar.Server.entitybatchtime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7661,10 +7914,10 @@ public class ConsoleGen
 			FullName = "server.entityrate",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.entityrate.ToString(),
+			GetOveride = () => ConVar.Server.entityrate.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.entityrate = str.ToInt();
+				ConVar.Server.entityrate = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7674,10 +7927,10 @@ public class ConsoleGen
 			FullName = "server.events",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.events.ToString(),
+			GetOveride = () => ConVar.Server.events.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.events = str.ToBool();
+				ConVar.Server.events = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7689,7 +7942,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.fps(arg);
+				ConVar.Server.fps(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7703,10 +7956,10 @@ public class ConsoleGen
 			Saved = true,
 			Replicated = true,
 			Variable = true,
-			GetOveride = () => Server.funWaterDamageThreshold.ToString(),
+			GetOveride = () => ConVar.Server.funWaterDamageThreshold.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.funWaterDamageThreshold = str.ToFloat();
+				ConVar.Server.funWaterDamageThreshold = str.ToFloat();
 			},
 			Default = "0.8"
 		},
@@ -7721,10 +7974,10 @@ public class ConsoleGen
 			Saved = true,
 			Replicated = true,
 			Variable = true,
-			GetOveride = () => Server.funWaterWetnessGain.ToString(),
+			GetOveride = () => ConVar.Server.funWaterWetnessGain.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.funWaterWetnessGain = str.ToFloat();
+				ConVar.Server.funWaterWetnessGain = str.ToFloat();
 			},
 			Default = "0.05"
 		},
@@ -7735,10 +7988,10 @@ public class ConsoleGen
 			FullName = "server.gamemode",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.gamemode.ToString(),
+			GetOveride = () => ConVar.Server.gamemode.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.gamemode = str;
+				ConVar.Server.gamemode = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7750,10 +8003,10 @@ public class ConsoleGen
 			Saved = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.headerimage.ToString(),
+			GetOveride = () => ConVar.Server.headerimage.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.headerimage = str;
+				ConVar.Server.headerimage = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7764,10 +8017,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.hostname.ToString(),
+			GetOveride = () => ConVar.Server.hostname.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.hostname = str;
+				ConVar.Server.hostname = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7777,10 +8030,10 @@ public class ConsoleGen
 			FullName = "server.identity",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.identity.ToString(),
+			GetOveride = () => ConVar.Server.identity.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.identity = str;
+				ConVar.Server.identity = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7791,10 +8044,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.idlekick.ToString(),
+			GetOveride = () => ConVar.Server.idlekick.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.idlekick = str.ToInt();
+				ConVar.Server.idlekick = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7804,10 +8057,10 @@ public class ConsoleGen
 			FullName = "server.idlekickadmins",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.idlekickadmins.ToString(),
+			GetOveride = () => ConVar.Server.idlekickadmins.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.idlekickadmins = str.ToInt();
+				ConVar.Server.idlekickadmins = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7817,10 +8070,10 @@ public class ConsoleGen
 			FullName = "server.idlekickmode",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.idlekickmode.ToString(),
+			GetOveride = () => ConVar.Server.idlekickmode.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.idlekickmode = str.ToInt();
+				ConVar.Server.idlekickmode = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7832,10 +8085,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "Base chance of recovery after incapacitated wounded state",
 			Variable = true,
-			GetOveride = () => Server.incapacitatedrecoverchance.ToString(),
+			GetOveride = () => ConVar.Server.incapacitatedrecoverchance.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.incapacitatedrecoverchance = str.ToFloat();
+				ConVar.Server.incapacitatedrecoverchance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7848,10 +8101,26 @@ public class ConsoleGen
 			Description = "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting",
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.industrialCrafterFrequency.ToString(),
+			GetOveride = () => ConVar.Server.industrialCrafterFrequency.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.industrialCrafterFrequency = str.ToFloat();
+				ConVar.Server.industrialCrafterFrequency = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "industrialframebudgetms",
+			Parent = "server",
+			FullName = "server.industrialframebudgetms",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How long per frame to spend on industrial jobs",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.industrialFrameBudgetMs.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.industrialFrameBudgetMs = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7861,10 +8130,10 @@ public class ConsoleGen
 			FullName = "server.ip",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.ip.ToString(),
+			GetOveride = () => ConVar.Server.ip.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.ip = str;
+				ConVar.Server.ip = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7874,10 +8143,10 @@ public class ConsoleGen
 			FullName = "server.ipqueriespermin",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.ipQueriesPerMin.ToString(),
+			GetOveride = () => ConVar.Server.ipQueriesPerMin.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.ipQueriesPerMin = str.ToInt();
+				ConVar.Server.ipQueriesPerMin = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7887,10 +8156,10 @@ public class ConsoleGen
 			FullName = "server.itemdespawn",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.itemdespawn.ToString(),
+			GetOveride = () => ConVar.Server.itemdespawn.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.itemdespawn = str.ToFloat();
+				ConVar.Server.itemdespawn = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7900,10 +8169,10 @@ public class ConsoleGen
 			FullName = "server.itemdespawn_container_scale",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.itemdespawn_container_scale.ToString(),
+			GetOveride = () => ConVar.Server.itemdespawn_container_scale.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.itemdespawn_container_scale = str.ToFloat();
+				ConVar.Server.itemdespawn_container_scale = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7913,10 +8182,10 @@ public class ConsoleGen
 			FullName = "server.itemdespawn_quick",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.itemdespawn_quick.ToString(),
+			GetOveride = () => ConVar.Server.itemdespawn_quick.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.itemdespawn_quick = str.ToFloat();
+				ConVar.Server.itemdespawn_quick = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7926,10 +8195,10 @@ public class ConsoleGen
 			FullName = "server.level",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.level.ToString(),
+			GetOveride = () => ConVar.Server.level.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.level = str;
+				ConVar.Server.level = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7939,10 +8208,10 @@ public class ConsoleGen
 			FullName = "server.leveltransfer",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.leveltransfer.ToString(),
+			GetOveride = () => ConVar.Server.leveltransfer.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.leveltransfer = str.ToBool();
+				ConVar.Server.leveltransfer = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7952,10 +8221,10 @@ public class ConsoleGen
 			FullName = "server.levelurl",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.levelurl.ToString(),
+			GetOveride = () => ConVar.Server.levelurl.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.levelurl = str;
+				ConVar.Server.levelurl = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -7968,7 +8237,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.listtoolcupboards(arg);
+				ConVar.Server.listtoolcupboards(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7981,7 +8250,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.listvendingmachines(arg);
+				ConVar.Server.listvendingmachines(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7993,10 +8262,10 @@ public class ConsoleGen
 			Saved = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.logoimage.ToString(),
+			GetOveride = () => ConVar.Server.logoimage.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.logoimage = str;
+				ConVar.Server.logoimage = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -8006,23 +8275,49 @@ public class ConsoleGen
 			FullName = "server.maxconnectionsperip",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxconnectionsperip.ToString(),
+			GetOveride = () => ConVar.Server.maxconnectionsperip.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxconnectionsperip = str.ToInt();
+				ConVar.Server.maxconnectionsperip = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "maxdecryptqueue",
+			Name = "maxdecryptqueuebytes",
 			Parent = "server",
-			FullName = "server.maxdecryptqueue",
+			FullName = "server.maxdecryptqueuebytes",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxdecryptqueue.ToString(),
+			GetOveride = () => ConVar.Server.maxdecryptqueuebytes.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxdecryptqueue = str.ToInt();
+				ConVar.Server.maxdecryptqueuebytes = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxdecryptqueuelength",
+			Parent = "server",
+			FullName = "server.maxdecryptqueuelength",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxdecryptqueuelength.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxdecryptqueuelength = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxdecryptthreadwait",
+			Parent = "server",
+			FullName = "server.maxdecryptthreadwait",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxdecryptthreadwait.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxdecryptthreadwait = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8035,23 +8330,23 @@ public class ConsoleGen
 			Description = "How many stacks a single conveyor can move in a single tick",
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.maxItemStacksMovedPerTickIndustrial.ToString(),
+			GetOveride = () => ConVar.Server.maxItemStacksMovedPerTickIndustrial.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxItemStacksMovedPerTickIndustrial = str.ToInt();
+				ConVar.Server.maxItemStacksMovedPerTickIndustrial = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "maxpacketsize",
+			Name = "maxmainthreadwait",
 			Parent = "server",
-			FullName = "server.maxpacketsize",
+			FullName = "server.maxmainthreadwait",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketsize.ToString(),
+			GetOveride = () => ConVar.Server.maxmainthreadwait.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketsize = str.ToInt();
+				ConVar.Server.maxmainthreadwait = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8061,10 +8356,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketsize_command",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketsize_command.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketsize_command.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketsize_command = str.ToInt();
+				ConVar.Server.maxpacketsize_command = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8074,10 +8369,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond = str.ToInt();
+				ConVar.Server.maxpacketspersecond = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8087,10 +8382,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond_command",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond_command.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond_command.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond_command = str.ToInt();
+				ConVar.Server.maxpacketspersecond_command = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8100,10 +8395,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond_rpc",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond_rpc.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond_rpc.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond_rpc = str.ToInt();
+				ConVar.Server.maxpacketspersecond_rpc = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8113,10 +8408,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond_rpc_signal",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond_rpc_signal.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond_rpc_signal.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond_rpc_signal = str.ToInt();
+				ConVar.Server.maxpacketspersecond_rpc_signal = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8126,10 +8421,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond_tick",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond_tick.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond_tick.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond_tick = str.ToInt();
+				ConVar.Server.maxpacketspersecond_tick = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8139,10 +8434,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond_voice",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond_voice.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond_voice.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond_voice = str.ToInt();
+				ConVar.Server.maxpacketspersecond_voice = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8152,10 +8447,10 @@ public class ConsoleGen
 			FullName = "server.maxpacketspersecond_world",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxpacketspersecond_world.ToString(),
+			GetOveride = () => ConVar.Server.maxpacketspersecond_world.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxpacketspersecond_world = str.ToInt();
+				ConVar.Server.maxpacketspersecond_world = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8166,23 +8461,49 @@ public class ConsoleGen
 			ServerAdmin = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.maxplayers.ToString(),
+			GetOveride = () => ConVar.Server.maxplayers.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxplayers = str.ToInt();
+				ConVar.Server.maxplayers = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "maxreadqueue",
+			Name = "maxreadqueuebytes",
 			Parent = "server",
-			FullName = "server.maxreadqueue",
+			FullName = "server.maxreadqueuebytes",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxreadqueue.ToString(),
+			GetOveride = () => ConVar.Server.maxreadqueuebytes.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxreadqueue = str.ToInt();
+				ConVar.Server.maxreadqueuebytes = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxreadqueuelength",
+			Parent = "server",
+			FullName = "server.maxreadqueuelength",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxreadqueuelength.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxreadqueuelength = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxreadthreadwait",
+			Parent = "server",
+			FullName = "server.maxreadthreadwait",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxreadthreadwait.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxreadthreadwait = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8192,10 +8513,10 @@ public class ConsoleGen
 			FullName = "server.maxreceivetime",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxreceivetime.ToString(),
+			GetOveride = () => ConVar.Server.maxreceivetime.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxreceivetime = str.ToFloat();
+				ConVar.Server.maxreceivetime = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8205,23 +8526,49 @@ public class ConsoleGen
 			FullName = "server.maxunack",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxunack.ToString(),
+			GetOveride = () => ConVar.Server.maxunack.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxunack = str.ToInt();
+				ConVar.Server.maxunack = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "maxwritequeue",
+			Name = "maxwritequeuebytes",
 			Parent = "server",
-			FullName = "server.maxwritequeue",
+			FullName = "server.maxwritequeuebytes",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.maxwritequeue.ToString(),
+			GetOveride = () => ConVar.Server.maxwritequeuebytes.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.maxwritequeue = str.ToInt();
+				ConVar.Server.maxwritequeuebytes = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxwritequeuelength",
+			Parent = "server",
+			FullName = "server.maxwritequeuelength",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxwritequeuelength.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxwritequeuelength = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxwritethreadwait",
+			Parent = "server",
+			FullName = "server.maxwritethreadwait",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxwritethreadwait.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxwritethreadwait = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8232,10 +8579,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.meleearmor.ToString(),
+			GetOveride = () => ConVar.Server.meleearmor.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.meleearmor = str.ToFloat();
+				ConVar.Server.meleearmor = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8246,10 +8593,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.meleedamage.ToString(),
+			GetOveride = () => ConVar.Server.meleedamage.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.meleedamage = str.ToFloat();
+				ConVar.Server.meleedamage = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8259,10 +8606,10 @@ public class ConsoleGen
 			FullName = "server.metabolismtick",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.metabolismtick.ToString(),
+			GetOveride = () => ConVar.Server.metabolismtick.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.metabolismtick = str.ToFloat();
+				ConVar.Server.metabolismtick = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8272,10 +8619,10 @@ public class ConsoleGen
 			FullName = "server.modifiertickrate",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.modifierTickRate.ToString(),
+			GetOveride = () => ConVar.Server.modifierTickRate.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.modifierTickRate = str.ToFloat();
+				ConVar.Server.modifierTickRate = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8290,10 +8637,10 @@ public class ConsoleGen
 			Replicated = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.motd.ToString(),
+			GetOveride = () => ConVar.Server.motd.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.motd = str;
+				ConVar.Server.motd = str;
 			},
 			Default = ""
 		},
@@ -8304,10 +8651,10 @@ public class ConsoleGen
 			FullName = "server.netcache",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.netcache.ToString(),
+			GetOveride = () => ConVar.Server.netcache.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.netcache = str.ToBool();
+				ConVar.Server.netcache = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8317,10 +8664,10 @@ public class ConsoleGen
 			FullName = "server.netcachesize",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.netcachesize.ToString(),
+			GetOveride = () => ConVar.Server.netcachesize.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.netcachesize = str.ToInt();
+				ConVar.Server.netcachesize = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8330,10 +8677,10 @@ public class ConsoleGen
 			FullName = "server.netlog",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.netlog.ToString(),
+			GetOveride = () => ConVar.Server.netlog.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.netlog = str.ToBool();
+				ConVar.Server.netlog = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8345,8 +8692,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval8 = Server.netprotocol(arg);
-				arg.ReplyWithObject(rval8);
+				string rval11 = ConVar.Server.netprotocol(arg);
+				arg.ReplyWithObject(rval11);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8357,10 +8704,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.nonPlanterDeathChancePerTick.ToString(),
+			GetOveride = () => ConVar.Server.nonPlanterDeathChancePerTick.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.nonPlanterDeathChancePerTick = str.ToFloat();
+				ConVar.Server.nonPlanterDeathChancePerTick = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8370,10 +8717,10 @@ public class ConsoleGen
 			FullName = "server.official",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.official.ToString(),
+			GetOveride = () => ConVar.Server.official.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.official = str.ToBool();
+				ConVar.Server.official = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8384,10 +8731,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.optimalPlanterQualitySaturation.ToString(),
+			GetOveride = () => ConVar.Server.optimalPlanterQualitySaturation.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.optimalPlanterQualitySaturation = str.ToFloat();
+				ConVar.Server.optimalPlanterQualitySaturation = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8399,8 +8746,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval7 = Server.packetlog(arg);
-				arg.ReplyWithObject(rval7);
+				string rval10 = ConVar.Server.packetlog(arg);
+				arg.ReplyWithObject(rval10);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8410,10 +8757,10 @@ public class ConsoleGen
 			FullName = "server.packetlog_enabled",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.packetlog_enabled.ToString(),
+			GetOveride = () => ConVar.Server.packetlog_enabled.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.packetlog_enabled = str.ToBool();
+				ConVar.Server.packetlog_enabled = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8423,10 +8770,10 @@ public class ConsoleGen
 			FullName = "server.plantlightdetection",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.plantlightdetection.ToString(),
+			GetOveride = () => ConVar.Server.plantlightdetection.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.plantlightdetection = str.ToBool();
+				ConVar.Server.plantlightdetection = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8439,10 +8786,10 @@ public class ConsoleGen
 			Client = true,
 			Replicated = true,
 			Variable = true,
-			GetOveride = () => Server.planttick.ToString(),
+			GetOveride = () => ConVar.Server.planttick.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.planttick = str.ToFloat();
+				ConVar.Server.planttick = str.ToFloat();
 			},
 			Default = "60"
 		},
@@ -8453,10 +8800,10 @@ public class ConsoleGen
 			FullName = "server.planttickscale",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.planttickscale.ToString(),
+			GetOveride = () => ConVar.Server.planttickscale.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.planttickscale = str.ToFloat();
+				ConVar.Server.planttickscale = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8469,7 +8816,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.playerlistpos(arg);
+				ConVar.Server.playerlistpos(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8480,10 +8827,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.playerserverfall.ToString(),
+			GetOveride = () => ConVar.Server.playerserverfall.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.playerserverfall = str.ToBool();
+				ConVar.Server.playerserverfall = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8493,10 +8840,10 @@ public class ConsoleGen
 			FullName = "server.playertimeout",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.playertimeout.ToString(),
+			GetOveride = () => ConVar.Server.playertimeout.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.playertimeout = str.ToInt();
+				ConVar.Server.playertimeout = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8506,10 +8853,23 @@ public class ConsoleGen
 			FullName = "server.port",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.port.ToString(),
+			GetOveride = () => ConVar.Server.port.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.port = str.ToInt();
+				ConVar.Server.port = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printdecryptqueue",
+			Parent = "server",
+			FullName = "server.printdecryptqueue",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval9 = ConVar.Server.printdecryptqueue(arg);
+				arg.ReplyWithObject(rval9);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8522,8 +8882,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval6 = Server.printeyes(arg);
-				arg.ReplyWithObject(rval6);
+				string rval8 = ConVar.Server.printeyes(arg);
+				arg.ReplyWithObject(rval8);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8536,8 +8896,21 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval5 = Server.printpos(arg);
-				arg.ReplyWithObject(rval5);
+				string rval7 = ConVar.Server.printpos(arg);
+				arg.ReplyWithObject(rval7);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printreadqueue",
+			Parent = "server",
+			FullName = "server.printreadqueue",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval6 = ConVar.Server.printreadqueue(arg);
+				arg.ReplyWithObject(rval6);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8549,10 +8922,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "Should F7 reports from players be printed to console",
 			Variable = true,
-			GetOveride = () => Server.printReportsToConsole.ToString(),
+			GetOveride = () => ConVar.Server.printReportsToConsole.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.printReportsToConsole = str.ToBool();
+				ConVar.Server.printReportsToConsole = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8565,7 +8938,20 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval4 = Server.printrot(arg);
+				string rval5 = ConVar.Server.printrot(arg);
+				arg.ReplyWithObject(rval5);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printwritequeue",
+			Parent = "server",
+			FullName = "server.printwritequeue",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval4 = ConVar.Server.printwritequeue(arg);
 				arg.ReplyWithObject(rval4);
 			}
 		},
@@ -8576,10 +8962,10 @@ public class ConsoleGen
 			FullName = "server.pve",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.pve.ToString(),
+			GetOveride = () => ConVar.Server.pve.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.pve = str.ToBool();
+				ConVar.Server.pve = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8589,10 +8975,10 @@ public class ConsoleGen
 			FullName = "server.queriespersecond",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.queriesPerSecond.ToString(),
+			GetOveride = () => ConVar.Server.queriesPerSecond.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.queriesPerSecond = str.ToInt();
+				ConVar.Server.queriesPerSecond = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8602,10 +8988,10 @@ public class ConsoleGen
 			FullName = "server.queryport",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.queryport.ToString(),
+			GetOveride = () => ConVar.Server.queryport.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.queryport = str.ToInt();
+				ConVar.Server.queryport = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8616,10 +9002,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.radiation.ToString(),
+			GetOveride = () => ConVar.Server.radiation.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.radiation = str.ToBool();
+				ConVar.Server.radiation = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8631,7 +9017,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval3 = Server.readcfg(arg);
+				string rval3 = ConVar.Server.readcfg(arg);
 				arg.ReplyWithObject(rval3);
 			}
 		},
@@ -8644,10 +9030,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "HTTP API endpoint for receiving F7 reports",
 			Variable = true,
-			GetOveride = () => Server.reportsServerEndpoint.ToString(),
+			GetOveride = () => ConVar.Server.reportsServerEndpoint.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.reportsServerEndpoint = str;
+				ConVar.Server.reportsServerEndpoint = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -8659,10 +9045,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "If set, this key will be included with any reports sent via reportsServerEndpoint (for validation)",
 			Variable = true,
-			GetOveride = () => Server.reportsServerEndpointKey.ToString(),
+			GetOveride = () => ConVar.Server.reportsServerEndpointKey.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.reportsServerEndpointKey = str;
+				ConVar.Server.reportsServerEndpointKey = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -8673,10 +9059,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "If a player presses the respawn button, respawn at their death location (for trailer filming)",
 			Variable = true,
-			GetOveride = () => Server.respawnAtDeathPosition.ToString(),
+			GetOveride = () => ConVar.Server.respawnAtDeathPosition.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.respawnAtDeathPosition = str.ToBool();
+				ConVar.Server.respawnAtDeathPosition = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8686,10 +9072,10 @@ public class ConsoleGen
 			FullName = "server.respawnresetrange",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.respawnresetrange.ToString(),
+			GetOveride = () => ConVar.Server.respawnresetrange.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.respawnresetrange = str.ToFloat();
+				ConVar.Server.respawnresetrange = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8700,10 +9086,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Description = "When a player respawns give them the loadout assigned to client.RespawnLoadout (created with inventory.saveloadout)",
 			Variable = true,
-			GetOveride = () => Server.respawnWithLoadout.ToString(),
+			GetOveride = () => ConVar.Server.respawnWithLoadout.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.respawnWithLoadout = str.ToBool();
+				ConVar.Server.respawnWithLoadout = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8714,10 +9100,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.rewounddelay.ToString(),
+			GetOveride = () => ConVar.Server.rewounddelay.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.rewounddelay = str.ToFloat();
+				ConVar.Server.rewounddelay = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8729,7 +9115,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval2 = Server.rpclog(arg);
+				string rval2 = ConVar.Server.rpclog(arg);
 				arg.ReplyWithObject(rval2);
 			}
 		},
@@ -8740,10 +9126,10 @@ public class ConsoleGen
 			FullName = "server.rpclog_enabled",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.rpclog_enabled.ToString(),
+			GetOveride = () => ConVar.Server.rpclog_enabled.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.rpclog_enabled = str.ToBool();
+				ConVar.Server.rpclog_enabled = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8753,10 +9139,10 @@ public class ConsoleGen
 			FullName = "server.salt",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.salt.ToString(),
+			GetOveride = () => ConVar.Server.salt.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.salt = str.ToInt();
+				ConVar.Server.salt = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8769,7 +9155,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.save(arg);
+				ConVar.Server.save(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8781,10 +9167,10 @@ public class ConsoleGen
 			Saved = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.saveBackupCount.ToString(),
+			GetOveride = () => ConVar.Server.saveBackupCount.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.saveBackupCount = str.ToInt();
+				ConVar.Server.saveBackupCount = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8794,10 +9180,10 @@ public class ConsoleGen
 			FullName = "server.savecachesize",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.savecachesize.ToString(),
+			GetOveride = () => ConVar.Server.savecachesize.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.savecachesize = str.ToInt();
+				ConVar.Server.savecachesize = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8807,10 +9193,10 @@ public class ConsoleGen
 			FullName = "server.saveinterval",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.saveinterval.ToString(),
+			GetOveride = () => ConVar.Server.saveinterval.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.saveinterval = str.ToInt();
+				ConVar.Server.saveinterval = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8820,10 +9206,10 @@ public class ConsoleGen
 			FullName = "server.schematime",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.schematime.ToString(),
+			GetOveride = () => ConVar.Server.schematime.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.schematime = str.ToFloat();
+				ConVar.Server.schematime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8833,10 +9219,10 @@ public class ConsoleGen
 			FullName = "server.secure",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.secure.ToString(),
+			GetOveride = () => ConVar.Server.secure.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.secure = str.ToBool();
+				ConVar.Server.secure = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8846,10 +9232,10 @@ public class ConsoleGen
 			FullName = "server.seed",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.seed.ToString(),
+			GetOveride = () => ConVar.Server.seed.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.seed = str.ToInt();
+				ConVar.Server.seed = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8862,7 +9248,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.sendnetworkupdate(arg);
+				ConVar.Server.sendnetworkupdate(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8875,7 +9261,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.setshowholstereditems(arg);
+				ConVar.Server.setshowholstereditems(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8886,10 +9272,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.showHolsteredItems.ToString(),
+			GetOveride = () => ConVar.Server.showHolsteredItems.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.showHolsteredItems = str.ToBool();
+				ConVar.Server.showHolsteredItems = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8902,7 +9288,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.snapshot(arg);
+				ConVar.Server.snapshot(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8913,10 +9299,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.sprinklerEyeHeightOffset.ToString(),
+			GetOveride = () => ConVar.Server.sprinklerEyeHeightOffset.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.sprinklerEyeHeightOffset = str.ToFloat();
+				ConVar.Server.sprinklerEyeHeightOffset = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8927,10 +9313,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			Saved = true,
 			Variable = true,
-			GetOveride = () => Server.sprinklerRadius.ToString(),
+			GetOveride = () => ConVar.Server.sprinklerRadius.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.sprinklerRadius = str.ToFloat();
+				ConVar.Server.sprinklerRadius = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8940,10 +9326,10 @@ public class ConsoleGen
 			FullName = "server.stability",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.stability.ToString(),
+			GetOveride = () => ConVar.Server.stability.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.stability = str.ToBool();
+				ConVar.Server.stability = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8956,7 +9342,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.start(arg);
+				ConVar.Server.start(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -8966,10 +9352,10 @@ public class ConsoleGen
 			FullName = "server.statbackup",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.statBackup.ToString(),
+			GetOveride = () => ConVar.Server.statBackup.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.statBackup = str.ToBool();
+				ConVar.Server.statBackup = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8979,10 +9365,10 @@ public class ConsoleGen
 			FullName = "server.stats",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.stats.ToString(),
+			GetOveride = () => ConVar.Server.stats.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.stats = str.ToBool();
+				ConVar.Server.stats = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8995,7 +9381,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.stop(arg);
+				ConVar.Server.stop(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -9008,10 +9394,10 @@ public class ConsoleGen
 			Description = "Comma-separated server browser tag values (see wiki)",
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.tags.ToString(),
+			GetOveride = () => ConVar.Server.tags.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.tags = str;
+				ConVar.Server.tags = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -9021,10 +9407,10 @@ public class ConsoleGen
 			FullName = "server.tickrate",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.tickrate.ToString(),
+			GetOveride = () => ConVar.Server.tickrate.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.tickrate = str.ToInt();
+				ConVar.Server.tickrate = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9034,10 +9420,10 @@ public class ConsoleGen
 			FullName = "server.updatebatch",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.updatebatch.ToString(),
+			GetOveride = () => ConVar.Server.updatebatch.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.updatebatch = str.ToInt();
+				ConVar.Server.updatebatch = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9047,10 +9433,10 @@ public class ConsoleGen
 			FullName = "server.updatebatchspawn",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.updatebatchspawn.ToString(),
+			GetOveride = () => ConVar.Server.updatebatchspawn.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.updatebatchspawn = str.ToInt();
+				ConVar.Server.updatebatchspawn = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9061,10 +9447,10 @@ public class ConsoleGen
 			ServerAdmin = true,
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => Server.url.ToString(),
+			GetOveride = () => ConVar.Server.url.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.url = str;
+				ConVar.Server.url = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -9074,10 +9460,10 @@ public class ConsoleGen
 			FullName = "server.useminimumplantcondition",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.useMinimumPlantCondition.ToString(),
+			GetOveride = () => ConVar.Server.useMinimumPlantCondition.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.useMinimumPlantCondition = str.ToBool();
+				ConVar.Server.useMinimumPlantCondition = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9089,10 +9475,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "When transferring water, should containers keep 1 water behind. Enabling this should help performance if water IO is causing performance loss",
 			Variable = true,
-			GetOveride = () => Server.waterContainersLeaveWaterBehind.ToString(),
+			GetOveride = () => ConVar.Server.waterContainersLeaveWaterBehind.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.waterContainersLeaveWaterBehind = str.ToBool();
+				ConVar.Server.waterContainersLeaveWaterBehind = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9102,10 +9488,10 @@ public class ConsoleGen
 			FullName = "server.worldsize",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => Server.worldsize.ToString(),
+			GetOveride = () => ConVar.Server.worldsize.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.worldsize = str.ToInt();
+				ConVar.Server.worldsize = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9117,10 +9503,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "Maximum percent chance added to base wounded/incapacitated recovery chance, based on the player's food and water level",
 			Variable = true,
-			GetOveride = () => Server.woundedmaxfoodandwaterbonus.ToString(),
+			GetOveride = () => ConVar.Server.woundedmaxfoodandwaterbonus.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.woundedmaxfoodandwaterbonus = str.ToFloat();
+				ConVar.Server.woundedmaxfoodandwaterbonus = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9132,10 +9518,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "Base chance of recovery after crawling wounded state",
 			Variable = true,
-			GetOveride = () => Server.woundedrecoverchance.ToString(),
+			GetOveride = () => ConVar.Server.woundedrecoverchance.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.woundedrecoverchance = str.ToFloat();
+				ConVar.Server.woundedrecoverchance = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9147,10 +9533,10 @@ public class ConsoleGen
 			Saved = true,
 			Description = "Can players be wounded after recieving fatal damage",
 			Variable = true,
-			GetOveride = () => Server.woundingenabled.ToString(),
+			GetOveride = () => ConVar.Server.woundingenabled.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Server.woundingenabled = str.ToBool();
+				ConVar.Server.woundingenabled = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9163,7 +9549,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Server.writecfg(arg);
+				ConVar.Server.writecfg(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -9635,6 +10021,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				vehicle.killcars(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "killdrones",
+			Parent = "vehicle",
+			FullName = "vehicle.killdrones",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				vehicle.killdrones(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -10493,6 +10891,53 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				DiagnosticsConSys.dump(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "altitudespeedoverride",
+			Parent = "drone",
+			FullName = "drone.altitudespeedoverride",
+			ServerAdmin = true,
+			Description = "If greater than zero, overrides the drone's vertical movement speed",
+			Variable = true,
+			GetOveride = () => Drone.altitudeSpeedOverride.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Drone.altitudeSpeedOverride = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxcontrolrange",
+			Parent = "drone",
+			FullName = "drone.maxcontrolrange",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Description = "How far drones can be flown away from the controlling computer station",
+			Replicated = true,
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Drone.maxControlRange.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Drone.maxControlRange = str.ToFloat();
+			},
+			Default = "250"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "movementspeedoverride",
+			Parent = "drone",
+			FullName = "drone.movementspeedoverride",
+			ServerAdmin = true,
+			Description = "If greater than zero, overrides the drone's planar movement speed",
+			Variable = true,
+			GetOveride = () => Drone.movementSpeedOverride.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Drone.movementSpeedOverride = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

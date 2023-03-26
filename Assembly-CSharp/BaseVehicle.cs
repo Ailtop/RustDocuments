@@ -1218,9 +1218,9 @@ public class BaseVehicle : BaseMountable
 		BaseMountable baseMountable = baseEntity as BaseMountable;
 		if (baseMountable != null)
 		{
-			if (!baseMountable.enableSaving)
+			if (enableSaving != baseMountable.enableSaving)
 			{
-				baseMountable.EnableSaving(wants: true);
+				baseMountable.EnableSaving(enableSaving);
 			}
 			if (mountToSpawn.bone != "")
 			{

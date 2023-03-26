@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ConVar;
 using Oxide.Core;
@@ -63,6 +64,8 @@ public class AIBrainSenses
 
 	private BaseAIBrain brain;
 
+	private Func<BaseEntity, bool> aiCaresAbout;
+
 	public float TimeSinceThreat => UnityEngine.Time.realtimeSinceStartup - LastThreatTimestamp;
 
 	public SimpleAIMemory Memory { get; set; } = new SimpleAIMemory();
@@ -76,6 +79,7 @@ public class AIBrainSenses
 
 	public void Init(BaseEntity owner, BaseAIBrain brain, float memoryDuration, float range, float targetLostRange, float visionCone, bool checkVision, bool checkLOS, bool ignoreNonVisionSneakers, float listenRange, bool hostileTargetsOnly, bool senseFriendlies, bool ignoreSafeZonePlayers, EntityType senseTypes, bool refreshKnownLOS)
 	{
+		aiCaresAbout = AiCaresAbout;
 		this.owner = owner;
 		this.brain = brain;
 		MemoryDuration = memoryDuration;
@@ -155,7 +159,7 @@ public class AIBrainSenses
 
 	private void SensePlayers()
 	{
-		int playersInSphere = BaseEntity.Query.Server.GetPlayersInSphere(owner.transform.position, maxRange, playerQueryResults, AiCaresAbout);
+		int playersInSphere = BaseEntity.Query.Server.GetPlayersInSphere(owner.transform.position, maxRange, playerQueryResults, aiCaresAbout);
 		for (int i = 0; i < playersInSphere; i++)
 		{
 			BasePlayer ent = playerQueryResults[i];
@@ -165,7 +169,7 @@ public class AIBrainSenses
 
 	private void SenseBrains()
 	{
-		int brainsInSphere = BaseEntity.Query.Server.GetBrainsInSphere(owner.transform.position, maxRange, queryResults, AiCaresAbout);
+		int brainsInSphere = BaseEntity.Query.Server.GetBrainsInSphere(owner.transform.position, maxRange, queryResults, aiCaresAbout);
 		for (int i = 0; i < brainsInSphere; i++)
 		{
 			BaseEntity ent = queryResults[i];

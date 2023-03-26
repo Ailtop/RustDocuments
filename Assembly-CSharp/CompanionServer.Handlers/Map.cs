@@ -15,7 +15,7 @@ public class Map : BaseHandler<AppEmpty>
 
 	private static string _background;
 
-	protected override int TokenCost => 5;
+	protected override double TokenCost => 5.0;
 
 	public override void Execute()
 	{

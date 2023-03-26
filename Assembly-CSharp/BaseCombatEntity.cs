@@ -354,26 +354,30 @@ public class BaseCombatEntity : BaseEntity
 		float num4 = list.Sum((ItemAmount x) => x.amount);
 		if (num4 > 0f)
 		{
-			float a = list.Min((ItemAmount x) => Mathf.Clamp01((float)player2.inventory.GetAmount(x.itemid) / x.amount));
-			a = Mathf.Min(a, 50f / num2);
-			if (a <= 0f)
+			float num5 = list.Min((ItemAmount x) => Mathf.Clamp01((float)player2.inventory.GetAmount(x.itemid) / x.amount));
+			if (float.IsNaN(num5))
+			{
+				num5 = 0f;
+			}
+			num5 = Mathf.Min(num5, 50f / num2);
+			if (num5 <= 0f)
 			{
 				OnRepairFailedResources(player2, list);
 				return;
 			}
-			int num5 = 0;
+			int num6 = 0;
 			foreach (ItemAmount item in list)
 			{
-				int amount = Mathf.CeilToInt(a * item.amount);
-				int num6 = player2.inventory.Take(null, item.itemid, amount);
-				if (num6 > 0)
+				int amount = Mathf.CeilToInt(num5 * item.amount);
+				int num7 = player2.inventory.Take(null, item.itemid, amount);
+				if (num7 > 0)
 				{
-					num5 += num6;
-					player2.Command("note.inv", item.itemid, num6 * -1);
+					num6 += num7;
+					player2.Command("note.inv", item.itemid, num7 * -1);
 				}
 			}
-			float num7 = (float)num5 / num4;
-			health += num2 * num7;
+			float num8 = (float)num6 / num4;
+			health += num2 * num8;
 			SendNetworkUpdate();
 		}
 		else

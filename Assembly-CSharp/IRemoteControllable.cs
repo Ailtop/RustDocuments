@@ -4,25 +4,31 @@ public interface IRemoteControllable
 {
 	bool RequiresMouse { get; }
 
+	float MaxRange { get; }
+
+	RemoteControllableControls RequiredControls { get; }
+
+	CameraViewerId? ControllingViewerId { get; }
+
 	Transform GetEyes();
+
+	float GetFovScale();
 
 	BaseEntity GetEnt();
 
-	bool Occupied();
+	string GetIdentifier();
 
 	void UpdateIdentifier(string newID, bool clientSend = false);
-
-	string GetIdentifier();
 
 	void RCSetup();
 
 	void RCShutdown();
 
-	bool CanControl();
+	bool CanControl(ulong playerID);
 
-	void UserInput(InputState inputState, BasePlayer player);
+	void UserInput(InputState inputState, CameraViewerId viewerID);
 
-	void InitializeControl(BasePlayer controller);
+	bool InitializeControl(CameraViewerId viewerID);
 
-	void StopControl();
+	void StopControl(CameraViewerId viewerID);
 }

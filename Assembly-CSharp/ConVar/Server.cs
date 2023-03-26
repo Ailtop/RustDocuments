@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Epic.OnlineServices;
 using Epic.OnlineServices.Logging;
 using Epic.OnlineServices.Reports;
 using Facepunch.Extend;
@@ -348,6 +347,9 @@ public class Server : ConsoleSystem
 	[ServerVar(Help = "How many stacks a single conveyor can move in a single tick", Saved = true, ShowInAdminUI = true)]
 	public static int maxItemStacksMovedPerTickIndustrial = 12;
 
+	[ServerVar(Help = "How long per frame to spend on industrial jobs", Saved = true, ShowInAdminUI = true)]
+	public static float industrialFrameBudgetMs = 0.5f;
+
 	[ServerVar(Saved = true)]
 	public static bool showHolsteredItems = true;
 
@@ -405,7 +407,7 @@ public class Server : ConsoleSystem
 	}
 
 	[ServerVar]
-	public static float maxreceivetime
+	public static int maxreceivetime
 	{
 		get
 		{
@@ -413,46 +415,137 @@ public class Server : ConsoleSystem
 		}
 		set
 		{
-			Network.Server.MaxReceiveTime = Mathf.Clamp(value, 1f, 1000f);
+			Network.Server.MaxReceiveTime = Mathf.Clamp(value, 10, 1000);
 		}
 	}
 
 	[ServerVar]
-	public static int maxreadqueue
+	public static int maxmainthreadwait
 	{
 		get
 		{
-			return Network.Server.MaxReadQueue;
+			return Network.Server.MaxMainThreadWait;
 		}
 		set
 		{
-			Network.Server.MaxReadQueue = Mathf.Max(value, 1);
+			Network.Server.MaxMainThreadWait = Mathf.Clamp(value, 1, 1000);
 		}
 	}
 
 	[ServerVar]
-	public static int maxwritequeue
+	public static int maxreadthreadwait
 	{
 		get
 		{
-			return Network.Server.MaxWriteQueue;
+			return Network.Server.MaxReadThreadWait;
 		}
 		set
 		{
-			Network.Server.MaxWriteQueue = Mathf.Max(value, 1);
+			Network.Server.MaxReadThreadWait = Mathf.Clamp(value, 1, 1000);
 		}
 	}
 
 	[ServerVar]
-	public static int maxdecryptqueue
+	public static int maxwritethreadwait
 	{
 		get
 		{
-			return Network.Server.MaxDecryptQueue;
+			return Network.Server.MaxWriteThreadWait;
 		}
 		set
 		{
-			Network.Server.MaxDecryptQueue = Mathf.Max(value, 1);
+			Network.Server.MaxWriteThreadWait = Mathf.Clamp(value, 1, 1000);
+		}
+	}
+
+	[ServerVar]
+	public static int maxdecryptthreadwait
+	{
+		get
+		{
+			return Network.Server.MaxDecryptThreadWait;
+		}
+		set
+		{
+			Network.Server.MaxDecryptThreadWait = Mathf.Clamp(value, 1, 1000);
+		}
+	}
+
+	[ServerVar]
+	public static int maxreadqueuelength
+	{
+		get
+		{
+			return Network.Server.MaxReadQueueLength;
+		}
+		set
+		{
+			Network.Server.MaxReadQueueLength = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxwritequeuelength
+	{
+		get
+		{
+			return Network.Server.MaxWriteQueueLength;
+		}
+		set
+		{
+			Network.Server.MaxWriteQueueLength = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxdecryptqueuelength
+	{
+		get
+		{
+			return Network.Server.MaxDecryptQueueLength;
+		}
+		set
+		{
+			Network.Server.MaxDecryptQueueLength = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxreadqueuebytes
+	{
+		get
+		{
+			return Network.Server.MaxReadQueueBytes;
+		}
+		set
+		{
+			Network.Server.MaxReadQueueBytes = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxwritequeuebytes
+	{
+		get
+		{
+			return Network.Server.MaxWriteQueueBytes;
+		}
+		set
+		{
+			Network.Server.MaxWriteQueueBytes = Mathf.Max(value, 1);
+		}
+	}
+
+	[ServerVar]
+	public static int maxdecryptqueuebytes
+	{
+		get
+		{
+			return Network.Server.MaxDecryptQueueBytes;
+		}
+		set
+		{
+			Network.Server.MaxDecryptQueueBytes = Mathf.Max(value, 1);
 		}
 	}
 
@@ -466,19 +559,6 @@ public class Server : ConsoleSystem
 		set
 		{
 			Network.Server.MaxPacketsPerSecond = (ulong)Mathf.Clamp(value, 1, 1000000);
-		}
-	}
-
-	[ServerVar]
-	public static int maxpacketsize
-	{
-		get
-		{
-			return Network.Server.MaxPacketSize;
-		}
-		set
-		{
-			Network.Server.MaxPacketSize = Mathf.Clamp(value, 1, 1000000000);
 		}
 	}
 
@@ -548,6 +628,24 @@ public class Server : ConsoleSystem
 		{
 			sleepingPlayer.inventory.UpdatedVisibleHolsteredItems();
 		}
+	}
+
+	[ServerVar]
+	public static string printreadqueue(Arg arg)
+	{
+		return "Server read queue: " + Network.Net.sv.ReadQueueLength + " items / " + Network.Net.sv.ReadQueueBytes.FormatBytes();
+	}
+
+	[ServerVar]
+	public static string printwritequeue(Arg arg)
+	{
+		return "Server write queue: " + Network.Net.sv.WriteQueueLength + " items / " + Network.Net.sv.WriteQueueBytes.FormatBytes();
+	}
+
+	[ServerVar]
+	public static string printdecryptqueue(Arg arg)
+	{
+		return "Server decrypt queue: " + Network.Net.sv.DecryptQueueLength + " items / " + Network.Net.sv.DecryptQueueBytes.FormatBytes();
 	}
 
 	[ServerVar]
@@ -726,19 +824,10 @@ public class Server : ConsoleSystem
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		if (!(basePlayer == null))
 		{
-			ulong uInt = arg.GetUInt64(0, 0uL);
+			string text = arg.GetUInt64(0, 0uL).ToString();
 			string @string = arg.GetString(1);
-			UnityEngine.Debug.LogWarning(string.Concat(basePlayer, " reported ", uInt, ": ", @string.ToPrintable(140)));
-			if (EACServer.Reports != null)
-			{
-				SendPlayerBehaviorReportOptions sendPlayerBehaviorReportOptions = default(SendPlayerBehaviorReportOptions);
-				sendPlayerBehaviorReportOptions.ReportedUserId = ProductUserId.FromString(uInt.ToString());
-				sendPlayerBehaviorReportOptions.ReporterUserId = ProductUserId.FromString(basePlayer.net.connection.userid.ToString());
-				sendPlayerBehaviorReportOptions.Category = PlayerReportsCategory.Cheating;
-				sendPlayerBehaviorReportOptions.Message = @string;
-				SendPlayerBehaviorReportOptions options = sendPlayerBehaviorReportOptions;
-				EACServer.Reports.SendPlayerBehaviorReport(ref options, null, null);
-			}
+			UnityEngine.Debug.LogWarning(string.Concat(basePlayer, " reported ", text, ": ", @string.ToPrintable(140)));
+			EACServer.SendPlayerBehaviorReport(basePlayer, PlayerReportsCategory.Cheating, text, @string);
 		}
 	}
 

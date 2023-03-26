@@ -338,7 +338,7 @@ public class DeliveryDrone : Drone
 		}
 	}
 
-	public override bool CanControl()
+	public override bool CanControl(ulong playerID)
 	{
 		return false;
 	}

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using CompanionServer;
 using ConVar;
-using Epic.OnlineServices.AntiCheatCommon;
 using Facepunch;
 using Facepunch.Extend;
 using Facepunch.Math;
@@ -2079,7 +2078,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			return;
 		}
 		Vector3 end = vector2 - (vector2 - player.eyes.position).normalized * 0.25f;
-		if (!GamePhysics.CheckCapsule(player.eyes.position, end, 0.25f, 1218519041) && !AntiHack.TestNoClipping(player, vector2 + player.NoClipOffset(), vector2 + player.NoClipOffset(), player.NoClipRadius(ConVar.AntiHack.noclip_margin), ConVar.AntiHack.noclip_backtracking, sphereCast: true))
+		if (!GamePhysics.CheckCapsule(player.eyes.position, end, 0.25f, 1218519041) && !AntiHack.TestNoClipping(vector2 + player.NoClipOffset(), vector2 + player.NoClipOffset(), player.NoClipRadius(ConVar.AntiHack.noclip_margin), ConVar.AntiHack.noclip_backtracking, sphereCast: true))
 		{
 			player.EnsureDismounted();
 			player.transform.position = vector2;
@@ -2912,7 +2911,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 233;
+		missions.protocol = 234;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -3012,7 +3011,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (233 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (234 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save. Clearing");
 				loadedMissions.activeMission = -1;
@@ -4853,10 +4852,21 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			serverTickRate = Player.tickrate_sv;
 			serverTickInterval = 1f / (float)serverTickRate;
 		}
-		if (ConVar.AntiHack.terrain_protection > 0 && UnityEngine.Time.frameCount % ConVar.AntiHack.terrain_timeslice == (long)net.ID % (long)ConVar.AntiHack.terrain_timeslice && !AntiHack.ShouldIgnore(this) && AntiHack.IsInsideTerrain(this))
+		if (ConVar.AntiHack.terrain_protection > 0 && UnityEngine.Time.frameCount % ConVar.AntiHack.terrain_timeslice == (long)net.ID % (long)ConVar.AntiHack.terrain_timeslice && !AntiHack.ShouldIgnore(this))
 		{
-			AntiHack.AddViolation(this, AntiHackType.InsideTerrain, ConVar.AntiHack.terrain_penalty);
-			if (ConVar.AntiHack.terrain_kill)
+			bool flag = false;
+			if (AntiHack.IsInsideTerrain(this))
+			{
+				flag = true;
+				AntiHack.AddViolation(this, AntiHackType.InsideTerrain, ConVar.AntiHack.terrain_penalty);
+			}
+			else if (ConVar.AntiHack.terrain_check_geometry && AntiHack.IsInsideMesh(base.transform.position))
+			{
+				flag = true;
+				AntiHack.AddViolation(this, AntiHackType.InsideGeometry, ConVar.AntiHack.terrain_penalty);
+				AntiHack.Log(this, AntiHackType.InsideGeometry, "Seems to be clipped inside " + AntiHack.isInsideRayHit.collider.name);
+			}
+			if (flag && ConVar.AntiHack.terrain_kill)
 			{
 				Hurt(1000f, DamageType.Suicide, this, useProtection: false);
 				return;
@@ -5256,44 +5266,34 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public virtual void EndSleeping()
 	{
-		if (!IsSleeping() || Interface.CallHook("OnPlayerSleepEnd", this) != null)
+		if (IsSleeping() && Interface.CallHook("OnPlayerSleepEnd", this) == null)
 		{
-			return;
-		}
-		SetPlayerFlag(PlayerFlags.Sleeping, b: false);
-		sleepStartTime = -1f;
-		sleepingPlayerList.Remove(this);
-		if (userID < 10000000 && !bots.Contains(this))
-		{
-			bots.Add(this);
-		}
-		CancelInvoke(ScheduledDeath);
-		InvokeRepeating(InventoryUpdate, 1f, 0.1f * UnityEngine.Random.Range(0.99f, 1.01f));
-		if (RelationshipManager.TeamsEnabled())
-		{
-			InvokeRandomized(TeamUpdate, 1f, 4f, 1f);
-		}
-		EnablePlayerCollider();
-		AddPlayerRigidbody();
-		SetServerFall(wantsOn: false);
-		if (HasParent())
-		{
-			SetParent(null, worldPositionStays: true);
-			ForceUpdateTriggers();
-		}
-		inventory.containerMain.OnChanged();
-		inventory.containerBelt.OnChanged();
-		inventory.containerWear.OnChanged();
-		Interface.CallHook("OnPlayerSleepEnded", this);
-		if (!EACServer.CanSendAnalytics || net.connection == null)
-		{
-			return;
-		}
-		using (TimeWarning.New("EAC.LogPlayerSpawn"))
-		{
-			LogPlayerSpawnOptions options = default(LogPlayerSpawnOptions);
-			options.SpawnedPlayerHandle = EACServer.GetClient(net.connection);
-			EACServer.Interface.LogPlayerSpawn(ref options);
+			SetPlayerFlag(PlayerFlags.Sleeping, b: false);
+			sleepStartTime = -1f;
+			sleepingPlayerList.Remove(this);
+			if (userID < 10000000 && !bots.Contains(this))
+			{
+				bots.Add(this);
+			}
+			CancelInvoke(ScheduledDeath);
+			InvokeRepeating(InventoryUpdate, 1f, 0.1f * UnityEngine.Random.Range(0.99f, 1.01f));
+			if (RelationshipManager.TeamsEnabled())
+			{
+				InvokeRandomized(TeamUpdate, 1f, 4f, 1f);
+			}
+			EnablePlayerCollider();
+			AddPlayerRigidbody();
+			SetServerFall(wantsOn: false);
+			if (HasParent())
+			{
+				SetParent(null, worldPositionStays: true);
+				ForceUpdateTriggers();
+			}
+			inventory.containerMain.OnChanged();
+			inventory.containerBelt.OnChanged();
+			inventory.containerWear.OnChanged();
+			Interface.CallHook("OnPlayerSleepEnded", this);
+			EACServer.LogPlayerSpawn(this);
 		}
 	}
 
@@ -5523,15 +5523,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			inventory.crafting.CancelAll(returnItems: true);
 		}
-		if (EACServer.CanSendAnalytics && net.connection != null)
-		{
-			using (TimeWarning.New("EAC.LogPlayerDespawn"))
-			{
-				LogPlayerDespawnOptions options = default(LogPlayerDespawnOptions);
-				options.DespawnedPlayerHandle = EACServer.GetClient(net.connection);
-				EACServer.Interface.LogPlayerDespawn(ref options);
-			}
-		}
+		EACServer.LogPlayerDespawn(this);
 		BaseCorpse baseCorpse = CreateCorpse();
 		if (baseCorpse != null)
 		{
@@ -5852,84 +5844,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			BasePlayer instigator = info?.InitiatorPlayer;
 			BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerHurt(instigator, this, info);
 		}
-		if (EACServer.CanSendAnalytics && info.Initiator != null && info.Initiator is BasePlayer)
-		{
-			BasePlayer basePlayer = info.Initiator.ToPlayer();
-			if (net.connection != null && basePlayer.net.connection != null)
-			{
-				using (TimeWarning.New("EAC.LogPlayerTakeDamage"))
-				{
-					LogPlayerTakeDamageOptions options = default(LogPlayerTakeDamageOptions);
-					LogPlayerUseWeaponData value2 = default(LogPlayerUseWeaponData);
-					options.AttackerPlayerHandle = EACServer.GetClient(basePlayer.net.connection);
-					options.VictimPlayerHandle = EACServer.GetClient(net.connection);
-					options.DamageTaken = info.damageTypes.Total();
-					options.DamagePosition = new Vec3f
-					{
-						x = info.HitPositionWorld.x,
-						y = info.HitPositionWorld.y,
-						z = info.HitPositionWorld.z
-					};
-					options.IsCriticalHit = info.isHeadshot;
-					if (IsDead())
-					{
-						options.DamageResult = AntiCheatCommonPlayerTakeDamageResult.Eliminated;
-					}
-					else if (IsWounded())
-					{
-						options.DamageResult = AntiCheatCommonPlayerTakeDamageResult.Downed;
-					}
-					if (info.Weapon != null)
-					{
-						Item item = info.Weapon.GetItem();
-						if (item != null)
-						{
-							value2.WeaponName = item.info.shortname;
-						}
-						else
-						{
-							value2.WeaponName = "unknown";
-						}
-					}
-					else
-					{
-						value2.WeaponName = "unknown";
-					}
-					Vector3 position = basePlayer.eyes.position;
-					Quaternion rotation = basePlayer.eyes.rotation;
-					Vector3 position2 = eyes.position;
-					Quaternion rotation2 = eyes.rotation;
-					options.AttackerPlayerPosition = new Vec3f
-					{
-						x = position.x,
-						y = position.y,
-						z = position.z
-					};
-					options.AttackerPlayerViewRotation = new Quat
-					{
-						w = rotation.w,
-						x = rotation.x,
-						y = rotation.y,
-						z = rotation.z
-					};
-					options.VictimPlayerPosition = new Vec3f
-					{
-						x = position2.x,
-						y = position2.y,
-						z = position2.z
-					};
-					options.VictimPlayerViewRotation = new Quat
-					{
-						w = rotation2.w,
-						x = rotation2.x,
-						y = rotation2.y,
-						z = rotation2.z
-					};
-					options.PlayerUseWeaponData = value2;
-					EACServer.Interface.LogPlayerTakeDamage(ref options);
-				}
-			}
-		}
+		EACServer.LogPlayerTakeDamage(this, info);
 		metabolism.SendChangesToClient();
 		if (info.PointStart != Vector3.zero && (info.damageTypes.Total() >= 0f || IsGod()))
 		{
@@ -6831,59 +6746,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	private void EACStateUpdate()
 	{
-		if (!EACServer.CanSendAnalytics || net == null || net.connection == null || IsReceivingSnapshot)
+		if (!IsReceivingSnapshot)
 		{
-			return;
-		}
-		Vector3 position = eyes.position;
-		Quaternion rotation = eyes.rotation;
-		LogPlayerTickOptions options = default(LogPlayerTickOptions);
-		options.PlayerHandle = EACServer.GetClient(net.connection);
-		options.PlayerPosition = new Vec3f
-		{
-			x = position.x,
-			y = position.y,
-			z = position.z
-		};
-		options.PlayerViewRotation = new Quat
-		{
-			w = rotation.w,
-			x = rotation.x,
-			y = rotation.y,
-			z = rotation.z
-		};
-		options.PlayerHealth = Health();
-		if (IsDucked())
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.Crouching;
-		}
-		if (isMounted)
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.Mounted;
-		}
-		if (IsCrawling())
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.Prone;
-		}
-		if (IsSwimming())
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.Swimming;
-		}
-		if (!IsOnGround())
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.Falling;
-		}
-		if (OnLadder())
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.OnLadder;
-		}
-		if (IsFlying)
-		{
-			options.PlayerMovementState |= AntiCheatCommonPlayerMovementState.Flying;
-		}
-		using (TimeWarning.New("EAC.LogPlayerTick"))
-		{
-			EACServer.Interface.LogPlayerTick(ref options);
+			EACServer.LogPlayerTick(this);
 		}
 	}
 
@@ -7320,22 +7185,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public void StopWounded(BasePlayer source = null)
 	{
-		if (!IsWounded())
+		if (IsWounded())
 		{
-			return;
-		}
-		RecoverFromWounded();
-		CancelInvoke(WoundingTick);
-		if (!EACServer.CanSendAnalytics || net.connection == null || !(source != null) || source.net.connection == null)
-		{
-			return;
-		}
-		using (TimeWarning.New("EAC.LogPlayerRevive"))
-		{
-			LogPlayerReviveOptions options = default(LogPlayerReviveOptions);
-			options.RevivedPlayerHandle = EACServer.GetClient(net.connection);
-			options.ReviverPlayerHandle = EACServer.GetClient(source.net.connection);
-			EACServer.Interface.LogPlayerRevive(ref options);
+			RecoverFromWounded();
+			CancelInvoke(WoundingTick);
+			EACServer.LogPlayerRevive(source, this);
 		}
 	}
 

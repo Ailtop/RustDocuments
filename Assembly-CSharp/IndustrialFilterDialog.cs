@@ -22,5 +22,19 @@ public class IndustrialFilterDialog : UIDialog
 
 	public GameObject NoItemsPrompt;
 
+	public Rust.UI.Dropdown FilterModeDropdown;
+
+	public GameObject[] FilterModeExplanations;
+
+	public GameObject FilterModeBlocker;
+
+	public RustText FilterCountText;
+
+	public GameObject BufferRoot;
+
+	public GameObjectRef BufferItemPrefab;
+
+	public Transform BufferTransform;
+
 	public RustButton PasteButton;
 }

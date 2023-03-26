@@ -429,6 +429,8 @@ public class TexasHoldEmController : CardGameController
 			if (input == 64)
 			{
 				playerData.EnableSendingCards();
+				playerData.availableInputs = GetAvailableInputsForPlayer(playerData);
+				base.Owner.SendNetworkUpdate();
 			}
 			LastActionTarget = playerData.UserID;
 			LastAction = (PokerInputOption)input;

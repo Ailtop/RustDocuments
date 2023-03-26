@@ -600,14 +600,7 @@ public class BlackjackController : CardGameController
 		}
 		case BlackjackInputOption.DoubleDown:
 		{
-			if (pdBlackjack.playingSplitCards)
-			{
-				selectedMoveValue = TryMakeBet(pdBlackjack, pdBlackjack.splitBetThisRound, BetType.Split);
-			}
-			else
-			{
-				selectedMoveValue = TryMakeBet(pdBlackjack, pdBlackjack.betThisRound, BetType.Main);
-			}
+			selectedMoveValue = TryMakeBet(pdBlackjack, pdBlackjack.betThisRound, BetType.Main);
 			cardStack.TryTakeCard(out var card);
 			pdBlackjack.Cards.Add(card);
 			if (!pdBlackjack.TrySwitchToSplitHand())

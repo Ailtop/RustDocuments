@@ -723,7 +723,7 @@ public class Item
 						amount -= num2;
 						slot2.MarkDirty();
 						MarkDirty();
-						Interface.CallHook("OnItemStacked", slot2, this, newcontainer);
+						Interface.CallHook("OnItemStacked", slot2, this, newcontainer, num2);
 						if (amount <= 0)
 						{
 							RemoveFromWorld();
@@ -783,9 +783,11 @@ public class Item
 				Item item = SplitItem(newcontainer.maxStackSize);
 				if (item != null && !item.MoveToContainer(newcontainer, iTargetPos, allowStack: false, ignoreStackLimit: false, sourcePlayer) && (itemContainer == null || !item.MoveToContainer(itemContainer, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer)))
 				{
-					item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
+					Vector3 dropPosition = newcontainer.dropPosition;
+					Vector3 dropVelocity = newcontainer.dropVelocity;
+					Interface.CallHook("OnItemStacked", itemContainerEntity, this, newcontainer);
+					item.Drop(dropPosition, dropVelocity);
 				}
-				Interface.CallHook("OnItemStacked", itemContainerEntity, this, newcontainer);
 				return true;
 			}
 			if (!newcontainer.CanAccept(this))
@@ -1003,6 +1005,13 @@ public class Item
 			item.instanceData.dataInt = instanceData.dataInt;
 			item.instanceData.ShouldPool = false;
 		}
+		if (instanceData != null && instanceData.dataInt > 0 && info != null && info.Blueprint != null && info.Blueprint.workbenchLevelRequired == 3)
+		{
+			item.instanceData = new ProtoBuf.Item.InstanceData();
+			item.instanceData.dataInt = instanceData.dataInt;
+			item.instanceData.ShouldPool = false;
+			item.SetFlag(Flag.IsOn, IsOn());
+		}
 		MarkDirty();
 		return item;
 	}
@@ -1067,6 +1076,10 @@ public class Item
 			{
 				return false;
 			}
+		}
+		if (item.instanceData != null && instanceData != null && (item.IsOn() != IsOn() || (item.instanceData.dataInt != instanceData.dataInt && item.info.Blueprint != null && item.info.Blueprint.workbenchLevelRequired == 3)))
+		{
+			return false;
 		}
 		if (instanceData != null && instanceData.subEntity != 0 && (bool)info.GetComponent<ItemModSign>())
 		{

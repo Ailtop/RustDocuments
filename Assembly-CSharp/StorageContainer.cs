@@ -19,6 +19,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 
 	public bool dropsLoot = true;
 
+	public float dropLootDestroyPercent;
+
 	public bool dropFloats;
 
 	public bool isLootable = true;
@@ -65,6 +67,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 	public bool DropsLoot => dropsLoot;
 
 	public bool DropFloats => dropFloats;
+
+	public float DestroyLootPercent => dropLootDestroyPercent;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -418,7 +422,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 		else
 		{
 			string prefab = (containerEntity.DropFloats ? "assets/prefabs/misc/item drop/item_drop_buoyant.prefab" : "assets/prefabs/misc/item drop/item_drop.prefab");
-			_ = itemContainer.Drop(prefab, containerEntity.GetDropPosition(), containerEntity.Transform.rotation) != null;
+			_ = itemContainer.Drop(prefab, containerEntity.GetDropPosition(), containerEntity.Transform.rotation, containerEntity.DestroyLootPercent) != null;
 		}
 	}
 

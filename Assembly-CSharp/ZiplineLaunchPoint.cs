@@ -185,7 +185,7 @@ public class ZiplineLaunchPoint : BaseEntity
 
 	public bool CheckLineOfSight(Vector3 from, Vector3 to)
 	{
-		Vector3 vector = CalculateLineMidPoint(from, to) - Vector3.up * 0.5f;
+		Vector3 vector = CalculateLineMidPoint(from, to) - Vector3.up * 0.75f;
 		if (GamePhysics.LineOfSightRadius(from, to, 1218511105, 0.5f, 2f) && GamePhysics.LineOfSightRadius(from, vector, 1218511105, 0.5f, 2f))
 		{
 			return GamePhysics.LineOfSightRadius(vector, to, 1218511105, 0.5f, 2f);
@@ -193,9 +193,9 @@ public class ZiplineLaunchPoint : BaseEntity
 		return false;
 	}
 
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(2uL)]
-	[RPC_Server]
 	public void MountPlayer(RPCMessage msg)
 	{
 		if (IsBusy() || msg.player == null || msg.player.Distance(LineDeparturePoint.position) > 3f || !IsPlayerFacingValidDirection(msg.player) || ziplineTargets.Count == 0)

@@ -273,7 +273,12 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 			{
 				collider.enabled = false;
 			}
-			ClientRPC(null, "TreeFall", info.attackNormal);
+			Vector3 vector = info.attackNormal;
+			if (vector == Vector3.zero)
+			{
+				vector = Vector3Ex.Direction2D(base.transform.position, info.PointStart);
+			}
+			ClientRPC(null, "TreeFall", vector);
 			Invoke(DelayedKill, fallDuration + 1f);
 		}
 		else

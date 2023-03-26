@@ -14,15 +14,37 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	public static List<IRemoteControllable> allControllables = new List<IRemoteControllable>();
 
 	[Header("RC Entity")]
-	public string rcIdentifier = "NONE";
+	public string rcIdentifier = "";
 
 	public Transform viewEyes;
 
 	public GameObjectRef IDPanelPrefab;
 
-	public bool IsBeingControlled { get; set; }
+	public RemoteControllableControls rcControls;
+
+	public virtual bool CanAcceptInput => false;
+
+	public int ViewerCount { get; private set; }
+
+	public CameraViewerId? ControllingViewerId { get; private set; }
+
+	public bool IsBeingControlled
+	{
+		get
+		{
+			if (ViewerCount > 0)
+			{
+				return ControllingViewerId.HasValue;
+			}
+			return false;
+		}
+	}
 
 	public virtual bool RequiresMouse => false;
+
+	public virtual float MaxRange => 10000f;
+
+	public RemoteControllableControls RequiredControls => rcControls;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -73,14 +95,14 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		return viewEyes;
 	}
 
+	public float GetFovScale()
+	{
+		return 1f;
+	}
+
 	public BaseEntity GetEnt()
 	{
 		return this;
-	}
-
-	public bool Occupied()
-	{
-		return false;
 	}
 
 	public string GetIdentifier()
@@ -88,18 +110,28 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		return rcIdentifier;
 	}
 
-	public virtual void UserInput(InputState inputState, BasePlayer player)
+	public virtual bool InitializeControl(CameraViewerId viewerID)
 	{
+		ViewerCount++;
+		if (CanAcceptInput && !ControllingViewerId.HasValue)
+		{
+			ControllingViewerId = viewerID;
+			return true;
+		}
+		return !CanAcceptInput;
 	}
 
-	public virtual void InitializeControl(BasePlayer controller)
+	public virtual void StopControl(CameraViewerId viewerID)
 	{
-		IsBeingControlled = true;
+		ViewerCount--;
+		if (ControllingViewerId == viewerID)
+		{
+			ControllingViewerId = null;
+		}
 	}
 
-	public virtual void StopControl()
+	public virtual void UserInput(InputState inputState, CameraViewerId viewerID)
 	{
-		IsBeingControlled = false;
 	}
 
 	public void UpdateIdentifier(string newID, bool clientSend = false)
@@ -110,11 +142,6 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 			if (!IDInUse(newID))
 			{
 				rcIdentifier = newID;
-				Debug.Log("Updated Identifier to : " + rcIdentifier);
-			}
-			else
-			{
-				Debug.Log("ID In use!" + newID);
 			}
 			SendNetworkUpdate();
 		}
@@ -124,7 +151,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	{
 		if (base.isServer)
 		{
-			allControllables.Add(this);
+			InstallControllable(this);
 		}
 	}
 
@@ -132,7 +159,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	{
 		if (base.isServer)
 		{
-			allControllables.Remove(this);
+			RemoveControllable(this);
 		}
 	}
 
@@ -148,9 +175,9 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		base.DestroyShared();
 	}
 
-	public virtual bool CanControl()
+	public virtual bool CanControl(ulong playerID)
 	{
-		object obj = Interface.CallHook("OnEntityControl", this);
+		object obj = Interface.CallHook("OnEntityControl", this, playerID);
 		if (obj is bool)
 		{
 			return (bool)obj;
@@ -162,12 +189,12 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 	[RPC_Server.MaxDistance(3f)]
 	public void Server_SetID(RPCMessage msg)
 	{
-		if (!CanControl())
+		if (msg.player == null || !CanControl(msg.player.userID) || !CanChangeID(msg.player))
 		{
 			return;
 		}
 		string text = msg.read.String();
-		if (ComputerStation.IsValidIdentifier(text))
+		if (string.IsNullOrEmpty(text) || ComputerStation.IsValidIdentifier(text))
 		{
 			string text2 = msg.read.String();
 			if (ComputerStation.IsValidIdentifier(text2) && text == GetIdentifier())
@@ -178,11 +205,19 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		}
 	}
 
+	public override bool CanUseNetworkCache(Connection connection)
+	{
+		return false;
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
-		info.msg.rcEntity = Facepunch.Pool.Get<RCEntity>();
-		info.msg.rcEntity.identifier = GetIdentifier();
+		if (info.forDisk || CanChangeID(info.forConnection?.player as BasePlayer))
+		{
+			info.msg.rcEntity = Facepunch.Pool.Get<RCEntity>();
+			info.msg.rcEntity.identifier = GetIdentifier();
+		}
 	}
 
 	public override void Load(LoadInfo info)
@@ -192,6 +227,15 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		{
 			UpdateIdentifier(info.msg.rcEntity.identifier);
 		}
+	}
+
+	protected virtual bool CanChangeID(BasePlayer player)
+	{
+		if (player != null && player.CanBuild() && player.IsBuildingAuthed())
+		{
+			return player.IsHoldingEntity<Hammer>();
+		}
+		return false;
 	}
 
 	public static bool IDInUse(string id)

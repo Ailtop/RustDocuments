@@ -214,7 +214,7 @@ public sealed class ItemContainer
 		}
 	}
 
-	public DroppedItemContainer Drop(string prefab, Vector3 pos, Quaternion rot)
+	public DroppedItemContainer Drop(string prefab, Vector3 pos, Quaternion rot, float destroyPercent)
 	{
 		if (itemList == null || itemList.Count == 0)
 		{
@@ -228,7 +228,7 @@ public sealed class ItemContainer
 		DroppedItemContainer droppedItemContainer = baseEntity as DroppedItemContainer;
 		if (droppedItemContainer != null)
 		{
-			droppedItemContainer.TakeFrom(this);
+			droppedItemContainer.TakeFrom(new ItemContainer[1] { this }, destroyPercent);
 		}
 		droppedItemContainer.Spawn();
 		return droppedItemContainer;
@@ -788,13 +788,24 @@ public sealed class ItemContainer
 		return num;
 	}
 
-	public int GetTotalItemAmount(ItemDefinition def, int slotStartInclusive, int slotEndInclusive)
+	public int GetTotalItemAmount(Item item, int slotStartInclusive, int slotEndInclusive)
 	{
 		int num = 0;
 		for (int i = slotStartInclusive; i <= slotEndInclusive; i++)
 		{
 			Item slot = GetSlot(i);
-			if (slot != null && slot.info == def)
+			if (slot == null)
+			{
+				continue;
+			}
+			if (item.IsBlueprint())
+			{
+				if (slot.IsBlueprint() && slot.blueprintTarget == item.blueprintTarget)
+				{
+					num += slot.amount;
+				}
+			}
+			else if (slot.info == item.info || slot.info.isRedirectOf == item.info)
 			{
 				num += slot.amount;
 			}

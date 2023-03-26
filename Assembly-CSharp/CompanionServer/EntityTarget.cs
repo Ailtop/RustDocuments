@@ -2,7 +2,7 @@ using System;
 
 namespace CompanionServer;
 
-public struct EntityTarget : IEquatable<EntityTarget>
+public readonly struct EntityTarget : IEquatable<EntityTarget>
 {
 	public uint EntityId { get; }
 

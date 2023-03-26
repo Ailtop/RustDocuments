@@ -199,9 +199,9 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 		}
 	}
 
+	[RPC_Server.MaxDistance(5f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.MaxDistance(5f)]
 	public void UpdateSign(RPCMessage msg)
 	{
 		if (msg.player == null || !CanUpdateSign(msg.player))

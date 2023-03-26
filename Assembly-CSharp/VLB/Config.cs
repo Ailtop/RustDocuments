@@ -19,9 +19,9 @@ public class Config : ScriptableObject
 	[HighlightNull]
 	private Shader beamShader1Pass;
 
-	[FormerlySerializedAs("BeamShader")]
 	[FormerlySerializedAs("beamShader")]
 	[SerializeField]
+	[FormerlySerializedAs("BeamShader")]
 	[HighlightNull]
 	private Shader beamShader2Pass;
 

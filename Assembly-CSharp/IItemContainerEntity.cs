@@ -8,6 +8,8 @@ public interface IItemContainerEntity : IIdealSlotEntity
 
 	bool DropsLoot { get; }
 
+	float DestroyLootPercent { get; }
+
 	bool DropFloats { get; }
 
 	void DropItems(BaseEntity initiator = null);

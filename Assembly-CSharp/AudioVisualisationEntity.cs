@@ -99,7 +99,8 @@ public class AudioVisualisationEntity : IOEntity
 		base.OnFlagsChanged(old, next);
 		if (base.isServer && old.HasFlag(Flags.Reserved8) != next.HasFlag(Flags.Reserved8) && next.HasFlag(Flags.Reserved8))
 		{
-			IOEntity audioSource = GetAudioSource(this, BoomBox.BacktrackLength);
+			int depth = BoomBox.BacktrackLength * 4;
+			IOEntity audioSource = GetAudioSource(this, ref depth);
 			if (audioSource != null)
 			{
 				ClientRPC(null, "Client_PlayAudioFrom", audioSource.net.ID);
@@ -108,7 +109,7 @@ public class AudioVisualisationEntity : IOEntity
 		}
 	}
 
-	private IOEntity GetAudioSource(IOEntity entity, int depth)
+	private IOEntity GetAudioSource(IOEntity entity, ref int depth)
 	{
 		if (depth <= 0)
 		{
@@ -132,7 +133,8 @@ public class AudioVisualisationEntity : IOEntity
 			}
 			if (iOEntity != null)
 			{
-				iOEntity = GetAudioSource(iOEntity, depth - 1);
+				depth--;
+				iOEntity = GetAudioSource(iOEntity, ref depth);
 				if (iOEntity != null && iOEntity.TryGetComponent<IAudioConnectionSource>(out var _))
 				{
 					return iOEntity;
@@ -160,9 +162,9 @@ public class AudioVisualisationEntity : IOEntity
 		info.msg.audioEntity.gradient = currentGradient;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerUpdateSettings(RPCMessage msg)
 	{
 		int num = msg.read.Int32();

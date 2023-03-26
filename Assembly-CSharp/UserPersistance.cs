@@ -29,7 +29,7 @@ public class UserPersistance : IDisposable
 		string text = strFolder + "/player.blueprints.";
 		if (activeGameMode != null && activeGameMode.wipeBpsOnProtocol)
 		{
-			text = text + 233 + ".";
+			text = text + 234 + ".";
 		}
 		blueprints.Open(text + 5 + ".db");
 		if (!blueprints.TableExists("data"))
@@ -61,7 +61,7 @@ public class UserPersistance : IDisposable
 			tokens.Execute("ALTER TABLE data ADD COLUMN locked BOOLEAN DEFAULT 0");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 233 + ".db");
+		playerState.Open(strFolder + "/player.states." + 234 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");
@@ -240,12 +240,38 @@ public class UserPersistance : IDisposable
 				locked = flag;
 				return num;
 			}
-			int num2 = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+			int num2 = GenerateAppToken();
 			tokens.Execute("INSERT INTO data ( userid, token ) VALUES ( ?, ? )", playerID, num2);
 			tokenCache.Add(playerID, (num2, false));
 			locked = false;
 			return num2;
 		}
+	}
+
+	public void RegenerateAppToken(ulong playerID)
+	{
+		if (tokens == null)
+		{
+			return;
+		}
+		using (TimeWarning.New("RegenerateAppToken"))
+		{
+			tokenCache.Remove(playerID);
+			bool arg = tokens.QueryInt("SELECT locked FROM data WHERE userid = ?", playerID) != 0;
+			int num = GenerateAppToken();
+			tokens.Execute("INSERT OR REPLACE INTO data ( userid, token, locked ) VALUES ( ?, ?, ? )", playerID, num, arg);
+			tokenCache.Add(playerID, (num, false));
+		}
+	}
+
+	private static int GenerateAppToken()
+	{
+		int num = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+		if (num == 0)
+		{
+			num++;
+		}
+		return num;
 	}
 
 	public bool SetAppTokenLocked(ulong playerID, bool locked)

@@ -35,6 +35,14 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 
 	public GameObject[] ClosedColliderRoots;
 
+	[SerializeField]
+	[ReadOnly]
+	private float openAnimLength = 4f;
+
+	[SerializeField]
+	[ReadOnly]
+	private float closeAnimLength = 4f;
+
 	private float decayResetTimeLast = float.NegativeInfinity;
 
 	public NavMeshModifierVolume NavMeshVolumeAnimals;
@@ -435,7 +443,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 		if (!suppressBlockageChecks && (!open || checkPhysBoxesOnOpen))
 		{
-			StartCheckingForBlockages();
+			StartCheckingForBlockages(open);
 		}
 	}
 
@@ -517,17 +525,18 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 		if (checkPhysBoxesOnOpen)
 		{
-			StartCheckingForBlockages();
+			StartCheckingForBlockages(isOpening: true);
 		}
 		Interface.CallHook("OnDoorOpened", this, rpc.player);
 	}
 
-	private void StartCheckingForBlockages()
+	private void StartCheckingForBlockages(bool isOpening)
 	{
 		if (HasVehiclePushBoxes)
 		{
-			Invoke(EnableVehiclePhysBoxes, 0.25f);
-			Invoke(DisableVehiclePhysBox, 4f);
+			Invoke(EnableVehiclePhysBoxes, 0.2f);
+			float time = (isOpening ? openAnimLength : closeAnimLength);
+			Invoke(DisableVehiclePhysBox, time);
 		}
 	}
 
@@ -565,7 +574,7 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 			{
 				SetNavMeshLinkEnabled(wantsOn: false);
 			}
-			StartCheckingForBlockages();
+			StartCheckingForBlockages(isOpening: false);
 			Interface.CallHook("OnDoorClosed", this, rpc.player);
 		}
 	}

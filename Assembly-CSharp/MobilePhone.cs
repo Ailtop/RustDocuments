@@ -679,9 +679,9 @@ public class MobilePhone : HeldEntity
 		Controller.ServerSendVoicemail(msg);
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.FromOwner]
-	[RPC_Server]
 	public void ServerPlayVoicemail(RPCMessage msg)
 	{
 		Controller.ServerPlayVoicemail(msg);

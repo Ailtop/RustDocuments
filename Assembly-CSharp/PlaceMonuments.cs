@@ -148,7 +148,7 @@ public class PlaceMonuments : ProceduralComponent
 						Vector3 vector = pos;
 						prefab.ApplyDecorComponents(ref pos, ref rot, ref scale);
 						DistanceInfo distanceInfo = GetDistanceInfo(a, prefab, pos, rot, scale, vector);
-						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < (float)dungeonEntrance.CellSize))
+						if (distanceInfo.minDistanceSameType < (float)MinDistanceSameType || distanceInfo.minDistanceDifferentType < (float)MinDistanceDifferentType || ((bool)dungeonEntrance && distanceInfo.minDistanceDungeonEntrance < dungeonEntrance.MinDistance))
 						{
 							continue;
 						}

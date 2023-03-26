@@ -10,7 +10,11 @@ public class IndustrialFilterItemIcon : MonoBehaviour
 
 	public RustInput MaxInput;
 
+	public RustInput BufferInput;
+
 	public RustInput MinInput;
 
 	public GameObject BlueprintIcon;
+
+	public GameObject InverseModeBlocker;
 }

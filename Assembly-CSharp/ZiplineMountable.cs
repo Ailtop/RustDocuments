@@ -45,6 +45,8 @@ public class ZiplineMountable : BaseMountable
 
 	public List<Collider> ignoreColliders = new List<Collider>();
 
+	private Vector3 lastSafePosition;
+
 	public Vector3 startPosition = Vector3.zero;
 
 	public Vector3 endPosition = Vector3.zero;
@@ -127,6 +129,7 @@ public class ZiplineMountable : BaseMountable
 		GamePhysics.OverlapSphere(base.transform.position, 6f, ignoreColliders, 1218511105);
 		startPosition = base.transform.position;
 		startRotation = base.transform.rotation;
+		lastSafePosition = startPosition;
 		endPosition = lineStartPos;
 		endRotation = lineStartRot;
 		elapsedMoveTime = 0f;
@@ -147,7 +150,7 @@ public class ZiplineMountable : BaseMountable
 		List<RaycastHit> obj = Facepunch.Pool.GetList<RaycastHit>();
 		Vector3 position = vector.WithY(vector.y - ZipCollider.height * 0.6f);
 		Vector3 position2 = vector;
-		GamePhysics.CapsuleSweep(position, position2, ZipCollider.radius * 0.5f, base.transform.forward, num, obj, 1218511105);
+		GamePhysics.CapsuleSweep(position, position2, ZipCollider.radius, base.transform.forward, num, obj, 1218511105);
 		foreach (RaycastHit item in obj)
 		{
 			if (!(item.collider == ZipCollider) && !ignoreColliders.Contains(item.collider) && !(item.collider.GetComponentInParent<PowerlineNode>() != null))
@@ -156,6 +159,10 @@ public class ZiplineMountable : BaseMountable
 				if (componentInParent != null)
 				{
 					componentInParent.EndZipline();
+				}
+				if (!GetDismountPosition(_mounted, out var _))
+				{
+					base.transform.position = lastSafePosition;
 				}
 				EndZipline();
 				Facepunch.Pool.FreeList(ref obj);
@@ -167,13 +174,15 @@ public class ZiplineMountable : BaseMountable
 		{
 			base.transform.position = GetLineEndPoint(applyDismountOffset: true);
 			hasEnded = true;
+			return;
 		}
-		else
+		if (Vector3.Distance(lastSafePosition, base.transform.position) > 0.75f)
 		{
-			Vector3 normalized = (vector - base.transform.position.WithY(vector.y)).normalized;
-			base.transform.position = Vector3.Lerp(base.transform.position, vector, UnityEngine.Time.deltaTime * 12f);
-			base.transform.forward = normalized;
+			lastSafePosition = base.transform.position;
 		}
+		Vector3 normalized = (vector - base.transform.position.WithY(vector.y)).normalized;
+		base.transform.position = Vector3.Lerp(base.transform.position, vector, UnityEngine.Time.deltaTime * 12f);
+		base.transform.forward = normalized;
 	}
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)

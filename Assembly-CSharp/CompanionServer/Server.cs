@@ -105,9 +105,14 @@ public static class Server
 		Listener?.EntitySubscribers?.Send(target, broadcast);
 	}
 
-	public static void ClearSubscribers(EntityTarget target)
+	public static void Broadcast(CameraTarget target, AppBroadcast broadcast)
 	{
-		Listener?.EntitySubscribers?.Clear(target);
+		Listener?.CameraSubscribers?.Send(target, broadcast);
+	}
+
+	public static bool HasAnySubscribers(CameraTarget target)
+	{
+		return Listener?.CameraSubscribers?.HasAnySubscribers(target) ?? false;
 	}
 
 	public static bool CanSendPairingNotification(ulong playerId)

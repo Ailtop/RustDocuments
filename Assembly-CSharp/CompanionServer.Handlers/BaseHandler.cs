@@ -7,7 +7,7 @@ public abstract class BaseHandler<T> : IHandler, Pool.IPooled where T : class
 {
 	private TokenBucketList<ulong> _playerBuckets;
 
-	protected virtual int TokenCost => 1;
+	protected virtual double TokenCost => 1.0;
 
 	public IConnection Client { get; private set; }
 

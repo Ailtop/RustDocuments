@@ -1,4 +1,5 @@
 using PokerEvaluator;
+using UnityEngine;
 
 namespace Facepunch.CardGames;
 
@@ -63,11 +64,19 @@ public class PlayingCard
 
 	public int GetPokerEvaluationValue()
 	{
+		if (IsUnknownCard)
+		{
+			Debug.LogWarning(GetType().Name + ": Called GetPokerEvaluationValue on unknown card.");
+		}
 		return Arrays.primes[(int)Rank] | ((int)Rank << 8) | GetPokerSuitCode() | (1 << (int)(16 + Rank));
 	}
 
 	private int GetPokerSuitCode()
 	{
+		if (IsUnknownCard)
+		{
+			Debug.LogWarning(GetType().Name + ": Called GetPokerSuitCode on unknown card.");
+		}
 		return Suit switch
 		{
 			Suit.Spades => 4096, 

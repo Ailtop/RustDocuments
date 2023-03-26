@@ -121,7 +121,12 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 			{
 				continue;
 			}
-			IOEntity iOEntity = root.outputs[i].connectedTo.Get();
+			IOSlot iOSlot = root.outputs[i];
+			if (iOSlot.type != 0)
+			{
+				continue;
+			}
+			IOEntity iOEntity = iOSlot.connectedTo.Get();
 			if (!(iOEntity != null))
 			{
 				continue;

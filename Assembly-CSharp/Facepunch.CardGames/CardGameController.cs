@@ -684,6 +684,7 @@ public abstract class CardGameController : IDisposable
 			}
 			item.LeaveCurrentRound(clearBets: true, leftRoundEarly: false);
 		}
+		UpdateAllAvailableInputs();
 		Owner.SendNetworkUpdate();
 		Owner.Invoke(InvokeStartNewRound, TimeBetweenRounds);
 	}

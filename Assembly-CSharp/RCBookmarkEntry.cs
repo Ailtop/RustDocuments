@@ -28,7 +28,5 @@ public class RCBookmarkEntry : MonoBehaviour
 
 	public string identifier { get; private set; }
 
-	public uint netid { get; private set; }
-
 	public bool isControlling { get; private set; }
 }

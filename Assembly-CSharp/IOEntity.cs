@@ -100,9 +100,18 @@ public class IOEntity : DecayEntity
 
 		public WireTool.WireColour wireColour;
 
+		public float lineThickness;
+
 		public void Clear()
 		{
-			connectedTo.Clear();
+			if (connectedTo == null)
+			{
+				connectedTo = new IORef();
+			}
+			else
+			{
+				connectedTo.Clear();
+			}
 			connectedToSlot = 0;
 			linePoints = null;
 		}
@@ -120,6 +129,12 @@ public class IOEntity : DecayEntity
 		public IIndustrialStorage Storage;
 
 		public int SlotIndex;
+
+		public int MaxStackSize;
+
+		public int ParentStorage;
+
+		public int IndustrialSiblingCount;
 	}
 
 	[Header("IOEntity")]
@@ -174,7 +189,7 @@ public class IOEntity : DecayEntity
 
 	public bool ensureOutputsUpdated;
 
-	public const int MaxContainerSourceCount = 16;
+	public const int MaxContainerSourceCount = 32;
 
 	private List<BoxCollider> spawnedColliders = new List<BoxCollider>();
 
@@ -428,9 +443,9 @@ public class IOEntity : DecayEntity
 		return false;
 	}
 
+	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server]
 	[RPC_Server.IsVisible(6f)]
-	[RPC_Server.CallsPerSecond(10uL)]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -558,7 +573,8 @@ public class IOEntity : DecayEntity
 
 	public void ClearConnections()
 	{
-		List<IOEntity> list = new List<IOEntity>();
+		List<IOEntity> obj = Facepunch.Pool.GetList<IOEntity>();
+		List<IOEntity> obj2 = Facepunch.Pool.GetList<IOEntity>();
 		IOSlot[] array = inputs;
 		foreach (IOSlot iOSlot in array)
 		{
@@ -566,6 +582,10 @@ public class IOEntity : DecayEntity
 			if (iOSlot.connectedTo.Get() != null)
 			{
 				iOEntity = iOSlot.connectedTo.Get();
+				if (iOSlot.type == IOType.Industrial)
+				{
+					obj2.Add(iOEntity);
+				}
 				IOSlot[] array2 = iOSlot.connectedTo.Get().outputs;
 				foreach (IOSlot iOSlot2 in array2)
 				{
@@ -586,7 +606,11 @@ public class IOEntity : DecayEntity
 		{
 			if (iOSlot3.connectedTo.Get() != null)
 			{
-				list.Add(iOSlot3.connectedTo.Get());
+				obj.Add(iOSlot3.connectedTo.Get());
+				if (iOSlot3.type == IOType.Industrial)
+				{
+					obj2.Add(obj[obj.Count - 1]);
+				}
 				IOSlot[] array2 = iOSlot3.connectedTo.Get().inputs;
 				foreach (IOSlot iOSlot4 in array2)
 				{
@@ -603,7 +627,7 @@ public class IOEntity : DecayEntity
 			iOSlot3.Clear();
 		}
 		SendNetworkUpdate();
-		foreach (IOEntity item in list)
+		foreach (IOEntity item in obj)
 		{
 			if (item != null)
 			{
@@ -615,6 +639,17 @@ public class IOEntity : DecayEntity
 		{
 			UpdateFromInput(0, k);
 		}
+		foreach (IOEntity item2 in obj2)
+		{
+			if (item2 != null)
+			{
+				item2.NotifyIndustrialNetworkChanged();
+			}
+			item2.RefreshIndustrialPreventBuilding();
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj2);
+		RefreshIndustrialPreventBuilding();
 	}
 
 	public void Shutdown()
@@ -791,6 +826,41 @@ public class IOEntity : DecayEntity
 		}
 	}
 
+	public void NotifyIndustrialNetworkChanged()
+	{
+		List<IOEntity> obj = Facepunch.Pool.GetList<IOEntity>();
+		OnIndustrialNetworkChanged();
+		NotifyIndustrialNetworkChanged(obj, input: true, 128);
+		obj.Clear();
+		NotifyIndustrialNetworkChanged(obj, input: false, 128);
+		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	private void NotifyIndustrialNetworkChanged(List<IOEntity> existing, bool input, int maxDepth)
+	{
+		if (maxDepth <= 0 || existing.Contains(this))
+		{
+			return;
+		}
+		if (existing.Count != 0)
+		{
+			OnIndustrialNetworkChanged();
+		}
+		existing.Add(this);
+		IOSlot[] array = (input ? inputs : outputs);
+		foreach (IOSlot iOSlot in array)
+		{
+			if (iOSlot.type == IOType.Industrial && iOSlot.connectedTo.Get() != null)
+			{
+				iOSlot.connectedTo.Get().NotifyIndustrialNetworkChanged(existing, input, maxDepth - 1);
+			}
+		}
+	}
+
+	protected virtual void OnIndustrialNetworkChanged()
+	{
+	}
+
 	public bool ShouldUpdateOutputs()
 	{
 		if (UnityEngine.Time.realtimeSinceStartup - lastUpdateTime < responsetime)
@@ -880,6 +950,7 @@ public class IOEntity : DecayEntity
 			iOConnection.type = (int)iOSlot.type;
 			iOConnection.inUse = iOConnection.connectedID != 0;
 			iOConnection.colour = (int)iOSlot.wireColour;
+			iOConnection.lineThickness = iOSlot.lineThickness;
 			info.msg.ioEntity.inputs.Add(iOConnection);
 		}
 		array = outputs;
@@ -893,6 +964,7 @@ public class IOEntity : DecayEntity
 			iOConnection2.inUse = iOConnection2.connectedID != 0;
 			iOConnection2.colour = (int)iOSlot2.wireColour;
 			iOConnection2.worldSpaceRotation = iOSlot2.worldSpaceLineEndRotation;
+			iOConnection2.lineThickness = iOSlot2.lineThickness;
 			if (iOSlot2.linePoints != null)
 			{
 				iOConnection2.linePointList = Facepunch.Pool.GetList<ProtoBuf.IOEntity.IOConnection.LineVec>();
@@ -926,54 +998,82 @@ public class IOEntity : DecayEntity
 		return inputAmount;
 	}
 
-	public void FindContainerSource(List<ContainerInputOutput> found, int depth, bool input, Func<IIndustrialStorage, int, bool> validFilter)
+	public void FindContainerSource(List<ContainerInputOutput> found, int depth, bool input, int parentId = -1, int stackSize = 0)
 	{
-		if (depth <= 0 || found.Count >= 16)
+		if (depth <= 0 || found.Count >= 32)
 		{
 			return;
 		}
 		int num = 0;
-		IOSlot[] array = (input ? inputs : outputs);
+		int num2 = 1;
+		IOSlot[] array;
+		if (!input)
+		{
+			num2 = 0;
+			array = outputs;
+			for (int i = 0; i < array.Length; i++)
+			{
+				if (array[i].type == IOType.Industrial)
+				{
+					num2++;
+				}
+			}
+		}
+		List<int> obj = Facepunch.Pool.GetList<int>();
+		array = (input ? inputs : outputs);
 		foreach (IOSlot iOSlot in array)
 		{
 			num++;
 			if (iOSlot.type != IOType.Industrial)
 			{
-				break;
+				continue;
 			}
 			IOEntity iOEntity = iOSlot.connectedTo.Get(base.isServer);
 			if (!(iOEntity != null))
 			{
 				continue;
 			}
-			if (iOEntity is IIndustrialStorage industrialStorage && (validFilter == null || validFilter(industrialStorage, iOSlot.connectedToSlot)))
+			int num3 = -1;
+			if (iOEntity is IIndustrialStorage storage2)
 			{
 				num = iOSlot.connectedToSlot;
-				if (GetExistingCount(industrialStorage) < 2)
+				if (GetExistingCount(storage2) < 2)
 				{
 					found.Add(new ContainerInputOutput
 					{
 						SlotIndex = num,
-						Storage = industrialStorage
+						Storage = storage2,
+						ParentStorage = parentId,
+						MaxStackSize = stackSize / num2
 					});
+					num3 = found.Count - 1;
+					obj.Add(num3);
 				}
 			}
 			if ((!(iOEntity is IIndustrialStorage) || iOEntity is IndustrialStorageAdaptor) && !(iOEntity is IndustrialConveyor) && iOEntity != null)
 			{
-				iOEntity.FindContainerSource(found, depth - 1, input, validFilter);
+				iOEntity.FindContainerSource(found, depth - 1, input, (num3 == -1) ? parentId : num3, stackSize / num2);
 			}
 		}
+		int count = obj.Count;
+		foreach (int item in obj)
+		{
+			ContainerInputOutput value = found[item];
+			value.IndustrialSiblingCount = count;
+			found[item] = value;
+		}
+		Facepunch.Pool.FreeList(ref obj);
 		int GetExistingCount(IIndustrialStorage storage)
 		{
-			int num2 = 0;
-			foreach (ContainerInputOutput item in found)
+			int num4 = 0;
+			foreach (ContainerInputOutput item2 in found)
 			{
-				if (item.Storage == storage)
+				if (item2.Storage == storage)
 				{
-					num2++;
+					num4++;
 				}
 			}
-			return num2;
+			return num4;
 		}
 	}
 
@@ -1031,65 +1131,63 @@ public class IOEntity : DecayEntity
 				inputs[i].niceName = iOConnection.niceName;
 				inputs[i].type = (IOType)iOConnection.type;
 				inputs[i].wireColour = (WireTool.WireColour)iOConnection.colour;
+				inputs[i].lineThickness = iOConnection.lineThickness;
 			}
 		}
 		if (info.msg.ioEntity.outputs != null)
 		{
-			if (!info.fromDisk && base.isClient)
-			{
-				IOSlot[] array = outputs;
-				for (int j = 0; j < array.Length; j++)
-				{
-					array[j].Clear();
-				}
-			}
 			int count2 = info.msg.ioEntity.outputs.Count;
-			IOSlot[] array2 = null;
+			IOSlot[] array = null;
 			if (outputs.Length != count2 && count2 > 0)
 			{
-				array2 = outputs;
+				array = outputs;
 				outputs = new IOSlot[count2];
-				for (int k = 0; k < array2.Length; k++)
+				for (int j = 0; j < array.Length; j++)
 				{
-					if (k < count2)
+					if (j < count2)
 					{
-						outputs[k] = array2[k];
+						outputs[j] = array[j];
 					}
 				}
 			}
-			for (int l = 0; l < count2; l++)
+			for (int k = 0; k < count2; k++)
 			{
-				if (outputs[l] == null)
+				if (outputs[k] == null)
 				{
-					outputs[l] = new IOSlot();
+					outputs[k] = new IOSlot();
 				}
-				ProtoBuf.IOEntity.IOConnection iOConnection2 = info.msg.ioEntity.outputs[l];
-				outputs[l].connectedTo = new IORef();
-				outputs[l].connectedTo.entityRef.uid = iOConnection2.connectedID;
+				ProtoBuf.IOEntity.IOConnection iOConnection2 = info.msg.ioEntity.outputs[k];
+				if (iOConnection2.linePointList == null || iOConnection2.linePointList.Count == 0 || iOConnection2.connectedID == 0)
+				{
+					outputs[k].Clear();
+				}
+				outputs[k].connectedTo = new IORef();
+				outputs[k].connectedTo.entityRef.uid = iOConnection2.connectedID;
 				if (base.isClient)
 				{
-					outputs[l].connectedTo.InitClient();
+					outputs[k].connectedTo.InitClient();
 				}
-				outputs[l].connectedToSlot = iOConnection2.connectedToSlot;
-				outputs[l].niceName = iOConnection2.niceName;
-				outputs[l].type = (IOType)iOConnection2.type;
-				outputs[l].wireColour = (WireTool.WireColour)iOConnection2.colour;
-				outputs[l].worldSpaceLineEndRotation = iOConnection2.worldSpaceRotation;
+				outputs[k].connectedToSlot = iOConnection2.connectedToSlot;
+				outputs[k].niceName = iOConnection2.niceName;
+				outputs[k].type = (IOType)iOConnection2.type;
+				outputs[k].wireColour = (WireTool.WireColour)iOConnection2.colour;
+				outputs[k].worldSpaceLineEndRotation = iOConnection2.worldSpaceRotation;
+				outputs[k].lineThickness = iOConnection2.lineThickness;
 				if (info.fromDisk || base.isClient)
 				{
 					List<ProtoBuf.IOEntity.IOConnection.LineVec> linePointList = iOConnection2.linePointList;
-					if (outputs[l].linePoints == null || outputs[l].linePoints.Length != linePointList.Count)
+					if (outputs[k].linePoints == null || outputs[k].linePoints.Length != linePointList.Count)
 					{
-						outputs[l].linePoints = new Vector3[linePointList.Count];
+						outputs[k].linePoints = new Vector3[linePointList.Count];
 					}
-					if (outputs[l].slackLevels == null || outputs[l].slackLevels.Length != linePointList.Count)
+					if (outputs[k].slackLevels == null || outputs[k].slackLevels.Length != linePointList.Count)
 					{
-						outputs[l].slackLevels = new float[linePointList.Count];
+						outputs[k].slackLevels = new float[linePointList.Count];
 					}
-					for (int m = 0; m < linePointList.Count; m++)
+					for (int l = 0; l < linePointList.Count; l++)
 					{
-						outputs[l].linePoints[m] = linePointList[m].vec;
-						outputs[l].slackLevels[m] = linePointList[m].vec.w;
+						outputs[k].linePoints[l] = linePointList[l].vec;
+						outputs[k].slackLevels[l] = linePointList[l].vec.w;
 					}
 				}
 			}

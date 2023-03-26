@@ -2,7 +2,7 @@ using System;
 
 namespace CompanionServer;
 
-public struct PlayerTarget : IEquatable<PlayerTarget>
+public readonly struct PlayerTarget : IEquatable<PlayerTarget>
 {
 	public ulong SteamId { get; }
 

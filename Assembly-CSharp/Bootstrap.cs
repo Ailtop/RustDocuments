@@ -70,13 +70,15 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		ConsoleSystem.Index.Initialize(ConsoleGen.All);
 		UnityButtons.Register();
 		Output.Install();
+		Facepunch.Pool.ResizeBuffer<NetRead>(16384);
+		Facepunch.Pool.ResizeBuffer<NetWrite>(16384);
 		Facepunch.Pool.ResizeBuffer<Networkable>(65536);
 		Facepunch.Pool.ResizeBuffer<EntityLink>(65536);
 		Facepunch.Pool.FillBuffer<Networkable>();
 		Facepunch.Pool.FillBuffer<EntityLink>();
-		if (Facepunch.CommandLine.HasSwitch("-networkthread"))
+		if (Facepunch.CommandLine.HasSwitch("-nonetworkthread"))
 		{
-			BaseNetwork.Multithreading = true;
+			BaseNetwork.Multithreading = false;
 		}
 		SteamNetworking.SetDebugFunction();
 		if (Facepunch.CommandLine.HasSwitch("-swnet"))
@@ -267,7 +269,6 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		{
 			Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/performance.prefab"));
 		}
-		Facepunch.Pool.Clear();
 		Rust.GC.Collect();
 		Rust.Application.isLoading = false;
 	}

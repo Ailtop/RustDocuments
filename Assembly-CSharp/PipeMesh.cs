@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PipeMesh : MonoBehaviour
 {
-	public bool UseJobs;
-
 	public float PipeRadius = 0.04f;
 
 	public Material PipeMaterial;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Facepunch;
 using Oxide.Core;
 using Rust;
 using Rust.Ai;
@@ -86,6 +87,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 				fuseLength = (float)obj;
 			}
 			Invoke(Explode, fuseLength);
+			SetFlag(Flags.Reserved2, b: true);
 		}
 	}
 
@@ -128,7 +130,8 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 		{
 			if (onlyDamageParent)
 			{
-				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 166144, useLineOfSight: true);
+				Vector3 vector = CenterPoint();
+				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), vector, minExplosionRadius, explosionRadius, damageTypes, 166144, useLineOfSight: true);
 				BaseEntity baseEntity = GetParentEntity();
 				BaseCombatEntity baseCombatEntity = baseEntity as BaseCombatEntity;
 				while (baseCombatEntity == null && baseEntity != null && baseEntity.HasParent())
@@ -136,26 +139,70 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 					baseEntity = baseEntity.GetParentEntity();
 					baseCombatEntity = baseEntity as BaseCombatEntity;
 				}
+				if (baseEntity == null || !GameObjectEx.IsOnLayer(baseEntity.gameObject, Layer.Construction))
+				{
+					List<BuildingBlock> obj = Pool.GetList<BuildingBlock>();
+					Vis.Entities(vector, explosionRadius, obj, 2097152, QueryTriggerInteraction.Ignore);
+					BuildingBlock buildingBlock = null;
+					float num = float.PositiveInfinity;
+					foreach (BuildingBlock item in obj)
+					{
+						if (!item.isClient && !item.IsDestroyed && !(item.healthFraction <= 0f))
+						{
+							float num2 = Vector3.Distance(item.ClosestPoint(vector), vector);
+							if (num2 < num && item.IsVisible(vector, explosionRadius))
+							{
+								buildingBlock = item;
+								num = num2;
+							}
+						}
+					}
+					if ((bool)buildingBlock)
+					{
+						HitInfo hitInfo = new HitInfo();
+						hitInfo.Initiator = creatorEntity;
+						hitInfo.WeaponPrefab = LookupPrefab();
+						hitInfo.damageTypes.Add(damageTypes);
+						hitInfo.PointStart = vector;
+						hitInfo.PointEnd = buildingBlock.transform.position;
+						float amount = 1f - Mathf.Clamp01((num - minExplosionRadius) / (explosionRadius - minExplosionRadius));
+						hitInfo.damageTypes.ScaleAll(amount);
+						buildingBlock.Hurt(hitInfo);
+					}
+					Pool.FreeList(ref obj);
+				}
 				if ((bool)baseCombatEntity)
 				{
-					HitInfo hitInfo = new HitInfo();
-					hitInfo.Initiator = creatorEntity;
-					hitInfo.WeaponPrefab = LookupPrefab();
-					hitInfo.damageTypes.Add(damageTypes);
-					baseCombatEntity.Hurt(hitInfo);
+					HitInfo hitInfo2 = new HitInfo();
+					hitInfo2.Initiator = creatorEntity;
+					hitInfo2.WeaponPrefab = LookupPrefab();
+					hitInfo2.damageTypes.Add(damageTypes);
+					hitInfo2.PointStart = vector;
+					hitInfo2.PointEnd = baseCombatEntity.transform.position;
+					baseCombatEntity.Hurt(hitInfo2);
+				}
+				else if (baseEntity != null)
+				{
+					HitInfo hitInfo3 = new HitInfo();
+					hitInfo3.Initiator = creatorEntity;
+					hitInfo3.WeaponPrefab = LookupPrefab();
+					hitInfo3.damageTypes.Add(damageTypes);
+					hitInfo3.PointStart = vector;
+					hitInfo3.PointEnd = baseEntity.transform.position;
+					baseEntity.OnAttacked(hitInfo3);
 				}
 				if (creatorEntity != null && damageTypes != null)
 				{
-					float num = 0f;
+					float num3 = 0f;
 					foreach (DamageTypeEntry damageType in damageTypes)
 					{
-						num += damageType.amount;
+						num3 += damageType.amount;
 					}
 					Sensation sensation = default(Sensation);
 					sensation.Type = SensationType.Explosion;
 					sensation.Position = creatorEntity.transform.position;
 					sensation.Radius = explosionRadius * 17f;
-					sensation.DamagePotential = num;
+					sensation.DamagePotential = num3;
 					sensation.InitiatorPlayer = creatorEntity as BasePlayer;
 					sensation.Initiator = creatorEntity;
 					Sense.Stimulate(sensation);
@@ -166,16 +213,16 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 				DamageUtil.RadiusDamage(creatorEntity, LookupPrefab(), CenterPoint(), minExplosionRadius, explosionRadius, damageTypes, 1076005121, useLineOfSight: true);
 				if (creatorEntity != null && damageTypes != null)
 				{
-					float num2 = 0f;
+					float num4 = 0f;
 					foreach (DamageTypeEntry damageType2 in damageTypes)
 					{
-						num2 += damageType2.amount;
+						num4 += damageType2.amount;
 					}
 					Sensation sensation = default(Sensation);
 					sensation.Type = SensationType.Explosion;
 					sensation.Position = creatorEntity.transform.position;
 					sensation.Radius = explosionRadius * 17f;
-					sensation.DamagePotential = num2;
+					sensation.DamagePotential = num4;
 					sensation.InitiatorPlayer = creatorEntity as BasePlayer;
 					sensation.Initiator = creatorEntity;
 					Sense.Stimulate(sensation);
@@ -224,7 +271,15 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 
 	public virtual bool CanStickTo(BaseEntity entity)
 	{
-		return entity.GetComponent<DecorDeployable>() == null;
+		if (entity.TryGetComponent<DecorDeployable>(out var _))
+		{
+			return false;
+		}
+		if (entity is Drone)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	private void DoBounceEffect()
@@ -338,6 +393,29 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 	internal override void OnParentRemoved()
 	{
 		UnStick();
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+	}
+
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		if (parentEntity.IsValid(serverside: true))
+		{
+			DoStick(base.transform.position, base.transform.forward, parentEntity.Get(serverside: true), null);
+		}
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.explosive != null)
+		{
+			parentEntity.uid = info.msg.explosive.parentid;
+		}
 	}
 
 	public virtual void SetCollisionEnabled(bool wantsCollision)

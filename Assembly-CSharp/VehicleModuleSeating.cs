@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Network;
+using Oxide.Core;
 using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -295,6 +296,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 			}
 			if (flag)
 			{
+				Interface.CallHook("OnVehicleHornPressed", this, player);
 				hornPlayer = player;
 			}
 		}

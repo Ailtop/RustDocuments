@@ -145,4 +145,17 @@ public class vehicle : ConsoleSystem
 			array[i].Kill();
 		}
 	}
+
+	[ServerVar]
+	public static void killdrones(Arg args)
+	{
+		Drone[] array = BaseEntity.Util.FindAll<Drone>();
+		foreach (Drone drone in array)
+		{
+			if (!(drone is DeliveryDrone))
+			{
+				drone.Kill();
+			}
+		}
+	}
 }

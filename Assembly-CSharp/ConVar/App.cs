@@ -53,6 +53,17 @@ public class App : ConsoleSystem
 		}
 	}
 
+	[ServerUserVar]
+	public static void regeneratetoken(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (!(basePlayer == null))
+		{
+			SingletonComponent<ServerMgr>.Instance.persistance.RegenerateAppToken(basePlayer.userID);
+			arg.ReplyWith("Regenerated Rust+ token");
+		}
+	}
+
 	[ServerVar]
 	public static void info(Arg arg)
 	{

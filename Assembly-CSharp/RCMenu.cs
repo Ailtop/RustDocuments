@@ -23,6 +23,8 @@ public class RCMenu : ComputerMenu
 
 	public float interferenceFadeDuration = 0.2f;
 
+	public float rangeInterferenceScale = 10000f;
+
 	public Text timeText;
 
 	public Text watchedDurationText;
@@ -34,4 +36,16 @@ public class RCMenu : ComputerMenu
 	public SoundDefinition bookmarkPressedSoundDef;
 
 	public GameObject[] hideIfStatic;
+
+	public GameObject readOnlyIndicator;
+
+	public GameObject crosshair;
+
+	public float fogOverrideDensity = 0.1f;
+
+	public float autoTurretFogDistance = 30f;
+
+	public float autoTurretDotBaseScale = 2f;
+
+	public float autoTurretDotGrowScale = 4f;
 }

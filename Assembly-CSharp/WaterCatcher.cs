@@ -108,7 +108,7 @@ public class WaterCatcher : LiquidContainer
 				}
 			}
 		}
-		if (connected is LiquidContainer liquidContainer && liquidContainer.inventory.GetAmount(itemToCreate.itemid, onlyUsableAmounts: false) + amount > liquidContainer.maxStackSize)
+		if (connected is LiquidContainer liquidContainer && liquidContainer.inventory.GetAmount(itemToCreate.itemid, onlyUsableAmounts: false) + amount < liquidContainer.maxStackSize)
 		{
 			return connected;
 		}

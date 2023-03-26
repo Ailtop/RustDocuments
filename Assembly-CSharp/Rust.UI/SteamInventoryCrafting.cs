@@ -8,6 +8,8 @@ public class SteamInventoryCrafting : MonoBehaviour
 {
 	public GameObject Container;
 
+	public ToggleGroup ToggleGroup;
+
 	public Button ConvertToItem;
 
 	public TextMeshProUGUI WoodAmount;
@@ -15,8 +17,6 @@ public class SteamInventoryCrafting : MonoBehaviour
 	public TextMeshProUGUI ClothAmount;
 
 	public TextMeshProUGUI MetalAmount;
-
-	public int SelectedCount;
 
 	public TextMeshProUGUI InfoText;
 

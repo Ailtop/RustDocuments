@@ -60,7 +60,7 @@ public class WireTool : HeldEntity
 
 	public float RadialMenuHoldTime = 0.25f;
 
-	private const float IndustrialWallOffset = 0.02f;
+	private const float IndustrialWallOffset = 0.03f;
 
 	public static Translate.Phrase Default = new Translate.Phrase("wiretoolcolour.default", "Default");
 
@@ -450,9 +450,9 @@ public class WireTool : HeldEntity
 		return false;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -489,27 +489,33 @@ public class WireTool : HeldEntity
 		}
 		BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
 		IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
-		if (!(iOEntity2 == null) && !(Vector3.Distance(baseNetworkable2.transform.position, baseNetworkable.transform.position) > maxWireLength) && num < iOEntity.inputs.Length && num2 < iOEntity2.outputs.Length && !(iOEntity.inputs[num].connectedTo.Get() != null) && !(iOEntity2.outputs[num2].connectedTo.Get() != null) && (!iOEntity.inputs[num].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity) && CanModifyEntity(player, iOEntity2))
+		if (iOEntity2 == null || Vector3.Distance(baseNetworkable2.transform.position, baseNetworkable.transform.position) > maxWireLength || num >= iOEntity.inputs.Length || num2 >= iOEntity2.outputs.Length || iOEntity.inputs[num].connectedTo.Get() != null || iOEntity2.outputs[num2].connectedTo.Get() != null || (iOEntity.inputs[num].rootConnectionsOnly && !iOEntity2.IsRootEntity()) || !CanModifyEntity(player, iOEntity) || !CanModifyEntity(player, iOEntity2))
 		{
-			if (Interface.CallHook("OnWireConnect", msg.player, baseNetworkable, num, baseNetworkable2, num2) != null)
-			{
-				((IOEntity)baseNetworkable2).outputs[num2].linePoints = null;
-				return;
-			}
-			iOEntity.inputs[num].connectedTo.Set(iOEntity2);
-			iOEntity.inputs[num].connectedToSlot = num2;
-			iOEntity.inputs[num].wireColour = wireColour;
-			iOEntity.inputs[num].connectedTo.Init();
-			iOEntity2.outputs[num2].connectedTo.Set(iOEntity);
-			iOEntity2.outputs[num2].connectedToSlot = num;
-			iOEntity2.outputs[num2].wireColour = wireColour;
-			iOEntity2.outputs[num2].connectedTo.Init();
-			iOEntity2.outputs[num2].worldSpaceLineEndRotation = iOEntity.transform.TransformDirection(iOEntity.inputs[num].handleDirection);
-			iOEntity2.MarkDirtyForceUpdateOutputs();
-			iOEntity2.SendNetworkUpdate();
-			iOEntity.SendNetworkUpdate();
-			iOEntity2.SendChangedToRoot(forceUpdate: true);
-			iOEntity2.RefreshIndustrialPreventBuilding();
+			return;
+		}
+		if (Interface.CallHook("OnWireConnect", msg.player, baseNetworkable, num, baseNetworkable2, num2) != null)
+		{
+			((IOEntity)baseNetworkable2).outputs[num2].linePoints = null;
+			return;
+		}
+		iOEntity.inputs[num].connectedTo.Set(iOEntity2);
+		iOEntity.inputs[num].connectedToSlot = num2;
+		iOEntity.inputs[num].wireColour = wireColour;
+		iOEntity.inputs[num].connectedTo.Init();
+		iOEntity2.outputs[num2].connectedTo.Set(iOEntity);
+		iOEntity2.outputs[num2].connectedToSlot = num;
+		iOEntity2.outputs[num2].wireColour = wireColour;
+		iOEntity2.outputs[num2].connectedTo.Init();
+		iOEntity2.outputs[num2].worldSpaceLineEndRotation = iOEntity.transform.TransformDirection(iOEntity.inputs[num].handleDirection);
+		iOEntity2.MarkDirtyForceUpdateOutputs();
+		iOEntity2.SendNetworkUpdate();
+		iOEntity.SendNetworkUpdate();
+		iOEntity2.SendChangedToRoot(forceUpdate: true);
+		iOEntity2.RefreshIndustrialPreventBuilding();
+		if (wireType == IOEntity.IOType.Industrial)
+		{
+			iOEntity.NotifyIndustrialNetworkChanged();
+			iOEntity2.NotifyIndustrialNetworkChanged();
 		}
 	}
 
@@ -584,11 +590,19 @@ public class WireTool : HeldEntity
 			}
 		}
 		iOEntity2.SendNetworkUpdate();
+		if (iOEntity != null && iOEntity.ioType == IOEntity.IOType.Industrial)
+		{
+			iOEntity.NotifyIndustrialNetworkChanged();
+		}
+		if (iOEntity2 != null && iOEntity2.ioType == IOEntity.IOType.Industrial)
+		{
+			iOEntity2.NotifyIndustrialNetworkChanged();
+		}
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server.FromOwner]
 	public void RequestChangeColor(RPCMessage msg)
 	{
 		if (!CanPlayerUseWires(msg.player))

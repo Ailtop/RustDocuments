@@ -51,6 +51,25 @@ public class CardPlayerData : IDisposable
 
 	public bool HasAvailableInputs => availableInputs > 0;
 
+	public bool AllCardsAreKnown
+	{
+		get
+		{
+			if (Cards.Count == 0)
+			{
+				return false;
+			}
+			foreach (PlayingCard card in Cards)
+			{
+				if (card.IsUnknownCard)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+	}
+
 	private bool IsClient => !isServer;
 
 	public bool LeftRoundEarly { get; set; }

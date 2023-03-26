@@ -24,27 +24,31 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 
 	public const Flags Crafting = Flags.Reserved1;
 
+	public const Flags FullOutput = Flags.Reserved2;
+
 	public Renderer[] MeshRenderers;
 
 	public ParticleSystemContainer JobCompleteFx;
 
 	public SoundDefinition JobCompleteSoundDef;
 
+	public const int BlueprintSlotStart = 0;
+
+	public const int BlueprintSlotEnd = 3;
+
 	private ItemDefinition currentlyCrafting;
 
 	private int currentlyCraftingAmount;
 
-	private const int StorageSize = 11;
+	private const int StorageSize = 12;
 
-	private const int BlueprintSlot = 0;
+	private const int InputSlotStart = 4;
 
-	private const int InputSlotStart = 1;
+	private const int InputSlotEnd = 7;
 
-	private const int InputSlotEnd = 4;
+	private const int OutputSlotStart = 8;
 
-	private const int OutputSlotStart = 5;
-
-	private const int OutputSlotEnd = 8;
+	private const int OutputSlotEnd = 11;
 
 	public TimeUntilWithDuration jobFinishes { get; private set; }
 
@@ -53,6 +57,8 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 	public Transform Transform => base.transform;
 
 	public bool DropsLoot => true;
+
+	public float DestroyLootPercent => 0f;
 
 	public bool DropFloats { get; }
 
@@ -242,7 +248,7 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		inventory = new ItemContainer();
 		inventory.entityOwner = this;
 		inventory.canAcceptItem = CanAcceptItem;
-		inventory.ServerInitialize(null, 11);
+		inventory.ServerInitialize(null, 12);
 		if (giveUID)
 		{
 			inventory.GiveUID();
@@ -251,7 +257,7 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 
 	private bool CanAcceptItem(Item item, int index)
 	{
-		if (index == 0 && !item.IsBlueprint())
+		if (index >= 0 && index <= 3 && !item.IsBlueprint())
 		{
 			return false;
 		}
@@ -263,13 +269,17 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		global::IndustrialEntity.Queue.Add(this);
 	}
 
-	private Item GetTargetBlueprint()
+	private Item GetTargetBlueprint(int index)
 	{
 		if (inventory == null)
 		{
 			return null;
 		}
-		Item slot = inventory.GetSlot(0);
+		if (index < 0 || index > 3)
+		{
+			return null;
+		}
+		Item slot = inventory.GetSlot(index);
 		if (slot == null || !slot.IsBlueprint())
 		{
 			return null;
@@ -284,56 +294,66 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		{
 			return;
 		}
-		Item targetBlueprint = GetTargetBlueprint();
-		if (targetBlueprint == null || GetWorkbench() == null || GetWorkbench().Workbenchlevel < targetBlueprint.blueprintTargetDef.Blueprint.workbenchLevelRequired)
+		for (int i = 0; i <= 3; i++)
 		{
-			return;
-		}
-		ItemBlueprint blueprint = targetBlueprint.blueprintTargetDef.Blueprint;
-		bool flag = true;
-		foreach (ItemAmount ingredient in blueprint.ingredients)
-		{
-			if ((float)GetInputAmount(ingredient.itemDef) < ingredient.amount)
+			Item targetBlueprint = GetTargetBlueprint(i);
+			if (targetBlueprint == null || GetWorkbench() == null || GetWorkbench().Workbenchlevel < targetBlueprint.blueprintTargetDef.Blueprint.workbenchLevelRequired)
 			{
-				flag = false;
+				continue;
+			}
+			ItemBlueprint blueprint = targetBlueprint.blueprintTargetDef.Blueprint;
+			if (Interface.CallHook("OnItemCraft", this, blueprint) != null)
+			{
 				break;
 			}
-		}
-		if (!flag)
-		{
-			return;
-		}
-		flag = false;
-		for (int i = 5; i <= 8; i++)
-		{
-			Item slot = inventory.GetSlot(i);
-			if (slot == null || (slot.info == targetBlueprint.blueprintTargetDef && slot.amount + blueprint.amountToCreate <= slot.MaxStackable()))
+			bool flag = true;
+			foreach (ItemAmount ingredient in blueprint.ingredients)
 			{
-				flag = true;
-				break;
+				if ((float)GetInputAmount(ingredient.itemDef) < ingredient.amount)
+				{
+					flag = false;
+					break;
+				}
 			}
+			if (!flag)
+			{
+				continue;
+			}
+			flag = false;
+			for (int j = 8; j <= 11; j++)
+			{
+				Item slot = inventory.GetSlot(j);
+				if (slot == null || (slot.info == targetBlueprint.blueprintTargetDef && slot.amount + blueprint.amountToCreate <= slot.MaxStackable()))
+				{
+					flag = true;
+					break;
+				}
+			}
+			if (!flag)
+			{
+				SetFlag(Flags.Reserved2, b: true);
+				continue;
+			}
+			SetFlag(Flags.Reserved2, b: false);
+			foreach (ItemAmount ingredient2 in blueprint.ingredients)
+			{
+				ConsumeInputIngredient(ingredient2);
+			}
+			currentlyCrafting = targetBlueprint.blueprintTargetDef;
+			currentlyCraftingAmount = blueprint.amountToCreate;
+			float time = blueprint.time;
+			Invoke(CompleteCraft, time);
+			jobFinishes = time;
+			SetFlag(Flags.Reserved1, b: true);
+			ClientRPC((Connection)null, "ClientUpdateCraftTimeRemaining", (float)jobFinishes, jobFinishes.Duration);
+			break;
 		}
-		if (!flag)
-		{
-			return;
-		}
-		foreach (ItemAmount ingredient2 in blueprint.ingredients)
-		{
-			ConsumeInputIngredient(ingredient2);
-		}
-		currentlyCrafting = targetBlueprint.blueprintTargetDef;
-		currentlyCraftingAmount = blueprint.amountToCreate;
-		float time = blueprint.time;
-		Invoke(CompleteCraft, time);
-		jobFinishes = time;
-		SetFlag(Flags.Reserved1, b: true);
-		ClientRPC((Connection)null, "ClientUpdateCraftTimeRemaining", (float)jobFinishes, jobFinishes.Duration);
 	}
 
 	private void CompleteCraft()
 	{
 		bool flag = false;
-		for (int i = 5; i <= 8; i++)
+		for (int i = 8; i <= 11; i++)
 		{
 			Item slot = inventory.GetSlot(i);
 			if (slot == null)
@@ -368,7 +388,7 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 			return 0;
 		}
 		int num = 0;
-		for (int i = 1; i <= 4; i++)
+		for (int i = 4; i <= 7; i++)
 		{
 			Item slot = inventory.GetSlot(i);
 			if (slot != null && def == slot.info)
@@ -386,7 +406,7 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 			return false;
 		}
 		float num = am.amount;
-		for (int i = 1; i <= 4; i++)
+		for (int i = 4; i <= 7; i++)
 		{
 			Item slot = inventory.GetSlot(i);
 			if (slot != null && am.itemDef == slot.info)
@@ -428,7 +448,7 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		if (info.msg.storageBox != null && inventory != null)
 		{
 			inventory.Load(info.msg.storageBox.contents);
-			inventory.capacity = 11;
+			inventory.capacity = 12;
 		}
 		if (base.isServer && info.fromDisk && info.msg.industrialCrafter != null)
 		{
@@ -442,18 +462,18 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 	{
 		if (slotIndex == 3)
 		{
-			return new Vector2i(0, 0);
+			return new Vector2i(0, 3);
 		}
-		return new Vector2i(1, 4);
+		return new Vector2i(4, 7);
 	}
 
 	public Vector2i OutputSlotRange(int slotIndex)
 	{
 		if (slotIndex == 1)
 		{
-			return Vector2i.zero;
+			return new Vector2i(0, 3);
 		}
-		return new Vector2i(5, 8);
+		return new Vector2i(8, 11);
 	}
 
 	public void OnStorageItemTransferBegin()
@@ -507,8 +527,12 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 	{
 		if (wantsOn != IsOn())
 		{
-			SetFlag(Flags.On, wantsOn);
-			SetFlag(Flags.Busy, b: true);
+			SetFlag(Flags.On, wantsOn, recursive: false, networkupdate: false);
+			SetFlag(Flags.Busy, b: true, recursive: false, networkupdate: false);
+			if (!wantsOn)
+			{
+				SetFlag(Flags.Reserved2, b: false, recursive: false, networkupdate: false);
+			}
 			Invoke(Unbusy, 0.5f);
 			SendNetworkUpdateImmediate();
 			MarkDirty();
@@ -520,9 +544,9 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		SetFlag(Flags.Busy, b: false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(2uL)]
+	[RPC_Server]
 	private void SvSwitch(RPCMessage msg)
 	{
 		SetSwitch(!IsOn());

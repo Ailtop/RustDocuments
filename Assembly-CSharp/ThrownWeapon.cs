@@ -128,7 +128,7 @@ public class ThrownWeapon : AttackEntity
 		{
 			return;
 		}
-		baseEntity.creatorEntity = ownerPlayer;
+		baseEntity.SetCreatorEntity(ownerPlayer);
 		Vector3 vector2 = vector + Quaternion.AngleAxis(10f, Vector3.right) * Vector3.up;
 		float num2 = GetThrowVelocity(position, targetPosition, vector2);
 		if (float.IsNaN(num2))
@@ -219,7 +219,12 @@ public class ThrownWeapon : AttackEntity
 		{
 			return;
 		}
-		baseEntity.creatorEntity = msg.player;
+		Item ownerItem = GetOwnerItem();
+		if (ownerItem != null && ownerItem.instanceData != null && ownerItem.HasFlag(Item.Flag.IsOn))
+		{
+			baseEntity.gameObject.SendMessage("SetFrequency", GetOwnerItem().instanceData.dataInt, SendMessageOptions.DontRequireReceiver);
+		}
+		baseEntity.SetCreatorEntity(msg.player);
 		baseEntity.skinID = skinID;
 		baseEntity.SetVelocity(GetInheritedVelocity(msg.player, normalized) + normalized * maxThrowVelocity * num + msg.player.estimatedVelocity * 0.5f);
 		if (tumbleVelocity > 0f)

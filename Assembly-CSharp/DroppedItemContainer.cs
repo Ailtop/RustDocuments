@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -160,7 +161,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 		}
 	}
 
-	public void TakeFrom(params ItemContainer[] source)
+	public void TakeFrom(ItemContainer[] source, float destroyPercent = 0f)
 	{
 		Assert.IsTrue(inventory == null, "Initializing Twice");
 		using (TimeWarning.New("DroppedItemContainer.TakeFrom"))
@@ -176,18 +177,43 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 			inventory.GiveUID();
 			inventory.entityOwner = this;
 			inventory.SetFlag(ItemContainer.Flag.NoItemInput, b: true);
+			List<Item> obj = Facepunch.Pool.GetList<Item>();
 			array = source;
 			for (int i = 0; i < array.Length; i++)
 			{
 				Item[] array2 = array[i].itemList.ToArray();
 				foreach (Item item in array2)
 				{
+					if (destroyPercent > 0f)
+					{
+						if (item.amount == 1)
+						{
+							obj.Add(item);
+							continue;
+						}
+						item.amount = Mathf.CeilToInt((float)item.amount * (1f - destroyPercent));
+					}
 					if (!item.MoveToContainer(inventory))
 					{
 						item.DropAndTossUpwards(base.transform.position);
 					}
 				}
 			}
+			if (obj.Count > 0)
+			{
+				int num2 = Mathf.FloorToInt((float)obj.Count * destroyPercent);
+				int num3 = Mathf.Max(0, obj.Count - num2);
+				obj.Shuffle((uint)UnityEngine.Random.Range(0, int.MaxValue));
+				for (int k = 0; k < num3; k++)
+				{
+					Item item2 = obj[k];
+					if (!item2.MoveToContainer(inventory))
+					{
+						item2.DropAndTossUpwards(base.transform.position);
+					}
+				}
+			}
+			Facepunch.Pool.FreeList(ref obj);
 			ResetRemovalTime();
 		}
 	}

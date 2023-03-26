@@ -51,9 +51,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[Tooltip("Affects how many F-stops (EV) to add to the dynamic range of the curve.")]
 	[DisplayName("Shoulder Length")]
 	[Min(0f)]
+	[Tooltip("Affects how many F-stops (EV) to add to the dynamic range of the curve.")]
 	public FloatParameter toneCurveShoulderLength = new FloatParameter
 	{
 		value = 0.5f
@@ -67,9 +67,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Gamma")]
 	[Min(0.001f)]
 	[Tooltip("Applies a gamma function to the curve.")]
+	[DisplayName("Gamma")]
 	public FloatParameter toneCurveGamma = new FloatParameter
 	{
 		value = 1f
@@ -115,9 +115,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = Color.white
 	};
 
+	[DisplayName("Hue Shift")]
 	[Range(-180f, 180f)]
 	[Tooltip("Shift the hue of all colors.")]
-	[DisplayName("Hue Shift")]
 	public FloatParameter hueShift = new FloatParameter
 	{
 		value = 0f
@@ -170,9 +170,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[DisplayName("Blue")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the blue channel in the overall mix.")]
-	[DisplayName("Blue")]
 	public FloatParameter mixerRedOutBlueIn = new FloatParameter
 	{
 		value = 0f
@@ -186,17 +186,17 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[DisplayName("Green")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the green channel in the overall mix.")]
-	[DisplayName("Green")]
 	public FloatParameter mixerGreenOutGreenIn = new FloatParameter
 	{
 		value = 100f
 	};
 
+	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	[DisplayName("Blue")]
 	[Range(-200f, 200f)]
-	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	public FloatParameter mixerGreenOutBlueIn = new FloatParameter
 	{
 		value = 0f
@@ -210,25 +210,25 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the green channel in the overall mix.")]
 	[DisplayName("Green")]
+	[Range(-200f, 200f)]
 	public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 	{
 		value = 0f
 	};
 
+	[DisplayName("Blue")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the blue channel in the overall mix.")]
-	[DisplayName("Blue")]
 	public FloatParameter mixerBlueOutBlueIn = new FloatParameter
 	{
 		value = 100f
 	};
 
-	[DisplayName("Lift")]
 	[Tooltip("Controls the darkest portions of the render.")]
 	[Trackball(TrackballAttribute.Mode.Lift)]
+	[DisplayName("Lift")]
 	public Vector4Parameter lift = new Vector4Parameter
 	{
 		value = new Vector4(1f, 1f, 1f, 0f)
@@ -242,9 +242,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = new Vector4(1f, 1f, 1f, 0f)
 	};
 
+	[DisplayName("Gain")]
 	[Tooltip("Controls the lightest portions of the render.")]
 	[Trackball(TrackballAttribute.Mode.Gain)]
-	[DisplayName("Gain")]
 	public Vector4Parameter gain = new Vector4Parameter
 	{
 		value = new Vector4(1f, 1f, 1f, 0f)
