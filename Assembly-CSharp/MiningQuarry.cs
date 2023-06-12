@@ -1,5 +1,6 @@
 using System;
 using Facepunch;
+using Facepunch.Rust;
 using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
@@ -207,6 +208,7 @@ public class MiningQuarry : BaseResourceExtractor
 			{
 				int iAmount = num3 - num2;
 				Item item = ItemManager.Create(resource.type, iAmount, 0uL);
+				Facepunch.Rust.Analytics.Azure.OnQuarryItem(Facepunch.Rust.Analytics.Azure.ResourceMode.Produced, item.info.shortname, item.amount, this);
 				if (Interface.CallHook("OnQuarryGather", this, item) != null)
 				{
 					item.Remove();
@@ -235,6 +237,7 @@ public class MiningQuarry : BaseResourceExtractor
 		if (item != null && item.amount >= 1)
 		{
 			pendingWork += workPerFuel;
+			Facepunch.Rust.Analytics.Azure.OnQuarryItem(Facepunch.Rust.Analytics.Azure.ResourceMode.Consumed, item.info.shortname, 1, this);
 			item.UseItem();
 			return true;
 		}

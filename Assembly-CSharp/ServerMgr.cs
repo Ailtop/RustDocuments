@@ -360,10 +360,6 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		{
 			basePlayer.Respawn();
 		}
-		else
-		{
-			basePlayer.SendRespawnOptions();
-		}
 		DebugEx.Log($"{basePlayer.displayName} with steamid {basePlayer.userID} joined from ip {basePlayer.net.connection.ipaddress}");
 		DebugEx.Log($"\tNetworkId {basePlayer.userID} is {basePlayer.net.ID} ({basePlayer.displayName})");
 		if (basePlayer.net.connection.ownerid != basePlayer.net.connection.userid)
@@ -388,6 +384,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 				packet.connection.info.Set(item.name, item.value);
 			}
 			connectionQueue.JoinedGame(packet.connection);
+			Facepunch.Rust.Analytics.Azure.OnPlayerConnected(packet.connection);
 			using (TimeWarning.New("ClientReady"))
 			{
 				BasePlayer basePlayer;
@@ -402,6 +399,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 						basePlayer = SpawnNewPlayer(packet.connection);
 					}
 				}
+				basePlayer.SendRespawnOptions();
 				if (basePlayer != null)
 				{
 					Util.SendSignedInNotification(basePlayer);
@@ -413,7 +411,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	private void OnRPCMessage(Message packet)
 	{
-		uint uid = packet.read.UInt32();
+		NetworkableId uid = packet.read.EntityID();
 		uint num = packet.read.UInt32();
 		if (ConVar.Server.rpclog_enabled)
 		{
@@ -489,14 +487,14 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their branch is '", text, "' not '", branch, "'"));
 			Network.Net.sv.Kick(packet.connection, "Wrong Steam Beta: Requires '" + branch + "' branch!");
 		}
-		else if (packet.connection.protocol > 2377)
+		else if (packet.connection.protocol > 2392)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2377));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2392));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Server update required!");
 		}
-		else if (packet.connection.protocol < 2377)
+		else if (packet.connection.protocol < 2392)
 		{
-			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2377));
+			DebugEx.Log(string.Concat("Kicking ", packet.connection, " - their protocol is ", packet.connection.protocol, " not ", 2392));
 			Network.Net.sv.Kick(packet.connection, "Wrong Connection Protocol: Client update required!");
 		}
 		else
@@ -536,6 +534,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			SaveRestore.SaveCreatedTime = DateTime.UtcNow;
 			World.LoadedFromSave = false;
 		}
+		SaveRestore.InitializeWipeId();
 		if ((bool)SingletonComponent<SpawnHandler>.Instance)
 		{
 			if (!skipInitialSpawn)
@@ -552,6 +551,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 		}
 		CreateImportantEntities();
 		auth = GetComponent<ConnectionAuth>();
+		Facepunch.Rust.Analytics.Azure.Initialize();
 	}
 
 	public void OpenConnection()
@@ -1129,7 +1129,8 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			string text4 = (ConVar.Server.pve ? ",pve" : string.Empty);
 			string text5 = ConVar.Server.tags?.Trim(',') ?? "";
 			string text6 = ((!string.IsNullOrWhiteSpace(text5)) ? ("," + text5) : "");
-			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2377}{text4}{text6},h{AssemblyHash},{text},{text2},{text3}";
+			string text7 = BuildInfo.Current?.Scm?.ChangeId ?? "0";
+			SteamServer.GameTags = $"mp{ConVar.Server.maxplayers},cp{BasePlayer.activePlayerList.Count},pt{Network.Net.sv.ProtocolId},qp{SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued},v{2392}{text4}{text6},h{AssemblyHash},{text},{text2},{text3},cs{text7}";
 			if (ConVar.Server.description != null && ConVar.Server.description.Length > 100)
 			{
 				string[] array = ConVar.Server.description.SplitToChunks(100).ToArray();
@@ -1171,6 +1172,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			SteamServer.SetKey("uptime", ((int)UnityEngine.Time.realtimeSinceStartup).ToString());
 			SteamServer.SetKey("gc_mb", Performance.report.memoryAllocations.ToString());
 			SteamServer.SetKey("gc_cl", Performance.report.memoryCollections.ToString());
+			SteamServer.SetKey("ram_sys", (Performance.report.memoryUsageSystem / 1000000).ToString());
 			SteamServer.SetKey("fps", Performance.report.frameRate.ToString());
 			SteamServer.SetKey("fps_avg", Performance.report.frameRateAverage.ToString("0.00"));
 			SteamServer.SetKey("ent_cnt", BaseNetworkable.serverEntities.Count.ToString());
@@ -1181,6 +1183,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 
 	public void OnDisconnected(string strReason, Network.Connection connection)
 	{
+		Facepunch.Rust.Analytics.Azure.OnPlayerDisconnected(connection, strReason);
 		connectionQueue.RemoveConnection(connection);
 		ConnectionAuth.OnDisconnect(connection);
 		PlatformService.Instance.EndPlayerSession(connection.userid);
@@ -1310,6 +1313,7 @@ public class ServerMgr : SingletonComponent<ServerMgr>, IServerCallback
 			approval.hostname = ConVar.Server.hostname;
 			approval.official = ConVar.Server.official;
 			approval.encryption = num;
+			approval.version = BuildInfo.Current.Scm.Branch + "#" + BuildInfo.Current.Scm.ChangeId;
 			NetWrite netWrite = Network.Net.sv.StartWrite();
 			netWrite.PacketID(Message.Type.Approved);
 			approval.WriteToStream(netWrite);

@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -124,12 +125,12 @@ public class Deployer : HeldEntity
 			return;
 		}
 		Ray ray = msg.read.Ray();
-		uint num = msg.read.UInt32();
-		if (Interface.CallHook("CanDeployItem", msg.player, this, num) == null)
+		NetworkableId networkableId = msg.read.EntityID();
+		if (Interface.CallHook("CanDeployItem", msg.player, this, networkableId) == null)
 		{
 			if (deployable.toSlot)
 			{
-				DoDeploy_Slot(deployable, ray, num);
+				DoDeploy_Slot(deployable, ray, networkableId);
 			}
 			else
 			{
@@ -138,7 +139,7 @@ public class Deployer : HeldEntity
 		}
 	}
 
-	public void DoDeploy_Slot(Deployable deployable, Ray ray, uint entityID)
+	public void DoDeploy_Slot(Deployable deployable, Ray ray, NetworkableId entityID)
 	{
 		if (!HasItemAmount())
 		{
@@ -187,6 +188,7 @@ public class Deployer : HeldEntity
 		}
 		modDeployable.OnDeployed(baseEntity2, ownerPlayer);
 		Interface.CallHook("OnItemDeployed", this, baseEntity, baseEntity2);
+		Facepunch.Rust.Analytics.Azure.OnEntityBuilt(baseEntity2, ownerPlayer);
 		UseItemAmount(1);
 	}
 
@@ -241,6 +243,7 @@ public class Deployer : HeldEntity
 			baseEntity.Spawn();
 			modDeployable.OnDeployed(baseEntity, ownerPlayer);
 			Interface.CallHook("OnItemDeployed", this, modDeployable, baseEntity);
+			Facepunch.Rust.Analytics.Azure.OnEntityBuilt(baseEntity, ownerPlayer);
 			UseItemAmount(1);
 		}
 	}

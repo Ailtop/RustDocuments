@@ -16,4 +16,6 @@ public class ServerBrowserItem : MonoBehaviour
 	public Toggle favourited;
 
 	public ServerBrowserTagList serverTagList;
+
+	public TextMeshProUGUI changeset;
 }

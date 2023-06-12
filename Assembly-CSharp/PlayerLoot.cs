@@ -56,7 +56,7 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 		itemSource = null;
 	}
 
-	public ItemContainer FindContainer(uint id)
+	public ItemContainer FindContainer(ItemContainerId id)
 	{
 		Check();
 		if (!IsLooting())
@@ -74,7 +74,7 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 		return null;
 	}
 
-	public Item FindItem(uint id)
+	public Item FindItem(ItemId id)
 	{
 		Check();
 		if (!IsLooting())
@@ -188,6 +188,10 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 		itemSource = null;
 		Interface.CallHook("OnLootEntity", GetComponent<BasePlayer>(), targetEntity);
 		MarkDirty();
+		if (targetEntity is ILootableEntity lootableEntity)
+		{
+			lootableEntity.LastLootedBy = base.baseEntity.userID;
+		}
 		return true;
 	}
 

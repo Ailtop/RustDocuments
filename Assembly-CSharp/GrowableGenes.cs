@@ -78,7 +78,8 @@ public class GrowableGenes
 			num3 += item2.Weighting;
 			if (num2 < num3)
 			{
-				return item2.GeneType;
+				result = item2.GeneType;
+				break;
 			}
 		}
 		return result;

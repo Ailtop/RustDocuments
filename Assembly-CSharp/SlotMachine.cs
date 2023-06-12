@@ -317,8 +317,7 @@ public class SlotMachine : BaseMountable
 		{
 			return;
 		}
-		BasePlayer player = rpc.player;
-		CurrentSpinPlayer = player;
+		(CurrentSpinPlayer = rpc.player).inventory.loot.Clear();
 		Item slot = component.inventory.GetSlot(0);
 		int amount = 0;
 		if (slot != null)
@@ -351,7 +350,7 @@ public class SlotMachine : BaseMountable
 	private void RPC_Deposit(RPCMessage rpc)
 	{
 		BasePlayer player = rpc.player;
-		if (!(player == null) && StorageInstance.IsValid(base.isServer))
+		if (!(player == null) && !HasFlag(Flags.Reserved2) && StorageInstance.IsValid(base.isServer))
 		{
 			StorageInstance.Get(base.isServer).GetComponent<StorageContainer>().PlayerOpenLoot(player, "", doPositionChecks: false);
 		}
@@ -384,6 +383,7 @@ public class SlotMachine : BaseMountable
 					CurrentSpinPlayer.ChatMessage($"You received {num}x {info.Item.itemDef.displayName.english} for slots payout!");
 				}
 				Analytics.Server.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, num);
+				Analytics.Azure.OnGamblingResult(CurrentSpinPlayer, this, (int)PayoutSettings.SpinCost.amount, num);
 				if (info.OverrideWinEffect != null && info.OverrideWinEffect.isValid)
 				{
 					Effect.server.Run(info.OverrideWinEffect.resourcePath, this, 0u, Vector3.zero, Vector3.zero);
@@ -400,6 +400,7 @@ public class SlotMachine : BaseMountable
 			else
 			{
 				Analytics.Server.SlotMachineTransaction((int)PayoutSettings.SpinCost.amount * CurrentMultiplier, 0);
+				Analytics.Azure.OnGamblingResult(CurrentSpinPlayer, this, (int)PayoutSettings.SpinCost.amount * CurrentMultiplier, 0);
 			}
 		}
 		else
@@ -466,12 +467,12 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	private void Server_RequestMultiplierChange(RPCMessage msg)
 	{
-		if (!(msg.player != _mounted))
+		if (!(msg.player != _mounted) && !HasFlag(Flags.Reserved2))
 		{
 			CurrentMultiplier = Mathf.Clamp(msg.read.Int32(), 1, 5);
 			OnBettingScrapUpdated(GetBettingAmount());

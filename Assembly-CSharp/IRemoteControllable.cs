@@ -10,6 +10,8 @@ public interface IRemoteControllable
 
 	CameraViewerId? ControllingViewerId { get; }
 
+	bool CanPing { get; }
+
 	Transform GetEyes();
 
 	float GetFovScale();
@@ -17,6 +19,10 @@ public interface IRemoteControllable
 	BaseEntity GetEnt();
 
 	string GetIdentifier();
+
+	float Health();
+
+	float MaxHealth();
 
 	void UpdateIdentifier(string newID, bool clientSend = false);
 

@@ -25,9 +25,12 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 	[HideInInspector]
 	public DungeonGridInfo DungeonEntrance;
 
+	private OBB obbBounds;
+
 	protected override void Awake()
 	{
 		base.Awake();
+		obbBounds = new OBB(base.transform.position, base.transform.rotation, Bounds);
 		if ((bool)TerrainMeta.Path)
 		{
 			TerrainMeta.Path.Monuments.Add(this);
@@ -68,32 +71,32 @@ public class MonumentInfo : LandmarkInfo, IPrefabPreProcess
 
 	public float Distance(Vector3 position)
 	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).Distance(position);
+		return obbBounds.Distance(position);
 	}
 
 	public float SqrDistance(Vector3 position)
 	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).SqrDistance(position);
+		return obbBounds.SqrDistance(position);
 	}
 
 	public float Distance(OBB obb)
 	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).Distance(obb);
+		return obbBounds.Distance(obb);
 	}
 
 	public float SqrDistance(OBB obb)
 	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).SqrDistance(obb);
+		return obbBounds.SqrDistance(obb);
 	}
 
 	public bool IsInBounds(Vector3 position)
 	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).Contains(position);
+		return obbBounds.Contains(position);
 	}
 
 	public Vector3 ClosestPointOnBounds(Vector3 position)
 	{
-		return new OBB(base.transform.position, base.transform.rotation, Bounds).ClosestPoint(position);
+		return obbBounds.ClosestPoint(position);
 	}
 
 	public PathFinder.Point GetPathFinderPoint(int res)

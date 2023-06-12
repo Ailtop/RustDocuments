@@ -18,6 +18,8 @@ public class RCBookmarkEntry : MonoBehaviour
 
 	public Image backgroundImage;
 
+	public Color selectedColor;
+
 	public Color activeColor;
 
 	public Color inactiveColor;
@@ -27,6 +29,8 @@ public class RCBookmarkEntry : MonoBehaviour
 	public EventTrigger eventTrigger;
 
 	public string identifier { get; private set; }
+
+	public bool isSelected { get; private set; }
 
 	public bool isControlling { get; private set; }
 }

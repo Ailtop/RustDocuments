@@ -585,13 +585,13 @@ public class WaterDynamics : MonoBehaviour
 			ImageDesc desc = default(ImageDesc);
 			byte[] array = new byte[1];
 			RasterBindImage_Native(ref desc, ref array[0]);
-			return result;
 		}
 		catch (EntryPointNotFoundException)
 		{
 			Debug.Log("[WaterDynamics] Fast native path not available. Reverting to managed fallback.");
-			return false;
+			result = false;
 		}
+		return result;
 	}
 
 	public void Initialize(Vector3 areaPosition, Vector3 areaSize)

@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 
 public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 {
-	private uint? _currentlyRenderedDungeon;
+	private NetworkableId? _currentlyRenderedDungeon;
 
 	private int? _underwaterLabFloorCount;
 
@@ -39,29 +39,26 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 		if (closest != null && closest.spawnedCells != null)
 		{
 			Matrix4x4 matrix4x = Matrix4x4.Translate(closest.mapOffset);
+			foreach (ProceduralDungeonCell spawnedCell in closest.spawnedCells)
 			{
-				foreach (ProceduralDungeonCell spawnedCell in closest.spawnedCells)
+				if (spawnedCell == null || spawnedCell.mapRenderers == null || spawnedCell.mapRenderers.Length == 0)
 				{
-					if (spawnedCell == null || spawnedCell.mapRenderers == null || spawnedCell.mapRenderers.Length == 0)
+					continue;
+				}
+				MeshRenderer[] mapRenderers = spawnedCell.mapRenderers;
+				foreach (MeshRenderer meshRenderer in mapRenderers)
+				{
+					if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out var component))
 					{
-						continue;
-					}
-					MeshRenderer[] mapRenderers = spawnedCell.mapRenderers;
-					foreach (MeshRenderer meshRenderer in mapRenderers)
-					{
-						if (!(meshRenderer == null) && meshRenderer.TryGetComponent<MeshFilter>(out var component))
+						Mesh sharedMesh = component.sharedMesh;
+						int subMeshCount = sharedMesh.subMeshCount;
+						Matrix4x4 matrix = matrix4x * meshRenderer.transform.localToWorldMatrix;
+						for (int j = 0; j < subMeshCount; j++)
 						{
-							Mesh sharedMesh = component.sharedMesh;
-							int subMeshCount = sharedMesh.subMeshCount;
-							Matrix4x4 matrix = matrix4x * meshRenderer.transform.localToWorldMatrix;
-							for (int j = 0; j < subMeshCount; j++)
-							{
-								commandBuffer.DrawMesh(sharedMesh, matrix, renderMaterial, j);
-							}
+							commandBuffer.DrawMesh(sharedMesh, matrix, renderMaterial, j);
 						}
 					}
 				}
-				return commandBuffer;
 			}
 		}
 		return commandBuffer;

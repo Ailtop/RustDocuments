@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -75,8 +76,8 @@ public class BaseLock : BaseEntity
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_TakeLock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && !IsLocked() && Interface.CallHook("CanPickupLock", rpc.player, this) == null)
@@ -86,6 +87,7 @@ public class BaseLock : BaseEntity
 			{
 				rpc.player.GiveItem(item);
 			}
+			Facepunch.Rust.Analytics.Azure.OnEntityPickedUp(rpc.player, this);
 			Kill();
 		}
 	}

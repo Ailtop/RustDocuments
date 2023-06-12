@@ -20,8 +20,13 @@ public class DropUtil
 			if (baseEntity == null)
 			{
 				item.Remove();
+				continue;
 			}
-			else if (num2 > 0f)
+			if (baseEntity is DroppedItem droppedItem && container.entityOwner is LootContainer)
+			{
+				droppedItem.DropReason = DroppedItem.DropReasonEnum.Loot;
+			}
+			if (num2 > 0f)
 			{
 				baseEntity.SetVelocity(new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(-1f, 1f)) * num2);
 				baseEntity.SetAngularVelocity(new Vector3(UnityEngine.Random.Range(-10f, 10f), UnityEngine.Random.Range(-10f, 10f), UnityEngine.Random.Range(-10f, 10f)) * num2);

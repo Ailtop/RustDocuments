@@ -12,5 +12,5 @@ public class FrequencyConfig : UIDialog
 
 	private ItemContainer tempContainer;
 
-	private uint tempItemID;
+	private ItemId tempItemID;
 }

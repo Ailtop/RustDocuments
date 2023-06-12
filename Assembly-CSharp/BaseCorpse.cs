@@ -13,7 +13,16 @@ public class BaseCorpse : BaseCombatEntity
 	[NonSerialized]
 	public ResourceDispenser resourceDispenser;
 
+	[NonSerialized]
+	public SpawnGroup spawnGroup;
+
 	public override TraitFlag Traits => base.Traits | TraitFlag.Food | TraitFlag.Meat;
+
+	public override void ResetState()
+	{
+		spawnGroup = null;
+		base.ResetState();
+	}
 
 	public override void ServerInit()
 	{
@@ -27,6 +36,11 @@ public class BaseCorpse : BaseCombatEntity
 	{
 		parentEnt = pr;
 		base.transform.SetPositionAndRotation(parentEnt.CenterPoint(), parentEnt.transform.rotation);
+		SpawnPointInstance component = GetComponent<SpawnPointInstance>();
+		if (component != null)
+		{
+			spawnGroup = component.parentSpawnPointUser as SpawnGroup;
+		}
 	}
 
 	public virtual bool CanRemove()

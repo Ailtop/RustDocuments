@@ -73,6 +73,8 @@ public class Admin : ConsoleSystem
 
 		public int Memory;
 
+		public int MemoryUsageSystem;
+
 		public int Collections;
 
 		public int NetworkIn;
@@ -101,7 +103,7 @@ public class Admin : ConsoleSystem
 	[Preserve]
 	public struct ServerUGCInfo
 	{
-		public uint entityId;
+		public NetworkableId entityId;
 
 		public uint[] crcs;
 
@@ -154,7 +156,7 @@ public class Admin : ConsoleSystem
 		if (!flag && @string.Length == 0)
 		{
 			text = text + "hostname: " + Server.hostname + "\n";
-			text = text + "version : " + 2377 + " secure (secure mode enabled, connected to Steam3)\n";
+			text = text + "version : " + 2392 + " secure (secure mode enabled, connected to Steam3)\n";
 			text = text + "map     : " + Server.level + "\n";
 			text += $"players : {BasePlayer.activePlayerList.Count()} ({Server.maxplayers} max) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Queued} queued) ({SingletonComponent<ServerMgr>.Instance.connectionQueue.Joining} joining)\n\n";
 		}
@@ -274,6 +276,105 @@ public class Admin : ConsoleSystem
 			action(uInt, arg2);
 		}
 		arg.ReplyWith(arg.HasArg("--json") ? table.ToJson() : table.ToString());
+	}
+
+	[ServerVar(Help = "upgrade_radius 'grade' 'radius'")]
+	public static void upgrade_radius(Arg arg)
+	{
+		if (!arg.HasArgs(2))
+		{
+			arg.ReplyWith("Format is 'upgrade_radius {grade} {radius}'");
+		}
+		else
+		{
+			SkinRadiusInternal(arg, changeAnyGrade: true);
+		}
+	}
+
+	[ServerVar(Help = "skin_radius 'skin' 'radius'")]
+	public static void skin_radius(Arg arg)
+	{
+		if (!arg.HasArgs(2))
+		{
+			arg.ReplyWith("Format is 'skin_radius {skin} {radius}'");
+		}
+		else
+		{
+			SkinRadiusInternal(arg, changeAnyGrade: false);
+		}
+	}
+
+	private static void SkinRadiusInternal(Arg arg, bool changeAnyGrade)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (basePlayer == null)
+		{
+			arg.ReplyWith("This must be called from the client");
+			return;
+		}
+		float @float = arg.GetFloat(1);
+		string @string = arg.GetString(0);
+		BuildingGrade buildingGrade = null;
+		IEnumerable<BuildingGrade> source = from x in PrefabAttribute.server.FindAll<ConstructionGrade>(2194854973u)
+			select x.gradeBase;
+		switch (@string)
+		{
+		case "twig":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "twigs");
+			break;
+		case "wood":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "wood");
+			break;
+		case "stone":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "stone");
+			break;
+		case "metal":
+		case "sheetmetal":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "metal");
+			break;
+		case "hqm":
+		case "armored":
+		case "armoured":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "toptier");
+			break;
+		case "adobe":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "adobe");
+			break;
+		case "shipping":
+		case "shippingcontainer":
+		case "container":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "shipping_container");
+			break;
+		case "brutal":
+		case "brutalist":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "brutalist");
+			break;
+		case "brick":
+			buildingGrade = source.FirstOrDefault((BuildingGrade x) => x.name == "brick");
+			break;
+		default:
+			arg.ReplyWith("Valid skins are: twig, wood, stone, metal, hqm, adobe, shipping, brutalist, brick");
+			return;
+		}
+		if (buildingGrade == null)
+		{
+			arg.ReplyWith("Unable to find skin object for " + @string);
+			return;
+		}
+		if (!buildingGrade.enabledInStandalone)
+		{
+			arg.ReplyWith("Skin " + @string + " is not enabled in standalone yet");
+			return;
+		}
+		List<BuildingBlock> list = new List<BuildingBlock>();
+		global::Vis.Entities(basePlayer.transform.position, @float, list, 2097152);
+		foreach (BuildingBlock item in list)
+		{
+			if (item.grade == buildingGrade.type || changeAnyGrade)
+			{
+				item.ChangeGradeAndSkin(buildingGrade.type, buildingGrade.skin);
+			}
+		}
 	}
 
 	[ServerVar]
@@ -961,9 +1062,110 @@ public class Admin : ConsoleSystem
 	}
 
 	[ServerVar]
+	public static void authradius(Arg arg)
+	{
+		float @float = arg.GetFloat(0, -1f);
+		if (@float < 0f)
+		{
+			arg.ReplyWith("Format is 'authradius {radius} [user]'");
+		}
+		else
+		{
+			SetAuthInRadius(ArgEx.GetPlayer(arg, 1) ?? ArgEx.Player(arg), @float, auth: true);
+		}
+	}
+
+	[ServerVar]
+	public static void deauthradius(Arg arg)
+	{
+		float @float = arg.GetFloat(0, -1f);
+		if (@float < 0f)
+		{
+			arg.ReplyWith("Format is 'deauthradius {radius} [user]'");
+		}
+		else
+		{
+			SetAuthInRadius(ArgEx.GetPlayer(arg, 1) ?? ArgEx.Player(arg), @float, auth: false);
+		}
+	}
+
+	private static void SetAuthInRadius(BasePlayer player, float radius, bool auth)
+	{
+		List<BaseEntity> list = new List<BaseEntity>();
+		global::Vis.Entities(player.transform.position, radius, list);
+		foreach (BaseEntity item in list)
+		{
+			if (item.isServer && !SetUserAuthorized(item, player.userID, auth))
+			{
+				SetUserAuthorized(item.GetSlot(BaseEntity.Slot.Lock), player.userID, auth);
+			}
+		}
+	}
+
+	private static bool SetUserAuthorized(BaseEntity entity, ulong userId, bool state)
+	{
+		if (entity == null)
+		{
+			return false;
+		}
+		if (entity is CodeLock codeLock)
+		{
+			if (state)
+			{
+				codeLock.whitelistPlayers.Add(userId);
+			}
+			else
+			{
+				codeLock.whitelistPlayers.Remove(userId);
+				codeLock.guestPlayers.Remove(userId);
+			}
+			codeLock.SendNetworkUpdate();
+		}
+		else if (entity is AutoTurret autoTurret)
+		{
+			if (state)
+			{
+				autoTurret.authorizedPlayers.Add(new PlayerNameID
+				{
+					ShouldPool = false,
+					userid = userId,
+					username = ""
+				});
+			}
+			else
+			{
+				autoTurret.authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == userId);
+			}
+			autoTurret.SendNetworkUpdate();
+		}
+		else
+		{
+			if (!(entity is BuildingPrivlidge buildingPrivlidge))
+			{
+				return false;
+			}
+			if (state)
+			{
+				buildingPrivlidge.authorizedPlayers.Add(new PlayerNameID
+				{
+					ShouldPool = false,
+					userid = userId,
+					username = ""
+				});
+			}
+			else
+			{
+				buildingPrivlidge.authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == userId);
+			}
+			buildingPrivlidge.SendNetworkUpdate();
+		}
+		return true;
+	}
+
+	[ServerVar]
 	public static void entid(Arg arg)
 	{
-		BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(arg.GetUInt(1)) as BaseEntity;
+		BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(ArgEx.GetEntityID(arg, 1)) as BaseEntity;
 		if (baseEntity == null || baseEntity is BasePlayer)
 		{
 			return;
@@ -1215,12 +1417,13 @@ public class Admin : ConsoleSystem
 		result.Map = Server.level;
 		result.Framerate = Performance.report.frameRate;
 		result.Memory = (int)Performance.report.memoryAllocations;
+		result.MemoryUsageSystem = (int)Performance.report.memoryUsageSystem;
 		result.Collections = (int)Performance.report.memoryCollections;
 		result.NetworkIn = (int)((Network.Net.sv != null) ? Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesReceived_LastSecond) : 0);
 		result.NetworkOut = (int)((Network.Net.sv != null) ? Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond) : 0);
 		result.Restarting = SingletonComponent<ServerMgr>.Instance.Restarting;
 		result.SaveCreatedTime = SaveRestore.SaveCreatedTime.ToString();
-		result.Version = 2377;
+		result.Version = 2392;
 		result.Protocol = Protocol.printable;
 		return result;
 	}
@@ -1345,17 +1548,17 @@ public class Admin : ConsoleSystem
 		if (allowAdminUI && !(ArgEx.Player(arg) == null))
 		{
 			uint uInt = arg.GetUInt(0);
-			uint uInt2 = arg.GetUInt(1);
+			NetworkableId entityID = ArgEx.GetEntityID(arg, 1);
 			FileStorage.Type @int = (FileStorage.Type)arg.GetInt(2);
-			uint uInt3 = arg.GetUInt(3);
-			byte[] array = FileStorage.server.Get(uInt, @int, uInt2, uInt3);
+			uint uInt2 = arg.GetUInt(3);
+			byte[] array = FileStorage.server.Get(uInt, @int, entityID, uInt2);
 			if (array != null)
 			{
 				SendInfo sendInfo = new SendInfo(arg.Connection);
 				sendInfo.channel = 2;
 				sendInfo.method = SendMethod.Reliable;
 				SendInfo sendInfo2 = sendInfo;
-				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedUGC", uInt, (uint)array.Length, array, uInt3, (byte)@int);
+				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedUGC", uInt, (uint)array.Length, array, uInt2, (byte)@int);
 			}
 		}
 	}
@@ -1367,11 +1570,11 @@ public class Admin : ConsoleSystem
 		{
 			return;
 		}
-		uint uInt = arg.GetUInt(0);
-		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+		NetworkableId entityID = ArgEx.GetEntityID(arg, 0);
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(entityID);
 		if (baseNetworkable != null)
 		{
-			FileStorage.server.RemoveAllByEntity(uInt);
+			FileStorage.server.RemoveAllByEntity(entityID);
 			if (baseNetworkable.TryGetComponent<IUGCBrowserEntity>(out var component))
 			{
 				component.ClearContent();
@@ -1384,15 +1587,15 @@ public class Admin : ConsoleSystem
 	{
 		if (allowAdminUI)
 		{
-			uint uInt = arg.GetUInt(0);
-			BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+			NetworkableId entityID = ArgEx.GetEntityID(arg, 0);
+			BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(entityID);
 			if (baseNetworkable != null && baseNetworkable is PatternFirework patternFirework)
 			{
 				SendInfo sendInfo = new SendInfo(arg.Connection);
 				sendInfo.channel = 2;
 				sendInfo.method = SendMethod.Reliable;
 				SendInfo sendInfo2 = sendInfo;
-				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedPatternFirework", uInt, patternFirework.Design.ToProtoBytes());
+				ArgEx.Player(arg).ClientRPCEx(sendInfo2, null, "AdminReceivedPatternFirework", entityID, patternFirework.Design.ToProtoBytes());
 			}
 		}
 	}
@@ -1400,16 +1603,16 @@ public class Admin : ConsoleSystem
 	[ServerVar]
 	public static void clearugcentity(Arg arg)
 	{
-		uint uInt = arg.GetUInt(0);
-		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+		NetworkableId entityID = ArgEx.GetEntityID(arg, 0);
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(entityID);
 		if (baseNetworkable != null && baseNetworkable.TryGetComponent<IUGCBrowserEntity>(out var component))
 		{
 			component.ClearContent();
-			arg.ReplyWith($"Cleared content on {baseNetworkable.ShortPrefabName}/{uInt}");
+			arg.ReplyWith($"Cleared content on {baseNetworkable.ShortPrefabName}/{entityID}");
 		}
 		else
 		{
-			arg.ReplyWith($"Could not find UGC entity with id {uInt}");
+			arg.ReplyWith($"Could not find UGC entity with id {entityID}");
 		}
 	}
 
@@ -1433,8 +1636,8 @@ public class Admin : ConsoleSystem
 	[ServerVar]
 	public static void getugcinfo(Arg arg)
 	{
-		uint uInt = arg.GetUInt(0);
-		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uInt);
+		NetworkableId entityID = ArgEx.GetEntityID(arg, 0);
+		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(entityID);
 		if (baseNetworkable != null && baseNetworkable.TryGetComponent<IUGCBrowserEntity>(out var component))
 		{
 			ServerUGCInfo serverUGCInfo = new ServerUGCInfo(component);
@@ -1442,7 +1645,7 @@ public class Admin : ConsoleSystem
 		}
 		else
 		{
-			arg.ReplyWith($"Invalid entity id: {uInt}");
+			arg.ReplyWith($"Invalid entity id: {entityID}");
 		}
 	}
 

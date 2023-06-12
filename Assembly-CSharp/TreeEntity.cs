@@ -149,7 +149,7 @@ public class TreeEntity : ResourceEntity, IPrefabPreProcess
 	{
 		if (!base.isClient && !(UnityEngine.Time.realtimeSinceStartup < nextBirdTime) && !(bounds.extents.y < 6f))
 		{
-			uint seed = net.ID + birdCycleIndex;
+			uint seed = (uint)(int)net.ID.Value + birdCycleIndex;
 			if (SeedRandom.Range(ref seed, 0, 2) == 0)
 			{
 				Effect.server.Run("assets/prefabs/npc/birds/birdemission.prefab", base.transform.position + Vector3.up * UnityEngine.Random.Range(bounds.extents.y * 0.65f, bounds.extents.y * 0.9f), Vector3.up);

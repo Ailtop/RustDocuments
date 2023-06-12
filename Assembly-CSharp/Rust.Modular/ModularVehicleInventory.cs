@@ -11,7 +11,7 @@ public class ModularVehicleInventory : IDisposable
 
 	public ItemContainer ChassisContainer { get; }
 
-	public uint UID => ModuleContainer.uid;
+	public ItemContainerId UID => ModuleContainer.uid;
 
 	private int TotalSockets => vehicle.TotalSockets;
 

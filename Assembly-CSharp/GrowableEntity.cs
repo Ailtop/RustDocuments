@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -958,6 +959,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		{
 			Item item = ItemManager.Create(Properties.CloneItem, num, 0uL);
 			GrowableGeneEncoding.EncodeGenesToItem(this, item);
+			Facepunch.Rust.Analytics.Azure.OnGatherItem(item.info.shortname, item.amount, this, player);
 			player.GiveItem(item, GiveItemReason.ResourceHarvested);
 			if (Properties.pickEffect.isValid)
 			{
@@ -1041,6 +1043,7 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		if (player != null)
 		{
 			Interface.CallHook("OnGrowableGathered", this, item, player);
+			Facepunch.Rust.Analytics.Azure.OnGatherItem(item.info.shortname, item.amount, this, player);
 			player.GiveItem(item, GiveItemReason.ResourceHarvested);
 		}
 		else
@@ -1058,8 +1061,8 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_EatFruit(RPCMessage msg)
 	{
 		PickFruit(msg.player, eat: true);
@@ -1089,15 +1092,15 @@ public class GrowableEntity : BaseCombatEntity, IInstanceDataReceiver
 		PickFruit(msg.player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_RemoveDying(RPCMessage msg)
 	{
 		RemoveDying(msg.player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_RemoveDyingAll(RPCMessage msg)
 	{
 		if (GetParentEntity() != null)

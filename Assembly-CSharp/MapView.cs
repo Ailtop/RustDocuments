@@ -22,11 +22,19 @@ public class MapView : FacepunchBehaviour
 
 	public GameObjectRef missionMarkerPrefab;
 
+	public Transform activeInteractionParent;
+
+	public Transform localPlayerInterestPointRoot;
+
 	public TeamMemberMapMarker[] teamPositions;
 
-	public PointOfInterestMapMarker PointOfInterestMarker;
+	public List<PointOfInterestMapMarker> PointOfInterestMarkers;
 
-	public PointOfInterestMapMarker LeaderPointOfInterestMarker;
+	public List<PointOfInterestMapMarker> TeamPointOfInterestMarkers;
+
+	public List<PointOfInterestMapMarker> LocalPings;
+
+	public List<PointOfInterestMapMarker> TeamPings;
 
 	public GameObject PlayerDeathMarker;
 
@@ -44,6 +52,8 @@ public class MapView : FacepunchBehaviour
 	public bool ShowDeathMarker = true;
 
 	public bool ShowSleepingBags = true;
+
+	public bool AllowSleepingBagDeletion;
 
 	public bool ShowLocalPlayer = true;
 

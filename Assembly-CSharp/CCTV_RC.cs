@@ -34,9 +34,9 @@ public class CCTV_RC : PoweredRemoteControlEntity, IRemoteControllableClientCall
 
 	public float yawAmount;
 
-	private int fovScaleIndex;
+	public int fovScaleIndex;
 
-	private float fovScaleLerped = 1f;
+	public float fovScaleLerped = 1f;
 
 	public bool hasPTZ = true;
 
@@ -62,9 +62,11 @@ public class CCTV_RC : PoweredRemoteControlEntity, IRemoteControllableClientCall
 
 	public SoundDefinition zoomOutSoundDef;
 
-	private RealTimeSinceEx timeSinceLastServerTick;
+	public RealTimeSinceEx timeSinceLastServerTick;
 
 	public override bool RequiresMouse => hasPTZ;
+
+	protected override bool EntityCanPing => true;
 
 	public override bool CanAcceptInput => hasPTZ;
 
@@ -199,7 +201,7 @@ public class CCTV_RC : PoweredRemoteControlEntity, IRemoteControllableClientCall
 		}
 	}
 
-	private bool UpdateManualAim(InputState inputState)
+	public bool UpdateManualAim(InputState inputState)
 	{
 		if (!hasPTZ)
 		{

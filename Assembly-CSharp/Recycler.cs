@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -10,6 +11,8 @@ using UnityEngine.Assertions;
 
 public class Recycler : StorageContainer
 {
+	public Animator Animator;
+
 	public float recycleEfficiency = 0.5f;
 
 	public SoundDefinition grindingLoopDef;
@@ -241,24 +244,26 @@ public class Recycler : StorageContainer
 					}
 					if (num4 >= 1)
 					{
-						Item newItem = ItemManager.CreateByName("scrap", num4, 0uL);
-						MoveItemToOutput(newItem);
+						Item item = ItemManager.CreateByName("scrap", num4, 0uL);
+						Facepunch.Rust.Analytics.Azure.OnRecyclerItemProduced(item.info.shortname, item.amount, this, slot);
+						MoveItemToOutput(item);
 					}
 				}
 				if (!string.IsNullOrEmpty(slot.info.Blueprint.RecycleStat))
 				{
 					List<BasePlayer> obj2 = Facepunch.Pool.GetList<BasePlayer>();
 					Vis.Entities(base.transform.position, 3f, obj2, 131072);
-					foreach (BasePlayer item in obj2)
+					foreach (BasePlayer item3 in obj2)
 					{
-						if (item.IsAlive() && !item.IsSleeping() && item.inventory.loot.entitySource == this)
+						if (item3.IsAlive() && !item3.IsSleeping() && item3.inventory.loot.entitySource == this)
 						{
-							item.stats.Add(slot.info.Blueprint.RecycleStat, num3, (Stats)5);
-							item.stats.Save();
+							item3.stats.Add(slot.info.Blueprint.RecycleStat, num3, (Stats)5);
+							item3.stats.Save();
 						}
 					}
 					Facepunch.Pool.FreeList(ref obj2);
 				}
+				Facepunch.Rust.Analytics.Azure.OnItemRecycled(slot.info.shortname, num3, this);
 				slot.UseItem(num3);
 				foreach (ItemAmount ingredient in slot.info.Blueprint.ingredients)
 				{
@@ -290,8 +295,9 @@ public class Recycler : StorageContainer
 					for (int j = 0; j < num7; j++)
 					{
 						int num8 = ((num6 > ingredient.itemDef.stackable) ? ingredient.itemDef.stackable : num6);
-						Item newItem2 = ItemManager.Create(ingredient.itemDef, num8, 0uL);
-						if (!MoveItemToOutput(newItem2))
+						Item item2 = ItemManager.Create(ingredient.itemDef, num8, 0uL);
+						Facepunch.Rust.Analytics.Azure.OnRecyclerItemProduced(item2.info.shortname, item2.amount, this, slot);
+						if (!MoveItemToOutput(item2))
 						{
 							flag = true;
 						}
@@ -331,5 +337,17 @@ public class Recycler : StorageContainer
 			SetFlag(Flags.On, b: false);
 			SendNetworkUpdateImmediate();
 		}
+	}
+
+	public void PlayAnim()
+	{
+	}
+
+	public void StopAnim()
+	{
+	}
+
+	private void ToggleAnim(bool toggle)
+	{
 	}
 }

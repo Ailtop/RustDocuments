@@ -23,7 +23,7 @@ public class MarketTerminal : StorageContainer
 
 	private bool _transactionActive;
 
-	private static readonly List<uint> _deliveryEligible = new List<uint>(128);
+	private static readonly List<NetworkableId> _deliveryEligible = new List<NetworkableId>(128);
 
 	private static RealTimeSince _deliveryEligibleLastCalculated;
 
@@ -172,8 +172,8 @@ public class MarketTerminal : StorageContainer
 			Debug.LogError("Marketplace is not set", this);
 			return;
 		}
-		uint num = entity.SendDrone(player, this, vendingMachine);
-		if (num == 0)
+		NetworkableId droneId = entity.SendDrone(player, this, vendingMachine);
+		if (!droneId.IsValid)
 		{
 			Debug.LogError("Failed to spawn delivery drone");
 			return;
@@ -181,14 +181,14 @@ public class MarketTerminal : StorageContainer
 		ProtoBuf.MarketTerminal.PendingOrder pendingOrder = Facepunch.Pool.Get<ProtoBuf.MarketTerminal.PendingOrder>();
 		pendingOrder.vendingMachineId = vendingMachine.net.ID;
 		pendingOrder.timeUntilExpiry = orderTimeout;
-		pendingOrder.droneId = num;
+		pendingOrder.droneId = droneId;
 		pendingOrders.Add(pendingOrder);
 		CheckForExpiredOrders();
 		UpdateHasItems(sendNetworkUpdate: false);
 		SendNetworkUpdateImmediate();
 	}
 
-	public void CompleteOrder(uint vendingMachineId)
+	public void CompleteOrder(NetworkableId vendingMachineId)
 	{
 		if (pendingOrders != null)
 		{
@@ -301,14 +301,14 @@ public class MarketTerminal : StorageContainer
 			return;
 		}
 		using EntityIdList entityIdList = Facepunch.Pool.Get<EntityIdList>();
-		entityIdList.entityIds = Facepunch.Pool.GetList<uint>();
+		entityIdList.entityIds = Facepunch.Pool.GetList<NetworkableId>();
 		GetDeliveryEligibleVendingMachines(entityIdList.entityIds);
 		ClientRPCPlayer(null, msg.player, "Client_OpenMarket", entityIdList);
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Server_Purchase(RPCMessage msg)
 	{
 		if (!CanPlayerInteract(msg.player))
@@ -320,37 +320,37 @@ public class MarketTerminal : StorageContainer
 			Debug.LogError("Marketplace is not set", this);
 			return;
 		}
-		uint num = msg.read.UInt32();
+		NetworkableId networkableId = msg.read.EntityID();
+		int num = msg.read.Int32();
 		int num2 = msg.read.Int32();
-		int num3 = msg.read.Int32();
-		VendingMachine vendingMachine = BaseNetworkable.serverEntities.Find(num) as VendingMachine;
-		if (vendingMachine == null || !BaseNetworkableEx.IsValid(vendingMachine) || num2 < 0 || num2 >= vendingMachine.sellOrders.sellOrders.Count || num3 <= 0 || base.inventory.IsFull())
+		VendingMachine vendingMachine = BaseNetworkable.serverEntities.Find(networkableId) as VendingMachine;
+		if (vendingMachine == null || !BaseNetworkableEx.IsValid(vendingMachine) || num < 0 || num >= vendingMachine.sellOrders.sellOrders.Count || num2 <= 0 || base.inventory.IsFull())
 		{
 			return;
 		}
 		GetDeliveryEligibleVendingMachines(null);
-		if (_deliveryEligible == null || !_deliveryEligible.Contains(num))
+		if (_deliveryEligible == null || !_deliveryEligible.Contains(networkableId))
 		{
 			return;
 		}
 		try
 		{
 			_transactionActive = true;
-			int num4 = deliveryFeeAmount;
-			ProtoBuf.VendingMachine.SellOrder sellOrder = vendingMachine.sellOrders.sellOrders[num2];
-			if (!CanPlayerAffordOrderAndDeliveryFee(msg.player, sellOrder, num3))
+			int num3 = deliveryFeeAmount;
+			ProtoBuf.VendingMachine.SellOrder sellOrder = vendingMachine.sellOrders.sellOrders[num];
+			if (!CanPlayerAffordOrderAndDeliveryFee(msg.player, sellOrder, num2))
 			{
 				return;
 			}
-			int num5 = msg.player.inventory.Take(null, deliveryFeeCurrency.itemid, num4);
-			if (num5 != num4)
+			int num4 = msg.player.inventory.Take(null, deliveryFeeCurrency.itemid, num3);
+			if (num4 != num3)
 			{
-				Debug.LogError($"Took an incorrect number of items for the delivery fee (took {num5}, should have taken {num4})");
+				Debug.LogError($"Took an incorrect number of items for the delivery fee (took {num4}, should have taken {num3})");
 			}
-			ClientRPCPlayer(null, msg.player, "Client_ShowItemNotice", deliveryFeeCurrency.itemid, -num4, arg3: false);
-			if (!vendingMachine.DoTransaction(msg.player, num2, num3, base.inventory, _onCurrencyRemovedCached, _onItemPurchasedCached))
+			ClientRPCPlayer(null, msg.player, "Client_ShowItemNotice", deliveryFeeCurrency.itemid, -num3, arg3: false);
+			if (!vendingMachine.DoTransaction(msg.player, num, num2, base.inventory, _onCurrencyRemovedCached, _onItemPurchasedCached, this))
 			{
-				Item item = ItemManager.CreateByItemID(deliveryFeeCurrency.itemid, num4, 0uL);
+				Item item = ItemManager.CreateByItemID(deliveryFeeCurrency.itemid, num3, 0uL);
 				if (!msg.player.inventory.GiveItem(item))
 				{
 					item.Drop(msg.player.inventory.containerMain.dropPosition, msg.player.inventory.containerMain.dropVelocity);
@@ -462,7 +462,7 @@ public class MarketTerminal : StorageContainer
 		}
 	}
 
-	public void GetDeliveryEligibleVendingMachines(List<uint> vendingMachineIds)
+	public void GetDeliveryEligibleVendingMachines(List<NetworkableId> vendingMachineIds)
 	{
 		if ((float)_deliveryEligibleLastCalculated < 5f)
 		{
@@ -471,7 +471,7 @@ public class MarketTerminal : StorageContainer
 				return;
 			}
 			{
-				foreach (uint item in _deliveryEligible)
+				foreach (NetworkableId item in _deliveryEligible)
 				{
 					vendingMachineIds.Add(item);
 				}
@@ -495,7 +495,7 @@ public class MarketTerminal : StorageContainer
 		{
 			return;
 		}
-		foreach (uint item2 in _deliveryEligible)
+		foreach (NetworkableId item2 in _deliveryEligible)
 		{
 			vendingMachineIds.Add(item2);
 		}
@@ -541,7 +541,7 @@ public class MarketTerminal : StorageContainer
 		return true;
 	}
 
-	public bool HasPendingOrderFor(uint vendingMachineId)
+	public bool HasPendingOrderFor(NetworkableId vendingMachineId)
 	{
 		return pendingOrders?.FindWith((ProtoBuf.MarketTerminal.PendingOrder o) => o.vendingMachineId, vendingMachineId) != null;
 	}

@@ -10,7 +10,7 @@ public class IceFence : GraveyardFence
 
 	public int GetStyleFromID()
 	{
-		uint seed = net.ID;
+		uint seed = (uint)net.ID.Value;
 		return SeedRandom.Range(ref seed, 0, styles.Length);
 	}
 

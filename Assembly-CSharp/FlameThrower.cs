@@ -192,6 +192,10 @@ public class FlameThrower : AttackEntity
 
 	public void ReduceAmmo(float firingTime)
 	{
+		if (base.UsingInfiniteAmmoCheat)
+		{
+			return;
+		}
 		ammoRemainder += fuelPerSec * firingTime;
 		if (ammoRemainder >= 1f)
 		{
@@ -240,6 +244,11 @@ public class FlameThrower : AttackEntity
 		if (!ownerPlayer)
 		{
 			return null;
+		}
+		object obj = Interface.CallHook("OnInventoryAmmoItemFind", ownerPlayer.inventory, fuelType);
+		if (obj is Item)
+		{
+			return (Item)obj;
 		}
 		Item item = ownerPlayer.inventory.containerMain.FindItemsByItemName(fuelType.shortname);
 		if (item == null)
@@ -325,8 +334,8 @@ public class FlameThrower : AttackEntity
 		SetFlameState(wantsOn: false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void DoReload(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -349,7 +358,10 @@ public class FlameThrower : AttackEntity
 	{
 		if (wantsOn)
 		{
-			ammo--;
+			if (!base.UsingInfiniteAmmoCheat)
+			{
+				ammo--;
+			}
 			if (ammo < 0)
 			{
 				ammo = 0;
@@ -425,7 +437,11 @@ public class FlameThrower : AttackEntity
 		{
 			SetFlameState(wantsOn: false);
 		}
-		GetOwnerItem()?.LoseCondition(num);
+		Item ownerItem = GetOwnerItem();
+		if (ownerItem != null && !base.UsingInfiniteAmmoCheat)
+		{
+			ownerItem.LoseCondition(num);
+		}
 	}
 
 	public override void ServerCommand(Item item, string command, BasePlayer player)

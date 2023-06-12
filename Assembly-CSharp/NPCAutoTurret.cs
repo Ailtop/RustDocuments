@@ -61,7 +61,7 @@ public class NPCAutoTurret : AutoTurret
 		base.FireGun(targetPos, aimCone, muzzleToUse, target);
 	}
 
-	protected override bool Ignore(BasePlayer player)
+	public override bool Ignore(BasePlayer player)
 	{
 		if (!(player is ScientistNPC))
 		{

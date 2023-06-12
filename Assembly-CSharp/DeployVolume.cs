@@ -22,6 +22,9 @@ public abstract class DeployVolume : PrefabAttribute
 	[FormerlySerializedAs("entities")]
 	public BaseEntity[] entityList;
 
+	[SerializeField]
+	public EntityListScriptableObject[] entityGroups;
+
 	public bool IsBuildingBlock { get; set; }
 
 	public static Collider LastDeployHit { get; private set; }
@@ -117,36 +120,61 @@ public abstract class DeployVolume : PrefabAttribute
 			{
 				continue;
 			}
-			if (volume.entityList.Length == 0)
+			if (volume.entityList.Length == 0 && volume.entityGroups.Length == 0)
 			{
 				return true;
 			}
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(list[i]);
+			BaseEntity entity = GameObjectEx.ToBaseEntity(list[i]);
 			bool flag = false;
-			if (baseEntity != null)
+			if (volume.entityGroups != null)
 			{
-				BaseEntity[] array = volume.entityList;
-				foreach (BaseEntity baseEntity2 in array)
+				EntityListScriptableObject[] array = volume.entityGroups;
+				foreach (EntityListScriptableObject entityListScriptableObject in array)
 				{
-					if (baseEntity.prefabID == baseEntity2.prefabID)
+					if (entityListScriptableObject.entities == null || entityListScriptableObject.entities.Length == 0)
+					{
+						Debug.LogWarning("Skipping entity group '" + entityListScriptableObject.name + "' when checking volume: there are no entities");
+						continue;
+					}
+					if (CheckEntityList(entity, entityListScriptableObject.entities, entityListScriptableObject.whitelist))
 					{
 						flag = true;
-						break;
+						continue;
 					}
+					return false;
 				}
 			}
-			if (volume.entityMode == EntityMode.IncludeList)
-			{
-				if (flag)
-				{
-					return true;
-				}
-			}
-			else if (volume.entityMode == EntityMode.ExcludeList && !flag)
+			if (CheckEntityList(entity, volume.entityList, volume.entityMode == EntityMode.IncludeList))
 			{
 				return true;
 			}
+			return false;
 		}
 		return false;
+	}
+
+	private static bool CheckEntityList(BaseEntity entity, BaseEntity[] entities, bool whitelist)
+	{
+		if (entities == null || entities.Length == 0)
+		{
+			return true;
+		}
+		bool flag = false;
+		if (entity != null)
+		{
+			foreach (BaseEntity baseEntity in entities)
+			{
+				if (entity.prefabID == baseEntity.prefabID)
+				{
+					flag = true;
+					break;
+				}
+			}
+		}
+		if (whitelist)
+		{
+			return flag;
+		}
+		return !flag;
 	}
 }

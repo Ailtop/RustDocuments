@@ -57,4 +57,12 @@ public class AIMemoryBank<T>
 			slots[index] = default(T);
 		}
 	}
+
+	public void Clear()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			Remove(i);
+		}
+	}
 }

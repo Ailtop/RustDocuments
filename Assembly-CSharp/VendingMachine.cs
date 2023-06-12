@@ -602,8 +602,8 @@ public class VendingMachine : StorageContainer
 	}
 
 	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.IsVisible(3f)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))
@@ -629,8 +629,8 @@ public class VendingMachine : StorageContainer
 		Decay.RadialDecayTouch(base.transform.position, 40f, 2097408);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void TransactionStart(RPCMessage rpc)
 	{
 	}
@@ -657,7 +657,7 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	public bool DoTransaction(BasePlayer buyer, int sellOrderId, int numberOfTransactions = 1, ItemContainer targetContainer = null, Action<BasePlayer, Item> onCurrencyRemoved = null, Action<BasePlayer, Item> onItemPurchased = null)
+	public bool DoTransaction(BasePlayer buyer, int sellOrderId, int numberOfTransactions = 1, ItemContainer targetContainer = null, Action<BasePlayer, Item> onCurrencyRemoved = null, Action<BasePlayer, Item> onItemPurchased = null, MarketTerminal droneMarketTerminal = null)
 	{
 		if (sellOrderId < 0 || sellOrderId >= sellOrders.sellOrders.Count)
 		{
@@ -722,6 +722,7 @@ public class VendingMachine : StorageContainer
 				break;
 			}
 		}
+		Facepunch.Rust.Analytics.Azure.OnBuyFromVendingMachine(buyer, this, sellOrder.itemToSellID, sellOrder.itemToSellAmount * numberOfTransactions, sellOrder.itemToSellIsBP, sellOrder.currencyID, sellOrder.currencyAmountPerItem * numberOfTransactions, sellOrder.currencyIsBP, numberOfTransactions, droneMarketTerminal);
 		int num7 = 0;
 		foreach (Item item4 in obj2)
 		{
@@ -778,6 +779,11 @@ public class VendingMachine : StorageContainer
 	{
 		if (Interface.CallHook("OnGiveSoldItem", this, soldItem, buyer) == null)
 		{
+			while (soldItem.amount > soldItem.MaxStackable())
+			{
+				Item item = soldItem.SplitItem(soldItem.MaxStackable());
+				buyer.GiveItem(item, GiveItemReason.PickedUp);
+			}
 			buyer.GiveItem(soldItem, GiveItemReason.PickedUp);
 		}
 	}
@@ -794,8 +800,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Broadcast(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -808,8 +814,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_UpdateShopName(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -850,8 +856,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_OpenShop(RPCMessage msg)
 	{
 		if (OccupiedCheck(msg.player) && Interface.CallHook("OnVendingShopOpen", this, msg.player) == null)
@@ -862,8 +868,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_OpenAdmin(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -936,8 +942,8 @@ public class VendingMachine : StorageContainer
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_DeleteSellOrder(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -947,6 +953,8 @@ public class VendingMachine : StorageContainer
 			Interface.CallHook("OnDeleteVendingOffer", this, num);
 			if (num >= 0 && num < sellOrders.sellOrders.Count)
 			{
+				ProtoBuf.VendingMachine.SellOrder sellOrder = sellOrders.sellOrders[num];
+				Facepunch.Rust.Analytics.Azure.OnVendingMachineOrderChanged(msg.player, this, sellOrder.itemToSellID, sellOrder.itemToSellAmount, sellOrder.itemToSellIsBP, sellOrder.currencyID, sellOrder.currencyAmountPerItem, sellOrder.currencyIsBP, added: false);
 				sellOrders.sellOrders.RemoveAt(num);
 			}
 			RefreshSellOrderStockLevel();
@@ -970,8 +978,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_AddSellOrder(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -982,12 +990,13 @@ public class VendingMachine : StorageContainer
 				player.ChatMessage("Too many sell orders - remove some");
 				return;
 			}
-			int itemToSellID = msg.read.Int32();
-			int itemToSellAmount = msg.read.Int32();
-			int currencyToUseID = msg.read.Int32();
-			int currencyAmount = msg.read.Int32();
-			byte bpState = msg.read.UInt8();
-			AddSellOrder(itemToSellID, itemToSellAmount, currencyToUseID, currencyAmount, bpState);
+			int num = msg.read.Int32();
+			int num2 = msg.read.Int32();
+			int num3 = msg.read.Int32();
+			int num4 = msg.read.Int32();
+			byte b = msg.read.UInt8();
+			AddSellOrder(num, num2, num3, num4, b);
+			Facepunch.Rust.Analytics.Azure.OnVendingMachineOrderChanged(msg.player, this, num, num2, b == 2 || b == 3, num3, num4, b == 1 || b == 3, added: true);
 		}
 	}
 

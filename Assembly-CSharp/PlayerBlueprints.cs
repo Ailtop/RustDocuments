@@ -69,6 +69,10 @@ public class PlayerBlueprints : EntityComponent<BasePlayer>
 				{
 					return false;
 				}
+				if (base.baseEntity.UnlockAllSkins)
+				{
+					return true;
+				}
 				if (targetItem.steamItem == null)
 				{
 					bool flag = false;
@@ -101,9 +105,16 @@ public class PlayerBlueprints : EntityComponent<BasePlayer>
 				}
 				return true;
 			}
-			if (targetItem.Blueprint.NeedsSteamDLC && targetItem.steamDlc != null && targetItem.steamDlc.HasLicense(base.baseEntity.userID))
+			if (targetItem.Blueprint.NeedsSteamDLC)
 			{
-				return true;
+				if (base.baseEntity.UnlockAllSkins)
+				{
+					return true;
+				}
+				if (targetItem.steamDlc != null && targetItem.steamDlc.HasLicense(base.baseEntity.userID))
+				{
+					return true;
+				}
 			}
 		}
 		int[] defaultBlueprints = ItemManager.defaultBlueprints;
@@ -133,7 +144,7 @@ public class PlayerBlueprints : EntityComponent<BasePlayer>
 		{
 			return (bool)obj;
 		}
-		if (skinItemId != 0 && !CheckSkinOwnership(skinItemId, playerId))
+		if (skinItemId != 0 && !base.baseEntity.UnlockAllSkins && !CheckSkinOwnership(skinItemId, playerId))
 		{
 			return false;
 		}

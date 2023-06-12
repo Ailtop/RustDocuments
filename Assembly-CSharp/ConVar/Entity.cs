@@ -16,11 +16,11 @@ public class Entity : ConsoleSystem
 	{
 		public BaseNetworkable entity;
 
-		public uint entityID;
+		public NetworkableId entityID;
 
 		public uint groupID;
 
-		public uint parentID;
+		public NetworkableId parentID;
 
 		public string status;
 
@@ -29,10 +29,10 @@ public class Entity : ConsoleSystem
 			entity = src;
 			BaseEntity baseEntity = entity as BaseEntity;
 			BaseEntity baseEntity2 = ((baseEntity != null) ? baseEntity.GetParentEntity() : null);
-			entityID = ((entity != null && entity.net != null) ? entity.net.ID : 0u);
+			entityID = ((entity != null && entity.net != null) ? entity.net.ID : default(NetworkableId));
 			groupID = ((entity != null && entity.net != null && entity.net.group != null) ? entity.net.group.ID : 0u);
-			parentID = ((baseEntity != null) ? baseEntity.parentEntity.uid : 0u);
-			if (baseEntity != null && baseEntity.parentEntity.uid != 0)
+			parentID = ((baseEntity != null) ? baseEntity.parentEntity.uid : default(NetworkableId));
+			if (baseEntity != null && baseEntity.parentEntity.uid.IsValid)
 			{
 				if (baseEntity2 == null)
 				{
@@ -80,7 +80,7 @@ public class Entity : ConsoleSystem
 				EntityInfo arg = new EntityInfo(serverEntity);
 				if (filter(arg))
 				{
-					textTable.AddRow("sv", arg.entityID.ToString(), arg.groupID.ToString(), arg.parentID.ToString(), arg.entity.ShortPrefabName, arg.entity.transform.position.ToString(), arg.entity.transform.localPosition.ToString(), arg.entity.transform.rotation.eulerAngles.ToString(), arg.entity.transform.localRotation.eulerAngles.ToString(), arg.status, arg.entity.InvokeString());
+					textTable.AddRow("sv", arg.entityID.Value.ToString(), arg.groupID.ToString(), arg.parentID.Value.ToString(), arg.entity.ShortPrefabName, arg.entity.transform.position.ToString(), arg.entity.transform.localPosition.ToString(), arg.entity.transform.rotation.eulerAngles.ToString(), arg.entity.transform.localRotation.eulerAngles.ToString(), arg.status, arg.entity.InvokeString());
 				}
 			}
 		}
@@ -100,7 +100,7 @@ public class Entity : ConsoleSystem
 	[ClientVar]
 	public static void find_id(Arg args)
 	{
-		uint filter = args.GetUInt(0);
+		NetworkableId filter = ArgEx.GetEntityID(args, 0);
 		TextTable entityTable = GetEntityTable((EntityInfo info) => info.entityID == filter);
 		args.ReplyWith(entityTable.ToString());
 	}
@@ -118,7 +118,7 @@ public class Entity : ConsoleSystem
 	[ClientVar]
 	public static void find_parent(Arg args)
 	{
-		uint filter = args.GetUInt(0);
+		NetworkableId filter = ArgEx.GetEntityID(args, 0);
 		TextTable entityTable = GetEntityTable((EntityInfo info) => info.parentID == filter);
 		args.ReplyWith(entityTable.ToString());
 	}
@@ -132,8 +132,8 @@ public class Entity : ConsoleSystem
 		args.ReplyWith(entityTable.ToString());
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void find_radius(Arg args)
 	{
 		BasePlayer player = ArgEx.Player(args);
@@ -145,14 +145,14 @@ public class Entity : ConsoleSystem
 		}
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void find_self(Arg args)
 	{
 		BasePlayer basePlayer = ArgEx.Player(args);
 		if (!(basePlayer == null) && basePlayer.net != null)
 		{
-			uint filter = basePlayer.net.ID;
+			NetworkableId filter = basePlayer.net.ID;
 			TextTable entityTable = GetEntityTable((EntityInfo info) => info.entityID == filter);
 			args.ReplyWith(entityTable.ToString());
 		}
@@ -161,12 +161,12 @@ public class Entity : ConsoleSystem
 	[ServerVar]
 	public static void debug_toggle(Arg args)
 	{
-		int @int = args.GetInt(0);
-		if (@int == 0)
+		NetworkableId entityID = ArgEx.GetEntityID(args, 0);
+		if (!entityID.IsValid)
 		{
 			return;
 		}
-		BaseEntity baseEntity = BaseNetworkable.serverEntities.Find((uint)@int) as BaseEntity;
+		BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(entityID) as BaseEntity;
 		if (!(baseEntity == null))
 		{
 			baseEntity.SetFlag(BaseEntity.Flags.Debugging, !baseEntity.IsDebugging());
@@ -174,16 +174,17 @@ public class Entity : ConsoleSystem
 			{
 				baseEntity.OnDebugStart();
 			}
-			args.ReplyWith("Debugging for " + baseEntity.net.ID + " " + (baseEntity.IsDebugging() ? "enabled" : "disabled"));
+			args.ReplyWith(string.Concat("Debugging for ", baseEntity.net.ID, " ", baseEntity.IsDebugging() ? "enabled" : "disabled"));
 		}
 	}
 
 	[ServerVar]
-	public static void nudge(int entID)
+	public static void nudge(Arg args)
 	{
-		if (entID != 0)
+		NetworkableId entityID = ArgEx.GetEntityID(args, 0);
+		if (entityID.IsValid)
 		{
-			BaseEntity baseEntity = BaseNetworkable.serverEntities.Find((uint)entID) as BaseEntity;
+			BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(entityID) as BaseEntity;
 			if (!(baseEntity == null))
 			{
 				baseEntity.BroadcastMessage("DebugNudge", SendMessageOptions.DontRequireReceiver);

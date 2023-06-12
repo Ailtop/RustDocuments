@@ -66,8 +66,8 @@ public class StrobeLight : IOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetStrobeSpeed(RPCMessage msg)
 	{
 		int num = msg.read.Int32();

@@ -36,8 +36,8 @@ public abstract class BaseCardGameEntity : BaseVehicle
 		Blackjack = 1
 	}
 
-	[Header("Card Game")]
 	[SerializeField]
+	[Header("Card Game")]
 	private GameObjectRef uiPrefab;
 
 	public ItemDefinition scrapItemDef;
@@ -623,8 +623,8 @@ public abstract class BaseCardGameEntity : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Editor_MakeRandomMove(RPCMessage msg)
 	{
 		if (UnityEngine.Application.isEditor)

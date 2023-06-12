@@ -4,9 +4,9 @@ public struct EntityRef
 {
 	internal BaseEntity ent_cached;
 
-	internal uint id_cached;
+	internal NetworkableId id_cached;
 
-	public uint uid
+	public NetworkableId uid
 	{
 		get
 		{
@@ -19,11 +19,11 @@ public struct EntityRef
 		set
 		{
 			id_cached = value;
-			if (id_cached == 0)
+			if (!id_cached.IsValid)
 			{
 				ent_cached = null;
 			}
-			else if (!BaseNetworkableEx.IsValid(ent_cached) || ent_cached.net.ID != id_cached)
+			else if (!BaseNetworkableEx.IsValid(ent_cached) || !(ent_cached.net.ID == id_cached))
 			{
 				ent_cached = null;
 			}
@@ -32,7 +32,7 @@ public struct EntityRef
 
 	public bool IsSet()
 	{
-		return id_cached != 0;
+		return id_cached.IsValid;
 	}
 
 	public bool IsValid(bool serverside)
@@ -43,7 +43,7 @@ public struct EntityRef
 	public void Set(BaseEntity ent)
 	{
 		ent_cached = ent;
-		id_cached = 0u;
+		id_cached = default(NetworkableId);
 		if (BaseNetworkableEx.IsValid(ent_cached))
 		{
 			id_cached = ent_cached.net.ID;
@@ -52,7 +52,7 @@ public struct EntityRef
 
 	public BaseEntity Get(bool serverside)
 	{
-		if (ent_cached == null && id_cached != 0)
+		if (ent_cached == null && id_cached.IsValid)
 		{
 			if (serverside)
 			{
@@ -76,7 +76,7 @@ public struct EntityRef<T> where T : BaseEntity
 
 	public bool IsSet => entityRef.IsSet();
 
-	public uint uid
+	public NetworkableId uid
 	{
 		get
 		{
@@ -88,7 +88,7 @@ public struct EntityRef<T> where T : BaseEntity
 		}
 	}
 
-	public EntityRef(uint uid)
+	public EntityRef(NetworkableId uid)
 	{
 		entityRef = new EntityRef
 		{

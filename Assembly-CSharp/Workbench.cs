@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -172,6 +173,7 @@ public class Workbench : StorageContainer
 					if (byID2 != null && byID2.itemDef != null)
 					{
 						player.blueprints.Unlock(byID2.itemDef);
+						Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, byID2.itemDef, "techtree", this);
 					}
 				}
 				Debug.Log("Player unlocked group :" + byID.groupName);
@@ -185,6 +187,7 @@ public class Workbench : StorageContainer
 					player.inventory.Take(null, itemid, num2);
 					player.blueprints.Unlock(byID.itemDef);
 					Interface.CallHook("OnTechTreeNodeUnlocked", this, byID, player);
+					Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, byID.itemDef, "techtree", this);
 				}
 			}
 		}
@@ -199,8 +202,8 @@ public class Workbench : StorageContainer
 		return blueprintBaseDef;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_BeginExperiment(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

@@ -148,8 +148,8 @@ public class BaseMelee : AttackEntity
 		return player.GetInheritedThrowVelocity(direction);
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
@@ -192,6 +192,7 @@ public class BaseMelee : AttackEntity
 				return;
 			}
 			player.CleanupExpiredProjectiles();
+			Guid projectileGroupId = Guid.NewGuid();
 			foreach (ProjectileShoot.Projectile projectile in projectileShoot.projectiles)
 			{
 				if (player.HasFiredProjectile(projectile.projectileID))
@@ -201,7 +202,7 @@ public class BaseMelee : AttackEntity
 				}
 				else if (ValidateEyePos(player, projectile.startPos))
 				{
-					player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, item.info, item);
+					player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, item.info, projectileGroupId, item);
 					Effect effect = new Effect();
 					effect.Init(Effect.Type.Projectile, projectile.startPos, projectile.startVel, msg.connection);
 					effect.scale = 1f;
@@ -324,7 +325,11 @@ public class BaseMelee : AttackEntity
 
 	public void LoseCondition(float amount)
 	{
-		GetOwnerItem()?.LoseCondition(amount);
+		Item ownerItem = GetOwnerItem();
+		if (ownerItem != null && !base.UsingInfiniteAmmoCheat)
+		{
+			ownerItem.LoseCondition(amount);
+		}
 	}
 
 	public virtual float GetConditionLoss()
@@ -349,11 +354,14 @@ public class BaseMelee : AttackEntity
 			}
 		}
 		conditionLoss += num * 0.2f;
-		ownerItem.LoseCondition(conditionLoss);
+		if (!base.UsingInfiniteAmmoCheat)
+		{
+			ownerItem.LoseCondition(conditionLoss);
+		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void PlayerAttack(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

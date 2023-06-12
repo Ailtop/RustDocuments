@@ -85,7 +85,7 @@ public class BaseMission : BaseScriptableObject
 
 		private BaseMission _cachedMission;
 
-		public uint providerID;
+		public NetworkableId providerID;
 
 		public uint missionID;
 
@@ -189,7 +189,7 @@ public class BaseMission : BaseScriptableObject
 
 		public void EnterPool()
 		{
-			providerID = 0u;
+			providerID = default(NetworkableId);
 			missionID = 0u;
 			status = MissionStatus.Default;
 			completionScale = 0f;
@@ -578,6 +578,7 @@ public class BaseMission : BaseScriptableObject
 			}
 		}
 		Facepunch.Rust.Analytics.Server.MissionComplete(this);
+		Facepunch.Rust.Analytics.Azure.OnMissionComplete(assignee, this);
 		instance.status = MissionStatus.Completed;
 		assignee.SetActiveMission(-1);
 		assignee.MissionDirty();
@@ -601,6 +602,7 @@ public class BaseMission : BaseScriptableObject
 		assignee.ChatMessage("You have failed the mission : " + missionName.english);
 		DoMissionEffect(failedEffect.resourcePath, assignee);
 		Facepunch.Rust.Analytics.Server.MissionFailed(this, failReason);
+		Facepunch.Rust.Analytics.Azure.OnMissionComplete(assignee, this, failReason);
 		instance.status = MissionStatus.Failed;
 		MissionEnded(instance, assignee);
 		Interface.CallHook("OnMissionFailed", this, instance, assignee, failReason);

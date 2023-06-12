@@ -142,25 +142,29 @@ public class Detonator : HeldEntity, IRFObject
 	[RPC_Server]
 	public void ServerSetFrequency(RPCMessage msg)
 	{
-		if (msg.player == null || !msg.player.CanBuild() || GetOwnerPlayer() != msg.player || UnityEngine.Time.time < nextChangeTime)
+		ServerSetFrequency(msg.player, msg.read.Int32());
+	}
+
+	public void ServerSetFrequency(BasePlayer player, int freq)
+	{
+		if (player == null || GetOwnerPlayer() != player || UnityEngine.Time.time < nextChangeTime)
 		{
 			return;
 		}
 		nextChangeTime = UnityEngine.Time.time + 2f;
-		int num = msg.read.Int32();
-		if (RFManager.IsReserved(num))
+		if (RFManager.IsReserved(freq))
 		{
-			RFManager.ReserveErrorPrint(msg.player);
+			RFManager.ReserveErrorPrint(player);
 		}
 		else
 		{
-			if (Interface.CallHook("OnRfFrequencyChange", this, num, msg.player) != null)
+			if (Interface.CallHook("OnRfFrequencyChange", this, freq, player) != null)
 			{
 				return;
 			}
 			Item ownerItem = GetOwnerItem();
-			RFManager.ChangeFrequency(frequency, num, this, isListener: false, IsOn());
-			frequency = num;
+			RFManager.ChangeFrequency(frequency, freq, this, isListener: false, IsOn());
+			frequency = freq;
 			SendNetworkUpdate();
 			Item item = GetItem();
 			if (item != null)
@@ -174,7 +178,7 @@ public class Detonator : HeldEntity, IRFObject
 				item.MarkDirty();
 			}
 			ownerItem?.LoseCondition(ownerItem.maxCondition * 0.01f);
-			Interface.CallHook("OnRfFrequencyChanged", this, num, msg.player);
+			Interface.CallHook("OnRfFrequencyChanged", this, freq, player);
 		}
 	}
 

@@ -23,41 +23,42 @@ public class Pool : ConsoleSystem
 	[ClientVar]
 	public static bool prewarm = true;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool enabled = true;
 
 	[ServerVar]
 	[ClientVar]
 	public static bool debug = false;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void print_memory(Arg arg)
 	{
-		if (Facepunch.Pool.directory.Count == 0)
+		if (Facepunch.Pool.Directory.Count == 0)
 		{
 			arg.ReplyWith("Memory pool is empty.");
 			return;
 		}
 		TextTable textTable = new TextTable();
 		textTable.AddColumn("type");
+		textTable.AddColumn("capacity");
 		textTable.AddColumn("pooled");
 		textTable.AddColumn("active");
 		textTable.AddColumn("hits");
 		textTable.AddColumn("misses");
 		textTable.AddColumn("spills");
-		foreach (KeyValuePair<Type, Facepunch.Pool.ICollection> item in Facepunch.Pool.directory.OrderByDescending((KeyValuePair<Type, Facepunch.Pool.ICollection> x) => x.Value.ItemsCreated))
+		foreach (KeyValuePair<Type, Facepunch.Pool.IPoolCollection> item in Facepunch.Pool.Directory.OrderByDescending((KeyValuePair<Type, Facepunch.Pool.IPoolCollection> x) => x.Value.ItemsCreated))
 		{
-			string text = item.Key.ToString().Replace("System.Collections.Generic.", "");
-			Facepunch.Pool.ICollection value = item.Value;
-			textTable.AddRow(text, value.ItemsInStack.FormatNumberShort(), value.ItemsInUse.FormatNumberShort(), value.ItemsTaken.FormatNumberShort(), value.ItemsCreated.FormatNumberShort(), value.ItemsSpilled.FormatNumberShort());
+			Type key = item.Key;
+			Facepunch.Pool.IPoolCollection value = item.Value;
+			textTable.AddRow(key.ToString().Replace("System.Collections.Generic.", ""), value.ItemsCapacity.FormatNumberShort(), value.ItemsInStack.FormatNumberShort(), value.ItemsInUse.FormatNumberShort(), value.ItemsTaken.FormatNumberShort(), value.ItemsCreated.FormatNumberShort(), value.ItemsSpilled.FormatNumberShort());
 		}
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void print_arraypool(Arg arg)
 	{
 		ArrayPool<byte> arrayPool = BaseNetwork.ArrayPool;
@@ -78,8 +79,8 @@ public class Pool : ConsoleSystem
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void print_prefabs(Arg arg)
 	{
 		PrefabPoolCollection pool = GameManager.server.pool;
@@ -133,23 +134,23 @@ public class Pool : ConsoleSystem
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void clear_memory(Arg arg)
 	{
 		Facepunch.Pool.Clear(arg.GetString(0, string.Empty));
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void clear_prefabs(Arg arg)
 	{
 		string @string = arg.GetString(0, string.Empty);
 		GameManager.server.pool.Clear(@string);
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void clear_assets(Arg arg)
 	{
 		AssetPool.Clear(arg.GetString(0, string.Empty));

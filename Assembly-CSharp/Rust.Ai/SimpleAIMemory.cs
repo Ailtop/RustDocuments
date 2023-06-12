@@ -120,11 +120,11 @@ public class SimpleAIMemory
 		return Players.Contains(player);
 	}
 
-	internal void Forget(float secondsOld)
+	public void Forget(float secondsOld)
 	{
 		for (int i = 0; i < All.Count; i++)
 		{
-			if (!(UnityEngine.Time.realtimeSinceStartup - All[i].Timestamp > secondsOld))
+			if (!(UnityEngine.Time.realtimeSinceStartup - All[i].Timestamp >= secondsOld))
 			{
 				continue;
 			}

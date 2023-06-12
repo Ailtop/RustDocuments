@@ -140,7 +140,7 @@ public class Cassette : BaseEntity, IUGCBrowserEntity
 		AudioId = info.msg.cassette.audioId;
 		CreatorSteamId = info.msg.cassette.creatorSteamId;
 		preloadedAudioId = info.msg.cassette.preloadAudioId;
-		if (base.isServer && info.msg.cassette.holder != 0)
+		if (base.isServer && info.msg.cassette.holder.IsValid)
 		{
 			BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(info.msg.cassette.holder);
 			if (baseNetworkable != null && baseNetworkable is ICassettePlayer cassettePlayer)
@@ -208,8 +208,8 @@ public class Cassette : BaseEntity, IUGCBrowserEntity
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void Server_MakeNewFile(RPCMessage msg)
 	{
 		if (msg.player == null)

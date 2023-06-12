@@ -43,6 +43,11 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 
 	public BoxCollider setFreeIfMovedBeyond;
 
+	public string category;
+
+	[NonSerialized]
+	public MonumentInfo Monument;
+
 	public bool fillOnSpawn;
 
 	public BaseSpawnPoint[] spawnPoints;
@@ -97,6 +102,19 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 			{
 				Invoke(SpawnInitial, 1f);
 			}
+			Monument = FindMonument();
+		}
+	}
+
+	protected void OnDestroy()
+	{
+		if ((bool)SingletonComponent<SpawnHandler>.Instance)
+		{
+			SingletonComponent<SpawnHandler>.Instance.SpawnGroups.Remove(this);
+		}
+		else
+		{
+			Debug.LogWarning(GetType().Name + ": SpawnHandler instance not found.");
 		}
 	}
 
@@ -270,6 +288,11 @@ public class SpawnGroup : BaseMonoBehaviour, IServerComponent, ISpawnPointUser, 
 			baseSpawnPoint.GetLocation(out pos, out rot);
 		}
 		return baseSpawnPoint;
+	}
+
+	private MonumentInfo FindMonument()
+	{
+		return GetComponentInParent<MonumentInfo>();
 	}
 
 	protected virtual void OnDrawGizmos()

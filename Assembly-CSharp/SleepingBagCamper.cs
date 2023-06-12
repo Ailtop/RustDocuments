@@ -107,6 +107,7 @@ public class SleepingBagCamper : SleepingBag
 		BasePlayer player = msg.player;
 		if (!(player == null) && AssociatedSeat.IsValid(base.isServer) && !(AssociatedSeat.Get(base.isServer).GetMounted() != player))
 		{
+			SleepingBag.RemoveBagForPlayer(this, deployerUserID);
 			deployerUserID = 0uL;
 			SendNetworkUpdate();
 		}

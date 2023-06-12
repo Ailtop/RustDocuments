@@ -55,11 +55,17 @@ public struct RaycastRayProcessingJob : IJobParallelFor
 				Interlocked.Increment(ref CompanionServer.Cameras.BurstUtil.Get(in colliderHits, num3));
 			}
 		}
-		float num4 = math.clamp((num ? @readonly.distance : farPlane) / farPlane, 0f, 1f);
-		float num5 = math.max(math.dot(cameraForward, @readonly.normal), 0f);
-		ushort num6 = (ushort)(num4 * 1023f);
-		byte b2 = (byte)(num5 * 63f);
-		outputs[index] = (num6 >> 8 << 24) | ((num6 & 0xFF) << 16) | (b2 << 8) | b;
+		float num4 = (num ? @readonly.distance : farPlane);
+		if (b == 7)
+		{
+			b = 0;
+			num4 *= 1.1f;
+		}
+		float num5 = math.clamp(num4 / farPlane, 0f, 1f);
+		float num6 = math.max(math.dot(cameraForward, @readonly.normal), 0f);
+		ushort num7 = (ushort)(num5 * 1023f);
+		byte b2 = (byte)(num6 * 63f);
+		outputs[index] = (num7 >> 8 << 24) | ((num7 & 0xFF) << 16) | (b2 << 8) | b;
 	}
 
 	private static int BinarySearch(NativeArray<int> haystack, int needle)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -42,7 +43,7 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 		}
 	}
 
-	private enum OvenItemType
+	public enum OvenItemType
 	{
 		Burnable = 0,
 		Byproduct = 1,
@@ -86,7 +87,7 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 
 	public const float UpdateRate = 0.5f;
 
-	protected virtual bool CanRunWithNoFuel => false;
+	public virtual bool CanRunWithNoFuel => false;
 
 	public ItemContainer Container => base.inventory;
 
@@ -297,12 +298,12 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 		StopCooking();
 	}
 
-	private int GetFuelRate()
+	public int GetFuelRate()
 	{
 		return 1;
 	}
 
-	private int GetCharcoalRate()
+	public int GetCharcoalRate()
 	{
 		return 1;
 	}
@@ -375,7 +376,9 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 			fuel.Remove();
 			return;
 		}
-		fuel.UseItem(GetFuelRate());
+		int fuelRate = GetFuelRate();
+		fuel.UseItem(fuelRate);
+		Facepunch.Rust.Analytics.Azure.AddPendingItems(this, fuel.info.shortname, fuelRate, "smelt");
 		fuel.fuel = burnable.fuelAmount;
 		fuel.MarkDirty();
 		Interface.CallHook("OnFuelConsumed", this, fuel, burnable);
@@ -494,7 +497,7 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 		return null;
 	}
 
-	private void IncreaseCookTime(float amount)
+	public void IncreaseCookTime(float amount)
 	{
 		List<Item> obj = Facepunch.Pool.GetList<Item>();
 		foreach (Item item in base.inventory.itemList)
@@ -516,7 +519,7 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 	{
 		if (IndustrialMode == IndustrialSlotMode.LargeFurnace)
 		{
-			return new Vector2i(0, 7);
+			return new Vector2i(0, 6);
 		}
 		if (IndustrialMode == IndustrialSlotMode.OilRefinery)
 		{

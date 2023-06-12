@@ -8,9 +8,17 @@ public class UICompass : MonoBehaviour
 
 	public CanvasGroup compassGroup;
 
-	public CompassMapMarker CompassMarker;
+	public List<CompassMapMarker> CompassMarkers;
 
-	public CompassMapMarker TeamLeaderCompassMarker;
+	public List<CompassMapMarker> TeamCompassMarkers;
 
 	public List<CompassMissionMarker> MissionMarkers;
+
+	public List<CompassMapMarker> LocalPings;
+
+	public List<CompassMapMarker> TeamPings;
+
+	public Image LeftPingPulse;
+
+	public Image RightPingPulse;
 }

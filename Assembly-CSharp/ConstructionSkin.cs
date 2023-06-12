@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ConstructionSkin : BasePrefab
 {
-	private List<GameObject> conditionals;
+	public List<GameObject> conditionals;
 
 	public int DetermineConditionalModelState(BuildingBlock parent)
 	{
@@ -52,7 +52,7 @@ public class ConstructionSkin : BasePrefab
 		}
 	}
 
-	public void Refresh(BuildingBlock parent)
+	public virtual void Refresh(BuildingBlock parent)
 	{
 		DestroyConditionalModels(parent);
 		CreateConditionalModels(parent);
@@ -62,5 +62,10 @@ public class ConstructionSkin : BasePrefab
 	{
 		DestroyConditionalModels(parent);
 		parent.gameManager.Retire(base.gameObject);
+	}
+
+	public virtual uint GetStartingDetailColour(uint playerColourIndex)
+	{
+		return 0u;
 	}
 }

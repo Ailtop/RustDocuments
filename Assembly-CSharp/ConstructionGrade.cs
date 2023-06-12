@@ -25,21 +25,22 @@ public class ConstructionGrade : PrefabAttribute
 		}
 	}
 
-	public List<ItemAmount> costToBuild
+	public List<ItemAmount> CostToBuild(BuildingGrade.Enum fromGrade = BuildingGrade.Enum.None)
 	{
-		get
+		if (_costToBuild == null)
 		{
-			if (_costToBuild != null)
-			{
-				return _costToBuild;
-			}
 			_costToBuild = new List<ItemAmount>();
-			foreach (ItemAmount item in gradeBase.baseCost)
-			{
-				_costToBuild.Add(new ItemAmount(item.itemDef, Mathf.Ceil(item.amount * construction.costMultiplier)));
-			}
-			return _costToBuild;
 		}
+		else
+		{
+			_costToBuild.Clear();
+		}
+		float num = ((fromGrade == gradeBase.type) ? 0.2f : 1f);
+		foreach (ItemAmount item in gradeBase.baseCost)
+		{
+			_costToBuild.Add(new ItemAmount(item.itemDef, Mathf.Ceil(item.amount * construction.costMultiplier * num)));
+		}
+		return _costToBuild;
 	}
 
 	protected override Type GetIndexedType()

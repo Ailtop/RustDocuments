@@ -341,21 +341,21 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public void ServerPlayAnsweringMessage(PhoneController fromPhone)
 	{
+		NetworkableId arg = default(NetworkableId);
 		uint num = 0u;
-		uint num2 = 0u;
-		uint arg = 0u;
+		uint arg2 = 0u;
 		if (activeCallTo != null && activeCallTo.cachedCassette != null)
 		{
-			num = activeCallTo.cachedCassette.net.ID;
-			num2 = activeCallTo.cachedCassette.AudioId;
-			if (num2 == 0)
+			arg = activeCallTo.cachedCassette.net.ID;
+			num = activeCallTo.cachedCassette.AudioId;
+			if (num == 0)
 			{
-				arg = StringPool.Get(activeCallTo.cachedCassette.PreloadedAudio.name);
+				arg2 = StringPool.Get(activeCallTo.cachedCassette.PreloadedAudio.name);
 			}
 		}
-		if (num != 0)
+		if (arg.IsValid)
 		{
-			base.baseEntity.ClientRPC(null, "ClientPlayAnsweringMessage", num, num2, arg, fromPhone.HasVoicemailSlot() ? 1 : 0, activeCallTo.PhoneNumber);
+			base.baseEntity.ClientRPC(null, "ClientPlayAnsweringMessage", arg, num, arg2, fromPhone.HasVoicemailSlot() ? 1 : 0, activeCallTo.PhoneNumber);
 			Invoke(TriggerTimeOut, activeCallTo.cachedCassette.MaxCassetteLength);
 		}
 		else

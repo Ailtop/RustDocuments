@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -133,13 +134,16 @@ public class BaseLauncher : BaseProjectile
 		}
 		reloadStarted = false;
 		reloadFinished = false;
-		if (primaryMagazine.contents <= 0)
+		if (!base.UsingInfiniteAmmoCheat)
 		{
-			AntiHack.Log(player, AntiHackType.ProjectileHack, "Magazine empty (" + base.ShortPrefabName + ")");
-			player.stats.combat.LogInvalid(player, this, "magazine_empty");
-			return;
+			if (primaryMagazine.contents <= 0)
+			{
+				AntiHack.Log(player, AntiHackType.ProjectileHack, "Magazine empty (" + base.ShortPrefabName + ")");
+				player.stats.combat.LogInvalid(player, this, "magazine_empty");
+				return;
+			}
+			primaryMagazine.contents--;
 		}
-		primaryMagazine.contents--;
 		SignalBroadcast(Signal.Attack, string.Empty, player.net.connection);
 		Vector3 vector = msg.read.Vector3();
 		Vector3 vector2 = msg.read.Vector3().normalized;
@@ -193,9 +197,14 @@ public class BaseLauncher : BaseProjectile
 				component2.InitializeVelocity(GetInheritedVelocity(player, vector2) + vector2 * component2.speed);
 			}
 			baseEntity.Spawn();
-			StartAttackCooldown(ScaleRepeatDelay(repeatDelay));
+			Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(player, baseEntity, this);
 			Interface.CallHook("OnRocketLaunched", player, baseEntity);
-			GetOwnerItem()?.LoseCondition(UnityEngine.Random.Range(1f, 2f));
+			StartAttackCooldown(ScaleRepeatDelay(repeatDelay));
+			Item ownerItem = GetOwnerItem();
+			if (ownerItem != null && !base.UsingInfiniteAmmoCheat)
+			{
+				ownerItem.LoseCondition(UnityEngine.Random.Range(1f, 2f));
+			}
 		}
 	}
 }

@@ -10,6 +10,8 @@ public class RandomParameterNumber : StateMachineBehaviour
 
 	public bool preventRepetition;
 
+	public bool isFloat;
+
 	private int last;
 
 	public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -21,7 +23,14 @@ public class RandomParameterNumber : StateMachineBehaviour
 			num = Random.Range(min, max);
 			num2++;
 		}
-		animator.SetInteger(parameterName, num);
+		if (isFloat)
+		{
+			animator.SetFloat(parameterName, num);
+		}
+		else
+		{
+			animator.SetInteger(parameterName, num);
+		}
 		last = num;
 	}
 }

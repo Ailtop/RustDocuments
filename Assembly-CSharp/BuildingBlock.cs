@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -37,9 +38,15 @@ public class BuildingBlock : StabilityEntity
 
 	private bool forceSkinRefresh;
 
+	private ulong lastSkinID;
+
 	public int modelState;
 
 	public int lastModelState;
+
+	private uint lastCustomColour;
+
+	public uint playerCustomColourToApply;
 
 	public BuildingGrade.Enum grade;
 
@@ -71,26 +78,9 @@ public class BuildingBlock : StabilityEntity
 		new Vector3(0f, 1f, -1f).normalized
 	};
 
-	public ConstructionGrade currentGrade
-	{
-		get
-		{
-			ConstructionGrade constructionGrade = GetGrade(grade);
-			if (constructionGrade != null)
-			{
-				return constructionGrade;
-			}
-			for (int i = 0; i < blockDefinition.grades.Length; i++)
-			{
-				if (blockDefinition.grades[i] != null)
-				{
-					return blockDefinition.grades[i];
-				}
-			}
-			Debug.LogWarning("Building block grade not found: " + grade);
-			return null;
-		}
-	}
+	public uint customColour { get; private set; }
+
+	public ConstructionGrade currentGrade => blockDefinition.GetGrade(grade, skinID);
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -240,6 +230,42 @@ public class BuildingBlock : StabilityEntity
 				}
 				return true;
 			}
+			if (rpc == 4081052216u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoUpgradeToGrade_Delayed "));
+				}
+				using (TimeWarning.New("DoUpgradeToGrade_Delayed"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.MaxDistance.Test(4081052216u, "DoUpgradeToGrade_Delayed", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg6 = rPCMessage;
+							DoUpgradeToGrade_Delayed(msg6);
+						}
+					}
+					catch (Exception exception5)
+					{
+						Debug.LogException(exception5);
+						player.Kick("RPC Error in DoUpgradeToGrade_Delayed");
+					}
+				}
+				return true;
+			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
 	}
@@ -278,6 +304,7 @@ public class BuildingBlock : StabilityEntity
 	{
 		if (msg.player.CanInteract() && CanDemolish(msg.player) && Interface.CallHook("OnStructureDemolish", this, msg.player, false) == null)
 		{
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockDemolished(msg.player, this);
 			Kill(DestroyMode.Gib);
 		}
 	}
@@ -288,6 +315,7 @@ public class BuildingBlock : StabilityEntity
 	{
 		if (msg.player.CanInteract() && msg.player.IsAdmin && Interface.CallHook("OnStructureDemolish", this, msg.player, true) == null)
 		{
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockDemolished(msg.player, this);
 			Kill(DestroyMode.Gib);
 		}
 	}
@@ -314,45 +342,35 @@ public class BuildingBlock : StabilityEntity
 		return (modelState & (1 << index)) != 0;
 	}
 
-	public ConstructionGrade GetGrade(BuildingGrade.Enum iGrade)
+	public bool CanChangeToGrade(BuildingGrade.Enum iGrade, ulong iSkin, BasePlayer player)
 	{
-		if ((int)grade >= blockDefinition.grades.Length)
-		{
-			Debug.LogWarning(string.Concat("Grade out of range ", base.gameObject, " ", grade, " / ", blockDefinition.grades.Length));
-			return blockDefinition.defaultGrade;
-		}
-		return blockDefinition.grades[(int)iGrade];
-	}
-
-	public bool CanChangeToGrade(BuildingGrade.Enum iGrade, BasePlayer player)
-	{
-		object obj = Interface.CallHook("CanChangeGrade", player, this, iGrade);
+		object obj = Interface.CallHook("CanChangeGrade", player, this, iGrade, iSkin);
 		if (obj is bool)
 		{
 			return (bool)obj;
 		}
-		if (HasUpgradePrivilege(iGrade, player))
+		if (HasUpgradePrivilege(iGrade, iSkin, player))
 		{
 			return !IsUpgradeBlocked();
 		}
 		return false;
 	}
 
-	public bool HasUpgradePrivilege(BuildingGrade.Enum iGrade, BasePlayer player)
+	public bool HasUpgradePrivilege(BuildingGrade.Enum iGrade, ulong iSkin, BasePlayer player)
 	{
-		if (iGrade == grade)
-		{
-			return false;
-		}
-		if ((int)iGrade >= blockDefinition.grades.Length)
-		{
-			return false;
-		}
-		if (iGrade < BuildingGrade.Enum.Twigs)
-		{
-			return false;
-		}
 		if (iGrade < grade)
+		{
+			return false;
+		}
+		if (iGrade == grade && iSkin == skinID)
+		{
+			return false;
+		}
+		if (iGrade <= BuildingGrade.Enum.None)
+		{
+			return false;
+		}
+		if (iGrade >= BuildingGrade.Enum.Count)
 		{
 			return false;
 		}
@@ -369,14 +387,14 @@ public class BuildingBlock : StabilityEntity
 		return DeployVolume.Check(base.transform.position, base.transform.rotation, volumes, ~(1 << base.gameObject.layer));
 	}
 
-	public bool CanAffordUpgrade(BuildingGrade.Enum iGrade, BasePlayer player)
+	public bool CanAffordUpgrade(BuildingGrade.Enum iGrade, ulong iSkin, BasePlayer player)
 	{
-		object obj = Interface.CallHook("CanAffordUpgrade", player, this, iGrade);
+		object obj = Interface.CallHook("CanAffordUpgrade", player, this, iGrade, iSkin);
 		if (obj is bool)
 		{
 			return (bool)obj;
 		}
-		foreach (ItemAmount item in GetGrade(iGrade).costToBuild)
+		foreach (ItemAmount item in blockDefinition.GetGrade(iGrade, iSkin).CostToBuild(grade))
 		{
 			if ((float)player.inventory.GetAmount(item.itemid) < item.amount)
 			{
@@ -386,14 +404,14 @@ public class BuildingBlock : StabilityEntity
 		return true;
 	}
 
-	public void SetGrade(BuildingGrade.Enum iGradeID)
+	public void SetGrade(BuildingGrade.Enum iGrade)
 	{
-		if (blockDefinition.grades == null || (int)iGradeID >= blockDefinition.grades.Length)
+		if (blockDefinition.grades == null || iGrade <= BuildingGrade.Enum.None || iGrade >= BuildingGrade.Enum.Count)
 		{
 			Debug.LogError("Tried to set to undefined grade! " + blockDefinition.fullName, base.gameObject);
 			return;
 		}
-		grade = iGradeID;
+		grade = iGrade;
 		grade = currentGrade.gradeBase.type;
 		UpdateGrade();
 	}
@@ -403,6 +421,18 @@ public class BuildingBlock : StabilityEntity
 		baseProtection = currentGrade.gradeBase.damageProtecton;
 	}
 
+	protected override void OnSkinChanged(ulong oldSkinID, ulong newSkinID)
+	{
+		if (oldSkinID != newSkinID)
+		{
+			skinID = newSkinID;
+		}
+	}
+
+	protected override void OnSkinPreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+	}
+
 	public void SetHealthToMax()
 	{
 		base.health = MaxHealth();
@@ -410,37 +440,76 @@ public class BuildingBlock : StabilityEntity
 
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	public void DoUpgradeToGrade(RPCMessage msg)
+	public void DoUpgradeToGrade_Delayed(RPCMessage msg)
 	{
-		if (msg.player.CanInteract())
+		if (!msg.player.CanInteract())
 		{
-			BuildingGrade.Enum @enum = (BuildingGrade.Enum)msg.read.Int32();
-			ConstructionGrade constructionGrade = GetGrade(@enum);
-			if (!(constructionGrade == null) && CanChangeToGrade(@enum, msg.player) && CanAffordUpgrade(@enum, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum) == null && !(base.SecondsSinceAttacked < 30f))
+			return;
+		}
+		BuildingGrade.Enum @enum = (BuildingGrade.Enum)msg.read.Int32();
+		ulong num = msg.read.UInt64();
+		ConstructionGrade constructionGrade = blockDefinition.GetGrade(@enum, num);
+		if (!(constructionGrade == null) && CanChangeToGrade(@enum, num, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum, num) == null && CanAffordUpgrade(@enum, num, msg.player) && !(base.SecondsSinceAttacked < 30f) && (num == 0L || msg.player.blueprints.steamInventory.HasItem((int)num)))
+		{
+			PayForUpgrade(constructionGrade, msg.player);
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockUpgraded(msg.player, this, @enum);
+			if (msg.player != null)
 			{
-				PayForUpgrade(constructionGrade, msg.player);
-				ChangeGrade(@enum, playEffect: true);
+				playerCustomColourToApply = msg.player.LastBlockColourChangeId;
 			}
+			ClientRPC(null, "DoUpgradeEffect", (int)@enum, num);
+			OnSkinChanged(skinID, num);
+			ChangeGrade(@enum, playEffect: true);
 		}
 	}
 
-	public void ChangeGrade(BuildingGrade.Enum targetGrade, bool playEffect = false)
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
+	public void DoUpgradeToGrade(RPCMessage msg)
 	{
-		if (grade != targetGrade)
+		if (!msg.player.CanInteract())
 		{
-			SetGrade(targetGrade);
+			return;
+		}
+		BuildingGrade.Enum @enum = (BuildingGrade.Enum)msg.read.Int32();
+		ulong num = msg.read.UInt64();
+		ConstructionGrade constructionGrade = blockDefinition.GetGrade(@enum, num);
+		if (!(constructionGrade == null) && CanChangeToGrade(@enum, num, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum, num) == null && CanAffordUpgrade(@enum, num, msg.player) && !(base.SecondsSinceAttacked < 30f) && (num == 0L || msg.player.blueprints.steamInventory.HasItem((int)num)))
+		{
+			PayForUpgrade(constructionGrade, msg.player);
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockUpgraded(msg.player, this, @enum);
+			if (msg.player != null)
+			{
+				playerCustomColourToApply = msg.player.LastBlockColourChangeId;
+			}
+			ClientRPC(null, "DoUpgradeEffect", (int)@enum, num);
+			OnSkinChanged(skinID, num);
+			ChangeGrade(@enum, playEffect: true);
+		}
+	}
+
+	public void ChangeGradeAndSkin(BuildingGrade.Enum targetGrade, ulong skin, bool playEffect = false, bool updateSkin = true)
+	{
+		OnSkinChanged(skinID, skin);
+		ChangeGrade(targetGrade, playEffect, updateSkin);
+	}
+
+	public void ChangeGrade(BuildingGrade.Enum targetGrade, bool playEffect = false, bool updateSkin = true)
+	{
+		SetGrade(targetGrade);
+		if (grade != lastGrade)
+		{
 			SetHealthToMax();
 			StartBeingRotatable();
-			SendNetworkUpdate();
-			UpdateSkin();
-			ResetUpkeepTime();
-			UpdateSurroundingEntities();
-			BuildingManager.server.GetBuilding(buildingID)?.Dirty();
-			if (playEffect)
-			{
-				Effect.server.Run("assets/bundled/prefabs/fx/build/promote_" + targetGrade.ToString().ToLower() + ".prefab", this, 0u, Vector3.zero, Vector3.zero);
-			}
 		}
+		if (updateSkin)
+		{
+			UpdateSkin();
+		}
+		SendNetworkUpdate();
+		ResetUpkeepTime();
+		UpdateSurroundingEntities();
+		BuildingManager.server.GetBuilding(buildingID)?.Dirty();
 	}
 
 	public void PayForUpgrade(ConstructionGrade g, BasePlayer player)
@@ -450,9 +519,11 @@ public class BuildingBlock : StabilityEntity
 			return;
 		}
 		List<Item> list = new List<Item>();
-		foreach (ItemAmount item in g.costToBuild)
+		foreach (ItemAmount item in g.CostToBuild(grade))
 		{
 			player.inventory.Take(list, item.itemid, (int)item.amount);
+			ItemDefinition itemDefinition = ItemManager.FindItemDefinition(item.itemid);
+			Facepunch.Rust.Analytics.Azure.LogResource(Facepunch.Rust.Analytics.Azure.ResourceMode.Consumed, "upgrade_block", itemDefinition.shortname, (int)item.amount, this, null, safezone: false, null, player.userID);
 			player.Command("note.inv " + item.itemid + " " + item.amount * -1f);
 		}
 		foreach (Item item2 in list)
@@ -461,11 +532,21 @@ public class BuildingBlock : StabilityEntity
 		}
 	}
 
+	public void SetCustomColour(uint newColour)
+	{
+		if (newColour != customColour)
+		{
+			customColour = newColour;
+			SendNetworkUpdateImmediate();
+			ClientRPC(null, "RefreshSkin");
+		}
+	}
+
 	public bool NeedsSkinChange()
 	{
-		if (!(currentSkin == null) && !forceSkinRefresh && lastGrade == grade)
+		if (!(currentSkin == null) && !forceSkinRefresh && lastGrade == grade && lastModelState == modelState)
 		{
-			return lastModelState != modelState;
+			return lastSkinID != skinID;
 		}
 		return true;
 	}
@@ -552,22 +633,22 @@ public class BuildingBlock : StabilityEntity
 			ChangeSkin(constructionGrade.skinObject);
 			return;
 		}
-		ConstructionGrade[] grades = blockDefinition.grades;
-		foreach (ConstructionGrade constructionGrade2 in grades)
+		ConstructionGrade defaultGrade = blockDefinition.defaultGrade;
+		if (defaultGrade.skinObject.isValid)
 		{
-			if (constructionGrade2.skinObject.isValid)
-			{
-				ChangeSkin(constructionGrade2.skinObject);
-				return;
-			}
+			ChangeSkin(defaultGrade.skinObject);
 		}
-		Debug.LogWarning("No skins found for " + base.gameObject);
+		else
+		{
+			Debug.LogWarning("No skins found for " + base.gameObject);
+		}
 	}
 
 	public void ChangeSkin(GameObjectRef prefab)
 	{
-		bool flag = lastGrade != grade;
+		bool flag = lastGrade != grade || lastSkinID != skinID;
 		lastGrade = grade;
+		lastSkinID = skinID;
 		if (flag)
 		{
 			if (currentSkin == null)
@@ -580,6 +661,10 @@ public class BuildingBlock : StabilityEntity
 			}
 			GameObject gameObject = base.gameManager.CreatePrefab(prefab.resourcePath, base.transform);
 			currentSkin = gameObject.GetComponent<ConstructionSkin>();
+			if (currentSkin != null && base.isServer && !Rust.Application.isLoading)
+			{
+				customColour = currentSkin.GetStartingDetailColour(playerCustomColourToApply);
+			}
 			Model component = currentSkin.GetComponent<Model>();
 			SetModel(component);
 			Assert.IsTrue(model == component, "Didn't manage to set model successfully!");
@@ -590,7 +675,9 @@ public class BuildingBlock : StabilityEntity
 		}
 		bool flag2 = lastModelState != modelState;
 		lastModelState = modelState;
-		if (flag || flag2 || forceSkinRefresh)
+		bool flag3 = lastCustomColour != customColour;
+		lastCustomColour = customColour;
+		if (flag || flag2 || forceSkinRefresh || flag3)
 		{
 			currentSkin.Refresh(this);
 			if (base.isServer && flag2)
@@ -646,7 +733,7 @@ public class BuildingBlock : StabilityEntity
 
 	public override List<ItemAmount> BuildCost()
 	{
-		return currentGrade.costToBuild;
+		return currentGrade.CostToBuild();
 	}
 
 	public override void OnHealthChanged(float oldvalue, float newvalue)
@@ -704,8 +791,8 @@ public class BuildingBlock : StabilityEntity
 		return !player.IsBuildingBlocked(base.transform.position, base.transform.rotation, bounds);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void DoRotation(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanRotate(msg.player) && blockDefinition.canRotateAfterPlacement && Interface.CallHook("OnStructureRotate", this, msg.player) == null)
@@ -741,11 +828,21 @@ public class BuildingBlock : StabilityEntity
 		info.msg.buildingBlock = Facepunch.Pool.Get<ProtoBuf.BuildingBlock>();
 		info.msg.buildingBlock.model = modelState;
 		info.msg.buildingBlock.grade = (int)grade;
+		if (customColour != 0)
+		{
+			info.msg.simpleUint = Facepunch.Pool.Get<SimpleUInt>();
+			info.msg.simpleUint.value = customColour;
+		}
 	}
 
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
+		customColour = 0u;
+		if (info.msg.simpleUint != null)
+		{
+			customColour = info.msg.simpleUint.value;
+		}
 		if (info.msg.buildingBlock != null)
 		{
 			SetConditionalModel(info.msg.buildingBlock.model);

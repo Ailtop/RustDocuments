@@ -47,8 +47,8 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 
 	public LODLevel[] lodRenderers;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private List<ConditionalObject> conditionals;
 
 	[Header("Trigger Parent")]
@@ -82,7 +82,7 @@ public class BaseVehicleModule : BaseVehicle, IPrefabPreProcess
 
 	public float Mass => mass;
 
-	public uint ID => net.ID;
+	public NetworkableId ID => net.ID;
 
 	public bool IsOnAVehicle => Vehicle != null;
 

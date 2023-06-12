@@ -72,7 +72,7 @@ public class Connection : IConnection
 
 	public void OnMessage(Span<byte> data)
 	{
-		if (App.update && App.queuelimit > 0)
+		if (App.update && App.queuelimit > 0 && data.Length <= App.maxmessagesize)
 		{
 			MemoryBuffer memoryBuffer = new MemoryBuffer(data.Length);
 			data.CopyTo(memoryBuffer);

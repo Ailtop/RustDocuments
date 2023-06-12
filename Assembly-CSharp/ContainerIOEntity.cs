@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntity, LootPanel.IHasLootPanel, IContainerSounds
+public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntity, ILootableEntity, LootPanel.IHasLootPanel, IContainerSounds
 {
 	public ItemDefinition onlyAllowedItem;
 
@@ -47,6 +47,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 	public bool DropFloats => dropFloats;
 
 	public float DestroyLootPercent => 0f;
+
+	public ulong LastLootedBy { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -120,7 +122,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		if (inventory != null && inventory.uid == 0)
+		if (inventory != null && !inventory.uid.IsValid)
 		{
 			inventory.GiveUID();
 		}
@@ -183,8 +185,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 		StorageContainer.DropItems(this, initiator);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -245,9 +247,9 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 		return -1;
 	}
 
-	public virtual uint GetIdealContainer(BasePlayer player, Item item)
+	public virtual ItemContainerId GetIdealContainer(BasePlayer player, Item item, bool altMove)
 	{
-		return 0u;
+		return default(ItemContainerId);
 	}
 
 	public virtual void DropBonusItems(BaseEntity initiator, ItemContainer container)

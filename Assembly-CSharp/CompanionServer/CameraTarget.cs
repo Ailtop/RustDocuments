@@ -4,9 +4,9 @@ namespace CompanionServer;
 
 public readonly struct CameraTarget : IEquatable<CameraTarget>
 {
-	public uint EntityId { get; }
+	public NetworkableId EntityId { get; }
 
-	public CameraTarget(uint entityId)
+	public CameraTarget(NetworkableId entityId)
 	{
 		EntityId = entityId;
 	}
@@ -27,7 +27,7 @@ public readonly struct CameraTarget : IEquatable<CameraTarget>
 
 	public override int GetHashCode()
 	{
-		return (int)EntityId;
+		return EntityId.GetHashCode();
 	}
 
 	public static bool operator ==(CameraTarget left, CameraTarget right)

@@ -38,8 +38,8 @@ public sealed class ScreenSpaceReflections : PostProcessEffectSettings
 		value = 100f
 	};
 
-	[Range(0f, 1f)]
 	[Tooltip("Fades reflections close to the near planes.")]
+	[Range(0f, 1f)]
 	public FloatParameter distanceFade = new FloatParameter
 	{
 		value = 0.5f

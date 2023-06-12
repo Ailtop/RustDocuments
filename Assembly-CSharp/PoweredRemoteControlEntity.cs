@@ -29,11 +29,15 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 
 	public RemoteControllableControls RequiredControls => rcControls;
 
+	public bool CanPing => EntityCanPing;
+
+	protected virtual bool EntityCanPing => false;
+
 	public virtual bool CanAcceptInput => false;
 
-	public int ViewerCount { get; private set; }
+	public int ViewerCount { get; set; }
 
-	public CameraViewerId? ControllingViewerId { get; private set; }
+	public CameraViewerId? ControllingViewerId { get; set; }
 
 	public bool IsBeingControlled
 	{
@@ -123,7 +127,7 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 			int length = rcIdentifier.IndexOf(text);
 			_ = text.Length;
 			string text2 = rcIdentifier.Substring(0, length);
-			text2 += net.ID;
+			text2 += net.ID.ToString();
 			UpdateIdentifier(text2);
 		}
 	}
@@ -282,7 +286,7 @@ public class PoweredRemoteControlEntity : IOEntity, IRemoteControllable
 		base.DestroyShared();
 	}
 
-	protected bool CanChangeID(BasePlayer player)
+	public bool CanChangeID(BasePlayer player)
 	{
 		if (player != null && player.CanBuild())
 		{

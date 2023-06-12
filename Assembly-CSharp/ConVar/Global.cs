@@ -6,6 +6,7 @@ using Facepunch;
 using Facepunch.Extend;
 using Network;
 using Network.Visibility;
+using ProtoBuf;
 using Rust;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -17,20 +18,20 @@ public class Global : ConsoleSystem
 {
 	private static int _developer;
 
-	[ServerVar]
 	[ClientVar(Help = "WARNING: This causes random crashes!")]
+	[ServerVar]
 	public static bool skipAssetWarmup_crashes = false;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static int maxthreads = 8;
 
 	private const int DefaultWarmupConcurrency = 1;
 
 	private const int DefaultPreloadConcurrency = 1;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static int warmupConcurrency = 1;
 
 	[ServerVar]
@@ -43,15 +44,15 @@ public class Global : ConsoleSystem
 
 	private const bool DefaultAsyncWarmupEnabled = false;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool asyncWarmup = false;
 
 	[ClientVar(Saved = true, Help = "Experimental faster loading, requires game restart (0 = off, 1 = partial, 2 = full)")]
 	public static int asyncLoadingPreset = 0;
 
-	[ServerVar(Saved = true)]
 	[ClientVar(Saved = true)]
+	[ServerVar(Saved = true)]
 	public static int perf = 0;
 
 	[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
@@ -136,8 +137,8 @@ public class Global : ConsoleSystem
 		ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void quit(Arg args)
 	{
 		SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -209,8 +210,8 @@ public class Global : ConsoleSystem
 		args.ReplyWith(text);
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void colliders(Arg args)
 	{
 		int num = (from x in UnityEngine.Object.FindObjectsOfType<Collider>()
@@ -223,15 +224,15 @@ public class Global : ConsoleSystem
 		args.ReplyWith(strValue);
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void error(Arg args)
 	{
 		((GameObject)null).transform.position = Vector3.zero;
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void queue(Arg args)
 	{
 		string text = "";
@@ -399,14 +400,14 @@ public class Global : ConsoleSystem
 		{
 			return;
 		}
-		uint uInt = args.GetUInt(0);
-		if (uInt == 0)
+		NetworkableId entityID = ArgEx.GetEntityID(args, 0);
+		if (!entityID.IsValid)
 		{
 			args.ReplyWith("Missing sleeping bag ID");
 		}
 		else if (basePlayer.CanRespawn())
 		{
-			if (SleepingBag.SpawnPlayer(basePlayer, uInt))
+			if (SleepingBag.SpawnPlayer(basePlayer, entityID))
 			{
 				basePlayer.MarkRespawn();
 			}
@@ -427,14 +428,14 @@ public class Global : ConsoleSystem
 		BasePlayer basePlayer = ArgEx.Player(args);
 		if ((bool)basePlayer)
 		{
-			uint uInt = args.GetUInt(0);
-			if (uInt == 0)
+			NetworkableId entityID = ArgEx.GetEntityID(args, 0);
+			if (!entityID.IsValid)
 			{
 				args.ReplyWith("Missing sleeping bag ID");
 			}
 			else
 			{
-				SleepingBag.DestroyBag(basePlayer, uInt);
+				SleepingBag.DestroyBag(basePlayer, entityID);
 			}
 		}
 	}
@@ -599,16 +600,49 @@ public class Global : ConsoleSystem
 	public static void teleport2marker(Arg arg)
 	{
 		BasePlayer basePlayer = ArgEx.Player(arg);
-		if (basePlayer.ServerCurrentMapNote == null)
+		if (basePlayer.State.pointsOfInterest == null || basePlayer.State.pointsOfInterest.Count == 0)
 		{
 			arg.ReplyWith("You don't have a marker set");
 			return;
 		}
-		Vector3 worldPosition = basePlayer.ServerCurrentMapNote.worldPosition;
+		string @string = arg.GetString(0);
+		if (!string.IsNullOrEmpty(@string))
+		{
+			foreach (MapNote item in basePlayer.State.pointsOfInterest)
+			{
+				if (!string.IsNullOrEmpty(item.label) && string.Equals(item.label, @string, StringComparison.InvariantCultureIgnoreCase))
+				{
+					TeleportToMarker(item, basePlayer);
+					return;
+				}
+			}
+		}
+		if (arg.HasArgs())
+		{
+			int @int = arg.GetInt(0);
+			if (@int >= 0 && @int < basePlayer.State.pointsOfInterest.Count)
+			{
+				TeleportToMarker(basePlayer.State.pointsOfInterest[@int], basePlayer);
+				return;
+			}
+		}
+		int debugMapMarkerIndex = basePlayer.DebugMapMarkerIndex;
+		debugMapMarkerIndex++;
+		if (debugMapMarkerIndex >= basePlayer.State.pointsOfInterest.Count)
+		{
+			debugMapMarkerIndex = 0;
+		}
+		TeleportToMarker(basePlayer.State.pointsOfInterest[debugMapMarkerIndex], basePlayer);
+		basePlayer.DebugMapMarkerIndex = debugMapMarkerIndex;
+	}
+
+	private static void TeleportToMarker(MapNote marker, BasePlayer player)
+	{
+		Vector3 worldPosition = marker.worldPosition;
 		float height = TerrainMeta.HeightMap.GetHeight(worldPosition);
 		float height2 = TerrainMeta.WaterMap.GetHeight(worldPosition);
 		worldPosition.y = Mathf.Max(height, height2);
-		basePlayer.Teleport(worldPosition);
+		player.Teleport(worldPosition);
 	}
 
 	[ServerVar]
@@ -634,22 +668,22 @@ public class Global : ConsoleSystem
 		GC.unload();
 	}
 
-	[ServerVar(ServerUser = true)]
 	[ClientVar]
+	[ServerVar(ServerUser = true)]
 	public static void version(Arg arg)
 	{
 		arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void sysinfo(Arg arg)
 	{
 		arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void sysuid(Arg arg)
 	{
 		arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);

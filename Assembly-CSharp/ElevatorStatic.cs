@@ -81,11 +81,11 @@ public class ElevatorStatic : Elevator
 	{
 		if (ownerElevator != null)
 		{
-			ownerElevator.RequestMoveLiftTo(base.Floor, out var _);
+			ownerElevator.RequestMoveLiftTo(base.Floor, out var _, this);
 		}
 		else if (base.IsTop)
 		{
-			RequestMoveLiftTo(base.Floor, out var _);
+			RequestMoveLiftTo(base.Floor, out var _, this);
 		}
 	}
 
@@ -102,6 +102,19 @@ public class ElevatorStatic : Elevator
 		return null;
 	}
 
+	protected override void OpenDoorsAtFloor(int floor)
+	{
+		base.OpenDoorsAtFloor(floor);
+		if (floor == floorPositions.Count)
+		{
+			OpenLiftDoors();
+		}
+		else
+		{
+			floorPositions[floor].OpenLiftDoors();
+		}
+	}
+
 	public override void OnMoveBegin()
 	{
 		base.OnMoveBegin();
@@ -110,6 +123,7 @@ public class ElevatorStatic : Elevator
 		{
 			elevatorStatic.OnLiftLeavingFloor();
 		}
+		NotifyLiftEntityDoorsOpen(state: false);
 	}
 
 	public void OnLiftLeavingFloor()
@@ -129,11 +143,12 @@ public class ElevatorStatic : Elevator
 		{
 			elevatorStatic.OnLiftArrivedAtFloor();
 		}
+		NotifyLiftEntityDoorsOpen(state: true);
 	}
 
-	public override void OnLiftCalledWhenAtTargetFloor()
+	protected override void OpenLiftDoors()
 	{
-		base.OnLiftCalledWhenAtTargetFloor();
+		base.OpenLiftDoors();
 		OnLiftArrivedAtFloor();
 	}
 

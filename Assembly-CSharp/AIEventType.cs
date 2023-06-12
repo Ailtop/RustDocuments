@@ -25,5 +25,6 @@ public enum AIEventType
 	OnPositionMemorySet = 22,
 	AggressionTimer = 23,
 	Reloading = 24,
-	InRangeOfHome = 25
+	InRangeOfHome = 25,
+	IsBlinded = 26
 }

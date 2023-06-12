@@ -56,7 +56,7 @@ public sealed class ItemContainer
 
 	public int capacity = 2;
 
-	public uint uid;
+	public ItemContainerId uid;
 
 	public bool dirty;
 
@@ -186,7 +186,7 @@ public sealed class ItemContainer
 	{
 		parent = parentItem;
 		capacity = iMaxCapacity;
-		uid = 0u;
+		uid = default(ItemContainerId);
 		isServer = true;
 		if (allowedContents == (ContentsType)0)
 		{
@@ -197,8 +197,8 @@ public sealed class ItemContainer
 
 	public void GiveUID()
 	{
-		Assert.IsTrue(uid == 0, "Calling GiveUID - but already has a uid!");
-		uid = Net.sv.TakeUID();
+		Assert.IsTrue(!uid.IsValid, "Calling GiveUID - but already has a uid!");
+		uid = new ItemContainerId(Net.sv.TakeUID());
 	}
 
 	public void MarkDirty()
@@ -298,7 +298,7 @@ public sealed class ItemContainer
 		}
 	}
 
-	public Item FindItemByUID(uint iUID)
+	public Item FindItemByUID(ItemId iUID)
 	{
 		for (int i = 0; i < itemList.Count; i++)
 		{
@@ -426,6 +426,31 @@ public sealed class ItemContainer
 		return null;
 	}
 
+	public Item GetNonFullStackWithinRange(Item def, Vector2i range)
+	{
+		int count = itemList.Count;
+		for (int i = 0; i < count; i++)
+		{
+			if (itemList[i].amount >= itemList[i].info.stackable || itemList[i].position < range.x || itemList[i].position > range.y)
+			{
+				continue;
+			}
+			if (def.IsBlueprint())
+			{
+				if (itemList[i].blueprintTarget != def.blueprintTarget)
+				{
+					continue;
+				}
+			}
+			else if (itemList[i].info != def.info)
+			{
+				continue;
+			}
+			return itemList[i];
+		}
+		return null;
+	}
+
 	public bool FindPosition(Item item)
 	{
 		int position = item.position;
@@ -490,8 +515,8 @@ public sealed class ItemContainer
 		onItemAddedRemoved = null;
 		if (Net.sv != null)
 		{
-			Net.sv.ReturnUID(uid);
-			uid = 0u;
+			Net.sv.ReturnUID(uid.Value);
+			uid = default(ItemContainerId);
 		}
 		List<Item> obj = Pool.GetList<Item>();
 		foreach (Item item in itemList)
@@ -548,9 +573,9 @@ public sealed class ItemContainer
 		return null;
 	}
 
-	public Item FindBySubEntityID(uint subEntityID)
+	public Item FindBySubEntityID(NetworkableId subEntityID)
 	{
-		if (subEntityID == 0)
+		if (!subEntityID.IsValid)
 		{
 			return null;
 		}
@@ -805,7 +830,7 @@ public sealed class ItemContainer
 					num += slot.amount;
 				}
 			}
-			else if (slot.info == item.info || slot.info.isRedirectOf == item.info)
+			else if (slot.info == item.info || slot.info.isRedirectOf == item.info || item.info.isRedirectOf == slot.info)
 			{
 				num += slot.amount;
 			}
@@ -908,7 +933,7 @@ public sealed class ItemContainer
 		return num;
 	}
 
-	public ItemContainer FindContainer(uint id)
+	public ItemContainer FindContainer(ItemContainerId id)
 	{
 		if (id == uid)
 		{

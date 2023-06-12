@@ -677,12 +677,11 @@ public static class RuntimeUtilities
 				try
 				{
 					result = t.GetTypes();
-					return result;
 				}
 				catch
 				{
-					return result;
 				}
+				return result;
 			});
 		}
 		return m_AssemblyTypes;

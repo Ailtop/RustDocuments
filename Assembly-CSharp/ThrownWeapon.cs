@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using Rust;
@@ -151,6 +152,7 @@ public class ThrownWeapon : AttackEntity
 		TimedExplosive timedExplosive = baseEntity as TimedExplosive;
 		if (timedExplosive != null)
 		{
+			Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(ownerPlayer, baseEntity);
 			float num3 = 0f;
 			foreach (DamageTypeEntry damageType in timedExplosive.damageTypes)
 			{
@@ -191,8 +193,8 @@ public class ThrownWeapon : AttackEntity
 		return Mathf.Sqrt(0.5f * y3 * magnitude * magnitude / (magnitude2 * (magnitude2 * y - y2 * magnitude)));
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoThrow(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())
@@ -273,8 +275,8 @@ public class ThrownWeapon : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoDrop(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown() || (!canThrowUnderwater && msg.player.IsHeadUnderwater()))
@@ -305,9 +307,10 @@ public class ThrownWeapon : AttackEntity
 			if ((bool)entity && entity is StabilityEntity && baseEntity is TimedExplosive)
 			{
 				entity = entity.ToServer<BaseEntity>();
-				TimedExplosive obj = baseEntity as TimedExplosive;
-				obj.onlyDamageParent = true;
-				obj.DoStick(point, normal, entity, collider);
+				TimedExplosive timedExplosive = baseEntity as TimedExplosive;
+				timedExplosive.onlyDamageParent = true;
+				timedExplosive.DoStick(point, normal, entity, collider);
+				Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(msg.player, timedExplosive);
 			}
 			else
 			{

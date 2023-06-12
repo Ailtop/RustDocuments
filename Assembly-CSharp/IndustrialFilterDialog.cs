@@ -37,4 +37,8 @@ public class IndustrialFilterDialog : UIDialog
 	public Transform BufferTransform;
 
 	public RustButton PasteButton;
+
+	public GameObject[] RegularCopyPasteButtons;
+
+	public GameObject[] JsonCopyPasteButtons;
 }

@@ -91,6 +91,10 @@ public class VehicleSpawner : BaseEntity
 		{
 			Analytics.Server.VehiclePurchased(component.ShortPrefabName);
 		}
+		if (newOwner != null)
+		{
+			Analytics.Azure.OnVehiclePurchased(newOwner, baseEntity);
+		}
 		return component;
 	}
 

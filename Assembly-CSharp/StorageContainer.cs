@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEntity, LootPanel.IHasLootPanel, IContainerSounds, PlayerInventory.ICanMoveFrom
+public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEntity, ILootableEntity, LootPanel.IHasLootPanel, IContainerSounds, PlayerInventory.ICanMoveFrom
 {
 	[Header("Storage Container")]
 	public static readonly Translate.Phrase LockedMessage = new Translate.Phrase("storage.locked", "Can't loot right now");
@@ -69,6 +69,8 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 	public bool DropFloats => dropFloats;
 
 	public float DestroyLootPercent => dropLootDestroyPercent;
+
+	public ulong LastLootedBy { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -259,7 +261,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		if (inventory != null && inventory.uid == 0)
+		if (inventory != null && !inventory.uid.IsValid)
 		{
 			inventory.GiveUID();
 		}
@@ -411,7 +413,7 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 		{
 			return;
 		}
-		if (containerEntity.ShouldDropItemsIndividually() || itemContainer.itemList.Count == 1)
+		if (containerEntity.ShouldDropItemsIndividually() || (itemContainer.itemList.Count == 1 && !containerEntity.DropFloats))
 		{
 			if (initiator != null)
 			{
@@ -467,9 +469,9 @@ public class StorageContainer : DecayEntity, IItemContainerEntity, IIdealSlotEnt
 		return -1;
 	}
 
-	public virtual uint GetIdealContainer(BasePlayer player, Item item)
+	public virtual ItemContainerId GetIdealContainer(BasePlayer player, Item item, bool altMove)
 	{
-		return 0u;
+		return default(ItemContainerId);
 	}
 
 	public override bool HasSlot(Slot slot)

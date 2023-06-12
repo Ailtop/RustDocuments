@@ -10,4 +10,6 @@ public class KeyBindUI : MonoBehaviour
 	public Button btnB;
 
 	public string bindString;
+
+	public static bool IsBinding { get; private set; }
 }

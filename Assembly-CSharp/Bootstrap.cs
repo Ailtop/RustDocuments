@@ -144,14 +144,18 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		BenchmarkTimer timer = BenchmarkTimer.New("bootstrap");
 		if (!UnityEngine.Application.isEditor)
 		{
-			ExceptionReporter.InitializeFromUrl("https://83df169465e84da091c1a3cd2fbffeee:3671b903f9a840ecb68411cf946ab9b6@sentry.io/51080");
-			ExceptionReporter.Disabled = !Facepunch.Utility.CommandLine.Full.Contains("-official") && !Facepunch.Utility.CommandLine.Full.Contains("-server.official") && !Facepunch.Utility.CommandLine.Full.Contains("+official") && !Facepunch.Utility.CommandLine.Full.Contains("+server.official");
 			BuildInfo current = BuildInfo.Current;
-			if (current.Scm.Branch != null && current.Scm.Branch.StartsWith("main"))
+			if ((current.Scm.Branch == null || !(current.Scm.Branch == "experimental/release")) && !(current.Scm.Branch == "release"))
 			{
 				ExceptionReporter.InitializeFromUrl("https://0654eb77d1e04d6babad83201b6b6b95:d2098f1d15834cae90501548bd5dbd0d@sentry.io/1836389");
-				ExceptionReporter.Disabled = false;
 			}
+			else
+			{
+				ExceptionReporter.InitializeFromUrl("https://83df169465e84da091c1a3cd2fbffeee:3671b903f9a840ecb68411cf946ab9b6@sentry.io/51080");
+			}
+			bool num = Facepunch.Utility.CommandLine.Full.Contains("-official") || Facepunch.Utility.CommandLine.Full.Contains("-server.official") || Facepunch.Utility.CommandLine.Full.Contains("+official") || Facepunch.Utility.CommandLine.Full.Contains("+server.official");
+			bool flag = Facepunch.Utility.CommandLine.Full.Contains("-stats") || Facepunch.Utility.CommandLine.Full.Contains("-server.stats") || Facepunch.Utility.CommandLine.Full.Contains("+stats") || Facepunch.Utility.CommandLine.Full.Contains("+server.stats");
+			ExceptionReporter.Disabled = !(num && flag);
 		}
 		if (AssetBundleBackend.Enabled)
 		{

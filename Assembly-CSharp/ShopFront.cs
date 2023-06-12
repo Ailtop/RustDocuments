@@ -400,6 +400,6 @@ public class ShopFront : StorageContainer
 
 	public void UpdatePlayers()
 	{
-		ClientRPC(null, "CLIENT_ReceivePlayers", (!(vendorPlayer == null)) ? vendorPlayer.net.ID : 0u, (!(customerPlayer == null)) ? customerPlayer.net.ID : 0u);
+		ClientRPC(null, "CLIENT_ReceivePlayers", (vendorPlayer == null) ? default(NetworkableId) : vendorPlayer.net.ID, (customerPlayer == null) ? default(NetworkableId) : customerPlayer.net.ID);
 	}
 }

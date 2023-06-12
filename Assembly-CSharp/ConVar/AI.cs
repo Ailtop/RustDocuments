@@ -256,6 +256,11 @@ public class AI : ConsoleSystem
 		{
 			array[i].Kill();
 		}
+		TunnelDweller[] array2 = BaseEntity.Util.FindAll<TunnelDweller>();
+		for (int i = 0; i < array2.Length; i++)
+		{
+			array2[i].Kill();
+		}
 	}
 
 	[ServerVar]

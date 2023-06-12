@@ -444,8 +444,8 @@ public class IOEntity : DecayEntity
 	}
 
 	[RPC_Server.CallsPerSecond(10uL)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(6f)]
+	[RPC_Server]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -948,7 +948,7 @@ public class IOEntity : DecayEntity
 			iOConnection.connectedToSlot = iOSlot.connectedToSlot;
 			iOConnection.niceName = iOSlot.niceName;
 			iOConnection.type = (int)iOSlot.type;
-			iOConnection.inUse = iOConnection.connectedID != 0;
+			iOConnection.inUse = iOConnection.connectedID.IsValid;
 			iOConnection.colour = (int)iOSlot.wireColour;
 			iOConnection.lineThickness = iOSlot.lineThickness;
 			info.msg.ioEntity.inputs.Add(iOConnection);
@@ -961,7 +961,7 @@ public class IOEntity : DecayEntity
 			iOConnection2.connectedToSlot = iOSlot2.connectedToSlot;
 			iOConnection2.niceName = iOSlot2.niceName;
 			iOConnection2.type = (int)iOSlot2.type;
-			iOConnection2.inUse = iOConnection2.connectedID != 0;
+			iOConnection2.inUse = iOConnection2.connectedID.IsValid;
 			iOConnection2.colour = (int)iOSlot2.wireColour;
 			iOConnection2.worldSpaceRotation = iOSlot2.worldSpaceLineEndRotation;
 			iOConnection2.lineThickness = iOSlot2.lineThickness;
@@ -1157,7 +1157,7 @@ public class IOEntity : DecayEntity
 					outputs[k] = new IOSlot();
 				}
 				ProtoBuf.IOEntity.IOConnection iOConnection2 = info.msg.ioEntity.outputs[k];
-				if (iOConnection2.linePointList == null || iOConnection2.linePointList.Count == 0 || iOConnection2.connectedID == 0)
+				if (iOConnection2.linePointList == null || iOConnection2.linePointList.Count == 0 || !iOConnection2.connectedID.IsValid)
 				{
 					outputs[k].Clear();
 				}

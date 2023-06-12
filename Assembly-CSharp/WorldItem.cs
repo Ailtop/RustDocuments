@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -116,6 +117,7 @@ public class WorldItem : BaseEntity
 		{
 			ClientRPC(null, "PickupSound");
 			Item item = this.item;
+			Facepunch.Rust.Analytics.Azure.OnItemPickup(msg.player, this);
 			RemoveItem();
 			msg.player.GiveItem(item, GiveItemReason.PickedUp);
 			msg.player.SignalBroadcast(Signal.Gesture, "pickup_item");
@@ -227,7 +229,7 @@ public class WorldItem : BaseEntity
 		{
 			if (base.isServer)
 			{
-				_name = string.Format("{1}[{0}] {2}", (net != null) ? net.ID : 0u, base.ShortPrefabName, ObjectEx.IsUnityNull(this) ? "NULL" : base.name);
+				_name = string.Format("{1}[{0}] {2}", net?.ID ?? default(NetworkableId), base.ShortPrefabName, ObjectEx.IsUnityNull(this) ? "NULL" : base.name);
 			}
 			else
 			{

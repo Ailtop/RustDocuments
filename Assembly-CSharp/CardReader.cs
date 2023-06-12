@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -118,15 +119,15 @@ public class CardReader : IOEntity
 		Effect.server.Run(accessGrantedEffect.resourcePath, audioPosition.position, Vector3.up);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ServerCardSwiped(RPCMessage msg)
 	{
-		if (!IsPowered() || Vector3Ex.Distance2D(msg.player.transform.position, base.transform.position) > 1f || IsInvoking(GrantCard) || IsInvoking(FailCard))
+		if (!IsPowered() || Vector3Ex.Distance2D(msg.player.transform.position, base.transform.position) > 1f || IsInvoking(GrantCard) || IsInvoking(FailCard) || HasFlag(Flags.On))
 		{
 			return;
 		}
-		uint uid = msg.read.UInt32();
+		NetworkableId uid = msg.read.EntityID();
 		Keycard keycard = BaseNetworkable.serverEntities.Find(uid) as Keycard;
 		Effect.server.Run(swipeEffect.resourcePath, audioPosition.position, Vector3.up, msg.player.net.connection);
 		if (keycard != null && Interface.CallHook("OnCardSwipe", this, keycard, msg.player) == null)
@@ -134,6 +135,7 @@ public class CardReader : IOEntity
 			Item item = keycard.GetItem();
 			if (item != null && keycard.accessLevel == accessLevel && item.conditionNormalized > 0f)
 			{
+				Facepunch.Rust.Analytics.Azure.OnKeycardSwiped(msg.player, this);
 				Invoke(GrantCard, 0.5f);
 				item.LoseCondition(1f);
 			}

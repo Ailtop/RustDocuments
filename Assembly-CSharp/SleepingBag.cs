@@ -5,14 +5,49 @@ using System.Linq;
 using System.Text;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
+using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public class SleepingBag : DecayEntity
 {
+	public enum BagAssignMode
+	{
+		Allowed = 0,
+		TeamAndFriendlyContacts = 1,
+		None = 2,
+		LAST = 2
+	}
+
+	public enum BagResultType
+	{
+		Ok = 0,
+		TooManyBags = 1,
+		BagBlocked = 2
+	}
+
+	public struct CanAssignBedResult
+	{
+		public BagResultType Result;
+
+		public int Count;
+
+		public int Max;
+	}
+
+	public struct CanBuildResult
+	{
+		public bool Result;
+
+		public Translate.Phrase Phrase;
+
+		public string[] Arguments;
+	}
+
 	public enum SleepingBagResetReason
 	{
 		Respawned = 0,
@@ -53,9 +88,15 @@ public class SleepingBag : DecayEntity
 
 	public Translate.Phrase cannotMakeBedPhrase = new Translate.Phrase("cannot_make_bed_limit", "You cannot take ownership of the bed, you are at your bag limit");
 
+	public Translate.Phrase bedAssigningBlocked = new Translate.Phrase("bag_assign_blocked", "That player has blocked bag assignment");
+
 	public float unlockTime;
 
 	public static List<SleepingBag> sleepingBags = new List<SleepingBag>();
+
+	private bool notifyPlayerOnServerInit;
+
+	private static Dictionary<ulong, List<SleepingBag>> bagsPerPlayer = new Dictionary<ulong, List<SleepingBag>>();
 
 	public virtual float unlockSeconds
 	{
@@ -76,7 +117,7 @@ public class SleepingBag : DecayEntity
 			if (rpc == 3057055788u && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AssignToFriend "));
 				}
@@ -112,7 +153,7 @@ public class SleepingBag : DecayEntity
 			if (rpc == 1335950295 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Rename "));
 				}
@@ -148,7 +189,7 @@ public class SleepingBag : DecayEntity
 			if (rpc == 42669546 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_MakeBed "));
 				}
@@ -184,7 +225,7 @@ public class SleepingBag : DecayEntity
 			if (rpc == 393812086 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (Global.developer > 2)
+				if (ConVar.Global.developer > 2)
 				{
 					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_MakePublic "));
 				}
@@ -249,17 +290,106 @@ public class SleepingBag : DecayEntity
 		return false;
 	}
 
+	public static CanAssignBedResult? CanAssignBed(BasePlayer player, SleepingBag newBag, ulong targetPlayer, int countOffset = 1, int maxOffset = 0, SleepingBag ignore = null)
+	{
+		int num = ConVar.Server.max_sleeping_bags + maxOffset;
+		if (num < 0)
+		{
+			return null;
+		}
+		int num2 = countOffset;
+		BasePlayer basePlayer = BasePlayer.FindByID(targetPlayer);
+		CanAssignBedResult value;
+		if (player != basePlayer && basePlayer != null)
+		{
+			switch ((BagAssignMode)Mathf.Clamp(basePlayer.GetInfoInt("client.bagassignmode", 0), 0, 2))
+			{
+			case BagAssignMode.None:
+				value = default(CanAssignBedResult);
+				value.Result = BagResultType.BagBlocked;
+				return value;
+			case BagAssignMode.TeamAndFriendlyContacts:
+			{
+				bool flag = false;
+				if (basePlayer.Team != null && basePlayer.Team.members.Contains(player.userID))
+				{
+					flag = true;
+				}
+				else
+				{
+					RelationshipManager.PlayerRelationshipInfo relations = RelationshipManager.ServerInstance.GetRelationships(targetPlayer).GetRelations(player.userID);
+					if (relations != null && relations.type == RelationshipManager.RelationshipType.Friend)
+					{
+						flag = true;
+					}
+				}
+				if (!flag)
+				{
+					value = default(CanAssignBedResult);
+					value.Result = BagResultType.BagBlocked;
+					return value;
+				}
+				break;
+			}
+			}
+		}
+		foreach (SleepingBag sleepingBag in sleepingBags)
+		{
+			if (sleepingBag != ignore && sleepingBag.deployerUserID == targetPlayer)
+			{
+				num2++;
+				if (num2 > num)
+				{
+					value = default(CanAssignBedResult);
+					value.Count = num2;
+					value.Max = num;
+					value.Result = BagResultType.TooManyBags;
+					return value;
+				}
+			}
+		}
+		value = default(CanAssignBedResult);
+		value.Count = num2;
+		value.Max = num;
+		value.Result = BagResultType.Ok;
+		return value;
+	}
+
+	public static CanBuildResult? CanBuildBed(BasePlayer player, Construction construction)
+	{
+		if (GameManager.server.FindPrefab(construction.prefabID)?.GetComponent<BaseEntity>() is SleepingBag)
+		{
+			CanAssignBedResult? canAssignBedResult = CanAssignBed(player, null, player.userID);
+			if (canAssignBedResult.HasValue)
+			{
+				CanBuildResult value;
+				if (canAssignBedResult.Value.Result == BagResultType.Ok)
+				{
+					value = default(CanBuildResult);
+					value.Result = true;
+					value.Phrase = bagLimitPhrase;
+					value.Arguments = new string[2]
+					{
+						canAssignBedResult.Value.Count.ToString(),
+						canAssignBedResult.Value.Max.ToString()
+					};
+					return value;
+				}
+				value = default(CanBuildResult);
+				value.Result = false;
+				value.Phrase = bagLimitReachedPhrase;
+				return value;
+			}
+		}
+		return null;
+	}
+
 	public static SleepingBag[] FindForPlayer(ulong playerID, bool ignoreTimers)
 	{
 		return sleepingBags.Where((SleepingBag x) => x.ValidForPlayer(playerID, ignoreTimers)).ToArray();
 	}
 
-	public static SleepingBag FindForPlayer(ulong playerID, uint sleepingBagID, bool ignoreTimers)
-	{
-		return sleepingBags.FirstOrDefault((SleepingBag x) => x.deployerUserID == playerID && x.net.ID == sleepingBagID && (ignoreTimers || x.unlockTime < UnityEngine.Time.realtimeSinceStartup));
-	}
-
-	public static bool SpawnPlayer(BasePlayer player, uint sleepingBag)
+	public static bool SpawnPlayer(BasePlayer player, NetworkableId sleepingBag)
 	{
 		BasePlayer player2 = player;
 		SleepingBag[] array = FindForPlayer(player2.userID, ignoreTimers: true);
@@ -278,7 +408,7 @@ public class SleepingBag : DecayEntity
 			return false;
 		}
 		sleepingBag2.GetSpawnPos(out var pos, out var rot);
-		player2.RespawnAt(pos, rot);
+		player2.RespawnAt(pos, rot, sleepingBag2);
 		sleepingBag2.PostPlayerSpawn(player2);
 		SleepingBag[] array2 = array;
 		for (int i = 0; i < array2.Length; i++)
@@ -288,14 +418,72 @@ public class SleepingBag : DecayEntity
 		return true;
 	}
 
+	public static void AddBagForPlayer(SleepingBag bag, ulong user, bool networkUpdate = true)
+	{
+		if (user == 0L)
+		{
+			return;
+		}
+		if (!bagsPerPlayer.TryGetValue(user, out var value))
+		{
+			value = new List<SleepingBag>();
+			bagsPerPlayer[user] = value;
+		}
+		if (!value.Contains(bag))
+		{
+			value.Add(bag);
+			if (networkUpdate)
+			{
+				RelationshipManager.FindByID(user)?.SendNetworkUpdate();
+			}
+		}
+	}
+
+	public static void RemoveBagForPlayer(SleepingBag bag, ulong user)
+	{
+		if (user != 0L && bagsPerPlayer.TryGetValue(user, out var value))
+		{
+			if (value.Remove(bag))
+			{
+				RelationshipManager.FindByID(user)?.SendNetworkUpdate();
+			}
+			if (value.Count == 0)
+			{
+				bagsPerPlayer.Remove(user);
+			}
+		}
+	}
+
+	public static void OnBagChangedOwnership(SleepingBag bag, ulong oldUser)
+	{
+		if (bag.deployerUserID != oldUser)
+		{
+			RemoveBagForPlayer(bag, oldUser);
+			AddBagForPlayer(bag, bag.deployerUserID);
+		}
+	}
+
+	public static int GetSleepingBagCount(ulong userId)
+	{
+		if (userId == 0L)
+		{
+			return 0;
+		}
+		if (!bagsPerPlayer.TryGetValue(userId, out var value))
+		{
+			return 0;
+		}
+		return value.Count;
+	}
+
 	public virtual void SetUnlockTime(float newTime)
 	{
 		unlockTime = newTime;
 	}
 
-	public static bool DestroyBag(BasePlayer player, uint sleepingBag)
+	public static bool DestroyBag(BasePlayer player, NetworkableId sleepingBag)
 	{
-		SleepingBag sleepingBag2 = FindForPlayer(player.userID, sleepingBag, ignoreTimers: false);
+		SleepingBag sleepingBag2 = FindForPlayer(player.userID, ignoreTimers: true).FirstOrDefault((SleepingBag x) => x.net.ID == sleepingBag);
 		if (sleepingBag2 == null)
 		{
 			return false;
@@ -304,16 +492,11 @@ public class SleepingBag : DecayEntity
 		{
 			return false;
 		}
-		if (sleepingBag2.canBePublic)
-		{
-			sleepingBag2.SetPublic(isPublic: true);
-			sleepingBag2.deployerUserID = 0uL;
-		}
-		else
-		{
-			sleepingBag2.Kill();
-		}
+		RemoveBagForPlayer(sleepingBag2, sleepingBag2.deployerUserID);
+		sleepingBag2.deployerUserID = 0uL;
+		sleepingBag2.SendNetworkUpdate();
 		player.SendRespawnOptions();
+		Facepunch.Rust.Analytics.Azure.OnBagUnclaimed(player, sleepingBag2);
 		Interface.CallHook("OnSleepingBagDestroyed", sleepingBag2, player);
 		return true;
 	}
@@ -345,6 +528,7 @@ public class SleepingBag : DecayEntity
 			deployerUserID = player.userID;
 			SetBagTimer(this, base.transform.position, SleepingBagResetReason.Placed);
 			SendNetworkUpdate();
+			notifyPlayerOnServerInit = true;
 		}
 	}
 
@@ -398,6 +582,30 @@ public class SleepingBag : DecayEntity
 		if (!sleepingBags.Contains(this))
 		{
 			sleepingBags.Add(this);
+			if (deployerUserID != 0L)
+			{
+				AddBagForPlayer(this, deployerUserID, !Rust.Application.isLoadingSave);
+			}
+		}
+		if (notifyPlayerOnServerInit)
+		{
+			notifyPlayerOnServerInit = false;
+			NotifyPlayer(deployerUserID);
+		}
+	}
+
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		AddBagForPlayer(this, deployerUserID, !Rust.Application.isLoadingSave);
+	}
+
+	private void NotifyPlayer(ulong id)
+	{
+		BasePlayer basePlayer = BasePlayer.FindByID(id);
+		if (basePlayer != null && basePlayer.IsConnected)
+		{
+			basePlayer.SendRespawnOptions();
 		}
 	}
 
@@ -405,6 +613,8 @@ public class SleepingBag : DecayEntity
 	{
 		base.DoServerDestroy();
 		sleepingBags.RemoveAll((SleepingBag x) => x == this);
+		RemoveBagForPlayer(this, deployerUserID);
+		NotifyPlayer(deployerUserID);
 	}
 
 	public override void Save(SaveInfo info)
@@ -415,8 +625,8 @@ public class SleepingBag : DecayEntity
 		info.msg.sleepingBag.deployerID = deployerUserID;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Rename(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -437,6 +647,7 @@ public class SleepingBag : DecayEntity
 			}
 			niceName = text;
 			SendNetworkUpdate();
+			NotifyPlayer(deployerUserID);
 		}
 	}
 
@@ -453,46 +664,42 @@ public class SleepingBag : DecayEntity
 		{
 			return;
 		}
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
-		if (activeGameMode != null)
+		if (ConVar.Server.max_sleeping_bags > 0)
 		{
-			BaseGameMode.CanAssignBedResult? canAssignBedResult = activeGameMode.CanAssignBed(msg.player, this, num, 1, -1);
+			CanAssignBedResult? canAssignBedResult = CanAssignBed(msg.player, this, num);
 			if (canAssignBedResult.HasValue)
 			{
 				BasePlayer basePlayer = RelationshipManager.FindByID(num);
-				if (!canAssignBedResult.Value.Result)
+				if (canAssignBedResult.Value.Result == BagResultType.TooManyBags)
 				{
 					msg.player.ShowToast(GameTip.Styles.Red_Normal, cannotAssignBedPhrase, basePlayer?.displayName ?? "other player");
+				}
+				else if (canAssignBedResult.Value.Result == BagResultType.BagBlocked)
+				{
+					msg.player.ShowToast(GameTip.Styles.Red_Normal, bedAssigningBlocked);
 				}
 				else
 				{
 					basePlayer?.ShowToast(GameTip.Styles.Blue_Long, assignedBagPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
+					msg.player.ShowToast(GameTip.Styles.Blue_Long, bagLimitPhrase, (GetSleepingBagCount(msg.player.userID) - 1).ToString(), canAssignBedResult.Value.Max.ToString());
 				}
-				if (!canAssignBedResult.Value.Result)
+				if (canAssignBedResult.Value.Result != 0)
 				{
 					return;
 				}
 			}
 		}
+		ulong num2 = deployerUserID;
 		deployerUserID = num;
+		NotifyPlayer(num2);
+		NotifyPlayer(deployerUserID);
+		OnBagChangedOwnership(this, num2);
+		Facepunch.Rust.Analytics.Azure.OnSleepingBagAssigned(msg.player, this, num);
 		SendNetworkUpdate();
-		CheckForOnlineAndDead();
 	}
 
-	private void CheckForOnlineAndDead()
-	{
-		if (deployerUserID != 0L)
-		{
-			BasePlayer basePlayer = BasePlayer.FindByID(deployerUserID);
-			if (basePlayer != null && basePlayer.IsConnected && basePlayer.IsDead())
-			{
-				basePlayer.SendRespawnOptions();
-			}
-		}
-	}
-
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public virtual void RPC_MakePublic(RPCMessage msg)
 	{
 		if (!canBePublic || !msg.player.CanInteract() || (deployerUserID != msg.player.userID && !msg.player.CanBuild()))
@@ -507,23 +714,35 @@ public class SleepingBag : DecayEntity
 		SetPublic(flag);
 		if (!IsPublic())
 		{
-			BaseGameMode.CanAssignBedResult? canAssignBedResult = BaseGameMode.GetActiveGameMode(serverside: true)?.CanAssignBed(msg.player, this, msg.player.userID, 1, 0, this);
-			if (canAssignBedResult.HasValue)
+			if (ConVar.Server.max_sleeping_bags > 0)
 			{
-				if (canAssignBedResult.Value.Result)
+				CanAssignBedResult? canAssignBedResult = CanAssignBed(msg.player, this, msg.player.userID, 1, 0, this);
+				if (canAssignBedResult.HasValue)
 				{
-					msg.player.ShowToast(GameTip.Styles.Blue_Long, bagLimitPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
-				}
-				else
-				{
-					msg.player.ShowToast(GameTip.Styles.Blue_Long, cannotMakeBedPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
-				}
-				if (!canAssignBedResult.Value.Result)
-				{
-					return;
+					if (canAssignBedResult.Value.Result == BagResultType.Ok)
+					{
+						msg.player.ShowToast(GameTip.Styles.Blue_Long, bagLimitPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
+					}
+					else
+					{
+						msg.player.ShowToast(GameTip.Styles.Blue_Long, cannotMakeBedPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
+					}
+					if (canAssignBedResult.Value.Result != 0)
+					{
+						return;
+					}
 				}
 			}
+			ulong num = deployerUserID;
 			deployerUserID = msg.player.userID;
+			NotifyPlayer(num);
+			NotifyPlayer(deployerUserID);
+			OnBagChangedOwnership(this, num);
+			Facepunch.Rust.Analytics.Azure.OnSleepingBagAssigned(msg.player, this, deployerUserID = msg.player.userID);
+		}
+		else
+		{
+			Facepunch.Rust.Analytics.Azure.OnSleepingBagAssigned(msg.player, this, 0uL);
 		}
 		SendNetworkUpdate();
 	}
@@ -536,28 +755,36 @@ public class SleepingBag : DecayEntity
 		{
 			return;
 		}
-		BaseGameMode.CanAssignBedResult? canAssignBedResult = BaseGameMode.GetActiveGameMode(serverside: true)?.CanAssignBed(msg.player, this, msg.player.userID, 1, 0, this);
-		if (canAssignBedResult.HasValue)
+		if (ConVar.Server.max_sleeping_bags > 0)
 		{
-			if (!canAssignBedResult.Value.Result)
+			CanAssignBedResult? canAssignBedResult = CanAssignBed(msg.player, this, msg.player.userID, 1, 0, this);
+			if (canAssignBedResult.HasValue)
 			{
-				msg.player.ShowToast(GameTip.Styles.Red_Normal, cannotMakeBedPhrase);
-			}
-			else
-			{
-				msg.player.ShowToast(GameTip.Styles.Blue_Long, bagLimitPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
-			}
-			if (!canAssignBedResult.Value.Result)
-			{
-				return;
+				if (canAssignBedResult.Value.Result != 0)
+				{
+					msg.player.ShowToast(GameTip.Styles.Red_Normal, cannotMakeBedPhrase);
+				}
+				else
+				{
+					msg.player.ShowToast(GameTip.Styles.Blue_Long, bagLimitPhrase, canAssignBedResult.Value.Count.ToString(), canAssignBedResult.Value.Max.ToString());
+				}
+				if (canAssignBedResult.Value.Result != 0)
+				{
+					return;
+				}
 			}
 		}
+		ulong num = deployerUserID;
 		deployerUserID = msg.player.userID;
+		NotifyPlayer(num);
+		NotifyPlayer(deployerUserID);
+		OnBagChangedOwnership(this, num);
 		SendNetworkUpdate();
 	}
 
 	protected virtual void PostPlayerSpawn(BasePlayer p)
 	{
+		p.SendRespawnOptions();
 	}
 
 	public virtual bool IsOccupied()

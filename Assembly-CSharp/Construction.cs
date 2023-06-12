@@ -367,6 +367,19 @@ public class Construction : PrefabAttribute
 		}
 	}
 
+	public ConstructionGrade GetGrade(BuildingGrade.Enum iGrade, ulong iSkin)
+	{
+		ConstructionGrade[] array = grades;
+		foreach (ConstructionGrade constructionGrade in array)
+		{
+			if (constructionGrade.gradeBase.type == iGrade && constructionGrade.gradeBase.skin == iSkin)
+			{
+				return constructionGrade;
+			}
+		}
+		return defaultGrade;
+	}
+
 	protected override void AttributeSetup(GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
 		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
@@ -378,20 +391,17 @@ public class Construction : PrefabAttribute
 		allSockets = GetComponentsInChildren<Socket_Base>(includeInactive: true);
 		allProximities = GetComponentsInChildren<BuildingProximity>(includeInactive: true);
 		socketHandle = GetComponentsInChildren<SocketHandle>(includeInactive: true).FirstOrDefault();
-		ConstructionGrade[] components = rootObj.GetComponents<ConstructionGrade>();
-		grades = new ConstructionGrade[5];
-		ConstructionGrade[] array = components;
+		grades = rootObj.GetComponents<ConstructionGrade>();
+		ConstructionGrade[] array = grades;
 		foreach (ConstructionGrade constructionGrade in array)
 		{
-			constructionGrade.construction = this;
-			grades[(int)constructionGrade.gradeBase.type] = constructionGrade;
-		}
-		for (int j = 0; j < grades.Length; j++)
-		{
-			if (!(grades[j] == null))
+			if (!(constructionGrade == null))
 			{
-				defaultGrade = grades[j];
-				break;
+				constructionGrade.construction = this;
+				if (!(defaultGrade != null))
+				{
+					defaultGrade = constructionGrade;
+				}
 			}
 		}
 	}

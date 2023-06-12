@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace UnityStandardAssets.CinematicEffects;
 
-[ImageEffectAllowedInSceneView]
 [ExecuteInEditMode]
 [AddComponentMenu("Image Effects/Cinematic/Tonemapping and Color Grading")]
+[ImageEffectAllowedInSceneView]
 public class TonemappingColorGrading : MonoBehaviour
 {
 	[AttributeUsage(AttributeTargets.Field)]
@@ -57,8 +57,8 @@ public class TonemappingColorGrading : MonoBehaviour
 	{
 		public bool enabled;
 
-		[Min(0f)]
 		[Tooltip("Midpoint Adjustment.")]
+		[Min(0f)]
 		public float middleGrey;
 
 		[Tooltip("The lowest possible exposure value; adjust this value to modify the brightest areas of your level.")]
@@ -67,8 +67,8 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("The highest possible exposure value; adjust this value to modify the darkest areas of your level.")]
 		public float max;
 
-		[Min(0f)]
 		[Tooltip("Speed of linear adaptation. Higher is faster.")]
+		[Min(0f)]
 		public float speed;
 
 		[Tooltip("Displays a luminosity helper in the GameView.")]
@@ -109,8 +109,8 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Tonemapping technique to use. ACES is the recommended one.")]
 		public Tonemapper tonemapper;
 
-		[Min(0f)]
 		[Tooltip("Adjusts the overall exposure of the scene.")]
+		[Min(0f)]
 		public float exposure;
 
 		[Tooltip("Custom tonemapping curve.")]
@@ -162,8 +162,8 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Custom lookup texture (strip format, e.g. 256x16).")]
 		public Texture texture;
 
-		[Range(0f, 1f)]
 		[Tooltip("Blending factor.")]
+		[Range(0f, 1f)]
 		public float contribution;
 
 		public static LUTSettings defaultSettings
@@ -215,17 +215,17 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
 		public float tint;
 
-		[Space]
 		[Range(-0.5f, 0.5f)]
 		[Tooltip("Shift the hue of all colors.")]
+		[Space]
 		public float hue;
 
-		[Range(0f, 2f)]
 		[Tooltip("Pushes the intensity of all colors.")]
+		[Range(0f, 2f)]
 		public float saturation;
 
-		[Range(-1f, 1f)]
 		[Tooltip("Adjusts the saturation so that clipping is minimized as colors approach full saturation.")]
+		[Range(-1f, 1f)]
 		public float vibrance;
 
 		[Range(0f, 10f)]
@@ -333,16 +333,16 @@ public class TonemappingColorGrading : MonoBehaviour
 		[Tooltip("Internal LUT precision. \"Normal\" is 256x16, \"High\" is 1024x32. Prefer \"Normal\" on mobile devices.")]
 		public ColorGradingPrecision precision;
 
-		[Space]
 		[ColorWheelGroup]
+		[Space]
 		public ColorWheelsSettings colorWheels;
 
-		[Space]
 		[IndentedGroup]
+		[Space]
 		public BasicsSettings basics;
 
-		[Space]
 		[ChannelMixer]
+		[Space]
 		public ChannelMixerSettings channelMixer;
 
 		[Space]
@@ -379,16 +379,16 @@ public class TonemappingColorGrading : MonoBehaviour
 		}
 	}
 
-	[SerializeField]
 	[SettingsGroup]
+	[SerializeField]
 	private EyeAdaptationSettings m_EyeAdaptation = EyeAdaptationSettings.defaultSettings;
 
-	[SerializeField]
 	[SettingsGroup]
+	[SerializeField]
 	private TonemappingSettings m_Tonemapping = TonemappingSettings.defaultSettings;
 
-	[SerializeField]
 	[SettingsGroup]
+	[SerializeField]
 	private ColorGradingSettings m_ColorGrading = ColorGradingSettings.defaultSettings;
 
 	[SerializeField]

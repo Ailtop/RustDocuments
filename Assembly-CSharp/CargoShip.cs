@@ -101,9 +101,9 @@ public class CargoShip : BaseEntity
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.simpleUID != null)
+		if (info.msg.simpleUint != null)
 		{
-			layoutChoice = info.msg.simpleUID.uid;
+			layoutChoice = info.msg.simpleUint.value;
 		}
 	}
 
@@ -243,8 +243,8 @@ public class CargoShip : BaseEntity
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
-		info.msg.simpleUID = Pool.Get<SimpleUID>();
-		info.msg.simpleUID.uid = layoutChoice;
+		info.msg.simpleUint = Pool.Get<SimpleUInt>();
+		info.msg.simpleUint.value = layoutChoice;
 	}
 
 	public override void PostServerLoad()

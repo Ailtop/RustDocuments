@@ -77,7 +77,6 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 				{
 					num ^= (item?.GetHashCode() ?? 0) & 0x7FFFFFFF;
 				}
-				return num;
 			}
 			return num;
 		}
@@ -85,7 +84,7 @@ public class ServerBrowserList : BaseMonoBehaviour, VirtualScroll.IDataSource
 
 	public QueryType queryType;
 
-	public static string VersionTag = "v" + 2377;
+	public static string VersionTag = "v" + 2392;
 
 	public ServerKeyvalues[] keyValues = new ServerKeyvalues[0];
 

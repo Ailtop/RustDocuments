@@ -122,46 +122,6 @@ public class WireTool : HeldEntity
 	{
 		using (TimeWarning.New("WireTool.OnRpcMessage"))
 		{
-			if (rpc == 678101026 && player != null)
-			{
-				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
-				if (ConVar.Global.developer > 2)
-				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddLine "));
-				}
-				using (TimeWarning.New("AddLine"))
-				{
-					using (TimeWarning.New("Conditions"))
-					{
-						if (!RPC_Server.FromOwner.Test(678101026u, "AddLine", this, player))
-						{
-							return true;
-						}
-						if (!RPC_Server.IsActiveItem.Test(678101026u, "AddLine", this, player))
-						{
-							return true;
-						}
-					}
-					try
-					{
-						using (TimeWarning.New("Call"))
-						{
-							RPCMessage rPCMessage = default(RPCMessage);
-							rPCMessage.connection = msg.connection;
-							rPCMessage.player = player;
-							rPCMessage.read = msg.read;
-							RPCMessage msg2 = rPCMessage;
-							AddLine(msg2);
-						}
-					}
-					catch (Exception exception)
-					{
-						Debug.LogException(exception);
-						player.Kick("RPC Error in AddLine");
-					}
-				}
-				return true;
-			}
 			if (rpc == 40328523 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -190,13 +150,13 @@ public class WireTool : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg3 = rPCMessage;
-							MakeConnection(msg3);
+							RPCMessage msg2 = rPCMessage;
+							MakeConnection(msg2);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception exception)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(exception);
 						player.Kick("RPC Error in MakeConnection");
 					}
 				}
@@ -230,13 +190,13 @@ public class WireTool : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg4 = rPCMessage;
-							RequestChangeColor(msg4);
+							RPCMessage msg3 = rPCMessage;
+							RequestChangeColor(msg3);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception2)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in RequestChangeColor");
 					}
 				}
@@ -270,13 +230,13 @@ public class WireTool : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg5 = rPCMessage;
-							RequestClear(msg5);
+							RPCMessage msg4 = rPCMessage;
+							RequestClear(msg4);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception3)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in RequestClear");
 					}
 				}
@@ -303,9 +263,9 @@ public class WireTool : HeldEntity
 							SetPlugged(plugged);
 						}
 					}
-					catch (Exception exception5)
+					catch (Exception exception4)
 					{
-						Debug.LogException(exception5);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in SetPlugged");
 					}
 				}
@@ -339,13 +299,13 @@ public class WireTool : HeldEntity
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg6 = rPCMessage;
-							TryClear(msg6);
+							RPCMessage msg5 = rPCMessage;
+							TryClear(msg5);
 						}
 					}
-					catch (Exception exception6)
+					catch (Exception exception5)
 					{
-						Debug.LogException(exception6);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in TryClear");
 					}
 				}
@@ -456,7 +416,7 @@ public class WireTool : HeldEntity
 	public void TryClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		uint uid = msg.read.UInt32();
+		NetworkableId uid = msg.read.EntityID();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
 		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
 		if (!(iOEntity == null) && CanPlayerUseWires(player) && CanModifyEntity(player, iOEntity))
@@ -467,8 +427,8 @@ public class WireTool : HeldEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -476,10 +436,21 @@ public class WireTool : HeldEntity
 		{
 			return;
 		}
-		uint uid = msg.read.UInt32();
 		int num = msg.read.Int32();
-		uint uid2 = msg.read.UInt32();
+		if (num > 18)
+		{
+			return;
+		}
+		List<Vector3> list = new List<Vector3>();
+		for (int i = 0; i < num; i++)
+		{
+			Vector3 item = msg.read.Vector3();
+			list.Add(item);
+		}
+		NetworkableId uid = msg.read.EntityID();
 		int num2 = msg.read.Int32();
+		NetworkableId uid2 = msg.read.EntityID();
+		int num3 = msg.read.Int32();
 		WireColour wireColour = IntToColour(msg.read.Int32());
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
 		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
@@ -489,33 +460,28 @@ public class WireTool : HeldEntity
 		}
 		BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
 		IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
-		if (iOEntity2 == null || Vector3.Distance(baseNetworkable2.transform.position, baseNetworkable.transform.position) > maxWireLength || num >= iOEntity.inputs.Length || num2 >= iOEntity2.outputs.Length || iOEntity.inputs[num].connectedTo.Get() != null || iOEntity2.outputs[num2].connectedTo.Get() != null || (iOEntity.inputs[num].rootConnectionsOnly && !iOEntity2.IsRootEntity()) || !CanModifyEntity(player, iOEntity) || !CanModifyEntity(player, iOEntity2))
+		if (!(iOEntity2 == null) && ValidateLine(list, iOEntity, iOEntity2, player, num3) && !(Vector3.Distance(baseNetworkable2.transform.position, baseNetworkable.transform.position) > maxWireLength) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity) && CanModifyEntity(player, iOEntity2) && Interface.CallHook("OnWireConnect", player, baseNetworkable, num2, baseNetworkable2, num3, list) == null)
 		{
-			return;
-		}
-		if (Interface.CallHook("OnWireConnect", msg.player, baseNetworkable, num, baseNetworkable2, num2) != null)
-		{
-			((IOEntity)baseNetworkable2).outputs[num2].linePoints = null;
-			return;
-		}
-		iOEntity.inputs[num].connectedTo.Set(iOEntity2);
-		iOEntity.inputs[num].connectedToSlot = num2;
-		iOEntity.inputs[num].wireColour = wireColour;
-		iOEntity.inputs[num].connectedTo.Init();
-		iOEntity2.outputs[num2].connectedTo.Set(iOEntity);
-		iOEntity2.outputs[num2].connectedToSlot = num;
-		iOEntity2.outputs[num2].wireColour = wireColour;
-		iOEntity2.outputs[num2].connectedTo.Init();
-		iOEntity2.outputs[num2].worldSpaceLineEndRotation = iOEntity.transform.TransformDirection(iOEntity.inputs[num].handleDirection);
-		iOEntity2.MarkDirtyForceUpdateOutputs();
-		iOEntity2.SendNetworkUpdate();
-		iOEntity.SendNetworkUpdate();
-		iOEntity2.SendChangedToRoot(forceUpdate: true);
-		iOEntity2.RefreshIndustrialPreventBuilding();
-		if (wireType == IOEntity.IOType.Industrial)
-		{
-			iOEntity.NotifyIndustrialNetworkChanged();
-			iOEntity2.NotifyIndustrialNetworkChanged();
+			iOEntity.inputs[num2].connectedTo.Set(iOEntity2);
+			iOEntity.inputs[num2].connectedToSlot = num3;
+			iOEntity.inputs[num2].wireColour = wireColour;
+			iOEntity.inputs[num2].connectedTo.Init();
+			iOEntity2.outputs[num3].connectedTo.Set(iOEntity);
+			iOEntity2.outputs[num3].connectedToSlot = num2;
+			iOEntity2.outputs[num3].linePoints = list.ToArray();
+			iOEntity2.outputs[num3].wireColour = wireColour;
+			iOEntity2.outputs[num3].connectedTo.Init();
+			iOEntity2.outputs[num3].worldSpaceLineEndRotation = iOEntity.transform.TransformDirection(iOEntity.inputs[num2].handleDirection);
+			iOEntity2.MarkDirtyForceUpdateOutputs();
+			iOEntity2.SendNetworkUpdate();
+			iOEntity.SendNetworkUpdate();
+			iOEntity2.SendChangedToRoot(forceUpdate: true);
+			iOEntity2.RefreshIndustrialPreventBuilding();
+			if (wireType == IOEntity.IOType.Industrial)
+			{
+				iOEntity.NotifyIndustrialNetworkChanged();
+				iOEntity2.NotifyIndustrialNetworkChanged();
+			}
 		}
 	}
 
@@ -532,7 +498,7 @@ public class WireTool : HeldEntity
 		BasePlayer player = msg.player;
 		if (CanPlayerUseWires(player))
 		{
-			uint uid = msg.read.UInt32();
+			NetworkableId uid = msg.read.EntityID();
 			int clearIndex = msg.read.Int32();
 			bool isInput = msg.read.Bit();
 			AttemptClearSlot(BaseNetworkable.serverEntities.Find(uid), player, clearIndex, isInput);
@@ -609,7 +575,7 @@ public class WireTool : HeldEntity
 		{
 			return;
 		}
-		uint uid = msg.read.UInt32();
+		NetworkableId uid = msg.read.EntityID();
 		int index = msg.read.Int32();
 		bool flag = msg.read.Bit();
 		WireColour wireColour = IntToColour(msg.read.Int32());
@@ -629,48 +595,6 @@ public class WireTool : HeldEntity
 				iOEntity.SendNetworkUpdate();
 				obj.wireColour = wireColour;
 				iOEntity2.SendNetworkUpdate();
-			}
-		}
-	}
-
-	[RPC_Server]
-	[RPC_Server.IsActiveItem]
-	[RPC_Server.FromOwner]
-	public void AddLine(RPCMessage msg)
-	{
-		BasePlayer player = msg.player;
-		if (!CanPlayerUseWires(player))
-		{
-			return;
-		}
-		int num = msg.read.Int32();
-		if (num > 18)
-		{
-			return;
-		}
-		List<Vector3> list = new List<Vector3>();
-		for (int i = 0; i < num; i++)
-		{
-			Vector3 item = msg.read.Vector3();
-			list.Add(item);
-		}
-		uint uid = msg.read.UInt32();
-		int num2 = msg.read.Int32();
-		uint uid2 = msg.read.UInt32();
-		int num3 = msg.read.Int32();
-		WireColour wireColour = IntToColour(msg.read.Int32());
-		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
-		IOEntity iOEntity = ((baseNetworkable == null) ? null : baseNetworkable.GetComponent<IOEntity>());
-		if (!(iOEntity == null))
-		{
-			BaseNetworkable baseNetworkable2 = BaseNetworkable.serverEntities.Find(uid2);
-			IOEntity iOEntity2 = ((baseNetworkable2 == null) ? null : baseNetworkable2.GetComponent<IOEntity>());
-			if (!(iOEntity2 == null) && ValidateLine(list, iOEntity, iOEntity2, player, num3) && num2 < iOEntity.inputs.Length && num3 < iOEntity2.outputs.Length && !(iOEntity.inputs[num2].connectedTo.Get() != null) && !(iOEntity2.outputs[num3].connectedTo.Get() != null) && (!iOEntity.inputs[num2].rootConnectionsOnly || iOEntity2.IsRootEntity()) && CanModifyEntity(player, iOEntity2) && CanModifyEntity(player, iOEntity))
-			{
-				iOEntity2.outputs[num3].linePoints = list.ToArray();
-				iOEntity2.outputs[num3].wireColour = wireColour;
-				iOEntity2.SendNetworkUpdate();
-				iOEntity2.RefreshIndustrialPreventBuilding();
 			}
 		}
 	}

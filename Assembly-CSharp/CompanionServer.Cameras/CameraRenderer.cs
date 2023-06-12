@@ -53,6 +53,14 @@ public class CameraRenderer : Pool.IPooled
 	[ServerVar]
 	public static int entityMaxDistance = 100;
 
+	[ServerVar]
+	public static int playerMaxDistance = 30;
+
+	[ServerVar]
+	public static int playerNameMaxDistance = 10;
+
+	private static readonly Dictionary<NetworkableId, NetworkableId> _entityIdMap = new Dictionary<NetworkableId, NetworkableId>();
+
 	private readonly Dictionary<int, (byte MaterialIndex, int Age)> _knownColliders = new Dictionary<int, (byte, int)>();
 
 	private readonly Dictionary<int, BaseEntity> _colliderToEntity = new Dictionary<int, BaseEntity>();
@@ -240,7 +248,8 @@ public class CameraRenderer : Pool.IPooled
 			Vector3 position = eyes.position;
 			Quaternion rotation = eyes.rotation;
 			Matrix4x4 worldToLocalMatrix = eyes.worldToLocalMatrix;
-			uint iD = this.entity.net.ID;
+			NetworkableId iD = this.entity.net.ID;
+			_entityIdMap.Clear();
 			AppBroadcast appBroadcast = Pool.Get<AppBroadcast>();
 			appBroadcast.cameraRays = Pool.Get<AppCameraRays>();
 			appBroadcast.cameraRays.verticalFov = _fieldOfView;
@@ -248,24 +257,41 @@ public class CameraRenderer : Pool.IPooled
 			appBroadcast.cameraRays.rayData = new ArraySegment<byte>(array, 0, count);
 			appBroadcast.cameraRays.distance = distance;
 			appBroadcast.cameraRays.entities = Pool.GetList<AppCameraRays.Entity>();
+			appBroadcast.cameraRays.timeOfDay = ((TOD_Sky.Instance != null) ? TOD_Sky.Instance.LerpValue : 1f);
 			foreach (BaseEntity value in _colliderToEntity.Values)
 			{
-				if (BaseNetworkableEx.IsValid(value))
+				if (!BaseNetworkableEx.IsValid(value))
 				{
-					Vector3 position2 = value.transform.position;
-					if (!(Vector3.Distance(position2, position) > (float)entityMaxDistance))
+					continue;
+				}
+				Vector3 position2 = value.transform.position;
+				float num2 = Vector3.Distance(position2, position);
+				if (num2 > (float)entityMaxDistance)
+				{
+					continue;
+				}
+				string name = null;
+				if (value is BasePlayer basePlayer)
+				{
+					if (num2 > (float)playerMaxDistance)
 					{
-						AppCameraRays.Entity entity = Pool.Get<AppCameraRays.Entity>();
-						entity.entityId = value.net.ID;
-						entity.type = ((value is TreeEntity) ? AppCameraRays.EntityType.Tree : AppCameraRays.EntityType.Player);
-						entity.position = worldToLocalMatrix.MultiplyPoint3x4(position2);
-						entity.rotation = (Quaternion.Inverse(value.transform.rotation) * rotation).eulerAngles * ((float)Math.PI / 180f);
-						entity.size = Vector3.Scale(value.bounds.size, value.transform.localScale);
-						entity.name = ((value is BasePlayer basePlayer) ? basePlayer.displayName : null);
-						appBroadcast.cameraRays.entities.Add(entity);
+						continue;
+					}
+					if (num2 <= (float)playerNameMaxDistance)
+					{
+						name = basePlayer.displayName;
 					}
 				}
+				AppCameraRays.Entity entity = Pool.Get<AppCameraRays.Entity>();
+				entity.entityId = RandomizeEntityId(value.net.ID);
+				entity.type = ((value is TreeEntity) ? AppCameraRays.EntityType.Tree : AppCameraRays.EntityType.Player);
+				entity.position = worldToLocalMatrix.MultiplyPoint3x4(position2);
+				entity.rotation = (Quaternion.Inverse(value.transform.rotation) * rotation).eulerAngles * ((float)Math.PI / 180f);
+				entity.size = Vector3.Scale(value.bounds.size, value.transform.localScale);
+				entity.name = name;
+				appBroadcast.cameraRays.entities.Add(entity);
 			}
+			appBroadcast.cameraRays.entities.Sort((AppCameraRays.Entity x, AppCameraRays.Entity y) => x.entityId.Value.CompareTo(y.entityId.Value));
 			Server.Broadcast(new CameraTarget(iD), appBroadcast);
 			_sampleOffset = _nextSampleOffset;
 			if (!Server.HasAnySubscribers(new CameraTarget(iD)))
@@ -334,6 +360,22 @@ public class CameraRenderer : Pool.IPooled
 			}
 			_knownColliders[foundColliderId] = (item, 0);
 		}
+	}
+
+	private static NetworkableId RandomizeEntityId(NetworkableId realId)
+	{
+		if (_entityIdMap.TryGetValue(realId, out var value))
+		{
+			return value;
+		}
+		NetworkableId networkableId;
+		do
+		{
+			networkableId = new NetworkableId((ulong)UnityEngine.Random.Range(0, 2500));
+		}
+		while (_entityIdMap.ContainsKey(networkableId));
+		_entityIdMap.Add(realId, networkableId);
+		return networkableId;
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]

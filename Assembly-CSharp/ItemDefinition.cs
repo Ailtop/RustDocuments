@@ -54,11 +54,12 @@ public class ItemDefinition : MonoBehaviour
 		Genetics = 3,
 		OxygenSeconds = 4,
 		Frequency = 5,
-		Generic = 6
+		Generic = 6,
+		BagLimit = 7
 	}
 
-	[Header("Item")]
 	[ReadOnly]
+	[Header("Item")]
 	public int itemid;
 
 	[Tooltip("The shortname should be unique. A hash will be generated from it to identify the item type. If this name changes at any point it will make all saves incompatible")]

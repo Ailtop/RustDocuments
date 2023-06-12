@@ -3,48 +3,48 @@ namespace ConVar;
 [Factory("antihack")]
 public class AntiHack : ConsoleSystem
 {
-	[ReplicatedVar]
 	[Help("collider margin when checking for noclipping on dismount")]
+	[ReplicatedVar]
 	public static float noclip_margin_dismount = 0.22f;
 
-	[ReplicatedVar]
 	[Help("collider backtracking when checking for noclipping")]
+	[ReplicatedVar]
 	public static float noclip_backtracking = 0.01f;
 
 	[ServerVar]
 	[Help("report violations to the anti cheat backend")]
 	public static bool reporting = false;
 
-	[ServerVar]
 	[Help("are admins allowed to use their admin cheat")]
+	[ServerVar]
 	public static bool admincheat = true;
 
 	[ServerVar]
 	[Help("use antihack to verify object placement by players")]
 	public static bool objectplacement = true;
 
-	[ServerVar]
 	[Help("use antihack to verify model state sent by players")]
+	[ServerVar]
 	public static bool modelstate = true;
 
 	[ServerVar]
 	[Help("whether or not to force the position on the client")]
 	public static bool forceposition = true;
 
-	[ServerVar]
 	[Help("0 == users, 1 == admins, 2 == developers")]
+	[ServerVar]
 	public static int userlevel = 2;
 
-	[ServerVar]
 	[Help("0 == no enforcement, 1 == kick, 2 == ban (DISABLED)")]
+	[ServerVar]
 	public static int enforcementlevel = 1;
 
-	[ServerVar]
 	[Help("max allowed client desync, lower value = more false positives")]
+	[ServerVar]
 	public static float maxdesync = 1f;
 
-	[ServerVar]
 	[Help("max allowed client tick interval delta time, lower value = more false positives")]
+	[ServerVar]
 	public static float maxdeltatime = 1f;
 
 	[ServerVar]
@@ -55,8 +55,8 @@ public class AntiHack : ConsoleSystem
 	[Help("how much forgiveness to add when checking the distance from the player tick history")]
 	public static float tickhistoryforgiveness = 0.1f;
 
-	[ServerVar]
 	[Help("the rate at which violation values go back down")]
+	[ServerVar]
 	public static float relaxationrate = 0.1f;
 
 	[ServerVar]
@@ -79,8 +79,8 @@ public class AntiHack : ConsoleSystem
 	[Help("how far to penetrate the terrain before violating")]
 	public static float terrain_padding = 0.3f;
 
-	[ServerVar]
 	[Help("violation penalty to hand out when terrain is detected")]
+	[ServerVar]
 	public static float terrain_penalty = 100f;
 
 	[ServerVar]
@@ -99,16 +99,16 @@ public class AntiHack : ConsoleSystem
 	[Help("whether or not to reject movement when noclip is detected")]
 	public static bool noclip_reject = true;
 
-	[ServerVar]
 	[Help("violation penalty to hand out when noclip is detected")]
+	[ServerVar]
 	public static float noclip_penalty = 0f;
 
-	[ServerVar]
 	[Help("collider margin when checking for noclipping")]
+	[ServerVar]
 	public static float noclip_margin = 0.09f;
 
-	[ServerVar]
 	[Help("movement curve step size, lower value = less false positives")]
+	[ServerVar]
 	public static float noclip_stepsize = 0.1f;
 
 	[ServerVar]
@@ -135,8 +135,8 @@ public class AntiHack : ConsoleSystem
 	[Help("speed threshold to assume speedhacking, lower value = more false positives")]
 	public static float speedhack_forgiveness_inertia = 10f;
 
-	[ServerVar]
 	[Help("speed forgiveness when moving down slopes, lower value = more false positives")]
+	[ServerVar]
 	public static float speedhack_slopespeed = 10f;
 
 	[ServerVar]
@@ -203,20 +203,20 @@ public class AntiHack : ConsoleSystem
 	[Help("projectile client frames to include in delay, lower value = more false positives")]
 	public static float projectile_clientframes = 2f;
 
-	[ServerVar]
 	[Help("projectile trajectory forgiveness, lower value = more false positives")]
+	[ServerVar]
 	public static float projectile_trajectory = 1f;
 
-	[ServerVar]
 	[Help("projectile penetration angle change, lower value = more false positives")]
+	[ServerVar]
 	public static float projectile_anglechange = 60f;
 
 	[ServerVar]
 	[Help("projectile penetration velocity change, lower value = more false positives")]
 	public static float projectile_velocitychange = 1.1f;
 
-	[ServerVar]
 	[Help("projectile desync forgiveness, lower value = more false positives")]
+	[ServerVar]
 	public static float projectile_desync = 1f;
 
 	[ServerVar]
@@ -227,8 +227,8 @@ public class AntiHack : ConsoleSystem
 	[Help("line of sight directional forgiveness when checking eye or center position")]
 	public static float projectile_losforgiveness = 0.2f;
 
-	[ServerVar]
 	[Help("how often a projectile is allowed to penetrate something before its damage is ignored")]
+	[ServerVar]
 	public static int projectile_damagedepth = 2;
 
 	[ServerVar]
@@ -251,8 +251,8 @@ public class AntiHack : ConsoleSystem
 	[Help("melee distance forgiveness in percent, lower value = more false positives")]
 	public static float melee_forgiveness = 0.5f;
 
-	[ServerVar]
 	[Help("melee server frames to include in delay, lower value = more false positives")]
+	[ServerVar]
 	public static float melee_serverframes = 2f;
 
 	[ServerVar]
@@ -271,16 +271,16 @@ public class AntiHack : ConsoleSystem
 	[Help("0 == disabled, 1 == distance, 2 == distance + LOS, 3 = distance + LOS + altitude, 4 = distance + LOS + altitude + noclip, 5 = distance + LOS + altitude + noclip + history")]
 	public static int eye_protection = 4;
 
-	[ServerVar]
 	[Help("violation penalty to hand out when eye hack is detected")]
+	[ServerVar]
 	public static float eye_penalty = 0f;
 
-	[ServerVar]
 	[Help("eye speed forgiveness in percent, lower value = more false positives")]
+	[ServerVar]
 	public static float eye_forgiveness = 0.5f;
 
-	[ServerVar]
 	[Help("eye server frames to include in delay, lower value = more false positives")]
+	[ServerVar]
 	public static float eye_serverframes = 2f;
 
 	[ServerVar]
@@ -299,8 +299,8 @@ public class AntiHack : ConsoleSystem
 	[Help("collider margin when checking for noclipping")]
 	public static float eye_noclip_margin = 0.21f;
 
-	[ServerVar]
 	[Help("collider backtracking when checking for noclipping")]
+	[ServerVar]
 	public static float eye_noclip_backtracking = 0.01f;
 
 	[ServerVar]
@@ -315,12 +315,12 @@ public class AntiHack : ConsoleSystem
 	[Help("how much forgiveness to add when checking the distance between player tick history and player eye history")]
 	public static float eye_history_forgiveness = 0.1f;
 
-	[ServerVar]
 	[Help("line of sight sphere cast radius, 0 == raycast")]
+	[ServerVar]
 	public static float build_losradius = 0.01f;
 
-	[ServerVar]
 	[Help("line of sight sphere cast radius, 0 == raycast")]
+	[ServerVar]
 	public static float build_losradius_sleepingbag = 0.3f;
 
 	[ServerVar]

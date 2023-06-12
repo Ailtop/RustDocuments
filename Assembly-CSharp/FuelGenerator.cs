@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -121,8 +122,8 @@ public class FuelGenerator : ContainerIOEntity
 		return currentEnergy;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_EngineSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnSwitchToggle", this, msg.player) == null)
@@ -172,6 +173,7 @@ public class FuelGenerator : ContainerIOEntity
 		{
 			int num = Mathf.FloorToInt(pendingFuel);
 			slot.UseItem(num);
+			Facepunch.Rust.Analytics.Azure.AddPendingItems(this, slot.info.shortname, num, "generator");
 			pendingFuel -= num;
 		}
 		return true;

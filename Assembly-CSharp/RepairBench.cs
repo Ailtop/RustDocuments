@@ -163,8 +163,8 @@ public class RepairBench : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ChangeSkin(RPCMessage msg)
 	{
 		if (UnityEngine.Time.realtimeSinceStartup < nextSkinChangeTime)
@@ -179,6 +179,10 @@ public class RepairBench : StorageContainer
 			return;
 		}
 		bool flag = false;
+		if (msg.player.UnlockAllSkins)
+		{
+			flag = true;
+		}
 		if (num != 0 && !flag && !player.blueprints.CheckSkinOwnership(num, player.userID))
 		{
 			debugprint("RepairBench.ChangeSkin player does not have item :" + num + ":");
@@ -258,11 +262,13 @@ public class RepairBench : StorageContainer
 				ApplySkinToItem(item, Skin);
 			}
 			Facepunch.Rust.Analytics.Server.SkinUsed(item.info.shortname, num);
+			Facepunch.Rust.Analytics.Azure.OnSkinChanged(player, this, item, Skin);
 		}
 		else
 		{
 			ApplySkinToItem(slot, Skin);
 			Facepunch.Rust.Analytics.Server.SkinUsed(slot.info.shortname, num);
+			Facepunch.Rust.Analytics.Azure.OnSkinChanged(player, this, slot, Skin);
 		}
 		if (skinchangeEffect.isValid)
 		{
@@ -347,10 +353,14 @@ public class RepairBench : StorageContainer
 			{
 				int amount2 = Mathf.CeilToInt(item2.amount * num);
 				player.inventory.Take(null, item2.itemid, amount2);
+				Facepunch.Rust.Analytics.Azure.LogResource(Facepunch.Rust.Analytics.Azure.ResourceMode.Consumed, "repair", item2.itemDef.shortname, amount2, repairBenchEntity, null, safezone: false, null, 0uL, null, itemToRepair);
 			}
 		}
 		Facepunch.Pool.FreeList(ref obj);
+		float conditionNormalized = itemToRepair.conditionNormalized;
+		float maxConditionNormalized = itemToRepair.maxConditionNormalized;
 		itemToRepair.DoRepair(maxConditionLostOnRepair);
+		Facepunch.Rust.Analytics.Azure.OnItemRepaired(player, repairBenchEntity, itemToRepair, conditionNormalized, maxConditionNormalized);
 		if (Global.developer > 0)
 		{
 			Debug.Log("Item repaired! condition : " + itemToRepair.condition + "/" + itemToRepair.maxCondition);

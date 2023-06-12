@@ -386,11 +386,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				return maximumDistance.ToString("0.00f");
 			}
 
-			public static bool Test(string debugName, BaseEntity ent, BasePlayer player, float maximumDistance)
-			{
-				return Test(0u, debugName, ent, player, maximumDistance);
-			}
-
 			public static bool Test(uint id, string debugName, BaseEntity ent, BasePlayer player, float maximumDistance)
 			{
 				if (ent == null || player == null)
@@ -420,11 +415,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				return maximumDistance.ToString("0.00f");
 			}
 
-			public static bool Test(string debugName, BaseEntity ent, BasePlayer player, float maximumDistance)
-			{
-				return Test(0u, debugName, ent, player, maximumDistance);
-			}
-
 			public static bool Test(uint id, string debugName, BaseEntity ent, BasePlayer player, float maximumDistance)
 			{
 				if (ent == null || player == null)
@@ -450,11 +440,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public class FromOwner : Conditional
 		{
-			public static bool Test(string debugName, BaseEntity ent, BasePlayer player)
-			{
-				return Test(0u, debugName, ent, player);
-			}
-
 			public static bool Test(uint id, string debugName, BaseEntity ent, BasePlayer player)
 			{
 				if (ent == null || player == null)
@@ -484,11 +469,6 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public class IsActiveItem : Conditional
 		{
-			public static bool Test(string debugName, BaseEntity ent, BasePlayer player)
-			{
-				return Test(0u, debugName, ent, player);
-			}
-
 			public static bool Test(uint id, string debugName, BaseEntity ent, BasePlayer player)
 			{
 				if (ent == null || player == null)
@@ -987,7 +967,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual void DebugServer(int rep, float time)
 	{
-		DebugText(base.transform.position + Vector3.up * 1f, $"{((net != null) ? net.ID : 0u)}: {base.name}\n{DebugText()}", Color.white, time);
+		DebugText(base.transform.position + Vector3.up * 1f, $"{net?.ID.Value ?? 0}: {base.name}\n{DebugText()}", Color.white, time);
 	}
 
 	public virtual string DebugText()
@@ -1016,6 +996,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public bool HasFlag(Flags f)
 	{
 		return (flags & f) == f;
+	}
+
+	public bool HasAny(Flags f)
+	{
+		return (flags & f) > (Flags)0;
 	}
 
 	public bool ParentHasFlag(Flags f)
@@ -1533,7 +1518,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		Debug.Assert(entity.isServer, "SetParent - child should be a SERVER entity");
 		Debug.Assert(entity.net != null, "Setting parent to entity that hasn't spawned yet! (net is null)");
-		Debug.Assert(entity.net.ID != 0, "Setting parent to entity that hasn't spawned yet! (id = 0)");
+		Debug.Assert(entity.net.ID.IsValid, "Setting parent to entity that hasn't spawned yet! (id = 0)");
 		entity.AddChild(this);
 		OnParentChanging(baseEntity, entity);
 		parentEntity.Set(entity);
@@ -1939,7 +1924,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		NetWrite netWrite = Network.Net.sv.StartWrite();
 		netWrite.PacketID(Message.Type.RPCMessage);
-		netWrite.UInt32(net.ID);
+		netWrite.EntityID(net.ID);
 		netWrite.UInt32(StringPool.Get(funcName));
 		netWrite.UInt64(sourceConnection?.userid ?? 0);
 		return netWrite;
@@ -2356,8 +2341,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return $"Owner ID: {OwnerID}";
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2397,7 +2382,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	private void OnSkinChanged(ulong oldSkinID, ulong newSkinID)
+	protected virtual void OnSkinChanged(ulong oldSkinID, ulong newSkinID)
 	{
 		if (oldSkinID != newSkinID)
 		{
@@ -2405,13 +2390,18 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	public virtual void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	protected virtual void OnSkinPreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
 	{
 		if (clientside && Skinnable.All != null && Skinnable.FindForEntity(name) != null)
 		{
 			Rust.Workshop.WorkshopSkin.Prepare(rootObj);
 			MaterialReplacement.Prepare(rootObj);
 		}
+	}
+
+	public virtual void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		OnSkinPreProcess(preProcess, rootObj, name, serverside, clientside, bundling);
 	}
 
 	public bool HasAnySlot()
@@ -2887,9 +2877,9 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			return true;
 		}
-		uint num = ((net != null) ? net.ID : 0);
-		uint num2 = ((other.net != null) ? other.net.ID : 0u);
-		return num < num2;
+		NetworkableId obj = net?.ID ?? default(NetworkableId);
+		NetworkableId networkableId = other.net?.ID ?? default(NetworkableId);
+		return obj.Value < networkableId.Value;
 	}
 
 	public virtual bool IsOutside()
@@ -3059,7 +3049,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return null;
 	}
 
-	public virtual Item GetItem(uint itemId)
+	public virtual Item GetItem(ItemId itemId)
 	{
 		return null;
 	}
@@ -3085,7 +3075,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			if (base.isServer)
 			{
-				_name = string.Format("{1}[{0}]", (net != null) ? net.ID : 0u, base.ShortPrefabName);
+				_name = string.Format("{1}[{0}]", net?.ID ?? default(NetworkableId), base.ShortPrefabName);
 			}
 			else
 			{
@@ -3326,7 +3316,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		else
 		{
-			parentEntity.uid = 0u;
+			parentEntity.uid = default(NetworkableId);
 			parentBone = 0u;
 		}
 		if (info.msg.ownerInfo != null)

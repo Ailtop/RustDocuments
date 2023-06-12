@@ -106,7 +106,7 @@ public class InstantCameraTool : HeldEntity
 			Debug.LogError("Failed to create photo item");
 			return;
 		}
-		if (item2.instanceData.subEntity == 0)
+		if (!item2.instanceData.subEntity.IsValid)
 		{
 			item2.Remove();
 			Debug.LogError("Photo has no sub-entity");

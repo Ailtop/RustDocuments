@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -100,8 +101,8 @@ public class MedicalTool : AttackEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void UseOther(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -111,7 +112,7 @@ public class MedicalTool : AttackEntity
 		}
 		else if (player.CanInteract() && HasItemAmount() && canUseOnOther)
 		{
-			BasePlayer basePlayer = BaseNetworkable.serverEntities.Find(msg.read.UInt32()) as BasePlayer;
+			BasePlayer basePlayer = BaseNetworkable.serverEntities.Find(msg.read.EntityID()) as BasePlayer;
 			if (basePlayer != null && Vector3.Distance(basePlayer.transform.position, player.transform.position) < 4f)
 			{
 				ClientRPCPlayer(null, player, "Reset");
@@ -122,8 +123,8 @@ public class MedicalTool : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void UseSelf(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -166,7 +167,8 @@ public class MedicalTool : AttackEntity
 		{
 			return;
 		}
-		ItemModConsumable component = GetOwnerItemDefinition().GetComponent<ItemModConsumable>();
+		ItemDefinition ownerItemDefinition = GetOwnerItemDefinition();
+		ItemModConsumable component = ownerItemDefinition.GetComponent<ItemModConsumable>();
 		if (!component)
 		{
 			Debug.LogWarning("No consumable for medicaltool :" + base.name);
@@ -178,13 +180,17 @@ public class MedicalTool : AttackEntity
 				return;
 			}
 			BasePlayer ownerPlayer = GetOwnerPlayer();
-			if (player != ownerPlayer && player.IsWounded() && canRevive)
+			Facepunch.Rust.Analytics.Azure.OnMedUsed(ownerItemDefinition.shortname, ownerPlayer, player);
+			if (player != ownerPlayer)
 			{
 				if (Interface.CallHook("OnPlayerRevive", GetOwnerPlayer(), player) != null)
 				{
 					return;
 				}
-				player.StopWounded(ownerPlayer);
+				if (player.IsWounded() && canRevive)
+				{
+					player.StopWounded(ownerPlayer);
+				}
 			}
 			foreach (ItemModConsumable.ConsumableEffect effect in component.effects)
 			{

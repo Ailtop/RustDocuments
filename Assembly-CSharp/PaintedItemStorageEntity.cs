@@ -110,8 +110,8 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver, IUGCBro
 		info.msg.paintedItem.editedBy = lastEditedBy;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server]
 	private void Server_UpdateImage(RPCMessage msg)
 	{
 		if (msg.player == null || msg.player.userID != base.OwnerID)

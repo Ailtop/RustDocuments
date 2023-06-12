@@ -48,6 +48,18 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		}
 	}
 
+	protected void OnDestroy()
+	{
+		if ((bool)SingletonComponent<SpawnHandler>.Instance)
+		{
+			SingletonComponent<SpawnHandler>.Instance.SpawnGroups.Remove(this);
+		}
+		else
+		{
+			Debug.LogWarning(GetType().Name + ": SpawnHandler instance not found.");
+		}
+	}
+
 	protected void OnDrawGizmosSelected()
 	{
 		if (TryGetEntityBounds(out var result))

@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 [RequireComponent(typeof(Camera))]
-[AddComponentMenu("Image Effects/Sonic Ether/SE Screen-Space Shadows")]
 [ExecuteInEditMode]
+[AddComponentMenu("Image Effects/Sonic Ether/SE Screen-Space Shadows")]
 public class SEScreenSpaceShadows : MonoBehaviour
 {
 	private CommandBuffer blendShadowsCommandBuffer;

@@ -111,11 +111,11 @@ public class SamSite : ContainerIOEntity
 
 	public float lastTargetVisibleTime;
 
-	private int lastAmmoCount;
+	public int lastAmmoCount;
 
 	public int currentTubeIndex;
 
-	private int firedCount;
+	public int firedCount;
 
 	public float nextBurstTime;
 
@@ -205,7 +205,7 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
-	private void MarkIODirty()
+	public void MarkIODirty()
 	{
 		if (!staticRespawn)
 		{
@@ -235,7 +235,7 @@ public class SamSite : ContainerIOEntity
 		}
 	}
 
-	private void OnItemAddedRemoved(Item arg1, bool arg2)
+	public void OnItemAddedRemoved(Item arg1, bool arg2)
 	{
 		EnsureReloaded();
 		if (IsPowered())

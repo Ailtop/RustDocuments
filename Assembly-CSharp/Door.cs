@@ -35,12 +35,12 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 
 	public GameObject[] ClosedColliderRoots;
 
-	[SerializeField]
 	[ReadOnly]
+	[SerializeField]
 	private float openAnimLength = 4f;
 
-	[SerializeField]
 	[ReadOnly]
+	[SerializeField]
 	private float closeAnimLength = 4f;
 
 	private float decayResetTimeLast = float.NegativeInfinity;
@@ -480,8 +480,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_OpenDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract(usableWhileCrawling: true) || !canHandOpen || IsOpen() || IsBusy() || IsLocked())
@@ -579,8 +579,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_KnockDoor(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract(usableWhileCrawling: true) || !knockEffect.isValid || UnityEngine.Time.realtimeSinceStartup < nextKnockTime)
@@ -642,8 +642,8 @@ public class Door : AnimatedBuildingBlock, INotifyTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void Server_NotifyWoundedOpen(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

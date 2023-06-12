@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface IMissionProvider
 {
-	uint ProviderID();
+	NetworkableId ProviderID();
 
 	Vector3 ProviderPosition();
 

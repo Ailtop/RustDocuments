@@ -13,6 +13,20 @@ using UnityEngine.Assertions;
 
 public class BaseRidableAnimal : BaseVehicle
 {
+	[Serializable]
+	public struct PurchaseOption
+	{
+		public ItemDefinition TokenItem;
+
+		public Translate.Phrase Title;
+
+		public Translate.Phrase Description;
+
+		public Sprite Icon;
+
+		public int order;
+	}
+
 	public enum RunState
 	{
 		stopped = 1,
@@ -40,6 +54,14 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public const Flags Flag_ForSale = Flags.Reserved2;
 
+	public Translate.Phrase SingleHorseTitle = new Translate.Phrase("purchase_single_horse", "Purchase Single Saddle");
+
+	public Translate.Phrase SingleHorseDescription = new Translate.Phrase("purchase_single_horse_desc", "A single saddle for one player.");
+
+	public Translate.Phrase DoubleHorseTitle = new Translate.Phrase("purchase_double_horse", "Purchase Double Saddle");
+
+	public Translate.Phrase DoubleHorseDescription = new Translate.Phrase("purchase_double_horse_desc", "A double saddle for two players.");
+
 	private Vector3 lastMoveDirection;
 
 	public GameObjectRef saddlePrefab;
@@ -57,6 +79,8 @@ public class BaseRidableAnimal : BaseVehicle
 	public const Flags Flag_HasRider = Flags.On;
 
 	[Header("Purchase")]
+	public List<PurchaseOption> PurchaseOptions;
+
 	public ItemDefinition purchaseToken;
 
 	public GameObjectRef eatEffect;
@@ -161,12 +185,12 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public static Queue<BaseRidableAnimal> _processQueue = new Queue<BaseRidableAnimal>();
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing ridable animals per frame")]
+	[ServerVar]
 	public static float framebudgetms = 1f;
 
-	[ServerVar]
 	[Help("Scale all ridable animal dung production rates by this value. 0 will disable dung production.")]
+	[ServerVar]
 	public static float dungTimeScale = 1f;
 
 	private BaseEntity leadTarget;
@@ -530,6 +554,16 @@ public class BaseRidableAnimal : BaseVehicle
 		LoadContainer(info);
 	}
 
+	public virtual bool HasValidSaddle()
+	{
+		return true;
+	}
+
+	public virtual bool HasSeatAvailable()
+	{
+		return true;
+	}
+
 	public override void AttemptMount(BasePlayer player, bool doMountChecks = true)
 	{
 		if (!IsForSale())
@@ -547,26 +581,29 @@ public class BaseRidableAnimal : BaseVehicle
 	public void RPC_Claim(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && Interface.CallHook("OnRidableAnimalClaim", this, player) == null && IsForSale())
+		if (!(player == null) && IsForSale())
 		{
-			Item item = GetPurchaseToken(player);
-			if (item != null)
+			int tokenItemID = msg.read.Int32();
+			Item item = GetPurchaseToken(player, tokenItemID);
+			if (item != null && Interface.CallHook("OnRidableAnimalClaim", this, player, item) == null)
 			{
-				item.UseItem();
 				SetFlag(Flags.Reserved2, b: false);
+				OnClaimedWithToken(item);
+				item.UseItem();
 				Facepunch.Rust.Analytics.Server.VehiclePurchased(base.ShortPrefabName);
+				Facepunch.Rust.Analytics.Azure.OnVehiclePurchased(msg.player, this);
 				AttemptMount(player, doMountChecks: false);
 				Interface.CallHook("OnRidableAnimalClaimed", this, player);
 			}
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Lead(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null) && !HasDriver() && !IsForSale())
+		if (!(player == null) && !AnyMounted() && !IsForSale())
 		{
 			bool num = IsLeading();
 			bool flag = msg.read.Bit();
@@ -578,6 +615,10 @@ public class BaseRidableAnimal : BaseVehicle
 		}
 	}
 
+	public virtual void OnClaimedWithToken(Item tokenItem)
+	{
+	}
+
 	public override void PlayerMounted(BasePlayer player, BaseMountable seat)
 	{
 		base.PlayerMounted(player, seat);
@@ -587,7 +628,10 @@ public class BaseRidableAnimal : BaseVehicle
 	public override void PlayerDismounted(BasePlayer player, BaseMountable seat)
 	{
 		base.PlayerDismounted(player, seat);
-		SetFlag(Flags.On, b: false, recursive: true);
+		if (NumMounted() == 0)
+		{
+			SetFlag(Flags.On, b: false, recursive: true);
+		}
 	}
 
 	public void SetDecayActive(bool isActive)
@@ -720,17 +764,27 @@ public class BaseRidableAnimal : BaseVehicle
 
 	public override void PlayerServerInput(InputState inputState, BasePlayer player)
 	{
-		RiderInput(inputState, player);
+		if (IsDriver(player))
+		{
+			RiderInput(inputState, player);
+		}
 	}
 
 	public void DismountHeavyPlayers()
 	{
-		if (HasFlag(Flags.On))
+		if (!AnyMounted())
 		{
-			BasePlayer driver = GetDriver();
-			if ((bool)driver && IsPlayerTooHeavy(driver))
+			return;
+		}
+		foreach (MountPointInfo allMountPoint in base.allMountPoints)
+		{
+			if (!(allMountPoint.mountable == null))
 			{
-				DismountAllPlayers();
+				BasePlayer mounted = allMountPoint.mountable.GetMounted();
+				if (!(mounted == null) && IsPlayerTooHeavy(mounted))
+				{
+					allMountPoint.mountable.DismountAllPlayers();
+				}
 			}
 		}
 	}
@@ -953,15 +1007,16 @@ public class BaseRidableAnimal : BaseVehicle
 		{
 			return false;
 		}
-		bool flag = false;
+		return IsStandCollisionClear();
+	}
+
+	public virtual bool IsStandCollisionClear()
+	{
 		List<Collider> obj = Facepunch.Pool.GetList<Collider>();
 		Vis.Colliders(mountPoints[0].mountable.eyePositionOverride.transform.position - base.transform.forward * 1f, 2f, obj, 2162689);
-		if (obj.Count > 0)
-		{
-			flag = true;
-		}
+		bool num = obj.Count > 0;
 		Facepunch.Pool.FreeList(ref obj);
-		return !flag;
+		return !num;
 	}
 
 	public void DoDebugMovement()
@@ -1457,15 +1512,19 @@ public class BaseRidableAnimal : BaseVehicle
 		dropUntilTime = duration;
 	}
 
-	public bool PlayerHasToken(BasePlayer player)
+	public override void InitShared()
 	{
-		return GetPurchaseToken(player) != null;
+		base.InitShared();
 	}
 
-	public Item GetPurchaseToken(BasePlayer player)
+	public bool PlayerHasToken(BasePlayer player, int tokenItemID)
 	{
-		int itemid = purchaseToken.itemid;
-		return player.inventory.FindItemID(itemid);
+		return GetPurchaseToken(player, tokenItemID) != null;
+	}
+
+	public Item GetPurchaseToken(BasePlayer player, int tokenItemID)
+	{
+		return player.inventory.FindItemID(tokenItemID);
 	}
 
 	public virtual float GetWalkSpeed()

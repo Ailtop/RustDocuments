@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Facepunch.Rust;
 using Oxide.Core;
 using UnityEngine;
 
@@ -148,6 +149,7 @@ public class EntityFuelSystem
 		{
 			int num = Mathf.FloorToInt(pendingFuel);
 			slot.UseItem(num);
+			Facepunch.Rust.Analytics.Azure.AddPendingItems(fuelContainer?.GetParentEntity() ?? fuelContainer, slot.info.shortname, num, "fuel_system");
 			pendingFuel -= num;
 			return num;
 		}

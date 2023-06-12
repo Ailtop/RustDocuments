@@ -30,7 +30,7 @@ public class MissionObjective_SpeakWith : MissionObjective
 			if ((bool)baseEntity)
 			{
 				IMissionProvider component = baseEntity.GetComponent<IMissionProvider>();
-				if (component != null && component.ProviderID().ToString() == identifier && amount == 1f)
+				if (component != null && component.ProviderID().Value.ToString() == identifier && amount == 1f)
 				{
 					bool flag = true;
 					if (requiredReturnItems != null && requiredReturnItems.Length != 0)

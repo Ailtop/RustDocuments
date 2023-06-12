@@ -37,11 +37,11 @@ public class ComputerStation : BaseMountable
 
 	public float autoGatherRadius;
 
-	private ulong currentPlayerID;
+	public ulong currentPlayerID;
 
-	private float nextAddTime;
+	public float nextAddTime;
 
-	private static readonly char[] BookmarkSplit = new char[1] { ';' };
+	public static readonly char[] BookmarkSplit = new char[1] { ';' };
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -167,6 +167,16 @@ public class ComputerStation : BaseMountable
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	public bool AllowPings()
+	{
+		BaseEntity baseEntity = currentlyControllingEnt.Get(base.isServer);
+		if (baseEntity != null && baseEntity is IRemoteControllable remoteControllable && remoteControllable.CanPing)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	public static bool IsValidIdentifier(string str)
 	{
 		if (string.IsNullOrEmpty(str))
@@ -241,12 +251,12 @@ public class ComputerStation : BaseMountable
 				return;
 			}
 			baseEntity.GetComponent<IRemoteControllable>().StopControl(new CameraViewerId(currentPlayerID, 0L));
-			if ((bool)ply)
-			{
-				ply.net.SwitchSecondaryGroup(null);
-			}
 		}
-		currentlyControllingEnt.uid = 0u;
+		if ((bool)ply)
+		{
+			ply.net.SwitchSecondaryGroup(null);
+		}
+		currentlyControllingEnt.uid = default(NetworkableId);
 		currentPlayerID = 0uL;
 		SetFlag(Flags.Reserved2, b: false, recursive: false, networkupdate: false);
 		SendNetworkUpdate();
@@ -340,7 +350,7 @@ public class ComputerStation : BaseMountable
 		}
 	}
 
-	private void CheckCCTVAchievement()
+	public void CheckCCTVAchievement()
 	{
 		if (!(_mounted != null))
 		{

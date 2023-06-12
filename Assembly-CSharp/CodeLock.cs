@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -296,8 +297,8 @@ public class CodeLock : BaseLock
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_ChangeCode(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract())
@@ -312,6 +313,7 @@ public class CodeLock : BaseLock
 			{
 				SetFlag(Flags.Locked, b: true);
 			}
+			Facepunch.Rust.Analytics.Azure.OnCodelockChanged(rpc.player, this, flag ? guestCode : code, text, flag);
 			if (!flag)
 			{
 				code = text;
@@ -407,11 +409,13 @@ public class CodeLock : BaseLock
 				whitelistPlayers.Add(rpc.player.userID);
 				wrongCodes = 0;
 			}
+			Facepunch.Rust.Analytics.Azure.OnCodeLockEntered(rpc.player, this, isGuest: false);
 		}
 		else if (flag && !guestPlayers.Contains(rpc.player.userID))
 		{
 			DoEffect(effectCodeChanged.resourcePath);
 			guestPlayers.Add(rpc.player.userID);
+			Facepunch.Rust.Analytics.Azure.OnCodeLockEntered(rpc.player, this, isGuest: true);
 		}
 	}
 

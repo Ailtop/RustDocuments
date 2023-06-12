@@ -324,8 +324,6 @@ public class BaseProjectile : AttackEntity
 
 	protected virtual ItemDefinition PrimaryMagazineAmmo => primaryMagazine.ammoType;
 
-	private bool UsingInfiniteAmmoCheat => false;
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BaseProjectile.OnRpcMessage"))
@@ -991,7 +989,7 @@ public class BaseProjectile : AttackEntity
 		uint num = 0u;
 		foreach (BaseEntity child in children)
 		{
-			num += child.net.ID;
+			num += (uint)(int)child.net.ID.Value;
 			num += (uint)child.flags;
 		}
 		uint num2 = CRC.Compute32(0u, num);
@@ -1123,9 +1121,9 @@ public class BaseProjectile : AttackEntity
 		return HasFlag(Flags.Reserved6) == defaultOn;
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	[RPC_Server.CallsPerSecond(2uL)]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void ToggleFireMode(RPCMessage msg)
 	{
 		if (canChangeFireModes && IsBurstEligable())
@@ -1152,8 +1150,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void SwitchAmmoTo(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -1195,8 +1193,8 @@ public class BaseProjectile : AttackEntity
 		UpdateAttachmentsState();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void StartReload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1277,8 +1275,8 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Reload(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1328,9 +1326,9 @@ public class BaseProjectile : AttackEntity
 		}
 	}
 
+	[RPC_Server.IsActiveItem]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.IsActiveItem]
 	private void CLProject(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -1347,7 +1345,7 @@ public class BaseProjectile : AttackEntity
 		}
 		reloadStarted = false;
 		reloadFinished = false;
-		if (primaryMagazine.contents <= 0 && !UsingInfiniteAmmoCheat)
+		if (primaryMagazine.contents <= 0 && !base.UsingInfiniteAmmoCheat)
 		{
 			AntiHack.Log(player, AntiHackType.ProjectileHack, "Magazine empty (" + base.ShortPrefabName + ")");
 			player.stats.combat.LogInvalid(player, this, "ammo_missing");
@@ -1361,7 +1359,7 @@ public class BaseProjectile : AttackEntity
 			player.stats.combat.LogInvalid(player, this, "ammo_mismatch");
 			return;
 		}
-		if (!UsingInfiniteAmmoCheat)
+		if (!base.UsingInfiniteAmmoCheat)
 		{
 			primaryMagazine.contents--;
 		}
@@ -1385,6 +1383,7 @@ public class BaseProjectile : AttackEntity
 		}
 		SignalBroadcast(Signal.Attack, string.Empty, msg.connection);
 		player.CleanupExpiredProjectiles();
+		Guid projectileGroupId = Guid.NewGuid();
 		foreach (ProjectileShoot.Projectile projectile in projectileShoot.projectiles)
 		{
 			if (player.HasFiredProjectile(projectile.projectileID))
@@ -1394,7 +1393,7 @@ public class BaseProjectile : AttackEntity
 			}
 			else if (ValidateEyePos(player, projectile.startPos))
 			{
-				player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, primaryMagazineAmmo);
+				player.NoteFiredProjectile(projectile.projectileID, projectile.startPos, projectile.startVel, this, primaryMagazineAmmo, projectileGroupId);
 				if (!player.limitNetworking)
 				{
 					CreateProjectileEffectClientside(component.projectileObject.resourcePath, projectile.startPos, projectile.startVel, projectile.seed, msg.connection, IsSilenced());
@@ -1467,12 +1466,21 @@ public class BaseProjectile : AttackEntity
 		}
 		float barrelConditionLoss = primaryMagazine.ammoType.GetComponent<ItemModProjectile>().barrelConditionLoss;
 		float num = 0.25f;
-		ownerItem.LoseCondition(num + barrelConditionLoss);
-		if (ownerItem.contents != null && ownerItem.contents.itemList != null)
+		bool usingInfiniteAmmoCheat = base.UsingInfiniteAmmoCheat;
+		if (!usingInfiniteAmmoCheat)
 		{
-			for (int num2 = ownerItem.contents.itemList.Count - 1; num2 >= 0; num2--)
+			ownerItem.LoseCondition(num + barrelConditionLoss);
+		}
+		if (ownerItem.contents == null || ownerItem.contents.itemList == null)
+		{
+			return;
+		}
+		for (int num2 = ownerItem.contents.itemList.Count - 1; num2 >= 0; num2--)
+		{
+			Item item = ownerItem.contents.itemList[num2];
+			if (item != null && !usingInfiniteAmmoCheat)
 			{
-				ownerItem.contents.itemList[num2]?.LoseCondition(num + barrelConditionLoss);
+				item.LoseCondition(num + barrelConditionLoss);
 			}
 		}
 	}

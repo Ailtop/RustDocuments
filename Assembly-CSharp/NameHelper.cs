@@ -1,16 +1,12 @@
-using System.Collections.Generic;
-
 public static class NameHelper
 {
-	private static Dictionary<string, string> _cache = new Dictionary<string, string>();
-
-	public static string Get(ulong userId, string name)
+	public static string Get(ulong userId, string name, bool isClient = true)
 	{
 		return name;
 	}
 
-	public static string Get(IPlayerInfo playerInfo)
+	public static string Get(IPlayerInfo playerInfo, bool isClient = true)
 	{
-		return Get(playerInfo.UserId, playerInfo.UserName);
+		return Get(playerInfo.UserId, playerInfo.UserName, isClient);
 	}
 }

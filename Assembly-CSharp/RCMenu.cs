@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class RCMenu : ComputerMenu
@@ -33,13 +34,24 @@ public class RCMenu : ComputerMenu
 
 	public Text noSignalText;
 
+	public Text healthText;
+
+	public GameObject healthBarParent;
+
+	public RectTransform healthBarBackground;
+
+	public RectTransform healthBarFill;
+
 	public SoundDefinition bookmarkPressedSoundDef;
 
 	public GameObject[] hideIfStatic;
 
 	public GameObject readOnlyIndicator;
 
-	public GameObject crosshair;
+	[FormerlySerializedAs("crosshair")]
+	public GameObject aimCrosshair;
+
+	public GameObject generalCrosshair;
 
 	public float fogOverrideDensity = 0.1f;
 
@@ -48,4 +60,8 @@ public class RCMenu : ComputerMenu
 	public float autoTurretDotBaseScale = 2f;
 
 	public float autoTurretDotGrowScale = 4f;
+
+	public PingManager PingManager;
+
+	public ScrollRectSettable scrollRect;
 }

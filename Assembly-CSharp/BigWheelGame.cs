@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch.Rust;
 using Oxide.Core;
 using UnityEngine;
 
@@ -46,7 +48,7 @@ public class BigWheelGame : SpinnerWheel
 	{
 		if (!(velocity > 0f))
 		{
-			velocity += UnityEngine.Random.Range(7f, 10f);
+			velocity += UnityEngine.Random.Range(7f, 16f);
 			spinNumber++;
 			SetTerminalsLocked(isLocked: true);
 		}
@@ -102,6 +104,7 @@ public class BigWheelGame : SpinnerWheel
 	public void Payout()
 	{
 		HitNumber currentHitType = GetCurrentHitType();
+		Guid value = Guid.NewGuid();
 		foreach (BigWheelBettingTerminal terminal in terminals)
 		{
 			if (terminal.isClient)
@@ -114,12 +117,14 @@ public class BigWheelGame : SpinnerWheel
 			if (slot != null)
 			{
 				int num = currentHitType.ColorToMultiplier(currentHitType.hitType);
+				int amount = slot.amount;
 				if (Interface.CallHook("OnBigWheelWin", this, slot, terminal, num) == null)
 				{
 					slot.amount += slot.amount * num;
 					slot.RemoveFromContainer();
 					slot.MoveToContainer(terminal.inventory, 5);
 					flag = true;
+					Facepunch.Rust.Analytics.Azure.OnGamblingResult(terminal.lastPlayer, terminal, amount, slot.amount, value);
 				}
 			}
 			for (int i = 0; i < 5; i++)
@@ -127,6 +132,7 @@ public class BigWheelGame : SpinnerWheel
 				Item slot2 = terminal.inventory.GetSlot(i);
 				if (slot2 != null && Interface.CallHook("OnBigWheelLoss", this, slot2, terminal) == null)
 				{
+					Facepunch.Rust.Analytics.Azure.OnGamblingResult(terminal.lastPlayer, terminal, slot2.amount, 0, value);
 					slot2.Remove();
 					flag2 = true;
 				}

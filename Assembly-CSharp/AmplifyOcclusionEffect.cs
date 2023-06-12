@@ -1,8 +1,8 @@
 using UnityEngine;
 
 [AddComponentMenu("Image Effects/Amplify Occlusion")]
-[RequireComponent(typeof(Camera))]
 [ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
 public class AmplifyOcclusionEffect : AmplifyOcclusionBase
 {
 }

@@ -72,8 +72,8 @@ public class MLRS : BaseMountable
 	[SerializeField]
 	private GameObjectRef dashboardStoragePrefab;
 
-	[Header("MLRS Rotation")]
 	[SerializeField]
+	[Header("MLRS Rotation")]
 	private Transform hRotator;
 
 	[SerializeField]
@@ -85,20 +85,20 @@ public class MLRS : BaseMountable
 	[SerializeField]
 	public float vRotSpeed = 10f;
 
-	[SerializeField]
 	[Range(50f, 90f)]
+	[SerializeField]
 	public float vRotMax = 85f;
 
 	[SerializeField]
 	private Transform hydraulics;
 
+	[SerializeField]
 	[Header("MLRS Weaponry")]
 	[Tooltip("Minimum distance from the MLRS to a targeted hit point. In metres.")]
-	[SerializeField]
 	public float minRange = 200f;
 
-	[Tooltip("The size of the area that the rockets may hit, minus rocket damage radius.")]
 	[SerializeField]
+	[Tooltip("The size of the area that the rockets may hit, minus rocket damage radius.")]
 	public float targetAreaRadius = 30f;
 
 	[SerializeField]
@@ -631,7 +631,7 @@ public class MLRS : BaseMountable
 		Vector3 targetPos = TrueHitPos + new Vector3(vector.x, 0f, vector.y);
 		float g;
 		Vector3 aimToTarget = GetAimToTarget(targetPos, out g);
-		if (BaseMountable.TryFireProjectile(rocketContainer, AmmoTypes.MLRS_ROCKET, firingPos, aimToTarget, _mounted, 0f, 0f, out var projectile))
+		if (TryFireProjectile(rocketContainer, AmmoTypes.MLRS_ROCKET, firingPos, aimToTarget, rocketOwnerRef.Get(serverside: true) as BasePlayer, 0f, 0f, out var projectile))
 		{
 			projectile.gravityModifier = g / (0f - UnityEngine.Physics.gravity.y);
 			Interface.CallHook("OnMlrsRocketFired", this, projectile);
@@ -663,8 +663,8 @@ public class MLRS : BaseMountable
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_SetTargetHitPos(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -685,8 +685,8 @@ public class MLRS : BaseMountable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Open_Rockets(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

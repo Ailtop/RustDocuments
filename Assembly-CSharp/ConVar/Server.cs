@@ -254,6 +254,12 @@ public class Server : ConsoleSystem
 	[ServerVar]
 	public static float respawnresetrange = 50f;
 
+	[ReplicatedVar]
+	public static int max_sleeping_bags = 15;
+
+	[ReplicatedVar]
+	public static bool bag_quota_item_amount = true;
+
 	[ServerVar]
 	public static int maxunack = 4;
 
@@ -332,10 +338,10 @@ public class Server : ConsoleSystem
 	[ServerVar(Help = "When transferring water, should containers keep 1 water behind. Enabling this should help performance if water IO is causing performance loss", Saved = true)]
 	public static bool waterContainersLeaveWaterBehind = false;
 
-	[ServerVar(Help = "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement", Saved = true, ShowInAdminUI = true)]
+	[ServerVar(Help = "How often industrial conveyors attempt to move items (value is an interval measured in seconds). Setting to 0 will disable all movement", Saved = true, ShowInAdminUI = true)]
 	public static float conveyorMoveFrequency = 5f;
 
-	[ServerVar(Help = "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting", Saved = true, ShowInAdminUI = true)]
+	[ServerVar(Help = "How often industrial crafters attempt to craft items (value is an interval measured in seconds). Setting to 0 will disable all crafting", Saved = true, ShowInAdminUI = true)]
 	public static float industrialCrafterFrequency = 5f;
 
 	[ReplicatedVar(Help = "How much scrap is required to research default blueprints", Saved = true, ShowInAdminUI = true)]
@@ -349,6 +355,15 @@ public class Server : ConsoleSystem
 
 	[ServerVar(Help = "How long per frame to spend on industrial jobs", Saved = true, ShowInAdminUI = true)]
 	public static float industrialFrameBudgetMs = 0.5f;
+
+	[ReplicatedVar(Help = "How many markers each player can place", Saved = true, ShowInAdminUI = true)]
+	public static int maximumMapMarkers = 5;
+
+	[ServerVar(Help = "How many pings can be placed by each player", Saved = true, ShowInAdminUI = true)]
+	public static int maximumPings = 5;
+
+	[ServerVar(Help = "How long a ping should last", Saved = true, ShowInAdminUI = true)]
+	public static float pingDuration = 10f;
 
 	[ServerVar(Saved = true)]
 	public static bool showHolsteredItems = true;
@@ -390,6 +405,19 @@ public class Server : ConsoleSystem
 		set
 		{
 			EOS.LogLevel = (LogLevel)value;
+		}
+	}
+
+	[ServerVar]
+	public static int maxclientinfosize
+	{
+		get
+		{
+			return Connection.MaxClientInfoSize;
+		}
+		set
+		{
+			Connection.MaxClientInfoSize = Mathf.Max(value, 1);
 		}
 	}
 
@@ -843,7 +871,7 @@ public class Server : ConsoleSystem
 		{
 			return "invalid player";
 		}
-		return basePlayer.stats.combat.Get(combatlogsize, 0u, arg.HasArg("--json"), arg.IsAdmin, arg.Connection?.userid ?? 0);
+		return basePlayer.stats.combat.Get(combatlogsize, default(NetworkableId), arg.HasArg("--json"), arg.IsAdmin, arg.Connection?.userid ?? 0);
 	}
 
 	[ServerAllVar(Help = "Get the player combat log, only showing outgoing damage")]
@@ -965,5 +993,21 @@ public class Server : ConsoleSystem
 			textTable.AddRow(item.net.ID.ToString(), item.transform.position.ToString(), item.authorizedPlayers.Count.ToString());
 		}
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
+	}
+
+	[ServerVar]
+	public static void BroadcastPlayVideo(Arg arg)
+	{
+		string @string = arg.GetString(0);
+		if (string.IsNullOrWhiteSpace(@string))
+		{
+			arg.ReplyWith("Missing video URL");
+			return;
+		}
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			activePlayer.Command("client.playvideo", @string);
+		}
+		arg.ReplyWith($"Sent video to {BasePlayer.activePlayerList.Count} players");
 	}
 }

@@ -84,6 +84,21 @@ public static class NetworkWriteEx
 			write.Color(in obj4);
 			return;
 		}
+		if (typeof(T) == typeof(NetworkableId))
+		{
+			write.EntityID(GenericsUtil.Cast<T, NetworkableId>(obj));
+			return;
+		}
+		if (typeof(T) == typeof(ItemContainerId))
+		{
+			write.ItemContainerID(GenericsUtil.Cast<T, ItemContainerId>(obj));
+			return;
+		}
+		if (typeof(T) == typeof(ItemId))
+		{
+			write.ItemID(GenericsUtil.Cast<T, ItemId>(obj));
+			return;
+		}
 		if ((object)obj is IProto proto)
 		{
 			proto.WriteToStream(write);

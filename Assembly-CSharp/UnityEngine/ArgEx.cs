@@ -49,4 +49,14 @@ public static class ArgEx
 		}
 		return GetPlayerOrSleeper(arg, iArgNum);
 	}
+
+	public static NetworkableId GetEntityID(this ConsoleSystem.Arg arg, int iArg, NetworkableId def = default(NetworkableId))
+	{
+		return new NetworkableId(arg.GetUInt64(iArg, def.Value));
+	}
+
+	public static ItemId GetItemID(this ConsoleSystem.Arg arg, int iArg, ItemId def = default(ItemId))
+	{
+		return new ItemId(arg.GetUInt64(iArg, def.Value));
+	}
 }

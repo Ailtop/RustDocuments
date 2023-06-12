@@ -103,6 +103,14 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 		}
 	}
 
+	public class BaseBlindedState : BasicAIState
+	{
+		public BaseBlindedState()
+			: base(AIState.Blinded)
+		{
+		}
+	}
+
 	public class BaseChaseState : BasicAIState
 	{
 		public BaseChaseState()
@@ -708,6 +716,10 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 
 	public bool RefreshKnownLOS;
 
+	public bool CanBeBlinded = true;
+
+	public float BlindDurationMultiplier = 1f;
+
 	public AIState ClientCurrentState;
 
 	public Vector3 mainInterestPoint;
@@ -740,6 +752,8 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 	protected float thinkRate = 0.25f;
 
 	protected float lastThinkTime;
+
+	protected float unblindTime;
 
 	public BasicAIState CurrentState { get; set; }
 
@@ -1198,6 +1212,29 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 		return states.Keys.ToList();
 	}
 
+	public bool Blinded()
+	{
+		return UnityEngine.Time.time < unblindTime;
+	}
+
+	public void SetBlinded(float duration)
+	{
+		if (!CanBeBlinded || Blinded())
+		{
+			return;
+		}
+		unblindTime = UnityEngine.Time.time + duration;
+		if (HasState(AIState.Blinded) && AIDesign != null)
+		{
+			BasicAIState basicAIState = states[AIState.Blinded];
+			AIStateContainer firstStateContainerOfType = AIDesign.GetFirstStateContainerOfType(AIState.Blinded);
+			if (basicAIState != null && firstStateContainerOfType != null)
+			{
+				SwitchToState(basicAIState, firstStateContainerOfType.ID);
+			}
+		}
+	}
+
 	public void Start()
 	{
 		AddStates();
@@ -1329,18 +1366,23 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 		states.Add(newState.StateType, newState);
 	}
 
+	public bool HasState(AIState state)
+	{
+		return states.ContainsKey(state);
+	}
+
 	public bool SwitchToState(AIState newState, int stateContainerID = -1)
 	{
-		if (states.ContainsKey(newState))
+		if (!HasState(newState))
 		{
-			bool num = SwitchToState(states[newState], stateContainerID);
-			if (num)
-			{
-				OnStateChanged();
-			}
-			return num;
+			return false;
 		}
-		return false;
+		bool num = SwitchToState(states[newState], stateContainerID);
+		if (num)
+		{
+			OnStateChanged();
+		}
+		return num;
 	}
 
 	private bool SwitchToState(BasicAIState newState, int stateContainerID = -1)

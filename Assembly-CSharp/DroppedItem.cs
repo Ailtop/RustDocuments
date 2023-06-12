@@ -1,13 +1,29 @@
+using System;
 using ConVar;
+using Facepunch.Rust;
 using Oxide.Core;
 using UnityEngine;
 
 public class DroppedItem : WorldItem
 {
+	public enum DropReasonEnum
+	{
+		Unknown = 0,
+		Player = 1,
+		Death = 2,
+		Loot = 3
+	}
+
 	[Header("DroppedItem")]
 	public GameObject itemModel;
 
 	private Collider childCollider;
+
+	[NonSerialized]
+	public DropReasonEnum DropReason;
+
+	[NonSerialized]
+	public ulong DroppedBy;
 
 	public override float GetNetworkTime()
 	{
@@ -32,6 +48,7 @@ public class DroppedItem : WorldItem
 	public void IdleDestroy()
 	{
 		Interface.CallHook("OnItemDespawn", item);
+		Facepunch.Rust.Analytics.Azure.OnItemDespawn(this, item, (int)DropReason, DroppedBy);
 		DestroyItem();
 		Kill();
 	}
@@ -73,15 +90,19 @@ public class DroppedItem : WorldItem
 		int num3 = di.item.amount + item.amount;
 		if (num3 <= item.MaxStackable() && num3 != 0)
 		{
+			if (di.DropReason == DropReasonEnum.Player)
+			{
+				DropReason = DropReasonEnum.Player;
+			}
 			di.DestroyItem();
 			di.Kill();
 			item.amount = num3;
 			item.MarkDirty();
 			if (GetDespawnDuration() < float.PositiveInfinity)
 			{
+				Interface.CallHook("OnDroppedItemCombined", this);
 				Invoke(IdleDestroy, GetDespawnDuration());
 			}
-			Interface.CallHook("OnDroppedItemCombined", this);
 			Effect.server.Run("assets/bundled/prefabs/fx/notice/stack.world.fx.prefab", this, 0u, Vector3.zero, Vector3.zero);
 		}
 	}
@@ -117,7 +138,7 @@ public class DroppedItem : WorldItem
 	{
 		base.PostInitShared();
 		GameObject gameObject = null;
-		gameObject = ((item == null || !item.info.worldModelPrefab.isValid) ? Object.Instantiate(itemModel) : item.info.worldModelPrefab.Instantiate());
+		gameObject = ((item == null || !item.info.worldModelPrefab.isValid) ? UnityEngine.Object.Instantiate(itemModel) : item.info.worldModelPrefab.Instantiate());
 		gameObject.transform.SetParent(base.transform, worldPositionStays: false);
 		gameObject.transform.localPosition = Vector3.zero;
 		gameObject.transform.localRotation = Quaternion.identity;

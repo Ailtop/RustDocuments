@@ -3,6 +3,7 @@ using System;
 using ConVar;
 using Facepunch;
 using Network;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -303,8 +304,8 @@ public class Chainsaw : BaseMelee
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void DoReload(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -369,8 +370,8 @@ public class Chainsaw : BaseMelee
 		ReduceAmmo(fuelPerSec);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Server_StartEngine(RPCMessage msg)
 	{
 		if (ammo > 0 && !EngineOn())
@@ -488,6 +489,11 @@ public class Chainsaw : BaseMelee
 		if (!ownerPlayer)
 		{
 			return null;
+		}
+		object obj = Interface.CallHook("OnInventoryAmmoItemFind", ownerPlayer.inventory, fuelType);
+		if (obj is Item)
+		{
+			return (Item)obj;
 		}
 		Item item = ownerPlayer.inventory.containerMain.FindItemsByItemName(fuelType.shortname);
 		if (item == null)

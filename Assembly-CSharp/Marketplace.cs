@@ -18,17 +18,17 @@ public class Marketplace : BaseEntity
 
 	public EntityRef<MarketTerminal>[] terminalEntities;
 
-	public uint SendDrone(BasePlayer player, MarketTerminal sourceTerminal, VendingMachine vendingMachine)
+	public NetworkableId SendDrone(BasePlayer player, MarketTerminal sourceTerminal, VendingMachine vendingMachine)
 	{
 		if (sourceTerminal == null || vendingMachine == null)
 		{
-			return 0u;
+			return default(NetworkableId);
 		}
 		BaseEntity baseEntity = GameManager.server.CreateEntity(deliveryDronePrefab?.resourcePath, droneLaunchPoint.position, droneLaunchPoint.rotation);
 		if (!(baseEntity is DeliveryDrone deliveryDrone))
 		{
 			baseEntity.Kill();
-			return 0u;
+			return default(NetworkableId);
 		}
 		deliveryDrone.OwnerID = player.userID;
 		deliveryDrone.Spawn();
@@ -98,7 +98,7 @@ public class Marketplace : BaseEntity
 		base.Load(info);
 		if (info.msg.subEntityList != null)
 		{
-			List<uint> subEntityIds = info.msg.subEntityList.subEntityIds;
+			List<NetworkableId> subEntityIds = info.msg.subEntityList.subEntityIds;
 			Array.Resize(ref terminalEntities, subEntityIds.Count);
 			for (int i = 0; i < subEntityIds.Count; i++)
 			{
@@ -112,7 +112,7 @@ public class Marketplace : BaseEntity
 	{
 		base.Save(info);
 		info.msg.subEntityList = Pool.Get<SubEntityList>();
-		info.msg.subEntityList.subEntityIds = Pool.GetList<uint>();
+		info.msg.subEntityList.subEntityIds = Pool.GetList<NetworkableId>();
 		if (terminalEntities != null)
 		{
 			for (int i = 0; i < terminalEntities.Length; i++)

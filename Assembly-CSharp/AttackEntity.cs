@@ -49,6 +49,19 @@ public class AttackEntity : HeldEntity
 
 	public float nextAttackTime = float.NegativeInfinity;
 
+	protected bool UsingInfiniteAmmoCheat
+	{
+		get
+		{
+			BasePlayer ownerPlayer = GetOwnerPlayer();
+			if (ownerPlayer == null || (!ownerPlayer.IsAdmin && !ownerPlayer.IsDeveloper))
+			{
+				return false;
+			}
+			return ownerPlayer.GetInfoBool("player.infiniteammo", defaultVal: false);
+		}
+	}
+
 	public float NextAttackTime => nextAttackTime;
 
 	public virtual Vector3 GetInheritedVelocity(BasePlayer player, Vector3 direction)
@@ -277,9 +290,10 @@ public class AttackEntity : HeldEntity
 				Vector3 position2 = player.eyes.position;
 				Vector3 vector2 = eyePos;
 				float num11 = Vector3.Distance(position2, vector2);
+				Collider collider;
 				if (num11 > ConVar.AntiHack.eye_noclip_cutoff)
 				{
-					if (AntiHack.TestNoClipping(position2, vector2, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2))
+					if (AntiHack.TestNoClipping(position2, vector2, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2, out collider))
 					{
 						string shortPrefabName5 = base.ShortPrefabName;
 						AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
@@ -287,7 +301,7 @@ public class AttackEntity : HeldEntity
 						flag = false;
 					}
 				}
-				else if (num11 > 0.01f && AntiHack.TestNoClipping(position2, vector2, 0.01f, ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2))
+				else if (num11 > 0.01f && AntiHack.TestNoClipping(position2, vector2, 0.01f, ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2, out collider))
 				{
 					string shortPrefabName6 = base.ShortPrefabName;
 					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName6, " on attack) ", position2, " ", vector2));

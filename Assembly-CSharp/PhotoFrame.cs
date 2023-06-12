@@ -27,7 +27,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 
 	public int TextureCount => 1;
 
-	public uint NetworkID => net.ID;
+	public NetworkableId NetworkID => net.ID;
 
 	public FileStorage.Type FileType => FileStorage.Type.png;
 
@@ -199,8 +199,8 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 		return CanUpdateSign(player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(5f)]
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(3uL)]
 	public void UpdateSign(RPCMessage msg)
 	{
@@ -218,8 +218,8 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void LockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUpdateSign(msg.player))
@@ -231,8 +231,8 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void UnLockSign(RPCMessage msg)
 	{
 		if (msg.player.CanInteract() && CanUnlockSign(msg.player))
@@ -321,10 +321,10 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 	{
 		base.OnItemAddedOrRemoved(item, added);
 		Item item2 = ((base.inventory.itemList.Count > 0) ? base.inventory.itemList[0] : null);
-		uint num = ((item2 != null && item2.IsValid()) ? item2.instanceData.subEntity : 0u);
-		if (num != _photoEntity.uid)
+		NetworkableId networkableId = ((item2 != null && item2.IsValid()) ? item2.instanceData.subEntity : default(NetworkableId));
+		if (networkableId != _photoEntity.uid)
 		{
-			_photoEntity.uid = num;
+			_photoEntity.uid = networkableId;
 			SendNetworkUpdate();
 		}
 	}
@@ -384,7 +384,7 @@ public class PhotoFrame : StorageContainer, ILOD, IImageReceiver, ISignage, IUGC
 	{
 		if (base.CanPickup(player))
 		{
-			return _photoEntity.uid == 0;
+			return !_photoEntity.uid.IsValid;
 		}
 		return false;
 	}

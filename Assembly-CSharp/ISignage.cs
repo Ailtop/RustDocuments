@@ -6,7 +6,7 @@ public interface ISignage
 
 	int TextureCount { get; }
 
-	uint NetworkID { get; }
+	NetworkableId NetworkID { get; }
 
 	FileStorage.Type FileType { get; }
 

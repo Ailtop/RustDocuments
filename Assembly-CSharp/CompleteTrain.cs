@@ -818,7 +818,6 @@ public class CompleteTrain : IDisposable
 				Vector3 contactPoint = colliderContent.ClosestPointOnBounds(trigger.owner.transform.position);
 				trigger.owner.TryShowCollisionFX(contactPoint, trigger.owner.collisionEffect);
 			}
-			return trackSpeed;
 		}
 		return trackSpeed;
 	}
@@ -838,7 +837,6 @@ public class CompleteTrain : IDisposable
 				{
 					hashSet.Add(staticContent);
 				}
-				return trackSpeed;
 			}
 		}
 		else if (wasStaticColliding == StaticCollisionState.StaticColliding)

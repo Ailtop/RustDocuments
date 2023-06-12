@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -168,17 +169,17 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 	{
 		Initialize();
 		containerMain.ServerInitialize(null, 24);
-		if (containerMain.uid == 0)
+		if (!containerMain.uid.IsValid)
 		{
 			containerMain.GiveUID();
 		}
 		containerBelt.ServerInitialize(null, 6);
-		if (containerBelt.uid == 0)
+		if (!containerBelt.uid.IsValid)
 		{
 			containerBelt.GiveUID();
 		}
 		containerWear.ServerInitialize(null, 7);
-		if (containerWear.uid == 0)
+		if (!containerWear.uid.IsValid)
 		{
 			containerWear.GiveUID();
 		}
@@ -296,7 +297,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		{
 			return;
 		}
-		uint id = msg.read.UInt32();
+		ItemId id = msg.read.ItemID();
 		string text = msg.read.String();
 		Item item = FindItemUID(id);
 		if (item == null || Interface.CallHook("OnItemAction", item, text, msg.player) != null || item.IsLocked() || (item.parent != null && item.parent.IsLocked()) || !CanMoveItemsFrom(item.GetEntityOwner(), item))
@@ -313,11 +314,27 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			base.baseEntity.stats.Add("item_drop", 1, (Stats)5);
 			if (num < item.amount)
 			{
-				item.SplitItem(num)?.Drop(base.baseEntity.GetDropPosition(), base.baseEntity.GetDropVelocity());
+				Item item2 = item.SplitItem(num);
+				if (item2 != null)
+				{
+					DroppedItem droppedItem = item2.Drop(base.baseEntity.GetDropPosition(), base.baseEntity.GetDropVelocity()) as DroppedItem;
+					if (droppedItem != null)
+					{
+						droppedItem.DropReason = DroppedItem.DropReasonEnum.Player;
+						droppedItem.DroppedBy = base.baseEntity.userID;
+						Facepunch.Rust.Analytics.Azure.OnItemDropped(base.baseEntity, droppedItem, DroppedItem.DropReasonEnum.Player);
+					}
+				}
 			}
 			else
 			{
-				item.Drop(base.baseEntity.GetDropPosition(), base.baseEntity.GetDropVelocity());
+				DroppedItem droppedItem2 = item.Drop(base.baseEntity.GetDropPosition(), base.baseEntity.GetDropVelocity()) as DroppedItem;
+				if (droppedItem2 != null)
+				{
+					droppedItem2.DropReason = DroppedItem.DropReasonEnum.Player;
+					droppedItem2.DroppedBy = base.baseEntity.userID;
+					Facepunch.Rust.Analytics.Azure.OnItemDropped(base.baseEntity, droppedItem2, DroppedItem.DropReasonEnum.Player);
+				}
 			}
 			base.baseEntity.SignalBroadcast(BaseEntity.Signal.Gesture, "drop_item");
 		}
@@ -333,18 +350,19 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 	[BaseEntity.RPC_Server.FromOwner]
 	public void MoveItem(BaseEntity.RPCMessage msg)
 	{
-		uint num = msg.read.UInt32();
-		uint num2 = msg.read.UInt32();
-		int num3 = msg.read.Int8();
-		int num4 = (int)msg.read.UInt32();
-		Item item = FindItemUID(num);
+		ItemId itemId = msg.read.ItemID();
+		ItemContainerId itemContainerId = msg.read.ItemContainerID();
+		int num = msg.read.Int8();
+		int num2 = (int)msg.read.UInt32();
+		bool flag = msg.read.Bit();
+		Item item = FindItemUID(itemId);
 		if (item == null)
 		{
-			msg.player.ChatMessage("Invalid item (" + num + ")");
+			msg.player.ChatMessage(string.Concat("Invalid item (", itemId, ")"));
 		}
 		else
 		{
-			if (Interface.CallHook("CanMoveItem", item, this, num2, num3, num4) != null)
+			if (Interface.CallHook("CanMoveItem", item, this, itemContainerId, num, num2, flag) != null)
 			{
 				return;
 			}
@@ -354,25 +372,35 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				msg.player.ChatMessage("Cannot move item!");
 				return;
 			}
-			if (num4 <= 0)
+			if (num2 <= 0)
 			{
-				num4 = item.amount;
+				num2 = item.amount;
 			}
-			num4 = Mathf.Clamp(num4, 1, item.MaxStackable());
+			num2 = Mathf.Clamp(num2, 1, item.MaxStackable());
 			if (msg.player.GetActiveItem() == item)
 			{
-				msg.player.UpdateActiveItem(0u);
+				msg.player.UpdateActiveItem(default(ItemId));
 			}
-			if (num2 == 0)
+			if (!itemContainerId.IsValid)
 			{
 				BaseEntity baseEntity = entityOwner;
 				if (loot.containers.Count > 0)
 				{
-					baseEntity = ((entityOwner == base.baseEntity) ? loot.entitySource : base.baseEntity);
+					if (entityOwner == base.baseEntity)
+					{
+						if (!flag)
+						{
+							baseEntity = loot.entitySource;
+						}
+					}
+					else
+					{
+						baseEntity = base.baseEntity;
+					}
 				}
 				if (baseEntity is IIdealSlotEntity idealSlotEntity)
 				{
-					num2 = idealSlotEntity.GetIdealContainer(base.baseEntity, item);
+					itemContainerId = idealSlotEntity.GetIdealContainer(base.baseEntity, item, flag);
 				}
 				ItemContainer parent = item.parent;
 				if (parent != null && parent.IsLocked())
@@ -380,7 +408,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 					msg.player.ChatMessage("Container is locked!");
 					return;
 				}
-				if (num2 == 0)
+				if (!itemContainerId.IsValid)
 				{
 					if (baseEntity == loot.entitySource)
 					{
@@ -393,17 +421,17 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 						}
 						return;
 					}
-					if (!GiveItem(item))
+					if (!GiveItem(item, null, flag))
 					{
 						msg.player.ChatMessage("GiveItem failed!");
 					}
 					return;
 				}
 			}
-			ItemContainer itemContainer = FindContainer(num2);
+			ItemContainer itemContainer = FindContainer(itemContainerId);
 			if (itemContainer == null)
 			{
-				msg.player.ChatMessage("Invalid container (" + num2 + ")");
+				msg.player.ChatMessage(string.Concat("Invalid container (", itemContainerId, ")"));
 				return;
 			}
 			if (itemContainer.IsLocked())
@@ -418,15 +446,15 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			}
 			using (TimeWarning.New("Split"))
 			{
-				if (item.amount > num4)
+				if (item.amount > num2)
 				{
-					int split_Amount = num4;
+					int split_Amount = num2;
 					if (itemContainer.maxStackSize > 0)
 					{
-						split_Amount = Mathf.Min(num4, itemContainer.maxStackSize);
+						split_Amount = Mathf.Min(num2, itemContainer.maxStackSize);
 					}
 					Item item2 = item.SplitItem(split_Amount);
-					if (!item2.MoveToContainer(itemContainer, num3, allowStack: true, ignoreStackLimit: false, base.baseEntity))
+					if (!item2.MoveToContainer(itemContainer, num, allowStack: true, ignoreStackLimit: false, base.baseEntity))
 					{
 						item.amount += item2.amount;
 						item2.Remove();
@@ -436,7 +464,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 					return;
 				}
 			}
-			if (item.MoveToContainer(itemContainer, num3, allowStack: true, ignoreStackLimit: false, base.baseEntity))
+			if (item.MoveToContainer(itemContainer, num, allowStack: true, ignoreStackLimit: false, base.baseEntity))
 			{
 				ItemManager.DoRemoves();
 				ServerUpdate(0f);
@@ -486,15 +514,20 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 
 	private bool CanWearItem(Item item, int targetSlot)
 	{
-		ItemModWearable component = item.info.GetComponent<ItemModWearable>();
-		if (component == null)
-		{
-			return false;
-		}
 		object obj = Interface.CallHook("CanWearItem", this, item, targetSlot);
 		if (obj is bool)
 		{
 			return (bool)obj;
+		}
+		return CanWearItem(item, canAdjustClothing: true);
+	}
+
+	private bool CanWearItem(Item item, bool canAdjustClothing)
+	{
+		ItemModWearable component = item.info.GetComponent<ItemModWearable>();
+		if (component == null)
+		{
+			return false;
 		}
 		if (component.npcOnly && !Inventory.disableAttireLimitations)
 		{
@@ -514,6 +547,10 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			ItemModWearable component2 = item2.info.GetComponent<ItemModWearable>();
 			if (!(component2 == null) && !Inventory.disableAttireLimitations && !component.CanExistWith(component2))
 			{
+				if (!canAdjustClothing)
+				{
+					return false;
+				}
 				bool flag = false;
 				if (item.parent == containerBelt)
 				{
@@ -591,9 +628,9 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		}
 	}
 
-	public Item FindItemUID(uint id)
+	public Item FindItemUID(ItemId id)
 	{
-		if (id == 0)
+		if (!id.IsValid)
 		{
 			return null;
 		}
@@ -663,7 +700,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return null;
 	}
 
-	public Item FindBySubEntityID(uint subEntityID)
+	public Item FindBySubEntityID(NetworkableId subEntityID)
 	{
 		if (containerMain != null)
 		{
@@ -715,7 +752,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return list;
 	}
 
-	public ItemContainer FindContainer(uint id)
+	public ItemContainer FindContainer(ItemContainerId id)
 	{
 		using (TimeWarning.New("FindContainer"))
 		{
@@ -755,15 +792,17 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return null;
 	}
 
-	public bool GiveItem(Item item, ItemContainer container = null)
+	public bool GiveItem(Item item, ItemContainer container = null, bool tryWearClothing = false)
 	{
 		if (item == null)
 		{
 			return false;
 		}
-		int position = -1;
-		GetIdealPickupContainer(item, ref container, ref position);
-		if (container != null && item.MoveToContainer(container, position))
+		if (container == null)
+		{
+			GetIdealPickupContainer(item, ref container, tryWearClothing);
+		}
+		if (container != null && item.MoveToContainer(container))
 		{
 			return true;
 		}
@@ -778,7 +817,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 		return false;
 	}
 
-	protected void GetIdealPickupContainer(Item item, ref ItemContainer container, ref int position)
+	protected void GetIdealPickupContainer(Item item, ref ItemContainer container, bool tryWearClothing)
 	{
 		if (item.MaxStackable() > 1)
 		{
@@ -793,7 +832,11 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 				return;
 			}
 		}
-		if (item.info.isUsable && !item.info.HasFlag(ItemDefinition.Flag.NotStraightToBelt))
+		if (tryWearClothing && item.info.isWearable && CanWearItem(item, canAdjustClothing: false))
+		{
+			container = containerWear;
+		}
+		else if (item.info.isUsable && !item.info.HasFlag(ItemDefinition.Flag.NotStraightToBelt))
 		{
 			container = containerBelt;
 		}
@@ -861,6 +904,7 @@ public class PlayerInventory : EntityComponent<BasePlayer>
 			int infoInt = base.baseEntity.GetInfoInt(convarSkinName, 0);
 			bool flag = false;
 			bool flag2 = false;
+			flag2 = base.baseEntity?.UnlockAllSkins ?? false;
 			if (infoInt > 0 && (base.baseEntity.blueprints.steamInventory.HasItem(infoInt) || flag2))
 			{
 				ItemDefinition itemDefinition = ItemManager.FindItemDefinition(itemShortName);

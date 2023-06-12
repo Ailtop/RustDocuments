@@ -6,7 +6,8 @@ public class ItemModAnimalEquipment : ItemMod
 		Armor = 1,
 		Saddle = 2,
 		Bit = 3,
-		Feet = 4
+		Feet = 4,
+		SaddleDouble = 5
 	}
 
 	public BaseEntity.Flags WearableFlag;

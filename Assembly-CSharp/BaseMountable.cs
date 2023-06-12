@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using Rust;
@@ -28,8 +29,8 @@ public class BaseMountable : BaseCombatEntity
 
 	public static Translate.Phrase dismountPhrase = new Translate.Phrase("dismount", "Dismount");
 
-	[Header("View")]
 	[FormerlySerializedAs("eyeOverride")]
+	[Header("View")]
 	public Transform eyePositionOverride;
 
 	[FormerlySerializedAs("eyeOverride")]
@@ -45,6 +46,8 @@ public class BaseMountable : BaseCombatEntity
 
 	[Header("Mounting")]
 	public Transform mountAnchor;
+
+	public float mountLOSVertOffset = 0.5f;
 
 	public PlayerModel.MountPoses mountPose;
 
@@ -332,7 +335,7 @@ public class BaseMountable : BaseCombatEntity
 				{
 					Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} is visible.");
 				}
-				if (!AntiHack.TestNoClipping(dismountCheckStart, vector, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, vehicleLayer: false, legacyDismount ? null : this))
+				if (!AntiHack.TestNoClipping(dismountCheckStart, vector, player.NoClipRadius(ConVar.AntiHack.noclip_margin_dismount), ConVar.AntiHack.noclip_backtracking, sphereCast: true, out var _, vehicleLayer: false, legacyDismount ? null : this))
 				{
 					if (debugDismounts)
 					{
@@ -392,8 +395,8 @@ public class BaseMountable : BaseCombatEntity
 		base.OnKilled(info);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_WantsMount(RPCMessage msg)
 	{
 		WantsMount(msg.player);
@@ -429,7 +432,7 @@ public class BaseMountable : BaseCombatEntity
 		}
 		if (doMountChecks)
 		{
-			if (checkPlayerLosOnMount && UnityEngine.Physics.Linecast(player.eyes.position, mountAnchor.position + base.transform.up * 0.5f, 1218652417))
+			if (checkPlayerLosOnMount && UnityEngine.Physics.Linecast(player.eyes.position, mountAnchor.position + base.transform.up * mountLOSVertOffset, 1218652417))
 			{
 				Debug.Log("No line of sight to mount pos");
 				return;
@@ -681,7 +684,7 @@ public class BaseMountable : BaseCombatEntity
 	{
 	}
 
-	public static bool TryFireProjectile(StorageContainer ammoStorage, AmmoTypes ammoType, Vector3 firingPos, Vector3 firingDir, BasePlayer driver, float launchOffset, float minSpeed, out ServerProjectile projectile)
+	public bool TryFireProjectile(StorageContainer ammoStorage, AmmoTypes ammoType, Vector3 firingPos, Vector3 firingDir, BasePlayer driver, float launchOffset, float minSpeed, out ServerProjectile projectile)
 	{
 		projectile = null;
 		if (ammoStorage == null)
@@ -724,6 +727,7 @@ public class BaseMountable : BaseCombatEntity
 				baseEntity.OwnerID = driver.userID;
 			}
 			baseEntity.Spawn();
+			Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(driver, baseEntity, this);
 			item.UseItem();
 			result = true;
 		}

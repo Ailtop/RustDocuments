@@ -93,7 +93,7 @@ public class ScrapTransportHelicopter : MiniCopter, TriggerHurtNotChild.IHurtTri
 		return 100;
 	}
 
-	public float GetPlayerDamageMultiplier()
+	public float GetDamageMultiplier(BaseEntity ent)
 	{
 		return 1f;
 	}

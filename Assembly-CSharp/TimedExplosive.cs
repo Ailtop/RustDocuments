@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Facepunch;
+using Facepunch.Rust;
 using Oxide.Core;
 using Rust;
 using Rust.Ai;
@@ -22,6 +23,12 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 
 	public bool onlyDamageParent;
 
+	public bool BlindAI;
+
+	public float aiBlindDuration = 2.5f;
+
+	public float aiBlindRange = 4f;
+
 	public GameObjectRef explosionEffect;
 
 	[Tooltip("Optional: Will fall back to explosionEffect if not assigned.")]
@@ -41,6 +48,8 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 	private float lastBounceTime;
 
 	private CollisionDetectionMode? initialCollisionDetectionMode;
+
+	private static BaseEntity[] queryResults = new BaseEntity[64];
 
 	protected virtual bool AlwaysRunWaterCheck => false;
 
@@ -108,6 +117,7 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 
 	public virtual void Explode(Vector3 explosionFxPos)
 	{
+		Facepunch.Rust.Analytics.Azure.OnExplosion(this);
 		Collider component = GetComponent<Collider>();
 		if ((bool)component)
 		{
@@ -177,8 +187,6 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 					hitInfo2.Initiator = creatorEntity;
 					hitInfo2.WeaponPrefab = LookupPrefab();
 					hitInfo2.damageTypes.Add(damageTypes);
-					hitInfo2.PointStart = vector;
-					hitInfo2.PointEnd = baseCombatEntity.transform.position;
 					baseCombatEntity.Hurt(hitInfo2);
 				}
 				else if (baseEntity != null)
@@ -228,10 +236,39 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 					Sense.Stimulate(sensation);
 				}
 			}
+			BlindAnyAI();
 		}
 		if (!base.IsDestroyed && !HasFlag(Flags.Broken))
 		{
 			Kill(DestroyMode.Gib);
+		}
+	}
+
+	private void BlindAnyAI()
+	{
+		if (!BlindAI)
+		{
+			return;
+		}
+		int brainsInSphere = Query.Server.GetBrainsInSphere(base.transform.position, 10f, queryResults);
+		for (int i = 0; i < brainsInSphere; i++)
+		{
+			BaseEntity baseEntity = queryResults[i];
+			if (Vector3.Distance(base.transform.position, baseEntity.transform.position) > aiBlindRange)
+			{
+				continue;
+			}
+			BaseAIBrain component = baseEntity.GetComponent<BaseAIBrain>();
+			if (!(component == null))
+			{
+				BaseEntity brainBaseEntity = component.GetBrainBaseEntity();
+				if (!(brainBaseEntity == null) && brainBaseEntity.IsVisible(CenterPoint()))
+				{
+					float blinded = aiBlindDuration * component.BlindDurationMultiplier * UnityEngine.Random.Range(0.6f, 1.4f);
+					component.SetBlinded(blinded);
+					queryResults[i] = null;
+				}
+			}
 		}
 	}
 
@@ -271,6 +308,11 @@ public class TimedExplosive : BaseEntity, ServerProjectile.IProjectileImpact
 
 	public virtual bool CanStickTo(BaseEntity entity)
 	{
+		object obj = Interface.CallHook("CanExplosiveStick", this, entity);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		if (entity.TryGetComponent<DecorDeployable>(out var _))
 		{
 			return false;

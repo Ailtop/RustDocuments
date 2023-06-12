@@ -22,8 +22,8 @@ public class Physics : ConsoleSystem
 	[ServerVar]
 	public static float groundwatchdelay = 0.1f;
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static bool batchsynctransforms = true;
 
 	[ServerVar]

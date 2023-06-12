@@ -40,8 +40,16 @@ public class PieMenu : UIBehaviour
 
 		public ColorMode? overrideColorMode;
 
+		public bool showOverlay;
+
 		[NonSerialized]
 		public Action<BasePlayer> action;
+
+		[NonSerialized]
+		public Action<BasePlayer> actionPrev;
+
+		[NonSerialized]
+		public Action<BasePlayer> actionNext;
 
 		[NonSerialized]
 		public PieOption option;
@@ -73,6 +81,10 @@ public class PieMenu : UIBehaviour
 	public MenuOption[] options;
 
 	public GameObject scaleTarget;
+
+	public GameObject arrowLeft;
+
+	public GameObject arrowRight;
 
 	public float sliceGaps = 10f;
 
@@ -121,8 +133,6 @@ public class PieMenu : UIBehaviour
 
 	private CanvasGroup canvasGroup;
 
-	public bool IsOpen;
-
 	public Material IconMaterial;
 
 	internal MenuOption selectedOption;
@@ -132,6 +142,8 @@ public class PieMenu : UIBehaviour
 	private static Color middleImageColor = new Color(0.804f, 0.255f, 0.169f, 0.784f);
 
 	private static AnimationCurve easePunch = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.112586f, 0.9976035f), new Keyframe(0.3120486f, 0.01720615f), new Keyframe(0.4316337f, 0.17030682f), new Keyframe(0.5524869f, 0.03141804f), new Keyframe(0.6549395f, 0.002909959f), new Keyframe(0.770987f, 0.009817753f), new Keyframe(0.8838775f, 0.001939224f), new Keyframe(1f, 0f));
+
+	public bool IsOpen { get; private set; }
 
 	protected override void Start()
 	{
@@ -225,6 +237,7 @@ public class PieMenu : UIBehaviour
 			LeanTween.scale(scaleTarget, Vector3.one * (success ? 1.5f : 0.5f), 0.2f).setEase(LeanTweenType.easeOutCirc);
 			GameObjectEx.SetChildComponentsEnabled<TMP_Text>(Instance.gameObject, enabled: false);
 			IsOpen = false;
+			selectedOption = null;
 		}
 	}
 
@@ -292,7 +305,7 @@ public class PieMenu : UIBehaviour
 				GameObject gameObject = Facepunch.Instantiate.GameObject(pieOptionPrefab);
 				gameObject.transform.SetParent(optionsCanvas.transform, worldPositionStays: false);
 				options[j].option = gameObject.GetComponent<PieOption>();
-				options[j].option.UpdateOption(num7, num9, sliceGaps, options[j].name, outerSize, innerSize, num8 * iconSize, options[j].sprite);
+				options[j].option.UpdateOption(num7, num9, sliceGaps, options[j].name, outerSize, innerSize, num8 * iconSize, options[j].sprite, options[j].showOverlay);
 				options[j].option.imageIcon.material = ((options[j].overrideColorMode.HasValue && options[j].overrideColorMode.Value.Mode == MenuOption.ColorMode.PieMenuSpriteColorOption.SpriteColor) ? null : IconMaterial);
 				num7 += num9;
 			}
@@ -355,6 +368,26 @@ public class PieMenu : UIBehaviour
 				middleTitle.text = options[i].name;
 				middleDesc.text = options[i].desc;
 				middleRequired.text = "";
+				Facepunch.Input.Button buttonObjectWithBind = Facepunch.Input.GetButtonObjectWithBind("+prevskin");
+				if (options[i].actionPrev != null && buttonObjectWithBind != null && buttonObjectWithBind.Code != 0)
+				{
+					arrowLeft.SetActive(value: true);
+					arrowLeft.GetComponentInChildren<TextMeshProUGUI>().text = buttonObjectWithBind.Code.ToShortname();
+				}
+				else
+				{
+					arrowLeft.SetActive(value: false);
+				}
+				Facepunch.Input.Button buttonObjectWithBind2 = Facepunch.Input.GetButtonObjectWithBind("+nextskin");
+				if (options[i].actionNext != null && buttonObjectWithBind2 != null && buttonObjectWithBind2.Code != 0)
+				{
+					arrowRight.SetActive(value: true);
+					arrowRight.GetComponentInChildren<TextMeshProUGUI>().text = buttonObjectWithBind2.Code.ToShortname();
+				}
+				else
+				{
+					arrowRight.SetActive(value: false);
+				}
 				string requirements = options[i].requirements;
 				if (requirements != null)
 				{
@@ -362,7 +395,10 @@ public class PieMenu : UIBehaviour
 					requirements = requirements.Replace("[/e]", "</color>");
 					middleRequired.text = requirements;
 				}
-				options[i].option.imageIcon.color = colorIconHovered;
+				if (!options[i].showOverlay)
+				{
+					options[i].option.imageIcon.color = colorIconHovered;
+				}
 				if (selectedOption != options[i])
 				{
 					if (selectedOption != null && !options[i].disabled)
@@ -412,5 +448,13 @@ public class PieMenu : UIBehaviour
 	public bool DoSelect()
 	{
 		return true;
+	}
+
+	public void DoPrev()
+	{
+	}
+
+	public void DoNext()
+	{
 	}
 }

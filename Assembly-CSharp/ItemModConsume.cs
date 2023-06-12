@@ -47,6 +47,7 @@ public class ItemModConsume : ItemMod
 		{
 			player.GiveAchievement(consumable.achievementWhenEaten);
 		}
+		Facepunch.Rust.Analytics.Azure.OnConsumableUsed(player, item);
 		float num = Mathf.Max(consumable.amountToConsume, 1);
 		float num2 = Mathf.Min(item.amount, num);
 		float num3 = num2 / num;

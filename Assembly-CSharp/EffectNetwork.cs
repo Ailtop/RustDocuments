@@ -30,7 +30,7 @@ public static class EffectNetwork
 				netWrite.Send(new SendInfo(BaseNetworkable.GlobalNetworkGroup.subscribers));
 				return;
 			}
-			if (effect.entity != 0)
+			if (effect.entity.IsValid)
 			{
 				BaseEntity baseEntity = BaseNetworkable.serverEntities.Find(effect.entity) as BaseEntity;
 				if (!BaseNetworkableEx.IsValid(baseEntity))

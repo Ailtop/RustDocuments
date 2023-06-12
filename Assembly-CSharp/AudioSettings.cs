@@ -4,13 +4,15 @@ using UnityEngine.Audio;
 
 public class AudioSettings : MonoBehaviour
 {
+	public static float duckingFactor = 1f;
+
 	public AudioMixer mixer;
 
 	private void Update()
 	{
 		if (!(mixer == null))
 		{
-			mixer.SetFloat("MasterVol", LinearToDecibel(Audio.master));
+			mixer.SetFloat("MasterVol", LinearToDecibel(Audio.master * duckingFactor));
 			mixer.GetFloat("MusicVol", out var value);
 			if (!LevelManager.isLoaded || !MainCamera.isValid)
 			{

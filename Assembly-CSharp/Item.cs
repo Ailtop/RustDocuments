@@ -32,7 +32,7 @@ public class Item
 
 	public ItemDefinition info;
 
-	public uint uid;
+	public ItemId uid;
 
 	public bool dirty;
 
@@ -53,6 +53,8 @@ public class Item
 	public ulong skin;
 
 	public string name;
+
+	public string streamerName;
 
 	public string text;
 
@@ -357,6 +359,19 @@ public class Item
 		MarkDirty();
 	}
 
+	public string GetName(bool? streamerModeOverride = null)
+	{
+		if (streamerModeOverride.HasValue)
+		{
+			if (!streamerModeOverride.Value)
+			{
+				return name;
+			}
+			return streamerName ?? name;
+		}
+		return name;
+	}
+
 	public bool IsBlueprint()
 	{
 		return blueprintTarget != 0;
@@ -454,7 +469,7 @@ public class Item
 
 	public void Initialize(ItemDefinition template)
 	{
-		uid = Network.Net.sv.TakeUID();
+		uid = new ItemId(Network.Net.sv.TakeUID());
 		float num = (maxCondition = info.condition.max);
 		condition = num;
 		OnItemCreated();
@@ -783,10 +798,8 @@ public class Item
 				Item item = SplitItem(newcontainer.maxStackSize);
 				if (item != null && !item.MoveToContainer(newcontainer, iTargetPos, allowStack: false, ignoreStackLimit: false, sourcePlayer) && (itemContainer == null || !item.MoveToContainer(itemContainer, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer)))
 				{
-					Vector3 dropPosition = newcontainer.dropPosition;
-					Vector3 dropVelocity = newcontainer.dropVelocity;
 					Interface.CallHook("OnItemStacked", itemContainerEntity, this, newcontainer);
-					item.Drop(dropPosition, dropVelocity);
+					item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
 				}
 				return true;
 			}
@@ -926,10 +939,10 @@ public class Item
 	{
 		this.OnDirty = null;
 		this.onCycle = null;
-		if (isServer && uid != 0 && Network.Net.sv != null)
+		if (isServer && uid.IsValid && Network.Net.sv != null)
 		{
-			Network.Net.sv.ReturnUID(uid);
-			uid = 0u;
+			Network.Net.sv.ReturnUID(uid.Value);
+			uid = default(ItemId);
 		}
 		if (contents != null)
 		{
@@ -1081,11 +1094,11 @@ public class Item
 		{
 			return false;
 		}
-		if (instanceData != null && instanceData.subEntity != 0 && (bool)info.GetComponent<ItemModSign>())
+		if (instanceData != null && instanceData.subEntity.IsValid && (bool)info.GetComponent<ItemModSign>())
 		{
 			return false;
 		}
-		if (item.instanceData != null && item.instanceData.subEntity != 0 && (bool)item.info.GetComponent<ItemModSign>())
+		if (item.instanceData != null && item.instanceData.subEntity.IsValid && (bool)item.info.GetComponent<ItemModSign>())
 		{
 			return false;
 		}
@@ -1108,7 +1121,7 @@ public class Item
 			worldEnt.Set(null);
 			MarkDirty();
 		}
-		else if (worldEnt.uid != ent.net.ID)
+		else if (!(worldEnt.uid == ent.net.ID))
 		{
 			worldEnt.Set(ent);
 			MarkDirty();
@@ -1253,7 +1266,7 @@ public class Item
 		return "Item." + info.shortname + "x" + amount + "." + uid;
 	}
 
-	public Item FindItem(uint iUID)
+	public Item FindItem(ItemId iUID)
 	{
 		if (uid == iUID)
 		{
@@ -1297,6 +1310,7 @@ public class Item
 		item.heldEntity = heldEntity.uid;
 		item.skinid = skin;
 		item.name = name;
+		item.streamerName = streamerName;
 		item.text = text;
 		item.cooktime = cookTimeLeft;
 		if (hasCondition)
@@ -1320,6 +1334,7 @@ public class Item
 		}
 		uid = load.UID;
 		name = load.name;
+		streamerName = load.streamerName;
 		text = load.text;
 		cookTimeLeft = load.cooktime;
 		amount = load.amount;
@@ -1331,7 +1346,7 @@ public class Item
 		heldEntity.uid = load.heldEntity;
 		if (isServer)
 		{
-			Network.Net.sv.RegisterUID(uid);
+			Network.Net.sv.RegisterUID(uid.Value);
 		}
 		if (instanceData != null)
 		{

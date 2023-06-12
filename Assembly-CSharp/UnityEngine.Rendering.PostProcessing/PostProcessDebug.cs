@@ -1,7 +1,7 @@
 namespace UnityEngine.Rendering.PostProcessing;
 
-[ExecuteAlways]
 [AddComponentMenu("Rendering/Post-process Debug", 1002)]
+[ExecuteAlways]
 public sealed class PostProcessDebug : MonoBehaviour
 {
 	public PostProcessLayer postProcessLayer;

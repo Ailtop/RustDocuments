@@ -9,11 +9,11 @@ public class ElectricOven : BaseOven
 
 	public Transform IoEntityAnchor;
 
-	private EntityRef<IOEntity> spawnedIo;
+	public EntityRef<IOEntity> spawnedIo;
 
-	private bool resumeCookingWhenPowerResumes;
+	public bool resumeCookingWhenPowerResumes;
 
-	protected override bool CanRunWithNoFuel
+	public override bool CanRunWithNoFuel
 	{
 		get
 		{
@@ -34,7 +34,7 @@ public class ElectricOven : BaseOven
 		}
 	}
 
-	private void SpawnIOEnt()
+	public void SpawnIOEnt()
 	{
 		if (IoEntity.isValid && IoEntityAnchor != null)
 		{

@@ -230,8 +230,8 @@ public class BaseFishingRod : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Server_RequestCast(RPCMessage msg)
 	{
 		Vector3 pos = msg.read.Vector3();

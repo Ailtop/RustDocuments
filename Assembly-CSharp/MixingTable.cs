@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -118,8 +119,8 @@ public class MixingTable : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void SVSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMixingTableToggle", this, msg.player) != null)
@@ -229,6 +230,7 @@ public class MixingTable : StorageContainer
 				int num = recipe.Ingredients[i].Count * quantity;
 				if (num > 0)
 				{
+					Facepunch.Rust.Analytics.Azure.OnCraftMaterialConsumed(item.info.shortname, item.amount, MixStartingPlayer, this, inSafezone: false, recipe.ProducedItem?.shortname);
 					item.UseItem(num);
 				}
 			}
@@ -276,6 +278,7 @@ public class MixingTable : StorageContainer
 		{
 			int num3 = ((num > stackable) ? stackable : num);
 			Item item = ItemManager.Create(recipe.ProducedItem, num3, 0uL);
+			Facepunch.Rust.Analytics.Azure.OnCraftItem(item.info.shortname, item.amount, MixStartingPlayer, this, inSafezone: false);
 			if (!item.MoveToContainer(base.inventory))
 			{
 				item.Drop(base.inventory.dropPosition, base.inventory.dropVelocity);

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using Rust;
@@ -274,6 +275,7 @@ public class FlameTurret : StorageContainer
 		{
 			int num = Mathf.FloorToInt(pendingFuel);
 			slot.UseItem(num);
+			Facepunch.Rust.Analytics.Azure.AddPendingItems(this, slot.info.shortname, num, "flame_turret");
 			pendingFuel -= num;
 		}
 		return true;

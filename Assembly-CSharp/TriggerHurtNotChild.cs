@@ -9,7 +9,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 	{
 		BasePlayer GetPlayerDamageInitiator();
 
-		float GetPlayerDamageMultiplier();
+		float GetDamageMultiplier(BaseEntity ent);
 
 		void OnHurtTriggerOccupant(BaseEntity hurtEntity, DamageType damageType, float damageTotal);
 	}
@@ -157,7 +157,7 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 				float num = DamagePerSecond * 1f / DamageTickRate;
 				if (UseSourceEntityDamageMultiplier && hurtTiggerUser != null)
 				{
-					num *= hurtTiggerUser.GetPlayerDamageMultiplier();
+					num *= hurtTiggerUser.GetDamageMultiplier(item);
 				}
 				if (item.IsNpc)
 				{
@@ -168,6 +168,18 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 					num *= resourceMultiplier;
 				}
 				Vector3 vector = item.transform.position + Vector3.up * 1f;
+				bool flag = item is BasePlayer || item is BaseNpc;
+				BaseEntity baseEntity = null;
+				BaseEntity weaponPrefab = null;
+				if (hurtTiggerUser != null)
+				{
+					baseEntity = hurtTiggerUser.GetPlayerDamageInitiator();
+					weaponPrefab = SourceEntity.LookupPrefab();
+				}
+				if (baseEntity == null)
+				{
+					baseEntity = ((!(SourceEntity != null)) ? GameObjectEx.ToBaseEntity(base.gameObject) : SourceEntity);
+				}
 				HitInfo hitInfo = new HitInfo
 				{
 					DoHitEffects = true,
@@ -175,9 +187,9 @@ public class TriggerHurtNotChild : TriggerBase, IServerComponent, IHurtTrigger
 					HitPositionWorld = vector,
 					HitPositionLocal = item.transform.InverseTransformPoint(vector),
 					HitNormalWorld = Vector3.up,
-					HitMaterial = ((item is BaseCombatEntity) ? StringPool.Get("Flesh") : 0u),
-					WeaponPrefab = ((SourceEntity != null) ? SourceEntity.gameManager.FindPrefab(SourceEntity.prefabID).GetComponent<BaseEntity>() : null),
-					Initiator = ((hurtTiggerUser != null) ? hurtTiggerUser.GetPlayerDamageInitiator() : null)
+					HitMaterial = (flag ? StringPool.Get("Flesh") : 0u),
+					WeaponPrefab = weaponPrefab,
+					Initiator = baseEntity
 				};
 				hitInfo.damageTypes = new DamageTypeList();
 				hitInfo.damageTypes.Set(damageType, num);

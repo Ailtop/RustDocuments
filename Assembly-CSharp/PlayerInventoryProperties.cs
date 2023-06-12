@@ -25,6 +25,8 @@ public class PlayerInventoryProperties : ScriptableObject
 
 	public PlayerInventoryProperties giveBase;
 
+	private static PlayerInventoryProperties[] allInventories;
+
 	public void GiveToPlayer(BasePlayer player)
 	{
 		if (player == null)
@@ -62,5 +64,26 @@ public class PlayerInventoryProperties : ScriptableObject
 			}
 			player.inventory.GiveItem(item, destination);
 		}
+	}
+
+	public static PlayerInventoryProperties GetInventoryConfig(string name)
+	{
+		if (allInventories == null)
+		{
+			allInventories = FileSystem.LoadAll<PlayerInventoryProperties>("assets/content/properties/playerinventory");
+			Debug.Log($"Found {allInventories.Length} inventories");
+		}
+		if (allInventories != null)
+		{
+			PlayerInventoryProperties[] array = allInventories;
+			foreach (PlayerInventoryProperties playerInventoryProperties in array)
+			{
+				if (playerInventoryProperties.niceName.ToLower() == name.ToLower())
+				{
+					return playerInventoryProperties;
+				}
+			}
+		}
+		return null;
 	}
 }

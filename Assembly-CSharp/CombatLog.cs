@@ -9,9 +9,9 @@ public class CombatLog
 	{
 		public float time;
 
-		public uint attacker_id;
+		public ulong attacker_id;
 
-		public uint target_id;
+		public ulong target_id;
 
 		public string attacker;
 
@@ -102,8 +102,10 @@ public class CombatLog
 		}
 		float health_new = ((hitEntity != null) ? hitEntity.Health() : 0f);
 		val.time = UnityEngine.Time.realtimeSinceStartup;
-		val.attacker_id = ((attacker != null && attacker.net != null) ? attacker.net.ID : 0u);
-		val.target_id = ((hitEntity != null && hitEntity.net != null) ? hitEntity.net.ID : 0u);
+		NetworkableId obj = ((attacker != null && attacker.net != null) ? attacker.net.ID : default(NetworkableId));
+		val.attacker_id = obj.Value;
+		NetworkableId obj2 = ((hitEntity != null && hitEntity.net != null) ? hitEntity.net.ID : default(NetworkableId));
+		val.target_id = obj2.Value;
 		val.attacker = ((player == attacker) ? "you" : (attacker?.ShortPrefabName ?? "N/A"));
 		val.target = ((player == hitEntity) ? "you" : (hitEntity?.ShortPrefabName ?? "N/A"));
 		val.weapon = ((weapon != null) ? weapon.name : "N/A");
@@ -140,7 +142,7 @@ public class CombatLog
 		}
 	}
 
-	public string Get(int count, uint filterByAttacker = 0u, bool json = false, bool isAdmin = false, ulong requestingUser = 0uL)
+	public string Get(int count, NetworkableId filterByAttacker = default(NetworkableId), bool json = false, bool isAdmin = false, ulong requestingUser = 0uL)
 	{
 		if (storage == null)
 		{
@@ -180,7 +182,7 @@ public class CombatLog
 			}
 			else
 			{
-				if ((filterByAttacker != 0 && item.attacker_id != filterByAttacker) || (activeGameMode != null && !activeGameMode.returnValidCombatlog && !isAdmin && item.proj_hits > 0))
+				if ((filterByAttacker.IsValid && item.attacker_id != filterByAttacker.Value) || (activeGameMode != null && !activeGameMode.returnValidCombatlog && !isAdmin && item.proj_hits > 0))
 				{
 					continue;
 				}
@@ -189,7 +191,7 @@ public class CombatLog
 				{
 					string text = num3.ToString("0.00s");
 					string attacker = item.attacker;
-					uint attacker_id = item.attacker_id;
+					ulong attacker_id = item.attacker_id;
 					string text2 = attacker_id.ToString();
 					string target = item.target;
 					attacker_id = item.target_id;

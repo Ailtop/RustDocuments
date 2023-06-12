@@ -273,7 +273,7 @@ public class Effect : EffectData
 		{
 			Debug.LogWarning("Effect.Init - invalid entity");
 		}
-		entity = (BaseNetworkableEx.IsValid(ent) ? ent.net.ID : 0u);
+		entity = (BaseNetworkableEx.IsValid(ent) ? ent.net.ID : default(NetworkableId));
 		source = sourceConnection?.userid ?? 0;
 		bone = boneID;
 	}
@@ -287,7 +287,7 @@ public class Effect : EffectData
 		worldNrm = normWorld;
 		gameObject = null;
 		Up = Vector3.zero;
-		entity = 0u;
+		entity = default(NetworkableId);
 		origin = worldPos;
 		normal = worldNrm;
 		bone = 0u;

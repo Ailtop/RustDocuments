@@ -18,7 +18,7 @@ public class BasePortal : BaseCombatEntity
 
 	public BasePortal targetPortal;
 
-	public uint targetID;
+	public NetworkableId targetID;
 
 	public Transform localEntryExitPos;
 
@@ -109,7 +109,7 @@ public class BasePortal : BaseCombatEntity
 		{
 			targetID = targetPortal.net.ID;
 		}
-		if (targetPortal == null && targetID != 0)
+		if (targetPortal == null && targetID.IsValid)
 		{
 			BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(targetID);
 			if (baseNetworkable != null)
@@ -201,8 +201,8 @@ public class BasePortal : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
 	public void RPC_UsePortal(RPCMessage msg)
 	{

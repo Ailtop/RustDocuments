@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Network.Visibility;
 using Oxide.Core;
@@ -64,18 +65,18 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	public abstract class EntityRealm : IEnumerable<BaseNetworkable>, IEnumerable
 	{
-		public ListDictionary<uint, BaseNetworkable> entityList = new ListDictionary<uint, BaseNetworkable>();
+		public ListDictionary<NetworkableId, BaseNetworkable> entityList = new ListDictionary<NetworkableId, BaseNetworkable>();
 
 		public int Count => entityList.Count;
 
 		protected abstract Manager visibilityManager { get; }
 
-		public bool Contains(uint uid)
+		public bool Contains(NetworkableId uid)
 		{
 			return entityList.Contains(uid);
 		}
 
-		public BaseNetworkable Find(uint uid)
+		public BaseNetworkable Find(NetworkableId uid)
 		{
 			BaseNetworkable val = null;
 			if (!entityList.TryGetValue(uid, out val))
@@ -190,8 +191,8 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	private MemoryStream _SaveCache;
 
-	[Header("BaseNetworkable")]
 	[ReadOnly]
+	[Header("BaseNetworkable")]
 	public uint prefabID;
 
 	[Tooltip("If enabled the entity will send to everyone on the server - regardless of position")]
@@ -493,6 +494,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	internal virtual void DoServerDestroy()
 	{
 		isSpawned = false;
+		Facepunch.Rust.Analytics.Azure.OnEntityDestroyed(this);
 	}
 
 	public virtual bool ShouldNetworkTo(BasePlayer player)
@@ -616,8 +618,8 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 				obj = GetNetworkRotation().eulerAngles;
 				netWrite.Vector3(in obj);
 				netWrite.Float(GetNetworkTime());
-				uint uid = parentEntity.uid;
-				if (uid != 0)
+				NetworkableId uid = parentEntity.uid;
+				if (uid.IsValid)
 				{
 					netWrite.EntityID(uid);
 				}
@@ -772,7 +774,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		return false;
 	}
 
-	public bool EqualNetID(uint otherID)
+	public bool EqualNetID(NetworkableId otherID)
 	{
 		if (net != null)
 		{
@@ -786,6 +788,10 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		if (children.Count > 0)
 		{
 			children.Clear();
+		}
+		if (this is ILootableEntity lootableEntity)
+		{
+			lootableEntity.LastLootedBy = 0uL;
 		}
 	}
 
@@ -926,7 +932,7 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	{
 	}
 
-	public void InitLoad(uint entityID)
+	public void InitLoad(NetworkableId entityID)
 	{
 		net = Network.Net.sv.CreateNetworkable(entityID);
 		serverEntities.RegisterID(this);

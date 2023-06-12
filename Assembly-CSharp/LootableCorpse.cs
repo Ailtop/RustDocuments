@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -28,13 +29,15 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	{
 		get
 		{
-			return NameHelper.Get(playerSteamID, _playerName);
+			return NameHelper.Get(playerSteamID, _playerName, base.isClient);
 		}
 		set
 		{
 			_playerName = value;
 		}
 	}
+
+	public virtual string streamerName { get; set; }
 
 	public Translate.Phrase LootPanelTitle => playerName;
 
@@ -156,8 +159,10 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 	{
 		if (!firstLooted)
 		{
-			_ = playerSteamID;
-			_ = 10000000;
+			if (playerSteamID <= 10000000)
+			{
+				Facepunch.Rust.Analytics.Azure.OnFirstLooted(this, baseEntity);
+			}
 			firstLooted = true;
 		}
 		return base.OnStartBeingLooted(baseEntity);
@@ -168,8 +173,8 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_LootCorpse(RPCMessage rpc)
 	{
 		BasePlayer player = rpc.player;
@@ -222,6 +227,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		info.msg.lootableCorpse = Facepunch.Pool.Get<ProtoBuf.LootableCorpse>();
 		info.msg.lootableCorpse.playerName = playerName;
 		info.msg.lootableCorpse.playerID = playerSteamID;
+		info.msg.lootableCorpse.streamerName = streamerName;
 		if (!info.forDisk || containers == null)
 		{
 			return;
@@ -250,6 +256,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 			return;
 		}
 		playerName = info.msg.lootableCorpse.playerName;
+		streamerName = info.msg.lootableCorpse.streamerName;
 		playerSteamID = info.msg.lootableCorpse.playerID;
 		if (info.fromDisk && info.msg.lootableCorpse.privateData != null && info.msg.lootableCorpse.privateData.container != null)
 		{

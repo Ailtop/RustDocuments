@@ -25,5 +25,6 @@ public enum AIState
 	CombatStationary = 22,
 	Cooldown = 23,
 	MoveToPoint = 24,
-	MoveToVector3 = 25
+	MoveToVector3 = 25,
+	Blinded = 26
 }

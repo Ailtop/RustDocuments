@@ -32,11 +32,23 @@ public class CameraSubscribe : BaseHandler<AppCameraSubscribe>
 			SendError("no_player");
 			return;
 		}
+		if (base.Player.IsConnected)
+		{
+			base.Client.EndViewing();
+			SendError("player_online");
+			return;
+		}
 		IRemoteControllable remoteControllable = RemoteControlEntity.FindByID(base.Proto.cameraId);
 		if (remoteControllable == null || !remoteControllable.CanControl(base.UserId))
 		{
 			base.Client.EndViewing();
 			SendError("not_found");
+			return;
+		}
+		if (remoteControllable is CCTV_RC cCTV_RC && cCTV_RC.IsStatic())
+		{
+			base.Client.EndViewing();
+			SendError("access_denied");
 			return;
 		}
 		BaseEntity ent = remoteControllable.GetEnt();

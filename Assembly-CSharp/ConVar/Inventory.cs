@@ -23,11 +23,15 @@ public class Inventory : ConsoleSystem
 			public ulong skin;
 
 			public int[] containedItems;
+
+			public int blueprintTarget;
 		}
 
 		public SavedItem[] belt;
 
 		public SavedItem[] wear;
+
+		public SavedItem[] main;
 
 		public int heldItemIndex;
 
@@ -39,7 +43,16 @@ public class Inventory : ConsoleSystem
 		{
 			belt = SaveItems(player.inventory.containerBelt);
 			wear = SaveItems(player.inventory.containerWear);
+			main = SaveItems(player.inventory.containerMain);
 			heldItemIndex = GetSlotIndex(player);
+		}
+
+		public SavedLoadout(PlayerInventoryProperties properties)
+		{
+			belt = SaveItems(properties.belt);
+			wear = SaveItems(properties.wear);
+			main = SaveItems(properties.main);
+			heldItemIndex = 0;
 		}
 
 		private static SavedItem[] SaveItems(ItemContainer itemContainer)
@@ -56,6 +69,7 @@ public class Inventory : ConsoleSystem
 				savedItem.id = slot.info.itemid;
 				savedItem.amount = slot.amount;
 				savedItem.skin = slot.skin;
+				savedItem.blueprintTarget = slot.blueprintTarget;
 				SavedItem item = savedItem;
 				if (slot.contents != null && slot.contents.itemList != null)
 				{
@@ -71,26 +85,53 @@ public class Inventory : ConsoleSystem
 			return list.ToArray();
 		}
 
+		private static SavedItem[] SaveItems(List<PlayerInventoryProperties.ItemAmountSkinned> items)
+		{
+			List<SavedItem> list = new List<SavedItem>();
+			foreach (PlayerInventoryProperties.ItemAmountSkinned item2 in items)
+			{
+				SavedItem savedItem = default(SavedItem);
+				savedItem.id = item2.itemid;
+				savedItem.amount = (int)item2.amount;
+				savedItem.skin = item2.skinOverride;
+				SavedItem item = savedItem;
+				if (item2.blueprint)
+				{
+					item.blueprintTarget = item.id;
+					item.id = ItemManager.blueprintBaseDef.itemid;
+				}
+				list.Add(item);
+			}
+			return list.ToArray();
+		}
+
 		public void LoadItemsOnTo(BasePlayer player)
 		{
+			player.inventory.containerMain.Clear();
 			player.inventory.containerBelt.Clear();
 			player.inventory.containerWear.Clear();
-			SavedItem[] array = belt;
-			foreach (SavedItem item in array)
-			{
-				player.inventory.GiveItem(LoadItem(item), player.inventory.containerBelt);
-			}
-			array = wear;
-			foreach (SavedItem item2 in array)
-			{
-				player.inventory.GiveItem(LoadItem(item2), player.inventory.containerWear);
-			}
+			ItemManager.DoRemoves();
+			LoadItems(belt, player.inventory.containerBelt);
+			LoadItems(wear, player.inventory.containerWear);
+			LoadItems(main, player.inventory.containerMain);
 			EquipItemInSlot(player, heldItemIndex);
+			player.inventory.SendSnapshot();
+			void LoadItems(SavedItem[] items, ItemContainer container)
+			{
+				foreach (SavedItem item in items)
+				{
+					player.inventory.GiveItem(LoadItem(item), container);
+				}
+			}
 		}
 
 		private Item LoadItem(SavedItem item)
 		{
 			Item item2 = ItemManager.CreateByItemID(item.id, item.amount, item.skin);
+			if (item.blueprintTarget != 0)
+			{
+				item2.blueprintTarget = item.blueprintTarget;
+			}
 			if (item.containedItems != null && item.containedItems.Length != 0)
 			{
 				int[] containedItems = item.containedItems;
@@ -428,7 +469,7 @@ public class Inventory : ConsoleSystem
 		if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
 		{
 			string @string = arg.GetString(0);
-			BasePlayer basePlayer2 = ArgEx.GetPlayerOrSleeperOrBot(arg, 1);
+			BasePlayer basePlayer2 = (string.IsNullOrEmpty(arg.GetString(1)) ? null : ArgEx.GetPlayerOrSleeperOrBot(arg, 1));
 			if (basePlayer2 == null)
 			{
 				basePlayer2 = basePlayer;
@@ -456,7 +497,7 @@ public class Inventory : ConsoleSystem
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
 		{
-			BasePlayer basePlayer2 = ArgEx.GetPlayerOrSleeperOrBot(arg, 0);
+			BasePlayer basePlayer2 = (string.IsNullOrEmpty(arg.GetString(1)) ? null : ArgEx.GetPlayerOrSleeperOrBot(arg, 1));
 			if (basePlayer2 == null)
 			{
 				basePlayer2 = basePlayer;
@@ -493,6 +534,13 @@ public class Inventory : ConsoleSystem
 
 	public static bool LoadLoadout(string name, out SavedLoadout so)
 	{
+		PlayerInventoryProperties inventoryConfig = PlayerInventoryProperties.GetInventoryConfig(name);
+		if (inventoryConfig != null)
+		{
+			Debug.Log("Found builtin config!");
+			so = new SavedLoadout(inventoryConfig);
+			return true;
+		}
 		so = new SavedLoadout();
 		string loadoutPath = GetLoadoutPath(name);
 		if (!File.Exists(loadoutPath))
@@ -524,8 +572,8 @@ public class Inventory : ConsoleSystem
 		arg.ReplyWith(stringBuilder.ToString());
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void defs(Arg arg)
 	{
 		if (Steamworks.SteamInventory.Definitions == null)
@@ -597,7 +645,7 @@ public class Inventory : ConsoleSystem
 
 	private static void EquipItemInSlot(BasePlayer player, int slot)
 	{
-		uint itemID = 0u;
+		ItemId itemID = default(ItemId);
 		for (int i = 0; i < player.inventory.containerBelt.itemList.Count; i++)
 		{
 			if (player.inventory.containerBelt.itemList[i] != null && i == slot)
@@ -615,7 +663,7 @@ public class Inventory : ConsoleSystem
 		{
 			return -1;
 		}
-		uint uid = player.GetActiveItem().uid;
+		ItemId uid = player.GetActiveItem().uid;
 		for (int i = 0; i < player.inventory.containerBelt.itemList.Count; i++)
 		{
 			if (player.inventory.containerBelt.itemList[i] != null && player.inventory.containerBelt.itemList[i].uid == uid)

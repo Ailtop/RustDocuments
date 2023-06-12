@@ -20,8 +20,8 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 
 	private bool disablePhysics;
 
-	[Header("Modular Vehicle")]
 	[SerializeField]
+	[Header("Modular Vehicle")]
 	public List<ModularVehicleSocket> moduleSockets;
 
 	[SerializeField]
@@ -131,7 +131,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
-		if (Inventory != null && Inventory.UID == 0)
+		if (Inventory != null && !Inventory.UID.IsValid)
 		{
 			Inventory.GiveUIDs();
 		}
@@ -322,7 +322,7 @@ public abstract class BaseModularVehicle : GroundVehicle, PlayerInventory.ICanMo
 		}
 	}
 
-	public Item GetVehicleItem(uint itemUID)
+	public Item GetVehicleItem(ItemId itemUID)
 	{
 		Item item = Inventory.ChassisContainer.FindItemByUID(itemUID);
 		if (item == null)

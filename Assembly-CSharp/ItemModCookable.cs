@@ -1,3 +1,4 @@
+using Facepunch.Rust;
 using UnityEngine;
 
 public class ItemModCookable : ItemMod
@@ -72,11 +73,13 @@ public class ItemModCookable : ItemMod
 		{
 			item.Remove();
 		}
+		Analytics.Azure.AddPendingItems(baseOven, item.info.shortname, a, "smelt");
 		if (!(becomeOnCooked != null))
 		{
 			return;
 		}
 		Item item2 = ItemManager.Create(becomeOnCooked, amountOfBecome * a, 0uL);
+		Analytics.Azure.AddPendingItems(baseOven, item2.info.shortname, item2.amount, "smelt", consumed: false);
 		if (item2 != null && !item2.MoveToContainer(item.parent) && !item2.MoveToContainer(item.parent))
 		{
 			item2.Drop(item.parent.dropPosition, item.parent.dropVelocity);

@@ -56,6 +56,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			float scaledDuration = GetScaledDuration(value.blueprint, currentCraftLevel);
 			value.endTime = UnityEngine.Time.realtimeSinceStartup + scaledDuration;
+			value.workbenchEntity = value.owner.GetCachedCraftLevelWorkbench();
 			if (value.owner != null)
 			{
 				value.owner.Command("note.craft_start", value.taskUID, scaledDuration, value.amount);
@@ -168,6 +169,8 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		Item item = ItemManager.CreateByItemID(task.blueprint.targetItem.itemid, 1, skin);
 		item.amount = task.blueprint.amountToCreate;
 		int amount = item.amount;
+		_ = task.owner.currentCraftLevel;
+		bool inSafezone = task.owner.InSafeZone();
 		if (item.hasCondition && task.conditionScale != 1f)
 		{
 			item.maxCondition *= task.conditionScale;
@@ -186,6 +189,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 				if (takenItem.info == ingredient.itemDef)
 				{
 					int num2 = Mathf.Min(takenItem.amount, num);
+					Facepunch.Rust.Analytics.Azure.OnCraftMaterialConsumed(takenItem.info.shortname, num, base.baseEntity, task.workbenchEntity, inSafezone, item.info.shortname);
 					takenItem.UseItem(num);
 					num -= num2;
 				}
@@ -193,6 +197,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 			}
 		}
 		Facepunch.Rust.Analytics.Server.Crafting(task.blueprint.targetItem.shortname, task.skinID);
+		Facepunch.Rust.Analytics.Azure.OnCraftItem(item.info.shortname, item.amount, base.baseEntity, task.workbenchEntity, inSafezone);
 		task.owner.Command("note.craft_done", task.taskUID, 1, task.amount);
 		Interface.CallHook("OnItemCraftFinished", task, item);
 		if (task.instanceData != null)

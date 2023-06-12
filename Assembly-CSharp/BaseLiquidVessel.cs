@@ -263,12 +263,15 @@ public class BaseLiquidVessel : AttackEntity
 
 	public void LoseWater(int amount)
 	{
-		Item slot = GetItem().contents.GetSlot(0);
-		if (slot != null)
+		if (!base.UsingInfiniteAmmoCheat)
 		{
-			slot.UseItem(amount);
-			slot.MarkDirty();
-			SendNetworkUpdateImmediate();
+			Item slot = GetItem().contents.GetSlot(0);
+			if (slot != null)
+			{
+				slot.UseItem(amount);
+				slot.MarkDirty();
+				SendNetworkUpdateImmediate();
+			}
 		}
 	}
 

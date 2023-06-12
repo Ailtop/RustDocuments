@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -111,20 +112,23 @@ public class Planner : HeldEntity
 			AntiHack.NoteAdminHack(ownerPlayer);
 			return;
 		}
-		BaseGameMode.CanBuildResult? canBuildResult = BaseGameMode.GetActiveGameMode(serverside: true)?.CanBuildEntity(ownerPlayer, construction);
-		if (canBuildResult.HasValue)
+		if (ConVar.Server.max_sleeping_bags > 0)
 		{
-			if (canBuildResult.Value.Phrase != null)
+			SleepingBag.CanBuildResult? canBuildResult = SleepingBag.CanBuildBed(ownerPlayer, construction);
+			if (canBuildResult.HasValue)
 			{
-				ownerPlayer.ShowToast((!canBuildResult.Value.Result) ? GameTip.Styles.Red_Normal : GameTip.Styles.Blue_Long, canBuildResult.Value.Phrase, canBuildResult.Value.Arguments);
-			}
-			if (!canBuildResult.Value.Result)
-			{
-				return;
+				if (canBuildResult.Value.Phrase != null)
+				{
+					ownerPlayer.ShowToast((!canBuildResult.Value.Result) ? GameTip.Styles.Red_Normal : GameTip.Styles.Blue_Long, canBuildResult.Value.Phrase, canBuildResult.Value.Arguments);
+				}
+				if (!canBuildResult.Value.Result)
+				{
+					return;
+				}
 			}
 		}
 		Construction.Target target = default(Construction.Target);
-		if (msg.entity != 0)
+		if (msg.entity.IsValid)
 		{
 			target.entity = BaseNetworkable.serverEntities.Find(msg.entity) as BaseEntity;
 			if (target.entity == null)
@@ -262,9 +266,9 @@ public class Planner : HeldEntity
 		}
 		Interface.CallHook("OnEntityBuilt", this, gameObject);
 		Deployable deployable = GetDeployable();
+		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
 		if (deployable != null)
 		{
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
 			if (deployable.setSocketParent && target.entity != null && target.entity.SupportsChildDeployables() && (bool)baseEntity)
 			{
 				baseEntity.SetParent(target.entity, worldPositionStays: true);
@@ -298,6 +302,10 @@ public class Planner : HeldEntity
 					Effect.server.Run(deployable.placeEffect.resourcePath, target.position, target.normal);
 				}
 			}
+		}
+		if (baseEntity != null)
+		{
+			Facepunch.Rust.Analytics.Azure.OnEntityBuilt(baseEntity, ownerPlayer);
 		}
 		PayForPlacement(ownerPlayer, component);
 	}
@@ -384,7 +392,7 @@ public class Planner : HeldEntity
 			return;
 		}
 		List<Item> list = new List<Item>();
-		foreach (ItemAmount item in component.defaultGrade.costToBuild)
+		foreach (ItemAmount item in component.defaultGrade.CostToBuild())
 		{
 			player.inventory.Take(list, item.itemDef.itemid, (int)item.amount);
 			player.Command("note.inv", item.itemDef.itemid, item.amount * -1f);
@@ -411,7 +419,7 @@ public class Planner : HeldEntity
 		{
 			return (bool)obj;
 		}
-		foreach (ItemAmount item in component.defaultGrade.costToBuild)
+		foreach (ItemAmount item in component.defaultGrade.CostToBuild())
 		{
 			if ((float)ownerPlayer.inventory.GetAmount(item.itemDef.itemid) < item.amount)
 			{

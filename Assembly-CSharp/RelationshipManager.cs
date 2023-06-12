@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CompanionServer;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -195,10 +196,15 @@ public class RelationshipManager : BaseEntity
 				return false;
 			}
 			player.currentTeam = teamID;
+			bool num = members.Count == 0;
 			members.Add(userID);
 			ServerInstance.playerToTeam.Add(userID, this);
 			MarkDirty();
 			player.SendNetworkUpdate();
+			if (!num)
+			{
+				Facepunch.Rust.Analytics.Azure.OnTeamChanged("added", teamID, teamLeader, userID, members);
+			}
 			return true;
 		}
 
@@ -219,9 +225,11 @@ public class RelationshipManager : BaseEntity
 					if (members.Count > 0)
 					{
 						SetTeamLeader(members[0]);
+						Facepunch.Rust.Analytics.Azure.OnTeamChanged("removed", teamID, teamLeader, playerID, members);
 					}
 					else
 					{
+						Facepunch.Rust.Analytics.Azure.OnTeamChanged("disband", teamID, teamLeader, playerID, members);
 						Disband();
 					}
 				}
@@ -233,6 +241,7 @@ public class RelationshipManager : BaseEntity
 
 		public void SetTeamLeader(ulong newTeamLeader)
 		{
+			Facepunch.Rust.Analytics.Azure.OnTeamChanged("promoted", teamID, teamLeader, newTeamLeader, members);
 			teamLeader = newTeamLeader;
 			MarkDirty();
 		}
@@ -339,6 +348,37 @@ public class RelationshipManager : BaseEntity
 	{
 		using (TimeWarning.New("RelationshipManager.OnRpcMessage"))
 		{
+			if (rpc == 532372582 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BagQuotaRequest_SERVER "));
+				}
+				using (TimeWarning.New("BagQuotaRequest_SERVER"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(532372582u, "BagQuotaRequest_SERVER", this, player, 2uL))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							BagQuotaRequest_SERVER();
+						}
+					}
+					catch (Exception exception)
+					{
+						Debug.LogException(exception);
+						player.Kick("RPC Error in BagQuotaRequest_SERVER");
+					}
+				}
+				return true;
+			}
 			if (rpc == 1684577101 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
@@ -367,9 +407,9 @@ public class RelationshipManager : BaseEntity
 							SERVER_ChangeRelationship(msg2);
 						}
 					}
-					catch (Exception exception)
+					catch (Exception exception2)
 					{
-						Debug.LogException(exception);
+						Debug.LogException(exception2);
 						player.Kick("RPC Error in SERVER_ChangeRelationship");
 					}
 				}
@@ -403,9 +443,9 @@ public class RelationshipManager : BaseEntity
 							SERVER_ReceiveMugshot(msg3);
 						}
 					}
-					catch (Exception exception2)
+					catch (Exception exception3)
 					{
-						Debug.LogException(exception2);
+						Debug.LogException(exception3);
 						player.Kick("RPC Error in SERVER_ReceiveMugshot");
 					}
 				}
@@ -439,9 +479,9 @@ public class RelationshipManager : BaseEntity
 							SERVER_SendFreshContacts(msg4);
 						}
 					}
-					catch (Exception exception3)
+					catch (Exception exception4)
 					{
-						Debug.LogException(exception3);
+						Debug.LogException(exception4);
 						player.Kick("RPC Error in SERVER_SendFreshContacts");
 					}
 				}
@@ -475,9 +515,9 @@ public class RelationshipManager : BaseEntity
 							SERVER_UpdatePlayerNote(msg5);
 						}
 					}
-					catch (Exception exception4)
+					catch (Exception exception5)
 					{
-						Debug.LogException(exception4);
+						Debug.LogException(exception5);
 						player.Kick("RPC Error in SERVER_UpdatePlayerNote");
 					}
 				}
@@ -485,6 +525,12 @@ public class RelationshipManager : BaseEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(2uL)]
+	public void BagQuotaRequest_SERVER()
+	{
 	}
 
 	public override void ServerInit()
@@ -1106,8 +1152,10 @@ public class RelationshipManager : BaseEntity
 		if (basePlayer.currentTeam == 0L && Interface.CallHook("OnTeamCreate", basePlayer) == null)
 		{
 			PlayerTeam playerTeam = ServerInstance.CreateTeam();
-			playerTeam.teamLeader = basePlayer.userID;
-			playerTeam.AddPlayer(basePlayer);
+			PlayerTeam playerTeam2 = playerTeam;
+			playerTeam2.teamLeader = basePlayer.userID;
+			playerTeam2.AddPlayer(basePlayer);
+			Facepunch.Rust.Analytics.Azure.OnTeamChanged("created", playerTeam2.teamID, basePlayer.userID, basePlayer.userID, playerTeam2.members);
 			Interface.CallHook("OnTeamCreated", basePlayer, playerTeam);
 		}
 	}

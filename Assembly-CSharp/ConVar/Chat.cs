@@ -6,6 +6,7 @@ using CircularBuffer;
 using CompanionServer;
 using Facepunch;
 using Facepunch.Math;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -50,8 +51,8 @@ public class Chat : ConsoleSystem
 
 	private const float textVolumeBoost = 0.2f;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool enabled = true;
 
 	[ServerVar(Help = "Number of messages to keep in memory for chat history")]
@@ -140,7 +141,9 @@ public class Chat : ConsoleSystem
 			}
 		}
 		string @string = arg.GetString(0, "text");
-		if (sayAs(targetChannel, basePlayer.userID, basePlayer.displayName, @string, basePlayer))
+		bool num2 = sayAs(targetChannel, basePlayer.userID, basePlayer.displayName, @string, basePlayer);
+		Facepunch.Rust.Analytics.Azure.OnChatMessage(basePlayer, @string, (int)targetChannel);
+		if (num2)
 		{
 			basePlayer.NextChatTime = UnityEngine.Time.realtimeSinceStartup + 1.5f;
 		}
@@ -287,8 +290,8 @@ public class Chat : ConsoleSystem
 		return false;
 	}
 
-	[ServerVar]
 	[Help("Return the last x lines of the console. Default is 200")]
+	[ServerVar]
 	public static IEnumerable<ChatEntry> tail(Arg arg)
 	{
 		int @int = arg.GetInt(0, 200);

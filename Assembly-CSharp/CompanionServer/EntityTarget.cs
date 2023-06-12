@@ -4,9 +4,9 @@ namespace CompanionServer;
 
 public readonly struct EntityTarget : IEquatable<EntityTarget>
 {
-	public uint EntityId { get; }
+	public NetworkableId EntityId { get; }
 
-	public EntityTarget(uint entityId)
+	public EntityTarget(NetworkableId entityId)
 	{
 		EntityId = entityId;
 	}
@@ -27,7 +27,7 @@ public readonly struct EntityTarget : IEquatable<EntityTarget>
 
 	public override int GetHashCode()
 	{
-		return (int)EntityId;
+		return EntityId.GetHashCode();
 	}
 
 	public static bool operator ==(EntityTarget left, EntityTarget right)

@@ -621,7 +621,7 @@ public class ModularCarGarage : ContainerIOEntity
 		{
 			if (IsOn() || !carOccupant.IsComplete())
 			{
-				if (lockedOccupant == null)
+				if (lockedOccupant == null && !carOccupant.rigidBody.isKinematic)
 				{
 					GrabOccupant(occupantTrigger.carOccupant);
 				}
@@ -674,9 +674,9 @@ public class ModularCarGarage : ContainerIOEntity
 		info.msg.vehicleLift.occupantLockState = (int)OccupantLockState;
 	}
 
-	public override uint GetIdealContainer(BasePlayer player, Item item)
+	public override ItemContainerId GetIdealContainer(BasePlayer player, Item item, bool altMove)
 	{
-		return 0u;
+		return default(ItemContainerId);
 	}
 
 	public override bool PlayerOpenLoot(BasePlayer player, string panelToOpen = "", bool doPositionChecks = true)
@@ -838,16 +838,16 @@ public class ModularCarGarage : ContainerIOEntity
 		SetFlag(Flags.Reserved6, b: false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	public void RPC_RepairItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		uint num = msg.read.UInt32();
+		ItemId itemId = msg.read.ItemID();
 		if (!(player == null) && HasOccupant)
 		{
-			Item vehicleItem = carOccupant.GetVehicleItem(num);
+			Item vehicleItem = carOccupant.GetVehicleItem(itemId);
 			if (vehicleItem != null)
 			{
 				RepairBench.RepairAnItem(vehicleItem, player, this, 0f, mustKnowBlueprint: false);
@@ -855,14 +855,14 @@ public class ModularCarGarage : ContainerIOEntity
 			}
 			else
 			{
-				Debug.LogError(GetType().Name + ": Couldn't get item to repair, with ID: " + num);
+				Debug.LogError(GetType().Name + ": Couldn't get item to repair, with ID: " + itemId);
 			}
 		}
 	}
 
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenEditing(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -872,9 +872,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_DiedWithKeypadOpen(RPCMessage msg)
 	{
 		SetFlag(Flags.Reserved7, b: false);
@@ -887,7 +887,7 @@ public class ModularCarGarage : ContainerIOEntity
 	public void RPC_SelectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		uint itemUID = msg.read.UInt32();
+		ItemId itemUID = msg.read.ItemID();
 		if (player == null || !player.inventory.loot.IsLooting() || player.inventory.loot.entitySource != this || !HasOccupant)
 		{
 			return;
@@ -926,8 +926,8 @@ public class ModularCarGarage : ContainerIOEntity
 		Interface.CallHook("OnVehicleModuleSelected", vehicleItem, this, player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_DeselectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -986,9 +986,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
 	public void RPC_RequestNewCode(RPCMessage msg)
 	{
 		if (!HasOccupant || !carOccupant.CarLock.HasALock)
@@ -1006,9 +1006,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
 	public void RPC_StartDestroyingChassis(RPCMessage msg)
 	{

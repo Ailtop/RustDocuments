@@ -2,11 +2,8 @@ using UnityEngine;
 
 namespace Facepunch.UI;
 
-public class ESPCanvas : MonoBehaviour
+public class ESPCanvas : SingletonComponent<ESPCanvas>
 {
-	[Tooltip("Max amount of elements to show at once")]
-	public int MaxElements;
-
 	[Tooltip("Amount of times per second we should update the visible panels")]
 	public float RefreshRate = 5f;
 
@@ -16,15 +13,30 @@ public class ESPCanvas : MonoBehaviour
 	[Tooltip("Entities this far away won't be overlayed")]
 	public float MaxDistance = 64f;
 
-	[ClientVar(ClientAdmin = true)]
-	public static float OverrideMaxDisplayDistance;
+	private static int NameplateCount = 32;
 
 	[ClientVar(ClientAdmin = true)]
-	public static bool DisableOcclusionChecks;
+	public static float OverrideMaxDisplayDistance = 0f;
 
 	[ClientVar(ClientAdmin = true)]
-	public static bool ShowHealth;
+	public static bool DisableOcclusionChecks = false;
 
 	[ClientVar(ClientAdmin = true)]
-	public static bool ColourCodeTeams;
+	public static bool ShowHealth = false;
+
+	[ClientVar(ClientAdmin = true)]
+	public static bool ColourCodeTeams = false;
+
+	[ClientVar(ClientAdmin = true, Help = "Max amount of nameplates to show at once")]
+	public static int MaxNameplates
+	{
+		get
+		{
+			return NameplateCount;
+		}
+		set
+		{
+			NameplateCount = Mathf.Clamp(value, 16, 150);
+		}
+	}
 }

@@ -87,7 +87,7 @@ public class HeldEntity : BaseEntity
 
 	private TimeSince lastHeldEvent;
 
-	public uint ownerItemUID;
+	public ItemId ownerItemUID;
 
 	private Item cachedItem;
 

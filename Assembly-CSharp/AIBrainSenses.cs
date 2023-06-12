@@ -62,7 +62,7 @@ public class AIBrainSenses
 
 	public IAIAttack ownerAttack;
 
-	private BaseAIBrain brain;
+	public BaseAIBrain brain;
 
 	private Func<BaseEntity, bool> aiCaresAbout;
 
@@ -100,6 +100,11 @@ public class AIBrainSenses
 		this.refreshKnownLOS = refreshKnownLOS;
 		ownerSenses = owner as IAISenses;
 		knownPlayersLOSUpdateInterval = ((owner is HumanNPC) ? HumanKnownPlayersLOSUpdateInterval : KnownPlayersLOSUpdateInterval);
+	}
+
+	public void DelaySenseUpdate(float delay)
+	{
+		nextUpdateTime = UnityEngine.Time.time + delay;
 	}
 
 	public void Update()

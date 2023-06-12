@@ -245,6 +245,7 @@ public class ExcavatorArm : BaseEntity
 				{
 					return;
 				}
+				Facepunch.Rust.Analytics.Azure.OnExcavatorProduceItem(item, this);
 				if (!item.MoveToContainer(outputPile.inventory))
 				{
 					item.Drop(outputPile.GetDropPosition(), outputPile.GetDropVelocity());
@@ -267,8 +268,8 @@ public class ExcavatorArm : BaseEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_SetResourceTarget(RPCMessage msg)
 	{
 		string text = msg.read.String();

@@ -5,12 +5,12 @@ namespace Rust.AI;
 
 public static class AStarPath
 {
-	private static float Heuristic(BasePathNode from, BasePathNode to)
+	private static float Heuristic(IAIPathNode from, IAIPathNode to)
 	{
-		return Vector3.Distance(from.transform.position, to.transform.position);
+		return Vector3.Distance(from.Position, to.Position);
 	}
 
-	public static bool FindPath(BasePathNode start, BasePathNode goal, out Stack<BasePathNode> path, out float pathCost)
+	public static bool FindPath(IAIPathNode start, IAIPathNode goal, out Stack<IAIPathNode> path, out float pathCost)
 	{
 		path = null;
 		pathCost = -1f;
@@ -20,7 +20,7 @@ public static class AStarPath
 			return false;
 		}
 		AStarNodeList aStarNodeList = new AStarNodeList();
-		HashSet<BasePathNode> hashSet = new HashSet<BasePathNode>();
+		HashSet<IAIPathNode> hashSet = new HashSet<IAIPathNode>();
 		AStarNode item = new AStarNode(0f, Heuristic(start, goal), null, start);
 		aStarNodeList.Add(item);
 		while (aStarNodeList.Count > 0)
@@ -30,7 +30,7 @@ public static class AStarPath
 			hashSet.Add(aStarNode.Node);
 			if (aStarNode.Satisfies(goal))
 			{
-				path = new Stack<BasePathNode>();
+				path = new Stack<IAIPathNode>();
 				pathCost = 0f;
 				while (aStarNode.Parent != null)
 				{
@@ -45,7 +45,7 @@ public static class AStarPath
 				result = true;
 				break;
 			}
-			foreach (BasePathNode item2 in aStarNode.Node.linked)
+			foreach (IAIPathNode item2 in aStarNode.Node.Linked)
 			{
 				if (!hashSet.Contains(item2))
 				{

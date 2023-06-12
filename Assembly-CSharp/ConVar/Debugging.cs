@@ -14,15 +14,15 @@ namespace ConVar;
 [Factory("debug")]
 public class Debugging : ConsoleSystem
 {
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool checktriggers = false;
 
 	[ServerVar]
 	public static bool checkparentingtriggers = true;
 
-	[ServerVar]
 	[ClientVar(Saved = false, Help = "Shows some debug info for dismount attempts.")]
+	[ServerVar]
 	public static bool DebugDismounts = false;
 
 	[ServerVar(Help = "Do not damage any items")]
@@ -32,8 +32,8 @@ public class Debugging : ConsoleSystem
 	[ServerVar]
 	public static bool callbacks = false;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool log
 	{
 		get
@@ -77,6 +77,36 @@ public class Debugging : ConsoleSystem
 		float num = Mathf.Clamp(arg.GetFloat(0), 0f, 1f);
 		arg.ReplyWith("Stalling for " + num + " seconds...");
 		Thread.Sleep(Mathf.RoundToInt(num * 1000f));
+	}
+
+	[ServerVar(Help = "Repair all items in inventory")]
+	public static void repair_inventory(Arg args)
+	{
+		BasePlayer basePlayer = ArgEx.Player(args);
+		if (!basePlayer)
+		{
+			return;
+		}
+		Item[] array = basePlayer.inventory.AllItems();
+		foreach (Item item in array)
+		{
+			if (item != null)
+			{
+				item.maxCondition = item.info.condition.max;
+				item.condition = item.maxCondition;
+				item.MarkDirty();
+			}
+			if (item.contents == null)
+			{
+				continue;
+			}
+			foreach (Item item2 in item.contents.itemList)
+			{
+				item2.maxCondition = item2.info.condition.max;
+				item2.condition = item2.maxCondition;
+				item2.MarkDirty();
+			}
+		}
 	}
 
 	[ServerVar(Help = "Takes you in and out of your current network group, causing you to delete and then download all entities in your PVS again")]

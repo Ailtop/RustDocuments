@@ -1,10 +1,10 @@
 using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(Camera))]
-[AddComponentMenu("KriptoFX/Explosion_Bloom")]
 [ImageEffectAllowedInSceneView]
+[ExecuteInEditMode]
+[AddComponentMenu("KriptoFX/Explosion_Bloom")]
 public class Explosion_Bloom : MonoBehaviour
 {
 	[Serializable]
@@ -24,16 +24,16 @@ public class Explosion_Bloom : MonoBehaviour
 		[Tooltip("Changes extent of veiling effects in a screen resolution-independent fashion.")]
 		public float radius;
 
-		[SerializeField]
 		[Tooltip("Blend factor of the result image.")]
+		[SerializeField]
 		public float intensity;
 
-		[SerializeField]
 		[Tooltip("Controls filter quality and buffer resolution.")]
+		[SerializeField]
 		public bool highQuality;
 
-		[SerializeField]
 		[Tooltip("Reduces flashing noise with an additional filter.")]
+		[SerializeField]
 		public bool antiFlicker;
 
 		public float thresholdGamma

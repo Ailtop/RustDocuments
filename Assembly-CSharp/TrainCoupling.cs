@@ -114,14 +114,14 @@ public class TrainCoupling
 		return controller.rearCoupling;
 	}
 
-	public bool TryGetCoupledToID(out uint id)
+	public bool TryGetCoupledToID(out NetworkableId id)
 	{
 		if (CoupledTo != null && CoupledTo.owner != null && BaseNetworkableEx.IsValid(CoupledTo.owner))
 		{
 			id = CoupledTo.owner.net.ID;
 			return true;
 		}
-		id = 0u;
+		id = default(NetworkableId);
 		return false;
 	}
 }

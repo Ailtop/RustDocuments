@@ -9,7 +9,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, IContainerSounds
+public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, IContainerSounds, ILootableEntity
 {
 	public string lootPanelName = "generic";
 
@@ -37,13 +37,15 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 	{
 		get
 		{
-			return NameHelper.Get(playerSteamID, _playerName);
+			return NameHelper.Get(playerSteamID, _playerName, base.isClient);
 		}
 		set
 		{
 			_playerName = value;
 		}
 	}
+
+	public ulong LastLootedBy { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -146,7 +148,6 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 			{
 				num = Mathf.Max(num, item.GetDespawnDuration());
 			}
-			return num;
 		}
 		return num;
 	}

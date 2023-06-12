@@ -44,7 +44,7 @@ public static class RenderInfo
 
 		public string EntityName;
 
-		public uint EntityId;
+		public ulong EntityId;
 
 		public bool UpdateWhenOffscreen;
 
@@ -67,7 +67,7 @@ public static class RenderInfo
 				result.EntityName = baseEntity.PrefabName;
 				if (baseEntity.net != null)
 				{
-					result.EntityId = baseEntity.net.ID;
+					result.EntityId = baseEntity.net.ID.Value;
 				}
 			}
 			else

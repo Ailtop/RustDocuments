@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[955]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[990]
 	{
 		new ConsoleSystem.Command
 		{
@@ -476,6 +476,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "spawnroadbradley",
+			Parent = "bradleyapc",
+			FullName = "bradleyapc.spawnroadbradley",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval29 = BradleyAPC.svspawnroadbradley(arg.GetVector3(0, Vector3.zero), arg.GetVector3(1, Vector3.zero));
+				arg.ReplyWithObject(rval29);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "egress_duration_minutes",
 			Parent = "cargoship",
 			FullName = "cargoship.egress_duration_minutes",
@@ -817,6 +830,32 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "playermaxdistance",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.playermaxdistance",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.playerMaxDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.playerMaxDistance = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "playernamemaxdistance",
+			Parent = "camerarenderer",
+			FullName = "camerarenderer.playernamemaxdistance",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => CameraRenderer.playerNameMaxDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				CameraRenderer.playerNameMaxDistance = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "renderinterval",
 			Parent = "camerarenderer",
 			FullName = "camerarenderer.renderinterval",
@@ -996,6 +1035,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "authradius",
+			Parent = "global",
+			FullName = "global.authradius",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.authradius(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "ban",
 			Parent = "global",
 			FullName = "global.ban",
@@ -1133,6 +1184,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.clientperf_frametime(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "deauthradius",
+			Parent = "global",
+			FullName = "global.deauthradius",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.deauthradius(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1387,6 +1450,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "skin_radius",
+			Parent = "global",
+			FullName = "global.skin_radius",
+			ServerAdmin = true,
+			Description = "skin_radius 'skin' 'radius'",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.skin_radius(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "skipqueue",
 			Parent = "global",
 			FullName = "global.skipqueue",
@@ -1497,6 +1573,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Admin.unmute(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "upgrade_radius",
+			Parent = "global",
+			FullName = "global.upgrade_radius",
+			ServerAdmin = true,
+			Description = "upgrade_radius 'grade' 'radius'",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Admin.upgrade_radius(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -3763,6 +3852,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "maxmessagesize",
+			Parent = "app",
+			FullName = "app.maxmessagesize",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => App.maxmessagesize.ToString(),
+			SetOveride = delegate(string str)
+			{
+				App.maxmessagesize = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "notifications",
 			Parent = "app",
 			FullName = "app.notifications",
@@ -4449,6 +4551,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "repair_inventory",
+			Parent = "debug",
+			FullName = "debug.repair_inventory",
+			ServerAdmin = true,
+			Description = "Repair all items in inventory",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.repair_inventory(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "resetsleepingbagtimers",
 			Parent = "debug",
 			FullName = "debug.resetsleepingbagtimers",
@@ -5087,7 +5202,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Entity.nudge(arg.GetInt(0));
+				Entity.nudge(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7002,6 +7117,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "reloadweapons",
+			Parent = "player",
+			FullName = "player.reloadweapons",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Player.reloadweapons(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "resetstate",
 			Parent = "player",
 			FullName = "player.resetstate",
@@ -7436,6 +7563,23 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "bag_quota_item_amount",
+			Parent = "server",
+			FullName = "server.bag_quota_item_amount",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.bag_quota_item_amount.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.bag_quota_item_amount = str.ToBool();
+			},
+			Default = "True"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "bansserverendpoint",
 			Parent = "server",
 			FullName = "server.bansserverendpoint",
@@ -7515,6 +7659,18 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Server.branch = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "broadcastplayvideo",
+			Parent = "server",
+			FullName = "server.broadcastplayvideo",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				ConVar.Server.BroadcastPlayVideo(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7701,7 +7857,7 @@ public class ConsoleGen
 			FullName = "server.conveyormovefrequency",
 			ServerAdmin = true,
 			Saved = true,
-			Description = "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement",
+			Description = "How often industrial conveyors attempt to move items (value is an interval measured in seconds). Setting to 0 will disable all movement",
 			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => ConVar.Server.conveyorMoveFrequency.ToString(),
@@ -8098,7 +8254,7 @@ public class ConsoleGen
 			FullName = "server.industrialcrafterfrequency",
 			ServerAdmin = true,
 			Saved = true,
-			Description = "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting",
+			Description = "How often industrial crafters attempt to craft items (value is an interval measured in seconds). Setting to 0 will disable all crafting",
 			ShowInAdminUI = true,
 			Variable = true,
 			GetOveride = () => ConVar.Server.industrialCrafterFrequency.ToString(),
@@ -8270,6 +8426,36 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "max_sleeping_bags",
+			Parent = "server",
+			FullName = "server.max_sleeping_bags",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.max_sleeping_bags.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.max_sleeping_bags = str.ToInt();
+			},
+			Default = "15"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxclientinfosize",
+			Parent = "server",
+			FullName = "server.maxclientinfosize",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxclientinfosize.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxclientinfosize = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxconnectionsperip",
 			Parent = "server",
 			FullName = "server.maxconnectionsperip",
@@ -8318,6 +8504,42 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Server.maxdecryptthreadwait = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maximummapmarkers",
+			Parent = "server",
+			FullName = "server.maximummapmarkers",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Saved = true,
+			Description = "How many markers each player can place",
+			Replicated = true,
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maximumMapMarkers.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maximumMapMarkers = str.ToInt();
+			},
+			Default = "5"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maximumpings",
+			Parent = "server",
+			FullName = "server.maximumpings",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How many pings can be placed by each player",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maximumPings.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maximumPings = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8761,6 +8983,22 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Server.packetlog_enabled = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "pingduration",
+			Parent = "server",
+			FullName = "server.pingduration",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "How long a ping should last",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.pingDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.pingDuration = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -9859,6 +10097,25 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "server_allow_steam_nicknames",
+			Parent = "steam",
+			FullName = "steam.server_allow_steam_nicknames",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Saved = true,
+			Replicated = true,
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => Steam.server_allow_steam_nicknames.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Steam.server_allow_steam_nicknames = str.ToBool();
+			},
+			Default = "True"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "call",
 			Parent = "supply",
 			FullName = "supply.call",
@@ -9879,6 +10136,30 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Supply.drop(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cpu_affinity",
+			Parent = "system",
+			FullName = "system.cpu_affinity",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				SystemCommands.cpu_affinity(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cpu_priority",
+			Parent = "system",
+			FullName = "system.cpu_priority",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				SystemCommands.cpu_priority(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -10226,6 +10507,36 @@ public class ConsoleGen
 			{
 				ConVar.Vis.weakspots = str.ToBool();
 			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "togglevoicerangeboost",
+			Parent = "voice",
+			FullName = "voice.togglevoicerangeboost",
+			ServerAdmin = true,
+			Description = "Enabled/disables voice range boost for a player eg. ToggleVoiceRangeBoost sam 1",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Voice.ToggleVoiceRangeBoost(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "voicerangeboostamount",
+			Parent = "voice",
+			FullName = "voice.voicerangeboostamount",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Voice.voiceRangeBoostAmount.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Voice.voiceRangeBoostAmount = str.ToFloat();
+			},
+			Default = "50"
 		},
 		new ConsoleSystem.Command
 		{
@@ -10859,6 +11170,30 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "cui_test",
+			Parent = "cui",
+			FullName = "cui.cui_test",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				cui.cui_test(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "cui_test_update",
+			Parent = "cui",
+			FullName = "cui.cui_test_update",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				cui.cui_test_update(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "endtest",
 			Parent = "cui",
 			FullName = "cui.endtest",
@@ -10867,18 +11202,6 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				cui.endtest(arg);
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "test",
-			Parent = "cui",
-			FullName = "cui.test",
-			ServerUser = true,
-			Variable = false,
-			Call = delegate(ConsoleSystem.Arg arg)
-			{
-				cui.test(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -10964,6 +11287,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				DynamicNavMesh.use_baked_terrain_mesh = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "event_hours_before_wipe",
+			Parent = "eventschedulewipeoffset",
+			FullName = "eventschedulewipeoffset.event_hours_before_wipe",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => EventScheduleWipeOffset.hoursBeforeWipeRealtime.ToString(),
+			SetOveride = delegate(string str)
+			{
+				EventScheduleWipeOffset.hoursBeforeWipeRealtime = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -11238,6 +11574,7 @@ public class ConsoleGen
 			Parent = "analytics",
 			FullName = "analytics.analytics_header",
 			ServerAdmin = true,
+			Saved = true,
 			Variable = true,
 			GetOveride = () => Analytics.AnalyticsHeader.ToString(),
 			SetOveride = delegate(string str)
@@ -11251,6 +11588,7 @@ public class ConsoleGen
 			Parent = "analytics",
 			FullName = "analytics.analytics_secret",
 			ServerAdmin = true,
+			Saved = true,
 			Variable = true,
 			GetOveride = () => Analytics.AnalyticsSecret.ToString(),
 			SetOveride = delegate(string str)
@@ -11260,15 +11598,28 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "client_analytics_url",
+			Name = "pending_analytics",
 			Parent = "analytics",
-			FullName = "analytics.client_analytics_url",
+			FullName = "analytics.pending_analytics",
 			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Analytics.GetPendingAnalytics(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "high_freq_stats",
+			Parent = "analytics",
+			FullName = "analytics.high_freq_stats",
+			ServerAdmin = true,
+			Saved = true,
 			Variable = true,
-			GetOveride = () => Analytics.ClientAnalyticsUrl.ToString(),
+			GetOveride = () => Analytics.HighFrequencyStats.ToString(),
 			SetOveride = delegate(string str)
 			{
-				Analytics.ClientAnalyticsUrl = str;
+				Analytics.HighFrequencyStats = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -11282,6 +11633,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Analytics.ServerAnalyticsUrl = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "stats_blacklist",
+			Parent = "analytics",
+			FullName = "analytics.stats_blacklist",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => Analytics.stats_blacklist.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Analytics.stats_blacklist = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -12613,6 +12978,126 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				TrainCouplingController.max_couple_speed = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "days_to_add_test",
+			Parent = "wipetimer",
+			FullName = "wipetimer.days_to_add_test",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => WipeTimer.daysToAddTest.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.daysToAddTest = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "hours_to_add_test",
+			Parent = "wipetimer",
+			FullName = "wipetimer.hours_to_add_test",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => WipeTimer.hoursToAddTest.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.hoursToAddTest = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printtimezones",
+			Parent = "wipetimer",
+			FullName = "wipetimer.printtimezones",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				WipeTimer.PrintTimeZones(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "printwipe",
+			Parent = "wipetimer",
+			FullName = "wipetimer.printwipe",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				WipeTimer.PrintWipe(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipecronoverride",
+			Parent = "wipetimer",
+			FullName = "wipetimer.wipecronoverride",
+			ServerAdmin = true,
+			Description = "Custom cron expression for the wipe schedule. Overrides all other convars (except wipeUnixTimestampOverride) if set. Uses Cronos as a parser: https://github.com/HangfireIO/Cronos/",
+			Variable = true,
+			GetOveride = () => WipeTimer.wipeCronOverride.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.wipeCronOverride = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipedayofweek",
+			Parent = "wipetimer",
+			FullName = "wipetimer.wipedayofweek",
+			ServerAdmin = true,
+			Description = "0=sun,1=mon,2=tues,3=wed,4=thur,5=fri,6=sat",
+			Variable = true,
+			GetOveride = () => WipeTimer.wipeDayOfWeek.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.wipeDayOfWeek = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipehourofday",
+			Parent = "wipetimer",
+			FullName = "wipetimer.wipehourofday",
+			ServerAdmin = true,
+			Description = "Which hour to wipe? 14.5 = 2:30pm",
+			Variable = true,
+			GetOveride = () => WipeTimer.wipeHourOfDay.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.wipeHourOfDay = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipetimezone",
+			Parent = "wipetimer",
+			FullName = "wipetimer.wipetimezone",
+			ServerAdmin = true,
+			Description = "The timezone to use for wipes. Defaults to the server's time zone if not set or invalid. Value should be a TZ identifier as seen here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+			Variable = true,
+			GetOveride = () => WipeTimer.wipeTimezone.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.wipeTimezone = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "wipeunixtimestampoverride",
+			Parent = "wipetimer",
+			FullName = "wipetimer.wipeunixtimestampoverride",
+			ServerAdmin = true,
+			Description = "Unix timestamp (seconds) for the upcoming wipe. Overrides all other convars if set to a time in the future.",
+			Variable = true,
+			GetOveride = () => WipeTimer.wipeUnixTimestampOverride.ToString(),
+			SetOveride = delegate(string str)
+			{
+				WipeTimer.wipeUnixTimestampOverride = str.ToLong(0L);
 			}
 		},
 		new ConsoleSystem.Command

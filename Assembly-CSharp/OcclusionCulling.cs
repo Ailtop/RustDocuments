@@ -1341,13 +1341,13 @@ public class OcclusionCulling : MonoBehaviour
 			int changed = 0;
 			int changedCount = 0;
 			ProcessOccludees_Native(ref states, ref bucket, 0, ref results, 0, ref changed, ref changedCount, ref zero, 0f, 0u);
-			return result;
 		}
 		catch (EntryPointNotFoundException)
 		{
 			Debug.Log("[OcclusionCulling] Fast native path not available. Reverting to managed fallback.");
-			return false;
+			result = false;
 		}
+		return result;
 	}
 
 	private void OnDisable()

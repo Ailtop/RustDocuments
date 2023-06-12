@@ -19,24 +19,6 @@ public class BaseGameMode : BaseEntity
 		public int? Amount;
 	}
 
-	public struct CanAssignBedResult
-	{
-		public bool Result;
-
-		public int Count;
-
-		public int Max;
-	}
-
-	public struct CanBuildResult
-	{
-		public bool Result;
-
-		public Translate.Phrase Phrase;
-
-		public string[] Arguments;
-	}
-
 	[Serializable]
 	public class GameModeTeam
 	{
@@ -157,6 +139,8 @@ public class BaseGameMode : BaseEntity
 	public float autoHealDuration = 1f;
 
 	public bool hasKillFeed;
+
+	public bool allowPings = true;
 
 	public static BaseGameMode svActiveGameMode = null;
 
@@ -575,66 +559,6 @@ public class BaseGameMode : BaseEntity
 		return null;
 	}
 
-	public virtual CanBuildResult? CanBuildEntity(BasePlayer player, Construction construction)
-	{
-		if (GameManager.server.FindPrefab(construction.prefabID)?.GetComponent<BaseEntity>() is SleepingBag)
-		{
-			CanAssignBedResult? canAssignBedResult = CanAssignBed(player, null, player.userID);
-			if (canAssignBedResult.HasValue)
-			{
-				CanBuildResult value;
-				if (canAssignBedResult.Value.Result)
-				{
-					value = default(CanBuildResult);
-					value.Result = true;
-					value.Phrase = SleepingBag.bagLimitPhrase;
-					value.Arguments = new string[2]
-					{
-						canAssignBedResult.Value.Count.ToString(),
-						canAssignBedResult.Value.Max.ToString()
-					};
-					return value;
-				}
-				value = default(CanBuildResult);
-				value.Result = false;
-				value.Phrase = SleepingBag.bagLimitReachedPhrase;
-				return value;
-			}
-		}
-		return null;
-	}
-
-	public virtual CanAssignBedResult? CanAssignBed(BasePlayer player, SleepingBag newBag, ulong targetPlayer, int countOffset = 1, int maxOffset = 0, SleepingBag ignore = null)
-	{
-		int num = GetMaxBeds(player) + maxOffset;
-		if (num < 0)
-		{
-			return null;
-		}
-		int num2 = countOffset;
-		CanAssignBedResult value;
-		foreach (SleepingBag sleepingBag in SleepingBag.sleepingBags)
-		{
-			if (sleepingBag != ignore && sleepingBag.deployerUserID == targetPlayer)
-			{
-				num2++;
-				if (num2 > num)
-				{
-					value = default(CanAssignBedResult);
-					value.Count = num2;
-					value.Max = num;
-					value.Result = false;
-					return value;
-				}
-			}
-		}
-		value = default(CanAssignBedResult);
-		value.Count = num2;
-		value.Max = num;
-		value.Result = true;
-		return value;
-	}
-
 	private void DeleteEntities()
 	{
 		if (!SingletonComponent<ServerMgr>.Instance.runFrameUpdate)
@@ -704,6 +628,7 @@ public class BaseGameMode : BaseEntity
 		{
 			RelationshipManager.maxTeamSize = 0;
 		}
+		ConVar.Server.max_sleeping_bags = maximumSleepingBags;
 		ConVar.Server.crawlingenabled = crawling;
 		DeleteEntities();
 		if (wipeBpsOnProtocol)

@@ -151,7 +151,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 		}
 	}
 
-	public float GetPlayerDamageMultiplier()
+	public float GetDamageMultiplier(BaseEntity ent)
 	{
 		return Mathf.Abs(GetSpeed()) * 1f;
 	}

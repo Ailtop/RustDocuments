@@ -41,6 +41,9 @@ public class App : ConsoleSystem
 	[ServerVar]
 	public static int maxconnectionsperip = 5;
 
+	[ServerVar]
+	public static int maxmessagesize = 1048576;
+
 	[ServerUserVar]
 	public static async void pair(Arg arg)
 	{

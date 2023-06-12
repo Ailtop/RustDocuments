@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -44,8 +45,8 @@ public class FogMachine : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetFogOff(RPCMessage msg)
 	{
 		if (IsOn() && msg.player.CanBuild())
@@ -166,6 +167,7 @@ public class FogMachine : ContainerIOEntity
 		{
 			int num = Mathf.FloorToInt(pendingFuel);
 			slot.UseItem(num);
+			Analytics.Azure.AddPendingItems(this, slot.info.shortname, num, "fog");
 			pendingFuel -= num;
 		}
 		return true;

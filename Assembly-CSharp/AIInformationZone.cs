@@ -6,6 +6,8 @@ using UnityEngine.AI;
 
 public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 {
+	public bool RenderBounds;
+
 	public bool ShouldSleepAI;
 
 	public bool Virtual;
@@ -395,6 +397,15 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 
 	public void OnDrawGizmos()
 	{
+	}
+
+	public void OnDrawGizmosSelected()
+	{
+		DrawBounds();
+	}
+
+	private void DrawBounds()
+	{
 		Gizmos.matrix = base.transform.localToWorldMatrix;
 		Gizmos.color = new Color(1f, 0f, 0f, 0.5f);
 		Gizmos.DrawCube(bounds.center, bounds.size);
@@ -724,7 +735,7 @@ public class AIInformationZone : BaseMonoBehaviour, IServerComponent
 				num = num2;
 				if (num2 < 0.25f)
 				{
-					return result;
+					break;
 				}
 			}
 		}

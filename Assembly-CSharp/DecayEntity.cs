@@ -11,6 +11,8 @@ public class DecayEntity : BaseCombatEntity
 {
 	public GameObjectRef debrisPrefab;
 
+	public Vector3 debrisRotationOffset = Vector3.zero;
+
 	[NonSerialized]
 	public uint buildingID;
 
@@ -309,7 +311,7 @@ public class DecayEntity : BaseCombatEntity
 	{
 		if (debrisPrefab.isValid)
 		{
-			BaseEntity baseEntity = GameManager.server.CreateEntity(debrisPrefab.resourcePath, base.transform.position, base.transform.rotation);
+			BaseEntity baseEntity = GameManager.server.CreateEntity(debrisPrefab.resourcePath, base.transform.position, base.transform.rotation * Quaternion.Euler(debrisRotationOffset));
 			if ((bool)baseEntity)
 			{
 				baseEntity.Spawn();

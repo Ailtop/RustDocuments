@@ -4,6 +4,13 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Rust/Gestures/Gesture Config")]
 public class GestureConfig : ScriptableObject
 {
+	public enum GestureType
+	{
+		Player = 0,
+		NPC = 1,
+		Cinematic = 2
+	}
+
 	public enum PlayerModelLayer
 	{
 		UpperBody = 3,
@@ -55,6 +62,12 @@ public class GestureConfig : ScriptableObject
 	[Header("Player model setup")]
 	public PlayerModelLayer playerModelLayer = PlayerModelLayer.UpperBody;
 
+	public GestureType gestureType;
+
+	public bool hideHeldEntity = true;
+
+	public bool canDuckDuringGesture;
+
 	public MovementCapabilities movementMode;
 
 	public AnimationType animationType;
@@ -63,6 +76,7 @@ public class GestureConfig : ScriptableObject
 
 	public bool useRootMotion;
 
+	[Header("Ownership")]
 	public GestureActionType actionType;
 
 	public bool forceUnlock;
@@ -81,6 +95,14 @@ public class GestureConfig : ScriptableObject
 		if (forceUnlock)
 		{
 			return true;
+		}
+		if (gestureType == GestureType.NPC)
+		{
+			return player.IsNpc;
+		}
+		if (gestureType == GestureType.Cinematic)
+		{
+			return player.IsAdmin;
 		}
 		if (dlcItem != null && dlcItem.CanUse(player))
 		{

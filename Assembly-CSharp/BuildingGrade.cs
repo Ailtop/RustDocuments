@@ -17,6 +17,10 @@ public class BuildingGrade : ScriptableObject
 
 	public Enum type;
 
+	public ulong skin;
+
+	public bool enabledInStandalone;
+
 	public float baseHealth;
 
 	public List<ItemAmount> baseCost;
@@ -24,6 +28,8 @@ public class BuildingGrade : ScriptableObject
 	public PhysicMaterial physicMaterial;
 
 	public ProtectionProperties damageProtecton;
+
+	public bool supportsColourChange;
 
 	public BaseEntity.Menu.Option upgradeMenu;
 }

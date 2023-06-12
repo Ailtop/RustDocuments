@@ -1,6 +1,7 @@
 #define UNITY_ASSERTIONS
 using System;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -133,6 +134,7 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 			}
 			if ((bool)reciever)
 			{
+				Facepunch.Rust.Analytics.Azure.OnGatherItem(item.info.shortname, item.amount, this, reciever);
 				reciever.GiveItem(item, GiveItemReason.ResourceHarvested);
 			}
 			else
@@ -153,8 +155,8 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		Kill();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Pickup(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())
@@ -163,8 +165,8 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void PickupEat(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())

@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -136,24 +137,33 @@ public class ResearchTable : StorageContainer
 		{
 			return (int)obj;
 		}
+		return ScrapForResearch(item.info);
+	}
+
+	public int ScrapForResearch(ItemDefinition info)
+	{
+		if (info.isRedirectOf != null)
+		{
+			return ScrapForResearch(info.isRedirectOf);
+		}
 		int result = 0;
-		if (item.info.rarity == Rarity.Common)
+		if (info.rarity == Rarity.Common)
 		{
 			result = 20;
 		}
-		if (item.info.rarity == Rarity.Uncommon)
+		if (info.rarity == Rarity.Uncommon)
 		{
 			result = 75;
 		}
-		if (item.info.rarity == Rarity.Rare)
+		if (info.rarity == Rarity.Rare)
 		{
 			result = 125;
 		}
-		if (item.info.rarity == Rarity.VeryRare || item.info.rarity == Rarity.None)
+		if (info.rarity == Rarity.VeryRare || info.rarity == Rarity.None)
 		{
 			result = 500;
 		}
-		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint(item.info);
+		ItemBlueprint itemBlueprint = ItemManager.FindBlueprint(info);
 		if (itemBlueprint != null && itemBlueprint.defaultBlueprint)
 		{
 			return ConVar.Server.defaultBlueprintResearchCost;
@@ -284,6 +294,8 @@ public class ResearchTable : StorageContainer
 			researchFinishedTime = UnityEngine.Time.realtimeSinceStartup + researchDuration;
 			Invoke(ResearchAttemptFinished, researchDuration);
 			base.inventory.SetLocked(isLocked: true);
+			int scrapCost = ScrapForResearch(targetItem);
+			Facepunch.Rust.Analytics.Azure.OnResearchStarted(player, this, targetItem, scrapCost);
 			SetFlag(Flags.On, b: true);
 			SendNetworkUpdate();
 			player.inventory.loot.SendImmediate();

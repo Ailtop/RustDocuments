@@ -9,7 +9,7 @@ public class TriggerDanceAchievement : TriggerBase
 	public string AchievementName;
 
 	[NonSerialized]
-	private List<ulong> triggeredPlayers = new List<ulong>();
+	private List<NetworkableId> triggeredPlayers = new List<NetworkableId>();
 
 	public void OnPuzzleReset()
 	{

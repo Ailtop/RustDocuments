@@ -154,8 +154,8 @@ public class AdventCalendar : BaseCombatEntity
 	}
 
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_RequestGift(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

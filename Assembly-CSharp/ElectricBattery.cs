@@ -162,7 +162,8 @@ public class ElectricBattery : IOEntity, IInstanceDataReceiver
 				num += connected.DesiredPower();
 				if (num >= maxOutput)
 				{
-					return maxOutput;
+					num = maxOutput;
+					break;
 				}
 			}
 		}

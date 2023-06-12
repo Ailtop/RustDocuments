@@ -108,6 +108,7 @@ public class FreeableLootContainer : LootContainer
 			{
 				player.ProcessMissionEvent(BaseMission.MissionEventType.FREE_CRATE, "", 1f);
 				Analytics.Server.FreeUnderwaterCrate();
+				Analytics.Azure.OnFreeUnderwaterCrate(msg.player, this);
 			}
 		}
 	}

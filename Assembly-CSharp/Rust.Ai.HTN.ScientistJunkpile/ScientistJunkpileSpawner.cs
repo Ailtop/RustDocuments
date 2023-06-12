@@ -58,6 +58,18 @@ public class ScientistJunkpileSpawner : MonoBehaviour, IServerComponent, ISpawnG
 		}
 	}
 
+	protected void OnDestroy()
+	{
+		if ((bool)SingletonComponent<SpawnHandler>.Instance)
+		{
+			SingletonComponent<SpawnHandler>.Instance.SpawnGroups.Remove(this);
+		}
+		else
+		{
+			Debug.LogWarning(GetType().Name + ": SpawnHandler instance not found.");
+		}
+	}
+
 	public void Fill()
 	{
 		DoRespawn();

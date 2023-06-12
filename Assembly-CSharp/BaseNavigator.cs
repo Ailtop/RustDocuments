@@ -136,9 +136,9 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	protected Vector3 currentNavMeshLinkEndPos;
 
-	protected Stack<BasePathNode> currentAStarPath;
+	protected Stack<IAIPathNode> currentAStarPath;
 
-	protected BasePathNode targetNode;
+	protected IAIPathNode targetNode;
 
 	protected float currentSpeedFraction = 1f;
 
@@ -382,7 +382,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		return true;
 	}
 
-	public bool SetDestination(BasePath path, BasePathNode newTargetNode, float speedFraction)
+	public bool SetDestination(BasePath path, IAIPathNode newTargetNode, float speedFraction)
 	{
 		if (!AI.move)
 		{
@@ -401,12 +401,12 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			return true;
 		}
-		if (ReachedPosition(newTargetNode.transform.position))
+		if (ReachedPosition(newTargetNode.Position))
 		{
 			return true;
 		}
-		BasePathNode closestToPoint = path.GetClosestToPoint(base.transform.position);
-		if (closestToPoint == null || closestToPoint.transform == null)
+		IAIPathNode closestToPoint = path.GetClosestToPoint(base.transform.position);
+		if (closestToPoint == null || !closestToPoint.IsValid())
 		{
 			return false;
 		}
@@ -415,7 +415,7 @@ public class BaseNavigator : BaseMonoBehaviour
 			currentSpeedFraction = speedFraction;
 			targetNode = newTargetNode;
 			SetCurrentNavigationType(NavigationType.AStar);
-			Destination = newTargetNode.transform.position;
+			Destination = newTargetNode.Position;
 			return true;
 		}
 		return false;
@@ -766,7 +766,7 @@ public class BaseNavigator : BaseMonoBehaviour
 	{
 		if (currentAStarPath != null && currentAStarPath.Count > 0)
 		{
-			return currentAStarPath.Peek().transform.position;
+			return currentAStarPath.Peek().Position;
 		}
 		return Agent.nextPosition;
 	}
@@ -812,7 +812,7 @@ public class BaseNavigator : BaseMonoBehaviour
 					Stop();
 					return;
 				}
-				moveToPosition = currentAStarPath.Peek().transform.position;
+				moveToPosition = currentAStarPath.Peek().Position;
 			}
 		}
 		if (CurrentNavigationType == NavigationType.NavMesh)

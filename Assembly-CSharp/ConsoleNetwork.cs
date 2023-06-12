@@ -45,9 +45,8 @@ public static class ConsoleNetwork
 
 	public static void SendClientCommand(Connection cn, string strCommand, params object[] args)
 	{
-		if (Network.Net.sv.IsConnected())
+		if (Network.Net.sv.IsConnected() && Interface.CallHook("OnSendCommand", cn, strCommand, args) == null)
 		{
-			Interface.CallHook("OnSendCommand", cn, strCommand, args);
 			NetWrite netWrite = Network.Net.sv.StartWrite();
 			netWrite.PacketID(Message.Type.ConsoleCommand);
 			string val = ConsoleSystem.BuildCommand(strCommand, args);
@@ -58,9 +57,8 @@ public static class ConsoleNetwork
 
 	public static void SendClientCommand(List<Connection> cn, string strCommand, params object[] args)
 	{
-		if (Network.Net.sv.IsConnected())
+		if (Network.Net.sv.IsConnected() && Interface.CallHook("OnSendCommand", cn, strCommand, args) == null)
 		{
-			Interface.CallHook("OnSendCommand", cn, strCommand, args);
 			NetWrite netWrite = Network.Net.sv.StartWrite();
 			netWrite.PacketID(Message.Type.ConsoleCommand);
 			netWrite.String(ConsoleSystem.BuildCommand(strCommand, args));
@@ -70,9 +68,8 @@ public static class ConsoleNetwork
 
 	public static void BroadcastToAllClients(string strCommand, params object[] args)
 	{
-		if (Network.Net.sv.IsConnected())
+		if (Network.Net.sv.IsConnected() && Interface.CallHook("OnBroadcastCommand", strCommand, args) == null)
 		{
-			Interface.CallHook("OnBroadcastCommand", strCommand, args);
 			NetWrite netWrite = Network.Net.sv.StartWrite();
 			netWrite.PacketID(Message.Type.ConsoleCommand);
 			netWrite.String(ConsoleSystem.BuildCommand(strCommand, args));

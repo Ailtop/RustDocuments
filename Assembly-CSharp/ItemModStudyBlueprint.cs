@@ -1,3 +1,4 @@
+using Facepunch.Rust;
 using Oxide.Core;
 using UnityEngine;
 
@@ -55,11 +56,13 @@ public class ItemModStudyBlueprint : ItemMod
 		}
 		item2.UseItem();
 		player.blueprints.Unlock(blueprintTargetDef);
+		Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, blueprintTargetDef, "blueprint");
 		if (blueprint != null && blueprint.additionalUnlocks != null && blueprint.additionalUnlocks.Count > 0)
 		{
 			foreach (ItemDefinition additionalUnlock2 in blueprint.additionalUnlocks)
 			{
 				player.blueprints.Unlock(additionalUnlock2);
+				Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, additionalUnlock2, "blueprint");
 			}
 		}
 		if (studyEffect.isValid)

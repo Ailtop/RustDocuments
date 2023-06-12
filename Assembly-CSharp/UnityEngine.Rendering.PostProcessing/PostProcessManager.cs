@@ -119,7 +119,6 @@ public sealed class PostProcessManager
 					result = item;
 				}
 			}
-			return result;
 		}
 		return result;
 	}

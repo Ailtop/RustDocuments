@@ -34,6 +34,10 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 
 	public bool paint3D;
 
+	public bool applyToSkinRenderers = true;
+
+	public bool applyToFirstPersonLegs = true;
+
 	[NonSerialized]
 	public bool isSelected;
 
@@ -64,7 +68,10 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		(applyToAllRenderers ? base.transform.root : base.transform).GetComponentsInChildren(includeInactive: true, obj);
 		foreach (Renderer item in obj)
 		{
-			item.SetPropertyBlock(block);
+			if (applyToSkinRenderers || !item.TryGetComponent<PlayerModelSkin>(out var _))
+			{
+				item.SetPropertyBlock(block);
+			}
 		}
 		if (extraRenderers != null)
 		{
@@ -77,7 +84,7 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 				}
 			}
 		}
-		if (legRenderer != null)
+		if (applyToFirstPersonLegs && legRenderer != null)
 		{
 			legRenderer.SetPropertyBlock(block);
 		}

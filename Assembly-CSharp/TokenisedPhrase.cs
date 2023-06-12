@@ -34,6 +34,7 @@ public class TokenisedPhrase : Translate.Phrase
 		str = str.Replace("[+duck]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+duck")).ToUpper());
 		str = str.Replace("[+pets]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+pets")).ToUpper());
 		str = str.Replace("[lighttoggle]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("lighttoggle")).ToUpper());
+		str = str.Replace("[+ping]", string.Format("[{0}]", Facepunch.Input.GetButtonWithBind("+ping")).ToUpper());
 		return str;
 	}
 

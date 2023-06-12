@@ -247,7 +247,7 @@ public class Graphics : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
+	[ClientVar(ClientAdmin = true)]
 	public static bool itemskins
 	{
 		get
@@ -273,7 +273,7 @@ public class Graphics : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
+	[ClientVar(ClientAdmin = true)]
 	public static float itemskintimeout
 	{
 		get

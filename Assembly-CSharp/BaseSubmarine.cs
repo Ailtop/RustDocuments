@@ -45,8 +45,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	private bool wasOnSurface;
 
-	[Header("Submarine Main")]
 	[SerializeField]
+	[Header("Submarine Main")]
 	private Transform centreOfMassTransform;
 
 	[SerializeField]
@@ -79,8 +79,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	[SerializeField]
 	private GameObjectRef fuelStoragePrefab;
 
-	[Header("Submarine Engine & Fuel")]
 	[SerializeField]
+	[Header("Submarine Engine & Fuel")]
 	public float engineKW = 200f;
 
 	[SerializeField]
@@ -659,7 +659,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			if (IsInWater && (float)timeSinceTorpedoFired >= maxFireRate)
 			{
 				float minSpeed = GetSpeed() + 2f;
-				if (BaseMountable.TryFireProjectile(torpedoContainer, AmmoTypes.TORPEDO, torpedoFiringPoint.position, torpedoFiringPoint.forward, driver, 1f, minSpeed, out var _))
+				if (TryFireProjectile(torpedoContainer, AmmoTypes.TORPEDO, torpedoFiringPoint.position, torpedoFiringPoint.forward, driver, 1f, minSpeed, out var _))
 				{
 					timeSinceTorpedoFired = 0f;
 					flag = false;
@@ -840,8 +840,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_OpenTorpedoStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

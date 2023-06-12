@@ -1,8 +1,10 @@
 #define UNITY_ASSERTIONS
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -84,13 +86,13 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 
 	public const float bulletDamage = 15f;
 
-	private RealTimeSinceEx timeSinceLastServerTick;
+	public RealTimeSinceEx timeSinceLastServerTick;
 
 	public float nextForcedAimTime;
 
 	public Vector3 lastSentAimDir = Vector3.zero;
 
-	private static float[] visibilityOffsets = new float[3] { 0f, 0.15f, -0.15f };
+	public static float[] visibilityOffsets = new float[3] { 0f, 0.15f, -0.15f };
 
 	public int peekIndex;
 
@@ -162,15 +164,17 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 	[NonSerialized]
 	public int consumptionAmount = 10;
 
+	public bool CanPing => false;
+
 	public virtual bool RequiresMouse => true;
 
 	public float MaxRange => 10000f;
 
 	public RemoteControllableControls RequiredControls => rcControls;
 
-	public int ViewerCount { get; private set; }
+	public int ViewerCount { get; set; }
 
-	public CameraViewerId? ControllingViewerId { get; private set; }
+	public CameraViewerId? ControllingViewerId { get; set; }
 
 	public bool IsBeingControlled
 	{
@@ -589,7 +593,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	private bool UpdateManualAim(InputState inputState)
+	public bool UpdateManualAim(InputState inputState)
 	{
 		float x = (0f - inputState.current.mouseDelta.y) * rcTurnSensitivity;
 		float y = inputState.current.mouseDelta.x * rcTurnSensitivity;
@@ -674,7 +678,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		return rcIdentifier;
 	}
 
-	protected virtual bool CanChangeID(BasePlayer player)
+	public virtual bool CanChangeID(BasePlayer player)
 	{
 		return CanChangeSettings(player);
 	}
@@ -844,8 +848,8 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		SetFlag(Flags.Reserved4, b);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void FlipAim(RPCMessage rpc)
 	{
 		if (!IsOnline() && IsAuthed(rpc.player) && !booting && Interface.CallHook("OnTurretRotate", this, rpc.player) == null)
@@ -855,14 +859,14 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void AddSelfAuthorize(RPCMessage rpc)
 	{
 		AddSelfAuthorize(rpc.player);
 	}
 
-	private void AddSelfAuthorize(BasePlayer player)
+	public void AddSelfAuthorize(BasePlayer player)
 	{
 		BasePlayer player2 = player;
 		if (!IsOnline() && player2.CanBuild() && !AtMaxAuthCapacity() && Interface.CallHook("OnTurretAuthorize", this, player) == null)
@@ -872,6 +876,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 			playerNameID.userid = player2.userID;
 			playerNameID.username = player2.displayName;
 			authorizedPlayers.Add(playerNameID);
+			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, player2, authorizedPlayers.Select((PlayerNameID x) => x.userid), "added", player2.userID);
 			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
@@ -885,46 +890,50 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		if (!booting && !IsOnline() && IsAuthed(rpc2.player) && Interface.CallHook("OnTurretDeauthorize", this, rpc.player) == null)
 		{
 			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
+			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, rpc2.player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "removed", rpc2.player.userID);
 			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void ClearList(RPCMessage rpc)
 	{
 		if (!booting && !IsOnline() && IsAuthed(rpc.player) && Interface.CallHook("OnTurretClearList", this, rpc.player) == null)
 		{
 			authorizedPlayers.Clear();
+			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, rpc.player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "clear", rpc.player.userID);
 			UpdateMaxAuthCapacity();
 			SendNetworkUpdate();
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void AssignToFriend(RPCMessage msg)
 	{
-		if (!AtMaxAuthCapacity() && !(msg.player == null) && msg.player.CanInteract() && CanChangeSettings(msg.player))
+		if (AtMaxAuthCapacity() || msg.player == null || !msg.player.CanInteract() || !CanChangeSettings(msg.player))
 		{
-			ulong num = msg.read.UInt64();
-			if (num != 0L && !IsAuthed(num) && Interface.CallHook("OnTurretAssign", this, num, msg.player) == null)
-			{
-				string username = BasePlayer.SanitizePlayerNameString(msg.read.String(), num);
-				PlayerNameID playerNameID = new PlayerNameID();
-				playerNameID.userid = num;
-				playerNameID.username = username;
-				authorizedPlayers.Add(playerNameID);
-				UpdateMaxAuthCapacity();
-				SendNetworkUpdate();
-				Interface.CallHook("OnTurretAssigned", this, num, msg.player);
-			}
+			return;
+		}
+		ulong num = msg.read.UInt64();
+		if (num != 0L && !IsAuthed(num) && Interface.CallHook("OnTurretAssign", this, num, msg.player) == null)
+		{
+			string username = BasePlayer.SanitizePlayerNameString(msg.read.String(), num);
+			PlayerNameID playerNameID = new PlayerNameID();
+			playerNameID.userid = num;
+			playerNameID.username = username;
+			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, msg.player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "added", num);
+			authorizedPlayers.Add(playerNameID);
+			UpdateMaxAuthCapacity();
+			SendNetworkUpdate();
+			Interface.CallHook("OnTurretAssigned", this, num, msg.player);
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SERVER_Peacekeeper(RPCMessage rpc)
 	{
 		if (IsAuthed(rpc.player))
@@ -1410,6 +1419,15 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		base.OnKilled(info);
 	}
 
+	public override bool OnStartBeingLooted(BasePlayer baseEntity)
+	{
+		if (!IsAuthed(baseEntity))
+		{
+			return false;
+		}
+		return base.OnStartBeingLooted(baseEntity);
+	}
+
 	public override void PlayerStoppedLooting(BasePlayer player)
 	{
 		base.PlayerStoppedLooting(player);
@@ -1572,7 +1590,7 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		}
 	}
 
-	protected virtual bool Ignore(BasePlayer player)
+	public virtual bool Ignore(BasePlayer player)
 	{
 		return false;
 	}
@@ -1686,9 +1704,9 @@ public class AutoTurret : ContainerIOEntity, IRemoteControllable
 		AddSelfAuthorize(deployedBy);
 	}
 
-	public override uint GetIdealContainer(BasePlayer player, Item item)
+	public override ItemContainerId GetIdealContainer(BasePlayer player, Item item, bool altMove)
 	{
-		return 0u;
+		return default(ItemContainerId);
 	}
 
 	public override int GetIdealSlot(BasePlayer player, Item item)

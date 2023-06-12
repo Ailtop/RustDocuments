@@ -178,6 +178,8 @@ public class BaseAIEvent
 			return new ReloadingAIEvent();
 		case AIEventType.InRangeOfHome:
 			return new InRangeOfHomeAIEvent();
+		case AIEventType.IsBlinded:
+			return new IsBlindedAIEvent();
 		default:
 			Debug.LogWarning(string.Concat("No case for ", eventType, " event in BaseAIEvent.CreateEvent()!"));
 			return null;

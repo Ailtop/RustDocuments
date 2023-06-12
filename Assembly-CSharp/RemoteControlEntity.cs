@@ -22,11 +22,13 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 
 	public RemoteControllableControls rcControls;
 
+	public bool CanPing => true;
+
 	public virtual bool CanAcceptInput => false;
 
-	public int ViewerCount { get; private set; }
+	public int ViewerCount { get; set; }
 
-	public CameraViewerId? ControllingViewerId { get; private set; }
+	public CameraViewerId? ControllingViewerId { get; set; }
 
 	public bool IsBeingControlled
 	{
@@ -185,8 +187,8 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_SetID(RPCMessage msg)
 	{
 		if (msg.player == null || !CanControl(msg.player.userID) || !CanChangeID(msg.player))
@@ -229,7 +231,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		}
 	}
 
-	protected virtual bool CanChangeID(BasePlayer player)
+	public virtual bool CanChangeID(BasePlayer player)
 	{
 		if (player != null && player.CanBuild() && player.IsBuildingAuthed())
 		{

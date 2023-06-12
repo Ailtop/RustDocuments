@@ -86,8 +86,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 	[SerializeField]
 	private TokenisedPhrase trainHasThrottle;
 
-	[Header("Coaling Tower Audio")]
 	[SerializeField]
+	[Header("Coaling Tower Audio")]
 	private GameObject buttonSoundPos;
 
 	[SerializeField]
@@ -502,8 +502,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Unload(RPCMessage msg)
 	{
 		if (!TryUnloadActiveWagon(out var attemptStatus) && msg.player != null)
@@ -512,8 +512,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Next(RPCMessage msg)
 	{
 		if (TryShuntTrain(next: true, out var attemptStatus))
@@ -526,8 +526,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Prev(RPCMessage msg)
 	{
 		if (TryShuntTrain(next: false, out var attemptStatus))

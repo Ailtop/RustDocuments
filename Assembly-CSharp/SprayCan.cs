@@ -9,6 +9,7 @@ using Network;
 using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Serialization;
 
 public class SprayCan : HeldEntity
 {
@@ -81,6 +82,17 @@ public class SprayCan : HeldEntity
 	public static Translate.Phrase FreeSprayNamePhrase = new Translate.Phrase("freespray_radial", "Free Spray");
 
 	public static Translate.Phrase FreeSprayDescPhrase = new Translate.Phrase("freespray_radial_desc", "Spray shapes freely with various colors");
+
+	public static Translate.Phrase BuildingSkinDefaultPhrase = new Translate.Phrase("buildingskin_default", "Automatic colour");
+
+	public static Translate.Phrase BuildingSkinDefaultDescPhrase = new Translate.Phrase("buildingskin_default_desc", "Reset the block to random colouring");
+
+	public static Translate.Phrase BuildingSkinColourPhrase = new Translate.Phrase("buildingskin_colour", "Set colour");
+
+	public static Translate.Phrase BuildingSkinColourDescPhrase = new Translate.Phrase("buildingskin_colour_desc", "Set the block to the highlighted colour");
+
+	[FormerlySerializedAs("ShippingCOntainerColourLookup")]
+	public ConstructionSkin_ColourLookup ShippingContainerColourLookup;
 
 	public const string ENEMY_BASE_STAT = "sprayed_enemy_base";
 
@@ -196,6 +208,46 @@ public class SprayCan : HeldEntity
 				}
 				return true;
 			}
+			if (rpc == 14517645 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (Global.developer > 2)
+				{
+					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetBlockColourId "));
+				}
+				using (TimeWarning.New("Server_SetBlockColourId"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(14517645u, "Server_SetBlockColourId", this, player, 3uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.IsActiveItem.Test(14517645u, "Server_SetBlockColourId", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg5 = rPCMessage;
+							Server_SetBlockColourId(msg5);
+						}
+					}
+					catch (Exception exception4)
+					{
+						Debug.LogException(exception4);
+						player.Kick("RPC Error in Server_SetBlockColourId");
+					}
+				}
+				return true;
+			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
 	}
@@ -243,6 +295,10 @@ public class SprayCan : HeldEntity
 
 	public bool CanSprayFreehand(BasePlayer player)
 	{
+		if (player.UnlockAllSkins)
+		{
+			return true;
+		}
 		if (FreeSprayUnlockItem != null)
 		{
 			if (!player.blueprints.steamInventory.HasItem(FreeSprayUnlockItem.id))
@@ -277,7 +333,7 @@ public class SprayCan : HeldEntity
 		{
 			return;
 		}
-		uint uid = msg.read.UInt32();
+		NetworkableId uid = msg.read.EntityID();
 		BaseNetworkable baseNetworkable = BaseNetworkable.serverEntities.Find(uid);
 		int targetSkin = msg.read.Int32();
 		if (msg.player == null || !msg.player.CanBuild())
@@ -285,6 +341,10 @@ public class SprayCan : HeldEntity
 			return;
 		}
 		bool flag = false;
+		if (msg.player.UnlockAllSkins)
+		{
+			flag = true;
+		}
 		if (targetSkin != 0 && !flag && !msg.player.blueprints.CheckSkinOwnership(targetSkin, msg.player.userID))
 		{
 			SprayFailResponse(SprayFailReason.SkinNotOwned);
@@ -443,9 +503,9 @@ public class SprayCan : HeldEntity
 					}
 					baseEntity2.SetSlots(slots);
 				}
+				Interface.CallHook("OnEntityReskinned", baseEntity2, skin, msg.player);
 				Facepunch.Pool.FreeList(ref obj);
 			}
-			Interface.CallHook("OnEntityReskinned", baseEntity2, skin, msg.player);
 			ClientRPC(null, "Client_ReskinResult", 1, baseEntity2.net.ID);
 		}
 		LoseCondition(ConditionLossPerReskin);
@@ -543,6 +603,10 @@ public class SprayCan : HeldEntity
 			Quaternion quaternion = Quaternion.LookRotation((new Plane(vector2, vector).ClosestPointOnPlane(point) - vector).normalized, vector2);
 			quaternion *= Quaternion.Euler(0f, 0f, 90f);
 			bool flag = false;
+			if (msg.player.IsDeveloper)
+			{
+				flag = true;
+			}
 			if (num != 0 && !flag && !msg.player.blueprints.CheckSkinOwnership(num, msg.player.userID))
 			{
 				Debug.Log($"SprayCan.ChangeItemSkin player does not have item :{num}:");
@@ -585,6 +649,36 @@ public class SprayCan : HeldEntity
 				paintingLine.Kill();
 			}
 			paintingLine = null;
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server.CallsPerSecond(3uL)]
+	private void Server_SetBlockColourId(RPCMessage msg)
+	{
+		NetworkableId uid = msg.read.EntityID();
+		uint num = msg.read.UInt32();
+		BasePlayer player = msg.player;
+		SetFlag(Flags.Busy, b: true);
+		Invoke(ClearBusy, 0.1f);
+		if (player == null || !player.CanBuild())
+		{
+			return;
+		}
+		BuildingBlock buildingBlock = BaseNetworkable.serverEntities.Find(uid) as BuildingBlock;
+		if (buildingBlock != null)
+		{
+			if (player.Distance(buildingBlock) > 4f)
+			{
+				return;
+			}
+			buildingBlock.SetCustomColour(num);
+		}
+		BasePlayer ownerPlayer = GetOwnerPlayer();
+		if (ownerPlayer != null)
+		{
+			ownerPlayer.LastBlockColourChangeId = num;
 		}
 	}
 

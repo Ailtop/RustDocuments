@@ -8,7 +8,7 @@ using ProtoBuf;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealSlotEntity, LootPanel.IHasLootPanel, IContainerSounds, IIndustrialStorage
+public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealSlotEntity, ILootableEntity, LootPanel.IHasLootPanel, IContainerSounds, IIndustrialStorage
 {
 	public string LootPanelName = "generic";
 
@@ -61,6 +61,8 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 	public float DestroyLootPercent => 0f;
 
 	public bool DropFloats { get; }
+
+	public ulong LastLootedBy { get; set; }
 
 	public ItemContainer Container => inventory;
 
@@ -174,8 +176,15 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		}
 	}
 
+	public override void OnKilled(HitInfo info)
+	{
+		base.OnKilled(info);
+		DropItems(info?.Initiator);
+	}
+
 	public void DropItems(BaseEntity initiator = null)
 	{
+		StorageContainer.DropItems(this, initiator);
 	}
 
 	public bool ShouldDropItemsIndividually()
@@ -187,8 +196,8 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -544,9 +553,9 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		SetFlag(Flags.Busy, b: false);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(2uL)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void SvSwitch(RPCMessage msg)
 	{
 		SetSwitch(!IsOn());
@@ -570,9 +579,9 @@ public class IndustrialCrafter : IndustrialEntity, IItemContainerEntity, IIdealS
 		return -1;
 	}
 
-	public uint GetIdealContainer(BasePlayer player, Item item)
+	public ItemContainerId GetIdealContainer(BasePlayer player, Item item, bool altMove)
 	{
-		return 0u;
+		return default(ItemContainerId);
 	}
 
 	public Workbench GetWorkbench()

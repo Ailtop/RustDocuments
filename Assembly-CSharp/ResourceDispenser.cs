@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Facepunch.Rust;
 using Oxide.Core;
 using Rust;
 using UnityEngine;
@@ -207,6 +208,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 				{
 					item = (Item)obj;
 				}
+				Facepunch.Rust.Analytics.Azure.OnGatherItem(item.info.shortname, item.amount, base.baseEntity, player, weapon);
 				player.GiveItem(item, BaseEntity.GiveItemReason.ResourceHarvested);
 			}
 		}
@@ -249,7 +251,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		if ((bool)entity)
 		{
 			Debug.Assert(attackWeapon.GetItem() != null, string.Concat("Attack Weapon ", attackWeapon, " has no Item"));
-			Debug.Assert(attackWeapon.ownerItemUID != 0, string.Concat("Attack Weapon ", attackWeapon, " ownerItemUID is 0"));
+			Debug.Assert(attackWeapon.ownerItemUID.IsValid, string.Concat("Attack Weapon ", attackWeapon, " ownerItemUID is 0"));
 			Debug.Assert(attackWeapon.GetParentEntity() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is null"));
 			Debug.Assert(BaseNetworkableEx.IsValid(attackWeapon.GetParentEntity()), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
 			Debug.Assert(attackWeapon.GetParentEntity().ToPlayer() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not a player"));
@@ -313,6 +315,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			if (Interface.CallHook("OnDispenserGather", this, entity, item) == null && item != null)
 			{
 				OverrideOwnership(item, attackWeapon);
+				Facepunch.Rust.Analytics.Azure.OnGatherItem(item.info.shortname, item.amount, base.baseEntity, entity, attackWeapon);
 				entity.GiveItem(item, BaseEntity.GiveItemReason.ResourceHarvested);
 			}
 		}

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -256,6 +257,7 @@ public class BaseCombatEntity : BaseEntity
 			OnPickedUpPreItemMove(item, rpc.player);
 			rpc.player.GiveItem(item, GiveItemReason.PickedUp);
 			OnPickedUp(item, rpc.player);
+			Facepunch.Rust.Analytics.Azure.OnEntityPickedUp(rpc.player, this);
 			Kill();
 		}
 	}
@@ -352,6 +354,7 @@ public class BaseCombatEntity : BaseEntity
 			return;
 		}
 		float num4 = list.Sum((ItemAmount x) => x.amount);
+		float healthBefore = health;
 		if (num4 > 0f)
 		{
 			float num5 = list.Min((ItemAmount x) => Mathf.Clamp01((float)player2.inventory.GetAmount(x.itemid) / x.amount));
@@ -370,6 +373,7 @@ public class BaseCombatEntity : BaseEntity
 			{
 				int amount = Mathf.CeilToInt(num5 * item.amount);
 				int num7 = player2.inventory.Take(null, item.itemid, amount);
+				Facepunch.Rust.Analytics.Azure.LogResource(Facepunch.Rust.Analytics.Azure.ResourceMode.Consumed, "repair_entity", item.itemDef.shortname, num7, this, null, safezone: false, null, player2.userID);
 				if (num7 > 0)
 				{
 					num6 += num7;
@@ -385,6 +389,7 @@ public class BaseCombatEntity : BaseEntity
 			health += num2;
 			SendNetworkUpdate();
 		}
+		Facepunch.Rust.Analytics.Azure.OnEntityRepaired(player2, this, healthBefore, health);
 		if (Health() >= MaxHealth())
 		{
 			OnRepairFinished();
@@ -498,7 +503,9 @@ public class BaseCombatEntity : BaseEntity
 					LastAttackedDir = (lastAttacker.transform.position - base.transform.position).normalized;
 				}
 			}
-			if (Health() <= 0f)
+			bool flag = Health() <= 0f;
+			Facepunch.Rust.Analytics.Azure.OnEntityTakeDamage(info, flag);
+			if (flag)
 			{
 				Die(info);
 			}

@@ -518,7 +518,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		engineController = new VehicleEngineController<TrainEngine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
 		if (base.isServer)
 		{
-			bool b = SeedRandom.Range(net.ID, 0, 2) == 0;
+			bool b = SeedRandom.Range((uint)net.ID.Value, 0, 2) == 0;
 			SetFlag(Flags.Reserved9, b);
 		}
 	}

@@ -181,11 +181,11 @@ public class Landmine : BaseTrap
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_Disarm(RPCMessage rpc)
 	{
-		if (rpc.player.net.ID != triggerPlayerID && Armed() && Interface.CallHook("OnTrapDisarm", this, rpc.player) == null)
+		if (rpc.player.userID != triggerPlayerID && Armed() && Interface.CallHook("OnTrapDisarm", this, rpc.player) == null)
 		{
 			SetFlag(Flags.On, b: false);
 			if (UnityEngine.Random.Range(0, 100) < 15)

@@ -40,6 +40,8 @@ public class Elevator : IOEntity, IFlagNotify
 
 	public Transform CableRoot;
 
+	public float LiftMoveDelay;
+
 	protected const Flags TopFloorFlag = Flags.Reserved1;
 
 	public const Flags ElevatorPowered = Flags.Reserved2;
@@ -89,7 +91,7 @@ public class Elevator : IOEntity, IFlagNotify
 		{
 			if (elevatorEnt.IsTop && Interface.CallHook("OnElevatorCall", this, elevatorEnt) == null)
 			{
-				elevatorEnt.RequestMoveLiftTo(Floor, out var _);
+				elevatorEnt.RequestMoveLiftTo(Floor, out var _, this);
 			}
 		}, (ConstructionSocket socket) => socket.socketType == ConstructionSocket.Type.Elevator);
 	}
@@ -118,10 +120,10 @@ public class Elevator : IOEntity, IFlagNotify
 			}
 			break;
 		}
-		RequestMoveLiftTo(num, out var _);
+		RequestMoveLiftTo(num, out var _, this);
 	}
 
-	public bool RequestMoveLiftTo(int targetFloor, out float timeToTravel)
+	public bool RequestMoveLiftTo(int targetFloor, out float timeToTravel, Elevator fromElevator)
 	{
 		timeToTravel = 0f;
 		if (Interface.CallHook("OnElevatorMove", this, targetFloor) != null)
@@ -144,9 +146,12 @@ public class Elevator : IOEntity, IFlagNotify
 		{
 			return false;
 		}
-		if (LiftPositionToFloor() == targetFloor)
+		int num = LiftPositionToFloor();
+		if (num == targetFloor)
 		{
-			OnLiftCalledWhenAtTargetFloor();
+			OpenLiftDoors();
+			OpenDoorsAtFloor(num);
+			fromElevator.OpenLiftDoors();
 			return false;
 		}
 		Vector3 worldSpaceFloorPosition = GetWorldSpaceFloorPosition(targetFloor);
@@ -157,13 +162,15 @@ public class Elevator : IOEntity, IFlagNotify
 		OnMoveBegin();
 		Vector3 vector = base.transform.InverseTransformPoint(worldSpaceFloorPosition);
 		timeToTravel = TimeToTravelDistance(Mathf.Abs(liftEntity.transform.localPosition.y - vector.y));
-		LeanTween.moveLocalY(liftEntity.gameObject, vector.y, timeToTravel);
+		LeanTween.moveLocalY(liftEntity.gameObject, vector.y, timeToTravel).delay = LiftMoveDelay;
+		timeToTravel += LiftMoveDelay;
 		SetFlag(Flags.Busy, b: true);
 		if (targetFloor < Floor)
 		{
 			liftEntity.ToggleHurtTrigger(state: true);
 		}
-		Invoke(ClearBusy, timeToTravel);
+		Invoke(ClearBusy, timeToTravel + 1f);
+		liftEntity.NotifyNewFloor(targetFloor, Floor);
 		if (ioEntity != null)
 		{
 			ioEntity.SetFlag(Flags.Busy, b: true);
@@ -172,8 +179,9 @@ public class Elevator : IOEntity, IFlagNotify
 		return true;
 	}
 
-	public virtual void OnLiftCalledWhenAtTargetFloor()
+	protected virtual void OpenLiftDoors()
 	{
+		NotifyLiftEntityDoorsOpen(state: true);
 	}
 
 	public virtual void OnMoveBegin()
@@ -364,6 +372,25 @@ public class Elevator : IOEntity, IFlagNotify
 			return true;
 		}
 		return false;
+	}
+
+	public void NotifyLiftEntityDoorsOpen(bool state)
+	{
+		if (!(liftEntity != null))
+		{
+			return;
+		}
+		foreach (BaseEntity child in liftEntity.children)
+		{
+			if (child is Door door)
+			{
+				door.SetOpen(state);
+			}
+		}
+	}
+
+	protected virtual void OpenDoorsAtFloor(int floor)
+	{
 	}
 
 	public override void OnFlagsChanged(Flags old, Flags next)

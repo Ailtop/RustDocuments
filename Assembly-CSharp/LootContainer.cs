@@ -1,4 +1,5 @@
 using System;
+using Facepunch.Rust;
 using Oxide.Core;
 using Rust;
 using UnityEngine;
@@ -217,7 +218,7 @@ public class LootContainer : StorageContainer
 			Item item = ItemManager.Create(scrapDef, num3, 0uL);
 			if (item != null && Interface.CallHook("OnBonusItemDrop", item, basePlayer) == null)
 			{
-				item.Drop(GetDropPosition() + new Vector3(0f, 0.5f, 0f), GetInheritedDropVelocity());
+				(item.Drop(GetDropPosition() + new Vector3(0f, 0.5f, 0f), GetInheritedDropVelocity()) as DroppedItem).DropReason = DroppedItem.DropReasonEnum.Loot;
 				Interface.CallHook("OnBonusItemDropped", item, basePlayer);
 			}
 		}
@@ -228,6 +229,7 @@ public class LootContainer : StorageContainer
 		if (!FirstLooted)
 		{
 			FirstLooted = true;
+			Facepunch.Rust.Analytics.Azure.OnFirstLooted(this, baseEntity);
 		}
 		return base.OnStartBeingLooted(baseEntity);
 	}
@@ -253,6 +255,7 @@ public class LootContainer : StorageContainer
 
 	public override void OnKilled(HitInfo info)
 	{
+		Facepunch.Rust.Analytics.Azure.OnLootContainerDestroyed(this, info.InitiatorPlayer, info.Weapon);
 		base.OnKilled(info);
 		if (info != null && info.InitiatorPlayer != null && !string.IsNullOrEmpty(deathStat))
 		{

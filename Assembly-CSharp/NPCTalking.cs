@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using ConVar;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using UnityEngine;
@@ -271,9 +272,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_BeginTalking(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -303,18 +304,18 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 	{
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void Server_EndTalking(RPCMessage msg)
 	{
 		OnConversationEnded(msg.player);
 		Interface.CallHook("OnNpcConversationEnded", this, msg.player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
 	public void ConversationAction(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -421,6 +422,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				ForceSpeechNode(player, speechNodeIndex2);
 				break;
 			}
+			Facepunch.Rust.Analytics.Azure.OnNPCVendor(player, this, nPCConversationResultAction.scrapCost, nPCConversationResultAction.action);
 			num = nPCConversationResultAction.scrapCost;
 			foreach (Item item2 in list)
 			{

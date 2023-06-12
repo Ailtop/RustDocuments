@@ -49,9 +49,9 @@ public class Drone : RemoteControlEntity, IRemoteControllableClientCallbacks, IR
 	[ClientVar(ClientAdmin = true)]
 	public static float windLerpSpeed = 0.1f;
 
-	private const Flags Flag_ThrottleUp = Flags.Reserved1;
+	public const Flags Flag_ThrottleUp = Flags.Reserved1;
 
-	private const Flags Flag_Flying = Flags.Reserved2;
+	public const Flags Flag_Flying = Flags.Reserved2;
 
 	[Header("Drone")]
 	public Rigidbody body;
@@ -131,7 +131,7 @@ public class Drone : RemoteControlEntity, IRemoteControllableClientCallbacks, IR
 
 	public Transform propellerD;
 
-	private float pitch;
+	public float pitch;
 
 	public Vector3? targetPosition;
 
@@ -141,11 +141,11 @@ public class Drone : RemoteControlEntity, IRemoteControllableClientCallbacks, IR
 
 	public double lastCollision = -1000.0;
 
-	private TimeSince lastGroundCheck;
+	public TimeSince lastGroundCheck;
 
 	public bool isGrounded;
 
-	private RealTimeSinceEx lastPlayerCheck;
+	public RealTimeSinceEx lastPlayerCheck;
 
 	public override bool RequiresMouse => true;
 
@@ -219,7 +219,7 @@ public class Drone : RemoteControlEntity, IRemoteControllableClientCallbacks, IR
 		}
 	}
 
-	protected virtual void Update_Server()
+	public virtual void Update_Server()
 	{
 		if (!base.isServer || IsDead() || base.IsBeingControlled || !targetPosition.HasValue)
 		{
@@ -411,7 +411,7 @@ public class Drone : RemoteControlEntity, IRemoteControllableClientCallbacks, IR
 		}
 	}
 
-	protected override bool CanChangeID(BasePlayer player)
+	public override bool CanChangeID(BasePlayer player)
 	{
 		if (player != null && base.OwnerID == player.userID)
 		{
@@ -461,5 +461,10 @@ public class Drone : RemoteControlEntity, IRemoteControllableClientCallbacks, IR
 	public override bool ShouldInheritNetworkGroup()
 	{
 		return false;
+	}
+
+	public override float MaxVelocity()
+	{
+		return 30f;
 	}
 }

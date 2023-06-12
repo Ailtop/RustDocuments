@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Facepunch;
+using Facepunch.Rust;
 using Network;
 using Oxide.Core;
 using ProtoBuf;
@@ -130,6 +131,7 @@ public class DieselEngine : StorageContainer
 			return false;
 		}
 		slot.UseItem(amount);
+		Facepunch.Rust.Analytics.Azure.OnExcavatorConsumeFuel(slot, amount, this);
 		UpdateHasFuelFlag();
 		return true;
 	}

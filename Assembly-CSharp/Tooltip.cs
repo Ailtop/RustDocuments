@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Tooltip : BaseMonoBehaviour, IClientComponent
 {
-	public static GameObject Current;
+	public static TooltipContainer Current;
 
 	[TextArea]
 	public string Text;

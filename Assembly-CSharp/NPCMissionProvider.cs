@@ -4,7 +4,7 @@ public class NPCMissionProvider : NPCTalking, IMissionProvider
 {
 	public MissionManifest manifest;
 
-	public uint ProviderID()
+	public NetworkableId ProviderID()
 	{
 		return net.ID;
 	}
@@ -21,13 +21,13 @@ public class NPCMissionProvider : NPCTalking, IMissionProvider
 
 	public override void OnConversationEnded(BasePlayer player)
 	{
-		player.ProcessMissionEvent(BaseMission.MissionEventType.CONVERSATION, ProviderID().ToString(), 0f);
+		player.ProcessMissionEvent(BaseMission.MissionEventType.CONVERSATION, ProviderID().Value.ToString(), 0f);
 		base.OnConversationEnded(player);
 	}
 
 	public override void OnConversationStarted(BasePlayer speakingTo)
 	{
-		speakingTo.ProcessMissionEvent(BaseMission.MissionEventType.CONVERSATION, ProviderID().ToString(), 1f);
+		speakingTo.ProcessMissionEvent(BaseMission.MissionEventType.CONVERSATION, ProviderID().Value.ToString(), 1f);
 		base.OnConversationStarted(speakingTo);
 	}
 

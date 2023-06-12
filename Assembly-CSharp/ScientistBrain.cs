@@ -2,6 +2,28 @@ using UnityEngine;
 
 public class ScientistBrain : BaseAIBrain
 {
+	public class BlindedState : BaseBlindedState
+	{
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateEnter(brain, entity);
+			HumanNPC obj = entity as HumanNPC;
+			obj.SetDucked(flag: false);
+			obj.Server_StartGesture(235662700u);
+			brain.Navigator.SetDestination(brain.PathFinder.GetRandomPositionAround(entity.transform.position, 1f, 2.5f), BaseNavigator.NavigationSpeed.Slowest);
+		}
+
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateLeave(brain, entity);
+			brain.Navigator.ClearFacingDirectionOverride();
+			if (entity.ToPlayer() != null)
+			{
+				entity.ToPlayer().Server_CancelGesture();
+			}
+		}
+	}
+
 	public class ChaseState : BasicAIState
 	{
 		private StateStatus status = StateStatus.Error;
@@ -406,7 +428,12 @@ public class ScientistBrain : BaseAIBrain
 			{
 				return StateStatus.Running;
 			}
+			PickGoodLookDirection();
 			return StateStatus.Finished;
+		}
+
+		private void PickGoodLookDirection()
+		{
 		}
 	}
 
@@ -522,6 +549,7 @@ public class ScientistBrain : BaseAIBrain
 		AddState(new CombatStationaryState());
 		AddState(new BaseMoveTorwardsState());
 		AddState(new MoveToVector3State());
+		AddState(new BlindedState());
 	}
 
 	public override void InitializeAI()

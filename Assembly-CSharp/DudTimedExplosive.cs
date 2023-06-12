@@ -16,7 +16,7 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 
 	public AudioSource wickSound;
 
-	public float dudChance = 0.3f;
+	public float dudChance = 0.4f;
 
 	[ItemSelector(ItemCategory.All)]
 	public ItemDefinition itemToGive;
@@ -117,8 +117,8 @@ public class DudTimedExplosive : TimedExplosive, IIgniteable, ISplashable
 		return randomTimerTime * num;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Pickup(RPCMessage msg)
 	{
 		if (!IsWickBurning())

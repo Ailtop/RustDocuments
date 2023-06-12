@@ -12,7 +12,7 @@ public class VendingMachineMapMarker : MapMarker
 	public ProtoBuf.VendingMachine client_vendingMachine;
 
 	[NonSerialized]
-	public uint client_vendingMachineNetworkID;
+	public NetworkableId client_vendingMachineNetworkID;
 
 	public GameObjectRef clusterMarkerObj;
 
@@ -48,22 +48,19 @@ public class VendingMachineMapMarker : MapMarker
 		if (server_vendingMachine != null)
 		{
 			appMarkerData.sellOrders = Pool.GetList<AppMarker.SellOrder>();
+			foreach (ProtoBuf.VendingMachine.SellOrder sellOrder2 in server_vendingMachine.sellOrders.sellOrders)
 			{
-				foreach (ProtoBuf.VendingMachine.SellOrder sellOrder2 in server_vendingMachine.sellOrders.sellOrders)
-				{
-					AppMarker.SellOrder sellOrder = Pool.Get<AppMarker.SellOrder>();
-					sellOrder.itemId = sellOrder2.itemToSellID;
-					sellOrder.quantity = sellOrder2.itemToSellAmount;
-					sellOrder.currencyId = sellOrder2.currencyID;
-					sellOrder.costPerItem = sellOrder2.currencyAmountPerItem;
-					sellOrder.amountInStock = sellOrder2.inStock;
-					sellOrder.itemIsBlueprint = sellOrder2.itemToSellIsBP;
-					sellOrder.currencyIsBlueprint = sellOrder2.currencyIsBP;
-					sellOrder.itemCondition = sellOrder2.itemCondition;
-					sellOrder.itemConditionMax = sellOrder2.itemConditionMax;
-					appMarkerData.sellOrders.Add(sellOrder);
-				}
-				return appMarkerData;
+				AppMarker.SellOrder sellOrder = Pool.Get<AppMarker.SellOrder>();
+				sellOrder.itemId = sellOrder2.itemToSellID;
+				sellOrder.quantity = sellOrder2.itemToSellAmount;
+				sellOrder.currencyId = sellOrder2.currencyID;
+				sellOrder.costPerItem = sellOrder2.currencyAmountPerItem;
+				sellOrder.amountInStock = sellOrder2.inStock;
+				sellOrder.itemIsBlueprint = sellOrder2.itemToSellIsBP;
+				sellOrder.currencyIsBlueprint = sellOrder2.currencyIsBP;
+				sellOrder.itemCondition = sellOrder2.itemCondition;
+				sellOrder.itemConditionMax = sellOrder2.itemConditionMax;
+				appMarkerData.sellOrders.Add(sellOrder);
 			}
 		}
 		return appMarkerData;

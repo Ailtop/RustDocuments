@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using ConVar;
 using Epic.OnlineServices.Reports;
 using Facepunch;
+using Facepunch.Rust;
 using Oxide.Core;
 using UnityEngine;
 
@@ -90,7 +91,7 @@ public static class AntiHack
 
 	public static RaycastHit isInsideRayHit;
 
-	public static bool TestNoClipping(Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast, bool vehicleLayer = false, BaseEntity ignoreEntity = null)
+	public static bool TestNoClipping(Vector3 oldPos, Vector3 newPos, float radius, float backtracking, bool sphereCast, out Collider collider, bool vehicleLayer = false, BaseEntity ignoreEntity = null)
 	{
 		int num = 429990145;
 		if (!vehicleLayer)
@@ -107,6 +108,7 @@ public static class AntiHack
 		{
 			flag = ((ignoreEntity == null) ? UnityEngine.Physics.SphereCast(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore) : GamePhysics.Trace(ray, radius, out hitInfo, magnitude, num, QueryTriggerInteraction.Ignore, ignoreEntity));
 		}
+		collider = hitInfo.collider;
 		if (flag)
 		{
 			return GamePhysics.Verify(hitInfo);
@@ -117,16 +119,22 @@ public static class AntiHack
 	public static void Cycle()
 	{
 		float num = UnityEngine.Time.unscaledTime - 60f;
-		if (groupedLogs.Count > 0)
+		if (groupedLogs.Count <= 0)
 		{
-			GroupedLog groupedLog = groupedLogs.Peek();
-			while (groupedLog.firstLogTime <= num)
+			return;
+		}
+		GroupedLog groupedLog = groupedLogs.Peek();
+		while (groupedLog.firstLogTime <= num)
+		{
+			GroupedLog obj = groupedLogs.Dequeue();
+			LogToConsole(obj.playerName, obj.antiHackType, $"{obj.message} (x{obj.num})", obj.averagePos);
+			Facepunch.Pool.Free(ref obj);
+			if (groupedLogs.Count != 0)
 			{
-				GroupedLog obj = groupedLogs.Dequeue();
-				LogToConsole(obj.playerName, obj.antiHackType, $"{obj.message} (x{obj.num})", obj.averagePos);
-				Facepunch.Pool.Free(ref obj);
 				groupedLog = groupedLogs.Peek();
+				continue;
 			}
+			break;
 		}
 	}
 
@@ -186,12 +194,13 @@ public static class AntiHack
 				return true;
 			}
 			bool flag = deltaTime > ConVar.AntiHack.maxdeltatime;
-			if (IsNoClipping(ply, ticks, deltaTime))
+			if (IsNoClipping(ply, ticks, deltaTime, out var collider))
 			{
 				if (flag)
 				{
 					return false;
 				}
+				Facepunch.Rust.Analytics.Azure.OnNoclipViolation(ply, ticks.CurrentPoint, ticks.EndPoint, ticks.Count, collider);
 				AddViolation(ply, AntiHackType.NoClip, ConVar.AntiHack.noclip_penalty * ticks.Length);
 				if (ConVar.AntiHack.noclip_reject)
 				{
@@ -204,6 +213,7 @@ public static class AntiHack
 				{
 					return false;
 				}
+				Facepunch.Rust.Analytics.Azure.OnSpeedhackViolation(ply, ticks.CurrentPoint, ticks.EndPoint, ticks.Count);
 				AddViolation(ply, AntiHackType.SpeedHack, ConVar.AntiHack.speedhack_penalty * ticks.Length);
 				if (ConVar.AntiHack.speedhack_reject)
 				{
@@ -216,6 +226,7 @@ public static class AntiHack
 				{
 					return false;
 				}
+				Facepunch.Rust.Analytics.Azure.OnFlyhackViolation(ply, ticks.CurrentPoint, ticks.EndPoint, ticks.Count);
 				AddViolation(ply, AntiHackType.FlyHack, ConVar.AntiHack.flyhack_penalty * ticks.Length);
 				if (ConVar.AntiHack.flyhack_reject)
 				{
@@ -232,10 +243,11 @@ public static class AntiHack
 		{
 			for (int i = 0; i < ply.eyeHistory.Count; i++)
 			{
-				Vector3 point = ply.eyeHistory[i];
-				if (ply.tickHistory.Distance(ply, point) > ConVar.AntiHack.eye_history_forgiveness)
+				Vector3 vector = ply.eyeHistory[i];
+				if (ply.tickHistory.Distance(ply, vector) > ConVar.AntiHack.eye_history_forgiveness)
 				{
 					AddViolation(ply, AntiHackType.EyeHack, ConVar.AntiHack.eye_history_penalty);
+					Facepunch.Rust.Analytics.Azure.OnEyehackViolation(ply, vector);
 				}
 			}
 			ply.eyeHistory.Clear();
@@ -295,8 +307,9 @@ public static class AntiHack
 		return false;
 	}
 
-	public static bool IsNoClipping(BasePlayer ply, TickInterpolator ticks, float deltaTime)
+	public static bool IsNoClipping(BasePlayer ply, TickInterpolator ticks, float deltaTime, out Collider collider)
 	{
+		collider = null;
 		using (TimeWarning.New("AntiHack.IsNoClipping"))
 		{
 			ply.vehiclePauseTime = Mathf.Max(0f, ply.vehiclePauseTime - deltaTime);
@@ -325,7 +338,7 @@ public static class AntiHack
 				while (ticks.MoveNext(b))
 				{
 					vector2 = (flag ? ticks.CurrentPoint : matrix4x.MultiplyPoint3x4(ticks.CurrentPoint));
-					if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
+					if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, out collider, vehicleLayer))
 					{
 						return true;
 					}
@@ -334,12 +347,12 @@ public static class AntiHack
 			}
 			else if (ConVar.AntiHack.noclip_protection >= 2)
 			{
-				if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, vehicleLayer))
+				if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: true, out collider, vehicleLayer))
 				{
 					return true;
 				}
 			}
-			else if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false, vehicleLayer))
+			else if (TestNoClipping(vector + vector3, vector2 + vector3, radius, noclip_backtracking, sphereCast: false, out collider, vehicleLayer))
 			{
 				return true;
 			}
@@ -535,6 +548,13 @@ public static class AntiHack
 		{
 			return false;
 		}
+		foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+		{
+			if (monument.IsInBounds(deployPos))
+			{
+				return false;
+			}
+		}
 		if (IsInsideMesh(deployPos) && IsInsideMesh(target.ray.origin))
 		{
 			LogToConsoleBatched(target.player, AntiHackType.InsideGeometry, "Tried to build while clipped inside " + isInsideRayHit.collider.name, 25f);
@@ -585,6 +605,7 @@ public static class AntiHack
 		{
 			LogToConsole(ply, type, message);
 		}
+		Facepunch.Rust.Analytics.Azure.OnAntihackViolation(ply, (int)type, message);
 		LogToEAC(ply, type, message);
 	}
 

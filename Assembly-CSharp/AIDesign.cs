@@ -56,6 +56,18 @@ public class AIDesign
 		return stateContainers[id];
 	}
 
+	public AIStateContainer GetFirstStateContainerOfType(AIState stateType)
+	{
+		foreach (AIStateContainer value in stateContainers.Values)
+		{
+			if (value.State == stateType)
+			{
+				return value;
+			}
+		}
+		return null;
+	}
+
 	public ProtoBuf.AIDesign ToProto(int currentStateID)
 	{
 		ProtoBuf.AIDesign aIDesign = new ProtoBuf.AIDesign();

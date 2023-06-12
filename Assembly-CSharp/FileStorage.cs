@@ -13,7 +13,7 @@ public class FileStorage : IDisposable
 	{
 		public byte[] data;
 
-		public uint entityID;
+		public NetworkableId entityID;
 
 		public uint numID;
 	}
@@ -31,7 +31,7 @@ public class FileStorage : IDisposable
 
 	private MruDictionary<uint, CacheData> _cache = new MruDictionary<uint, CacheData>(1000);
 
-	public static FileStorage server = new FileStorage("sv.files." + 234, server: true);
+	public static FileStorage server = new FileStorage("sv.files." + 238, server: true);
 
 	protected FileStorage(string name, bool server)
 	{
@@ -73,14 +73,14 @@ public class FileStorage : IDisposable
 		}
 	}
 
-	public uint Store(byte[] data, Type type, uint entityID, uint numID = 0u)
+	public uint Store(byte[] data, Type type, NetworkableId entityID, uint numID = 0u)
 	{
 		using (TimeWarning.New("FileStorage.Store"))
 		{
 			uint cRC = GetCRC(data, type);
 			if (db != null)
 			{
-				db.Execute("INSERT OR REPLACE INTO data ( crc, data, entid, filetype, part ) VALUES ( ?, ?, ?, ?, ? )", (int)cRC, data, (int)entityID, (int)type, (int)numID);
+				db.Execute("INSERT OR REPLACE INTO data ( crc, data, entid, filetype, part ) VALUES ( ?, ?, ?, ?, ? )", (int)cRC, data, (long)entityID.Value, (int)type, (int)numID);
 			}
 			_cache.Remove(cRC);
 			_cache.Add(cRC, new CacheData
@@ -93,7 +93,7 @@ public class FileStorage : IDisposable
 		}
 	}
 
-	public byte[] Get(uint crc, Type type, uint entityID, uint numID = 0u)
+	public byte[] Get(uint crc, Type type, NetworkableId entityID, uint numID = 0u)
 	{
 		using (TimeWarning.New("FileStorage.Get"))
 		{
@@ -106,7 +106,7 @@ public class FileStorage : IDisposable
 			{
 				return null;
 			}
-			byte[] array = db.QueryBlob("SELECT data FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ? LIMIT 1", (int)crc, (int)type, (int)entityID, (int)numID);
+			byte[] array = db.QueryBlob("SELECT data FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ? LIMIT 1", (int)crc, (int)type, (long)entityID.Value, (int)numID);
 			if (array == null)
 			{
 				return null;
@@ -122,37 +122,37 @@ public class FileStorage : IDisposable
 		}
 	}
 
-	public void Remove(uint crc, Type type, uint entityID)
+	public void Remove(uint crc, Type type, NetworkableId entityID)
 	{
 		using (TimeWarning.New("FileStorage.Remove"))
 		{
 			if (db != null)
 			{
-				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ?", (int)crc, (int)type, (int)entityID);
+				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ?", (int)crc, (int)type, (long)entityID.Value);
 			}
 			_cache.Remove(crc);
 		}
 	}
 
-	public void RemoveExact(uint crc, Type type, uint entityID, uint numid)
+	public void RemoveExact(uint crc, Type type, NetworkableId entityID, uint numid)
 	{
 		using (TimeWarning.New("FileStorage.RemoveExact"))
 		{
 			if (db != null)
 			{
-				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ?", (int)crc, (int)type, (int)entityID, (int)numid);
+				db.Execute("DELETE FROM data WHERE crc = ? AND filetype = ? AND entid = ? AND part = ?", (int)crc, (int)type, (long)entityID.Value, (int)numid);
 			}
 			_cache.Remove(crc);
 		}
 	}
 
-	public void RemoveEntityNum(uint entityid, uint numid)
+	public void RemoveEntityNum(NetworkableId entityid, uint numid)
 	{
 		using (TimeWarning.New("FileStorage.RemoveEntityNum"))
 		{
 			if (db != null)
 			{
-				db.Execute("DELETE FROM data WHERE entid = ? AND part = ?", (int)entityid, (int)numid);
+				db.Execute("DELETE FROM data WHERE entid = ? AND part = ?", (long)entityid.Value, (int)numid);
 			}
 			uint[] array = (from x in _cache
 				where x.Value.entityID == entityid && x.Value.numID == numid
@@ -164,24 +164,24 @@ public class FileStorage : IDisposable
 		}
 	}
 
-	public void RemoveAllByEntity(uint entityid)
+	public void RemoveAllByEntity(NetworkableId entityid)
 	{
 		using (TimeWarning.New("FileStorage.RemoveAllByEntity"))
 		{
 			if (db != null)
 			{
-				db.Execute("DELETE FROM data WHERE entid = ?", (int)entityid);
+				db.Execute("DELETE FROM data WHERE entid = ?", (long)entityid.Value);
 			}
 		}
 	}
 
-	public void ReassignEntityId(uint oldId, uint newId)
+	public void ReassignEntityId(NetworkableId oldId, NetworkableId newId)
 	{
 		using (TimeWarning.New("FileStorage.ReassignEntityId"))
 		{
 			if (db != null)
 			{
-				db.Execute("UPDATE data SET entid = ? WHERE entid = ?", (int)newId, (int)oldId);
+				db.Execute("UPDATE data SET entid = ? WHERE entid = ?", (long)newId.Value, (long)oldId.Value);
 			}
 		}
 	}

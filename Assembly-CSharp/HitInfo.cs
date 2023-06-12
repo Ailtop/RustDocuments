@@ -195,7 +195,7 @@ public class HitInfo
 		HitEntity = null;
 		PointStart = attack.pointStart;
 		PointEnd = attack.pointEnd;
-		if (attack.hitID != 0)
+		if (attack.hitID.IsValid)
 		{
 			DidHit = true;
 			if (serverSide)

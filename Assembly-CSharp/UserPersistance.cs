@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Facepunch;
 using Facepunch.Math;
+using Facepunch.Rust;
 using Facepunch.Sqlite;
 using ProtoBuf;
 using UnityEngine;
@@ -20,6 +21,8 @@ public class UserPersistance : IDisposable
 
 	public static Dictionary<ulong, string> nameCache;
 
+	private static Dictionary<ulong, string> wipeIdCache;
+
 	public static MruDictionary<ulong, (int Token, bool Locked)> tokenCache;
 
 	public UserPersistance(string strFolder)
@@ -29,7 +32,7 @@ public class UserPersistance : IDisposable
 		string text = strFolder + "/player.blueprints.";
 		if (activeGameMode != null && activeGameMode.wipeBpsOnProtocol)
 		{
-			text = text + 234 + ".";
+			text = text + 238 + ".";
 		}
 		blueprints.Open(text + 5 + ".db");
 		if (!blueprints.TableExists("data"))
@@ -61,13 +64,14 @@ public class UserPersistance : IDisposable
 			tokens.Execute("ALTER TABLE data ADD COLUMN locked BOOLEAN DEFAULT 0");
 		}
 		playerState = new Facepunch.Sqlite.Database();
-		playerState.Open(strFolder + "/player.states." + 234 + ".db");
+		playerState.Open(strFolder + "/player.states." + 238 + ".db");
 		if (!playerState.TableExists("data"))
 		{
 			playerState.Execute("CREATE TABLE data ( userid INT PRIMARY KEY, state BLOB )");
 		}
 		nameCache = new Dictionary<ulong, string>();
 		tokenCache = new MruDictionary<ulong, (int, bool)>(500);
+		wipeIdCache = new Dictionary<ulong, string>();
 	}
 
 	public virtual void Dispose()
@@ -305,6 +309,22 @@ public class UserPersistance : IDisposable
 		{
 			playerState.Execute("INSERT OR REPLACE INTO data ( userid, state ) VALUES ( ?, ? )", playerID, state);
 		}
+	}
+
+	public string GetUserWipeId(ulong playerID)
+	{
+		if (playerID <= 10000000)
+		{
+			return null;
+		}
+		if (wipeIdCache.TryGetValue(playerID, out var value))
+		{
+			return value;
+		}
+		value = (playerID + SaveRestore.WipeId).Sha256().HexString();
+		wipeIdCache[playerID] = value;
+		Analytics.Azure.OnPlayerInitializedWipeId(playerID, value);
+		return value;
 	}
 
 	public void ResetPlayerState(ulong playerID)

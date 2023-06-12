@@ -7,8 +7,8 @@ namespace ConVar;
 [Factory("world")]
 public class World : ConsoleSystem
 {
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool cache = true;
 
 	[ClientVar]
@@ -25,10 +25,11 @@ public class World : ConsoleSystem
 		TextTable textTable = new TextTable();
 		textTable.AddColumn("type");
 		textTable.AddColumn("name");
+		textTable.AddColumn("prefab");
 		textTable.AddColumn("pos");
 		foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
 		{
-			textTable.AddRow(monument.Type.ToString(), monument.name, monument.transform.position.ToString());
+			textTable.AddRow(monument.Type.ToString(), monument.displayPhrase.translated, monument.name, monument.transform.position.ToString());
 		}
 		arg.ReplyWith(textTable.ToString());
 	}

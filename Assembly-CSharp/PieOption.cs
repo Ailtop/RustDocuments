@@ -8,11 +8,13 @@ public class PieOption : MonoBehaviour
 
 	public Image imageIcon;
 
+	public Image overlayIcon;
+
 	internal float midRadius => (background.startRadius + background.endRadius) * 0.5f;
 
 	internal float sliceSize => background.endRadius - background.startRadius;
 
-	public void UpdateOption(float startSlice, float sliceSize, float border, string optionTitle, float outerSize, float innerSize, float imageSize, Sprite sprite)
+	public void UpdateOption(float startSlice, float sliceSize, float border, string optionTitle, float outerSize, float innerSize, float imageSize, Sprite sprite, bool showOverlay)
 	{
 		if (!(background == null))
 		{
@@ -31,6 +33,12 @@ public class PieOption : MonoBehaviour
 			imageIcon.rectTransform.localPosition = new Vector3(x, y);
 			imageIcon.rectTransform.sizeDelta = new Vector2(num3 * imageSize, num3 * imageSize);
 			imageIcon.sprite = sprite;
+			overlayIcon.gameObject.SetActive(showOverlay);
+			if (showOverlay)
+			{
+				overlayIcon.rectTransform.localPosition = imageIcon.rectTransform.localPosition;
+				overlayIcon.rectTransform.sizeDelta = imageIcon.rectTransform.sizeDelta;
+			}
 		}
 	}
 }

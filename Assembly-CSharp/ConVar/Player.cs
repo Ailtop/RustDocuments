@@ -15,6 +15,9 @@ public class Player : ConsoleSystem
 	[ServerVar]
 	public static int tickrate_sv = 16;
 
+	[ClientVar(ClientInfo = true)]
+	public static bool InfiniteAmmo = false;
+
 	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "Whether the crawling state expires")]
 	public static bool woundforever = false;
 
@@ -49,8 +52,8 @@ public class Player : ConsoleSystem
 		}
 	}
 
-	[ServerUserVar]
 	[ClientVar(AllowRunFromServer = true)]
+	[ServerUserVar]
 	public static void cinematic_stop(Arg arg)
 	{
 		if (!arg.IsServerside)
@@ -91,7 +94,7 @@ public class Player : ConsoleSystem
 			{
 				basePlayer = ArgEx.Player(arg);
 			}
-			basePlayer.UpdateActiveItem(0u);
+			basePlayer.UpdateActiveItem(default(ItemId));
 			basePlayer.SignalBroadcast(BaseEntity.Signal.Gesture, @string);
 		}
 	}
@@ -370,6 +373,37 @@ public class Player : ConsoleSystem
 		}
 	}
 
+	[ServerVar(ServerAdmin = true)]
+	public static void reloadweapons(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		for (int i = 0; i < PlayerBelt.MaxBeltSlots; i++)
+		{
+			Item itemInSlot = basePlayer.Belt.GetItemInSlot(i);
+			if (itemInSlot == null)
+			{
+				continue;
+			}
+			if (itemInSlot.GetHeldEntity() is BaseProjectile baseProjectile)
+			{
+				if (baseProjectile.primaryMagazine != null)
+				{
+					baseProjectile.primaryMagazine.contents = baseProjectile.primaryMagazine.capacity;
+					baseProjectile.SendNetworkUpdateImmediate();
+				}
+			}
+			else if (itemInSlot.GetHeldEntity() is FlameThrower flameThrower)
+			{
+				flameThrower.ammo = flameThrower.maxAmmo;
+				flameThrower.SendNetworkUpdateImmediate();
+			}
+			else if (itemInSlot.GetHeldEntity() is LiquidWeapon liquidWeapon)
+			{
+				liquidWeapon.AddLiquid(ItemManager.FindItemDefinition("water"), 999);
+			}
+		}
+	}
+
 	[ServerVar]
 	public static void createskull(Arg arg)
 	{
@@ -381,6 +415,7 @@ public class Player : ConsoleSystem
 		}
 		Item item = ItemManager.Create(ItemManager.FindItemDefinition("skull.human"), 1, 0uL);
 		item.name = HumanBodyResourceDispenser.CreateSkullName(text);
+		item.streamerName = item.name;
 		basePlayer.inventory.GiveItem(item);
 	}
 

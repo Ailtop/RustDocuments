@@ -655,7 +655,7 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 	{
 		cachedCassette = null;
 		Controller.DeleteAllVoicemail();
-		ClientRPC(null, "ClientOnCassetteChanged", 0);
+		ClientRPC(null, "ClientOnCassetteChanged", default(NetworkableId));
 	}
 
 	private bool CanAcceptItem(Item item, int targetSlot)
@@ -677,16 +677,16 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.DestroyShared();
 	}
 
-	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void UpdatePhoneName(RPCMessage msg)
 	{
 		Controller.UpdatePhoneName(msg);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
 	public void Server_RequestPhoneDirectory(RPCMessage msg)
 	{
@@ -716,8 +716,8 @@ public class Telephone : ContainerIOEntity, ICassettePlayer
 		Controller.ServerSendVoicemail(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	public void ServerPlayVoicemail(RPCMessage msg)
 	{

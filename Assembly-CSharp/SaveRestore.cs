@@ -10,6 +10,7 @@ using ConVar;
 using Facepunch;
 using Facepunch.Math;
 using Network;
+using Newtonsoft.Json;
 using Oxide.Core;
 using ProtoBuf;
 using Rust;
@@ -18,8 +19,13 @@ using UnityEngine.Assertions;
 
 public class SaveRestore : SingletonComponent<SaveRestore>
 {
+	public class SaveExtraData
+	{
+		public string WipeId;
+	}
+
 	[CompilerGenerated]
-	private sealed class _003CDoAutomatedSave_003Ed__13 : IEnumerator<object>, IEnumerator, IDisposable
+	private sealed class _003CDoAutomatedSave_003Ed__19 : IEnumerator<object>, IEnumerator, IDisposable
 	{
 		private int _003C_003E1__state;
 
@@ -50,7 +56,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		}
 
 		[DebuggerHidden]
-		public _003CDoAutomatedSave_003Ed__13(int _003C_003E1__state)
+		public _003CDoAutomatedSave_003Ed__19(int _003C_003E1__state)
 		{
 			this._003C_003E1__state = _003C_003E1__state;
 		}
@@ -135,6 +141,8 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 
 	private static MemoryStream SaveBuffer = new MemoryStream(33554432);
 
+	public static string WipeId { get; private set; }
+
 	public static void ClearMapEntities()
 	{
 		BaseEntity[] array = UnityEngine.Object.FindObjectsOfType<BaseEntity>();
@@ -187,12 +195,17 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 					UnityEngine.Debug.LogWarning("Invalid save (missing header)");
 					return false;
 				}
+				if (binaryReader.PeekChar() == 74)
+				{
+					binaryReader.ReadChar();
+					WipeId = JsonConvert.DeserializeObject<SaveExtraData>(binaryReader.ReadString()).WipeId;
+				}
 				if (binaryReader.PeekChar() == 68)
 				{
 					binaryReader.ReadChar();
 					SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 				}
-				if (binaryReader.ReadUInt32() != 234)
+				if (binaryReader.ReadUInt32() != 238)
 				{
 					if (allowOutOfDateSaves)
 					{
@@ -207,7 +220,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				Assert.IsTrue(BaseEntity.saveList.Count == 0, "BaseEntity.saveList isn't empty!");
 				Network.Net.sv.Reset();
 				Rust.Application.isLoadingSave = true;
-				HashSet<uint> hashSet = new HashSet<uint>();
+				HashSet<NetworkableId> hashSet = new HashSet<NetworkableId>();
 				while (fileStream.Position < fileStream.Length)
 				{
 					RCon.Update();
@@ -227,15 +240,15 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 					}
 					if (entData.basePlayer != null && dictionary.Any((KeyValuePair<BaseEntity, ProtoBuf.Entity> x) => x.Value.basePlayer != null && x.Value.basePlayer.userid == entData.basePlayer.userid))
 					{
-						UnityEngine.Debug.LogWarning("Skipping entity " + entData.baseNetworkable.uid + " - it's a player " + entData.basePlayer.userid + " who is in the save multiple times");
+						UnityEngine.Debug.LogWarning(string.Concat("Skipping entity ", entData.baseNetworkable.uid, " - it's a player ", entData.basePlayer.userid, " who is in the save multiple times"));
 						continue;
 					}
-					if (entData.baseNetworkable.uid != 0 && hashSet.Contains(entData.baseNetworkable.uid))
+					if (entData.baseNetworkable.uid.IsValid && hashSet.Contains(entData.baseNetworkable.uid))
 					{
-						UnityEngine.Debug.LogWarning("Skipping entity " + entData.baseNetworkable.uid + " " + StringPool.Get(entData.baseNetworkable.prefabID) + " - uid is used multiple times");
+						UnityEngine.Debug.LogWarning(string.Concat("Skipping entity ", entData.baseNetworkable.uid, " ", StringPool.Get(entData.baseNetworkable.prefabID), " - uid is used multiple times"));
 						continue;
 					}
-					if (entData.baseNetworkable.uid != 0)
+					if (entData.baseNetworkable.uid.IsValid)
 					{
 						hashSet.Add(entData.baseNetworkable.uid);
 					}
@@ -299,6 +312,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 				SingletonComponent<SpawnHandler>.Instance.EnforceLimits();
 				DebugEx.Log("\tdone.");
 			}
+			InitializeWipeId();
 			Rust.Application.isLoadingSave = false;
 			return true;
 		}
@@ -415,6 +429,14 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		DebugEx.Log("\tdone.");
 	}
 
+	public static void InitializeWipeId()
+	{
+		if (WipeId == null)
+		{
+			WipeId = Guid.NewGuid().ToString("N");
+		}
+	}
+
 	public static IEnumerator Save(string strFilename, bool AndWait = false)
 	{
 		if (Rust.Application.isQuitting)
@@ -466,9 +488,14 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 			writer.Write((sbyte)65);
 			writer.Write((sbyte)86);
 			writer.Write((sbyte)82);
+			InitializeWipeId();
+			SaveExtraData saveExtraData = new SaveExtraData();
+			saveExtraData.WipeId = WipeId;
+			writer.Write((sbyte)74);
+			writer.Write(JsonConvert.SerializeObject(saveExtraData));
 			writer.Write((sbyte)68);
 			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(234u);
+			writer.Write(238u);
 			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
 			saveInfo.forDisk = true;
 			if (!AndWait)
@@ -610,11 +637,11 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		}
 	}
 
-	[IteratorStateMachine(typeof(_003CDoAutomatedSave_003Ed__13))]
+	[IteratorStateMachine(typeof(_003CDoAutomatedSave_003Ed__19))]
 	private IEnumerator DoAutomatedSave(bool AndWait = false)
 	{
 		Interface.CallHook("OnServerSave");
-		return new _003CDoAutomatedSave_003Ed__13(0)
+		return new _003CDoAutomatedSave_003Ed__19(0)
 		{
 			_003C_003E4__this = this,
 			AndWait = AndWait

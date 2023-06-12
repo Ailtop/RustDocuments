@@ -1,3 +1,4 @@
+using System;
 using Network;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ public class BigWheelBettingTerminal : StorageContainer
 	public SoundDefinition winSound;
 
 	public SoundDefinition loseSound;
+
+	[NonSerialized]
+	public BasePlayer lastPlayer;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -48,7 +52,12 @@ public class BigWheelBettingTerminal : StorageContainer
 		{
 			return false;
 		}
-		return base.PlayerOpenLoot(player, panelToOpen);
+		bool num = base.PlayerOpenLoot(player, panelToOpen);
+		if (num)
+		{
+			lastPlayer = player;
+		}
+		return num;
 	}
 
 	public bool TrySetBigWheel(BigWheelGame newWheel)

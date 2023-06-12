@@ -38,6 +38,8 @@ public class ElevatorLift : BaseCombatEntity
 
 	private float nextMovementAccent;
 
+	public Vector3 lastPosition;
+
 	private const Flags PressedUp = Flags.Reserved1;
 
 	private const Flags PressedDown = Flags.Reserved2;
@@ -102,8 +104,8 @@ public class ElevatorLift : BaseCombatEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Server_RaiseLowerFloor(RPCMessage msg)
 	{
 		if (!CanMove())
@@ -163,7 +165,21 @@ public class ElevatorLift : BaseCombatEntity
 		{
 			return (bool)obj;
 		}
-		return !VehicleTrigger.HasContents;
+		if (VehicleTrigger.HasContents && VehicleTrigger.entityContents != null)
+		{
+			foreach (BaseEntity entityContent in VehicleTrigger.entityContents)
+			{
+				if (!(entityContent is Drone))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public virtual void NotifyNewFloor(int newFloor, int totalFloors)
+	{
 	}
 
 	public void ToggleMovementCollider(bool state)

@@ -6,9 +6,21 @@ public class IndustrialStorageAdaptor : IndustrialEntity, IIndustrialStorage
 
 	public GameObject RedLight;
 
+	private BaseEntity _cachedParent;
+
 	private ItemContainer cachedContainer;
 
-	private BaseEntity _cachedParent;
+	public BaseEntity cachedParent
+	{
+		get
+		{
+			if (_cachedParent == null)
+			{
+				_cachedParent = GetParentEntity();
+			}
+			return _cachedParent;
+		}
+	}
 
 	public ItemContainer Container
 	{
@@ -19,18 +31,6 @@ public class IndustrialStorageAdaptor : IndustrialEntity, IIndustrialStorage
 				cachedContainer = (cachedParent as StorageContainer)?.inventory;
 			}
 			return cachedContainer;
-		}
-	}
-
-	private BaseEntity cachedParent
-	{
-		get
-		{
-			if (_cachedParent == null)
-			{
-				_cachedParent = GetParentEntity();
-			}
-			return _cachedParent;
 		}
 	}
 

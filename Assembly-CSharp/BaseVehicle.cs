@@ -714,7 +714,7 @@ public class BaseVehicle : BaseMountable
 		return num;
 	}
 
-	public int MaxMounted()
+	public virtual int MaxMounted()
 	{
 		if (!HasMountPoints())
 		{
@@ -863,6 +863,11 @@ public class BaseVehicle : BaseMountable
 		return null;
 	}
 
+	public virtual bool IsPlayerSeatSwapValid(BasePlayer player, int fromIndex, int toIndex)
+	{
+		return true;
+	}
+
 	public void SwapSeats(BasePlayer player, int targetSeat = 0)
 	{
 		if (!HasMountPoints() || !CanSwapSeats)
@@ -879,7 +884,7 @@ public class BaseVehicle : BaseMountable
 		BaseMountable baseMountable = null;
 		if (baseMountable == null)
 		{
-			int num2 = MaxMounted();
+			int num2 = NumSwappableSeats();
 			for (int i = 0; i < num2; i++)
 			{
 				num++;
@@ -888,7 +893,7 @@ public class BaseVehicle : BaseMountable
 					num = 0;
 				}
 				MountPointInfo mountPoint = GetMountPoint(num);
-				if (mountPoint?.mountable != null && !mountPoint.mountable.AnyMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position))
+				if (mountPoint?.mountable != null && !mountPoint.mountable.AnyMounted() && mountPoint.mountable.CanSwapToThis(player) && !IsSeatClipping(mountPoint.mountable) && IsSeatVisible(mountPoint.mountable, player.eyes.position) && IsPlayerSeatSwapValid(player, playerSeat, num))
 				{
 					baseMountable = mountPoint.mountable;
 					break;
@@ -901,6 +906,11 @@ public class BaseVehicle : BaseMountable
 			baseMountable.MountPlayer(player);
 			player.MarkSwapSeat();
 		}
+	}
+
+	public virtual int NumSwappableSeats()
+	{
+		return MaxMounted();
 	}
 
 	public bool HasDriverMountPoints()
