@@ -391,6 +391,9 @@
   "hazmatsuit_scientist_arctic": [
     "ItemModWearable"
   ],
+  "hazmatsuit_scientist_nvgm": [
+    "ItemModWearable"
+  ],
   "hazmatsuit_scientist_peacekeeper": [
     "ItemModWearable"
   ],
@@ -1346,6 +1349,9 @@
   "rustige_egg_e": [
     "ItemModEntity"
   ],
+  "rustige_egg_f": [
+    "ItemModEntity"
+  ],
   "attire.nesthat": [
     "ItemModWearable"
   ],
@@ -1486,6 +1492,15 @@
   "skull.trophy": [
     "ItemModEntity"
   ],
+  "blueidtag": [],
+  "grayidtag": [],
+  "greenidtag": [],
+  "orangeidtag": [],
+  "pinkidtag": [],
+  "purpleidtag": [],
+  "redidtag": [],
+  "whiteidtag": [],
+  "yellowidtag": [],
   "movembermoustachecard": [
     "ItemModWearable"
   ],
@@ -2032,6 +2047,10 @@
     "ItemModConsume",
     "ItemModMenuOption"
   ],
+  "supertea": [
+    "ItemModConsume",
+    "ItemModMenuOption"
+  ],
   "woodtea.advanced": [
     "ItemModConsume",
     "ItemModMenuOption"
@@ -2059,7 +2078,8 @@
     "ItemModEntity"
   ],
   "rf.detonator": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModSetFrequency"
   ],
   "fishingrod.handmade": [
     "ItemModEntity",
@@ -2118,6 +2138,7 @@
     "ItemModEntity"
   ],
   "rf_pager": [
+    "ItemModPager",
     "ItemModRFListener",
     "ItemModAssociatedEntity`1"
   ],
@@ -2537,7 +2558,13 @@
   "horse.armor.wood": [
     "ItemModAnimalEquipment"
   ],
+  "horse.saddle.double": [
+    "ItemModAnimalEquipment"
+  ],
   "horse.saddle": [],
+  "horse.saddle.single": [
+    "ItemModAnimalEquipment"
+  ],
   "horse.saddlebag": [
     "ItemModAnimalEquipment"
   ],

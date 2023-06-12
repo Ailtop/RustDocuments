@@ -1,0 +1,192 @@
+{
+  "assets/bundled/prefabs/autospawn/monument/fishing_village/fishing_village_c.prefab": {
+    "DisplayName": "Fishing Village",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": true,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 4,
+    "Tier": 3,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 200.0,
+        "y": 200.0,
+        "z": 200.0
+      },
+      "extents": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      },
+      "min": {
+        "x": -100.0,
+        "y": -100.0,
+        "z": -100.0
+      },
+      "max": {
+        "x": 100.0,
+        "y": 100.0,
+        "z": 100.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/cave/cave_small_easy.prefab": {
+    "DisplayName": "",
+    "shouldDisplayOnMap": false,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 0,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "extents": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "min": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "max": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/monument/underwater_lab/underwater_lab_d.prefab": {
+    "DisplayName": "Underwater Lab",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 2,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 64.0,
+        "y": 64.0,
+        "z": 64.0
+      },
+      "extents": {
+        "x": 32.0,
+        "y": 32.0,
+        "z": 32.0
+      },
+      "min": {
+        "x": -32.0,
+        "y": -32.0,
+        "z": -32.0
+      },
+      "max": {
+        "x": 32.0,
+        "y": 32.0,
+        "z": 32.0
+      }
+    }
+  },
+  "OilrigAI2": {
+    "DisplayName": "Large Oil Rig",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": true,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 2,
+    "Tier": 6,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 140.0,
+        "y": 100.0,
+        "z": 140.0
+      },
+      "extents": {
+        "x": 70.0,
+        "y": 50.0,
+        "z": 70.0
+      },
+      "min": {
+        "x": -70.0,
+        "y": -50.0,
+        "z": -70.0
+      },
+      "max": {
+        "x": 70.0,
+        "y": 50.0,
+        "z": 70.0
+      }
+    }
+  },
+  "OilrigAI": {
+    "DisplayName": "Oil Rig",
+    "shouldDisplayOnMap": true,
+    "MinWorldSize": 0,
+    "HasNavmesh": true,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": false,
+    "Type": 2,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 25.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 140.0,
+        "y": 100.0,
+        "z": 140.0
+      },
+      "extents": {
+        "x": 70.0,
+        "y": 50.0,
+        "z": 70.0
+      },
+      "min": {
+        "x": -45.0,
+        "y": -50.0,
+        "z": -70.0
+      },
+      "max": {
+        "x": 95.0,
+        "y": 50.0,
+        "z": 70.0
+      }
+    }
+  }
+}

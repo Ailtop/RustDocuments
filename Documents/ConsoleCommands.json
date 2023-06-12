@@ -408,6 +408,18 @@
     "Saved": true
   },
   {
+    "Name": "spawnroadbradley",
+    "Parent": "bradleyapc",
+    "FullName": "bradleyapc.spawnroadbradley",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
     "Name": "egress_duration_minutes",
     "Parent": "cargoship",
     "FullName": "cargoship.egress_duration_minutes",
@@ -720,6 +732,30 @@
     "Saved": false
   },
   {
+    "Name": "playermaxdistance",
+    "Parent": "camerarenderer",
+    "FullName": "camerarenderer.playermaxdistance",
+    "GetOveride": "30",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "playernamemaxdistance",
+    "Parent": "camerarenderer",
+    "FullName": "camerarenderer.playernamemaxdistance",
+    "GetOveride": "10",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
     "Name": "renderinterval",
     "Parent": "camerarenderer",
     "FullName": "camerarenderer.renderinterval",
@@ -888,6 +924,18 @@
     "Saved": false
   },
   {
+    "Name": "authradius",
+    "Parent": "global",
+    "FullName": "global.authradius",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
     "Name": "ban",
     "Parent": "global",
     "FullName": "global.ban",
@@ -1011,6 +1059,18 @@
     "Name": "clientperf_frametime",
     "Parent": "global",
     "FullName": "global.clientperf_frametime",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "deauthradius",
+    "Parent": "global",
+    "FullName": "global.deauthradius",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": true,
@@ -1260,6 +1320,18 @@
     "Saved": false
   },
   {
+    "Name": "skin_radius",
+    "Parent": "global",
+    "FullName": "global.skin_radius",
+    "GetOveride": "",
+    "Description": "skin_radius 'skin' 'radius'",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
     "Name": "skipqueue",
     "Parent": "global",
     "FullName": "global.skipqueue",
@@ -1361,6 +1433,18 @@
     "FullName": "global.unmute",
     "GetOveride": "",
     "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "upgrade_radius",
+    "Parent": "global",
+    "FullName": "global.upgrade_radius",
+    "GetOveride": "",
+    "Description": "upgrade_radius 'grade' 'radius'",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
@@ -3408,6 +3492,18 @@
     "Saved": false
   },
   {
+    "Name": "maxmessagesize",
+    "Parent": "app",
+    "FullName": "app.maxmessagesize",
+    "GetOveride": "1048576",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
     "Name": "notifications",
     "Parent": "app",
     "FullName": "app.notifications",
@@ -4037,6 +4133,18 @@
     "FullName": "debug.renderinfo",
     "GetOveride": "",
     "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "repair_inventory",
+    "Parent": "debug",
+    "FullName": "debug.repair_inventory",
+    "GetOveride": "",
+    "Description": "Repair all items in inventory",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
@@ -4731,7 +4839,7 @@
     "Name": "time",
     "Parent": "env",
     "FullName": "env.time",
-    "GetOveride": "9.336142",
+    "GetOveride": "9.087262",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -6432,6 +6540,18 @@
     "Saved": false
   },
   {
+    "Name": "reloadweapons",
+    "Parent": "player",
+    "FullName": "player.reloadweapons",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
     "Name": "resetstate",
     "Parent": "player",
     "FullName": "player.resetstate",
@@ -6840,6 +6960,18 @@
     "Saved": false
   },
   {
+    "Name": "bag_quota_item_amount",
+    "Parent": "server",
+    "FullName": "server.bag_quota_item_amount",
+    "GetOveride": "True",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
     "Name": "bansserverendpoint",
     "Parent": "server",
     "FullName": "server.bansserverendpoint",
@@ -6909,6 +7041,18 @@
     "ServerUser": false,
     "AllowRunFromServer": false,
     "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "broadcastplayvideo",
+    "Parent": "server",
+    "FullName": "server.broadcastplayvideo",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
     "Saved": false
   },
   {
@@ -7072,7 +7216,7 @@
     "Parent": "server",
     "FullName": "server.conveyormovefrequency",
     "GetOveride": "5",
-    "Description": "How often industrial conveyors attempt to move items. Setting to 0 will disable all movement",
+    "Description": "How often industrial conveyors attempt to move items (value is an interval measured in seconds). Setting to 0 will disable all movement",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
@@ -7408,7 +7552,7 @@
     "Parent": "server",
     "FullName": "server.industrialcrafterfrequency",
     "GetOveride": "5",
-    "Description": "How often industrial crafters attempt to craft items. Setting to 0 will disable all crafting",
+    "Description": "How often industrial crafters attempt to craft items (value is an interval measured in seconds). Setting to 0 will disable all crafting",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
@@ -7560,6 +7704,30 @@
     "Saved": true
   },
   {
+    "Name": "max_sleeping_bags",
+    "Parent": "server",
+    "FullName": "server.max_sleeping_bags",
+    "GetOveride": "-1",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "maxclientinfosize",
+    "Parent": "server",
+    "FullName": "server.maxclientinfosize",
+    "GetOveride": "1048576",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
     "Name": "maxconnectionsperip",
     "Parent": "server",
     "FullName": "server.maxconnectionsperip",
@@ -7606,6 +7774,30 @@
     "AllowRunFromServer": false,
     "Variable": true,
     "Saved": false
+  },
+  {
+    "Name": "maximummapmarkers",
+    "Parent": "server",
+    "FullName": "server.maximummapmarkers",
+    "GetOveride": "5",
+    "Description": "How many markers each player can place",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
+    "Name": "maximumpings",
+    "Parent": "server",
+    "FullName": "server.maximumpings",
+    "GetOveride": "5",
+    "Description": "How many pings can be placed by each player",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
   },
   {
     "Name": "maxitemstacksmovedpertickindustrial",
@@ -8004,6 +8196,18 @@
     "Saved": false
   },
   {
+    "Name": "pingduration",
+    "Parent": "server",
+    "FullName": "server.pingduration",
+    "GetOveride": "10",
+    "Description": "How long a ping should last",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
     "Name": "plantlightdetection",
     "Parent": "server",
     "FullName": "server.plantlightdetection",
@@ -8367,7 +8571,7 @@
     "Name": "savecachesize",
     "Parent": "server",
     "FullName": "server.savecachesize",
-    "GetOveride": "61921",
+    "GetOveride": "62413",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -8988,6 +9192,18 @@
     "Saved": false
   },
   {
+    "Name": "server_allow_steam_nicknames",
+    "Parent": "steam",
+    "FullName": "steam.server_allow_steam_nicknames",
+    "GetOveride": "True",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
+  },
+  {
     "Name": "call",
     "Parent": "supply",
     "FullName": "supply.call",
@@ -9003,6 +9219,30 @@
     "Name": "drop",
     "Parent": "supply",
     "FullName": "supply.drop",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "cpu_affinity",
+    "Parent": "system",
+    "FullName": "system.cpu_affinity",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "cpu_priority",
+    "Parent": "system",
+    "FullName": "system.cpu_priority",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": true,
@@ -9328,6 +9568,30 @@
     "Parent": "vis",
     "FullName": "vis.weakspots",
     "GetOveride": "False",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "togglevoicerangeboost",
+    "Parent": "voice",
+    "FullName": "voice.togglevoicerangeboost",
+    "GetOveride": "",
+    "Description": "Enabled/disables voice range boost for a player eg. ToggleVoiceRangeBoost sam 1",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "voicerangeboostamount",
+    "Parent": "voice",
+    "FullName": "voice.voicerangeboostamount",
+    "GetOveride": "50",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -9828,9 +10092,9 @@
     "Saved": false
   },
   {
-    "Name": "endtest",
+    "Name": "cui_test",
     "Parent": "cui",
-    "FullName": "cui.endtest",
+    "FullName": "cui.cui_test",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": false,
@@ -9840,9 +10104,21 @@
     "Saved": false
   },
   {
-    "Name": "test",
+    "Name": "cui_test_update",
     "Parent": "cui",
-    "FullName": "cui.test",
+    "FullName": "cui.cui_test_update",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": false,
+    "ServerUser": true,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "endtest",
+    "Parent": "cui",
+    "FullName": "cui.endtest",
     "GetOveride": "",
     "Description": "",
     "ServerAdmin": false,
@@ -9916,6 +10192,18 @@
     "Parent": "dynamicnavmesh",
     "FullName": "dynamicnavmesh.use_baked_terrain_mesh",
     "GetOveride": "False",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "event_hours_before_wipe",
+    "Parent": "eventschedulewipeoffset",
+    "FullName": "eventschedulewipeoffset.event_hours_before_wipe",
+    "GetOveride": "24",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -10173,7 +10461,7 @@
     "ServerUser": false,
     "AllowRunFromServer": false,
     "Variable": true,
-    "Saved": false
+    "Saved": true
   },
   {
     "Name": "analytics_secret",
@@ -10185,31 +10473,55 @@
     "ServerUser": false,
     "AllowRunFromServer": false,
     "Variable": true,
+    "Saved": true
+  },
+  {
+    "Name": "pending_analytics",
+    "Parent": "analytics",
+    "FullName": "analytics.pending_analytics",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
     "Saved": false
   },
   {
-    "Name": "client_analytics_url",
+    "Name": "high_freq_stats",
     "Parent": "analytics",
-    "FullName": "analytics.client_analytics_url",
-    "GetOveride": "https://functions-rust-api.azurewebsites.net/api/public/analytics/rust/client",
+    "FullName": "analytics.high_freq_stats",
+    "GetOveride": "True",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
     "Variable": true,
-    "Saved": false
+    "Saved": true
   },
   {
     "Name": "server_analytics_url",
     "Parent": "analytics",
     "FullName": "analytics.server_analytics_url",
-    "GetOveride": "https://functions-rust-api.azurewebsites.net/api/public/analytics/rust/server",
+    "GetOveride": "https://rust-api.facepunch.com/api/public/analytics/rust/server",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,
     "Variable": true,
     "Saved": false
+  },
+  {
+    "Name": "stats_blacklist",
+    "Parent": "analytics",
+    "FullName": "analytics.stats_blacklist",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": true
   },
   {
     "Name": "movetowardsrate",
@@ -10827,7 +11139,7 @@
     "Name": "maxteamsize",
     "Parent": "relationshipmanager",
     "FullName": "relationshipmanager.maxteamsize",
-    "GetOveride": "0",
+    "GetOveride": "100",
     "Description": "",
     "ServerAdmin": true,
     "ServerUser": false,
@@ -11381,6 +11693,114 @@
     "FullName": "traincouplingcontroller.max_couple_speed",
     "GetOveride": "9",
     "Description": "Maximum difference in velocity for train cars to couple",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "days_to_add_test",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.days_to_add_test",
+    "GetOveride": "0",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "hours_to_add_test",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.hours_to_add_test",
+    "GetOveride": "0",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "printtimezones",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.printtimezones",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "printwipe",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.printwipe",
+    "GetOveride": "",
+    "Description": "",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": false,
+    "Saved": false
+  },
+  {
+    "Name": "wipecronoverride",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.wipecronoverride",
+    "GetOveride": "",
+    "Description": "Custom cron expression for the wipe schedule. Overrides all other convars (except wipeUnixTimestampOverride) if set. Uses Cronos as a parser: https://github.com/HangfireIO/Cronos/",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "wipedayofweek",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.wipedayofweek",
+    "GetOveride": "4",
+    "Description": "0=sun,1=mon,2=tues,3=wed,4=thur,5=fri,6=sat",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "wipehourofday",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.wipehourofday",
+    "GetOveride": "19",
+    "Description": "Which hour to wipe? 14.5 = 2:30pm",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "wipetimezone",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.wipetimezone",
+    "GetOveride": "Europe/London",
+    "Description": "The timezone to use for wipes. Defaults to the server's time zone if not set or invalid. Value should be a TZ identifier as seen here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+    "ServerAdmin": true,
+    "ServerUser": false,
+    "AllowRunFromServer": false,
+    "Variable": true,
+    "Saved": false
+  },
+  {
+    "Name": "wipeunixtimestampoverride",
+    "Parent": "wipetimer",
+    "FullName": "wipetimer.wipeunixtimestampoverride",
+    "GetOveride": "0",
+    "Description": "Unix timestamp (seconds) for the upcoming wipe. Overrides all other convars if set to a time in the future.",
     "ServerAdmin": true,
     "ServerUser": false,
     "AllowRunFromServer": false,

@@ -1188,6 +1188,11 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "br_sphere": [
+    "SphereEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "twitch_dropbox.deployed": [
     "DropBox",
     "Mailbox",
@@ -1728,6 +1733,15 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "door.hinged.bunker.door_nuclear_silo": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "door.hinged.bunker_hatch": [
     "Door",
     "AnimatedBuildingBlock",
@@ -1747,6 +1761,24 @@
     "BaseNetworkable"
   ],
   "door.hinged.elevator_door": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.elevator_door_office": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.elevator_inside_door_office": [
     "Door",
     "AnimatedBuildingBlock",
     "StabilityEntity",
@@ -1837,6 +1869,42 @@
     "BaseNetworkable"
   ],
   "door.hinged.industrial_a_h": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.nms_green": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.nms_grey": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.nms_hatch": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "door.hinged.nms_red": [
     "Door",
     "AnimatedBuildingBlock",
     "StabilityEntity",
@@ -2113,6 +2181,11 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "wipetimer": [
+    "WipeTimer",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "wall.frame.shopfront.door_static": [
     "Door",
     "AnimatedBuildingBlock",
@@ -2322,6 +2395,13 @@
   ],
   "carshredder.entity": [
     "LargeShredder",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "elevator_office_lift.static": [
+    "ElevatorLiftStatic",
+    "ElevatorLift",
+    "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
@@ -4384,6 +4464,7 @@
     "BaseNetworkable"
   ],
   "elevator_lift": [
+    "ElevatorLiftPlayer",
     "ElevatorLift",
     "BaseCombatEntity",
     "BaseEntity",
@@ -4391,6 +4472,15 @@
   ],
   "elevatorioentity": [
     "ElevatorIOEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "elevator.static.office.top": [
+    "ElevatorStatic",
+    "Elevator",
     "IOEntity",
     "DecayEntity",
     "BaseCombatEntity",
@@ -5998,6 +6088,33 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "pressbutton_officeelevatorcall": [
+    "PressButton_TrainTunnel",
+    "PressButton",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "pressbutton_officeelevatordown": [
+    "PressButton_TrainTunnel",
+    "PressButton",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "pressbutton_officeelevatorup": [
+    "PressButton_TrainTunnel",
+    "PressButton",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "pressbutton_trainstairwell": [
     "PressButton_TrainTunnel",
     "PressButton",
@@ -6426,6 +6543,12 @@
     "BaseNetworkable"
   ],
   "rustigeegg_e.deployed": [
+    "RustigeEgg",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rustigeegg_f.deployed": [
     "RustigeEgg",
     "BaseCombatEntity",
     "BaseEntity",
@@ -8572,6 +8695,14 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "saddlerear": [
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "saddletest": [
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
@@ -9612,6 +9743,15 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "scientistnpc_arena": [
+    "ScientistNPC",
+    "HumanNPC",
+    "NPCPlayer",
+    "BasePlayer",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "scientistnpc_cargo": [
     "ScientistNPC",
     "HumanNPC",
@@ -9748,6 +9888,15 @@
     "BaseNetworkable"
   ],
   "scientistnpc_roam": [
+    "ScientistNPC",
+    "HumanNPC",
+    "NPCPlayer",
+    "BasePlayer",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scientistnpc_roam_nvg_variant": [
     "ScientistNPC",
     "HumanNPC",
     "NPCPlayer",
@@ -9899,6 +10048,12 @@
     "PercentFullStorageContainer",
     "StorageContainer",
     "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "f15e": [
+    "F15",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"

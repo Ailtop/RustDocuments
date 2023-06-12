@@ -1794,6 +1794,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/autospawn/monument/medium/nuclear_missile_silo.prefab",
+    "guid": "70cbd98e7a74bda4caa0206afc5858d4",
+    "hash": 454470717,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/autospawn/monument/medium/radtown_small_3.prefab",
     "guid": "3e90f2d71b290b74b9eda11339e00635",
     "hash": 3257319375,
@@ -4359,6 +4365,30 @@
     "name": "assets/bundled/prefabs/fx/bucket_drop_debris.prefab",
     "guid": "2ee28dd02530a38479651678e89fec5a",
     "hash": 2391551618,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/fx/build/construction_upgrade_metal.prefab",
+    "guid": "9cf1e9c1876fc471f9738655bf5dfea6",
+    "hash": 2350367293,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/fx/build/construction_upgrade_stone.prefab",
+    "guid": "ef00bcd35446d430283e862c0bea91c6",
+    "hash": 2106402529,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/fx/build/construction_upgrade_toptier.prefab",
+    "guid": "99aff365d233846c49aa9032f2b055d6",
+    "hash": 3892914366,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/fx/build/construction_upgrade_wood.prefab",
+    "guid": "169dda147316c4666a69fbf76f895352",
+    "hash": 1289980151,
     "pool": true
   },
   {
@@ -8268,6 +8298,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_concrete_01_alt.prefab",
+    "guid": "d83fdddee070149488a948cc77e0ed26",
+    "hash": 2947172677,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_concrete_02.prefab",
     "guid": "da9e864d675c9994bb39987f614e784f",
     "hash": 1873115399,
@@ -8307,6 +8343,12 @@
     "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_concrete_08.prefab",
     "guid": "a83df6c3b627db24b94ae1eb68d50dd8",
     "hash": 1596821847,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_concrete_09.prefab",
+    "guid": "5d372f5b76cad9f4c82776c2245eee64",
+    "hash": 1525600883,
     "pool": false
   },
   {
@@ -8406,6 +8448,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_metal_03_alt.prefab",
+    "guid": "15331095e82f6584aa9a5d53ed4e4176",
+    "hash": 3194037454,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_metal_04.prefab",
     "guid": "e525149379159634d8d84519ae69ee28",
     "hash": 215739451,
@@ -8445,6 +8493,24 @@
     "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_metal_10.prefab",
     "guid": "c2e23f8f6e60c2e4f9460b28b88e106e",
     "hash": 496888743,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_metal_11.prefab",
+    "guid": "9c01c948e2101f04bb24fed65b333aff",
+    "hash": 1893489715,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_metal_11_alt1.prefab",
+    "guid": "ddd3868d42528d245ac529552c985598",
+    "hash": 1333469223,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_metal_11_alt2.prefab",
+    "guid": "9732fb78fc4e77341a8c096d501dde95",
+    "hash": 2216579462,
     "pool": false
   },
   {
@@ -8556,6 +8622,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_tiles_08.prefab",
+    "guid": "ecd2ae858c6fbcc40a2cfd62692aebe0",
+    "hash": 1906853158,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/modding/cubes/tiled/cube_tiled_wood_01.prefab",
     "guid": "c82fe512bac7ed447a8ced3385c6ab68",
     "hash": 3200448202,
@@ -8625,6 +8697,12 @@
     "name": "assets/bundled/prefabs/modding/events/charitablerust/wck_logo.prefab",
     "guid": "fcc9e9931d8c6f14e9331940e3bfe4a1",
     "hash": 270471765,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/modding/events/twitch/br_sphere.prefab",
+    "guid": "bf883e6ca23cc664893560df5b0223f2",
+    "hash": 2637346832,
     "pool": false
   },
   {
@@ -9618,6 +9696,12 @@
     "pool": true
   },
   {
+    "name": "assets/bundled/prefabs/static/door.hinged.bunker.door_nuclear_silo.prefab",
+    "guid": "24081b3cd2b539f49b89b4ae141e8fbe",
+    "hash": 2237837448,
+    "pool": true
+  },
+  {
     "name": "assets/bundled/prefabs/static/door.hinged.bunker_hatch.prefab",
     "guid": "1aa8cc4284526474da6ae6fbc1cf5936",
     "hash": 744964644,
@@ -9633,6 +9717,18 @@
     "name": "assets/bundled/prefabs/static/door.hinged.elevator_door.prefab",
     "guid": "6b4d705a7b6a27f42992ed88e4565c27",
     "hash": 323267652,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/static/door.hinged.elevator_door_office.prefab",
+    "guid": "c735c2b91a3eebc4fb59c587ed364179",
+    "hash": 2544802907,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/static/door.hinged.elevator_inside_door_office.prefab",
+    "guid": "f406e48771c87374ab3ffc650b2e06d6",
+    "hash": 61736494,
     "pool": false
   },
   {
@@ -9693,6 +9789,30 @@
     "name": "assets/bundled/prefabs/static/door.hinged.industrial_a_h.prefab",
     "guid": "69c55de07c69a864fbb39d446e0817ef",
     "hash": 4048370658,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/static/door.hinged.nms_green.prefab",
+    "guid": "241703831eb58b741beeb81ddb949119",
+    "hash": 4026062825,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/static/door.hinged.nms_grey.prefab",
+    "guid": "9b301387ff032f143954b3d4b8993d1f",
+    "hash": 3552157237,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/static/door.hinged.nms_hatch.prefab",
+    "guid": "74fdef1f3f4e0124f9e992cdf0669675",
+    "hash": 1746777970,
+    "pool": true
+  },
+  {
+    "name": "assets/bundled/prefabs/static/door.hinged.nms_red.prefab",
+    "guid": "5fb66851457833c408e824a7f74934d2",
+    "hash": 7998121,
     "pool": true
   },
   {
@@ -9855,6 +9975,12 @@
     "name": "assets/bundled/prefabs/static/sign.large.wood.static.prefab",
     "guid": "c7289caa7c486364b8817a99126a6617",
     "hash": 229978991,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/static/simple_vertical_elevator.static.prefab",
+    "guid": "02ebff49a6a6c704ca4054732eb3779f",
+    "hash": 810436405,
     "pool": false
   },
   {
@@ -10167,6 +10293,12 @@
     "name": "assets/bundled/prefabs/ui/dialogs/ui.dialog.trophy.prefab",
     "guid": "cffbd916cb4c09648ac56cd29fbe2e26",
     "hash": 466360271,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/ui/dialogs/ui.dialog.videoplayer.prefab",
+    "guid": "ca49940df02c7d941aeb7efe8e313004",
+    "hash": 895173690,
     "pool": false
   },
   {
@@ -10572,6 +10704,12 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/wipetimer.prefab",
+    "guid": "9fbfe263f0df9c9478b51e38664c9875",
+    "hash": 2783201446,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/wire_prefab.prefab",
     "guid": "ff8db350e14619b44befc345040b68c0",
     "hash": 177531866,
@@ -10632,9 +10770,21 @@
     "pool": false
   },
   {
+    "name": "assets/bundled/prefabs/world/event_f15e.prefab",
+    "guid": "566ada202c349cb4da3df3338f9ec0c4",
+    "hash": 1186542917,
+    "pool": false
+  },
+  {
     "name": "assets/bundled/prefabs/world/event_helicopter.prefab",
     "guid": "31fcc05f88f7244f89755dae527e04fd",
     "hash": 3609094641,
+    "pool": false
+  },
+  {
+    "name": "assets/bundled/prefabs/world/event_roadbradley.prefab",
+    "guid": "021d1b5766b2ced4dae0493090396300",
+    "hash": 3080911900,
     "pool": false
   },
   {
@@ -11043,6 +11193,12 @@
     "name": "assets/content/building/parts/static/wall.wood.prefab",
     "guid": "77ee5224d3788ae45a0a993b874195d8",
     "hash": 1220779637,
+    "pool": false
+  },
+  {
+    "name": "assets/content/effects/brzone/brzone.prefab",
+    "guid": "86b6e5e07b7551b418bd643126da5451",
+    "hash": 1772634106,
     "pool": false
   },
   {
@@ -11697,6 +11853,264 @@
     "name": "assets/content/effects/wip/muzzle_smoke.prefab",
     "guid": "c275068d73244af4188da189961f4b4f",
     "hash": 2380936938,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_cracks/concrete_cracks_decal_a.prefab",
+    "guid": "11e980a69eb978c4e96973182c03589b",
+    "hash": 3769173702,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_cracks/concrete_cracks_decal_b.prefab",
+    "guid": "6b94faaa96e12e640ab494cd8f56d6cc",
+    "hash": 3219942381,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_cracks/concrete_cracks_decal_c.prefab",
+    "guid": "0687b829327fe0f418f3c4b80bc6f6ae",
+    "hash": 2829915999,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_cracks/concrete_cracks_decal_d.prefab",
+    "guid": "25ae1024da343e94ca47f1f90a1607bd",
+    "hash": 2678322412,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_a.prefab",
+    "guid": "224b28a980c1f974895cfaaa10875a7a",
+    "hash": 2450658493,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_b.prefab",
+    "guid": "c292e871655d049449798dfaea718439",
+    "hash": 3792904905,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_c.prefab",
+    "guid": "e59f037f3acfe3e4fa264745f4e63b43",
+    "hash": 907787976,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_d.prefab",
+    "guid": "a8a67ee362c34cb4eb6a881a08d74b7b",
+    "hash": 4280282958,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_e.prefab",
+    "guid": "8744fbeb9a31ecd4bad230a8f0f498a9",
+    "hash": 224946426,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_f.prefab",
+    "guid": "6f9927156e529c248be0cfc9f263058a",
+    "hash": 4049030395,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_debris/concrete_debris_decal_g.prefab",
+    "guid": "3ae00aab70283174d8aa1e1b66ed8ef4",
+    "hash": 3189872746,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_patches/concrete_patch_decal_a.prefab",
+    "guid": "7f4e9bfc2bafb9f47b43ed2a0afca991",
+    "hash": 3090422286,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_patches/concrete_patch_decal_b.prefab",
+    "guid": "6a9388c4cbe6cb9439456cc35a3e45b8",
+    "hash": 3591804733,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_patches/concrete_patch_decal_c.prefab",
+    "guid": "203a622c1062e0545813c04d4074b470",
+    "hash": 2176942255,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_patches/concrete_patch_decal_d.prefab",
+    "guid": "2e2513a1650b1cc47a747c2631a06fc3",
+    "hash": 3846829202,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_patches/concrete_patch_decal_e.prefab",
+    "guid": "8265d159836a6584dab37699bbd62d72",
+    "hash": 625860583,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_patches/concrete_patch_decal_f.prefab",
+    "guid": "00f7f6724676ceb4daa1f79883d365d0",
+    "hash": 20843186,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_rebar_damage/concrete_rebar_damage_decal_a.prefab",
+    "guid": "48aa99e97b1b59c45b1dbca0bdd9ae87",
+    "hash": 1472676514,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_rebar_damage/concrete_rebar_damage_decal_b.prefab",
+    "guid": "e0f8b6909355e7448b3b75ff13d2dfe7",
+    "hash": 3187475992,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_rebar_damage/concrete_rebar_damage_decal_c.prefab",
+    "guid": "deaae0c05a064b24eb65693592841675",
+    "hash": 1483113021,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_rebar_damage/concrete_rebar_damage_decal_d.prefab",
+    "guid": "3695e7c0429ee1846a87923a4cf37ae2",
+    "hash": 2758374962,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/concrete_rebar_damage/concrete_rebar_damage_decal_e.prefab",
+    "guid": "0085839262dd7664c8fdbf1d3b35757a",
+    "hash": 4288591541,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_a.prefab",
+    "guid": "189a6c7b936aae9409b9fae8dbaaef02",
+    "hash": 888512006,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_b.prefab",
+    "guid": "196c1752dbc30864983930243e992d4a",
+    "hash": 122376143,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_c.prefab",
+    "guid": "8604c9fbbd796d148a7cb08ac2b33b64",
+    "hash": 1571295988,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_d.prefab",
+    "guid": "8b6d201ae544f364680657ecb7fbd08b",
+    "hash": 3447149148,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_e.prefab",
+    "guid": "d0a691a04b9e985409704d6e1016f559",
+    "hash": 3775558681,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_f.prefab",
+    "guid": "77710e01ee3aa6f4b8c79ad7fa68edff",
+    "hash": 1837288609,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/cover_panel_decal_g.prefab",
+    "guid": "65f63c0f74525c147b30128d2fd34083",
+    "hash": 33239479,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/drain_rectangular_decal.prefab",
+    "guid": "e9ddac36174c4e14a95704963f60ab11",
+    "hash": 3044462520,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/drain_round_decal.prefab",
+    "guid": "427d3082c2491ca40be9231413737eff",
+    "hash": 355553965,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/drain_square_big_decal.prefab",
+    "guid": "08d48dd17c6fffe4a8266894b62b9dfa",
+    "hash": 3199268535,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/drain_square_medium_decal.prefab",
+    "guid": "1e161ec358deebf4395d0291f7f9fb74",
+    "hash": 1719369518,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/drain_square_small_decal.prefab",
+    "guid": "cefeaf9e50f919245a60fbd3c3bc14e6",
+    "hash": 3832289173,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/manhole_rectangular_big_decal.prefab",
+    "guid": "107c1f05a9fa48e41980ae46cac9a4ce",
+    "hash": 66514306,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/manhole_rectangular_medium_decal.prefab",
+    "guid": "8f6384a67240237449f569b0f3aa4ed2",
+    "hash": 3983867262,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/manhole_round_decal.prefab",
+    "guid": "d5777d07619f28749ac6efacf3ce7110",
+    "hash": 315827480,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/manhole_square_big_decal.prefab",
+    "guid": "348a551e8792aa34d8d85f5c9e7fdd14",
+    "hash": 2737816132,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/metal_details/manhole_square_medium_decal.prefab",
+    "guid": "ab404bf5961570547993088775f1e796",
+    "hash": 3770182496,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/scattered_paper/scattered_paper_decal_a.prefab",
+    "guid": "de322cbd0c5b6c04484a3b5a1cbe077d",
+    "hash": 440461774,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/scattered_paper/scattered_paper_decal_b.prefab",
+    "guid": "bee20a5469bca9d43a552beb28a70002",
+    "hash": 1602174786,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/scattered_paper/scattered_paper_decal_c.prefab",
+    "guid": "5eaecc907bd3034478f103b4e2a77e31",
+    "hash": 526333080,
+    "pool": false
+  },
+  {
+    "name": "assets/content/mesh decals/scattered_paper/scattered_paper_decal_d.prefab",
+    "guid": "ab9a8077b901e144490350ed7a041131",
+    "hash": 2304943078,
     "pool": false
   },
   {
@@ -15540,6 +15954,30 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/bathroom_stalls/bathroom_stall_a.prefab",
+    "guid": "92b632a3951d8e04aa5ccfa405561dd7",
+    "hash": 1472106968,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bathroom_stalls/bathroom_stall_b.prefab",
+    "guid": "508068bd06b67fc409544fb77cb0bc77",
+    "hash": 490651362,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bathroom_stalls/bathroom_stall_c.prefab",
+    "guid": "40e1e04de40bb0a469d88c27dabcf8e0",
+    "hash": 790368445,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bathroom_stalls/bathroom_stall_d.prefab",
+    "guid": "d1a0dec7c79b5c943a280acddd908071",
+    "hash": 2522905738,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/big_button/big_button.prefab",
     "guid": "1f8f15b460ee6b94eb818adc3bd9f7fb",
     "hash": 3354133373,
@@ -15687,6 +16125,36 @@
     "name": "assets/content/props/bulk_frame/bulk_frame_600.prefab",
     "guid": "efc8ee4bc7fefc245b69552d71c59475",
     "hash": 2054415474,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bulletin_board/bulletin_board_a.prefab",
+    "guid": "f6ca103194f438d42b6d19a635ea743f",
+    "hash": 3814809400,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bulletin_board/bulletin_board_b.prefab",
+    "guid": "5b4beb9f60abe814bbf415a56329a1f9",
+    "hash": 1751649309,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bulletin_board/bulletin_board_empty_a.prefab",
+    "guid": "08e3e231c3dffe843955cfcf68616ad8",
+    "hash": 1485944022,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bulletin_board/bulletin_board_glass_a.prefab",
+    "guid": "5b16cc4862c43aa499f5f61ee1370934",
+    "hash": 1708000978,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/bulletin_board/bulletin_board_glass_b.prefab",
+    "guid": "66099f1b0dd5caa41861e198a30bd038",
+    "hash": 2039375959,
     "pool": false
   },
   {
@@ -16044,9 +16512,33 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/control_panels/control_panels_tall_crn_b.prefab",
+    "guid": "5549598fb5b45c14194896205a15cdda",
+    "hash": 2107050827,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/control_panels/control_panels_tall_d.prefab",
     "guid": "eb9b58225b1c0c045ab2fa73e30deb44",
     "hash": 1744531758,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/control_panels/control_panels_tall_e.prefab",
+    "guid": "40782a41031504245840da361677c383",
+    "hash": 697321965,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/control_panels/control_panels_tall_f.prefab",
+    "guid": "c9876225d02fc0e4ca2f239bd0552783",
+    "hash": 4245786821,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/control_panels/control_panels_tall_g.prefab",
+    "guid": "ac5eb625c58918d4a97f02acbc1e04b9",
+    "hash": 235298106,
     "pool": false
   },
   {
@@ -16413,6 +16905,30 @@
     "name": "assets/content/props/gingerbread_barricades/gingerbread_barricades_tree.prefab",
     "guid": "bdb4027d3b9ca394dbbabde762912b52",
     "hash": 2560613303,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/ground_tarps/ground_tarp_a.prefab",
+    "guid": "5714816aaa5159c4a825edfcaf645904",
+    "hash": 3660065003,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/ground_tarps/ground_tarp_b.prefab",
+    "guid": "03be13beefd030c448178d3dd6e26fbf",
+    "hash": 4084461211,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/ground_tarps/ground_tarp_c.prefab",
+    "guid": "cc76ff221ce37a840a7869192d3644c3",
+    "hash": 1803305441,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/ground_tarps/ground_tarp_d.prefab",
+    "guid": "3b15033c12ce8dc4b883d5c106f48268",
+    "hash": 4252493353,
     "pool": false
   },
   {
@@ -16974,6 +17490,72 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_b.flickering.cold.prefab",
+    "guid": "85f8cc27672617141b384cad223c02b8",
+    "hash": 3081169652,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_b.off.prefab",
+    "guid": "ff9388941c08e214ea943332ff4128bb",
+    "hash": 2803142573,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_b.on.cold.prefab",
+    "guid": "f3481c8024920dd4dbcd2a5263e65ffa",
+    "hash": 1619893093,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_b.on.warm.prefab",
+    "guid": "9825c68981eb77f42a85a6f15e64f8f4",
+    "hash": 3953508700,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_c.flickering.cold.prefab",
+    "guid": "2b0dcdc7738f51f47a35ba87dca9ca0e",
+    "hash": 1013193002,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_c.off.prefab",
+    "guid": "9121e28b89e7a9a489fe5de31517bf81",
+    "hash": 705469508,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_c.on.cold.prefab",
+    "guid": "a2966219a7df0e4448027ebe708effde",
+    "hash": 516333205,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_d.flickering.cold.prefab",
+    "guid": "6fc4590824901ef46bd4b9d0fb699fcd",
+    "hash": 677467218,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_d.off.prefab",
+    "guid": "8fe352c5d3c557543a5681fde85ff8ce",
+    "hash": 3517298960,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_d.on.cold.prefab",
+    "guid": "b1ce5f06acc4b1448a170896edfb4779",
+    "hash": 3054369192,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_d.on.warm.prefab",
+    "guid": "546454fea8095a540a79295aa97cd425",
+    "hash": 2469336092,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/light_fixtures/v2/plight.fluorescent_officelight_lightbox.cold.prefab",
     "guid": "8170bb0ccc50e85499afb9b0f1e1bb84",
     "hash": 4108668171,
@@ -17127,6 +17709,12 @@
     "name": "assets/content/props/light_fixtures/v2/plight.siren.red.spinning.prefab",
     "guid": "0fb21e11f9cbe21418a9d472d3d0bfc2",
     "hash": 2766008673,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/plight.siren.red.spinning.v2.prefab",
+    "guid": "47442a8607ac39240b12a13ed08a0d27",
+    "hash": 3195344534,
     "pool": false
   },
   {
@@ -17301,6 +17889,24 @@
     "name": "assets/content/props/light_fixtures/v2/radtown work prefabs/militarytunnel lighting v2.prefab",
     "guid": "d8b3fd3b174ce1f438577b6ecd5f440f",
     "hash": 2305922457,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/radtown work prefabs/nuclear missile silo lighting top.prefab",
+    "guid": "cae50af8d2daf5b4dabf32c9d8dcc310",
+    "hash": 2473987700,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/radtown work prefabs/nuclear missile silo lighting.prefab",
+    "guid": "259c5f3bd115ee84bb1d0d7b0ceb1800",
+    "hash": 446393398,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/light_fixtures/v2/radtown work prefabs/nuclear_missile_silo_fx.prefab",
+    "guid": "b0b3bc2a3d878cc45acbba0730db76a2",
+    "hash": 1121031983,
     "pool": false
   },
   {
@@ -17610,6 +18216,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/mirrors/mirror_a.prefab",
+    "guid": "5a99d5e84c92eac45ace135448546549",
+    "hash": 1154472611,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/mirrors/mirror_b.prefab",
+    "guid": "cd937460a764f724aa9d739ea9d4d951",
+    "hash": 2904304334,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/misc_dressing_props/bleach.prefab",
     "guid": "4b5782078fb0b03469938775d5d60f2f",
     "hash": 4240598920,
@@ -17718,6 +18336,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/nuclear_warhead/nuclear_warhead.prefab",
+    "guid": "eb4547fef8646734b9986a5d4b6a382e",
+    "hash": 3073007227,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/nuclear_warhead/nuclear_warhead_cables_nms.prefab",
+    "guid": "2f985350dd15aba4782b5113b3e5b2ba",
+    "hash": 3597245183,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/office_furniture/bin_a.prefab",
     "guid": "3bc411f1fc4172a4a9cb35539a463a46",
     "hash": 1500631328,
@@ -17757,6 +18387,18 @@
     "name": "assets/content/props/office_furniture/computer_cabinet_e.prefab",
     "guid": "918ab017a6ff49d4d80c5a36967495ca",
     "hash": 37534296,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/office_furniture/computer_cabinet_f.prefab",
+    "guid": "a6d7f3bcc6c5b4f43bb6583c8a28ddfa",
+    "hash": 452611832,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/office_furniture/computer_cabinet_g.prefab",
+    "guid": "87f9f99d215822f4e8fd13e980e15b42",
+    "hash": 3522183868,
     "pool": false
   },
   {
@@ -17832,9 +18474,21 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/office_furniture/posters/poster_a_framed.prefab",
+    "guid": "edeee7f420dae504895a9566448f7bd5",
+    "hash": 1911729860,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/office_furniture/posters/poster_b.prefab",
     "guid": "af961df435e99934fa4bf5a0bfdcd0dc",
     "hash": 2588648014,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/office_furniture/posters/poster_b_framed.prefab",
+    "guid": "3759c39badc77814080601fe4e33aca8",
+    "hash": 1415833043,
     "pool": false
   },
   {
@@ -17844,9 +18498,21 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/office_furniture/posters/poster_c_framed.prefab",
+    "guid": "5de94ecb770539542b34e4affd8262c7",
+    "hash": 440141159,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/office_furniture/posters/poster_d.prefab",
     "guid": "05328d66a4d4feb4e902a5307fe7a2f9",
     "hash": 918367379,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/office_furniture/posters/poster_d_framed.prefab",
+    "guid": "bc967b12300bb614c834d7864236fc0e",
+    "hash": 638476586,
     "pool": false
   },
   {
@@ -17856,9 +18522,21 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/office_furniture/posters/poster_e_framed.prefab",
+    "guid": "d220f2f1292af8148a897b0bc9bb08ff",
+    "hash": 3818638667,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/office_furniture/posters/poster_f.prefab",
     "guid": "40b9535401be1c549884fe34e3639870",
     "hash": 3860736457,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/office_furniture/posters/poster_f_framed.prefab",
+    "guid": "f7c770c646bcc4847907746d4cc01070",
+    "hash": 3609904037,
     "pool": false
   },
   {
@@ -18078,9 +18756,81 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/pipes/air_duct/air_duct_end_a.prefab",
+    "guid": "c3f47bdb66371714780d61dd6dcc687d",
+    "hash": 1631937261,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/pipes/air_duct/air_duct_end_b.prefab",
     "guid": "5c0822dd6f2e6734ca12c054950e0b46",
     "hash": 4033783335,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_100_a.prefab",
+    "guid": "04dfc6e9bd4a0b54cbd6d0ee3224420a",
+    "hash": 439445981,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_100_b.prefab",
+    "guid": "19e76e3e381a6244ea1b65cbe34d6c65",
+    "hash": 1451535342,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_150_a.prefab",
+    "guid": "0b52271c00138c840b53ed9fcdfa6ec6",
+    "hash": 1196111467,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_25_a.prefab",
+    "guid": "df3140ef4e88d4b4da2d44890eea3c07",
+    "hash": 423973170,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_300_a.prefab",
+    "guid": "5406ccd51b18d8d4d80312f9163614c7",
+    "hash": 3038446870,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_300_b.prefab",
+    "guid": "267c5efc9d5a5ed4c887364589968546",
+    "hash": 2038489173,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_300_c.prefab",
+    "guid": "37330b5df3caf6647a42009cf4a249e0",
+    "hash": 14793963,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_300_d.prefab",
+    "guid": "6f656ec48daeae849ab609e71afbe742",
+    "hash": 2587776195,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_50_a.prefab",
+    "guid": "28ee646b6e8bedf4b837c429187e42b3",
+    "hash": 3762042242,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_crn_25x25_a.prefab",
+    "guid": "5dc8a8ce2470b814d9abe2b7433bed23",
+    "hash": 1777199997,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/electric_cables/electric_cable_crn_25x25_b.prefab",
+    "guid": "2d2ced38a2f747946816f8f50882c4ae",
+    "hash": 2746855197,
     "pool": false
   },
   {
@@ -18105,6 +18855,12 @@
     "name": "assets/content/props/pipes/pipe_a/pipe_a_300_c.prefab",
     "guid": "ef69fc8ad452fa542b50a51ff0c58367",
     "hash": 1758612647,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/pipe_a/pipe_a_300_d.prefab",
+    "guid": "9e111aee957fb1048814fad6c406c119",
+    "hash": 292413159,
     "pool": false
   },
   {
@@ -18252,9 +19008,27 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_100_a.prefab",
+    "guid": "4262cb7e870f2e7499c8907af7bbe884",
+    "hash": 2005676556,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_100_b.prefab",
+    "guid": "faba70a7e79af604ebe4e502e7c2ccb7",
+    "hash": 4153665845,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/pipes/pipe_d/pipe_d_150_a.prefab",
     "guid": "046f2004bd39c344fb8fa0641a9ae5dd",
     "hash": 1879803809,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_25_a.prefab",
+    "guid": "bad4537cc81867541bf547e2fb0c2d93",
+    "hash": 1304129912,
     "pool": false
   },
   {
@@ -18282,9 +19056,33 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_50_a.prefab",
+    "guid": "96db51d5c504e604aa167c24e89b507f",
+    "hash": 49297309,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_crn_100x25.prefab",
+    "guid": "b85ed7256f23e62498a1ebccdde273d3",
+    "hash": 1667178771,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/pipes/pipe_d/pipe_d_crn_150x150.prefab",
     "guid": "ebdd533bdadee994696a1d64e4ef8eeb",
     "hash": 14313884,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_crn_50x50.prefab",
+    "guid": "588fea103f4d5014aac74a2925ad414f",
+    "hash": 3477295694,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/pipes/pipe_d/pipe_d_valve_a.prefab",
+    "guid": "23037396827636e40bd2635a6f308609",
+    "hash": 1601411288,
     "pool": false
   },
   {
@@ -19242,6 +20040,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/signs_backlit/backlit_sign_exit_white.prefab",
+    "guid": "8c10228b3862ac44d8275480c2753073",
+    "hash": 807163041,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/signs_backlit/backlit_sign_fire_exit_green.prefab",
     "guid": "c6e00cba8feacd147aca232d1f30f26f",
     "hash": 4007377481,
@@ -19419,6 +20223,162 @@
     "name": "assets/content/props/signs_backlit/rack_hanging_short_b.prefab",
     "guid": "c0cac7ba128c99c40be8760d6d0deb5c",
     "hash": 2982582162,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_arrow_blue_fence.prefab",
+    "guid": "2d4f96a828a79534683418dc4830b794",
+    "hash": 3750609535,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_arrow_green_fence.prefab",
+    "guid": "6192c4b6902a8d54b8f88ab349c3c880",
+    "hash": 966471943,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_arrow_orange_fence.prefab",
+    "guid": "9359ef04f3e4e9f4bafc3a5128bb30c8",
+    "hash": 3674211441,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_arrow_red_fence.prefab",
+    "guid": "6849b206a0d4bc94696503e587d03cc5",
+    "hash": 168524075,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_cctv_fence.prefab",
+    "guid": "c51c3d47a48d2154698766963f867912",
+    "hash": 1678529932,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_employees_only_fence.prefab",
+    "guid": "343d82e04697d874cbb78fba7e818488",
+    "hash": 2462410983,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_fire_exit_left_fence.prefab",
+    "guid": "e88b840edcaffa94bb5955892f52e2c4",
+    "hash": 2635856439,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_fire_exit_right_fence.prefab",
+    "guid": "a4ba46a69ce55bb4cbd9a9a727a873f4",
+    "hash": 3440368498,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_fire_extinguisher_fence.prefab",
+    "guid": "cf4815097a066954a958390fd71e4c7f",
+    "hash": 867952299,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_first_aid_fence.prefab",
+    "guid": "35639bef6c5b0c245bc6ceac434be109",
+    "hash": 1108636836,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_flammable_materials_fence.prefab",
+    "guid": "ce62c58887259084eb3a5fb037962c2f",
+    "hash": 3711351368,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_gas_mask_blue_fence.prefab",
+    "guid": "123224b921543a74caf9a99531318e18",
+    "hash": 1374127946,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_gas_mask_orange_fence.prefab",
+    "guid": "f0a32eafd120a4f4386e9ace8584e822",
+    "hash": 1988322021,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_hard_hat_fence.prefab",
+    "guid": "f8d798644656a5a448ac39c48f39fcea",
+    "hash": 1806494031,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_high_voltage_fence.prefab",
+    "guid": "b6447ee2fa7b5dd46b7279a1669539b4",
+    "hash": 3193919417,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_no_smoking_large_fence.prefab",
+    "guid": "cf8546c6acac6a04d8facffc331272ca",
+    "hash": 2048648278,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_no_smoking_small_fence.prefab",
+    "guid": "b28f8d3eaf36122429fd71665577e702",
+    "hash": 2013551587,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_private_property_fence.prefab",
+    "guid": "a25bcbf648b735b4bb01c32f9b4dac85",
+    "hash": 582876423,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_radiation_area_fence.prefab",
+    "guid": "adb79011fd67b8a4abfab6cdd00b435e",
+    "hash": 3106808195,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_radiation_fence.prefab",
+    "guid": "ce136ecf142cbc349a07ab9976f77d05",
+    "hash": 1615012506,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_restricted_area_large_fence.prefab",
+    "guid": "eeb3242c9d6dff1459ede3f8dabb7419",
+    "hash": 224396874,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_restricted_area_small_fence.prefab",
+    "guid": "ef0ef0415a73b324d9577ce6deedb74b",
+    "hash": 3018456427,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_restrooms_fence.prefab",
+    "guid": "d6c83e0e42631d342ad8469586ab350c",
+    "hash": 3728328132,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_restrooms_left_fence.prefab",
+    "guid": "790f2b86f4d5cf5459ae6f78f4973a25",
+    "hash": 2907513307,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_restrooms_right_fence.prefab",
+    "guid": "79233a97241f06a45a199197f8bb985c",
+    "hash": 1491861669,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/signs_generic/fence_variant/sign_warning_authorised_fence.prefab",
+    "guid": "bd60a968446c1d24bb41b13bf510f674",
+    "hash": 971940919,
     "pool": false
   },
   {
@@ -19771,13 +20731,13 @@
   },
   {
     "name": "assets/content/props/small_junk/ground_junk_straight_b.prefab",
-    "guid": "f384dedcd779e824289aedd47c6d791d",
+    "guid": "590f6cf12d7047e409c1ff515170010c",
     "hash": 1586975246,
     "pool": false
   },
   {
     "name": "assets/content/props/small_junk/ground_junk_straight_c.prefab",
-    "guid": "147efb7e1a2e9b44b8fc4833d6d22139",
+    "guid": "8c1c623b6f8b6d54682f13ce44878047",
     "hash": 1435957420,
     "pool": false
   },
@@ -20112,6 +21072,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/toilet_furniture/sink_counter.prefab",
+    "guid": "cc1f35a886e58374095d074ad200f641",
+    "hash": 4144302426,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/toilet_furniture/sink_counter_corner_a.prefab",
+    "guid": "204553fd4a196bd429d233104ae7820a",
+    "hash": 2094191152,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/tools/handsaw/handsaw.prefab",
     "guid": "c730a17aa04c0ee4c9ff0d269cbd256b",
     "hash": 2623475463,
@@ -20310,6 +21282,54 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/vents_large/vent_large_duct_a.prefab",
+    "guid": "aedc1e92c3bcb604a9c9f93f9bd3e485",
+    "hash": 1329058446,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_duct_b.prefab",
+    "guid": "2f9776a64561afb4aa0f3e92e9a4dcb7",
+    "hash": 1769128592,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_duct_corner.prefab",
+    "guid": "592a59473663ffc42a99c84e93a1bcd4",
+    "hash": 4231680533,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_duct_slim_a.prefab",
+    "guid": "ff8020197961cb94f8705e722ced25b3",
+    "hash": 526588893,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_duct_slim_b.prefab",
+    "guid": "57afaecb239906842899bdd5c39a02c5",
+    "hash": 3471887210,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_duct_slim_corner.prefab",
+    "guid": "546cb59f9ea1a334a86bd9d470a2b7a9",
+    "hash": 2509238843,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_fan.prefab",
+    "guid": "72f76f67826eabd4ea45c7df512241f9",
+    "hash": 402527648,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/vents_large/vent_large_fan_backplane.prefab",
+    "guid": "9890204c289b2fa4a9b94c07582dec79",
+    "hash": 1523270672,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/water_drums/water_drum_a.prefab",
     "guid": "113a75342144ecc4f9fa63ef8a8447f0",
     "hash": 3576778262,
@@ -20325,6 +21345,12 @@
     "name": "assets/content/props/water_drums/water_drum_a_snow.prefab",
     "guid": "c77b40837875b2d4baefcf73ffb2394e",
     "hash": 1184602907,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/water_drums/water_drum_b.prefab",
+    "guid": "66a7200ffa3fa1f4290431e20c32eebe",
+    "hash": 2059753781,
     "pool": false
   },
   {
@@ -20394,6 +21420,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/wooden_bench/wooden_bench_a.prefab",
+    "guid": "5e4b7d1237abb304ab5b23e7bc4e33a8",
+    "hash": 2710481010,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/wooden_bench/wooden_bench_b.prefab",
+    "guid": "72d31b6a0c03e4a4697268cbc4ef6e17",
+    "hash": 2791214779,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/wooden_crates/crate_cover_300x600.prefab",
     "guid": "e04b22f368261a949969c4e110365090",
     "hash": 2729814320,
@@ -20403,6 +21441,12 @@
     "name": "assets/content/props/wooden_crates/wooden_crate_a.prefab",
     "guid": "ce22fd715bcf6144f8645627c18b0a83",
     "hash": 1716669483,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/wooden_crates/wooden_crate_a_green.prefab",
+    "guid": "27acd5170c2f46749b72e82db788d53d",
+    "hash": 3373960476,
     "pool": false
   },
   {
@@ -20424,6 +21468,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/wooden_crates/wooden_crate_b_green.prefab",
+    "guid": "fa2dc8ddb7a2005419110bc72319b13f",
+    "hash": 3834956360,
+    "pool": false
+  },
+  {
     "name": "assets/content/props/wooden_crates/wooden_crate_b_red.prefab",
     "guid": "57ab9fd0ff80a2a47b3ee4517ba0d7dd",
     "hash": 1736233688,
@@ -20439,6 +21489,12 @@
     "name": "assets/content/props/wooden_crates/wooden_crate_c.prefab",
     "guid": "35eeff86b8c00bd4a85c75ab529fee95",
     "hash": 177550005,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/wooden_crates/wooden_crate_c_green.prefab",
+    "guid": "d50eb22c0f05dd64b808b64a07b5fa15",
+    "hash": 3249362947,
     "pool": false
   },
   {
@@ -20505,6 +21561,12 @@
     "name": "assets/content/props/wooden_crates/wooden_crate_gingerbread.prefab",
     "guid": "0cdff2f8c53351a4bb971572e6ed9076",
     "hash": 2954096225,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/wooden_desk/wooden_desk_a.prefab",
+    "guid": "e6cbc0b607f56b341ac2d3b28240f714",
+    "hash": 698874160,
     "pool": false
   },
   {
@@ -20586,6 +21648,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/props/worklights/worklight_single.prefab",
+    "guid": "08e99e2aa6a22a14db435833445bff51",
+    "hash": 3286002395,
+    "pool": false
+  },
+  {
+    "name": "assets/content/props/worklights/worklight_triple.prefab",
+    "guid": "97e198431ef8fd24e8d1f9b313d252e0",
+    "hash": 3283038261,
+    "pool": false
+  },
+  {
     "name": "assets/content/sound/ambience/baseambienceemitter.prefab",
     "guid": "26e801d84d0254d00a278555d2eb870c",
     "hash": 2474674518,
@@ -20620,6 +21694,60 @@
     "guid": "46d56c11f143b43e4a8edad80bf25f35",
     "hash": 3142585907,
     "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-elevator-door-close-end.prefab",
+    "guid": "7930bdb6fd5d347a1a5cec259ffe1960",
+    "hash": 2211106263,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-elevator-door-close-start.prefab",
+    "guid": "86a784b04064f46c880515e2b018e574",
+    "hash": 3468265436,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-elevator-door-open-end.prefab",
+    "guid": "d3eab45c829ea426eb3548297b0b8795",
+    "hash": 2890935306,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-elevator-door-open-start.prefab",
+    "guid": "d2c37add3d90049ff838c802e3539700",
+    "hash": 2044196489,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-hatch-close-end.prefab",
+    "guid": "fdb0d7b1b8aa448da98208c91b3eca3a",
+    "hash": 1354007505,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-hatch-close-start.prefab",
+    "guid": "ba064f01ba278450e828b36069774e31",
+    "hash": 3305359494,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-hatch-open-end.prefab",
+    "guid": "74f4393153af54481ac958d0cb0e8758",
+    "hash": 1081189849,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/effects/nuclear-missile-silo-hatch-open-start.prefab",
+    "guid": "4dee382d2212340a0ae76efec4446b2e",
+    "hash": 816406469,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/monuments/nuclearmissilesilo/nuclear-missile-silo-audio.prefab",
+    "guid": "0986829376f6a400a9b1647ec44e3e58",
+    "hash": 1178421866,
+    "pool": false
   },
   {
     "name": "assets/content/sound/oilrig/oilriglargeaudio.prefab",
@@ -20859,6 +21987,12 @@
     "name": "assets/content/sound/templates/ui-sound.prefab",
     "guid": "75dac895926944e659d5f6f174cc1b96",
     "hash": 670747005,
+    "pool": true
+  },
+  {
+    "name": "assets/content/sound/templates/ui-sound-directional.prefab",
+    "guid": "f95094f458eb544f1a662226cfd93368",
+    "hash": 1493747767,
     "pool": true
   },
   {
@@ -21723,6 +22857,18 @@
     "name": "assets/content/structures/dredge/dredge_props.prefab",
     "guid": "df67f5b0cbb165d4497ece15df34a186",
     "hash": 1958320235,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/elevator/elevator_office_lift.static.prefab",
+    "guid": "eae8e6631e216d841841bcb2feb99531",
+    "hash": 1545272882,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/elevator/office_elevator_cabin.prefab",
+    "guid": "847abc405e1d18443adaed848ee09bba",
+    "hash": 2929692831,
     "pool": false
   },
   {
@@ -23874,6 +25020,324 @@
     "pool": false
   },
   {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_missile_shilo_elevator_shaft_a.prefab",
+    "guid": "2ddcb5ead13073345b7d85dd3419f8b0",
+    "hash": 4251321409,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_missile_shilo_elevator_shaft_b.prefab",
+    "guid": "6a20939fc529caa458335ac6feca1c1f",
+    "hash": 1392354459,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_missile_shilo_elevator_shaft_c.prefab",
+    "guid": "fa66c3853c96b2c4d84d1aca3bc79453",
+    "hash": 1624019750,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_bunker_hatch.prefab",
+    "guid": "316fdee53af1c2e4da33454801db6e00",
+    "hash": 1865925098,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_light_mount.prefab",
+    "guid": "abf9a2f564abbdf49b7bada89dd1f3bc",
+    "hash": 1595456284,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_pipe_a.prefab",
+    "guid": "d927a8b127c89c74482547c24b14d4c6",
+    "hash": 3692112471,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_pipe_b.prefab",
+    "guid": "ad918122b2bba154d8686ba81fc3411c",
+    "hash": 2904684876,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_platform_a.prefab",
+    "guid": "3b9900500c839f64a8ea6703158cdc81",
+    "hash": 324611161,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_platform_b.prefab",
+    "guid": "80b9afe6a7eaf954380471a3e7a8d301",
+    "hash": 4221618040,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_platform_hinge.prefab",
+    "guid": "2373f584e5e22c4488365fe5f5e2835b",
+    "hash": 1794148055,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_vent_a.prefab",
+    "guid": "c4819676298c8cd41b1f283610de8aab",
+    "hash": 201054737,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_vent_b.prefab",
+    "guid": "009e2a02d97066448bdeaff21bdf3b7f",
+    "hash": 171528399,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_vent_c.prefab",
+    "guid": "b8ac4d20b9b229048bb869a59cdc8f65",
+    "hash": 1697522446,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_vent_d.prefab",
+    "guid": "8ea26986b40855542bc29a2efd9a6fc1",
+    "hash": 3791290190,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_chute_walls.prefab",
+    "guid": "2e358a1c45f9a9049963a8253be378b2",
+    "hash": 1121279117,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_missile.prefab",
+    "guid": "0a124089cd394594686c04af275af805",
+    "hash": 3918629484,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_rocket_support.prefab",
+    "guid": "afc86b9baad703442a7a5c0449339c88",
+    "hash": 3741962766,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_a.prefab",
+    "guid": "6c05338c70dcc94408a3934a494ec316",
+    "hash": 3422520586,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_b.prefab",
+    "guid": "f19defd9b14df68448c4a764fd848b64",
+    "hash": 1560470943,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_c.prefab",
+    "guid": "302c1576f4c60b345a3f06e7b5df211e",
+    "hash": 2225117309,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_d.prefab",
+    "guid": "b52b31cafe07eba49ae7b4de8277e706",
+    "hash": 2033947943,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_e.prefab",
+    "guid": "4b6eb8acd6bc7314386e3f528089e1cb",
+    "hash": 3781471906,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_f.prefab",
+    "guid": "3bfb43cf94999364ebfecf5fd8fa611a",
+    "hash": 3274609432,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_g.prefab",
+    "guid": "b0ca610e90c93904c8af55ccc45ebae5",
+    "hash": 767666151,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_h.prefab",
+    "guid": "03d7588922268704c9d97967cf27d7a8",
+    "hash": 3092031096,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_i.prefab",
+    "guid": "6e1ce0b1b766dcc41a6e993700c01789",
+    "hash": 3597236520,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_j.prefab",
+    "guid": "769be72e69c7f464f92cfc2b5724516f",
+    "hash": 3085267458,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_k.prefab",
+    "guid": "0dfeb55451e9d9642b09d2933bd9c16e",
+    "hash": 118552974,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_l.prefab",
+    "guid": "481bfd7f02091d645a5c0826ca9f8a52",
+    "hash": 3811142150,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_m.prefab",
+    "guid": "f747c8f6458b26f4e9e12f1b4e15b145",
+    "hash": 884251191,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_n.prefab",
+    "guid": "3692b797e0938b941a5e405e6931c4b1",
+    "hash": 2171788297,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_o.prefab",
+    "guid": "429d96bc7f0c34d418b8b2c8006fb0e4",
+    "hash": 2682328342,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_room_p.prefab",
+    "guid": "2df581321a70dc247b4744636583893d",
+    "hash": 3897866825,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_computer_room.prefab",
+    "guid": "4afe5f347817f004f8c9e5d9f8f0827b",
+    "hash": 534023377,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_control_room.prefab",
+    "guid": "4a3bfa95a8c2389418ff0fcd279edfb2",
+    "hash": 1593190775,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_infirmary.prefab",
+    "guid": "bc1fe5a216a8ec345aa257d728dbc5b9",
+    "hash": 2290848891,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_level_0.prefab",
+    "guid": "45596c7b06e2b5440bdaa93a2864eb67",
+    "hash": 3871575982,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_level_1.prefab",
+    "guid": "30078053cd225464d97a4b005f17a890",
+    "hash": 884543516,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_level_2.prefab",
+    "guid": "8b5e021e16980d647b677031775a6c16",
+    "hash": 2830240023,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_level_3.prefab",
+    "guid": "18bfd076de0129249a2df8d66303bc17",
+    "hash": 2328965397,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_level_4.prefab",
+    "guid": "eb9e73a50f518af47b991bd99e0d0e44",
+    "hash": 1856715523,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_level_5.prefab",
+    "guid": "566d464c88284214ca9e36f311d3032c",
+    "hash": 3622292755,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_office.prefab",
+    "guid": "3cabb503f16ae0d4e8b2efd2232c3832",
+    "hash": 616919891,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_text_sleeping_quarters.prefab",
+    "guid": "d65db2b3af5b6cc4b96454595fcfc782",
+    "hash": 4225164693,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_300x450_crn_a.prefab",
+    "guid": "4c50882934427d043909d79019ba54bd",
+    "hash": 2663428525,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_300x450_crn_b.prefab",
+    "guid": "33aebd2811abffa4d9ff0e76d224b61b",
+    "hash": 4213800463,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_300x600_b.prefab",
+    "guid": "1975cb4f6baf18841be8391c6f69c5d2",
+    "hash": 1795055145,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_300x600_end.prefab",
+    "guid": "c1cbc1a437a08ed45b95762b1cd9d15f",
+    "hash": 3154036459,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_300x600_end_mirr.prefab",
+    "guid": "20d806967545ca3449b9bd8de22f6167",
+    "hash": 2723355541,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_300x900_stairs.prefab",
+    "guid": "3eb53caf4b32cf94b9caaff361859ab9",
+    "hash": 3422758770,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_exit.prefab",
+    "guid": "d203f50943d7b8643a71d630f592aec3",
+    "hash": 1787815735,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_exit_garage.prefab",
+    "guid": "fa91f59ce1179e0448fdfcbfca38937d",
+    "hash": 1871327566,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/nuclear_missile_silo/nuclear_silo_tunnel_tube_a.prefab",
+    "guid": "6fcf32164ce225e439a59a8f580abbeb",
+    "hash": 2783216119,
+    "pool": false
+  },
+  {
     "name": "assets/content/structures/office_buildings/cobalt_office_sign.prefab",
     "guid": "4c8e37bacbcc8f547b280a529dfb7284",
     "hash": 835836255,
@@ -24762,6 +26226,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/structures/portacabin_buildings/portacabin_building_roof_300_900.prefab",
+    "guid": "4d17916e22a02c2439f175cef94c65a8",
+    "hash": 469243822,
+    "pool": false
+  },
+  {
     "name": "assets/content/structures/portacabin_buildings/portacabin_building_roof_600_1200.prefab",
     "guid": "ab250736456f3604e8676d1a3561748e",
     "hash": 2816106544,
@@ -24774,9 +26244,21 @@
     "pool": false
   },
   {
+    "name": "assets/content/structures/portacabin_buildings/portacabin_building_roof_600_900_b.prefab",
+    "guid": "53f742de0e8254547adc16210e7a06c7",
+    "hash": 3295352504,
+    "pool": false
+  },
+  {
     "name": "assets/content/structures/portacabin_buildings/portacabin_building_roof_900_1200.prefab",
     "guid": "3f96b3fdf3618e14c96bf1955c672ddb",
     "hash": 3153896245,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/portacabin_buildings/portacabin_building_roof_900_1200_b.prefab",
+    "guid": "a53bdbae4be5cc14c96ff604590aea1e",
+    "hash": 735057291,
     "pool": false
   },
   {
@@ -24807,6 +26289,36 @@
     "name": "assets/content/structures/portacabin_buildings/prefabs/arctic_portacabin_building_900_1200_b.prefab",
     "guid": "0e628a7f9fc14c74089d3f95d1a39c64",
     "hash": 1937618509,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/portacabin_buildings/prefabs/nuclear_missile_silo_portacabin_building_1200_1800_a.prefab",
+    "guid": "29a8c899412db534fa46a75f39aae700",
+    "hash": 3827528173,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/portacabin_buildings/prefabs/nuclear_missile_silo_portacabin_building_300_900_a.prefab",
+    "guid": "33ab25cc8fa8a354aa58e0da4d5b5eb6",
+    "hash": 3195683643,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/portacabin_buildings/prefabs/nuclear_missile_silo_portacabin_building_600_900_a.prefab",
+    "guid": "9ecfed9a42f828e4286905ea4f2d7306",
+    "hash": 1044419263,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/portacabin_buildings/prefabs/nuclear_missile_silo_portacabin_building_900_1200_a.prefab",
+    "guid": "c0cf9644c11452c4fb4bd31da2ada5c0",
+    "hash": 3361259340,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/portacabin_buildings/prefabs/nuclear_missile_silo_portacabin_building_900_1200_b.prefab",
+    "guid": "679630bf17a96f24e9114de565b507f3",
+    "hash": 3704047024,
     "pool": false
   },
   {
@@ -25077,6 +26589,12 @@
     "name": "assets/content/structures/radiation/radiationsphere.prefab",
     "guid": "e1b086d5ecc8b2c40a4aa0f2477823e9",
     "hash": 1744658818,
+    "pool": false
+  },
+  {
+    "name": "assets/content/structures/radio_tower/radio_tower.prefab",
+    "guid": "8651f5945a8834c48acc7d8a0b70a43b",
+    "hash": 2583858098,
     "pool": false
   },
   {
@@ -29490,6 +31008,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/structures/watchtower_b/watchtower_b.prefab",
+    "guid": "5fbc93e7bf12f1f40ac7cd439114a1df",
+    "hash": 3021722469,
+    "pool": false
+  },
+  {
     "name": "assets/content/structures/wind_turbines/wind_turbine.prefab",
     "guid": "9b0a34c308dc8c3409eb4ac9bf065540",
     "hash": 3808836573,
@@ -30438,6 +31962,12 @@
     "pool": false
   },
   {
+    "name": "assets/content/ui/gameui/aidesigner/events/new/isblindedevent.prefab",
+    "guid": "63039b27c1805c1468be3e573e3e0043",
+    "hash": 314229988,
+    "pool": false
+  },
+  {
     "name": "assets/content/ui/gameui/aidesigner/events/new/ismountedevent.prefab",
     "guid": "7219b9f8940152d4b882f955323870e1",
     "hash": 3059013073,
@@ -30810,6 +32340,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/ui/gameui/gameui.hud.pings.prefab",
+    "guid": "b92408956eb758642b3eb82b5cafd2e8",
+    "hash": 3634824033,
+    "pool": false
+  },
+  {
+    "name": "assets/content/ui/gameui/gameui.hud.pingwidget.prefab",
+    "guid": "44166637dc473ad489d406b29ba4f961",
+    "hash": 4239521215,
+    "pool": false
+  },
+  {
     "name": "assets/content/ui/gameui/gameui.hud.playernames.prefab",
     "guid": "8602d42d17c58ef4781fdcd97e0e3d9a",
     "hash": 3135062800,
@@ -30981,7 +32523,7 @@
     "name": "assets/content/ui/gameui/tooltip.prefab",
     "guid": "73b4b54cc3e2cf14db4305afcf25931d",
     "hash": 1895126584,
-    "pool": false
+    "pool": true
   },
   {
     "name": "assets/content/ui/gameui/tooltip_alwaysontop.prefab",
@@ -33336,6 +34878,18 @@
     "pool": false
   },
   {
+    "name": "assets/content/vehicles/trains/caboose/caboose_ground_junk_straight_b.prefab",
+    "guid": "f384dedcd779e824289aedd47c6d791d",
+    "hash": 1388125155,
+    "pool": false
+  },
+  {
+    "name": "assets/content/vehicles/trains/caboose/caboose_ground_junk_straight_c.prefab",
+    "guid": "147efb7e1a2e9b44b8fc4833d6d22139",
+    "hash": 2715294761,
+    "pool": false
+  },
+  {
     "name": "assets/content/vehicles/trains/caboose/caboose_lightswitch.prefab",
     "guid": "0bf4d106b66995148beaf48d55b4c066",
     "hash": 489802822,
@@ -34338,6 +35892,24 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/ammo/handmade shell/handmadeshotgunshellfull.worldmodel.prefab",
+    "guid": "174125485ae91ed4baf45976e706bf4c",
+    "hash": 564593101,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/handmade shell/w_handmadeshotgunshellempty.prefab",
+    "guid": "13ec2b8e1e29689499d2de4d0cb0a476",
+    "hash": 3171757683,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/handmade shell/w_handmadeshotgunshellhalf.prefab",
+    "guid": "9a211f85f1d46fa4098937a9574c3c5f",
+    "hash": 2889637275,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/ammo/nails/nail.prefab",
     "guid": "ffc3ae3b4f38fb6408e06fe1d3149000",
     "hash": 2577479505,
@@ -34374,6 +35946,60 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxemptyhv.worldmodel.prefab",
+    "guid": "ef6d3d82ece783e44b2e6b18007403b7",
+    "hash": 2321683330,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxemptyincendiary.worldmodel.prefab",
+    "guid": "df1984fb6b6b1a648a9ec9cb6fef34db",
+    "hash": 1237539353,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxemptystandard.worldmodel.prefab",
+    "guid": "fb644589662041f4b8eb36801a25f229",
+    "hash": 3459103187,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxfullhv.worldmodel.prefab",
+    "guid": "32d15bad2a2b9e0408dd22c0229e0d64",
+    "hash": 3153692030,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxfullincendiary.worldmodel.prefab",
+    "guid": "ac93fd380ca66fa4498c51ac8bf08efd",
+    "hash": 909178101,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxfullstandard.worldmodel.prefab",
+    "guid": "6c83fb74b4774114d975390a3631abf4",
+    "hash": 3920969255,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxhalfhv.worldmodel.prefab",
+    "guid": "ebdb57c4db45dc74680df17ee7aa897b",
+    "hash": 2615771141,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxhalfincendiary.worldmodel.prefab",
+    "guid": "ce122ae9520a52d49a16192711d76653",
+    "hash": 2990831193,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/pistol/pistolammoboxhalfstandard.worldmodel.prefab",
+    "guid": "98bf5b3ac6973cd428d9fc22613e20d9",
+    "hash": 242678272,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/ammo/pistol/pistolbullet.prefab",
     "guid": "f5b0ab5cb1c8c2b4f8a67fe21d4266b1",
     "hash": 2421548478,
@@ -34407,6 +36033,78 @@
     "name": "assets/prefabs/ammo/rifle/ammo_rifle_hv.item.prefab",
     "guid": "89cade4f4bed6634f9379c4b084a6a2d",
     "hash": 1110035653,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxemptyexplosive.worldmodel.prefab",
+    "guid": "c25a9d92652b10b4498398c06d386f44",
+    "hash": 968217123,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxemptyhv.worldmodel.prefab",
+    "guid": "63328a13e06c7794ab8116f71a4a0bc2",
+    "hash": 1044675860,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxemptyincendiary.worldmodel.prefab",
+    "guid": "0d99371b347126148b9fec7b8454b4c2",
+    "hash": 2945051732,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxemptystandard.worldmodel.prefab",
+    "guid": "b861fb7cf4a36974381e141a805ba2cc",
+    "hash": 1253530611,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxfullexplosive.worldmodel.prefab",
+    "guid": "0a35e47f62712b84e9263fb4986fdcd7",
+    "hash": 2773532262,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxfullhv.worldmodel.prefab",
+    "guid": "eff6c0bbd52cd7d4cb27a03184f067ee",
+    "hash": 3009117215,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxfullincendiary.worldmodel.prefab",
+    "guid": "803fcce2f6b1ad74f895edc5037ebaea",
+    "hash": 916721822,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxfullstandard.worldmodel.prefab",
+    "guid": "b08d8c7d519c13448b77aa8bd90843c4",
+    "hash": 1462134847,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxhalfexplosive.worldmodel.prefab",
+    "guid": "0daf80e1fc17ccd499229370c4a0b149",
+    "hash": 2872622998,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxhalfhv.worldmodel.prefab",
+    "guid": "9654dfc674d76f64b80ad4c945331eec",
+    "hash": 3965677711,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxhalfincendiary.worldmodel.prefab",
+    "guid": "af230abf9adfc094b8f492ac9e3b777a",
+    "hash": 612059970,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rifle/rifleammoboxhalfstandard.worldmodel.prefab",
+    "guid": "921d74a64b8e75448ae11b38e66db237",
+    "hash": 3074280199,
     "pool": false
   },
   {
@@ -34449,6 +36147,18 @@
     "name": "assets/prefabs/ammo/rocket/ammo_rocket_smoke.item.prefab",
     "guid": "d34dc96537a252a47a9d895bbbbdf861",
     "hash": 3290828504,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rocket/hvrocket.worldmodel.prefab",
+    "guid": "54d5db9f27cdad645af8599017616b4d",
+    "hash": 292346195,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/rocket/incendiaryrocket.worldmodel.prefab",
+    "guid": "5d66415d6eccbc844a6849ef87196449",
+    "hash": 125578975,
     "pool": false
   },
   {
@@ -34506,6 +36216,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/ammo/shotgun/shotgunammoboxfullclosed.worldmodel.prefab",
+    "guid": "57314dee68e12e043af1bfe39eb8d776",
+    "hash": 3460532770,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/ammo/shotgun/shotgunbullet.prefab",
     "guid": "4e4f2fa9263fe404191f9d39c4b78503",
     "hash": 1991236224,
@@ -34518,10 +36234,58 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/ammo/shotgun/shotgunincendiaryammoboxfullclosed.worldmodel.prefab",
+    "guid": "3dcc11f928779c74681b29ee6bb2cbfc",
+    "hash": 3561718865,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/ammo/shotgun/shotgunslug.prefab",
     "guid": "35e44bb3173e8f94780fd752da7983a8",
     "hash": 648078183,
     "pool": true
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/shotgunslugammoboxfullclosed.worldmodel.prefab",
+    "guid": "3c0b86dc4e7ab1145a74acccceed44b3",
+    "hash": 3335625382,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/w_shotgunammoboxempty.prefab",
+    "guid": "65ec8bb74579a2642bebf3aa6863d7b9",
+    "hash": 2908350987,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/w_shotgunammoboxhalf.prefab",
+    "guid": "47776a90618389946a6cd128809fcba9",
+    "hash": 1721711524,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/w_shotgunincendiaryammoboxempty.prefab",
+    "guid": "555f29a36efc82e42a0e29e570b7bd0b",
+    "hash": 3049233300,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/w_shotgunincendiaryammoboxhalf.prefab",
+    "guid": "3c88fcd66349f3642814bb3731820ef8",
+    "hash": 2206519242,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/w_shotgunslugammoboxempty.prefab",
+    "guid": "dd19394c6c2b3914c9fa4169b2467b88",
+    "hash": 1899084331,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/ammo/shotgun/w_shotgunslugammoboxhalf.prefab",
+    "guid": "84d38af0117aed0468796a7acd598602",
+    "hash": 1427385193,
+    "pool": false
   },
   {
     "name": "assets/prefabs/ammo/speargun/speargun_spear.item.prefab",
@@ -34560,6 +36324,72 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/building core/creation/creationeffect_stone.prefab",
+    "guid": "979a2f01d13f2cb439fc9929268118c0",
+    "hash": 1826518627,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/creation/creationeffect_wood.prefab",
+    "guid": "34338006a33309145ac7cfdc13d9660f",
+    "hash": 531089928,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/creation/creationgibinstance.prefab",
+    "guid": "7b1818903eb178f4d87bd043ce633e3f",
+    "hash": 2066080066,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/building core/creation/creationgibmovementsmoke.prefab",
+    "guid": "b282e54cd158d90468119d4bd496e218",
+    "hash": 382829059,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/building core/creation/creationpuff.prefab",
+    "guid": "da971141b3b4be648bfce4a0f64ceea6",
+    "hash": 3713702031,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/creation/creationpuff_hqm.prefab",
+    "guid": "2bac96479ed673248a9fae83ca15a975",
+    "hash": 3628164645,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/creation/creationpuff_sheet.prefab",
+    "guid": "22b1701bcd77c8b41ac3282a88f254c9",
+    "hash": 1162276377,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.frame/floor.frame.adobe.prefab",
+    "guid": "d5c1336c47f87d14db8934cf6d273ce5",
+    "hash": 2175610292,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.frame/floor.frame.brick.prefab",
+    "guid": "d75850400ba4f5b459e7b4c6458a9549",
+    "hash": 3498158232,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.frame/floor.frame.brutalist.prefab",
+    "guid": "dfc4ea8895daf8048834b23c4e9171e6",
+    "hash": 2017547388,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.frame/floor.frame.container.prefab",
+    "guid": "189ba956e283f8e4c8122081abdf2e72",
+    "hash": 2322219059,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/floor.frame/floor.frame.metal.prefab",
     "guid": "e7d43d0d4282f6e4c99d9df488d796fd",
     "hash": 457145434,
@@ -34593,6 +36423,30 @@
     "name": "assets/prefabs/building core/floor.frame/floor.frame.wood.prefab",
     "guid": "f2d2a01b71588f041a03572661cecabb",
     "hash": 190731310,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle.frame/floor.triangle.adobe.frame.prefab",
+    "guid": "7459e2c52fbd0564c817c34b8aac784f",
+    "hash": 1567175893,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle.frame/floor.triangle.brick.frame.prefab",
+    "guid": "5e0a900630ae2274486044974c7ea0ff",
+    "hash": 4035830038,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle.frame/floor.triangle.brutalist.frame.prefab",
+    "guid": "e3a19a3e99aeafb4fac30705a5fb9e7b",
+    "hash": 59805482,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle.frame/floor.triangle.container.frame.prefab",
+    "guid": "03af7f68a1c3d584e807819c6f8aafa0",
+    "hash": 1701889273,
     "pool": true
   },
   {
@@ -34632,6 +36486,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/floor.triangle/floor.triangle.adobe.prefab",
+    "guid": "2f7b4f30b347a0d41800f752a80519f2",
+    "hash": 2402679676,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle/floor.triangle.brick.prefab",
+    "guid": "96ef132421e496d4bae29308a95b2f60",
+    "hash": 567892703,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle/floor.triangle.brutalist.prefab",
+    "guid": "178d1ee3513b6e44c9d4a2ce96b12c7b",
+    "hash": 431291008,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor.triangle/floor.triangle.container.prefab",
+    "guid": "6317eb2ac6ad87d4295f439f93be638f",
+    "hash": 991127659,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/floor.triangle/floor.triangle.metal.prefab",
     "guid": "2692d86401156014bac5e0f4a24d46a0",
     "hash": 770566494,
@@ -34665,6 +36543,30 @@
     "name": "assets/prefabs/building core/floor.triangle/floor.triangle.wood.prefab",
     "guid": "b8e9d1d872254954e8c6ac7ab14f15e9",
     "hash": 2629308934,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor/floor.adobe.prefab",
+    "guid": "361ad6b2fe238734a84a5ca429541213",
+    "hash": 1966473397,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor/floor.brick.prefab",
+    "guid": "40431ed03a8303242a671324204586fe",
+    "hash": 3772301203,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor/floor.brutalist.prefab",
+    "guid": "5e2a14f52eaeae440b2f4b7e5a2839c7",
+    "hash": 4275185942,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/floor/floor.container.prefab",
+    "guid": "861d48a932a126443a4f3bfd16d0f3d6",
+    "hash": 2317982925,
     "pool": true
   },
   {
@@ -34704,6 +36606,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/foundation.steps/foundation.steps.adobe.prefab",
+    "guid": "9b713021595d9dd49bf170f504fcc079",
+    "hash": 4222653414,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.steps/foundation.steps.brick.prefab",
+    "guid": "5056c3fc56c39d7408cc54a520465a0e",
+    "hash": 3985420193,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.steps/foundation.steps.brutalist.prefab",
+    "guid": "5da49fef5b7bb5d48825565ba7647aaf",
+    "hash": 936270744,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.steps/foundation.steps.container.prefab",
+    "guid": "abacf45dcf1813047adb56eba6b86bd2",
+    "hash": 3785900109,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/foundation.steps/foundation.steps.metal.prefab",
     "guid": "a6eb9ffd7533f8e4d80ef984b09ee722",
     "hash": 4183571989,
@@ -34740,6 +36666,42 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.adobe.prefab",
+    "guid": "7752187e9c7bf2e42a4e0352f2f13c01",
+    "hash": 3787746031,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.brick.prefab",
+    "guid": "a055ae9fd32226941a8e625d428fe609",
+    "hash": 922034457,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.brick.wall.corner.l.prefab",
+    "guid": "0ee2f0c33eedb474c80cb3089c1a9487",
+    "hash": 2872500180,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.brick.wall.corner.r.prefab",
+    "guid": "9a7f19794d8e124469d51bb294dd0713",
+    "hash": 671473910,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.brutalist.prefab",
+    "guid": "022da2b528554064b86d9508bcd971fa",
+    "hash": 4273907058,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.container.prefab",
+    "guid": "eeda1a8bb89f20b409179b9a13b5f8f4",
+    "hash": 1303157528,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.metal.prefab",
     "guid": "34278a9999ed76845997b9372bc3ebdc",
     "hash": 3170121798,
@@ -34758,6 +36720,18 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.stone.wall.corner.l.prefab",
+    "guid": "989fa643eea57e549a57a5daa677d3c8",
+    "hash": 1039350231,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.stone.wall.corner.r.prefab",
+    "guid": "a7af7745fe7bb6b49bec5d27f03898bf",
+    "hash": 1192547875,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.toptier.prefab",
     "guid": "5c7c101d8bf9e254f8652f939584de07",
     "hash": 977022139,
@@ -34773,6 +36747,78 @@
     "name": "assets/prefabs/building core/foundation.triangle/foundation.triangle.wood.prefab",
     "guid": "0c97853a8eb660a4a90d1d33f91267a8",
     "hash": 2669235086,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.adobe.prefab",
+    "guid": "984a9ad3aa9760342ab4b09c725ca16b",
+    "hash": 4001296764,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.adobe.wall.corner.l.prefab",
+    "guid": "ebbb327f3b55bf2438260cd09e121fbf",
+    "hash": 1622838474,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.adobe.wall.corner.r.prefab",
+    "guid": "34e5efbe66ed43041a183503fe036c03",
+    "hash": 419809248,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.adobe.wall.prefab",
+    "guid": "39fa664da071f944e9d656c13b48b98f",
+    "hash": 27559718,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.brick.prefab",
+    "guid": "41c7662962cac5b4e8af6fe22cfc3582",
+    "hash": 4018777599,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.brick.wall.corner.l.prefab",
+    "guid": "b14876b543780264a9d9c563dd3c366c",
+    "hash": 2630437753,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.brick.wall.corner.r.prefab",
+    "guid": "e47183e84cefbc54d87fad1e932349f8",
+    "hash": 2313874222,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.brick.wall.prefab",
+    "guid": "bc7423710b6f6ed4fa2cf1bf4b117b58",
+    "hash": 3268882933,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.brutalist.prefab",
+    "guid": "5ec39b09108344044afb98accf53d163",
+    "hash": 617073715,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.brutalist.wall.prefab",
+    "guid": "ddf23fedb1700af4eac0e43f8904abda",
+    "hash": 3996336477,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.container.prefab",
+    "guid": "f282edd92ebdf04408b043d10046a923",
+    "hash": 2227645339,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.container.wall.prefab",
+    "guid": "7d501d170c9458e4496b4915564065d2",
+    "hash": 3683387130,
     "pool": true
   },
   {
@@ -34797,6 +36843,18 @@
     "name": "assets/prefabs/building core/foundation/foundation.stone.prefab",
     "guid": "22062dd6534746f4c97dfe92a7949d39",
     "hash": 2880777998,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.stone.wall.corner.l.prefab",
+    "guid": "fbae4c3ef786faf458aeba0512fd65a1",
+    "hash": 2206744955,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/foundation/foundation.stone.wall.corner.r.prefab",
+    "guid": "e563d7c8d7f9a224e91e91e3f39ee020",
+    "hash": 1248007617,
     "pool": true
   },
   {
@@ -34830,6 +36888,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/ramp/ramp.150.adobe.prefab",
+    "guid": "826f35304b5bcdf41a2d2da8d8f59511",
+    "hash": 1676639032,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.150.brick.prefab",
+    "guid": "11ce2c790b8884e4da03861ebc6405a5",
+    "hash": 1372565418,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.150.brutalist.prefab",
+    "guid": "e84ab83d4112ecf4486e1768f1a1ccfc",
+    "hash": 365955640,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.150.container.prefab",
+    "guid": "13076bba362267641a9bc70526c167fe",
+    "hash": 1937101194,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/ramp/ramp.150.metal.prefab",
     "guid": "1c610869cf6a24247b406130db4fd0f1",
     "hash": 3460658125,
@@ -34860,6 +36942,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/ramp/ramp.75.adobe.prefab",
+    "guid": "3f3704503664b4145abdf4ff65927032",
+    "hash": 2530909956,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.75.brick.prefab",
+    "guid": "dfc4e32837292c0488badf4b0cead9ab",
+    "hash": 2371615609,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.75.brutalist.prefab",
+    "guid": "b1a9b553d4ded314080f9dfec4cb4384",
+    "hash": 3818307187,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.75.container.prefab",
+    "guid": "24929335ecb8e804a83f4623e9385812",
+    "hash": 178884141,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/ramp/ramp.75.metal.prefab",
     "guid": "7745fbe574b154e4ba3b6e38f70d90af",
     "hash": 2632011342,
@@ -34887,6 +36993,30 @@
     "name": "assets/prefabs/building core/ramp/ramp.75.wood.prefab",
     "guid": "2e589b4c0cdba5847bc1670bacc5ff91",
     "hash": 1083816058,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.adobe.prefab",
+    "guid": "16ac56ac9b8feb94982f1f420033e7bf",
+    "hash": 3035811125,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.brick.prefab",
+    "guid": "b4c36e23d81b92a4e922e836e0dd9908",
+    "hash": 677687045,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.brutalist.prefab",
+    "guid": "de52a08b27c00924ebba12e541a53428",
+    "hash": 2787901701,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/ramp/ramp.container.prefab",
+    "guid": "b4fda7258befcaa45ab56280676efb9e",
+    "hash": 509682560,
     "pool": true
   },
   {
@@ -34923,6 +37053,150 @@
     "name": "assets/prefabs/building core/ramp/ramp.wood.prefab",
     "guid": "91f577dab27a8ca4292a07e2e64bb2ad",
     "hash": 501433505,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.adobe.down.prefab",
+    "guid": "d50d64a7c444e3343b9f137d064061b7",
+    "hash": 3797786099,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.adobe.down.top.line.prefab",
+    "guid": "2731678a6d47f9d48b4e78f5f77024bf",
+    "hash": 2921579418,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.adobe.prefab",
+    "guid": "03586c135c7460f4f8f7e9f3dc55a42e",
+    "hash": 2741279308,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.adobe.up.left.line.prefab",
+    "guid": "ffce204d3daf1164eb7378895aa9116c",
+    "hash": 2317611468,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.adobe.up.prefab",
+    "guid": "ec4e1858f126595468eb3328eba673e0",
+    "hash": 1650558230,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.adobe.up.right.line.prefab",
+    "guid": "c11f7de262763d642b936917b1f98ac6",
+    "hash": 1115572434,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.down.prefab",
+    "guid": "24646f0411af28d48a4fae44e232c43d",
+    "hash": 861568736,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.down.top.line.prefab",
+    "guid": "d11d561b793a2f844b7e7b452b77b727",
+    "hash": 2237453382,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.prefab",
+    "guid": "e22d061cae7d1944980b97d9ba520cc0",
+    "hash": 4269940925,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.up.left.line.prefab",
+    "guid": "7e12a4e257d9eb54e811b57177e7abb2",
+    "hash": 683320350,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.up.prefab",
+    "guid": "520ff731b114d8b48a9280d4b8bf333d",
+    "hash": 568727259,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.up.right.line.prefab",
+    "guid": "a914ad86555aab145bea95aea5f830b2",
+    "hash": 344012681,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brick.up.top.line.prefab",
+    "guid": "008406ae9bd574e43a8e28ecc5c6e7aa",
+    "hash": 4168380847,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brutalist.down.prefab",
+    "guid": "ffbdb71f97ecc484b95262883f902898",
+    "hash": 3189419888,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brutalist.prefab",
+    "guid": "d3b968aedb4451a49a21b5857db903d5",
+    "hash": 1024193893,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brutalist.up.left.line.prefab",
+    "guid": "1d6cb0609808acc4f94e8e0fd196016f",
+    "hash": 3443979746,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brutalist.up.prefab",
+    "guid": "f4bb032eccb2ab443b8c48ca4e2cabbd",
+    "hash": 2575581552,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.brutalist.up.right.line.prefab",
+    "guid": "e369809737dbd5245a1004d98a42acbd",
+    "hash": 3108473924,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.container.down.prefab",
+    "guid": "f2560f730957320448342e9cb821a98b",
+    "hash": 1201840900,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.container.down.top.line.prefab",
+    "guid": "bb6827b5bcaf975449edbc63dae9b92a",
+    "hash": 2120034496,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.container.prefab",
+    "guid": "3d995076c35a3254c86916070688c5d4",
+    "hash": 1222285414,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.container.up.left.line.prefab",
+    "guid": "07f10fee66de6804db7b42c06f8b1d36",
+    "hash": 535714906,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.container.up.prefab",
+    "guid": "909d61d6a50251148b2dd43be4915612",
+    "hash": 2153596691,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof.triangle/roof.triangle.container.up.right.line.prefab",
+    "guid": "1195e4d78e3606842ac1ee3ce6dee0f8",
+    "hash": 661745980,
     "pool": true
   },
   {
@@ -35139,6 +37413,324 @@
     "name": "assets/prefabs/building core/roof.triangle/roof.triangle.wood.up.top.line.prefab",
     "guid": "964d91161fa36f440900e1a3fc2f6c48",
     "hash": 656263248,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.bottom.line.prefab",
+    "guid": "3f020ec1c194d36439a197122f0eada7",
+    "hash": 99925410,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.corner.90.concave.l.prefab",
+    "guid": "2c3370670547d1a4bb4e9797b9fc9f38",
+    "hash": 1224792743,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.corner.90.concave.l.top.line.prefab",
+    "guid": "da958ebfcf12f794989593427bf057c6",
+    "hash": 710211368,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.corner.90.concave.r.prefab",
+    "guid": "e62f8929b29a91145879eb8e60ae66b9",
+    "hash": 2312129824,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.corner.90.concave.r.top.line.prefab",
+    "guid": "896d83614f16e784ea2c87bba56c72e8",
+    "hash": 1585146655,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.corner.90.convex.l.prefab",
+    "guid": "59b287858a7731f4f93a5f12ab6fde68",
+    "hash": 1753284683,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.corner.90.convex.r.prefab",
+    "guid": "9255d5767a47557458782f2434fa7273",
+    "hash": 2832504956,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.full.prefab",
+    "guid": "f2a4edc7c7618b244b4e2ec0db6c012d",
+    "hash": 1531471048,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.left.line.prefab",
+    "guid": "488113900a7846b4ca90f3d868c72e6f",
+    "hash": 1935776627,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.prefab",
+    "guid": "262e28806f02d554697aafab0e06fd83",
+    "hash": 3740827077,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.right.line.prefab",
+    "guid": "2b8b43d001b394f44bb65d5b4d11af87",
+    "hash": 4258105483,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.top.line.end.l.prefab",
+    "guid": "31e384c0734051044930197a04bc218a",
+    "hash": 1162865679,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.top.line.end.r.prefab",
+    "guid": "aad4ce1da6e093e4195769cd27bdcb29",
+    "hash": 2171736500,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.adobe.top.line.prefab",
+    "guid": "e77c966253c58ce459ecc256f31354ae",
+    "hash": 3097923791,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.bottom.line.prefab",
+    "guid": "b43956b988a297d489f079fa68848009",
+    "hash": 2201515380,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.60.concave.l.prefab",
+    "guid": "1c765496f0ae23a4998a69fe447294a8",
+    "hash": 1344746799,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.60.concave.l.top.line.prefab",
+    "guid": "9b583ffc1030af144a9fa64f65d502be",
+    "hash": 3185435304,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.60.concave.r.prefab",
+    "guid": "1acee3d7fa54a554b83c6614632165c0",
+    "hash": 1386388662,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.60.concave.r.top.line.prefab",
+    "guid": "c76d7d649a9e6ac449ac7543b1d3f807",
+    "hash": 1104721244,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.90.concave.l.prefab",
+    "guid": "978c82620619adc43b5a6aed9f4f9037",
+    "hash": 1125266601,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.90.concave.l.top.line.prefab",
+    "guid": "cb47e1f6553568b43beccb5fd7f4fc36",
+    "hash": 3755157031,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.90.concave.r.prefab",
+    "guid": "80ad2e946fe8c414780f4911b500983d",
+    "hash": 2682552876,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.90.concave.r.top.line.prefab",
+    "guid": "73e80a89698b7a14c8382e2546b9b072",
+    "hash": 2423418128,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.90.convex.l.prefab",
+    "guid": "b091f7eb665a8014db13b6499abac53c",
+    "hash": 1129267943,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.corner.90.convex.r.prefab",
+    "guid": "71376f6be15ede843b4aa796707d6a4d",
+    "hash": 1439260112,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.full.prefab",
+    "guid": "af6a5d89ed14ddb43ad547db1f80df58",
+    "hash": 1136295882,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.left.line.prefab",
+    "guid": "496a68ad31063ba4c9c4c4200b2cfee0",
+    "hash": 2501071677,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.prefab",
+    "guid": "616a85e66bade894dacad0cb58d699e3",
+    "hash": 759081327,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.right.line.prefab",
+    "guid": "d88a73f29efe4b84a822cb45c8064652",
+    "hash": 3470025241,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.top.line.end.left.prefab",
+    "guid": "44a7359f32ee78f4784b8774e779732f",
+    "hash": 1050507224,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.top.line.end.right.prefab",
+    "guid": "05a1b44b5f5257b419346f5d66f48b45",
+    "hash": 2068104576,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brick.top.line.prefab",
+    "guid": "078eb7ff2feea4c498aea2319b696d05",
+    "hash": 3221868701,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.bottom.line.prefab",
+    "guid": "75422eccf4c1023489fd3609fbfe971e",
+    "hash": 1778126190,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.corner.90.concave.l.prefab",
+    "guid": "f894670f6b621e7498690c1cf267134e",
+    "hash": 1959636750,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.corner.90.concave.r.prefab",
+    "guid": "c1a9535cb932f644d99442c2aee3a298",
+    "hash": 4207435458,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.corner.90.convex.l.prefab",
+    "guid": "276687ee37c2fff4b8e5154f42528d4e",
+    "hash": 1160320127,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.corner.90.convex.r.prefab",
+    "guid": "f92c96b022b353b4abf0cbfc11b84611",
+    "hash": 740295465,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.full.prefab",
+    "guid": "3dd990c59bd87f847a1f7b1cfc2076d7",
+    "hash": 566313456,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.left.line.prefab",
+    "guid": "db02ba0127f474f49af93fc43f6ac739",
+    "hash": 3401193889,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.prefab",
+    "guid": "83ccdcc6919167048b09052753a5faed",
+    "hash": 1774897051,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.brutalist.right.line.prefab",
+    "guid": "ef199feff1216bb448bcac16a60a23ce",
+    "hash": 2677625871,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.bottom.line.prefab",
+    "guid": "c8904b22bf24df340aa4a0e1acb25a70",
+    "hash": 110357552,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.corner.90.concave.l.prefab",
+    "guid": "99220117297566d49a6fb13962a68f82",
+    "hash": 1671653218,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.corner.90.concave.l.top.line.prefab",
+    "guid": "7b6eabd6929894b488aba8caa9130724",
+    "hash": 1580733230,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.corner.90.concave.r.prefab",
+    "guid": "094605134d31a98419bcf143a6898bd2",
+    "hash": 2490829645,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.corner.90.concave.r.top.line.prefab",
+    "guid": "5a05a2f7da80ad442b5c546b940179fb",
+    "hash": 2239318358,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.corner.90.convex.l.prefab",
+    "guid": "5be9810b16bdc5a4596e09fcf1aa24e5",
+    "hash": 908587006,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.corner.90.convex.r.prefab",
+    "guid": "1a31cc6d7afa8e944898809db2864c93",
+    "hash": 1608469534,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.full.prefab",
+    "guid": "4bf9bcae6287b7e4f838d7e09fc07d2e",
+    "hash": 947052039,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.left.line.prefab",
+    "guid": "520994e9039d7f94692c4f5b85b8d3d5",
+    "hash": 864202734,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.prefab",
+    "guid": "713ecdcd2fa6c1f45834041eebf1ade6",
+    "hash": 3743450105,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.right.line.prefab",
+    "guid": "26d4126a90f502942a3b4cdf33caf985",
+    "hash": 746817810,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/roof/roof.container.top.line.prefab",
+    "guid": "0ae2238e60e1ebb4baa4b45816dd565b",
+    "hash": 3887895456,
     "pool": true
   },
   {
@@ -35688,6 +38280,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/stairs.l/block.stair.lshape.adobe.prefab",
+    "guid": "50d99abdf99b2bd44a599b695d20e4fb",
+    "hash": 64768928,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.l/block.stair.lshape.brick.prefab",
+    "guid": "dd93ccb51623ce3498b3544572b2bf98",
+    "hash": 417550815,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.l/block.stair.lshape.brutalist.prefab",
+    "guid": "d1b2c3dce24205b4d80f9616c6bbf435",
+    "hash": 2184519531,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.l/block.stair.lshape.container.prefab",
+    "guid": "5a22b56afc0d5ef44a8ec5563e933624",
+    "hash": 2506244441,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/stairs.l/block.stair.lshape.metal.prefab",
     "guid": "4b7ff5fc79e49dc4b9b25e10cb47fbee",
     "hash": 2553053469,
@@ -35727,6 +38343,54 @@
     "name": "assets/prefabs/building core/stairs.spiral.triangle/block.stair.spiral.triangle.prefab",
     "guid": "8e72240bd04af52469a0f9802c564fa8",
     "hash": 447548514,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.adobe.prefab",
+    "guid": "58dd04e805c542349a5df730c2a986c1",
+    "hash": 1560447673,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.brick.prefab",
+    "guid": "3089ac04b280e094ebe5c635344b29bc",
+    "hash": 920565092,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.brutalist.prefab",
+    "guid": "478c4df3c78ada94f901593bc4081734",
+    "hash": 2814197480,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.container.prefab",
+    "guid": "f138fb28f02bde4428d504982c9ccc94",
+    "hash": 2067630539,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.landing.adobe.prefab",
+    "guid": "287d2ad4c7693d74cb8d6a3bd039d8ac",
+    "hash": 2187826608,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.landing.brick.prefab",
+    "guid": "8a6bb388d64537f4bbbe89bc0a281ea1",
+    "hash": 1996961345,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.landing.brutalist.prefab",
+    "guid": "dca9bfc1f8c80364a914fa031e2f76eb",
+    "hash": 2406897719,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral.triangle/stairs.triangle.spiral.landing.container.prefab",
+    "guid": "f34b244dd15217043b10b459e2407d01",
+    "hash": 2014729190,
     "pool": true
   },
   {
@@ -35790,6 +38454,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/stairs.spiral/block.stair.spiral.adobe.prefab",
+    "guid": "f37c0674c5edf9443b1f72c9c45975a4",
+    "hash": 932998744,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/block.stair.spiral.brick.prefab",
+    "guid": "4f419e7971c18f44eb9a6251a29784a2",
+    "hash": 3629327742,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/block.stair.spiral.brutalist.prefab",
+    "guid": "f1e22dc0b83dd2049a6b0fe96bfc0c50",
+    "hash": 1309247921,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/block.stair.spiral.container.prefab",
+    "guid": "5160326ba0259364398193e6f61b7687",
+    "hash": 808220672,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/stairs.spiral/block.stair.spiral.metal.prefab",
     "guid": "b1a400bb0f1262b49ad346e5d6188b00",
     "hash": 3595500402,
@@ -35823,6 +38511,30 @@
     "name": "assets/prefabs/building core/stairs.spiral/block.stair.spiral.wood.prefab",
     "guid": "383adc83c69f6ed43b3d2e8ad33d31ef",
     "hash": 2557589201,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/stairs.spiral.landing.adobe.prefab",
+    "guid": "aa79aef16fecf914ab5965566993a677",
+    "hash": 3241554351,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/stairs.spiral.landing.brick.prefab",
+    "guid": "06409172076f95649b063dd9cd165209",
+    "hash": 4207150506,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/stairs.spiral.landing.brutalist.prefab",
+    "guid": "49b692c1e012f684da4038d8e5f7de18",
+    "hash": 2958902845,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.spiral/stairs.spiral.landing.container.prefab",
+    "guid": "c294a99bf11f35d4d8163895aef5d569",
+    "hash": 2329239749,
     "pool": true
   },
   {
@@ -35862,6 +38574,30 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/building core/stairs.u/block.stair.ushape.adobe.prefab",
+    "guid": "79811c4e1d5078740904e20e1ee1161b",
+    "hash": 1426190460,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.u/block.stair.ushape.brick.prefab",
+    "guid": "87684a4953ab6c443b89c69b0729489e",
+    "hash": 1576416499,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.u/block.stair.ushape.brutalist.prefab",
+    "guid": "33bf8d25f544f78429aed51fe00e2eff",
+    "hash": 1064819302,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/stairs.u/block.stair.ushape.container.prefab",
+    "guid": "e80e25d5cc98ae7418b2575717fc832b",
+    "hash": 4231689498,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/stairs.u/block.stair.ushape.metal.prefab",
     "guid": "8e6e979d4fa41964bb34a00a4c6ede5f",
     "hash": 433379011,
@@ -35895,6 +38631,30 @@
     "name": "assets/prefabs/building core/stairs.u/block.stair.ushape.wood.prefab",
     "guid": "44f604a43b1700b4b819ba9a934664f2",
     "hash": 3779627137,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.doorway/wall.doorway.adobe.prefab",
+    "guid": "bb772b13889f3824bae361a8b47814d6",
+    "hash": 1172262350,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.doorway/wall.doorway.brick.prefab",
+    "guid": "b1a783706e1c0234684dd63496d60b33",
+    "hash": 116202539,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.doorway/wall.doorway.brutalist.prefab",
+    "guid": "2c58eff833c3296439824740a34c899f",
+    "hash": 3520043382,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.doorway/wall.doorway.container.prefab",
+    "guid": "4e0c0475f01f25743866b02adc446ab0",
+    "hash": 3140161392,
     "pool": true
   },
   {
@@ -35934,6 +38694,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/wall.frame/wall.frame.adobe.prefab",
+    "guid": "effb1f96c1754224780c91a4cb15085e",
+    "hash": 2369399600,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.frame/wall.frame.brick.prefab",
+    "guid": "9c900f079bde9994490fdca07f0e9e25",
+    "hash": 4286830470,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.frame/wall.frame.brutalist.prefab",
+    "guid": "5815e44dd58cb6042a25245191384512",
+    "hash": 2559224208,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.frame/wall.frame.container.prefab",
+    "guid": "3e598bc31a56a1748b879b28cebbaf61",
+    "hash": 109802163,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/wall.frame/wall.frame.metal.prefab",
     "guid": "a298d10f373fa634591b492c677b324b",
     "hash": 4157340360,
@@ -35967,6 +38751,78 @@
     "name": "assets/prefabs/building core/wall.frame/wall.frame.wood.prefab",
     "guid": "35a3cc0c2701bdf458855b9a2e396eca",
     "hash": 3433239006,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.adobe.corner.l.prefab",
+    "guid": "fb9dba8cc17c92a42b0d8e207e683d57",
+    "hash": 727242569,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.adobe.corner.r.prefab",
+    "guid": "a99aef1565c700f45b8db76cc6c8d128",
+    "hash": 1464555525,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.adobe.prefab",
+    "guid": "a04cd74c2384e90489e20263c24a4dcb",
+    "hash": 1308304173,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.brick.corner.l.prefab",
+    "guid": "cfba331d2beca5e4b87372bf8498e8ff",
+    "hash": 1078905122,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.brick.corner.r.prefab",
+    "guid": "d0832a67358010f4ea493fc69df16e0c",
+    "hash": 3561225850,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.brick.prefab",
+    "guid": "acb726192f1d03d49a245bcb66c65cf3",
+    "hash": 4033482105,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.brutalist.corner.l.prefab",
+    "guid": "9db3abfddf18fd645af1bce4518eab2b",
+    "hash": 1772603057,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.brutalist.corner.r.prefab",
+    "guid": "71489014d63b45544bc456261ddaf106",
+    "hash": 3755434964,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.brutalist.prefab",
+    "guid": "13a3a3a5892fd2f4ea3d5a9a1091177c",
+    "hash": 1149647425,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.container.corner.l.prefab",
+    "guid": "0c5692dcde027b34e929eb96557c0cb6",
+    "hash": 3661312977,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.container.corner.r.prefab",
+    "guid": "a54478d8a61c1ac4292a373ed8afcb19",
+    "hash": 2339913073,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.half/wall.half.container.prefab",
+    "guid": "0a9dc7121a668f7469cdda06f5a22246",
+    "hash": 454601191,
     "pool": true
   },
   {
@@ -36054,6 +38910,78 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/wall.low/wall.low.adobe.corner.l.prefab",
+    "guid": "ebff0f3f9526b794fa99eaf16bebc8db",
+    "hash": 4092537390,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.adobe.corner.r.prefab",
+    "guid": "2b8a3990e1c29dd4cad8bfd0d33dcb51",
+    "hash": 129666125,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.adobe.prefab",
+    "guid": "fe3ae3d185a234743a84a8c4e6aee014",
+    "hash": 1031073991,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.brick.corner.l.prefab",
+    "guid": "db7c44f9649d05e4fa2893f389e60ae0",
+    "hash": 2462764039,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.brick.corner.r.prefab",
+    "guid": "332acd322e410014b8572700cce55a10",
+    "hash": 3346470337,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.brick.prefab",
+    "guid": "5ed1bbd9369daea4f864286ac5b6acbd",
+    "hash": 485633900,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.brutalist.corner.l.prefab",
+    "guid": "6b5eac13d7be1d54ea45bbcfc0de67a3",
+    "hash": 1863458494,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.brutalist.corner.r.prefab",
+    "guid": "2fda4aeb0c7aaa3499c9c90ce3248bb6",
+    "hash": 1336630519,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.brutalist.prefab",
+    "guid": "54c6d02f44c42774096f0d56bb2c37e9",
+    "hash": 2455750387,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.container.corner.l.prefab",
+    "guid": "4e13977c938b48149b028c14976d1501",
+    "hash": 3030949348,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.container.corner.r.prefab",
+    "guid": "a0694ed04e28f5844834c8ca188decec",
+    "hash": 2835464843,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.low/wall.low.container.prefab",
+    "guid": "fc67cd0e0403cbe47b538a3a8a68a2b2",
+    "hash": 1211385023,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/wall.low/wall.low.metal.corner.l.prefab",
     "guid": "442c4a0bb74d3ea47af97d51ab768852",
     "hash": 550202113,
@@ -36138,6 +39066,30 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building core/wall.window/wall.window.adobe.prefab",
+    "guid": "1f9af1d3a040fd14bb603e5846afd245",
+    "hash": 157114022,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.window/wall.window.brick.prefab",
+    "guid": "88ae6f7470197c44b9e2d98abdddc901",
+    "hash": 258849294,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.window/wall.window.brutalist.prefab",
+    "guid": "5f290b990fa9c2840a80e9e63481e4ac",
+    "hash": 1874448610,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall.window/wall.window.container.prefab",
+    "guid": "05acb0f2430b62d479b06029948463f9",
+    "hash": 1191937813,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building core/wall.window/wall.window.metal.prefab",
     "guid": "c03e1966949c72f4aa422676cf4205c7",
     "hash": 46282902,
@@ -36183,6 +39135,150 @@
     "name": "assets/prefabs/building core/wall.window/wall.window.wood.prefab",
     "guid": "6550dcb256594c4458e504981640aa07",
     "hash": 2885216655,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.adobe.corner.l.prefab",
+    "guid": "b72d7307e3fb6f043a32f219c7d0699c",
+    "hash": 169552827,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.adobe.corner.r.prefab",
+    "guid": "62049a2ce3bc608439db49169177a538",
+    "hash": 474443824,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.adobe.full.prefab",
+    "guid": "967ad249d37268f459c6c655037288fa",
+    "hash": 747574820,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.adobe.left.prefab",
+    "guid": "b127b93537ffe5448bcc8ead1bb28072",
+    "hash": 577527812,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.adobe.prefab",
+    "guid": "2fe80571c4cf4ca43a416272f737449b",
+    "hash": 668807453,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.adobe.right.prefab",
+    "guid": "eca66cf6698768a4b8b34d4aa0bb944b",
+    "hash": 3883465082,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brick.corner.l.prefab",
+    "guid": "058d03e24b42c4e408e48d2cd06b4e6c",
+    "hash": 33631816,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brick.corner.r.prefab",
+    "guid": "3b0dd016160b70445bce19383c7aed7b",
+    "hash": 3524825719,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brick.full.prefab",
+    "guid": "8669b207f0c30d947b48495c5a31e01e",
+    "hash": 419416213,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brick.left.prefab",
+    "guid": "7bf90819d477fc44e8a94106c3f88292",
+    "hash": 3466939370,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brick.prefab",
+    "guid": "c878f88d377156a4087a59d512077d6f",
+    "hash": 752575003,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brick.right.prefab",
+    "guid": "7c382498313831d40adf581d5605c3fb",
+    "hash": 2766912323,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brutalist.corner.l.prefab",
+    "guid": "181132fc4f87b294a9b5a502e033fd63",
+    "hash": 1023173403,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brutalist.corner.r.prefab",
+    "guid": "6c8c71d8ba53484418a0cfd7c61665f6",
+    "hash": 715064017,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brutalist.full.prefab",
+    "guid": "979366ecb8b2c6e40b02b12e9a0c164a",
+    "hash": 3908223732,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brutalist.left.prefab",
+    "guid": "70bcf137777314e4ab7938ed9fc94644",
+    "hash": 2811528312,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brutalist.prefab",
+    "guid": "5d0003caaa3f5a54aacf8729c1948abe",
+    "hash": 876193636,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.brutalist.right.prefab",
+    "guid": "6f33ca2b08b58c74a9ffef4d76a885de",
+    "hash": 313034747,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.container.corner.l.prefab",
+    "guid": "b285e33de3dde3749b3a2d49da032cb5",
+    "hash": 2407895915,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.container.corner.r.prefab",
+    "guid": "2e26c070942d4254bb2948a59dbf2782",
+    "hash": 1284981665,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.container.full.prefab",
+    "guid": "d99d910cf2d0bac45a0959f9549ce3c7",
+    "hash": 2568609252,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.container.left.prefab",
+    "guid": "91b50cebac31eda4ca74b3b3b7669471",
+    "hash": 789236637,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.container.prefab",
+    "guid": "6a0727d76846a864087faf1f8c8685c6",
+    "hash": 3208033050,
+    "pool": true
+  },
+  {
+    "name": "assets/prefabs/building core/wall/wall.container.right.prefab",
+    "guid": "10dccc99d39c359488c4633127d649a3",
+    "hash": 606747092,
     "pool": true
   },
   {
@@ -37044,6 +40140,18 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/building/wall.window.bars/wall.window.bars.brickskin.item.prefab",
+    "guid": "b938778cc758a2548a7dbe72a26c81ec",
+    "hash": 174316958,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/building/wall.window.bars/wall.window.bars.brickskin.prefab",
+    "guid": "f79e2e59e13f35d42acd100c21faf42a",
+    "hash": 1171566496,
+    "pool": true
+  },
+  {
     "name": "assets/prefabs/building/wall.window.bars/wall.window.bars.metal.item.prefab",
     "guid": "a5693a579ee4fb74b974e4c7499006cb",
     "hash": 2892401748,
@@ -37426,6 +40534,12 @@
     "guid": "980d2bc402878e8419536406f79b9553",
     "hash": 3579074974,
     "pool": true
+  },
+  {
+    "name": "assets/prefabs/clothes/gloves.roadsign/roadsigngloves.worldmodel.prefab",
+    "guid": "0be75abdd30540f43ac70d8a121b39d6",
+    "hash": 619906382,
+    "pool": false
   },
   {
     "name": "assets/prefabs/clothes/gloves.roadsign/roadsigngloves_viewmodel.prefab",
@@ -38934,6 +42048,18 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/clothes/suit.hazmat/scientist/scientistsuitnvgm.item.prefab",
+    "guid": "68703a460b00f3a4a8f9234bf9da4e00",
+    "hash": 607939560,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/clothes/suit.hazmat/scientist/scientistsuitnvgm.prefab",
+    "guid": "2a9bbb94c7308cd439a7142f1aeb44ce",
+    "hash": 3681982235,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/clothes/suit.hazmat/scientist/scientistsuitpeacekeeper.item.prefab",
     "guid": "d7e783888670d0c449021660fb6a729e",
     "hash": 180777727,
@@ -39798,6 +42924,12 @@
     "pool": true
   },
   {
+    "name": "assets/prefabs/deployable/bear trap/snaptrap.worldmodel.prefab",
+    "guid": "bc55fd6a49345da4a8c1516247d1e52b",
+    "hash": 2658457127,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/deployable/bed/bed.item.prefab",
     "guid": "1f3e9c2fdc7fa4944bfec5cc92886ee5",
     "hash": 3189020285,
@@ -40318,6 +43450,12 @@
     "guid": "6ddb54b8613a8ae42b65e678e5ace151",
     "hash": 855553829,
     "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/elevator/static/elevator.static.office.top.prefab",
+    "guid": "096922161ae96d540a0078138060af27",
+    "hash": 2008256530,
+    "pool": true
   },
   {
     "name": "assets/prefabs/deployable/elevator/static/elevator.static.prefab",
@@ -41835,6 +44973,12 @@
     "name": "assets/prefabs/deployable/ptz security camera/ptzsecuritycamera.prefab",
     "guid": "9bb254b5bcc11e5488c3307ce7a78d42",
     "hash": 4274316069,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/deployable/ptz security camera/ptzsecuritycamera.worldmodel.prefab",
+    "guid": "8987038926d8d7d4fafd2ce527874164",
+    "hash": 1669267988,
     "pool": false
   },
   {
@@ -44466,6 +47610,24 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/io/electric/switches/pressbutton/pressbutton_officeelevatorcall.prefab",
+    "guid": "166b01799a03d3446a031d685ea2b952",
+    "hash": 3024956667,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/io/electric/switches/pressbutton/pressbutton_officeelevatordown.prefab",
+    "guid": "accd8cfb4d692324791c50e75694ab00",
+    "hash": 2322765486,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/io/electric/switches/pressbutton/pressbutton_officeelevatorup.prefab",
+    "guid": "a3038d564d90d5e4dad163a45a0e913d",
+    "hash": 322122625,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/io/electric/switches/pressbutton/pressbutton_trainstairwell.prefab",
     "guid": "321bc5d77bd21164284938e2f8b6a3b3",
     "hash": 1802909967,
@@ -45648,6 +48810,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/misc/easter/egg_suit/egg.suit_female.prefab",
+    "guid": "e96d98fc08158c9428e333c26dde8109",
+    "hash": 1433763804,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/misc/easter/egg_suit/item.painted.storage.prefab",
     "guid": "8cf9b97ba8ccc664aad395ea7c5a7f40",
     "hash": 2806530431,
@@ -45765,6 +48933,24 @@
     "name": "assets/prefabs/misc/easter/faberge_egg_e/rustigeegg_e.deployed.prefab",
     "guid": "dbe03a2675970e44eba8ef72253e4106",
     "hash": 1833328825,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/easter/faberge_egg_f/faberge_egg_f.worldmodel.prefab",
+    "guid": "3b01915d4f25c334a9f7007a1b74be54",
+    "hash": 3310681912,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/easter/faberge_egg_f/rustige_egg_f.item.prefab",
+    "guid": "30b09aa2ad929784ebb1ab9d4c55b4fc",
+    "hash": 4198153819,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/easter/faberge_egg_f/rustigeegg_f.deployed.prefab",
+    "guid": "10cac904f7b95c44da0961acaee7c862",
+    "hash": 31755465,
     "pool": false
   },
   {
@@ -46674,6 +49860,120 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/misc/id_tags/id_tags_blue.prefab",
+    "guid": "92f65350877e40241908e6e67aa5ed71",
+    "hash": 231166598,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_gray.prefab",
+    "guid": "68af24ee0d3c3dd459162184f62d2cf7",
+    "hash": 4252942467,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_green.prefab",
+    "guid": "9100c1be3ca33314cb7ea8986ddaf3b2",
+    "hash": 4011533208,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_orange.prefab",
+    "guid": "3c0ce0f974c31624099ab833f1b92aac",
+    "hash": 2940204768,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_pink.prefab",
+    "guid": "b6c8c6127e7f6bb41813d9d2c46bb3c4",
+    "hash": 2251251142,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_purple.prefab",
+    "guid": "720efd68a8c7eee4283c5016592e4b12",
+    "hash": 3743673198,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_red.prefab",
+    "guid": "bda5b67e9c2e7fb4cbf0c1e779aafca0",
+    "hash": 4067334771,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_white.prefab",
+    "guid": "1e7a5c75f0508d9409a6abc301734172",
+    "hash": 3394798456,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/id_tags_yellow.prefab",
+    "guid": "649d0ff86da863944b535411eb2c0993",
+    "hash": 3433590125,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_blue.item.prefab",
+    "guid": "78d5ad9d182e1ec42bb6107e0aebaec2",
+    "hash": 1645947816,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_gray.item.prefab",
+    "guid": "6a6ed3446cfc2504395da4e547dfec21",
+    "hash": 2492348677,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_green.item.prefab",
+    "guid": "3a75e653209e1bb4e973a26a7cd5a723",
+    "hash": 3007199367,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_orange.item.prefab",
+    "guid": "a70d50e59f3926441a61705a45988d26",
+    "hash": 1327900461,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_pink.item.prefab",
+    "guid": "7d6f0e7edac4e3040acb1131c23d2eef",
+    "hash": 1299407376,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_purple.item.prefab",
+    "guid": "b4af062ed47bf254abb9cf553cbf5d7f",
+    "hash": 2519547699,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_red.item.prefab",
+    "guid": "6a5cd1b021307cb4e9f969ea38d4c4b2",
+    "hash": 2883491021,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_white.item.prefab",
+    "guid": "b31821eea4b6b5f4280d9972bd870906",
+    "hash": 519209961,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/idtag_yellow.item.prefab",
+    "guid": "270daf5290939e848882b0dd082b9652",
+    "hash": 4026867871,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/id_tags/material/gameobject.prefab",
+    "guid": "1ebc3c44503b2b34b9822a92b4be23c0",
+    "hash": 483472417,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/misc/ioentitypreventbuilding.prefab",
     "guid": "60260b2ffbfcc8341bcd883195f07bfb",
     "hash": 2932091640,
@@ -47223,6 +50523,12 @@
     "name": "assets/prefabs/misc/movember/movember_moustache_style01/prefabs/movember_moustache_style01_male_light05.prefab",
     "guid": "f0db62548e1e80e4eafa1103e1d0818c",
     "hash": 2446122999,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/misc/nmsscreens/wipelaptop.prefab",
+    "guid": "34652552564e54245a24badd75579e42",
+    "hash": 214216425,
     "pool": false
   },
   {
@@ -52752,6 +56058,12 @@
     "pool": false
   },
   {
+    "name": "assets/prefabs/tea/supertea/supertea.item.prefab",
+    "guid": "1cbabda364460654d9855d8ffa91344b",
+    "hash": 1965561390,
+    "pool": false
+  },
+  {
     "name": "assets/prefabs/tea/woodtea/woodtea.advanced.item.prefab",
     "guid": "921f792bcb8d8f1448cb5ba4fe2a740c",
     "hash": 1800374742,
@@ -53694,15 +57006,21 @@
     "pool": false
   },
   {
-    "name": "assets/prefabs/tools/map/ui/ui.map.interestpoint.prefab",
-    "guid": "14059e80df2010e40a34931bf7d91982",
-    "hash": 3262025274,
+    "name": "assets/prefabs/tools/map/ui/ui.map.interestpoint.list.prefab",
+    "guid": "a128fc9ea4ddaea4191e9c69a43e4780",
+    "hash": 2994465150,
     "pool": false
   },
   {
-    "name": "assets/prefabs/tools/map/ui/ui.map.leaderinterestpoint.prefab",
-    "guid": "f53b7f98a1f74cd4592703b74b5fb8cc",
-    "hash": 2567520191,
+    "name": "assets/prefabs/tools/map/ui/ui.map.interestpoint.markerstyle.prefab",
+    "guid": "264118b4f6c2bb14da3ab2f2264b7809",
+    "hash": 1515637886,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/tools/map/ui/ui.map.interestpoint.prefab",
+    "guid": "14059e80df2010e40a34931bf7d91982",
+    "hash": 3262025274,
     "pool": false
   },
   {
@@ -54369,6 +57687,12 @@
     "name": "assets/prefabs/vehicle/seats/pilotseat.prefab",
     "guid": "79bdb60b97f4a0745b3c034c8d635d45",
     "hash": 952100854,
+    "pool": false
+  },
+  {
+    "name": "assets/prefabs/vehicle/seats/saddlerear.prefab",
+    "guid": "657030e4b71aae448b11c40b77691962",
+    "hash": 1283312890,
     "pool": false
   },
   {
@@ -61788,9 +65112,21 @@
     "pool": false
   },
   {
+    "name": "assets/rust.ai/agents/horse/model/double saddle/doublesaddle.prefab",
+    "guid": "8bcefb08b11e4e54b91acb0b6b88805e",
+    "hash": 345103910,
+    "pool": false
+  },
+  {
     "name": "assets/rust.ai/agents/npcplayer/humannpc/banditguard/npc_bandit_guard.prefab",
     "guid": "bf1c381ed645be947a38a3abeed077f5",
     "hash": 412745708,
+    "pool": false
+  },
+  {
+    "name": "assets/rust.ai/agents/npcplayer/humannpc/scientist/scientistnpc_arena.prefab",
+    "guid": "d53196dfbd487bb4ba4d945543402d92",
+    "hash": 3430609603,
     "pool": false
   },
   {
@@ -61887,6 +65223,12 @@
     "name": "assets/rust.ai/agents/npcplayer/humannpc/scientist/scientistnpc_roam.prefab",
     "guid": "adb1626eb0a3ab747aa5345479befccf",
     "hash": 4199494415,
+    "pool": false
+  },
+  {
+    "name": "assets/rust.ai/agents/npcplayer/humannpc/scientist/scientistnpc_roam_nvg_variant.prefab",
+    "guid": "6102c75813549854e88934e1125114c2",
+    "hash": 4134517186,
     "pool": false
   },
   {
@@ -62148,6 +65490,30 @@
     "pool": true
   },
   {
+    "name": "assets/rust.ai/arena/aiarena.prefab",
+    "guid": "34d40cb9e2793d943b114f664e21108b",
+    "hash": 1596319630,
+    "pool": false
+  },
+  {
+    "name": "assets/rust.ai/arena/aiarena_floor.prefab",
+    "guid": "d5c8371598fb6764fb05474f53df4f59",
+    "hash": 3215171687,
+    "pool": false
+  },
+  {
+    "name": "assets/rust.ai/arena/aiarena_wall.prefab",
+    "guid": "4f38d48b73250da488d3aa6f2ea0db0e",
+    "hash": 2249523178,
+    "pool": false
+  },
+  {
+    "name": "assets/rust.ai/arena/aiarena_wallhalf.prefab",
+    "guid": "3b0c34dd905c00448b62c717e6695d93",
+    "hash": 460192059,
+    "pool": false
+  },
+  {
     "name": "assets/rust.ai/cover/coverpointcubeblocker.prefab",
     "guid": "6f26ba78d9a65e44a8e031b7ef92689d",
     "hash": 4026589096,
@@ -62226,9 +65592,21 @@
     "pool": false
   },
   {
+    "name": "assets/rust.ai/nextai/ridablehorse/items/horse.saddle.double.item.prefab",
+    "guid": "ec38493ffb66b49faa68bd345f8e8a3f",
+    "hash": 1496735010,
+    "pool": false
+  },
+  {
     "name": "assets/rust.ai/nextai/ridablehorse/items/horse.saddle.item.prefab",
     "guid": "d98091b52cb6a8f4da819379ad65103b",
     "hash": 3997810714,
+    "pool": false
+  },
+  {
+    "name": "assets/rust.ai/nextai/ridablehorse/items/horse.saddle.single.item.prefab",
+    "guid": "9fa6127dd9c10418f9b0b6a1630fd0a6",
+    "hash": 4115357278,
     "pool": false
   },
   {
@@ -62598,6 +65976,30 @@
     "pool": false
   },
   {
+    "name": "assets/scenes/prefabs/nuclear missile silo/nms_hlod.prefab",
+    "guid": "f12a799f1e67341478c141b06bf44d34",
+    "hash": 4084326891,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/prefabs/nuclear missile silo/nuclear_missile_silo_ai.prefab",
+    "guid": "0dcbb407ba861ea438ad5c3fd32d8b71",
+    "hash": 3289764804,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/prefabs/nuclear missile silo/nuclear_missile_silo_fencenavmeshobstacles.prefab",
+    "guid": "989b6ec791124b24e9d2aa50e5140dc0",
+    "hash": 695370144,
+    "pool": false
+  },
+  {
+    "name": "assets/scenes/prefabs/nuclear missile silo/puzzle_security.prefab",
+    "guid": "801e7d15a5a5cfc4c837b3e7fac9ecda",
+    "hash": 3109546301,
+    "pool": false
+  },
+  {
     "name": "assets/scenes/prefabs/oilrig/oilrig_hlod.prefab",
     "guid": "20cc2e9c48eda0348a28fe89a98eb5cd",
     "hash": 812953098,
@@ -62901,6 +66303,24 @@
     "name": "assets/scenes/test/modelviewer/modelviewercamera.prefab",
     "guid": "b821fbc35603231429426885f8be0cb6",
     "hash": 4154640459,
+    "pool": false
+  },
+  {
+    "name": "assets/scripts/entity/misc/f15/f15_sectional.prefab",
+    "guid": "072ddc1efafc0a5449ef610eb6e31503",
+    "hash": 3638115533,
+    "pool": false
+  },
+  {
+    "name": "assets/scripts/entity/misc/f15/f15e.prefab",
+    "guid": "f74600851fa925947b2ec32da307e6c4",
+    "hash": 2100330297,
+    "pool": false
+  },
+  {
+    "name": "assets/scripts/entity/misc/f15/pfx_flarecountermeasure.prefab",
+    "guid": "3fd5605c2b4223347ad3271a153adf9b",
+    "hash": 1731786938,
     "pool": false
   },
   {

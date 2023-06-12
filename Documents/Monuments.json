@@ -37,7 +37,7 @@
       }
     }
   },
-  "assets/bundled/prefabs/autospawn/monument/cave/cave_small_medium.prefab": {
+  "assets/bundled/prefabs/autospawn/monument/cave/cave_small_easy.prefab": {
     "DisplayName": "",
     "shouldDisplayOnMap": false,
     "MinWorldSize": 0,
