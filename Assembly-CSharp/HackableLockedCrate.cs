@@ -53,7 +53,7 @@ public class HackableLockedCrate : LootContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Hack "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Hack ");
 				}
 				using (TimeWarning.New("RPC_Hack"))
 				{
@@ -188,7 +188,7 @@ public class HackableLockedCrate : LootContainer
 		{
 			Interface.CallHook("OnCrateLanded", this);
 		}
-		else if (UnityEngine.Physics.Raycast(new Ray(base.transform.position + Vector3.up * 0.5f, Vector3.down), out hitInfo, 1f, 1218511105))
+		else if (UnityEngine.Physics.Raycast(new Ray(base.transform.position + Vector3.up * 0.5f, Vector3.down), out hitInfo, 1f, 1084293377))
 		{
 			Effect.server.Run(landEffect.resourcePath, hitInfo.point, Vector3.up);
 			hasLanded = true;
@@ -202,8 +202,8 @@ public class HackableLockedCrate : LootContainer
 		SetFlag(Flags.Reserved1, b: false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Hack(RPCMessage msg)
 	{
 		if (!IsBeingHacked() && Interface.CallHook("CanHackCrate", msg.player, this) == null)

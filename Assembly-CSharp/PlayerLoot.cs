@@ -103,7 +103,7 @@ public class PlayerLoot : EntityComponent<BasePlayer>
 			base.baseEntity.ChatMessage("Stopping Looting because lootable doesn't exist!");
 			Clear();
 		}
-		else if (!entitySource.CanBeLooted(base.baseEntity))
+		else if (!entitySource.CanBeLooted(base.baseEntity) || entitySource.IsTransferring())
 		{
 			Clear();
 		}

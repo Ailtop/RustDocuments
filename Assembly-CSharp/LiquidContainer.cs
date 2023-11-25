@@ -71,7 +71,7 @@ public class LiquidContainer : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVDrink "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SVDrink ");
 				}
 				using (TimeWarning.New("SVDrink"))
 				{
@@ -104,6 +104,15 @@ public class LiquidContainer : ContainerIOEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override bool AllowWireConnections()
+	{
+		if (HasParent() && parentEntity.Get(base.isServer) != null && parentEntity.Get(base.isServer) is VehicleModuleStorage)
+		{
+			return true;
+		}
+		return base.AllowWireConnections();
 	}
 
 	public override bool IsRootEntity()
@@ -338,8 +347,8 @@ public class LiquidContainer : ContainerIOEntity
 		return GetLiquidItem().amount;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void SVDrink(RPCMessage rpc)
 	{
 		if (!rpc.player.metabolism.CanConsume() || Interface.CallHook("OnPlayerDrink", rpc.player, this) != null)

@@ -46,7 +46,7 @@ public class ResearchTable : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoResearch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoResearch ");
 				}
 				using (TimeWarning.New("DoResearch"))
 				{
@@ -130,9 +130,9 @@ public class ResearchTable : StorageContainer
 		return result;
 	}
 
-	public int ScrapForResearch(Item item)
+	public static int ScrapForResearch(Item item)
 	{
-		object obj = Interface.CallHook("OnResearchCostDetermine", item, this);
+		object obj = Interface.CallHook("OnResearchCostDetermine", item);
 		if (obj is int)
 		{
 			return (int)obj;
@@ -140,7 +140,7 @@ public class ResearchTable : StorageContainer
 		return ScrapForResearch(item.info);
 	}
 
-	public int ScrapForResearch(ItemDefinition info)
+	public static int ScrapForResearch(ItemDefinition info)
 	{
 		if (info.isRedirectOf != null)
 		{

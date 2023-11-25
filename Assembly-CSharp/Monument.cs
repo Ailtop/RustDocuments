@@ -6,6 +6,10 @@ public class Monument : TerrainPlacement
 
 	public float Fade = 10f;
 
+	public bool AutoCliffSplat = true;
+
+	public bool AutoCliffTopology = true;
+
 	protected void OnDrawGizmosSelected()
 	{
 		if (Radius == 0f)
@@ -76,7 +80,10 @@ public class Monument : TerrainPlacement
 		Vector3 v4 = localToWorld.MultiplyPoint3x4(offset + new Vector3(Radius, 0f, Radius));
 		TerrainMeta.SplatMap.ForEachParallel(v, v2, v3, v4, delegate(int x, int z)
 		{
-			GenerateCliffSplat.Process(x, z);
+			if (AutoCliffSplat)
+			{
+				GenerateCliffSplat.Process(x, z);
+			}
 			float normZ = TerrainMeta.SplatMap.Coordinate(z);
 			float normX = TerrainMeta.SplatMap.Coordinate(x);
 			Vector3 point = new Vector3(TerrainMeta.DenormalizeX(normX), 0f, TerrainMeta.DenormalizeZ(normZ));
@@ -212,7 +219,10 @@ public class Monument : TerrainPlacement
 		Vector3 v4 = localToWorld.MultiplyPoint3x4(offset + new Vector3(Radius, 0f, Radius));
 		TerrainMeta.TopologyMap.ForEachParallel(v, v2, v3, v4, delegate(int x, int z)
 		{
-			GenerateCliffTopology.Process(x, z);
+			if (AutoCliffTopology)
+			{
+				GenerateCliffTopology.Process(x, z);
+			}
 			float normZ = TerrainMeta.TopologyMap.Coordinate(z);
 			float normX = TerrainMeta.TopologyMap.Coordinate(x);
 			Vector3 point = new Vector3(TerrainMeta.DenormalizeX(normX), 0f, TerrainMeta.DenormalizeZ(normZ));

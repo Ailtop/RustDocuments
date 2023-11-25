@@ -4,8 +4,8 @@ using UnityEngine.Sprites;
 
 namespace UnityEngine.UI.Extensions;
 
-[RequireComponent(typeof(RectTransform))]
 [AddComponentMenu("UI/Extensions/Primitives/UILineRenderer")]
+[RequireComponent(typeof(RectTransform))]
 public class UILineRenderer : UIPrimitiveBase
 {
 	private enum SegmentType
@@ -31,9 +31,9 @@ public class UILineRenderer : UIPrimitiveBase
 		Catenary = 4
 	}
 
-	private const float MIN_MITER_JOIN = (float)Math.PI / 12f;
+	private const float MIN_MITER_JOIN = MathF.PI / 12f;
 
-	private const float MIN_BEVEL_NICE_JOIN = (float)Math.PI / 6f;
+	private const float MIN_BEVEL_NICE_JOIN = MathF.PI / 6f;
 
 	private static Vector2 UV_TOP_LEFT;
 
@@ -59,32 +59,32 @@ public class UILineRenderer : UIPrimitiveBase
 
 	private static Vector2[] fullUvs;
 
-	[SerializeField]
 	[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
+	[SerializeField]
 	internal Vector2[] m_points;
 
-	[SerializeField]
 	[Tooltip("Segments to be drawn\n This is a list of arrays of points")]
+	[SerializeField]
 	internal List<Vector2[]> m_segments;
 
 	[Tooltip("Thickness of the line")]
 	[SerializeField]
 	internal float lineThickness = 2f;
 
-	[SerializeField]
 	[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
+	[SerializeField]
 	internal bool relativeSize;
 
-	[SerializeField]
 	[Tooltip("Do the points identify a single line or split pairs of lines")]
+	[SerializeField]
 	internal bool lineList;
 
 	[Tooltip("Add end caps to each line\nMultiple caps when used with Line List")]
 	[SerializeField]
 	internal bool lineCaps;
 
-	[Tooltip("Resolution of the Bezier curve, different to line Resolution")]
 	[SerializeField]
+	[Tooltip("Resolution of the Bezier curve, different to line Resolution")]
 	internal int bezierSegmentsPerCurve = 10;
 
 	[Tooltip("The type of Join used between lines, Square/Mitre or Curved/Bevel")]
@@ -264,7 +264,7 @@ public class UILineRenderer : UIPrimitiveBase
 			{
 				Vector3 vector5 = list[k][1].position - list[k][2].position;
 				Vector3 vector6 = list[k + 1][2].position - list[k + 1][1].position;
-				float num5 = Vector2.Angle(vector5, vector6) * ((float)Math.PI / 180f);
+				float num5 = Vector2.Angle(vector5, vector6) * (MathF.PI / 180f);
 				float num6 = Mathf.Sign(Vector3.Cross(vector5.normalized, vector6.normalized).z);
 				float num7 = lineThickness / (2f * Mathf.Tan(num5 / 2f));
 				Vector3 position = list[k][2].position - vector5.normalized * num7 * num6;
@@ -272,7 +272,7 @@ public class UILineRenderer : UIPrimitiveBase
 				JoinType joinType = LineJoins;
 				if (joinType == JoinType.Miter)
 				{
-					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > (float)Math.PI / 12f)
+					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > MathF.PI / 12f)
 					{
 						list[k][2].position = position;
 						list[k][3].position = position2;
@@ -286,7 +286,7 @@ public class UILineRenderer : UIPrimitiveBase
 				}
 				if (joinType == JoinType.Bevel)
 				{
-					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > (float)Math.PI / 6f)
+					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > MathF.PI / 6f)
 					{
 						if (num6 < 0f)
 						{

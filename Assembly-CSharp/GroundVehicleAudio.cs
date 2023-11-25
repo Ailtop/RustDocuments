@@ -21,8 +21,8 @@ public abstract class GroundVehicleAudio : MonoBehaviour, IClientComponent
 	[SerializeField]
 	private float wheelRatioMultiplier = 600f;
 
-	[Header("Water")]
 	[SerializeField]
+	[Header("Water")]
 	private SoundDefinition waterSplashSoundDef;
 
 	[SerializeField]
@@ -31,11 +31,11 @@ public abstract class GroundVehicleAudio : MonoBehaviour, IClientComponent
 	[SerializeField]
 	private float waterSoundsMaxSpeed = 10f;
 
-	[SerializeField]
 	[Header("Brakes")]
+	[SerializeField]
 	private SoundDefinition brakeSoundDef;
 
-	[SerializeField]
 	[Header("Lights")]
+	[SerializeField]
 	private SoundDefinition lightsToggleSound;
 }

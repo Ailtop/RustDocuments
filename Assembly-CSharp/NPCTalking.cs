@@ -42,7 +42,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ConversationAction "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ConversationAction ");
 				}
 				using (TimeWarning.New("ConversationAction"))
 				{
@@ -82,7 +82,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_BeginTalking "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_BeginTalking ");
 				}
 				using (TimeWarning.New("Server_BeginTalking"))
 				{
@@ -122,7 +122,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_EndTalking "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_EndTalking ");
 				}
 				using (TimeWarning.New("Server_EndTalking"))
 				{
@@ -162,7 +162,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_ResponsePressed "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_ResponsePressed ");
 				}
 				using (TimeWarning.New("Server_ResponsePressed"))
 				{
@@ -272,9 +272,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_BeginTalking(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -313,8 +313,8 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		Interface.CallHook("OnNpcConversationEnded", this, msg.player);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	public void ConversationAction(RPCMessage msg)
 	{
@@ -336,9 +336,9 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	public void Server_ResponsePressed(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -411,7 +411,7 @@ public class NPCTalking : NPCShopKeeper, IConversationProvider
 				}
 			}
 			int num = nPCConversationResultAction.scrapCost;
-			List<Item> list = player.inventory.FindItemIDs(itemDefinition.itemid);
+			List<Item> list = player.inventory.FindItemsByItemID(itemDefinition.itemid);
 			foreach (Item item in list)
 			{
 				num -= item.amount;

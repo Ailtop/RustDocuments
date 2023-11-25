@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
@@ -30,7 +32,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 
 	public virtual bool HasRangeLimit => true;
 
-	protected virtual int mask => 1236478737;
+	protected virtual int mask => 1237003025;
 
 	public Vector3 CurrentVelocity { get; set; }
 
@@ -40,7 +42,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		{
 			return float.PositiveInfinity;
 		}
-		float a = Mathf.Sin((float)Math.PI / 2f) * speed * speed / (0f - Physics.gravity.y * gravityModifier);
+		float a = Mathf.Sin(MathF.PI / 2f) * speed * speed / (0f - Physics.gravity.y * gravityModifier);
 		float b = speed * maxFuseTime;
 		return Mathf.Min(a, b);
 	}
@@ -53,6 +55,11 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		}
 	}
 
+	public virtual bool ShouldSwim()
+	{
+		return swimScale != Vector3.zero;
+	}
+
 	public virtual bool DoMovement()
 	{
 		if (impacted)
@@ -61,7 +68,7 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 		}
 		CurrentVelocity += Physics.gravity * gravityModifier * Time.fixedDeltaTime * Time.timeScale;
 		Vector3 currentVelocity = CurrentVelocity;
-		if (swimScale != Vector3.zero)
+		if (ShouldSwim())
 		{
 			if (swimRandom == 0f)
 			{
@@ -72,21 +79,29 @@ public class ServerProjectile : EntityComponent<BaseEntity>, IServerComponent
 			direction = base.transform.InverseTransformDirection(direction);
 			currentVelocity += direction;
 		}
+		List<RaycastHit> obj = Pool.GetList<RaycastHit>();
 		float num2 = currentVelocity.magnitude * Time.fixedDeltaTime;
 		Vector3 position = base.transform.position;
-		if (GamePhysics.Trace(new Ray(position, currentVelocity.normalized), radius, out var hitInfo, num2 + scanRange, mask, QueryTriggerInteraction.Ignore))
+		GamePhysics.TraceAll(new Ray(position, currentVelocity.normalized), radius, obj, num2 + scanRange, mask, QueryTriggerInteraction.Ignore);
+		foreach (RaycastHit item in obj)
 		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
-			if (IsAValidHit(entity))
+			BaseEntity entity = RaycastHitEx.GetEntity(item);
+			if ((!(entity != null) || !entity.isClient) && IsAValidHit(entity))
 			{
-				base.transform.position += base.transform.forward * Mathf.Max(0f, hitInfo.distance - 0.1f);
-				GetComponent<IProjectileImpact>()?.ProjectileImpact(hitInfo, position);
-				impacted = true;
-				return false;
+				ColliderInfo colliderInfo = ((item.collider != null) ? item.collider.GetComponent<ColliderInfo>() : null);
+				if (colliderInfo == null || colliderInfo.HasFlag(ColliderInfo.Flags.Shootable))
+				{
+					base.transform.position += base.transform.forward * Mathf.Max(0f, item.distance - 0.1f);
+					GetComponent<IProjectileImpact>()?.ProjectileImpact(item, position);
+					impacted = true;
+					Pool.FreeList(ref obj);
+					return false;
+				}
 			}
 		}
 		base.transform.position += base.transform.forward * num2;
 		base.transform.rotation = Quaternion.LookRotation(currentVelocity.normalized);
+		Pool.FreeList(ref obj);
 		return true;
 	}
 

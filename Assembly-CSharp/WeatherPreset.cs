@@ -18,6 +18,9 @@ public class WeatherPreset : ScriptableObject
 
 	public TOD_CloudParameters Clouds;
 
+	[Range(0f, 10f)]
+	public float OceanScale;
+
 	public void Apply(TOD_Sky sky)
 	{
 		sky.Atmosphere.RayleighMultiplier = Atmosphere.RayleighMultiplier;
@@ -79,6 +82,7 @@ public class WeatherPreset : ScriptableObject
 		Clouds.Saturation = -1f;
 		Clouds.Scattering = -1f;
 		Clouds.Brightness = -1f;
+		OceanScale = -1f;
 	}
 
 	public void Set(WeatherPreset other)
@@ -102,6 +106,7 @@ public class WeatherPreset : ScriptableObject
 		Clouds.Saturation = other.Clouds.Saturation;
 		Clouds.Scattering = other.Clouds.Scattering;
 		Clouds.Brightness = other.Clouds.Brightness;
+		OceanScale = other.OceanScale;
 	}
 
 	public override string ToString()
@@ -126,6 +131,7 @@ public class WeatherPreset : ScriptableObject
 		stringBuilder.AppendLine($"Saturation {Clouds.Saturation}");
 		stringBuilder.AppendLine($"Scattering {Clouds.Scattering}");
 		stringBuilder.AppendLine($"Brightness {Clouds.Brightness}");
+		stringBuilder.AppendLine($"Ocean {OceanScale}");
 		return stringBuilder.ToString();
 	}
 
@@ -150,6 +156,7 @@ public class WeatherPreset : ScriptableObject
 		Fade(ref Clouds.Saturation, a.Clouds.Saturation, b.Clouds.Saturation, t);
 		Fade(ref Clouds.Scattering, a.Clouds.Scattering, b.Clouds.Scattering, t);
 		Fade(ref Clouds.Brightness, a.Clouds.Brightness, b.Clouds.Brightness, t);
+		Fade(ref OceanScale, a.OceanScale, b.OceanScale, t);
 	}
 
 	public void Override(WeatherPreset other)
@@ -173,6 +180,7 @@ public class WeatherPreset : ScriptableObject
 		Override(ref Clouds.Saturation, other.Clouds.Saturation);
 		Override(ref Clouds.Scattering, other.Clouds.Scattering);
 		Override(ref Clouds.Brightness, other.Clouds.Brightness);
+		Override(ref OceanScale, other.OceanScale);
 	}
 
 	public void Max(WeatherPreset other)
@@ -196,6 +204,7 @@ public class WeatherPreset : ScriptableObject
 		Max(ref Clouds.Saturation, other.Clouds.Saturation);
 		Max(ref Clouds.Scattering, other.Clouds.Scattering);
 		Max(ref Clouds.Brightness, other.Clouds.Brightness);
+		Max(ref OceanScale, other.OceanScale);
 	}
 
 	public void Min(WeatherPreset other)
@@ -219,6 +228,7 @@ public class WeatherPreset : ScriptableObject
 		Min(ref Clouds.Saturation, other.Clouds.Saturation);
 		Min(ref Clouds.Scattering, other.Clouds.Scattering);
 		Min(ref Clouds.Brightness, other.Clouds.Brightness);
+		Min(ref OceanScale, other.OceanScale);
 	}
 
 	private void Fade(ref float x, float a, float b, float t)

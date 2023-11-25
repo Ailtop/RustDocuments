@@ -17,7 +17,7 @@ public class PlayerCorpse : LootableCorpse
 
 	public override bool OnStartBeingLooted(BasePlayer baseEntity)
 	{
-		if (baseEntity.InSafeZone() && baseEntity.userID != playerSteamID)
+		if ((baseEntity.InSafeZone() || InSafeZone()) && baseEntity.userID != playerSteamID)
 		{
 			return false;
 		}

@@ -37,7 +37,7 @@ public class PathInterpolator
 		Points = points;
 		MinIndex = DefaultMinIndex;
 		MaxIndex = DefaultMaxIndex;
-		Circular = Vector3.Distance(points[0], points[points.Length - 1]) < 0.1f;
+		Circular = Vector3.Distance(points[0], points[^1]) < 0.1f;
 	}
 
 	public PathInterpolator(Vector3[] points, Vector3[] tangents)
@@ -220,6 +220,20 @@ public class PathInterpolator
 			throw new Exception("Tangents have not been calculated yet or are outdated.");
 		}
 		return Tangents[MaxIndex];
+	}
+
+	public Vector3 GetPointByIndex(int i)
+	{
+		if (!Circular)
+		{
+			return Points[Mathf.Clamp(i, 0, Points.Length - 1)];
+		}
+		return Points[(i % Points.Length + Points.Length) % Points.Length];
+	}
+
+	public Vector3 GetTangentByIndex(int i)
+	{
+		return (GetPoint(i + 1) - GetPoint(i - 1)).normalized;
 	}
 
 	public Vector3 GetPoint(float distance)

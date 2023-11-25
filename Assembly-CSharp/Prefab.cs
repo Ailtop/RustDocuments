@@ -208,7 +208,7 @@ public class Prefab : IComparable<Prefab>
 		return new Prefab(text, prefab, manager, attribute);
 	}
 
-	public static Prefab[] Load(string folder, GameManager manager = null, PrefabAttribute.Library attribute = null, bool useProbabilities = true)
+	public static Prefab[] Load(string folder, GameManager manager = null, PrefabAttribute.Library attribute = null, bool useProbabilities = true, bool useWorldConfig = true)
 	{
 		if (string.IsNullOrEmpty(folder))
 		{
@@ -222,7 +222,7 @@ public class Prefab : IComparable<Prefab>
 		{
 			attribute = DefaultAttribute;
 		}
-		string[] array = FindPrefabNames(folder, useProbabilities);
+		string[] array = FindPrefabNames(folder, useProbabilities, useWorldConfig);
 		Prefab[] array2 = new Prefab[array.Length];
 		for (int i = 0; i < array2.Length; i++)
 		{
@@ -233,13 +233,13 @@ public class Prefab : IComparable<Prefab>
 		return array2;
 	}
 
-	public static Prefab<T>[] Load<T>(string folder, GameManager manager = null, PrefabAttribute.Library attribute = null, bool useProbabilities = true) where T : Component
+	public static Prefab<T>[] Load<T>(string folder, GameManager manager = null, PrefabAttribute.Library attribute = null, bool useProbabilities = true, bool useWorldConfig = true) where T : Component
 	{
 		if (string.IsNullOrEmpty(folder))
 		{
 			return null;
 		}
-		return Load<T>(FindPrefabNames(folder, useProbabilities), manager, attribute);
+		return Load<T>(FindPrefabNames(folder, useProbabilities, useWorldConfig), manager, attribute);
 	}
 
 	public static Prefab<T>[] Load<T>(string[] names, GameManager manager = null, PrefabAttribute.Library attribute = null) where T : Component
@@ -312,7 +312,7 @@ public class Prefab : IComparable<Prefab>
 		return new Prefab<T>(text, gameObject, component, manager, attribute);
 	}
 
-	private static string[] FindPrefabNames(string strPrefab, bool useProbabilities = false)
+	private static string[] FindPrefabNames(string strPrefab, bool useProbabilities = false, bool useWorldConfig = false)
 	{
 		strPrefab = strPrefab.TrimEnd('/').ToLower();
 		GameObject[] array = FileSystem.LoadPrefabs(strPrefab + "/");
@@ -320,17 +320,21 @@ public class Prefab : IComparable<Prefab>
 		GameObject[] array2 = array;
 		foreach (GameObject gameObject in array2)
 		{
-			string item = strPrefab + "/" + gameObject.name.ToLower() + ".prefab";
+			string text = strPrefab + "/" + gameObject.name.ToLower() + ".prefab";
+			if (useWorldConfig && !World.Config.IsPrefabAllowed(text))
+			{
+				continue;
+			}
 			if (!useProbabilities)
 			{
-				list.Add(item);
+				list.Add(text);
 				continue;
 			}
 			PrefabParameters component = gameObject.GetComponent<PrefabParameters>();
 			int num = ((!component) ? 1 : component.Count);
 			for (int j = 0; j < num; j++)
 			{
-				list.Add(item);
+				list.Add(text);
 			}
 		}
 		list.Sort();

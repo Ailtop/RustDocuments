@@ -21,13 +21,13 @@ public class PlanterBox : StorageContainer, ISplashable
 
 	private static readonly float MaximumSaturationTriggerLevel = ConVar.Server.optimalPlanterQualitySaturation + 0.1f;
 
-	private TimeCachedValue<float> sunExposure;
+	public TimeCachedValue<float> sunExposure;
 
-	private TimeCachedValue<float> artificialLightExposure;
+	public TimeCachedValue<float> artificialLightExposure;
 
-	private TimeCachedValue<float> plantTemperature;
+	public TimeCachedValue<float> plantTemperature;
 
-	private TimeCachedValue<float> plantArtificalTemperature;
+	public TimeCachedValue<float> plantArtificalTemperature;
 
 	private TimeSince lastSplashNetworkUpdate;
 
@@ -54,7 +54,7 @@ public class PlanterBox : StorageContainer, ISplashable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestSaturationUpdate "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RequestSaturationUpdate ");
 				}
 				using (TimeWarning.New("RPC_RequestSaturationUpdate"))
 				{
@@ -142,6 +142,15 @@ public class PlanterBox : StorageContainer, ISplashable
 		if (ItemIsFertilizer(item))
 		{
 			return true;
+		}
+		return false;
+	}
+
+	public override bool CanPickup(BasePlayer player)
+	{
+		if (base.CanPickup(player))
+		{
+			return !HasPlants();
 		}
 		return false;
 	}
@@ -329,6 +338,18 @@ public class PlanterBox : StorageContainer, ISplashable
 	private float CalculatePlantTemperature()
 	{
 		return Mathf.Max(Climate.GetTemperature(base.transform.position), 15f);
+	}
+
+	private bool HasPlants()
+	{
+		foreach (BaseEntity child in children)
+		{
+			if (child is GrowableEntity)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void CalculateRainFactor()

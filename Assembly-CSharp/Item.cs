@@ -148,6 +148,8 @@ public class Item
 		}
 	}
 
+	public int? ammoCount { get; set; }
+
 	public int despawnMultiplier
 	{
 		get
@@ -641,7 +643,6 @@ public class Item
 		{
 			bool flag = iTargetPos == -1;
 			ItemContainer itemContainer = parent;
-			IItemContainerEntity itemContainerEntity = default(IItemContainerEntity);
 			if (iTargetPos == -1)
 			{
 				if (allowStack && info.stackable > 1)
@@ -656,16 +657,12 @@ public class Item
 						}
 					}
 				}
-				if (iTargetPos == -1)
+				if (iTargetPos == -1 && newcontainer.GetEntityOwner(returnHeldEntity: true) is IItemContainerEntity itemContainerEntity)
 				{
-					itemContainerEntity = newcontainer.GetEntityOwner(returnHeldEntity: true) as IItemContainerEntity;
-					if (itemContainerEntity != null)
+					iTargetPos = itemContainerEntity.GetIdealSlot(sourcePlayer, this);
+					if (iTargetPos == int.MinValue)
 					{
-						iTargetPos = itemContainerEntity.GetIdealSlot(sourcePlayer, this);
-						if (iTargetPos == int.MinValue)
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 				if (iTargetPos == -1)
@@ -798,9 +795,9 @@ public class Item
 				Item item = SplitItem(newcontainer.maxStackSize);
 				if (item != null && !item.MoveToContainer(newcontainer, iTargetPos, allowStack: false, ignoreStackLimit: false, sourcePlayer) && (itemContainer == null || !item.MoveToContainer(itemContainer, -1, allowStack: true, ignoreStackLimit: false, sourcePlayer)))
 				{
-					Interface.CallHook("OnItemStacked", itemContainerEntity, this, newcontainer);
 					item.Drop(newcontainer.dropPosition, newcontainer.dropVelocity);
 				}
+				Interface.CallHook("OnItemStacked", item, this, newcontainer);
 				return true;
 			}
 			if (!newcontainer.CanAccept(this))
@@ -893,7 +890,7 @@ public class Item
 
 	public BaseEntity DropAndTossUpwards(Vector3 vPos, float force = 2f)
 	{
-		float f = UnityEngine.Random.value * (float)Math.PI * 2f;
+		float f = UnityEngine.Random.value * MathF.PI * 2f;
 		return Drop(vVelocity: new Vector3(Mathf.Sin(f), 1f, Mathf.Cos(f)) * force, vPos: vPos + Vector3.up * 0.1f);
 	}
 
@@ -986,6 +983,15 @@ public class Item
 			return null;
 		}
 		return parent.GetOwnerPlayer();
+	}
+
+	public bool IsBackpack()
+	{
+		if (info != null)
+		{
+			return (info.flags & ItemDefinition.Flag.Backpack) != 0;
+		}
+		return false;
 	}
 
 	public Item SplitItem(int split_Amount)
@@ -1263,7 +1269,18 @@ public class Item
 
 	public override string ToString()
 	{
-		return "Item." + info.shortname + "x" + amount + "." + uid;
+		string[] obj = new string[6]
+		{
+			"Item.",
+			info.shortname,
+			"x",
+			amount.ToString(),
+			".",
+			null
+		};
+		ItemId itemId = uid;
+		obj[5] = itemId.ToString();
+		return string.Concat(obj);
 	}
 
 	public Item FindItem(ItemId iUID)
@@ -1294,6 +1311,11 @@ public class Item
 		return num;
 	}
 
+	public GameObjectRef GetWorldModel()
+	{
+		return info.GetWorldModel(amount);
+	}
+
 	public virtual ProtoBuf.Item Save(bool bIncludeContainer = false, bool bIncludeOwners = true)
 	{
 		dirty = false;
@@ -1313,6 +1335,15 @@ public class Item
 		item.streamerName = streamerName;
 		item.text = text;
 		item.cooktime = cookTimeLeft;
+		item.ammoCount = 0;
+		if (heldEntity.uid.IsValid)
+		{
+			BaseProjectile baseProjectile = GetHeldEntity() as BaseProjectile;
+			if (baseProjectile != null)
+			{
+				item.ammoCount = baseProjectile.primaryMagazine.contents + 1;
+			}
+		}
 		if (hasCondition)
 		{
 			item.conditionData = Facepunch.Pool.Get<ProtoBuf.Item.ConditionData>();
@@ -1344,6 +1375,14 @@ public class Item
 		flags = (Flag)load.flags;
 		worldEnt.uid = load.worldEntity;
 		heldEntity.uid = load.heldEntity;
+		if (load.ammoCount == 0)
+		{
+			ammoCount = null;
+		}
+		else
+		{
+			ammoCount = load.ammoCount - 1;
+		}
 		if (isServer)
 		{
 			Network.Net.sv.RegisterUID(uid.Value);

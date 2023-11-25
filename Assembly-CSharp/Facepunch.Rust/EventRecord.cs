@@ -164,7 +164,7 @@ public class EventRecord : Pool.IPooled
 		{
 			return this;
 		}
-		if (entity is BasePlayer basePlayer && !basePlayer.IsNpc && !basePlayer.IsBot)
+		if (entity is BasePlayer { IsNpc: false, IsBot: false } basePlayer)
 		{
 			string userWipeId = SingletonComponent<ServerMgr>.Instance.persistance.GetUserWipeId(basePlayer.userID);
 			Data.Add(new EventRecordField(key, "_userid")
@@ -186,7 +186,7 @@ public class EventRecord : Pool.IPooled
 		if (entity is BaseProjectile baseProjectile)
 		{
 			Item item = baseProjectile.GetItem();
-			if (item != null && (item.contents?.itemList?.Count ?? 0) > 0)
+			if (item != null && (item.contents?.itemList?.Count).GetValueOrDefault() > 0)
 			{
 				List<string> obj = Pool.GetList<string>();
 				foreach (Item item2 in item.contents.itemList)

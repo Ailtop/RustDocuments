@@ -3,7 +3,7 @@ using ProtoBuf;
 
 namespace CompanionServer.Handlers;
 
-public class TeamInfo : BaseHandler<AppEmpty>
+public class TeamInfo : BasePlayerHandler<AppEmpty>
 {
 	public override void Execute()
 	{

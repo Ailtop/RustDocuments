@@ -415,7 +415,7 @@ public class Climate : SingletonComponent<Climate>
 
 	private uint GetSeedFromLong(long val)
 	{
-		uint x = (uint)((val % 4294967295L + uint.MaxValue) % 4294967295L);
+		uint x = (uint)((val % uint.MaxValue + uint.MaxValue) % uint.MaxValue);
 		SeedRandom.Wanghash(ref x);
 		SeedRandom.Wanghash(ref x);
 		SeedRandom.Wanghash(ref x);

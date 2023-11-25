@@ -48,6 +48,41 @@ public class DiagnosticsConSys : ConsoleSystem
 		WriteTextToFile(targetFolder + "UnityEngine.Animators.Counts.Enabled.txt", stringBuilder3.ToString());
 	}
 
+	[ServerVar]
+	[ClientVar]
+	public static void dump(Arg args)
+	{
+		if (Directory.Exists("diagnostics"))
+		{
+			Directory.CreateDirectory("diagnostics");
+		}
+		int num = 1;
+		while (Directory.Exists("diagnostics/" + num))
+		{
+			num++;
+		}
+		Directory.CreateDirectory("diagnostics/" + num);
+		string targetFolder = "diagnostics/" + num + "/";
+		DumpLODGroups(targetFolder);
+		DumpSystemInformation(targetFolder);
+		DumpGameObjects(targetFolder);
+		DumpObjects(targetFolder);
+		DumpEntities(targetFolder);
+		DumpNetwork(targetFolder);
+		DumpPhysics(targetFolder);
+		DumpAnimators(targetFolder);
+	}
+
+	private static void DumpSystemInformation(string targetFolder)
+	{
+		WriteTextToFile(targetFolder + "System.Info.txt", SystemInfoGeneralText.currentInfo);
+	}
+
+	private static void WriteTextToFile(string file, string text)
+	{
+		File.WriteAllText(file, text);
+	}
+
 	private static void DumpEntities(string targetFolder)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
@@ -324,39 +359,5 @@ public class DiagnosticsConSys : ConsoleSystem
 		{
 			DumpGameObjectRecursive(str, tx.GetChild(l), indent + 2, includeComponents);
 		}
-	}
-
-	[ClientVar]
-	[ServerVar]
-	public static void dump(Arg args)
-	{
-		if (Directory.Exists("diagnostics"))
-		{
-			Directory.CreateDirectory("diagnostics");
-		}
-		int i;
-		for (i = 1; Directory.Exists("diagnostics/" + i); i++)
-		{
-		}
-		Directory.CreateDirectory("diagnostics/" + i);
-		string targetFolder = "diagnostics/" + i + "/";
-		DumpLODGroups(targetFolder);
-		DumpSystemInformation(targetFolder);
-		DumpGameObjects(targetFolder);
-		DumpObjects(targetFolder);
-		DumpEntities(targetFolder);
-		DumpNetwork(targetFolder);
-		DumpPhysics(targetFolder);
-		DumpAnimators(targetFolder);
-	}
-
-	private static void DumpSystemInformation(string targetFolder)
-	{
-		WriteTextToFile(targetFolder + "System.Info.txt", SystemInfoGeneralText.currentInfo);
-	}
-
-	private static void WriteTextToFile(string file, string text)
-	{
-		File.WriteAllText(file, text);
 	}
 }

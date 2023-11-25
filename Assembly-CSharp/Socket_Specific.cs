@@ -6,6 +6,8 @@ public class Socket_Specific : Socket_Base
 
 	public string targetSocketName;
 
+	public bool blockPlacementOnChildEntities;
+
 	private void OnDrawGizmos()
 	{
 		Gizmos.matrix = base.transform.localToWorldMatrix;
@@ -26,6 +28,10 @@ public class Socket_Specific : Socket_Base
 		}
 		Socket_Specific_Female socket_Specific_Female = target.socket as Socket_Specific_Female;
 		if (socket_Specific_Female == null)
+		{
+			return false;
+		}
+		if (blockPlacementOnChildEntities && target.entity != null && target.entity.GetParentEntity() != null)
 		{
 			return false;
 		}

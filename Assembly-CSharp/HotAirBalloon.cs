@@ -10,13 +10,33 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
+public class HotAirBalloon : BaseCombatEntity, VehicleSpawner.IVehicleSpawnUser, SamSite.ISamSiteTarget
 {
-	protected const Flags Flag_HasFuel = Flags.Reserved6;
+	[Serializable]
+	public struct UpgradeOption
+	{
+		public ItemDefinition TokenItem;
 
-	protected const Flags Flag_HalfInflated = Flags.Reserved1;
+		public Translate.Phrase Title;
 
-	protected const Flags Flag_FullInflated = Flags.Reserved2;
+		public Translate.Phrase Description;
+
+		public Sprite Icon;
+
+		public int order;
+	}
+
+	public const Flags Flag_HasFuel = Flags.Reserved6;
+
+	public const Flags Flag_Grounded = Flags.Reserved7;
+
+	public const Flags Flag_CanModifyEquipment = Flags.Reserved8;
+
+	public const Flags Flag_HalfInflated = Flags.Reserved1;
+
+	public const Flags Flag_FullInflated = Flags.Reserved2;
+
+	public const Flags Flag_OnlyOwnerEntry = Flags.Locked;
 
 	public Transform centerOfMass;
 
@@ -59,6 +79,9 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public GameObject[] killTriggers;
 
+	[Header("Upgrades")]
+	public List<UpgradeOption> UpgradeOptions;
+
 	public EntityFuelSystem fuelSystem;
 
 	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
@@ -66,6 +89,8 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	[ServerVar(Help = "How long before a HAB loses all its health while outside")]
 	public static float outsidedecayminutes = 180f;
+
+	public float NextUpgradeTime;
 
 	public float windForce = 30000f;
 
@@ -80,6 +105,8 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	[ServerVar]
 	public static float serviceCeiling = 200f;
 
+	public Vector3 lastFailedDecayPosition = Vector3.zero;
+
 	public float currentBuoyancy;
 
 	public float lastBlastTime;
@@ -88,9 +115,19 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public bool grounded;
 
+	public float spawnTime = -1f;
+
+	public float safeAreaRadius;
+
+	public Vector3 safeAreaOrigin;
+
 	public bool IsFullyInflated => inflationLevel >= 1f;
 
+	public bool Grounded => HasFlag(Flags.Reserved7);
+
 	public SamSite.SamTargetType SAMTargetType => SamSite.targetTypeVehicle;
+
+	public bool IsClient => base.isClient;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -101,7 +138,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - EngineSwitch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - EngineSwitch ");
 				}
 				using (TimeWarning.New("EngineSwitch"))
 				{
@@ -137,7 +174,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuel ");
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -157,6 +194,42 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 					{
 						Debug.LogException(exception2);
 						player.Kick("RPC Error in RPC_OpenFuel");
+					}
+				}
+				return true;
+			}
+			if (rpc == 2441951484u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_ReqEquipItem ");
+				}
+				using (TimeWarning.New("RPC_ReqEquipItem"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.IsVisible.Test(2441951484u, "RPC_ReqEquipItem", this, player, 3f))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg4 = rPCMessage;
+							RPC_ReqEquipItem(msg4);
+						}
+					}
+					catch (Exception exception3)
+					{
+						Debug.LogException(exception3);
+						player.Kick("RPC Error in RPC_ReqEquipItem");
 					}
 				}
 				return true;
@@ -188,9 +261,66 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		}
 	}
 
+	public bool CanModifyEquipment()
+	{
+		if (base.isServer && UnityEngine.Time.time < NextUpgradeTime)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public void DelayNextUpgrade(float delay)
+	{
+		if (UnityEngine.Time.time + delay > NextUpgradeTime)
+		{
+			NextUpgradeTime = UnityEngine.Time.time + delay;
+		}
+	}
+
+	public int GetEquipmentCount(ItemModHABEquipment item)
+	{
+		int num = 0;
+		for (int num2 = children.Count - 1; num2 >= 0; num2--)
+		{
+			BaseEntity baseEntity = children[num2];
+			if (!(baseEntity == null) && baseEntity.prefabID == item.Prefab.resourceID)
+			{
+				num++;
+			}
+		}
+		return num;
+	}
+
+	public void RemoveItemsOfType(ItemModHABEquipment item)
+	{
+		for (int num = children.Count - 1; num >= 0; num--)
+		{
+			BaseEntity baseEntity = children[num];
+			if (!(baseEntity == null) && baseEntity.prefabID == item.Prefab.resourceID)
+			{
+				baseEntity.Kill();
+			}
+		}
+	}
+
 	public bool WaterLogged()
 	{
-		return WaterLevel.Test(engineHeight.position, waves: true, this);
+		return WaterLevel.Test(engineHeight.position, waves: true, volumes: true, this);
+	}
+
+	public bool OnlyOwnerAccessible()
+	{
+		return HasFlag(Flags.Locked);
+	}
+
+	public override void OnAttacked(HitInfo info)
+	{
+		if (IsSafe() && !info.damageTypes.Has(DamageType.Decay))
+		{
+			info.damageTypes.ScaleAll(0f);
+		}
+		base.OnAttacked(info);
 	}
 
 	protected override void OnChildAdded(BaseEntity child)
@@ -205,6 +335,26 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			if (child.prefabID == storageUnitPrefab.GetEntity().prefabID)
 			{
 				storageUnitInstance.Set((StorageContainer)child);
+				_ = storageUnitInstance.Get(serverside: true).inventory;
+			}
+			bool isLoadingSave = Rust.Application.isLoadingSave;
+			HotAirBalloonEquipment hotAirBalloonEquipment = child as HotAirBalloonEquipment;
+			if (hotAirBalloonEquipment != null)
+			{
+				hotAirBalloonEquipment.Added(this, isLoadingSave);
+			}
+		}
+	}
+
+	protected override void OnChildRemoved(BaseEntity child)
+	{
+		base.OnChildRemoved(child);
+		if (base.isServer)
+		{
+			HotAirBalloonEquipment hotAirBalloonEquipment = child as HotAirBalloonEquipment;
+			if (hotAirBalloonEquipment != null)
+			{
+				hotAirBalloonEquipment.Removed(this);
 			}
 		}
 	}
@@ -226,7 +376,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		}
 		if (IsFullyInflated)
 		{
-			return !BaseVehicle.InSafeZone(triggers, base.transform.position);
+			return !InSafeZone();
 		}
 		return false;
 	}
@@ -239,6 +389,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
+		ClearOwnerEntry();
 		SetFlag(Flags.On, b: false);
 	}
 
@@ -246,7 +397,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 	public void RPC_OpenFuel(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (!(player == null))
+		if (!(player == null) && (!OnlyOwnerAccessible() || !(msg.player != creatorEntity)))
 		{
 			fuelSystem.LootFuel(player);
 		}
@@ -279,21 +430,46 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public void DecayTick()
 	{
-		if (base.healthFraction != 0f && !IsFullyInflated && !(UnityEngine.Time.time < lastBlastTime + 600f))
+		if (base.healthFraction == 0f)
+		{
+			return;
+		}
+		if (IsFullyInflated)
+		{
+			bool flag = true;
+			if (lastFailedDecayPosition != Vector3.zero && Distance(lastFailedDecayPosition) < 2f)
+			{
+				flag = false;
+			}
+			lastFailedDecayPosition = base.transform.position;
+			if (flag)
+			{
+				return;
+			}
+			myRigidbody.AddForceAtPosition(Vector3.up * (0f - UnityEngine.Physics.gravity.y) * myRigidbody.mass * 20f, buoyancyPoint.position, ForceMode.Force);
+			myRigidbody.AddForceAtPosition(UnityEngine.Random.onUnitSphere.WithY(0f) * 20f, buoyancyPoint.position, ForceMode.Force);
+			Debug.Log("Bump");
+		}
+		if (!(UnityEngine.Time.time < lastBlastTime + 600f))
 		{
 			float num = 1f / outsidedecayminutes;
-			if (IsOutside())
+			if (IsOutside() || IsFullyInflated)
 			{
 				Hurt(MaxHealth() * num, DamageType.Decay, this, useProtection: false);
 			}
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void EngineSwitch(RPCMessage msg)
 	{
-		if (Interface.CallHook("OnHotAirBalloonToggle", this, msg.player) == null)
+		if (Interface.CallHook("OnHotAirBalloonToggle", this, msg.player) != null)
+		{
+			return;
+		}
+		BasePlayer player = msg.player;
+		if (!(player == null) && (!OnlyOwnerAccessible() || !(player != creatorEntity)))
 		{
 			bool b = msg.read.Bit();
 			SetFlag(Flags.On, b);
@@ -317,14 +493,11 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 
 	public void UpdateIsGrounded()
 	{
-		if (!(lastBlastTime + 5f > UnityEngine.Time.time))
-		{
-			List<Collider> obj = Facepunch.Pool.GetList<Collider>();
-			GamePhysics.OverlapSphere(groundSample.transform.position, 1.25f, obj, 1218511105);
-			grounded = obj.Count > 0;
-			CheckGlobal(flags);
-			Facepunch.Pool.FreeList(ref obj);
-		}
+		List<Collider> obj = Facepunch.Pool.GetList<Collider>();
+		GamePhysics.OverlapSphere(groundSample.transform.position, 1.25f, obj, 1218511105);
+		grounded = obj.Count > 0;
+		CheckGlobal(flags);
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public override void OnFlagsChanged(Flags old, Flags next)
@@ -336,7 +509,7 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		}
 	}
 
-	private void CheckGlobal(Flags flags)
+	public void CheckGlobal(Flags flags)
 	{
 		bool wants = flags.HasFlag(Flags.On) || flags.HasFlag(Flags.Reserved2) || flags.HasFlag(Flags.Reserved1) || !grounded;
 		EnableGlobalBroadcast(wants);
@@ -357,6 +530,8 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			fuelSystem.TryUseFuel(UnityEngine.Time.fixedDeltaTime, fuelPerSec);
 		}
 		SetFlag(Flags.Reserved6, fuelSystem.HasFuel());
+		SetFlag(Flags.Reserved7, grounded);
+		SetFlag(Flags.Reserved8, CanModifyEquipment());
 		bool flag = (IsFullyInflated && myRigidbody.velocity.y < 0f) || myRigidbody.velocity.y < 0.75f;
 		GameObject[] array = killTriggers;
 		foreach (GameObject gameObject in array)
@@ -435,6 +610,10 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 			myRigidbody.AddForceAtPosition(vector * 0.1f, buoyancyPoint.position, ForceMode.Force);
 			myRigidbody.AddForce(vector * 0.9f, ForceMode.Force);
 		}
+		if (OnlyOwnerAccessible() && safeAreaRadius != -1f && Vector3.Distance(base.transform.position, safeAreaOrigin) > safeAreaRadius)
+		{
+			ClearOwnerEntry();
+		}
 	}
 
 	public override Vector3 GetLocalVelocityServer()
@@ -452,16 +631,124 @@ public class HotAirBalloon : BaseCombatEntity, SamSite.ISamSiteTarget
 		{
 			return Quaternion.identity;
 		}
-		if (myRigidbody.angularVelocity.sqrMagnitude < 0.1f)
+		return Quaternion.Euler(myRigidbody.angularVelocity * 57.29578f);
+	}
+
+	public void ClearOwnerEntry()
+	{
+		creatorEntity = null;
+		SetFlag(Flags.Locked, b: false);
+		safeAreaRadius = -1f;
+		safeAreaOrigin = Vector3.zero;
+	}
+
+	public bool IsSafe()
+	{
+		if (OnlyOwnerAccessible())
 		{
-			return Quaternion.identity;
+			return Vector3.Distance(safeAreaOrigin, base.transform.position) <= safeAreaRadius;
 		}
-		return Quaternion.LookRotation(myRigidbody.angularVelocity, base.transform.up);
+		return false;
+	}
+
+	public void SetupOwner(BasePlayer owner, Vector3 newSafeAreaOrigin, float newSafeAreaRadius)
+	{
+		if (owner != null)
+		{
+			creatorEntity = owner;
+			SetFlag(Flags.Locked, b: true);
+			safeAreaRadius = newSafeAreaRadius;
+			safeAreaOrigin = newSafeAreaOrigin;
+			spawnTime = UnityEngine.Time.realtimeSinceStartup;
+		}
+	}
+
+	public bool IsDespawnEligable()
+	{
+		if (spawnTime != -1f)
+		{
+			return spawnTime + 300f < UnityEngine.Time.realtimeSinceStartup;
+		}
+		return true;
+	}
+
+	public EntityFuelSystem GetFuelSystem()
+	{
+		return fuelSystem;
+	}
+
+	public int StartingFuelUnits()
+	{
+		return 75;
 	}
 
 	public Vector3 GetWindAtPos(Vector3 pos)
 	{
 		float num = pos.y * 6f;
-		return new Vector3(Mathf.Sin(num * ((float)Math.PI / 180f)), 0f, Mathf.Cos(num * ((float)Math.PI / 180f))).normalized * 1f;
+		return new Vector3(Mathf.Sin(num * (MathF.PI / 180f)), 0f, Mathf.Cos(num * (MathF.PI / 180f))).normalized * 1f;
+	}
+
+	public bool PlayerHasEquipmentItem(BasePlayer player, int tokenItemID)
+	{
+		return GetEquipmentItem(player, tokenItemID) != null;
+	}
+
+	public Item GetEquipmentItem(BasePlayer player, int tokenItemID)
+	{
+		return player.inventory.FindItemByItemID(tokenItemID);
+	}
+
+	public override float MaxHealth()
+	{
+		if (base.isServer)
+		{
+			return base.MaxHealth();
+		}
+		float num = base.MaxHealth();
+		float num2 = 0f;
+		foreach (BaseEntity child in children)
+		{
+			if (child is HotAirBalloonArmor hotAirBalloonArmor)
+			{
+				num2 += hotAirBalloonArmor.AdditionalHealth;
+			}
+		}
+		return num + num2;
+	}
+
+	public override List<ItemAmount> BuildCost()
+	{
+		List<ItemAmount> list = new List<ItemAmount>(base.BuildCost());
+		foreach (BaseEntity child in children)
+		{
+			if (child is HotAirBalloonEquipment hotAirBalloonEquipment)
+			{
+				list.AddRange(hotAirBalloonEquipment.BuildCost());
+			}
+		}
+		return list;
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	public void RPC_ReqEquipItem(RPCMessage msg)
+	{
+		BasePlayer player = msg.player;
+		if (player == null)
+		{
+			return;
+		}
+		int tokenItemID = msg.read.Int32();
+		Item equipmentItem = GetEquipmentItem(player, tokenItemID);
+		if (equipmentItem != null)
+		{
+			ItemModHABEquipment component = equipmentItem.info.GetComponent<ItemModHABEquipment>();
+			if (!(component == null) && component.CanEquipToHAB(this))
+			{
+				component.ApplyToHAB(this);
+				equipmentItem.UseItem();
+				SendNetworkUpdateImmediate();
+			}
+		}
 	}
 }

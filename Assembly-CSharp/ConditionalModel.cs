@@ -9,6 +9,8 @@ public class ConditionalModel : PrefabAttribute
 
 	public bool onServer = true;
 
+	public bool IsImportant;
+
 	[NonSerialized]
 	public ModelConditionTest[] conditions;
 

@@ -351,13 +351,13 @@ public class BlackjackController : CardGameController
 		}
 		if (obj.Count > 0)
 		{
-			int num = 0;
+			int value = 0;
 			if (blackjackInputOption == BlackjackInputOption.SubmitBet)
 			{
-				num = MinBuyIn;
+				value = MinBuyIn;
 			}
-			Debug.Log(string.Concat(pdBlackjack.UserID, " Taking random action: ", blackjackInputOption, " with value ", num));
-			ReceivedInputFromPlayer(pdBlackjack, (int)blackjackInputOption, countAsAction: true, num);
+			Debug.Log(pdBlackjack.UserID + " Taking random action: " + blackjackInputOption.ToString() + " with value " + value);
+			ReceivedInputFromPlayer(pdBlackjack, (int)blackjackInputOption, countAsAction: true, value);
 		}
 		else
 		{
@@ -515,9 +515,12 @@ public class BlackjackController : CardGameController
 		return winnings;
 	}
 
-	protected override void HandlePlayerLeavingDuringTheirTurn(CardPlayerData pData)
+	protected override void HandlePlayerLeavingTable(CardPlayerData pData)
 	{
-		ReceivedInputFromPlayer(pData, 128, countAsAction: true, 0, playerInitiated: false);
+		if (pData.HasUserInCurrentRound)
+		{
+			ReceivedInputFromPlayer(pData, 128, countAsAction: true, 0, playerInitiated: false);
+		}
 	}
 
 	protected override void SubReceivedInputFromPlayer(CardPlayerData pData, int input, int value, bool countAsAction)

@@ -126,7 +126,7 @@ public class ZiplineMountable : BaseMountable
 		linePoints = targetLinePoints;
 		currentTravelDistance = 0f;
 		mountTime = 0f;
-		GamePhysics.OverlapSphere(base.transform.position, 6f, ignoreColliders, 1218511105);
+		GamePhysics.OverlapSphere(base.transform.position, 6f, ignoreColliders, 1084293377);
 		startPosition = base.transform.position;
 		startRotation = base.transform.rotation;
 		lastSafePosition = startPosition;
@@ -150,7 +150,7 @@ public class ZiplineMountable : BaseMountable
 		List<RaycastHit> obj = Facepunch.Pool.GetList<RaycastHit>();
 		Vector3 position = vector.WithY(vector.y - ZipCollider.height * 0.6f);
 		Vector3 position2 = vector;
-		GamePhysics.CapsuleSweep(position, position2, ZipCollider.radius, base.transform.forward, num, obj, 1218511105);
+		GamePhysics.CapsuleSweep(position, position2, ZipCollider.radius, base.transform.forward, num, obj, 1084293377);
 		foreach (RaycastHit item in obj)
 		{
 			if (!(item.collider == ZipCollider) && !ignoreColliders.Contains(item.collider) && !(item.collider.GetComponentInParent<PowerlineNode>() != null))

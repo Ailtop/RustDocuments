@@ -13,6 +13,9 @@ public class Weather : ConsoleSystem
 	[ServerVar]
 	public static float wetness_snow = 0.2f;
 
+	[ReplicatedVar(Default = "-1")]
+	public static float ocean_time = -1f;
+
 	[ReplicatedVar(Default = "1")]
 	public static float clear_chance
 	{
@@ -513,6 +516,26 @@ public class Weather : ConsoleSystem
 		}
 	}
 
+	[ReplicatedVar(Default = "-1")]
+	public static float ocean_scale
+	{
+		get
+		{
+			if (!SingletonComponent<Climate>.Instance)
+			{
+				return -1f;
+			}
+			return SingletonComponent<Climate>.Instance.WeatherOverrides.OceanScale;
+		}
+		set
+		{
+			if ((bool)SingletonComponent<Climate>.Instance)
+			{
+				SingletonComponent<Climate>.Instance.WeatherOverrides.OceanScale = value;
+			}
+		}
+	}
+
 	[ServerVar]
 	[ClientVar]
 	public static void load(Arg args)
@@ -540,8 +563,8 @@ public class Weather : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void reset(Arg args)
 	{
 		if ((bool)SingletonComponent<Climate>.Instance)

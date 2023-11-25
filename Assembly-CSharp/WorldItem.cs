@@ -11,8 +11,6 @@ using UnityEngine.Assertions;
 
 public class WorldItem : BaseEntity
 {
-	private bool _isInvokingSendItemUpdate;
-
 	[Header("WorldItem")]
 	public bool allowPickup = true;
 
@@ -22,6 +20,8 @@ public class WorldItem : BaseEntity
 	protected float eatSeconds = 10f;
 
 	protected float caloriesPerSecond = 1f;
+
+	private bool _isInvokingSendItemUpdate;
 
 	public override TraitFlag Traits
 	{
@@ -44,7 +44,7 @@ public class WorldItem : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Pickup "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Pickup ");
 				}
 				using (TimeWarning.New("Pickup"))
 				{
@@ -77,73 +77,6 @@ public class WorldItem : BaseEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
-	}
-
-	public override void ServerInit()
-	{
-		base.ServerInit();
-		if (item != null)
-		{
-			BroadcastMessage("OnItemChanged", item, SendMessageOptions.DontRequireReceiver);
-		}
-	}
-
-	private void DoItemNetworking()
-	{
-		if (!_isInvokingSendItemUpdate)
-		{
-			_isInvokingSendItemUpdate = true;
-			Invoke(SendItemUpdate, 0.1f);
-		}
-	}
-
-	private void SendItemUpdate()
-	{
-		_isInvokingSendItemUpdate = false;
-		if (item == null)
-		{
-			return;
-		}
-		using UpdateItem updateItem = Facepunch.Pool.Get<UpdateItem>();
-		updateItem.item = item.Save(bIncludeContainer: false, bIncludeOwners: false);
-		ClientRPC(null, "UpdateItem", updateItem);
-	}
-
-	[RPC_Server]
-	[RPC_Server.IsVisible(3f)]
-	public void Pickup(RPCMessage msg)
-	{
-		if (msg.player.CanInteract() && this.item != null && allowPickup && Interface.CallHook("OnItemPickup", this.item, msg.player) == null)
-		{
-			ClientRPC(null, "PickupSound");
-			Item item = this.item;
-			Facepunch.Rust.Analytics.Azure.OnItemPickup(msg.player, this);
-			RemoveItem();
-			msg.player.GiveItem(item, GiveItemReason.PickedUp);
-			msg.player.SignalBroadcast(Signal.Gesture, "pickup_item");
-		}
-	}
-
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		if (item != null)
-		{
-			bool forDisk = info.forDisk;
-			info.msg.worldItem = Facepunch.Pool.Get<ProtoBuf.WorldItem>();
-			info.msg.worldItem.item = item.Save(forDisk, bIncludeOwners: false);
-		}
-	}
-
-	internal override void DoServerDestroy()
-	{
-		base.DoServerDestroy();
-		DestroyItem();
-	}
-
-	public override void SwitchParent(BaseEntity ent)
-	{
-		SetParent(ent, parentBone);
 	}
 
 	public override Item GetItem()
@@ -237,5 +170,72 @@ public class WorldItem : BaseEntity
 			}
 		}
 		return _name;
+	}
+
+	public override void ServerInit()
+	{
+		base.ServerInit();
+		if (item != null)
+		{
+			BroadcastMessage("OnItemChanged", item, SendMessageOptions.DontRequireReceiver);
+		}
+	}
+
+	private void DoItemNetworking()
+	{
+		if (!_isInvokingSendItemUpdate)
+		{
+			_isInvokingSendItemUpdate = true;
+			Invoke(SendItemUpdate, 0.1f);
+		}
+	}
+
+	private void SendItemUpdate()
+	{
+		_isInvokingSendItemUpdate = false;
+		if (item == null)
+		{
+			return;
+		}
+		using UpdateItem updateItem = Facepunch.Pool.Get<UpdateItem>();
+		updateItem.item = item.Save(bIncludeContainer: false, bIncludeOwners: false);
+		ClientRPC(null, "UpdateItem", updateItem);
+	}
+
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
+	public void Pickup(RPCMessage msg)
+	{
+		if (msg.player.CanInteract() && this.item != null && allowPickup && Interface.CallHook("OnItemPickup", this.item, msg.player) == null)
+		{
+			ClientRPC(null, "PickupSound");
+			Item item = this.item;
+			Facepunch.Rust.Analytics.Azure.OnItemPickup(msg.player, this);
+			RemoveItem();
+			msg.player.GiveItem(item, GiveItemReason.PickedUp);
+			msg.player.SignalBroadcast(Signal.Gesture, "pickup_item");
+		}
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		if (item != null)
+		{
+			bool forDisk = info.forDisk;
+			info.msg.worldItem = Facepunch.Pool.Get<ProtoBuf.WorldItem>();
+			info.msg.worldItem.item = item.Save(forDisk, bIncludeOwners: false);
+		}
+	}
+
+	internal override void DoServerDestroy()
+	{
+		base.DoServerDestroy();
+		DestroyItem();
+	}
+
+	public override void SwitchParent(BaseEntity ent)
+	{
+		SetParent(ent, parentBone);
 	}
 }

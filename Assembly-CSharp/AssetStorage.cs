@@ -4,7 +4,7 @@ public static class AssetStorage
 {
 	public static void Save<T>(ref T asset, string path) where T : Object
 	{
-		_ = (bool)(Object)asset;
+		_ = (bool)asset;
 	}
 
 	public static void Save(ref Texture2D asset)
@@ -22,7 +22,7 @@ public static class AssetStorage
 
 	public static void Delete<T>(ref T asset) where T : Object
 	{
-		if ((bool)(Object)asset)
+		if ((bool)asset)
 		{
 			Object.Destroy(asset);
 			asset = null;

@@ -61,7 +61,7 @@ public class Sprinkler : IOEntity
 				Vector3 startPosition = position + up * (Server.sprinklerRadius * 0.5f);
 				Vector3 endPosition = position + up * sprinklerEyeHeightOffset;
 				List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-				Vis.Entities(startPosition, endPosition, Server.sprinklerRadius, obj, 1236478737);
+				Vis.Entities(startPosition, endPosition, Server.sprinklerRadius, obj, 1237003025);
 				if (obj.Count > 0)
 				{
 					foreach (BaseEntity item in obj)

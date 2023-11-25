@@ -34,8 +34,8 @@ public class FogMachine : ContainerIOEntity
 		return HasFlag(Flags.Reserved5);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetFogOn(RPCMessage msg)
 	{
 		if (!IsEmitting() && !IsOn() && HasFuel() && msg.player.CanBuild())
@@ -226,7 +226,7 @@ public class FogMachine : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetFogOff "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetFogOff ");
 				}
 				using (TimeWarning.New("SetFogOff"))
 				{
@@ -262,7 +262,7 @@ public class FogMachine : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetFogOn "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetFogOn ");
 				}
 				using (TimeWarning.New("SetFogOn"))
 				{
@@ -298,7 +298,7 @@ public class FogMachine : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetMotionDetection "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetMotionDetection ");
 				}
 				using (TimeWarning.New("SetMotionDetection"))
 				{

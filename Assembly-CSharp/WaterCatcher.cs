@@ -6,6 +6,8 @@ public class WaterCatcher : LiquidContainer
 	[Header("Water Catcher")]
 	public ItemDefinition itemToCreate;
 
+	public WaterCatcherCollectRate collectionRates;
+
 	public float maxItemToCreate = 10f;
 
 	[Header("Outside Test")]
@@ -26,14 +28,14 @@ public class WaterCatcher : LiquidContainer
 	{
 		if (!IsFull() && Interface.CallHook("OnWaterCollect", this) == null)
 		{
-			float num = 0.25f;
-			num += Climate.GetFog(base.transform.position) * 2f;
+			float baseRate = collectionRates.baseRate;
+			baseRate += Climate.GetFog(base.transform.position) * collectionRates.fogRate;
 			if (TestIsOutside())
 			{
-				num += Climate.GetRain(base.transform.position);
-				num += Climate.GetSnow(base.transform.position) * 0.5f;
+				baseRate += Climate.GetRain(base.transform.position) * collectionRates.rainRate;
+				baseRate += Climate.GetSnow(base.transform.position) * collectionRates.snowRate;
 			}
-			AddResource(Mathf.CeilToInt(maxItemToCreate * num));
+			AddResource(Mathf.CeilToInt(maxItemToCreate * baseRate));
 		}
 	}
 

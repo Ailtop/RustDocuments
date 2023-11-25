@@ -6,7 +6,7 @@ public static class SystemInfoEx
 {
 	private static bool[] supportedRenderTextureFormats;
 
-	public static int systemMemoryUsed => (int)(System_GetMemoryUsage() / 1024uL / 1024uL);
+	public static int systemMemoryUsed => (int)(System_GetMemoryUsage() / 1024 / 1024);
 
 	[DllImport("RustNative")]
 	private static extern ulong System_GetMemoryUsage();

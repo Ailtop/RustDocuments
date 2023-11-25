@@ -65,7 +65,7 @@ public abstract class GroundVehicle : BaseVehicle, IEngineControllerUser, IEntit
 		}
 	}
 
-	public float GetSpeed()
+	public override float GetSpeed()
 	{
 		if (IsStationary())
 		{

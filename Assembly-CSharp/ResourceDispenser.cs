@@ -37,6 +37,8 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 
 		public GatherPropertyEntry Flesh;
 
+		public bool ProduceHeadItem;
+
 		public float GetProficiency()
 		{
 			float num = 0f;
@@ -128,7 +130,7 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		}
 	}
 
-	public void DoGather(HitInfo info)
+	public void DoGather(HitInfo info, BaseCorpse corpse = null)
 	{
 		if (!base.baseEntity.isServer || !info.CanGather || info.DidGather)
 		{
@@ -174,6 +176,10 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 			if (info.DidGather && num2 < maxDestroyFractionForFinishBonus)
 			{
 				AssignFinishBonus(info.InitiatorPlayer, 1f - num2, info.Weapon);
+			}
+			if (base.gameObject.TryGetComponent<HeadDispenser>(out var component))
+			{
+				component.DispenseHead(info, corpse);
 			}
 		}
 		else
@@ -250,19 +256,19 @@ public class ResourceDispenser : EntityComponent<BaseEntity>, IServerComponent
 		UpdateVars();
 		if ((bool)entity)
 		{
-			Debug.Assert(attackWeapon.GetItem() != null, string.Concat("Attack Weapon ", attackWeapon, " has no Item"));
-			Debug.Assert(attackWeapon.ownerItemUID.IsValid, string.Concat("Attack Weapon ", attackWeapon, " ownerItemUID is 0"));
-			Debug.Assert(attackWeapon.GetParentEntity() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is null"));
-			Debug.Assert(BaseNetworkableEx.IsValid(attackWeapon.GetParentEntity()), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
-			Debug.Assert(attackWeapon.GetParentEntity().ToPlayer() != null, string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not a player"));
-			Debug.Assert(!attackWeapon.GetParentEntity().ToPlayer().IsDead(), string.Concat("Attack Weapon ", attackWeapon, " GetParentEntity is not valid"));
+			Debug.Assert(attackWeapon.GetItem() != null, "Attack Weapon " + attackWeapon?.ToString() + " has no Item");
+			Debug.Assert(attackWeapon.ownerItemUID.IsValid, "Attack Weapon " + attackWeapon?.ToString() + " ownerItemUID is 0");
+			Debug.Assert(attackWeapon.GetParentEntity() != null, "Attack Weapon " + attackWeapon?.ToString() + " GetParentEntity is null");
+			Debug.Assert(BaseNetworkableEx.IsValid(attackWeapon.GetParentEntity()), "Attack Weapon " + attackWeapon?.ToString() + " GetParentEntity is not valid");
+			Debug.Assert(attackWeapon.GetParentEntity().ToPlayer() != null, "Attack Weapon " + attackWeapon?.ToString() + " GetParentEntity is not a player");
+			Debug.Assert(!attackWeapon.GetParentEntity().ToPlayer().IsDead(), "Attack Weapon " + attackWeapon?.ToString() + " GetParentEntity is not valid");
 			BasePlayer ownerPlayer = attackWeapon.GetOwnerPlayer();
-			Debug.Assert(ownerPlayer != null, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is null"));
-			Debug.Assert(ownerPlayer == entity, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer is not player"));
+			Debug.Assert(ownerPlayer != null, "Attack Weapon " + attackWeapon?.ToString() + " ownerPlayer is null");
+			Debug.Assert(ownerPlayer == entity, "Attack Weapon " + attackWeapon?.ToString() + " ownerPlayer is not player");
 			if (ownerPlayer != null)
 			{
-				Debug.Assert(ownerPlayer.inventory != null, string.Concat("Attack Weapon ", attackWeapon, " ownerPlayer inventory is null"));
-				Debug.Assert(ownerPlayer.inventory.FindItemUID(attackWeapon.ownerItemUID) != null, string.Concat("Attack Weapon ", attackWeapon, " FindItemUID is null"));
+				Debug.Assert(ownerPlayer.inventory != null, "Attack Weapon " + attackWeapon?.ToString() + " ownerPlayer inventory is null");
+				Debug.Assert(ownerPlayer.inventory.FindItemByUID(attackWeapon.ownerItemUID) != null, "Attack Weapon " + attackWeapon?.ToString() + " FindItemByUID is null");
 			}
 		}
 	}

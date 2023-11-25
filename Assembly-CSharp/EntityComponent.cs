@@ -10,7 +10,7 @@ public class EntityComponent<T> : EntityComponentBase where T : BaseEntity
 	{
 		get
 		{
-			if ((UnityEngine.Object)_baseEntity == (UnityEngine.Object)null)
+			if (_baseEntity == null)
 			{
 				UpdateBaseEntity();
 			}

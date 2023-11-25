@@ -32,12 +32,6 @@ public class ModularCarGarage : ContainerIOEntity
 		Up = 1
 	}
 
-	public ModularCar lockedOccupant;
-
-	public readonly HashSet<BasePlayer> lootingPlayers = new HashSet<BasePlayer>();
-
-	public MagnetSnap magnetSnap;
-
 	[SerializeField]
 	public Transform vehicleLift;
 
@@ -114,6 +108,32 @@ public class ModularCarGarage : ContainerIOEntity
 
 	public const Flags Flag_PlayerObstructing = Flags.Reserved8;
 
+	public ModularCar lockedOccupant;
+
+	public readonly HashSet<BasePlayer> lootingPlayers = new HashSet<BasePlayer>();
+
+	public MagnetSnap magnetSnap;
+
+	public bool PlatformIsOccupied { get; set; }
+
+	public bool HasEditableOccupant { get; set; }
+
+	public bool HasDriveableOccupant { get; set; }
+
+	public OccupantLock OccupantLockState { get; set; }
+
+	public bool LiftIsUp => vehicleLiftState == VehicleLiftState.Up;
+
+	public bool LiftIsMoving => vehicleLiftAnim.isPlaying;
+
+	public bool LiftIsDown => vehicleLiftState == VehicleLiftState.Down;
+
+	public bool IsDestroyingChassis => HasFlag(Flags.Reserved6);
+
+	private bool IsEnteringKeycode => HasFlag(Flags.Reserved7);
+
+	public bool PlayerObstructingLift => HasFlag(Flags.Reserved8);
+
 	public ModularCar carOccupant
 	{
 		get
@@ -138,26 +158,6 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	public bool PlatformIsOccupied { get; set; }
-
-	public bool HasEditableOccupant { get; set; }
-
-	public bool HasDriveableOccupant { get; set; }
-
-	public OccupantLock OccupantLockState { get; set; }
-
-	public bool LiftIsUp => vehicleLiftState == VehicleLiftState.Up;
-
-	public bool LiftIsMoving => vehicleLiftAnim.isPlaying;
-
-	public bool LiftIsDown => vehicleLiftState == VehicleLiftState.Down;
-
-	public bool IsDestroyingChassis => HasFlag(Flags.Reserved6);
-
-	private bool IsEnteringKeycode => HasFlag(Flags.Reserved7);
-
-	public bool PlayerObstructingLift => HasFlag(Flags.Reserved8);
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("ModularCarGarage.OnRpcMessage"))
@@ -167,7 +167,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DeselectedLootItem "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_DeselectedLootItem ");
 				}
 				using (TimeWarning.New("RPC_DeselectedLootItem"))
 				{
@@ -203,7 +203,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DiedWithKeypadOpen "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_DiedWithKeypadOpen ");
 				}
 				using (TimeWarning.New("RPC_DiedWithKeypadOpen"))
 				{
@@ -243,7 +243,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenEditing "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenEditing ");
 				}
 				using (TimeWarning.New("RPC_OpenEditing"))
 				{
@@ -283,7 +283,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RepairItem "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RepairItem ");
 				}
 				using (TimeWarning.New("RPC_RepairItem"))
 				{
@@ -323,7 +323,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestAddLock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RequestAddLock ");
 				}
 				using (TimeWarning.New("RPC_RequestAddLock"))
 				{
@@ -363,7 +363,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestNewCode "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RequestNewCode ");
 				}
 				using (TimeWarning.New("RPC_RequestNewCode"))
 				{
@@ -403,7 +403,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestRemoveLock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RequestRemoveLock ");
 				}
 				using (TimeWarning.New("RPC_RequestRemoveLock"))
 				{
@@ -443,7 +443,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_SelectedLootItem "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_SelectedLootItem ");
 				}
 				using (TimeWarning.New("RPC_SelectedLootItem"))
 				{
@@ -479,7 +479,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_StartDestroyingChassis "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_StartDestroyingChassis ");
 				}
 				using (TimeWarning.New("RPC_StartDestroyingChassis"))
 				{
@@ -523,7 +523,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_StartKeycodeEntry "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_StartKeycodeEntry ");
 				}
 				using (TimeWarning.New("RPC_StartKeycodeEntry"))
 				{
@@ -559,7 +559,7 @@ public class ModularCarGarage : ContainerIOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_StopDestroyingChassis "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_StopDestroyingChassis ");
 				}
 				using (TimeWarning.New("RPC_StopDestroyingChassis"))
 				{
@@ -600,6 +600,113 @@ public class ModularCarGarage : ContainerIOEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void PreProcess(IPrefabProcessor process, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		downPos = vehicleLift.transform.position;
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (base.isServer)
+		{
+			UpdateOccupantMode();
+		}
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (IsOn())
+		{
+			return base.CanBeLooted(player);
+		}
+		return false;
+	}
+
+	public override int ConsumptionAmount()
+	{
+		return 5;
+	}
+
+	public void SetOccupantState(bool hasOccupant, bool editableOccupant, bool driveableOccupant, OccupantLock occupantLockState, bool forced = false)
+	{
+		if (PlatformIsOccupied == hasOccupant && HasEditableOccupant == editableOccupant && HasDriveableOccupant == driveableOccupant && OccupantLockState == occupantLockState && !forced)
+		{
+			return;
+		}
+		bool hasEditableOccupant = HasEditableOccupant;
+		PlatformIsOccupied = hasOccupant;
+		HasEditableOccupant = editableOccupant;
+		HasDriveableOccupant = driveableOccupant;
+		OccupantLockState = occupantLockState;
+		if (base.isServer)
+		{
+			UpdateOccupantMode();
+			SendNetworkUpdate();
+			if (hasEditableOccupant && !editableOccupant)
+			{
+				EditableOccupantLeft();
+			}
+			else if (editableOccupant && !hasEditableOccupant)
+			{
+				EditableOccupantEntered();
+			}
+		}
+		RefreshLiftState();
+	}
+
+	public void RefreshLiftState(bool forced = false)
+	{
+		VehicleLiftState desiredLiftState = ((IsOpen() || IsEnteringKeycode || (HasEditableOccupant && !HasDriveableOccupant)) ? VehicleLiftState.Up : VehicleLiftState.Down);
+		MoveLift(desiredLiftState, 0f, forced);
+	}
+
+	public void MoveLift(VehicleLiftState desiredLiftState, float startDelay = 0f, bool forced = false)
+	{
+		if (vehicleLiftState != desiredLiftState || forced)
+		{
+			_ = vehicleLiftState;
+			vehicleLiftState = desiredLiftState;
+			if (base.isServer)
+			{
+				UpdateOccupantMode();
+				WakeNearbyRigidbodies();
+			}
+			if (!base.gameObject.activeSelf)
+			{
+				vehicleLiftAnim[animName].time = ((desiredLiftState == VehicleLiftState.Up) ? 1f : 0f);
+				vehicleLiftAnim.Play();
+			}
+			else if (desiredLiftState == VehicleLiftState.Up)
+			{
+				Invoke(MoveLiftUp, startDelay);
+			}
+			else
+			{
+				Invoke(MoveLiftDown, startDelay);
+			}
+		}
+	}
+
+	public void MoveLiftUp()
+	{
+		AnimationState animationState = vehicleLiftAnim[animName];
+		animationState.speed = animationState.length / liftMoveTime;
+		vehicleLiftAnim.Play();
+	}
+
+	public void MoveLiftDown()
+	{
+		AnimationState animationState = vehicleLiftAnim[animName];
+		animationState.speed = animationState.length / liftMoveTime;
+		if (!vehicleLiftAnim.isPlaying && Vector3.Distance(vehicleLift.transform.position, downPos) > 0.01f)
+		{
+			animationState.time = 1f;
+		}
+		animationState.speed *= -1f;
+		vehicleLiftAnim.Play();
 	}
 
 	public void FixedUpdate()
@@ -776,7 +883,7 @@ public class ModularCarGarage : ContainerIOEntity
 				attachedRigidbody.WakeUp();
 			}
 			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(item);
-			if (baseEntity != null && baseEntity is BaseRidableAnimal baseRidableAnimal && baseRidableAnimal.isServer)
+			if (baseEntity != null && baseEntity is BaseRidableAnimal { isServer: not false } baseRidableAnimal)
 			{
 				baseRidableAnimal.UpdateDropToGroundForDuration(2f);
 			}
@@ -838,8 +945,8 @@ public class ModularCarGarage : ContainerIOEntity
 		SetFlag(Flags.Reserved6, b: false);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
 	public void RPC_RepairItem(RPCMessage msg)
 	{
@@ -855,14 +962,16 @@ public class ModularCarGarage : ContainerIOEntity
 			}
 			else
 			{
-				Debug.LogError(GetType().Name + ": Couldn't get item to repair, with ID: " + itemId);
+				string text = GetType().Name;
+				ItemId itemId2 = itemId;
+				Debug.LogError(text + ": Couldn't get item to repair, with ID: " + itemId2.ToString());
 			}
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_OpenEditing(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -873,8 +982,8 @@ public class ModularCarGarage : ContainerIOEntity
 	}
 
 	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_DiedWithKeypadOpen(RPCMessage msg)
 	{
 		SetFlag(Flags.Reserved7, b: false);
@@ -882,8 +991,8 @@ public class ModularCarGarage : ContainerIOEntity
 		RefreshLiftState();
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_SelectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -926,8 +1035,8 @@ public class ModularCarGarage : ContainerIOEntity
 		Interface.CallHook("OnVehicleModuleSelected", vehicleItem, this, player);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_DeselectedLootItem(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -974,9 +1083,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.IsVisible(3f)]
 	public void RPC_RequestRemoveLock(RPCMessage msg)
 	{
 		if (HasOccupant && carOccupant.CarLock.HasALock)
@@ -987,8 +1096,8 @@ public class ModularCarGarage : ContainerIOEntity
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_RequestNewCode(RPCMessage msg)
 	{
 		if (!HasOccupant || !carOccupant.CarLock.HasALock)
@@ -1006,9 +1115,9 @@ public class ModularCarGarage : ContainerIOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.IsVisible(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
 	public void RPC_StartDestroyingChassis(RPCMessage msg)
 	{
@@ -1035,108 +1144,5 @@ public class ModularCarGarage : ContainerIOEntity
 			carOccupant.Kill(DestroyMode.Gib);
 			SetFlag(Flags.Reserved6, b: false);
 		}
-	}
-
-	public override void PreProcess(IPrefabProcessor process, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		downPos = vehicleLift.transform.position;
-	}
-
-	public override void OnFlagsChanged(Flags old, Flags next)
-	{
-		base.OnFlagsChanged(old, next);
-		if (base.isServer)
-		{
-			UpdateOccupantMode();
-		}
-	}
-
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		return IsOn();
-	}
-
-	public override int ConsumptionAmount()
-	{
-		return 5;
-	}
-
-	public void SetOccupantState(bool hasOccupant, bool editableOccupant, bool driveableOccupant, OccupantLock occupantLockState, bool forced = false)
-	{
-		if (PlatformIsOccupied == hasOccupant && HasEditableOccupant == editableOccupant && HasDriveableOccupant == driveableOccupant && OccupantLockState == occupantLockState && !forced)
-		{
-			return;
-		}
-		bool hasEditableOccupant = HasEditableOccupant;
-		PlatformIsOccupied = hasOccupant;
-		HasEditableOccupant = editableOccupant;
-		HasDriveableOccupant = driveableOccupant;
-		OccupantLockState = occupantLockState;
-		if (base.isServer)
-		{
-			UpdateOccupantMode();
-			SendNetworkUpdate();
-			if (hasEditableOccupant && !editableOccupant)
-			{
-				EditableOccupantLeft();
-			}
-			else if (editableOccupant && !hasEditableOccupant)
-			{
-				EditableOccupantEntered();
-			}
-		}
-		RefreshLiftState();
-	}
-
-	public void RefreshLiftState(bool forced = false)
-	{
-		VehicleLiftState desiredLiftState = ((IsOpen() || IsEnteringKeycode || (HasEditableOccupant && !HasDriveableOccupant)) ? VehicleLiftState.Up : VehicleLiftState.Down);
-		MoveLift(desiredLiftState, 0f, forced);
-	}
-
-	public void MoveLift(VehicleLiftState desiredLiftState, float startDelay = 0f, bool forced = false)
-	{
-		if (vehicleLiftState != desiredLiftState || forced)
-		{
-			_ = vehicleLiftState;
-			vehicleLiftState = desiredLiftState;
-			if (base.isServer)
-			{
-				UpdateOccupantMode();
-				WakeNearbyRigidbodies();
-			}
-			if (!base.gameObject.activeSelf)
-			{
-				vehicleLiftAnim[animName].time = ((desiredLiftState == VehicleLiftState.Up) ? 1f : 0f);
-				vehicleLiftAnim.Play();
-			}
-			else if (desiredLiftState == VehicleLiftState.Up)
-			{
-				Invoke(MoveLiftUp, startDelay);
-			}
-			else
-			{
-				Invoke(MoveLiftDown, startDelay);
-			}
-		}
-	}
-
-	public void MoveLiftUp()
-	{
-		AnimationState animationState = vehicleLiftAnim[animName];
-		animationState.speed = animationState.length / liftMoveTime;
-		vehicleLiftAnim.Play();
-	}
-
-	public void MoveLiftDown()
-	{
-		AnimationState animationState = vehicleLiftAnim[animName];
-		animationState.speed = animationState.length / liftMoveTime;
-		if (!vehicleLiftAnim.isPlaying && Vector3.Distance(vehicleLift.transform.position, downPos) > 0.01f)
-		{
-			animationState.time = 1f;
-		}
-		animationState.speed *= -1f;
-		vehicleLiftAnim.Play();
 	}
 }

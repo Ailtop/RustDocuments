@@ -33,7 +33,7 @@ public class ScaleBySpeed : MonoBehaviour
 		bool flag = WaterSystem.GetHeight(position) > position.y - submergedThickness;
 		if (sqrMagnitude > 0.0001f)
 		{
-			sqrMagnitude = Mathf.Sqrt(sqrMagnitude);
+			sqrMagnitude = Mathf.Sqrt(sqrMagnitude) / Time.deltaTime;
 			float value = Mathf.Clamp(sqrMagnitude, minSpeed, maxSpeed) / (maxSpeed - minSpeed);
 			num = Mathf.Lerp(minScale, maxScale, Mathf.Clamp01(value));
 			if (component != null && toggleComponent)

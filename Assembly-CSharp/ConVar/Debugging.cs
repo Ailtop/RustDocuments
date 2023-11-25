@@ -21,19 +21,19 @@ public class Debugging : ConsoleSystem
 	[ServerVar]
 	public static bool checkparentingtriggers = true;
 
-	[ClientVar(Saved = false, Help = "Shows some debug info for dismount attempts.")]
 	[ServerVar]
+	[ClientVar(Saved = false, Help = "Shows some debug info for dismount attempts.")]
 	public static bool DebugDismounts = false;
 
 	[ServerVar(Help = "Do not damage any items")]
 	public static bool disablecondition = false;
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static bool callbacks = false;
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static bool log
 	{
 		get
@@ -46,8 +46,8 @@ public class Debugging : ConsoleSystem
 		}
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void renderinfo(Arg arg)
 	{
 		RenderInfo.GenerateReport();
@@ -109,6 +109,45 @@ public class Debugging : ConsoleSystem
 		}
 	}
 
+	[ServerVar]
+	public static void spawnParachuteTester(Arg arg)
+	{
+		float @float = arg.GetFloat(0, 50f);
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		BasePlayer basePlayer2 = GameManager.server.CreateEntity("assets/prefabs/player/player.prefab", basePlayer.transform.position + Vector3.up * @float, Quaternion.LookRotation(basePlayer.eyes.BodyForward())) as BasePlayer;
+		basePlayer2.Spawn();
+		basePlayer2.eyes.rotation = basePlayer.eyes.rotation;
+		basePlayer2.SendNetworkUpdate();
+		Inventory.copyTo(basePlayer, basePlayer2);
+		if (!basePlayer2.HasValidParachuteEquipped())
+		{
+			basePlayer2.inventory.containerWear.GiveItem(ItemManager.CreateByName("parachute", 1, 0uL));
+		}
+		basePlayer2.RequestParachuteDeploy();
+	}
+
+	[ServerVar]
+	public static void deleteEntitiesByShortname(Arg arg)
+	{
+		string text = arg.GetString(0).ToLower();
+		float @float = arg.GetFloat(1);
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		List<BaseNetworkable> obj = Facepunch.Pool.GetList<BaseNetworkable>();
+		foreach (BaseNetworkable serverEntity in BaseNetworkable.serverEntities)
+		{
+			if (serverEntity.ShortPrefabName == text && (@float == 0f || (basePlayer != null && basePlayer.Distance(serverEntity as BaseEntity) <= @float)))
+			{
+				obj.Add(serverEntity);
+			}
+		}
+		Debug.Log($"Deleting {obj.Count} {text}...");
+		foreach (BaseNetworkable item in obj)
+		{
+			item.Kill();
+		}
+		Facepunch.Pool.FreeList(ref obj);
+	}
+
 	[ServerVar(Help = "Takes you in and out of your current network group, causing you to delete and then download all entities in your PVS again")]
 	public static void flushgroup(Arg arg)
 	{
@@ -137,7 +176,7 @@ public class Debugging : ConsoleSystem
 			PuzzleReset[] array2 = array;
 			foreach (PuzzleReset puzzleReset in array2)
 			{
-				Debug.Log("resetting puzzle at :" + puzzleReset.transform.position);
+				Debug.Log("resetting puzzle at :" + puzzleReset.transform.position.ToString());
 				puzzleReset.DoReset();
 				puzzleReset.ResetTimer();
 			}
@@ -242,6 +281,7 @@ public class Debugging : ConsoleSystem
 		AdjustHealth(ArgEx.Player(arg), 1000f);
 		AdjustCalories(ArgEx.Player(arg), 1000f);
 		AdjustHydration(ArgEx.Player(arg), 1000f);
+		AdjustRadiation(ArgEx.Player(arg), -10000f);
 	}
 
 	[ServerVar]
@@ -268,6 +308,59 @@ public class Debugging : ConsoleSystem
 		AdjustHydration(ArgEx.Player(arg), arg.GetInt(0, 1), arg.GetInt(1, 1));
 	}
 
+	[ServerVar]
+	public static void sethealth(Arg arg)
+	{
+		if (!arg.HasArgs())
+		{
+			arg.ReplyWith("Please enter an amount.");
+			return;
+		}
+		int @int = arg.GetInt(0);
+		BasePlayer usePlayer = GetUsePlayer(arg, 1);
+		if ((bool)usePlayer)
+		{
+			usePlayer.SetHealth(@int);
+		}
+	}
+
+	[ServerVar]
+	public static void setdamage(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		if (!arg.HasArgs())
+		{
+			arg.ReplyWith("Please enter an amount.");
+			return;
+		}
+		int @int = arg.GetInt(0);
+		BasePlayer usePlayer = GetUsePlayer(arg, 1);
+		if ((bool)usePlayer)
+		{
+			float damageAmount = usePlayer.health - (float)@int;
+			HitInfo info = new HitInfo(basePlayer, basePlayer, DamageType.Bullet, damageAmount);
+			usePlayer.OnAttacked(info);
+		}
+	}
+
+	[ServerVar]
+	public static void setfood(Arg arg)
+	{
+		setattribute(arg, MetabolismAttribute.Type.Calories);
+	}
+
+	[ServerVar]
+	public static void setwater(Arg arg)
+	{
+		setattribute(arg, MetabolismAttribute.Type.Hydration);
+	}
+
+	[ServerVar]
+	public static void setradiation(Arg arg)
+	{
+		setattribute(arg, MetabolismAttribute.Type.Radiation);
+	}
+
 	private static void AdjustHealth(BasePlayer player, float amount, string bone = null)
 	{
 		HitInfo hitInfo = new HitInfo(player, player, DamageType.Bullet, 0f - amount);
@@ -286,6 +379,41 @@ public class Debugging : ConsoleSystem
 	private static void AdjustHydration(BasePlayer player, float amount, float time = 1f)
 	{
 		player.metabolism.ApplyChange(MetabolismAttribute.Type.Hydration, amount, time);
+	}
+
+	private static void AdjustRadiation(BasePlayer player, float amount, float time = 1f)
+	{
+		player.metabolism.SetAttribute(MetabolismAttribute.Type.Radiation, amount);
+	}
+
+	private static void setattribute(Arg arg, MetabolismAttribute.Type type)
+	{
+		if (!arg.HasArgs())
+		{
+			arg.ReplyWith("Please enter an amount.");
+			return;
+		}
+		int @int = arg.GetInt(0);
+		BasePlayer usePlayer = GetUsePlayer(arg, 1);
+		if ((bool)usePlayer)
+		{
+			usePlayer.metabolism.SetAttribute(type, @int);
+		}
+	}
+
+	private static BasePlayer GetUsePlayer(Arg arg, int playerArgument)
+	{
+		BasePlayer basePlayer = null;
+		if (arg.HasArgs(playerArgument + 1))
+		{
+			BasePlayer player = ArgEx.GetPlayer(arg, playerArgument);
+			if (!player)
+			{
+				return null;
+			}
+			return player;
+		}
+		return ArgEx.Player(arg);
 	}
 
 	[ServerVar]

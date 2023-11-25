@@ -16,25 +16,25 @@ public static class GamePhysics
 
 	public static bool CheckSphere(Vector3 position, float radius, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
 	{
-		layerMask = HandleTerrainCollision(position, layerMask);
+		layerMask = HandleIgnoreCollision(position, layerMask);
 		return UnityEngine.Physics.CheckSphere(position, radius, layerMask, triggerInteraction);
 	}
 
 	public static bool CheckCapsule(Vector3 start, Vector3 end, float radius, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
 	{
-		layerMask = HandleTerrainCollision((start + end) * 0.5f, layerMask);
+		layerMask = HandleIgnoreCollision((start + end) * 0.5f, layerMask);
 		return UnityEngine.Physics.CheckCapsule(start, end, radius, layerMask, triggerInteraction);
 	}
 
 	public static bool CheckOBB(OBB obb, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
 	{
-		layerMask = HandleTerrainCollision(obb.position, layerMask);
+		layerMask = HandleIgnoreCollision(obb.position, layerMask);
 		return UnityEngine.Physics.CheckBox(obb.position, obb.extents, obb.rotation, layerMask, triggerInteraction);
 	}
 
 	public static bool CheckOBBAndEntity(OBB obb, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal, BaseEntity ignoreEntity = null)
 	{
-		layerMask = HandleTerrainCollision(obb.position, layerMask);
+		layerMask = HandleIgnoreCollision(obb.position, layerMask);
 		int num = UnityEngine.Physics.OverlapBoxNonAlloc(obb.position, obb.extents, colBuffer, obb.rotation, layerMask, triggerInteraction);
 		for (int i = 0; i < num; i++)
 		{
@@ -49,7 +49,7 @@ public static class GamePhysics
 
 	public static bool CheckBounds(Bounds bounds, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.UseGlobal)
 	{
-		layerMask = HandleTerrainCollision(bounds.center, layerMask);
+		layerMask = HandleIgnoreCollision(bounds.center, layerMask);
 		return UnityEngine.Physics.CheckBox(bounds.center, bounds.extents, Quaternion.identity, layerMask, triggerInteraction);
 	}
 
@@ -103,46 +103,46 @@ public static class GamePhysics
 
 	public static void OverlapSphere(Vector3 position, float radius, List<Collider> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
 	{
-		layerMask = HandleTerrainCollision(position, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, colBuffer, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(position, layerMask);
+		int count = UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, colBuffer, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
 	public static void CapsuleSweep(Vector3 position0, Vector3 position1, float radius, Vector3 direction, float distance, List<RaycastHit> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
 	{
-		layerMask = HandleTerrainCollision(position1, layerMask);
-		layerMask = HandleTerrainCollision(position1, layerMask);
+		layerMask = HandleIgnoreCollision(position1, layerMask);
+		layerMask = HandleIgnoreCollision(position1, layerMask);
 		HitBufferToList(UnityEngine.Physics.CapsuleCastNonAlloc(position0, position1, radius, direction, hitBuffer, distance, layerMask, triggerInteraction), list);
 	}
 
 	public static void OverlapCapsule(Vector3 point0, Vector3 point1, float radius, List<Collider> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
 	{
-		layerMask = HandleTerrainCollision(point0, layerMask);
-		layerMask = HandleTerrainCollision(point1, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, colBuffer, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(point0, layerMask);
+		layerMask = HandleIgnoreCollision(point1, layerMask);
+		int count = UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, colBuffer, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
 	public static void OverlapOBB(OBB obb, List<Collider> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
 	{
-		layerMask = HandleTerrainCollision(obb.position, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapBoxNonAlloc(obb.position, obb.extents, colBuffer, obb.rotation, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(obb.position, layerMask);
+		int count = UnityEngine.Physics.OverlapBoxNonAlloc(obb.position, obb.extents, colBuffer, obb.rotation, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
 	public static void OverlapBounds(Bounds bounds, List<Collider> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore)
 	{
-		layerMask = HandleTerrainCollision(bounds.center, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapBoxNonAlloc(bounds.center, bounds.extents, colBuffer, Quaternion.identity, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(bounds.center, layerMask);
+		int count = UnityEngine.Physics.OverlapBoxNonAlloc(bounds.center, bounds.extents, colBuffer, Quaternion.identity, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
-	private static void BufferToList(int count, List<Collider> list)
+	private static void BufferToList(Collider[] buffer, int count, List<Collider> list)
 	{
-		if (count >= colBuffer.Length)
-		{
-			Debug.LogWarning("Physics query is exceeding collider buffer length.");
-		}
 		for (int i = 0; i < count; i++)
 		{
-			list.Add(colBuffer[i]);
-			colBuffer[i] = null;
+			list.Add(buffer[i]);
+			buffer[i] = null;
 		}
 	}
 
@@ -196,43 +196,43 @@ public static class GamePhysics
 
 	public static void OverlapSphere<T>(Vector3 position, float radius, List<T> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore) where T : Component
 	{
-		layerMask = HandleTerrainCollision(position, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, colBuffer, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(position, layerMask);
+		int count = UnityEngine.Physics.OverlapSphereNonAlloc(position, radius, colBuffer, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
 	public static void OverlapCapsule<T>(Vector3 point0, Vector3 point1, float radius, List<T> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore) where T : Component
 	{
-		layerMask = HandleTerrainCollision(point0, layerMask);
-		layerMask = HandleTerrainCollision(point1, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, colBuffer, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(point0, layerMask);
+		layerMask = HandleIgnoreCollision(point1, layerMask);
+		int count = UnityEngine.Physics.OverlapCapsuleNonAlloc(point0, point1, radius, colBuffer, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
 	public static void OverlapOBB<T>(OBB obb, List<T> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore) where T : Component
 	{
-		layerMask = HandleTerrainCollision(obb.position, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapBoxNonAlloc(obb.position, obb.extents, colBuffer, obb.rotation, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(obb.position, layerMask);
+		int count = UnityEngine.Physics.OverlapBoxNonAlloc(obb.position, obb.extents, colBuffer, obb.rotation, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
 	public static void OverlapBounds<T>(Bounds bounds, List<T> list, int layerMask = -5, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore) where T : Component
 	{
-		layerMask = HandleTerrainCollision(bounds.center, layerMask);
-		BufferToList(UnityEngine.Physics.OverlapBoxNonAlloc(bounds.center, bounds.extents, colBuffer, Quaternion.identity, layerMask, triggerInteraction), list);
+		layerMask = HandleIgnoreCollision(bounds.center, layerMask);
+		int count = UnityEngine.Physics.OverlapBoxNonAlloc(bounds.center, bounds.extents, colBuffer, Quaternion.identity, layerMask, triggerInteraction);
+		BufferToList(colBuffer, count, list);
 	}
 
-	private static void BufferToList<T>(int count, List<T> list) where T : Component
+	private static void BufferToList<T>(Collider[] buffer, int count, List<T> list) where T : Component
 	{
-		if (count >= colBuffer.Length)
-		{
-			Debug.LogWarning("Physics query is exceeding collider buffer length.");
-		}
 		for (int i = 0; i < count; i++)
 		{
-			T component = colBuffer[i].gameObject.GetComponent<T>();
-			if ((bool)(UnityEngine.Object)component)
+			T component = buffer[i].gameObject.GetComponent<T>();
+			if ((bool)component)
 			{
 				list.Add(component);
 			}
-			colBuffer[i] = null;
+			buffer[i] = null;
 		}
 	}
 
@@ -274,6 +274,15 @@ public static class GamePhysics
 	{
 		int num = 0;
 		num = ((radius != 0f) ? UnityEngine.Physics.SphereCastNonAlloc(ray, radius, hitBuffer, maxDistance, layerMask, triggerInteraction) : UnityEngine.Physics.RaycastNonAlloc(ray, hitBuffer, maxDistance, layerMask, triggerInteraction));
+		if (num < hitBuffer.Length && ((uint)layerMask & 0x10u) != 0 && WaterSystem.Trace(ray, out var position, out var normal, maxDistance))
+		{
+			RaycastHit raycastHit = default(RaycastHit);
+			raycastHit.point = position;
+			raycastHit.normal = normal;
+			raycastHit.distance = (position - ray.origin).magnitude;
+			RaycastHit raycastHit2 = raycastHit;
+			hitBuffer[num++] = raycastHit2;
+		}
 		if (num == 0)
 		{
 			return;
@@ -284,10 +293,10 @@ public static class GamePhysics
 		}
 		for (int i = 0; i < num; i++)
 		{
-			RaycastHit raycastHit = hitBuffer[i];
-			if (Verify(raycastHit, ignoreEntity))
+			RaycastHit raycastHit3 = hitBuffer[i];
+			if (Verify(raycastHit3, ignoreEntity))
 			{
-				hits.Add(raycastHit);
+				hits.Add(raycastHit3);
 			}
 		}
 	}
@@ -382,9 +391,21 @@ public static class GamePhysics
 
 	public static bool Verify(Collider collider, Vector3 point, BaseEntity ignoreEntity = null)
 	{
-		if (collider is TerrainCollider && (bool)TerrainMeta.Collision && TerrainMeta.Collision.GetIgnore(point))
+		if (collider == null)
 		{
-			return false;
+			if ((bool)WaterSystem.Collision && WaterSystem.Collision.GetIgnore(point))
+			{
+				return false;
+			}
+			return true;
+		}
+		if (collider is TerrainCollider)
+		{
+			if ((bool)TerrainMeta.Collision && TerrainMeta.Collision.GetIgnore(point))
+			{
+				return false;
+			}
+			return true;
 		}
 		if (CompareEntity(GameObjectEx.ToBaseEntity(collider), ignoreEntity))
 		{
@@ -406,12 +427,17 @@ public static class GamePhysics
 		return false;
 	}
 
-	public static int HandleTerrainCollision(Vector3 position, int layerMask)
+	public static int HandleIgnoreCollision(Vector3 position, int layerMask)
 	{
 		int num = 8388608;
 		if ((layerMask & num) != 0 && (bool)TerrainMeta.Collision && TerrainMeta.Collision.GetIgnore(position))
 		{
 			layerMask &= ~num;
+		}
+		int num2 = 16;
+		if ((layerMask & num2) != 0 && (bool)WaterSystem.Collision && WaterSystem.Collision.GetIgnore(position))
+		{
+			layerMask &= ~num2;
 		}
 		return layerMask;
 	}

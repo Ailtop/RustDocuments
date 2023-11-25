@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Collections.Generic;
 using ConVar;
 using Facepunch;
 using Network;
@@ -20,6 +21,8 @@ public class PoweredLightsDeployer : HeldEntity
 	public float maxPlaceDistance = 5f;
 
 	public float lengthPerAmount = 0.5f;
+
+	private const int placementLayerMask = 10551297;
 
 	public AdvancedChristmasLights active
 	{
@@ -47,7 +50,7 @@ public class PoweredLightsDeployer : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddPoint "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - AddPoint ");
 				}
 				using (TimeWarning.New("AddPoint"))
 				{
@@ -83,7 +86,7 @@ public class PoweredLightsDeployer : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Finish "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Finish ");
 				}
 				using (TimeWarning.New("Finish"))
 				{
@@ -118,6 +121,23 @@ public class PoweredLightsDeployer : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
+	private bool CheckValidPlacement(Vector3 position, float radius, int layerMask)
+	{
+		bool result = true;
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		Vis.Entities(position, radius, obj, 10551297);
+		foreach (BaseEntity item in obj)
+		{
+			if (item is AnimatedBuildingBlock)
+			{
+				result = false;
+				break;
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
+		return result;
+	}
+
 	public static bool CanPlayerUse(BasePlayer player)
 	{
 		if (player.CanBuild())
@@ -127,14 +147,14 @@ public class PoweredLightsDeployer : HeldEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void AddPoint(RPCMessage msg)
 	{
 		Vector3 vector = msg.read.Vector3();
 		Vector3 vector2 = msg.read.Vector3();
 		BasePlayer player = msg.player;
-		if (GetItem() == null || GetItem().amount < 1 || !IsVisible(vector) || !CanPlayerUse(player) || Vector3.Distance(vector, player.eyes.position) > maxPlaceDistance)
+		if (GetItem() == null || GetItem().amount < 1 || !IsVisible(vector) || !CanPlayerUse(player) || Vector3.Distance(vector, player.eyes.position) > maxPlaceDistance || !CheckValidPlacement(vector, 0.1f, 10551297))
 		{
 			return;
 		}
@@ -177,8 +197,8 @@ public class PoweredLightsDeployer : HeldEntity
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void Finish(RPCMessage msg)
 	{
 		DoFinish();

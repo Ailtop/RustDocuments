@@ -30,7 +30,7 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerTogglePlay "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerTogglePlay ");
 				}
 				using (TimeWarning.New("ServerTogglePlay"))
 				{
@@ -65,8 +65,8 @@ public class DeployedRecorder : StorageContainer, ICassettePlayer
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ServerTogglePlay(RPCMessage msg)
 	{
 		bool play = msg.read.ReadByte() == 1;

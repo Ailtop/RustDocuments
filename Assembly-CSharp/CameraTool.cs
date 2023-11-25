@@ -18,7 +18,7 @@ public class CameraTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVNoteScreenshot "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SVNoteScreenshot ");
 				}
 				using (TimeWarning.New("SVNoteScreenshot"))
 				{
@@ -53,8 +53,8 @@ public class CameraTool : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void SVNoteScreenshot(RPCMessage msg)
 	{
 	}

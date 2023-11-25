@@ -72,12 +72,12 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 	[SerializeField]
 	private Seating seating;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 steerAngle;
 
-	[SerializeField]
 	[HideInInspector]
+	[SerializeField]
 	private Vector3 accelAngle;
 
 	[SerializeField]
@@ -92,8 +92,8 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 	[HideInInspector]
 	private Vector3 fuelAngle;
 
-	[SerializeField]
 	[Header("Horn")]
+	[SerializeField]
 	private SoundDefinition hornLoop;
 
 	[SerializeField]
@@ -138,7 +138,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DestroyLock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_DestroyLock ");
 				}
 				using (TimeWarning.New("RPC_DestroyLock"))
 				{
@@ -311,8 +311,8 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_DestroyLock(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -337,7 +337,7 @@ public class VehicleModuleSeating : BaseVehicleModule, IPrefabPreProcess
 		bool flag = true;
 		foreach (BaseVehicleModule attachedModuleEntity in Car.AttachedModuleEntities)
 		{
-			if (attachedModuleEntity is VehicleModuleEngine vehicleModuleEngine && !vehicleModuleEngine.AtPeakPerformance)
+			if (attachedModuleEntity is VehicleModuleEngine { AtPeakPerformance: false })
 			{
 				flag = false;
 				break;

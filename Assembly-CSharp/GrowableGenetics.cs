@@ -31,7 +31,7 @@ public static class GrowableGenetics
 	public static void CrossBreed(GrowableEntity growable)
 	{
 		List<GrowableEntity> list = Pool.GetList<GrowableEntity>();
-		Vis.Entities(growable.transform.position, 1.5f, list, 512);
+		Vis.Entities(growable.transform.position, 1.5f, list, 524288);
 		bool flag = false;
 		for (int i = 0; i < 6; i++)
 		{

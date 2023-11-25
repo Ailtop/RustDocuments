@@ -26,13 +26,13 @@ public class KeyLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_CreateKey "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_CreateKey ");
 				}
 				using (TimeWarning.New("RPC_CreateKey"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(4135414453u, "RPC_CreateKey", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(4135414453u, "RPC_CreateKey", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -62,13 +62,13 @@ public class KeyLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Lock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Lock ");
 				}
 				using (TimeWarning.New("RPC_Lock"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(954115386u, "RPC_Lock", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(954115386u, "RPC_Lock", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -98,13 +98,13 @@ public class KeyLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Unlock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Unlock ");
 				}
 				using (TimeWarning.New("RPC_Unlock"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(1663222372u, "RPC_Unlock", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(1663222372u, "RPC_Unlock", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -143,7 +143,7 @@ public class KeyLock : BaseLock
 		{
 			return true;
 		}
-		foreach (Item item in player.inventory.FindItemIDs(keyItemType.itemid))
+		foreach (Item item in player.inventory.FindItemsByItemID(keyItemType.itemid))
 		{
 			if (CanKeyUnlockUs(item))
 			{
@@ -234,7 +234,7 @@ public class KeyLock : BaseLock
 		return !IsLocked();
 	}
 
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	[RPC_Server]
 	private void RPC_Unlock(RPCMessage rpc)
 	{
@@ -245,8 +245,8 @@ public class KeyLock : BaseLock
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	private void RPC_Lock(RPCMessage rpc)
 	{
 		Lock(rpc.player);
@@ -261,7 +261,7 @@ public class KeyLock : BaseLock
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	[RPC_Server]
 	private void RPC_CreateKey(RPCMessage rpc)
 	{

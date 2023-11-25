@@ -23,7 +23,7 @@ public class TriggerAnalytic : TriggerBase, IServerComponent
 		{
 			return null;
 		}
-		if (GameObjectEx.ToBaseEntity(obj) is BasePlayer basePlayer && !basePlayer.IsNpc && basePlayer.isServer)
+		if (GameObjectEx.ToBaseEntity(obj) is BasePlayer { IsNpc: false, isServer: not false } basePlayer)
 		{
 			return basePlayer.gameObject;
 		}

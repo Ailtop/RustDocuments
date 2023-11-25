@@ -7,14 +7,14 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 {
 	public Vector3 groundPosition = Vector3.zero;
 
-	public LayerMask layers = 27328512;
+	public LayerMask layers = 161546240;
 
 	public float radius = 0.1f;
 
 	[Header("Whitelist")]
 	public BaseEntity[] whitelist;
 
-	private int fails;
+	public int fails;
 
 	private void OnDrawGizmosSelected()
 	{
@@ -61,7 +61,7 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 		Facepunch.Pool.FreeList(ref obj);
 	}
 
-	private void OnPhysicsNeighbourChanged()
+	public void OnPhysicsNeighbourChanged()
 	{
 		if (!OnGround())
 		{
@@ -89,11 +89,15 @@ public class GroundWatch : BaseMonoBehaviour, IServerComponent
 		}
 	}
 
-	private bool OnGround()
+	public bool OnGround()
 	{
 		BaseEntity component = GetComponent<BaseEntity>();
 		if ((bool)component)
 		{
+			if (component.HasParent())
+			{
+				return true;
+			}
 			Construction construction = PrefabAttribute.server.Find<Construction>(component.prefabID);
 			if ((bool)construction)
 			{

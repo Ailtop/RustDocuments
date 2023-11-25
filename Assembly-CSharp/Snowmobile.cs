@@ -8,22 +8,8 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHurtNotChild.IHurtTriggerUser, VehicleChassisVisuals<Snowmobile>.IClientWheelUser, IPrefabPreProcess
+public class Snowmobile : GroundVehicle, VehicleChassisVisuals<Snowmobile>.IClientWheelUser, IPrefabPreProcess, CarPhysics<Snowmobile>.ICar, TriggerHurtNotChild.IHurtTriggerUser
 {
-	public CarPhysics<Snowmobile> carPhysics;
-
-	public VehicleTerrainHandler serverTerrainHandler;
-
-	private CarWheel[] wheels;
-
-	public TimeSince timeSinceLastUsed;
-
-	private const float DECAY_TICK_TIME = 60f;
-
-	public float prevTerrainModDrag;
-
-	public TimeSince timeSinceTerrainModCheck;
-
 	[SerializeField]
 	[Header("Snowmobile")]
 	private Transform centreOfMassTransform;
@@ -137,17 +123,19 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 
 	private const float FORCE_MULTIPLIER = 10f;
 
-	public VehicleTerrainHandler.Surface OnSurface
-	{
-		get
-		{
-			if (serverTerrainHandler == null)
-			{
-				return VehicleTerrainHandler.Surface.Default;
-			}
-			return serverTerrainHandler.OnSurface;
-		}
-	}
+	public CarPhysics<Snowmobile> carPhysics;
+
+	public VehicleTerrainHandler serverTerrainHandler;
+
+	private CarWheel[] wheels;
+
+	public TimeSince timeSinceLastUsed;
+
+	private const float DECAY_TICK_TIME = 60f;
+
+	public float prevTerrainModDrag;
+
+	public TimeSince timeSinceTerrainModCheck;
 
 	public float ThrottleInput
 	{
@@ -256,6 +244,18 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 		}
 	}
 
+	public VehicleTerrainHandler.Surface OnSurface
+	{
+		get
+		{
+			if (serverTerrainHandler == null)
+			{
+				return VehicleTerrainHandler.Surface.Default;
+			}
+			return serverTerrainHandler.OnSurface;
+		}
+	}
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("Snowmobile.OnRpcMessage"))
@@ -265,7 +265,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuel ");
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -294,7 +294,7 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenItemStorage "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenItemStorage ");
 				}
 				using (TimeWarning.New("RPC_OpenItemStorage"))
 				{
@@ -327,6 +327,88 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.snowmobile != null)
+		{
+			itemStorageInstance.uid = info.msg.snowmobile.storageID;
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.snowmobile.fuelStorageID;
+			cachedFuelFraction = info.msg.snowmobile.fuelFraction;
+		}
+	}
+
+	public float GetMaxDriveForce()
+	{
+		return (float)engineKW * 10f * GetPerformanceFraction();
+	}
+
+	public override float GetMaxForwardSpeed()
+	{
+		return GetMaxDriveForce() / Mass * 15f;
+	}
+
+	public override float GetThrottleInput()
+	{
+		return ThrottleInput;
+	}
+
+	public override float GetBrakeInput()
+	{
+		return BrakeInput;
+	}
+
+	public float GetSteerInput()
+	{
+		return SteerInput;
+	}
+
+	public bool GetSteerModInput()
+	{
+		return false;
+	}
+
+	public float GetPerformanceFraction()
+	{
+		float t = Mathf.InverseLerp(0.25f, 0.5f, base.healthFraction);
+		return Mathf.Lerp(0.5f, 1f, t);
+	}
+
+	public float GetFuelFraction()
+	{
+		if (base.isServer)
+		{
+			return engineController.FuelSystem.GetFuelFraction();
+		}
+		return cachedFuelFraction;
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (!base.CanBeLooted(player))
+		{
+			return false;
+		}
+		if (!PlayerIsMounted(player))
+		{
+			return !IsOn();
+		}
+		return true;
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (base.isServer && Rust.GameInfo.HasAchievements && !old.HasFlag(Flags.On) && next.HasFlag(Flags.On))
+		{
+			BasePlayer driver = GetDriver();
+			if (driver != null && driver.FindTrigger<TriggerSnowmobileAchievement>() != null)
+			{
+				driver.GiveAchievement("DRIVE_SNOWMOBILE");
+			}
+		}
 	}
 
 	public override void ServerInit()
@@ -587,8 +669,8 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_OpenItemStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -598,88 +680,6 @@ public class Snowmobile : GroundVehicle, CarPhysics<Snowmobile>.ICar, TriggerHur
 			if (itemContainer != null)
 			{
 				itemContainer.PlayerOpenLoot(player);
-			}
-		}
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.snowmobile != null)
-		{
-			itemStorageInstance.uid = info.msg.snowmobile.storageID;
-			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.snowmobile.fuelStorageID;
-			cachedFuelFraction = info.msg.snowmobile.fuelFraction;
-		}
-	}
-
-	public float GetMaxDriveForce()
-	{
-		return (float)engineKW * 10f * GetPerformanceFraction();
-	}
-
-	public override float GetMaxForwardSpeed()
-	{
-		return GetMaxDriveForce() / Mass * 15f;
-	}
-
-	public override float GetThrottleInput()
-	{
-		return ThrottleInput;
-	}
-
-	public override float GetBrakeInput()
-	{
-		return BrakeInput;
-	}
-
-	public float GetSteerInput()
-	{
-		return SteerInput;
-	}
-
-	public bool GetSteerModInput()
-	{
-		return false;
-	}
-
-	public float GetPerformanceFraction()
-	{
-		float t = Mathf.InverseLerp(0.25f, 0.5f, base.healthFraction);
-		return Mathf.Lerp(0.5f, 1f, t);
-	}
-
-	public float GetFuelFraction()
-	{
-		if (base.isServer)
-		{
-			return engineController.FuelSystem.GetFuelFraction();
-		}
-		return cachedFuelFraction;
-	}
-
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		if (!base.CanBeLooted(player))
-		{
-			return false;
-		}
-		if (!PlayerIsMounted(player))
-		{
-			return !IsOn();
-		}
-		return true;
-	}
-
-	public override void OnFlagsChanged(Flags old, Flags next)
-	{
-		base.OnFlagsChanged(old, next);
-		if (base.isServer && Rust.GameInfo.HasAchievements && !old.HasFlag(Flags.On) && next.HasFlag(Flags.On))
-		{
-			BasePlayer driver = GetDriver();
-			if (driver != null && driver.FindTrigger<TriggerSnowmobileAchievement>() != null)
-			{
-				driver.GiveAchievement("DRIVE_SNOWMOBILE");
 			}
 		}
 	}

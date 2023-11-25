@@ -21,9 +21,9 @@ public class InstrumentTool : HeldEntity
 
 	private NoteBindingCollection.NoteData lastPlayedTurretData;
 
-	public override bool IsUsableByTurret => UsableByAutoTurrets;
-
 	public override Transform MuzzleTransform => MuzzleT;
+
+	public override bool IsUsableByTurret => UsableByAutoTurrets;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -34,7 +34,7 @@ public class InstrumentTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_PlayNote "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_PlayNote ");
 				}
 				using (TimeWarning.New("Server_PlayNote"))
 				{
@@ -63,7 +63,7 @@ public class InstrumentTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StopNote "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_StopNote ");
 				}
 				using (TimeWarning.New("Server_StopNote"))
 				{

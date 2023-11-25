@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-[CreateAssetMenu(menuName = "Rust/Vehicles/Train Wagon Loot Data", fileName = "Train Wagon Loot Data")]
+[CreateAssetMenu(menuName = "Scriptable Object/Vehicles/Train Wagon Loot Data", fileName = "Train Wagon Loot Data")]
 public class TrainWagonLootData : ScriptableObject
 {
 	[Serializable]
@@ -30,8 +30,8 @@ public class TrainWagonLootData : ScriptableObject
 	[SerializeField]
 	private LootOption[] oreOptions;
 
-	[ReadOnly]
 	[SerializeField]
+	[ReadOnly]
 	private LootOption lootWagonContent;
 
 	[SerializeField]

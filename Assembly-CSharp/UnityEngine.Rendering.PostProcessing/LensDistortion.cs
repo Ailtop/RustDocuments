@@ -6,8 +6,8 @@ namespace UnityEngine.Rendering.PostProcessing;
 [PostProcess(typeof(UnityEngine.Rendering.PostProcessing.LensDistortionRenderer), "Unity/Lens Distortion", true)]
 public sealed class LensDistortion : PostProcessEffectSettings
 {
-	[Range(-100f, 100f)]
 	[Tooltip("Total distortion amount.")]
+	[Range(-100f, 100f)]
 	public FloatParameter intensity = new FloatParameter
 	{
 		value = 0f
@@ -21,9 +21,9 @@ public sealed class LensDistortion : PostProcessEffectSettings
 		value = 1f
 	};
 
-	[Range(0f, 1f)]
 	[DisplayName("Y Multiplier")]
 	[Tooltip("Intensity multiplier on the y-axis. Set it to 0 to disable distortion on this axis.")]
+	[Range(0f, 1f)]
 	public FloatParameter intensityY = new FloatParameter
 	{
 		value = 1f
@@ -45,8 +45,8 @@ public sealed class LensDistortion : PostProcessEffectSettings
 	};
 
 	[Space]
-	[Range(0.01f, 5f)]
 	[Tooltip("Global screen scaling.")]
+	[Range(0.01f, 5f)]
 	public FloatParameter scale = new FloatParameter
 	{
 		value = 1f

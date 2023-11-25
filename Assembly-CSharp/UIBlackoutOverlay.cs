@@ -21,4 +21,8 @@ public class UIBlackoutOverlay : MonoBehaviour
 	public static Dictionary<blackoutType, UIBlackoutOverlay> instances;
 
 	public blackoutType overlayType = blackoutType.NONE;
+
+	public bool overrideCanvasScaling;
+
+	public float referenceScale = 1f;
 }

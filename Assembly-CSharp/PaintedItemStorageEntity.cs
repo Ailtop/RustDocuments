@@ -54,7 +54,7 @@ public class PaintedItemStorageEntity : BaseEntity, IServerFileReceiver, IUGCBro
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_UpdateImage "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_UpdateImage ");
 				}
 				using (TimeWarning.New("Server_UpdateImage"))
 				{

@@ -39,7 +39,7 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_AddPointMidSpray "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_AddPointMidSpray ");
 				}
 				using (TimeWarning.New("Server_AddPointMidSpray"))
 				{
@@ -68,7 +68,7 @@ public class SprayCanSpray_Freehand : SprayCanSpray
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_FinishEditing "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_FinishEditing ");
 				}
 				using (TimeWarning.New("Server_FinishEditing"))
 				{

@@ -11,6 +11,8 @@ public class WaterBall : BaseEntity
 
 	public GameObjectRef waterExplosion;
 
+	public Collider waterCollider;
+
 	public Rigidbody myRigidBody;
 
 	public override void ServerInit()
@@ -44,7 +46,7 @@ public class WaterBall : BaseEntity
 			return (bool)obj;
 		}
 		List<BaseEntity> obj2 = Pool.GetList<BaseEntity>();
-		Vis.Entities(position, radius, obj2, 1219701523);
+		Vis.Entities(position, radius, obj2, 1220225811);
 		int num = 0;
 		int num2 = amount;
 		while (amount > 0 && num < 3)
@@ -86,6 +88,7 @@ public class WaterBall : BaseEntity
 			DoSplash(base.transform.position + new Vector3(0f, num * 0.75f, 0f), num, liquidType, waterAmount);
 			Effect.server.Run(waterExplosion.resourcePath, base.transform.position + new Vector3(0f, 0f, 0f), Vector3.up);
 			myRigidBody.isKinematic = true;
+			waterCollider.enabled = false;
 			Invoke(Extinguish, 2f);
 		}
 	}

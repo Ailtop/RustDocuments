@@ -44,7 +44,7 @@ public abstract class BaseMetabolism<T> : EntityComponent<T> where T : BaseComba
 		timeSinceLastMetabolism += delta;
 		if (!(timeSinceLastMetabolism <= ConVar.Server.metabolismtick))
 		{
-			if ((bool)(Object)owner && !owner.IsDead())
+			if ((bool)owner && !owner.IsDead())
 			{
 				RunMetabolism(ownerEntity, timeSinceLastMetabolism);
 				DoMetabolismDamage(ownerEntity, timeSinceLastMetabolism);
@@ -86,14 +86,14 @@ public abstract class BaseMetabolism<T> : EntityComponent<T> where T : BaseComba
 		heartrate.MoveTowards(0.05f, delta * (1f / 60f));
 	}
 
-	public void ApplyChange(MetabolismAttribute.Type type, float amount, float time)
+	public virtual void ApplyChange(MetabolismAttribute.Type type, float amount, float time)
 	{
 		FindAttribute(type)?.Add(amount);
 	}
 
 	public bool ShouldDie()
 	{
-		if ((bool)(Object)owner)
+		if ((bool)owner)
 		{
 			return owner.Health() <= 0f;
 		}

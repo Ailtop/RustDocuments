@@ -31,9 +31,9 @@ public class UILineRendererList : UIPrimitiveBase
 		Catenary = 4
 	}
 
-	private const float MIN_MITER_JOIN = (float)Math.PI / 12f;
+	private const float MIN_MITER_JOIN = MathF.PI / 12f;
 
-	private const float MIN_BEVEL_NICE_JOIN = (float)Math.PI / 6f;
+	private const float MIN_BEVEL_NICE_JOIN = MathF.PI / 6f;
 
 	private static Vector2 UV_TOP_LEFT;
 
@@ -59,20 +59,20 @@ public class UILineRendererList : UIPrimitiveBase
 
 	private static Vector2[] fullUvs;
 
-	[SerializeField]
 	[Tooltip("Points to draw lines between\n Can be improved using the Resolution Option")]
+	[SerializeField]
 	internal List<Vector2> m_points;
 
 	[SerializeField]
 	[Tooltip("Thickness of the line")]
 	internal float lineThickness = 2f;
 
-	[SerializeField]
 	[Tooltip("Use the relative bounds of the Rect Transform (0,0 -> 0,1) or screen space coordinates")]
+	[SerializeField]
 	internal bool relativeSize;
 
-	[Tooltip("Do the points identify a single line or split pairs of lines")]
 	[SerializeField]
+	[Tooltip("Do the points identify a single line or split pairs of lines")]
 	internal bool lineList;
 
 	[SerializeField]
@@ -265,7 +265,7 @@ public class UILineRendererList : UIPrimitiveBase
 			{
 				Vector3 vector5 = list[k][1].position - list[k][2].position;
 				Vector3 vector6 = list[k + 1][2].position - list[k + 1][1].position;
-				float num5 = Vector2.Angle(vector5, vector6) * ((float)Math.PI / 180f);
+				float num5 = Vector2.Angle(vector5, vector6) * (MathF.PI / 180f);
 				float num6 = Mathf.Sign(Vector3.Cross(vector5.normalized, vector6.normalized).z);
 				float num7 = lineThickness / (2f * Mathf.Tan(num5 / 2f));
 				Vector3 position = list[k][2].position - vector5.normalized * num7 * num6;
@@ -273,7 +273,7 @@ public class UILineRendererList : UIPrimitiveBase
 				JoinType joinType = LineJoins;
 				if (joinType == JoinType.Miter)
 				{
-					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > (float)Math.PI / 12f)
+					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > MathF.PI / 12f)
 					{
 						list[k][2].position = position;
 						list[k][3].position = position2;
@@ -287,7 +287,7 @@ public class UILineRendererList : UIPrimitiveBase
 				}
 				if (joinType == JoinType.Bevel)
 				{
-					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > (float)Math.PI / 6f)
+					if (num7 < vector5.magnitude / 2f && num7 < vector6.magnitude / 2f && num5 > MathF.PI / 6f)
 					{
 						if (num6 < 0f)
 						{

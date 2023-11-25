@@ -7,6 +7,19 @@ using UnityEngine.Serialization;
 
 public class Construction : PrefabAttribute
 {
+	public class Grade
+	{
+		public BuildingGrade grade;
+
+		public float maxHealth;
+
+		public List<ItemAmount> costToBuild;
+
+		public PhysicMaterial physicMaterial => grade.physicMaterial;
+
+		public ProtectionProperties damageProtecton => grade.damageProtecton;
+	}
+
 	public struct Target
 	{
 		public bool valid;
@@ -52,21 +65,6 @@ public class Construction : PrefabAttribute
 		public Quaternion rotation;
 	}
 
-	public class Grade
-	{
-		public BuildingGrade grade;
-
-		public float maxHealth;
-
-		public List<ItemAmount> costToBuild;
-
-		public PhysicMaterial physicMaterial => grade.physicMaterial;
-
-		public ProtectionProperties damageProtecton => grade.damageProtecton;
-	}
-
-	public static string lastPlacementError;
-
 	public BaseEntity.Menu.Option info;
 
 	public bool canBypassBuildingPermission;
@@ -90,6 +88,8 @@ public class Construction : PrefabAttribute
 	public Vector3 applyStartingRotation = Vector3.zero;
 
 	public Transform deployOffset;
+
+	public bool enforceLineOfSightCheckAgainstParentEntity;
 
 	[Range(0f, 10f)]
 	public float healthMultiplier = 1f;
@@ -131,6 +131,102 @@ public class Construction : PrefabAttribute
 
 	[NonSerialized]
 	public ConstructionPlaceholder placeholder;
+
+	public static string lastPlacementError;
+
+	public BaseEntity CreateConstruction(Target target, bool bNeedsValidPlacement = false)
+	{
+		GameObject gameObject = GameManager.server.CreatePrefab(fullName, Vector3.zero, Quaternion.identity, active: false);
+		bool flag = UpdatePlacement(gameObject.transform, this, ref target);
+		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
+		if (bNeedsValidPlacement && !flag)
+		{
+			if (BaseNetworkableEx.IsValid(baseEntity))
+			{
+				baseEntity.Kill();
+			}
+			else
+			{
+				GameManager.Destroy(gameObject);
+			}
+			return null;
+		}
+		DecayEntity decayEntity = baseEntity as DecayEntity;
+		if ((bool)decayEntity)
+		{
+			decayEntity.AttachToBuilding(target.entity as DecayEntity);
+		}
+		return baseEntity;
+	}
+
+	public bool HasMaleSockets(Target target)
+	{
+		Socket_Base[] array = allSockets;
+		foreach (Socket_Base socket_Base in array)
+		{
+			if (socket_Base.male && !socket_Base.maleDummy && socket_Base.TestTarget(target))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void FindMaleSockets(Target target, List<Socket_Base> sockets)
+	{
+		Socket_Base[] array = allSockets;
+		foreach (Socket_Base socket_Base in array)
+		{
+			if (socket_Base.male && !socket_Base.maleDummy && socket_Base.TestTarget(target))
+			{
+				sockets.Add(socket_Base);
+			}
+		}
+	}
+
+	public ConstructionGrade GetGrade(BuildingGrade.Enum iGrade, ulong iSkin)
+	{
+		ConstructionGrade[] array = grades;
+		foreach (ConstructionGrade constructionGrade in array)
+		{
+			if (constructionGrade.gradeBase.type == iGrade && constructionGrade.gradeBase.skin == iSkin)
+			{
+				return constructionGrade;
+			}
+		}
+		return defaultGrade;
+	}
+
+	protected override void AttributeSetup(GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
+		isBuildingPrivilege = rootObj.GetComponent<BuildingPrivlidge>();
+		isSleepingBag = rootObj.GetComponent<SleepingBag>();
+		bounds = rootObj.GetComponent<BaseEntity>().bounds;
+		deployable = GetComponent<Deployable>();
+		placeholder = GetComponentInChildren<ConstructionPlaceholder>();
+		allSockets = GetComponentsInChildren<Socket_Base>(includeInactive: true);
+		allProximities = GetComponentsInChildren<BuildingProximity>(includeInactive: true);
+		socketHandle = GetComponentsInChildren<SocketHandle>(includeInactive: true).FirstOrDefault();
+		grades = rootObj.GetComponents<ConstructionGrade>();
+		ConstructionGrade[] array = grades;
+		foreach (ConstructionGrade constructionGrade in array)
+		{
+			if (!(constructionGrade == null))
+			{
+				constructionGrade.construction = this;
+				if (!(defaultGrade != null))
+				{
+					defaultGrade = constructionGrade;
+				}
+			}
+		}
+	}
+
+	protected override Type GetIndexedType()
+	{
+		return typeof(Construction);
+	}
 
 	public bool UpdatePlacement(Transform transform, Construction common, ref Target target)
 	{
@@ -262,10 +358,13 @@ public class Construction : PrefabAttribute
 		{
 			return true;
 		}
-		StabilityEntity stabilityEntity = RaycastHitEx.GetEntity(hitInfo) as StabilityEntity;
-		if (stabilityEntity != null && target.entity == stabilityEntity)
+		if (!common.enforceLineOfSightCheckAgainstParentEntity)
 		{
-			return true;
+			StabilityEntity stabilityEntity = RaycastHitEx.GetEntity(hitInfo) as StabilityEntity;
+			if (stabilityEntity != null && target.entity == stabilityEntity)
+			{
+				return true;
+			}
 		}
 		if (vector.magnitude - hitInfo.distance < 0.2f)
 		{
@@ -315,99 +414,5 @@ public class Construction : PrefabAttribute
 	public virtual bool ShowAsNeutral(Target target)
 	{
 		return target.inBuildingPrivilege;
-	}
-
-	public BaseEntity CreateConstruction(Target target, bool bNeedsValidPlacement = false)
-	{
-		GameObject gameObject = GameManager.server.CreatePrefab(fullName, Vector3.zero, Quaternion.identity, active: false);
-		bool flag = UpdatePlacement(gameObject.transform, this, ref target);
-		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
-		if (bNeedsValidPlacement && !flag)
-		{
-			if (BaseNetworkableEx.IsValid(baseEntity))
-			{
-				baseEntity.Kill();
-			}
-			else
-			{
-				GameManager.Destroy(gameObject);
-			}
-			return null;
-		}
-		DecayEntity decayEntity = baseEntity as DecayEntity;
-		if ((bool)decayEntity)
-		{
-			decayEntity.AttachToBuilding(target.entity as DecayEntity);
-		}
-		return baseEntity;
-	}
-
-	public bool HasMaleSockets(Target target)
-	{
-		Socket_Base[] array = allSockets;
-		foreach (Socket_Base socket_Base in array)
-		{
-			if (socket_Base.male && !socket_Base.maleDummy && socket_Base.TestTarget(target))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public void FindMaleSockets(Target target, List<Socket_Base> sockets)
-	{
-		Socket_Base[] array = allSockets;
-		foreach (Socket_Base socket_Base in array)
-		{
-			if (socket_Base.male && !socket_Base.maleDummy && socket_Base.TestTarget(target))
-			{
-				sockets.Add(socket_Base);
-			}
-		}
-	}
-
-	public ConstructionGrade GetGrade(BuildingGrade.Enum iGrade, ulong iSkin)
-	{
-		ConstructionGrade[] array = grades;
-		foreach (ConstructionGrade constructionGrade in array)
-		{
-			if (constructionGrade.gradeBase.type == iGrade && constructionGrade.gradeBase.skin == iSkin)
-			{
-				return constructionGrade;
-			}
-		}
-		return defaultGrade;
-	}
-
-	protected override void AttributeSetup(GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		base.AttributeSetup(rootObj, name, serverside, clientside, bundling);
-		isBuildingPrivilege = rootObj.GetComponent<BuildingPrivlidge>();
-		isSleepingBag = rootObj.GetComponent<SleepingBag>();
-		bounds = rootObj.GetComponent<BaseEntity>().bounds;
-		deployable = GetComponent<Deployable>();
-		placeholder = GetComponentInChildren<ConstructionPlaceholder>();
-		allSockets = GetComponentsInChildren<Socket_Base>(includeInactive: true);
-		allProximities = GetComponentsInChildren<BuildingProximity>(includeInactive: true);
-		socketHandle = GetComponentsInChildren<SocketHandle>(includeInactive: true).FirstOrDefault();
-		grades = rootObj.GetComponents<ConstructionGrade>();
-		ConstructionGrade[] array = grades;
-		foreach (ConstructionGrade constructionGrade in array)
-		{
-			if (!(constructionGrade == null))
-			{
-				constructionGrade.construction = this;
-				if (!(defaultGrade != null))
-				{
-					defaultGrade = constructionGrade;
-				}
-			}
-		}
-	}
-
-	protected override Type GetIndexedType()
-	{
-		return typeof(Construction);
 	}
 }

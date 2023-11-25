@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class PostUpdateHook : MonoBehaviour
 {
 	public static Action OnUpdate;

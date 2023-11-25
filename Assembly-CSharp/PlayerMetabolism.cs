@@ -136,6 +136,20 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		return bleeding.value > 0f;
 	}
 
+	public void ForceUpdateWorkbenchFlags()
+	{
+		owner.InvalidateWorkbenchCache();
+		UpdateWorkbenchFlags();
+	}
+
+	private void UpdateWorkbenchFlags()
+	{
+		float currentCraftLevel = owner.currentCraftLevel;
+		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench1, currentCraftLevel == 1f);
+		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench2, currentCraftLevel == 2f);
+		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench3, currentCraftLevel == 3f);
+	}
+
 	protected override void RunMetabolism(BaseCombatEntity ownerEntity, float delta)
 	{
 		if (Interface.CallHook("OnRunPlayerMetabolism", this, ownerEntity, delta) != null)
@@ -145,11 +159,10 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		float currentTemperature = owner.currentTemperature;
 		float fTarget = owner.currentComfort;
-		float currentCraftLevel = owner.currentCraftLevel;
-		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench1, currentCraftLevel == 1f);
-		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench2, currentCraftLevel == 2f);
-		owner.SetPlayerFlag(BasePlayer.PlayerFlags.Workbench3, currentCraftLevel == 3f);
+		UpdateWorkbenchFlags();
 		owner.SetPlayerFlag(BasePlayer.PlayerFlags.SafeZone, owner.InSafeZone());
+		owner.SetPlayerFlag(BasePlayer.PlayerFlags.NoRespawnZone, owner.InNoRespawnZone());
+		owner.SetPlayerFlag(BasePlayer.PlayerFlags.ModifyClan, owner.CanModifyClan());
 		if (activeGameMode == null || activeGameMode.allowTemperature)
 		{
 			float num = currentTemperature;
@@ -237,12 +250,20 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		{
 			radiation_poison.Subtract(radiation_poison.value * 0.2f * wetness.Fraction() * delta * 0.2f);
 		}
-		if (ConVar.Server.radiation && !owner.IsGod())
+		if (ConVar.Server.radiation)
 		{
-			radiation_level.value = owner.radiationLevel;
-			if (radiation_level.value > 0f)
+			if (!owner.IsGod())
 			{
-				radiation_poison.Add(radiation_level.value * delta);
+				radiation_level.value = owner.radiationLevel;
+				if (radiation_level.value > 0f)
+				{
+					radiation_poison.Add(radiation_level.value * delta);
+				}
+			}
+			else if (radiation_level.value > 0f)
+			{
+				radiation_level.value = 0f;
+				radiation_poison.value = 0f;
 			}
 		}
 		if (pending_health.value > 0f)
@@ -298,6 +319,11 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		base.baseEntity.ClientRPCPlayerAndSpectators(null, base.baseEntity, "UpdateMetabolism", arg);
 	}
 
+	public override void ApplyChange(MetabolismAttribute.Type type, float amount, float time)
+	{
+		FindAttribute(type)?.Add(amount);
+	}
+
 	public bool CanConsume()
 	{
 		if ((bool)owner && owner.IsHeadUnderwater())
@@ -351,6 +377,16 @@ public class PlayerMetabolism : BaseMetabolism<BasePlayer>
 		if ((bool)owner)
 		{
 			owner.health = s.health;
+		}
+	}
+
+	public void SetAttribute(MetabolismAttribute.Type type, float amount)
+	{
+		MetabolismAttribute metabolismAttribute = FindAttribute(type);
+		if (metabolismAttribute != null)
+		{
+			float num = metabolismAttribute.value - amount;
+			metabolismAttribute.Add(0f - num);
 		}
 	}
 

@@ -78,11 +78,14 @@ public class DoorManipulator : IOEntity
 					continue;
 				}
 			}
-			float num2 = Vector3.Distance(item.transform.position, base.transform.position);
-			if (num2 < num)
+			if (!item.IsOnMovingObject())
 			{
-				result = item;
-				num = num2;
+				float num2 = Vector3.Distance(item.transform.position, base.transform.position);
+				if (num2 < num)
+				{
+					result = item;
+					num = num2;
+				}
 			}
 		}
 		Pool.FreeList(ref obj);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Facepunch;
 using UnityEngine;
 
@@ -36,14 +37,14 @@ public class ServerBrowserTagGroup : MonoBehaviour
 		return false;
 	}
 
-	public void Refresh(in ServerInfo server, ref int tagsEnabled, int maxTags)
+	public void Refresh(HashSet<string> serverTags, ref int tagsEnabled, int maxTags)
 	{
 		Initialize();
 		bool flag = false;
 		ServerBrowserTag[] array = tags;
 		foreach (ServerBrowserTag serverBrowserTag in array)
 		{
-			if ((!isExclusive || !flag) && tagsEnabled <= maxTags && server.Tags.Contains(serverBrowserTag.serverTag))
+			if ((!isExclusive || !flag) && tagsEnabled <= maxTags && serverTags.Contains(serverBrowserTag.serverTag))
 			{
 				serverBrowserTag.SetActive(active: true);
 				tagsEnabled++;

@@ -68,6 +68,10 @@ public class GestureConfig : ScriptableObject
 
 	public bool canDuckDuringGesture;
 
+	public bool hideInWheel;
+
+	public bool hasViewmodelAnimation = true;
+
 	public MovementCapabilities movementMode;
 
 	public AnimationType animationType;

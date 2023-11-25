@@ -30,7 +30,7 @@ public class Recycler : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVSwitch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SVSwitch ");
 				}
 				using (TimeWarning.New("SVSwitch"))
 				{
@@ -122,7 +122,7 @@ public class Recycler : StorageContainer
 	private void SVSwitch(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();
-		if (flag == IsOn() || msg.player == null || Interface.CallHook("OnRecyclerToggle", this, msg.player) != null || (flag && !HasRecyclable()))
+		if (flag == IsOn() || msg.player == null || Interface.CallHook("OnRecyclerToggle", this, msg.player) != null || (!flag && onlyOneUser && msg.player.inventory.loot.entitySource != this) || (flag && !HasRecyclable()))
 		{
 			return;
 		}

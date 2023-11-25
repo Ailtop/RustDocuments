@@ -28,8 +28,8 @@ public class GC : ConsoleSystem
 		}
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool incremental_enabled
 	{
 		get
@@ -42,13 +42,13 @@ public class GC : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static int incremental_milliseconds
 	{
 		get
 		{
-			return (int)(GarbageCollector.incrementalTimeSliceNanoseconds / 1000000uL);
+			return (int)(GarbageCollector.incrementalTimeSliceNanoseconds / 1000000);
 		}
 		set
 		{
@@ -56,8 +56,8 @@ public class GC : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static bool enabled
 	{
 		get
@@ -84,8 +84,8 @@ public class GC : ConsoleSystem
 		Resources.UnloadUnusedAssets();
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void alloc(Arg args)
 	{
 		byte[] array = new byte[args.GetInt(0, 1048576)];

@@ -6,6 +6,7 @@ using ConVar;
 using Facepunch;
 using Network;
 using Oxide.Core;
+using ProtoBuf;
 using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -60,7 +61,11 @@ public class WireTool : HeldEntity
 
 	public float RadialMenuHoldTime = 0.25f;
 
-	private const float IndustrialWallOffset = 0.03f;
+	public float disconnectDelay = 0.15f;
+
+	public float clearDelay = 0.65f;
+
+	private const float IndustrialWallOffset = 0.04f;
 
 	public static Translate.Phrase Default = new Translate.Phrase("wiretoolcolour.default", "Default");
 
@@ -127,7 +132,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - MakeConnection "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - MakeConnection ");
 				}
 				using (TimeWarning.New("MakeConnection"))
 				{
@@ -167,7 +172,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestChangeColor "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestChangeColor ");
 				}
 				using (TimeWarning.New("RequestChangeColor"))
 				{
@@ -207,7 +212,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestClear "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestClear ");
 				}
 				using (TimeWarning.New("RequestClear"))
 				{
@@ -247,7 +252,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetPlugged "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetPlugged ");
 				}
 				using (TimeWarning.New("SetPlugged"))
 				{
@@ -276,7 +281,7 @@ public class WireTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TryClear "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - TryClear ");
 				}
 				using (TimeWarning.New("TryClear"))
 				{
@@ -396,9 +401,13 @@ public class WireTool : HeldEntity
 		return result;
 	}
 
-	public static bool CanModifyEntity(BasePlayer player, BaseEntity ent)
+	public static bool CanModifyEntity(BasePlayer player, IOEntity ent)
 	{
-		return player.CanBuild(ent.transform.position, ent.transform.rotation, ent.bounds);
+		if (player.CanBuild(ent.transform.position, ent.transform.rotation, ent.bounds))
+		{
+			return ent.AllowWireConnections();
+		}
+		return false;
 	}
 
 	public bool PendingPlugRoot()
@@ -410,8 +419,8 @@ public class WireTool : HeldEntity
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	public void TryClear(RPCMessage msg)
 	{
@@ -426,9 +435,9 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void MakeConnection(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -490,39 +499,101 @@ public class WireTool : HeldEntity
 	{
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void RequestClear(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		if (CanPlayerUseWires(player))
+		if (!CanPlayerUseWires(player))
 		{
-			NetworkableId uid = msg.read.EntityID();
-			int clearIndex = msg.read.Int32();
-			bool isInput = msg.read.Bit();
-			AttemptClearSlot(BaseNetworkable.serverEntities.Find(uid), player, clearIndex, isInput);
+			return;
+		}
+		NetworkableId uid = msg.read.EntityID();
+		int num = msg.read.Int32();
+		bool flag = msg.read.Bit();
+		bool flag2 = msg.read.Bit();
+		IOEntity iOEntity = BaseNetworkable.serverEntities.Find(uid) as IOEntity;
+		if (iOEntity == null)
+		{
+			return;
+		}
+		IOEntity.IOSlot iOSlot = (flag ? iOEntity.inputs : iOEntity.outputs)[num];
+		IOEntity iOEntity2 = iOSlot.connectedTo.Get();
+		if (iOEntity2 == null)
+		{
+			return;
+		}
+		IOEntity.IOSlot iOSlot2 = (flag ? iOEntity2.outputs : iOEntity2.inputs)[iOSlot.connectedToSlot];
+		using WireReconnectMessage wireReconnectMessage = Facepunch.Pool.Get<WireReconnectMessage>();
+		wireReconnectMessage.isInput = !flag;
+		wireReconnectMessage.slotIndex = iOSlot.connectedToSlot;
+		wireReconnectMessage.entityId = iOSlot.connectedTo.Get().net.ID;
+		wireReconnectMessage.wireColor = 0;
+		wireReconnectMessage.linePoints = Facepunch.Pool.GetList<Vector3>();
+		IOEntity iOEntity3 = iOEntity;
+		Vector3[] array = iOSlot.linePoints;
+		if (array == null || array.Length == 0)
+		{
+			iOEntity3 = iOEntity2;
+			array = iOSlot2.linePoints;
+		}
+		if (array == null)
+		{
+			array = new Vector3[0];
+		}
+		bool flag3 = iOEntity3 != iOEntity;
+		if (iOEntity == iOEntity3 && flag)
+		{
+			flag3 = true;
+		}
+		wireReconnectMessage.linePoints.AddRange(array);
+		if (flag3)
+		{
+			wireReconnectMessage.linePoints.Reverse();
+		}
+		if (wireReconnectMessage.linePoints.Count >= 2)
+		{
+			wireReconnectMessage.linePoints.RemoveAt(0);
+			wireReconnectMessage.linePoints.RemoveAt(wireReconnectMessage.linePoints.Count - 1);
+		}
+		for (int i = 0; i < wireReconnectMessage.linePoints.Count; i++)
+		{
+			wireReconnectMessage.linePoints[i] = iOEntity3.transform.TransformPoint(wireReconnectMessage.linePoints[i]);
+		}
+		if (AttemptClearSlot(iOEntity, player, num, flag) && flag2)
+		{
+			ClientRPCPlayer(null, player, "OnWireCleared", wireReconnectMessage);
 		}
 	}
 
-	public static void AttemptClearSlot(BaseNetworkable clearEnt, BasePlayer ply, int clearIndex, bool isInput)
+	public static bool AttemptClearSlot(BaseNetworkable clearEnt, BasePlayer ply, int clearIndex, bool isInput)
 	{
 		IOEntity iOEntity = ((clearEnt == null) ? null : clearEnt.GetComponent<IOEntity>());
-		if (iOEntity == null || (ply != null && !CanModifyEntity(ply, iOEntity)) || clearIndex >= (isInput ? iOEntity.inputs.Length : iOEntity.outputs.Length))
+		if (iOEntity == null)
 		{
-			return;
+			return false;
+		}
+		if (ply != null && !CanModifyEntity(ply, iOEntity))
+		{
+			return false;
+		}
+		if (clearIndex >= (isInput ? iOEntity.inputs.Length : iOEntity.outputs.Length))
+		{
+			return false;
 		}
 		IOEntity.IOSlot iOSlot = (isInput ? iOEntity.inputs[clearIndex] : iOEntity.outputs[clearIndex]);
 		if (iOSlot.connectedTo.Get() == null)
 		{
-			return;
+			return false;
 		}
 		IOEntity iOEntity2 = iOSlot.connectedTo.Get();
-		if (Interface.CallHook("OnWireClear", ply, iOEntity, clearIndex, iOEntity2, isInput) != null)
+		object obj = Interface.CallHook("OnWireClear", ply, iOEntity, clearIndex, iOEntity2, isInput);
+		if (obj is bool)
 		{
-			return;
+			return (bool)obj;
 		}
-		IOEntity.IOSlot obj = (isInput ? iOEntity2.outputs[iOSlot.connectedToSlot] : iOEntity2.inputs[iOSlot.connectedToSlot]);
+		IOEntity.IOSlot obj2 = (isInput ? iOEntity2.outputs[iOSlot.connectedToSlot] : iOEntity2.inputs[iOSlot.connectedToSlot]);
 		if (isInput)
 		{
 			iOEntity.UpdateFromInput(0, clearIndex);
@@ -532,9 +603,9 @@ public class WireTool : HeldEntity
 			iOEntity2.UpdateFromInput(0, iOSlot.connectedToSlot);
 		}
 		iOSlot.Clear();
-		obj.Clear();
+		obj2.Clear();
 		iOEntity.MarkDirtyForceUpdateOutputs();
-		iOEntity.SendNetworkUpdate();
+		iOEntity.SendNetworkUpdateImmediate();
 		iOEntity.RefreshIndustrialPreventBuilding();
 		if (iOEntity2 != null)
 		{
@@ -555,7 +626,7 @@ public class WireTool : HeldEntity
 				}
 			}
 		}
-		iOEntity2.SendNetworkUpdate();
+		iOEntity2.SendNetworkUpdateImmediate();
 		if (iOEntity != null && iOEntity.ioType == IOEntity.IOType.Industrial)
 		{
 			iOEntity.NotifyIndustrialNetworkChanged();
@@ -564,11 +635,12 @@ public class WireTool : HeldEntity
 		{
 			iOEntity2.NotifyIndustrialNetworkChanged();
 		}
+		return true;
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	[RPC_Server.FromOwner]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void RequestChangeColor(RPCMessage msg)
 	{
 		if (!CanPlayerUseWires(msg.player))
@@ -599,7 +671,7 @@ public class WireTool : HeldEntity
 		}
 	}
 
-	private WireColour IntToColour(int i)
+	public WireColour IntToColour(int i)
 	{
 		if (i < 0)
 		{
@@ -617,7 +689,7 @@ public class WireTool : HeldEntity
 		return wireColour;
 	}
 
-	private bool ValidateLine(List<Vector3> lineList, IOEntity inputEntity, IOEntity outputEntity, BasePlayer byPlayer, int outputIndex)
+	public bool ValidateLine(List<Vector3> lineList, IOEntity inputEntity, IOEntity outputEntity, BasePlayer byPlayer, int outputIndex)
 	{
 		if (lineList.Count < 2)
 		{
@@ -671,7 +743,7 @@ public class WireTool : HeldEntity
 		return true;
 	}
 
-	private bool VerifyLineOfSight(List<Vector3> positions, Matrix4x4 localToWorldSpace)
+	public bool VerifyLineOfSight(List<Vector3> positions, Matrix4x4 localToWorldSpace)
 	{
 		Vector3 worldSpaceA = localToWorldSpace.MultiplyPoint3x4(positions[0]);
 		for (int i = 1; i < positions.Count; i++)
@@ -686,7 +758,7 @@ public class WireTool : HeldEntity
 		return true;
 	}
 
-	private bool VerifyLineOfSight(Vector3 worldSpaceA, Vector3 worldSpaceB)
+	public bool VerifyLineOfSight(Vector3 worldSpaceA, Vector3 worldSpaceB)
 	{
 		float maxDistance = Vector3.Distance(worldSpaceA, worldSpaceB);
 		Vector3 normalized = (worldSpaceA - worldSpaceB).normalized;

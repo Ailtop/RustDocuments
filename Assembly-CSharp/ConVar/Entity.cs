@@ -50,7 +50,7 @@ public class Entity : ConsoleSystem
 		}
 	}
 
-	private struct EntitySpawnRequest
+	public struct EntitySpawnRequest
 	{
 		public string PrefabName;
 
@@ -123,8 +123,8 @@ public class Entity : ConsoleSystem
 		args.ReplyWith(entityTable.ToString());
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void find_status(Arg args)
 	{
 		string filter = args.GetString(0);
@@ -145,8 +145,8 @@ public class Entity : ConsoleSystem
 		}
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void find_self(Arg args)
 	{
 		BasePlayer basePlayer = ArgEx.Player(args);
@@ -174,7 +174,8 @@ public class Entity : ConsoleSystem
 			{
 				baseEntity.OnDebugStart();
 			}
-			args.ReplyWith(string.Concat("Debugging for ", baseEntity.net.ID, " ", baseEntity.IsDebugging() ? "enabled" : "disabled"));
+			NetworkableId iD = baseEntity.net.ID;
+			args.ReplyWith("Debugging for " + iD.ToString() + " " + (baseEntity.IsDebugging() ? "enabled" : "disabled"));
 		}
 	}
 
@@ -192,7 +193,7 @@ public class Entity : ConsoleSystem
 		}
 	}
 
-	private static EntitySpawnRequest GetSpawnEntityFromName(string name)
+	public static EntitySpawnRequest GetSpawnEntityFromName(string name)
 	{
 		EntitySpawnRequest result;
 		if (string.IsNullOrEmpty(name))
@@ -248,7 +249,9 @@ public class Entity : ConsoleSystem
 		}
 		baseEntity.Spawn();
 		Debug.Log($"{arg} spawned \"{baseEntity}\" at {pos}");
-		return string.Concat("spawned ", baseEntity, " at ", pos);
+		string obj = baseEntity?.ToString();
+		Vector3 vector = pos;
+		return "spawned " + obj + " at " + vector.ToString();
 	}
 
 	[ServerVar(Name = "spawnitem")]
@@ -285,7 +288,9 @@ public class Entity : ConsoleSystem
 		}
 		BaseEntity arg2 = item.CreateWorldObject(pos);
 		Debug.Log($"{arg} spawned \"{arg2}\" at {pos} (via spawnitem)");
-		return string.Concat("spawned ", item, " at ", pos);
+		string obj = item?.ToString();
+		Vector3 vector = pos;
+		return "spawned " + obj + " at " + vector.ToString();
 	}
 
 	[ServerVar(Name = "spawngrid")]

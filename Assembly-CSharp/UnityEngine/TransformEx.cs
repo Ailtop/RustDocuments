@@ -24,7 +24,7 @@ public static class TransformEx
 	public static void RemoveComponent<T>(this Transform transform) where T : Component
 	{
 		T component = transform.GetComponent<T>();
-		if (!((Object)component == (Object)null))
+		if (!(component == null))
 		{
 			GameManager.Destroy(component);
 		}
@@ -32,7 +32,7 @@ public static class TransformEx
 
 	public static void RetireAllChildren(this Transform transform, GameManager gameManager)
 	{
-		List<GameObject> obj = Pool.GetList<GameObject>();
+		List<GameObject> obj = Facepunch.Pool.GetList<GameObject>();
 		foreach (Transform item in transform)
 		{
 			if (!item.CompareTag("persist"))
@@ -44,7 +44,7 @@ public static class TransformEx
 		{
 			gameManager.Retire(item2);
 		}
-		Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj);
 	}
 
 	public static List<Transform> GetChildren(this Transform transform)
@@ -88,6 +88,17 @@ public static class TransformEx
 		return (from x in GetAllChildren(transform)
 			where x.CompareTag(strTag)
 			select x).ToArray();
+	}
+
+	public static Matrix4x4 LocalToPrefabRoot(this Transform transform)
+	{
+		Matrix4x4 identity = Matrix4x4.identity;
+		while (transform.parent != null)
+		{
+			identity *= Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
+			transform = transform.parent;
+		}
+		return identity;
 	}
 
 	public static void Identity(this GameObject go)
@@ -229,19 +240,19 @@ public static class TransformEx
 
 	public static T GetComponentInChildrenIncludeDisabled<T>(this Transform transform) where T : Component
 	{
-		List<T> obj = Pool.GetList<T>();
+		List<T> obj = Facepunch.Pool.GetList<T>();
 		transform.GetComponentsInChildren(includeInactive: true, obj);
 		T result = ((obj.Count > 0) ? obj[0] : null);
-		Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj);
 		return result;
 	}
 
 	public static bool HasComponentInChildrenIncludeDisabled<T>(this Transform transform) where T : Component
 	{
-		List<T> obj = Pool.GetList<T>();
+		List<T> obj = Facepunch.Pool.GetList<T>();
 		transform.GetComponentsInChildren(includeInactive: true, obj);
 		bool result = obj.Count > 0;
-		Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj);
 		return result;
 	}
 

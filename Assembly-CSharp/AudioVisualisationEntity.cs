@@ -55,7 +55,7 @@ public class AudioVisualisationEntity : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerUpdateSettings "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerUpdateSettings ");
 				}
 				using (TimeWarning.New("ServerUpdateSettings"))
 				{
@@ -163,8 +163,8 @@ public class AudioVisualisationEntity : IOEntity
 	}
 
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerUpdateSettings(RPCMessage msg)
 	{
 		int num = msg.read.Int32();

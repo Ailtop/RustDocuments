@@ -80,8 +80,8 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 	}
 
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void StartOpenDesigner(RPCMessage rpc)
 	{
 		if (PlayerCanModify(rpc.player))
@@ -90,9 +90,9 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.IsVisible(3f)]
 	private void ServerSetFireworkDesign(RPCMessage rpc)
 	{
 		if (!PlayerCanModify(rpc.player))
@@ -126,8 +126,8 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 	}
 
 	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SetShellFuseLength(RPCMessage rpc)
 	{
 		if (PlayerCanModify(rpc.player))
@@ -202,7 +202,7 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerSetFireworkDesign "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerSetFireworkDesign ");
 				}
 				using (TimeWarning.New("ServerSetFireworkDesign"))
 				{
@@ -242,7 +242,7 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetShellFuseLength "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetShellFuseLength ");
 				}
 				using (TimeWarning.New("SetShellFuseLength"))
 				{
@@ -282,7 +282,7 @@ public class PatternFirework : MortarFirework, IUGCBrowserEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartOpenDesigner "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - StartOpenDesigner ");
 				}
 				using (TimeWarning.New("StartOpenDesigner"))
 				{

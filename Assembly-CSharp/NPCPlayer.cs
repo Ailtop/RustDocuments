@@ -404,7 +404,7 @@ public class NPCPlayer : BasePlayer
 	{
 		if (!ValidBounds.Test(moveToPosition) && base.transform != null && !base.IsDestroyed)
 		{
-			Debug.Log(string.Concat("Invalid NavAgent Position: ", this, " ", moveToPosition.ToString(), " (destroying)"));
+			Debug.Log("Invalid NavAgent Position: " + this?.ToString() + " " + moveToPosition.ToString() + " (destroying)");
 			Kill();
 			return false;
 		}

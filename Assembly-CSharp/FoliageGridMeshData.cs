@@ -72,7 +72,7 @@ public class FoliageGridMeshData
 		{
 			return;
 		}
-		bounds = new Bounds(meshGroup.data[0].position, Vector3.one);
+		bounds = new Bounds(meshGroup.data[0].position, Vector3.zero);
 		for (int i = 0; i < meshGroup.data.Count; i++)
 		{
 			MeshInstance meshInstance = meshGroup.data[i];
@@ -99,9 +99,9 @@ public class FoliageGridMeshData
 				}
 				vertices.Add(item);
 			}
-			bounds.Encapsulate(meshInstance.position);
+			bounds.Encapsulate(new Bounds(meshInstance.position + meshInstance.data.bounds.center, meshInstance.data.bounds.size));
 		}
-		bounds.size += Vector3.one * 2f;
+		bounds.size += Vector3.one;
 	}
 
 	public void Apply(Mesh mesh)

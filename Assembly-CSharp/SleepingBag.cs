@@ -119,7 +119,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AssignToFriend "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - AssignToFriend ");
 				}
 				using (TimeWarning.New("AssignToFriend"))
 				{
@@ -155,7 +155,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Rename "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Rename ");
 				}
 				using (TimeWarning.New("Rename"))
 				{
@@ -191,7 +191,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_MakeBed "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_MakeBed ");
 				}
 				using (TimeWarning.New("RPC_MakeBed"))
 				{
@@ -227,7 +227,7 @@ public class SleepingBag : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_MakePublic "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_MakePublic ");
 				}
 				using (TimeWarning.New("RPC_MakePublic"))
 				{
@@ -322,6 +322,10 @@ public class SleepingBag : DecayEntity
 					{
 						flag = true;
 					}
+					if (!flag && ClanManager.ServerInstance != null && basePlayer.clanId != 0L && basePlayer.clanId == player.clanId)
+					{
+						flag = true;
+					}
 				}
 				if (!flag)
 				{
@@ -403,7 +407,7 @@ public class SleepingBag : DecayEntity
 		{
 			sleepingBag2 = (SleepingBag)obj;
 		}
-		if (sleepingBag2.IsOccupied())
+		if (sleepingBag2.GetRespawnState(player2.userID) != RespawnInformation.SpawnOptions.RespawnState.OK)
 		{
 			return false;
 		}
@@ -476,28 +480,54 @@ public class SleepingBag : DecayEntity
 		return value.Count;
 	}
 
+	public static bool TrySpawnPlayer(BasePlayer player, NetworkableId sleepingBag, out string errorMessage)
+	{
+		if (!player.IsDead())
+		{
+			errorMessage = "Couldn't spawn - player is not dead!";
+			return false;
+		}
+		if (player.CanRespawn())
+		{
+			if (SpawnPlayer(player, sleepingBag))
+			{
+				player.MarkRespawn();
+				errorMessage = null;
+				return true;
+			}
+			errorMessage = "Couldn't spawn in sleeping bag!";
+			return false;
+		}
+		errorMessage = "You can't respawn again so quickly, wait a while";
+		return false;
+	}
+
 	public virtual void SetUnlockTime(float newTime)
 	{
 		unlockTime = newTime;
 	}
 
-	public static bool DestroyBag(BasePlayer player, NetworkableId sleepingBag)
+	public static bool DestroyBag(ulong userID, NetworkableId sleepingBag)
 	{
-		SleepingBag sleepingBag2 = FindForPlayer(player.userID, ignoreTimers: true).FirstOrDefault((SleepingBag x) => x.net.ID == sleepingBag);
+		SleepingBag sleepingBag2 = FindForPlayer(userID, ignoreTimers: true).FirstOrDefault((SleepingBag x) => x.net.ID == sleepingBag);
 		if (sleepingBag2 == null)
 		{
 			return false;
 		}
-		if (Interface.CallHook("OnSleepingBagDestroy", sleepingBag2, player) != null)
+		if (Interface.CallHook("OnSleepingBagDestroy", sleepingBag2, userID) != null)
 		{
 			return false;
 		}
 		RemoveBagForPlayer(sleepingBag2, sleepingBag2.deployerUserID);
 		sleepingBag2.deployerUserID = 0uL;
 		sleepingBag2.SendNetworkUpdate();
-		player.SendRespawnOptions();
-		Facepunch.Rust.Analytics.Azure.OnBagUnclaimed(player, sleepingBag2);
-		Interface.CallHook("OnSleepingBagDestroyed", sleepingBag2, player);
+		BasePlayer basePlayer = BasePlayer.FindByID(userID);
+		if (basePlayer != null)
+		{
+			basePlayer.SendRespawnOptions();
+			Interface.CallHook("OnSleepingBagDestroyed", sleepingBag2, userID);
+			Facepunch.Rust.Analytics.Azure.OnBagUnclaimed(basePlayer, sleepingBag2);
+		}
 		return true;
 	}
 
@@ -594,6 +624,17 @@ public class SleepingBag : DecayEntity
 		}
 	}
 
+	public override void OnParentChanging(BaseEntity oldParent, BaseEntity newParent)
+	{
+		base.OnParentChanging(oldParent, newParent);
+		Invoke(DelayedPlayerNotify, 0.1f);
+	}
+
+	private void DelayedPlayerNotify()
+	{
+		NotifyPlayer(deployerUserID);
+	}
+
 	public override void PostServerLoad()
 	{
 		base.PostServerLoad();
@@ -625,8 +666,8 @@ public class SleepingBag : DecayEntity
 		info.msg.sleepingBag.deployerID = deployerUserID;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void Rename(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -698,8 +739,8 @@ public class SleepingBag : DecayEntity
 		SendNetworkUpdate();
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public virtual void RPC_MakePublic(RPCMessage msg)
 	{
 		if (!canBePublic || !msg.player.CanInteract() || (deployerUserID != msg.player.userID && !msg.player.CanBuild()))
@@ -780,6 +821,7 @@ public class SleepingBag : DecayEntity
 		NotifyPlayer(deployerUserID);
 		OnBagChangedOwnership(this, num);
 		SendNetworkUpdate();
+		Interface.CallHook("OnBedMade", this, msg.player);
 	}
 
 	protected virtual void PostPlayerSpawn(BasePlayer p)
@@ -787,9 +829,27 @@ public class SleepingBag : DecayEntity
 		p.SendRespawnOptions();
 	}
 
-	public virtual bool IsOccupied()
+	public virtual RespawnInformation.SpawnOptions.RespawnState GetRespawnState(ulong userID)
 	{
-		return false;
+		if (WaterLevel.Test(base.transform.position, waves: true, volumes: false))
+		{
+			return RespawnInformation.SpawnOptions.RespawnState.Underwater;
+		}
+		if (TriggerNoRespawnZone.InAnyNoRespawnZone(base.transform.position))
+		{
+			return RespawnInformation.SpawnOptions.RespawnState.InNoRespawnZone;
+		}
+		return RespawnInformation.SpawnOptions.RespawnState.OK;
+	}
+
+	public virtual bool IsMobile()
+	{
+		BaseEntity baseEntity = GetParentEntity();
+		if (baseEntity != null && baseEntity is BaseVehicle)
+		{
+			return true;
+		}
+		return RespawnType == RespawnInformation.SpawnOptions.RespawnType.Camper;
 	}
 
 	public override string Admin_Who()

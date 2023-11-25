@@ -124,6 +124,6 @@ public struct EntityRef<T> where T : BaseEntity
 	public bool TryGet(bool serverside, out T entity)
 	{
 		entity = Get(serverside);
-		return entity != null;
+		return (object)entity != null;
 	}
 }

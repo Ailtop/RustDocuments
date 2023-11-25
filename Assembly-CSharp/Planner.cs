@@ -25,7 +25,7 @@ public class Planner : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoPlace "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoPlace ");
 				}
 				using (TimeWarning.New("DoPlace"))
 				{
@@ -60,8 +60,28 @@ public class Planner : HeldEntity
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
+	public ItemModDeployable GetModDeployable()
+	{
+		ItemDefinition ownerItemDefinition = GetOwnerItemDefinition();
+		if (ownerItemDefinition == null)
+		{
+			return null;
+		}
+		return ownerItemDefinition.GetComponent<ItemModDeployable>();
+	}
+
+	public Deployable GetDeployable()
+	{
+		ItemModDeployable modDeployable = GetModDeployable();
+		if (modDeployable == null)
+		{
+			return null;
+		}
+		return modDeployable.GetDeployable(this);
+	}
+
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoPlace(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -133,9 +153,11 @@ public class Planner : HeldEntity
 			target.entity = BaseNetworkable.serverEntities.Find(msg.entity) as BaseEntity;
 			if (target.entity == null)
 			{
-				ownerPlayer.ChatMessage("Couldn't find entity " + msg.entity);
+				NetworkableId entity = msg.entity;
+				ownerPlayer.ChatMessage("Couldn't find entity " + entity.ToString());
 				return;
 			}
+			msg.ray = new Ray(target.entity.transform.TransformPoint(msg.ray.origin), target.entity.transform.TransformDirection(msg.ray.direction));
 			msg.position = target.entity.transform.TransformPoint(msg.position);
 			msg.normal = target.entity.transform.TransformDirection(msg.normal);
 			msg.rotation = target.entity.transform.rotation * msg.rotation;
@@ -169,7 +191,7 @@ public class Planner : HeldEntity
 		{
 			return;
 		}
-		if (target.entity != null && deployable != null && deployable.setSocketParent)
+		if (ShouldParent(target.entity, deployable))
 		{
 			Vector3 position = ((target.socket != null) ? target.GetWorldPosition() : target.position);
 			float num = target.entity.Distance(position);
@@ -220,7 +242,15 @@ public class Planner : HeldEntity
 			Vector3 origin = target.ray.origin;
 			Vector3 p = vector;
 			int num = 2097152;
-			int num2 = (ConVar.AntiHack.build_terraincheck ? 10551296 : 2162688);
+			int num2 = 2162688;
+			if (ConVar.AntiHack.build_terraincheck)
+			{
+				num2 |= 0x800000;
+			}
+			if (ConVar.AntiHack.build_vehiclecheck)
+			{
+				num2 |= 0x8000000;
+			}
 			float num3 = ConVar.AntiHack.build_losradius;
 			float padding = ConVar.AntiHack.build_losradius + 0.01f;
 			int layerMask = num2;
@@ -267,9 +297,9 @@ public class Planner : HeldEntity
 		Interface.CallHook("OnEntityBuilt", this, gameObject);
 		Deployable deployable = GetDeployable();
 		BaseEntity baseEntity = GameObjectEx.ToBaseEntity(gameObject);
-		if (deployable != null)
+		if (baseEntity != null && deployable != null)
 		{
-			if (deployable.setSocketParent && target.entity != null && target.entity.SupportsChildDeployables() && (bool)baseEntity)
+			if (ShouldParent(target.entity, deployable))
 			{
 				baseEntity.SetParent(target.entity, worldPositionStays: true);
 			}
@@ -429,23 +459,12 @@ public class Planner : HeldEntity
 		return true;
 	}
 
-	public ItemModDeployable GetModDeployable()
+	private bool ShouldParent(BaseEntity targetEntity, Deployable deployable)
 	{
-		ItemDefinition ownerItemDefinition = GetOwnerItemDefinition();
-		if (ownerItemDefinition == null)
+		if (targetEntity != null && targetEntity.SupportsChildDeployables() && (targetEntity.ForceDeployableSetParent() || (deployable != null && deployable.setSocketParent)))
 		{
-			return null;
+			return true;
 		}
-		return ownerItemDefinition.GetComponent<ItemModDeployable>();
-	}
-
-	public Deployable GetDeployable()
-	{
-		ItemModDeployable modDeployable = GetModDeployable();
-		if (modDeployable == null)
-		{
-			return null;
-		}
-		return modDeployable.GetDeployable(this);
+		return false;
 	}
 }

@@ -8,21 +8,6 @@ using UnityEngine;
 
 public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 {
-	public static Dictionary<string, string> ValidStations;
-
-	public static Dictionary<string, string> ServerValidStations;
-
-	[ReplicatedVar(Saved = true, Help = "A list of radio stations that are valid on this server. Format: NAME,URL,NAME,URL,etc", ShowInAdminUI = true)]
-	public static string ServerUrlList = string.Empty;
-
-	public static string lastParsedServerList;
-
-	public ShoutcastStreamer ShoutcastStreamer;
-
-	public GameObjectRef RadioIpDialog;
-
-	public ulong AssignedRadioBy;
-
 	public AudioSource SoundSource;
 
 	public float ConditionLossRate = 0.25f;
@@ -40,8 +25,20 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 
 	public Action<float> HurtCallback;
 
-	public string CurrentRadioIp { get; set; } = "rustradio.facepunch.com";
+	public static Dictionary<string, string> ValidStations;
 
+	public static Dictionary<string, string> ServerValidStations;
+
+	[ReplicatedVar(Saved = true, Help = "A list of radio stations that are valid on this server. Format: NAME,URL,NAME,URL,etc", ShowInAdminUI = true)]
+	public static string ServerUrlList = string.Empty;
+
+	public static string lastParsedServerList;
+
+	public ShoutcastStreamer ShoutcastStreamer;
+
+	public GameObjectRef RadioIpDialog;
+
+	public ulong AssignedRadioBy;
 
 	public BaseEntity BaseEntity => base.baseEntity;
 
@@ -56,6 +53,9 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 			return false;
 		}
 	}
+
+	public string CurrentRadioIp { get; set; } = "rustradio.facepunch.com";
+
 
 	[ServerVar]
 	public static void ClearRadioByUser(ConsoleSystem.Arg arg)
@@ -79,6 +79,101 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		arg.ReplyWith($"Stopped and cleared saved URL of {num} boom boxes");
 	}
 
+	public void ServerTogglePlay(BaseEntity.RPCMessage msg)
+	{
+		if (IsPowered())
+		{
+			bool play = msg.read.ReadByte() == 1;
+			ServerTogglePlay(play);
+		}
+	}
+
+	public void DeductCondition()
+	{
+		HurtCallback?.Invoke(ConditionLossRate * ConVar.Decay.scale);
+	}
+
+	public void ServerTogglePlay(bool play)
+	{
+		if (!(base.baseEntity == null))
+		{
+			SetFlag(BaseEntity.Flags.On, play);
+			if (base.baseEntity is IOEntity iOEntity)
+			{
+				iOEntity.SendChangedToRoot(forceUpdate: true);
+				iOEntity.MarkDirtyForceUpdateOutputs();
+			}
+			if (play && !IsInvoking(DeductCondition) && ConditionLossRate > 0f)
+			{
+				InvokeRepeating(DeductCondition, 1f, 1f);
+			}
+			else if (IsInvoking(DeductCondition))
+			{
+				CancelInvoke(DeductCondition);
+			}
+		}
+	}
+
+	public void OnCassetteInserted(Cassette c)
+	{
+		if (!(base.baseEntity == null))
+		{
+			base.baseEntity.ClientRPC(null, "Client_OnCassetteInserted", c.net.ID);
+			ServerTogglePlay(play: false);
+			SetFlag(BaseEntity.Flags.Reserved1, state: true);
+			base.baseEntity.SendNetworkUpdate();
+		}
+	}
+
+	public void OnCassetteRemoved(Cassette c)
+	{
+		if (!(base.baseEntity == null))
+		{
+			base.baseEntity.ClientRPC(null, "Client_OnCassetteRemoved");
+			ServerTogglePlay(play: false);
+			SetFlag(BaseEntity.Flags.Reserved1, state: false);
+		}
+	}
+
+	public bool IsPowered()
+	{
+		if (base.baseEntity == null)
+		{
+			return false;
+		}
+		if (!base.baseEntity.HasFlag(BaseEntity.Flags.Reserved8))
+		{
+			return base.baseEntity is HeldBoomBox;
+		}
+		return true;
+	}
+
+	public bool IsOn()
+	{
+		if (base.baseEntity == null)
+		{
+			return false;
+		}
+		return base.baseEntity.IsOn();
+	}
+
+	public bool HasFlag(BaseEntity.Flags f)
+	{
+		if (base.baseEntity == null)
+		{
+			return false;
+		}
+		return base.baseEntity.HasFlag(f);
+	}
+
+	public void SetFlag(BaseEntity.Flags f, bool state)
+	{
+		if (base.baseEntity != null)
+		{
+			base.baseEntity.SetFlag(f, state);
+		}
+	}
+
 	public static void LoadStations()
 	{
 		if (ValidStations == null)
@@ -90,7 +185,7 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 
 	public static Dictionary<string, string> GetStationData()
 	{
-		if ((Facepunch.Application.Manifest?.Metadata)?["RadioStations"] is JArray jArray && jArray.Count > 0)
+		if ((Facepunch.Application.Manifest?.Metadata)?["RadioStations"] is JArray { Count: >0 } jArray)
 		{
 			string[] array = new string[2];
 			Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -207,101 +302,6 @@ public class BoomBox : EntityComponent<BaseEntity>, INotifyLOD
 		{
 			CurrentRadioIp = info.msg.boomBox.radioIp;
 			AssignedRadioBy = info.msg.boomBox.assignedRadioBy;
-		}
-	}
-
-	public void ServerTogglePlay(BaseEntity.RPCMessage msg)
-	{
-		if (IsPowered())
-		{
-			bool play = msg.read.ReadByte() == 1;
-			ServerTogglePlay(play);
-		}
-	}
-
-	public void DeductCondition()
-	{
-		HurtCallback?.Invoke(ConditionLossRate * ConVar.Decay.scale);
-	}
-
-	public void ServerTogglePlay(bool play)
-	{
-		if (!(base.baseEntity == null))
-		{
-			SetFlag(BaseEntity.Flags.On, play);
-			if (base.baseEntity is IOEntity iOEntity)
-			{
-				iOEntity.SendChangedToRoot(forceUpdate: true);
-				iOEntity.MarkDirtyForceUpdateOutputs();
-			}
-			if (play && !IsInvoking(DeductCondition) && ConditionLossRate > 0f)
-			{
-				InvokeRepeating(DeductCondition, 1f, 1f);
-			}
-			else if (IsInvoking(DeductCondition))
-			{
-				CancelInvoke(DeductCondition);
-			}
-		}
-	}
-
-	public void OnCassetteInserted(Cassette c)
-	{
-		if (!(base.baseEntity == null))
-		{
-			base.baseEntity.ClientRPC(null, "Client_OnCassetteInserted", c.net.ID);
-			ServerTogglePlay(play: false);
-			SetFlag(BaseEntity.Flags.Reserved1, state: true);
-			base.baseEntity.SendNetworkUpdate();
-		}
-	}
-
-	public void OnCassetteRemoved(Cassette c)
-	{
-		if (!(base.baseEntity == null))
-		{
-			base.baseEntity.ClientRPC(null, "Client_OnCassetteRemoved");
-			ServerTogglePlay(play: false);
-			SetFlag(BaseEntity.Flags.Reserved1, state: false);
-		}
-	}
-
-	public bool IsPowered()
-	{
-		if (base.baseEntity == null)
-		{
-			return false;
-		}
-		if (!base.baseEntity.HasFlag(BaseEntity.Flags.Reserved8))
-		{
-			return base.baseEntity is HeldBoomBox;
-		}
-		return true;
-	}
-
-	public bool IsOn()
-	{
-		if (base.baseEntity == null)
-		{
-			return false;
-		}
-		return base.baseEntity.IsOn();
-	}
-
-	public bool HasFlag(BaseEntity.Flags f)
-	{
-		if (base.baseEntity == null)
-		{
-			return false;
-		}
-		return base.baseEntity.HasFlag(f);
-	}
-
-	public void SetFlag(BaseEntity.Flags f, bool state)
-	{
-		if (base.baseEntity != null)
-		{
-			base.baseEntity.SetFlag(f, state);
 		}
 	}
 }

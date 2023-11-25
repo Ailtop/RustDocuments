@@ -14,8 +14,15 @@ public class ParticleSystemContainer : MonoBehaviour, IPrefabPreProcess
 
 	public bool precached;
 
+	public bool includeLights;
+
 	[HideInInspector]
-	public ParticleSystemGroup[] particleGroups;
+	[SerializeField]
+	private ParticleSystemGroup[] particleGroups;
+
+	[SerializeField]
+	[HideInInspector]
+	private Light[] lights;
 
 	public void Play()
 	{
@@ -31,6 +38,16 @@ public class ParticleSystemContainer : MonoBehaviour, IPrefabPreProcess
 
 	public void Clear()
 	{
+	}
+
+	private void SetLights(bool on)
+	{
+		Light[] array = ((!precached) ? GetComponentsInChildren<Light>() : lights);
+		Light[] array2 = array;
+		for (int i = 0; i < array2.Length; i++)
+		{
+			array2[i].enabled = on;
+		}
 	}
 
 	public void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
@@ -49,6 +66,10 @@ public class ParticleSystemContainer : MonoBehaviour, IPrefabPreProcess
 				list.Add(item);
 			}
 			particleGroups = list.ToArray();
+			if (includeLights)
+			{
+				lights = GetComponentsInChildren<Light>();
+			}
 		}
 	}
 }

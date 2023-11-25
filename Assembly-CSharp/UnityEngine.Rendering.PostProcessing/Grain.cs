@@ -12,22 +12,22 @@ public sealed class Grain : PostProcessEffectSettings
 		value = true
 	};
 
-	[Range(0f, 1f)]
 	[Tooltip("Grain strength. Higher values mean more visible grain.")]
+	[Range(0f, 1f)]
 	public FloatParameter intensity = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Tooltip("Grain particle size.")]
 	[Range(0.3f, 3f)]
+	[Tooltip("Grain particle size.")]
 	public FloatParameter size = new FloatParameter
 	{
 		value = 1f
 	};
 
-	[Tooltip("Controls the noise response curve based on scene luminance. Lower values mean less noise in dark areas.")]
 	[DisplayName("Luminance Contribution")]
+	[Tooltip("Controls the noise response curve based on scene luminance. Lower values mean less noise in dark areas.")]
 	[Range(0f, 1f)]
 	public FloatParameter lumContrib = new FloatParameter
 	{

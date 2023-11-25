@@ -56,7 +56,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLoot "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenLoot ");
 				}
 				using (TimeWarning.New("RPC_OpenLoot"))
 				{
@@ -93,7 +93,7 @@ public class DroppedItemContainer : BaseCombatEntity, LootPanel.IHasLootPanel, I
 
 	public override bool OnStartBeingLooted(BasePlayer baseEntity)
 	{
-		if (baseEntity.InSafeZone() && baseEntity.userID != playerSteamID)
+		if ((baseEntity.InSafeZone() || InSafeZone()) && baseEntity.userID != playerSteamID)
 		{
 			return false;
 		}

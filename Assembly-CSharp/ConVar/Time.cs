@@ -37,8 +37,8 @@ public class Time : ConsoleSystem
 		}
 	}
 
-	[Help("The time scale")]
 	[ServerVar]
+	[Help("The time scale")]
 	public static float timescale
 	{
 		get

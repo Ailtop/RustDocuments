@@ -17,13 +17,15 @@ using Rust.Registry;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, IEntity, NetworkHandler
+public abstract class BaseNetworkable : BaseMonoBehaviour, IEntity, NetworkHandler, IPrefabPostProcess
 {
 	public struct SaveInfo
 	{
 		public ProtoBuf.Entity msg;
 
 		public bool forDisk;
+
+		public bool forTransfer;
 
 		public Connection forConnection;
 
@@ -46,6 +48,8 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		public ProtoBuf.Entity msg;
 
 		public bool fromDisk;
+
+		public bool fromTransfer;
 	}
 
 	public class EntityRealmServer : EntityRealm
@@ -146,9 +150,14 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			}
 		}
 
-		public IEnumerator<BaseNetworkable> GetEnumerator()
+		public BufferList<BaseNetworkable>.Enumerator GetEnumerator()
 		{
 			return entityList.Values.GetEnumerator();
+		}
+
+		IEnumerator<BaseNetworkable> IEnumerable<BaseNetworkable>.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -167,6 +176,29 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 		None = 0,
 		Gib = 1
 	}
+
+	[Header("BaseNetworkable")]
+	[ReadOnly]
+	public uint prefabID;
+
+	[Tooltip("If enabled the entity will send to everyone on the server - regardless of position")]
+	public bool globalBroadcast;
+
+	[Tooltip("Global broadcast a cut down version of the entity to show buildings across the map")]
+	public bool globalBuildingBlock;
+
+	[NonSerialized]
+	public Networkable net;
+
+	private string _prefabName;
+
+	private string _prefabNameWithoutExtension;
+
+	public static EntityRealm serverEntities = new EntityRealmServer();
+
+	private const bool isServersideEntity = true;
+
+	public static List<Connection> connectionsInSphereList = new List<Connection>();
 
 	public List<Component> postNetworkUpdateComponents = new List<Component>();
 
@@ -191,25 +223,35 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 
 	private MemoryStream _SaveCache;
 
-	[ReadOnly]
-	[Header("BaseNetworkable")]
-	public uint prefabID;
+	public bool IsDestroyed { get; private set; }
 
-	[Tooltip("If enabled the entity will send to everyone on the server - regardless of position")]
-	public bool globalBroadcast;
+	public string PrefabName
+	{
+		get
+		{
+			if (_prefabName == null)
+			{
+				_prefabName = StringPool.Get(prefabID);
+			}
+			return _prefabName;
+		}
+	}
 
-	[NonSerialized]
-	public Networkable net;
+	public string ShortPrefabName
+	{
+		get
+		{
+			if (_prefabNameWithoutExtension == null)
+			{
+				_prefabNameWithoutExtension = Path.GetFileNameWithoutExtension(PrefabName);
+			}
+			return _prefabNameWithoutExtension;
+		}
+	}
 
-	private string _prefabName;
+	public bool isServer => true;
 
-	private string _prefabNameWithoutExtension;
-
-	public static EntityRealm serverEntities = new EntityRealmServer();
-
-	private const bool isServersideEntity = true;
-
-	public static List<Connection> connectionsInSphereList = new List<Connection>();
+	public bool isClient => false;
 
 	public bool limitNetworking
 	{
@@ -262,476 +304,6 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	public static Group GlobalNetworkGroup => Network.Net.sv.visibility.Get(0u);
 
 	public static Group LimboNetworkGroup => Network.Net.sv.visibility.Get(1u);
-
-	public bool IsDestroyed { get; private set; }
-
-	public string PrefabName
-	{
-		get
-		{
-			if (_prefabName == null)
-			{
-				_prefabName = StringPool.Get(prefabID);
-			}
-			return _prefabName;
-		}
-	}
-
-	public string ShortPrefabName
-	{
-		get
-		{
-			if (_prefabNameWithoutExtension == null)
-			{
-				_prefabNameWithoutExtension = Path.GetFileNameWithoutExtension(PrefabName);
-			}
-			return _prefabNameWithoutExtension;
-		}
-	}
-
-	public bool isServer => true;
-
-	public bool isClient => false;
-
-	public void BroadcastOnPostNetworkUpdate(BaseEntity entity)
-	{
-		foreach (Component postNetworkUpdateComponent in postNetworkUpdateComponents)
-		{
-			(postNetworkUpdateComponent as IOnPostNetworkUpdate)?.OnPostNetworkUpdate(entity);
-		}
-		foreach (BaseEntity child in children)
-		{
-			child.BroadcastOnPostNetworkUpdate(entity);
-		}
-	}
-
-	public virtual void PostProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		if (!serverside)
-		{
-			postNetworkUpdateComponents = GetComponentsInChildren<IOnPostNetworkUpdate>(includeInactive: true).Cast<Component>().ToList();
-		}
-	}
-
-	private void OnNetworkLimitStart()
-	{
-		LogEntry(LogEntryType.Network, 2, "OnNetworkLimitStart");
-		List<Connection> subscribers = GetSubscribers();
-		if (subscribers == null)
-		{
-			return;
-		}
-		subscribers = subscribers.ToList();
-		subscribers.RemoveAll((Connection x) => ShouldNetworkTo(x.player as BasePlayer));
-		OnNetworkSubscribersLeave(subscribers);
-		if (children == null)
-		{
-			return;
-		}
-		foreach (BaseEntity child in children)
-		{
-			child.OnNetworkLimitStart();
-		}
-	}
-
-	private void OnNetworkLimitEnd()
-	{
-		LogEntry(LogEntryType.Network, 2, "OnNetworkLimitEnd");
-		List<Connection> subscribers = GetSubscribers();
-		if (subscribers == null)
-		{
-			return;
-		}
-		OnNetworkSubscribersEnter(subscribers);
-		if (children == null)
-		{
-			return;
-		}
-		foreach (BaseEntity child in children)
-		{
-			child.OnNetworkLimitEnd();
-		}
-	}
-
-	public BaseEntity GetParentEntity()
-	{
-		return parentEntity.Get(isServer);
-	}
-
-	public bool HasParent()
-	{
-		return parentEntity.IsValid(isServer);
-	}
-
-	public void AddChild(BaseEntity child)
-	{
-		if (!children.Contains(child))
-		{
-			children.Add(child);
-			OnChildAdded(child);
-		}
-	}
-
-	protected virtual void OnChildAdded(BaseEntity child)
-	{
-	}
-
-	public void RemoveChild(BaseEntity child)
-	{
-		children.Remove(child);
-		OnChildRemoved(child);
-	}
-
-	protected virtual void OnChildRemoved(BaseEntity child)
-	{
-	}
-
-	public virtual float GetNetworkTime()
-	{
-		return UnityEngine.Time.time;
-	}
-
-	public virtual void Spawn()
-	{
-		SpawnShared();
-		if (net == null)
-		{
-			net = Network.Net.sv.CreateNetworkable();
-		}
-		creationFrame = UnityEngine.Time.frameCount;
-		PreInitShared();
-		InitShared();
-		ServerInit();
-		PostInitShared();
-		UpdateNetworkGroup();
-		isSpawned = true;
-		Interface.CallHook("OnEntitySpawned", this);
-		SendNetworkUpdateImmediate(justCreated: true);
-		if (Rust.Application.isLoading && !Rust.Application.isLoadingSave)
-		{
-			OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
-		}
-	}
-
-	public bool IsFullySpawned()
-	{
-		return isSpawned;
-	}
-
-	public virtual void ServerInit()
-	{
-		serverEntities.RegisterID(this);
-		if (net != null)
-		{
-			net.handler = this;
-		}
-	}
-
-	public List<Connection> GetSubscribers()
-	{
-		if (net == null)
-		{
-			return null;
-		}
-		if (net.group == null)
-		{
-			return null;
-		}
-		return net.group.subscribers;
-	}
-
-	public void KillMessage()
-	{
-		Kill();
-	}
-
-	public virtual void AdminKill()
-	{
-		Kill(DestroyMode.Gib);
-	}
-
-	public void Kill(DestroyMode mode = DestroyMode.None)
-	{
-		if (IsDestroyed)
-		{
-			Debug.LogWarning("Calling kill - but already IsDestroyed!? " + this);
-		}
-		else if (Interface.CallHook("OnEntityKill", this) == null)
-		{
-			OnParentDestroyingEx.BroadcastOnParentDestroying(base.gameObject);
-			DoEntityDestroy();
-			TerminateOnClient(mode);
-			TerminateOnServer();
-			EntityDestroy();
-		}
-	}
-
-	public void TerminateOnClient(DestroyMode mode)
-	{
-		if (net != null && net.group != null && Network.Net.sv.IsConnected())
-		{
-			LogEntry(LogEntryType.Network, 2, "Term {0}", mode);
-			NetWrite netWrite = Network.Net.sv.StartWrite();
-			netWrite.PacketID(Message.Type.EntityDestroy);
-			netWrite.EntityID(net.ID);
-			netWrite.UInt8((byte)mode);
-			netWrite.Send(new SendInfo(net.group.subscribers));
-		}
-	}
-
-	private void TerminateOnServer()
-	{
-		if (net != null)
-		{
-			InvalidateNetworkCache();
-			serverEntities.UnregisterID(this);
-			Network.Net.sv.DestroyNetworkable(ref net);
-			StopAllCoroutines();
-			base.gameObject.SetActive(value: false);
-		}
-	}
-
-	internal virtual void DoServerDestroy()
-	{
-		isSpawned = false;
-		Facepunch.Rust.Analytics.Azure.OnEntityDestroyed(this);
-	}
-
-	public virtual bool ShouldNetworkTo(BasePlayer player)
-	{
-		object obj = Interface.CallHook("CanNetworkTo", this, player);
-		if (obj is bool)
-		{
-			return (bool)obj;
-		}
-		if (net.group == null)
-		{
-			return true;
-		}
-		return player.net.subscriber.IsSubscribed(net.group);
-	}
-
-	public void SendNetworkGroupChange()
-	{
-		if (isSpawned && Network.Net.sv.IsConnected())
-		{
-			if (net.group == null)
-			{
-				Debug.LogWarning(ToString() + " changed its network group to null");
-				return;
-			}
-			NetWrite netWrite = Network.Net.sv.StartWrite();
-			netWrite.PacketID(Message.Type.GroupChange);
-			netWrite.EntityID(net.ID);
-			netWrite.GroupID(net.group.ID);
-			netWrite.Send(new SendInfo(net.group.subscribers));
-		}
-	}
-
-	public void SendAsSnapshot(Connection connection, bool justCreated = false)
-	{
-		if (Interface.CallHook("OnEntitySnapshot", this, connection) == null)
-		{
-			NetWrite netWrite = Network.Net.sv.StartWrite();
-			connection.validate.entityUpdates++;
-			SaveInfo saveInfo = default(SaveInfo);
-			saveInfo.forConnection = connection;
-			saveInfo.forDisk = false;
-			SaveInfo saveInfo2 = saveInfo;
-			netWrite.PacketID(Message.Type.Entities);
-			netWrite.UInt32(connection.validate.entityUpdates);
-			ToStreamForNetwork(netWrite, saveInfo2);
-			netWrite.Send(new SendInfo(connection));
-		}
-	}
-
-	public void SendNetworkUpdate(BasePlayer.NetworkQueue queue = BasePlayer.NetworkQueue.Update)
-	{
-		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
-		{
-			return;
-		}
-		using (TimeWarning.New("SendNetworkUpdate"))
-		{
-			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate");
-			InvalidateNetworkCache();
-			List<Connection> subscribers = GetSubscribers();
-			if (subscribers != null && subscribers.Count > 0)
-			{
-				for (int i = 0; i < subscribers.Count; i++)
-				{
-					BasePlayer basePlayer = subscribers[i].player as BasePlayer;
-					if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
-					{
-						basePlayer.QueueUpdate(queue, this);
-					}
-				}
-			}
-		}
-		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
-	}
-
-	public void SendNetworkUpdateImmediate(bool justCreated = false)
-	{
-		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
-		{
-			return;
-		}
-		using (TimeWarning.New("SendNetworkUpdateImmediate"))
-		{
-			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdateImmediate");
-			InvalidateNetworkCache();
-			List<Connection> subscribers = GetSubscribers();
-			if (subscribers != null && subscribers.Count > 0)
-			{
-				for (int i = 0; i < subscribers.Count; i++)
-				{
-					Connection connection = subscribers[i];
-					BasePlayer basePlayer = connection.player as BasePlayer;
-					if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
-					{
-						SendAsSnapshot(connection, justCreated);
-					}
-				}
-			}
-		}
-		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
-	}
-
-	public void SendNetworkUpdate_Position()
-	{
-		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
-		{
-			return;
-		}
-		using (TimeWarning.New("SendNetworkUpdate_Position"))
-		{
-			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Position");
-			List<Connection> subscribers = GetSubscribers();
-			if (subscribers != null && subscribers.Count > 0)
-			{
-				NetWrite netWrite = Network.Net.sv.StartWrite();
-				netWrite.PacketID(Message.Type.EntityPosition);
-				netWrite.EntityID(net.ID);
-				Vector3 obj = GetNetworkPosition();
-				netWrite.Vector3(in obj);
-				obj = GetNetworkRotation().eulerAngles;
-				netWrite.Vector3(in obj);
-				netWrite.Float(GetNetworkTime());
-				NetworkableId uid = parentEntity.uid;
-				if (uid.IsValid)
-				{
-					netWrite.EntityID(uid);
-				}
-				SendInfo sendInfo = new SendInfo(subscribers);
-				sendInfo.method = SendMethod.ReliableUnordered;
-				sendInfo.priority = Priority.Immediate;
-				SendInfo info = sendInfo;
-				netWrite.Send(info);
-			}
-		}
-	}
-
-	public void ToStream(Stream stream, SaveInfo saveInfo)
-	{
-		using (saveInfo.msg = Facepunch.Pool.Get<ProtoBuf.Entity>())
-		{
-			Save(saveInfo);
-			if (saveInfo.msg.baseEntity == null)
-			{
-				Debug.LogError(string.Concat(this, ": ToStream - no BaseEntity!?"));
-			}
-			if (saveInfo.msg.baseNetworkable == null)
-			{
-				Debug.LogError(string.Concat(this, ": ToStream - no baseNetworkable!?"));
-			}
-			Interface.CallHook("IOnEntitySaved", this, saveInfo);
-			saveInfo.msg.ToProto(stream);
-			PostSave(saveInfo);
-		}
-	}
-
-	public virtual bool CanUseNetworkCache(Connection connection)
-	{
-		return ConVar.Server.netcache;
-	}
-
-	public void ToStreamForNetwork(Stream stream, SaveInfo saveInfo)
-	{
-		if (!CanUseNetworkCache(saveInfo.forConnection))
-		{
-			ToStream(stream, saveInfo);
-			return;
-		}
-		if (_NetworkCache == null)
-		{
-			_NetworkCache = ((EntityMemoryStreamPool.Count > 0) ? (_NetworkCache = EntityMemoryStreamPool.Dequeue()) : new MemoryStream(8));
-			ToStream(_NetworkCache, saveInfo);
-			ConVar.Server.netcachesize += (int)_NetworkCache.Length;
-		}
-		_NetworkCache.WriteTo(stream);
-	}
-
-	public void InvalidateNetworkCache()
-	{
-		using (TimeWarning.New("InvalidateNetworkCache"))
-		{
-			if (_SaveCache != null)
-			{
-				ConVar.Server.savecachesize -= (int)_SaveCache.Length;
-				_SaveCache.SetLength(0L);
-				_SaveCache.Position = 0L;
-				EntityMemoryStreamPool.Enqueue(_SaveCache);
-				_SaveCache = null;
-			}
-			if (_NetworkCache != null)
-			{
-				ConVar.Server.netcachesize -= (int)_NetworkCache.Length;
-				_NetworkCache.SetLength(0L);
-				_NetworkCache.Position = 0L;
-				EntityMemoryStreamPool.Enqueue(_NetworkCache);
-				_NetworkCache = null;
-			}
-			LogEntry(LogEntryType.Network, 3, "InvalidateNetworkCache");
-		}
-	}
-
-	public MemoryStream GetSaveCache()
-	{
-		if (_SaveCache == null)
-		{
-			if (EntityMemoryStreamPool.Count > 0)
-			{
-				_SaveCache = EntityMemoryStreamPool.Dequeue();
-			}
-			else
-			{
-				_SaveCache = new MemoryStream(8);
-			}
-			SaveInfo saveInfo = default(SaveInfo);
-			saveInfo.forDisk = true;
-			SaveInfo saveInfo2 = saveInfo;
-			ToStream(_SaveCache, saveInfo2);
-			ConVar.Server.savecachesize += (int)_SaveCache.Length;
-		}
-		return _SaveCache;
-	}
-
-	public virtual void UpdateNetworkGroup()
-	{
-		Assert.IsTrue(isServer, "UpdateNetworkGroup called on clientside entity!");
-		if (net == null)
-		{
-			return;
-		}
-		using (TimeWarning.New("UpdateGroups"))
-		{
-			if (net.UpdateGroups(base.transform.position))
-			{
-				SendNetworkGroupChange();
-			}
-		}
-	}
 
 	public virtual Vector3 GetNetworkPosition()
 	{
@@ -947,7 +519,9 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 	{
 		if (info.msg.baseNetworkable != null)
 		{
-			ProtoBuf.BaseNetworkable baseNetworkable = info.msg.baseNetworkable;
+			LoadInfo loadInfo = info;
+			Interface.CallHook("OnEntityLoaded", this, info);
+			ProtoBuf.BaseNetworkable baseNetworkable = loadInfo.msg.baseNetworkable;
 			if (prefabID != baseNetworkable.prefabID)
 			{
 				Debug.LogError("Prefab IDs don't match! " + prefabID + "/" + baseNetworkable.prefabID + " -> " + base.gameObject, base.gameObject);
@@ -1051,5 +625,479 @@ public abstract class BaseNetworkable : BaseMonoBehaviour, IPrefabPostProcess, I
 			}
 		}
 		return false;
+	}
+
+	public static bool HasConnections(Vector3 position)
+	{
+		if (Network.Net.sv == null)
+		{
+			return false;
+		}
+		if (Network.Net.sv.visibility == null)
+		{
+			return false;
+		}
+		Group group = Network.Net.sv.visibility.GetGroup(position);
+		if (group == null)
+		{
+			return false;
+		}
+		List<Connection> subscribers = group.subscribers;
+		for (int i = 0; i < subscribers.Count; i++)
+		{
+			Connection connection = subscribers[i];
+			if (connection.active && !(connection.player as BasePlayer == null))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void BroadcastOnPostNetworkUpdate(BaseEntity entity)
+	{
+		foreach (Component postNetworkUpdateComponent in postNetworkUpdateComponents)
+		{
+			(postNetworkUpdateComponent as IOnPostNetworkUpdate)?.OnPostNetworkUpdate(entity);
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.BroadcastOnPostNetworkUpdate(entity);
+		}
+	}
+
+	public virtual void PostProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		if (!serverside)
+		{
+			postNetworkUpdateComponents = GetComponentsInChildren<IOnPostNetworkUpdate>(includeInactive: true).Cast<Component>().ToList();
+		}
+	}
+
+	private void OnNetworkLimitStart()
+	{
+		LogEntry(LogEntryType.Network, 2, "OnNetworkLimitStart");
+		List<Connection> subscribers = GetSubscribers();
+		if (subscribers == null)
+		{
+			return;
+		}
+		subscribers = subscribers.ToList();
+		subscribers.RemoveAll((Connection x) => ShouldNetworkTo(x.player as BasePlayer));
+		OnNetworkSubscribersLeave(subscribers);
+		if (children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.OnNetworkLimitStart();
+		}
+	}
+
+	private void OnNetworkLimitEnd()
+	{
+		LogEntry(LogEntryType.Network, 2, "OnNetworkLimitEnd");
+		List<Connection> subscribers = GetSubscribers();
+		if (subscribers == null)
+		{
+			return;
+		}
+		OnNetworkSubscribersEnter(subscribers);
+		if (children == null)
+		{
+			return;
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.OnNetworkLimitEnd();
+		}
+	}
+
+	public BaseEntity GetParentEntity()
+	{
+		return parentEntity.Get(isServer);
+	}
+
+	public bool HasParent()
+	{
+		return parentEntity.IsValid(isServer);
+	}
+
+	public void AddChild(BaseEntity child)
+	{
+		if (!children.Contains(child))
+		{
+			children.Add(child);
+			OnChildAdded(child);
+		}
+	}
+
+	protected virtual void OnChildAdded(BaseEntity child)
+	{
+	}
+
+	public void RemoveChild(BaseEntity child)
+	{
+		children.Remove(child);
+		OnChildRemoved(child);
+	}
+
+	protected virtual void OnChildRemoved(BaseEntity child)
+	{
+	}
+
+	public virtual float GetNetworkTime()
+	{
+		return UnityEngine.Time.time;
+	}
+
+	public virtual void Spawn()
+	{
+		SpawnShared();
+		if (net == null)
+		{
+			net = Network.Net.sv.CreateNetworkable();
+		}
+		creationFrame = UnityEngine.Time.frameCount;
+		PreInitShared();
+		InitShared();
+		ServerInit();
+		PostInitShared();
+		UpdateNetworkGroup();
+		isSpawned = true;
+		Interface.CallHook("OnEntitySpawned", this);
+		SendNetworkUpdateImmediate(justCreated: true);
+		Invoke(SendGlobalNetworkUpdate, 0f);
+		if (Rust.Application.isLoading && !Rust.Application.isLoadingSave)
+		{
+			OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+		}
+	}
+
+	private void SendGlobalNetworkUpdate()
+	{
+		GlobalNetworkHandler.server?.TrySendNetworkUpdate(this);
+	}
+
+	public bool IsFullySpawned()
+	{
+		return isSpawned;
+	}
+
+	public virtual void ServerInit()
+	{
+		serverEntities.RegisterID(this);
+		if (net != null)
+		{
+			net.handler = this;
+		}
+	}
+
+	public List<Connection> GetSubscribers()
+	{
+		if (net == null)
+		{
+			return null;
+		}
+		if (net.group == null)
+		{
+			return null;
+		}
+		return net.group.subscribers;
+	}
+
+	public void KillMessage()
+	{
+		Kill();
+	}
+
+	public virtual void AdminKill()
+	{
+		Kill(DestroyMode.Gib);
+	}
+
+	public void Kill(DestroyMode mode = DestroyMode.None)
+	{
+		if (IsDestroyed)
+		{
+			Debug.LogWarning("Calling kill - but already IsDestroyed!? " + this);
+		}
+		else if (Interface.CallHook("OnEntityKill", this) == null)
+		{
+			OnParentDestroyingEx.BroadcastOnParentDestroying(base.gameObject);
+			DoEntityDestroy();
+			TerminateOnClient(mode);
+			TerminateOnServer();
+			EntityDestroy();
+		}
+	}
+
+	public void TerminateOnClient(DestroyMode mode)
+	{
+		if (net != null && net.group != null && Network.Net.sv.IsConnected())
+		{
+			LogEntry(LogEntryType.Network, 2, "Term {0}", mode);
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.EntityDestroy);
+			netWrite.EntityID(net.ID);
+			netWrite.UInt8((byte)mode);
+			netWrite.Send(new SendInfo(net.group.subscribers));
+			GlobalNetworkHandler.server?.OnEntityKilled(this);
+		}
+	}
+
+	private void TerminateOnServer()
+	{
+		if (net != null)
+		{
+			InvalidateNetworkCache();
+			serverEntities.UnregisterID(this);
+			Network.Net.sv.DestroyNetworkable(ref net);
+			StopAllCoroutines();
+			base.gameObject.SetActive(value: false);
+		}
+	}
+
+	internal virtual void DoServerDestroy()
+	{
+		isSpawned = false;
+		Facepunch.Rust.Analytics.Azure.OnEntityDestroyed(this);
+	}
+
+	public virtual bool ShouldNetworkTo(BasePlayer player)
+	{
+		object obj = Interface.CallHook("CanNetworkTo", this, player);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
+		if (net.group == null)
+		{
+			return true;
+		}
+		return player.net.subscriber.IsSubscribed(net.group);
+	}
+
+	public void SendNetworkGroupChange()
+	{
+		if (isSpawned && Network.Net.sv.IsConnected())
+		{
+			if (net.group == null)
+			{
+				Debug.LogWarning(ToString() + " changed its network group to null");
+				return;
+			}
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.GroupChange);
+			netWrite.EntityID(net.ID);
+			netWrite.GroupID(net.group.ID);
+			netWrite.Send(new SendInfo(net.group.subscribers));
+		}
+	}
+
+	public void SendAsSnapshot(Connection connection, bool justCreated = false)
+	{
+		if (Interface.CallHook("OnEntitySnapshot", this, connection) == null)
+		{
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			connection.validate.entityUpdates++;
+			SaveInfo saveInfo = default(SaveInfo);
+			saveInfo.forConnection = connection;
+			saveInfo.forDisk = false;
+			SaveInfo saveInfo2 = saveInfo;
+			netWrite.PacketID(Message.Type.Entities);
+			netWrite.UInt32(connection.validate.entityUpdates);
+			ToStreamForNetwork(netWrite, saveInfo2);
+			netWrite.Send(new SendInfo(connection));
+		}
+	}
+
+	public void SendNetworkUpdate(BasePlayer.NetworkQueue queue = BasePlayer.NetworkQueue.Update)
+	{
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
+		{
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdate"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate");
+			InvalidateNetworkCache();
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null && subscribers.Count > 0)
+			{
+				for (int i = 0; i < subscribers.Count; i++)
+				{
+					BasePlayer basePlayer = subscribers[i].player as BasePlayer;
+					if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
+					{
+						basePlayer.QueueUpdate(queue, this);
+					}
+				}
+			}
+		}
+		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+	}
+
+	public void SendNetworkUpdateImmediate(bool justCreated = false)
+	{
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
+		{
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdateImmediate"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdateImmediate");
+			InvalidateNetworkCache();
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null && subscribers.Count > 0)
+			{
+				for (int i = 0; i < subscribers.Count; i++)
+				{
+					Connection connection = subscribers[i];
+					BasePlayer basePlayer = connection.player as BasePlayer;
+					if (!(basePlayer == null) && ShouldNetworkTo(basePlayer))
+					{
+						SendAsSnapshot(connection, justCreated);
+					}
+				}
+			}
+		}
+		OnSendNetworkUpdateEx.SendOnSendNetworkUpdate(base.gameObject, this as BaseEntity);
+	}
+
+	public void SendNetworkUpdate_Position()
+	{
+		if (Rust.Application.isLoading || Rust.Application.isLoadingSave || IsDestroyed || net == null || !isSpawned)
+		{
+			return;
+		}
+		using (TimeWarning.New("SendNetworkUpdate_Position"))
+		{
+			LogEntry(LogEntryType.Network, 2, "SendNetworkUpdate_Position");
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null && subscribers.Count > 0)
+			{
+				NetWrite netWrite = Network.Net.sv.StartWrite();
+				netWrite.PacketID(Message.Type.EntityPosition);
+				netWrite.EntityID(net.ID);
+				Vector3 obj = GetNetworkPosition();
+				netWrite.Vector3(in obj);
+				obj = GetNetworkRotation().eulerAngles;
+				netWrite.Vector3(in obj);
+				netWrite.Float(GetNetworkTime());
+				NetworkableId uid = parentEntity.uid;
+				if (uid.IsValid)
+				{
+					netWrite.EntityID(uid);
+				}
+				SendInfo sendInfo = new SendInfo(subscribers);
+				sendInfo.method = SendMethod.ReliableUnordered;
+				sendInfo.priority = Priority.Immediate;
+				SendInfo info = sendInfo;
+				netWrite.Send(info);
+			}
+		}
+	}
+
+	public void ToStream(Stream stream, SaveInfo saveInfo)
+	{
+		using (saveInfo.msg = Facepunch.Pool.Get<ProtoBuf.Entity>())
+		{
+			Save(saveInfo);
+			if (saveInfo.msg.baseEntity == null)
+			{
+				Debug.LogError(this?.ToString() + ": ToStream - no BaseEntity!?");
+			}
+			if (saveInfo.msg.baseNetworkable == null)
+			{
+				Debug.LogError(this?.ToString() + ": ToStream - no baseNetworkable!?");
+			}
+			Interface.CallHook("IOnEntitySaved", this, saveInfo);
+			saveInfo.msg.ToProto(stream);
+			PostSave(saveInfo);
+		}
+	}
+
+	public virtual bool CanUseNetworkCache(Connection connection)
+	{
+		return ConVar.Server.netcache;
+	}
+
+	public void ToStreamForNetwork(Stream stream, SaveInfo saveInfo)
+	{
+		if (!CanUseNetworkCache(saveInfo.forConnection))
+		{
+			ToStream(stream, saveInfo);
+			return;
+		}
+		if (_NetworkCache == null)
+		{
+			_NetworkCache = ((EntityMemoryStreamPool.Count > 0) ? (_NetworkCache = EntityMemoryStreamPool.Dequeue()) : new MemoryStream(8));
+			ToStream(_NetworkCache, saveInfo);
+			ConVar.Server.netcachesize += (int)_NetworkCache.Length;
+		}
+		_NetworkCache.WriteTo(stream);
+	}
+
+	public void InvalidateNetworkCache()
+	{
+		using (TimeWarning.New("InvalidateNetworkCache"))
+		{
+			if (_SaveCache != null)
+			{
+				ConVar.Server.savecachesize -= (int)_SaveCache.Length;
+				_SaveCache.SetLength(0L);
+				_SaveCache.Position = 0L;
+				EntityMemoryStreamPool.Enqueue(_SaveCache);
+				_SaveCache = null;
+			}
+			if (_NetworkCache != null)
+			{
+				ConVar.Server.netcachesize -= (int)_NetworkCache.Length;
+				_NetworkCache.SetLength(0L);
+				_NetworkCache.Position = 0L;
+				EntityMemoryStreamPool.Enqueue(_NetworkCache);
+				_NetworkCache = null;
+			}
+			LogEntry(LogEntryType.Network, 3, "InvalidateNetworkCache");
+		}
+	}
+
+	public MemoryStream GetSaveCache()
+	{
+		if (_SaveCache == null)
+		{
+			if (EntityMemoryStreamPool.Count > 0)
+			{
+				_SaveCache = EntityMemoryStreamPool.Dequeue();
+			}
+			else
+			{
+				_SaveCache = new MemoryStream(8);
+			}
+			SaveInfo saveInfo = default(SaveInfo);
+			saveInfo.forDisk = true;
+			SaveInfo saveInfo2 = saveInfo;
+			ToStream(_SaveCache, saveInfo2);
+			ConVar.Server.savecachesize += (int)_SaveCache.Length;
+		}
+		return _SaveCache;
+	}
+
+	public virtual void UpdateNetworkGroup()
+	{
+		Assert.IsTrue(isServer, "UpdateNetworkGroup called on clientside entity!");
+		if (net == null)
+		{
+			return;
+		}
+		using (TimeWarning.New("UpdateGroups"))
+		{
+			if (net.UpdateGroups(base.transform.position))
+			{
+				SendNetworkGroupChange();
+			}
+		}
 	}
 }

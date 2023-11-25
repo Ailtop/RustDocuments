@@ -6,15 +6,15 @@ namespace UnityEngine.Rendering.PostProcessing;
 [PostProcess(typeof(UnityEngine.Rendering.PostProcessing.ColorGradingRenderer), "Unity/Color Grading", true)]
 public sealed class ColorGrading : PostProcessEffectSettings
 {
-	[Tooltip("Select a color grading mode that fits your dynamic range and workflow. Use HDR if your camera is set to render in HDR and your target platform supports it. Use LDR for low-end mobiles or devices that don't support HDR. Use External if you prefer authoring a Log LUT in an external software.")]
 	[DisplayName("Mode")]
+	[Tooltip("Select a color grading mode that fits your dynamic range and workflow. Use HDR if your camera is set to render in HDR and your target platform supports it. Use LDR for low-end mobiles or devices that don't support HDR. Use External if you prefer authoring a Log LUT in an external software.")]
 	public GradingModeParameter gradingMode = new GradingModeParameter
 	{
 		value = GradingMode.HighDefinitionRange
 	};
 
-	[Tooltip("A custom 3D log-encoded texture.")]
 	[DisplayName("Lookup Texture")]
+	[Tooltip("A custom 3D log-encoded texture.")]
 	public TextureParameter externalLut = new TextureParameter
 	{
 		value = null
@@ -28,16 +28,16 @@ public sealed class ColorGrading : PostProcessEffectSettings
 	};
 
 	[Tooltip("Affects the transition between the toe and the mid section of the curve. A value of 0 means no toe, a value of 1 means a very hard transition.")]
-	[Range(0f, 1f)]
 	[DisplayName("Toe Strength")]
+	[Range(0f, 1f)]
 	public FloatParameter toneCurveToeStrength = new FloatParameter
 	{
 		value = 0f
 	};
 
+	[DisplayName("Toe Length")]
 	[Range(0f, 1f)]
 	[Tooltip("Affects how much of the dynamic range is in the toe. With a small value, the toe will be very short and quickly transition into the linear section, with a larger value, the toe will be longer.")]
-	[DisplayName("Toe Length")]
 	public FloatParameter toneCurveToeLength = new FloatParameter
 	{
 		value = 0.5f
@@ -51,25 +51,25 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Shoulder Length")]
 	[Tooltip("Affects how many F-stops (EV) to add to the dynamic range of the curve.")]
 	[Min(0f)]
+	[DisplayName("Shoulder Length")]
 	public FloatParameter toneCurveShoulderLength = new FloatParameter
 	{
 		value = 0.5f
 	};
 
 	[Range(0f, 1f)]
-	[DisplayName("Shoulder Angle")]
 	[Tooltip("Affects how much overshoot to add to the shoulder.")]
+	[DisplayName("Shoulder Angle")]
 	public FloatParameter toneCurveShoulderAngle = new FloatParameter
 	{
 		value = 0f
 	};
 
 	[Min(0.001f)]
-	[DisplayName("Gamma")]
 	[Tooltip("Applies a gamma function to the curve.")]
+	[DisplayName("Gamma")]
 	public FloatParameter toneCurveGamma = new FloatParameter
 	{
 		value = 1f
@@ -92,16 +92,16 @@ public sealed class ColorGrading : PostProcessEffectSettings
 	};
 
 	[DisplayName("Temperature")]
-	[Tooltip("Sets the white balance to a custom color temperature.")]
 	[Range(-100f, 100f)]
+	[Tooltip("Sets the white balance to a custom color temperature.")]
 	public FloatParameter temperature = new FloatParameter
 	{
 		value = 0f
 	};
 
 	[DisplayName("Tint")]
-	[Range(-100f, 100f)]
 	[Tooltip("Sets the white balance to compensate for a green or magenta tint.")]
+	[Range(-100f, 100f)]
 	public FloatParameter tint = new FloatParameter
 	{
 		value = 0f
@@ -115,9 +115,9 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = Color.white
 	};
 
+	[Range(-180f, 180f)]
 	[Tooltip("Shift the hue of all colors.")]
 	[DisplayName("Hue Shift")]
-	[Range(-180f, 180f)]
 	public FloatParameter hueShift = new FloatParameter
 	{
 		value = 0f
@@ -146,17 +146,32 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Contrast")]
-	[Tooltip("Expands or shrinks the overall range of tonal values.")]
 	[Range(-100f, 100f)]
+	[Tooltip("Expands or shrinks the overall range of tonal values.")]
+	[DisplayName("Contrast")]
 	public FloatParameter contrast = new FloatParameter
 	{
 		value = 0f
 	};
 
+	[DisplayName("Mode")]
+	[Tooltip("Select masking type to avoid applying grading to certain areas.")]
+	public MaskingModeParameter maskMode = new MaskingModeParameter
+	{
+		value = MaskingMode.None
+	};
+
+	[Tooltip("Mask intensity.")]
+	[DisplayName("Intensity")]
+	[Range(0f, 10f)]
+	public FloatParameter maskIntensity = new FloatParameter
+	{
+		value = 1f
+	};
+
 	[DisplayName("Red")]
-	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the red channel in the overall mix.")]
+	[Range(-200f, 200f)]
 	public FloatParameter mixerRedOutRedIn = new FloatParameter
 	{
 		value = 100f
@@ -170,8 +185,8 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
-	[DisplayName("Blue")]
 	[Range(-200f, 200f)]
+	[DisplayName("Blue")]
 	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	public FloatParameter mixerRedOutBlueIn = new FloatParameter
 	{
@@ -202,40 +217,40 @@ public sealed class ColorGrading : PostProcessEffectSettings
 		value = 0f
 	};
 
+	[DisplayName("Red")]
 	[Range(-200f, 200f)]
 	[Tooltip("Modify influence of the red channel in the overall mix.")]
-	[DisplayName("Red")]
 	public FloatParameter mixerBlueOutRedIn = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Tooltip("Modify influence of the green channel in the overall mix.")]
-	[Range(-200f, 200f)]
 	[DisplayName("Green")]
+	[Range(-200f, 200f)]
+	[Tooltip("Modify influence of the green channel in the overall mix.")]
 	public FloatParameter mixerBlueOutGreenIn = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Tooltip("Modify influence of the blue channel in the overall mix.")]
-	[Range(-200f, 200f)]
 	[DisplayName("Blue")]
+	[Range(-200f, 200f)]
+	[Tooltip("Modify influence of the blue channel in the overall mix.")]
 	public FloatParameter mixerBlueOutBlueIn = new FloatParameter
 	{
 		value = 100f
 	};
 
-	[Trackball(TrackballAttribute.Mode.Lift)]
-	[Tooltip("Controls the darkest portions of the render.")]
 	[DisplayName("Lift")]
+	[Tooltip("Controls the darkest portions of the render.")]
+	[Trackball(TrackballAttribute.Mode.Lift)]
 	public Vector4Parameter lift = new Vector4Parameter
 	{
 		value = new Vector4(1f, 1f, 1f, 0f)
 	};
 
-	[Tooltip("Power function that controls mid-range tones.")]
 	[DisplayName("Gamma")]
+	[Tooltip("Power function that controls mid-range tones.")]
 	[Trackball(TrackballAttribute.Mode.Gamma)]
 	public Vector4Parameter gamma = new Vector4Parameter
 	{

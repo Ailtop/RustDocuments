@@ -5,10 +5,6 @@ using UnityEngine.Rendering;
 
 public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 {
-	private NetworkableId? _currentlyRenderedDungeon;
-
-	private int? _underwaterLabFloorCount;
-
 	public Camera renderCamera;
 
 	public CameraEvent cameraEvent;
@@ -16,6 +12,61 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 	public Material renderMaterial;
 
 	private MapLayer? _currentlyRenderedLayer;
+
+	private NetworkableId? _currentlyRenderedDungeon;
+
+	private int? _underwaterLabFloorCount;
+
+	public void Render(MapLayer layer)
+	{
+		if (layer < MapLayer.TrainTunnels)
+		{
+			return;
+		}
+		if (layer == MapLayer.Dungeons)
+		{
+			RenderDungeonsLayer();
+		}
+		else if (layer != _currentlyRenderedLayer)
+		{
+			_currentlyRenderedLayer = layer;
+			switch (layer)
+			{
+			case MapLayer.TrainTunnels:
+				RenderTrainLayer();
+				break;
+			case MapLayer.Underwater1:
+			case MapLayer.Underwater2:
+			case MapLayer.Underwater3:
+			case MapLayer.Underwater4:
+			case MapLayer.Underwater5:
+			case MapLayer.Underwater6:
+			case MapLayer.Underwater7:
+			case MapLayer.Underwater8:
+				RenderUnderwaterLabs((int)(layer - 1));
+				break;
+			}
+		}
+	}
+
+	private void RenderImpl(CommandBuffer cb)
+	{
+		double num = (double)World.Size * 1.5;
+		renderCamera.orthographicSize = (float)num / 2f;
+		renderCamera.RemoveAllCommandBuffers();
+		renderCamera.AddCommandBuffer(cameraEvent, cb);
+		renderCamera.Render();
+		renderCamera.RemoveAllCommandBuffers();
+	}
+
+	public static MapLayerRenderer GetOrCreate()
+	{
+		if (SingletonComponent<MapLayerRenderer>.Instance != null)
+		{
+			return SingletonComponent<MapLayerRenderer>.Instance;
+		}
+		return GameManager.server.CreatePrefab("assets/prefabs/engine/maplayerrenderer.prefab", Vector3.zero, Quaternion.identity).GetComponent<MapLayerRenderer>();
+	}
 
 	private void RenderDungeonsLayer()
 	{
@@ -171,56 +222,5 @@ public class MapLayerRenderer : SingletonComponent<MapLayerRenderer>
 			}
 		}
 		return commandBuffer;
-	}
-
-	public void Render(MapLayer layer)
-	{
-		if (layer < MapLayer.TrainTunnels)
-		{
-			return;
-		}
-		if (layer == MapLayer.Dungeons)
-		{
-			RenderDungeonsLayer();
-		}
-		else if (layer != _currentlyRenderedLayer)
-		{
-			_currentlyRenderedLayer = layer;
-			switch (layer)
-			{
-			case MapLayer.TrainTunnels:
-				RenderTrainLayer();
-				break;
-			case MapLayer.Underwater1:
-			case MapLayer.Underwater2:
-			case MapLayer.Underwater3:
-			case MapLayer.Underwater4:
-			case MapLayer.Underwater5:
-			case MapLayer.Underwater6:
-			case MapLayer.Underwater7:
-			case MapLayer.Underwater8:
-				RenderUnderwaterLabs((int)(layer - 1));
-				break;
-			}
-		}
-	}
-
-	private void RenderImpl(CommandBuffer cb)
-	{
-		double num = (double)World.Size * 1.5;
-		renderCamera.orthographicSize = (float)num / 2f;
-		renderCamera.RemoveAllCommandBuffers();
-		renderCamera.AddCommandBuffer(cameraEvent, cb);
-		renderCamera.Render();
-		renderCamera.RemoveAllCommandBuffers();
-	}
-
-	public static MapLayerRenderer GetOrCreate()
-	{
-		if (SingletonComponent<MapLayerRenderer>.Instance != null)
-		{
-			return SingletonComponent<MapLayerRenderer>.Instance;
-		}
-		return GameManager.server.CreatePrefab("assets/prefabs/engine/maplayerrenderer.prefab", Vector3.zero, Quaternion.identity).GetComponent<MapLayerRenderer>();
 	}
 }

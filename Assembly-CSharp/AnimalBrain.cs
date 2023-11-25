@@ -289,6 +289,51 @@ public class AnimalBrain : BaseAIBrain
 		}
 	}
 
+	public class MoveToPointState : BasicAIState
+	{
+		private float originalStopDistance;
+
+		public MoveToPointState()
+			: base(AIState.MoveToPoint)
+		{
+		}
+
+		public override void StateEnter(BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateEnter(brain, entity);
+			BaseNavigator navigator = brain.Navigator;
+			originalStopDistance = navigator.StoppingDistance;
+			navigator.StoppingDistance = 0.5f;
+		}
+
+		public override void StateLeave(BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateLeave(brain, entity);
+			brain.Navigator.StoppingDistance = originalStopDistance;
+			Stop();
+		}
+
+		private void Stop()
+		{
+			brain.Navigator.Stop();
+		}
+
+		public override StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
+		{
+			base.StateThink(delta, brain, entity);
+			Vector3 pos = brain.Events.Memory.Position.Get(6);
+			if (!brain.Navigator.SetDestination(pos, ControlTestAnimalSpeed))
+			{
+				return StateStatus.Error;
+			}
+			if (!brain.Navigator.Moving)
+			{
+				return StateStatus.Finished;
+			}
+			return StateStatus.Running;
+		}
+	}
+
 	public class MoveTowardsState : BaseMoveTorwardsState
 	{
 	}
@@ -362,6 +407,8 @@ public class AnimalBrain : BaseAIBrain
 
 	public static int Count;
 
+	public static BaseNavigator.NavigationSpeed ControlTestAnimalSpeed = BaseNavigator.NavigationSpeed.Fast;
+
 	public override void AddStates()
 	{
 		base.AddStates();
@@ -373,6 +420,7 @@ public class AnimalBrain : BaseAIBrain
 		AddState(new BaseSleepState());
 		AddState(new ChaseState());
 		AddState(new BaseCooldownState());
+		AddState(new MoveToPointState());
 	}
 
 	public override void InitializeAI()

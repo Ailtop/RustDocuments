@@ -9,6 +9,8 @@ using UnityEngine.Assertions;
 
 public class BaseLauncher : BaseProjectile
 {
+	public float initialSpeedMultiplier = 1f;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BaseLauncher.OnRpcMessage"))
@@ -18,7 +20,7 @@ public class BaseLauncher : BaseProjectile
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SV_Launch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SV_Launch ");
 				}
 				using (TimeWarning.New("SV_Launch"))
 				{
@@ -81,10 +83,10 @@ public class BaseLauncher : BaseProjectile
 			base.ServerUse(damageModifier, originOverride);
 			return;
 		}
-		primaryMagazine.contents--;
+		ModifyAmmoCount(-1);
 		if (primaryMagazine.contents < 0)
 		{
-			primaryMagazine.contents = 0;
+			SetAmmoCount(0);
 		}
 		Vector3 vector = MuzzlePoint.transform.forward;
 		Vector3 position = MuzzlePoint.transform.position;
@@ -94,7 +96,7 @@ public class BaseLauncher : BaseProjectile
 			vector = AimConeUtil.GetModifiedAimConeDirection(num, vector);
 		}
 		float num2 = 1f;
-		if (UnityEngine.Physics.Raycast(position, vector, out var hitInfo, num2, 1236478737))
+		if (UnityEngine.Physics.Raycast(position, vector, out var hitInfo, num2, 1237003025))
 		{
 			num2 = hitInfo.distance - 0.1f;
 		}
@@ -106,7 +108,7 @@ public class BaseLauncher : BaseProjectile
 			ServerProjectile component2 = baseEntity.GetComponent<ServerProjectile>();
 			if ((bool)component2)
 			{
-				component2.InitializeVelocity(vector * component2.speed);
+				component2.InitializeVelocity(vector * component2.speed * initialSpeedMultiplier);
 			}
 			baseEntity.SendMessage("SetDamageScale", flag ? npcDamageScale : turretDamageScale);
 			baseEntity.Spawn();
@@ -142,7 +144,7 @@ public class BaseLauncher : BaseProjectile
 				player.stats.combat.LogInvalid(player, this, "magazine_empty");
 				return;
 			}
-			primaryMagazine.contents--;
+			ModifyAmmoCount(-1);
 		}
 		SignalBroadcast(Signal.Attack, string.Empty, player.net.connection);
 		Vector3 vector = msg.read.Vector3();
@@ -183,28 +185,42 @@ public class BaseLauncher : BaseProjectile
 			vector2 = AimConeUtil.GetModifiedAimConeDirection(num2, vector2);
 		}
 		float num3 = 1f;
-		if (UnityEngine.Physics.Raycast(vector, vector2, out var hitInfo, num3, 1236478737))
+		if (UnityEngine.Physics.Raycast(vector, vector2, out var hitInfo, num3, 1237003025))
 		{
 			num3 = hitInfo.distance - 0.1f;
 		}
 		BaseEntity baseEntity = GameManager.server.CreateEntity(component.projectileObject.resourcePath, vector + vector2 * num3);
-		if (!(baseEntity == null))
+		if (baseEntity == null)
 		{
-			baseEntity.creatorEntity = player;
-			ServerProjectile component2 = baseEntity.GetComponent<ServerProjectile>();
-			if ((bool)component2)
-			{
-				component2.InitializeVelocity(GetInheritedVelocity(player, vector2) + vector2 * component2.speed);
-			}
-			baseEntity.Spawn();
-			Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(player, baseEntity, this);
-			Interface.CallHook("OnRocketLaunched", player, baseEntity);
-			StartAttackCooldown(ScaleRepeatDelay(repeatDelay));
-			Item ownerItem = GetOwnerItem();
-			if (ownerItem != null && !base.UsingInfiniteAmmoCheat)
+			return;
+		}
+		baseEntity.creatorEntity = player;
+		ServerProjectile component2 = baseEntity.GetComponent<ServerProjectile>();
+		if ((bool)component2)
+		{
+			component2.InitializeVelocity(GetInheritedVelocity(player, vector2) + vector2 * component2.speed * initialSpeedMultiplier);
+		}
+		baseEntity.Spawn();
+		ProjectileLaunched_Server(component2);
+		Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(player, baseEntity, this);
+		Interface.CallHook("OnRocketLaunched", player, baseEntity);
+		StartAttackCooldown(ScaleRepeatDelay(repeatDelay));
+		Item ownerItem = GetOwnerItem();
+		if (ownerItem != null)
+		{
+			if (!base.UsingInfiniteAmmoCheat)
 			{
 				ownerItem.LoseCondition(UnityEngine.Random.Range(1f, 2f));
 			}
+			BaseMountable mounted2 = player.GetMounted();
+			if (mounted2 != null)
+			{
+				mounted2.OnWeaponFired(this);
+			}
 		}
+	}
+
+	public virtual void ProjectileLaunched_Server(ServerProjectile justLaunched)
+	{
 	}
 }

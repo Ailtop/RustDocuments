@@ -19,9 +19,9 @@ public class MapInterface : SingletonComponent<MapInterface>
 
 	public ScrollRectEx scrollRect;
 
-	public Toggle showGridToggle;
+	public RustButton showGridToggle;
 
-	public Button FocusButton;
+	public RustButton FocusButton;
 
 	public CanvasGroup CanvasGroup;
 
@@ -31,6 +31,12 @@ public class MapInterface : SingletonComponent<MapInterface>
 
 	public MapView View;
 
+	public UINexusMap NexusMap;
+
+	public GameObject NexusButtonGroup;
+
+	public RustButton NexusToggle;
+
 	public Color[] PointOfInterestColours;
 
 	public PointOfInterestSpriteConfig[] PointOfInterestSprites;
@@ -38,6 +44,8 @@ public class MapInterface : SingletonComponent<MapInterface>
 	public Sprite PingBackground;
 
 	public bool DebugStayOpen;
+
+	public GameObject MarkerListSection;
 
 	public GameObjectRef MarkerListPrefab;
 
@@ -54,4 +62,6 @@ public class MapInterface : SingletonComponent<MapInterface>
 	public CanvasGroup TeamMarkersCanvas;
 
 	public RustImageButton ShowSleepingBagsButton;
+
+	public RustImageButton ShowVendingMachinesButton;
 }

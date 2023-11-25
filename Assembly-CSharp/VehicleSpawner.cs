@@ -6,6 +6,25 @@ using UnityEngine;
 
 public class VehicleSpawner : BaseEntity
 {
+	public interface IVehicleSpawnUser
+	{
+		string ShortPrefabName { get; }
+
+		bool IsClient { get; }
+
+		bool IsDestroyed { get; }
+
+		void SetupOwner(BasePlayer owner, Vector3 newSafeAreaOrigin, float newSafeAreaRadius);
+
+		bool IsDespawnEligable();
+
+		EntityFuelSystem GetFuelSystem();
+
+		int StartingFuelUnits();
+
+		void Kill(DestroyMode mode);
+	}
+
 	[Serializable]
 	public class SpawnPair
 	{
@@ -33,10 +52,10 @@ public class VehicleSpawner : BaseEntity
 		return 32768;
 	}
 
-	public BaseVehicle GetVehicleOccupying()
+	public IVehicleSpawnUser GetVehicleOccupying()
 	{
-		BaseVehicle result = null;
-		List<BaseVehicle> obj = Pool.GetList<BaseVehicle>();
+		IVehicleSpawnUser result = null;
+		List<IVehicleSpawnUser> obj = Pool.GetList<IVehicleSpawnUser>();
 		Vis.Entities(spawnOffset.transform.position, occupyRadius, obj, GetOccupyLayer(), QueryTriggerInteraction.Ignore);
 		if (obj.Count > 0)
 		{
@@ -48,7 +67,7 @@ public class VehicleSpawner : BaseEntity
 
 	public bool IsPadOccupied()
 	{
-		BaseVehicle vehicleOccupying = GetVehicleOccupying();
+		IVehicleSpawnUser vehicleOccupying = GetVehicleOccupying();
 		if (vehicleOccupying != null)
 		{
 			return !vehicleOccupying.IsDespawnEligable();
@@ -75,13 +94,13 @@ public class VehicleSpawner : BaseEntity
 		}
 	}
 
-	public BaseVehicle SpawnVehicle(string prefabToSpawn, BasePlayer newOwner)
+	public IVehicleSpawnUser SpawnVehicle(string prefabToSpawn, BasePlayer newOwner)
 	{
 		CleanupArea(cleanupRadius);
 		NudgePlayersInRadius(spawnNudgeRadius);
 		BaseEntity baseEntity = GameManager.server.CreateEntity(prefabToSpawn, spawnOffset.transform.position, spawnOffset.transform.rotation);
 		baseEntity.Spawn();
-		BaseVehicle component = baseEntity.GetComponent<BaseVehicle>();
+		IVehicleSpawnUser component = baseEntity.GetComponent<IVehicleSpawnUser>();
 		if (newOwner != null)
 		{
 			component.SetupOwner(newOwner, spawnOffset.transform.position, safeRadius);
@@ -100,17 +119,17 @@ public class VehicleSpawner : BaseEntity
 
 	public void CleanupArea(float radius)
 	{
-		List<BaseVehicle> obj = Pool.GetList<BaseVehicle>();
+		List<IVehicleSpawnUser> obj = Pool.GetList<IVehicleSpawnUser>();
 		Vis.Entities(spawnOffset.transform.position, radius, obj, 32768);
-		foreach (BaseVehicle item in obj)
+		foreach (IVehicleSpawnUser item in obj)
 		{
-			if (!item.isClient && !item.IsDestroyed)
+			if (!item.IsClient && !item.IsDestroyed)
 			{
-				item.Kill();
+				item.Kill(DestroyMode.None);
 			}
 		}
 		List<ServerGib> obj2 = Pool.GetList<ServerGib>();
-		Vis.Entities(spawnOffset.transform.position, radius, obj2, 67108865);
+		Vis.Entities(spawnOffset.transform.position, radius, obj2, -2147483647);
 		foreach (ServerGib item2 in obj2)
 		{
 			if (!item2.isClient)

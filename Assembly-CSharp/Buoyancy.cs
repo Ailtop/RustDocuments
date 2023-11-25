@@ -1,8 +1,15 @@
 using System;
+using ConVar;
 using UnityEngine;
 
 public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 {
+	public enum WhenDisabled
+	{
+		GoToSleep = 0,
+		GoKinematic = 1
+	}
+
 	private struct BuoyancyPointData
 	{
 		public Transform transform;
@@ -26,12 +33,16 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	public float flowMovementScale = 1f;
 
-	public float requiredSubmergedFraction;
+	public float requiredSubmergedFraction = 0.5f;
 
 	public bool useUnderwaterDrag;
 
 	[Range(0f, 3f)]
 	public float underwaterDrag = 2f;
+
+	[Range(0f, 1f)]
+	[Tooltip("How much this object will ignore the waves system, 0 = flat water, 1 = full waves (default 1)")]
+	public float flatWaterLerp = 1f;
 
 	public Action<bool> SubmergedChanged;
 
@@ -39,6 +50,8 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	[NonSerialized]
 	public float submergedFraction;
+
+	public WhenDisabled whenDisabled;
 
 	private BuoyancyPointData[] pointData;
 
@@ -60,7 +73,7 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	public float? ArtificialHeight;
 
-	public float waveHeightScale = 0.5f;
+	private BaseVehicle forVehicle;
 
 	public float timeOutOfWater { get; private set; }
 
@@ -71,40 +84,78 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 
 	private void Awake()
 	{
+		forVehicle = forEntity as BaseVehicle;
 		InvokeRandomized(CheckSleepState, 0.5f, 5f, 1f);
 	}
 
 	public void Sleep()
 	{
-		if (rigidBody != null)
+		if (whenDisabled == WhenDisabled.GoToSleep)
 		{
-			rigidBody.Sleep();
+			if (rigidBody != null)
+			{
+				rigidBody.Sleep();
+			}
+		}
+		else if (whenDisabled == WhenDisabled.GoKinematic)
+		{
+			if (forVehicle != null)
+			{
+				forVehicle.SetToKinematic();
+			}
+			else if (rigidBody != null)
+			{
+				rigidBody.isKinematic = true;
+			}
 		}
 		base.enabled = false;
 	}
 
 	public void Wake()
 	{
-		if (rigidBody != null)
+		if (whenDisabled == WhenDisabled.GoToSleep)
 		{
-			rigidBody.WakeUp();
+			if (rigidBody != null)
+			{
+				rigidBody.WakeUp();
+			}
+		}
+		else if (whenDisabled == WhenDisabled.GoKinematic)
+		{
+			if (forVehicle != null)
+			{
+				forVehicle.SetToNonKinematic();
+			}
+			else if (rigidBody != null)
+			{
+				rigidBody.isKinematic = false;
+			}
 		}
 		base.enabled = true;
 	}
 
 	public void CheckSleepState()
 	{
-		if (!(base.transform == null) && !(rigidBody == null))
+		if (base.transform == null || rigidBody == null)
 		{
-			bool flag = BaseNetworkable.HasCloseConnections(base.transform.position, 100f);
-			if (base.enabled && (rigidBody.IsSleeping() || (!flag && timeInWater > 6f)))
-			{
-				Invoke(Sleep, 0f);
-			}
-			else if (!base.enabled && (!rigidBody.IsSleeping() || (flag && timeInWater > 0f)))
-			{
-				Invoke(Wake, 0f);
-			}
+			return;
+		}
+		bool flag = BaseNetworkable.HasCloseConnections(base.transform.position, 100f);
+		bool flag2 = rigidBody.IsSleeping() || rigidBody.isKinematic;
+		bool flag3 = flag2 || (!flag && timeInWater > 6f);
+		if (forVehicle != null && forVehicle.IsOn())
+		{
+			flag3 = false;
+		}
+		if (base.enabled && flag3)
+		{
+			Invoke(Sleep, 0f);
+			return;
+		}
+		bool flag4 = !flag2 || (flag && timeInWater > 0f);
+		if (!base.enabled && flag4)
+		{
+			Invoke(Wake, 0f);
 		}
 	}
 
@@ -172,7 +223,7 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 				obj.transform.parent = component.gameObject.transform;
 				obj.transform.localPosition = component.centerOfMass;
 				BuoyancyPoint buoyancyPoint = obj.AddComponent<BuoyancyPoint>();
-				buoyancyPoint.buoyancyForce = component.mass * (0f - Physics.gravity.y);
+				buoyancyPoint.buoyancyForce = component.mass * (0f - UnityEngine.Physics.gravity.y);
 				buoyancyPoint.buoyancyForce *= 1.32f;
 				buoyancyPoint.size = 0.2f;
 				points = new BuoyancyPoint[1];
@@ -217,7 +268,7 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 			Invoke(Sleep, 0f);
 			return;
 		}
-		float time = Time.time;
+		float time = UnityEngine.Time.time;
 		float x = TerrainMeta.Position.x;
 		float z = TerrainMeta.Position.z;
 		float x2 = TerrainMeta.OneOverSize.x;
@@ -234,6 +285,7 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 			pointPositionUVArray[i] = new Vector2(x3, y);
 		}
 		WaterSystem.GetHeightArray(pointPositionArray, pointPositionUVArray, pointShoreVectorArray, pointTerrainHeightArray, pointWaterHeightArray);
+		bool flag = flatWaterLerp < 1f;
 		int num = 0;
 		for (int j = 0; j < points.Length; j++)
 		{
@@ -249,10 +301,14 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 			}
 			bool doDeepwaterChecks = !ArtificialHeight.HasValue;
 			WaterLevel.WaterInfo buoyancyWaterInfo = WaterLevel.GetBuoyancyWaterInfo(position2, posUV, terrainHeight, waterHeight, doDeepwaterChecks, forEntity);
-			bool flag = false;
+			if (flag && buoyancyWaterInfo.isValid)
+			{
+				buoyancyWaterInfo.currentDepth = (buoyancyWaterInfo.surfaceLevel = Mathf.Lerp(Env.oceanlevel, buoyancyWaterInfo.surfaceLevel, flatWaterLerp)) - position2.y;
+			}
+			bool flag2 = false;
 			if (position2.y < buoyancyWaterInfo.surfaceLevel && buoyancyWaterInfo.isValid)
 			{
-				flag = true;
+				flag2 = true;
 				num++;
 				float currentDepth = buoyancyWaterInfo.currentDepth;
 				float num2 = Mathf.InverseLerp(0f, buoyancyPoint.size, currentDepth);
@@ -269,14 +325,14 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 				}
 				rigidBody.AddForceAtPosition(force, position2, ForceMode.Force);
 			}
-			if (buoyancyPoint.doSplashEffects && ((!buoyancyPoint.wasSubmergedLastFrame && flag) || (!flag && buoyancyPoint.wasSubmergedLastFrame)) && doEffects && rigidBody.GetRelativePointVelocity(localPosition).magnitude > 1f)
+			if (buoyancyPoint.doSplashEffects && ((!buoyancyPoint.wasSubmergedLastFrame && flag2) || (!flag2 && buoyancyPoint.wasSubmergedLastFrame)) && doEffects && rigidBody.GetRelativePointVelocity(localPosition).magnitude > 1f)
 			{
 				string strName = ((waterImpacts != null && waterImpacts.Length != 0 && waterImpacts[0].isValid) ? waterImpacts[0].resourcePath : DefaultWaterImpact());
 				Vector3 vector = new Vector3(UnityEngine.Random.Range(-0.25f, 0.25f), 0f, UnityEngine.Random.Range(-0.25f, 0.25f));
 				Effect.server.Run(strName, position2 + vector, Vector3.up);
-				buoyancyPoint.nexSplashTime = Time.time + 0.25f;
+				buoyancyPoint.nexSplashTime = UnityEngine.Time.time + 0.25f;
 			}
-			buoyancyPoint.wasSubmergedLastFrame = flag;
+			buoyancyPoint.wasSubmergedLastFrame = flag2;
 		}
 		if (points.Length != 0)
 		{
@@ -284,12 +340,12 @@ public class Buoyancy : ListComponent<Buoyancy>, IServerComponent
 		}
 		if (submergedFraction > requiredSubmergedFraction)
 		{
-			timeInWater += Time.fixedDeltaTime;
+			timeInWater += UnityEngine.Time.fixedDeltaTime;
 			timeOutOfWater = 0f;
 		}
 		else
 		{
-			timeOutOfWater += Time.fixedDeltaTime;
+			timeOutOfWater += UnityEngine.Time.fixedDeltaTime;
 			timeInWater = 0f;
 		}
 	}

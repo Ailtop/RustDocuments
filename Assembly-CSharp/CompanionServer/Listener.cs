@@ -57,10 +57,13 @@ public class Listener : IDisposable, IBroadcastSender<Connection, AppBroadcast>
 
 	public readonly SubscriberList<EntityTarget, Connection, AppBroadcast> EntitySubscribers;
 
+	public readonly SubscriberList<ClanTarget, Connection, AppBroadcast> ClanSubscribers;
+
 	public readonly SubscriberList<CameraTarget, Connection, AppBroadcast> CameraSubscribers;
 
 	public Listener(IPAddress ipAddress, int port)
 	{
+		Listener listener = this;
 		Address = ipAddress;
 		Port = port;
 		Limiter = new ConnectionLimiter();
@@ -74,17 +77,17 @@ public class Listener : IDisposable, IBroadcastSender<Connection, AppBroadcast>
 		_server.Start(delegate(IWebSocketConnection socket)
 		{
 			IPAddress address = socket.ConnectionInfo.ClientIpAddress;
-			if (!Limiter.TryAdd(address) || _ipBans.IsBanned(address))
+			if (!listener.Limiter.TryAdd(address) || listener._ipBans.IsBanned(address))
 			{
 				socket.Close();
 			}
 			else
 			{
-				long connectionId = Interlocked.Increment(ref _nextConnectionId);
-				Connection conn = new Connection(connectionId, this, socket);
+				long connectionId = Interlocked.Increment(ref listener._nextConnectionId);
+				Connection conn = new Connection(connectionId, listener, socket);
 				socket.OnClose = delegate
 				{
-					Limiter.Remove(address);
+					listener.Limiter.Remove(address);
 					syncContext.Post(delegate(object c)
 					{
 						((Connection)c).OnClose();
@@ -97,6 +100,7 @@ public class Listener : IDisposable, IBroadcastSender<Connection, AppBroadcast>
 		_stopwatch = new Stopwatch();
 		PlayerSubscribers = new SubscriberList<PlayerTarget, Connection, AppBroadcast>(this);
 		EntitySubscribers = new SubscriberList<EntityTarget, Connection, AppBroadcast>(this);
+		ClanSubscribers = new SubscriberList<ClanTarget, Connection, AppBroadcast>(this);
 		CameraSubscribers = new SubscriberList<CameraTarget, Connection, AppBroadcast>(this, 30.0);
 	}
 
@@ -166,7 +170,7 @@ public class Listener : IDisposable, IBroadcastSender<Connection, AppBroadcast>
 		{
 			buffer.Dispose();
 		}
-		if (Handle<AppEmpty, Info>((AppRequest r) => r.getInfo, out var requestHandler2) || Handle<AppEmpty, CompanionServer.Handlers.Time>((AppRequest r) => r.getTime, out requestHandler2) || Handle<AppEmpty, Map>((AppRequest r) => r.getMap, out requestHandler2) || Handle<AppEmpty, TeamInfo>((AppRequest r) => r.getTeamInfo, out requestHandler2) || Handle<AppEmpty, TeamChat>((AppRequest r) => r.getTeamChat, out requestHandler2) || Handle<AppSendMessage, SendTeamChat>((AppRequest r) => r.sendTeamMessage, out requestHandler2) || Handle<AppEmpty, EntityInfo>((AppRequest r) => r.getEntityInfo, out requestHandler2) || Handle<AppSetEntityValue, SetEntityValue>((AppRequest r) => r.setEntityValue, out requestHandler2) || Handle<AppEmpty, CheckSubscription>((AppRequest r) => r.checkSubscription, out requestHandler2) || Handle<AppFlag, SetSubscription>((AppRequest r) => r.setSubscription, out requestHandler2) || Handle<AppEmpty, MapMarkers>((AppRequest r) => r.getMapMarkers, out requestHandler2) || Handle<AppPromoteToLeader, PromoteToLeader>((AppRequest r) => r.promoteToLeader, out requestHandler2) || Handle<AppCameraSubscribe, CameraSubscribe>((AppRequest r) => r.cameraSubscribe, out requestHandler2) || Handle<AppEmpty, CameraUnsubscribe>((AppRequest r) => r.cameraUnsubscribe, out requestHandler2) || Handle<AppCameraInput, CameraInput>((AppRequest r) => r.cameraInput, out requestHandler2))
+		if (Handle<AppEmpty, Info>((AppRequest r) => r.getInfo, out var requestHandler2) || Handle<AppEmpty, CompanionServer.Handlers.Time>((AppRequest r) => r.getTime, out requestHandler2) || Handle<AppEmpty, Map>((AppRequest r) => r.getMap, out requestHandler2) || Handle<AppEmpty, TeamInfo>((AppRequest r) => r.getTeamInfo, out requestHandler2) || Handle<AppEmpty, TeamChat>((AppRequest r) => r.getTeamChat, out requestHandler2) || Handle<AppSendMessage, SendTeamChat>((AppRequest r) => r.sendTeamMessage, out requestHandler2) || Handle<AppEmpty, EntityInfo>((AppRequest r) => r.getEntityInfo, out requestHandler2) || Handle<AppSetEntityValue, SetEntityValue>((AppRequest r) => r.setEntityValue, out requestHandler2) || Handle<AppEmpty, CheckSubscription>((AppRequest r) => r.checkSubscription, out requestHandler2) || Handle<AppFlag, SetSubscription>((AppRequest r) => r.setSubscription, out requestHandler2) || Handle<AppEmpty, MapMarkers>((AppRequest r) => r.getMapMarkers, out requestHandler2) || Handle<AppPromoteToLeader, PromoteToLeader>((AppRequest r) => r.promoteToLeader, out requestHandler2) || Handle<AppEmpty, CompanionServer.Handlers.ClanInfo>((AppRequest r) => r.getClanInfo, out requestHandler2) || Handle<AppEmpty, ClanChat>((AppRequest r) => r.getClanChat, out requestHandler2) || Handle<AppSendMessage, SetClanMotd>((AppRequest r) => r.setClanMotd, out requestHandler2) || Handle<AppSendMessage, SendClanChat>((AppRequest r) => r.sendClanMessage, out requestHandler2) || Handle<AppGetNexusAuth, NexusAuth>((AppRequest r) => r.getNexusAuth, out requestHandler2) || Handle<AppCameraSubscribe, CameraSubscribe>((AppRequest r) => r.cameraSubscribe, out requestHandler2) || Handle<AppEmpty, CameraUnsubscribe>((AppRequest r) => r.cameraUnsubscribe, out requestHandler2) || Handle<AppCameraInput, CameraInput>((AppRequest r) => r.cameraInput, out requestHandler2))
 		{
 			try
 			{

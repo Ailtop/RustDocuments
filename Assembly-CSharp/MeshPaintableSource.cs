@@ -65,7 +65,16 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 		}
 		UpdateMaterials(block, null, forEditing: false, isSelected);
 		List<Renderer> obj = Pool.GetList<Renderer>();
-		(applyToAllRenderers ? base.transform.root : base.transform).GetComponentsInChildren(includeInactive: true, obj);
+		Transform transform = (applyToAllRenderers ? base.transform.root : base.transform);
+		if (applyToSkinRenderers)
+		{
+			BaseEntity componentInParent = GetComponentInParent<BaseEntity>();
+			if (componentInParent != null)
+			{
+				transform = componentInParent.transform;
+			}
+		}
+		transform.GetComponentsInChildren(includeInactive: true, obj);
 		foreach (Renderer item in obj)
 		{
 			if (applyToSkinRenderers || !item.TryGetComponent<PlayerModelSkin>(out var _))
@@ -98,6 +107,11 @@ public class MeshPaintableSource : MonoBehaviour, IClientComponent
 			UnityEngine.Object.Destroy(texture);
 			texture = null;
 		}
+	}
+
+	public void OnDestroy()
+	{
+		Free();
 	}
 
 	public virtual void UpdateMaterials(MaterialPropertyBlock block, Texture2D textureOverride = null, bool forEditing = false, bool isSelected = false)

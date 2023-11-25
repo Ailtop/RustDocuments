@@ -7,12 +7,18 @@ namespace ConVar;
 [Factory("world")]
 public class World : ConsoleSystem
 {
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static bool cache = true;
 
 	[ClientVar]
 	public static bool streaming = true;
+
+	[ServerVar]
+	public static string configString = string.Empty;
+
+	[ServerVar]
+	public static string configFile = string.Empty;
 
 	[ClientVar]
 	[ServerVar]

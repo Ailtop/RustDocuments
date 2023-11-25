@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -18,6 +19,7 @@ using Newtonsoft.Json;
 using Oxide.Core;
 using Oxide.Core.Libraries.Covalence;
 using ProtoBuf;
+using ProtoBuf.Nexus;
 using Rust;
 using SilentOrbit.ProtocolBuffers;
 using UnityEngine;
@@ -129,12 +131,21 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Workbench1 = 0x100000,
 		Workbench2 = 0x200000,
 		Workbench3 = 0x400000,
-		VoiceRangeBoost = 0x800000
+		VoiceRangeBoost = 0x800000,
+		ModifyClan = 0x1000000,
+		LoadingAfterTransfer = 0x2000000,
+		NoRespawnZone = 0x4000000
 	}
 
 	public static class GestureIds
 	{
 		public const uint FlashBlindId = 235662700u;
+	}
+
+	public enum GestureStartSource
+	{
+		ServerAction = 0,
+		Player = 1
 	}
 
 	public enum MapNoteType
@@ -219,6 +230,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 		public Vector3 position;
 
+		public Vector3 positionOffset;
+
 		public Vector3 velocity;
 
 		public Vector3 initialPosition;
@@ -277,6 +290,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
+	public class SpawnPoint
+	{
+		public Vector3 pos;
+
+		public Quaternion rot;
+	}
+
 	public enum TimeCategory
 	{
 		Wilderness = 1,
@@ -303,13 +323,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			}
 			return false;
 		}
-	}
-
-	public class SpawnPoint
-	{
-		public Vector3 pos;
-
-		public Quaternion rot;
 	}
 
 	[Serializable]
@@ -367,6 +380,15 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	[NonSerialized]
 	public TimeAverageValueLookup<uint> rpcHistory = new TimeAverageValueLookup<uint>();
+
+	public static readonly Translate.Phrase ClanInviteSuccess = new Translate.Phrase("clan.action.invite.success", "Invited {name} to your clan.");
+
+	public static readonly Translate.Phrase ClanInviteFailure = new Translate.Phrase("clan.action.invite.failure", "Failed to invite {name} to your clan. Please wait a minute and try again.");
+
+	public static readonly Translate.Phrase ClanInviteFull = new Translate.Phrase("clan.action.invite.full", "Cannot invite {name} to your clan because your clan is full.");
+
+	[NonSerialized]
+	public long clanId;
 
 	public ViewModel GestureViewModel;
 
@@ -490,6 +512,56 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public Dictionary<int, FiredProjectile> firedProjectiles = new Dictionary<int, FiredProjectile>();
 
+	[NonSerialized]
+	public PlayerStatistics stats;
+
+	[NonSerialized]
+	public ItemId svActiveItemID;
+
+	[NonSerialized]
+	public float NextChatTime;
+
+	[NonSerialized]
+	public float nextSuicideTime;
+
+	[NonSerialized]
+	public float nextRespawnTime;
+
+	[NonSerialized]
+	public string respawnId;
+
+	private RealTimeUntil timeUntilLoadingExpires;
+
+	public Vector3 viewAngles;
+
+	public float lastSubscriptionTick;
+
+	public float lastPlayerTick;
+
+	public float sleepStartTime = -1f;
+
+	public float fallTickRate = 0.1f;
+
+	public float lastFallTime;
+
+	public float fallVelocity;
+
+	private HitInfo cachedNonSuicideHitInfo;
+
+	public static ListHashSet<BasePlayer> activePlayerList = new ListHashSet<BasePlayer>();
+
+	public static ListHashSet<BasePlayer> sleepingPlayerList = new ListHashSet<BasePlayer>();
+
+	public static ListHashSet<BasePlayer> bots = new ListHashSet<BasePlayer>();
+
+	public float cachedCraftLevel;
+
+	public float nextCheckTime;
+
+	private Workbench _cachedWorkbench;
+
+	public PersistantPlayer cachedPersistantPlayer;
+
 	private const int WILDERNESS = 1;
 
 	private const int MONUMENT = 2;
@@ -537,54 +609,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	private bool waitingForLifeStoryUpdate;
 
 	public static LifeStoryWorkQueue lifeStoryQueue = new LifeStoryWorkQueue();
-
-	[NonSerialized]
-	public PlayerStatistics stats;
-
-	[NonSerialized]
-	public ItemId svActiveItemID;
-
-	[NonSerialized]
-	public float NextChatTime;
-
-	[NonSerialized]
-	public float nextSuicideTime;
-
-	[NonSerialized]
-	public float nextRespawnTime;
-
-	[NonSerialized]
-	public string respawnId;
-
-	public Vector3 viewAngles;
-
-	public float lastSubscriptionTick;
-
-	public float lastPlayerTick;
-
-	public float sleepStartTime = -1f;
-
-	public float fallTickRate = 0.1f;
-
-	public float lastFallTime;
-
-	public float fallVelocity;
-
-	private HitInfo cachedNonSuicideHitInfo;
-
-	public static ListHashSet<BasePlayer> activePlayerList = new ListHashSet<BasePlayer>();
-
-	public static ListHashSet<BasePlayer> sleepingPlayerList = new ListHashSet<BasePlayer>();
-
-	public static ListHashSet<BasePlayer> bots = new ListHashSet<BasePlayer>();
-
-	public float cachedCraftLevel;
-
-	public float nextCheckTime;
-
-	private Workbench _cachedWorkbench;
-
-	public PersistantPlayer cachedPersistantPlayer;
 
 	public int SpectateOffset = 1000000;
 
@@ -914,10 +938,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	public bool hasPreviousLife => previousLifeStory != null;
-
-	public int currentTimeCategory { get; private set; }
-
 	public virtual BaseNpc.AiStatistics.FamilyEnum Family => BaseNpc.AiStatistics.FamilyEnum.Player;
 
 	public override float PositionTickRate
@@ -931,6 +951,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	public int DebugMapMarkerIndex { get; set; }
 
 	public uint LastBlockColourChangeId { get; set; }
+
+	public bool PlayHeavyLandingAnimation { get; set; }
 
 	public Vector3 estimatedVelocity { get; private set; }
 
@@ -1034,31 +1056,6 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	public float currentSafeLevel
-	{
-		get
-		{
-			float num = 0f;
-			if (triggers == null)
-			{
-				return num;
-			}
-			for (int i = 0; i < triggers.Count; i++)
-			{
-				TriggerSafeZone triggerSafeZone = triggers[i] as TriggerSafeZone;
-				if (!(triggerSafeZone == null))
-				{
-					float safeLevel = triggerSafeZone.GetSafeLevel(base.transform.position);
-					if (safeLevel > num)
-					{
-						num = safeLevel;
-					}
-				}
-			}
-			return num;
-		}
-	}
-
 	public PersistantPlayer PersistantPlayerInfo
 	{
 		get
@@ -1079,6 +1076,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			SingletonComponent<ServerMgr>.Instance.persistance.SetPlayerInfo(userID, value);
 		}
 	}
+
+	public bool hasPreviousLife => previousLifeStory != null;
+
+	public int currentTimeCategory { get; private set; }
 
 	public bool IsBeingSpectated { get; private set; }
 
@@ -1200,7 +1201,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClientKeepConnectionAlive "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ClientKeepConnectionAlive ");
 				}
 				using (TimeWarning.New("ClientKeepConnectionAlive"))
 				{
@@ -1236,7 +1237,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClientLoadingComplete "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ClientLoadingComplete ");
 				}
 				using (TimeWarning.New("ClientLoadingComplete"))
 				{
@@ -1272,7 +1273,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - IssuePetCommand "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - IssuePetCommand ");
 				}
 				using (TimeWarning.New("IssuePetCommand"))
 				{
@@ -1301,7 +1302,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - IssuePetCommandRaycast "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - IssuePetCommandRaycast ");
 				}
 				using (TimeWarning.New("IssuePetCommandRaycast"))
 				{
@@ -1330,7 +1331,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnFeedbackReport "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - OnFeedbackReport ");
 				}
 				using (TimeWarning.New("OnFeedbackReport"))
 				{
@@ -1366,7 +1367,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnPlayerLanded "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - OnPlayerLanded ");
 				}
 				using (TimeWarning.New("OnPlayerLanded"))
 				{
@@ -1402,7 +1403,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnPlayerReported "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - OnPlayerReported ");
 				}
 				using (TimeWarning.New("OnPlayerReported"))
 				{
@@ -1438,7 +1439,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnProjectileAttack "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - OnProjectileAttack ");
 				}
 				using (TimeWarning.New("OnProjectileAttack"))
 				{
@@ -1474,7 +1475,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnProjectileRicochet "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - OnProjectileRicochet ");
 				}
 				using (TimeWarning.New("OnProjectileRicochet"))
 				{
@@ -1510,7 +1511,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - OnProjectileUpdate "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - OnProjectileUpdate ");
 				}
 				using (TimeWarning.New("OnProjectileUpdate"))
 				{
@@ -1546,7 +1547,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - PerformanceReport "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - PerformanceReport ");
 				}
 				using (TimeWarning.New("PerformanceReport"))
 				{
@@ -1582,7 +1583,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - PerformanceReport_Frametime "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - PerformanceReport_Frametime ");
 				}
 				using (TimeWarning.New("PerformanceReport_Frametime"))
 				{
@@ -1613,12 +1614,52 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				}
 				return true;
 			}
+			if (rpc == 1024003327 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestParachuteDeploy ");
+				}
+				using (TimeWarning.New("RequestParachuteDeploy"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(1024003327u, "RequestParachuteDeploy", this, player, 5uL))
+						{
+							return true;
+						}
+						if (!RPC_Server.FromOwner.Test(1024003327u, "RequestParachuteDeploy", this, player))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg14 = rPCMessage;
+							RequestParachuteDeploy(msg14);
+						}
+					}
+					catch (Exception exception13)
+					{
+						Debug.LogException(exception13);
+						player.Kick("RPC Error in RequestParachuteDeploy");
+					}
+				}
+				return true;
+			}
 			if (rpc == 52352806 && player != null)
 			{
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestRespawnInformation "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestRespawnInformation ");
 				}
 				using (TimeWarning.New("RequestRespawnInformation"))
 				{
@@ -1641,14 +1682,45 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg14 = rPCMessage;
-							RequestRespawnInformation(msg14);
+							RPCMessage msg15 = rPCMessage;
+							RequestRespawnInformation(msg15);
 						}
 					}
-					catch (Exception exception13)
+					catch (Exception exception14)
 					{
-						Debug.LogException(exception13);
+						Debug.LogException(exception14);
 						player.Kick("RPC Error in RequestRespawnInformation");
+					}
+				}
+				return true;
+			}
+			if (rpc == 1774681338 && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestServerEmoji ");
+				}
+				using (TimeWarning.New("RequestServerEmoji"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(1774681338u, "RequestServerEmoji", this, player, 1uL))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RequestServerEmoji();
+						}
+					}
+					catch (Exception exception15)
+					{
+						Debug.LogException(exception15);
+						player.Kick("RPC Error in RequestServerEmoji");
 					}
 				}
 				return true;
@@ -1658,7 +1730,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Assist "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Assist ");
 				}
 				using (TimeWarning.New("RPC_Assist"))
 				{
@@ -1677,13 +1749,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg15 = rPCMessage;
-							RPC_Assist(msg15);
+							RPCMessage msg16 = rPCMessage;
+							RPC_Assist(msg16);
 						}
 					}
-					catch (Exception exception14)
+					catch (Exception exception16)
 					{
-						Debug.LogException(exception14);
+						Debug.LogException(exception16);
 						player.Kick("RPC Error in RPC_Assist");
 					}
 				}
@@ -1694,7 +1766,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_KeepAlive "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_KeepAlive ");
 				}
 				using (TimeWarning.New("RPC_KeepAlive"))
 				{
@@ -1713,13 +1785,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg16 = rPCMessage;
-							RPC_KeepAlive(msg16);
+							RPCMessage msg17 = rPCMessage;
+							RPC_KeepAlive(msg17);
 						}
 					}
-					catch (Exception exception15)
+					catch (Exception exception17)
 					{
-						Debug.LogException(exception15);
+						Debug.LogException(exception17);
 						player.Kick("RPC Error in RPC_KeepAlive");
 					}
 				}
@@ -1730,7 +1802,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_LootPlayer "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_LootPlayer ");
 				}
 				using (TimeWarning.New("RPC_LootPlayer"))
 				{
@@ -1749,13 +1821,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg17 = rPCMessage;
-							RPC_LootPlayer(msg17);
+							RPCMessage msg18 = rPCMessage;
+							RPC_LootPlayer(msg18);
 						}
 					}
-					catch (Exception exception16)
+					catch (Exception exception18)
 					{
-						Debug.LogException(exception16);
+						Debug.LogException(exception18);
 						player.Kick("RPC Error in RPC_LootPlayer");
 					}
 				}
@@ -1766,7 +1838,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_StartClimb "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_StartClimb ");
 				}
 				using (TimeWarning.New("RPC_StartClimb"))
 				{
@@ -1778,13 +1850,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg18 = rPCMessage;
-							RPC_StartClimb(msg18);
+							RPCMessage msg19 = rPCMessage;
+							RPC_StartClimb(msg19);
 						}
 					}
-					catch (Exception exception17)
+					catch (Exception exception19)
 					{
-						Debug.LogException(exception17);
+						Debug.LogException(exception19);
 						player.Kick("RPC Error in RPC_StartClimb");
 					}
 				}
@@ -1795,7 +1867,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_AddMarker "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_AddMarker ");
 				}
 				using (TimeWarning.New("Server_AddMarker"))
 				{
@@ -1818,13 +1890,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg19 = rPCMessage;
-							Server_AddMarker(msg19);
+							RPCMessage msg20 = rPCMessage;
+							Server_AddMarker(msg20);
 						}
 					}
-					catch (Exception exception18)
+					catch (Exception exception20)
 					{
-						Debug.LogException(exception18);
+						Debug.LogException(exception20);
 						player.Kick("RPC Error in Server_AddMarker");
 					}
 				}
@@ -1835,7 +1907,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_AddPing "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_AddPing ");
 				}
 				using (TimeWarning.New("Server_AddPing"))
 				{
@@ -1858,13 +1930,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg20 = rPCMessage;
-							Server_AddPing(msg20);
+							RPCMessage msg21 = rPCMessage;
+							Server_AddPing(msg21);
 						}
 					}
-					catch (Exception exception19)
+					catch (Exception exception21)
 					{
-						Debug.LogException(exception19);
+						Debug.LogException(exception21);
 						player.Kick("RPC Error in Server_AddPing");
 					}
 				}
@@ -1875,7 +1947,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_CancelGesture "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_CancelGesture ");
 				}
 				using (TimeWarning.New("Server_CancelGesture"))
 				{
@@ -1897,9 +1969,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							Server_CancelGesture();
 						}
 					}
-					catch (Exception exception20)
+					catch (Exception exception22)
 					{
-						Debug.LogException(exception20);
+						Debug.LogException(exception22);
 						player.Kick("RPC Error in Server_CancelGesture");
 					}
 				}
@@ -1910,7 +1982,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_ClearMapMarkers "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_ClearMapMarkers ");
 				}
 				using (TimeWarning.New("Server_ClearMapMarkers"))
 				{
@@ -1933,13 +2005,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg21 = rPCMessage;
-							Server_ClearMapMarkers(msg21);
+							RPCMessage msg22 = rPCMessage;
+							Server_ClearMapMarkers(msg22);
 						}
 					}
-					catch (Exception exception21)
+					catch (Exception exception23)
 					{
-						Debug.LogException(exception21);
+						Debug.LogException(exception23);
 						player.Kick("RPC Error in Server_ClearMapMarkers");
 					}
 				}
@@ -1950,7 +2022,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RemovePing "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RemovePing ");
 				}
 				using (TimeWarning.New("Server_RemovePing"))
 				{
@@ -1973,13 +2045,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg22 = rPCMessage;
-							Server_RemovePing(msg22);
+							RPCMessage msg23 = rPCMessage;
+							Server_RemovePing(msg23);
 						}
 					}
-					catch (Exception exception22)
+					catch (Exception exception24)
 					{
-						Debug.LogException(exception22);
+						Debug.LogException(exception24);
 						player.Kick("RPC Error in Server_RemovePing");
 					}
 				}
@@ -1990,7 +2062,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RemovePointOfInterest "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RemovePointOfInterest ");
 				}
 				using (TimeWarning.New("Server_RemovePointOfInterest"))
 				{
@@ -2013,13 +2085,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg23 = rPCMessage;
-							Server_RemovePointOfInterest(msg23);
+							RPCMessage msg24 = rPCMessage;
+							Server_RemovePointOfInterest(msg24);
 						}
 					}
-					catch (Exception exception23)
+					catch (Exception exception25)
 					{
-						Debug.LogException(exception23);
+						Debug.LogException(exception25);
 						player.Kick("RPC Error in Server_RemovePointOfInterest");
 					}
 				}
@@ -2030,7 +2102,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestMarkers "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RequestMarkers ");
 				}
 				using (TimeWarning.New("Server_RequestMarkers"))
 				{
@@ -2053,13 +2125,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg24 = rPCMessage;
-							Server_RequestMarkers(msg24);
+							RPCMessage msg25 = rPCMessage;
+							Server_RequestMarkers(msg25);
 						}
 					}
-					catch (Exception exception24)
+					catch (Exception exception26)
 					{
-						Debug.LogException(exception24);
+						Debug.LogException(exception26);
 						player.Kick("RPC Error in Server_RequestMarkers");
 					}
 				}
@@ -2070,7 +2142,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StartGesture "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_StartGesture ");
 				}
 				using (TimeWarning.New("Server_StartGesture"))
 				{
@@ -2093,13 +2165,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg25 = rPCMessage;
-							Server_StartGesture(msg25);
+							RPCMessage msg26 = rPCMessage;
+							Server_StartGesture(msg26);
 						}
 					}
-					catch (Exception exception25)
+					catch (Exception exception27)
 					{
-						Debug.LogException(exception25);
+						Debug.LogException(exception27);
 						player.Kick("RPC Error in Server_StartGesture");
 					}
 				}
@@ -2110,7 +2182,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_UpdateMarker "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_UpdateMarker ");
 				}
 				using (TimeWarning.New("Server_UpdateMarker"))
 				{
@@ -2133,14 +2205,50 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg26 = rPCMessage;
-							Server_UpdateMarker(msg26);
+							RPCMessage msg27 = rPCMessage;
+							Server_UpdateMarker(msg27);
 						}
 					}
-					catch (Exception exception26)
+					catch (Exception exception28)
 					{
-						Debug.LogException(exception26);
+						Debug.LogException(exception28);
 						player.Kick("RPC Error in Server_UpdateMarker");
+					}
+				}
+				return true;
+			}
+			if (rpc == 2192544725u && player != null)
+			{
+				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
+				if (ConVar.Global.developer > 2)
+				{
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerRequestEmojiData ");
+				}
+				using (TimeWarning.New("ServerRequestEmojiData"))
+				{
+					using (TimeWarning.New("Conditions"))
+					{
+						if (!RPC_Server.CallsPerSecond.Test(2192544725u, "ServerRequestEmojiData", this, player, 3uL))
+						{
+							return true;
+						}
+					}
+					try
+					{
+						using (TimeWarning.New("Call"))
+						{
+							RPCMessage rPCMessage = default(RPCMessage);
+							rPCMessage.connection = msg.connection;
+							rPCMessage.player = player;
+							rPCMessage.read = msg.read;
+							RPCMessage msg28 = rPCMessage;
+							ServerRequestEmojiData(msg28);
+						}
+					}
+					catch (Exception exception29)
+					{
+						Debug.LogException(exception29);
+						player.Kick("RPC Error in ServerRequestEmojiData");
 					}
 				}
 				return true;
@@ -2150,7 +2258,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerRPC_UnderwearChange "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerRPC_UnderwearChange ");
 				}
 				using (TimeWarning.New("ServerRPC_UnderwearChange"))
 				{
@@ -2162,13 +2270,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg27 = rPCMessage;
-							ServerRPC_UnderwearChange(msg27);
+							RPCMessage msg29 = rPCMessage;
+							ServerRPC_UnderwearChange(msg29);
 						}
 					}
-					catch (Exception exception27)
+					catch (Exception exception30)
 					{
-						Debug.LogException(exception27);
+						Debug.LogException(exception30);
 						player.Kick("RPC Error in ServerRPC_UnderwearChange");
 					}
 				}
@@ -2179,7 +2287,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SV_Drink "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SV_Drink ");
 				}
 				using (TimeWarning.New("SV_Drink"))
 				{
@@ -2191,13 +2299,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 							rPCMessage.connection = msg.connection;
 							rPCMessage.player = player;
 							rPCMessage.read = msg.read;
-							RPCMessage msg28 = rPCMessage;
-							SV_Drink(msg28);
+							RPCMessage msg30 = rPCMessage;
+							SV_Drink(msg30);
 						}
 					}
-					catch (Exception exception28)
+					catch (Exception exception31)
 					{
-						Debug.LogException(exception28);
+						Debug.LogException(exception31);
 						player.Kick("RPC Error in SV_Drink");
 					}
 				}
@@ -2254,6 +2362,102 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		rpcHistory.Clear();
 	}
 
+	public bool CanModifyClan()
+	{
+		if (base.isServer)
+		{
+			if (triggers == null || ClanManager.ServerInstance == null)
+			{
+				return false;
+			}
+			foreach (TriggerBase trigger in triggers)
+			{
+				if (trigger is TriggerClanModify)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		return false;
+	}
+
+	public void LoadClanInfo()
+	{
+		ClanManager clanManager = ClanManager.ServerInstance;
+		if (!(clanManager == null))
+		{
+			LoadClanInfoImpl();
+		}
+		async void LoadClanInfoImpl()
+		{
+			try
+			{
+				ClanValueResult<IClan> clanValueResult = await clanManager.Backend.GetByMember(userID);
+				if (!clanValueResult.IsSuccess)
+				{
+					if (clanValueResult.Result != ClanResult.NoClan)
+					{
+						Debug.LogError($"Failed to find clan for {userID}: {clanValueResult.Result}");
+						Invoke(LoadClanInfo, 45 + UnityEngine.Random.Range(0, 30));
+						return;
+					}
+					clanId = 0L;
+				}
+				else
+				{
+					clanId = clanValueResult.Value.ClanId;
+				}
+				SendNetworkUpdate();
+				if (net?.connection != null)
+				{
+					UpdateClanLastSeen();
+					if (clanId != 0L)
+					{
+						clanManager.ClanMemberConnectionsChanged(clanId);
+					}
+				}
+			}
+			catch (Exception exception)
+			{
+				Debug.LogException(exception);
+			}
+		}
+	}
+
+	public void UpdateClanLastSeen()
+	{
+		ClanManager clanManager = ClanManager.ServerInstance;
+		if (!(clanManager == null) && clanId != 0L)
+		{
+			UpdateClanLastSeenImpl();
+		}
+		async void UpdateClanLastSeenImpl()
+		{
+			_ = 1;
+			try
+			{
+				ClanValueResult<IClan> clanValueResult = await clanManager.Backend.Get(clanId);
+				if (!clanValueResult.IsSuccess)
+				{
+					LoadClanInfo();
+				}
+				else
+				{
+					ClanResult clanResult = await clanValueResult.Value.UpdateLastSeen(userID);
+					if (clanResult != ClanResult.Success)
+					{
+						Debug.LogWarning($"Couldn't update clan last seen for {userID}: {clanResult}");
+					}
+				}
+			}
+			catch (Exception arg)
+			{
+				Debug.LogError($"Failed to update clan last seen for {userID}: {arg}");
+			}
+		}
+	}
+
 	public override bool CanBeLooted(BasePlayer player)
 	{
 		object obj = Interface.CallHook("CanLootPlayer", this, player);
@@ -2265,15 +2469,15 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			return false;
 		}
-		if (!IsWounded())
+		if ((IsWounded() || IsSleeping()) && !IsLoadingAfterTransfer())
 		{
-			return IsSleeping();
+			return !IsTransferring();
 		}
-		return true;
+		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_LootPlayer(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -2315,7 +2519,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	{
 		BasePlayer player = msg.player;
 		Vector3 vector = msg.read.Vector3();
-		if (vector.IsNaNOrInfinity() || !player || !player.metabolism.CanConsume() || Vector3.Distance(player.transform.position, vector) > 5f || !WaterLevel.Test(vector, waves: true, this) || (isMounted && !GetMounted().canDrinkWhileMounted))
+		if (vector.IsNaNOrInfinity() || !player || !player.metabolism.CanConsume() || Vector3.Distance(player.transform.position, vector) > 5f || !WaterLevel.Test(vector, waves: true, volumes: true, this) || (isMounted && !GetMounted().canDrinkWhileMounted))
 		{
 			return;
 		}
@@ -2364,6 +2568,29 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				player.ClientRPCPlayer(null, player, "ForcePositionTo", vector2);
 			}
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
+	private void RequestServerEmoji()
+	{
+		RustEmojiLibrary.FindAllServerEmoji();
+		if (RustEmojiLibrary.allServerEmoji.Count > 0)
+		{
+			ClientRPCPlayerList(null, this, "ClientReceiveEmojiList", RustEmojiLibrary.cachedServerList);
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(3uL)]
+	private void ServerRequestEmojiData(RPCMessage msg)
+	{
+		string text = msg.read.String();
+		if (RustEmojiLibrary.allServerEmoji.TryGetValue(text, out var value))
+		{
+			byte[] array = FileStorage.server.Get(value.CRC, value.FileType, RustEmojiLibrary.EmojiStorageNetworkId);
+			ClientRPCPlayer(null, msg.player, "ClientReceiveEmojiData", (uint)array.Length, array, text, value.CRC, (int)value.FileType);
 		}
 	}
 
@@ -2555,9 +2782,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	public void Server_StartGesture(RPCMessage msg)
 	{
 		if (!IsGestureBlocked())
@@ -2580,9 +2807,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	public void Server_StartGesture(GestureConfig toPlay)
+	public void Server_StartGesture(GestureConfig toPlay, GestureStartSource startSource = GestureStartSource.Player)
 	{
-		if (!(toPlay != null) || !toPlay.IsOwnedBy(this) || !toPlay.CanBeUsedBy(this))
+		if ((toPlay != null && toPlay.hideInWheel && startSource == GestureStartSource.Player && !ConVar.Server.cinematic) || !(toPlay != null) || !toPlay.IsOwnedBy(this) || !toPlay.CanBeUsedBy(this))
 		{
 			return;
 		}
@@ -2619,8 +2846,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	}
 
 	[RPC_Server.FromOwner]
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(10uL)]
+	[RPC_Server]
 	public void Server_CancelGesture()
 	{
 		currentGesture = null;
@@ -2936,9 +3163,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(8uL)]
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(8uL)]
 	public void Server_AddMarker(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMapMarkerAdd", this, MapNote.Deserialize(msg.read)) == null)
@@ -2993,8 +3220,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	}
 
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void Server_UpdateMarker(RPCMessage msg)
 	{
 		if (State.pointsOfInterest == null)
@@ -3022,9 +3249,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server.FromOwner]
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(10uL)]
 	public void Server_RemovePointOfInterest(RPCMessage msg)
 	{
 		int num = msg.read.Int32();
@@ -3039,16 +3266,16 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	}
 
 	[RPC_Server]
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.FromOwner]
 	public void Server_RequestMarkers(RPCMessage msg)
 	{
 		SendMarkersToClient();
 	}
 
+	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
-	[RPC_Server.FromOwner]
 	public void Server_ClearMapMarkers(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnMapMarkersClear", this, State.pointsOfInterest) != null)
@@ -3314,7 +3541,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Missions missions = Facepunch.Pool.Get<Missions>();
 		missions.missions = Facepunch.Pool.GetList<MissionInstance>();
 		missions.activeMission = GetActiveMission();
-		missions.protocol = 238;
+		missions.protocol = 243;
 		missions.seed = World.Seed;
 		missions.saveCreatedTime = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
 		foreach (BaseMission.MissionInstance mission in this.missions)
@@ -3414,7 +3641,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			uint seed = loadedMissions.seed;
 			int saveCreatedTime = loadedMissions.saveCreatedTime;
 			int num2 = Epoch.FromDateTime(SaveRestore.SaveCreatedTime);
-			if (238 != protocol || World.Seed != seed || num2 != saveCreatedTime)
+			if (243 != protocol || World.Seed != seed || num2 != saveCreatedTime)
 			{
 				Debug.Log("Missions were from old protocol or different seed, or not from a loaded save. Clearing");
 				loadedMissions.activeMission = -1;
@@ -3529,6 +3756,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			modelState.crawling = IsCrawling();
 			if (!base.limitNetworking && Interface.CallHook("OnSendModelState", this) == null)
 			{
+				modelState.loading = IsLoadingAfterTransfer();
 				ClientRPC(null, "OnModelState", modelState);
 			}
 		}
@@ -3600,7 +3828,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		if (baseMountable != null)
 		{
 			baseMountable.MountPlayer(this);
-			if (!baseMountable.allowSleeperMounting)
+			if (!AllowSleeperMounting(baseMountable))
 			{
 				baseMountable.DismountPlayer(this);
 			}
@@ -3609,6 +3837,202 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			mounted.Set(null);
 		}
+	}
+
+	public bool AllowSleeperMounting(BaseMountable mountable)
+	{
+		if (mountable.allowSleeperMounting)
+		{
+			return true;
+		}
+		if (!IsLoadingAfterTransfer())
+		{
+			return IsTransferProtected();
+		}
+		return true;
+	}
+
+	public PlayerSecondaryData SaveSecondaryData()
+	{
+		PlayerSecondaryData playerSecondaryData = Facepunch.Pool.Get<PlayerSecondaryData>();
+		playerSecondaryData.userId = userID;
+		PlayerState playerState = State.Copy();
+		if (playerState.pointsOfInterest != null)
+		{
+			Facepunch.Pool.FreeListAndItems(ref playerState.pointsOfInterest);
+		}
+		if (playerState.pings != null)
+		{
+			Facepunch.Pool.FreeListAndItems(ref playerState.pings);
+		}
+		playerState.deathMarker?.Dispose();
+		playerState.deathMarker = null;
+		playerState.missions?.Dispose();
+		playerState.missions = null;
+		playerSecondaryData.playerState = playerState;
+		if (currentTeam != 0L)
+		{
+			RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindTeam(currentTeam);
+			if (playerTeam != null)
+			{
+				playerSecondaryData.teamId = playerTeam.teamID;
+				playerSecondaryData.isTeamLeader = playerTeam.teamLeader == userID;
+			}
+		}
+		playerSecondaryData.relationships = Facepunch.Pool.GetList<PlayerSecondaryData.RelationshipData>();
+		foreach (RelationshipManager.PlayerRelationshipInfo value in RelationshipManager.ServerInstance.GetRelationships(userID).relations.Values)
+		{
+			PlayerSecondaryData.RelationshipData relationshipData = Facepunch.Pool.Get<PlayerSecondaryData.RelationshipData>();
+			relationshipData.info = value.ToProto();
+			relationshipData.mugshotData = GetPoolableMugshotData(value);
+			playerSecondaryData.relationships.Add(relationshipData);
+		}
+		return playerSecondaryData;
+		ArraySegment<byte> GetPoolableMugshotData(RelationshipManager.PlayerRelationshipInfo relationshipInfo)
+		{
+			if (relationshipInfo.mugshotCrc == 0)
+			{
+				return default(ArraySegment<byte>);
+			}
+			try
+			{
+				uint steamIdHash = RelationshipManager.GetSteamIdHash(userID, relationshipInfo.player);
+				byte[] array = FileStorage.server.Get(relationshipInfo.mugshotCrc, FileStorage.Type.jpg, RelationshipManager.ServerInstance.net.ID, steamIdHash);
+				if (array == null)
+				{
+					return default(ArraySegment<byte>);
+				}
+				byte[] array2 = System.Buffers.ArrayPool<byte>.Shared.Rent(array.Length);
+				new Span<byte>(array).CopyTo(array2);
+				return new ArraySegment<byte>(array2, 0, array.Length);
+			}
+			catch (Exception exception)
+			{
+				Debug.LogException(exception);
+				return default(ArraySegment<byte>);
+			}
+		}
+	}
+
+	public void LoadSecondaryData(PlayerSecondaryData data)
+	{
+		if (data == null)
+		{
+			return;
+		}
+		if (data.userId != userID)
+		{
+			Debug.LogError($"Attempted to load secondary data with an incorrect userID! Expected {data.userId} but player has {userID}, not loading it.");
+			return;
+		}
+		if (data.playerState != null)
+		{
+			State.unHostileTimestamp = data.playerState.unHostileTimestamp;
+			DirtyPlayerState();
+		}
+		if (data.relationships == null)
+		{
+			return;
+		}
+		RelationshipManager.PlayerRelationships relationships = RelationshipManager.ServerInstance.GetRelationships(userID);
+		relationships.relations.Clear();
+		foreach (PlayerSecondaryData.RelationshipData relationship in data.relationships)
+		{
+			if (relationship.mugshotData.Count > 0)
+			{
+				try
+				{
+					byte[] array = new byte[relationship.mugshotData.Count];
+					MemoryExtensions.AsSpan(relationship.mugshotData).CopyTo(array);
+					uint steamIdHash = RelationshipManager.GetSteamIdHash(userID, relationship.info.playerID);
+					uint num = FileStorage.server.Store(array, FileStorage.Type.jpg, RelationshipManager.ServerInstance.net.ID, steamIdHash);
+					if (num != relationship.info.mugshotCrc)
+					{
+						Debug.LogWarning($"Mugshot data for {userID}->{relationship.info.playerID} had a CRC mismatch, updating it");
+						relationship.info.mugshotCrc = num;
+					}
+				}
+				catch (Exception exception)
+				{
+					Debug.LogException(exception);
+				}
+			}
+			relationships.relations.Add(relationship.info.playerID, RelationshipManager.PlayerRelationshipInfo.FromProto(relationship.info));
+		}
+		RelationshipManager.ServerInstance.MarkRelationshipsDirtyFor(this);
+	}
+
+	public override void DisableTransferProtection()
+	{
+		BaseVehicle vehicleParent = GetVehicleParent();
+		if (vehicleParent != null && vehicleParent.IsTransferProtected())
+		{
+			vehicleParent.DisableTransferProtection();
+		}
+		base.DisableTransferProtection();
+	}
+
+	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
+	private void RequestParachuteDeploy(RPCMessage msg)
+	{
+		RequestParachuteDeploy();
+	}
+
+	public void RequestParachuteDeploy()
+	{
+		if (isMounted || !CheckParachuteClearance())
+		{
+			return;
+		}
+		Item slot = inventory.containerWear.GetSlot(7);
+		if (slot == null || !(slot.conditionNormalized > 0f) || slot.isBroken || !slot.info.TryGetComponent<ItemModParachute>(out var component))
+		{
+			return;
+		}
+		Parachute parachute = GameManager.server.CreateEntity(component.ParachuteVehiclePrefab.resourcePath, base.transform.position, eyes.rotation) as Parachute;
+		if (parachute != null)
+		{
+			parachute.skinID = slot.skin;
+			parachute.Spawn();
+			parachute.SetHealth(parachute.MaxHealth() * slot.conditionNormalized);
+			parachute.AttemptMount(this);
+			if (isMounted)
+			{
+				slot.Remove();
+				ItemManager.DoRemoves();
+				SendNetworkUpdate();
+			}
+			else
+			{
+				parachute.Kill();
+			}
+		}
+	}
+
+	public bool CheckParachuteClearance()
+	{
+		Vector3 position = base.transform.position;
+		if (!WaterLevel.Test(position - Vector3.up * 5f, waves: false, volumes: true, this) && !GamePhysics.Trace(new Ray(position, -Vector3.up), 1f, out var _, 6f, 1218543873))
+		{
+			return !GamePhysics.CheckSphere(position + Vector3.up * 3.5f, 2f, 1218543873);
+		}
+		return false;
+	}
+
+	public bool HasValidParachuteEquipped()
+	{
+		if (inventory == null || inventory.containerWear == null)
+		{
+			return false;
+		}
+		Item slot = inventory.containerWear.GetSlot(7);
+		if (slot != null && slot.conditionNormalized > 0f && !slot.isBroken && slot.info.TryGetComponent<ItemModParachute>(out var _))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	public void ClearClientPetLink()
@@ -3709,9 +4133,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		note.icon = pingStyle.IconIndex;
 	}
 
+	[RPC_Server]
 	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(3uL)]
-	[RPC_Server]
 	private void Server_AddPing(RPCMessage msg)
 	{
 		if (State.pings == null)
@@ -3749,9 +4173,9 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Facepunch.Rust.Analytics.Azure.OnPlayerPinged(this, pingType, wasViaWheel);
 	}
 
-	[RPC_Server]
-	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void Server_RemovePing(RPCMessage msg)
 	{
 		if (State.pings == null)
@@ -3768,7 +4192,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	private void SendPingsToClient()
+	public void SendPingsToClient()
 	{
 		using MapNoteList mapNoteList = Facepunch.Pool.Get<MapNoteList>();
 		mapNoteList.notes = Facepunch.Pool.GetList<MapNote>();
@@ -3858,8 +4282,17 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		return HasPlayerFlag(PlayerFlags.ServerFall);
 	}
 
+	public bool IsLoadingAfterTransfer()
+	{
+		return HasPlayerFlag(PlayerFlags.LoadingAfterTransfer);
+	}
+
 	public bool CanBuild()
 	{
+		if (IsBuildingBlockedByVehicle())
+		{
+			return false;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege();
 		if (buildingPrivilege == null)
 		{
@@ -3870,7 +4303,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool CanBuild(Vector3 position, Quaternion rotation, Bounds bounds)
 	{
-		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(new OBB(position, rotation, bounds));
+		OBB obb = new OBB(position, rotation, bounds);
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return false;
+		}
+		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
 			return true;
@@ -3880,6 +4318,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool CanBuild(OBB obb)
 	{
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return false;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
@@ -3890,6 +4332,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsBuildingBlocked()
 	{
+		if (IsBuildingBlockedByVehicle())
+		{
+			return true;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege();
 		if (buildingPrivilege == null)
 		{
@@ -3900,7 +4346,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsBuildingBlocked(Vector3 position, Quaternion rotation, Bounds bounds)
 	{
-		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(new OBB(position, rotation, bounds));
+		OBB obb = new OBB(position, rotation, bounds);
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return true;
+		}
+		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
 			return false;
@@ -3910,6 +4361,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsBuildingBlocked(OBB obb)
 	{
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return true;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
@@ -3920,6 +4375,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsBuildingAuthed()
 	{
+		if (IsBuildingBlockedByVehicle())
+		{
+			return false;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege();
 		if (buildingPrivilege == null)
 		{
@@ -3930,7 +4389,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsBuildingAuthed(Vector3 position, Quaternion rotation, Bounds bounds)
 	{
-		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(new OBB(position, rotation, bounds));
+		OBB obb = new OBB(position, rotation, bounds);
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return false;
+		}
+		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
 			return false;
@@ -3940,6 +4404,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsBuildingAuthed(OBB obb)
 	{
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return false;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
@@ -3950,21 +4418,38 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool CanPlaceBuildingPrivilege()
 	{
+		if (IsBuildingBlockedByVehicle())
+		{
+			return false;
+		}
 		return GetBuildingPrivilege() == null;
 	}
 
 	public bool CanPlaceBuildingPrivilege(Vector3 position, Quaternion rotation, Bounds bounds)
 	{
-		return GetBuildingPrivilege(new OBB(position, rotation, bounds)) == null;
+		OBB obb = new OBB(position, rotation, bounds);
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return false;
+		}
+		return GetBuildingPrivilege(obb) == null;
 	}
 
 	public bool CanPlaceBuildingPrivilege(OBB obb)
 	{
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return false;
+		}
 		return GetBuildingPrivilege(obb) == null;
 	}
 
 	public bool IsNearEnemyBase()
 	{
+		if (IsBuildingBlockedByVehicle())
+		{
+			return true;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege();
 		if (buildingPrivilege == null)
 		{
@@ -3979,7 +4464,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsNearEnemyBase(Vector3 position, Quaternion rotation, Bounds bounds)
 	{
-		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(new OBB(position, rotation, bounds));
+		OBB obb = new OBB(position, rotation, bounds);
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return true;
+		}
+		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
 			return false;
@@ -3993,6 +4483,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public bool IsNearEnemyBase(OBB obb)
 	{
+		if (IsBuildingBlockedByVehicle(obb))
+		{
+			return true;
+		}
 		BuildingPrivlidge buildingPrivilege = GetBuildingPrivilege(obb);
 		if (buildingPrivilege == null)
 		{
@@ -4002,6 +4496,33 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			return buildingPrivilege.AnyAuthed();
 		}
+		return false;
+	}
+
+	public bool IsBuildingBlockedByVehicle()
+	{
+		return IsBuildingBlockedByVehicle(WorldSpaceBounds());
+	}
+
+	private bool IsBuildingBlockedByVehicle(Vector3 position, Quaternion rotation, Bounds bounds)
+	{
+		return IsBuildingBlockedByVehicle(new OBB(position, rotation, bounds));
+	}
+
+	private bool IsBuildingBlockedByVehicle(OBB obb)
+	{
+		List<BaseVehicle> obj = Facepunch.Pool.GetList<BaseVehicle>();
+		Vis.Entities(obb.position, 2f + obb.extents.magnitude, obj, 134217728);
+		for (int i = 0; i < obj.Count; i++)
+		{
+			BaseVehicle baseVehicle = obj[i];
+			if (baseVehicle.isServer == base.isServer && !baseVehicle.IsDead() && !(obb.Distance(baseVehicle.WorldSpaceBounds()) > 2f) && !baseVehicle.IsAuthed(this))
+			{
+				Facepunch.Pool.FreeList(ref obj);
+				return true;
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
 		return false;
 	}
 
@@ -4074,13 +4595,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		hitInfo.ProjectilePrefab = value.projectilePrefab;
 		hitInfo.damageProperties = value.projectilePrefab.damageProperties;
 		Vector3 position = value.position;
+		Vector3 positionOffset = value.positionOffset;
 		Vector3 velocity = value.velocity;
 		float partialTime = value.partialTime;
 		float travelTime = value.travelTime;
 		float num = Mathf.Clamp(playerProjectileAttack.travelTime, value.travelTime, 8f);
 		Vector3 gravity = UnityEngine.Physics.gravity * value.projectilePrefab.gravityModifier;
 		float drag = value.projectilePrefab.drag;
-		int layerMask = (ConVar.AntiHack.projectile_terraincheck ? 10551296 : 2162688);
 		BaseEntity hitEntity = hitInfo.HitEntity;
 		BasePlayer basePlayer = hitEntity as BasePlayer;
 		bool flag = basePlayer != null;
@@ -4092,11 +4613,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		bool flag7 = flag6 && hitEntity.IsNpc;
 		bool flag8 = hitInfo.HitMaterial == Projectile.WaterMaterialID();
 		bool flag9;
+		int num15;
 		Vector3 position2;
 		Vector3 pointStart;
 		Vector3 hitPositionWorld;
-		Vector3 vector2;
-		int num27;
+		Vector3 vector;
+		int num32;
 		if (value.protection > 0)
 		{
 			flag9 = true;
@@ -4115,6 +4637,15 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			float num12 = ((value.protection >= 6) ? ((desyncTimeClamped + num9 + num10) * num2) : num11);
 			float num13 = (num5 - desyncTimeClamped - num9 - num10) * num3;
 			float num14 = Vector3.Distance(value.initialPosition, hitInfo.HitPositionWorld);
+			num15 = 2162688;
+			if (ConVar.AntiHack.projectile_terraincheck)
+			{
+				num15 |= 0x800000;
+			}
+			if (ConVar.AntiHack.projectile_vehiclecheck)
+			{
+				num15 |= 0x8000000;
+			}
 			if (flag && hitInfo.boneArea == (HitArea)(-1))
 			{
 				string text = hitInfo.ProjectilePrefab.name;
@@ -4134,7 +4665,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 					stats.combat.LogInvalid(hitInfo, "water_entity");
 					flag9 = false;
 				}
-				if (!WaterLevel.Test(hitInfo.HitPositionWorld - 0.5f * Vector3.up, waves: false, this))
+				if (!WaterLevel.Test(hitInfo.HitPositionWorld - 0.5f * Vector3.up, waves: true, volumes: true, this))
 				{
 					string text5 = hitInfo.ProjectilePrefab.name;
 					string text6 = (flag6 ? hitEntity.ShortPrefabName : "world");
@@ -4148,14 +4679,14 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				if (flag6)
 				{
-					float num15 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
-					float num16 = hitEntity.BoundsPadding() + num12 * num15;
-					float num17 = hitEntity.Distance(hitInfo.HitPositionWorld);
-					if (num17 > num16)
+					float num16 = hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude;
+					float num17 = hitEntity.BoundsPadding() + num12 * num16;
+					float num18 = hitEntity.Distance(hitInfo.HitPositionWorld);
+					if (num18 > num17)
 					{
 						string text7 = hitInfo.ProjectilePrefab.name;
 						string shortPrefabName = hitEntity.ShortPrefabName;
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Entity too far away (" + text7 + " on " + shortPrefabName + " with " + num17 + "m > " + num16 + "m in " + num12 + "s)");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Entity too far away (" + text7 + " on " + shortPrefabName + " with " + num18 + "m > " + num17 + "m in " + num12 + "s)");
 						Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 						stats.combat.LogInvalid(hitInfo, "entity_distance");
 						flag9 = false;
@@ -4164,13 +4695,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				if (value.protection >= 6 && flag9 && flag && !flag7 && !flag2 && !flag3 && !flag4 && !flag5)
 				{
 					float magnitude = basePlayer.GetParentVelocity().magnitude;
-					float num18 = basePlayer.BoundsPadding() + num12 * magnitude + ConVar.AntiHack.tickhistoryforgiveness;
-					float num19 = basePlayer.tickHistory.Distance(basePlayer, hitInfo.HitPositionWorld);
-					if (num19 > num18)
+					float num19 = basePlayer.BoundsPadding() + num12 * magnitude + ConVar.AntiHack.tickhistoryforgiveness;
+					float num20 = basePlayer.tickHistory.Distance(basePlayer, hitInfo.HitPositionWorld);
+					if (num20 > num19)
 					{
 						string text8 = hitInfo.ProjectilePrefab.name;
 						string shortPrefabName2 = basePlayer.ShortPrefabName;
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Player too far away (" + text8 + " on " + shortPrefabName2 + " with " + num19 + "m > " + num18 + "m in " + num12 + "s)");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Player too far away (" + text8 + " on " + shortPrefabName2 + " with " + num20 + "m > " + num19 + "m in " + num12 + "s)");
 						Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 						stats.combat.LogInvalid(hitInfo, "player_distance");
 						flag9 = false;
@@ -4179,23 +4710,25 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			}
 			if (value.protection >= 1)
 			{
+				float num21 = (flag6 ? (hitEntity.MaxVelocity() + hitEntity.GetParentVelocity().magnitude) : 0f);
+				float num22 = (flag6 ? (num12 * num21) : 0f);
 				float magnitude2 = value.initialVelocity.magnitude;
-				float num20 = hitInfo.ProjectilePrefab.initialDistance + num11 * magnitude2;
-				float num21 = hitInfo.ProjectileDistance + 1f;
-				if (num14 > num20)
+				float num23 = hitInfo.ProjectilePrefab.initialDistance + num11 * magnitude2;
+				float num24 = hitInfo.ProjectileDistance + 1f + positionOffset.magnitude + num22;
+				if (num14 > num23)
 				{
 					string text9 = hitInfo.ProjectilePrefab.name;
 					string text10 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too fast (" + text9 + " on " + text10 + " with " + num14 + "m > " + num20 + "m in " + num11 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too fast (" + text9 + " on " + text10 + " with " + num14 + "m > " + num23 + "m in " + num11 + "s)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					stats.combat.LogInvalid(hitInfo, "projectile_maxspeed");
 					flag9 = false;
 				}
-				if (num14 > num21)
+				if (num14 > num24)
 				{
 					string text11 = hitInfo.ProjectilePrefab.name;
 					string text12 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too far away (" + text11 + " on " + text12 + " with " + num14 + "m > " + num21 + "m in " + num11 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too far away (" + text11 + " on " + text12 + " with " + num14 + "m > " + num24 + "m in " + num11 + "s)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					stats.combat.LogInvalid(hitInfo, "projectile_distance");
 					flag9 = false;
@@ -4212,25 +4745,34 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			}
 			if (value.protection >= 4)
 			{
+				float num25 = 0f;
+				if (flag6)
+				{
+					float num26 = hitEntity.GetParentVelocity().magnitude;
+					if (hitEntity is CargoShip || hitEntity is Tugboat)
+					{
+						num26 += hitEntity.MaxVelocity();
+					}
+					num25 = num12 * num26;
+				}
 				SimulateProjectile(ref position, ref velocity, ref partialTime, num - travelTime, gravity, drag, out var prevPosition, out var prevVelocity);
-				Vector3 vector = prevVelocity * (1f / 32f);
-				Line line = new Line(prevPosition - vector, position + vector);
-				float num22 = line.Distance(hitInfo.PointStart);
-				float num23 = line.Distance(hitInfo.HitPositionWorld);
-				if (num22 > ConVar.AntiHack.projectile_trajectory)
+				Line line = new Line(prevPosition - prevVelocity, position + prevVelocity);
+				float num27 = Mathf.Max(line.Distance(hitInfo.PointStart) - positionOffset.magnitude - num25, 0f);
+				float num28 = Mathf.Max(line.Distance(hitInfo.HitPositionWorld) - positionOffset.magnitude - num25, 0f);
+				if (num27 > ConVar.AntiHack.projectile_trajectory)
 				{
 					string text15 = value.projectilePrefab.name;
 					string text16 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + text15 + " on " + text16 + " with " + num22 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Start position trajectory (" + text15 + " on " + text16 + " with " + num27 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					stats.combat.LogInvalid(hitInfo, "trajectory_start");
 					flag9 = false;
 				}
-				if (num23 > ConVar.AntiHack.projectile_trajectory)
+				if (num28 > ConVar.AntiHack.projectile_trajectory)
 				{
 					string text17 = value.projectilePrefab.name;
 					string text18 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + text17 + " on " + text18 + " with " + num23 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "End position trajectory (" + text17 + " on " + text18 + " with " + num28 + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					stats.combat.LogInvalid(hitInfo, "trajectory_end");
 					flag9 = false;
@@ -4238,34 +4780,34 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				hitInfo.ProjectileVelocity = velocity;
 				if (playerProjectileAttack.hitVelocity != Vector3.zero && velocity != Vector3.zero)
 				{
-					float num24 = Vector3.Angle(playerProjectileAttack.hitVelocity, velocity);
-					float num25 = playerProjectileAttack.hitVelocity.magnitude / velocity.magnitude;
-					if (num24 > ConVar.AntiHack.projectile_anglechange)
+					float num29 = Vector3.Angle(playerProjectileAttack.hitVelocity, velocity);
+					float num30 = playerProjectileAttack.hitVelocity.magnitude / velocity.magnitude;
+					if (num29 > ConVar.AntiHack.projectile_anglechange)
 					{
 						string text19 = value.projectilePrefab.name;
 						string text20 = (flag6 ? hitEntity.ShortPrefabName : "world");
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + text19 + " on " + text20 + " with " + num24 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory angle change (" + text19 + " on " + text20 + " with " + num29 + "deg > " + ConVar.AntiHack.projectile_anglechange + "deg)");
 						Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 						stats.combat.LogInvalid(hitInfo, "angle_change");
 						flag9 = false;
 					}
-					if (num25 > ConVar.AntiHack.projectile_velocitychange)
+					if (num30 > ConVar.AntiHack.projectile_velocitychange)
 					{
 						string text21 = value.projectilePrefab.name;
 						string text22 = (flag6 ? hitEntity.ShortPrefabName : "world");
-						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + text21 + " on " + text22 + " with " + num25 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
+						AntiHack.Log(this, AntiHackType.ProjectileHack, "Trajectory velocity change (" + text21 + " on " + text22 + " with " + num30 + " > " + ConVar.AntiHack.projectile_velocitychange + ")");
 						Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 						stats.combat.LogInvalid(hitInfo, "velocity_change");
 						flag9 = false;
 					}
 				}
 				float magnitude3 = velocity.magnitude;
-				float num26 = num13 * magnitude3;
-				if (num14 < num26)
+				float num31 = num13 * magnitude3;
+				if (num14 < num31)
 				{
 					string text23 = hitInfo.ProjectilePrefab.name;
 					string text24 = (flag6 ? hitEntity.ShortPrefabName : "world");
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too slow (" + text23 + " on " + text24 + " with " + num14 + "m < " + num26 + "m in " + num13 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too slow (" + text23 + " on " + text24 + " with " + num14 + "m < " + num31 + "m in " + num13 + "s)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					stats.combat.LogInvalid(hitInfo, "projectile_minspeed");
 					flag9 = false;
@@ -4280,39 +4822,64 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				{
 					hitPositionWorld -= hitInfo.ProjectileVelocity.normalized * 0.001f;
 				}
-				vector2 = hitInfo.PositionOnRay(hitPositionWorld);
+				vector = hitInfo.PositionOnRay(hitPositionWorld);
+				Vector3 vector2 = Vector3.zero;
 				Vector3 vector3 = Vector3.zero;
-				Vector3 vector4 = Vector3.zero;
 				if (ConVar.AntiHack.projectile_backtracking > 0f)
 				{
-					vector3 = (pointStart - position2).normalized * ConVar.AntiHack.projectile_backtracking;
-					vector4 = (vector2 - pointStart).normalized * ConVar.AntiHack.projectile_backtracking;
+					vector2 = (pointStart - position2).normalized * ConVar.AntiHack.projectile_backtracking;
+					vector3 = (vector - pointStart).normalized * ConVar.AntiHack.projectile_backtracking;
 				}
-				if (GamePhysics.LineOfSight(position2 - vector3, pointStart + vector3, layerMask, value.lastEntityHit) && GamePhysics.LineOfSight(pointStart - vector4, vector2, layerMask, value.lastEntityHit))
+				if (GamePhysics.LineOfSight(position2 - vector2, pointStart + vector2, num15, value.lastEntityHit) && GamePhysics.LineOfSight(pointStart - vector3, vector, num15, value.lastEntityHit))
 				{
-					num27 = (GamePhysics.LineOfSight(vector2, hitPositionWorld, layerMask, value.lastEntityHit) ? 1 : 0);
-					if (num27 != 0)
+					num32 = (GamePhysics.LineOfSight(vector, hitPositionWorld, num15, value.lastEntityHit) ? 1 : 0);
+					if (num32 != 0)
 					{
 						stats.Add("hit_" + (flag6 ? hitEntity.Categorize() : "world") + "_direct_los", 1, Stats.Server);
-						goto IL_0ff3;
+						goto IL_10b0;
 					}
 				}
 				else
 				{
-					num27 = 0;
+					num32 = 0;
 				}
 				stats.Add("hit_" + (flag6 ? hitEntity.Categorize() : "world") + "_indirect_los", 1, Stats.Server);
-				goto IL_0ff3;
+				goto IL_10b0;
 			}
-			goto IL_1204;
+			goto IL_1311;
 		}
-		goto IL_121d;
-		IL_0ff3:
-		if (num27 == 0)
+		goto IL_132a;
+		IL_1311:
+		if (!flag9)
+		{
+			AntiHack.AddViolation(this, AntiHackType.ProjectileHack, ConVar.AntiHack.projectile_penalty);
+			playerProjectileAttack.ResetToPool();
+			playerProjectileAttack = null;
+			return;
+		}
+		goto IL_132a;
+		IL_10b0:
+		if (num32 == 0)
 		{
 			string text25 = hitInfo.ProjectilePrefab.name;
 			string text26 = (flag6 ? hitEntity.ShortPrefabName : "world");
-			AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text25, " on ", text26, ") ", position2, " ", pointStart, " ", vector2, " ", hitPositionWorld));
+			string[] obj = new string[12]
+			{
+				"Line of sight (", text25, " on ", text26, ") ", null, null, null, null, null,
+				null, null
+			};
+			Vector3 vector4 = position2;
+			obj[5] = vector4.ToString();
+			obj[6] = " ";
+			vector4 = pointStart;
+			obj[7] = vector4.ToString();
+			obj[8] = " ";
+			vector4 = vector;
+			obj[9] = vector4.ToString();
+			obj[10] = " ";
+			vector4 = hitPositionWorld;
+			obj[11] = vector4.ToString();
+			AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat(obj));
 			Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 			stats.combat.LogInvalid(hitInfo, "projectile_los");
 			flag9 = false;
@@ -4323,23 +4890,39 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			Vector3 position3 = basePlayer.eyes.position;
 			Vector3 vector5 = basePlayer.CenterPoint();
 			float projectile_losforgiveness = ConVar.AntiHack.projectile_losforgiveness;
-			bool flag10 = GamePhysics.LineOfSight(hitPositionWorld2, position3, layerMask, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(position3, hitPositionWorld2, layerMask, projectile_losforgiveness, 0f);
+			bool flag10 = GamePhysics.LineOfSight(hitPositionWorld2, position3, num15, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(position3, hitPositionWorld2, num15, projectile_losforgiveness, 0f);
 			if (!flag10)
 			{
-				flag10 = GamePhysics.LineOfSight(hitPositionWorld2, vector5, layerMask, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(vector5, hitPositionWorld2, layerMask, projectile_losforgiveness, 0f);
+				flag10 = GamePhysics.LineOfSight(hitPositionWorld2, vector5, num15, 0f, projectile_losforgiveness) && GamePhysics.LineOfSight(vector5, hitPositionWorld2, num15, projectile_losforgiveness, 0f);
 			}
 			if (!flag10)
 			{
 				string text27 = hitInfo.ProjectilePrefab.name;
 				string text28 = (flag6 ? hitEntity.ShortPrefabName : "world");
-				AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text27, " on ", text28, ") ", hitPositionWorld2, " ", position3, " or ", hitPositionWorld2, " ", vector5));
+				string[] obj2 = new string[12]
+				{
+					"Line of sight (", text27, " on ", text28, ") ", null, null, null, null, null,
+					null, null
+				};
+				Vector3 vector4 = hitPositionWorld2;
+				obj2[5] = vector4.ToString();
+				obj2[6] = " ";
+				vector4 = position3;
+				obj2[7] = vector4.ToString();
+				obj2[8] = " or ";
+				vector4 = hitPositionWorld2;
+				obj2[9] = vector4.ToString();
+				obj2[10] = " ";
+				vector4 = vector5;
+				obj2[11] = vector4.ToString();
+				AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat(obj2));
 				Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 				stats.combat.LogInvalid(hitInfo, "projectile_los");
 				flag9 = false;
 			}
 		}
-		goto IL_1204;
-		IL_121d:
+		goto IL_1311;
+		IL_132a:
 		value.position = hitInfo.HitPositionWorld;
 		value.velocity = playerProjectileAttack.hitVelocity;
 		value.travelTime = num;
@@ -4347,13 +4930,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		value.hits++;
 		value.lastEntityHit = hitEntity;
 		hitInfo.ProjectilePrefab.CalculateDamage(hitInfo, value.projectileModifier, value.integrity);
-		if (value.integrity < 1f)
+		if (flag8)
 		{
-			value.integrity = 0f;
-		}
-		else if (flag8)
-		{
-			value.integrity = Mathf.Clamp01(value.integrity - 0.1f);
+			if (hitInfo.ProjectilePrefab.waterIntegrityLoss > 0f)
+			{
+				value.integrity = Mathf.Clamp01(value.integrity - hitInfo.ProjectilePrefab.waterIntegrityLoss);
+			}
 		}
 		else if (hitInfo.ProjectilePrefab.penetrationPower <= 0f || !flag6)
 		{
@@ -4361,8 +4943,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 		else
 		{
-			float num28 = hitEntity.PenetrationResistance(hitInfo) / hitInfo.ProjectilePrefab.penetrationPower;
-			value.integrity = Mathf.Clamp01(value.integrity - num28);
+			float num33 = hitEntity.PenetrationResistance(hitInfo) / hitInfo.ProjectilePrefab.penetrationPower;
+			value.integrity = Mathf.Clamp01(value.integrity - num33);
 		}
 		if (flag6)
 		{
@@ -4399,20 +4981,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Effect.server.ImpactEffect(hitInfo);
 		playerProjectileAttack.ResetToPool();
 		playerProjectileAttack = null;
-		return;
-		IL_1204:
-		if (!flag9)
-		{
-			AntiHack.AddViolation(this, AntiHackType.ProjectileHack, ConVar.AntiHack.projectile_penalty);
-			playerProjectileAttack.ResetToPool();
-			playerProjectileAttack = null;
-			return;
-		}
-		goto IL_121d;
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void OnProjectileRicochet(RPCMessage msg)
 	{
 		PlayerProjectileRicochet playerProjectileRicochet = PlayerProjectileRicochet.Deserialize(msg.read);
@@ -4447,8 +5019,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void OnProjectileUpdate(RPCMessage msg)
 	{
 		PlayerProjectileUpdate playerProjectileUpdate = PlayerProjectileUpdate.Deserialize(msg.read);
@@ -4487,45 +5059,99 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			return;
 		}
 		Vector3 position = value.position;
+		Vector3 positionOffset = value.positionOffset;
 		Vector3 velocity = value.velocity;
 		float num = value.trajectoryMismatch;
 		float partialTime = value.partialTime;
 		float travelTime = value.travelTime;
 		float num2 = Mathf.Clamp(playerProjectileUpdate.travelTime, value.travelTime, 8f);
-		Vector3 gravity = UnityEngine.Physics.gravity * value.projectilePrefab.gravityModifier;
+		Vector3 vector = UnityEngine.Physics.gravity * value.projectilePrefab.gravityModifier;
 		float drag = value.projectilePrefab.drag;
-		int layerMask = (ConVar.AntiHack.projectile_terraincheck ? 10551296 : 2162688);
 		if (value.protection > 0)
 		{
-			float num3 = 1f + ConVar.AntiHack.projectile_forgiveness;
+			float num3 = 1f - ConVar.AntiHack.projectile_forgiveness;
+			float num4 = 1f + ConVar.AntiHack.projectile_forgiveness;
 			float projectile_clientframes = ConVar.AntiHack.projectile_clientframes;
 			float projectile_serverframes = ConVar.AntiHack.projectile_serverframes;
-			float num4 = Mathx.Decrement(value.firedTime);
-			float num5 = Mathf.Clamp(Mathx.Increment(UnityEngine.Time.realtimeSinceStartup) - num4, 0f, 8f);
-			float num6 = num2;
-			float num7 = (value.desyncLifeTime = Mathf.Abs(num5 - num6));
-			float num8 = Mathf.Min(num5, num6);
-			float num9 = projectile_clientframes / 60f;
-			float num10 = projectile_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
-			float num11 = (desyncTimeClamped + num8 + num9 + num10) * num3;
+			float num5 = Mathx.Decrement(value.firedTime);
+			float num6 = Mathf.Clamp(Mathx.Increment(UnityEngine.Time.realtimeSinceStartup) - num5, 0f, 8f);
+			float num7 = num2;
+			float num8 = (value.desyncLifeTime = Mathf.Abs(num6 - num7));
+			float num9 = Mathf.Min(num6, num7);
+			float num10 = projectile_clientframes / 60f;
+			float num11 = projectile_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
+			float num12 = (num9 + desyncTimeClamped + num10 + num11) * num4;
+			float num13 = Mathf.Max(0f, (num9 - desyncTimeClamped - num10 - num11) * num3);
+			int num14 = 2162688;
+			if (ConVar.AntiHack.projectile_terraincheck)
+			{
+				num14 |= 0x800000;
+			}
+			if (ConVar.AntiHack.projectile_vehiclecheck)
+			{
+				num14 |= 0x8000000;
+			}
 			if (value.protection >= 1)
 			{
-				float magnitude = value.initialVelocity.magnitude;
-				float num12 = value.projectilePrefab.initialDistance + num11 * magnitude;
-				float num13 = Vector3.Distance(value.initialPosition, playerProjectileUpdate.curPosition);
-				if (num13 > num12)
+				float num15 = value.projectilePrefab.initialDistance + num12 * value.initialVelocity.magnitude;
+				float num16 = Vector3.Distance(value.initialPosition, playerProjectileUpdate.curPosition);
+				if (num16 > num15)
 				{
 					string text = value.projectilePrefab.name;
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile too fast (" + text + " with " + num13 + "m > " + num12 + "m in " + num11 + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile distance (" + text + " with " + num16 + "m > " + num15 + "m in " + num12 + "s)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					playerProjectileUpdate.ResetToPool();
 					playerProjectileUpdate = null;
 					return;
 				}
-				if (num7 > ConVar.AntiHack.projectile_desync)
+				if (num8 > ConVar.AntiHack.projectile_desync)
 				{
 					string text2 = value.projectilePrefab.name;
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile desync (" + text2 + " with " + num7 + "s > " + ConVar.AntiHack.projectile_desync + "s)");
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile desync (" + text2 + " with " + num8 + "s > " + ConVar.AntiHack.projectile_desync + "s)");
+					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
+					playerProjectileUpdate.ResetToPool();
+					playerProjectileUpdate = null;
+					return;
+				}
+				Vector3 curVelocity = playerProjectileUpdate.curVelocity;
+				Vector3 initialVelocity = value.initialVelocity;
+				Vector3 vector2 = ((value.hits == 0) ? initialVelocity : value.velocity);
+				float num17 = drag * (1f / 32f);
+				Vector3 vector3 = vector * (1f / 32f);
+				int num18 = Mathf.FloorToInt(num13 / (1f / 32f));
+				int num19 = Mathf.CeilToInt(num12 / (1f / 32f));
+				for (int i = 0; i < num18; i++)
+				{
+					initialVelocity += vector3;
+					initialVelocity -= initialVelocity * num17;
+					vector2 += vector3;
+					vector2 -= vector2 * num17;
+				}
+				float magnitude = curVelocity.magnitude;
+				float magnitude2 = initialVelocity.magnitude;
+				float magnitude3 = vector2.magnitude;
+				for (int j = num18; j < num19; j++)
+				{
+					initialVelocity += vector3;
+					initialVelocity -= initialVelocity * num17;
+					vector2 += vector3;
+					vector2 -= vector2 * num17;
+				}
+				magnitude3 = Mathf.Min(magnitude3, vector2.magnitude);
+				magnitude2 = Mathf.Max(magnitude2, initialVelocity.magnitude);
+				if (magnitude < magnitude3 * num3)
+				{
+					string text3 = value.projectilePrefab.name;
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile velocity too low (" + text3 + " with " + magnitude + " < " + magnitude3 + ")");
+					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
+					playerProjectileUpdate.ResetToPool();
+					playerProjectileUpdate = null;
+					return;
+				}
+				if (magnitude > magnitude2 * num4)
+				{
+					string text4 = value.projectilePrefab.name;
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Projectile velocity too high (" + text4 + " with " + magnitude + " > " + magnitude2 + ")");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					playerProjectileUpdate.ResetToPool();
 					playerProjectileUpdate = null;
@@ -4536,15 +5162,21 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				Vector3 position2 = value.position;
 				Vector3 curPosition = playerProjectileUpdate.curPosition;
-				Vector3 vector = Vector3.zero;
+				Vector3 vector4 = Vector3.zero;
 				if (ConVar.AntiHack.projectile_backtracking > 0f)
 				{
-					vector = (curPosition - position2).normalized * ConVar.AntiHack.projectile_backtracking;
+					vector4 = (curPosition - position2).normalized * ConVar.AntiHack.projectile_backtracking;
 				}
-				if (!GamePhysics.LineOfSight(position2 - vector, curPosition + vector, layerMask, value.lastEntityHit))
+				if (!GamePhysics.LineOfSight(position2 - vector4, curPosition + vector4, num14, value.lastEntityHit))
 				{
-					string text3 = value.projectilePrefab.name;
-					AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat("Line of sight (", text3, " on update) ", position2, " ", curPosition));
+					string text5 = value.projectilePrefab.name;
+					string[] obj = new string[6] { "Line of sight (", text5, " on update) ", null, null, null };
+					Vector3 vector5 = position2;
+					obj[3] = vector5.ToString();
+					obj[4] = " ";
+					vector5 = curPosition;
+					obj[5] = vector5.ToString();
+					AntiHack.Log(this, AntiHackType.ProjectileHack, string.Concat(obj));
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					playerProjectileUpdate.ResetToPool();
 					playerProjectileUpdate = null;
@@ -4553,13 +5185,13 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			}
 			if (value.protection >= 4)
 			{
-				SimulateProjectile(ref position, ref velocity, ref partialTime, num2 - travelTime, gravity, drag, out var prevPosition, out var prevVelocity);
-				Vector3 vector2 = prevVelocity * (1f / 32f);
-				num += new Line(prevPosition - vector2, position + vector2).Distance(playerProjectileUpdate.curPosition);
+				SimulateProjectile(ref position, ref velocity, ref partialTime, num2 - travelTime, vector, drag, out var prevPosition, out var prevVelocity);
+				Line line = new Line(prevPosition - prevVelocity, position + prevVelocity);
+				num += Mathf.Max(line.Distance(playerProjectileUpdate.curPosition) - positionOffset.magnitude, 0f);
 				if (num > ConVar.AntiHack.projectile_trajectory)
 				{
-					string text4 = value.projectilePrefab.name;
-					AntiHack.Log(this, AntiHackType.ProjectileHack, "Update position trajectory (" + text4 + " on update with " + num + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
+					string text6 = value.projectilePrefab.name;
+					AntiHack.Log(this, AntiHackType.ProjectileHack, "Update position trajectory (" + text6 + " on update with " + num + "m > " + ConVar.AntiHack.projectile_trajectory + "m)");
 					Facepunch.Rust.Analytics.Azure.OnProjectileHackViolation(value);
 					playerProjectileUpdate.ResetToPool();
 					playerProjectileUpdate = null;
@@ -4570,11 +5202,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				if (value.inheritedVelocity != Vector3.zero)
 				{
-					Vector3 curVelocity = value.inheritedVelocity + velocity;
-					Vector3 curVelocity2 = playerProjectileUpdate.curVelocity;
-					if (curVelocity2.magnitude > 2f * curVelocity.magnitude)
+					Vector3 curVelocity2 = value.inheritedVelocity + velocity;
+					Vector3 curVelocity3 = playerProjectileUpdate.curVelocity;
+					if (curVelocity3.magnitude > 2f * curVelocity2.magnitude || curVelocity3.magnitude < 0.5f * curVelocity2.magnitude)
 					{
-						playerProjectileUpdate.curVelocity = curVelocity;
+						playerProjectileUpdate.curVelocity = curVelocity2;
 					}
 					value.inheritedVelocity = Vector3.zero;
 				}
@@ -4623,7 +5255,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			prevVelocity = velocity;
 			position += velocity * num2;
 			velocity += gravity * num;
-			velocity -= velocity * drag * num;
+			velocity -= velocity * (drag * num);
 			travelTime -= num2;
 		}
 		int num3 = Mathf.FloorToInt(travelTime / num);
@@ -4633,7 +5265,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			prevVelocity = velocity;
 			position += velocity * num;
 			velocity += gravity * num;
-			velocity -= velocity * drag * num;
+			velocity -= velocity * (drag * num);
 		}
 		partialTime = travelTime - num * (float)num3;
 		if (partialTime > Mathf.Epsilon)
@@ -4682,13 +5314,23 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		if (projectilePrefab.stickProbability > 0f && UnityEngine.Random.value <= projectilePrefab.stickProbability)
 		{
 			baseEntity = ((info.HitEntity == null) ? item.CreateWorldObject(info.HitPositionWorld, Quaternion.LookRotation(projectileVelocity.normalized)) : ((info.HitBone != 0) ? item.CreateWorldObject(info.HitPositionLocal, Quaternion.LookRotation(info.HitNormalLocal * -1f), info.HitEntity, info.HitBone) : item.CreateWorldObject(info.HitPositionLocal, Quaternion.LookRotation(info.HitEntity.transform.InverseTransformDirection(projectileVelocity.normalized)), info.HitEntity)));
-			baseEntity.GetComponent<Rigidbody>().isKinematic = true;
-			return;
+			DroppedItem droppedItem = baseEntity as DroppedItem;
+			if (droppedItem != null)
+			{
+				droppedItem.GoKinematic();
+			}
+			else
+			{
+				baseEntity.GetComponent<Rigidbody>().isKinematic = true;
+			}
 		}
-		baseEntity = item.CreateWorldObject(info.HitPositionWorld, Quaternion.LookRotation(projectileVelocity.normalized));
-		Rigidbody component = baseEntity.GetComponent<Rigidbody>();
-		component.AddForce(projectileVelocity.normalized * 200f);
-		component.WakeUp();
+		else
+		{
+			baseEntity = item.CreateWorldObject(info.HitPositionWorld, Quaternion.LookRotation(projectileVelocity.normalized));
+			Rigidbody component = baseEntity.GetComponent<Rigidbody>();
+			component.AddForce(projectileVelocity.normalized * 200f);
+			component.WakeUp();
+		}
 	}
 
 	public void CleanupExpiredProjectiles()
@@ -4707,7 +5349,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		return firedProjectiles.ContainsKey(id);
 	}
 
-	public void NoteFiredProjectile(int projectileid, Vector3 startPos, Vector3 startVel, AttackEntity attackEnt, ItemDefinition firedItemDef, Guid projectileGroupId, Item pickupItem = null)
+	public void NoteFiredProjectile(int projectileid, Vector3 startPos, Vector3 startVel, AttackEntity attackEnt, ItemDefinition firedItemDef, Guid projectileGroupId, Vector3 positionOffset, Item pickupItem = null)
 	{
 		BaseProjectile baseProjectile = attackEnt as BaseProjectile;
 		ItemModProjectile component = firedItemDef.GetComponent<ItemModProjectile>();
@@ -4763,6 +5405,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		firedProjectile.pickupItem = pickupItem;
 		firedProjectile.integrity = 1f;
 		firedProjectile.position = startPos;
+		firedProjectile.positionOffset = positionOffset;
 		firedProjectile.velocity = startVel;
 		firedProjectile.initialPosition = startPos;
 		firedProjectile.initialVelocity = startVel;
@@ -4798,6 +5441,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			firedProjectile.integrity = 1f;
 			firedProjectile.trajectoryMismatch = 0f;
 			firedProjectile.position = startPos;
+			firedProjectile.positionOffset = Vector3.zero;
 			firedProjectile.velocity = startVel;
 			firedProjectile.initialPosition = startPos;
 			firedProjectile.initialVelocity = startVel;
@@ -4876,6 +5520,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		modelState.sleeping = IsSleeping();
 		modelState.relaxed = IsRelaxed();
 		modelState.crawling = IsCrawling();
+		modelState.loading = IsLoadingAfterTransfer();
 		info.msg.basePlayer.modelState = modelState.Copy();
 		if (info.forDisk)
 		{
@@ -4912,8 +5557,17 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 		if (info.forDisk)
 		{
+			info.msg.basePlayer.loadingTimeout = timeUntilLoadingExpires;
 			info.msg.basePlayer.currentLife = lifeStory;
 			info.msg.basePlayer.previousLife = previousLifeStory;
+		}
+		if (!info.forDisk)
+		{
+			info.msg.basePlayer.clanId = clanId;
+		}
+		if (info.forDisk)
+		{
+			info.msg.basePlayer.itemCrafter = inventory.crafting.Save();
 		}
 		if (info.forDisk)
 		{
@@ -4924,43 +5578,51 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	public override void Load(LoadInfo info)
 	{
 		base.Load(info);
-		if (info.msg.basePlayer != null)
+		if (info.msg.basePlayer == null)
 		{
-			ProtoBuf.BasePlayer basePlayer = info.msg.basePlayer;
-			userID = basePlayer.userid;
-			UserIDString = userID.ToString();
-			if (basePlayer.name != null)
+			return;
+		}
+		ProtoBuf.BasePlayer basePlayer = info.msg.basePlayer;
+		userID = basePlayer.userid;
+		UserIDString = userID.ToString();
+		if (basePlayer.name != null)
+		{
+			displayName = basePlayer.name;
+		}
+		_ = playerFlags;
+		playerFlags = (PlayerFlags)basePlayer.playerFlags;
+		currentTeam = basePlayer.currentTeam;
+		reputation = basePlayer.reputation;
+		if (basePlayer.metabolism != null)
+		{
+			metabolism.Load(basePlayer.metabolism);
+		}
+		if (basePlayer.modifiers != null && modifiers != null)
+		{
+			modifiers.Load(basePlayer.modifiers);
+		}
+		if (basePlayer.inventory != null)
+		{
+			inventory.Load(basePlayer.inventory);
+		}
+		if (basePlayer.modelState != null)
+		{
+			if (modelState != null)
 			{
-				displayName = basePlayer.name;
+				modelState.ResetToPool();
+				modelState = null;
 			}
-			playerFlags = (PlayerFlags)basePlayer.playerFlags;
-			currentTeam = basePlayer.currentTeam;
-			reputation = basePlayer.reputation;
-			if (basePlayer.metabolism != null)
-			{
-				metabolism.Load(basePlayer.metabolism);
-			}
-			if (basePlayer.modifiers != null && modifiers != null)
-			{
-				modifiers.Load(basePlayer.modifiers);
-			}
-			if (basePlayer.inventory != null)
-			{
-				inventory.Load(basePlayer.inventory);
-			}
-			if (basePlayer.modelState != null)
-			{
-				if (modelState != null)
-				{
-					modelState.ResetToPool();
-					modelState = null;
-				}
-				modelState = basePlayer.modelState;
-				basePlayer.modelState = null;
-			}
+			modelState = basePlayer.modelState;
+			basePlayer.modelState = null;
 		}
 		if (info.fromDisk)
 		{
+			timeUntilLoadingExpires = info.msg.basePlayer.loadingTimeout;
+			if ((float)timeUntilLoadingExpires > 0f)
+			{
+				float time = Mathf.Clamp(timeUntilLoadingExpires, 0f, Nexus.loadingTimeout);
+				Invoke(RemoveLoadingPlayerFlag, time);
+			}
 			lifeStory = info.msg.basePlayer.currentLife;
 			if (lifeStory != null)
 			{
@@ -4984,300 +5646,15 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Die();
 			}
 			respawnId = info.msg.basePlayer.respawnId;
-		}
-	}
-
-	internal void LifeStoryStart()
-	{
-		if (lifeStory != null)
-		{
-			Debug.LogError("Stomping old lifeStory");
-			lifeStory = null;
-		}
-		lifeStory = new PlayerLifeStory
-		{
-			ShouldPool = false
-		};
-		lifeStory.timeBorn = (uint)Epoch.Current;
-		hasSentPresenceState = false;
-	}
-
-	public void LifeStoryEnd()
-	{
-		SingletonComponent<ServerMgr>.Instance.persistance.AddLifeStory(userID, lifeStory);
-		previousLifeStory = lifeStory;
-		lifeStory = null;
-	}
-
-	internal void LifeStoryUpdate(float deltaTime, float moveSpeed)
-	{
-		if (lifeStory != null)
-		{
-			lifeStory.secondsAlive += deltaTime;
-			nextTimeCategoryUpdate -= deltaTime * ((moveSpeed > 0.1f) ? 1f : 0.25f);
-			if (nextTimeCategoryUpdate <= 0f && !waitingForLifeStoryUpdate)
+			if (info.msg.basePlayer.itemCrafter?.queue != null)
 			{
-				nextTimeCategoryUpdate = 7f + 7f * UnityEngine.Random.Range(0.2f, 1f);
-				waitingForLifeStoryUpdate = true;
-				lifeStoryQueue.Add(this);
-			}
-			if (LifeStoryInWilderness)
-			{
-				lifeStory.secondsWilderness += deltaTime;
-			}
-			if (LifeStoryInMonument)
-			{
-				lifeStory.secondsInMonument += deltaTime;
-			}
-			if (LifeStoryInBase)
-			{
-				lifeStory.secondsInBase += deltaTime;
-			}
-			if (LifeStoryFlying)
-			{
-				lifeStory.secondsFlying += deltaTime;
-			}
-			if (LifeStoryBoating)
-			{
-				lifeStory.secondsBoating += deltaTime;
-			}
-			if (LifeStorySwimming)
-			{
-				lifeStory.secondsSwimming += deltaTime;
-			}
-			if (LifeStoryDriving)
-			{
-				lifeStory.secondsDriving += deltaTime;
-			}
-			if (IsSleeping())
-			{
-				lifeStory.secondsSleeping += deltaTime;
-			}
-			else if (IsRunning())
-			{
-				lifeStory.metersRun += moveSpeed * deltaTime;
-			}
-			else
-			{
-				lifeStory.metersWalked += moveSpeed * deltaTime;
+				inventory.crafting.Load(info.msg.basePlayer.itemCrafter);
 			}
 		}
-	}
-
-	public void UpdateTimeCategory()
-	{
-		using (TimeWarning.New("UpdateTimeCategory"))
+		if (!info.fromDisk)
 		{
-			waitingForLifeStoryUpdate = false;
-			int num = currentTimeCategory;
-			currentTimeCategory = 1;
-			if (IsBuildingAuthed())
-			{
-				currentTimeCategory = 4;
-			}
-			Vector3 position = base.transform.position;
-			if (TerrainMeta.TopologyMap != null && ((uint)TerrainMeta.TopologyMap.GetTopology(position) & 0x400u) != 0)
-			{
-				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
-				{
-					if (monument.shouldDisplayOnMap && monument.IsInBounds(position))
-					{
-						currentTimeCategory = 2;
-						break;
-					}
-				}
-			}
-			if (IsSwimming())
-			{
-				currentTimeCategory |= 32;
-			}
-			if (isMounted)
-			{
-				BaseMountable baseMountable = GetMounted();
-				if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Boating)
-				{
-					currentTimeCategory |= 16;
-				}
-				else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Flying)
-				{
-					currentTimeCategory |= 8;
-				}
-				else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Driving)
-				{
-					currentTimeCategory |= 64;
-				}
-			}
-			else if (HasParent() && GetParentEntity() is BaseMountable baseMountable2)
-			{
-				if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Boating)
-				{
-					currentTimeCategory |= 16;
-				}
-				else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Flying)
-				{
-					currentTimeCategory |= 8;
-				}
-				else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Driving)
-				{
-					currentTimeCategory |= 64;
-				}
-			}
-			if (num != currentTimeCategory || !hasSentPresenceState)
-			{
-				LifeStoryInWilderness = (1 & currentTimeCategory) != 0;
-				LifeStoryInMonument = (2 & currentTimeCategory) != 0;
-				LifeStoryInBase = (4 & currentTimeCategory) != 0;
-				LifeStoryFlying = (8 & currentTimeCategory) != 0;
-				LifeStoryBoating = (0x10 & currentTimeCategory) != 0;
-				LifeStorySwimming = (0x20 & currentTimeCategory) != 0;
-				LifeStoryDriving = (0x40 & currentTimeCategory) != 0;
-				ClientRPCPlayer(null, this, "UpdateRichPresenceState", currentTimeCategory);
-				hasSentPresenceState = true;
-			}
+			clanId = info.msg.basePlayer.clanId;
 		}
-	}
-
-	public void LifeStoryShotFired(BaseEntity withWeapon)
-	{
-		if (lifeStory == null)
-		{
-			return;
-		}
-		if (lifeStory.weaponStats == null)
-		{
-			lifeStory.weaponStats = Facepunch.Pool.GetList<PlayerLifeStory.WeaponStats>();
-		}
-		foreach (PlayerLifeStory.WeaponStats weaponStat in lifeStory.weaponStats)
-		{
-			if (weaponStat.weaponName == withWeapon.ShortPrefabName)
-			{
-				weaponStat.shotsFired++;
-				return;
-			}
-		}
-		PlayerLifeStory.WeaponStats weaponStats = Facepunch.Pool.Get<PlayerLifeStory.WeaponStats>();
-		weaponStats.weaponName = withWeapon.ShortPrefabName;
-		weaponStats.shotsFired++;
-		lifeStory.weaponStats.Add(weaponStats);
-	}
-
-	public void LifeStoryShotHit(BaseEntity withWeapon)
-	{
-		if (lifeStory == null || withWeapon == null)
-		{
-			return;
-		}
-		if (lifeStory.weaponStats == null)
-		{
-			lifeStory.weaponStats = Facepunch.Pool.GetList<PlayerLifeStory.WeaponStats>();
-		}
-		foreach (PlayerLifeStory.WeaponStats weaponStat in lifeStory.weaponStats)
-		{
-			if (weaponStat.weaponName == withWeapon.ShortPrefabName)
-			{
-				weaponStat.shotsHit++;
-				return;
-			}
-		}
-		PlayerLifeStory.WeaponStats weaponStats = Facepunch.Pool.Get<PlayerLifeStory.WeaponStats>();
-		weaponStats.weaponName = withWeapon.ShortPrefabName;
-		weaponStats.shotsHit++;
-		lifeStory.weaponStats.Add(weaponStats);
-	}
-
-	public void LifeStoryKill(BaseCombatEntity killed)
-	{
-		if (lifeStory != null)
-		{
-			if (killed is ScientistNPC)
-			{
-				lifeStory.killedScientists++;
-			}
-			else if (killed is BasePlayer)
-			{
-				lifeStory.killedPlayers++;
-			}
-			else if (killed is BaseAnimalNPC)
-			{
-				lifeStory.killedAnimals++;
-			}
-		}
-	}
-
-	public void LifeStoryGenericStat(string key, int value)
-	{
-		if (lifeStory == null)
-		{
-			return;
-		}
-		if (lifeStory.genericStats == null)
-		{
-			lifeStory.genericStats = Facepunch.Pool.GetList<PlayerLifeStory.GenericStat>();
-		}
-		foreach (PlayerLifeStory.GenericStat genericStat2 in lifeStory.genericStats)
-		{
-			if (genericStat2.key == key)
-			{
-				genericStat2.value += value;
-				return;
-			}
-		}
-		PlayerLifeStory.GenericStat genericStat = Facepunch.Pool.Get<PlayerLifeStory.GenericStat>();
-		genericStat.key = key;
-		genericStat.value = value;
-		lifeStory.genericStats.Add(genericStat);
-	}
-
-	public void LifeStoryHurt(float amount)
-	{
-		if (lifeStory != null)
-		{
-			lifeStory.totalDamageTaken += amount;
-		}
-	}
-
-	public void LifeStoryHeal(float amount)
-	{
-		if (lifeStory != null)
-		{
-			lifeStory.totalHealing += amount;
-		}
-	}
-
-	internal void LifeStoryLogDeath(HitInfo deathBlow, DamageType lastDamage)
-	{
-		if (lifeStory == null)
-		{
-			return;
-		}
-		lifeStory.timeDied = (uint)Epoch.Current;
-		PlayerLifeStory.DeathInfo deathInfo = Facepunch.Pool.Get<PlayerLifeStory.DeathInfo>();
-		deathInfo.lastDamageType = (int)lastDamage;
-		if (deathBlow != null)
-		{
-			if (deathBlow.Initiator != null)
-			{
-				deathBlow.Initiator.AttackerInfo(deathInfo);
-				deathInfo.attackerDistance = Distance(deathBlow.Initiator);
-			}
-			if (deathBlow.WeaponPrefab != null)
-			{
-				deathInfo.inflictorName = deathBlow.WeaponPrefab.ShortPrefabName;
-			}
-			if (deathBlow.HitBone != 0)
-			{
-				deathInfo.hitBone = StringPool.Get(deathBlow.HitBone);
-			}
-			else
-			{
-				deathInfo.hitBone = "";
-			}
-		}
-		else if (base.SecondsSinceAttacked <= 60f && lastAttacker != null)
-		{
-			lastAttacker.AttackerInfo(deathInfo);
-		}
-		lifeStory.deathInfo = deathInfo;
 	}
 
 	internal override void OnParentRemoved()
@@ -5438,7 +5815,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			serverTickRate = Player.tickrate_sv;
 			serverTickInterval = 1f / (float)serverTickRate;
 		}
-		if (ConVar.AntiHack.terrain_protection > 0 && UnityEngine.Time.frameCount % ConVar.AntiHack.terrain_timeslice == (long)(uint)net.ID.Value % (long)ConVar.AntiHack.terrain_timeslice && !AntiHack.ShouldIgnore(this))
+		if (ConVar.AntiHack.terrain_protection > 0 && UnityEngine.Time.frameCount % ConVar.AntiHack.terrain_timeslice == (uint)net.ID.Value % ConVar.AntiHack.terrain_timeslice && !AntiHack.ShouldIgnore(this))
 		{
 			bool flag = false;
 			if (AntiHack.IsInsideTerrain(this))
@@ -5540,6 +5917,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				MarkWeaponDrawnDuration(0f);
 			}
+			if (PlayHeavyLandingAnimation && !modelState.mounted && modelState.onground && Parachute.LandingAnimations)
+			{
+				Server_StartGesture(GestureCollection.HeavyLandingId);
+				PlayHeavyLandingAnimation = false;
+			}
 			if (timeSinceLastTick > (float)ConVar.Server.playertimeout)
 			{
 				lastTickTime = 0f;
@@ -5554,6 +5936,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			stats.Add("time", num3, Stats.Server);
 			secondsConnected = num2;
 		}
+		if (IsLoadingAfterTransfer())
+		{
+			Debug.LogWarning("Force removing loading flag for player (sanity check failed)", this);
+			SetPlayerFlag(PlayerFlags.LoadingAfterTransfer, b: false);
+		}
 		RefreshColliderSize(forced: false);
 		SendModelState();
 	}
@@ -5561,6 +5948,26 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	private void EnterGame()
 	{
 		SetPlayerFlag(PlayerFlags.ReceivingSnapshot, b: false);
+		bool flag = false;
+		if (IsTransferProtected())
+		{
+			BaseVehicle vehicleParent = GetVehicleParent();
+			if (vehicleParent == null || vehicleParent.ShouldDisableTransferProtectionOnLoad(this))
+			{
+				DisableTransferProtection();
+				flag = true;
+			}
+		}
+		if (IsLoadingAfterTransfer())
+		{
+			SetPlayerFlag(PlayerFlags.LoadingAfterTransfer, b: false);
+			EndSleeping();
+			flag = true;
+		}
+		if (flag)
+		{
+			SendNetworkUpdateImmediate();
+		}
 		ClientRPCPlayer(null, this, "FinishLoading");
 		Invoke(DelayedTeamUpdate, 1f);
 		LoadMissions(State.missions);
@@ -5569,6 +5976,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		if (num > 0.0)
 		{
 			ClientRPCPlayer(null, this, "SetHostileLength", (float)num);
+		}
+		if (IsTransferProtected() && base.TransferProtectionRemaining > 0f)
+		{
+			ClientRPCPlayer(null, this, "SetTransferProtectionDuration", base.TransferProtectionRemaining);
 		}
 		if (modifiers != null)
 		{
@@ -5632,6 +6043,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			net.OnConnected(c);
 			net.StartSubscriber();
 			SendAsSnapshot(net.connection);
+			GlobalNetworkHandler.server.StartSendingSnapshot(this);
 			ClientRPCPlayer(null, this, "StartLoading");
 			if ((bool)BaseGameMode.GetActiveGameMode(serverside: true))
 			{
@@ -5669,6 +6081,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 					ChatMessage("antihack.eye_protection is disabled!");
 				}
 			}
+			inventory.crafting.SendToOwner();
 		}
 	}
 
@@ -5687,32 +6100,88 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public void SendRespawnOptions()
 	{
-		using RespawnInformation respawnInformation = Facepunch.Pool.Get<RespawnInformation>();
-		respawnInformation.spawnOptions = Facepunch.Pool.Get<List<RespawnInformation.SpawnOptions>>();
+		if (NexusServer.Started && ZoneController.Instance.CanRespawnAcrossZones(this))
+		{
+			CollectExternalAndSend();
+			return;
+		}
+		List<RespawnInformation.SpawnOptions> list = Facepunch.Pool.GetList<RespawnInformation.SpawnOptions>();
+		GetRespawnOptionsForPlayer(list, userID);
+		Interface.CallHook("OnRespawnInformationGiven", this, list);
+		SendToPlayer(list, loading: false);
+		async void CollectExternalAndSend()
+		{
+			List<RespawnInformation.SpawnOptions> list2 = Facepunch.Pool.GetList<RespawnInformation.SpawnOptions>();
+			GetRespawnOptionsForPlayer(list2, userID);
+			List<RespawnInformation.SpawnOptions> allSpawnOptions = Facepunch.Pool.GetList<RespawnInformation.SpawnOptions>();
+			foreach (RespawnInformation.SpawnOptions item in list2)
+			{
+				allSpawnOptions.Add(item.Copy());
+			}
+			SendToPlayer(list2, loading: true);
+			try
+			{
+				Request request = Facepunch.Pool.Get<Request>();
+				request.spawnOptions = Facepunch.Pool.Get<SpawnOptionsRequest>();
+				request.spawnOptions.userId = userID;
+				using (NexusRpcResult nexusRpcResult = await NexusServer.BroadcastRpc(request, 10f))
+				{
+					foreach (KeyValuePair<string, Response> response in nexusRpcResult.Responses)
+					{
+						string key = response.Key;
+						SpawnOptionsResponse spawnOptions2 = response.Value.spawnOptions;
+						if (spawnOptions2 != null && spawnOptions2.spawnOptions.Count != 0)
+						{
+							foreach (RespawnInformation.SpawnOptions spawnOption in spawnOptions2.spawnOptions)
+							{
+								RespawnInformation.SpawnOptions spawnOptions3 = spawnOption.Copy();
+								spawnOptions3.nexusZone = key;
+								allSpawnOptions.Add(spawnOptions3);
+							}
+						}
+					}
+				}
+				SendToPlayer(allSpawnOptions, loading: false);
+			}
+			catch (Exception exception)
+			{
+				Debug.LogException(exception);
+			}
+		}
+		void SendToPlayer(List<RespawnInformation.SpawnOptions> spawnOptions, bool loading)
+		{
+			using RespawnInformation respawnInformation = Facepunch.Pool.Get<RespawnInformation>();
+			respawnInformation.spawnOptions = spawnOptions;
+			respawnInformation.loading = loading;
+			if (IsDead())
+			{
+				respawnInformation.previousLife = previousLifeStory;
+				respawnInformation.fadeIn = previousLifeStory != null && previousLifeStory.timeDied > Epoch.Current - 5;
+			}
+			ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
+		}
+	}
+
+	public static void GetRespawnOptionsForPlayer(List<RespawnInformation.SpawnOptions> spawnOptions, ulong userID)
+	{
 		SleepingBag[] array = SleepingBag.FindForPlayer(userID, ignoreTimers: true);
 		foreach (SleepingBag sleepingBag in array)
 		{
-			RespawnInformation.SpawnOptions spawnOptions = Facepunch.Pool.Get<RespawnInformation.SpawnOptions>();
-			spawnOptions.id = sleepingBag.net.ID;
-			spawnOptions.name = sleepingBag.niceName;
-			spawnOptions.worldPosition = sleepingBag.transform.position;
-			spawnOptions.type = sleepingBag.RespawnType;
-			spawnOptions.unlockSeconds = sleepingBag.GetUnlockSeconds(userID);
-			spawnOptions.occupied = sleepingBag.IsOccupied();
-			respawnInformation.spawnOptions.Add(spawnOptions);
+			RespawnInformation.SpawnOptions spawnOptions2 = Facepunch.Pool.Get<RespawnInformation.SpawnOptions>();
+			spawnOptions2.id = sleepingBag.net.ID;
+			spawnOptions2.name = sleepingBag.niceName;
+			spawnOptions2.worldPosition = sleepingBag.transform.position;
+			spawnOptions2.type = (sleepingBag.isStatic ? RespawnInformation.SpawnOptions.RespawnType.Static : sleepingBag.RespawnType);
+			spawnOptions2.unlockSeconds = sleepingBag.GetUnlockSeconds(userID);
+			spawnOptions2.respawnState = sleepingBag.GetRespawnState(userID);
+			spawnOptions2.mobile = sleepingBag.IsMobile();
+			spawnOptions.Add(spawnOptions2);
 		}
-		if (IsDead())
-		{
-			respawnInformation.previousLife = previousLifeStory;
-			respawnInformation.fadeIn = previousLifeStory != null && previousLifeStory.timeDied > Epoch.Current - 5;
-		}
-		Interface.CallHook("OnRespawnInformationGiven", this, respawnInformation);
-		ClientRPCPlayer(null, this, "OnRespawnInformation", respawnInformation);
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(1uL)]
 	private void RequestRespawnInformation(RPCMessage msg)
 	{
 		SendRespawnOptions();
@@ -5733,24 +6202,27 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				Invoke(ScheduledDeath, NPCAutoTurret.sleeperhostiledelay);
 			}
 			BaseMountable baseMountable = GetMounted();
-			if (baseMountable != null && !baseMountable.allowSleeperMounting)
+			if (baseMountable != null && !AllowSleeperMounting(baseMountable))
 			{
 				EnsureDismounted();
 			}
 			SetPlayerFlag(PlayerFlags.Sleeping, b: true);
 			sleepStartTime = UnityEngine.Time.time;
-			sleepingPlayerList.Add(this);
+			sleepingPlayerList.TryAdd(this);
 			bots.Remove(this);
 			CancelInvoke(InventoryUpdate);
 			CancelInvoke(TeamUpdate);
+			CancelInvoke(UpdateClanLastSeen);
 			inventory.loot.Clear();
-			inventory.crafting.CancelAll(returnItems: true);
 			inventory.containerMain.OnChanged();
 			inventory.containerBelt.OnChanged();
 			inventory.containerWear.OnChanged();
-			TurnOffAllLights();
 			EnablePlayerCollider();
-			RemovePlayerRigidbody();
+			if (!IsLoadingAfterTransfer())
+			{
+				RemovePlayerRigidbody();
+				TurnOffAllLights();
+			}
 			SetServerFall(wantsOn: true);
 		}
 	}
@@ -5845,7 +6317,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			position2 += Vector3.down * num5;
 			UpdateEstimatedVelocity(position, position2, num);
-			if (WaterLevel.Test(position2, waves: true, this) || AntiHack.TestInsideTerrain(position2))
+			if (WaterLevel.Test(position2, waves: true, volumes: true, this) || AntiHack.TestInsideTerrain(position2))
 			{
 				SetServerFall(wantsOn: false);
 			}
@@ -5875,6 +6347,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				InvokeRandomized(TeamUpdate, 1f, 4f, 1f);
 			}
+			InvokeRandomized(UpdateClanLastSeen, 300f, 300f, 60f);
 			EnablePlayerCollider();
 			AddPlayerRigidbody();
 			SetServerFall(wantsOn: false);
@@ -5928,6 +6401,12 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerDisconnected(this);
 		}
 		BaseMission.PlayerDisconnected(this);
+		ClanManager serverInstance = ClanManager.ServerInstance;
+		if (clanId != 0L && serverInstance != null)
+		{
+			serverInstance.ClanMemberConnectionsChanged(clanId);
+		}
+		UpdateClanLastSeen();
 	}
 
 	private void InventoryUpdate()
@@ -6050,7 +6529,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 				playerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
 				if (!flag)
 				{
-					playerCorpse.TakeFrom(inventory.containerMain, inventory.containerWear, inventory.containerBelt);
+					playerCorpse.TakeFrom(this, inventory.containerMain, inventory.containerWear, inventory.containerBelt);
 				}
 				playerCorpse.playerName = displayName;
 				playerCorpse.streamerName = RandomUsernames.Get(userID);
@@ -6131,7 +6610,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 					component.AddForce((info.attackNormal + Vector3.up * 0.5f).normalized * 1f, ForceMode.VelocityChange);
 				}
 			}
-			if (baseCorpse is PlayerCorpse playerCorpse && playerCorpse.containers != null)
+			if (baseCorpse is PlayerCorpse { containers: not null } playerCorpse)
 			{
 				foreach (BasePlayer item in obj)
 				{
@@ -6172,7 +6651,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			{
 				if (info.Initiator == this)
 				{
-					text = string.Concat(ToString(), " was killed by ", lastDamage, " at ", base.transform.position);
+					text = ToString() + " was killed by " + lastDamage.ToString() + " at " + base.transform.position.ToString();
 					text2 = "You died: killed by " + lastDamage;
 					if (lastDamage == DamageType.Suicide)
 					{
@@ -6190,7 +6669,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 					if (info.Initiator is BasePlayer)
 					{
 						BasePlayer basePlayer = info.Initiator.ToPlayer();
-						text = ToString() + " was killed by " + basePlayer.ToString() + " at " + base.transform.position;
+						text = ToString() + " was killed by " + basePlayer.ToString() + " at " + base.transform.position.ToString();
 						text2 = "You died: killed by " + basePlayer.displayName + " (" + basePlayer.userID + ")";
 						basePlayer.stats.Add("kill_player", 1, Stats.All);
 						basePlayer.LifeStoryKill(this);
@@ -6212,7 +6691,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 					}
 					else
 					{
-						text = ToString() + " was killed by " + info.Initiator.ShortPrefabName + " (" + info.Initiator.Categorize() + ") at " + base.transform.position;
+						text = ToString() + " was killed by " + info.Initiator.ShortPrefabName + " (" + info.Initiator.Categorize() + ") at " + base.transform.position.ToString();
 						text2 = "You died: killed by " + info.Initiator.Categorize();
 						stats.Add("death_" + info.Initiator.Categorize(), 1);
 					}
@@ -6224,19 +6703,19 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			}
 			else if (lastDamage == DamageType.Fall)
 			{
-				text = ToString() + " was killed by fall at " + base.transform.position;
+				text = ToString() + " was killed by fall at " + base.transform.position.ToString();
 				text2 = "You died: killed by fall";
 				Facepunch.Rust.Analytics.Server.Death("fall", ServerPosition);
 			}
 			else
 			{
-				text = ToString() + " was killed by " + info.damageTypes.GetMajorityDamageType().ToString() + " at " + base.transform.position;
+				text = ToString() + " was killed by " + info.damageTypes.GetMajorityDamageType().ToString() + " at " + base.transform.position.ToString();
 				text2 = "You died: " + info.damageTypes.GetMajorityDamageType();
 			}
 		}
 		else
 		{
-			text = string.Concat(ToString(), " died (", lastDamage, ")");
+			text = ToString() + " died (" + lastDamage.ToString() + ")";
 			text2 = "You died: " + lastDamage;
 		}
 		using (TimeWarning.New("LogMessage"))
@@ -6322,7 +6801,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			BaseGameMode.GetActiveGameMode(serverside: true).OnPlayerRespawn(this);
 		}
-		if (net != null)
+		if (IsConnected)
 		{
 			EACServer.OnStartLoading(net.connection);
 		}
@@ -6373,11 +6852,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 
 	public override void Hurt(HitInfo info)
 	{
-		if (IsDead() || (IsImmortalTo(info) && info.damageTypes.Total() >= 0f) || Interface.CallHook("IOnBasePlayerHurt", this, info) != null)
+		if (IsDead() || IsTransferProtected() || (IsImmortalTo(info) && info.damageTypes.Total() >= 0f) || Interface.CallHook("IOnBasePlayerHurt", this, info) != null)
 		{
 			return;
 		}
-		if (ConVar.Server.pve && (bool)info.Initiator && info.Initiator is BasePlayer && info.Initiator != this)
+		if (ConVar.Server.pve && !IsNpc && (bool)info.Initiator && info.Initiator is BasePlayer && info.Initiator != this)
 		{
 			(info.Initiator as BasePlayer).Hurt(info.damageTypes.Total(), DamageType.Generic);
 			return;
@@ -6706,6 +7185,11 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		info.attackerSteamID = userID;
 	}
 
+	public void InvalidateWorkbenchCache()
+	{
+		nextCheckTime = 0f;
+	}
+
 	public Workbench GetCachedCraftLevelWorkbench()
 	{
 		return _cachedWorkbench;
@@ -6810,8 +7294,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		return net.connection.info.GetString(key, defaultVal);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void PerformanceReport(RPCMessage msg)
 	{
 		string text = msg.read.String();
@@ -6849,8 +7333,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server]
 	public void PerformanceReport_Frametime(RPCMessage msg)
 	{
 		int request_id = msg.read.Int32();
@@ -6878,7 +7362,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			return (bool)obj;
 		}
-		if (IsSpectating() && player != this && !player.net.connection.info.GetBool("global.specnet"))
+		if (IsSpectating() && player != this)
 		{
 			return false;
 		}
@@ -6893,8 +7377,8 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(1uL)]
 	public void OnPlayerReported(RPCMessage msg)
 	{
 		string text = msg.read.String();
@@ -7064,6 +7548,349 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 			return inventory.containerMain.uid;
 		}
 		return default(ItemContainerId);
+	}
+
+	private BaseVehicle GetVehicleParent()
+	{
+		BaseVehicle mountedVehicle = GetMountedVehicle();
+		if (mountedVehicle != null)
+		{
+			return mountedVehicle;
+		}
+		BaseEntity baseEntity = GetParentEntity();
+		if (baseEntity != null && baseEntity is BaseVehicle result)
+		{
+			return result;
+		}
+		return null;
+	}
+
+	private void RemoveLoadingPlayerFlag()
+	{
+		if (IsLoadingAfterTransfer())
+		{
+			SetPlayerFlag(PlayerFlags.LoadingAfterTransfer, b: false);
+			if (IsSleeping())
+			{
+				SetPlayerFlag(PlayerFlags.Sleeping, b: false);
+				StartSleeping();
+			}
+		}
+	}
+
+	public bool InNoRespawnZone()
+	{
+		bool flag = false;
+		Vector3 position = base.transform.position;
+		if (triggers != null)
+		{
+			for (int i = 0; i < triggers.Count; i++)
+			{
+				TriggerNoRespawnZone triggerNoRespawnZone = triggers[i] as TriggerNoRespawnZone;
+				if (!(triggerNoRespawnZone == null))
+				{
+					flag = triggerNoRespawnZone.InNoRespawnZone(position, checkRadius: false);
+					if (flag)
+					{
+						break;
+					}
+				}
+			}
+		}
+		return flag;
+	}
+
+	internal void LifeStoryStart()
+	{
+		if (lifeStory != null)
+		{
+			Debug.LogError("Stomping old lifeStory");
+			lifeStory = null;
+		}
+		lifeStory = new PlayerLifeStory
+		{
+			ShouldPool = false
+		};
+		lifeStory.timeBorn = (uint)Epoch.Current;
+		hasSentPresenceState = false;
+	}
+
+	public void LifeStoryEnd()
+	{
+		SingletonComponent<ServerMgr>.Instance.persistance.AddLifeStory(userID, lifeStory);
+		previousLifeStory = lifeStory;
+		lifeStory = null;
+	}
+
+	internal void LifeStoryUpdate(float deltaTime, float moveSpeed)
+	{
+		if (lifeStory != null)
+		{
+			lifeStory.secondsAlive += deltaTime;
+			nextTimeCategoryUpdate -= deltaTime * ((moveSpeed > 0.1f) ? 1f : 0.25f);
+			if (nextTimeCategoryUpdate <= 0f && !waitingForLifeStoryUpdate)
+			{
+				nextTimeCategoryUpdate = 7f + 7f * UnityEngine.Random.Range(0.2f, 1f);
+				waitingForLifeStoryUpdate = true;
+				lifeStoryQueue.Add(this);
+			}
+			if (LifeStoryInWilderness)
+			{
+				lifeStory.secondsWilderness += deltaTime;
+			}
+			if (LifeStoryInMonument)
+			{
+				lifeStory.secondsInMonument += deltaTime;
+			}
+			if (LifeStoryInBase)
+			{
+				lifeStory.secondsInBase += deltaTime;
+			}
+			if (LifeStoryFlying)
+			{
+				lifeStory.secondsFlying += deltaTime;
+			}
+			if (LifeStoryBoating)
+			{
+				lifeStory.secondsBoating += deltaTime;
+			}
+			if (LifeStorySwimming)
+			{
+				lifeStory.secondsSwimming += deltaTime;
+			}
+			if (LifeStoryDriving)
+			{
+				lifeStory.secondsDriving += deltaTime;
+			}
+			if (IsSleeping())
+			{
+				lifeStory.secondsSleeping += deltaTime;
+			}
+			else if (IsRunning())
+			{
+				lifeStory.metersRun += moveSpeed * deltaTime;
+			}
+			else
+			{
+				lifeStory.metersWalked += moveSpeed * deltaTime;
+			}
+		}
+	}
+
+	public void UpdateTimeCategory()
+	{
+		using (TimeWarning.New("UpdateTimeCategory"))
+		{
+			waitingForLifeStoryUpdate = false;
+			int num = currentTimeCategory;
+			currentTimeCategory = 1;
+			if (IsBuildingAuthed())
+			{
+				currentTimeCategory = 4;
+			}
+			Vector3 position = base.transform.position;
+			if (TerrainMeta.TopologyMap != null && ((uint)TerrainMeta.TopologyMap.GetTopology(position) & 0x400u) != 0)
+			{
+				foreach (MonumentInfo monument in TerrainMeta.Path.Monuments)
+				{
+					if (monument.shouldDisplayOnMap && monument.IsInBounds(position))
+					{
+						currentTimeCategory = 2;
+						break;
+					}
+				}
+			}
+			if (IsSwimming())
+			{
+				currentTimeCategory |= 32;
+			}
+			if (isMounted)
+			{
+				BaseMountable baseMountable = GetMounted();
+				if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Boating)
+				{
+					currentTimeCategory |= 16;
+				}
+				else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Flying)
+				{
+					currentTimeCategory |= 8;
+				}
+				else if (baseMountable.mountTimeStatType == BaseMountable.MountStatType.Driving)
+				{
+					currentTimeCategory |= 64;
+				}
+			}
+			else if (HasParent() && GetParentEntity() is BaseMountable baseMountable2)
+			{
+				if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Boating)
+				{
+					currentTimeCategory |= 16;
+				}
+				else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Flying)
+				{
+					currentTimeCategory |= 8;
+				}
+				else if (baseMountable2.mountTimeStatType == BaseMountable.MountStatType.Driving)
+				{
+					currentTimeCategory |= 64;
+				}
+			}
+			if (num != currentTimeCategory || !hasSentPresenceState)
+			{
+				LifeStoryInWilderness = (1 & currentTimeCategory) != 0;
+				LifeStoryInMonument = (2 & currentTimeCategory) != 0;
+				LifeStoryInBase = (4 & currentTimeCategory) != 0;
+				LifeStoryFlying = (8 & currentTimeCategory) != 0;
+				LifeStoryBoating = (0x10 & currentTimeCategory) != 0;
+				LifeStorySwimming = (0x20 & currentTimeCategory) != 0;
+				LifeStoryDriving = (0x40 & currentTimeCategory) != 0;
+				ClientRPCPlayer(null, this, "UpdateRichPresenceState", currentTimeCategory);
+				hasSentPresenceState = true;
+			}
+		}
+	}
+
+	public void LifeStoryShotFired(BaseEntity withWeapon)
+	{
+		if (lifeStory == null)
+		{
+			return;
+		}
+		if (lifeStory.weaponStats == null)
+		{
+			lifeStory.weaponStats = Facepunch.Pool.GetList<PlayerLifeStory.WeaponStats>();
+		}
+		foreach (PlayerLifeStory.WeaponStats weaponStat in lifeStory.weaponStats)
+		{
+			if (weaponStat.weaponName == withWeapon.ShortPrefabName)
+			{
+				weaponStat.shotsFired++;
+				return;
+			}
+		}
+		PlayerLifeStory.WeaponStats weaponStats = Facepunch.Pool.Get<PlayerLifeStory.WeaponStats>();
+		weaponStats.weaponName = withWeapon.ShortPrefabName;
+		weaponStats.shotsFired++;
+		lifeStory.weaponStats.Add(weaponStats);
+	}
+
+	public void LifeStoryShotHit(BaseEntity withWeapon)
+	{
+		if (lifeStory == null || withWeapon == null)
+		{
+			return;
+		}
+		if (lifeStory.weaponStats == null)
+		{
+			lifeStory.weaponStats = Facepunch.Pool.GetList<PlayerLifeStory.WeaponStats>();
+		}
+		foreach (PlayerLifeStory.WeaponStats weaponStat in lifeStory.weaponStats)
+		{
+			if (weaponStat.weaponName == withWeapon.ShortPrefabName)
+			{
+				weaponStat.shotsHit++;
+				return;
+			}
+		}
+		PlayerLifeStory.WeaponStats weaponStats = Facepunch.Pool.Get<PlayerLifeStory.WeaponStats>();
+		weaponStats.weaponName = withWeapon.ShortPrefabName;
+		weaponStats.shotsHit++;
+		lifeStory.weaponStats.Add(weaponStats);
+	}
+
+	public void LifeStoryKill(BaseCombatEntity killed)
+	{
+		if (lifeStory != null)
+		{
+			if (killed is ScientistNPC)
+			{
+				lifeStory.killedScientists++;
+			}
+			else if (killed is BasePlayer)
+			{
+				lifeStory.killedPlayers++;
+			}
+			else if (killed is BaseAnimalNPC)
+			{
+				lifeStory.killedAnimals++;
+			}
+		}
+	}
+
+	public void LifeStoryGenericStat(string key, int value)
+	{
+		if (lifeStory == null)
+		{
+			return;
+		}
+		if (lifeStory.genericStats == null)
+		{
+			lifeStory.genericStats = Facepunch.Pool.GetList<PlayerLifeStory.GenericStat>();
+		}
+		foreach (PlayerLifeStory.GenericStat genericStat2 in lifeStory.genericStats)
+		{
+			if (genericStat2.key == key)
+			{
+				genericStat2.value += value;
+				return;
+			}
+		}
+		PlayerLifeStory.GenericStat genericStat = Facepunch.Pool.Get<PlayerLifeStory.GenericStat>();
+		genericStat.key = key;
+		genericStat.value = value;
+		lifeStory.genericStats.Add(genericStat);
+	}
+
+	public void LifeStoryHurt(float amount)
+	{
+		if (lifeStory != null)
+		{
+			lifeStory.totalDamageTaken += amount;
+		}
+	}
+
+	public void LifeStoryHeal(float amount)
+	{
+		if (lifeStory != null)
+		{
+			lifeStory.totalHealing += amount;
+		}
+	}
+
+	internal void LifeStoryLogDeath(HitInfo deathBlow, DamageType lastDamage)
+	{
+		if (lifeStory == null)
+		{
+			return;
+		}
+		lifeStory.timeDied = (uint)Epoch.Current;
+		PlayerLifeStory.DeathInfo deathInfo = Facepunch.Pool.Get<PlayerLifeStory.DeathInfo>();
+		deathInfo.lastDamageType = (int)lastDamage;
+		if (deathBlow != null)
+		{
+			if (deathBlow.Initiator != null)
+			{
+				deathBlow.Initiator.AttackerInfo(deathInfo);
+				deathInfo.attackerDistance = Distance(deathBlow.Initiator);
+			}
+			if (deathBlow.WeaponPrefab != null)
+			{
+				deathInfo.inflictorName = deathBlow.WeaponPrefab.ShortPrefabName;
+			}
+			if (deathBlow.HitBone != 0)
+			{
+				deathInfo.hitBone = StringPool.Get(deathBlow.HitBone);
+			}
+			else
+			{
+				deathInfo.hitBone = "";
+			}
+		}
+		else if (base.SecondsSinceAttacked <= 60f && lastAttacker != null)
+		{
+			lastAttacker.AttackerInfo(deathInfo);
+		}
+		lifeStory.deathInfo = deathInfo;
 	}
 
 	private void Tick_Spectator()
@@ -7821,6 +8648,26 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 	public void ProlongWounding(float delay)
 	{
 		woundedDuration = Mathf.Max(woundedDuration, Mathf.Min(TimeSinceWoundedStarted + delay, woundedDuration + delay));
+		SendWoundedInformation(woundedDuration);
+	}
+
+	public void SendWoundedInformation(float timeLeft)
+	{
+		float recoveryChance = GetRecoveryChance();
+		ClientRPCPlayer(null, this, "CLIENT_GetWoundedInformation", recoveryChance, timeLeft, woundedDuration);
+	}
+
+	public float GetRecoveryChance()
+	{
+		float num = (IsIncapacitated() ? ConVar.Server.incapacitatedrecoverchance : ConVar.Server.woundedrecoverchance);
+		float num2 = Mathf.Lerp(t: (metabolism.hydration.Fraction() + metabolism.calories.Fraction()) / 2f, a: 0f, b: ConVar.Server.woundedmaxfoodandwaterbonus);
+		float result = Mathf.Clamp01(num + num2);
+		ItemDefinition itemDefinition = ItemManager.FindItemDefinition("largemedkit");
+		if (inventory.containerBelt.FindItemByItemID(itemDefinition.itemid) != null && !woundedByFallDamage)
+		{
+			return 1f;
+		}
+		return result;
 	}
 
 	public void WoundingTick()
@@ -7876,6 +8723,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		healingWhileCrawling = 0f;
 		WoundedStartSharedCode(info);
 		StartWoundedTick(40, 50);
+		SendWoundedInformation(woundedDuration);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -7891,6 +8739,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		SetPlayerFlag(PlayerFlags.Incapacitated, b: true);
 		SetServerFall(wantsOn: true);
 		StartWoundedTick(10, 25);
+		SendWoundedInformation(woundedDuration);
 		SendNetworkUpdateImmediate();
 	}
 
@@ -8100,6 +8949,37 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		base.DestroyShared();
 	}
 
+	public override bool InSafeZone()
+	{
+		if (base.isServer)
+		{
+			return base.InSafeZone();
+		}
+		return false;
+	}
+
+	public bool IsInNoRespawnZone()
+	{
+		if (base.isServer)
+		{
+			return InNoRespawnZone();
+		}
+		return false;
+	}
+
+	public bool IsOnATugboat()
+	{
+		if (GetMountedVehicle() is Tugboat)
+		{
+			return true;
+		}
+		if (GetParentEntity() is Tugboat)
+		{
+			return true;
+		}
+		return false;
+	}
+
 	public static void ServerCycle(float deltaTime)
 	{
 		for (int i = 0; i < activePlayerList.Values.Count; i++)
@@ -8141,23 +9021,27 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		Facepunch.Pool.FreeList(ref obj);
 	}
 
-	public bool InSafeZone()
+	private bool ManuallyCheckSafezone()
 	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(base.isServer);
-		if (activeGameMode != null && !activeGameMode.safeZone)
+		if (!base.isServer)
 		{
 			return false;
 		}
-		if (base.isServer)
+		List<Collider> list = Facepunch.Pool.GetList<Collider>();
+		Vis.Colliders(base.transform.position, 0f, list);
+		foreach (Collider item in list)
 		{
-			return currentSafeLevel > 0f;
+			if (item.GetComponent<TriggerSafeZone>() != null)
+			{
+				return true;
+			}
 		}
 		return false;
 	}
 
 	public override bool OnStartBeingLooted(BasePlayer baseEntity)
 	{
-		if (baseEntity.InSafeZone() && baseEntity.userID != userID)
+		if ((baseEntity.InSafeZone() || InSafeZone() || ManuallyCheckSafezone()) && baseEntity.userID != userID)
 		{
 			return false;
 		}
@@ -8172,6 +9056,10 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		if (IsCrawling())
 		{
 			GoToIncapacitated(null);
+		}
+		if (inventory.crafting != null)
+		{
+			inventory.crafting.CancelAll(returnItems: true);
 		}
 		return base.OnStartBeingLooted(baseEntity);
 	}
@@ -8437,7 +9325,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			nextColliderRefreshTime = UnityEngine.Time.time + 0.25f + UnityEngine.Random.Range(-0.05f, 0.05f);
 			BaseMountable baseMountable = GetMounted();
-			CapsuleColliderInfo capsuleColliderInfo = ((baseMountable != null && BaseNetworkableEx.IsValid(baseMountable)) ? ((!baseMountable.modifiesPlayerCollider) ? playerColliderStanding : baseMountable.customPlayerCollider) : ((IsIncapacitated() || IsSleeping()) ? playerColliderLyingDown : (IsCrawling() ? playerColliderCrawling : ((!modelState.ducked) ? playerColliderStanding : playerColliderDucked))));
+			CapsuleColliderInfo capsuleColliderInfo = ((baseMountable != null && BaseNetworkableEx.IsValid(baseMountable)) ? ((!baseMountable.modifiesPlayerCollider) ? playerColliderStanding : baseMountable.customPlayerCollider) : ((!IsIncapacitated() && !IsSleeping()) ? (IsCrawling() ? playerColliderCrawling : ((!modelState.ducked && !IsSwimming()) ? playerColliderStanding : playerColliderDucked)) : playerColliderLyingDown));
 			if (playerCollider.height != capsuleColliderInfo.height || playerCollider.radius != capsuleColliderInfo.radius || playerCollider.center != capsuleColliderInfo.center)
 			{
 				playerCollider.height = capsuleColliderInfo.height;
@@ -8758,7 +9646,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		{
 			return null;
 		}
-		return inventory.FindItemUID(itemId);
+		return inventory.FindItemByUID(itemId);
 	}
 
 	public override float WaterFactor()
@@ -8775,7 +9663,7 @@ public class BasePlayer : BaseCombatEntity, LootPanel.IHasLootPanel, IIdealSlotE
 		float num = playerCollider.height * 0.5f;
 		Vector3 start = playerCollider.transform.position + playerCollider.transform.rotation * (playerCollider.center - Vector3.up * (num - radius));
 		Vector3 end = playerCollider.transform.position + playerCollider.transform.rotation * (playerCollider.center + Vector3.up * (num - radius));
-		return WaterLevel.Factor(start, end, radius, this);
+		return WaterLevel.Factor(start, end, radius, waves: true, volumes: true, this);
 	}
 
 	public override float AirFactor()

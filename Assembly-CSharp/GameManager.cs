@@ -26,7 +26,7 @@ public class GameManager
 		Clientside = clientside;
 		Serverside = serverside;
 		preProcessed = new PrefabPreProcess(clientside, serverside);
-		pool = new PrefabPoolCollection();
+		pool = new PrefabPoolCollection(clientside);
 	}
 
 	public GameObject FindPrefab(uint prefabID)

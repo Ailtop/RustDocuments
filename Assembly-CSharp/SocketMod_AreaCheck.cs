@@ -34,11 +34,23 @@ public class SocketMod_AreaCheck : SocketMod
 
 	public override bool DoCheck(Construction.Placement place)
 	{
-		if (DoCheck(place.position, place.rotation))
+		bool flag = DoCheck(place.position, place.rotation);
+		if (!flag)
+		{
+			Construction.lastPlacementError = "Failed Check: IsInArea (" + hierachyName + ")";
+		}
+		else if (wantsInside && ((int)layerMask & 0x8000000) == 0)
+		{
+			flag = !GamePhysics.CheckSphere(place.position, 5f, 134217728);
+			if (!flag)
+			{
+				Construction.lastPlacementError = "Failed Check: IsInArea (" + hierachyName + ") Vehicle_Large test";
+			}
+		}
+		if (flag)
 		{
 			return true;
 		}
-		Construction.lastPlacementError = "Failed Check: IsInArea (" + hierachyName + ")";
 		return false;
 	}
 }

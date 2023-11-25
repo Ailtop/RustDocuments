@@ -129,7 +129,7 @@ public class VehicleEngineController<TOwner> where TOwner : BaseVehicle, IEngine
 	{
 		if (waterloggedPoint != null)
 		{
-			return WaterLevel.Test(waterloggedPoint.position, waves: true, owner);
+			return WaterLevel.Test(waterloggedPoint.position, waves: true, volumes: true, owner);
 		}
 		return false;
 	}

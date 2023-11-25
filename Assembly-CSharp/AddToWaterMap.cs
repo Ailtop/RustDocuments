@@ -2,15 +2,18 @@ using UnityEngine;
 
 public class AddToWaterMap : ProceduralObject
 {
+	public bool isOcean;
+
 	public override void Process()
 	{
+		Vector3 vector = new Vector3(10000f, 1000f, 10000f);
 		Collider component = GetComponent<Collider>();
-		Bounds bounds = component.bounds;
+		Bounds bounds = (isOcean ? new Bounds(-vector / 2f, vector) : component.bounds);
 		int num = TerrainMeta.WaterMap.Index(TerrainMeta.NormalizeX(bounds.min.x));
 		int num2 = TerrainMeta.WaterMap.Index(TerrainMeta.NormalizeZ(bounds.max.x));
 		int num3 = TerrainMeta.WaterMap.Index(TerrainMeta.NormalizeX(bounds.min.z));
 		int num4 = TerrainMeta.WaterMap.Index(TerrainMeta.NormalizeZ(bounds.max.z));
-		if (component is BoxCollider && base.transform.rotation == Quaternion.identity)
+		if (isOcean || (component is BoxCollider && base.transform.rotation == Quaternion.identity))
 		{
 			float num5 = TerrainMeta.NormalizeY(bounds.max.y);
 			for (int i = num3; i <= num4; i++)

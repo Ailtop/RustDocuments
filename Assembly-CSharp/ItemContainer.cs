@@ -9,7 +9,7 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public sealed class ItemContainer
+public sealed class ItemContainer : IAmmoContainer
 {
 	[Flags]
 	public enum Flag
@@ -556,7 +556,7 @@ public sealed class ItemContainer
 		return null;
 	}
 
-	public Item FindItemsByItemName(string name)
+	public Item FindItemByItemName(string name)
 	{
 		ItemDefinition itemDefinition = ItemManager.FindItemDefinition(name);
 		if (itemDefinition == null)
@@ -762,6 +762,50 @@ public sealed class ItemContainer
 		return num;
 	}
 
+	public bool TryTakeOne(int itemid, out Item item)
+	{
+		item = null;
+		foreach (Item item3 in itemList)
+		{
+			if (item3.info.itemid == itemid)
+			{
+				if (item3.amount > 1)
+				{
+					item3.MarkDirty();
+					item3.amount--;
+					Item item2 = ItemManager.CreateByItemID(itemid, 1, 0uL);
+					item2.amount = 1;
+					item2.CollectedForCrafting(playerOwner);
+					item = item2;
+				}
+				else
+				{
+					item = item3;
+				}
+				break;
+			}
+		}
+		if (item != null)
+		{
+			item.RemoveFromContainer();
+			return true;
+		}
+		return false;
+	}
+
+	public bool GiveItem(Item item, ItemContainer container = null)
+	{
+		if (item == null)
+		{
+			return false;
+		}
+		if (container != null && item.MoveToContainer(container))
+		{
+			return true;
+		}
+		return item.MoveToContainer(this);
+	}
+
 	public void OnCycle(float delta)
 	{
 		for (int i = 0; i < itemList.Count; i++)
@@ -831,6 +875,10 @@ public sealed class ItemContainer
 				}
 			}
 			else if (slot.info == item.info || slot.info.isRedirectOf == item.info || item.info.isRedirectOf == slot.info)
+			{
+				num += slot.amount;
+			}
+			else if (slot.info.isRedirectOf != null && slot.info.isRedirectOf == item.info.isRedirectOf)
 			{
 				num += slot.amount;
 			}
@@ -1006,5 +1054,17 @@ public sealed class ItemContainer
 			return (CanAcceptResult)obj;
 		}
 		return CanAcceptResult.CanAccept;
+	}
+
+	public bool HasBackpackItem()
+	{
+		foreach (Item item in itemList)
+		{
+			if (!item.isBroken && item.IsBackpack())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

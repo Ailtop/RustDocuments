@@ -19,7 +19,7 @@ public class ElectricSwitch : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVSwitch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SVSwitch ");
 				}
 				using (TimeWarning.New("SVSwitch"))
 				{
@@ -82,7 +82,16 @@ public class ElectricSwitch : IOEntity
 		return GetCurrentEnergy();
 	}
 
-	public override void IOStateChanged(int inputAmount, int inputSlot)
+	public override int CalculateCurrentEnergy(int inputAmount, int inputSlot)
+	{
+		if (inputSlot != 0)
+		{
+			return GetCurrentEnergy();
+		}
+		return base.CalculateCurrentEnergy(inputAmount, inputSlot);
+	}
+
+	public override void UpdateHasPower(int inputAmount, int inputSlot)
 	{
 		if (inputSlot == 1 && inputAmount > 0)
 		{
@@ -92,7 +101,10 @@ public class ElectricSwitch : IOEntity
 		{
 			SetSwitch(wantsOn: false);
 		}
-		base.IOStateChanged(inputAmount, inputSlot);
+		if (inputSlot == 0)
+		{
+			base.UpdateHasPower(inputAmount, inputSlot);
+		}
 	}
 
 	public override void ServerInit()
@@ -113,8 +125,8 @@ public class ElectricSwitch : IOEntity
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SVSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnSwitchToggle", this, msg.player) == null)

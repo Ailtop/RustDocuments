@@ -11,6 +11,6 @@ public static class ComponentEx
 
 	public static bool HasComponent<T>(this Component component) where T : Component
 	{
-		return (Object)component.GetComponent<T>() != (Object)null;
+		return component.GetComponent<T>() != null;
 	}
 }

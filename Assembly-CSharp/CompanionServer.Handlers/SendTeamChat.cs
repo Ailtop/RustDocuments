@@ -4,11 +4,11 @@ using ProtoBuf;
 
 namespace CompanionServer.Handlers;
 
-public class SendTeamChat : BaseHandler<AppSendMessage>
+public class SendTeamChat : BasePlayerHandler<AppSendMessage>
 {
 	protected override double TokenCost => 2.0;
 
-	public override void Execute()
+	public override async void Execute()
 	{
 		string text = base.Proto.message?.Trim();
 		if (string.IsNullOrWhiteSpace(text))
@@ -18,7 +18,7 @@ public class SendTeamChat : BaseHandler<AppSendMessage>
 		}
 		text = text.Truncate(256, "…");
 		string username = base.Player?.displayName ?? SingletonComponent<ServerMgr>.Instance.persistance.GetPlayerName(base.UserId) ?? "[unknown]";
-		if (Chat.sayAs(Chat.ChatChannel.Team, base.UserId, username, text, base.Player))
+		if (await Chat.sayAs(Chat.ChatChannel.Team, base.UserId, username, text, base.Player))
 		{
 			SendSuccess();
 		}

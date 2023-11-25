@@ -33,7 +33,7 @@ public class Megaphone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_ToggleBroadcasting "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_ToggleBroadcasting ");
 				}
 				using (TimeWarning.New("Server_ToggleBroadcasting"))
 				{

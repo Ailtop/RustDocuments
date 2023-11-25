@@ -31,13 +31,13 @@ public class Texture : ConsoleSystem
 		stringBuilder.AppendLine($"Immediately discard unused mips:  {UnityEngine.Texture.streamingTextureDiscardUnusedMips}");
 		stringBuilder.AppendLine($"Max level of reduction:           {QualitySettings.streamingMipmapsMaxLevelReduction}");
 		stringBuilder.AppendLine();
-		stringBuilder.AppendLine($"currentTextureMemory:             {UnityEngine.Texture.currentTextureMemory / 1048576uL}MB (current estimated usage)");
-		stringBuilder.AppendLine($"desiredTextureMemory:             {UnityEngine.Texture.desiredTextureMemory / 1048576uL}MB");
+		stringBuilder.AppendLine($"currentTextureMemory:             {UnityEngine.Texture.currentTextureMemory / 1048576}MB (current estimated usage)");
+		stringBuilder.AppendLine($"desiredTextureMemory:             {UnityEngine.Texture.desiredTextureMemory / 1048576}MB");
 		stringBuilder.AppendLine($"nonStreamingTextureCount:         {UnityEngine.Texture.nonStreamingTextureCount}");
-		stringBuilder.AppendLine($"nonStreamingTextureMemory:        {UnityEngine.Texture.nonStreamingTextureMemory / 1048576uL}MB");
+		stringBuilder.AppendLine($"nonStreamingTextureMemory:        {UnityEngine.Texture.nonStreamingTextureMemory / 1048576}MB");
 		stringBuilder.AppendLine($"streamingTextureCount:            {UnityEngine.Texture.streamingTextureCount}");
-		stringBuilder.AppendLine($"targetTextureMemory:              {UnityEngine.Texture.targetTextureMemory / 1048576uL}MB");
-		stringBuilder.AppendLine($"totalTextureMemory:               {UnityEngine.Texture.totalTextureMemory / 1048576uL}MB (if everything was loaded at highest quality)");
+		stringBuilder.AppendLine($"targetTextureMemory:              {UnityEngine.Texture.targetTextureMemory / 1048576}MB");
+		stringBuilder.AppendLine($"totalTextureMemory:               {UnityEngine.Texture.totalTextureMemory / 1048576}MB (if everything was loaded at highest quality)");
 		stringBuilder.AppendLine();
 		stringBuilder.AppendLine($"streamingMipmapUploadCount:       {UnityEngine.Texture.streamingMipmapUploadCount}");
 		stringBuilder.AppendLine($"streamingTextureLoadingCount:     {UnityEngine.Texture.streamingTextureLoadingCount}");

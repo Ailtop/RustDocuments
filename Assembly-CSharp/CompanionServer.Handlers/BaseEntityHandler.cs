@@ -1,6 +1,6 @@
 namespace CompanionServer.Handlers;
 
-public abstract class BaseEntityHandler<T> : BaseHandler<T> where T : class
+public abstract class BaseEntityHandler<T> : BasePlayerHandler<T> where T : class
 {
 	protected AppIOEntity Entity { get; private set; }
 

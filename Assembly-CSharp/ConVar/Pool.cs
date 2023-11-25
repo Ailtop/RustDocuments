@@ -15,12 +15,12 @@ namespace ConVar;
 [Factory("pool")]
 public class Pool : ConsoleSystem
 {
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static int mode = 2;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static bool prewarm = true;
 
 	[ClientVar]
@@ -57,8 +57,8 @@ public class Pool : ConsoleSystem
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void print_arraypool(Arg arg)
 	{
 		ArrayPool<byte> arrayPool = BaseNetwork.ArrayPool;
@@ -79,8 +79,8 @@ public class Pool : ConsoleSystem
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void print_prefabs(Arg arg)
 	{
 		PrefabPoolCollection pool = GameManager.server.pool;
@@ -93,15 +93,19 @@ public class Pool : ConsoleSystem
 		TextTable textTable = new TextTable();
 		textTable.AddColumn("id");
 		textTable.AddColumn("name");
+		textTable.AddColumn("missed");
 		textTable.AddColumn("count");
-		foreach (KeyValuePair<uint, PrefabPool> item in pool.storage)
+		textTable.AddColumn("target");
+		textTable.AddColumn("added");
+		textTable.AddColumn("removed");
+		foreach (PrefabPool item in pool.storage.Values.OrderByDescending((PrefabPool x) => x.Missed))
 		{
-			string text = item.Key.ToString();
-			string text2 = StringPool.Get(item.Key);
-			string text3 = item.Value.Count.ToString();
-			if (string.IsNullOrEmpty(@string) || text2.Contains(@string, CompareOptions.IgnoreCase))
+			string text = StringPool.Get(item.PrefabName).ToString();
+			string prefabName = item.PrefabName;
+			string text2 = item.Count.ToString();
+			if (string.IsNullOrEmpty(@string) || prefabName.Contains(@string, CompareOptions.IgnoreCase))
 			{
-				textTable.AddRow(text, Path.GetFileNameWithoutExtension(text2), text3);
+				textTable.AddRow(text, Path.GetFileNameWithoutExtension(prefabName), text2, item.TargetCapacity.ToString(), item.Missed.ToString(), item.Pushed.ToString(), item.Popped.ToString());
 			}
 		}
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
@@ -134,8 +138,8 @@ public class Pool : ConsoleSystem
 		arg.ReplyWith(arg.HasArg("--json") ? textTable.ToJson() : textTable.ToString());
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void clear_memory(Arg arg)
 	{
 		Facepunch.Pool.Clear(arg.GetString(0, string.Empty));
@@ -149,8 +153,8 @@ public class Pool : ConsoleSystem
 		GameManager.server.pool.Clear(@string);
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void clear_assets(Arg arg)
 	{
 		AssetPool.Clear(arg.GetString(0, string.Empty));

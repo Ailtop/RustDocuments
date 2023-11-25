@@ -59,7 +59,7 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLoot "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenLoot ");
 				}
 				using (TimeWarning.New("RPC_OpenLoot"))
 				{
@@ -185,8 +185,8 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 		StorageContainer.DropItems(this, initiator);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)
@@ -209,9 +209,9 @@ public class ContainerIOEntity : IOEntity, IItemContainerEntity, IIdealSlotEntit
 		{
 			return false;
 		}
-		if (onlyOneUser && IsOpen())
+		if ((onlyOneUser && IsOpen()) || IsTransferring())
 		{
-			player.ChatMessage("Already in use");
+			player.ShowToast(GameTip.Styles.Red_Normal, StorageContainer.LockedMessage);
 			return false;
 		}
 		if (panelToOpen == "")

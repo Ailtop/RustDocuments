@@ -44,7 +44,7 @@ public static class Auth_CentralizedBans
 					yield break;
 				}
 				connection.authStatus = "";
-				if (!ConVar.Server.bansServerEndpoint.EndsWith("/"))
+				if (!ConVar.Server.bansServerEndpoint.EndsWith("/") && !ConVar.Server.bansServerEndpoint.EndsWith("="))
 				{
 					ConVar.Server.bansServerEndpoint += "/";
 				}
@@ -56,14 +56,14 @@ public static class Auth_CentralizedBans
 					yield return ownerRequest.SendWebRequest();
 					break;
 				}
-				goto IL_0152;
+				goto IL_0163;
 			case 1:
 				if (CheckIfPlayerBanned(connection.ownerid, connection, ownerRequest))
 				{
 					yield break;
 				}
 				ownerRequest = null;
-				goto IL_0152;
+				goto IL_0163;
 			case 2:
 				{
 					if (!CheckIfPlayerBanned(connection.userid, connection, userRequest))
@@ -72,7 +72,7 @@ public static class Auth_CentralizedBans
 					}
 					yield break;
 				}
-				IL_0152:
+				IL_0163:
 				uri2 = ConVar.Server.bansServerEndpoint + connection.userid;
 				userRequest = UnityWebRequest.Get(uri2);
 				userRequest.timeout = ConVar.Server.bansServerTimeout;

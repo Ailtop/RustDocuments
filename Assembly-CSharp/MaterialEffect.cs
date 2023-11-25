@@ -79,7 +79,7 @@ public class MaterialEffect : ScriptableObject
 			}
 			return;
 		}
-		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(ray.origin);
+		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(ray.origin, waves: true, volumes: false);
 		if (waterInfo.isValid)
 		{
 			Vector3 vector = new Vector3(ray.origin.x, WaterSystem.GetHeight(ray.origin), ray.origin.z);

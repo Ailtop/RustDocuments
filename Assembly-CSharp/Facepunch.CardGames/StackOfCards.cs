@@ -60,7 +60,7 @@ public class StackOfCards
 		stringBuilder.AppendLine("Cards in the deck: ");
 		foreach (PlayingCard card in cards)
 		{
-			stringBuilder.AppendLine(string.Concat(card.Rank, " of ", card.Suit));
+			stringBuilder.AppendLine(card.Rank.ToString() + " of " + card.Suit);
 		}
 		Debug.Log(stringBuilder.ToString());
 	}

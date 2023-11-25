@@ -15,6 +15,8 @@ public class SocketMod_EntityCheck : SocketMod
 
 	public bool wantsCollide;
 
+	public static Translate.Phrase ErrorPhrase = new Translate.Phrase("error_entitycheck", "Invalid entity");
+
 	private void OnDrawGizmosSelected()
 	{
 		Gizmos.matrix = base.transform.localToWorldMatrix;
@@ -24,24 +26,29 @@ public class SocketMod_EntityCheck : SocketMod
 
 	public override bool DoCheck(Construction.Placement place)
 	{
+		bool flag = !wantsCollide;
 		Vector3 position = place.position + place.rotation * worldPosition;
 		List<BaseEntity> obj = Pool.GetList<BaseEntity>();
 		Vis.Entities(position, sphereRadius, obj, layerMask.value, queryTriggers);
 		foreach (BaseEntity ent in obj)
 		{
-			bool flag = entityTypes.Any((BaseEntity x) => x.prefabID == ent.prefabID);
-			if (flag && wantsCollide)
+			bool flag2 = entityTypes.Any((BaseEntity x) => x.prefabID == ent.prefabID);
+			if (flag2 && wantsCollide)
 			{
-				Pool.FreeList(ref obj);
-				return true;
+				flag = true;
+				break;
 			}
-			if (flag && !wantsCollide)
+			if (flag2 && !wantsCollide)
 			{
-				Pool.FreeList(ref obj);
-				return false;
+				flag = false;
+				break;
 			}
 		}
+		if (!flag)
+		{
+			Construction.lastPlacementError = ErrorPhrase.translated;
+		}
 		Pool.FreeList(ref obj);
-		return !wantsCollide;
+		return flag;
 	}
 }

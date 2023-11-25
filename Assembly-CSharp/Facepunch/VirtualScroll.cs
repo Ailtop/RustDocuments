@@ -14,6 +14,11 @@ public class VirtualScroll : MonoBehaviour
 		void SetItemData(int i, GameObject obj);
 	}
 
+	public interface IVisualUpdate
+	{
+		void OnVisualUpdate(int i, GameObject obj);
+	}
+
 	public int ItemHeight = 40;
 
 	public int ItemSpacing = 10;
@@ -103,6 +108,18 @@ public class VirtualScroll : MonoBehaviour
 			{
 				BuildItem(i);
 			}
+		}
+	}
+
+	public void Update()
+	{
+		if (!(dataSource is IVisualUpdate visualUpdate))
+		{
+			return;
+		}
+		foreach (KeyValuePair<int, GameObject> item in ActivePool)
+		{
+			visualUpdate.OnVisualUpdate(item.Key, item.Value);
 		}
 	}
 

@@ -418,7 +418,7 @@ public class SimpleShark : BaseCombatEntity
 				return false;
 			}
 		}
-		else if (!WaterLevel.Test(newTarget.CenterPoint(), waves: true, newTarget))
+		else if (!WaterLevel.Test(newTarget.CenterPoint(), waves: true, volumes: false, newTarget))
 		{
 			return false;
 		}

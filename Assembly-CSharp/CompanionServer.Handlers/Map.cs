@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CompanionServer.Handlers;
 
-public class Map : BaseHandler<AppEmpty>
+public class Map : BasePlayerHandler<AppEmpty>
 {
 	private static int _width;
 

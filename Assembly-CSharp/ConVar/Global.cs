@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using Facepunch;
 using Facepunch.Extend;
+using Facepunch.Nexus.Models;
 using Network;
 using Network.Visibility;
 using ProtoBuf;
+using ProtoBuf.Nexus;
 using Rust;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -18,24 +20,24 @@ public class Global : ConsoleSystem
 {
 	private static int _developer;
 
-	[ClientVar(Help = "WARNING: This causes random crashes!")]
 	[ServerVar]
+	[ClientVar(Help = "WARNING: This causes random crashes!")]
 	public static bool skipAssetWarmup_crashes = false;
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static int maxthreads = 8;
 
 	private const int DefaultWarmupConcurrency = 1;
 
 	private const int DefaultPreloadConcurrency = 1;
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static int warmupConcurrency = 1;
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static int preloadConcurrency = 1;
 
 	[ServerVar]
@@ -44,8 +46,8 @@ public class Global : ConsoleSystem
 
 	private const bool DefaultAsyncWarmupEnabled = false;
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static bool asyncWarmup = false;
 
 	[ClientVar(Saved = true, Help = "Experimental faster loading, requires game restart (0 = off, 1 = partial, 2 = full)")]
@@ -58,11 +60,8 @@ public class Global : ConsoleSystem
 	[ClientVar(ClientInfo = true, Saved = true, Help = "If you're an admin this will enable god mode")]
 	public static bool god = false;
 
-	[ClientVar(ClientInfo = true, Saved = true, Help = "If enabled you will be networked when you're spectating. This means that you will hear audio chat, but also means that cheaters will potentially be able to detect you watching them.")]
-	public static bool specnet = false;
-
-	[ClientVar]
 	[ServerVar(ClientAdmin = true, ServerAdmin = true, Help = "When enabled a player wearing a gingerbread suit will gib like the gingerbread NPC's")]
+	[ClientVar]
 	public static bool cinematicGingerbreadCorpses = false;
 
 	private static uint _gingerbreadMaterialID = 0u;
@@ -78,6 +77,18 @@ public class Global : ConsoleSystem
 
 	[ServerVar(Help = "Disables the backpacks that appear after a corpse times out")]
 	public static bool disableBagDropping = false;
+
+	[ClientVar(Saved = true, Help = "Disables any emoji animations")]
+	public static bool blockEmojiAnimations = false;
+
+	[ClientVar(Saved = true, Help = "Blocks any emoji from appearing")]
+	public static bool blockEmoji = false;
+
+	[ClientVar(Saved = true, Help = "Blocks emoji provided by servers from appearing")]
+	public static bool blockServerEmoji = false;
+
+	[ClientVar(Saved = true, Help = "Displays any emoji rendering errors in the console")]
+	public static bool showEmojiErrors = false;
 
 	[ServerVar]
 	[ClientVar]
@@ -137,8 +148,8 @@ public class Global : ConsoleSystem
 		ServerMgr.RestartServer(args.GetString(1, string.Empty), args.GetInt(0, 300));
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void quit(Arg args)
 	{
 		SingletonComponent<ServerMgr>.Instance.Shutdown();
@@ -190,7 +201,7 @@ public class Global : ConsoleSystem
 			return keyValuePair.Value;
 		}))
 		{
-			text = string.Concat(text, dictionary[item.Key].ToString().PadLeft(10), " ", item.Value.FormatBytes().PadLeft(15), "\t", item.Key, "\n");
+			text = text + dictionary[item.Key].ToString().PadLeft(10) + " " + item.Value.FormatBytes().PadLeft(15) + "\t" + item.Key?.ToString() + "\n";
 		}
 		args.ReplyWith(text);
 	}
@@ -210,8 +221,8 @@ public class Global : ConsoleSystem
 		args.ReplyWith(text);
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void colliders(Arg args)
 	{
 		int num = (from x in UnityEngine.Object.FindObjectsOfType<Collider>()
@@ -224,8 +235,8 @@ public class Global : ConsoleSystem
 		args.ReplyWith(strValue);
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void error(Arg args)
 	{
 		((GameObject)null).transform.position = Vector3.zero;
@@ -296,7 +307,7 @@ public class Global : ConsoleSystem
 		{
 			if (developer > 0)
 			{
-				UnityEngine.Debug.LogWarning(string.Concat(basePlayer, " wanted to respawn but isn't dead or spectating"));
+				UnityEngine.Debug.LogWarning(basePlayer?.ToString() + " wanted to respawn but isn't dead or spectating");
 			}
 			basePlayer.SendNetworkUpdate();
 		}
@@ -404,21 +415,75 @@ public class Global : ConsoleSystem
 		if (!entityID.IsValid)
 		{
 			args.ReplyWith("Missing sleeping bag ID");
+			return;
 		}
-		else if (basePlayer.CanRespawn())
+		string @string = args.GetString(1);
+		string errorMessage;
+		if (NexusServer.Started && !string.IsNullOrWhiteSpace(@string))
 		{
-			if (SleepingBag.SpawnPlayer(basePlayer, entityID))
+			if (!ZoneController.Instance.CanRespawnAcrossZones(basePlayer))
 			{
-				basePlayer.MarkRespawn();
+				args.ReplyWith("You cannot respawn to a different zone");
+				return;
+			}
+			NexusZoneDetails nexusZoneDetails = NexusServer.FindZone(@string);
+			if (nexusZoneDetails == null)
+			{
+				args.ReplyWith("Zone was not found");
+			}
+			else if (!basePlayer.CanRespawn())
+			{
+				args.ReplyWith("You can't respawn again so quickly, wait a while");
 			}
 			else
 			{
-				args.ReplyWith("Couldn't spawn in sleeping bag!");
+				NexusRespawn(basePlayer, nexusZoneDetails, entityID);
 			}
 		}
-		else
+		else if (!SleepingBag.TrySpawnPlayer(basePlayer, entityID, out errorMessage))
 		{
-			basePlayer.ConsoleMessage("You can't respawn again so quickly, wait a while");
+			args.ReplyWith(errorMessage);
+		}
+		static async void NexusRespawn(BasePlayer player, NexusZoneDetails toZone, NetworkableId sleepingBag)
+		{
+			_ = 1;
+			try
+			{
+				player.nextRespawnTime = float.PositiveInfinity;
+				Request request = Facepunch.Pool.Get<Request>();
+				request.respawnAtBag = Facepunch.Pool.Get<SleepingBagRespawnRequest>();
+				request.respawnAtBag.userId = player.userID;
+				request.respawnAtBag.sleepingBagId = sleepingBag;
+				request.respawnAtBag.secondaryData = player.SaveSecondaryData();
+				using (Response response = await NexusServer.ZoneRpc(toZone.Key, request))
+				{
+					if (!response.status.success)
+					{
+						if (player.IsConnected)
+						{
+							player.ConsoleMessage("RespawnAtBag failed: " + response.status.errorMessage);
+						}
+						return;
+					}
+				}
+				await NexusServer.ZoneClient.Assign(player.UserIDString, toZone.Key);
+				if (player.IsConnected)
+				{
+					ConsoleNetwork.SendClientCommandImmediate(player.net.connection, "nexus.redirect", toZone.IpAddress, toZone.GamePort, NexusUtil.ConnectionProtocol(toZone));
+					player.Kick("Redirecting to another zone...");
+				}
+			}
+			catch (Exception ex)
+			{
+				if (player.IsConnected)
+				{
+					player.ConsoleMessage(ex.ToString());
+				}
+			}
+			finally
+			{
+				player.MarkRespawn();
+			}
 		}
 	}
 
@@ -426,16 +491,49 @@ public class Global : ConsoleSystem
 	public static void respawn_sleepingbag_remove(Arg args)
 	{
 		BasePlayer basePlayer = ArgEx.Player(args);
-		if ((bool)basePlayer)
+		if (!basePlayer)
 		{
-			NetworkableId entityID = ArgEx.GetEntityID(args, 0);
-			if (!entityID.IsValid)
+			return;
+		}
+		NetworkableId entityID = ArgEx.GetEntityID(args, 0);
+		if (!entityID.IsValid)
+		{
+			args.ReplyWith("Missing sleeping bag ID");
+			return;
+		}
+		string @string = args.GetString(1);
+		if (NexusServer.Started && !string.IsNullOrWhiteSpace(@string))
+		{
+			NexusZoneDetails nexusZoneDetails = NexusServer.FindZone(@string);
+			if (nexusZoneDetails == null)
 			{
-				args.ReplyWith("Missing sleeping bag ID");
+				args.ReplyWith("Zone was not found");
 			}
-			else
+			else if (ZoneController.Instance.CanRespawnAcrossZones(basePlayer))
 			{
-				SleepingBag.DestroyBag(basePlayer, entityID);
+				NexusRemoveBag(basePlayer, nexusZoneDetails.Key, entityID);
+			}
+		}
+		else
+		{
+			SleepingBag.DestroyBag(basePlayer.userID, entityID);
+		}
+		static async void NexusRemoveBag(BasePlayer player, string zoneKey, NetworkableId sleepingBag)
+		{
+			try
+			{
+				Request request = Facepunch.Pool.Get<Request>();
+				request.destroyBag = Facepunch.Pool.Get<SleepingBagDestroyRequest>();
+				request.destroyBag.userId = player.userID;
+				request.destroyBag.sleepingBagId = sleepingBag;
+				(await NexusServer.ZoneRpc(zoneKey, request)).Dispose();
+			}
+			catch (Exception ex)
+			{
+				if (player.IsConnected)
+				{
+					player.ConsoleMessage(ex.ToString());
+				}
 			}
 		}
 	}
@@ -500,6 +598,23 @@ public class Global : ConsoleSystem
 		if ((bool)basePlayer && basePlayer.IsAlive())
 		{
 			playerOrSleeperOrBot.Teleport(basePlayer);
+		}
+	}
+
+	[ServerVar]
+	public static void teleporteveryone2me(Arg args)
+	{
+		BasePlayer basePlayer = ArgEx.Player(args);
+		if (!basePlayer || !basePlayer.IsAlive())
+		{
+			return;
+		}
+		foreach (BasePlayer allPlayer in BasePlayer.allPlayerList)
+		{
+			if (allPlayer.IsAlive() && !(allPlayer == basePlayer))
+			{
+				allPlayer.Teleport(basePlayer);
+			}
 		}
 	}
 
@@ -652,6 +767,7 @@ public class Global : ConsoleSystem
 		if (basePlayer.ServerCurrentDeathNote == null)
 		{
 			arg.ReplyWith("You don't have a current death note!");
+			return;
 		}
 		Vector3 worldPosition = basePlayer.ServerCurrentDeathNote.worldPosition;
 		basePlayer.Teleport(worldPosition);
@@ -668,8 +784,8 @@ public class Global : ConsoleSystem
 		GC.unload();
 	}
 
-	[ClientVar]
 	[ServerVar(ServerUser = true)]
+	[ClientVar]
 	public static void version(Arg arg)
 	{
 		arg.ReplyWith($"Protocol: {Protocol.printable}\nBuild Date: {BuildInfo.Current.BuildDate}\nUnity Version: {UnityEngine.Application.unityVersion}\nChangeset: {BuildInfo.Current.Scm.ChangeId}\nBranch: {BuildInfo.Current.Scm.Branch}");
@@ -682,8 +798,8 @@ public class Global : ConsoleSystem
 		arg.ReplyWith(SystemInfoGeneralText.currentInfo);
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void sysuid(Arg arg)
 	{
 		arg.ReplyWith(SystemInfo.deviceUniqueIdentifier);
@@ -714,8 +830,8 @@ public class Global : ConsoleSystem
 		}
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void subscriptions(Arg arg)
 	{
 		TextTable textTable = new TextTable();

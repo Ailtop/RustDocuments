@@ -73,7 +73,7 @@ public class TrainCarUnloadable : TrainCar
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Open "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Open ");
 				}
 				using (TimeWarning.New("RPC_Open"))
 				{
@@ -395,8 +395,8 @@ public class TrainCarUnloadable : TrainCar
 		return num;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

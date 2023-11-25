@@ -16,7 +16,7 @@ public class ResourceRef<T> where T : UnityEngine.Object
 
 	public T Get()
 	{
-		if ((UnityEngine.Object)_cachedObject == (UnityEngine.Object)null)
+		if (_cachedObject == null)
 		{
 			_cachedObject = GameManifest.GUIDToObject(guid) as T;
 		}

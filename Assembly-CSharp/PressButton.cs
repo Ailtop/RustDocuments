@@ -27,7 +27,7 @@ public class PressButton : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Press "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Press ");
 				}
 				using (TimeWarning.New("Press"))
 				{
@@ -100,8 +100,8 @@ public class PressButton : IOEntity
 		SetFlag(Flags.On, b: false);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void Press(RPCMessage msg)
 	{
 		if (!IsOn() && Interface.CallHook("OnButtonPress", this, msg.player) == null)

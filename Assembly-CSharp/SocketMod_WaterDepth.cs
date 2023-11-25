@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Facepunch;
-using UnityEngine;
-
 public class SocketMod_WaterDepth : SocketMod
 {
 	public float MinimumWaterDepth = 2f;
@@ -16,26 +12,12 @@ public class SocketMod_WaterDepth : SocketMod
 
 	public override bool DoCheck(Construction.Placement place)
 	{
-		Vector3 vector = place.position + place.rotation * worldPosition;
-		if (!AllowWaterVolumes)
-		{
-			List<WaterVolume> obj = Pool.GetList<WaterVolume>();
-			Vis.Components(vector, 0.5f, obj, 262144);
-			int count = obj.Count;
-			Pool.FreeList(ref obj);
-			if (count > 0)
-			{
-				Construction.lastPlacementError = "Failed Check: WaterDepth_VolumeCheck (" + hierachyName + ")";
-				return false;
-			}
-		}
-		vector.y = WaterSystem.GetHeight(vector) - 0.1f;
-		float overallWaterDepth = WaterLevel.GetOverallWaterDepth(vector, waves: false);
-		if (overallWaterDepth > MinimumWaterDepth && overallWaterDepth < MaximumWaterDepth)
+		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(place.position + place.rotation * worldPosition, waves: false, AllowWaterVolumes, null, noEarlyExit: true);
+		if (waterInfo.overallDepth > MinimumWaterDepth && waterInfo.overallDepth < MaximumWaterDepth)
 		{
 			return true;
 		}
-		if (overallWaterDepth <= MinimumWaterDepth)
+		if (waterInfo.overallDepth <= MinimumWaterDepth)
 		{
 			Construction.lastPlacementError = TooShallowPhrase.translated;
 		}

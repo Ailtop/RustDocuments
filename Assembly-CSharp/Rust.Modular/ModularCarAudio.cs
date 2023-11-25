@@ -6,8 +6,8 @@ public class ModularCarAudio : GroundVehicleAudio
 {
 	public bool showDebug;
 
-	[Header("Skid")]
 	[SerializeField]
+	[Header("Skid")]
 	private SoundDefinition skidSoundLoop;
 
 	[SerializeField]
@@ -22,8 +22,8 @@ public class ModularCarAudio : GroundVehicleAudio
 	[SerializeField]
 	private float skidMaxSlip = 25f;
 
-	[SerializeField]
 	[Header("Movement & Suspension")]
+	[SerializeField]
 	private SoundDefinition movementStartOneshot;
 
 	[SerializeField]

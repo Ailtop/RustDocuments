@@ -8,6 +8,8 @@ public class PlayerEyes : EntityComponent<BasePlayer>
 
 	public static readonly Vector3 CrawlOffset = new Vector3(0f, -1.15f, 0.175f);
 
+	public static readonly Vector3 ParachuteOffset = new Vector3(0f, -1.45f, 0.3f);
+
 	public Vector3 thirdPersonSleepingOffset = new Vector3(0.43f, 1.25f, 0.7f);
 
 	public LazyAimProperties defaultLazyAim;

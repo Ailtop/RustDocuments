@@ -1,6 +1,7 @@
 using Rust;
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class TriggerParent : TriggerBase, IServerComponent
 {
 	[Tooltip("Deparent if the parented entity clips into an obstacle")]
@@ -21,7 +22,14 @@ public class TriggerParent : TriggerBase, IServerComponent
 	[Tooltip("If the player is already parented to something else, they'll switch over to another parent only if this is true")]
 	public bool overrideOtherTriggers;
 
+	[Tooltip("Requires associatedMountable to be set. Prevents players entering the trigger if there's something between their feet and the bottom of the parent trigger")]
+	public bool checkForObjUnderFeet;
+
 	public const int CLIP_CHECK_MASK = 1218511105;
+
+	protected Collider triggerCollider;
+
+	protected float triggerHeight;
 
 	private BasePlayer killPlayerTemp;
 
@@ -80,10 +88,10 @@ public class TriggerParent : TriggerBase, IServerComponent
 		{
 			return false;
 		}
-		if (!bypassOtherTriggerCheck)
+		if (!bypassOtherTriggerCheck && !overrideOtherTriggers)
 		{
 			BaseEntity parentEntity = ent.GetParentEntity();
-			if (!overrideOtherTriggers && BaseNetworkableEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
+			if (BaseNetworkableEx.IsValid(parentEntity) && parentEntity != GameObjectEx.ToBaseEntity(base.gameObject))
 			{
 				return false;
 			}
@@ -92,23 +100,28 @@ public class TriggerParent : TriggerBase, IServerComponent
 		{
 			return false;
 		}
-		if (doClippingCheck && IsClipping(ent))
+		if (doClippingCheck && IsClipping(ent) && !(ent is BaseCorpse))
 		{
 			return false;
 		}
-		if (!parentMountedPlayers || !parentSleepers)
+		if (checkForObjUnderFeet && HasObjUnderFeet(ent))
 		{
-			BasePlayer basePlayer = ent.ToPlayer();
-			if (basePlayer != null)
+			return false;
+		}
+		BasePlayer basePlayer = ent.ToPlayer();
+		if (basePlayer != null)
+		{
+			if (basePlayer.IsSwimming())
 			{
-				if (!parentMountedPlayers && basePlayer.isMounted)
-				{
-					return false;
-				}
-				if (!parentSleepers && basePlayer.IsSleeping())
-				{
-					return false;
-				}
+				return false;
+			}
+			if (!parentMountedPlayers && basePlayer.isMounted)
+			{
+				return false;
+			}
+			if (!parentSleepers && basePlayer.IsSleeping())
+			{
+				return false;
 			}
 		}
 		return true;
@@ -202,5 +215,23 @@ public class TriggerParent : TriggerBase, IServerComponent
 	protected virtual bool IsClipping(BaseEntity ent)
 	{
 		return GamePhysics.CheckOBB(ent.WorldSpaceBounds(), 1218511105, QueryTriggerInteraction.Ignore);
+	}
+
+	private bool HasObjUnderFeet(BaseEntity ent)
+	{
+		Vector3 origin = ent.PivotPoint() + ent.transform.up * 0.1f;
+		float maxDistance = triggerHeight + 0.1f;
+		Ray ray = new Ray(origin, -base.transform.up);
+		Debug.DrawRay(ray.origin, ray.direction, Color.blue, 1f);
+		if (GamePhysics.Trace(ray, 0f, out var hitInfo, maxDistance, 429990145, QueryTriggerInteraction.Ignore, ent) && hitInfo.collider != null)
+		{
+			BaseEntity other = GameObjectEx.ToBaseEntity(base.gameObject);
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(hitInfo.collider);
+			if (baseEntity == null || !baseEntity.EqualNetID(other))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -66,7 +66,7 @@ public class GingerbreadNPC : HumanNPC, global::IClientBrainStateListener
 				nPCPlayerCorpse.SetLootableIn(2f);
 				nPCPlayerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
 				nPCPlayerCorpse.SetFlag(Flags.Reserved2, b: true);
-				nPCPlayerCorpse.TakeFrom(inventory.containerMain);
+				nPCPlayerCorpse.TakeFrom(this, inventory.containerMain);
 				nPCPlayerCorpse.playerName = "Gingerbread";
 				nPCPlayerCorpse.playerSteamID = userID;
 				nPCPlayerCorpse.Spawn();

@@ -292,14 +292,19 @@ public class PerformanceLogging
 			["cpu_frequency"] = SystemInfo.processorFrequency.ToString(),
 			["cpu_name"] = SystemInfo.processorType.Trim(),
 			["system_memory"] = SystemInfo.systemMemorySize.ToString(),
-			["os"] = SystemInfo.operatingSystem
+			["os"] = SystemInfo.operatingSystem,
+			["supports_compute_shaders"] = SystemInfo.supportsComputeShaders.ToString(),
+			["supports_async_compute"] = SystemInfo.supportsAsyncCompute.ToString(),
+			["supports_async_gpu_readback"] = SystemInfo.supportsAsyncGPUReadback.ToString(),
+			["supports_3d_textures"] = SystemInfo.supports3DTextures.ToString(),
+			["supports_instancing"] = SystemInfo.supportsInstancing.ToString()
 		};
 		Dictionary<string, string> dictionary = new Dictionary<string, string>
 		{
 			["unity"] = UnityEngine.Application.unityVersion ?? "editor",
 			["changeset"] = BuildInfo.Current?.Scm.ChangeId ?? "editor",
 			["branch"] = BuildInfo.Current?.Scm.Branch ?? "editor",
-			["network_version"] = 2392.ToString()
+			["network_version"] = 2511.ToString()
 		};
 		dictionary["eos_sdk"] = VersionInterface.GetVersion()?.ToString() ?? "disabled";
 		record.AddObject("hardware", data).AddObject("application", dictionary);
@@ -347,6 +352,7 @@ public class PerformanceLogging
 			}
 			Frametimes = Pool.GetList<TimeSpan>();
 			PingHistory = Pool.GetList<int>();
+			lagSpikes.Clear();
 			garbageCollections.Clear();
 		}
 	}

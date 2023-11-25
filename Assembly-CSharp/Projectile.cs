@@ -58,6 +58,9 @@ public class Projectile : BaseMonoBehaviour
 
 	public float penetrationPower = 1f;
 
+	[Range(0f, 1f)]
+	public float waterIntegrityLoss = 0.1f;
+
 	[Header("Damage")]
 	public DamageProperties damageProperties;
 

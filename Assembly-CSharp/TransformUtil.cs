@@ -20,9 +20,9 @@ public static class TransformUtil
 		startPos.y += 0.25f;
 		range += 0.25f;
 		hitOut = default(RaycastHit);
-		if (Physics.Raycast(new Ray(startPos, Vector3.down), out var hitInfo, range, mask))
+		if (GamePhysics.Trace(new Ray(startPos, Vector3.down), 0f, out var hitInfo, range, mask))
 		{
-			if (ignoreTransform != null && (hitInfo.collider.transform == ignoreTransform || hitInfo.collider.transform.IsChildOf(ignoreTransform)))
+			if (ignoreTransform != null && hitInfo.collider != null && (hitInfo.collider.transform == ignoreTransform || hitInfo.collider.transform.IsChildOf(ignoreTransform)))
 			{
 				return GetGroundInfo(startPos - new Vector3(0f, 0.01f, 0f), out hitOut, range, mask, ignoreTransform);
 			}
@@ -50,7 +50,7 @@ public static class TransformUtil
 		GamePhysics.TraceAll(new Ray(startPos, Vector3.down), 0f, obj, range, mask, QueryTriggerInteraction.Ignore);
 		foreach (RaycastHit item in obj)
 		{
-			if (!(ignoreTransform != null) || (!(item.collider.transform == ignoreTransform) && !item.collider.transform.IsChildOf(ignoreTransform)))
+			if (!(ignoreTransform != null) || !(item.collider != null) || (!(item.collider.transform == ignoreTransform) && !item.collider.transform.IsChildOf(ignoreTransform)))
 			{
 				pos = item.point;
 				normal = item.normal;

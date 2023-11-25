@@ -26,7 +26,7 @@ public class MapEntity : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ImageUpdate "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ImageUpdate ");
 				}
 				using (TimeWarning.New("ImageUpdate"))
 				{
@@ -92,8 +92,8 @@ public class MapEntity : HeldEntity
 	}
 
 	[RPC_Server.CallsPerSecond(1uL)]
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void ImageUpdate(RPCMessage msg)
 	{
 		if (msg.player == null)

@@ -20,7 +20,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AnswerPhone "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - AnswerPhone ");
 				}
 				using (TimeWarning.New("AnswerPhone"))
 				{
@@ -56,7 +56,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClearCurrentUser "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ClearCurrentUser ");
 				}
 				using (TimeWarning.New("ClearCurrentUser"))
 				{
@@ -92,7 +92,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - InitiateCall "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - InitiateCall ");
 				}
 				using (TimeWarning.New("InitiateCall"))
 				{
@@ -128,7 +128,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_AddSavedNumber "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_AddSavedNumber ");
 				}
 				using (TimeWarning.New("Server_AddSavedNumber"))
 				{
@@ -168,7 +168,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RemoveSavedNumber "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RemoveSavedNumber ");
 				}
 				using (TimeWarning.New("Server_RemoveSavedNumber"))
 				{
@@ -208,7 +208,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestCurrentState "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RequestCurrentState ");
 				}
 				using (TimeWarning.New("Server_RequestCurrentState"))
 				{
@@ -244,7 +244,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestPhoneDirectory "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RequestPhoneDirectory ");
 				}
 				using (TimeWarning.New("Server_RequestPhoneDirectory"))
 				{
@@ -284,7 +284,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerDeleteVoicemail "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerDeleteVoicemail ");
 				}
 				using (TimeWarning.New("ServerDeleteVoicemail"))
 				{
@@ -324,7 +324,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerHangUp "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerHangUp ");
 				}
 				using (TimeWarning.New("ServerHangUp"))
 				{
@@ -360,7 +360,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerPlayVoicemail "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerPlayVoicemail ");
 				}
 				using (TimeWarning.New("ServerPlayVoicemail"))
 				{
@@ -400,7 +400,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerSendVoicemail "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerSendVoicemail ");
 				}
 				using (TimeWarning.New("ServerSendVoicemail"))
 				{
@@ -436,7 +436,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerStopVoicemail "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerStopVoicemail ");
 				}
 				using (TimeWarning.New("ServerStopVoicemail"))
 				{
@@ -476,7 +476,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetCurrentUser "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetCurrentUser ");
 				}
 				using (TimeWarning.New("SetCurrentUser"))
 				{
@@ -512,7 +512,7 @@ public class MobilePhone : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdatePhoneName "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UpdatePhoneName ");
 				}
 				using (TimeWarning.New("UpdatePhoneName"))
 				{
@@ -592,8 +592,8 @@ public class MobilePhone : HeldEntity
 		Controller.OnParentChanged(newParent);
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void ClearCurrentUser(RPCMessage msg)
 	{
 		Controller.ClearCurrentUser(msg);
@@ -606,22 +606,22 @@ public class MobilePhone : HeldEntity
 		Controller.SetCurrentUser(msg);
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void InitiateCall(RPCMessage msg)
 	{
 		Controller.InitiateCall(msg);
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	public void AnswerPhone(RPCMessage msg)
 	{
 		Controller.AnswerPhone(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void ServerHangUp(RPCMessage msg)
 	{
 		Controller.ServerHangUp(msg);
@@ -641,25 +641,25 @@ public class MobilePhone : HeldEntity
 		Controller.UpdatePhoneName(msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
 	public void Server_RequestPhoneDirectory(RPCMessage msg)
 	{
 		Controller.Server_RequestPhoneDirectory(msg);
 	}
 
-	[RPC_Server.FromOwner]
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	[RPC_Server.CallsPerSecond(5uL)]
 	public void Server_AddSavedNumber(RPCMessage msg)
 	{
 		Controller.Server_AddSavedNumber(msg);
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
-	[RPC_Server.CallsPerSecond(5uL)]
 	public void Server_RemoveSavedNumber(RPCMessage msg)
 	{
 		Controller.Server_RemoveSavedNumber(msg);
@@ -672,23 +672,23 @@ public class MobilePhone : HeldEntity
 		Controller.SetPhoneStateWithPlayer(Controller.serverState);
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server]
 	public void ServerSendVoicemail(RPCMessage msg)
 	{
 		Controller.ServerSendVoicemail(msg);
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void ServerPlayVoicemail(RPCMessage msg)
 	{
 		Controller.ServerPlayVoicemail(msg);
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.FromOwner]
 	public void ServerStopVoicemail(RPCMessage msg)
 	{
@@ -696,8 +696,8 @@ public class MobilePhone : HeldEntity
 	}
 
 	[RPC_Server.FromOwner]
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void ServerDeleteVoicemail(RPCMessage msg)
 	{
 		Controller.ServerDeleteVoicemail(msg);

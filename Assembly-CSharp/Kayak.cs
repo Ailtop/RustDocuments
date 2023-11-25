@@ -225,7 +225,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 		int num = NumMounted();
 		if (num == 0)
 		{
-			return 0.5f;
+			return 1f;
 		}
 		if (num < 2)
 		{
@@ -236,7 +236,7 @@ public class Kayak : BaseBoat, IPoolVehicle
 
 	public void BoatDecay()
 	{
-		BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsed, MotorRowboat.outsidedecayminutes, MotorRowboat.deepwaterdecayminutes);
+		BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsed, MotorRowboat.outsidedecayminutes, MotorRowboat.deepwaterdecayminutes, MotorRowboat.decaystartdelayminutes, preventDecayIndoors);
 	}
 
 	public override bool CanPickup(BasePlayer player)

@@ -55,7 +55,7 @@ public class ElevatorLift : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RaiseLowerFloor "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RaiseLowerFloor ");
 				}
 				using (TimeWarning.New("Server_RaiseLowerFloor"))
 				{

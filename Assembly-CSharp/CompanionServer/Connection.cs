@@ -22,6 +22,8 @@ public class Connection : IConnection
 
 	private readonly HashSet<EntityTarget> _subscribedEntities;
 
+	private readonly HashSet<ClanTarget> _subscribedClans;
+
 	private IRemoteControllable _currentCamera;
 
 	private ulong _cameraViewerSteamId;
@@ -46,6 +48,7 @@ public class Connection : IConnection
 		_listener = listener;
 		_connection = connection;
 		_subscribedEntities = new HashSet<EntityTarget>();
+		_subscribedClans = new HashSet<ClanTarget>();
 	}
 
 	public void OnClose()
@@ -60,6 +63,11 @@ public class Connection : IConnection
 			_listener.EntitySubscribers.Remove(subscribedEntity, this);
 		}
 		_subscribedEntities.Clear();
+		foreach (ClanTarget subscribedClan in _subscribedClans)
+		{
+			_listener.ClanSubscribers.Remove(subscribedClan, this);
+		}
+		_subscribedClans.Clear();
 		_currentCamera?.StopControl(new CameraViewerId(_cameraViewerSteamId, ConnectionId));
 		if (TryGetCameraTarget(_currentCamera, out var target))
 		{
@@ -178,6 +186,31 @@ public class Connection : IConnection
 		_currentCamera = null;
 		_isControllingCamera = false;
 		_cameraViewerSteamId = 0uL;
+	}
+
+	public void Subscribe(ClanTarget target)
+	{
+		if (_subscribedClans.Contains(target))
+		{
+			return;
+		}
+		foreach (ClanTarget subscribedClan in _subscribedClans)
+		{
+			_listener.ClanSubscribers.Remove(subscribedClan, this);
+		}
+		_subscribedClans.Clear();
+		if (_subscribedClans.Add(target))
+		{
+			_listener.ClanSubscribers.Add(target, this);
+		}
+	}
+
+	public void Unsubscribe(ClanTarget target)
+	{
+		if (_subscribedClans.Remove(target))
+		{
+			_listener.ClanSubscribers.Remove(target, this);
+		}
 	}
 
 	public void SendRaw(MemoryBuffer data)

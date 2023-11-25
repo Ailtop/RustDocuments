@@ -7,9 +7,6 @@ public class Physics : ConsoleSystem
 {
 	private const float baseGravity = -9.81f;
 
-	[ServerVar(Help = "The collision detection mode that dropped items and corpses should use")]
-	public static int droppedmode = 2;
-
 	[ServerVar(Help = "Send effects to clients when physics objects collide")]
 	public static bool sendeffects = true;
 
@@ -133,26 +130,6 @@ public class Physics : ConsoleSystem
 		set
 		{
 			UnityEngine.Physics.autoSyncTransforms = value;
-		}
-	}
-
-	internal static void ApplyDropped(Rigidbody rigidBody)
-	{
-		if (droppedmode <= 0)
-		{
-			rigidBody.collisionDetectionMode = CollisionDetectionMode.Discrete;
-		}
-		if (droppedmode == 1)
-		{
-			rigidBody.collisionDetectionMode = CollisionDetectionMode.Continuous;
-		}
-		if (droppedmode == 2)
-		{
-			rigidBody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-		}
-		if (droppedmode >= 3)
-		{
-			rigidBody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
 		}
 	}
 }

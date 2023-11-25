@@ -111,7 +111,7 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVSwitch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SVSwitch ");
 				}
 				using (TimeWarning.New("SVSwitch"))
 				{
@@ -384,8 +384,8 @@ public class BaseOven : StorageContainer, ISplashable, IIndustrialStorage
 		Interface.CallHook("OnFuelConsumed", this, fuel, burnable);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	protected virtual void SVSwitch(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

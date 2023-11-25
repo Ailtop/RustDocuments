@@ -6,6 +6,10 @@ public static class ColliderEx
 {
 	public static PhysicMaterial GetMaterialAt(this Collider obj, Vector3 pos)
 	{
+		if (obj == null)
+		{
+			return TerrainMeta.Config.WaterMaterial;
+		}
 		if (obj is TerrainCollider)
 		{
 			return TerrainMeta.Physics.GetMaterial(pos);
@@ -42,9 +46,9 @@ public static class ColliderEx
 		{
 			result = Vector3.Scale(boxCollider.size, transformScale).Max() * 0.5f;
 		}
-		else if (col is CapsuleCollider capsuleCollider)
+		else if (col is CapsuleCollider { direction: var direction } capsuleCollider)
 		{
-			float num = capsuleCollider.direction switch
+			float num = direction switch
 			{
 				0 => transformScale.y, 
 				1 => transformScale.x, 
@@ -52,9 +56,9 @@ public static class ColliderEx
 			};
 			result = capsuleCollider.radius * num;
 		}
-		else if (col is MeshCollider meshCollider)
+		else if (col is MeshCollider { bounds: var bounds })
 		{
-			result = Vector3.Scale(meshCollider.bounds.size, transformScale).Max() * 0.5f;
+			result = Vector3.Scale(bounds.size, transformScale).Max() * 0.5f;
 		}
 		return result;
 	}

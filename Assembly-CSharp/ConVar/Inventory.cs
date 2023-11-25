@@ -198,11 +198,9 @@ public class Inventory : ConsoleSystem
 		if (basePlayer.IsDeveloper)
 		{
 			basePlayer.ChatMessage("you silently gave yourself " + num + " x " + item.info.displayName.english);
+			return;
 		}
-		else
-		{
-			Chat.Broadcast(basePlayer.displayName + " gave themselves " + num + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
-		}
+		Chat.Broadcast(basePlayer.displayName + " gave themselves " + num + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
 	}
 
 	[ServerVar]
@@ -331,11 +329,9 @@ public class Inventory : ConsoleSystem
 		if (basePlayer.IsDeveloper)
 		{
 			basePlayer.ChatMessage("you silently gave yourself " + num + " x " + item.info.displayName.english);
+			return;
 		}
-		else
-		{
-			Chat.Broadcast(basePlayer.displayName + " gave themselves " + num + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
-		}
+		Chat.Broadcast(basePlayer.displayName + " gave themselves " + num + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
 	}
 
 	[ServerVar]
@@ -365,11 +361,9 @@ public class Inventory : ConsoleSystem
 		if (basePlayer.IsDeveloper)
 		{
 			basePlayer.ChatMessage("you silently gave yourself " + item.amount + " x " + item.info.displayName.english);
+			return;
 		}
-		else
-		{
-			Chat.Broadcast(basePlayer.displayName + " gave themselves " + item.amount + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
-		}
+		Chat.Broadcast(basePlayer.displayName + " gave themselves " + item.amount + " x " + item.info.displayName.english, "SERVER", "#eee", 0uL);
 	}
 
 	[ServerVar(Help = "Copies the players inventory to the player in front of them")]
@@ -398,19 +392,23 @@ public class Inventory : ConsoleSystem
 		{
 			basePlayer2 = RelationshipManager.GetLookingAtPlayer(basePlayer);
 		}
-		if (basePlayer2 == null)
+		if (!(basePlayer2 == null))
 		{
-			return;
+			copyTo(basePlayer, basePlayer2);
 		}
-		basePlayer2.inventory.containerBelt.Clear();
-		basePlayer2.inventory.containerWear.Clear();
+	}
+
+	public static void copyTo(BasePlayer from, BasePlayer toply)
+	{
+		toply.inventory.containerBelt.Clear();
+		toply.inventory.containerWear.Clear();
 		int num = 0;
-		foreach (Item item2 in basePlayer.inventory.containerBelt.itemList)
+		foreach (Item item2 in from.inventory.containerBelt.itemList)
 		{
-			basePlayer2.inventory.containerBelt.AddItem(item2.info, item2.amount, item2.skin);
+			toply.inventory.containerBelt.AddItem(item2.info, item2.amount, item2.skin);
 			if (item2.contents != null)
 			{
-				Item item = basePlayer2.inventory.containerBelt.itemList[num];
+				Item item = toply.inventory.containerBelt.itemList[num];
 				foreach (Item item3 in item2.contents.itemList)
 				{
 					item.contents.AddItem(item3.info, item3.amount, item3.skin);
@@ -418,17 +416,17 @@ public class Inventory : ConsoleSystem
 			}
 			num++;
 		}
-		foreach (Item item4 in basePlayer.inventory.containerWear.itemList)
+		foreach (Item item4 in from.inventory.containerWear.itemList)
 		{
-			basePlayer2.inventory.containerWear.AddItem(item4.info, item4.amount, item4.skin);
+			toply.inventory.containerWear.AddItem(item4.info, item4.amount, item4.skin);
 		}
-		if (basePlayer.IsDeveloper)
+		if (from.IsDeveloper)
 		{
-			basePlayer.ChatMessage("you silently copied items to " + basePlayer2.displayName);
+			from.ChatMessage("you silently copied items to " + toply.displayName);
 		}
 		else
 		{
-			Chat.Broadcast(basePlayer.displayName + " copied their inventory to " + basePlayer2.displayName, "SERVER", "#eee", 0uL);
+			Chat.Broadcast(from.displayName + " copied their inventory to " + toply.displayName, "SERVER", "#eee", 0uL);
 		}
 	}
 
@@ -497,14 +495,14 @@ public class Inventory : ConsoleSystem
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		if (!(basePlayer == null) && (basePlayer.IsAdmin || basePlayer.IsDeveloper || Server.cinematic))
 		{
-			BasePlayer basePlayer2 = (string.IsNullOrEmpty(arg.GetString(1)) ? null : ArgEx.GetPlayerOrSleeperOrBot(arg, 1));
+			BasePlayer basePlayer2 = (string.IsNullOrEmpty(arg.GetString(0)) ? null : ArgEx.GetPlayerOrSleeperOrBot(arg, 0));
 			if (basePlayer2 == null)
 			{
 				basePlayer2 = basePlayer;
 			}
 			if (basePlayer2 == null)
 			{
-				arg.ReplyWith("Could not find player " + arg.GetString(1) + " and no local player available");
+				arg.ReplyWith("Could not find player " + arg.GetString(0) + " and no local player available");
 				return;
 			}
 			basePlayer2.inventory.containerBelt.Clear();

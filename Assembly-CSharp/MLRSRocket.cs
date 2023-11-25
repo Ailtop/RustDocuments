@@ -29,7 +29,7 @@ public class MLRSRocket : TimedExplosive, SamSite.ISamSiteTarget
 	public override void ProjectileImpact(RaycastHit info, Vector3 rayOrigin)
 	{
 		Explode(rayOrigin);
-		if (Physics.Raycast(info.point + Vector3.up, Vector3.down, 4f, 1218511121, QueryTriggerInteraction.Ignore))
+		if (Physics.Raycast(info.point + Vector3.up, Vector3.down, 4f, 1084293393, QueryTriggerInteraction.Ignore))
 		{
 			Effect.server.Run(explosionGroundFXPrefab.resourcePath, info.point, Vector3.up, null, broadcast: true);
 		}

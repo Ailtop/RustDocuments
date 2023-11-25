@@ -49,8 +49,6 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		DEATH = 6
 	}
 
-	public List<targetinfo> _targetList = new List<targetinfo>();
-
 	public Vector3 interestZoneOrigin;
 
 	public Vector3 destination;
@@ -91,9 +89,11 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public static PatrolHelicopterAI heliInstance;
 
-	public BaseHelicopter helicopterBase;
+	public PatrolHelicopter helicopterBase;
 
 	public aiState _currentState;
+
+	public float oceanDepthTargetCutoff = 3f;
 
 	private Vector3 _aimTarget;
 
@@ -116,6 +116,8 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 	public float spawnTime;
 
 	public float lastDamageTime;
+
+	public List<targetinfo> _targetList = new List<targetinfo>();
 
 	private float deathTimeout;
 
@@ -169,108 +171,9 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	private float _lastThinkTime;
 
-	public void UpdateTargetList()
-	{
-		Vector3 strafePos = Vector3.zero;
-		bool flag = false;
-		bool shouldUseNapalm = false;
-		for (int num = _targetList.Count - 1; num >= 0; num--)
-		{
-			targetinfo targetinfo = _targetList[num];
-			if (targetinfo == null || targetinfo.ent == null)
-			{
-				_targetList.Remove(targetinfo);
-			}
-			else
-			{
-				if (UnityEngine.Time.realtimeSinceStartup > targetinfo.nextLOSCheck)
-				{
-					targetinfo.nextLOSCheck = UnityEngine.Time.realtimeSinceStartup + 1f;
-					if (PlayerVisible(targetinfo.ply))
-					{
-						targetinfo.lastSeenTime = UnityEngine.Time.realtimeSinceStartup;
-						targetinfo.visibleFor += 1f;
-					}
-					else
-					{
-						targetinfo.visibleFor = 0f;
-					}
-				}
-				bool flag2 = (targetinfo.ply ? targetinfo.ply.IsDead() : (targetinfo.ent.Health() <= 0f));
-				if (targetinfo.TimeSinceSeen() >= 6f || flag2)
-				{
-					bool flag3 = UnityEngine.Random.Range(0f, 1f) >= 0f;
-					if ((CanStrafe() || CanUseNapalm()) && IsAlive() && !flag && !flag2 && (targetinfo.ply == leftGun._target || targetinfo.ply == rightGun._target) && flag3)
-					{
-						shouldUseNapalm = !ValidStrafeTarget(targetinfo.ply) || UnityEngine.Random.Range(0f, 1f) > 0.75f;
-						flag = true;
-						strafePos = targetinfo.ply.transform.position;
-					}
-					_targetList.Remove(targetinfo);
-				}
-			}
-		}
-		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
-		{
-			if (activePlayer.InSafeZone() || Vector3Ex.Distance2D(base.transform.position, activePlayer.transform.position) > 150f)
-			{
-				continue;
-			}
-			bool flag4 = false;
-			foreach (targetinfo target in _targetList)
-			{
-				if (target.ply == activePlayer)
-				{
-					flag4 = true;
-					break;
-				}
-			}
-			if (!flag4 && activePlayer.GetThreatLevel() > 0.5f && PlayerVisible(activePlayer))
-			{
-				_targetList.Add(new targetinfo(activePlayer, activePlayer));
-			}
-		}
-		if (flag)
-		{
-			ExitCurrentState();
-			State_Strafe_Enter(strafePos, shouldUseNapalm);
-		}
-	}
-
-	public bool PlayerVisible(BasePlayer ply)
-	{
-		object obj = Interface.CallHook("CanHelicopterTarget", this, ply);
-		if (obj is bool)
-		{
-			return (bool)obj;
-		}
-		Vector3 position = ply.eyes.position;
-		if (TOD_Sky.Instance.IsNight && Vector3.Distance(position, interestZoneOrigin) > 40f)
-		{
-			return false;
-		}
-		Vector3 vector = base.transform.position - Vector3.up * 6f;
-		float num = Vector3.Distance(position, vector);
-		Vector3 normalized = (position - vector).normalized;
-		if (GamePhysics.Trace(new Ray(vector + normalized * 5f, normalized), 0f, out var hitInfo, num * 1.1f, 1218652417) && GameObjectEx.ToBaseEntity(hitInfo.collider.gameObject) == ply)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public void WasAttacked(HitInfo info)
-	{
-		BasePlayer basePlayer = info.Initiator as BasePlayer;
-		if (basePlayer != null)
-		{
-			_targetList.Add(new targetinfo(basePlayer, basePlayer));
-		}
-	}
-
 	public void Awake()
 	{
-		if (PatrolHelicopter.lifetimeMinutes == 0f)
+		if (ConVar.PatrolHelicopter.lifetimeMinutes == 0f)
 		{
 			Invoke(DestroyMe, 1f);
 			return;
@@ -349,7 +252,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public bool AtDestination()
 	{
-		return Vector3.Distance(base.transform.position, destination) < destination_min_dist;
+		return Vector3Ex.Distance2D(base.transform.position, destination) < destination_min_dist;
 	}
 
 	public void MoveToDestination()
@@ -391,6 +294,13 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 				float num7 = obstaclePushForce * num6;
 				b2 += _lastMoveDir * num7 * -1f;
 				b2 += Vector3.up * num7;
+			}
+			float num8 = base.transform.position.y - WaterSystem.OceanLevel;
+			if (num8 < num5)
+			{
+				float num9 = 1f - num8 / num5;
+				float num10 = terrainPushForce * num8 * num9;
+				b2 += Vector3.up * num10;
 			}
 			pushVec = Vector3.Lerp(pushVec, b2, UnityEngine.Time.deltaTime);
 			base.transform.position += pushVec * UnityEngine.Time.deltaTime;
@@ -456,7 +366,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		DoMachineGuns();
 		if (!isRetiring)
 		{
-			float num = Mathf.Max(spawnTime + PatrolHelicopter.lifetimeMinutes * 60f, lastDamageTime + 120f);
+			float num = Mathf.Max(spawnTime + ConVar.PatrolHelicopter.lifetimeMinutes * 60f, lastDamageTime + 120f);
 			if (UnityEngine.Time.realtimeSinceStartup > num)
 			{
 				Retire();
@@ -464,7 +374,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		}
 	}
 
-	public void WeakspotDamaged(BaseHelicopter.weakspot weak, HitInfo info)
+	public void WeakspotDamaged(PatrolHelicopter.weakspot weak, HitInfo info)
 	{
 		float num = UnityEngine.Time.realtimeSinceStartup - lastDamageTime;
 		lastDamageTime = UnityEngine.Time.realtimeSinceStartup;
@@ -505,7 +415,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public void FireGun(Vector3 targetPos, float aimCone, bool left)
 	{
-		if (PatrolHelicopter.guns == 0)
+		if (ConVar.PatrolHelicopter.guns == 0)
 		{
 			return;
 		}
@@ -513,7 +423,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		Vector3 normalized = (targetPos - position).normalized;
 		position += normalized * 2f;
 		Vector3 modifiedAimConeDirection = AimConeUtil.GetModifiedAimConeDirection(aimCone, normalized);
-		if (GamePhysics.Trace(new Ray(position, modifiedAimConeDirection), 0f, out var hitInfo, 300f, 1219701521))
+		if (GamePhysics.Trace(new Ray(position, modifiedAimConeDirection), 0f, out var hitInfo, 300f, 1220225809))
 		{
 			targetPos = hitInfo.point;
 			if ((bool)hitInfo.collider)
@@ -522,7 +432,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 				if ((bool)entity && entity != helicopterBase)
 				{
 					BaseCombatEntity baseCombatEntity = entity as BaseCombatEntity;
-					HitInfo info = new HitInfo(helicopterBase, entity, DamageType.Bullet, helicopterBase.bulletDamage * PatrolHelicopter.bulletDamageScale, hitInfo.point);
+					HitInfo info = new HitInfo(helicopterBase, entity, DamageType.Bullet, helicopterBase.bulletDamage * ConVar.PatrolHelicopter.bulletDamageScale, hitInfo.point);
 					if ((bool)baseCombatEntity)
 					{
 						baseCombatEntity.OnAttacked(info);
@@ -615,11 +525,114 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		_aimTarget = Vector3.zero;
 	}
 
+	public void UpdateTargetList()
+	{
+		Vector3 strafePos = Vector3.zero;
+		bool flag = false;
+		bool shouldUseNapalm = false;
+		for (int num = _targetList.Count - 1; num >= 0; num--)
+		{
+			targetinfo targetinfo = _targetList[num];
+			if (targetinfo == null || targetinfo.ent == null)
+			{
+				_targetList.Remove(targetinfo);
+			}
+			else
+			{
+				if (UnityEngine.Time.realtimeSinceStartup > targetinfo.nextLOSCheck)
+				{
+					targetinfo.nextLOSCheck = UnityEngine.Time.realtimeSinceStartup + 1f;
+					if (PlayerVisible(targetinfo.ply))
+					{
+						targetinfo.lastSeenTime = UnityEngine.Time.realtimeSinceStartup;
+						targetinfo.visibleFor += 1f;
+					}
+					else
+					{
+						targetinfo.visibleFor = 0f;
+					}
+				}
+				bool flag2 = (targetinfo.ply ? targetinfo.ply.IsDead() : (targetinfo.ent.Health() <= 0f));
+				if (targetinfo.TimeSinceSeen() >= 6f || flag2)
+				{
+					bool flag3 = UnityEngine.Random.Range(0f, 1f) >= 0f;
+					if ((CanStrafe() || CanUseNapalm()) && IsAlive() && !flag && !flag2 && (targetinfo.ply == leftGun._target || targetinfo.ply == rightGun._target) && flag3)
+					{
+						shouldUseNapalm = !ValidStrafeTarget(targetinfo.ply) || UnityEngine.Random.Range(0f, 1f) > 0.75f;
+						flag = true;
+						strafePos = targetinfo.ply.transform.position;
+					}
+					_targetList.Remove(targetinfo);
+				}
+			}
+		}
+		foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+		{
+			if (activePlayer.InSafeZone() || Vector3Ex.Distance2D(base.transform.position, activePlayer.transform.position) > 150f)
+			{
+				continue;
+			}
+			bool flag4 = false;
+			foreach (targetinfo target in _targetList)
+			{
+				if (target.ply == activePlayer)
+				{
+					flag4 = true;
+					break;
+				}
+			}
+			if (!flag4 && activePlayer.GetThreatLevel() > 0.5f && PlayerVisible(activePlayer))
+			{
+				_targetList.Add(new targetinfo(activePlayer, activePlayer));
+			}
+		}
+		if (flag)
+		{
+			ExitCurrentState();
+			State_Strafe_Enter(strafePos, shouldUseNapalm);
+		}
+	}
+
+	public bool PlayerVisible(BasePlayer ply)
+	{
+		object obj = Interface.CallHook("CanHelicopterTarget", this, ply);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
+		Vector3 position = ply.eyes.position;
+		if (ply.eyes.position.y < WaterSystem.OceanLevel && Mathf.Abs(WaterSystem.OceanLevel - ply.eyes.position.y) > oceanDepthTargetCutoff)
+		{
+			return false;
+		}
+		if (TOD_Sky.Instance.IsNight && Vector3.Distance(position, interestZoneOrigin) > 40f)
+		{
+			return false;
+		}
+		Vector3 vector = base.transform.position - Vector3.up * 6f;
+		float num = Vector3.Distance(position, vector);
+		Vector3 normalized = (position - vector).normalized;
+		if (GamePhysics.Trace(new Ray(vector + normalized * 5f, normalized), 0f, out var hitInfo, num * 1.1f, 1218652417) && GameObjectEx.ToBaseEntity(hitInfo.collider.gameObject) == ply)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public void WasAttacked(HitInfo info)
+	{
+		BasePlayer basePlayer = info.Initiator as BasePlayer;
+		if (basePlayer != null)
+		{
+			_targetList.Add(new targetinfo(basePlayer, basePlayer));
+		}
+	}
+
 	public void State_Death_Think(float timePassed)
 	{
 		float num = UnityEngine.Time.realtimeSinceStartup * 0.25f;
-		float x = Mathf.Sin((float)Math.PI * 2f * num) * 10f;
-		float z = Mathf.Cos((float)Math.PI * 2f * num) * 10f;
+		float x = Mathf.Sin(MathF.PI * 2f * num) * 10f;
+		float z = Mathf.Cos(MathF.PI * 2f * num) * 10f;
 		Vector3 vector = new Vector3(x, 0f, z);
 		SetAimTarget(base.transform.position + vector, isDoorSide: true);
 		Ray ray = new Ray(base.transform.position, GetLastMoveDir());
@@ -635,7 +648,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		maxRotationSpeed *= 8f;
 		_currentState = aiState.DEATH;
 		Vector3 randomOffset = GetRandomOffset(base.transform.position, 20f, 60f);
-		int num = 1236478737;
+		int num = 1237003025;
 		TransformUtil.GetGroundInfo(randomOffset - Vector3.up * 2f, out var pos, out var _, 500f, num);
 		SetTargetDestination(pos);
 		targetThrottleSpeed = 0.5f;
@@ -706,7 +719,7 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 				hasEnteredOrbit = true;
 				orbitStartTime = UnityEngine.Time.realtimeSinceStartup;
 			}
-			float num = (float)Math.PI * 2f * currentOrbitDistance;
+			float num = MathF.PI * 2f * currentOrbitDistance;
 			float num2 = 0.5f * maxSpeed;
 			float num3 = num / num2;
 			currentOrbitTime += timePassed / (num3 * 1.01f);
@@ -726,8 +739,8 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 
 	public Vector3 GetOrbitPosition(float rate)
 	{
-		float x = Mathf.Sin((float)Math.PI * 2f * rate) * currentOrbitDistance;
-		float z = Mathf.Cos((float)Math.PI * 2f * rate) * currentOrbitDistance;
+		float x = Mathf.Sin(MathF.PI * 2f * rate) * currentOrbitDistance;
+		float z = Mathf.Cos(MathF.PI * 2f * rate) * currentOrbitDistance;
 		Vector3 vector = new Vector3(x, 20f, z);
 		return interestZoneOrigin + vector;
 	}
@@ -985,11 +998,6 @@ public class PatrolHelicopterAI : BaseMonoBehaviour
 		if (num > 0f)
 		{
 			vector2 = AimConeUtil.GetModifiedAimConeDirection(num, vector2);
-		}
-		float maxDistance = 1f;
-		if (UnityEngine.Physics.Raycast(vector, vector2, out var hitInfo, maxDistance, 1236478737))
-		{
-			maxDistance = hitInfo.distance - 0.1f;
 		}
 		Effect.server.Run(helicopterBase.rocket_fire_effect.resourcePath, helicopterBase, StringPool.Get(flag ? "rocket_tube_left" : "rocket_tube_right"), Vector3.zero, Vector3.forward, null, broadcast: true);
 		BaseEntity baseEntity = GameManager.server.CreateEntity(useNapalm ? rocketProjectile_Napalm.resourcePath : rocketProjectile.resourcePath, vector);

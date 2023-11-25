@@ -11,6 +11,7 @@ public class EntityFlag_Toggle : EntityComponent<BaseEntity>, IOnPostNetworkUpda
 
 	public bool runClientside = true;
 
+	[Tooltip("Server-side only works if the EntityFlag_Toggle is on the same GameObject as the Entity")]
 	public bool runServerside = true;
 
 	public BaseEntity.Flags flag;
@@ -19,8 +20,8 @@ public class EntityFlag_Toggle : EntityComponent<BaseEntity>, IOnPostNetworkUpda
 	[Tooltip("If multiple flags are defined in 'flag', should they all be set, or any?")]
 	private FlagCheck flagCheck;
 
-	[Tooltip("Specify any flags that must NOT be on for this toggle to be on")]
 	[SerializeField]
+	[Tooltip("Specify any flags that must NOT be on for this toggle to be on")]
 	private BaseEntity.Flags notFlag;
 
 	[SerializeField]

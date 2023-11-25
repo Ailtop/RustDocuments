@@ -1,6 +1,6 @@
 public static class NameHelper
 {
-	public static string Get(ulong userId, string name, bool isClient = true)
+	public static string Get(ulong userId, string name, bool isClient = true, bool forceFriendly = false)
 	{
 		return name;
 	}

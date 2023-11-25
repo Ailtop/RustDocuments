@@ -20,7 +20,7 @@ public class F15 : BaseCombatEntity
 
 	public float rollSpeed = 1f;
 
-	protected Vector3 movePosition;
+	public Vector3 movePosition;
 
 	public GameObjectRef missilePrefab;
 

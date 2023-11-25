@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConVar;
 using Facepunch;
 using Rust.UI;
 using UnityEngine;
@@ -42,7 +43,7 @@ public class PrefabPreProcess : IPrefabProcessor
 		typeof(TOD_ImageEffect),
 		typeof(TOD_Scattering),
 		typeof(TOD_Rays),
-		typeof(Tree),
+		typeof(UnityEngine.Tree),
 		typeof(Projector),
 		typeof(HttpImage),
 		typeof(EventTrigger),
@@ -138,6 +139,8 @@ public class PrefabPreProcess : IPrefabProcessor
 
 	public void ProcessObject(string name, GameObject go, bool resetLocalTransform = true)
 	{
+		StringPool.Get(name);
+		bool flag = go.GetComponent<StripEmptyChildren>() != null && Render.IsInstancingEnabled;
 		if (!isClientside)
 		{
 			Type[] array = clientsideOnlyTypes;
@@ -198,10 +201,14 @@ public class PrefabPreProcess : IPrefabProcessor
 			if (isClientside)
 			{
 				bool num = item5.gameObject.CompareTag("Client Cull");
-				bool flag = item5 != go.transform && item5.gameObject.GetComponent<BaseEntity>() != null;
-				if (num || flag)
+				bool flag2 = item5 != go.transform && item5.gameObject.GetComponent<BaseEntity>() != null;
+				if (num || flag2)
 				{
 					RemoveComponents(item5.gameObject);
+					NominateForDeletion(item5.gameObject);
+				}
+				else if (flag)
+				{
 					NominateForDeletion(item5.gameObject);
 				}
 			}

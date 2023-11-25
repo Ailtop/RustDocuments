@@ -16,7 +16,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 
 	public GameObjectRef lockedCratePrefab;
 
-	public const Flags Flag_Damaged = Flags.Reserved7;
+	public const Flags Flag_Damaged = Flags.Reserved9;
 
 	public const Flags Flag_NearDeath = Flags.OnFire;
 
@@ -301,7 +301,7 @@ public class CH47HelicopterAIController : CH47Helicopter
 		{
 			base.OnAttacked(info);
 			InitiateAnger();
-			SetFlag(Flags.Reserved7, base.healthFraction <= 0.8f);
+			SetFlag(Flags.Reserved9, base.healthFraction <= 0.8f);
 			SetFlag(Flags.OnFire, base.healthFraction <= 0.33f);
 		}
 	}

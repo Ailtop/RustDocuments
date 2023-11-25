@@ -88,6 +88,11 @@ public class AttackEntity : HeldEntity
 	{
 	}
 
+	public virtual bool ServerTryReload(IAmmoContainer ammoSource)
+	{
+		return true;
+	}
+
 	public virtual void TopUpAmmo()
 	{
 	}
@@ -222,9 +227,9 @@ public class AttackEntity : HeldEntity
 		return true;
 	}
 
-	protected bool ValidateEyePos(BasePlayer player, Vector3 eyePos)
+	protected bool ValidateEyePos(BasePlayer player, Vector3 eyePos, bool checkLineOfSight = true)
 	{
-		object obj = Interface.CallHook("OnEyePosValidate", this, player, eyePos);
+		object obj = Interface.CallHook("OnEyePosValidate", this, player, eyePos, checkLineOfSight);
 		if (obj is bool)
 		{
 			return (bool)obj;
@@ -245,7 +250,6 @@ public class AttackEntity : HeldEntity
 			float num2 = eye_clientframes / 60f;
 			float num3 = eye_serverframes * Mathx.Max(UnityEngine.Time.deltaTime, UnityEngine.Time.smoothDeltaTime, UnityEngine.Time.fixedDeltaTime);
 			float num4 = (player.desyncTimeClamped + num2 + num3) * num;
-			int layerMask = (ConVar.AntiHack.eye_terraincheck ? 10551296 : 2162688);
 			if (ConVar.AntiHack.eye_protection >= 1)
 			{
 				float num5 = player.MaxVelocity() + player.GetParentVelocity().magnitude;
@@ -272,41 +276,74 @@ public class AttackEntity : HeldEntity
 					flag = false;
 				}
 			}
-			if (ConVar.AntiHack.eye_protection >= 2)
+			if (checkLineOfSight)
 			{
-				Vector3 center = player.eyes.center;
-				Vector3 position = player.eyes.position;
-				Vector3 vector = eyePos;
-				if (!GamePhysics.LineOfSightRadius(center, position, layerMask, ConVar.AntiHack.eye_losradius) || !GamePhysics.LineOfSightRadius(position, vector, layerMask, ConVar.AntiHack.eye_losradius))
+				int num11 = 2162688;
+				if (ConVar.AntiHack.eye_terraincheck)
 				{
-					string shortPrefabName4 = base.ShortPrefabName;
-					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("Line of sight (", shortPrefabName4, " on attack) ", center, " ", position, " ", vector));
-					player.stats.combat.LogInvalid(player, this, "eye_los");
-					flag = false;
+					num11 |= 0x800000;
 				}
-			}
-			if (ConVar.AntiHack.eye_protection >= 4 && !player.HasParent())
-			{
-				Vector3 position2 = player.eyes.position;
-				Vector3 vector2 = eyePos;
-				float num11 = Vector3.Distance(position2, vector2);
-				Collider collider;
-				if (num11 > ConVar.AntiHack.eye_noclip_cutoff)
+				if (ConVar.AntiHack.eye_vehiclecheck)
 				{
-					if (AntiHack.TestNoClipping(position2, vector2, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2, out collider))
+					num11 |= 0x8000000;
+				}
+				if (ConVar.AntiHack.eye_protection >= 2)
+				{
+					Vector3 center = player.eyes.center;
+					Vector3 position = player.eyes.position;
+					Vector3 vector = eyePos;
+					if (!GamePhysics.LineOfSightRadius(center, position, num11, ConVar.AntiHack.eye_losradius) || !GamePhysics.LineOfSightRadius(position, vector, num11, ConVar.AntiHack.eye_losradius))
 					{
-						string shortPrefabName5 = base.ShortPrefabName;
-						AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName5, " on attack) ", position2, " ", vector2));
-						player.stats.combat.LogInvalid(player, this, "eye_noclip");
+						string shortPrefabName4 = base.ShortPrefabName;
+						string[] obj2 = new string[8] { "Line of sight (", shortPrefabName4, " on attack) ", null, null, null, null, null };
+						Vector3 vector2 = center;
+						obj2[3] = vector2.ToString();
+						obj2[4] = " ";
+						vector2 = position;
+						obj2[5] = vector2.ToString();
+						obj2[6] = " ";
+						vector2 = vector;
+						obj2[7] = vector2.ToString();
+						AntiHack.Log(player, AntiHackType.EyeHack, string.Concat(obj2));
+						player.stats.combat.LogInvalid(player, this, "eye_los");
 						flag = false;
 					}
 				}
-				else if (num11 > 0.01f && AntiHack.TestNoClipping(position2, vector2, 0.01f, ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2, out collider))
+				if (ConVar.AntiHack.eye_protection >= 4 && !player.HasParent())
 				{
-					string shortPrefabName6 = base.ShortPrefabName;
-					AntiHack.Log(player, AntiHackType.EyeHack, string.Concat("NoClip (", shortPrefabName6, " on attack) ", position2, " ", vector2));
-					player.stats.combat.LogInvalid(player, this, "eye_noclip");
-					flag = false;
+					Vector3 position2 = player.eyes.position;
+					Vector3 vector3 = eyePos;
+					float num12 = Vector3.Distance(position2, vector3);
+					Collider collider;
+					if (num12 > ConVar.AntiHack.eye_noclip_cutoff)
+					{
+						if (AntiHack.TestNoClipping(position2, vector3, player.NoClipRadius(ConVar.AntiHack.eye_noclip_margin), ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2, out collider))
+						{
+							string shortPrefabName5 = base.ShortPrefabName;
+							string[] obj3 = new string[6] { "NoClip (", shortPrefabName5, " on attack) ", null, null, null };
+							Vector3 vector2 = position2;
+							obj3[3] = vector2.ToString();
+							obj3[4] = " ";
+							vector2 = vector3;
+							obj3[5] = vector2.ToString();
+							AntiHack.Log(player, AntiHackType.EyeHack, string.Concat(obj3));
+							player.stats.combat.LogInvalid(player, this, "eye_noclip");
+							flag = false;
+						}
+					}
+					else if (num12 > 0.01f && AntiHack.TestNoClipping(position2, vector3, 0.01f, ConVar.AntiHack.eye_noclip_backtracking, ConVar.AntiHack.noclip_protection >= 2, out collider))
+					{
+						string shortPrefabName6 = base.ShortPrefabName;
+						string[] obj4 = new string[6] { "NoClip (", shortPrefabName6, " on attack) ", null, null, null };
+						Vector3 vector2 = position2;
+						obj4[3] = vector2.ToString();
+						obj4[4] = " ";
+						vector2 = vector3;
+						obj4[5] = vector2.ToString();
+						AntiHack.Log(player, AntiHackType.EyeHack, string.Concat(obj4));
+						player.stats.combat.LogInvalid(player, this, "eye_noclip");
+						flag = false;
+					}
 				}
 			}
 			if (!flag)

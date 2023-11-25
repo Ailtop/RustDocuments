@@ -24,7 +24,7 @@ public class BearTrap : BaseTrap
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Arm "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Arm ");
 				}
 				using (TimeWarning.New("RPC_Arm"))
 				{
@@ -145,8 +145,8 @@ public class BearTrap : BaseTrap
 		base.OnAttacked(info);
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Arm(RPCMessage rpc)
 	{
 		if (!Armed() && Interface.CallHook("OnTrapArm", this, rpc.player) == null)

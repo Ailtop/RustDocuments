@@ -19,4 +19,6 @@ public class UIInventory : SingletonComponent<UIInventory>
 	public ChangelogPanel ChangelogPanel;
 
 	public ContactsPanel contactsPanel;
+
+	public GameObject backpackSlot;
 }

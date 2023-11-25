@@ -26,7 +26,7 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Pickup "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Pickup ");
 				}
 				using (TimeWarning.New("Pickup"))
 				{
@@ -62,7 +62,7 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - PickupEat "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - PickupEat ");
 				}
 				using (TimeWarning.New("PickupEat"))
 				{
@@ -165,8 +165,8 @@ public class CollectibleEntity : BaseEntity, IPrefabPreProcess
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void PickupEat(RPCMessage msg)
 	{
 		if (msg.player.CanInteract())

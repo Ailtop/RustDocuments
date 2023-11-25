@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using CompanionServer;
 using Facepunch.Extend;
 using Steamworks;
@@ -79,6 +81,29 @@ public class App : ConsoleSystem
 		arg.ReplyWith($"Server ID: {serverid}\nListening on: {listener.Address}:{listener.Port}\nApp connects to: {GetPublicIP()}:{port}");
 	}
 
+	[ServerVar(Help = "Retry initializing the Rust+ companion server if it previously failed")]
+	public static void retry_initialize(Arg arg)
+	{
+		if (CompanionServer.Server.IsEnabled)
+		{
+			arg.ReplyWith("Companion server is already initialized!");
+			return;
+		}
+		if (port < 0)
+		{
+			arg.ReplyWith("Companion server port is invalid, cannot initialize companion server");
+			return;
+		}
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		if (activeGameMode != null && !activeGameMode.rustPlus)
+		{
+			arg.ReplyWith("Companion server is disabled by gamemode, cannot initialize companion server");
+			return;
+		}
+		arg.ReplyWith("Trying to initialize companion server...");
+		CompanionServer.Server.Initialize();
+	}
+
 	[ServerVar]
 	public static void resetlimiter(Arg arg)
 	{
@@ -124,12 +149,33 @@ public class App : ConsoleSystem
 		{
 			if (!IPAddress.TryParse(listenip, out var address) || address.AddressFamily != AddressFamily.InterNetwork)
 			{
-				Debug.LogError("Invalid app.listenip: " + listenip);
+				UnityEngine.Debug.LogError("Invalid app.listenip: " + listenip);
 				return IPAddress.Any;
 			}
 			return address;
 		}
 		return IPAddress.Any;
+	}
+
+	public static async ValueTask<string> GetPublicIPAsync()
+	{
+		Stopwatch timer = null;
+		string publicIP;
+		while (true)
+		{
+			bool num = timer != null && timer.Elapsed.TotalMinutes > 2.0;
+			publicIP = GetPublicIP();
+			if (num || (!string.IsNullOrWhiteSpace(publicIP) && publicIP != "0.0.0.0"))
+			{
+				break;
+			}
+			if (timer == null)
+			{
+				timer = Stopwatch.StartNew();
+			}
+			await Task.Delay(10000);
+		}
+		return publicIP;
 	}
 
 	public static string GetPublicIP()

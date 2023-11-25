@@ -20,7 +20,7 @@ public class SteamInventory : EntityComponent<BasePlayer>
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateSteamInventory "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UpdateSteamInventory ");
 				}
 				using (TimeWarning.New("UpdateSteamInventory"))
 				{
@@ -76,8 +76,8 @@ public class SteamInventory : EntityComponent<BasePlayer>
 		return false;
 	}
 
-	[BaseEntity.RPC_Server.FromOwner]
 	[BaseEntity.RPC_Server]
+	[BaseEntity.RPC_Server.FromOwner]
 	private async Task UpdateSteamInventory(BaseEntity.RPCMessage msg)
 	{
 		byte[] array = msg.read.BytesWithSize();

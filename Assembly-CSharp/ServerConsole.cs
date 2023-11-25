@@ -132,16 +132,16 @@ public class ServerConsole : SingletonComponent<ServerConsole>
 				string text = ((long)UnityEngine.Time.realtimeSinceStartup).FormatSeconds();
 				string text2 = currentGameTime.ToString("[H:mm]");
 				string text3 = " " + text2 + " [" + currentPlayerCount + "/" + maxPlayerCount + "] " + ConVar.Server.hostname + " [" + ConVar.Server.level + "]";
-				string obj = (Performance.current.frameRate + "fps " + Performance.current.memoryCollections + "gc " + text) ?? "";
-				string text4 = Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesReceived_LastSecond).FormatBytes(shortFormat: true) + "/s in, " + Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond).FormatBytes(shortFormat: true) + "/s out";
-				string text5 = obj.PadLeft(input.lineWidth - 1);
-				text5 = text3 + ((text3.Length < text5.Length) ? text5.Substring(text3.Length) : "");
-				string text6 = " " + currentEntityCount.ToString("n0") + " ents, " + currentSleeperCount.ToString("n0") + " slprs";
-				string text7 = text4.PadLeft(input.lineWidth - 1);
-				text7 = text6 + ((text6.Length < text7.Length) ? text7.Substring(text6.Length) : "");
+				string text4 = Performance.current.frameRate + "fps " + Performance.current.memoryCollections + "gc " + text;
+				string text5 = Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesReceived_LastSecond).FormatBytes(shortFormat: true) + "/s in, " + Network.Net.sv.GetStat(null, BaseNetwork.StatTypeLong.BytesSent_LastSecond).FormatBytes(shortFormat: true) + "/s out";
+				string text6 = text4.PadLeft(input.lineWidth - 1);
+				text6 = text3 + ((text3.Length < text6.Length) ? text6.Substring(text3.Length) : "");
+				string text7 = " " + currentEntityCount.ToString("n0") + " ents, " + currentSleeperCount.ToString("n0") + " slprs";
+				string text8 = text5.PadLeft(input.lineWidth - 1);
+				text8 = text7 + ((text7.Length < text8.Length) ? text8.Substring(text7.Length) : "");
 				input.statusText[0] = "";
-				input.statusText[1] = text5;
-				input.statusText[2] = text7;
+				input.statusText[1] = text6;
+				input.statusText[2] = text8;
 			}
 		}
 	}

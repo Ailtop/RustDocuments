@@ -68,7 +68,7 @@ public class FlameThrower : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoReload "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoReload ");
 				}
 				using (TimeWarning.New("DoReload"))
 				{
@@ -104,7 +104,7 @@ public class FlameThrower : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetFiring "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetFiring ");
 				}
 				using (TimeWarning.New("SetFiring"))
 				{
@@ -140,7 +140,7 @@ public class FlameThrower : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TogglePilotLight "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - TogglePilotLight ");
 				}
 				using (TimeWarning.New("TogglePilotLight"))
 				{
@@ -250,12 +250,7 @@ public class FlameThrower : AttackEntity
 		{
 			return (Item)obj;
 		}
-		Item item = ownerPlayer.inventory.containerMain.FindItemsByItemName(fuelType.shortname);
-		if (item == null)
-		{
-			item = ownerPlayer.inventory.containerBelt.FindItemsByItemName(fuelType.shortname);
-		}
-		return item;
+		return ownerPlayer.inventory.FindItemByItemName(fuelType.shortname);
 	}
 
 	public override void Load(LoadInfo info)
@@ -334,8 +329,8 @@ public class FlameThrower : AttackEntity
 		SetFlameState(wantsOn: false);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void DoReload(RPCMessage msg)
 	{
 		BasePlayer ownerPlayer = GetOwnerPlayer();
@@ -384,8 +379,8 @@ public class FlameThrower : AttackEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	public void TogglePilotLight(RPCMessage msg)
 	{
 		PilotLightToggle_Shared();

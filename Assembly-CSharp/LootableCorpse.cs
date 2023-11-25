@@ -54,7 +54,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_LootCorpse "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_LootCorpse ");
 				}
 				using (TimeWarning.New("RPC_LootCorpse"))
 				{
@@ -120,7 +120,7 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 		containers = null;
 	}
 
-	public void TakeFrom(params ItemContainer[] source)
+	public void TakeFrom(BaseEntity fromEntity, params ItemContainer[] source)
 	{
 		Assert.IsTrue(containers == null, "Initializing Twice");
 		using (TimeWarning.New("Corpse.TakeFrom"))
@@ -142,6 +142,14 @@ public class LootableCorpse : BaseCorpse, LootPanel.IHasLootPanel
 				}
 			}
 			ResetRemovalTime();
+		}
+		if (base.gameObject.TryGetComponent<HeadDispenser>(out var component))
+		{
+			GameObject gameObject = GameManager.server.FindPrefab(fromEntity.prefabID);
+			if (gameObject != null && gameObject.TryGetComponent<BasePlayer>(out var component2))
+			{
+				component.overrideEntity = component2;
+			}
 		}
 	}
 

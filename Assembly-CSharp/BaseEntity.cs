@@ -121,6 +121,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		public float drag;
 	}
 
+	public enum GiveItemReason
+	{
+		Generic = 0,
+		ResourceHarvested = 1,
+		PickedUp = 2,
+		Crafted = 3
+	}
+
 	[Flags]
 	public enum Flags
 	{
@@ -144,7 +152,12 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		Reserved9 = 0x20000,
 		Reserved10 = 0x40000,
 		Reserved11 = 0x80000,
-		InUse = 0x100000
+		InUse = 0x100000,
+		Reserved12 = 0x200000,
+		Reserved13 = 0x400000,
+		Unused23 = 0x800000,
+		Protected = 0x1000000,
+		Transferring = 0x2000000
 	}
 
 	private readonly struct QueuedFileRequest : IEquatable<QueuedFileRequest>
@@ -191,9 +204,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 		public override int GetHashCode()
 		{
-			uint num = ((((((((uint)(((Entity != null) ? Entity.GetHashCode() : 0) * 397) ^ (uint)Type) * 397) ^ Part) * 397) ^ Crc) * 397) ^ ResponseFunction) * 397;
-			bool? respondIfNotFound = RespondIfNotFound;
-			return (int)num ^ respondIfNotFound.GetHashCode();
+			return (int)(((((((((uint)(((Entity != null) ? Entity.GetHashCode() : 0) * 397) ^ (uint)Type) * 397) ^ Part) * 397) ^ Crc) * 397) ^ ResponseFunction) * 397) ^ RespondIfNotFound.GetHashCode();
 		}
 	}
 
@@ -376,6 +387,8 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			private float maximumDistance;
 
+			public bool CheckParent { get; set; }
+
 			public MaxDistance(float maxDist)
 			{
 				maximumDistance = maxDist;
@@ -383,21 +396,27 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 			public override string GetArgs()
 			{
-				return maximumDistance.ToString("0.00f");
+				return maximumDistance.ToString("0.00f") + (CheckParent ? ", true" : "");
 			}
 
-			public static bool Test(uint id, string debugName, BaseEntity ent, BasePlayer player, float maximumDistance)
+			public static bool Test(uint id, string debugName, BaseEntity ent, BasePlayer player, float maximumDistance, bool checkParent = false)
 			{
 				if (ent == null || player == null)
 				{
 					return false;
 				}
-				object obj = Interface.CallHook("OnEntityDistanceCheck", ent, player, id, debugName, maximumDistance);
+				object obj = Interface.CallHook("OnEntityDistanceCheck", ent, player, id, debugName, maximumDistance, checkParent);
 				if (obj is bool)
 				{
 					return (bool)obj;
 				}
-				return ent.Distance(player.eyes.position) <= maximumDistance;
+				bool flag = ent.Distance(player.eyes.position) <= maximumDistance;
+				if (checkParent && !flag)
+				{
+					BaseEntity parentEntity = ent.GetParentEntity();
+					flag = parentEntity != null && parentEntity.Distance(player.eyes.position) <= maximumDistance;
+				}
+				return flag;
 			}
 		}
 
@@ -426,7 +445,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				{
 					return (bool)obj;
 				}
-				if (GamePhysics.LineOfSight(player.eyes.center, player.eyes.position, 2162688))
+				if (GamePhysics.LineOfSight(player.eyes.center, player.eyes.position, 1218519041))
 				{
 					if (!ent.IsVisible(player.eyes.HeadRay(), 1218519041, maximumDistance))
 					{
@@ -687,13 +706,32 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	public enum GiveItemReason
-	{
-		Generic = 0,
-		ResourceHarvested = 1,
-		PickedUp = 2,
-		Crafted = 3
-	}
+	[Header("BaseEntity")]
+	public Bounds bounds;
+
+	public GameObjectRef impactEffect;
+
+	public bool enableSaving = true;
+
+	public bool syncPosition;
+
+	public Model model;
+
+	public Flags flags;
+
+	[NonSerialized]
+	public uint parentBone;
+
+	[NonSerialized]
+	public ulong skinID;
+
+	private EntityComponentBase[] _components;
+
+	[HideInInspector]
+	public bool HasBrain;
+
+	[NonSerialized]
+	public string _name;
 
 	private static Queue<BaseEntity> globalBroadcastQueue = new Queue<BaseEntity>();
 
@@ -704,6 +742,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public List<EntityLink> links = new List<EntityLink>();
 
 	private bool linkedToNeighbours;
+
+	private TimeUntil _transferProtectionRemaining;
+
+	private Action _disableTransferProtectionAction;
+
+	public Spawnable _spawnable;
+
+	public static HashSet<BaseEntity> saveList = new HashSet<BaseEntity>();
 
 	[NonSerialized]
 	public BaseEntity creatorEntity;
@@ -726,39 +772,55 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	protected OccludeeSphere localOccludee = new OccludeeSphere(-1);
 
-	[Header("BaseEntity")]
-	public Bounds bounds;
-
-	public GameObjectRef impactEffect;
-
-	public bool enableSaving = true;
-
-	public bool syncPosition;
-
-	public Model model;
-
-	[InspectorFlags]
-	public Flags flags;
-
-	[NonSerialized]
-	public uint parentBone;
-
-	[NonSerialized]
-	public ulong skinID;
-
-	private EntityComponentBase[] _components;
-
-	[HideInInspector]
-	public bool HasBrain;
-
-	[NonSerialized]
-	public string _name;
-
-	public Spawnable _spawnable;
-
-	public static HashSet<BaseEntity> saveList = new HashSet<BaseEntity>();
-
 	public virtual float RealisticMass => 100f;
+
+	public EntityComponentBase[] Components => _components ?? (_components = GetComponentsInChildren<EntityComponentBase>(includeInactive: true));
+
+	public virtual bool IsNpc => false;
+
+	public ulong OwnerID { get; set; }
+
+	protected float TransferProtectionRemaining => _transferProtectionRemaining;
+
+	protected Action DisableTransferProtectionAction => _disableTransferProtectionAction ?? (_disableTransferProtectionAction = DisableTransferProtection);
+
+	public virtual bool ShouldTransferAssociatedFiles => false;
+
+	public virtual float PositionTickRate => 0.1f;
+
+	public virtual bool PositionTickFixedTime => false;
+
+	public virtual Vector3 ServerPosition
+	{
+		get
+		{
+			return base.transform.localPosition;
+		}
+		set
+		{
+			if (!(base.transform.localPosition == value))
+			{
+				base.transform.localPosition = value;
+				base.transform.hasChanged = true;
+			}
+		}
+	}
+
+	public virtual Quaternion ServerRotation
+	{
+		get
+		{
+			return base.transform.localRotation;
+		}
+		set
+		{
+			if (!(base.transform.localRotation == value))
+			{
+				base.transform.localRotation = value;
+				base.transform.hasChanged = true;
+			}
+		}
+	}
 
 	public float radiationLevel
 	{
@@ -801,7 +863,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				TriggerTemperature triggerTemperature = triggers[i] as TriggerTemperature;
 				if (!(triggerTemperature == null))
 				{
-					num = triggerTemperature.WorkoutTemperature(GetNetworkPosition(), num);
+					num = triggerTemperature.WorkoutTemperature(base.transform.position, num);
 				}
 			}
 			return num;
@@ -829,51 +891,9 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	public virtual float PositionTickRate => 0.1f;
-
-	public virtual bool PositionTickFixedTime => false;
-
-	public virtual Vector3 ServerPosition
-	{
-		get
-		{
-			return base.transform.localPosition;
-		}
-		set
-		{
-			if (!(base.transform.localPosition == value))
-			{
-				base.transform.localPosition = value;
-				base.transform.hasChanged = true;
-			}
-		}
-	}
-
-	public virtual Quaternion ServerRotation
-	{
-		get
-		{
-			return base.transform.localRotation;
-		}
-		set
-		{
-			if (!(base.transform.localRotation == value))
-			{
-				base.transform.localRotation = value;
-				base.transform.hasChanged = true;
-			}
-		}
-	}
-
 	public virtual TraitFlag Traits => TraitFlag.None;
 
 	public float Weight { get; protected set; }
-
-	public EntityComponentBase[] Components => _components ?? (_components = GetComponentsInChildren<EntityComponentBase>(includeInactive: true));
-
-	public virtual bool IsNpc => false;
-
-	public ulong OwnerID { get; set; }
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -884,7 +904,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BroadcastSignalFromClient "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - BroadcastSignalFromClient ");
 				}
 				using (TimeWarning.New("BroadcastSignalFromClient"))
 				{
@@ -920,7 +940,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SV_RequestFile "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SV_RequestFile ");
 				}
 				using (TimeWarning.New("SV_RequestFile"))
 				{
@@ -963,6 +983,593 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		{
 			UnityEngine.TransformEx.RemoveComponent<EntityCollisionMessage>(base.gameObject.transform);
 		}
+	}
+
+	public virtual BasePlayer ToPlayer()
+	{
+		return null;
+	}
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		InitEntityLinks();
+	}
+
+	public override void DestroyShared()
+	{
+		base.DestroyShared();
+		FreeEntityLinks();
+	}
+
+	public override void ResetState()
+	{
+		base.ResetState();
+		parentBone = 0u;
+		OwnerID = 0uL;
+		flags = (Flags)0;
+		parentEntity = default(EntityRef);
+		if (base.isServer)
+		{
+			_spawnable = null;
+		}
+	}
+
+	public virtual float InheritedVelocityScale()
+	{
+		return 0f;
+	}
+
+	public virtual bool InheritedVelocityDirection()
+	{
+		return true;
+	}
+
+	public virtual Vector3 GetInheritedProjectileVelocity(Vector3 direction)
+	{
+		BaseEntity baseEntity = parentEntity.Get(base.isServer);
+		if (baseEntity == null)
+		{
+			return Vector3.zero;
+		}
+		if (baseEntity.InheritedVelocityDirection())
+		{
+			return GetParentVelocity() * baseEntity.InheritedVelocityScale();
+		}
+		return Mathf.Max(Vector3.Dot(GetParentVelocity() * baseEntity.InheritedVelocityScale(), direction), 0f) * direction;
+	}
+
+	public virtual Vector3 GetInheritedThrowVelocity(Vector3 direction)
+	{
+		return GetParentVelocity();
+	}
+
+	public virtual Vector3 GetInheritedDropVelocity()
+	{
+		BaseEntity baseEntity = parentEntity.Get(base.isServer);
+		if (!(baseEntity != null))
+		{
+			return Vector3.zero;
+		}
+		return baseEntity.GetWorldVelocity();
+	}
+
+	public Vector3 GetParentVelocity()
+	{
+		BaseEntity baseEntity = parentEntity.Get(base.isServer);
+		if (!(baseEntity != null))
+		{
+			return Vector3.zero;
+		}
+		return baseEntity.GetWorldVelocity() + (baseEntity.GetAngularVelocity() * base.transform.localPosition - base.transform.localPosition);
+	}
+
+	public Vector3 GetWorldVelocity()
+	{
+		BaseEntity baseEntity = parentEntity.Get(base.isServer);
+		if (!(baseEntity != null))
+		{
+			return GetLocalVelocity();
+		}
+		return baseEntity.GetWorldVelocity() + (baseEntity.GetAngularVelocity() * base.transform.localPosition - base.transform.localPosition) + baseEntity.transform.TransformDirection(GetLocalVelocity());
+	}
+
+	public Vector3 GetLocalVelocity()
+	{
+		if (base.isServer)
+		{
+			return GetLocalVelocityServer();
+		}
+		return Vector3.zero;
+	}
+
+	public Quaternion GetAngularVelocity()
+	{
+		if (base.isServer)
+		{
+			return GetAngularVelocityServer();
+		}
+		return Quaternion.identity;
+	}
+
+	public virtual OBB WorldSpaceBounds()
+	{
+		return new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
+	}
+
+	public Vector3 PivotPoint()
+	{
+		return base.transform.position;
+	}
+
+	public Vector3 CenterPoint()
+	{
+		return WorldSpaceBounds().position;
+	}
+
+	public Vector3 ClosestPoint(Vector3 position)
+	{
+		return WorldSpaceBounds().ClosestPoint(position);
+	}
+
+	public virtual Vector3 TriggerPoint()
+	{
+		return CenterPoint();
+	}
+
+	public float Distance(Vector3 position)
+	{
+		return (ClosestPoint(position) - position).magnitude;
+	}
+
+	public float SqrDistance(Vector3 position)
+	{
+		return (ClosestPoint(position) - position).sqrMagnitude;
+	}
+
+	public float Distance(BaseEntity other)
+	{
+		return Distance(other.transform.position);
+	}
+
+	public float SqrDistance(BaseEntity other)
+	{
+		return SqrDistance(other.transform.position);
+	}
+
+	public float Distance2D(Vector3 position)
+	{
+		return (ClosestPoint(position) - position).Magnitude2D();
+	}
+
+	public float SqrDistance2D(Vector3 position)
+	{
+		return (ClosestPoint(position) - position).SqrMagnitude2D();
+	}
+
+	public float Distance2D(BaseEntity other)
+	{
+		return Distance(other.transform.position);
+	}
+
+	public float SqrDistance2D(BaseEntity other)
+	{
+		return SqrDistance(other.transform.position);
+	}
+
+	public bool IsVisible(Ray ray, int layerMask, float maxDistance)
+	{
+		if (ray.origin.IsNaNOrInfinity())
+		{
+			return false;
+		}
+		if (ray.direction.IsNaNOrInfinity())
+		{
+			return false;
+		}
+		if (ray.direction == Vector3.zero)
+		{
+			return false;
+		}
+		if (!WorldSpaceBounds().Trace(ray, out var hit, maxDistance))
+		{
+			return false;
+		}
+		if (GamePhysics.Trace(ray, 0f, out var hitInfo, maxDistance, layerMask))
+		{
+			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
+			if (entity == this)
+			{
+				return true;
+			}
+			if (entity != null && (bool)GetParentEntity() && GetParentEntity().EqualNetID(entity) && RaycastHitEx.IsOnLayer(hitInfo, Rust.Layer.Vehicle_Detailed))
+			{
+				return true;
+			}
+			if (hitInfo.distance <= hit.distance)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public bool IsVisibleSpecificLayers(Vector3 position, Vector3 target, int layerMask, float maxDistance = float.PositiveInfinity)
+	{
+		Vector3 vector = target - position;
+		float magnitude = vector.magnitude;
+		if (magnitude < Mathf.Epsilon)
+		{
+			return true;
+		}
+		Vector3 vector2 = vector / magnitude;
+		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
+		return IsVisible(new Ray(position + vector3, vector2), layerMask, maxDistance);
+	}
+
+	public bool IsVisible(Vector3 position, Vector3 target, float maxDistance = float.PositiveInfinity)
+	{
+		Vector3 vector = target - position;
+		float magnitude = vector.magnitude;
+		if (magnitude < Mathf.Epsilon)
+		{
+			return true;
+		}
+		Vector3 vector2 = vector / magnitude;
+		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
+		maxDistance = Mathf.Min(maxDistance, magnitude + 0.2f);
+		return IsVisible(new Ray(position + vector3, vector2), 1218519041, maxDistance);
+	}
+
+	public bool IsVisible(Vector3 position, float maxDistance = float.PositiveInfinity)
+	{
+		Vector3 target = CenterPoint();
+		if (IsVisible(position, target, maxDistance))
+		{
+			return true;
+		}
+		Vector3 target2 = ClosestPoint(position);
+		if (IsVisible(position, target2, maxDistance))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public bool IsVisibleAndCanSee(Vector3 position)
+	{
+		Vector3 vector = CenterPoint();
+		if (IsVisible(position, vector) && CanSee(vector, position))
+		{
+			return true;
+		}
+		Vector3 vector2 = ClosestPoint(position);
+		if (IsVisible(position, vector2) && CanSee(vector2, position))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	public bool CanSee(Vector3 fromPos, Vector3 targetPos)
+	{
+		return GamePhysics.LineOfSight(fromPos, targetPos, 1218519041, this);
+	}
+
+	public bool IsOlderThan(BaseEntity other)
+	{
+		if (other == null)
+		{
+			return true;
+		}
+		NetworkableId obj = net?.ID ?? default(NetworkableId);
+		NetworkableId networkableId = other.net?.ID ?? default(NetworkableId);
+		return obj.Value < networkableId.Value;
+	}
+
+	public virtual bool IsOutside()
+	{
+		return IsOutside(WorldSpaceBounds().position);
+	}
+
+	public bool IsOutside(Vector3 position)
+	{
+		bool result = true;
+		if (UnityEngine.Physics.Raycast(position + Vector3.up * 100f, Vector3.down, out var hitInfo, 100f, 161546513))
+		{
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(hitInfo.collider);
+			if (baseEntity == null || !BaseEntityEx.HasEntityInParents(baseEntity, this))
+			{
+				result = false;
+			}
+		}
+		return result;
+	}
+
+	public virtual float WaterFactor()
+	{
+		return WaterLevel.Factor(WorldSpaceBounds().ToBounds(), waves: true, volumes: true, this);
+	}
+
+	public virtual float AirFactor()
+	{
+		if (!(WaterFactor() > 0.85f))
+		{
+			return 1f;
+		}
+		return 0f;
+	}
+
+	public bool WaterTestFromVolumes(Vector3 pos, out WaterLevel.WaterInfo info)
+	{
+		if (triggers == null)
+		{
+			info = default(WaterLevel.WaterInfo);
+			return false;
+		}
+		for (int i = 0; i < triggers.Count; i++)
+		{
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(pos, out info))
+			{
+				return true;
+			}
+		}
+		info = default(WaterLevel.WaterInfo);
+		return false;
+	}
+
+	public bool IsInWaterVolume(Vector3 pos)
+	{
+		if (triggers == null)
+		{
+			return false;
+		}
+		for (int i = 0; i < triggers.Count; i++)
+		{
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(pos, out var _))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool WaterTestFromVolumes(Bounds bounds, out WaterLevel.WaterInfo info)
+	{
+		if (triggers == null)
+		{
+			info = default(WaterLevel.WaterInfo);
+			return false;
+		}
+		for (int i = 0; i < triggers.Count; i++)
+		{
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(bounds, out info))
+			{
+				return true;
+			}
+		}
+		info = default(WaterLevel.WaterInfo);
+		return false;
+	}
+
+	public bool WaterTestFromVolumes(Vector3 start, Vector3 end, float radius, out WaterLevel.WaterInfo info)
+	{
+		if (triggers == null)
+		{
+			info = default(WaterLevel.WaterInfo);
+			return false;
+		}
+		for (int i = 0; i < triggers.Count; i++)
+		{
+			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(start, end, radius, out info))
+			{
+				return true;
+			}
+		}
+		info = default(WaterLevel.WaterInfo);
+		return false;
+	}
+
+	public virtual bool BlocksWaterFor(BasePlayer player)
+	{
+		return false;
+	}
+
+	public virtual float Health()
+	{
+		return 0f;
+	}
+
+	public virtual float MaxHealth()
+	{
+		return 0f;
+	}
+
+	public virtual float MaxVelocity()
+	{
+		return 0f;
+	}
+
+	public virtual float BoundsPadding()
+	{
+		return 0.1f;
+	}
+
+	public virtual float PenetrationResistance(HitInfo info)
+	{
+		return 100f;
+	}
+
+	public virtual GameObjectRef GetImpactEffect(HitInfo info)
+	{
+		return impactEffect;
+	}
+
+	public virtual void OnAttacked(HitInfo info)
+	{
+	}
+
+	public virtual Item GetItem()
+	{
+		return null;
+	}
+
+	public virtual Item GetItem(ItemId itemId)
+	{
+		return null;
+	}
+
+	public virtual void GiveItem(Item item, GiveItemReason reason = GiveItemReason.Generic)
+	{
+		item.Remove();
+	}
+
+	public virtual bool CanBeLooted(BasePlayer player)
+	{
+		return !IsTransferring();
+	}
+
+	public virtual BaseEntity GetEntity()
+	{
+		return this;
+	}
+
+	public override string ToString()
+	{
+		if (_name == null)
+		{
+			if (base.isServer)
+			{
+				_name = string.Format("{1}[{0}]", net?.ID ?? default(NetworkableId), base.ShortPrefabName);
+			}
+			else
+			{
+				_name = base.ShortPrefabName;
+			}
+		}
+		return _name;
+	}
+
+	public virtual string Categorize()
+	{
+		return "entity";
+	}
+
+	public void Log(string str)
+	{
+		if (base.isClient)
+		{
+			Debug.Log("<color=#ffa>[" + ToString() + "] " + str + "</color>", base.gameObject);
+		}
+		else
+		{
+			Debug.Log("<color=#aff>[" + ToString() + "] " + str + "</color>", base.gameObject);
+		}
+	}
+
+	public void SetModel(Model mdl)
+	{
+		if (!(model == mdl))
+		{
+			model = mdl;
+		}
+	}
+
+	public Model GetModel()
+	{
+		return model;
+	}
+
+	public virtual Transform[] GetBones()
+	{
+		if ((bool)model)
+		{
+			return model.GetBones();
+		}
+		return null;
+	}
+
+	public virtual Transform FindBone(string strName)
+	{
+		if ((bool)model)
+		{
+			return model.FindBone(strName);
+		}
+		return base.transform;
+	}
+
+	public virtual uint FindBoneID(Transform boneTransform)
+	{
+		if ((bool)model)
+		{
+			return model.FindBoneID(boneTransform);
+		}
+		return StringPool.closest;
+	}
+
+	public virtual Transform FindClosestBone(Vector3 worldPos)
+	{
+		if ((bool)model)
+		{
+			return model.FindClosestBone(worldPos);
+		}
+		return base.transform;
+	}
+
+	public virtual bool ShouldBlockProjectiles()
+	{
+		return true;
+	}
+
+	public virtual bool ShouldInheritNetworkGroup()
+	{
+		return true;
+	}
+
+	public virtual bool SupportsChildDeployables()
+	{
+		return false;
+	}
+
+	public virtual bool ForceDeployableSetParent()
+	{
+		return false;
+	}
+
+	public bool IsOnMovingObject()
+	{
+		if (syncPosition)
+		{
+			return true;
+		}
+		BaseEntity baseEntity = GetParentEntity();
+		if (!(baseEntity != null))
+		{
+			return false;
+		}
+		return baseEntity.IsOnMovingObject();
+	}
+
+	public void BroadcastEntityMessage(string msg, float radius = 20f, int layerMask = 1218652417)
+	{
+		if (base.isClient)
+		{
+			return;
+		}
+		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
+		Vis.Entities(base.transform.position, radius, obj, layerMask);
+		foreach (BaseEntity item in obj)
+		{
+			if (item.isServer)
+			{
+				item.OnEntityMessage(this, msg);
+			}
+		}
+		Facepunch.Pool.FreeList(ref obj);
+	}
+
+	public virtual void OnEntityMessage(BaseEntity from, string msg)
+	{
 	}
 
 	public virtual void DebugServer(int rep, float time)
@@ -1015,14 +1622,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public void SetFlag(Flags f, bool b, bool recursive = false, bool networkupdate = true)
 	{
-		Flags old = flags;
+		Flags flags = this.flags;
 		if (b)
 		{
 			if (HasFlag(f))
 			{
 				return;
 			}
-			flags |= f;
+			this.flags |= f;
 		}
 		else
 		{
@@ -1030,12 +1637,16 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			{
 				return;
 			}
-			flags &= ~f;
+			this.flags &= ~f;
 		}
-		OnFlagsChanged(old, flags);
+		OnFlagsChanged(flags, this.flags);
 		if (networkupdate)
 		{
 			SendNetworkUpdate();
+			if (flags != this.flags)
+			{
+				GlobalNetworkHandler.server?.TrySendNetworkUpdate(this);
+			}
 		}
 		else
 		{
@@ -1092,6 +1703,16 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public bool IsBusy()
 	{
 		return HasFlag(Flags.Busy);
+	}
+
+	public bool IsTransferProtected()
+	{
+		return HasFlag(Flags.Protected);
+	}
+
+	public bool IsTransferring()
+	{
+		return HasFlag(Flags.Transferring);
 	}
 
 	public override string GetLogColor()
@@ -1444,6 +2065,54 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		ClientRPCEx(sendInfo2, null, funcName, num, (uint)array.Length, array, num2, (byte)type);
 	}
 
+	public virtual void EnableTransferProtection()
+	{
+		if (!IsTransferProtected())
+		{
+			SetFlag(Flags.Protected, b: true);
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null)
+			{
+				List<Connection> obj = Facepunch.Pool.GetList<Connection>();
+				foreach (Connection item in subscribers)
+				{
+					if (!ShouldNetworkTo(item.player as BasePlayer))
+					{
+						obj.Add(item);
+					}
+				}
+				OnNetworkSubscribersLeave(obj);
+				Facepunch.Pool.FreeList(ref obj);
+			}
+			float protectionDuration = Nexus.protectionDuration;
+			_transferProtectionRemaining = protectionDuration;
+			Invoke(DisableTransferProtectionAction, protectionDuration);
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.EnableTransferProtection();
+		}
+	}
+
+	public virtual void DisableTransferProtection()
+	{
+		if (IsTransferProtected())
+		{
+			SetFlag(Flags.Protected, b: false);
+			List<Connection> subscribers = GetSubscribers();
+			if (subscribers != null)
+			{
+				OnNetworkSubscribersEnter(subscribers);
+			}
+			_transferProtectionRemaining = 0f;
+			CancelInvoke(DisableTransferProtectionAction);
+		}
+		foreach (BaseEntity child in children)
+		{
+			child.DisableTransferProtection();
+		}
+	}
+
 	public void SetParent(BaseEntity entity, bool worldPositionStays = false, bool sendImmediate = false)
 	{
 		SetParent(entity, 0u, worldPositionStays, sendImmediate);
@@ -1598,13 +2267,22 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public virtual void OnParentChanging(BaseEntity oldParent, BaseEntity newParent)
 	{
 		Rigidbody component = GetComponent<Rigidbody>();
-		if ((bool)component)
+		if (!component)
 		{
-			if (oldParent != null && oldParent.GetComponent<Rigidbody>() == null)
+			return;
+		}
+		if (oldParent != null)
+		{
+			Rigidbody component2 = oldParent.GetComponent<Rigidbody>();
+			if (component2 == null || component2.isKinematic)
 			{
 				component.velocity += oldParent.GetWorldVelocity();
 			}
-			if (newParent != null && newParent.GetComponent<Rigidbody>() == null)
+		}
+		if (newParent != null)
+		{
+			Rigidbody component3 = newParent.GetComponent<Rigidbody>();
+			if (component3 == null || component3.isKinematic)
 			{
 				component.velocity -= newParent.GetWorldVelocity();
 			}
@@ -1612,6 +2290,11 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	}
 
 	public virtual BuildingPrivlidge GetBuildingPrivilege()
+	{
+		return GetNearestBuildingPrivledge();
+	}
+
+	public BuildingPrivlidge GetNearestBuildingPrivledge()
 	{
 		return GetBuildingPrivilege(WorldSpaceBounds());
 	}
@@ -1920,7 +2603,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
-	private NetWrite ClientRPCStart(Connection sourceConnection, string funcName)
+	protected NetWrite ClientRPCStart(Connection sourceConnection, string funcName)
 	{
 		NetWrite netWrite = Network.Net.sv.StartWrite();
 		netWrite.PacketID(Message.Type.RPCMessage);
@@ -1935,19 +2618,206 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		NetworkWriteEx.WriteObject(write, arg);
 	}
 
-	private void ClientRPCSend(NetWrite write, SendInfo sendInfo)
+	protected void ClientRPCSend(NetWrite write, SendInfo sendInfo)
 	{
 		write.Send(sendInfo);
 	}
 
-	public virtual float RadiationProtection()
+	public void ClientRPCPlayerList<T1>(Connection sourceConnection, BasePlayer player, string funcName, List<T1> list)
 	{
-		return 0f;
+		if (!Network.Net.sv.IsConnected() || net == null || player.net.connection == null)
+		{
+			return;
+		}
+		NetWrite write = ClientRPCStart(sourceConnection, funcName);
+		ClientRPCWrite(write, list.Count);
+		foreach (T1 item in list)
+		{
+			ClientRPCWrite(write, item);
+		}
+		ClientRPCSend(write, new SendInfo(player.net.connection)
+		{
+			priority = Priority.Immediate
+		});
 	}
 
-	public virtual float RadiationExposureFraction()
+	public override void Save(SaveInfo info)
 	{
-		return 1f;
+		base.Save(info);
+		BaseEntity baseEntity = parentEntity.Get(base.isServer);
+		info.msg.baseEntity = Facepunch.Pool.Get<ProtoBuf.BaseEntity>();
+		if (info.forDisk)
+		{
+			if (this is BasePlayer)
+			{
+				if (baseEntity == null || baseEntity.enableSaving)
+				{
+					info.msg.baseEntity.pos = base.transform.localPosition;
+					info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
+				}
+				else
+				{
+					info.msg.baseEntity.pos = base.transform.position;
+					info.msg.baseEntity.rot = base.transform.rotation.eulerAngles;
+				}
+			}
+			else
+			{
+				info.msg.baseEntity.pos = base.transform.localPosition;
+				info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
+			}
+		}
+		else
+		{
+			info.msg.baseEntity.pos = GetNetworkPosition();
+			info.msg.baseEntity.rot = GetNetworkRotation().eulerAngles;
+			info.msg.baseEntity.time = GetNetworkTime();
+		}
+		info.msg.baseEntity.flags = (int)flags;
+		info.msg.baseEntity.skinid = skinID;
+		if (info.forDisk && this is BasePlayer)
+		{
+			if (baseEntity != null && baseEntity.enableSaving)
+			{
+				info.msg.parent = Facepunch.Pool.Get<ParentInfo>();
+				info.msg.parent.uid = parentEntity.uid;
+				info.msg.parent.bone = parentBone;
+			}
+		}
+		else if (baseEntity != null)
+		{
+			info.msg.parent = Facepunch.Pool.Get<ParentInfo>();
+			info.msg.parent.uid = parentEntity.uid;
+			info.msg.parent.bone = parentBone;
+		}
+		if (HasAnySlot())
+		{
+			info.msg.entitySlots = Facepunch.Pool.Get<EntitySlots>();
+			info.msg.entitySlots.slotLock = entitySlots[0].uid;
+			info.msg.entitySlots.slotFireMod = entitySlots[1].uid;
+			info.msg.entitySlots.slotUpperModification = entitySlots[2].uid;
+			info.msg.entitySlots.centerDecoration = entitySlots[5].uid;
+			info.msg.entitySlots.lowerCenterDecoration = entitySlots[6].uid;
+			info.msg.entitySlots.storageMonitor = entitySlots[7].uid;
+		}
+		if (info.forDisk && (bool)_spawnable)
+		{
+			_spawnable.Save(info);
+		}
+		if (OwnerID != 0L && (info.forDisk || ShouldNetworkOwnerInfo()))
+		{
+			info.msg.ownerInfo = Facepunch.Pool.Get<OwnerInfo>();
+			info.msg.ownerInfo.steamid = OwnerID;
+		}
+		if (Components != null)
+		{
+			for (int i = 0; i < Components.Length; i++)
+			{
+				if (!(Components[i] == null))
+				{
+					Components[i].SaveComponent(info);
+				}
+			}
+		}
+		if (info.forTransfer && ShouldTransferAssociatedFiles)
+		{
+			info.msg.associatedFiles = Facepunch.Pool.Get<AssociatedFiles>();
+			info.msg.associatedFiles.files = Facepunch.Pool.GetList<AssociatedFiles.AssociatedFile>();
+			info.msg.associatedFiles.files.AddRange(FileStorage.server.QueryAllByEntity(net.ID));
+		}
+	}
+
+	public virtual bool ShouldNetworkOwnerInfo()
+	{
+		return false;
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.baseEntity != null)
+		{
+			ProtoBuf.BaseEntity baseEntity = info.msg.baseEntity;
+			Flags old = flags;
+			if (base.isServer)
+			{
+				baseEntity.flags &= -33554433;
+			}
+			flags = (Flags)baseEntity.flags;
+			OnFlagsChanged(old, flags);
+			OnSkinChanged(skinID, info.msg.baseEntity.skinid);
+			if (info.fromDisk)
+			{
+				if (baseEntity.pos.IsNaNOrInfinity())
+				{
+					string text = ToString();
+					Vector3 pos = baseEntity.pos;
+					Debug.LogWarning(text + " has broken position - " + pos.ToString());
+					baseEntity.pos = Vector3.zero;
+				}
+				base.transform.localPosition = baseEntity.pos;
+				base.transform.localRotation = Quaternion.Euler(baseEntity.rot);
+			}
+		}
+		if (info.msg.entitySlots != null)
+		{
+			entitySlots[0].uid = info.msg.entitySlots.slotLock;
+			entitySlots[1].uid = info.msg.entitySlots.slotFireMod;
+			entitySlots[2].uid = info.msg.entitySlots.slotUpperModification;
+			entitySlots[5].uid = info.msg.entitySlots.centerDecoration;
+			entitySlots[6].uid = info.msg.entitySlots.lowerCenterDecoration;
+			entitySlots[7].uid = info.msg.entitySlots.storageMonitor;
+		}
+		if (info.msg.parent != null)
+		{
+			if (base.isServer)
+			{
+				BaseEntity entity = BaseNetworkable.serverEntities.Find(info.msg.parent.uid) as BaseEntity;
+				SetParent(entity, info.msg.parent.bone);
+			}
+			parentEntity.uid = info.msg.parent.uid;
+			parentBone = info.msg.parent.bone;
+		}
+		else
+		{
+			parentEntity.uid = default(NetworkableId);
+			parentBone = 0u;
+		}
+		if (info.msg.ownerInfo != null)
+		{
+			OwnerID = info.msg.ownerInfo.steamid;
+		}
+		if ((bool)_spawnable)
+		{
+			_spawnable.Load(info);
+		}
+		if (info.fromTransfer && ShouldTransferAssociatedFiles && info.msg.associatedFiles != null && info.msg.associatedFiles.files != null)
+		{
+			foreach (AssociatedFiles.AssociatedFile file in info.msg.associatedFiles.files)
+			{
+				if (FileStorage.server.Store(file.data, (FileStorage.Type)file.type, net.ID, file.numID) != file.crc)
+				{
+					Debug.LogWarning("Associated file has a different CRC after transfer!");
+				}
+			}
+		}
+		if (info.fromDisk && info.msg.baseEntity != null && IsTransferProtected())
+		{
+			float num = ((info.msg.baseEntity.protection > 0f) ? info.msg.baseEntity.protection : Nexus.protectionDuration);
+			_transferProtectionRemaining = num;
+			Invoke(DisableTransferProtectionAction, num);
+		}
+		if (Components == null)
+		{
+			return;
+		}
+		for (int i = 0; i < Components.Length; i++)
+		{
+			if (!(Components[i] == null))
+			{
+				Components[i].LoadComponent(info);
+			}
+		}
 	}
 
 	public virtual void SetCreatorEntity(BaseEntity newCreatorEntity)
@@ -1998,6 +2868,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 		_spawnable = GetComponent<Spawnable>();
 		base.ServerInit();
+		if (!base.isServer)
+		{
+			return;
+		}
 		if (enableSaving && !saveList.Contains(this))
 		{
 			saveList.Add(this);
@@ -2024,9 +2898,14 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	{
 	}
 
+	protected virtual bool TransformHasMoved()
+	{
+		return base.transform.hasChanged;
+	}
+
 	public void NetworkPositionTick()
 	{
-		if (!base.transform.hasChanged)
+		if (!TransformHasMoved())
 		{
 			if (ticksSinceStopped >= 6)
 			{
@@ -2080,7 +2959,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			doneMovingWithoutARigidBodyCheck++;
 			if (doneMovingWithoutARigidBodyCheck >= 10 && !(GetComponent<Collider>() == null) && GetComponent<Rigidbody>() == null)
 			{
-				Debug.LogWarning(string.Concat("Entity moving without a rigid body! (", base.gameObject, ")"), this);
+				Debug.LogWarning("Entity moving without a rigid body! (" + base.gameObject?.ToString() + ")", this);
 			}
 		}
 	}
@@ -2161,7 +3040,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 
 	public virtual void OnInvalidPosition()
 	{
-		Debug.Log(string.Concat("Invalid Position: ", this, " ", base.transform.position, " (destroying)"));
+		Debug.Log("Invalid Position: " + this?.ToString() + " " + base.transform.position.ToString() + " (destroying)");
 		Kill();
 	}
 
@@ -2179,7 +3058,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		BaseCorpse baseCorpse = GameManager.server.CreateEntity(strCorpsePrefab) as BaseCorpse;
 		if (baseCorpse == null)
 		{
-			Debug.LogWarning(string.Concat("Error creating corpse: ", base.gameObject, " - ", strCorpsePrefab));
+			Debug.LogWarning("Error creating corpse: " + base.gameObject?.ToString() + " - " + strCorpsePrefab);
 			return null;
 		}
 		baseCorpse.InitCorpse(this);
@@ -2210,7 +3089,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				{
 					if (!Rust.Application.isLoadingSave)
 					{
-						Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + parentEntity.uid);
+						Debug.LogWarning("UpdateNetworkGroup: Missing parent entity " + parentEntity.uid.ToString());
 						Invoke(UpdateNetworkGroup, 2f);
 						isCallingUpdateNetworkGroup = true;
 					}
@@ -2224,7 +3103,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 				}
 				else
 				{
-					Debug.LogWarning(string.Concat(base.gameObject, ": has parent id - but couldn't find parent! ", parentEntity));
+					Debug.LogWarning(base.gameObject?.ToString() + ": has parent id - but couldn't find parent! " + parentEntity);
 				}
 			}
 			else if (base.limitNetworking && !(this is BasePlayer))
@@ -2255,6 +3134,10 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		if (player == this)
 		{
 			return true;
+		}
+		if (IsTransferProtected())
+		{
+			return false;
 		}
 		BaseEntity baseEntity = GetParentEntity();
 		if (base.limitNetworking)
@@ -2341,8 +3224,18 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		return $"Owner ID: {OwnerID}";
 	}
 
-	[RPC_Server.FromOwner]
+	public virtual float RadiationProtection()
+	{
+		return 0f;
+	}
+
+	public virtual float RadiationExposureFraction()
+	{
+		return 1f;
+	}
+
 	[RPC_Server]
+	[RPC_Server.FromOwner]
 	private void BroadcastSignalFromClient(RPCMessage msg)
 	{
 		uint num = StringPool.Get("BroadcastSignalFromClient");
@@ -2510,7 +3403,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 		foreach (TriggerBase trigger in triggers)
 		{
-			if (!((UnityEngine.Object)(trigger as T) == (UnityEngine.Object)null))
+			if (!(trigger as T == null))
 			{
 				return trigger as T;
 			}
@@ -2521,7 +3414,7 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 	public bool FindTrigger<T>(out T result) where T : TriggerBase
 	{
 		result = FindTrigger<T>();
-		return (UnityEngine.Object)result != (UnityEngine.Object)null;
+		return result != null;
 	}
 
 	private void ForceUpdateTriggersAction()
@@ -2590,6 +3483,33 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 		}
 	}
 
+	public virtual bool InSafeZone()
+	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		if (activeGameMode != null && !activeGameMode.safeZone)
+		{
+			return false;
+		}
+		float num = 0f;
+		Vector3 position = base.transform.position;
+		if (triggers != null)
+		{
+			for (int i = 0; i < triggers.Count; i++)
+			{
+				TriggerSafeZone triggerSafeZone = triggers[i] as TriggerSafeZone;
+				if (!(triggerSafeZone == null))
+				{
+					float safeLevel = triggerSafeZone.GetSafeLevel(position);
+					if (safeLevel > num)
+					{
+						num = safeLevel;
+					}
+				}
+			}
+		}
+		return num > 0f;
+	}
+
 	public TriggerParent FindSuitableParent()
 	{
 		if (triggers == null)
@@ -2604,739 +3524,5 @@ public class BaseEntity : BaseNetworkable, IOnParentSpawning, IPrefabPreProcess
 			}
 		}
 		return null;
-	}
-
-	public virtual BasePlayer ToPlayer()
-	{
-		return null;
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
-		InitEntityLinks();
-	}
-
-	public override void DestroyShared()
-	{
-		base.DestroyShared();
-		FreeEntityLinks();
-	}
-
-	public override void ResetState()
-	{
-		base.ResetState();
-		parentBone = 0u;
-		OwnerID = 0uL;
-		flags = (Flags)0;
-		parentEntity = default(EntityRef);
-		if (base.isServer)
-		{
-			_spawnable = null;
-		}
-	}
-
-	public virtual float InheritedVelocityScale()
-	{
-		return 0f;
-	}
-
-	public virtual bool InheritedVelocityDirection()
-	{
-		return true;
-	}
-
-	public virtual Vector3 GetInheritedProjectileVelocity(Vector3 direction)
-	{
-		BaseEntity baseEntity = parentEntity.Get(base.isServer);
-		if (baseEntity == null)
-		{
-			return Vector3.zero;
-		}
-		if (baseEntity.InheritedVelocityDirection())
-		{
-			return GetParentVelocity() * baseEntity.InheritedVelocityScale();
-		}
-		return Mathf.Max(Vector3.Dot(GetParentVelocity() * baseEntity.InheritedVelocityScale(), direction), 0f) * direction;
-	}
-
-	public virtual Vector3 GetInheritedThrowVelocity(Vector3 direction)
-	{
-		return GetParentVelocity();
-	}
-
-	public virtual Vector3 GetInheritedDropVelocity()
-	{
-		BaseEntity baseEntity = parentEntity.Get(base.isServer);
-		if (!(baseEntity != null))
-		{
-			return Vector3.zero;
-		}
-		return baseEntity.GetWorldVelocity();
-	}
-
-	public Vector3 GetParentVelocity()
-	{
-		BaseEntity baseEntity = parentEntity.Get(base.isServer);
-		if (!(baseEntity != null))
-		{
-			return Vector3.zero;
-		}
-		return baseEntity.GetWorldVelocity() + (baseEntity.GetAngularVelocity() * base.transform.localPosition - base.transform.localPosition);
-	}
-
-	public Vector3 GetWorldVelocity()
-	{
-		BaseEntity baseEntity = parentEntity.Get(base.isServer);
-		if (!(baseEntity != null))
-		{
-			return GetLocalVelocity();
-		}
-		return baseEntity.GetWorldVelocity() + (baseEntity.GetAngularVelocity() * base.transform.localPosition - base.transform.localPosition) + baseEntity.transform.TransformDirection(GetLocalVelocity());
-	}
-
-	public Vector3 GetLocalVelocity()
-	{
-		if (base.isServer)
-		{
-			return GetLocalVelocityServer();
-		}
-		return Vector3.zero;
-	}
-
-	public Quaternion GetAngularVelocity()
-	{
-		if (base.isServer)
-		{
-			return GetAngularVelocityServer();
-		}
-		return Quaternion.identity;
-	}
-
-	public virtual OBB WorldSpaceBounds()
-	{
-		return new OBB(base.transform.position, base.transform.lossyScale, base.transform.rotation, bounds);
-	}
-
-	public Vector3 PivotPoint()
-	{
-		return base.transform.position;
-	}
-
-	public Vector3 CenterPoint()
-	{
-		return WorldSpaceBounds().position;
-	}
-
-	public Vector3 ClosestPoint(Vector3 position)
-	{
-		return WorldSpaceBounds().ClosestPoint(position);
-	}
-
-	public virtual Vector3 TriggerPoint()
-	{
-		return CenterPoint();
-	}
-
-	public float Distance(Vector3 position)
-	{
-		return (ClosestPoint(position) - position).magnitude;
-	}
-
-	public float SqrDistance(Vector3 position)
-	{
-		return (ClosestPoint(position) - position).sqrMagnitude;
-	}
-
-	public float Distance(BaseEntity other)
-	{
-		return Distance(other.transform.position);
-	}
-
-	public float SqrDistance(BaseEntity other)
-	{
-		return SqrDistance(other.transform.position);
-	}
-
-	public float Distance2D(Vector3 position)
-	{
-		return (ClosestPoint(position) - position).Magnitude2D();
-	}
-
-	public float SqrDistance2D(Vector3 position)
-	{
-		return (ClosestPoint(position) - position).SqrMagnitude2D();
-	}
-
-	public float Distance2D(BaseEntity other)
-	{
-		return Distance(other.transform.position);
-	}
-
-	public float SqrDistance2D(BaseEntity other)
-	{
-		return SqrDistance(other.transform.position);
-	}
-
-	public bool IsVisible(Ray ray, int layerMask, float maxDistance)
-	{
-		if (ray.origin.IsNaNOrInfinity())
-		{
-			return false;
-		}
-		if (ray.direction.IsNaNOrInfinity())
-		{
-			return false;
-		}
-		if (ray.direction == Vector3.zero)
-		{
-			return false;
-		}
-		if (!WorldSpaceBounds().Trace(ray, out var hit, maxDistance))
-		{
-			return false;
-		}
-		if (GamePhysics.Trace(ray, 0f, out var hitInfo, maxDistance, layerMask))
-		{
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
-			if (entity == this)
-			{
-				return true;
-			}
-			if (entity != null && (bool)GetParentEntity() && GetParentEntity().EqualNetID(entity) && RaycastHitEx.IsOnLayer(hitInfo, Rust.Layer.Vehicle_Detailed))
-			{
-				return true;
-			}
-			if (hitInfo.distance <= hit.distance)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public bool IsVisibleSpecificLayers(Vector3 position, Vector3 target, int layerMask, float maxDistance = float.PositiveInfinity)
-	{
-		Vector3 vector = target - position;
-		float magnitude = vector.magnitude;
-		if (magnitude < Mathf.Epsilon)
-		{
-			return true;
-		}
-		Vector3 vector2 = vector / magnitude;
-		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
-		return IsVisible(new Ray(position + vector3, vector2), layerMask, maxDistance);
-	}
-
-	public bool IsVisible(Vector3 position, Vector3 target, float maxDistance = float.PositiveInfinity)
-	{
-		Vector3 vector = target - position;
-		float magnitude = vector.magnitude;
-		if (magnitude < Mathf.Epsilon)
-		{
-			return true;
-		}
-		Vector3 vector2 = vector / magnitude;
-		Vector3 vector3 = vector2 * Mathf.Min(magnitude, 0.01f);
-		return IsVisible(new Ray(position + vector3, vector2), 1218519041, maxDistance);
-	}
-
-	public bool IsVisible(Vector3 position, float maxDistance = float.PositiveInfinity)
-	{
-		Vector3 target = CenterPoint();
-		if (IsVisible(position, target, maxDistance))
-		{
-			return true;
-		}
-		Vector3 target2 = ClosestPoint(position);
-		if (IsVisible(position, target2, maxDistance))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public bool IsVisibleAndCanSee(Vector3 position, float maxDistance = float.PositiveInfinity)
-	{
-		Vector3 vector = CenterPoint();
-		if (IsVisible(position, vector, maxDistance) && IsVisible(vector, position, maxDistance))
-		{
-			return true;
-		}
-		Vector3 vector2 = ClosestPoint(position);
-		if (IsVisible(position, vector2, maxDistance) && IsVisible(vector2, position, maxDistance))
-		{
-			return true;
-		}
-		return false;
-	}
-
-	public bool IsOlderThan(BaseEntity other)
-	{
-		if (other == null)
-		{
-			return true;
-		}
-		NetworkableId obj = net?.ID ?? default(NetworkableId);
-		NetworkableId networkableId = other.net?.ID ?? default(NetworkableId);
-		return obj.Value < networkableId.Value;
-	}
-
-	public virtual bool IsOutside()
-	{
-		return IsOutside(WorldSpaceBounds().position);
-	}
-
-	public bool IsOutside(Vector3 position)
-	{
-		bool result = true;
-		bool flag;
-		do
-		{
-			flag = false;
-			if (!UnityEngine.Physics.Raycast(position, Vector3.up, out var hitInfo, 100f, 161546513))
-			{
-				continue;
-			}
-			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(hitInfo.collider);
-			if (baseEntity != null && BaseEntityEx.HasEntityInParents(baseEntity, this))
-			{
-				if (hitInfo.point.y > position.y + 0.2f)
-				{
-					position = hitInfo.point + Vector3.up * 0.05f;
-				}
-				else
-				{
-					position.y += 0.2f;
-				}
-				flag = true;
-			}
-			else
-			{
-				result = false;
-			}
-		}
-		while (flag);
-		return result;
-	}
-
-	public virtual float WaterFactor()
-	{
-		return WaterLevel.Factor(WorldSpaceBounds().ToBounds(), this);
-	}
-
-	public virtual float AirFactor()
-	{
-		if (!(WaterFactor() > 0.85f))
-		{
-			return 1f;
-		}
-		return 0f;
-	}
-
-	public bool WaterTestFromVolumes(Vector3 pos, out WaterLevel.WaterInfo info)
-	{
-		if (triggers == null)
-		{
-			info = default(WaterLevel.WaterInfo);
-			return false;
-		}
-		for (int i = 0; i < triggers.Count; i++)
-		{
-			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(pos, out info))
-			{
-				return true;
-			}
-		}
-		info = default(WaterLevel.WaterInfo);
-		return false;
-	}
-
-	public bool IsInWaterVolume(Vector3 pos)
-	{
-		if (triggers == null)
-		{
-			return false;
-		}
-		WaterLevel.WaterInfo info = default(WaterLevel.WaterInfo);
-		for (int i = 0; i < triggers.Count; i++)
-		{
-			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(pos, out info))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public bool WaterTestFromVolumes(Bounds bounds, out WaterLevel.WaterInfo info)
-	{
-		if (triggers == null)
-		{
-			info = default(WaterLevel.WaterInfo);
-			return false;
-		}
-		for (int i = 0; i < triggers.Count; i++)
-		{
-			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(bounds, out info))
-			{
-				return true;
-			}
-		}
-		info = default(WaterLevel.WaterInfo);
-		return false;
-	}
-
-	public bool WaterTestFromVolumes(Vector3 start, Vector3 end, float radius, out WaterLevel.WaterInfo info)
-	{
-		if (triggers == null)
-		{
-			info = default(WaterLevel.WaterInfo);
-			return false;
-		}
-		for (int i = 0; i < triggers.Count; i++)
-		{
-			if (triggers[i] is WaterVolume waterVolume && waterVolume.Test(start, end, radius, out info))
-			{
-				return true;
-			}
-		}
-		info = default(WaterLevel.WaterInfo);
-		return false;
-	}
-
-	public virtual bool BlocksWaterFor(BasePlayer player)
-	{
-		return false;
-	}
-
-	public virtual float Health()
-	{
-		return 0f;
-	}
-
-	public virtual float MaxHealth()
-	{
-		return 0f;
-	}
-
-	public virtual float MaxVelocity()
-	{
-		return 0f;
-	}
-
-	public virtual float BoundsPadding()
-	{
-		return 0.1f;
-	}
-
-	public virtual float PenetrationResistance(HitInfo info)
-	{
-		return 100f;
-	}
-
-	public virtual GameObjectRef GetImpactEffect(HitInfo info)
-	{
-		return impactEffect;
-	}
-
-	public virtual void OnAttacked(HitInfo info)
-	{
-	}
-
-	public virtual Item GetItem()
-	{
-		return null;
-	}
-
-	public virtual Item GetItem(ItemId itemId)
-	{
-		return null;
-	}
-
-	public virtual void GiveItem(Item item, GiveItemReason reason = GiveItemReason.Generic)
-	{
-		item.Remove();
-	}
-
-	public virtual bool CanBeLooted(BasePlayer player)
-	{
-		return true;
-	}
-
-	public virtual BaseEntity GetEntity()
-	{
-		return this;
-	}
-
-	public override string ToString()
-	{
-		if (_name == null)
-		{
-			if (base.isServer)
-			{
-				_name = string.Format("{1}[{0}]", net?.ID ?? default(NetworkableId), base.ShortPrefabName);
-			}
-			else
-			{
-				_name = base.ShortPrefabName;
-			}
-		}
-		return _name;
-	}
-
-	public virtual string Categorize()
-	{
-		return "entity";
-	}
-
-	public void Log(string str)
-	{
-		if (base.isClient)
-		{
-			Debug.Log("<color=#ffa>[" + ToString() + "] " + str + "</color>", base.gameObject);
-		}
-		else
-		{
-			Debug.Log("<color=#aff>[" + ToString() + "] " + str + "</color>", base.gameObject);
-		}
-	}
-
-	public void SetModel(Model mdl)
-	{
-		if (!(model == mdl))
-		{
-			model = mdl;
-		}
-	}
-
-	public Model GetModel()
-	{
-		return model;
-	}
-
-	public virtual Transform[] GetBones()
-	{
-		if ((bool)model)
-		{
-			return model.GetBones();
-		}
-		return null;
-	}
-
-	public virtual Transform FindBone(string strName)
-	{
-		if ((bool)model)
-		{
-			return model.FindBone(strName);
-		}
-		return base.transform;
-	}
-
-	public virtual uint FindBoneID(Transform boneTransform)
-	{
-		if ((bool)model)
-		{
-			return model.FindBoneID(boneTransform);
-		}
-		return StringPool.closest;
-	}
-
-	public virtual Transform FindClosestBone(Vector3 worldPos)
-	{
-		if ((bool)model)
-		{
-			return model.FindClosestBone(worldPos);
-		}
-		return base.transform;
-	}
-
-	public virtual bool ShouldBlockProjectiles()
-	{
-		return true;
-	}
-
-	public virtual bool ShouldInheritNetworkGroup()
-	{
-		return true;
-	}
-
-	public virtual bool SupportsChildDeployables()
-	{
-		return false;
-	}
-
-	public void BroadcastEntityMessage(string msg, float radius = 20f, int layerMask = 1218652417)
-	{
-		if (base.isClient)
-		{
-			return;
-		}
-		List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-		Vis.Entities(base.transform.position, radius, obj, layerMask);
-		foreach (BaseEntity item in obj)
-		{
-			if (item.isServer)
-			{
-				item.OnEntityMessage(this, msg);
-			}
-		}
-		Facepunch.Pool.FreeList(ref obj);
-	}
-
-	public virtual void OnEntityMessage(BaseEntity from, string msg)
-	{
-	}
-
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		BaseEntity baseEntity = parentEntity.Get(base.isServer);
-		info.msg.baseEntity = Facepunch.Pool.Get<ProtoBuf.BaseEntity>();
-		if (info.forDisk)
-		{
-			if (this is BasePlayer)
-			{
-				if (baseEntity == null || baseEntity.enableSaving)
-				{
-					info.msg.baseEntity.pos = base.transform.localPosition;
-					info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
-				}
-				else
-				{
-					info.msg.baseEntity.pos = base.transform.position;
-					info.msg.baseEntity.rot = base.transform.rotation.eulerAngles;
-				}
-			}
-			else
-			{
-				info.msg.baseEntity.pos = base.transform.localPosition;
-				info.msg.baseEntity.rot = base.transform.localRotation.eulerAngles;
-			}
-		}
-		else
-		{
-			info.msg.baseEntity.pos = GetNetworkPosition();
-			info.msg.baseEntity.rot = GetNetworkRotation().eulerAngles;
-			info.msg.baseEntity.time = GetNetworkTime();
-		}
-		info.msg.baseEntity.flags = (int)flags;
-		info.msg.baseEntity.skinid = skinID;
-		if (info.forDisk && this is BasePlayer)
-		{
-			if (baseEntity != null && baseEntity.enableSaving)
-			{
-				info.msg.parent = Facepunch.Pool.Get<ParentInfo>();
-				info.msg.parent.uid = parentEntity.uid;
-				info.msg.parent.bone = parentBone;
-			}
-		}
-		else if (baseEntity != null)
-		{
-			info.msg.parent = Facepunch.Pool.Get<ParentInfo>();
-			info.msg.parent.uid = parentEntity.uid;
-			info.msg.parent.bone = parentBone;
-		}
-		if (HasAnySlot())
-		{
-			info.msg.entitySlots = Facepunch.Pool.Get<EntitySlots>();
-			info.msg.entitySlots.slotLock = entitySlots[0].uid;
-			info.msg.entitySlots.slotFireMod = entitySlots[1].uid;
-			info.msg.entitySlots.slotUpperModification = entitySlots[2].uid;
-			info.msg.entitySlots.centerDecoration = entitySlots[5].uid;
-			info.msg.entitySlots.lowerCenterDecoration = entitySlots[6].uid;
-			info.msg.entitySlots.storageMonitor = entitySlots[7].uid;
-		}
-		if (info.forDisk && (bool)_spawnable)
-		{
-			_spawnable.Save(info);
-		}
-		if (OwnerID != 0L && (info.forDisk || ShouldNetworkOwnerInfo()))
-		{
-			info.msg.ownerInfo = Facepunch.Pool.Get<OwnerInfo>();
-			info.msg.ownerInfo.steamid = OwnerID;
-		}
-		if (Components == null)
-		{
-			return;
-		}
-		for (int i = 0; i < Components.Length; i++)
-		{
-			if (!(Components[i] == null))
-			{
-				Components[i].SaveComponent(info);
-			}
-		}
-	}
-
-	public virtual bool ShouldNetworkOwnerInfo()
-	{
-		return false;
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.baseEntity != null)
-		{
-			ProtoBuf.BaseEntity baseEntity = info.msg.baseEntity;
-			Flags old = flags;
-			flags = (Flags)baseEntity.flags;
-			OnFlagsChanged(old, flags);
-			OnSkinChanged(skinID, info.msg.baseEntity.skinid);
-			if (info.fromDisk)
-			{
-				if (baseEntity.pos.IsNaNOrInfinity())
-				{
-					Debug.LogWarning(ToString() + " has broken position - " + baseEntity.pos);
-					baseEntity.pos = Vector3.zero;
-				}
-				base.transform.localPosition = baseEntity.pos;
-				base.transform.localRotation = Quaternion.Euler(baseEntity.rot);
-			}
-		}
-		if (info.msg.entitySlots != null)
-		{
-			entitySlots[0].uid = info.msg.entitySlots.slotLock;
-			entitySlots[1].uid = info.msg.entitySlots.slotFireMod;
-			entitySlots[2].uid = info.msg.entitySlots.slotUpperModification;
-			entitySlots[5].uid = info.msg.entitySlots.centerDecoration;
-			entitySlots[6].uid = info.msg.entitySlots.lowerCenterDecoration;
-			entitySlots[7].uid = info.msg.entitySlots.storageMonitor;
-		}
-		if (info.msg.parent != null)
-		{
-			if (base.isServer)
-			{
-				BaseEntity entity = BaseNetworkable.serverEntities.Find(info.msg.parent.uid) as BaseEntity;
-				SetParent(entity, info.msg.parent.bone);
-			}
-			parentEntity.uid = info.msg.parent.uid;
-			parentBone = info.msg.parent.bone;
-		}
-		else
-		{
-			parentEntity.uid = default(NetworkableId);
-			parentBone = 0u;
-		}
-		if (info.msg.ownerInfo != null)
-		{
-			OwnerID = info.msg.ownerInfo.steamid;
-		}
-		if ((bool)_spawnable)
-		{
-			_spawnable.Load(info);
-		}
-		if (Components == null)
-		{
-			return;
-		}
-		for (int i = 0; i < Components.Length; i++)
-		{
-			if (!(Components[i] == null))
-			{
-				Components[i].LoadComponent(info);
-			}
-		}
 	}
 }

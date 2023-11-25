@@ -151,6 +151,19 @@ public class TerrainMeta : MonoBehaviour
 		return false;
 	}
 
+	public static float InnerDistToEdge2D(Vector3 worldPos)
+	{
+		float num = Position.x - Size.x;
+		float num2 = Position.x + Size.x + Size.x;
+		float num3 = Position.z - Size.z;
+		float num4 = Position.z + Size.z + Size.z;
+		float num5 = Mathf.Abs(worldPos.x - num);
+		float num6 = Mathf.Abs(worldPos.x - num2);
+		float num7 = Mathf.Abs(worldPos.z - num3);
+		float num8 = Mathf.Abs(worldPos.z - num4);
+		return Mathf.Min(num5, num6, num7, num8);
+	}
+
 	public static Vector3 RandomPointOffshore()
 	{
 		float num = UnityEngine.Random.Range(-1f, 1f);

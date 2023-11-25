@@ -81,7 +81,8 @@ public class BradleySpawner : MonoBehaviour, IServerComponent
 			{
 				baseEntity.Kill();
 			}
-			Debug.Log("BradleyAPC Spawned at :" + position);
+			Vector3 vector = position;
+			Debug.Log("BradleyAPC Spawned at :" + vector.ToString());
 			spawned = component;
 		}
 	}

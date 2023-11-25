@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ConVar;
 using Facepunch;
+using Oxide.Core;
 using ProtoBuf;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ public class EggHuntEvent : BaseHuntEvent
 	[NonSerialized]
 	public static float durationSeconds = 180f;
 
-	private Dictionary<ulong, EggHunter> _eggHunters = new Dictionary<ulong, EggHunter>();
+	public Dictionary<ulong, EggHunter> _eggHunters = new Dictionary<ulong, EggHunter>();
 
 	public List<CollectableEasterEgg> _spawnedEggs = new List<CollectableEasterEgg>();
 
@@ -60,7 +61,10 @@ public class EggHuntEvent : BaseHuntEvent
 
 	public void StartEvent()
 	{
-		SpawnEggs();
+		if (Interface.CallHook("OnHuntEventStart", this) == null)
+		{
+			SpawnEggs();
+		}
 	}
 
 	public void SpawnEggsAtPoint(int numEggs, Vector3 pos, Vector3 aimDir, float minDist = 1f, float maxDist = 2f)
@@ -239,7 +243,7 @@ public class EggHuntEvent : BaseHuntEvent
 			{
 				SetFlag(Flags.Reserved1, b: true);
 			}
-			if (timeAlive - warmupTime > durationSeconds && !IsInvoking(Cooldown))
+			if (timeAlive - warmupTime > durationSeconds && !IsInvoking(Cooldown) && Interface.CallHook("OnHuntEventEnd", this) == null)
 			{
 				SetFlag(Flags.Reserved2, b: true);
 				CleanupEggs();

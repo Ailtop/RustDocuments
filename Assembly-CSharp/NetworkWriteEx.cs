@@ -10,100 +10,90 @@ public static class NetworkWriteEx
 		{
 			Vector3 obj2 = GenericsUtil.Cast<T, Vector3>(obj);
 			write.Vector3(in obj2);
-			return;
 		}
-		if (typeof(T) == typeof(Ray))
+		else if (typeof(T) == typeof(Ray))
 		{
 			Ray obj3 = GenericsUtil.Cast<T, Ray>(obj);
 			write.Ray(in obj3);
-			return;
 		}
-		if (typeof(T) == typeof(float))
+		else if (typeof(T) == typeof(float))
 		{
 			write.Float(GenericsUtil.Cast<T, float>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(short))
+		else if (typeof(T) == typeof(short))
 		{
 			write.Int16(GenericsUtil.Cast<T, short>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(ushort))
+		else if (typeof(T) == typeof(ushort))
 		{
 			write.UInt16(GenericsUtil.Cast<T, ushort>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(int))
+		else if (typeof(T) == typeof(int))
 		{
 			write.Int32(GenericsUtil.Cast<T, int>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(uint))
+		else if (typeof(T) == typeof(uint))
 		{
 			write.UInt32(GenericsUtil.Cast<T, uint>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(byte[]))
+		else if (typeof(T) == typeof(byte[]))
 		{
 			write.Bytes(GenericsUtil.Cast<T, byte[]>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(long))
+		else if (typeof(T) == typeof(long))
 		{
 			write.Int64(GenericsUtil.Cast<T, long>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(ulong))
+		else if (typeof(T) == typeof(ulong))
 		{
 			write.UInt64(GenericsUtil.Cast<T, ulong>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(string))
+		else if (typeof(T) == typeof(string))
 		{
 			write.String(GenericsUtil.Cast<T, string>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(sbyte))
+		else if (typeof(T) == typeof(sbyte))
 		{
 			write.Int8(GenericsUtil.Cast<T, sbyte>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(byte))
+		else if (typeof(T) == typeof(byte))
 		{
 			write.UInt8(GenericsUtil.Cast<T, byte>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(bool))
+		else if (typeof(T) == typeof(bool))
 		{
 			write.Bool(GenericsUtil.Cast<T, bool>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(Color))
+		else if (typeof(T) == typeof(Color))
 		{
 			Color obj4 = GenericsUtil.Cast<T, Color>(obj);
 			write.Color(in obj4);
-			return;
 		}
-		if (typeof(T) == typeof(NetworkableId))
+		else if (typeof(T) == typeof(Color32))
+		{
+			Color32 obj5 = GenericsUtil.Cast<T, Color32>(obj);
+			write.Color32(in obj5);
+		}
+		else if (typeof(T) == typeof(NetworkableId))
 		{
 			write.EntityID(GenericsUtil.Cast<T, NetworkableId>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(ItemContainerId))
+		else if (typeof(T) == typeof(ItemContainerId))
 		{
 			write.ItemContainerID(GenericsUtil.Cast<T, ItemContainerId>(obj));
-			return;
 		}
-		if (typeof(T) == typeof(ItemId))
+		else if (typeof(T) == typeof(ItemId))
 		{
 			write.ItemID(GenericsUtil.Cast<T, ItemId>(obj));
-			return;
 		}
-		if ((object)obj is IProto proto)
+		else if (obj is IProto proto)
 		{
 			proto.WriteToStream(write);
-			return;
 		}
-		Debug.LogError(string.Concat("NetworkData.Write - no handler to write ", obj, " -> ", obj.GetType()));
+		else
+		{
+			T val = obj;
+			Debug.LogError("NetworkData.Write - no handler to write " + val?.ToString() + " -> " + obj.GetType());
+		}
 	}
 }

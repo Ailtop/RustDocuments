@@ -54,7 +54,7 @@ public class BaseLiquidVessel : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoDrink "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoDrink ");
 				}
 				using (TimeWarning.New("DoDrink"))
 				{
@@ -90,7 +90,7 @@ public class BaseLiquidVessel : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SendFilling "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SendFilling ");
 				}
 				using (TimeWarning.New("SendFilling"))
 				{
@@ -119,7 +119,7 @@ public class BaseLiquidVessel : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ThrowContents "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ThrowContents ");
 				}
 				using (TimeWarning.New("ThrowContents"))
 				{
@@ -385,8 +385,8 @@ public class BaseLiquidVessel : AttackEntity
 		nextFreeTime = UnityEngine.Time.realtimeSinceStartup - 1f;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void DoDrink(RPCMessage msg)
 	{
 		if (!msg.player.CanInteract())
@@ -484,7 +484,7 @@ public class BaseLiquidVessel : AttackEntity
 		{
 			return null;
 		}
-		if (UnityEngine.Physics.Raycast(ownerPlayer.eyes.HeadRay(), out var hitInfo, 2f, 1236478737))
+		if (UnityEngine.Physics.Raycast(ownerPlayer.eyes.HeadRay(), out var hitInfo, 2f, 1237003025))
 		{
 			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
 			if ((bool)entity && !hitInfo.collider.gameObject.CompareTag("Not Player Usable") && !hitInfo.collider.gameObject.CompareTag("Usable Primary"))

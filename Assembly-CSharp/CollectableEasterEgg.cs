@@ -2,6 +2,7 @@
 using System;
 using ConVar;
 using Network;
+using Oxide.Core;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +29,7 @@ public class CollectableEasterEgg : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PickUp "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_PickUp ");
 				}
 				using (TimeWarning.New("RPC_PickUp"))
 				{
@@ -64,7 +65,7 @@ public class CollectableEasterEgg : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_StartPickUp "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_StartPickUp ");
 				}
 				using (TimeWarning.New("RPC_StartPickUp"))
 				{
@@ -108,8 +109,8 @@ public class CollectableEasterEgg : BaseEntity
 		base.ServerInit();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_StartPickUp(RPCMessage msg)
 	{
 		if (!(msg.player == null))
@@ -118,8 +119,8 @@ public class CollectableEasterEgg : BaseEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_PickUp(RPCMessage msg)
 	{
 		if (msg.player == null)
@@ -133,7 +134,7 @@ public class CollectableEasterEgg : BaseEntity
 		}
 		if ((bool)EggHuntEvent.serverEvent)
 		{
-			if (!EggHuntEvent.serverEvent.IsEventActive())
+			if (!EggHuntEvent.serverEvent.IsEventActive() || Interface.CallHook("OnEventCollectablePickup", msg.player, this) != null)
 			{
 				return;
 			}

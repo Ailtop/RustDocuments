@@ -11,40 +11,8 @@ using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 using VLB;
 
-public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, IEntity, IAirSupply
+public class BaseSubmarine : BaseVehicle, IEngineControllerUser, IEntity, IAirSupply, IPoolVehicle
 {
-	[Serializable]
-	public class ParentTriggerInfo
-	{
-		public TriggerParent trigger;
-
-		public Transform triggerWaterLevel;
-	}
-
-	public float targetClimbSpeed;
-
-	public float maxDamageThisTick;
-
-	private float nextCollisionDamageTime;
-
-	private bool prevPrimaryFireInput;
-
-	private bool primaryFireInput;
-
-	private const float DECAY_TICK_TIME = 60f;
-
-	public TimeSince timeSinceLastUsed;
-
-	public TimeSince timeSinceTorpedoFired;
-
-	private TimeSince timeSinceFailRPCSent;
-
-	private float normalDrag;
-
-	private float highDrag;
-
-	private bool wasOnSurface;
-
 	[SerializeField]
 	[Header("Submarine Main")]
 	private Transform centreOfMassTransform;
@@ -72,9 +40,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	[SerializeField]
 	private SonarObject sonarObject;
-
-	[SerializeField]
-	private ParentTriggerInfo[] parentTriggers;
 
 	[SerializeField]
 	private GameObjectRef fuelStoragePrefab;
@@ -105,18 +70,19 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 	[SerializeField]
 	private bool internalAccessStorage;
 
-	[Header("Submarine Weaponry")]
 	[SerializeField]
+	[Header("Submarine Weaponry")]
 	public GameObjectRef torpedoStoragePrefab;
 
 	[SerializeField]
 	public Transform torpedoFiringPoint;
 
+	[FormerlySerializedAs("maxFireRate")]
 	[SerializeField]
-	public float maxFireRate = 1.5f;
+	public float reloadTime = 1.5f;
 
-	[Header("Submarine Audio & FX")]
 	[SerializeField]
+	[Header("Submarine Audio & FX")]
 	protected SubmarineAudio submarineAudio;
 
 	[SerializeField]
@@ -232,6 +198,30 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public int waterLayerMask;
 
+	public float targetClimbSpeed;
+
+	public float maxDamageThisTick;
+
+	private float nextCollisionDamageTime;
+
+	private bool prevPrimaryFireInput;
+
+	private bool primaryFireInput;
+
+	private const float DECAY_TICK_TIME = 60f;
+
+	public TimeSince timeSinceLastUsed;
+
+	public TimeSince timeSinceTorpedoFired;
+
+	private TimeSince timeSinceFailRPCSent;
+
+	private float normalDrag;
+
+	private float highDrag;
+
+	private bool wasOnSurface;
+
 	public ItemModGiveOxygen.AirSupplyType AirType => ItemModGiveOxygen.AirSupplyType.Submarine;
 
 	public VehicleEngineController<BaseSubmarine>.EngineState EngineState => engineController.CurEngineState;
@@ -332,7 +322,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuel ");
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -361,7 +351,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenItemStorage "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenItemStorage ");
 				}
 				using (TimeWarning.New("RPC_OpenItemStorage"))
 				{
@@ -397,7 +387,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenTorpedoStorage "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenTorpedoStorage ");
 				}
 				using (TimeWarning.New("RPC_OpenTorpedoStorage"))
 				{
@@ -430,6 +420,152 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		waterLayerMask = LayerMask.GetMask("Water");
+		engineController = new VehicleEngineController<BaseSubmarine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.submarine != null)
+		{
+			ThrottleInput = info.msg.submarine.throttle;
+			UpDownInput = info.msg.submarine.upDown;
+			RudderInput = info.msg.submarine.rudder;
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.submarine.fuelStorageID;
+			cachedFuelAmount = info.msg.submarine.fuelAmount;
+			torpedoStorageInstance.uid = info.msg.submarine.torpedoStorageID;
+			Oxygen = info.msg.submarine.oxygen;
+			itemStorageInstance.uid = info.msg.submarine.itemStorageID;
+			UpdatePhysicalRudder(RudderInput, 0f);
+		}
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (old != next && base.isServer)
+		{
+			ServerFlagsChanged(old, next);
+		}
+	}
+
+	public override float WaterFactorForPlayer(BasePlayer player)
+	{
+		return 0f;
+	}
+
+	public override float AirFactor()
+	{
+		return Oxygen;
+	}
+
+	public override bool BlocksWaterFor(BasePlayer player)
+	{
+		return player.GetMountedVehicle() == this;
+	}
+
+	public float GetFuelAmount()
+	{
+		if (base.isServer)
+		{
+			return engineController.FuelSystem.GetFuelAmount();
+		}
+		return cachedFuelAmount;
+	}
+
+	public override float GetSpeed()
+	{
+		if (IsStationary())
+		{
+			return 0f;
+		}
+		return Vector3.Dot(Velocity, base.transform.forward);
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (!base.CanBeLooted(player))
+		{
+			return false;
+		}
+		if (PlayerIsMounted(player))
+		{
+			return base.CanBeLooted(player);
+		}
+		if (internalAccessStorage)
+		{
+			return false;
+		}
+		if (!IsOn())
+		{
+			return base.CanBeLooted(player);
+		}
+		return false;
+	}
+
+	public float GetAirTimeRemaining()
+	{
+		if (Oxygen <= 0.5f)
+		{
+			return 0f;
+		}
+		return Mathf.InverseLerp(0.5f, 1f, Oxygen) * oxygenminutes * 60f;
+	}
+
+	protected override bool CanPushNow(BasePlayer pusher)
+	{
+		if (!base.CanPushNow(pusher))
+		{
+			return false;
+		}
+		if (pusher.isMounted || pusher.IsSwimming() || !pusher.IsOnGround())
+		{
+			return false;
+		}
+		return !pusher.IsStandingOnEntity(this, 8192);
+	}
+
+	private void UpdatePhysicalRudder(float turnInput, float deltaTime)
+	{
+		float num = (0f - turnInput) * maxRudderAngle;
+		float y = ((!base.IsMovingOrOn) ? num : Mathf.MoveTowards(PhysicalRudderAngle, num, 200f * deltaTime));
+		Quaternion localRotation = Quaternion.Euler(0f, y, 0f);
+		if (base.isClient)
+		{
+			rudderVisualTransform.localRotation = localRotation;
+		}
+		rudderDetailedColliderTransform.localRotation = localRotation;
+	}
+
+	private bool CanMount(BasePlayer player)
+	{
+		return !player.IsDead();
+	}
+
+	private void UpdateWaterInfo()
+	{
+		waterSurfaceY = GetWaterSurfaceY();
+		curSubDepthY = waterSurfaceY - base.transform.position.y;
+	}
+
+	private float GetWaterSurfaceY()
+	{
+		if (UnityEngine.Physics.Raycast(base.transform.position - Vector3.up * 1.5f, Vector3.up, out var hitInfo, 5f, waterLayerMask, QueryTriggerInteraction.Collide))
+		{
+			return hitInfo.point.y;
+		}
+		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(base.transform.position, waves: true, volumes: true, this);
+		if (!waterInfo.isValid)
+		{
+			return base.transform.position.y - 1f;
+		}
+		return waterInfo.surfaceLevel;
 	}
 
 	public override void ServerInit()
@@ -656,7 +792,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		if (driver != null && primaryFireInput)
 		{
 			bool flag = true;
-			if (IsInWater && (float)timeSinceTorpedoFired >= maxFireRate)
+			if (IsInWater && (float)timeSinceTorpedoFired >= reloadTime)
 			{
 				float minSpeed = GetSpeed() + 2f;
 				if (TryFireProjectile(torpedoContainer, AmmoTypes.TORPEDO, torpedoFiringPoint.position, torpedoFiringPoint.forward, driver, 1f, minSpeed, out var _))
@@ -681,15 +817,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		if ((float)timeSinceLastUsed > 300f && LightsAreOn)
 		{
 			SetFlag(Flags.Reserved5, b: false);
-		}
-		for (int i = 0; i < parentTriggers.Length; i++)
-		{
-			float num10 = parentTriggers[i].triggerWaterLevel.position.y - base.transform.position.y;
-			bool flag2 = curSubDepthY - num10 <= 0f;
-			if (flag2 != parentTriggers[i].trigger.enabled)
-			{
-				parentTriggers[i].trigger.enabled = flag2;
-			}
 		}
 	}
 
@@ -827,7 +954,7 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 
 	public void SubmarineDecay()
 	{
-		BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsed, outsidedecayminutes, deepwaterdecayminutes);
+		BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsed, outsidedecayminutes, deepwaterdecayminutes, MotorRowboat.decaystartdelayminutes, preventDecayIndoors: true);
 	}
 
 	[RPC_Server]
@@ -840,8 +967,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_OpenTorpedoStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -855,8 +982,8 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_OpenItemStorage(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -881,148 +1008,6 @@ public class BaseSubmarine : BaseVehicle, IPoolVehicle, IEngineControllerUser, I
 				driver.GiveAchievement("SUBMARINE_MOONPOOL");
 			}
 		}
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
-		waterLayerMask = LayerMask.GetMask("Water");
-		engineController = new VehicleEngineController<BaseSubmarine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.submarine != null)
-		{
-			ThrottleInput = info.msg.submarine.throttle;
-			UpDownInput = info.msg.submarine.upDown;
-			RudderInput = info.msg.submarine.rudder;
-			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.submarine.fuelStorageID;
-			cachedFuelAmount = info.msg.submarine.fuelAmount;
-			torpedoStorageInstance.uid = info.msg.submarine.torpedoStorageID;
-			Oxygen = info.msg.submarine.oxygen;
-			itemStorageInstance.uid = info.msg.submarine.itemStorageID;
-			UpdatePhysicalRudder(RudderInput, 0f);
-		}
-	}
-
-	public override void OnFlagsChanged(Flags old, Flags next)
-	{
-		base.OnFlagsChanged(old, next);
-		if (old != next && base.isServer)
-		{
-			ServerFlagsChanged(old, next);
-		}
-	}
-
-	public override float WaterFactorForPlayer(BasePlayer player)
-	{
-		return 0f;
-	}
-
-	public override float AirFactor()
-	{
-		return Oxygen;
-	}
-
-	public override bool BlocksWaterFor(BasePlayer player)
-	{
-		return true;
-	}
-
-	public float GetFuelAmount()
-	{
-		if (base.isServer)
-		{
-			return engineController.FuelSystem.GetFuelAmount();
-		}
-		return cachedFuelAmount;
-	}
-
-	public float GetSpeed()
-	{
-		if (IsStationary())
-		{
-			return 0f;
-		}
-		return Vector3.Dot(Velocity, base.transform.forward);
-	}
-
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		if (!base.CanBeLooted(player))
-		{
-			return false;
-		}
-		if (PlayerIsMounted(player))
-		{
-			return true;
-		}
-		if (internalAccessStorage)
-		{
-			return false;
-		}
-		return !IsOn();
-	}
-
-	public float GetAirTimeRemaining()
-	{
-		if (Oxygen <= 0.5f)
-		{
-			return 0f;
-		}
-		return Mathf.InverseLerp(0.5f, 1f, Oxygen) * oxygenminutes * 60f;
-	}
-
-	protected override bool CanPushNow(BasePlayer pusher)
-	{
-		if (!base.CanPushNow(pusher))
-		{
-			return false;
-		}
-		if (pusher.isMounted || pusher.IsSwimming() || !pusher.IsOnGround())
-		{
-			return false;
-		}
-		return !pusher.IsStandingOnEntity(this, 8192);
-	}
-
-	private void UpdatePhysicalRudder(float turnInput, float deltaTime)
-	{
-		float num = (0f - turnInput) * maxRudderAngle;
-		float y = ((!base.IsMovingOrOn) ? num : Mathf.MoveTowards(PhysicalRudderAngle, num, 200f * deltaTime));
-		Quaternion localRotation = Quaternion.Euler(0f, y, 0f);
-		if (base.isClient)
-		{
-			rudderVisualTransform.localRotation = localRotation;
-		}
-		rudderDetailedColliderTransform.localRotation = localRotation;
-	}
-
-	private bool CanMount(BasePlayer player)
-	{
-		return !player.IsDead();
-	}
-
-	private void UpdateWaterInfo()
-	{
-		waterSurfaceY = GetWaterSurfaceY();
-		curSubDepthY = waterSurfaceY - base.transform.position.y;
-	}
-
-	private float GetWaterSurfaceY()
-	{
-		if (UnityEngine.Physics.Raycast(base.transform.position - Vector3.up * 1.5f, Vector3.up, out var hitInfo, 5f, waterLayerMask, QueryTriggerInteraction.Collide))
-		{
-			return hitInfo.point.y;
-		}
-		WaterLevel.WaterInfo waterInfo = WaterLevel.GetWaterInfo(base.transform.position, waves: true, this);
-		if (!waterInfo.isValid)
-		{
-			return base.transform.position.y - 1f;
-		}
-		return waterInfo.surfaceLevel;
 	}
 
 	void IEngineControllerUser.Invoke(Action action, float time)

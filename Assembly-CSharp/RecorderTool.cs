@@ -49,7 +49,7 @@ public class RecorderTool : ThrownWeapon, ICassettePlayer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_TogglePlaying "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_TogglePlaying ");
 				}
 				using (TimeWarning.New("Server_TogglePlaying"))
 				{
@@ -89,8 +89,8 @@ public class RecorderTool : ThrownWeapon, ICassettePlayer
 		return cachedCassette != null;
 	}
 
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	public void Server_TogglePlaying(RPCMessage msg)
 	{
 		bool b = msg.read.ReadByte() == 1;

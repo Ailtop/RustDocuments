@@ -16,7 +16,7 @@ public class CustomDoorManipulator : DoorManipulator
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoPair "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoPair ");
 				}
 				using (TimeWarning.New("DoPair"))
 				{
@@ -52,7 +52,7 @@ public class CustomDoorManipulator : DoorManipulator
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerActionChange "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerActionChange ");
 				}
 				using (TimeWarning.New("ServerActionChange"))
 				{

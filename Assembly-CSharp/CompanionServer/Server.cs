@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -60,12 +59,13 @@ public static class Server
 		}
 		if (IsEnabled)
 		{
-			UnityEngine.Debug.LogWarning("Rust+ is already started up! Skipping second startup");
+			Debug.LogWarning("Rust+ is already started up! Skipping second startup");
 			return;
 		}
 		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
 		if (!(activeGameMode != null) || activeGameMode.rustPlus)
 		{
+			Shutdown();
 			Map.PopulateCache();
 			if (App.port == 0)
 			{
@@ -77,7 +77,7 @@ public static class Server
 			}
 			catch (Exception arg)
 			{
-				UnityEngine.Debug.LogError($"Companion server failed to start: {arg}");
+				Debug.LogError($"Companion server failed to start: {arg}");
 			}
 			PostInitializeServer();
 		}
@@ -105,6 +105,11 @@ public static class Server
 		Listener?.EntitySubscribers?.Send(target, broadcast);
 	}
 
+	public static void Broadcast(ClanTarget target, AppBroadcast broadcast)
+	{
+		Listener?.ClanSubscribers?.Send(target, broadcast);
+	}
+
 	public static void Broadcast(CameraTarget target, AppBroadcast broadcast)
 	{
 		Listener?.CameraSubscribers?.Send(target, broadcast);
@@ -112,7 +117,7 @@ public static class Server
 
 	public static bool HasAnySubscribers(CameraTarget target)
 	{
-		return Listener?.CameraSubscribers?.HasAnySubscribers(target) ?? false;
+		return (Listener?.CameraSubscribers?.HasAnySubscribers(target)).GetValueOrDefault();
 	}
 
 	public static bool CanSendPairingNotification(ulong playerId)
@@ -128,25 +133,27 @@ public static class Server
 
 	private static async Task SetupServerRegistration()
 	{
-		_ = 2;
+		_ = 3;
 		try
 		{
 			if (TryLoadServerRegistration(out var _, out var serverToken))
 			{
-				StringContent content = new StringContent(serverToken, Encoding.UTF8, "text/plain");
-				HttpResponseMessage httpResponseMessage = await Http.PostAsync("https://companion-rust.facepunch.com/api/server/refresh", content);
+				StringContent refreshContent = new StringContent(serverToken, Encoding.UTF8, "text/plain");
+				HttpResponseMessage httpResponseMessage = await AutoRetry(() => Http.PostAsync("https://companion-rust.facepunch.com/api/server/refresh", refreshContent));
 				if (httpResponseMessage.IsSuccessStatusCode)
 				{
 					SetServerRegistration(await httpResponseMessage.Content.ReadAsStringAsync());
 					return;
 				}
-				UnityEngine.Debug.LogWarning("Failed to refresh server ID - registering a new one");
+				Debug.LogWarning("Failed to refresh server ID - registering a new one");
 			}
-			SetServerRegistration(await Http.GetStringAsync("https://companion-rust.facepunch.com/api/server/register"));
+			HttpResponseMessage obj = await AutoRetry(() => Http.GetAsync("https://companion-rust.facepunch.com/api/server/register"));
+			obj.EnsureSuccessStatusCode();
+			SetServerRegistration(await obj.Content.ReadAsStringAsync());
 		}
 		catch (Exception arg)
 		{
-			UnityEngine.Debug.LogError($"Failed to setup companion server registration: {arg}");
+			Debug.LogError($"Failed to setup companion server registration: {arg}");
 		}
 	}
 
@@ -168,7 +175,7 @@ public static class Server
 		}
 		catch (Exception arg)
 		{
-			UnityEngine.Debug.LogError($"Failed to load companion server registration: {arg}");
+			Debug.LogError($"Failed to load companion server registration: {arg}");
 			return false;
 		}
 	}
@@ -182,7 +189,7 @@ public static class Server
 		}
 		catch (Exception arg)
 		{
-			UnityEngine.Debug.LogError($"Failed to parse registration response JSON: {responseJson}\n\n{arg}");
+			Debug.LogError($"Failed to parse registration response JSON: {responseJson}\n\n{arg}");
 		}
 		SetServerId(registerResponse?.ServerId);
 		Token = registerResponse?.ServerToken;
@@ -196,7 +203,7 @@ public static class Server
 		}
 		catch (Exception arg2)
 		{
-			UnityEngine.Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
+			Debug.LogError($"Unable to save companion app server registration - server ID may be different after restart: {arg2}");
 		}
 	}
 
@@ -204,23 +211,23 @@ public static class Server
 	{
 		if (!IsEnabled)
 		{
-			SetServerId(null);
+			Shutdown();
 			return;
 		}
 		try
 		{
-			string arg = await GetPublicIPAsync();
-			StringContent content = new StringContent("", Encoding.UTF8, "text/plain");
-			HttpResponseMessage testResponse = await Http.PostAsync("https://companion-rust.facepunch.com/api/server" + $"/test_connection?address={arg}&port={App.port}", content);
+			string publicIp = await App.GetPublicIPAsync();
+			StringContent testContent = new StringContent("", Encoding.UTF8, "text/plain");
+			HttpResponseMessage testResponse = await AutoRetry(() => Http.PostAsync("https://companion-rust.facepunch.com/api/server" + $"/test_connection?address={publicIp}&port={App.port}", testContent));
 			string text = await testResponse.Content.ReadAsStringAsync();
 			TestConnectionResponse testConnectionResponse = null;
 			try
 			{
 				testConnectionResponse = JsonConvert.DeserializeObject<TestConnectionResponse>(text);
 			}
-			catch (Exception arg2)
+			catch (Exception arg)
 			{
-				UnityEngine.Debug.LogError($"Failed to parse connectivity test response JSON: {text}\n\n{arg2}");
+				Debug.LogError($"Failed to parse connectivity test response JSON: {text}\n\n{arg}");
 			}
 			if (testConnectionResponse == null)
 			{
@@ -230,37 +237,44 @@ public static class Server
 			string text2 = string.Join("\n", messages ?? Enumerable.Empty<string>());
 			if (testResponse.StatusCode == (HttpStatusCode)555)
 			{
-				UnityEngine.Debug.LogError("Rust+ companion server connectivity test failed! Disabling Rust+ features.\n\n" + text2);
+				Debug.LogError("Rust+ companion server connectivity test failed! Disabling Rust+ features.\n\n" + text2);
 				SetServerId(null);
 				return;
 			}
 			testResponse.EnsureSuccessStatusCode();
 			if (!string.IsNullOrWhiteSpace(text2))
 			{
-				UnityEngine.Debug.LogWarning("Rust+ companion server connectivity test has warnings:\n" + text2);
+				Debug.LogWarning("Rust+ companion server connectivity test has warnings:\n" + text2);
 			}
 		}
-		catch (Exception arg3)
+		catch (Exception arg2)
 		{
-			UnityEngine.Debug.LogError($"Failed to check connectivity to the companion server: {arg3}");
+			Debug.LogError($"Failed to check connectivity to the companion server: {arg2}");
 		}
 	}
 
-	private static async Task<string> GetPublicIPAsync()
+	private static async Task<HttpResponseMessage> AutoRetry(Func<Task<HttpResponseMessage>> action)
 	{
-		Stopwatch timer = Stopwatch.StartNew();
-		string publicIP;
-		while (true)
+		Exception lastException = null;
+		for (int i = 0; i < 5; i++)
 		{
-			bool num = timer.Elapsed.TotalMinutes > 2.0;
-			publicIP = App.GetPublicIP();
-			if (num || (!string.IsNullOrWhiteSpace(publicIP) && publicIP != "0.0.0.0"))
+			try
 			{
-				break;
+				HttpResponseMessage httpResponseMessage = await action();
+				int statusCode = (int)httpResponseMessage.StatusCode;
+				if (statusCode != 555 && statusCode >= 500 && statusCode <= 599 && i < 4)
+				{
+					httpResponseMessage.EnsureSuccessStatusCode();
+				}
+				return httpResponseMessage;
 			}
-			await Task.Delay(10000);
+			catch (Exception ex)
+			{
+				lastException = ex;
+			}
+			await Task.Delay(30000);
 		}
-		return publicIP;
+		throw lastException ?? new Exception("Exceeded maximum number of retries");
 	}
 
 	private static void SetServerId(string serverId)

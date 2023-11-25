@@ -9,8 +9,6 @@ using UnityEngine;
 
 public class PhoneController : EntityComponent<BaseEntity>
 {
-	public PhoneController activeCallTo;
-
 	public int PhoneNumber;
 
 	public string PhoneName;
@@ -71,19 +69,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 
 	public List<ProtoBuf.VoicemailEntry> savedVoicemail;
 
-	public Telephone.CallState serverState { get; set; }
-
-	public uint AnsweringMessageId
-	{
-		get
-		{
-			if (!(base.baseEntity is Telephone telephone))
-			{
-				return 0u;
-			}
-			return telephone.AnsweringMessageId;
-		}
-	}
+	public PhoneController activeCallTo;
 
 	public int MaxVoicemailSlots
 	{
@@ -141,6 +127,46 @@ public class PhoneController : EntityComponent<BaseEntity>
 			}
 			return telephone.cachedCassette;
 		}
+	}
+
+	public Telephone.CallState serverState { get; set; }
+
+	public uint AnsweringMessageId
+	{
+		get
+		{
+			if (!(base.baseEntity is Telephone telephone))
+			{
+				return 0u;
+			}
+			return telephone.AnsweringMessageId;
+		}
+	}
+
+	private bool IsPowered()
+	{
+		if (base.baseEntity != null && base.baseEntity is IOEntity iOEntity)
+		{
+			return iOEntity.IsPowered();
+		}
+		return false;
+	}
+
+	public bool IsSavedContactValid(string contactName, int contactNumber)
+	{
+		if (contactName.Length <= 0 || contactName.Length > 20)
+		{
+			return false;
+		}
+		if (contactNumber < 10000000 || contactNumber >= 100000000)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public void OnFlagsChanged(BaseEntity.Flags old, BaseEntity.Flags next)
+	{
 	}
 
 	public void ServerInit()
@@ -350,7 +376,7 @@ public class PhoneController : EntityComponent<BaseEntity>
 			num = activeCallTo.cachedCassette.AudioId;
 			if (num == 0)
 			{
-				arg2 = StringPool.Get(activeCallTo.cachedCassette.PreloadedAudio.name);
+				arg2 = activeCallTo.cachedCassette.PreloadContent.GetSoundContentId(activeCallTo.cachedCassette.PreloadedAudio);
 			}
 		}
 		if (arg.IsValid)
@@ -689,31 +715,5 @@ public class PhoneController : EntityComponent<BaseEntity>
 			FileStorage.server.Remove(item.audioId, FileStorage.Type.ogg, base.baseEntity.net.ID);
 		}
 		Pool.FreeList(ref savedVoicemail);
-	}
-
-	private bool IsPowered()
-	{
-		if (base.baseEntity != null && base.baseEntity is IOEntity iOEntity)
-		{
-			return iOEntity.IsPowered();
-		}
-		return false;
-	}
-
-	public bool IsSavedContactValid(string contactName, int contactNumber)
-	{
-		if (contactName.Length <= 0 || contactName.Length > 20)
-		{
-			return false;
-		}
-		if (contactNumber < 10000000 || contactNumber >= 100000000)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public void OnFlagsChanged(BaseEntity.Flags old, BaseEntity.Flags next)
-	{
 	}
 }

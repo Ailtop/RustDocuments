@@ -1,3 +1,4 @@
+using Rust.UI;
 using TMPro;
 using UnityEngine;
 
@@ -7,9 +8,15 @@ public class ESPPlayerInfo : MonoBehaviour
 {
 	public Vector3 WorldOffset;
 
-	public TextMeshProUGUI Text;
+	public RustText Text;
 
-	public TextMeshProUGUI Image;
+	public TextMeshProUGUI[] TextElements;
+
+	public RustIcon Loading;
+
+	public GameObject ClanElement;
+
+	public RustText ClanText;
 
 	public CanvasGroup group;
 
@@ -18,6 +25,8 @@ public class ESPPlayerInfo : MonoBehaviour
 	public Gradient gradientTeam;
 
 	public Color TeamColor;
+
+	public Color ClanColor;
 
 	public Color AllyColor = Color.blue;
 

@@ -44,7 +44,7 @@ public class AdventCalendar : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RequestGift "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RequestGift ");
 				}
 				using (TimeWarning.New("RPC_RequestGift"))
 				{
@@ -153,8 +153,8 @@ public class AdventCalendar : BaseCombatEntity
 		return false;
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	public void RPC_RequestGift(RPCMessage msg)
 	{

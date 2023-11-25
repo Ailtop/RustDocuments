@@ -126,7 +126,8 @@ public class ProceduralDynamicDungeon : BaseEntity
 		if (!Rust.Application.isLoadingSave)
 		{
 			baseseed = (seed = (uint)Random.Range(0, 12345567));
-			Debug.Log("Spawning dungeon with seed :" + (int)seed);
+			int num = (int)seed;
+			Debug.Log("Spawning dungeon with seed :" + num);
 		}
 		base.ServerInit();
 		if (!Rust.Application.isLoadingSave)
@@ -226,8 +227,8 @@ public class ProceduralDynamicDungeon : BaseEntity
 		}
 	}
 
-	[ExecuteInEditMode]
 	[ContextMenu("Test Grid")]
+	[ExecuteInEditMode]
 	public void GenerateGrid()
 	{
 		Vector3 vector = base.transform.position - new Vector3((float)gridResolution * gridSpacing * 0.5f, 0f, (float)gridResolution * gridSpacing * 0.5f);
@@ -235,7 +236,7 @@ public class ProceduralDynamicDungeon : BaseEntity
 		grid = new bool[gridResolution * gridResolution];
 		for (int i = 0; i < grid.Length; i++)
 		{
-			grid[i] = ((SeedRandom.Range(ref seed, 0, 2) == 0) ? true : false);
+			grid[i] = SeedRandom.Range(ref seed, 0, 2) == 0;
 		}
 		SetEntrance(3, 0);
 		for (int j = 0; j < gridResolution; j++)

@@ -21,8 +21,8 @@ public class Player : ConsoleSystem
 	[ServerVar(Saved = true, ShowInAdminUI = true, Help = "Whether the crawling state expires")]
 	public static bool woundforever = false;
 
-	[ServerUserVar]
 	[ClientVar(AllowRunFromServer = true)]
+	[ServerUserVar]
 	public static void cinematic_play(Arg arg)
 	{
 		if (!arg.HasArgs() || !arg.IsServerside)
@@ -361,7 +361,7 @@ public class Player : ConsoleSystem
 		for (int i = 0; i < PlayerBelt.MaxBeltSlots; i++)
 		{
 			Item itemInSlot = basePlayer.Belt.GetItemInSlot(i);
-			if (itemInSlot != null && itemInSlot.GetHeldEntity() is BaseLiquidVessel baseLiquidVessel && baseLiquidVessel.hasLid)
+			if (itemInSlot != null && itemInSlot.GetHeldEntity() is BaseLiquidVessel { hasLid: not false } baseLiquidVessel)
 			{
 				int amount = 999;
 				if (baseLiquidVessel.GetItem().info.TryGetComponent<ItemModContainer>(out var component))
@@ -388,7 +388,7 @@ public class Player : ConsoleSystem
 			{
 				if (baseProjectile.primaryMagazine != null)
 				{
-					baseProjectile.primaryMagazine.contents = baseProjectile.primaryMagazine.capacity;
+					baseProjectile.SetAmmoCount(baseProjectile.primaryMagazine.capacity);
 					baseProjectile.SendNetworkUpdateImmediate();
 				}
 			}
@@ -417,6 +417,35 @@ public class Player : ConsoleSystem
 		item.name = HumanBodyResourceDispenser.CreateSkullName(text);
 		item.streamerName = item.name;
 		basePlayer.inventory.GiveItem(item);
+	}
+
+	[ServerVar]
+	public static string createTrophy(Arg arg)
+	{
+		BasePlayer basePlayer = ArgEx.Player(arg);
+		Entity.EntitySpawnRequest spawnEntityFromName = Entity.GetSpawnEntityFromName(arg.GetString(0));
+		if (!spawnEntityFromName.Valid)
+		{
+			return spawnEntityFromName.Error;
+		}
+		if (GameManager.server.FindPrefab(spawnEntityFromName.PrefabName).TryGetComponent<BaseCombatEntity>(out var component))
+		{
+			Item item = ItemManager.CreateByName("head.bag", 1, 0uL);
+			HeadEntity associatedEntity = ItemModAssociatedEntity<HeadEntity>.GetAssociatedEntity(item);
+			if (associatedEntity != null)
+			{
+				associatedEntity.SetupSourceId(component.prefabID);
+			}
+			if (basePlayer.inventory.GiveItem(item))
+			{
+				basePlayer.Command("note.inv", item.info.itemid, 1);
+			}
+			else
+			{
+				item.DropAndTossUpwards(basePlayer.eyes.position);
+			}
+		}
+		return "Created head";
 	}
 
 	[ServerVar]

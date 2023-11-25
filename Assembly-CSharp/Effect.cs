@@ -58,7 +58,7 @@ public class Effect : EffectData
 			string materialName = StringPool.Get(info.HitMaterial);
 			string strName = EffectDictionary.GetParticle(info.damageTypes.GetMajorityDamageType(), materialName);
 			string decal = EffectDictionary.GetDecal(info.damageTypes.GetMajorityDamageType(), materialName);
-			if (TerrainMeta.WaterMap != null && info.HitMaterial != Projectile.WaterMaterialID() && info.HitMaterial != Projectile.FleshMaterialID() && info.HitPositionWorld.y < TerrainMeta.WaterMap.GetHeight(info.HitPositionWorld) && WaterLevel.Test(info.HitPositionWorld, waves: false))
+			if (TerrainMeta.WaterMap != null && info.HitMaterial != Projectile.WaterMaterialID() && info.HitMaterial != Projectile.FleshMaterialID() && info.HitPositionWorld.y < TerrainMeta.WaterMap.GetHeight(info.HitPositionWorld) && WaterLevel.Test(info.HitPositionWorld, waves: false, volumes: false))
 			{
 				return;
 			}
@@ -165,7 +165,7 @@ public class Effect : EffectData
 				return;
 			}
 			string materialName = StringPool.Get(info.HitMaterial);
-			if (TerrainMeta.WaterMap != null && info.HitMaterial != Projectile.WaterMaterialID() && info.HitMaterial != Projectile.FleshMaterialID() && info.HitPositionWorld.y < TerrainMeta.WaterMap.GetHeight(info.HitPositionWorld) && WaterLevel.Test(info.HitPositionWorld, waves: false))
+			if (TerrainMeta.WaterMap != null && info.HitMaterial != Projectile.WaterMaterialID() && info.HitMaterial != Projectile.FleshMaterialID() && info.HitPositionWorld.y < TerrainMeta.WaterMap.GetHeight(info.HitPositionWorld) && WaterLevel.Test(info.HitPositionWorld, waves: false, volumes: false))
 			{
 				return;
 			}

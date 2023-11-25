@@ -16,4 +16,7 @@ public class Water : ConsoleSystem
 	public static int MaxReflections = 2;
 
 	public static int MinReflections = 0;
+
+	[ClientVar(ClientAdmin = true, Default = "0")]
+	public static bool scaled_time = false;
 }

@@ -105,7 +105,7 @@ public class SprayCan : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BeginFreehandSpray "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - BeginFreehandSpray ");
 				}
 				using (TimeWarning.New("BeginFreehandSpray"))
 				{
@@ -141,12 +141,16 @@ public class SprayCan : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ChangeItemSkin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ChangeItemSkin ");
 				}
 				using (TimeWarning.New("ChangeItemSkin"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
+						if (!RPC_Server.CallsPerSecond.Test(151738090u, "ChangeItemSkin", this, player, 2uL))
+						{
+							return true;
+						}
 						if (!RPC_Server.IsActiveItem.Test(151738090u, "ChangeItemSkin", this, player))
 						{
 							return true;
@@ -177,7 +181,7 @@ public class SprayCan : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - CreateSpray "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - CreateSpray ");
 				}
 				using (TimeWarning.New("CreateSpray"))
 				{
@@ -213,7 +217,7 @@ public class SprayCan : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetBlockColourId "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_SetBlockColourId ");
 				}
 				using (TimeWarning.New("Server_SetBlockColourId"))
 				{
@@ -325,6 +329,7 @@ public class SprayCan : HeldEntity
 		return !triggerNoSpray.IsPositionValid(pos);
 	}
 
+	[RPC_Server.CallsPerSecond(2uL)]
 	[RPC_Server]
 	[RPC_Server.IsActiveItem]
 	private void ChangeItemSkin(RPCMessage msg)
@@ -350,163 +355,169 @@ public class SprayCan : HeldEntity
 			SprayFailResponse(SprayFailReason.SkinNotOwned);
 			return;
 		}
-		if (baseNetworkable != null && baseNetworkable is BaseEntity baseEntity2)
+		if (baseNetworkable != null)
 		{
-			Vector3 position = baseEntity2.WorldSpaceBounds().ClosestPoint(msg.player.eyes.position);
-			if (!msg.player.IsVisible(position, 3f))
+			BaseEntity baseEntity2 = baseNetworkable as BaseEntity;
+			if ((object)baseEntity2 != null)
 			{
-				SprayFailResponse(SprayFailReason.LineOfSight);
-				return;
-			}
-			if (baseNetworkable is Door door)
-			{
-				if (!door.GetPlayerLockPermission(msg.player))
+				Vector3 position = baseEntity2.WorldSpaceBounds().ClosestPoint(msg.player.eyes.position);
+				if (!msg.player.IsVisible(position, 3f))
 				{
-					msg.player.ChatMessage("Door must be openable");
+					SprayFailResponse(SprayFailReason.LineOfSight);
 					return;
 				}
-				if (door.IsOpen())
+				if (baseNetworkable is Door door)
 				{
-					msg.player.ChatMessage("Door must be closed");
-					return;
+					if (!door.GetPlayerLockPermission(msg.player))
+					{
+						msg.player.ChatMessage("Door must be openable");
+						return;
+					}
+					if (door.IsOpen())
+					{
+						msg.player.ChatMessage("Door must be closed");
+						return;
+					}
 				}
-			}
-			if (!GetItemDefinitionForEntity(baseEntity2, out var def))
-			{
-				SprayFailResponse(SprayFailReason.InvalidItem);
-				return;
-			}
-			ItemDefinition itemDefinition = null;
-			ulong num = ItemDefinition.FindSkin(def.itemid, targetSkin);
-			ItemSkinDirectory.Skin skin = def.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => x.id == targetSkin);
-			if (Interface.CallHook("OnEntityReskin", baseEntity2, skin, msg.player) != null)
-			{
-				return;
-			}
-			if (skin.invItem != null && skin.invItem is ItemSkin itemSkin)
-			{
-				if (itemSkin.Redirect != null)
+				if (!GetItemDefinitionForEntity(baseEntity2, out var def))
 				{
-					itemDefinition = itemSkin.Redirect;
-				}
-				else if (GetItemDefinitionForEntity(baseEntity2, out def, useRedirect: false) && def.isRedirectOf != null)
-				{
-					itemDefinition = def.isRedirectOf;
-				}
-			}
-			else if (def.isRedirectOf != null || (GetItemDefinitionForEntity(baseEntity2, out def, useRedirect: false) && def.isRedirectOf != null))
-			{
-				itemDefinition = def.isRedirectOf;
-			}
-			if (itemDefinition == null)
-			{
-				baseEntity2.skinID = num;
-				baseEntity2.SendNetworkUpdate();
-				Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, targetSkin);
-			}
-			else
-			{
-				if (!CanEntityBeRespawned(baseEntity2, out var reason2))
-				{
-					SprayFailResponse(reason2);
-					return;
-				}
-				if (!GetEntityPrefabPath(itemDefinition, out var resourcePath))
-				{
-					Debug.LogWarning("Cannot find resource path of redirect entity to spawn! " + itemDefinition.gameObject.name);
 					SprayFailResponse(SprayFailReason.InvalidItem);
 					return;
 				}
-				Vector3 position2 = baseEntity2.transform.position;
-				Quaternion rotation = baseEntity2.transform.rotation;
-				BaseEntity entity = baseEntity2.GetParentEntity();
-				float health = baseEntity2.Health();
-				EntityRef[] slots = baseEntity2.GetSlots();
-				float lastAttackedTime = ((baseEntity2 is BaseCombatEntity baseCombatEntity) ? baseCombatEntity.lastAttackedTime : 0f);
-				bool flag2 = baseEntity2 is Door;
-				Dictionary<ContainerSet, List<Item>> dictionary2 = new Dictionary<ContainerSet, List<Item>>();
-				SaveEntityStorage(baseEntity2, dictionary2, 0);
-				List<ChildPreserveInfo> obj = Facepunch.Pool.GetList<ChildPreserveInfo>();
-				if (flag2)
+				ItemDefinition itemDefinition = null;
+				ulong num = ItemDefinition.FindSkin(def.itemid, targetSkin);
+				ItemSkinDirectory.Skin skin = def.skins.FirstOrDefault((ItemSkinDirectory.Skin x) => x.id == targetSkin);
+				if (Interface.CallHook("OnEntityReskin", baseEntity2, skin, msg.player) != null)
 				{
-					foreach (BaseEntity child in baseEntity2.children)
+					return;
+				}
+				if (skin.invItem != null && skin.invItem is ItemSkin itemSkin)
+				{
+					if (itemSkin.Redirect != null)
 					{
-						obj.Add(new ChildPreserveInfo
-						{
-							TargetEntity = child,
-							TargetBone = child.parentBone,
-							LocalPosition = child.transform.localPosition,
-							LocalRotation = child.transform.localRotation
-						});
+						itemDefinition = itemSkin.Redirect;
 					}
-					foreach (ChildPreserveInfo item in obj)
+					else if (GetItemDefinitionForEntity(baseEntity2, out def, useRedirect: false) && def.isRedirectOf != null)
 					{
-						item.TargetEntity.SetParent(null, worldPositionStays: true);
+						itemDefinition = def.isRedirectOf;
 					}
 				}
-				else
+				else if (def.isRedirectOf != null || (GetItemDefinitionForEntity(baseEntity2, out def, useRedirect: false) && def.isRedirectOf != null))
 				{
-					for (int i = 0; i < baseEntity2.children.Count; i++)
-					{
-						SaveEntityStorage(baseEntity2.children[i], dictionary2, -1);
-					}
+					itemDefinition = def.isRedirectOf;
 				}
-				baseEntity2.Kill();
-				baseEntity2 = GameManager.server.CreateEntity(resourcePath, position2, rotation);
-				baseEntity2.SetParent(entity);
-				if (GetItemDefinitionForEntity(baseEntity2, out var def2, useRedirect: false) && def2.isRedirectOf != null)
-				{
-					baseEntity2.skinID = 0uL;
-				}
-				else
+				if (itemDefinition == null)
 				{
 					baseEntity2.skinID = num;
-				}
-				if (baseEntity2 is DecayEntity decayEntity)
-				{
-					decayEntity.AttachToBuilding(null);
-				}
-				baseEntity2.Spawn();
-				if (baseEntity2 is BaseCombatEntity baseCombatEntity2)
-				{
-					baseCombatEntity2.SetHealth(health);
-					baseCombatEntity2.lastAttackedTime = lastAttackedTime;
-				}
-				if (dictionary2.Count > 0)
-				{
-					RestoreEntityStorage(baseEntity2, 0, dictionary2);
-					if (!flag2)
-					{
-						for (int j = 0; j < baseEntity2.children.Count; j++)
-						{
-							RestoreEntityStorage(baseEntity2.children[j], -1, dictionary2);
-						}
-					}
-					foreach (KeyValuePair<ContainerSet, List<Item>> item2 in dictionary2)
-					{
-						foreach (Item item3 in item2.Value)
-						{
-							Debug.Log($"Deleting {item3} as it has no new container");
-							item3.Remove();
-						}
-					}
+					baseEntity2.SendNetworkUpdate();
 					Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, targetSkin);
 				}
-				if (flag2)
+				else
 				{
-					foreach (ChildPreserveInfo item4 in obj)
+					if (!CanEntityBeRespawned(baseEntity2, out var reason2))
 					{
-						item4.TargetEntity.SetParent(baseEntity2, item4.TargetBone, worldPositionStays: true);
-						item4.TargetEntity.transform.localPosition = item4.LocalPosition;
-						item4.TargetEntity.transform.localRotation = item4.LocalRotation;
-						item4.TargetEntity.SendNetworkUpdate();
+						SprayFailResponse(reason2);
+						return;
 					}
-					baseEntity2.SetSlots(slots);
+					if (!GetEntityPrefabPath(itemDefinition, out var resourcePath))
+					{
+						Debug.LogWarning("Cannot find resource path of redirect entity to spawn! " + itemDefinition.gameObject.name);
+						SprayFailResponse(SprayFailReason.InvalidItem);
+						return;
+					}
+					Vector3 localPosition = baseEntity2.transform.localPosition;
+					Quaternion localRotation = baseEntity2.transform.localRotation;
+					BaseEntity baseEntity3 = baseEntity2.GetParentEntity();
+					float health = baseEntity2.Health();
+					EntityRef[] slots = baseEntity2.GetSlots();
+					float lastAttackedTime = ((baseEntity2 is BaseCombatEntity baseCombatEntity) ? baseCombatEntity.lastAttackedTime : 0f);
+					bool flag2 = baseEntity2 is Door;
+					Dictionary<ContainerSet, List<Item>> dictionary2 = new Dictionary<ContainerSet, List<Item>>();
+					SaveEntityStorage(baseEntity2, dictionary2, 0);
+					List<ChildPreserveInfo> obj = Facepunch.Pool.GetList<ChildPreserveInfo>();
+					if (flag2)
+					{
+						foreach (BaseEntity child in baseEntity2.children)
+						{
+							obj.Add(new ChildPreserveInfo
+							{
+								TargetEntity = child,
+								TargetBone = child.parentBone,
+								LocalPosition = child.transform.localPosition,
+								LocalRotation = child.transform.localRotation
+							});
+						}
+						foreach (ChildPreserveInfo item in obj)
+						{
+							item.TargetEntity.SetParent(null, worldPositionStays: true);
+						}
+					}
+					else
+					{
+						for (int i = 0; i < baseEntity2.children.Count; i++)
+						{
+							SaveEntityStorage(baseEntity2.children[i], dictionary2, -1);
+						}
+					}
+					baseEntity2.Kill();
+					baseEntity2 = GameManager.server.CreateEntity(resourcePath, (baseEntity3 != null) ? baseEntity3.transform.TransformPoint(localPosition) : localPosition, (baseEntity3 != null) ? (baseEntity3.transform.rotation * localRotation) : localRotation);
+					baseEntity2.SetParent(baseEntity3);
+					baseEntity2.transform.localPosition = localPosition;
+					baseEntity2.transform.localRotation = localRotation;
+					if (GetItemDefinitionForEntity(baseEntity2, out var def2, useRedirect: false) && def2.isRedirectOf != null)
+					{
+						baseEntity2.skinID = 0uL;
+					}
+					else
+					{
+						baseEntity2.skinID = num;
+					}
+					if (baseEntity2 is DecayEntity decayEntity)
+					{
+						decayEntity.AttachToBuilding(null);
+					}
+					baseEntity2.Spawn();
+					if (baseEntity2 is BaseCombatEntity baseCombatEntity2)
+					{
+						baseCombatEntity2.SetHealth(health);
+						baseCombatEntity2.lastAttackedTime = lastAttackedTime;
+					}
+					if (dictionary2.Count > 0)
+					{
+						RestoreEntityStorage(baseEntity2, 0, dictionary2);
+						if (!flag2)
+						{
+							for (int j = 0; j < baseEntity2.children.Count; j++)
+							{
+								RestoreEntityStorage(baseEntity2.children[j], -1, dictionary2);
+							}
+						}
+						foreach (KeyValuePair<ContainerSet, List<Item>> item2 in dictionary2)
+						{
+							foreach (Item item3 in item2.Value)
+							{
+								Debug.Log($"Deleting {item3} as it has no new container");
+								item3.Remove();
+							}
+						}
+						Facepunch.Rust.Analytics.Server.SkinUsed(def.shortname, targetSkin);
+					}
+					if (flag2)
+					{
+						foreach (ChildPreserveInfo item4 in obj)
+						{
+							item4.TargetEntity.SetParent(baseEntity2, item4.TargetBone, worldPositionStays: true);
+							item4.TargetEntity.transform.localPosition = item4.LocalPosition;
+							item4.TargetEntity.transform.localRotation = item4.LocalRotation;
+							item4.TargetEntity.SendNetworkUpdate();
+						}
+						baseEntity2.SetSlots(slots);
+					}
+					Interface.CallHook("OnEntityReskinned", baseEntity2, skin, msg.player);
+					Facepunch.Pool.FreeList(ref obj);
 				}
-				Interface.CallHook("OnEntityReskinned", baseEntity2, skin, msg.player);
-				Facepunch.Pool.FreeList(ref obj);
+				ClientRPC(null, "Client_ReskinResult", 1, baseEntity2.net.ID);
 			}
-			ClientRPC(null, "Client_ReskinResult", 1, baseEntity2.net.ID);
 		}
 		LoseCondition(ConditionLossPerReskin);
 		ClientRPC(null, "Client_ChangeSprayColour", -1);
@@ -652,9 +663,9 @@ public class SprayCan : HeldEntity
 		}
 	}
 
-	[RPC_Server]
-	[RPC_Server.IsActiveItem]
 	[RPC_Server.CallsPerSecond(3uL)]
+	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void Server_SetBlockColourId(RPCMessage msg)
 	{
 		NetworkableId uid = msg.read.EntityID();
@@ -666,6 +677,7 @@ public class SprayCan : HeldEntity
 		{
 			return;
 		}
+		BasePlayer ownerPlayer = GetOwnerPlayer();
 		BuildingBlock buildingBlock = BaseNetworkable.serverEntities.Find(uid) as BuildingBlock;
 		if (buildingBlock != null)
 		{
@@ -673,9 +685,10 @@ public class SprayCan : HeldEntity
 			{
 				return;
 			}
+			uint customColour = buildingBlock.customColour;
 			buildingBlock.SetCustomColour(num);
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockColorChanged(ownerPlayer, buildingBlock, customColour, num);
 		}
-		BasePlayer ownerPlayer = GetOwnerPlayer();
 		if (ownerPlayer != null)
 		{
 			ownerPlayer.LastBlockColourChangeId = num;

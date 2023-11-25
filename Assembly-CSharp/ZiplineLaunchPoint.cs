@@ -43,7 +43,7 @@ public class ZiplineLaunchPoint : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - MountPlayer "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - MountPlayer ");
 				}
 				using (TimeWarning.New("MountPlayer"))
 				{
@@ -114,7 +114,7 @@ public class ZiplineLaunchPoint : BaseEntity
 		foundPositions.Clear();
 		Vector3 position = LineDeparturePoint.position;
 		List<ZiplineTarget> list = Facepunch.Pool.GetList<ZiplineTarget>();
-		GamePhysics.OverlapSphere(position + base.transform.forward * 200f, 200f, list, 1218511105);
+		GamePhysics.OverlapSphere(position + base.transform.forward * 200f, 200f, list, 1084293377);
 		ZiplineTarget ziplineTarget = null;
 		float num = float.MaxValue;
 		float num2 = 3f;
@@ -186,15 +186,15 @@ public class ZiplineLaunchPoint : BaseEntity
 	public bool CheckLineOfSight(Vector3 from, Vector3 to)
 	{
 		Vector3 vector = CalculateLineMidPoint(from, to) - Vector3.up * 0.75f;
-		if (GamePhysics.LineOfSightRadius(from, to, 1218511105, 0.5f, 2f) && GamePhysics.LineOfSightRadius(from, vector, 1218511105, 0.5f, 2f))
+		if (GamePhysics.LineOfSightRadius(from, to, 1084293377, 0.5f, 2f) && GamePhysics.LineOfSightRadius(from, vector, 1084293377, 0.5f, 2f))
 		{
-			return GamePhysics.LineOfSightRadius(vector, to, 1218511105, 0.5f, 2f);
+			return GamePhysics.LineOfSightRadius(vector, to, 1084293377, 0.5f, 2f);
 		}
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.CallsPerSecond(2uL)]
+	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
 	public void MountPlayer(RPCMessage msg)
 	{

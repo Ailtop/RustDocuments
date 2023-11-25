@@ -286,7 +286,7 @@ public class CameraRenderer : Pool.IPooled
 				entity.entityId = RandomizeEntityId(value.net.ID);
 				entity.type = ((value is TreeEntity) ? AppCameraRays.EntityType.Tree : AppCameraRays.EntityType.Player);
 				entity.position = worldToLocalMatrix.MultiplyPoint3x4(position2);
-				entity.rotation = (Quaternion.Inverse(value.transform.rotation) * rotation).eulerAngles * ((float)Math.PI / 180f);
+				entity.rotation = (Quaternion.Inverse(value.transform.rotation) * rotation).eulerAngles * (MathF.PI / 180f);
 				entity.size = Vector3.Scale(value.bounds.size, value.transform.localScale);
 				entity.name = name;
 				appBroadcast.cameraRays.entities.Add(entity);

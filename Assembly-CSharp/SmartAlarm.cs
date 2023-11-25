@@ -42,7 +42,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetNotificationTextImpl "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetNotificationTextImpl ");
 				}
 				using (TimeWarning.New("SetNotificationTextImpl"))
 				{
@@ -82,7 +82,7 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartSetupNotification "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - StartSetupNotification ");
 				}
 				using (TimeWarning.New("StartSetupNotification"))
 				{
@@ -211,9 +211,9 @@ public class SmartAlarm : AppIOEntity, ISubscribable
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
 	private void SetNotificationTextImpl(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract())

@@ -200,6 +200,10 @@ public class AIBrainSenses
 		{
 			return false;
 		}
+		if (entity.IsTransferProtected())
+		{
+			return false;
+		}
 		if (!IsValidSenseType(entity))
 		{
 			return false;

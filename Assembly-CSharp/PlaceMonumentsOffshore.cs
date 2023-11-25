@@ -89,7 +89,7 @@ public class PlaceMonumentsOffshore : ProceduralComponent
 					{
 						float x = 0f;
 						float z = 0f;
-						switch (seed % 4u)
+						switch (seed % 4)
 						{
 						case 0u:
 							x = SeedRandom.Range(ref seed, min, max);

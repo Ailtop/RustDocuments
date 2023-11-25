@@ -57,7 +57,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BroadcastEntityMessage "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - BroadcastEntityMessage ");
 				}
 				using (TimeWarning.New("BroadcastEntityMessage"))
 				{
@@ -97,7 +97,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DestroyMessageFromHost "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DestroyMessageFromHost ");
 				}
 				using (TimeWarning.New("DestroyMessageFromHost"))
 				{
@@ -133,7 +133,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - GetSnapshotFromClient "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - GetSnapshotFromClient ");
 				}
 				using (TimeWarning.New("GetSnapshotFromClient"))
 				{
@@ -173,7 +173,7 @@ public class BaseArcadeMachine : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestAddScore "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestAddScore ");
 				}
 				using (TimeWarning.New("RequestAddScore"))
 				{
@@ -304,8 +304,8 @@ public class BaseArcadeMachine : BaseVehicle
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void DestroyMessageFromHost(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -321,8 +321,8 @@ public class BaseArcadeMachine : BaseVehicle
 		}
 	}
 
-	[RPC_Server.CallsPerSecond(7uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(7uL)]
 	[RPC_Server.IsVisible(3f)]
 	public void BroadcastEntityMessage(RPCMessage msg)
 	{

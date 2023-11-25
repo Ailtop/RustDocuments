@@ -60,7 +60,20 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		LeftFoot = 0x20000,
 		RightFoot = 0x40000,
 		Mouth = 0x80000,
-		Eyes = 0x100000
+		Eyes = 0x100000,
+		Back = 0x200000
+	}
+
+	[Serializable]
+	public struct PartRandomizer
+	{
+		public PartCollection[] groups;
+	}
+
+	[Serializable]
+	public struct PartCollection
+	{
+		public GameObject[] parts;
 	}
 
 	[InspectorFlags]
@@ -80,6 +93,8 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 
 	[InspectorFlags]
 	public OccupationSlots occupationOver;
+
+	public bool IsBackpack;
 
 	public bool showCensorshipCube;
 
@@ -125,14 +140,17 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 	[HideInInspector]
 	public List<ComponentInfo> componentInfos = new List<ComponentInfo>();
 
+	[HideInInspector]
+	public List<WearableNotify> notifies = new List<WearableNotify>();
+
 	public bool HideInEyesView;
 
-	[Header("First Person Legs")]
 	[Tooltip("If this is true, we'll hide this item in the first person view. Usually done for items that you definitely won't see in first person view, like facemasks and hats.")]
+	[Header("First Person Legs")]
 	public bool HideInFirstPerson;
 
-	[Range(0f, 5f)]
 	[Tooltip("Use this if the clothing item clips into the player view. It'll push the chest legs model backwards.")]
+	[Range(0f, 5f)]
 	public float ExtraLeanBack;
 
 	[Tooltip("Enable this to check for BoneRetargets which need to be preserved in first person view")]
@@ -146,9 +164,13 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 
 	public Renderer[] RenderersLod3;
 
+	public Renderer[] RenderersLod4;
+
 	public Renderer[] SkipInFirstPersonLegs;
 
 	private static LOD[] emptyLOD = new LOD[1];
+
+	public PartRandomizer[] randomParts;
 
 	public void OnItemSetup(Item item)
 	{
@@ -176,10 +198,12 @@ public class Wearable : MonoBehaviour, IItemSetup, IPrefabPreProcess
 		GetComponentsInChildren(includeInactive: true, skinnedRenderers);
 		GetComponentsInChildren(includeInactive: true, skeletonSkins);
 		GetComponentsInChildren(includeInactive: true, componentInfos);
+		GetComponentsInChildren(includeInactive: true, notifies);
 		RenderersLod0 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("0")).ToArray();
 		RenderersLod1 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("1")).ToArray();
 		RenderersLod2 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("2")).ToArray();
 		RenderersLod3 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("3")).ToArray();
+		RenderersLod4 = renderers.Where((Renderer x) => x.gameObject.name.EndsWith("4")).ToArray();
 		foreach (Renderer renderer in renderers)
 		{
 			renderer.gameObject.AddComponent<ObjectMotionVectorFix>();

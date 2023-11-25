@@ -89,6 +89,24 @@ public class GenerateRoadLayout : ProceduralComponent
 		{
 			TerrainMeta.Path.Roads.Clear();
 			TerrainMeta.Path.Roads.AddRange(World.GetPaths("Road"));
+			{
+				foreach (PathList road in TerrainMeta.Path.Roads)
+				{
+					Vector3[] points = road.Path.Points;
+					for (int i = 1; i < points.Length - 1; i++)
+					{
+						Vector3 vector = points[i];
+						vector.y = Mathf.Max(TerrainMeta.HeightMap.GetHeight(vector), 1f);
+						points[i] = vector;
+					}
+					road.Path.Smoothen(16, new Vector3(0f, 1f, 0f));
+					road.Path.RecalculateTangents();
+				}
+				return;
+			}
+		}
+		if ((RoadType == InfrastructureType.Road && !World.Config.SideRoads) || (RoadType == InfrastructureType.Trail && !World.Config.Trails))
+		{
 			return;
 		}
 		List<PathList> list = new List<PathList>();
@@ -102,14 +120,14 @@ public class GenerateRoadLayout : ProceduralComponent
 		List<PathFinder.Point> list6 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list7 = new List<PathFinder.Point>();
 		List<PathFinder.Point> list8 = new List<PathFinder.Point>();
-		foreach (PathList road in TerrainMeta.Path.Roads)
+		foreach (PathList road2 in TerrainMeta.Path.Roads)
 		{
-			if (road.ProcgenStartNode == null || road.ProcgenEndNode == null)
+			if (road2.ProcgenStartNode == null || road2.ProcgenEndNode == null)
 			{
 				continue;
 			}
 			int num = 1;
-			for (PathFinder.Node node4 = road.ProcgenStartNode; node4 != null; node4 = node4.next)
+			for (PathFinder.Node node4 = road2.ProcgenStartNode; node4 != null; node4 = node4.next)
 			{
 				if (num % 8 == 0)
 				{
@@ -150,9 +168,8 @@ public class GenerateRoadLayout : ProceduralComponent
 				list4.AddRange(list5.Where((PathNode x) => x.monument == node3.monument));
 				list5.RemoveAll((PathNode x) => x.monument == node3.monument);
 				pathFinder.PushPoint = node3.monument.GetPathFinderPoint(length);
-				pathFinder.PushRadius = node3.monument.GetPathFinderRadius(length);
-				pathFinder.PushDistance = 40;
-				pathFinder.PushMultiplier = 1;
+				pathFinder.PushRadius = (pathFinder.PushDistance = node3.monument.GetPathFinderRadius(length));
+				pathFinder.PushMultiplier = 50000;
 			}
 			list8.Clear();
 			list8.AddRange(list4.Select((PathNode x) => x.node.point));

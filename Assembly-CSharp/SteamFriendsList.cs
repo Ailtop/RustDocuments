@@ -25,6 +25,8 @@ public class SteamFriendsList : MonoBehaviour
 
 	public bool HideSteamIdsInStreamerMode;
 
+	public bool IncludeContacts;
+
 	public bool RefreshOnEnable = true;
 
 	public onFriendSelectedEvent onFriendSelected;

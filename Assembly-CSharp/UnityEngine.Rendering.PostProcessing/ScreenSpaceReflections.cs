@@ -25,8 +25,8 @@ public sealed class ScreenSpaceReflections : PostProcessEffectSettings
 		value = ScreenSpaceReflectionResolution.Downsampled
 	};
 
-	[Range(1f, 64f)]
 	[Tooltip("Ray thickness. Lower values are more expensive but allow the effect to detect smaller details.")]
+	[Range(1f, 64f)]
 	public FloatParameter thickness = new FloatParameter
 	{
 		value = 8f
@@ -38,15 +38,15 @@ public sealed class ScreenSpaceReflections : PostProcessEffectSettings
 		value = 100f
 	};
 
-	[Tooltip("Fades reflections close to the near planes.")]
 	[Range(0f, 1f)]
+	[Tooltip("Fades reflections close to the near planes.")]
 	public FloatParameter distanceFade = new FloatParameter
 	{
 		value = 0.5f
 	};
 
-	[Range(0f, 1f)]
 	[Tooltip("Fades reflections close to the screen edges.")]
+	[Range(0f, 1f)]
 	public FloatParameter vignette = new FloatParameter
 	{
 		value = 0.5f

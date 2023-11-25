@@ -45,7 +45,7 @@ public class InstantCameraTool : HeldEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TakePhoto "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - TakePhoto ");
 				}
 				using (TimeWarning.New("TakePhoto"))
 				{
@@ -85,8 +85,8 @@ public class InstantCameraTool : HeldEntity
 	}
 
 	[RPC_Server.CallsPerSecond(3uL)]
-	[RPC_Server]
 	[RPC_Server.FromOwner]
+	[RPC_Server]
 	private void TakePhoto(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

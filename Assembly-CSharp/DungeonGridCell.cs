@@ -22,6 +22,8 @@ public class DungeonGridCell : MonoBehaviour
 
 	public MeshRenderer[] MapRenderers;
 
+	public bool Replaceable;
+
 	public bool ShouldAvoid(uint id)
 	{
 		GameObjectRef[] avoidNeighbours = AvoidNeighbours;

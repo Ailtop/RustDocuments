@@ -7,7 +7,7 @@ public class SpawnDistribution
 
 	public float Density;
 
-	internal int Count;
+	public int Count;
 
 	private WorldSpaceGrid<int> grid;
 

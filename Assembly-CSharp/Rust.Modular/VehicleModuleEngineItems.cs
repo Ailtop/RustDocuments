@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Rust.Modular;
 
-[CreateAssetMenu(fileName = "Vehicle Module Engine Items", menuName = "Rust/Vehicles/Module Engine Items")]
+[CreateAssetMenu(fileName = "Vehicle Module Engine Items", menuName = "Scriptable Object/Vehicles/Module Engine Items")]
 public class VehicleModuleEngineItems : ScriptableObject
 {
 	[SerializeField]

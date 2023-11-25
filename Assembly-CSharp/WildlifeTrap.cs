@@ -7,17 +7,17 @@ using UnityEngine;
 
 public class WildlifeTrap : StorageContainer
 {
-	public static class WildlifeTrapFlags
-	{
-		public const Flags Occupied = Flags.Reserved1;
-	}
-
 	[Serializable]
 	public class WildlifeWeight
 	{
 		public TrappableWildlife wildlife;
 
 		public int weight;
+	}
+
+	public static class WildlifeTrapFlags
+	{
+		public const Flags Occupied = Flags.Reserved1;
 	}
 
 	public float tickRate = 60f;
@@ -31,16 +31,6 @@ public class WildlifeTrap : StorageContainer
 	public List<ItemDefinition> ignoreBait;
 
 	public List<WildlifeWeight> targetWildlife;
-
-	public bool HasCatch()
-	{
-		return HasFlag(Flags.Reserved1);
-	}
-
-	public bool IsTrapActive()
-	{
-		return HasFlag(Flags.On);
-	}
 
 	public override void ResetState()
 	{
@@ -60,23 +50,34 @@ public class WildlifeTrap : StorageContainer
 		}
 	}
 
+	private int CalculateBaitCalories(Item bait)
+	{
+		ItemModConsumable component = bait.info.GetComponent<ItemModConsumable>();
+		if (component == null)
+		{
+			return 0;
+		}
+		if (ignoreBait.Contains(bait.info))
+		{
+			return 0;
+		}
+		int num = 0;
+		foreach (ItemModConsumable.ConsumableEffect effect in component.effects)
+		{
+			if (effect.type == MetabolismAttribute.Type.Calories && effect.amount > 0f)
+			{
+				num += Mathf.CeilToInt(effect.amount * (float)bait.amount);
+			}
+		}
+		return num;
+	}
+
 	public int GetBaitCalories()
 	{
 		int num = 0;
 		foreach (Item item in base.inventory.itemList)
 		{
-			ItemModConsumable component = item.info.GetComponent<ItemModConsumable>();
-			if (component == null || ignoreBait.Contains(item.info))
-			{
-				continue;
-			}
-			foreach (ItemModConsumable.ConsumableEffect effect in component.effects)
-			{
-				if (effect.type == MetabolismAttribute.Type.Calories && effect.amount > 0f)
-				{
-					num += Mathf.CeilToInt(effect.amount * (float)item.amount);
-				}
-			}
+			num += CalculateBaitCalories(item);
 		}
 		return num;
 	}
@@ -207,5 +208,38 @@ public class WildlifeTrap : StorageContainer
 			}
 		}
 		return null;
+	}
+
+	public override void ServerInit()
+	{
+		base.ServerInit();
+		ItemContainer itemContainer = base.inventory;
+		itemContainer.canAcceptItem = (Func<Item, int, bool>)Delegate.Combine(itemContainer.canAcceptItem, new Func<Item, int, bool>(CanAcceptItem));
+	}
+
+	private bool CanAcceptItem(Item item, int slot)
+	{
+		if (CalculateBaitCalories(item) > 0)
+		{
+			return true;
+		}
+		foreach (WildlifeWeight item2 in targetWildlife)
+		{
+			if (item2.wildlife?.inventoryObject == item.info)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public bool HasCatch()
+	{
+		return HasFlag(Flags.Reserved1);
+	}
+
+	public bool IsTrapActive()
+	{
+		return HasFlag(Flags.On);
 	}
 }

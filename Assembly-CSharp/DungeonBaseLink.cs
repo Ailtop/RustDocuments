@@ -50,7 +50,15 @@ public class DungeonBaseLink : MonoBehaviour
 		}
 	}
 
-	protected void Start()
+	protected void Awake()
+	{
+		if ((bool)TerrainMeta.Path)
+		{
+			TerrainMeta.Path.DungeonBaseLinks.Add(this);
+		}
+	}
+
+	internal void Initialize()
 	{
 		if (!(TerrainMeta.Path == null))
 		{

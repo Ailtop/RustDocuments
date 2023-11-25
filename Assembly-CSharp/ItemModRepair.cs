@@ -1,3 +1,4 @@
+using Facepunch.Rust;
 using Oxide.Core;
 
 public class ItemModRepair : ItemMod
@@ -7,6 +8,8 @@ public class ItemModRepair : ItemMod
 	public GameObjectRef successEffect;
 
 	public int workbenchLvlRequired;
+
+	public bool canUseRepairBench;
 
 	public bool HasCraftLevel(BasePlayer player = null)
 	{
@@ -21,11 +24,14 @@ public class ItemModRepair : ItemMod
 	{
 		if (command == "refill" && !player.IsSwimming() && HasCraftLevel(player) && !(item.conditionNormalized >= 1f) && Interface.CallHook("OnItemRefill", item, player) == null)
 		{
+			float conditionNormalized = item.conditionNormalized;
+			float maxConditionNormalized = item.maxConditionNormalized;
 			item.DoRepair(conditionLost);
 			if (successEffect.isValid)
 			{
 				Effect.server.Run(successEffect.resourcePath, player.eyes.position);
 			}
+			Facepunch.Rust.Analytics.Azure.OnItemRepaired(player, player.GetCachedCraftLevelWorkbench(), item, conditionNormalized, maxConditionNormalized);
 		}
 	}
 }

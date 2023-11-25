@@ -28,8 +28,6 @@ public class FlameTurret : StorageContainer
 		}
 	}
 
-	public static UpdateFlameTurretWorkQueue updateFlameTurretQueueServer = new UpdateFlameTurretWorkQueue();
-
 	public Transform upper;
 
 	public Vector3 aimDir;
@@ -71,6 +69,8 @@ public class FlameTurret : StorageContainer
 	private float nextTriggerCheckTime;
 
 	private float pendingFuel;
+
+	public static UpdateFlameTurretWorkQueue updateFlameTurretQueueServer = new UpdateFlameTurretWorkQueue();
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{

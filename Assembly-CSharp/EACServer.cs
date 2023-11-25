@@ -4,6 +4,7 @@ using ConVar;
 using Epic.OnlineServices;
 using Epic.OnlineServices.AntiCheatCommon;
 using Epic.OnlineServices.AntiCheatServer;
+using Epic.OnlineServices.Connect;
 using Epic.OnlineServices.Reports;
 using Network;
 using Oxide.Core;
@@ -144,6 +145,44 @@ public static class EACServer
 		connection2status[connection] = AntiCheatCommonClientAuthStatus.RemoteAuthComplete;
 	}
 
+	private static void OnVerifyIdToken(ref VerifyIdTokenCallbackInfo data)
+	{
+		if (!ConVar.Server.anticheattoken)
+		{
+			Debug.LogWarning("[EAC] Verify ID token skipped: server.anticheattoken == false");
+			return;
+		}
+		IntPtr client = (IntPtr)data.ClientData;
+		Connection connection = GetConnection(client);
+		if (connection == null)
+		{
+			Debug.LogError("[EAC] Verify ID token for invalid client: " + client);
+			return;
+		}
+		if (connection.IsDevelopmentBuild())
+		{
+			Debug.LogWarning("[EAC] Verify ID token skipped for unprotected client: " + connection.ToString());
+			return;
+		}
+		if (data.ResultCode != 0)
+		{
+			string text = "Verify ID token " + data.ResultCode;
+			Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({text})");
+			connection.authStatus = "eactoken";
+			Network.Net.sv.Kick(connection, "EAC: " + text);
+			return;
+		}
+		string text2 = data.AccountId.ToString();
+		string text3 = connection.userid.ToString();
+		if (text2 != text3)
+		{
+			string text4 = "Verify ID token account mismatch with " + text2 + " != " + text3;
+			Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({text4})");
+			connection.authStatus = "eactoken";
+			Network.Net.sv.Kick(connection, "EAC: " + text4);
+		}
+	}
+
 	private static void OnClientAuthStatusChanged(ref OnClientAuthStatusChangedCallbackInfo data)
 	{
 		using (TimeWarning.New("AntiCheatKickPlayer", 10))
@@ -166,6 +205,11 @@ public static class EACServer
 			else if (data.ClientAuthStatus == AntiCheatCommonClientAuthStatus.RemoteAuthComplete)
 			{
 				OnAuthenticatedRemote(connection);
+				IdToken idToken = default(IdToken);
+				idToken.ProductUserId = ProductUserId.FromString(connection.anticheatId);
+				idToken.JsonWebToken = connection.anticheatToken;
+				IdToken token = idToken;
+				EOS.VerifyIdToken(clientHandle, token, OnVerifyIdToken);
 			}
 		}
 	}
@@ -179,35 +223,36 @@ public static class EACServer
 			if (connection == null)
 			{
 				Debug.LogError("[EAC] Status update for invalid client: " + clientHandle);
-				return;
 			}
-			AntiCheatCommonClientAction clientAction = data.ClientAction;
-			if (clientAction != AntiCheatCommonClientAction.RemovePlayer)
+			else
 			{
-				return;
-			}
-			Utf8String actionReasonDetailsString = data.ActionReasonDetailsString;
-			Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({actionReasonDetailsString})");
-			connection.authStatus = "eac";
-			Network.Net.sv.Kick(connection, "EAC: " + actionReasonDetailsString);
-			Oxide.Core.Interface.CallHook("OnPlayerKicked", connection, actionReasonDetailsString.ToString());
-			if (data.ActionReasonCode == AntiCheatCommonClientActionReason.PermanentBanned || data.ActionReasonCode == AntiCheatCommonClientActionReason.TemporaryBanned)
-			{
-				connection.authStatus = "eacbanned";
-				ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Kicking " + connection.username + " (banned by anticheat)");
-				Oxide.Core.Interface.CallHook("OnPlayerBanned", connection, actionReasonDetailsString.ToString());
-				if (data.ActionReasonCode == AntiCheatCommonClientActionReason.PermanentBanned)
+				if (data.ClientAction != AntiCheatCommonClientAction.RemovePlayer)
 				{
-					Entity.DeleteBy(connection.userid);
+					return;
 				}
+				Utf8String actionReasonDetailsString = data.ActionReasonDetailsString;
+				Debug.Log($"[EAC] Kicking {connection.userid} / {connection.username} ({actionReasonDetailsString})");
+				connection.authStatus = "eac";
+				Network.Net.sv.Kick(connection, "EAC: " + actionReasonDetailsString);
+				Oxide.Core.Interface.CallHook("OnPlayerKicked", connection, actionReasonDetailsString.ToString());
+				if (data.ActionReasonCode == AntiCheatCommonClientActionReason.PermanentBanned || data.ActionReasonCode == AntiCheatCommonClientActionReason.TemporaryBanned)
+				{
+					connection.authStatus = "eacbanned";
+					ConsoleNetwork.BroadcastToAllClients("chat.add", 2, 0, "<color=#fff>SERVER</color> Kicking " + connection.username + " (banned by anticheat)");
+					Oxide.Core.Interface.CallHook("OnPlayerBanned", connection, actionReasonDetailsString.ToString());
+					if (data.ActionReasonCode == AntiCheatCommonClientActionReason.PermanentBanned)
+					{
+						Entity.DeleteBy(connection.userid);
+					}
+				}
+				UnregisterClientOptions unregisterClientOptions = default(UnregisterClientOptions);
+				unregisterClientOptions.ClientHandle = clientHandle;
+				UnregisterClientOptions options = unregisterClientOptions;
+				Interface.UnregisterClient(ref options);
+				client2connection.TryRemove((uint)(int)clientHandle, out var _);
+				connection2client.TryRemove(connection, out var _);
+				connection2status.TryRemove(connection, out var _);
 			}
-			UnregisterClientOptions unregisterClientOptions = default(UnregisterClientOptions);
-			unregisterClientOptions.ClientHandle = clientHandle;
-			UnregisterClientOptions options = unregisterClientOptions;
-			Interface.UnregisterClient(ref options);
-			client2connection.TryRemove((uint)(int)clientHandle, out var _);
-			connection2client.TryRemove(connection, out var _);
-			connection2status.TryRemove(connection, out var _);
 		}
 	}
 
@@ -324,31 +369,36 @@ public static class EACServer
 	{
 		if (ConVar.Server.secure && !Application.isEditor)
 		{
-			if (Interface != null)
+			if (!(Interface != null))
 			{
-				IntPtr intPtr = GenerateCompatibilityClient();
-				if (intPtr == IntPtr.Zero)
-				{
-					Debug.LogError("[EAC] GenerateCompatibilityClient returned invalid client: " + intPtr);
-					return;
-				}
-				RegisterClientOptions registerClientOptions = default(RegisterClientOptions);
-				registerClientOptions.ClientHandle = intPtr;
-				registerClientOptions.AccountId = connection.userid.ToString();
-				registerClientOptions.IpAddress = connection.IPAddressWithoutPort();
-				registerClientOptions.ClientType = ((connection.authLevel >= 3 && connection.os == "editor") ? AntiCheatCommonClientType.UnprotectedClient : AntiCheatCommonClientType.ProtectedClient);
-				registerClientOptions.ClientPlatform = ((connection.os == "windows") ? AntiCheatCommonClientPlatform.Windows : ((connection.os == "linux") ? AntiCheatCommonClientPlatform.Linux : ((connection.os == "mac") ? AntiCheatCommonClientPlatform.Mac : AntiCheatCommonClientPlatform.Unknown)));
-				RegisterClientOptions options = registerClientOptions;
-				SetClientDetailsOptions setClientDetailsOptions = default(SetClientDetailsOptions);
-				setClientDetailsOptions.ClientHandle = intPtr;
-				setClientDetailsOptions.ClientFlags = ((connection.authLevel != 0) ? AntiCheatCommonClientFlags.Admin : AntiCheatCommonClientFlags.None);
-				SetClientDetailsOptions options2 = setClientDetailsOptions;
-				Interface.RegisterClient(ref options);
-				Interface.SetClientDetails(ref options2);
-				client2connection.TryAdd((uint)(int)intPtr, connection);
-				connection2client.TryAdd(connection, (uint)(int)intPtr);
-				connection2status.TryAdd(connection, AntiCheatCommonClientAuthStatus.Invalid);
+				return;
 			}
+			IntPtr intPtr = GenerateCompatibilityClient();
+			if (intPtr == IntPtr.Zero)
+			{
+				Debug.LogError("[EAC] GenerateCompatibilityClient returned invalid client: " + intPtr);
+				return;
+			}
+			RegisterClientOptions registerClientOptions = default(RegisterClientOptions);
+			registerClientOptions.ClientHandle = intPtr;
+			registerClientOptions.AccountId = connection.userid.ToString();
+			registerClientOptions.IpAddress = connection.IPAddressWithoutPort();
+			registerClientOptions.ClientType = (connection.IsDevelopmentBuild() ? AntiCheatCommonClientType.UnprotectedClient : AntiCheatCommonClientType.ProtectedClient);
+			registerClientOptions.ClientPlatform = ((connection.os == "windows") ? AntiCheatCommonClientPlatform.Windows : ((connection.os == "linux") ? AntiCheatCommonClientPlatform.Linux : ((connection.os == "mac") ? AntiCheatCommonClientPlatform.Mac : AntiCheatCommonClientPlatform.Unknown)));
+			RegisterClientOptions options = registerClientOptions;
+			if (options.ClientType == AntiCheatCommonClientType.UnprotectedClient)
+			{
+				Debug.LogWarning("[EAC] Joining game as unprotected client: " + connection.ToString());
+			}
+			SetClientDetailsOptions setClientDetailsOptions = default(SetClientDetailsOptions);
+			setClientDetailsOptions.ClientHandle = intPtr;
+			setClientDetailsOptions.ClientFlags = ((connection.authLevel != 0) ? AntiCheatCommonClientFlags.Admin : AntiCheatCommonClientFlags.None);
+			SetClientDetailsOptions options2 = setClientDetailsOptions;
+			Interface.RegisterClient(ref options);
+			Interface.SetClientDetails(ref options2);
+			client2connection.TryAdd((uint)(int)intPtr, connection);
+			connection2client.TryAdd(connection, (uint)(int)intPtr);
+			connection2status.TryAdd(connection, AntiCheatCommonClientAuthStatus.Invalid);
 		}
 		else
 		{

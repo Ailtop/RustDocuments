@@ -12,8 +12,8 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 
 	public LayerMask customBoundsCheckMask;
 
-	[Tooltip("Simply spawns the entity once. No respawning. Entity can be saved if desired.")]
 	[SerializeField]
+	[Tooltip("Simply spawns the entity once. No respawning. Entity can be saved if desired.")]
 	public bool oneTimeSpawner;
 
 	internal bool isSpawnerActive = true;
@@ -123,7 +123,7 @@ public class IndividualSpawner : BaseMonoBehaviour, IServerComponent, ISpawnPoin
 		return SingletonComponent<SpawnHandler>.Instance.CheckBounds(entityPrefab.Get(), base.transform.position, base.transform.rotation, Vector3.one);
 	}
 
-	public void TrySpawnEntity()
+	public virtual void TrySpawnEntity()
 	{
 		if (!isSpawnerActive || IsSpawned)
 		{

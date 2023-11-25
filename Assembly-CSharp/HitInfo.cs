@@ -214,6 +214,32 @@ public class HitInfo
 		HitNormalLocal = attack.hitNormalLocal.normalized;
 		HitNormalWorld = attack.hitNormalWorld.normalized;
 		HitMaterial = attack.hitMaterialID;
+		if (attack.srcParentID.IsValid)
+		{
+			BaseEntity baseEntity = null;
+			if (serverSide)
+			{
+				baseEntity = BaseNetworkable.serverEntities.Find(attack.srcParentID) as BaseEntity;
+			}
+			if (BaseNetworkableEx.IsValid(baseEntity))
+			{
+				PointStart = baseEntity.transform.TransformPoint(PointStart);
+			}
+		}
+		if (attack.dstParentID.IsValid)
+		{
+			BaseEntity baseEntity2 = null;
+			if (serverSide)
+			{
+				baseEntity2 = BaseNetworkable.serverEntities.Find(attack.dstParentID) as BaseEntity;
+			}
+			if (BaseNetworkableEx.IsValid(baseEntity2))
+			{
+				PointEnd = baseEntity2.transform.TransformPoint(PointEnd);
+				HitPositionWorld = baseEntity2.transform.TransformPoint(HitPositionWorld);
+				HitNormalWorld = baseEntity2.transform.TransformDirection(HitNormalWorld);
+			}
+		}
 	}
 
 	public Vector3 PositionOnRay(Vector3 position)

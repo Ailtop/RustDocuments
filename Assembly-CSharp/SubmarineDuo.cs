@@ -38,7 +38,7 @@ public class SubmarineDuo : BaseSubmarine
 	private Transform ammoFlag;
 
 	[SerializeField]
-	private SubmarineSonar sonar;
+	private SonarSystem sonar;
 
 	[SerializeField]
 	private Transform torpedoTubeHatch;

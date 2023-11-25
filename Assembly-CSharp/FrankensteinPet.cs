@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 {
-	[ServerVar(Help = "How long before a Frankenstein Pet dies un controlled and not asleep on table")]
 	[Header("Frankenstein")]
+	[ServerVar(Help = "How long before a Frankenstein Pet dies un controlled and not asleep on table")]
 	public static float decayminutes = 180f;
 
 	[Header("Audio")]
@@ -211,7 +211,7 @@ public class FrankensteinPet : BasePet, IAISenses, IAIAttack
 				nPCPlayerCorpse.SetLootableIn(2f);
 				nPCPlayerCorpse.SetFlag(Flags.Reserved5, HasPlayerFlag(PlayerFlags.DisplaySash));
 				nPCPlayerCorpse.SetFlag(Flags.Reserved2, b: true);
-				nPCPlayerCorpse.TakeFrom(inventory.containerMain, inventory.containerWear, inventory.containerBelt);
+				nPCPlayerCorpse.TakeFrom(this, inventory.containerMain, inventory.containerWear, inventory.containerBelt);
 				nPCPlayerCorpse.playerName = OverrideCorpseName();
 				nPCPlayerCorpse.playerSteamID = userID;
 				nPCPlayerCorpse.Spawn();

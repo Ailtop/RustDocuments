@@ -136,27 +136,31 @@ public class BaseCorpse : BaseCombatEntity
 				Debug.LogError("[BaseCorpse] ragdoll.primaryBody isn't set!" + component.gameObject.name);
 				return null;
 			}
-			BoxCollider component2 = component.primaryBody.GetComponent<BoxCollider>();
-			if (component2 == null)
+			if (base.gameObject.GetComponent<Collider>() == null)
 			{
-				Debug.LogError("Ragdoll has unsupported primary collider (make it supported) ", component);
-				return null;
+				BoxCollider component2 = component.primaryBody.GetComponent<BoxCollider>();
+				if (component2 == null)
+				{
+					Debug.LogError("Ragdoll has unsupported primary collider (make it supported) ", component);
+					return null;
+				}
+				BoxCollider boxCollider = base.gameObject.AddComponent<BoxCollider>();
+				boxCollider.size = component2.size * 2f;
+				boxCollider.center = component2.center;
+				boxCollider.sharedMaterial = component2.sharedMaterial;
 			}
-			BoxCollider boxCollider = base.gameObject.AddComponent<BoxCollider>();
-			boxCollider.size = component2.size * 2f;
-			boxCollider.center = component2.center;
-			boxCollider.sharedMaterial = component2.sharedMaterial;
 		}
-		Rigidbody rigidbody = base.gameObject.AddComponent<Rigidbody>();
+		Rigidbody rigidbody = GetComponent<Rigidbody>();
 		if (rigidbody == null)
 		{
-			Debug.LogError("[BaseCorpse] already has a RigidBody defined - and it shouldn't!" + base.gameObject.name);
-			return null;
+			rigidbody = base.gameObject.AddComponent<Rigidbody>();
 		}
 		rigidbody.mass = 10f;
 		rigidbody.useGravity = true;
 		rigidbody.drag = 0.5f;
+		rigidbody.angularDrag = 0.5f;
 		rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+		rigidbody.sleepThreshold = Mathf.Max(0.05f, UnityEngine.Physics.sleepThreshold);
 		if (base.isServer)
 		{
 			Buoyancy component3 = GetComponent<Buoyancy>();
@@ -164,10 +168,10 @@ public class BaseCorpse : BaseCombatEntity
 			{
 				component3.rigidBody = rigidbody;
 			}
-			ConVar.Physics.ApplyDropped(rigidbody);
 			Vector3 velocity = Vector3Ex.Range(-1f, 1f);
 			velocity.y += 1f;
 			rigidbody.velocity = velocity;
+			rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
 			rigidbody.angularVelocity = Vector3Ex.Range(-10f, 10f);
 		}
 		return rigidbody;
@@ -198,7 +202,7 @@ public class BaseCorpse : BaseCombatEntity
 			ResetRemovalTime();
 			if ((bool)resourceDispenser)
 			{
-				resourceDispenser.OnAttacked(info);
+				resourceDispenser.DoGather(info, this);
 			}
 			if (!info.DidGather)
 			{

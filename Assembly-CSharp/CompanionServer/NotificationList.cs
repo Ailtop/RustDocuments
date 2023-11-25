@@ -131,6 +131,64 @@ public class NotificationList
 		{
 			return NotificationSendResult.Sent;
 		}
+		List<List<ulong>> batches = Facepunch.Pool.GetList<List<ulong>>();
+		List<ulong> list = null;
+		foreach (ulong steamId in steamIds)
+		{
+			if (list == null)
+			{
+				list = Facepunch.Pool.GetList<ulong>();
+			}
+			list.Add(steamId);
+			if (list.Count >= 100)
+			{
+				batches.Add(list);
+				list = null;
+			}
+		}
+		if (list != null && list.Count > 0)
+		{
+			batches.Add(list);
+		}
+		NotificationSendResult? errorResult = null;
+		bool anySent = false;
+		foreach (List<ulong> item in batches)
+		{
+			List<ulong> batchCopy = item;
+			NotificationSendResult notificationSendResult = await SendNotificationBatchImpl(batchCopy, channel, title, body, data);
+			Facepunch.Pool.FreeList(ref batchCopy);
+			switch (notificationSendResult)
+			{
+			case NotificationSendResult.Failed:
+				errorResult = NotificationSendResult.Failed;
+				break;
+			case NotificationSendResult.ServerError:
+				if (errorResult != NotificationSendResult.Failed)
+				{
+					errorResult = NotificationSendResult.ServerError;
+				}
+				break;
+			}
+			if (notificationSendResult == NotificationSendResult.Sent)
+			{
+				anySent = true;
+			}
+		}
+		Facepunch.Pool.FreeList(ref batches);
+		if (data != null)
+		{
+			data.Clear();
+			Facepunch.Pool.Free(ref data);
+		}
+		if (errorResult.HasValue)
+		{
+			return errorResult.Value;
+		}
+		return anySent ? NotificationSendResult.Sent : NotificationSendResult.NoTargetsFound;
+	}
+
+	private static async Task<NotificationSendResult> SendNotificationBatchImpl(IEnumerable<ulong> steamIds, NotificationChannel channel, string title, string body, Dictionary<string, string> data)
+	{
 		PushRequest obj = Facepunch.Pool.Get<PushRequest>();
 		obj.ServerToken = Server.Token;
 		obj.Channel = channel;

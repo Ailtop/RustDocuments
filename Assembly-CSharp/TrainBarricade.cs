@@ -5,8 +5,8 @@ using UnityEngine.Serialization;
 
 public class TrainBarricade : BaseCombatEntity, ITrainCollidable, TrainTrackSpline.ITrainTrackUser
 {
-	[FormerlySerializedAs("damagePerMPS")]
 	[SerializeField]
+	[FormerlySerializedAs("damagePerMPS")]
 	private float trainDamagePerMPS = 10f;
 
 	[SerializeField]

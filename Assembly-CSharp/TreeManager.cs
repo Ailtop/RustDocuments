@@ -1,5 +1,6 @@
 #define UNITY_ASSERTIONS
 using System;
+using System.Diagnostics;
 using ConVar;
 using Facepunch;
 using Network;
@@ -14,8 +15,6 @@ public class TreeManager : BaseEntity
 
 	public static TreeManager server;
 
-	private const int maxTreesPerPacket = 100;
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("TreeManager.OnRpcMessage"))
@@ -25,7 +24,7 @@ public class TreeManager : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SERVER_RequestTrees "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SERVER_RequestTrees ");
 				}
 				using (TimeWarning.New("SERVER_RequestTrees"))
 				{
@@ -50,7 +49,7 @@ public class TreeManager : BaseEntity
 					}
 					catch (Exception exception)
 					{
-						Debug.LogException(exception);
+						UnityEngine.Debug.LogException(exception);
 						player.Kick("RPC Error in SERVER_RequestTrees");
 					}
 				}
@@ -76,6 +75,15 @@ public class TreeManager : BaseEntity
 		result.y = Mathf.FloatToHalf(vec3.y);
 		result.z = Mathf.FloatToHalf(vec3.z);
 		return result;
+	}
+
+	public int GetTreeCount()
+	{
+		if (server == this)
+		{
+			return entities.Count;
+		}
+		return -1;
 	}
 
 	public override void ServerInit()
@@ -115,6 +123,7 @@ public class TreeManager : BaseEntity
 
 	public static void SendSnapshot(BasePlayer player)
 	{
+		Stopwatch stopwatch = Stopwatch.StartNew();
 		BufferList<BaseEntity> values = entities.Values;
 		TreeList treeList = null;
 		for (int i = 0; i < values.Count; i++)
@@ -128,7 +137,7 @@ public class TreeManager : BaseEntity
 				treeList.trees = Facepunch.Pool.GetList<ProtoBuf.Tree>();
 			}
 			treeList.trees.Add(tree);
-			if (treeList.trees.Count >= 100)
+			if (treeList.trees.Count >= ConVar.Server.maxpacketsize_globaltrees)
 			{
 				server.ClientRPCPlayer(null, player, "CLIENT_ReceiveTrees", treeList);
 				treeList.Dispose();
@@ -141,10 +150,15 @@ public class TreeManager : BaseEntity
 			treeList.Dispose();
 			treeList = null;
 		}
+		stopwatch.Stop();
+		if (ConVar.Net.global_network_debug)
+		{
+			UnityEngine.Debug.Log($"Took {stopwatch.ElapsedMilliseconds}ms to send {values.Count} global trees to {player.ToString()}");
+		}
 	}
 
-	[RPC_Server.CallsPerSecond(0uL)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(0uL)]
 	private void SERVER_RequestTrees(RPCMessage msg)
 	{
 		SendSnapshot(msg.player);

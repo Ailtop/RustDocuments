@@ -61,7 +61,7 @@ public class NeonSign : Signage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetAnimationSpeed "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetAnimationSpeed ");
 				}
 				using (TimeWarning.New("SetAnimationSpeed"))
 				{
@@ -101,7 +101,7 @@ public class NeonSign : Signage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateNeonColors "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UpdateNeonColors ");
 				}
 				using (TimeWarning.New("UpdateNeonColors"))
 				{
@@ -242,9 +242,9 @@ public class NeonSign : Signage
 		info.msg.neonSign.animationSpeed = animationSpeed;
 	}
 
-	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void SetAnimationSpeed(RPCMessage msg)
 	{
 		float num = Mathf.Clamp(msg.read.Float(), 0.5f, 5f);
@@ -258,8 +258,8 @@ public class NeonSign : Signage
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(3f)]
 	public void UpdateNeonColors(RPCMessage msg)
 	{
 		if (CanUpdateSign(msg.player))

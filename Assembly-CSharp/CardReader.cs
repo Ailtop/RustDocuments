@@ -36,7 +36,7 @@ public class CardReader : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerCardSwiped "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerCardSwiped ");
 				}
 				using (TimeWarning.New("ServerCardSwiped"))
 				{
@@ -119,8 +119,8 @@ public class CardReader : IOEntity
 		Effect.server.Run(accessGrantedEffect.resourcePath, audioPosition.position, Vector3.up);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void ServerCardSwiped(RPCMessage msg)
 	{
 		if (!IsPowered() || Vector3Ex.Distance2D(msg.player.transform.position, base.transform.position) > 1f || IsInvoking(GrantCard) || IsInvoking(FailCard) || HasFlag(Flags.On))

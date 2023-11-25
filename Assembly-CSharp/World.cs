@@ -13,11 +13,23 @@ using UnityEngine;
 
 public static class World
 {
+	private static uint _size;
+
 	public static uint Seed { get; set; }
 
 	public static uint Salt { get; set; }
 
-	public static uint Size { get; set; }
+	public static uint Size
+	{
+		get
+		{
+			return _size;
+		}
+		set
+		{
+			_size = value;
+		}
+	}
 
 	public static string Checksum { get; set; }
 
@@ -33,11 +45,15 @@ public static class World
 
 	public static bool Transfer { get; set; }
 
+	public static bool Nexus => NexusServer.Started;
+
 	public static bool LoadedFromSave { get; set; }
 
 	public static int SpawnIndex { get; set; }
 
 	public static WorldSerialization Serialization { get; set; }
+
+	public static WorldConfig Config { get; set; }
 
 	public static string Name
 	{
@@ -61,7 +77,7 @@ public static class World
 			{
 				return Name + ".map";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 238 + ".map";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 243 + ".map";
 		}
 	}
 
@@ -81,9 +97,9 @@ public static class World
 		{
 			if (CanLoadFromUrl())
 			{
-				return Name + "." + 238 + ".sav";
+				return Name + "." + 243 + ".sav";
 			}
-			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 238 + ".sav";
+			return Name.Replace(" ", "").ToLower() + "." + Size + "." + Seed + "." + 243 + ".sav";
 		}
 	}
 
@@ -124,8 +140,12 @@ public static class World
 
 	public static void CleanupOldFiles()
 	{
+		if (!Directory.Exists(MapFolderName))
+		{
+			return;
+		}
 		Regex regex1 = new Regex("proceduralmap\\.[0-9]+\\.[0-9]+\\.[0-9]+\\.map");
-		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 238 + "\\.map");
+		Regex regex2 = new Regex("\\.[0-9]+\\.[0-9]+\\." + 243 + "\\.map");
 		foreach (string item in from path in Directory.GetFiles(MapFolderName, "*.map")
 			where regex1.IsMatch(path) && !regex2.IsMatch(path)
 			select path)
@@ -150,7 +170,7 @@ public static class World
 	{
 		if (seed == 0)
 		{
-			seed = MurmurHashEx.MurmurHashUnsigned(SeedIdentifier()) % 2147483647u;
+			seed = MurmurHashEx.MurmurHashUnsigned(SeedIdentifier()) % int.MaxValue;
 		}
 		if (seed == 0)
 		{
@@ -162,7 +182,7 @@ public static class World
 
 	private static string SeedIdentifier()
 	{
-		return SystemInfo.deviceUniqueIdentifier + "_" + 238 + "_" + Server.identity;
+		return SystemInfo.deviceUniqueIdentifier + "_" + 243 + "_" + Server.identity;
 	}
 
 	public static void InitSalt(int salt)
@@ -174,7 +194,7 @@ public static class World
 	{
 		if (salt == 0)
 		{
-			salt = MurmurHashEx.MurmurHashUnsigned(SaltIdentifier()) % 2147483647u;
+			salt = MurmurHashEx.MurmurHashUnsigned(SaltIdentifier()) % int.MaxValue;
 		}
 		if (salt == 0)
 		{

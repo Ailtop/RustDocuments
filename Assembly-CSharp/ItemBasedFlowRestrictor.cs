@@ -41,7 +41,7 @@ public class ItemBasedFlowRestrictor : IOEntity, IContainerSounds
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLoot "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenLoot ");
 				}
 				using (TimeWarning.New("RPC_OpenLoot"))
 				{
@@ -212,8 +212,8 @@ public class ItemBasedFlowRestrictor : IOEntity, IContainerSounds
 		MarkDirty();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage rpc)
 	{
 		if (inventory != null)

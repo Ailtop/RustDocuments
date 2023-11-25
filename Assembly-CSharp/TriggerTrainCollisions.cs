@@ -151,7 +151,7 @@ public class TriggerTrainCollisions : TriggerBase
 		{
 			foreach (Collider colliderContent in colliderContents)
 			{
-				if (colliderContent != null && (UnityEngine.Object)colliderContent.GetComponentInParent<T>() == (UnityEngine.Object)component)
+				if (colliderContent != null && colliderContent.GetComponentInParent<T>() == component)
 				{
 					return true;
 				}

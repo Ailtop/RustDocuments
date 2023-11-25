@@ -65,6 +65,12 @@ public class Graphics : ConsoleSystem
 	public static float dof_focus_time = 0.2f;
 
 	[ClientVar(Saved = true, ClientAdmin = true)]
+	public static float dof_squeeze = 0f;
+
+	[ClientVar(Saved = true, ClientAdmin = true)]
+	public static float dof_barrel = 0f;
+
+	[ClientVar(Saved = true, ClientAdmin = true)]
 	public static bool dof_debug = false;
 
 	[ClientVar(Saved = true, Help = "Goes from 0 - 3, higher = more dof samples but slower perf")]
@@ -141,6 +147,8 @@ public class Graphics : ConsoleSystem
 			bool flag = SystemInfo.graphicsDeviceType == GraphicsDeviceType.OpenGLCore;
 			KeywordUtil.EnsureKeywordState("SHADOW_QUALITY_HIGH", !flag && _shadowquality == 2);
 			KeywordUtil.EnsureKeywordState("SHADOW_QUALITY_VERYHIGH", !flag && _shadowquality == 3);
+			KeywordUtil.EnsureKeywordState("FORWARD_SHADOWS_MEDIUM", _shadowquality == 1);
+			KeywordUtil.EnsureKeywordState("FORWARD_SHADOWS_HIGH", _shadowquality >= 2);
 		}
 	}
 

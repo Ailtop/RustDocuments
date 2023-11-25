@@ -56,8 +56,9 @@ public class ConvarControlledSpawnPopulationRail : ConvarControlledSpawnPopulati
 		return false;
 	}
 
-	public override void OnPostFill(SpawnHandler spawnHandler)
+	public override void SubFill(SpawnHandler spawnHandler, SpawnDistribution distribution, int numToFill, bool initialSpawn)
 	{
+		base.SubFill(spawnHandler, distribution, numToFill, initialSpawn);
 		List<Prefab<Spawnable>> obj = Pool.GetList<Prefab<Spawnable>>();
 		Prefab<Spawnable>[] prefabs = Prefabs;
 		foreach (Prefab<Spawnable> prefab in prefabs)

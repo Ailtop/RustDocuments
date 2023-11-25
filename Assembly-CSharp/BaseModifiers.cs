@@ -203,7 +203,7 @@ public abstract class BaseModifiers<T> : EntityComponent<T> where T : BaseCombat
 		timeSinceLastTick += num;
 		if (!(timeSinceLastTick <= ConVar.Server.modifierTickRate))
 		{
-			if ((Object)owner != (Object)null && !owner.IsDead())
+			if (owner != null && !owner.IsDead())
 			{
 				TickModifiers(ownerEntity, timeSinceLastTick);
 			}

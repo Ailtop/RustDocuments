@@ -35,7 +35,7 @@ public static class Craptography
 	public static void XOR(uint seed, ArraySegment<byte> src, ref ArraySegment<byte> dst)
 	{
 		int num = hash.Length;
-		int num2 = (int)((long)seed % (long)num);
+		int num2 = (int)(seed % num);
 		for (int i = 0; i < src.Count; i++)
 		{
 			dst.Array[dst.Offset + i] = (byte)(src.Array[src.Offset + i] ^ hash[(num2 + i) % num]);

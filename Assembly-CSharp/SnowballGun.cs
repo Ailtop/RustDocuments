@@ -16,18 +16,19 @@ public class SnowballGun : BaseProjectile
 
 	protected override bool CanRefundAmmo => false;
 
-	protected override void ReloadMagazine(int desiredAmount = -1)
+	public override bool TryReloadMagazine(IAmmoContainer ammoSource, int desiredAmount = -1)
 	{
+		desiredAmount = 1;
+		TryReload(ammoSource, desiredAmount, CanRefundAmmo);
+		SetAmmoCount(primaryMagazine.capacity);
+		primaryMagazine.ammoType = OverrideProjectile;
+		SendNetworkUpdateImmediate();
+		ItemManager.DoRemoves();
 		BasePlayer ownerPlayer = GetOwnerPlayer();
-		if ((bool)ownerPlayer)
+		if (ownerPlayer != null)
 		{
-			desiredAmount = 1;
-			primaryMagazine.Reload(ownerPlayer, desiredAmount, CanRefundAmmo);
-			primaryMagazine.contents = primaryMagazine.capacity;
-			primaryMagazine.ammoType = OverrideProjectile;
-			SendNetworkUpdateImmediate();
-			ItemManager.DoRemoves();
 			ownerPlayer.inventory.ServerUpdate(0f);
 		}
+		return true;
 	}
 }

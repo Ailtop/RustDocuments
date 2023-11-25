@@ -13,6 +13,15 @@ using UnityEngine.Serialization;
 
 public class BaseMountable : BaseCombatEntity
 {
+	public enum DismountConvarType
+	{
+		Misc = 0,
+		Boating = 1,
+		Flying = 2,
+		GroundVehicle = 3,
+		Horse = 4
+	}
+
 	public enum MountStatType
 	{
 		None = 0,
@@ -29,11 +38,9 @@ public class BaseMountable : BaseCombatEntity
 
 	public static Translate.Phrase dismountPhrase = new Translate.Phrase("dismount", "Dismount");
 
-	[FormerlySerializedAs("eyeOverride")]
 	[Header("View")]
 	public Transform eyePositionOverride;
 
-	[FormerlySerializedAs("eyeOverride")]
 	public Transform eyeCenterOverride;
 
 	public Vector2 pitchClamp = new Vector2(-80f, 50f);
@@ -65,7 +72,8 @@ public class BaseMountable : BaseCombatEntity
 
 	public bool legacyDismount;
 
-	[FormerlySerializedAs("modifyPlayerCollider")]
+	public ItemModWearable wearWhileMounted;
+
 	public bool modifiesPlayerCollider;
 
 	public BasePlayer.CapsuleColliderInfo customPlayerCollider;
@@ -75,6 +83,8 @@ public class BaseMountable : BaseCombatEntity
 	public SoundDefinition swapSoundDef;
 
 	public SoundDefinition dismountSoundDef;
+
+	public DismountConvarType dismountHoldType;
 
 	public MountStatType mountTimeStatType;
 
@@ -89,6 +99,9 @@ public class BaseMountable : BaseCombatEntity
 
 	[Header("Camera")]
 	public BasePlayer.CameraMode MountedCameraMode;
+
+	[Header("Rigidbody (Optional)")]
+	public Rigidbody rigidBody;
 
 	[FormerlySerializedAs("needsVehicleTick")]
 	public bool isMobile;
@@ -124,7 +137,7 @@ public class BaseMountable : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsDismount "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_WantsDismount ");
 				}
 				using (TimeWarning.New("RPC_WantsDismount"))
 				{
@@ -153,7 +166,7 @@ public class BaseMountable : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsMount "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_WantsMount ");
 				}
 				using (TimeWarning.New("RPC_WantsMount"))
 				{
@@ -212,11 +225,6 @@ public class BaseMountable : BaseCombatEntity
 		return base.transform;
 	}
 
-	public virtual Quaternion GetMountedBodyAngles()
-	{
-		return GetEyeOverride().rotation;
-	}
-
 	public virtual bool ModifiesThirdPersonCamera()
 	{
 		return false;
@@ -248,7 +256,7 @@ public class BaseMountable : BaseCombatEntity
 		{
 			return Vector3.zero;
 		}
-		return eyePositionOverride.transform.position;
+		return GetEyeOverride().position;
 	}
 
 	public virtual Vector3 EyeCenterForPlayer(BasePlayer player, Quaternion lookRot)
@@ -262,7 +270,7 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual float WaterFactorForPlayer(BasePlayer player)
 	{
-		return WaterLevel.Factor(player.WorldSpaceBounds().ToBounds(), this);
+		return WaterLevel.Factor(player.WorldSpaceBounds().ToBounds(), waves: true, volumes: true, this);
 	}
 
 	public override float MaxVelocity()
@@ -328,7 +336,7 @@ public class BaseMountable : BaseCombatEntity
 			{
 				Debug.Log($"ValidDismountPosition debug: Dismount point {disPos} capsule check is OK.");
 			}
-			if (IsVisible(position))
+			if (IsVisibleAndCanSee(position))
 			{
 				Vector3 vector = disPos + player.NoClipOffset();
 				if (debugDismounts)
@@ -367,6 +375,10 @@ public class BaseMountable : BaseCombatEntity
 	}
 
 	public virtual void LightToggle(BasePlayer player)
+	{
+	}
+
+	public virtual void OnWeaponFired(BaseProjectile weapon)
 	{
 	}
 
@@ -426,7 +438,7 @@ public class BaseMountable : BaseCombatEntity
 
 	public virtual void AttemptMount(BasePlayer player, bool doMountChecks = true)
 	{
-		if (_mounted != null || IsDead() || !player.CanMountMountablesNow())
+		if (_mounted != null || IsDead() || !player.CanMountMountablesNow() || IsTransferring())
 		{
 			return;
 		}
@@ -449,6 +461,14 @@ public class BaseMountable : BaseCombatEntity
 	public virtual bool AttemptDismount(BasePlayer player)
 	{
 		if (player != _mounted)
+		{
+			return false;
+		}
+		if (IsTransferring())
+		{
+			return false;
+		}
+		if (VehicleParent() != null && !VehicleParent().AllowPlayerInstigatedDismount(player))
 		{
 			return false;
 		}
@@ -484,6 +504,7 @@ public class BaseMountable : BaseCombatEntity
 			player.OverrideViewAngles(transform.rotation.eulerAngles);
 			_mounted.eyes.NetworkUpdate(transform.rotation);
 			player.ClientRPCPlayer(null, player, "ForcePositionTo", player.transform.position);
+			Facepunch.Rust.Analytics.Azure.OnMountEntity(player, this, VehicleParent());
 			OnPlayerMounted();
 			Interface.CallHook("OnEntityMounted", this, player);
 		}
@@ -586,6 +607,7 @@ public class BaseMountable : BaseCombatEntity
 			{
 				player.ClientRPCPlayer(null, player, "ForcePositionTo", res);
 			}
+			Facepunch.Rust.Analytics.Azure.OnDismountEntity(player, this, baseVehicle);
 			OnPlayerDismounted(player);
 			Interface.CallHook("OnEntityDismounted", this, player);
 		}
@@ -594,7 +616,7 @@ public class BaseMountable : BaseCombatEntity
 	public virtual bool GetDismountPosition(BasePlayer player, out Vector3 res)
 	{
 		BaseVehicle baseVehicle = VehicleParent();
-		if (baseVehicle != null)
+		if (baseVehicle != null && baseVehicle.IsVehicleMountPoint(this))
 		{
 			return baseVehicle.GetDismountPosition(player, out res);
 		}
@@ -665,6 +687,31 @@ public class BaseMountable : BaseCombatEntity
 			_mounted.ServerRotation = mountAnchor.transform.rotation;
 			_mounted.MovePosition(mountAnchor.transform.position);
 		}
+		if (!(rigidBody != null) || rigidBody.IsSleeping() || rigidBody.isKinematic)
+		{
+			return;
+		}
+		float num = ValidBounds.TestDist(base.transform.position) - 25f;
+		if (num < 0f)
+		{
+			num = 0f;
+		}
+		if (!(num < 100f))
+		{
+			return;
+		}
+		Vector3 normalized = base.transform.position.normalized;
+		float num2 = Vector3.Dot(rigidBody.velocity, normalized);
+		if (num2 > 0f)
+		{
+			float num3 = 1f - num / 100f;
+			rigidBody.velocity -= normalized * num2 * (num3 * num3);
+			if (num < 25f)
+			{
+				float num4 = 1f - num / 25f;
+				rigidBody.AddForce(-normalized * 20f * num4, ForceMode.Acceleration);
+			}
+		}
 	}
 
 	public virtual void PostVehicleFixedUpdate()
@@ -684,7 +731,7 @@ public class BaseMountable : BaseCombatEntity
 	{
 	}
 
-	public bool TryFireProjectile(StorageContainer ammoStorage, AmmoTypes ammoType, Vector3 firingPos, Vector3 firingDir, BasePlayer driver, float launchOffset, float minSpeed, out ServerProjectile projectile)
+	public bool TryFireProjectile(StorageContainer ammoStorage, AmmoTypes ammoType, Vector3 firingPos, Vector3 firingDir, BasePlayer shooter, float launchOffset, float minSpeed, out ServerProjectile projectile)
 	{
 		projectile = null;
 		if (ammoStorage == null)
@@ -703,7 +750,7 @@ public class BaseMountable : BaseCombatEntity
 		}
 		if (obj.Count > 0)
 		{
-			if (UnityEngine.Physics.Raycast(firingPos, firingDir, out var hitInfo, launchOffset, 1236478737))
+			if (UnityEngine.Physics.Raycast(firingPos, firingDir, out var hitInfo, launchOffset, 1237003025))
 			{
 				launchOffset = hitInfo.distance - 0.1f;
 			}
@@ -721,18 +768,28 @@ public class BaseMountable : BaseCombatEntity
 				}
 			}
 			projectile.InitializeVelocity(vector);
-			if (BaseNetworkableEx.IsValid(driver))
+			if (BaseNetworkableEx.IsValid(shooter))
 			{
-				baseEntity.creatorEntity = driver;
-				baseEntity.OwnerID = driver.userID;
+				baseEntity.creatorEntity = shooter;
+				baseEntity.OwnerID = shooter.userID;
 			}
 			baseEntity.Spawn();
-			Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(driver, baseEntity, this);
+			Facepunch.Rust.Analytics.Azure.OnExplosiveLaunched(shooter, baseEntity, this);
 			item.UseItem();
 			result = true;
 		}
 		Facepunch.Pool.FreeList(ref obj);
 		return result;
+	}
+
+	public override void DisableTransferProtection()
+	{
+		base.DisableTransferProtection();
+		BasePlayer mounted = GetMounted();
+		if (mounted != null && mounted.IsTransferProtected())
+		{
+			mounted.DisableTransferProtection();
+		}
 	}
 
 	public virtual bool IsInstrument()

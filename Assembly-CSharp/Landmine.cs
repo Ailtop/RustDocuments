@@ -35,7 +35,7 @@ public class Landmine : BaseTrap
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Disarm "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Disarm ");
 				}
 				using (TimeWarning.New("RPC_Disarm"))
 				{

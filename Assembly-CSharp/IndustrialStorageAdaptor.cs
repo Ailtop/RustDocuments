@@ -6,9 +6,9 @@ public class IndustrialStorageAdaptor : IndustrialEntity, IIndustrialStorage
 
 	public GameObject RedLight;
 
-	private BaseEntity _cachedParent;
+	public BaseEntity _cachedParent;
 
-	private ItemContainer cachedContainer;
+	public ItemContainer cachedContainer;
 
 	public BaseEntity cachedParent
 	{
@@ -91,17 +91,31 @@ public class IndustrialStorageAdaptor : IndustrialEntity, IIndustrialStorage
 
 	public void OnStorageItemTransferBegin()
 	{
-		if (cachedParent != null && cachedParent is VendingMachine vendingMachine)
+		if (cachedParent != null)
 		{
-			vendingMachine.OnIndustrialItemTransferBegins();
+			if (cachedParent is VendingMachine vendingMachine)
+			{
+				vendingMachine.OnIndustrialItemTransferBegins();
+			}
+			else if (cachedParent is Locker locker)
+			{
+				locker.OnIndustrialItemTransferBegin();
+			}
 		}
 	}
 
 	public void OnStorageItemTransferEnd()
 	{
-		if (cachedParent != null && cachedParent is VendingMachine vendingMachine)
+		if (cachedParent != null)
 		{
-			vendingMachine.OnIndustrialItemTransferEnds();
+			if (cachedParent is VendingMachine vendingMachine)
+			{
+				vendingMachine.OnIndustrialItemTransferEnds();
+			}
+			else if (cachedParent is Locker locker)
+			{
+				locker.OnIndustrialItemTransferEnd();
+			}
 		}
 	}
 

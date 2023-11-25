@@ -469,7 +469,7 @@ public static class AntiHack
 		{
 			float flyhack_extrusion = ConVar.AntiHack.flyhack_extrusion;
 			Vector3 vector = (oldPos + newPos) * 0.5f;
-			if (!ply.OnLadder() && !WaterLevel.Test(vector - new Vector3(0f, flyhack_extrusion, 0f), waves: true, ply) && (EnvironmentManager.Get(vector) & EnvironmentType.Elevator) == 0)
+			if (!ply.OnLadder() && !WaterLevel.Test(vector - new Vector3(0f, flyhack_extrusion, 0f), waves: true, volumes: true, ply) && (EnvironmentManager.Get(vector) & EnvironmentType.Elevator) == 0)
 			{
 				float flyhack_margin = ConVar.AntiHack.flyhack_margin;
 				float radius = ply.GetRadius();
@@ -587,7 +587,7 @@ public static class AntiHack
 			{
 				LogToConsole(ply, ply.lastViolationType, "Enforcing (violation of " + ply.violationLevel + ")");
 			}
-			string reason = string.Concat(ply.lastViolationType, " Violation Level ", ply.violationLevel);
+			string reason = ply.lastViolationType.ToString() + " Violation Level " + ply.violationLevel;
 			if (ConVar.AntiHack.enforcementlevel > 1)
 			{
 				Kick(ply, reason);
@@ -627,19 +627,31 @@ public static class AntiHack
 
 	private static void LogToConsole(BasePlayer ply, AntiHackType type, string message)
 	{
-		Debug.LogWarning(string.Concat(ply, " ", type, ": ", message, " at ", ply.transform.position));
+		Debug.LogWarning(ply?.ToString() + " " + type.ToString() + ": " + message + " at " + ply.transform.position.ToString());
 	}
 
 	private static void LogToConsole(string plyName, AntiHackType type, string message, Vector3 pos)
 	{
-		Debug.LogWarning(string.Concat(plyName, " ", type, ": ", message, " at ", pos));
+		string[] obj = new string[7]
+		{
+			plyName,
+			" ",
+			type.ToString(),
+			": ",
+			message,
+			" at ",
+			null
+		};
+		Vector3 vector = pos;
+		obj[6] = vector.ToString();
+		Debug.LogWarning(string.Concat(obj));
 	}
 
 	private static void LogToEAC(BasePlayer ply, AntiHackType type, string message)
 	{
 		if (ConVar.AntiHack.reporting)
 		{
-			EACServer.SendPlayerBehaviorReport(PlayerReportsCategory.Exploiting, ply.UserIDString, string.Concat(type, ": ", message));
+			EACServer.SendPlayerBehaviorReport(PlayerReportsCategory.Exploiting, ply.UserIDString, type.ToString() + ": " + message);
 		}
 	}
 

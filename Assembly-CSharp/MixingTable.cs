@@ -45,7 +45,7 @@ public class MixingTable : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SVSwitch "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SVSwitch ");
 				}
 				using (TimeWarning.New("SVSwitch"))
 				{

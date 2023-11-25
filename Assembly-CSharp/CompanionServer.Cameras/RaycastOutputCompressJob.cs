@@ -31,7 +31,7 @@ public struct RaycastOutputCompressJob : IJob
 			ushort num3 = RayDistance(num2);
 			byte b = RayAlignment(num2);
 			byte b2 = RayMaterial(num2);
-			int num4 = ((int)num3 / 128 * 3 + (int)b / 16 * 5 + b2 * 7) & 0x3F;
+			int num4 = (num3 / 128 * 3 + b / 16 * 5 + b2 * 7) & 0x3F;
 			int num5 = nativeArray[num4];
 			if (num5 == num2)
 			{

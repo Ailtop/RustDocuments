@@ -32,37 +32,6 @@ public class DecayEntity : BaseCombatEntity
 
 	public virtual bool BypassInsideDecayMultiplier => false;
 
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		info.msg.decayEntity = Facepunch.Pool.Get<ProtoBuf.DecayEntity>();
-		info.msg.decayEntity.buildingID = buildingID;
-		if (info.forDisk)
-		{
-			info.msg.decayEntity.decayTimer = decayTimer;
-			info.msg.decayEntity.upkeepTimer = upkeepTimer;
-		}
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.decayEntity == null)
-		{
-			return;
-		}
-		decayTimer = info.msg.decayEntity.decayTimer;
-		upkeepTimer = info.msg.decayEntity.upkeepTimer;
-		if (buildingID != info.msg.decayEntity.buildingID)
-		{
-			AttachToBuilding(info.msg.decayEntity.buildingID);
-			if (info.fromDisk)
-			{
-				BuildingManager.server.LoadBuildingID(buildingID);
-			}
-		}
-	}
-
 	public override void ResetState()
 	{
 		base.ResetState();
@@ -240,7 +209,7 @@ public class DecayEntity : BaseCombatEntity
 			return;
 		}
 		lastDecayTick = UnityEngine.Time.time;
-		if (!decay.ShouldDecay(this))
+		if (HasParent() || !decay.ShouldDecay(this))
 		{
 			return;
 		}
@@ -314,9 +283,61 @@ public class DecayEntity : BaseCombatEntity
 			BaseEntity baseEntity = GameManager.server.CreateEntity(debrisPrefab.resourcePath, base.transform.position, base.transform.rotation * Quaternion.Euler(debrisRotationOffset));
 			if ((bool)baseEntity)
 			{
+				baseEntity.SetParent(parentEntity.Get(serverside: true), worldPositionStays: true);
 				baseEntity.Spawn();
 			}
 		}
 		base.OnKilled(info);
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		BaseEntity baseEntity = GetParentEntity();
+		if (!(baseEntity != null))
+		{
+			return false;
+		}
+		return baseEntity.ForceDeployableSetParent();
+	}
+
+	public override bool ForceDeployableSetParent()
+	{
+		BaseEntity baseEntity = GetParentEntity();
+		if (!(baseEntity != null))
+		{
+			return false;
+		}
+		return baseEntity.ForceDeployableSetParent();
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		info.msg.decayEntity = Facepunch.Pool.Get<ProtoBuf.DecayEntity>();
+		info.msg.decayEntity.buildingID = buildingID;
+		if (info.forDisk)
+		{
+			info.msg.decayEntity.decayTimer = decayTimer;
+			info.msg.decayEntity.upkeepTimer = upkeepTimer;
+		}
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.decayEntity == null)
+		{
+			return;
+		}
+		decayTimer = info.msg.decayEntity.decayTimer;
+		upkeepTimer = info.msg.decayEntity.upkeepTimer;
+		if (buildingID != info.msg.decayEntity.buildingID)
+		{
+			AttachToBuilding(info.msg.decayEntity.buildingID);
+			if (info.fromDisk)
+			{
+				BuildingManager.server.LoadBuildingID(buildingID);
+			}
+		}
 	}
 }

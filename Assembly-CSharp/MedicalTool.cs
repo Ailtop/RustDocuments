@@ -30,7 +30,7 @@ public class MedicalTool : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UseOther "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UseOther ");
 				}
 				using (TimeWarning.New("UseOther"))
 				{
@@ -66,7 +66,7 @@ public class MedicalTool : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UseSelf "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UseSelf ");
 				}
 				using (TimeWarning.New("UseSelf"))
 				{

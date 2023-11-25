@@ -38,7 +38,7 @@ public class PieShape : Graphic
 		float num5 = num + (num2 - num) * 0.5f;
 		Color color = this.color;
 		float num6 = base.rectTransform.rect.height * 0.5f;
-		Vector2 vector = new Vector2(Mathf.Sin(num5 * ((float)Math.PI / 180f)), Mathf.Cos(num5 * ((float)Math.PI / 180f))) * border;
+		Vector2 vector = new Vector2(Mathf.Sin(num5 * (MathF.PI / 180f)), Mathf.Cos(num5 * (MathF.PI / 180f))) * border;
 		int num7 = 0;
 		for (float num8 = num; num8 < num2; num8 += num4)
 		{
@@ -47,15 +47,15 @@ public class PieShape : Graphic
 				color = ((!(color == Color.red)) ? Color.red : Color.white);
 			}
 			simpleVert.color = color;
-			float num9 = Mathf.Sin(num8 * ((float)Math.PI / 180f));
-			float num10 = Mathf.Cos(num8 * ((float)Math.PI / 180f));
+			float num9 = Mathf.Sin(num8 * (MathF.PI / 180f));
+			float num10 = Mathf.Cos(num8 * (MathF.PI / 180f));
 			float num11 = num8 + num4;
 			if (num11 > num2)
 			{
 				num11 = num2;
 			}
-			float num12 = Mathf.Sin(num11 * ((float)Math.PI / 180f));
-			float num13 = Mathf.Cos(num11 * ((float)Math.PI / 180f));
+			float num12 = Mathf.Sin(num11 * (MathF.PI / 180f));
+			float num13 = Mathf.Cos(num11 * (MathF.PI / 180f));
 			simpleVert.position = new Vector2(num9 * outerSize * num6, num10 * outerSize * num6) + vector;
 			vbo.AddVert(simpleVert);
 			simpleVert.position = new Vector2(num12 * outerSize * num6, num13 * outerSize * num6) + vector;

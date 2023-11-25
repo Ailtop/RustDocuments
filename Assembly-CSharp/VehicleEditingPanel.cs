@@ -26,8 +26,8 @@ public class VehicleEditingPanel : LootPanel
 	[SerializeField]
 	private float disabledAlpha = 0.25f;
 
-	[SerializeField]
 	[Header("Edit Vehicle")]
+	[SerializeField]
 	private CanvasGroup editGroup;
 
 	[SerializeField]
@@ -138,7 +138,7 @@ public class VehicleEditingPanel : LootPanel
 	[SerializeField]
 	private Translate.Phrase phraseEmptyStorage;
 
-	[Header("Create Chassis")]
 	[SerializeField]
+	[Header("Create Chassis")]
 	private CreateChassisEntry[] chassisOptions;
 }

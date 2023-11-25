@@ -30,8 +30,8 @@ public struct RaycastRaySetupJob : IJobParallelFor
 	[Unity.Collections.ReadOnly]
 	public NativeArray<int2> samplePositions;
 
-	[WriteOnly]
 	[NativeMatchesParallelForLength]
+	[WriteOnly]
 	public NativeArray<RaycastCommand> raycastCommands;
 
 	public void Execute(int index)

@@ -80,17 +80,17 @@ public static class GameObjectEx
 
 	public static bool HasComponent<T>(this GameObject obj) where T : Component
 	{
-		return (Object)obj.GetComponent<T>() != (Object)null;
+		return obj.GetComponent<T>() != null;
 	}
 
 	public static void SetChildComponentsEnabled<T>(this GameObject gameObject, bool enabled) where T : MonoBehaviour
 	{
-		List<T> obj = Pool.GetList<T>();
+		List<T> obj = Facepunch.Pool.GetList<T>();
 		gameObject.GetComponentsInChildren(includeInactive: true, obj);
 		foreach (T item in obj)
 		{
 			item.enabled = enabled;
 		}
-		Pool.FreeList(ref obj);
+		Facepunch.Pool.FreeList(ref obj);
 	}
 }

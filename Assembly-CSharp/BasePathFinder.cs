@@ -9,7 +9,7 @@ public class BasePathFinder
 
 	private Vector3 chosenPosition;
 
-	private const float halfPI = (float)Math.PI / 180f;
+	private const float halfPI = MathF.PI / 180f;
 
 	public virtual Vector3 GetRandomPatrolPoint()
 	{
@@ -172,6 +172,6 @@ public class BasePathFinder
 
 	public static Vector3 GetPointOnCircle(Vector3 center, float radius, float degrees)
 	{
-		return new Vector3(center.x + radius * Mathf.Cos(degrees * ((float)Math.PI / 180f)), z: center.z + radius * Mathf.Sin(degrees * ((float)Math.PI / 180f)), y: center.y);
+		return new Vector3(center.x + radius * Mathf.Cos(degrees * (MathF.PI / 180f)), z: center.z + radius * Mathf.Sin(degrees * (MathF.PI / 180f)), y: center.y);
 	}
 }

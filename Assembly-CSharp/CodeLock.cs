@@ -60,13 +60,13 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_ChangeCode "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_ChangeCode ");
 				}
 				using (TimeWarning.New("RPC_ChangeCode"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(4013784361u, "RPC_ChangeCode", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(4013784361u, "RPC_ChangeCode", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -96,13 +96,13 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TryLock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - TryLock ");
 				}
 				using (TimeWarning.New("TryLock"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(2626067433u, "TryLock", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(2626067433u, "TryLock", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -132,13 +132,13 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TryUnlock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - TryUnlock ");
 				}
 				using (TimeWarning.New("TryUnlock"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(1718262u, "TryUnlock", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(1718262u, "TryUnlock", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -168,13 +168,13 @@ public class CodeLock : BaseLock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UnlockWithCode "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UnlockWithCode ");
 				}
 				using (TimeWarning.New("UnlockWithCode"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(418605506u, "UnlockWithCode", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(418605506u, "UnlockWithCode", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -297,7 +297,7 @@ public class CodeLock : BaseLock
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	[RPC_Server]
 	private void RPC_ChangeCode(RPCMessage rpc)
 	{
@@ -328,13 +328,14 @@ public class CodeLock : BaseLock
 				guestPlayers.Clear();
 				guestPlayers.Add(rpc.player.userID);
 			}
+			Interface.CallHook("OnCodeChanged", rpc.player, this, text, flag);
 			DoEffect(effectCodeChanged.resourcePath);
 			SendNetworkUpdate();
 		}
 	}
 
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	private void TryUnlock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && IsLocked() && Interface.CallHook("CanUnlock", rpc.player, this) == null && !IsCodeEntryBlocked() && whitelistPlayers.Contains(rpc.player.userID))
@@ -346,7 +347,7 @@ public class CodeLock : BaseLock
 	}
 
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	private void TryLock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && !IsLocked() && code.Length == 4 && Interface.CallHook("CanLock", rpc.player, this) == null && whitelistPlayers.Contains(rpc.player.userID))
@@ -363,8 +364,8 @@ public class CodeLock : BaseLock
 		wrongCodes = 0;
 	}
 
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	[RPC_Server]
-	[RPC_Server.MaxDistance(3f)]
 	private void UnlockWithCode(RPCMessage rpc)
 	{
 		if (!rpc.player.CanInteract() || !IsLocked() || IsCodeEntryBlocked())

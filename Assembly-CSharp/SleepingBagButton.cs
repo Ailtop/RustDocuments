@@ -9,11 +9,21 @@ public class SleepingBagButton : MonoBehaviour
 
 	public GameObject LockRoot;
 
-	public GameObject OccupiedRoot;
+	public GameObject UnavailableRoot;
+
+	public Tooltip unavailableTooltip;
+
+	public Translate.Phrase occupied;
+
+	public Translate.Phrase underwater;
+
+	public Translate.Phrase noRespawnZone;
 
 	public Button ClickButton;
 
 	public TextMeshProUGUI BagName;
+
+	public TextMeshProUGUI ZoneName;
 
 	public TextMeshProUGUI LockTime;
 

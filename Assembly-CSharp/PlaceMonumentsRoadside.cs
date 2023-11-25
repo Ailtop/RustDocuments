@@ -97,11 +97,14 @@ public class PlaceMonumentsRoadside : ProceduralComponent
 			_ = TerrainMeta.HeightMap;
 			List<Prefab<MonumentInfo>> list = new List<Prefab<MonumentInfo>>();
 			string[] array2 = array;
-			for (int i = 0; i < array2.Length; i++)
+			foreach (string text in array2)
 			{
-				Prefab<MonumentInfo>[] array3 = Prefab.Load<MonumentInfo>(array2[i]);
-				ArrayEx.Shuffle(array3, ref seed);
-				list.AddRange(array3);
+				if (!text.Contains("tunnel-entrance") || World.Config.BelowGroundRails)
+				{
+					Prefab<MonumentInfo>[] array3 = Prefab.Load<MonumentInfo>(text);
+					ArrayEx.Shuffle(array3, ref seed);
+					list.AddRange(array3);
+				}
 			}
 			Prefab<MonumentInfo>[] array4 = list.ToArray();
 			if (array4 == null || array4.Length == 0)

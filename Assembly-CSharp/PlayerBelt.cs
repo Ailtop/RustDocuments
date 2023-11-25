@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class PlayerBelt
 {
+	public static int ClientAutoSelectSlot = -1;
+
+	public static uint ClientAutoSeletItemUID = 0u;
+
 	public static int SelectedSlot = -1;
 
 	protected BasePlayer player;

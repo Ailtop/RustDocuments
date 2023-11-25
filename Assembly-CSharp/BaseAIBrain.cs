@@ -11,8 +11,86 @@ using Rust;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, global::IAIDesign, IAIGroupable, IAIEventListener
+public class BaseAIBrain : EntityComponent<BaseEntity>, IAISleepable, global::IAIDesign, IAIGroupable, IAIEventListener, IPet
 {
+	public class BasicAIState
+	{
+		public BaseAIBrain brain;
+
+		protected float _lastStateExitTime;
+
+		public AIState StateType { get; private set; }
+
+		public float TimeInState { get; private set; }
+
+		public bool AgrresiveState { get; protected set; }
+
+		public virtual void StateEnter(BaseAIBrain brain, BaseEntity entity)
+		{
+			TimeInState = 0f;
+		}
+
+		public virtual StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
+		{
+			TimeInState += delta;
+			return StateStatus.Running;
+		}
+
+		public virtual void StateLeave(BaseAIBrain brain, BaseEntity entity)
+		{
+			TimeInState = 0f;
+			_lastStateExitTime = UnityEngine.Time.time;
+		}
+
+		public virtual bool CanInterrupt()
+		{
+			return true;
+		}
+
+		public virtual bool CanEnter()
+		{
+			return true;
+		}
+
+		public virtual bool CanLeave()
+		{
+			return CanInterrupt();
+		}
+
+		public virtual float GetWeight()
+		{
+			return 0f;
+		}
+
+		public float TimeSinceState()
+		{
+			return UnityEngine.Time.time - _lastStateExitTime;
+		}
+
+		public BasicAIState(AIState state)
+		{
+			StateType = state;
+		}
+
+		public void Reset()
+		{
+			TimeInState = 0f;
+		}
+
+		public bool IsInState()
+		{
+			if (brain != null && brain.CurrentState != null)
+			{
+				return brain.CurrentState == this;
+			}
+			return false;
+		}
+
+		public virtual void DrawGizmos()
+		{
+		}
+	}
+
 	public class BaseAttackState : BasicAIState
 	{
 		private IAIAttack attack;
@@ -594,84 +672,6 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 		}
 	}
 
-	public class BasicAIState
-	{
-		public BaseAIBrain brain;
-
-		protected float _lastStateExitTime;
-
-		public AIState StateType { get; private set; }
-
-		public float TimeInState { get; private set; }
-
-		public bool AgrresiveState { get; protected set; }
-
-		public virtual void StateEnter(BaseAIBrain brain, BaseEntity entity)
-		{
-			TimeInState = 0f;
-		}
-
-		public virtual StateStatus StateThink(float delta, BaseAIBrain brain, BaseEntity entity)
-		{
-			TimeInState += delta;
-			return StateStatus.Running;
-		}
-
-		public virtual void StateLeave(BaseAIBrain brain, BaseEntity entity)
-		{
-			TimeInState = 0f;
-			_lastStateExitTime = UnityEngine.Time.time;
-		}
-
-		public virtual bool CanInterrupt()
-		{
-			return true;
-		}
-
-		public virtual bool CanEnter()
-		{
-			return true;
-		}
-
-		public virtual bool CanLeave()
-		{
-			return CanInterrupt();
-		}
-
-		public virtual float GetWeight()
-		{
-			return 0f;
-		}
-
-		public float TimeSinceState()
-		{
-			return UnityEngine.Time.time - _lastStateExitTime;
-		}
-
-		public BasicAIState(AIState state)
-		{
-			StateType = state;
-		}
-
-		public void Reset()
-		{
-			TimeInState = 0f;
-		}
-
-		public bool IsInState()
-		{
-			if (brain != null && brain.CurrentState != null)
-			{
-				return brain.CurrentState == this;
-			}
-			return false;
-		}
-
-		public virtual void DrawGizmos()
-		{
-		}
-	}
-
 	public bool SendClientCurrentState;
 
 	public bool UseQueuedMovementUpdates;
@@ -792,7 +792,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestAIDesign "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestAIDesign ");
 				}
 				using (TimeWarning.New("RequestAIDesign"))
 				{
@@ -821,7 +821,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StopAIDesign "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - StopAIDesign ");
 				}
 				using (TimeWarning.New("StopAIDesign"))
 				{
@@ -850,7 +850,7 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SubmitAIDesign "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SubmitAIDesign ");
 				}
 				using (TimeWarning.New("SubmitAIDesign"))
 				{
@@ -876,75 +876,6 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
-	}
-
-	public bool IsPet()
-	{
-		return Pet;
-	}
-
-	public void SetPetOwner(BasePlayer player)
-	{
-		BaseEntity baseEntity = (player.PetEntity = GetBaseEntity());
-		baseEntity.OwnerID = player.userID;
-		BasePet.ActivePetByOwnerID[player.userID] = baseEntity as BasePet;
-	}
-
-	public bool IsOwnedBy(BasePlayer player)
-	{
-		if (OwningPlayer == null)
-		{
-			return false;
-		}
-		if (player == null)
-		{
-			return false;
-		}
-		if ((object)this == null)
-		{
-			return false;
-		}
-		return OwningPlayer == player;
-	}
-
-	public bool IssuePetCommand(PetCommandType cmd, int param, Ray? ray)
-	{
-		if (ray.HasValue)
-		{
-			int layerMask = 10551296;
-			if (UnityEngine.Physics.Raycast(ray.Value, out var hitInfo, 75f, layerMask))
-			{
-				Events.Memory.Position.Set(hitInfo.point, 6);
-			}
-			else
-			{
-				Events.Memory.Position.Set(base.transform.position, 6);
-			}
-		}
-		switch (cmd)
-		{
-		case PetCommandType.LoadDesign:
-			if (param < 0 || param >= Designs.Count)
-			{
-				return false;
-			}
-			LoadAIDesign(AIDesigns.GetByNameOrInstance(Designs[param].Filename, InstanceSpecificDesign), null, param);
-			return true;
-		case PetCommandType.SetState:
-		{
-			AIStateContainer stateContainerByID = AIDesign.GetStateContainerByID(param);
-			if (stateContainerByID == null)
-			{
-				return false;
-			}
-			return SwitchToState(stateContainerByID.State, param);
-		}
-		case PetCommandType.Destroy:
-			GetBaseEntity().Kill();
-			return true;
-		default:
-			return false;
-		}
 	}
 
 	public void ForceSetAge(float age)
@@ -1184,11 +1115,10 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 	{
 		OwningPlayer = owner;
 		Events.Memory.Entity.Set(OwningPlayer, 5);
-		IPet pet;
-		if ((pet = this) != null && pet.IsPet())
+		if ((object)this != null && ((IPet)this).IsPet())
 		{
-			pet.SetPetOwner(owner);
-			owner.Pet = pet;
+			((IPet)this).SetPetOwner(owner);
+			owner.Pet = this;
 		}
 	}
 
@@ -1698,6 +1628,75 @@ public class BaseAIBrain : EntityComponent<BaseEntity>, IPet, IAISleepable, glob
 			int previousStateID = currentStateContainerID;
 			SwitchToState(stateContainerByID.State, newStateContainerID);
 			SendStateChangeEvent(previousStateID, currentStateContainerID, sourceEventID);
+		}
+	}
+
+	public bool IsPet()
+	{
+		return Pet;
+	}
+
+	public void SetPetOwner(BasePlayer player)
+	{
+		BaseEntity baseEntity = (player.PetEntity = GetBaseEntity());
+		baseEntity.OwnerID = player.userID;
+		BasePet.ActivePetByOwnerID[player.userID] = baseEntity as BasePet;
+	}
+
+	public bool IsOwnedBy(BasePlayer player)
+	{
+		if (OwningPlayer == null)
+		{
+			return false;
+		}
+		if (player == null)
+		{
+			return false;
+		}
+		if ((object)this == null)
+		{
+			return false;
+		}
+		return OwningPlayer == player;
+	}
+
+	public bool IssuePetCommand(PetCommandType cmd, int param, Ray? ray)
+	{
+		if (ray.HasValue)
+		{
+			int layerMask = 10551296;
+			if (UnityEngine.Physics.Raycast(ray.Value, out var hitInfo, 75f, layerMask))
+			{
+				Events.Memory.Position.Set(hitInfo.point, 6);
+			}
+			else
+			{
+				Events.Memory.Position.Set(base.transform.position, 6);
+			}
+		}
+		switch (cmd)
+		{
+		case PetCommandType.LoadDesign:
+			if (param < 0 || param >= Designs.Count)
+			{
+				return false;
+			}
+			LoadAIDesign(AIDesigns.GetByNameOrInstance(Designs[param].Filename, InstanceSpecificDesign), null, param);
+			return true;
+		case PetCommandType.SetState:
+		{
+			AIStateContainer stateContainerByID = AIDesign.GetStateContainerByID(param);
+			if (stateContainerByID == null)
+			{
+				return false;
+			}
+			return SwitchToState(stateContainerByID.State, param);
+		}
+		case PetCommandType.Destroy:
+			GetBaseEntity().Kill();
+			return true;
+		default:
+			return false;
 		}
 	}
 }

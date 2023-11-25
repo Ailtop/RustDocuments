@@ -55,6 +55,21 @@ public static class ConsoleNetwork
 		}
 	}
 
+	public static void SendClientCommandImmediate(Connection cn, string strCommand, params object[] args)
+	{
+		if (Network.Net.sv.IsConnected())
+		{
+			NetWrite netWrite = Network.Net.sv.StartWrite();
+			netWrite.PacketID(Message.Type.ConsoleCommand);
+			string val = ConsoleSystem.BuildCommand(strCommand, args);
+			netWrite.String(val);
+			netWrite.SendImmediate(new SendInfo(cn)
+			{
+				priority = Priority.Immediate
+			});
+		}
+	}
+
 	public static void SendClientCommand(List<Connection> cn, string strCommand, params object[] args)
 	{
 		if (Network.Net.sv.IsConnected() && Interface.CallHook("OnSendCommand", cn, strCommand, args) == null)

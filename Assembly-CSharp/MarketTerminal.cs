@@ -15,18 +15,6 @@ using UnityEngine.Assertions;
 
 public class MarketTerminal : StorageContainer
 {
-	public Action<BasePlayer, Item> _onCurrencyRemovedCached;
-
-	public Action<BasePlayer, Item> _onItemPurchasedCached;
-
-	private Action _checkForExpiredOrdersCached;
-
-	private bool _transactionActive;
-
-	private static readonly List<NetworkableId> _deliveryEligible = new List<NetworkableId>(128);
-
-	private static RealTimeSince _deliveryEligibleLastCalculated;
-
 	public const Flags Flag_HasItems = Flags.Reserved1;
 
 	public const Flags Flag_InventoryFull = Flags.Reserved2;
@@ -56,6 +44,18 @@ public class MarketTerminal : StorageContainer
 
 	public List<ProtoBuf.MarketTerminal.PendingOrder> pendingOrders;
 
+	public Action<BasePlayer, Item> _onCurrencyRemovedCached;
+
+	public Action<BasePlayer, Item> _onItemPurchasedCached;
+
+	private Action _checkForExpiredOrdersCached;
+
+	private bool _transactionActive;
+
+	private static readonly List<NetworkableId> _deliveryEligible = new List<NetworkableId>(128);
+
+	private static RealTimeSince _deliveryEligibleLastCalculated;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("MarketTerminal.OnRpcMessage"))
@@ -65,7 +65,7 @@ public class MarketTerminal : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_Purchase "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_Purchase ");
 				}
 				using (TimeWarning.New("Server_Purchase"))
 				{
@@ -105,7 +105,7 @@ public class MarketTerminal : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_TryOpenMarket "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_TryOpenMarket ");
 				}
 				using (TimeWarning.New("Server_TryOpenMarket"))
 				{
@@ -142,6 +142,74 @@ public class MarketTerminal : StorageContainer
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public bool CanPlayerAffordOrderAndDeliveryFee(BasePlayer player, ProtoBuf.VendingMachine.SellOrder sellOrder, int numberOfTransactions)
+	{
+		int num = player.inventory.FindItemsByItemID(deliveryFeeCurrency.itemid).Sum((Item i) => i.amount);
+		int num2 = deliveryFeeAmount;
+		if (num < num2)
+		{
+			return false;
+		}
+		if (sellOrder != null)
+		{
+			int num3 = sellOrder.currencyAmountPerItem * numberOfTransactions;
+			if (sellOrder.currencyID == deliveryFeeCurrency.itemid && !sellOrder.currencyIsBP && num < num2 + num3)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public bool HasPendingOrderFor(NetworkableId vendingMachineId)
+	{
+		return pendingOrders?.FindWith((ProtoBuf.MarketTerminal.PendingOrder o) => o.vendingMachineId, vendingMachineId) != null;
+	}
+
+	public bool CanPlayerInteract(BasePlayer player)
+	{
+		if (player == null)
+		{
+			return false;
+		}
+		if (_customerSteamId == 0L || (float)_timeUntilCustomerExpiry <= 0f)
+		{
+			return true;
+		}
+		return player.userID == _customerSteamId;
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.marketTerminal == null)
+		{
+			return;
+		}
+		_customerSteamId = info.msg.marketTerminal.customerSteamId;
+		_customerName = info.msg.marketTerminal.customerName;
+		_timeUntilCustomerExpiry = info.msg.marketTerminal.timeUntilExpiry;
+		_marketplace = new EntityRef<Marketplace>(info.msg.marketTerminal.marketplaceId);
+		if (pendingOrders == null)
+		{
+			pendingOrders = Facepunch.Pool.GetList<ProtoBuf.MarketTerminal.PendingOrder>();
+		}
+		if (pendingOrders.Count > 0)
+		{
+			foreach (ProtoBuf.MarketTerminal.PendingOrder pendingOrder in pendingOrders)
+			{
+				ProtoBuf.MarketTerminal.PendingOrder obj = pendingOrder;
+				Facepunch.Pool.Free(ref obj);
+			}
+			pendingOrders.Clear();
+		}
+		foreach (ProtoBuf.MarketTerminal.PendingOrder order in info.msg.marketTerminal.orders)
+		{
+			ProtoBuf.MarketTerminal.PendingOrder item = order.Copy();
+			pendingOrders.Add(item);
+		}
 	}
 
 	public void Setup(Marketplace marketplace)
@@ -519,74 +587,6 @@ public class MarketTerminal : StorageContainer
 				return false;
 			}
 			return true;
-		}
-	}
-
-	public bool CanPlayerAffordOrderAndDeliveryFee(BasePlayer player, ProtoBuf.VendingMachine.SellOrder sellOrder, int numberOfTransactions)
-	{
-		int num = player.inventory.FindItemIDs(deliveryFeeCurrency.itemid).Sum((Item i) => i.amount);
-		int num2 = deliveryFeeAmount;
-		if (num < num2)
-		{
-			return false;
-		}
-		if (sellOrder != null)
-		{
-			int num3 = sellOrder.currencyAmountPerItem * numberOfTransactions;
-			if (sellOrder.currencyID == deliveryFeeCurrency.itemid && !sellOrder.currencyIsBP && num < num2 + num3)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public bool HasPendingOrderFor(NetworkableId vendingMachineId)
-	{
-		return pendingOrders?.FindWith((ProtoBuf.MarketTerminal.PendingOrder o) => o.vendingMachineId, vendingMachineId) != null;
-	}
-
-	public bool CanPlayerInteract(BasePlayer player)
-	{
-		if (player == null)
-		{
-			return false;
-		}
-		if (_customerSteamId == 0L || (float)_timeUntilCustomerExpiry <= 0f)
-		{
-			return true;
-		}
-		return player.userID == _customerSteamId;
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.marketTerminal == null)
-		{
-			return;
-		}
-		_customerSteamId = info.msg.marketTerminal.customerSteamId;
-		_customerName = info.msg.marketTerminal.customerName;
-		_timeUntilCustomerExpiry = info.msg.marketTerminal.timeUntilExpiry;
-		_marketplace = new EntityRef<Marketplace>(info.msg.marketTerminal.marketplaceId);
-		if (pendingOrders == null)
-		{
-			pendingOrders = Facepunch.Pool.GetList<ProtoBuf.MarketTerminal.PendingOrder>();
-		}
-		if (pendingOrders.Count > 0)
-		{
-			foreach (ProtoBuf.MarketTerminal.PendingOrder pendingOrder in pendingOrders)
-			{
-				ProtoBuf.MarketTerminal.PendingOrder obj = pendingOrder;
-				Facepunch.Pool.Free(ref obj);
-			}
-			pendingOrders.Clear();
-		}
-		foreach (ProtoBuf.MarketTerminal.PendingOrder order in info.msg.marketTerminal.orders)
-		{
-			ProtoBuf.MarketTerminal.PendingOrder item = order.Copy();
-			pendingOrders.Add(item);
 		}
 	}
 }

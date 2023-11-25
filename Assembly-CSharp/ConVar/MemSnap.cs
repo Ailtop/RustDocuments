@@ -17,8 +17,8 @@ public class MemSnap : ConsoleSystem
 		return new DirectoryInfo(path).FullName;
 	}
 
-	[ClientVar]
 	[ServerVar]
+	[ClientVar]
 	public static void managed(Arg arg)
 	{
 		MemoryProfiler.TakeSnapshot(NeedProfileFolder() + "/memdump-" + DateTime.Now.ToString("MM-dd-yyyy-h-mm-ss") + ".snap", null, CaptureFlags.ManagedObjects);
@@ -31,8 +31,8 @@ public class MemSnap : ConsoleSystem
 		MemoryProfiler.TakeSnapshot(NeedProfileFolder() + "/memdump-" + DateTime.Now.ToString("MM-dd-yyyy-h-mm-ss") + ".snap", null, CaptureFlags.NativeObjects);
 	}
 
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void full(Arg arg)
 	{
 		MemoryProfiler.TakeSnapshot(NeedProfileFolder() + "/memdump-" + DateTime.Now.ToString("MM-dd-yyyy-h-mm-ss") + ".snap", null, CaptureFlags.ManagedObjects | CaptureFlags.NativeObjects | CaptureFlags.NativeAllocations | CaptureFlags.NativeAllocationSites | CaptureFlags.NativeStackTraces);

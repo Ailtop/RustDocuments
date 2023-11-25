@@ -42,7 +42,7 @@ public class FrankensteinTable : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - CreateFrankenstein "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - CreateFrankenstein ");
 				}
 				using (TimeWarning.New("CreateFrankenstein"))
 				{
@@ -78,7 +78,7 @@ public class FrankensteinTable : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestSleepFrankenstein "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestSleepFrankenstein ");
 				}
 				using (TimeWarning.New("RequestSleepFrankenstein"))
 				{
@@ -114,7 +114,7 @@ public class FrankensteinTable : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RequestWakeFrankenstein "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RequestWakeFrankenstein ");
 				}
 				using (TimeWarning.New("RequestWakeFrankenstein"))
 				{

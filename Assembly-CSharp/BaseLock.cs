@@ -21,13 +21,13 @@ public class BaseLock : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TakeLock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_TakeLock ");
 				}
 				using (TimeWarning.New("RPC_TakeLock"))
 				{
 					using (TimeWarning.New("Conditions"))
 					{
-						if (!RPC_Server.MaxDistance.Test(3572556655u, "RPC_TakeLock", this, player, 3f))
+						if (!RPC_Server.MaxDistance.Test(3572556655u, "RPC_TakeLock", this, player, 3f, checkParent: true))
 						{
 							return true;
 						}
@@ -76,8 +76,8 @@ public class BaseLock : BaseEntity
 		return true;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f, CheckParent = true)]
 	public void RPC_TakeLock(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && !IsLocked() && Interface.CallHook("CanPickupLock", rpc.player, this) == null)

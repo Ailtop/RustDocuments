@@ -66,6 +66,9 @@ public class Server : ConsoleSystem
 	public static string anticheatkey = "OWUDFZmi9VNL/7VhGVSSmCWALKTltKw8ISepa0VXs60";
 
 	[ServerVar]
+	public static bool anticheattoken = true;
+
+	[ServerVar]
 	public static int tickrate = 10;
 
 	[ServerVar]
@@ -365,6 +368,14 @@ public class Server : ConsoleSystem
 	[ServerVar(Help = "How long a ping should last", Saved = true, ShowInAdminUI = true)]
 	public static float pingDuration = 10f;
 
+	[ServerVar(Help = "Allows backpack equipping while not grounded", Saved = true, ShowInAdminUI = true)]
+	public static bool canEquipBackpacksInAir = false;
+
+	[ReplicatedVar(Help = "How long it takes to pick up a used parachute in seconds", Saved = true, ShowInAdminUI = true)]
+	public static float parachuteRepackTime = 8f;
+
+	public static bool emojiOwnershipCheck = false;
+
 	[ServerVar(Saved = true)]
 	public static bool showHolsteredItems = true;
 
@@ -382,6 +393,12 @@ public class Server : ConsoleSystem
 
 	[ServerVar]
 	public static int maxpacketsize_command = 100000;
+
+	[ServerVar]
+	public static int maxpacketsize_globaltrees = 100;
+
+	[ServerVar]
+	public static int maxpacketsize_globalentities = 1000;
 
 	[ServerVar]
 	public static int maxpacketspersecond_tick = 300;
@@ -854,7 +871,7 @@ public class Server : ConsoleSystem
 		{
 			string text = arg.GetUInt64(0, 0uL).ToString();
 			string @string = arg.GetString(1);
-			UnityEngine.Debug.LogWarning(string.Concat(basePlayer, " reported ", text, ": ", @string.ToPrintable(140)));
+			UnityEngine.Debug.LogWarning(basePlayer?.ToString() + " reported " + text + ": " + @string.ToPrintable(140));
 			EACServer.SendPlayerBehaviorReport(basePlayer, PlayerReportsCategory.Cheating, text, @string);
 		}
 	}
@@ -871,7 +888,12 @@ public class Server : ConsoleSystem
 		{
 			return "invalid player";
 		}
-		return basePlayer.stats.combat.Get(combatlogsize, default(NetworkableId), arg.HasArg("--json"), arg.IsAdmin, arg.Connection?.userid ?? 0);
+		CombatLog combat = basePlayer.stats.combat;
+		int count = combatlogsize;
+		bool json = arg.HasArg("--json");
+		bool isAdmin = arg.IsAdmin;
+		ulong requestingUser = arg.Connection?.userid ?? 0;
+		return combat.Get(count, default(NetworkableId), json, isAdmin, requestingUser);
 	}
 
 	[ServerAllVar(Help = "Get the player combat log, only showing outgoing damage")]
@@ -1009,5 +1031,11 @@ public class Server : ConsoleSystem
 			activePlayer.Command("client.playvideo", @string);
 		}
 		arg.ReplyWith($"Sent video to {BasePlayer.activePlayerList.Count} players");
+	}
+
+	[ServerVar(Help = "Rescans the serveremoji folder, note that clients will need to reconnect to get the latest emoji")]
+	public static void ResetServerEmoji()
+	{
+		RustEmojiLibrary.ResetServerEmoji();
 	}
 }

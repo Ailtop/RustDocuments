@@ -14,46 +14,46 @@ public sealed class AutoExposure : PostProcessEffectSettings
 		value = new Vector2(50f, 95f)
 	};
 
-	[Tooltip("Minimum average luminance to consider for auto exposure. Unit is EV.")]
-	[DisplayName("Minimum (EV)")]
 	[Range(-9f, 9f)]
+	[DisplayName("Minimum (EV)")]
+	[Tooltip("Minimum average luminance to consider for auto exposure. Unit is EV.")]
 	public FloatParameter minLuminance = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Range(-9f, 9f)]
 	[Tooltip("Maximum average luminance to consider for auto exposure. Unit is EV.")]
+	[Range(-9f, 9f)]
 	[DisplayName("Maximum (EV)")]
 	public FloatParameter maxLuminance = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Tooltip("Use this to scale the global exposure of the scene.")]
-	[Min(0f)]
 	[DisplayName("Exposure Compensation")]
+	[Min(0f)]
+	[Tooltip("Use this to scale the global exposure of the scene.")]
 	public FloatParameter keyValue = new FloatParameter
 	{
 		value = 1f
 	};
 
-	[Tooltip("Use \"Progressive\" if you want auto exposure to be animated. Use \"Fixed\" otherwise.")]
 	[DisplayName("Type")]
+	[Tooltip("Use \"Progressive\" if you want auto exposure to be animated. Use \"Fixed\" otherwise.")]
 	public EyeAdaptationParameter eyeAdaptation = new EyeAdaptationParameter
 	{
 		value = EyeAdaptation.Progressive
 	};
 
-	[Tooltip("Adaptation speed from a dark to a light environment.")]
 	[Min(0f)]
+	[Tooltip("Adaptation speed from a dark to a light environment.")]
 	public FloatParameter speedUp = new FloatParameter
 	{
 		value = 2f
 	};
 
-	[Tooltip("Adaptation speed from a light to a dark environment.")]
 	[Min(0f)]
+	[Tooltip("Adaptation speed from a light to a dark environment.")]
 	public FloatParameter speedDown = new FloatParameter
 	{
 		value = 1f

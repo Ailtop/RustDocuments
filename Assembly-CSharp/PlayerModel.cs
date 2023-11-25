@@ -35,12 +35,9 @@ public class PlayerModel : ListComponent<PlayerModel>
 		ZiplineHold = 27,
 		Sit_Locomotive = 28,
 		Sit_Throne = 29,
+		Parachute = 30,
 		Standing = 128
 	}
-
-	public Transform[] Shoulders;
-
-	public Transform[] AdditionalSpineBones;
 
 	protected static int speed = Animator.StringToHash("speed");
 
@@ -68,6 +65,10 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	protected static int deploy = Animator.StringToHash("deploy");
 
+	protected static int turnOn = Animator.StringToHash("turnOn");
+
+	protected static int turnOff = Animator.StringToHash("turnOff");
+
 	protected static int reload = Animator.StringToHash("reload");
 
 	protected static int throwWeapon = Animator.StringToHash("throw");
@@ -88,9 +89,9 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	protected static int vehicle_aim_speed = Animator.StringToHash("vehicleAimYawSpeed");
 
-	protected static int onPhone = Animator.StringToHash("onPhone");
-
 	protected static int usePoseTransition = Animator.StringToHash("usePoseTransition");
+
+	protected static int onPhone = Animator.StringToHash("onPhone");
 
 	protected static int leftFootIK = Animator.StringToHash("leftFootIK");
 
@@ -103,6 +104,14 @@ public class PlayerModel : ListComponent<PlayerModel>
 	protected static int forwardReaction = Animator.StringToHash("forwardReaction");
 
 	protected static int rightReaction = Animator.StringToHash("rightReaction");
+
+	protected static int ladderType = Animator.StringToHash("ladderType");
+
+	protected static int hasParachute = Animator.StringToHash("hasParachute");
+
+	protected static int nonGroundedTime = Animator.StringToHash("nonGroundedTime");
+
+	protected static int deployParachuteTrigger = Animator.StringToHash("deployParachute");
 
 	public BoxCollider collision;
 
@@ -175,8 +184,8 @@ public class PlayerModel : ListComponent<PlayerModel>
 
 	public SubsurfaceProfile subsurfaceProfile;
 
-	[Range(0f, 1f)]
 	[Header("Parameters")]
+	[Range(0f, 1f)]
 	public float voiceVolume;
 
 	[Range(0f, 1f)]
@@ -201,6 +210,10 @@ public class PlayerModel : ListComponent<PlayerModel>
 	public int tempPoseType;
 
 	public uint underwearSkin;
+
+	public Transform[] Shoulders;
+
+	public Transform[] AdditionalSpineBones;
 
 	public ulong overrideSkinSeed { get; private set; }
 

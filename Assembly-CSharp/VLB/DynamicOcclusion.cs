@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace VLB;
 
-[HelpURL("http://saladgamer.com/vlb-doc/comp-dynocclusion/")]
 [DisallowMultipleComponent]
 [ExecuteInEditMode]
+[HelpURL("http://saladgamer.com/vlb-doc/comp-dynocclusion/")]
 [RequireComponent(typeof(VolumetricLightBeam))]
 public class DynamicOcclusion : MonoBehaviour
 {

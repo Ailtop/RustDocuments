@@ -22,7 +22,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_UpdateRadioIP "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_UpdateRadioIP ");
 				}
 				using (TimeWarning.New("Server_UpdateRadioIP"))
 				{
@@ -62,7 +62,7 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ServerTogglePlay "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ServerTogglePlay ");
 				}
 				using (TimeWarning.New("ServerTogglePlay"))
 				{
@@ -110,9 +110,9 @@ public class HeldBoomBox : HeldEntity, ICassettePlayer
 		BoxController.ServerTogglePlay(msg);
 	}
 
+	[RPC_Server]
 	[RPC_Server.CallsPerSecond(2uL)]
 	[RPC_Server.IsActiveItem]
-	[RPC_Server]
 	private void Server_UpdateRadioIP(RPCMessage msg)
 	{
 		BoxController.Server_UpdateRadioIP(msg);

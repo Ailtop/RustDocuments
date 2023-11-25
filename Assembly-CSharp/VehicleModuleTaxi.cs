@@ -7,8 +7,8 @@ using UnityEngine.Assertions;
 
 public class VehicleModuleTaxi : VehicleModuleStorage
 {
-	[SerializeField]
 	[Header("Taxi")]
+	[SerializeField]
 	private SoundDefinition kickButtonSound;
 
 	[SerializeField]
@@ -28,7 +28,7 @@ public class VehicleModuleTaxi : VehicleModuleStorage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_KickPassengers "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_KickPassengers ");
 				}
 				using (TimeWarning.New("RPC_KickPassengers"))
 				{

@@ -22,31 +22,43 @@ public class SocketMod_SphereCheck : SocketMod
 	public override bool DoCheck(Construction.Placement place)
 	{
 		Vector3 position = place.position + place.rotation * worldPosition;
-		if (wantsCollide == GamePhysics.CheckSphere(position, sphereRadius, layerMask.value))
+		bool flag = wantsCollide == GamePhysics.CheckSphere(position, sphereRadius, layerMask.value);
+		if (!flag)
+		{
+			bool flag2 = false;
+			Construction.lastPlacementError = "Failed Check: Sphere Test (" + hierachyName + ")";
+			if ((int)layerMask == 2097152 && wantsCollide)
+			{
+				Construction.lastPlacementError = Error_WantsCollideConstruction.translated;
+				if (flag2)
+				{
+					Construction.lastPlacementError = Construction.lastPlacementError + " (" + hierachyName + ")";
+				}
+			}
+			else if (!wantsCollide && ((int)layerMask & 0x200000) == 2097152)
+			{
+				Construction.lastPlacementError = Error_DoesNotWantCollideConstruction.translated;
+				if (flag2)
+				{
+					Construction.lastPlacementError = Construction.lastPlacementError + " (" + hierachyName + ")";
+				}
+			}
+			else
+			{
+				Construction.lastPlacementError = "Failed Check: Sphere Test (" + hierachyName + ")";
+			}
+		}
+		else if (wantsCollide && ((int)layerMask & 0x8000000) == 0)
+		{
+			flag = !GamePhysics.CheckSphere(place.position, 5f, 134217728);
+			if (!flag)
+			{
+				Construction.lastPlacementError = "Failed Check: Sphere Test (" + hierachyName + ") Vehicle_Large test";
+			}
+		}
+		if (flag)
 		{
 			return true;
-		}
-		bool flag = false;
-		Construction.lastPlacementError = "Failed Check: Sphere Test (" + hierachyName + ")";
-		if ((int)layerMask == 2097152 && wantsCollide)
-		{
-			Construction.lastPlacementError = Error_WantsCollideConstruction.translated;
-			if (flag)
-			{
-				Construction.lastPlacementError = Construction.lastPlacementError + " (" + hierachyName + ")";
-			}
-		}
-		else if (!wantsCollide && ((int)layerMask & 0x200000) == 2097152)
-		{
-			Construction.lastPlacementError = Error_DoesNotWantCollideConstruction.translated;
-			if (flag)
-			{
-				Construction.lastPlacementError = Construction.lastPlacementError + " (" + hierachyName + ")";
-			}
-		}
-		else
-		{
-			Construction.lastPlacementError = "Failed Check: Sphere Test (" + hierachyName + ")";
 		}
 		return false;
 	}

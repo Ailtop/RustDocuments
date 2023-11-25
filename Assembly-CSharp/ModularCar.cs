@@ -12,19 +12,8 @@ using Rust.Modular;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVelocity, CarPhysics<ModularCar>.ICar, IVehicleLockUser, VehicleChassisVisuals<ModularCar>.IClientWheelUser
+public class ModularCar : BaseModularVehicle, IVehicleLockUser, VehicleChassisVisuals<ModularCar>.IClientWheelUser, TakeCollisionDamage.ICanRestoreVelocity, CarPhysics<ModularCar>.ICar
 {
-	private class DriverSeatInputs
-	{
-		public float steerInput;
-
-		public bool steerMod;
-
-		public float brakeInput;
-
-		public float throttleInput;
-	}
-
 	[Serializable]
 	public class SpawnSettings
 	{
@@ -51,49 +40,16 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		public AdminBonus adminBonus;
 	}
 
-	public static HashSet<ModularCar> allCarsList = new HashSet<ModularCar>();
+	private class DriverSeatInputs
+	{
+		public float steerInput;
 
-	public readonly ListDictionary<BaseMountable, DriverSeatInputs> driverSeatInputs = new ListDictionary<BaseMountable, DriverSeatInputs>();
+		public bool steerMod;
 
-	public CarPhysics<ModularCar> carPhysics;
+		public float brakeInput;
 
-	public VehicleTerrainHandler serverTerrainHandler;
-
-	private CarWheel[] wheels;
-
-	public float lastEngineOnTime;
-
-	private const float DECAY_TICK_TIME = 60f;
-
-	private const float INSIDE_DECAY_MULTIPLIER = 0.1f;
-
-	private const float CORPSE_DECAY_MINUTES = 5f;
-
-	public Vector3 prevPosition;
-
-	public Quaternion prevRotation;
-
-	private Bounds collisionCheckBounds;
-
-	private Vector3 lastGoodPos;
-
-	private Quaternion lastGoodRot;
-
-	private bool lastPosWasBad;
-
-	public float deathDamageCounter;
-
-	private const float DAMAGE_TO_GIB = 600f;
-
-	public TimeSince timeSinceDeath;
-
-	private const float IMMUNE_TIME = 1f;
-
-	public readonly Vector3 groundedCOMMultiplier = new Vector3(0.25f, 0.3f, 0.25f);
-
-	public readonly Vector3 airbourneCOMMultiplier = new Vector3(0.25f, 0.75f, 0.25f);
-
-	public Vector3 prevCOMMultiplier;
+		public float throttleInput;
+	}
 
 	[Header("Modular Car")]
 	public ModularCarChassisVisuals chassisVisuals;
@@ -146,19 +102,49 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 	public float cachedFuelFraction;
 
-	public override bool AlwaysAllowBradleyTargeting => true;
+	public static HashSet<ModularCar> allCarsList = new HashSet<ModularCar>();
 
-	public VehicleTerrainHandler.Surface OnSurface
-	{
-		get
-		{
-			if (serverTerrainHandler == null)
-			{
-				return VehicleTerrainHandler.Surface.Default;
-			}
-			return serverTerrainHandler.OnSurface;
-		}
-	}
+	public readonly ListDictionary<BaseMountable, DriverSeatInputs> driverSeatInputs = new ListDictionary<BaseMountable, DriverSeatInputs>();
+
+	public CarPhysics<ModularCar> carPhysics;
+
+	public VehicleTerrainHandler serverTerrainHandler;
+
+	private CarWheel[] wheels;
+
+	public float lastEngineOnTime;
+
+	private const float DECAY_TICK_TIME = 60f;
+
+	private const float INSIDE_DECAY_MULTIPLIER = 0.1f;
+
+	private const float CORPSE_DECAY_MINUTES = 5f;
+
+	public Vector3 prevPosition;
+
+	public Quaternion prevRotation;
+
+	private Bounds collisionCheckBounds;
+
+	private Vector3 lastGoodPos;
+
+	private Quaternion lastGoodRot;
+
+	private bool lastPosWasBad;
+
+	public float deathDamageCounter;
+
+	private const float DAMAGE_TO_GIB = 600f;
+
+	public TimeSince timeSinceDeath;
+
+	private const float IMMUNE_TIME = 1f;
+
+	public readonly Vector3 groundedCOMMultiplier = new Vector3(0.25f, 0.3f, 0.25f);
+
+	public readonly Vector3 airbourneCOMMultiplier = new Vector3(0.25f, 0.75f, 0.25f);
+
+	public Vector3 prevCOMMultiplier;
 
 	public override float DriveWheelVelocity
 	{
@@ -204,6 +190,20 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 	public ModularCarCodeLock CarLock { get; private set; }
 
+	public override bool AlwaysAllowBradleyTargeting => true;
+
+	public VehicleTerrainHandler.Surface OnSurface
+	{
+		get
+		{
+			if (serverTerrainHandler == null)
+			{
+				return VehicleTerrainHandler.Surface.Default;
+			}
+			return serverTerrainHandler.OnSurface;
+		}
+	}
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("ModularCar.OnRpcMessage"))
@@ -213,7 +213,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuel ");
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -242,7 +242,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuelWithKeycode "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuelWithKeycode ");
 				}
 				using (TimeWarning.New("RPC_OpenFuelWithKeycode"))
 				{
@@ -271,7 +271,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TryMountWithKeycode "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_TryMountWithKeycode ");
 				}
 				using (TimeWarning.New("RPC_TryMountWithKeycode"))
 				{
@@ -297,6 +297,250 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void PreProcess(IPrefabProcessor process, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		base.PreProcess(process, rootObj, name, serverside, clientside, bundling);
+		damageShowingRenderers = GetComponentsInChildren<MeshRenderer>();
+	}
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		if (CarLock == null)
+		{
+			CarLock = new ModularCarCodeLock(this, base.isServer);
+		}
+	}
+
+	public override float MaxHealth()
+	{
+		return AssociatedItemDef.condition.max;
+	}
+
+	public override float StartHealth()
+	{
+		return AssociatedItemDef.condition.max;
+	}
+
+	public float TotalHealth()
+	{
+		float num = 0f;
+		for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
+		{
+			num += base.AttachedModuleEntities[i].Health();
+		}
+		return num;
+	}
+
+	public float TotalMaxHealth()
+	{
+		float num = 0f;
+		for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
+		{
+			num += base.AttachedModuleEntities[i].MaxHealth();
+		}
+		return num;
+	}
+
+	public override float GetMaxForwardSpeed()
+	{
+		float num = GetMaxDriveForce() / base.TotalMass * 30f;
+		return Mathf.Pow(0.9945f, num) * num;
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.modularCar == null)
+		{
+			return;
+		}
+		engineController.FuelSystem.fuelStorageInstance.uid = info.msg.modularCar.fuelStorageID;
+		cachedFuelFraction = info.msg.modularCar.fuelFraction;
+		bool hasALock = CarLock.HasALock;
+		CarLock.Load(info);
+		if (CarLock.HasALock != hasALock)
+		{
+			for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
+			{
+				base.AttachedModuleEntities[i].RefreshConditionals(canGib: true);
+			}
+		}
+	}
+
+	public override void OnFlagsChanged(Flags old, Flags next)
+	{
+		base.OnFlagsChanged(old, next);
+		if (old != next)
+		{
+			RefreshEngineState();
+		}
+	}
+
+	public override float GetThrottleInput()
+	{
+		if (base.isServer)
+		{
+			float num = 0f;
+			BufferList<DriverSeatInputs> values = driverSeatInputs.Values;
+			for (int i = 0; i < values.Count; i++)
+			{
+				num += values[i].throttleInput;
+			}
+			return Mathf.Clamp(num, -1f, 1f);
+		}
+		return 0f;
+	}
+
+	public override float GetBrakeInput()
+	{
+		if (base.isServer)
+		{
+			float num = 0f;
+			BufferList<DriverSeatInputs> values = driverSeatInputs.Values;
+			for (int i = 0; i < values.Count; i++)
+			{
+				num += values[i].brakeInput;
+			}
+			return Mathf.Clamp01(num);
+		}
+		return 0f;
+	}
+
+	public float GetMaxDriveForce()
+	{
+		float num = 0f;
+		for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
+		{
+			num += base.AttachedModuleEntities[i].GetMaxDriveForce();
+		}
+		return RollOffDriveForce(num);
+	}
+
+	public float GetFuelFraction()
+	{
+		if (base.isServer)
+		{
+			return engineController.FuelSystem.GetFuelFraction();
+		}
+		return cachedFuelFraction;
+	}
+
+	public bool PlayerHasUnlockPermission(BasePlayer player)
+	{
+		return CarLock.HasLockPermission(player);
+	}
+
+	public bool KeycodeEntryBlocked(BasePlayer player)
+	{
+		return CarLock.CodeEntryBlocked(player);
+	}
+
+	public override bool PlayerCanUseThis(BasePlayer player, ModularCarCodeLock.LockType lockType)
+	{
+		return CarLock.PlayerCanUseThis(player, lockType);
+	}
+
+	public bool PlayerCanDestroyLock(BasePlayer player, BaseVehicleModule viaModule)
+	{
+		return CarLock.PlayerCanDestroyLock(viaModule);
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (player == null)
+		{
+			return false;
+		}
+		if (PlayerIsMounted(player))
+		{
+			return true;
+		}
+		if (!PlayerCanUseThis(player, ModularCarCodeLock.LockType.General))
+		{
+			return false;
+		}
+		if (!IsOn())
+		{
+			return base.CanBeLooted(player);
+		}
+		return false;
+	}
+
+	public override bool CanPushNow(BasePlayer pusher)
+	{
+		if (!base.CanPushNow(pusher))
+		{
+			return false;
+		}
+		if (pusher.InSafeZone() && !CarLock.HasLockPermission(pusher))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public bool RefreshEngineState()
+	{
+		if (lastSetEngineState == base.CurEngineState)
+		{
+			return false;
+		}
+		if (base.isServer && base.CurEngineState == VehicleEngineController<GroundVehicle>.EngineState.Off)
+		{
+			lastEngineOnTime = UnityEngine.Time.time;
+		}
+		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
+		{
+			attachedModuleEntity.OnEngineStateChanged(lastSetEngineState, base.CurEngineState);
+		}
+		if (base.isServer && Rust.GameInfo.HasAchievements && NumMounted() >= 5)
+		{
+			foreach (MountPointInfo allMountPoint in base.allMountPoints)
+			{
+				if (allMountPoint.mountable != null && allMountPoint.mountable.GetMounted() != null)
+				{
+					allMountPoint.mountable.GetMounted().GiveAchievement("BATTLE_BUS");
+				}
+			}
+		}
+		lastSetEngineState = base.CurEngineState;
+		return true;
+	}
+
+	public float RollOffDriveForce(float driveForce)
+	{
+		return Mathf.Pow(0.9999175f, driveForce) * driveForce;
+	}
+
+	public void RefreshChassisProtectionState()
+	{
+		if (base.HasAnyModules)
+		{
+			baseProtection = immortalProtection;
+			if (base.isServer)
+			{
+				SetHealth(MaxHealth());
+			}
+		}
+		else
+		{
+			baseProtection = mortalProtection;
+		}
+	}
+
+	public override void ModuleEntityAdded(BaseVehicleModule addedModule)
+	{
+		base.ModuleEntityAdded(addedModule);
+		RefreshChassisProtectionState();
+	}
+
+	public override void ModuleEntityRemoved(BaseVehicleModule removedModule)
+	{
+		base.ModuleEntityRemoved(removedModule);
+		RefreshChassisProtectionState();
 	}
 
 	public override void ServerInit()
@@ -367,7 +611,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 		float num = Mathf.Abs(speed);
 		if (lastPosWasBad || num > 15f)
 		{
-			if (GamePhysics.CheckOBB(new OBB(mainChassisCollider.transform, collisionCheckBounds), 1218511105, QueryTriggerInteraction.Ignore))
+			if (GamePhysics.CheckOBB(new OBB(mainChassisCollider.transform, collisionCheckBounds), 1084293377, QueryTriggerInteraction.Ignore))
 			{
 				rigidBody.position = lastGoodPos;
 				rigidBody.rotation = lastGoodRot;
@@ -501,7 +745,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 	public override void Hurt(HitInfo info)
 	{
-		if (!IsDead() && info.damageTypes.Get(DamageType.Decay) == 0f)
+		if (!IsDead() && !IsTransferProtected() && info.damageTypes.Get(DamageType.Decay) == 0f)
 		{
 			PropagateDamageToModules(info, 0.5f / (float)base.NumAttachedModules, 0.9f / (float)base.NumAttachedModules, null);
 		}
@@ -623,6 +867,7 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 
 	public override void ModuleHurt(BaseVehicleModule hurtModule, HitInfo info)
 	{
+		base.ModuleHurt(hurtModule, info);
 		if (IsDead())
 		{
 			if ((float)timeSinceDeath > 1f)
@@ -916,245 +1161,5 @@ public class ModularCar : BaseModularVehicle, TakeCollisionDamage.ICanRestoreVel
 				attachedModuleEntity.ScaleDamageForPlayer(player, info);
 			}
 		}
-	}
-
-	public override void PreProcess(IPrefabProcessor process, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		base.PreProcess(process, rootObj, name, serverside, clientside, bundling);
-		damageShowingRenderers = GetComponentsInChildren<MeshRenderer>();
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
-		if (CarLock == null)
-		{
-			CarLock = new ModularCarCodeLock(this, base.isServer);
-		}
-	}
-
-	public override float MaxHealth()
-	{
-		return AssociatedItemDef.condition.max;
-	}
-
-	public override float StartHealth()
-	{
-		return AssociatedItemDef.condition.max;
-	}
-
-	public float TotalHealth()
-	{
-		float num = 0f;
-		for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
-		{
-			num += base.AttachedModuleEntities[i].Health();
-		}
-		return num;
-	}
-
-	public float TotalMaxHealth()
-	{
-		float num = 0f;
-		for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
-		{
-			num += base.AttachedModuleEntities[i].MaxHealth();
-		}
-		return num;
-	}
-
-	public override float GetMaxForwardSpeed()
-	{
-		float num = GetMaxDriveForce() / base.TotalMass * 30f;
-		return Mathf.Pow(0.9945f, num) * num;
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.modularCar == null)
-		{
-			return;
-		}
-		engineController.FuelSystem.fuelStorageInstance.uid = info.msg.modularCar.fuelStorageID;
-		cachedFuelFraction = info.msg.modularCar.fuelFraction;
-		bool hasALock = CarLock.HasALock;
-		CarLock.Load(info);
-		if (CarLock.HasALock != hasALock)
-		{
-			for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
-			{
-				base.AttachedModuleEntities[i].RefreshConditionals(canGib: true);
-			}
-		}
-	}
-
-	public override void OnFlagsChanged(Flags old, Flags next)
-	{
-		base.OnFlagsChanged(old, next);
-		if (old != next)
-		{
-			RefreshEngineState();
-		}
-	}
-
-	public override float GetThrottleInput()
-	{
-		if (base.isServer)
-		{
-			float num = 0f;
-			BufferList<DriverSeatInputs> values = driverSeatInputs.Values;
-			for (int i = 0; i < values.Count; i++)
-			{
-				num += values[i].throttleInput;
-			}
-			return Mathf.Clamp(num, -1f, 1f);
-		}
-		return 0f;
-	}
-
-	public override float GetBrakeInput()
-	{
-		if (base.isServer)
-		{
-			float num = 0f;
-			BufferList<DriverSeatInputs> values = driverSeatInputs.Values;
-			for (int i = 0; i < values.Count; i++)
-			{
-				num += values[i].brakeInput;
-			}
-			return Mathf.Clamp01(num);
-		}
-		return 0f;
-	}
-
-	public float GetMaxDriveForce()
-	{
-		float num = 0f;
-		for (int i = 0; i < base.AttachedModuleEntities.Count; i++)
-		{
-			num += base.AttachedModuleEntities[i].GetMaxDriveForce();
-		}
-		return RollOffDriveForce(num);
-	}
-
-	public float GetFuelFraction()
-	{
-		if (base.isServer)
-		{
-			return engineController.FuelSystem.GetFuelFraction();
-		}
-		return cachedFuelFraction;
-	}
-
-	public bool PlayerHasUnlockPermission(BasePlayer player)
-	{
-		return CarLock.HasLockPermission(player);
-	}
-
-	public bool KeycodeEntryBlocked(BasePlayer player)
-	{
-		return CarLock.CodeEntryBlocked(player);
-	}
-
-	public override bool PlayerCanUseThis(BasePlayer player, ModularCarCodeLock.LockType lockType)
-	{
-		return CarLock.PlayerCanUseThis(player, lockType);
-	}
-
-	public bool PlayerCanDestroyLock(BasePlayer player, BaseVehicleModule viaModule)
-	{
-		return CarLock.PlayerCanDestroyLock(viaModule);
-	}
-
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		if (player == null)
-		{
-			return false;
-		}
-		if (PlayerIsMounted(player))
-		{
-			return true;
-		}
-		if (!PlayerCanUseThis(player, ModularCarCodeLock.LockType.General))
-		{
-			return false;
-		}
-		return !IsOn();
-	}
-
-	public override bool CanPushNow(BasePlayer pusher)
-	{
-		if (!base.CanPushNow(pusher))
-		{
-			return false;
-		}
-		if (pusher.InSafeZone() && !CarLock.HasLockPermission(pusher))
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public bool RefreshEngineState()
-	{
-		if (lastSetEngineState == base.CurEngineState)
-		{
-			return false;
-		}
-		if (base.isServer && base.CurEngineState == VehicleEngineController<GroundVehicle>.EngineState.Off)
-		{
-			lastEngineOnTime = UnityEngine.Time.time;
-		}
-		foreach (BaseVehicleModule attachedModuleEntity in base.AttachedModuleEntities)
-		{
-			attachedModuleEntity.OnEngineStateChanged(lastSetEngineState, base.CurEngineState);
-		}
-		if (base.isServer && Rust.GameInfo.HasAchievements && NumMounted() >= 5)
-		{
-			foreach (MountPointInfo allMountPoint in base.allMountPoints)
-			{
-				if (allMountPoint.mountable != null && allMountPoint.mountable.GetMounted() != null)
-				{
-					allMountPoint.mountable.GetMounted().GiveAchievement("BATTLE_BUS");
-				}
-			}
-		}
-		lastSetEngineState = base.CurEngineState;
-		return true;
-	}
-
-	public float RollOffDriveForce(float driveForce)
-	{
-		return Mathf.Pow(0.9999175f, driveForce) * driveForce;
-	}
-
-	public void RefreshChassisProtectionState()
-	{
-		if (base.HasAnyModules)
-		{
-			baseProtection = immortalProtection;
-			if (base.isServer)
-			{
-				SetHealth(MaxHealth());
-			}
-		}
-		else
-		{
-			baseProtection = mortalProtection;
-		}
-	}
-
-	public override void ModuleEntityAdded(BaseVehicleModule addedModule)
-	{
-		base.ModuleEntityAdded(addedModule);
-		RefreshChassisProtectionState();
-	}
-
-	public override void ModuleEntityRemoved(BaseVehicleModule removedModule)
-	{
-		base.ModuleEntityRemoved(removedModule);
-		RefreshChassisProtectionState();
 	}
 }

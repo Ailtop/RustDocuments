@@ -851,7 +851,7 @@ public class PathList
 		{
 			array3[j].AllocMinimal();
 		}
-		Bounds bounds = meshes[meshes.Length - 1].bounds;
+		Bounds bounds = meshes[^1].bounds;
 		Vector3 min = bounds.min;
 		Vector3 size = bounds.size;
 		float num = Width / bounds.size.x;

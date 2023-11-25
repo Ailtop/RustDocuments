@@ -13,6 +13,10 @@ using UnityEngine.Assertions;
 
 public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 {
+	public ItemDefinition RequiredHeldEntity;
+
+	private List<ulong> editHistory = new List<ulong>();
+
 	private const float TextureRequestTimeout = 15f;
 
 	public GameObjectRef changeTextDialog;
@@ -22,9 +26,17 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 	[NonSerialized]
 	public uint[] textureIDs;
 
-	public ItemDefinition RequiredHeldEntity;
+	public NetworkableId NetworkID => net.ID;
 
-	private List<ulong> editHistory = new List<ulong>();
+	public FileStorage.Type FileType => FileStorage.Type.png;
+
+	public UGCType ContentType => UGCType.ImagePng;
+
+	public List<ulong> EditingHistory => editHistory;
+
+	public BaseNetworkable UgcEntity => this;
+
+	public uint[] GetContentCRCs => GetTextureCRCs();
 
 	public Vector2i TextureSize
 	{
@@ -52,18 +64,6 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 		}
 	}
 
-	public NetworkableId NetworkID => net.ID;
-
-	public FileStorage.Type FileType => FileStorage.Type.png;
-
-	public UGCType ContentType => UGCType.ImagePng;
-
-	public List<ulong> EditingHistory => editHistory;
-
-	public BaseNetworkable UgcEntity => this;
-
-	public uint[] GetContentCRCs => GetTextureCRCs();
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("Signage.OnRpcMessage"))
@@ -73,7 +73,7 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - LockSign "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - LockSign ");
 				}
 				using (TimeWarning.New("LockSign"))
 				{
@@ -109,7 +109,7 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UnLockSign "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UnLockSign ");
 				}
 				using (TimeWarning.New("UnLockSign"))
 				{
@@ -145,7 +145,7 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - UpdateSign "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - UpdateSign ");
 				}
 				using (TimeWarning.New("UpdateSign"))
 				{
@@ -182,82 +182,6 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
-	}
-
-	public override void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
-	{
-		base.PreProcess(preProcess, rootObj, name, serverside, clientside, bundling);
-		if (paintableSources != null && paintableSources.Length > 1)
-		{
-			MeshPaintableSource meshPaintableSource = paintableSources[0];
-			for (int i = 1; i < paintableSources.Length; i++)
-			{
-				MeshPaintableSource obj = paintableSources[i];
-				obj.texWidth = meshPaintableSource.texWidth;
-				obj.texHeight = meshPaintableSource.texHeight;
-			}
-		}
-	}
-
-	[RPC_Server]
-	[RPC_Server.CallsPerSecond(5uL)]
-	[RPC_Server.MaxDistance(5f)]
-	public void UpdateSign(RPCMessage msg)
-	{
-		if (msg.player == null || !CanUpdateSign(msg.player))
-		{
-			return;
-		}
-		int num = msg.read.Int32();
-		if (num < 0 || num >= paintableSources.Length)
-		{
-			return;
-		}
-		byte[] array = msg.read.BytesWithSize();
-		if (msg.read.Unread > 0 && msg.read.Bit() && !msg.player.IsAdmin)
-		{
-			UnityEngine.Debug.LogWarning($"{msg.player} tried to upload a sign from a file but they aren't admin, ignoring");
-			return;
-		}
-		EnsureInitialized();
-		if (array == null)
-		{
-			if (textureIDs[num] != 0)
-			{
-				FileStorage.server.RemoveExact(textureIDs[num], FileStorage.Type.png, net.ID, (uint)num);
-			}
-			textureIDs[num] = 0u;
-		}
-		else
-		{
-			if (!ImageProcessing.IsValidPNG(array, 1024, 1024))
-			{
-				return;
-			}
-			if (textureIDs[num] != 0)
-			{
-				FileStorage.server.RemoveExact(textureIDs[num], FileStorage.Type.png, net.ID, (uint)num);
-			}
-			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
-		}
-		LogEdit(msg.player);
-		SendNetworkUpdate();
-		Interface.CallHook("OnSignUpdated", this, msg.player, num);
-	}
-
-	public void EnsureInitialized()
-	{
-		int num = Mathf.Max(paintableSources.Length, 1);
-		if (textureIDs == null || textureIDs.Length != num)
-		{
-			Array.Resize(ref textureIDs, num);
-		}
-	}
-
-	[Conditional("SIGN_DEBUG")]
-	private static void SignDebugLog(string str)
-	{
-		UnityEngine.Debug.Log(str);
 	}
 
 	public virtual bool CanUpdateSign(BasePlayer player)
@@ -546,5 +470,81 @@ public class Signage : IOEntity, ILOD, ISignage, IUGCBrowserEntity
 	public override string Categorize()
 	{
 		return "sign";
+	}
+
+	public override void PreProcess(IPrefabProcessor preProcess, GameObject rootObj, string name, bool serverside, bool clientside, bool bundling)
+	{
+		base.PreProcess(preProcess, rootObj, name, serverside, clientside, bundling);
+		if (paintableSources != null && paintableSources.Length > 1)
+		{
+			MeshPaintableSource meshPaintableSource = paintableSources[0];
+			for (int i = 1; i < paintableSources.Length; i++)
+			{
+				MeshPaintableSource obj = paintableSources[i];
+				obj.texWidth = meshPaintableSource.texWidth;
+				obj.texHeight = meshPaintableSource.texHeight;
+			}
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.CallsPerSecond(5uL)]
+	[RPC_Server.MaxDistance(5f)]
+	public void UpdateSign(RPCMessage msg)
+	{
+		if (msg.player == null || !CanUpdateSign(msg.player))
+		{
+			return;
+		}
+		int num = msg.read.Int32();
+		if (num < 0 || num >= paintableSources.Length)
+		{
+			return;
+		}
+		byte[] array = msg.read.BytesWithSize();
+		if (msg.read.Unread > 0 && msg.read.Bit() && !msg.player.IsAdmin)
+		{
+			UnityEngine.Debug.LogWarning($"{msg.player} tried to upload a sign from a file but they aren't admin, ignoring");
+			return;
+		}
+		EnsureInitialized();
+		if (array == null)
+		{
+			if (textureIDs[num] != 0)
+			{
+				FileStorage.server.RemoveExact(textureIDs[num], FileStorage.Type.png, net.ID, (uint)num);
+			}
+			textureIDs[num] = 0u;
+		}
+		else
+		{
+			if (!ImageProcessing.IsValidPNG(array, 1024, 1024))
+			{
+				return;
+			}
+			if (textureIDs[num] != 0)
+			{
+				FileStorage.server.RemoveExact(textureIDs[num], FileStorage.Type.png, net.ID, (uint)num);
+			}
+			textureIDs[num] = FileStorage.server.Store(array, FileStorage.Type.png, net.ID, (uint)num);
+		}
+		LogEdit(msg.player);
+		SendNetworkUpdate();
+		Interface.CallHook("OnSignUpdated", this, msg.player, num);
+	}
+
+	public void EnsureInitialized()
+	{
+		int num = Mathf.Max(paintableSources.Length, 1);
+		if (textureIDs == null || textureIDs.Length != num)
+		{
+			Array.Resize(ref textureIDs, num);
+		}
+	}
+
+	[Conditional("SIGN_DEBUG")]
+	private static void SignDebugLog(string str)
+	{
+		UnityEngine.Debug.Log(str);
 	}
 }

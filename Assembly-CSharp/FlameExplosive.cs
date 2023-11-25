@@ -33,7 +33,7 @@ public class FlameExplosive : TimedExplosive
 			return;
 		}
 		Vector3 position = base.transform.position;
-		if (blockCreateUnderwater && WaterLevel.Test(position))
+		if (blockCreateUnderwater && WaterLevel.Test(position, waves: true, volumes: false))
 		{
 			base.Explode();
 			return;

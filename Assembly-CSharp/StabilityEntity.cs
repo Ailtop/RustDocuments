@@ -46,7 +46,7 @@ public class StabilityEntity : DecayEntity
 				return;
 			}
 			List<BaseEntity> obj = Facepunch.Pool.GetList<BaseEntity>();
-			Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj, 69372162);
+			Vis.Entities(bounds.center, bounds.extents.magnitude + 1f, obj, -2145220350);
 			foreach (BaseEntity item in obj)
 			{
 				if (!item.IsDestroyed && !item.isClient)
@@ -87,7 +87,7 @@ public class StabilityEntity : DecayEntity
 			{
 				StabilityEntity stabilityEntity2 = link.connections[i].owner as StabilityEntity;
 				Socket_Base socket = link.connections[i].socket;
-				if (!(stabilityEntity2 == null) && !(stabilityEntity2 == parent) && !(stabilityEntity2 == ignoreEntity) && !stabilityEntity2.isClient && !stabilityEntity2.IsDestroyed && (!(socket is ConstructionSocket constructionSocket) || !constructionSocket.femaleNoStability) && (stabilityEntity == null || stabilityEntity2.cachedDistanceFromGround < stabilityEntity.cachedDistanceFromGround))
+				if (!(stabilityEntity2 == null) && !(stabilityEntity2 == parent) && !(stabilityEntity2 == ignoreEntity) && !stabilityEntity2.isClient && !stabilityEntity2.IsDestroyed && !(socket is ConstructionSocket { femaleNoStability: not false }) && (stabilityEntity == null || stabilityEntity2.cachedDistanceFromGround < stabilityEntity.cachedDistanceFromGround))
 				{
 					stabilityEntity = stabilityEntity2;
 				}
@@ -95,10 +95,6 @@ public class StabilityEntity : DecayEntity
 			return stabilityEntity;
 		}
 	}
-
-	public static StabilityCheckWorkQueue stabilityCheckQueue = new StabilityCheckWorkQueue();
-
-	public static UpdateSurroundingsQueue updateSurroundingsQueue = new UpdateSurroundingsQueue();
 
 	public bool grounded;
 
@@ -114,31 +110,9 @@ public class StabilityEntity : DecayEntity
 
 	private bool dirty;
 
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		info.msg.stabilityEntity = Facepunch.Pool.Get<ProtoBuf.StabilityEntity>();
-		info.msg.stabilityEntity.stability = cachedStability;
-		info.msg.stabilityEntity.distanceFromGround = cachedDistanceFromGround;
-	}
+	public static StabilityCheckWorkQueue stabilityCheckQueue = new StabilityCheckWorkQueue();
 
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.stabilityEntity != null)
-		{
-			cachedStability = info.msg.stabilityEntity.stability;
-			cachedDistanceFromGround = info.msg.stabilityEntity.distanceFromGround;
-			if (cachedStability <= 0f)
-			{
-				cachedStability = 0f;
-			}
-			if (cachedDistanceFromGround <= 0)
-			{
-				cachedDistanceFromGround = int.MaxValue;
-			}
-		}
-	}
+	public static UpdateSurroundingsQueue updateSurroundingsQueue = new UpdateSurroundingsQueue();
 
 	public override void ResetState()
 	{
@@ -156,7 +130,7 @@ public class StabilityEntity : DecayEntity
 	public void InitializeSupports()
 	{
 		supports = new List<Support>();
-		if (grounded)
+		if (grounded || HasParent())
 		{
 			return;
 		}
@@ -180,7 +154,7 @@ public class StabilityEntity : DecayEntity
 
 	public int DistanceFromGround(StabilityEntity ignoreEntity = null)
 	{
-		if (grounded)
+		if (grounded || HasParent())
 		{
 			return 1;
 		}
@@ -210,7 +184,7 @@ public class StabilityEntity : DecayEntity
 
 	public float SupportValue(StabilityEntity ignoreEntity = null)
 	{
-		if (grounded)
+		if (grounded || HasParent())
 		{
 			return 1f;
 		}
@@ -241,7 +215,7 @@ public class StabilityEntity : DecayEntity
 
 	public int CachedDistanceFromGround(StabilityEntity ignoreEntity = null)
 	{
-		if (grounded)
+		if (grounded || HasParent())
 		{
 			return 1;
 		}
@@ -271,7 +245,7 @@ public class StabilityEntity : DecayEntity
 
 	public float CachedSupportValue(StabilityEntity ignoreEntity = null)
 	{
-		if (grounded)
+		if (grounded || HasParent())
 		{
 			return 1f;
 		}
@@ -409,5 +383,31 @@ public class StabilityEntity : DecayEntity
 	{
 		base.DoServerDestroy();
 		UpdateSurroundingEntities();
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		info.msg.stabilityEntity = Facepunch.Pool.Get<ProtoBuf.StabilityEntity>();
+		info.msg.stabilityEntity.stability = cachedStability;
+		info.msg.stabilityEntity.distanceFromGround = cachedDistanceFromGround;
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.stabilityEntity != null)
+		{
+			cachedStability = info.msg.stabilityEntity.stability;
+			cachedDistanceFromGround = info.msg.stabilityEntity.distanceFromGround;
+			if (cachedStability <= 0f)
+			{
+				cachedStability = 0f;
+			}
+			if (cachedDistanceFromGround <= 0)
+			{
+				cachedDistanceFromGround = int.MaxValue;
+			}
+		}
 	}
 }

@@ -22,15 +22,11 @@ public class JunkPileWater : JunkPile
 		}
 	}
 
-	public static JunkpileWaterWorkQueue junkpileWaterWorkQueue = new JunkpileWaterWorkQueue();
-
-	[ServerVar]
-	[Help("How many milliseconds to budget for processing life story updates per frame")]
-	public static float framebudgetms = 0.25f;
-
 	public Transform[] buoyancyPoints;
 
 	public bool debugDraw;
+
+	public float updateCullRange = 16f;
 
 	private Quaternion baseRotation = Quaternion.identity;
 
@@ -39,6 +35,12 @@ public class JunkPileWater : JunkPile
 	private TimeUntil nextPlayerCheck;
 
 	private bool hasPlayersNearby;
+
+	public static JunkpileWaterWorkQueue junkpileWaterWorkQueue = new JunkpileWaterWorkQueue();
+
+	[ServerVar]
+	[Help("How many milliseconds to budget for processing junk pile updates per frame")]
+	public static float framebudgetms = 0.25f;
 
 	public override void Spawn()
 	{
@@ -98,6 +100,6 @@ public class JunkPileWater : JunkPile
 
 	public void UpdateNearbyPlayers()
 	{
-		hasPlayersNearby = BaseNetworkable.HasCloseConnections(base.transform.position, 16f);
+		hasPlayersNearby = BaseNetworkable.HasCloseConnections(base.transform.position, updateCullRange);
 	}
 }

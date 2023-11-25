@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Engine Audio Preset", menuName = "Rust/Vehicles/Engine Audio Preset")]
+[CreateAssetMenu(fileName = "Engine Audio Preset", menuName = "Scriptable Object/Vehicles/Engine Audio Preset")]
 public class EngineAudioSet : ScriptableObject
 {
 	public BlendedEngineLoopDefinition[] engineAudioLoops;

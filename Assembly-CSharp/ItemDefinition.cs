@@ -33,6 +33,14 @@ public class ItemDefinition : MonoBehaviour
 		public WorldSpawnCondition foundCondition;
 	}
 
+	[Serializable]
+	public struct OverrideWorldModel
+	{
+		public GameObjectRef worldModel;
+
+		public int minStackSize;
+	}
+
 	public enum RedirectVendingBehaviour
 	{
 		NoListing = 0,
@@ -43,7 +51,9 @@ public class ItemDefinition : MonoBehaviour
 	public enum Flag
 	{
 		NoDropping = 1,
-		NotStraightToBelt = 2
+		NotStraightToBelt = 2,
+		NotAllowedInBelt = 4,
+		Backpack = 8
 	}
 
 	public enum AmountType
@@ -123,6 +133,8 @@ public class ItemDefinition : MonoBehaviour
 	public ItemDefinition Parent;
 
 	public GameObjectRef worldModelPrefab;
+
+	public OverrideWorldModel[] worldModelOverrides;
 
 	public ItemDefinition isRedirectOf;
 
@@ -249,5 +261,37 @@ public class ItemDefinition : MonoBehaviour
 		ItemModWearable = GetComponent<ItemModWearable>();
 		isHoldable = GetComponent<ItemModEntity>() != null;
 		isUsable = GetComponent<ItemModEntity>() != null || GetComponent<ItemModConsume>() != null;
+	}
+
+	public GameObjectRef GetWorldModel(int amount)
+	{
+		if (worldModelOverrides == null || worldModelOverrides.Length == 0)
+		{
+			return worldModelPrefab;
+		}
+		for (int num = worldModelOverrides.Length - 1; num >= 0; num--)
+		{
+			if (amount >= worldModelOverrides[num].minStackSize)
+			{
+				return worldModelOverrides[num].worldModel;
+			}
+		}
+		return worldModelPrefab;
+	}
+
+	public int GetWorldModelIndex(int amount)
+	{
+		if (worldModelOverrides == null || worldModelOverrides.Length == 0)
+		{
+			return -1;
+		}
+		for (int num = worldModelOverrides.Length - 1; num >= 0; num--)
+		{
+			if (amount >= worldModelOverrides[num].minStackSize)
+			{
+				return num;
+			}
+		}
+		return -1;
 	}
 }

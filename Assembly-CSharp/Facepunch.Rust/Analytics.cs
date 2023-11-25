@@ -12,6 +12,7 @@ using ConVar;
 using Network;
 using Newtonsoft.Json;
 using Rust;
+using Steamworks;
 using UnityEngine;
 
 namespace Facepunch.Rust;
@@ -20,112 +21,6 @@ public static class Analytics
 {
 	public static class Azure
 	{
-		private struct EntitySumItem
-		{
-			public uint PrefabId;
-
-			public int Count;
-
-			public int Grade;
-		}
-
-		private struct EntityKey : IEquatable<EntityKey>
-		{
-			public uint PrefabId;
-
-			public int Grade;
-
-			public bool Equals(EntityKey other)
-			{
-				if (PrefabId == other.PrefabId)
-				{
-					return Grade == other.Grade;
-				}
-				return false;
-			}
-
-			public override int GetHashCode()
-			{
-				return (17 * 23 + PrefabId.GetHashCode()) * 31 + Grade.GetHashCode();
-			}
-		}
-
-		private class PendingItemsData : Pool.IPooled
-		{
-			public PendingItemsKey Key;
-
-			public int amount;
-
-			public string category;
-
-			public void EnterPool()
-			{
-				Key = default(PendingItemsKey);
-				amount = 0;
-				category = null;
-			}
-
-			public void LeavePool()
-			{
-			}
-		}
-
-		private struct PendingItemsKey : IEquatable<PendingItemsKey>
-		{
-			public string Item;
-
-			public bool Consumed;
-
-			public string Entity;
-
-			public string Category;
-
-			public NetworkableId EntityId;
-
-			public bool Equals(PendingItemsKey other)
-			{
-				if (Item == other.Item && Entity == other.Entity && EntityId == other.EntityId && Consumed == other.Consumed)
-				{
-					return Category == other.Category;
-				}
-				return false;
-			}
-
-			public override int GetHashCode()
-			{
-				return ((((17 * 23 + Item.GetHashCode()) * 31 + Consumed.GetHashCode()) * 37 + Entity.GetHashCode()) * 47 + Category.GetHashCode()) * 53 + EntityId.GetHashCode();
-			}
-		}
-
-		private struct PlayerPos
-		{
-			public string UserId;
-
-			public Vector3 Position;
-
-			public Vector3 Direction;
-		}
-
-		private class TeamInfo : Pool.IPooled
-		{
-			public List<string> online = new List<string>();
-
-			public List<string> offline = new List<string>();
-
-			public int member_count;
-
-			public void EnterPool()
-			{
-				online.Clear();
-				offline.Clear();
-				member_count = 0;
-			}
-
-			public void LeavePool()
-			{
-			}
-		}
-
 		public enum ResourceMode
 		{
 			Produced = 0,
@@ -244,11 +139,23 @@ public static class Analytics
 
 			public const string Gambling = "gambing";
 
+			public const string BuildingBlockColor = "building_block_color";
+
 			public const string MissionComplete = "mission_complete";
 
 			public const string PlayerPinged = "player_pinged";
 
 			public const string BagUnclaim = "bag_unclaim";
+
+			public const string SteamAuth = "steam_auth";
+
+			public const string ParachuteUsed = "parachute_used";
+
+			public const string MountEntity = "mount";
+
+			public const string DismountEntity = "dismount";
+
+			public const string BurstToggle = "burst_toggle";
 		}
 
 		private struct SimpleItemAmount
@@ -312,13 +219,139 @@ public static class Analytics
 			}
 		}
 
+		private struct EntitySumItem
+		{
+			public uint PrefabId;
+
+			public int Count;
+
+			public int Grade;
+		}
+
+		private struct EntityKey : IEquatable<EntityKey>
+		{
+			public uint PrefabId;
+
+			public int Grade;
+
+			public bool Equals(EntityKey other)
+			{
+				if (PrefabId == other.PrefabId)
+				{
+					return Grade == other.Grade;
+				}
+				return false;
+			}
+
+			public override int GetHashCode()
+			{
+				return (17 * 23 + PrefabId.GetHashCode()) * 31 + Grade.GetHashCode();
+			}
+		}
+
+		private class PendingItemsData : Pool.IPooled
+		{
+			public PendingItemsKey Key;
+
+			public int amount;
+
+			public string category;
+
+			public void EnterPool()
+			{
+				Key = default(PendingItemsKey);
+				amount = 0;
+				category = null;
+			}
+
+			public void LeavePool()
+			{
+			}
+		}
+
+		private struct PendingItemsKey : IEquatable<PendingItemsKey>
+		{
+			public string Item;
+
+			public bool Consumed;
+
+			public string Entity;
+
+			public string Category;
+
+			public NetworkableId EntityId;
+
+			public bool Equals(PendingItemsKey other)
+			{
+				if (Item == other.Item && Entity == other.Entity && EntityId == other.EntityId && Consumed == other.Consumed)
+				{
+					return Category == other.Category;
+				}
+				return false;
+			}
+
+			public override int GetHashCode()
+			{
+				return ((((17 * 23 + Item.GetHashCode()) * 31 + Consumed.GetHashCode()) * 37 + Entity.GetHashCode()) * 47 + Category.GetHashCode()) * 53 + EntityId.GetHashCode();
+			}
+		}
+
+		private class PlayerAggregate : Pool.IPooled
+		{
+			public string UserId;
+
+			public Vector3 Position;
+
+			public Vector3 Direction;
+
+			public List<string> Hotbar = new List<string>();
+
+			public List<string> Worn = new List<string>();
+
+			public string ActiveItem;
+
+			public void EnterPool()
+			{
+				UserId = null;
+				Position = default(Vector3);
+				Direction = default(Vector3);
+				Hotbar.Clear();
+				Worn.Clear();
+				ActiveItem = null;
+			}
+
+			public void LeavePool()
+			{
+			}
+		}
+
+		private class TeamInfo : Pool.IPooled
+		{
+			public List<string> online = new List<string>();
+
+			public List<string> offline = new List<string>();
+
+			public int member_count;
+
+			public void EnterPool()
+			{
+				online.Clear();
+				offline.Clear();
+				member_count = 0;
+			}
+
+			public void LeavePool()
+			{
+			}
+		}
+
+		private static Dictionary<FiredProjectileKey, PendingFiredProjectile> firedProjectiles = new Dictionary<FiredProjectileKey, PendingFiredProjectile>();
+
 		private static Dictionary<int, string> geneCache = new Dictionary<int, string>();
 
 		public static int MaxMSPerFrame = 5;
 
 		private static Dictionary<PendingItemsKey, PendingItemsData> pendingItems = new Dictionary<PendingItemsKey, PendingItemsData>();
-
-		private static Dictionary<FiredProjectileKey, PendingFiredProjectile> firedProjectiles = new Dictionary<FiredProjectileKey, PendingFiredProjectile>();
 
 		public static bool Stats
 		{
@@ -330,364 +363,6 @@ public static class Analytics
 				}
 				return false;
 			}
-		}
-
-		private static string GetGenesAsString(GrowableEntity plant)
-		{
-			int key = GrowableGeneEncoding.EncodeGenesToInt(plant.Genes);
-			if (!geneCache.TryGetValue(key, out var value))
-			{
-				return string.Join("", from x in plant.Genes.Genes
-					group x by x.GetDisplayCharacter() into x
-					orderby x.Key
-					select x.Count() + x.Key);
-			}
-			return value;
-		}
-
-		private static string GetMonument(BaseEntity entity)
-		{
-			if (entity == null)
-			{
-				return null;
-			}
-			SpawnGroup spawnGroup = null;
-			if (entity is BaseCorpse baseCorpse)
-			{
-				spawnGroup = baseCorpse.spawnGroup;
-			}
-			if (spawnGroup == null)
-			{
-				SpawnPointInstance component = entity.GetComponent<SpawnPointInstance>();
-				if (component != null)
-				{
-					spawnGroup = component.parentSpawnPointUser as SpawnGroup;
-				}
-			}
-			if (spawnGroup != null)
-			{
-				if (!string.IsNullOrEmpty(spawnGroup.category))
-				{
-					return spawnGroup.category;
-				}
-				if (spawnGroup.Monument != null)
-				{
-					return spawnGroup.Monument.name;
-				}
-			}
-			MonumentInfo monumentInfo = TerrainMeta.Path.FindMonumentWithBoundsOverlap(entity.transform.position);
-			if (monumentInfo != null)
-			{
-				return monumentInfo.name;
-			}
-			return null;
-		}
-
-		private static string GetBiome(Vector3 position)
-		{
-			string result = null;
-			switch ((TerrainBiome.Enum)TerrainMeta.BiomeMap.GetBiomeMaxType(position))
-			{
-			case TerrainBiome.Enum.Arid:
-				result = "arid";
-				break;
-			case TerrainBiome.Enum.Temperate:
-				result = "grass";
-				break;
-			case TerrainBiome.Enum.Tundra:
-				result = "tundra";
-				break;
-			case TerrainBiome.Enum.Arctic:
-				result = "arctic";
-				break;
-			}
-			return result;
-		}
-
-		private static bool IsOcean(Vector3 position)
-		{
-			return TerrainMeta.TopologyMap.GetTopology(position) == 128;
-		}
-
-		private static IEnumerator AggregateLoop()
-		{
-			int loop = 0;
-			while (!global::Rust.Application.isQuitting)
-			{
-				yield return CoroutineEx.waitForSecondsRealtime(60f);
-				if (Stats)
-				{
-					yield return TryCatch(AggregatePlayers(blueprints: false, positions: true));
-					if (loop % 60 == 0)
-					{
-						PushServerInfo();
-						yield return TryCatch(AggregateEntitiesAndItems());
-						yield return TryCatch(AggregatePlayers(blueprints: true));
-						yield return TryCatch(AggregateTeams());
-						Dictionary<PendingItemsKey, PendingItemsData> dict = pendingItems;
-						pendingItems = new Dictionary<PendingItemsKey, PendingItemsData>();
-						yield return PushPendingItemsLoopAsync(dict);
-					}
-					loop++;
-				}
-			}
-		}
-
-		private static IEnumerator TryCatch(IEnumerator coroutine)
-		{
-			while (true)
-			{
-				try
-				{
-					if (!coroutine.MoveNext())
-					{
-						break;
-					}
-				}
-				catch (Exception exception)
-				{
-					UnityEngine.Debug.LogException(exception);
-					break;
-				}
-				yield return coroutine.Current;
-			}
-		}
-
-		private static IEnumerator AggregateEntitiesAndItems()
-		{
-			List<BaseNetworkable> entityQueue = new List<BaseNetworkable>();
-			entityQueue.Clear();
-			int totalCount = BaseNetworkable.serverEntities.Count;
-			entityQueue.AddRange(BaseNetworkable.serverEntities);
-			Dictionary<string, int> itemDict = new Dictionary<string, int>();
-			Dictionary<EntityKey, int> entityDict = new Dictionary<EntityKey, int>();
-			yield return null;
-			UnityEngine.Debug.Log("Starting to aggregate entities & items...");
-			DateTime startTime = DateTime.UtcNow;
-			Stopwatch watch = Stopwatch.StartNew();
-			foreach (BaseNetworkable entity in entityQueue)
-			{
-				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
-				{
-					yield return null;
-					watch.Restart();
-				}
-				if (entity == null || entity.IsDestroyed)
-				{
-					continue;
-				}
-				EntityKey entityKey = default(EntityKey);
-				entityKey.PrefabId = entity.prefabID;
-				EntityKey key = entityKey;
-				if (entity is BuildingBlock buildingBlock)
-				{
-					key.Grade = (int)(buildingBlock.grade + 1);
-				}
-				entityDict.TryGetValue(key, out var value);
-				entityDict[key] = value + 1;
-				if (!(entity is LootContainer) && (!(entity is BasePlayer basePlayer) || !basePlayer.IsNpc) && !(entity is NPCPlayer))
-				{
-					if (entity is BasePlayer basePlayer2)
-					{
-						AddItemsToDict(basePlayer2.inventory.containerMain, itemDict);
-						AddItemsToDict(basePlayer2.inventory.containerBelt, itemDict);
-						AddItemsToDict(basePlayer2.inventory.containerWear, itemDict);
-					}
-					else if (entity is IItemContainerEntity itemContainerEntity)
-					{
-						AddItemsToDict(itemContainerEntity.inventory, itemDict);
-					}
-					else if (entity is DroppedItemContainer droppedItemContainer && droppedItemContainer.inventory != null)
-					{
-						AddItemsToDict(droppedItemContainer.inventory, itemDict);
-					}
-				}
-			}
-			UnityEngine.Debug.Log($"Took {System.Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 1)}s to aggregate {totalCount} entities & items...");
-			_ = DateTime.UtcNow;
-			EventRecord.New("entity_sum").AddObject("counts", entityDict.Select(delegate(KeyValuePair<EntityKey, int> x)
-			{
-				EntitySumItem result = default(EntitySumItem);
-				result.PrefabId = x.Key.PrefabId;
-				result.Grade = x.Key.Grade;
-				result.Count = x.Value;
-				return result;
-			})).Submit();
-			yield return null;
-			EventRecord.New("item_sum").AddObject("counts", itemDict).Submit();
-			yield return null;
-		}
-
-		private static void AddItemsToDict(ItemContainer container, Dictionary<string, int> dict)
-		{
-			if (container == null || container.itemList == null)
-			{
-				return;
-			}
-			foreach (Item item in container.itemList)
-			{
-				string shortname = item.info.shortname;
-				dict.TryGetValue(shortname, out var value);
-				dict[shortname] = value + item.amount;
-				if (item.contents != null)
-				{
-					AddItemsToDict(item.contents, dict);
-				}
-			}
-		}
-
-		private static IEnumerator PushPendingItemsLoopAsync(Dictionary<PendingItemsKey, PendingItemsData> dict)
-		{
-			Stopwatch watch = Stopwatch.StartNew();
-			foreach (PendingItemsData value in dict.Values)
-			{
-				try
-				{
-					LogResource(value.Key.Consumed ? ResourceMode.Consumed : ResourceMode.Produced, value.category, value.Key.Item, value.amount, null, null, safezone: false, null, 0uL, value.Key.Entity);
-				}
-				catch (Exception exception)
-				{
-					UnityEngine.Debug.LogException(exception);
-				}
-				PendingItemsData obj = value;
-				Pool.Free(ref obj);
-				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
-				{
-					yield return null;
-					watch.Restart();
-				}
-			}
-			dict.Clear();
-		}
-
-		public static void AddPendingItems(BaseEntity entity, string itemName, int amount, string category, bool consumed = true, bool perEntity = false)
-		{
-			PendingItemsKey pendingItemsKey = default(PendingItemsKey);
-			pendingItemsKey.Entity = entity.ShortPrefabName;
-			pendingItemsKey.Category = category;
-			pendingItemsKey.Item = itemName;
-			pendingItemsKey.Consumed = consumed;
-			pendingItemsKey.EntityId = (perEntity ? entity.net.ID : default(NetworkableId));
-			PendingItemsKey key = pendingItemsKey;
-			if (!pendingItems.TryGetValue(key, out var value))
-			{
-				value = Pool.Get<PendingItemsData>();
-				value.Key = key;
-				value.category = category;
-				pendingItems[key] = value;
-			}
-			value.amount += amount;
-		}
-
-		private static IEnumerator AggregatePlayers(bool blueprints = false, bool positions = false)
-		{
-			Stopwatch watch = Stopwatch.StartNew();
-			List<BasePlayer> list = Pool.GetList<BasePlayer>();
-			list.AddRange(BasePlayer.activePlayerList);
-			Dictionary<int, int> playerBps = (blueprints ? new Dictionary<int, int>() : null);
-			List<PlayerPos> playerPositions = (positions ? new List<PlayerPos>() : null);
-			foreach (BasePlayer item in list)
-			{
-				if (item == null || item.IsDestroyed)
-				{
-					continue;
-				}
-				if (blueprints)
-				{
-					foreach (int unlockedItem in item.PersistantPlayerInfo.unlockedItems)
-					{
-						playerBps.TryGetValue(unlockedItem, out var value);
-						playerBps[unlockedItem] = value + 1;
-					}
-				}
-				if (positions)
-				{
-					playerPositions.Add(new PlayerPos
-					{
-						UserId = item.WipeId,
-						Position = item.transform.position,
-						Direction = item.eyes.bodyRotation.eulerAngles
-					});
-				}
-				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
-				{
-					yield return null;
-					watch.Restart();
-				}
-			}
-			if (blueprints)
-			{
-				EventRecord.New("blueprint_aggregate_online").AddObject("blueprints", playerBps.Select((KeyValuePair<int, int> x) => new
-				{
-					Key = ItemManager.FindItemDefinition(x.Key).shortname,
-					value = x.Value
-				})).Submit();
-			}
-			if (positions)
-			{
-				EventRecord.New("player_positions").AddObject("positions", playerPositions).AddObject("player_count", playerPositions.Count)
-					.Submit();
-			}
-		}
-
-		private static IEnumerator AggregateTeams()
-		{
-			yield return null;
-			HashSet<ulong> teamIds = new HashSet<ulong>();
-			int inTeam = 0;
-			int notInTeam = 0;
-			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
-			{
-				if (activePlayer != null && !activePlayer.IsDestroyed && activePlayer.currentTeam != 0L)
-				{
-					teamIds.Add(activePlayer.currentTeam);
-					inTeam++;
-				}
-				else
-				{
-					notInTeam++;
-				}
-			}
-			yield return null;
-			Stopwatch watch = Stopwatch.StartNew();
-			List<TeamInfo> teams = Pool.GetList<TeamInfo>();
-			foreach (ulong item in teamIds)
-			{
-				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindTeam(item);
-				if (playerTeam == null || !((playerTeam.members != null) & (playerTeam.members.Count > 0)))
-				{
-					continue;
-				}
-				TeamInfo teamInfo = Pool.Get<TeamInfo>();
-				teams.Add(teamInfo);
-				foreach (ulong member in playerTeam.members)
-				{
-					BasePlayer basePlayer = RelationshipManager.FindByID(member);
-					if (basePlayer != null && !basePlayer.IsDestroyed && basePlayer.IsConnected && !basePlayer.IsSleeping())
-					{
-						teamInfo.online.Add(SingletonComponent<ServerMgr>.Instance.persistance.GetUserWipeId(member));
-					}
-					else
-					{
-						teamInfo.offline.Add(SingletonComponent<ServerMgr>.Instance.persistance.GetUserWipeId(member));
-					}
-				}
-				teamInfo.member_count = teamInfo.online.Count + teamInfo.offline.Count;
-				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
-				{
-					yield return null;
-					watch.Restart();
-				}
-			}
-			EventRecord.New("online_teams").AddObject("teams", teams).AddField("users_in_team", inTeam)
-				.AddField("users_not_in_team", notInTeam)
-				.Submit();
-			foreach (TeamInfo item2 in teams)
-			{
-				TeamInfo obj = item2;
-				Pool.Free(ref obj);
-			}
-			Pool.FreeList(ref teams);
 		}
 
 		public static void Initialize()
@@ -711,8 +386,8 @@ public static class Analytics
 					.AddField("ip_convar", global::Network.Net.sv.ip)
 					.AddField("port_convar", global::Network.Net.sv.port)
 					.AddField("net_protocol", global::Network.Net.sv.ProtocolId)
-					.AddField("protocol_network", 2392)
-					.AddField("protocol_save", 238)
+					.AddField("protocol_network", 2511)
+					.AddField("protocol_save", 243)
 					.AddField("changeset", BuildInfo.Current?.Scm.ChangeId ?? "0")
 					.AddField("unity_version", UnityEngine.Application.unityVersion)
 					.AddField("branch", BuildInfo.Current?.Scm.Branch ?? "empty")
@@ -804,7 +479,8 @@ public static class Analytics
 					.AddField("projectile_id", projectile.id)
 					.AddField("attacker", player)
 					.AddField("look_dir", player.tickViewAngles)
-					.AddField("model_state", (player.modelStateTick ?? player.modelState).flags);
+					.AddField("model_state", (player.modelStateTick ?? player.modelState).flags)
+					.AddField("burst_mode", projectile.weaponSource?.HasFlag(BaseEntity.Flags.Reserved6) ?? false);
 				PendingFiredProjectile pendingFiredProjectile = Pool.Get<PendingFiredProjectile>();
 				pendingFiredProjectile.Record = record;
 				pendingFiredProjectile.FiredProjectile = projectile;
@@ -970,7 +646,7 @@ public static class Analytics
 			}
 			try
 			{
-				if (trackedSpawnedIds.Contains(entity.net.ID))
+				if (BaseNetworkableEx.IsValid(entity) && trackedSpawnedIds.Contains(entity.net.ID))
 				{
 					EventRecord.New("entity_killed").AddField("entity", entity).Submit();
 				}
@@ -1144,7 +820,7 @@ public static class Analytics
 			}
 		}
 
-		public static void OnBlueprintLearned(BasePlayer player, ItemDefinition item, string reason, BaseEntity entity = null)
+		public static void OnBlueprintLearned(BasePlayer player, ItemDefinition item, string reason, int scrapCost, BaseEntity entity)
 		{
 			if (!Stats)
 			{
@@ -1155,6 +831,7 @@ public static class Analytics
 				EventRecord.New("blueprint_learned").AddField("player", player).AddField("item", item.shortname)
 					.AddField("reason", reason)
 					.AddField("entity", entity)
+					.AddField("scrap_cost", scrapCost)
 					.Submit();
 			}
 			catch (Exception exception)
@@ -1227,9 +904,8 @@ public static class Analytics
 						.AddField("biome", GetBiome(entity.transform.position))
 						.Submit();
 				}
-				else if (entity is LootableCorpse lootableCorpse)
+				else if (entity is LootableCorpse { containers: var containers })
 				{
-					ItemContainer[] containers = lootableCorpse.containers;
 					foreach (ItemContainer container in containers)
 					{
 						LogItemsLooted(player, entity, container);
@@ -1270,7 +946,7 @@ public static class Analytics
 			}
 			try
 			{
-				if (!(entity is LootContainer lootContainer) || !lootContainer.FirstLooted)
+				if (!(entity is LootContainer { FirstLooted: not false } lootContainer))
 				{
 					return;
 				}
@@ -1301,6 +977,42 @@ public static class Analytics
 					eventRecord.AddField("max_sleeping_bags", ConVar.Server.max_sleeping_bags);
 				}
 				eventRecord.Submit();
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
+		}
+
+		public static void OnMountEntity(BasePlayer player, BaseEntity seat, BaseEntity vehicle)
+		{
+			if (!Stats)
+			{
+				return;
+			}
+			try
+			{
+				EventRecord.New("mount").AddField("player", player).AddField("vehicle", vehicle)
+					.AddField("seat", seat)
+					.Submit();
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
+		}
+
+		public static void OnDismountEntity(BasePlayer player, BaseEntity seat, BaseEntity vehicle)
+		{
+			if (!Stats)
+			{
+				return;
+			}
+			try
+			{
+				EventRecord.New("dismount").AddField("player", player).AddField("vehicle", vehicle)
+					.AddField("seat", seat)
+					.Submit();
 			}
 			catch (Exception exception)
 			{
@@ -1574,7 +1286,7 @@ public static class Analytics
 					else
 					{
 						value = Vector3.Distance(info.HitNormalWorld, initiatorPlayer.eyes.position);
-						value = Vector3Ex.Distance2D(info.HitNormalWorld, initiatorPlayer.eyes.position);
+						value2 = Vector3Ex.Distance2D(info.HitNormalWorld, initiatorPlayer.eyes.position);
 					}
 				}
 				if (eventRecord == null)
@@ -2057,7 +1769,7 @@ public static class Analytics
 			}
 		}
 
-		public static void OnBuildingBlockUpgraded(BasePlayer player, BuildingBlock buildingBlock, BuildingGrade.Enum targetGrade)
+		public static void OnBuildingBlockUpgraded(BasePlayer player, BuildingBlock buildingBlock, BuildingGrade.Enum targetGrade, uint targetColor, ulong targetSkin)
 		{
 			if (!Stats)
 			{
@@ -2068,6 +1780,10 @@ public static class Analytics
 				EventRecord.New("block_upgrade").AddField("player", player).AddField("entity", buildingBlock)
 					.AddField("old_grade", (int)buildingBlock.grade)
 					.AddField("new_grade", (int)targetGrade)
+					.AddField("color", targetColor)
+					.AddField("biome", GetBiome(buildingBlock.transform.position))
+					.AddField("skin_old", buildingBlock.skinID)
+					.AddField("skin", targetSkin)
 					.Submit();
 			}
 			catch (Exception exception)
@@ -2223,6 +1939,455 @@ public static class Analytics
 			{
 				UnityEngine.Debug.LogException(exception);
 			}
+		}
+
+		public static void OnSteamAuth(ulong userId, ulong ownerUserId, string authResponse)
+		{
+			try
+			{
+				EventRecord.New("steam_auth").AddField("user", userId).AddField("owner", ownerUserId)
+					.AddField("response", authResponse)
+					.AddField("server_port", global::Network.Net.sv.port)
+					.AddField("network_mode", global::Network.Net.sv.ProtocolId)
+					.AddField("player_count", BasePlayer.activePlayerList.Count)
+					.AddField("max_players", ConVar.Server.maxplayers)
+					.AddField("hostname", ConVar.Server.hostname)
+					.Submit();
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
+		}
+
+		public static void OnBuildingBlockColorChanged(BasePlayer player, BuildingBlock block, uint oldColor, uint newColor)
+		{
+			if (!Stats)
+			{
+				return;
+			}
+			try
+			{
+				EventRecord.New("player_pinged").AddField("player", player).AddField("entity", block)
+					.AddField("color_old", oldColor)
+					.AddField("color_new", newColor)
+					.AddField("biome", GetBiome(block.transform.position))
+					.Submit();
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
+		}
+
+		public static void OnBurstModeToggled(BasePlayer player, BaseProjectile gun, bool state)
+		{
+			if (!Stats)
+			{
+				return;
+			}
+			try
+			{
+				EventRecord.New("burst_toggle").AddField("player", player).AddField("weapon", gun)
+					.AddField("enabled", state)
+					.Submit();
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
+		}
+
+		public static void OnParachuteUsed(BasePlayer player, float distanceTravelled, float deployHeight, float timeInAir)
+		{
+			if (!Stats)
+			{
+				return;
+			}
+			try
+			{
+				EventRecord.New("parachute_used").AddField("player", player).AddField("distanceTravelled", distanceTravelled)
+					.AddField("deployHeight", deployHeight)
+					.AddField("timeInAir", timeInAir)
+					.Submit();
+			}
+			catch (Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
+		}
+
+		private static string GetGenesAsString(GrowableEntity plant)
+		{
+			int key = GrowableGeneEncoding.EncodeGenesToInt(plant.Genes);
+			if (!geneCache.TryGetValue(key, out var value))
+			{
+				return string.Join("", from x in plant.Genes.Genes
+					group x by x.GetDisplayCharacter() into x
+					orderby x.Key
+					select x.Count() + x.Key);
+			}
+			return value;
+		}
+
+		private static string GetMonument(BaseEntity entity)
+		{
+			if (entity == null)
+			{
+				return null;
+			}
+			SpawnGroup spawnGroup = null;
+			if (entity is BaseCorpse baseCorpse)
+			{
+				spawnGroup = baseCorpse.spawnGroup;
+			}
+			if (spawnGroup == null)
+			{
+				SpawnPointInstance component = entity.GetComponent<SpawnPointInstance>();
+				if (component != null)
+				{
+					spawnGroup = component.parentSpawnPointUser as SpawnGroup;
+				}
+			}
+			if (spawnGroup != null)
+			{
+				if (!string.IsNullOrEmpty(spawnGroup.category))
+				{
+					return spawnGroup.category;
+				}
+				if (spawnGroup.Monument != null)
+				{
+					return spawnGroup.Monument.name;
+				}
+			}
+			MonumentInfo monumentInfo = TerrainMeta.Path.FindMonumentWithBoundsOverlap(entity.transform.position);
+			if (monumentInfo != null)
+			{
+				return monumentInfo.name;
+			}
+			return null;
+		}
+
+		private static string GetBiome(Vector3 position)
+		{
+			string result = null;
+			switch ((TerrainBiome.Enum)TerrainMeta.BiomeMap.GetBiomeMaxType(position))
+			{
+			case TerrainBiome.Enum.Arid:
+				result = "arid";
+				break;
+			case TerrainBiome.Enum.Temperate:
+				result = "grass";
+				break;
+			case TerrainBiome.Enum.Tundra:
+				result = "tundra";
+				break;
+			case TerrainBiome.Enum.Arctic:
+				result = "arctic";
+				break;
+			}
+			return result;
+		}
+
+		private static bool IsOcean(Vector3 position)
+		{
+			return TerrainMeta.TopologyMap.GetTopology(position) == 128;
+		}
+
+		private static IEnumerator AggregateLoop()
+		{
+			int loop = 0;
+			while (!global::Rust.Application.isQuitting)
+			{
+				yield return CoroutineEx.waitForSecondsRealtime(60f);
+				if (Stats)
+				{
+					yield return TryCatch(AggregatePlayers(blueprints: false, positions: true));
+					if (loop % 60 == 0)
+					{
+						PushServerInfo();
+						yield return TryCatch(AggregateEntitiesAndItems());
+						yield return TryCatch(AggregatePlayers(blueprints: true));
+						yield return TryCatch(AggregateTeams());
+						Dictionary<PendingItemsKey, PendingItemsData> dict = pendingItems;
+						pendingItems = new Dictionary<PendingItemsKey, PendingItemsData>();
+						yield return PushPendingItemsLoopAsync(dict);
+					}
+					loop++;
+				}
+			}
+		}
+
+		private static IEnumerator TryCatch(IEnumerator coroutine)
+		{
+			while (true)
+			{
+				try
+				{
+					if (!coroutine.MoveNext())
+					{
+						break;
+					}
+				}
+				catch (Exception exception)
+				{
+					UnityEngine.Debug.LogException(exception);
+					break;
+				}
+				yield return coroutine.Current;
+			}
+		}
+
+		private static IEnumerator AggregateEntitiesAndItems()
+		{
+			List<BaseNetworkable> entityQueue = new List<BaseNetworkable>();
+			entityQueue.Clear();
+			int totalCount = BaseNetworkable.serverEntities.Count;
+			entityQueue.AddRange(BaseNetworkable.serverEntities);
+			Dictionary<string, int> itemDict = new Dictionary<string, int>();
+			Dictionary<EntityKey, int> entityDict = new Dictionary<EntityKey, int>();
+			yield return null;
+			UnityEngine.Debug.Log("Starting to aggregate entities & items...");
+			DateTime startTime = DateTime.UtcNow;
+			Stopwatch watch = Stopwatch.StartNew();
+			foreach (BaseNetworkable entity in entityQueue)
+			{
+				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
+				{
+					yield return null;
+					watch.Restart();
+				}
+				if (entity == null || entity.IsDestroyed)
+				{
+					continue;
+				}
+				EntityKey entityKey = default(EntityKey);
+				entityKey.PrefabId = entity.prefabID;
+				EntityKey key = entityKey;
+				if (entity is BuildingBlock buildingBlock)
+				{
+					key.Grade = (int)(buildingBlock.grade + 1);
+				}
+				entityDict.TryGetValue(key, out var value);
+				entityDict[key] = value + 1;
+				if (!(entity is LootContainer) && !(entity is BasePlayer { IsNpc: not false }) && !(entity is NPCPlayer))
+				{
+					if (entity is BasePlayer basePlayer2)
+					{
+						AddItemsToDict(basePlayer2.inventory.containerMain, itemDict);
+						AddItemsToDict(basePlayer2.inventory.containerBelt, itemDict);
+						AddItemsToDict(basePlayer2.inventory.containerWear, itemDict);
+					}
+					else if (entity is IItemContainerEntity itemContainerEntity)
+					{
+						AddItemsToDict(itemContainerEntity.inventory, itemDict);
+					}
+					else if (entity is DroppedItemContainer { inventory: not null } droppedItemContainer)
+					{
+						AddItemsToDict(droppedItemContainer.inventory, itemDict);
+					}
+				}
+			}
+			UnityEngine.Debug.Log($"Took {System.Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 1)}s to aggregate {totalCount} entities & items...");
+			_ = DateTime.UtcNow;
+			EventRecord.New("entity_sum").AddObject("counts", entityDict.Select(delegate(KeyValuePair<EntityKey, int> x)
+			{
+				EntitySumItem result = default(EntitySumItem);
+				result.PrefabId = x.Key.PrefabId;
+				result.Grade = x.Key.Grade;
+				result.Count = x.Value;
+				return result;
+			})).Submit();
+			yield return null;
+			EventRecord.New("item_sum").AddObject("counts", itemDict).Submit();
+			yield return null;
+		}
+
+		private static void AddItemsToDict(ItemContainer container, Dictionary<string, int> dict)
+		{
+			if (container == null || container.itemList == null)
+			{
+				return;
+			}
+			foreach (Item item in container.itemList)
+			{
+				string shortname = item.info.shortname;
+				dict.TryGetValue(shortname, out var value);
+				dict[shortname] = value + item.amount;
+				if (item.contents != null)
+				{
+					AddItemsToDict(item.contents, dict);
+				}
+			}
+		}
+
+		private static IEnumerator PushPendingItemsLoopAsync(Dictionary<PendingItemsKey, PendingItemsData> dict)
+		{
+			Stopwatch watch = Stopwatch.StartNew();
+			foreach (PendingItemsData value in dict.Values)
+			{
+				try
+				{
+					LogResource(value.Key.Consumed ? ResourceMode.Consumed : ResourceMode.Produced, value.category, value.Key.Item, value.amount, null, null, safezone: false, null, 0uL, value.Key.Entity);
+				}
+				catch (Exception exception)
+				{
+					UnityEngine.Debug.LogException(exception);
+				}
+				PendingItemsData obj = value;
+				Pool.Free(ref obj);
+				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
+				{
+					yield return null;
+					watch.Restart();
+				}
+			}
+			dict.Clear();
+		}
+
+		public static void AddPendingItems(BaseEntity entity, string itemName, int amount, string category, bool consumed = true, bool perEntity = false)
+		{
+			PendingItemsKey pendingItemsKey = default(PendingItemsKey);
+			pendingItemsKey.Entity = entity.ShortPrefabName;
+			pendingItemsKey.Category = category;
+			pendingItemsKey.Item = itemName;
+			pendingItemsKey.Consumed = consumed;
+			pendingItemsKey.EntityId = (perEntity ? entity.net.ID : default(NetworkableId));
+			PendingItemsKey key = pendingItemsKey;
+			if (!pendingItems.TryGetValue(key, out var value))
+			{
+				value = Pool.Get<PendingItemsData>();
+				value.Key = key;
+				value.category = category;
+				pendingItems[key] = value;
+			}
+			value.amount += amount;
+		}
+
+		private static IEnumerator AggregatePlayers(bool blueprints = false, bool positions = false)
+		{
+			Stopwatch watch = Stopwatch.StartNew();
+			List<BasePlayer> list = Pool.GetList<BasePlayer>();
+			list.AddRange(BasePlayer.activePlayerList);
+			Dictionary<int, int> playerBps = (blueprints ? new Dictionary<int, int>() : null);
+			List<PlayerAggregate> playerPositions = (positions ? Pool.GetList<PlayerAggregate>() : null);
+			foreach (BasePlayer item in list)
+			{
+				if (item == null || item.IsDestroyed)
+				{
+					continue;
+				}
+				if (blueprints)
+				{
+					foreach (int unlockedItem in item.PersistantPlayerInfo.unlockedItems)
+					{
+						playerBps.TryGetValue(unlockedItem, out var value);
+						playerBps[unlockedItem] = value + 1;
+					}
+				}
+				if (positions)
+				{
+					PlayerAggregate playerAggregate = Pool.Get<PlayerAggregate>();
+					playerAggregate.UserId = item.WipeId;
+					playerAggregate.Position = item.transform.position;
+					playerAggregate.Direction = item.eyes.bodyRotation.eulerAngles;
+					foreach (Item item2 in item.inventory.containerBelt.itemList)
+					{
+						playerAggregate.Hotbar.Add(item2.info.shortname);
+					}
+					foreach (Item item3 in item.inventory.containerWear.itemList)
+					{
+						playerAggregate.Hotbar.Add(item3.info.shortname);
+					}
+					playerAggregate.ActiveItem = item.GetActiveItem()?.info.shortname;
+					playerPositions.Add(playerAggregate);
+				}
+				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
+				{
+					yield return null;
+					watch.Restart();
+				}
+			}
+			if (blueprints)
+			{
+				EventRecord.New("blueprint_aggregate_online").AddObject("blueprints", playerBps.Select((KeyValuePair<int, int> x) => new
+				{
+					Key = ItemManager.FindItemDefinition(x.Key).shortname,
+					value = x.Value
+				})).Submit();
+			}
+			if (!positions)
+			{
+				yield break;
+			}
+			EventRecord.New("player_positions").AddObject("positions", playerPositions).AddObject("player_count", playerPositions.Count)
+				.Submit();
+			foreach (PlayerAggregate item4 in playerPositions)
+			{
+				PlayerAggregate obj = item4;
+				Pool.Free(ref obj);
+			}
+			Pool.FreeList(ref playerPositions);
+		}
+
+		private static IEnumerator AggregateTeams()
+		{
+			yield return null;
+			HashSet<ulong> teamIds = new HashSet<ulong>();
+			int inTeam = 0;
+			int notInTeam = 0;
+			foreach (BasePlayer activePlayer in BasePlayer.activePlayerList)
+			{
+				if (activePlayer != null && !activePlayer.IsDestroyed && activePlayer.currentTeam != 0L)
+				{
+					teamIds.Add(activePlayer.currentTeam);
+					inTeam++;
+				}
+				else
+				{
+					notInTeam++;
+				}
+			}
+			yield return null;
+			Stopwatch watch = Stopwatch.StartNew();
+			List<TeamInfo> teams = Pool.GetList<TeamInfo>();
+			foreach (ulong item in teamIds)
+			{
+				RelationshipManager.PlayerTeam playerTeam = RelationshipManager.ServerInstance.FindTeam(item);
+				if (playerTeam == null || !((playerTeam.members != null) & (playerTeam.members.Count > 0)))
+				{
+					continue;
+				}
+				TeamInfo teamInfo = Pool.Get<TeamInfo>();
+				teams.Add(teamInfo);
+				foreach (ulong member in playerTeam.members)
+				{
+					BasePlayer basePlayer = RelationshipManager.FindByID(member);
+					if (basePlayer != null && !basePlayer.IsDestroyed && basePlayer.IsConnected && !basePlayer.IsSleeping())
+					{
+						teamInfo.online.Add(SingletonComponent<ServerMgr>.Instance.persistance.GetUserWipeId(member));
+					}
+					else
+					{
+						teamInfo.offline.Add(SingletonComponent<ServerMgr>.Instance.persistance.GetUserWipeId(member));
+					}
+				}
+				teamInfo.member_count = teamInfo.online.Count + teamInfo.offline.Count;
+				if (watch.ElapsedMilliseconds > MaxMSPerFrame)
+				{
+					yield return null;
+					watch.Restart();
+				}
+			}
+			EventRecord.New("online_teams").AddObject("teams", teams).AddField("users_in_team", inTeam)
+				.AddField("users_not_in_team", notInTeam)
+				.Submit();
+			foreach (TeamInfo item2 in teams)
+			{
+				TeamInfo obj = item2;
+				Pool.Free(ref obj);
+			}
+			Pool.FreeList(ref teams);
 		}
 	}
 
@@ -2395,6 +2560,7 @@ public static class Analytics
 			try
 			{
 				SerializeEvents(records, stream);
+				AuthTicket ticket = null;
 				for (int attempt = 0; attempt < MaxRetries; attempt++)
 				{
 					try
@@ -2414,8 +2580,10 @@ public static class Analytics
 							content.Headers.Add("X-SERVER-IP", global::Network.Net.sv.ip);
 							content.Headers.Add("X-SERVER-PORT", global::Network.Net.sv.port.ToString());
 						}
-						(await HttpClient.PostAsync(IsClient ? ClientAnalyticsUrl : ServerAnalyticsUrl, content)).EnsureSuccessStatusCode();
-						break;
+						if (UploadAnalytics)
+						{
+							(await HttpClient.PostAsync(IsClient ? ClientAnalyticsUrl : ServerAnalyticsUrl, content)).EnsureSuccessStatusCode();
+						}
 					}
 					catch (Exception ex)
 					{
@@ -2423,18 +2591,32 @@ public static class Analytics
 						{
 							UnityEngine.Debug.LogException(ex);
 						}
+						goto IL_01e4;
+					}
+					break;
+					IL_01e4:
+					if (ticket != null)
+					{
+						try
+						{
+							ticket.Cancel();
+						}
+						catch (Exception ex2)
+						{
+							UnityEngine.Debug.LogError("Failed to cancel auth ticket in analytics: " + ex2.ToString());
+						}
 					}
 				}
 			}
-			catch (Exception ex2)
+			catch (Exception ex3)
 			{
 				if (IsClient)
 				{
-					UnityEngine.Debug.LogWarning(ex2.ToString());
+					UnityEngine.Debug.LogWarning(ex3.ToString());
 				}
 				else
 				{
-					UnityEngine.Debug.LogException(ex2);
+					UnityEngine.Debug.LogException(ex3);
 				}
 			}
 			finally
@@ -2855,28 +3037,6 @@ public static class Analytics
 
 	private static HashSet<NetworkableId> trackedSpawnedIds = new HashSet<NetworkableId>();
 
-	public static string ClientAnalyticsUrl { get; set; } = "https://rust-api.facepunch.com/api/public/analytics/rust/client";
-
-
-	[ServerVar(Name = "server_analytics_url")]
-	public static string ServerAnalyticsUrl { get; set; } = "https://rust-api.facepunch.com/api/public/analytics/rust/server";
-
-
-	[ServerVar(Name = "analytics_header", Saved = true)]
-	public static string AnalyticsHeader { get; set; } = "X-API-KEY";
-
-
-	[ServerVar(Name = "analytics_secret", Saved = true)]
-	public static string AnalyticsSecret { get; set; } = "";
-
-
-	public static string AnalyticsPublicKey { get; set; } = "pub878ABLezSB6onshSwBCRGYDCpEI";
-
-
-	[ServerVar(Name = "high_freq_stats", Saved = true)]
-	public static bool HighFrequencyStats { get; set; } = true;
-
-
 	[ServerVar(Name = "stats_blacklist", Saved = true)]
 	public static string stats_blacklist
 	{
@@ -2893,14 +3053,42 @@ public static class Analytics
 			if (string.IsNullOrEmpty(value))
 			{
 				StatsBlacklist = null;
-				return;
 			}
-			StatsBlacklist = new HashSet<string>(value.Split(','));
+			else
+			{
+				StatsBlacklist = new HashSet<string>(value.Split(','));
+			}
 		}
 	}
 
-	[ServerVar(Name = "pending_analytics")]
+	public static string ClientAnalyticsUrl { get; set; } = "https://rust-api.facepunch.com/api/public/analytics/rust/client";
+
+
+	[ServerVar(Name = "server_analytics_url")]
+	public static string ServerAnalyticsUrl { get; set; } = "https://rust-api.facepunch.com/api/public/analytics/rust/server";
+
+
+	[ServerVar(Name = "analytics_header", Saved = true)]
+	public static string AnalyticsHeader { get; set; } = "X-API-KEY";
+
+
+	[ServerVar(Name = "analytics_enabled")]
+	public static bool UploadAnalytics { get; set; } = true;
+
+
+	[ServerVar(Name = "analytics_secret", Saved = true)]
+	public static string AnalyticsSecret { get; set; } = "";
+
+
+	public static string AnalyticsPublicKey { get; set; } = "pub878ABLezSB6onshSwBCRGYDCpEI";
+
+
+	[ServerVar(Name = "high_freq_stats", Saved = true)]
+	public static bool HighFrequencyStats { get; set; } = true;
+
+
 	[ClientVar(Name = "pending_analytics")]
+	[ServerVar(Name = "pending_analytics")]
 	public static void GetPendingAnalytics(ConsoleSystem.Arg arg)
 	{
 		int pendingCount = AzureWebInterface.server.PendingCount;

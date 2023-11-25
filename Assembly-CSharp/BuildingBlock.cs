@@ -36,11 +36,21 @@ public class BuildingBlock : StabilityEntity
 		}
 	}
 
+	[NonSerialized]
+	public Construction blockDefinition;
+
+	private static Vector3[] outsideLookupOffsets = new Vector3[5]
+	{
+		new Vector3(0f, 1f, 0f).normalized,
+		new Vector3(1f, 1f, 0f).normalized,
+		new Vector3(-1f, 1f, 0f).normalized,
+		new Vector3(0f, 1f, 1f).normalized,
+		new Vector3(0f, 1f, -1f).normalized
+	};
+
 	private bool forceSkinRefresh;
 
 	private ulong lastSkinID;
-
-	public int modelState;
 
 	public int lastModelState;
 
@@ -62,25 +72,36 @@ public class BuildingBlock : StabilityEntity
 
 	public static UpdateSkinWorkQueue updateSkinQueueServer = new UpdateSkinWorkQueue();
 
+	private bool globalNetworkCooldown;
+
 	public bool CullBushes;
 
 	public bool CheckForPipesOnModelChange;
 
-	[NonSerialized]
-	public Construction blockDefinition;
+	public OBBComponent AlternativePipeBounds;
 
-	private static Vector3[] outsideLookupOffsets = new Vector3[5]
-	{
-		new Vector3(0f, 1f, 0f).normalized,
-		new Vector3(1f, 1f, 0f).normalized,
-		new Vector3(-1f, 1f, 0f).normalized,
-		new Vector3(0f, 1f, 1f).normalized,
-		new Vector3(0f, 1f, -1f).normalized
-	};
+	public int modelState { get; set; }
 
 	public uint customColour { get; private set; }
 
-	public ConstructionGrade currentGrade => blockDefinition.GetGrade(grade, skinID);
+	public ConstructionGrade currentGrade
+	{
+		get
+		{
+			if (blockDefinition == null)
+			{
+				Debug.LogWarning($"blockDefinition is null for {base.ShortPrefabName} {grade} {skinID}");
+				return null;
+			}
+			ConstructionGrade constructionGrade = blockDefinition.GetGrade(grade, skinID);
+			if (constructionGrade == null)
+			{
+				Debug.LogWarning($"currentGrade is null for {base.ShortPrefabName} {grade} {skinID}");
+				return null;
+			}
+			return constructionGrade;
+		}
+	}
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -91,7 +112,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoDemolish "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoDemolish ");
 				}
 				using (TimeWarning.New("DoDemolish"))
 				{
@@ -127,7 +148,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoImmediateDemolish "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoImmediateDemolish ");
 				}
 				using (TimeWarning.New("DoImmediateDemolish"))
 				{
@@ -163,7 +184,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoRotation "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoRotation ");
 				}
 				using (TimeWarning.New("DoRotation"))
 				{
@@ -199,7 +220,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoUpgradeToGrade "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoUpgradeToGrade ");
 				}
 				using (TimeWarning.New("DoUpgradeToGrade"))
 				{
@@ -235,7 +256,7 @@ public class BuildingBlock : StabilityEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoUpgradeToGrade_Delayed "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoUpgradeToGrade_Delayed ");
 				}
 				using (TimeWarning.New("DoUpgradeToGrade_Delayed"))
 				{
@@ -268,6 +289,73 @@ public class BuildingBlock : StabilityEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void ResetState()
+	{
+		base.ResetState();
+		blockDefinition = null;
+		forceSkinRefresh = false;
+		modelState = 0;
+		lastModelState = 0;
+		grade = BuildingGrade.Enum.Twigs;
+		lastGrade = BuildingGrade.Enum.None;
+		DestroySkin();
+		UpdatePlaceholder(state: true);
+	}
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		placeholderRenderer = GetComponent<MeshRenderer>();
+		placeholderCollider = GetComponent<MeshCollider>();
+	}
+
+	public override void PostInitShared()
+	{
+		baseProtection = currentGrade.gradeBase.damageProtecton;
+		grade = currentGrade.gradeBase.type;
+		base.PostInitShared();
+	}
+
+	public override void DestroyShared()
+	{
+		if (base.isServer)
+		{
+			RefreshNeighbours(linkToNeighbours: false);
+		}
+		base.DestroyShared();
+	}
+
+	public override string Categorize()
+	{
+		return "building";
+	}
+
+	public override float BoundsPadding()
+	{
+		return 1f;
+	}
+
+	public override bool IsOutside()
+	{
+		float outside_test_range = ConVar.Decay.outside_test_range;
+		Vector3 vector = PivotPoint();
+		for (int i = 0; i < outsideLookupOffsets.Length; i++)
+		{
+			Vector3 vector2 = outsideLookupOffsets[i];
+			Vector3 origin = vector + vector2 * outside_test_range;
+			if (!UnityEngine.Physics.Raycast(new Ray(origin, -vector2), outside_test_range - 0.5f, 2097152))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
 	}
 
 	public bool CanDemolish(BasePlayer player)
@@ -334,7 +422,14 @@ public class BuildingBlock : StabilityEntity
 
 	public void SetConditionalModel(int state)
 	{
-		modelState = state;
+		if (state != modelState)
+		{
+			modelState = state;
+			if (base.isServer)
+			{
+				GlobalNetworkHandler.server?.TrySendNetworkUpdate(this);
+			}
+		}
 	}
 
 	public bool GetConditionalModel(int index)
@@ -452,12 +547,12 @@ public class BuildingBlock : StabilityEntity
 		if (!(constructionGrade == null) && CanChangeToGrade(@enum, num, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum, num) == null && CanAffordUpgrade(@enum, num, msg.player) && !(base.SecondsSinceAttacked < 30f) && (num == 0L || msg.player.blueprints.steamInventory.HasItem((int)num)))
 		{
 			PayForUpgrade(constructionGrade, msg.player);
-			Facepunch.Rust.Analytics.Azure.OnBuildingBlockUpgraded(msg.player, this, @enum);
 			if (msg.player != null)
 			{
 				playerCustomColourToApply = msg.player.LastBlockColourChangeId;
 			}
 			ClientRPC(null, "DoUpgradeEffect", (int)@enum, num);
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockUpgraded(msg.player, this, @enum, playerCustomColourToApply, num);
 			OnSkinChanged(skinID, num);
 			ChangeGrade(@enum, playEffect: true);
 		}
@@ -471,20 +566,18 @@ public class BuildingBlock : StabilityEntity
 		{
 			return;
 		}
-		BuildingGrade.Enum @enum = (BuildingGrade.Enum)msg.read.Int32();
-		ulong num = msg.read.UInt64();
-		ConstructionGrade constructionGrade = blockDefinition.GetGrade(@enum, num);
-		if (!(constructionGrade == null) && CanChangeToGrade(@enum, num, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, @enum, num) == null && CanAffordUpgrade(@enum, num, msg.player) && !(base.SecondsSinceAttacked < 30f) && (num == 0L || msg.player.blueprints.steamInventory.HasItem((int)num)))
+		ConstructionGrade constructionGrade = blockDefinition.GetGrade((BuildingGrade.Enum)msg.read.Int32(), msg.read.UInt64());
+		if (!(constructionGrade == null) && CanChangeToGrade(constructionGrade.gradeBase.type, constructionGrade.gradeBase.skin, msg.player) && Interface.CallHook("OnStructureUpgrade", this, msg.player, constructionGrade.gradeBase.type, constructionGrade.gradeBase.skin) == null && CanAffordUpgrade(constructionGrade.gradeBase.type, constructionGrade.gradeBase.skin, msg.player) && !(base.SecondsSinceAttacked < 30f) && (constructionGrade.gradeBase.skin == 0L || msg.player.blueprints.steamInventory.HasItem((int)constructionGrade.gradeBase.skin)))
 		{
 			PayForUpgrade(constructionGrade, msg.player);
-			Facepunch.Rust.Analytics.Azure.OnBuildingBlockUpgraded(msg.player, this, @enum);
 			if (msg.player != null)
 			{
 				playerCustomColourToApply = msg.player.LastBlockColourChangeId;
 			}
-			ClientRPC(null, "DoUpgradeEffect", (int)@enum, num);
-			OnSkinChanged(skinID, num);
-			ChangeGrade(@enum, playEffect: true);
+			ClientRPC(null, "DoUpgradeEffect", (int)constructionGrade.gradeBase.type, constructionGrade.gradeBase.skin);
+			Facepunch.Rust.Analytics.Azure.OnBuildingBlockUpgraded(msg.player, this, constructionGrade.gradeBase.type, playerCustomColourToApply, constructionGrade.gradeBase.skin);
+			OnSkinChanged(skinID, constructionGrade.gradeBase.skin);
+			ChangeGrade(constructionGrade.gradeBase.type, playEffect: true);
 		}
 	}
 
@@ -509,6 +602,7 @@ public class BuildingBlock : StabilityEntity
 		SendNetworkUpdate();
 		ResetUpkeepTime();
 		UpdateSurroundingEntities();
+		GlobalNetworkHandler.server.TrySendNetworkUpdate(this);
 		BuildingManager.server.GetBuilding(buildingID)?.Dirty();
 	}
 
@@ -539,6 +633,7 @@ public class BuildingBlock : StabilityEntity
 			customColour = newColour;
 			SendNetworkUpdateImmediate();
 			ClientRPC(null, "RefreshSkin");
+			GlobalNetworkHandler.server.TrySendNetworkUpdate(this);
 		}
 	}
 
@@ -628,6 +723,11 @@ public class BuildingBlock : StabilityEntity
 			return;
 		}
 		ConstructionGrade constructionGrade = currentGrade;
+		if (currentGrade == null)
+		{
+			Debug.LogWarning("CurrentGrade is null!");
+			return;
+		}
 		if (constructionGrade.skinObject.isValid)
 		{
 			ChangeSkin(constructionGrade.skinObject);
@@ -671,7 +771,7 @@ public class BuildingBlock : StabilityEntity
 		}
 		if (base.isServer)
 		{
-			modelState = currentSkin.DetermineConditionalModelState(this);
+			SetConditionalModel(currentSkin.DetermineConditionalModelState(this));
 		}
 		bool flag2 = lastModelState != modelState;
 		lastModelState = modelState;
@@ -704,6 +804,7 @@ public class BuildingBlock : StabilityEntity
 		return grade != BuildingGrade.Enum.Twigs;
 	}
 
+	[ContextMenu("Check for pipes")]
 	public void CheckForPipes()
 	{
 		if (!CheckForPipesOnModelChange || !ConVar.Server.enforcePipeChecksOnBuildingBlockChanges || Rust.Application.isLoading)
@@ -711,7 +812,9 @@ public class BuildingBlock : StabilityEntity
 			return;
 		}
 		List<ColliderInfo_Pipe> obj = Facepunch.Pool.GetList<ColliderInfo_Pipe>();
-		Vis.Components(new OBB(base.transform, bounds), obj, 536870912);
+		Bounds bounds = base.bounds;
+		bounds.extents *= 0.97f;
+		Vis.Components((AlternativePipeBounds != null) ? AlternativePipeBounds.GetObb() : new OBB(base.transform, bounds), obj, 536870912);
 		foreach (ColliderInfo_Pipe item in obj)
 		{
 			if (!(item == null) && item.gameObject.activeInHierarchy && item.HasFlag(ColliderInfo.Flags.OnlyBlockBuildingBlock) && item.ParentEntity != null && item.ParentEntity.isServer)
@@ -804,7 +907,20 @@ public class BuildingBlock : StabilityEntity
 			RefreshNeighbours(linkToNeighbours: false);
 			SendNetworkUpdateImmediate();
 			ClientRPC(null, "RefreshSkin");
+			if (!globalNetworkCooldown)
+			{
+				globalNetworkCooldown = true;
+				GlobalNetworkHandler.server.TrySendNetworkUpdate(this);
+				CancelInvoke(ResetGlobalNetworkCooldown);
+				Invoke(ResetGlobalNetworkCooldown, 15f);
+			}
 		}
+	}
+
+	private void ResetGlobalNetworkCooldown()
+	{
+		globalNetworkCooldown = false;
+		GlobalNetworkHandler.server.TrySendNetworkUpdate(this);
 	}
 
 	public void StopBeingRotatable()
@@ -912,72 +1028,5 @@ public class BuildingBlock : StabilityEntity
 		{
 			base.Hurt(info);
 		}
-	}
-
-	public override void ResetState()
-	{
-		base.ResetState();
-		blockDefinition = null;
-		forceSkinRefresh = false;
-		modelState = 0;
-		lastModelState = 0;
-		grade = BuildingGrade.Enum.Twigs;
-		lastGrade = BuildingGrade.Enum.None;
-		DestroySkin();
-		UpdatePlaceholder(state: true);
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
-		placeholderRenderer = GetComponent<MeshRenderer>();
-		placeholderCollider = GetComponent<MeshCollider>();
-	}
-
-	public override void PostInitShared()
-	{
-		baseProtection = currentGrade.gradeBase.damageProtecton;
-		grade = currentGrade.gradeBase.type;
-		base.PostInitShared();
-	}
-
-	public override void DestroyShared()
-	{
-		if (base.isServer)
-		{
-			RefreshNeighbours(linkToNeighbours: false);
-		}
-		base.DestroyShared();
-	}
-
-	public override string Categorize()
-	{
-		return "building";
-	}
-
-	public override float BoundsPadding()
-	{
-		return 1f;
-	}
-
-	public override bool IsOutside()
-	{
-		float outside_test_range = ConVar.Decay.outside_test_range;
-		Vector3 vector = PivotPoint();
-		for (int i = 0; i < outsideLookupOffsets.Length; i++)
-		{
-			Vector3 vector2 = outsideLookupOffsets[i];
-			Vector3 origin = vector + vector2 * outside_test_range;
-			if (!UnityEngine.Physics.Raycast(new Ray(origin, -vector2), outside_test_range - 0.5f, 2097152))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public override bool SupportsChildDeployables()
-	{
-		return true;
 	}
 }

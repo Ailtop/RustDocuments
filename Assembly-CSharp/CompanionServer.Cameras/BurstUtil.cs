@@ -35,9 +35,9 @@ internal static class BurstUtil
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public unsafe static int GetColliderId(this RaycastHit hit)
+	public static int GetColliderId(this RaycastHit hit)
 	{
-		return ((RaycastHitPublic*)(&hit))->m_Collider;
+		return hit.colliderInstanceID;
 	}
 
 	public unsafe static Collider GetCollider(int colliderInstanceId)

@@ -35,7 +35,7 @@ public class StashContainer : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_HideStash "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_HideStash ");
 				}
 				using (TimeWarning.New("RPC_HideStash"))
 				{
@@ -71,7 +71,7 @@ public class StashContainer : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_WantsUnhide "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_WantsUnhide ");
 				}
 				using (TimeWarning.New("RPC_WantsUnhide"))
 				{
@@ -106,11 +106,6 @@ public class StashContainer : StorageContainer
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	public bool IsHidden()
-	{
-		return HasFlag(Flags.Reserved5);
-	}
-
 	public bool PlayerInRange(BasePlayer ply)
 	{
 		if (Vector3.Distance(base.transform.position, ply.transform.position) <= uncoverRange)
@@ -132,7 +127,7 @@ public class StashContainer : StorageContainer
 
 	public void DoOccludedCheck()
 	{
-		if (UnityEngine.Physics.SphereCast(new Ray(base.transform.position + Vector3.up * 5f, Vector3.down), 0.25f, 5f, 2097152))
+		if (UnityEngine.Physics.SphereCast(new Ray(base.transform.position + Vector3.up * 5f, Vector3.down), 0.25f, 5f, 2097152) && Interface.CallHook("OnStashOcclude", this) == null)
 		{
 			DropItems();
 			Kill();
@@ -182,8 +177,8 @@ public class StashContainer : StorageContainer
 		SetHidden(!IsHidden());
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_HideStash(RPCMessage rpc)
 	{
 		if (Interface.CallHook("CanHideStash", rpc.player, this) == null)
@@ -221,5 +216,10 @@ public class StashContainer : StorageContainer
 			LeanTween.cancel(visuals.gameObject);
 			LeanTween.moveLocalY(visuals.gameObject, to, 1f);
 		}
+	}
+
+	public bool IsHidden()
+	{
+		return HasFlag(Flags.Reserved5);
 	}
 }

@@ -24,7 +24,7 @@ public class Lift : AnimatedBuildingBlock
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_UseLift "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_UseLift ");
 				}
 				using (TimeWarning.New("RPC_UseLift"))
 				{
@@ -59,8 +59,8 @@ public class Lift : AnimatedBuildingBlock
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_UseLift(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && Interface.CallHook("OnLiftUse", this, rpc.player) == null)

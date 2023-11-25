@@ -38,7 +38,7 @@ public class PowerCounter : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SERVER_SetTarget "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SERVER_SetTarget ");
 				}
 				using (TimeWarning.New("SERVER_SetTarget"))
 				{
@@ -74,7 +74,7 @@ public class PowerCounter : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ToggleDisplayMode "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ToggleDisplayMode ");
 				}
 				using (TimeWarning.New("ToggleDisplayMode"))
 				{
@@ -150,8 +150,8 @@ public class PowerCounter : IOEntity
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void ToggleDisplayMode(RPCMessage msg)
 	{
 		bool flag = msg.read.Bit();

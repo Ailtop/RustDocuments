@@ -33,7 +33,7 @@ public class LocomotiveExtraVisuals : MonoBehaviour
 	[SerializeField]
 	private float speedoMax = 80f;
 
-	[Header("Fans")]
 	[SerializeField]
+	[Header("Fans")]
 	private Transform[] engineFans;
 }

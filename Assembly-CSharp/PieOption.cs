@@ -28,8 +28,8 @@ public class PieOption : MonoBehaviour
 			background.innerSize = innerSize;
 			background.color = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 0f);
 			float num4 = startSlice + sliceSize * 0.5f;
-			float x = Mathf.Sin(num4 * ((float)Math.PI / 180f)) * num2;
-			float y = Mathf.Cos(num4 * ((float)Math.PI / 180f)) * num2;
+			float x = Mathf.Sin(num4 * (MathF.PI / 180f)) * num2;
+			float y = Mathf.Cos(num4 * (MathF.PI / 180f)) * num2;
 			imageIcon.rectTransform.localPosition = new Vector3(x, y);
 			imageIcon.rectTransform.sizeDelta = new Vector2(num3 * imageSize, num3 * imageSize);
 			imageIcon.sprite = sprite;

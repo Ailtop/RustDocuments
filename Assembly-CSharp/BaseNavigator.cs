@@ -316,19 +316,30 @@ public class BaseNavigator : BaseMonoBehaviour
 		{
 			return true;
 		}
-		bool flag = true;
+		bool flag = false;
 		float maxRange = (IsSwimming() ? 30f : 6f);
 		if (GetNearestNavmeshPosition(base.transform.position + Vector3.one * 2f, out var position, maxRange))
 		{
 			flag = Warp(position);
+			if (flag)
+			{
+				OnPlacedOnNavmesh();
+			}
 		}
-		else
+		if (!flag)
 		{
-			flag = false;
 			StuckOffNavmesh = true;
-			Debug.LogWarning(string.Concat(base.gameObject.name, " failed to sample navmesh at position ", base.transform.position, " on area: ", DefaultArea), base.gameObject);
+			OnFailedToPlaceOnNavmesh();
 		}
 		return flag;
+	}
+
+	public virtual void OnPlacedOnNavmesh()
+	{
+	}
+
+	public virtual void OnFailedToPlaceOnNavmesh()
+	{
 	}
 
 	public bool Warp(Vector3 position)
@@ -776,7 +787,7 @@ public class BaseNavigator : BaseMonoBehaviour
 		bool flag = ValidBounds.Test(moveToPosition);
 		if (BaseEntity != null && !flag && base.transform != null && !BaseEntity.IsDestroyed)
 		{
-			Debug.Log(string.Concat("Invalid NavAgent Position: ", this, " ", moveToPosition.ToString(), " (destroying)"));
+			Debug.Log("Invalid NavAgent Position: " + this?.ToString() + " " + moveToPosition.ToString() + " (destroying)");
 			BaseEntity.Kill();
 			return false;
 		}
@@ -1051,7 +1062,7 @@ public class BaseNavigator : BaseMonoBehaviour
 
 	public bool IsAcceptableWaterDepth(Vector3 pos)
 	{
-		return WaterLevel.GetOverallWaterDepth(pos) <= MaxWaterDepth;
+		return WaterLevel.GetOverallWaterDepth(pos, waves: true, volumes: false) <= MaxWaterDepth;
 	}
 
 	public void SetBrakingEnabled(bool flag)

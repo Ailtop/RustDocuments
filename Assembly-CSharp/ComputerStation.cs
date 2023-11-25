@@ -52,7 +52,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddBookmark "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - AddBookmark ");
 				}
 				using (TimeWarning.New("AddBookmark"))
 				{
@@ -81,7 +81,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BeginControllingBookmark "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - BeginControllingBookmark ");
 				}
 				using (TimeWarning.New("BeginControllingBookmark"))
 				{
@@ -110,7 +110,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DeleteBookmark "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DeleteBookmark ");
 				}
 				using (TimeWarning.New("DeleteBookmark"))
 				{
@@ -139,7 +139,7 @@ public class ComputerStation : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_DisconnectControl "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_DisconnectControl ");
 				}
 				using (TimeWarning.New("Server_DisconnectControl"))
 				{
@@ -170,7 +170,7 @@ public class ComputerStation : BaseMountable
 	public bool AllowPings()
 	{
 		BaseEntity baseEntity = currentlyControllingEnt.Get(base.isServer);
-		if (baseEntity != null && baseEntity is IRemoteControllable remoteControllable && remoteControllable.CanPing)
+		if (baseEntity != null && baseEntity is IRemoteControllable { CanPing: not false })
 		{
 			return true;
 		}

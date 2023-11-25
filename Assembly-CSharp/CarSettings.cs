@@ -4,8 +4,8 @@ using UnityEngine;
 [Serializable]
 public class CarSettings
 {
-	[Range(0f, 1f)]
 	[Header("Vehicle Setup")]
+	[Range(0f, 1f)]
 	public float rollingResistance = 0.05f;
 
 	[Range(0f, 1f)]
@@ -51,7 +51,7 @@ public class CarSettings
 	[Header("Brakes")]
 	public float brakeForceMultiplier = 1000f;
 
-	[Header("Front/Rear Vehicle Balance")]
 	[Range(0f, 1f)]
+	[Header("Front/Rear Vehicle Balance")]
 	public float handlingBias = 0.5f;
 }

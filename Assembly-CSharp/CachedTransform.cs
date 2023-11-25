@@ -23,7 +23,7 @@ public struct CachedTransform<T> where T : Component
 	public CachedTransform(T instance)
 	{
 		component = instance;
-		if ((bool)(Object)component)
+		if ((bool)component)
 		{
 			position = component.transform.position;
 			rotation = component.transform.rotation;
@@ -39,7 +39,7 @@ public struct CachedTransform<T> where T : Component
 
 	public void Apply()
 	{
-		if ((bool)(Object)component)
+		if ((bool)component)
 		{
 			component.transform.SetPositionAndRotation(position, rotation);
 			component.transform.localScale = localScale;
@@ -56,6 +56,6 @@ public struct CachedTransform<T> where T : Component
 
 	public static implicit operator bool(CachedTransform<T> instance)
 	{
-		return (Object)instance.component != (Object)null;
+		return instance.component != null;
 	}
 }

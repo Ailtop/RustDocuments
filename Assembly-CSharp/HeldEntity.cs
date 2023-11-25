@@ -93,9 +93,9 @@ public class HeldEntity : BaseEntity
 
 	public bool hostile => hostileScore > 0f;
 
-	public virtual bool IsUsableByTurret => false;
-
 	public virtual Transform MuzzleTransform => null;
+
+	public virtual bool IsUsableByTurret => false;
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -103,11 +103,6 @@ public class HeldEntity : BaseEntity
 		{
 		}
 		return base.OnRpcMessage(player, rpc, msg);
-	}
-
-	public void SendPunch(Vector3 amount, float duration)
-	{
-		ClientRPCPlayer(null, GetOwnerPlayer(), "CL_Punch", amount, duration);
 	}
 
 	public bool LightsOn()
@@ -174,6 +169,7 @@ public class HeldEntity : BaseEntity
 		if (holsterInfo.displayWhenHolstered)
 		{
 			holsterVisible = visible;
+			genericVisible = false;
 			UpdateHeldItemVisibility();
 		}
 	}
@@ -198,7 +194,7 @@ public class HeldEntity : BaseEntity
 	public void UpdateHeldItemVisibility()
 	{
 		bool flag = false;
-		if ((bool)GetOwnerPlayer())
+		if (!genericVisible && (bool)GetOwnerPlayer())
 		{
 			bool flag2 = GetOwnerPlayer().GetHeldEntity() == this;
 			flag = ((!ConVar.Server.showHolsteredItems && !flag2) ? UpdateVisiblity_Invis() : (flag2 ? UpdateVisibility_Hand() : ((!holsterVisible) ? UpdateVisiblity_Invis() : UpdateVisiblity_Holster())));
@@ -308,7 +304,7 @@ public class HeldEntity : BaseEntity
 		{
 			return null;
 		}
-		return ownerPlayer.inventory.FindItemUID(ownerItemUID);
+		return ownerPlayer.inventory.FindItemByUID(ownerItemUID);
 	}
 
 	public override Item GetItem()
@@ -438,5 +434,10 @@ public class HeldEntity : BaseEntity
 		{
 			ownerItemUID = info.msg.heldEntity.itemUID;
 		}
+	}
+
+	public void SendPunch(Vector3 amount, float duration)
+	{
+		ClientRPCPlayer(null, GetOwnerPlayer(), "CL_Punch", amount, duration);
 	}
 }

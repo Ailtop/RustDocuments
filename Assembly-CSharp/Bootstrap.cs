@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CompanionServer;
 using ConVar;
 using Facepunch;
@@ -45,7 +48,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 			{
 				return true;
 			}
-			if (Object.FindObjectsOfType<GameSetup>().Count() > 0)
+			if (UnityEngine.Object.FindObjectsOfType<GameSetup>().Count() > 0)
 			{
 				return true;
 			}
@@ -248,15 +251,17 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
 		GameManifest.LoadAssets();
+		WriteToLog("Initializing Nexus");
+		yield return StartCoroutine(StartNexusServer());
 		WriteToLog("Loading Scene");
 		yield return CoroutineEx.waitForEndOfFrame;
 		yield return CoroutineEx.waitForEndOfFrame;
-		UnityEngine.Physics.solverIterationCount = 3;
+		UnityEngine.Physics.defaultSolverIterations = 3;
 		int @int = PlayerPrefs.GetInt("UnityGraphicsQuality");
 		QualitySettings.SetQualityLevel(0);
 		PlayerPrefs.SetInt("UnityGraphicsQuality", @int);
-		Object.DontDestroyOnLoad(base.gameObject);
-		Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/server_console.prefab"));
+		UnityEngine.Object.DontDestroyOnLoad(base.gameObject);
+		UnityEngine.Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/server_console.prefab"));
 		StartupShared();
 		World.InitSize(ConVar.Server.worldsize);
 		World.InitSeed(ConVar.Server.seed);
@@ -269,12 +274,35 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		string[] assetList = FileSystem_Warmup.GetAssetList();
 		yield return StartCoroutine(FileSystem_Warmup.Run(assetList, WriteToLog, "Asset Warmup ({0}/{1})"));
 		yield return StartCoroutine(StartServer(!Facepunch.CommandLine.HasSwitch("-skipload"), "", allowOutOfDateSaves: false));
-		if (!Object.FindObjectOfType<Performance>())
+		if (!UnityEngine.Object.FindObjectOfType<Performance>())
 		{
-			Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/performance.prefab"));
+			UnityEngine.Object.DontDestroyOnLoad(GameManager.server.CreatePrefab("assets/bundled/prefabs/system/performance.prefab"));
 		}
 		Rust.GC.Collect();
 		Rust.Application.isLoading = false;
+	}
+
+	private static void EnsureRootFolderCreated()
+	{
+		try
+		{
+			Directory.CreateDirectory(ConVar.Server.rootFolder);
+		}
+		catch (Exception arg)
+		{
+			Debug.LogWarning($"Failed to automatically create the save directory: {ConVar.Server.rootFolder}\n\n{arg}");
+		}
+	}
+
+	public static IEnumerator StartNexusServer()
+	{
+		EnsureRootFolderCreated();
+		yield return NexusServer.Initialize();
+		if (NexusServer.FailedToStart)
+		{
+			Debug.LogError("Nexus server failed to start, terminating");
+			Rust.Application.Quit();
+		}
 	}
 
 	public static IEnumerator StartServer(bool doLoad, string saveFileOverride, bool allowOutOfDateSaves)
@@ -286,6 +314,7 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		}
 		RCon.Initialize();
 		BaseEntity.Query.Server = new BaseEntity.Query.EntityTree(8096f);
+		EnsureRootFolderCreated();
 		if ((bool)SingletonComponent<WorldSetup>.Instance)
 		{
 			yield return SingletonComponent<WorldSetup>.Instance.StartCoroutine(SingletonComponent<WorldSetup>.Instance.InitCoroutine());
@@ -333,9 +362,9 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 			}
 		}
 		GameObject gameObject = GameManager.server.CreatePrefab("assets/bundled/prefabs/system/server.prefab");
-		Object.DontDestroyOnLoad(gameObject);
+		UnityEngine.Object.DontDestroyOnLoad(gameObject);
 		ServerMgr serverMgr = gameObject.GetComponent<ServerMgr>();
-		serverMgr.Initialize(doLoad, saveFileOverride, allowOutOfDateSaves);
+		bool saveWasLoaded = serverMgr.Initialize(doLoad, saveFileOverride, allowOutOfDateSaves);
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		SaveRestore.InitializeEntityLinks();
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
@@ -349,12 +378,37 @@ public class Bootstrap : SingletonComponent<Bootstrap>
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
 		MissionManifest.Get();
 		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
+		if (Clan.enabled)
+		{
+			ClanManager clanManager = ClanManager.ServerInstance;
+			if (clanManager == null)
+			{
+				Debug.LogError("ClanManager was not spawned!");
+				Rust.Application.Quit();
+				yield break;
+			}
+			Task initializeTask = clanManager.Initialize();
+			yield return new WaitUntil(() => initializeTask.IsCompleted);
+			initializeTask.Wait();
+			clanManager.LoadClanInfoForSleepers();
+		}
+		yield return CoroutineEx.waitForSecondsRealtime(0.1f);
+		if (NexusServer.Started)
+		{
+			NexusServer.UploadMapImage();
+			if (saveWasLoaded)
+			{
+				NexusServer.RestoreUnsavedState();
+			}
+			NexusServer.ZoneClient.StartListening();
+		}
 		serverMgr.OpenConnection();
 		CompanionServer.Server.Initialize();
 		using (BenchmarkTimer.New("Boombox.LoadStations"))
 		{
 			BoomBox.LoadStations();
 		}
+		RustEmojiLibrary.FindAllServerEmoji();
 		if (ConVar.Time.pausewhileloading)
 		{
 			UnityEngine.Time.timeScale = timeScale;

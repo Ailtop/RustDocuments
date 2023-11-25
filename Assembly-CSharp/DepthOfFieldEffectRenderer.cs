@@ -69,6 +69,7 @@ public class DepthOfFieldEffectRenderer : PostProcessEffectRenderer<DepthOfField
 		internalBlurWidth = Mathf.Max(value5, 0f);
 		focalDistance01 = FocalDistance01(context.camera, value3);
 		propertySheet.properties.SetVector("_CurveParams", new Vector4(1f, value2, value4 / 10f, focalDistance01));
+		propertySheet.properties.SetVector("_DistortionParams", new Vector4(base.settings.anamorphicSqueeze, (float)base.settings.anamorphicBarrel * 2f, 0f, 0f));
 		if (value)
 		{
 			internalBlurWidth *= 2f;
@@ -82,6 +83,14 @@ public class DepthOfFieldEffectRenderer : PostProcessEffectRenderer<DepthOfField
 		command.GetTemporaryRT(nameID, width >> 1, height >> 1, 0, FilterMode.Bilinear, sourceFormat);
 		command.GetTemporaryRT(nameID2, width >> 1, height >> 1, 0, FilterMode.Bilinear, sourceFormat);
 		int pass = 2;
+		if ((float)base.settings.anamorphicSqueeze > 0f || (float)base.settings.anamorphicBarrel > 0f)
+		{
+			command.EnableShaderKeyword("ANAMORPHIC_BOKEH");
+		}
+		else
+		{
+			command.DisableShaderKeyword("ANAMORPHIC_BOKEH");
+		}
 		propertySheet.properties.SetVector("_Offsets", new Vector4(0f, internalBlurWidth, 0.025f, internalBlurWidth));
 		propertySheet.properties.SetInt("_BlurCountMode", (int)blurSampleCount.value);
 		RuntimeUtilities.BlitFullscreenTriangle(command, context.source, context.destination, propertySheet, pass);

@@ -20,7 +20,7 @@ public class RustigeEgg : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Open "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Open ");
 				}
 				using (TimeWarning.New("RPC_Open"))
 				{
@@ -56,7 +56,7 @@ public class RustigeEgg : BaseCombatEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Spin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Spin ");
 				}
 				using (TimeWarning.New("RPC_Spin"))
 				{
@@ -96,8 +96,8 @@ public class RustigeEgg : BaseCombatEntity
 		return HasFlag(Flags.Reserved1);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Spin(RPCMessage msg)
 	{
 	}

@@ -24,7 +24,7 @@ public static class CoroutineEx
 
 	public static WaitForSecondsRealtimeEx waitForSecondsRealtime(float seconds)
 	{
-		WaitForSecondsRealtimeEx waitForSecondsRealtimeEx = Pool.Get<WaitForSecondsRealtimeEx>();
+		WaitForSecondsRealtimeEx waitForSecondsRealtimeEx = Facepunch.Pool.Get<WaitForSecondsRealtimeEx>();
 		waitForSecondsRealtimeEx.WaitTime = seconds;
 		return waitForSecondsRealtimeEx;
 	}

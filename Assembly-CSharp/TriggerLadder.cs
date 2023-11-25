@@ -2,6 +2,14 @@ using UnityEngine;
 
 public class TriggerLadder : TriggerBase
 {
+	public enum LadderType
+	{
+		Rungs = 0,
+		Rope = 1
+	}
+
+	public LadderType Type;
+
 	public override GameObject InterestedInObject(GameObject obj)
 	{
 		obj = base.InterestedInObject(obj);

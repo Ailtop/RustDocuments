@@ -29,26 +29,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		Fwd_Hi = 6
 	}
 
-	public const float HAZARD_CHECK_EVERY = 1f;
-
-	public const float HAZARD_DIST_MAX = 325f;
-
-	public const float HAZARD_DIST_MIN = 20f;
-
-	public const float HAZARD_SPEED_MIN = 4.5f;
-
-	public float buttonHoldTime;
-
-	public static readonly EngineSpeeds MaxThrottle = EngineSpeeds.Fwd_Hi;
-
-	public static readonly EngineSpeeds MinThrottle = EngineSpeeds.Rev_Hi;
-
-	public EngineDamageOverTime engineDamage;
-
-	public Vector3 engineLocalOffset;
-
-	public int lastSentLinedUpToUnload = -1;
-
 	[Header("Train Engine")]
 	[SerializeField]
 	public Transform leftHandLever;
@@ -150,8 +130,8 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 	[SerializeField]
 	private ParticleSystemContainer[] sparks;
 
-	[FormerlySerializedAs("brakeSparkLights")]
 	[SerializeField]
+	[FormerlySerializedAs("brakeSparkLights")]
 	private Light[] sparkLights;
 
 	[SerializeField]
@@ -167,7 +147,25 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public VehicleEngineController<TrainEngine> engineController;
 
-	public override bool networkUpdateOnCompleteTrainChange => true;
+	public const float HAZARD_CHECK_EVERY = 1f;
+
+	public const float HAZARD_DIST_MAX = 325f;
+
+	public const float HAZARD_DIST_MIN = 20f;
+
+	public const float HAZARD_SPEED_MIN = 4.5f;
+
+	public float buttonHoldTime;
+
+	public static readonly EngineSpeeds MaxThrottle = EngineSpeeds.Fwd_Hi;
+
+	public static readonly EngineSpeeds MinThrottle = EngineSpeeds.Rev_Hi;
+
+	public EngineDamageOverTime engineDamage;
+
+	public Vector3 engineLocalOffset;
+
+	public int lastSentLinedUpToUnload = -1;
 
 	public bool LightsAreOn => HasFlag(Flags.Reserved5);
 
@@ -180,6 +178,8 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 
 	public override TrainCarType CarType => TrainCarType.Engine;
 
+	public override bool networkUpdateOnCompleteTrainChange => true;
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("TrainEngine.OnRpcMessage"))
@@ -189,7 +189,7 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuel ");
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -215,6 +215,118 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		engineController = new VehicleEngineController<TrainEngine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
+		if (base.isServer)
+		{
+			bool b = SeedRandom.Range((uint)net.ID.Value, 0, 2) == 0;
+			SetFlag(Flags.Reserved9, b);
+		}
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.trainEngine != null)
+		{
+			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.trainEngine.fuelStorageID;
+			SetThrottle((EngineSpeeds)info.msg.trainEngine.throttleSetting);
+		}
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (!base.CanBeLooted(player))
+		{
+			return false;
+		}
+		if (player.isMounted)
+		{
+			return false;
+		}
+		if (lootablesAreOnPlatform)
+		{
+			return PlayerIsOnPlatform(player);
+		}
+		if (GetLocalVelocity().magnitude < 2f)
+		{
+			return true;
+		}
+		return PlayerIsOnPlatform(player);
+	}
+
+	public float GetEnginePowerMultiplier(float minPercent)
+	{
+		if (base.healthFraction > 0.4f)
+		{
+			return 1f;
+		}
+		return Mathf.Lerp(minPercent, 1f, base.healthFraction / 0.4f);
+	}
+
+	public float GetThrottleFraction()
+	{
+		return CurThrottleSetting switch
+		{
+			EngineSpeeds.Rev_Hi => -1f, 
+			EngineSpeeds.Rev_Med => -0.5f, 
+			EngineSpeeds.Rev_Lo => -0.2f, 
+			EngineSpeeds.Zero => 0f, 
+			EngineSpeeds.Fwd_Lo => 0.2f, 
+			EngineSpeeds.Fwd_Med => 0.5f, 
+			EngineSpeeds.Fwd_Hi => 1f, 
+			_ => 0f, 
+		};
+	}
+
+	public bool IsNearDesiredSpeed(float leeway)
+	{
+		float num = Vector3.Dot(base.transform.forward, GetLocalVelocity());
+		float num2 = maxSpeed * GetThrottleFraction();
+		if (num2 < 0f)
+		{
+			return num - leeway <= num2;
+		}
+		return num + leeway >= num2;
+	}
+
+	public override void SetTrackSelection(TrainTrackSpline.TrackSelection trackSelection)
+	{
+		base.SetTrackSelection(trackSelection);
+	}
+
+	public void SetThrottle(EngineSpeeds throttle)
+	{
+		if (CurThrottleSetting != throttle)
+		{
+			CurThrottleSetting = throttle;
+			if (base.isServer)
+			{
+				ClientRPC(null, "SetThrottle", (sbyte)throttle);
+			}
+		}
+	}
+
+	public int GetFuelAmount()
+	{
+		if (base.isServer)
+		{
+			return engineController.FuelSystem.GetFuelAmount();
+		}
+		return 0;
+	}
+
+	public bool CanMount(BasePlayer player)
+	{
+		if (mustMountFromPlatform)
+		{
+			return PlayerIsOnPlatform(player);
+		}
+		return true;
 	}
 
 	public override void ServerInit()
@@ -510,118 +622,6 @@ public class TrainEngine : TrainCar, IEngineControllerUser, IEntity
 		{
 			GetFuelSystem().LootFuel(player);
 		}
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
-		engineController = new VehicleEngineController<TrainEngine>(this, base.isServer, engineStartupTime, fuelStoragePrefab);
-		if (base.isServer)
-		{
-			bool b = SeedRandom.Range((uint)net.ID.Value, 0, 2) == 0;
-			SetFlag(Flags.Reserved9, b);
-		}
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.trainEngine != null)
-		{
-			engineController.FuelSystem.fuelStorageInstance.uid = info.msg.trainEngine.fuelStorageID;
-			SetThrottle((EngineSpeeds)info.msg.trainEngine.throttleSetting);
-		}
-	}
-
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		if (!base.CanBeLooted(player))
-		{
-			return false;
-		}
-		if (player.isMounted)
-		{
-			return false;
-		}
-		if (lootablesAreOnPlatform)
-		{
-			return PlayerIsOnPlatform(player);
-		}
-		if (GetLocalVelocity().magnitude < 2f)
-		{
-			return true;
-		}
-		return PlayerIsOnPlatform(player);
-	}
-
-	public float GetEnginePowerMultiplier(float minPercent)
-	{
-		if (base.healthFraction > 0.4f)
-		{
-			return 1f;
-		}
-		return Mathf.Lerp(minPercent, 1f, base.healthFraction / 0.4f);
-	}
-
-	public float GetThrottleFraction()
-	{
-		return CurThrottleSetting switch
-		{
-			EngineSpeeds.Rev_Hi => -1f, 
-			EngineSpeeds.Rev_Med => -0.5f, 
-			EngineSpeeds.Rev_Lo => -0.2f, 
-			EngineSpeeds.Zero => 0f, 
-			EngineSpeeds.Fwd_Lo => 0.2f, 
-			EngineSpeeds.Fwd_Med => 0.5f, 
-			EngineSpeeds.Fwd_Hi => 1f, 
-			_ => 0f, 
-		};
-	}
-
-	public bool IsNearDesiredSpeed(float leeway)
-	{
-		float num = Vector3.Dot(base.transform.forward, GetLocalVelocity());
-		float num2 = maxSpeed * GetThrottleFraction();
-		if (num2 < 0f)
-		{
-			return num - leeway <= num2;
-		}
-		return num + leeway >= num2;
-	}
-
-	public override void SetTrackSelection(TrainTrackSpline.TrackSelection trackSelection)
-	{
-		base.SetTrackSelection(trackSelection);
-	}
-
-	public void SetThrottle(EngineSpeeds throttle)
-	{
-		if (CurThrottleSetting != throttle)
-		{
-			CurThrottleSetting = throttle;
-			if (base.isServer)
-			{
-				ClientRPC(null, "SetThrottle", (sbyte)throttle);
-			}
-		}
-	}
-
-	public int GetFuelAmount()
-	{
-		if (base.isServer)
-		{
-			return engineController.FuelSystem.GetFuelAmount();
-		}
-		return 0;
-	}
-
-	public bool CanMount(BasePlayer player)
-	{
-		if (mustMountFromPlatform)
-		{
-			return PlayerIsOnPlatform(player);
-		}
-		return true;
 	}
 
 	void IEngineControllerUser.Invoke(Action action, float time)

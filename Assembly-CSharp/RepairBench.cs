@@ -29,7 +29,7 @@ public class RepairBench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ChangeSkin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ChangeSkin ");
 				}
 				using (TimeWarning.New("ChangeSkin"))
 				{
@@ -65,7 +65,7 @@ public class RepairBench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RepairItem "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RepairItem ");
 				}
 				using (TimeWarning.New("RepairItem"))
 				{
@@ -112,6 +112,11 @@ public class RepairBench : StorageContainer
 
 	public static void GetRepairCostList(ItemBlueprint bp, List<ItemAmount> allIngredients)
 	{
+		ItemModRepair itemModRepair = bp.targetItem?.GetComponent<ItemModRepair>();
+		if (itemModRepair != null && itemModRepair.canUseRepairBench)
+		{
+			return;
+		}
 		foreach (ItemAmount ingredient in bp.ingredients)
 		{
 			allIngredients.Add(new ItemAmount(ingredient.itemDef, ingredient.amount));
@@ -167,23 +172,22 @@ public class RepairBench : StorageContainer
 	[RPC_Server]
 	public void ChangeSkin(RPCMessage msg)
 	{
-		if (UnityEngine.Time.realtimeSinceStartup < nextSkinChangeTime)
-		{
-			return;
-		}
+		bool flag = UnityEngine.Time.realtimeSinceStartup < nextSkinChangeTime;
 		BasePlayer player = msg.player;
 		int num = msg.read.Int32();
+		ItemId itemId = new ItemId(msg.read.UInt64());
+		bool isValid = itemId.IsValid;
 		Item slot = base.inventory.GetSlot(0);
-		if (slot == null || Interface.CallHook("OnItemSkinChange", num, slot, this, msg.player) != null)
+		if (slot == null || Interface.CallHook("OnItemSkinChange", num, slot, this, player) != null || (isValid && slot.uid != itemId))
 		{
 			return;
 		}
-		bool flag = false;
+		bool flag2 = false;
 		if (msg.player.UnlockAllSkins)
 		{
-			flag = true;
+			flag2 = true;
 		}
-		if (num != 0 && !flag && !player.blueprints.CheckSkinOwnership(num, player.userID))
+		if (num != 0 && !flag2 && !player.blueprints.CheckSkinOwnership(num, player.userID))
 		{
 			debugprint("RepairBench.ChangeSkin player does not have item :" + num + ":");
 			return;
@@ -205,20 +209,20 @@ public class RepairBench : StorageContainer
 		if (((bool)itemSkin && (itemSkin.Redirect != null || slot.info.isRedirectOf != null)) || (!itemSkin && slot.info.isRedirectOf != null))
 		{
 			ItemDefinition template = ((itemSkin != null) ? itemSkin.Redirect : slot.info.isRedirectOf);
-			bool flag2 = false;
+			bool flag3 = false;
 			if (itemSkin != null && itemSkin.Redirect == null && slot.info.isRedirectOf != null)
 			{
 				template = slot.info.isRedirectOf;
-				flag2 = num != 0;
+				flag3 = num != 0;
 			}
 			float condition = slot.condition;
 			float maxCondition = slot.maxCondition;
 			int amount = slot.amount;
-			int contents = 0;
+			int ammoCount = 0;
 			ItemDefinition ammoType = null;
-			if (slot.GetHeldEntity() != null && slot.GetHeldEntity() is BaseProjectile baseProjectile && baseProjectile.primaryMagazine != null)
+			if (slot.GetHeldEntity() != null && slot.GetHeldEntity() is BaseProjectile { primaryMagazine: not null } baseProjectile)
 			{
-				contents = baseProjectile.primaryMagazine.contents;
+				ammoCount = baseProjectile.primaryMagazine.contents;
 				ammoType = baseProjectile.primaryMagazine.ammoType;
 			}
 			List<Item> obj = Facepunch.Pool.GetList<Item>();
@@ -244,7 +248,7 @@ public class RepairBench : StorageContainer
 			{
 				if (baseProjectile2.primaryMagazine != null)
 				{
-					baseProjectile2.primaryMagazine.contents = contents;
+					baseProjectile2.SetAmmoCount(ammoCount);
 					baseProjectile2.primaryMagazine.ammoType = ammoType;
 				}
 				baseProjectile2.ForceModsChanged();
@@ -257,7 +261,7 @@ public class RepairBench : StorageContainer
 				}
 			}
 			Facepunch.Pool.FreeList(ref obj);
-			if (flag2)
+			if (flag3)
 			{
 				ApplySkinToItem(item, Skin);
 			}
@@ -270,7 +274,7 @@ public class RepairBench : StorageContainer
 			Facepunch.Rust.Analytics.Server.SkinUsed(slot.info.shortname, num);
 			Facepunch.Rust.Analytics.Azure.OnSkinChanged(player, this, slot, Skin);
 		}
-		if (skinchangeEffect.isValid)
+		if (flag && skinchangeEffect.isValid)
 		{
 			Effect.server.Run(skinchangeEffect.resourcePath, this, 0u, new Vector3(0f, 1.5f, 0f), Vector3.zero);
 		}
@@ -288,13 +292,19 @@ public class RepairBench : StorageContainer
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RepairItem(RPCMessage msg)
 	{
 		Item slot = base.inventory.GetSlot(0);
 		BasePlayer player = msg.player;
-		RepairAnItem(slot, player, this, maxConditionLostOnRepair, mustKnowBlueprint: true);
+		float conditionLost = maxConditionLostOnRepair;
+		ItemModRepair component = slot.info.GetComponent<ItemModRepair>();
+		if (component != null)
+		{
+			conditionLost = component.conditionLost;
+		}
+		RepairAnItem(slot, player, this, conditionLost, mustKnowBlueprint: true);
 	}
 
 	public override int GetIdealSlot(BasePlayer player, Item item)
@@ -310,7 +320,12 @@ public class RepairBench : StorageContainer
 		}
 		ItemDefinition info = itemToRepair.info;
 		ItemBlueprint component = info.GetComponent<ItemBlueprint>();
-		if (!component || !info.condition.repairable || itemToRepair.condition == itemToRepair.maxCondition)
+		if (!component)
+		{
+			return;
+		}
+		ItemModRepair component2 = itemToRepair.info.GetComponent<ItemModRepair>();
+		if (!info.condition.repairable || itemToRepair.condition == itemToRepair.maxCondition)
 		{
 			return;
 		}
@@ -365,6 +380,11 @@ public class RepairBench : StorageContainer
 		{
 			Debug.Log("Item repaired! condition : " + itemToRepair.condition + "/" + itemToRepair.maxCondition);
 		}
-		Effect.server.Run("assets/bundled/prefabs/fx/repairbench/itemrepair.prefab", repairBenchEntity, 0u, Vector3.zero, Vector3.zero);
+		string strName = "assets/bundled/prefabs/fx/repairbench/itemrepair.prefab";
+		if (component2 != null && component2.successEffect?.Get() != null)
+		{
+			strName = component2.successEffect.resourcePath;
+		}
+		Effect.server.Run(strName, repairBenchEntity, 0u, Vector3.zero, Vector3.zero);
 	}
 }

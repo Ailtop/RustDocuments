@@ -72,9 +72,23 @@ public class WaterOverlay : MonoBehaviour, IClientComponent
 			chromaticAberration = true,
 			godRays = false
 		};
+
+		public static EffectParams DefaultCinematic = new EffectParams
+		{
+			scatterCoefficient = 0.025f,
+			blur = false,
+			blurDistance = 10f,
+			blurSize = 2f,
+			wiggle = false,
+			wiggleSpeed = 0f,
+			chromaticAberration = true,
+			godRays = false
+		};
 	}
 
 	public PostProcessVolume postProcessVolume;
+
+	public PostProcessVolume blurPostProcessVolume;
 
 	public EffectParams adminParams = EffectParams.DefaultAdmin;
 
@@ -83,6 +97,8 @@ public class WaterOverlay : MonoBehaviour, IClientComponent
 	public EffectParams submarineParams = EffectParams.DefaultSubmarine;
 
 	public EffectParams underwaterLabParams = EffectParams.DefaultUnderwaterLab;
+
+	public EffectParams cinematicParams = EffectParams.DefaultCinematic;
 
 	public Material[] UnderwaterFogMaterials;
 }

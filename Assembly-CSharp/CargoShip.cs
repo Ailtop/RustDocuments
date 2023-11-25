@@ -417,7 +417,17 @@ public class CargoShip : BaseEntity
 		return true;
 	}
 
+	public override float MaxVelocity()
+	{
+		return 8f;
+	}
+
 	public override bool SupportsChildDeployables()
+	{
+		return true;
+	}
+
+	public override bool ForceDeployableSetParent()
 	{
 		return true;
 	}

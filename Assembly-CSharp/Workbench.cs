@@ -45,7 +45,7 @@ public class Workbench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_BeginExperiment "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_BeginExperiment ");
 				}
 				using (TimeWarning.New("RPC_BeginExperiment"))
 				{
@@ -81,7 +81,7 @@ public class Workbench : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_TechTreeUnlock "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_TechTreeUnlock ");
 				}
 				using (TimeWarning.New("RPC_TechTreeUnlock"))
 				{
@@ -148,16 +148,16 @@ public class Workbench : StorageContainer
 		return false;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_TechTreeUnlock(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
-		int num = msg.read.Int32();
-		TechTreeData.NodeInstance byID = techTree.GetByID(num);
+		int id = msg.read.Int32();
+		TechTreeData.NodeInstance byID = techTree.GetByID(id);
 		if (byID == null)
 		{
-			Debug.Log("Node for unlock not found :" + num);
+			Debug.Log("Node for unlock not found :" + id);
 		}
 		else
 		{
@@ -173,21 +173,21 @@ public class Workbench : StorageContainer
 					if (byID2 != null && byID2.itemDef != null)
 					{
 						player.blueprints.Unlock(byID2.itemDef);
-						Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, byID2.itemDef, "techtree", this);
+						Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, byID2.itemDef, "techtree", 0, this);
 					}
 				}
 				Debug.Log("Player unlocked group :" + byID.groupName);
 			}
 			else if (byID.itemDef != null && Interface.CallHook("OnTechTreeNodeUnlock", this, byID, player) == null)
 			{
-				int num2 = ResearchTable.ScrapForResearch(byID.itemDef, ResearchTable.ResearchType.TechTree);
+				int num = ResearchTable.ScrapForResearch(byID.itemDef, ResearchTable.ResearchType.TechTree);
 				int itemid = ItemManager.FindItemDefinition("scrap").itemid;
-				if (player.inventory.GetAmount(itemid) >= num2)
+				if (player.inventory.GetAmount(itemid) >= num)
 				{
-					player.inventory.Take(null, itemid, num2);
+					player.inventory.Take(null, itemid, num);
 					player.blueprints.Unlock(byID.itemDef);
 					Interface.CallHook("OnTechTreeNodeUnlocked", this, byID, player);
-					Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, byID.itemDef, "techtree", this);
+					Facepunch.Rust.Analytics.Azure.OnBlueprintLearned(player, byID.itemDef, "techtree", num, this);
 				}
 			}
 		}
@@ -202,8 +202,8 @@ public class Workbench : StorageContainer
 		return blueprintBaseDef;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_BeginExperiment(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

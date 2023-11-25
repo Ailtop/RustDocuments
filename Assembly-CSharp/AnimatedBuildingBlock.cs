@@ -9,6 +9,8 @@ public class AnimatedBuildingBlock : StabilityEntity
 
 	private bool isAnimating;
 
+	private static readonly int Open = Animator.StringToHash("open");
+
 	public override void ServerInit()
 	{
 		base.ServerInit();
@@ -42,7 +44,7 @@ public class AnimatedBuildingBlock : StabilityEntity
 		{
 			isAnimating = true;
 			model.animator.enabled = true;
-			model.animator.SetBool("open", animatorIsOpen = IsOpen());
+			model.animator.SetBool(Open, animatorIsOpen = IsOpen());
 			if (flag)
 			{
 				model.animator.fireEvents = false;

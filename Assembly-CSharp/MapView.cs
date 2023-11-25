@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using Rust.UI;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
-public class MapView : FacepunchBehaviour
+public class MapView : FacepunchBehaviour, IPointerDownHandler, IEventSystemHandler
 {
 	public RawImage mapImage;
 
@@ -27,6 +29,8 @@ public class MapView : FacepunchBehaviour
 	public Transform localPlayerInterestPointRoot;
 
 	public TeamMemberMapMarker[] teamPositions;
+
+	public TeamMemberMapMarker[] clanPositions;
 
 	public List<PointOfInterestMapMarker> PointOfInterestMarkers;
 
@@ -59,9 +63,13 @@ public class MapView : FacepunchBehaviour
 
 	public bool ShowTeamMembers = true;
 
+	public bool ShowBagsOnBottom;
+
 	public bool ShowTrainLayer;
 
 	public bool ShowMissions;
+
+	public bool ForceShowVendingMachines;
 
 	[FormerlySerializedAs("ShowTrainLayer")]
 	public bool ShowUndergroundLayers;
@@ -77,4 +85,10 @@ public class MapView : FacepunchBehaviour
 	public RustImageButton[] UnderwaterButtons;
 
 	public RustImageButton DungeonButton;
+
+	public UnityEvent onClicked;
+
+	public void OnPointerDown(PointerEventData eventData)
+	{
+	}
 }

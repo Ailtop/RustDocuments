@@ -62,6 +62,9 @@ public class PlaceMonuments : ProceduralComponent
 	[Tooltip("Distance to monuments of a different type")]
 	public DistanceMode DistanceDifferentType;
 
+	[Tooltip("Enable to only spawn these monuments when running as a nexus")]
+	public bool NexusOnly;
+
 	public const int GroupCandidates = 8;
 
 	public const int IndividualCandidates = 8;
@@ -72,6 +75,10 @@ public class PlaceMonuments : ProceduralComponent
 
 	public override void Process(uint seed)
 	{
+		if (NexusOnly && !World.Nexus)
+		{
+			return;
+		}
 		string[] array = (from folder in ResourceFolder.Split(',')
 			select "assets/bundled/prefabs/autospawn/" + folder + "/").ToArray();
 		if (World.Networked)
@@ -89,11 +96,14 @@ public class PlaceMonuments : ProceduralComponent
 			List<PathFinder.Point> endList = null;
 			List<Prefab<MonumentInfo>> list = new List<Prefab<MonumentInfo>>();
 			string[] array2 = array;
-			for (int i = 0; i < array2.Length; i++)
+			foreach (string text in array2)
 			{
-				Prefab<MonumentInfo>[] array3 = Prefab.Load<MonumentInfo>(array2[i]);
-				ArrayEx.Shuffle(array3, ref seed);
-				list.AddRange(array3);
+				if (!text.Contains("underwater_lab") || World.Config.UnderwaterLabs)
+				{
+					Prefab<MonumentInfo>[] array3 = Prefab.Load<MonumentInfo>(text);
+					ArrayEx.Shuffle(array3, ref seed);
+					list.AddRange(array3);
+				}
 			}
 			Prefab<MonumentInfo>[] array4 = list.ToArray();
 			if (array4 == null || array4.Length == 0)
@@ -217,8 +227,8 @@ public class PlaceMonuments : ProceduralComponent
 										new PathFinder.Point(length - 1, length - 1)
 									};
 								}
-								PathFinder.Point pathFinderPoint = terrainPathConnect.GetPathFinderPoint(pathFinder.GetResolution(0), pos + rot * Vector3.Scale(scale, terrainPathConnect.transform.localPosition));
-								if (pathFinder.FindPathUndirected(new List<PathFinder.Point> { pathFinderPoint }, endList, 100000) == null)
+								PathFinder.Point point = PathFinder.GetPoint(pos + rot * Vector3.Scale(scale, terrainPathConnect.transform.localPosition), pathFinder.GetResolution(0));
+								if (pathFinder.FindPathUndirected(new List<PathFinder.Point> { point }, endList, 100000) == null)
 								{
 									flag = true;
 									break;

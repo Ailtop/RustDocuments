@@ -20,5 +20,7 @@ public class UIChat : PriorityListComponent<UIChat>
 
 	public GameObject userPopup;
 
+	public EmojiGallery emojiGallery;
+
 	public static bool isOpen;
 }

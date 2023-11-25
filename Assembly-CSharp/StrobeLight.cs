@@ -49,8 +49,8 @@ public class StrobeLight : IOEntity
 		return speedSlow;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetStrobe(RPCMessage msg)
 	{
 		bool strobe = msg.read.Bit();
@@ -142,7 +142,7 @@ public class StrobeLight : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetStrobe "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetStrobe ");
 				}
 				using (TimeWarning.New("SetStrobe"))
 				{
@@ -178,7 +178,7 @@ public class StrobeLight : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetStrobeSpeed "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetStrobeSpeed ");
 				}
 				using (TimeWarning.New("SetStrobeSpeed"))
 				{

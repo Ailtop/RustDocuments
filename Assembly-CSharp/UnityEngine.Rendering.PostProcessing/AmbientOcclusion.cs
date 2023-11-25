@@ -12,15 +12,15 @@ public sealed class AmbientOcclusion : PostProcessEffectSettings
 		value = AmbientOcclusionMode.MultiScaleVolumetricObscurance
 	};
 
-	[Range(0f, 4f)]
 	[Tooltip("The degree of darkness added by ambient occlusion. Higher values produce darker areas.")]
+	[Range(0f, 4f)]
 	public FloatParameter intensity = new FloatParameter
 	{
 		value = 0f
 	};
 
-	[Tooltip("The custom color to use for the ambient occlusion. The default is black.")]
 	[ColorUsage(false)]
+	[Tooltip("The custom color to use for the ambient occlusion. The default is black.")]
 	public ColorParameter color = new ColorParameter
 	{
 		value = Color.black
@@ -50,15 +50,15 @@ public sealed class AmbientOcclusion : PostProcessEffectSettings
 		value = -12f
 	};
 
-	[Tooltip("This modifies the thickness of occluders. It increases the size of dark areas and also introduces a dark halo around objects.")]
 	[Range(1f, 10f)]
+	[Tooltip("This modifies the thickness of occluders. It increases the size of dark areas and also introduces a dark halo around objects.")]
 	public FloatParameter thicknessModifier = new FloatParameter
 	{
 		value = 1f
 	};
 
-	[Tooltip("Modifies the influence of direct lighting on ambient occlusion.")]
 	[Range(0f, 1f)]
+	[Tooltip("Modifies the influence of direct lighting on ambient occlusion.")]
 	public FloatParameter directLightingStrength = new FloatParameter
 	{
 		value = 0f

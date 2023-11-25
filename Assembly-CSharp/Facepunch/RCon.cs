@@ -526,7 +526,7 @@ public class RCon
 			isInput = true;
 			if (Print)
 			{
-				Debug.Log(string.Concat("[rcon] ", cmd.Ip, ": ", cmd.Message));
+				Debug.Log("[rcon] " + cmd.Ip?.ToString() + ": " + cmd.Message);
 			}
 			isInput = false;
 			string text = ConsoleSystem.Run(ConsoleSystem.Option.Server.Quiet(), cmd.Message);

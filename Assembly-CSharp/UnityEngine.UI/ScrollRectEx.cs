@@ -6,10 +6,10 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI;
 
-[ExecuteInEditMode]
-[AddComponentMenu("UI/Scroll Rect Ex", 37)]
 [RequireComponent(typeof(RectTransform))]
 [SelectionBase]
+[AddComponentMenu("UI/Scroll Rect Ex", 37)]
+[ExecuteInEditMode]
 public class ScrollRectEx : UIBehaviour, IInitializePotentialDragHandler, IEventSystemHandler, IBeginDragHandler, IEndDragHandler, IDragHandler, IScrollHandler, ICanvasElement, ILayoutGroup, ILayoutController
 {
 	public enum MovementType
@@ -448,6 +448,17 @@ public class ScrollRectEx : UIBehaviour, IInitializePotentialDragHandler, IEvent
 				return m_ContentBounds.size.y > m_ViewBounds.size.y + 0.01f;
 			}
 			return true;
+		}
+	}
+
+	public Rect normalizedViewRect
+	{
+		get
+		{
+			UpdateBounds();
+			Vector3 b = m_ContentBounds.size.Inverse();
+			Vector3 vector = Vector3.Scale((m_ContentBounds.center - m_ContentBounds.extents).Abs() + new Vector3(0f - m_ViewBounds.extents.x, m_ViewBounds.extents.y), b);
+			return new Rect(size: Vector3.Scale(m_ViewBounds.size, b), position: vector);
 		}
 	}
 

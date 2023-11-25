@@ -17,6 +17,10 @@ public class TriggerBase : BaseMonoBehaviour
 	[NonSerialized]
 	public HashSet<BaseEntity> entityContents;
 
+	public Action<BaseNetworkable> OnEntityEnterTrigger;
+
+	public Action<BaseNetworkable> OnEntityLeaveTrigger;
+
 	public bool HasAnyContents => !CollectionEx.IsNullOrEmpty(contents);
 
 	public bool HasAnyEntityContents => !CollectionEx.IsNullOrEmpty(entityContents);
@@ -55,6 +59,7 @@ public class TriggerBase : BaseMonoBehaviour
 			if (Interface.CallHook("OnEntityEnter", this, ent) == null)
 			{
 				entityContents.Add(ent);
+				OnEntityEnterTrigger?.Invoke(ent);
 			}
 		}
 	}
@@ -64,6 +69,7 @@ public class TriggerBase : BaseMonoBehaviour
 		if (entityContents != null && Interface.CallHook("OnEntityLeave", this, ent) == null)
 		{
 			entityContents.Remove(ent);
+			OnEntityLeaveTrigger?.Invoke(ent);
 		}
 	}
 

@@ -317,19 +317,20 @@ public static class RuntimeUtilities
 		if (!m_LutStrips.TryGetValue(size, out var value))
 		{
 			int num = size * size;
-			Color[] array = new Color[num * size];
-			float num2 = 1f / ((float)size - 1f);
+			int num2 = size;
+			Color[] array = new Color[num * num2];
+			float num3 = 1f / ((float)size - 1f);
 			for (int i = 0; i < size; i++)
 			{
-				int num3 = i * size;
-				float b = (float)i * num2;
+				int num4 = i * size;
+				float b = (float)i * num3;
 				for (int j = 0; j < size; j++)
 				{
-					float g = (float)j * num2;
+					float g = (float)j * num3;
 					for (int k = 0; k < size; k++)
 					{
-						float r = (float)k * num2;
-						array[j * num + num3 + k] = new Color(r, g, b);
+						float r = (float)k * num3;
+						array[j * num + num4 + k] = new Color(r, g, b);
 					}
 				}
 			}
@@ -595,7 +596,7 @@ public static class RuntimeUtilities
 		{
 			queue.Enqueue(gameObject.transform);
 			T component = gameObject.GetComponent<T>();
-			if ((Object)component != (Object)null)
+			if (component != null)
 			{
 				yield return component;
 			}
@@ -606,7 +607,7 @@ public static class RuntimeUtilities
 			{
 				queue.Enqueue(item);
 				T component2 = item.GetComponent<T>();
-				if ((Object)component2 != (Object)null)
+				if (component2 != null)
 				{
 					yield return component2;
 				}
@@ -631,7 +632,7 @@ public static class RuntimeUtilities
 	{
 		float nearClipPlane = camera.nearClipPlane;
 		_ = camera.farClipPlane;
-		float num = Mathf.Tan((float)Math.PI / 360f * camera.fieldOfView) * nearClipPlane;
+		float num = Mathf.Tan(MathF.PI / 360f * camera.fieldOfView) * nearClipPlane;
 		float num2 = num * camera.aspect;
 		offset.x *= num2 / (0.5f * (float)camera.pixelWidth);
 		offset.y *= num / (0.5f * (float)camera.pixelHeight);
@@ -700,8 +701,7 @@ public static class RuntimeUtilities
 		{
 			expression = ((LambdaExpression)expression).Body;
 		}
-		ExpressionType nodeType = expression.NodeType;
-		if (nodeType == ExpressionType.MemberAccess)
+		if (expression.NodeType == ExpressionType.MemberAccess)
 		{
 			return ((FieldInfo)((MemberExpression)expression).Member).GetCustomAttributes(inherit: false).Cast<Attribute>().ToArray();
 		}
@@ -710,8 +710,7 @@ public static class RuntimeUtilities
 
 	public static string GetFieldPath<TType, TValue>(Expression<Func<TType, TValue>> expr)
 	{
-		ExpressionType nodeType = expr.Body.NodeType;
-		if (nodeType == ExpressionType.MemberAccess)
+		if (expr.Body.NodeType == ExpressionType.MemberAccess)
 		{
 			MemberExpression memberExpression = expr.Body as MemberExpression;
 			List<string> list = new List<string>();

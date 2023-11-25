@@ -6,18 +6,18 @@ using UnityEngine.Serialization;
 
 namespace VLB;
 
-[DisallowMultipleComponent]
 [HelpURL("http://saladgamer.com/vlb-doc/comp-lightbeam/")]
-[ExecuteInEditMode]
 [SelectionBase]
+[DisallowMultipleComponent]
+[ExecuteInEditMode]
 public class VolumetricLightBeam : MonoBehaviour
 {
 	public bool colorFromLight = true;
 
 	public ColorMode colorMode;
 
-	[FormerlySerializedAs("colorValue")]
 	[ColorUsage(true, true)]
+	[FormerlySerializedAs("colorValue")]
 	public Color color = Consts.FlatColor;
 
 	public Gradient colorGradient;
@@ -116,7 +116,7 @@ public class VolumetricLightBeam : MonoBehaviour
 
 	public float coneAngle => Mathf.Atan2(coneRadiusEnd - coneRadiusStart, fadeEnd) * 57.29578f * 2f;
 
-	public float coneRadiusEnd => fadeEnd * Mathf.Tan(spotAngle * ((float)Math.PI / 180f) * 0.5f);
+	public float coneRadiusEnd => fadeEnd * Mathf.Tan(spotAngle * (MathF.PI / 180f) * 0.5f);
 
 	public float coneVolume
 	{
@@ -124,7 +124,7 @@ public class VolumetricLightBeam : MonoBehaviour
 		{
 			float num = coneRadiusStart;
 			float num2 = coneRadiusEnd;
-			return (float)Math.PI / 3f * (num * num + num * num2 + num2 * num2) * fadeEnd;
+			return MathF.PI / 3f * (num * num + num * num2 + num2 * num2) * fadeEnd;
 		}
 	}
 
@@ -371,7 +371,7 @@ public class VolumetricLightBeam : MonoBehaviour
 			return -1f;
 		}
 		Vector2 normalized = new Vector2(Utils.xy(posOS).magnitude, posOS.z + coneApexOffsetZ).normalized;
-		return Mathf.Clamp((Mathf.Abs(Mathf.Sin(coneAngle * ((float)Math.PI / 180f) / 2f)) - Mathf.Abs(normalized.x)) / 0.1f, -1f, 1f);
+		return Mathf.Clamp((Mathf.Abs(Mathf.Sin(coneAngle * (MathF.PI / 180f) / 2f)) - Mathf.Abs(normalized.x)) / 0.1f, -1f, 1f);
 	}
 
 	[Obsolete("Use 'GenerateGeometry()' instead")]

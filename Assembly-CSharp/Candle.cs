@@ -21,7 +21,7 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetWantsOn "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetWantsOn ");
 				}
 				using (TimeWarning.New("SetWantsOn"))
 				{
@@ -56,8 +56,8 @@ public class Candle : BaseCombatEntity, ISplashable, IIgniteable
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetWantsOn(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();

@@ -12,6 +12,8 @@ public class PhotoEntity : ImageStorageEntity, IUGCBrowserEntity
 
 	protected override uint CrcToLoad => ImageCrc;
 
+	public override bool ShouldTransferAssociatedFiles => true;
+
 	public uint[] GetContentCRCs
 	{
 		get

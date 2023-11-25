@@ -67,7 +67,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoReload "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoReload ");
 				}
 				using (TimeWarning.New("DoReload"))
 				{
@@ -103,7 +103,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetAttacking "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_SetAttacking ");
 				}
 				using (TimeWarning.New("Server_SetAttacking"))
 				{
@@ -139,7 +139,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StartEngine "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_StartEngine ");
 				}
 				using (TimeWarning.New("Server_StartEngine"))
 				{
@@ -175,7 +175,7 @@ public class Chainsaw : BaseMelee
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_StopEngine "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_StopEngine ");
 				}
 				using (TimeWarning.New("Server_StopEngine"))
 				{
@@ -370,8 +370,8 @@ public class Chainsaw : BaseMelee
 		ReduceAmmo(fuelPerSec);
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	public void Server_StartEngine(RPCMessage msg)
 	{
 		if (ammo > 0 && !EngineOn())
@@ -495,11 +495,6 @@ public class Chainsaw : BaseMelee
 		{
 			return (Item)obj;
 		}
-		Item item = ownerPlayer.inventory.containerMain.FindItemsByItemName(fuelType.shortname);
-		if (item == null)
-		{
-			item = ownerPlayer.inventory.containerBelt.FindItemsByItemName(fuelType.shortname);
-		}
-		return item;
+		return ownerPlayer.inventory.FindItemByItemName(fuelType.shortname);
 	}
 }

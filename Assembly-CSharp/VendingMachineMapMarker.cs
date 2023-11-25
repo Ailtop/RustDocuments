@@ -16,6 +16,33 @@ public class VendingMachineMapMarker : MapMarker
 
 	public GameObjectRef clusterMarkerObj;
 
+	public void SetVendingMachine(VendingMachine vm, string shopName)
+	{
+		server_vendingMachine = vm;
+		markerShopName = shopName;
+		if (!IsInvoking(TryUpdatePosition))
+		{
+			InvokeRandomized(TryUpdatePosition, 30f, 30f, 10f);
+		}
+	}
+
+	private void TryUpdatePosition()
+	{
+		if (server_vendingMachine != null && server_vendingMachine.GetParentEntity() != null)
+		{
+			base.transform.position = server_vendingMachine.transform.position;
+			try
+			{
+				syncPosition = true;
+				NetworkPositionTick();
+			}
+			finally
+			{
+				syncPosition = false;
+			}
+		}
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);

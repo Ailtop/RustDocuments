@@ -1,7 +1,6 @@
 internal enum TextureCacheState
 {
-	Skipped = 0,
-	Initializing = 1,
-	Uncached = 2,
-	CachedRaw = 3
+	Initializing = 0,
+	Uncached = 1,
+	CachedRaw = 2
 }

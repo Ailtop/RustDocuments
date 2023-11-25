@@ -151,7 +151,7 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		int result;
 		int item = Math.DivRem(groupId, numIDsPerLayer, out result);
 		int result2;
-		return (Math.DivRem(result, cellCount, out result2), result2, item);
+		return (x: Math.DivRem(result, cellCount, out result2), y: result2, layer: item);
 	}
 
 	private Bounds GetBounds(uint uid)
@@ -218,7 +218,18 @@ public class NetworkVisibilityGrid : MonoBehaviour, Provider
 		if (!IsInside(group, vPos))
 		{
 			float num = group.bounds.SqrDistance(vPos);
-			Debug.Log("Group is inside is all fucked " + iD + "/" + num + "/" + vPos);
+			string[] obj = new string[6]
+			{
+				"Group is inside is all fucked ",
+				iD.ToString(),
+				"/",
+				num.ToString(),
+				"/",
+				null
+			};
+			Vector3 vector = vPos;
+			obj[5] = vector.ToString();
+			Debug.Log(string.Concat(obj));
 		}
 		return group;
 	}

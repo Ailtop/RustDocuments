@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class SnowmobileAudio : GroundVehicleAudio
 {
-	[Header("Engine")]
 	[SerializeField]
+	[Header("Engine")]
 	private EngineAudioSet engineAudioSet;
 
-	[SerializeField]
 	[Header("Skis")]
+	[SerializeField]
 	private AnimationCurve skiGainCurve;
 
 	[SerializeField]

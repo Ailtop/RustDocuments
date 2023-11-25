@@ -3,6 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Rust/Gestures/Gesture Collection")]
 public class GestureCollection : ScriptableObject
 {
+	public static uint HeavyLandingId = 3204230781u;
+
 	public GestureConfig[] AllGestures;
 
 	public float GestureVmInDuration = 0.25f;

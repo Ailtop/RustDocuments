@@ -27,6 +27,8 @@ public class UIDeathScreen : SingletonComponent<UIDeathScreen>, IUIScreen
 
 	public List<SleepingBagButton> sleepingBagButtons = new List<SleepingBagButton>();
 
+	public GameObject loadingIndicator;
+
 	public RespawnColourScheme[] RespawnColourSchemes;
 
 	public GameObject RespawnScrollGradient;

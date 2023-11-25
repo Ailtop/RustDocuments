@@ -45,11 +45,10 @@ public class RoadBradleys : TriggeredEvent
 			if ((bool)bradleyAPC)
 			{
 				spawnedAPCs.Add(bradleyAPC);
+				continue;
 			}
-			else
-			{
-				Debug.Log("Failed to spawn bradley at: " + zero);
-			}
+			Vector3 vector = zero;
+			Debug.Log("Failed to spawn bradley at: " + vector.ToString());
 		}
 	}
 }

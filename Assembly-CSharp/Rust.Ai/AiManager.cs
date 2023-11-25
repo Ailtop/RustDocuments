@@ -7,8 +7,8 @@ namespace Rust.Ai;
 [DefaultExecutionOrder(-103)]
 public class AiManager : SingletonComponent<AiManager>, IServerComponent
 {
-	[SerializeField]
 	[Header("Cover System")]
+	[SerializeField]
 	public bool UseCover = true;
 
 	public float CoverPointVolumeCellSize = 20f;

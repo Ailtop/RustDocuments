@@ -40,7 +40,7 @@ public class TriggerPlayerTimer : TriggerBase
 		bool flag = false;
 		foreach (BaseEntity entityContent in entityContents)
 		{
-			if (entityContent is BasePlayer basePlayer && !basePlayer.isMounted)
+			if (entityContent is BasePlayer { isMounted: false })
 			{
 				flag = true;
 			}

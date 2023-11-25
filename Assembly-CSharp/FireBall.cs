@@ -30,7 +30,7 @@ public class FireBall : BaseEntity, ISplashable
 
 	public bool canMerge;
 
-	public LayerMask AttackLayers = 1219701521;
+	public LayerMask AttackLayers = 1220225809;
 
 	public bool ignoreNPC;
 

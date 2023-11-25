@@ -146,7 +146,7 @@ public class IndustrialConveyor : IndustrialEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_ChangeFilters "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_ChangeFilters ");
 				}
 				using (TimeWarning.New("RPC_ChangeFilters"))
 				{
@@ -186,7 +186,7 @@ public class IndustrialConveyor : IndustrialEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestUpToDateFilters "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RequestUpToDateFilters ");
 				}
 				using (TimeWarning.New("Server_RequestUpToDateFilters"))
 				{
@@ -226,7 +226,7 @@ public class IndustrialConveyor : IndustrialEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					UnityEngine.Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SvSwitch "));
+					UnityEngine.Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SvSwitch ");
 				}
 				using (TimeWarning.New("SvSwitch"))
 				{
@@ -325,7 +325,7 @@ public class IndustrialConveyor : IndustrialEntity
 			ItemFilter itemFilter = filterItems[i];
 			if (FilterMatches(itemFilter, item))
 			{
-				filter = (itemFilter, i);
+				filter = (filter: itemFilter, index: i);
 				return true;
 			}
 		}
@@ -375,8 +375,11 @@ public class IndustrialConveyor : IndustrialEntity
 			refreshInputOutputs = false;
 			splitInputs.Clear();
 			splitOutputs.Clear();
-			FindContainerSource(splitInputs, 32, input: true);
-			FindContainerSource(splitOutputs, 32, input: false, -1, MaxStackSizePerMove);
+			List<IOEntity> obj = Facepunch.Pool.GetList<IOEntity>();
+			FindContainerSource(splitInputs, 32, input: true, obj);
+			obj.Clear();
+			FindContainerSource(splitOutputs, 32, input: false, obj, -1, MaxStackSizePerMove);
+			Facepunch.Pool.FreeList(ref obj);
 		}
 		bool hasItems = CheckIfAnyInputPassesFilters(splitInputs);
 		if ((!lastFilterState.HasValue || hasItems != lastFilterState) && !hasItems)
@@ -395,7 +398,7 @@ public class IndustrialConveyor : IndustrialEntity
 			transfer.ItemTransfers = Facepunch.Pool.GetList<IndustrialConveyorTransfer.ItemTransfer>();
 			transfer.inputEntities = Facepunch.Pool.GetList<NetworkableId>();
 			transfer.outputEntities = Facepunch.Pool.GetList<NetworkableId>();
-			List<int> obj = Facepunch.Pool.GetList<int>();
+			List<int> obj2 = Facepunch.Pool.GetList<int>();
 			int num = 0;
 			int count = splitOutputs.Count;
 			foreach (ContainerInputOutput splitOutput in splitOutputs)
@@ -509,14 +512,14 @@ public class IndustrialConveyor : IndustrialEntity
 						Item nonFullStackWithinRange = container2.GetNonFullStackWithinRange(item2 ?? slot, range);
 						if (nonFullStackWithinRange != null)
 						{
-							(item2 ?? slot).MoveToContainer(container2, nonFullStackWithinRange.position, allowStack: true, ignoreStackLimit: false, null, allowSwap: false);
+							flag4 = (item2 ?? slot).MoveToContainer(container2, nonFullStackWithinRange.position, allowStack: true, ignoreStackLimit: false, null, allowSwap: false);
 						}
-						else
+						if (!flag4)
 						{
 							for (int j = range.x; j <= range.y; j++)
 							{
 								Item slot2 = container2.GetSlot(j);
-								if ((slot2 == null || slot2.info == slot.info) && (item2 ?? slot).MoveToContainer(container2, j, allowStack: true, ignoreStackLimit: false, null, allowSwap: false))
+								if ((slot2 == null || (slot2.info == slot.info && slot2.condition == slot.condition)) && (item2 ?? slot).MoveToContainer(container2, j, allowStack: true, ignoreStackLimit: false, null, allowSwap: false))
 								{
 									flag4 = true;
 									break;
@@ -548,9 +551,9 @@ public class IndustrialConveyor : IndustrialEntity
 								AddTransfer(slot.info.itemid, amount2, splitInput.Storage.IndustrialEntity, splitOutput.Storage.IndustrialEntity);
 							}
 						}
-						else if (!obj.Contains(num))
+						else if (!obj2.Contains(num))
 						{
-							obj.Add(num);
+							obj2.Add(num);
 						}
 						splitOutput.Storage.OnStorageItemTransferEnd();
 						if (num2 >= ConVar.Server.maxItemStacksMovedPerTickIndustrial)
@@ -569,7 +572,7 @@ public class IndustrialConveyor : IndustrialEntity
 			{
 				UpdateFilterPassthroughs();
 			}
-			Facepunch.Pool.FreeList(ref obj);
+			Facepunch.Pool.FreeList(ref obj2);
 			if (transfer.ItemTransfers.Count > 0)
 			{
 				ClientRPCEx(new SendInfo(BaseNetworkable.GetConnectionsWithin(base.transform.position, 30f)), null, "ReceiveItemTransferDetails", transfer);
@@ -740,7 +743,7 @@ public class IndustrialConveyor : IndustrialEntity
 					filterItems[i] = itemFilter;
 				}
 			}
-			if (mode == ConveyorMode.And && (num == filterItems.Count || num == num2))
+			if (mode == ConveyorMode.And && num > 0 && (num == filterItems.Count || num == num2))
 			{
 				if (num2 == 0)
 				{
@@ -775,8 +778,8 @@ public class IndustrialConveyor : IndustrialEntity
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server.CallsPerSecond(1uL)]
+	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
 	private void RPC_ChangeFilters(RPCMessage msg)
 	{
@@ -808,8 +811,8 @@ public class IndustrialConveyor : IndustrialEntity
 	}
 
 	[RPC_Server.CallsPerSecond(2uL)]
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void SvSwitch(RPCMessage msg)
 	{
 		if (Interface.CallHook("OnSwitchToggle", this, msg.player) == null)
@@ -924,8 +927,8 @@ public class IndustrialConveyor : IndustrialEntity
 		return IsOn();
 	}
 
-	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.CallsPerSecond(1uL)]
 	[RPC_Server]
 	private void Server_RequestUpToDateFilters(RPCMessage msg)
 	{

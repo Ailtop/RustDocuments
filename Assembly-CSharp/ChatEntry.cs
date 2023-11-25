@@ -19,4 +19,8 @@ public class ChatEntry : MonoBehaviour
 	public Translate.Phrase CardsPhrase = new Translate.Phrase("cards", "cards");
 
 	public Translate.Phrase TeamPhrase = new Translate.Phrase("team", "team");
+
+	public TmProEmojiRedirector EmojiRedirector;
+
+	public Translate.Phrase ClanPhrase = new Translate.Phrase("clan", "clan");
 }

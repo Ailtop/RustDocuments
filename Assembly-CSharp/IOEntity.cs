@@ -145,8 +145,8 @@ public class IOEntity : DecayEntity
 	[NonSerialized]
 	public int lastResetIndex;
 
-	[ServerVar]
 	[Help("How many miliseconds to budget for processing io entities per server frame")]
+	[ServerVar]
 	public static float framebudgetms = 1f;
 
 	[ServerVar]
@@ -191,7 +191,7 @@ public class IOEntity : DecayEntity
 
 	public const int MaxContainerSourceCount = 32;
 
-	private List<BoxCollider> spawnedColliders = new List<BoxCollider>();
+	private List<Collider> spawnedColliders = new List<Collider>();
 
 	public virtual bool IsGravitySource => false;
 
@@ -212,7 +212,7 @@ public class IOEntity : DecayEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestData "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RequestData ");
 				}
 				using (TimeWarning.New("Server_RequestData"))
 				{
@@ -320,6 +320,15 @@ public class IOEntity : DecayEntity
 
 	public virtual bool WantsPower()
 	{
+		return true;
+	}
+
+	public virtual bool AllowWireConnections()
+	{
+		if (GetComponentInParent<BaseVehicle>() != null)
+		{
+			return false;
+		}
 		return true;
 	}
 
@@ -443,9 +452,9 @@ public class IOEntity : DecayEntity
 		return false;
 	}
 
-	[RPC_Server.CallsPerSecond(10uL)]
 	[RPC_Server.IsVisible(6f)]
 	[RPC_Server]
+	[RPC_Server.CallsPerSecond(10uL)]
 	private void Server_RequestData(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -998,7 +1007,7 @@ public class IOEntity : DecayEntity
 		return inputAmount;
 	}
 
-	public void FindContainerSource(List<ContainerInputOutput> found, int depth, bool input, int parentId = -1, int stackSize = 0)
+	public void FindContainerSource(List<ContainerInputOutput> found, int depth, bool input, List<IOEntity> ignoreList, int parentId = -1, int stackSize = 0)
 	{
 		if (depth <= 0 || found.Count >= 32)
 		{
@@ -1029,7 +1038,7 @@ public class IOEntity : DecayEntity
 				continue;
 			}
 			IOEntity iOEntity = iOSlot.connectedTo.Get(base.isServer);
-			if (!(iOEntity != null))
+			if (!(iOEntity != null) || ignoreList.Contains(iOEntity))
 			{
 				continue;
 			}
@@ -1050,9 +1059,13 @@ public class IOEntity : DecayEntity
 					obj.Add(num3);
 				}
 			}
+			else
+			{
+				ignoreList.Add(iOEntity);
+			}
 			if ((!(iOEntity is IIndustrialStorage) || iOEntity is IndustrialStorageAdaptor) && !(iOEntity is IndustrialConveyor) && iOEntity != null)
 			{
-				iOEntity.FindContainerSource(found, depth - 1, input, (num3 == -1) ? parentId : num3, stackSize / num2);
+				iOEntity.FindContainerSource(found, depth - 1, input, ignoreList, (num3 == -1) ? parentId : num3, stackSize / num2);
 			}
 		}
 		int count = obj.Count;
@@ -1254,13 +1267,13 @@ public class IOEntity : DecayEntity
 			{
 				Vector3 vector2 = localToWorldMatrix.MultiplyPoint3x4(iOSlot.linePoints[j]);
 				Vector3 pos = Vector3.Lerp(vector2, vector, 0.5f);
-				float z = Vector3.Distance(vector2, vector);
+				float num = Vector3.Distance(vector2, vector);
 				Quaternion rot = Quaternion.LookRotation((vector2 - vector).normalized);
 				GameObject obj = base.gameManager.CreatePrefab("assets/prefabs/misc/ioentitypreventbuilding.prefab", pos, rot);
 				obj.transform.SetParent(base.transform);
-				if (obj.TryGetComponent<BoxCollider>(out var component))
+				if (obj.TryGetComponent<CapsuleCollider>(out var component))
 				{
-					component.size = new Vector3(0.1f, 0.1f, z);
+					component.height = num + component.radius;
 					spawnedColliders.Add(component);
 				}
 				if (obj.TryGetComponent<ColliderInfo_Pipe>(out var component2))
@@ -1275,7 +1288,7 @@ public class IOEntity : DecayEntity
 
 	private void ClearIndustrialPreventBuilding()
 	{
-		foreach (BoxCollider spawnedCollider in spawnedColliders)
+		foreach (Collider spawnedCollider in spawnedColliders)
 		{
 			base.gameManager.Retire(spawnedCollider.gameObject);
 		}

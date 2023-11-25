@@ -25,7 +25,7 @@ public class PatrolHelicopter : ConsoleSystem
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		if ((bool)basePlayer)
 		{
-			Debug.Log("heli called to : " + basePlayer.transform.position);
+			Debug.Log("heli called to : " + basePlayer.transform.position.ToString());
 			BaseEntity baseEntity = GameManager.server.CreateEntity("assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab");
 			if ((bool)baseEntity)
 			{
@@ -41,7 +41,7 @@ public class PatrolHelicopter : ConsoleSystem
 		BasePlayer basePlayer = ArgEx.Player(arg);
 		if ((bool)basePlayer)
 		{
-			Debug.Log("heli called to : " + basePlayer.transform.position);
+			Debug.Log("heli called to : " + basePlayer.transform.position.ToString());
 			BaseEntity baseEntity = GameManager.server.CreateEntity("assets/prefabs/npc/patrol helicopter/patrolhelicopter.prefab");
 			if ((bool)baseEntity)
 			{
@@ -79,7 +79,7 @@ public class PatrolHelicopter : ConsoleSystem
 			}
 			else if (UnityEngine.Physics.Raycast(basePlayer.eyes.HeadRay(), out hitInfo, 1000f, 1218652417))
 			{
-				Debug.Log("strafing :" + hitInfo.point);
+				Debug.Log("strafing :" + hitInfo.point.ToString());
 				heliInstance.interestZoneOrigin = hitInfo.point;
 				heliInstance.ExitCurrentState();
 				heliInstance.State_Strafe_Enter(hitInfo.point);

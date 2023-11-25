@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Rust/Vehicles/WorldSpline Shared Data", fileName = "WorldSpline Prefab Shared Data")]
+[CreateAssetMenu(menuName = "Scriptable Object/Vehicles/WorldSpline Shared Data", fileName = "WorldSpline Prefab Shared Data")]
 public class WorldSplineSharedData : ScriptableObject
 {
 	[SerializeField]

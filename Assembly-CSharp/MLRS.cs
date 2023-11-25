@@ -21,50 +21,6 @@ public class MLRS : BaseMountable
 		public Renderer rocket;
 	}
 
-	private struct TheoreticalProjectile
-	{
-		public Vector3 pos;
-
-		public Vector3 forward;
-
-		public float gravityMult;
-
-		public TheoreticalProjectile(Vector3 pos, Vector3 forward, float gravityMult)
-		{
-			this.pos = pos;
-			this.forward = forward;
-			this.gravityMult = gravityMult;
-		}
-	}
-
-	public const string MLRS_PLAYER_KILL_STAT = "mlrs_kills";
-
-	private float leftRightInput;
-
-	private float upDownInput;
-
-	public Vector3 lastSentTargetHitPos;
-
-	public Vector3 lastSentTrueHitPos;
-
-	public int nextRocketIndex;
-
-	public EntityRef rocketOwnerRef;
-
-	public TimeSince timeSinceBroken;
-
-	public int radiusModIndex;
-
-	private float[] radiusMods = new float[4]
-	{
-		0.1f,
-		0.2f,
-		1f / 3f,
-		2f / 3f
-	};
-
-	public Vector3 trueTargetHitPos;
-
 	[Header("MLRS Components")]
 	[SerializeField]
 	private GameObjectRef rocketStoragePrefab;
@@ -72,8 +28,8 @@ public class MLRS : BaseMountable
 	[SerializeField]
 	private GameObjectRef dashboardStoragePrefab;
 
-	[SerializeField]
 	[Header("MLRS Rotation")]
+	[SerializeField]
 	private Transform hRotator;
 
 	[SerializeField]
@@ -85,20 +41,20 @@ public class MLRS : BaseMountable
 	[SerializeField]
 	public float vRotSpeed = 10f;
 
-	[Range(50f, 90f)]
 	[SerializeField]
+	[Range(50f, 90f)]
 	public float vRotMax = 85f;
 
 	[SerializeField]
 	private Transform hydraulics;
 
-	[SerializeField]
 	[Header("MLRS Weaponry")]
 	[Tooltip("Minimum distance from the MLRS to a targeted hit point. In metres.")]
+	[SerializeField]
 	public float minRange = 200f;
 
-	[SerializeField]
 	[Tooltip("The size of the area that the rockets may hit, minus rocket damage radius.")]
+	[SerializeField]
 	public float targetAreaRadius = 30f;
 
 	[SerializeField]
@@ -163,6 +119,34 @@ public class MLRS : BaseMountable
 	public float rocketSpeed;
 
 	private bool isInitialLoad = true;
+
+	public const string MLRS_PLAYER_KILL_STAT = "mlrs_kills";
+
+	private float leftRightInput;
+
+	private float upDownInput;
+
+	public Vector3 lastSentTargetHitPos;
+
+	public Vector3 lastSentTrueHitPos;
+
+	public int nextRocketIndex;
+
+	public EntityRef rocketOwnerRef;
+
+	public TimeSince timeSinceBroken;
+
+	public int radiusModIndex;
+
+	private float[] radiusMods = new float[4]
+	{
+		0.1f,
+		0.2f,
+		1f / 3f,
+		2f / 3f
+	};
+
+	public Vector3 trueTargetHitPos;
 
 	public Vector3 UserTargetHitPos { get; set; }
 
@@ -248,7 +232,7 @@ public class MLRS : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Fire_Rockets "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Fire_Rockets ");
 				}
 				using (TimeWarning.New("RPC_Fire_Rockets"))
 				{
@@ -284,7 +268,7 @@ public class MLRS : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Open_Dashboard "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Open_Dashboard ");
 				}
 				using (TimeWarning.New("RPC_Open_Dashboard"))
 				{
@@ -320,7 +304,7 @@ public class MLRS : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Open_Rockets "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Open_Rockets ");
 				}
 				using (TimeWarning.New("RPC_Open_Rockets"))
 				{
@@ -356,7 +340,7 @@ public class MLRS : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_SetTargetHitPos "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_SetTargetHitPos ");
 				}
 				using (TimeWarning.New("RPC_SetTargetHitPos"))
 				{
@@ -389,6 +373,126 @@ public class MLRS : BaseMountable
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		GameObject obj = mlrsRocket.Get();
+		ServerProjectile component = obj.GetComponent<ServerProjectile>();
+		rocketBaseGravity = (0f - UnityEngine.Physics.gravity.y) * component.gravityModifier;
+		rocketSpeed = component.speed;
+		TimedExplosive component2 = obj.GetComponent<TimedExplosive>();
+		RocketDamageRadius = component2.explosionRadius;
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.mlrs != null)
+		{
+			SetUserTargetHitPos(info.msg.mlrs.targetPos);
+			TrueHitPos = info.msg.mlrs.curHitPos;
+			HitPosToRotation(TrueHitPos, out var hRot, out var vRot, out var g);
+			CurGravityMultiplier = g / (0f - UnityEngine.Physics.gravity.y);
+			if (base.isServer)
+			{
+				HRotation = hRot;
+				VRotation = vRot;
+			}
+			rocketStorageInstance.uid = info.msg.mlrs.rocketStorageID;
+			dashboardStorageInstance.uid = info.msg.mlrs.dashboardStorageID;
+			RocketAmmoCount = (int)info.msg.mlrs.ammoCount;
+		}
+	}
+
+	public override bool CanBeLooted(BasePlayer player)
+	{
+		if (!IsFiringRockets)
+		{
+			return base.CanBeLooted(player);
+		}
+		return false;
+	}
+
+	public void SetUserTargetHitPos(Vector3 worldPos)
+	{
+		if (UserTargetHitPos == worldPos)
+		{
+			return;
+		}
+		if (base.isServer)
+		{
+			Vector3 position = TerrainMeta.Position;
+			Vector3 vector = position + TerrainMeta.Size;
+			worldPos.x = Mathf.Clamp(worldPos.x, position.x, vector.x);
+			worldPos.z = Mathf.Clamp(worldPos.z, position.z, vector.z);
+			worldPos.y = GetSurfaceHeight(worldPos);
+		}
+		if (Interface.CallHook("OnMlrsTarget", this, worldPos, _mounted) != null)
+		{
+			return;
+		}
+		UserTargetHitPos = worldPos;
+		if (base.isServer)
+		{
+			trueTargetHitPos = UserTargetHitPos;
+			foreach (TriggerSafeZone allSafeZone in TriggerSafeZone.allSafeZones)
+			{
+				Vector3 center = allSafeZone.triggerCollider.bounds.center;
+				center.y = 0f;
+				float num = ColliderEx.GetRadius(allSafeZone.triggerCollider, allSafeZone.transform.localScale) + targetAreaRadius;
+				trueTargetHitPos.y = 0f;
+				if (Vector3.Distance(center, trueTargetHitPos) < num)
+				{
+					Vector3 vector2 = trueTargetHitPos - center;
+					trueTargetHitPos = center + vector2.normalized * num;
+					trueTargetHitPos.y = GetSurfaceHeight(trueTargetHitPos);
+					break;
+				}
+			}
+		}
+		Interface.CallHook("OnMlrsTargetSet", this, trueTargetHitPos, _mounted);
+	}
+
+	public StorageContainer GetRocketContainer()
+	{
+		BaseEntity baseEntity = rocketStorageInstance.Get(base.isServer);
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
+		{
+			return baseEntity as StorageContainer;
+		}
+		return null;
+	}
+
+	public StorageContainer GetDashboardContainer()
+	{
+		BaseEntity baseEntity = dashboardStorageInstance.Get(base.isServer);
+		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
+		{
+			return baseEntity as StorageContainer;
+		}
+		return null;
+	}
+
+	public void HitPosToRotation(Vector3 hitPos, out float hRot, out float vRot, out float g)
+	{
+		Vector3 aimToTarget = Ballistics.GetAimToTarget(firingPoint.position, hitPos, rocketSpeed, vRotMax, rocketBaseGravity, minRange, out g);
+		Vector3 eulerAngles = Quaternion.LookRotation(aimToTarget, Vector3.up).eulerAngles;
+		vRot = eulerAngles.x - 360f;
+		aimToTarget.y = 0f;
+		hRot = eulerAngles.y;
+	}
+
+	public static float ProjectileDistToSpeed(float x, float y, float angle, float g, float fallbackV)
+	{
+		float num = angle * (MathF.PI / 180f);
+		float num2 = Mathf.Sqrt(x * x * g / (x * Mathf.Sin(2f * num) - 2f * y * Mathf.Cos(num) * Mathf.Cos(num)));
+		if (float.IsNaN(num2) || num2 < 1f)
+		{
+			num2 = fallbackV;
+		}
+		return num2;
 	}
 
 	protected override void OnChildAdded(BaseEntity child)
@@ -447,58 +551,13 @@ public class MLRS : BaseMountable
 					HRotation = Mathf.MoveTowardsAngle(HRotation, hRot, UnityEngine.Time.deltaTime * hRotSpeed);
 				}
 				CurGravityMultiplier = num;
-				TrueHitPos = GetTrueHitPos();
+				TrueHitPos = Ballistics.GetPhysicsProjectileHitPos(firingPoint.position, firingPoint.forward, rocketSpeed, UnityEngine.Physics.gravity.y * CurGravityMultiplier, 2f, 0.66f, 128f, this);
 			}
 		}
 		if (UserTargetHitPos != lastSentTargetHitPos || TrueHitPos != lastSentTrueHitPos || RocketAmmoCount != rocketAmmoCount)
 		{
 			SendNetworkUpdate();
 		}
-	}
-
-	public Vector3 GetTrueHitPos()
-	{
-		TheoreticalProjectile projectile = new TheoreticalProjectile(firingPoint.position, firingPoint.forward.normalized * rocketSpeed, CurGravityMultiplier);
-		int num = 0;
-		float dt = ((projectile.forward.y > 0f) ? 2f : 0.66f);
-		while (!NextRayHitSomething(ref projectile, dt) && (float)num < 128f)
-		{
-			num++;
-		}
-		return projectile.pos;
-	}
-
-	public bool NextRayHitSomething(ref TheoreticalProjectile projectile, float dt)
-	{
-		float num = UnityEngine.Physics.gravity.y * projectile.gravityMult;
-		Vector3 pos = projectile.pos;
-		float num2 = projectile.forward.MagnitudeXZ() * dt;
-		float y = projectile.forward.y * dt + num * dt * dt * 0.5f;
-		Vector2 vector = projectile.forward.XZ2D().normalized * num2;
-		Vector3 vector2 = new Vector3(vector.x, y, vector.y);
-		projectile.pos += vector2;
-		float y2 = projectile.forward.y + num * dt;
-		projectile.forward.y = y2;
-		if (UnityEngine.Physics.Linecast(pos, projectile.pos, out var hitInfo, 1084293393, QueryTriggerInteraction.Ignore))
-		{
-			projectile.pos = hitInfo.point;
-			BaseEntity entity = RaycastHitEx.GetEntity(hitInfo);
-			int num3;
-			if (entity != null)
-			{
-				num3 = (entity.EqualNetID(this) ? 1 : 0);
-				if (num3 != 0)
-				{
-					projectile.pos += projectile.forward * 1f;
-				}
-			}
-			else
-			{
-				num3 = 0;
-			}
-			return num3 == 0;
-		}
-		return false;
 	}
 
 	public float GetSurfaceHeight(Vector3 pos)
@@ -567,14 +626,15 @@ public class MLRS : BaseMountable
 		}
 		StorageContainer rocketContainer = GetRocketContainer();
 		ItemDefinition itemDefinition = ItemManager.FindItemDefinition("ammo.rocket.mlrs");
-		if (RocketAmmoCount < rocketContainer.inventory.capacity * itemDefinition.stackable)
+		int num = rocketContainer.inventory.capacity * itemDefinition.stackable;
+		if (RocketAmmoCount < num)
 		{
-			int num = itemDefinition.stackable * rocketContainer.inventory.capacity - RocketAmmoCount;
-			while (num > 0)
+			int num2 = num - RocketAmmoCount;
+			while (num2 > 0)
 			{
-				int num2 = Mathf.Min(num, itemDefinition.stackable);
+				int num3 = Mathf.Min(num2, itemDefinition.stackable);
 				rocketContainer.inventory.AddItem(itemDefinition, itemDefinition.stackable, 0uL);
-				num -= num2;
+				num2 -= num3;
 			}
 		}
 		SetRepaired();
@@ -628,12 +688,12 @@ public class MLRS : BaseMountable
 		}
 		radiusModIndex++;
 		Vector2 vector = UnityEngine.Random.insideUnitCircle * (targetAreaRadius - RocketDamageRadius) * num;
-		Vector3 targetPos = TrueHitPos + new Vector3(vector.x, 0f, vector.y);
-		float g;
-		Vector3 aimToTarget = GetAimToTarget(targetPos, out g);
+		Vector3 target = TrueHitPos + new Vector3(vector.x, 0f, vector.y);
+		float requiredGravity;
+		Vector3 aimToTarget = Ballistics.GetAimToTarget(firingPoint.position, target, rocketSpeed, vRotMax, rocketBaseGravity, minRange, out requiredGravity);
 		if (TryFireProjectile(rocketContainer, AmmoTypes.MLRS_ROCKET, firingPos, aimToTarget, rocketOwnerRef.Get(serverside: true) as BasePlayer, 0f, 0f, out var projectile))
 		{
-			projectile.gravityModifier = g / (0f - UnityEngine.Physics.gravity.y);
+			projectile.gravityModifier = requiredGravity / (0f - UnityEngine.Physics.gravity.y);
 			Interface.CallHook("OnMlrsRocketFired", this, projectile);
 			nextRocketIndex--;
 		}
@@ -663,8 +723,8 @@ public class MLRS : BaseMountable
 		return false;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_SetTargetHitPos(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -685,8 +745,8 @@ public class MLRS : BaseMountable
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void RPC_Open_Rockets(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -704,8 +764,8 @@ public class MLRS : BaseMountable
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	public void RPC_Open_Dashboard(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -721,158 +781,5 @@ public class MLRS : BaseMountable
 				Debug.LogError(GetType().Name + ": No container component found.");
 			}
 		}
-	}
-
-	public override void InitShared()
-	{
-		base.InitShared();
-		GameObject obj = mlrsRocket.Get();
-		ServerProjectile component = obj.GetComponent<ServerProjectile>();
-		rocketBaseGravity = (0f - UnityEngine.Physics.gravity.y) * component.gravityModifier;
-		rocketSpeed = component.speed;
-		TimedExplosive component2 = obj.GetComponent<TimedExplosive>();
-		RocketDamageRadius = component2.explosionRadius;
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.mlrs != null)
-		{
-			SetUserTargetHitPos(info.msg.mlrs.targetPos);
-			TrueHitPos = info.msg.mlrs.curHitPos;
-			HitPosToRotation(TrueHitPos, out var hRot, out var vRot, out var g);
-			CurGravityMultiplier = g / (0f - UnityEngine.Physics.gravity.y);
-			if (base.isServer)
-			{
-				HRotation = hRot;
-				VRotation = vRot;
-			}
-			rocketStorageInstance.uid = info.msg.mlrs.rocketStorageID;
-			dashboardStorageInstance.uid = info.msg.mlrs.dashboardStorageID;
-			RocketAmmoCount = (int)info.msg.mlrs.ammoCount;
-		}
-	}
-
-	public override bool CanBeLooted(BasePlayer player)
-	{
-		return !IsFiringRockets;
-	}
-
-	public void SetUserTargetHitPos(Vector3 worldPos)
-	{
-		if (UserTargetHitPos == worldPos)
-		{
-			return;
-		}
-		if (base.isServer)
-		{
-			Vector3 position = TerrainMeta.Position;
-			Vector3 vector = position + TerrainMeta.Size;
-			worldPos.x = Mathf.Clamp(worldPos.x, position.x, vector.x);
-			worldPos.z = Mathf.Clamp(worldPos.z, position.z, vector.z);
-			worldPos.y = GetSurfaceHeight(worldPos);
-		}
-		if (Interface.CallHook("OnMlrsTarget", this, worldPos, _mounted) != null)
-		{
-			return;
-		}
-		UserTargetHitPos = worldPos;
-		if (base.isServer)
-		{
-			trueTargetHitPos = UserTargetHitPos;
-			foreach (TriggerSafeZone allSafeZone in TriggerSafeZone.allSafeZones)
-			{
-				Vector3 center = allSafeZone.triggerCollider.bounds.center;
-				center.y = 0f;
-				float num = ColliderEx.GetRadius(allSafeZone.triggerCollider, allSafeZone.transform.localScale) + targetAreaRadius;
-				trueTargetHitPos.y = 0f;
-				if (Vector3.Distance(center, trueTargetHitPos) < num)
-				{
-					Vector3 vector2 = trueTargetHitPos - center;
-					trueTargetHitPos = center + vector2.normalized * num;
-					trueTargetHitPos.y = GetSurfaceHeight(trueTargetHitPos);
-					break;
-				}
-			}
-		}
-		Interface.CallHook("OnMlrsTargetSet", this, trueTargetHitPos, _mounted);
-	}
-
-	public StorageContainer GetRocketContainer()
-	{
-		BaseEntity baseEntity = rocketStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
-		{
-			return baseEntity as StorageContainer;
-		}
-		return null;
-	}
-
-	public StorageContainer GetDashboardContainer()
-	{
-		BaseEntity baseEntity = dashboardStorageInstance.Get(base.isServer);
-		if (baseEntity != null && BaseNetworkableEx.IsValid(baseEntity))
-		{
-			return baseEntity as StorageContainer;
-		}
-		return null;
-	}
-
-	public void HitPosToRotation(Vector3 hitPos, out float hRot, out float vRot, out float g)
-	{
-		Vector3 aimToTarget = GetAimToTarget(hitPos, out g);
-		Vector3 eulerAngles = Quaternion.LookRotation(aimToTarget, Vector3.up).eulerAngles;
-		vRot = eulerAngles.x - 360f;
-		aimToTarget.y = 0f;
-		hRot = eulerAngles.y;
-	}
-
-	public Vector3 GetAimToTarget(Vector3 targetPos, out float g)
-	{
-		g = rocketBaseGravity;
-		float num = rocketSpeed;
-		Vector3 vector = targetPos - firingPoint.position;
-		float num2 = vector.Magnitude2D();
-		float y = vector.y;
-		float num3 = Mathf.Sqrt(num * num * num * num - g * (g * (num2 * num2) + 2f * y * num * num));
-		float num4 = Mathf.Atan((num * num + num3) / (g * num2)) * 57.29578f;
-		float num5 = Mathf.Clamp(num4, 0f, 90f);
-		if (float.IsNaN(num4))
-		{
-			num5 = 45f;
-			g = ProjectileDistToGravity(num2, y, num5, num);
-		}
-		else if (num4 > vRotMax)
-		{
-			num5 = vRotMax;
-			g = ProjectileDistToGravity(Mathf.Max(num2, minRange), y, num5, num);
-		}
-		vector.Normalize();
-		vector.y = 0f;
-		Vector3 axis = Vector3.Cross(vector, Vector3.up);
-		return Quaternion.AngleAxis(num5, axis) * vector;
-	}
-
-	public static float ProjectileDistToSpeed(float x, float y, float angle, float g, float fallbackV)
-	{
-		float num = angle * ((float)Math.PI / 180f);
-		float num2 = Mathf.Sqrt(x * x * g / (x * Mathf.Sin(2f * num) - 2f * y * Mathf.Cos(num) * Mathf.Cos(num)));
-		if (float.IsNaN(num2) || num2 < 1f)
-		{
-			num2 = fallbackV;
-		}
-		return num2;
-	}
-
-	public static float ProjectileDistToGravity(float x, float y, float θ, float v)
-	{
-		float num = θ * ((float)Math.PI / 180f);
-		float num2 = (v * v * x * Mathf.Sin(2f * num) - 2f * v * v * y * Mathf.Cos(num) * Mathf.Cos(num)) / (x * x);
-		if (float.IsNaN(num2) || num2 < 0.01f)
-		{
-			num2 = 0f - UnityEngine.Physics.gravity.y;
-		}
-		return num2;
 	}
 }

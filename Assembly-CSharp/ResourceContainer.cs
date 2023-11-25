@@ -27,7 +27,7 @@ public class ResourceContainer : EntityComponent<BaseEntity>
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartLootingContainer "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - StartLootingContainer ");
 				}
 				using (TimeWarning.New("StartLootingContainer"))
 				{
@@ -62,8 +62,8 @@ public class ResourceContainer : EntityComponent<BaseEntity>
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[BaseEntity.RPC_Server]
 	[BaseEntity.RPC_Server.IsVisible(3f)]
+	[BaseEntity.RPC_Server]
 	private void StartLootingContainer(BaseEntity.RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

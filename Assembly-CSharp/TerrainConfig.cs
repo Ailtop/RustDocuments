@@ -80,6 +80,8 @@ public class TerrainConfig : ScriptableObject
 
 	public PhysicMaterial GenericMaterial;
 
+	public PhysicMaterial WaterMaterial;
+
 	public Material Material;
 
 	public Material MarginMaterial;

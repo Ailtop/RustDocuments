@@ -9,8 +9,8 @@ namespace ConVar;
 [ConsoleSystem.Factory("system")]
 public static class SystemCommands
 {
-	[ServerVar]
 	[ClientVar]
+	[ServerVar]
 	public static void cpu_affinity(ConsoleSystem.Arg arg)
 	{
 		long num = 0L;

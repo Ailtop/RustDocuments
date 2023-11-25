@@ -47,7 +47,7 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 	{
 		base.OnRemove(item);
 		T associatedEntity = GetAssociatedEntity(item);
-		if ((bool)(Object)associatedEntity)
+		if ((bool)associatedEntity)
 		{
 			associatedEntity.Kill();
 		}
@@ -68,7 +68,7 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 	public void UpdateParent(Item item)
 	{
 		T associatedEntity = GetAssociatedEntity(item);
-		if ((Object)associatedEntity == (Object)null)
+		if (associatedEntity == null)
 		{
 			return;
 		}
@@ -126,6 +126,12 @@ public abstract class ItemModAssociatedEntity<T> : ItemMod where T : BaseEntity
 			return null;
 		}
 		return null;
+	}
+
+	public static bool GetAssociatedEntity(Item item, out T result, bool isServer = true)
+	{
+		result = GetAssociatedEntity(item, isServer);
+		return result != null;
 	}
 
 	public static T GetAssociatedEntity(Item item, bool isServer = true)

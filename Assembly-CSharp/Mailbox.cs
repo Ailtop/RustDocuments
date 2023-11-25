@@ -29,7 +29,7 @@ public class Mailbox : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Submit "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Submit ");
 				}
 				using (TimeWarning.New("RPC_Submit"))
 				{

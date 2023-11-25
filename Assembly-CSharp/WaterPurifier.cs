@@ -27,11 +27,6 @@ public class WaterPurifier : LiquidContainer
 
 	public float pendingFreshWater;
 
-	public bool IsBoiling()
-	{
-		return HasFlag(Flags.Reserved1);
-	}
-
 	public override void ServerInit()
 	{
 		base.ServerInit();
@@ -192,5 +187,10 @@ public class WaterPurifier : LiquidContainer
 		{
 			SetFlag(Flags.On, b: false);
 		}
+	}
+
+	public bool IsBoiling()
+	{
+		return HasFlag(Flags.Reserved1);
 	}
 }

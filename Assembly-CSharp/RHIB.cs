@@ -7,7 +7,9 @@ using UnityEngine.Assertions;
 
 public class RHIB : MotorRowboat
 {
-	public GameObject steeringWheel;
+	public Transform steeringWheelLeftHandTarget;
+
+	public Transform steeringWheelRightHandTarget;
 
 	[ServerVar(Help = "Population active on the server", ShowInAdminUI = true)]
 	public static float rhibpopulation;
@@ -23,7 +25,7 @@ public class RHIB : MotorRowboat
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_Release "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_Release ");
 				}
 				using (TimeWarning.New("Server_Release"))
 				{

@@ -33,7 +33,7 @@ public class ThrownWeapon : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoDrop "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoDrop ");
 				}
 				using (TimeWarning.New("DoDrop"))
 				{
@@ -69,7 +69,7 @@ public class ThrownWeapon : AttackEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - DoThrow "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - DoThrow ");
 				}
 				using (TimeWarning.New("DoThrow"))
 				{
@@ -193,8 +193,8 @@ public class ThrownWeapon : AttackEntity
 		return Mathf.Sqrt(0.5f * y3 * magnitude * magnitude / (magnitude2 * (magnitude2 * y - y2 * magnitude)));
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoThrow(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown())
@@ -275,8 +275,8 @@ public class ThrownWeapon : AttackEntity
 		}
 	}
 
-	[RPC_Server.IsActiveItem]
 	[RPC_Server]
+	[RPC_Server.IsActiveItem]
 	private void DoDrop(RPCMessage msg)
 	{
 		if (!HasItemAmount() || HasAttackCooldown() || (!canThrowUnderwater && msg.player.IsHeadUnderwater()))
@@ -298,7 +298,7 @@ public class ThrownWeapon : AttackEntity
 		{
 			return;
 		}
-		if (canStick && UnityEngine.Physics.SphereCast(new Ray(vector, normalized), 0.05f, out var hitInfo, 1.5f, 1236478737))
+		if (canStick && UnityEngine.Physics.SphereCast(new Ray(vector, normalized), 0.05f, out var hitInfo, 1.5f, 1237003025))
 		{
 			Vector3 point = hitInfo.point;
 			Vector3 normal = hitInfo.normal;

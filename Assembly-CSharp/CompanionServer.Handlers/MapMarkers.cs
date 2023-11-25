@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CompanionServer.Handlers;
 
-public class MapMarkers : BaseHandler<AppEmpty>
+public class MapMarkers : BasePlayerHandler<AppEmpty>
 {
 	public override void Execute()
 	{

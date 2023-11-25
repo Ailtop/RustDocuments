@@ -39,21 +39,23 @@ public class MotorRowboat : BaseBoat
 
 	public float splashAccentFrequencyMax = 10f;
 
-	protected const Flags Flag_EngineOn = Flags.Reserved1;
-
 	protected const Flags Flag_ThrottleOn = Flags.Reserved2;
 
 	protected const Flags Flag_TurnLeft = Flags.Reserved3;
 
 	protected const Flags Flag_TurnRight = Flags.Reserved4;
 
-	protected const Flags Flag_Submerged = Flags.Reserved5;
-
 	protected const Flags Flag_HasFuel = Flags.Reserved6;
 
 	protected const Flags Flag_RecentlyPushed = Flags.Reserved8;
 
+	protected const Flags Flag_Submerged = Flags.Reserved9;
+
+	protected const Flags Flag_Dying = Flags.Broken;
+
 	public const float submergeFractionMinimum = 0.85f;
+
+	public float deathSinkRate = 0.1f;
 
 	[Header("Fuel")]
 	public GameObjectRef fuelStoragePrefab;
@@ -74,6 +76,16 @@ public class MotorRowboat : BaseBoat
 
 	public ParticleSystemContainer engineEffectThrottle;
 
+	[Tooltip("If not supplied, with use engineEffectThrottle for both")]
+	public ParticleSystemContainer engineEffectThrottleReverse;
+
+	[Tooltip("Only needed if using a forwardTravelEffect")]
+	public Transform boatFront;
+
+	public ParticleSystemContainer forwardTravelEffect;
+
+	public float forwardTravelEffectMinSpeed = 1f;
+
 	public Projector causticsProjector;
 
 	public Transform causticsDepthTest;
@@ -81,6 +93,8 @@ public class MotorRowboat : BaseBoat
 	public Transform engineLeftHandPosition;
 
 	public Transform engineRotate;
+
+	public float engineRotateRangeMultiplier = 1f;
 
 	public Transform propellerRotate;
 
@@ -93,15 +107,18 @@ public class MotorRowboat : BaseBoat
 	[ServerVar(Help = "How long before a boat loses all its health while in deep water")]
 	public static float deepwaterdecayminutes = 120f;
 
-	public EntityFuelSystem fuelSystem;
+	[ServerVar(Help = "How long until decay begins after the boat was last used")]
+	public static float decaystartdelayminutes = 45f;
 
-	public TimeSince timeSinceLastUsedFuel;
+	public EntityFuelSystem fuelSystem;
 
 	public Transform[] stationaryDismounts;
 
-	public Collider mainCollider;
+	public TimeSince timeSinceLastUsedFuel;
 
 	public float angularDragBase = 0.5f;
+
+	public float engineOffAngularDragMultiplier = 1f;
 
 	public float angularDragVelocity = 0.5f;
 
@@ -113,15 +130,15 @@ public class MotorRowboat : BaseBoat
 
 	public float offAxisDot = 0.25f;
 
-	private const float DECAY_TICK_TIME = 60f;
+	protected const float DECAY_TICK_TIME = 60f;
 
 	private TimeSince startedFlip;
 
 	public float lastHadDriverTime;
 
-	public bool dying;
-
 	public const float maxVelForStationaryDismount = 4f;
+
+	public bool IsDying => HasFlag(Flags.Broken);
 
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
@@ -132,7 +149,7 @@ public class MotorRowboat : BaseBoat
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_EngineToggle "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_EngineToggle ");
 				}
 				using (TimeWarning.New("RPC_EngineToggle"))
 				{
@@ -161,7 +178,7 @@ public class MotorRowboat : BaseBoat
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenFuel "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenFuel ");
 				}
 				using (TimeWarning.New("RPC_OpenFuel"))
 				{
@@ -191,6 +208,7 @@ public class MotorRowboat : BaseBoat
 
 	public override void InitShared()
 	{
+		base.InitShared();
 		fuelSystem = new EntityFuelSystem(base.isServer, fuelStoragePrefab, children);
 	}
 
@@ -210,7 +228,7 @@ public class MotorRowboat : BaseBoat
 			{
 				fuelSystem.CheckNewChild(child);
 			}
-			if (child.prefabID == storageUnitPrefab.GetEntity().prefabID)
+			if (storageUnitPrefab.isValid && child.prefabID == storageUnitPrefab.GetEntity().prefabID)
 			{
 				storageUnitInstance.Set((StorageContainer)child);
 			}
@@ -236,11 +254,11 @@ public class MotorRowboat : BaseBoat
 		return 50;
 	}
 
-	public void BoatDecay()
+	public virtual void BoatDecay()
 	{
-		if (!dying)
+		if (!IsDying)
 		{
-			BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsedFuel, outsidedecayminutes, deepwaterdecayminutes);
+			BaseBoat.WaterVehicleDecay(this, 60f, timeSinceLastUsedFuel, outsidedecayminutes, deepwaterdecayminutes, decaystartdelayminutes, preventDecayIndoors);
 		}
 	}
 
@@ -270,7 +288,7 @@ public class MotorRowboat : BaseBoat
 			num2 += Mathf.InverseLerp(0.8f, 1f, value) * 3f;
 			rigidBody.AddForceAtPosition(vector3 * num2, position, ForceMode.VelocityChange);
 		}
-		if (HasFlag(Flags.Reserved5))
+		if (HasFlag(Flags.Reserved9))
 		{
 			if (pushWaterEffect.isValid)
 			{
@@ -331,7 +349,7 @@ public class MotorRowboat : BaseBoat
 		BasePlayer driver = GetDriver();
 		if (!wantsOn || Interface.CallHook("OnEngineStart", this, driver) == null)
 		{
-			SetFlag(Flags.Reserved1, wantsOn);
+			SetFlag(Flags.On, wantsOn);
 			if (wantsOn)
 			{
 				Interface.CallHook("OnEngineStarted", this, driver);
@@ -345,15 +363,17 @@ public class MotorRowboat : BaseBoat
 		Invoke(CheckInvalidBoat, 1f);
 		if (base.health <= 0f)
 		{
-			Invoke(ActualDeath, vehicle.boat_corpse_seconds);
+			EnterCorpseState();
 			buoyancy.buoyancyScale = 0f;
-			dying = true;
+			SetFlag(Flags.Broken, b: true);
 		}
 	}
 
 	public void CheckInvalidBoat()
 	{
-		if (!fuelSystem.fuelStorageInstance.IsValid(base.isServer) || !storageUnitInstance.IsValid(base.isServer))
+		bool num = fuelStoragePrefab.isValid && !fuelSystem.fuelStorageInstance.IsValid(base.isServer);
+		bool flag = storageUnitPrefab.isValid && !storageUnitInstance.IsValid(base.isServer);
+		if (num || flag)
 		{
 			Debug.Log("Destroying invalid boat ");
 			Invoke(ActualDeath, 1f);
@@ -367,7 +387,7 @@ public class MotorRowboat : BaseBoat
 
 	public override bool EngineOn()
 	{
-		return HasFlag(Flags.Reserved1);
+		return IsOn();
 	}
 
 	public float TimeSinceDriver()
@@ -383,6 +403,10 @@ public class MotorRowboat : BaseBoat
 
 	public override void VehicleFixedUpdate()
 	{
+		if (IsTransferProtected())
+		{
+			return;
+		}
 		base.VehicleFixedUpdate();
 		float num = TimeSinceDriver();
 		if (num > 15f)
@@ -396,9 +420,9 @@ public class MotorRowboat : BaseBoat
 		}
 		SetFlags();
 		UpdateDrag();
-		if (dying)
+		if (IsDying)
 		{
-			buoyancy.buoyancyScale = Mathf.Lerp(buoyancy.buoyancyScale, 0f, UnityEngine.Time.fixedDeltaTime * 0.1f);
+			buoyancy.buoyancyScale = Mathf.Lerp(buoyancy.buoyancyScale, 0f, UnityEngine.Time.fixedDeltaTime * deathSinkRate);
 		}
 		else
 		{
@@ -428,9 +452,9 @@ public class MotorRowboat : BaseBoat
 			Flags num = flags;
 			SetFlag(Flags.Reserved3, steering > 0f, recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved4, steering < 0f, recursive: false, networkupdate: false);
-			SetFlag(Flags.Reserved1, b, recursive: false, networkupdate: false);
+			SetFlag(Flags.On, b, recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved2, EngineOn() && gasPedal != 0f, recursive: false, networkupdate: false);
-			SetFlag(Flags.Reserved5, buoyancy.submergedFraction > 0.85f, recursive: false, networkupdate: false);
+			SetFlag(Flags.Reserved9, buoyancy.submergedFraction > 0.85f, recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved6, fuelSystem.HasFuel(), recursive: false, networkupdate: false);
 			SetFlag(Flags.Reserved8, base.RecentlyPushed, recursive: false, networkupdate: false);
 			if (num != flags)
@@ -475,25 +499,31 @@ public class MotorRowboat : BaseBoat
 	{
 		float value = rigidBody.velocity.SqrMagnitude2D();
 		float num = Mathf.InverseLerp(0f, 2f, value);
-		rigidBody.angularDrag = angularDragBase + angularDragVelocity * num;
+		float num2 = angularDragBase * (IsOn() ? 1f : engineOffAngularDragMultiplier);
+		rigidBody.angularDrag = num2 + angularDragVelocity * num;
 		rigidBody.drag = landDrag + waterDrag * Mathf.InverseLerp(0f, 1f, buoyancy.submergedFraction);
 		if (offAxisDrag > 0f)
 		{
 			float value2 = Vector3.Dot(base.transform.forward, rigidBody.velocity.normalized);
-			float num2 = Mathf.InverseLerp(0.98f, 0.92f, value2);
-			rigidBody.drag += num2 * offAxisDrag * buoyancy.submergedFraction;
+			float num3 = Mathf.InverseLerp(0.98f, 0.92f, value2);
+			rigidBody.drag += num3 * offAxisDrag * buoyancy.submergedFraction;
 		}
 	}
 
 	public override void OnKilled(HitInfo info)
 	{
-		if (!dying)
+		if (!IsDying)
 		{
-			dying = true;
+			SetFlag(Flags.Broken, b: true);
 			repair.enabled = false;
 			Invoke(DismountAllPlayers, 10f);
-			Invoke(ActualDeath, vehicle.boat_corpse_seconds);
+			EnterCorpseState();
 		}
+	}
+
+	protected virtual void EnterCorpseState()
+	{
+		Invoke(ActualDeath, vehicle.boat_corpse_seconds);
 	}
 
 	public void ActualDeath()
@@ -503,7 +533,7 @@ public class MotorRowboat : BaseBoat
 
 	public override bool MountEligable(BasePlayer player)
 	{
-		if (dying)
+		if (IsDying)
 		{
 			return false;
 		}
@@ -556,6 +586,17 @@ public class MotorRowboat : BaseBoat
 		return base.GetDismountPosition(player, out res);
 	}
 
+	public override void DisableTransferProtection()
+	{
+		if (GetDriver() != null && IsOn())
+		{
+			gasPedal = 0f;
+			steering = 0f;
+			lastHadDriverTime = UnityEngine.Time.time;
+		}
+		base.DisableTransferProtection();
+	}
+
 	public override void Save(SaveInfo info)
 	{
 		base.Save(info);
@@ -582,7 +623,7 @@ public class MotorRowboat : BaseBoat
 		{
 			return false;
 		}
-		if (dying)
+		if (IsDying)
 		{
 			return false;
 		}

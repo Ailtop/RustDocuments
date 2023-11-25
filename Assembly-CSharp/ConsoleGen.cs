@@ -11,7 +11,7 @@ using UnityEngine;
 
 public class ConsoleGen
 {
-	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[990]
+	public static ConsoleSystem.Command[] All = new ConsoleSystem.Command[1063]
 	{
 		new ConsoleSystem.Command
 		{
@@ -93,6 +93,46 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "auto_turret_budget_ms",
+			Parent = "autoturret",
+			FullName = "autoturret.auto_turret_budget_ms",
+			ServerAdmin = true,
+			Description = "How many milliseconds to spend on target scanning per frame",
+			Variable = true,
+			GetOveride = () => AutoTurret.auto_turret_budget_ms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				AutoTurret.auto_turret_budget_ms = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "do_shore_drift",
+			Parent = "baseboat",
+			FullName = "baseboat.do_shore_drift",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BaseBoat.do_shore_drift.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseBoat.do_shore_drift = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "drift_speed",
+			Parent = "baseboat",
+			FullName = "baseboat.drift_speed",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => BaseBoat.drift_speed.ToString(),
+			SetOveride = delegate(string str)
+			{
+				BaseBoat.drift_speed = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "generate_paths",
 			Parent = "baseboat",
 			FullName = "baseboat.generate_paths",
@@ -102,6 +142,32 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				BaseBoat.generate_paths = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "seconds_between_shore_drift",
+			Parent = "baseboat",
+			FullName = "baseboat.seconds_between_shore_drift",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				int num3 = BaseBoat.seconds_between_shore_drift(arg);
+				arg.ReplyWithObject(num3);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "seconds_until_shore_drift",
+			Parent = "baseboat",
+			FullName = "baseboat.seconds_until_shore_drift",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				int num2 = BaseBoat.seconds_until_shore_drift(arg);
+				arg.ReplyWithObject(num2);
 			}
 		},
 		new ConsoleSystem.Command
@@ -483,8 +549,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval29 = BradleyAPC.svspawnroadbradley(arg.GetVector3(0, Vector3.zero), arg.GetVector3(1, Vector3.zero));
-				arg.ReplyWithObject(rval29);
+				string rval30 = BradleyAPC.svspawnroadbradley(arg.GetVector3(0, Vector3.zero), arg.GetVector3(1, Vector3.zero));
+				arg.ReplyWithObject(rval30);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1107,8 +1173,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				ServerUsers.User[] rval28 = Admin.Bans();
-				arg.ReplyWithObject(rval28);
+				ServerUsers.User[] rval29 = Admin.Bans();
+				arg.ReplyWithObject(rval29);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1121,8 +1187,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				BuildInfo rval27 = Admin.BuildInfo();
-				arg.ReplyWithObject(rval27);
+				BuildInfo rval28 = Admin.BuildInfo();
+				arg.ReplyWithObject(rval28);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1355,8 +1421,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				Admin.PlayerInfo[] rval26 = Admin.playerlist();
-				arg.ReplyWithObject(rval26);
+				Admin.PlayerInfo[] rval27 = Admin.playerlist();
+				arg.ReplyWithObject(rval27);
 			}
 		},
 		new ConsoleSystem.Command
@@ -1547,8 +1613,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval25 = Admin.teaminfo(arg);
-				arg.ReplyWithObject(rval25);
+				string rval26 = Admin.teaminfo(arg);
+				arg.ReplyWithObject(rval26);
 			}
 		},
 		new ConsoleSystem.Command
@@ -2729,6 +2795,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "build_vehiclecheck",
+			Parent = "antihack",
+			FullName = "antihack.build_vehiclecheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.build_vehiclecheck.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.build_vehiclecheck = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "debuglevel",
 			Parent = "antihack",
 			FullName = "antihack.debuglevel",
@@ -2907,6 +2986,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.eye_terraincheck = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "eye_vehiclecheck",
+			Parent = "antihack",
+			FullName = "antihack.eye_vehiclecheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.eye_vehiclecheck.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.eye_vehiclecheck = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -3106,6 +3198,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "melee_backtracking",
+			Parent = "antihack",
+			FullName = "antihack.melee_backtracking",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.melee_backtracking.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.melee_backtracking = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "melee_clientframes",
 			Parent = "antihack",
 			FullName = "antihack.melee_clientframes",
@@ -3193,6 +3298,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.melee_terraincheck = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "melee_vehiclecheck",
+			Parent = "antihack",
+			FullName = "antihack.melee_vehiclecheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.melee_vehiclecheck.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.melee_vehiclecheck = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -3452,6 +3570,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "projectile_positionoffset",
+			Parent = "antihack",
+			FullName = "antihack.projectile_positionoffset",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.projectile_positionoffset.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_positionoffset = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "projectile_protection",
 			Parent = "antihack",
 			FullName = "antihack.projectile_protection",
@@ -3500,6 +3631,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.AntiHack.projectile_trajectory = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "projectile_vehiclecheck",
+			Parent = "antihack",
+			FullName = "antihack.projectile_vehiclecheck",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.AntiHack.projectile_vehiclecheck.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.AntiHack.projectile_vehiclecheck = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -3955,6 +4099,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "retry_initialize",
+			Parent = "app",
+			FullName = "app.retry_initialize",
+			ServerAdmin = true,
+			Description = "Retry initializing the Rust+ companion server if it previously failed",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				App.retry_initialize(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "serverid",
 			Parent = "app",
 			FullName = "app.serverid",
@@ -4058,6 +4215,18 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Chat.cardgamesay(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clansay",
+			Parent = "chat",
+			FullName = "chat.clansay",
+			ServerUser = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Chat.clansay(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4167,8 +4336,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval24 = Chat.search(arg);
-				arg.ReplyWithObject(rval24);
+				IEnumerable<Chat.ChatEntry> rval25 = Chat.search(arg);
+				arg.ReplyWithObject(rval25);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4193,8 +4362,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Chat.ChatEntry> rval23 = Chat.tail(arg);
-				arg.ReplyWithObject(rval23);
+				IEnumerable<Chat.ChatEntry> rval24 = Chat.tail(arg);
+				arg.ReplyWithObject(rval24);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4211,6 +4380,47 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "enabled",
+			Parent = "clan",
+			FullName = "clan.enabled",
+			ServerAdmin = true,
+			Description = "Enables the clan system if set to true (must be set at boot, requires restart)",
+			Variable = true,
+			GetOveride = () => Clan.enabled.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Clan.enabled = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "info",
+			Parent = "clan",
+			FullName = "clan.info",
+			ServerAdmin = true,
+			Description = "Prints info about a clan given its ID",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Clan.Info(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxmembercount",
+			Parent = "clan",
+			FullName = "clan.maxmembercount",
+			ServerAdmin = true,
+			Description = "Maximum number of members each clan can have (local backend only!)",
+			Variable = true,
+			GetOveride = () => Clan.maxMemberCount.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Clan.maxMemberCount = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "search",
 			Parent = "console",
 			FullName = "console.search",
@@ -4218,8 +4428,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval22 = Console.search(arg);
-				arg.ReplyWithObject(rval22);
+				IEnumerable<Output.Entry> rval23 = Console.search(arg);
+				arg.ReplyWithObject(rval23);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4231,8 +4441,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				IEnumerable<Output.Entry> rval21 = Console.tail(arg);
-				arg.ReplyWithObject(rval21);
+				IEnumerable<Output.Entry> rval22 = Console.tail(arg);
+				arg.ReplyWithObject(rval22);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4414,6 +4624,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "deleteentitiesbyshortname",
+			Parent = "debug",
+			FullName = "debug.deleteentitiesbyshortname",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.deleteEntitiesByShortname(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "disablecondition",
 			Parent = "debug",
 			FullName = "debug.disablecondition",
@@ -4572,6 +4794,78 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Debugging.ResetSleepingBagTimers(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "setdamage",
+			Parent = "debug",
+			FullName = "debug.setdamage",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.setdamage(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "setfood",
+			Parent = "debug",
+			FullName = "debug.setfood",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.setfood(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "sethealth",
+			Parent = "debug",
+			FullName = "debug.sethealth",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.sethealth(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "setradiation",
+			Parent = "debug",
+			FullName = "debug.setradiation",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.setradiation(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "setwater",
+			Parent = "debug",
+			FullName = "debug.setwater",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.setwater(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "spawnparachutetester",
+			Parent = "debug",
+			FullName = "debug.spawnparachutetester",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Debugging.spawnParachuteTester(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -4998,8 +5292,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval20 = Demo.record(arg);
-				arg.ReplyWithObject(rval20);
+				string rval21 = Demo.record(arg);
+				arg.ReplyWithObject(rval21);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5066,8 +5360,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval19 = Demo.stop(arg);
-				arg.ReplyWithObject(rval19);
+				string rval20 = Demo.stop(arg);
+				arg.ReplyWithObject(rval20);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5226,8 +5520,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval18 = Entity.svspawn(arg.GetString(0), arg.GetVector3(1, Vector3.zero), arg.GetVector3(2, Vector3.zero));
-				arg.ReplyWithObject(rval18);
+				string rval19 = Entity.svspawn(arg.GetString(0), arg.GetVector3(1, Vector3.zero), arg.GetVector3(2, Vector3.zero));
+				arg.ReplyWithObject(rval19);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5239,8 +5533,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval17 = Entity.svspawngrid(arg.GetString(0), arg.GetInt(1, 5), arg.GetInt(2, 5), arg.GetInt(3, 5));
-				arg.ReplyWithObject(rval17);
+				string rval18 = Entity.svspawngrid(arg.GetString(0), arg.GetInt(1, 5), arg.GetInt(2, 5), arg.GetInt(3, 5));
+				arg.ReplyWithObject(rval18);
 			}
 		},
 		new ConsoleSystem.Command
@@ -5252,8 +5546,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				string rval16 = Entity.svspawnitem(arg.GetString(0), arg.GetVector3(1, Vector3.zero));
-				arg.ReplyWithObject(rval16);
+				string rval17 = Entity.svspawnitem(arg.GetString(0), arg.GetVector3(1, Vector3.zero));
+				arg.ReplyWithObject(rval17);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6068,6 +6362,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "teleporteveryone2me",
+			Parent = "global",
+			FullName = "global.teleporteveryone2me",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Global.teleporteveryone2me(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "teleportlos",
 			Parent = "global",
 			FullName = "global.teleportlos",
@@ -6568,8 +6874,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				object rval15 = ConVar.Manifest.PrintManifest();
-				arg.ReplyWithObject(rval15);
+				object rval16 = ConVar.Manifest.PrintManifest();
+				arg.ReplyWithObject(rval16);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6581,8 +6887,8 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				object rval14 = ConVar.Manifest.PrintManifestRaw();
-				arg.ReplyWithObject(rval14);
+				object rval15 = ConVar.Manifest.PrintManifestRaw();
+				arg.ReplyWithObject(rval15);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6619,6 +6925,47 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				MemSnap.native(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "global_network_debug",
+			Parent = "net",
+			FullName = "net.global_network_debug",
+			ServerAdmin = true,
+			Description = "Toggle printing time taken to send all trees & all global entities to client when they connect",
+			Variable = true,
+			GetOveride = () => Net.global_network_debug.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Net.global_network_debug = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "global_networked_bases",
+			Parent = "net",
+			FullName = "net.global_networked_bases",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Net.globalNetworkedBases.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Net.globalNetworkedBases = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "limit_global_update_broadcast",
+			Parent = "net",
+			FullName = "net.limit_global_update_broadcast",
+			ServerAdmin = true,
+			Description = "(default) true = only broadcast to clients with global networking enabled, false = broadcast to every client regardless",
+			Variable = true,
+			GetOveride = () => Net.limit_global_update_broadcast.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Net.limit_global_update_broadcast = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6662,15 +7009,314 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "broadcast_ping",
+			Parent = "nexus",
+			FullName = "nexus.broadcast_ping",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Nexus.broadcast_ping(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "clanclatbatchduration",
+			Parent = "nexus",
+			FullName = "nexus.clanclatbatchduration",
+			ServerAdmin = true,
+			Description = "Maximum duration in seconds to batch clan chat messages to send to other servers on the nexus",
+			Variable = true,
+			GetOveride = () => Nexus.clanClatBatchDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.clanClatBatchDuration = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "defaultzonecontactradius",
+			Parent = "nexus",
+			FullName = "nexus.defaultzonecontactradius",
+			ServerAdmin = true,
+			Description = "Default distance between zones to allow boat travel, if map.contactRadius isn't set in the nexus (uses normalized coordinates)",
+			Variable = true,
+			GetOveride = () => Nexus.defaultZoneContactRadius.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.defaultZoneContactRadius = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "endpoint",
+			Parent = "nexus",
+			FullName = "nexus.endpoint",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Description = "URL endpoint to use for the Nexus API",
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Nexus.endpoint.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.endpoint = str;
+			},
+			Default = "https://api.facepunch.com/api/nexus/"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "islandspawndistance",
+			Parent = "nexus",
+			FullName = "nexus.islandspawndistance",
+			ServerAdmin = true,
+			Description = "How far away islands should be spawned, as a factor of the map size",
+			Variable = true,
+			GetOveride = () => Nexus.islandSpawnDistance.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.islandSpawnDistance = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "loadingtimeout",
+			Parent = "nexus",
+			FullName = "nexus.loadingtimeout",
+			ServerAdmin = true,
+			Description = "Time in seconds to keep players in the loading state before going to sleep",
+			Variable = true,
+			GetOveride = () => Nexus.loadingTimeout.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.loadingTimeout = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "logging",
+			Parent = "nexus",
+			FullName = "nexus.logging",
+			ServerAdmin = true,
+			Client = true,
+			Variable = true,
+			GetOveride = () => Nexus.logging.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.logging = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "mapimagescale",
+			Parent = "nexus",
+			FullName = "nexus.mapimagescale",
+			ServerAdmin = true,
+			Description = "Scale of the map to render and upload to the nexus",
+			Variable = true,
+			GetOveride = () => Nexus.mapImageScale.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.mapImageScale = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "messagelockduration",
+			Parent = "nexus",
+			FullName = "nexus.messagelockduration",
+			ServerAdmin = true,
+			Description = "Time in seconds to allow the server to process nexus messages before re-sending (requires restart)",
+			Variable = true,
+			GetOveride = () => Nexus.messageLockDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.messageLockDuration = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "ping",
+			Parent = "nexus",
+			FullName = "nexus.ping",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Nexus.ping(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "pinginterval",
+			Parent = "nexus",
+			FullName = "nexus.pinginterval",
+			ServerAdmin = true,
+			Description = "Time in seconds to wait between server status pings",
+			Variable = true,
+			GetOveride = () => Nexus.pingInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.pingInterval = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "playermanifestinterval",
+			Parent = "nexus",
+			FullName = "nexus.playermanifestinterval",
+			ServerAdmin = true,
+			Description = "Interval in seconds to broadcast the player manifest to other servers on the nexus",
+			Variable = true,
+			GetOveride = () => Nexus.playerManifestInterval.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.playerManifestInterval = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "playeronline",
+			Parent = "nexus",
+			FullName = "nexus.playeronline",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Nexus.playeronline(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "protectionduration",
+			Parent = "nexus",
+			FullName = "nexus.protectionduration",
+			ServerAdmin = true,
+			Description = "Maximum time in seconds to keep transfer protection enabled on entities",
+			Variable = true,
+			GetOveride = () => Nexus.protectionDuration.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.protectionDuration = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "refreshislands",
+			Parent = "nexus",
+			FullName = "nexus.refreshislands",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Nexus.refreshislands(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "rpctimeoutmultiplier",
+			Parent = "nexus",
+			FullName = "nexus.rpctimeoutmultiplier",
+			ServerAdmin = true,
+			Description = "Multiplier for nexus RPC timeout durations in case we expect different latencies",
+			Variable = true,
+			GetOveride = () => Nexus.rpcTimeoutMultiplier.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.rpcTimeoutMultiplier = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "secretkey",
+			Parent = "nexus",
+			FullName = "nexus.secretkey",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Nexus.secretKey.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.secretKey = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "timeoffset",
+			Parent = "nexus",
+			FullName = "nexus.timeoffset",
+			ServerAdmin = true,
+			Description = "Time offset in hours from the nexus clock",
+			Variable = true,
+			GetOveride = () => Nexus.timeOffset.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.timeOffset = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "transfer",
+			Parent = "nexus",
+			FullName = "nexus.transfer",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Nexus.transfer(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "transferflushtime",
+			Parent = "nexus",
+			FullName = "nexus.transferflushtime",
+			ServerAdmin = true,
+			Description = "Maximum amount of time in seconds that transfers should be cached before auto-saving",
+			Variable = true,
+			GetOveride = () => Nexus.transferFlushTime.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.transferFlushTime = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "uploadmap",
+			Parent = "nexus",
+			FullName = "nexus.uploadmap",
+			ServerAdmin = true,
+			Description = "Reupload the map image to the nexus. Normally happens automatically at server boot. WARNING: This will lag the server!",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Nexus.uploadmap(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "zonecontroller",
+			Parent = "nexus",
+			FullName = "nexus.zonecontroller",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Nexus.zoneController.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Nexus.zoneController = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "bulletaccuracy",
 			Parent = "heli",
 			FullName = "heli.bulletaccuracy",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => PatrolHelicopter.bulletAccuracy.ToString(),
+			GetOveride = () => ConVar.PatrolHelicopter.bulletAccuracy.ToString(),
 			SetOveride = delegate(string str)
 			{
-				PatrolHelicopter.bulletAccuracy = str.ToFloat();
+				ConVar.PatrolHelicopter.bulletAccuracy = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6680,10 +7326,10 @@ public class ConsoleGen
 			FullName = "heli.bulletdamagescale",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => PatrolHelicopter.bulletDamageScale.ToString(),
+			GetOveride = () => ConVar.PatrolHelicopter.bulletDamageScale.ToString(),
 			SetOveride = delegate(string str)
 			{
-				PatrolHelicopter.bulletDamageScale = str.ToFloat();
+				ConVar.PatrolHelicopter.bulletDamageScale = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6695,7 +7341,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				PatrolHelicopter.call(arg);
+				ConVar.PatrolHelicopter.call(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6707,7 +7353,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				PatrolHelicopter.calltome(arg);
+				ConVar.PatrolHelicopter.calltome(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6719,7 +7365,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				PatrolHelicopter.drop(arg);
+				ConVar.PatrolHelicopter.drop(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6729,10 +7375,10 @@ public class ConsoleGen
 			FullName = "heli.guns",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => PatrolHelicopter.guns.ToString(),
+			GetOveride = () => ConVar.PatrolHelicopter.guns.ToString(),
 			SetOveride = delegate(string str)
 			{
-				PatrolHelicopter.guns = str.ToInt();
+				ConVar.PatrolHelicopter.guns = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6742,10 +7388,10 @@ public class ConsoleGen
 			FullName = "heli.lifetimeminutes",
 			ServerAdmin = true,
 			Variable = true,
-			GetOveride = () => PatrolHelicopter.lifetimeMinutes.ToString(),
+			GetOveride = () => ConVar.PatrolHelicopter.lifetimeMinutes.ToString(),
 			SetOveride = delegate(string str)
 			{
-				PatrolHelicopter.lifetimeMinutes = str.ToFloat();
+				ConVar.PatrolHelicopter.lifetimeMinutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -6757,7 +7403,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				PatrolHelicopter.strafe(arg);
+				ConVar.PatrolHelicopter.strafe(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6769,7 +7415,7 @@ public class ConsoleGen
 			Variable = false,
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
-				PatrolHelicopter.testpuzzle(arg);
+				ConVar.PatrolHelicopter.testpuzzle(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -6809,20 +7455,6 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Physics.bouncethreshold = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "droppedmode",
-			Parent = "physics",
-			FullName = "physics.droppedmode",
-			ServerAdmin = true,
-			Description = "The collision detection mode that dropped items and corpses should use",
-			Variable = true,
-			GetOveride = () => ConVar.Physics.droppedmode.ToString(),
-			SetOveride = delegate(string str)
-			{
-				ConVar.Physics.droppedmode = str.ToInt();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7017,6 +7649,19 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				Player.createskull(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "createtrophy",
+			Parent = "player",
+			FullName = "player.createtrophy",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				string rval14 = Player.createTrophy(arg);
+				arg.ReplyWithObject(rval14);
 			}
 		},
 		new ConsoleSystem.Command
@@ -7428,6 +8073,31 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "print_global_entities",
+			Parent = "render",
+			FullName = "render.print_global_entities",
+			ServerAdmin = true,
+			Description = "Print off count of global building entities on the server",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Render.print_global_entities(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tree_entities",
+			Parent = "render",
+			FullName = "render.tree_entities",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				Render.tree_entities(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "hostileduration",
 			Parent = "sentry",
 			FullName = "sentry.hostileduration",
@@ -7438,6 +8108,34 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				Sentry.hostileduration = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "interferenceradius",
+			Parent = "sentry",
+			FullName = "sentry.interferenceradius",
+			ServerAdmin = true,
+			Description = "radius to check for other turrets",
+			Variable = true,
+			GetOveride = () => Sentry.interferenceradius.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Sentry.interferenceradius = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxinterference",
+			Parent = "sentry",
+			FullName = "sentry.maxinterference",
+			ServerAdmin = true,
+			Description = "max interference from other turrets",
+			Variable = true,
+			GetOveride = () => Sentry.maxinterference.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Sentry.maxinterference = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7491,6 +8189,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Server.anticheatlog = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "anticheattoken",
+			Parent = "server",
+			FullName = "server.anticheattoken",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.anticheattoken.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.anticheattoken = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -7699,6 +8410,22 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Server.bulletdamage = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "canequipbackpacksinair",
+			Parent = "server",
+			FullName = "server.canequipbackpacksinair",
+			ServerAdmin = true,
+			Saved = true,
+			Description = "Allows backpack equipping while not grounded",
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.canEquipBackpacksInAir.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.canEquipBackpacksInAir = str.ToBool();
 			}
 		},
 		new ConsoleSystem.Command
@@ -8586,6 +9313,32 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "maxpacketsize_globalentities",
+			Parent = "server",
+			FullName = "server.maxpacketsize_globalentities",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxpacketsize_globalentities.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxpacketsize_globalentities = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "maxpacketsize_globaltrees",
+			Parent = "server",
+			FullName = "server.maxpacketsize_globaltrees",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.maxpacketsize_globaltrees.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.maxpacketsize_globaltrees = str.ToInt();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "maxpacketspersecond",
 			Parent = "server",
 			FullName = "server.maxpacketspersecond",
@@ -8987,6 +9740,26 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "parachuterepacktime",
+			Parent = "server",
+			FullName = "server.parachuterepacktime",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Saved = true,
+			Description = "How long it takes to pick up a used parachute in seconds",
+			Replicated = true,
+			ShowInAdminUI = true,
+			Variable = true,
+			GetOveride = () => ConVar.Server.parachuteRepackTime.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.Server.parachuteRepackTime = str.ToFloat();
+			},
+			Default = "8"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "pingduration",
 			Parent = "server",
 			FullName = "server.pingduration",
@@ -9287,6 +10060,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.Server.reportsServerEndpointKey = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "resetserveremoji",
+			Parent = "server",
+			FullName = "server.resetserveremoji",
+			ServerAdmin = true,
+			Description = "Rescans the serveremoji folder, note that clients will need to reconnect to get the latest emoji",
+			Variable = false,
+			Call = delegate
+			{
+				ConVar.Server.ResetServerEmoji();
 			}
 		},
 		new ConsoleSystem.Command
@@ -10229,6 +11015,18 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "autohover",
+			Parent = "vehicle",
+			FullName = "vehicle.autohover",
+			ServerAdmin = true,
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				vehicle.autohover(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "boat_corpse_seconds",
 			Parent = "vehicle",
 			FullName = "vehicle.boat_corpse_seconds",
@@ -10238,6 +11036,19 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				vehicle.boat_corpse_seconds = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "boatdriftinfo",
+			Parent = "vehicle",
+			FullName = "vehicle.boatdriftinfo",
+			ServerAdmin = true,
+			Description = "Print out boat drift status for all boats",
+			Variable = false,
+			Call = delegate(ConsoleSystem.Arg arg)
+			{
+				vehicle.boatdriftinfo(arg);
 			}
 		},
 		new ConsoleSystem.Command
@@ -10858,6 +11669,40 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "ocean_scale",
+			Parent = "weather",
+			FullName = "weather.ocean_scale",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Weather.ocean_scale.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Weather.ocean_scale = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "ocean_time",
+			Parent = "weather",
+			FullName = "weather.ocean_time",
+			ServerAdmin = true,
+			ClientAdmin = true,
+			Client = true,
+			Replicated = true,
+			Variable = true,
+			GetOveride = () => Weather.ocean_time.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Weather.ocean_time = str.ToFloat();
+			},
+			Default = "-1"
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "overcast_chance",
 			Parent = "weather",
 			FullName = "weather.overcast_chance",
@@ -11048,6 +11893,32 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				ConVar.World.cache = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "configfile",
+			Parent = "world",
+			FullName = "world.configfile",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.World.configFile.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.World.configFile = str;
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "configstring",
+			Parent = "world",
+			FullName = "world.configstring",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => ConVar.World.configString.ToString(),
+			SetOveride = delegate(string str)
+			{
+				ConVar.World.configString = str;
 			}
 		},
 		new ConsoleSystem.Command
@@ -11651,6 +12522,19 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "analytics_enabled",
+			Parent = "analytics",
+			FullName = "analytics.analytics_enabled",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Analytics.UploadAnalytics.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Analytics.UploadAnalytics = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "movetowardsrate",
 			Parent = "frankensteinbrain",
 			FullName = "frankensteinbrain.movetowardsrate",
@@ -11738,6 +12622,20 @@ public class ConsoleGen
 			Call = delegate(ConsoleSystem.Arg arg)
 			{
 				GrowableEntity.GrowAll(arg);
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "gun_trap_budget_ms",
+			Parent = "guntrap",
+			FullName = "guntrap.gun_trap_budget_ms",
+			ServerAdmin = true,
+			Description = "How many milliseconds to spend on target scanning per frame",
+			Variable = true,
+			GetOveride = () => GunTrap.gun_trap_budget_ms.ToString(),
+			SetOveride = delegate(string str)
+			{
+				GunTrap.gun_trap_budget_ms = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -11968,34 +12866,6 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
-			Name = "insidedecayminutes",
-			Parent = "minicopter",
-			FullName = "minicopter.insidedecayminutes",
-			ServerAdmin = true,
-			Description = "How long before a minicopter loses all its health while indoors",
-			Variable = true,
-			GetOveride = () => MiniCopter.insidedecayminutes.ToString(),
-			SetOveride = delegate(string str)
-			{
-				MiniCopter.insidedecayminutes = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
-			Name = "outsidedecayminutes",
-			Parent = "minicopter",
-			FullName = "minicopter.outsidedecayminutes",
-			ServerAdmin = true,
-			Description = "How long before a minicopter loses all its health while outside",
-			Variable = true,
-			GetOveride = () => MiniCopter.outsidedecayminutes.ToString(),
-			SetOveride = delegate(string str)
-			{
-				MiniCopter.outsidedecayminutes = str.ToFloat();
-			}
-		},
-		new ConsoleSystem.Command
-		{
 			Name = "population",
 			Parent = "minicopter",
 			FullName = "minicopter.population",
@@ -12003,10 +12873,10 @@ public class ConsoleGen
 			Description = "Population active on the server",
 			ShowInAdminUI = true,
 			Variable = true,
-			GetOveride = () => MiniCopter.population.ToString(),
+			GetOveride = () => Minicopter.population.ToString(),
 			SetOveride = delegate(string str)
 			{
-				MiniCopter.population = str.ToFloat();
+				Minicopter.population = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -12063,6 +12933,20 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				MonumentNavMesh.use_baked_terrain_mesh = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "decaystartdelayminutes",
+			Parent = "motorrowboat",
+			FullName = "motorrowboat.decaystartdelayminutes",
+			ServerAdmin = true,
+			Description = "How long until decay begins after the boat was last used",
+			Variable = true,
+			GetOveride = () => MotorRowboat.decaystartdelayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				MotorRowboat.decaystartdelayminutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -12136,6 +13020,34 @@ public class ConsoleGen
 		},
 		new ConsoleSystem.Command
 		{
+			Name = "bypassrepack",
+			Parent = "parachute",
+			FullName = "parachute.bypassrepack",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => Parachute.BypassRepack.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Parachute.BypassRepack = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "landinganimations",
+			Parent = "parachute",
+			FullName = "parachute.landinganimations",
+			ServerAdmin = true,
+			Saved = true,
+			Variable = true,
+			GetOveride = () => Parachute.LandingAnimations.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Parachute.LandingAnimations = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
 			Name = "controldistance",
 			Parent = "petbrain",
 			FullName = "petbrain.controldistance",
@@ -12201,6 +13113,34 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				PetBrain.IdleWhenOwnerOfflineOrDead = str.ToBool();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "insidedecayminutes",
+			Parent = "playerhelicopter",
+			FullName = "playerhelicopter.insidedecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a player helicopter loses all its health while indoors",
+			Variable = true,
+			GetOveride = () => PlayerHelicopter.insidedecayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PlayerHelicopter.insidedecayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "outsidedecayminutes",
+			Parent = "playerhelicopter",
+			FullName = "playerhelicopter.outsidedecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a player helicopter loses all its health while outside",
+			Variable = true,
+			GetOveride = () => PlayerHelicopter.outsidedecayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				PlayerHelicopter.outsidedecayminutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command
@@ -12283,7 +13223,7 @@ public class ConsoleGen
 			{
 				RelationshipManager.contacts = str.ToBool();
 			},
-			Default = "True"
+			Default = "true"
 		},
 		new ConsoleSystem.Command
 		{
@@ -12978,6 +13918,47 @@ public class ConsoleGen
 			SetOveride = delegate(string str)
 			{
 				TrainCouplingController.max_couple_speed = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tugcorpseseconds",
+			Parent = "tugboat",
+			FullName = "tugboat.tugcorpseseconds",
+			ServerAdmin = true,
+			Variable = true,
+			GetOveride = () => Tugboat.tugcorpseseconds.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Tugboat.tugcorpseseconds = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tugdecayminutes",
+			Parent = "tugboat",
+			FullName = "tugboat.tugdecayminutes",
+			ServerAdmin = true,
+			Description = "How long before a tugboat loses all its health while outside",
+			Variable = true,
+			GetOveride = () => Tugboat.tugdecayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Tugboat.tugdecayminutes = str.ToFloat();
+			}
+		},
+		new ConsoleSystem.Command
+		{
+			Name = "tugdecaystartdelayminutes",
+			Parent = "tugboat",
+			FullName = "tugboat.tugdecaystartdelayminutes",
+			ServerAdmin = true,
+			Description = "How long until decay begins after the tugboat was last used",
+			Variable = true,
+			GetOveride = () => Tugboat.tugdecaystartdelayminutes.ToString(),
+			SetOveride = delegate(string str)
+			{
+				Tugboat.tugdecaystartdelayminutes = str.ToFloat();
 			}
 		},
 		new ConsoleSystem.Command

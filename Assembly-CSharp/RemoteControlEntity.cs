@@ -57,7 +57,7 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_SetID "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_SetID ");
 				}
 				using (TimeWarning.New("Server_SetID"))
 				{
@@ -187,8 +187,8 @@ public class RemoteControlEntity : BaseCombatEntity, IRemoteControllable
 		return true;
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	public void Server_SetID(RPCMessage msg)
 	{
 		if (msg.player == null || !CanControl(msg.player.userID) || !CanChangeID(msg.player))

@@ -42,7 +42,7 @@ public class SpinnerWheel : Signage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_AnyoneSpin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_AnyoneSpin ");
 				}
 				using (TimeWarning.New("RPC_AnyoneSpin"))
 				{
@@ -78,7 +78,7 @@ public class SpinnerWheel : Signage
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Spin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Spin ");
 				}
 				using (TimeWarning.New("RPC_Spin"))
 				{
@@ -122,7 +122,7 @@ public class SpinnerWheel : Signage
 	{
 		base.Save(info);
 		info.msg.spinnerWheel = Facepunch.Pool.Get<ProtoBuf.SpinnerWheel>();
-		info.msg.spinnerWheel.spin = wheel.rotation.eulerAngles;
+		info.msg.spinnerWheel.spin = wheel.localRotation.eulerAngles;
 	}
 
 	public override void Load(LoadInfo info)
@@ -130,10 +130,14 @@ public class SpinnerWheel : Signage
 		base.Load(info);
 		if (info.msg.spinnerWheel != null)
 		{
-			Quaternion rotation = Quaternion.Euler(info.msg.spinnerWheel.spin);
+			Quaternion localRotation = Quaternion.Euler(info.msg.spinnerWheel.spin);
+			if (base.isServer && info.fromDisk)
+			{
+				localRotation = Quaternion.identity;
+			}
 			if (base.isServer)
 			{
-				wheel.transform.rotation = rotation;
+				wheel.transform.localRotation = localRotation;
 			}
 		}
 	}
@@ -174,8 +178,8 @@ public class SpinnerWheel : Signage
 		}
 	}
 
-	[RPC_Server.MaxDistance(3f)]
 	[RPC_Server]
+	[RPC_Server.MaxDistance(3f)]
 	private void RPC_Spin(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && AllowPlayerSpins() && (AnyoneSpin() || rpc.player.CanBuild()) && Interface.CallHook("OnSpinWheel", rpc.player, this) == null && !(velocity > 15f))

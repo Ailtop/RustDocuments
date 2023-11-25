@@ -55,4 +55,18 @@ public static class BoundsEx
 		result.max = result.max.ToCanvas(target);
 		return result;
 	}
+
+	public static float InnerDistToEdge2D(this Bounds b, Vector3 point)
+	{
+		float num = Mathf.Abs(point.x - b.min.x);
+		float num2 = Mathf.Abs(point.x - b.max.x);
+		float num3 = Mathf.Abs(point.z - b.min.z);
+		float num4 = Mathf.Abs(point.z - b.max.z);
+		return Mathf.Min(num, num2, num3, num4);
+	}
+
+	public static float MaxExtent(this Bounds b)
+	{
+		return Mathf.Max(b.extents.x, b.extents.y, b.extents.z);
+	}
 }

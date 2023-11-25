@@ -92,7 +92,7 @@ public class LiquidWeapon : BaseLiquidVessel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - PumpWater "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - PumpWater ");
 				}
 				using (TimeWarning.New("PumpWater"))
 				{
@@ -128,7 +128,7 @@ public class LiquidWeapon : BaseLiquidVessel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StartFiring "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - StartFiring ");
 				}
 				using (TimeWarning.New("StartFiring"))
 				{
@@ -164,7 +164,7 @@ public class LiquidWeapon : BaseLiquidVessel
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - StopFiring "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - StopFiring ");
 				}
 				using (TimeWarning.New("StopFiring"))
 				{
@@ -194,8 +194,8 @@ public class LiquidWeapon : BaseLiquidVessel
 		return base.OnRpcMessage(player, rpc, msg);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsActiveItem]
+	[RPC_Server]
 	private void StartFiring(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

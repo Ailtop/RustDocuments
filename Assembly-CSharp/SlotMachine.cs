@@ -115,7 +115,7 @@ public class SlotMachine : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Deposit "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Deposit ");
 				}
 				using (TimeWarning.New("RPC_Deposit"))
 				{
@@ -151,7 +151,7 @@ public class SlotMachine : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Spin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Spin ");
 				}
 				using (TimeWarning.New("RPC_Spin"))
 				{
@@ -187,7 +187,7 @@ public class SlotMachine : BaseMountable
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - Server_RequestMultiplierChange "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - Server_RequestMultiplierChange ");
 				}
 				using (TimeWarning.New("Server_RequestMultiplierChange"))
 				{
@@ -467,9 +467,9 @@ public class SlotMachine : BaseMountable
 		}
 	}
 
+	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
-	[RPC_Server.CallsPerSecond(5uL)]
 	private void Server_RequestMultiplierChange(RPCMessage msg)
 	{
 		if (!(msg.player != _mounted) && !HasFlag(Flags.Reserved2))

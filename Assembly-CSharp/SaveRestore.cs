@@ -25,7 +25,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 	}
 
 	[CompilerGenerated]
-	private sealed class _003CDoAutomatedSave_003Ed__19 : IEnumerator<object>, IEnumerator, IDisposable
+	private sealed class _003CDoAutomatedSave_003Ed__12 : IEnumerator<object>, IEnumerator, IDisposable
 	{
 		private int _003C_003E1__state;
 
@@ -56,7 +56,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		}
 
 		[DebuggerHidden]
-		public _003CDoAutomatedSave_003Ed__19(int _003C_003E1__state)
+		public _003CDoAutomatedSave_003Ed__12(int _003C_003E1__state)
 		{
 			this._003C_003E1__state = _003C_003E1__state;
 		}
@@ -139,9 +139,248 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 
 	public static DateTime SaveCreatedTime;
 
+	private static RealTimeSince TimeSinceLastSave;
+
 	private static MemoryStream SaveBuffer = new MemoryStream(33554432);
 
 	public static string WipeId { get; private set; }
+
+	public static IEnumerator Save(string strFilename, bool AndWait = false)
+	{
+		if (Rust.Application.isQuitting)
+		{
+			yield break;
+		}
+		Stopwatch timerCache = new Stopwatch();
+		Stopwatch timerWrite = new Stopwatch();
+		Stopwatch timerDisk = new Stopwatch();
+		int iEnts = 0;
+		timerCache.Start();
+		using (TimeWarning.New("SaveCache", 100))
+		{
+			Stopwatch sw = Stopwatch.StartNew();
+			BaseEntity[] array = BaseEntity.saveList.ToArray();
+			foreach (BaseEntity baseEntity in array)
+			{
+				if (baseEntity == null || !BaseNetworkableEx.IsValid(baseEntity))
+				{
+					continue;
+				}
+				try
+				{
+					baseEntity.GetSaveCache();
+				}
+				catch (Exception exception)
+				{
+					UnityEngine.Debug.LogException(exception);
+				}
+				if (sw.Elapsed.TotalMilliseconds > 5.0)
+				{
+					if (!AndWait)
+					{
+						yield return CoroutineEx.waitForEndOfFrame;
+					}
+					sw.Reset();
+					sw.Start();
+				}
+			}
+		}
+		timerCache.Stop();
+		SaveBuffer.Position = 0L;
+		SaveBuffer.SetLength(0L);
+		timerWrite.Start();
+		using (TimeWarning.New("SaveWrite", 100))
+		{
+			BinaryWriter writer = new BinaryWriter(SaveBuffer);
+			writer.Write((sbyte)83);
+			writer.Write((sbyte)65);
+			writer.Write((sbyte)86);
+			writer.Write((sbyte)82);
+			InitializeWipeId();
+			SaveExtraData saveExtraData = new SaveExtraData();
+			saveExtraData.WipeId = WipeId;
+			writer.Write((sbyte)74);
+			writer.Write(JsonConvert.SerializeObject(saveExtraData));
+			writer.Write((sbyte)68);
+			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
+			writer.Write(243u);
+			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
+			saveInfo.forDisk = true;
+			if (!AndWait)
+			{
+				yield return CoroutineEx.waitForEndOfFrame;
+			}
+			foreach (BaseEntity save in BaseEntity.saveList)
+			{
+				if (save == null || save.IsDestroyed)
+				{
+					UnityEngine.Debug.LogWarning("Entity is NULL but is still in saveList - not destroyed properly? " + save, save);
+					continue;
+				}
+				MemoryStream memoryStream = null;
+				try
+				{
+					memoryStream = save.GetSaveCache();
+				}
+				catch (Exception exception2)
+				{
+					UnityEngine.Debug.LogException(exception2);
+				}
+				if (memoryStream == null || memoryStream.Length <= 0)
+				{
+					UnityEngine.Debug.LogWarningFormat("Skipping saving entity {0} - because {1}", save, (memoryStream == null) ? "savecache is null" : "savecache is 0");
+				}
+				else
+				{
+					writer.Write((uint)memoryStream.Length);
+					writer.Write(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
+					iEnts++;
+				}
+			}
+		}
+		timerWrite.Stop();
+		if (!AndWait)
+		{
+			yield return CoroutineEx.waitForEndOfFrame;
+		}
+		timerDisk.Start();
+		using (TimeWarning.New("SaveBackup", 100))
+		{
+			ShiftSaveBackups(strFilename);
+		}
+		using (TimeWarning.New("SaveDisk", 100))
+		{
+			try
+			{
+				string text = strFilename + ".new";
+				if (File.Exists(text))
+				{
+					File.Delete(text);
+				}
+				try
+				{
+					using FileStream destination = File.OpenWrite(text);
+					SaveBuffer.Position = 0L;
+					SaveBuffer.CopyTo(destination);
+				}
+				catch (Exception ex)
+				{
+					UnityEngine.Debug.LogError("Couldn't write save file! We got an exception: " + ex);
+					if (File.Exists(text))
+					{
+						File.Delete(text);
+					}
+					yield break;
+				}
+				File.Copy(text, strFilename, overwrite: true);
+				File.Delete(text);
+			}
+			catch (Exception ex2)
+			{
+				UnityEngine.Debug.LogError("Error when saving to disk: " + ex2);
+				yield break;
+			}
+		}
+		timerDisk.Stop();
+		UnityEngine.Debug.LogFormat("Saved {0} ents, cache({1}), write({2}), disk({3}).", iEnts.ToString("N0"), timerCache.Elapsed.TotalSeconds.ToString("0.00"), timerWrite.Elapsed.TotalSeconds.ToString("0.00"), timerDisk.Elapsed.TotalSeconds.ToString("0.00"));
+		NexusServer.PostGameSaved();
+	}
+
+	private static void ShiftSaveBackups(string fileName)
+	{
+		int num = Mathf.Max(ConVar.Server.saveBackupCount, 2);
+		if (!File.Exists(fileName))
+		{
+			return;
+		}
+		try
+		{
+			int num2 = 0;
+			for (int j = 1; j <= num; j++)
+			{
+				if (!File.Exists(fileName + "." + j))
+				{
+					break;
+				}
+				num2++;
+			}
+			string text = GetBackupName(num2 + 1);
+			for (int num3 = num2; num3 > 0; num3--)
+			{
+				string text2 = GetBackupName(num3);
+				if (num3 == num)
+				{
+					File.Delete(text2);
+				}
+				else if (File.Exists(text2))
+				{
+					if (File.Exists(text))
+					{
+						File.Delete(text);
+					}
+					File.Move(text2, text);
+				}
+				text = text2;
+			}
+			File.Copy(fileName, text, overwrite: true);
+		}
+		catch (Exception ex)
+		{
+			UnityEngine.Debug.LogError("Error while backing up old saves: " + ex.Message);
+			UnityEngine.Debug.LogException(ex);
+			throw;
+		}
+		string GetBackupName(int i)
+		{
+			return $"{fileName}.{i}";
+		}
+	}
+
+	private void Start()
+	{
+		StartCoroutine(SaveRegularly());
+	}
+
+	private IEnumerator SaveRegularly()
+	{
+		while (true)
+		{
+			yield return CoroutineEx.waitForSeconds(1f);
+			if ((float)TimeSinceLastSave >= (float)ConVar.Server.saveinterval || NexusServer.NeedsJournalFlush || NexusServer.NeedTransferFlush)
+			{
+				yield return StartCoroutine(DoAutomatedSave());
+				TimeSinceLastSave = 0f;
+			}
+		}
+	}
+
+	[IteratorStateMachine(typeof(_003CDoAutomatedSave_003Ed__12))]
+	private IEnumerator DoAutomatedSave(bool AndWait = false)
+	{
+		Interface.CallHook("OnServerSave");
+		return new _003CDoAutomatedSave_003Ed__12(0)
+		{
+			_003C_003E4__this = this,
+			AndWait = AndWait
+		};
+	}
+
+	public static bool Save(bool AndWait)
+	{
+		if (SingletonComponent<SaveRestore>.Instance == null)
+		{
+			return false;
+		}
+		if (IsSaving)
+		{
+			return false;
+		}
+		IEnumerator enumerator = SingletonComponent<SaveRestore>.Instance.DoAutomatedSave(AndWait: true);
+		while (enumerator.MoveNext())
+		{
+		}
+		return true;
+	}
 
 	public static void ClearMapEntities()
 	{
@@ -205,7 +444,7 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 					binaryReader.ReadChar();
 					SaveCreatedTime = Epoch.ToDateTime(binaryReader.ReadInt32());
 				}
-				if (binaryReader.ReadUInt32() != 238)
+				if (binaryReader.ReadUInt32() != 243)
 				{
 					if (allowOutOfDateSaves)
 					{
@@ -240,31 +479,44 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 					}
 					if (entData.basePlayer != null && dictionary.Any((KeyValuePair<BaseEntity, ProtoBuf.Entity> x) => x.Value.basePlayer != null && x.Value.basePlayer.userid == entData.basePlayer.userid))
 					{
-						UnityEngine.Debug.LogWarning(string.Concat("Skipping entity ", entData.baseNetworkable.uid, " - it's a player ", entData.basePlayer.userid, " who is in the save multiple times"));
-						continue;
+						string[] obj = new string[5] { "Skipping entity ", null, null, null, null };
+						NetworkableId uid = entData.baseNetworkable.uid;
+						obj[1] = uid.ToString();
+						obj[2] = " - it's a player ";
+						obj[3] = entData.basePlayer.userid.ToString();
+						obj[4] = " who is in the save multiple times";
+						UnityEngine.Debug.LogWarning(string.Concat(obj));
 					}
-					if (entData.baseNetworkable.uid.IsValid && hashSet.Contains(entData.baseNetworkable.uid))
+					else if (entData.baseNetworkable.uid.IsValid && hashSet.Contains(entData.baseNetworkable.uid))
 					{
-						UnityEngine.Debug.LogWarning(string.Concat("Skipping entity ", entData.baseNetworkable.uid, " ", StringPool.Get(entData.baseNetworkable.prefabID), " - uid is used multiple times"));
-						continue;
+						string[] obj2 = new string[5] { "Skipping entity ", null, null, null, null };
+						NetworkableId uid = entData.baseNetworkable.uid;
+						obj2[1] = uid.ToString();
+						obj2[2] = " ";
+						obj2[3] = StringPool.Get(entData.baseNetworkable.prefabID);
+						obj2[4] = " - uid is used multiple times";
+						UnityEngine.Debug.LogWarning(string.Concat(obj2));
 					}
-					if (entData.baseNetworkable.uid.IsValid)
+					else
 					{
-						hashSet.Add(entData.baseNetworkable.uid);
-					}
-					BaseEntity baseEntity = GameManager.server.CreateEntity(StringPool.Get(entData.baseNetworkable.prefabID), entData.baseEntity.pos, Quaternion.Euler(entData.baseEntity.rot));
-					if ((bool)baseEntity)
-					{
-						baseEntity.InitLoad(entData.baseNetworkable.uid);
-						dictionary.Add(baseEntity, entData);
+						if (entData.baseNetworkable.uid.IsValid)
+						{
+							hashSet.Add(entData.baseNetworkable.uid);
+						}
+						BaseEntity baseEntity = GameManager.server.CreateEntity(StringPool.Get(entData.baseNetworkable.prefabID), entData.baseEntity.pos, Quaternion.Euler(entData.baseEntity.rot));
+						if ((bool)baseEntity)
+						{
+							baseEntity.InitLoad(entData.baseNetworkable.uid);
+							dictionary.Add(baseEntity, entData);
+						}
 					}
 				}
 			}
 			DebugEx.Log("Spawning " + dictionary.Count + " entities");
-			object obj = Interface.CallHook("OnSaveLoad", dictionary);
-			if (obj is bool)
+			object obj3 = Interface.CallHook("OnSaveLoad", dictionary);
+			if (obj3 is bool)
 			{
-				return (bool)obj;
+				return (bool)obj3;
 			}
 			BaseNetworkable.LoadInfo info = default(BaseNetworkable.LoadInfo);
 			info.fromDisk = true;
@@ -435,233 +687,5 @@ public class SaveRestore : SingletonComponent<SaveRestore>
 		{
 			WipeId = Guid.NewGuid().ToString("N");
 		}
-	}
-
-	public static IEnumerator Save(string strFilename, bool AndWait = false)
-	{
-		if (Rust.Application.isQuitting)
-		{
-			yield break;
-		}
-		Stopwatch timerCache = new Stopwatch();
-		Stopwatch timerWrite = new Stopwatch();
-		Stopwatch timerDisk = new Stopwatch();
-		int iEnts = 0;
-		timerCache.Start();
-		using (TimeWarning.New("SaveCache", 100))
-		{
-			Stopwatch sw = Stopwatch.StartNew();
-			BaseEntity[] array = BaseEntity.saveList.ToArray();
-			foreach (BaseEntity baseEntity in array)
-			{
-				if (baseEntity == null || !BaseNetworkableEx.IsValid(baseEntity))
-				{
-					continue;
-				}
-				try
-				{
-					baseEntity.GetSaveCache();
-				}
-				catch (Exception exception)
-				{
-					UnityEngine.Debug.LogException(exception);
-				}
-				if (sw.Elapsed.TotalMilliseconds > 5.0)
-				{
-					if (!AndWait)
-					{
-						yield return CoroutineEx.waitForEndOfFrame;
-					}
-					sw.Reset();
-					sw.Start();
-				}
-			}
-		}
-		timerCache.Stop();
-		SaveBuffer.Position = 0L;
-		SaveBuffer.SetLength(0L);
-		timerWrite.Start();
-		using (TimeWarning.New("SaveWrite", 100))
-		{
-			BinaryWriter writer = new BinaryWriter(SaveBuffer);
-			writer.Write((sbyte)83);
-			writer.Write((sbyte)65);
-			writer.Write((sbyte)86);
-			writer.Write((sbyte)82);
-			InitializeWipeId();
-			SaveExtraData saveExtraData = new SaveExtraData();
-			saveExtraData.WipeId = WipeId;
-			writer.Write((sbyte)74);
-			writer.Write(JsonConvert.SerializeObject(saveExtraData));
-			writer.Write((sbyte)68);
-			writer.Write(Epoch.FromDateTime(SaveCreatedTime));
-			writer.Write(238u);
-			BaseNetworkable.SaveInfo saveInfo = default(BaseNetworkable.SaveInfo);
-			saveInfo.forDisk = true;
-			if (!AndWait)
-			{
-				yield return CoroutineEx.waitForEndOfFrame;
-			}
-			foreach (BaseEntity save in BaseEntity.saveList)
-			{
-				if (save == null || save.IsDestroyed)
-				{
-					UnityEngine.Debug.LogWarning("Entity is NULL but is still in saveList - not destroyed properly? " + save, save);
-					continue;
-				}
-				MemoryStream memoryStream = null;
-				try
-				{
-					memoryStream = save.GetSaveCache();
-				}
-				catch (Exception exception2)
-				{
-					UnityEngine.Debug.LogException(exception2);
-				}
-				if (memoryStream == null || memoryStream.Length <= 0)
-				{
-					UnityEngine.Debug.LogWarningFormat("Skipping saving entity {0} - because {1}", save, (memoryStream == null) ? "savecache is null" : "savecache is 0");
-				}
-				else
-				{
-					writer.Write((uint)memoryStream.Length);
-					writer.Write(memoryStream.GetBuffer(), 0, (int)memoryStream.Length);
-					iEnts++;
-				}
-			}
-		}
-		timerWrite.Stop();
-		if (!AndWait)
-		{
-			yield return CoroutineEx.waitForEndOfFrame;
-		}
-		timerDisk.Start();
-		using (TimeWarning.New("SaveBackup", 100))
-		{
-			ShiftSaveBackups(strFilename);
-		}
-		using (TimeWarning.New("SaveDisk", 100))
-		{
-			try
-			{
-				string text = strFilename + ".new";
-				if (File.Exists(text))
-				{
-					File.Delete(text);
-				}
-				try
-				{
-					using FileStream destination = File.OpenWrite(text);
-					SaveBuffer.Position = 0L;
-					SaveBuffer.CopyTo(destination);
-				}
-				catch (Exception ex)
-				{
-					UnityEngine.Debug.LogError("Couldn't write save file! We got an exception: " + ex);
-					if (File.Exists(text))
-					{
-						File.Delete(text);
-					}
-					yield break;
-				}
-				File.Copy(text, strFilename, overwrite: true);
-				File.Delete(text);
-			}
-			catch (Exception ex2)
-			{
-				UnityEngine.Debug.LogError("Error when saving to disk: " + ex2);
-				yield break;
-			}
-		}
-		timerDisk.Stop();
-		UnityEngine.Debug.LogFormat("Saved {0} ents, cache({1}), write({2}), disk({3}).", iEnts.ToString("N0"), timerCache.Elapsed.TotalSeconds.ToString("0.00"), timerWrite.Elapsed.TotalSeconds.ToString("0.00"), timerDisk.Elapsed.TotalSeconds.ToString("0.00"));
-	}
-
-	private static void ShiftSaveBackups(string fileName)
-	{
-		int num = Mathf.Max(ConVar.Server.saveBackupCount, 2);
-		if (!File.Exists(fileName))
-		{
-			return;
-		}
-		try
-		{
-			int num2 = 0;
-			for (int j = 1; j <= num && File.Exists(fileName + "." + j); j++)
-			{
-				num2++;
-			}
-			string text = GetBackupName(num2 + 1);
-			for (int num3 = num2; num3 > 0; num3--)
-			{
-				string text2 = GetBackupName(num3);
-				if (num3 == num)
-				{
-					File.Delete(text2);
-				}
-				else if (File.Exists(text2))
-				{
-					if (File.Exists(text))
-					{
-						File.Delete(text);
-					}
-					File.Move(text2, text);
-				}
-				text = text2;
-			}
-			File.Copy(fileName, text, overwrite: true);
-		}
-		catch (Exception ex)
-		{
-			UnityEngine.Debug.LogError("Error while backing up old saves: " + ex.Message);
-			UnityEngine.Debug.LogException(ex);
-			throw;
-		}
-		string GetBackupName(int i)
-		{
-			return $"{fileName}.{i}";
-		}
-	}
-
-	private void Start()
-	{
-		StartCoroutine(SaveRegularly());
-	}
-
-	private IEnumerator SaveRegularly()
-	{
-		while (true)
-		{
-			yield return CoroutineEx.waitForSeconds(ConVar.Server.saveinterval);
-			yield return StartCoroutine(DoAutomatedSave());
-		}
-	}
-
-	[IteratorStateMachine(typeof(_003CDoAutomatedSave_003Ed__19))]
-	private IEnumerator DoAutomatedSave(bool AndWait = false)
-	{
-		Interface.CallHook("OnServerSave");
-		return new _003CDoAutomatedSave_003Ed__19(0)
-		{
-			_003C_003E4__this = this,
-			AndWait = AndWait
-		};
-	}
-
-	public static bool Save(bool AndWait)
-	{
-		if (SingletonComponent<SaveRestore>.Instance == null)
-		{
-			return false;
-		}
-		if (IsSaving)
-		{
-			return false;
-		}
-		IEnumerator enumerator = SingletonComponent<SaveRestore>.Instance.DoAutomatedSave(AndWait: true);
-		while (enumerator.MoveNext())
-		{
-		}
-		return true;
 	}
 }

@@ -11,8 +11,6 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 		Back = 3
 	}
 
-	public Rigidbody rigidBody;
-
 	public Transform centerOfMass;
 
 	public float forwardPushForce = 5f;
@@ -141,15 +139,20 @@ public class WaterInflatable : BaseMountable, IPoolVehicle, INotifyTrigger
 			return;
 		}
 		Vector3 position = base.transform.position;
-		if (forceClippingCheck || Vector3.Distance(position, lastClipCheckPosition) > headSpaceCheckRadius * 0.5f)
+		if (!forceClippingCheck && !(Vector3.Distance(position, lastClipCheckPosition) > headSpaceCheckRadius * 0.5f))
 		{
-			forceClippingCheck = false;
-			lastClipCheckPosition = position;
-			if (GamePhysics.CheckSphere(headSpaceCheckPosition.position, headSpaceCheckRadius, 1218511105))
-			{
-				DismountAllPlayers();
-			}
+			return;
 		}
+		forceClippingCheck = false;
+		if (GamePhysics.CheckSphere(headSpaceCheckPosition.position, headSpaceCheckRadius, 1218511105, QueryTriggerInteraction.Ignore))
+		{
+			if (!GetDismountPosition(GetMounted(), out var _))
+			{
+				base.transform.position = lastClipCheckPosition;
+			}
+			DismountAllPlayers();
+		}
+		lastClipCheckPosition = position;
 	}
 
 	public override void OnPlayerMounted()

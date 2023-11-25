@@ -61,9 +61,9 @@ public static class AppPlayerExtensions
 			member.x = vector.x;
 			member.y = vector.y;
 			member.isOnline = basePlayer?.IsConnected ?? false;
-			member.spawnTime = basePlayer?.lifeStory?.timeBorn ?? 0;
+			member.spawnTime = (basePlayer?.lifeStory?.timeBorn).GetValueOrDefault();
 			member.isAlive = basePlayer?.IsAlive() ?? false;
-			member.deathTime = basePlayer?.previousLifeStory?.timeDied ?? 0;
+			member.deathTime = (basePlayer?.previousLifeStory?.timeDied).GetValueOrDefault();
 			appTeamInfo.members.Add(member);
 		}
 		appTeamInfo.leaderSteamId = team.teamLeader;

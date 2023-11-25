@@ -164,14 +164,18 @@ public class EntityFuelSystem
 		}
 	}
 
-	public void AddStartingFuel(float amount = -1f)
+	public void AddStartingFuel(int amount)
 	{
-		amount = ((amount == -1f) ? ((float)GetFuelContainer().allowedItem.stackable * 0.2f) : amount);
 		GetFuelContainer().inventory.AddItem(GetFuelContainer().allowedItem, Mathf.FloorToInt(amount), 0uL);
 	}
 
 	public void AdminAddFuel()
 	{
 		GetFuelContainer().inventory.AddItem(GetFuelContainer().allowedItem, GetFuelContainer().allowedItem.stackable, 0uL);
+	}
+
+	public int GetFuelCapacity()
+	{
+		return GetFuelContainer().allowedItem.stackable;
 	}
 }

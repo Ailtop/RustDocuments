@@ -91,7 +91,7 @@ public abstract class BaseCardGameEntity : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Editor_MakeRandomMove "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Editor_MakeRandomMove ");
 				}
 				using (TimeWarning.New("RPC_Editor_MakeRandomMove"))
 				{
@@ -127,7 +127,7 @@ public abstract class BaseCardGameEntity : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Editor_SpawnTestPlayer "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Editor_SpawnTestPlayer ");
 				}
 				using (TimeWarning.New("RPC_Editor_SpawnTestPlayer"))
 				{
@@ -163,7 +163,7 @@ public abstract class BaseCardGameEntity : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_LeaveTable "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_LeaveTable ");
 				}
 				using (TimeWarning.New("RPC_LeaveTable"))
 				{
@@ -199,7 +199,7 @@ public abstract class BaseCardGameEntity : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLoot "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenLoot ");
 				}
 				using (TimeWarning.New("RPC_OpenLoot"))
 				{
@@ -235,7 +235,7 @@ public abstract class BaseCardGameEntity : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Play "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Play ");
 				}
 				using (TimeWarning.New("RPC_Play"))
 				{
@@ -271,7 +271,7 @@ public abstract class BaseCardGameEntity : BaseVehicle
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PlayerInput "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_PlayerInput ");
 				}
 				using (TimeWarning.New("RPC_PlayerInput"))
 				{
@@ -557,22 +557,22 @@ public abstract class BaseCardGameEntity : BaseVehicle
 		base.SpawnSubEntities();
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_PlayerInput(RPCMessage msg)
 	{
 		GameController.ReceivedInputFromPlayer(msg.player, msg.read.Int32(), countAsAction: true, msg.read.Int32());
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_LeaveTable(RPCMessage msg)
 	{
 		GameController.LeaveTable(msg.player.userID);
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	private void RPC_OpenLoot(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -582,8 +582,8 @@ public abstract class BaseCardGameEntity : BaseVehicle
 		}
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void RPC_Editor_SpawnTestPlayer(RPCMessage msg)
 	{
 		if (!UnityEngine.Application.isEditor)

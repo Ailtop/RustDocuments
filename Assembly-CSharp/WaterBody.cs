@@ -42,14 +42,18 @@ public class WaterBody : MonoBehaviour
 
 	public void OnOceanLevelChanged(float newLevel)
 	{
-		if (IsOcean)
+		if (!IsOcean || Triggers == null)
 		{
-			Collider[] triggers = Triggers;
-			foreach (Collider obj in triggers)
+			return;
+		}
+		Collider[] triggers = Triggers;
+		foreach (Collider collider in triggers)
+		{
+			if (!(collider == null))
 			{
-				Vector3 position = obj.transform.position;
+				Vector3 position = collider.transform.position;
 				position.y = newLevel;
-				obj.transform.position = position;
+				collider.transform.position = position;
 			}
 		}
 	}

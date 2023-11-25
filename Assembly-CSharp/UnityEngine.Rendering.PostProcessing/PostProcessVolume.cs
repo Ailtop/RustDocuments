@@ -1,7 +1,7 @@
 namespace UnityEngine.Rendering.PostProcessing;
 
-[AddComponentMenu("Rendering/Post-process Volume", 1001)]
 [ExecuteAlways]
+[AddComponentMenu("Rendering/Post-process Volume", 1001)]
 public sealed class PostProcessVolume : MonoBehaviour
 {
 	public PostProcessProfile sharedProfile;

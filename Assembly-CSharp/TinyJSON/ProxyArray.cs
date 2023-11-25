@@ -53,11 +53,10 @@ public sealed class ProxyArray : Variant, IEnumerable<Variant>, IEnumerable
 		{
 			return true;
 		}
-		if (!(list[0] is ProxyArray proxyArray))
+		if (!(list[0] is ProxyArray { Count: var count }))
 		{
 			return false;
 		}
-		int count = proxyArray.Count;
 		for (int i = 1; i < num; i++)
 		{
 			if (!(list[i] is ProxyArray proxyArray2))

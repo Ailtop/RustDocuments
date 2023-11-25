@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Facepunch;
 using UnityEngine;
 
 public static class WaterLevel
@@ -13,16 +15,16 @@ public static class WaterLevel
 		public float surfaceLevel;
 	}
 
-	public static float Factor(Vector3 start, Vector3 end, float radius, BaseEntity forEntity = null)
+	public static float Factor(Vector3 start, Vector3 end, float radius, bool waves, bool volumes, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.Factor"))
 		{
-			WaterInfo waterInfo = GetWaterInfo(start, end, radius, forEntity);
+			WaterInfo waterInfo = GetWaterInfo(start, end, radius, waves, volumes, forEntity);
 			return waterInfo.isValid ? Mathf.InverseLerp(Mathf.Min(start.y, end.y) - radius, Mathf.Max(start.y, end.y) + radius, waterInfo.surfaceLevel) : 0f;
 		}
 	}
 
-	public static float Factor(Bounds bounds, BaseEntity forEntity = null)
+	public static float Factor(Bounds bounds, bool waves, bool volumes, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.Factor"))
 		{
@@ -30,36 +32,36 @@ public static class WaterLevel
 			{
 				bounds.size = new Vector3(0.1f, 0.1f, 0.1f);
 			}
-			WaterInfo waterInfo = GetWaterInfo(bounds, forEntity);
+			WaterInfo waterInfo = GetWaterInfo(bounds, waves, volumes, forEntity);
 			return waterInfo.isValid ? Mathf.InverseLerp(bounds.min.y, bounds.max.y, waterInfo.surfaceLevel) : 0f;
 		}
 	}
 
-	public static bool Test(Vector3 pos, bool waves = true, BaseEntity forEntity = null)
+	public static bool Test(Vector3 pos, bool waves, bool volumes, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.Test"))
 		{
-			return GetWaterInfo(pos, waves, forEntity).isValid;
+			return GetWaterInfo(pos, waves, volumes, forEntity).isValid;
 		}
 	}
 
-	public static float GetWaterDepth(Vector3 pos, bool waves = true, BaseEntity forEntity = null)
+	public static float GetWaterDepth(Vector3 pos, bool waves, bool volumes, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.GetWaterDepth"))
 		{
-			return GetWaterInfo(pos, waves, forEntity).currentDepth;
+			return GetWaterInfo(pos, waves, volumes, forEntity).currentDepth;
 		}
 	}
 
-	public static float GetOverallWaterDepth(Vector3 pos, bool waves = true, BaseEntity forEntity = null, bool noEarlyExit = false)
+	public static float GetOverallWaterDepth(Vector3 pos, bool waves, bool volumes, BaseEntity forEntity = null, bool noEarlyExit = false)
 	{
 		using (TimeWarning.New("WaterLevel.GetOverallWaterDepth"))
 		{
-			return GetWaterInfo(pos, waves, forEntity, noEarlyExit).overallDepth;
+			return GetWaterInfo(pos, waves, volumes, forEntity, noEarlyExit).overallDepth;
 		}
 	}
 
-	public static WaterInfo GetBuoyancyWaterInfo(Vector3 pos, Vector2 posUV, float terrainHeight, float waterHeight, bool doDeepwaterChecks, BaseEntity forEntity = null)
+	public static WaterInfo GetBuoyancyWaterInfo(Vector3 pos, Vector2 posUV, float terrainHeight, float waterHeight, bool doDeepwaterChecks, BaseEntity forEntity)
 	{
 		using (TimeWarning.New("WaterLevel.GetWaterInfo"))
 		{
@@ -95,27 +97,19 @@ public static class WaterLevel
 		}
 	}
 
-	public static WaterInfo GetWaterInfo(Vector3 pos, bool waves = true, BaseEntity forEntity = null, bool noEarlyExit = false)
+	public static WaterInfo GetWaterInfo(Vector3 pos, bool waves, bool volumes, BaseEntity forEntity = null, bool noEarlyExit = false)
 	{
 		using (TimeWarning.New("WaterLevel.GetWaterInfo"))
 		{
-			WaterInfo result = default(WaterInfo);
-			float num = 0f;
-			if (waves)
-			{
-				num = WaterSystem.GetHeight(pos);
-			}
-			else if ((bool)TerrainMeta.WaterMap)
-			{
-				num = TerrainMeta.WaterMap.GetHeight(pos);
-			}
+			WaterInfo waterInfo = default(WaterInfo);
+			float num = GetWaterLevel(pos);
 			if (pos.y > num)
 			{
 				if (!noEarlyExit)
 				{
-					return GetWaterInfoFromVolumes(pos, forEntity);
+					return volumes ? GetWaterInfoFromVolumes(pos, forEntity) : waterInfo;
 				}
-				result = GetWaterInfoFromVolumes(pos, forEntity);
+				waterInfo = (volumes ? GetWaterInfoFromVolumes(pos, forEntity) : waterInfo);
 			}
 			float num2 = (TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(pos) : 0f);
 			if (pos.y < num2 - 1f)
@@ -123,38 +117,30 @@ public static class WaterLevel
 				num = 0f;
 				if (pos.y > num && !noEarlyExit)
 				{
-					return result;
+					return waterInfo;
 				}
 			}
 			if ((bool)WaterSystem.Collision && WaterSystem.Collision.GetIgnore(pos))
 			{
-				return result;
+				return waterInfo;
 			}
-			result.isValid = true;
-			result.currentDepth = Mathf.Max(0f, num - pos.y);
-			result.overallDepth = Mathf.Max(0f, num - num2);
-			result.surfaceLevel = num;
-			return result;
+			waterInfo.isValid = true;
+			waterInfo.currentDepth = Mathf.Max(0f, num - pos.y);
+			waterInfo.overallDepth = Mathf.Max(0f, num - num2);
+			waterInfo.surfaceLevel = num;
+			return waterInfo;
 		}
 	}
 
-	public static WaterInfo GetWaterInfo(Bounds bounds, BaseEntity forEntity = null, bool waves = true)
+	public static WaterInfo GetWaterInfo(Bounds bounds, bool waves, bool volumes, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.GetWaterInfo"))
 		{
-			WaterInfo result = default(WaterInfo);
-			float num = 0f;
-			if (waves)
-			{
-				num = WaterSystem.GetHeight(bounds.center);
-			}
-			else if ((bool)TerrainMeta.WaterMap)
-			{
-				num = TerrainMeta.WaterMap.GetHeight(bounds.center);
-			}
+			WaterInfo waterInfo = default(WaterInfo);
+			float num = GetWaterLevel(bounds.center);
 			if (bounds.min.y > num)
 			{
-				return GetWaterInfoFromVolumes(bounds, forEntity);
+				return volumes ? GetWaterInfoFromVolumes(bounds, forEntity) : waterInfo;
 			}
 			float num2 = (TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(bounds.center) : 0f);
 			if (bounds.max.y < num2 - 1f)
@@ -162,66 +148,85 @@ public static class WaterLevel
 				num = 0f;
 				if (bounds.min.y > num)
 				{
-					return result;
+					return waterInfo;
 				}
 			}
 			if ((bool)WaterSystem.Collision && WaterSystem.Collision.GetIgnore(bounds))
 			{
-				return result;
+				return waterInfo;
 			}
-			result.isValid = true;
-			result.currentDepth = Mathf.Max(0f, num - bounds.min.y);
-			result.overallDepth = Mathf.Max(0f, num - num2);
-			result.surfaceLevel = num;
-			return result;
+			waterInfo.isValid = true;
+			waterInfo.currentDepth = Mathf.Max(0f, num - bounds.min.y);
+			waterInfo.overallDepth = Mathf.Max(0f, num - num2);
+			waterInfo.surfaceLevel = num;
+			return waterInfo;
 		}
 	}
 
-	public static WaterInfo GetWaterInfo(Vector3 start, Vector3 end, float radius, BaseEntity forEntity = null, bool waves = true)
+	public static WaterInfo GetWaterInfo(Vector3 start, Vector3 end, float radius, bool waves, bool volumes, BaseEntity forEntity = null)
 	{
 		using (TimeWarning.New("WaterLevel.GetWaterInfo"))
 		{
-			WaterInfo result = default(WaterInfo);
-			float num = 0f;
+			WaterInfo waterInfo = default(WaterInfo);
 			Vector3 vector = (start + end) * 0.5f;
-			float num2 = Mathf.Min(start.y, end.y) - radius;
-			float num3 = Mathf.Max(start.y, end.y) + radius;
-			if (waves)
+			float num = Mathf.Min(start.y, end.y) - radius;
+			float num2 = Mathf.Max(start.y, end.y) + radius;
+			float num3 = GetWaterLevel(vector);
+			if (num > num3)
 			{
-				num = WaterSystem.GetHeight(vector);
-			}
-			else if ((bool)TerrainMeta.WaterMap)
-			{
-				num = TerrainMeta.WaterMap.GetHeight(vector);
-			}
-			if (num2 > num)
-			{
-				return GetWaterInfoFromVolumes(start, end, radius, forEntity);
+				return volumes ? GetWaterInfoFromVolumes(start, end, radius, forEntity) : waterInfo;
 			}
 			float num4 = (TerrainMeta.HeightMap ? TerrainMeta.HeightMap.GetHeight(vector) : 0f);
-			if (num3 < num4 - 1f)
+			if (num2 < num4 - 1f)
 			{
-				num = 0f;
-				if (num2 > num)
+				num3 = 0f;
+				if (num > num3)
 				{
-					return result;
+					return waterInfo;
 				}
 			}
 			if ((bool)WaterSystem.Collision && WaterSystem.Collision.GetIgnore(start, end, radius))
 			{
-				Vector3 pos = vector.WithY(Mathf.Lerp(num2, num3, 0.75f));
+				Vector3 pos = vector.WithY(Mathf.Lerp(num, num2, 0.75f));
 				if (WaterSystem.Collision.GetIgnore(pos))
 				{
-					return result;
+					return waterInfo;
 				}
-				num = Mathf.Min(num, pos.y);
+				num3 = Mathf.Min(num3, pos.y);
 			}
-			result.isValid = true;
-			result.currentDepth = Mathf.Max(0f, num - num2);
-			result.overallDepth = Mathf.Max(0f, num - num4);
-			result.surfaceLevel = num;
-			return result;
+			waterInfo.isValid = true;
+			waterInfo.currentDepth = Mathf.Max(0f, num3 - num);
+			waterInfo.overallDepth = Mathf.Max(0f, num3 - num4);
+			waterInfo.surfaceLevel = num3;
+			return waterInfo;
 		}
+	}
+
+	public static WaterInfo GetWaterInfo(Camera cam, bool waves, bool volumes, BaseEntity forEntity = null, bool noEarlyExit = false)
+	{
+		using (TimeWarning.New("WaterLevel.GetWaterInfo"))
+		{
+			if (cam.transform.position.y < WaterSystem.MinLevel() - 1f)
+			{
+				return GetWaterInfo(cam.transform.position, waves, volumes, forEntity, noEarlyExit);
+			}
+			return GetWaterInfo(cam.transform.position - Vector3.up, waves, volumes, forEntity, noEarlyExit);
+		}
+	}
+
+	private static float GetWaterLevel(Vector3 pos)
+	{
+		float num = (TerrainMeta.HeightMap ? TerrainMeta.WaterMap.GetHeight(pos) : 0f);
+		if (num < WaterSystem.MaxLevel())
+		{
+			float height = WaterSystem.GetHeight(pos);
+			if (num > WaterSystem.OceanLevel)
+			{
+				return Mathf.Max(num, height);
+			}
+			return height;
+		}
+		return num;
 	}
 
 	private static WaterInfo GetWaterInfoFromVolumes(Bounds bounds, BaseEntity forEntity)
@@ -229,6 +234,15 @@ public static class WaterLevel
 		WaterInfo info = default(WaterInfo);
 		if (forEntity == null)
 		{
+			List<WaterVolume> obj = Pool.GetList<WaterVolume>();
+			Vis.Components(new OBB(bounds), obj, 262144);
+			using (List<WaterVolume>.Enumerator enumerator = obj.GetEnumerator())
+			{
+				while (enumerator.MoveNext() && !enumerator.Current.Test(bounds, out info))
+				{
+				}
+			}
+			Pool.FreeList(ref obj);
 			return info;
 		}
 		forEntity.WaterTestFromVolumes(bounds, out info);
@@ -240,6 +254,15 @@ public static class WaterLevel
 		WaterInfo info = default(WaterInfo);
 		if (forEntity == null)
 		{
+			List<WaterVolume> obj = Pool.GetList<WaterVolume>();
+			Vis.Components(pos, 0.1f, obj, 262144);
+			using (List<WaterVolume>.Enumerator enumerator = obj.GetEnumerator())
+			{
+				while (enumerator.MoveNext() && !enumerator.Current.Test(pos, out info))
+				{
+				}
+			}
+			Pool.FreeList(ref obj);
 			return info;
 		}
 		forEntity.WaterTestFromVolumes(pos, out info);
@@ -251,6 +274,15 @@ public static class WaterLevel
 		WaterInfo info = default(WaterInfo);
 		if (forEntity == null)
 		{
+			List<WaterVolume> obj = Pool.GetList<WaterVolume>();
+			Vis.Components(start, end, radius, obj, 262144);
+			using (List<WaterVolume>.Enumerator enumerator = obj.GetEnumerator())
+			{
+				while (enumerator.MoveNext() && !enumerator.Current.Test(start, end, radius, out info))
+				{
+				}
+			}
+			Pool.FreeList(ref obj);
 			return info;
 		}
 		forEntity.WaterTestFromVolumes(start, end, radius, out info);

@@ -24,10 +24,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 		TrainHasThrottle = 8
 	}
 
-	private TrainCarUnloadable tcUnloadingNow;
-
-	[Header("Coaling Tower")]
 	[SerializeField]
+	[Header("Coaling Tower")]
 	private BoxCollider unloadingBounds;
 
 	[SerializeField]
@@ -67,8 +65,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 	[SerializeField]
 	private ParticleSystemContainer unloadingFXContainerFuel;
 
-	[Header("Coaling Tower Text")]
 	[SerializeField]
+	[Header("Coaling Tower Text")]
 	private TokenisedPhrase noTraincar;
 
 	[SerializeField]
@@ -86,8 +84,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 	[SerializeField]
 	private TokenisedPhrase trainHasThrottle;
 
-	[SerializeField]
 	[Header("Coaling Tower Audio")]
+	[SerializeField]
 	private GameObject buttonSoundPos;
 
 	[SerializeField]
@@ -196,6 +194,8 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 
 	private Sound unloadDestinationSound;
 
+	private TrainCarUnloadable tcUnloadingNow;
+
 	private bool HasTrainCar => activeTrainCarRef.IsValid(base.isServer);
 
 	private bool HasUnloadable => activeUnloadableRef.IsValid(base.isServer);
@@ -203,6 +203,160 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 	private bool HasUnloadableLinedUp => HasFlag(Flags.Reserved2);
 
 	public Vector3 UnloadingPos { get; private set; }
+
+	public override void InitShared()
+	{
+		base.InitShared();
+		LootTypeIndex = new NetworkedProperty<int>(this);
+		UnloadingPos = unloadingBounds.transform.position + unloadingBounds.transform.rotation * unloadingBounds.center;
+		unloadersInWorld.Add(this);
+	}
+
+	public override void DestroyShared()
+	{
+		base.DestroyShared();
+		unloadersInWorld.Remove(this);
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		if (info.msg.coalingTower != null)
+		{
+			LootTypeIndex.Value = info.msg.coalingTower.lootTypeIndex;
+			oreStorageInstance.uid = info.msg.coalingTower.oreStorageID;
+			fuelStorageInstance.uid = info.msg.coalingTower.fuelStorageID;
+		}
+	}
+
+	public static bool IsUnderAnUnloader(TrainCar trainCar, out bool isLinedUp, out Vector3 unloaderPos)
+	{
+		foreach (CoalingTower item in unloadersInWorld)
+		{
+			if (item.TrainCarIsUnder(trainCar, out isLinedUp))
+			{
+				unloaderPos = item.UnloadingPos;
+				return true;
+			}
+		}
+		isLinedUp = false;
+		unloaderPos = Vector3.zero;
+		return false;
+	}
+
+	public bool TrainCarIsUnder(TrainCar trainCar, out bool isLinedUp)
+	{
+		isLinedUp = false;
+		if (!BaseNetworkableEx.IsValid(trainCar))
+		{
+			return false;
+		}
+		TrainCarUnloadable activeUnloadable = GetActiveUnloadable();
+		if (activeUnloadable != null && activeUnloadable.EqualNetID(trainCar))
+		{
+			isLinedUp = HasUnloadableLinedUp;
+			return true;
+		}
+		return false;
+	}
+
+	private OreHopper GetOreStorage()
+	{
+		OreHopper oreHopper = oreStorageInstance.Get(base.isServer);
+		if (BaseNetworkableEx.IsValid(oreHopper))
+		{
+			return oreHopper;
+		}
+		return null;
+	}
+
+	private PercentFullStorageContainer GetFuelStorage()
+	{
+		PercentFullStorageContainer percentFullStorageContainer = fuelStorageInstance.Get(base.isServer);
+		if (BaseNetworkableEx.IsValid(percentFullStorageContainer))
+		{
+			return percentFullStorageContainer;
+		}
+		return null;
+	}
+
+	private TrainCar GetActiveTrainCar()
+	{
+		TrainCar trainCar = activeTrainCarRef.Get(base.isServer);
+		if (BaseNetworkableEx.IsValid(trainCar))
+		{
+			return trainCar;
+		}
+		return null;
+	}
+
+	private TrainCarUnloadable GetActiveUnloadable()
+	{
+		TrainCarUnloadable trainCarUnloadable = activeUnloadableRef.Get(base.isServer);
+		if (BaseNetworkableEx.IsValid(trainCarUnloadable))
+		{
+			return trainCarUnloadable;
+		}
+		return null;
+	}
+
+	private bool OutputBinIsFull()
+	{
+		TrainCarUnloadable activeUnloadable = GetActiveUnloadable();
+		if (activeUnloadable == null)
+		{
+			return false;
+		}
+		switch (activeUnloadable.wagonType)
+		{
+		case TrainCarUnloadable.WagonType.Lootboxes:
+			return false;
+		case TrainCarUnloadable.WagonType.Fuel:
+		{
+			PercentFullStorageContainer fuelStorage = GetFuelStorage();
+			if (!(fuelStorage != null))
+			{
+				return false;
+			}
+			return fuelStorage.IsFull();
+		}
+		default:
+		{
+			OreHopper oreStorage = GetOreStorage();
+			if (!(oreStorage != null))
+			{
+				return false;
+			}
+			return oreStorage.IsFull();
+		}
+		}
+	}
+
+	private bool WagonIsEmpty()
+	{
+		TrainCarUnloadable activeUnloadable = GetActiveUnloadable();
+		if (activeUnloadable != null)
+		{
+			return activeUnloadable.GetOrePercent() == 0f;
+		}
+		return true;
+	}
+
+	private bool CanUnloadNow(out ActionAttemptStatus attemptStatus)
+	{
+		if (!HasUnloadableLinedUp)
+		{
+			attemptStatus = ActionAttemptStatus.NoTrainCar;
+			return false;
+		}
+		if (OutputBinIsFull())
+		{
+			attemptStatus = ActionAttemptStatus.OutputIsFull;
+			return false;
+		}
+		attemptStatus = ActionAttemptStatus.NoError;
+		return IsPowered();
+	}
 
 	public override void Save(SaveInfo info)
 	{
@@ -540,160 +694,6 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 		}
 	}
 
-	public override void InitShared()
-	{
-		base.InitShared();
-		LootTypeIndex = new NetworkedProperty<int>(this);
-		UnloadingPos = unloadingBounds.transform.position + unloadingBounds.transform.rotation * unloadingBounds.center;
-		unloadersInWorld.Add(this);
-	}
-
-	public override void DestroyShared()
-	{
-		base.DestroyShared();
-		unloadersInWorld.Remove(this);
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		if (info.msg.coalingTower != null)
-		{
-			LootTypeIndex.Value = info.msg.coalingTower.lootTypeIndex;
-			oreStorageInstance.uid = info.msg.coalingTower.oreStorageID;
-			fuelStorageInstance.uid = info.msg.coalingTower.fuelStorageID;
-		}
-	}
-
-	public static bool IsUnderAnUnloader(TrainCar trainCar, out bool isLinedUp, out Vector3 unloaderPos)
-	{
-		foreach (CoalingTower item in unloadersInWorld)
-		{
-			if (item.TrainCarIsUnder(trainCar, out isLinedUp))
-			{
-				unloaderPos = item.UnloadingPos;
-				return true;
-			}
-		}
-		isLinedUp = false;
-		unloaderPos = Vector3.zero;
-		return false;
-	}
-
-	public bool TrainCarIsUnder(TrainCar trainCar, out bool isLinedUp)
-	{
-		isLinedUp = false;
-		if (!BaseNetworkableEx.IsValid(trainCar))
-		{
-			return false;
-		}
-		TrainCarUnloadable activeUnloadable = GetActiveUnloadable();
-		if (activeUnloadable != null && activeUnloadable.EqualNetID(trainCar))
-		{
-			isLinedUp = HasUnloadableLinedUp;
-			return true;
-		}
-		return false;
-	}
-
-	private OreHopper GetOreStorage()
-	{
-		OreHopper oreHopper = oreStorageInstance.Get(base.isServer);
-		if (BaseNetworkableEx.IsValid(oreHopper))
-		{
-			return oreHopper;
-		}
-		return null;
-	}
-
-	private PercentFullStorageContainer GetFuelStorage()
-	{
-		PercentFullStorageContainer percentFullStorageContainer = fuelStorageInstance.Get(base.isServer);
-		if (BaseNetworkableEx.IsValid(percentFullStorageContainer))
-		{
-			return percentFullStorageContainer;
-		}
-		return null;
-	}
-
-	private TrainCar GetActiveTrainCar()
-	{
-		TrainCar trainCar = activeTrainCarRef.Get(base.isServer);
-		if (BaseNetworkableEx.IsValid(trainCar))
-		{
-			return trainCar;
-		}
-		return null;
-	}
-
-	private TrainCarUnloadable GetActiveUnloadable()
-	{
-		TrainCarUnloadable trainCarUnloadable = activeUnloadableRef.Get(base.isServer);
-		if (BaseNetworkableEx.IsValid(trainCarUnloadable))
-		{
-			return trainCarUnloadable;
-		}
-		return null;
-	}
-
-	private bool OutputBinIsFull()
-	{
-		TrainCarUnloadable activeUnloadable = GetActiveUnloadable();
-		if (activeUnloadable == null)
-		{
-			return false;
-		}
-		switch (activeUnloadable.wagonType)
-		{
-		case TrainCarUnloadable.WagonType.Lootboxes:
-			return false;
-		case TrainCarUnloadable.WagonType.Fuel:
-		{
-			PercentFullStorageContainer fuelStorage = GetFuelStorage();
-			if (!(fuelStorage != null))
-			{
-				return false;
-			}
-			return fuelStorage.IsFull();
-		}
-		default:
-		{
-			OreHopper oreStorage = GetOreStorage();
-			if (!(oreStorage != null))
-			{
-				return false;
-			}
-			return oreStorage.IsFull();
-		}
-		}
-	}
-
-	private bool WagonIsEmpty()
-	{
-		TrainCarUnloadable activeUnloadable = GetActiveUnloadable();
-		if (activeUnloadable != null)
-		{
-			return activeUnloadable.GetOrePercent() == 0f;
-		}
-		return true;
-	}
-
-	private bool CanUnloadNow(out ActionAttemptStatus attemptStatus)
-	{
-		if (!HasUnloadableLinedUp)
-		{
-			attemptStatus = ActionAttemptStatus.NoTrainCar;
-			return false;
-		}
-		if (OutputBinIsFull())
-		{
-			attemptStatus = ActionAttemptStatus.OutputIsFull;
-			return false;
-		}
-		attemptStatus = ActionAttemptStatus.NoError;
-		return IsPowered();
-	}
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("CoalingTower.OnRpcMessage"))
@@ -703,7 +703,7 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Next "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Next ");
 				}
 				using (TimeWarning.New("RPC_Next"))
 				{
@@ -739,7 +739,7 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Prev "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Prev ");
 				}
 				using (TimeWarning.New("RPC_Prev"))
 				{
@@ -775,7 +775,7 @@ public class CoalingTower : IOEntity, INotifyEntityTrigger
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Unload "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Unload ");
 				}
 				using (TimeWarning.New("RPC_Unload"))
 				{

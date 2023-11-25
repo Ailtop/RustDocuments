@@ -65,7 +65,8 @@ public class PaddlingPool : LiquidContainer, ISplashable
 
 	public int DoSplash(ItemDefinition splashType, int amount)
 	{
-		base.inventory.AddItem(splashType, amount, 0uL);
+		int amount2 = Mathf.Clamp(Mathf.RoundToInt((float)amount * 0.66f), 1, amount);
+		base.inventory.AddItem(splashType, amount2, 0uL);
 		return amount;
 	}
 

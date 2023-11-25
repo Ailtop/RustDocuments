@@ -659,8 +659,18 @@ public class TexasHoldEmController : CardGameController
 		return (int)pokerInputOption;
 	}
 
-	protected override void HandlePlayerLeavingDuringTheirTurn(CardPlayerData pData)
+	protected override void HandlePlayerLeavingTable(CardPlayerData pData)
 	{
-		ReceivedInputFromPlayer(pData, 1, countAsAction: true, 0, playerInitiated: false);
+		if (TryGetActivePlayer(out var activePlayer))
+		{
+			if (pData == activePlayer)
+			{
+				ReceivedInputFromPlayer(pData, 1, countAsAction: true, 0, playerInitiated: false);
+			}
+			else if (pData.HasUserInCurrentRound && pData.mountIndex < activePlayer.mountIndex && activePlayerIndex > 0)
+			{
+				activePlayerIndex--;
+			}
+		}
 	}
 }

@@ -10,6 +10,8 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 {
 	public bool AutomaticallySetup;
 
+	public bool BypassProceduralSpawn;
+
 	public GameObject terrain;
 
 	public GameObject decorPrefab;
@@ -27,6 +29,11 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 	public uint EditorSize;
 
 	public string EditorUrl = string.Empty;
+
+	public string EditorConfigFile = string.Empty;
+
+	[TextArea]
+	public string EditorConfigString = string.Empty;
 
 	public List<ProceduralObject> ProceduralObjects = new List<ProceduralObject>();
 
@@ -47,7 +54,7 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 	protected override void Awake()
 	{
 		base.Awake();
-		Prefab[] array = Prefab.Load("assets/bundled/prefabs/world");
+		Prefab[] array = Prefab.Load("assets/bundled/prefabs/world", null, null, useProbabilities: false, useWorldConfig: false);
 		foreach (Prefab prefab in array)
 		{
 			if (prefab.Object.GetComponent<BaseEntity>() != null)
@@ -87,6 +94,14 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 		World.Serialization = new WorldSerialization();
 		World.Cached = false;
 		World.CleanupOldFiles();
+		if (!string.IsNullOrEmpty(EditorConfigString))
+		{
+			ConVar.World.configString = EditorConfigString;
+		}
+		if (!string.IsNullOrEmpty(EditorConfigFile))
+		{
+			ConVar.World.configFile = EditorConfigFile;
+		}
 		if (AutomaticallySetup)
 		{
 			StartCoroutine(InitCoroutine());
@@ -114,6 +129,18 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 		else
 		{
 			Debug.Log("Generating procedural map of size " + World.Size + " with seed " + World.Seed);
+		}
+		World.Config = new WorldConfig();
+		if (!string.IsNullOrEmpty(ConVar.World.configString))
+		{
+			Debug.Log("Loading custom world config from world.configstring convar");
+			World.Config.LoadFromJsonString(ConVar.World.configString);
+		}
+		else if (!string.IsNullOrEmpty(ConVar.World.configFile))
+		{
+			string text = ConVar.Server.rootFolder + "/" + ConVar.World.configFile;
+			Debug.Log("Loading custom world config from world.configfile convar: " + text);
+			World.Config.LoadFromJsonFile(text);
 		}
 		ProceduralComponent[] components = GetComponentsInChildren<ProceduralComponent>(includeInactive: true);
 		Timing downloadTimer = Timing.Start("Downloading World");
@@ -222,6 +249,16 @@ public class WorldSetup : SingletonComponent<WorldSetup>
 			TerrainMeta.Path.Rivers.AddRange(World.GetPaths("River"));
 			TerrainMeta.Path.Powerlines.AddRange(World.GetPaths("Powerline"));
 			TerrainMeta.Path.Rails.AddRange(World.GetPaths("Rail"));
+		}
+		if (TerrainMeta.Path != null)
+		{
+			foreach (DungeonBaseLink dungeonBaseLink in TerrainMeta.Path.DungeonBaseLinks)
+			{
+				if (dungeonBaseLink != null)
+				{
+					dungeonBaseLink.Initialize();
+				}
+			}
 		}
 		spawnTimer.End();
 		Timing procgenTimer = Timing.Start("Processing World");

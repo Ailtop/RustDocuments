@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Facepunch;
 using Network;
 using UnityEngine;
 
@@ -60,28 +58,11 @@ public class JunkPile : BaseEntity
 
 	public void CheckEmpty()
 	{
-		if (SpawnGroupsEmpty() && !PlayersNearby())
+		if (SpawnGroupsEmpty() && !BaseNetworkable.HasCloseConnections(base.transform.position, TimeoutPlayerCheckRadius()))
 		{
 			CancelInvoke(CheckEmpty);
 			SinkAndDestroy();
 		}
-	}
-
-	public bool PlayersNearby()
-	{
-		List<BasePlayer> obj = Pool.GetList<BasePlayer>();
-		Vis.Entities(base.transform.position, TimeoutPlayerCheckRadius(), obj, 131072);
-		bool result = false;
-		foreach (BasePlayer item in obj)
-		{
-			if (!item.IsSleeping() && item.IsAlive() && !(item is HumanNPC))
-			{
-				result = true;
-				break;
-			}
-		}
-		Pool.FreeList(ref obj);
-		return result;
 	}
 
 	public virtual float TimeoutPlayerCheckRadius()
@@ -91,7 +72,7 @@ public class JunkPile : BaseEntity
 
 	public void TimeOut()
 	{
-		if (PlayersNearby())
+		if (BaseNetworkable.HasCloseConnections(base.transform.position, TimeoutPlayerCheckRadius()))
 		{
 			Invoke(TimeOut, 30f);
 			return;

@@ -60,7 +60,7 @@ public class AdvancedChristmasLights : IOEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetAnimationStyle "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetAnimationStyle ");
 				}
 				using (TimeWarning.New("SetAnimationStyle"))
 				{
@@ -192,15 +192,17 @@ public class AdvancedChristmasLights : IOEntity
 		return true;
 	}
 
-	[RPC_Server]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
 	public void SetAnimationStyle(RPCMessage msg)
 	{
 		int value = msg.read.Int32();
 		value = Mathf.Clamp(value, 1, 7);
 		if (Global.developer > 0)
 		{
-			Debug.Log("Set animation style to :" + value + " old was : " + (int)animationStyle);
+			string text = value.ToString();
+			int num = (int)animationStyle;
+			Debug.Log("Set animation style to :" + text + " old was : " + num);
 		}
 		AnimationType animationType = (AnimationType)value;
 		if (animationType != animationStyle)

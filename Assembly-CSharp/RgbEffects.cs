@@ -37,8 +37,8 @@ public class RgbEffects : SingletonComponent<RgbEffects>
 	{
 	}
 
-	[EditorBrowsable(EditorBrowsableState.Never)]
 	[ClientVar(Name = "pulse")]
+	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static void ConVar_Pulse(ConsoleSystem.Arg args)
 	{
 	}

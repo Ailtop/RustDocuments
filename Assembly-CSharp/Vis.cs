@@ -9,7 +9,7 @@ public static class Vis
 
 	private static void Buffer(Vector3 position, float radius, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide)
 	{
-		layerMask = GamePhysics.HandleTerrainCollision(position, layerMask);
+		layerMask = GamePhysics.HandleIgnoreCollision(position, layerMask);
 		int num = colCount;
 		colCount = Physics.OverlapSphereNonAlloc(position, radius, colBuffer, layerMask, triggerInteraction);
 		for (int i = colCount; i < num; i++)
@@ -35,7 +35,7 @@ public static class Vis
 		for (int i = 0; i < colCount; i++)
 		{
 			T val = colBuffer[i] as T;
-			if (!((Object)val == (Object)null) && val.enabled)
+			if (!(val == null) && val.enabled)
 			{
 				list.Add(val);
 			}
@@ -51,7 +51,7 @@ public static class Vis
 			if (!(collider == null) && collider.enabled)
 			{
 				T component = collider.GetComponent<T>();
-				if (!((Object)component == (Object)null))
+				if (!(component == null))
 				{
 					list.Add(component);
 				}
@@ -86,7 +86,7 @@ public static class Vis
 			if (!(baseEntity == null))
 			{
 				T component = baseEntity.GetComponent<T>();
-				if (!((Object)component == (Object)null))
+				if (!(component == null))
 				{
 					list.Add(component);
 				}
@@ -96,7 +96,7 @@ public static class Vis
 
 	private static void Buffer(OBB bounds, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide)
 	{
-		layerMask = GamePhysics.HandleTerrainCollision(bounds.position, layerMask);
+		layerMask = GamePhysics.HandleIgnoreCollision(bounds.position, layerMask);
 		int num = colCount;
 		colCount = Physics.OverlapBoxNonAlloc(bounds.position, bounds.extents, colBuffer, bounds.rotation, layerMask, triggerInteraction);
 		for (int i = colCount; i < num; i++)
@@ -116,7 +116,7 @@ public static class Vis
 		for (int i = 0; i < colCount; i++)
 		{
 			T val = colBuffer[i] as T;
-			if (!((Object)val == (Object)null) && val.enabled)
+			if (!(val == null) && val.enabled)
 			{
 				list.Add(val);
 			}
@@ -132,7 +132,7 @@ public static class Vis
 			if (!(collider == null) && collider.enabled)
 			{
 				T component = collider.GetComponent<T>();
-				if (!((Object)component == (Object)null))
+				if (!(component == null))
 				{
 					list.Add(component);
 				}
@@ -149,7 +149,7 @@ public static class Vis
 			if (!(collider == null) && collider.enabled)
 			{
 				T val = GameObjectEx.ToBaseEntity(collider) as T;
-				if (!((Object)val == (Object)null))
+				if (!(val == null))
 				{
 					list.Add(val);
 				}
@@ -171,7 +171,7 @@ public static class Vis
 			if (!(baseEntity == null))
 			{
 				T component = baseEntity.GetComponent<T>();
-				if (!((Object)component == (Object)null))
+				if (!(component == null))
 				{
 					list.Add(component);
 				}
@@ -181,7 +181,7 @@ public static class Vis
 
 	private static void Buffer(Vector3 startPosition, Vector3 endPosition, float radius, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide)
 	{
-		layerMask = GamePhysics.HandleTerrainCollision(startPosition, layerMask);
+		layerMask = GamePhysics.HandleIgnoreCollision(startPosition, layerMask);
 		int num = colCount;
 		colCount = Physics.OverlapCapsuleNonAlloc(startPosition, endPosition, radius, colBuffer, layerMask, triggerInteraction);
 		for (int i = colCount; i < num; i++)
@@ -195,6 +195,36 @@ public static class Vis
 		}
 	}
 
+	public static void Colliders<T>(Vector3 startPosition, Vector3 endPosition, float radius, List<T> list, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide) where T : Collider
+	{
+		Buffer(startPosition, endPosition, radius, layerMask, triggerInteraction);
+		for (int i = 0; i < colCount; i++)
+		{
+			T val = colBuffer[i] as T;
+			if (!(val == null) && val.enabled)
+			{
+				list.Add(val);
+			}
+		}
+	}
+
+	public static void Components<T>(Vector3 startPosition, Vector3 endPosition, float radius, List<T> list, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide) where T : Component
+	{
+		Buffer(startPosition, endPosition, radius, layerMask, triggerInteraction);
+		for (int i = 0; i < colCount; i++)
+		{
+			Collider collider = colBuffer[i];
+			if (!(collider == null) && collider.enabled)
+			{
+				T component = collider.GetComponent<T>();
+				if (!(component == null))
+				{
+					list.Add(component);
+				}
+			}
+		}
+	}
+
 	public static void Entities<T>(Vector3 startPosition, Vector3 endPosition, float radius, List<T> list, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide) where T : BaseEntity
 	{
 		Buffer(startPosition, endPosition, radius, layerMask, triggerInteraction);
@@ -204,9 +234,31 @@ public static class Vis
 			if (!(collider == null) && collider.enabled)
 			{
 				T val = GameObjectEx.ToBaseEntity(collider) as T;
-				if (!((Object)val == (Object)null))
+				if (!(val == null))
 				{
 					list.Add(val);
+				}
+			}
+		}
+	}
+
+	public static void EntityComponents<T>(Vector3 startPosition, Vector3 endPosition, float radius, List<T> list, int layerMask = -1, QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Collide) where T : EntityComponentBase
+	{
+		Buffer(startPosition, endPosition, radius, layerMask, triggerInteraction);
+		for (int i = 0; i < colCount; i++)
+		{
+			Collider collider = colBuffer[i];
+			if (collider == null || !collider.enabled)
+			{
+				continue;
+			}
+			BaseEntity baseEntity = GameObjectEx.ToBaseEntity(collider);
+			if (!(baseEntity == null))
+			{
+				T component = baseEntity.GetComponent<T>();
+				if (!(component == null))
+				{
+					list.Add(component);
 				}
 			}
 		}

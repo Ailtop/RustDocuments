@@ -29,6 +29,12 @@ public class BuildingPrivlidge : StorageContainer
 		}
 	}
 
+	public List<PlayerNameID> authorizedPlayers = new List<PlayerNameID>();
+
+	public const Flags Flag_MaxAuths = Flags.Reserved5;
+
+	public List<ItemDefinition> allowedConstructionItems = new List<ItemDefinition>();
+
 	public float cachedProtectedMinutes;
 
 	public float nextProtectedCalcTime;
@@ -43,12 +49,6 @@ public class BuildingPrivlidge : StorageContainer
 
 	public List<ItemAmount> upkeepBuffer = new List<ItemAmount>();
 
-	public List<PlayerNameID> authorizedPlayers = new List<PlayerNameID>();
-
-	public const Flags Flag_MaxAuths = Flags.Reserved5;
-
-	public List<ItemDefinition> allowedConstructionItems = new List<ItemDefinition>();
-
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BuildingPrivlidge.OnRpcMessage"))
@@ -58,7 +58,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - AddSelfAuthorize "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - AddSelfAuthorize ");
 				}
 				using (TimeWarning.New("AddSelfAuthorize"))
 				{
@@ -94,7 +94,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - ClearList "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - ClearList ");
 				}
 				using (TimeWarning.New("ClearList"))
 				{
@@ -130,7 +130,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RemoveSelfAuthorize "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RemoveSelfAuthorize ");
 				}
 				using (TimeWarning.New("RemoveSelfAuthorize"))
 				{
@@ -166,7 +166,7 @@ public class BuildingPrivlidge : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Rotate "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Rotate ");
 				}
 				using (TimeWarning.New("RPC_Rotate"))
 				{
@@ -199,6 +199,246 @@ public class BuildingPrivlidge : StorageContainer
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public override void ResetState()
+	{
+		base.ResetState();
+		authorizedPlayers.Clear();
+	}
+
+	public bool IsAuthed(BasePlayer player)
+	{
+		return authorizedPlayers.Any((PlayerNameID x) => x.userid == player.userID);
+	}
+
+	public bool IsAuthed(ulong userID)
+	{
+		return authorizedPlayers.Any((PlayerNameID x) => x.userid == userID);
+	}
+
+	public bool AnyAuthed()
+	{
+		return authorizedPlayers.Count > 0;
+	}
+
+	public override bool ItemFilter(Item item, int targetSlot)
+	{
+		bool flag = allowedConstructionItems.Contains(item.info);
+		if (!flag && targetSlot == -1)
+		{
+			int num = 0;
+			foreach (Item item2 in base.inventory.itemList)
+			{
+				if (!allowedConstructionItems.Contains(item2.info) && (item2.info != item.info || item2.amount == item2.MaxStackable()))
+				{
+					num++;
+				}
+			}
+			if (num >= 24)
+			{
+				return false;
+			}
+		}
+		if (targetSlot >= 24 && targetSlot <= 28)
+		{
+			return flag;
+		}
+		return base.ItemFilter(item, targetSlot);
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		info.msg.buildingPrivilege = Facepunch.Pool.Get<BuildingPrivilege>();
+		info.msg.buildingPrivilege.users = authorizedPlayers;
+		if (!info.forDisk)
+		{
+			info.msg.buildingPrivilege.upkeepPeriodMinutes = CalculateUpkeepPeriodMinutes();
+			info.msg.buildingPrivilege.costFraction = CalculateUpkeepCostFraction();
+			info.msg.buildingPrivilege.protectedMinutes = GetProtectedMinutes();
+		}
+	}
+
+	public override void PostSave(SaveInfo info)
+	{
+		info.msg.buildingPrivilege.users = null;
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		base.Load(info);
+		authorizedPlayers.Clear();
+		if (info.msg.buildingPrivilege != null && info.msg.buildingPrivilege.users != null)
+		{
+			authorizedPlayers = info.msg.buildingPrivilege.users;
+			if (!info.fromDisk)
+			{
+				cachedProtectedMinutes = info.msg.buildingPrivilege.protectedMinutes;
+			}
+			info.msg.buildingPrivilege.users = null;
+		}
+	}
+
+	public void BuildingDirty()
+	{
+		if (base.isServer)
+		{
+			AddDelayedUpdate();
+		}
+	}
+
+	public bool AtMaxAuthCapacity()
+	{
+		return HasFlag(Flags.Reserved5);
+	}
+
+	public void UpdateMaxAuthCapacity()
+	{
+		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
+		if ((bool)activeGameMode && activeGameMode.limitTeamAuths)
+		{
+			SetFlag(Flags.Reserved5, authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize());
+		}
+	}
+
+	protected override void OnInventoryDirty()
+	{
+		base.OnInventoryDirty();
+		AddDelayedUpdate();
+	}
+
+	public override void OnItemAddedOrRemoved(Item item, bool bAdded)
+	{
+		base.OnItemAddedOrRemoved(item, bAdded);
+		AddDelayedUpdate();
+	}
+
+	public void AddDelayedUpdate()
+	{
+		if (IsInvoking(DelayedUpdate))
+		{
+			CancelInvoke(DelayedUpdate);
+		}
+		Invoke(DelayedUpdate, 1f);
+	}
+
+	public void DelayedUpdate()
+	{
+		MarkProtectedMinutesDirty();
+		SendNetworkUpdate();
+	}
+
+	public bool CanAdministrate(BasePlayer player)
+	{
+		BaseLock baseLock = GetSlot(Slot.Lock) as BaseLock;
+		if (baseLock == null)
+		{
+			return true;
+		}
+		return baseLock.OnTryToOpen(player);
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	public void AddSelfAuthorize(RPCMessage rpc)
+	{
+		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardAuthorize", this, rpc.player) == null)
+		{
+			AddPlayer(rpc.player);
+			SendNetworkUpdate();
+		}
+	}
+
+	public void AddPlayer(BasePlayer player)
+	{
+		if (!AtMaxAuthCapacity())
+		{
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == player.userID);
+			PlayerNameID playerNameID = new PlayerNameID();
+			playerNameID.userid = player.userID;
+			playerNameID.username = player.displayName;
+			authorizedPlayers.Add(playerNameID);
+			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "added", player.userID);
+			UpdateMaxAuthCapacity();
+		}
+	}
+
+	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
+	public void RemoveSelfAuthorize(RPCMessage rpc)
+	{
+		RPCMessage rpc2 = rpc;
+		if (rpc2.player.CanInteract() && CanAdministrate(rpc2.player) && Interface.CallHook("OnCupboardDeauthorize", this, rpc.player) == null)
+		{
+			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
+			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, rpc2.player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "removed", rpc2.player.userID);
+			UpdateMaxAuthCapacity();
+			SendNetworkUpdate();
+		}
+	}
+
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
+	public void ClearList(RPCMessage rpc)
+	{
+		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardClearList", this, rpc.player) == null)
+		{
+			authorizedPlayers.Clear();
+			UpdateMaxAuthCapacity();
+			SendNetworkUpdate();
+		}
+	}
+
+	[RPC_Server.IsVisible(3f)]
+	[RPC_Server]
+	public void RPC_Rotate(RPCMessage msg)
+	{
+		BasePlayer player = msg.player;
+		if (player.CanBuild() && (bool)player.GetHeldEntity() && player.GetHeldEntity().GetComponent<Hammer>() != null && (GetSlot(Slot.Lock) == null || !GetSlot(Slot.Lock).IsLocked()) && !HasAttachedStorageAdaptor())
+		{
+			base.transform.rotation = Quaternion.LookRotation(-base.transform.forward, base.transform.up);
+			SendNetworkUpdate();
+			Deployable component = GetComponent<Deployable>();
+			if (component != null && component.placeEffect.isValid)
+			{
+				Effect.server.Run(component.placeEffect.resourcePath, base.transform.position, Vector3.up);
+			}
+		}
+		BaseEntity slot = GetSlot(Slot.Lock);
+		if (slot != null)
+		{
+			slot.SendNetworkUpdate();
+		}
+	}
+
+	public override int GetIdealSlot(BasePlayer player, Item item)
+	{
+		if (item != null && item.info != null && allowedConstructionItems.Contains(item.info))
+		{
+			for (int i = 24; i <= 27; i++)
+			{
+				if (base.inventory.GetSlot(i) == null)
+				{
+					return i;
+				}
+			}
+		}
+		return base.GetIdealSlot(player, item);
+	}
+
+	public override bool HasSlot(Slot slot)
+	{
+		if (slot == Slot.Lock)
+		{
+			return true;
+		}
+		return base.HasSlot(slot);
+	}
+
+	public override bool SupportsChildDeployables()
+	{
+		return true;
 	}
 
 	public float CalculateUpkeepPeriodMinutes()
@@ -462,253 +702,13 @@ public class BuildingPrivlidge : StorageContainer
 			float protectedSeconds = decayEntity.GetProtectedSeconds();
 			if (num > protectedSeconds)
 			{
-				float num2 = PurchaseUpkeepTime(decayEntity, num - protectedSeconds);
-				decayEntity.AddUpkeepTime(num2);
+				float time = PurchaseUpkeepTime(decayEntity, num - protectedSeconds);
+				decayEntity.AddUpkeepTime(time);
 				if (IsDebugging())
 				{
-					Debug.Log(ToString() + " purchased upkeep time for " + decayEntity.ToString() + ": " + protectedSeconds + " + " + num2 + " = " + decayEntity.GetProtectedSeconds());
+					Debug.Log(ToString() + " purchased upkeep time for " + decayEntity.ToString() + ": " + protectedSeconds + " + " + time + " = " + decayEntity.GetProtectedSeconds());
 				}
 			}
 		}
-	}
-
-	public override void ResetState()
-	{
-		base.ResetState();
-		authorizedPlayers.Clear();
-	}
-
-	public bool IsAuthed(BasePlayer player)
-	{
-		return authorizedPlayers.Any((PlayerNameID x) => x.userid == player.userID);
-	}
-
-	public bool IsAuthed(ulong userID)
-	{
-		return authorizedPlayers.Any((PlayerNameID x) => x.userid == userID);
-	}
-
-	public bool AnyAuthed()
-	{
-		return authorizedPlayers.Count > 0;
-	}
-
-	public override bool ItemFilter(Item item, int targetSlot)
-	{
-		bool flag = allowedConstructionItems.Contains(item.info);
-		if (!flag && targetSlot == -1)
-		{
-			int num = 0;
-			foreach (Item item2 in base.inventory.itemList)
-			{
-				if (!allowedConstructionItems.Contains(item2.info) && (item2.info != item.info || item2.amount == item2.MaxStackable()))
-				{
-					num++;
-				}
-			}
-			if (num >= 24)
-			{
-				return false;
-			}
-		}
-		if (targetSlot >= 24 && targetSlot <= 27)
-		{
-			return flag;
-		}
-		return base.ItemFilter(item, targetSlot);
-	}
-
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		info.msg.buildingPrivilege = Facepunch.Pool.Get<BuildingPrivilege>();
-		info.msg.buildingPrivilege.users = authorizedPlayers;
-		if (!info.forDisk)
-		{
-			info.msg.buildingPrivilege.upkeepPeriodMinutes = CalculateUpkeepPeriodMinutes();
-			info.msg.buildingPrivilege.costFraction = CalculateUpkeepCostFraction();
-			info.msg.buildingPrivilege.protectedMinutes = GetProtectedMinutes();
-		}
-	}
-
-	public override void PostSave(SaveInfo info)
-	{
-		info.msg.buildingPrivilege.users = null;
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		base.Load(info);
-		authorizedPlayers.Clear();
-		if (info.msg.buildingPrivilege != null && info.msg.buildingPrivilege.users != null)
-		{
-			authorizedPlayers = info.msg.buildingPrivilege.users;
-			if (!info.fromDisk)
-			{
-				cachedProtectedMinutes = info.msg.buildingPrivilege.protectedMinutes;
-			}
-			info.msg.buildingPrivilege.users = null;
-		}
-	}
-
-	public void BuildingDirty()
-	{
-		if (base.isServer)
-		{
-			AddDelayedUpdate();
-		}
-	}
-
-	public bool AtMaxAuthCapacity()
-	{
-		return HasFlag(Flags.Reserved5);
-	}
-
-	public void UpdateMaxAuthCapacity()
-	{
-		BaseGameMode activeGameMode = BaseGameMode.GetActiveGameMode(serverside: true);
-		if ((bool)activeGameMode && activeGameMode.limitTeamAuths)
-		{
-			SetFlag(Flags.Reserved5, authorizedPlayers.Count >= activeGameMode.GetMaxRelationshipTeamSize());
-		}
-	}
-
-	protected override void OnInventoryDirty()
-	{
-		base.OnInventoryDirty();
-		AddDelayedUpdate();
-	}
-
-	public override void OnItemAddedOrRemoved(Item item, bool bAdded)
-	{
-		base.OnItemAddedOrRemoved(item, bAdded);
-		AddDelayedUpdate();
-	}
-
-	public void AddDelayedUpdate()
-	{
-		if (IsInvoking(DelayedUpdate))
-		{
-			CancelInvoke(DelayedUpdate);
-		}
-		Invoke(DelayedUpdate, 1f);
-	}
-
-	public void DelayedUpdate()
-	{
-		MarkProtectedMinutesDirty();
-		SendNetworkUpdate();
-	}
-
-	public bool CanAdministrate(BasePlayer player)
-	{
-		BaseLock baseLock = GetSlot(Slot.Lock) as BaseLock;
-		if (baseLock == null)
-		{
-			return true;
-		}
-		return baseLock.OnTryToOpen(player);
-	}
-
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
-	public void AddSelfAuthorize(RPCMessage rpc)
-	{
-		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardAuthorize", this, rpc.player) == null)
-		{
-			AddPlayer(rpc.player);
-			SendNetworkUpdate();
-		}
-	}
-
-	public void AddPlayer(BasePlayer player)
-	{
-		if (!AtMaxAuthCapacity())
-		{
-			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == player.userID);
-			PlayerNameID playerNameID = new PlayerNameID();
-			playerNameID.userid = player.userID;
-			playerNameID.username = player.displayName;
-			authorizedPlayers.Add(playerNameID);
-			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "added", player.userID);
-			UpdateMaxAuthCapacity();
-		}
-	}
-
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
-	public void RemoveSelfAuthorize(RPCMessage rpc)
-	{
-		RPCMessage rpc2 = rpc;
-		if (rpc2.player.CanInteract() && CanAdministrate(rpc2.player) && Interface.CallHook("OnCupboardDeauthorize", this, rpc.player) == null)
-		{
-			authorizedPlayers.RemoveAll((PlayerNameID x) => x.userid == rpc2.player.userID);
-			Facepunch.Rust.Analytics.Azure.OnEntityAuthChanged(this, rpc2.player, authorizedPlayers.Select((PlayerNameID x) => x.userid), "removed", rpc2.player.userID);
-			UpdateMaxAuthCapacity();
-			SendNetworkUpdate();
-		}
-	}
-
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
-	public void ClearList(RPCMessage rpc)
-	{
-		if (rpc.player.CanInteract() && CanAdministrate(rpc.player) && Interface.CallHook("OnCupboardClearList", this, rpc.player) == null)
-		{
-			authorizedPlayers.Clear();
-			UpdateMaxAuthCapacity();
-			SendNetworkUpdate();
-		}
-	}
-
-	[RPC_Server.IsVisible(3f)]
-	[RPC_Server]
-	public void RPC_Rotate(RPCMessage msg)
-	{
-		BasePlayer player = msg.player;
-		if (player.CanBuild() && (bool)player.GetHeldEntity() && player.GetHeldEntity().GetComponent<Hammer>() != null && (GetSlot(Slot.Lock) == null || !GetSlot(Slot.Lock).IsLocked()) && !HasAttachedStorageAdaptor())
-		{
-			base.transform.rotation = Quaternion.LookRotation(-base.transform.forward, base.transform.up);
-			SendNetworkUpdate();
-			Deployable component = GetComponent<Deployable>();
-			if (component != null && component.placeEffect.isValid)
-			{
-				Effect.server.Run(component.placeEffect.resourcePath, base.transform.position, Vector3.up);
-			}
-		}
-		BaseEntity slot = GetSlot(Slot.Lock);
-		if (slot != null)
-		{
-			slot.SendNetworkUpdate();
-		}
-	}
-
-	public override int GetIdealSlot(BasePlayer player, Item item)
-	{
-		if (item != null && item.info != null && allowedConstructionItems.Contains(item.info))
-		{
-			for (int i = 24; i <= 27; i++)
-			{
-				if (base.inventory.GetSlot(i) == null)
-				{
-					return i;
-				}
-			}
-		}
-		return base.GetIdealSlot(player, item);
-	}
-
-	public override bool HasSlot(Slot slot)
-	{
-		if (slot == Slot.Lock)
-		{
-			return true;
-		}
-		return base.HasSlot(slot);
-	}
-
-	public override bool SupportsChildDeployables()
-	{
-		return true;
 	}
 }

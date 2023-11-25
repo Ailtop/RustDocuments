@@ -66,7 +66,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - BuyItem "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - BuyItem ");
 				}
 				using (TimeWarning.New("BuyItem"))
 				{
@@ -106,7 +106,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_AddSellOrder "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_AddSellOrder ");
 				}
 				using (TimeWarning.New("RPC_AddSellOrder"))
 				{
@@ -142,7 +142,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_Broadcast "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_Broadcast ");
 				}
 				using (TimeWarning.New("RPC_Broadcast"))
 				{
@@ -178,7 +178,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_DeleteSellOrder "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_DeleteSellOrder ");
 				}
 				using (TimeWarning.New("RPC_DeleteSellOrder"))
 				{
@@ -214,7 +214,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenAdmin "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenAdmin ");
 				}
 				using (TimeWarning.New("RPC_OpenAdmin"))
 				{
@@ -250,7 +250,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenShop "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenShop ");
 				}
 				using (TimeWarning.New("RPC_OpenShop"))
 				{
@@ -286,7 +286,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_RotateVM "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_RotateVM ");
 				}
 				using (TimeWarning.New("RPC_RotateVM"))
 				{
@@ -322,7 +322,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_UpdateShopName "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_UpdateShopName ");
 				}
 				using (TimeWarning.New("RPC_UpdateShopName"))
 				{
@@ -358,7 +358,7 @@ public class VendingMachine : StorageContainer
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - TransactionStart "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - TransactionStart ");
 				}
 				using (TimeWarning.New("TransactionStart"))
 				{
@@ -602,8 +602,8 @@ public class VendingMachine : StorageContainer
 	}
 
 	[RPC_Server]
-	[RPC_Server.CallsPerSecond(5uL)]
 	[RPC_Server.IsVisible(3f)]
+	[RPC_Server.CallsPerSecond(5uL)]
 	public void BuyItem(RPCMessage rpc)
 	{
 		if (OccupiedCheck(rpc.player))
@@ -629,8 +629,8 @@ public class VendingMachine : StorageContainer
 		Decay.RadialDecayTouch(base.transform.position, 40f, 2097408);
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void TransactionStart(RPCMessage rpc)
 	{
 	}
@@ -688,10 +688,10 @@ public class VendingMachine : StorageContainer
 			Facepunch.Pool.FreeList(ref obj2);
 			return false;
 		}
-		List<Item> source = buyer.inventory.FindItemIDs(sellOrder.currencyID);
+		List<Item> source = buyer.inventory.FindItemsByItemID(sellOrder.currencyID);
 		if (sellOrder.currencyIsBP)
 		{
-			source = (from x in buyer.inventory.FindItemIDs(blueprintBaseDef.itemid)
+			source = (from x in buyer.inventory.FindItemsByItemID(blueprintBaseDef.itemid)
 				where x.blueprintTarget == sellOrder.currencyID
 				select x).ToList();
 		}
@@ -800,8 +800,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_Broadcast(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -838,8 +838,7 @@ public class VendingMachine : StorageContainer
 				flag = true;
 			}
 			myMarker.SetFlag(Flags.Busy, OutOfStock());
-			myMarker.markerShopName = shopName;
-			myMarker.server_vendingMachine = this;
+			myMarker.SetVendingMachine(this, shopName);
 			if (flag)
 			{
 				myMarker.Spawn();
@@ -868,8 +867,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_OpenAdmin(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -942,8 +941,8 @@ public class VendingMachine : StorageContainer
 		return false;
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_DeleteSellOrder(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;
@@ -978,8 +977,8 @@ public class VendingMachine : StorageContainer
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void RPC_AddSellOrder(RPCMessage msg)
 	{
 		BasePlayer player = msg.player;

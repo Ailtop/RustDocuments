@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConVar;
@@ -14,6 +15,9 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 	public LinkedList<ItemCraftTask> queue = new LinkedList<ItemCraftTask>();
 
 	public int taskUID;
+
+	[NonSerialized]
+	public BasePlayer owner;
 
 	public void AddContainer(ItemContainer container)
 	{
@@ -43,11 +47,11 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		ItemCraftTask value = queue.First.Value;
 		if (value.cancelled)
 		{
-			value.owner.Command("note.craft_done", value.taskUID, 0);
+			owner.Command("note.craft_done", value.taskUID, 0);
 			queue.RemoveFirst();
 			return;
 		}
-		float currentCraftLevel = value.owner.currentCraftLevel;
+		float currentCraftLevel = owner.currentCraftLevel;
 		if (value.endTime > UnityEngine.Time.realtimeSinceStartup)
 		{
 			return;
@@ -56,11 +60,11 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			float scaledDuration = GetScaledDuration(value.blueprint, currentCraftLevel);
 			value.endTime = UnityEngine.Time.realtimeSinceStartup + scaledDuration;
-			value.workbenchEntity = value.owner.GetCachedCraftLevelWorkbench();
-			if (value.owner != null)
+			value.workbenchEntity = owner.GetCachedCraftLevelWorkbench();
+			if (owner != null)
 			{
-				value.owner.Command("note.craft_start", value.taskUID, scaledDuration, value.amount);
-				if (value.owner.IsAdmin && Craft.instant)
+				owner.Command("note.craft_start", value.taskUID, scaledDuration, value.amount);
+				if (owner.IsAdmin && Craft.instant)
 				{
 					value.endTime = UnityEngine.Time.realtimeSinceStartup + 1f;
 				}
@@ -103,20 +107,19 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			CollectIngredient(ingredient.itemid, (int)ingredient.amount * amount, list);
 		}
-		task.potentialOwners = new List<ulong>();
 		foreach (Item item in list)
 		{
 			item.CollectedForCrafting(player);
-			if (!task.potentialOwners.Contains(player.userID))
-			{
-				task.potentialOwners.Add(player.userID);
-			}
 		}
 		task.takenItems = list;
 	}
 
 	public bool CraftItem(ItemBlueprint bp, BasePlayer owner, ProtoBuf.Item.InstanceData instanceData = null, int amount = 1, int skinID = 0, Item fromTempBlueprint = null, bool free = false)
 	{
+		if (owner != null && owner.IsTransferring())
+		{
+			return false;
+		}
 		if (!CanCraft(bp, amount, free))
 		{
 			return false;
@@ -130,7 +133,6 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 		itemCraftTask.endTime = 0f;
 		itemCraftTask.taskUID = taskUID;
-		itemCraftTask.owner = owner;
 		itemCraftTask.instanceData = instanceData;
 		if (itemCraftTask.instanceData != null)
 		{
@@ -154,9 +156,9 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 			return (bool)obj;
 		}
 		queue.AddLast(itemCraftTask);
-		if (itemCraftTask.owner != null)
+		if (owner != null)
 		{
-			itemCraftTask.owner.Command("note.craft_add", itemCraftTask.taskUID, itemCraftTask.blueprint.targetItem.itemid, amount, itemCraftTask.skinID);
+			owner.Command("note.craft_add", itemCraftTask.taskUID, itemCraftTask.blueprint.targetItem.itemid, amount, itemCraftTask.skinID);
 		}
 		return true;
 	}
@@ -169,8 +171,8 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		Item item = ItemManager.CreateByItemID(task.blueprint.targetItem.itemid, 1, skin);
 		item.amount = task.blueprint.amountToCreate;
 		int amount = item.amount;
-		_ = task.owner.currentCraftLevel;
-		bool inSafezone = task.owner.InSafeZone();
+		_ = owner.currentCraftLevel;
+		bool inSafezone = owner.InSafeZone();
 		if (item.hasCondition && task.conditionScale != 1f)
 		{
 			item.maxCondition *= task.conditionScale;
@@ -198,24 +200,24 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		}
 		Facepunch.Rust.Analytics.Server.Crafting(task.blueprint.targetItem.shortname, task.skinID);
 		Facepunch.Rust.Analytics.Azure.OnCraftItem(item.info.shortname, item.amount, base.baseEntity, task.workbenchEntity, inSafezone);
-		task.owner.Command("note.craft_done", task.taskUID, 1, task.amount);
-		Interface.CallHook("OnItemCraftFinished", task, item);
+		owner.Command("note.craft_done", task.taskUID, 1, task.amount);
+		Interface.CallHook("OnItemCraftFinished", task, item, this);
 		if (task.instanceData != null)
 		{
 			item.instanceData = task.instanceData;
 		}
 		if (!string.IsNullOrEmpty(task.blueprint.UnlockAchievment))
 		{
-			task.owner.GiveAchievement(task.blueprint.UnlockAchievment);
+			owner.GiveAchievement(task.blueprint.UnlockAchievment);
 		}
-		if (task.owner.inventory.GiveItem(item))
+		if (owner.inventory.GiveItem(item))
 		{
-			task.owner.Command("note.inv", item.info.itemid, amount);
+			owner.Command("note.inv", item.info.itemid, amount);
 			return;
 		}
 		ItemContainer itemContainer = containers.First();
-		task.owner.Command("note.inv", item.info.itemid, amount);
-		task.owner.Command("note.inv", item.info.itemid, -item.amount);
+		owner.Command("note.inv", item.info.itemid, amount);
+		owner.Command("note.inv", item.info.itemid, -item.amount);
 		item.Drop(itemContainer.dropPosition, itemContainer.dropVelocity);
 	}
 
@@ -225,18 +227,22 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			return false;
 		}
+		if (owner != null && owner.IsTransferring())
+		{
+			return false;
+		}
 		ItemCraftTask itemCraftTask = queue.FirstOrDefault((ItemCraftTask x) => x.taskUID == iID && !x.cancelled);
 		if (itemCraftTask == null)
 		{
 			return false;
 		}
 		itemCraftTask.cancelled = true;
-		if (itemCraftTask.owner == null)
+		if (owner == null)
 		{
 			return true;
 		}
-		Interface.CallHook("OnItemCraftCancelled", itemCraftTask);
-		itemCraftTask.owner.Command("note.craft_done", itemCraftTask.taskUID, 0);
+		Interface.CallHook("OnItemCraftCancelled", itemCraftTask, this);
+		owner.Command("note.craft_done", itemCraftTask.taskUID, 0);
 		if (itemCraftTask.takenItems != null && itemCraftTask.takenItems.Count > 0 && ReturnItems)
 		{
 			foreach (Item takenItem in itemCraftTask.takenItems)
@@ -247,10 +253,10 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 					{
 						takenItem.UseItem(itemCraftTask.numCrafted);
 					}
-					if (takenItem.amount > 0 && !takenItem.MoveToContainer(itemCraftTask.owner.inventory.containerMain))
+					if (takenItem.amount > 0 && !takenItem.MoveToContainer(owner.inventory.containerMain))
 					{
-						takenItem.Drop(itemCraftTask.owner.inventory.containerMain.dropPosition + UnityEngine.Random.value * Vector3.down + UnityEngine.Random.insideUnitSphere, itemCraftTask.owner.inventory.containerMain.dropVelocity);
-						itemCraftTask.owner.Command("note.inv", takenItem.info.itemid, -takenItem.amount);
+						takenItem.Drop(owner.inventory.containerMain.dropPosition + UnityEngine.Random.value * Vector3.down + UnityEngine.Random.insideUnitSphere, owner.inventory.containerMain.dropVelocity);
+						owner.Command("note.inv", takenItem.info.itemid, -takenItem.amount);
 					}
 				}
 			}
@@ -261,6 +267,10 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 	public bool CancelBlueprint(int itemid)
 	{
 		if (queue.Count == 0)
+		{
+			return false;
+		}
+		if (owner != null && owner.IsTransferring())
 		{
 			return false;
 		}
@@ -335,7 +345,12 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 
 	public bool FastTrackTask(int taskID)
 	{
+		int taskID2 = taskID;
 		if (queue.Count == 0)
+		{
+			return false;
+		}
+		if (owner != null && owner.IsTransferring())
 		{
 			return false;
 		}
@@ -344,7 +359,7 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			return false;
 		}
-		ItemCraftTask itemCraftTask = queue.FirstOrDefault((ItemCraftTask x) => x.taskUID == taskID && !x.cancelled);
+		ItemCraftTask itemCraftTask = queue.FirstOrDefault((ItemCraftTask x) => x.taskUID == taskID2 && !x.cancelled);
 		if (itemCraftTask == null)
 		{
 			return false;
@@ -353,10 +368,109 @@ public class ItemCrafter : EntityComponent<BasePlayer>
 		{
 			return false;
 		}
+		object obj = Interface.CallHook("CanFastTrackCraftTask", this, itemCraftTask, taskID);
+		if (obj is bool)
+		{
+			return (bool)obj;
+		}
 		value.endTime = 0f;
 		queue.Remove(itemCraftTask);
 		queue.AddFirst(itemCraftTask);
-		itemCraftTask.owner.Command("note.craft_fasttracked", taskID);
+		owner.Command("note.craft_fasttracked", taskID2);
 		return true;
+	}
+
+	public ProtoBuf.ItemCrafter Save()
+	{
+		ProtoBuf.ItemCrafter itemCrafter = Facepunch.Pool.Get<ProtoBuf.ItemCrafter>();
+		itemCrafter.queue = Facepunch.Pool.GetList<ProtoBuf.ItemCrafter.Task>();
+		foreach (ItemCraftTask item in queue)
+		{
+			ProtoBuf.ItemCrafter.Task task = Facepunch.Pool.Get<ProtoBuf.ItemCrafter.Task>();
+			task.itemID = item.blueprint.targetItem.itemid;
+			task.remainingTime = ((item.endTime > 0f) ? (item.endTime - UnityEngine.Time.realtimeSinceStartup) : 0f);
+			task.taskUID = item.taskUID;
+			task.cancelled = item.cancelled;
+			task.instanceData = item.instanceData?.Copy();
+			task.amount = item.amount;
+			task.skinID = item.skinID;
+			task.takenItems = SaveItems(item.takenItems);
+			task.numCrafted = item.numCrafted;
+			task.conditionScale = item.conditionScale;
+			task.workbenchEntity = (BaseNetworkableEx.IsValid(item.workbenchEntity) ? item.workbenchEntity.net.ID : default(NetworkableId));
+			itemCrafter.queue.Add(task);
+		}
+		return itemCrafter;
+		static List<ProtoBuf.Item> SaveItems(List<Item> items)
+		{
+			List<ProtoBuf.Item> list = Facepunch.Pool.GetList<ProtoBuf.Item>();
+			if (items != null)
+			{
+				foreach (Item item2 in items)
+				{
+					list.Add(item2.Save(bIncludeContainer: true));
+				}
+			}
+			return list;
+		}
+	}
+
+	public void Load(ProtoBuf.ItemCrafter proto)
+	{
+		if (proto?.queue == null)
+		{
+			return;
+		}
+		queue.Clear();
+		foreach (ProtoBuf.ItemCrafter.Task item in proto.queue)
+		{
+			ItemDefinition itemDefinition = ItemManager.FindItemDefinition(item.itemID);
+			if (itemDefinition == null || !itemDefinition.TryGetComponent<ItemBlueprint>(out var component))
+			{
+				Debug.LogWarning($"ItemCrafter has queue task for item ID {item.itemID}, but it was not found or has no blueprint. Skipping it");
+				continue;
+			}
+			ItemCraftTask itemCraftTask = Facepunch.Pool.Get<ItemCraftTask>();
+			itemCraftTask.blueprint = component;
+			itemCraftTask.endTime = ((item.remainingTime > 0f) ? (UnityEngine.Time.realtimeSinceStartup + item.remainingTime) : 0f);
+			itemCraftTask.taskUID = item.taskUID;
+			itemCraftTask.cancelled = item.cancelled;
+			itemCraftTask.instanceData = item.instanceData?.Copy();
+			itemCraftTask.amount = item.amount;
+			itemCraftTask.skinID = item.skinID;
+			itemCraftTask.takenItems = LoadItems(item.takenItems);
+			itemCraftTask.numCrafted = item.numCrafted;
+			itemCraftTask.conditionScale = item.conditionScale;
+			itemCraftTask.workbenchEntity = new EntityRef<BaseEntity>
+			{
+				uid = item.workbenchEntity
+			}.Get(serverside: true);
+			queue.AddLast(itemCraftTask);
+			taskUID = Mathf.Max(taskUID, itemCraftTask.taskUID);
+		}
+		static List<Item> LoadItems(List<ProtoBuf.Item> itemProtos)
+		{
+			List<Item> list = new List<Item>();
+			if (itemProtos != null)
+			{
+				foreach (ProtoBuf.Item itemProto in itemProtos)
+				{
+					list.Add(ItemManager.Load(itemProto, null, isServer: true));
+				}
+			}
+			return list;
+		}
+	}
+
+	public void SendToOwner()
+	{
+		if (!BaseNetworkableEx.IsValid(owner) || !owner.IsConnected)
+		{
+			return;
+		}
+		foreach (ItemCraftTask item in queue)
+		{
+			owner.Command("note.craft_add", item.taskUID, item.blueprint.targetItem.itemid, item.amount, item.skinID);
+		}
 	}
 }

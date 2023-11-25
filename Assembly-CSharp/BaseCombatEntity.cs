@@ -14,6 +14,22 @@ using UnityEngine.Assertions;
 
 public class BaseCombatEntity : BaseEntity
 {
+	public enum LifeState
+	{
+		Alive = 0,
+		Dead = 1
+	}
+
+	[Serializable]
+	public enum Faction
+	{
+		Default = 0,
+		Player = 1,
+		Bandit = 2,
+		Scientist = 3,
+		Horror = 4
+	}
+
 	[Serializable]
 	public struct Pickup
 	{
@@ -38,6 +54,9 @@ public class BaseCombatEntity : BaseEntity
 
 		[Tooltip("Inventory Must be empty (if applicable) to be picked up")]
 		public bool requireEmptyInv;
+
+		[Tooltip("If set, pickup will take this long in seconds")]
+		public float overridePickupTime;
 	}
 
 	[Serializable]
@@ -62,41 +81,6 @@ public class BaseCombatEntity : BaseEntity
 		Loud = 2
 	}
 
-	public enum LifeState
-	{
-		Alive = 0,
-		Dead = 1
-	}
-
-	[Serializable]
-	public enum Faction
-	{
-		Default = 0,
-		Player = 1,
-		Bandit = 2,
-		Scientist = 3,
-		Horror = 4
-	}
-
-	private const float MAX_HEALTH_REPAIR = 50f;
-
-	[NonSerialized]
-	public DamageType lastDamage;
-
-	[NonSerialized]
-	public BaseEntity lastAttacker;
-
-	public BaseEntity lastDealtDamageTo;
-
-	[NonSerialized]
-	public bool ResetLifeStateOnSpawn = true;
-
-	public DirectionProperties[] propDirection;
-
-	public float unHostileTime;
-
-	public float lastNoiseTime;
-
 	[Header("BaseCombatEntity")]
 	public SkeletonProperties skeletonProperties;
 
@@ -110,6 +94,7 @@ public class BaseCombatEntity : BaseEntity
 
 	public bool ShowHealthInfo = true;
 
+	[ReadOnly]
 	public LifeState lifestate;
 
 	public bool sendsHitNotification;
@@ -132,11 +117,24 @@ public class BaseCombatEntity : BaseEntity
 
 	public int lastNotifyFrame;
 
-	public float TimeSinceLastNoise => UnityEngine.Time.time - lastNoiseTime;
+	private const float MAX_HEALTH_REPAIR = 50f;
 
-	public ActionVolume LastNoiseVolume { get; private set; }
+	[NonSerialized]
+	public DamageType lastDamage;
 
-	public Vector3 LastNoisePosition { get; private set; }
+	[NonSerialized]
+	public BaseEntity lastAttacker;
+
+	public BaseEntity lastDealtDamageTo;
+
+	[NonSerialized]
+	public bool ResetLifeStateOnSpawn = true;
+
+	public DirectionProperties[] propDirection;
+
+	public float unHostileTime;
+
+	public float lastNoiseTime;
 
 	public Vector3 LastAttackedDir { get; set; }
 
@@ -163,6 +161,12 @@ public class BaseCombatEntity : BaseEntity
 		}
 	}
 
+	public float TimeSinceLastNoise => UnityEngine.Time.time - lastNoiseTime;
+
+	public ActionVolume LastNoiseVolume { get; private set; }
+
+	public Vector3 LastNoisePosition { get; private set; }
+
 	public override bool OnRpcMessage(BasePlayer player, uint rpc, Message msg)
 	{
 		using (TimeWarning.New("BaseCombatEntity.OnRpcMessage"))
@@ -172,7 +176,7 @@ public class BaseCombatEntity : BaseEntity
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_PickupStart "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_PickupStart ");
 				}
 				using (TimeWarning.New("RPC_PickupStart"))
 				{
@@ -205,6 +209,171 @@ public class BaseCombatEntity : BaseEntity
 			}
 		}
 		return base.OnRpcMessage(player, rpc, msg);
+	}
+
+	public virtual bool IsDead()
+	{
+		return lifestate == LifeState.Dead;
+	}
+
+	public virtual bool IsAlive()
+	{
+		return lifestate == LifeState.Alive;
+	}
+
+	public Faction GetFaction()
+	{
+		return faction;
+	}
+
+	public virtual bool IsFriendly(BaseCombatEntity other)
+	{
+		return false;
+	}
+
+	public override void ResetState()
+	{
+		base.ResetState();
+		health = MaxHealth();
+		if (base.isServer)
+		{
+			lastAttackedTime = float.NegativeInfinity;
+			lastDealtDamageTime = float.NegativeInfinity;
+		}
+	}
+
+	public override void DestroyShared()
+	{
+		base.DestroyShared();
+		if (base.isServer)
+		{
+			UpdateSurroundings();
+		}
+	}
+
+	public virtual float GetThreatLevel()
+	{
+		return 0f;
+	}
+
+	public override float PenetrationResistance(HitInfo info)
+	{
+		if (!baseProtection)
+		{
+			return 100f;
+		}
+		return baseProtection.density;
+	}
+
+	public virtual void ScaleDamage(HitInfo info)
+	{
+		if (info.UseProtection && baseProtection != null)
+		{
+			baseProtection.Scale(info.damageTypes);
+		}
+	}
+
+	public HitArea SkeletonLookup(uint boneID)
+	{
+		if (skeletonProperties == null)
+		{
+			return (HitArea)(-1);
+		}
+		return skeletonProperties.FindBone(boneID)?.area ?? ((HitArea)(-1));
+	}
+
+	public override void Save(SaveInfo info)
+	{
+		base.Save(info);
+		info.msg.baseCombat = Facepunch.Pool.Get<BaseCombat>();
+		info.msg.baseCombat.state = (int)lifestate;
+		info.msg.baseCombat.health = Health();
+	}
+
+	public override void PostServerLoad()
+	{
+		base.PostServerLoad();
+		if (Health() > MaxHealth())
+		{
+			health = MaxHealth();
+		}
+		if (float.IsNaN(Health()))
+		{
+			health = MaxHealth();
+		}
+	}
+
+	public override void Load(LoadInfo info)
+	{
+		if (base.isServer)
+		{
+			lifestate = LifeState.Alive;
+		}
+		if (info.msg.baseCombat != null)
+		{
+			lifestate = (LifeState)info.msg.baseCombat.state;
+			_health = info.msg.baseCombat.health;
+		}
+		base.Load(info);
+	}
+
+	public override float Health()
+	{
+		return _health;
+	}
+
+	public override float MaxHealth()
+	{
+		return _maxHealth;
+	}
+
+	public virtual float StartHealth()
+	{
+		return startHealth;
+	}
+
+	public virtual float StartMaxHealth()
+	{
+		return StartHealth();
+	}
+
+	public void SetMaxHealth(float newMax)
+	{
+		_maxHealth = newMax;
+		_health = Mathf.Min(_health, newMax);
+	}
+
+	public void DoHitNotify(HitInfo info)
+	{
+		using (TimeWarning.New("DoHitNotify"))
+		{
+			if (sendsHitNotification && !(info.Initiator == null) && info.Initiator is BasePlayer && !(this == info.Initiator) && (!info.isHeadshot || !(info.HitEntity is BasePlayer)) && UnityEngine.Time.frameCount != lastNotifyFrame)
+			{
+				lastNotifyFrame = UnityEngine.Time.frameCount;
+				bool flag = info.Weapon is BaseMelee;
+				if (base.isServer && (!flag || sendsMeleeHitNotification))
+				{
+					bool arg = info.Initiator.net.connection == info.Predicted;
+					ClientRPCPlayerAndSpectators(null, info.Initiator as BasePlayer, "HitNotify", arg);
+				}
+			}
+		}
+	}
+
+	public override void OnAttacked(HitInfo info)
+	{
+		using (TimeWarning.New("BaseCombatEntity.OnAttacked"))
+		{
+			if (!IsDead())
+			{
+				DoHitNotify(info);
+			}
+			if (base.isServer)
+			{
+				Hurt(info);
+			}
+		}
+		base.OnAttacked(info);
 	}
 
 	protected virtual int GetPickupCount()
@@ -243,8 +412,8 @@ public class BaseCombatEntity : BaseEntity
 	{
 	}
 
-	[RPC_Server]
 	[RPC_Server.MaxDistance(3f)]
+	[RPC_Server]
 	private void RPC_PickupStart(RPCMessage rpc)
 	{
 		if (rpc.player.CanInteract() && CanPickup(rpc.player))
@@ -440,7 +609,7 @@ public class BaseCombatEntity : BaseEntity
 	public virtual void Hurt(HitInfo info)
 	{
 		Assert.IsTrue(base.isServer, "This should be called serverside only");
-		if (IsDead())
+		if (IsDead() || IsTransferProtected())
 		{
 			return;
 		}
@@ -477,7 +646,7 @@ public class BaseCombatEntity : BaseEntity
 			SendNetworkUpdate();
 			if (ConVar.Global.developer > 1)
 			{
-				Debug.Log(string.Concat("[Combat]".PadRight(10), base.gameObject.name, " hurt ", info.damageTypes.GetMajorityDamageType(), "/", info.damageTypes.Total(), " - ", health.ToString("0"), " health left"));
+				Debug.Log("[Combat]".PadRight(10) + base.gameObject.name + " hurt " + info.damageTypes.GetMajorityDamageType().ToString() + "/" + info.damageTypes.Total() + " - " + health.ToString("0") + " health left");
 			}
 			lastDamage = info.damageTypes.GetMajorityDamageType();
 			lastAttacker = info.Initiator;
@@ -568,7 +737,7 @@ public class BaseCombatEntity : BaseEntity
 				text = string.Concat(obj);
 			}
 		}
-		string text2 = string.Concat("<color=lightblue>Damage:</color>".PadRight(10), info.damageTypes.Total().ToString("0.00"), "\n<color=lightblue>Health:</color>".PadRight(10), health.ToString("0.00"), " / ", (health - info.damageTypes.Total() <= 0f) ? "<color=red>" : "<color=green>", (health - info.damageTypes.Total()).ToString("0.00"), "</color>", "\n<color=lightblue>HitEnt:</color>".PadRight(10), this, "\n<color=lightblue>HitBone:</color>".PadRight(10), info.boneName, "\n<color=lightblue>Attacker:</color>".PadRight(10), info.Initiator, "\n<color=lightblue>WeaponPrefab:</color>".PadRight(10), info.WeaponPrefab, "\n<color=lightblue>Damages:</color>\n", text);
+		string text2 = "<color=lightblue>Damage:</color>".PadRight(10) + info.damageTypes.Total().ToString("0.00") + "\n<color=lightblue>Health:</color>".PadRight(10) + health.ToString("0.00") + " / " + ((health - info.damageTypes.Total() <= 0f) ? "<color=red>" : "<color=green>") + (health - info.damageTypes.Total()).ToString("0.00") + "</color>" + "\n<color=lightblue>HitEnt:</color>".PadRight(10) + this?.ToString() + "\n<color=lightblue>HitBone:</color>".PadRight(10) + info.boneName + "\n<color=lightblue>Attacker:</color>".PadRight(10) + info.Initiator?.ToString() + "\n<color=lightblue>WeaponPrefab:</color>".PadRight(10) + info.WeaponPrefab?.ToString() + "\n<color=lightblue>Damages:</color>\n" + text;
 		ConsoleNetwork.BroadcastToAllClients("ddraw.text", 60, Color.white, info.HitPositionWorld, text2);
 	}
 
@@ -656,170 +825,5 @@ public class BaseCombatEntity : BaseEntity
 			return false;
 		}
 		return Vector3.Distance(listenPosition, LastNoisePosition) <= listenRange;
-	}
-
-	public virtual bool IsDead()
-	{
-		return lifestate == LifeState.Dead;
-	}
-
-	public virtual bool IsAlive()
-	{
-		return lifestate == LifeState.Alive;
-	}
-
-	public Faction GetFaction()
-	{
-		return faction;
-	}
-
-	public virtual bool IsFriendly(BaseCombatEntity other)
-	{
-		return false;
-	}
-
-	public override void ResetState()
-	{
-		base.ResetState();
-		health = MaxHealth();
-		if (base.isServer)
-		{
-			lastAttackedTime = float.NegativeInfinity;
-			lastDealtDamageTime = float.NegativeInfinity;
-		}
-	}
-
-	public override void DestroyShared()
-	{
-		base.DestroyShared();
-		if (base.isServer)
-		{
-			UpdateSurroundings();
-		}
-	}
-
-	public virtual float GetThreatLevel()
-	{
-		return 0f;
-	}
-
-	public override float PenetrationResistance(HitInfo info)
-	{
-		if (!baseProtection)
-		{
-			return 100f;
-		}
-		return baseProtection.density;
-	}
-
-	public virtual void ScaleDamage(HitInfo info)
-	{
-		if (info.UseProtection && baseProtection != null)
-		{
-			baseProtection.Scale(info.damageTypes);
-		}
-	}
-
-	public HitArea SkeletonLookup(uint boneID)
-	{
-		if (skeletonProperties == null)
-		{
-			return (HitArea)(-1);
-		}
-		return skeletonProperties.FindBone(boneID)?.area ?? ((HitArea)(-1));
-	}
-
-	public override void Save(SaveInfo info)
-	{
-		base.Save(info);
-		info.msg.baseCombat = Facepunch.Pool.Get<BaseCombat>();
-		info.msg.baseCombat.state = (int)lifestate;
-		info.msg.baseCombat.health = Health();
-	}
-
-	public override void PostServerLoad()
-	{
-		base.PostServerLoad();
-		if (Health() > MaxHealth())
-		{
-			health = MaxHealth();
-		}
-		if (float.IsNaN(Health()))
-		{
-			health = MaxHealth();
-		}
-	}
-
-	public override void Load(LoadInfo info)
-	{
-		if (base.isServer)
-		{
-			lifestate = LifeState.Alive;
-		}
-		if (info.msg.baseCombat != null)
-		{
-			lifestate = (LifeState)info.msg.baseCombat.state;
-			_health = info.msg.baseCombat.health;
-		}
-		base.Load(info);
-	}
-
-	public override float Health()
-	{
-		return _health;
-	}
-
-	public override float MaxHealth()
-	{
-		return _maxHealth;
-	}
-
-	public virtual float StartHealth()
-	{
-		return startHealth;
-	}
-
-	public virtual float StartMaxHealth()
-	{
-		return StartHealth();
-	}
-
-	public void SetMaxHealth(float newMax)
-	{
-		_maxHealth = newMax;
-		_health = Mathf.Min(_health, newMax);
-	}
-
-	public void DoHitNotify(HitInfo info)
-	{
-		using (TimeWarning.New("DoHitNotify"))
-		{
-			if (sendsHitNotification && !(info.Initiator == null) && info.Initiator is BasePlayer && !(this == info.Initiator) && (!info.isHeadshot || !(info.HitEntity is BasePlayer)) && UnityEngine.Time.frameCount != lastNotifyFrame)
-			{
-				lastNotifyFrame = UnityEngine.Time.frameCount;
-				bool flag = info.Weapon is BaseMelee;
-				if (base.isServer && (!flag || sendsMeleeHitNotification))
-				{
-					bool arg = info.Initiator.net.connection == info.Predicted;
-					ClientRPCPlayerAndSpectators(null, info.Initiator as BasePlayer, "HitNotify", arg);
-				}
-			}
-		}
-	}
-
-	public override void OnAttacked(HitInfo info)
-	{
-		using (TimeWarning.New("BaseCombatEntity.OnAttacked"))
-		{
-			if (!IsDead())
-			{
-				DoHitNotify(info);
-			}
-			if (base.isServer)
-			{
-				Hurt(info);
-			}
-		}
-		base.OnAttacked(info);
 	}
 }

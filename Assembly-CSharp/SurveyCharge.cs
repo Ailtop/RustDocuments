@@ -12,7 +12,7 @@ public class SurveyCharge : TimedExplosive
 	public override void Explode()
 	{
 		base.Explode();
-		if (WaterLevel.Test(base.transform.position, waves: true, this))
+		if (WaterLevel.Test(base.transform.position, waves: true, volumes: true, this))
 		{
 			return;
 		}

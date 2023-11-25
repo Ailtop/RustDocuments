@@ -46,7 +46,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenLocker "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenLocker ");
 				}
 				using (TimeWarning.New("RPC_OpenLocker"))
 				{
@@ -82,7 +82,7 @@ public class VehicleModuleCamper : VehicleModuleSeating
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (ConVar.Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - RPC_OpenStorage "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - RPC_OpenStorage ");
 				}
 				using (TimeWarning.New("RPC_OpenStorage"))
 				{

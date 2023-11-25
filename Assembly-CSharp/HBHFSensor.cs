@@ -27,7 +27,7 @@ public class HBHFSensor : BaseDetector
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetIncludeAuth "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetIncludeAuth ");
 				}
 				using (TimeWarning.New("SetIncludeAuth"))
 				{
@@ -63,7 +63,7 @@ public class HBHFSensor : BaseDetector
 				Assert.IsTrue(player.isServer, "SV_RPC Message is using a clientside player!");
 				if (Global.developer > 2)
 				{
-					Debug.Log(string.Concat("SV_RPCMessage: ", player, " - SetIncludeOthers "));
+					Debug.Log("SV_RPCMessage: " + player?.ToString() + " - SetIncludeOthers ");
 				}
 				using (TimeWarning.New("SetIncludeOthers"))
 				{
@@ -169,8 +169,8 @@ public class HBHFSensor : BaseDetector
 		}
 	}
 
-	[RPC_Server.IsVisible(3f)]
 	[RPC_Server]
+	[RPC_Server.IsVisible(3f)]
 	public void SetIncludeOthers(RPCMessage msg)
 	{
 		bool b = msg.read.Bit();
