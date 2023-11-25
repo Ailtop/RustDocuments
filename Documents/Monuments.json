@@ -1,5 +1,5 @@
 {
-  "assets/bundled/prefabs/autospawn/monument/fishing_village/fishing_village_c.prefab": {
+  "assets/bundled/prefabs/autospawn/monument/fishing_village/fishing_village_b.prefab": {
     "DisplayName": "Fishing Village",
     "shouldDisplayOnMap": true,
     "MinWorldSize": 0,
@@ -34,6 +34,44 @@
         "x": 100.0,
         "y": 100.0,
         "z": 100.0
+      }
+    }
+  },
+  "assets/bundled/prefabs/autospawn/tunnel-entrance/entrance_bunker_d.prefab": {
+    "DisplayName": "Train Tunnel",
+    "shouldDisplayOnMap": false,
+    "MinWorldSize": 0,
+    "HasNavmesh": false,
+    "IsSafeZone": false,
+    "WantsDungeonLink": true,
+    "HasDungeonLink": true,
+    "Type": 7,
+    "Tier": -1,
+    "Bounds": {
+      "center": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "size": {
+        "x": 50.0,
+        "y": 50.0,
+        "z": 50.0
+      },
+      "extents": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
+      },
+      "min": {
+        "x": -25.0,
+        "y": -25.0,
+        "z": -25.0
+      },
+      "max": {
+        "x": 25.0,
+        "y": 25.0,
+        "z": 25.0
       }
     }
   },

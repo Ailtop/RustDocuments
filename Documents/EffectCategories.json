@@ -19,6 +19,7 @@
       "assets/bundled/prefabs/fx/missing.prefab",
       "assets/bundled/prefabs/fx/oil_geyser.prefab",
       "assets/bundled/prefabs/fx/ore_break.prefab",
+      "assets/bundled/prefabs/fx/parachute_land.prefab",
       "assets/bundled/prefabs/fx/screen_jump.prefab",
       "assets/bundled/prefabs/fx/screen_land.prefab",
       "assets/bundled/prefabs/fx/smoke_cover_full.prefab",
@@ -112,6 +113,12 @@
     ]
   },
   {
+    "folder": "assets/bundled/prefabs/fx/decals/blunt/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/blunt/glass_small/decal_blunt_glass_small.prefab"
+    ]
+  },
+  {
     "folder": "assets/bundled/prefabs/fx/decals/blunt/grass",
     "prefabs": [
       "assets/bundled/prefabs/fx/decals/blunt/grass/decal_blunt_grass_01.prefab"
@@ -199,6 +206,14 @@
       "assets/bundled/prefabs/fx/decals/bullet/glass/decal_bullet_glass.prefab",
       "assets/bundled/prefabs/fx/decals/bullet/glass/decal_bullet_glass2.prefab",
       "assets/bundled/prefabs/fx/decals/bullet/glass/decal_bullet_glass3.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/bullet/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/bullet/glass_small/decal_bullet_glass_small.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/glass_small/decal_bullet_glass2_small.prefab",
+      "assets/bundled/prefabs/fx/decals/bullet/glass_small/decal_bullet_glass3_small.prefab"
     ]
   },
   {
@@ -369,6 +384,12 @@
     ]
   },
   {
+    "folder": "assets/bundled/prefabs/fx/decals/slash/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/slash/glass_small/decal_slash_glass_small.prefab"
+    ]
+  },
+  {
     "folder": "assets/bundled/prefabs/fx/decals/slash/grass",
     "prefabs": [
       "assets/bundled/prefabs/fx/decals/slash/grass/decal_slash_grass_01.prefab"
@@ -447,6 +468,12 @@
     "folder": "assets/bundled/prefabs/fx/decals/stab/glass",
     "prefabs": [
       "assets/bundled/prefabs/fx/decals/stab/glass/decal_stab_glass.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/decals/stab/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/decals/stab/glass_small/decal_stab_glass_small.prefab"
     ]
   },
   {
@@ -624,6 +651,12 @@
     ]
   },
   {
+    "folder": "assets/bundled/prefabs/fx/impacts/blunt/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/blunt/glass_small/glass1_small.prefab"
+    ]
+  },
+  {
     "folder": "assets/bundled/prefabs/fx/impacts/blunt/grass",
     "prefabs": [
       "assets/bundled/prefabs/fx/impacts/blunt/grass/grass1.prefab"
@@ -741,6 +774,12 @@
     ]
   },
   {
+    "folder": "assets/bundled/prefabs/fx/impacts/bullet/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/bullet/glass_small/glass1_small.prefab"
+    ]
+  },
+  {
     "folder": "assets/bundled/prefabs/fx/impacts/bullet/grass",
     "prefabs": [
       "assets/bundled/prefabs/fx/impacts/bullet/grass/grass1.prefab"
@@ -816,6 +855,12 @@
     "folder": "assets/bundled/prefabs/fx/impacts/bullet/wood",
     "prefabs": [
       "assets/bundled/prefabs/fx/impacts/bullet/wood/wood1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/footstep",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/footstep/footstepwatersplashvfx_nester.prefab"
     ]
   },
   {
@@ -2355,6 +2400,12 @@
     ]
   },
   {
+    "folder": "assets/bundled/prefabs/fx/impacts/slash/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/slash/glass_small/glass1_small.prefab"
+    ]
+  },
+  {
     "folder": "assets/bundled/prefabs/fx/impacts/slash/grass",
     "prefabs": [
       "assets/bundled/prefabs/fx/impacts/slash/grass/grass1.prefab",
@@ -2462,6 +2513,12 @@
     "folder": "assets/bundled/prefabs/fx/impacts/stab/glass",
     "prefabs": [
       "assets/bundled/prefabs/fx/impacts/stab/glass/glass1.prefab"
+    ]
+  },
+  {
+    "folder": "assets/bundled/prefabs/fx/impacts/stab/glass_small",
+    "prefabs": [
+      "assets/bundled/prefabs/fx/impacts/stab/glass_small/glass1_small.prefab"
     ]
   },
   {

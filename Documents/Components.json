@@ -2160,6 +2160,17 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "net_global": [
+    "GlobalNetworkHandler",
+    "PointEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "clan_manager": [
+    "ClanManager",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "community": [
     "CommunityEntity",
     "PointEntity",
@@ -2211,6 +2222,26 @@
   ],
   "tree_marking_nospherecast": [
     "TreeMarker",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "nexus.dock.terminal": [
+    "NexusDockTerminal",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "nexusferry.entity": [
+    "NexusFerry",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "islandmarker": [
+    "MapMarker",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "nexusisland": [
+    "NexusIsland",
     "BaseEntity",
     "BaseNetworkable"
   ],
@@ -2345,6 +2376,26 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "sentry.scientist.barge": [
+    "NPCAutoTurret",
+    "AutoTurret",
+    "ContainerIOEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "sentry.scientist.barge.static": [
+    "NPCAutoTurret",
+    "AutoTurret",
+    "ContainerIOEntity",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "sentry.scientist.static": [
     "NPCAutoTurret",
     "AutoTurret",
@@ -2360,6 +2411,16 @@
     "IOEntity",
     "DecayEntity",
     "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "train_signal_lights_a": [
+    "TrainSignal",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "train_signal_lights_b": [
+    "TrainSignal",
     "BaseEntity",
     "BaseNetworkable"
   ],
@@ -2525,6 +2586,39 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "attackhelicopter.entity": [
+    "AttackHelicopter",
+    "PlayerHelicopter",
+    "BaseHelicopter",
+    "BaseVehicle",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "fuel_storage_attackheli": [
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rockets_attackheli": [
+    "AttackHelicopterRockets",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "turret_attackheli": [
+    "AttackHelicopterTurret",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "ball.entity": [
     "SoccerBall",
     "BaseCombatEntity",
@@ -2588,6 +2682,38 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "door.hinged.tugboat.door": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "tugboat fuel_storage": [
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "tugboat_privilege": [
+    "VehiclePrivilege",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "tugboat": [
+    "Spawnable",
+    "Tugboat",
+    "MotorRowboat",
+    "BaseBoat",
+    "BaseVehicle",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "junktest": [
     "BaseCombatEntity",
     "BaseEntity",
@@ -2609,8 +2735,9 @@
   ],
   "minicopter.entity": [
     "Spawnable",
-    "MiniCopter",
-    "BaseHelicopterVehicle",
+    "Minicopter",
+    "PlayerHelicopter",
+    "BaseHelicopter",
     "BaseVehicle",
     "BaseMountable",
     "BaseCombatEntity",
@@ -3245,8 +3372,8 @@
   "scraptransporthelicopter": [
     "Spawnable",
     "ScrapTransportHelicopter",
-    "MiniCopter",
-    "BaseHelicopterVehicle",
+    "PlayerHelicopter",
+    "BaseHelicopter",
     "BaseVehicle",
     "BaseMountable",
     "BaseCombatEntity",
@@ -3664,6 +3791,11 @@
   ],
   "rocket_fire": [
     "FlameExplosive",
+    "TimedExplosive",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rocket_heatseeker": [
     "TimedExplosive",
     "BaseEntity",
     "BaseNetworkable"
@@ -4368,6 +4500,24 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "clan.table": [
+    "ClanTable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "clantable.deployed": [
+    "ClanTable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "clantable.static": [
+    "ClanTable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "composter": [
     "Composter",
     "StorageContainer",
@@ -4666,6 +4816,22 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "weaponracklight": [
+    "SimpleLight",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponracklightdouble": [
+    "SimpleLight",
+    "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "hitchtrough.deployed": [
     "HitchTrough",
     "StorageContainer",
@@ -4674,9 +4840,25 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "door.hinged.hab_t1": [
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "hotairballoon": [
     "Spawnable",
     "HotAirBalloon",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "hotairballoon_armor_t1": [
+    "HotAirBalloonArmor",
+    "HotAirBalloonEquipment",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -5778,9 +5960,57 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
-  "generator.wind.scrap": [
-    "SimpleBuildingBlock",
-    "StabilityEntity",
+  "weaponrack_horizontal.deployed": [
+    "WeaponRack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponrack_single1.deployed": [
+    "WeaponRack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponrack_single2.deployed": [
+    "WeaponRack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponrack_single3.deployed": [
+    "WeaponRack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponrack_stand.deployed": [
+    "WeaponRack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponrack_tall.deployed": [
+    "WeaponRack",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "weaponrack_wide.deployed": [
+    "WeaponRack",
+    "StorageContainer",
     "DecayEntity",
     "BaseCombatEntity",
     "BaseEntity",
@@ -5789,6 +6019,14 @@
   "electric.windmill.small": [
     "ElectricWindmill",
     "IOEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "generator.wind.scrap": [
+    "SimpleBuildingBlock",
+    "StabilityEntity",
     "DecayEntity",
     "BaseCombatEntity",
     "BaseEntity",
@@ -6323,6 +6561,160 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "door.double.hinged.bardoors": [
+    "GestureDoor",
+    "Door",
+    "AnimatedBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "bathtub.planter.deployed": [
+    "PlanterBox",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "headbag": [
+    "HeadEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "fishtrophy.deployed": [
+    "FishMount",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "huntingtrophylarge.deployed": [
+    "HuntingTrophy",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "huntingtrophysmall.deployed": [
+    "HuntingTrophy",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "minecart.planter.deployed": [
+    "PlanterBox",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "railroadplanter.deployed": [
+    "PlanterBox",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rockingchair.deployed": [
+    "RockingChair",
+    "BaseChair",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rockingchair.rockingchair2.deployed": [
+    "RockingChair",
+    "BaseChair",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rockingchair.rockingchair3.deployed": [
+    "RockingChair",
+    "BaseChair",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "skinningknife.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "storage_barrel_a": [
+    "BoxStorage",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "storage_barrel_b": [
+    "BoxStorage",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "storage_barrel_c": [
+    "BoxStorage",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "torchholder.deployed": [
+    "TorchDeployableLightSource",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "wantedposter.wantedposter2": [
+    "WantedPoster",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "wantedposter.wantedposter3": [
+    "WantedPoster",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "wantedposter.wantedposter4": [
+    "WantedPoster",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "wantedposter.deployed": [
+    "WantedPoster",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "desert_dwelling_double_a": [
     "NPCDwelling",
     "BaseEntity",
@@ -6690,6 +7082,8 @@
   ],
   "spookyspeaker": [
     "SpookySpeaker",
+    "IOEntity",
+    "DecayEntity",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -6852,6 +7246,282 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "frontiermirror.large": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "frontiermirror.medium": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "frontiermirror.small": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "frontiermirror.standing": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldframe.large": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldframe.medium": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldframe.small": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldframe.standing": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldmirror.large": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldmirror.medium": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldmirror.small": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "goldmirror.standing": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupframe.large": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupframe.medium": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupframe.small": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupframe.standing": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupmirror.large": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupmirror.medium": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupmirror.small": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "lightupmirror.standing": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapframe.large": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapframe.medium": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapframe.small": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapframe.standing": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapmirror.large": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapmirror.medium": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapmirror.small": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "scrapmirror.standing": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "twowaymirror.window": [
+    "SimpleBuildingBlock",
+    "StabilityEntity",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodframe.large": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodframe.medium": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodframe.small": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodframe.standing": [
+    "PhotoFrame",
+    "StorageContainer",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodmirror.large": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodmirror.medium": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodmirror.small": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "woodmirror.standing": [
+    "ReflectionPlane",
+    "DecayEntity",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "orebonus_generic": [
     "OreHotSpot",
     "BaseCombatEntity",
@@ -6859,6 +7529,17 @@
     "BaseNetworkable"
   ],
   "parachute": [
+    "Parachute",
+    "BaseVehicle",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "parachuteunpacked": [
+    "ParachuteUnpacked",
+    "DecayEntity",
+    "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
   ],
@@ -7931,7 +8612,7 @@
   ],
   "ch47.entity": [
     "CH47Helicopter",
-    "BaseHelicopterVehicle",
+    "BaseHelicopter",
     "BaseVehicle",
     "BaseMountable",
     "BaseCombatEntity",
@@ -7941,7 +8622,7 @@
   "ch47scientists.entity": [
     "CH47HelicopterAIController",
     "CH47Helicopter",
-    "BaseHelicopterVehicle",
+    "BaseHelicopter",
     "BaseVehicle",
     "BaseMountable",
     "BaseCombatEntity",
@@ -8062,7 +8743,7 @@
     "BaseNetworkable"
   ],
   "patrolhelicopter": [
-    "BaseHelicopter",
+    "PatrolHelicopter",
     "BaseCombatEntity",
     "BaseEntity",
     "BaseNetworkable"
@@ -8157,6 +8838,22 @@
     "LootableCorpse",
     "BaseCorpse",
     "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "physicsentitycube": [
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "physicsentitycube_maxfriction": [
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "physicsentitycube_maxfriction_heavy": [
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "physicsentitycube_maxfriction_light": [
     "BaseEntity",
     "BaseNetworkable"
   ],
@@ -8301,6 +8998,7 @@
     "BaseNetworkable"
   ],
   "flare.deployed": [
+    "RoadFlare",
     "TimedExplosive",
     "BaseEntity",
     "BaseNetworkable"
@@ -8546,6 +9244,24 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "attackhelidriver": [
+    "AttackHeliDriverSeat",
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "attackheligunner": [
+    "AttackHeliGunnerSeat",
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "copilotseat": [
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
@@ -8671,6 +9387,16 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "parachuteseat": [
+    "ParachuteSeat",
+    "SledSeat",
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "passenger": [
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
@@ -8688,6 +9414,15 @@
     "BaseNetworkable"
   ],
   "pilotseat": [
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "rhibdriver": [
+    "RHIBDriver",
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
     "BaseMountable",
@@ -8771,6 +9506,7 @@
     "BaseNetworkable"
   ],
   "standingdriver": [
+    "SledSeat",
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
     "BaseMountable",
@@ -8817,6 +9553,14 @@
     "BaseNetworkable"
   ],
   "transporthelipilot": [
+    "BaseVehicleSeat",
+    "BaseVehicleMountPoint",
+    "BaseMountable",
+    "BaseCombatEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "tugboatdriver": [
     "BaseVehicleSeat",
     "BaseVehicleMountPoint",
     "BaseMountable",
@@ -9094,6 +9838,13 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "ak47u_diver.entity": [
+    "BaseProjectile",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "ak47u_ice.entity": [
     "BaseProjectile",
     "AttackEntity",
@@ -9185,6 +9936,28 @@
   "crossbow.entity": [
     "CrossbowWeapon",
     "BaseProjectile",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "diver_hatchet.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "diver_pickaxe.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "diver_torch.entity": [
+    "TorchWeapon",
+    "BaseMelee",
     "AttackEntity",
     "HeldEntity",
     "BaseEntity",
@@ -9309,6 +10082,13 @@
     "BaseEntity",
     "BaseNetworkable"
   ],
+  "vampirestake.entity": [
+    "BaseMelee",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
   "hammer.entity": [
     "Hammer",
     "BaseMelee",
@@ -9328,6 +10108,20 @@
     "BaseProjectile",
     "AttackEntity",
     "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "homing_missile_launcher.entity": [
+    "LockOnLauncher",
+    "BaseLauncher",
+    "BaseProjectile",
+    "AttackEntity",
+    "HeldEntity",
+    "BaseEntity",
+    "BaseNetworkable"
+  ],
+  "seekertest": [
+    "SeekerTest",
     "BaseEntity",
     "BaseNetworkable"
   ],

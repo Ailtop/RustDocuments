@@ -9,11 +9,15 @@
   "strobelight": [
     "ItemModEntity"
   ],
+  "attackhelicopter": [],
   "kayak": [
     "ItemModEntity"
   ],
   "rhib": [],
   "rowboat": [
+    "ItemModEntity"
+  ],
+  "tugboat": [
     "ItemModEntity"
   ],
   "minihelicopter.repair": [],
@@ -51,6 +55,7 @@
   "ammo.rocket.basic": [],
   "ammo.rocket.fire": [],
   "ammo.rocket.hv": [],
+  "ammo.rocket.seeker": [],
   "ammo.rocket.smoke": [],
   "ammo.shotgun": [],
   "ammo.shotgun.fire": [],
@@ -188,6 +193,12 @@
     "ItemModWearable"
   ],
   "tactical.gloves": [
+    "ItemModWearable"
+  ],
+  "draculacape": [
+    "ItemModWearable"
+  ],
+  "draculamask": [
     "ItemModWearable"
   ],
   "ghostsheet": [
@@ -376,6 +387,9 @@
   "hazmatsuit.arcticsuit": [
     "ItemModWearable"
   ],
+  "hazmatsuit.diver": [
+    "ItemModWearable"
+  ],
   "hazmatsuit": [
     "ItemModWearable"
   ],
@@ -535,6 +549,9 @@
   "chair.icethrone": [
     "ItemModEntity"
   ],
+  "clantable": [
+    "ItemModEntity"
+  ],
   "composter": [
     "ItemModEntity"
   ],
@@ -548,7 +565,8 @@
     "ItemModEntity"
   ],
   "elevator": [
-    "ItemModEntity"
+    "ItemModEntity",
+    "ItemModChildIO"
   ],
   "fireplace.stone": [
     "ItemModEntity"
@@ -610,8 +628,17 @@
   "furnace": [
     "ItemModEntity"
   ],
+  "weaponrack.light": [
+    "ItemModEntity"
+  ],
+  "weaponrack.doublelight": [
+    "ItemModEntity"
+  ],
   "hitchtroughcombo": [
     "ItemModEntity"
+  ],
+  "hab.armor": [
+    "ItemModHABEquipment"
   ],
   "habrepair": [],
   "jackolantern.angry": [
@@ -971,6 +998,30 @@
   "water.purifier": [
     "ItemModEntity"
   ],
+  "gunrack.horizontal": [
+    "ItemModEntity",
+    "ItemModChildIO"
+  ],
+  "gunrack.single.1.horizontal": [
+    "ItemModEntity"
+  ],
+  "gunrack.single.2.horizontal": [
+    "ItemModEntity"
+  ],
+  "gunrack.single.3.horizontal": [
+    "ItemModEntity"
+  ],
+  "gunrack_stand": [
+    "ItemModEntity"
+  ],
+  "gunrack_tall.horizontal": [
+    "ItemModEntity",
+    "ItemModChildIO"
+  ],
+  "gunrack_wide.horizontal": [
+    "ItemModEntity",
+    "ItemModChildIO"
+  ],
   "generator.wind.scrap": [
     "ItemModEntity"
   ],
@@ -1308,6 +1359,67 @@
   "arcade.machine.chippy": [
     "ItemModEntity"
   ],
+  "door.double.hinged.bardoors": [
+    "ItemModEntity"
+  ],
+  "bathtub.planter": [
+    "ItemModEntity"
+  ],
+  "head.bag": [
+    "ItemModHead",
+    "ItemModAssociatedEntity`1"
+  ],
+  "fishtrophy": [
+    "ItemModEntity"
+  ],
+  "huntingtrophylarge": [
+    "ItemModEntity"
+  ],
+  "huntingtrophysmall": [
+    "ItemModEntity"
+  ],
+  "minecart.planter": [
+    "ItemModEntity"
+  ],
+  "rail.road.planter": [
+    "ItemModEntity"
+  ],
+  "rockingchair": [
+    "ItemModEntity"
+  ],
+  "rockingchair.rockingchair2": [
+    "ItemModEntity"
+  ],
+  "rockingchair.rockingchair3": [
+    "ItemModEntity"
+  ],
+  "knife.skinning": [
+    "ItemModEntity"
+  ],
+  "storage_barrel_a": [
+    "ItemModEntity"
+  ],
+  "storage_barrel_b": [
+    "ItemModEntity"
+  ],
+  "storage_barrel_c": [
+    "ItemModEntity"
+  ],
+  "torchholder": [
+    "ItemModEntity"
+  ],
+  "wantedposter.wantedposter2": [
+    "ItemModEntity"
+  ],
+  "wantedposter.wantedposter3": [
+    "ItemModEntity"
+  ],
+  "wantedposter.wantedposter4": [
+    "ItemModEntity"
+  ],
+  "wantedposter": [
+    "ItemModEntity"
+  ],
   "bluedogtags": [],
   "dogtagneutral": [],
   "reddogtags": [],
@@ -1501,6 +1613,117 @@
   "redidtag": [],
   "whiteidtag": [],
   "yellowidtag": [],
+  "frontiermirror.large": [
+    "ItemModEntity"
+  ],
+  "frontiermirror.medium": [
+    "ItemModEntity"
+  ],
+  "frontiermirror.small": [
+    "ItemModEntity"
+  ],
+  "frontiermirror.standing": [
+    "ItemModEntity"
+  ],
+  "goldframe.large": [
+    "ItemModEntity"
+  ],
+  "goldframe.medium": [
+    "ItemModEntity"
+  ],
+  "goldframe.small": [
+    "ItemModEntity"
+  ],
+  "goldframe.standing": [
+    "ItemModEntity"
+  ],
+  "goldmirror.large": [
+    "ItemModEntity"
+  ],
+  "goldmirror.medium": [
+    "ItemModEntity"
+  ],
+  "goldmirror.small": [
+    "ItemModEntity"
+  ],
+  "goldmirror.standing": [
+    "ItemModEntity"
+  ],
+  "lightup.large": [
+    "ItemModEntity"
+  ],
+  "lightupframe.medium": [
+    "ItemModEntity"
+  ],
+  "lightupframe.small": [
+    "ItemModEntity"
+  ],
+  "lightupframe.standing": [
+    "ItemModEntity"
+  ],
+  "lightupmirror.large": [
+    "ItemModEntity"
+  ],
+  "lightupmirror.medium": [
+    "ItemModEntity"
+  ],
+  "lightupmirror.small": [
+    "ItemModEntity"
+  ],
+  "lightupmirror.standing": [
+    "ItemModEntity"
+  ],
+  "scrapframe.large": [
+    "ItemModEntity"
+  ],
+  "scrapframe.medium": [
+    "ItemModEntity"
+  ],
+  "scrapframe.small": [
+    "ItemModEntity"
+  ],
+  "scrapframe.standing": [
+    "ItemModEntity"
+  ],
+  "scrapmirror.large": [
+    "ItemModEntity"
+  ],
+  "scrapmirror.medium": [
+    "ItemModEntity"
+  ],
+  "scrapmirror.small": [
+    "ItemModEntity"
+  ],
+  "scrapmirror.standing": [
+    "ItemModEntity"
+  ],
+  "twowaymirror.window": [
+    "ItemModEntity"
+  ],
+  "woodframe.large": [
+    "ItemModEntity"
+  ],
+  "woodframe.medium": [
+    "ItemModEntity"
+  ],
+  "woodframe.small": [
+    "ItemModEntity"
+  ],
+  "woodframe.standing": [
+    "ItemModEntity"
+  ],
+  "woodmirror.large": [
+    "ItemModEntity"
+  ],
+  "woodmirror.medium": [
+    "ItemModEntity"
+  ],
+  "woodmirror.small": [
+    "ItemModEntity"
+  ],
+  "woodmirror.standing": [
+    "ItemModEntity"
+  ],
   "movembermoustachecard": [
     "ItemModWearable"
   ],
@@ -1508,6 +1731,14 @@
     "ItemModWearable"
   ],
   "note": [],
+  "parachute.deployed": [
+    "ItemModWearable"
+  ],
+  "parachute": [
+    "ItemModWearable",
+    "ItemModParachute",
+    "ItemModBackpack"
+  ],
   "factorydoor": [
     "ItemModEntity"
   ],
@@ -2322,7 +2553,13 @@
   ],
   "rifle.ak": [
     "ItemModEntity",
-    "ItemModContainer"
+    "ItemModContainer",
+    "ItemModRackMountable"
+  ],
+  "rifle.ak.diver": [
+    "ItemModEntity",
+    "ItemModContainer",
+    "ItemModRackMountable"
   ],
   "rifle.ak.ice": [
     "ItemModEntity",
@@ -2364,6 +2601,15 @@
   "crossbow": [
     "ItemModEntity",
     "ItemModContainer"
+  ],
+  "diverhatchet": [
+    "ItemModEntity"
+  ],
+  "diverpickaxe": [
+    "ItemModEntity"
+  ],
+  "divertorch": [
+    "ItemModEntity"
   ],
   "shotgun.double": [
     "ItemModEntity",
@@ -2408,6 +2654,9 @@
   "skull": [
     "ItemModEntity"
   ],
+  "vampire.stake": [
+    "ItemModEntity"
+  ],
   "hammer": [
     "ItemModEntity"
   ],
@@ -2417,6 +2666,9 @@
   "hmlmg": [
     "ItemModEntity",
     "ItemModContainer"
+  ],
+  "homingmissile.launcher": [
+    "ItemModEntity"
   ],
   "knife.combat": [
     "ItemModEntity"
@@ -2435,7 +2687,8 @@
   ],
   "rifle.m39": [
     "ItemModEntity",
-    "ItemModContainer"
+    "ItemModContainer",
+    "ItemModRackMountable"
   ],
   "pistol.m92": [
     "ItemModEntity",
